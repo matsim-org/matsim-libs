@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.freight.carriers.carrier.CarrierUtils;
-import org.matsim.freight.carriers.carrier.Carriers;
+import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCostsFactory;
 import org.matsim.freight.carriers.jsprit.VRPTransportCostsFactory;
 import org.matsim.core.config.Config;
@@ -92,7 +92,7 @@ public class JointDemandModule extends AbstractModule {
         }
 
         public Carriers get() {
-            return CarrierUtils.getCarriers(this.scenario);
+            return CarriersUtils.getCarriers(this.scenario);
         }
     }
 

@@ -36,17 +36,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.freight.carriers.carrier.Carrier;
-import org.matsim.freight.carriers.carrier.CarrierPlanWriter;
-import org.matsim.freight.carriers.carrier.CarrierService;
-import org.matsim.freight.carriers.carrier.CarrierUtils;
-import org.matsim.freight.carriers.carrier.CarrierVehicle;
-import org.matsim.freight.carriers.carrier.CarrierVehicleTypes;
-import org.matsim.freight.carriers.carrier.Carriers;
-import org.matsim.freight.carriers.carrier.CarrierConstants;
-import org.matsim.freight.carriers.carrier.ScheduledTour;
-import org.matsim.freight.carriers.carrier.TimeWindow;
-import org.matsim.freight.carriers.carrier.Tour;
+import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.jsprit.VRPTransportCostsFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
@@ -127,7 +117,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 		if (!scenario.getVehicles().getVehicleTypes().containsKey(carrierVehicle.getType().getId()))
 			scenario.getVehicles().addVehicleType(carrierVehicle.getType());
 		Id<Vehicle> vid = Id.createVehicleId(driverPerson.getId());
-		VehicleUtils.insertVehicleIdsIntoAttributes(driverPerson, Map.of(CarrierUtils.getCarrierMode(carrier), vid));
+		VehicleUtils.insertVehicleIdsIntoAttributes(driverPerson, Map.of(CarriersUtils.getCarrierMode(carrier), vid));
 		scenario.getVehicles()
 				.addVehicle(scenario.getVehicles().getFactory().createVehicle(vid, carrierVehicle.getType()));
 		freightVehicles.add(vid);
@@ -211,7 +201,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 	 */
 	private Plan createPlainPlanFromTour(Carrier carrier, ScheduledTour scheduledTour) {
 
-		String carrierMode = CarrierUtils.getCarrierMode(carrier);
+		String carrierMode = CarriersUtils.getCarrierMode(carrier);
 
 		// Create empty plan
 		Plan plan = PopulationUtils.createPlan();

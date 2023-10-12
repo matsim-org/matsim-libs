@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.freight.carriers.carrier.*;
-import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -63,14 +63,14 @@ final class FreightScenarioCreator {
 
         for(int i=1;i<10;i++){
             Id<Link> homeId = Id.createLinkId("i("+i+",9)R");
-            Carrier carrier = CarrierUtils.createCarrier(Id.create(agentCounter,Carrier.class ) );
+            Carrier carrier = CarriersUtils.createCarrier(Id.create(agentCounter,Carrier.class ) );
             createFleet(homeId, carrier);
             createCustomers(carrier,scenario.getNetwork());
             agentCounter++;
             carriers.addCarrier(carrier);
 
             Id<Link> homeIdR = Id.createLinkId("i("+i+",0)");
-            Carrier carrier_ = CarrierUtils.createCarrier(Id.create(agentCounter,Carrier.class ) );
+            Carrier carrier_ = CarriersUtils.createCarrier(Id.create(agentCounter,Carrier.class ) );
             createFleet(homeIdR, carrier_);
             createCustomers(carrier_,scenario.getNetwork());
             agentCounter++;
@@ -79,14 +79,14 @@ final class FreightScenarioCreator {
 
         for(int i=1;i<10;i++){
             Id<Link> homeId = Id.createLinkId("j(0,"+i+")R");
-            Carrier carrier = CarrierUtils.createCarrier(Id.create(agentCounter,Carrier.class ) );
+            Carrier carrier = CarriersUtils.createCarrier(Id.create(agentCounter,Carrier.class ) );
             createFleet(homeId, carrier);
             createCustomers(carrier,scenario.getNetwork());
             agentCounter++;
             carriers.addCarrier(carrier);
 
             Id<Link> homeIdR = Id.createLinkId("j(9,"+i+")");
-            Carrier carrier_ = CarrierUtils.createCarrier(Id.create(agentCounter,Carrier.class ) );
+            Carrier carrier_ = CarriersUtils.createCarrier(Id.create(agentCounter,Carrier.class ) );
             createFleet(homeIdR, carrier_);
             createCustomers(carrier_,scenario.getNetwork());
             agentCounter++;
@@ -106,7 +106,7 @@ final class FreightScenarioCreator {
             serviceBuilder.setServiceDuration(5*60);
             serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(6*60*60, 15*60*60));
             CarrierService carrierService = serviceBuilder.build();
-            CarrierUtils.addService(carrier, carrierService);
+            CarriersUtils.addService(carrier, carrierService);
         }
     }
 
@@ -150,15 +150,15 @@ final class FreightScenarioCreator {
 
         //light
         CarrierVehicle carrierVehicle_lightA = createLightVehicle(carrier.getId(), homeId, "a");
-        CarrierUtils.addCarrierVehicle(carrier, carrierVehicle_lightA);
+        CarriersUtils.addCarrierVehicle(carrier, carrierVehicle_lightA);
         CarrierVehicle carrierVehicle_lightB = createLightVehicle(carrier.getId(), oppositeId, "b");
-        CarrierUtils.addCarrierVehicle(carrier, carrierVehicle_lightB);
+        CarriersUtils.addCarrierVehicle(carrier, carrierVehicle_lightB);
 
         //heavy
         CarrierVehicle carrierVehicle_heavyA = createHeavyVehicle(carrier.getId(), homeId, "a");
-        CarrierUtils.addCarrierVehicle(carrier, carrierVehicle_heavyA);
+        CarriersUtils.addCarrierVehicle(carrier, carrierVehicle_heavyA);
         CarrierVehicle carrierVehicle_heavyB = createHeavyVehicle(carrier.getId(), oppositeId, "b");
-        CarrierUtils.addCarrierVehicle(carrier, carrierVehicle_heavyB);
+        CarriersUtils.addCarrierVehicle(carrier, carrierVehicle_heavyB);
 
         carrier.getCarrierCapabilities().setFleetSize(FleetSize.INFINITE);
     }

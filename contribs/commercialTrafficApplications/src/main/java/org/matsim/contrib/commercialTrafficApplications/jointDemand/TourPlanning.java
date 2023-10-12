@@ -31,10 +31,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.freight.carriers.carrier.Carrier;
-import org.matsim.freight.carriers.carrier.CarrierPlan;
-import org.matsim.freight.carriers.carrier.CarrierUtils;
-import org.matsim.freight.carriers.carrier.Carriers;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierPlan;
+import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.VRPTransportCosts;
@@ -153,7 +153,7 @@ class TourPlanning {
 				log.info("setting maxIterations=1 as carrier has no services");
 				algorithm.setMaxIterations(1);
 			} else {
-				algorithm.setMaxIterations(CarrierUtils.getJspritIterations(carrier));
+				algorithm.setMaxIterations(CarriersUtils.getJspritIterations(carrier));
 			}
 
 			// variationCoefficient = stdDeviation/mean. so i set the threshold rather soft

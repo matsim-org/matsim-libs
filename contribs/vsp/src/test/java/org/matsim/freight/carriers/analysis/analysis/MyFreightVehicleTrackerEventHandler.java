@@ -24,8 +24,7 @@ package org.matsim.freight.carriers.analysis.analysis;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.freight.carriers.analysis.analysis.FreightAnalysisVehicleTracking;
-import org.matsim.freight.carriers.carrier.Carriers;
+import org.matsim.freight.carriers.Carriers;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 

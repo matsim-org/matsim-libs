@@ -45,9 +45,8 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.carrier.*;
-import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts.Builder;
@@ -83,18 +82,18 @@ public class CarrierControlerUtilsTest {
 
 		//Create carrier with services and shipments
 		Carriers carriersWithServicesAndShpiments = new Carriers();
-		carrierWServices = CarrierUtils.createCarrier(CARRIER_SERVICES_ID );
+		carrierWServices = CarriersUtils.createCarrier(CARRIER_SERVICES_ID );
 		CarrierService service1 = createMatsimService("Service1", "i(3,9)", 2);
-		CarrierUtils.addService(carrierWServices, service1);
+		CarriersUtils.addService(carrierWServices, service1);
 		CarrierService service2 = createMatsimService("Service2", "i(4,9)", 2);
-		CarrierUtils.addService(carrierWServices, service2);
+		CarriersUtils.addService(carrierWServices, service2);
 
 		//Create carrier with shipments
-		carrierWShipments = CarrierUtils.createCarrier(CARRIER_SHIPMENTS_ID );
+		carrierWShipments = CarriersUtils.createCarrier(CARRIER_SHIPMENTS_ID );
 		CarrierShipment shipment1 = createMatsimShipment("shipment1", "i(1,0)", "i(7,6)R", 1);
-		CarrierUtils.addShipment(carrierWShipments, shipment1);
+		CarriersUtils.addShipment(carrierWShipments, shipment1);
 		CarrierShipment shipment2 = createMatsimShipment("shipment2", "i(3,0)", "i(3,7)", 2);
-		CarrierUtils.addShipment(carrierWShipments, shipment2);
+		CarriersUtils.addShipment(carrierWShipments, shipment2);
 
 		//Create vehicle for Carriers
 		final Id<VehicleType> vehicleTypeId = Id.create( "gridType", VehicleType.class );
@@ -107,7 +106,7 @@ public class CarrierControlerUtilsTest {
 		costInfo.setCostsPerMeter( 0.0001 ) ;
 		costInfo.setCostsPerSecond( 0.001 ) ;
 		costInfo.setFixedCost( 130. ) ;
-//		VehicleType carrierVehType = CarrierUtils.CarrierVehicleTypeBuilder.newInstance( vehicleTypeId )
+//		VehicleType carrierVehType = CarriersUtils.CarrierVehicleTypeBuilder.newInstance( vehicleTypeId )
 		carrierVehType.setMaximumVelocity( 10. ) ;
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
 		vehicleTypes.getVehicleTypes().put(carrierVehType.getId(), carrierVehType);
@@ -156,7 +155,7 @@ public class CarrierControlerUtilsTest {
 		 */
 
 		//Convert to jsprit VRP
-		Carriers carriersWithShipmentsOnly = CarrierUtils.createShipmentVRPCarrierFromServiceVRPSolution(carriersWithServicesAndShpiments);
+		Carriers carriersWithShipmentsOnly = CarriersUtils.createShipmentVRPCarrierFromServiceVRPSolution(carriersWithServicesAndShpiments);
 		carrierWShipmentsOnlyFromCarrierWServices = carriersWithShipmentsOnly.getCarriers().get(CARRIER_SERVICES_ID);		//with converted Service
 		carrierWShipmentsOnlyFromCarrierWShipments = carriersWithShipmentsOnly.getCarriers().get(CARRIER_SHIPMENTS_ID);		//with copied Shipments
 
@@ -244,7 +243,7 @@ public class CarrierControlerUtilsTest {
 	public void copiingOfShipmentsIsDoneCorrectly() {
 		boolean foundShipment1 = false;
 		boolean foundShipment2 = false;
-		CarrierShipment carrierShipment1 = CarrierUtils.getShipment(carrierWShipmentsOnlyFromCarrierWShipments, Id.create("shipment1", CarrierShipment.class));
+		CarrierShipment carrierShipment1 = CarriersUtils.getShipment(carrierWShipmentsOnlyFromCarrierWShipments, Id.create("shipment1", CarrierShipment.class));
 		assert carrierShipment1 != null;
 		if (carrierShipment1.getId() == Id.create("shipment1", CarrierShipment.class)) {
 				System.out.println("Found Shipment1");
@@ -259,7 +258,7 @@ public class CarrierControlerUtilsTest {
 				Assert.assertEquals(0.0, carrierShipment1.getPickupTimeWindow().getStart(), 0);
 				Assert.assertEquals(7200.0, carrierShipment1.getPickupTimeWindow().getEnd(), 0);
 			}
-		CarrierShipment carrierShipment2 = CarrierUtils.getShipment(carrierWShipmentsOnlyFromCarrierWShipments, Id.create("shipment2", CarrierShipment.class));
+		CarrierShipment carrierShipment2 = CarriersUtils.getShipment(carrierWShipmentsOnlyFromCarrierWShipments, Id.create("shipment2", CarrierShipment.class));
 		assert carrierShipment2 != null;
 		if (carrierShipment2.getId() == Id.create("shipment2", CarrierShipment.class)) {
 				System.out.println("Found Shipment2");
@@ -283,7 +282,7 @@ public class CarrierControlerUtilsTest {
 	public void convertionOfServicesIsDoneCorrectly() {
 		boolean foundSercice1 = false;
 		boolean foundService2 = false;
-		CarrierShipment carrierShipment1 = CarrierUtils.getShipment(carrierWShipmentsOnlyFromCarrierWServices, Id.create("Service1", CarrierShipment.class));
+		CarrierShipment carrierShipment1 = CarriersUtils.getShipment(carrierWShipmentsOnlyFromCarrierWServices, Id.create("Service1", CarrierShipment.class));
 		assert carrierShipment1 != null;
 		if (carrierShipment1.getId() == Id.create("Service1", CarrierShipment.class)) {
 				foundSercice1 = true;
@@ -297,7 +296,7 @@ public class CarrierControlerUtilsTest {
 				Assert.assertEquals(0.0, carrierShipment1.getPickupTimeWindow().getStart(), 0);
 				Assert.assertEquals(36001.0, carrierShipment1.getPickupTimeWindow().getEnd(), 0);
 			}
-		CarrierShipment carrierShipment2 = CarrierUtils.getShipment(carrierWShipmentsOnlyFromCarrierWServices, Id.create("Service2", CarrierShipment.class));
+		CarrierShipment carrierShipment2 = CarriersUtils.getShipment(carrierWShipmentsOnlyFromCarrierWServices, Id.create("Service2", CarrierShipment.class));
 		assert carrierShipment2 != null;
 		if (carrierShipment2.getId() == Id.create("Service2", CarrierShipment.class)) {
 				foundService2 = true;
@@ -321,11 +320,11 @@ public class CarrierControlerUtilsTest {
 	*/
 	@Test(expected=UnsupportedOperationException.class)
 	public void exceptionIsThrownWhenUsingMixedShipmentsAndServices() {
-		Carrier carrierMixedWServicesAndShipments = CarrierUtils.createCarrier(Id.create("CarrierMixed", Carrier.class ) );
+		Carrier carrierMixedWServicesAndShipments = CarriersUtils.createCarrier(Id.create("CarrierMixed", Carrier.class ) );
 		CarrierService service1 = createMatsimService("Service1", "i(3,9)", 2);
-		CarrierUtils.addService(carrierMixedWServicesAndShipments, service1);
+		CarriersUtils.addService(carrierMixedWServicesAndShipments, service1);
 		CarrierShipment shipment1 = createMatsimShipment("shipment1", "i(1,0)", "i(7,6)R", 1);
-		CarrierUtils.addShipment(carrierMixedWServicesAndShipments, shipment1);
+		CarriersUtils.addShipment(carrierMixedWServicesAndShipments, shipment1);
 
         Network network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(network).readFile(testUtils.getPackageInputDirectory() + "grid-network.xml");
@@ -365,15 +364,15 @@ public class CarrierControlerUtilsTest {
 	public void testAddVehicleTypeSkill(){
 		VehiclesFactory factory = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getVehicles().getFactory();
 		VehicleType type = factory.createVehicleType(Id.create("test", VehicleType.class));
-		Assert.assertFalse("Should not have skill.", CarrierUtils.hasSkill(type, "testSkill"));
+		Assert.assertFalse("Should not have skill.", CarriersUtils.hasSkill(type, "testSkill"));
 
-		CarrierUtils.addSkill(type, "testSkillOne");
-		Assert.assertTrue("Should have skill 'testSkillOne'.", CarrierUtils.hasSkill(type, "testSkillOne"));
+		CarriersUtils.addSkill(type, "testSkillOne");
+		Assert.assertTrue("Should have skill 'testSkillOne'.", CarriersUtils.hasSkill(type, "testSkillOne"));
 
 
-		CarrierUtils.addSkill(type, "testSkillTwo");
-		Assert.assertTrue("Should have skill 'testSkillOne'.", CarrierUtils.hasSkill(type, "testSkillOne"));
-		Assert.assertTrue("Should have skill 'testSkillTwo'.", CarrierUtils.hasSkill(type, "testSkillTwo"));
+		CarriersUtils.addSkill(type, "testSkillTwo");
+		Assert.assertTrue("Should have skill 'testSkillOne'.", CarriersUtils.hasSkill(type, "testSkillOne"));
+		Assert.assertTrue("Should have skill 'testSkillTwo'.", CarriersUtils.hasSkill(type, "testSkillTwo"));
 	}
 
 	@Test
@@ -381,15 +380,15 @@ public class CarrierControlerUtilsTest {
 		CarrierShipment shipment = CarrierShipment.Builder.newInstance(
 				Id.create("testShipment", CarrierShipment.class), Id.createLinkId("1"), Id.createLinkId("2"), 1)
 				.build();
-		Assert.assertFalse("Should not have skill.", CarrierUtils.hasSkill(shipment, "testSkill"));
+		Assert.assertFalse("Should not have skill.", CarriersUtils.hasSkill(shipment, "testSkill"));
 
-		CarrierUtils.addSkill(shipment, "testSkillOne");
-		Assert.assertTrue("Should have skill 'testSkillOne'.", CarrierUtils.hasSkill(shipment, "testSkillOne"));
+		CarriersUtils.addSkill(shipment, "testSkillOne");
+		Assert.assertTrue("Should have skill 'testSkillOne'.", CarriersUtils.hasSkill(shipment, "testSkillOne"));
 
 
-		CarrierUtils.addSkill(shipment, "testSkillTwo");
-		Assert.assertTrue("Should have skill 'testSkillOne'.", CarrierUtils.hasSkill(shipment, "testSkillOne"));
-		Assert.assertTrue("Should have skill 'testSkillTwo'.", CarrierUtils.hasSkill(shipment, "testSkillTwo"));
+		CarriersUtils.addSkill(shipment, "testSkillTwo");
+		Assert.assertTrue("Should have skill 'testSkillOne'.", CarriersUtils.hasSkill(shipment, "testSkillOne"));
+		Assert.assertTrue("Should have skill 'testSkillTwo'.", CarriersUtils.hasSkill(shipment, "testSkillTwo"));
 	}
 
 	@Test
@@ -397,15 +396,15 @@ public class CarrierControlerUtilsTest {
 		CarrierService service = CarrierService.Builder.newInstance(
 				Id.create("testShipment", CarrierService.class), Id.createLinkId("2"))
 				.build();
-		Assert.assertFalse("Should not have skill.", CarrierUtils.hasSkill(service, "testSkill"));
+		Assert.assertFalse("Should not have skill.", CarriersUtils.hasSkill(service, "testSkill"));
 
-		CarrierUtils.addSkill(service, "testSkillOne");
-		Assert.assertTrue("Should have skill 'testSkillOne'.", CarrierUtils.hasSkill(service, "testSkillOne"));
+		CarriersUtils.addSkill(service, "testSkillOne");
+		Assert.assertTrue("Should have skill 'testSkillOne'.", CarriersUtils.hasSkill(service, "testSkillOne"));
 
 
-		CarrierUtils.addSkill(service, "testSkillTwo");
-		Assert.assertTrue("Should have skill 'testSkillOne'.", CarrierUtils.hasSkill(service, "testSkillOne"));
-		Assert.assertTrue("Should have skill 'testSkillTwo'.", CarrierUtils.hasSkill(service, "testSkillTwo"));
+		CarriersUtils.addSkill(service, "testSkillTwo");
+		Assert.assertTrue("Should have skill 'testSkillOne'.", CarriersUtils.hasSkill(service, "testSkillOne"));
+		Assert.assertTrue("Should have skill 'testSkillTwo'.", CarriersUtils.hasSkill(service, "testSkillTwo"));
 	}
 
 	@Test
@@ -421,11 +420,11 @@ public class CarrierControlerUtilsTest {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		CarrierUtils.loadCarriersAccordingToFreightConfig(scenario );
+		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario );
 		Controler controler = new Controler(scenario);
 
 		try {
-			CarrierUtils.runJsprit(scenario);
+			CarriersUtils.runJsprit(scenario);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail();
@@ -443,15 +442,15 @@ public class CarrierControlerUtilsTest {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		CarrierUtils.loadCarriersAccordingToFreightConfig(scenario);
+		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
 
 		//remove all attributes --> remove the NumberOfJspritIterations attribute to trigger exception
-		Carriers carriers = CarrierUtils.getCarriers(scenario);
+		Carriers carriers = CarriersUtils.getCarriers(scenario);
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			carrier.getAttributes().clear();
 		}
 
-		CarrierUtils.runJsprit(scenario);
+		CarriersUtils.runJsprit(scenario);
 	}
 
 	/**
@@ -462,10 +461,10 @@ public class CarrierControlerUtilsTest {
 		Config config = prepareConfig();
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		CarrierUtils.loadCarriersAccordingToFreightConfig(scenario);
+		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
 
 		try {
-			CarrierUtils.runJsprit(scenario);
+			CarriersUtils.runJsprit(scenario);
 		} catch (Exception e) {
 			Assert.fail();
 		}

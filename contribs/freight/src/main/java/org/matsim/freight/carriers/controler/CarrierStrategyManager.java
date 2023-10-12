@@ -23,8 +23,8 @@ package org.matsim.freight.carriers.controler;
 
 import com.google.inject.Provider;
 import org.matsim.core.replanning.GenericStrategyManager;
-import org.matsim.freight.carriers.carrier.Carrier;
-import org.matsim.freight.carriers.carrier.CarrierPlan;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierPlan;
 
 /**
  * The current (jul'22) logic of this is: <ul>

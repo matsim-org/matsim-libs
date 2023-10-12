@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.carrier.Carrier;
-import org.matsim.freight.carriers.carrier.CarrierUtils;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -96,9 +96,9 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		}
 
 		freightCarriersConfigGroup.setCarriersFile(carriersWOSolutionFileLocation);
-		CarrierUtils.loadCarriersAccordingToFreightConfig(scenarioWOSolution);
+		CarriersUtils.loadCarriersAccordingToFreightConfig(scenarioWOSolution);
 		freightCarriersConfigGroup.setCarriersFile(carriersWSolutionFileLocation);
-		CarrierUtils.loadCarriersAccordingToFreightConfig(scenarioWSolution);
+		CarriersUtils.loadCarriersAccordingToFreightConfig(scenarioWSolution);
 
 		assert population != null;
 		for (Person person : population.getPersons().values()) {
@@ -109,10 +109,10 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 			Assert.assertTrue(person.getAttributes().getAsMap().containsKey("purpose"));
 		}
 
-		Assert.assertEquals(CarrierUtils.addOrGetCarriers(scenarioWSolution).getCarriers().size(),
-				CarrierUtils.addOrGetCarriers(scenarioWOSolution).getCarriers().size(), 0);
+		Assert.assertEquals(CarriersUtils.addOrGetCarriers(scenarioWSolution).getCarriers().size(),
+				CarriersUtils.addOrGetCarriers(scenarioWOSolution).getCarriers().size(), 0);
 		int countedTours = 0;
-		for (Carrier carrier_withSolution : CarrierUtils.addOrGetCarriers(scenarioWSolution).getCarriers().values()) {
+		for (Carrier carrier_withSolution : CarriersUtils.addOrGetCarriers(scenarioWSolution).getCarriers().values()) {
 			countedTours += carrier_withSolution.getSelectedPlan().getScheduledTours().size();
 		}
 		Assert.assertEquals(population.getPersons().size(), countedTours, 0);

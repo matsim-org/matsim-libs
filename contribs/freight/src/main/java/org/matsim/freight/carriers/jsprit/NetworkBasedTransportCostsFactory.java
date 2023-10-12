@@ -27,7 +27,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.carrier.Carriers;
+import org.matsim.freight.carriers.Carriers;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.HashSet;

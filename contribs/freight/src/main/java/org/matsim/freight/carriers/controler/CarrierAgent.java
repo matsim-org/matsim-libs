@@ -31,9 +31,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.freight.carriers.carrier.*;
-import org.matsim.freight.carriers.carrier.Tour.TourActivity;
-import org.matsim.freight.carriers.carrier.Tour.TourElement;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.Tour.TourActivity;
+import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.carriers.events.CarrierEventCreator;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
@@ -114,7 +114,7 @@ final class CarrierAgent implements Identifiable<Carrier>
 					// to "prepareForSim" for carriers.  Did not check any further.  kai, jul'22
 
 					//this returns TransportMode.car if the attribute is null
-					Leg leg = PopulationUtils.createLeg(CarrierUtils.getCarrierMode(carrier));
+					Leg leg = PopulationUtils.createLeg(CarriersUtils.getCarrierMode(carrier));
 
 					//TODO we might need to set the route to null if the mode is a drt mode
 					leg.setRoute(route);
@@ -136,7 +136,7 @@ final class CarrierAgent implements Identifiable<Carrier>
 			plan.addActivity(endActivity);
 			driverPerson.addPlan(plan);
 			plan.setPerson(driverPerson);
-			CarrierUtils.putVehicle( plan, vehicle );
+			CarriersUtils.putVehicle( plan, vehicle );
 			routes.add(plan);
 			carrierDriverAgents.put(driverId, carrierDriverAgent);
 		}

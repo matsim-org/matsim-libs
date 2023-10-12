@@ -36,8 +36,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.carrier.*;
+import org.matsim.freight.carriers.*;
 
 import java.util.List;
 
@@ -98,7 +97,7 @@ public final class CarrierModule extends AbstractModule {
 		bind( CarrierStrategyManager.class ).toProvider( () -> null );
 		// (the null binding means that a zeroth iteration will run. kai, jul'22)
 
-		this.addControlerListenerBinding().toInstance((ShutdownListener) event -> writeAdditionalRunOutput( event.getServices().getControlerIO(), event.getServices().getConfig(), CarrierUtils.getCarriers( event.getServices().getScenario() ) ));
+		this.addControlerListenerBinding().toInstance((ShutdownListener) event -> writeAdditionalRunOutput( event.getServices().getControlerIO(), event.getServices().getConfig(), CarriersUtils.getCarriers( event.getServices().getScenario() ) ));
 
 	}
 
@@ -146,7 +145,7 @@ public final class CarrierModule extends AbstractModule {
 	private static class CarrierProvider implements Provider<Carriers> {
 		@Inject Scenario scenario;
 		@Override public Carriers get() {
-			return CarrierUtils.getCarriers(scenario);
+			return CarriersUtils.getCarriers(scenario);
 		}
 	}
 }

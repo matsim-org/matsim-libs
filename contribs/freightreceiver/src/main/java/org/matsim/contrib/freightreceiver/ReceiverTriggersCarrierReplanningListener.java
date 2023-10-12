@@ -25,7 +25,7 @@ import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
 import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.freight.carriers.carrier.*;
+import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.NetworkRouter;
@@ -60,7 +60,7 @@ class ReceiverTriggersCarrierReplanningListener implements IterationStartsListen
         CollaborationUtils.setCoalitionFromReceiverAttributes( sc );
 
         // clean out plans, services, shipments from carriers:
-        Map<Id<Carrier>, Carrier> carriers = CarrierUtils.getCarriers(sc).getCarriers();
+        Map<Id<Carrier>, Carrier> carriers = CarriersUtils.getCarriers(sc).getCarriers();
         for( Carrier carrier : carriers.values() ){
             carrier.clearPlans();
             carrier.getShipments().clear();
@@ -121,7 +121,7 @@ class ReceiverTriggersCarrierReplanningListener implements IterationStartsListen
         String outputdirectory = sc.getConfig().controller().getOutputDirectory();
         outputdirectory += outputdirectory.endsWith("/") ? "" : "/";
 //        new CarrierPlanWriter(CarrierControlerUtils.getCarriers(sc)).write(outputdirectory + ReceiverConfigGroup.CARRIERS_FILE);
-        new CarrierPlanWriter(CarrierUtils.getCarriers(sc)).write(outputdirectory +receiverConfig.getCarriersFile() );
+        new CarrierPlanWriter(CarriersUtils.getCarriers(sc)).write(outputdirectory +receiverConfig.getCarriersFile() );
 //        new ReceiversWriter( ReceiverUtils.getReceivers( sc ) ).write(outputdirectory + ReceiverConfigGroup.RECEIVERS_FILE);
         new ReceiversWriter( ReceiverUtils.getReceivers( sc ) ).write(outputdirectory + receiverConfig.getReceiversFile());
     }

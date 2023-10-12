@@ -36,10 +36,10 @@ import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.ActivityScoring;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.LegScoring;
-import org.matsim.freight.carriers.carrier.Carrier;
-import org.matsim.freight.carriers.carrier.CarrierConstants;
-import org.matsim.freight.carriers.carrier.CarrierUtils;
-import org.matsim.freight.carriers.carrier.CarrierVehicle;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierConstants;
+import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.CarrierVehicle;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.vehicles.Vehicle;
 
@@ -97,7 +97,7 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 				if(currentLeg.getRoute() instanceof NetworkRoute){
 					NetworkRoute nRoute = (NetworkRoute) currentLeg.getRoute();
 					Id<Vehicle> vehicleId = nRoute.getVehicleId();
-					CarrierVehicle vehicle = CarrierUtils.getCarrierVehicle(carrier, vehicleId);
+					CarrierVehicle vehicle = CarriersUtils.getCarrierVehicle(carrier, vehicleId);
 					assert vehicle != null : "cannot find vehicle with id=" + vehicleId;
 					if(!employedVehicles.contains(vehicle)){
 						employedVehicles.add(vehicle);

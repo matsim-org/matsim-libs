@@ -38,8 +38,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.freight.carriers.carrier.*;
-import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -325,7 +325,7 @@ public class MatsimTransformerTest {
 		VehicleRoutingProblem vehicleRoutingProblem = VehicleRoutingProblem.Builder.newInstance().addAllJobs(services1)
 				.addAllJobs(services2).addVehicle(v1).addVehicle(v2).build();
 
-		CarrierPlan plan = new CarrierPlan(CarrierUtils.createCarrier(Id.create("myCarrier", Carrier.class)), sTours);
+		CarrierPlan plan = new CarrierPlan(CarriersUtils.createCarrier(Id.create("myCarrier", Carrier.class)), sTours);
 		plan.setScore(-100.0);
 		VehicleRoutingProblemSolution solution = MatsimJspritFactory.createSolution(plan, vehicleRoutingProblem);
 		assertNotNull(solution);
@@ -383,7 +383,7 @@ public class MatsimTransformerTest {
 //		EngineInformation engineInformation = new EngineInformation();
 //		engineInformation.setFuelType( FuelType.diesel );
 //		engineInformation.setFuelConsumption( (double) 15 );
-//		CarrierUtils.CarrierVehicleTypeBuilder builder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance( Id.create( "matsimType", VehicleType.class ) )
+//		CarriersUtils.CarrierVehicleTypeBuilder builder = CarriersUtils.CarrierVehicleTypeBuilder.newInstance( Id.create( "matsimType", VehicleType.class ) )
 		VehicleType vehicleType = VehicleUtils.getFactory()
 				.createVehicleType(Id.create("matsimType", VehicleType.class)).setMaximumVelocity(13.8);
 		vehicleType.getCapacity().setOther(50);
@@ -514,7 +514,7 @@ public class MatsimTransformerTest {
 	}
 
 	private Carrier createCarrierWithServices() {
-		Carrier carrier = CarrierUtils.createCarrier(Id.create("TestCarrier", Carrier.class));
+		Carrier carrier = CarriersUtils.createCarrier(Id.create("TestCarrier", Carrier.class));
 		VehicleType matsimType = getMatsimVehicleType();
 		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance()
 				.addVehicle(getMatsimVehicle("matsimVehicle", "i(6,0)", matsimType)).setFleetSize(FleetSize.INFINITE);
@@ -522,24 +522,24 @@ public class MatsimTransformerTest {
 		CarrierService carrierService1 = CarrierService.Builder
 				.newInstance(Id.create("serviceId", CarrierService.class), Id.create("i(7,4)R", Link.class))
 				.setCapacityDemand(20).setServiceDuration(10.0).build();
-		CarrierUtils.addService(carrier, carrierService1);
+		CarriersUtils.addService(carrier, carrierService1);
 		CarrierService carrierService2 = CarrierService.Builder
 				.newInstance(Id.create("serviceId2", CarrierService.class), Id.create("i(3,9)", Link.class))
 				.setCapacityDemand(10).setServiceDuration(20.0).build();
-		CarrierUtils.addService(carrier, carrierService2);
+		CarriersUtils.addService(carrier, carrierService2);
 		return carrier;
 	}
 
 	private Carrier createCarrierWithShipments() {
-		Carrier carrier = CarrierUtils.createCarrier(Id.create("TestCarrier", Carrier.class));
+		Carrier carrier = CarriersUtils.createCarrier(Id.create("TestCarrier", Carrier.class));
 		VehicleType matsimType = getMatsimVehicleType();
 		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance()
 				.addVehicle(getMatsimVehicle("matsimVehicle", "i(6,0)", matsimType)).setFleetSize(FleetSize.INFINITE);
 		carrier.setCarrierCapabilities(ccBuilder.build());
 		CarrierShipment shipment1 = getMatsimShipment("shipment1", "i(6,0)", "i(7,4)R", 10);
-		CarrierUtils.addShipment(carrier, shipment1);
+		CarriersUtils.addShipment(carrier, shipment1);
 		CarrierShipment shipment2 = getMatsimShipment("shipment2", "i(6,0)", "i(3,9)", 20);
-		CarrierUtils.addShipment(carrier, shipment2);
+		CarriersUtils.addShipment(carrier, shipment2);
 		return carrier;
 	}
 

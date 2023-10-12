@@ -35,7 +35,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.freight.carriers.carrier.*;
+import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.FreightActivity;
 import org.matsim.freight.carriers.jsprit.VehicleTypeDependentRoadPricingCalculator;
@@ -185,7 +185,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 		public void handleLeg(Leg leg) {
 			if(leg.getRoute() instanceof NetworkRoute nRoute){
 				Id<Vehicle> vehicleId = nRoute.getVehicleId();
-				CarrierVehicle vehicle = CarrierUtils.getCarrierVehicle(carrier, vehicleId);
+				CarrierVehicle vehicle = CarriersUtils.getCarrierVehicle(carrier, vehicleId);
 				Gbl.assertNotNull(vehicle);
 				if(!employedVehicles.contains(vehicle)){
 					employedVehicles.add(vehicle);
@@ -234,7 +234,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 		@Override
 		public void handleEvent(Event event) {
 			if(event instanceof LinkEnterEvent){
-				CarrierVehicle carrierVehicle = CarrierUtils.getCarrierVehicle(carrier, ((LinkEnterEvent) event).getVehicleId());
+				CarrierVehicle carrierVehicle = CarriersUtils.getCarrierVehicle(carrier, ((LinkEnterEvent) event).getVehicleId());
 				if(carrierVehicle == null) throw new IllegalStateException("carrier vehicle missing");
 				double toll = roadPricing.getTollAmount(carrierVehicle.getType().getId(),network.getLinks().get(((LinkEnterEvent) event).getLinkId() ),event.getTime() );
 				if(toll > 0.) System.out.println("bing: vehicle " + carrierVehicle.getId() + " paid toll " + toll + "" );

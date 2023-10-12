@@ -27,9 +27,9 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.freight.carriers.carrier.Carrier;
-import org.matsim.freight.carriers.carrier.CarrierConstants;
-import org.matsim.freight.carriers.carrier.ScheduledTour;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierConstants;
+import org.matsim.freight.carriers.ScheduledTour;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.TreeMap;

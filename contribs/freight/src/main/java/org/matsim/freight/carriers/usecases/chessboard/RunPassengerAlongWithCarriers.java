@@ -46,7 +46,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.freight.carriers.carrier.*;
+import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controler.*;
 import org.matsim.freight.carriers.usecases.analysis.CarrierScoreStats;
 import org.matsim.freight.carriers.usecases.analysis.LegHistogram;
@@ -108,7 +108,7 @@ final class RunPassengerAlongWithCarriers {
 	public final Scenario prepareScenario(Config config) {
 		Gbl.assertNotNull( config );
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		CarrierUtils.addOrGetCarriers(scenario);
+		CarriersUtils.addOrGetCarriers(scenario);
 		return scenario;
 	}
 

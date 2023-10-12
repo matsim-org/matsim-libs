@@ -38,10 +38,9 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup;
+import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup.UseDistanceConstraintForTourPlanning;
-import org.matsim.freight.carriers.carrier.*;
-import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -101,16 +100,16 @@ public class DistanceConstraintFromVehiclesFileTest {
 
 		FleetSize fleetSize = FleetSize.INFINITE;
 
-		Carrier carrierV1 = CarrierUtils.createCarrier(Id.create("Carrier_Version1", Carrier.class));
+		Carrier carrierV1 = CarriersUtils.createCarrier(Id.create("Carrier_Version1", Carrier.class));
 
 		carriers.addCarrier(addTwoServicesToCarrier(carrierV1));
 		createCarriers(carriers, fleetSize, carrierV1, vehicleTypes);
 
 		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
 		scenario.addScenarioElement("carriers", carriers);
-		CarrierUtils.setJspritIterations(carrierV1, 25);
+		CarriersUtils.setJspritIterations(carrierV1, 25);
 
-		CarrierUtils.runJsprit(scenario);
+		CarriersUtils.runJsprit(scenario);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
 				carrierV1.getSelectedPlan().getScheduledTours().size());
@@ -174,16 +173,16 @@ public class DistanceConstraintFromVehiclesFileTest {
 
 		FleetSize fleetSize = FleetSize.INFINITE;
 
-		Carrier carrierV2 = CarrierUtils.createCarrier(Id.create("Carrier_Version2", Carrier.class));
+		Carrier carrierV2 = CarriersUtils.createCarrier(Id.create("Carrier_Version2", Carrier.class));
 
 		carriers.addCarrier(addTwoServicesToCarrier(carrierV2));
 		createCarriers(carriers, fleetSize, carrierV2, vehicleTypes);
 
 		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
 		scenario.addScenarioElement("carriers", carriers);
-		CarrierUtils.setJspritIterations(carrierV2, 10);
+		CarriersUtils.setJspritIterations(carrierV2, 10);
 
-		CarrierUtils.runJsprit(scenario);
+		CarriersUtils.runJsprit(scenario);
 
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
@@ -249,16 +248,16 @@ public class DistanceConstraintFromVehiclesFileTest {
 		}
 
 		FleetSize fleetSize = FleetSize.INFINITE;
-		Carrier carrierV3 = CarrierUtils.createCarrier(Id.create("Carrier_Version3", Carrier.class));
+		Carrier carrierV3 = CarriersUtils.createCarrier(Id.create("Carrier_Version3", Carrier.class));
 
 		carriers.addCarrier(addTwoServicesToCarrier(carrierV3));
 		createCarriers(carriers, fleetSize, carrierV3, vehicleTypes);
 
 		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
 		scenario.addScenarioElement("carriers", carriers);
-		CarrierUtils.setJspritIterations(carrierV3, 10);
+		CarriersUtils.setJspritIterations(carrierV3, 10);
 
-		CarrierUtils.runJsprit(scenario);
+		CarriersUtils.runJsprit(scenario);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
 				carrierV3.getSelectedPlan().getScheduledTours().size());
@@ -331,16 +330,16 @@ public class DistanceConstraintFromVehiclesFileTest {
 		}
 
 		FleetSize fleetSize = FleetSize.INFINITE;
-		Carrier carrierV4 = CarrierUtils.createCarrier(Id.create("Carrier_Version4", Carrier.class));
+		Carrier carrierV4 = CarriersUtils.createCarrier(Id.create("Carrier_Version4", Carrier.class));
 
 		carriers.addCarrier(addThreeServicesToCarrier(carrierV4));
 		createCarriers(carriers, fleetSize, carrierV4, vehicleTypes);
 
 		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
 		scenario.addScenarioElement("carriers", carriers);
-		CarrierUtils.setJspritIterations(carrierV4, 10);
+		CarriersUtils.setJspritIterations(carrierV4, 10);
 
-		CarrierUtils.runJsprit(scenario);
+		CarriersUtils.runJsprit(scenario);
 
 		Assert.assertEquals("Not the correct amount of scheduled tours", 2,
 				carrierV4.getSelectedPlan().getScheduledTours().size());
@@ -410,14 +409,14 @@ public class DistanceConstraintFromVehiclesFileTest {
 				.newInstance(Id.create("Service1", CarrierService.class), Id.createLinkId("j(3,8)"))
 				.setServiceDuration(20).setServiceStartTimeWindow(TimeWindow.newInstance(8 * 3600, 10 * 3600))
 				.setCapacityDemand(40).build();
-		CarrierUtils.addService(carrier, service1);
+		CarriersUtils.addService(carrier, service1);
 
 		// Service 2
 		CarrierService service2 = CarrierService.Builder
 				.newInstance(Id.create("Service2", CarrierService.class), Id.createLinkId("j(0,3)R"))
 				.setServiceDuration(20).setServiceStartTimeWindow(TimeWindow.newInstance(8 * 3600, 10 * 3600))
 				.setCapacityDemand(40).build();
-		CarrierUtils.addService(carrier, service2);
+		CarriersUtils.addService(carrier, service2);
 
 		return carrier;
 	}
@@ -431,7 +430,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 				.newInstance(Id.create("Service3", CarrierService.class), Id.createLinkId("j(9,2)"))
 				.setServiceDuration(20).setServiceStartTimeWindow(TimeWindow.newInstance(8 * 3600, 10 * 3600))
 				.setCapacityDemand(40).build();
-		CarrierUtils.addService(carrier, service3);
+		CarriersUtils.addService(carrier, service3);
 
 		return carrier;
 	}
@@ -484,7 +483,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 
 		singleCarrier.setCarrierCapabilities(CarrierCapabilities.Builder.newInstance().setFleetSize(fleetSize).build());
 		for (CarrierVehicle carrierVehicle : vehicles) {
-			CarrierUtils.addCarrierVehicle(singleCarrier, carrierVehicle);
+			CarriersUtils.addCarrierVehicle(singleCarrier, carrierVehicle);
 		}
 		singleCarrier.getCarrierCapabilities().getVehicleTypes().addAll(vehicleTypes.getVehicleTypes().values());
 

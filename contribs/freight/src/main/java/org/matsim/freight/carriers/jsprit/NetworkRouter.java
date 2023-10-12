@@ -20,8 +20,8 @@
  */
 package org.matsim.freight.carriers.jsprit;
 
-import org.matsim.freight.carriers.carrier.CarrierPlan;
-import org.matsim.freight.carriers.carrier.ScheduledTour;
+import org.matsim.freight.carriers.CarrierPlan;
+import org.matsim.freight.carriers.ScheduledTour;
 import org.matsim.freight.carriers.controler.CarrierTimeAndSpaceTourRouter;
 
 /**

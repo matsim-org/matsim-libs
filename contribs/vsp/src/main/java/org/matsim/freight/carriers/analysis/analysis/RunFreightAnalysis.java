@@ -22,9 +22,9 @@
 package org.matsim.freight.carriers.analysis.analysis;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.freight.carriers.carrier.CarrierPlanXmlReader;
-import org.matsim.freight.carriers.carrier.CarrierVehicleTypes;
-import org.matsim.freight.carriers.carrier.Carriers;
+import org.matsim.freight.carriers.CarrierPlanXmlReader;
+import org.matsim.freight.carriers.CarrierVehicleTypes;
+import org.matsim.freight.carriers.Carriers;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;

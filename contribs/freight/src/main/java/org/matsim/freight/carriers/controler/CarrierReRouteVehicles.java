@@ -29,8 +29,8 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.freight.carriers.carrier.CarrierPlan;
-import org.matsim.freight.carriers.carrier.ScheduledTour;
+import org.matsim.freight.carriers.CarrierPlan;
+import org.matsim.freight.carriers.ScheduledTour;
 
 /**
  * Strategy module to reRoute a carrierPlan.

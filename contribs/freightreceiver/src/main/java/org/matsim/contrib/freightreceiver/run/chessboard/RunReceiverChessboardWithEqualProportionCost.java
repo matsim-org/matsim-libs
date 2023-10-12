@@ -23,8 +23,8 @@ package org.matsim.contrib.freightreceiver.run.chessboard;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.freight.carriers.carrier.CarrierUtils;
-import org.matsim.freight.carriers.carrier.Carriers;
+import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.usecases.analysis.CarrierScoreStats;
 import org.matsim.contrib.freightreceiver.ReceiverModule;
 import org.matsim.contrib.freightreceiver.ReceiverReplanningType;
@@ -83,7 +83,7 @@ public class RunReceiverChessboardWithEqualProportionCost {
 	 * TODO This is less elegant than the embedded score stats for the receiver.
 	 */
 	static void prepareFreightOutputDataAndStats(MatsimServices controler) {
-		CarrierScoreStats scoreStats = new CarrierScoreStats(CarrierUtils.getCarriers(controler.getScenario()), controler.getScenario().getConfig().controller().getOutputDirectory() + "/carrier_scores", true);
+		CarrierScoreStats scoreStats = new CarrierScoreStats(CarriersUtils.getCarriers(controler.getScenario()), controler.getScenario().getConfig().controller().getOutputDirectory() + "/carrier_scores", true);
 		controler.addControlerListener(scoreStats);
 	}
 

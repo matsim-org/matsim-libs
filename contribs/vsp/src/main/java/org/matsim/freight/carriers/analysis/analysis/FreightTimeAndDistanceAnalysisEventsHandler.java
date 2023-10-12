@@ -27,9 +27,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.freight.carriers.carrier.Carrier;
-import org.matsim.freight.carriers.carrier.CarrierUtils;
-import org.matsim.freight.carriers.carrier.Tour;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -162,7 +162,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements BasicEventHa
 
 		//----- All VehicleTypes in CarriervehicleTypes container. Used so that even unused vehTypes appear in the output
 
-		TreeMap<Id<VehicleType>, VehicleType> vehicleTypesMap = new TreeMap<>(CarrierUtils.getCarrierVehicleTypes(scenario).getVehicleTypes());
+		TreeMap<Id<VehicleType>, VehicleType> vehicleTypesMap = new TreeMap<>(CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes());
 		//For the case that there are additional vehicle types found in the events.
 		for (VehicleType vehicleType : vehicleId2VehicleType.values()) {
 			vehicleTypesMap.putIfAbsent(vehicleType.getId(), vehicleType);

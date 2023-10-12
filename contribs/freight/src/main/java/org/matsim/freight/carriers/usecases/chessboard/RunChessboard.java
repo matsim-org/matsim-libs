@@ -45,8 +45,7 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.carrier.*;
+import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controler.*;
 import org.matsim.freight.carriers.usecases.analysis.CarrierScoreStats;
 import org.matsim.freight.carriers.usecases.analysis.LegHistogram;
@@ -70,10 +69,10 @@ public final class RunChessboard {
 		freightCarriersConfigGroup.setCarriersVehicleTypesFile("vehicleTypes.xml");
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		CarrierUtils.loadCarriersAccordingToFreightConfig( scenario );
+		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
 
-		Carriers carriers = CarrierUtils.addOrGetCarriers( scenario );
-		CarrierVehicleTypes types = CarrierUtils.getCarrierVehicleTypes( scenario );
+		Carriers carriers = CarriersUtils.addOrGetCarriers( scenario );
+		CarrierVehicleTypes types = CarriersUtils.getCarrierVehicleTypes( scenario );
 
 		Controler controler = new Controler( scenario);
 

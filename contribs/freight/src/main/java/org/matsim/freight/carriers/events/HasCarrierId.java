@@ -22,7 +22,7 @@
 package org.matsim.freight.carriers.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.freight.carriers.carrier.Carrier;
+import org.matsim.freight.carriers.Carrier;
 
 /**
  * @author Kai Martins-Turner (kturner)

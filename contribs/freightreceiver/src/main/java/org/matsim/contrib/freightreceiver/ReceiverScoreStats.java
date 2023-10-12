@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.freight.carriers.carrier.CarrierUtils;
+import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.contrib.freightreceiver.collaboration.CollaborationUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -92,7 +92,7 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 		if ((event.getIteration() + 1) % (ConfigUtils.addOrGetModule(sc.getConfig(), ReceiverConfigGroup.class).getReceiverReplanningInterval()) != 0)
 			return;
 		String dir = event.getServices().getControlerIO().getIterationPath(event.getIteration());
-		CarrierUtils.writeCarriers(CarrierUtils.getCarriers(sc), dir + File.separator + event.getIteration() + CARRIER_PLANS_XML);
+		CarriersUtils.writeCarriers(CarriersUtils.getCarriers(sc), dir + File.separator + event.getIteration() + CARRIER_PLANS_XML);
 		new ReceiversWriter(ReceiverUtils.getReceivers(sc)).write(dir + File.separator + event.getIteration() + RECEIVER_PLANS_XML);
 	}
 

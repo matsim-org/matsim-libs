@@ -35,8 +35,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.freight.carriers.carrier.*;
-import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts.Builder;
@@ -72,18 +72,18 @@ public class CarrierControlerUtilsIT {
 
 		//Create carrier with services and shipments
 		Carriers carriersWithServicesAndShpiments = new Carriers();
-		carrierWServices = CarrierUtils.createCarrier(CARRIER_SERVICES_ID );
+		carrierWServices = CarriersUtils.createCarrier(CARRIER_SERVICES_ID );
 		CarrierService service1 = createMatsimService("Service1", "i(3,9)", 2);
-		CarrierUtils.addService(carrierWServices, service1);
+		CarriersUtils.addService(carrierWServices, service1);
 		CarrierService service2 = createMatsimService("Service2", "i(4,9)", 2);
-		CarrierUtils.addService(carrierWServices, service2);
+		CarriersUtils.addService(carrierWServices, service2);
 
 		//Create carrier with shipments
-		carrierWShipments = CarrierUtils.createCarrier(CARRIER_SHIPMENTS_ID );
+		carrierWShipments = CarriersUtils.createCarrier(CARRIER_SHIPMENTS_ID );
 		CarrierShipment shipment1 = createMatsimShipment("shipment1", "i(1,0)", "i(7,6)R", 1);
-		CarrierUtils.addShipment(carrierWShipments, shipment1);
+		CarriersUtils.addShipment(carrierWShipments, shipment1);
 		CarrierShipment shipment2 = createMatsimShipment("shipment2", "i(3,0)", "i(3,7)", 2);
-		CarrierUtils.addShipment(carrierWShipments, shipment2);
+		CarriersUtils.addShipment(carrierWShipments, shipment2);
 
 		//Create vehicle for Carriers
 		final Id<VehicleType> vehTypeId = Id.create( "gridType", VehicleType.class );
@@ -97,7 +97,7 @@ public class CarrierControlerUtilsIT {
 		costInfo.setCostsPerSecond( 0.001 ) ;
 		costInfo.setCostsPerMeter( 0.0001 ) ;
 		costInfo.setFixedCost( 130. ) ;
-//		VehicleType carrierVehType = CarrierUtils.CarrierVehicleTypeBuilder.newInstance( vehTypeId )
+//		VehicleType carrierVehType = CarriersUtils.CarrierVehicleTypeBuilder.newInstance( vehTypeId )
 		carrierVehType.setMaximumVelocity(10);
 
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
@@ -148,7 +148,7 @@ public class CarrierControlerUtilsIT {
 		 */
 
 		//Convert to jsprit VRP
-		Carriers carriersWithShipmentsOnly = CarrierUtils.createShipmentVRPCarrierFromServiceVRPSolution(
+		Carriers carriersWithShipmentsOnly = CarriersUtils.createShipmentVRPCarrierFromServiceVRPSolution(
 				carriersWithServicesAndShpiments );
 
 		// assign vehicle types to the carriers

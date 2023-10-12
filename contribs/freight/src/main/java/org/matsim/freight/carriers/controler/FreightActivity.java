@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.freight.carriers.carrier.TimeWindow;
+import org.matsim.freight.carriers.TimeWindow;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class FreightActivity implements Activity {

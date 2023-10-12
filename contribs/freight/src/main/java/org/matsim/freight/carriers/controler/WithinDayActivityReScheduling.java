@@ -35,8 +35,8 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.freight.carriers.carrier.Tour.Start;
-import org.matsim.freight.carriers.carrier.Tour.TourActivity;
+import org.matsim.freight.carriers.Tour.Start;
+import org.matsim.freight.carriers.Tour.TourActivity;
 
 import java.util.Collection;
 import java.util.HashSet;

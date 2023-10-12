@@ -3,7 +3,7 @@ package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.carrier.CarrierUtils;
+import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -21,7 +21,7 @@ public class CommercialTrafficIntegrationTest {
         freightCarriersConfigGroup.setCarriersFile("jointDemand_carriers_car.xml");
         freightCarriersConfigGroup.setCarriersVehicleTypesFile("jointDemand_vehicleTypes.xml");
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        CarrierUtils.loadCarriersAccordingToFreightConfig(scenario);
+        CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new JointDemandModule());
         controler.run();

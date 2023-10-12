@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.freight.carriers.carrier.Carrier;
-import org.matsim.freight.carriers.carrier.CarrierShipment;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierShipment;
 import org.matsim.freight.carriers.events.CarrierShipmentDeliveryEndEvent;
 import org.matsim.freight.carriers.events.CarrierShipmentPickupEndEvent;
 

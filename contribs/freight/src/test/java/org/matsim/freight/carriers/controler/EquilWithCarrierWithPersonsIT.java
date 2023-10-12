@@ -34,7 +34,7 @@ import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.freight.carriers.carrier.*;
+import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.mobsim.DistanceScoringFunctionFactoryForTests;
 import org.matsim.freight.carriers.mobsim.StrategyManagerFactoryForTests;
 import org.matsim.testcases.MatsimTestUtils;
@@ -80,7 +80,7 @@ public class EquilWithCarrierWithPersonsIT {
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( testUtils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
 
-		Carriers carriers = CarrierUtils.addOrGetCarriers(scenario );
+		Carriers carriers = CarriersUtils.addOrGetCarriers(scenario );
 		new CarrierPlanXmlReader( carriers, carrierVehicleTypes ).readFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
 		return scenario;
 	}

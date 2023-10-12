@@ -39,7 +39,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.freight.carriers.carrier.*;
+import org.matsim.freight.carriers.*;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.Vehicle;
@@ -70,17 +70,17 @@ public class FixedCostsTest  {
 		CarrierService service1 = createMatsimService("Service1", "i(3,0)", 1);
 		CarrierService service2 = createMatsimService("Service2", "i(9,9)R", 1);
 
-		Carrier carrier1 = CarrierUtils.createCarrier(Id.create("carrier1", Carrier.class ) );
-		CarrierUtils.addService(carrier1, service1);
-		CarrierUtils.addService(carrier1, service2);
+		Carrier carrier1 = CarriersUtils.createCarrier(Id.create("carrier1", Carrier.class ) );
+		CarriersUtils.addService(carrier1, service1);
+		CarriersUtils.addService(carrier1, service2);
 
-		Carrier carrier2 = CarrierUtils.createCarrier(Id.create("carrier2", Carrier.class ) );
-		CarrierUtils.addService(carrier2, service1);
-		CarrierUtils.addService(carrier2, service2);
+		Carrier carrier2 = CarriersUtils.createCarrier(Id.create("carrier2", Carrier.class ) );
+		CarriersUtils.addService(carrier2, service1);
+		CarriersUtils.addService(carrier2, service2);
 
-		Carrier carrier3 = CarrierUtils.createCarrier(Id.create("carrier3", Carrier.class ) );
-		CarrierUtils.addService(carrier3, service1);
-		CarrierUtils.addService(carrier3, service2);
+		Carrier carrier3 = CarriersUtils.createCarrier(Id.create("carrier3", Carrier.class ) );
+		CarriersUtils.addService(carrier3, service1);
+		CarriersUtils.addService(carrier3, service2);
 
 
 		//Create add vehicle for carriers

@@ -52,8 +52,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.carrier.*;
+import org.matsim.freight.carriers.*;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -90,13 +89,13 @@ public final class MatsimJspritFactory {
 						Id.createLinkId(jspritShipment.getPickupLocation().getId()),
 						Id.createLinkId(jspritShipment.getDeliveryLocation().getId()), jspritShipment.getSize().get(0))
 				.setDeliveryServiceTime(jspritShipment.getDeliveryServiceTime())
-				.setDeliveryTimeWindow(org.matsim.freight.carriers.carrier.TimeWindow.newInstance(jspritShipment.getDeliveryTimeWindow().getStart(),
+				.setDeliveryTimeWindow(org.matsim.freight.carriers.TimeWindow.newInstance(jspritShipment.getDeliveryTimeWindow().getStart(),
 						jspritShipment.getDeliveryTimeWindow().getEnd()))
 				.setPickupServiceTime(jspritShipment.getPickupServiceTime())
-				.setPickupTimeWindow(org.matsim.freight.carriers.carrier.TimeWindow.newInstance(jspritShipment.getPickupTimeWindow().getStart(),
+				.setPickupTimeWindow(org.matsim.freight.carriers.TimeWindow.newInstance(jspritShipment.getPickupTimeWindow().getStart(),
 						jspritShipment.getPickupTimeWindow().getEnd()))
 				.build();
-		CarrierUtils.setSkills(carrierShipment, jspritShipment.getRequiredSkills().values());
+		CarriersUtils.setSkills(carrierShipment, jspritShipment.getRequiredSkills().values());
 		return carrierShipment;
 	}
 
@@ -120,7 +119,7 @@ public final class MatsimJspritFactory {
 						carrierShipment.getPickupTimeWindow().getStart(),
 						carrierShipment.getPickupTimeWindow().getEnd()))
 				.addSizeDimension(0, carrierShipment.getSize());
-		for (String skill : CarrierUtils.getSkills(carrierShipment)) {
+		for (String skill : CarriersUtils.getSkills(carrierShipment)) {
 			shipmentBuilder.addRequiredSkill(skill);
 		}
 		return shipmentBuilder.build();
@@ -151,7 +150,7 @@ public final class MatsimJspritFactory {
 						carrierShipment.getPickupTimeWindow().getStart(),
 						carrierShipment.getPickupTimeWindow().getEnd()))
 				.addSizeDimension(0, carrierShipment.getSize());
-		for (String skill : CarrierUtils.getSkills(carrierShipment)) {
+		for (String skill : CarriersUtils.getSkills(carrierShipment)) {
 			shipmentBuilder.addRequiredSkill(skill);
 		}
 		return shipmentBuilder.build();
@@ -171,7 +170,7 @@ public final class MatsimJspritFactory {
 				.setTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(
 						carrierService.getServiceStartTimeWindow().getStart(),
 						carrierService.getServiceStartTimeWindow().getEnd()));
-		for (String skill : CarrierUtils.getSkills(carrierService)) {
+		for (String skill : CarriersUtils.getSkills(carrierService)) {
 			serviceBuilder.addRequiredSkill(skill);
 		}
 		return serviceBuilder.build();
@@ -188,9 +187,9 @@ public final class MatsimJspritFactory {
 		serviceBuilder.setCapacityDemand(jspritService.getSize().get(0));
 		serviceBuilder.setServiceDuration(jspritService.getServiceDuration());
 		serviceBuilder.setServiceStartTimeWindow(
-				org.matsim.freight.carriers.carrier.TimeWindow.newInstance(jspritService.getTimeWindow().getStart(), jspritService.getTimeWindow().getEnd()));
+				org.matsim.freight.carriers.TimeWindow.newInstance(jspritService.getTimeWindow().getStart(), jspritService.getTimeWindow().getEnd()));
 		CarrierService carrierService = serviceBuilder.build();
-		CarrierUtils.setSkills(carrierService, jspritService.getRequiredSkills().values());
+		CarriersUtils.setSkills(carrierService, jspritService.getRequiredSkills().values());
 		return carrierService;
 	}
 
@@ -215,7 +214,7 @@ public final class MatsimJspritFactory {
 		vehicleBuilder.setEarliestStart(carrierVehicle.getEarliestStartTime())
 				.setLatestArrival(carrierVehicle.getLatestEndTime()).setStartLocation(vehicleLocation)
 				.setType(vehicleType);
-		for (String skill : CarrierUtils.getSkills(carrierVehicle.getType())) {
+		for (String skill : CarriersUtils.getSkills(carrierVehicle.getType())) {
 			vehicleBuilder.addSkill(skill);
 		}
 
@@ -260,7 +259,7 @@ public final class MatsimJspritFactory {
 		CarrierVehicle carrierVehicle = carrierVehicleBuilder.build();
 
 		for (String skill : jspritVehicle.getSkills().values()) {
-			CarrierUtils.addSkill(carrierVehicle.getType(), skill);
+			CarriersUtils.addSkill(carrierVehicle.getType(), skill);
 		}
 
 		if (jspritVehicle.getEarliestDeparture() != carrierVehicle.getEarliestStartTime())
@@ -682,7 +681,7 @@ public final class MatsimJspritFactory {
 	 */
 	public static Carrier createCarrier(String carrierId, VehicleRoutingProblem vrp) {
 		Id<Carrier> id = Id.create(carrierId, Carrier.class);
-		Carrier carrier = CarrierUtils.createCarrier(id);
+		Carrier carrier = CarriersUtils.createCarrier(id);
 		CarrierCapabilities.Builder capabilityBuilder = CarrierCapabilities.Builder.newInstance();
 
 		// fleet and vehicles
@@ -753,7 +752,7 @@ public final class MatsimJspritFactory {
 					ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
 					constraintManager.addConstraint(
 							new DistanceConstraint(
-									CarrierUtils.getCarrierVehicleTypes(scenario), netBasedCosts),
+									CarriersUtils.getCarrierVehicleTypes(scenario), netBasedCosts),
 							ConstraintManager.Priority.CRITICAL);
 					AlgorithmConfig algorithmConfig = new AlgorithmConfig();
 					AlgorithmConfigXmlReader xmlReader = new AlgorithmConfigXmlReader(algorithmConfig);
@@ -777,7 +776,7 @@ public final class MatsimJspritFactory {
 					ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
 					constraintManager.addConstraint(
 							new DistanceConstraint(
-									CarrierUtils.getCarrierVehicleTypes(scenario), netBasedCosts),
+									CarriersUtils.getCarrierVehicleTypes(scenario), netBasedCosts),
 							ConstraintManager.Priority.CRITICAL);
 					algorithm = Jsprit.Builder.newInstance(problem)
 							.setStateAndConstraintManager(stateManager, constraintManager).buildAlgorithm();

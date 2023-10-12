@@ -31,10 +31,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.carrier.Carrier;
-import org.matsim.freight.carriers.carrier.CarrierUtils;
-import org.matsim.freight.carriers.carrier.ScheduledTour;
-import org.matsim.freight.carriers.carrier.Tour;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.ScheduledTour;
+import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.mobsim.DistanceScoringFunctionFactoryForTests;
 import org.matsim.freight.carriers.mobsim.StrategyManagerFactoryForTests;
 import org.matsim.freight.carriers.mobsim.TimeScoringFunctionFactoryForTests;
@@ -72,7 +72,7 @@ public class EquilWithCarrierWithoutPersonsIT {
 		Scenario scenario = EquilWithCarrierWithPersonsIT.commonScenario( config, testUtils );
 
 		// set the routes to null:
-		for( Carrier carrier : CarrierUtils.getCarriers( scenario ).getCarriers().values() ){
+		for( Carrier carrier : CarriersUtils.getCarriers( scenario ).getCarriers().values() ){
 			for( ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours() ){
 				for( Tour.TourElement tourElement : tour.getTour().getTourElements() ){
 					if ( tourElement instanceof Tour.Leg ) {
@@ -110,10 +110,10 @@ public class EquilWithCarrierWithoutPersonsIT {
 		});
 		controler.run();
 
-		Carrier carrier1 = CarrierUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier1", Carrier.class));
+		Carrier carrier1 = CarriersUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier1", Carrier.class));
 		Assert.assertEquals(-170000.0, carrier1.getSelectedPlan().getScore(), 0.0 );
 
-		Carrier carrier2 = CarrierUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier2", Carrier.class));
+		Carrier carrier2 = CarriersUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier2", Carrier.class));
 		Assert.assertEquals(-85000.0, carrier2.getSelectedPlan().getScore(), 0.0 );
 	}
 
@@ -136,10 +136,10 @@ public class EquilWithCarrierWithoutPersonsIT {
 		});
 		controler.run();
 
-		Carrier carrier1 = CarrierUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier1", Carrier.class));
+		Carrier carrier1 = CarriersUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier1", Carrier.class));
 		Assert.assertEquals(-240.0, carrier1.getSelectedPlan().getScore(), 2.0);
 
-		Carrier carrier2 = CarrierUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier2", Carrier.class));
+		Carrier carrier2 = CarriersUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier2", Carrier.class));
 		Assert.assertEquals(0.0, carrier2.getSelectedPlan().getScore(), 0.0 );
 
 	}
@@ -164,10 +164,10 @@ public class EquilWithCarrierWithoutPersonsIT {
 		});
 		controler.run();
 
-		Carrier carrier1 = CarrierUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier1", Carrier.class));
+		Carrier carrier1 = CarriersUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier1", Carrier.class));
 		Assert.assertEquals(-4873.0, carrier1.getSelectedPlan().getScore(), 2.0);
 
-		Carrier carrier2 = CarrierUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier2", Carrier.class));
+		Carrier carrier2 = CarriersUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier2", Carrier.class));
 		Assert.assertEquals(0.0, carrier2.getSelectedPlan().getScore(), 0.0 );
 
 	}
@@ -192,7 +192,7 @@ public class EquilWithCarrierWithoutPersonsIT {
 		});
 		controler.run();
 
-		Carrier carrier1 = CarrierUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier1", Carrier.class));
+		Carrier carrier1 = CarriersUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier1", Carrier.class));
 		Assert.assertEquals(-4871.0, carrier1.getSelectedPlan().getScore(), 2.0);
 	}
 

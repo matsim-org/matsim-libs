@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.freightreceiver;
 
-import org.matsim.freight.carriers.carrier.Carrier;
+import org.matsim.freight.carriers.Carrier;
 
 public interface ReceiverCostAllocation {
 	double getScore(Carrier carrier, Receiver receiver);

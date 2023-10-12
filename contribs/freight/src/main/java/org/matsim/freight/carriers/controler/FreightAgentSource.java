@@ -31,7 +31,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
-import org.matsim.freight.carriers.carrier.CarrierUtils;
+import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -73,14 +73,14 @@ import java.util.Collection;
 				MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson( freightDriverPlan.getPerson() );
 
 				Vehicle vehicle;
-				if( CarrierUtils.getVehicle( freightDriverPlan ) == null ){
+				if( CarriersUtils.getVehicle( freightDriverPlan ) == null ){
 					vehicle = VehicleUtils.getFactory().createVehicle( Id.create( agent.getId(), Vehicle.class ), VehicleUtils.getDefaultVehicleType() );
 					log.warn( "vehicle for agent " + freightDriverPlan.getPerson().getId() + " is missing. set default vehicle where maxVelocity is solely defined by link.speed." );
-				} else if( CarrierUtils.getVehicle( freightDriverPlan ).getType() == null ){
+				} else if( CarriersUtils.getVehicle( freightDriverPlan ).getType() == null ){
 					vehicle = VehicleUtils.getFactory().createVehicle( Id.create( agent.getId(), Vehicle.class ), VehicleUtils.getDefaultVehicleType() );
 					log.warn( "vehicleType for agent " + freightDriverPlan.getPerson().getId() + " is missing. set default vehicleType where maxVelocity is solely defined by link.speed." );
 				} else {
-					vehicle = CarrierUtils.getVehicle( freightDriverPlan );
+					vehicle = CarriersUtils.getVehicle( freightDriverPlan );
 				}
 
 				log.warn( "inserting vehicleId=" + vehicle.getId() + " into mobsim." );

@@ -18,8 +18,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.options.ShpOptions;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.carrier.*;
+import org.matsim.freight.carriers.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
@@ -96,18 +95,18 @@ public class DemandReaderFromCSVTest {
 		DemandReaderFromCSV.checkNewDemand(scenario, demandInformation, polygonsInShape, shapeCategory);
 		DemandReaderFromCSV.createDemandForCarriers(scenario, polygonsInShape, demandInformation, population, false,
 				null);
-		Assert.assertEquals(3, CarrierUtils.getCarriers(scenario).getCarriers().size());
+		Assert.assertEquals(3, CarriersUtils.getCarriers(scenario).getCarriers().size());
 		Assert.assertTrue(
-				CarrierUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier1", Carrier.class)));
+				CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier1", Carrier.class)));
 		Assert.assertTrue(
-				CarrierUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier2", Carrier.class)));
+				CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier2", Carrier.class)));
 		Assert.assertTrue(
-				CarrierUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier3", Carrier.class)));
+				CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier3", Carrier.class)));
 
 		// check carrier 1
 		Network network = NetworkUtils.readNetwork(
 				"https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml");
-		Carrier testCarrier1 = CarrierUtils.getCarriers(scenario).getCarriers()
+		Carrier testCarrier1 = CarriersUtils.getCarriers(scenario).getCarriers()
 				.get(Id.create("testCarrier1", Carrier.class));
 		Assert.assertEquals(14, testCarrier1.getServices().size());
 		Assert.assertEquals(0, testCarrier1.getShipments().size());
@@ -153,7 +152,7 @@ public class DemandReaderFromCSVTest {
 		Assert.assertTrue(locationsPerServiceElement.get("serviceElement2").contains("i(2,0)"));
 
 		// check carrier 2
-		Carrier testCarrier2 = CarrierUtils.getCarriers(scenario).getCarriers()
+		Carrier testCarrier2 = CarriersUtils.getCarriers(scenario).getCarriers()
 				.get(Id.create("testCarrier2", Carrier.class));
 		Assert.assertEquals(0, testCarrier2.getServices().size());
 		Assert.assertEquals(11, testCarrier2.getShipments().size());
@@ -204,7 +203,7 @@ public class DemandReaderFromCSVTest {
 		Assert.assertEquals(2, locationsPerShipmentElement.get("ShipmenElement2_delivery").size());
 
 		// check carrier 3
-		Carrier testCarrier3 = CarrierUtils.getCarriers(scenario).getCarriers()
+		Carrier testCarrier3 = CarriersUtils.getCarriers(scenario).getCarriers()
 				.get(Id.create("testCarrier3", Carrier.class));
 		Assert.assertEquals(0, testCarrier3.getServices().size());
 		Assert.assertEquals(4, testCarrier3.getShipments().size());

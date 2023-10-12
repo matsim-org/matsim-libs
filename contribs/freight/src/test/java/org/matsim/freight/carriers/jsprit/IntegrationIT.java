@@ -36,8 +36,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.carrier.*;
+import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -66,18 +65,18 @@ public class IntegrationIT {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 
-		CarrierUtils.loadCarriersAccordingToFreightConfig(scenario);
+		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
 
-		for (Carrier carrier : CarrierUtils.getCarriers(scenario).getCarriers().values()) {
-			CarrierUtils.setJspritIterations(carrier, 1);
+		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
+			CarriersUtils.setJspritIterations(carrier, 1);
 		}
 
-		CarrierUtils.runJsprit(scenario);
+		CarriersUtils.runJsprit(scenario);
 		double scoreWithRunJsprit = 0;
-		for (Carrier carrier : CarrierUtils.getCarriers(scenario).getCarriers().values()) {
+		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
 			scoreWithRunJsprit = scoreWithRunJsprit + carrier.getSelectedPlan().getJspritScore();
 		}
-		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), CarrierUtils.getCarriers(scenario), CarrierUtils.getCarrierVehicleTypes(scenario));
+		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), CarriersUtils.getCarriers(scenario), CarriersUtils.getCarrierVehicleTypes(scenario));
 		Assert.assertEquals("The score of both runs are not the same", scoreWithRunJsprit, scoreRunWithOldStructure, MatsimTestUtils.EPSILON);
 	}
 

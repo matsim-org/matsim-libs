@@ -1,6 +1,6 @@
 package org.matsim.contrib.freightreceiver.collaboration;
 
-import org.matsim.freight.carriers.carrier.Carriers;
+import org.matsim.freight.carriers.Carriers;
 import org.matsim.contrib.freightreceiver.*;
 
 /**

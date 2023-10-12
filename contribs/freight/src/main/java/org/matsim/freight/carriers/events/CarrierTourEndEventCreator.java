@@ -25,9 +25,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.freight.carriers.carrier.Carrier;
-import org.matsim.freight.carriers.carrier.CarrierConstants;
-import org.matsim.freight.carriers.carrier.ScheduledTour;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierConstants;
+import org.matsim.freight.carriers.ScheduledTour;
 import org.matsim.vehicles.Vehicle;
 
 /*package-private*/ final class CarrierTourEndEventCreator implements CarrierEventCreator {

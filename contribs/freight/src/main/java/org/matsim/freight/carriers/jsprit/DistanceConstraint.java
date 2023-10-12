@@ -31,7 +31,7 @@ import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.freight.carriers.carrier.CarrierVehicleTypes;
+import org.matsim.freight.carriers.CarrierVehicleTypes;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
