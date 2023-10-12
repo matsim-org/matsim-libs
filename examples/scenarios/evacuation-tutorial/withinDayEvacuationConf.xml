@@ -17,17 +17,16 @@
 
 		<!-- The size of the time bin (in sec) into which the link travel times are aggregated for the router -->
 		<param name="travelTimeBinSize" value="300" />
-		<param name="travelTimeCalculator" value="TravelTimeCalculatorHashMap" />
 	</module>
 
-	
+
 	<module name="qsim">
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
 		<param name="flowCapacityFactor" value="0.1" />
 		<param name="storageCapacityFactor" value="0.1" />
 		<param name="stuckTime" value="600" />
-		
+
 		<!-- Boolean. `true': stuck vehicles are removed, aborting the plan; `false': stuck vehicles are forced into the next link. `false' is probably the better choice. -->
 		<param name="removeStuckVehicles" value="false" />
 	</module>
@@ -40,7 +39,7 @@
 		<param name="outputDirectory" value="&OUTPUTBASE;" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
-		
+
 		<!-- Defines which mobility simulation will be used. Currently supported: queueSimulation, qsim, jdeqsim, multimodalQSim -->
 		<param name="mobsim" value="qsim" />
 	</module>
