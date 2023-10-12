@@ -1,20 +1,13 @@
 package org.matsim.api.core.v01;
 
-import java.util.Collections;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.lang3.tuple.Triple;
-import org.matsim.api.core.v01.IdAnnotations.JsonLinkId;
-import org.matsim.api.core.v01.IdAnnotations.JsonNodeId;
-import org.matsim.api.core.v01.IdAnnotations.JsonPersonId;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Person;
 
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationConfig;
+import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -26,6 +19,7 @@ import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.deser.Deserializers;
 import com.fasterxml.jackson.databind.deser.KeyDeserializers;
 import com.fasterxml.jackson.databind.ser.Serializers;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 /**
  * Use as follows with your {@link ObjectMapper} instance:
@@ -36,24 +30,6 @@ public class IdDeSerializationModule extends Module {
 
 	private static final String NAME = IdDeSerializationModule.class.getSimpleName();
 	private static final Version VERSION = new Version(0, 1, 0, null, "org.matsim", "api.core.v01");
-	private static final Map<Class<?>, Triple<JsonSerializer<?>, JsonDeserializer<?>, KeyDeserializer>> DE_SERIALIZER_MAP;
-	static {
-		Map<Class<?>, Triple<JsonSerializer<?>, JsonDeserializer<?>, KeyDeserializer>> m = new HashMap<>();
-		m.put(Person.class, Triple.of(
-				new JsonPersonId.PersonIdSerializer(),
-				new JsonPersonId.PersonIdDeserializer(),
-				new JsonPersonId.PersonIdKeyDeserializer()));
-		m.put(Node.class, Triple.of(
-				new JsonNodeId.NodeIdSerializer(),
-				new JsonNodeId.NodeIdDeserializer(),
-				new JsonNodeId.NodeIdKeyDeserializer()));
-		m.put(Link.class, Triple.of(
-				new JsonLinkId.LinkIdSerializer(),
-				new JsonLinkId.LinkIdDeserializer(),
-				new JsonLinkId.LinkIdKeyDeserializer()));
-		// Add your own classes below here
-		DE_SERIALIZER_MAP = Collections.unmodifiableMap(m);
-	}
 
 	private static Module instance = null;
 
@@ -85,13 +61,16 @@ public class IdDeSerializationModule extends Module {
 		context.addKeyDeserializers(new IdKeyDeserializers());
 	}
 
+	private static final StdSerializer<?> SERIALIZER = new IdAnnotations.JsonIdSerializer<>(Id.class);
+	private static final Map<Class<?>, KeyDeserializer> KEY_DESERIALIZER_CACHE = new HashMap<>();
+
 	private static final class IdSerializers extends Serializers.Base {
 
 		@Override
 		public JsonSerializer<?> findSerializer(SerializationConfig config, JavaType type,
 				BeanDescription beanDesc) {
 			if (type.getRawClass().equals(Id.class) && type.containedTypeCount() == 1) {
-				return DE_SERIALIZER_MAP.get(type.containedType(0).getRawClass()).getLeft();
+				return SERIALIZER;
 			}
 			return null;
 		}
@@ -104,7 +83,7 @@ public class IdDeSerializationModule extends Module {
 		public JsonDeserializer<?> findBeanDeserializer(JavaType type, DeserializationConfig config,
 				BeanDescription beanDesc) throws JsonMappingException {
 			if (type.getRawClass().equals(Id.class) && type.containedTypeCount() == 1) {
-				return DE_SERIALIZER_MAP.get(type.containedType(0).getRawClass()).getMiddle();
+				return IdAnnotations.JsonIdDeserializer.getInstance(type.containedType(0).getRawClass());
 			}
 			return null;
 		}
@@ -117,7 +96,15 @@ public class IdDeSerializationModule extends Module {
 		public KeyDeserializer findKeyDeserializer(JavaType type, DeserializationConfig config,
 				BeanDescription beanDesc) throws JsonMappingException {
 			if (type.getRawClass().equals(Id.class) && type.containedTypeCount() == 1) {
-				return DE_SERIALIZER_MAP.get(type.containedType(0).getRawClass()).getRight();
+				return KEY_DESERIALIZER_CACHE.computeIfAbsent(type.containedType(0).getRawClass(),
+						k -> new KeyDeserializer() {
+
+							@Override
+							public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
+								return Id.create(key, k);
+							}
+
+						});
 			}
 			return null;
 		}

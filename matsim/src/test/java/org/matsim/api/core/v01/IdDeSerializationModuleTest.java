@@ -30,8 +30,10 @@ public class IdDeSerializationModuleTest {
 
 		// create map with Id<T> as keys
 		Map<Id<Link>, String> map0 = new LinkedHashMap<>();
-		map0.put(Id.createLinkId("0"), "a");
-		map0.put(Id.createLinkId("1"), "b");
+		Id<Link> linkId0 = Id.createLinkId("0");
+		Id<Link> linkId1 = Id.createLinkId("1");
+		map0.put(linkId0, "a");
+		map0.put(linkId1, "b");
 
 		// build writer
 		JavaType linkIdType = TYPE_FACTORY.constructParametricType(Id.class, Link.class);
@@ -56,6 +58,10 @@ public class IdDeSerializationModuleTest {
 			throw new RuntimeException(e);
 		}
 		Assert.assertEquals(map0, map1);
+		Assert.assertEquals(linkId0,
+				map1.keySet().stream().filter(lId -> lId.equals(linkId0)).findFirst().orElseThrow());
+		Assert.assertSame(linkId0,
+				map1.keySet().stream().filter(lId -> lId.equals(linkId0)).findFirst().orElseThrow());
 	}
 
 	@Test
@@ -63,7 +69,8 @@ public class IdDeSerializationModuleTest {
 
 		// create map with Id<T> as values
 		Map<String, Id<Link>> map0 = new LinkedHashMap<>();
-		map0.put("a", Id.createLinkId("0"));
+		Id<Link> linkId0 = Id.createLinkId("0");
+		map0.put("a", linkId0);
 		map0.put("b", Id.createLinkId("1"));
 
 		// build writer
@@ -89,6 +96,8 @@ public class IdDeSerializationModuleTest {
 			throw new RuntimeException(e);
 		}
 		Assert.assertEquals(map0, map1);
+		Assert.assertEquals(linkId0, map1.get("a"));
+		Assert.assertSame(linkId0, map1.get("a"));
 	}
 
 }

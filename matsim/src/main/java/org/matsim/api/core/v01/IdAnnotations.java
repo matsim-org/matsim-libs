@@ -23,20 +23,23 @@ package org.matsim.api.core.v01;
 import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Person;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.KeyDeserializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
@@ -44,156 +47,91 @@ public interface IdAnnotations {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@JacksonAnnotationsInside
-	@JsonSerialize(using = JsonPersonId.PersonIdSerializer.class)
-	@JsonDeserialize(using = JsonPersonId.PersonIdDeserializer.class)
-	public @interface JsonPersonId {
+	@JsonSerialize(using = JsonIdSerializer.class)
+	@JsonDeserialize(using = JsonIdContextualDeserializer.class)
+	public @interface JsonId {
 
-		static class PersonIdSerializer extends StdSerializer<Id<Person>> {
+	}
 
-			protected PersonIdSerializer() {
-				this(null);
-			}
+	class JsonIdSerializer<T> extends StdSerializer<T> {
 
-			protected PersonIdSerializer(Class<Id<Person>> vc) {
-				super(vc);
-			}
-
-			@Override
-			public void serialize(Id<Person> value, JsonGenerator gen, SerializerProvider provider) throws IOException {
-				gen.writeString(value.toString());
-			}
-
+		protected JsonIdSerializer() {
+			this(null);
 		}
 
-		static class PersonIdDeserializer extends StdDeserializer<Id<Person>> {
-
-			protected PersonIdDeserializer() {
-				this(null);
-			}
-
-			protected PersonIdDeserializer(Class<?> vc) {
-				super(vc);
-			}
-
-			@Override
-			public Id<Person> deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
-				JsonNode node = jp.getCodec().readTree(jp);
-				return Id.createPersonId(node.asText());
-			}
-
+		protected JsonIdSerializer(Class<T> vc) {
+			super(vc);
 		}
 
-		static class PersonIdKeyDeserializer extends KeyDeserializer {
-
-			@Override
-			public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
-				return Id.createPersonId(key);
-			}
-
+		@Override
+		public void serialize(T value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+			gen.writeString(value.toString());
 		}
 
 	}
 
-	@Retention(RetentionPolicy.RUNTIME)
-	@JacksonAnnotationsInside
-	@JsonSerialize(using = JsonLinkId.LinkIdSerializer.class)
-	@JsonDeserialize(using = JsonLinkId.LinkIdDeserializer.class)
-	public @interface JsonLinkId {
+	class JsonIdContextualDeserializer<T> extends StdDeserializer<Id<T>> implements ContextualDeserializer {
 
-		static class LinkIdSerializer extends StdSerializer<Id<Link>> {
+		private Class<T> idClass;
 
-			protected LinkIdSerializer() {
-				this(null);
-			}
-
-			protected LinkIdSerializer(Class<Id<Link>> vc) {
-				super(vc);
-			}
-
-			@Override
-			public void serialize(Id<Link> value, JsonGenerator gen, SerializerProvider provider) throws IOException {
-				gen.writeString(value.toString());
-			}
-
+		protected JsonIdContextualDeserializer() {
+			this(null);
 		}
 
-		static class LinkIdDeserializer extends StdDeserializer<Id<Link>> {
-
-			protected LinkIdDeserializer() {
-				this(null);
-			}
-
-			protected LinkIdDeserializer(Class<?> vc) {
-				super(vc);
-			}
-
-			@Override
-			public Id<Link> deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
-				JsonNode node = jp.getCodec().readTree(jp);
-				return Id.createLinkId(node.asText());
-			}
-
+		protected JsonIdContextualDeserializer(Class<T> idClass) {
+			super(Object.class);
+			this.idClass = idClass;
 		}
 
-		static class LinkIdKeyDeserializer extends KeyDeserializer {
+		@Override
+		public JsonDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property)
+				throws JsonMappingException {
 
-			@Override
-			public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
-				return Id.createLinkId(key);
+			final Class<? extends Object> idClass;
+			{
+				final JavaType type;
+				if (property != null)
+					type = property.getType();
+				else {
+					type = ctxt.getContextualType();
+				}
+				idClass = type.containedType(0).getRawClass();
 			}
 
+			return JsonIdDeserializer.getInstance(idClass);
+		}
+
+		@Override
+		public Id<T> deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JacksonException {
+			JsonNode node = jp.getCodec().readTree(jp);
+			return Id.create(node.asText(), idClass);
 		}
 
 	}
 
-	@Retention(RetentionPolicy.RUNTIME)
-	@JacksonAnnotationsInside
-	@JsonSerialize(using = JsonNodeId.NodeIdSerializer.class)
-	@JsonDeserialize(using = JsonNodeId.NodeIdDeserializer.class)
-	public @interface JsonNodeId {
+	class JsonIdDeserializer<T> extends StdDeserializer<Id<T>> {
 
-		static class NodeIdSerializer extends StdSerializer<Id<Node>> {
+		private static final Map<Class<?>, JsonIdDeserializer<?>> CACHE = new HashMap<>();
 
-			protected NodeIdSerializer() {
-				this(null);
-			}
-
-			protected NodeIdSerializer(Class<Id<Node>> vc) {
-				super(vc);
-			}
-
-			@Override
-			public void serialize(Id<Node> value, JsonGenerator gen, SerializerProvider provider) throws IOException {
-				gen.writeString(value.toString());
-			}
-
+		public static JsonIdDeserializer<?> getInstance(Class<?> clazz) {
+			return CACHE.computeIfAbsent(clazz, k -> new JsonIdDeserializer<>(k));
 		}
 
-		static class NodeIdDeserializer extends StdDeserializer<Id<Node>> {
+		private final Class<T> idClass;
 
-			protected NodeIdDeserializer() {
-				this(null);
-			}
-
-			protected NodeIdDeserializer(Class<?> vc) {
-				super(vc);
-			}
-
-			@Override
-			public Id<Node> deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
-				JsonNode node = jp.getCodec().readTree(jp);
-				return Id.createNodeId(node.asText());
-			}
-
+		private JsonIdDeserializer() {
+			this(null);
 		}
 
-		static class NodeIdKeyDeserializer extends KeyDeserializer {
+		private JsonIdDeserializer(Class<T> idClass) {
+			super(Object.class);
+			this.idClass = idClass;
+		}
 
-			@Override
-			public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
-				return Id.createNodeId(key);
-			}
-
+		@Override
+		public Id<T> deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+			JsonNode node = jp.getCodec().readTree(jp);
+			return Id.create(node.asText(), idClass);
 		}
 
 	}
