@@ -46,7 +46,6 @@ public class RunPSimTest {
 	 */
 	@Test
 	public void testA() {
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		config.controller().setCreateGraphs(false);
 
 		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
@@ -108,10 +107,7 @@ public class RunPSimTest {
 		Population popActual = PopulationUtils.createPopulation( config );
 		PopulationUtils.readPopulation( popActual, outDir + "/output_plans.xml.gz" );
 		new PopulationComparison().compare( popExpected, popActual ) ;
-		Assert.assertEquals("RunPsim score changed.", 138.88379880881348, psimScore, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("RunPsim score changed.", 134.54001491094124d, psimScore, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("RunPsim score changed.", 134.52369453719413d, psimScore, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("RunPsim score changed.", 132.73129073101293d, psimScore, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("RunPsim score changed.", 138.88788052033888, psimScore, MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -123,7 +119,6 @@ public class RunPSimTest {
 	 */
 	@Test
 	public void testB() {
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(2);
 		config.controller().setCreateGraphs(false);
@@ -135,9 +130,8 @@ public class RunPSimTest {
 		controler.run();
 
 		double qsimScore = execScoreTracker.executedScore;
-		logger.info("Default controler score was " + qsimScore );
-//		Assert.assertEquals("Default controler score changed.", 131.84309487251033d, qsimScore, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Default controler score changed.", 131.84350487113088d, qsimScore, MatsimTestUtils.EPSILON);
+		logger.info("Default controller score was " + qsimScore );
+		Assert.assertEquals("Default controller score changed.", 131.85545404187428, qsimScore, MatsimTestUtils.EPSILON);
 	}
 
 	class ExecScoreTracker implements ShutdownListener {
