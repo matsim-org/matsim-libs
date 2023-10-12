@@ -34,6 +34,8 @@ import java.util.Random;
 public class ParkingUtils {
 
 	static public final String ParkingStageInteractionType = "parking";
+	static public final String ParkingActivityType = "parking_activity";
+	static public final String WaitingForParkingActivityType = "waitingForParkingSpace_activity";
 	static public final int NO_OF_LINKS_TO_GET_ON_ROUTE = 5;
 
 
