@@ -49,7 +49,6 @@ import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PtCountsConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
@@ -148,8 +147,6 @@ public final class Config implements MatsimExtensionPoint {
 		this.modules.put(TimeAllocationMutatorConfigGroup.GROUP_NAME, new TimeAllocationMutatorConfigGroup());
 
 		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, new VspExperimentalConfigGroup());
-
-		this.modules.put(PtCountsConfigGroup.GROUP_NAME, new PtCountsConfigGroup());
 
 		this.modules.put(TransitConfigGroup.GROUP_NAME, new TransitConfigGroup());
 
@@ -450,10 +447,6 @@ public final class Config implements MatsimExtensionPoint {
 
 	public QSimConfigGroup qsim() {
 		return (QSimConfigGroup) this.getModule(QSimConfigGroup.GROUP_NAME);
-	}
-
-	public PtCountsConfigGroup ptCounts() {
-		return (PtCountsConfigGroup) this.getModule(PtCountsConfigGroup.GROUP_NAME);
 	}
 
 	public TransitConfigGroup transit() {
