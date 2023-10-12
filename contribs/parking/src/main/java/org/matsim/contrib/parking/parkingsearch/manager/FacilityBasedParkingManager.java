@@ -26,8 +26,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.sim.ParkingSearchConfigGroup;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
@@ -61,6 +63,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	protected Network network;
 	protected ParkingSearchConfigGroup psConfigGroup;
 	protected boolean canParkOnlyAtFacilities;
+	private QSim qsim;
 	private final int maxSlotIndex;
 	private final int maxTime;
 	private final int timeBinSize;
