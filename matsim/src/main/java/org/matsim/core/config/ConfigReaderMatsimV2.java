@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.checkerframework.checker.units.qual.C;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -50,13 +51,20 @@ class ConfigReaderMatsimV2 extends MatsimXmlParser {
 
 	private final Config config;
 
-	private final ConfigAliases aliases = new ConfigAliases();
+	private final ConfigAliases aliases;
 	private final Deque<ConfigGroup> moduleStack = new ArrayDeque<>();
 	private final Deque<String> pathStack = new ArrayDeque<>();
 
 	ConfigReaderMatsimV2(final Config config) {
 		super(ValidationType.DTD_ONLY);
 		this.config = config;
+		this.aliases = new ConfigAliases();
+	}
+
+	ConfigReaderMatsimV2(final Config config, final ConfigAliases aliases) {
+		super(ValidationType.DTD_ONLY);
+		this.config = config;
+		this.aliases = aliases;
 	}
 
 	public ConfigAliases getConfigAliases() {

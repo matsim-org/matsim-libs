@@ -37,6 +37,28 @@ public class ConfigReaderMatsimV2Test {
 	}
 
 	@Test
+	public void testModuleNameAlias_noOldModules() {
+		Config config = ConfigUtils.createConfig();
+		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
+
+		String xml = """
+				<?xml version="1.0" ?>
+				<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+				<config>
+					<module name="controler">
+						<param name="lastIteration" value="27"/>
+					</module>
+				</config>
+				""";
+		ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
+
+		r2.readStream(bais);
+
+		Assert.assertEquals(27, config.controller().getLastIteration());
+		Assert.assertNull(config.getModules().get("controler"));
+	}
+
+	@Test
 	public void testParamNameAlias() {
 		Config config = ConfigUtils.createConfig();
 		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);

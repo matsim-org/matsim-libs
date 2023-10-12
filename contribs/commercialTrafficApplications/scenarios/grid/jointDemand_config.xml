@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
-    <module name="JDEQSim">
-        <param name="carSize" value="7.5"/>
-        <param name="endTime" value="undefined"/>
-        <param name="flowCapacityFactor" value="1.0"/>
-        <param name="gapTravelSpeed" value="15.0"/>
-        <param name="minimumInFlowCapacity" value="1800.0"/>
-        <param name="squeezeTime" value="1800.0"/>
-        <param name="storageCapacityFactor" value="1.0"/>
-    </module>
     <module name="TimeAllocationMutator">
         <!-- Default:true; Defines whether time mutation changes an activity's duration. -->
         <param name="mutationAffectsDuration" value="true"/>
