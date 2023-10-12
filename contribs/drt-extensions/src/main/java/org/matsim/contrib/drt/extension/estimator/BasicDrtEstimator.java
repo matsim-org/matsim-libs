@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.extension.estimator.run.DrtEstimatorConfigGroup;
 import org.matsim.contrib.drt.routing.DrtRoute;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -29,6 +30,7 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 
 	private final DrtEventSequenceCollector collector;
 	private final DrtEstimatorConfigGroup config;
+	private final DrtConfigGroup drtConfig;
 
 	private final DrtSpeedUpParams speedUpParams;
 
@@ -46,6 +48,7 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 		//zones = injector.getModal(DrtZonalSystem.class);
 		collector = injector.getModal(DrtEventSequenceCollector.class);
 		config = injector.getModal(DrtEstimatorConfigGroup.class);
+		drtConfig = injector.getModal(DrtConfigGroup.class);
 
 		DrtSpeedUpParams modal;
 		try {
@@ -115,9 +118,14 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 	@Override
 	public Estimate estimate(DrtRoute route, OptionalTime departureTime) {
 
-		if (currentEst == null)
-			return new Estimate(route.getDistance() * config.defaultDetourFactor,
-					route.getDirectRideTime() * config.defaultDetourFactor, config.defaultWaitTime, 0);
+		if (currentEst == null) {
+			// If not estimates are present, use the drt default worse case parameters
+			double travelTime =  Math.min(route.getDirectRideTime() + drtConfig.maxAbsoluteDetour,
+				route.getDirectRideTime() * drtConfig.maxTravelTimeAlpha + drtConfig.maxTravelTimeBeta);
+
+			// for distance, also use the max travel time alpha
+			return new Estimate(route.getDistance() * drtConfig.maxTravelTimeAlpha, travelTime, drtConfig.maxWaitTime, 0);
+		}
 
 		double fare = 0;
 		if (this.fare != null)

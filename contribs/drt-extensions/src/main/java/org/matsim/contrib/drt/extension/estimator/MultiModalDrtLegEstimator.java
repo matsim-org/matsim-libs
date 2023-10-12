@@ -28,7 +28,7 @@ public class MultiModalDrtLegEstimator implements LegEstimator<ModeAvailability>
 
 	private static final Logger log = LogManager.getLogger(MultiModalDrtLegEstimator.class);
 
-	private final Map<String, DrtEstimator> estimators = new HashMap<>();
+	protected final Map<String, DrtEstimator> estimators = new HashMap<>();
 
 	@Inject
 	public MultiModalDrtLegEstimator(Injector injector) {

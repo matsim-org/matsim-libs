@@ -48,16 +48,6 @@ public class DrtEstimatorConfigGroup extends ReflectiveConfigGroupWithConfigurab
 	@PositiveOrZero
 	public double randomization = 0.1;
 
-	@Parameter
-	@Comment("Default wait time in seconds, when no estimates are present.")
-	@PositiveOrZero
-	public double defaultWaitTime = 300;
-
-	@Parameter
-	@Comment("Default detour factor, when no estimates are present.")
-	@PositiveOrZero
-	public double defaultDetourFactor = 1.05;
-
 
 	@Override
 	public String getMode() {
