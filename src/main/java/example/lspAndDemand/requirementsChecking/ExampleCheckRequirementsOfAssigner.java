@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.freight.carriers.carrier.*;
-import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -67,7 +67,7 @@ class ExampleCheckRequirementsOfAssigner {
 				.addVehicle(redVehicle)
 				.setFleetSize(FleetSize.INFINITE)
 				.build();
-		Carrier redCarrier = CarrierUtils.createCarrier(redCarrierId);
+		Carrier redCarrier = CarriersUtils.createCarrier(redCarrierId);
 		redCarrier.setCarrierCapabilities(redCapabilities);
 
 		LSPResource redResource = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(redCarrier, network)
@@ -99,7 +99,7 @@ class ExampleCheckRequirementsOfAssigner {
 				.addVehicle(blueVehicle)
 				.setFleetSize(FleetSize.INFINITE)
 				.build();
-		Carrier blueCarrier = CarrierUtils.createCarrier(blueCarrierId);
+		Carrier blueCarrier = CarriersUtils.createCarrier(blueCarrierId);
 		blueCarrier.setCarrierCapabilities(blueCapabilities);
 
 		LSPResource blueResource = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(blueCarrier, network)

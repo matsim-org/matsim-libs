@@ -6,7 +6,7 @@ import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.freight.carriers.carrier.Carrier;
+import org.matsim.freight.carriers.Carrier;
 
 import java.util.ArrayList;
 

@@ -31,7 +31,7 @@ import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.freight.carriers.carrier.CarrierService;
+import org.matsim.freight.carriers.CarrierService;
 import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
 import org.matsim.freight.carriers.events.eventhandler.FreightServiceEndEventHandler;
 

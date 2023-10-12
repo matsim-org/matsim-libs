@@ -31,10 +31,10 @@ import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.freight.carriers.carrier.CarrierService;
-import org.matsim.freight.carriers.carrier.Tour;
-import org.matsim.freight.carriers.carrier.Tour.ServiceActivity;
-import org.matsim.freight.carriers.carrier.Tour.TourElement;
+import org.matsim.freight.carriers.CarrierService;
+import org.matsim.freight.carriers.Tour;
+import org.matsim.freight.carriers.Tour.ServiceActivity;
+import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.eventhandler.FreightTourEndEventHandler;
 

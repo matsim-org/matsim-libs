@@ -38,9 +38,8 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.carrier.*;
-import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
 import org.matsim.freight.carriers.events.eventhandler.FreightServiceEndEventHandler;
 import org.matsim.vehicles.VehicleType;
@@ -71,7 +70,7 @@ import java.util.*;
 				.addVehicle(CarrierVehicle.newInstance(Id.createVehicleId("CollectionVehicle"), collectionLinkId, carrierVehicleType))
 				.setFleetSize(FleetSize.INFINITE).build();
 
-		Carrier carrier = CarrierUtils.createCarrier(Id.create("CollectionCarrier", Carrier.class));
+		Carrier carrier = CarriersUtils.createCarrier(Id.create("CollectionCarrier", Carrier.class));
 		carrier.setCarrierCapabilities(capabilities);
 
 		//The Resource i.e. the Resource is created

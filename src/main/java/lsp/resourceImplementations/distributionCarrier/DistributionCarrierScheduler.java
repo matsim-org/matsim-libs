@@ -27,11 +27,11 @@ import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Id;
-import org.matsim.freight.carriers.carrier.*;
-import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.freight.carriers.carrier.Tour.Leg;
-import org.matsim.freight.carriers.carrier.Tour.ServiceActivity;
-import org.matsim.freight.carriers.carrier.Tour.TourElement;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.Tour.Leg;
+import org.matsim.freight.carriers.Tour.ServiceActivity;
+import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
@@ -259,7 +259,7 @@ import java.util.List;
 	private Carrier createAuxiliaryCarrier(ArrayList<LspShipmentWithTime> shipmentsInCurrentTour, double startTime) {
 		final Id<Carrier> carrierId = Id.create(carrier.getId().toString() + carrierCnt, Carrier.class);
 		carrierCnt ++;
-		Carrier auxiliaryCarrier = CarrierUtils.createCarrier(carrierId);
+		Carrier auxiliaryCarrier = CarriersUtils.createCarrier(carrierId);
 		CarrierVehicle carrierVehicle = carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next();
 		final VehicleType vehicleType = carrierVehicle.getType();
 

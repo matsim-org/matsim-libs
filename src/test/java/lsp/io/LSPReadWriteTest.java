@@ -3,10 +3,10 @@ package lsp.io;
 import lsp.LSPs;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.freight.carriers.carrier.CarrierPlanXmlReader;
-import org.matsim.freight.carriers.carrier.CarrierVehicleTypeReader;
-import org.matsim.freight.carriers.carrier.CarrierVehicleTypes;
-import org.matsim.freight.carriers.carrier.Carriers;
+import org.matsim.freight.carriers.CarrierPlanXmlReader;
+import org.matsim.freight.carriers.CarrierVehicleTypeReader;
+import org.matsim.freight.carriers.CarrierVehicleTypes;
+import org.matsim.freight.carriers.Carriers;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.Collections;

@@ -27,10 +27,10 @@ import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
-import org.matsim.freight.carriers.carrier.CarrierService;
-import org.matsim.freight.carriers.carrier.Tour;
-import org.matsim.freight.carriers.carrier.Tour.ServiceActivity;
-import org.matsim.freight.carriers.carrier.Tour.TourElement;
+import org.matsim.freight.carriers.CarrierService;
+import org.matsim.freight.carriers.Tour;
+import org.matsim.freight.carriers.Tour.ServiceActivity;
+import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
 import org.matsim.freight.carriers.events.eventhandler.FreightTourStartEventHandler;
 

@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.freight.carriers.carrier.*;
-import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -80,7 +80,7 @@ public class CollectionResourceTest {
 		capabilitiesBuilder.addVehicle(collectionCarrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		capabilities = capabilitiesBuilder.build();
-		collectionCarrier = CarrierUtils.createCarrier(carrierId);
+		collectionCarrier = CarriersUtils.createCarrier(carrierId);
 		collectionCarrier.setCarrierCapabilities(capabilities);
 
 

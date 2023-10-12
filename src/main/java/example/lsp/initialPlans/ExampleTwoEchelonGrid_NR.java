@@ -48,8 +48,7 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.carrier.*;
+import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
@@ -157,8 +156,8 @@ final class ExampleTwoEchelonGrid_NR {
 
 		//Ggf. muss der Ordner noch erstellt werden (?)
 		new LSPPlanXmlWriter(LSPUtils.getLSPs(controler.getScenario())).write(controler.getConfig().controller().getOutputDirectory() + "/lsps.xml");
-		new LSPPlanXmlReader(LSPUtils.getLSPs(controler.getScenario()), CarrierUtils.getCarriers(controler.getScenario()));
-		new CarrierPlanWriter(CarrierUtils.getCarriers(controler.getScenario())).write(controler.getConfig().controller().getOutputDirectory() + "/carriers.xml");
+		new LSPPlanXmlReader(LSPUtils.getLSPs(controler.getScenario()), CarriersUtils.getCarriers(controler.getScenario()));
+		new CarrierPlanWriter(CarriersUtils.getCarriers(controler.getScenario())).write(controler.getConfig().controller().getOutputDirectory() + "/carriers.xml");
 
 		log.info("Some results ....");
 
@@ -218,10 +217,10 @@ final class ExampleTwoEchelonGrid_NR {
 		{
 			log.info("Create lspPlan for direct delivery");
 
-			Carrier directCarrier = CarrierUtils.createCarrier(Id.create("directCarrier", Carrier.class));
+			Carrier directCarrier = CarriersUtils.createCarrier(Id.create("directCarrier", Carrier.class));
 			directCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-			CarrierUtils.addCarrierVehicle(directCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
+			CarriersUtils.addCarrierVehicle(directCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
 			LSPResource directCarrierRessource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(directCarrier, network)
 					.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 					.build();
@@ -245,10 +244,10 @@ final class ExampleTwoEchelonGrid_NR {
 		{
 			log.info("Create lspPlan with Hub");
 
-			Carrier mainCarrier = CarrierUtils.createCarrier(Id.create("mainCarrier", Carrier.class));
+			Carrier mainCarrier = CarriersUtils.createCarrier(Id.create("mainCarrier", Carrier.class));
 			mainCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-			CarrierUtils.addCarrierVehicle(mainCarrier, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
+			CarriersUtils.addCarrierVehicle(mainCarrier, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
 			LSPResource mainCarrierRessource = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier, network)
 					.setFromLinkId(DEPOT_LINK_ID)
 					.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
@@ -276,7 +275,7 @@ final class ExampleTwoEchelonGrid_NR {
 					.setResource(hubResource)
 					.build(); //Nicht unbedingt nötig, aber nehme den alten Hub nun als Depot. Waren werden dann dort "Zusammengestellt".
 
-			Carrier distributionCarrier = CarrierUtils.createCarrier(Id.create("distributionCarrier", Carrier.class));
+			Carrier distributionCarrier = CarriersUtils.createCarrier(Id.create("distributionCarrier", Carrier.class));
 			distributionCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 			final VehicleType vehType;
@@ -285,7 +284,7 @@ final class ExampleTwoEchelonGrid_NR {
 				case lowerCost4LastMile -> 	vehType = VEH_TYPE_SMALL_05;
 				default -> throw new IllegalStateException("Unexpected value: " + costSetting);
 			}
-			CarrierUtils.addCarrierVehicle(distributionCarrier, CarrierVehicle.newInstance(Id.createVehicleId("distributionTruck"), HUB_LINK_ID, vehType));
+			CarriersUtils.addCarrierVehicle(distributionCarrier, CarrierVehicle.newInstance(Id.createVehicleId("distributionTruck"), HUB_LINK_ID, vehType));
 			LSPResource distributionCarrierRessource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
 					.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 					.build();

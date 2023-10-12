@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.freight.carriers.carrier.Carrier;
+import org.matsim.freight.carriers.Carrier;
 
 /**
  * This is somewhat similar to the MATSim core {@link ScoringFunction}, which is also used for {@link Carrier}s.  A difference, however, is that it

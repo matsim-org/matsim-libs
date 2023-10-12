@@ -23,7 +23,7 @@ package lsp.shipment;
 import lsp.LSPDataObject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.freight.carriers.carrier.TimeWindow;
+import org.matsim.freight.carriers.TimeWindow;
 
 import java.util.ArrayList;
 import java.util.Collection;

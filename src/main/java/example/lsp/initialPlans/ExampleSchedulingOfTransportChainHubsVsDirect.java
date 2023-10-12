@@ -44,9 +44,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.carrier.*;
-import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
@@ -217,7 +216,7 @@ import java.util.*;
 
 			log.info("");
 			log.info("The Carrier for the main run is created");
-			Carrier mainRunCarrier = CarrierUtils.createCarrier(Id.create("MainRunCarrier", Carrier.class));
+			Carrier mainRunCarrier = CarriersUtils.createCarrier(Id.create("MainRunCarrier", Carrier.class));
 
 			VehicleType mainRunVehicleType = CarrierVehicleType.Builder.newInstance(Id.create("MainRunCarrierVehicleType", VehicleType.class))
 					.setCapacity(30)
@@ -280,7 +279,7 @@ import java.util.*;
 
 			CarrierVehicle distributionCarrierVehicle = CarrierVehicle.Builder.newInstance(Id.createVehicleId("DistributionVehicle"), hubLinkId, distributionVehicleType).build();
 
-			Carrier distributionCarrier = CarrierUtils.createCarrier(Id.create("DistributionCarrier", Carrier.class));
+			Carrier distributionCarrier = CarriersUtils.createCarrier(Id.create("DistributionCarrier", Carrier.class));
 			distributionCarrier.setCarrierCapabilities(
 					CarrierCapabilities.Builder.newInstance()
 							.addType(distributionVehicleType)
@@ -319,7 +318,7 @@ import java.util.*;
 					.addVehicle(directDistributionCarrierVehicle)
 					.setFleetSize(FleetSize.INFINITE)
 					.build();
-			Carrier directDistributionCarrier = CarrierUtils.createCarrier(Id.create("DirectDistributionCarrier", Carrier.class));
+			Carrier directDistributionCarrier = CarriersUtils.createCarrier(Id.create("DirectDistributionCarrier", Carrier.class));
 			directDistributionCarrier.setCarrierCapabilities(directDistributionCarrierCapabilities);
 
 			//The distribution adapter i.e. the Resource is created

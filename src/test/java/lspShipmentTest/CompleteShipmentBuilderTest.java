@@ -32,7 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.freight.carriers.carrier.TimeWindow;
+import org.matsim.freight.carriers.TimeWindow;
 
 import java.util.ArrayList;
 import java.util.Collections;
