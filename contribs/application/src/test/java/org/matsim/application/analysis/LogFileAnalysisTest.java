@@ -24,15 +24,15 @@ public class LogFileAnalysisTest {
 
 		Config config = ConfigUtils.createConfig();
 
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setLastIteration(2);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setLastIteration(2);
 
 		int execute = MATSimApplication.execute(MATSimApplicationTest.TestScenario.class, config);
 
 		Assertions.assertThat(execute)
 			.isEqualTo(0);
 
-		Path out = Path.of(config.controler().getOutputDirectory());
+		Path out = Path.of(config.controller().getOutputDirectory());
 		new LogFileAnalysis().execute(
 			"--input", ApplicationUtils.matchInput("logfile.log", out).toString(),
 			"--output-memory-stats", out.resolve("mem_stats.csv").toString(),

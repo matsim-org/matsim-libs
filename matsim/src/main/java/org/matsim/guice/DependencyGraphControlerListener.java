@@ -32,7 +32,7 @@ import com.google.inject.grapher.Alias;
 import com.google.inject.grapher.NodeId;
 import com.google.inject.spi.ProviderBinding;
 import com.google.inject.util.Types;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
@@ -68,7 +68,7 @@ class DependencyGraphControlerListener implements StartupListener {
 	}
 
 	public void notifyStartup(StartupEvent event) {
-		if (event.getServices().getConfig().controler().isCreateGraphs()) {
+		if (event.getServices().getConfig().controller().isCreateGraphs()) {
 			try (PrintWriter out = new PrintWriter(new File(controlerIO.getOutputFilename("modules.dot")))) {
 				MatsimGrapher grapher = new MatsimGrapher(new AbstractInjectorGrapher.GrapherParameters()
 						.setAliasCreator(bindings -> {
@@ -82,7 +82,7 @@ class DependencyGraphControlerListener implements StartupListener {
 									allAliases.addAll(getMapBinderAliases(String.class, TravelTime.class, bindings));
 									allAliases.addAll(getMapBinderAliases(String.class, TravelDisutilityFactory.class, bindings));
 									allAliases.addAll(getMapBinderAliases(String.class, RoutingModule.class, bindings));
-									allAliases.addAll(getMapBinderAliases(StrategyConfigGroup.StrategySettings.class, PlanStrategy.class, bindings));
+									allAliases.addAll(getMapBinderAliases(ReplanningConfigGroup.StrategySettings.class, PlanStrategy.class, bindings));
 									allAliases.addAll(getMultibinderAliases(ControlerListener.class, bindings));
 									allAliases.addAll(getMultibinderAliases(SnapshotWriter.class, bindings));
 									allAliases.addAll(getMultibinderAliases(MobsimListener.class, bindings));

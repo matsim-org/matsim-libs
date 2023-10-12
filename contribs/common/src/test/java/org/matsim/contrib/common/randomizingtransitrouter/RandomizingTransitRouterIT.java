@@ -33,11 +33,9 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.contrib.common.randomizedtransitrouter.RandomizingTransitRouterModule;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.FacilitiesConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
@@ -54,11 +52,11 @@ import org.matsim.vehicles.Vehicle;
  */
 public class RandomizingTransitRouterIT {
 	private static final Logger log = LogManager.getLogger( RandomizingTransitRouterIT.class ) ;
-	
+
 	private static final class MyObserver implements PersonEntersVehicleEventHandler {
 //		private enum ObservedVehicle{ pt_1009_1 /*direct, fast, with wait*/, pt_2009_1 /*direct, slow*/, pt_3009_1 /*with interchange*/} ;
-		
-		Map<Id<Vehicle>,Double> cnts = new HashMap<>() ;		
+
+		Map<Id<Vehicle>,Double> cnts = new HashMap<>() ;
 
 		@Override public void reset(int iteration) {
 			cnts.clear();
@@ -67,13 +65,13 @@ public class RandomizingTransitRouterIT {
 		@Override public void handleEvent(PersonEntersVehicleEvent event) {
 			cnts.merge( event.getVehicleId() , 1. , Double::sum );
 		}
-		
+
 		void printCounts() {
 			for ( Entry<Id<Vehicle>, Double> entry : cnts.entrySet() ) {
 				log.info( "Vehicle id: " + entry.getKey() + "; number of boards: " + entry.getValue() ) ;
 			}
 		}
-		
+
 		Map< Id<Vehicle>, Double> getCounts() {
 			return this.cnts ;
 		}
@@ -87,7 +85,7 @@ public class RandomizingTransitRouterIT {
 		String outputDir = utils.getOutputDirectory() ;
 
 		Config config = utils.createConfigWithPackageInputResourcePathAsContext();
-		
+
 		config.network().setInputFile("network.xml");
 		config.plans().setInputFile("population.xml");
 
@@ -95,25 +93,25 @@ public class RandomizingTransitRouterIT {
 		config.transit().setTransitScheduleFile("transitschedule.xml");
 		config.transit().setVehiclesFile("transitVehicles.xml");
 		config.transit().setUseTransit(true);
-		
-		config.controler().setOutputDirectory( outputDir );
-		config.controler().setLastIteration(20);
-		config.controler().setCreateGraphs(false);
-		config.controler().setDumpDataAtEnd(false);
-		
+
+		config.controller().setOutputDirectory( outputDir );
+		config.controller().setLastIteration(20);
+		config.controller().setCreateGraphs(false);
+		config.controller().setDumpDataAtEnd(false);
+
 		config.global().setNumberOfThreads(1);
-		
-		config.planCalcScore().addActivityParams( new ActivityParams("home").setTypicalDuration( 6*3600. ) );
-		config.planCalcScore().addActivityParams( new ActivityParams("education_100").setTypicalDuration( 6*3600. ) );
+
+		config.scoring().addActivityParams( new ActivityParams("home").setTypicalDuration( 6*3600. ) );
+		config.scoring().addActivityParams( new ActivityParams("education_100").setTypicalDuration( 6*3600. ) );
 
 //		config.strategy().addStrategySettings( new StrategySettings( ConfigUtils.createAvailableStrategyId(config)).setStrategyName(DefaultStrategy.ReRoute ).setWeight(0.1 ) );
 //		config.strategy().addStrategySettings( new StrategySettings( ConfigUtils.createAvailableStrategyId(config)).setStrategyName(DefaultSelector.ChangeExpBeta ).setWeight(0.9 ) );
-		config.strategy().addStrategySettings( new StrategySettings().setStrategyName(DefaultStrategy.ReRoute ).setWeight(0.1 ) );
-		config.strategy().addStrategySettings( new StrategySettings().setStrategyName(DefaultSelector.ChangeExpBeta ).setWeight(0.9 ) );
+		config.replanning().addStrategySettings( new StrategySettings().setStrategyName(DefaultStrategy.ReRoute ).setWeight(0.1 ) );
+		config.replanning().addStrategySettings( new StrategySettings().setStrategyName(DefaultSelector.ChangeExpBeta ).setWeight(0.9 ) );
 		// yy changing the above (= no longer using createAvailableStrategyId) changes the results.  :-( :-( :-(
 
 		config.qsim().setEndTime(18.*3600.);
-		
+
 		config.timeAllocationMutator().setMutationRange(7200);
 		config.timeAllocationMutator().setAffectingDuration(false);
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
@@ -125,39 +123,39 @@ public class RandomizingTransitRouterIT {
 		// * The implicit activity coordinates may be elsewhere.
 		// * The "fudged" walk distances may be different.
 		// * It uses getNearestLinkEXACTLY, and thus activities may be attached to other links.
-		
+
 		config.vspExperimental().setWritingOutputEvents(true);
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.warn );
-		
+
 		// ---
-		
+
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		
+
 		// ---
-		
+
 		Controler controler = new Controler( scenario ) ;
 
 		controler.addOverridingModule( new RandomizingTransitRouterModule() );
 
 		final MyObserver observer = new MyObserver();
 		controler.getEvents().addHandler(observer);
-		
+
 		controler.run();
-		
+
 		// ---
-		
-		observer.printCounts(); 
-		
+
+		observer.printCounts();
+
 		// yyyy the following is just a regression test, making sure that results remain stable.  In general, the randomized transit router
 		// could be improved, for example along the lines of the randomized regular router, which uses a (hopefully unbiased) lognormal
 		// distribution rather than a biased uniform distribution as is used here.  kai, jul'15
-		
+
 		Assert.assertEquals(36., observer.getCounts().get( Id.create("1009", Vehicle.class) ), 0.1 );
 		Assert.assertEquals( 8. /*6.*/ , observer.getCounts().get( Id.create("1012", Vehicle.class) ) , 0.1 );
 		Assert.assertEquals(22. /*21.*/, observer.getCounts().get( Id.create("2009", Vehicle.class) ) , 0.1 );
 		Assert.assertEquals(36., observer.getCounts().get( Id.create("3009", Vehicle.class) ) , 0.1 );
-		
-		
+
+
 	}
 
 }

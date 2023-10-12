@@ -7,7 +7,7 @@ import org.matsim.core.config.Config;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class RunPassengerAlongWithCarriersIT {
-   
+
     @Rule
     public MatsimTestUtils utils = new MatsimTestUtils() ;
 
@@ -17,8 +17,8 @@ public class RunPassengerAlongWithCarriersIT {
         	RunPassengerAlongWithCarriers abc = new RunPassengerAlongWithCarriers();
             // ---
             Config config = abc.prepareConfig();
-            config.controler().setLastIteration( 1 );
-            config.controler().setOutputDirectory( utils.getOutputDirectory() );
+            config.controller().setLastIteration( 1 );
+            config.controller().setOutputDirectory( utils.getOutputDirectory() );
             // ---
             abc.run();
         } catch (Exception ee ) {

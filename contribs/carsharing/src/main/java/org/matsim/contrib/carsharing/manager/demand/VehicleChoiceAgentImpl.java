@@ -2,7 +2,6 @@ package org.matsim.contrib.carsharing.manager.demand;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,7 +14,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContainer;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -72,7 +71,7 @@ public class VehicleChoiceAgentImpl implements VehicleChoiceAgent {
 
 		CSVehicle chosenVehicle = null;
 		double maxUtility = Integer.MIN_VALUE;
-		double marginalUtilityOfMoney = ((PlanCalcScoreConfigGroup) scenario.getConfig().getModule("planCalcScore"))
+		double marginalUtilityOfMoney = ((ScoringConfigGroup) scenario.getConfig().getModule("planCalcScore"))
 				.getMarginalUtilityOfMoney();
 		for (CSVehicle vehicle : vehicleOptions) {
 			Link vehicleLocation = this.carsharingSupply.getCompany(vehicle.getCompanyId())

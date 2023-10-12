@@ -90,8 +90,8 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
         pkMbyModeCalculator.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
         pHbyModeCalculator.writeOutput();
         pkMbyModeCalculator.writeOutput();
-        final boolean writingTripsAtAll = config.controler().getWriteTripsInterval() > 0;
-        final boolean regularWriteEvents = writingTripsAtAll && ((event.getIteration() > 0 && event.getIteration() % config.controler().getWriteTripsInterval() == 0) || event.isLastIteration());
+        final boolean writingTripsAtAll = config.controller().getWriteTripsInterval() > 0;
+        final boolean regularWriteEvents = writingTripsAtAll && ((event.getIteration() > 0 && event.getIteration() % config.controller().getWriteTripsInterval() == 0) || event.isLastIteration());
         if (regularWriteEvents || (writingTripsAtAll && event.getIteration() == 0)) {
             new TripsAndLegsCSVWriter(scenario, customTripsWriterExtension, customLegsWriterExtension, mainModeIdentifier, customTimeWriter).write(experiencedPlansService.getExperiencedPlans()
                     , outputDirectoryHierarchy.getIterationFilename(event.getIteration(), Controler.DefaultFiles.tripscsv)
@@ -106,7 +106,7 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
 	public void notifyShutdown(ShutdownEvent event) {
 		travelDistanceStats.close();
 
-        if (config.controler().getWriteTripsInterval() > 0) {
+        if (config.controller().getWriteTripsInterval() > 0) {
             writePersonsCSV();
         }
     }

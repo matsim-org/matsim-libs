@@ -35,7 +35,7 @@ import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -83,7 +83,7 @@ public class DistanceConstraintTest {
 	public final void CarrierSmallBatteryTest_Version1() throws ExecutionException, InterruptedException {
 
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -102,7 +102,7 @@ public class DistanceConstraintTest {
 		VehicleUtils.setEnergyConsumptionKWhPerMeter(vehicleType_LargeV1.getEngineInformation(), 0.015);
 		vehicleType_LargeV1.getCapacity().setOther(80.);
 		vehicleType_LargeV1.setDescription("Carrier_Version1");
-		
+
 		VehicleType vehicleType_SmallV1 = VehicleUtils.createVehicleType(Id.create("SmallBattery_V1", VehicleType.class));
 		vehicleType_SmallV1.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(70.);
 		VehicleUtils.setHbefaTechnology(vehicleType_SmallV1.getEngineInformation(), "electricity");
@@ -137,7 +137,7 @@ public class DistanceConstraintTest {
 				MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30000, maxDistance_vehicleType_SmallV1,
 				MatsimTestUtils.EPSILON);
-		
+
 		double distanceTour = 0.0;
 		List<Tour.TourElement> elements = carrierV1.getSelectedPlan().getScheduledTours().iterator().next().getTour()
 				.getTourElements();
@@ -161,7 +161,7 @@ public class DistanceConstraintTest {
 	@Test
 	public final void CarrierLargeBatteryTest_Version2() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -181,7 +181,7 @@ public class DistanceConstraintTest {
 		VehicleUtils.setEnergyConsumptionKWhPerMeter(vehicleType_LargeV2.getEngineInformation(), 0.015);
 		vehicleType_LargeV2.setDescription("Carrier_Version2");
 		vehicleType_LargeV2.getCapacity().setOther(80.);
-		
+
 		VehicleType vehicleType_SmallV2 = VehicleUtils.createVehicleType(Id.create("SmallBattery_V2", VehicleType.class));
 		vehicleType_SmallV2.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(70.);
 		VehicleUtils.setHbefaTechnology(vehicleType_SmallV2.getEngineInformation(), "electricity");
@@ -201,8 +201,8 @@ public class DistanceConstraintTest {
 		CarrierUtils.setJspritIterations(carrierV2, 10);
 
 		FreightUtils.runJsprit(scenario);
-		
-		
+
+
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
 				carrierV2.getSelectedPlan().getScheduledTours().size());
 
@@ -243,7 +243,7 @@ public class DistanceConstraintTest {
 	@Test
 	public final void Carrier2SmallBatteryTest_Version3() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -262,7 +262,7 @@ public class DistanceConstraintTest {
 		VehicleUtils.setEnergyConsumptionKWhPerMeter(vehicleType_LargeV3.getEngineInformation(), 0.015);
 		vehicleType_LargeV3.setDescription("Carrier_Version3");
 		vehicleType_LargeV3.getCapacity().setOther(80.);
-		
+
 		VehicleType vehicleType_SmallV3 = VehicleUtils.createVehicleType(Id.create("SmallBattery_V3", VehicleType.class));
 		vehicleType_SmallV3.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(40.);
 		VehicleUtils.setHbefaTechnology(vehicleType_SmallV3.getEngineInformation(), "electricity");
@@ -333,7 +333,7 @@ public class DistanceConstraintTest {
 	@Test
 	public final void CarrierWithAdditionalDieselVehicleTest_Version4() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -352,15 +352,15 @@ public class DistanceConstraintTest {
 		VehicleUtils.setEnergyConsumptionKWhPerMeter(vehicleType_LargeV4.getEngineInformation(), 0.015);
 		vehicleType_LargeV4.setDescription("Carrier_Version4");
 		vehicleType_LargeV4.getCapacity().setOther(120.);
-		
+
 		VehicleType vehicleType_SmallV4 = VehicleUtils.createVehicleType(Id.create("SmallBattery_V4", VehicleType.class));
 		vehicleType_SmallV4.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(70.);
 		VehicleUtils.setHbefaTechnology(vehicleType_SmallV4.getEngineInformation(), "electricity");
 		VehicleUtils.setEnergyCapacity(vehicleType_SmallV4.getEngineInformation(), 300.);
-		VehicleUtils.setEnergyConsumptionKWhPerMeter(vehicleType_SmallV4.getEngineInformation(), 0.01);	
+		VehicleUtils.setEnergyConsumptionKWhPerMeter(vehicleType_SmallV4.getEngineInformation(), 0.01);
 		vehicleType_SmallV4.setDescription("Carrier_Version4");
 		vehicleType_SmallV4.getCapacity().setOther(120.);
-		
+
 		VehicleType vehicleType_Diesel = VehicleUtils.createVehicleType(Id.create("DieselVehicle", VehicleType.class));
 		vehicleType_Diesel.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(400.);
 		VehicleUtils.setHbefaTechnology(vehicleType_Diesel.getEngineInformation(), "diesel");
@@ -394,7 +394,7 @@ public class DistanceConstraintTest {
 
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30000, maxDistance_vehicleType_SmallV4,
 				MatsimTestUtils.EPSILON);
-		
+
 		for (ScheduledTour scheduledTour : carrierV4.getSelectedPlan().getScheduledTours()) {
 
 			String thisTypeId = scheduledTour.getVehicle().getType().getId().toString();
@@ -432,7 +432,7 @@ public class DistanceConstraintTest {
 	@Test
 	public final void CarrierWithShipmentsMidSizeBatteryTest_Version5() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -511,7 +511,7 @@ public class DistanceConstraintTest {
 	@Test
 	public final void CarrierWithShipmentsLargeBatteryTest_Version6() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -583,14 +583,14 @@ public class DistanceConstraintTest {
 	 */
 	static void prepareConfig(Config config) {
 		config.network().setInputFile(IOUtils.extendUrl(SCENARIO_URL, "grid9x9.xml").toString());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		new OutputDirectoryHierarchy(config.controler().getOutputDirectory(), config.controler().getRunId(),
-				config.controler().getOverwriteFileSetting(), CompressionType.gzip);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		new OutputDirectoryHierarchy(config.controller().getOutputDirectory(), config.controller().getRunId(),
+				config.controller().getOverwriteFileSetting(), CompressionType.gzip);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 		config.global().setRandomSeed(4177);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
 		freightConfigGroup.setUseDistanceConstraintForTourPlanning(UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);

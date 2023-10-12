@@ -143,9 +143,9 @@ public class NetworkReprojectionIOTest {
 				TARGET_CRS,
 				ProjectionUtils.getCRS(scenario.getNetwork()));
 
-		config.controler().setLastIteration( 0 );
+		config.controller().setLastIteration( 0 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
-		config.controler().setOutputDirectory( outputDirectory );
+		config.controller().setOutputDirectory( outputDirectory );
 		final Controler controler = new Controler( scenario );
 		controler.run();
 
@@ -197,9 +197,9 @@ public class NetworkReprojectionIOTest {
 					MatsimTestUtils.EPSILON );
 		}
 
-		config.controler().setLastIteration( 0 );
+		config.controller().setLastIteration( 0 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
-		config.controler().setOutputDirectory( outputDirectory );
+		config.controller().setOutputDirectory( outputDirectory );
 		final Controler controler = new Controler( scenario );
 		controler.run();
 

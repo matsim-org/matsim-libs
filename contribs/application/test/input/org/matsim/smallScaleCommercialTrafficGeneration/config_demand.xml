@@ -70,15 +70,6 @@
 		<param name="laneDefinitionsFile" value="null" />
 		<param name="timeVariantNetwork" value="false" />
 	</module>
-	<module name="JDEQSim" >
-		<param name="carSize" value="7.5" />
-		<param name="endTime" value="undefined" />
-		<param name="flowCapacityFactor" value="1.0" />
-		<param name="gapTravelSpeed" value="15.0" />
-		<param name="minimumInFlowCapacity" value="1800.0" />
-		<param name="squeezeTime" value="1800.0" />
-		<param name="storageCapacityFactor" value="1.0" />
-	</module>
 	<module name="ReplanningAnnealer" >
 		<!-- Activate the scaling of replanning modules using an annealing approach rather than fixed rates. -->
 		<param name="activateAnnealingModule" value="false" />

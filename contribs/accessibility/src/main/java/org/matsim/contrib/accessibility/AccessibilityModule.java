@@ -139,7 +139,7 @@ public final class AccessibilityModule extends AbstractModule {
 				}
 				AccessibilityUtils.assignAdditionalFacilitiesDataToMeasurePoint(measuringPoints, measurePointGeometryMap, additionalFacs);
 
-				String outputDirectory = scenario.getConfig().controler().getOutputDirectory() + "/" + activityType;
+				String outputDirectory = scenario.getConfig().controller().getOutputDirectory() + "/" + activityType;
 				AccessibilityComputationShutdownListener accessibilityShutdownListener = new AccessibilityComputationShutdownListener(scenario, measuringPoints, opportunities, outputDirectory);
 
 //				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
@@ -150,14 +150,14 @@ public final class AccessibilityModule extends AbstractModule {
 						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
 						Gbl.assertNotNull(travelDisutilityFactory);
 						calculator = new NetworkModeAccessibilityExpContributionCalculator(mode, new FreeSpeedTravelTime(), travelDisutilityFactory, scenario);
-					} else if ( config.plansCalcRoute().getNetworkModes().contains( mode ) ) {
+					} else if ( config.routing().getNetworkModes().contains( mode ) ) {
 						final TravelTime nwModeTravelTime = travelTimes.get(mode);
 						Gbl.assertNotNull(nwModeTravelTime);
 						final TravelDisutilityFactory nwModeTravelDisutility = travelDisutilityFactories.get(mode);
 						Gbl.assertNotNull( nwModeTravelDisutility );
 						calculator = new NetworkModeAccessibilityExpContributionCalculator(mode, nwModeTravelTime, nwModeTravelDisutility, scenario);
 					} else if ( TransportMode.pt.equals( mode ) ){
-						calculator = new SwissRailRaptorAccessibilityContributionCalculator( mode, config.planCalcScore(), scenario );
+						calculator = new SwissRailRaptorAccessibilityContributionCalculator( mode, config.scoring(), scenario );
 					} else if ( Modes4Accessibility.matrixBasedPt.name().equals( mode ) ) {
 						throw new RuntimeException("currently not supported because implementation not consistent with guice grapher.  kai, sep'19") ;
 //						calculator = new LeastCostPathCalculatorAccessibilityContributionCalculator(
@@ -175,7 +175,7 @@ public final class AccessibilityModule extends AbstractModule {
 						if ( travelDisutilityFactory==null ) {
 							throw new RuntimeException("mode=" + mode + "; travelDisutilityFactory is null!") ;
 						}
-						calculator = new TripRouterAccessibilityContributionCalculator(mode, tripRouter, config.planCalcScore(), scenario,
+						calculator = new TripRouterAccessibilityContributionCalculator(mode, tripRouter, config.scoring(), scenario,
 							  travelTime, travelDisutilityFactory );
 					}
 
@@ -195,7 +195,7 @@ public final class AccessibilityModule extends AbstractModule {
 					}
 					Set <String> additionalFacInfo = additionalFacs.keySet();
 					accessibilityShutdownListener.addFacilityDataExchangeListener(new GeoserverUpdater(acg.getOutputCrs(),
-							config.controler().getRunId() + "_" + activityType, measurePointGeometryMap, additionalFacInfo,
+							config.controller().getRunId() + "_" + activityType, measurePointGeometryMap, additionalFacInfo,
 							outputDirectory, pushing2Geoserver, createQGisOutput));
 				}
 

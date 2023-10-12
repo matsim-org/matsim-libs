@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.matsim.analysis;
 
@@ -21,8 +21,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.PopulationUtils;
@@ -336,13 +336,13 @@ public class TravelDistanceStatsTest {
 
 	private void performTest(IdMap<Person, Plan> map, String outputDirectory) {
 
-		ControlerConfigGroup controlerConfigGroup = new ControlerConfigGroup();
+		ControllerConfigGroup controllerConfigGroup = new ControllerConfigGroup();
 		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(outputDirectory,
 				OverwriteFileSetting.overwriteExistingFiles, CompressionType.gzip);
-		controlerConfigGroup.setCreateGraphs(true);
-		controlerConfigGroup.setFirstIteration(0);
-		controlerConfigGroup.setLastIteration(10);
-		TravelDistanceStats travelDistanceStats = new TravelDistanceStats(controlerConfigGroup, controlerIO);
+		controllerConfigGroup.setCreateGraphs(true);
+		controllerConfigGroup.setFirstIteration(0);
+		controllerConfigGroup.setLastIteration(10);
+		TravelDistanceStats travelDistanceStats = new TravelDistanceStats(controllerConfigGroup, controlerIO);
 		travelDistanceStats.addIteration(0, map);
 		readAndValidateValues(0, person1legsum + person2legsum + person3legsum, 12,
 				person1TotalNumberOfLegs + person2TotalNumberOfLegs + person3TotalNumberOfLegs);

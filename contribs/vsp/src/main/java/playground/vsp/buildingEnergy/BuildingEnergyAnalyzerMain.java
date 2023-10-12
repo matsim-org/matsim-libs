@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.gbl.Gbl;
@@ -36,12 +36,12 @@ import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyConsumption
 
 /**
  * @author droeder
- * 
+ *
  */
 class BuildingEnergyAnalyzerMain {
 
 	private static final Logger log = LogManager.getLogger(BuildingEnergyAnalyzerMain.class);
-	
+
 	private static final String[] ARGS = new String[]{
 		"E:\\VSP\\svn\\shared-svn\\studies\\droeder\\buildingEnergy\\runs\\",
 		"E:\\VSP\\svn\\shared-svn\\studies\\droeder\\buildingEnergy\\runs\\outputCaseStudies\\",
@@ -64,8 +64,8 @@ class BuildingEnergyAnalyzerMain {
 	}
 
 	/**
-	 * 
-	 * 
+	 *
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -100,7 +100,7 @@ class BuildingEnergyAnalyzerMain {
 		OutputDirectoryLogging.initLogging(
 				new OutputDirectoryHierarchy(outputPath, BuildingEnergyAnalyzer.class.getSimpleName(),
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles,
-						ControlerConfigGroup.CompressionType.none));
+						ControllerConfigGroup.CompressionType.none));
 		OutputDirectoryLogging.catchLogEntries();
 		// dump input-parameters to log
 		log.info("running class: " + System.getProperty("sun.java.command"));
@@ -135,16 +135,16 @@ class BuildingEnergyAnalyzerMain {
 		Gbl.printElapsedTime();
 		log.info("finished.");
 	}
-	
+
 	private static class OfficeEnergyConsumptionRuleImpl implements BuildingEnergyConsumptionRule{
-		
+
 		private double additional;
 		private double baseLoad;
 		private double td;
 		private double someCoefficient;
 
 		/**
-		 * 
+		 *
 		 * @param td, duration timeslice [s]
 		 * @param baseLoadPerPerson [kW]
 		 * @param additionalLoadPerPerson [kW]
@@ -155,7 +155,7 @@ class BuildingEnergyAnalyzerMain {
 			this.additional = additionalLoadPerPerson;
 			this.someCoefficient = someCoefficient;
 		}
-		
+
 		@Override
 		public double getEnergyConsumption_kWh(double maxSize, double currentOccupancy) {
 			if(currentOccupancy > maxSize) throw new RuntimeException("more persons on the link than expected");
@@ -164,17 +164,17 @@ class BuildingEnergyAnalyzerMain {
 			double additionalLoad = this.additional * maxSize;
 			return (td / 3600. * (baseload + additionalLoad * (1 - Math.exp(-1.0 * currentOccupancy / maxSize * someCoefficient))));
 		}
-		
+
 	}
-	
+
 	private static class HomeEnergyConsumptionRuleImpl implements BuildingEnergyConsumptionRule{
-		
+
 		private double td;
 		private double baseLoad;
 		private double additional;
 
 		/**
-		 * 
+		 *
 		 * @param td
 		 * @param baseLoadPerPerson
 		 * @param additionalLoadPerPerson
@@ -189,7 +189,7 @@ class BuildingEnergyAnalyzerMain {
 		public double getEnergyConsumption_kWh(double maxSize, double currentOccupancy) {
 			return (td/3600. * (maxSize * baseLoad + currentOccupancy * additional));
 		}
-		
+
 	}
 
 }

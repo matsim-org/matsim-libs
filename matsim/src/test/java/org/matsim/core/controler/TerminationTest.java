@@ -11,8 +11,8 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
@@ -35,7 +35,7 @@ public class TerminationTest {
 
 	@Test
 	public void testSimulationEndsOnInterval() {
-		prepareExperiment(2, 4, ControlerConfigGroup.CleanIterations.keep).run();
+		prepareExperiment(2, 4, ControllerConfigGroup.CleanIterations.keep).run();
 
 		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.4/4.events.xml.gz").exists());
 		Assert.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
@@ -47,7 +47,7 @@ public class TerminationTest {
 
 	@Test
 	public void testOnlyRunIterationZero() {
-		prepareExperiment(2, 0, ControlerConfigGroup.CleanIterations.keep).run();
+		prepareExperiment(2, 0, ControllerConfigGroup.CleanIterations.keep).run();
 
 		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.0/0.events.xml.gz").exists());
 		Assert.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
@@ -62,7 +62,7 @@ public class TerminationTest {
 		// This is the case when the TerminationCriterion decides that the simulation is
 		// done, but it does not fall at the same time as the output interval.
 
-		prepareExperiment(2, 3, ControlerConfigGroup.CleanIterations.keep).run();
+		prepareExperiment(2, 3, ControllerConfigGroup.CleanIterations.keep).run();
 
 		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.2/2.events.xml.gz").exists());
 		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.3/3.events.xml.gz").exists());
@@ -75,17 +75,17 @@ public class TerminationTest {
 
 	@Test
 	public void testSimulationEndDeleteIters() {
-		prepareExperiment(2, 3, ControlerConfigGroup.CleanIterations.delete).run();
+		prepareExperiment(2, 3, ControllerConfigGroup.CleanIterations.delete).run();
 		Assert.assertFalse(new File(utils.getOutputDirectory(), "/ITERS").exists());
 	}
 
-	private Controler prepareExperiment(int interval, int criterion, ControlerConfigGroup.CleanIterations iters) {
+	private Controler prepareExperiment(int interval, int criterion, ControllerConfigGroup.CleanIterations iters) {
 		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setCleanItersAtEnd(iters);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setCleanItersAtEnd(iters);
 
-		config.controler().setWriteEventsInterval(interval);
-		config.controler().setLastIteration(criterion);
+		config.controller().setWriteEventsInterval(interval);
+		config.controller().setLastIteration(criterion);
 
 		return new Controler(config);
 	}
@@ -98,7 +98,7 @@ public class TerminationTest {
 		 * is written, decides that more iterations need to be run.
 		 */
 
-		Controler controller = prepareExperiment(2, 1000, ControlerConfigGroup.CleanIterations.keep);
+		Controler controller = prepareExperiment(2, 1000, ControllerConfigGroup.CleanIterations.keep);
 
 		controller.setTerminationCriterion(new TerminationCriterion() {
 			@Override
@@ -132,8 +132,8 @@ public class TerminationTest {
 		 */
 
 		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setCleanItersAtEnd(ControlerConfigGroup.CleanIterations.keep);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setCleanItersAtEnd(ControllerConfigGroup.CleanIterations.keep);
 
 		{ // Set up mode choice
 			config.changeMode().setModes(new String[] { "car", "walk" });
@@ -141,7 +141,7 @@ public class TerminationTest {
 			StrategySettings modeStrategy = new StrategySettings();
 			modeStrategy.setStrategyName(DefaultStrategy.ChangeTripMode);
 			modeStrategy.setWeight(0.1);
-			config.strategy().addStrategySettings(modeStrategy);
+			config.replanning().addStrategySettings(modeStrategy);
 		}
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);

@@ -30,7 +30,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class ReplanningAnnealerConfigGroup extends ReflectiveConfigGroup {
 
-    public static final String GROUP_NAME = "ReplanningAnnealer";
+    public static final String GROUP_NAME = "replanningAnnealer";
     private static final String ACTIVATE_ANNEALING_MODULE = "activateAnnealingModule";
     private boolean activateAnnealingModule = false;
 

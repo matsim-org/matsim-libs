@@ -25,9 +25,9 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.ControllerConfigGroup.EventsFileFormat;
 
-public class ControlerConfigGroupTest {
+public class ControllerConfigGroupTest {
 
 	/**
 	 * Ensure that the events-file-format is correctly stored
@@ -37,46 +37,46 @@ public class ControlerConfigGroupTest {
 	 */
 	@Test
 	public void testEventsFileFormat() {
-		ControlerConfigGroup cg = new ControlerConfigGroup();
+		ControllerConfigGroup cg = new ControllerConfigGroup();
 		Set<EventsFileFormat> formats;
 		// test initial value
 		formats = cg.getEventsFileFormats();
 		Assert.assertEquals(1, formats.size());
 		Assert.assertTrue(formats.contains(EventsFileFormat.xml));
-		Assert.assertEquals("xml", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
+		Assert.assertEquals("xml", cg.getValue(ControllerConfigGroup.EVENTS_FILE_FORMAT));
 		// test setting with setEventsFileFormat
 		cg.setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
 		formats = cg.getEventsFileFormats();
 		Assert.assertEquals(1, formats.size());
 		Assert.assertTrue(formats.contains(EventsFileFormat.xml));
-		Assert.assertEquals("xml", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
+		Assert.assertEquals("xml", cg.getValue(ControllerConfigGroup.EVENTS_FILE_FORMAT));
 		// test setting to none
 		cg.setEventsFileFormats(EnumSet.noneOf(EventsFileFormat.class));
 		formats = cg.getEventsFileFormats();
 		Assert.assertEquals(0, formats.size());
-		Assert.assertEquals("", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
+		Assert.assertEquals("", cg.getValue(ControllerConfigGroup.EVENTS_FILE_FORMAT));
 		// test setting with addParam
-		cg.addParam(ControlerConfigGroup.EVENTS_FILE_FORMAT, "xml");
+		cg.addParam(ControllerConfigGroup.EVENTS_FILE_FORMAT, "xml");
 		formats = cg.getEventsFileFormats();
 		Assert.assertEquals(1, formats.size());
 		Assert.assertTrue(formats.contains(EventsFileFormat.xml));
-		Assert.assertEquals("xml", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
+		Assert.assertEquals("xml", cg.getValue(ControllerConfigGroup.EVENTS_FILE_FORMAT));
 		// test setting to none
-		cg.addParam(ControlerConfigGroup.EVENTS_FILE_FORMAT, "");
+		cg.addParam(ControllerConfigGroup.EVENTS_FILE_FORMAT, "");
 		formats = cg.getEventsFileFormats();
 		Assert.assertEquals(0, formats.size());
-		Assert.assertEquals("", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
+		Assert.assertEquals("", cg.getValue(ControllerConfigGroup.EVENTS_FILE_FORMAT));
 		// test setting with non-conform formatting
-		cg.addParam(ControlerConfigGroup.EVENTS_FILE_FORMAT, " xml\t\t  ");
+		cg.addParam(ControllerConfigGroup.EVENTS_FILE_FORMAT, " xml\t\t  ");
 		formats = cg.getEventsFileFormats();
 		Assert.assertEquals(1, formats.size());
 		Assert.assertTrue(formats.contains(EventsFileFormat.xml));
-		Assert.assertEquals("xml", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
+		Assert.assertEquals("xml", cg.getValue(ControllerConfigGroup.EVENTS_FILE_FORMAT));
 		// test setting to non-conform none
-		cg.addParam(ControlerConfigGroup.EVENTS_FILE_FORMAT, "  \t ");
+		cg.addParam(ControllerConfigGroup.EVENTS_FILE_FORMAT, "  \t ");
 		formats = cg.getEventsFileFormats();
 		Assert.assertEquals(0, formats.size());
-		Assert.assertEquals("", cg.getValue(ControlerConfigGroup.EVENTS_FILE_FORMAT));
+		Assert.assertEquals("", cg.getValue(ControllerConfigGroup.EVENTS_FILE_FORMAT));
 	}
 
 	/**
@@ -87,18 +87,18 @@ public class ControlerConfigGroupTest {
 	 */
 	@Test
 	public void testMobsim() {
-		ControlerConfigGroup cg = new ControlerConfigGroup();
+		ControllerConfigGroup cg = new ControllerConfigGroup();
 		// test initial value
 		Assert.assertEquals("qsim", cg.getMobsim());
-		Assert.assertEquals("qsim", cg.getValue(ControlerConfigGroup.MOBSIM));
+		Assert.assertEquals("qsim", cg.getValue(ControllerConfigGroup.MOBSIM));
 		// test setting to null
 		cg.setMobsim(null);
 		Assert.assertNull(cg.getMobsim());
-		Assert.assertNull(cg.getValue(ControlerConfigGroup.MOBSIM));
+		Assert.assertNull(cg.getValue(ControllerConfigGroup.MOBSIM));
 		// test setting with addParam
-		cg.addParam(ControlerConfigGroup.MOBSIM, "queueSimulation");
+		cg.addParam(ControllerConfigGroup.MOBSIM, "queueSimulation");
 		Assert.assertEquals("queueSimulation", cg.getMobsim());
-		Assert.assertEquals("queueSimulation", cg.getValue(ControlerConfigGroup.MOBSIM));
+		Assert.assertEquals("queueSimulation", cg.getValue(ControllerConfigGroup.MOBSIM));
 	}
 
 	/**
@@ -109,7 +109,7 @@ public class ControlerConfigGroupTest {
 	 */
 	@Test
 	public void testWritePlansInterval() {
-		ControlerConfigGroup cg = new ControlerConfigGroup();
+		ControllerConfigGroup cg = new ControllerConfigGroup();
 		// test initial value
 		Assert.assertEquals(50, cg.getWritePlansInterval());
 		// test setting with setMobsim
@@ -121,12 +121,12 @@ public class ControlerConfigGroupTest {
 	}
 
 	/**
-	 * Ensure that the enableLinkToLinkRouting value is correctly stored and 
+	 * Ensure that the enableLinkToLinkRouting value is correctly stored and
 	 * returned with the getters and setters.
 	 */
 	@Test
 	public void testLink2LinkRouting(){
-		ControlerConfigGroup cg = new ControlerConfigGroup();
+		ControllerConfigGroup cg = new ControllerConfigGroup();
 		//initial value
 		Assert.assertFalse(cg.isLinkToLinkRoutingEnabled());
 		//modify by string
@@ -144,12 +144,12 @@ public class ControlerConfigGroupTest {
 	}
 
 	/**
-	 * Ensure that the writeSnapshotsInterval value is correctly stored and 
+	 * Ensure that the writeSnapshotsInterval value is correctly stored and
 	 * returned with the getters and setters.
 	 */
 	@Test
 	public void testWriteSnapshotInterval(){
-		ControlerConfigGroup cg = new ControlerConfigGroup();
+		ControllerConfigGroup cg = new ControllerConfigGroup();
 		//initial value
 		Assert.assertEquals(1, cg.getWriteSnapshotsInterval());
 		//modify by string
@@ -161,5 +161,5 @@ public class ControlerConfigGroupTest {
 		Assert.assertEquals(42, cg.getWriteSnapshotsInterval());
 	}
 
-	
+
 }

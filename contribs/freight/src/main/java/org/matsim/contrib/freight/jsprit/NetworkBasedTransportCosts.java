@@ -592,6 +592,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		}
 		String typeId = vehicle.getType().getTypeId();
 		int timeSlice = getTimeSlice(departureTime);
+		departureTime = timeSlice*timeSliceWidth;
 		TransportDataKey transportDataKey = makeKey(fromId.getId(), toId.getId(), timeSlice, typeId);
 		TransportData data = costCache.get(transportDataKey);
 		double transportTime;
@@ -680,6 +681,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		LeastCostPathCalculator router = createLeastCostPathCalculator();
 
 		int timeSlice = getTimeSlice(departureTime);
+		departureTime = timeSlice*timeSliceWidth;
 		String typeId = vehicle.getType().getTypeId();
 		TransportDataKey transportDataKey = makeKey(fromId.getId(), toId.getId(), timeSlice, typeId);
 		TransportData data = costCache.get(transportDataKey);
@@ -738,6 +740,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		}
 		String typeId = vehicle.getType().getTypeId();
 		int timeSlice = getTimeSlice(departureTime);
+		departureTime = timeSlice*timeSliceWidth;
 		TransportDataKey transportDataKey = makeKey(fromId.getId(), toId.getId(), timeSlice, typeId);
 		TransportData data = costCache.get(transportDataKey);
 		double travelDistance;

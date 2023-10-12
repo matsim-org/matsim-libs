@@ -107,7 +107,7 @@ public class ControlerEventsTest {
 
 		public TestController(Config config) {
 			this.config = config;
-			super.setupOutputDirectory(new OutputDirectoryHierarchy(config.controler()));
+			super.setupOutputDirectory(new OutputDirectoryHierarchy(config.controller()));
 		}
 
 		@Override
@@ -131,12 +131,12 @@ public class ControlerEventsTest {
 
 		@Override
 		protected boolean mayTerminateAfterIteration(int iteration) {
-			return iteration >= config.controler().getLastIteration();
+			return iteration >= config.controller().getLastIteration();
 		}
 
 		@Override
 		protected boolean shouldTerminate(int iteration) {
-			return iteration >= config.controler().getLastIteration();
+			return iteration >= config.controller().getLastIteration();
 		}
 	}
 

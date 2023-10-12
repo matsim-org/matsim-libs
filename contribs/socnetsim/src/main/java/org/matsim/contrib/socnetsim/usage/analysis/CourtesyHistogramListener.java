@@ -59,7 +59,7 @@ public class CourtesyHistogramListener  implements IterationEndsListener, Iterat
     CourtesyHistogramListener(Config config, CourtesyHistogram histogram, OutputDirectoryHierarchy controlerIO) {
         this.controlerIO = controlerIO;
 		this.histogram = histogram;
-		this.outputGraph = config.controler().isCreateGraphs();
+		this.outputGraph = config.controller().isCreateGraphs();
 	}
 
 	@Override

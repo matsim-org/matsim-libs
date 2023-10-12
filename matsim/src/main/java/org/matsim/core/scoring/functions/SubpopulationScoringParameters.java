@@ -21,7 +21,7 @@ package org.matsim.core.scoring.functions;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.population.PopulationUtils;
@@ -36,22 +36,22 @@ import java.util.Map;
  * @author thibautd
  */
 public class SubpopulationScoringParameters implements ScoringParametersForPerson {
-	private final PlanCalcScoreConfigGroup config;
+	private final ScoringConfigGroup config;
 	private final ScenarioConfigGroup scConfig;
 	private final TransitConfigGroup transitConfigGroup;
 	private final Map<String, ScoringParameters> params = new HashMap<>();
 	private final Population population;
 
 	@Inject
-	SubpopulationScoringParameters(PlansConfigGroup plansConfigGroup, PlanCalcScoreConfigGroup planCalcScoreConfigGroup, ScenarioConfigGroup scenarioConfigGroup, Population population, TransitConfigGroup transitConfigGroup) {
-		this.config = planCalcScoreConfigGroup;
+	SubpopulationScoringParameters(PlansConfigGroup plansConfigGroup, ScoringConfigGroup scoringConfigGroup, ScenarioConfigGroup scenarioConfigGroup, Population population, TransitConfigGroup transitConfigGroup) {
+		this.config = scoringConfigGroup;
 		this.scConfig = scenarioConfigGroup;
 		this.transitConfigGroup = transitConfigGroup;
 		this.population = population ;
 	}
 
 	public SubpopulationScoringParameters(Scenario scenario) {
-		this(scenario.getConfig().plans(), scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getPopulation(), scenario.getConfig().transit());
+		this(scenario.getConfig().plans(), scenario.getConfig().scoring(), scenario.getConfig().scenario(), scenario.getPopulation(), scenario.getConfig().transit());
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class SubpopulationScoringParameters implements ScoringParametersForPerso
 
 
 
-				PlanCalcScoreConfigGroup.ActivityParams transitActivityParams = new PlanCalcScoreConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
+				ScoringConfigGroup.ActivityParams transitActivityParams = new ScoringConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 				transitActivityParams.setTypicalDuration(120.0);
 				transitActivityParams.setOpeningTime(0.) ;
 				transitActivityParams.setClosingTime(0.) ;

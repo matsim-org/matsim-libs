@@ -35,17 +35,17 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ConfigReader;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * Test for {@link StrategyConfigGroup}.
+ * Test for {@link ReplanningConfigGroup}.
  *
  * @author mrieser
  */
-public class StrategyConfigGroupTest {
+public class ReplanningConfigGroupTest {
 
-	private static final Logger log = LogManager.getLogger(StrategyConfigGroupTest.class);
+	private static final Logger log = LogManager.getLogger(ReplanningConfigGroupTest.class);
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -56,7 +56,7 @@ public class StrategyConfigGroupTest {
 	 */
 	@Test
 	public void testParamNames() {
-		StrategyConfigGroup configGroup = new StrategyConfigGroup();
+		ReplanningConfigGroup configGroup = new ReplanningConfigGroup();
 		configGroup.addParam("maxAgentPlanMemorySize", "3");
 		configGroup.addParam("Module_1", "ReRoute");
 		configGroup.addParam("ModuleProbability_1", "0.5");
@@ -81,7 +81,7 @@ public class StrategyConfigGroupTest {
 	@Test
 	public void testCheckConsistency() {
 		// start with a simple configuration with exactly one module defined
-		StrategyConfigGroup configGroup = new StrategyConfigGroup();
+		ReplanningConfigGroup configGroup = new ReplanningConfigGroup();
 		configGroup.addParam("maxAgentPlanMemorySize", "3");
 		configGroup.addParam("Module_1", "ReRoute");
 		configGroup.addParam("ModuleProbability_1", "0.5");
@@ -149,7 +149,7 @@ public class StrategyConfigGroupTest {
 
 	@Test
 	public void testIOWithFormatChange() {
-		final StrategyConfigGroup initialGroup = createTestConfigGroup();
+		final ReplanningConfigGroup initialGroup = createTestConfigGroup();
 
 		final String v1path = utils.getOutputDirectory() + "/configv1_out.xml";
 		final Config configV1 = new Config();
@@ -160,7 +160,7 @@ public class StrategyConfigGroupTest {
 		final Config configV1In = ConfigUtils.createConfig();
 		new ConfigReader( configV1In ).readFile( v1path );
 
-		assertIdentical("re-read v1", initialGroup, configV1In.strategy());
+		assertIdentical("re-read v1", initialGroup, configV1In.replanning());
 
 		final String v2path = utils.getOutputDirectory() + "/configv2_out.xml";
 
@@ -169,13 +169,13 @@ public class StrategyConfigGroupTest {
 		final Config configV2 = ConfigUtils.createConfig();
 		new ConfigReader( configV2 ).readFile( v2path );
 
-		assertIdentical("re-read v2", initialGroup, configV2.strategy());
+		assertIdentical("re-read v2", initialGroup, configV2.replanning());
 	}
 
 	private void assertIdentical(
 			final String msg,
-			final StrategyConfigGroup initialGroup,
-			final StrategyConfigGroup inputConfigGroup) {
+			final ReplanningConfigGroup initialGroup,
+			final ReplanningConfigGroup inputConfigGroup) {
 		assertEquals(
 				"wrong config template for "+msg,
 				initialGroup.getExternalExeConfigTemplate(),
@@ -213,10 +213,10 @@ public class StrategyConfigGroupTest {
 				inputConfigGroup.getStrategySettings().size() );
 	}
 
-	private ConfigGroup toUnderscoredModule(final StrategyConfigGroup initialGroup) {
+	private ConfigGroup toUnderscoredModule(final ReplanningConfigGroup initialGroup) {
 		// yyyy is this method/this execution path still necessary?  Maybe we need to be able to read config v1, but certainly
 		// we don't need to WRITE it, do we?  kai/mz, nov'15
-		
+
 		final ConfigGroup module = new ConfigGroup( initialGroup.getName() );
 
 		for ( Map.Entry<String, String> e : initialGroup.getParams().entrySet() ) {
@@ -236,8 +236,8 @@ public class StrategyConfigGroupTest {
 		return module;
 	}
 
-	private StrategyConfigGroup createTestConfigGroup() {
-		final StrategyConfigGroup group = new StrategyConfigGroup();
+	private ReplanningConfigGroup createTestConfigGroup() {
+		final ReplanningConfigGroup group = new ReplanningConfigGroup();
 		group.setExternalExeConfigTemplate( "bwark" );
 		group.setExternalExeTimeOut( 999 );
 		group.setExternalExeTmpFileRootDir( "some/random/location" );

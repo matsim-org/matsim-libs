@@ -49,7 +49,7 @@ import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.jsprit.VRPTransportCostsFactory;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.population.PopulationUtils;
@@ -301,7 +301,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
         createAndAddFreightAgents(this.carriers, this.scenario.getPopulation());
 
         event.getServices().getInjector().getInstance(ScoreCommercialJobs.class).prepareTourArrivalsForDay();
-        String dir = event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/";
+        String dir = event.getServices().getConfig().controller().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/";
         log.info("writing carrier file of iteration " + event.getIteration() + " to " + dir);
         CarrierPlanWriter planWriter = new CarrierPlanWriter(carriers);
         planWriter.write(dir + "carriers_it" + event.getIteration() + ".xml");
@@ -415,7 +415,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 				log.info("Toggle " + ChangeCommercialJobOperator.SELECTOR_NAME);
 			}
 
-			Collection<StrategySettings> allStrategies = this.scenario.getConfig().strategy().getStrategySettings();
+			Collection<StrategySettings> allStrategies = this.scenario.getConfig().replanning().getStrategySettings();
 
 			for (StrategySettings strategy : allStrategies) {
 				if (strategy.getStrategyName().equals(ChangeCommercialJobOperator.SELECTOR_NAME)) {

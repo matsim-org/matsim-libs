@@ -58,7 +58,7 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		String fileName = sc.getConfig().controler().getOutputDirectory() + ReceiverUtils.FILENAME_RECEIVER_SCORES;
+		String fileName = sc.getConfig().controller().getOutputDirectory() + ReceiverUtils.FILENAME_RECEIVER_SCORES;
 		if (fileName.toLowerCase(Locale.ROOT).endsWith(".txt")) {
 			this.out = IOUtils.getBufferedWriter(fileName);
 		} else {
@@ -69,8 +69,8 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-		this.minIteration = event.getServices().getConfig().controler().getFirstIteration();
-		int maxIter = event.getServices().getConfig().controler().getLastIteration();
+		this.minIteration = event.getServices().getConfig().controller().getFirstIteration();
+		int maxIter = event.getServices().getConfig().controller().getLastIteration();
 		int iterations = maxIter - this.minIteration;
 		if (iterations > 5000) iterations = 5000; // limit the history size
 		this.history = new double[4][iterations + 1];
@@ -97,7 +97,7 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 	}
 
 	private void writeIterationScores(IterationEndsEvent event) {
-		String fileName = sc.getConfig().controler().getOutputDirectory() + ReceiverUtils.FILENAME_RECEIVER_SCORES;
+		String fileName = sc.getConfig().controller().getOutputDirectory() + ReceiverUtils.FILENAME_RECEIVER_SCORES;
 
 		double sumScoreWorst = 0.0;
 		double sumScoreBest = 0.0;
@@ -228,7 +228,7 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 	}
 
 	static void writeHeadings(Scenario sc) {
-		try(BufferedWriter bw = IOUtils.getBufferedWriter(sc.getConfig().controler().getOutputDirectory() + RECEIVER_STATS_CSV)) {
+		try(BufferedWriter bw = IOUtils.getBufferedWriter(sc.getConfig().controller().getOutputDirectory() + RECEIVER_STATS_CSV)) {
 			bw.write(String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s",
 				"iteration",
 				"receiver_id",
@@ -264,7 +264,7 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 					boolean member = (boolean) receiver.getAttributes().getAttribute(CollaborationUtils.ATTR_GRANDCOALITION_MEMBER);
 
 
-					try (BufferedWriter bw1 = IOUtils.getAppendingBufferedWriter(sc.getConfig().controler().getOutputDirectory() + RECEIVER_STATS_CSV)) {
+					try (BufferedWriter bw1 = IOUtils.getAppendingBufferedWriter(sc.getConfig().controller().getOutputDirectory() + RECEIVER_STATS_CSV)) {
 						bw1.write(String.format("%d,%s,%s,%f,%f,%f,%s,%f,%f,%f,%b,%b",
 							event.getIteration(),
 							receiver.getId(),

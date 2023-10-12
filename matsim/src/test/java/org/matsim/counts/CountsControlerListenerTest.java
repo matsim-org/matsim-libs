@@ -65,7 +65,7 @@ public class CountsControlerListenerTest {
 	public void testUseVolumesOfIteration() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		CountsControlerListener ccl = new CountsControlerListener(config.global(), scenario.getNetwork(), config.controler(), config.counts(), null, null, null);
+		CountsControlerListener ccl = new CountsControlerListener(config.global(), scenario.getNetwork(), config.controller(), config.counts(), null, null, null);
 
 		// test defaults
 		Assert.assertEquals(10, config.counts().getWriteCountsInterval());
@@ -265,23 +265,23 @@ public class CountsControlerListenerTest {
 				bind(Mobsim.class).toProvider(DummyMobsimFactory.class);
 			}
 		});
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(7);
+		config.controller().setFirstIteration(0);
+		config.controller().setLastIteration(7);
 
-        controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		config.controler().setWritePlansInterval(0);
+        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
+		config.controller().setWritePlansInterval(0);
 		controler.run();
 
-		Assert.assertTrue(new File(config.controler().getOutputDirectory() + "ITERS/it.0/0.countscompare.txt").exists());
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.1/1.countscompare.txt").exists());
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.2/2.countscompare.txt").exists());
-		Assert.assertTrue(new File(config.controler().getOutputDirectory() + "ITERS/it.3/3.countscompare.txt").exists());
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.4/4.countscompare.txt").exists());
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.5/5.countscompare.txt").exists());
-		Assert.assertTrue(new File(config.controler().getOutputDirectory() + "ITERS/it.6/6.countscompare.txt").exists());
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.7/7.countscompare.txt").exists());
+		Assert.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.0/0.countscompare.txt").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.1/1.countscompare.txt").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.2/2.countscompare.txt").exists());
+		Assert.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompare.txt").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.4/4.countscompare.txt").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.5/5.countscompare.txt").exists());
+		Assert.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.6/6.countscompare.txt").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.7/7.countscompare.txt").exists());
 	}
 
 	@Test
@@ -303,26 +303,26 @@ public class CountsControlerListenerTest {
 				bind(Mobsim.class).toProvider(DummyMobsimFactory.class);
 			}
 		});
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(7);
+		config.controller().setFirstIteration(0);
+		config.controller().setLastIteration(7);
 
-        controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		config.controler().setWritePlansInterval(0);
+        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
+		config.controller().setWritePlansInterval(0);
 		controler.run();
 
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.0/0.countscompareAWTV.txt").exists());
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.1/1.countscompareAWTV.txt").exists());
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.2/2.countscompareAWTV.txt").exists());
-		Assert.assertTrue(new File(config.controler().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt").exists());
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.4/4.countscompareAWTV.txt").exists());
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.5/5.countscompareAWTV.txt").exists());
-		Assert.assertTrue(new File(config.controler().getOutputDirectory() + "ITERS/it.6/6.countscompareAWTV.txt").exists());
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.7/7.countscompareAWTV.txt").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.0/0.countscompareAWTV.txt").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.1/1.countscompareAWTV.txt").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.2/2.countscompareAWTV.txt").exists());
+		Assert.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.4/4.countscompareAWTV.txt").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.5/5.countscompareAWTV.txt").exists());
+		Assert.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.6/6.countscompareAWTV.txt").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.7/7.countscompareAWTV.txt").exists());
 
-		Assert.assertEquals(3.5, getVolume(config.controler().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
-		Assert.assertEquals(6.5, getVolume(config.controler().getOutputDirectory() + "ITERS/it.6/6.countscompareAWTV.txt"), 1e-8);
+		Assert.assertEquals(3.5, getVolume(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
+		Assert.assertEquals(6.5, getVolume(config.controller().getOutputDirectory() + "ITERS/it.6/6.countscompareAWTV.txt"), 1e-8);
 	}
 
 	@Test
@@ -337,30 +337,30 @@ public class CountsControlerListenerTest {
 		cConfig.setOutputFormat("txt");
 		cConfig.setInputFile("counts.xml"); // just any file to activate the counts feature
 
-		config.controler().setMobsim("dummy");
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(3);
+		config.controller().setMobsim("dummy");
+		config.controller().setFirstIteration(0);
+		config.controller().setLastIteration(3);
 
 		createAndRunControler(config);
-		Assert.assertEquals(150, getVolume(config.controler().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
+		Assert.assertEquals(150, getVolume(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
 
 		// enable modes filtering and count only car
 		cConfig.setAnalyzedModes(TransportMode.car);
 		cConfig.setFilterModes(true);
 		createAndRunControler(config);
-		Assert.assertEquals(100, getVolume(config.controler().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
+		Assert.assertEquals(100, getVolume(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
 
 		// enable modes filtering and count only walk
 		cConfig.setAnalyzedModes(TransportMode.walk);
 		cConfig.setFilterModes(true);
 		createAndRunControler(config);
-		Assert.assertEquals(50, getVolume(config.controler().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
+		Assert.assertEquals(50, getVolume(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
 
 		// enable modes filtering and count only bike
 		cConfig.setAnalyzedModes(TransportMode.bike);
 		cConfig.setFilterModes(true);
 		createAndRunControler(config);
-		Assert.assertEquals(0, getVolume(config.controler().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
+		Assert.assertEquals(0, getVolume(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
 
 
 	}
@@ -375,11 +375,11 @@ public class CountsControlerListenerTest {
 				bind(EventsManager.class).to(EventsManagerImpl.class).in(Singleton.class);
 			}
 		});
-		controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		config.controler().setWritePlansInterval(0);
+		controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controller().setWriteEventsInterval(0);
+		config.controller().setWritePlansInterval(0);
 		controler.run();
 	}
 

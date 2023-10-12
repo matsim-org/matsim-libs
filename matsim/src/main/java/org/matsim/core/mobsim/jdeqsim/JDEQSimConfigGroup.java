@@ -30,7 +30,7 @@ import org.matsim.core.utils.misc.Time;
  */
 public class JDEQSimConfigGroup extends ReflectiveConfigGroup {
 
-	public final static String NAME = "JDEQSim";
+	public final static String NAME = "jdeqsim";
 
 	// CONSTANTS
 	public static final String START_LEG = "start leg";

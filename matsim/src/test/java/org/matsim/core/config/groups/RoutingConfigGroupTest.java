@@ -33,11 +33,11 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ConfigReader;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.TeleportedModeParams;
+import org.matsim.core.config.groups.RoutingConfigGroup.TeleportedModeParams;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class PlansCalcRouteConfigGroupTest {
-	private final static Logger log = LogManager.getLogger(PlansCalcRouteConfigGroupTest.class);
+public class RoutingConfigGroupTest {
+	private final static Logger log = LogManager.getLogger(RoutingConfigGroupTest.class);
 	private final static int N_MODE_ROUTING_PARAMS_DEFAULT = 5 ;
 
 	@Rule
@@ -49,7 +49,7 @@ public class PlansCalcRouteConfigGroupTest {
 		final String filename = outdir + "config.xml";
 		{
 			Config config = ConfigUtils.createConfig();
-			PlansCalcRouteConfigGroup group = config.plansCalcRoute();
+			RoutingConfigGroup group = config.routing();
 			Assert.assertEquals( N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size() );
 			group.clearModeRoutingParams();
 //			group.setTeleportedModeSpeed( TransportMode.bike, 1. );
@@ -63,7 +63,7 @@ public class PlansCalcRouteConfigGroupTest {
 		}
 		{
 			Config config = ConfigUtils.loadConfig( filename ) ;
-			PlansCalcRouteConfigGroup group = config.plansCalcRoute();
+			RoutingConfigGroup group = config.routing();
 			Assert.assertEquals( 0, group.getModeRoutingParams().size() );
 		}
 	}
@@ -73,7 +73,7 @@ public class PlansCalcRouteConfigGroupTest {
 		final String filename = outdir + "config.xml";
 		{
 			Config config = ConfigUtils.createConfig();
-			PlansCalcRouteConfigGroup group = config.plansCalcRoute();
+			RoutingConfigGroup group = config.routing();
 			Assert.assertEquals( N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size() );
 			group.clearModeRoutingParams();
 			group.setTeleportedModeSpeed( TransportMode.bike, 1. );
@@ -87,7 +87,7 @@ public class PlansCalcRouteConfigGroupTest {
 		}
 		{
 			Config config = ConfigUtils.loadConfig( filename ) ;
-			PlansCalcRouteConfigGroup group = config.plansCalcRoute();
+			RoutingConfigGroup group = config.routing();
 			Assert.assertEquals( 0, group.getModeRoutingParams().size() );
 		}
 	}
@@ -97,7 +97,7 @@ public class PlansCalcRouteConfigGroupTest {
 		final String filename = outdir + "config.xml";
 		{
 			Config config = ConfigUtils.createConfig();
-			PlansCalcRouteConfigGroup group = config.plansCalcRoute();
+			RoutingConfigGroup group = config.routing();
 			Assert.assertEquals( N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size() );
 			group.setTeleportedModeSpeed( TransportMode.bike, 1. );
 			Assert.assertEquals( 1, group.getModeRoutingParams().size() );
@@ -112,14 +112,14 @@ public class PlansCalcRouteConfigGroupTest {
 		}
 		{
 			Config config = ConfigUtils.loadConfig( filename ) ;
-			PlansCalcRouteConfigGroup group = config.plansCalcRoute();
+			RoutingConfigGroup group = config.routing();
 			Assert.assertEquals( 0, group.getModeRoutingParams().size() );
 		}
 	}
 	@Test
 	public void testClearDefaults() {
 		Config config = ConfigUtils.createConfig(  ) ;
-		PlansCalcRouteConfigGroup group = config.plansCalcRoute() ;
+		RoutingConfigGroup group = config.routing() ;
 		Assert.assertEquals( N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size() );
 		group.setTeleportedModeSpeed( "def", 1. );
 		Assert.assertEquals( 1, group.getModeRoutingParams().size() );
@@ -131,20 +131,20 @@ public class PlansCalcRouteConfigGroupTest {
 	@Test
 	public void test3() {
 		Config config = ConfigUtils.createConfig(  ) ;
-		PlansCalcRouteConfigGroup group = config.plansCalcRoute() ;
+		RoutingConfigGroup group = config.routing() ;
 		group.clearModeRoutingParams();
 		group.setClearingDefaultModeRoutingParams( true ); // should be ok
 	}
 	@Test( expected = RuntimeException.class )
 	public void testInconsistencyBetweenActionAndState() {
-		PlansCalcRouteConfigGroup group = new PlansCalcRouteConfigGroup() ;
+		RoutingConfigGroup group = new RoutingConfigGroup() ;
 		group.clearModeRoutingParams();
 		group.setClearingDefaultModeRoutingParams( false ); // should fail
 	}
 
 	@Test
 	public void testBackwardsCompatibility() {
-		PlansCalcRouteConfigGroup group = new PlansCalcRouteConfigGroup();
+		RoutingConfigGroup group = new RoutingConfigGroup();
 
 		// test default
 		Assert.assertEquals("different default than expected.", 3.0 / 3.6, group.getTeleportedModeSpeeds().get(TransportMode.walk), MatsimTestUtils.EPSILON);
@@ -162,7 +162,7 @@ public class PlansCalcRouteConfigGroupTest {
 
 	@Test
 	public void testDefaultsAreCleared() {
-		PlansCalcRouteConfigGroup group = new PlansCalcRouteConfigGroup();
+		RoutingConfigGroup group = new RoutingConfigGroup();
 //		group.clearModeRoutingParams();
 		group.setTeleportedModeSpeed( "skateboard" , 20 / 3.6 );
 		group.setTeleportedModeSpeed( "longboard" , 20 / 3.6 );
@@ -173,9 +173,9 @@ public class PlansCalcRouteConfigGroupTest {
 	}
 
 	@Test
-	public void testIODifferentVersions() 
+	public void testIODifferentVersions()
 	{
-		final PlansCalcRouteConfigGroup initialGroup = createTestConfigGroup();
+		final RoutingConfigGroup initialGroup = createTestConfigGroup();
 
 		log.info( "constructing new config ...");
 		final Config configV1 = new Config();
@@ -197,7 +197,7 @@ public class PlansCalcRouteConfigGroupTest {
 		log.info("... done reading file into new config.") ;
 
 		log.info( "asserting ...");
-		assertIdentical("re-read v1", initialGroup, configV1In.plansCalcRoute());
+		assertIdentical("re-read v1", initialGroup, configV1In.routing());
 		log.info( "... done asserting.") ;
 
 		final String v2path = utils.getOutputDirectory() + "/configv2_out.xml";
@@ -207,15 +207,15 @@ public class PlansCalcRouteConfigGroupTest {
 		final Config configV2 = ConfigUtils.createConfig();
 		new ConfigReader( configV2 ).readFile( v2path );
 
-		assertIdentical("re-read v2", initialGroup, configV2.plansCalcRoute());
+		assertIdentical("re-read v2", initialGroup, configV2.routing());
 	}
-	
+
 	@Test( expected=RuntimeException.class )
 	public void testConsistencyCheckIfNoTeleportedSpeed() {
 		final Config config = ConfigUtils.createConfig();
 
 		final TeleportedModeParams params = new TeleportedModeParams( "skateboard" );
-		config.plansCalcRoute().addModeRoutingParams( params );
+		config.routing().addModeRoutingParams( params );
 		// (one needs to set one of the teleported speed settings)
 
 		config.checkConsistency();
@@ -237,8 +237,8 @@ public class PlansCalcRouteConfigGroupTest {
 
 	private static void assertIdentical(
 			final String msg,
-			final PlansCalcRouteConfigGroup initialGroup,
-			final PlansCalcRouteConfigGroup inputConfigGroup) {
+			final RoutingConfigGroup initialGroup,
+			final RoutingConfigGroup inputConfigGroup) {
 		Assert.assertEquals(
 				"unexpected beelineDistanceFactor",
 //				initialGroup.getBeelineDistanceFactor(),
@@ -260,14 +260,14 @@ public class PlansCalcRouteConfigGroupTest {
 				inputConfigGroup.getTeleportedModeSpeeds() );
 	}
 
-	private static ConfigGroup toUnderscoredModule(final PlansCalcRouteConfigGroup initialGroup) {
+	private static ConfigGroup toUnderscoredModule(final RoutingConfigGroup initialGroup) {
 		final ConfigGroup module = new ConfigGroup( initialGroup.getName() );
 
 		for ( Map.Entry<String, String> e : initialGroup.getParams().entrySet() ) {
 			log.info( "add param="+e.getKey() + " with value=" + e.getValue() );
 			module.addParam( e.getKey() , e.getValue() );
 		}
-		
+
 		for ( TeleportedModeParams settings : initialGroup.getModeRoutingParams().values() ) {
 			final String mode = settings.getMode();
 			module.addParam( "teleportedModeSpeed_"+mode , ""+settings.getTeleportedModeSpeed() );
@@ -283,23 +283,23 @@ public class PlansCalcRouteConfigGroupTest {
 			} else if ( !settings.getBeelineDistanceFactor().equals( val ) ) {
 				throw new RuntimeException( "beeline distance factor varies by mode; this cannot be covered by this test" ) ;
 			}
-		}		
+		}
 		module.addParam( "beelineDistanceFactor", ""+val );
-		
+
 		return module;
 	}
 
-	private static PlansCalcRouteConfigGroup createTestConfigGroup() {
-		log.info( "creating test config group ... "); 
-		
-		final PlansCalcRouteConfigGroup group = new PlansCalcRouteConfigGroup();
+	private static RoutingConfigGroup createTestConfigGroup() {
+		log.info( "creating test config group ... ");
+
+		final RoutingConfigGroup group = new RoutingConfigGroup();
 
 		group.setNetworkModes( Arrays.asList( "electricity" , "water_supply" ) );
 
 		// two modes with only one speed
 		group.setTeleportedModeFreespeedFactor( "inline skate" , 0.1 );
 //		group.getModeRoutingParams().get("inline skate").setBeelineDistanceFactor( 10000000. );
-		
+
 		group.setTeleportedModeSpeed( "ice skates" , 10 );
 //		group.getModeRoutingParams().get("ice skates").setBeelineDistanceFactor( 10000000. );
 
@@ -310,7 +310,7 @@ public class PlansCalcRouteConfigGroupTest {
 		//group.setTeleportedModeFreespeedFactor( "overboard" , 100 );
 		//group.setTeleportedModeSpeed( "overboard" , 999 );
 
-		log.info( "... done creating test config group."); 
+		log.info( "... done creating test config group.");
 		return group;
 	}
 }

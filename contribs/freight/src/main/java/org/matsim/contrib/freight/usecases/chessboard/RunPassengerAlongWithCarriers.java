@@ -102,9 +102,9 @@ final class RunPassengerAlongWithCarriers {
 
 	public final Config prepareConfig() {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(url, "config.xml"));
-		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		config.global().setRandomSeed(4177);
-		config.controler().setOutputDirectory("./output/");
+		config.controller().setOutputDirectory("./output/");
 		return config;
 	}
 
@@ -123,7 +123,7 @@ final class RunPassengerAlongWithCarriers {
 		final LegHistogram withoutFreight = new LegHistogram(900);
 		withoutFreight.setPopulation(scenario.getPopulation());
 
-		CarrierScoreStats scores = new CarrierScoreStats(carriers, scenario.getConfig().controler().getOutputDirectory()+ "carrier_scores", true);
+		CarrierScoreStats scores = new CarrierScoreStats(carriers, scenario.getConfig().controller().getOutputDirectory()+ "carrier_scores", true);
 
 		eventsManager.addHandler(withoutFreight);
 		eventsManager.addHandler(freightOnly);
