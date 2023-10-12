@@ -248,7 +248,8 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 		if (indexOfFollowingActivity == indexOfParkingActivity) {
 			Activity currentActivity = ((Activity) plan.getPlanElements().get(this.planIndex));
 			Activity activityAfterFollowing = ((Activity) plan.getPlanElements().get(this.planIndex + 4));
-			if (agent.getCurrentLinkId().equals(activityAfterFollowing.getLinkId())) {
+			if (agent.getCurrentLinkId().equals(activityAfterFollowing.getLinkId()) && !ParkingUtils.checkIfActivityHasNoParking(
+                    (Activity) currentPlanElement)) {
 				boolean canParkAtFacilityUntilGetIn = ((FacilityBasedParkingManager) parkingManager).canParkAtThisFacilityUntilEnd(
 					agent.getCurrentLinkId(),
 					followingActivity.getMaximumDuration().seconds(), currentActivity.getMaximumDuration().seconds(),
@@ -264,7 +265,8 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 		// checks if the now started parking activity can extend until the end of the following GetIn activity
 		else if (indexOfCurrentActivity == indexOfParkingActivity) {
 			Activity currentActivity = ((Activity) plan.getPlanElements().get(this.planIndex + 1));
-			if (agent.getCurrentLinkId().equals(followingActivity.getLinkId())) {
+			if (agent.getCurrentLinkId().equals(followingActivity.getLinkId()) && !ParkingUtils.checkIfActivityHasNoParking(
+				followingActivity)) {
 				boolean canParkAtFacilityUntilGetIn = ((FacilityBasedParkingManager) parkingManager).canParkAtThisFacilityUntilEnd(
 					agent.getCurrentLinkId(),
 					currentActivity.getMaximumDuration().seconds(), 0.,
