@@ -22,13 +22,12 @@
 package org.matsim.freight.carriers.controler;
 
 /**
- * Utils for the work with the freight contrib
+ * Utils class for (package-private) content of freight.carriers.controler - package;
  *
  * @author kturner
  *
  */
 public class CarrierControlerUtils {
-
 
 	public static CarrierStrategyManager createDefaultCarrierStrategyManager() {
 		return new CarrierStrategyManagerImpl();
