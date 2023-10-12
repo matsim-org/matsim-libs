@@ -86,10 +86,10 @@ public class BicycleTest {
 		// Normal network
 		config.network().setInputFile("network_normal.xml");
 		config.plans().setInputFile("population_1200.xml");
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setLastIteration(0);
-		config.controler().setCreateGraphs(false);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setLastIteration(0);
+		config.controller().setCreateGraphs(false);
 
 		new RunBicycleExample().run(config );
 
@@ -122,10 +122,10 @@ public class BicycleTest {
 
 		config.plans().setInputFile("population_1200.xml");
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setLastIteration(0);
-		config.controler().setCreateGraphs(false);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setLastIteration(0);
+		config.controller().setCreateGraphs(false);
 
 		new RunBicycleExample().run(config );
 		{
@@ -153,10 +153,10 @@ public class BicycleTest {
 		// Links 4-8 and 13-17 are pedestrian zones
 		config.network().setInputFile("network_pedestrian.xml");
 		config.plans().setInputFile("population_1200.xml");
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setLastIteration(0);
-		config.controler().setCreateGraphs(false);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setLastIteration(0);
+		config.controller().setCreateGraphs(false);
 
 		new RunBicycleExample().run(config );
 
@@ -182,10 +182,10 @@ public class BicycleTest {
 		// Links 2-4/8-10 and 11-13/17-19 have cycle lanes (cycleway=lane)
 		config.network().setInputFile("network_lane.xml");
 		config.plans().setInputFile("population_1200.xml");
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setLastIteration(0);
-		config.controler().setCreateGraphs(false);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setLastIteration(0);
+		config.controller().setCreateGraphs(false);
 
 		new RunBicycleExample().run(config );
 
@@ -211,10 +211,10 @@ public class BicycleTest {
 		// Nodes 5-8 have a z-coordinate > 0, i.e. the links leading to those nodes have a slope
 		config.network().setInputFile("network_gradient.xml");
 		config.plans().setInputFile("population_1200.xml");
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setLastIteration(0);
-		config.controler().setCreateGraphs(false);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setLastIteration(0);
+		config.controller().setCreateGraphs(false);
 
 		new RunBicycleExample().run(config );
 
@@ -241,10 +241,10 @@ public class BicycleTest {
 		// and links 4-5 and 13-14 have cycle lanes
 		config.network().setInputFile("network_gradient_lane.xml");
 		config.plans().setInputFile("population_1200.xml");
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setLastIteration(0);
-		config.controler().setCreateGraphs(false);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setLastIteration(0);
+		config.controller().setCreateGraphs(false);
 
 		new RunBicycleExample().run(config );
 
@@ -270,13 +270,13 @@ public class BicycleTest {
 		// Normal network
 		config.network().setInputFile("network_normal.xml");
 		config.plans().setInputFile("population_1200.xml");
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		// 10 iterations
-		config.controler().setLastIteration(10);
-		config.controler().setWriteEventsInterval(10);
-		config.controler().setWritePlansInterval(10);
-		config.controler().setCreateGraphs(false);
+		config.controller().setLastIteration(10);
+		config.controller().setWriteEventsInterval(10);
+		config.controller().setWritePlansInterval(10);
+		config.controller().setCreateGraphs(false);
 
 		new RunBicycleExample().run(config );
 
@@ -345,9 +345,9 @@ public class BicycleTest {
 
 			// the following comes from inlining RunBicycleExample, which we need since we need to modify scenario data:
 			config.global().setNumberOfThreads(1 );
-			config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists );
+			config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists );
 
-			config.plansCalcRoute().setRoutingRandomness(3. );
+			config.routing().setRoutingRandomness(3. );
 
 			final String bicycle = bicycleConfigGroup.getBicycleMode();
 
@@ -444,10 +444,10 @@ public class BicycleTest {
 		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 
-		config.controler().setWriteEventsInterval(0);
-		config.controler().setWritePlansInterval(0);
-		config.controler().setCreateGraphs(false);
-		config.controler().setDumpDataAtEnd(false);
+		config.controller().setWriteEventsInterval(0);
+		config.controller().setWritePlansInterval(0);
+		config.controller().setCreateGraphs(false);
+		config.controller().setDumpDataAtEnd(false);
 		config.qsim().setStartTime(6. * 3600.);
 		config.qsim().setEndTime(10. * 3600.);
 
@@ -456,43 +456,43 @@ public class BicycleTest {
 		mainModeList.add(TransportMode.car);
 		config.qsim().setMainModes(mainModeList);
 
-		config.strategy().setMaxAgentPlanMemorySize(5);
+		config.replanning().setMaxAgentPlanMemorySize(5);
 		{
 			StrategySettings strategySettings = new StrategySettings();
 			strategySettings.setStrategyName("ChangeExpBeta");
 			strategySettings.setWeight(1.0);
-			config.strategy().addStrategySettings(strategySettings);
+			config.replanning().addStrategySettings(strategySettings);
 		}
 
 		ActivityParams homeActivity = new ActivityParams("home");
 		homeActivity.setTypicalDuration(12*60*60);
-		config.planCalcScore().addActivityParams(homeActivity);
+		config.scoring().addActivityParams(homeActivity);
 
 		ActivityParams workActivity = new ActivityParams("work");
 		workActivity.setTypicalDuration(8*60*60);
-		config.planCalcScore().addActivityParams(workActivity);
+		config.scoring().addActivityParams(workActivity);
 
 		ModeParams bicycle = new ModeParams( bicycleMode );
 		bicycle.setConstant(0.);
 		bicycle.setMarginalUtilityOfDistance(-0.0004); // util/m
 		bicycle.setMarginalUtilityOfTraveling(-6.0); // util/h
 		bicycle.setMonetaryDistanceRate(0.);
-		config.planCalcScore().addModeParams(bicycle);
+		config.scoring().addModeParams(bicycle);
 
-		config.plansCalcRoute().setNetworkModes(mainModeList);
+		config.routing().setNetworkModes(mainModeList);
 
 		// link 2 has infrastructure speed factor = 1.0, all other links 0.01
 		config.network().setInputFile("network_infrastructure-speed-factor.xml");
 		config.plans().setInputFile("population_4.xml");
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setLastIteration(0);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setLastIteration(0);
 
 		config.global().setNumberOfThreads(1);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		config.plansCalcRoute().setRoutingRandomness(3.);
+		config.routing().setRoutingRandomness(3.);
 
 		// ---
 
@@ -539,10 +539,10 @@ public class BicycleTest {
 		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
 
-		config.controler().setWriteEventsInterval(0);
-		config.controler().setWritePlansInterval(0);
-		config.controler().setCreateGraphs(false);
-		config.controler().setDumpDataAtEnd(false);
+		config.controller().setWriteEventsInterval(0);
+		config.controller().setWritePlansInterval(0);
+		config.controller().setCreateGraphs(false);
+		config.controller().setDumpDataAtEnd(false);
 		config.qsim().setStartTime(6. * 3600.);
 		config.qsim().setEndTime(14. * 3600.);
 
@@ -551,41 +551,41 @@ public class BicycleTest {
 		mainModeList.add(TransportMode.car);
 		config.qsim().setMainModes(mainModeList);
 
-		config.strategy().setMaxAgentPlanMemorySize(5);
+		config.replanning().setMaxAgentPlanMemorySize(5);
 		{
 			StrategySettings strategySettings = new StrategySettings();
 			strategySettings.setStrategyName("ChangeExpBeta");
 			strategySettings.setWeight(1.0);
-			config.strategy().addStrategySettings(strategySettings);
+			config.replanning().addStrategySettings(strategySettings);
 		}
 
 		ActivityParams homeActivity = new ActivityParams("home");
 		homeActivity.setTypicalDuration(12*60*60);
-		config.planCalcScore().addActivityParams(homeActivity);
+		config.scoring().addActivityParams(homeActivity);
 
 		ActivityParams workActivity = new ActivityParams("work");
 		workActivity.setTypicalDuration(8*60*60);
-		config.planCalcScore().addActivityParams(workActivity);
+		config.scoring().addActivityParams(workActivity);
 
 		ModeParams bicycle = new ModeParams("bicycle");
 		bicycle.setConstant(0.);
 		bicycle.setMarginalUtilityOfDistance(-999999); // util/m
 		bicycle.setMarginalUtilityOfTraveling(-6.0); // util/h
 		bicycle.setMonetaryDistanceRate(0.);
-		config.planCalcScore().addModeParams(bicycle);
+		config.scoring().addModeParams(bicycle);
 
-		config.plansCalcRoute().setNetworkModes(mainModeList);
+		config.routing().setNetworkModes(mainModeList);
 
 		// link 2 has infrastructure speed factor = 1.0, all other links 0.01
 		config.network().setInputFile("network_infrastructure-speed-factor.xml");
 		config.plans().setInputFile("population_4.xml");
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setLastIteration(0);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setLastIteration(0);
 
 		config.global().setNumberOfThreads(1);
 
-		config.plansCalcRoute().setRoutingRandomness(3.);
+		config.routing().setRoutingRandomness(3.);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		var vf  = scenario.getVehicles().getFactory();
@@ -626,13 +626,13 @@ public class BicycleTest {
 		// Normal network
 		config.network().setInputFile( "network_normal.xml" );
 		config.plans().setInputFile( "population_1200.xml" );
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
-		config.controler().setOutputDirectory( utils.getOutputDirectory() );
-		config.controler().setLastIteration( lastIteration );
-		config.controler().setLastIteration( lastIteration );
-		config.controler().setWriteEventsInterval( 10 );
-		config.controler().setWritePlansInterval( 10 );
-		config.controler().setCreateGraphs( false );
+		config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setOutputDirectory( utils.getOutputDirectory() );
+		config.controller().setLastIteration( lastIteration );
+		config.controller().setLastIteration( lastIteration );
+		config.controller().setWriteEventsInterval( 10 );
+		config.controller().setWritePlansInterval( 10 );
+		config.controller().setCreateGraphs( false );
 		return config;
 	}
 

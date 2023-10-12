@@ -70,7 +70,7 @@ public class MarginalCongestionHandlerV3Test {
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 
 		Config config = ConfigUtils.loadConfig( configFile ) ;
-		config.plansCalcRoute().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 
 		final Controler controler = new Controler(config);
 		controler.addOverridingModule(new AbstractModule() {
@@ -92,7 +92,7 @@ public class MarginalCongestionHandlerV3Test {
 			}
 		});
 
-		controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+		controler.getConfig().controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		controler.run();
 
 		// process

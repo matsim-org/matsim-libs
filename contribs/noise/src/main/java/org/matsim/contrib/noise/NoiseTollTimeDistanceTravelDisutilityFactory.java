@@ -51,7 +51,7 @@ public final class NoiseTollTimeDistanceTravelDisutilityFactory implements Trave
 
 		return new NoiseTollTimeDistanceTravelDisutility(
 				travelDisutilityFactoryDelegate.createTravelDisutility(timeCalculator ),
-				new NoiseTollCalculator(noiseContext), this.noiseContext.getScenario().getConfig().planCalcScore().getMarginalUtilityOfMoney(),
+				new NoiseTollCalculator(noiseContext), this.noiseContext.getScenario().getConfig().scoring().getMarginalUtilityOfMoney(),
 				routingConfigGroup.getRoutingRandomness()!=0.
 			);
 	}

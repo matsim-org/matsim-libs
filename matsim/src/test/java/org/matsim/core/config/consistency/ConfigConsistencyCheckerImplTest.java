@@ -58,7 +58,7 @@ public class ConfigConsistencyCheckerImplTest {
 		Config config = new Config();
 		config.addCoreModules();
 
-		config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(3.0);
+		config.scoring().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(3.0);
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
@@ -76,7 +76,7 @@ public class ConfigConsistencyCheckerImplTest {
 		Config config = new Config();
 		config.addCoreModules();
 
-		config.planCalcScore().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(3.0);
+		config.scoring().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(3.0);
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
@@ -94,7 +94,7 @@ public class ConfigConsistencyCheckerImplTest {
 		Config config = new Config();
 		config.addCoreModules();
 
-		config.planCalcScore().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(3.0);
+		config.scoring().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(3.0);
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
@@ -112,7 +112,7 @@ public class ConfigConsistencyCheckerImplTest {
 		Config config = new Config();
 		config.addCoreModules();
 
-		config.planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(3.0);
+		config.scoring().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(3.0);
 
 		LogCounter logger = new LogCounter(Level.WARN);
 		try {
@@ -132,7 +132,7 @@ public class ConfigConsistencyCheckerImplTest {
 
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setClosingTime(1.) ;
-		config.planCalcScore().addActivityParams(transitActivityParams);
+		config.scoring().addActivityParams(transitActivityParams);
 
 		try {
 			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
@@ -165,9 +165,9 @@ public class ConfigConsistencyCheckerImplTest {
 				Assert.assertFalse( problem );
 			}
 			{
-				Set<String> modes = new LinkedHashSet<>( config.plansCalcRoute().getNetworkModes() );
+				Set<String> modes = new LinkedHashSet<>( config.routing().getNetworkModes() );
 				modes.add( TransportMode.bike );
-				config.plansCalcRoute().setNetworkModes( modes );
+				config.routing().setNetworkModes( modes );
 
 				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
 				Assert.assertFalse( problem );
@@ -199,9 +199,9 @@ public class ConfigConsistencyCheckerImplTest {
 			ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
 
 			{
-				Set<String> modes = new LinkedHashSet<>( config.plansCalcRoute().getNetworkModes() );
+				Set<String> modes = new LinkedHashSet<>( config.routing().getNetworkModes() );
 				modes.add( TransportMode.bike );
-				config.plansCalcRoute().setNetworkModes( modes );
+				config.routing().setNetworkModes( modes );
 
 				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
 				// see comments inside that static function. kai, jul'19

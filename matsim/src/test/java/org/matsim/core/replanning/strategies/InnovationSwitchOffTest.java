@@ -64,7 +64,7 @@ public class InnovationSwitchOffTest {
 	@Test
 	public void testInnovationSwitchOff() {
 		Config config = ConfigUtils.createConfig(ExamplesUtils.getTestScenarioURL("equil"));
-		config.controler().setOutputDirectory(this.utils.getOutputDirectory());
+		config.controller().setOutputDirectory(this.utils.getOutputDirectory());
 
 		config.network().setInputFile("network.xml");
 		config.plans().setInputFile("plans2.xml");
@@ -73,44 +73,44 @@ public class InnovationSwitchOffTest {
 			StrategySettings settings = new StrategySettings(Id.create(1, StrategySettings.class));
 			settings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.BestScore.toString());
 			settings.setWeight(0.5);
-			config.strategy().addStrategySettings(settings);
+			config.replanning().addStrategySettings(settings);
 		}
 		{
 			StrategySettings settings = new StrategySettings(Id.create(2, StrategySettings.class));
 			settings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 			settings.setWeight(0.5);
-			config.strategy().addStrategySettings(settings);
+			config.replanning().addStrategySettings(settings);
 		}
 		{
 			StrategySettings settings = new StrategySettings(Id.create(3, StrategySettings.class));
 			settings.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator.toString());
 			settings.setWeight(0.1);
-			config.strategy().addStrategySettings(settings);
+			config.replanning().addStrategySettings(settings);
 		}
 		{
 			StrategySettings settings = new StrategySettings(Id.create(4, StrategySettings.class));
 			settings.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.toString());
 			settings.setWeight(0.1);
 			settings.setDisableAfter(11);
-			config.strategy().addStrategySettings(settings);
+			config.replanning().addStrategySettings(settings);
 		}
 
-		config.strategy().setFractionOfIterationsToDisableInnovation(0.66);
+		config.replanning().setFractionOfIterationsToDisableInnovation(0.66);
 
-		config.controler().setFirstIteration(10);
-		config.controler().setLastIteration(16);
+		config.controller().setFirstIteration(10);
+		config.controller().setLastIteration(16);
 
 		{
 			ActivityParams params = new ActivityParams("h");
 			params.setTypicalDuration(12. * 3600.);
-			config.planCalcScore().addActivityParams(params);
+			config.scoring().addActivityParams(params);
 		}
 		{
 			ActivityParams params = new ActivityParams("w");
 			params.setTypicalDuration(8. * 3600.);
-			config.planCalcScore().addActivityParams(params);
+			config.scoring().addActivityParams(params);
 		}
-		config.controler().setCreateGraphs(false);
+		config.controller().setCreateGraphs(false);
 
 
 		com.google.inject.Injector injector = Injector.createInjector(config, new AbstractModule() {

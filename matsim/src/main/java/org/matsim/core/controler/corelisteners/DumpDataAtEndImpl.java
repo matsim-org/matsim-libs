@@ -200,7 +200,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
     }
 
 	private void dumpExperiencedPlans(int iteration) {
-		if (this.config.planCalcScore().isWriteExperiencedPlans() ) {
+		if (this.config.scoring().isWriteExperiencedPlans() ) {
 			try {
 				IOUtils.copyFile(this.controlerIO.getIterationFilename(iteration, Controler.DefaultFiles.experiencedPlans),
 						this.controlerIO.getOutputFilename(Controler.DefaultFiles.experiencedPlans));

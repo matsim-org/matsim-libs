@@ -156,11 +156,11 @@ public class DataPrepare {
 		new PopulationReader(this.scenario).readFile(InInputPlansFileWithXY2Links);
 
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
-		FreespeedTravelTimeAndDisutility timeCostCalculator = new FreespeedTravelTimeAndDisutility(this.scenario.getConfig().planCalcScore());
+		FreespeedTravelTimeAndDisutility timeCostCalculator = new FreespeedTravelTimeAndDisutility(this.scenario.getConfig().scoring());
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
 
-		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(this.scenario.getConfig().planCalcScore()
-				, this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter(),
+		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(this.scenario.getConfig().scoring()
+				, this.scenario.getConfig().routing(), this.scenario.getConfig().transitRouter(),
 				this.scenario.getConfig().vspExperimental());
 
 		log.warn( "please chack that this still does what you want. td, oct 2013");
@@ -185,8 +185,8 @@ public class DataPrepare {
 
 	protected void visualizeRouterNetwork() {
 
-		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(this.scenario.getConfig().planCalcScore()
-				, this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter(),
+		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(this.scenario.getConfig().scoring()
+				, this.scenario.getConfig().routing(), this.scenario.getConfig().transitRouter(),
 				this.scenario.getConfig().vspExperimental());
 
 		TransitRouterImpl router = new TransitRouterImpl(transitRouterConfig, this.scenario.getTransitSchedule() );
@@ -221,7 +221,7 @@ public class DataPrepare {
 
 	private void buildUmlaeufe() {
 		Collection<TransitLine> transitLines = this.scenario.getTransitSchedule().getTransitLines().values();
-		GreedyUmlaufBuilderImpl greedyUmlaufBuilder = new GreedyUmlaufBuilderImpl(new UmlaufInterpolator(this.scenario.getNetwork(), this.scenario.getConfig().planCalcScore()), transitLines);
+		GreedyUmlaufBuilderImpl greedyUmlaufBuilder = new GreedyUmlaufBuilderImpl(new UmlaufInterpolator(this.scenario.getNetwork(), this.scenario.getConfig().scoring()), transitLines);
 		Collection<Umlauf> umlaeufe = greedyUmlaufBuilder.build();
 
 		VehiclesFactory vb = this.scenario.getTransitVehicles().getFactory();

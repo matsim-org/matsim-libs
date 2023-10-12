@@ -58,32 +58,32 @@ public class ResumableRunsIT {
 	@Test
 	public void testResumableRuns() throws MalformedURLException {
 		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
-		config.controler().setLastIteration(11);
-		config.controler().setWriteEventsInterval(1);
+		config.controller().setLastIteration(11);
+		config.controller().setWriteEventsInterval(1);
 		config.global().setNumberOfThreads(1); // only use one thread to rule out other disturbances for the test
-		config.controler().setWritePlansInterval(10);
+		config.controller().setWritePlansInterval(10);
 
 		// run1
-		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/run1/");
+		config.controller().setOutputDirectory(utils.getOutputDirectory() + "/run1/");
 		/*
 		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
-		 * to store the persons in the population, we have to sort the population manually.  
+		 * to store the persons in the population, we have to sort the population manually.
 		 * cdobler, oct'11
 		 */
 		Scenario scenario1 = ScenarioUtils.loadScenario(config);
 		PopulationUtils.sortPersons(scenario1.getPopulation());
 		Controler controler1 = new Controler(scenario1);
-        controler1.getConfig().controler().setCreateGraphs(false);
-		controler1.getConfig().controler().setDumpDataAtEnd(false);
+        controler1.getConfig().controller().setCreateGraphs(false);
+		controler1.getConfig().controller().setDumpDataAtEnd(false);
 		controler1.run();
 
 		// run2
-		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/run2/");
-		config.controler().setFirstIteration(10);
+		config.controller().setOutputDirectory(utils.getOutputDirectory() + "/run2/");
+		config.controller().setFirstIteration(10);
 		config.plans().setInputFile(new File(utils.getOutputDirectory() + "/run1/ITERS/it.10/10.plans.xml.gz").toURI().toURL().toString());
 		Controler controler2 = new Controler(config);
-        controler2.getConfig().controler().setCreateGraphs(false);
-		controler2.getConfig().controler().setDumpDataAtEnd(false);
+        controler2.getConfig().controller().setCreateGraphs(false);
+		controler2.getConfig().controller().setDumpDataAtEnd(false);
 		controler2.run();
 
 		// comparison

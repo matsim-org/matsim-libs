@@ -63,8 +63,8 @@ public class MultiModalModule extends AbstractModule {
         // would just operate on that sub-network.
         // kai, dec'19
 
-        RoutingConfigGroup routingConfigGroup = getConfig().plansCalcRoute();
-        ScoringConfigGroup cnScoringGroup = getConfig().planCalcScore();
+        RoutingConfigGroup routingConfigGroup = getConfig().routing();
+        ScoringConfigGroup cnScoringGroup = getConfig().scoring();
         MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
         Set<String> simulatedModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
         for (String mode : simulatedModes) {

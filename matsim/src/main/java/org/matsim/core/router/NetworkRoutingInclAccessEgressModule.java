@@ -112,7 +112,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		this.config = scenario.getConfig();
 		this.accessToNetworkRouter = accessToNetworkRouter;
 		this.egressFromNetworkRouter = egressFromNetworkRouter;
-		this.accessEgressType = config.plansCalcRoute().getAccessEgressType();
+		this.accessEgressType = config.routing().getAccessEgressType();
 		this.timeInterpretation = timeInterpretation;
 		if (accessEgressType.equals(AccessEgressType.none)) {
 			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
@@ -323,7 +323,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf, Config config) {
 		final RoutingConfigGroup.TeleportedModeParams params;
 		RoutingConfigGroup.TeleportedModeParams tmp;
-		final Map<String, RoutingConfigGroup.TeleportedModeParams> paramsMap = config.plansCalcRoute().getModeRoutingParams();
+		final Map<String, RoutingConfigGroup.TeleportedModeParams> paramsMap = config.routing().getModeRoutingParams();
 		if ((tmp = paramsMap.get(TransportMode.non_network_walk)) != null) {
 			params = tmp;
 		} else if ((tmp = paramsMap.get(TransportMode.walk)) != null) {

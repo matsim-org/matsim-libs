@@ -204,7 +204,7 @@ public class Events2Snapshot {
 			this.visualizer.addSnapshotWriter(this.writer);
 		}
 
-		Collection<SnapshotFormat> snapshotFormats = this.config.controler().getSnapshotFormat();
+		Collection<SnapshotFormat> snapshotFormats = this.config.controller().getSnapshotFormat();
 
 		for( SnapshotFormat snapshotFormat : snapshotFormats ){
 			switch( snapshotFormat ){

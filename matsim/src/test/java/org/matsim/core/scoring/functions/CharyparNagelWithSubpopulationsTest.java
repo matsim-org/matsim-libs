@@ -119,7 +119,7 @@ public class CharyparNagelWithSubpopulationsTest {
 			PopulationUtils.putPersonAttribute( person, "subpopulation", subpop );
 
 			final double util = (double) i;
-			final ScoringParameterSet params = config.planCalcScore().getOrCreateScoringParameters(subpop);
+			final ScoringParameterSet params = config.scoring().getOrCreateScoringParameters(subpop);
 
 			params.setMarginalUtlOfWaitingPt_utils_hr(-util);
 			params.setEarlyDeparture_utils_hr(-util);

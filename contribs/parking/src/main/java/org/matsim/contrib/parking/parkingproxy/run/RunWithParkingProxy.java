@@ -36,9 +36,9 @@ public class RunWithParkingProxy {
 		Config config = ConfigUtils.loadConfig(args, parkingConfig);
 
 		//config.controler().setLastIteration(100);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		config.plansCalcRoute().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
-		config.planCalcScore().setWriteExperiencedPlans(true);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.routing().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
+		config.scoring().setWriteExperiencedPlans(true);
 
 		Scenario scen = ScenarioUtils.loadScenario(config);
 

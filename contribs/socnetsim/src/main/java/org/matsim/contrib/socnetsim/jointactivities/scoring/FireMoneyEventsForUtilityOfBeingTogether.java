@@ -94,7 +94,7 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 				module.getActTypeFilterForJointScoring(),
 				module.getModeFilterForJointScoring(),
 				getPersonOverlapScorerFactory( sc ),
-				sc.getConfig().planCalcScore().getMarginalUtilityOfMoney(),
+				sc.getConfig().scoring().getMarginalUtilityOfMoney(),
 				sc.getActivityFacilities(),
 				(SocialNetwork) sc.getScenarioElement( SocialNetwork.ELEMENT_NAME ) );
 
@@ -151,7 +151,7 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 
 		if ( typicalDuration != null ) return typicalDuration;
 
-		final ActivityParams params = scenario.getConfig().planCalcScore().getActivityParams( type );
+		final ActivityParams params = scenario.getConfig().scoring().getActivityParams( type );
 
 		if ( params == null ) {
 			//throw new RuntimeException( "could not find typical duration for Person "+person.getId()+" for type "+type );

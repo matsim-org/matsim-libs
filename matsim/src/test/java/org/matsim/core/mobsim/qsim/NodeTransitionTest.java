@@ -640,13 +640,13 @@ public class NodeTransitionTest {
 		static Scenario createMergeScenario() {
 			MatsimRandom.reset();
 			Config config = ConfigUtils.createConfig();
-			config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-			config.controler().setLastIteration(0);
+			config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			config.controller().setLastIteration(0);
 			config.qsim().setStuckTime(24*3600);
 			config.qsim().setRemoveStuckVehicles(false);
 			ScoringConfigGroup.ActivityParams dummyAct = new ScoringConfigGroup.ActivityParams("dummy");
 	        dummyAct.setTypicalDuration(12 * 3600);
-	        config.planCalcScore().addActivityParams(dummyAct);
+	        config.scoring().addActivityParams(dummyAct);
 
 			Scenario scenario = ScenarioUtils.createScenario(config);
 
@@ -681,13 +681,13 @@ public class NodeTransitionTest {
 		static Scenario createBlockedNodeScenario() {
 			MatsimRandom.reset();
 			Config config = ConfigUtils.createConfig();
-			config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-			config.controler().setLastIteration(0);
+			config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			config.controller().setLastIteration(0);
 			config.qsim().setStuckTime(24*3600);
 			config.qsim().setRemoveStuckVehicles(false);
 			ScoringConfigGroup.ActivityParams dummyAct = new ScoringConfigGroup.ActivityParams("dummy");
 	        dummyAct.setTypicalDuration(12 * 3600);
-	        config.planCalcScore().addActivityParams(dummyAct);
+	        config.scoring().addActivityParams(dummyAct);
 
 			Scenario scenario = ScenarioUtils.createScenario(config);
 

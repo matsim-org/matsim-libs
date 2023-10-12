@@ -132,26 +132,26 @@ public class ScoringFunctionsForPopulationStressIT {
 	@Test
 	public void workWithNewEventsManager() {
 		Config config = ConfigUtils.createConfig();
-		config.parallelEventHandling().setOneThreadPerHandler(true);
+		config.eventsManager().setOneThreadPerHandler(true);
 		work(config);
 	}
 
 	@Test
 	public void workWithOldEventsManager() {
 		Config config = ConfigUtils.createConfig();
-		config.parallelEventHandling().setNumberOfThreads(8);
+		config.eventsManager().setNumberOfThreads(8);
 		work(config);
 	}
 
 	private void work(Config config) {
 		ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setTypicalDuration(100.0);
-		config.planCalcScore().addActivityParams(work);
+		config.scoring().addActivityParams(work);
 		ScoringConfigGroup.ModeParams car = new ScoringConfigGroup.ModeParams("car");
 		car.setMarginalUtilityOfTraveling(0.0);
 		car.setMarginalUtilityOfDistance(0.0);
 		car.setConstant(-1.0);
-		config.planCalcScore().addModeParams(car);
+		config.scoring().addModeParams(car);
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		Id<Person> personId = Id.createPersonId(1);
 		scenario.getPopulation().addPerson(scenario.getPopulation().getFactory().createPerson(personId));
@@ -251,17 +251,17 @@ public class ScoringFunctionsForPopulationStressIT {
 	@Test @Ignore
 	public void unlikelyTimingOfScoringFunctionStillWorks() {
 		Config config = ConfigUtils.createConfig();
-		config.parallelEventHandling().setNumberOfThreads(8);
-		config.parallelEventHandling().setOneThreadPerHandler(true);
-		config.parallelEventHandling().setSynchronizeOnSimSteps(false);
+		config.eventsManager().setNumberOfThreads(8);
+		config.eventsManager().setOneThreadPerHandler(true);
+		config.eventsManager().setSynchronizeOnSimSteps(false);
 		ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setTypicalDuration(100.0);
-		config.planCalcScore().addActivityParams(work);
+		config.scoring().addActivityParams(work);
 		ScoringConfigGroup.ModeParams car = new ScoringConfigGroup.ModeParams("car");
 		car.setMarginalUtilityOfTraveling(0.0);
 		car.setMarginalUtilityOfDistance(0.0);
 		car.setConstant(-1.0);
-		config.planCalcScore().addModeParams(car);
+		config.scoring().addModeParams(car);
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		Id<Person> personId = Id.createPersonId(1);
 		scenario.getPopulation().addPerson(scenario.getPopulation().getFactory().createPerson(personId));

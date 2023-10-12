@@ -74,18 +74,18 @@ public enum SnzActivities {
 
 		for (SnzActivities value : SnzActivities.values()) {
 			for (long ii = 600; ii <= 97200; ii += 600) {
-				config.planCalcScore().addActivityParams(value.apply(new ScoringConfigGroup.ActivityParams(value.name() + "_" + ii).setTypicalDuration(ii)));
+				config.scoring().addActivityParams(value.apply(new ScoringConfigGroup.ActivityParams(value.name() + "_" + ii).setTypicalDuration(ii)));
 			}
 		}
 
-		config.planCalcScore().addActivityParams(new ScoringConfigGroup.ActivityParams("car interaction").setTypicalDuration(60));
-		config.planCalcScore().addActivityParams(new ScoringConfigGroup.ActivityParams("ride interaction").setTypicalDuration(60));
-		config.planCalcScore().addActivityParams(new ScoringConfigGroup.ActivityParams("bike interaction").setTypicalDuration(60));
+		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("car interaction").setTypicalDuration(60));
+		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("ride interaction").setTypicalDuration(60));
+		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("bike interaction").setTypicalDuration(60));
 
-		config.planCalcScore().addActivityParams(new ScoringConfigGroup.ActivityParams("other").setTypicalDuration(600 * 3));
+		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("other").setTypicalDuration(600 * 3));
 
-		config.planCalcScore().addActivityParams(new ScoringConfigGroup.ActivityParams("freight_start").setTypicalDuration(60 * 15));
-		config.planCalcScore().addActivityParams(new ScoringConfigGroup.ActivityParams("freight_end").setTypicalDuration(60 * 15));
+		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("freight_start").setTypicalDuration(60 * 15));
+		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("freight_end").setTypicalDuration(60 * 15));
 
 	}
 }

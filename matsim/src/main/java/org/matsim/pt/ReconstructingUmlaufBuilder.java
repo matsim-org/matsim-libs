@@ -66,7 +66,7 @@ public final class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	@Inject public ReconstructingUmlaufBuilder( Scenario scenario ) {
 		// (normal constructor used from TransitQSimEngine for testing :-(.  kai, mar'20) yy change
 
-		this.umlaufInterpolator = new UmlaufInterpolator(scenario.getNetwork(), scenario.getConfig().planCalcScore());
+		this.umlaufInterpolator = new UmlaufInterpolator(scenario.getNetwork(), scenario.getConfig().scoring());
 		this.transitLines = scenario.getTransitSchedule().getTransitLines().values();
 		this.vehicles = scenario.getTransitVehicles();
 		this.umlaufIdsByVehicleId = new HashMap<>();

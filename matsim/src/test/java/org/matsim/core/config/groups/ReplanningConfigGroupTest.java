@@ -160,7 +160,7 @@ public class ReplanningConfigGroupTest {
 		final Config configV1In = ConfigUtils.createConfig();
 		new ConfigReader( configV1In ).readFile( v1path );
 
-		assertIdentical("re-read v1", initialGroup, configV1In.strategy());
+		assertIdentical("re-read v1", initialGroup, configV1In.replanning());
 
 		final String v2path = utils.getOutputDirectory() + "/configv2_out.xml";
 
@@ -169,7 +169,7 @@ public class ReplanningConfigGroupTest {
 		final Config configV2 = ConfigUtils.createConfig();
 		new ConfigReader( configV2 ).readFile( v2path );
 
-		assertIdentical("re-read v2", initialGroup, configV2.strategy());
+		assertIdentical("re-read v2", initialGroup, configV2.replanning());
 	}
 
 	private void assertIdentical(

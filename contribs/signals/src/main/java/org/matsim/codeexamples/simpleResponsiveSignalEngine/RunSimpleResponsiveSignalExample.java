@@ -246,9 +246,9 @@ public class RunSimpleResponsiveSignalExample {
 
 	private static Config defineConfig() {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory("output/simpleResponsiveSignalEngineExample/");
+		config.controller().setOutputDirectory("output/simpleResponsiveSignalEngineExample/");
 
-		config.controler().setLastIteration(40);
+		config.controller().setLastIteration(40);
 		config.travelTimeCalculator().setMaxTime(3600 * 5);
 		config.qsim().setStartTime(0);
 		config.qsim().setEndTime(3600 * 5);
@@ -259,7 +259,7 @@ public class RunSimpleResponsiveSignalExample {
 
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
-		config.planCalcScore().addActivityParams(dummyAct);
+		config.scoring().addActivityParams(dummyAct);
 
 //		{
 //			StrategySettings strat = new StrategySettings();
@@ -279,16 +279,16 @@ public class RunSimpleResponsiveSignalExample {
 			StrategySettings strat = new StrategySettings();
 			strat.setStrategyName(DefaultSelector.KeepLastSelected.toString());
 			strat.setWeight(0.0);
-			strat.setDisableAfter(config.controler().getLastIteration());
-			config.strategy().addStrategySettings(strat);
+			strat.setDisableAfter(config.controller().getLastIteration());
+			config.replanning().addStrategySettings(strat);
 		}
 
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists ) ;
-		config.controler().setWriteEventsInterval(config.controler().getLastIteration());
-		config.controler().setWritePlansInterval(config.controler().getLastIteration());
+		config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists ) ;
+		config.controller().setWriteEventsInterval(config.controller().getLastIteration());
+		config.controller().setWritePlansInterval(config.controller().getLastIteration());
 		config.vspExperimental().setWritingOutputEvents(true);
-		config.planCalcScore().setWriteExperiencedPlans(true);
-		config.controler().setCreateGraphs(true);
+		config.scoring().setWriteExperiencedPlans(true);
+		config.controller().setCreateGraphs(true);
 
 		return config;
 	}

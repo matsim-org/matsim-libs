@@ -45,8 +45,8 @@ public class TestScenario extends MATSimApplication {
 
 		URL context = ExamplesUtils.getTestScenarioURL("kelheim");
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(context, "config.xml"));
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		return config;
 	}
 

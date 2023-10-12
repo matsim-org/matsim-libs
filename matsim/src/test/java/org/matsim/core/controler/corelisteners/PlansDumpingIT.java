@@ -40,11 +40,11 @@ public class PlansDumpingIT {
 	@Test
 	public void testPlansDump_Interval() {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controler().setLastIteration(10);
-		config.controler().setWritePlansInterval(3);
+		config.controller().setLastIteration(10);
+		config.controller().setWritePlansInterval(3);
 		Controler c = new Controler(config);
-		c.getConfig().controler().setWriteEventsInterval(0);
-        c.getConfig().controler().setCreateGraphs(false);
+		c.getConfig().controller().setWriteEventsInterval(0);
+        c.getConfig().controller().setCreateGraphs(false);
 
         c.run();
 
@@ -64,11 +64,11 @@ public class PlansDumpingIT {
 	@Test
 	public void testPlansDump_Never() {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controler().setLastIteration(10);
-		config.controler().setWritePlansInterval(0);
+		config.controller().setLastIteration(10);
+		config.controller().setWritePlansInterval(0);
 		Controler c = new Controler(config);
-		c.getConfig().controler().setWriteEventsInterval(0);
-        c.getConfig().controler().setCreateGraphs(false);
+		c.getConfig().controller().setWriteEventsInterval(0);
+        c.getConfig().controller().setCreateGraphs(false);
 
         c.run();
 
@@ -88,11 +88,11 @@ public class PlansDumpingIT {
 	@Test
 	public void testPlansDump_Always() {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controler().setLastIteration(10);
-		config.controler().setWritePlansInterval(1);
+		config.controller().setLastIteration(10);
+		config.controller().setWritePlansInterval(1);
 		Controler c = new Controler(config);
-		c.getConfig().controler().setWriteEventsInterval(0);
-        c.getConfig().controler().setCreateGraphs(false);
+		c.getConfig().controller().setWriteEventsInterval(0);
+        c.getConfig().controller().setCreateGraphs(false);
 
         c.run();
 

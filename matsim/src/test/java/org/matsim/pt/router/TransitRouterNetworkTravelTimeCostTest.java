@@ -34,8 +34,8 @@ public class TransitRouterNetworkTravelTimeCostTest {
 	@Test public void testTravelTime() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
-				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
+		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().scoring(),
+				f.scenario.getConfig().routing(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
 		TransitRouterNetworkTravelTimeAndDisutility tc = new TransitRouterNetworkTravelTimeAndDisutility(conf);
 		TransitRouterImpl router = new TransitRouterImpl(conf, f.schedule);
@@ -55,8 +55,8 @@ public class TransitRouterNetworkTravelTimeCostTest {
 	@Test public void testWaitingTime() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
-				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
+		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().scoring(),
+				f.scenario.getConfig().routing(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
 		TransitRouterNetworkTravelTimeAndDisutility tc = new TransitRouterNetworkTravelTimeAndDisutility(conf);
 		TransitRouterImpl router = new TransitRouterImpl(conf, f.schedule);
@@ -79,8 +79,8 @@ public class TransitRouterNetworkTravelTimeCostTest {
 	@Test public void testTravelTimeAfterMidnight() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
-				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
+		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().scoring(),
+				f.scenario.getConfig().routing(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
 		TransitRouterNetworkTravelTimeAndDisutility tc = new TransitRouterNetworkTravelTimeAndDisutility(conf);
 		TransitRouterImpl router = new TransitRouterImpl(conf, f.schedule);
@@ -105,8 +105,8 @@ public class TransitRouterNetworkTravelTimeCostTest {
 	@Test public void testTravelCostLineSwitch() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
-				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
+		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().scoring(),
+				f.scenario.getConfig().routing(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
 		TransitRouterNetworkTravelTimeAndDisutility tc = new TransitRouterNetworkTravelTimeAndDisutility(conf);
 		TransitRouterImpl router = new TransitRouterImpl(conf, f.schedule);
@@ -134,8 +134,8 @@ public class TransitRouterNetworkTravelTimeCostTest {
 	@Test public void testTravelCostLineSwitch_AdditionalTransferTime() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
-				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
+		TransitRouterConfig conf = new TransitRouterConfig(f.scenario.getConfig().scoring(),
+				f.scenario.getConfig().routing(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
 		TransitRouterNetworkTravelTimeAndDisutility tc = new TransitRouterNetworkTravelTimeAndDisutility(conf);
 		TransitRouterImpl router = new TransitRouterImpl(conf, f.schedule);

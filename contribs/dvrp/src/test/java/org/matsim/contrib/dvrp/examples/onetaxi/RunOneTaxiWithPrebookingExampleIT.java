@@ -78,9 +78,9 @@ public class RunOneTaxiWithPrebookingExampleIT {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
 				"generic_dvrp_one_taxi_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new DvrpConfigGroup(), new OTFVisConfigGroup());
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		{
 			QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule(config,
 					QSimComponentsConfigGroup.class);

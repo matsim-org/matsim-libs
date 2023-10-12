@@ -45,8 +45,8 @@ public class ExampleWithinDayControllerTest {
 	@Test
 	public void testRun() {
 		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setLastIteration(1);
-		config.controler().setRoutingAlgorithmType(ControllerConfigGroup.RoutingAlgorithmType.Dijkstra);
+		config.controller().setLastIteration(1);
+		config.controller().setRoutingAlgorithmType(ControllerConfigGroup.RoutingAlgorithmType.Dijkstra);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		preparePlans(scenario);
 		final Controler controler = new Controler(scenario);

@@ -22,9 +22,9 @@ public class TransitRouterModuleTest {
 	public void testTransitRoutingAlgorithm_DependencyInjection_Dijkstra() {
 		Fixture f = new Fixture();
 		f.config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
-		f.config.controler().setOutputDirectory(this.utils.getOutputDirectory());
-		f.config.controler().setLastIteration(0);
-		f.config.controler().setDumpDataAtEnd(false);
+		f.config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+		f.config.controller().setLastIteration(0);
+		f.config.controller().setDumpDataAtEnd(false);
 
 		Controler controler = new Controler(f.scenario);
 		controler.addOverridingModule(new AbstractModule() {
@@ -44,9 +44,9 @@ public class TransitRouterModuleTest {
 	public void testTransitRoutingAlgorithm_DependencyInjection_Raptor() {
 		Fixture f = new Fixture();
 		f.config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.SwissRailRaptor);
-		f.config.controler().setOutputDirectory(this.utils.getOutputDirectory());
-		f.config.controler().setLastIteration(0);
-		f.config.controler().setDumpDataAtEnd(false);
+		f.config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+		f.config.controller().setLastIteration(0);
+		f.config.controller().setDumpDataAtEnd(false);
 
 		Controler controler = new Controler(f.scenario);
 		controler.addOverridingModule(new AbstractModule() {

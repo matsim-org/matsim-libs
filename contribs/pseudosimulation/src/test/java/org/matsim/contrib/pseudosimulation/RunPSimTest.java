@@ -47,13 +47,13 @@ public class RunPSimTest {
 	@Test
 	public void testA() {
 		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
-		config.controler().setCreateGraphs(false);
+		config.controller().setCreateGraphs(false);
 
 		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
 		config.addModule(pSimConfigGroup);
 		pSimConfigGroup.setIterationsPerCycle(20);
 
-		config.plansCalcRoute().setRoutingRandomness(0.);
+		config.routing().setRoutingRandomness(0.);
 
 		//identify selector strategies
 		Field[] selectors = DefaultPlanStrategiesModule.DefaultSelector.class.getDeclaredFields();
@@ -71,7 +71,7 @@ public class RunPSimTest {
 		selectorNames.add( DefaultPlanStrategiesModule.DefaultSelector.SelectExpBeta );
 
 		//lower the weight of non-selector strategies, as we will run many iters
-		for( ReplanningConfigGroup.StrategySettings settings : config.strategy().getStrategySettings() ){
+		for( ReplanningConfigGroup.StrategySettings settings : config.replanning().getStrategySettings() ){
 			if( !selectorNames.contains( settings.getStrategyName() ) ){
 				logger.warn( settings.getStrategyName() );
 				settings.setWeight( settings.getWeight() * 20 );
@@ -82,8 +82,8 @@ public class RunPSimTest {
 //		System.exit( -1);
 
 		final String outDir = utils.getOutputDirectory();
-		config.controler().setOutputDirectory( outDir );
-		config.controler().setLastIteration(20);
+		config.controller().setOutputDirectory( outDir );
+		config.controller().setLastIteration(20);
 //		config.controler().setDumpDataAtEnd(false);
 //		config.strategy().setFractionOfIterationsToDisableInnovation( 0.8 ); // crashes
 
@@ -124,11 +124,11 @@ public class RunPSimTest {
 	@Test
 	public void testB() {
 		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setLastIteration(2);
-		config.controler().setCreateGraphs(false);
-		config.controler().setDumpDataAtEnd(false);
-		config.plansCalcRoute().setRoutingRandomness(0.);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setLastIteration(2);
+		config.controller().setCreateGraphs(false);
+		config.controller().setDumpDataAtEnd(false);
+		config.routing().setRoutingRandomness(0.);
 		Controler controler = new Controler(config);
 		ExecScoreTracker execScoreTracker = new ExecScoreTracker(controler);
 		controler.addControlerListener(execScoreTracker);
@@ -150,7 +150,7 @@ public class RunPSimTest {
 
 		@Override
 		public void notifyShutdown(ShutdownEvent event) {
-			executedScore = controler.getScoreStats().getScoreHistory().get(ScoreStatsControlerListener.ScoreItem.executed).get(controler.getConfig().controler().getLastIteration());
+			executedScore = controler.getScoreStats().getScoreHistory().get(ScoreStatsControlerListener.ScoreItem.executed).get(controler.getConfig().controller().getLastIteration());
 		}
 
 

@@ -48,10 +48,10 @@ public class PersonScoringParametersFromPersonAttributesIT {
     @Test
     public void testSetAttributeAndRunEquil(){
         Config config = testUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
-        config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-        config.controler().setLastIteration(0);
-        config.planCalcScore().setPerforming_utils_hr(0.0d);
-        config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(0.0d);
+        config.controller().setOutputDirectory(testUtils.getOutputDirectory());
+        config.controller().setLastIteration(0);
+        config.scoring().setPerforming_utils_hr(0.0d);
+        config.scoring().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(0.0d);
         config.plans().setInputFile("plans2.xml");
 
         Scenario scenario = ScenarioUtils.loadScenario(config);

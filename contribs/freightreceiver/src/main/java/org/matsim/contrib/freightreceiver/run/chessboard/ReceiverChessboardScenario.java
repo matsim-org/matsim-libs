@@ -102,15 +102,15 @@ public class ReceiverChessboardScenario {
 
         config.setContext(context);
 
-		config.controler().setOutputDirectory(outputFolder);
-        config.controler().setFirstIteration(0);
-        config.controler().setLastIteration(ReceiverChessboardParameters.NUM_ITERATIONS);
-        config.controler().setMobsim("qsim");
-        config.controler().setWriteSnapshotsInterval(ReceiverChessboardParameters.STAT_INTERVAL);
+		config.controller().setOutputDirectory(outputFolder);
+        config.controller().setFirstIteration(0);
+        config.controller().setLastIteration(ReceiverChessboardParameters.NUM_ITERATIONS);
+        config.controller().setMobsim("qsim");
+        config.controller().setWriteSnapshotsInterval(ReceiverChessboardParameters.STAT_INTERVAL);
         config.global().setRandomSeed(seed);
         config.network().setInputFile("grid9x9.xml");
 
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
         return config;
     }
@@ -120,7 +120,7 @@ public class ReceiverChessboardScenario {
 	 */
     public static void writeFreightScenario(Scenario sc) {
         /* Write the necessary bits to file. */
-        String outputFolder = sc.getConfig().controler().getOutputDirectory();
+        String outputFolder = sc.getConfig().controller().getOutputDirectory();
 		boolean success = new File(outputFolder).mkdirs();
         if (!success) {
             LOG.warn("Could not successfully create '" + outputFolder + "'. Maybe it already exists?");

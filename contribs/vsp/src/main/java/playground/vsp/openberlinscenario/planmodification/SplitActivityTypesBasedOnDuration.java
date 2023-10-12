@@ -103,11 +103,11 @@ public class SplitActivityTypesBasedOnDuration {
 		}
 
 		for (ActivityParams actParams : newActivityParams) {
-			scenario.getConfig().planCalcScore().addActivityParams(actParams);
+			scenario.getConfig().scoring().addActivityParams(actParams);
 		}
 
 		log.info("New activity parameters: ");
-		for (ActivityParams actParams : scenario.getConfig().planCalcScore().getActivityParams()) {
+		for (ActivityParams actParams : scenario.getConfig().scoring().getActivityParams()) {
 			initialActivityParams.add(actParams);
 			log.info(" -> " + actParams.getActivityType());
 		}

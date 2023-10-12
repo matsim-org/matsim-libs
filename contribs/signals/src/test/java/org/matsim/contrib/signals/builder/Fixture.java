@@ -86,15 +86,15 @@ public class Fixture {
 			e.printStackTrace();
 		}
 		Config conf = ConfigUtils.createConfig(testUtils.classInputResourcePath());
-		conf.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		conf.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		ActivityParams params = new ActivityParams("h");
 		params.setTypicalDuration(24.0 * 3600.0);
-		conf.planCalcScore().addActivityParams(params);
+		conf.scoring().addActivityParams(params);
 
 		StrategySettings settings = new StrategySettings(Id.create("1", StrategySettings.class));
 		settings.setStrategyName("ChangeExpBeta");
 		settings.setWeight(1.0);
-		conf.strategy().addStrategySettings(settings);
+		conf.replanning().addStrategySettings(settings);
 		conf.network().setInputFile("network.xml.gz");
 		conf.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 		conf.plans().setInputFile("plans1Agent.xml");

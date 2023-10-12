@@ -77,7 +77,7 @@ final class ConstantSpeedAccessibilityExpContributionCalculator implements Acces
 		this.scenario = scenario;
 
 		this.config = scenario.getConfig();
-		final ScoringConfigGroup scoringConfigGroup = config.planCalcScore() ;
+		final ScoringConfigGroup scoringConfigGroup = config.scoring() ;
 
 		if (scoringConfigGroup.getOrCreateModeParams(mode).getMonetaryDistanceRate() != 0.) {
 			LOG.error("Monetary distance cost rate for " + mode + " different from zero, but not used in accessibility computations");
@@ -85,10 +85,10 @@ final class ConstantSpeedAccessibilityExpContributionCalculator implements Acces
 
 		logitScaleParameter = scoringConfigGroup.getBrainExpBeta();
 
-		if (config.plansCalcRoute().getTeleportedModeSpeeds().get(mode) == null) {
+		if (config.routing().getTeleportedModeSpeeds().get(mode) == null) {
 			LOG.error("No teleported mode speed for mode " + mode + " set.");
 		}
-		this.modeSpeed_m_h = config.plansCalcRoute().getTeleportedModeSpeeds().get(mode) * 3600.;
+		this.modeSpeed_m_h = config.routing().getTeleportedModeSpeeds().get(mode) * 3600.;
 
 		final ScoringConfigGroup.ModeParams modeParams = scoringConfigGroup.getOrCreateModeParams(mode);
 		betaModeTT = modeParams.getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
@@ -97,7 +97,7 @@ final class ConstantSpeedAccessibilityExpContributionCalculator implements Acces
 
 		betaWalkTT = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
 		betaWalkTD = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
-		this.walkSpeed_m_h = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600;
+		this.walkSpeed_m_h = config.routing().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600;
 	}
 
 

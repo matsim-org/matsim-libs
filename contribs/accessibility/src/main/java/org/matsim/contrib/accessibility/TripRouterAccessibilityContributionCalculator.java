@@ -90,7 +90,7 @@ class TripRouterAccessibilityContributionCalculator implements AccessibilityCont
 
 		betaWalkTT = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
 
-		this.walkSpeed_m_s = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
+		this.walkSpeed_m_s = scenario.getConfig().routing().getTeleportedModeSpeeds().get(TransportMode.walk);
 
 		this.travelTime = travelTime;
 		this.travelDisutilityFactory = travelDisutilityFactory;

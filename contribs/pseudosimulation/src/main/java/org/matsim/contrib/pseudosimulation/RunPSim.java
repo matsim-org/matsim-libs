@@ -61,8 +61,8 @@ public class RunPSim {
 		//The following line will make the controler use the events manager that doesn't check for event order.
 		//This is essential for pseudo-simulation as the PSim module generates events on a person-basis,
 		//not a system basis
-		config.parallelEventHandling().setSynchronizeOnSimSteps(false);
-		config.parallelEventHandling().setNumberOfThreads(1);
+		config.eventsManager().setSynchronizeOnSimSteps(false);
+		config.eventsManager().setNumberOfThreads(1);
 
 		this.matsimControler = new Controler(scenario);
 
@@ -104,7 +104,7 @@ public class RunPSim {
 
 	public static void main(String args[]) {
 		Config config = ConfigUtils.loadConfig(args[0]);
-		config.controler().setCreateGraphs(false);
+		config.controller().setCreateGraphs(false);
 
 		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
 		config.addModule(pSimConfigGroup);

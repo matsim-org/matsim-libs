@@ -309,7 +309,7 @@ public class AgentNotificationTest {
 		RoutingConfigGroup.TeleportedModeParams params = new RoutingConfigGroup.TeleportedModeParams( TransportMode.walk ) ;
 		params.setBeelineDistanceFactor(1.3);
 		params.setTeleportedModeSpeed(1.);
-		config.plansCalcRoute().addModeRoutingParams( params );
+		config.routing().addModeRoutingParams( params );
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 

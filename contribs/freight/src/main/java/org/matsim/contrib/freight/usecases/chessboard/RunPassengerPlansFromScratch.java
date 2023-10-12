@@ -40,13 +40,13 @@ final class RunPassengerPlansFromScratch {
 
 		ActivityParams workParams = new ActivityParams("work");
 		workParams.setTypicalDuration(60 * 60 * 8);
-		config.planCalcScore().addActivityParams(workParams);
+		config.scoring().addActivityParams(workParams);
 		ActivityParams homeParams = new ActivityParams("home");
 		homeParams.setTypicalDuration(16 * 60 * 60);
-		config.planCalcScore().addActivityParams(homeParams);
+		config.scoring().addActivityParams(homeParams);
 		config.global().setCoordinateSystem("EPSG:32632");
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(2);
+		config.controller().setFirstIteration(0);
+		config.controller().setLastIteration(2);
 		config.network().setInputFile(NETWORK_FILENAME);
 		config.plans().setInputFile(PLANS_FILENAME);
 
@@ -59,15 +59,15 @@ final class RunPassengerPlansFromScratch {
 		reRoute.setWeight(0.5);
 		//		reRoute.setDisableAfter(300);
 
-		config.strategy().setMaxAgentPlanMemorySize(5);
-		config.strategy().addStrategySettings(bestScore);
-		config.strategy().addStrategySettings(reRoute);
+		config.replanning().setMaxAgentPlanMemorySize(5);
+		config.replanning().addStrategySettings(bestScore);
+		config.replanning().addStrategySettings(reRoute);
 		//
 		Controler controler = new Controler(config);
-		controler.getConfig().controler().setWriteEventsInterval(1);
-		controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controller().setWriteEventsInterval(1);
+		controler.getConfig().controller().setCreateGraphs(false);
 		//Select how to react of not empty output directory
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		//		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
 
 		controler.run();

@@ -718,10 +718,10 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 
 		private Config defineConfig() {
 			Config config = ConfigUtils.createConfig();
-			config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+			config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 
 			// set number of iterations
-			config.controler().setLastIteration(0);
+			config.controller().setLastIteration(0);
 
 			config.qsim().setStartTime(simStart_h*3600);
 	        config.qsim().setUsingFastCapacityUpdate(false);
@@ -735,26 +735,26 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 				StrategySettings strat = new StrategySettings();
 				strat.setStrategyName(DefaultSelector.KeepLastSelected.toString());
 				strat.setWeight(1);
-				strat.setDisableAfter(config.controler().getLastIteration());
-				config.strategy().addStrategySettings(strat);
+				strat.setDisableAfter(config.controller().getLastIteration());
+				config.replanning().addStrategySettings(strat);
 			}
 			config.qsim().setStuckTime( 3600 );
 			config.qsim().setRemoveStuckVehicles(false);
 
-			config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 			config.vspExperimental().setWritingOutputEvents(false);
-			config.planCalcScore().setWriteExperiencedPlans(false);
-			config.controler().setCreateGraphs(false);
-			config.controler().setDumpDataAtEnd(false);
-			config.controler().setWriteEventsInterval(config.controler().getLastIteration());
-			config.controler().setWritePlansInterval(config.controler().getLastIteration());
+			config.scoring().setWriteExperiencedPlans(false);
+			config.controller().setCreateGraphs(false);
+			config.controller().setDumpDataAtEnd(false);
+			config.controller().setWriteEventsInterval(config.controller().getLastIteration());
+			config.controller().setWritePlansInterval(config.controller().getLastIteration());
 
 			// define activity types
 			{
 				ActivityParams dummyAct = new ActivityParams("dummy");
 				dummyAct.setTypicalDuration(12 * 3600);
-				config.planCalcScore().addActivityParams(dummyAct);
+				config.scoring().addActivityParams(dummyAct);
 			}
 			return config;
 		}

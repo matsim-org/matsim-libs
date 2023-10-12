@@ -79,13 +79,13 @@ public final class CreateEmissionConfig {
 			MatsimServices controler = new Controler(config);
 
 		// controlerConfigGroup
-			ControllerConfigGroup ccg = controler.getConfig().controler();
+			ControllerConfigGroup ccg = controler.getConfig().controller();
 			ccg.setOutputDirectory(outputPath);
 			ccg.setFirstIteration(0);
 			ccg.setLastIteration(numberOfIterations-1);
 
 		// planCalcScoreConfigGroup
-			ScoringConfigGroup pcs = controler.getConfig().planCalcScore();
+			ScoringConfigGroup pcs = controler.getConfig().scoring();
 			ActivityParams homeP = new ActivityParams("home");
 			homeP.setTypicalDuration(12 * 3600);
 			pcs.addActivityParams(homeP);
@@ -94,7 +94,7 @@ public final class CreateEmissionConfig {
 			pcs.addActivityParams(workP);
 
 		// strategy
-			ReplanningConfigGroup scg = controler.getConfig().strategy();
+			ReplanningConfigGroup scg = controler.getConfig().replanning();
 			StrategySettings strategySettings = new StrategySettings();
 			strategySettings.setStrategyName("ChangeExpBeta");
 			strategySettings.setWeight(1.0);

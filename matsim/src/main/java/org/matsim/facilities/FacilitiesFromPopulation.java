@@ -86,7 +86,7 @@ public final class FacilitiesFromPopulation {
 		this.addEmptyActivityOptions = true ;
 		this.facilitiesSource = facilityConfigGroup.getFacilitiesSource();
 		this.network = scenario.getNetwork() ;
-		this.scoringConfigGroup = scenario.getConfig().planCalcScore() ;
+		this.scoringConfigGroup = scenario.getConfig().scoring() ;
 		this.scenario = scenario;
 	}
 	public void setFacilitiesSource( final FacilitiesSource facilitiesSource ) {

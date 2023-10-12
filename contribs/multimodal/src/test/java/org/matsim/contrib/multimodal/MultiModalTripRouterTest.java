@@ -68,13 +68,13 @@ public class MultiModalTripRouterTest {
 	public void testRouteLeg() {
 
 		final Config config = ConfigUtils.createConfig();
-		config.plansCalcRoute().addParam("teleportedModeSpeed_bike", "6.01");
-		config.plansCalcRoute().addParam("teleportedModeFreespeedFactor_pt", "2.0");
-		config.plansCalcRoute().addParam("teleportedModeSpeed_ride", "15.0");
-		config.plansCalcRoute().addParam("teleportedModeSpeed_undefined", "13.88888888888889");
-		config.plansCalcRoute().addParam("teleportedModeSpeed_walk", "1.34");
+		config.routing().addParam("teleportedModeSpeed_bike", "6.01");
+		config.routing().addParam("teleportedModeFreespeedFactor_pt", "2.0");
+		config.routing().addParam("teleportedModeSpeed_ride", "15.0");
+		config.routing().addParam("teleportedModeSpeed_undefined", "13.88888888888889");
+		config.routing().addParam("teleportedModeSpeed_walk", "1.34");
 
-		config.planCalcScore().addModeParams( new ScoringConfigGroup.ModeParams( TransportMode.ride ) );
+		config.scoring().addModeParams( new ScoringConfigGroup.ModeParams( TransportMode.ride ) );
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 
 		createNetwork(scenario);

@@ -67,11 +67,11 @@ public class TestPositionEmissionModule {
         emissionConfig.setDetailedVsAverageLookupBehavior(
                 EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable); //This is the previous behaviour
         var config = ConfigUtils.loadConfig(configFile, emissionConfig);
-        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         config.qsim().setSnapshotPeriod(1);
         config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
-        config.controler().setWriteSnapshotsInterval(1);
-        config.controler().setSnapshotFormat(Set.of(ControllerConfigGroup.SnapshotFormat.positionevents));
+        config.controller().setWriteSnapshotsInterval(1);
+        config.controller().setSnapshotFormat(Set.of(ControllerConfigGroup.SnapshotFormat.positionevents));
 
         var scenario = ScenarioUtils.loadScenario(config);
 
@@ -89,8 +89,8 @@ public class TestPositionEmissionModule {
         emissionConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
         var config = ConfigUtils.loadConfig(configFile, emissionConfig);
-        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+        config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 
         emissionConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.csv");
         emissionConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.csv" );
@@ -98,24 +98,24 @@ public class TestPositionEmissionModule {
 
         final ScoringConfigGroup.ActivityParams homeParams = new ScoringConfigGroup.ActivityParams("home")
                 .setTypicalDuration(20);
-        config.planCalcScore().addActivityParams(homeParams);
+        config.scoring().addActivityParams(homeParams);
         final ScoringConfigGroup.ActivityParams workParams = new ScoringConfigGroup.ActivityParams("work")
                 .setTypicalDuration(20);
-        config.planCalcScore().addActivityParams(workParams);
+        config.scoring().addActivityParams(workParams);
 
         var strategy = new ReplanningConfigGroup.StrategySettings();
         strategy.setStrategyName("ChangeExpBeta");
         strategy.setWeight(1.0);
 
-        config.strategy().addParameterSet(strategy);
+        config.replanning().addParameterSet(strategy);
 
         // activate snapshots
         config.qsim().setSnapshotPeriod(1);
         config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
-        config.controler().setWriteSnapshotsInterval(1);
-        config.controler().setSnapshotFormat(Set.of(ControllerConfigGroup.SnapshotFormat.positionevents));
-        config.controler().setFirstIteration(0);
-        config.controler().setLastIteration(0);
+        config.controller().setWriteSnapshotsInterval(1);
+        config.controller().setSnapshotFormat(Set.of(ControllerConfigGroup.SnapshotFormat.positionevents));
+        config.controller().setFirstIteration(0);
+        config.controller().setLastIteration(0);
 
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
 

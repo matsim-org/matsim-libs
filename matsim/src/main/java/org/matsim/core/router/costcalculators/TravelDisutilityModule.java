@@ -29,7 +29,7 @@ public class TravelDisutilityModule extends AbstractModule {
 
     @Override
     public void install() {
-        RoutingConfigGroup routeConfigGroup = getConfig().plansCalcRoute();
+        RoutingConfigGroup routeConfigGroup = getConfig().routing();
         for (String mode : routeConfigGroup.getNetworkModes()) {
 
             final RandomizingTimeDistanceTravelDisutilityFactory builder = new RandomizingTimeDistanceTravelDisutilityFactory( mode, getConfig() );

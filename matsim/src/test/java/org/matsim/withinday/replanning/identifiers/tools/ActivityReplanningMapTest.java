@@ -103,11 +103,11 @@ public class ActivityReplanningMapTest {
 		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
 		QSimConfigGroup qSimConfig = config.qsim();
 		qSimConfig.setNumberOfThreads(2);
-		config.controler().setMobsim("qsim");
-		config.controler().setLastIteration(0);
+		config.controller().setMobsim("qsim");
+		config.controller().setLastIteration(0);
 		config.qsim().setStartTime(0.0);
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
-		config.controler().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
+		config.controller().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
 
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new WithinDayModule());
@@ -117,10 +117,10 @@ public class ActivityReplanningMapTest {
 				addMobsimListenerBinding().to(MobsimListenerForTests.class);
 			}
 		});
-        controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.getConfig().controler().setWritePlansInterval(0);
+        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
+		controler.getConfig().controller().setWritePlansInterval(0);
 		controler.run();
 	}
 

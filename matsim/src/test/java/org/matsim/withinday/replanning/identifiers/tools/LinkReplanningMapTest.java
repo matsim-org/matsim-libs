@@ -58,9 +58,9 @@ public class LinkReplanningMapTest {
 		qSimConfig.setNumberOfThreads(2);
 		qSimConfig.setFlowCapFactor(100.0);	// ensure that agents don't have to wait at an intersection
 		qSimConfig.setStorageCapFactor(100.0);	// ensure that agents don't have to wait at an intersection
-		config.controler().setMobsim("qsim");
-		config.controler().setLastIteration(0);
-		config.controler().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
+		config.controller().setMobsim("qsim");
+		config.controller().setLastIteration(0);
+		config.controller().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
 
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new WithinDayModule());

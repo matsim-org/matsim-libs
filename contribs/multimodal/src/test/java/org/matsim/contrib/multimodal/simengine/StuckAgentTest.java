@@ -68,14 +68,14 @@ public class StuckAgentTest {
 	@Test
 	public void testStuckEvents() {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		config.qsim().setEndTime(24*3600);
 
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 		// doesn't matter - MultiModalModule sets the mobsim unconditionally. it just can't be something
 		// which the ControlerDefaultsModule knows about. Try it, you will get an error. Quite safe.
-		config.controler().setMobsim("myMobsim");
+		config.controller().setMobsim("myMobsim");
 
 
 		MultiModalConfigGroup multiModalConfigGroup = new MultiModalConfigGroup();
@@ -85,19 +85,19 @@ public class StuckAgentTest {
 
 		ActivityParams homeParams = new ActivityParams("home");
 		homeParams.setTypicalDuration(16*3600);
-		config.planCalcScore().addActivityParams(homeParams);
+		config.scoring().addActivityParams(homeParams);
 
 		// set default walk speed; according to Weidmann 1.34 [m/s]
 		double defaultWalkSpeed = 1.34;
-		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
+		config.routing().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
 
 		// set default bike speed; Parkin and Rotheram according to 6.01 [m/s]
 		double defaultBikeSpeed = 6.01;
-		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.bike, defaultBikeSpeed);
+		config.routing().setTeleportedModeSpeed(TransportMode.bike, defaultBikeSpeed);
 
 		// set unkown mode speed
 		double unknownModeSpeed = 2.0;
-		config.plansCalcRoute().setTeleportedModeSpeed("other", unknownModeSpeed);
+		config.routing().setTeleportedModeSpeed("other", unknownModeSpeed);
 
         config.travelTimeCalculator().setFilterModes(true);
 
@@ -148,9 +148,9 @@ public class StuckAgentTest {
 		scenario.getPopulation().addPerson(createPerson(scenario, "p4", "walk", null, 24.5*3600));	// departs after simulation has ended
 
 		Controler controler = new Controler(scenario);
-        controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
+        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
 
         controler.addOverridingModule(new MultiModalModule());
 

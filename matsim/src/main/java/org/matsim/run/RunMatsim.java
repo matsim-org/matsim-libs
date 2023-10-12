@@ -32,30 +32,30 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 public class RunMatsim {
 
 	private final org.matsim.core.controler.Controler controler;
-	
+
 	public RunMatsim(final String[] args) {
 		this.controler = new org.matsim.core.controler.Controler(args);
 	}
-	
+
 	public RunMatsim(final String configFilename) {
 		this.controler = new org.matsim.core.controler.Controler(configFilename);
 	}
-	
+
 	public void setOverwriteFiles(final boolean overwriteFiles) {
-		this.controler.getConfig().controler().setOverwriteFileSetting(
+		this.controler.getConfig().controller().setOverwriteFileSetting(
 				overwriteFiles ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 	}
-	
+
 	public Scenario getScenario() {
 		return this.controler.getScenario() ;
 	}
-	
+
 	public void run() {
 		this.controler.run();
 	}
-	
+
 	public  static void main(String[] args) {
 		new RunMatsim(args).run();
 	}

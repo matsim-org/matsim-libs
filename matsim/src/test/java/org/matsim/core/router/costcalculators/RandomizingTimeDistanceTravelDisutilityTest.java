@@ -84,11 +84,11 @@ public class RandomizingTimeDistanceTravelDisutilityTest {
 		Fixture f = new Fixture();
 //		PlanCalcScoreConfigGroup planCalcScoreCfg = new PlanCalcScoreConfigGroup();
 		Config config = ConfigUtils.createConfig();
-		ScoringConfigGroup planCalcScoreCfg = config.planCalcScore();
+		ScoringConfigGroup planCalcScoreCfg = config.scoring();
 		ModeParams modeParams = new ModeParams(TransportMode.car);
 		modeParams.setMonetaryDistanceRate(-0.1);
 		planCalcScoreCfg.addModeParams(modeParams);
-		config.plansCalcRoute().setRoutingRandomness( sigma );
+		config.routing().setRoutingRandomness( sigma );
 
 		RandomizingTimeDistanceTravelDisutilityFactory factory = new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config);
                 TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(f.s.getNetwork());

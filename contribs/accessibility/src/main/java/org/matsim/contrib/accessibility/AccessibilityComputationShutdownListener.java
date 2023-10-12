@@ -68,7 +68,7 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 		this.outputDirectory = outputDirectory;
 
 		this.acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-		this.cnScoringGroup = scenario.getConfig().planCalcScore();
+		this.cnScoringGroup = scenario.getConfig().scoring();
 
 		if (cnScoringGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0.) {
 			LOG.error("Marginal utility of distance for car different from zero, but not used in accessibility computations");

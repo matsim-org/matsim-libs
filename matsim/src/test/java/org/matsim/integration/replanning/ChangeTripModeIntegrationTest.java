@@ -81,7 +81,7 @@ public class ChangeTripModeIntegrationTest {
 		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setStrategyName("ChangeTripMode");
 		strategySettings.setWeight(1.0);
-		config.strategy().addStrategySettings(strategySettings);
+		config.replanning().addStrategySettings(strategySettings);
 		//		config.setParam("changeMode", "modes", "car,walk");
 		String[] str = {"car","walk"} ;
 		config.changeMode().setModes(str);

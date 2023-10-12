@@ -45,7 +45,7 @@ public class TripRouterModuleTest {
     public void testRouterCreation() {
         for (ControllerConfigGroup.RoutingAlgorithmType routingAlgorithmType : ControllerConfigGroup.RoutingAlgorithmType.values()) {
             Config config = ConfigUtils.createConfig();
-            config.controler().setRoutingAlgorithmType(routingAlgorithmType);
+            config.controller().setRoutingAlgorithmType(routingAlgorithmType);
             Scenario scenario = ScenarioUtils.createScenario(config);
             LeastCostPathCalculatorFactory defaultLeastCostPathCalculatorFactory = TripRouterFactoryBuilderWithDefaults.createDefaultLeastCostPathCalculatorFactory(scenario);
             LeastCostPathCalculator pathCalculator = defaultLeastCostPathCalculatorFactory.createPathCalculator(

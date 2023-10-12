@@ -37,9 +37,6 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
@@ -47,7 +44,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import jakarta.inject.Inject;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -122,7 +118,7 @@ BeforeMobsimListener, AfterMobsimListener  {
 	}
 
 	private boolean isActiveInThisIteration( int iter ) {
-		return iter % config.ptCounts().getPtCountsInterval() == 0 && iter >= config.controler().getFirstIteration();
+		return iter % config.ptCounts().getPtCountsInterval() == 0 && iter >= config.controller().getFirstIteration();
 	}
 
 	@Override

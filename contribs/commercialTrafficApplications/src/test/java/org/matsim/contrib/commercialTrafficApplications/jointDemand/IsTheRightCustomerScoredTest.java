@@ -47,8 +47,8 @@ public class IsTheRightCustomerScoredTest {
     public void setUp() {
 
         Config config = ConfigUtils.loadConfig("./scenarios/grid/jointDemand_config.xml");
-        config.controler().setLastIteration(0);
-        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+        config.controller().setLastIteration(0);
+        config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         JointDemandConfigGroup jointDemandConfigGroup = ConfigUtils.addOrGetModule(config, JointDemandConfigGroup.class);
         jointDemandConfigGroup.setMaxJobScore(MAX_JOB_SCORE);
         FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);

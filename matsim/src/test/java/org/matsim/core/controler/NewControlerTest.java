@@ -46,8 +46,8 @@ public class NewControlerTest {
 		// facility file is provided in config and facilitySource is 'fromFile', the facilitySource must be changed. Amit Jan'18
 		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.none);
 
-		config.controler().setLastIteration(1);
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		config.controller().setLastIteration(1);
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		com.google.inject.Injector injector = Injector.createInjector(config, new AbstractModule() {
 			@Override

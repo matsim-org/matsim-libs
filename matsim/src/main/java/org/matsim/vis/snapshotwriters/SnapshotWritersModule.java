@@ -40,13 +40,13 @@ public class SnapshotWritersModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		if (getConfig().controler().getSnapshotFormat().contains(SnapshotFormat.transims)) {
+		if (getConfig().controller().getSnapshotFormat().contains(SnapshotFormat.transims)) {
 			addSnapshotWriterBinding().toProvider(TransimsSnapshotWriterFactory.class);
 		}
-		if (getConfig().controler().getSnapshotFormat().contains(SnapshotFormat.positionevents)) {
+		if (getConfig().controller().getSnapshotFormat().contains(SnapshotFormat.positionevents)) {
 			addSnapshotWriterBinding().toProvider(PositionEventsWriterFactory.class);
 		}
-		if (getConfig().controler().getWriteSnapshotsInterval() != 0) {
+		if (getConfig().controller().getWriteSnapshotsInterval() != 0) {
 			addMobsimListenerBinding().toProvider(SnapshotWriterManagerProvider.class);
 		}
 	}

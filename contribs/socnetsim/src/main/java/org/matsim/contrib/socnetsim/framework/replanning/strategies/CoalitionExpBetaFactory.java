@@ -49,7 +49,7 @@ public class CoalitionExpBetaFactory extends NonInnovativeStrategyFactory  {
 		return new CoalitionSelector(
 				new LogitWeight(
 					MatsimRandom.getLocalInstance(),
-					sc.getConfig().planCalcScore().getBrainExpBeta()),
+					sc.getConfig().scoring().getBrainExpBeta()),
 				conflictSolver);
 	}
 }

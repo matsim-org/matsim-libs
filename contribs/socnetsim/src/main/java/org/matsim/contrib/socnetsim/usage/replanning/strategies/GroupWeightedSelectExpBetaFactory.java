@@ -54,13 +54,13 @@ public class GroupWeightedSelectExpBetaFactory extends NonInnovativeStrategyFact
 				sc.getConfig().getModule(
 						GroupReplanningConfigGroup.GROUP_NAME );
 
-		return 
+		return
 				 new HighestWeightSelector(
 					 incompatiblePlansIdentifierFactory ,
 					 new WeightedWeight(
 						 new LogitWeight(
 							MatsimRandom.getLocalInstance(),
-							sc.getConfig().planCalcScore().getBrainExpBeta()),
+							sc.getConfig().scoring().getBrainExpBeta()),
 						 configGroup.getWeightAttributeName(),
 						 sc.getPopulation() ) );
 

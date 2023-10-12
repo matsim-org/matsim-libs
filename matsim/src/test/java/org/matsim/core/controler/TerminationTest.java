@@ -81,11 +81,11 @@ public class TerminationTest {
 
 	private Controler prepareExperiment(int interval, int criterion, ControllerConfigGroup.CleanIterations iters) {
 		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setCleanItersAtEnd(iters);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setCleanItersAtEnd(iters);
 
-		config.controler().setWriteEventsInterval(interval);
-		config.controler().setLastIteration(criterion);
+		config.controller().setWriteEventsInterval(interval);
+		config.controller().setLastIteration(criterion);
 
 		return new Controler(config);
 	}
@@ -132,8 +132,8 @@ public class TerminationTest {
 		 */
 
 		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setCleanItersAtEnd(ControllerConfigGroup.CleanIterations.keep);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setCleanItersAtEnd(ControllerConfigGroup.CleanIterations.keep);
 
 		{ // Set up mode choice
 			config.changeMode().setModes(new String[] { "car", "walk" });
@@ -141,7 +141,7 @@ public class TerminationTest {
 			StrategySettings modeStrategy = new StrategySettings();
 			modeStrategy.setStrategyName(DefaultStrategy.ChangeTripMode);
 			modeStrategy.setWeight(0.1);
-			config.strategy().addStrategySettings(modeStrategy);
+			config.replanning().addStrategySettings(modeStrategy);
 		}
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);

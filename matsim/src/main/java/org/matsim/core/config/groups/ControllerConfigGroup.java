@@ -430,7 +430,7 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 	}
 	@Override
 	protected void checkConsistency(Config config) {
-		if ( config.controler().getOverwriteFileSetting() == OverwriteFileSetting.overwriteExistingFiles ) {
+		if ( config.controller().getOverwriteFileSetting() == OverwriteFileSetting.overwriteExistingFiles ) {
 			log.warn( "setting overwriting behavior to "+overwriteFileSetting );
 			log.warn( "this is not recommended, as it might result in a directory containing output from several model runs" );
 			log.warn( "prefer the options "+OverwriteFileSetting.deleteDirectoryIfExists+" or "+OverwriteFileSetting.failIfDirectoryExists );

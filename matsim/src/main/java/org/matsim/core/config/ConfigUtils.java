@@ -236,7 +236,7 @@ public class ConfigUtils implements MatsimExtensionPoint {
 		if (!prefix.endsWith("/") && !prefix.endsWith(File.separator)) {
 			prefix = prefix + File.separator;
 		}
-		config.controler().setOutputDirectory(getAbsolutePath(prefix, config.controler().getOutputDirectory()));
+		config.controller().setOutputDirectory(getAbsolutePath(prefix, config.controller().getOutputDirectory()));
 		config.network().setInputFile(getAbsolutePath(prefix, config.network().getInputFile()));
 		config.plans().setInputFile(getAbsolutePath(prefix, config.plans().getInputFile()));
 		config.facilities().setInputFile(getAbsolutePath(prefix, config.facilities().getInputFile()));
@@ -263,7 +263,7 @@ public class ConfigUtils implements MatsimExtensionPoint {
 	// (Had the problem in RandomizingTransitRotuerIT.) kai, dec'19
 	public static Id<StrategySettings> createAvailableStrategyId(Config config) {
 		long maxStrategyId = 0;
-		for( StrategySettings strategySettings : config.strategy().getStrategySettings() ){
+		for( StrategySettings strategySettings : config.replanning().getStrategySettings() ){
 			maxStrategyId = Math.max( maxStrategyId , Long.parseLong( strategySettings.getId().toString() ) );
 		}
 		return Id.create(maxStrategyId + 1, StrategySettings.class);

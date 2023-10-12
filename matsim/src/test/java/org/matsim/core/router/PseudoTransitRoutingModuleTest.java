@@ -103,8 +103,8 @@ public class PseudoTransitRoutingModuleTest {
 			params.setTeleportedModeFreespeedFactor(2.);
 			params.setBeelineDistanceFactor(1.);
 			params.setTeleportedModeFreespeedLimit(5.);
-			f.s.getConfig().plansCalcRoute().addModeRoutingParams(params);
-			f.s.getConfig().controler().setOutputDirectory(utils.getOutputDirectory());
+			f.s.getConfig().routing().addModeRoutingParams(params);
+			f.s.getConfig().controller().setOutputDirectory(utils.getOutputDirectory());
 
 			com.google.inject.Injector injector = Injector.createInjector(f.s.getConfig(), new AbstractModule() {
 				@Override public void install() {
@@ -134,11 +134,11 @@ public class PseudoTransitRoutingModuleTest {
 		public final Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		public Fixture() {
-			s.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			s.getConfig().controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 			TeleportedModeParams walk = new TeleportedModeParams(TransportMode.walk);
 			walk.setBeelineDistanceFactor(1.3);
 			walk.setTeleportedModeSpeed(3.0 / 3.6);
-			s.getConfig().plansCalcRoute().addModeRoutingParams(walk);
+			s.getConfig().routing().addModeRoutingParams(walk);
 
 			Network net = this.s.getNetwork();
 			NetworkFactory nf = net.getFactory();

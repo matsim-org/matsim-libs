@@ -24,9 +24,9 @@ public class SelectSingleTripModeStrategyTest extends ScenarioTest {
 
 		Config config = TestScenario.loadConfig(utils);
 
-		config.controler().setLastIteration(10);
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		config.strategy().addStrategySettings(new ReplanningConfigGroup.StrategySettings()
+		config.controller().setLastIteration(10);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		config.replanning().addStrategySettings(new ReplanningConfigGroup.StrategySettings()
 				.setStrategyName(InformedModeChoiceModule.SELECT_SINGLE_TRIP_MODE_STRATEGY)
 				.setSubpopulation("person")
 				.setWeight(0.5)

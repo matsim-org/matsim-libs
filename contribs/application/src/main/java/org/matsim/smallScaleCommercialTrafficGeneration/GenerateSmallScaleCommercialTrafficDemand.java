@@ -172,7 +172,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		Config config = readAndCheckConfig(configPath, modelName, sampleName, output);
 
-		output = Path.of(config.controler().getOutputDirectory());
+		output = Path.of(config.controller().getOutputDirectory());
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		NetworkUtils.runNetworkCleaner(scenario.getNetwork()); // e.g. for vulkaneifel network
@@ -236,23 +236,23 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					}
 					default -> throw new RuntimeException("No traffic type selected.");
 				}
-				if (config.controler().getRunId() == null)
+				if (config.controller().getRunId() == null)
 					new CarrierPlanWriter(FreightUtils.addOrGetCarriers(scenario))
-						.write(scenario.getConfig().controler().getOutputDirectory() + "/output_CarrierDemand.xml");
+						.write(scenario.getConfig().controller().getOutputDirectory() + "/output_CarrierDemand.xml");
 				else
 					new CarrierPlanWriter(FreightUtils.addOrGetCarriers(scenario))
-						.write(scenario.getConfig().controler().getOutputDirectory() + "/"
-							+ scenario.getConfig().controler().getRunId() + ".output_CarrierDemand.xml");
+						.write(scenario.getConfig().controller().getOutputDirectory() + "/"
+							+ scenario.getConfig().controller().getRunId() + ".output_CarrierDemand.xml");
 				solveSeparatedVRPs(scenario, regionLinksMap);
 			}
 		}
-		if (config.controler().getRunId() == null)
+		if (config.controller().getRunId() == null)
 			new CarrierPlanWriter(FreightUtils.addOrGetCarriers(scenario)).write(
-				scenario.getConfig().controler().getOutputDirectory() + "/output_CarrierDemandWithPlans.xml");
+				scenario.getConfig().controller().getOutputDirectory() + "/output_CarrierDemandWithPlans.xml");
 		else
 			new CarrierPlanWriter(FreightUtils.addOrGetCarriers(scenario))
 				.write(
-					scenario.getConfig().controler().getOutputDirectory() + "/" + scenario.getConfig().controler().getRunId() + ".output_CarrierDemandWithPlans.xml");
+					scenario.getConfig().controller().getOutputDirectory() + "/" + scenario.getConfig().controller().getRunId() + ".output_CarrierDemandWithPlans.xml");
 		Controler controler = prepareControler(scenario);
 		controler.run();
 		SmallScaleCommercialTrafficUtils.createPlansBasedOnCarrierPlans(controler.getScenario(),
@@ -433,15 +433,15 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		Config config = ConfigUtils.loadConfig(configPath.toString());
 		if (output == null || output.toString().isEmpty())
-			config.controler().setOutputDirectory(Path.of(config.controler().getOutputDirectory()).resolve(modelName)
+			config.controller().setOutputDirectory(Path.of(config.controller().getOutputDirectory()).resolve(modelName)
 				.resolve(usedSmallScaleCommercialTrafficType.toString() + "_" + sampleName + "pct" + "_"
 					+ java.time.LocalDate.now() + "_" + java.time.LocalTime.now().toSecondOfDay() + "_" + resistanceFactor)
 				.toString());
 		else
-			config.controler().setOutputDirectory(output.toString());
-		new OutputDirectoryHierarchy(config.controler().getOutputDirectory(), config.controler().getRunId(),
-			config.controler().getOverwriteFileSetting(), ControllerConfigGroup.CompressionType.gzip);
-		new File(Path.of(config.controler().getOutputDirectory()).resolve("calculatedData").toString()).mkdir();
+			config.controller().setOutputDirectory(output.toString());
+		new OutputDirectoryHierarchy(config.controller().getOutputDirectory(), config.controller().getRunId(),
+			config.controller().getOverwriteFileSetting(), ControllerConfigGroup.CompressionType.gzip);
+		new File(Path.of(config.controller().getOutputDirectory()).resolve("calculatedData").toString()).mkdir();
 		rnd = new Random(config.global().getRandomSeed());
 		if (config.network().getInputFile() == null)
 			throw new Exception("No network file in config");
@@ -449,7 +449,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			throw new Exception("No network CRS is set in config");
 		if (config.global().getCoordinateSystem() == null)
 			throw new Exception("No global CRS is set in config");
-		if (config.controler().getOutputDirectory() == null)
+		if (config.controller().getOutputDirectory() == null)
 			throw new Exception("No output directory was set");
 
 		return config;

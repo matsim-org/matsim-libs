@@ -34,13 +34,13 @@ import org.matsim.core.mobsim.qsim.QSimModule;
 public class DefaultMobsimModule extends AbstractModule {
     @Override
     public void install() {
-        if (getConfig().controler().getMobsim().equals(ControllerConfigGroup.MobsimType.qsim.toString())) {
+        if (getConfig().controller().getMobsim().equals(ControllerConfigGroup.MobsimType.qsim.toString())) {
             install(new QSimModule());
 //            bind(  RelativePositionOfEntryExitOnLink.class ).toInstance( () -> 1. );
-        } else if (getConfig().controler().getMobsim().equals(ControllerConfigGroup.MobsimType.JDEQSim.toString())) {
+        } else if (getConfig().controller().getMobsim().equals(ControllerConfigGroup.MobsimType.JDEQSim.toString())) {
             bindMobsim().to(JDEQSimulation.class);
             //            bind(  RelativePositionOfEntryExitOnLink.class ).toInstance( () -> 0. );
-        } else if (getConfig().controler().getMobsim().equals(ControllerConfigGroup.MobsimType.hermes.toString())) {
+        } else if (getConfig().controller().getMobsim().equals(ControllerConfigGroup.MobsimType.hermes.toString())) {
             bindMobsim().toProvider(HermesProvider.class);
         } else if (getConfig().getModule(ExternalMobimConfigGroup.GROUP_NAME) != null
                 && ((ExternalMobimConfigGroup)getConfig().getModule(

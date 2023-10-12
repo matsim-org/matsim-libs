@@ -196,7 +196,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 			Plan modifiablePlan = WithinDayAgentUtils.getModifiablePlan(mobsimagent);
 			TripRouter tripRouter = tripRouterProvider.get();
 			Set<String> modesWithVehicles = new HashSet<>(scenario.getConfig().qsim().getMainModes());
-			modesWithVehicles.addAll(scenario.getConfig().plansCalcRoute().getNetworkModes());
+			modesWithVehicles.addAll(scenario.getConfig().routing().getNetworkModes());
 
 			for (Id<Vehicle> ev : selectedEVPlans.get(plan)) {
 				//only replan cnt times per vehicle and person. otherwise, there might be a leg which is just too long and we end up in an infinity loop...
@@ -350,7 +350,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		Double chargingBegin = null;
 
 		Set<String> modesWithVehicles = new HashSet<>(scenario.getConfig().qsim().getMainModes());
-		modesWithVehicles.addAll(scenario.getConfig().plansCalcRoute().getNetworkModes());
+		modesWithVehicles.addAll(scenario.getConfig().routing().getNetworkModes());
 
 		Leg lastLegWithVehicle = null;
 
@@ -451,7 +451,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		Activity plugoutTripDestination = findRealOrChargingActAfter(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
 
 		{    //some consistency checks.. //TODO consider to put in a JUnit test..
-			int offset = config.plansCalcRoute().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ? 1 : 3;
+			int offset = config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ? 1 : 3;
 
 			Preconditions.checkNotNull(pluginTripOrigin, "pluginTripOrigin is null. should never happen..");
 			Preconditions.checkState(!pluginTripOrigin.equals(actWhileCharging),

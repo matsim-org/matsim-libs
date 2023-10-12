@@ -54,7 +54,7 @@ public class UserBenefitsCalculator {
 	private final Set<Id<Person>> stuckingAgents;
 
 	public UserBenefitsCalculator(Config config, WelfareMeasure wm, boolean considerAllPlans) {
-		ScoringConfigGroup pcs = config.planCalcScore();
+		ScoringConfigGroup pcs = config.scoring();
 		this.betaLogit = pcs.getBrainExpBeta();
 		this.marginalUtlOfMoney = pcs.getMarginalUtilityOfMoney();
 		this.welfareMeasure = wm;
@@ -73,7 +73,7 @@ public class UserBenefitsCalculator {
 	public UserBenefitsCalculator(Config config, Set<Id<Person>> stuckingAgents) {
 		logger.info("Providing the IDs of agents that are stucking in the final iteration (selected plans).");
 
-		ScoringConfigGroup pcs = config.planCalcScore();
+		ScoringConfigGroup pcs = config.scoring();
 		this.betaLogit = pcs.getBrainExpBeta();
 		this.marginalUtlOfMoney = pcs.getMarginalUtilityOfMoney();
 		this.stuckingAgents = stuckingAgents;

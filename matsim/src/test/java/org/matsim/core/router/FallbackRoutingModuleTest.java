@@ -33,13 +33,13 @@ public class FallbackRoutingModuleTest{
 	public void calcRoute(){
 
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory( utils.getOutputDirectory() );
-		config.controler().setLastIteration( 1 );
+		config.controller().setOutputDirectory( utils.getOutputDirectory() );
+		config.controller().setLastIteration( 1 );
 
 		ReplanningConfigGroup.StrategySettings sets = new ReplanningConfigGroup.StrategySettings();
 		sets.setStrategyName( DefaultPlanStrategiesModule.DefaultStrategy.ReRoute );
 		sets.setWeight( 1. );
-		config.strategy().addStrategySettings( sets );
+		config.replanning().addStrategySettings( sets );
 
 		Scenario scenario = ScenarioUtils.createScenario( config );
 

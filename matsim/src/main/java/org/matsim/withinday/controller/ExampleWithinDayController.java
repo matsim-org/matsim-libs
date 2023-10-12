@@ -133,7 +133,7 @@ public final class ExampleWithinDayController implements StartupListener {
 		}
 
 		Config config = ConfigUtils.loadConfig( args[0] , new WithinDayConfigGroup() ) ;
-		config.controler().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
+		config.controller().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
 
 		Scenario scenario = ScenarioUtils.loadScenario( config) ;
 

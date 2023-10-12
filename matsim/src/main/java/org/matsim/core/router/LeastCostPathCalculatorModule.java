@@ -37,11 +37,11 @@ public class LeastCostPathCalculatorModule extends AbstractModule {
 	    // kai/mm, jan'17
 
         Config config = getConfig();
-        if (config.controler().getRoutingAlgorithmType().equals(ControllerConfigGroup.RoutingAlgorithmType.Dijkstra)) {
+        if (config.controller().getRoutingAlgorithmType().equals(ControllerConfigGroup.RoutingAlgorithmType.Dijkstra)) {
             bind(LeastCostPathCalculatorFactory.class).to(DijkstraFactory.class);
-        } else if (config.controler().getRoutingAlgorithmType().equals(ControllerConfigGroup.RoutingAlgorithmType.AStarLandmarks)) {
+        } else if (config.controller().getRoutingAlgorithmType().equals(ControllerConfigGroup.RoutingAlgorithmType.AStarLandmarks)) {
             bind(LeastCostPathCalculatorFactory.class).to(AStarLandmarksFactory.class);
-        } else if (config.controler().getRoutingAlgorithmType().equals(ControllerConfigGroup.RoutingAlgorithmType.SpeedyALT)) {
+        } else if (config.controller().getRoutingAlgorithmType().equals(ControllerConfigGroup.RoutingAlgorithmType.SpeedyALT)) {
             bind(LeastCostPathCalculatorFactory.class).to(SpeedyALTFactory.class);
         }
     }

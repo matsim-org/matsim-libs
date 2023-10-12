@@ -28,7 +28,7 @@ public final class DiscreteModeChoiceConfigurator {
 	}
 
 	static public void configureAsSubtourModeChoiceReplacement(Config config) {
-		for (StrategySettings strategy : config.strategy().getStrategySettings()) {
+		for (StrategySettings strategy : config.replanning().getStrategySettings()) {
 			if (strategy.getStrategyName().equals(DefaultStrategy.SubtourModeChoice)) {
 				strategy.setStrategyName(DiscreteModeChoiceModule.STRATEGY_NAME);
 			}
@@ -89,7 +89,7 @@ public final class DiscreteModeChoiceConfigurator {
 	}
 
 	static public void configureAsModeChoiceInTheLoop(Config config, double replanningRate) {
-		ReplanningConfigGroup replanningConfigGroup = config.strategy();
+		ReplanningConfigGroup replanningConfigGroup = config.replanning();
 		replanningConfigGroup.clearStrategySettings();
 
 		replanningConfigGroup.setMaxAgentPlanMemorySize(1);

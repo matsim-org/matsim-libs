@@ -107,26 +107,26 @@ public class PtAlongALine2Test {
 
 		// === GBL: ===
 
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 
 		// === ROUTER: ===
 
-		config.plansCalcRoute().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
+		config.routing().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		// (as of today, will also influence router. kai, jun'19)
 
 		if (drtMode == DrtMode.teleportBeeline) {// (configure teleportation router)
-			config.plansCalcRoute()
+			config.routing()
 					.addModeRoutingParams(
 							new RoutingConfigGroup.TeleportedModeParams().setMode(TransportMode.drt ).setTeleportedModeSpeed(100. / 3.6 ) );
 			if (drt2) {
-				config.plansCalcRoute()
+				config.routing()
 						.addModeRoutingParams(
 								new RoutingConfigGroup.TeleportedModeParams().setMode("drt2" ).setTeleportedModeSpeed(100. / 3.6 ) );
 			}
 			if (drt3) {
-				config.plansCalcRoute()
+				config.routing()
 						.addModeRoutingParams(
 								new RoutingConfigGroup.TeleportedModeParams().setMode("drt3" ).setTeleportedModeSpeed(100. / 3.6 ) );
 			}
@@ -140,14 +140,14 @@ public class PtAlongALine2Test {
 			if (drt3) {
 				networkModes.add("drt3");
 			}
-			config.plansCalcRoute().setNetworkModes(networkModes);
+			config.routing().setNetworkModes(networkModes);
 		}
 
-		config.plansCalcRoute()
+		config.routing()
 				.addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams().setMode("walk" ).setTeleportedModeSpeed(5. / 3.6 ) );
 
 		// set up walk2 so we don't need walk in raptor:
-		config.plansCalcRoute()
+		config.routing()
 				.addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams().setMode("walk2" ).setTeleportedModeSpeed(5. / 3.6 ) );
 
 		// === RAPTOR: ===
@@ -196,21 +196,21 @@ public class PtAlongALine2Test {
 
 		// === SCORING: ===
 
-		double margUtlTravPt = config.planCalcScore().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling();
+		double margUtlTravPt = config.scoring().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling();
 		if (drtMode != DrtMode.none) {
 			// (scoring parameters for drt modes)
-			config.planCalcScore()
+			config.scoring()
 					.addModeParams(new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling(margUtlTravPt));
 			if (drt2) {
-				config.planCalcScore()
+				config.scoring()
 						.addModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
 			}
 			if (drt3) {
-				config.planCalcScore()
+				config.scoring()
 						.addModeParams(new ModeParams("drt3").setMarginalUtilityOfTraveling(margUtlTravPt));
 			}
 		}
-		config.planCalcScore().addModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
+		config.scoring().addModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
 
 		// === QSIM: ===
 
@@ -269,7 +269,7 @@ public class PtAlongALine2Test {
 			}
 
 			for (DrtConfigGroup drtConfigGroup : mm.getModalElements()) {
-				DrtConfigs.adjustDrtConfig(drtConfigGroup, config.planCalcScore(), config.plansCalcRoute());
+				DrtConfigs.adjustDrtConfig(drtConfigGroup, config.scoring(), config.routing());
 			}
 		}
 
@@ -593,21 +593,21 @@ public class PtAlongALine2Test {
 
 		// === GBL: ===
 
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 
 		// === ROUTER: ===
 
-		config.plansCalcRoute().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		// (as of today, will also influence router. kai, jun'19)
 
-		config.plansCalcRoute().setNetworkModes(new HashSet<>(Arrays.asList(TransportMode.drt, "drt2")));
+		config.routing().setNetworkModes(new HashSet<>(Arrays.asList(TransportMode.drt, "drt2")));
 
 		// set up walk2 so we don't use faulty walk in raptor:
-		config.plansCalcRoute().addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams("walk2").setTeleportedModeSpeed(5. / 3.6 ) );
+		config.routing().addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams("walk2").setTeleportedModeSpeed(5. / 3.6 ) );
 
-		config.plansCalcRoute()
+		config.routing()
 				.addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams(TransportMode.walk).setTeleportedModeSpeed(0. ) );
 		// (when specifying "walk2", all default routing params are cleared.  However, swiss rail raptor needs "walk" to function. kai, feb'20)
 
@@ -647,14 +647,14 @@ public class PtAlongALine2Test {
 
 		// === SCORING: ===
 		{
-			double margUtlTravPt = config.planCalcScore()
+			double margUtlTravPt = config.scoring()
 					.getModes()
 					.get(TransportMode.pt)
 					.getMarginalUtilityOfTraveling();
-			config.planCalcScore()
+			config.scoring()
 					.addModeParams(new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling(margUtlTravPt));
-			config.planCalcScore().addModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
-			config.planCalcScore().addModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
+			config.scoring().addModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
+			config.scoring().addModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
 		}
 		// === QSIM: ===
 
@@ -755,22 +755,22 @@ public class PtAlongALine2Test {
 
 		// === GBL: ===
 
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 
 		// === ROUTER: ===
 
-		config.plansCalcRoute().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
+		config.routing().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		// (as of today, will also influence router. kai, jun'19)
 
 		// remove teleportation walk router:
-		config.plansCalcRoute().removeModeRoutingParams(TransportMode.walk);
+		config.routing().removeModeRoutingParams(TransportMode.walk);
 
 		// add network walk router:
-		Set<String> networkModes = new HashSet<>(config.plansCalcRoute().getNetworkModes());
+		Set<String> networkModes = new HashSet<>(config.routing().getNetworkModes());
 		networkModes.add(TransportMode.walk);
-		config.plansCalcRoute().setNetworkModes(networkModes);
+		config.routing().setNetworkModes(networkModes);
 
 		// === RAPTOR: ===
 		{

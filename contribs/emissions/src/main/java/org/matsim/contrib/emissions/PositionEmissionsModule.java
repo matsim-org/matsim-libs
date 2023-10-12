@@ -68,7 +68,7 @@ public class PositionEmissionsModule extends AbstractModule {
 		if (config.qsim().getSnapshotPeriod() > 1) {
 			throw new RuntimeException("only snapshot periods of 1s are supported.");
 		}
-		if (!config.controler().getSnapshotFormat().contains(ControllerConfigGroup.SnapshotFormat.positionevents)) {
+		if (!config.controller().getSnapshotFormat().contains(ControllerConfigGroup.SnapshotFormat.positionevents)) {
 			throw new RuntimeException("config.controler.snapshotFormat must be set to 'positionevents'");
 		}
 		if (isNotCorrectSnapshotStyle(config.qsim().getSnapshotStyle())) {

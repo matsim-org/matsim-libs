@@ -68,8 +68,8 @@ public class HermesRoundaboutTest {
 	public void testRoundaboutBehavior(){
 		ScenarioImporter.flush();
 		final Config config = createConfig();
-		config.controler().setMobsim("hermes");
-		config.parallelEventHandling().setOneThreadPerHandler(true);
+		config.controller().setMobsim("hermes");
+		config.eventsManager().setOneThreadPerHandler(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		buildRoundaboutNetwork(scenario);
 		buildPopulation(scenario);
@@ -87,26 +87,26 @@ public class HermesRoundaboutTest {
 	private Config createConfig() {
 
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		config.qsim().setUsePersonIdForMissingVehicleId(true);
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(2);
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		config.plansCalcRoute().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink); //standard accessEgressMode is walk
+		config.controller().setFirstIteration(0);
+		config.controller().setLastIteration(2);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink); //standard accessEgressMode is walk
 
 		final ScoringConfigGroup.ActivityParams homeParams = new ScoringConfigGroup.ActivityParams("home");
 		homeParams.setTypicalDuration(1);
-		config.planCalcScore().addActivityParams(homeParams);
+		config.scoring().addActivityParams(homeParams);
 
 		final ScoringConfigGroup.ActivityParams workParams = new ScoringConfigGroup.ActivityParams("work");
 		workParams.setTypicalDuration(1);
-		config.planCalcScore().addActivityParams(workParams);
+		config.scoring().addActivityParams(workParams);
 
 		ReplanningConfigGroup.StrategySettings replanning = new ReplanningConfigGroup.StrategySettings();
 		replanning.setStrategyName("ReRoute");
 		replanning.setWeight(1.0);
-		config.strategy().addStrategySettings(replanning);
+		config.replanning().addStrategySettings(replanning);
 
 		return config;
 	}

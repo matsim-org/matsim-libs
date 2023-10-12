@@ -49,7 +49,7 @@ public class ScoringConfigGroupTest {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private void testResultsBeforeCheckConsistency( Config config, boolean fullyHierarchical ) {
-		ScoringConfigGroup scoringConfig = config.planCalcScore() ;
+		ScoringConfigGroup scoringConfig = config.scoring() ;
 
 		if ( ! fullyHierarchical ){
 			// mode params are there for default modes:
@@ -70,10 +70,10 @@ public class ScoringConfigGroupTest {
 //		}
 	}
 	private void testResultsAfterCheckConsistency( Config config ) {
-		ScoringConfigGroup scoringConfig = config.planCalcScore() ;
+		ScoringConfigGroup scoringConfig = config.scoring() ;
 
 		// default stage/interaction params for modes routed on the network are now there:
-		for( String networkMode : config.plansCalcRoute().getNetworkModes() ){
+		for( String networkMode : config.routing().getNetworkModes() ){
 			Assert.assertNotNull( scoringConfig.getActivityParams( createStageActivityType( networkMode ) ) );
 		}
 	}
@@ -81,7 +81,7 @@ public class ScoringConfigGroupTest {
 	@Test
 	public void testFullyHierarchicalVersion() {
 		Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config_v2_w_scoringparams.xml" ) ;
-		ScoringConfigGroup scoringConfig = config.planCalcScore() ;
+		ScoringConfigGroup scoringConfig = config.scoring() ;
 		testResultsBeforeCheckConsistency( config, true ) ;
 		log.warn( "" );
 		for( ModeParams modeParams : scoringConfig.getModes().values() ){
@@ -93,7 +93,7 @@ public class ScoringConfigGroupTest {
 		}
 		log.warn( "" );
 		log.warn( "checking consistency ..." );
-		config.plansCalcRoute().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 		scoringConfig.checkConsistency( config );
 		testResultsAfterCheckConsistency( config );
 		log.warn( "" );
@@ -109,7 +109,7 @@ public class ScoringConfigGroupTest {
 	@Test
 	public void testVersionWoScoringparams() {
 		Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config_v2_wo_scoringparams.xml" ) ;
-		ScoringConfigGroup scoringConfig = config.planCalcScore() ;
+		ScoringConfigGroup scoringConfig = config.scoring() ;
 		testResultsBeforeCheckConsistency( config, false ) ;
 		log.warn( "" );
 		for( ModeParams modeParams : scoringConfig.getModes().values() ){
@@ -121,7 +121,7 @@ public class ScoringConfigGroupTest {
 		}
 		log.warn( "" );
 		log.warn( "checking consistency ..." );
-		config.plansCalcRoute().setAccessEgressType( RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
+		config.routing().setAccessEgressType( RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 		scoringConfig.checkConsistency( config );
 		testResultsAfterCheckConsistency( config );
 		log.warn( "" );
@@ -161,7 +161,7 @@ public class ScoringConfigGroupTest {
 		final Config configV1In = ConfigUtils.createConfig();
 		new ConfigReader( configV1In ).readFile( v1path );
 
-		assertIdentical("re-read v1", initialGroup, configV1In.planCalcScore());
+		assertIdentical("re-read v1", initialGroup, configV1In.scoring());
 
 		final String v2path = utils.getOutputDirectory() + "/configv2_out.xml";
 
@@ -170,7 +170,7 @@ public class ScoringConfigGroupTest {
 		final Config configV2 = ConfigUtils.createConfig();
 		new ConfigReader( configV2 ).readFile( v2path );
 
-		assertIdentical("re-read v2", initialGroup, configV2.planCalcScore());
+		assertIdentical("re-read v2", initialGroup, configV2.scoring());
 	}
 
 	private void assertIdentical(

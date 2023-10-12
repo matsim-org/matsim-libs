@@ -92,13 +92,13 @@ public class TimeInterpretationTest {
 	}
 
 	private Controler prepareController(Config config) {
-		config.controler()
+		config.controller()
 				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 
 		ActivityParams genericParams = new ActivityParams("generic");
 		genericParams.setScoringThisActivityAtAll(false);
-		config.planCalcScore().addActivityParams(genericParams);
+		config.scoring().addActivityParams(genericParams);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 

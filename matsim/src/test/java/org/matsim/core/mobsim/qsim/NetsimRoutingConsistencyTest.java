@@ -214,12 +214,12 @@ public class NetsimRoutingConsistencyTest {
 		public void testRoutingVsSimulationFullStack() {
 			Config config = ConfigUtils.createConfig();
 
-			config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-			config.controler().setLastIteration(0);
+			config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			config.controller().setLastIteration(0);
 
 			ActivityParams activityParams = new ActivityParams("A");
 			activityParams.setTypicalDuration(100.0);
-			config.planCalcScore().addActivityParams(activityParams);
+			config.scoring().addActivityParams(activityParams);
 
 			Scenario scenario = ScenarioUtils.createScenario(config);
 			Network network = scenario.getNetwork();

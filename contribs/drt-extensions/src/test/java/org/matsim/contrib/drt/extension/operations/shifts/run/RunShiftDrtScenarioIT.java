@@ -85,9 +85,9 @@ public class RunShiftDrtScenarioIT {
 		config.travelTimeCalculator().setAnalyzedModes(modes);
 
 		ScoringConfigGroup.ModeParams scoreParams = new ScoringConfigGroup.ModeParams("drt");
-		config.planCalcScore().addModeParams(scoreParams);
+		config.scoring().addModeParams(scoreParams);
 		ScoringConfigGroup.ModeParams scoreParams2 = new ScoringConfigGroup.ModeParams("walk");
-		config.planCalcScore().addModeParams(scoreParams2);
+		config.scoring().addModeParams(scoreParams2);
 
 		config.plans().setInputFile(plansFile);
 		config.network().setInputFile(networkFile);
@@ -106,22 +106,22 @@ public class RunShiftDrtScenarioIT {
 		final ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setTypicalDuration(2 * 3600);
 
-		config.planCalcScore().addActivityParams(home);
-		config.planCalcScore().addActivityParams(other);
-		config.planCalcScore().addActivityParams(education);
-		config.planCalcScore().addActivityParams(shopping);
-		config.planCalcScore().addActivityParams(work);
+		config.scoring().addActivityParams(home);
+		config.scoring().addActivityParams(other);
+		config.scoring().addActivityParams(education);
+		config.scoring().addActivityParams(shopping);
+		config.scoring().addActivityParams(work);
 
 		final ReplanningConfigGroup.StrategySettings stratSets = new ReplanningConfigGroup.StrategySettings();
 		stratSets.setWeight(1);
 		stratSets.setStrategyName("ChangeExpBeta");
-		config.strategy().addStrategySettings(stratSets);
+		config.replanning().addStrategySettings(stratSets);
 
-		config.controler().setLastIteration(1);
-		config.controler().setWriteEventsInterval(1);
+		config.controller().setLastIteration(1);
+		config.controller().setWriteEventsInterval(1);
 
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory("test/output/holzkirchen_shifts");
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory("test/output/holzkirchen_shifts");
 
 		DrtOperationsParams operationsParams = (DrtOperationsParams) drtWithShiftsConfigGroup.createParameterSet(DrtOperationsParams.SET_NAME);
 		ShiftsParams shiftsParams = (ShiftsParams) operationsParams.createParameterSet(ShiftsParams.SET_NAME);

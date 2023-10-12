@@ -33,7 +33,7 @@ public class ConfigReaderMatsimV2Test {
 		r2.getConfigAliases().addAlias("theController", ControllerConfigGroup.GROUP_NAME);
 		r2.readStream(bais);
 
-		Assert.assertEquals(27, config.controler().getLastIteration());
+		Assert.assertEquals(27, config.controller().getLastIteration());
 	}
 
 	@Test
@@ -55,7 +55,7 @@ public class ConfigReaderMatsimV2Test {
 		r2.getConfigAliases().addAlias("theLastIteration", "lastIteration");
 		r2.readStream(bais);
 
-		Assert.assertEquals(23, config.controler().getLastIteration());
+		Assert.assertEquals(23, config.controller().getLastIteration());
 	}
 
 	@Test
@@ -78,7 +78,7 @@ public class ConfigReaderMatsimV2Test {
 		r2.getConfigAliases().addAlias("theLastIteration", "lastIteration");
 		r2.readStream(bais);
 
-		Assert.assertEquals(23, config.controler().getLastIteration());
+		Assert.assertEquals(23, config.controller().getLastIteration());
 	}
 
 	/**
@@ -267,7 +267,7 @@ public class ConfigReaderMatsimV2Test {
 		r2.getConfigAliases().addAlias("theMode", "mode", "scoring", "scoringParameters", "modeParams");
 		r2.readStream(bais);
 
-		Assert.assertEquals(-5.6, config.planCalcScore().getModes().get("car").getMarginalUtilityOfTraveling(), 1e-7);
-		Assert.assertEquals(-8.7, config.planCalcScore().getModes().get("unicycle").getMarginalUtilityOfTraveling(), 1e-7);
+		Assert.assertEquals(-5.6, config.scoring().getModes().get("car").getMarginalUtilityOfTraveling(), 1e-7);
+		Assert.assertEquals(-8.7, config.scoring().getModes().get("unicycle").getMarginalUtilityOfTraveling(), 1e-7);
 	}
 }

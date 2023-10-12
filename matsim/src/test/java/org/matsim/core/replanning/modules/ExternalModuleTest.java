@@ -33,11 +33,9 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.*;
-import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -56,8 +54,8 @@ public class ExternalModuleTest {
         originalScenario = ScenarioUtils.loadScenario(utils.loadConfig("test/scenarios/equil/config.xml"));
         final String outputDirectory = utils.getOutputDirectory();
         outputDirectoryHierarchy = new OutputDirectoryHierarchy(
-                outputDirectory, OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists, this.scenario.getConfig().controler().getCompressionType());
-        scenario.getConfig().controler().setOutputDirectory( outputDirectory );
+                outputDirectory, OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists, this.scenario.getConfig().controller().getCompressionType());
+        scenario.getConfig().controller().setOutputDirectory( outputDirectory );
 //        scenario.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 
 //        // the following includes all retrofittings that were added later:

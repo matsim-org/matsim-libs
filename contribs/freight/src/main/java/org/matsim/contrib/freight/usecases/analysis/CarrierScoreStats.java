@@ -100,8 +100,8 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-		this.minIteration = event.getServices().getConfig().controler().getFirstIteration();
-		int maxIter = event.getServices().getConfig().controler().getLastIteration();
+		this.minIteration = event.getServices().getConfig().controller().getFirstIteration();
+		int maxIter = event.getServices().getConfig().controller().getLastIteration();
 		int iterations = maxIter - this.minIteration;
 		if (iterations > 5000) iterations = 5000; // limit the history size
 		this.history = new double[4][iterations+1];

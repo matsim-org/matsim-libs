@@ -65,7 +65,7 @@ public class AccessibilityUtils {
 		// yyyy this method ignores the "capacities" of the facilities. kai, mar'14
 		// for now, we decided not to add "capacities" as it is not needed for current projects. dz, feb'16
 
-		double walkSpeed_m_h = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
+		double walkSpeed_m_h = config.routing().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 
 		LOG.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with same nearest node...");
@@ -76,11 +76,11 @@ public class AccessibilityUtils {
 			double distance_m = NetworkUtils.getEuclideanDistance(opportunity.getCoord(), nearestNode.getCoord());
 
 			// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
-			double walkBetaTT_utils_h = config.planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling()
-					- config.planCalcScore().getPerforming_utils_hr(); // default values: -12 = (-6.) - (6.)
+			double walkBetaTT_utils_h = config.scoring().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling()
+					- config.scoring().getPerforming_utils_hr(); // default values: -12 = (-6.) - (6.)
 			double VjkWalkTravelTime = walkBetaTT_utils_h * (distance_m / walkSpeed_m_h);
 
-			double expVjk = Math.exp(config.planCalcScore().getBrainExpBeta() * VjkWalkTravelTime);
+			double expVjk = Math.exp(config.scoring().getBrainExpBeta() * VjkWalkTravelTime);
 
 			// add Vjk to sum
 			AggregationObject jco = opportunityClusterMap.get(nearestNode.getId()); // Why "jco"?

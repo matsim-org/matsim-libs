@@ -79,7 +79,7 @@ public class MultiModalTravelTimeFactory implements MatsimFactory {
 
 	private void initMultiModalTravelTimeFactories(Config config) {
 
-		RoutingConfigGroup routingConfigGroup = config.plansCalcRoute();
+		RoutingConfigGroup routingConfigGroup = config.routing();
         MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) config.getModule(MultiModalConfigGroup.GROUP_NAME);
         Set<String> simulatedModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
 

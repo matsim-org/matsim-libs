@@ -91,25 +91,25 @@ class RunJointDemandCarToggleJspritExample {
         ReplanningConfigGroup.StrategySettings changeExpBeta = new ReplanningConfigGroup.StrategySettings();
         changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
         changeExpBeta.setWeight(0.5);
-        config.strategy().addStrategySettings(changeExpBeta);
+        config.replanning().addStrategySettings(changeExpBeta);
 
         ReplanningConfigGroup.StrategySettings changeJobOperator = new ReplanningConfigGroup.StrategySettings();
         changeJobOperator.setStrategyName(ChangeCommercialJobOperator.SELECTOR_NAME);
         changeJobOperator.setWeight(0.5);
-        config.strategy().addStrategySettings(changeJobOperator);
+        config.replanning().addStrategySettings(changeJobOperator);
 
-        config.strategy().setFractionOfIterationsToDisableInnovation(.8);
+        config.replanning().setFractionOfIterationsToDisableInnovation(.8);
         ScoringConfigGroup.ActivityParams home = new ScoringConfigGroup.ActivityParams("home");
         home.setTypicalDuration(14 * 3600);
-        config.planCalcScore().addActivityParams(home);
+        config.scoring().addActivityParams(home);
         ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
         work.setTypicalDuration(14 * 3600);
         work.setOpeningTime(8 * 3600);
         work.setClosingTime(8 * 3600);
-        config.planCalcScore().addActivityParams(work);
-        config.controler().setWriteEventsInterval(5);
-        config.controler().setOutputDirectory("output/commercialTrafficApplications/jointDemand/RunJointDemandCarToggleJspritExample");
-        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        config.controler().setLastIteration(5);
+        config.scoring().addActivityParams(work);
+        config.controller().setWriteEventsInterval(5);
+        config.controller().setOutputDirectory("output/commercialTrafficApplications/jointDemand/RunJointDemandCarToggleJspritExample");
+        config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        config.controller().setLastIteration(5);
     }
 }

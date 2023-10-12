@@ -78,10 +78,10 @@ public class WithinDayTravelTimeWithNetworkChangeEventsTest {
 
 		final Config config = ConfigUtils.createConfig();
 
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(0);
-		config.controler().setOutputDirectory(outputDirectory);
-		config.controler().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
+		config.controller().setFirstIteration(0);
+		config.controller().setLastIteration(0);
+		config.controller().setOutputDirectory(outputDirectory);
+		config.controller().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
 
 		config.qsim().setStartTime(6. * 3600.);
 		config.qsim().setEndTime(11 * 3600.);
@@ -89,12 +89,12 @@ public class WithinDayTravelTimeWithNetworkChangeEventsTest {
 		ActivityParams paramsA = new ActivityParams();
 		paramsA.setActivityType("home");
 		paramsA.setTypicalDuration(1234.);
-		config.planCalcScore().addActivityParams(paramsA);
+		config.scoring().addActivityParams(paramsA);
 
 		ActivityParams paramsB = new ActivityParams();
 		paramsB.setActivityType("work");
 		paramsB.setTypicalDuration(1234.);
-		config.planCalcScore().addActivityParams(paramsB);
+		config.scoring().addActivityParams(paramsB);
 
 		config.network().setTimeVariantNetwork(true);
 
@@ -108,7 +108,7 @@ public class WithinDayTravelTimeWithNetworkChangeEventsTest {
 		NetworkUtils.addNetworkChangeEvent(scenario.getNetwork(), nce);
 
 		final Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 
 		Set<String> analyzedModes = new HashSet<>();
 		analyzedModes.add(TransportMode.car);

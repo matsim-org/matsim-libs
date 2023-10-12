@@ -75,21 +75,21 @@ public class WithinDayTravelTimeTest {
 	private void testGetLinkTravelTime(boolean isUsingFastCapacityUpdate) {
 
         Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setOutputDirectory(helper.getOutputDirectory()+"fastCapacityUpdate_"+isUsingFastCapacityUpdate);
+		config.controller().setOutputDirectory(helper.getOutputDirectory()+"fastCapacityUpdate_"+isUsingFastCapacityUpdate);
 
 		QSimConfigGroup qSimConfig = config.qsim();
 		qSimConfig.setNumberOfThreads(2);
 		qSimConfig.setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 
-		config.controler().setCreateGraphs(false);
-		config.controler().setDumpDataAtEnd(false);
-		config.controler().setWriteEventsInterval(0);
-		config.controler().setWritePlansInterval(0);
+		config.controller().setCreateGraphs(false);
+		config.controller().setDumpDataAtEnd(false);
+		config.controller().setWriteEventsInterval(0);
+		config.controller().setWritePlansInterval(0);
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
 
 		config.network().setTimeVariantNetwork(true);
 

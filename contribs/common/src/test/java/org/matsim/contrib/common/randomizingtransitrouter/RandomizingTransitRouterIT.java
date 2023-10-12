@@ -94,20 +94,20 @@ public class RandomizingTransitRouterIT {
 		config.transit().setVehiclesFile("transitVehicles.xml");
 		config.transit().setUseTransit(true);
 
-		config.controler().setOutputDirectory( outputDir );
-		config.controler().setLastIteration(20);
-		config.controler().setCreateGraphs(false);
-		config.controler().setDumpDataAtEnd(false);
+		config.controller().setOutputDirectory( outputDir );
+		config.controller().setLastIteration(20);
+		config.controller().setCreateGraphs(false);
+		config.controller().setDumpDataAtEnd(false);
 
 		config.global().setNumberOfThreads(1);
 
-		config.planCalcScore().addActivityParams( new ActivityParams("home").setTypicalDuration( 6*3600. ) );
-		config.planCalcScore().addActivityParams( new ActivityParams("education_100").setTypicalDuration( 6*3600. ) );
+		config.scoring().addActivityParams( new ActivityParams("home").setTypicalDuration( 6*3600. ) );
+		config.scoring().addActivityParams( new ActivityParams("education_100").setTypicalDuration( 6*3600. ) );
 
 //		config.strategy().addStrategySettings( new StrategySettings( ConfigUtils.createAvailableStrategyId(config)).setStrategyName(DefaultStrategy.ReRoute ).setWeight(0.1 ) );
 //		config.strategy().addStrategySettings( new StrategySettings( ConfigUtils.createAvailableStrategyId(config)).setStrategyName(DefaultSelector.ChangeExpBeta ).setWeight(0.9 ) );
-		config.strategy().addStrategySettings( new StrategySettings().setStrategyName(DefaultStrategy.ReRoute ).setWeight(0.1 ) );
-		config.strategy().addStrategySettings( new StrategySettings().setStrategyName(DefaultSelector.ChangeExpBeta ).setWeight(0.9 ) );
+		config.replanning().addStrategySettings( new StrategySettings().setStrategyName(DefaultStrategy.ReRoute ).setWeight(0.1 ) );
+		config.replanning().addStrategySettings( new StrategySettings().setStrategyName(DefaultSelector.ChangeExpBeta ).setWeight(0.9 ) );
 		// yy changing the above (= no longer using createAvailableStrategyId) changes the results.  :-( :-( :-(
 
 		config.qsim().setEndTime(18.*3600.);

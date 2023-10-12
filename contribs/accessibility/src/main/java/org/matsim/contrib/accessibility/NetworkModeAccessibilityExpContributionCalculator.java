@@ -68,7 +68,7 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 		Gbl.assertNotNull(travelDisutilityFactory);
 		this.travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
 
-		scoringConfigGroup = scenario.getConfig().planCalcScore();
+		scoringConfigGroup = scenario.getConfig().scoring();
 		networkConfigGroup = scenario.getConfig().network();
 
 		RoadPricingScheme scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
@@ -80,7 +80,7 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 
 		betaWalkTT = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
 
-		this.walkSpeed_m_s = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
+		this.walkSpeed_m_s = scenario.getConfig().routing().getTeleportedModeSpeeds().get(TransportMode.walk);
 	}
 
 

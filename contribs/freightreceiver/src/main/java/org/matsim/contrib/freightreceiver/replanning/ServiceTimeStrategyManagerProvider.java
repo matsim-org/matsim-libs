@@ -39,7 +39,7 @@ final class ServiceTimeStrategyManagerProvider implements Provider<ReceiverStrat
 			GenericPlanStrategyImpl<ReceiverPlan, Receiver> increaseStrategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanChanger.Factory<ReceiverPlan, Receiver>().build());
 			increaseStrategy.addStrategyModule(new ServiceTimeMutator(Time.parseTime("0:15:00"), Time.parseTime("04:00:00"), true));
 			strategyManager.addStrategy(increaseStrategy, null, 0.15);
-			strategyManager.addChangeRequest((int) (sc.getConfig().controler().getLastIteration() * 0.9), increaseStrategy, null, 0.0);
+			strategyManager.addChangeRequest((int) (sc.getConfig().controller().getLastIteration() * 0.9), increaseStrategy, null, 0.0);
 		}
 
 		{
@@ -48,7 +48,7 @@ final class ServiceTimeStrategyManagerProvider implements Provider<ReceiverStrat
 			GenericPlanStrategyImpl<ReceiverPlan, Receiver> decreaseStrategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanChanger.Factory<ReceiverPlan, Receiver>().build());
 			decreaseStrategy.addStrategyModule(new ServiceTimeMutator(Time.parseTime("00:15:00"), Time.parseTime("01:00:00"), false));
 			strategyManager.addStrategy(decreaseStrategy, null, 0.15);
-			strategyManager.addChangeRequest((int) (sc.getConfig().controler().getLastIteration() * 0.9), decreaseStrategy, null, 0.0);
+			strategyManager.addChangeRequest((int) (sc.getConfig().controller().getLastIteration() * 0.9), decreaseStrategy, null, 0.0);
 		}
 
 		/* Replanning for grand coalition receivers.*/

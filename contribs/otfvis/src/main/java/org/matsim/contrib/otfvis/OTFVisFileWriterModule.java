@@ -33,7 +33,7 @@ public class OTFVisFileWriterModule extends AbstractModule {
 	@Override
 	public void install() {
 		ConfigUtils.addOrGetModule(getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
-		if (getConfig().controler().getSnapshotFormat().contains( SnapshotFormat.otfvis )) {
+		if (getConfig().controller().getSnapshotFormat().contains( SnapshotFormat.otfvis )) {
 			addSnapshotWriterBinding().toProvider(OTFFileWriterFactory.class);
 		}
 	}

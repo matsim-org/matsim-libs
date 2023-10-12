@@ -81,7 +81,7 @@ public class TravelDistanceStats {
 	 * @throws UncheckedIOException
 	 */
 	public TravelDistanceStats(final Config config, final String filename, final boolean createPNG) throws UncheckedIOException {
-        this(config.controler(), filename, filename + "legs", filename + "trips", createPNG);
+        this(config.controller(), filename, filename + "legs", filename + "trips", createPNG);
     }
 
     private TravelDistanceStats(ControllerConfigGroup controllerConfigGroup, String travelDistanceStatsFileName,

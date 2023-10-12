@@ -365,10 +365,10 @@ public class SylviaIT {
 
 	private Config defineConfig() {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 
 		// set number of iterations
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 
 		// able or enable signals and lanes
 		SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
@@ -389,8 +389,8 @@ public class SylviaIT {
 			StrategySettings strat = new StrategySettings();
 			strat.setStrategyName(DefaultSelector.KeepLastSelected.toString());
 			strat.setWeight(0.9);
-			strat.setDisableAfter(config.controler().getLastIteration());
-			config.strategy().addStrategySettings(strat);
+			strat.setDisableAfter(config.controller().getLastIteration());
+			config.replanning().addStrategySettings(strat);
 		}
 
 		// choose maximal number of plans per agent. 0 means unlimited
@@ -404,20 +404,20 @@ public class SylviaIT {
 
 		config.qsim().setUsingFastCapacityUpdate(false);
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		config.vspExperimental().setWritingOutputEvents(false);
-		config.planCalcScore().setWriteExperiencedPlans(false);
-		config.controler().setCreateGraphs(false);
+		config.scoring().setWriteExperiencedPlans(false);
+		config.controller().setCreateGraphs(false);
 
-		config.controler().setWriteEventsInterval(config.controler().getLastIteration());
-		config.controler().setWritePlansInterval(config.controler().getLastIteration());
+		config.controller().setWriteEventsInterval(config.controller().getLastIteration());
+		config.controller().setWritePlansInterval(config.controller().getLastIteration());
 
 		// define activity types
 		{
 			ActivityParams dummyAct = new ActivityParams("dummy");
 			dummyAct.setTypicalDuration(12 * 3600);
-			config.planCalcScore().addActivityParams(dummyAct);
+			config.scoring().addActivityParams(dummyAct);
 		}
 
 		return config;

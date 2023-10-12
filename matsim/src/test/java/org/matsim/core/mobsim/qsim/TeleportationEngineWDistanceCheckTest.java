@@ -61,18 +61,18 @@ public class TeleportationEngineWDistanceCheckTest {
 	@Test
 	public final void test() {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory( utils.getOutputDirectory() );
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
-		config.controler().setLastIteration(0);
+		config.controller().setOutputDirectory( utils.getOutputDirectory() );
+		config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setLastIteration(0);
 
 		ActivityParams params = new ActivityParams("dummy" ) ;
-		config.planCalcScore().addActivityParams(params);
+		config.scoring().addActivityParams(params);
 		params.setScoringThisActivityAtAll(false);
 
 		StrategySettings stratSets = new StrategySettings() ;
 		stratSets.setStrategyName( DefaultSelector.ChangeExpBeta.toString() );
 		stratSets.setWeight(1.);
-		config.strategy().addStrategySettings( stratSets );
+		config.replanning().addStrategySettings( stratSets );
 
 		Scenario scenario = ScenarioUtils.createScenario( config ) ;
 

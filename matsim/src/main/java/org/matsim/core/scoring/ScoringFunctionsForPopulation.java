@@ -95,7 +95,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	@Inject
 	ScoringFunctionsForPopulation(ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
 						 Population population, ScoringFunctionFactory scoringFunctionFactory, Config config) {
-		ControllerConfigGroup controllerConfigGroup = config.controler();
+		ControllerConfigGroup controllerConfigGroup = config.controller();
 
 		if (controllerConfigGroup.getEventTypeToCreateScoringFunctions() == ControllerConfigGroup.EventTypeToCreateScoringFunctions.IterationStarts) {
 			controlerListenerManager.addControlerListener((IterationStartsListener) event -> init());

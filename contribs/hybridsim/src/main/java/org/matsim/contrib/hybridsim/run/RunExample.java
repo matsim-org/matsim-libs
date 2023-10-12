@@ -80,8 +80,8 @@ public class RunExample {
 		}
 
 		Config c = ConfigUtils.createConfig();
-		c.controler().setLastIteration(0);
-		c.controler().setWriteEventsInterval(1);
+		c.controller().setLastIteration(0);
+		c.controller().setWriteEventsInterval(1);
 
         c.qsim().setEndTime(3600);
 
@@ -93,7 +93,7 @@ public class RunExample {
 		createHybridsimScenario(sc); //enable for grpc_jps_as_a_service branch
 
 		final Controler controller = new Controler(sc);
-		controller.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controller.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		final EventsManager eventsManager = EventsUtils.createEventsManager();
 
@@ -346,11 +346,11 @@ public class RunExample {
 		post.setEarliestEndTime(49);
 		post.setLatestStartTime(49);
 		post.setOpeningTime(49);
-		c.planCalcScore().addActivityParams(pre);
-		c.planCalcScore().addActivityParams(post);
+		c.scoring().addActivityParams(pre);
+		c.scoring().addActivityParams(post);
 
-		c.planCalcScore().setLateArrival_utils_hr(0.);
-		c.planCalcScore().setPerforming_utils_hr(0.);
+		c.scoring().setLateArrival_utils_hr(0.);
+		c.scoring().setPerforming_utils_hr(0.);
 	}
 
 	private static void createPopulation(Scenario sc) {

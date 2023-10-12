@@ -95,7 +95,7 @@ public class EditRoutesTest {
 
 		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
+		if ( !scenario.getConfig().routing().getAccessEgressType().equals(AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -155,7 +155,7 @@ public class EditRoutesTest {
 		int scndAct = 2 ;
 		int scndCarLeg = 3 ; // 3-->9
 		int thrdAct = 4 ;
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
+		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3
 			scndAct = 6 ;
 			scndCarLeg = 9 ; // 3-->9
@@ -232,7 +232,7 @@ public class EditRoutesTest {
 		createScenario();
 		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
+		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -280,7 +280,7 @@ public class EditRoutesTest {
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
+		if ( !scenario.getConfig().routing().getAccessEgressType().equals(AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -304,7 +304,7 @@ public class EditRoutesTest {
 
 		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
+		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -324,7 +324,7 @@ public class EditRoutesTest {
 
 		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
+		if ( !scenario.getConfig().routing().getAccessEgressType().equals(AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -345,7 +345,7 @@ public class EditRoutesTest {
 
 		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
+		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -364,7 +364,7 @@ public class EditRoutesTest {
 
 		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
+		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -383,7 +383,7 @@ public class EditRoutesTest {
 
 		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
+		if ( !scenario.getConfig().routing().getAccessEgressType().equals(AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -402,7 +402,7 @@ public class EditRoutesTest {
 
 		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
+		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -421,7 +421,7 @@ public class EditRoutesTest {
 
 		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
+		if ( !scenario.getConfig().routing().getAccessEgressType().equals(AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -442,7 +442,7 @@ public class EditRoutesTest {
 
 		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
+		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3
 			scndCarLeg = 9 ; // 3-->9
 		}

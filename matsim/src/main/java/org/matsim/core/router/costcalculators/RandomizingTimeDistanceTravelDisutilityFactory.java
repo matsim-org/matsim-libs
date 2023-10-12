@@ -57,8 +57,8 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 		// material from injection, but there are many uses of this class outside injection.
 
 		this.mode = mode;
-		this.cnScoringGroup = config.planCalcScore();
-		this.sigma = config.plansCalcRoute().getRoutingRandomness();
+		this.cnScoringGroup = config.scoring();
+		this.sigma = config.routing().getRoutingRandomness();
 	}
 
 	@Override

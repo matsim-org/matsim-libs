@@ -83,7 +83,7 @@ public class DistanceConstraintTest {
 	public final void CarrierSmallBatteryTest_Version1() throws ExecutionException, InterruptedException {
 
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -161,7 +161,7 @@ public class DistanceConstraintTest {
 	@Test
 	public final void CarrierLargeBatteryTest_Version2() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -243,7 +243,7 @@ public class DistanceConstraintTest {
 	@Test
 	public final void Carrier2SmallBatteryTest_Version3() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -333,7 +333,7 @@ public class DistanceConstraintTest {
 	@Test
 	public final void CarrierWithAdditionalDieselVehicleTest_Version4() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -432,7 +432,7 @@ public class DistanceConstraintTest {
 	@Test
 	public final void CarrierWithShipmentsMidSizeBatteryTest_Version5() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -511,7 +511,7 @@ public class DistanceConstraintTest {
 	@Test
 	public final void CarrierWithShipmentsLargeBatteryTest_Version6() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -583,14 +583,14 @@ public class DistanceConstraintTest {
 	 */
 	static void prepareConfig(Config config) {
 		config.network().setInputFile(IOUtils.extendUrl(SCENARIO_URL, "grid9x9.xml").toString());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		new OutputDirectoryHierarchy(config.controler().getOutputDirectory(), config.controler().getRunId(),
-				config.controler().getOverwriteFileSetting(), CompressionType.gzip);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		new OutputDirectoryHierarchy(config.controller().getOutputDirectory(), config.controller().getRunId(),
+				config.controller().getOverwriteFileSetting(), CompressionType.gzip);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 		config.global().setRandomSeed(4177);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
 		freightConfigGroup.setUseDistanceConstraintForTourPlanning(UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);

@@ -84,7 +84,7 @@ public class MultiModalPTCombinationTest {
 
 		Scenario scenario = f.scenario;
 		Config config = scenario.getConfig();
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		MultiModalConfigGroup mmcg = new MultiModalConfigGroup();
 		mmcg.setMultiModalSimulationEnabled(true);
@@ -93,29 +93,29 @@ public class MultiModalPTCombinationTest {
 
 		config.qsim().setEndTime(24*3600);
 
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 		// doesn't matter - MultiModalModule sets the mobsim unconditionally. it just can't be something
 		// which the ControlerDefaultsModule knows about. Try it, you will get an error. Quite safe.
-		config.controler().setMobsim("myMobsim");
+		config.controller().setMobsim("myMobsim");
 
 
 		ActivityParams homeParams = new ActivityParams("home");
 		homeParams.setTypicalDuration(16*3600);
-		config.planCalcScore().addActivityParams(homeParams);
+		config.scoring().addActivityParams(homeParams);
 
 		// set default walk speed; according to Weidmann 1.34 [m/s]
 		double defaultWalkSpeed = 1.34;
-		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
+		config.routing().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
 		final RoutingConfigGroup.TeleportedModeParams pt = new RoutingConfigGroup.TeleportedModeParams( TransportMode.pt );
 		pt.setTeleportedModeFreespeedFactor( 2.0 );
-		config.plansCalcRoute().addParameterSet( pt );
+		config.routing().addParameterSet( pt );
 
         config.travelTimeCalculator().setFilterModes(true);
 
 		Controler controler = new Controler(scenario);
-        controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
+        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
 //		controler.setOverwriteFiles(true);
 
         controler.addOverridingModule(new MultiModalModule());
@@ -133,7 +133,7 @@ public class MultiModalPTCombinationTest {
 		Assert.assertEquals(ptPlan.getPlanElements().toString(), 7, ptPlan.getPlanElements().size());
 
 		Plan walkPlan = walkPerson.getSelectedPlan();
-		if ( !config.plansCalcRoute().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
+		if ( !config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 			Assert.assertEquals(walkPlan.getPlanElements().toString(), 7, walkPlan.getPlanElements().size());
 		} else {
 			Assert.assertEquals(walkPlan.getPlanElements().toString(), 3, walkPlan.getPlanElements().size());

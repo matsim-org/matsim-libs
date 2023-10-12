@@ -124,17 +124,17 @@ public class VehicleSourceTest {
 		config.qsim().setVehiclesSource(this.vehiclesSource );
 		config.qsim().setUsePersonIdForMissingVehicleId(this.usingPersonIdForMissingVehicleId );
 
-		config.controler().setOutputDirectory(helper.getOutputDirectory());
-		config.controler().setLastIteration(0);
-		config.controler().setWriteEventsInterval(1);
-		config.controler().setCreateGraphs(false);
-		config.controler().setDumpDataAtEnd(false);
+		config.controller().setOutputDirectory(helper.getOutputDirectory());
+		config.controller().setLastIteration(0);
+		config.controller().setWriteEventsInterval(1);
+		config.controller().setCreateGraphs(false);
+		config.controller().setDumpDataAtEnd(false);
 
-		config.planCalcScore().addActivityParams( new ActivityParams("h").setTypicalDuration(1. * 3600. ) );
-		config.planCalcScore().addActivityParams( new ActivityParams("w").setTypicalDuration(1. * 3600. ) );
+		config.scoring().addActivityParams( new ActivityParams("h").setTypicalDuration(1. * 3600. ) );
+		config.scoring().addActivityParams( new ActivityParams("w").setTypicalDuration(1. * 3600. ) );
 
 		final Controler cont = new Controler(scenario);
-		cont.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		cont.getConfig().controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleLinkTravelTimes = new HashMap<>();
 		final VehicleLinkTravelTimeEventHandler handler = new VehicleLinkTravelTimeEventHandler(vehicleLinkTravelTimes);

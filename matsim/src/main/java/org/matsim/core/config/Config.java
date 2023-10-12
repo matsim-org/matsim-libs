@@ -400,7 +400,7 @@ public final class Config implements MatsimExtensionPoint {
 		return (GlobalConfigGroup) this.getModule(GlobalConfigGroup.GROUP_NAME);
 	}
 
-	public final ControllerConfigGroup controler() {
+	public final ControllerConfigGroup controller() {
 		return (ControllerConfigGroup) this.getModule(ControllerConfigGroup.GROUP_NAME);
 	}
 
@@ -408,7 +408,7 @@ public final class Config implements MatsimExtensionPoint {
 		return (CountsConfigGroup) this.getModule(CountsConfigGroup.GROUP_NAME);
 	}
 
-	public final ScoringConfigGroup planCalcScore() {
+	public final ScoringConfigGroup scoring() {
 		return (ScoringConfigGroup) this.getModule(ScoringConfigGroup.GROUP_NAME);
 	}
 
@@ -428,7 +428,7 @@ public final class Config implements MatsimExtensionPoint {
 		return (FacilitiesConfigGroup) this.getModule(FacilitiesConfigGroup.GROUP_NAME);
 	}
 
-    public final ReplanningConfigGroup strategy() {
+    public final ReplanningConfigGroup replanning() {
 		return (ReplanningConfigGroup) this.getModule(ReplanningConfigGroup.GROUP_NAME);
 	}
 
@@ -440,7 +440,7 @@ public final class Config implements MatsimExtensionPoint {
 		return (ScenarioConfigGroup) this.getModule(ScenarioConfigGroup.GROUP_NAME);
 	}
 
-	public RoutingConfigGroup plansCalcRoute() {
+	public RoutingConfigGroup routing() {
 		return (RoutingConfigGroup) this.getModule(RoutingConfigGroup.GROUP_NAME);
 	}
 
@@ -472,7 +472,7 @@ public final class Config implements MatsimExtensionPoint {
 		return (TimeAllocationMutatorConfigGroup) this.getModule(TimeAllocationMutatorConfigGroup.GROUP_NAME);
 	}
 
-	public EventsManagerConfigGroup parallelEventHandling() {
+	public EventsManagerConfigGroup eventsManager() {
 		return (EventsManagerConfigGroup) this.getModule(EventsManagerConfigGroup.GROUP_NAME);
 	}
 

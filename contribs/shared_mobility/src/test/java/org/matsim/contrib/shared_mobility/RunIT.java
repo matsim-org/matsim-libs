@@ -43,9 +43,9 @@ public class RunIT {
 
 
 		Config config = ConfigUtils.loadConfig(ConfigGroup.getInputFileURL(scenarioUrl, "config_default.xml"));
-		config.controler().setLastIteration(2);
+		config.controller().setLastIteration(2);
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		// We need to add the sharing config group
 		SharingConfigGroup sharingConfig = new SharingConfigGroup();
 		config.addModule(sharingConfig);
@@ -126,23 +126,23 @@ public class RunIT {
 		// We need to add interaction activity types to scoring
 		ActivityParams pickupParams = new ActivityParams(SharingUtils.PICKUP_ACTIVITY);
 		pickupParams.setScoringThisActivityAtAll(false);
-		config.planCalcScore().addActivityParams(pickupParams);
+		config.scoring().addActivityParams(pickupParams);
 
 		ActivityParams dropoffParams = new ActivityParams(SharingUtils.DROPOFF_ACTIVITY);
 		dropoffParams.setScoringThisActivityAtAll(false);
-		config.planCalcScore().addActivityParams(dropoffParams);
+		config.scoring().addActivityParams(dropoffParams);
 
 		ActivityParams bookingParams = new ActivityParams(SharingUtils.BOOKING_ACTIVITY);
 		bookingParams.setScoringThisActivityAtAll(false);
-		config.planCalcScore().addActivityParams(bookingParams);
+		config.scoring().addActivityParams(bookingParams);
 
 		// We need to score car
 		ModeParams carScoringParams = new ModeParams("car");
-		config.planCalcScore().addModeParams(carScoringParams);
+		config.scoring().addModeParams(carScoringParams);
 
 		// We need to score bike
 		ModeParams bikeScoringParams = new ModeParams("bike");
-		config.planCalcScore().addModeParams(bikeScoringParams);
+		config.scoring().addModeParams(bikeScoringParams);
 
 		// Set up controller (no specific settings needed for scenario)
 		Controler controller = new Controler(config);

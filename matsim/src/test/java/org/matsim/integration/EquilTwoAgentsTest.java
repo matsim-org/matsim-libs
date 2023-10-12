@@ -93,16 +93,16 @@ public class EquilTwoAgentsTest {
 		ConfigUtils.loadConfig(config, IOUtils.extendUrl(utils.classInputResourcePath(), "config.xml"));
 		config.plans().setInputFile(IOUtils.extendUrl(utils.classInputResourcePath(), "plans2.xml").toString());
 
-		ScoringConfigGroup pcsConfig = config.planCalcScore() ;
+		ScoringConfigGroup pcsConfig = config.scoring() ;
 		ActivityParams params = new ActivityParams("h") ;
         params.setTypicalDuration(123456789.0) ; // probably dummy
 		params.setScoringThisActivityAtAll(false);
 		pcsConfig.addActivityParams(params) ;
 
 		final Controler controler = new Controler(config);
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.getConfig().controler().setCreateGraphs(false);
-        controler.getConfig().controler().setWriteEventsInterval(0);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controller().setCreateGraphs(false);
+        controler.getConfig().controller().setWriteEventsInterval(0);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

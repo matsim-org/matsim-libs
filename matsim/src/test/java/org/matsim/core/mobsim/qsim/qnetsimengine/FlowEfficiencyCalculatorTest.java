@@ -130,13 +130,13 @@ public class FlowEfficiencyCalculatorTest {
 
 	private Scenario createScenario() {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(0);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(0);
 
 		ActivityParams genericParams = new ActivityParams("generic");
 		genericParams.setTypicalDuration(1.0);
 
-		config.planCalcScore().addActivityParams(genericParams);
+		config.scoring().addActivityParams(genericParams);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 

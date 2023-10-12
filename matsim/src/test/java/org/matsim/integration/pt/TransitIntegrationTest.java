@@ -36,13 +36,13 @@ public class TransitIntegrationTest {
 	@Test(expected = RuntimeException.class)
 	public void testPtInteractionParams() {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		ScoringConfigGroup.ActivityParams params = new ScoringConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		params.setScoringThisActivityAtAll(true);
 		params.setTypicalDuration(60.0);
-		config.planCalcScore().addActivityParams(params);
+		config.scoring().addActivityParams(params);
 		// ---
-		config.controler().setLastIteration(0); // in case the exception is _not_ thrown, we don't need 100 iterations to find that out ...
+		config.controller().setLastIteration(0); // in case the exception is _not_ thrown, we don't need 100 iterations to find that out ...
 		// ---
 		Controler controler = new Controler(config);
 		controler.run();
@@ -52,16 +52,16 @@ public class TransitIntegrationTest {
 	@Test(expected = RuntimeException.class)
 	public void testSubpopulationParams() {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		ScoringConfigGroup.ActivityParams params = new ScoringConfigGroup.ActivityParams("home");
 		params.setScoringThisActivityAtAll(true);
 		params.setTypicalDuration(60.0);
-		ScoringParameterSet sps = config.planCalcScore().getOrCreateScoringParameters("one");
+		ScoringParameterSet sps = config.scoring().getOrCreateScoringParameters("one");
 		sps.addActivityParams(params);
-		ScoringParameterSet sps2 = config.planCalcScore().getOrCreateScoringParameters("two");
+		ScoringParameterSet sps2 = config.scoring().getOrCreateScoringParameters("two");
 		sps2.addActivityParams(params);
 		// ---
-		config.controler().setLastIteration(0); // in case the exception is _not_ thrown, we don't need 100 iterations to find that out ...
+		config.controller().setLastIteration(0); // in case the exception is _not_ thrown, we don't need 100 iterations to find that out ...
 		config.checkConsistency();
 
 		Controler controler = new Controler(config);

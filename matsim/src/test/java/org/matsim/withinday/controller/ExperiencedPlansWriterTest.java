@@ -81,16 +81,16 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 
 		Config config = ConfigUtils.createConfig();
 
-		config.controler().setOutputDirectory(this.utils.getOutputDirectory());
+		config.controller().setOutputDirectory(this.utils.getOutputDirectory());
 
 		config.qsim().setEndTime(24 * 3600);
 
-		config.controler().setLastIteration(0);
-		config.controler().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
+		config.controller().setLastIteration(0);
+		config.controller().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
 
 		ActivityParams homeParams = new ActivityParams("home");
 		homeParams.setTypicalDuration(16*3600);
-		config.planCalcScore().addActivityParams(homeParams);
+		config.scoring().addActivityParams(homeParams);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
@@ -101,10 +101,10 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 		population.addPerson(createPerson(scenario, "p02"));
 
 		Controler controler = new Controler(scenario);
-        controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.getConfig().controler().setOverwriteFileSetting(
+        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
+		controler.getConfig().controller().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

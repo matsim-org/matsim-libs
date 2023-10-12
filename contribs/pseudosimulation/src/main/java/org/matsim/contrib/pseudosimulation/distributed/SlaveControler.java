@@ -151,7 +151,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         final DistributedSimConfigGroup distributedSimConfigGroup = ConfigUtils.addOrGetModule(this.config,DistributedSimConfigGroup.GROUP_NAME,DistributedSimConfigGroup.class);
 
         //The following line will make the controler use the events manager that doesn't check for event order
-        config.parallelEventHandling().setSynchronizeOnSimSteps(false);
+        config.eventsManager().setSynchronizeOnSimSteps(false);
         //if you don't set the number of threads, org.matsim.core.events.EventsUtils will just use the simstepmanager
         int numThreads = config.global().getNumberOfThreads();
         if (commandLine.hasOption("t"))
@@ -166,7 +166,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             System.err.println("Will use the number of threads in config for simulation.");
         }
         config.global().setNumberOfThreads(numThreads);
-        config.parallelEventHandling().setNumberOfThreads(1);
+        config.eventsManager().setNumberOfThreads(1);
 
         String hostname = "localhost";
         if (commandLine.hasOption("h")) {
@@ -208,7 +208,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         numberOfPlansOnSlave = reader.readInt();
         slaveMutationRate = reader.readDouble();
         slaveLogger.warn("Running " + numberOfPSimIterationsPerCycle + " PSim iterations for every QSim iter");
-        config.controler().setLastIteration(reader.readInt());
+        config.controller().setLastIteration(reader.readInt());
         initialRouting = reader.readBoolean();
         boolean quickReplannning = reader.readBoolean();
         fullTransitPerformanceTransmission = reader.readBoolean();
@@ -224,18 +224,18 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         writer.flush();
 
 
-        config.controler().setOutputDirectory(config.controler().getOutputDirectory() + "_" + myNumber);
+        config.controller().setOutputDirectory(config.controller().getOutputDirectory() + "_" + myNumber);
         //limit IO
         config.linkStats().setWriteLinkStatsInterval(0);
-        config.controler().setCreateGraphs(false);
-        config.controler().setWriteEventsInterval(0);
-        config.controler().setWritePlansInterval(0);
-        config.controler().setWriteSnapshotsInterval(0);
+        config.controller().setCreateGraphs(false);
+        config.controller().setWriteEventsInterval(0);
+        config.controller().setWritePlansInterval(0);
+        config.controller().setWriteSnapshotsInterval(0);
         // don't load plans; receive them from master
         config.plans().setInputFile(null);
 //        Important, otherwise Psim breaks
-        config.parallelEventHandling().setSynchronizeOnSimSteps(false);
-        config.parallelEventHandling().setNumberOfThreads(1);
+        config.eventsManager().setSynchronizeOnSimSteps(false);
+        config.eventsManager().setNumberOfThreads(1);
         if (slaveMutationRate > 0)
             setReplanningWeights(config, slaveMutationRate);
 
@@ -249,7 +249,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         DistributedPlanStrategyTranslationAndRegistration.substituteStrategies(config, quickReplannning, numberOfPSimIterationsPerCycle);
         matsimControler = new Controler(scenario);
         DistributedPlanStrategyTranslationAndRegistration.registerStrategiesWithControler(this.matsimControler, plancatcher, quickReplannning, numberOfPSimIterationsPerCycle);
-        matsimControler.getConfig().controler().setOverwriteFileSetting(
+        matsimControler.getConfig().controller().setOverwriteFileSetting(
                 true ?
                         OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
                         OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
@@ -308,7 +308,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             @Override
             public void install() {
                 bind(TravelTime.class).toInstance(travelTime);
-                if (scenario.getConfig().strategy().getPlanSelectorForRemoval().equals("DiversityGeneratingPlansRemover")) {
+                if (scenario.getConfig().replanning().getPlanSelectorForRemoval().equals("DiversityGeneratingPlansRemover")) {
                     bindPlanSelectorForRemoval().toProvider(DiversityGeneratingPlansRemover.Builder.class);
                 }
             }
@@ -319,11 +319,11 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
         }
         if (diversityGeneratingPlanSelection)
-            matsimControler.getConfig().strategy().setPlanSelectorForRemoval("DiversityGeneratingPlansRemover");
+            matsimControler.getConfig().replanning().setPlanSelectorForRemoval("DiversityGeneratingPlansRemover");
         //no use for this, if you don't exactly know the communicationsMode of population when something goes wrong.
         // better to have plans written out every n successful iterations, specified in the config
-        matsimControler.getConfig().controler().setDumpDataAtEnd(false);
-        matsimControler.getConfig().strategy().setMaxAgentPlanMemorySize(numberOfPlansOnSlave);
+        matsimControler.getConfig().controller().setDumpDataAtEnd(false);
+        matsimControler.getConfig().replanning().setMaxAgentPlanMemorySize(numberOfPlansOnSlave);
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
@@ -631,7 +631,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         if (mutationRate > 1)
             mutationRate = 0.9999;
         List<ReplanningConfigGroup.StrategySettings> strategySettings = new ArrayList<>();
-        strategySettings.addAll(config.strategy().getStrategySettings());
+        strategySettings.addAll(config.replanning().getStrategySettings());
         Map<Integer, Double> selectors = new HashMap<>();
         Map<Integer, Double> mutators = new HashMap<>();
         for (int i = 0; i < strategySettings.size(); i++) {
@@ -653,9 +653,9 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             strategySettings.get(entry.getKey()).setWeight(mutationRate * entry.getValue() / mutatorSum);
         }
         //put it back in the config
-        config.strategy().clearStrategySettings();
+        config.replanning().clearStrategySettings();
         for (ReplanningConfigGroup.StrategySettings strategySetting : strategySettings) {
-            config.strategy().addStrategySettings(strategySetting);
+            config.replanning().addStrategySettings(strategySetting);
         }
     }
 

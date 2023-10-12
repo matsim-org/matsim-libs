@@ -173,7 +173,7 @@ public class RoutingIT {
 
 		final FreespeedTravelTimeAndDisutility calculator =
 				new FreespeedTravelTimeAndDisutility(
-						scenario.getConfig().planCalcScore() );
+						scenario.getConfig().scoring() );
 		final LeastCostPathCalculatorFactory factory1 = provider.getFactory(
 				scenario.getNetwork(),
 				calculator,

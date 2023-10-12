@@ -510,7 +510,7 @@ public class LaemmerIT {
 			// create Config
 			Config config = ConfigUtils.loadConfig("./examples/tutorial/singleCrossingScenario/config.xml");
 			config.plans().setInputFile(null);
-			config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+			config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 
 			LaemmerConfigGroup laemmerConfigGroup = ConfigUtils.addOrGetModule(config,
 					LaemmerConfigGroup.GROUP_NAME, LaemmerConfigGroup.class);
@@ -546,12 +546,12 @@ public class LaemmerIT {
 		}
 
 		void setLastIteration(int lastIteration) {
-			scenario.getConfig().controler().setLastIteration(lastIteration);
+			scenario.getConfig().controller().setLastIteration(lastIteration);
 			// add replanning strategy
 			StrategySettings strat = new StrategySettings();
 			strat.setStrategyName(DefaultSelector.KeepLastSelected.toString());
 			strat.setWeight(1.);
-			scenario.getConfig().strategy().addStrategySettings(strat);
+			scenario.getConfig().replanning().addStrategySettings(strat);
 		}
 
 		DelayAnalysisTool run(SignalAnalysisTool signalAnalyzer) {

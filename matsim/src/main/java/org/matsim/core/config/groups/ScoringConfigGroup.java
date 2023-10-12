@@ -633,7 +633,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 			for (ScoringParameterSet scoringParameterSet : this.getScoringParametersPerSubpopulation().values()) {
 
-				for (String mode : config.plansCalcRoute().getNetworkModes()) {
+				for (String mode : config.routing().getNetworkModes()) {
 					createAndAddInteractionActivity( scoringParameterSet, mode );
 				}
 				// (In principle, the for loop following next should be sufficient, i.e. taking the necessary modes from scoring.

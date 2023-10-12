@@ -54,8 +54,8 @@ public class ReRoutingIT {
 		config.qsim().setTimeStepSize(10.0);
 		config.qsim().setStuckTime(100.0);
 		config.qsim().setRemoveStuckVehicles(true);
-		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
-		config.controler().setLastIteration(1);
+		config.controller().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
+		config.controller().setLastIteration(1);
 		/* linear interpolate the into time bins aggregated travel time data to avoid artifacts at the boundaries of time bins:
 		 * e.g. a first time bin with aggregated travel time of 90 seconds and a second time bin with 45 seconds; time bin size 60;
 		 * i.e. consolidateData-method in TravelTimeCalculator will accept this difference; imagine an requested route starting 2
@@ -79,10 +79,10 @@ public class ReRoutingIT {
 	@Test
 	public void testReRoutingDijkstra() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
-		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
+		scenario.getConfig().controller().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 		this.evaluate();
 	}
@@ -90,10 +90,10 @@ public class ReRoutingIT {
 	@Test
 	public void testReRoutingAStarLandmarks() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
-		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
+		scenario.getConfig().controller().setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 		this.evaluate();
 	}
@@ -101,10 +101,10 @@ public class ReRoutingIT {
 	@Test
 	public void testReRoutingSpeedyALT() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
-		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.SpeedyALT);
+		scenario.getConfig().controller().setRoutingAlgorithmType(RoutingAlgorithmType.SpeedyALT);
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 		this.evaluate("plans_speedyALT.xml.gz");
 	}

@@ -110,7 +110,7 @@ public class TripRouterFactoryImplTest {
 					public void install() {
 						install(new ScenarioByInstanceModule(scenario));
 						install(new TimeInterpretationModule());
-						addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility( config.planCalcScore() ));
+						addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility( config.scoring() ));
 						addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
 					}
 				}));
@@ -130,7 +130,7 @@ public class TripRouterFactoryImplTest {
 				PopulationUtils.getFactory().createPerson(Id.create("toto", Person.class)), new AttributesImpl());
 
 		Leg l = (Leg) trip.get( 0 );
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
+		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 			l = (Leg) trip.get(2) ;
 		}
 
@@ -189,7 +189,7 @@ public class TripRouterFactoryImplTest {
 				install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {
 					@Override
 					public void install() {
-						addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility( config.planCalcScore() ));
+						addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility( config.scoring() ));
 						addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
 					}
 				}));
@@ -206,7 +206,7 @@ public class TripRouterFactoryImplTest {
 				PopulationUtils.getFactory().createPerson(Id.create("toto", Person.class)), new AttributesImpl());
 
 		Leg l = (Leg) trip.get( 0 );
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
+		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 			l = (Leg) trip.get(2) ;
 		}
 

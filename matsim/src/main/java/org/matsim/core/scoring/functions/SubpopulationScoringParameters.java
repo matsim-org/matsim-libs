@@ -51,7 +51,7 @@ public class SubpopulationScoringParameters implements ScoringParametersForPerso
 	}
 
 	public SubpopulationScoringParameters(Scenario scenario) {
-		this(scenario.getConfig().plans(), scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getPopulation(), scenario.getConfig().transit());
+		this(scenario.getConfig().plans(), scenario.getConfig().scoring(), scenario.getConfig().scenario(), scenario.getPopulation(), scenario.getConfig().transit());
 	}
 
 	@Override

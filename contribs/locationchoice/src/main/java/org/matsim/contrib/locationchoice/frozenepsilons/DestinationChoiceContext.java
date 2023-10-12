@@ -111,7 +111,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 
 	public void init() {
 		if ( params==null ){
-			this.params = new ScoringParameters.Builder( scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters( null ),
+			this.params = new ScoringParameters.Builder( scenario.getConfig().scoring(), scenario.getConfig().scoring().getScoringParameters( null ),
 				  scenario.getConfig().scenario() ).build();
 			this.dccg = ConfigUtils.addOrGetModule( this.scenario.getConfig(), FrozenTastesConfigGroup.class );
 			ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler( this.dccg );
@@ -185,7 +185,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 			}
 		} else {
 			log.warn("prefs are taken from the config and if available from the desires as there is no preferences file specified \n");
-			for (ActivityParams activityParams : this.scenario.getConfig().planCalcScore().getActivityParams()) {
+			for (ActivityParams activityParams : this.scenario.getConfig().scoring().getActivityParams()) {
 				for (Person p : this.scenario.getPopulation().getPersons().values()) {
 					prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getActivityType(),
 							activityParams.getTypicalDuration());

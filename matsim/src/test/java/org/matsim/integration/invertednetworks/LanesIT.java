@@ -66,11 +66,11 @@ public class LanesIT {
 		config.network().setInputFile("network.xml");
 		config.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 		config.plans().setInputFile("population.xml");
-		config.controler().setRoutingAlgorithmType(ControllerConfigGroup.RoutingAlgorithmType.Dijkstra);
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "output");
+		config.controller().setRoutingAlgorithmType(ControllerConfigGroup.RoutingAlgorithmType.Dijkstra);
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory() + "output");
 		final int lastIteration = 50;
-		config.controler().setLastIteration(lastIteration);
-		config.controler().setCreateGraphs(false);
+		config.controller().setLastIteration(lastIteration);
+		config.controller().setCreateGraphs(false);
 		config.vspExperimental().setWritingOutputEvents(false);
 		config.travelTimeCalculator().setSeparateModes( false );
 		// ---

@@ -108,12 +108,12 @@ public class RunUrbanEVExample {
 		urbanEVConfig.setCriticalSOC(0.4);
 
 		//TODO actually, should also work with all AccessEgressTypes but we have to check (write JUnit test)
-		config.plansCalcRoute().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none );
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none );
 
 		//register charging interaction activities for car
-		config.planCalcScore().addActivityParams(
+		config.scoring().addActivityParams(
 				new ActivityParams(TransportMode.car + UrbanEVModule.PLUGOUT_INTERACTION).setScoringThisActivityAtAll(false ) );
-		config.planCalcScore().addActivityParams(
+		config.scoring().addActivityParams(
 				new ActivityParams( TransportMode.car + UrbanEVModule.PLUGIN_INTERACTION).setScoringThisActivityAtAll( false ) );
 		return config;
 	}

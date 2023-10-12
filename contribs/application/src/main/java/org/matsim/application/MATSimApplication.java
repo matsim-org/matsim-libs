@@ -177,13 +177,13 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		}
 
 		if (iterations > -1)
-			config.controler().setLastIteration(iterations);
+			config.controller().setLastIteration(iterations);
 
 		if (output != null)
-			config.controler().setOutputDirectory(output.toString());
+			config.controller().setOutputDirectory(output.toString());
 
 		if (runId != null)
-			config.controler().setRunId(runId);
+			config.controller().setRunId(runId);
 
 		final Scenario scenario = createScenario(config);
 
@@ -199,7 +199,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		if (post != PostProcessOption.disabled) {
 
-			List<MATSimAppCommand> commands = preparePostProcessing(Path.of(config.controler().getOutputDirectory()), config.controler().getRunId());
+			List<MATSimAppCommand> commands = preparePostProcessing(Path.of(config.controller().getOutputDirectory()), config.controller().getRunId());
 
 			for (MATSimAppCommand command : commands) {
 
@@ -370,14 +370,14 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		else
 			postfix = "-" + option + "_" + value;
 
-		String outputDir = config.controler().getOutputDirectory();
+		String outputDir = config.controller().getOutputDirectory();
 		if (outputDir.endsWith("/")) {
-			config.controler().setOutputDirectory(outputDir.substring(0, outputDir.length() - 1) + postfix + "/");
+			config.controller().setOutputDirectory(outputDir.substring(0, outputDir.length() - 1) + postfix + "/");
 		} else
-			config.controler().setOutputDirectory(outputDir + postfix);
+			config.controller().setOutputDirectory(outputDir + postfix);
 
 		// dot should not be part of run id
-		config.controler().setRunId(config.controler().getRunId() + postfix.replace(".", ""));
+		config.controller().setRunId(config.controller().getRunId() + postfix.replace(".", ""));
 	}
 
 	/**

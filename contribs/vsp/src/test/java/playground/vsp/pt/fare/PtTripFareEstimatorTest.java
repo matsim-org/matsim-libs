@@ -52,7 +52,7 @@ public class PtTripFareEstimatorTest {
 
 		Config config = TestScenario.loadConfig(utils);
 
-		Map<String, ScoringConfigGroup.ModeParams> modes = config.planCalcScore().getScoringParameters("person").getModes();
+		Map<String, ScoringConfigGroup.ModeParams> modes = config.scoring().getScoringParameters("person").getModes();
 
 		ScoringConfigGroup.ModeParams pt = modes.get(TransportMode.pt);
 		ScoringConfigGroup.ModeParams walk = modes.get(TransportMode.walk);

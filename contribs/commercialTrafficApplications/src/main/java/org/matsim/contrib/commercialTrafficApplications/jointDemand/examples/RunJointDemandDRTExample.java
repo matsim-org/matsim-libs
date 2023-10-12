@@ -80,8 +80,8 @@ class RunJointDemandDRTExample {
     public void run(URL configURL){
         Config config = loadConfig(configURL);
         prepareConfig(config);
-        DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore(),
-                config.plansCalcRoute());
+        DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.scoring(),
+                config.routing());
 
         Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
         ScenarioUtils.loadScenario(scenario);
@@ -105,30 +105,30 @@ class RunJointDemandDRTExample {
         ReplanningConfigGroup.StrategySettings changeExpBeta = new ReplanningConfigGroup.StrategySettings();
         changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
         changeExpBeta.setWeight(0.5);
-        config.strategy().addStrategySettings(changeExpBeta);
+        config.replanning().addStrategySettings(changeExpBeta);
         ReplanningConfigGroup.StrategySettings changeServiceOperator = new ReplanningConfigGroup.StrategySettings();
         changeServiceOperator.setStrategyName(ChangeCommercialJobOperator.SELECTOR_NAME);
         changeServiceOperator.setWeight(0.5);
-        config.strategy().addStrategySettings(changeServiceOperator);
+        config.replanning().addStrategySettings(changeServiceOperator);
 
-        config.strategy().setFractionOfIterationsToDisableInnovation(.8);
+        config.replanning().setFractionOfIterationsToDisableInnovation(.8);
         ScoringConfigGroup.ActivityParams home = new ScoringConfigGroup.ActivityParams("home");
         home.setTypicalDuration(14 * 3600);
-        config.planCalcScore().addActivityParams(home);
+        config.scoring().addActivityParams(home);
         ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
         work.setTypicalDuration(14 * 3600);
         work.setOpeningTime(8 * 3600);
         work.setClosingTime(8 * 3600);
-        config.planCalcScore().addActivityParams(work);
-        config.controler().setWriteEventsInterval(1);
-        config.controler().setOutputDirectory("output/commercialTrafficApplications/jointDemand/RunJointDemandUsingDRTExample");
-        config.controler()
+        config.scoring().addActivityParams(work);
+        config.controller().setWriteEventsInterval(1);
+        config.controller().setOutputDirectory("output/commercialTrafficApplications/jointDemand/RunJointDemandUsingDRTExample");
+        config.controller()
                 .setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
         config.qsim().setEndTime(26 * 3600);
         config.qsim().setSimEndtimeInterpretation(QSimConfigGroup.EndtimeInterpretation.onlyUseEndtime);
 
-        config.controler().setLastIteration(5);
+        config.controller().setLastIteration(5);
     }
 
     private static void loadConfigGroups(Config config) {

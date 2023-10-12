@@ -36,7 +36,7 @@ public final class RaptorUtils {
     }
 
     public static RaptorStaticConfig createStaticConfig(Config config) {
-        RoutingConfigGroup pcrConfig = config.plansCalcRoute();
+        RoutingConfigGroup pcrConfig = config.routing();
         SwissRailRaptorConfigGroup srrConfig = ConfigUtils.addOrGetModule(config, SwissRailRaptorConfigGroup.class);
 
         RaptorStaticConfig staticConfig = new RaptorStaticConfig();
@@ -73,7 +73,7 @@ public final class RaptorUtils {
 
         raptorParams.setMarginalUtilityOfWaitingPt_utl_s(trConfig.getMarginalUtilityOfWaitingPt_utl_s());
 
-        ScoringConfigGroup pcsConfig = config.planCalcScore();
+        ScoringConfigGroup pcsConfig = config.scoring();
         double marginalUtilityPerforming = pcsConfig.getPerforming_utils_hr() / 3600.0;
         for (Map.Entry<String, ScoringConfigGroup.ModeParams> e : pcsConfig.getModes().entrySet()) {
             String mode = e.getKey();

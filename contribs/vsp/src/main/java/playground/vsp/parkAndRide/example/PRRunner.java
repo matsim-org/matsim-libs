@@ -70,7 +70,7 @@ public class PRRunner {
 		ConfigUtils.loadConfig(config, configFile);
 
 		final Controler controler = new Controler(config);
-		controler.getConfig().controler().setOverwriteFileSetting(
+		controler.getConfig().controller().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
@@ -79,7 +79,7 @@ public class PRRunner {
 
 		ActivityParams prActivityParams = new ActivityParams(PRConstants.PARKANDRIDE_ACTIVITY_TYPE);
 		prActivityParams.setTypicalDuration(prSettings.getTypicalDuration());
-		controler.getConfig().planCalcScore().addActivityParams(prActivityParams);
+		controler.getConfig().scoring().addActivityParams(prActivityParams);
 
         controler.setScoringFunctionFactory(new PRScoringFunctionFactory(controler.getScenario(), prSettings.getIntermodalTransferPenalty()));
 

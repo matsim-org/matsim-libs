@@ -53,7 +53,7 @@ public class RouteFactoryIntegrationTest {
 	public void testRouteFactoryIntegration() {
 		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.plans().setInputFile("plans2.xml");
-		Collection<StrategySettings> settings = config.strategy().getStrategySettings();
+		Collection<StrategySettings> settings = config.replanning().getStrategySettings();
 		for (StrategySettings setting: settings) {
 			if ("ReRoute".equals(setting.getStrategyName())) {
 				setting.setWeight(1.0);
@@ -61,13 +61,13 @@ public class RouteFactoryIntegrationTest {
 				setting.setWeight(0.0);
 			}
 		}
-		config.controler().setLastIteration(1);
+		config.controller().setLastIteration(1);
 
 //		 test the default
-		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/default");
+		config.controller().setOutputDirectory(utils.getOutputDirectory() + "/default");
 		Controler controler = new Controler(config);
-        controler.getConfig().controler().setCreateGraphs(false);
-        controler.getConfig().controler().setWriteEventsInterval(0);
+        controler.getConfig().controller().setCreateGraphs(false);
+        controler.getConfig().controller().setWriteEventsInterval(0);
 		controler.run();
 
         Population population = controler.getScenario().getPopulation();
@@ -86,14 +86,14 @@ public class RouteFactoryIntegrationTest {
 		}
 
 		// test another setting
-		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/variant1");
+		config.controller().setOutputDirectory(utils.getOutputDirectory() + "/variant1");
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory(NetworkRoute.class, new HeavyCompressedNetworkRouteFactory(scenario.getNetwork(), TransportMode.car));
 		ScenarioUtils.loadScenario(scenario);
 
 		Controler controler2 = new Controler(scenario);
-        controler2.getConfig().controler().setCreateGraphs(false);
-        controler2.getConfig().controler().setWriteEventsInterval(0);
+        controler2.getConfig().controller().setCreateGraphs(false);
+        controler2.getConfig().controller().setWriteEventsInterval(0);
 		controler2.run();
 
         Population population2 = controler2.getScenario().getPopulation();

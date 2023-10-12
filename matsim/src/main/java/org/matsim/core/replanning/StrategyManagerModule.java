@@ -59,7 +59,7 @@ public class StrategyManagerModule extends AbstractModule {
 		// (this will bind a Map that has StrategySettings as key, and PlanStrategy as value.  Not sure why StrategySettings as key, and not just the name, but possibly this is mean to allow adding
 		// the same strategy multiple times, with possibly different settings.)
 
-		for (ReplanningConfigGroup.StrategySettings settings : getConfig().strategy().getStrategySettings()) {
+		for (ReplanningConfigGroup.StrategySettings settings : getConfig().replanning().getStrategySettings()) {
 			String name = settings.getStrategyName() ;
 			if (name.equals("ExternalModule")) {
 				// plan strategy is some external executable:

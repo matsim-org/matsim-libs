@@ -115,7 +115,7 @@ public class DistributedPlanStrategyTranslationAndRegistration {
     }
 
     public static void substituteStrategies(Config config, boolean quickReplanning, int selectionInflationFactor) {
-        for (ReplanningConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
+        for (ReplanningConfigGroup.StrategySettings settings : config.replanning().getStrategySettings()) {
 
             String classname = settings.getStrategyName();
 

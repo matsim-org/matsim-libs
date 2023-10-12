@@ -49,7 +49,7 @@ public class RoutingConfigGroupTest {
 		final String filename = outdir + "config.xml";
 		{
 			Config config = ConfigUtils.createConfig();
-			RoutingConfigGroup group = config.plansCalcRoute();
+			RoutingConfigGroup group = config.routing();
 			Assert.assertEquals( N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size() );
 			group.clearModeRoutingParams();
 //			group.setTeleportedModeSpeed( TransportMode.bike, 1. );
@@ -63,7 +63,7 @@ public class RoutingConfigGroupTest {
 		}
 		{
 			Config config = ConfigUtils.loadConfig( filename ) ;
-			RoutingConfigGroup group = config.plansCalcRoute();
+			RoutingConfigGroup group = config.routing();
 			Assert.assertEquals( 0, group.getModeRoutingParams().size() );
 		}
 	}
@@ -73,7 +73,7 @@ public class RoutingConfigGroupTest {
 		final String filename = outdir + "config.xml";
 		{
 			Config config = ConfigUtils.createConfig();
-			RoutingConfigGroup group = config.plansCalcRoute();
+			RoutingConfigGroup group = config.routing();
 			Assert.assertEquals( N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size() );
 			group.clearModeRoutingParams();
 			group.setTeleportedModeSpeed( TransportMode.bike, 1. );
@@ -87,7 +87,7 @@ public class RoutingConfigGroupTest {
 		}
 		{
 			Config config = ConfigUtils.loadConfig( filename ) ;
-			RoutingConfigGroup group = config.plansCalcRoute();
+			RoutingConfigGroup group = config.routing();
 			Assert.assertEquals( 0, group.getModeRoutingParams().size() );
 		}
 	}
@@ -97,7 +97,7 @@ public class RoutingConfigGroupTest {
 		final String filename = outdir + "config.xml";
 		{
 			Config config = ConfigUtils.createConfig();
-			RoutingConfigGroup group = config.plansCalcRoute();
+			RoutingConfigGroup group = config.routing();
 			Assert.assertEquals( N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size() );
 			group.setTeleportedModeSpeed( TransportMode.bike, 1. );
 			Assert.assertEquals( 1, group.getModeRoutingParams().size() );
@@ -112,14 +112,14 @@ public class RoutingConfigGroupTest {
 		}
 		{
 			Config config = ConfigUtils.loadConfig( filename ) ;
-			RoutingConfigGroup group = config.plansCalcRoute();
+			RoutingConfigGroup group = config.routing();
 			Assert.assertEquals( 0, group.getModeRoutingParams().size() );
 		}
 	}
 	@Test
 	public void testClearDefaults() {
 		Config config = ConfigUtils.createConfig(  ) ;
-		RoutingConfigGroup group = config.plansCalcRoute() ;
+		RoutingConfigGroup group = config.routing() ;
 		Assert.assertEquals( N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size() );
 		group.setTeleportedModeSpeed( "def", 1. );
 		Assert.assertEquals( 1, group.getModeRoutingParams().size() );
@@ -131,7 +131,7 @@ public class RoutingConfigGroupTest {
 	@Test
 	public void test3() {
 		Config config = ConfigUtils.createConfig(  ) ;
-		RoutingConfigGroup group = config.plansCalcRoute() ;
+		RoutingConfigGroup group = config.routing() ;
 		group.clearModeRoutingParams();
 		group.setClearingDefaultModeRoutingParams( true ); // should be ok
 	}
@@ -197,7 +197,7 @@ public class RoutingConfigGroupTest {
 		log.info("... done reading file into new config.") ;
 
 		log.info( "asserting ...");
-		assertIdentical("re-read v1", initialGroup, configV1In.plansCalcRoute());
+		assertIdentical("re-read v1", initialGroup, configV1In.routing());
 		log.info( "... done asserting.") ;
 
 		final String v2path = utils.getOutputDirectory() + "/configv2_out.xml";
@@ -207,7 +207,7 @@ public class RoutingConfigGroupTest {
 		final Config configV2 = ConfigUtils.createConfig();
 		new ConfigReader( configV2 ).readFile( v2path );
 
-		assertIdentical("re-read v2", initialGroup, configV2.plansCalcRoute());
+		assertIdentical("re-read v2", initialGroup, configV2.routing());
 	}
 
 	@Test( expected=RuntimeException.class )
@@ -215,7 +215,7 @@ public class RoutingConfigGroupTest {
 		final Config config = ConfigUtils.createConfig();
 
 		final TeleportedModeParams params = new TeleportedModeParams( "skateboard" );
-		config.plansCalcRoute().addModeRoutingParams( params );
+		config.routing().addModeRoutingParams( params );
 		// (one needs to set one of the teleported speed settings)
 
 		config.checkConsistency();

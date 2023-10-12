@@ -112,7 +112,7 @@ public class ExecutedPlansServiceImpl implements AfterMobsimListener, ExecutedPl
 
 		// write this in every iteration in order to be consistent with previous design.  I think this should be changed.  kai, jun'16
 		// as a quick fix, writing this as often as the base plans file.  kai, jun'23
-		if ( event.getIteration() % scenario.getConfig().controler().getWritePlansInterval() == 0 ){
+		if ( event.getIteration() % scenario.getConfig().controller().getWritePlansInterval() == 0 ){
 			String outputFile = controlerIO.getIterationFilename( event.getIteration(), EXECUTEDPLANSFILE );
 			writeExecutedPlans( outputFile );
 		}

@@ -141,9 +141,9 @@ public class ModalDistanceCadytsSingleDistanceIT {
         Config config = ConfigUtils.createConfig();
         String[] modes = new String[]{TransportMode.car, TransportMode.bike};
 
-        config.controler().setOutputDirectory(this.utils.getOutputDirectory());
-        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        config.controler().setLastIteration(20);
+        config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+        config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        config.controller().setLastIteration(20);
 
         config.counts().setWriteCountsInterval(1);
         config.counts().setAverageCountsOverIterations(1);
@@ -152,7 +152,7 @@ public class ModalDistanceCadytsSingleDistanceIT {
         home.setMinimalDuration(6 * 3600);
         home.setTypicalDuration(6 * 3600);
         home.setEarliestEndTime(6 * 3600);
-        config.planCalcScore().addActivityParams(home);
+        config.scoring().addActivityParams(home);
 
         ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
         work.setMinimalDuration(8 * 3600);
@@ -160,25 +160,25 @@ public class ModalDistanceCadytsSingleDistanceIT {
         work.setEarliestEndTime(14 * 3600);
         work.setOpeningTime(6 * 3600);
         work.setClosingTime(18 * 3600);
-        config.planCalcScore().addActivityParams(work);
+        config.scoring().addActivityParams(work);
 
         // have random selection of plans to generate heterogenity in the beginning, so that cadyts can calibrate its correction
         ReplanningConfigGroup.StrategySettings selectRandom = new ReplanningConfigGroup.StrategySettings();
         selectRandom.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.SelectRandom);
         selectRandom.setDisableAfter(17);
         selectRandom.setWeight(0.5);
-        config.strategy().addStrategySettings(selectRandom);
+        config.replanning().addStrategySettings(selectRandom);
 
         // have change exp beta, so that mode distribution converges at the end of the simulation
         ReplanningConfigGroup.StrategySettings changeExpBeta = new ReplanningConfigGroup.StrategySettings();
         changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
         changeExpBeta.setWeight(0.5);
-        config.strategy().addStrategySettings(changeExpBeta);
+        config.replanning().addStrategySettings(changeExpBeta);
 
         // remove teleported bike
-        config.plansCalcRoute().removeModeRoutingParams(TransportMode.bike);
-        config.plansCalcRoute().setNetworkModes(Arrays.asList(modes));
-        config.plansCalcRoute().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
+        config.routing().removeModeRoutingParams(TransportMode.bike);
+        config.routing().setNetworkModes(Arrays.asList(modes));
+        config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 
         config.qsim().setMainModes(Arrays.asList(modes));
         config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
@@ -191,7 +191,7 @@ public class ModalDistanceCadytsSingleDistanceIT {
         config.travelTimeCalculator().setFilterModes(true);
         config.changeMode().setModes(modes);
         config.changeMode().setBehavior(ChangeModeConfigGroup.Behavior.fromSpecifiedModesToSpecifiedModes);
-        config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
+        config.replanning().setFractionOfIterationsToDisableInnovation(0.8);
 
         return config;
     }

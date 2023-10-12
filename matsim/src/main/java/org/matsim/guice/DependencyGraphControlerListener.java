@@ -68,7 +68,7 @@ class DependencyGraphControlerListener implements StartupListener {
 	}
 
 	public void notifyStartup(StartupEvent event) {
-		if (event.getServices().getConfig().controler().isCreateGraphs()) {
+		if (event.getServices().getConfig().controller().isCreateGraphs()) {
 			try (PrintWriter out = new PrintWriter(new File(controlerIO.getOutputFilename("modules.dot")))) {
 				MatsimGrapher grapher = new MatsimGrapher(new AbstractInjectorGrapher.GrapherParameters()
 						.setAliasCreator(bindings -> {

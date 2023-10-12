@@ -61,24 +61,24 @@ public class RunCarsharing {
 		// We need to add interaction activity types to scoring
 		ActivityParams pickupParams = new ActivityParams(SharingUtils.PICKUP_ACTIVITY);
 		pickupParams.setScoringThisActivityAtAll(false);
-		config.planCalcScore().addActivityParams(pickupParams);
+		config.scoring().addActivityParams(pickupParams);
 
 		ActivityParams dropoffParams = new ActivityParams(SharingUtils.DROPOFF_ACTIVITY);
 		dropoffParams.setScoringThisActivityAtAll(false);
-		config.planCalcScore().addActivityParams(dropoffParams);
+		config.scoring().addActivityParams(dropoffParams);
 
 		ActivityParams bookingParams = new ActivityParams(SharingUtils.BOOKING_ACTIVITY);
 		bookingParams.setScoringThisActivityAtAll(false);
-		config.planCalcScore().addActivityParams(bookingParams);
+		config.scoring().addActivityParams(bookingParams);
 
 		// We need to score car
 		ModeParams carScoringParams = new ModeParams("car");
-		config.planCalcScore().addModeParams(carScoringParams);
+		config.scoring().addModeParams(carScoringParams);
 
 		// Write out all events (DEBUG)
-		config.controler().setWriteEventsInterval(1);
-		config.controler().setWritePlansInterval(1);
-		config.controler().setLastIteration(10);
+		config.controller().setWriteEventsInterval(1);
+		config.controller().setWritePlansInterval(1);
+		config.controller().setLastIteration(10);
 
 		// Set up controller (no specific settings needed for scenario)
 		Controler controller = new Controler(config);

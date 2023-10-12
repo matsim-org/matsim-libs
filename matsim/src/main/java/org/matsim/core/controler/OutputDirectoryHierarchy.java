@@ -72,7 +72,7 @@ public final class OutputDirectoryHierarchy {
 	 * @param config
 	 */
 	public OutputDirectoryHierarchy( Config config ) {
-		this( config.controler().getOutputDirectory(), config.controler().getRunId(), config.controler().getOverwriteFileSetting(), config.controler().getCompressionType() );
+		this( config.controller().getOutputDirectory(), config.controller().getRunId(), config.controller().getOverwriteFileSetting(), config.controller().getCompressionType() );
 	}
 
 	public OutputDirectoryHierarchy(String outputPath, OverwriteFileSetting overwriteFiles, ControllerConfigGroup.CompressionType defaultCompressionType) {

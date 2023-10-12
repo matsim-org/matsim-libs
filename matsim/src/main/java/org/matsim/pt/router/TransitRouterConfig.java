@@ -103,7 +103,7 @@ public class TransitRouterConfig implements MatsimParameters {
 	private boolean cacheTree;
 
 	public TransitRouterConfig(final Config config) {
-		this(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
+		this(config.scoring(), config.routing(), config.transitRouter(), config.vspExperimental());
 	}
 
 	public TransitRouterConfig(final ScoringConfigGroup pcsConfig, final RoutingConfigGroup pcrConfig,
