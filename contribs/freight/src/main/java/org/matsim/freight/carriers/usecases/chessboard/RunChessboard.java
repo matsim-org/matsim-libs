@@ -45,7 +45,7 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.freight.carriers.FreightConfigGroup;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.carrier.*;
 import org.matsim.freight.carriers.controler.*;
 import org.matsim.freight.carriers.usecases.analysis.CarrierScoreStats;
@@ -65,9 +65,9 @@ public final class RunChessboard {
 			config = ConfigUtils.loadConfig( args );
 		}
 
-		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class );
-		freightConfigGroup.setCarriersFile("carrierPlans.xml");
-		freightConfigGroup.setCarriersVehicleTypesFile("vehicleTypes.xml");
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule( config, FreightCarriersConfigGroup.class );
+		freightCarriersConfigGroup.setCarriersFile("carrierPlans.xml");
+		freightCarriersConfigGroup.setCarriersVehicleTypesFile("vehicleTypes.xml");
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		CarrierUtils.loadCarriersAccordingToFreightConfig( scenario );

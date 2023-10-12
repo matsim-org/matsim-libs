@@ -36,7 +36,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.freight.carriers.FreightConfigGroup;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.carrier.*;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.testcases.MatsimTestUtils;
@@ -57,11 +57,11 @@ public class IntegrationIT {
 		Config config = ConfigUtils.createConfig();
 		config.global().setRandomSeed(4177);
 
-		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-		freightConfigGroup.setCarriersFile(carrierFilename);
-		freightConfigGroup.setCarriersVehicleTypesFile(vehicleTypeFilename);
-		freightConfigGroup.setTravelTimeSliceWidth(24*3600);
-		freightConfigGroup.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.enforceBeginnings);
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightCarriersConfigGroup.setCarriersFile(carrierFilename);
+		freightCarriersConfigGroup.setCarriersVehicleTypesFile(vehicleTypeFilename);
+		freightCarriersConfigGroup.setTravelTimeSliceWidth(24*3600);
+		freightCarriersConfigGroup.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.enforceBeginnings);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);

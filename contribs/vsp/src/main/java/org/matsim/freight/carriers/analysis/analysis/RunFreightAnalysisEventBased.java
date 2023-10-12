@@ -24,7 +24,7 @@ package org.matsim.freight.carriers.analysis.analysis;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.freight.carriers.FreightConfigGroup;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.carrier.CarrierUtils;
 import org.matsim.freight.carriers.events.CarrierEventsReaders;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -79,9 +79,9 @@ public class RunFreightAnalysisEventBased {
 		config.eventsManager().setEstimatedNumberOfEvents(null);
 		config.global().setNumberOfThreads(1);
 		//freight settings
-		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;
-		freightConfigGroup.setCarriersFile( SIM_OUTPUT_PATH + "output_carriers.xml.gz");
-		freightConfigGroup.setCarriersVehicleTypesFile(SIM_OUTPUT_PATH + "output_allVehicles.xml.gz");
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule( config, FreightCarriersConfigGroup.class ) ;
+		freightCarriersConfigGroup.setCarriersFile( SIM_OUTPUT_PATH + "output_carriers.xml.gz");
+		freightCarriersConfigGroup.setCarriersVehicleTypesFile(SIM_OUTPUT_PATH + "output_allVehicles.xml.gz");
 
 		//Were to store the analysis output?
 		String analysisOutputDirectory = ANALYSIS_OUTPUT_PATH;

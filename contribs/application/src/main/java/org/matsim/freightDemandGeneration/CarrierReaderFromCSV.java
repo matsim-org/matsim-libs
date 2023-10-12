@@ -27,7 +27,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.freight.carriers.FreightConfigGroup;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.carrier.*;
 import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -235,7 +235,7 @@ public final class CarrierReaderFromCSV {
 	 * Reads and create the carriers with reading the information from the csv file.
 	 *
 	 * @param scenario
-	 * @param freightConfigGroup
+	 * @param freightCarriersConfigGroup
 	 * @param csvLocationCarrier
 	 * @param polygonsInShape
 	 * @param defaultJspritIterations
@@ -243,14 +243,14 @@ public final class CarrierReaderFromCSV {
 	 * @param shapeCategory
 	 * @throws IOException
 	 */
-	public static void readAndCreateCarrierFromCSV(Scenario scenario, FreightConfigGroup freightConfigGroup,
+	public static void readAndCreateCarrierFromCSV(Scenario scenario, FreightCarriersConfigGroup freightCarriersConfigGroup,
 												   Path csvLocationCarrier, Collection<SimpleFeature> polygonsInShape, int defaultJspritIterations,
 												   CoordinateTransformation crsTransformationNetworkAndShape, String shapeCategory) throws IOException {
 
 		Set<CarrierInformationElement> allNewCarrierInformation = readCarrierInformation(csvLocationCarrier);
-		checkNewCarrier(allNewCarrierInformation, freightConfigGroup, scenario, polygonsInShape, shapeCategory);
+		checkNewCarrier(allNewCarrierInformation, freightCarriersConfigGroup, scenario, polygonsInShape, shapeCategory);
 		log.info("The read carrier information from the csv are checked without errors.");
-		createNewCarrierAndAddVehicleTypes(scenario, allNewCarrierInformation, freightConfigGroup, polygonsInShape,
+		createNewCarrierAndAddVehicleTypes(scenario, allNewCarrierInformation, freightCarriersConfigGroup, polygonsInShape,
 				defaultJspritIterations, crsTransformationNetworkAndShape);
 	}
 
@@ -306,13 +306,13 @@ public final class CarrierReaderFromCSV {
 	 * Checks if the read carrier information are consistent.
 	 *
 	 * @param allNewCarrierInformation
-	 * @param freightConfigGroup
+	 * @param freightCarriersConfigGroup
 	 * @param scenario
 	 * @param polygonsInShape
 	 * @param shapeCategory
 	 */
 	static void checkNewCarrier(Set<CarrierInformationElement> allNewCarrierInformation,
-								FreightConfigGroup freightConfigGroup, Scenario scenario, Collection<SimpleFeature> polygonsInShape, String shapeCategory) {
+								FreightCarriersConfigGroup freightCarriersConfigGroup, Scenario scenario, Collection<SimpleFeature> polygonsInShape, String shapeCategory) {
 
 		CarrierUtils.addOrGetCarriers(scenario);
 		for (CarrierInformationElement carrierElement : allNewCarrierInformation) {
@@ -322,7 +322,7 @@ public final class CarrierReaderFromCSV {
 						+ " being loaded from the csv is already in the given Carrier file. It is not possible to add to an existing Carrier. Please check!");
 			CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
 			new CarrierVehicleTypeReader(carrierVehicleTypes)
-					.readFile(freightConfigGroup.getCarriersVehicleTypesFile());
+					.readFile(freightCarriersConfigGroup.getCarriersVehicleTypesFile());
 			if (carrierElement.getVehicleTypes() != null)
 				for (String type : carrierElement.getVehicleTypes()) {
 					if (!carrierVehicleTypes.getVehicleTypes().containsKey(Id.create(type, VehicleType.class)))
@@ -409,20 +409,20 @@ public final class CarrierReaderFromCSV {
 	 *
 	 * @param scenario
 	 * @param allNewCarrierInformation
-	 * @param freightConfigGroup
+	 * @param freightCarriersConfigGroup
 	 * @param polygonsInShape
 	 * @param defaultJspritIterations
 	 * @param crsTransformationNetworkAndShape
 	 */
 	static void createNewCarrierAndAddVehicleTypes(Scenario scenario,
-			Set<CarrierInformationElement> allNewCarrierInformation, FreightConfigGroup freightConfigGroup,
+			Set<CarrierInformationElement> allNewCarrierInformation, FreightCarriersConfigGroup freightCarriersConfigGroup,
 			Collection<SimpleFeature> polygonsInShape, int defaultJspritIterations,
 			CoordinateTransformation crsTransformationNetworkAndShape) {
 
 		Carriers carriers = CarrierUtils.addOrGetCarriers(scenario);
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
 		CarrierVehicleTypes usedCarrierVehicleTypes = CarrierUtils.getCarrierVehicleTypes(scenario);
-		new CarrierVehicleTypeReader(carrierVehicleTypes).readFile(freightConfigGroup.getCarriersVehicleTypesFile());
+		new CarrierVehicleTypeReader(carrierVehicleTypes).readFile(freightCarriersConfigGroup.getCarriersVehicleTypesFile());
 
 		for (CarrierInformationElement singleNewCarrier : allNewCarrierInformation) {
 			if (singleNewCarrier.getVehicleTypes() == null) {

@@ -38,8 +38,8 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.freight.carriers.FreightConfigGroup;
-import org.matsim.freight.carriers.FreightConfigGroup.UseDistanceConstraintForTourPlanning;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup.UseDistanceConstraintForTourPlanning;
 import org.matsim.freight.carriers.carrier.*;
 import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.testcases.MatsimTestUtils;
@@ -90,7 +90,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 		CarrierVehicleTypes allVehicleTypes = new CarrierVehicleTypes();
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
 
-		new CarrierVehicleTypeReader(allVehicleTypes).readFile(ConfigUtils.addOrGetModule(config, FreightConfigGroup.class).getCarriersVehicleTypesFile());
+		new CarrierVehicleTypeReader(allVehicleTypes).readFile(ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class).getCarriersVehicleTypesFile());
 
 		//Filter for V1 vehicleTypes.
 		for (VehicleType vehicleType : allVehicleTypes.getVehicleTypes().values()) {
@@ -163,7 +163,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 		CarrierVehicleTypes allVehicleTypes = new CarrierVehicleTypes();
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
 
-		new CarrierVehicleTypeReader(allVehicleTypes).readFile(ConfigUtils.addOrGetModule(config, FreightConfigGroup.class).getCarriersVehicleTypesFile());
+		new CarrierVehicleTypeReader(allVehicleTypes).readFile(ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class).getCarriersVehicleTypesFile());
 
 		//Filter for V1 vehicleTypes.
 		for (VehicleType vehicleType : allVehicleTypes.getVehicleTypes().values()) {
@@ -239,7 +239,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 		CarrierVehicleTypes allVehicleTypes = new CarrierVehicleTypes();
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
 
-		new CarrierVehicleTypeReader(allVehicleTypes).readFile(ConfigUtils.addOrGetModule(config, FreightConfigGroup.class).getCarriersVehicleTypesFile());
+		new CarrierVehicleTypeReader(allVehicleTypes).readFile(ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class).getCarriersVehicleTypesFile());
 
 		//Filter for V3 vehicleTypes.
 		for (VehicleType vehicleType : allVehicleTypes.getVehicleTypes().values()) {
@@ -320,7 +320,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 		CarrierVehicleTypes allVehicleTypes = new CarrierVehicleTypes();
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
 
-		new CarrierVehicleTypeReader(allVehicleTypes).readFile(ConfigUtils.addOrGetModule(config, FreightConfigGroup.class).getCarriersVehicleTypesFile());
+		new CarrierVehicleTypeReader(allVehicleTypes).readFile(ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class).getCarriersVehicleTypesFile());
 
 		//Filter for V4 vehicleTypes including diesel.
 		for (VehicleType vehicleType : allVehicleTypes.getVehicleTypes().values()) {
@@ -399,9 +399,9 @@ public class DistanceConstraintFromVehiclesFileTest {
 		config.global().setRandomSeed(4177);
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 
-		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-		freightConfigGroup.setUseDistanceConstraintForTourPlanning(UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);
-		freightConfigGroup.setCarriersVehicleTypesFile(testUtils.getPackageInputDirectory()+"/vehicleTypesForDCTest.xml");
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightCarriersConfigGroup.setUseDistanceConstraintForTourPlanning(UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);
+		freightCarriersConfigGroup.setCarriersVehicleTypesFile(testUtils.getPackageInputDirectory()+"/vehicleTypesForDCTest.xml");
 	}
 
 	private static Carrier addTwoServicesToCarrier(Carrier carrier) {

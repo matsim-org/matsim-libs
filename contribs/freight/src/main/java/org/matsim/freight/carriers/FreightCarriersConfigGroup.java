@@ -28,9 +28,9 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import java.net.URL;
 import java.util.Map;
 
-public class FreightConfigGroup extends ReflectiveConfigGroup {
+public class FreightCarriersConfigGroup extends ReflectiveConfigGroup {
 
-    public static final String GROUPNAME="freight" ;
+    public static final String GROUPNAME="freightCarriers" ;
 
     private String carriersFile;
     static final String CARRIERS_FILE = "carriersFile";
@@ -58,7 +58,7 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
     private UseDistanceConstraintForTourPlanning useDistanceConstraintForTourPlanning = UseDistanceConstraintForTourPlanning.noDistanceConstraint;
     private static final String USE_DISTANCE_CONSTRAINT_DESC = "Use distance constraint within the tour planning phase. This does NOT ensure that the tours in MATSim will respect this limitation";
 
-    public FreightConfigGroup() {
+    public FreightCarriersConfigGroup() {
         super(GROUPNAME);
     }
 

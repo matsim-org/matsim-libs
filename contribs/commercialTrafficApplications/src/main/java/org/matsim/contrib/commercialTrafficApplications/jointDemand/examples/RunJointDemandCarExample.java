@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.ChangeCommercialJobOperator;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.JointDemandConfigGroup;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.JointDemandModule;
-import org.matsim.freight.carriers.FreightConfigGroup;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.carrier.CarrierUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -72,15 +72,15 @@ class RunJointDemandCarExample {
         JointDemandConfigGroup jointDemandConfigGroup = ConfigUtils.addOrGetModule(config, JointDemandConfigGroup.class);
         jointDemandConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
 
-        FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-        freightConfigGroup.setTravelTimeSliceWidth(3600);
-        freightConfigGroup.setCarriersFile("jointDemand_carriers_car.xml");
-        freightConfigGroup.setCarriersVehicleTypesFile("jointDemand_vehicleTypes.xml");
+        FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+        freightCarriersConfigGroup.setTravelTimeSliceWidth(3600);
+        freightCarriersConfigGroup.setCarriersFile("jointDemand_carriers_car.xml");
+        freightCarriersConfigGroup.setCarriersVehicleTypesFile("jointDemand_vehicleTypes.xml");
 
         prepareConfig(config);
 
         Scenario scenario = loadScenario(config);
-        CarrierUtils.loadCarriersAccordingToFreightConfig(scenario); //assumes that input file paths are set in FreightConfigGroup
+        CarrierUtils.loadCarriersAccordingToFreightConfig(scenario); //assumes that input file paths are set in FreightCarriersConfigGroup
         //alternatively, one can read in the input Carriers and CarrierVehicleTypes manually and use
         //CarrierControlerUtils.getCarriers(scenario) and CarrierControlerUtils.getCarrierVehicleTypes(scenario)
 

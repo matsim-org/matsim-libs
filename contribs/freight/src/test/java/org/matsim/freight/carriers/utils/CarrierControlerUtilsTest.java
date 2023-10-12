@@ -45,7 +45,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.freight.carriers.FreightConfigGroup;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.carrier.*;
 import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
@@ -416,7 +416,7 @@ public class CarrierControlerUtilsTest {
 		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ) ;
 		String vraFile= IOUtils.extendUrl(scenarioUrl, "algorithm_v2.xml" ).toString();
 
-		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;
+		FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule( config, FreightCarriersConfigGroup.class ) ;
 		freightConfig.setVehicleRoutingAlgorithmFileFile(vraFile);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -431,7 +431,7 @@ public class CarrierControlerUtilsTest {
 			Assert.fail();
 		}
 
-		Assert.assertEquals(vraFile, ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgorithmFile());
+		Assert.assertEquals(vraFile, ConfigUtils.addOrGetModule( controler.getConfig(), FreightCarriersConfigGroup.class ).getVehicleRoutingAlgorithmFile());
 	}
 
 	/**
@@ -469,7 +469,7 @@ public class CarrierControlerUtilsTest {
 		} catch (Exception e) {
 			Assert.fail();
 		}
-		Assert.assertNull(ConfigUtils.addOrGetModule(scenario.getConfig(), FreightConfigGroup.class).getVehicleRoutingAlgorithmFile());
+		Assert.assertNull(ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class).getVehicleRoutingAlgorithmFile());
 	}
 
 	private Config prepareConfig(){
@@ -478,11 +478,11 @@ public class CarrierControlerUtilsTest {
 		config.controller().setLastIteration(0);
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
 		//freight configstuff
-		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-		freightConfigGroup.setCarriersFile(IOUtils.extendUrl(scenarioUrl, "singleCarrierFiveActivitiesWithoutRoutes.xml" ).toString() );
-		freightConfigGroup.setCarriersVehicleTypesFile(IOUtils.extendUrl(scenarioUrl, "vehicleTypes.xml" ).toString() );
-		freightConfigGroup.setTravelTimeSliceWidth(24*3600);
-		freightConfigGroup.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.enforceBeginnings);
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightCarriersConfigGroup.setCarriersFile(IOUtils.extendUrl(scenarioUrl, "singleCarrierFiveActivitiesWithoutRoutes.xml" ).toString() );
+		freightCarriersConfigGroup.setCarriersVehicleTypesFile(IOUtils.extendUrl(scenarioUrl, "vehicleTypes.xml" ).toString() );
+		freightCarriersConfigGroup.setTravelTimeSliceWidth(24*3600);
+		freightCarriersConfigGroup.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.enforceBeginnings);
 		return config;
 	}
 

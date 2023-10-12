@@ -31,6 +31,7 @@ public final class ConfigAliases {
 		this.addAlias("planscalcroute", "routing");
 		this.addAlias("strategy", "replanning");
 		this.addAlias("parallelEventHandling", "eventsManager");
+		this.addAlias("freight", "freightCarriers");
 
 		this.addAlias("BrainExpBeta", "brainExpBeta", "scoring");
 		this.addAlias("PathSizeLogitBeta", "pathSizeLogitBeta", "scoring");

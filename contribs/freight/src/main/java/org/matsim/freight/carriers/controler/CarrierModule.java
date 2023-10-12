@@ -36,7 +36,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.freight.carriers.FreightConfigGroup;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.carrier.*;
 
 import java.util.List;
@@ -45,7 +45,7 @@ public final class CarrierModule extends AbstractModule {
 
 
 	@Override public void install() {
-		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( getConfig(), FreightConfigGroup.class ) ;
+		FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule( getConfig(), FreightCarriersConfigGroup.class ) ;
 
 		bind(Carriers.class).toProvider( new CarrierProvider() ).asEagerSingleton(); // needs to be eager since it is still scenario construction. kai, oct'19
 		// this is probably ok

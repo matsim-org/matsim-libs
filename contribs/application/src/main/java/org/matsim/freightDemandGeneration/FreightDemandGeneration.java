@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.ShpOptions;
-import org.matsim.freight.carriers.FreightConfigGroup;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.carrier.Carrier;
 import org.matsim.freight.carriers.carrier.CarrierPlanWriter;
 import org.matsim.freight.carriers.carrier.CarrierUtils;
@@ -240,9 +240,9 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		config.controller().setLastIteration(lastMATSimIteration);
 		config.global().setRandomSeed(4177);
 		config.global().setCoordinateSystem(coordinateSystem);
-		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-		freightConfigGroup.setTravelTimeSliceWidth(1800);
-		freightConfigGroup.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.enforceBeginnings);
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightCarriersConfigGroup.setTravelTimeSliceWidth(1800);
+		freightCarriersConfigGroup.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.enforceBeginnings);
 
 		return config;
 	}
@@ -281,11 +281,11 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 */
 	private static void prepareVehicles(Config config, String vehicleTypesFileLocation) {
 
-		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 		if (Objects.equals(vehicleTypesFileLocation, ""))
 			throw new RuntimeException("No path to the vehicleTypes selected");
 		else {
-			freightConfigGroup.setCarriersVehicleTypesFile(vehicleTypesFileLocation);
+			freightCarriersConfigGroup.setCarriersVehicleTypesFile(vehicleTypesFileLocation);
 			log.info("Get vehicleTypes from: " + vehicleTypesFileLocation);
 		}
 	}
@@ -306,8 +306,8 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 			String carriersFileLocation, Path csvLocationCarrier, Collection<SimpleFeature> polygonsInShape,
 			int defaultJspritIterations, CoordinateTransformation crsTransformationNetworkAndShape) throws IOException {
 
-		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
-				FreightConfigGroup.class);
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
+				FreightCarriersConfigGroup.class);
 		switch (selectedCarrierInputOption) {
 			case addCSVDataToExistingCarrierFileData -> {
 				// reads an existing carrier file and adds the information based on the read csv
@@ -315,10 +315,10 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 				if (Objects.equals(carriersFileLocation, ""))
 					throw new RuntimeException("No path to the carrier file selected");
 				else {
-					freightConfigGroup.setCarriersFile(carriersFileLocation);
+					freightCarriersConfigGroup.setCarriersFile(carriersFileLocation);
 					CarrierUtils.loadCarriersAccordingToFreightConfig(scenario);
 					log.info("Load carriers from: " + carriersFileLocation);
-					CarrierReaderFromCSV.readAndCreateCarrierFromCSV(scenario, freightConfigGroup, csvLocationCarrier,
+					CarrierReaderFromCSV.readAndCreateCarrierFromCSV(scenario, freightCarriersConfigGroup, csvLocationCarrier,
 							polygonsInShape, defaultJspritIterations, crsTransformationNetworkAndShape, shapeCategory);
 				}
 			}
@@ -327,14 +327,14 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 				if (Objects.equals(carriersFileLocation, ""))
 					throw new RuntimeException("No path to the carrier file selected");
 				else {
-					freightConfigGroup.setCarriersFile(carriersFileLocation);
+					freightCarriersConfigGroup.setCarriersFile(carriersFileLocation);
 					CarrierUtils.loadCarriersAccordingToFreightConfig(scenario);
 					log.info("Load carriers from: " + carriersFileLocation);
 				}
 			}
 			case createCarriersFromCSV ->
 				// creates all carriers based on the given information in the read carrier csv
-					CarrierReaderFromCSV.readAndCreateCarrierFromCSV(scenario, freightConfigGroup, csvLocationCarrier,
+					CarrierReaderFromCSV.readAndCreateCarrierFromCSV(scenario, freightCarriersConfigGroup, csvLocationCarrier,
 							polygonsInShape, defaultJspritIterations, crsTransformationNetworkAndShape, shapeCategory);
 			default -> throw new RuntimeException("no method to create or read carrier selected.");
 		}
@@ -524,11 +524,11 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	 */
 	private static void runJsprit(Controler controler, boolean usingRangeRestriction)
 			throws ExecutionException, InterruptedException {
-		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(controler.getConfig(),
-				FreightConfigGroup.class);
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(controler.getConfig(),
+				FreightCarriersConfigGroup.class);
 		if (usingRangeRestriction)
-			freightConfigGroup.setUseDistanceConstraintForTourPlanning(
-					FreightConfigGroup.UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);
+			freightCarriersConfigGroup.setUseDistanceConstraintForTourPlanning(
+					FreightCarriersConfigGroup.UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);
 		CarrierUtils.runJsprit(controler.getScenario());
 	}
 }

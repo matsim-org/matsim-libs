@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.freight.carriers.FreightConfigGroup;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.carrier.Carriers;
 import org.matsim.vehicles.VehicleType;
 
@@ -53,8 +53,8 @@ public class NetworkBasedTransportCostsFactory implements VRPTransportCostsFacto
 
     @Override
     public VRPTransportCosts createVRPTransportCosts() {
-        FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config,
-                FreightConfigGroup.class);
+        FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config,
+                FreightCarriersConfigGroup.class);
 
         Set<VehicleType> vehicleTypes = new HashSet<>();
         carriers.getCarriers().values().forEach(
@@ -63,7 +63,7 @@ public class NetworkBasedTransportCostsFactory implements VRPTransportCostsFacto
         NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder
                 .newInstance(scenario.getNetwork(), vehicleTypes);
 
-        netBuilder.setTimeSliceWidth(freightConfigGroup.getTravelTimeSliceWidth());
+        netBuilder.setTimeSliceWidth(freightCarriersConfigGroup.getTravelTimeSliceWidth());
         netBuilder.setTravelTime(travelTimes.get(TransportMode.car));
         return netBuilder.build();
     }

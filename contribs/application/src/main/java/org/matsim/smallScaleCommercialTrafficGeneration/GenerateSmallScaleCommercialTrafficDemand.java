@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.application.options.ShpOptions.Index;
-import org.matsim.freight.carriers.FreightConfigGroup;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.carrier.*;
 import org.matsim.freight.carriers.controler.*;
 import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
@@ -177,17 +177,17 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		NetworkUtils.runNetworkCleaner(scenario.getNetwork()); // e.g. for vulkaneifel network
 
-		FreightConfigGroup freightConfigGroup;
+		FreightCarriersConfigGroup freightCarriersConfigGroup;
 		switch (usedCreationOption) {
 			case useExistingCarrierFileWithSolution -> {
 				log.info("Existing carriers (including carrier vehicle types ) should be set in the freight config group");
 				if (includeExistingModels)
 					throw new Exception(
 						"You set that existing models should included to the new model. This is only possible for a creation of the new carrier file and not by using an existing.");
-				freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-				if (config.vehicles() != null && freightConfigGroup.getCarriersVehicleTypesFile() == null)
-					freightConfigGroup.setCarriersVehicleTypesFile(config.vehicles().getVehiclesFile());
-				log.info("Load carriers from: " + freightConfigGroup.getCarriersFile());
+				freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+				if (config.vehicles() != null && freightCarriersConfigGroup.getCarriersVehicleTypesFile() == null)
+					freightCarriersConfigGroup.setCarriersVehicleTypesFile(config.vehicles().getVehiclesFile());
+				log.info("Load carriers from: " + freightCarriersConfigGroup.getCarriersFile());
 				CarrierUtils.loadCarriersAccordingToFreightConfig(scenario);
 			}
 			case useExistingCarrierFileWithoutSolution -> {
@@ -195,10 +195,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				if (includeExistingModels)
 					throw new Exception(
 						"You set that existing models should included to the new model. This is only possible for a creation of the new carrier file and not by using an existing.");
-				freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-				if (config.vehicles() != null && freightConfigGroup.getCarriersVehicleTypesFile() == null)
-					freightConfigGroup.setCarriersVehicleTypesFile(config.vehicles().getVehiclesFile());
-				log.info("Load carriers from: " + freightConfigGroup.getCarriersFile());
+				freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+				if (config.vehicles() != null && freightCarriersConfigGroup.getCarriersVehicleTypesFile() == null)
+					freightCarriersConfigGroup.setCarriersVehicleTypesFile(config.vehicles().getVehiclesFile());
+				log.info("Load carriers from: " + freightCarriersConfigGroup.getCarriersFile());
 				CarrierUtils.loadCarriersAccordingToFreightConfig(scenario);
 				solveSeparatedVRPs(scenario, null);
 			}

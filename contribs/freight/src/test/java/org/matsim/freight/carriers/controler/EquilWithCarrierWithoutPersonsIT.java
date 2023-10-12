@@ -30,7 +30,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.freight.carriers.FreightConfigGroup;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.carrier.Carrier;
 import org.matsim.freight.carriers.carrier.CarrierUtils;
 import org.matsim.freight.carriers.carrier.ScheduledTour;
@@ -120,11 +120,11 @@ public class EquilWithCarrierWithoutPersonsIT {
 	@Test
 	public void testScoringInSecondsWoTimeWindowEnforcement(){
 		setUp();
-		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class );
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule( controler.getConfig(), FreightCarriersConfigGroup.class );
 		if ( false ){
-			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.enforceBeginnings );
+			freightCarriersConfigGroup.setTimeWindowHandling( FreightCarriersConfigGroup.TimeWindowHandling.enforceBeginnings );
 		} else{
-			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
+			freightCarriersConfigGroup.setTimeWindowHandling( FreightCarriersConfigGroup.TimeWindowHandling.ignore );
 		}
 		controler.addOverridingModule( new CarrierModule( ) );
 		controler.addOverridingModule(new AbstractModule() {
@@ -147,11 +147,11 @@ public class EquilWithCarrierWithoutPersonsIT {
 	@Test
 	public void testScoringInSecondsWTimeWindowEnforcement(){
 		setUp();
-		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class );
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule( controler.getConfig(), FreightCarriersConfigGroup.class );
 		if ( true ){
-			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.enforceBeginnings );
+			freightCarriersConfigGroup.setTimeWindowHandling( FreightCarriersConfigGroup.TimeWindowHandling.enforceBeginnings );
 		} else{
-			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
+			freightCarriersConfigGroup.setTimeWindowHandling( FreightCarriersConfigGroup.TimeWindowHandling.ignore );
 		}
 		final CarrierModule carrierModule = new CarrierModule( );
 		controler.addOverridingModule( carrierModule );
@@ -175,11 +175,11 @@ public class EquilWithCarrierWithoutPersonsIT {
 	@Test
 	public void testScoringInSecondsWithWithinDayRescheduling(){
 		setUp();
-		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class );
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule( controler.getConfig(), FreightCarriersConfigGroup.class );
 		if ( true ){
-			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.enforceBeginnings );
+			freightCarriersConfigGroup.setTimeWindowHandling( FreightCarriersConfigGroup.TimeWindowHandling.enforceBeginnings );
 		} else{
-			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
+			freightCarriersConfigGroup.setTimeWindowHandling( FreightCarriersConfigGroup.TimeWindowHandling.ignore );
 		}
 		CarrierModule carrierControler = new CarrierModule();
 		controler.addOverridingModule(carrierControler);

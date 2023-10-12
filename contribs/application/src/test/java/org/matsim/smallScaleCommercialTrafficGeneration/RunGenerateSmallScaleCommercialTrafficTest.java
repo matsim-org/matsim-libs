@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.freight.carriers.FreightConfigGroup;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.carrier.Carrier;
 import org.matsim.freight.carriers.carrier.CarrierUtils;
 import org.matsim.core.config.Config;
@@ -81,7 +81,7 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		Population population = null;
 		String carriersWOSolutionFileLocation = null;
 		String carriersWSolutionFileLocation = null;
-		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 
 		for (File outputFiles : Objects.requireNonNull(Objects.requireNonNull(outputFolder.listFiles())[0].listFiles())) {
 
@@ -92,12 +92,12 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 			if (outputFiles.getName().contains("output_CarrierDemandWithPlans.xml"))
 				carriersWSolutionFileLocation = outputFiles.getPath();
 			if (outputFiles.getName().contains("output_carriersVehicleTypes.xml.gz"))
-				freightConfigGroup.setCarriersVehicleTypesFile(outputFiles.getPath());
+				freightCarriersConfigGroup.setCarriersVehicleTypesFile(outputFiles.getPath());
 		}
 
-		freightConfigGroup.setCarriersFile(carriersWOSolutionFileLocation);
+		freightCarriersConfigGroup.setCarriersFile(carriersWOSolutionFileLocation);
 		CarrierUtils.loadCarriersAccordingToFreightConfig(scenarioWOSolution);
-		freightConfigGroup.setCarriersFile(carriersWSolutionFileLocation);
+		freightCarriersConfigGroup.setCarriersFile(carriersWSolutionFileLocation);
 		CarrierUtils.loadCarriersAccordingToFreightConfig(scenarioWSolution);
 
 		assert population != null;

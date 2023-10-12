@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.freight.carriers.FreightConfigGroup.UseDistanceConstraintForTourPlanning;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup.UseDistanceConstraintForTourPlanning;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -36,23 +36,23 @@ import java.util.Map;
 /**
  * @author mrieser / Simunto
  */
-public class FreightConfigGroupTest {
+public class FreightCarriersConfigGroupTest {
 
 	@Test
 	public void test_allParametersAreWrittenToXml() {
-		FreightConfigGroup freight = new FreightConfigGroup();
+		FreightCarriersConfigGroup freight = new FreightCarriersConfigGroup();
 		Map<String, String> params = freight.getParams();
 
-		Assert.assertTrue(params.containsKey(FreightConfigGroup.CARRIERS_FILE));
-		Assert.assertTrue(params.containsKey(FreightConfigGroup.CARRIERS_VEHICLE_TYPE));
-		Assert.assertTrue(params.containsKey(FreightConfigGroup.VEHICLE_ROUTING_ALGORITHM));
-		Assert.assertTrue(params.containsKey(FreightConfigGroup.TRAVEL_TIME_SLICE_WIDTH));
-		Assert.assertTrue(params.containsKey(FreightConfigGroup.USE_DISTANCE_CONSTRAINT));
+		Assert.assertTrue(params.containsKey(FreightCarriersConfigGroup.CARRIERS_FILE));
+		Assert.assertTrue(params.containsKey(FreightCarriersConfigGroup.CARRIERS_VEHICLE_TYPE));
+		Assert.assertTrue(params.containsKey(FreightCarriersConfigGroup.VEHICLE_ROUTING_ALGORITHM));
+		Assert.assertTrue(params.containsKey(FreightCarriersConfigGroup.TRAVEL_TIME_SLICE_WIDTH));
+		Assert.assertTrue(params.containsKey(FreightCarriersConfigGroup.USE_DISTANCE_CONSTRAINT));
 	}
 
 	@Test
 	public void test_configXmlCanBeParsed() {
-		FreightConfigGroup freight = new FreightConfigGroup();
+		FreightCarriersConfigGroup freight = new FreightCarriersConfigGroup();
 		Config config = ConfigUtils.createConfig(freight);
 
 		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
