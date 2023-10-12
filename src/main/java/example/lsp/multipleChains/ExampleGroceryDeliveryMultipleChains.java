@@ -22,7 +22,7 @@ import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.freight.carriers.FreightConfigGroup;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.carrier.*;
 import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
@@ -111,8 +111,8 @@ public class ExampleGroceryDeliveryMultipleChains {
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setWriteEventsInterval(1);
 
-		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
+		FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 
 		return config;
 	}

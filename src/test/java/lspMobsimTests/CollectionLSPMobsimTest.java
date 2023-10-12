@@ -42,7 +42,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.freight.carriers.FreightConfigGroup;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.carrier.*;
 import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.testcases.MatsimTestUtils;
@@ -78,8 +78,8 @@ public class CollectionLSPMobsimTest {
 		config.controller().setFirstIteration(0);
 		config.controller().setLastIteration(0);
 
-		var freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
+		var freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 
 		// load scenario:
 		Scenario scenario = ScenarioUtils.loadScenario(config);

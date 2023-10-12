@@ -24,7 +24,7 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.freight.carriers.FreightConfigGroup;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.carrier.*;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
@@ -130,8 +130,8 @@ public class ExampleMultipleOneEchelonChainsReplanning {
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setWriteEventsInterval(1);
 
-		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
+		FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 
 		return config;
 	}

@@ -38,7 +38,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.freight.carriers.FreightConfigGroup;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.carrier.*;
 import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
@@ -203,8 +203,8 @@ import java.util.*;
 		config.controller().setLastIteration(0);
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		var freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
+		var freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 		return config;
 	}
 

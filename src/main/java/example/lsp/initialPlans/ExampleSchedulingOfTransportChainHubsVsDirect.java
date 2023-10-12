@@ -44,7 +44,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.freight.carriers.FreightConfigGroup;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.carrier.*;
 import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.controler.CarrierControlerUtils;
@@ -105,8 +105,8 @@ import java.util.*;
 		}
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
-		var freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
+		var freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 
 		log.warn("solutionType= " + solutionType);
 

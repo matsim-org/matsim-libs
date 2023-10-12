@@ -40,7 +40,7 @@ import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.freight.carriers.FreightConfigGroup;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.carrier.Carrier;
 import org.matsim.freight.carriers.carrier.Carriers;
 import org.matsim.freight.carriers.controler.*;
@@ -51,11 +51,11 @@ import java.util.List;
 public class LSPModule extends AbstractModule {
 	private static final Logger log = LogManager.getLogger(LSPModule.class);
 
-//	private final FreightConfigGroup carrierConfig = new FreightConfigGroup();
+//	private final FreightCarriersConfigGroup carrierConfig = new FreightCarriersConfigGroup();
 
 	@Override
 	public void install() {
-		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule(getConfig(), FreightConfigGroup.class);
+		FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(getConfig(), FreightCarriersConfigGroup.class);
 
 		bind(LSPControlerListener.class).in(Singleton.class);
 		addControlerListenerBinding().to(LSPControlerListener.class);
