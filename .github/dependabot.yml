@@ -4,9 +4,6 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-    groups:
-      maven:
-        patterns: ["*"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
