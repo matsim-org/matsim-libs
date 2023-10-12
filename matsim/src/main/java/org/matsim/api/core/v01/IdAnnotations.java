@@ -33,6 +33,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.KeyDeserializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -82,6 +83,15 @@ public interface IdAnnotations {
 
 		}
 
+		static class PersonIdKeyDeserializer extends KeyDeserializer {
+
+			@Override
+			public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
+				return Id.createPersonId(key);
+			}
+
+		}
+
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
@@ -125,6 +135,15 @@ public interface IdAnnotations {
 
 		}
 
+		static class LinkIdKeyDeserializer extends KeyDeserializer {
+
+			@Override
+			public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
+				return Id.createLinkId(key);
+			}
+
+		}
+
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
@@ -164,6 +183,15 @@ public interface IdAnnotations {
 			public Id<Node> deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
 				JsonNode node = jp.getCodec().readTree(jp);
 				return Id.createNodeId(node.asText());
+			}
+
+		}
+
+		static class NodeIdKeyDeserializer extends KeyDeserializer {
+
+			@Override
+			public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
+				return Id.createNodeId(key);
 			}
 
 		}
