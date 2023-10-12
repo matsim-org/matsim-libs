@@ -33,7 +33,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.freight.carriers.controler.FreightUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -181,7 +180,7 @@ public class CarrierPlanXmlReaderV2Test {
 	public void test_readStream() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		Carriers carriers = FreightUtils.addOrGetCarriers(scenario);
+		Carriers carriers = CarrierUtils.addOrGetCarriers(scenario);
 
 		String xml = """
 				<?xml version="1.0" encoding="UTF-8"?>

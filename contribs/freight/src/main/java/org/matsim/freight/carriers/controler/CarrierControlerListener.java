@@ -29,6 +29,7 @@ import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ScoringListener;
+import org.matsim.freight.carriers.carrier.CarrierUtils;
 
 import javax.annotation.Nullable;
 
@@ -77,7 +78,7 @@ public class CarrierControlerListener implements ScoringListener, ReplanningList
 		if ( strategyManager==null ) {
 			throw new RuntimeException( "You need to set CarrierStrategyManager to something meaningful to run iterations." );
 		}
-		strategyManager.run( FreightUtils.getCarriers( scenario ).getCarriers().values() , event.getIteration(), event.getReplanningContext() );
+		strategyManager.run( CarrierUtils.getCarriers( scenario ).getCarriers().values() , event.getIteration(), event.getReplanningContext() );
 	}
 
 }

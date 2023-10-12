@@ -27,7 +27,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.freight.carriers.controler.FreightUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -139,7 +138,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
 		CarrierPlan plan1 = plans.get(0);
 		plan1.getAttributes().getAttribute("jspritScore");
-		assertEquals(Double.NaN, FreightUtils.getJspritScore(plan1), testUtils.EPSILON);
+		assertEquals(Double.NaN, CarrierUtils.getJspritScore(plan1), testUtils.EPSILON);
 	}
 
 	@Test
@@ -147,7 +146,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
 		CarrierPlan plan2 = plans.get(1);
 		plan2.getAttributes().getAttribute("jspritScore");
-		assertEquals(80.0, FreightUtils.getJspritScore(plan2), testUtils.EPSILON);
+		assertEquals(80.0, CarrierUtils.getJspritScore(plan2), testUtils.EPSILON);
 	}
 
 	@Test
@@ -155,7 +154,7 @@ public class CarrierPlanXmlWriterV2_1Test {
 		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
 		CarrierPlan plan3 = plans.get(2);
 		plan3.getAttributes().getAttribute("jspritScore");
-		assertEquals(105.0, FreightUtils.getJspritScore(plan3), testUtils.EPSILON);
+		assertEquals(105.0, CarrierUtils.getJspritScore(plan3), testUtils.EPSILON);
 	}
 
 

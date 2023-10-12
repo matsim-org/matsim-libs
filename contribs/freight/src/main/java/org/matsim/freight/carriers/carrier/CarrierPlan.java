@@ -22,7 +22,6 @@
 package org.matsim.freight.carriers.carrier;
 
 import org.matsim.api.core.v01.population.BasicPlan;
-import org.matsim.freight.carriers.controler.FreightUtils;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
@@ -84,7 +83,7 @@ public class CarrierPlan implements BasicPlan, Attributable {
 	 * @return score from jsprit.
 	 */
 	public Double getJspritScore(){
-		return FreightUtils.getJspritScore(this);
+		return CarrierUtils.getJspritScore(this);
 	}
 
 	/**
@@ -92,7 +91,7 @@ public class CarrierPlan implements BasicPlan, Attributable {
 	 * This is _not_ the score from the MATSim simulation.
 	 */
 	public void setJspritScore(Double score){
-		FreightUtils.setJspritScore(this, score);
+		CarrierUtils.setJspritScore(this, score);
 	}
 
 	public Collection<ScheduledTour> getScheduledTours() {

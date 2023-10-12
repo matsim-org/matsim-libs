@@ -26,7 +26,7 @@ import org.matsim.contrib.commercialTrafficApplications.jointDemand.ChangeCommer
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.JointDemandConfigGroup;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.JointDemandModule;
 import org.matsim.freight.carriers.FreightConfigGroup;
-import org.matsim.freight.carriers.controler.FreightUtils;
+import org.matsim.freight.carriers.carrier.CarrierUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
@@ -80,9 +80,9 @@ class RunJointDemandCarExample {
         prepareConfig(config);
 
         Scenario scenario = loadScenario(config);
-        FreightUtils.loadCarriersAccordingToFreightConfig(scenario); //assumes that input file paths are set in FreightConfigGroup
+        CarrierUtils.loadCarriersAccordingToFreightConfig(scenario); //assumes that input file paths are set in FreightConfigGroup
         //alternatively, one can read in the input Carriers and CarrierVehicleTypes manually and use
-        //FreightUtils.getCarriers(scenario) and FreightUtils.getCarrierVehicleTypes(scenario)
+        //CarrierControlerUtils.getCarriers(scenario) and CarrierControlerUtils.getCarrierVehicleTypes(scenario)
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new JointDemandModule() );

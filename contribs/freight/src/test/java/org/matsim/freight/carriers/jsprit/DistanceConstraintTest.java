@@ -42,7 +42,6 @@ import org.matsim.freight.carriers.FreightConfigGroup;
 import org.matsim.freight.carriers.FreightConfigGroup.UseDistanceConstraintForTourPlanning;
 import org.matsim.freight.carriers.carrier.*;
 import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.freight.carriers.controler.FreightUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -121,7 +120,7 @@ public class DistanceConstraintTest {
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV1, 25);
 
-		FreightUtils.runJsprit(scenario);
+		CarrierUtils.runJsprit(scenario);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
 				carrierV1.getSelectedPlan().getScheduledTours().size());
@@ -200,7 +199,7 @@ public class DistanceConstraintTest {
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV2, 10);
 
-		FreightUtils.runJsprit(scenario);
+		CarrierUtils.runJsprit(scenario);
 
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
@@ -284,7 +283,7 @@ public class DistanceConstraintTest {
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV3, 10);
 
-		FreightUtils.runJsprit(scenario);
+		CarrierUtils.runJsprit(scenario);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
 				carrierV3.getSelectedPlan().getScheduledTours().size());
@@ -379,7 +378,7 @@ public class DistanceConstraintTest {
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV4, 10);
 
-		FreightUtils.runJsprit(scenario);
+		CarrierUtils.runJsprit(scenario);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
 				carrierV4.getSelectedPlan().getScheduledTours().size());
@@ -462,7 +461,7 @@ public class DistanceConstraintTest {
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV5, 10);
 
-		FreightUtils.runJsprit(scenario);
+		CarrierUtils.runJsprit(scenario);
 
 		//We need two tours, due to reloading both shipments must be transported one after the other
 		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
@@ -541,7 +540,7 @@ public class DistanceConstraintTest {
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV5, 10);
 
-		FreightUtils.runJsprit(scenario);
+		CarrierUtils.runJsprit(scenario);
 
 
 		//We need two tours, due to reloading both shipments must be transported one after the other

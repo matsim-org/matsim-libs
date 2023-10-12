@@ -25,7 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.freight.carriers.FreightConfigGroup;
-import org.matsim.freight.carriers.controler.FreightUtils;
+import org.matsim.freight.carriers.carrier.CarrierUtils;
 import org.matsim.freight.carriers.events.CarrierEventsReaders;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -96,11 +96,11 @@ public class RunFreightAnalysisEventBased {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		//load carriers according to freight config
-		FreightUtils.loadCarriersAccordingToFreightConfig( scenario );
+		CarrierUtils.loadCarriersAccordingToFreightConfig( scenario );
 
 
 		// CarrierPlanAnalysis
-		CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(FreightUtils.getCarriers(scenario));
+		CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(CarrierUtils.getCarriers(scenario));
 		carrierPlanAnalysis.runAnalysisAndWriteStats(analysisOutputDirectory);
 
 		// Prepare eventsManager - start of event based Analysis;
@@ -109,7 +109,7 @@ public class RunFreightAnalysisEventBased {
 		FreightTimeAndDistanceAnalysisEventsHandler freightTimeAndDistanceAnalysisEventsHandler = new FreightTimeAndDistanceAnalysisEventsHandler(scenario);
 		eventsManager.addHandler(freightTimeAndDistanceAnalysisEventsHandler);
 
-		CarrierLoadAnalysis carrierLoadAnalysis = new CarrierLoadAnalysis(FreightUtils.getCarriers(scenario));
+		CarrierLoadAnalysis carrierLoadAnalysis = new CarrierLoadAnalysis(CarrierUtils.getCarriers(scenario));
 		eventsManager.addHandler(carrierLoadAnalysis);
 
 		eventsManager.initProcessing();

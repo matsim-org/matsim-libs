@@ -136,7 +136,7 @@ final class CarrierAgent implements Identifiable<Carrier>
 			plan.addActivity(endActivity);
 			driverPerson.addPlan(plan);
 			plan.setPerson(driverPerson);
-			FreightUtils.putVehicle( plan, vehicle );
+			CarrierUtils.putVehicle( plan, vehicle );
 			routes.add(plan);
 			carrierDriverAgents.put(driverId, carrierDriverAgent);
 		}

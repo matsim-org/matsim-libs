@@ -19,7 +19,7 @@ public class ReceiverUtils {
 	public static final String ATTR_RECEIVER_SCORE = "score";
 	public static final String ATTR_RECEIVER_TW_COST = "twCost";
 
-	//Now using the MATSim-infrastructure to avoid problems if this element is named differently beetween (MATSim) FreightUtils and here.
+	//Now using the MATSim-infrastructure to avoid problems if this element is named differently beetween (MATSim) CarrierControlerUtils and here.
 	// I also replaced the usage here by the current MATSim syntax KMT'jan21
 //	private static final String CARRIERS_SCENARIO_ELEMENT = "carriers";
 

@@ -70,10 +70,10 @@ public final class RunChessboard {
 		freightConfigGroup.setCarriersVehicleTypesFile("vehicleTypes.xml");
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		FreightUtils.loadCarriersAccordingToFreightConfig( scenario );
+		CarrierUtils.loadCarriersAccordingToFreightConfig( scenario );
 
-		Carriers carriers = FreightUtils.addOrGetCarriers( scenario );
-		CarrierVehicleTypes types = FreightUtils.getCarrierVehicleTypes( scenario );
+		Carriers carriers = CarrierUtils.addOrGetCarriers( scenario );
+		CarrierVehicleTypes types = CarrierUtils.getCarrierVehicleTypes( scenario );
 
 		Controler controler = new Controler( scenario);
 
@@ -140,7 +140,7 @@ public final class RunChessboard {
 
 		@Override
 		public CarrierStrategyManager get() {
-			final CarrierStrategyManager strategyManager = FreightUtils.createDefaultCarrierStrategyManager();
+			final CarrierStrategyManager strategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
 			strategyManager.setMaxPlansPerAgent(5);
 			{
 				GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<>( new ExpBetaPlanChanger.Factory<CarrierPlan,Carrier>().build() );

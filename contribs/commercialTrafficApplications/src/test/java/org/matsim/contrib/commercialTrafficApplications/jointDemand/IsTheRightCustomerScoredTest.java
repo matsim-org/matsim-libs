@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.freight.carriers.FreightConfigGroup;
 import org.matsim.freight.carriers.carrier.*;
-import org.matsim.freight.carriers.controler.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -55,10 +54,10 @@ public class IsTheRightCustomerScoredTest {
         freightConfigGroup.setCarriersFile("jointDemand_carriers_car.xml");
         freightConfigGroup.setCarriersVehicleTypesFile("jointDemand_vehicleTypes.xml");
         scenario = ScenarioUtils.loadScenario(config);
-        FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+        CarrierUtils.loadCarriersAccordingToFreightConfig(scenario);
 
         //limit the fleet size of carrier pizza_1 so that it can handly only one order/job
-        FreightUtils.getCarriers(scenario).getCarriers().get(Id.create("salamiPizza", Carrier.class)).getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.FINITE);
+        CarrierUtils.getCarriers(scenario).getCarriers().get(Id.create("salamiPizza", Carrier.class)).getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.FINITE);
 
         preparePopulation(scenario);
 
@@ -107,7 +106,7 @@ public class IsTheRightCustomerScoredTest {
         Plan nonCustomerPlan = scenario.getPopulation().getPersons().get(Id.createPersonId("nonCustomer")).getSelectedPlan();
 
         //derive the service activity from the carrier plan and compare the service id (which should contain the customer id) with the person id of the expected customer
-        Carrier pizzaCarrier = FreightUtils.getCarriers(scenario).getCarriers().get(Id.create("salamiPizza", Carrier.class));
+        Carrier pizzaCarrier = CarrierUtils.getCarriers(scenario).getCarriers().get(Id.create("salamiPizza", Carrier.class));
         ScheduledTour tour = (ScheduledTour) pizzaCarrier.getSelectedPlan().getScheduledTours().toArray()[0];
         Id<CarrierService> serviceActivity = tour.getTour().getTourElements().stream()
                 .filter(tourElement -> tourElement instanceof Tour.ServiceActivity)

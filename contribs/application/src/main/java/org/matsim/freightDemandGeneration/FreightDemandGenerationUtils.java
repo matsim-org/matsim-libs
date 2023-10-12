@@ -32,7 +32,7 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.freight.carriers.carrier.Carrier;
 import org.matsim.freight.carriers.carrier.CarrierService;
 import org.matsim.freight.carriers.carrier.CarrierShipment;
-import org.matsim.freight.carriers.controler.FreightUtils;
+import org.matsim.freight.carriers.carrier.CarrierUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -103,7 +103,7 @@ public class FreightDemandGenerationUtils {
 		try (FileWriter writer = new FileWriter(file, true)) {
 			writer.write("id	x	y	type	ServiceLocation	pickupLocation	deliveryLocation\n");
 
-			for (Carrier thisCarrier : FreightUtils.getCarriers(controler.getScenario()).getCarriers().values()) {
+			for (Carrier thisCarrier : CarrierUtils.getCarriers(controler.getScenario()).getCarriers().values()) {
 				for (CarrierService thisService : thisCarrier.getServices().values()) {
 					Coord coord = FreightDemandGenerationUtils
 							.getCoordOfMiddlePointOfLink(network.getLinks().get(thisService.getLocationLinkId()));

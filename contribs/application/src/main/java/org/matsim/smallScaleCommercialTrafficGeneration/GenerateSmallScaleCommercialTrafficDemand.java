@@ -188,7 +188,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				if (config.vehicles() != null && freightConfigGroup.getCarriersVehicleTypesFile() == null)
 					freightConfigGroup.setCarriersVehicleTypesFile(config.vehicles().getVehiclesFile());
 				log.info("Load carriers from: " + freightConfigGroup.getCarriersFile());
-				FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+				CarrierUtils.loadCarriersAccordingToFreightConfig(scenario);
 			}
 			case useExistingCarrierFileWithoutSolution -> {
 				log.info("Existing carriers (including carrier vehicle types ) should be set in the freight config group");
@@ -199,7 +199,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				if (config.vehicles() != null && freightConfigGroup.getCarriersVehicleTypesFile() == null)
 					freightConfigGroup.setCarriersVehicleTypesFile(config.vehicles().getVehiclesFile());
 				log.info("Load carriers from: " + freightConfigGroup.getCarriersFile());
-				FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+				CarrierUtils.loadCarriersAccordingToFreightConfig(scenario);
 				solveSeparatedVRPs(scenario, null);
 			}
 			default -> {
@@ -237,20 +237,20 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					default -> throw new RuntimeException("No traffic type selected.");
 				}
 				if (config.controller().getRunId() == null)
-					new CarrierPlanWriter(FreightUtils.addOrGetCarriers(scenario))
+					new CarrierPlanWriter(CarrierUtils.addOrGetCarriers(scenario))
 						.write(scenario.getConfig().controller().getOutputDirectory() + "/output_CarrierDemand.xml");
 				else
-					new CarrierPlanWriter(FreightUtils.addOrGetCarriers(scenario))
+					new CarrierPlanWriter(CarrierUtils.addOrGetCarriers(scenario))
 						.write(scenario.getConfig().controller().getOutputDirectory() + "/"
 							+ scenario.getConfig().controller().getRunId() + ".output_CarrierDemand.xml");
 				solveSeparatedVRPs(scenario, regionLinksMap);
 			}
 		}
 		if (config.controller().getRunId() == null)
-			new CarrierPlanWriter(FreightUtils.addOrGetCarriers(scenario)).write(
+			new CarrierPlanWriter(CarrierUtils.addOrGetCarriers(scenario)).write(
 				scenario.getConfig().controller().getOutputDirectory() + "/output_CarrierDemandWithPlans.xml");
 		else
-			new CarrierPlanWriter(FreightUtils.addOrGetCarriers(scenario))
+			new CarrierPlanWriter(CarrierUtils.addOrGetCarriers(scenario))
 				.write(
 					scenario.getConfig().controller().getOutputDirectory() + "/" + scenario.getConfig().controller().getRunId() + ".output_CarrierDemandWithPlans.xml");
 		Controler controler = prepareControler(scenario);
@@ -270,10 +270,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		boolean splitVRPs = false;
 		int maxServicesPerCarrier = 100;
 		Map<Id<Carrier>, Carrier> allCarriers = new HashMap<>(
-			FreightUtils.getCarriers(originalScenario).getCarriers());
+			CarrierUtils.getCarriers(originalScenario).getCarriers());
 		Map<Id<Carrier>, Carrier> solvedCarriers = new HashMap<>();
 		List<Id<Carrier>> keyList = new ArrayList<>(allCarriers.keySet());
-		FreightUtils.getCarriers(originalScenario).getCarriers().values().forEach(carrier -> {
+		CarrierUtils.getCarriers(originalScenario).getCarriers().values().forEach(carrier -> {
 			if (CarrierUtils.getJspritIterations(carrier) == 0) {
 				allCarriers.remove(carrier.getId());
 				solvedCarriers.put(carrier.getId(), carrier);
@@ -369,18 +369,18 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					subCarriers.remove(id);
 				}
 			}
-			FreightUtils.getCarriers(originalScenario).getCarriers().clear();
-			FreightUtils.getCarriers(originalScenario).getCarriers().putAll(subCarriers);
+			CarrierUtils.getCarriers(originalScenario).getCarriers().clear();
+			CarrierUtils.getCarriers(originalScenario).getCarriers().putAll(subCarriers);
 			log.info("Solving carriers " + (fromIndex + 1) + "-" + (toIndex) + " of all " + allCarriers.size()
 				+ " carriers. This are " + subCarriers.size() + " VRP to solve.");
-			FreightUtils.runJsprit(originalScenario);
-			solvedCarriers.putAll(FreightUtils.getCarriers(originalScenario).getCarriers());
-			FreightUtils.getCarriers(originalScenario).getCarriers().clear();
+			CarrierUtils.runJsprit(originalScenario);
+			solvedCarriers.putAll(CarrierUtils.getCarriers(originalScenario).getCarriers());
+			CarrierUtils.getCarriers(originalScenario).getCarriers().clear();
 			if (!splitVRPs)
 				break;
 		}
-		FreightUtils.getCarriers(originalScenario).getCarriers().putAll(solvedCarriers);
-		FreightUtils.getCarriers(originalScenario).getCarriers().values().forEach(carrier -> {
+		CarrierUtils.getCarriers(originalScenario).getCarriers().putAll(solvedCarriers);
+		CarrierUtils.getCarriers(originalScenario).getCarriers().values().forEach(carrier -> {
 			if (regionLinksMap != null && !carrier.getAttributes().getAsMap().containsKey("tourStartArea")) {
 				List<String> startAreas = new ArrayList<>();
 				for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
@@ -466,7 +466,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			@Override
 			public void install() {
 				bind(CarrierStrategyManager.class).toProvider(
-					new MyCarrierPlanStrategyManagerFactory(FreightUtils.getCarrierVehicleTypes(scenario)));
+					new MyCarrierPlanStrategyManagerFactory(CarrierUtils.getCarrierVehicleTypes(scenario)));
 				bind(CarrierScoringFunctionFactory.class).toInstance(new MyCarrierScoringFunctionFactory());
 			}
 		});
@@ -490,7 +490,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		Map<StopDurationGoodTrafficKey, ValueSelectorUnderGivenProbability> stopDurationTimeSelector = createStopDurationTimeDistributionPerCategory(
 			smallScaleCommercialTrafficType);
 
-		CarrierVehicleTypes carrierVehicleTypes = FreightUtils.getCarrierVehicleTypes(scenario);
+		CarrierVehicleTypes carrierVehicleTypes = CarrierUtils.getCarrierVehicleTypes(scenario);
 		Map<Id<VehicleType>, VehicleType> additionalCarrierVehicleTypes = scenario.getVehicles().getVehicleTypes();
 		additionalCarrierVehicleTypes.values().forEach(
 			vehicleType -> carrierVehicleTypes.getVehicleTypes().putIfAbsent(vehicleType.getId(), vehicleType));
@@ -583,7 +583,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						assert possibleVehicleTypes != null;
 
 						for (String possibleVehicleType : possibleVehicleTypes) {
-							if (FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().containsKey(
+							if (CarrierUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().containsKey(
 								Id.create(possibleVehicleType, VehicleType.class)))
 								vehicleTypes.add(possibleVehicleType);
 						}
@@ -675,7 +675,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 			CarrierService thisService = CarrierService.Builder.newInstance(idNewService, linkId)
 				.setServiceDuration(serviceTimePerStop).setServiceStartTimeWindow(serviceTimeWindow).build();
-			FreightUtils.getCarriers(scenario).getCarriers().get(Id.create(carrierName, Carrier.class)).getServices()
+			CarrierUtils.getCarriers(scenario).getCarriers().get(Id.create(carrierName, Carrier.class)).getServices()
 				.put(thisService.getId(), thisService);
 		}
 
@@ -693,8 +693,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 													ValueSelectorUnderGivenProbability tourStartTimeSelector,
 													ValueSelectorUnderGivenProbability tourDurationTimeSelector) {
 
-		Carriers carriers = FreightUtils.addOrGetCarriers(scenario);
-		CarrierVehicleTypes carrierVehicleTypes = FreightUtils.getCarrierVehicleTypes(scenario);
+		Carriers carriers = CarrierUtils.addOrGetCarriers(scenario);
+		CarrierVehicleTypes carrierVehicleTypes = CarrierUtils.getCarrierVehicleTypes(scenario);
 
 		CarrierCapabilities carrierCapabilities;
 
@@ -971,7 +971,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				travelDisutility, modeTravelTimes.get(TransportMode.car));
 
 //			final GenericStrategyManager<CarrierPlan, Carrier> strategyManager = new GenericStrategyManager<>();
-			final CarrierStrategyManager strategyManager = FreightUtils.createDefaultCarrierStrategyManager();
+			final CarrierStrategyManager strategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
 			strategyManager.setMaxPlansPerAgent(5);
 			{
 				GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<>(

@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.carriers.FreightConfigGroup;
 import org.matsim.freight.carriers.carrier.*;
 import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.freight.carriers.controler.FreightUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -315,9 +314,9 @@ public final class CarrierReaderFromCSV {
 	static void checkNewCarrier(Set<CarrierInformationElement> allNewCarrierInformation,
 								FreightConfigGroup freightConfigGroup, Scenario scenario, Collection<SimpleFeature> polygonsInShape, String shapeCategory) {
 
-		FreightUtils.addOrGetCarriers(scenario);
+		CarrierUtils.addOrGetCarriers(scenario);
 		for (CarrierInformationElement carrierElement : allNewCarrierInformation) {
-			if (FreightUtils.getCarriers(scenario).getCarriers()
+			if (CarrierUtils.getCarriers(scenario).getCarriers()
 					.containsKey(Id.create(carrierElement.getName(), Carrier.class)))
 				throw new RuntimeException("The Carrier " + carrierElement.getName()
 						+ " being loaded from the csv is already in the given Carrier file. It is not possible to add to an existing Carrier. Please check!");
@@ -420,9 +419,9 @@ public final class CarrierReaderFromCSV {
 			Collection<SimpleFeature> polygonsInShape, int defaultJspritIterations,
 			CoordinateTransformation crsTransformationNetworkAndShape) {
 
-		Carriers carriers = FreightUtils.addOrGetCarriers(scenario);
+		Carriers carriers = CarrierUtils.addOrGetCarriers(scenario);
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
-		CarrierVehicleTypes usedCarrierVehicleTypes = FreightUtils.getCarrierVehicleTypes(scenario);
+		CarrierVehicleTypes usedCarrierVehicleTypes = CarrierUtils.getCarrierVehicleTypes(scenario);
 		new CarrierVehicleTypeReader(carrierVehicleTypes).readFile(freightConfigGroup.getCarriersVehicleTypesFile());
 
 		for (CarrierInformationElement singleNewCarrier : allNewCarrierInformation) {

@@ -45,7 +45,6 @@ import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.carrier.Tour.Pickup;
 import org.matsim.freight.carriers.carrier.Tour.ServiceActivity;
 import org.matsim.freight.carriers.carrier.Tour.TourElement;
-import org.matsim.freight.carriers.controler.FreightUtils;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
@@ -191,7 +190,7 @@ public class SmallScaleCommercialTrafficUtils {
 
 			Plan plan = popFactory.createPlan();
 			String carrierName = person.getId().toString().split("freight_")[1].split("_veh_")[0];
-			Carrier relatedCarrier = FreightUtils.addOrGetCarriers(scenario).getCarriers()
+			Carrier relatedCarrier = CarrierUtils.addOrGetCarriers(scenario).getCarriers()
 				.get(Id.create(carrierName, Carrier.class));
 			String subpopulation = relatedCarrier.getAttributes().getAttribute("subpopulation").toString();
 			final String mode;
@@ -460,7 +459,7 @@ public class SmallScaleCommercialTrafficUtils {
 				}
 			}
 			carrierToRemove.forEach(carrier -> carriers.getCarriers().remove(carrier.getId()));
-			FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().putAll(usedVehicleTypes.getVehicleTypes());
+			CarrierUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().putAll(usedVehicleTypes.getVehicleTypes());
 
 			carriers.getCarriers().values().forEach(carrier -> {
 				Carrier newCarrier = CarrierUtils
@@ -503,7 +502,7 @@ public class SmallScaleCommercialTrafficUtils {
 					CarrierUtils.setJspritIterations(newCarrier, CarrierUtils.getJspritIterations(carrier));
 					newCarrier.getCarrierCapabilities().setFleetSize(carrier.getCarrierCapabilities().getFleetSize());
 				}
-				FreightUtils.addOrGetCarriers(scenario).getCarriers().put(newCarrier.getId(), newCarrier);
+				CarrierUtils.addOrGetCarriers(scenario).getCarriers().put(newCarrier.getId(), newCarrier);
 			});
 		}
 	}

@@ -37,7 +37,6 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.freight.carriers.carrier.*;
-import org.matsim.freight.carriers.controler.FreightUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
@@ -79,7 +78,7 @@ public class SkillsIT {
 	}
 
 	private VehicleRoutingProblemSolution generateCarrierPlans(Scenario scenario) {
-		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(Id.create("TestCarrier", Carrier.class));
+		Carrier carrier = CarrierUtils.getCarriers(scenario).getCarriers().get(Id.create("TestCarrier", Carrier.class));
 		NetworkBasedTransportCosts networkBasedTransportCosts = NetworkBasedTransportCosts.Builder.newInstance(
 				scenario.getNetwork(), carrier.getCarrierCapabilities().getVehicleTypes())
 				.setTimeSliceWidth((int) Time.parseTime("00:30:00"))
@@ -97,9 +96,9 @@ public class SkillsIT {
 		carrier.setSelectedPlan(newPlan);
 		SolutionPrinter.print(problem, solution, SolutionPrinter.Print.VERBOSE);
 
-//		new CarrierPlanXmlWriterV3(FreightUtils.getCarriers(scenario)).write(utils.getOutputDirectory() + "carriers.xml");
+//		new CarrierPlanXmlWriterV3(CarrierControlerUtils.getCarriers(scenario)).write(utils.getOutputDirectory() + "carriers.xml");
 //		Scenario scNew = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		new CarrierPlanXmlReaderV3(FreightUtils.getCarriers(scNew)).readFile(utils.getOutputDirectory() + "carriers.xml");
+//		new CarrierPlanXmlReaderV3(CarrierControlerUtils.getCarriers(scNew)).readFile(utils.getOutputDirectory() + "carriers.xml");
 		return solution;
 	}
 
@@ -107,7 +106,7 @@ public class SkillsIT {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(utils.getClassInputDirectory() + "grid-network.xml");
 
-		Carriers carriers = FreightUtils.addOrGetCarriers(scenario );
+		Carriers carriers = CarrierUtils.addOrGetCarriers(scenario );
 		{
 			Carrier carrier = CarrierUtils.createCarrier( Id.create("TestCarrier", Carrier.class));
 			{
@@ -127,7 +126,7 @@ public class SkillsIT {
 				typeOne.getCostInformation().setFixedCost( 1000.0 ).setCostsPerMeter( 0.001 ).setCostsPerSecond( 0.001 ) ;
 //				typeOne.setCapacity(vehicleCapacity);
 				typeOne.getCapacity().setOther( 2.0 );
-				FreightUtils.addSkill(typeOne, "skill 1");
+				CarrierUtils.addSkill(typeOne, "skill 1");
 				capabilitiesBuilder.addType(typeOne);
 				CarrierVehicle vehicleOne = CarrierVehicle.Builder.newInstance(Id.createVehicleId("1"), carrierLocation, typeOne )
 						.setEarliestStart(0.0)
@@ -141,7 +140,7 @@ public class SkillsIT {
 				typeTwo.getCostInformation().setFixedCost( 1000.0 ).setCostsPerMeter( 0.001 ).setCostsPerSecond( 0.001 ) ;
 //				typeTwo.setCapacity(vehicleCapacity);
 				typeTwo.getCapacity().setOther( 2.0 );
-				FreightUtils.addSkill(typeTwo, "skill 2");
+				CarrierUtils.addSkill(typeTwo, "skill 2");
 				capabilitiesBuilder.addType(typeTwo);
 				CarrierVehicle vehicleTwo = CarrierVehicle.Builder.newInstance(Id.createVehicleId("2"), carrierLocation, typeTwo )
 						.setEarliestStart(0.0)
@@ -158,7 +157,7 @@ public class SkillsIT {
 	}
 
 	private void addShipmentsRequiringDifferentSkills(Scenario scenario) {
-		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(Id.create("TestCarrier", Carrier.class));
+		Carrier carrier = CarrierUtils.getCarriers(scenario).getCarriers().get(Id.create("TestCarrier", Carrier.class));
 		CarrierShipment shipmentOne = CarrierShipment.Builder.newInstance(
 				Id.create("1", CarrierShipment.class),
 				carrierLocation,
@@ -169,7 +168,7 @@ public class SkillsIT {
 				.setDeliveryTimeWindow(TimeWindow.newInstance(0.0, Time.parseTime("24:00:00")))
 				.setDeliveryServiceTime(Time.parseTime("00:05:00"))
 				.build();
-		FreightUtils.addSkill(shipmentOne, "skill 1");
+		CarrierUtils.addSkill(shipmentOne, "skill 1");
 		CarrierUtils.addShipment(carrier, shipmentOne);
 
 		CarrierShipment shipmentTwo = CarrierShipment.Builder.newInstance(
@@ -182,12 +181,12 @@ public class SkillsIT {
 				.setDeliveryTimeWindow(TimeWindow.newInstance(0.0, Time.parseTime("24:00:00")))
 				.setDeliveryServiceTime(Time.parseTime("00:05:00"))
 				.build();
-		FreightUtils.addSkill(shipmentTwo, "skill 2");
+		CarrierUtils.addSkill(shipmentTwo, "skill 2");
 		CarrierUtils.addShipment(carrier, shipmentTwo);
 	}
 
 	private void addShipmentsRequiringSameSkills(Scenario scenario) {
-		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(Id.create("TestCarrier", Carrier.class));
+		Carrier carrier = CarrierUtils.getCarriers(scenario).getCarriers().get(Id.create("TestCarrier", Carrier.class));
 		CarrierShipment shipmentOne = CarrierShipment.Builder.newInstance(
 				Id.create("1", CarrierShipment.class),
 				carrierLocation,
@@ -198,7 +197,7 @@ public class SkillsIT {
 				.setDeliveryTimeWindow(TimeWindow.newInstance(0.0, Time.parseTime("24:00:00")))
 				.setDeliveryServiceTime(Time.parseTime("00:05:00"))
 				.build();
-		FreightUtils.addSkill(shipmentOne, "skill 1");
+		CarrierUtils.addSkill(shipmentOne, "skill 1");
 		CarrierUtils.addShipment(carrier, shipmentOne);
 
 		CarrierShipment shipmentTwo = CarrierShipment.Builder.newInstance(
@@ -211,7 +210,7 @@ public class SkillsIT {
 				.setDeliveryTimeWindow(TimeWindow.newInstance(0.0, Time.parseTime("24:00:00")))
 				.setDeliveryServiceTime(Time.parseTime("00:05:00"))
 				.build();
-		FreightUtils.addSkill(shipmentTwo, "skill 1");
+		CarrierUtils.addSkill(shipmentTwo, "skill 1");
 		CarrierUtils.addShipment(carrier, shipmentTwo);
 	}
 

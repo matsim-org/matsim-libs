@@ -108,7 +108,7 @@ final class RunPassengerAlongWithCarriers {
 	public final Scenario prepareScenario(Config config) {
 		Gbl.assertNotNull( config );
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		FreightUtils.addOrGetCarriers(scenario);
+		CarrierUtils.addOrGetCarriers(scenario);
 		return scenario;
 	}
 
@@ -153,7 +153,7 @@ final class RunPassengerAlongWithCarriers {
 			final TravelDisutility travelDisutility = CarrierTravelDisutilities.createBaseDisutility(types, modeTravelTimes.get(TransportMode.car ) );
 			final LeastCostPathCalculator router = leastCostPathCalculatorFactory.createPathCalculator(network, travelDisutility, modeTravelTimes.get(TransportMode.car));
 
-			final CarrierStrategyManager carrierStrategyManager = FreightUtils.createDefaultCarrierStrategyManager();
+			final CarrierStrategyManager carrierStrategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
 			carrierStrategyManager.setMaxPlansPerAgent(5);
 
 			carrierStrategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 0.95);

@@ -98,7 +98,7 @@ public final class CarrierModule extends AbstractModule {
 		bind( CarrierStrategyManager.class ).toProvider( () -> null );
 		// (the null binding means that a zeroth iteration will run. kai, jul'22)
 
-		this.addControlerListenerBinding().toInstance((ShutdownListener) event -> writeAdditionalRunOutput( event.getServices().getControlerIO(), event.getServices().getConfig(), FreightUtils.getCarriers( event.getServices().getScenario() ) ));
+		this.addControlerListenerBinding().toInstance((ShutdownListener) event -> writeAdditionalRunOutput( event.getServices().getControlerIO(), event.getServices().getConfig(), CarrierUtils.getCarriers( event.getServices().getScenario() ) ));
 
 	}
 
@@ -146,7 +146,7 @@ public final class CarrierModule extends AbstractModule {
 	private static class CarrierProvider implements Provider<Carriers> {
 		@Inject Scenario scenario;
 		@Override public Carriers get() {
-			return FreightUtils.getCarriers(scenario);
+			return CarrierUtils.getCarriers(scenario);
 		}
 	}
 }

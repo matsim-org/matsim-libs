@@ -36,7 +36,6 @@ import org.matsim.freight.carriers.FreightConfigGroup;
 import org.matsim.freight.carriers.controler.CarrierModule;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
-import org.matsim.freight.carriers.controler.FreightUtils;
 import org.matsim.freight.carriers.mobsim.DistanceScoringFunctionFactoryForTests;
 import org.matsim.freight.carriers.mobsim.StrategyManagerFactoryForTests;
 import org.matsim.testcases.MatsimTestUtils;
@@ -74,7 +73,7 @@ public class CarrierModuleTest {
 
         Scenario scenario = ScenarioUtils.loadScenario( config );
 
-	    FreightUtils.loadCarriersAccordingToFreightConfig( scenario );
+	    CarrierUtils.loadCarriersAccordingToFreightConfig( scenario );
 
 	    controler = new Controler(scenario);
     }

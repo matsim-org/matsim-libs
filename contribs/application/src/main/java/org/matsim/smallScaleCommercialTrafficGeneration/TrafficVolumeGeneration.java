@@ -31,7 +31,6 @@ import org.matsim.freight.carriers.carrier.*;
 import org.matsim.freight.carriers.carrier.Tour.Pickup;
 import org.matsim.freight.carriers.carrier.Tour.ServiceActivity;
 import org.matsim.freight.carriers.carrier.Tour.TourElement;
-import org.matsim.freight.carriers.controler.FreightUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -278,7 +277,7 @@ public class TrafficVolumeGeneration {
 			HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
 			HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop) {
 
-		for (Carrier carrier : FreightUtils.addOrGetCarriers(scenario).getCarriers().values()) {
+		for (Carrier carrier : CarrierUtils.addOrGetCarriers(scenario).getCarriers().values()) {
 			if (!carrier.getAttributes().getAsMap().containsKey("subpopulation")
 					|| !carrier.getAttributes().getAttribute("subpopulation").equals(smallScaleCommercialTrafficType))
 				continue;

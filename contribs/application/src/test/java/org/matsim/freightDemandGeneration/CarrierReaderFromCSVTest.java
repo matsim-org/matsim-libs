@@ -18,7 +18,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.freight.carriers.FreightConfigGroup;
-import org.matsim.freight.carriers.controler.FreightUtils;
 import org.matsim.freight.carriers.carrier.Carrier;
 import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.carrier.CarrierUtils;
@@ -62,16 +61,16 @@ public class CarrierReaderFromCSVTest {
 		CarrierReaderFromCSV.checkNewCarrier(allNewCarrierInformation, freightConfigGroup, scenario, polygonsInShape, shapeCategory);
 		CarrierReaderFromCSV.createNewCarrierAndAddVehicleTypes(scenario, allNewCarrierInformation, freightConfigGroup,
 				polygonsInShape, 1, null);
-		Assert.assertEquals(3, FreightUtils.getCarriers(scenario).getCarriers().size());
+		Assert.assertEquals(3, CarrierUtils.getCarriers(scenario).getCarriers().size());
 		Assert.assertTrue(
-				FreightUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier1", Carrier.class)));
+				CarrierUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier1", Carrier.class)));
 		Assert.assertTrue(
-				FreightUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier2", Carrier.class)));
+				CarrierUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier2", Carrier.class)));
 		Assert.assertTrue(
-				FreightUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier3", Carrier.class)));
+				CarrierUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("testCarrier3", Carrier.class)));
 
 		// check carrier 1
-		Carrier testCarrier1 = FreightUtils.getCarriers(scenario).getCarriers()
+		Carrier testCarrier1 = CarrierUtils.getCarriers(scenario).getCarriers()
 				.get(Id.create("testCarrier1", Carrier.class));
 		Assert.assertEquals(FleetSize.INFINITE, testCarrier1.getCarrierCapabilities().getFleetSize());
 		Assert.assertEquals(10, CarrierUtils.getJspritIterations(testCarrier1));
@@ -101,7 +100,7 @@ public class CarrierReaderFromCSVTest {
 		Assert.assertTrue(typesPerDepot.get("j(2,4)R").contains("testVehicle2"));
 
 		// check carrier 2
-		Carrier testCarrier2 = FreightUtils.getCarriers(scenario).getCarriers()
+		Carrier testCarrier2 = CarrierUtils.getCarriers(scenario).getCarriers()
 				.get(Id.create("testCarrier2", Carrier.class));
 		Assert.assertEquals(FleetSize.FINITE, testCarrier2.getCarrierCapabilities().getFleetSize());
 		Assert.assertEquals(15, CarrierUtils.getJspritIterations(testCarrier2));
@@ -126,7 +125,7 @@ public class CarrierReaderFromCSVTest {
 		// check carrier 3
 		Network network = NetworkUtils.readNetwork(
 				"https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml");
-		Carrier testCarrier3 = FreightUtils.getCarriers(scenario).getCarriers()
+		Carrier testCarrier3 = CarrierUtils.getCarriers(scenario).getCarriers()
 				.get(Id.create("testCarrier3", Carrier.class));
 		Assert.assertEquals(FleetSize.INFINITE, testCarrier3.getCarrierCapabilities().getFleetSize());
 		Assert.assertEquals(1, CarrierUtils.getJspritIterations(testCarrier3));

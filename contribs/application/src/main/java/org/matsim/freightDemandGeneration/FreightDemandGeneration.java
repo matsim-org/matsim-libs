@@ -29,10 +29,10 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.freight.carriers.FreightConfigGroup;
 import org.matsim.freight.carriers.carrier.Carrier;
 import org.matsim.freight.carriers.carrier.CarrierPlanWriter;
+import org.matsim.freight.carriers.carrier.CarrierUtils;
 import org.matsim.freight.carriers.carrier.Carriers;
 import org.matsim.freight.carriers.controler.CarrierModule;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
-import org.matsim.freight.carriers.controler.FreightUtils;
 import org.matsim.freight.carriers.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -316,7 +316,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 					throw new RuntimeException("No path to the carrier file selected");
 				else {
 					freightConfigGroup.setCarriersFile(carriersFileLocation);
-					FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+					CarrierUtils.loadCarriersAccordingToFreightConfig(scenario);
 					log.info("Load carriers from: " + carriersFileLocation);
 					CarrierReaderFromCSV.readAndCreateCarrierFromCSV(scenario, freightConfigGroup, csvLocationCarrier,
 							polygonsInShape, defaultJspritIterations, crsTransformationNetworkAndShape, shapeCategory);
@@ -328,7 +328,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 					throw new RuntimeException("No path to the carrier file selected");
 				else {
 					freightConfigGroup.setCarriersFile(carriersFileLocation);
-					FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+					CarrierUtils.loadCarriersAccordingToFreightConfig(scenario);
 					log.info("Load carriers from: " + carriersFileLocation);
 				}
 			}
@@ -415,7 +415,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 			case useDemandFromCarrierFile -> {
 				// use only the given demand of the read carrier file
 				boolean oneCarrierHasJobs = false;
-				for (Carrier carrier : FreightUtils.getCarriers(scenario).getCarriers().values())
+				for (Carrier carrier : CarrierUtils.getCarriers(scenario).getCarriers().values())
 					if (carrier.getServices().isEmpty() && carrier.getShipments().isEmpty())
 						log.warn(carrier.getId().toString() + " has no jobs which can be used");
 					else {
@@ -529,6 +529,6 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		if (usingRangeRestriction)
 			freightConfigGroup.setUseDistanceConstraintForTourPlanning(
 					FreightConfigGroup.UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);
-		FreightUtils.runJsprit(controler.getScenario());
+		CarrierUtils.runJsprit(controler.getScenario());
 	}
 }

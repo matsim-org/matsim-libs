@@ -37,7 +37,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.freight.carriers.carrier.*;
 import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.freight.carriers.controler.FreightUtils;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts.Builder;
@@ -54,7 +53,7 @@ import java.util.Collection;
  * @author kturner
  *
  */
-public class FreightUtilsIT {
+public class CarrierControlerUtilsIT {
 
 	private final Id<Carrier> CARRIER_SERVICES_ID = Id.create("CarrierWServices", Carrier.class);
 	private final Id<Carrier> CARRIER_SHIPMENTS_ID = Id.create("CarrierWShipments", Carrier.class);
@@ -149,7 +148,7 @@ public class FreightUtilsIT {
 		 */
 
 		//Convert to jsprit VRP
-		Carriers carriersWithShipmentsOnly = FreightUtils.createShipmentVRPCarrierFromServiceVRPSolution(
+		Carriers carriersWithShipmentsOnly = CarrierUtils.createShipmentVRPCarrierFromServiceVRPSolution(
 				carriersWithServicesAndShpiments );
 
 		// assign vehicle types to the carriers
