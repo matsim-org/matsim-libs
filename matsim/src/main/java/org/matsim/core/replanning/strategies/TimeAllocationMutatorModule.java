@@ -42,14 +42,15 @@ import jakarta.inject.Provider;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
- * Wraps the {@link org.matsim.core.population.algorithms.PlanMutateTimeAllocation}-
+ * Wraps the {@link org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation}-
  * PlanAlgorithm into a {@link PlanStrategyModule} so it can be used for plans
  * replanning. Supports multiple threads.
  *
  * @author mrieser
- * @see org.matsim.core.population.algorithms.PlanMutateTimeAllocation
+ * @see org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation
  */
 class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 
@@ -59,7 +60,6 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 
 	private final double mutationRange;
 	private final boolean affectingDuration;
-//	private final String subpopulationAttribute;
 	private final Map<String, Double> subpopulationMutationRanges;
 	private final Map<String, Boolean> subpopulationAffectingDuration;
 	private final PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation;
@@ -74,7 +74,6 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 		this.affectingDuration = affectingDuration;
 		this.mutationRange = mutationRange;
 		this.activityDurationInterpretation = (config.plans().getActivityDurationInterpretation());
-//		this.subpopulationAttribute = null;
 		this.subpopulationMutationRanges = null;
 		this.subpopulationAffectingDuration = null;
 		log.warn("deprecated constructor was used - individual time allocation mutator settings for subpopulations is not supported!");
@@ -93,9 +92,7 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 
 		// in case we have subpopulations and individual settings for them
 		if (
-//				plansConfigGroup.getSubpopulationAttributeName() != null &&
-				timeAllocationMutatorConfigGroup.isUseIndividualSettingsForSubpopulations() && population != null) {
-//			this.subpopulationAttribute = plansConfigGroup.getSubpopulationAttributeName();
+			timeAllocationMutatorConfigGroup.isUseIndividualSettingsForSubpopulations() && population != null) {
 			this.subpopulationMutationRanges = new HashMap<>();
 			this.subpopulationAffectingDuration = new HashMap<>();
 
@@ -108,7 +105,6 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 				log.info("Found individual time mutator settings for subpopulation: " + subpopulation);
 			}
 		} else {
-//			this.subpopulationAttribute = null;
 			this.subpopulationMutationRanges = null;
 			this.subpopulationAffectingDuration = null;
 		}
@@ -117,13 +113,11 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		PlanAlgorithm pmta;
-		switch (this.activityDurationInterpretation) {
-		case minOfDurationAndEndTime:
+		if (Objects.requireNonNull(this.activityDurationInterpretation) == PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime) {
 			pmta = new TripPlanMutateTimeAllocation(this.mutationRange, this.affectingDuration, MatsimRandom.getLocalInstance(),
 					this.subpopulationMutationRanges, this.subpopulationAffectingDuration);
-			break;
-		default:
-			if(this.affectingDuration) {
+		} else {
+			if (this.affectingDuration) {
 				if (!ACTIVITY_DURATION_WARNING_SHOWN) {
 					log.warn("Please be aware that durations of activities now can mutate freely and possibly become negative." +
 							"This might be a problem if you have \n" +
