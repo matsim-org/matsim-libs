@@ -42,7 +42,6 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 								ParkingSearchManager parkingManager, Id<Vehicle> vehicleId, MobsimTimer timer, EventsManager events) {
 		super(currentPlannedLeg.getMode(), route, logic, parkingManager, vehicleId, timer, events);
 		this.followingActivity = (Activity) plan.getPlanElements().get(planIndexNextActivity);
-		followingActivity.setStartTime(timer.getTimeOfDay());
 		this.currentPlannedLeg = currentPlannedLeg;
 		this.plan = plan;
 		this.planIndexNextActivity = planIndexNextActivity;
@@ -110,6 +109,7 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 			if (hasFoundParking || reachedDestinationWithoutParking) {
 				// easy, we can just park where at our destination link
 				if (hasFoundParking && !passangerInteractionAtParkingFacilityAtEndOfLeg) {
+					//calculate parkingTime for parking_activity
 					double parkingDuration;
 					double expectedDrivingDurationToPickup;
 					double drivingDurationFromGetOff = timer.getTimeOfDay() - currentPlannedLeg.getDepartureTime().seconds();
