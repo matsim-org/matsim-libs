@@ -255,7 +255,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 				}
 				this.lastParkActionState = LastParkActionState.WALKTOPARK;
 				this.currentlyAssignedVehicleId = vehicleId;
-				this.stageInteractionType = ParkingUtils.PARKACTIVITYTYPE;
+				this.stageInteractionType = ParkingUtils.ParkingStageInteractionType;
 				return new StaticPassengerDynLeg(walkLeg.getRoute(), walkLeg.getMode());
 			} else if (currentLeg.getMode().equals(TransportMode.pt)) {
 				if (currentLeg.getRoute() instanceof TransitPassengerRoute) {

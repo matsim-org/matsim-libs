@@ -144,7 +144,7 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 					throw new RuntimeException(message);
 				}
 				this.currentlyAssignedVehicleId = vehicleId;
-				this.stageInteractionType = ParkingUtils.PARKACTIVITYTYPE;
+				this.stageInteractionType = ParkingUtils.ParkingStageInteractionType;
 				if (!walkLeg.getTravelTime().equals(OptionalTime.defined(0.))) {
 					this.lastParkActionState = LastParkActionState.WALKTOPARK;
 					return new StaticPassengerDynLeg(walkLeg.getRoute(), walkLeg.getMode());

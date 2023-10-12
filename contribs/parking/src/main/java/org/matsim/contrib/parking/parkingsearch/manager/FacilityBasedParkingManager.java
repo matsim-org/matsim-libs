@@ -69,7 +69,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		canParkOnlyAtFacilities = psConfigGroup.getCanParkOnlyAtFacilities();
 		this.network = scenario.getNetwork();
 		parkingFacilities = scenario.getActivityFacilities()
-			.getFacilitiesForActivityType(ParkingUtils.PARKACTIVITYTYPE);
+			.getFacilitiesForActivityType(ParkingUtils.ParkingStageInteractionType);
 		LogManager.getLogger(getClass()).info(parkingFacilities.toString());
 		this.timeBinSize = 15 * 60;
 		this.maxTime = 24 * 3600 - 1;
@@ -160,7 +160,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		}
 		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
 		for (Id<ActivityFacility> fac : parkingFacilitiesAtLink) {
-			double cap = this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE)
+			double cap = this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.ParkingStageInteractionType)
 				.getCapacity();
 			this.reservationsRequests.get(fac).increment();
 			if (this.occupation.get(fac).doubleValue() < cap) {
@@ -228,7 +228,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		for (Entry<Id<ActivityFacility>, MutableLong> e : this.occupation.entrySet()) {
 			Id<Link> linkId = this.parkingFacilities.get(e.getKey()).getLinkId();
 			double capacity = this.parkingFacilities.get(e.getKey()).getActivityOptions()
-				.get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
+				.get(ParkingUtils.ParkingStageInteractionType).getCapacity();
 			double x = this.parkingFacilities.get(e.getKey()).getCoord().getX();
 			double y = this.parkingFacilities.get(e.getKey()).getCoord().getY();
 
@@ -257,7 +257,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
 		if (!(parkingFacilitiesAtLink == null)) {
 			for (Id<ActivityFacility> fac : parkingFacilitiesAtLink) {
-				allSpaces += this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
+				allSpaces += this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.ParkingStageInteractionType).getCapacity();
 			}
 		}
 		return allSpaces;
@@ -270,7 +270,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 			return 0;
 		} else {
 			for (Id<ActivityFacility> fac : parkingFacilitiesAtLink) {
-				int cap = (int) this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
+				int cap = (int) this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.ParkingStageInteractionType).getCapacity();
 				allFreeSpaces += (cap - this.occupation.get(fac).intValue());
 			}
 		}
