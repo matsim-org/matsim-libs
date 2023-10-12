@@ -131,7 +131,7 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 				((Activity) plan.getPlanElements().get(planIndex)).setEndTime(now);
 				((Activity) plan.getPlanElements().get(planIndex + 4)).setStartTime(now + ((Activity) plan.getPlanElements().get(planIndex + 2)).getMaximumDuration().seconds());
 				// checks if it is possible to stay from getOff until getIn
-				boolean possibleToStay = checkIfParkingFacilityFollowsAndPossibleToStay(this.planIndex,this.planIndex + 2);
+				boolean possibleToStay = checkIfParkingIsPossibleUntilNextActivities(this.planIndex,this.planIndex + 2);
 				if (possibleToStay)
 					return nextStateAfterNonCarTrip(oldAction, now);
 			}
@@ -221,7 +221,7 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 		Activity nextPlannedActivity = (Activity) this.currentPlanElement;
 		// checks if you can extend parking here until getIn
 		if (nextPlannedActivity.getType().equals(ParkingUtils.ParkingActivityType) && plan.getPlanElements().get(planIndex + 2) instanceof Leg) {
-			checkIfParkingFacilityFollowsAndPossibleToStay(planIndex + 1,planIndex + 1);
+			checkIfParkingIsPossibleUntilNextActivities(planIndex + 1,planIndex + 1);
 		}
 		// switch back to activity
 		planIndex++;
@@ -241,7 +241,7 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 
 	}
 
-	private boolean checkIfParkingFacilityFollowsAndPossibleToStay(int indexOfCurrentActivity, int indexOfParkingActivity) {
+	private boolean checkIfParkingIsPossibleUntilNextActivities(int indexOfCurrentActivity, int indexOfParkingActivity) {
 		int indexOfFollowingActivity = indexOfCurrentActivity + 2;
 		Activity followingActivity = ((Activity) plan.getPlanElements().get(indexOfFollowingActivity));
 		//checks if it is possible to stay from the current getOff until the getIn
