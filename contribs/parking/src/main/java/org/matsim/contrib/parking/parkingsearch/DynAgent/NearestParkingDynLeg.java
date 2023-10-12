@@ -8,16 +8,14 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
-import org.matsim.contrib.parking.parkingsearch.events.RemoveParkingActivityEvent;
-import org.matsim.contrib.parking.parkingsearch.events.ReserveParkingLocationEvent;
-import org.matsim.contrib.parking.parkingsearch.events.SelectNewParkingLocationEvent;
-import org.matsim.contrib.parking.parkingsearch.events.StartParkingSearchEvent;
+import org.matsim.contrib.parking.parkingsearch.events.*;
 import org.matsim.contrib.parking.parkingsearch.manager.FacilityBasedParkingManager;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
 import org.matsim.contrib.parking.parkingsearch.search.NearestParkingSpotSearchLogic;
 import org.matsim.contrib.parking.parkingsearch.search.ParkingSearchLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
@@ -138,8 +136,16 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 					}
 				}
 				// need to find the next link
-				double nextPickupTime = followingActivity.getStartTime().seconds() + followingActivity.getMaximumDuration().seconds();
-				double maxParkingDuration = nextPickupTime - timer.getTimeOfDay();
+				double nextPickupTime;
+				double maxParkingDuration;
+				if (passangerInteractionAtParkingFacilityAtEndOfLeg){
+					nextPickupTime = 0.;
+					maxParkingDuration = followingActivity.getMaximumDuration().seconds();
+				}
+				else {
+					nextPickupTime = currentPlannedLeg.getDepartureTime().seconds() + followingActivity.getMaximumDuration().seconds();
+					maxParkingDuration = nextPickupTime - timer.getTimeOfDay();
+				}
 				Id<Link> nextLinkId = ((NearestParkingSpotSearchLogic) this.logic).getNextLink(currentLinkId, route.getEndLinkId(), vehicleId, mode,
 					timer.getTimeOfDay(), maxParkingDuration, nextPickupTime, passangerInteractionAtParkingFacilityAtEndOfLeg,
 					followingActivity.getCoord());
