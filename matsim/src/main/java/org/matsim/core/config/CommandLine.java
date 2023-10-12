@@ -21,6 +21,7 @@
 
  package org.matsim.core.config;
 
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -139,6 +140,8 @@ public class CommandLine {
 
 	final private boolean positionalArgumentsAllowed;
 	final private boolean allowAnyOption;
+
+	private final ConfigAliases configAliases = new ConfigAliases();
 
 	// Configuration part
 
@@ -554,6 +557,8 @@ public class CommandLine {
 		if (separatorIndex > -1) {
 			String module = remainder.substring(0, separatorIndex);
 			String newRemainder = remainder.substring(separatorIndex + 1);
+
+			module = this.configAliases.resolveAlias(module, new ArrayDeque<>());
 
 			if (config.getModules().containsKey(module)) {
 				processParameter(option, module, config.getModules().get(module), newRemainder);
