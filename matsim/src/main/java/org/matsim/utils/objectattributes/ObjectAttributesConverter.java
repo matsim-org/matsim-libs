@@ -60,6 +60,7 @@ public class ObjectAttributesConverter {
 		this.converters.put(Coord.class.getName(), new CoordConverter());
 		this.converters.put(Coord[].class.getName(), new CoordArrayConverter());
 		this.converters.put(PersonVehicles.class.getName(), new PersonVehiclesAttributeConverter());
+		this.converters.put(PersonVehicleTypesAttributeConverter.class.getName(), new PersonVehicleTypesAttributeConverter());
 	}
 
 	//this is for reading

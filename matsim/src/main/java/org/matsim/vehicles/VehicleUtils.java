@@ -41,6 +41,7 @@ public final class VehicleUtils {
 
 	private static final VehicleType DEFAULT_VEHICLE_TYPE = VehicleUtils.getFactory().createVehicleType(Id.create("defaultVehicleType", VehicleType.class));
 	private static final String VEHICLE_ATTRIBUTE_KEY = "vehicles";
+	private static final String VEHICLE_TYPES_ATTRIBUTE_KEY = "vehicleTypes";
 
 	// should remain under the hood --> should remain private
 	private static final String DOOR_OPERATION_MODE = "doorOperationMode" ;
@@ -192,17 +193,17 @@ public final class VehicleUtils {
 	 * @param modeToVehicleType mode string mapped to vehicle type ids. The provided map is copied and stored as unmodifiable map.
 	 */
 	public static void insertVehicleTypesIntoAttributes(Person person, Map<String, Id<VehicleType>> modeToVehicleType) {
-		Object attr = person.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_KEY);
+		Object attr = person.getAttributes().getAttribute(VEHICLE_TYPES_ATTRIBUTE_KEY);
 
 		Map<String, Id<VehicleType>> modeToTypesCopy = new HashMap<>(modeToVehicleType);
-		PersonVehicles personVehicles;
+		PersonVehicleTypes personVehiclesTypes;
 		if (attr == null) {
-			personVehicles = new PersonVehicles();
+			personVehiclesTypes = new PersonVehicleTypes();
 		} else {
-			personVehicles = (PersonVehicles) attr;
+			personVehiclesTypes = (PersonVehicleTypes) attr;
 		}
-		personVehicles.addModeVehicleTypes(modeToTypesCopy);
-		person.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_KEY, personVehicles);
+		personVehiclesTypes.putModeVehicleTypes(modeToTypesCopy);
+		person.getAttributes().putAttribute(VEHICLE_TYPES_ATTRIBUTE_KEY, personVehiclesTypes);
 	}
 
 	//******** general VehicleType attributes ************

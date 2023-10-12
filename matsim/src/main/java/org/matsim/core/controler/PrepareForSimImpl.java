@@ -238,7 +238,8 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 					// write mode-string to vehicle-id into a map
 					.collect(Collectors.toMap(tuple -> tuple.getFirst().getKey(), Tuple::getSecond));
 
-			// TODO: check if vehicle type already present
+			// TODO: check if vehicle type is already present
+			// TODO: store vehicle type in attribute that can be used here
 
 
 			VehicleUtils.insertVehicleIdsIntoAttributes(person, modeToVehicle);
