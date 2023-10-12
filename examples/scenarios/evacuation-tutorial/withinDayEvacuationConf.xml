@@ -17,7 +17,6 @@
 
 		<!-- The size of the time bin (in sec) into which the link travel times are aggregated for the router -->
 		<param name="travelTimeBinSize" value="300" />
-		<param name="travelTimeCalculator" value="TravelTimeCalculatorHashMap" />
 	</module>
 
 

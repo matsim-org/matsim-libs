@@ -533,8 +533,6 @@
 		<param name="travelTimeAggregator" value="optimistic" />
 		<!-- The size of the time bin (in sec) into which the link travel times are aggregated for the router -->
 		<param name="travelTimeBinSize" value="900" />
-		<!-- possible values: TravelTimeCalculatorArray TravelTimeCalculatorHashMap  -->
-		<param name="travelTimeCalculator" value="TravelTimeCalculatorArray" />
 		<!-- How to deal with link entry times at different positions during the time bin. Currently supported: average, linearinterpolation -->
 		<param name="travelTimeGetter" value="average" />
 	</module>
