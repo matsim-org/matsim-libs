@@ -58,7 +58,7 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 	Random r = MatsimRandom.getLocalInstance();
 	protected List<String> parkings = new ArrayList<>();
 
-	Map<Id<Vehicle>, Id<Link>> parkedVehicles = new HashMap<Id<Vehicle>, Id<Link>>();
+	protected Map<Id<Vehicle>, Id<Link>> parkedVehicles = new HashMap<Id<Vehicle>, Id<Link>>();
 
 	/**
 	 *
