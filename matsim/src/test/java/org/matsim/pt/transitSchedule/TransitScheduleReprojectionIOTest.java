@@ -177,6 +177,7 @@ public class TransitScheduleReprojectionIOTest {
 			config.transit().setTransitScheduleFile( withAttributes );
 			config.transit().setUseTransit( true );
 			config.transit().setInputScheduleCRS( INITIAL_CRS );
+			config.network().setInputFile("multimodalnetwork.xml");
 			// yyyyyy Is it so plausible that this is given here when the test is about having this in the file? kai, sep'18
 			config.global().setCoordinateSystem( TARGET_CRS );
 			config.controller().setLastIteration( -1 );

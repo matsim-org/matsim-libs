@@ -66,7 +66,6 @@ public class PtScoringTest {
 	@Test
 	public void test_PtScoringLineswitch() {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		ScoringConfigGroup pcs = config.scoring() ;
 
 		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
@@ -219,7 +218,6 @@ public class PtScoringTest {
 	@Test
 	public void test_PtScoringLineswitchAndPtConstant() {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		ScoringConfigGroup pcs = config.scoring() ;
 
 		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform))
@@ -375,7 +373,6 @@ public class PtScoringTest {
 	@Test
 	public void test_PtScoring_Wait() {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"));
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		ScoringConfigGroup pcs = config.scoring();
 
 		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
@@ -462,7 +459,6 @@ public class PtScoringTest {
 	@Test
 	public void test_PtScoring() {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"));
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		ScoringConfigGroup pcs = config.scoring() ;
 
 		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform))
