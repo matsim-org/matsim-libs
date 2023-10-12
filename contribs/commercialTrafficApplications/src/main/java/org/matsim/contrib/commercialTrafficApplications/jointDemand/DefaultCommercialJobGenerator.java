@@ -36,18 +36,18 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlanWriter;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierUtils;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.carrier.CarrierConstants;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.TimeWindow;
-import org.matsim.contrib.freight.carrier.Tour;
-import org.matsim.contrib.freight.jsprit.VRPTransportCostsFactory;
+import org.matsim.freight.carriers.carrier.Carrier;
+import org.matsim.freight.carriers.carrier.CarrierPlanWriter;
+import org.matsim.freight.carriers.carrier.CarrierService;
+import org.matsim.freight.carriers.carrier.CarrierUtils;
+import org.matsim.freight.carriers.carrier.CarrierVehicle;
+import org.matsim.freight.carriers.carrier.CarrierVehicleTypes;
+import org.matsim.freight.carriers.carrier.Carriers;
+import org.matsim.freight.carriers.carrier.CarrierConstants;
+import org.matsim.freight.carriers.carrier.ScheduledTour;
+import org.matsim.freight.carriers.carrier.TimeWindow;
+import org.matsim.freight.carriers.carrier.Tour;
+import org.matsim.freight.carriers.jsprit.VRPTransportCostsFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -223,7 +223,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 		plan.addActivity(startActivity);
 
 		for (Tour.TourElement tourElement : scheduledTour.getTour().getTourElements()) {
-			if (tourElement instanceof org.matsim.contrib.freight.carrier.Tour.Leg) {
+			if (tourElement instanceof Tour.Leg) {
 
 				// Take information from scheduled leg and create a defaultLeg
 				Tour.Leg tourLeg = (Tour.Leg) tourElement;

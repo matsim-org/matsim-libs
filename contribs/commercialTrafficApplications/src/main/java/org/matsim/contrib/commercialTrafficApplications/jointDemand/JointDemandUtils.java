@@ -22,9 +22,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.freight.carriers.carrier.Carrier;
+import org.matsim.freight.carriers.carrier.CarrierVehicle;
+import org.matsim.freight.carriers.carrier.Carriers;
 
 import javax.annotation.Nullable;
 import java.util.*;

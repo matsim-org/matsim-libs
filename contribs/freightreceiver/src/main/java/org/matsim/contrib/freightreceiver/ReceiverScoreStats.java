@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.controler.FreightUtils;
+import org.matsim.freight.carriers.controler.FreightUtils;
 import org.matsim.contrib.freightreceiver.collaboration.CollaborationUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.IterationEndsEvent;

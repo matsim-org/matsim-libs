@@ -22,8 +22,8 @@ package org.matsim.contrib.freightreceiver;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.freight.carriers.carrier.Carrier;
+import org.matsim.freight.carriers.carrier.TimeWindow;
 import org.matsim.contrib.freightreceiver.collaboration.CollaborationUtils;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.io.MatsimXmlParser;

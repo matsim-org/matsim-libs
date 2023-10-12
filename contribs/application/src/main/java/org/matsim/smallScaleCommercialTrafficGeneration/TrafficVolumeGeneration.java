@@ -27,11 +27,11 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.carrier.Tour.Pickup;
-import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
-import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.controler.FreightUtils;
+import org.matsim.freight.carriers.carrier.*;
+import org.matsim.freight.carriers.carrier.Tour.Pickup;
+import org.matsim.freight.carriers.carrier.Tour.ServiceActivity;
+import org.matsim.freight.carriers.carrier.Tour.TourElement;
+import org.matsim.freight.carriers.controler.FreightUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 
