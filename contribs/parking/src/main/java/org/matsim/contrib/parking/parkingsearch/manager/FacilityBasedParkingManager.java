@@ -213,7 +213,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 				return true;
 			} else {
 				throw new RuntimeException("no parking reservation found for vehicle " + vehicleId.toString()
-					+ "arrival on link " + linkId + " with parking restriction");
+					+ " arrival on link " + linkId + " with parking restriction");
 			}
 		}
 	}
