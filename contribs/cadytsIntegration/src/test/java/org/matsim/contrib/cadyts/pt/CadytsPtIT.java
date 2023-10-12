@@ -39,12 +39,11 @@ import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.utils.CalibrationStatReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ControllerConfigGroup.MobsimType;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -82,11 +81,11 @@ public class CadytsPtIT {
 		String inputDir = this.utils.getClassInputDirectory();
 
 		Config config = createTestConfig(inputDir, this.utils.getOutputDirectory());
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 		StrategySettings stratSets = new StrategySettings();
 		stratSets.setStrategyName("ccc") ;
 		stratSets.setWeight(1.) ;
-		config.strategy().addStrategySettings(stratSets) ;
+		config.replanning().addStrategySettings(stratSets) ;
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		final Controler controler = new Controler(scenario);
@@ -104,9 +103,9 @@ public class CadytsPtIT {
 			}
 		});
 
-		controler.getConfig().controler().setCreateGraphs(false);
-        controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.getConfig().controler().setDumpDataAtEnd(true);
+		controler.getConfig().controller().setCreateGraphs(false);
+        controler.getConfig().controller().setWriteEventsInterval(0);
+		controler.getConfig().controller().setDumpDataAtEnd(true);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -144,19 +143,19 @@ public class CadytsPtIT {
 
 		final Config config = createTestConfig(inputDir, outputDir);
 
-		config.controler().setLastIteration(lastIteration) ;
+		config.controller().setLastIteration(lastIteration) ;
 
-		config.planCalcScore().setBrainExpBeta(beta) ;
+		config.scoring().setBrainExpBeta(beta) ;
 
 		StrategySettings stratSets = new StrategySettings() ;
 		stratSets.setStrategyName("ChangeExpBeta") ;
 		stratSets.setWeight(1.0) ;
-		config.strategy().addStrategySettings(stratSets) ;
+		config.replanning().addStrategySettings(stratSets) ;
 
 		// ===
 
 		final Controler controler = new Controler(config);
-		controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controller().setCreateGraphs(false);
 		controler.addOverridingModule(new CadytsPtModule());
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
@@ -298,22 +297,22 @@ public class CadytsPtIT {
 
 		Config config = createTestConfig(inputDir, outputDir) ;
 
-		config.controler().setWriteEventsInterval(0) ;
-		config.controler().setLastIteration(lastIteration) ;
+		config.controller().setWriteEventsInterval(0) ;
+		config.controller().setLastIteration(lastIteration) ;
 		// seems to need 15 iterations as "warm-up"; at least the cadyts corrections are much smaller until then.
 
-		config.planCalcScore().setBrainExpBeta(beta) ;
+		config.scoring().setBrainExpBeta(beta) ;
 
 		StrategySettings stratSets = new StrategySettings();
 		stratSets.setStrategyName("ccc") ;
 		stratSets.setWeight(1.) ;
-		config.strategy().addStrategySettings(stratSets) ;
+		config.replanning().addStrategySettings(stratSets) ;
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 
 		final Controler controler = new Controler( scenario );
-        controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(true);
+        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(true);
 
 		controler.addOverridingModule(new CadytsPtModule());
 		controler.addOverridingModule(new AbstractModule() {
@@ -448,16 +447,16 @@ public class CadytsPtIT {
 
 		Config config = createTestConfig(inputDir, this.utils.getOutputDirectory());
 
-		config.controler().setLastIteration(lastIteration) ;
-		config.controler().setWritePlansInterval(1) ;
-		config.controler().setWriteEventsInterval(1) ;
+		config.controller().setLastIteration(lastIteration) ;
+		config.controller().setWritePlansInterval(1) ;
+		config.controller().setWriteEventsInterval(1) ;
 
 		config.ptCounts().setPtCountsInterval(1) ;
 
 		StrategySettings stratSets = new StrategySettings();
 		stratSets.setStrategyName("ccc") ;
 		stratSets.setWeight(1.) ;
-		config.strategy().addStrategySettings(stratSets) ;
+		config.replanning().addStrategySettings(stratSets) ;
 
 		CadytsConfigGroup cConfig = (CadytsConfigGroup) config.getModule(CadytsConfigGroup.GROUP_NAME) ;
 		cConfig.setTimeBinSize(7200) ;
@@ -483,9 +482,9 @@ public class CadytsPtIT {
 			}
 		});
 
-		controler.getConfig().controler().setCreateGraphs(false);
-        controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.getConfig().controler().setDumpDataAtEnd(true);
+		controler.getConfig().controller().setCreateGraphs(false);
+        controler.getConfig().controller().setWriteEventsInterval(0);
+		controler.getConfig().controller().setDumpDataAtEnd(true);
 		controler.run();
 
 		// ====================================
@@ -621,11 +620,11 @@ public class CadytsPtIT {
 		// ---
 		config.transit().setUseTransit(true) ;
 		// ---
-		config.controler().setFirstIteration(1) ;
-		config.controler().setLastIteration(10) ;
-		config.controler().setOutputDirectory(outputDir) ;
-		config.controler().setWriteEventsInterval(1) ;
-		config.controler().setMobsim(MobsimType.qsim.toString()) ;
+		config.controller().setFirstIteration(1) ;
+		config.controller().setLastIteration(10) ;
+		config.controller().setOutputDirectory(outputDir) ;
+		config.controller().setWriteEventsInterval(1) ;
+		config.controller().setMobsim(MobsimType.qsim.toString()) ;
 		// ---
 
 		config.qsim().setFlowCapFactor(0.02) ;
@@ -641,11 +640,11 @@ public class CadytsPtIT {
 		// ---
 		{
 			ActivityParams params = new ActivityParams("h") ;
-			config.planCalcScore().addActivityParams(params ) ;
+			config.scoring().addActivityParams(params ) ;
 			params.setTypicalDuration(12*60*60.) ;
 		}{
 			ActivityParams params = new ActivityParams("w") ;
-			config.planCalcScore().addActivityParams(params ) ;
+			config.scoring().addActivityParams(params ) ;
 			params.setTypicalDuration(8*60*60.) ;
 		}
 		// ---

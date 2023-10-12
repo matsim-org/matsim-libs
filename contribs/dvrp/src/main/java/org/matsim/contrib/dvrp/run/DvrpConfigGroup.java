@@ -143,7 +143,7 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurable
 		if (config.qsim().isRemoveStuckVehicles()) {
 			throw new RuntimeException("Stuck DynAgents cannot be removed from simulation");
 		}
-		if (!config.parallelEventHandling().getSynchronizeOnSimSteps()) {
+		if (!config.eventsManager().getSynchronizeOnSimSteps()) {
 			throw new RuntimeException("Synchronization on sim steps is required");
 		}
 	}

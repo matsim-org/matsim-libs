@@ -28,9 +28,9 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  * @author nagel
  *
  */
-public final class ParallelEventHandlingConfigGroup extends ReflectiveConfigGroup {
+public final class EventsManagerConfigGroup extends ReflectiveConfigGroup {
 
-	public static final String GROUP_NAME = "parallelEventHandling";
+	public static final String GROUP_NAME = "eventsManager";
 
 	private final static String NUMBER_OF_THREADS = "numberOfThreads";
 	private Integer numberOfThreads = null;
@@ -39,10 +39,10 @@ public final class ParallelEventHandlingConfigGroup extends ReflectiveConfigGrou
 	private final static String ESTIMATED_NUMBER_OF_EVENTS = "estimatedNumberOfEvents";
 	private Long estimatedNumberOfEvents = null;
 
-	private final static String SYNCHRONIZE_ON_SIMSTEPS = "synchronizeOnSimSteps"; 
+	private final static String SYNCHRONIZE_ON_SIMSTEPS = "synchronizeOnSimSteps";
 	private Boolean synchronizeOnSimSteps = true;
-	
-	private final static String ONE_THREAD_PER_HANDLER = "oneThreadPerHandler"; 
+
+	private final static String ONE_THREAD_PER_HANDLER = "oneThreadPerHandler";
 	private Boolean oneThreadPerHandler = false;
 
 	private final static String EVENTS_QUEUE_SIZE = "eventsQueueSize";
@@ -53,7 +53,7 @@ public final class ParallelEventHandlingConfigGroup extends ReflectiveConfigGrou
 
 	private boolean locked = false;
 
-	public ParallelEventHandlingConfigGroup() {
+	public EventsManagerConfigGroup() {
 		super(GROUP_NAME);
 	}
 
@@ -80,7 +80,7 @@ public final class ParallelEventHandlingConfigGroup extends ReflectiveConfigGrou
 
 	/**
 	 * {@value #NUMBER_OF_THREADS_COMMENT}
-	 * 
+	 *
 	 * @param numberOfThreads
 	 */
 	@StringSetter( NUMBER_OF_THREADS )
@@ -143,7 +143,7 @@ public final class ParallelEventHandlingConfigGroup extends ReflectiveConfigGrou
 			throw new RuntimeException("it is too late in the control flow to modify this parameter");
 		}
 	}
-	
+
 	public void makeLocked() {
 		this.locked = true;
 	}

@@ -114,9 +114,9 @@ public class FacilitiesReprojectionIOTest {
 				TARGET_CRS,
 				ProjectionUtils.getCRS(scenario.getActivityFacilities()));
 
-		config.controler().setLastIteration( -1 );
+		config.controller().setLastIteration( -1 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
-		config.controler().setOutputDirectory( outputDirectory );
+		config.controller().setOutputDirectory( outputDirectory );
 		final Controler controler = new Controler( scenario );
 		controler.run();
 
@@ -179,9 +179,9 @@ public class FacilitiesReprojectionIOTest {
 					epsilon );
 		}
 
-		config.controler().setLastIteration( -1 );
+		config.controller().setLastIteration( -1 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
-		config.controler().setOutputDirectory( outputDirectory );
+		config.controller().setOutputDirectory( outputDirectory );
 		final Controler controler = new Controler( scenario );
 		controler.run();
 

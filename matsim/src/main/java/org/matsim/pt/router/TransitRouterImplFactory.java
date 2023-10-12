@@ -42,8 +42,8 @@ public class TransitRouterImplFactory implements Provider<TransitRouter> {
 	@Inject
 	TransitRouterImplFactory(final TransitSchedule schedule, final EventsManager events, final Config config) {
 		this(schedule, new TransitRouterConfig(
-				config.planCalcScore(),
-				config.plansCalcRoute(),
+				config.scoring(),
+				config.routing(),
 				config.transitRouter(),
 				config.vspExperimental()));
 		events.addHandler((TransitScheduleChangedEventHandler) event -> {

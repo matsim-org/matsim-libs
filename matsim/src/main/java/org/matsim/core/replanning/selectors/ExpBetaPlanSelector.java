@@ -24,10 +24,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 
 /**
@@ -40,12 +39,12 @@ public class ExpBetaPlanSelector<T extends BasicPlan, I> implements PlanSelector
 
 	protected static final double MIN_WEIGHT = Double.MIN_VALUE;
 	protected final double beta;
-	
+
 	public ExpBetaPlanSelector( final double logitScaleFactor ) {
 		this.beta = logitScaleFactor ;
 	}
 
-	public ExpBetaPlanSelector(PlanCalcScoreConfigGroup charyparNagelScoringConfigGroup) {
+	public ExpBetaPlanSelector(ScoringConfigGroup charyparNagelScoringConfigGroup) {
 		this( charyparNagelScoringConfigGroup.getBrainExpBeta() ) ;
 	}
 

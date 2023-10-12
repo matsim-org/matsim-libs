@@ -40,7 +40,7 @@ class ModalDistanceCadytsBuilder {
 		validateTimeBinSize(cadytsConfig.getTimeBinSize());
 
 		AnalyticalCalibrator<Id<DistanceDistribution.DistanceBin>> calibrator = new AnalyticalCalibrator<>(
-				config.controler().getOutputDirectory() + "/cadyts" + MARGINALS + ".log",
+				config.controller().getOutputDirectory() + "/cadyts" + MARGINALS + ".log",
 				MatsimRandom.getLocalInstance().nextLong(),
 				cadytsConfig.getTimeBinSize()
 		);
@@ -51,7 +51,7 @@ class ModalDistanceCadytsBuilder {
 		calibrator.setFreezeIteration(cadytsConfig.getFreezeIteration());
 		calibrator.setPreparatoryIterations(cadytsConfig.getPreparatoryIterations());
 		calibrator.setVarianceScale(cadytsConfig.getVarianceScale());
-		calibrator.setStatisticsFile(config.controler().getOutputDirectory() + "/calibration-stats"+MARGINALS+".txt");
+		calibrator.setStatisticsFile(config.controller().getOutputDirectory() + "/calibration-stats"+MARGINALS+".txt");
 
 		calibrator.setBruteForce(cadytsConfig.useBruteForce());
 		// I don't think this has an influence on any of the variants we are using. (Has an influence only when plan choice is left

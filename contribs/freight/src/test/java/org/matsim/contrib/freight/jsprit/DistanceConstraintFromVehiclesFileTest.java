@@ -35,7 +35,7 @@ import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -81,7 +81,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 	public final void CarrierSmallBatteryTest_Version1() throws ExecutionException, InterruptedException {
 
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -130,7 +130,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 				MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30000, maxDistance_vehicleType_SmallV1,
 				MatsimTestUtils.EPSILON);
-		
+
 		double distanceTour = 0.0;
 		List<Tour.TourElement> elements = carrierV1.getSelectedPlan().getScheduledTours().iterator().next().getTour()
 				.getTourElements();
@@ -154,7 +154,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 	@Test
 	public final void CarrierLargeBatteryTest_Version2() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -185,8 +185,8 @@ public class DistanceConstraintFromVehiclesFileTest {
 		CarrierUtils.setJspritIterations(carrierV2, 10);
 
 		FreightUtils.runJsprit(scenario);
-		
-		
+
+
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
 				carrierV2.getSelectedPlan().getScheduledTours().size());
 
@@ -230,7 +230,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 	@Test
 	public final void Carrier2SmallBatteryTest_Version3() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -311,7 +311,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 	@Test
 	public final void CarrierWithAdditionalDieselVehicleTest_Version4() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -359,7 +359,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30000, maxDistance_vehicleType_SmallV4,
 				MatsimTestUtils.EPSILON);
-		
+
 		for (ScheduledTour scheduledTour : carrierV4.getSelectedPlan().getScheduledTours()) {
 
 			String thisTypeId = scheduledTour.getVehicle().getType().getId().toString();
@@ -391,14 +391,14 @@ public class DistanceConstraintFromVehiclesFileTest {
 	 */
 	private void prepareConfig(Config config) {
 		config.network().setInputFile(IOUtils.extendUrl(SCENARIO_URL, "grid9x9.xml").toString());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		new OutputDirectoryHierarchy(config.controler().getOutputDirectory(), config.controler().getRunId(),
-				config.controler().getOverwriteFileSetting(), CompressionType.gzip);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		new OutputDirectoryHierarchy(config.controller().getOutputDirectory(), config.controller().getRunId(),
+				config.controller().getOverwriteFileSetting(), CompressionType.gzip);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 		config.global().setRandomSeed(4177);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
 		freightConfigGroup.setUseDistanceConstraintForTourPlanning(UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);

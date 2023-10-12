@@ -75,8 +75,8 @@ public class RunFreightAnalysisEventBased {
 		config.network().setInputFile(SIM_OUTPUT_PATH + "output_network.xml.gz");
 		config.global().setCoordinateSystem(GLOBAL_CRS);
 		config.plans().setInputFile(null);
-		config.parallelEventHandling().setNumberOfThreads(null);
-		config.parallelEventHandling().setEstimatedNumberOfEvents(null);
+		config.eventsManager().setNumberOfThreads(null);
+		config.eventsManager().setEstimatedNumberOfEvents(null);
 		config.global().setNumberOfThreads(1);
 		//freight settings
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;

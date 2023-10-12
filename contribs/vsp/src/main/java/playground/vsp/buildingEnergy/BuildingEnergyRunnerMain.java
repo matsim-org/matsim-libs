@@ -57,7 +57,7 @@ public abstract class BuildingEnergyRunnerMain {
 	private static final  int LENGTH = 2;
 
 	/**
-	 * 
+	 *
 	 * @param args {configfile agents2exclude.csv}
 	 */
 	public static void main(String[] args) {
@@ -72,7 +72,7 @@ public abstract class BuildingEnergyRunnerMain {
 			System.exit(-1);
 		}
 		OutputDirectoryLogging.catchLogEntries();
-		
+
 		log.info("running " + BuildingEnergyRunnerMain.class.getName() );
 		String configFilename = args[0];
 		String agents2exclude = args[1];
@@ -84,14 +84,14 @@ public abstract class BuildingEnergyRunnerMain {
 		Scenario sc = loadScenario(c, agents2exclude);
 		// run
 		Controler controler = new Controler(sc);
-		controler.getConfig().controler().setOverwriteFileSetting(
+		controler.getConfig().controller().setOverwriteFileSetting(
 				overwrite ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.addControlerListener(new MyControlerListener(c, sc.getNetwork()));
 		controler.run();
 	}
-	
+
 	/**
 	 * @param configFilename
 	 * @param agents2exclude
@@ -139,33 +139,33 @@ public abstract class BuildingEnergyRunnerMain {
 	// static class which plug the analysis to the services and generates some more output (distance- & tt-shares)
 	private static class MyControlerListener implements IterationStartsListener,
 												IterationEndsListener{
-		
+
 		private SimpleTripAnalyzer analyzer;
-		
+
 		MyControlerListener(Config c, Network net){
 			analyzer =  new SimpleTripAnalyzer(c, net, null);
 		}
-		
+
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
-			if(event.getIteration() == event.getServices().getConfig().controler().getLastIteration()){
+			if(event.getIteration() == event.getServices().getConfig().controller().getLastIteration()){
 				analyzer.reset(event.getIteration());
 				event.getServices().getEvents().addHandler(analyzer);
 			}
 		}
-		
+
 		@Override
 		public void notifyIterationEnds(IterationEndsEvent event) {
-			if(event.getIteration() == event.getServices().getConfig().controler().getLastIteration()){
+			if(event.getIteration() == event.getServices().getConfig().controller().getLastIteration()){
                 analyzer.run(event.getServices().getScenario().getPopulation());
 				String path = event.getServices().getControlerIO().getOutputPath() + System.getProperty("file.separator");
-				String prefix = event.getServices().getConfig().controler().getRunId() + ".";
+				String prefix = event.getServices().getConfig().controller().getRunId() + ".";
 				analyzer.dumpData(path, prefix);
 				calcWriteDistanceDistribution(analyzer.getTraveller(), path + prefix + "distanceShare.csv.gz");
 				calcAndWriteTTDistribution(analyzer.getTraveller(), path + prefix + "ttShare.csv.gz");
 			}
 		}
-		
+
 		/**
 		 * @param traveller
 		 */
@@ -194,7 +194,7 @@ public abstract class BuildingEnergyRunnerMain {
 			}
 			dumpData(map, file);
 		}
-		
+
 		/**
 		 * @param traveller
 		 */
@@ -223,7 +223,7 @@ public abstract class BuildingEnergyRunnerMain {
 			}
 			dumpData(map, file);
 		}
-		
+
 		/**
 		 * @param map
 		 * @param file
@@ -249,7 +249,7 @@ public abstract class BuildingEnergyRunnerMain {
 				e.printStackTrace();
 			}
 		}
-		
+
 		/**
 		 * @param temp
 		 * @param dist
@@ -262,9 +262,9 @@ public abstract class BuildingEnergyRunnerMain {
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		private Map<Integer, Integer> getColumn(Map<String, Map<Integer,Integer>> map, List<Integer> distribution, String mode){
 			if(map.containsKey(mode)) return map.get(mode);
 			Map<Integer, Integer> temp = new LinkedHashMap<Integer, Integer>();
@@ -274,9 +274,9 @@ public abstract class BuildingEnergyRunnerMain {
 			map.put(mode, temp);
 			return temp;
 		}
-		
+
 	}
-	
+
 }
 
 

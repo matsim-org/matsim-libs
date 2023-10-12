@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimManager;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.replanning.choosers.StrategyChooser;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
@@ -65,20 +65,20 @@ public class StrategyManager implements MatsimManager {
 	private final GenericStrategyManagerImpl<Plan, Person> delegate;
 
 	@Inject
-	StrategyManager( StrategyConfigGroup strategyConfigGroup,
-			 ControlerConfigGroup controlerConfigGroup, StrategyChooser<Plan, Person> strategyChooser,
-			 Map<StrategyConfigGroup.StrategySettings, PlanStrategy> planStrategies ) {
+	StrategyManager(ReplanningConfigGroup replanningConfigGroup,
+									ControllerConfigGroup controllerConfigGroup, StrategyChooser<Plan, Person> strategyChooser,
+									Map<ReplanningConfigGroup.StrategySettings, PlanStrategy> planStrategies ) {
 
 		this(strategyChooser);
-		setMaxPlansPerAgent(strategyConfigGroup.getMaxAgentPlanMemorySize());
+		setMaxPlansPerAgent(replanningConfigGroup.getMaxAgentPlanMemorySize());
 
-		int globalInnovationDisableAfter = (int) ((controlerConfigGroup.getLastIteration() - controlerConfigGroup.getFirstIteration())
-				* strategyConfigGroup.getFractionOfIterationsToDisableInnovation() + controlerConfigGroup.getFirstIteration());
+		int globalInnovationDisableAfter = (int) ((controllerConfigGroup.getLastIteration() - controllerConfigGroup.getFirstIteration())
+				* replanningConfigGroup.getFractionOfIterationsToDisableInnovation() + controllerConfigGroup.getFirstIteration());
 		log.info("global innovation switch off after iteration: " + globalInnovationDisableAfter);
 
-		for (Map.Entry<StrategyConfigGroup.StrategySettings, PlanStrategy> entry : planStrategies.entrySet()) {
+		for (Map.Entry<ReplanningConfigGroup.StrategySettings, PlanStrategy> entry : planStrategies.entrySet()) {
 			PlanStrategy strategy = entry.getValue();
-			StrategyConfigGroup.StrategySettings settings = entry.getKey();
+			ReplanningConfigGroup.StrategySettings settings = entry.getKey();
 			addStrategy(strategy, settings.getSubpopulation(), settings.getWeight());
 
 			// now check if this modules should be disabled after some iterations
@@ -90,7 +90,7 @@ public class StrategyManager implements MatsimManager {
 			}
 
 			if (maxIter >= 0) {
-				if (maxIter >= controlerConfigGroup.getFirstIteration()) {
+				if (maxIter >= controllerConfigGroup.getFirstIteration()) {
 					addChangeRequest(maxIter + 1, strategy, settings.getSubpopulation(), 0.0);
 				} else {
 					/* The services starts at a later iteration than this change request is scheduled for.

@@ -46,7 +46,7 @@ import org.matsim.utils.MemoryObserver;
 
 
     private Integer thisIteration = null;
-    
+
     protected AbstractController() {
         this(new ControlerListenerManagerImpl(), new IterationStopWatch(), null);
     }
@@ -97,7 +97,7 @@ import org.matsim.utils.MemoryObserver;
     protected abstract void runMobSim();
 
     protected abstract void prepareForSim();
-    
+
     protected abstract void prepareForMobsim() ;
 
     /**
@@ -112,11 +112,11 @@ import org.matsim.utils.MemoryObserver;
 	protected abstract boolean shouldTerminate(int iteration);
 
     private void doIterations(Config config) throws MatsimRuntimeModifications.UnexpectedShutdownException {
-    	int iteration = config.controler().getFirstIteration();
-    	
+    	int iteration = config.controller().getFirstIteration();
+
     	// Special case if lastIteration == -1 -> Do not run any Mobsim
-    	boolean doTerminate = config.controler().getLastIteration() < iteration;
-    	
+    	boolean doTerminate = config.controller().getLastIteration() < iteration;
+
     	while (!doTerminate) {
     		boolean isLastIteration = mayTerminateAfterIteration(iteration);
     		iteration(config, iteration, isLastIteration);
@@ -124,7 +124,7 @@ import org.matsim.utils.MemoryObserver;
     		iteration++;
     	}
     }
-    
+
     final String MARKER = "### ";
 
     private void iteration(final Config config, final int iteration, boolean isLastIteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
@@ -143,7 +143,7 @@ import org.matsim.utils.MemoryObserver;
             }
         });
 
-        if (iteration > config.controler().getFirstIteration()) {
+        if (iteration > config.controller().getFirstIteration()) {
             iterationStep("replanning", new Runnable() {
                 @Override
                 public void run() {
@@ -176,7 +176,7 @@ import org.matsim.utils.MemoryObserver;
         } catch (UncheckedIOException e) {
             log.error("Could not write stopwatch file.", e);
         }
-        if (config.controler().isCreateGraphs()) {
+        if (config.controller().isCreateGraphs()) {
             this.getStopwatch().writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch"));
         }
         log.info(MARKER + "ITERATION " + iteration + " ENDS");
@@ -196,7 +196,7 @@ import org.matsim.utils.MemoryObserver;
                     controlerListenerManagerImpl.fireControlerBeforeMobsimEvent(iteration, isLastIteration);
                 }
             });
-            
+
             iterationStep( "prepareForMobsim", new Runnable(){
                     @Override
                 public void run() {

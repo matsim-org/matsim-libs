@@ -51,7 +51,7 @@ public class RunEventsToTravelDiaries {
         printHelp();
         try {
             config = ConfigUtils.loadConfig(args[0]);
-            outputDirectory = config.controler().getOutputDirectory();
+            outputDirectory = config.controller().getOutputDirectory();
 
             eventsFileName = args[1];
 

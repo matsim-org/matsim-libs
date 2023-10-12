@@ -39,8 +39,8 @@ public class MobsimListenerTest {
     @Test
     public void testRunMobsim_listenerTransient() {
         Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-        cfg.controler().setLastIteration(1);
-        cfg.controler().setWritePlansInterval(0);
+        cfg.controller().setLastIteration(1);
+        cfg.controller().setWritePlansInterval(0);
         final Controler c = new Controler(cfg);
         c.addOverridingModule(new AbstractModule() {
             @Override
@@ -48,17 +48,17 @@ public class MobsimListenerTest {
                 addMobsimListenerBinding().to(CountingMobsimListener.class);
             }
         });
-        c.getConfig().controler().setCreateGraphs(false);
-        c.getConfig().controler().setDumpDataAtEnd(false);
-        c.getConfig().controler().setWriteEventsInterval(0);
+        c.getConfig().controller().setCreateGraphs(false);
+        c.getConfig().controller().setDumpDataAtEnd(false);
+        c.getConfig().controller().setWriteEventsInterval(0);
         c.run();
     }
 
     @Test(expected = RuntimeException.class)
     public void testRunMobsim_listenerSingleton() {
         Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-        cfg.controler().setLastIteration(1);
-        cfg.controler().setWritePlansInterval(0);
+        cfg.controller().setLastIteration(1);
+        cfg.controller().setWritePlansInterval(0);
         final Controler c = new Controler(cfg);
         c.addOverridingModule(new AbstractModule() {
             @Override
@@ -66,9 +66,9 @@ public class MobsimListenerTest {
                 addMobsimListenerBinding().to(SingletonCountingMobsimListener.class);
             }
         });
-        c.getConfig().controler().setCreateGraphs(false);
-        c.getConfig().controler().setDumpDataAtEnd(false);
-        c.getConfig().controler().setWriteEventsInterval(0);
+        c.getConfig().controller().setCreateGraphs(false);
+        c.getConfig().controller().setDumpDataAtEnd(false);
+        c.getConfig().controller().setWriteEventsInterval(0);
         c.run();
     }
 

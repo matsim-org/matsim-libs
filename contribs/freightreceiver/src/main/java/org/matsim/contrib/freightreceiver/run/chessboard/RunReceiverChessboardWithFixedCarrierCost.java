@@ -65,7 +65,7 @@ public class RunReceiverChessboardWithFixedCarrierCost {
 			true);
 
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setLastIteration(50);
+		controler.getConfig().controller().setLastIteration(50);
 
 		/* Set up the receiver module. */
 		ReceiverModule receiverModule = new ReceiverModule(ReceiverUtils.createFixedReceiverCostAllocation(100.0));
@@ -85,7 +85,7 @@ public class RunReceiverChessboardWithFixedCarrierCost {
 	 * TODO This is less elegant than the embedded score stats for the receiver.
 	 */
 	static void prepareFreightOutputDataAndStats(MatsimServices controler) {
-		CarrierScoreStats scoreStats = new CarrierScoreStats(FreightUtils.getCarriers(controler.getScenario()), controler.getScenario().getConfig().controler().getOutputDirectory() + "/carrier_scores", true);
+		CarrierScoreStats scoreStats = new CarrierScoreStats(FreightUtils.getCarriers(controler.getScenario()), controler.getScenario().getConfig().controller().getOutputDirectory() + "/carrier_scores", true);
 		controler.addControlerListener(scoreStats);
 	}
 

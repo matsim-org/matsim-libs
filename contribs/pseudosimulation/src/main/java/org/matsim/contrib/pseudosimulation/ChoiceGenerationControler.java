@@ -43,9 +43,9 @@ public class ChoiceGenerationControler implements BeforeMobsimListener{
         Scenario scenario;
 public ChoiceGenerationControler(String[] args) {
     config = ConfigUtils.loadConfig(args[0]);
-    config.parallelEventHandling().setSynchronizeOnSimSteps(false);
-    config.parallelEventHandling().setNumberOfThreads(1);
-    config.planCalcScore().setWriteExperiencedPlans(true);
+    config.eventsManager().setSynchronizeOnSimSteps(false);
+    config.eventsManager().setNumberOfThreads(1);
+    config.scoring().setWriteExperiencedPlans(true);
     scenario = ScenarioUtils.loadScenario(config);
     controler = new Controler(scenario);
 

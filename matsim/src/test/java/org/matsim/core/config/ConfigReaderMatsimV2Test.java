@@ -2,7 +2,7 @@ package org.matsim.core.config;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
@@ -30,10 +30,32 @@ public class ConfigReaderMatsimV2Test {
 				""";
 		ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
 
-		r2.addAlias("theController", ControlerConfigGroup.GROUP_NAME);
+		r2.getConfigAliases().addAlias("theController", ControllerConfigGroup.GROUP_NAME);
 		r2.readStream(bais);
 
-		Assert.assertEquals(27, config.controler().getLastIteration());
+		Assert.assertEquals(27, config.controller().getLastIteration());
+	}
+
+	@Test
+	public void testModuleNameAlias_noOldModules() {
+		Config config = ConfigUtils.createConfig();
+		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
+
+		String xml = """
+				<?xml version="1.0" ?>
+				<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+				<config>
+					<module name="controler">
+						<param name="lastIteration" value="27"/>
+					</module>
+				</config>
+				""";
+		ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
+
+		r2.readStream(bais);
+
+		Assert.assertEquals(27, config.controller().getLastIteration());
+		Assert.assertNull(config.getModules().get("controler"));
 	}
 
 	@Test
@@ -52,10 +74,10 @@ public class ConfigReaderMatsimV2Test {
 				""";
 		ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
 
-		r2.addAlias("theLastIteration", "lastIteration");
+		r2.getConfigAliases().addAlias("theLastIteration", "lastIteration");
 		r2.readStream(bais);
 
-		Assert.assertEquals(23, config.controler().getLastIteration());
+		Assert.assertEquals(23, config.controller().getLastIteration());
 	}
 
 	@Test
@@ -74,11 +96,44 @@ public class ConfigReaderMatsimV2Test {
 				""";
 		ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
 
-		r2.addAlias("theController", ControlerConfigGroup.GROUP_NAME);
-		r2.addAlias("theLastIteration", "lastIteration");
+		r2.getConfigAliases().addAlias("theController", ControllerConfigGroup.GROUP_NAME);
+		r2.getConfigAliases().addAlias("theLastIteration", "lastIteration");
 		r2.readStream(bais);
 
-		Assert.assertEquals(23, config.controler().getLastIteration());
+		Assert.assertEquals(23, config.controller().getLastIteration());
+	}
+
+	/**
+	 * Test that a parameter can be renamed inside a renamed module.
+	 */
+	@Test
+	public void testConditionalParamNameAliasWithModuleRenaming() {
+		Config config = ConfigUtils.createConfig();
+		ConfigReaderMatsimV2 r2 = new ConfigReaderMatsimV2(config);
+
+		String xml = """
+				<?xml version="1.0" ?>
+				<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+				<config>
+					<module name="the_network">
+						<param name="input" value="my_network.xml.gz" />
+					</module>
+					<module name="the_plans">
+						<param name="input" value="my_plans.xml.gz" />
+					</module>
+				</config>
+				""";
+		ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
+
+		r2.getConfigAliases().addAlias("the_network", "network");
+		r2.getConfigAliases().addAlias("the_plans", "plans");
+		// for the path, the new name needs to be used:
+		r2.getConfigAliases().addAlias("input", "inputNetworkFile", "network");
+		r2.getConfigAliases().addAlias("input", "inputPlansFile", "plans");
+		r2.readStream(bais);
+
+		Assert.assertEquals("my_network.xml.gz", config.network().getInputFile());
+		Assert.assertEquals("my_plans.xml.gz", config.plans().getInputFile());
 	}
 
 	/**
@@ -104,8 +159,8 @@ public class ConfigReaderMatsimV2Test {
 				""";
 		ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
 
-		r2.addAlias("input", "inputNetworkFile", "network");
-		r2.addAlias("input", "inputPlansFile", "plans");
+		r2.getConfigAliases().addAlias("input", "inputNetworkFile", "network");
+		r2.getConfigAliases().addAlias("input", "inputPlansFile", "plans");
 		r2.readStream(bais);
 
 		Assert.assertEquals("my_network.xml.gz", config.network().getInputFile());
@@ -134,7 +189,7 @@ public class ConfigReaderMatsimV2Test {
 				""";
 		ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
 
-		r2.addAlias("inputNetworkFile", "inputPlansFile", "plans");
+		r2.getConfigAliases().addAlias("inputNetworkFile", "inputPlansFile", "plans");
 		r2.readStream(bais);
 
 		Assert.assertEquals("my_network.xml.gz", config.network().getInputFile());
@@ -160,7 +215,7 @@ public class ConfigReaderMatsimV2Test {
 				""";
 		ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
 
-		r2.addAlias("inputPlansFile", "input", "inexistant");
+		r2.getConfigAliases().addAlias("inputPlansFile", "input", "inexistant");
 		r2.readStream(bais); // if the alias were matched, it should produce an exception, as "input" is not known
 
 		Assert.assertEquals("my_plans.xml.gz", config.plans().getInputFile());
@@ -185,7 +240,7 @@ public class ConfigReaderMatsimV2Test {
 				""";
 		ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
 
-		r2.addAlias("inputPlansFile", "input", "plans", "inexistant");
+		r2.getConfigAliases().addAlias("inputPlansFile", "input", "plans", "inexistant");
 		r2.readStream(bais); // if the alias were matched, it should produce an exception, as "input" is not known
 
 		Assert.assertEquals("my_plans.xml.gz", config.plans().getInputFile());
@@ -204,9 +259,9 @@ public class ConfigReaderMatsimV2Test {
 				<?xml version="1.0" ?>
 				<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 				<config>
-					<module name="scoring">
+					<module name="planCalcScore">
 						<param name="learningRate" value="1.0" />
-						<param name="BrainExpBeta" value="2.0" />
+						<param name="brainExpBeta" value="2.0" />
 
 						<parameterset type="scoringParameters">
 							<param name="lateArrival" value="-18" />
@@ -228,12 +283,13 @@ public class ConfigReaderMatsimV2Test {
 				""";
 		ByteArrayInputStream bais = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
 
-		r2.addAlias("scoring", "planCalcScore");
-		r2.addAlias("theLateArrival", "lateArrival", "planCalcScore", "scoringParameters");
-		r2.addAlias("theMode", "mode", "planCalcScore", "scoringParameters", "modeParams");
+		r2.getConfigAliases().clearAliases();
+		r2.getConfigAliases().addAlias("planCalcScore", "scoring");
+		r2.getConfigAliases().addAlias("theLateArrival", "lateArrival", "scoring", "scoringParameters");
+		r2.getConfigAliases().addAlias("theMode", "mode", "scoring", "scoringParameters", "modeParams");
 		r2.readStream(bais);
 
-		Assert.assertEquals(-5.6, config.planCalcScore().getModes().get("car").getMarginalUtilityOfTraveling(), 1e-7);
-		Assert.assertEquals(-8.7, config.planCalcScore().getModes().get("unicycle").getMarginalUtilityOfTraveling(), 1e-7);
+		Assert.assertEquals(-5.6, config.scoring().getModes().get("car").getMarginalUtilityOfTraveling(), 1e-7);
+		Assert.assertEquals(-8.7, config.scoring().getModes().get("unicycle").getMarginalUtilityOfTraveling(), 1e-7);
 	}
 }

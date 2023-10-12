@@ -40,12 +40,12 @@ import java.util.*;
  * @author dgrether
  * @author mrieser
  */
-public final class PlansCalcRouteConfigGroup extends ConfigGroup {
+public final class RoutingConfigGroup extends ConfigGroup {
 	// yy There is a certain degree of messiness in this class because of retrofitting, e.g. making beelineDistance mode-specific while
 	// being backwards compatible.  This could eventually be cleaned up, maybe about a year after introducing it.  kai, jun'15
-	
-	public static final String GROUP_NAME = "planscalcroute";
-	
+
+	public static final String GROUP_NAME = "routing";
+
 	private static final String BEELINE_DISTANCE_FACTOR = "beelineDistanceFactor";
 	private static final String NETWORK_MODES = "networkModes";
 	private static final String TELEPORTED_MODE_SPEEDS = "teleportedModeSpeed_";
@@ -53,7 +53,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 
 	public static final String UNDEFINED = "undefined";
-	
+
 	// For config file backward compatibility.
 	// These are just hardcoded versions of the options above.
 	private static final String PT_SPEED_FACTOR = "ptSpeedFactor";
@@ -61,13 +61,13 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	private static final String WALK_SPEED = "walkSpeed";
 	private static final String BIKE_SPEED = "bikeSpeed";
 	private static final String UNDEFINED_MODE_SPEED = "undefinedModeSpeed";
-	
-	private static final Logger log = LogManager.getLogger(PlansCalcRouteConfigGroup.class) ;
-	
+
+	private static final Logger log = LogManager.getLogger(RoutingConfigGroup.class) ;
+
 	private Collection<String> networkModes = Collections.singletonList( TransportMode.car );
 
 	private boolean acceptModeParamsWithoutClearing;
-	
+
 	private Double beelineDistanceFactor = 1.3 ;
 
 	public enum AccessEgressType {
@@ -138,13 +138,13 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		public static final String SET_TYPE = "teleportedModeParameters";
 		public static final String MODE = "mode";
 		public static final String TELEPORTED_MODE_FREESPEED_FACTOR = "teleportedModeFreespeedFactor";
-		
+
 		private String mode = null;
 
 		// beeline teleportation:
 		private Double teleportedModeSpeed = null;
 		private Double beelineDistanceFactorForMode = null ;
-		
+
 		// route computed on network:
 		private Double teleportedModeFreespeedFactor = null;
 		private Double teleportedModeFreespeedLimit = Double.POSITIVE_INFINITY ;
@@ -153,7 +153,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		"Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. " +
 		"Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +" +
 		"teleportedModeFreespeedFactor wins over teleportedModeSpeed.";
-		
+
 		private static final String TELEPORTED_MODE_FREESPEED_LIMIT_CMT = "When using freespeed factor, a speed limit on the free speed. "
 				+ "Link travel time will be $= factor * [ min( link_freespeed, freespeed_limit) ]" ;
 
@@ -194,7 +194,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 		/**
 		 * Currently not in xml interface.
-		 * 
+		 *
 		 * @return teleportedModeFreespeedLimit -- {@value #TELEPORTED_MODE_FREESPEED_LIMIT_CMT}
 		 */
 		public final Double getTeleportedModeFreespeedLimit() {
@@ -203,7 +203,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 		/**
 		 * Currently not in xml interface.
-		 * 
+		 *
 		 * @param teleportedModeFreespeedLimit -- {@value #TELEPORTED_MODE_FREESPEED_LIMIT_CMT}
 		 */
 		public TeleportedModeParams setTeleportedModeFreespeedLimit( Double teleportedModeFreespeedLimit ) {
@@ -237,7 +237,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			this.teleportedModeSpeed = teleportedModeSpeed;
 			return this;
 		}
-		
+
 		/**
 		 * @return {@value #TELEPORTED_MODE_FREESPEED_FACTOR_CMT}
 		 */
@@ -245,7 +245,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		public Double getTeleportedModeFreespeedFactor() {
 			return teleportedModeFreespeedFactor;
 		}
-		
+
 		/**
 		 * @param teleportedModeFreespeedFactor -- {@value #TELEPORTED_MODE_FREESPEED_FACTOR_CMT}
 		 */
@@ -259,7 +259,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			this.teleportedModeFreespeedFactor = teleportedModeFreespeedFactor;
 			return this;
 		}
-		
+
 		@StringSetter("beelineDistanceFactor")
 		public TeleportedModeParams setBeelineDistanceFactor( Double val ) {
 			testForLocked() ;
@@ -270,10 +270,10 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		public Double getBeelineDistanceFactor() {
 			return this.beelineDistanceFactorForMode ;
 		}
-		
+
 	}
-	
-	public PlansCalcRouteConfigGroup() {
+
+	public RoutingConfigGroup() {
 		super(GROUP_NAME);
 
 		acceptModeParamsWithoutClearing = true;
@@ -288,7 +288,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			walk.setTeleportedModeSpeed( 3.0 / 3.6 ); // 3.0 km/h --> m/s
 			addParameterSet( walk );
 		}
-		
+
 		// the following two are deliberately different from "walk" since "walk" may become a network routing mode, but these two
 		// will not. kai, dec'15
 		{
@@ -333,7 +333,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 //			addParameterSet( transit_walk );
 //		}
 		// one might add the above but it was not added in the original design.  Not sure about the reason. kai, feb'15
-		
+
 		this.acceptModeParamsWithoutClearing = false;
 	}
 
@@ -461,7 +461,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 		for ( ConfigGroup pars : getParameterSets( TeleportedModeParams.SET_TYPE ) ) {
 			if ( this.isLocked() ) {
-				pars.setLocked(); 
+				pars.setLocked();
 			}
 			final String mode = ((TeleportedModeParams) pars).getMode();
 			final TeleportedModeParams old = map.put( mode , (TeleportedModeParams)	pars );
@@ -480,7 +480,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			addParameterSet( pars );
 		}
 		if ( this.isLocked() ) {
-			pars.setLocked(); 
+			pars.setLocked();
 		}
 
 		return pars;
@@ -562,7 +562,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		final Map<String, Double> map = new LinkedHashMap< >();
 		for ( TeleportedModeParams pars : getModeRoutingParams().values() ) {
 			if ( this.isLocked() ) {
-				pars.setLocked(); 
+				pars.setLocked();
 			}
 
 			final Double speed = pars.getTeleportedModeSpeed();
@@ -575,7 +575,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		final Map<String, Double> map = new LinkedHashMap< >();
 		for ( TeleportedModeParams pars : getModeRoutingParams().values() ) {
 			if ( this.isLocked() ) {
-				pars.setLocked(); 
+				pars.setLocked();
 			}
 
 			final Double speed = pars.getTeleportedModeFreespeedFactor();
@@ -583,12 +583,12 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		}
 		return map;
 	}
-	
+
 	public Map<String,Double> getBeelineDistanceFactors() {
 		final Map<String,Double> map = new LinkedHashMap<>() ;
 		for ( TeleportedModeParams pars : getModeRoutingParams().values() ) {
 			if ( this.isLocked() ) {
-				pars.setLocked(); 
+				pars.setLocked();
 			}
 
 			final Double val = pars.getBeelineDistanceFactor() ;
@@ -614,16 +614,16 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		pars.setTeleportedModeSpeed( speed );
 		addParameterSet( pars );
 	}
-	
+
 	@Deprecated // use mode-specific beeline distance factors! kai, apr'15
 	public void setBeelineDistanceFactor(double val) {
 		testForLocked() ;
 		// yyyy thinking about this: this should in design maybe not be different from the other teleportation factors (reset everything
 		// if one is set; or possibly disallow setting it at all). kai, feb'15
-		
+
 		// memorize the global factor for ModeRoutingParams that are added later:
 		this.beelineDistanceFactor = val ;
-		
+
 		// push the global factor to the local ones for all ModeRoutingParams that are already there:
 		for ( TeleportedModeParams params : this.getModeRoutingParams().values() ) {
 			params.setBeelineDistanceFactor( val );

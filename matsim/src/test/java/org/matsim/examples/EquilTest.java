@@ -68,7 +68,7 @@ public class EquilTest  {
 	@Test
 	public void testEquil() {
 		Config config = ConfigUtils.createConfig() ;
-		config.controler().setOutputDirectory( utils.getOutputDirectory() );
+		config.controller().setOutputDirectory( utils.getOutputDirectory() );
 		config.qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);
 		config.facilities().setFacilitiesSource( FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile );
 

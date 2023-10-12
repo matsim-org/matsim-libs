@@ -119,7 +119,7 @@ class ReceiverTriggersCarrierReplanningListener implements IterationStartsListen
             carrier.setSelectedPlan(newPlan);
 
         }
-        String outputdirectory = sc.getConfig().controler().getOutputDirectory();
+        String outputdirectory = sc.getConfig().controller().getOutputDirectory();
         outputdirectory += outputdirectory.endsWith("/") ? "" : "/";
 //        new CarrierPlanWriter(FreightUtils.getCarriers(sc)).write(outputdirectory + ReceiverConfigGroup.CARRIERS_FILE);
         new CarrierPlanWriter(FreightUtils.getCarriers(sc)).write(outputdirectory +receiverConfig.getCarriersFile() );
