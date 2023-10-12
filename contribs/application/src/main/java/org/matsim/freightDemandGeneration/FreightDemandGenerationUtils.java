@@ -99,7 +99,7 @@ public class FreightDemandGenerationUtils {
 	static void createDemandLocationsFile(Controler controler) {
 
 		Network network = controler.getScenario().getNetwork();
-		File file = new File(controler.getConfig().controler().getOutputDirectory() + "/outputFacilitiesFile.tsv");
+		File file = new File(controler.getConfig().controller().getOutputDirectory() + "/outputFacilitiesFile.tsv");
 		try (FileWriter writer = new FileWriter(file, true)) {
 			writer.write("id	x	y	type	ServiceLocation	pickupLocation	deliveryLocation\n");
 

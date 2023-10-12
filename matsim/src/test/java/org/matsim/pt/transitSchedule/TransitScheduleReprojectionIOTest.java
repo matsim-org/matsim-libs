@@ -112,8 +112,8 @@ public class TransitScheduleReprojectionIOTest {
 			config.transit().setUseTransit( true );
 			config.transit().setInputScheduleCRS( INITIAL_CRS );
 			config.global().setCoordinateSystem( TARGET_CRS );
-			config.controler().setLastIteration( -1 );
-			config.controler().setOutputDirectory( outputDirectory );
+			config.controller().setLastIteration( -1 );
+			config.controller().setOutputDirectory( outputDirectory );
 			config.network().setInputFile("multimodalnetwork.xml");
 			scenario = ScenarioUtils.loadScenario( config );
 		}
@@ -179,9 +179,8 @@ public class TransitScheduleReprojectionIOTest {
 			config.transit().setInputScheduleCRS( INITIAL_CRS );
 			// yyyyyy Is it so plausible that this is given here when the test is about having this in the file? kai, sep'18
 			config.global().setCoordinateSystem( TARGET_CRS );
-			config.controler().setLastIteration( -1 );
-			config.controler().setOutputDirectory( outputDirectory );
-			config.network().setInputFile("multimodalnetwork.xml");
+			config.controller().setLastIteration( -1 );
+			config.controller().setOutputDirectory( outputDirectory );
 
 			log.info( "" ) ;
 			log.info("just before we are getting the exception:") ;

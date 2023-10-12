@@ -36,7 +36,7 @@ import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -232,12 +232,12 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	private Config prepareConfig(int lastMATSimIteration, String coordinateSystem) {
 		Config config = ConfigUtils.createConfig();
 //		ScenarioUtils.loadScenario(config);
-		config.controler().setOutputDirectory(outputLocation.toString());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		new OutputDirectoryHierarchy(config.controler().getOutputDirectory(), config.controler().getRunId(),
-				config.controler().getOverwriteFileSetting(), ControlerConfigGroup.CompressionType.gzip);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		config.controler().setLastIteration(lastMATSimIteration);
+		config.controller().setOutputDirectory(outputLocation.toString());
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		new OutputDirectoryHierarchy(config.controller().getOutputDirectory(), config.controller().getRunId(),
+				config.controller().getOverwriteFileSetting(), ControllerConfigGroup.CompressionType.gzip);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controller().setLastIteration(lastMATSimIteration);
 		config.global().setRandomSeed(4177);
 		config.global().setCoordinateSystem(coordinateSystem);
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
@@ -462,29 +462,29 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 			case runJspritAndMATSim -> {
 				// solves the VRP with jsprit and runs MATSim afterwards
 				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-						.write(config.controler().getOutputDirectory() + "/output_carriersNoPlans.xml");
+						.write(config.controller().getOutputDirectory() + "/output_carriersNoPlans.xml");
 				runJsprit(controler, false);
 				controler.run();
 				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-						.write(config.controler().getOutputDirectory() + "/output_carriersWithPlans.xml");
+						.write(config.controller().getOutputDirectory() + "/output_carriersWithPlans.xml");
 			}
 			case runJspritAndMATSimWithDistanceConstraint -> {
 				// solves the VRP with jsprit by using the distance constraint and runs MATSim
 				// afterwards
 				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-						.write(config.controler().getOutputDirectory() + "/output_carriersNoPlans.xml");
+						.write(config.controller().getOutputDirectory() + "/output_carriersNoPlans.xml");
 				runJsprit(controler, true);
 				controler.run();
 				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-						.write(config.controler().getOutputDirectory() + "/output_carriersWithPlans.xml");
+						.write(config.controller().getOutputDirectory() + "/output_carriersWithPlans.xml");
 			}
 			case runJsprit -> {
 				// solves only the VRP with jsprit
 				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-						.write(config.controler().getOutputDirectory() + "/output_carriersNoPlans.xml");
+						.write(config.controller().getOutputDirectory() + "/output_carriersNoPlans.xml");
 				runJsprit(controler, false);
 				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-						.write(config.controler().getOutputDirectory() + "/output_carriersWithPlans.xml");
+						.write(config.controller().getOutputDirectory() + "/output_carriersWithPlans.xml");
 				log.warn(
 						"##Finished with the jsprit solution. If you also want to run MATSim, please change  case of optionsOfVRPSolutions");
 				System.exit(0);
@@ -492,10 +492,10 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 			case runJspritWithDistanceConstraint -> {
 				// solves only the VRP with jsprit by using the distance constraint
 				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-						.write(config.controler().getOutputDirectory() + "/output_carriersNoPlans.xml");
+						.write(config.controller().getOutputDirectory() + "/output_carriersNoPlans.xml");
 				runJsprit(controler, true);
 				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-						.write(config.controler().getOutputDirectory() + "/output_carriersWithPlans.xml");
+						.write(config.controller().getOutputDirectory() + "/output_carriersWithPlans.xml");
 				log.warn(
 						"##Finished with the jsprit solution. If you also want to run MATSim, please change  case of optionsOfVRPSolutions");
 				System.exit(0);
@@ -504,7 +504,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 				// creates no solution of the VRP and only writes the carrier file with the
 				// generated carriers and demands
 				new CarrierPlanWriter((Carriers) controler.getScenario().getScenarioElement("carriers"))
-						.write(config.controler().getOutputDirectory() + "/output_carriersNoPlans.xml");
+						.write(config.controller().getOutputDirectory() + "/output_carriersNoPlans.xml");
 				log.warn(
 						"##Finished without solution of the VRP. If you also want to run jsprit and/or MATSim, please change case of optionsOfVRPSolutions");
 				System.exit(0);

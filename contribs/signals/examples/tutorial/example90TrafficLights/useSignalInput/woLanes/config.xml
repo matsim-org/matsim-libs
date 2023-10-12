@@ -4,18 +4,6 @@
 
 <!-- ====================================================================== -->
 
-	<module name="JDEQSim" >
-		<param name="carSize" value="7.5" />
-		<param name="endTime" value="undefined" />
-		<param name="flowCapacityFactor" value="1.0" />
-		<param name="gapTravelSpeed" value="15.0" />
-		<param name="minimumInFlowCapacity" value="1800.0" />
-		<param name="squeezeTime" value="1800.0" />
-		<param name="storageCapacityFactor" value="1.0" />
-	</module>
-
-<!-- ====================================================================== -->
-
 	<module name="TimeAllocationMutator" >
 		<param name="mutationAffectsDuration" value="true" />
 
@@ -55,7 +43,7 @@
 		<!-- Default=1000;  -->
 		<param name="lastIteration" value="1000" />
 
-		<!-- Defines which mobility simulation will be used. Currently supported: qsim JDEQSim 
+		<!-- Defines which mobility simulation will be used. Currently supported: qsim JDEQSim
 		Depending on the chosen mobsim, you'll have to add additional config modules to configure the corresponding mobsim.
 		For 'qsim', add a module 'qsim' to the config. -->
 		<param name="mobsim" value="qsim" />
@@ -65,7 +53,7 @@
 		<!-- Possible values: failIfDirectoryExists, overwriteExistingFiles, deleteDirectoryIfExists -->
 		<param name="overwriteFiles" value="failIfDirectoryExists" />
 
-		<!-- The type of routing (least cost path) algorithm used, may have the values: Dijkstra, FastDijkstra, AStarLandmarks or FastAStarLandmarks -->
+		<!-- The type of routing (least cost path) algorithm used, may have the values: Dijkstra, AStarLandmarks or SpeedyALT -->
 		<param name="routingAlgorithmType" value="Dijkstra" />
 
 		<!-- An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc. -->
@@ -234,7 +222,7 @@
 				<!-- method to compute score at typical duration.  Options: | uniform | relative | Use uniform for backwards compatibility (all activities same score; higher proba to drop long acts). -->
 				<param name="typicalDurationScoreComputation" value="uniform" />
 			</parameterset>
-			
+
 			<parameterset type="activityParams" >
 				<param name="activityType" value="w" />
 				<param name="closingTime" value="undefined" />
@@ -249,7 +237,7 @@
 				<!-- method to compute score at typical duration.  Options: | uniform | relative | Use uniform for backwards compatibility (all activities same score; higher proba to drop long acts). -->
 				<param name="typicalDurationScoreComputation" value="uniform" />
 			</parameterset>
-			
+
 			<parameterset type="activityParams" >
 				<param name="activityType" value="car interaction" />
 				<param name="closingTime" value="undefined" />
@@ -733,9 +721,6 @@
 
 		<!-- The size of the time bin (in sec) into which the link travel times are aggregated for the router -->
 		<param name="travelTimeBinSize" value="900" />
-
-		<!-- possible values: nullTravelTimeCalculatorArray TravelTimeCalculatorHashMap  -->
-		<param name="travelTimeCalculator" value="TravelTimeCalculatorArray" />
 
 		<!-- How to deal with link entry times at different positions during the time bin. Currently supported: average, linearinterpolation -->
 		<param name="travelTimeGetter" value="average" />

@@ -165,7 +165,7 @@ class ReceiverControlerListener implements ScoringListener, IterationEndsListene
             receiverLinkMap.put(linkId, receiver);
         }
 
-		try (BufferedWriter bw = IOUtils.getBufferedWriter(this.sc.getConfig().controler().getOutputDirectory() + "output_receiverInTourPlacement.csv.gz")) {
+		try (BufferedWriter bw = IOUtils.getBufferedWriter(this.sc.getConfig().controller().getOutputDirectory() + "output_receiverInTourPlacement.csv.gz")) {
 			bw.write("receiverId,twStart,twEnd,twDuration,positionInTour,product,deliveryStart,deliveryEnd");
 			bw.newLine();
 

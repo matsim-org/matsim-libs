@@ -31,8 +31,8 @@ import org.matsim.contrib.freight.mobsim.DistanceScoringFunctionFactoryForTests;
 import org.matsim.contrib.freight.mobsim.StrategyManagerFactoryForTests;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -47,13 +47,13 @@ public class EquilWithCarrierWithPersonsIT {
 	static Config commonConfig( MatsimTestUtils testUtils ) {
 		Config config = ConfigUtils.createConfig();
 
-		config.planCalcScore().addActivityParams( new ActivityParams("w").setTypicalDuration(60 * 60 * 8 ) );
-		config.planCalcScore().addActivityParams( new ActivityParams("h").setTypicalDuration(16 * 60 * 60 ) );
+		config.scoring().addActivityParams( new ActivityParams("w").setTypicalDuration(60 * 60 * 8 ) );
+		config.scoring().addActivityParams( new ActivityParams("h").setTypicalDuration(16 * 60 * 60 ) );
 		config.global().setCoordinateSystem("EPSG:32632");
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(2);
+		config.controller().setFirstIteration(0);
+		config.controller().setLastIteration(2);
 
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		config.network().setInputFile( testUtils.getClassInputDirectory() + "network.xml" );
 
 		return config;
@@ -64,9 +64,9 @@ public class EquilWithCarrierWithPersonsIT {
 		Config config = commonConfig( testUtils );
 
 		config.plans().setInputFile( testUtils.getClassInputDirectory() + "plans100.xml" );
-		config.strategy().setMaxAgentPlanMemorySize(5);
-		config.strategy().addStrategySettings( new StrategySettings().setStrategyName("BestScore" ).setWeight(1.0 ) );
-		config.strategy().addStrategySettings( new StrategySettings().setStrategyName("ReRoute" ).setWeight(0.0 ).setDisableAfter(300 ) );
+		config.replanning().setMaxAgentPlanMemorySize(5);
+		config.replanning().addStrategySettings( new StrategySettings().setStrategyName("BestScore" ).setWeight(1.0 ) );
+		config.replanning().addStrategySettings( new StrategySettings().setStrategyName("ReRoute" ).setWeight(0.0 ).setDisableAfter(300 ) );
 
 		Scenario scenario = commonScenario( config, testUtils );
 

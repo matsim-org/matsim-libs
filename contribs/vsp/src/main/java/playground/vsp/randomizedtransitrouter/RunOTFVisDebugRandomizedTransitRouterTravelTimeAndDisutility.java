@@ -46,13 +46,13 @@ import com.google.inject.Provider;
  */
 public class RunOTFVisDebugRandomizedTransitRouterTravelTimeAndDisutility {
 
-	
+
 	public static void main(String[] args) {
 		final Config config = ConfigUtils.loadConfig(args[0]) ;
 
 		boolean doVisualization = true;
 
-		config.planCalcScore().setWriteExperiencedPlans(true) ;
+		config.scoring().setWriteExperiencedPlans(true) ;
 
 		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawTransitFacilities(true) ; // this DOES work
 		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawTransitFacilityIds(false);
@@ -61,16 +61,16 @@ public class RunOTFVisDebugRandomizedTransitRouterTravelTimeAndDisutility {
 		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setScaleQuadTreeRect(true);
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
-		
+
 		final Controler ctrl = new Controler(scenario) ;
 
-		ctrl.getConfig().controler().setOverwriteFileSetting(
+		ctrl.getConfig().controller().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 		ctrl.addOverridingModule(new RandomizingTransitRouterModule());
-		
+
 		if (doVisualization){
 			ctrl.addOverridingModule(new AbstractModule() {
 				@Override
@@ -96,6 +96,6 @@ public class RunOTFVisDebugRandomizedTransitRouterTravelTimeAndDisutility {
 			});
 		}
 		ctrl.run() ;
-		
+
 	}
 }

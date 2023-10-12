@@ -47,7 +47,7 @@
 		<param name="outputDirectory" value="test/output/org/matsim/smallScaleCommercialTrafficGeneration/RunGenerateSmallScaleCommercialTrafficTest/testMainRunAndResults/" />
 		<!-- Possible values: failIfDirectoryExists, overwriteExistingFiles, deleteDirectoryIfExists -->
 		<param name="overwriteFiles" value="overwriteExistingFiles" />
-		<!-- The type of routing (least cost path) algorithm used, may have the values: [Dijkstra, AStarLandmarks, FastDijkstra, FastAStarLandmarks, SpeedyALT] -->
+		<!-- The type of routing (least cost path) algorithm used, may have the values: [Dijkstra, AStarLandmarks, SpeedyALT] -->
 		<param name="routingAlgorithmType" value="SpeedyALT" />
 		<!-- An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc. -->
 		<param name="runId" value="test" />
@@ -69,15 +69,6 @@
 		<param name="inputNetworkFile" value="https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml" />
 		<param name="laneDefinitionsFile" value="null" />
 		<param name="timeVariantNetwork" value="false" />
-	</module>
-	<module name="JDEQSim" >
-		<param name="carSize" value="7.5" />
-		<param name="endTime" value="undefined" />
-		<param name="flowCapacityFactor" value="1.0" />
-		<param name="gapTravelSpeed" value="15.0" />
-		<param name="minimumInFlowCapacity" value="1800.0" />
-		<param name="squeezeTime" value="1800.0" />
-		<param name="storageCapacityFactor" value="1.0" />
 	</module>
 	<module name="ReplanningAnnealer" >
 		<!-- Activate the scaling of replanning modules using an annealing approach rather than fixed rates. -->
@@ -560,8 +551,6 @@
 		<param name="travelTimeAggregator" value="optimistic" />
 		<!-- The size of the time bin (in sec) into which the link travel times are aggregated for the router -->
 		<param name="travelTimeBinSize" value="900" />
-		<!-- possible values: TravelTimeCalculatorArray TravelTimeCalculatorHashMap  -->
-		<param name="travelTimeCalculator" value="TravelTimeCalculatorArray" />
 		<!-- How to deal with link entry times at different positions during the time bin. Currently supported: average, linearinterpolation -->
 		<param name="travelTimeGetter" value="average" />
 	</module>

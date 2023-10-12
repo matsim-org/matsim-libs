@@ -410,7 +410,7 @@ public class FreightUtilsTest {
 	@Test
 	public void testRunJsprit_allInformationGiven(){
 		Config config = prepareConfig();
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ) ;
 		String vraFile= IOUtils.extendUrl(scenarioUrl, "algorithm_v2.xml" ).toString();
@@ -439,7 +439,7 @@ public class FreightUtilsTest {
 	@Test(expected = java.util.concurrent.ExecutionException.class)
 	public void testRunJsprit_NoOfJspritIterationsMissing() throws ExecutionException, InterruptedException {
 		Config config = prepareConfig();
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
@@ -459,7 +459,7 @@ public class FreightUtilsTest {
 	@Test
 	public void testRunJsprit_NoAlgortihmFileGiven(){
 		Config config = prepareConfig();
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 
@@ -474,7 +474,7 @@ public class FreightUtilsTest {
 	private Config prepareConfig(){
 		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ) ;
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(scenarioUrl, "config.xml" ) );
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
 		//freight configstuff
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);

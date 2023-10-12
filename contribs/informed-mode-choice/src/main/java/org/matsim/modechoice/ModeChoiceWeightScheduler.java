@@ -40,8 +40,8 @@ public final class ModeChoiceWeightScheduler implements StartupListener, Iterati
 		anneal = imc.getAnneal();
 
 		// The first iteration does not do any replanning
-		n = config.controler().getLastIteration() - 1;
-		double disableInnovation = config.strategy().getFractionOfIterationsToDisableInnovation();
+		n = config.controller().getLastIteration() - 1;
+		double disableInnovation = config.replanning().getFractionOfIterationsToDisableInnovation();
 		if (disableInnovation > 0 && disableInnovation < 1)
 			n *= disableInnovation;
 

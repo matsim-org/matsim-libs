@@ -23,9 +23,9 @@ public class DashboardTests {
 	private void run() {
 
 		Config config = DrtTestScenario.loadConfig(utils);
-		config.controler().setLastIteration(4);
-		config.controler().setWritePlansInterval(4);
-		config.controler().setWriteEventsInterval(4);
+		config.controller().setLastIteration(4);
+		config.controller().setWritePlansInterval(4);
+		config.controller().setWriteEventsInterval(4);
 
 		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
 		group.defaultParams().sampleSize = 0.001;

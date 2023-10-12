@@ -120,7 +120,7 @@ public class EditTripsTest {
 		Config config = ConfigUtils
 				.loadConfig(configURL);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler()
+		config.controller()
 				.setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
@@ -159,7 +159,7 @@ public class EditTripsTest {
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils.loadConfig(configURL);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler().setOutputDirectory(outputDirectory);
+		config.controller().setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
 		double activityEndTime = 7. * 3600 + 15. * 60;
@@ -197,7 +197,7 @@ public class EditTripsTest {
 		Config config = ConfigUtils
 				.loadConfig(configURL);;
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler()
+		config.controller()
 				.setOutputDirectory(outputDirectory);
 		config.network().setTimeVariantNetwork(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -234,7 +234,7 @@ public class EditTripsTest {
 		Config config = ConfigUtils
 				.loadConfig(configURL);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler()
+		config.controller()
 				.setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
@@ -277,7 +277,7 @@ public class EditTripsTest {
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils.loadConfig(configURL);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler().setOutputDirectory(outputDirectory);
+		config.controller().setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
 		double activityEndTime = 7. * 3600 + 22. * 60;
@@ -316,10 +316,10 @@ public class EditTripsTest {
 		Config config = ConfigUtils
 				.loadConfig(configURL);;
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler()
+		config.controller()
 				.setOutputDirectory(outputDirectory);
-		config.planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(
-				config.planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - 3);
+		config.scoring().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(
+				config.scoring().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - 3);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
 		double activityEndTime = 7. * 3600 + 22. * 60;
@@ -355,7 +355,7 @@ public class EditTripsTest {
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils.loadConfig(configURL);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler().setOutputDirectory(outputDirectory);
+		config.controller().setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
 		double activityEndTime = 7. * 3600 + 22. * 60;
@@ -393,7 +393,7 @@ public class EditTripsTest {
 		Config config = ConfigUtils
 				.loadConfig(configURL);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler()
+		config.controller()
 				.setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
@@ -418,7 +418,7 @@ public class EditTripsTest {
 			}
 			assertTrue("Number of used lines ist not plausible", numberOfUsedLines == 1 || numberOfUsedLines == 2);
 		}
-		System.out.println(config.controler().getOutputDirectory());
+		System.out.println(config.controller().getOutputDirectory());
 	}
 
 

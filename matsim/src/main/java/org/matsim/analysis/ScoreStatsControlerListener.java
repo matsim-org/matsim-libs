@@ -33,8 +33,8 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -74,7 +74,7 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 	final private String fileName;
 
 	private final boolean createPNG;
-	private final ControlerConfigGroup controlerConfigGroup;
+	private final ControllerConfigGroup controllerConfigGroup;
 
 	private final Map<ScoreItem, Map< Integer, Double>> scoreHistory = new HashMap<>();
 
@@ -85,13 +85,13 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 	private final static Logger log = LogManager.getLogger(ScoreStatsControlerListener.class);
 
 	@Inject
-	ScoreStatsControlerListener(ControlerConfigGroup controlerConfigGroup, Population population, OutputDirectoryHierarchy controlerIO,
-			PlanCalcScoreConfigGroup scoreConfig, Provider<TripRouter> tripRouterFactory ) {
+	ScoreStatsControlerListener(ControllerConfigGroup controllerConfigGroup, Population population, OutputDirectoryHierarchy controlerIO,
+															ScoringConfigGroup scoreConfig, Provider<TripRouter> tripRouterFactory ) {
 
-		this.controlerConfigGroup = controlerConfigGroup;
+		this.controllerConfigGroup = controllerConfigGroup;
 		this.population = population;
 		this.fileName = controlerIO.getOutputFilename(FILENAME_SCORESTATS);
-		this.createPNG = controlerConfigGroup.isCreateGraphs();
+		this.createPNG = controllerConfigGroup.isCreateGraphs();
 		this.out = IOUtils.getBufferedWriter(this.fileName + ".txt");
 
 		Set<String> subpopulations = population.getPersons().values().stream()
@@ -116,7 +116,7 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		this.minIteration = controlerConfigGroup.getFirstIteration();
+		this.minIteration = controllerConfigGroup.getFirstIteration();
 		//		int maxIter = controlerConfigGroup.getLastIteration();
 		//		int iterations = maxIter - this.minIteration;
 		//		if (iterations > 5000) iterations = 5000; // limit the history size

@@ -138,7 +138,7 @@ public final class CarrierModule extends AbstractModule {
 
 	private static void writeAdditionalRunOutput( OutputDirectoryHierarchy controllerIO, Config config, Carriers carriers ) {
 		// ### some final output: ###
-		String compression = config.controler().getCompressionType().fileEnding;
+		String compression = config.controller().getCompressionType().fileEnding;
 		new CarrierPlanWriter(carriers).write( controllerIO.getOutputFilename("output_carriers.xml" + compression));
 		new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write(controllerIO.getOutputFilename("output_carriersVehicleTypes.xml" + compression));
 	}

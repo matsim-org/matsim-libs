@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.matsim.analysis;
 
@@ -19,8 +19,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.router.StageActivityTypeIdentifier;
@@ -38,7 +38,7 @@ public class PHbyModeCalculatorTest {
 	private int walk_travel;
 	private int pt_wait;
 	private int stageActivity_wait;
-	
+
 
 	Id<Person> person1 = Id.create("person1", Person.class);
 	Id<Person> person2 = Id.create("person2", Person.class);
@@ -86,18 +86,18 @@ public class PHbyModeCalculatorTest {
 
 	private void performTest(IdMap<Person, Plan> map, String outputDirectory) {
 
-		ControlerConfigGroup controlerConfigGroup = new ControlerConfigGroup();
+		ControllerConfigGroup controllerConfigGroup = new ControllerConfigGroup();
 		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(outputDirectory,
 				OverwriteFileSetting.overwriteExistingFiles, CompressionType.gzip);
-		controlerConfigGroup.setCreateGraphs(true);
-		controlerConfigGroup.setFirstIteration(0);
-		controlerConfigGroup.setLastIteration(10);
-		PHbyModeCalculator phbyModeCalculator = new PHbyModeCalculator(controlerConfigGroup, controlerIO);
+		controllerConfigGroup.setCreateGraphs(true);
+		controllerConfigGroup.setFirstIteration(0);
+		controllerConfigGroup.setLastIteration(10);
+		PHbyModeCalculator phbyModeCalculator = new PHbyModeCalculator(controllerConfigGroup, controlerIO);
 
 		phbyModeCalculator.addIteration(1, map);
 		phbyModeCalculator.writeOutput();
 		readAndValidateValues(1, map);
-		
+
 		// removing person 2
 		map.remove(person2);
 		phbyModeCalculator.addIteration(2, map);
@@ -145,7 +145,7 @@ public class PHbyModeCalculatorTest {
 								.getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME) - ((Leg) elem).getDepartureTime().seconds();
 						modeValues.put("pt_wait", wait_value);
 					}
-						
+
 				}else if(elem instanceof Activity) {
 					Activity act = (Activity) elem;
 					if (StageActivityTypeIdentifier.isStageActivity(act.getType())) {
@@ -218,11 +218,11 @@ public class PHbyModeCalculatorTest {
 			case "walk_travel":
 				walk_travel = i;
 				break;
-				
+
 			case "pt_wait":
 				pt_wait = i;
 				break;
-				
+
 			case "stageActivity_wait":
 				stageActivity_wait = i;
 				break;

@@ -17,9 +17,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
 package org.matsim.examples.simple;
 
 import java.util.List;
@@ -36,9 +33,9 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
@@ -69,8 +66,8 @@ public class PtScoringTest {
 	@Test
 	public void test_PtScoringLineswitch() {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.SwissRailRaptor);
-		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
+		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
+		ScoringConfigGroup pcs = config.scoring() ;
 
 		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
 			for(ActivityParams params : pcs.getActivityParams()){
@@ -81,8 +78,8 @@ public class PtScoringTest {
 		pcs.setWriteExperiencedPlans(true);
 
 		Controler controler = new Controler(config);
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controller().setCreateGraphs(false);
 
         EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);
@@ -222,8 +219,8 @@ public class PtScoringTest {
 	@Test
 	public void test_PtScoringLineswitchAndPtConstant() {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.SwissRailRaptor);
-		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
+		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
+		ScoringConfigGroup pcs = config.scoring() ;
 
 		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform))
 			for(ActivityParams params : pcs.getActivityParams()){
@@ -234,8 +231,8 @@ public class PtScoringTest {
 		pcs.getModes().get(TransportMode.pt).setConstant(1.);
 
 		Controler controler = new Controler(config);
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controller().setCreateGraphs(false);
 
         EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);
@@ -378,8 +375,8 @@ public class PtScoringTest {
 	@Test
 	public void test_PtScoring_Wait() {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"));
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.SwissRailRaptor);
-		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
+		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
+		ScoringConfigGroup pcs = config.scoring();
 
 		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
 			for(ActivityParams params : pcs.getActivityParams()){
@@ -391,8 +388,8 @@ public class PtScoringTest {
 		pcs.setMarginalUtlOfWaitingPt_utils_hr(-18.0) ;
 
 		Controler controler = new Controler(config);
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controller().setCreateGraphs(false);
 
         EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);
@@ -465,8 +462,8 @@ public class PtScoringTest {
 	@Test
 	public void test_PtScoring() {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"));
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.SwissRailRaptor);
-		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
+		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
+		ScoringConfigGroup pcs = config.scoring() ;
 
 		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform))
 		for(ActivityParams params : pcs.getActivityParams()){
@@ -476,8 +473,8 @@ public class PtScoringTest {
 		pcs.setWriteExperiencedPlans(true);
 
 		Controler controler = new Controler(config);
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controller().setCreateGraphs(false);
 
         EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);

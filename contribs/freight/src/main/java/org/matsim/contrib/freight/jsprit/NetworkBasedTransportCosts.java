@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.core.router.FastDijkstraFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -369,7 +369,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 		private int timeSliceWidth = Integer.MAX_VALUE;
 
-		private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = (network, travelCosts, travelTimes) -> new FastDijkstraFactory().createPathCalculator(network, travelCosts, travelTime);
+		private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = (network, travelCosts, travelTimes) -> new SpeedyALTFactory().createPathCalculator(network, travelCosts, travelTime);
 
 		private VehicleTypeDependentRoadPricingCalculator roadPricingCalculator = new VehicleTypeDependentRoadPricingCalculator();
 
@@ -455,7 +455,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		 * each thread a new LCPA is created with the same LCPA-factory. That is,
 		 * memorizing data in the factory-obj might violate thread-safety.
 		 * <p>
-		 * By default, it use {@link FastDijkstraFactory}
+		 * By default, it use {@link SpeedyALTFactory}
 		 *
 		 * @param {@link {@link LeastCostPathCalculatorFactory}
 		 * @return this builder
@@ -548,7 +548,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 	private final VehicleTypeDependentRoadPricingCalculator roadPricingCalc;
 
 	/**
-	 * by default sets the {@link FastDijkstraFactory}
+	 * by default sets the {@link SpeedyALTFactory}
 	 */
 	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
@@ -592,6 +592,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		}
 		String typeId = vehicle.getType().getTypeId();
 		int timeSlice = getTimeSlice(departureTime);
+		departureTime = timeSlice*timeSliceWidth;
 		TransportDataKey transportDataKey = makeKey(fromId.getId(), toId.getId(), timeSlice, typeId);
 		TransportData data = costCache.get(transportDataKey);
 		double transportTime;
@@ -680,6 +681,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		LeastCostPathCalculator router = createLeastCostPathCalculator();
 
 		int timeSlice = getTimeSlice(departureTime);
+		departureTime = timeSlice*timeSliceWidth;
 		String typeId = vehicle.getType().getTypeId();
 		TransportDataKey transportDataKey = makeKey(fromId.getId(), toId.getId(), timeSlice, typeId);
 		TransportData data = costCache.get(transportDataKey);
@@ -738,6 +740,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		}
 		String typeId = vehicle.getType().getTypeId();
 		int timeSlice = getTimeSlice(departureTime);
+		departureTime = timeSlice*timeSliceWidth;
 		TransportDataKey transportDataKey = makeKey(fromId.getId(), toId.getId(), timeSlice, typeId);
 		TransportData data = costCache.get(transportDataKey);
 		double travelDistance;

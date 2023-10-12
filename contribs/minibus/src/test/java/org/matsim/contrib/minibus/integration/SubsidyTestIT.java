@@ -66,14 +66,14 @@ public class SubsidyTestIT implements TabularFileHandler {
 		config.transit().setVehiclesFile(gridScenarioDirectory + "transitVehicles.xml");
 		config.transit().setTransitScheduleFile(gridScenarioDirectory + "transitSchedule_10min.xml");
 		config.plans().setInputFile(gridScenarioDirectory + "population_1000_per_hour_each_from_6_to_10.xml.gz");
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setWriteEventsInterval(0);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setWriteEventsInterval(0);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 
-		controler.getConfig().controler().setCreateGraphs(true);
+		controler.getConfig().controller().setCreateGraphs(true);
 
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 
 		controler.addOverridingModule(new PModule()) ;
 		controler.run();

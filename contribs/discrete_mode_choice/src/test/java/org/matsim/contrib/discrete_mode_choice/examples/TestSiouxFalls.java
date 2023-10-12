@@ -30,13 +30,13 @@ public class TestSiouxFalls {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(scenarioURL, "config_default.xml"));
 		DiscreteModeChoiceConfigurator.configureAsSubtourModeChoiceReplacement(config);
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(1);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(1);
 		// save some bandwidth/time:
-		config.controler().setCreateGraphs( false );
-		config.controler().setWritePlansInterval( 0 );
-		config.controler().setWriteEventsInterval( 0 );
-		config.controler().setDumpDataAtEnd( false );
+		config.controller().setCreateGraphs( false );
+		config.controller().setWritePlansInterval( 0 );
+		config.controller().setWriteEventsInterval( 0 );
+		config.controller().setDumpDataAtEnd( false );
 
 		config.qsim().setFlowCapFactor(10000.0);
 		config.qsim().setStorageCapFactor(10000.0);

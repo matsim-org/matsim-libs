@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -18,7 +18,7 @@ import java.util.Map;
  */
 final class LeastCostPathCalculatorAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
 	private final LeastCostPathCalculator leastCostPathCalculator;
-	private final PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
+	private final ScoringConfigGroup scoringConfigGroup;
 	private Node fromNode;
 	private Double departureTime;
 	private Scenario scenario;
@@ -27,8 +27,8 @@ final class LeastCostPathCalculatorAccessibilityContributionCalculator implement
     Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities;
 
 
-	public LeastCostPathCalculatorAccessibilityContributionCalculator(PlanCalcScoreConfigGroup planCalcScoreConfigGroup, LeastCostPathCalculator leastCostPathCalculator, Scenario scenario) {
-		this.planCalcScoreConfigGroup = planCalcScoreConfigGroup;
+	public LeastCostPathCalculatorAccessibilityContributionCalculator(ScoringConfigGroup scoringConfigGroup, LeastCostPathCalculator leastCostPathCalculator, Scenario scenario) {
+		this.scoringConfigGroup = scoringConfigGroup;
 		this.leastCostPathCalculator = leastCostPathCalculator;
 		this.scenario = scenario;
 	}
@@ -55,7 +55,7 @@ final class LeastCostPathCalculatorAccessibilityContributionCalculator implement
 
 		for (final AggregationObject destination : aggregatedOpportunities.values()) {
 			LeastCostPathCalculator.Path path = leastCostPathCalculator.calcLeastCostPath(fromNode, (Node) destination.getNearestBasicLocation(), departureTime, null, null);
-			expSum += destination.getSum() * Math.exp(planCalcScoreConfigGroup.getBrainExpBeta() * path.travelCost);
+			expSum += destination.getSum() * Math.exp(scoringConfigGroup.getBrainExpBeta() * path.travelCost);
 		}
 		return expSum;
 	}
@@ -64,7 +64,7 @@ final class LeastCostPathCalculatorAccessibilityContributionCalculator implement
 	@Override
 	public LeastCostPathCalculatorAccessibilityContributionCalculator duplicate() {
 		LeastCostPathCalculatorAccessibilityContributionCalculator leastCostPathCalculatorAccessibilityContributionCalculator =
-				new LeastCostPathCalculatorAccessibilityContributionCalculator(this.planCalcScoreConfigGroup, this.leastCostPathCalculator, this.scenario);
+				new LeastCostPathCalculatorAccessibilityContributionCalculator(this.scoringConfigGroup, this.leastCostPathCalculator, this.scenario);
 		return leastCostPathCalculatorAccessibilityContributionCalculator;
 	}
 

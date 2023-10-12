@@ -47,7 +47,7 @@ import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 
-public class AbstractQSimModuleTest {	
+public class AbstractQSimModuleTest {
 	@Test
 	public void testOverrides() {
 		AbstractQSimModule moduleA = new AbstractQSimModule() {
@@ -83,8 +83,8 @@ public class AbstractQSimModuleTest {
 	@Test
 	public void testOverrideAgentFactory() {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(0);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(0);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -103,12 +103,12 @@ public class AbstractQSimModuleTest {
 
 		Assert.assertTrue(value.get() > 0);
 	}
-	
+
 	@Test
 	public void testOverrideAgentFactoryTwice() {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(0);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(0);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -165,8 +165,8 @@ public class AbstractQSimModuleTest {
 	@Test
 	public void testAddEngine() {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(0);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(0);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 

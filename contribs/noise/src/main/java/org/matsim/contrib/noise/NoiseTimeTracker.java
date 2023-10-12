@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.noise;
 
@@ -50,7 +50,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * A handler which computes noise emissions, immisions, affected agent units and damages for each receiver point and time interval.
  * Throws noise damage events for each affected and causing agent.
- * 
+ *
  * @author ikaddoura
  *
  */
@@ -58,12 +58,12 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 
 	private static final Logger log = LogManager.getLogger(NoiseTimeTracker.class);
 	private static final boolean printLog = true;
-	
+
 	private NoiseContext noiseContext;
 
 	private String outputDirectory;
 	private int iteration;
-	
+
 	private boolean useCompression = false ;
 
 	private int cWarn1 = 0;
@@ -127,15 +127,15 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 
 	@Override
 	public void reset(int iteration) {
-		
-		String outputDir = noiseContext.getScenario().getConfig().controler().getOutputDirectory();
+
+		String outputDir = noiseContext.getScenario().getConfig().controller().getOutputDirectory();
 		if (!outputDir.endsWith("/")) {
 			outputDir = outputDir + "/";
 		}
-		
+
 		this.outputDirectory = outputDir + "ITERS/" + "it." + iteration + "/";
 		log.info("Setting the output directory to " + outputDirectory);
-		
+
 		this.iteration = iteration;
 		this.damageCalculation.reset(iteration);
 		this.noiseContext.reset();
@@ -144,16 +144,16 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 			rp.reset();
 		}
 	}
-	
+
 	private void resetCurrentTimeIntervalInfo() {
 		this.noiseContext.getNoiseLinks().clear();
 		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			rp.resetTimeInterval();
 		}
 	}
-	
+
 	private void processTimeBin() {
-		
+
 		if (printLog) {
 			log.info("##############################################");
 		}
@@ -184,12 +184,12 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			for (Id<Person> personId : rp.getPersonId2actInfos().keySet()) {
 				rp.getPersonId2actInfos().get(personId).removeIf(personActivityInfo -> personActivityInfo.getEndTime() < (timeBinEnd));
-			}				
+			}
 		}
 	}
 
 	private void computeNoiseForCurrentTimeInterval() {
-		
+
 		if (printLog) {
 			log.info("Calculating noise emissions...");
 		}
@@ -214,7 +214,7 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 			}
 		}
 	}
-		
+
 	private boolean writeOutput() {
 		if (this.noiseContext.getNoiseParams().getWriteOutputIteration() == 0) {
 			return false;
@@ -230,7 +230,7 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 				+ this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
 		this.noiseContext.setCurrentTimeBinEndTime(newTimeInterval);
 	}
-	
+
 	/*
 	 * Emission
 	 */
@@ -269,7 +269,7 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 
 	void computeFinalTimeIntervals() {
 		while (this.noiseContext.getCurrentTimeBinEndTime() <= Math.max(24. * 3600., this.noiseContext.getScenario().getConfig().qsim().getEndTime().orElse(0))) {
-			processTimeBin();			
+			processTimeBin();
 		}
 	}
 

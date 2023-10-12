@@ -32,14 +32,13 @@ import jakarta.inject.Inject;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.scoring.EventsToLegs;
@@ -62,8 +61,8 @@ public class PHbyModeCalculator {
     private static final String STAGE_ACTIVITY = "stageActivity";
 
     @Inject
-    PHbyModeCalculator(ControlerConfigGroup controlerConfigGroup, OutputDirectoryHierarchy controlerIO) {
-        writePng = controlerConfigGroup.isCreateGraphs();
+    PHbyModeCalculator(ControllerConfigGroup controllerConfigGroup, OutputDirectoryHierarchy controlerIO) {
+        writePng = controllerConfigGroup.isCreateGraphs();
         this.controlerIO = controlerIO;
     }
 
