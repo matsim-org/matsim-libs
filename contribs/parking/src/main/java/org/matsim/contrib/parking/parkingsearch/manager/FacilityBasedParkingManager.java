@@ -46,6 +46,10 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	protected Map<Id<ActivityFacility>, MutableLong> reservationsRequests = new HashMap<>();
 	protected Map<Id<ActivityFacility>, MutableLong> rejectedParkingRequest = new HashMap<>();
 	protected Map<Id<ActivityFacility>, MutableLong> numberOfParkedVehicles = new HashMap<>();
+	protected Map<Id<ActivityFacility>, MutableLong> numberOfWaitingActivities = new HashMap<>();
+	protected Map<Id<ActivityFacility>, MutableLong> numberOfStaysFromGetOffUntilGetIn = new HashMap<>();
+	protected Map<Id<ActivityFacility>, MutableLong> numberOfParkingBeforeGetIn = new HashMap<>();
+	protected Map<Id<Link>, TreeMap<Double, Id<Vehicle>>> waitingVehicles = new HashMap<>();
 	protected TreeMap<Integer, MutableLong> rejectedReservationsByTime = new TreeMap<>();
 	protected TreeMap<Integer, MutableLong> foundParkingByTime = new TreeMap<>();
 	protected TreeMap<Integer, MutableLong> unparkByTime = new TreeMap<>();
@@ -90,6 +94,8 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 			this.rejectedParkingRequest.put(fac.getId(), new MutableLong(0));
 			this.numberOfParkedVehicles.put(fac.getId(), new MutableLong(0));
 			this.numberOfWaitingActivities.put(fac.getId(), new MutableLong(0));
+			this.numberOfStaysFromGetOffUntilGetIn.put(fac.getId(), new MutableLong(0));
+			this.numberOfParkingBeforeGetIn.put(fac.getId(), new MutableLong(0));
 		}
 		int slotIndex = getTimeSlotIndex(startTime);
 		while (slotIndex <= maxSlotIndex) {
@@ -236,8 +242,8 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 			String s = linkId.toString() + ";" + x + ";" + y + ";" + e.getKey().toString() + ";" + capacity + ";" + e.getValue().toString() + ";" + this.reservationsRequests.get(
 				e.getKey()).toString() + ";" + this.numberOfParkedVehicles.get(e.getKey()).toString() + ";" + this.rejectedParkingRequest.get(
-				e.getKey()).toString()+ ";" + this.numberOfWaitingActivities.get(
-				e.getKey()).toString();
+				e.getKey()).toString() + ";" + this.numberOfWaitingActivities.get(
+				e.getKey()).toString() + ";" + this.numberOfStaysFromGetOffUntilGetIn.get(e.getKey()).intValue() + ";" + this.numberOfParkingBeforeGetIn.get(e.getKey()).intValue();
 			stats.add(s);
 		}
 		return stats;
@@ -329,6 +335,27 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 			this.rejectedParkingRequest.get(fac).setValue(0);
 			this.reservationsRequests.get(fac).setValue(0);
 			this.numberOfParkedVehicles.get(fac).setValue(0);
+			this.numberOfWaitingActivities.get(fac).setValue(0);
 		}
+		waitingVehicles.clear();
+	}
+
+	public void addVehicleForWaitingForParking(Id<Link> linkId, Id<Vehicle> vehicleId, double now) {
+//		System.out.println(now + ": vehicle " +vehicleId.toString() + " starts waiting here: " + linkId.toString());
+		waitingVehicles.get(linkId).put(now + getParkStageActivityDuration() + 1, vehicleId);
+		for (Id<ActivityFacility> fac : this.facilitiesPerLink.get(linkId)) {
+			this.numberOfWaitingActivities.get(fac).increment();
+			break;
+		}
+
+	}
+		}
+	}
+	public void registerStayFromGetOffUntilGetIn(Id<Vehicle> vehcileId) {
+		this.numberOfStaysFromGetOffUntilGetIn.get(parkingLocations.get(vehcileId)).increment();
+	}
+
+	public void registerParkingBeforeGetIn(Id<Vehicle> vehcileId) {
+		this.numberOfParkingBeforeGetIn.get(parkingLocations.get(vehcileId)).increment();
 	}
 }

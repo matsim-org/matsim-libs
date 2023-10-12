@@ -82,7 +82,7 @@ public class ParkingListener implements IterationEndsListener {
 		BufferedWriter bw = IOUtils.getBufferedWriter(output.getIterationFilename(iteration, "parkingStats.csv"));
 		try {
 
-			String header = "linkId;X;Y;parkingFacility;capacity;EndOccupation;reservationsRequests;numberOfParkedVehicles;rejectedReservations";
+			String header = "linkId;X;Y;parkingFacility;capacity;EndOccupation;reservationsRequests;numberOfParkedVehicles;rejectedParkingRequest;numberOfWaitingActivities;numberOfStaysFromGetOffUntilGetIn;numberOfParkingBeforeGetIn";
 			bw.write(header);
 			bw.newLine();
 			for (String s : produceStatistics){
