@@ -127,9 +127,7 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 					ACTIVITY_DURATION_WARNING_SHOWN = true;
 				}
 			}
-			pmta = new PlanMutateTimeAllocationSimplified(
-					// TODO: is StageActivityHandling.ExcludeStageActivities right here?
-					StageActivityHandling.ExcludeStageActivities, this.mutationRange, this.affectingDuration, MatsimRandom.getLocalInstance());
+			pmta = new PlanMutateTimeAllocationSimplified(this.mutationRange, this.affectingDuration, MatsimRandom.getLocalInstance());
 		}
 		return pmta;
 	}

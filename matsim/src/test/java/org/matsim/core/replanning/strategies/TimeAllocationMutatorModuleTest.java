@@ -79,8 +79,8 @@ public class TimeAllocationMutatorModuleTest {
 	@Test public void testSimplifiedMutation() {
 		boolean affectingDuration = true ;
 
-		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(StageActivityHandling.ExcludeStageActivities, 750, affectingDuration, MatsimRandom.getLocalInstance()), 750);
-		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(StageActivityHandling.ExcludeStageActivities, 7200, affectingDuration, MatsimRandom.getLocalInstance()), 7200);
+		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified( 750, affectingDuration, MatsimRandom.getLocalInstance()), 750);
+		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified( 7200, affectingDuration, MatsimRandom.getLocalInstance()), 7200);
 	}
 
 	@Test public void testSubpopulations() {

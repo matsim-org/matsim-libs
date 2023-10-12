@@ -191,9 +191,7 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 	}
 
 	private String getSubpopulation(final Plan plan) {
-//		if (this.subpopulationAttribute == null) return null;
 		if (plan.getPerson() == null) return null;
-//		return (String) PopulationUtils.getPersonAttribute(plan.getPerson(), this.subpopulationAttribute);
 		return PopulationUtils.getSubpopulation( plan.getPerson() );
 	}
 

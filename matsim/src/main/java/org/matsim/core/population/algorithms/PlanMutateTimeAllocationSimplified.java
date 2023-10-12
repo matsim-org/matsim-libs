@@ -38,28 +38,17 @@ import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
  */
 public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 
-	private final StageActivityHandling stageActivityHandling;
 	private final double mutationRange;
 	private final Random random;
 	private final boolean affectingDuration;
 
-	/**
-	 * Initializes an instance mutating all activities in a plan
-	 * @param mutationRange
-	 * @param affectingDuration
-	 * @param random
-	 */
-	public PlanMutateTimeAllocationSimplified(final double mutationRange, boolean affectingDuration, final Random random) {
-		this( StageActivityHandling.StagesAsNormalActivities , mutationRange , affectingDuration, random );
-	}
 	/**
 	 * Initializes an instance mutating all non-stage activities in a plan
 	 * @param mutationRange
 	 * @param affectingDuration
 	 * @param random
 	 */
-	public PlanMutateTimeAllocationSimplified(final StageActivityHandling stageActivityHandling, final double mutationRange, boolean affectingDuration, final Random random) {
-		this.stageActivityHandling = stageActivityHandling;
+	public PlanMutateTimeAllocationSimplified(final double mutationRange, boolean affectingDuration, final Random random) {
 		this.mutationRange = mutationRange;
 		this.affectingDuration = affectingDuration;
 		this.random = random;
@@ -67,7 +56,7 @@ public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		for ( Activity act : TripStructureUtils.getActivities( plan , stageActivityHandling ) ) {
+		for ( Activity act : TripStructureUtils.getActivities( plan , StageActivityHandling.ExcludeStageActivities ) ) {
 			// this is deliberately simplistic.  Cleanup up of the time information should be done somewhere else.
 			if (act.getEndTime().isDefined()) {
 				act.setEndTime(mutateTime(act.getEndTime().seconds()));
