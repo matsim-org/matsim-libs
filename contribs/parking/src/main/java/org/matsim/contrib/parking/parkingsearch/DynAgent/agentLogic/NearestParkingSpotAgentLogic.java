@@ -130,6 +130,7 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 			if (plan.getPlanElements().get(planIndex) instanceof Activity && ((Activity) plan.getPlanElements().get(planIndex)).getType().contains("_GetOff")) {
 				((Activity) plan.getPlanElements().get(planIndex)).setEndTime(now);
 				((Activity) plan.getPlanElements().get(planIndex + 4)).setStartTime(now + ((Activity) plan.getPlanElements().get(planIndex + 2)).getMaximumDuration().seconds());
+				// checks if it is possible to stay from getOff until getIn
 				boolean possibleToStay = checkIfParkingFacilityFollowsAndPossibleToStay(this.planIndex,this.planIndex + 2);
 				if (possibleToStay)
 					return nextStateAfterNonCarTrip(oldAction, now);
@@ -218,7 +219,7 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 
 		this.currentPlanElement = plan.getPlanElements().get(planIndex + 1);
 		Activity nextPlannedActivity = (Activity) this.currentPlanElement;
-		// checks if it is possible to stay from getOff until getIn or if you can extend parking here until getIn
+		// checks if you can extend parking here until getIn
 		if (nextPlannedActivity.getType().equals(ParkingUtils.ParkingActivityType) && plan.getPlanElements().get(planIndex + 2) instanceof Leg) {
 			checkIfParkingFacilityFollowsAndPossibleToStay(planIndex + 1,planIndex + 1);
 		}
