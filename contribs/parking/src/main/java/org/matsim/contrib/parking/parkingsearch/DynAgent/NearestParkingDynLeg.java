@@ -104,6 +104,11 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 			return linkIds.get(currentLinkIdx + 1);
 
 		} else {
+			if (passangerInteractionAtParkingFacilityAtEndOfLeg && !hasFoundParking && followingActivity.getLinkId().equals(currentLinkId)) {
+				createWaitingActivityUntilPassengerInteractionIsPossible(currentLinkId, vehicleId, timer.getTimeOfDay());
+				this.events
+					.processEvent(new StartWaitingForParkingEvent(timer.getTimeOfDay(), vehicleId, currentLinkId));
+			}
 			if (hasFoundParking || reachedDestinationWithoutParking) {
 				// easy, we can just park where at our destination link
 				if (hasFoundParking && !passangerInteractionAtParkingFacilityAtEndOfLeg) {
@@ -123,35 +128,6 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 						- ((FacilityBasedParkingManager) parkingManager).getParkStageActivityDuration();
 					followingActivity.setMaximumDuration(parkingDuration);
 				}
-				if (plan.getPlanElements().size() > planIndexNextActivity + 2 || followingActivity.getType().equals("parking_activity")) {
-					Activity activityAfterFollowing = (Activity) plan.getPlanElements().get(planIndexNextActivity + 2);
-					// check if the following parkingActivity is at same link as the next Pickup and the parking is possible until the pickup
-					if (followingActivity.getType().equals("parking_activity") && currentLinkId.equals(activityAfterFollowing.getLinkId())) {
-						boolean canParkAtFacilityUntilGetIn = ((FacilityBasedParkingManager) parkingManager).canParkAtThisFacilityUntilEnd(
-							currentLinkId,
-							followingActivity.getMaximumDuration().seconds(), 0.,
-							activityAfterFollowing.getMaximumDuration().seconds(), timer.getTimeOfDay());
-						if (canParkAtFacilityUntilGetIn) {
-							plan.getPlanElements().remove(planIndexNextActivity + 1);
-//							log.info(
-//								plan.getPerson().getId().toString() + ": Parking activity can take place until GetIn. " + followingActivity.getType() + "The leg between parking and GetIn is been removed!");
-						}
-					} else if (activityAfterFollowing.getType().equals("parking_activity")) {
-						// checks if parking from GetOff until pickup at this facility is possible
-						boolean canParkAtGetOffFacility = ((FacilityBasedParkingManager) parkingManager).canParkAtThisFacilityUntilEnd(currentLinkId,
-							activityAfterFollowing.getMaximumDuration().seconds(), followingActivity.getMaximumDuration().seconds(),
-							((Activity) plan.getPlanElements().get(planIndexNextActivity + 4)).getMaximumDuration().seconds(), timer.getTimeOfDay());
-						if (canParkAtGetOffFacility) {
-							plan.getPlanElements().remove(planIndexNextActivity + 3);
-							plan.getPlanElements().remove(planIndexNextActivity + 1);
-//							log.info(
-//								plan.getPerson().getId().toString() + ": Parking activity can take place at getOff point. " + followingActivity.getType() + "The legs between getOff and parking are removed!");
-						}
-//						else log.info(
-//							plan.getPerson().getId().toString() + ": Parking activity can NOT take place at getOff point. " + followingActivity.getType() + "Bus will search for another facility!");
-					}
-				}
-
 				this.logic.reset();
 				return null;
 			} else {
@@ -199,6 +175,14 @@ public class NearestParkingDynLeg extends ParkingDynLeg {
 				return nextLinkId;
 			}
 		}
+	}
+
+	private void createWaitingActivityUntilPassengerInteractionIsPossible(Id<Link> newLinkId, Id<Vehicle> vehicleId, double now) {
+		Activity waitingActivity = PopulationUtils.createActivityFromLinkId(ParkingUtils.WaitingForParkingActivityType, newLinkId);
+		ParkingUtils.setNoParkingForActivity(waitingActivity);
+		plan.getPlanElements().add(planIndexNextActivity, waitingActivity);
+		hasFoundParking = true;
+		((FacilityBasedParkingManager) parkingManager).addVehicleForWaitingForParking(newLinkId, vehicleId, now);
 	}
 
 	private void removeNextActivityAndFollowingLeg() {
