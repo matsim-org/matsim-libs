@@ -179,7 +179,7 @@
 		<dependency>
 			<groupId>com.graphhopper</groupId>
 			<artifactId>graphhopper-core</artifactId>
-			<version>7.0</version>
+			<version>7.0-testgithub6</version>
 		</dependency>
 		<!-- Enforce version -->
 		<dependency>
