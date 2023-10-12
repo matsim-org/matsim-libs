@@ -23,11 +23,7 @@ package example.lsp.simulationTrackers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.freight.carriers.carrier.Carrier;
-import org.matsim.freight.carriers.carrier.CarrierVehicle;
-import org.matsim.freight.carriers.carrier.Carriers;
-import org.matsim.freight.carriers.carrier.ScheduledTour;
-import org.matsim.freight.carriers.controler.FreightUtils;
+import org.matsim.freight.carriers.carrier.*;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
 import org.matsim.freight.carriers.events.eventhandler.FreightTourStartEventHandler;
 
@@ -40,7 +36,7 @@ import java.util.Collection;
 	private double vehicleFixedCosts;
 
 	public TourStartHandler(Scenario scenario) {
-		this.carriers = FreightUtils.addOrGetCarriers(scenario);
+		this.carriers = CarrierUtils.addOrGetCarriers(scenario);
 	}
 
 	@Override

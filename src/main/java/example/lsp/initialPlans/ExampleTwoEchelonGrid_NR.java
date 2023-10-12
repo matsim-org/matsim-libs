@@ -50,9 +50,9 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.FreightConfigGroup;
 import org.matsim.freight.carriers.carrier.*;
+import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
-import org.matsim.freight.carriers.controler.FreightUtils;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
@@ -136,7 +136,7 @@ final class ExampleTwoEchelonGrid_NR {
 
 				bind( CarrierScoringFunctionFactory.class ).toInstance(carrierScorer);
 				bind( CarrierStrategyManager.class ).toProvider(() -> {
-					CarrierStrategyManager strategyManager = FreightUtils.createDefaultCarrierStrategyManager();
+					CarrierStrategyManager strategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
 					return strategyManager;
 				});
@@ -157,8 +157,8 @@ final class ExampleTwoEchelonGrid_NR {
 
 		//Ggf. muss der Ordner noch erstellt werden (?)
 		new LSPPlanXmlWriter(LSPUtils.getLSPs(controler.getScenario())).write(controler.getConfig().controller().getOutputDirectory() + "/lsps.xml");
-		new LSPPlanXmlReader(LSPUtils.getLSPs(controler.getScenario()), FreightUtils.getCarriers(controler.getScenario()));
-		new CarrierPlanWriter(FreightUtils.getCarriers(controler.getScenario())).write(controler.getConfig().controller().getOutputDirectory() + "/carriers.xml");
+		new LSPPlanXmlReader(LSPUtils.getLSPs(controler.getScenario()), CarrierUtils.getCarriers(controler.getScenario()));
+		new CarrierPlanWriter(CarrierUtils.getCarriers(controler.getScenario())).write(controler.getConfig().controller().getOutputDirectory() + "/carriers.xml");
 
 		log.info("Some results ....");
 

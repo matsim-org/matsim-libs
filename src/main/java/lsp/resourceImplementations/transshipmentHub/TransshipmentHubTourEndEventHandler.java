@@ -29,13 +29,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.freight.carriers.carrier.Carrier;
-import org.matsim.freight.carriers.carrier.CarrierService;
-import org.matsim.freight.carriers.carrier.ScheduledTour;
-import org.matsim.freight.carriers.carrier.Tour;
+import org.matsim.freight.carriers.carrier.*;
 import org.matsim.freight.carriers.carrier.Tour.ServiceActivity;
 import org.matsim.freight.carriers.carrier.Tour.TourElement;
-import org.matsim.freight.carriers.controler.FreightUtils;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.eventhandler.FreightTourEndEventHandler;
 
@@ -97,7 +93,7 @@ public class TransshipmentHubTourEndEventHandler implements AfterMobsimListener,
 	@Override
 	public void handleEvent(CarrierTourEndEvent event) {
 		Tour tour = null;
-		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
+		Carrier carrier = CarrierUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
 //		if (ResourceImplementationUtils.getCarrierType(carrier).equals(ResourceImplementationUtils.CARRIER_TYPE.mainRunCarrier)) { //Todo müsste auch für Collection Carrier gehen, aber da muss hub funktionalität eh geprüft werden, KMT 21.09.23
 			Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
 			for (ScheduledTour scheduledTour : scheduledTours) {

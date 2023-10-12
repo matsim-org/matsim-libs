@@ -35,9 +35,9 @@ import org.matsim.core.controler.listener.*;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.freight.carriers.carrier.Carrier;
 import org.matsim.freight.carriers.carrier.CarrierPlanWriter;
+import org.matsim.freight.carriers.carrier.CarrierUtils;
 import org.matsim.freight.carriers.carrier.Carriers;
 import org.matsim.freight.carriers.controler.CarrierAgentTracker;
-import org.matsim.freight.carriers.controler.FreightUtils;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -127,7 +127,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 		//Update carriers in scenario and CarrierAgentTracker
 		carrierAgentTracker.getCarriers().getCarriers().clear();
 		for (Carrier carrier : getCarriersFromLSP().getCarriers().values()) {
-			FreightUtils.getCarriers(scenario).addCarrier(carrier);
+			CarrierUtils.getCarriers(scenario).addCarrier(carrier);
 			carrierAgentTracker.getCarriers().addCarrier(carrier);
 		}
 
@@ -179,6 +179,6 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		new LSPPlanXmlWriter(LSPUtils.getLSPs(scenario)).write(controlerIO.getOutputPath() + "/output_lsps.xml.gz");
-		new CarrierPlanWriter(FreightUtils.getCarriers(scenario)).write(controlerIO.getOutputPath() + "/output_carriers.xml.gz");
+		new CarrierPlanWriter(CarrierUtils.getCarriers(scenario)).write(controlerIO.getOutputPath() + "/output_carriers.xml.gz");
 	}
 }
