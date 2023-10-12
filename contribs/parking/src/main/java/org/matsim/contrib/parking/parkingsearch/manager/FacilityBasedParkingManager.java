@@ -349,8 +349,31 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		}
 
 	}
+
+	public void checkFreeCapacitiesForWaitingVehicles(QSim qSim, double now) {
+		for (Id<Link> linkId : waitingVehicles.keySet()) {
+			if (!waitingVehicles.get(linkId).isEmpty()) {
+				for (Id<ActivityFacility> fac : this.facilitiesPerLink.get(linkId)) {
+					int cap = (int) this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.ParkingStageInteractionType).getCapacity();
+					while (this.occupation.get(fac).intValue() < cap && !waitingVehicles.get(linkId).isEmpty()) {
+						double startWaitingTime = waitingVehicles.get(linkId).firstKey();
+						if (startWaitingTime > now)
+							break;
+						Id<Vehicle> vehcileId = waitingVehicles.get(linkId).remove(startWaitingTime);
+						DynAgent agent = (DynAgent) qSim.getAgents().get(Id.createPersonId(vehcileId.toString()));
+						reserveSpaceIfVehicleCanParkHere(vehcileId, linkId);
+						agent.endActivityAndComputeNextState(now);
+						qsim.rescheduleActivityEnd(agent);
+					}
+				}
+			}
 		}
 	}
+
+	public void setQSim(QSim qSim) {
+		qsim = qSim;
+	}
+
 	public void registerStayFromGetOffUntilGetIn(Id<Vehicle> vehcileId) {
 		this.numberOfStaysFromGetOffUntilGetIn.get(parkingLocations.get(vehcileId)).increment();
 	}
