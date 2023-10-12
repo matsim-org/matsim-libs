@@ -4,8 +4,6 @@
 package org.matsim.contrib.pseudosimulation.mobsim;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
-import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
 import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.TransitEmulator;
 import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
@@ -42,25 +40,25 @@ public class PSimProvider implements Provider<Mobsim> {
         this.travelTime = travelTime;
     }
 
-    @Deprecated
-    public void setWaitTime(WaitTime waitTime) {
-    	throw new RuntimeException("Use an instance of " + TransitEmulator.class.getSimpleName() + " instead.");
-    }
+//    @Deprecated
+//    public void setWaitTime(WaitTime waitTime) {
+//    	throw new RuntimeException("Use an instance of " + TransitEmulator.class.getSimpleName() + " instead.");
+//    }
 
-    @Deprecated
-    public void setStopStopTime(StopStopTime stopStopTime) {
-    	throw new RuntimeException("Use an instance of " + TransitEmulator.class.getSimpleName() + " instead.");
-    }
+//    @Deprecated
+//    public void setStopStopTime(StopStopTime stopStopTime) {
+//    	throw new RuntimeException("Use an instance of " + TransitEmulator.class.getSimpleName() + " instead.");
+//    }
 
     @Deprecated
     public void setTransitPerformance(TransitPerformance transitPerformance) {
     	throw new RuntimeException("Use an instance of " + TransitEmulator.class.getSimpleName() + " instead.");
     }
 
-    @Deprecated
-    public void setTimes(TravelTime travelTime, WaitTime waitTime, StopStopTime stopStopTime) {
-    	throw new RuntimeException("Use an instance of " + TransitEmulator.class.getSimpleName() + " instead.");
-    }
+//    @Deprecated
+//    public void setTimes(TravelTime travelTime, WaitTime waitTime, StopStopTime stopStopTime) {
+//    	throw new RuntimeException("Use an instance of " + TransitEmulator.class.getSimpleName() + " instead.");
+//    }
 
     @Deprecated
     //will replace where necessary
