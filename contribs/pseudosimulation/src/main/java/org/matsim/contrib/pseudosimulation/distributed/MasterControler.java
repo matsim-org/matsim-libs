@@ -23,8 +23,6 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorSerializable;
-import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculatorSerializable;
 import org.matsim.contrib.pseudosimulation.distributed.instrumentation.scorestats.SlaveScoreStats;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.controler.GenomeAnalysis;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.controler.SlaveScoreWriter;
@@ -73,8 +71,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private Config config;
     private Controler matsimControler;
     private TreeMap<Integer, SlaveHandler> slaveHandlerTreeMap;
-    private WaitTimeCalculatorSerializable waitTimeCalculator;
-    private StopStopTimeCalculatorSerializable stopStopTimeCalculator;
+//    private WaitTimeCalculatorSerializable waitTimeCalculator;
+//    private StopStopTimeCalculatorSerializable stopStopTimeCalculator;
     private TransitPerformanceRecorder transitPerformanceRecorder;
     private SerializableLinkTravelTimes linkTravelTimes;
     private AtomicInteger numThreads = new AtomicInteger(0);
@@ -180,13 +178,13 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
 
         if (this.config.transit().isUseTransit()) {
-            waitTimeCalculator = new WaitTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(), this.config.travelTimeCalculator().getTraveltimeBinSize(),
-                    (int) (this.config.qsim().getEndTime().seconds() - this.config.qsim().getStartTime().seconds()));
-            matsimControler.getEvents().addHandler(waitTimeCalculator);
-            stopStopTimeCalculator = new StopStopTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(),
-                    this.config.travelTimeCalculator().getTraveltimeBinSize(), (int) (this.config.qsim()
-                    .getEndTime().seconds() - this.config.qsim().getStartTime().seconds()));
-            matsimControler.getEvents().addHandler(stopStopTimeCalculator);
+//            waitTimeCalculator = new WaitTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(), this.config.travelTimeCalculator().getTraveltimeBinSize(),
+//                    (int) (this.config.qsim().getEndTime().seconds() - this.config.qsim().getStartTime().seconds()));
+//            matsimControler.getEvents().addHandler(waitTimeCalculator);
+//            stopStopTimeCalculator = new StopStopTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(),
+//                    this.config.travelTimeCalculator().getTraveltimeBinSize(), (int) (this.config.qsim()
+//                    .getEndTime().seconds() - this.config.qsim().getStartTime().seconds()));
+//            matsimControler.getEvents().addHandler(stopStopTimeCalculator);
             //tell PlanSerializable to record transit routes
             PlanSerializable.isUseTransit = true;
             if (fullTransitPerformanceTransmission) {
@@ -778,8 +776,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             writer.writeInt(currentIteration);
             writer.writeObject(linkTravelTimes);
             if (config.transit().isUseTransit()) {
-                writer.writeObject(stopStopTimeCalculator.getStopStopTimes());
-                writer.writeObject(waitTimeCalculator.getWaitTimes());
+//                writer.writeObject(stopStopTimeCalculator.getStopStopTimes());
+//                writer.writeObject(waitTimeCalculator.getWaitTimes());
                 if (fullTransitPerformanceTransmission)
                     writer.writeObject(transitPerformanceRecorder.getTransitPerformance());
             }

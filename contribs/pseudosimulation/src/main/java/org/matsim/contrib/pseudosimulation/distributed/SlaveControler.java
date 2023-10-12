@@ -28,11 +28,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.common.diversitygeneration.planselectors.DiversityGeneratingPlansRemover;
-import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
-import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
-import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorSerializable;
-import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
-import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculatorSerializable;
 import org.matsim.contrib.pseudosimulation.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
 import org.matsim.contrib.pseudosimulation.mobsim.PSimProvider;
@@ -86,8 +81,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private double totalIterationTime;
     private Controler matsimControler;
     private TravelTime linkTravelTimes;
-    private WaitTime waitTimes;
-    private StopStopTime stopStopTimes;
     private ObjectInputStream reader;
     private ObjectOutputStream writer;
     private PSimProvider pSimProvider;
@@ -97,7 +90,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private boolean isOkForNextIter = true;
     private Map<Id<Person>, Double> selectedPlanScoreMemory;
     private TransitPerformance transitPerformance;
-    private TransitRouterEventsWSFactory transitRouterEventsWSFactory;
 
     private void printHelp(Options options) {
         String header = "The MasterControler takes the following options:\n\n";
@@ -268,15 +260,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         });
 
         if (config.transit().isUseTransit()) {
-
-            stopStopTimes = new StopStopTimeCalculatorSerializable(scenario.getTransitSchedule(),
-                    config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config
-                    .qsim().getEndTime().seconds() - config.qsim().getStartTime().seconds())).getStopStopTimes();
-
-            waitTimes = new WaitTimeCalculatorSerializable(scenario.getTransitSchedule(),
-                    config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config
-                    .qsim().getEndTime().seconds() - config.qsim().getStartTime().seconds())).getWaitTimes();
-
             // tell PlanSerializable to record transit routes
             PlanSerializable.isUseTransit = true;
 
@@ -285,11 +268,11 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
-                    System.out.println("init routers");
+//                    System.out.println("init routers");
 //                    transitRouterEventsWSFactory = new TransitRouterEventsWSFactory(scenario,
 //                            waitTimes,
 //                            stopStopTimes);
-                    bind(TransitRouter.class).toProvider(transitRouterEventsWSFactory);
+//                    bind(TransitRouter.class).toProvider(transitRouterEventsWSFactory);
                 }
             });
 
@@ -387,13 +370,13 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         travelTime.setTravelTime(linkTravelTimes);
         pSimProvider.setTravelTime(linkTravelTimes);
         if (config.transit().isUseTransit()) {
-            pSimProvider.setStopStopTime(stopStopTimes);
-            pSimProvider.setWaitTime(waitTimes);
-            pSimProvider.setTransitPerformance(transitPerformance);
-            if (transitRouterEventsWSFactory != null) {
+//            pSimProvider.setStopStopTime(stopStopTimes);
+//            pSimProvider.setWaitTime(waitTimes);
+//            pSimProvider.setTransitPerformance(transitPerformance);
+//            if (transitRouterEventsWSFactory != null) {
 //                transitRouterEventsWSFactory.setStopStopTimeCalculator(stopStopTimes);
 //                transitRouterEventsWSFactory.setWaitTimeCalculator(waitTimes);
-            }
+//            }
         }
         plancatcher.init();
         numberOfIterations++;
@@ -449,8 +432,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         masterCurrentIteration = reader.readInt();
         linkTravelTimes = (SerializableLinkTravelTimes) reader.readObject();
         if (config.transit().isUseTransit()) {
-            stopStopTimes = (StopStopTime) reader.readObject();
-            waitTimes = (WaitTime) reader.readObject();
+//            stopStopTimes = (StopStopTime) reader.readObject();
+//            waitTimes = (WaitTime) reader.readObject();
             if (fullTransitPerformanceTransmission) {
                 Object o = reader.readObject();
                 transitPerformance = (TransitPerformance) o;
@@ -619,8 +602,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
         Iterator<Map.Entry<Id<Person>, Double>> iterator = selectedPlanScoreMemory.entrySet().iterator();
-        StopStopTimeCalculatorSerializable.printCallStatisticsAndReset();
-        WaitTimeCalculatorSerializable.printCallStatisticsAndReset();
+//        StopStopTimeCalculatorSerializable.printCallStatisticsAndReset();
+//        WaitTimeCalculatorSerializable.printCallStatisticsAndReset();
         while (iterator.hasNext()) {
             Map.Entry<Id<Person>, Double> entry = iterator.next();
             scenario.getPopulation().getPersons().get(entry.getKey()).getSelectedPlan().setScore(entry.getValue());
