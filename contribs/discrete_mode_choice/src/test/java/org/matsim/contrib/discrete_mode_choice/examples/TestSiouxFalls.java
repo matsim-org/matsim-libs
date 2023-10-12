@@ -28,7 +28,6 @@ public class TestSiouxFalls {
 		URL scenarioURL = ExamplesUtils.getTestScenarioURL("siouxfalls-2014");
 
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(scenarioURL, "config_default.xml"));
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		DiscreteModeChoiceConfigurator.configureAsSubtourModeChoiceReplacement(config);
 
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -57,9 +56,9 @@ public class TestSiouxFalls {
 
 		controller.run();
 
-		assertEquals(42395, (int) listener.counts.get("pt"));
-		assertEquals(132284, (int) listener.counts.get("car"));
-		assertEquals(78809, (int) listener.counts.get("walk"));
+		assertEquals(44196, (int) listener.counts.get("pt"));
+		assertEquals(132316, (int) listener.counts.get("car"));
+		assertEquals(82140, (int) listener.counts.get("walk"));
 //		assertEquals(42520, (int) listener.counts.get("pt"));
 //		assertEquals(132100, (int) listener.counts.get("car"));
 //		assertEquals(79106, (int) listener.counts.get("walk"));
