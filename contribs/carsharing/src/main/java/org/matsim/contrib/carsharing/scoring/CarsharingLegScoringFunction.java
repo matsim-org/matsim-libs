@@ -55,7 +55,7 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 
 		AgentRentals agentRentals = this.demandHandler.getAgentRentalsMap().get(person.getId());
 		if (agentRentals != null) {
-			double marginalUtilityOfMoney = ((ScoringConfigGroup)this.config.getModule("planCalcScore")).getMarginalUtilityOfMoney();
+			double marginalUtilityOfMoney = this.config.scoring().getMarginalUtilityOfMoney();
 			for(RentalInfo rentalInfo : agentRentals.getArr()) {
 				CSVehicle vehicle = this.carsharingSupplyContainer.getAllVehicles().get(rentalInfo.getVehId().toString());
 				if (marginalUtilityOfMoney != 0.0)

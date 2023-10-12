@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.application.commands.RunScenario;
 import org.matsim.application.commands.ShowGUI;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigAliases;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
@@ -230,6 +231,9 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory()
 				.enable(YAMLGenerator.Feature.MINIMIZE_QUOTES));
 
+		ConfigAliases aliases = new ConfigAliases();
+		Deque<String> emptyStack = new ArrayDeque<>();
+
 		try (BufferedReader reader = Files.newBufferedReader(specs)) {
 
 			JsonNode node = mapper.readTree(reader);
@@ -238,10 +242,10 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 			while (fields.hasNext()) {
 				Map.Entry<String, JsonNode> field = fields.next();
-
-				ConfigGroup group = config.getModules().get(field.getKey());
+				String configGroupName = aliases.resolveAlias(field.getKey(), emptyStack);
+				ConfigGroup group = config.getModules().get(configGroupName);
 				if (group == null) {
-					log.warn("Config group not found: {}", field.getKey());
+					log.warn("Config group not found: {}", configGroupName);
 					continue;
 				}
 
