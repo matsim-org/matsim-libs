@@ -497,35 +497,6 @@
 
 <!-- ====================================================================== -->
 
-	<module name="ptCounts" >
-
-		<!-- factor by which to re-scale the simulated values.  necessary when simulation runs with something different from 100%.  needs to be adapted manually -->
-		<param name="countsScaleFactor" value="1.0" />
-
-		<!-- distance to distanceFilterCenterNode to include counting stations. The unit of distance is the Euclidean distance implied by the coordinate system -->
-		<param name="distanceFilter" value="null" />
-
-		<!-- node id for center node of distance filter -->
-		<param name="distanceFilterCenterNode" value="null" />
-
-		<!-- input file containing the alighting (getting off) counts for pt -->
-		<param name="inputAlightCountsFile" value="null" />
-
-		<!-- input file containing the boarding (getting on) counts for pt -->
-		<param name="inputBoardCountsFile" value="null" />
-
-		<!-- input file containing the occupancy counts for pt -->
-		<param name="inputOccupancyCountsFile" value="null" />
-
-		<!-- possible values: `html', `kml', `txt', `all' -->
-		<param name="outputformat" value="null" />
-
-		<!-- every how many iterations (starting with 0) counts comparisons are generated -->
-		<param name="ptCountsInterval" value="10" />
-	</module>
-
-<!-- ====================================================================== -->
-
 	<module name="qsim" >
 		<param name="endTime" value="undefined" />
 		<param name="flowCapacityFactor" value="1.0" />
