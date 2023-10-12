@@ -19,7 +19,7 @@
  *
  */
 
-package org.matsim.freight.carriers.analysis.analysis;
+package org.matsim.freight.carriers.analysis;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

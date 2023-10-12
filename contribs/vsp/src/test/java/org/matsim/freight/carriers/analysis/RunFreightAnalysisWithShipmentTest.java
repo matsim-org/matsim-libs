@@ -19,7 +19,7 @@
  *
  */
 
-package org.matsim.freight.carriers.analysis.analysis;
+package org.matsim.freight.carriers.analysis;
 
 import org.junit.Assert;
 import org.junit.Rule;

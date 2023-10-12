@@ -19,7 +19,7 @@
  *
  */
 
-package org.matsim.freight.carriers.analysis.analysis;
+package org.matsim.freight.carriers.analysis;
 
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
