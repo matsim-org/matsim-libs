@@ -26,6 +26,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.utils.objectattributes.attributeconverters.*;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.core.network.DisallowedNextLinks;
+import org.matsim.core.network.DisallowedNextLinks.DisallowedNextLinksAttributeConverter;
 import org.matsim.vehicles.PersonVehicles;
 
 import java.util.*;
@@ -60,6 +62,7 @@ public class ObjectAttributesConverter {
 		this.converters.put(Coord.class.getName(), new CoordConverter());
 		this.converters.put(Coord[].class.getName(), new CoordArrayConverter());
 		this.converters.put(PersonVehicles.class.getName(), new PersonVehiclesAttributeConverter());
+		this.converters.put(DisallowedNextLinks.class.getName(), new DisallowedNextLinksAttributeConverter());
 	}
 
 	//this is for reading
