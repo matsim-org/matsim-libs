@@ -8,7 +8,7 @@ import org.matsim.modechoice.EstimatorContext;
  *
  * @param <T> enumeration of possible ownerships
  */
-public interface LegEstimator<T extends Enum<T>> {
+public interface LegEstimator<T extends Enum<?>> {
 
 	/**
 	 * Calculate an estimate of utility íf this mode would be used.
