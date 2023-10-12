@@ -175,10 +175,10 @@ public final class PlanWithCachedJointPlan implements Plan {
 	}
 	
 	@Override
-	public Id<String> getPlanId() { return null; }
+	public Id<Plan> getId() { return null; }
 
 	@Override
-	public void setPlanId(Id<String> planId) { /* nothing to do here */ }
+	public void setPlanId(Id<Plan> planId) { /* nothing to do here */ }
 	
 	@Override
 	public int getIterationCreated() { return -1; }

@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.api.internal.MatsimPopulationObject;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
@@ -35,7 +36,7 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  * The only thing which is not "expected" in the same sense is the score.
  *
  */
-public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan, Attributable {
+public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan, Attributable, Identifiable<Plan> {
 	
 	public abstract List<PlanElement> getPlanElements();
 
@@ -51,9 +52,9 @@ public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan, A
 
 	public abstract void setType(final String type);
 	
-	public abstract void setPlanId(final Id<String> planId);
+	public abstract void setPlanId(Id<Plan> planId);
 	
-	public abstract Id<String> getPlanId();
+	public abstract Id<Plan> getId();
 	
 	public abstract int getIterationCreated();
 	
@@ -72,5 +73,6 @@ public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan, A
 	 * you are using this method!.
 	 */
 	public abstract void setPerson(Person person);
+	
 
 }

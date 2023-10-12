@@ -28,6 +28,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -40,6 +41,8 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /* deliberately package */  final class PlanImpl implements Plan {
 
+	private Id<Plan> id=  null;
+	
 	private ArrayList<PlanElement> actsLegs = new ArrayList<>();
 
 	private Double score = null;
@@ -125,13 +128,16 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 	}
     
 	@Override
-	public Id<String> getPlanId() {
-		return (Id<String>) this.getAttributes().getAttribute(PlanInheritanceModule.PLAN_ID);
+	public Id<Plan> getId() {
+		if(this.id!=null)
+			return this.id;
+		else return Id.create(this.getAttributes().getAttribute(PlanInheritanceModule.PLAN_ID).toString(),Plan.class);
 	}
 
 	@Override
-	public void setPlanId(Id<String> planId) {
-		this.getAttributes().putAttribute(PlanInheritanceModule.PLAN_ID, planId);
+	public void setPlanId(Id<Plan> planId) {
+		this.getAttributes().putAttribute(PlanInheritanceModule.PLAN_ID, planId.toString());
+		this.id = planId;
 	}
 	
 	@Override
@@ -195,6 +201,8 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 		}
 		return this.customizableDelegate.getCustomAttributes();
 	}
+
+
 
 //	public final void setLocked() {
 //		for ( PlanElement pe : this.actsLegs ) {

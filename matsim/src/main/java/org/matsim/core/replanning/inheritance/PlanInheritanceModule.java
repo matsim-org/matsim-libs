@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
-import org.matsim.core.config.groups.PlanInheritanceConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -49,7 +48,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.annealing.ReplanningAnnealerConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
 
 import com.google.inject.Singleton;
@@ -75,7 +73,7 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 	public static final String FILENAME_PLAN_INHERITANCE_RECORDS = "planInheritanceRecords";
 	
 	long numberOfPlanInheritanceRecordsCreated = 0;
-	Map<Id<String>, PlanInheritanceRecord> planId2planInheritanceRecords = new ConcurrentHashMap<>();
+	Map<Id<Plan>, PlanInheritanceRecord> planId2planInheritanceRecords = new ConcurrentHashMap<>();
 	
 	PlanInheritanceRecordWriter planInheritanceRecordWriter;
 	private ArrayList<String> strategies;
@@ -96,7 +94,7 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 		// reset all plan attributes that might be present from a previously performed matsim run
 		for (Person person : event.getServices().getScenario().getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
-				plan.setPlanId(Id.create(NONE, String.class));
+				plan.setPlanId(Id.create(NONE, Plan.class));
 				plan.setPlanMutator(INITIAL_PLAN);
 				plan.setIterationCreated(0);
 			}
@@ -157,8 +155,8 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		// check the plans of the population and all currently stored plan records - do the actual book-keeping
 		
-		Set<Id<String>> activePlanIds = new HashSet<>();
-		Set<Id<String>> selectedPlanIds = new HashSet<>();
+		Set<Id<Plan>> activePlanIds = new HashSet<>();
+		Set<Id<Plan>> selectedPlanIds = new HashSet<>();
 		
 		for (Person person : event.getServices().getScenario().getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
@@ -174,8 +172,8 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 					
 					PlanInheritanceRecord planInheritanceRecord = new PlanInheritanceRecord();
 					planInheritanceRecord.setAgentId(person.getId());
-					planInheritanceRecord.setPlanId( Id.create(Long.toString(++this.numberOfPlanInheritanceRecordsCreated, 36), String.class) );
-					planInheritanceRecord.setAncestorId(plan.getPlanId());
+					planInheritanceRecord.setPlanId(Id.create(Long.toString(++this.numberOfPlanInheritanceRecordsCreated, 36), Plan.class));
+					planInheritanceRecord.setAncestorId(plan.getId()); //works because new plan is copy of old selected and attributes are copied -> thus current attribute plan id is old selected plan id
 					plan.setPlanId(planInheritanceRecord.getPlanId());
 					planInheritanceRecord.setIterationCreated(plan.getIterationCreated());
 					planInheritanceRecord.setMutatedBy(plan.getPlanMutator());
@@ -184,22 +182,22 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 				}
 				
 				if (PersonUtils.isSelected(plan)) {
-					this.planId2planInheritanceRecords.get(plan.getPlanId()).getIterationsSelected().add(event.getIteration());
-					selectedPlanIds.add(plan.getPlanId());
+					this.planId2planInheritanceRecords.get(plan.getId()).getIterationsSelected().add(event.getIteration());
+					selectedPlanIds.add(plan.getId());
 				}
 				
-				activePlanIds.add(plan.getPlanId());
+				activePlanIds.add(plan.getId());
 			}
 		}
 		
-		List<Id<String>> deletedPlans = new ArrayList<>();
-		for (Id<String> planId : this.planId2planInheritanceRecords.keySet()) {
+		List<Id<Plan>> deletedPlans = new ArrayList<>();
+		for (Id<Plan> planId : this.planId2planInheritanceRecords.keySet()) {
 			if (!activePlanIds.contains(planId)) {
 				deletedPlans.add(planId);
 			}
 		}
 		
-		for (Id<String> deletedPlanId : deletedPlans) {
+		for (Id<Plan> deletedPlanId : deletedPlans) {
 			PlanInheritanceRecord deletedPlanInheritanceRecord = this.planId2planInheritanceRecords.remove(deletedPlanId);
 			deletedPlanInheritanceRecord.setIterationRemoved(event.getIteration());
 			this.planInheritanceRecordWriter.write(deletedPlanInheritanceRecord);
@@ -214,12 +212,12 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 	/**
 	 * Updates the default plan stats - namely the distribution of plan mutators based on the given plan ids.
 	 */
-	private void calculateAndWriteDistribution(int currentIteration, ArrayList<String> strategies, Map<Id<String>, PlanInheritanceRecord> planId2planInheritanceRecords, Set<Id<String>> planIds, BufferedWriter writer) {
+	private void calculateAndWriteDistribution(int currentIteration, ArrayList<String> strategies, Map<Id<Plan>, PlanInheritanceRecord> planId2planInheritanceRecords, Set<Id<Plan>> planIds, BufferedWriter writer) {
 		Map<String, AtomicLong> strategy2count = new HashMap<>();
 		for (String strategyName : strategies) {
 			strategy2count.put(strategyName, new AtomicLong(0));
 		}
-		for (Id<String> planId : planIds) {
+		for (Id<Plan> planId : planIds) {
 			String mutatedBy = planId2planInheritanceRecords.get(planId).getMutatedBy();
 			strategy2count.get(mutatedBy).incrementAndGet();
 		}

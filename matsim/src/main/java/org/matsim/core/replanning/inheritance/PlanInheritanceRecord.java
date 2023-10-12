@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 
 /**
  * Data container storing the data of a single plan.
@@ -41,12 +42,12 @@ public class PlanInheritanceRecord {
 	/**
 	 * The globally unique plan id.
 	 */
-	private Id<String> planId;
+	private Id<Plan> planId;
 	
 	/**
 	 * Id of the plan that this plan had been copied from before mutating. 
 	 */
-	private Id<String> ancestorId;
+	private Id<Plan> ancestorId;
 	
 	/**
 	 * The name of the strategy that altered this plan.
@@ -69,19 +70,19 @@ public class PlanInheritanceRecord {
 	 */
 	private List<Integer> iterationsSelected = new ArrayList<>(1);
 
-	public Id<String> getPlanId() {
+	public Id<Plan> getPlanId() {
 		return planId;
 	}
 
-	public void setPlanId(Id<String> planId) {
+	public void setPlanId(Id<Plan> planId) {
 		this.planId = planId;
 	}
 
-	public Id<String> getAncestorId() {
+	public Id<Plan> getAncestorId() {
 		return ancestorId;
 	}
 
-	public void setAncestorId(Id<String> ancestorId) {
+	public void setAncestorId(Id<Plan> ancestorId) {
 		this.ancestorId = ancestorId;
 	}
 

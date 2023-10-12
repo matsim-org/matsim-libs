@@ -286,13 +286,13 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 	}
 
 	@Override
-	public void setPlanId(Id<String> planId) {
+	public void setPlanId(Id<Plan> planId) {
 		throw new UnsupportedOperationException();
 		
 	}
 
 	@Override
-	public Id<String> getPlanId() {
+	public Id<Plan> getId() {
 		throw new UnsupportedOperationException();
 	}
 

@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -69,8 +70,8 @@ public class PlanInheritanceRecordReader {
 				String[] line = lineString.split(DELIMITER);
 				PlanInheritanceRecord planInheritanceRecord = new PlanInheritanceRecord();
 				planInheritanceRecord.setAgentId(Id.createPersonId(line[lookUp.get(PlanInheritanceRecordWriter.AGENT_ID)]));
-				planInheritanceRecord.setPlanId(Id.create(line[lookUp.get(PlanInheritanceRecordWriter.PLAN_ID)], String.class));
-				planInheritanceRecord.setAncestorId(Id.create(line[lookUp.get(PlanInheritanceRecordWriter.ANCESTOR_ID)], String.class));
+				planInheritanceRecord.setPlanId(Id.create(line[lookUp.get(PlanInheritanceRecordWriter.PLAN_ID)], Plan.class));
+				planInheritanceRecord.setAncestorId(Id.create(line[lookUp.get(PlanInheritanceRecordWriter.ANCESTOR_ID)], Plan.class));
 				planInheritanceRecord.setMutatedBy(line[lookUp.get(PlanInheritanceRecordWriter.MUTATED_BY)]);
 				planInheritanceRecord.setIterationCreated(Integer.parseInt(line[lookUp.get(PlanInheritanceRecordWriter.ITERATION_CREATED)]));
 				planInheritanceRecord.setIterationRemoved(Integer.parseInt(line[lookUp.get(PlanInheritanceRecordWriter.ITERATION_REMOVED)]));
