@@ -23,7 +23,6 @@ package org.matsim.freight.carriers.analysis;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.freight.carriers.analysis.analysis.RunFreightAnalysisEventBased;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.IOException;
