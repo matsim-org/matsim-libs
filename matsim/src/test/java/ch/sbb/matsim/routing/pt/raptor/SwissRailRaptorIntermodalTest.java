@@ -1242,9 +1242,9 @@ public class SwissRailRaptorIntermodalTest {
 		IntermodalFixture f = new IntermodalFixture();
 		f.scenario.getTransitSchedule().getFacilities().values()
 				.forEach(stopFacility -> TransitScheduleUtils.setSymmetricStopAccessEgressTime(stopFacility,120.0));
-		PlanCalcScoreConfigGroup.ModeParams walk = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.walk);
+		ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
 		walk.setMarginalUtilityOfTraveling(0.0);
-		f.config.planCalcScore().addModeParams(walk);
+		f.config.scoring().addModeParams(walk);
 
 		Map<String, RoutingModule> routingModules = new HashMap<>();
 		routingModules.put(TransportMode.walk,
