@@ -5,7 +5,7 @@ import lsp.LSPPlan;
 import lsp.LogisticChain;
 import lsp.shipment.LSPShipment;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
@@ -23,7 +23,7 @@ class RebalancingShipmentsStrategyFactory {
 	}
 
 	GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
-		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new PlanCalcScoreConfigGroup()));
+		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup()));
 		GenericPlanStrategyModule<LSPPlan> loadBalancingModule = new GenericPlanStrategyModule<>() {
 
 			@Override

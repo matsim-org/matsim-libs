@@ -27,11 +27,11 @@ import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.carrier.Tour.Leg;
-import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
-import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.freight.carriers.carrier.*;
+import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.carrier.Tour.Leg;
+import org.matsim.freight.carriers.carrier.Tour.ServiceActivity;
+import org.matsim.freight.carriers.carrier.Tour.TourElement;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;

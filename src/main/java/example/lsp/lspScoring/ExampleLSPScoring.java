@@ -31,11 +31,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.events.CarrierServiceEndEvent;
-import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -43,6 +38,11 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.freight.carriers.FreightConfigGroup;
+import org.matsim.freight.carriers.carrier.*;
+import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
+import org.matsim.freight.carriers.events.eventhandler.FreightServiceEndEventHandler;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
@@ -200,8 +200,8 @@ import java.util.*;
 
 		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 
-		config.controler().setLastIteration(0);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(0);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		var freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
 		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);

@@ -5,7 +5,7 @@ import lsp.shipment.LSPShipment;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.GenericPlanStrategy;
@@ -28,7 +28,7 @@ class ProximityStrategyFactory {
 
 	GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
 
-		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new PlanCalcScoreConfigGroup()));
+		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup()));
 		GenericPlanStrategyModule<LSPPlan> randomModule = new GenericPlanStrategyModule<>() {
 
 			@Override

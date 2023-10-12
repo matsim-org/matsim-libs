@@ -20,7 +20,7 @@ public class ExampleLSPScoringTest {
 	public void testMain() {
 
 		Config config = ExampleLSPScoring.prepareConfig();
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		Scenario scenario = ExampleLSPScoring.prepareScenario(config);
 

@@ -1,9 +1,9 @@
 package example.lsp.initialPlans;
 
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.freight.carriers.carrier.Carrier;
+import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 
 /**
  * @author Kai Martins-Turner (kturner)

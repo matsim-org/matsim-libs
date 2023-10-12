@@ -30,8 +30,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
@@ -41,6 +39,8 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.GenericStrategyManagerImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.freight.carriers.carrier.*;
+import org.matsim.freight.carriers.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -212,9 +212,9 @@ import java.util.*;
 
 		strategyManager.addStrategy( new TomorrowShipmentAssignerStrategyFactory(maybeTodayAssigner).createStrategy(), null, 1);
 
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(4);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controller().setFirstIteration(0);
+		config.controller().setLastIteration(4);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
 		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);

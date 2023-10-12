@@ -28,9 +28,9 @@ import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.freight.carriers.carrier.Carrier;
+import org.matsim.freight.carriers.carrier.CarrierVehicle;
 import org.matsim.vehicles.VehicleType;
 
 import java.io.BufferedWriter;

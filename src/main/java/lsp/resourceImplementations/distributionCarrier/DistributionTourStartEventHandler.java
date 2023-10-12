@@ -27,12 +27,12 @@ import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.Tour;
-import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
-import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.events.CarrierTourStartEvent;
-import org.matsim.contrib.freight.events.eventhandler.FreightTourStartEventHandler;
+import org.matsim.freight.carriers.carrier.CarrierService;
+import org.matsim.freight.carriers.carrier.Tour;
+import org.matsim.freight.carriers.carrier.Tour.ServiceActivity;
+import org.matsim.freight.carriers.carrier.Tour.TourElement;
+import org.matsim.freight.carriers.events.CarrierTourStartEvent;
+import org.matsim.freight.carriers.events.eventhandler.FreightTourStartEventHandler;
 
 public class DistributionTourStartEventHandler implements FreightTourStartEventHandler, LSPSimulationTracker<LSPShipment> {
 // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way to do the junit testing. kmt jun'23

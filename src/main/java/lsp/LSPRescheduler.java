@@ -20,11 +20,6 @@
 
 package lsp;
 
-import lsp.shipment.LSPShipment;
-import lsp.shipment.ShipmentUtils;
-import org.matsim.core.controler.events.ReplanningEvent;
-
-
 /**
  * There is a possibility and also sometimes a need for rescheduling before each
  * new iteration. This need results from changes to the plan of the LSP during

@@ -26,12 +26,12 @@ import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.Tour;
-import org.matsim.contrib.freight.carrier.Tour.Leg;
-import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.freight.carriers.carrier.Carrier;
+import org.matsim.freight.carriers.carrier.CarrierService;
+import org.matsim.freight.carriers.carrier.ScheduledTour;
+import org.matsim.freight.carriers.carrier.Tour;
+import org.matsim.freight.carriers.carrier.Tour.Leg;
+import org.matsim.freight.carriers.carrier.Tour.TourElement;
 
 import java.util.ArrayList;
 

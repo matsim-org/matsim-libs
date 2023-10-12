@@ -4,7 +4,7 @@ import lsp.LSP;
 import lsp.LSPPlan;
 import lsp.LogisticChain;
 import lsp.shipment.LSPShipment;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
@@ -23,7 +23,7 @@ class RandomShiftingStrategyFactory {
 
 	GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
 
-		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new PlanCalcScoreConfigGroup()));
+		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup()));
 		GenericPlanStrategyModule<LSPPlan> randomModule = new GenericPlanStrategyModule<>() {
 
 			@Override

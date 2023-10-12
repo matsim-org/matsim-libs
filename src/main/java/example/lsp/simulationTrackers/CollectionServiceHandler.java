@@ -22,11 +22,11 @@ package example.lsp.simulationTrackers;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.events.CarrierServiceEndEvent;
-import org.matsim.contrib.freight.events.CarrierServiceStartEvent;
-import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
-import org.matsim.contrib.freight.events.eventhandler.FreightServiceStartEventHandler;
+import org.matsim.freight.carriers.carrier.CarrierService;
+import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
+import org.matsim.freight.carriers.events.CarrierServiceStartEvent;
+import org.matsim.freight.carriers.events.eventhandler.FreightServiceEndEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.FreightServiceStartEventHandler;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;

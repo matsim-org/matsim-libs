@@ -27,12 +27,12 @@ import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.carrier.Tour.Leg;
-import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.freight.carriers.carrier.*;
+import org.matsim.freight.carriers.carrier.Tour.Leg;
+import org.matsim.freight.carriers.carrier.Tour.TourElement;
+import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
+import org.matsim.freight.carriers.jsprit.NetworkRouter;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
@@ -144,7 +144,7 @@ import java.util.*;
 					tourBuilder.scheduleEnd(Id.create(resource.getEndLinkId(), Link.class));
 			default -> throw new IllegalStateException("Unexpected value: " + resource.getVehicleReturn());
 		}
-		org.matsim.contrib.freight.carrier.Tour vehicleTour = tourBuilder.build();
+		org.matsim.freight.carriers.carrier.Tour vehicleTour = tourBuilder.build();
 		CarrierVehicle vehicle = carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next();
 		double tourStartTime = latestTupleTime + totalLoadingTime;
 		ScheduledTour sTour = ScheduledTour.newInstance(vehicleTour, vehicle, tourStartTime);
