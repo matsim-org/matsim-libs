@@ -22,6 +22,8 @@ package org.matsim.core.network;
 
 import java.util.*;
 
+import javax.annotation.Nullable;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -987,5 +989,30 @@ public final class NetworkUtils {
 
 		result.add(link.getToNode());
 		return result;
+	}
+
+	private static final String DISALLOWED_NEXT_LINKS_ATTRIBUTE = "disallowedNextLinks";
+
+	@Nullable
+	public static DisallowedNextLinks getDisallowedNextLinks(Link link) {
+		return (DisallowedNextLinks) link.getAttributes().getAttribute(DISALLOWED_NEXT_LINKS_ATTRIBUTE);
+	}
+
+	public static DisallowedNextLinks getOrCreateDisallowedNextLinks(Link link) {
+		DisallowedNextLinks disallowedNextLinks = getDisallowedNextLinks(link);
+		if (disallowedNextLinks == null) {
+			disallowedNextLinks = new DisallowedNextLinks();
+			setDisallowedNextLinks(link, disallowedNextLinks);
+		}
+		return disallowedNextLinks;
+	}
+
+	public static void setDisallowedNextLinks(Link link, DisallowedNextLinks disallowedNextLinks) {
+		link.getAttributes().putAttribute(DISALLOWED_NEXT_LINKS_ATTRIBUTE, disallowedNextLinks);
+	}
+
+	public static boolean addDisallowedNextLinks(Link link, String mode, Collection<Id<Link>> linkIds) {
+		DisallowedNextLinks disallowedNextLinks = getOrCreateDisallowedNextLinks(link);
+		return disallowedNextLinks.addDisallowedLinkSequence(mode, linkIds);
 	}
 }
