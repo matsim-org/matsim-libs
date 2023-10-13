@@ -21,6 +21,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.router.StageActivityTypeIdentifier;
@@ -92,7 +93,7 @@ public class PHbyModeCalculatorTest {
 		controllerConfigGroup.setCreateGraphs(true);
 		controllerConfigGroup.setFirstIteration(0);
 		controllerConfigGroup.setLastIteration(10);
-		PHbyModeCalculator phbyModeCalculator = new PHbyModeCalculator(controllerConfigGroup, controlerIO);
+		PHbyModeCalculator phbyModeCalculator = new PHbyModeCalculator(controllerConfigGroup, controlerIO, new GlobalConfigGroup());
 
 		phbyModeCalculator.addIteration(1, map);
 		phbyModeCalculator.writeOutput();
@@ -157,25 +158,26 @@ public class PHbyModeCalculatorTest {
 			}
 		}
 
-		String file = utils.getOutputDirectory() + "/PHbyModeCalculator" + "/ph_modestats.txt";
+		String file = utils.getOutputDirectory() + "/PHbyModeCalculator" + "/ph_modestats.csv";
 		BufferedReader br;
 		String line;
 		try {
 			br = new BufferedReader(new FileReader(file));
 			String firstRow = br.readLine();
-			String[] columnNames = firstRow.split("	");
+			String delimiter = new GlobalConfigGroup().getDefaultDelimiter();
+			String[] columnNames = firstRow.split(delimiter);
 			decideColumns(columnNames);
 			int iteration = 1;
 			while ((line = br.readLine()) != null) {
 				if (iteration == itr) {
-					String[] column = line.split("	");
+					String[] column = line.split(delimiter);
 					// checking if column number in greater than 0, because 0th column is always
 					// 'Iteration' and we don't need that --> see decideColumns() method
-					Double car_travel_value = Double.valueOf(column[car_travel]);
-					Double pt_travel_value = Double.valueOf(column[pt_travel]);
-					Double walk_travel_value = Double.valueOf(column[walk_travel]);
-					Double pt_wait_value = Double.valueOf(column[pt_wait]);
-					Double stageActivity_wait_value = Double.valueOf(column[stageActivity_wait]);
+					double car_travel_value = Double.parseDouble(column[car_travel]);
+					double pt_travel_value = Double.parseDouble(column[pt_travel]);
+					double walk_travel_value = Double.parseDouble(column[walk_travel]);
+					double pt_wait_value = Double.parseDouble(column[pt_wait]);
+					double stageActivity_wait_value = Double.parseDouble(column[stageActivity_wait]);
 
 					Assert.assertEquals("car_travel hour does not match", Math.round(modeValues.get("car") / 3600.0),
 							car_travel_value, 0);

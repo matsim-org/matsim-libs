@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -87,11 +88,11 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 
 	@Inject
 	ScoreStatsControlerListener(ControllerConfigGroup controllerConfigGroup, Population population, OutputDirectoryHierarchy controllerIO,
-															Config config ) {
+															GlobalConfigGroup globalConfig ) {
 		this.controllerConfigGroup = controllerConfigGroup;
 		this.population = population;
 		this.controllerIO = controllerIO;
-		this.delimiter = config.global().getDefaultDelimiter();
+		this.delimiter = globalConfig.getDefaultDelimiter();
 		this.createPNG = controllerConfigGroup.isCreateGraphs();
 		this.out = IOUtils.getBufferedWriter(controllerIO.getOutputFilename("scorestats.csv"));
 
