@@ -10,7 +10,7 @@ import org.matsim.contrib.drt.extension.estimator.run.DrtEstimatorModule;
 import org.matsim.contrib.drt.extension.estimator.run.MultiModeDrtEstimatorConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.modechoice.InformedModeChoiceModule;
 import org.matsim.modechoice.ModeOptions;
@@ -36,7 +36,7 @@ public class MultiModalDrtLegEstimatorTest {
 
 		Config config = DrtTestScenario.loadConfig(utils);
 
-		config.controler().setLastIteration(3);
+		config.controller().setLastIteration(3);
 
 		controler = MATSimApplication.prepare(new DrtTestScenario(MultiModalDrtLegEstimatorTest::prepare, MultiModalDrtLegEstimatorTest::prepare), config);
 	}
@@ -60,17 +60,17 @@ public class MultiModalDrtLegEstimatorTest {
 		estimators.addParameterSet(new DrtEstimatorConfigGroup("av"));
 
 		// Set subtour mode selection as strategy
-		List<StrategyConfigGroup.StrategySettings> strategies = config.strategy().getStrategySettings().stream()
+		List<ReplanningConfigGroup.StrategySettings> strategies = config.replanning().getStrategySettings().stream()
 				.filter(s -> !s.getStrategyName().toLowerCase().contains("mode")
 				).collect(Collectors.toList());
 
-		strategies.add(new StrategyConfigGroup.StrategySettings()
+		strategies.add(new ReplanningConfigGroup.StrategySettings()
 				.setStrategyName(InformedModeChoiceModule.SELECT_SUBTOUR_MODE_STRATEGY)
 						.setSubpopulation("person")
 						.setWeight(0.2));
 
-		config.strategy().clearStrategySettings();
-		strategies.forEach(s -> config.strategy().addStrategySettings(s));
+		config.replanning().clearStrategySettings();
+		strategies.forEach(s -> config.replanning().addStrategySettings(s));
 
 	}
 
