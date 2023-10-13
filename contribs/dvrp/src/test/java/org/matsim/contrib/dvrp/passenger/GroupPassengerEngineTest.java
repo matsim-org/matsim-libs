@@ -72,12 +72,12 @@ public class GroupPassengerEngineTest {
 
 		var requestId = Id.create("taxi_0", Request.class);
 		fixture.assertPassengerEvents(
-				Sets.newHashSet(person1, person2),
+				List.of(person1, person2),
 				new ActivityEndEvent(departureTime, person2, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(departureTime, person2, fixture.linkAB.getId(), MODE, MODE),
 				new ActivityEndEvent(departureTime, person1, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(departureTime, person1, fixture.linkAB.getId(), MODE, MODE),
-				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, List.of(person1, person2), VEHICLE_ID, 0,
+				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, List.of(person2, person1), VEHICLE_ID, 0,
 						scheduledDropoffTime),
 				new PersonEntersVehicleEvent(pickupStartTime, person1, Id.createVehicleId(VEHICLE_ID)),
 				new PassengerPickedUpEvent(pickupStartTime, MODE, requestId, person1, VEHICLE_ID),
