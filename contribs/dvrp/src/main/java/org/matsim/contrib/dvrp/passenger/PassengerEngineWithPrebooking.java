@@ -206,7 +206,7 @@ public final class PassengerEngineWithPrebooking
 			return false;// wait for the passenger
 		}
 
-		if (!internalPassengerHandling.tryPickUpPassengers(driver, Collections.singleton(passenger), requestId, now)) {
+		if (!internalPassengerHandling.tryPickUpPassengers(driver, List.of(passenger), requestId, now)) {
 			// the passenger has already been picked up and is on another taxi trip
 			// seems there have been at least 2 requests made by this passenger for this location
 			awaitingPickups.put(requestId, pickupActivity);
@@ -218,7 +218,7 @@ public final class PassengerEngineWithPrebooking
 
 	@Override
 	public void dropOffPassengers(MobsimDriverAgent driver, Id<Request> requestId, double now) {
-		internalPassengerHandling.dropOffPassengers(driver, Collections.singleton(activeRequests.remove(requestId).passenger), requestId, now);
+		internalPassengerHandling.dropOffPassengers(driver, List.of(activeRequests.remove(requestId).passenger), requestId, now);
 	}
 
 	// ================ REJECTED/SCHEDULED EVENTS

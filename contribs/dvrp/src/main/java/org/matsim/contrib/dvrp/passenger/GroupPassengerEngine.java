@@ -40,7 +40,7 @@ public class GroupPassengerEngine implements PassengerEngine, PassengerRequestRe
 
 
 	//accessed in doSimStep() and handleDeparture() (no need to sync)
-	private final Map<Id<Request>, Set<MobsimPassengerAgent>> activePassengers = new HashMap<>();
+	private final Map<Id<Request>, List<MobsimPassengerAgent>> activePassengers = new HashMap<>();
 
 	//accessed in doSimStep() and handleEvent() (potential data races)
 	private final Queue<PassengerRequestRejectedEvent> rejectedRequestsEvents = new ConcurrentLinkedQueue<>();
@@ -77,7 +77,7 @@ public class GroupPassengerEngine implements PassengerEngine, PassengerRequestRe
 	public void doSimStep(double time) {
 		handleDepartures();
 		while (!rejectedRequestsEvents.isEmpty()) {
-			Set<MobsimPassengerAgent> passengers = activePassengers.remove(rejectedRequestsEvents.poll().getRequestId());
+			List<MobsimPassengerAgent> passengers = activePassengers.remove(rejectedRequestsEvents.poll().getRequestId());
 			//not much else can be done for immediate requests
 			//set the passenger agent to abort - the event will be thrown by the QSim
 			for (MobsimPassengerAgent passenger: passengers) {
@@ -124,13 +124,13 @@ public class GroupPassengerEngine implements PassengerEngine, PassengerRequestRe
 					group.stream().map(Identifiable::getId).toList(), route,
 					getLink(firstAgent.getCurrentLinkId()), getLink(toLinkId),
 					mobsimTimer.getTimeOfDay(), mobsimTimer.getTimeOfDay());
-			validateAndSubmitRequest(new HashSet<>(group), request, mobsimTimer.getTimeOfDay());
+			validateAndSubmitRequest(List.copyOf(group), request, mobsimTimer.getTimeOfDay());
 		}
 
 		currentDepartures.clear();
 	}
 
-	private void validateAndSubmitRequest(Set<MobsimPassengerAgent> passengers, PassengerRequest request, double now) {
+	private void validateAndSubmitRequest(List<MobsimPassengerAgent> passengers, PassengerRequest request, double now) {
 		activePassengers.put(request.getId(), passengers);
 		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
 			//need to synchronise to address cases where requestSubmitted() may:

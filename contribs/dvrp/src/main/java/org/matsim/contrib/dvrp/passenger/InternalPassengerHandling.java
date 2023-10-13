@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.passenger;
 
 import static java.lang.String.format;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -75,7 +76,7 @@ class InternalPassengerHandling {
 		return violations.isEmpty();
 	}
 
-	boolean tryPickUpPassengers(MobsimDriverAgent driver, Set<MobsimPassengerAgent> passengers, Id<Request> requestId,
+	boolean tryPickUpPassengers(MobsimDriverAgent driver, List<MobsimPassengerAgent> passengers, Id<Request> requestId,
 			double now) {
 
 		//ensure for every passenger first
@@ -100,7 +101,7 @@ class InternalPassengerHandling {
 		return true;
 	}
 
-	void dropOffPassengers(MobsimDriverAgent driver, Set<MobsimPassengerAgent> passengers, Id<Request> requestId, double now) {
+	void dropOffPassengers(MobsimDriverAgent driver, List<MobsimPassengerAgent> passengers, Id<Request> requestId, double now) {
 		MobsimVehicle mobVehicle = driver.getVehicle();
 		Id<DvrpVehicle> vehicleId = Id.create(mobVehicle.getId(), DvrpVehicle.class);
 

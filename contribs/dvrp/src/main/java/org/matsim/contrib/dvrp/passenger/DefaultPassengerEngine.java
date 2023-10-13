@@ -63,7 +63,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	private InternalInterface internalInterface;
 
 	//accessed in doSimStep() and handleDeparture() (no need to sync)
-	private final Map<Id<Request>, Set<MobsimPassengerAgent>> activePassengers = new HashMap<>();
+	private final Map<Id<Request>, List<MobsimPassengerAgent>> activePassengers = new HashMap<>();
 
 	//accessed in doSimStep() and handleEvent() (potential data races)
 	private final Queue<PassengerRequestRejectedEvent> rejectedRequestsEvents = new ConcurrentLinkedQueue<>();
@@ -94,7 +94,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	@Override
 	public void doSimStep(double time) {
 		while (!rejectedRequestsEvents.isEmpty()) {
-			Set<MobsimPassengerAgent> passengers = activePassengers.remove(rejectedRequestsEvents.poll().getRequestId());
+			List<MobsimPassengerAgent> passengers = activePassengers.remove(rejectedRequestsEvents.poll().getRequestId());
 			//not much else can be done for immediate requests
 			//set the passenger agent to abort - the event will be thrown by the QSim
 			for (MobsimPassengerAgent passenger: passengers) {
@@ -122,11 +122,11 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 		Route route = ((Leg)((PlanAgent)passenger).getCurrentPlanElement()).getRoute();
 		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
 				List.of(passenger.getId()), route, getLink(fromLinkId), getLink(toLinkId), now, now);
-		validateAndSubmitRequest(Collections.singleton(passenger), request, now);
+		validateAndSubmitRequest(List.of(passenger), request, now);
 		return true;
 	}
 
-	private void validateAndSubmitRequest(Set<MobsimPassengerAgent> passengers, PassengerRequest request, double now) {
+	private void validateAndSubmitRequest(List<MobsimPassengerAgent> passengers, PassengerRequest request, double now) {
 		activePassengers.put(request.getId(), passengers);
 		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
 			//need to synchronise to address cases where requestSubmitted() may:
