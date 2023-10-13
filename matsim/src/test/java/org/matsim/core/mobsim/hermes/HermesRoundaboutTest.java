@@ -39,9 +39,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkUtils;
@@ -68,8 +68,8 @@ public class HermesRoundaboutTest {
 	public void testRoundaboutBehavior(){
 		ScenarioImporter.flush();
 		final Config config = createConfig();
-		config.controler().setMobsim("hermes");
-		config.parallelEventHandling().setOneThreadPerHandler(true);
+		config.controller().setMobsim("hermes");
+		config.eventsManager().setOneThreadPerHandler(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		buildRoundaboutNetwork(scenario);
 		buildPopulation(scenario);
@@ -87,26 +87,26 @@ public class HermesRoundaboutTest {
 	private Config createConfig() {
 
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		config.qsim().setUsePersonIdForMissingVehicleId(true);
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(2);
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink); //standard accessEgressMode is walk
+		config.controller().setFirstIteration(0);
+		config.controller().setLastIteration(2);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink); //standard accessEgressMode is walk
 
-		final PlanCalcScoreConfigGroup.ActivityParams homeParams = new PlanCalcScoreConfigGroup.ActivityParams("home");
+		final ScoringConfigGroup.ActivityParams homeParams = new ScoringConfigGroup.ActivityParams("home");
 		homeParams.setTypicalDuration(1);
-		config.planCalcScore().addActivityParams(homeParams);
+		config.scoring().addActivityParams(homeParams);
 
-		final PlanCalcScoreConfigGroup.ActivityParams workParams = new PlanCalcScoreConfigGroup.ActivityParams("work");
+		final ScoringConfigGroup.ActivityParams workParams = new ScoringConfigGroup.ActivityParams("work");
 		workParams.setTypicalDuration(1);
-		config.planCalcScore().addActivityParams(workParams);
+		config.scoring().addActivityParams(workParams);
 
-		StrategyConfigGroup.StrategySettings replanning = new StrategyConfigGroup.StrategySettings();
+		ReplanningConfigGroup.StrategySettings replanning = new ReplanningConfigGroup.StrategySettings();
 		replanning.setStrategyName("ReRoute");
 		replanning.setWeight(1.0);
-		config.strategy().addStrategySettings(replanning);
+		config.replanning().addStrategySettings(replanning);
 
 		return config;
 	}
@@ -190,7 +190,7 @@ public class HermesRoundaboutTest {
 		Link dd1 =  NetworkUtils.createAndAddLink(network,Id.createLinkId("d_d1"),d,d1,20,8,1100,1);
 		Link d1d2 =  NetworkUtils.createAndAddLink(network,Id.createLinkId("d1_d2"),d1,d2,2000,8,720000,1);
 		Link d2d1 =  NetworkUtils.createAndAddLink(network,Id.createLinkId("d2_d1"),d2,d1,2000,8,720000,1);
-		
+
 
 
 	}

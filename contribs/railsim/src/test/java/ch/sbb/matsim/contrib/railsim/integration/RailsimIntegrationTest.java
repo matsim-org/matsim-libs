@@ -340,10 +340,10 @@ public class RailsimIntegrationTest {
 		URL base = ExamplesUtils.getTestScenarioURL("kelheim");
 
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(base, "config.xml"));
-		config.controler().setLastIteration(0);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setCreateGraphs(false);
-		config.controler().setDumpDataAtEnd(false);
+		config.controller().setLastIteration(0);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setCreateGraphs(false);
+		config.controller().setDumpDataAtEnd(false);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -384,10 +384,10 @@ public class RailsimIntegrationTest {
 	private EventsCollector runSimulation(File scenarioDir, Consumer<Scenario> f) {
 		Config config = ConfigUtils.loadConfig(new File(scenarioDir, "config.xml").toString());
 
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setDumpDataAtEnd(true);
-		config.controler().setCreateGraphs(false);
-		config.controler().setLastIteration(0);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setDumpDataAtEnd(true);
+		config.controller().setCreateGraphs(false);
+		config.controller().setLastIteration(0);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 

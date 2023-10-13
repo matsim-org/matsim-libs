@@ -24,7 +24,6 @@ import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -122,11 +121,11 @@ public class TinyAccessibilityTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 
-		config.controler().setLastIteration(0);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(0);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		config.plansCalcRoute().setRoutingRandomness(0.);
+		config.routing().setRoutingRandomness(0.);
 
 		return config;
 	}

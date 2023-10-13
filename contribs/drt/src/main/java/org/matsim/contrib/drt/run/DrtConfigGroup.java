@@ -43,8 +43,8 @@ import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
@@ -325,7 +325,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	}
 
 	/**
-	 * Convenience method that brings syntax closer to syntax in, e.g., {@link PlansCalcRouteConfigGroup} or {@link PlanCalcScoreConfigGroup}
+	 * Convenience method that brings syntax closer to syntax in, e.g., {@link RoutingConfigGroup} or {@link ScoringConfigGroup}
 	 */
 	public final void addDrtInsertionSearchParams(final DrtInsertionSearchParams pars) {
 		addParameterSet(pars);

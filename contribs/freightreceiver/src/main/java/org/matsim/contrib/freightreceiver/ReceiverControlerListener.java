@@ -25,10 +25,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.Tour;
-import org.matsim.contrib.freight.controler.FreightUtils;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.ScheduledTour;
+import org.matsim.freight.carriers.Tour;
 import org.matsim.contrib.freightreceiver.collaboration.CollaborationUtils;
 import org.matsim.contrib.freightreceiver.replanning.ReceiverStrategyManager;
 import org.matsim.core.config.ConfigUtils;
@@ -165,11 +165,11 @@ class ReceiverControlerListener implements ScoringListener, IterationEndsListene
             receiverLinkMap.put(linkId, receiver);
         }
 
-		try (BufferedWriter bw = IOUtils.getBufferedWriter(this.sc.getConfig().controler().getOutputDirectory() + "output_receiverInTourPlacement.csv.gz")) {
+		try (BufferedWriter bw = IOUtils.getBufferedWriter(this.sc.getConfig().controller().getOutputDirectory() + "output_receiverInTourPlacement.csv.gz")) {
 			bw.write("receiverId,twStart,twEnd,twDuration,positionInTour,product,deliveryStart,deliveryEnd");
 			bw.newLine();
 
-			for (Carrier carrier : FreightUtils.getCarriers(this.sc).getCarriers().values()) {
+			for (Carrier carrier : CarriersUtils.getCarriers(this.sc).getCarriers().values()) {
 				Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
 				for (ScheduledTour tour : scheduledTours) {
 					for (int i = 0; i < tour.getTour().getTourElements().size(); i++) {

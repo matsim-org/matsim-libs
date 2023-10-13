@@ -22,14 +22,14 @@
 
 package org.matsim.core.router.costcalculators;
 
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 
 public class TravelDisutilityModule extends AbstractModule {
 
     @Override
     public void install() {
-        PlansCalcRouteConfigGroup routeConfigGroup = getConfig().plansCalcRoute();
+        RoutingConfigGroup routeConfigGroup = getConfig().routing();
         for (String mode : routeConfigGroup.getNetworkModes()) {
 
             final RandomizingTimeDistanceTravelDisutilityFactory builder = new RandomizingTimeDistanceTravelDisutilityFactory( mode, getConfig() );

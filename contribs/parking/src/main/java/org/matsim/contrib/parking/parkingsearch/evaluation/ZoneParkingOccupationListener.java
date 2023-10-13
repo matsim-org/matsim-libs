@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.matsim.contrib.parking.parkingsearch.evaluation;
 
@@ -29,22 +29,22 @@ import com.google.inject.Inject;
  *
  */
 public class ZoneParkingOccupationListener implements MobsimBeforeCleanupListener, MobsimAfterSimStepListener{
-	
+
 	private final ZoneParkingManager zoneManager;
 	private Logger log = LogManager.getLogger(ZoneParkingOccupationListener.class);
-	private HashMap<String,TreeSet<ParkingTuple>> zoneOccupationPerTime; 
+	private HashMap<String,TreeSet<ParkingTuple>> zoneOccupationPerTime;
 	private MatsimServices services;
 	int iteration;
-	
+
 	private TreeSet<Double> allMonitoredTimeStamps;
-	
+
 	/**
-	 * 
+	 *
 	 */
 	@Inject
 	public ZoneParkingOccupationListener(ParkingSearchManager manager, MatsimServices services, Config config) {
 		this.zoneManager = (ZoneParkingManager) manager;
-		iteration = config.controler().getFirstIteration();
+		iteration = config.controller().getFirstIteration();
 		this.services = services;
 		this.zoneOccupationPerTime = new HashMap<String,TreeSet<ParkingTuple>>();
 		for(String zone : zoneManager.getZones()){
@@ -56,14 +56,14 @@ public class ZoneParkingOccupationListener implements MobsimBeforeCleanupListene
 	@Override
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		if( (e.getSimulationTime()%900)  == 0 && !(e.getSimulationTime() == 0)){
-			
+
 			double	timeStamp = e.getSimulationTime();
 			if (!(this.allMonitoredTimeStamps.contains(timeStamp)) ) this.allMonitoredTimeStamps.add(timeStamp);
-			
+
 			for(String zone : this.zoneOccupationPerTime.keySet()){
 				double occ = this.zoneManager.getOccupancyRatioOfZone(zone);
 				ParkingTuple tuple = new ParkingTuple(timeStamp, occ);
-				this.zoneOccupationPerTime.get(zone).add(tuple);	
+				this.zoneOccupationPerTime.get(zone).add(tuple);
 			}
 		}
 	}
@@ -81,10 +81,10 @@ public class ZoneParkingOccupationListener implements MobsimBeforeCleanupListene
 			this.zoneOccupationPerTime.put(zone, tSet);
 			this.allMonitoredTimeStamps.clear();
 			this.allMonitoredTimeStamps.add(-1.0);
-		}		
+		}
 		iteration++;
 	}
-	
+
 	private void writeStats(String fileName) {
 		log.error("WRITING OCCUPANCY STATS TO " + fileName);
 
@@ -92,7 +92,7 @@ public class ZoneParkingOccupationListener implements MobsimBeforeCleanupListene
 		for(double d : this.allMonitoredTimeStamps){
 			head += "" + d +";";
 		}
-		
+
 		BufferedWriter bw = IOUtils.getBufferedWriter(fileName);
 		try {
 			bw.write(head);
@@ -104,10 +104,10 @@ public class ZoneParkingOccupationListener implements MobsimBeforeCleanupListene
 				TreeSet<Double> timeSet = new TreeSet<Double>();
 				timeSet.addAll(allMonitoredTimeStamps);
 				double oldOcc = -5.0;
-				
+
 				int zoneSize = currentSet.size();
 				int timeSize = timeSet.size();
-				
+
 				for(int i = 0; i < zoneSize; i++){
 					ParkingTuple ff = currentSet.pollFirst();
 					for(int zz = 0; zz < timeSize; zz ++ ){
@@ -135,7 +135,7 @@ public class ZoneParkingOccupationListener implements MobsimBeforeCleanupListene
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	
+
 	log.error("FINISHED WRITING OCCUPANCY STATS");
 	}
 
@@ -145,34 +145,34 @@ public class ZoneParkingOccupationListener implements MobsimBeforeCleanupListene
 		String head = ";;";
 		String capacityLine = "TotalCapacity;;";
 		String subheader = "SlotNr;SimTime;";
-		
+
 		ArrayList<double[]> zoneColumns = new ArrayList<double[]>();
 		int numberOfSlots = this.allMonitoredTimeStamps.size();
 		double[] slotTimes = new double[numberOfSlots];
 		int[] slotNumbers = new int[numberOfSlots];
 		TreeSet<Double> timeSet = new TreeSet<Double>();
 		timeSet.addAll(allMonitoredTimeStamps);
-		
+
 		for (int timeSlot = 0; timeSlot < numberOfSlots; timeSlot ++ ){
 			double tt = timeSet.pollFirst();
 			slotTimes[timeSlot] = tt;
-			slotNumbers[timeSlot] = (int) (tt/900); 
+			slotNumbers[timeSlot] = (int) (tt/900);
 		}
-		
+
 		for(String zone : this.zoneManager.getZones()){
 			head += zone +";";
 			capacityLine += this.zoneManager.getTotalCapacityOfZone(zone) + ";";
 			subheader += "OccRatio;";
-			
-			
+
+
 			double[] ratios = new double[numberOfSlots];
-			
-			TreeSet<ParkingTuple> ratioSet = this.zoneOccupationPerTime.get(zone); 
-			
+
+			TreeSet<ParkingTuple> ratioSet = this.zoneOccupationPerTime.get(zone);
+
 			double oldRatio = 0.0;
 			for(int i = 0; i < numberOfSlots; i++){
-				
-				ParkingTuple tuple = ratioSet.pollFirst(); 
+
+				ParkingTuple tuple = ratioSet.pollFirst();
 				if(slotTimes[i] == tuple.getTime()){
 					ratios[i] = tuple.getOccupancy();
 					oldRatio = tuple.getOccupancy();
@@ -184,10 +184,10 @@ public class ZoneParkingOccupationListener implements MobsimBeforeCleanupListene
 					throw new RuntimeException("timeSlot number is higher than recorded time. timeSlot: " + slotTimes[i] + "\t time: " + tuple.getTime());
 				}
 			}
-			
-			zoneColumns.add(ratios);			
+
+			zoneColumns.add(ratios);
 		}
-		
+
 				BufferedWriter bw = IOUtils.getBufferedWriter(fileName);
 		try {
 			bw.write(head);
@@ -195,27 +195,27 @@ public class ZoneParkingOccupationListener implements MobsimBeforeCleanupListene
 			bw.write(capacityLine);
 			bw.newLine();
 			bw.write(subheader);
-			
+
 			DecimalFormat df = new DecimalFormat("##.##");
-			
+
 			for(int z = 0; z < numberOfSlots; z++){
 				bw.newLine();
-				
+
 				String line = "" + slotNumbers[z] + ";" + df.format(slotTimes[z]) + ";";
 				for(int p = 0; p < this.zoneManager.getZones().size(); p++){
 					line += "" + df.format(zoneColumns.get(p)[z]) + ";";
 				}
-				
+
 				bw.write(line);
 			}
-				
+
 			bw.flush();
 			bw.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	
+
 	log.error("FINISHED WRITING OCCUPANCY STATS");
 	}
 

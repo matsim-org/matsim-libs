@@ -32,7 +32,6 @@ import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
@@ -50,10 +49,10 @@ import org.matsim.testcases.utils.EventsLogger;
  *
  */
 public class ControlerTest {
-	
+
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
-	
+
 	/**
 	 * Tests the setup with a traffic light that shows all the time green in the 0th iteration.
 	 * After the mobsim is run the signal settings are changed thus in the 1st iteration
@@ -64,13 +63,13 @@ public class ControlerTest {
 		//configure and load standard scenario
 		Fixture fixture = new Fixture();
 		Scenario scenario = fixture.createAndLoadTestScenarioOneSignal(false);
-		scenario.getConfig().controler().setFirstIteration(0);
-		scenario.getConfig().controler().setLastIteration(1);
-		scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
-		scenario.getConfig().controler().setWriteEventsInterval(1);
-		
+		scenario.getConfig().controller().setFirstIteration(0);
+		scenario.getConfig().controller().setLastIteration(1);
+		scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
+		scenario.getConfig().controller().setWriteEventsInterval(1);
+
 		Controler controler = new Controler(scenario);
-        controler.getConfig().controler().setCreateGraphs(false);
+        controler.getConfig().controller().setCreateGraphs(false);
         controler.addControlerListener(new AfterMobsimListener() {
 
 			@Override
@@ -82,7 +81,7 @@ public class ControlerTest {
 					((SignalsData) scenario
 						.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalControlData()
 						.getSignalSystemControllerDataBySystemId().values()) {
-					
+
 					for (SignalPlanData plan : intersectionSignal.getSignalPlanData().values()) {
 						plan.setCycleTime(2000);
 						for (SignalGroupSettingsData data : plan.getSignalGroupSettingsDataByGroupId().values()) {
@@ -93,7 +92,7 @@ public class ControlerTest {
 				}
 			}
 		});
-		
+
 		controler.addControlerListener((IterationStartsListener)event -> {
 			event.getServices().getEvents().addHandler(new EventsLogger());
 
@@ -108,11 +107,11 @@ public class ControlerTest {
 				event.getServices().getEvents().addHandler(signalsHandler0);
 			}
 		});
-		
+
 		controler.run();
 	}
-	
-	
+
+
 	private static final class TestSignalGroupStateChangedHandler implements
 			SignalGroupStateChangedEventHandler {
 
@@ -143,5 +142,5 @@ public class ControlerTest {
 			}
 		}
 	}
-	
+
 }

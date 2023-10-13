@@ -1,6 +1,22 @@
-/*
- * Copyright (C) Schweizerische Bundesbahnen SBB, 2017.
- */
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 
 package ch.sbb.matsim.routing.pt.raptor;
 
@@ -33,8 +49,8 @@ public class RaptorParameters {
     private double extensionRadius = 200.0;
 
     /**
-     * Factor with which direct walk generalized cost is multiplied before 
-     * it is compared to the pt generalized cost. 
+     * Factor with which direct walk generalized cost is multiplied before
+     * it is compared to the pt generalized cost.
      * Set to a very high value to reduce direct walk results.
      */
 	private double directWalkFactor = 1.0;
@@ -75,7 +91,7 @@ public class RaptorParameters {
     public void setExtensionRadius(double extensionRadius) {
         this.extensionRadius = extensionRadius;
     }
-    
+
     public double getDirectWalkFactor() {
         return this.directWalkFactor;
     }

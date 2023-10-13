@@ -1,6 +1,6 @@
 package org.matsim.contrib.freightreceiver.collaboration;
 
-import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.freight.carriers.Carrier;
 import org.matsim.contrib.freightreceiver.Receiver;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
