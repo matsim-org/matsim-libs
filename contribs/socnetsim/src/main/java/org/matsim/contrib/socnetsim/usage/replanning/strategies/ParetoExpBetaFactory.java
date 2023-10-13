@@ -48,13 +48,13 @@ public class ParetoExpBetaFactory extends NonInnovativeStrategyFactory {
 
 	@Override
 	public GroupLevelPlanSelector createSelector() {
-		return 
+		return
 				new HighestWeightSelector(
 						incompatiblePlansIdentifierFactory,
 						new ParetoWeight(
 							new LogitWeight(
 								MatsimRandom.getLocalInstance(),
-								sc.getConfig().planCalcScore().getBrainExpBeta())) );
+								sc.getConfig().scoring().getBrainExpBeta())) );
 	}
 }
 

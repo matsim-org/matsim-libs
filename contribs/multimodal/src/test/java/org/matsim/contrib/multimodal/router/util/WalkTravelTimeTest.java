@@ -75,10 +75,10 @@ public class WalkTravelTimeTest {
 
 		// set default walk speed; according to Weidmann 1.34 [m/s]
 		double defaultWalkSpeed = 1.34;
-		scenario.getConfig().plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
+		scenario.getConfig().routing().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
 
 		WalkTravelTime walkTravelTime;
-		walkTravelTime = new WalkTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
+		walkTravelTime = new WalkTravelTime(scenario.getConfig().routing(), linkSlopes);
 
 		double speed;
 		double expectedTravelTime;
@@ -95,7 +95,7 @@ public class WalkTravelTimeTest {
 
 		// increase age
 		PersonUtils.setAge(person, 80);
-		walkTravelTime = new WalkTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
+		walkTravelTime = new WalkTravelTime(scenario.getConfig().routing(), linkSlopes);
 		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		speed = defaultWalkSpeed * walkTravelTime.personFactors.get(person.getId()) * 1.0;
 		expectedTravelTime = link.getLength() / speed;
@@ -105,7 +105,7 @@ public class WalkTravelTimeTest {
 
 		// change gender
 		PersonUtils.setSex(person, "f");
-		walkTravelTime = new WalkTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
+		walkTravelTime = new WalkTravelTime(scenario.getConfig().routing(), linkSlopes);
 		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		speed = defaultWalkSpeed * walkTravelTime.personFactors.get(person.getId()) * 1.0;
 		expectedTravelTime = link.getLength() / speed;
@@ -117,7 +117,7 @@ public class WalkTravelTimeTest {
 		h2 = -0.1;
 		slope = 100 * (h2 - h1) / link.getLength();
 		linkSlopes.put(link.getId(), slope);
-		walkTravelTime = new WalkTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
+		walkTravelTime = new WalkTravelTime(scenario.getConfig().routing(), linkSlopes);
 		double slope2 = walkTravelTime.getSlope(link);
 		double slopeFactor = walkTravelTime.getSlopeFactor(slope2);
 		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person, null);
@@ -131,7 +131,7 @@ public class WalkTravelTimeTest {
 		h2 = 0.1;
 		slope = 100 * (h2 - h1) / link.getLength();
 		linkSlopes.put(link.getId(), slope);
-		walkTravelTime = new WalkTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
+		walkTravelTime = new WalkTravelTime(scenario.getConfig().routing(), linkSlopes);
         slopeFactor = walkTravelTime.getSlopeFactor(slope);
 		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		speed = defaultWalkSpeed * walkTravelTime.personFactors.get(person.getId()) * slopeFactor;
@@ -192,7 +192,7 @@ public class WalkTravelTimeTest {
 		double slope = 100 * (h2 - h1) / link.getLength();
 		linkSlopes.put(link.getId(), slope);
 
-		WalkTravelTime walkTravelTime = new WalkTravelTime(config.plansCalcRoute(), linkSlopes);
+		WalkTravelTime walkTravelTime = new WalkTravelTime(config.routing(), linkSlopes);
 
 		double tt1 = walkTravelTime.getLinkTravelTime(link, 0.0, p1, null);
 		double tt2 = walkTravelTime.getLinkTravelTime(link, 0.0, p2, null);

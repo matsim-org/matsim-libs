@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -41,7 +41,7 @@ public final class UmlaufInterpolator {
 	private final Network network;
 	private final LeastCostPathCalculator routingAlgo;
 
-	public UmlaufInterpolator(Network network, final PlanCalcScoreConfigGroup config) {
+	public UmlaufInterpolator(Network network, final ScoringConfigGroup config) {
 		super();
 		this.network = network;
 		FreespeedTravelTimeAndDisutility travelTimes = new FreespeedTravelTimeAndDisutility(config);

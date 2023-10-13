@@ -25,8 +25,8 @@ import com.google.inject.Inject;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.Carriers;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -77,7 +77,7 @@ class CommercialTrafficAnalysisListener implements IterationEndsListener {
         writeIterationCarrierStats(event);
         writeJobStats(services.getControlerIO().getIterationFilename(event.getIteration(), "commercialJobStats.csv"));
         analyzeCarrierMarketShares(event.getIteration());
-        
+
         firstIteration = false;
 
     }

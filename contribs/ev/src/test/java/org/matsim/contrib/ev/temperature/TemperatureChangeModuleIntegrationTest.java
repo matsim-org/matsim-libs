@@ -49,7 +49,7 @@ public class TemperatureChangeModuleIntegrationTest {
 
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "/config.xml",
 				new TemperatureChangeConfigGroup());
-		config.controler()
+		config.controller()
 				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 		Scenario scenario = ScenarioUtils.loadScenario(config);

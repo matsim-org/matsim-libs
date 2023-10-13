@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.matsim.analysis;
 
@@ -17,8 +17,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.PopulationUtils;
@@ -51,7 +51,7 @@ public class PKMbyModeCalculatorTest {
 		/****************************
 		 * Person - creating person 1
 		 ************************************/
-		
+
 		Plan plan = plans.createPlanOne();
 
 		// counting the total distance traveled in each mode
@@ -153,13 +153,13 @@ public class PKMbyModeCalculatorTest {
 
 	private void performTest(IdMap<Person, Plan> map, HashMap<String, Double> modeCalcDist, String outputDirectory) {
 
-		ControlerConfigGroup controlerConfigGroup = new ControlerConfigGroup();
+		ControllerConfigGroup controllerConfigGroup = new ControllerConfigGroup();
 		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(outputDirectory,
 				OverwriteFileSetting.overwriteExistingFiles, CompressionType.gzip);
-		controlerConfigGroup.setCreateGraphs(true);
-		controlerConfigGroup.setFirstIteration(0);
-		controlerConfigGroup.setLastIteration(10);
-		PKMbyModeCalculator pkmbyModeCalculator = new PKMbyModeCalculator(controlerConfigGroup, controlerIO);
+		controllerConfigGroup.setCreateGraphs(true);
+		controllerConfigGroup.setFirstIteration(0);
+		controllerConfigGroup.setLastIteration(10);
+		PKMbyModeCalculator pkmbyModeCalculator = new PKMbyModeCalculator(controllerConfigGroup, controlerIO);
 		// iteration 0
 		pkmbyModeCalculator.addIteration(0, map);
 		pkmbyModeCalculator.writeOutput();

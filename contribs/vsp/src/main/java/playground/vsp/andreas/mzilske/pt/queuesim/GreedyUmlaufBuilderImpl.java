@@ -30,12 +30,12 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 	private static final Logger log = LogManager.getLogger( GreedyUmlaufBuilderImpl.class );
 
 	public class UmlaufKey {
-		
+
 		private final Id<TransitLine> lineId;
 		private final Id<TransitStopFacility> stopFacilityId;
 		private final double lastArrivalTime;
 		private final Id<Umlauf> umlaufId;
-		
+
 
 		Id<Umlauf> getUmlaufId() {
 			return umlaufId;
@@ -52,7 +52,7 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 		public Id<TransitLine> getLineId() {
 			return lineId;
 		}
-		
+
 		public Id<TransitStopFacility> getStopFacility() {
 			return stopFacilityId;
 		}
@@ -60,12 +60,12 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 		double getLastArrivalTime() {
 			return lastArrivalTime;
 		}
-		
+
 		@Override
 		public String toString() {
 			return stopFacilityId + " at " + lastArrivalTime + "(" + getLineId() + ")";
 		}
-		
+
 
 	}
 
@@ -75,7 +75,7 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 		public int compare(UmlaufStueck o1, UmlaufStueck o2) {
 			return Double.compare(o1.getDeparture().getDepartureTime(), o2.getDeparture().getDepartureTime());
 		}
-		
+
 	};
 
 	private static final Comparator<UmlaufKey> umlaufKeyComparator = new Comparator<UmlaufKey>() {
@@ -86,7 +86,7 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 			if (c != 0) {
 				return c;
 			} else {
-				int cc = o1.getLineId().compareTo(o2.getLineId()); 
+				int cc = o1.getLineId().compareTo(o2.getLineId());
 				if (cc != 0) {
 					return cc;
 				} else {
@@ -99,9 +99,9 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 				}
 			}
 		}
-		
+
 	};
-	
+
 	private final Collection<TransitLine> transitLines;
 	private final SortedMap<UmlaufKey,Umlauf> umlaeufe = new TreeMap<UmlaufKey,Umlauf>(umlaufKeyComparator);
 	private ArrayList<UmlaufStueck> umlaufStuecke;
@@ -115,14 +115,14 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 
 	@Inject
 	GreedyUmlaufBuilderImpl( Scenario scenario ) {
-		interpolator = new UmlaufInterpolator( scenario.getNetwork(), scenario.getConfig().planCalcScore() );
+		interpolator = new UmlaufInterpolator( scenario.getNetwork(), scenario.getConfig().scoring() );
 		this.transitLines = scenario.getTransitSchedule().getTransitLines().values();
 	}
-	
+
 	private static boolean canBuild() {
 		return true;
 	}
-	
+
 	@Override
 	public Collection<Umlauf> build() {
 		if (!canBuild()) {
@@ -142,12 +142,12 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 		}
 		return umlaeufe.values();
 	}
-	
+
 	private static double getLastArrivalTime( Umlauf umlauf ) {
 		TransitRouteStop previousStop = getLastStop(umlauf);
 		double previousDepartureTime = getLastDeparture(umlauf).getDepartureTime();
 		double arrivalOffset = previousStop.getArrivalOffset().seconds();
-		double previousArrivalTime = previousDepartureTime + arrivalOffset;			
+		double previousArrivalTime = previousDepartureTime + arrivalOffset;
 		return previousArrivalTime;
 	}
 
@@ -210,7 +210,7 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 		Collections.sort(this.umlaufStuecke, departureTimeComparator);
 	}
 
-	
-	
+
+
 
 }

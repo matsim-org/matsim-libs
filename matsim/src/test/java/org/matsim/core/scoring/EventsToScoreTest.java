@@ -70,12 +70,12 @@ public class EventsToScoreTest {
 	@Test public void testMsaAveraging() {
 		Config config = ConfigUtils.createConfig() ;
 
-		config.controler().setFirstIteration(10);
-		config.controler().setLastIteration(110);
+		config.controller().setFirstIteration(10);
+		config.controller().setLastIteration(110);
 
-		config.planCalcScore().setMarginalUtilityOfMoney(1.);
+		config.scoring().setMarginalUtilityOfMoney(1.);
 
-		config.planCalcScore().setFractionOfIterationsToStartScoreMSA(0.9);
+		config.scoring().setFractionOfIterationsToStartScoreMSA(0.9);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
         Population population = scenario.getPopulation();
@@ -88,7 +88,7 @@ public class EventsToScoreTest {
 		EventsManager events = EventsUtils.createEventsManager();
 		EventsToScore e2s = EventsToScore.createWithScoreUpdating(scenario, sfFactory, events);
 
-		for ( int mockIteration = config.controler().getFirstIteration() ; mockIteration <= config.controler().getLastIteration() ; mockIteration++ ) {
+		for (int mockIteration = config.controller().getFirstIteration(); mockIteration <= config.controller().getLastIteration() ; mockIteration++ ) {
 
 			e2s.beginIteration(mockIteration, false); ;
 			events.initProcessing();

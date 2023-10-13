@@ -82,10 +82,10 @@ public final class ParallelEventsManagerImpl implements EventsManager {
 
 	@Inject
 	ParallelEventsManagerImpl(Config config) {
-		if (config.parallelEventHandling().getEstimatedNumberOfEvents() != null) {
-			preInputBufferMaxLength = (int) (config.parallelEventHandling().getEstimatedNumberOfEvents() / 10);
+		if (config.eventsManager().getEstimatedNumberOfEvents() != null) {
+			preInputBufferMaxLength = (int) (config.eventsManager().getEstimatedNumberOfEvents() / 10);
 		}
-		init(config.parallelEventHandling().getNumberOfThreads());
+		init(config.eventsManager().getNumberOfThreads());
 	}
 
 	/**

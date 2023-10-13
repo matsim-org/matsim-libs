@@ -47,7 +47,6 @@ public final class CadytsBuilderImpl {
 
 	public static <T extends Identifiable<T>> AnalyticalCalibrator<T> buildCalibratorAndAddMeasurements(final Config config, final Counts<T> occupCounts,
 																										LookUpItemFromId<T> lookUp, Class<T> idType) {
-
 		if (occupCounts.getCounts().size() == 0) {
 			log.warn("Counts container is empty.");
 		}
@@ -142,7 +141,7 @@ public final class CadytsBuilderImpl {
 
 
 		AnalyticalCalibrator<T> matsimCalibrator = new AnalyticalCalibrator<>(
-				config.controler().getOutputDirectory() + "/cadyts.log",
+				config.controller().getOutputDirectory() + "/cadyts.log",
 				MatsimRandom.getLocalInstance().nextLong(),cadytsConfig.getTimeBinSize()
 				 ) ;
 
@@ -161,7 +160,7 @@ public final class CadytsBuilderImpl {
 			log.warn("setting bruteForce==true for calibrator, but this won't do anything in the way the cadyts matsim integration is set up. kai, mar'14") ;
 		}
 
-		matsimCalibrator.setStatisticsFile(config.controler().getOutputDirectory() + "/calibration-stats.txt");
+		matsimCalibrator.setStatisticsFile(config.controller().getOutputDirectory() + "/calibration-stats.txt");
 		return matsimCalibrator;
 	}
 

@@ -75,11 +75,11 @@ public class BikeTravelTimeTest {
 
 		// set default walk speed; according to Weidmann 1.34 [m/s]
 		double defaultWalkSpeed = 1.34;
-		scenario.getConfig().plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
+		scenario.getConfig().routing().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
 
 		// set default bike speed; Prakin and Rotheram according to 6.01 [m/s]
 		double defaultBikeSpeed = 6.01;
-		scenario.getConfig().plansCalcRoute().setTeleportedModeSpeed(TransportMode.bike, defaultBikeSpeed);
+		scenario.getConfig().routing().setTeleportedModeSpeed(TransportMode.bike, defaultBikeSpeed);
 
 		BikeTravelTime bikeTravelTime;
 
@@ -88,7 +88,7 @@ public class BikeTravelTimeTest {
 		double calculatedTravelTime;
 
 		// reference speed * person factor * slope factor
-		bikeTravelTime = new BikeTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
+		bikeTravelTime = new BikeTravelTime(scenario.getConfig().routing(), linkSlopes);
 		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		speed = defaultBikeSpeed * bikeTravelTime.personFactorCache.get() * 1.0;
 		expectedTravelTime = link.getLength() / speed;
@@ -98,7 +98,7 @@ public class BikeTravelTimeTest {
 
 		// increase age
 		PersonUtils.setAge(person, 80);
-		bikeTravelTime = new BikeTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
+		bikeTravelTime = new BikeTravelTime(scenario.getConfig().routing(), linkSlopes);
 		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		speed = defaultBikeSpeed * bikeTravelTime.personFactorCache.get() * 1.0;
 		expectedTravelTime = link.getLength() / speed;
@@ -108,7 +108,7 @@ public class BikeTravelTimeTest {
 
 		// change gender
 		PersonUtils.setSex(person, "f");
-		bikeTravelTime = new BikeTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
+		bikeTravelTime = new BikeTravelTime(scenario.getConfig().routing(), linkSlopes);
 		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		speed = defaultBikeSpeed * bikeTravelTime.personFactorCache.get() * 1.0;
 		expectedTravelTime = link.getLength() / speed;
@@ -120,7 +120,7 @@ public class BikeTravelTimeTest {
 		h2 = 0.1;
 		slope = 100 * (h2 - h1) / link.getLength();
 		linkSlopes.put(link.getId(), slope);
-		bikeTravelTime = new BikeTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
+		bikeTravelTime = new BikeTravelTime(scenario.getConfig().routing(), linkSlopes);
 
 		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		double slope2 = bikeTravelTime.getSlope(link);
@@ -135,7 +135,7 @@ public class BikeTravelTimeTest {
 		h2 = -0.1;
 		slope = 100 * (h2 - h1) / link.getLength();
 		linkSlopes.put(link.getId(), slope);
-		bikeTravelTime = new BikeTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
+		bikeTravelTime = new BikeTravelTime(scenario.getConfig().routing(), linkSlopes);
 
 		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		slope2 = bikeTravelTime.getSlope(link);
@@ -150,9 +150,9 @@ public class BikeTravelTimeTest {
 		h2 = 0.25;
 		slope = 100 * (h2 - h1) / link.getLength();
 		linkSlopes.put(link.getId(), slope);
-		bikeTravelTime = new BikeTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
+		bikeTravelTime = new BikeTravelTime(scenario.getConfig().routing(), linkSlopes);
 
-		WalkTravelTime walkTravelTime = new WalkTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
+		WalkTravelTime walkTravelTime = new WalkTravelTime(scenario.getConfig().routing(), linkSlopes);
 		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		expectedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
@@ -211,7 +211,7 @@ public class BikeTravelTimeTest {
 		double slope = 100 * (h2 - h1) / link.getLength();
 		linkSlopes.put(link.getId(), slope);
 
-		BikeTravelTime bikeTravelTime = new BikeTravelTime(config.plansCalcRoute(), linkSlopes);
+		BikeTravelTime bikeTravelTime = new BikeTravelTime(config.routing(), linkSlopes);
 
 		double tt1 = bikeTravelTime.getLinkTravelTime(link, 0.0, p1, null);
 		double tt2 = bikeTravelTime.getLinkTravelTime(link, 0.0, p2, null);

@@ -45,6 +45,7 @@ public final class ConfigReader extends MatsimXmlParser {
 	private final static String CONFIG_V1 = "config_v1.dtd";
 	private final static String CONFIG_V2 = "config_v2.dtd";
 
+	private final ConfigAliases aliases = new ConfigAliases();
 	private final Config config;
 	private MatsimXmlParser delegate = null;
 
@@ -62,6 +63,10 @@ public final class ConfigReader extends MatsimXmlParser {
 	public ConfigReader(final Config config) {
 		super(ValidationType.DTD_ONLY);
 		this.config = config;
+	}
+
+	public ConfigAliases getConfigAliases() {
+		return this.aliases;
 	}
 
 	@Override

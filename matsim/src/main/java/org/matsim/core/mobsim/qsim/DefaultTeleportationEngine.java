@@ -96,7 +96,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 
 		double travelTime = agent.getExpectedTravelTime().seconds() ;
 		if ( withTravelTimeCheck ) {
-			Double speed = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get( agent.getMode() ) ;
+			Double speed = scenario.getConfig().routing().getTeleportedModeSpeeds().get( agent.getMode() ) ;
 			Facility dpfac = agent.getCurrentFacility() ;
 			Facility arfac = agent.getDestinationFacility() ;
 			travelTime = DefaultTeleportationEngine.travelTimeCheck(travelTime, speed, dpfac, arfac);

@@ -43,9 +43,9 @@ public class CadytsPlanChanger<T> implements PlanSelector<Plan, Person> {
 
 	public CadytsPlanChanger(Scenario scenario, CadytsContextI<T> cadytsContext) {
 		this.cadytsContext = cadytsContext;
-		this.beta = scenario.getConfig().planCalcScore().getBrainExpBeta() ;
+		this.beta = scenario.getConfig().scoring().getBrainExpBeta() ;
 	}
-	
+
 	@Override
 	public Plan selectPlan(final HasPlansAndId<Plan, Person> person) {
 		final Plan currentPlan = person.getSelectedPlan();

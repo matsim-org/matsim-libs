@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.vsp.parkAndRide.example;
 
@@ -30,7 +30,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -52,25 +52,25 @@ import playground.vsp.parkAndRide.scoring.PRScoringFunctionFactory;
  *
  */
 public class PRRunner {
-	
+
 	static String configFile;
-		
+
 	public static void main(String[] args) throws IOException {
-		
+
 		configFile = "/path-to/config.xml";
-		
+
 		PRRunner main = new PRRunner();
 		main.run();
 	}
-	
+
 	private void run() {
-		
+
 		Config config = new Config();
 		config.addModule(new PRConfigGroup());
 		ConfigUtils.loadConfig(config, configFile);
-				
+
 		final Controler controler = new Controler(config);
-		controler.getConfig().controler().setOverwriteFileSetting(
+		controler.getConfig().controller().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
@@ -79,10 +79,10 @@ public class PRRunner {
 
 		ActivityParams prActivityParams = new ActivityParams(PRConstants.PARKANDRIDE_ACTIVITY_TYPE);
 		prActivityParams.setTypicalDuration(prSettings.getTypicalDuration());
-		controler.getConfig().planCalcScore().addActivityParams(prActivityParams);
+		controler.getConfig().scoring().addActivityParams(prActivityParams);
 
         controler.setScoringFunctionFactory(new PRScoringFunctionFactory(controler.getScenario(), prSettings.getIntermodalTransferPenalty()));
-		
+
 		PRFileReader prReader = new PRFileReader(prSettings.getInputFile());
 		Map<Id<PRFacility>, PRFacility> id2prFacility = prReader.getId2prFacility();
 		final PRAdaptiveCapacityControl adaptiveControl = new PRAdaptiveCapacityControl(id2prFacility);
@@ -105,8 +105,8 @@ public class PRRunner {
 		});
 
 		controler.run();
-		
+
 	}
 
 }
-	
+

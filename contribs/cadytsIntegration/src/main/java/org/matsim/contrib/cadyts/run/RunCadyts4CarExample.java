@@ -74,7 +74,7 @@ public class RunCadyts4CarExample {
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
 				final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cadytsContext);
-				scoringFunction.setWeightOfCadytsCorrection(30. * config.planCalcScore().getBrainExpBeta()) ;
+				scoringFunction.setWeightOfCadytsCorrection(30. * config.scoring().getBrainExpBeta()) ;
 				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
 
 				return scoringFunctionAccumulator;

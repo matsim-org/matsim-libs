@@ -92,7 +92,7 @@ public class SpeedCalculatorTest{
         // (dto)
     }
     private double getSpeedOnLink( Link link, QVehicle vehicle ){
-        config.controler().setOutputDirectory( utils.getOutputDirectory() );
+        config.controller().setOutputDirectory( utils.getOutputDirectory() );
         Scenario scenario = ScenarioUtils.createScenario( config );
         AbstractQSimModule module = new AbstractQSimModule(){
             @Override public void configureQSim(){

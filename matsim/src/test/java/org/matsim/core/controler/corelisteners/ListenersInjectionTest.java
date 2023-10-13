@@ -73,7 +73,7 @@ public class ListenersInjectionTest {
 	private void testIsSingleton( final Class<? extends ControlerListener> klass ) {
 		final Config config = ConfigUtils.createConfig();
 		final String outputDir = utils.getOutputDirectory();
-		config.controler().setOutputDirectory( outputDir );
+		config.controller().setOutputDirectory( outputDir );
 
         final com.google.inject.Injector injector = Injector.createInjector(
                 config,
@@ -86,7 +86,7 @@ public class ListenersInjectionTest {
 						bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
 						bind(OutputDirectoryHierarchy.class).toInstance(new OutputDirectoryHierarchy(outputDir,
 								OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists,
-								config.controler().getCompressionType()));
+								config.controller().getCompressionType()));
 						bind(IterationStopWatch.class).toInstance(new IterationStopWatch());
 						bind(IterationCounter.class).toInstance(() -> 0);
 						install(new ScenarioByInstanceModule(ScenarioUtils.createScenario(config)));
