@@ -86,7 +86,7 @@ public class SubsidyTestIT implements TabularFileHandler {
 		filesToCheckFor.add(utils.getOutputDirectory() + "pStats.txt");
 		filesToCheckFor.add(utils.getOutputDirectory() + "scorestats.csv");
 		filesToCheckFor.add(utils.getOutputDirectory() + "stopwatch.csv");
-		filesToCheckFor.add(utils.getOutputDirectory() + "traveldistancestats.txt");
+		filesToCheckFor.add(utils.getOutputDirectory() + "traveldistancestats.csv");
 		filesToCheckFor.add(utils.getOutputDirectory() + "pStat_light.gexf.gz");
 		filesToCheckFor.add(utils.getOutputDirectory() + "pStat.gexf.gz");
 

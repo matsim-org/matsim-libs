@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -59,9 +60,10 @@ import java.util.stream.Collectors;
 public class TravelDistanceStats {
 
 	private final ControllerConfigGroup controllerConfigGroup;
-	final private BufferedWriter out;
-	final private String legStatsPngName;
-	final private String tripStatsPngName;
+	private final BufferedWriter out;
+	private final String legStatsPngName;
+	private final String tripStatsPngName;
+	private final String delimiter;
 
 	private double[] legStatsHistory = null;
 	private double[] tripStatsHistory = null;
@@ -69,10 +71,12 @@ public class TravelDistanceStats {
 	private final static Logger log = LogManager.getLogger(TravelDistanceStats.class);
 
 	@Inject
-	TravelDistanceStats(ControllerConfigGroup controllerConfigGroup, OutputDirectoryHierarchy controlerIO) {
+	TravelDistanceStats(ControllerConfigGroup controllerConfigGroup, OutputDirectoryHierarchy controlerIO, GlobalConfigGroup globalConfig) {
 		this(controllerConfigGroup, controlerIO.getOutputFilename("traveldistancestats"),
 				controlerIO.getOutputFilename("traveldistancestats") + "legs",
-				controlerIO.getOutputFilename("traveldistancestats") + "trips", controllerConfigGroup.isCreateGraphs());
+				controlerIO.getOutputFilename("traveldistancestats") + "trips",
+				controllerConfigGroup.isCreateGraphs(),
+				globalConfig.getDefaultDelimiter());
 	}
 
 	/**
@@ -80,15 +84,16 @@ public class TravelDistanceStats {
 	 * @param createPNG true if in every iteration, the distance statistics should be visualized in a graph and written to disk.
 	 * @throws UncheckedIOException
 	 */
-	public TravelDistanceStats(final Config config, final String filename, final boolean createPNG) throws UncheckedIOException {
-        this(config.controller(), filename, filename + "legs", filename + "trips", createPNG);
+	public TravelDistanceStats(final Config config, final String filename, final boolean createPNG, final String delimiter) throws UncheckedIOException {
+        this(config.controller(), filename, filename + "legs", filename + "trips", createPNG, delimiter);
     }
 
-    private TravelDistanceStats(ControllerConfigGroup controllerConfigGroup, String travelDistanceStatsFileName,
-																String legStatsPngName, String tripStatsPngName, boolean createPNG) {
+	private TravelDistanceStats(ControllerConfigGroup controllerConfigGroup, String travelDistanceStatsFileName,
+																String legStatsPngName, String tripStatsPngName, boolean createPNG, String delimiter) {
 		this.controllerConfigGroup = controllerConfigGroup;
 		this.legStatsPngName = legStatsPngName;
 		this.tripStatsPngName = tripStatsPngName;
+		this.delimiter = delimiter;
 		if (createPNG) {
 			int iterations = controllerConfigGroup.getLastIteration() - controllerConfigGroup.getFirstIteration();
 			if (iterations > 5000) {
@@ -97,13 +102,13 @@ public class TravelDistanceStats {
 			this.legStatsHistory = new double[iterations+1];
 			this.tripStatsHistory = new double[iterations+1];
 		}
-		if (travelDistanceStatsFileName.toLowerCase(Locale.ROOT).endsWith(".txt")) {
+		if (travelDistanceStatsFileName.toLowerCase(Locale.ROOT).endsWith(".csv")) {
 			this.out = IOUtils.getBufferedWriter(travelDistanceStatsFileName);
 		} else {
-			this.out = IOUtils.getBufferedWriter(travelDistanceStatsFileName + ".txt");
+			this.out = IOUtils.getBufferedWriter(travelDistanceStatsFileName + ".csv");
 		}
 		try {
-            this.out.write("ITERATION\tavg. Average Leg distance\tavg. Average Trip distance\n");
+			this.out.write("ITERATION" + this.delimiter + "avg. Average Leg distance" + this.delimiter + "avg. Average Trip distance\n");
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -149,7 +154,7 @@ public class TravelDistanceStats {
 		log.info("(and teleported legs whose route contains a distance.)");// TODO: still valid?
 
 		try {
-            this.out.write(iteration + "\t" + legStats.getAverage() + "\t" + tripStats.getAverage() + "\t" + "\n");
+			this.out.write(iteration + this.delimiter + legStats.getAverage() + this.delimiter + tripStats.getAverage() + this.delimiter + "\n");
 			this.out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();

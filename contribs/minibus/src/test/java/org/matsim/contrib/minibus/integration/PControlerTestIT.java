@@ -94,9 +94,9 @@ public class PControlerTestIT implements TabularFileHandler{
 		filesToCheckFor.add(outputPath + scenarioName + ".0.actsFromParatransitUsers.txt");
 		filesToCheckFor.add(outputPath + scenarioName + ".pOperatorLogger.txt");
 		filesToCheckFor.add(outputPath + scenarioName + ".pStats.txt");
-		filesToCheckFor.add(outputPath + scenarioName + ".scorestats.txt");
+		filesToCheckFor.add(outputPath + scenarioName + ".scorestats.csv");
 		filesToCheckFor.add(outputPath + scenarioName + ".stopwatch.csv");
-		filesToCheckFor.add(outputPath + scenarioName + ".traveldistancestats.txt");
+		filesToCheckFor.add(outputPath + scenarioName + ".traveldistancestats.csv");
 		filesToCheckFor.add(outputPath + scenarioName + ".pStat_light.gexf.gz");
 		filesToCheckFor.add(outputPath + scenarioName + ".pStat.gexf.gz");
 
