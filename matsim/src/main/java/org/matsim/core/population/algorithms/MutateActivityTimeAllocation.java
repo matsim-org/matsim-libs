@@ -84,17 +84,23 @@ public final class MutateActivityTimeAllocation implements PlanAlgorithm {
 	}
 
 	private void setLegDepartureTimes(Plan plan) {
-		Activity previousActivity = null;
+		//setting leg departure times can only be an estimate and might be useful for certain dynamic modes.
+		//In general, it is best to trigger a reroute after mutating time.
+		double now = 0;
 		for (PlanElement planElement : plan.getPlanElements()){
 			if (planElement instanceof Activity activity){
-				previousActivity = activity;
+				if (activity.getEndTime().isDefined()){
+					now = activity.getEndTime().seconds();
+				}
+				else if (activity.getMaximumDuration().isDefined()){
+					now = now + activity.getMaximumDuration().seconds();
+				}
 			} else if (planElement instanceof Leg leg){
-				if (previousActivity.getEndTime().isDefined()){
-					leg.setDepartureTime(previousActivity.getEndTime().seconds());
-				} else {
-					// previous activity has only a duration.
-					// Estimates about departure time would be very vague, thus they are not set.
-					leg.setDepartureTimeUndefined();
+				if (leg.getDepartureTime().isDefined()) {
+					leg.setDepartureTime(now);
+					if (leg.getTravelTime().isDefined()) {
+						now = now + leg.getTravelTime().seconds();
+					}
 				}
 			}
 		}
