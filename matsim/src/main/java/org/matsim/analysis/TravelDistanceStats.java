@@ -154,7 +154,7 @@ public class TravelDistanceStats {
 		log.info("(and teleported legs whose route contains a distance.)");// TODO: still valid?
 
 		try {
-			this.out.write(iteration + this.delimiter + legStats.getAverage() + this.delimiter + tripStats.getAverage() + this.delimiter + "\n");
+			this.out.write(iteration + this.delimiter + legStats.getAverage() + this.delimiter + tripStats.getAverage() + "\n");
 			this.out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
