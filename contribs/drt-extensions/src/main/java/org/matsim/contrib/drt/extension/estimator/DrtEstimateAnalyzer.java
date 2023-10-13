@@ -15,7 +15,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.modal.ModalInjector;
 import org.matsim.core.utils.misc.OptionalTime;
 
 import java.io.IOException;
@@ -40,10 +39,10 @@ public final class DrtEstimateAnalyzer implements StartupListener, ShutdownListe
 
 	private CSVPrinter csv;
 
-	public DrtEstimateAnalyzer(ModalInjector injector) {
-		estimator = injector.getModal(DrtEstimator.class);
-		collector = injector.getModal(DrtEventSequenceCollector.class);
-		config = injector.getModal(DrtEstimatorConfigGroup.class);
+	public DrtEstimateAnalyzer(DrtEstimator estimator, DrtEventSequenceCollector collector, DrtEstimatorConfigGroup config) {
+		this.estimator = estimator;
+		this.collector = collector;
+		this.config = config;
 	}
 
 	@Override
@@ -99,7 +98,7 @@ public final class DrtEstimateAnalyzer implements StartupListener, ShutdownListe
 		for (DrtEventSequenceCollector.EventSequence seq : collector.getPerformedRequestSequences().values()) {
 			if (seq.getPickedUp().isPresent() && seq.getDroppedOff().isPresent()) {
 
-				// TODO: many attributes are not filled
+				// many attributes are not filled, when using the constructor
 				DrtRoute route = new DrtRoute(seq.getSubmitted().getFromLinkId(), seq.getSubmitted().getToLinkId());
 				route.setDirectRideTime(seq.getSubmitted().getUnsharedRideTime());
 				route.setDistance(seq.getSubmitted().getUnsharedRideDistance());

@@ -16,7 +16,6 @@ import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.modal.ModalInjector;
 import org.matsim.core.utils.misc.OptionalTime;
 
 import java.util.SplittableRandom;
@@ -41,23 +40,13 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 	private GlobalEstimate currentEst;
 	private RegressionResults fare;
 
-	@Inject
-	public BasicDrtEstimator(ModalInjector injector) {
+	public BasicDrtEstimator(DrtEventSequenceCollector collector, DrtEstimatorConfigGroup config,
+							 DrtConfigGroup drtConfig, DrtSpeedUpParams speedUpParams) {
 		//zones = injector.getModal(DrtZonalSystem.class);
-		collector = injector.getModal(DrtEventSequenceCollector.class);
-		config = injector.getModal(DrtEstimatorConfigGroup.class);
-		drtConfig = injector.getModal(DrtConfigGroup.class);
-
-		DrtSpeedUpParams modal;
-		try {
-			DrtSpeedUp speedUp = injector.getModal(DrtSpeedUp.class);
-			modal = speedUp.getParams();
-		} catch (Exception e) {
-			modal = null;
-			// speed-up not installed
-		}
-
-		speedUpParams = modal;
+		this.collector = collector;
+		this.config = config;
+		this.drtConfig = drtConfig;
+		this.speedUpParams = speedUpParams;
 	}
 
 	@Override

@@ -1,16 +1,19 @@
 package org.matsim.contrib.drt.extension.estimator.run;
 
 import com.google.inject.Singleton;
+import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
+import org.matsim.contrib.drt.extension.estimator.BasicDrtEstimator;
 import org.matsim.contrib.drt.extension.estimator.DrtEstimateAnalyzer;
 import org.matsim.contrib.drt.extension.estimator.DrtEstimator;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.drt.speedup.DrtSpeedUp;
+import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.modal.ModalInjector;
-import org.matsim.core.modal.ModalProviders;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.util.Optional;
 
 /**
  * Main module that needs to be installed if any estimator is to be used.
@@ -20,44 +23,63 @@ public class DrtEstimatorModule extends AbstractModule {
 	@Override
 	public void install() {
 
-		MultiModeDrtEstimatorConfigGroup config = ConfigUtils.addOrGetModule(getConfig(), MultiModeDrtEstimatorConfigGroup.class);
+		MultiModeDrtConfigGroup drtConfigs = MultiModeDrtConfigGroup.get(getConfig());
+		MultiModeDrtEstimatorConfigGroup configs = ConfigUtils.addOrGetModule(getConfig(), MultiModeDrtEstimatorConfigGroup.class);
 
-		for (DrtEstimatorConfigGroup group : config.getModalElements()) {
-			install(new ModeModule(group));
+		for (DrtConfigGroup cfg : drtConfigs.getModalElements()) {
+
+			Optional<DrtEstimatorConfigGroup> estCfg = configs.getModalElement(cfg.mode);
+
+			estCfg.ifPresent(drtEstimatorConfigGroup -> install(new ModeModule(cfg, drtEstimatorConfigGroup)));
 		}
 	}
 
 	static final class ModeModule extends AbstractDvrpModeModule {
 
+		private final DrtConfigGroup cfg;
 		private final DrtEstimatorConfigGroup group;
 
-		public ModeModule(DrtEstimatorConfigGroup group) {
+		public ModeModule(DrtConfigGroup cfg, DrtEstimatorConfigGroup group) {
 			super(group.mode);
+			this.cfg = cfg;
 			this.group = group;
 		}
 
 		@Override
 		public void install() {
 
-			bindModal(DrtEstimator.class).toProvider(modalProvider(
+			// try with default injections and overwrite
+			if (group.estimator == DrtEstimatorConfigGroup.EstimatorType.BASIC) {
+				bindModal(DrtEstimator.class).toProvider(modalProvider(
 					getter -> {
+						DrtSpeedUpParams modal = null;
 						try {
-							Constructor<? extends DrtEstimator> constructor = group.estimator.getDeclaredConstructor(ModalInjector.class);
-							return constructor.newInstance(ModalProviders.createInjector(getter));
-						} catch (NoSuchMethodException e) {
-							throw new RuntimeException("Could not find constructor for DRT estimator. You need to have a public constructor with one parameter accepting ModalInjector", e);
-						} catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-							throw new RuntimeException("Could not instantiate DRT estimator", e);
+							DrtSpeedUp speedUp = getter.getModal(DrtSpeedUp.class);
+							modal = speedUp.getParams();
+						} catch (Exception e) {
+							// This happens if the speed-up is not installed
+							// there is no other way to check it
 						}
+
+						return new BasicDrtEstimator(getter.getModal(DrtEventSequenceCollector.class),
+							group,
+							cfg,
+							modal);
 					}
-			)).in(Singleton.class);
+				)).in(Singleton.class);
+			}
 
 			addControlerListenerBinding().to(modalKey(DrtEstimator.class));
 
 			bindModal(DrtEstimatorConfigGroup.class).toInstance(group);
 
 			// Needs to run before estimators
-			bindModal(DrtEstimateAnalyzer.class).toProvider(modalProvider(getter -> new DrtEstimateAnalyzer(ModalProviders.createInjector(getter)))).in(Singleton.class);
+			bindModal(DrtEstimateAnalyzer.class)
+				.toProvider(
+					modalProvider(getter -> new DrtEstimateAnalyzer(getter.getModal(DrtEstimator.class), getter.getModal(DrtEventSequenceCollector.class), group))
+				)
+				.in(Singleton.class);
+
 			addControlerListenerBinding().to(modalKey(DrtEstimateAnalyzer.class));
 
 		}

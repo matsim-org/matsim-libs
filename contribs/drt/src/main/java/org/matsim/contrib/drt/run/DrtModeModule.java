@@ -82,11 +82,11 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 							getter.getModal(DrtEventSequenceCollector.class)))).asEagerSingleton();
 			addControlerListenerBinding().to(modalKey(DrtSpeedUp.class));
 		});
-		
+
 		bindModal(DefaultStopTimeCalculator.class).toProvider(modalProvider(getter -> {
 			return new DefaultStopTimeCalculator(drtCfg.stopDuration);
 		})).in(Singleton.class);
-		
+
 		bindModal(StopTimeCalculator.class).to(modalKey(DefaultStopTimeCalculator.class));
 
 		install(new AdaptiveTravelTimeMatrixModule(drtCfg.mode));

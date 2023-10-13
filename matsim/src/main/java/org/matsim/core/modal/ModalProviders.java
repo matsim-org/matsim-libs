@@ -48,13 +48,6 @@ public class ModalProviders {
 		};
 	}
 
-	/**
-	 * Creates modal injector from getter.
-	 */
-	public static ModalInjectorImpl createInjector(InstanceGetter<? extends Annotation> getter) {
-		return new ModalInjectorImpl(getter);
-	}
-
 	public static final class InstanceGetter<M extends Annotation> {
 		private final String mode;
 		private final Injector injector;

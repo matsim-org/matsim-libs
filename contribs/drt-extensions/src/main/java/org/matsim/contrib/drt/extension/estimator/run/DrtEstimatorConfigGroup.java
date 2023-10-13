@@ -4,18 +4,23 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.drt.extension.estimator.BasicDrtEstimator;
-import org.matsim.contrib.drt.extension.estimator.DrtEstimator;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 
 public class DrtEstimatorConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
 
-	private static final Logger log = LogManager.getLogger(DrtConfigGroup.class);
+	/**
+	 * Type of estimator, which will be installed in {@link DrtEstimatorModule}.
+	 */
+	public enum EstimatorType {
+		BASIC,
+
+		/**
+		 * Custom estimator, that needs to provided via binding.
+		 */
+		CUSTOM
+	}
 
 	public static final String GROUP_NAME = "drtEstimator";
 
@@ -34,9 +39,9 @@ public class DrtEstimatorConfigGroup extends ReflectiveConfigGroupWithConfigurab
 	public String mode = TransportMode.drt;
 
 	@Parameter
-	@Comment("Fully qualified class name of the estimator that should be used.")
+	@Comment("Estimator typed to be used. In case of 'CUSTOM', guice bindings needs to be provided.")
 	@NotNull
-	public Class<? extends DrtEstimator> estimator = BasicDrtEstimator.class;
+	public EstimatorType estimator = EstimatorType.BASIC;
 
 	@Parameter
 	@Comment("Decay of the exponential moving average.")
@@ -44,10 +49,9 @@ public class DrtEstimatorConfigGroup extends ReflectiveConfigGroupWithConfigurab
 	public double decayFactor = 0.5;
 
 	@Parameter
-	@Comment("Randomize estimates with standard deviation")
+	@Comment("Factor multiplied with standard deviation to randomize estimates.")
 	@PositiveOrZero
 	public double randomization = 0.1;
-
 
 	@Override
 	public String getMode() {

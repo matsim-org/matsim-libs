@@ -21,6 +21,7 @@
 package org.matsim.contrib.drt.extension.estimator.run;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.matsim.contrib.dvrp.run.MultiModal;
@@ -91,4 +92,12 @@ public final class MultiModeDrtEstimatorConfigGroup extends ReflectiveConfigGrou
 	public Collection<DrtEstimatorConfigGroup> getModalElements() {
 		return (Collection<DrtEstimatorConfigGroup>)getParameterSets(DrtEstimatorConfigGroup.GROUP_NAME);
 	}
+
+	/**
+	 * Find estimator config for specific mode.
+	 */
+	public Optional<DrtEstimatorConfigGroup> getModalElement(String mode) {
+		return getModalElements().stream().filter(m -> m.getMode().equals(mode)).findFirst();
+	}
+
 }
