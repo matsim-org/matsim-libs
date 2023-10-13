@@ -27,10 +27,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.application.options.ShpOptions;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.carrier.CarrierUtils;
-import org.matsim.contrib.freight.controler.FreightUtils;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -407,15 +406,15 @@ public class TrafficVolumeGenerationTest {
 
 		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, regionLinksMap);
 
-		Assert.assertEquals(3, FreightUtils.getCarriers(scenario).getCarriers().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
-		Assert.assertTrue(FreightUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleServiceCarrier_carrier1", Carrier.class)));
-		Assert.assertTrue(FreightUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleServiceCarrier_carrier2", Carrier.class)));
-		Assert.assertTrue(FreightUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleShipmentCarrier_carrier1", Carrier.class)));
+		Assert.assertEquals(3, CarriersUtils.getCarriers(scenario).getCarriers().size(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(1, CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
+		Assert.assertTrue(CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleServiceCarrier_carrier1", Carrier.class)));
+		Assert.assertTrue(CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleServiceCarrier_carrier2", Carrier.class)));
+		Assert.assertTrue(CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleShipmentCarrier_carrier1", Carrier.class)));
 
-		Carrier addedCarrier1 = FreightUtils.getCarriers(scenario).getCarriers().get(Id.create("exampleServiceCarrier_carrier1", Carrier.class));
+		Carrier addedCarrier1 = CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create("exampleServiceCarrier_carrier1", Carrier.class));
 		Assert.assertNotNull(addedCarrier1.getSelectedPlan());
-		Assert.assertEquals(0, CarrierUtils.getJspritIterations(addedCarrier1), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(0, CarriersUtils.getJspritIterations(addedCarrier1), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, addedCarrier1.getCarrierCapabilities().getCarrierVehicles().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, addedCarrier1.getCarrierCapabilities().getVehicleTypes().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(3, addedCarrier1.getSelectedPlan().getScheduledTours().size(), MatsimTestUtils.EPSILON);
@@ -428,9 +427,9 @@ public class TrafficVolumeGenerationTest {
 		Assert.assertNull(addedCarrier1.getAttributes().getAttribute("vehicleType"));
 		Assert.assertEquals("testArea2_area3", addedCarrier1.getAttributes().getAttribute("tourStartArea"));
 
-		Carrier addedCarrier2 = FreightUtils.getCarriers(scenario).getCarriers().get(Id.create("exampleServiceCarrier_carrier2", Carrier.class));
+		Carrier addedCarrier2 = CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create("exampleServiceCarrier_carrier2", Carrier.class));
 		Assert.assertNotNull(addedCarrier2.getSelectedPlan());
-		Assert.assertEquals(0, CarrierUtils.getJspritIterations(addedCarrier2), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(0, CarriersUtils.getJspritIterations(addedCarrier2), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, addedCarrier2.getCarrierCapabilities().getCarrierVehicles().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, addedCarrier2.getCarrierCapabilities().getVehicleTypes().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(2, addedCarrier2.getSelectedPlan().getScheduledTours().size(), MatsimTestUtils.EPSILON);
@@ -442,9 +441,9 @@ public class TrafficVolumeGenerationTest {
 		Assert.assertNull(addedCarrier2.getAttributes().getAttribute("vehicleType"));
 		Assert.assertEquals("testArea2_area3", addedCarrier2.getAttributes().getAttribute("tourStartArea"));
 
-		Carrier addedCarrier3 = FreightUtils.getCarriers(scenario).getCarriers().get(Id.create("exampleShipmentCarrier_carrier1", Carrier.class));
+		Carrier addedCarrier3 = CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create("exampleShipmentCarrier_carrier1", Carrier.class));
 		Assert.assertNull(addedCarrier3.getSelectedPlan());
-		Assert.assertEquals(50, CarrierUtils.getJspritIterations(addedCarrier3), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(50, CarriersUtils.getJspritIterations(addedCarrier3), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, addedCarrier3.getCarrierCapabilities().getCarrierVehicles().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, addedCarrier3.getCarrierCapabilities().getVehicleTypes().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(FleetSize.INFINITE, addedCarrier3.getCarrierCapabilities().getFleetSize());
@@ -473,14 +472,14 @@ public class TrafficVolumeGenerationTest {
 
 		SmallScaleCommercialTrafficUtils.readExistingModels(scenario, sample, regionLinksMap);
 
-		Assert.assertEquals(2, FreightUtils.getCarriers(scenario).getCarriers().size(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
-		Assert.assertTrue(FreightUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleServiceCarrier_carrier1", Carrier.class)));
-		Assert.assertTrue(FreightUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleShipmentCarrier_carrier1", Carrier.class)));
+		Assert.assertEquals(2, CarriersUtils.getCarriers(scenario).getCarriers().size(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(1, CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
+		Assert.assertTrue(CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleServiceCarrier_carrier1", Carrier.class)));
+		Assert.assertTrue(CarriersUtils.getCarriers(scenario).getCarriers().containsKey(Id.create("exampleShipmentCarrier_carrier1", Carrier.class)));
 
-		Carrier addedCarrier1 = FreightUtils.getCarriers(scenario).getCarriers().get(Id.create("exampleServiceCarrier_carrier1", Carrier.class));
+		Carrier addedCarrier1 = CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create("exampleServiceCarrier_carrier1", Carrier.class));
 		Assert.assertNotNull(addedCarrier1.getSelectedPlan());
-		Assert.assertEquals(0, CarrierUtils.getJspritIterations(addedCarrier1), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(0, CarriersUtils.getJspritIterations(addedCarrier1), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, addedCarrier1.getCarrierCapabilities().getCarrierVehicles().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, addedCarrier1.getCarrierCapabilities().getVehicleTypes().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, addedCarrier1.getSelectedPlan().getScheduledTours().size(), MatsimTestUtils.EPSILON);
@@ -493,9 +492,9 @@ public class TrafficVolumeGenerationTest {
 		Assert.assertNull(addedCarrier1.getAttributes().getAttribute("vehicleType"));
 		Assert.assertEquals("testArea2_area3", addedCarrier1.getAttributes().getAttribute("tourStartArea"));
 
-		Carrier addedCarrier3 = FreightUtils.getCarriers(scenario).getCarriers().get(Id.create("exampleShipmentCarrier_carrier1", Carrier.class));
+		Carrier addedCarrier3 = CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create("exampleShipmentCarrier_carrier1", Carrier.class));
 		Assert.assertNull(addedCarrier3.getSelectedPlan());
-		Assert.assertEquals(50, CarrierUtils.getJspritIterations(addedCarrier3), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(50, CarriersUtils.getJspritIterations(addedCarrier3), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, addedCarrier3.getCarrierCapabilities().getCarrierVehicles().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, addedCarrier3.getCarrierCapabilities().getVehicleTypes().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(FleetSize.INFINITE, addedCarrier3.getCarrierCapabilities().getFleetSize());

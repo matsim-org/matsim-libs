@@ -30,10 +30,10 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.carrier.CarrierConstants;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierService;
+import org.matsim.freight.carriers.Carriers;
+import org.matsim.freight.carriers.CarrierConstants;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import java.util.*;

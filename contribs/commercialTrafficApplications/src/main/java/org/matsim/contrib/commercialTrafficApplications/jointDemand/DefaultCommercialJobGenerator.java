@@ -36,18 +36,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlanWriter;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierUtils;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.carrier.CarrierConstants;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.TimeWindow;
-import org.matsim.contrib.freight.carrier.Tour;
-import org.matsim.contrib.freight.jsprit.VRPTransportCostsFactory;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.jsprit.VRPTransportCostsFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -127,7 +117,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 		if (!scenario.getVehicles().getVehicleTypes().containsKey(carrierVehicle.getType().getId()))
 			scenario.getVehicles().addVehicleType(carrierVehicle.getType());
 		Id<Vehicle> vid = Id.createVehicleId(driverPerson.getId());
-		VehicleUtils.insertVehicleIdsIntoAttributes(driverPerson, Map.of(CarrierUtils.getCarrierMode(carrier), vid));
+		VehicleUtils.insertVehicleIdsIntoAttributes(driverPerson, Map.of(CarriersUtils.getCarrierMode(carrier), vid));
 		scenario.getVehicles()
 				.addVehicle(scenario.getVehicles().getFactory().createVehicle(vid, carrierVehicle.getType()));
 		freightVehicles.add(vid);
@@ -211,7 +201,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 	 */
 	private Plan createPlainPlanFromTour(Carrier carrier, ScheduledTour scheduledTour) {
 
-		String carrierMode = CarrierUtils.getCarrierMode(carrier);
+		String carrierMode = CarriersUtils.getCarrierMode(carrier);
 
 		// Create empty plan
 		Plan plan = PopulationUtils.createPlan();
@@ -223,7 +213,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 		plan.addActivity(startActivity);
 
 		for (Tour.TourElement tourElement : scheduledTour.getTour().getTourElements()) {
-			if (tourElement instanceof org.matsim.contrib.freight.carrier.Tour.Leg) {
+			if (tourElement instanceof Tour.Leg) {
 
 				// Take information from scheduled leg and create a defaultLeg
 				Tour.Leg tourLeg = (Tour.Leg) tourElement;

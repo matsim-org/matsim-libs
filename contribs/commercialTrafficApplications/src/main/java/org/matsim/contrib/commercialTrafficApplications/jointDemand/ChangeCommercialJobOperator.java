@@ -23,8 +23,8 @@ package org.matsim.contrib.commercialTrafficApplications.jointDemand;/*
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.Carriers;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.PlanAlgorithm;

@@ -36,8 +36,8 @@ import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.controler.FreightUtils;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
+import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
@@ -85,9 +85,9 @@ class RunJointDemandDRTExample {
 
         Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
         ScenarioUtils.loadScenario(scenario);
-        FreightUtils.loadCarriersAccordingToFreightConfig(scenario); //assumes that input file paths are set in FreightConfigGroup
+        CarriersUtils.loadCarriersAccordingToFreightConfig(scenario); //assumes that input file paths are set in FreightCarriersConfigGroup
         //alternatively, one can read in the input Carriers and CarrierVehicleTypes manually and use
-        //FreightUtils.getCarriers(scenario) and FreightUtils.getCarrierVehicleTypes(scenario)
+        //CarrierControlerUtils.getCarriers(scenario) and CarrierControlerUtils.getCarrierVehicleTypes(scenario)
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new JointDemandModule());
@@ -147,8 +147,8 @@ class RunJointDemandDRTExample {
         JointDemandConfigGroup jointDemandConfigGroup = ConfigUtils.addOrGetModule(config, JointDemandConfigGroup.class);
         jointDemandConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
 
-        FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-        freightConfigGroup.setCarriersFile("jointDemand_carriers_drt.xml");
-        freightConfigGroup.setCarriersVehicleTypesFile("jointDemand_vehicleTypes.xml");
+        FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+        freightCarriersConfigGroup.setCarriersFile("jointDemand_carriers_drt.xml");
+        freightCarriersConfigGroup.setCarriersVehicleTypesFile("jointDemand_vehicleTypes.xml");
     }
 }
