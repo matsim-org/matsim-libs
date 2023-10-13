@@ -149,6 +149,15 @@ public final class VehicleUtils {
 	}
 
 	/**
+	 * Retrieve the optional vehicle types per mode that might be assigned to a person.
+	 * Returns null if this is not defined.
+	 */
+	public static Map<String, Id<VehicleType>> getVehicleTypes(Person person) {
+		var personVehicles = (PersonVehicleTypes) person.getAttributes().getAttribute(VehicleUtils.VEHICLE_TYPES_ATTRIBUTE_KEY);
+		return personVehicles != null ? personVehicles.getModeVehicleTypes() : null;
+	}
+
+	/**
 	 * Retrieves a vehicleId from the person's attributes.
 	 *
 	 * @return the vehicleId of the person's vehicle for the specified mode
