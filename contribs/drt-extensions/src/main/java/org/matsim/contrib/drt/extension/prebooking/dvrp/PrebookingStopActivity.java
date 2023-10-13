@@ -39,13 +39,13 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 	private final PrebookingPassengerEngine passengerEngine;
 	private final PassengerStopDurationProvider stopDurationProvider;
 
-	private final PassengerEnteringHandler enteringHandler;
+	private final PassengerEnteringVehicleHandler enteringHandler;
 
 	public PrebookingStopActivity(PrebookingPassengerEngine passengerEngine, DynAgent driver, StayTask task,
 			Map<Id<Request>, ? extends AcceptedDrtRequest> dropoffRequests,
 			Map<Id<Request>, ? extends AcceptedDrtRequest> pickupRequests, String activityType,
 			PassengerStopDurationProvider stopDurationProvider, DvrpVehicle vehicle,
-			PassengerEnteringHandler enteringHandler) {
+			PassengerEnteringVehicleHandler enteringHandler) {
 		super(activityType);
 		this.passengerEngine = passengerEngine;
 		this.driver = driver;

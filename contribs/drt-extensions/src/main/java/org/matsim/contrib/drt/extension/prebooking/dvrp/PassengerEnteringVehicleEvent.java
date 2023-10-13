@@ -35,10 +35,10 @@ import org.matsim.contrib.dvrp.passenger.AbstractPassengerRequestEvent;
  * 
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
-public class PassengerEnteringEvent extends AbstractPassengerRequestEvent {
-	public static final String EVENT_TYPE = "passenger entering";
+public class PassengerEnteringVehicleEvent extends AbstractPassengerRequestEvent {
+	public static final String EVENT_TYPE = "passenger entering vehicle";
 
-	public PassengerEnteringEvent(double time, String mode, Id<Request> requestId, Id<Person> personId) {
+	public PassengerEnteringVehicleEvent(double time, String mode, Id<Request> requestId, Id<Person> personId) {
 		super(time, mode, requestId, personId);
 	}
 
@@ -47,12 +47,12 @@ public class PassengerEnteringEvent extends AbstractPassengerRequestEvent {
 		return EVENT_TYPE;
 	}
 
-	public static PassengerEnteringEvent convert(GenericEvent event) {
+	public static PassengerEnteringVehicleEvent convert(GenericEvent event) {
 		Map<String, String> attributes = event.getAttributes();
 		double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));
 		String mode = Objects.requireNonNull(attributes.get(ATTRIBUTE_MODE));
 		Id<Request> requestId = Id.create(attributes.get(ATTRIBUTE_REQUEST), Request.class);
 		Id<Person> personId = Id.createPersonId(attributes.get(ATTRIBUTE_PERSON));
-		return new PassengerEnteringEvent(time, mode, requestId, personId);
+		return new PassengerEnteringVehicleEvent(time, mode, requestId, personId);
 	}
 }

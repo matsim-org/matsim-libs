@@ -36,7 +36,7 @@ class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
 				DrtActionCreator delegate = getter.getModal(DrtActionCreator.class);
 				PassengerStopDurationProvider stopDurationProvider = getter
 						.getModal(PassengerStopDurationProvider.class);
-				PassengerEnteringHandler enteringHandler = getter.getModal(PassengerEnteringHandler.class);
+				PassengerEnteringVehicleHandler enteringHandler = getter.getModal(PassengerEnteringVehicleHandler.class);
 
 				return new PrebookingActionCreator(passengerEngine, delegate, stopDurationProvider, enteringHandler);
 			})).in(Singleton.class);
@@ -51,7 +51,7 @@ class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
 				PassengerStopDurationProvider stopDurationProvider = getter
 						.getModal(PassengerStopDurationProvider.class);
 				MobsimTimer timer = getter.get(MobsimTimer.class);
-				PassengerEnteringHandler enteringHandler = getter.getModal(PassengerEnteringHandler.class);
+				PassengerEnteringVehicleHandler enteringHandler = getter.getModal(PassengerEnteringVehicleHandler.class);
 
 				return new ElectricPrebookingActionCreator(passengerEngine, delegate, stopDurationProvider, timer,
 						enteringHandler);
@@ -59,9 +59,9 @@ class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
 			bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(ElectricPrebookingActionCreator.class));
 		}
 
-		bindModal(PassengerEnteringHandler.class).toProvider(modalProvider(getter -> {
+		bindModal(PassengerEnteringVehicleHandler.class).toProvider(modalProvider(getter -> {
 			EventsManager eventsManager = getter.get(EventsManager.class);
-			return new PassengerEnteringHandler(eventsManager, getMode());
+			return new PassengerEnteringVehicleHandler(eventsManager, getMode());
 		})).in(Singleton.class);
 
 		// override the PassengerEngine

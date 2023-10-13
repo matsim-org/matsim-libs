@@ -1,6 +1,6 @@
 package org.matsim.contrib.drt.extension.prebooking.electric;
 
-import org.matsim.contrib.drt.extension.prebooking.dvrp.PassengerEnteringHandler;
+import org.matsim.contrib.drt.extension.prebooking.dvrp.PassengerEnteringVehicleHandler;
 import org.matsim.contrib.drt.extension.prebooking.dvrp.PrebookingPassengerEngine;
 import org.matsim.contrib.drt.extension.prebooking.dvrp.PrebookingStopActivity;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
@@ -27,11 +27,11 @@ public class ElectricPrebookingActionCreator implements VrpAgentLogic.DynActionC
 	private final PrebookingPassengerEngine passengerEngine;
 	private final PassengerStopDurationProvider stopDurationProvider;
 	private final MobsimTimer timer;
-	private final PassengerEnteringHandler enteringHandler;
+	private final PassengerEnteringVehicleHandler enteringHandler;
 
 	public ElectricPrebookingActionCreator(PrebookingPassengerEngine passengerEngine,
 			VrpAgentLogic.DynActionCreator delegate, PassengerStopDurationProvider stopDurationProvider,
-			MobsimTimer timer, PassengerEnteringHandler enteringHandler) {
+			MobsimTimer timer, PassengerEnteringVehicleHandler enteringHandler) {
 		this.delegate = delegate;
 		this.passengerEngine = passengerEngine;
 		this.stopDurationProvider = stopDurationProvider;

@@ -26,10 +26,10 @@ public class PrebookingActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final VrpAgentLogic.DynActionCreator delegate;
 	private final PrebookingPassengerEngine passengerEngine;
 	private final PassengerStopDurationProvider stopDurationProvider;
-	private final PassengerEnteringHandler enteringHandler;
+	private final PassengerEnteringVehicleHandler enteringHandler;
 
 	public PrebookingActionCreator(PrebookingPassengerEngine passengerEngine, VrpAgentLogic.DynActionCreator delegate,
-			PassengerStopDurationProvider stopDurationProvider, PassengerEnteringHandler enteringHandler) {
+			PassengerStopDurationProvider stopDurationProvider, PassengerEnteringVehicleHandler enteringHandler) {
 		this.delegate = delegate;
 		this.passengerEngine = passengerEngine;
 		this.stopDurationProvider = stopDurationProvider;
