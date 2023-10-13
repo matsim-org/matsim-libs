@@ -79,7 +79,7 @@ public class DrtRequestSubmittedEvent extends PassengerRequestSubmittedEvent {
 		return unsharedRideDistance;
 	}
 
-	public final double getEarlistDepartureTime() {
+	public final double getEarliestDepartureTime() {
 		return earliestDepartureTime;
 	}
 	

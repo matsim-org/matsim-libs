@@ -123,7 +123,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 	private record DrtLeg(Id<Request> request, double submissionTime, double departureTime, Id<Person> person, Id<DvrpVehicle> vehicle, Id<Link> fromLinkId, Coord fromCoord,
 						  Id<Link> toLinkId, Coord toCoord, double waitTime, double unsharedDistanceEstimate_m, double unsharedTimeEstimate_m,
-						  double arrivalTime, double fare, double latestDepartureTime, double latestArrivalTime) {
+						  double arrivalTime, double fare, double earliestDepartureTime, double latestDepartureTime, double latestArrivalTime) {
 	}
 
 	private static DrtLeg newDrtLeg(EventSequence sequence, Function<Id<Link>, ? extends Link> linkProvider) {
@@ -146,10 +146,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		var arrivalTime = sequence.getDroppedOff().get().getTime();
 		// PersonMoneyEvent has negative amount because the agent's money is reduced -> for the operator that is a positive amount
 		var fare = sequence.getDrtFares().stream().mapToDouble(PersonMoneyEvent::getAmount).sum();
+		var earliestDepartureTime = sequence.getSubmitted().getEarliestDepartureTime();
 		var latestDepartureTime = sequence.getSubmitted().getLatestPickupTime();
 		var latestArrivalTime = sequence.getSubmitted().getLatestDropoffTime();
 		return new DrtLeg(request, submissionTime, departureTime, person, vehicle, fromLinkId, fromCoord, toLinkId, toCoord, waitTime, unsharedDistanceEstimate_m,
-				unsharedTimeEstimate_m, arrivalTime, fare, latestDepartureTime, latestArrivalTime);
+				unsharedTimeEstimate_m, arrivalTime, fare, earliestDepartureTime, latestDepartureTime, latestArrivalTime);
 	}
 
 	@Override
@@ -227,6 +228,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 					"travelDistance_m",//
 					"directTravelDistance_m",//
 					"fareForLeg", //
+					"earliestDepartureTime",
 					"latestDepartureTime", //
 					"latestArrivalTime");
 
@@ -247,6 +249,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 					format.format(drtVehicleStats.getTravelDistances().get(leg.request)),//
 					format.format(leg.unsharedDistanceEstimate_m),//
 					format.format(leg.fare), //
+					format.format(leg.earliestDepartureTime), //
 					format.format(leg.latestDepartureTime), //
 					format.format(leg.latestArrivalTime)));
 		}
@@ -369,7 +372,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			for (EventSequence seq : performedRequestEventSequences) {
 				if (seq.getPickedUp().isPresent()) {
 					double actualWaitTime = seq.getPickedUp().get().getTime() - seq.getDeparture().get().getTime();
-					double estimatedWaitTime = seq.getScheduled().get().getPickupTime() - seq.getSubmitted().getEarlistDepartureTime();
+					double estimatedWaitTime = seq.getScheduled().get().getPickupTime() - seq.getSubmitted().getEarliestDepartureTime();
 					bw.append(line(seq.getSubmitted().getRequestId(), actualWaitTime, estimatedWaitTime, actualWaitTime - estimatedWaitTime));
 					times.add(actualWaitTime, estimatedWaitTime);
 				}
