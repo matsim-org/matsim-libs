@@ -238,11 +238,10 @@ public class SmallScaleCommercialTrafficUtils {
 			if (relatedCarrier.getAttributes().getAsMap().containsKey("tourStartArea"))
 				newPerson.getAttributes().putAttribute("tourStartArea",
 					relatedCarrier.getAttributes().getAttribute("tourStartArea"));
-			VehicleUtils.insertVehicleIdsIntoAttributes(newPerson, (new HashMap<>() {
-				{
-					put(mode, (Id.createVehicleId(person.getId().toString())));
-				}
-			}));
+
+			// TODO: assign correct vehicle type here
+			VehicleUtils.insertVehicleIdsIntoAttributes(newPerson, Map.of(mode, Id.createVehicleId(person.getId().toString())));
+
 			population.addPerson(newPerson);
 		}
 
