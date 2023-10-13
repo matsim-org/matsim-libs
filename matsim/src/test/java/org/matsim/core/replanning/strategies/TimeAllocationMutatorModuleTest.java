@@ -22,13 +22,10 @@ package org.matsim.core.replanning.strategies;
 
 import static org.junit.Assert.assertTrue;
 
-import jakarta.inject.Provider;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -36,22 +33,18 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
-import org.matsim.core.population.algorithms.PlanMutateTimeAllocationSimplified;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.population.algorithms.MutateActivityTimeAllocation;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Tests the functionality of {@link TimeAllocationMutatorModule}, mainly that the
- * correct mutation range is handed over to the underlying {@link PlanMutateTimeAllocationSimplified}.
+ * correct mutation range is handed over to the underlying {@link MutateActivityTimeAllocation}.
  *
  * @author mrieser
  */
@@ -64,8 +57,8 @@ public class TimeAllocationMutatorModuleTest {
 	@Test public void testSimplifiedMutation() {
 		boolean affectingDuration = true ;
 
-		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified( 750, affectingDuration, MatsimRandom.getLocalInstance(),24*3600,false,1), 750);
-		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified( 7200, affectingDuration, MatsimRandom.getLocalInstance(),24*3600,false,1), 7200);
+		runSimplifiedMutationRangeTest(new MutateActivityTimeAllocation( 750, affectingDuration, MatsimRandom.getLocalInstance(),24*3600,false,1), 750);
+		runSimplifiedMutationRangeTest(new MutateActivityTimeAllocation( 7200, affectingDuration, MatsimRandom.getLocalInstance(),24*3600,false,1), 7200);
 	}
 
 	/**

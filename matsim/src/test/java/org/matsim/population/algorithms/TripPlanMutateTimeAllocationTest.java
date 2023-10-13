@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.algorithms.PlanMutateTimeAllocationSimplified;
+import org.matsim.core.population.algorithms.MutateActivityTimeAllocation;
 import org.matsim.pt.PtConstants;
 
 import java.util.Random;
@@ -66,8 +66,8 @@ public class TripPlanMutateTimeAllocationTest {
 		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord(0, 500));
 		boolean affectingDuration = true ;
 
-		PlanMutateTimeAllocationSimplified mutator =
-				new PlanMutateTimeAllocationSimplified(
+		MutateActivityTimeAllocation mutator =
+				new MutateActivityTimeAllocation(
 						3600.,
 						affectingDuration, new Random(2011),24*3600,false,1);
 		mutator.run(plan);
@@ -110,8 +110,8 @@ public class TripPlanMutateTimeAllocationTest {
 		boolean affectingDuration = true;
 		final double latestEndTime = 30. * 3600;
 
-		PlanMutateTimeAllocationSimplified mutator =
-				new PlanMutateTimeAllocationSimplified(
+		MutateActivityTimeAllocation mutator =
+				new MutateActivityTimeAllocation(
 						3600.,
 						affectingDuration, new Random(2011),latestEndTime,false,1);
 

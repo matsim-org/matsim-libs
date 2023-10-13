@@ -22,26 +22,13 @@ package org.matsim.core.replanning.strategies;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
-import org.matsim.core.population.algorithms.PlanMutateTimeAllocationSimplified;
-import org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation;
+import org.matsim.core.population.algorithms.MutateActivityTimeAllocation;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
-
-import jakarta.inject.Provider;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * Wraps the {@link org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation}-
@@ -70,7 +57,7 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		PlanAlgorithm pmta = new PlanMutateTimeAllocationSimplified
+		PlanAlgorithm pmta = new MutateActivityTimeAllocation
 				(this.mutationRange, this.affectingDuration, MatsimRandom.getLocalInstance(),
 						timeAllocationMutatorConfigGroup.getLatestActivityEndTime(), timeAllocationMutatorConfigGroup.isMutateAroundInitialEndTimeOnly(),
 						timeAllocationMutatorConfigGroup.getMutationRangeStep());

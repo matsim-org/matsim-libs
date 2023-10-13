@@ -20,27 +20,21 @@
 
 package org.matsim.core.population.algorithms;
 
-import java.util.Map;
 import java.util.Random;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 
 /**
  * Mutates the duration of activities randomly within a specified range.
- * <br>
- * Other than the "full" version, this version just mutates activity end time and activity duration if they are defined,
- * without thinking any further.  If this produces invalid plans, they will eventually be removed through the selection
- * process.  kai, jun'12
  *
- * @author knagel
+ * @author knagel, jbischoff
  */
-public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
+public final class MutateActivityTimeAllocation implements PlanAlgorithm {
 
 
 	public static final String INITIAL_END_TIME_ATTRIBUTE = "initialEndTime";
@@ -52,7 +46,7 @@ public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 	private final double mutationRangeStep;
 
 
-	public PlanMutateTimeAllocationSimplified(final double mutationRange, boolean affectingDuration, final Random random, double latestActivityEndTime, boolean mutateAroundInitialEndTimeOnly, double mutationRangeStep) {
+	public MutateActivityTimeAllocation(final double mutationRange, boolean affectingDuration, final Random random, double latestActivityEndTime, boolean mutateAroundInitialEndTimeOnly, double mutationRangeStep) {
 		this.mutationRange = mutationRange;
 		this.affectingDuration = affectingDuration;
 		this.random = random;
@@ -76,11 +70,8 @@ public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 					}
 				}
 				double newEndTime = Math.min(mutateTime(endTime, mutationRange),this.latestActivityEndTime);
-				double shift = endTime -newEndTime;
 				act.setEndTime(newEndTime);
-				if (act.getStartTime().isDefined()){
-					act.setStartTime(act.getStartTime().seconds()-shift);
-				}
+				act.setStartTimeUndefined();
 			}
 			else if ( affectingDuration ) {
 				if ( act.getMaximumDuration().isDefined()) {
