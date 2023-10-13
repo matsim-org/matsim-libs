@@ -23,6 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -172,12 +173,12 @@ import org.matsim.utils.MemoryObserver;
 
         this.getStopwatch().endIteration();
         try {
-            this.getStopwatch().writeTextFile(this.getControlerIO().getOutputFilename("stopwatch"));
+            this.getStopwatch().writeSeparatedFile(this.getControlerIO().getOutputFilename("stopwatch.csv"), config.global().getDefaultDelimiter());
         } catch (UncheckedIOException e) {
             log.error("Could not write stopwatch file.", e);
         }
         if (config.controller().isCreateGraphs()) {
-            this.getStopwatch().writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch"));
+            this.getStopwatch().writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch.png", ControllerConfigGroup.CompressionType.none));
         }
         log.info(MARKER + "ITERATION " + iteration + " ENDS");
         log.info(Controler.DIVIDER);
@@ -224,7 +225,7 @@ import org.matsim.utils.MemoryObserver;
 
 			// Java 7 seems able to detect which throwables this can be, thus no
 			// need to wrap or anything... Nice!
-			// If an exception occurs in the finally bloc, this exception will be
+			// If an exception occurs in the finally-block, this exception will be
 			// suppressed, but at least we logged it.
 			throw t;
         }

@@ -40,7 +40,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.ControllerConfigGroup;
-import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -66,19 +66,20 @@ import org.matsim.core.utils.io.UncheckedIOException;
  */
 public final class ModeStatsControlerListener implements StartupListener, IterationEndsListener {
 
-	public static final String FILENAME_MODESTATS = "modestats";
+	private final static String FILENAME_MODESTATS = "modestats";
 
-	final private Population population;
+	private final Population population;
 
-	final private String modeFileName ;
+	private final String modeFileName;
+	private final String delimiter;
 
 	private final boolean createPNG;
 	private final ControllerConfigGroup controllerConfigGroup;
 
-	Map<String,Map<Integer,Double>> modeHistories = new HashMap<>() ;
+	Map<String,Map<Integer,Double>> modeHistories = new HashMap<>();
 	private int minIteration = 0;
 	private MainModeIdentifier mainModeIdentifier;
-	private Map<String,Double> modeCnt = new TreeMap<>() ;
+	private Map<String,Double> modeCnt = new TreeMap<>();
 	private int firstIteration = -1;
 
 	// Keep all modes encountered so far in a sorted set to ensure output is written for modes sorted by mode.
@@ -88,17 +89,18 @@ public final class ModeStatsControlerListener implements StartupListener, Iterat
 
 	@Inject
 	ModeStatsControlerListener(ControllerConfigGroup controllerConfigGroup, Population population1, OutputDirectoryHierarchy controlerIO,
-														 ScoringConfigGroup scoreConfig, AnalysisMainModeIdentifier mainModeIdentifier) {
+														 GlobalConfigGroup globalConfigGroup, AnalysisMainModeIdentifier mainModeIdentifier) {
 		this.controllerConfigGroup = controllerConfigGroup;
 		this.population = population1;
-		this.modeFileName = controlerIO.getOutputFilename( FILENAME_MODESTATS ) ;
+		this.modeFileName = controlerIO.getOutputFilename(FILENAME_MODESTATS);
+		this.delimiter = globalConfigGroup.getDefaultDelimiter();
 		this.createPNG = controllerConfigGroup.isCreateGraphs();
 		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		this.minIteration = controllerConfigGroup.getFirstIteration();
+		this.minIteration = this.controllerConfigGroup.getFirstIteration();
 	}
 
 	@Override
@@ -111,18 +113,18 @@ public final class ModeStatsControlerListener implements StartupListener, Iterat
 			firstIteration = event.getIteration();
 		}
 		for (Person person : this.population.getPersons().values()) {
-			Plan plan = person.getSelectedPlan() ;
-			List<Trip> trips = TripStructureUtils.getTrips(plan) ;
+			Plan plan = person.getSelectedPlan();
+			List<Trip> trips = TripStructureUtils.getTrips(plan);
 			for ( Trip trip : trips ) {
-				String mode = this.mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ;
+				String mode = this.mainModeIdentifier.identifyMainMode(trip.getTripElements());
 				// yy as stated elsewhere, the "computer science" mode identification may not be the same as the "transport planning"
 				// mode identification.  Maybe revise.  kai, nov'16
 
 				Double cnt = this.modeCnt.get( mode );
-				if ( cnt==null ) {
-					cnt = 0. ;
+				if (cnt == null) {
+					cnt = 0.;
 				}
-				this.modeCnt.put( mode, cnt + 1 ) ;
+				this.modeCnt.put( mode, cnt + 1 );
 			}
 		}
 
@@ -155,22 +157,21 @@ public final class ModeStatsControlerListener implements StartupListener, Iterat
 			modeHistory.put( event.getIteration(), share ) ;
 		}
 
-		BufferedWriter modeOut = IOUtils.getBufferedWriter(this.modeFileName + ".txt");
-		try {
-			modeOut.write("Iteration");
+		try (BufferedWriter modeOut = IOUtils.getBufferedWriter(this.modeFileName + ".csv")) {
+			modeOut.write("iteration");
 			for ( String mode : modes ) {
-				modeOut.write("\t" + mode);
+				modeOut.write(this.delimiter);
+				modeOut.write(mode);
 			}
 			modeOut.write("\n");
 			for (int iter = firstIteration; iter <= event.getIteration(); iter++) {
 				modeOut.write( String.valueOf(iter) ) ;
 				for ( String mode : modes ) {
-					modeOut.write( "\t" + modeHistories.get(mode).get(iter)) ;
+					modeOut.write(this.delimiter + modeHistories.get(mode).get(iter));
 				}
 				modeOut.write( "\n" ) ;
 			}
 			modeOut.flush();
-			modeOut.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new UncheckedIOException(e);
