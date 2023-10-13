@@ -37,7 +37,7 @@ import java.util.concurrent.CyclicBarrier;
 public final class EventsFileComparator {
 	private static final Logger log = LogManager.getLogger(EventsFileComparator.class);
 
-	public enum Result { FILES_ARE_EQUAL, DIFFERENT_NUMBER_OF_TIMESTEPS, DIFFERENT_TIMESTEPS, MISSING_EVENT, WRONG_EVENT_COUNT }
+	public enum Result { FILES_ARE_EQUAL, DIFFERENT_NUMBER_OF_TIMESTEPS, DIFFERENT_TIMESTEPS, MISSING_EVENT, WRONG_EVENT_COUNT, ADDITIONAL_EVENT }
 
 	private boolean ignoringCoordinates = false;
 	public EventsFileComparator setIgnoringCoordinates( boolean ignoringCoordinates ){
@@ -113,7 +113,7 @@ public final class EventsFileComparator {
 		@Override
 		public void run() {
 			if (this.worker1.getCurrentTime() != this.worker2.getCurrentTime()) {
-				log.warn("Differnt time steps in event files!");
+				log.warn("Different time steps in event files!");
 				setExitCode(Result.DIFFERENT_TIMESTEPS);
 				return;
 			}
@@ -140,7 +140,7 @@ public final class EventsFileComparator {
 						logCounter++;
 						log.warn("The event:");
 						log.warn(entry.getKey());
-						log.warn("is missing in events file:" + worker2.getEventsFile());
+						log.warn("given in the first event file is missing in the second events file:" + worker2.getEventsFile());
 						setExitCode(Result.MISSING_EVENT);
 						problem = true;
 						if (logCounter == 50) {
@@ -167,8 +167,8 @@ public final class EventsFileComparator {
 						logCounter++;
 						log.warn("The event:");
 						log.warn(e.getKey());
-						log.warn("is missing in events file:" + worker1.getEventsFile());
-						setExitCode(Result.MISSING_EVENT);
+						log.warn(" in the second event file is an additional event. -> It is not in the first events file:" + worker1.getEventsFile());
+						setExitCode(Result.ADDITIONAL_EVENT);
 						problem = true;
 						if (logCounter == 50) {
 							log.warn(Gbl.FUTURE_SUPPRESSED);
