@@ -26,8 +26,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.MemoryObserver;
+
+import java.io.UncheckedIOException;
 
 /*package*/ abstract class AbstractController {
     // we already had one case where a method of this was removed, causing downstream failures; better just not

@@ -22,6 +22,7 @@ package org.matsim.visum;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 
 import org.apache.logging.log4j.LogManager;
@@ -31,7 +32,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.visum.VisumNetwork.StopPoint;
 import org.matsim.visum.VisumNetwork.TransitLine;
@@ -304,7 +304,7 @@ public class VisumNetworkReader {
 			final String[] parts = StringUtils.explode(line, ';');
 			VisumNetwork.StopPoint stopPt = new VisumNetwork.StopPoint(Id.create(parts[idxNo], VisumNetwork.StopPoint.class),
 					Id.create(parts[idxStopAreaNo], VisumNetwork.StopArea.class),
-					parts[idxName], 
+					parts[idxName],
 					Id.create(parts[idxRLNo], Link.class), Id.create(parts[idxNode], Node.class));
 			this.network.addStopPoint(stopPt);
 			// proceed to next line
@@ -413,7 +413,7 @@ public class VisumNetworkReader {
 		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 
-			VisumNetwork.TimeProfileItem tpi1 = new VisumNetwork.TimeProfileItem(parts[idxLineName], parts[idxLineRouteName], 
+			VisumNetwork.TimeProfileItem tpi1 = new VisumNetwork.TimeProfileItem(parts[idxLineName], parts[idxLineRouteName],
 					parts[idxTPName], parts[idxDCode], parts[idxIndex], parts[idxArr], parts[idxDep],
 					Id.create(parts[idxLRIIndex], VisumNetwork.TimeProfileItem.class));
 			this.network.addTimeProfileItem(tpi1);

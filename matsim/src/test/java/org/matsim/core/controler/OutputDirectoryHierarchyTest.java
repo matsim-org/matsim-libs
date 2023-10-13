@@ -23,7 +23,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.BufferedWriter;

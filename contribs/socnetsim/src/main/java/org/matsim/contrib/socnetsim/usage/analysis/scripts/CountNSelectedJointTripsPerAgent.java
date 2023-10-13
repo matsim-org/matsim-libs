@@ -21,6 +21,7 @@ package org.matsim.contrib.socnetsim.usage.analysis.scripts;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
@@ -32,7 +33,6 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 
