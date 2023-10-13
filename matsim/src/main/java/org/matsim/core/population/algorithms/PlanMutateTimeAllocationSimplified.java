@@ -20,10 +20,14 @@
 
 package org.matsim.core.population.algorithms;
 
+import java.util.Map;
 import java.util.Random;
 
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 
@@ -38,48 +42,84 @@ import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
  */
 public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 
+
+	public static final String INITIAL_END_TIME_ATTRIBUTE = "initialEndTime";
 	private final double mutationRange;
 	private final Random random;
 	private final boolean affectingDuration;
+	private final double latestActivityEndTime;
+	private final boolean mutateAroundInitialEndTimeOnly;
+	private final double mutationRangeStep;
 
-	/**
-	 * Initializes an instance mutating all non-stage activities in a plan
-	 * @param mutationRange
-	 * @param affectingDuration
-	 * @param random
-	 */
-	public PlanMutateTimeAllocationSimplified(final double mutationRange, boolean affectingDuration, final Random random) {
+
+	public PlanMutateTimeAllocationSimplified(final double mutationRange, boolean affectingDuration, final Random random, double latestActivityEndTime, boolean mutateAroundInitialEndTimeOnly, double mutationRangeStep) {
 		this.mutationRange = mutationRange;
 		this.affectingDuration = affectingDuration;
 		this.random = random;
+		this.latestActivityEndTime = latestActivityEndTime;
+		this.mutateAroundInitialEndTimeOnly = mutateAroundInitialEndTimeOnly;
+		this.mutationRangeStep = Math.max(1.0,mutationRangeStep);
+
 	}
 
 	@Override
 	public void run(final Plan plan) {
 		for ( Activity act : TripStructureUtils.getActivities( plan , StageActivityHandling.ExcludeStageActivities ) ) {
-			// this is deliberately simplistic.  Cleanup up of the time information should be done somewhere else.
 			if (act.getEndTime().isDefined()) {
-				act.setEndTime(mutateTime(act.getEndTime().seconds()));
+				double endTime = act.getEndTime().seconds();
+				if (mutateAroundInitialEndTimeOnly){
+					Object initialEndtime = act.getAttributes().getAttribute(INITIAL_END_TIME_ATTRIBUTE);
+					if (initialEndtime!=null) {
+						endTime = (double) initialEndtime;
+					} else {
+						act.getAttributes().putAttribute(INITIAL_END_TIME_ATTRIBUTE,endTime);
+					}
+				}
+				double newEndTime = Math.min(mutateTime(endTime, mutationRange),this.latestActivityEndTime);
+				double shift = endTime -newEndTime;
+				act.setEndTime(newEndTime);
+				if (act.getStartTime().isDefined()){
+					act.setStartTime(act.getStartTime().seconds()-shift);
+				}
 			}
-			if ( affectingDuration ) {
+			else if ( affectingDuration ) {
 				if ( act.getMaximumDuration().isDefined()) {
-					act.setMaximumDuration(Math.max(1.0,mutateTime(act.getMaximumDuration().seconds())));
+					act.setMaximumDuration(mutateTime(act.getMaximumDuration().seconds(), mutationRange));
 				}
 			}
 		}
-		// the legs are not doing anything. kai, jun'12
+		setLegDepartureTimes(plan);
+
 	}
 
-	private double mutateTime(final double time) {
-		double t = time;
-		t = t + (int)((this.random.nextDouble() * 2.0 - 1.0) * this.mutationRange);
+	private void setLegDepartureTimes(Plan plan) {
+		Activity previousActivity = null;
+		for (PlanElement planElement : plan.getPlanElements()){
+			if (planElement instanceof Activity activity){
+				previousActivity = activity;
+			} else if (planElement instanceof Leg leg){
+				if (previousActivity.getEndTime().isDefined()){
+					leg.setDepartureTime(previousActivity.getEndTime().seconds());
+				} else {
+					// previous activity has only a duration.
+					// Estimates about departure time would be very vague, thus they are not set.
+					leg.setDepartureTimeUndefined();
+				}
+			}
+		}
+	}
 
+	private double mutateTime(final double time, double mutationRange) {
+		double t = time;
+		int mutationRangeBins = (int) Math.ceil( mutationRange/mutationRangeStep);
+		t = t - mutationRange + (2*this.random.nextInt(mutationRangeBins)*mutationRangeStep) ;
 		if (t < 0) {
 			t = 0;
 		}
 		// note that this also affects duration
-
 		return t;
 	}
+
+
 
 }
