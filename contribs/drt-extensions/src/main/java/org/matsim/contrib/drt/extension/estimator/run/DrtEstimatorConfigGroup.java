@@ -46,7 +46,7 @@ public class DrtEstimatorConfigGroup extends ReflectiveConfigGroupWithConfigurab
 	@Parameter
 	@Comment("Decay of the exponential moving average.")
 	@Positive
-	public double decayFactor = 0.5;
+	public double decayFactor = 0.7;
 
 	@Parameter
 	@Comment("Factor multiplied with standard deviation to randomize estimates.")
