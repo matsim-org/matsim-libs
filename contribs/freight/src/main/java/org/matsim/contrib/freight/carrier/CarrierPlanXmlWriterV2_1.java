@@ -40,6 +40,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegat
 import org.matsim.vehicles.VehicleType;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -77,11 +78,11 @@ import static org.matsim.contrib.freight.carrier.CarrierConstants.*;
 	}
 
 	/**
-	 * Writes carriers and their plans into a xml-file.
+	 * This now writes out the carriers file.
 	 *
-	 * @param filename should be the target xml-file
+	 * @param filename should be the target xml-file including the path to it.
 	 */
-	public void write(String filename) {
+	private void writeCarrierPlan(String filename) {
 		logger.info("write carrier plans");
 		try {
 			openFile(filename);
@@ -103,6 +104,37 @@ import static org.matsim.contrib.freight.carrier.CarrierConstants.*;
 			logger.error(e);
 			System.exit(1);
 		}
+	}
+
+	/**
+	 * Writes carriers and their plans into a xml-file.
+	 * When using this, the directory, where the file goes to must be present.
+	 *
+	 * @deprecated Please use the method write(String filename, boolean createDirectory, String directoryPath) instead. KMT oct'23
+	 * @param filename should be the target xml-file
+	 */
+	@Deprecated(since = "oct'23")
+	public void write(String filename) {
+		write(filename, false);
+	}
+
+	public void write(String filename, boolean createDirectory) {
+		File file = new File(filename);
+		String directoryPath = file.getParent();
+
+		if (createDirectory) {
+			if (!directoryPath.isEmpty()) {
+				File dir = new File(directoryPath);
+				if (!dir.mkdir()) {
+					if (dir.exists()) {
+						logger.info("directory " + directoryPath + " exist already.");
+					} else {
+						logger.warn("Failed to create directory: " + directoryPath);
+					}
+				}
+			}
+		}
+		writeCarrierPlan(filename);
 	}
 
 	private void writeRootElement() throws UncheckedIOException, IOException {
