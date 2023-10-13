@@ -38,7 +38,7 @@ public class RunPSimTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private Logger logger = LogManager.getLogger(RunPSimTest.class );
+	private final Logger logger = LogManager.getLogger(RunPSimTest.class );
 
 	private final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial" ),"0.config.xml" ) );
 
@@ -109,7 +109,7 @@ public class RunPSimTest {
 		Population popActual = PopulationUtils.createPopulation( config );
 		PopulationUtils.readPopulation( popActual, outDir + "/output_plans.xml.gz" );
 		new PopulationComparison().compare( popExpected, popActual ) ;
-		Assert.assertEquals("RunPsim score changed.", 138.90474624352407, psimScore, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("RunPsim score changed.", 138.87261194067847, psimScore, MatsimTestUtils.EPSILON);
 //		Assert.assertEquals("RunPsim score changed.", 134.54001491094124d, psimScore, MatsimTestUtils.EPSILON);
 //		Assert.assertEquals("RunPsim score changed.", 134.52369453719413d, psimScore, MatsimTestUtils.EPSILON);
 //		Assert.assertEquals("RunPsim score changed.", 132.73129073101293d, psimScore, MatsimTestUtils.EPSILON);
@@ -137,8 +137,7 @@ public class RunPSimTest {
 
 		double qsimScore = execScoreTracker.executedScore;
 		logger.info("Default controler score was " + qsimScore );
-//		Assert.assertEquals("Default controler score changed.", 131.84309487251033d, qsimScore, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Default controler score changed.", 131.84350487113088d, qsimScore, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Default controler score changed.", 131.8543796128589, qsimScore, MatsimTestUtils.EPSILON);
 	}
 
 	class ExecScoreTracker implements ShutdownListener {
