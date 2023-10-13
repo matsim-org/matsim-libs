@@ -103,17 +103,20 @@ public final class Counts<T extends Identifiable<T>> implements Attributable {
 	 * Old style API to create a measurement for car volumes at one station.
 	 * Consider using {@link #createAndAddMeasureLocation(Id, String)} instead.
 	 *
-	 * @param linkId the link to which the counting station is assigned, must be unique
+	 * @param linkId      the link to which the counting station is assigned, must be unique
 	 * @param stationName some additional identifier for humans, e.g. the original name/id of the counting station
 	 * @return the created Count object, or {@linkplain RuntimeException} if it could not be created because it already exists
+	 * @deprecated use {@link #createAndAddMeasureLocation(Id, String)} instead
 	 */
+	@Deprecated
 	public final Count<T> createAndAddCount(final Id<T> linkId, final String stationName) {
 		MeasurementLocation<T> location = createAndAddMeasureLocation(linkId, stationName);
-        return new Count<>(location);
+		return new Count<>(location);
 	}
 
 	/**
 	 * Retrieve map of all counts. This will be inefficient because all intermediate objects for the old API will be created.
+	 *
 	 * @deprecated use {@link #getMeasureLocations()} instead
 	 */
 	@Deprecated
@@ -127,7 +130,11 @@ public final class Counts<T extends Identifiable<T>> implements Attributable {
 		return result;
 	}
 
-	public final Count<T> getCount(final Id<T> locId) {
+	/**
+	 * Use {@link #getMeasureLocation(Id)} instead.
+	 */
+	@Deprecated
+	public Count<T> getCount(final Id<T> locId) {
 		MeasurementLocation<T> loc = getMeasureLocation(locId);
 		return loc == null ? null : new Count<>(loc);
 	}

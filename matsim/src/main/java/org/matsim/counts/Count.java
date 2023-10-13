@@ -36,6 +36,7 @@ import java.util.OptionalDouble;
  *
  * @param <T>
  */
+@Deprecated
 public class Count<T> implements Identifiable<T> {
 
 
@@ -95,7 +96,7 @@ public class Count<T> implements Identifiable<T> {
 
 	@Override
 	public final Id<T> getId() {
-		return location.getId();
+		return location.getRefId();
 	}
 
 	public final String getCsLabel() {
@@ -116,7 +117,8 @@ public class Count<T> implements Identifiable<T> {
 
 	public final Volume getVolume(final int h) {
 		if (this.volume.supportsHourlyAggregate()) {
-			OptionalDouble v = this.volume.aggregateAtHour(h);
+			// Uses old format where hours starts at 1
+			OptionalDouble v = this.volume.aggregateAtHour(h - 1);
 			return v.isPresent() ? new Volume(h, v.getAsDouble()) : null;
 		}
 

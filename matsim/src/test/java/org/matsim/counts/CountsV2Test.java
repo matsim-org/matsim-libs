@@ -96,7 +96,7 @@ public class CountsV2Test {
 		MeasurementLocation<Link> station = dummyCounts.createAndAddMeasureLocation(Id.create("12", Link.class), "12_test");
 		Measurable volume = station.createVolume(TransportMode.car, Measurable.HOURLY);
 
-		volume.setAtHour(0, 500);
+		volume.setAtHour(-1, 500);
 
 	}
 
@@ -109,20 +109,20 @@ public class CountsV2Test {
 		MeasurementLocation<Link> station = counts.createAndAddMeasureLocation(Id.createLinkId(1), "test");
 		Measurable volumes = station.createVolume(TransportMode.car, Measurable.QUARTER_HOURLY);
 
+		volumes.setAtMinute(0, 100);
 		volumes.setAtMinute(15, 100);
-		volumes.setAtMinute(30, 100);
 		volumes.setAtMinute(45, 100);
 		volumes.setAtMinute(60, 100);
 		volumes.setAtMinute(75, 100);
 
+		assertThat(volumes.aggregateAtHour(0).orElse(-1))
+			.isEqualTo(300);
+
+
 		assertThat(volumes.aggregateAtHour(1).orElse(-1))
-			.isEqualTo(400);
+			.isEqualTo(200);
 
-
-		assertThat(volumes.aggregateAtHour(2).orElse(-1))
-			.isEqualTo(100);
-
-		assertThat(volumes.aggregateAtHour(3).isEmpty())
+		assertThat(volumes.aggregateAtHour(2).isEmpty())
 			.isTrue();
 	}
 
@@ -143,7 +143,7 @@ public class CountsV2Test {
 				MeasurementLocation<Link> count = counts.createAndAddMeasureLocation(id, id + "_test");
 				Measurable volume = count.createVolume(TransportMode.car, Measurable.HOURLY);
 
-				for (int i = 1; i <= 24; i++) {
+				for (int i = 0; i <= 23; i++) {
 					volume.setAtHour(i, random.nextInt(300, 800));
 				}
 				continue;
@@ -162,7 +162,7 @@ public class CountsV2Test {
 					volume.setDailyValue(random.nextInt(1000, 10000));
 				} else {
 					volume = count.createVolume(mode, Measurable.HOURLY);
-					for (int i = 1; i <= 24; i++)
+					for (int i = 0; i <= 23; i++)
 						volume.setAtHour(i, random.nextInt(300, 800));
 
 				}

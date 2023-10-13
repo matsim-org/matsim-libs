@@ -41,9 +41,11 @@
             <xs:element name="measurements" type="measureableType" minOccurs="1" maxOccurs="unbounded"/>
         </xs:sequence>
 
-        <xs:attribute name="id" type="xs:string" use="required"/>
-        <xs:attribute name="name" type="xs:string" use="optional" default="0"/>
-        <xs:attribute name="description" type="xs:string" use="optional" default="0"/>
+        <xs:attribute name="refId" type="xs:string" use="required"/>
+<!--        <xs:attribute name="refType" type="xs:string" use="required"/>-->
+        <xs:attribute name="id" type="xs:string" use="optional"/>
+        <xs:attribute name="name" type="xs:string" use="optional"/>
+        <xs:attribute name="description" type="xs:string" use="optional"/>
         <xs:attribute name="x" type="xs:double" use="optional"/>
         <xs:attribute name="y" type="xs:double" use="optional"/>
     </xs:complexType>
@@ -53,12 +55,12 @@
             <xs:element name="value" type="measureType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="type" type="xs:string" use="required"/>
-        <xs:attribute name="mode" type="xs:string" use="required"/>
+        <xs:attribute name="networkMode" type="xs:string" use="required"/>
         <xs:attribute name="interval" type="xs:positiveInteger" use="required"/>
     </xs:complexType>
 
     <xs:complexType name="measureType">
-        <xs:attribute name="t" type="xs:positiveInteger" use="required"/>
+        <xs:attribute name="t" type="xs:nonNegativeInteger" use="required"/>
         <xs:attribute name="val" type="xs:float" use="required"/>
     </xs:complexType>
 

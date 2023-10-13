@@ -15,13 +15,11 @@ import java.util.OptionalDouble;
  */
 public final class Measurable implements Iterable<Int2DoubleMap.Entry> {
 
-	static final String ELEMENT_NAME = "measurements";
-
 	/**
 	 * String to denote that the mode includes all vehicles.
 	 */
 	public static final String ANY_MODE = "any_vehicle";
-
+	static final String ELEMENT_NAME = "measurements";
 	public static String VOLUMES = "volumes";
 	public static String VELOCITIES = "velocities";
 	public static String PASSENGERS = "passengers";
@@ -76,8 +74,8 @@ public final class Measurable implements Iterable<Int2DoubleMap.Entry> {
 	}
 
 	public void setAtSecond(int seconds, double value) {
-		if (seconds <= 0)
-			throw new IllegalArgumentException("Time value starts at 1 and *not* zero.");
+		if (seconds < 0)
+			throw new IllegalArgumentException("Time value starts at 0.");
 
 		if (seconds % this.interval != 0)
 			throw new IllegalArgumentException("Time value doesn't match the interval!");
@@ -92,14 +90,14 @@ public final class Measurable implements Iterable<Int2DoubleMap.Entry> {
 		if (interval != DAILY)
 			throw new IllegalArgumentException("Does not contain daily values!");
 
-		return getAtHour(24);
+		return getAtHour(0);
 	}
 
 	public void setDailyValue(double value) {
 		if (interval != DAILY)
 			throw new IllegalArgumentException("Does not contain daily values!");
 
-		setAtHour(24, value);
+		setAtHour(0, value);
 	}
 
 	/**
@@ -136,7 +134,7 @@ public final class Measurable implements Iterable<Int2DoubleMap.Entry> {
 		if (interval == HOURLY)
 			return getAtHour(hour);
 
-		Int2DoubleSortedMap values = this.values.subMap((hour - 1) * HOURLY + 1, hour * HOURLY + 1);
+		Int2DoubleSortedMap values = this.values.subMap(hour * HOURLY, (hour + 1) * HOURLY);
 		if (values.isEmpty())
 			return OptionalDouble.empty();
 

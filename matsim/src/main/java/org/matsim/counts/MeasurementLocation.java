@@ -2,7 +2,6 @@ package org.matsim.counts;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
@@ -19,23 +18,35 @@ import java.util.Map;
  * several transport modes.
  * A single MeasurementLocation instance for example can hold traffic volumes for the mode 'car' and average velocities for the mode 'freight'.
  */
-public final class MeasurementLocation<T> implements Identifiable<T>, Attributable, Iterable<MeasurementLocation.TypeAndMode> {
+public final class MeasurementLocation<T> implements Attributable, Iterable<MeasurementLocation.TypeAndMode> {
 
 	static final String ELEMENT_NAME = "location";
 
-	private final Id<T> id;
+	private final Id<T> refId;
 	private final Map<TypeAndMode, Measurable> measurables = new LinkedHashMap<>();
 	private final Attributes attributes = new AttributesImpl();
+
+	private String id;
 	private String stationName;
 	private String description;
 	private Coord coordinates;
 
-	MeasurementLocation(final Id<T> id, String stationName) {
-		this.id = id;
+	MeasurementLocation(final Id<T> refId, String stationName) {
+		this.refId = refId;
 		this.stationName = stationName;
 	}
 
-	public Id<T> getId() {
+	/**
+	 * Id reference to the matsim infrastructure object.
+	 */
+	public Id<T> getRefId() {
+		return refId;
+	}
+
+	/**
+	 * Id that may be used internally, not corresponding to matsim ids.
+	 */
+	public String getId() {
 		return id;
 	}
 
@@ -97,6 +108,10 @@ public final class MeasurementLocation<T> implements Identifiable<T>, Attributab
 		return stationName;
 	}
 
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	public void setStationName(String stationName) {
 		this.stationName = stationName;
 	}
@@ -132,7 +147,7 @@ public final class MeasurementLocation<T> implements Identifiable<T>, Attributab
 	@Override
 	public String toString() {
 		return "MeasurementLocation{" +
-			"id=" + id +
+			"id=" + refId +
 			", stationName='" + stationName + '\'' +
 			'}';
 	}

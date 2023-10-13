@@ -68,11 +68,12 @@ public class CountsReaderMatsimV2 extends MatsimXmlParser {
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private void startMeasurementLocation(Attributes atts) {
-		String idString = atts.getValue("id");
+		String idString = atts.getValue("refId");
 		Id id = Id.create(idString, this.idClass);
 		String stationName = atts.getValue("name");
 
 		currLocation = counts.createAndAddMeasureLocation(id, stationName);
+		currLocation.setId(atts.getValue("id"));
 
 		String x = atts.getValue("x");
 		String y = atts.getValue("y");

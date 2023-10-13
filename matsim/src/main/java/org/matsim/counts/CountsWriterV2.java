@@ -97,7 +97,11 @@ final class CountsWriterV2 extends MatsimXmlWriter {
 		for (MeasurementLocation<?> count : counts.getMeasureLocations().values()) {
 
 			List<Tuple<String, String>> attributes = new ArrayList<>();
-			attributes.add(createTuple("id", count.getId().toString()));
+
+			attributes.add(createTuple("refId", count.getRefId().toString()));
+
+			if (count.getId() != null)
+				attributes.add(createTuple("id", count.getId()));
 
 			if (count.getStationName() != null)
 				attributes.add(createTuple("name", count.getStationName()));
