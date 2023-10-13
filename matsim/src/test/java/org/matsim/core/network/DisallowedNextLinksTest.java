@@ -45,18 +45,8 @@ public class DisallowedNextLinksTest {
 	@Test
 	public void testNetworkWriting() throws IOException {
 
-		Network n = NetworkUtils.createNetwork();
-		Node n0 = NetworkUtils.createAndAddNode(n, Id.createNodeId("0"), new Coord(0, 0));
-		Node n1 = NetworkUtils.createAndAddNode(n, Id.createNodeId("1"), new Coord(1, 0));
-		Node n2 = NetworkUtils.createAndAddNode(n, Id.createNodeId("2"), new Coord(2, -1));
-		Node n3 = NetworkUtils.createAndAddNode(n, Id.createNodeId("3"), new Coord(2, 1));
-		Node n4 = NetworkUtils.createAndAddNode(n, Id.createNodeId("4"), new Coord(3, 0));
-		Link l0 = NetworkUtils.createAndAddLink(n, Id.createLinkId("0"), n0, n1, Math.sqrt(2), 30 / 3.6, 900, 1);
-		Link l1 = NetworkUtils.createAndAddLink(n, Id.createLinkId("1"), n1, n2, Math.sqrt(2), 30 / 3.6, 900, 1);
-		Link l2 = NetworkUtils.createAndAddLink(n, Id.createLinkId("2"), n1, n3, Math.sqrt(2), 30 / 3.6, 900, 1);
-		Link l3 = NetworkUtils.createAndAddLink(n, Id.createLinkId("3"), n2, n4, Math.sqrt(2), 30 / 3.6, 900, 1);
-		Link l4 = NetworkUtils.createAndAddLink(n, Id.createLinkId("4"), n3, n4, Math.sqrt(2), 30 / 3.6, 900, 1);
-
+		Network n = createNetwork();
+		Link l1 = n.getLinks().get(Id.createLinkId("1"));
 		DisallowedNextLinks dnl = NetworkUtils.getOrCreateDisallowedNextLinks(l1);
 		dnl.addDisallowedLinkSequence("car", List.of(l1.getId()));
 
@@ -66,6 +56,31 @@ public class DisallowedNextLinksTest {
 		new MatsimNetworkReader(network).readFile(tempFile.toString());
 
 		Assert.assertEquals(dnl, NetworkUtils.getDisallowedNextLinks(network.getLinks().get(l1.getId())));
+	}
+
+	static Network createNetwork() {
+		// Nodes
+		//             n3
+		// n0 --- n1 <    > n4 --- n5
+		//             n2
+		// Links
+		//              l2 - * - l5
+		// * - l0 - * <             > * - l4 - *
+		//              l1 - * - l3
+		Network n = NetworkUtils.createNetwork();
+		Node n0 = NetworkUtils.createAndAddNode(n, Id.createNodeId("0"), new Coord(0, 0));
+		Node n1 = NetworkUtils.createAndAddNode(n, Id.createNodeId("1"), new Coord(1, 0));
+		Node n2 = NetworkUtils.createAndAddNode(n, Id.createNodeId("2"), new Coord(2, -1));
+		Node n3 = NetworkUtils.createAndAddNode(n, Id.createNodeId("3"), new Coord(2, 1));
+		Node n4 = NetworkUtils.createAndAddNode(n, Id.createNodeId("4"), new Coord(3, 0));
+		Node n5 = NetworkUtils.createAndAddNode(n, Id.createNodeId("5"), new Coord(4, 0));
+		NetworkUtils.createAndAddLink(n, Id.createLinkId("0"), n0, n1, Math.sqrt(2), 30 / 3.6, 900, 1);
+		NetworkUtils.createAndAddLink(n, Id.createLinkId("1"), n1, n2, Math.sqrt(2), 30 / 3.6, 900, 1);
+		NetworkUtils.createAndAddLink(n, Id.createLinkId("2"), n1, n3, Math.sqrt(2), 30 / 3.6, 900, 1);
+		NetworkUtils.createAndAddLink(n, Id.createLinkId("3"), n2, n4, Math.sqrt(2), 30 / 3.6, 900, 1);
+		NetworkUtils.createAndAddLink(n, Id.createLinkId("4"), n3, n4, Math.sqrt(2), 30 / 3.6, 900, 1);
+		NetworkUtils.createAndAddLink(n, Id.createLinkId("5"), n4, n5, Math.sqrt(2), 30 / 3.6, 900, 1);
+		return n;
 	}
 
 }
