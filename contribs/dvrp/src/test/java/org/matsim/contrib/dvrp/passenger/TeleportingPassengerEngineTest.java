@@ -38,6 +38,7 @@ import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.population.routes.GenericRouteImpl;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.*;
@@ -51,7 +52,7 @@ public class TeleportingPassengerEngineTest {
 	@Test
 	public void test_valid_teleported() {
 		double departureTime = 0;
-		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime);
+		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime, fixture.PERSON_ID);
 
 		double travelTime = 999;
 		double travelDistance = 555;
@@ -67,9 +68,10 @@ public class TeleportingPassengerEngineTest {
 		double arrivalTime = departureTime + travelTime;
 		var requestId = Id.create("taxi_0", Request.class);
 		fixture.assertPassengerEvents(
+				Collections.singleton(fixture.PERSON_ID),
 				new ActivityEndEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
-				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, Collections.singleton(fixture.PERSON_ID), null, departureTime,
+				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, List.of(fixture.PERSON_ID), null, departureTime,
 						arrivalTime), new PassengerPickedUpEvent(departureTime, MODE, requestId, fixture.PERSON_ID, null),
 				new PassengerDroppedOffEvent(arrivalTime, MODE, requestId, fixture.PERSON_ID, null),
 				new TeleportationArrivalEvent(arrivalTime, fixture.PERSON_ID, travelDistance, MODE),
@@ -80,7 +82,7 @@ public class TeleportingPassengerEngineTest {
 	@Test
 	public void test_invalid_rejected() {
 		double departureTime = 0;
-		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime);
+		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime, fixture.PERSON_ID);
 
 		TeleportedRouteCalculator teleportedRouteCalculator = request -> null; // unused
 		PassengerRequestValidator requestValidator = request -> Set.of("invalid");
@@ -88,9 +90,10 @@ public class TeleportingPassengerEngineTest {
 
 		var requestId = Id.create("taxi_0", Request.class);
 		fixture.assertPassengerEvents(
+				Collections.singleton(fixture.PERSON_ID),
 				new ActivityEndEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
-				new PassengerRequestRejectedEvent(departureTime, MODE, requestId, Collections.singleton(fixture.PERSON_ID), "invalid"),
+				new PassengerRequestRejectedEvent(departureTime, MODE, requestId, List.of(fixture.PERSON_ID), "invalid"),
 				new PersonStuckEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
 	}
 
