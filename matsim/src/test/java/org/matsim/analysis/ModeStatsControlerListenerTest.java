@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -356,7 +357,7 @@ public class ModeStatsControlerListenerTest {
 		controllerConfigGroup.setCreateGraphs(true);
 		controllerConfigGroup.setFirstIteration(0);
 		ModeStatsControlerListener modStatListner = new ModeStatsControlerListener(controllerConfigGroup, population,
-				controlerIO, scoreConfig, transportId);
+				controlerIO, new GlobalConfigGroup(), transportId);
 
 		StartupEvent eventStart = new StartupEvent(null);
 		modStatListner.notifyStartup(eventStart);
@@ -411,7 +412,7 @@ public class ModeStatsControlerListenerTest {
 	//sum of the scores of each mode should add up to 1
 	private void readAndcompareValues(HashMap<String, Integer> modes, int itr) {
 
-		String file = utils.getOutputDirectory() + "/ModeStatsControlerListener" + "/modestats.txt";
+		String file = utils.getOutputDirectory() + "/ModeStatsControlerListener" + "/modestats.csv";
 		BufferedReader br;
 		String line;
 		int totalTrips = modes.get(TransportMode.car) + modes.get(TransportMode.bike) + modes.get(TransportMode.pt)
@@ -420,12 +421,12 @@ public class ModeStatsControlerListenerTest {
 		try {
 			br = new BufferedReader(new FileReader(file));
 			String firstRow = br.readLine();
-			String[] columnNames = firstRow.split("	");
+			String[] columnNames = firstRow.split(",");
 			decideColumns(columnNames);
 			int iteration = 0;
 			while ((line = br.readLine()) != null) {
 				if (iteration == itr) {
-					String[] column = line.split("	");
+					String[] column = line.split(",");
 					// checking if column number in greater than 0, because 0th column is always 'Iteration' and we don't need that --> see decideColumns() method
 					Double carvalue = (car > 0) ? Double.valueOf(column[car]) : 0;
 					Double walkvalue = (walk > 0) ? Double.valueOf(column[walk]) : 0;
@@ -460,7 +461,6 @@ public class ModeStatsControlerListenerTest {
 				iteration++;
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

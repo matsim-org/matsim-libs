@@ -65,8 +65,8 @@ public class OverviewDashboard implements Dashboard {
 		}).el(PieChart.class, (viz, data) -> {
 			viz.title = "Mode Share";
 			viz.description = "at final Iteration";
-			viz.dataset = data.output("*.modestats.txt");
-			viz.ignoreColumns = List.of("Iteration");
+			viz.dataset = data.output("*.modestats.csv");
+			viz.ignoreColumns = List.of("iteration");
 			viz.useLastRow = true;
 		});
 
@@ -74,10 +74,10 @@ public class OverviewDashboard implements Dashboard {
 		layout.row("second").el(Line.class, (viz, data) -> {
 
 			viz.title = "Score";
-			viz.dataset = data.output("*.scorestats.txt");
+			viz.dataset = data.output("*.scorestats.csv");
 			viz.description = "per Iteration";
 			viz.x = "ITERATION";
-			viz.columns = List.of("avg. EXECUTED", "avg. WORST", "avg. BEST");
+			viz.columns = List.of("avg_executed", "avg_worst", "avg_best");
 			viz.xAxisName = "Iteration";
 			viz.yAxisName = "Score";
 
@@ -87,7 +87,7 @@ public class OverviewDashboard implements Dashboard {
 			.el(Area.class, (viz, data) -> {
 				viz.title = "Mode Share Progression";
 				viz.description = "per Iteration";
-				viz.dataset = data.output("*.modestats.txt");
+				viz.dataset = data.output("*.modestats.csv");
 				viz.x = "Iteration";
 				viz.xAxisName = "Iteration";
 				viz.yAxisName = "Share";
