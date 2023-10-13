@@ -108,13 +108,13 @@ public class TransitScheduleReprojectionIOTest {
 		Scenario scenario ;
 		{
 			final Config config = ConfigUtils.createConfig( ExamplesUtils.getTestScenarioURL( "pt-tutorial" ) );
-			config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 			config.transit().setTransitScheduleFile( "transitschedule.xml" );
 			config.transit().setUseTransit( true );
 			config.transit().setInputScheduleCRS( INITIAL_CRS );
 			config.global().setCoordinateSystem( TARGET_CRS );
 			config.controller().setLastIteration( -1 );
 			config.controller().setOutputDirectory( outputDirectory );
+			config.network().setInputFile("multimodalnetwork.xml");
 			scenario = ScenarioUtils.loadScenario( config );
 		}
 
@@ -174,10 +174,10 @@ public class TransitScheduleReprojectionIOTest {
 			new TransitScheduleWriter( originalScenario.getTransitSchedule() ).writeFile( withAttributes );
 
 			final Config config = ConfigUtils.createConfig( ExamplesUtils.getTestScenarioURL( "pt-tutorial" ) );
-			config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 			config.transit().setTransitScheduleFile( withAttributes );
 			config.transit().setUseTransit( true );
 			config.transit().setInputScheduleCRS( INITIAL_CRS );
+			config.network().setInputFile("multimodalnetwork.xml");
 			// yyyyyy Is it so plausible that this is given here when the test is about having this in the file? kai, sep'18
 			config.global().setCoordinateSystem( TARGET_CRS );
 			config.controller().setLastIteration( -1 );
