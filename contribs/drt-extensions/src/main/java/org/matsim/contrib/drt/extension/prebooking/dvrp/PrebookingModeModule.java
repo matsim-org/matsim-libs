@@ -1,5 +1,6 @@
 package org.matsim.contrib.drt.extension.prebooking.dvrp;
 
+import org.matsim.contrib.drt.extension.prebooking.analysis.PrebookingModeAnalysisModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.stops.MinimumStopDurationAdapter;
@@ -46,5 +47,8 @@ public class PrebookingModeModule extends AbstractDvrpModeModule {
 
 		// install QSim bindings / overrides
 		installOverridingQSimModule(new PrebookingModeQSimModule(getMode(), isElectric));
+
+		// analysis
+		install(new PrebookingModeAnalysisModule(getMode()));
 	}
 }

@@ -1,5 +1,6 @@
-package org.matsim.contrib.drt.extension.prebooking.events;
+package org.matsim.contrib.drt.extension.prebooking.dvrp;
 
+import org.matsim.contrib.drt.extension.prebooking.events.PassengerEnteringVehicleEvent;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.core.api.experimental.events.EventsManager;
 
@@ -8,11 +9,11 @@ import org.matsim.core.api.experimental.events.EventsManager;
  * 
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
-public class PassengerEnteringVehicleHandler {
+public class EnteringHandler {
 	private final EventsManager eventsManager;
 	private final String mode;
 
-	public PassengerEnteringVehicleHandler(EventsManager eventsManager, String mode) {
+	public EnteringHandler(EventsManager eventsManager, String mode) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
 	}

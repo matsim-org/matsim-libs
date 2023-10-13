@@ -3,7 +3,6 @@ package org.matsim.contrib.drt.extension.prebooking.dvrp;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.edrt.EDrtActionCreator;
 import org.matsim.contrib.drt.extension.prebooking.electric.ElectricPrebookingActionCreator;
-import org.matsim.contrib.drt.extension.prebooking.events.PassengerEnteringVehicleHandler;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
@@ -37,7 +36,7 @@ class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
 				DrtActionCreator delegate = getter.getModal(DrtActionCreator.class);
 				PassengerStopDurationProvider stopDurationProvider = getter
 						.getModal(PassengerStopDurationProvider.class);
-				PassengerEnteringVehicleHandler enteringHandler = getter.getModal(PassengerEnteringVehicleHandler.class);
+				EnteringHandler enteringHandler = getter.getModal(EnteringHandler.class);
 
 				return new PrebookingActionCreator(passengerEngine, delegate, stopDurationProvider, enteringHandler);
 			})).in(Singleton.class);
@@ -52,7 +51,7 @@ class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
 				PassengerStopDurationProvider stopDurationProvider = getter
 						.getModal(PassengerStopDurationProvider.class);
 				MobsimTimer timer = getter.get(MobsimTimer.class);
-				PassengerEnteringVehicleHandler enteringHandler = getter.getModal(PassengerEnteringVehicleHandler.class);
+				EnteringHandler enteringHandler = getter.getModal(EnteringHandler.class);
 
 				return new ElectricPrebookingActionCreator(passengerEngine, delegate, stopDurationProvider, timer,
 						enteringHandler);
@@ -60,9 +59,9 @@ class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
 			bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(ElectricPrebookingActionCreator.class));
 		}
 
-		bindModal(PassengerEnteringVehicleHandler.class).toProvider(modalProvider(getter -> {
+		bindModal(EnteringHandler.class).toProvider(modalProvider(getter -> {
 			EventsManager eventsManager = getter.get(EventsManager.class);
-			return new PassengerEnteringVehicleHandler(eventsManager, getMode());
+			return new EnteringHandler(eventsManager, getMode());
 		})).in(Singleton.class);
 
 		// override the PassengerEngine

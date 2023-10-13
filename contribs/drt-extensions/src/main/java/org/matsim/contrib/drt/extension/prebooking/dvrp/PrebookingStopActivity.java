@@ -7,7 +7,6 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.drt.extension.prebooking.events.PassengerEnteringVehicleHandler;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -40,13 +39,13 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 	private final PrebookingPassengerEngine passengerEngine;
 	private final PassengerStopDurationProvider stopDurationProvider;
 
-	private final PassengerEnteringVehicleHandler enteringHandler;
+	private final EnteringHandler enteringHandler;
 
 	public PrebookingStopActivity(PrebookingPassengerEngine passengerEngine, DynAgent driver, StayTask task,
 			Map<Id<Request>, ? extends AcceptedDrtRequest> dropoffRequests,
 			Map<Id<Request>, ? extends AcceptedDrtRequest> pickupRequests, String activityType,
 			PassengerStopDurationProvider stopDurationProvider, DvrpVehicle vehicle,
-			PassengerEnteringVehicleHandler enteringHandler) {
+			EnteringHandler enteringHandler) {
 		super(activityType);
 		this.passengerEngine = passengerEngine;
 		this.driver = driver;

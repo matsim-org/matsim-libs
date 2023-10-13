@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.drt.extension.prebooking.events.PassengerRequestBookedEvent;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
@@ -113,15 +114,20 @@ public class PrebookingManager implements MobsimEngine {
 	}
 
 	@Override
-	public void onPrepareSim() {}
-	
+	public void onPrepareSim() {
+	}
+
 	@Override
 	public void doSimStep(double now) {
 		synchronized (prebookingQueue) {
 			for (PrebookingQueueItem item : prebookingQueue) {
 				Verify.verify(item.leg.getMode().equals(mode), "Invalid mode for this prebooking manager");
 
-				PassengerRequest request = requestCreator.createRequest(createRequestId(), item.person.getId(),
+				Id<Request> requestId = createRequestId();
+
+				eventsManager.processEvent(new PassengerRequestBookedEvent(now, mode, requestId, item.person.getId()));
+
+				PassengerRequest request = requestCreator.createRequest(requestId, item.person.getId(),
 						item.leg.getRoute(), getLink(item.leg.getRoute().getStartLinkId()),
 						getLink(item.leg.getRoute().getEndLinkId()), item.earliestDepartureTime, now);
 
@@ -156,5 +162,6 @@ public class PrebookingManager implements MobsimEngine {
 	}
 
 	@Override
-	public void setInternalInterface(InternalInterface internalInterface) {};
+	public void setInternalInterface(InternalInterface internalInterface) {
+	};
 }

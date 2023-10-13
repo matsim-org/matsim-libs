@@ -67,6 +67,10 @@ public class PrebookingExampleIT {
 		Config config = ConfigUtils.loadConfig(configUrl,
 				new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new), new DvrpConfigGroup(),
 				new OTFVisConfigGroup(), new EvConfigGroup());
+
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+
 		Controler controler = EDrtControlerCreator.createControler(config, false);
 
 		for (DrtConfigGroup drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
