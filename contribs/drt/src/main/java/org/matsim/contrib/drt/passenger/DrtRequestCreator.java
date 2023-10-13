@@ -31,7 +31,7 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author michalm
@@ -47,7 +47,7 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 	}
 
 	@Override
-	public DrtRequest createRequest(Id<Request> id, Set<Id<Person>> passengerIds, Route route, Link fromLink, Link toLink,
+	public DrtRequest createRequest(Id<Request> id, List<Id<Person>> passengerIds, Route route, Link fromLink, Link toLink,
 									double departureTime, double submissionTime) {
 		DrtRoute drtRoute = (DrtRoute)route;
 		double latestDepartureTime = departureTime + drtRoute.getMaxWaitTime();

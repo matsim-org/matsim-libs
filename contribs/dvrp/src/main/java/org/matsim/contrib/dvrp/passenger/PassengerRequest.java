@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.optimizer.Request;
 
-import java.util.Set;
+import java.util.List;
 
 public interface PassengerRequest extends Request {
 	/**
@@ -43,7 +43,7 @@ public interface PassengerRequest extends Request {
 
 	Link getToLink();
 
-	Set<Id<Person>> getPassengerIds();
+	List<Id<Person>> getPassengerIds();
 
 	String getMode();
 }

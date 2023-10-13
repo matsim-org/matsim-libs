@@ -22,10 +22,7 @@ package org.matsim.contrib.drt.extension.preplanned.optimizer;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -204,7 +201,7 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 									  Map<PreplannedRequestKey, PreplannedRequest> unassignedRequests) {
 	}
 
-	public record PreplannedRequestKey(Set<Id<Person>> passengerIds, Id<Link> fromLinkId, Id<Link> toLinkId) {
+	public record PreplannedRequestKey(List<Id<Person>> passengerIds, Id<Link> fromLinkId, Id<Link> toLinkId) {
 	}
 
 	// also input to the external optimiser

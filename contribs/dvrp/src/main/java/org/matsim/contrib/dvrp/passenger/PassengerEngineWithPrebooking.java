@@ -132,7 +132,7 @@ public final class PassengerEngineWithPrebooking
 		double now = mobsimTimer.getTimeOfDay();
 		//TODO have a separate request creator for prebooking (accept TripInfo instead of Route)
 		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
-				Collections.singleton(passenger.getId()), tripInfo.getOriginalRequest().getPlannedRoute(),
+				List.of(passenger.getId()), tripInfo.getOriginalRequest().getPlannedRoute(),
 				getLink(tripInfo.getPickupLocation().getLinkId()), getLink(tripInfo.getDropoffLocation().getLinkId()),
 				tripInfo.getExpectedBoardingTime(), now);
 		validateAndSubmitRequest(passenger, request, tripInfo.getOriginalRequest(), now);

@@ -268,7 +268,7 @@ public class DefaultUnplannedRequestInserterTest {
 	private DrtRequest request(String id, String fromLinkId, String toLinkId) {
 		return DrtRequest.newBuilder()
 				.id(Id.create(id, Request.class))
-				.passengerIds(Collections.singleton(Id.createPersonId(id)))
+				.passengerIds(List.of(Id.createPersonId(id)))
 				.fromLink(link(fromLinkId))
 				.toLink(link(toLinkId))
 				.mode(mode)

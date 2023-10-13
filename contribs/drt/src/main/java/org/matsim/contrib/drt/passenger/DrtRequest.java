@@ -27,9 +27,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -42,7 +40,7 @@ public class DrtRequest implements PassengerRequest {
 	private final double latestStartTime;
 	private final double latestArrivalTime;
 
-	private final Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+	private final List<Id<Person>> passengerIds = new ArrayList<>();
 	private final String mode;
 
 	private final Link fromLink;
@@ -71,7 +69,7 @@ public class DrtRequest implements PassengerRequest {
 		builder.earliestStartTime = copy.getEarliestStartTime();
 		builder.latestStartTime = copy.getLatestStartTime();
 		builder.latestArrivalTime = copy.getLatestArrivalTime();
-		builder.passengerIds = new LinkedHashSet<>(copy.getPassengerIds());
+		builder.passengerIds = new ArrayList<>(copy.getPassengerIds());
 		builder.mode = copy.getMode();
 		builder.fromLink = copy.getFromLink();
 		builder.toLink = copy.getToLink();
@@ -113,8 +111,8 @@ public class DrtRequest implements PassengerRequest {
 	}
 
 	@Override
-	public Set<Id<Person>> getPassengerIds() {
-		return Collections.unmodifiableSet(passengerIds);
+	public List<Id<Person>> getPassengerIds() {
+		return Collections.unmodifiableList(passengerIds);
 	}
 
 	@Override
@@ -143,7 +141,7 @@ public class DrtRequest implements PassengerRequest {
 		private double earliestStartTime;
 		private double latestStartTime;
 		private double latestArrivalTime;
-		private Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+		private List<Id<Person>> passengerIds = new ArrayList<>();
 		private String mode;
 		private Link fromLink;
 		private Link toLink;
@@ -176,8 +174,8 @@ public class DrtRequest implements PassengerRequest {
 			return this;
 		}
 
-		public Builder passengerIds(Set<Id<Person>> val) {
-			passengerIds = new LinkedHashSet<>(val);
+		public Builder passengerIds(List<Id<Person>> val) {
+			passengerIds = new ArrayList<>(val);
 			return this;
 		}
 

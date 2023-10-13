@@ -275,7 +275,7 @@ public class DrtSpeedUpTest {
 		var requestId = Id.create(id, Request.class);
 		var personId = Id.create(id, Person.class);
 
-		var submittedEvent = new DrtRequestSubmittedEvent(submittedTime, MODE, requestId, Collections.singleton(personId), linkAB.getId(),
+		var submittedEvent = new DrtRequestSubmittedEvent(submittedTime, MODE, requestId, List.of(personId), linkAB.getId(),
 				linkBC.getId(), Double.NaN, Double.NaN, Double.NaN, Double.NaN);
 		var pickupEvent = new PassengerPickedUpEvent(submittedTime + waitTime, MODE, requestId, null, null);
 		double rideTime = DistanceUtils.calculateDistance(linkBC, linkAB) / inVehicleSpeed;

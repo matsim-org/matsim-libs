@@ -23,6 +23,7 @@ package org.matsim.contrib.dvrp.passenger;
 import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.*;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -61,7 +62,6 @@ import org.matsim.vehicles.VehicleUtils;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
-import com.google.inject.name.Names;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -82,7 +82,7 @@ public class DefaultPassengerEngineTest {
 	@Test
 	public void test_valid_served() {
 		double departureTime = 0;
-		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime);
+		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime, fixture.PERSON_ID);
 
 		PassengerRequestValidator requestValidator = request -> Set.of();//valid
 		createQSim(requestValidator, OneTaxiOptimizer.class).run();
@@ -99,9 +99,10 @@ public class DefaultPassengerEngineTest {
 
 		var requestId = Id.create("taxi_0", Request.class);
 		fixture.assertPassengerEvents(
+				Collections.singleton(fixture.PERSON_ID),
 				new ActivityEndEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
-				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, Collections.singleton(fixture.PERSON_ID), VEHICLE_ID, 0,
+				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, List.of(fixture.PERSON_ID), VEHICLE_ID, 0,
 						scheduledDropoffTime),
 				new PersonEntersVehicleEvent(pickupStartTime, fixture.PERSON_ID, Id.createVehicleId(VEHICLE_ID)),
 				new PassengerPickedUpEvent(pickupStartTime, MODE, requestId, fixture.PERSON_ID, VEHICLE_ID),
@@ -114,30 +115,34 @@ public class DefaultPassengerEngineTest {
 	@Test
 	public void test_invalid_rejected() {
 		double departureTime = 0;
-		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime);
+		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime, fixture.PERSON_ID);
 
 		PassengerRequestValidator requestValidator = request -> Set.of("invalid");
 		createQSim(requestValidator, OneTaxiOptimizer.class).run();
 
 		var requestId = Id.create("taxi_0", Request.class);
-		fixture.assertPassengerEvents(new ActivityEndEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
+		fixture.assertPassengerEvents(
+				Collections.singleton(fixture.PERSON_ID),
+				new ActivityEndEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
-				new PassengerRequestRejectedEvent(0, MODE, requestId, Collections.singleton(fixture.PERSON_ID), "invalid"),
+				new PassengerRequestRejectedEvent(0, MODE, requestId, List.of(fixture.PERSON_ID), "invalid"),
 				new PersonStuckEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
 	}
 
 	@Test
 	public void test_valid_rejected() {
 		double departureTime = 0;
-		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime);
+		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime, fixture.PERSON_ID);
 
 		PassengerRequestValidator requestValidator = request -> Set.of();
 		createQSim(requestValidator, RejectingOneTaxiOptimizer.class).run();
 
 		var requestId = Id.create("taxi_0", Request.class);
-		fixture.assertPassengerEvents(new ActivityEndEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
+		fixture.assertPassengerEvents(
+				Collections.singleton(fixture.PERSON_ID),
+				new ActivityEndEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
-				new PassengerRequestRejectedEvent(0, MODE, requestId, Collections.singleton(fixture.PERSON_ID), "rejecting_all_requests"),
+				new PassengerRequestRejectedEvent(0, MODE, requestId, List.of(fixture.PERSON_ID), "rejecting_all_requests"),
 				new PersonStuckEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
 	}
 

@@ -66,16 +66,16 @@ public class InsertionGeneratorTest {
 
 	private final Link fromLink = link("from");
 	private final Link toLink = link("to");
-	private final DrtRequest drtRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(Collections.singleton(Id.createPersonId("person"))).build();
+	private final DrtRequest drtRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("person"))).build();
 
 	private final DrtRequest drtRequest2Pax = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(
-			Sets.newHashSet(
+			List.of(
 					Id.createPersonId("person1"),
 					Id.createPersonId("person2")
 			)).build();
 
 	private final DrtRequest drtRequest5Pax = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(
-			Sets.newHashSet(
+			List.of(
 					Id.createPersonId("person1"),
 					Id.createPersonId("person2"),
 					Id.createPersonId("person3"),

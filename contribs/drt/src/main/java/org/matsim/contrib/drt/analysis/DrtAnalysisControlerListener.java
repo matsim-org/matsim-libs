@@ -371,7 +371,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 			bw.append(line("RequestId", "actualWaitTime", "estimatedWaitTime", "deviate"));
 			for (EventSequence seq : performedRequestEventSequences) {
-				Set<Id<Person>> personIds = seq.getSubmitted().getPersonIds();
+				List<Id<Person>> personIds = seq.getSubmitted().getPersonIds();
 				for (Id<Person> person : personIds) {
 					if(seq.getPickedUp().containsKey(person) && seq.getDepartures().containsKey(person)) {
 						double actualWaitTime = seq.getPickedUp().get(person).getTime() - seq.getDepartures().get(person).getTime();

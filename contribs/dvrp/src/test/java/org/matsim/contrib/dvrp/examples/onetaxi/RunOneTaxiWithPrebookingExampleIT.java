@@ -239,7 +239,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 		PassengerRequestScheduledEvent event = events.get(Id.createPersonId(personId));
 		assertThat(event.getVehicleId().toString()).isEqualTo("taxi_one");
 		assertThat(event.getPickupTime()).isCloseTo(pickupTime, Offset.offset(0.01));
-		assertThat(event.getPersonIds().stream().findAny().orElseThrow().toString()).isEqualTo(personId);
+		assertThat(event.getPersonIds().get(0).toString()).isEqualTo(personId);
 		assertThat(event.getRequestId().toString()).isEqualTo(requestId);
 	}
 

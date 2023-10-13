@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.optimizer.Request;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -44,9 +44,9 @@ public abstract class AbstractPassengerRequestEvent extends Event {
 
 	private final String mode;
 	private final Id<Request> requestId;
-	private final Set<Id<Person>> personIds;
+	private final List<Id<Person>> personIds;
 
-	AbstractPassengerRequestEvent(double time, String mode, Id<Request> requestId, Set<Id<Person>> personIds) {
+	AbstractPassengerRequestEvent(double time, String mode, Id<Request> requestId, List<Id<Person>> personIds) {
 		super(time);
 		this.mode = mode;
 		this.requestId = requestId;
@@ -67,8 +67,8 @@ public abstract class AbstractPassengerRequestEvent extends Event {
 	/**
 	 * @return ids of the passengers (persons)
 	 */
-	public final Set<Id<Person>> getPersonIds() {
-		return Collections.unmodifiableSet(personIds);
+	public final List<Id<Person>> getPersonIds() {
+		return Collections.unmodifiableList(personIds);
 	}
 
 	@Override

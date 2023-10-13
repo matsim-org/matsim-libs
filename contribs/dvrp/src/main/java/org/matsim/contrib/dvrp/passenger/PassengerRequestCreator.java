@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dvrp.optimizer.Request;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author michalm
@@ -44,6 +44,6 @@ public interface PassengerRequestCreator {
 	 * @param submissionTime time at which request was submitted
 	 * @return
 	 */
-	PassengerRequest createRequest(Id<Request> id, Set<Id<Person>> passengerIds, Route route, Link fromLink, Link toLink,
+	PassengerRequest createRequest(Id<Request> id, List<Id<Person>> passengerIds, Route route, Link fromLink, Link toLink,
 								   double departureTime, double submissionTime);
 }

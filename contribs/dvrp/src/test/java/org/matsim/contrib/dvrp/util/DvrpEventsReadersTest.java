@@ -72,9 +72,9 @@ public class DvrpEventsReadersTest {
 	}
 
 	private final List<Event> dvrpEvents = List.of(
-			new PassengerRequestSubmittedEvent(0, mode, request, Collections.singleton(person), fromLink, toLink),
-			new PassengerRequestScheduledEvent(1, mode, request, Collections.singleton(person), vehicle, 100, 200),
-			new PassengerRequestRejectedEvent(2, mode, request, Collections.singleton(person), "cause_1"),
+			new PassengerRequestSubmittedEvent(0, mode, request, List.of(person), fromLink, toLink),
+			new PassengerRequestScheduledEvent(1, mode, request, List.of(person), vehicle, 100, 200),
+			new PassengerRequestRejectedEvent(2, mode, request, List.of(person), "cause_1"),
 			new PassengerPickedUpEvent(111, mode, request, person, vehicle),
 			new PassengerDroppedOffEvent(222, mode, request, person, vehicle),
 			new TaskStartedEvent(300, mode, vehicle, driver, TestTaskType.DRIVE_TASK, 0, fromLink),

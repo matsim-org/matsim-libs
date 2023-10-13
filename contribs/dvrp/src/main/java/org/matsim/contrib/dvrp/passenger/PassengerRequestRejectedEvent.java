@@ -20,10 +20,7 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
@@ -42,7 +39,7 @@ public class PassengerRequestRejectedEvent extends AbstractPassengerRequestEvent
 
 	private final String cause;
 
-	public PassengerRequestRejectedEvent(double time, String mode, Id<Request> requestId, Set<Id<Person>> personIds,
+	public PassengerRequestRejectedEvent(double time, String mode, Id<Request> requestId, List<Id<Person>> personIds,
 			String cause) {
 		super(time, mode, requestId, personIds);
 		this.cause = cause;
@@ -70,7 +67,7 @@ public class PassengerRequestRejectedEvent extends AbstractPassengerRequestEvent
 		String mode = Objects.requireNonNull(attributes.get(ATTRIBUTE_MODE));
 		Id<Request> requestId = Id.create(attributes.get(ATTRIBUTE_REQUEST), Request.class);
 		String[] personIdsAttribute = attributes.get(ATTRIBUTE_PERSON).split(",");
-		Set<Id<Person>> personIds = new LinkedHashSet<>();
+		List<Id<Person>> personIds = new ArrayList<>();
 		for (String person : personIdsAttribute) {
 			personIds.add(Id.create(person, Person.class));
 		}		String cause = Objects.requireNonNull(attributes.get(ATTRIBUTE_CAUSE));

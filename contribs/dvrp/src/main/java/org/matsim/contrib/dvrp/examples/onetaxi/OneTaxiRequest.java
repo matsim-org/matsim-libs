@@ -28,10 +28,7 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author michalm
@@ -41,7 +38,7 @@ public final class OneTaxiRequest implements PassengerRequest {
 	private final double submissionTime;
 	private final double earliestStartTime;
 
-	private final Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+	private final List<Id<Person>> passengerIds = new ArrayList<>();
 	private final String mode;
 
 	private final Link fromLink;
@@ -84,8 +81,8 @@ public final class OneTaxiRequest implements PassengerRequest {
 	}
 
 	@Override
-	public Set<Id<Person>> getPassengerIds() {
-		return Collections.unmodifiableSet(passengerIds);
+	public List<Id<Person>> getPassengerIds() {
+		return Collections.unmodifiableList(passengerIds);
 	}
 
 	@Override
@@ -95,7 +92,7 @@ public final class OneTaxiRequest implements PassengerRequest {
 
 	public static final class OneTaxiRequestCreator implements PassengerRequestCreator {
 		@Override
-		public OneTaxiRequest createRequest(Id<Request> id, Set<Id<Person>> passengerIds, Route route, Link fromLink,
+		public OneTaxiRequest createRequest(Id<Request> id, List<Id<Person>> passengerIds, Route route, Link fromLink,
 				Link toLink, double departureTime, double submissionTime) {
 			return new OneTaxiRequest(id, passengerIds, TransportMode.taxi, fromLink, toLink, departureTime,
 					submissionTime);

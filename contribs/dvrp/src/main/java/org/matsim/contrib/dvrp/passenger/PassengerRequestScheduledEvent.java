@@ -20,10 +20,7 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
@@ -50,7 +47,7 @@ public class PassengerRequestScheduledEvent extends AbstractPassengerRequestEven
 	/**
 	 * An event processed upon request submission.
 	 */
-	public PassengerRequestScheduledEvent(double time, String mode, Id<Request> requestId, Set<Id<Person>> personIds,
+	public PassengerRequestScheduledEvent(double time, String mode, Id<Request> requestId, List<Id<Person>> personIds,
 			Id<DvrpVehicle> vehicleId, double pickupTime, double dropoffTime) {
 		super(time, mode, requestId, personIds);
 		this.vehicleId = vehicleId;
@@ -99,7 +96,7 @@ public class PassengerRequestScheduledEvent extends AbstractPassengerRequestEven
 		String mode = Objects.requireNonNull(attributes.get(ATTRIBUTE_MODE));
 		Id<Request> requestId = Id.create(attributes.get(ATTRIBUTE_REQUEST), Request.class);
 		String[] personIdsAttribute = attributes.get(ATTRIBUTE_PERSON).split(",");
-		Set<Id<Person>> personIds = new LinkedHashSet<>();
+		List<Id<Person>> personIds = new ArrayList<>();
 		for (String person : personIdsAttribute) {
 			personIds.add(Id.create(person, Person.class));
 		}
