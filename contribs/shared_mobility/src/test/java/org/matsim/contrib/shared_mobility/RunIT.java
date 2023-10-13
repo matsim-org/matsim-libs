@@ -1,5 +1,6 @@
 package org.matsim.contrib.shared_mobility;
 
+import java.io.UncheckedIOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;

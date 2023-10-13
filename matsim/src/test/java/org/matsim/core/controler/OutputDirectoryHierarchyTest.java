@@ -28,6 +28,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 /**
  * @author thibautd
