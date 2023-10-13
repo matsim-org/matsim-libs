@@ -38,7 +38,6 @@ public class GroupPassengerEngine implements PassengerEngine, PassengerRequestRe
 	private InternalInterface internalInterface;
 
 
-
 	//accessed in doSimStep() and handleDeparture() (no need to sync)
 	private final Map<Id<Request>, List<MobsimPassengerAgent>> activePassengers = new HashMap<>();
 
@@ -49,9 +48,7 @@ public class GroupPassengerEngine implements PassengerEngine, PassengerRequestRe
 
 	private final PassengerGroupIdentifier groupIdentifier;
 
-	GroupPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
-						 PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network,
-						 PassengerRequestValidator requestValidator, PassengerGroupIdentifier groupIdentifier) {
+	GroupPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer, PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network, PassengerRequestValidator requestValidator, PassengerGroupIdentifier groupIdentifier) {
 		this.mode = mode;
 		this.mobsimTimer = mobsimTimer;
 		this.requestCreator = requestCreator;
@@ -80,7 +77,7 @@ public class GroupPassengerEngine implements PassengerEngine, PassengerRequestRe
 			List<MobsimPassengerAgent> passengers = activePassengers.remove(rejectedRequestsEvents.poll().getRequestId());
 			//not much else can be done for immediate requests
 			//set the passenger agent to abort - the event will be thrown by the QSim
-			for (MobsimPassengerAgent passenger: passengers) {
+			for (MobsimPassengerAgent passenger : passengers) {
 				passenger.setStateToAbort(mobsimTimer.getTimeOfDay());
 				internalInterface.arrangeNextAgentState(passenger);
 			}
@@ -97,15 +94,21 @@ public class GroupPassengerEngine implements PassengerEngine, PassengerRequestRe
 			return false;
 		}
 
-		MobsimPassengerAgent passenger = (MobsimPassengerAgent)agent;
+		MobsimPassengerAgent passenger = (MobsimPassengerAgent) agent;
 		internalInterface.registerAdditionalAgentOnLink(passenger);
 		currentDepartures.add(passenger);
 		return true;
 	}
 
 	private void handleDepartures() {
-		Map<Id<PassengerGroupIdentifier.PassengerGroup>, List<MobsimPassengerAgent>> agentGroups
-				= currentDepartures.stream().collect(Collectors.groupingBy(groupIdentifier));
+		Map<Id<PassengerGroupIdentifier.PassengerGroup>, List<MobsimPassengerAgent>> agentGroups =
+				currentDepartures.stream().collect(
+						Collectors.groupingBy(
+								groupIdentifier,
+								Collectors.collectingAndThen(Collectors.toList(), list -> {
+									list.sort(Comparator.comparing(MobsimPassengerAgent::getId));
+									return list;
+								})));
 
 		for (List<MobsimPassengerAgent> group : agentGroups.values()) {
 
@@ -114,16 +117,13 @@ public class GroupPassengerEngine implements PassengerEngine, PassengerRequestRe
 			Id<Link> toLinkId = firstAgent.getDestinationLinkId();
 			Route route = ((Leg) ((PlanAgent) firstAgent).getCurrentPlanElement()).getRoute();
 
-			while(iterator.hasNext()) {
+			while (iterator.hasNext()) {
 				MobsimAgent next = iterator.next();
 				Gbl.assertIf(firstAgent.getCurrentLinkId().equals(next.getCurrentLinkId()));
 				Gbl.assertIf(toLinkId.equals(next.getDestinationLinkId()));
 			}
 
-			PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
-					group.stream().map(Identifiable::getId).toList(), route,
-					getLink(firstAgent.getCurrentLinkId()), getLink(toLinkId),
-					mobsimTimer.getTimeOfDay(), mobsimTimer.getTimeOfDay());
+			PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(), group.stream().map(Identifiable::getId).toList(), route, getLink(firstAgent.getCurrentLinkId()), getLink(toLinkId), mobsimTimer.getTimeOfDay(), mobsimTimer.getTimeOfDay());
 			validateAndSubmitRequest(List.copyOf(group), request, mobsimTimer.getTimeOfDay());
 		}
 
@@ -146,16 +146,12 @@ public class GroupPassengerEngine implements PassengerEngine, PassengerRequestRe
 	}
 
 	private Link getLink(Id<Link> linkId) {
-		return Preconditions.checkNotNull(network.getLinks().get(linkId),
-				"Link id=%s does not exist in network for mode %s. Agent departs from a link that does not belong to that network?",
-				linkId, mode);
+		return Preconditions.checkNotNull(network.getLinks().get(linkId), "Link id=%s does not exist in network for mode %s. Agent departs from a link that does not belong to that network?", linkId, mode);
 	}
 
 	@Override
-	public boolean tryPickUpPassengers(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
-									   Id<Request> requestId, double now) {
-		boolean pickedUp = internalPassengerHandling.tryPickUpPassengers(driver, activePassengers.get(requestId),
-				requestId, now);
+	public boolean tryPickUpPassengers(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver, Id<Request> requestId, double now) {
+		boolean pickedUp = internalPassengerHandling.tryPickUpPassengers(driver, activePassengers.get(requestId), requestId, now);
 		Verify.verify(pickedUp, "Not possible without prebooking");
 		return pickedUp;
 	}
@@ -182,9 +178,7 @@ public class GroupPassengerEngine implements PassengerEngine, PassengerRequestRe
 
 			@Override
 			public GroupPassengerEngine get() {
-				return new GroupPassengerEngine(getMode(), eventsManager, mobsimTimer,
-						getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class),
-						getModalInstance(Network.class), getModalInstance(PassengerRequestValidator.class), getModalInstance(PassengerGroupIdentifier.class));
+				return new GroupPassengerEngine(getMode(), eventsManager, mobsimTimer, getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class), getModalInstance(Network.class), getModalInstance(PassengerRequestValidator.class), getModalInstance(PassengerGroupIdentifier.class));
 			}
 		};
 	}

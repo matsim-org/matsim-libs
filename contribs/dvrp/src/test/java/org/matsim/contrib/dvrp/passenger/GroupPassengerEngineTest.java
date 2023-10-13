@@ -54,8 +54,8 @@ public class GroupPassengerEngineTest {
 		Id<Person> person1 = Id.createPersonId("1");
 		Id<Person> person2 = Id.createPersonId("2");
 
-		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime, person2);
 		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime, person1);
+		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime, person2);
 
 		PassengerRequestValidator requestValidator = request -> Set.of();//valid
 		createQSim(requestValidator, OneTaxiOptimizer.class).run();
@@ -77,12 +77,12 @@ public class GroupPassengerEngineTest {
 				new PersonDepartureEvent(departureTime, person2, fixture.linkAB.getId(), MODE, MODE),
 				new ActivityEndEvent(departureTime, person1, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(departureTime, person1, fixture.linkAB.getId(), MODE, MODE),
-				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, List.of(person2, person1), VEHICLE_ID, 0,
+				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, List.of(person1, person2), VEHICLE_ID, 0,
 						scheduledDropoffTime),
-				new PersonEntersVehicleEvent(pickupStartTime, person2, Id.createVehicleId(VEHICLE_ID)),
-				new PassengerPickedUpEvent(pickupStartTime, MODE, requestId, person2, VEHICLE_ID),
 				new PersonEntersVehicleEvent(pickupStartTime, person1, Id.createVehicleId(VEHICLE_ID)),
 				new PassengerPickedUpEvent(pickupStartTime, MODE, requestId, person1, VEHICLE_ID),
+				new PersonEntersVehicleEvent(pickupStartTime, person2, Id.createVehicleId(VEHICLE_ID)),
+				new PassengerPickedUpEvent(pickupStartTime, MODE, requestId, person2, VEHICLE_ID),
 				new PassengerDroppedOffEvent(dropoffEndTime, MODE, requestId, person1, VEHICLE_ID),
 				new PersonLeavesVehicleEvent(dropoffEndTime, person1, Id.createVehicleId(VEHICLE_ID)),
 				new PersonArrivalEvent(dropoffEndTime, person1, fixture.linkBA.getId(), MODE),
@@ -90,7 +90,8 @@ public class GroupPassengerEngineTest {
 				new PassengerDroppedOffEvent(dropoffEndTime, MODE, requestId, person2, VEHICLE_ID),
 				new PersonLeavesVehicleEvent(dropoffEndTime, person2, Id.createVehicleId(VEHICLE_ID)),
 				new PersonArrivalEvent(dropoffEndTime, person2, fixture.linkBA.getId(), MODE),
-				new ActivityStartEvent(dropoffEndTime, person2, fixture.linkBA.getId(), null, END_ACTIVITY));
+				new ActivityStartEvent(dropoffEndTime, person2, fixture.linkBA.getId(), null, END_ACTIVITY)
+				);
 	}
 
 
