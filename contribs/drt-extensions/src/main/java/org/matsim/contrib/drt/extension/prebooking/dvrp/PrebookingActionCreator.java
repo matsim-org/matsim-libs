@@ -2,6 +2,7 @@ package org.matsim.contrib.drt.extension.prebooking.dvrp;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
 
+import org.matsim.contrib.drt.extension.prebooking.events.PassengerEnteringVehicleHandler;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;

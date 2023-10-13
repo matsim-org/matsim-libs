@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.extension.prebooking.dvrp;
+package org.matsim.contrib.drt.extension.prebooking.events;
 
 import java.util.Map;
 import java.util.Objects;

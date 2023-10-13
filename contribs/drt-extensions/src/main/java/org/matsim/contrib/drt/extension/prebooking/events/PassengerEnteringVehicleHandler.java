@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.prebooking.dvrp;
+package org.matsim.contrib.drt.extension.prebooking.events;
 
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.core.api.experimental.events.EventsManager;

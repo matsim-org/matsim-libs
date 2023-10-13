@@ -1,8 +1,8 @@
 package org.matsim.contrib.drt.extension.prebooking.electric;
 
-import org.matsim.contrib.drt.extension.prebooking.dvrp.PassengerEnteringVehicleHandler;
 import org.matsim.contrib.drt.extension.prebooking.dvrp.PrebookingPassengerEngine;
 import org.matsim.contrib.drt.extension.prebooking.dvrp.PrebookingStopActivity;
+import org.matsim.contrib.drt.extension.prebooking.events.PassengerEnteringVehicleHandler;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;

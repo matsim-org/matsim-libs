@@ -3,6 +3,7 @@ package org.matsim.contrib.drt.extension.prebooking.dvrp;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.edrt.EDrtActionCreator;
 import org.matsim.contrib.drt.extension.prebooking.electric.ElectricPrebookingActionCreator;
+import org.matsim.contrib.drt.extension.prebooking.events.PassengerEnteringVehicleHandler;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
