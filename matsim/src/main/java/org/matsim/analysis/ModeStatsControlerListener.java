@@ -24,6 +24,7 @@ import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.List;
 import java.util.Map.Entry;
@@ -53,7 +54,6 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.charts.StackedBarChart;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 
 /**

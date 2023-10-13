@@ -21,6 +21,7 @@ package org.matsim.contrib.socnetsim.run;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -29,7 +30,6 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 import org.matsim.contrib.socnetsim.framework.replanning.GroupPlanStrategy;
 import org.matsim.contrib.socnetsim.framework.replanning.GroupStrategyManager;
@@ -52,7 +52,7 @@ public class ReplanningStatsDumper implements StartupListener, BeforeMobsimListe
 		this.writer = IOUtils.getBufferedWriter( outPath );
 		try {
 			this.writer.write( "iter\tgroupSize\tstrategy" );
-		} 
+		}
 		catch (IOException e) {
 			throw new UncheckedIOException( e );
 		}
@@ -71,7 +71,7 @@ public class ReplanningStatsDumper implements StartupListener, BeforeMobsimListe
 			this.writer.write( ""+g.getPersons().size() );
 			this.writer.write( "\t" );
 			this.writer.write( strategy.toString() );
-		} 
+		}
 		catch (IOException e) {
 			throw new UncheckedIOException( e );
 		}
@@ -81,7 +81,7 @@ public class ReplanningStatsDumper implements StartupListener, BeforeMobsimListe
 	public void notifyShutdown(ShutdownEvent event) {
 		try {
 			this.writer.close();
-		} 
+		}
 		catch (IOException e) {
 			throw new UncheckedIOException( e );
 		}
@@ -91,7 +91,7 @@ public class ReplanningStatsDumper implements StartupListener, BeforeMobsimListe
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		try {
 			this.writer.flush();
-		} 
+		}
 		catch (IOException e) {
 			throw new UncheckedIOException( e );
 		}

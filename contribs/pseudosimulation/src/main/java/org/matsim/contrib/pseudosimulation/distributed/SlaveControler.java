@@ -3,6 +3,7 @@ package org.matsim.contrib.pseudosimulation.distributed;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.UncheckedIOException;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -54,8 +55,6 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.pt.router.TransitRouter;
 
 import com.google.inject.Inject;
 
