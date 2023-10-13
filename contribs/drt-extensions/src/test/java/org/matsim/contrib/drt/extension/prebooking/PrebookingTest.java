@@ -79,7 +79,7 @@ public class PrebookingTest {
 		controller.run();
 
 		RequestInfo requestInfo = environment.getRequestInfo().get("personA");
-		assertEquals(1.0, requestInfo.submissionTime, 1e-3);
+		assertEquals(0.0, requestInfo.submissionTime, 1e-3);
 		assertEquals(2060.0, requestInfo.pickupTime, 1e-3);
 		assertEquals(2271.0, requestInfo.dropoffTime, 1e-3);
 
@@ -91,8 +91,8 @@ public class PrebookingTest {
 		assertEquals("DRIVE", taskInfo.get(4).type);
 		assertEquals("STOP", taskInfo.get(5).type);
 
-		assertEquals(2.0, taskInfo.get(1).startTime, 1e-3); // Pickup drive
-		assertEquals(87.0, taskInfo.get(2).startTime, 1e-3); // Starting to wait
+		assertEquals(1.0, taskInfo.get(1).startTime, 1e-3); // Pickup drive
+		assertEquals(86.0, taskInfo.get(2).startTime, 1e-3); // Starting to wait
 		assertEquals(1800.0, taskInfo.get(3).startTime, 1e-3); // Starting stop
 		assertEquals(2060.0, taskInfo.get(3).endTime, 1e-3); // Ending stop (260s duration)
 		assertEquals(2060.0, taskInfo.get(4).startTime, 1e-3); // Starting drive (ending stop)
@@ -118,7 +118,7 @@ public class PrebookingTest {
 		controller.run();
 
 		RequestInfo requestInfo = environment.getRequestInfo().get("personA");
-		assertEquals(1.0, requestInfo.submissionTime, 1e-3);
+		assertEquals(0.0, requestInfo.submissionTime, 1e-3);
 		assertEquals(2260.0 + 1.0, requestInfo.pickupTime, 1e-3); // One second for notifying vehicle
 		assertEquals(2472.0, requestInfo.dropoffTime, 1e-3);
 
@@ -130,8 +130,8 @@ public class PrebookingTest {
 		assertEquals("DRIVE", taskInfo.get(4).type);
 		assertEquals("STOP", taskInfo.get(5).type);
 
-		assertEquals(2.0, taskInfo.get(1).startTime, 1e-3); // Pickup drive
-		assertEquals(87.0, taskInfo.get(2).startTime, 1e-3); // Starting to wait
+		assertEquals(1.0, taskInfo.get(1).startTime, 1e-3); // Pickup drive
+		assertEquals(86.0, taskInfo.get(2).startTime, 1e-3); // Starting to wait
 		assertEquals(2200.0, taskInfo.get(3).startTime, 1e-3); // Starting stop
 		assertEquals(2261.0, taskInfo.get(3).endTime, 1e-3); // Ending stop (60s)
 		assertEquals(2261.0, taskInfo.get(4).startTime, 1e-3); // Starting drive (ending stop)
@@ -158,7 +158,7 @@ public class PrebookingTest {
 
 		{
 			RequestInfo requestInfo = environment.getRequestInfo().get("earlyRequest");
-			assertEquals(1.0, requestInfo.submissionTime, 1e-3);
+			assertEquals(0.0, requestInfo.submissionTime, 1e-3);
 			assertEquals(2000.0 + 60.0 + 1.0, requestInfo.pickupTime, 1e-3);
 			assertEquals(2272.0, requestInfo.dropoffTime, 1e-3);
 		}
@@ -200,7 +200,7 @@ public class PrebookingTest {
 
 		{
 			RequestInfo requestInfo = environment.getRequestInfo().get("lateRequest");
-			assertEquals(1.0, requestInfo.submissionTime, 1e-3);
+			assertEquals(0.0, requestInfo.submissionTime, 1e-3);
 			assertEquals(4000.0 + 60.0, requestInfo.pickupTime, 1e-3);
 			assertEquals(4103.0, requestInfo.dropoffTime, 1e-3);
 		}

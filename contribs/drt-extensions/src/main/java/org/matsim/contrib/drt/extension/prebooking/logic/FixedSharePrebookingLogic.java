@@ -10,15 +10,27 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.extension.prebooking.dvrp.PrebookingManager;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeTracker;
 
-public class FixedSharePrebookingLogic implements MobsimBeforeSimStepListener {
+import com.google.common.base.Verify;
+
+/**
+ * This class represents a prebooking logic that searches for DRT legs in the
+ * population and decides based on a predefiend probability if each trip is
+ * prebooked or not. Furthermore, you can configure how much in advance to the
+ * planned departure time the request is submitted.
+ * 
+ * Note that this logic is aimed towards scenarios where each agent has one trip
+ * (trip-based simulation). There is no logic that handles the special case
+ * where an agent may submit a request in the morning and another one for the
+ * afternoon, but the first one is rejected.
+ * 
+ * @author Sebastian Hörl (sebhoerl), IRT SystemX
+ */
+public class FixedSharePrebookingLogic extends TimedPrebookingLogic {
 	private final String mode;
 
-	private final PrebookingManager prebookingManager;
 	private final Population population;
 	private final TimeInterpretation timeInterpretation;
 
@@ -27,45 +39,46 @@ public class FixedSharePrebookingLogic implements MobsimBeforeSimStepListener {
 
 	private final long randomSeed;
 
-	private boolean submissionDone = false;
-
 	public FixedSharePrebookingLogic(String mode, double prbookingProbability, double submissionSlack,
 			PrebookingManager prebookingManager, Population population, TimeInterpretation timeInterpretation,
 			long randomSeed) {
+		super(prebookingManager);
+
 		this.mode = mode;
 		this.prbookingProbability = prbookingProbability;
 		this.submissionSlack = submissionSlack;
-		this.prebookingManager = prebookingManager;
 		this.population = population;
 		this.timeInterpretation = timeInterpretation;
 		this.randomSeed = randomSeed;
 	}
 
 	@Override
-	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent event) {
-		if (!submissionDone) {
-			Random random = new Random(randomSeed);
+	protected void scheduleRequests() {
+		Random random = new Random(randomSeed);
 
-			for (Person person : population.getPersons().values()) {
-				Plan plan = person.getSelectedPlan();
+		for (Person person : population.getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
 
-				TimeTracker timeTracker = new TimeTracker(timeInterpretation);
+			TimeTracker timeTracker = new TimeTracker(timeInterpretation);
+			boolean foundLeg = false;
 
-				for (PlanElement element : plan.getPlanElements()) {
-					if (element instanceof Leg) {
-						Leg leg = (Leg) element;
-						if (leg.getMode().equals(mode) && random.nextDouble() < prbookingProbability) {
-							double earliestDepartureTime = leg.getDepartureTime().seconds();
-							double submissionTime = leg.getDepartureTime().seconds() - submissionSlack;
-							prebookingManager.prebook(person, leg, earliestDepartureTime, submissionTime);
-						}
+			for (PlanElement element : plan.getPlanElements()) {
+				if (element instanceof Leg) {
+					Leg leg = (Leg) element;
+
+					if (leg.getMode().equals(mode) && random.nextDouble() < prbookingProbability) {
+						Verify.verify(!foundLeg, "Person " + person.getId().toString()
+								+ " has at least two drt legs. Please make use of a different PrebookingLogic.");
+						foundLeg = true;
+
+						double earliestDepartureTime = leg.getDepartureTime().seconds();
+						double submissionTime = leg.getDepartureTime().seconds() - submissionSlack;
+						queue.schedule(submissionTime, person, leg, earliestDepartureTime);
 					}
-
-					timeTracker.addElement(element);
 				}
-			}
 
-			submissionDone = true;
+				timeTracker.addElement(element);
+			}
 		}
 	}
 

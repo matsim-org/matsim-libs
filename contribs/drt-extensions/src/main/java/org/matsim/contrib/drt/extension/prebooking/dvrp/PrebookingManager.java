@@ -2,7 +2,6 @@ package org.matsim.contrib.drt.extension.prebooking.dvrp;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -20,10 +19,8 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
@@ -45,7 +42,7 @@ import com.google.common.base.Verify;
  * 
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
-public class PrebookingManager implements MobsimBeforeSimStepListener, MobsimBeforeCleanupListener {
+public class PrebookingManager implements MobsimEngine {
 	private static final String PREBOOKED_REQUEST_PREFIX = "prebookedRequestId";
 
 	private final String mode;
@@ -61,8 +58,7 @@ public class PrebookingManager implements MobsimBeforeSimStepListener, MobsimBef
 
 	private final String requestAttribute;
 
-	private final PriorityQueue<PrebookingQueueItem> prebookingQueue = new PriorityQueue<>();
-
+	private final List<PrebookingQueueItem> prebookingQueue = new LinkedList<>();
 	private final IdMap<Request, PassengerRequest> prebookedRequests = new IdMap<>(Request.class);
 
 	private final List<Leg> prebookedLegs = new LinkedList<>();
@@ -99,9 +95,12 @@ public class PrebookingManager implements MobsimBeforeSimStepListener, MobsimBef
 		return requestId.toString().startsWith(mode + "_prebooked_");
 	}
 
-	public void prebook(Person person, Leg leg, double earliestDepartureTime, double submissionTime) {
+	public void prebook(Person person, Leg leg, double earliestDepartureTime) {
 		Verify.verify(!cleanupFinished, "Attempting to prebook a request after Mobsim has finished");
-		this.prebookingQueue.add(new PrebookingQueueItem(person, leg, earliestDepartureTime, submissionTime));
+
+		synchronized (prebookingQueue) {
+			this.prebookingQueue.add(new PrebookingQueueItem(person, leg, earliestDepartureTime));
+		}
 	}
 
 	private Link getLink(Id<Link> linkId) {
@@ -110,38 +109,44 @@ public class PrebookingManager implements MobsimBeforeSimStepListener, MobsimBef
 				linkId, mode);
 	}
 
+	private record PrebookingQueueItem(Person person, Leg leg, double earliestDepartureTime) {
+	}
+
 	@Override
-	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent event) {
-		double now = event.getSimulationTime();
+	public void onPrepareSim() {}
+	
+	@Override
+	public void doSimStep(double now) {
+		synchronized (prebookingQueue) {
+			for (PrebookingQueueItem item : prebookingQueue) {
+				Verify.verify(item.leg.getMode().equals(mode), "Invalid mode for this prebooking manager");
 
-		while (prebookingQueue.size() > 0 && prebookingQueue.peek().submissionTime <= event.getSimulationTime()) {
-			PrebookingQueueItem item = prebookingQueue.poll();
+				PassengerRequest request = requestCreator.createRequest(createRequestId(), item.person.getId(),
+						item.leg.getRoute(), getLink(item.leg.getRoute().getStartLinkId()),
+						getLink(item.leg.getRoute().getEndLinkId()), item.earliestDepartureTime, now);
 
-			Verify.verify(item.leg.getMode().equals(mode), "Invalid mode for this prebooking manager");
+				Set<String> violations = requestValidator.validateRequest(request);
+				if (!violations.isEmpty()) {
+					String cause = String.join(", ", violations);
+					eventsManager.processEvent(new PassengerRequestRejectedEvent(now, mode, request.getId(),
+							request.getPassengerId(), cause));
+				} else {
+					synchronized (optimizer) {
+						optimizer.requestSubmitted(request);
+					}
 
-			PassengerRequest request = requestCreator.createRequest(createRequestId(), item.person.getId(),
-					item.leg.getRoute(), getLink(item.leg.getRoute().getStartLinkId()),
-					getLink(item.leg.getRoute().getEndLinkId()), item.earliestDepartureTime, now);
-
-			Set<String> violations = requestValidator.validateRequest(request);
-			if (!violations.isEmpty()) {
-				String cause = String.join(", ", violations);
-				eventsManager.processEvent(
-						new PassengerRequestRejectedEvent(now, mode, request.getId(), request.getPassengerId(), cause));
-			} else {
-				synchronized (optimizer) {
-					optimizer.requestSubmitted(request);
+					item.leg.getAttributes().putAttribute(requestAttribute, request.getId().toString());
+					prebookedRequests.put(request.getId(), request);
+					prebookedLegs.add(item.leg);
 				}
-
-				item.leg.getAttributes().putAttribute(requestAttribute, request.getId().toString());
-				prebookedRequests.put(request.getId(), request);
-				prebookedLegs.add(item.leg);
 			}
+
+			prebookingQueue.clear();
 		}
 	}
 
 	@Override
-	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e) {
+	public void afterSim() {
 		// reset leg attributes for next iteration
 		cleanupFinished = true;
 
@@ -150,23 +155,6 @@ public class PrebookingManager implements MobsimBeforeSimStepListener, MobsimBef
 		}
 	}
 
-	private class PrebookingQueueItem implements Comparable<PrebookingQueueItem> {
-		public Person person;
-		public Leg leg;
-		public double earliestDepartureTime;
-		public double submissionTime;
-
-		public PrebookingQueueItem(Person person, Leg leg, double earliestDepartureTime, double submissionTime) {
-			this.person = person;
-			this.leg = leg;
-			this.earliestDepartureTime = earliestDepartureTime;
-			this.submissionTime = submissionTime;
-		}
-
-		@Override
-		public int compareTo(PrebookingQueueItem o) {
-			// sort by submissionTime, but otherwise keep the order of submission
-			return Double.compare(submissionTime, o.submissionTime);
-		}
-	}
+	@Override
+	public void setInternalInterface(InternalInterface internalInterface) {};
 }
