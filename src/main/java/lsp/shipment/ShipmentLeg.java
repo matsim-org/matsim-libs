@@ -2,8 +2,8 @@ package lsp.shipment;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierService;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierService;
 
 public interface ShipmentLeg extends ShipmentPlanElement {
 	Id<Link> getToLinkId();

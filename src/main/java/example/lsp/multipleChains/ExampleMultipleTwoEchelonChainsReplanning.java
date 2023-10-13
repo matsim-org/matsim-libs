@@ -13,14 +13,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
-import org.matsim.contrib.freight.controler.CarrierStrategyManager;
-import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -31,6 +26,10 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
+import org.matsim.freight.carriers.controler.CarrierStrategyManager;
+import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
@@ -90,13 +89,13 @@ public class ExampleMultipleTwoEchelonChainsReplanning {
 				bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
 				bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
 				bind(CarrierStrategyManager.class).toProvider(() -> {
-					CarrierStrategyManager strategyManager = FreightUtils.createDefaultCarrierStrategyManager();
+					CarrierStrategyManager strategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
 					return strategyManager;
 				});
 				bind(LSPStrategyManager.class).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new PlanCalcScoreConfigGroup())), null, 1);
+					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
 					strategyManager.addStrategy(new ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
 					strategyManager.setMaxPlansPerAgent(5);
 					strategyManager.setPlanSelectorForRemoval(new WorstPlanForRemovalSelector());
@@ -122,15 +121,15 @@ public class ExampleMultipleTwoEchelonChainsReplanning {
 			}
 			ConfigUtils.applyCommandline(config,args);
 		} else {
-			config.controler().setOutputDirectory("output/multipleTwoEchelonChainsReplanning");
-			config.controler().setLastIteration(8);
+			config.controller().setOutputDirectory("output/multipleTwoEchelonChainsReplanning");
+			config.controller().setLastIteration(8);
 		}
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setWriteEventsInterval(1);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setWriteEventsInterval(1);
 
-		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
+		FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 
 		return config;
 	}
@@ -158,10 +157,10 @@ public class ExampleMultipleTwoEchelonChainsReplanning {
 		{
 			LogisticChain hubChainLeft;
 			{
-				Carrier mainCarrierLeft = CarrierUtils.createCarrier(Id.create("mainCarrierLeft", Carrier.class));
+				Carrier mainCarrierLeft = CarriersUtils.createCarrier(Id.create("mainCarrierLeft", Carrier.class));
 				mainCarrierLeft.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-				CarrierUtils.addCarrierVehicle(mainCarrierLeft, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
+				CarriersUtils.addCarrierVehicle(mainCarrierLeft, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
 				LSPResource mainCarrierResourceLeft = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrierLeft, network)
 						.setFromLinkId(DEPOT_LINK_ID)
 						.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
@@ -187,10 +186,10 @@ public class ExampleMultipleTwoEchelonChainsReplanning {
 						.setResource(hubResourceLeft)
 						.build();
 
-				Carrier distributionCarrierLeft = CarrierUtils.createCarrier(Id.create("distributionCarrierLeft", Carrier.class));
+				Carrier distributionCarrierLeft = CarriersUtils.createCarrier(Id.create("distributionCarrierLeft", Carrier.class));
 				distributionCarrierLeft.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-				CarrierUtils.addCarrierVehicle(distributionCarrierLeft, CarrierVehicle.newInstance(Id.createVehicleId("distributionTruck"), HUB_LEFT_LINK_ID, VEH_TYPE_SMALL_05));
+				CarriersUtils.addCarrierVehicle(distributionCarrierLeft, CarrierVehicle.newInstance(Id.createVehicleId("distributionTruck"), HUB_LEFT_LINK_ID, VEH_TYPE_SMALL_05));
 				LSPResource distributionCarrierResourceLeft = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrierLeft, network)
 						.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 						.build();
@@ -211,10 +210,10 @@ public class ExampleMultipleTwoEchelonChainsReplanning {
 
 			LogisticChain hubChainRight;
 			{
-				Carrier mainCarrier = CarrierUtils.createCarrier(Id.create("mainCarrier", Carrier.class));
+				Carrier mainCarrier = CarriersUtils.createCarrier(Id.create("mainCarrier", Carrier.class));
 				mainCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-				CarrierUtils.addCarrierVehicle(mainCarrier, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
+				CarriersUtils.addCarrierVehicle(mainCarrier, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
 				LSPResource mainCarrierResource = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier, network)
 						.setFromLinkId(DEPOT_LINK_ID)
 						.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
@@ -240,10 +239,10 @@ public class ExampleMultipleTwoEchelonChainsReplanning {
 						.setResource(hubResourceRight)
 						.build();
 
-				Carrier distributionCarrier = CarrierUtils.createCarrier(Id.create("distributionCarrier", Carrier.class));
+				Carrier distributionCarrier = CarriersUtils.createCarrier(Id.create("distributionCarrier", Carrier.class));
 				distributionCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-				CarrierUtils.addCarrierVehicle(distributionCarrier, CarrierVehicle.newInstance(Id.createVehicleId("distributionTruck"), HUB_RIGHT_LINK_ID, VEH_TYPE_SMALL_05));
+				CarriersUtils.addCarrierVehicle(distributionCarrier, CarrierVehicle.newInstance(Id.createVehicleId("distributionTruck"), HUB_RIGHT_LINK_ID, VEH_TYPE_SMALL_05));
 				LSPResource distributionCarrierResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
 						.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 						.build();

@@ -33,8 +33,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
@@ -42,6 +40,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -77,7 +77,7 @@ import java.util.Random;
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
 
-		Carrier collectionCarrier = CarrierUtils.createCarrier(collectionCarrierId);
+		Carrier collectionCarrier = CarriersUtils.createCarrier(collectionCarrierId);
 		collectionCarrier.setCarrierCapabilities(capabilities);
 
 		//The collection adapter i.e. the Resource is created
@@ -132,7 +132,7 @@ import java.util.Random;
 				.addVehicle(mainRunCarrierVehicle)
 				.setFleetSize(FleetSize.INFINITE)
 				.build();
-		Carrier mainRunCarrier = CarrierUtils.createCarrier(mainRunCarrierId);
+		Carrier mainRunCarrier = CarriersUtils.createCarrier(mainRunCarrierId);
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 		//The adapter i.e. the main run resource is created
@@ -189,7 +189,7 @@ import java.util.Random;
 		distributionCapabilitiesBuilder.addVehicle(distributionCarrierVehicle);
 		distributionCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities distributionCapabilities = distributionCapabilitiesBuilder.build();
-		Carrier distributionCarrier = CarrierUtils.createCarrier(distributionCarrierId);
+		Carrier distributionCarrier = CarriersUtils.createCarrier(distributionCarrierId);
 		distributionCarrier.setCarrierCapabilities(distributionCapabilities);
 
 		//The distribution adapter i.e. the Resource is created
@@ -327,9 +327,9 @@ import java.util.Random;
 				install(new LSPModule()); // this is the better syntax, having everything in one module. kai, may'22
 			}
 		});
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(0);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controller().setFirstIteration(0);
+		config.controller().setLastIteration(0);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
 		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);

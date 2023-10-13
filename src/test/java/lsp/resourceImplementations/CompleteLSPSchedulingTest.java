@@ -21,12 +21,12 @@
 package lsp.resourceImplementations;
 
 import lsp.*;
-import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
-import lsp.resourceImplementations.distributionCarrier.DistributionServiceStartEventHandler;
-import lsp.resourceImplementations.distributionCarrier.DistributionTourStartEventHandler;
 import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.resourceImplementations.collectionCarrier.CollectionServiceEndEventHandler;
 import lsp.resourceImplementations.collectionCarrier.CollectionTourEndEventHandler;
+import lsp.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import lsp.resourceImplementations.distributionCarrier.DistributionServiceStartEventHandler;
+import lsp.resourceImplementations.distributionCarrier.DistributionTourStartEventHandler;
 import lsp.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
 import lsp.resourceImplementations.mainRunCarrier.MainRunTourEndEventHandler;
 import lsp.resourceImplementations.mainRunCarrier.MainRunTourStartEventHandler;
@@ -41,12 +41,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -100,7 +100,7 @@ public class CompleteLSPSchedulingTest {
 		collectionCapabilitiesBuilder.addVehicle(collectionCarrierVehicle);
 		collectionCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities collectionCapabilities = collectionCapabilitiesBuilder.build();
-		Carrier collectionCarrier = CarrierUtils.createCarrier(collectionCarrierId);
+		Carrier collectionCarrier = CarriersUtils.createCarrier(collectionCarrierId);
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
 		collectionResource = CollectionCarrierUtils.CollectionCarrierResourceBuilder.newInstance(collectionCarrier, network)
@@ -151,7 +151,7 @@ public class CompleteLSPSchedulingTest {
 		mainRunCapabilitiesBuilder.addVehicle(mainRunCarrierVehicle);
 		mainRunCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities mainRunCapabilities = mainRunCapabilitiesBuilder.build();
-		Carrier mainRunCarrier = CarrierUtils.createCarrier(mainRunCarrierId);
+		Carrier mainRunCarrier = CarriersUtils.createCarrier(mainRunCarrierId);
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 		mainRunResource = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(mainRunCarrier, network)
@@ -200,7 +200,7 @@ public class CompleteLSPSchedulingTest {
 		capabilitiesBuilder.addVehicle(distributionCarrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities distributionCapabilities = capabilitiesBuilder.build();
-		Carrier distributionCarrier = CarrierUtils.createCarrier(distributionCarrierId);
+		Carrier distributionCarrier = CarriersUtils.createCarrier(distributionCarrierId);
 		distributionCarrier.setCarrierCapabilities(distributionCapabilities);
 
 		distributionResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)

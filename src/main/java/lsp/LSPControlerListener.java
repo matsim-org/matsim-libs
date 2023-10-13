@@ -27,17 +27,17 @@ import lsp.shipment.LSPShipment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlanWriter;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.controler.CarrierAgentTracker;
-import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierPlanWriter;
+import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.Carriers;
+import org.matsim.freight.carriers.controler.CarrierAgentTracker;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -127,7 +127,7 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 		//Update carriers in scenario and CarrierAgentTracker
 		carrierAgentTracker.getCarriers().getCarriers().clear();
 		for (Carrier carrier : getCarriersFromLSP().getCarriers().values()) {
-			FreightUtils.getCarriers(scenario).addCarrier(carrier);
+			CarriersUtils.getCarriers(scenario).addCarrier(carrier);
 			carrierAgentTracker.getCarriers().addCarrier(carrier);
 		}
 
@@ -179,6 +179,6 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		new LSPPlanXmlWriter(LSPUtils.getLSPs(scenario)).write(controlerIO.getOutputPath() + "/output_lsps.xml.gz");
-		new CarrierPlanWriter(FreightUtils.getCarriers(scenario)).write(controlerIO.getOutputPath() + "/output_carriers.xml.gz");
+		new CarrierPlanWriter(CarriersUtils.getCarriers(scenario)).write(controlerIO.getOutputPath() + "/output_carriers.xml.gz");
 	}
 }

@@ -21,22 +21,22 @@
 package lspShipmentAssignmentTests;
 
 import lsp.*;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
-import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
@@ -76,7 +76,7 @@ public class CollectionLSPShipmentAssigmentTest {
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
-		Carrier carrier = CarrierUtils.createCarrier(carrierId);
+		Carrier carrier = CarriersUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
 

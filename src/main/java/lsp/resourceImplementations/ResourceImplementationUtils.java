@@ -28,9 +28,9 @@ import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierVehicle;
 import org.matsim.vehicles.VehicleType;
 
 import java.io.BufferedWriter;
@@ -52,7 +52,7 @@ public class ResourceImplementationUtils {
 	/**
 	 * Collects all the vehicleTyps from the different Vehicle of the carrier.
 	 * This is needed since we do not use carrier.getCarrierCapabilities().getVehicleTypes() any more as second field to safe vehicleTypes ...
-	 * TODO: Maybe move to CarrierUtils in MATSim-libs / freight contrib.
+	 * TODO: Maybe move to CarriersUtils in MATSim-libs / freight contrib.
 	 * <p>
 	 * KMT/Jul22
 	 *

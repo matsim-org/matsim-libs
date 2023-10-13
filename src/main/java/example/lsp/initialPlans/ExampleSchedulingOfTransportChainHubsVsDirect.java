@@ -34,15 +34,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.controler.CarrierStrategyManager;
-import org.matsim.contrib.freight.controler.FreightUtils;
-import org.matsim.contrib.freight.events.CarrierServiceEndEvent;
-import org.matsim.contrib.freight.events.CarrierTourEndEvent;
-import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
-import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -53,6 +44,14 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.controler.CarrierControlerUtils;
+import org.matsim.freight.carriers.controler.CarrierStrategyManager;
+import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
+import org.matsim.freight.carriers.events.CarrierTourEndEvent;
+import org.matsim.freight.carriers.events.eventhandler.FreightServiceEndEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.FreightTourEndEventHandler;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
@@ -99,14 +98,14 @@ import java.util.*;
 		} else {
 			solutionType = SolutionType.onePlan_direct;
 			log.warn("SolutionType was set in code to: " + solutionType);
-			config.controler().setOutputDirectory("output/ChainVsDirect/" + solutionType);
-			config.controler().setLastIteration(2);
+			config.controller().setOutputDirectory("output/ChainVsDirect/" + solutionType);
+			config.controller().setLastIteration(2);
 
 		}
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
-		var freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
+		var freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 
 		log.warn("solutionType= " + solutionType);
 
@@ -151,7 +150,7 @@ import java.util.*;
 					return strategyManager;
 				});
 				bind( CarrierStrategyManager.class ).toProvider(() -> {
-					CarrierStrategyManager strategyManager = FreightUtils.createDefaultCarrierStrategyManager();
+					CarrierStrategyManager strategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new RandomPlanSelector<>()), null, 1);
 					return strategyManager;
 				});
@@ -165,7 +164,7 @@ import java.util.*;
 
 		//print the schedules for the assigned LSPShipments
 		log.info("print the schedules for the assigned LSPShipments");
-		ResourceImplementationUtils.printResults_shipmentPlan(config.controler().getOutputDirectory(), lsp);
+		ResourceImplementationUtils.printResults_shipmentPlan(config.controller().getOutputDirectory(), lsp);
 
 		log.info("Done.");
 
@@ -217,7 +216,7 @@ import java.util.*;
 
 			log.info("");
 			log.info("The Carrier for the main run is created");
-			Carrier mainRunCarrier = CarrierUtils.createCarrier(Id.create("MainRunCarrier", Carrier.class));
+			Carrier mainRunCarrier = CarriersUtils.createCarrier(Id.create("MainRunCarrier", Carrier.class));
 
 			VehicleType mainRunVehicleType = CarrierVehicleType.Builder.newInstance(Id.create("MainRunCarrierVehicleType", VehicleType.class))
 					.setCapacity(30)
@@ -280,7 +279,7 @@ import java.util.*;
 
 			CarrierVehicle distributionCarrierVehicle = CarrierVehicle.Builder.newInstance(Id.createVehicleId("DistributionVehicle"), hubLinkId, distributionVehicleType).build();
 
-			Carrier distributionCarrier = CarrierUtils.createCarrier(Id.create("DistributionCarrier", Carrier.class));
+			Carrier distributionCarrier = CarriersUtils.createCarrier(Id.create("DistributionCarrier", Carrier.class));
 			distributionCarrier.setCarrierCapabilities(
 					CarrierCapabilities.Builder.newInstance()
 							.addType(distributionVehicleType)
@@ -319,7 +318,7 @@ import java.util.*;
 					.addVehicle(directDistributionCarrierVehicle)
 					.setFleetSize(FleetSize.INFINITE)
 					.build();
-			Carrier directDistributionCarrier = CarrierUtils.createCarrier(Id.create("DirectDistributionCarrier", Carrier.class));
+			Carrier directDistributionCarrier = CarriersUtils.createCarrier(Id.create("DirectDistributionCarrier", Carrier.class));
 			directDistributionCarrier.setCarrierCapabilities(directDistributionCarrierCapabilities);
 
 			//The distribution adapter i.e. the Resource is created

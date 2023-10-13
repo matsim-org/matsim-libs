@@ -13,11 +13,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
-import org.matsim.contrib.freight.controler.CarrierStrategyManager;
-import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -30,6 +25,10 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
+import org.matsim.freight.carriers.controler.CarrierStrategyManager;
+import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
@@ -91,7 +90,7 @@ public class ExampleMultipleMixedEchelonChains {
 				carrierScorer.setToll(TOLL_VALUE);
 				bind(LSPScorerFactory.class).toInstance( () -> new MyLSPScorer());
 				bind(CarrierStrategyManager.class).toProvider(() -> {
-					CarrierStrategyManager strategyManager = FreightUtils.createDefaultCarrierStrategyManager();
+					CarrierStrategyManager strategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
 					return strategyManager;
 				});
@@ -120,15 +119,15 @@ public class ExampleMultipleMixedEchelonChains {
 			}
 			ConfigUtils.applyCommandline(config,args);
 		} else {
-			config.controler().setOutputDirectory("output/multipleMixedEchelonChains_" + assignerSetting);
-			config.controler().setLastIteration(0);
+			config.controller().setOutputDirectory("output/multipleMixedEchelonChains_" + assignerSetting);
+			config.controller().setLastIteration(0);
 		}
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setWriteEventsInterval(1);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setWriteEventsInterval(1);
 
-		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
+		FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 
 		return config;
 	}
@@ -156,10 +155,10 @@ public class ExampleMultipleMixedEchelonChains {
 		{
 			LogisticChain directChain;
 			{
-				Carrier singleCarrier = CarrierUtils.createCarrier(Id.create("singleCarrier", Carrier.class));
+				Carrier singleCarrier = CarriersUtils.createCarrier(Id.create("singleCarrier", Carrier.class));
 				singleCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-				CarrierUtils.addCarrierVehicle(singleCarrier, CarrierVehicle.newInstance(Id.createVehicleId("singleCarrier"), DEPOT_LINK_ID, VEH_TYPE_SMALL_05));
+				CarriersUtils.addCarrierVehicle(singleCarrier, CarrierVehicle.newInstance(Id.createVehicleId("singleCarrier"), DEPOT_LINK_ID, VEH_TYPE_SMALL_05));
 				LSPResource singleCarrierResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(singleCarrier, network)
 						.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 						.build();
@@ -175,10 +174,10 @@ public class ExampleMultipleMixedEchelonChains {
 
 			LogisticChain hubChain;
 			{
-				Carrier mainCarrier = CarrierUtils.createCarrier(Id.create("mainCarrier", Carrier.class));
+				Carrier mainCarrier = CarriersUtils.createCarrier(Id.create("mainCarrier", Carrier.class));
 				mainCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-				CarrierUtils.addCarrierVehicle(mainCarrier, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
+				CarriersUtils.addCarrierVehicle(mainCarrier, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
 				LSPResource mainCarrierResource = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier, network)
 						.setFromLinkId(DEPOT_LINK_ID)
 						.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
@@ -204,10 +203,10 @@ public class ExampleMultipleMixedEchelonChains {
 						.setResource(hubResource)
 						.build();
 
-				Carrier distributionCarrier = CarrierUtils.createCarrier(Id.create("distributionCarrier", Carrier.class));
+				Carrier distributionCarrier = CarriersUtils.createCarrier(Id.create("distributionCarrier", Carrier.class));
 				distributionCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-				CarrierUtils.addCarrierVehicle(distributionCarrier, CarrierVehicle.newInstance(Id.createVehicleId("distributionTruck"), HUB_LINK_ID, VEH_TYPE_SMALL_05));
+				CarriersUtils.addCarrierVehicle(distributionCarrier, CarrierVehicle.newInstance(Id.createVehicleId("distributionTruck"), HUB_LINK_ID, VEH_TYPE_SMALL_05));
 				LSPResource distributionCarrierResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
 						.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 						.build();

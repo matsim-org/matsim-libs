@@ -12,14 +12,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
-import org.matsim.contrib.freight.controler.CarrierStrategyManager;
-import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -31,6 +26,10 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
+import org.matsim.freight.carriers.controler.CarrierStrategyManager;
+import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
@@ -87,13 +86,13 @@ public class WorstPlanSelectorTest {
 				bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
 				bind(LSPScorerFactory.class).toInstance( () -> new MyLSPScorer());
 				bind(CarrierStrategyManager.class).toProvider(() -> {
-					CarrierStrategyManager strategyManager = FreightUtils.createDefaultCarrierStrategyManager();
+					CarrierStrategyManager strategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
 					return strategyManager;
 				});
 				bind(LSPStrategyManager.class).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new PlanCalcScoreConfigGroup())), null, 1);
+					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
 					strategyManager.addStrategy(new RandomDistributionAllShipmentsStrategyFactory().createStrategy(), null, 1);
 					strategyManager.setMaxPlansPerAgent(2);
 					strategyManager.setPlanSelectorForRemoval(new WorstPlanForRemovalSelector());
@@ -111,15 +110,15 @@ public class WorstPlanSelectorTest {
 	private Config prepareConfig() {
 		Config config = ConfigUtils.createConfig();
 
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setLastIteration(10);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setLastIteration(10);
 
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setWriteEventsInterval(1);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setWriteEventsInterval(1);
 
-		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
+		FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 
 		return config;
 	}
@@ -143,10 +142,10 @@ public class WorstPlanSelectorTest {
 		// A plan with one logistic chain, containing a single carrier is created
 		LSPPlan lspPlan_singleChain;
 		{
-			Carrier singleCarrier = CarrierUtils.createCarrier(Id.create("singleCarrier", Carrier.class));
+			Carrier singleCarrier = CarriersUtils.createCarrier(Id.create("singleCarrier", Carrier.class));
 			singleCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-			CarrierUtils.addCarrierVehicle(singleCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_EXPENSIVE));
+			CarriersUtils.addCarrierVehicle(singleCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_EXPENSIVE));
 			LSPResource singleCarrierResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(singleCarrier, network)
 					.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 					.build();
@@ -172,10 +171,10 @@ public class WorstPlanSelectorTest {
 		{
 			LogisticChainElement southCarrierElement;
 			{
-				Carrier carrierSouth = CarrierUtils.createCarrier(Id.create("carrierSouth", Carrier.class));
+				Carrier carrierSouth = CarriersUtils.createCarrier(Id.create("carrierSouth", Carrier.class));
 				carrierSouth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-				CarrierUtils.addCarrierVehicle(carrierSouth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_CHEAP));
+				CarriersUtils.addCarrierVehicle(carrierSouth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_SOUTH_LINK_ID, VEH_TYPE_CHEAP));
 				LSPResource carrierSouthResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(carrierSouth, network)
 						.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 						.build();
@@ -187,10 +186,10 @@ public class WorstPlanSelectorTest {
 
 			LogisticChainElement northCarrierElement;
 			{
-				Carrier carrierNorth = CarrierUtils.createCarrier(Id.create("CarrierNorth", Carrier.class));
+				Carrier carrierNorth = CarriersUtils.createCarrier(Id.create("CarrierNorth", Carrier.class));
 				carrierNorth.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-				CarrierUtils.addCarrierVehicle(carrierNorth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_NORTH_LINK_ID, VEH_TYPE_CHEAP));
+				CarriersUtils.addCarrierVehicle(carrierNorth, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_NORTH_LINK_ID, VEH_TYPE_CHEAP));
 				LSPResource carrierNorthResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(carrierNorth, network)
 						.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 						.build();

@@ -20,7 +20,7 @@
 
 package lsp;
 
-import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.freight.carriers.Carrier;
 
 public interface LSPCarrierResource extends LSPResource {
 

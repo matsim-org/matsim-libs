@@ -23,22 +23,17 @@ package lsp.resourceImplementations.transshipmentHub;
 import lsp.LSPResource;
 import lsp.LSPSimulationTracker;
 import lsp.LogisticChainElement;
-import lsp.resourceImplementations.ResourceImplementationUtils;
 import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.Tour;
-import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
-import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.controler.FreightUtils;
-import org.matsim.contrib.freight.events.CarrierTourEndEvent;
-import org.matsim.contrib.freight.events.eventhandler.FreightTourEndEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.Tour.ServiceActivity;
+import org.matsim.freight.carriers.Tour.TourElement;
+import org.matsim.freight.carriers.events.CarrierTourEndEvent;
+import org.matsim.freight.carriers.events.eventhandler.FreightTourEndEventHandler;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -98,7 +93,7 @@ public class TransshipmentHubTourEndEventHandler implements AfterMobsimListener,
 	@Override
 	public void handleEvent(CarrierTourEndEvent event) {
 		Tour tour = null;
-		Carrier carrier = FreightUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
+		Carrier carrier = CarriersUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
 //		if (ResourceImplementationUtils.getCarrierType(carrier).equals(ResourceImplementationUtils.CARRIER_TYPE.mainRunCarrier)) { //Todo müsste auch für Collection Carrier gehen, aber da muss hub funktionalität eh geprüft werden, KMT 21.09.23
 			Collection<ScheduledTour> scheduledTours = carrier.getSelectedPlan().getScheduledTours();
 			for (ScheduledTour scheduledTour : scheduledTours) {

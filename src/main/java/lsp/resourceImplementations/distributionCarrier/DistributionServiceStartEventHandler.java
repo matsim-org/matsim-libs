@@ -28,11 +28,11 @@ import lsp.shipment.ShipmentLeg;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.events.CarrierServiceStartEvent;
-import org.matsim.contrib.freight.events.eventhandler.FreightServiceStartEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.freight.carriers.CarrierService;
+import org.matsim.freight.carriers.events.CarrierServiceStartEvent;
+import org.matsim.freight.carriers.events.eventhandler.FreightServiceStartEventHandler;
 
 public class DistributionServiceStartEventHandler implements AfterMobsimListener, FreightServiceStartEventHandler, LSPSimulationTracker<LSPShipment> {
 // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way to do the junit testing. kmt jun'23

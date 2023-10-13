@@ -25,9 +25,9 @@ import lsp.LSPResource;
 import lsp.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierService;
+import org.matsim.freight.carriers.TimeWindow;
 
 import java.util.ArrayList;
 import java.util.Comparator;

@@ -11,11 +11,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
-import org.matsim.contrib.freight.controler.CarrierStrategyManager;
-import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -27,6 +22,10 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.controler.CarrierControlerUtils;
+import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
+import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
@@ -85,7 +84,7 @@ public class ExampleMultipleOneEchelonChains {
 				bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
 				bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
 				bind(CarrierStrategyManager.class).toProvider(() -> {
-					CarrierStrategyManager strategyManager = FreightUtils.createDefaultCarrierStrategyManager();
+					CarrierStrategyManager strategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
 					return strategyManager;
 				});
@@ -114,15 +113,15 @@ public class ExampleMultipleOneEchelonChains {
 			}
 			ConfigUtils.applyCommandline(config,args);
 		} else {
-			config.controler().setOutputDirectory("output/multipleOneEchelonChains_" + demandSetting);
-			config.controler().setLastIteration(2);
+			config.controller().setOutputDirectory("output/multipleOneEchelonChains_" + demandSetting);
+			config.controller().setLastIteration(2);
 		}
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setWriteEventsInterval(1);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setWriteEventsInterval(1);
 
-		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
+		FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 
 		return config;
 	}
@@ -148,10 +147,10 @@ public class ExampleMultipleOneEchelonChains {
 		// A plan with one logistic chain, containing a single carrier is created
 		LSPPlan singleOneEchelonChainPlan;
 		{
-			Carrier singleCarrier = CarrierUtils.createCarrier(Id.create("singleCarrier", Carrier.class));
+			Carrier singleCarrier = CarriersUtils.createCarrier(Id.create("singleCarrier", Carrier.class));
 			singleCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-			CarrierUtils.addCarrierVehicle(singleCarrier, CarrierVehicle.newInstance(Id.createVehicleId("veh_large"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
+			CarriersUtils.addCarrierVehicle(singleCarrier, CarrierVehicle.newInstance(Id.createVehicleId("veh_large"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
 			LSPResource singleCarrierResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(singleCarrier, network)
 					.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 					.build();
@@ -175,10 +174,10 @@ public class ExampleMultipleOneEchelonChains {
 		{
 			LogisticChainElement leftCarrierElement;
 			{
-				Carrier carrierLeft = CarrierUtils.createCarrier(Id.create("carrierLeft", Carrier.class));
+				Carrier carrierLeft = CarriersUtils.createCarrier(Id.create("carrierLeft", Carrier.class));
 				carrierLeft.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-				CarrierUtils.addCarrierVehicle(carrierLeft, CarrierVehicle.newInstance(Id.createVehicleId("veh_small"), DEPOT_LINK_ID, VEH_TYPE_SMALL_05));
+				CarriersUtils.addCarrierVehicle(carrierLeft, CarrierVehicle.newInstance(Id.createVehicleId("veh_small"), DEPOT_LINK_ID, VEH_TYPE_SMALL_05));
 				LSPResource carrierLeftResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(carrierLeft, network)
 						.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 						.build();
@@ -190,10 +189,10 @@ public class ExampleMultipleOneEchelonChains {
 
 			LogisticChainElement rightCarrierElement;
 			{
-				Carrier carrierRight = CarrierUtils.createCarrier(Id.create("carrierRight", Carrier.class));
+				Carrier carrierRight = CarriersUtils.createCarrier(Id.create("carrierRight", Carrier.class));
 				carrierRight.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-				CarrierUtils.addCarrierVehicle(carrierRight, CarrierVehicle.newInstance(Id.createVehicleId("veh_small"), DEPOT_LINK_ID, VEH_TYPE_SMALL_05));
+				CarriersUtils.addCarrierVehicle(carrierRight, CarrierVehicle.newInstance(Id.createVehicleId("veh_small"), DEPOT_LINK_ID, VEH_TYPE_SMALL_05));
 				LSPResource carrierRightResource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(carrierRight, network)
 						.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 						.build();

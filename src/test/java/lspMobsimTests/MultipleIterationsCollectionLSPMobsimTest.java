@@ -21,11 +21,11 @@
 package lspMobsimTests;
 
 import lsp.*;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import lsp.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentUtils;
-import lsp.resourceImplementations.ResourceImplementationUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,11 +33,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.controler.CarrierStrategyManager;
-import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -49,6 +44,10 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.controler.CarrierControlerUtils;
+import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
@@ -72,8 +71,8 @@ public class MultipleIterationsCollectionLSPMobsimTest {
 		Config config = new Config();
 		config.addCoreModules();
 
-		var freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
+		var freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -99,7 +98,7 @@ public class MultipleIterationsCollectionLSPMobsimTest {
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
-		Carrier carrier = CarrierUtils.createCarrier(carrierId);
+		Carrier carrier = CarriersUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
 
@@ -184,16 +183,16 @@ public class MultipleIterationsCollectionLSPMobsimTest {
 			@Override public void install(){
 				bind( LSPStrategyManager.class ).toInstance( new LSPModule.LSPStrategyManagerEmptyImpl() );
 				bind( CarrierStrategyManager.class ).toProvider(() -> {
-					CarrierStrategyManager strategyManager = FreightUtils.createDefaultCarrierStrategyManager();
+					CarrierStrategyManager strategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new RandomPlanSelector<>()), null, 1);
 					return strategyManager;
 				});
 			}
 		} );
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(1 + MatsimRandom.getRandom().nextInt(10));
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setFirstIteration(0);
+		config.controller().setLastIteration(1 + MatsimRandom.getRandom().nextInt(10));
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
 		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 		controler.run();

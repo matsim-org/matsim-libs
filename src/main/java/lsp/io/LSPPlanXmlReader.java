@@ -24,9 +24,9 @@ import lsp.LSPConstants;
 import lsp.LSPs;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.freight.carriers.Carriers;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 

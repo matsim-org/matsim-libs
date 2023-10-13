@@ -34,9 +34,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -45,6 +42,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -54,7 +53,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import static lsp.resourceImplementations.ResourceImplementationUtils.*;
+import static lsp.resourceImplementations.ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler;
+import static lsp.resourceImplementations.ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner;
 import static org.junit.Assert.*;
 
 public class CollectionLSPMobsimTest {
@@ -73,12 +73,12 @@ public class CollectionLSPMobsimTest {
 		// create config:
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(0);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setFirstIteration(0);
+		config.controller().setLastIteration(0);
 
-		var freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
+		var freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 
 		// load scenario:
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -106,7 +106,7 @@ public class CollectionLSPMobsimTest {
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
-		carrier = CarrierUtils.createCarrier(carrierId);
+		carrier = CarriersUtils.createCarrier(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
 

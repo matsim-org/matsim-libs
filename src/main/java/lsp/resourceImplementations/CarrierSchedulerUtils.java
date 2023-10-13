@@ -6,11 +6,11 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
-import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-import org.matsim.contrib.freight.jsprit.NetworkRouter;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierPlan;
+import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
+import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
+import org.matsim.freight.carriers.jsprit.NetworkRouter;
 
 import java.util.Collection;
 import java.util.List;

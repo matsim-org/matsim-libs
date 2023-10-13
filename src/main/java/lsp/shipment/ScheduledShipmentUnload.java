@@ -23,8 +23,8 @@ package lsp.shipment;
 import lsp.LSPResource;
 import lsp.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierService;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierService;
 
 class ScheduledShipmentUnload implements ShipmentPlanElement {
 

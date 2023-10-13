@@ -33,11 +33,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
-import org.matsim.contrib.freight.controler.CarrierStrategyManager;
-import org.matsim.contrib.freight.controler.FreightUtils;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -51,6 +46,10 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.controler.CarrierControlerUtils;
+import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
+import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
@@ -134,7 +133,7 @@ final class ExampleTwoEchelonGrid {
 
 				bind( CarrierScoringFunctionFactory.class ).toInstance(carrierScorer);
 				bind( CarrierStrategyManager.class ).toProvider(() -> {
-					CarrierStrategyManager strategyManager = FreightUtils.createDefaultCarrierStrategyManager();
+					CarrierStrategyManager strategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
 					return strategyManager;
 				});
@@ -175,16 +174,16 @@ final class ExampleTwoEchelonGrid {
 
 			CommandLine cmd = ConfigUtils.getCommandLine(args);
 		} else {
-			config.controler().setOutputDirectory("output/2echelon_"+demandSetting +  "_"  + costSetting  + "_"  + HUBCOSTS_FIX+ "_"  + TOLL_VALUE);
-			config.controler().setLastIteration(2);
+			config.controller().setOutputDirectory("output/2echelon_"+demandSetting +  "_"  + costSetting  + "_"  + HUBCOSTS_FIX+ "_"  + TOLL_VALUE);
+			config.controller().setLastIteration(2);
 		}
 
 		config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setWriteEventsInterval(1);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setWriteEventsInterval(1);
 
-		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-		freightConfig.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.ignore);
+		FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 
 		return config;
 	}
@@ -212,10 +211,10 @@ final class ExampleTwoEchelonGrid {
 		{
 			log.info("Create lspPlan for direct delivery");
 
-			Carrier directCarrier = CarrierUtils.createCarrier(Id.create("directCarrier", Carrier.class));
+			Carrier directCarrier = CarriersUtils.createCarrier(Id.create("directCarrier", Carrier.class));
 			directCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-			CarrierUtils.addCarrierVehicle(directCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
+			CarriersUtils.addCarrierVehicle(directCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
 			LSPResource directCarrierRessource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(directCarrier, network)
 					.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 					.build();
@@ -239,10 +238,10 @@ final class ExampleTwoEchelonGrid {
 		{
 			log.info("Create lspPlan with Hub");
 
-			Carrier mainCarrier = CarrierUtils.createCarrier(Id.create("mainCarrier", Carrier.class));
+			Carrier mainCarrier = CarriersUtils.createCarrier(Id.create("mainCarrier", Carrier.class));
 			mainCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-			CarrierUtils.addCarrierVehicle(mainCarrier, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
+			CarriersUtils.addCarrierVehicle(mainCarrier, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
 			LSPResource mainCarrierRessource = MainRunCarrierUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier, network)
 					.setFromLinkId(DEPOT_LINK_ID)
 					.setMainRunCarrierScheduler(MainRunCarrierUtils.createDefaultMainRunCarrierScheduler())
@@ -270,7 +269,7 @@ final class ExampleTwoEchelonGrid {
 					.setResource(hubResource)
 					.build(); //Nicht unbedingt nötig, aber nehme den alten Hub nun als Depot. Waren werden dann dort "Zusammengestellt".
 
-			Carrier distributionCarrier = CarrierUtils.createCarrier(Id.create("distributionCarrier", Carrier.class));
+			Carrier distributionCarrier = CarriersUtils.createCarrier(Id.create("distributionCarrier", Carrier.class));
 			distributionCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
 			final VehicleType vehType;
@@ -279,7 +278,7 @@ final class ExampleTwoEchelonGrid {
 				case lowerCost4LastMile -> 	vehType = VEH_TYPE_SMALL_05;
 				default -> throw new IllegalStateException("Unexpected value: " + costSetting);
 			}
-			CarrierUtils.addCarrierVehicle(distributionCarrier, CarrierVehicle.newInstance(Id.createVehicleId("distributionTruck"), HUB_LINK_ID, vehType));
+			CarriersUtils.addCarrierVehicle(distributionCarrier, CarrierVehicle.newInstance(Id.createVehicleId("distributionTruck"), HUB_LINK_ID, vehType));
 			LSPResource distributionCarrierRessource = DistributionCarrierUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier, network)
 					.setDistributionScheduler(DistributionCarrierUtils.createDefaultDistributionCarrierScheduler())
 					.build();

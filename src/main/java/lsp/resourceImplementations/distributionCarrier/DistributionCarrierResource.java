@@ -24,8 +24,8 @@ import lsp.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierVehicle;
 
 import java.util.Collection;
 
