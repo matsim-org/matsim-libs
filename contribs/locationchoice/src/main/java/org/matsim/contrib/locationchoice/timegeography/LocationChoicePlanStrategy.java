@@ -34,13 +34,13 @@ public class LocationChoicePlanStrategy implements PlanStrategy {
 				delegate = new PlanStrategyImpl( new BestPlanSelector() );
 				break;
 			case "ChangeExpBeta":
-				delegate = new PlanStrategyImpl( new ExpBetaPlanChanger( scenario.getConfig().planCalcScore().getBrainExpBeta() ) );
+				delegate = new PlanStrategyImpl( new ExpBetaPlanChanger( scenario.getConfig().scoring().getBrainExpBeta() ) );
 				break;
 			case "SelectRandom":
 				delegate = new PlanStrategyImpl( new RandomPlanSelector() );
 				break;
 			default:
-				delegate = new PlanStrategyImpl( new ExpBetaPlanSelector( scenario.getConfig().planCalcScore() ) );
+				delegate = new PlanStrategyImpl( new ExpBetaPlanSelector( scenario.getConfig().scoring() ) );
 				break;
 		}
 		delegate.addStrategyModule(new DestinationChoice( tripRouterProvider, scenario, timeInterpretation) );

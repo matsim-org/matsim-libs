@@ -10,10 +10,9 @@
 
   <module name="travelTimeCalculator" >
     <param name="travelTimeBinSize" value="900" />
-    <param name="travelTimeCalculator" value="TravelTimeCalculatorArray" />
   </module>
 
-	
+
 	<module name="network">
 		<param name="inputNetworkFile" value="../network.xml" />
 	</module>
@@ -21,7 +20,7 @@
 	<module name="plans">
 		<param name="inputPlansFile" value="../plans.xml" />
 	</module>
-	
+
 	<module name="locationchoice">
 		<param name="restraintFcnFactor" value="0.131687242798"/> <!-- factor of the fac.cap.restraint function -->
 		<param name="restraintFcnExp" value="5.0"/> <!-- exponent of the fac.cap.restraint function -->
@@ -32,12 +31,12 @@
 		<param name="flexible_types" value="s,l,w" />
 		<param name="algorithm" value="random" />
 	</module>
-		
+
 	<module name="facilities" >
 		<param name="inputFacilitiesFile" value="../facilities.xml" />
 		<param name="facilitiesSource" value="fromFile" />
-	</module>	
-	
+	</module>
+
 	<module name="qsim">
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="07:00:00" />
@@ -94,5 +93,5 @@
 			<param name="monetaryDistanceRate" value="0.0" />
 		</parameterset>
 	</module>
-	
+
 </config>

@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -97,9 +96,9 @@ public class CountsReprojectionIOTest {
 		// TODO: test also with loading from Controler C'tor?
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 
-		config.controler().setLastIteration( 0 );
+		config.controller().setLastIteration( 0 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
-		config.controler().setOutputDirectory( outputDirectory );
+		config.controller().setOutputDirectory( outputDirectory );
 
 		final Controler controler = new Controler( scenario );
 		controler.run();

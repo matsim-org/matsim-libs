@@ -129,7 +129,7 @@ public final class PBox implements POperators {
 		this.operators.addAll(operatorsFromSchedule);
 
 		// init initial set of operators - reduced by the number of preset operators
-		LinkedList<Operator> initialOperators = this.operatorInitializer.createAdditionalOperators(this.strategyManager, event.getServices().getConfig().controler().getFirstIteration(), (this.pConfig.getNumberOfOperators() - operatorsFromSchedule.size()));
+		LinkedList<Operator> initialOperators = this.operatorInitializer.createAdditionalOperators(this.strategyManager, event.getServices().getConfig().controller().getFirstIteration(), (this.pConfig.getNumberOfOperators() - operatorsFromSchedule.size()));
 		this.operators.addAll(initialOperators);
 
 		// collect the transit schedules from all operators

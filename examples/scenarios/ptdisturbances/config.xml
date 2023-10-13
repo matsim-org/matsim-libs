@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
-	<module name="controler" >
+	<module name="controller" >
 		<!-- Default=1000;  -->
 		<param name="lastIteration" value="0" />
 		<param name="outputDirectory" value="./scenarios/ptdisturbances/output/pt3-pt5" />
@@ -15,7 +15,7 @@
 	<module name="network" >
 		<param name="inputNetworkFile" value="./network.xml" />
 	</module>
-	<module name="planCalcScore" >
+	<module name="scoring" >
 		<param name="writeExperiencedPlans" value="true" />
 		<parameterset type="scoringParameters" >
 			<parameterset type="activityParams" >
@@ -56,7 +56,7 @@
 	<module name="plans" >
 		<param name="inputPlansFile" value="./population_pt3-pt5.xml" />
 	</module>
-	<module name="planscalcroute" >
+	<module name="routing" >
 		<parameterset type="teleportedModeParameters" >
 			<param name="mode" value="bike" />
 			<param name="teleportedModeSpeed" value="4.166666666666667" />

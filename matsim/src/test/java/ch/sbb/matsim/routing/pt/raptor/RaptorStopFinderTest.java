@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package ch.sbb.matsim.routing.pt.raptor;
 
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
@@ -16,7 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.DefaultRoutingRequest;
@@ -43,8 +62,8 @@ import java.util.Map;
 
 public class RaptorStopFinderTest {
 
-    private Facility fromFac = new FakeFacility(new Coord(0, 0), Id.create("AA", Link.class)); // stop A
-    private Facility toFac = new FakeFacility(new Coord(100000, 0), Id.create("XX", Link.class)); // stop X
+    private final Facility fromFac = new FakeFacility(new Coord(0, 0), Id.create("AA", Link.class)); // stop A
+    private final Facility toFac = new FakeFacility(new Coord(100000, 0), Id.create("XX", Link.class)); // stop X
 
 
     /** Empty Initial Search Radius
@@ -56,10 +75,10 @@ public class RaptorStopFinderTest {
      *
      * This functionality is tested for the two RaptorStopFinders: 1) DefaultStopFinder and 2) RandomAccessEgressModeRaptorStopFinder
      * For each RaptorStopFinder there is one test where StopFilterAttributes are not used to exlclude stops, and one test
-     * where StopFilterAttributes are used. 
+     * where StopFilterAttributes are used.
      */
-    
-    
+
+
     @Test
     public void testDefaultStopFinder_EmptyInitialSearchRadius() {
         /* General Radius includes no stops. Search_Extension_Radius is 0
@@ -88,9 +107,9 @@ public class RaptorStopFinderTest {
             List<? extends PlanElement> legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson));
 
             Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
-            
+
         }
-        
+
         /* General Radius includes stop B. Search_Extension_Radius is 0.
         Expected: Stop Finder will only find stop B. Lines C, D, and E are set to very fast, so as to check that only
         stop B is included.
@@ -215,9 +234,9 @@ public class RaptorStopFinderTest {
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
             List<? extends PlanElement> legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson));
-            
+
             Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
-            
+
         }
 
         /* General Radius includes stop B. Search_Extension_Radius is 0.
@@ -405,9 +424,9 @@ public class RaptorStopFinderTest {
             List<? extends PlanElement> legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson));
 
             Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
-            
+
         }
-        
+
         /* General Radius includes stop B. Search_Extension_Radius is 0.
         Expected: Stop Finder will only find stop B. Lines C, D, and E are set to very fast, so as to check that only
         stop B is included.
@@ -535,7 +554,7 @@ public class RaptorStopFinderTest {
             List<? extends PlanElement> legs = raptor.calcRoute(DefaultRoutingRequest.withoutAttributes(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson));
 
             Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
-            
+
         }
 
         /* General Radius includes stop B. Search_Extension_Radius is 0.
@@ -709,7 +728,7 @@ public class RaptorStopFinderTest {
      *
      * This functionality is tested for the two RaptorStopFinders: 1) DefaultStopFinder and 2) RandomAccessEgressModeRaptorStopFinder
      * For each RaptorStopFinder there is one test where StopFilterAttributes are not used to exlclude stops, and one test
-     * where StopFilterAttributes are used. 
+     * where StopFilterAttributes are used.
      */
     @Test
     public void testDefaultStopFinder_HalfFullInitialSearchRadius() {
@@ -1213,7 +1232,7 @@ public class RaptorStopFinderTest {
      *
      * This functionality is tested for the two RaptorStopFinders: 1) DefaultStopFinder and 2) RandomAccessEgressModeRaptorStopFinder
      * For each RaptorStopFinder there is one test where StopFilterAttributes are not used to exlclude stops, and one test
-     * where StopFilterAttributes are used. 
+     * where StopFilterAttributes are used.
      */
     @Test
     public void testDefaultStopFinder_FullInitialSearchRadius() {
@@ -1666,9 +1685,9 @@ public class RaptorStopFinderTest {
             routingModules.put("zoomer",
                     new TeleportationRoutingModule("zoomer", f0.scenario, 1000., 1.));
 
-            PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("zoomer");
+            ScoringConfigGroup.ModeParams modeParams = new ScoringConfigGroup.ModeParams("zoomer");
             modeParams.setMarginalUtilityOfTraveling(0.);
-            f0.scenario.getConfig().planCalcScore().addModeParams(modeParams);
+            f0.scenario.getConfig().scoring().addModeParams(modeParams);
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet zoomerAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -1732,9 +1751,9 @@ public class RaptorStopFinderTest {
             routingModules.put("zoomer",
                     new TeleportationRoutingModule("zoomer", f0.scenario, 1000., 1.));
 
-            PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("zoomer");
+            ScoringConfigGroup.ModeParams modeParams = new ScoringConfigGroup.ModeParams("zoomer");
             modeParams.setMarginalUtilityOfTraveling(0.);
-            f0.scenario.getConfig().planCalcScore().addModeParams(modeParams);
+            f0.scenario.getConfig().scoring().addModeParams(modeParams);
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet zoomerAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();

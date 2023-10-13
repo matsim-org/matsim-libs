@@ -215,9 +215,9 @@ public class PopulationReprojectionIOIT {
 				ProjectionUtils.getCRS(scenario.getPopulation()));
 
 		// do not perform ANY mobsim run
-		config.controler().setLastIteration( -1 );
+		config.controller().setLastIteration( -1 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
-		config.controler().setOutputDirectory( outputDirectory );
+		config.controller().setOutputDirectory( outputDirectory );
 		final Controler controler = new Controler( scenario );
 		controler.run();
 
@@ -319,9 +319,9 @@ public class PopulationReprojectionIOIT {
 		}
 
 		// do not perform ANY mobsim run
-		config.controler().setLastIteration( -1 );
+		config.controller().setLastIteration( -1 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
-		config.controler().setOutputDirectory( outputDirectory );
+		config.controller().setOutputDirectory( outputDirectory );
 		final Controler controler = new Controler( scenario );
 		controler.run();
 

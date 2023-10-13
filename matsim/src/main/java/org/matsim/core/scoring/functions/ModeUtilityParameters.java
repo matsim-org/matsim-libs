@@ -21,7 +21,7 @@
 
  package org.matsim.core.scoring.functions;
 
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 
 /**
  * Class that stores parameters used from the scoring functions
@@ -38,7 +38,7 @@ public class ModeUtilityParameters {
 
 		public Builder() {}
 
-		public Builder( PlanCalcScoreConfigGroup.ModeParams params ) {
+		public Builder( ScoringConfigGroup.ModeParams params ) {
 			this.marginalUtilityOfTraveling_s = params.getMarginalUtilityOfTraveling() / 3600.0;
 			this.marginalUtilityOfDistance_m = params.getMarginalUtilityOfDistance();
 			this.monetaryDistanceRate = params.getMonetaryDistanceRate();
@@ -61,7 +61,7 @@ public class ModeUtilityParameters {
 			this.monetaryDistanceRate = monetaryDistanceRate;
 			return this;
 		}
-		
+
 		public Builder setConstant(double constant) {
 			this.constant = constant;
 			return this;
@@ -71,7 +71,7 @@ public class ModeUtilityParameters {
 			this.dailyMoneyConstant = dailyMoneyConstant;
 			return this;
 		}
-		
+
 		public Builder setDailyUtilityConstant(double dailyUtilityConstant) {
 			this.dailyUtilityConstant = dailyUtilityConstant;
 			return this;

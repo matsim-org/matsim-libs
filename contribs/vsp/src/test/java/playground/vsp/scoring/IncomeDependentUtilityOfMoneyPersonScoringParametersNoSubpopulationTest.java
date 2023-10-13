@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -37,9 +37,9 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersNoSubpopulation
 	public void setUp() {
 		TransitConfigGroup transitConfigGroup = new TransitConfigGroup();
 		ScenarioConfigGroup scenarioConfigGroup = new ScenarioConfigGroup();
-		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = new PlanCalcScoreConfigGroup();
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
 
-		PlanCalcScoreConfigGroup.ScoringParameterSet defaultParams = planCalcScoreConfigGroup.getOrCreateScoringParameters(null);
+		ScoringConfigGroup.ScoringParameterSet defaultParams = scoringConfigGroup.getOrCreateScoringParameters(null);
 		defaultParams.setMarginalUtilityOfMoney(20);
 		defaultParams.setMarginalUtlOfWaitingPt_utils_hr(0.5d * 3600);
 
@@ -69,7 +69,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersNoSubpopulation
 
 		}
 		personScoringParams = new IncomeDependentUtilityOfMoneyPersonScoringParameters(population,
-				planCalcScoreConfigGroup,
+			scoringConfigGroup,
 				scenarioConfigGroup,
 				transitConfigGroup);
 	}

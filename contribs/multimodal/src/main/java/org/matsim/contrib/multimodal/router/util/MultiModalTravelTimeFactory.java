@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 
@@ -79,19 +79,19 @@ public class MultiModalTravelTimeFactory implements MatsimFactory {
 
 	private void initMultiModalTravelTimeFactories(Config config) {
 
-		PlansCalcRouteConfigGroup plansCalcRouteConfigGroup = config.plansCalcRoute();
+		RoutingConfigGroup routingConfigGroup = config.routing();
         MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) config.getModule(MultiModalConfigGroup.GROUP_NAME);
         Set<String> simulatedModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
 
 		for (String mode : simulatedModes) {
 			if (mode.equals(TransportMode.walk)) {
-				Provider<TravelTime> factory = new WalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
+				Provider<TravelTime> factory = new WalkTravelTimeFactory(routingConfigGroup, linkSlopes);
 				this.factories.put(mode, factory);
 			} else if (mode.equals(TransportMode.transit_walk)) {
-				Provider<TravelTime> factory = new TransitWalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
+				Provider<TravelTime> factory = new TransitWalkTravelTimeFactory(routingConfigGroup, linkSlopes);
 				this.factories.put(mode, factory);
 			} else if (mode.equals(TransportMode.bike)) {
-				Provider<TravelTime> factory = new BikeTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
+				Provider<TravelTime> factory = new BikeTravelTimeFactory(routingConfigGroup, linkSlopes);
 				this.factories.put(mode, factory);
 			} else {
 				Provider<TravelTime> factory = getTravelTimeFactory(mode);
@@ -101,7 +101,7 @@ public class MultiModalTravelTimeFactory implements MatsimFactory {
 							"Use a constructor where you provide the travel time objects. " +
 							"Using a UnknownTravelTime calculator based on constant speed." +
 							"Agent specific attributes are not taken into account!");
-					factory = new UnknownTravelTimeFactory(mode, plansCalcRouteConfigGroup);
+					factory = new UnknownTravelTimeFactory(mode, routingConfigGroup);
 					this.factories.put(mode, factory);
 				} else {
 					log.info("Found additional travel time factory from type " + factory.getClass().toString() +

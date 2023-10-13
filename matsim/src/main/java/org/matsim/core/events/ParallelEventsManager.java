@@ -59,7 +59,7 @@ public final class ParallelEventsManager implements EventsManager {
 
 	@Inject
 	ParallelEventsManager(Config config) {
-		this(config.parallelEventHandling().getSynchronizeOnSimSteps() != null ? config.parallelEventHandling().getSynchronizeOnSimSteps() : true, config.parallelEventHandling().getEventsQueueSize());
+		this(config.eventsManager().getSynchronizeOnSimSteps() != null ? config.eventsManager().getSynchronizeOnSimSteps() : true, config.eventsManager().getEventsQueueSize());
 
 	}
 

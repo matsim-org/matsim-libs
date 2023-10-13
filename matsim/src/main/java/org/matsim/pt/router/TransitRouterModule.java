@@ -32,8 +32,7 @@ public class TransitRouterModule extends AbstractModule {
         if (getConfig().transit().isUseTransit()) {
             switch (getConfig().transit().getRoutingAlgorithmType()) {
                 case DijkstraBased:
-                    bind(TransitRouter.class).toProvider(TransitRouterImplFactory.class);
-                    break;
+                    throw new RuntimeException("'DijkstraBased' is no longer supported as a transit routing algorithm. Use 'SwissRailRaptor' instead.");
                 case SwissRailRaptor:
                     install(new SwissRailRaptorModule());
                     break;

@@ -27,11 +27,10 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.carrier.Tour.Pickup;
-import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
-import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.controler.FreightUtils;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.Tour.Pickup;
+import org.matsim.freight.carriers.Tour.ServiceActivity;
+import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -278,7 +277,7 @@ public class TrafficVolumeGeneration {
 			HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
 			HashMap<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop) {
 
-		for (Carrier carrier : FreightUtils.addOrGetCarriers(scenario).getCarriers().values()) {
+		for (Carrier carrier : CarriersUtils.addOrGetCarriers(scenario).getCarriers().values()) {
 			if (!carrier.getAttributes().getAsMap().containsKey("subpopulation")
 					|| !carrier.getAttributes().getAttribute("subpopulation").equals(smallScaleCommercialTrafficType))
 				continue;

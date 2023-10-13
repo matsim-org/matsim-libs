@@ -36,24 +36,24 @@ import java.io.IOException;
 /**
  * This class contains a simple example how to visualize a simple scenario
  * with signalized intersections.
- * 
+ *
  * @author dgrether
  */
-public class VisualizeSignalScenario {	
+public class VisualizeSignalScenario {
 
 	private static final String INPUT_DIR = "./examples/tutorial/example90TrafficLights/useSignalInput/woLanes/";
-	
+
 	public static void run(boolean startOtfvis) throws IOException {
 		// --- load the configuration file
 		Config config = ConfigUtils.loadConfig(INPUT_DIR + "config.xml");
-		config.controler().setLastIteration(0);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		
+		config.controller().setLastIteration(0);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+
 		// --- create the scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		// load the information about signals data (i.e. fill the SignalsData object) and add it to the scenario as scenario element
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
-		
+
 		// --- create the controler
 		Controler c = new Controler(scenario);
 		// add the signals module to the simulation such that SignalsData is not only
@@ -64,11 +64,11 @@ public class VisualizeSignalScenario {
 			// add the module that start the otfvis visualization with signals
 			c.addOverridingModule(new OTFVisWithSignalsLiveModule());
 		}
-		
+
 		// --- run the simulation
 		c.run();
 	}
-	
+
 	public static void main(String[] args) throws IOException {
 		run(true);
 	}

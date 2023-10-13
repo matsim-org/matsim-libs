@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 
 package playground.vsp.congestion.controler;
@@ -51,30 +51,30 @@ public class MarginalCongestionPricingContolerListener implements StartupListene
 
 	private double factor = 1.0;
 	private MarginalCongestionPricingHandler pricingHandler;
-	
+
 	/**
 	 * @param scenario
 	 * @param tollHandler
-	 * @param handler must be one of the implementation for congestion pricing 
+	 * @param handler must be one of the implementation for congestion pricing
 	 */
 	public MarginalCongestionPricingContolerListener(Scenario scenario, TollHandler tollHandler, EventHandler congestionHandler){
 		this (scenario, tollHandler, congestionHandler, 1.0);
 	}
-	
+
 	public MarginalCongestionPricingContolerListener(Scenario scenario, TollHandler tollHandler, EventHandler congestionHandler, double factor){
 		this.scenario = scenario;
 		this.tollHandler = tollHandler;
 		this.congestionHandler = congestionHandler;
 		this.factor = factor;
 	}
-	
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		
+
 		EventsManager eventsManager = event.getServices().getEvents();
-		
+
 		this.pricingHandler = new MarginalCongestionPricingHandler(eventsManager, this.scenario, this.factor);
-		
+
 		eventsManager.addHandler(this.congestionHandler);
 		eventsManager.addHandler(this.pricingHandler);
 		eventsManager.addHandler(this.tollHandler);
@@ -82,13 +82,13 @@ public class MarginalCongestionPricingContolerListener implements StartupListene
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		
+
 		this.log.info("Set average tolls for each link Id and time bin...");
 		this.tollHandler.setLinkId2timeBin2avgToll();
 		this.log.info("Set average tolls for each link Id and time bin... Done.");
-		
+
 		// write out analysis every iteration
-		this.tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");
+		this.tollHandler.writeTollStats(this.scenario.getConfig().controller().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");
 	}
 
 }

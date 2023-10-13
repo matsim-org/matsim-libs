@@ -52,7 +52,7 @@ public class ShiftAnalysisControlerListener implements IterationEndsListener {
 
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
-        boolean createGraphs = event.getServices().getConfig().controler().isCreateGraphs();
+        boolean createGraphs = event.getServices().getConfig().controller().isCreateGraphs();
 
         writeAndPlotShiftDurationComparison(shiftDurationXY.getShift2plannedVsActualDuration(),
                 filename(event, "shiftDurationComparison", ".png"),
