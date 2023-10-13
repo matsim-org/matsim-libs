@@ -1,5 +1,7 @@
 package org.matsim.contrib.drt.extension.prebooking.dvrp;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,7 +20,9 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
 import com.google.common.base.Preconditions;
@@ -41,7 +45,7 @@ import com.google.common.base.Verify;
  * 
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
-public class PrebookingManager implements MobsimBeforeSimStepListener {
+public class PrebookingManager implements MobsimBeforeSimStepListener, MobsimBeforeCleanupListener {
 	private static final String PREBOOKED_REQUEST_PREFIX = "prebookedRequestId";
 
 	private final String mode;
@@ -60,6 +64,9 @@ public class PrebookingManager implements MobsimBeforeSimStepListener {
 	private final PriorityQueue<PrebookingQueueItem> prebookingQueue = new PriorityQueue<>();
 
 	private final IdMap<Request, PassengerRequest> prebookedRequests = new IdMap<>(Request.class);
+
+	private final List<Leg> prebookedLegs = new LinkedList<>();
+	private boolean cleanupFinished = false;
 
 	public PrebookingManager(String mode, Network network, PassengerRequestCreator requestCreator,
 			VrpOptimizer optimizer, PassengerRequestValidator requestValidator, EventsManager eventsManager) {
@@ -93,6 +100,7 @@ public class PrebookingManager implements MobsimBeforeSimStepListener {
 	}
 
 	public void prebook(Person person, Leg leg, double earliestDepartureTime, double submissionTime) {
+		Verify.verify(!cleanupFinished, "Attempting to prebook a request after Mobsim has finished");
 		this.prebookingQueue.add(new PrebookingQueueItem(person, leg, earliestDepartureTime, submissionTime));
 	}
 
@@ -127,7 +135,18 @@ public class PrebookingManager implements MobsimBeforeSimStepListener {
 
 				item.leg.getAttributes().putAttribute(requestAttribute, request.getId().toString());
 				prebookedRequests.put(request.getId(), request);
+				prebookedLegs.add(item.leg);
 			}
+		}
+	}
+
+	@Override
+	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e) {
+		// reset leg attributes for next iteration
+		cleanupFinished = true;
+
+		for (Leg leg : prebookedLegs) {
+			leg.getAttributes().removeAttribute(requestAttribute);
 		}
 	}
 
