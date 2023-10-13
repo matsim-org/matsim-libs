@@ -1,6 +1,5 @@
 package org.matsim.contrib.drt.extension.estimator;
 
-import com.google.inject.Inject;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.stat.regression.RegressionResults;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
@@ -54,7 +53,7 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 
 		// Speed-up iteration need to be ignored for the estimates
 		if (speedUpParams != null &&
-			DrtSpeedUp.isTeleportDrtUsers(speedUpParams, event.getServices().getConfig().controler(), event.getIteration())) {
+			DrtSpeedUp.isTeleportDrtUsers(speedUpParams, event.getServices().getConfig().controller(), event.getIteration())) {
 			return;
 		}
 
