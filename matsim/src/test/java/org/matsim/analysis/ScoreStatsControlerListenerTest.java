@@ -19,6 +19,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
@@ -480,7 +481,7 @@ public class ScoreStatsControlerListenerTest {
 		controllerConfigGroup.setCreateGraphs(true);
 		controllerConfigGroup.setFirstIteration(0);
 		controllerConfigGroup.setLastIteration(10);
-		ScoreStatsControlerListener scoreStatsControlerListener = new ScoreStatsControlerListener(controllerConfigGroup, population, controlerIO, null, null);
+		ScoreStatsControlerListener scoreStatsControlerListener = new ScoreStatsControlerListener(controllerConfigGroup, population, controlerIO, new Config());
 
 		String outDir = utils.getOutputDirectory() + "/ScoreStatsControlerListener";
 
@@ -520,7 +521,7 @@ public class ScoreStatsControlerListenerTest {
 
 	private void readAndValidateValues(String outDir,  int itr, Population population) throws IOException {
 
-		String file = outDir + "/scorestats.txt";
+		String file = outDir + "/scorestats.csv";
 		BufferedReader br;
 		String line;
 
@@ -552,10 +553,10 @@ public class ScoreStatsControlerListenerTest {
 			iteration++;
 		}
 
-		Assertions.assertThat(new File(outDir, "scorestats_group1.txt"))
+		Assertions.assertThat(new File(outDir, "scorestats_group1.csv"))
 			.isFile();
 
-		Assertions.assertThat(new File(outDir, "scorestats_group2.txt"))
+		Assertions.assertThat(new File(outDir, "scorestats_group2.csv"))
 			.isFile();
 	}
 
