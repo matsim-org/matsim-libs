@@ -63,7 +63,7 @@ public class CountsReaderMatsimV2 extends MatsimXmlParser {
 
 	private void startMeasurable(String tag, Attributes atts) {
 		int interval = Integer.parseInt(atts.getValue("interval"));
-		currMeasurable = currLocation.createMeasurable(atts.getValue("type"), atts.getValue("mode"), interval);
+		currMeasurable = currLocation.createMeasurable(atts.getValue("type"), atts.getValue("networkMode"), interval);
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})

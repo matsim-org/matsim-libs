@@ -140,7 +140,7 @@ final class CountsWriterV2 extends MatsimXmlWriter {
 
 			writeStartTag(Measurable.ELEMENT_NAME, List.of(
 				new Tuple<>("type", m.getMeasurableType()),
-				new Tuple<>("mode", m.getMode()),
+				new Tuple<>("networkMode", m.getMode()),
 				new Tuple<>("interval", String.valueOf(interval)))
 			);
 
