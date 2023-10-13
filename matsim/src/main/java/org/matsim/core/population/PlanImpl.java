@@ -131,7 +131,12 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 	public Id<Plan> getId() {
 		if(this.id!=null)
 			return this.id;
-		else return Id.create(this.getAttributes().getAttribute(PlanInheritanceModule.PLAN_ID).toString(),Plan.class);
+		else {
+			if(this.getAttributes().getAttribute(PlanInheritanceModule.PLAN_ID)!=null)
+				return Id.create(this.getAttributes().getAttribute(PlanInheritanceModule.PLAN_ID).toString(),Plan.class);
+			else return null;
+		}
+			
 	}
 
 	@Override

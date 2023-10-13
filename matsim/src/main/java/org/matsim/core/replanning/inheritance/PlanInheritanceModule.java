@@ -36,8 +36,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -85,9 +85,9 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		// initialize all default writers
-		CompressionType compressionType = event.getServices().getConfig().controler().getCompressionType();
+		CompressionType compressionType = event.getServices().getConfig().controller().getCompressionType();
 		this.planInheritanceRecordWriter = new PlanInheritanceRecordWriter(event.getServices().getControlerIO().getOutputFilename(FILENAME_PLAN_INHERITANCE_RECORDS + ".csv", compressionType));
-		this.strategies = this.getActiveStrategies(event.getServices().getConfig().strategy().getStrategySettings(), event.getServices().getStrategyManager());
+		this.strategies = this.getActiveStrategies(event.getServices().getConfig().replanning().getStrategySettings(), event.getServices().getStrategyManager());
 		this.selectedPlanStrategyShareWriter = this.initializeDistributionWriter(this.strategies, event.getServices().getControlerIO().getOutputFilename(FILENAME_PLAN_INHERITANCE_RECORDS + "_shares_selected.csv"));
 		this.planStrategyShareWriter = this.initializeDistributionWriter(this.strategies, event.getServices().getControlerIO().getOutputFilename(FILENAME_PLAN_INHERITANCE_RECORDS + "_shares.csv"));
 

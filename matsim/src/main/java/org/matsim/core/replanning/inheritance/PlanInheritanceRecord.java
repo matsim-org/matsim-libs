@@ -62,7 +62,7 @@ public class PlanInheritanceRecord {
 	/**
 	 * Iteration in which the plan had been removed from the choice-set.
 	 */
-	private int iterationRemoved;
+	private int iterationRemoved = -1;
 	
 	/**
 	 * Collection of iterations this plan had been the selected plan.

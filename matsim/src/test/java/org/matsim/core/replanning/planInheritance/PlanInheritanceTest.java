@@ -39,8 +39,8 @@ public class PlanInheritanceTest {
 			String outputDirectory = util.getOutputDirectory();
 
 			Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
-			config.controler().setLastIteration(10);
-			config.controler().setOutputDirectory(outputDirectory);
+			config.controller().setLastIteration(10);
+			config.controller().setOutputDirectory(outputDirectory);
 			config.planInheritance().setEnabled(true);
 			Controler c = new Controler(config);
 
@@ -76,7 +76,7 @@ public class PlanInheritanceTest {
 			assert( ((PlanInheritanceRecord) records.get(0)).getAncestorId().equals(Id.create("NONE",Plan.class)));
 			assert( ((PlanInheritanceRecord) records.get(0)).getMutatedBy().equals(PlanInheritanceModule.INITIAL_PLAN));
 			assert( ((PlanInheritanceRecord) records.get(0)).getIterationCreated() == 0);
-			assert( ((PlanInheritanceRecord) records.get(0)).getIterationRemoved() == 0);
+			assert( ((PlanInheritanceRecord) records.get(0)).getIterationRemoved() == -1);
 			assert( ((PlanInheritanceRecord) records.get(0)).getPlanId().equals(Id.create("1",Plan.class)));
 			assert( ((PlanInheritanceRecord) records.get(0)).getIterationsSelected().equals(Arrays.asList(0, 1, 2, 3, 4, 6, 7, 8, 9, 10)));
 			
@@ -84,7 +84,7 @@ public class PlanInheritanceTest {
 			assert( ((PlanInheritanceRecord) records.get(1)).getAncestorId().equals(Id.create("1",Plan.class)));
 			assert( ((PlanInheritanceRecord) records.get(1)).getMutatedBy().equals("RandomPlanSelector_ReRoute"));
 			assert( ((PlanInheritanceRecord) records.get(1)).getIterationCreated() == 5);
-			assert( ((PlanInheritanceRecord) records.get(1)).getIterationRemoved() == 0);
+			assert( ((PlanInheritanceRecord) records.get(1)).getIterationRemoved() == -1);
 			assert( ((PlanInheritanceRecord) records.get(1)).getPlanId().equals(Id.create("2",Plan.class)));
 			assert( ((PlanInheritanceRecord) records.get(1)).getIterationsSelected().equals(Arrays.asList(5)));
 			
@@ -97,8 +97,8 @@ public class PlanInheritanceTest {
 			String outputDirectory = util.getOutputDirectory();
 
 			Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
-			config.controler().setLastIteration(1);
-			config.controler().setOutputDirectory(outputDirectory);
+			config.controller().setLastIteration(1);
+			config.controller().setOutputDirectory(outputDirectory);
 			Controler c = new Controler(config);
 
 			c.run();
