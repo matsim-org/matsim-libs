@@ -109,7 +109,7 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 		List<DashboardProvider> result = new ArrayList<>();
 		for (ClassPath.ClassInfo info : classes) {
 			Class<?> clazz = info.load();
-			if (clazz.isAssignableFrom(DashboardProvider.class)) {
+			if (DashboardProvider.class.isAssignableFrom(clazz)) {
 				try {
 					Constructor<?> c = clazz.getDeclaredConstructor();
 					DashboardProvider o = (DashboardProvider) c.newInstance();
