@@ -83,7 +83,7 @@ public class Count<T> implements Identifiable<T> {
 
 		// Only hourly volumes can be set
 		if (this.volume.getInterval() == Measurable.HOURLY)
-			this.volume.setAtHour(h, val);
+			this.volume.setAtHour(h - 1, val);
 		else
 			log.warn("Unsupported counts '" + this.volume.getInterval() + "' for setting values. Resolution must be hourly.");
 
@@ -112,7 +112,7 @@ public class Count<T> implements Identifiable<T> {
 				hour = e.getIntKey() / Measurable.HOURLY;
 			}
 		}
-		return hour >= 0 ? new Volume(hour, max) : null;
+		return hour >= 0 ? new Volume(hour + 1, max) : null;
 	}
 
 	public final Volume getVolume(final int h) {
@@ -129,7 +129,7 @@ public class Count<T> implements Identifiable<T> {
 		HashMap<Integer, Volume> res = new HashMap<>();
 		for (Int2DoubleMap.Entry e : volume) {
 			int h = e.getIntKey() / Measurable.HOURLY;
-			res.put(h, new Volume(h, e.getDoubleValue()));
+			res.put(h, new Volume(h + 1, e.getDoubleValue()));
 		}
 
 		return res;
