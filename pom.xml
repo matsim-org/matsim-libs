@@ -34,7 +34,7 @@
         <geotools.version>29.2</geotools.version>
         <jts.version>1.19.0</jts.version>
         <guice.version>7.0.0</guice.version>
-        <jackson.version>2.15.2</jackson.version>
+        <jackson.version>2.15.3</jackson.version>
     </properties>
 
     <scm>
