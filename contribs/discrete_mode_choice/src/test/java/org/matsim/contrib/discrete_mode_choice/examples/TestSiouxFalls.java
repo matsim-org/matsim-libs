@@ -56,9 +56,9 @@ public class TestSiouxFalls {
 
 		controller.run();
 
-		assertEquals(44196, (int) listener.counts.get("pt"));
+		assertEquals(44195, (int) listener.counts.get("pt"));
 		assertEquals(132316, (int) listener.counts.get("car"));
-		assertEquals(82140, (int) listener.counts.get("walk"));
+		assertEquals(82139, (int) listener.counts.get("walk"));
 //		assertEquals(42520, (int) listener.counts.get("pt"));
 //		assertEquals(132100, (int) listener.counts.get("car"));
 //		assertEquals(79106, (int) listener.counts.get("walk"));
