@@ -17,6 +17,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
+import org.matsim.utils.objectattributes.attributeconverters.DisallowedNextLinksAttributeConverter;
 
 public class DisallowedNextLinksTest {
 
@@ -115,7 +116,7 @@ public class DisallowedNextLinksTest {
 		dnl0.addDisallowedLinkSequence("car",
 				List.of(Id.createLinkId("0"), Id.createLinkId("1"), Id.createLinkId("2")));
 		dnl0.addDisallowedLinkSequence("bike", List.of(Id.createLinkId("10"), Id.createLinkId("11")));
-		DisallowedNextLinks.DisallowedNextLinksAttributeConverter ac = new DisallowedNextLinks.DisallowedNextLinksAttributeConverter();
+		DisallowedNextLinksAttributeConverter ac = new DisallowedNextLinksAttributeConverter();
 		String s = ac.convertToString(dnl0);
 		DisallowedNextLinks dnl1 = ac.convert(s);
 
