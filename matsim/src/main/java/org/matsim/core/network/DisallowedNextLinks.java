@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -32,16 +33,32 @@ import com.google.common.collect.ImmutableList;
  */
 public class DisallowedNextLinks {
 
+	// Actually, it could be Map<String, Set<List<Id<Link>>>>, as the order of the
+	// next links sequences does not matter. However, we choose to store them in a
+	// list in favor of a smaller memory footprint.
 	private final Map<String, List<List<Id<Link>>>> linkIdSequencesMap = new HashMap<>();
 
+	/**
+	 * Add a sequence of subsequent links to be disallowed.
+	 * 
+	 * @param mode
+	 * @param linkSequence sequence of links that shall not be passed after passing
+	 *                     the link where this object is attached
+	 * @return true, if linkSequence was actually added
+	 */
 	public boolean addDisallowedLinkSequence(String mode, Collection<Id<Link>> linkSequence) {
-		List<List<Id<Link>>> sequences = this.linkIdSequencesMap.computeIfAbsent(mode, m -> new ArrayList<>());
+		List<List<Id<Link>>> linkSequences = this.linkIdSequencesMap.computeIfAbsent(mode, m -> new ArrayList<>());
+
+		boolean result = false;
 		// prevent adding empty/duplicate link id sequences, or duplicate link ids
 		if (!linkSequence.isEmpty() && new HashSet<>(linkSequence).size() == linkSequence.size()
-				&& !sequences.contains(linkSequence)) {
-			return sequences.add(ImmutableList.copyOf(linkSequence));
+				&& !linkSequences.contains(linkSequence)) {
+			result = linkSequences.add(ImmutableList.copyOf(linkSequence));
+			if (result) { // sorting is required for a.equals(b) <=> a.hashCode() == b.hashCode()
+				Collections.sort(linkSequences, (l, r) -> l.toString().compareTo(r.toString()));
+			}
 		}
-		return false;
+		return result;
 	}
 
 	public List<List<Id<Link>>> getDisallowedLinkSequences(String mode) {
@@ -65,8 +82,23 @@ public class DisallowedNextLinks {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof DisallowedNextLinks dls) {
-			return this.linkIdSequencesMap.equals(dls.linkIdSequencesMap);
+		if (obj instanceof DisallowedNextLinks dnl) {
+			if (!this.linkIdSequencesMap.keySet().equals(dnl.linkIdSequencesMap.keySet())) {
+				return false;
+			}
+			for (Entry<String, List<List<Id<Link>>>> entry : this.linkIdSequencesMap.entrySet()) {
+				String mode = entry.getKey();
+				List<List<Id<Link>>> linkSequences = entry.getValue();
+				List<List<Id<Link>>> otherLinkSequences = dnl.linkIdSequencesMap.get(mode);
+				// because we store next link sequences in a list, even though their order has
+				// no meaning, we need to ignore the order when comparing objects.
+				if (linkSequences.size() != otherLinkSequences.size()
+						|| !linkSequences.containsAll(otherLinkSequences)
+						|| !otherLinkSequences.containsAll(linkSequences)) {
+					return false;
+				}
+			}
+			return true;
 		}
 		return false;
 	}
