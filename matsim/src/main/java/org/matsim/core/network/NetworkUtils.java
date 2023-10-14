@@ -54,6 +54,10 @@ public final class NetworkUtils {
 
 	private static final Logger log = LogManager.getLogger(NetworkUtils.class);
 
+	private NetworkUtils() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	/**
 	 * This will create a time invariant network.
 	 *
