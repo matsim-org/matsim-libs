@@ -29,13 +29,13 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -151,7 +151,7 @@ public final class MatsimTestUtils extends TestWatcher {
 	private URL getResourceNotNull(String pathString) {
 		URL resource = this.testClass.getResource(pathString);
 		if (resource == null) {
-			throw new UncheckedIOException("Not found: "+pathString);
+			throw new UncheckedIOException(new IOException("Not found: "+pathString));
 		}
 		return resource;
 	}

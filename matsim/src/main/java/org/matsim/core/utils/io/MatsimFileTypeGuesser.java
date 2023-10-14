@@ -21,6 +21,7 @@
 package org.matsim.core.utils.io;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Locale;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -139,9 +140,9 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		} catch (SAXException e) {
-			throw new UncheckedIOException(e);
+			throw new UncheckedIOException(new IOException(e));
 		} catch (ParserConfigurationException e) {
-			throw new UncheckedIOException(e);
+			throw new UncheckedIOException(new IOException (e));
 		} catch (XMLTypeDetectionException e) {
 			this.xmlPublicId = e.publicId;
 			this.xmlSystemId = e.systemId;
