@@ -40,6 +40,12 @@ public class DisallowedNextLinksTest {
 	}
 
 	@Test
+	public void testIsEmpty() {
+		DisallowedNextLinks dnl= new DisallowedNextLinks();
+		Assert.assertTrue(dnl.isEmpty());
+	}
+
+	@Test
 	public void testAdding() {
 		DisallowedNextLinks dnl = new DisallowedNextLinks();
 		dnl.addDisallowedLinkSequence("car", List.of(Id.createLinkId("0"), Id.createLinkId("1")));

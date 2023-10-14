@@ -80,6 +80,10 @@ public class DisallowedNextLinks {
 		this.linkIdSequencesMap.clear();
 	}
 
+	public boolean isEmpty() {
+		return this.linkIdSequencesMap.isEmpty();
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof DisallowedNextLinks dnl) {
