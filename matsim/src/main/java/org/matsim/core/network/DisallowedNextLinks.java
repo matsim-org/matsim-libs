@@ -1,7 +1,6 @@
 package org.matsim.core.network;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,7 +36,7 @@ public class DisallowedNextLinks {
 	 *                     the link where this object is attached
 	 * @return true, if linkSequence was actually added
 	 */
-	public boolean addDisallowedLinkSequence(String mode, Collection<Id<Link>> linkSequence) {
+	public boolean addDisallowedLinkSequence(String mode, List<Id<Link>> linkSequence) {
 		List<List<Id<Link>>> linkSequences = this.linkIdSequencesMap.computeIfAbsent(mode, m -> new ArrayList<>());
 
 		boolean result = false;

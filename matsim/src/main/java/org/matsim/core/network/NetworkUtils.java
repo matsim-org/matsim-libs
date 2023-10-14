@@ -1011,7 +1011,7 @@ public final class NetworkUtils {
 		link.getAttributes().putAttribute(DISALLOWED_NEXT_LINKS_ATTRIBUTE, disallowedNextLinks);
 	}
 
-	public static boolean addDisallowedNextLinks(Link link, String mode, Collection<Id<Link>> linkIds) {
+	public static boolean addDisallowedNextLinks(Link link, String mode, List<Id<Link>> linkIds) {
 		DisallowedNextLinks disallowedNextLinks = getOrCreateDisallowedNextLinks(link);
 		return disallowedNextLinks.addDisallowedLinkSequence(mode, linkIds);
 	}
