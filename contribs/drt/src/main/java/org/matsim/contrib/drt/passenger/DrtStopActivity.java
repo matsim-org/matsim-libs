@@ -85,7 +85,7 @@ public class DrtStopActivity extends FirstLastSimStepDynActivity implements Pass
 	}
 
 	@Override
-	public void notifyPassengersAreReadyForDeparture(Set<MobsimPassengerAgent> passengers, double now) {
+	public void notifyPassengersAreReadyForDeparture(List<MobsimPassengerAgent> passengers, double now) {
 		if (now < endTime.get()) {
 			return;// pick up only at the end of stop activity
 		}

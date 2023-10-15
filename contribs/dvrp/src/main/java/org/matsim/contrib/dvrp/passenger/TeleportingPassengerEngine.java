@@ -146,7 +146,7 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 				List.of(passenger.getId()), route, getLink(fromLinkId), getLink(toLinkId), now, now);
 
 		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
-			Route teleportedRoute = adaptLegRouteForTeleportation(Collections.singleton(passenger), request, now);
+			Route teleportedRoute = adaptLegRouteForTeleportation(List.of(passenger), request, now);
 			eventsManager.processEvent(new PassengerPickedUpEvent(now, mode, request.getId(), passenger.getId(), null));
 			teleportationEngine.handleDeparture(now, passenger, fromLinkId);
 			teleportedRequests.add(ImmutablePair.of(now + teleportedRoute.getTravelTime().seconds(), request));
@@ -160,7 +160,7 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 		return true;
 	}
 
-	private Route adaptLegRouteForTeleportation(Set<MobsimPassengerAgent> passengers, PassengerRequest request, double now) {
+	private Route adaptLegRouteForTeleportation(List<MobsimPassengerAgent> passengers, PassengerRequest request, double now) {
 		Route teleportedRoute = teleportedRouteCalculator.calculateRoute(request);
 
 		for (MobsimPassengerAgent passenger : passengers) {

@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -65,8 +66,8 @@ public class MultiPassengerPickupActivity extends FirstLastSimStepDynActivity im
 	}
 
 	@Override
-	public void notifyPassengersAreReadyForDeparture(Set<MobsimPassengerAgent> passengers, double now) {
-		PassengerRequest request = getRequestForPassenger(passengers.stream().map(Identifiable::getId).collect(Collectors.toSet()));
+	public void notifyPassengersAreReadyForDeparture(List<MobsimPassengerAgent> passengers, double now) {
+		PassengerRequest request = getRequestForPassenger(passengers.stream().map(Identifiable::getId).toList());
 		if (passengerHandler.tryPickUpPassengers(this, driver, request.getId(), now)) {
 			requestsPickedUp++;
 		} else {
@@ -74,7 +75,7 @@ public class MultiPassengerPickupActivity extends FirstLastSimStepDynActivity im
 		}
 	}
 
-	private PassengerRequest getRequestForPassenger(Set<Id<Person>> passengerIds) {
+	private PassengerRequest getRequestForPassenger(List<Id<Person>> passengerIds) {
 		return requests.values()
 				.stream()
 				.filter(r -> r.getPassengerIds().containsAll(passengerIds))

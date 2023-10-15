@@ -16,6 +16,7 @@ import org.matsim.contrib.evrp.ChargingTask;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTask;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -67,12 +68,12 @@ public class ChargingBreakActivity extends FirstLastSimStepDynActivity implement
     }
 
     @Override
-    public void notifyPassengersAreReadyForDeparture(Set<MobsimPassengerAgent> passengers, double now) {
+    public void notifyPassengersAreReadyForDeparture(List<MobsimPassengerAgent> passengers, double now) {
         if (!isLastStep(now)) {
             return;// pick up only at the end of stop activity
         }
 
-        var request = getRequestForPassengers(passengers.stream().map(Identifiable::getId).collect(Collectors.toSet()));
+        var request = getRequestForPassengers(passengers.stream().map(Identifiable::getId).toList());
         if (passengerHandler.tryPickUpPassengers(this, driver, request.getId(), now)) {
             passengersPickedUp++;
         } else {
@@ -98,7 +99,7 @@ public class ChargingBreakActivity extends FirstLastSimStepDynActivity implement
         chargingDelegate.doSimStep(now);
     }
 
-    private AcceptedDrtRequest getRequestForPassengers(Set<Id<Person>> passengerIds) {
+    private AcceptedDrtRequest getRequestForPassengers(List<Id<Person>> passengerIds) {
         return pickupRequests.values().stream()
                 .filter(r -> r.getPassengerIds().containsAll(passengerIds))
                 .findAny()

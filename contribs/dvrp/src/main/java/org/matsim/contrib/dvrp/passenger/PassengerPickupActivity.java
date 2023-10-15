@@ -22,8 +22,9 @@ package org.matsim.contrib.dvrp.passenger;
 import org.matsim.contrib.dynagent.DynActivity;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
+import java.util.List;
 import java.util.Set;
 
 public interface PassengerPickupActivity extends DynActivity {
-	void notifyPassengersAreReadyForDeparture(Set<MobsimPassengerAgent> passengers, double now);
+	void notifyPassengersAreReadyForDeparture(List<MobsimPassengerAgent> passengers, double now);
 }

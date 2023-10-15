@@ -162,7 +162,7 @@ public final class PassengerEngineWithPrebooking
 		PassengerRequest prebookedRequest = prebookedRequests.get(0);
 		PassengerPickupActivity awaitingPickup = awaitingPickups.remove(prebookedRequest.getId());
 		if (awaitingPickup != null) {
-			awaitingPickup.notifyPassengersAreReadyForDeparture(Collections.singleton(passenger), now);
+			awaitingPickup.notifyPassengersAreReadyForDeparture(List.of(passenger), now);
 		}
 		return true;
 	}

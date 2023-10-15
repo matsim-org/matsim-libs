@@ -25,6 +25,7 @@ import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.dynagent.FirstLastSimStepDynActivity;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -57,8 +58,8 @@ public class SinglePassengerPickupActivity extends FirstLastSimStepDynActivity i
 	}
 
 	@Override
-	public void notifyPassengersAreReadyForDeparture(Set<MobsimPassengerAgent> passengers, double now) {
-		if (request.getPassengerIds().containsAll(passengers.stream().map(Identifiable::getId).collect(Collectors.toSet()))) {
+	public void notifyPassengersAreReadyForDeparture(List<MobsimPassengerAgent> passengers, double now) {
+		if (request.getPassengerIds().containsAll(passengers.stream().map(Identifiable::getId).toList())) {
 			throw new IllegalArgumentException("I am waiting for a different passenger!");
 		}
 

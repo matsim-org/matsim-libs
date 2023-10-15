@@ -36,7 +36,7 @@ public interface PassengerRequestCreator {
 	 * Prefer stateless implementation, otherwise provide other ways to achieve thread-safety.
 	 *
 	 * @param id             request ID
-	 * @param passengerIds   set of unique passenger IDs
+	 * @param passengerIds   list of unique passenger IDs
 	 * @param route          planned route (the required route type depends on the optimizer)
 	 * @param fromLink       start location
 	 * @param toLink         end location
