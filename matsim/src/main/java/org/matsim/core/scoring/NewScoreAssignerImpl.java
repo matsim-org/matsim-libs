@@ -27,8 +27,8 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 
 import jakarta.inject.Inject;
 import java.util.HashMap;
@@ -45,13 +45,13 @@ class NewScoreAssignerImpl implements NewScoreAssigner {
 	private long scoreCount = 0;
 
 	@Inject
-	NewScoreAssignerImpl(PlanCalcScoreConfigGroup planCalcScoreConfigGroup, ControlerConfigGroup controlerConfigGroup) {
-		if (planCalcScoreConfigGroup.getFractionOfIterationsToStartScoreMSA()!=null ) {
-			final int diff = controlerConfigGroup.getLastIteration() - controlerConfigGroup.getFirstIteration();
+	NewScoreAssignerImpl(ScoringConfigGroup scoringConfigGroup, ControllerConfigGroup controllerConfigGroup) {
+		if (scoringConfigGroup.getFractionOfIterationsToStartScoreMSA()!=null ) {
+			final int diff = controllerConfigGroup.getLastIteration() - controllerConfigGroup.getFirstIteration();
 			this.scoreMSAstartsAtIteration = (int) (diff
-					* planCalcScoreConfigGroup.getFractionOfIterationsToStartScoreMSA() + controlerConfigGroup.getFirstIteration());
+					* scoringConfigGroup.getFractionOfIterationsToStartScoreMSA() + controllerConfigGroup.getFirstIteration());
 		}
-		learningRate = planCalcScoreConfigGroup.getLearningRate();
+		learningRate = scoringConfigGroup.getLearningRate();
 	}
 
 	public void assignNewScores(int iteration, ScoringFunctionsForPopulation scoringFunctionsForPopulation, Population population) {

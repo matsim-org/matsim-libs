@@ -21,7 +21,7 @@
 package org.matsim.contrib.dvrp.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import static org.matsim.core.config.groups.ControllerConfigGroup.EventsFileFormat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

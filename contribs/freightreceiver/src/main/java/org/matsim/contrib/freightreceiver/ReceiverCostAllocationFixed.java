@@ -20,7 +20,7 @@
 package org.matsim.contrib.freightreceiver;
 
 import org.apache.logging.log4j.LogManager;
-import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.freight.carriers.Carrier;
 
 /**
  * A simple implementation where the cost allocated by the {@link Carrier} to

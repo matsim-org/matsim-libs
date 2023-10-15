@@ -8,8 +8,8 @@ public class PtFareModule extends AbstractModule {
 
     @Override
     public void install() {
-        getConfig().planCalcScore().getModes().get(TransportMode.pt).setDailyMonetaryConstant(0);
-        getConfig().planCalcScore().getModes().get(TransportMode.pt).setMarginalUtilityOfDistance(0);
+        getConfig().scoring().getModes().get(TransportMode.pt).setDailyMonetaryConstant(0);
+        getConfig().scoring().getModes().get(TransportMode.pt).setMarginalUtilityOfDistance(0);
         PtFareConfigGroup ptFareConfigGroup = ConfigUtils.addOrGetModule(this.getConfig(), PtFareConfigGroup.class);
         if (ptFareConfigGroup.getPtFareCalculation() == PtFareConfigGroup.PtFareCalculationModels.distanceBased) {
             DistanceBasedPtFareParams distanceBasedPtFareParams = ConfigUtils.addOrGetModule(this.getConfig(), DistanceBasedPtFareParams.class);

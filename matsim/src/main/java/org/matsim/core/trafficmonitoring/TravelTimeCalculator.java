@@ -61,11 +61,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * at a node may take a different amount of time.
  * <br>
  * Travel times on links are collected and averaged in bins/slots with a specified size
- * (<code>binSize</code>, in seconds, default 900 seconds = 15 minutes). The data for the travel times per link
- * is stored in {@link TravelTimeData}-objects. If a short binSize is used, it is useful to
- * use {@link TravelTimeDataHashMap},}
- * as that one does not use any memory to time bins where no traffic occurred. By default,
- * {@link TravelTimeDataArray} is used.
+ * (<code>binSize</code>, in seconds, default 900 seconds = 15 minutes).
  *
  * @author dgrether
  * @author mrieser
@@ -82,12 +78,10 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 	private final int numSlots;
 	TimeSlotComputation aggregator;
 
+	private final Network network;
+	private IdMap<Link, TravelTimeDataArray> linkData;
 
-	private IdMap<Link, TravelTimeData> linkData;
-
-	private Map<Tuple<Id<Link>, Id<Link>>, TravelTimeData> linkToLinkData;
-
-	private final DataContainerProvider dataContainerProvider;
+	private Map<Tuple<Id<Link>, Id<Link>>, TravelTimeDataArray> linkToLinkData;
 
 	private final Map<Id<Vehicle>, LinkEnterEvent> linkEnterEvents;
 
@@ -100,12 +94,10 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 
 	private final boolean calculateLinkToLinkTravelTimes;
 
-	private TravelTimeDataFactory ttDataFactory = null;
-
 	@Inject private QSimConfigGroup qsimConfig ;
 	TravelTimeGetter travelTimeGetter ;
 
-	@Deprecated // user builder instead.  kai, feb'19
+	@Deprecated // use builder instead.  kai, feb'19
 	public static TravelTimeCalculator create(Network network, TravelTimeCalculatorConfigGroup group) {
 		TravelTimeCalculator calculator = new TravelTimeCalculator(network, group);
 		configure(calculator, group, network);
@@ -115,29 +107,15 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 	private static TravelTimeCalculator configure(TravelTimeCalculator calculator, TravelTimeCalculatorConfigGroup config, Network network) {
 		// This should be replaced by a builder if we need the functionality.  kai/mads, feb'19
 
-
-		// Customize micro-behavior of the TravelTimeCalculator based on config. Should not be necessary for most use cases.
-		switch ( config.getTravelTimeCalculatorType() ) {
-			case TravelTimeCalculatorArray:
-				calculator.ttDataFactory = new TravelTimeDataArrayFactory(network, calculator.numSlots);
+		switch( config.getTravelTimeGetterType() ){
+			case "average":
+				calculator.travelTimeGetter = new AveragingTravelTimeGetter( calculator.aggregator );
 				break;
-			case TravelTimeCalculatorHashMap:
-				calculator.ttDataFactory = new TravelTimeDataHashMapFactory(network);
+			case "linearinterpolation":
+				calculator.travelTimeGetter = new LinearInterpolatingTravelTimeGetter( calculator.numSlots, calculator.timeSlice, calculator.aggregator );
 				break;
 			default:
-				throw new RuntimeException(config.getTravelTimeCalculatorType() + " is unknown!");
-		}
-		{
-			switch( config.getTravelTimeGetterType() ){
-				case "average":
-					calculator.travelTimeGetter = new AveragingTravelTimeGetter( calculator.aggregator );
-					break;
-				case "linearinterpolation":
-					calculator.travelTimeGetter = new LinearInterpolatingTravelTimeGetter( calculator.numSlots, calculator.timeSlice, calculator.aggregator );
-					break;
-				default:
-					throw new RuntimeException( config.getTravelTimeGetterType() + " is unknown!" );
-			}
+				throw new RuntimeException( config.getTravelTimeGetterType() + " is unknown!" );
 		}
 		return calculator;
 	}
@@ -232,27 +210,14 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		this.calculateLinkToLinkTravelTimes = calculateLinkToLinkTravelTimes;
 		this.filterAnalyzedModes = filterModes;
 		this.analyzedModes = analyzedModes;
+		this.network = network;
 		this.timeSlice = timeslice;
 		this.numSlots = TimeBinUtils.getTimeBinCount(maxTime, timeslice);
 		this.aggregator = new TimeSlotComputation(this.numSlots, this.timeSlice);
 		this.travelTimeGetter = new AveragingTravelTimeGetter( this.aggregator ) ;
-		this.ttDataFactory = new TravelTimeDataArrayFactory(network, this.numSlots);
-		if (this.calculateLinkTravelTimes){
+		if (this.calculateLinkTravelTimes) {
 			this.linkData = new IdMap<>(Link.class);
-
-			/*
-			 * So far, link data objects were stored in a HashMap. This lookup strategy is used
-			 * by a MapBasedDataContainerProvider.
-			 * When ArrayRoutingNetworks are used (as the FastRouter implementations do), the
-			 * getArrayIndex() methods from the RoutingLinks can be used to lookup the link
-			 * data objects in an array. This approach is implemented by the ArrayBasedDataContainerProvider.
-			 * Using a ArrayBasedDataContainerProvider instead of a MapBasedDataContainerProvider
-			 * increases the routing performance by 20-30%.
-			 * cdobler, oct'13
-			 */
-			//		this.dataContainerProvider = new MapBasedDataContainerProvider(linkData, ttDataFactory);
-			this.dataContainerProvider = new ArrayBasedDataContainerProvider(linkData, ttDataFactory, network);
-		} else this.dataContainerProvider = null;
+		}
 		if (this.calculateLinkToLinkTravelTimes){
 			// assume that every link has 2 outgoing links as default
 			this.linkToLinkData = new ConcurrentHashMap<>((int) (network.getLinks().size() * 1.4 * 2));
@@ -289,7 +254,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		if (this.calculateLinkTravelTimes) {
 			LinkEnterEvent oldEvent = this.linkEnterEvents.get(e.getVehicleId());
 			if (oldEvent != null) {
-				TravelTimeData data = this.dataContainerProvider.getTravelTimeData(e.getLinkId(), true);
+				TravelTimeData data = this.getTravelTimeData(e.getLinkId(), true);
 				double enterTime = oldEvent.getTime();
 
 				final int timeSlot = this.aggregator.getTimeSlotIndex(enterTime );
@@ -312,7 +277,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 	@Override
 	public void handleEvent(final VehicleLeavesTrafficEvent event) {
 		/* remove EnterEvents from list when a vehicle arrives.
-		 * otherwise, the activity duration would counted as travel time, when the
+		 * otherwise, the activity duration would be counted as travel time, when the
 		 * vehicle departs again and leaves the link! */
 		this.linkEnterEvents.remove(event.getVehicleId());
 
@@ -323,7 +288,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		/* remove EnterEvents from list when a bus stops on a link.
-		 * otherwise, the stop time would counted as travel time, when the
+		 * otherwise, the stop time would be counted as travel time, when the
 		 * bus departs again and leaves the link! */
 		this.linkEnterEvents.remove(event.getVehicleId());
 	}
@@ -332,7 +297,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 	public void handleEvent(VehicleAbortsEvent event) {
 		LinkEnterEvent e = this.linkEnterEvents.remove(event.getVehicleId());
 		if (e != null) {
-			TravelTimeData data = this.dataContainerProvider.getTravelTimeData(e.getLinkId(), true);
+			TravelTimeData data = this.getTravelTimeData(e.getLinkId(), true);
 			data.setNeedsConsolidation( true );
 
 			//			this.aggregator.addStuckEventTravelTime(data, e.getTime(), event.getTime());
@@ -351,57 +316,36 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		if (filterAnalyzedModes) this.vehiclesToIgnore.remove(event.getVehicleId());
 	}
 
-	private TravelTimeData getLinkToLinkTravelTimeData( Tuple<Id<Link>, Id<Link>> fromLinkToLink ) {
-		TravelTimeData data = this.linkToLinkData.get(fromLinkToLink);
+	private TravelTimeDataArray getTravelTimeData(final Id<Link> linkId, final boolean createIfMissing) {
+		TravelTimeDataArray data = this.linkData.get(linkId);
+		if ((null == data) && createIfMissing) {
+			data = this.createTravelTimeData(linkId);
+			this.linkData.put(linkId, data);
+		}
+		return data;
+	}
+
+	private TravelTimeDataArray getLinkToLinkTravelTimeData( Tuple<Id<Link>, Id<Link>> fromLinkToLink ) {
+		TravelTimeDataArray data = this.linkToLinkData.get(fromLinkToLink);
 		if ( null == data ) {
-			data = this.ttDataFactory.createTravelTimeData(fromLinkToLink.getFirst()) ;
+			data = this.createTravelTimeData(fromLinkToLink.getFirst()) ;
 			this.linkToLinkData.put(fromLinkToLink, data);
 		}
 		return data;
 	}
 
-	/*
-	 * Use the link as argument here! In case the DataContainer is array-based and the link is from a routing network,
-	 * the DataContainer uses the link's index to access its data structures instead of performing a map lookup, which
-	 * increases the router performance by 20-30%!
-	 * cdobler, aug'17
-	 */
-	private double getLinkTravelTime(final Link link, final double time) {
+	private TravelTimeDataArray createTravelTimeData(Id<Link> linkId) {
+		return new TravelTimeDataArray(this.network.getLinks().get(linkId), this.numSlots);
+	}
+
+	private double getLinkTravelTime(final Id<Link> linkId, final double time) {
 		if (this.calculateLinkTravelTimes) {
 
-			TravelTimeData data = this.dataContainerProvider.getTravelTimeData(link, true);
+			TravelTimeData data = this.getTravelTimeData(linkId, true);
 			if ( data.isNeedingConsolidation() ) {
 				consolidateData(data);
 			}
 			return this.travelTimeGetter.getTravelTime( data, time );
-
-			/*
-			 * Workaround for jumps in returned travel times due to time bin approach?
-			 * Should not be necessary when using linear interpolated travel times.
-			 */
-			//			DataContainer data = this.dataContainerProvider.getTravelTimeInfo(link, true);
-			//			if (data.needsConsolidation) {
-			//				consolidateData(data);
-			//			}
-			//			double travelTime = this.aggregator.getTravelTime(data, time);
-			//
-			//			// in case there is no previous time bin
-			//			if (time <= this.timeSlice) return travelTime;
-			//
-			//			int index = this.aggregator.getTimeSlotIndex(time);
-			//			double previousBinEndTime = index * this.timeSlice;
-			//
-			//			// calculate travel time when starting at the last second of the previous time slot
-			//			double previousTravelTime = this.aggregator.getTravelTime(data, time - this.timeSlice);
-			//
-			//			double prev = previousBinEndTime + previousTravelTime;
-			//			double now = time + travelTime;
-			//			if (now >= prev) {
-			//				return travelTime;
-			//			}
-			//			else {
-			//				return prev - time;	// ensure travel time not shorter than travel time from the previous bin
-			//			}
 		}
 		throw new IllegalStateException("No link travel time is available " +
 								    "if calculation is switched off by config option!");
@@ -511,7 +455,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 						linkTtimeFromVehicle = link.getLength() / vehicleType.getMaximumVelocity();
 					}
 				}
-				double linkTTimeFromObservation = TravelTimeCalculator.this.getLinkTravelTime(link, time);
+				double linkTTimeFromObservation = TravelTimeCalculator.this.getLinkTravelTime(link.getId(), time);
 				return Math.max( linkTtimeFromVehicle, linkTTimeFromObservation) ;
 				// yyyyyy should this not be min?  kai/janek, may'19
 				// No, it is correct. It is preventing the router to route with an empirical speed from
@@ -548,9 +492,4 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		};
 	}
 
-	@Deprecated // use builder.configure(config) instead.  kai, feb'19
-	public void setTtDataFactory( TravelTimeDataFactory ttDataFactory ){
-		// yyyyyy this is currently here for a test, but should be removed.  kai, feb'19
-		this.ttDataFactory = ttDataFactory;
-	}
 }

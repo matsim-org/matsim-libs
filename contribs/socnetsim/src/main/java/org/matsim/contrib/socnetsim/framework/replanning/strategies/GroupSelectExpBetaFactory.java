@@ -48,7 +48,7 @@ public class GroupSelectExpBetaFactory extends NonInnovativeStrategyFactory {
 		return new LogitSumSelector(
 			MatsimRandom.getLocalInstance(),
 			incompatiblePlansIdentifierFactory,
-			sc.getConfig().planCalcScore().getBrainExpBeta());
+			sc.getConfig().scoring().getBrainExpBeta());
 	}
 }
 

@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
+import java.io.UncheckedIOException;
 import java.util.HashSet;
 import java.util.List;
 
@@ -30,7 +31,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.utils.ScaleEpsilon;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 

@@ -44,15 +44,15 @@ public class RunSignalSystemsExampleTest {
 			Assert.fail("something went wrong: " + ee.getMessage()) ;
 		}
 	}
-	
+
 	@Test
 	public final void testMinimalExample() {
 		try {
 			Config config = ConfigUtils.loadConfig("./examples/tutorial/example90TrafficLights/useSignalInput/withLanes/config.xml");
-			config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-			config.controler().setLastIteration(0);
-			config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-			
+			config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			config.controller().setLastIteration(0);
+			config.controller().setOutputDirectory(testUtils.getOutputDirectory());
+
 			RunSignalSystemsExample.run(config, false);
 		} catch (Exception ee ) {
 			ee.printStackTrace();

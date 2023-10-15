@@ -266,7 +266,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		}
 
 		Set<String> modes = new HashSet<>(qSimConfigGroup.getMainModes());
-		modes.addAll(scenario.getConfig().plansCalcRoute().getNetworkModes());
+		modes.addAll(scenario.getConfig().routing().getNetworkModes());
 
 		for (String mode : modes) {
 			VehicleType type;

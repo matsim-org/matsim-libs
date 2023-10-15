@@ -23,12 +23,12 @@ package org.matsim.core.events.algorithms;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -98,7 +98,7 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 	/**
 	 * Encodes the given string in such a way that it no longer contains
 	 * characters that have a special meaning in xml.
-	 * 
+	 *
 	 * @see <a href="http://www.w3.org/International/questions/qa-escapes#use">http://www.w3.org/International/questions/qa-escapes#use</a>
 	 * @param attributeValue
 	 * @return String with some characters replaced by their xml-encoding.
@@ -141,7 +141,7 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 					bf.append(ch);
 				}
 			}
-			
+
 			return bf.toString();
 		}
 		return attributeValue;

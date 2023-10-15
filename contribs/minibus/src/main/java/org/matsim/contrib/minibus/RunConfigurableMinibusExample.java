@@ -26,9 +26,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.minibus.fare.StageContainer;
-import org.matsim.contrib.minibus.fare.TicketMachineDefaultImpl;
-import org.matsim.contrib.minibus.fare.TicketMachineI;
 import org.matsim.contrib.minibus.hook.PModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -39,7 +36,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * Entry point, registers all necessary hooks
- * 
+ *
  * @author aneumann
  */
 public final class RunConfigurableMinibusExample {
@@ -55,16 +52,16 @@ public final class RunConfigurableMinibusExample {
 		}
 
 		Config config = ConfigUtils.loadConfig( args[0], new PConfigGroup() ) ;
-		final PConfigGroup pConfig = ConfigUtils.addOrGetModule(config, PConfigGroup.class) ; 
+		final PConfigGroup pConfig = ConfigUtils.addOrGetModule(config, PConfigGroup.class) ;
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		final Set<Id<TransitStopFacility>> subsidizedStops = new TreeSet<>() ;
 		// subsidizedStops.add(...) ; // add subsidized stops
-		
+
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setCreateGraphs(false);
-		
+		controler.getConfig().controller().setCreateGraphs(false);
+
 		if ( true ) {
 			throw new RuntimeException("the following is not possibly any more; just copy PModule and modify it to your needs.  kai, jan'17") ;
 		}
@@ -73,18 +70,18 @@ public final class RunConfigurableMinibusExample {
 //			@Override public double getFare(StageContainer stageContainer) {
 //				double fare = delegate.getFare(stageContainer) ;
 //				if ( subsidizedStops.contains( stageContainer.getStopEntered() ) ) {
-//					fare+=1. ; 
+//					fare+=1. ;
 //					// this would increase the fare for the subsidized stops ...
 //					// ... but I fear that this also means that the passengers have to pay this.  kai, jan'17
 //				}
 //				return fare ;
 //			}
 //		}) ;
-		
-		
+
+
 		controler.addOverridingModule(new PModule()) ;
 
 
 		controler.run();
-	}		
+	}
 }

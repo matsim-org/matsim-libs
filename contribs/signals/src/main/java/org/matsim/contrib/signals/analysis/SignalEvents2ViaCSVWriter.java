@@ -92,7 +92,7 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if (event.getIteration() == scenario.getConfig().controler().getFirstIteration()) {
+		if (event.getIteration() == scenario.getConfig().controller().getFirstIteration()) {
 			/*
 			 * do all the stuff that is needed only once a simulation: - calculating coordinations for the via file - getting the signals data out of the scenario
 			 */
@@ -100,9 +100,9 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 		}
 
 		// write signal events in the same interval als usual matsim events
-		if (event.isLastIteration() || (scenario.getConfig().controler().getWriteEventsInterval() != 0 && event.getIteration() % scenario.getConfig().controler().getWriteEventsInterval() == 0)) {
+		if (event.isLastIteration() || (scenario.getConfig().controller().getWriteEventsInterval() != 0 && event.getIteration() % scenario.getConfig().controller().getWriteEventsInterval() == 0)) {
 			writeThisIteration = true;
-			String signalCSVFilename = scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/signalEvents2Via.csv";
+			String signalCSVFilename = scenario.getConfig().controller().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/signalEvents2Via.csv";
 
 			// log.info("Initializing SignalsCSVWriter ...");
 			signalsCSVWriter = IOUtils.getBufferedWriter(signalCSVFilename);

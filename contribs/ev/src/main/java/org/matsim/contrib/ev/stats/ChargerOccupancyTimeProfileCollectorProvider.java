@@ -67,7 +67,7 @@ public class ChargerOccupancyTimeProfileCollectorProvider implements Provider<Mo
 		};
 
 		var collector = new TimeProfileCollector(header, calc, 300, "charger_occupancy_time_profiles", matsimServices);
-		if (matsimServices.getConfig().controler().isCreateGraphs()) {
+		if (matsimServices.getConfig().controller().isCreateGraphs()) {
 			collector.setChartTypes(ChartType.Line, ChartType.StackedArea);
 		} else {
 			collector.setChartTypes();

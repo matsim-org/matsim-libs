@@ -29,19 +29,21 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
- * 
+ *
  * Allows fast queries of a TransitSchedule for the next departure of a given route at a given stop, from a given point
  * in time. If you need further queries of a TransitSchedule, put them here!
- * 
+ *
  * (I renamed this class and put the TransitSchedule in the constructor to make the purpose clear. michaz '13)
- * 
+ *
  * Thread-safe.
- * 
+ *
  * @author mrieser
  *
  */
 public class PreparedTransitSchedule {
-	
+
+	final static double MIDNIGHT = 24.0*3600;
+
 	/*
 	 * This needs to be a ConcurrentHashMap since multiple threads might add
 	 * data concurrently. Alternatively, the map could be filled with data
@@ -55,7 +57,7 @@ public class PreparedTransitSchedule {
      * Conceptually, an instance of this class wraps a TransitSchedule to optimize a function of it.
      */
 	public PreparedTransitSchedule(TransitSchedule schedule) {
-		
+
 	}
 
 	@Deprecated
@@ -65,20 +67,20 @@ public class PreparedTransitSchedule {
 	public PreparedTransitSchedule() {
 
 	}
-	
+
 	public double getNextDepartureTime(final TransitRoute route, final TransitRouteStop stop, final double depTime) {
-	
+
 		double earliestDepartureTimeAtTerminus = depTime - stop.getDepartureOffset().seconds();
 		// This shifts my time back to the terminus.
-	
-		if (earliestDepartureTimeAtTerminus >= TransitRouterNetworkTravelTimeAndDisutility.MIDNIGHT) {
-			earliestDepartureTimeAtTerminus = earliestDepartureTimeAtTerminus % TransitRouterNetworkTravelTimeAndDisutility.MIDNIGHT;
+
+		if (earliestDepartureTimeAtTerminus >= MIDNIGHT) {
+			earliestDepartureTimeAtTerminus = earliestDepartureTimeAtTerminus % MIDNIGHT;
 		}
 		if (earliestDepartureTimeAtTerminus < 0) {
 			// this may happen when depTime < departureOffset, e.g. I want to start at 24:03, but the bus departs at 23:55 at terminus
-			earliestDepartureTimeAtTerminus += TransitRouterNetworkTravelTimeAndDisutility.MIDNIGHT;
+			earliestDepartureTimeAtTerminus += MIDNIGHT;
 		}
-	
+
 		// this will search for the terminus departure that corresponds to my departure at the stop:
 		double[] cache = sortedDepartureCache.get(route);
 		if (cache == null) {
@@ -102,12 +104,12 @@ public class PreparedTransitSchedule {
 		}
 		double bestDepartureTime = cache[pos];
 		// (departure time at terminus)
-	
+
 		bestDepartureTime += stop.getDepartureOffset().seconds();
 		// (resulting departure time at stop)
-		
+
 		while (bestDepartureTime < depTime) {
-			bestDepartureTime += TransitRouterNetworkTravelTimeAndDisutility.MIDNIGHT;
+			bestDepartureTime += MIDNIGHT;
 			// (add enough "MIDNIGHT"s until we are _after_ the desired departure time)
 		}
 		return bestDepartureTime;

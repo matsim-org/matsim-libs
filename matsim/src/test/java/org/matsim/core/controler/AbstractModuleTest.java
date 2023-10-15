@@ -28,7 +28,7 @@ public class AbstractModuleTest{
 	public void test1() {
 
 		Config config = ConfigUtils.createConfig() ;
-		config.controler().setOutputDirectory( utils.getOutputDirectory() );
+		config.controller().setOutputDirectory( utils.getOutputDirectory() );
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 

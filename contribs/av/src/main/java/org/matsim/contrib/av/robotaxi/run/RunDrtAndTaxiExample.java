@@ -48,7 +48,7 @@ public class RunDrtAndTaxiExample {
 				new DvrpConfigGroup(), new OTFVisConfigGroup());
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);
-		config.controler()
+		config.controller()
 				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new MultiModeDrtModule());

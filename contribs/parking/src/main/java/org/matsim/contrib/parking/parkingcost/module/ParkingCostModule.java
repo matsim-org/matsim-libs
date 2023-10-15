@@ -35,7 +35,7 @@ public class ParkingCostModule extends AbstractModule {
 	public void install() {
 		ParkingCostConfigGroup parkingCostConfigGroup = ConfigUtils.addOrGetModule(getConfig(), ParkingCostConfigGroup.class);
 		if (parkingCostConfigGroup.useParkingCost) {
-			Collection<String> mainModes = switch (getConfig().controler().getMobsim()) {
+			Collection<String> mainModes = switch (getConfig().controller().getMobsim()) {
 				case "qsim" -> getConfig().qsim().getMainModes();
 				case "hermes" -> getConfig().hermes().getMainModes();
 				default -> throw new RuntimeException("ParkingCosts are currently supported for Qsim and Hermes");

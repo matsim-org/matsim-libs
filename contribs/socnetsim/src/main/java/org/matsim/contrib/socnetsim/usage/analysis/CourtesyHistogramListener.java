@@ -36,12 +36,12 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 import jakarta.inject.Singleton;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 /**
  * @author thibautd
@@ -59,7 +59,7 @@ public class CourtesyHistogramListener  implements IterationEndsListener, Iterat
     CourtesyHistogramListener(Config config, CourtesyHistogram histogram, OutputDirectoryHierarchy controlerIO) {
         this.controlerIO = controlerIO;
 		this.histogram = histogram;
-		this.outputGraph = config.controler().isCreateGraphs();
+		this.outputGraph = config.controller().isCreateGraphs();
 	}
 
 	@Override

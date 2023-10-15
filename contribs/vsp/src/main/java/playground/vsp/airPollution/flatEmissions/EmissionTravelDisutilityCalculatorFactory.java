@@ -24,7 +24,7 @@ import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -41,7 +41,7 @@ public class EmissionTravelDisutilityCalculatorFactory implements TravelDisutili
     private final RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory;
     @Inject  private EmissionModule emissionModule;
     @Inject  private EmissionCostModule emissionCostModule;
-    @Inject  private PlanCalcScoreConfigGroup cnScoringGroup;
+    @Inject  private ScoringConfigGroup cnScoringGroup;
     private Set<Id<Link>> hotspotLinks = null;
     @Inject private Vehicles vehicles;
 

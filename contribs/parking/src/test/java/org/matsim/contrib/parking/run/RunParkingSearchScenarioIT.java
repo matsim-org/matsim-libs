@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.parking.run;
 
@@ -42,13 +42,13 @@ public class RunParkingSearchScenarioIT {
 	public void testRunParking() {
 		String configFile = "./src/main/resources/parkingsearch/config.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new ParkingSearchConfigGroup());
-		config.controler().setLastIteration(0);
-		config.controler().setOutputDirectory( utils.getOutputDirectory() );
+		config.controller().setLastIteration(0);
+		config.controller().setOutputDirectory( utils.getOutputDirectory() );
 
 		ParkingSearchConfigGroup configGroup = (ParkingSearchConfigGroup) config.getModules().get(ParkingSearchConfigGroup.GROUP_NAME);
 		configGroup.setParkingSearchStrategy(ParkingSearchStrategy.Benenson);
-		
+
 		new RunParkingSearchExample().run(config,false);
-		
+
 	}
 }

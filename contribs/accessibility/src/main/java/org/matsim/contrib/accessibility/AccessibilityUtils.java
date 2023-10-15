@@ -34,7 +34,7 @@ import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -65,7 +65,7 @@ public class AccessibilityUtils {
 		// yyyy this method ignores the "capacities" of the facilities. kai, mar'14
 		// for now, we decided not to add "capacities" as it is not needed for current projects. dz, feb'16
 
-		double walkSpeed_m_h = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
+		double walkSpeed_m_h = config.routing().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 
 		LOG.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with same nearest node...");
@@ -76,11 +76,11 @@ public class AccessibilityUtils {
 			double distance_m = NetworkUtils.getEuclideanDistance(opportunity.getCoord(), nearestNode.getCoord());
 
 			// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
-			double walkBetaTT_utils_h = config.planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling()
-					- config.planCalcScore().getPerforming_utils_hr(); // default values: -12 = (-6.) - (6.)
+			double walkBetaTT_utils_h = config.scoring().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling()
+					- config.scoring().getPerforming_utils_hr(); // default values: -12 = (-6.) - (6.)
 			double VjkWalkTravelTime = walkBetaTT_utils_h * (distance_m / walkSpeed_m_h);
 
-			double expVjk = Math.exp(config.planCalcScore().getBrainExpBeta() * VjkWalkTravelTime);
+			double expVjk = Math.exp(config.scoring().getBrainExpBeta() * VjkWalkTravelTime);
 
 			// add Vjk to sum
 			AggregationObject jco = opportunityClusterMap.get(nearestNode.getId()); // Why "jco"?
@@ -142,16 +142,16 @@ public class AccessibilityUtils {
 	}
 
 
-	public static double getModeSpecificConstantForAccessibilities(String mode, PlanCalcScoreConfigGroup planCalcScoreConfigGroup) {
+	public static double getModeSpecificConstantForAccessibilities(String mode, ScoringConfigGroup scoringConfigGroup) {
 		double modeSpecificConstant;
 		if (mode.equals(Modes4Accessibility.freespeed.name())) {
-			modeSpecificConstant = planCalcScoreConfigGroup.getModes().get(TransportMode.car).getConstant();
+			modeSpecificConstant = scoringConfigGroup.getModes().get(TransportMode.car).getConstant();
 		} else {
-			modeSpecificConstant = planCalcScoreConfigGroup.getModes().get(mode).getConstant();
+			modeSpecificConstant = scoringConfigGroup.getModes().get(mode).getConstant();
 		}
 		return modeSpecificConstant;
 	}
-	
+
 	/**
 	 * Collects all facilities of a given type that have been loaded to the sceanrio.
 	 */
@@ -191,8 +191,8 @@ public class AccessibilityUtils {
 
 
 	public static void combineDifferentActivityOptionTypes(final Scenario scenario, String combinedType, final List<String> activityOptionsToBeIncluded) {
-		ActivityOption markerOption = new ActivityOptionImpl(combinedType); 
-		
+		ActivityOption markerOption = new ActivityOptionImpl(combinedType);
+
 		// Memorize all facilities that have certain activity options in a activity facilities container
 		final ActivityFacilities consideredFacilities = FacilitiesUtils.createActivityFacilities();
 		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
@@ -205,7 +205,7 @@ public class AccessibilityUtils {
 				}
 			}
 		}
-		
+
 		// Add  marker option to facilities to be considered
 		for (ActivityFacility facility : consideredFacilities.getFacilities().values()) {
 			facility.addActivityOption(markerOption);
@@ -227,16 +227,16 @@ public class AccessibilityUtils {
 	public static final ActivityFacilities createFacilityFromBuildingShapefile(String shapeFileName, String identifierCaption, String numberOfHouseholdsCaption) {
 		ShapeFileReader shapeFileReader = new ShapeFileReader();
 		Collection<SimpleFeature> features = shapeFileReader.readFileAndInitialize(shapeFileName);
-		
+
 		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities("DensitiyFacilities");
 		ActivityFacilitiesFactory aff = facilities.getFactory();
-		
+
 		for (SimpleFeature feature : features) {
 			String featureId = (String) feature.getAttribute(identifierCaption);
 			Integer numberOfHouseholds = Integer.parseInt((String) feature.getAttribute(numberOfHouseholdsCaption));
 			Geometry geometry = (Geometry) feature.getDefaultGeometry();
 			Coord coord = CoordUtils.createCoord(geometry.getCentroid().getX(), geometry.getCentroid().getY());
-			
+
 			for (int i = 0; i < numberOfHouseholds; i++) {
 				ActivityFacility facility = aff.createActivityFacility(Id.create(featureId + "_" + i, ActivityFacility.class), coord);
 				facilities.addActivityFacility(facility);
@@ -255,7 +255,7 @@ public class AccessibilityUtils {
 		double xMax = boundingBox.getXMax();
 		double yMin = boundingBox.getYMin();
 		double yMax = boundingBox.getYMax();
-		
+
 		ActivityFacilities measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(xMin, yMin, xMax, yMax, cellSize);
 		return measuringPoints;
 	}
@@ -263,7 +263,7 @@ public class AccessibilityUtils {
 
 	/**
 	 * Calculates the sum of the values of a given list.
-	 * 
+	 *
 	 * @param valueList
 	 * @return sum
 	 */
@@ -279,7 +279,7 @@ public class AccessibilityUtils {
 	/**
 	 * Calculates Gini coefficient of the values of a given values. The Gini Coefficient is equals to the half of
 	 * the relative mean absolute difference (RMD).
-	 * 
+	 *
 	 * @see <a href="https://en.wikipedia.org/wiki/Gini_coefficient">
 	 * @see <a href="https://en.wikipedia.org/wiki/Mean_absolute_difference#Relative_mean_absolute_difference">
 	 * @param valueList
@@ -289,7 +289,7 @@ public class AccessibilityUtils {
 		int numberOfValues = valueList.size();
 		double sumOfValues = calculateSum(valueList);
 		double arithmeticMean = sumOfValues / numberOfValues;
-		
+
 		double sumOfAbsoluteDifferences = 0.;
 		for (double i : valueList) {
 			for (double j : valueList) {
@@ -310,24 +310,24 @@ public class AccessibilityUtils {
 	public static ActivityFacilities createFacilitiesFromPlans(Population population) {
 		ActivityFacilitiesFactory aff = new ActivityFacilitiesFactoryImpl();
 		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
-		
+
 		for(Person person : population.getPersons().values()) {
 			for(Plan plan : person.getPlans()) {
 				Id <Person> personId = person.getId();
-				
+
 				for (PlanElement planElement : plan.getPlanElements()) {
 					if (planElement instanceof Activity) {
 						Activity activity = (Activity) planElement;
-						
+
 						Coord coord= activity.getCoord();
 						if (coord == null) {
 							throw new NullPointerException("Activity does not have any coordinates.");
 						}
-						
+
 						String activityType = activity.getType();
-						
+
 						// In case an agent visits the same activity location twice, create another activity facility with a modified ID
-						Integer i = 1;					
+						Integer i = 1;
 						Id<ActivityFacility> facilityId = Id.create(activityType + "_" + personId.toString() + "_" + i.toString(), ActivityFacility.class);
 						while (facilities.getFacilities().containsKey(facilityId)) {
 							i++;
@@ -335,7 +335,7 @@ public class AccessibilityUtils {
 						}
 
 						ActivityFacility facility = aff.createActivityFacility(facilityId, activity.getCoord());
-						
+
 						facility.addActivityOption(aff.createActivityOption(activityType));
 						facilities.addActivityFacility(facility);
 //						log.info("Created activity with option of type " + activityType + " and ID " + facilityId + ".");
@@ -353,7 +353,7 @@ public class AccessibilityUtils {
 		String monthStr = month + "";
 		if (month < 10)
 			monthStr = "0" + month;
-		String date = cal.get(Calendar.YEAR) + "-" 
+		String date = cal.get(Calendar.YEAR) + "-"
 				+ monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);
 		return date;
 	}
@@ -363,16 +363,16 @@ public class AccessibilityUtils {
 			Map<String, ActivityFacilities> additionalFacilityData) {
 		LOG.info("Start assigning additional facilities data to measure point.");
 		GeometryFactory geometryFactory = new GeometryFactory();
-		
+
 		for (ActivityFacilities additionalDataFacilities : additionalFacilityData.values()) { // Iterate over all additional data collections
 			String additionalDataName = additionalDataFacilities.getName();
 			int additionalDataFacilitiesToAssign = additionalDataFacilities.getFacilities().size();
-			
+
 			for (Id<ActivityFacility> measurePointId : measurePoints.getFacilities().keySet()) { // Iterate over all measure points
 				ActivityFacility measurePoint = measurePoints.getFacilities().get(measurePointId);
 				measurePoint.getAttributes().putAttribute(additionalDataName, 0);
 				Geometry geometry = measurePointGeometryMap.get(measurePointId);
-				
+
 				for (ActivityFacility facility : additionalDataFacilities.getFacilities().values()) { // Iterate over additional-data facilities
 					Point point = geometryFactory.createPoint(new Coordinate(facility.getCoord().getX(), facility.getCoord().getY()));
 					if (geometry.contains(point)) {

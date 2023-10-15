@@ -111,7 +111,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		this.vehicleOccupancyProfileCalculator = vehicleOccupancyProfileCalculator;
 		this.drtCfg = drtCfg;
 		this.qSimCfg = config.qsim();
-		runId = Optional.ofNullable(config.controler().getRunId()).orElse(notAvailableString);
+		runId = Optional.ofNullable(config.controller().getRunId()).orElse(notAvailableString);
 		maxcap = findMaxVehicleCapacity(fleet);
 
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -160,7 +160,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		boolean createGraphs = event.getServices().getConfig().controler().isCreateGraphs();
+		boolean createGraphs = event.getServices().getConfig().controller().isCreateGraphs();
 
 		writeAndPlotWaitTimeEstimateComparison(drtEventSequenceCollector.getPerformedRequestSequences().values(),
 				filename(event, "waitTimeComparison", ".png"), filename(event, "waitTimeComparison", ".csv"), createGraphs);

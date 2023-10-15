@@ -44,9 +44,9 @@ public class OutputTravelStatsTest {
 		String outputDirectory = util.getOutputDirectory();
 
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controler().setLastIteration(10);
-		config.controler().setWriteTripsInterval(1);
-		config.controler().setOutputDirectory(outputDirectory);
+		config.controller().setLastIteration(10);
+		config.controller().setWriteTripsInterval(1);
+		config.controller().setOutputDirectory(outputDirectory);
 		Controler c = new Controler(config);
 
 		c.run();
