@@ -41,13 +41,13 @@ import org.matsim.freight.carriers.events.eventhandler.FreightServiceStartEventH
 import org.matsim.freight.carriers.events.eventhandler.FreightShipmentDeliveryEventHandler;
 import org.matsim.freight.carriers.events.eventhandler.FreightShipmentPickupEventHandler;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 

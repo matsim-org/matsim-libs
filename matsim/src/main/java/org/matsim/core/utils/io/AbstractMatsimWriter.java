@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPOutputStream;
 
@@ -75,7 +76,7 @@ public abstract class AbstractMatsimWriter {
 
 	/**
 	 * Uses the specified OutputStream for writing.
-	 * 
+	 *
 	 */
 	protected final void openOutputStream(OutputStream outputStream) {
 		assertNotAlreadyOpen();
