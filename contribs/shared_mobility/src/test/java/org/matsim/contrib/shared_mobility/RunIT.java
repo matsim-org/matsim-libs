@@ -1,5 +1,6 @@
 package org.matsim.contrib.shared_mobility;
 
+import java.io.UncheckedIOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -32,7 +33,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.examples.ExamplesUtils;
 
 public class RunIT {

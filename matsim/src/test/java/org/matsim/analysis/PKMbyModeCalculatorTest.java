@@ -19,6 +19,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.PopulationUtils;
@@ -159,7 +160,7 @@ public class PKMbyModeCalculatorTest {
 		controllerConfigGroup.setCreateGraphs(true);
 		controllerConfigGroup.setFirstIteration(0);
 		controllerConfigGroup.setLastIteration(10);
-		PKMbyModeCalculator pkmbyModeCalculator = new PKMbyModeCalculator(controllerConfigGroup, controlerIO);
+		PKMbyModeCalculator pkmbyModeCalculator = new PKMbyModeCalculator(controllerConfigGroup, controlerIO, new GlobalConfigGroup());
 		// iteration 0
 		pkmbyModeCalculator.addIteration(0, map);
 		pkmbyModeCalculator.writeOutput();
@@ -198,23 +199,23 @@ public class PKMbyModeCalculatorTest {
 	/************ Reading and validating the output ************/
 	private void readAndValidateValues(int itr, Double totalCar, Double totalPt, Double totalWalk) {
 
-		String file = utils.getOutputDirectory() + "/PKMbyModeCalculator" + "/pkm_modestats.txt";
+		String file = utils.getOutputDirectory() + "/PKMbyModeCalculator" + "/pkm_modestats.csv";
 		BufferedReader br;
 		String line;
 		try {
 			br = new BufferedReader(new FileReader(file));
 			String firstRow = br.readLine();
-			String[] columnNames = firstRow.split("	");
+			String[] columnNames = firstRow.split(new GlobalConfigGroup().getDefaultDelimiter());
 			decideColumns(columnNames);
 			int iteration = 0;
 			while ((line = br.readLine()) != null) {
 				if (iteration == itr) {
-					String[] column = line.split("	");
+					String[] column = line.split(new GlobalConfigGroup().getDefaultDelimiter());
 					// checking if column number in greater than 0, because 0th column is always
 					// 'Iteration' and we don't need that --> see decideColumns() method
-					Double carStat = (car > 0) ? Double.valueOf(column[car]) : 0;
-					Double ptStat = (pt > 0) ? Double.valueOf(column[pt]) : 0;
-					Double walkStat = (walk > 0) ? Double.valueOf(column[walk]) : 0;
+					double carStat = (car > 0) ? Double.parseDouble(column[car]) : 0;
+					double ptStat = (pt > 0) ? Double.parseDouble(column[pt]) : 0;
+					double walkStat = (walk > 0) ? Double.parseDouble(column[walk]) : 0;
 
 					Assert.assertEquals("Car stats score does not match", Math.round((totalCar / 1000)), carStat, 0);
 					Assert.assertEquals("PT stats score does not match", Math.round((totalPt / 1000)), ptStat, 0);

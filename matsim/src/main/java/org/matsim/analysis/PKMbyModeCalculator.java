@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.charts.StackedBarChart;
 
@@ -49,15 +50,15 @@ public class PKMbyModeCalculator {
 
     private final Map<Integer,Map<String,Double>> pmtPerIteration = new TreeMap<>();
     private final boolean writePng;
-    private final OutputDirectoryHierarchy controlerIO;
-    private final static char DEL = '\t';
+    private final OutputDirectoryHierarchy controllerIO;
+		private final String delimiter;
     private final static String FILENAME = "pkm_modestats";
 
-
     @Inject
-    PKMbyModeCalculator(ControllerConfigGroup controllerConfigGroup, OutputDirectoryHierarchy controlerIO) {
+    PKMbyModeCalculator(ControllerConfigGroup controllerConfigGroup, OutputDirectoryHierarchy controllerIO, GlobalConfigGroup globalConfig) {
         writePng = controllerConfigGroup.isCreateGraphs();
-        this.controlerIO = controlerIO;
+        this.controllerIO = controllerIO;
+        this.delimiter = globalConfig.getDefaultDelimiter();
     }
 
     void addIteration(int iteration, IdMap<Person, Plan> map) {
@@ -88,7 +89,7 @@ public class PKMbyModeCalculator {
                 .flatMap(i->i.keySet().stream())
                 .collect(Collectors.toSet()));
 
-        try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(controlerIO.getOutputFilename( FILENAME+ ".txt"))), CSVFormat.DEFAULT.withDelimiter(DEL))) {
+        try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(controllerIO.getOutputFilename( FILENAME+ ".csv"))), CSVFormat.DEFAULT.withDelimiter(this.delimiter.charAt(0)))) {
             csvPrinter.print("Iteration");
             csvPrinter.printRecord(allModes);
 
@@ -122,7 +123,7 @@ public class PKMbyModeCalculator {
                 chart.addSeries(mode, value);
             }
             chart.addMatsimLogo();
-            chart.saveAsPng(controlerIO.getOutputFilename(FILENAME+ ".png"), 1024, 768);
+            chart.saveAsPng(controllerIO.getOutputFilename(FILENAME+ ".png"), 1024, 768);
 
         }
 
