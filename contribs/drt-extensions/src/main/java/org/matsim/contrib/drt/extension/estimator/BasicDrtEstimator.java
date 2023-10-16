@@ -112,9 +112,10 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 	public Estimate estimate(DrtRoute route, OptionalTime departureTime) {
 
 		if (currentEst == null) {
-			// If not estimates are present, use the drt default worse case parameters
+			// If not estimates are present, use travel time alpha as detour
+			// beta is not used, because estimates are supposed to be minimums and not worst cases
 			double travelTime = Math.min(route.getDirectRideTime() + drtConfig.maxAbsoluteDetour,
-				route.getDirectRideTime() * drtConfig.maxTravelTimeAlpha + drtConfig.maxTravelTimeBeta);
+				route.getDirectRideTime() * drtConfig.maxTravelTimeAlpha);
 
 			double fare = 0;
 			if (drtConfig.getDrtFareParams().isPresent()) {
