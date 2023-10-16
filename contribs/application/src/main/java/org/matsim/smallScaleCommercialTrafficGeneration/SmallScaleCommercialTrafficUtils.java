@@ -188,6 +188,8 @@ public class SmallScaleCommercialTrafficUtils {
 		Map<String, AtomicLong> idCounter = new HashMap<>();
 
 		Population populationFromCarrier = (Population) scenario.getScenarioElement("allpersons");
+		Vehicles allVehicles = VehicleUtils.getOrCreateAllvehicles(scenario);
+
 		for (Person person : populationFromCarrier.getPersons().values()) {
 
 			Plan plan = popFactory.createPlan();
