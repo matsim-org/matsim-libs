@@ -22,6 +22,7 @@ package org.matsim.core.replanning.strategies;
 
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -33,6 +34,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
@@ -40,7 +42,10 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.algorithms.MutateActivityTimeAllocation;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.Random;
 
 /**
  * Tests the functionality of {@link TimeAllocationMutatorModule}, mainly that the
@@ -144,5 +149,101 @@ public class TimeAllocationMutatorModuleTest {
 
 	private static void assertValueInRange(final String message, final double actual, final double lowerLimit, final double upperLimit) {
 		assertTrue(message + " actual: " + actual + ", range: " + lowerLimit + "..." + upperLimit, (lowerLimit <= actual) && (actual <= upperLimit));
+	}
+
+
+	@Test
+	public void testRun() {
+		// setup population with one person
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Plan plan = PersonUtils.createAndAddPlan(person, true);
+		Activity act = PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(0, 0));
+		act.setEndTime(8.0 * 3600);
+		PopulationUtils.createAndAddLeg( plan, TransportMode.transit_walk );
+		Activity ptAct1 = PopulationUtils.createAndAddActivityFromCoord(plan, PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 100));
+		ptAct1.setMaximumDuration(0);
+		PopulationUtils.createAndAddLeg( plan, TransportMode.pt );
+		Activity ptAct2 = PopulationUtils.createAndAddActivityFromCoord(plan, PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 100));
+		ptAct2.setMaximumDuration(0);
+		PopulationUtils.createAndAddLeg( plan, TransportMode.transit_walk );
+		act = PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord(0, 500));
+		act.setEndTime(16*3600);
+		PopulationUtils.createAndAddLeg( plan, TransportMode.transit_walk );
+		Activity ptAct3 = PopulationUtils.createAndAddActivityFromCoord(plan, PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 100));
+		ptAct3.setMaximumDuration(0);
+		PopulationUtils.createAndAddLeg( plan, TransportMode.pt );
+		Activity ptAct4 = PopulationUtils.createAndAddActivityFromCoord(plan, PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 100));
+		ptAct4.setMaximumDuration(0);
+		PopulationUtils.createAndAddLeg( plan, TransportMode.transit_walk );
+		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord(0, 500));
+		boolean affectingDuration = true ;
+
+		MutateActivityTimeAllocation mutator =
+				new MutateActivityTimeAllocation(
+						3600.,
+						affectingDuration, new Random(2011),24*3600,false,1);
+		mutator.run(plan);
+
+		Assert.assertEquals(0.0, ptAct1.getMaximumDuration().seconds(), 1e-8);
+		Assert.assertEquals(0.0, ptAct2.getMaximumDuration().seconds(), 1e-8);
+		Assert.assertEquals(0.0, ptAct3.getMaximumDuration().seconds(), 1e-8);
+		Assert.assertEquals(0.0, ptAct4.getMaximumDuration().seconds(), 1e-8);
+	}
+
+	@Test
+	public void testRunLatestEndTime() {
+		// setup population with one person
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Plan plan = PersonUtils.createAndAddPlan(person, true);
+		Activity act = PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(0, 0));
+		act.setEndTime(8.0 * 3600);
+		PopulationUtils.createAndAddLeg(plan, TransportMode.transit_walk);
+		Activity ptAct1 = PopulationUtils.createAndAddActivityFromCoord(plan, PtConstants.TRANSIT_ACTIVITY_TYPE,
+				new Coord(0, 100));
+		ptAct1.setMaximumDuration(0);
+		PopulationUtils.createAndAddLeg(plan, TransportMode.pt);
+		Activity ptAct2 = PopulationUtils.createAndAddActivityFromCoord(plan, PtConstants.TRANSIT_ACTIVITY_TYPE,
+				new Coord(0, 100));
+		ptAct2.setMaximumDuration(0);
+		PopulationUtils.createAndAddLeg(plan, TransportMode.transit_walk);
+		act = PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord(0, 500));
+		act.setEndTime(38 * 3600);
+		PopulationUtils.createAndAddLeg(plan, TransportMode.transit_walk);
+		Activity ptAct3 = PopulationUtils.createAndAddActivityFromCoord(plan, PtConstants.TRANSIT_ACTIVITY_TYPE,
+				new Coord(0, 100));
+		ptAct3.setMaximumDuration(0);
+		PopulationUtils.createAndAddLeg(plan, TransportMode.pt);
+		Activity ptAct4 = PopulationUtils.createAndAddActivityFromCoord(plan, PtConstants.TRANSIT_ACTIVITY_TYPE,
+				new Coord(0, 100));
+		ptAct4.setMaximumDuration(0);
+		PopulationUtils.createAndAddLeg(plan, TransportMode.transit_walk);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord(0, 500));
+
+		boolean affectingDuration = true;
+		final double latestEndTime = 30. * 3600;
+
+		MutateActivityTimeAllocation mutator =
+				new MutateActivityTimeAllocation(
+						3600.,
+						affectingDuration, new Random(2011),latestEndTime,false,1);
+
+		mutator.run(plan);
+
+		Assert.assertEquals(0.0, ptAct1.getMaximumDuration().seconds(), 1e-8);
+		Assert.assertEquals(0.0, ptAct2.getMaximumDuration().seconds(), 1e-8);
+		Assert.assertEquals(0.0, ptAct3.getMaximumDuration().seconds(), 1e-8);
+		Assert.assertEquals(0.0, ptAct4.getMaximumDuration().seconds(), 1e-8);
+
+		// check whether activity times are equal or less than latestEndTime
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity activity) {
+				if (activity.getStartTime().isDefined()) {
+					Assert.assertTrue(activity.getStartTime().seconds() <= latestEndTime);
+				}
+				if (activity.getEndTime().isDefined()) {
+					Assert.assertTrue(activity.getEndTime().seconds() <= latestEndTime);
+				}
+			}
+		}
 	}
 }
