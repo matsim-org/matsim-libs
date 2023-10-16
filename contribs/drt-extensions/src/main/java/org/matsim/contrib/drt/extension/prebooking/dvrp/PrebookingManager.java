@@ -11,7 +11,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.drt.extension.prebooking.events.PassengerEnteringVehicleEvent;
 import org.matsim.contrib.drt.extension.prebooking.events.PassengerRequestBookedEvent;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
@@ -62,9 +64,6 @@ public class PrebookingManager implements MobsimEngine {
 	private final List<PrebookingQueueItem> prebookingQueue = new LinkedList<>();
 	private final IdMap<Request, PassengerRequest> prebookedRequests = new IdMap<>(Request.class);
 
-	private final List<Leg> prebookedLegs = new LinkedList<>();
-	private boolean cleanupFinished = false;
-
 	public PrebookingManager(String mode, Network network, PassengerRequestCreator requestCreator,
 			VrpOptimizer optimizer, PassengerRequestValidator requestValidator, EventsManager eventsManager) {
 		this.network = network;
@@ -97,7 +96,7 @@ public class PrebookingManager implements MobsimEngine {
 	}
 
 	public void prebook(Person person, Leg leg, double earliestDepartureTime) {
-		Verify.verify(!cleanupFinished, "Attempting to prebook a request after Mobsim has finished");
+		Verify.verify(leg.getMode().equals(mode), "Invalid mode for this prebooking manager");
 
 		synchronized (prebookingQueue) {
 			this.prebookingQueue.add(new PrebookingQueueItem(person, leg, earliestDepartureTime));
@@ -143,22 +142,20 @@ public class PrebookingManager implements MobsimEngine {
 
 					item.leg.getAttributes().putAttribute(requestAttribute, request.getId().toString());
 					prebookedRequests.put(request.getId(), request);
-					prebookedLegs.add(item.leg);
 				}
 			}
 
 			prebookingQueue.clear();
 		}
 	}
+	
+	void notifyEntering(double now, AcceptedDrtRequest request) {
+		eventsManager
+				.processEvent(new PassengerEnteringVehicleEvent(now, mode, request.getId(), request.getPassengerId()));
+	}
 
 	@Override
 	public void afterSim() {
-		// reset leg attributes for next iteration
-		cleanupFinished = true;
-
-		for (Leg leg : prebookedLegs) {
-			leg.getAttributes().removeAttribute(requestAttribute);
-		}
 	}
 
 	@Override

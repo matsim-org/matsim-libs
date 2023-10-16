@@ -3,17 +3,14 @@ package org.matsim.contrib.drt.extension.prebooking.logic;
 import java.util.Random;
 
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.extension.prebooking.dvrp.PrebookingManager;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeTracker;
-
-import com.google.common.base.Verify;
 
 /**
  * This class represents a prebooking logic that searches for DRT legs in the
@@ -31,49 +28,51 @@ import com.google.common.base.Verify;
 public class FixedSharePrebookingLogic extends TimedPrebookingLogic {
 	private final String mode;
 
-	private final Population population;
+	private final QSim qsim;
 	private final TimeInterpretation timeInterpretation;
+	private final Population population;
 
-	private final double prbookingProbability;
+	private final double prebookingProbability;
 	private final double submissionSlack;
 
 	private final long randomSeed;
 
-	public FixedSharePrebookingLogic(String mode, double prbookingProbability, double submissionSlack,
+	public FixedSharePrebookingLogic(String mode, double prebookingProbability, double submissionSlack,
 			PrebookingManager prebookingManager, Population population, TimeInterpretation timeInterpretation,
-			long randomSeed) {
+			long randomSeed, QSim qsim) {
 		super(prebookingManager);
 
 		this.mode = mode;
-		this.prbookingProbability = prbookingProbability;
+		this.prebookingProbability = prebookingProbability;
 		this.submissionSlack = submissionSlack;
-		this.population = population;
 		this.timeInterpretation = timeInterpretation;
 		this.randomSeed = randomSeed;
+		this.qsim = qsim;
+		this.population = population;
+
 	}
 
 	@Override
 	protected void scheduleRequests() {
 		Random random = new Random(randomSeed);
 
-		for (Person person : population.getPersons().values()) {
-			Plan plan = person.getSelectedPlan();
+		PopulationIterator iterator = PopulationIterator.create(population, qsim);
+
+		while (iterator.hasNext()) {
+			var item = iterator.next();
 
 			TimeTracker timeTracker = new TimeTracker(timeInterpretation);
-			boolean foundLeg = false;
 
-			for (PlanElement element : plan.getPlanElements()) {
+			for (PlanElement element : item.plan().getPlanElements()) {
 				if (element instanceof Leg) {
 					Leg leg = (Leg) element;
 
-					if (leg.getMode().equals(mode) && random.nextDouble() < prbookingProbability) {
-						Verify.verify(!foundLeg, "Person " + person.getId().toString()
-								+ " has at least two drt legs. Please make use of a different PrebookingLogic.");
-						foundLeg = true;
-
+					if (leg.getMode().equals(mode) && random.nextDouble() < prebookingProbability) {
 						double earliestDepartureTime = leg.getDepartureTime().seconds();
-						double submissionTime = leg.getDepartureTime().seconds() - submissionSlack;
-						queue.schedule(submissionTime, person, leg, earliestDepartureTime);
+						double submissionTime = Double.isFinite(submissionSlack)
+								? leg.getDepartureTime().seconds() - submissionSlack
+								: timeInterpretation.getSimulationStartTime();
+						queue.schedule(submissionTime, item.person(), leg, earliestDepartureTime);
 					}
 				}
 
@@ -91,9 +90,11 @@ public class FixedSharePrebookingLogic extends TimedPrebookingLogic {
 					PrebookingManager prebookingManager = getter.getModal(PrebookingManager.class);
 					Population population = getter.get(Population.class);
 					TimeInterpretation timeInterpretation = TimeInterpretation.create(getConfig());
+					QSim qsim = getter.get(QSim.class);
 
 					return new FixedSharePrebookingLogic(mode, prebookingProbability, submissionSlack,
-							prebookingManager, population, timeInterpretation, getConfig().global().getRandomSeed());
+							prebookingManager, population, timeInterpretation, getConfig().global().getRandomSeed(),
+							qsim);
 				}));
 			}
 		});

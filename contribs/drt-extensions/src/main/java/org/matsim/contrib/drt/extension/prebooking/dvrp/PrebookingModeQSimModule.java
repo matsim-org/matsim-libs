@@ -3,27 +3,34 @@ package org.matsim.contrib.drt.extension.prebooking.dvrp;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.edrt.EDrtActionCreator;
 import org.matsim.contrib.drt.extension.prebooking.electric.ElectricPrebookingActionCreator;
+import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.passenger.DefaultRequestQueue;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
+import org.matsim.contrib.dvrp.passenger.RequestQueue;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
 
 class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
 	private final boolean isElectric;
+	private final DrtConfigGroup drtConfig;
 
-	PrebookingModeQSimModule(String mode, boolean isElectric) {
+	PrebookingModeQSimModule(String mode, DrtConfigGroup drtConfig, boolean isElectric) {
 		super(mode);
 
 		this.isElectric = isElectric;
+		this.drtConfig = drtConfig;
 	}
 
 	@Override
@@ -36,9 +43,9 @@ class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
 				DrtActionCreator delegate = getter.getModal(DrtActionCreator.class);
 				PassengerStopDurationProvider stopDurationProvider = getter
 						.getModal(PassengerStopDurationProvider.class);
-				EnteringHandler enteringHandler = getter.getModal(EnteringHandler.class);
+				PrebookingManager prebookingManager = getter.getModal(PrebookingManager.class);
 
-				return new PrebookingActionCreator(passengerEngine, delegate, stopDurationProvider, enteringHandler);
+				return new PrebookingActionCreator(passengerEngine, delegate, stopDurationProvider, prebookingManager);
 			})).in(Singleton.class);
 			bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(PrebookingActionCreator.class));
 		} else {
@@ -51,18 +58,13 @@ class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
 				PassengerStopDurationProvider stopDurationProvider = getter
 						.getModal(PassengerStopDurationProvider.class);
 				MobsimTimer timer = getter.get(MobsimTimer.class);
-				EnteringHandler enteringHandler = getter.getModal(EnteringHandler.class);
+				PrebookingManager prebookingManager = getter.getModal(PrebookingManager.class);
 
 				return new ElectricPrebookingActionCreator(passengerEngine, delegate, stopDurationProvider, timer,
-						enteringHandler);
+						prebookingManager);
 			})).in(Singleton.class);
 			bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(ElectricPrebookingActionCreator.class));
 		}
-
-		bindModal(EnteringHandler.class).toProvider(modalProvider(getter -> {
-			EventsManager eventsManager = getter.get(EventsManager.class);
-			return new EnteringHandler(eventsManager, getMode());
-		})).in(Singleton.class);
 
 		// override the PassengerEngine
 		bindModal(PrebookingPassengerEngine.class).toProvider(modalProvider(getter -> {
@@ -92,5 +94,15 @@ class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
 					eventsManager);
 		})).in(Singleton.class);
 		addModalQSimComponentBinding().to(modalKey(PrebookingManager.class));
+		
+		bindModal(new TypeLiteral<RequestQueue<DrtRequest>>() {
+		}).toProvider(modalProvider(getter -> {
+			PrebookingManager prebookingManager = getter.getModal(PrebookingManager.class);
+			RequestQueue<DrtRequest> delegate = DefaultRequestQueue
+					.withLimitedAdvanceRequestPlanningHorizon(drtConfig.advanceRequestPlanningHorizon);
+
+			return new PrebookingRequestQueue<>(prebookingManager, delegate);
+		})).in(Singleton.class);
+
 	}
 }

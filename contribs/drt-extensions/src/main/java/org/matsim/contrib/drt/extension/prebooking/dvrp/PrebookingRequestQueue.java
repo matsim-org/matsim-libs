@@ -15,7 +15,7 @@ public final class PrebookingRequestQueue<R extends PassengerRequest> implements
 	private final PrebookingManager prebookingManager;
 	private final RequestQueue<R> delegate;
 
-	private final List<R> queue = new LinkedList<>();
+	private final List<R> schedulableRequests = new LinkedList<>();
 
 	public PrebookingRequestQueue(PrebookingManager prebookingManager, RequestQueue<R> delegate) {
 		this.prebookingManager = prebookingManager;
@@ -31,7 +31,7 @@ public final class PrebookingRequestQueue<R extends PassengerRequest> implements
 	public void addRequest(R request) {
 		if (prebookingManager.isPrebookedRequest(request.getId())) {
 			// add to queue in the order of submission
-			queue.add(request);
+			schedulableRequests.add(request);
 		} else {
 			delegate.addRequest(request);
 		}
@@ -39,13 +39,8 @@ public final class PrebookingRequestQueue<R extends PassengerRequest> implements
 
 	@Override
 	public Collection<R> getSchedulableRequests() {
-		// prebooked requests, they are treated when and in the order they are submitted
-		List<R> requests = new LinkedList<>(queue);
-		queue.clear();
-
-		// other requests treated according to sorting default logic
-		requests.addAll(delegate.getSchedulableRequests());
-
-		return requests;
+		schedulableRequests.addAll(delegate.getSchedulableRequests());
+		delegate.getSchedulableRequests().clear();
+		return schedulableRequests;
 	}
 }

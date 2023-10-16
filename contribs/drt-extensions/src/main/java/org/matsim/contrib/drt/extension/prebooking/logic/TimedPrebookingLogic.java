@@ -47,9 +47,10 @@ public abstract class TimedPrebookingLogic implements MobsimInitializedListener,
 
 	protected class PrebookingQueue {
 		private PriorityQueue<ScheduledItem> queue = new PriorityQueue<>();
+		private int sequence = 0;
 
 		public void schedule(double submissionTime, Person person, Leg leg, double departureTime) {
-			queue.add(new ScheduledItem(submissionTime, person, leg, departureTime));
+			queue.add(new ScheduledItem(submissionTime, person, leg, departureTime, sequence++));
 		}
 
 		public Collection<ScheduledItem> getScheduledItems(double time) {
@@ -64,16 +65,23 @@ public abstract class TimedPrebookingLogic implements MobsimInitializedListener,
 
 		public void clear() {
 			queue.clear();
+			sequence = 0;
 		}
 
 	}
 
-	private record ScheduledItem(double submissionTime, Person person, Leg leg, double departuretime)
+	private record ScheduledItem(double submissionTime, Person person, Leg leg, double departuretime, int sequence)
 			implements Comparable<ScheduledItem> {
 		@Override
 		public int compareTo(ScheduledItem o) {
 			// sort by submissionTime, but otherwise keep the order of submission
-			return Double.compare(submissionTime, o.submissionTime);
+			int comparison = Double.compare(submissionTime, o.submissionTime);
+
+			if (comparison != 0) {
+				return comparison;
+			}
+
+			return Integer.compare(sequence, o.sequence);
 		}
 	}
 }

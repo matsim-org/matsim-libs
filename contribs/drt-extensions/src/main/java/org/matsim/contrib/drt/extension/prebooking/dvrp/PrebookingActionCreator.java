@@ -26,14 +26,14 @@ public class PrebookingActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final VrpAgentLogic.DynActionCreator delegate;
 	private final PrebookingPassengerEngine passengerEngine;
 	private final PassengerStopDurationProvider stopDurationProvider;
-	private final EnteringHandler enteringHandler;
+	private final PrebookingManager prebookingManager;
 
 	public PrebookingActionCreator(PrebookingPassengerEngine passengerEngine, VrpAgentLogic.DynActionCreator delegate,
-			PassengerStopDurationProvider stopDurationProvider, EnteringHandler enteringHandler) {
+			PassengerStopDurationProvider stopDurationProvider, PrebookingManager prebookingManager) {
 		this.delegate = delegate;
 		this.passengerEngine = passengerEngine;
 		this.stopDurationProvider = stopDurationProvider;
-		this.enteringHandler = enteringHandler;
+		this.prebookingManager = prebookingManager;
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class PrebookingActionCreator implements VrpAgentLogic.DynActionCreator {
 			DrtStopTask stopTask = (DrtStopTask) task;
 			return new PrebookingStopActivity(passengerEngine, dynAgent, stopTask, stopTask.getDropoffRequests(),
 					stopTask.getPickupRequests(), DrtActionCreator.DRT_STOP_NAME, stopDurationProvider, vehicle,
-					enteringHandler);
+					prebookingManager);
 		}
 
 		return delegate.createAction(dynAgent, vehicle, now);

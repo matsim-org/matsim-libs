@@ -2,13 +2,12 @@ package org.matsim.contrib.drt.extension.prebooking.logic;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.extension.prebooking.dvrp.PrebookingManager;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeTracker;
@@ -43,20 +42,24 @@ public class AttributePrebookingLogic extends TimedPrebookingLogic {
 
 	private final Population population;
 	private final TimeInterpretation timeInterpretation;
+	private final QSim qsim;
 
 	public AttributePrebookingLogic(String mode, PrebookingManager prebookingManager, Population population,
-			TimeInterpretation timeInterpretation) {
+			TimeInterpretation timeInterpretation, QSim qsim) {
 		super(prebookingManager);
 
 		this.mode = mode;
 		this.population = population;
 		this.timeInterpretation = timeInterpretation;
+		this.qsim = qsim;
 	}
 
 	@Override
 	protected void scheduleRequests() {
-		for (Person person : population.getPersons().values()) {
-			Plan plan = person.getSelectedPlan();
+		PopulationIterator iterator = PopulationIterator.create(population, qsim);
+
+		while (iterator.hasNext()) {
+			var item = iterator.next();
 
 			TimeTracker timeTracker = new TimeTracker(timeInterpretation);
 
@@ -64,11 +67,12 @@ public class AttributePrebookingLogic extends TimedPrebookingLogic {
 			Double plannedDepartureTime = null;
 			boolean foundLeg = false;
 
-			for (PlanElement element : plan.getPlanElements()) {
+			for (PlanElement element : item.plan().getPlanElements()) {
 				if (element instanceof Activity) {
 					Activity activity = (Activity) element;
 
 					if (!TripStructureUtils.isStageActivityType(activity.getType())) {
+						foundLeg = false;
 						submissionTime = (Double) activity.getAttributes().getAttribute(SUBMISSION_TIME_ATTRIBUTE);
 						plannedDepartureTime = (Double) activity.getAttributes()
 								.getAttribute(PLANNED_DEPARTURE_ATTRIBUTE);
@@ -79,8 +83,8 @@ public class AttributePrebookingLogic extends TimedPrebookingLogic {
 					Leg leg = (Leg) element;
 
 					if (leg.getMode().equals(mode)) {
-						Verify.verify(!foundLeg, "Person " + person.getId().toString()
-								+ " has at least two drt legs. Please make use of a different PrebookingLogic.");
+						Verify.verify(!foundLeg, "Person " + item.person().getId().toString()
+								+ " has at least two drt legs in one trip.");
 						foundLeg = true;
 
 						if (plannedDepartureTime == null) {
@@ -88,7 +92,7 @@ public class AttributePrebookingLogic extends TimedPrebookingLogic {
 						}
 
 						if (submissionTime != null) {
-							queue.schedule(submissionTime, person, leg, plannedDepartureTime);
+							queue.schedule(submissionTime, item.person(), leg, plannedDepartureTime);
 						}
 					}
 				}
@@ -106,8 +110,9 @@ public class AttributePrebookingLogic extends TimedPrebookingLogic {
 					PrebookingManager prebookingManager = getter.getModal(PrebookingManager.class);
 					Population population = getter.get(Population.class);
 					TimeInterpretation timeInterpretation = TimeInterpretation.create(getConfig());
+					QSim qsim = getter.get(QSim.class);
 
-					return new AttributePrebookingLogic(mode, prebookingManager, population, timeInterpretation);
+					return new AttributePrebookingLogic(mode, prebookingManager, population, timeInterpretation, qsim);
 				}));
 			}
 		});
