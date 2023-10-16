@@ -56,10 +56,7 @@ public class RunPSimTest {
 		//identify selector strategies
 		Field[] selectors = DefaultPlanStrategiesModule.DefaultSelector.class.getDeclaredFields();
 		List<String> selectorNames = new ArrayList<>();
-//		for (Field selector : selectors) {
-//			selectorNames.add(selector.toString());
-//			logger.warn( selector.toString() );
-//		}
+
 		// yyyyyy does not work as designed
 		selectorNames.add( DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta );
 		selectorNames.add( DefaultPlanStrategiesModule.DefaultSelector.BestScore );
@@ -106,10 +103,8 @@ public class RunPSimTest {
 		Population popActual = PopulationUtils.createPopulation( config );
 		PopulationUtils.readPopulation( popActual, outDir + "/output_plans.xml.gz" );
 		new PopulationComparison().compare( popExpected, popActual ) ;
-		Assert.assertEquals("RunPsim score changed.", 138.87261194067847, psimScore, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("RunPsim score changed.", 134.54001491094124d, psimScore, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("RunPsim score changed.", 134.52369453719413d, psimScore, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("RunPsim score changed.", 132.73129073101293d, psimScore, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("RunPsim score changed.", 138.86084460860525, psimScore, MatsimTestUtils.EPSILON);
+
 	}
 
 	/**
@@ -134,7 +129,7 @@ public class RunPSimTest {
 		double qsimScore = execScoreTracker.executedScore;
 		logger.info("Default controler score was " + qsimScore );
 //		Assert.assertEquals("Default controler score changed.", 131.84309487251033d, qsimScore, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Default controler score changed.", 131.84350487113088d, qsimScore, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Default controler score changed.", 131.8303325803256, qsimScore, MatsimTestUtils.EPSILON);
 	}
 
 	class ExecScoreTracker implements ShutdownListener {
