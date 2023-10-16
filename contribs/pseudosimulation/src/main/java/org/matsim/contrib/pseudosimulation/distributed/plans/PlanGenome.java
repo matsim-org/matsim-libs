@@ -219,6 +219,24 @@ public class PlanGenome implements Plan {
     public void setType(final String type) {
         this.type = type;
     }
+    
+	@Override
+	public Id<Plan> getId() { return null; }
+
+	@Override
+	public void setPlanId(Id<Plan> planId) { /* nothing to do here */ }
+    
+	@Override
+	public int getIterationCreated() { return -1; }
+
+	@Override
+	public void setIterationCreated(int iteration) { /* nothing to do here */ }
+
+	@Override
+	public String getPlanMutator() { return null; }
+
+	@Override
+	public void setPlanMutator(String planMutator) { /* nothing to do here */ }
 
     @Override
     public final List<PlanElement> getPlanElements() {
