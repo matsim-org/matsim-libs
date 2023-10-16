@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 
 import java.io.IOException;
@@ -63,7 +62,7 @@ final class CountsWriterV2 extends MatsimXmlWriter {
 		write(filename.toString());
 	}
 
-	private void writeRootElement() throws UncheckedIOException {
+	private void writeRootElement() {
 
 		List<Tuple<String, String>> atts = new ArrayList<>();
 
