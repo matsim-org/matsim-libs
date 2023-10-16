@@ -40,12 +40,12 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 	private RegressionResults fare;
 
 	public BasicDrtEstimator(DrtEventSequenceCollector collector, DrtEstimatorConfigGroup config,
-							 DrtConfigGroup drtConfig, DrtSpeedUpParams speedUpParams) {
+							 DrtConfigGroup drtConfig) {
 		//zones = injector.getModal(DrtZonalSystem.class);
 		this.collector = collector;
 		this.config = config;
 		this.drtConfig = drtConfig;
-		this.speedUpParams = speedUpParams;
+		this.speedUpParams = this.drtConfig.getDrtSpeedUpParams().isPresent() ? this.drtConfig.getDrtSpeedUpParams().get() : null;
 	}
 
 	@Override

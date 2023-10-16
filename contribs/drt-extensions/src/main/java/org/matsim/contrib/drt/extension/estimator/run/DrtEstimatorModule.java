@@ -7,8 +7,6 @@ import org.matsim.contrib.drt.extension.estimator.DrtEstimateAnalyzer;
 import org.matsim.contrib.drt.extension.estimator.DrtEstimator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.drt.speedup.DrtSpeedUp;
-import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -51,21 +49,7 @@ public class DrtEstimatorModule extends AbstractModule {
 			// try with default injections and overwrite
 			if (group.estimator == DrtEstimatorConfigGroup.EstimatorType.BASIC) {
 				bindModal(DrtEstimator.class).toProvider(modalProvider(
-					getter -> {
-						DrtSpeedUpParams modal = null;
-						try {
-							DrtSpeedUp speedUp = getter.getModal(DrtSpeedUp.class);
-							modal = speedUp.getParams();
-						} catch (Exception e) {
-							// This happens if the speed-up is not installed
-							// there is no other way to check it
-						}
-
-						return new BasicDrtEstimator(getter.getModal(DrtEventSequenceCollector.class),
-							group,
-							cfg,
-							modal);
-					}
+					getter -> new BasicDrtEstimator(getter.getModal(DrtEventSequenceCollector.class), group, cfg)
 				)).in(Singleton.class);
 			}
 
