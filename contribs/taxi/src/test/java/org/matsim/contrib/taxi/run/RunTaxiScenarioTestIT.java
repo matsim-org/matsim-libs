@@ -51,8 +51,8 @@ public class RunTaxiScenarioTestIT {
 				new OTFVisConfigGroup());
 		config.plans().setInputFile(plansFile);
 		TaxiConfigGroup.getSingleModeTaxiConfig(config).taxisFile = taxisFile;
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setDumpDataAtEnd(false);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setDumpDataAtEnd(false);
 		TaxiControlerCreator.createControler(config, false).run();
 	}
 }

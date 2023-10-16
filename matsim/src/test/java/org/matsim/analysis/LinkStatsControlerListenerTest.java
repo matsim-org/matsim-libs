@@ -65,8 +65,8 @@ public class LinkStatsControlerListenerTest {
 		String outputDirectory = util.getOutputDirectory();
 
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controler().setLastIteration(10);
-		config.controler().setOutputDirectory(outputDirectory);
+		config.controller().setLastIteration(10);
+		config.controller().setOutputDirectory(outputDirectory);
 		Controler c = new Controler(config);
 
 		c.run();
@@ -84,7 +84,7 @@ public class LinkStatsControlerListenerTest {
 	@Test
 	public void testUseVolumesOfIteration() {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(util.getOutputDirectory());
+		config.controller().setOutputDirectory(util.getOutputDirectory());
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		com.google.inject.Injector injector = Injector.createInjector(config, new AbstractModule() {
 			@Override
@@ -320,38 +320,38 @@ public class LinkStatsControlerListenerTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				if (getConfig().controler().getMobsim().equals("dummy")) {
+				if (getConfig().controller().getMobsim().equals("dummy")) {
 					bind(Mobsim.class).toProvider(DummyMobsimFactory.class);
 				}
 			}
 		});
-		config.controler().setMobsim("dummy");
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(7);
+		config.controller().setMobsim("dummy");
+		config.controller().setFirstIteration(0);
+		config.controller().setLastIteration(7);
 
-		controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		config.controler().setWritePlansInterval(0);
+		controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
+		config.controller().setWritePlansInterval(0);
 		controler.run();
 
-		Assert.assertTrue(new File(config.controler().getOutputDirectory() + "ITERS/it.0/0.linkstats.txt.gz").exists());
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.1/1.linkstats.txt.gz").exists());
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.2/2.linkstats.txt.gz").exists());
-		Assert.assertTrue(new File(config.controler().getOutputDirectory() + "ITERS/it.3/3.linkstats.txt.gz").exists());
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.4/4.linkstats.txt.gz").exists());
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.5/5.linkstats.txt.gz").exists());
-		Assert.assertTrue(new File(config.controler().getOutputDirectory() + "ITERS/it.6/6.linkstats.txt.gz").exists());
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.7/7.linkstats.txt.gz").exists());
+		Assert.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.0/0.linkstats.txt.gz").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.1/1.linkstats.txt.gz").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.2/2.linkstats.txt.gz").exists());
+		Assert.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.3/3.linkstats.txt.gz").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.4/4.linkstats.txt.gz").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.5/5.linkstats.txt.gz").exists());
+		Assert.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.6/6.linkstats.txt.gz").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.7/7.linkstats.txt.gz").exists());
 	}
 
 	@Test
 	public void testReset_CorrectlyExecuted() throws IOException {
 		Config config = this.util.loadConfig((String) null);
-		config.controler().setMobsim("dummy");
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(7);
-		config.controler().setWritePlansInterval(0);
+		config.controller().setMobsim("dummy");
+		config.controller().setFirstIteration(0);
+		config.controller().setLastIteration(7);
+		config.controller().setWritePlansInterval(0);
 		LinkStatsConfigGroup lsConfig = config.linkStats();
 
 		lsConfig.setWriteLinkStatsInterval(3);
@@ -367,31 +367,31 @@ public class LinkStatsControlerListenerTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				if (getConfig().controler().getMobsim().equals("dummy")) {
+				if (getConfig().controller().getMobsim().equals("dummy")) {
 					bind(Mobsim.class).toProvider(DummyMobsimFactory.class);
 				}
 			}
 		});
 
-		controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
+		controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
 		controler.run();
 
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.0/0.linkstats.txt.gz").exists());
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.1/1.linkstats.txt.gz").exists());
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.2/2.linkstats.txt.gz").exists());
-		Assert.assertTrue(new File(config.controler().getOutputDirectory() + "ITERS/it.3/3.linkstats.txt.gz").exists());
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.4/4.linkstats.txt.gz").exists());
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.5/5.linkstats.txt.gz").exists());
-		Assert.assertTrue(new File(config.controler().getOutputDirectory() + "ITERS/it.6/6.linkstats.txt.gz").exists());
-		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.7/7.linkstats.txt.gz").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.0/0.linkstats.txt.gz").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.1/1.linkstats.txt.gz").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.2/2.linkstats.txt.gz").exists());
+		Assert.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.3/3.linkstats.txt.gz").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.4/4.linkstats.txt.gz").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.5/5.linkstats.txt.gz").exists());
+		Assert.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.6/6.linkstats.txt.gz").exists());
+		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.7/7.linkstats.txt.gz").exists());
 
-		double[] volumes = getVolumes(config.controler().getOutputDirectory() + "ITERS/it.3/3.linkstats.txt");
+		double[] volumes = getVolumes(config.controller().getOutputDirectory() + "ITERS/it.3/3.linkstats.txt");
 		Assert.assertEquals(3, volumes[0], 1e-8);
 		Assert.assertEquals(3.5, volumes[1], 1e-8);
 		Assert.assertEquals(4, volumes[2], 1e-8);
-		volumes = getVolumes(config.controler().getOutputDirectory() + "ITERS/it.6/6.linkstats.txt");
+		volumes = getVolumes(config.controller().getOutputDirectory() + "ITERS/it.6/6.linkstats.txt");
 		Assert.assertEquals(6, volumes[0], 1e-8);
 		Assert.assertEquals(6.5, volumes[1], 1e-8);
 		Assert.assertEquals(7, volumes[2], 1e-8);

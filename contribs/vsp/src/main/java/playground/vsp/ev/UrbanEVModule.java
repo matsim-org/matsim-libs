@@ -20,11 +20,6 @@
 
 package playground.vsp.ev;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.ChargingModule;
 import org.matsim.contrib.ev.discharging.DischargingModule;
@@ -33,20 +28,19 @@ import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureModule;
 import org.matsim.contrib.ev.stats.EvStatsModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
-import org.matsim.core.modal.AbstractModalQSimModule;
 
 public class UrbanEVModule extends AbstractModule {
 	static final String PLUGIN_IDENTIFIER = " plugin";
-	public static final String PLUGIN_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType( PLUGIN_IDENTIFIER );
+	public static final String PLUGIN_INTERACTION = ScoringConfigGroup.createStageActivityType( PLUGIN_IDENTIFIER );
 	static final String PLUGOUT_IDENTIFIER = " plugout";
-	public static final String PLUGOUT_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType( PLUGOUT_IDENTIFIER );
+	public static final String PLUGOUT_INTERACTION = ScoringConfigGroup.createStageActivityType( PLUGOUT_IDENTIFIER );
 	@Inject private Config config;
 
 	@Override public void install() {

@@ -10,7 +10,6 @@
 
 	<module name="travelTimeCalculator" >
 		<param name="travelTimeBinSize" value="900" />
-		<param name="travelTimeCalculator" value="TravelTimeCalculatorArray" />
 	</module>
 
 	<module name="network">

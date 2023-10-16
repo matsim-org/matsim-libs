@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.application.MATSimApplication;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.PlanStrategy;
@@ -24,9 +24,9 @@ public class SelectSingleTripModeStrategyTest extends ScenarioTest {
 
 		Config config = TestScenario.loadConfig(utils);
 
-		config.controler().setLastIteration(10);
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		config.strategy().addStrategySettings(new StrategyConfigGroup.StrategySettings()
+		config.controller().setLastIteration(10);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		config.replanning().addStrategySettings(new ReplanningConfigGroup.StrategySettings()
 				.setStrategyName(InformedModeChoiceModule.SELECT_SINGLE_TRIP_MODE_STRATEGY)
 				.setSubpopulation("person")
 				.setWeight(0.5)

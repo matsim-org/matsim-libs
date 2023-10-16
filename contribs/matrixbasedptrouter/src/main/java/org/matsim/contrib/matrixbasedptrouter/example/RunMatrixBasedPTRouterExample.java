@@ -19,16 +19,11 @@
 
 package org.matsim.contrib.matrixbasedptrouter.example;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtModule;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
-import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
-import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * sets up a Matsim Scenario using example matrix based pt routing data
@@ -46,7 +41,7 @@ public class RunMatrixBasedPTRouterExample
         //load config - check the config file for required PT Matrix input file data
         String path = "src/main/resources/example/";
         Config config = ConfigUtils.loadConfig(path+"example_config.xml", new MatrixBasedPtRouterConfigGroup());
-        
+
         Controler controler = new Controler(config);
         controler.addOverridingModule(new MatrixBasedPtModule());
         controler.run();

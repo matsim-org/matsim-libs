@@ -46,8 +46,8 @@ public class SBBTransitQSimEngineIntegrationTest {
     public void testIntegration() {
         TestFixture f = new TestFixture();
 
-        f.config.controler().setOutputDirectory(this.utils.getOutputDirectory());
-        f.config.controler().setLastIteration(0);
+        f.config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+        f.config.controller().setLastIteration(0);
 
         Controler controler = new Controler(f.scenario);
         controler.addOverridingModule(new SBBTransitModule());
@@ -75,8 +75,8 @@ public class SBBTransitQSimEngineIntegrationTest {
         mainModes.add("car");
         mainModes.add("train");
         f.config.qsim().setMainModes(mainModes);
-        f.config.controler().setOutputDirectory(this.utils.getOutputDirectory());
-        f.config.controler().setLastIteration(0);
+        f.config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+        f.config.controller().setLastIteration(0);
 
         Controler controler = new Controler(f.scenario);
         controler.addOverridingModule(new SBBTransitModule());

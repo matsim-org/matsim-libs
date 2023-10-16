@@ -32,6 +32,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -207,7 +208,8 @@ public class MatsimXmlParserTest {
 			}.parse(stream);
 			Assert.fail("expected exception.");
 		} catch (UncheckedIOException e) {
-			Assert.assertTrue(e.getCause() instanceof SAXParseException); // expected
+			Assert.assertTrue(e.getCause() instanceof IOException); // expected
+			Assert.assertTrue(e.getCause().getCause() instanceof SAXParseException); // expected
 		}
 
 		Assert.assertEquals(3, log.size());
@@ -282,7 +284,8 @@ public class MatsimXmlParserTest {
 			}.parse(stream);
 			Assert.fail("expected exception.");
 		} catch (UncheckedIOException e) {
-			Assert.assertTrue(e.getCause() instanceof SAXParseException); // expected
+			Assert.assertTrue(e.getCause() instanceof IOException); // expected
+			Assert.assertTrue(e.getCause().getCause() instanceof SAXParseException); // expected
 		}
 
 		Assert.assertEquals(5, log.size());

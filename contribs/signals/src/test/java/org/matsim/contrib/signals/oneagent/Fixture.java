@@ -45,8 +45,8 @@ import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.Lane;
@@ -65,18 +65,18 @@ public class Fixture {
 	final Id<SignalPlan> signalPlanId2 = Id.create(2, SignalPlan.class);
 	final Id<SignalSystem> signalSystemId2 = Id.create(2, SignalSystem.class);
 	final Id<SignalGroup> signalGroupId100 = Id.create(100, SignalGroup.class);
-	
+
 	// only available if 'TwoSignals'-Method is used
 	final Id<SignalGroup> signalGroupId200 = Id.create(200, SignalGroup.class);
 	final Id<Link> linkId6 = Id.create(6, Link.class);
 	final Id<Node> nodeId6 = Id.create(6, Node.class);
-	
+
 
 	public Scenario createAndLoadTestScenarioOneSignal(Boolean useIntergreens){
 		Config conf = createConfigOneSignal(useIntergreens);
 		Scenario scenario = ScenarioUtils.loadScenario(conf);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(conf).loadSignalsData());
-		
+
 		return scenario;
 	}
 
@@ -89,15 +89,15 @@ public class Fixture {
 			e.printStackTrace();
 		}
 		Config conf = ConfigUtils.createConfig(testUtils.classInputResourcePath());
-		conf.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		conf.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		ActivityParams params = new ActivityParams("h");
 		params.setTypicalDuration(24.0 * 3600.0);
-		conf.planCalcScore().addActivityParams(params);
+		conf.scoring().addActivityParams(params);
 
 		StrategySettings settings = new StrategySettings(Id.create("1", StrategySettings.class));
 		settings.setStrategyName("ChangeExpBeta");
 		settings.setWeight(1.0);
-		conf.strategy().addStrategySettings(settings);
+		conf.replanning().addStrategySettings(settings);
 		conf.network().setInputFile("network.xml.gz");
 		conf.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 		conf.plans().setInputFile("plans1Agent.xml");
@@ -107,17 +107,17 @@ public class Fixture {
 		conf.qsim().setUsingFastCapacityUpdate(false);
 		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
 		signalsConfig.setUseSignalSystems(true);
-		
+
 		if (useIntergreens) {
 			signalsConfig.setIntergreenTimesFile("testIntergreenTimes_v1.0.xml");
 			signalsConfig.setUseIntergreenTimes(true);
 			signalsConfig.setActionOnIntergreenViolation(SignalSystemsConfigGroup.ActionOnSignalSpecsViolation.EXCEPTION);
-		}			
+		}
 
 		this.setSignalSystemConfigValues(signalsConfig, testUtils);
 		return conf;
 	}
-	
+
 	private void setSignalSystemConfigValues(SignalSystemsConfigGroup signalsConfig, MatsimTestUtils testUtils){
 		signalsConfig.setSignalSystemFile("testSignalSystems_v2.0.xml");
 		signalsConfig.setSignalGroupsFile("testSignalGroups_v2.0.xml");
@@ -130,10 +130,10 @@ public class Fixture {
 		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
 		signalsConfig.setIntersectionLogic(IntersectionLogic.CONFLICTING_DIRECTIONS_NO_TURN_RESTRICTIONS);
 		signalsConfig.setActionOnConflictingDirectionViolation(ActionOnSignalSpecsViolation.EXCEPTION);
-		
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
-		
+
 		// modify scenario
 		Network net = scenario.getNetwork();
 		net.addNode(net.getFactory().createNode(nodeId6, new Coord(0, 100)));
@@ -168,9 +168,9 @@ public class Fixture {
 		conflictsNode2.addDirection(direction1);
 		conflictsNode2.addDirection(direction2);
 		signalsData.getConflictingDirectionsData().addConflictingDirectionsForIntersection(signalSystemId2, nodeId2, conflictsNode2);
-		
+
 		return scenario;
 	}
 
-	
+
 }

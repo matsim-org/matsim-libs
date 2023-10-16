@@ -18,7 +18,7 @@
 
 package org.matsim.contrib.freightreceiver.replanning;
 
-import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.freight.carriers.TimeWindow;
 import org.matsim.contrib.freightreceiver.ReceiverPlan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.ReplanningContext;

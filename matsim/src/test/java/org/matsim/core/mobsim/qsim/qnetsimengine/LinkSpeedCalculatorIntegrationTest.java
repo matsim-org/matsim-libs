@@ -147,7 +147,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 
 		final Scenario scenario = f.scenario ;
 		final Config config = scenario.getConfig() ;
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 
 //		Collection<AbstractModule> defaultsModules = new ArrayList<>() ;
 //		defaultsModules.add( new ScenarioByInstanceModule( scenario ) ) ;

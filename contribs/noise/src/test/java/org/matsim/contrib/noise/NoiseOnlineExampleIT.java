@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.noise;
 
@@ -53,7 +53,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class NoiseOnlineExampleIT {
 	private static final Logger log = LogManager.getLogger( NoiseOnlineExampleIT.class ) ;
-	
+
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
@@ -62,8 +62,8 @@ public class NoiseOnlineExampleIT {
 
 		String configFile = testUtils.getPackageInputDirectory() + "config.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
-		config.controler().setLastIteration(1);
-		config.controler().setOutputDirectory( testUtils.getOutputDirectory() );
+		config.controller().setLastIteration(1);
+		config.controller().setOutputDirectory( testUtils.getOutputDirectory() );
 
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		noiseParameters.setWriteOutputIteration(1);
@@ -73,8 +73,8 @@ public class NoiseOnlineExampleIT {
 		controler.addOverridingModule(new NoiseModule());
 		controler.run();
 
-		String workingDirectory = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/";
-		String receiverPointsFile = controler.getConfig().controler().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
+		String workingDirectory = controler.getConfig().controller().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controller().getLastIteration() + "/immissions/";
+		String receiverPointsFile = controler.getConfig().controller().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
 		ProcessNoiseImmissions processNoiseImmissions = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile, noiseParameters.getReceiverPointGap());
 		processNoiseImmissions.run();
 	}
@@ -83,8 +83,8 @@ public class NoiseOnlineExampleIT {
 	public final void testOnTheFlyAggregationTerms() {
 		String configFile = testUtils.getPackageInputDirectory() + "config.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
-		config.controler().setLastIteration(1);
-		config.controler().setOutputDirectory( testUtils.getOutputDirectory() );
+		config.controller().setLastIteration(1);
+		config.controller().setOutputDirectory( testUtils.getOutputDirectory() );
 
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		noiseParameters.setWriteOutputIteration(1);
@@ -127,12 +127,12 @@ public class NoiseOnlineExampleIT {
 		controler.run();
 
 		//run file based noise processing as reference
-		String workingDirectory = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/";
-		String receiverPointsFile = controler.getConfig().controler().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
+		String workingDirectory = controler.getConfig().controller().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controller().getLastIteration() + "/immissions/";
+		String receiverPointsFile = controler.getConfig().controller().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
 		ProcessNoiseImmissions processNoiseImmissions = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile, noiseParameters.getReceiverPointGap());
 		processNoiseImmissions.run();
 
-		String pathToImmissionsFile = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/immission_processed.csv";
+		String pathToImmissionsFile = controler.getConfig().controller().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controller().getLastIteration() + "/immissions/immission_processed.csv";
 
 		//store file based noise aggregation terms by receiver
 		Map<Id<ReceiverPoint>, Double> ldenByRp = new HashMap<>();
@@ -183,8 +183,8 @@ public class NoiseOnlineExampleIT {
 	public final void testNoiseListener(){
 
 		Config config = ConfigUtils.loadConfig( testUtils.getPackageInputDirectory() + "config.xml", new NoiseConfigGroup() );
-		config.controler().setLastIteration(1);
-		config.controler().setOutputDirectory( testUtils.getOutputDirectory() );
+		config.controller().setLastIteration(1);
+		config.controller().setOutputDirectory( testUtils.getOutputDirectory() );
 
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		noiseParameters.setWriteOutputIteration(1);
@@ -206,8 +206,8 @@ public class NoiseOnlineExampleIT {
 
 		controler.run();
 
-		String workingDirectory = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/";
-		String receiverPointsFile = controler.getConfig().controler().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
+		String workingDirectory = controler.getConfig().controller().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controller().getLastIteration() + "/immissions/";
+		String receiverPointsFile = controler.getConfig().controller().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
 		ProcessNoiseImmissions processNoiseImmissions = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile, noiseParameters.getReceiverPointGap());
 		processNoiseImmissions.addListener( new NoiseModule.NoiseListener() {
 			@Override public void newRecord( XYTRecord record ) { log.warn( record ) ; }

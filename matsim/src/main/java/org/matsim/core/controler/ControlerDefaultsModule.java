@@ -44,7 +44,6 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.counts.CountsModule;
 import org.matsim.guice.DependencyGraphModule;
-import org.matsim.pt.counts.PtCountsModule;
 import org.matsim.vis.snapshotwriters.SnapshotWritersModule;
 
 import javax.imageio.ImageIO;
@@ -74,7 +73,6 @@ public final class ControlerDefaultsModule extends AbstractModule {
         install(new ScoreStatsModule());
         install(new ModeStatsModule());
         install(new CountsModule());
-        install(new PtCountsModule());
         install(new VspPlansCleanerModule());
         install(new SnapshotWritersModule());
         install(new DependencyGraphModule());
