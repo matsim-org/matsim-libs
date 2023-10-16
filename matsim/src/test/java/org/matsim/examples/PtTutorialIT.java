@@ -51,13 +51,13 @@ import org.matsim.testcases.MatsimTestUtils;
 public class PtTutorialIT {
 
 	private final static Logger log = LogManager.getLogger(PtTutorialIT.class);
-	
+
 	public @Rule MatsimTestUtils utils = new MatsimTestUtils();
-	
+
 	@Test
 	public void ensure_tutorial_runs() throws MalformedURLException {
 		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "0.config.xml"));
-		config.controler().setLastIteration(1);
+		config.controller().setLastIteration(1);
 
 		try {
 			Controler controler = new Controler(config);
@@ -76,9 +76,9 @@ public class PtTutorialIT {
 			Assert.fail("There shouldn't be any exception, but there was ... :-(");
 		}
 		final String it1Plans = "ITERS/it.1/1.plans.xml.gz";
-		Assert.assertTrue(new File(config.controler().getOutputDirectory(), it1Plans).exists());
-		Assert.assertTrue(new File(config.controler().getOutputDirectory(), "output_config.xml").exists());
-		
+		Assert.assertTrue(new File(config.controller().getOutputDirectory(), it1Plans).exists());
+		Assert.assertTrue(new File(config.controller().getOutputDirectory(), "output_config.xml").exists());
+
 		log.info( Controler.DIVIDER ) ;
 		log.info( Controler.DIVIDER ) ;
 		// try to restart from output:
@@ -87,11 +87,11 @@ public class PtTutorialIT {
 
 		config.plans().setInputFile(new File(utils.getOutputDirectory() + "/" + it1Plans).toURI().toURL().toString());
 
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles );
+		config.controller().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles );
 		// note: cannot delete directory since some of the input resides there. kai, sep'15
-		
-		config.controler().setFirstIteration(10);
-		config.controler().setLastIteration(10);
+
+		config.controller().setFirstIteration(10);
+		config.controller().setLastIteration(10);
 
 		try {
 			Controler controler = new Controler(config);
@@ -110,7 +110,7 @@ public class PtTutorialIT {
 			log.error(e.getMessage(), e);
 			Assert.fail("There shouldn't be any exception, but there was ... :-(");
 		}
-		
+
 	}
 
 	private static final class EnterVehicleEventCounter implements PersonEntersVehicleEventHandler {
@@ -154,5 +154,5 @@ public class PtTutorialIT {
 			}
 		}
 	}
-	
+
 }

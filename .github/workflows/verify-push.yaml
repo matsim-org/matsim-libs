@@ -58,7 +58,6 @@ jobs:
           - contribs/railsim
           - contribs/roadpricing
           - contribs/analysis
-          - contribs/eventsBasedPTRouter
           - contribs/hybridsim
           - contribs/informed-mode-choice
           - contribs/otfvis

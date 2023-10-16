@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -40,20 +40,20 @@ import playground.vsp.pipeline.PersonSink;
 import playground.vsp.pipeline.PersonSinkSource;
 
 public class PersonRouterFilter implements PersonSinkSource {
-	
+
 private Network network;
-	
+
 	private LeastCostPathCalculator dijkstra;
-	
+
 	private PersonSink sink;
-	
+
 	private Collection<Id> interestingNodeIds = new HashSet<Id>();
-	
+
 	double travelTimeToEntry = 0.0;
-	
+
 	public PersonRouterFilter(Network network) {
 		this.network = network;
-		FreespeedTravelTimeAndDisutility fttc = new FreespeedTravelTimeAndDisutility(new PlanCalcScoreConfigGroup());
+		FreespeedTravelTimeAndDisutility fttc = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
 		dijkstra = new DijkstraFactory().createPathCalculator(network, fttc, fttc);
 	}
 
@@ -97,7 +97,7 @@ private Network network;
 	public void setSink(PersonSink sink) {
 		this.sink = sink;
 	}
-	
+
 	private static double calculateFreespeedTravelTimeToNode(Network network, Path path, Node node) {
 		double travelTime = 0.0;
 		for (Link l : path.links) {

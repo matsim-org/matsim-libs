@@ -6,8 +6,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -45,7 +45,7 @@ public class ModeChoiceCoverageControlerListener implements StartupListener, Ite
     private final Population population;
     private final String modeFileName;
     private final boolean createPNG;
-    private final ControlerConfigGroup controlerConfigGroup;
+    private final ControllerConfigGroup controllerConfigGroup;
     private final MainModeIdentifier mainModeIdentifier;
 
     private int minIteration = 0;
@@ -64,10 +64,10 @@ public class ModeChoiceCoverageControlerListener implements StartupListener, Ite
 
 
     @Inject
-    ModeChoiceCoverageControlerListener(ControlerConfigGroup controlerConfigGroup, Population population1, OutputDirectoryHierarchy controlerIO,
-                                        PlanCalcScoreConfigGroup scoreConfig, AnalysisMainModeIdentifier mainModeIdentifier) {
+    ModeChoiceCoverageControlerListener(ControllerConfigGroup controllerConfigGroup, Population population1, OutputDirectoryHierarchy controlerIO,
+																				ScoringConfigGroup scoreConfig, AnalysisMainModeIdentifier mainModeIdentifier) {
 
-        this.controlerConfigGroup = controlerConfigGroup;
+        this.controllerConfigGroup = controllerConfigGroup;
         this.population = population1;
         this.modeFileName = controlerIO.getOutputFilename(FILENAME_MODESTATS);
         //		this.createPNG = controlerConfigGroup.isCreateGraphs();
@@ -81,7 +81,7 @@ public class ModeChoiceCoverageControlerListener implements StartupListener, Ite
 
     @Override
     public void notifyStartup(final StartupEvent event) {
-        this.minIteration = controlerConfigGroup.getFirstIteration();
+        this.minIteration = controllerConfigGroup.getFirstIteration();
     }
 
     @Override

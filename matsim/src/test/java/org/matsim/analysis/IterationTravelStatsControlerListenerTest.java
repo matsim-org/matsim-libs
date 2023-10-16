@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.matsim.analysis;
 
@@ -43,19 +43,19 @@ public class IterationTravelStatsControlerListenerTest {
 
 	final IdMap<Person, Plan> map = new IdMap<>(Person.class);
 	Config config = ConfigUtils.createConfig();
-	
+
 	private int person;
 	private int executed_score;
 	private int first_act_x;
 	private int first_act_y;
 	private int first_act_type;
-	
+
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
-	
+
 	@Test
 	public void testIterationTravelStatsControlerListener() {
-		
+
 		Plans plans = new Plans();
 
 		/****************************
@@ -78,9 +78,9 @@ public class IterationTravelStatsControlerListenerTest {
 		 * Plan 4-----creating plan 4
 		 **************************************/
 		Plan plan4 = plans.createPlanFour();
-		
+
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		
+
 		Person person1 = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));;
 		person1.addPlan(plan1);
 		Person person2 = PopulationUtils.getFactory().createPerson(Id.create("2", Person.class));;
@@ -89,18 +89,18 @@ public class IterationTravelStatsControlerListenerTest {
 		person3.addPlan(plan3);
 		Person person4 = PopulationUtils.getFactory().createPerson(Id.create("4", Person.class));;
 		person4.addPlan(plan4);
-		
+
 		scenario.getPopulation().addPerson(person1);
 		scenario.getPopulation().addPerson(person2);
 		scenario.getPopulation().addPerson(person3);
 		scenario.getPopulation().addPerson(person4);
-		
+
 		performTest(scenario, utils.getOutputDirectory() + "/IterationTravelStatsControlerListener");
 	}
-	
+
 	private void performTest(Scenario scenario, String outputDirectory) {
-		
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		ShutdownEvent shutdownEvent = new ShutdownEvent(null, false, 0);
 		com.google.inject.Injector injector = Injector.createInjector(config, new AbstractModule() {
 			@Override
@@ -121,11 +121,11 @@ public class IterationTravelStatsControlerListenerTest {
 		ltcl.notifyShutdown(shutdownEvent);
 		readAndValidateValues(scenario);
 	}
-	
+
 	private Activity identifyFirstActivity(Person person) {
 		return (Activity) person.getSelectedPlan().getPlanElements().get(0);
 	}
-	
+
 	private void readAndValidateValues(Scenario scenario) {
 
 		String file = utils.getOutputDirectory() + "/output_persons.csv.gz";
@@ -163,9 +163,9 @@ public class IterationTravelStatsControlerListenerTest {
 			e.printStackTrace();
 		}
 
-	
+
 	}
-	
+
 	private void decideColumns(String[] columnNames) {
 
 		Integer i = 0;
@@ -184,7 +184,7 @@ public class IterationTravelStatsControlerListenerTest {
 			case "first_act_x":
 				first_act_x = i;
 				break;
-				
+
 			case "first_act_y":
 				first_act_y = i;
 				break;

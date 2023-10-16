@@ -32,26 +32,19 @@ import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYBarPainter;
-import org.jfree.data.xy.DefaultTableXYDataset;
 import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifier;
@@ -80,7 +73,7 @@ public final class ModeStatsControlerListener implements StartupListener, Iterat
 	final private String modeFileName ;
 
 	private final boolean createPNG;
-	private final ControlerConfigGroup controlerConfigGroup;
+	private final ControllerConfigGroup controllerConfigGroup;
 
 	Map<String,Map<Integer,Double>> modeHistories = new HashMap<>() ;
 	private int minIteration = 0;
@@ -94,18 +87,18 @@ public final class ModeStatsControlerListener implements StartupListener, Iterat
 	private final static Logger log = LogManager.getLogger(ModeStatsControlerListener.class);
 
 	@Inject
-	ModeStatsControlerListener(ControlerConfigGroup controlerConfigGroup, Population population1, OutputDirectoryHierarchy controlerIO,
-							   PlanCalcScoreConfigGroup scoreConfig, AnalysisMainModeIdentifier mainModeIdentifier) {
-		this.controlerConfigGroup = controlerConfigGroup;
+	ModeStatsControlerListener(ControllerConfigGroup controllerConfigGroup, Population population1, OutputDirectoryHierarchy controlerIO,
+														 ScoringConfigGroup scoreConfig, AnalysisMainModeIdentifier mainModeIdentifier) {
+		this.controllerConfigGroup = controllerConfigGroup;
 		this.population = population1;
 		this.modeFileName = controlerIO.getOutputFilename( FILENAME_MODESTATS ) ;
-		this.createPNG = controlerConfigGroup.isCreateGraphs();
+		this.createPNG = controllerConfigGroup.isCreateGraphs();
 		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		this.minIteration = controlerConfigGroup.getFirstIteration();
+		this.minIteration = controllerConfigGroup.getFirstIteration();
 	}
 
 	@Override

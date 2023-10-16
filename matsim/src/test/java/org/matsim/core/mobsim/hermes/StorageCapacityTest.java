@@ -234,7 +234,7 @@ public class StorageCapacityTest {
 	public void testStorageCapacityWithVaryingPCUs() {
 		ScenarioImporter.flush();
 		Config config = ConfigUtils.createConfig();
-		config.plansCalcRoute().setNetworkModes(Set.of(TransportMode.car, TransportMode.truck));
+		config.routing().setNetworkModes(Set.of(TransportMode.car, TransportMode.truck));
 		config.hermes().setStuckTime(Integer.MAX_VALUE);
 		config.hermes().setMainModes(Set.of(TransportMode.car, TransportMode.truck));
 		Scenario scenario = ScenarioUtils.createScenario(config);

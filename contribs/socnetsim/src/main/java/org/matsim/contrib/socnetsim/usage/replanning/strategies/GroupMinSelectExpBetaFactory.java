@@ -54,7 +54,7 @@ public class GroupMinSelectExpBetaFactory extends NonInnovativeStrategyFactory {
 				new LowestScoreOfJointPlanWeight(
 					((JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME  )) ),
 				MatsimRandom.getLocalInstance(),
-				sc.getConfig().planCalcScore().getBrainExpBeta()) );
+				sc.getConfig().scoring().getBrainExpBeta()) );
 
 	}
 }

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
-    <module name="TimeAllocationMutator">
+    <module name="timeAllocationMutator">
         <param name="mutationRange" value="7200.0"/>
     </module>
 
-    <module name="controler">
+    <module name="controller">
         <param name="lastIteration" value="1000"/>
         <param name="overwriteFiles" value="failIfDirectoryExists"/>
         <param name="runId" value="kelheim-mini"/>
@@ -43,7 +43,7 @@
         <param name="useTransit" value="true"/>
     </module>
 
-    <module name="planscalcroute">
+    <module name="routing">
         <param name="networkModes" value="car,ride,freight"/>
         <parameterset type="teleportedModeParameters">
             <param name="beelineDistanceFactor" value="1.3"/>
@@ -73,7 +73,7 @@
         <param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true"/>
     </module>
 
-    <module name="strategy">
+    <module name="replanning">
         <param name="fractionOfIterationsToDisableInnovation" value="0.9"/>
         <parameterset type="strategysettings">
             <param name="strategyName" value="ChangeExpBeta"/>
@@ -140,7 +140,7 @@
         <param name="vspDefaultsCheckingLevel" value="warn"/>
     </module>
 
-    <module name="planCalcScore">
+    <module name="scoring">
         <param name="fractionOfIterationsToStartScoreMSA" value="1.0"/>
         <param name="writeExperiencedPlans" value="true" />
 

@@ -499,7 +499,7 @@ public class Gui extends JFrame {
 		txtConfigfilename.setText(configFilename);
 
 		File par = configFile.getParentFile();
-		File outputDir = new File(par, config.controler().getOutputDirectory());
+		File outputDir = new File(par, config.controller().getOutputDirectory());
 		try {
 			txtOutput.setText(outputDir.getCanonicalPath());
 		} catch (IOException e1) {

@@ -43,7 +43,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.PrepareForSimUtils;
@@ -90,22 +90,22 @@ public class SimulateAndScoreTest {
 		final Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit(true);
 
-		PlanCalcScoreConfigGroup.ActivityParams h = new PlanCalcScoreConfigGroup.ActivityParams("h");
+		ScoringConfigGroup.ActivityParams h = new ScoringConfigGroup.ActivityParams("h");
 		h.setTypicalDuration(16 * 3600);
-		PlanCalcScoreConfigGroup.ActivityParams w = new PlanCalcScoreConfigGroup.ActivityParams("w");
+		ScoringConfigGroup.ActivityParams w = new ScoringConfigGroup.ActivityParams("w");
 		w.setTypicalDuration(8 * 3600);
-		PlanCalcScoreConfigGroup.ActivityParams transitActivityParams = new PlanCalcScoreConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
+		ScoringConfigGroup.ActivityParams transitActivityParams = new ScoringConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
 
-		config.planCalcScore().setPerforming_utils_hr(0);
-		config.planCalcScore().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling((double) 0);
-		config.planCalcScore().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling((double) 0);
-		config.planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling((double) 0);
-		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate((double) 10);
-		config.planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate((double) 0);
-		config.planCalcScore().addActivityParams(h);
-		config.planCalcScore().addActivityParams(w);
-		config.planCalcScore().addActivityParams(transitActivityParams);
+		config.scoring().setPerforming_utils_hr(0);
+		config.scoring().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling((double) 0);
+		config.scoring().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling((double) 0);
+		config.scoring().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling((double) 0);
+		config.scoring().getModes().get(TransportMode.car).setMonetaryDistanceRate((double) 10);
+		config.scoring().getModes().get(TransportMode.pt).setMonetaryDistanceRate((double) 0);
+		config.scoring().addActivityParams(h);
+		config.scoring().addActivityParams(w);
+		config.scoring().addActivityParams(transitActivityParams);
 
 		// ---
 
@@ -278,17 +278,17 @@ public class SimulateAndScoreTest {
 		Netsim sim = new QSimBuilder(scenario.getConfig()) //
 			.useDefaults() //
 			.build(scenario, events);
-		PlanCalcScoreConfigGroup.ActivityParams h = new PlanCalcScoreConfigGroup.ActivityParams("h");
+		ScoringConfigGroup.ActivityParams h = new ScoringConfigGroup.ActivityParams("h");
 		h.setTypicalDuration(16 * 3600);
-		PlanCalcScoreConfigGroup.ActivityParams w = new PlanCalcScoreConfigGroup.ActivityParams("w");
+		ScoringConfigGroup.ActivityParams w = new ScoringConfigGroup.ActivityParams("w");
 		w.setTypicalDuration(8 * 3600);
-		scenario.getConfig().planCalcScore().setPerforming_utils_hr(0);
+		scenario.getConfig().scoring().setPerforming_utils_hr(0);
 		final double travelingPt = -1.00;
-		scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
+		scenario.getConfig().scoring().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
 		double monetaryDistanceRatePt = -0.001;
-		scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt);
-		scenario.getConfig().planCalcScore().addActivityParams(h);
-		scenario.getConfig().planCalcScore().addActivityParams(w);
+		scenario.getConfig().scoring().getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt);
+		scenario.getConfig().scoring().addActivityParams(h);
+		scenario.getConfig().scoring().addActivityParams(w);
 		EventsToScore scorer = EventsToScore.createWithScoreUpdating(scenario, new CharyparNagelScoringFunctionFactory(scenario), events);
 		EventsCollector handler = new EventsCollector();
 		events.addHandler(handler);

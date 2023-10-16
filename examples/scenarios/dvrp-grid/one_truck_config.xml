@@ -21,7 +21,7 @@
 		<param name="drawNonMovingItems" value="true"/>
 	</module>
 
-	<module name="controler">
+	<module name="controller">
 		<param name="outputDirectory" value="test/output/one_truck"/>
 		<param name="overwriteFiles" value="deleteDirectoryIfExists"/>
 		<param name="firstIteration" value="0"/>

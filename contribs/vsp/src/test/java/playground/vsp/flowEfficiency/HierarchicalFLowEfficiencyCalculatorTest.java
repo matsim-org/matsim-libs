@@ -1,7 +1,6 @@
 package playground.vsp.flowEfficiency;
 
 import com.google.inject.Provides;
-import com.google.inject.name.Names;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -26,7 +25,6 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -91,7 +89,7 @@ public class HierarchicalFLowEfficiencyCalculatorTest {
 				"eight_shared_taxi_config.xml");
 
 		Config config = ConfigUtils.loadConfig(configUrl, new DvrpConfigGroup(), new MultiModeDrtConfigGroup(), new OTFVisConfigGroup());
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.qsim().setEndTime(4*3600);
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);

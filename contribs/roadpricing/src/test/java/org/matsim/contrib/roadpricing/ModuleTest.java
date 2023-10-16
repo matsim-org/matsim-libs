@@ -67,14 +67,14 @@ public class ModuleTest {
     @Test
     public void testControlerWithRoadPricingByScenarioWorksTwice() {
         Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
-        config.controler().setOutputDirectory(utils.getOutputDirectory()+"/1");
+        config.controller().setOutputDirectory(utils.getOutputDirectory()+"/1");
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
         Controler controler1 = new Controler(scenario);
 //        controler1.setModules(new RoadPricingModuleDefaults());
 	    controler1.addOverridingModule( new RoadPricingModule() );
         controler1.run();
-        config.controler().setOutputDirectory(utils.getOutputDirectory()+"/2");
+        config.controller().setOutputDirectory(utils.getOutputDirectory()+"/2");
         Controler controler2 = new Controler(scenario);
 	    controler2.addOverridingModule( new RoadPricingModule() );
 //        controler2.setModules(new RoadPricingModuleDefaults());

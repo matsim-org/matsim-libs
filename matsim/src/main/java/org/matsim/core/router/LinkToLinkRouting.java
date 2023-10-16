@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkInverter;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
@@ -50,7 +50,7 @@ public class LinkToLinkRouting
     SingleModeNetworksCache singleModeNetworksCache;
 
     @Inject
-    PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
+		RoutingConfigGroup routingConfigGroup;
 
     @Inject
     LeastCostPathCalculatorFactory leastCostPathCalcFactory;
@@ -120,7 +120,7 @@ public class LinkToLinkRouting
         );
 
         // see NetworkRoutingProvider for some notes
-        if (!plansCalcRouteConfigGroup.getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none)) {
+        if (!routingConfigGroup.getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none)) {
             if (mode.equals(TransportMode.walk)) {
                 return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, leastCostPathCalculator, scenario,
                         filteredNetwork, invertedNetwork, null,null, timeInterpretation, multimodalLinkChooser);

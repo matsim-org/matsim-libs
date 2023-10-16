@@ -34,10 +34,10 @@ public final class EventsManagerModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		if (BooleanUtils.isTrue(getConfig().parallelEventHandling().getOneThreadPerHandler())) {
+		if (BooleanUtils.isTrue(getConfig().eventsManager().getOneThreadPerHandler())) {
 			bindEventsManager().to(ParallelEventsManager.class).in(Singleton.class);
-		} else if (getConfig().parallelEventHandling().getNumberOfThreads() != null) {
-			if (BooleanUtils.isTrue(getConfig().parallelEventHandling().getSynchronizeOnSimSteps())) {
+		} else if (getConfig().eventsManager().getNumberOfThreads() != null) {
+			if (BooleanUtils.isTrue(getConfig().eventsManager().getSynchronizeOnSimSteps())) {
 				bindEventsManager().to(SimStepParallelEventsManagerImpl.class).in(Singleton.class);
 			} else {
 				bindEventsManager().to(ParallelEventsManagerImpl.class).in(Singleton.class);

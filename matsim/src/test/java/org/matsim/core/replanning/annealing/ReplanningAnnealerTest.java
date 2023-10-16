@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -167,26 +167,26 @@ public class ReplanningAnnealerTest {
         this.saConfigVar = new ReplanningAnnealerConfigGroup.AnnealingVariable();
         this.saConfig.addAnnealingVariable(this.saConfigVar);
 
-        StrategyConfigGroup.StrategySettings s1 = new StrategyConfigGroup.StrategySettings();
+        ReplanningConfigGroup.StrategySettings s1 = new ReplanningConfigGroup.StrategySettings();
         s1.setStrategyName("ReRoute");
         s1.setWeight(0.2);
-        this.config.strategy().addStrategySettings(s1);
-        StrategyConfigGroup.StrategySettings s2 = new StrategyConfigGroup.StrategySettings();
+        this.config.replanning().addStrategySettings(s1);
+        ReplanningConfigGroup.StrategySettings s2 = new ReplanningConfigGroup.StrategySettings();
         s2.setStrategyName("SubtourModeChoice");
         s2.setWeight(0.2);
-        this.config.strategy().addStrategySettings(s2);
-        StrategyConfigGroup.StrategySettings s3 = new StrategyConfigGroup.StrategySettings();
+        this.config.replanning().addStrategySettings(s2);
+        ReplanningConfigGroup.StrategySettings s3 = new ReplanningConfigGroup.StrategySettings();
         s3.setStrategyName("ChangeExpBeta"); // shouldn't be affected
         s3.setWeight(0.5);
-        this.config.strategy().addStrategySettings(s3);
+        this.config.replanning().addStrategySettings(s3);
 
-        this.config.controler().setCreateGraphs(false);
-        this.config.controler().setDumpDataAtEnd(false);
-        this.config.controler().setWriteEventsInterval(0);
-        this.config.controler().setWritePlansInterval(0);
-        this.config.controler().setWriteSnapshotsInterval(0);
-        this.config.controler().setLastIteration(10);
-        this.config.controler().setOutputDirectory(this.utils.getOutputDirectory() + "annealOutput");
+        this.config.controller().setCreateGraphs(false);
+        this.config.controller().setDumpDataAtEnd(false);
+        this.config.controller().setWriteEventsInterval(0);
+        this.config.controller().setWritePlansInterval(0);
+        this.config.controller().setWriteSnapshotsInterval(0);
+        this.config.controller().setLastIteration(10);
+        this.config.controller().setOutputDirectory(this.utils.getOutputDirectory() + "annealOutput");
 
         this.scenario = ScenarioUtils.createScenario(this.config);
     }
@@ -288,7 +288,7 @@ public class ReplanningAnnealerTest {
         controler.run();
 
         Assert.assertEquals(expectedParameterAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
-        Assert.assertEquals(0.0, controler.getConfig().planCalcScore().getBrainExpBeta(), 1e-4);
+        Assert.assertEquals(0.0, controler.getConfig().scoring().getBrainExpBeta(), 1e-4);
     }
 
     @Test
@@ -308,7 +308,7 @@ public class ReplanningAnnealerTest {
         controler.run();
 
         Assert.assertEquals(expectedTwoParameterAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
-        Assert.assertEquals(0.0, controler.getConfig().planCalcScore().getBrainExpBeta(), 1e-4);
+        Assert.assertEquals(0.0, controler.getConfig().scoring().getBrainExpBeta(), 1e-4);
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
         List<Double> weights = sm.getWeights(null);
@@ -318,7 +318,7 @@ public class ReplanningAnnealerTest {
 
     @Test
     public void testInnovationSwitchoffAnneal() throws IOException {
-        this.config.strategy().setFractionOfIterationsToDisableInnovation(0.5);
+        this.config.replanning().setFractionOfIterationsToDisableInnovation(0.5);
         this.saConfigVar.setAnnealType("msa");
         this.saConfigVar.setShapeFactor(1.0);
         this.saConfigVar.setStartValue(0.5);
@@ -359,12 +359,12 @@ public class ReplanningAnnealerTest {
         this.saConfigVar.setEndValue(0.0);
         this.saConfigVar.setStartValue(0.5);
         this.saConfigVar.setDefaultSubpopulation(targetSubpop);
-        this.config.strategy().getStrategySettings().forEach(s -> s.setSubpopulation(targetSubpop));
-        StrategyConfigGroup.StrategySettings s = new StrategyConfigGroup.StrategySettings();
+        this.config.replanning().getStrategySettings().forEach(s -> s.setSubpopulation(targetSubpop));
+        ReplanningConfigGroup.StrategySettings s = new ReplanningConfigGroup.StrategySettings();
         s.setStrategyName("TimeAllocationMutator");
         s.setWeight(0.25);
         s.setSubpopulation("noAnneal");
-        this.config.strategy().addStrategySettings(s);
+        this.config.replanning().addStrategySettings(s);
 
         Controler controler = new Controler(this.scenario);
         controler.run();

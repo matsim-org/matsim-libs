@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -43,9 +43,9 @@ public class TripRouterModuleTest {
 
     @Test
     public void testRouterCreation() {
-        for (ControlerConfigGroup.RoutingAlgorithmType routingAlgorithmType : ControlerConfigGroup.RoutingAlgorithmType.values()) {
+        for (ControllerConfigGroup.RoutingAlgorithmType routingAlgorithmType : ControllerConfigGroup.RoutingAlgorithmType.values()) {
             Config config = ConfigUtils.createConfig();
-            config.controler().setRoutingAlgorithmType(routingAlgorithmType);
+            config.controller().setRoutingAlgorithmType(routingAlgorithmType);
             Scenario scenario = ScenarioUtils.createScenario(config);
             LeastCostPathCalculatorFactory defaultLeastCostPathCalculatorFactory = TripRouterFactoryBuilderWithDefaults.createDefaultLeastCostPathCalculatorFactory(scenario);
             LeastCostPathCalculator pathCalculator = defaultLeastCostPathCalculatorFactory.createPathCalculator(
