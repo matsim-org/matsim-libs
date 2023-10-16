@@ -25,8 +25,8 @@ public class CadytsCarWithPtScenarioIT {
     @Test @Ignore
     public void testCadytsWithPtVehicles() {
         final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("siouxfalls-2014"), "config_default.xml"));
-        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-        config.controler().setLastIteration(0);
+        config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+        config.controller().setLastIteration(0);
         final Scenario scenario = ScenarioUtils.loadScenario(config);
         final Counts<Link> calibrationCounts = new Counts<>();
         final Id<Link> testLink = Id.createLinkId("6_1");

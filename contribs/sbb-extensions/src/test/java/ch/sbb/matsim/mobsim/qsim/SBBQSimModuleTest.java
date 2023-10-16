@@ -70,7 +70,7 @@ public class SBBQSimModuleTest {
 
         Config config = ConfigUtils.createConfig();
         new ConfigReader(config).parse(new ByteArrayInputStream(xmlConfig.getBytes(StandardCharsets.UTF_8)));
-        config.controler().setOutputDirectory(this.utils.getOutputDirectory());
+        config.controller().setOutputDirectory(this.utils.getOutputDirectory());
         Scenario scenario = ScenarioUtils.createScenario(config);
         Controler controler = new Controler(scenario);
 

@@ -18,30 +18,30 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.accessibility;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
 /**
  * A simple cost calculator which only respects time to calculate generalized costs
- * This is based on org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility 
+ * This is based on org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility
  *
  * @author mrieser, thomas
  */
 class TravelTimeBasedTravelDisutility implements TravelDisutility{
-	
+
 	protected final TravelTime timeCalculator;
 	private final double marginalCostOfTime;
 
-	public TravelTimeBasedTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public TravelTimeBasedTravelDisutility(final TravelTime timeCalculator, ScoringConfigGroup cnScoringGroup) {
 		this.timeCalculator = timeCalculator;
 		/* Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.

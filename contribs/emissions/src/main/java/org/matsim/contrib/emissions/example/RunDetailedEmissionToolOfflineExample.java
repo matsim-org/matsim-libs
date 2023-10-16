@@ -29,7 +29,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -38,7 +37,7 @@ import org.matsim.vehicles.MatsimVehicleWriter;
 
 /**
  *
- * Use the config file as created by the 
+ * Use the config file as created by the
  * {@link CreateEmissionConfig CreateEmissionConfig} to calculate
  * emissions based on the link leave events of an events file. Resulting emission events are written into an event file.
  *
@@ -54,7 +53,7 @@ public final class RunDetailedEmissionToolOfflineExample{
 	//	private static final String emissionEventOutputFileName = "5.emission.events.offline.xml.gz";
 	private Config config;
 
-	// =======================================================================================================		
+	// =======================================================================================================
 
 	public static void main (String[] args){
 		RunDetailedEmissionToolOfflineExample emissionToolOfflineExampleV2Vehv1 = new RunDetailedEmissionToolOfflineExample();
@@ -96,7 +95,7 @@ public final class RunDetailedEmissionToolOfflineExample{
 
 		EmissionModule emissionModule = injector.getInstance(EmissionModule.class);
 
-		final String outputDirectory = scenario.getConfig().controler().getOutputDirectory();
+		final String outputDirectory = scenario.getConfig().controller().getOutputDirectory();
 		EventWriterXML emissionEventWriter = new EventWriterXML( outputDirectory + RunAverageEmissionToolOfflineExample.emissionEventsFilename ) ;
 		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 

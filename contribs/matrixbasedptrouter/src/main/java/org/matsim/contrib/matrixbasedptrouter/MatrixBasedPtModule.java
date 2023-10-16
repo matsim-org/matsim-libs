@@ -3,7 +3,7 @@ package org.matsim.contrib.matrixbasedptrouter;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.Provides;
@@ -18,9 +18,9 @@ public class MatrixBasedPtModule extends AbstractModule {
 		}
 		addRoutingModuleBinding(TransportMode.pt).to(MatrixBasedPtRoutingModule.class);
 	}
-	
+
 	@Provides
-	PtMatrix createPtMatrix(PlansCalcRouteConfigGroup plansCalcRoute, MatrixBasedPtRouterConfigGroup ippcm, Network network) {
+	PtMatrix createPtMatrix(RoutingConfigGroup plansCalcRoute, MatrixBasedPtRouterConfigGroup ippcm, Network network) {
 		return PtMatrix.createPtMatrix(plansCalcRoute, BoundingBox.createBoundingBox(network), ippcm);
 	}
 }

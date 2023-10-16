@@ -21,14 +21,14 @@ package org.matsim.core.controler;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 /**
  * @author thibautd
@@ -46,7 +46,7 @@ public class OutputDirectoryHierarchyTest {
 		new OutputDirectoryHierarchy(
 				outputDirectory,
 				OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists,
-				ControlerConfigGroup.CompressionType.none);
+				ControllerConfigGroup.CompressionType.none);
 
 		Assert.assertTrue(
 				"Directory was not created",
@@ -65,7 +65,7 @@ public class OutputDirectoryHierarchyTest {
 			new OutputDirectoryHierarchy(
 					outputDirectory,
 					OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists,
-					ControlerConfigGroup.CompressionType.none);
+					ControllerConfigGroup.CompressionType.none);
 		}
 		catch ( RuntimeException e ) {
 			return;
@@ -82,7 +82,7 @@ public class OutputDirectoryHierarchyTest {
 		new OutputDirectoryHierarchy(
 				outputDirectory,
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles,
-				ControlerConfigGroup.CompressionType.none);
+				ControllerConfigGroup.CompressionType.none);
 
 		Assert.assertTrue(
 				"Directory was not created",
@@ -100,7 +100,7 @@ public class OutputDirectoryHierarchyTest {
 		new OutputDirectoryHierarchy(
 				outputDirectory,
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles,
-				ControlerConfigGroup.CompressionType.none);
+				ControllerConfigGroup.CompressionType.none);
 
 		Assert.assertTrue(
 				"Directory was cleared",
@@ -117,7 +117,7 @@ public class OutputDirectoryHierarchyTest {
 		new OutputDirectoryHierarchy(
 				outputDirectory,
 				OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists,
-				ControlerConfigGroup.CompressionType.none);
+				ControllerConfigGroup.CompressionType.none);
 
 		Assert.assertTrue(
 				"Directory was not created",
@@ -135,7 +135,7 @@ public class OutputDirectoryHierarchyTest {
 		new OutputDirectoryHierarchy(
 				outputDirectory,
 				OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists,
-				ControlerConfigGroup.CompressionType.none);
+				ControllerConfigGroup.CompressionType.none);
 
 		Assert.assertTrue(
 				"Directory was deleted but not re-created!",

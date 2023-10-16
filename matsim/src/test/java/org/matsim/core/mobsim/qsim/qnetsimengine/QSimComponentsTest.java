@@ -40,9 +40,9 @@ public class QSimComponentsTest{
 		// be teleported if netsim engine is missing.  Thus, the RuntimeException confirms that removing the module worked.
 
 		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
-		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-		config.controler().setLastIteration( 0 );
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setLastIteration( 0 );
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		// remove the module:  (There is also syntax at some intermediate level for this, but I prefer the syntax at config level.  kai, oct'22)
 		QSimComponentsConfigGroup componentsConfig = ConfigUtils.addOrGetModule( config, QSimComponentsConfigGroup.class );
@@ -62,9 +62,9 @@ public class QSimComponentsTest{
 		// here we try to replace the QNetworkFactory.  Complains that QNetworkFactory is bound multiple times.
 
 		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
-		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-		config.controler().setLastIteration( 0 );
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setLastIteration( 0 );
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 
@@ -88,9 +88,9 @@ public class QSimComponentsTest{
 		// here we try to replace the QNetworkFactory at AbstractQSimModule.  This works.
 
 		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
-		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-		config.controler().setLastIteration( 0 );
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setLastIteration( 0 );
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 
@@ -110,9 +110,9 @@ public class QSimComponentsTest{
 		// use the newly implemented install _overriding_ qsim module.  With this, replacing the QNetworkFactory now works as part of AbstractModule.
 
 		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
-		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-		config.controler().setLastIteration( 0 );
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setLastIteration( 0 );
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 

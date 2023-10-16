@@ -41,7 +41,7 @@ public class RunMultiModeDrtExample {
 	public static void run(URL configUrl, boolean otfvis, int lastIteration) {
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
-		config.controler().setLastIteration(lastIteration);
+		config.controller().setLastIteration(lastIteration);
 
 		Controler controler = DrtControlerCreator.createControler(config, otfvis);
 

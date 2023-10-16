@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -41,7 +41,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 /**
  * {@link org.matsim.core.controler.listener.ControlerListener} that dumps the
  * complete plans regularly at the start of an iteration
- * ({@link ControlerConfigGroup#getWritePlansInterval()} as well as in the first
+ * ({@link ControllerConfigGroup#getWritePlansInterval()} as well as in the first
  * iteration, just in case someone might check that the replanning worked
  * correctly in the first iteration.
  *
@@ -62,7 +62,7 @@ final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 	private int writeMoreUntilIteration;
 
 	@Inject
-	PlansDumpingImpl(ControlerConfigGroup config) {
+	PlansDumpingImpl(ControllerConfigGroup config) {
 		this.writePlansInterval = config.getWritePlansInterval();
 		this.writeMoreUntilIteration = config.getWritePlansUntilIteration() ;
 	}

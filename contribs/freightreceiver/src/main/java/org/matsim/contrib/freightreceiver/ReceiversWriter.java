@@ -22,12 +22,12 @@ package org.matsim.contrib.freightreceiver;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.freight.carriers.TimeWindow;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 /**
  * Writes a {@link Receivers} container in the MATSim XML format.

@@ -126,7 +126,7 @@ final class RoadPricingModuleDefaults extends AbstractModule {
 			final Config config = scenario.getConfig();
 			final TravelDisutilityFactory originalTravelDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
 			RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory( originalTravelDisutilityFactory, scheme, config );
-			travelDisutilityFactory.setSigma(config.plansCalcRoute().getRoutingRandomness());
+			travelDisutilityFactory.setSigma(config.routing().getRoutingRandomness());
 			return travelDisutilityFactory;
 		}
 

@@ -56,7 +56,7 @@ public final class ShiftEfficiencyAnalysisControlerListener implements Iteration
 
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
-        boolean createGraphs = event.getServices().getConfig().controler().isCreateGraphs();
+        boolean createGraphs = event.getServices().getConfig().controller().isCreateGraphs();
 
         writeAndPlotShiftEfficiency(
                 shiftEfficiencyTracker.getCurrentRecord().getRevenueByShift(),

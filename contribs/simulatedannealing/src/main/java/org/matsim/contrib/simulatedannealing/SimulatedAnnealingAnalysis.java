@@ -39,7 +39,7 @@ public final class SimulatedAnnealingAnalysis<T> implements IterationStartsListe
 
 	public SimulatedAnnealingAnalysis(Config config, MatsimServices matsimServices, SimulatedAnnealing<T> simulatedAnnealing) {
 		this.matsimServices = matsimServices;
-		this.runId = Optional.ofNullable(config.controler().getRunId()).orElse(notAvailableString);
+		this.runId = Optional.ofNullable(config.controller().getRunId()).orElse(notAvailableString);
 		this.simulatedAnnealing = simulatedAnnealing;
 
 		this.delimiter = config.global().getDefaultDelimiter();

@@ -62,8 +62,8 @@ public class QSimEventsIntegrationTest {
 	@Test
 	public void controlerHandlesExceptionCorrectly_syncOnSimSteps() {
 		Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.parallelEventHandling().setNumberOfThreads(1);
-		config.parallelEventHandling().setSynchronizeOnSimSteps(true);
+		config.eventsManager().setNumberOfThreads(1);
+		config.eventsManager().setSynchronizeOnSimSteps(true);
 
 		Controler controler = new Controler(config);
 		controler.getEvents().addHandler((LinkLeaveEventHandler)event -> {
@@ -77,8 +77,8 @@ public class QSimEventsIntegrationTest {
 	@Test
 	public void controlerHandlesExceptionCorrectly_noSyncOnSimSteps() {
 		Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.parallelEventHandling().setNumberOfThreads(1);
-		config.parallelEventHandling().setSynchronizeOnSimSteps(false);
+		config.eventsManager().setNumberOfThreads(1);
+		config.eventsManager().setSynchronizeOnSimSteps(false);
 
 		Controler controler = new Controler(config);
 		controler.getEvents().addHandler((LinkLeaveEventHandler)event -> {

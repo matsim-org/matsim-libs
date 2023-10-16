@@ -20,7 +20,7 @@ package org.matsim.contrib.freightreceiver;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.freight.carriers.Carrier;
 import org.matsim.contrib.freightreceiver.replanning.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;

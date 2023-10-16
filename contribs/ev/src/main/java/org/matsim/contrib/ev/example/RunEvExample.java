@@ -23,7 +23,6 @@ package org.matsim.contrib.ev.example;/*
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Arrays;
 
 import org.apache.logging.log4j.LogManager;
@@ -32,14 +31,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
-import org.matsim.contrib.ev.charging.VehicleChargingHandler;
 import org.matsim.contrib.ev.routing.EvNetworkRoutingProvider;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class RunEvExample {
@@ -66,7 +63,7 @@ public class RunEvExample {
 
 	public void run( String[] args ) {
 		Config config = ConfigUtils.loadConfig(args, new EvConfigGroup());
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule( new AbstractModule(){

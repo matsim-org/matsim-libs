@@ -23,8 +23,6 @@
 		<!--param name="travelTimeAggregator" value="optimistic" /-->
 		<!--param name="travelTimeBinSize" value="900" /-->
 
-		<!-- TravelTimeCalculatorArray, TravelTimeCalculatorHashMap -->
-		<!--param name="travelTimeCalculator" value="TravelTimeCalculatorArray" /-->
 	</module>
 
 <!-- ====================================================================== -->
@@ -45,11 +43,11 @@
 
 
 	<module name="FreeFloating" >
-		<param name="areasFreefloating" value="freefloating_areas.xml" />	
-		<param name="useFreeFloating" value="true" />	
+		<param name="areasFreefloating" value="freefloating_areas.xml" />
+		<param name="useFreeFloating" value="true" />
 	</module>
 
-	<module name="OneWayCarsharing" >	    
+	<module name="OneWayCarsharing" >
         <param name="useOneWayCarsharing" value="true" />
         <!--  currently not used -->
         <param name="searchDistanceOneWayCarsharing" value="500.0" />
@@ -254,7 +252,7 @@
 				<param name="mode" value="walk" />
 				<param name="monetaryDistanceRate" value="0.0" />
 		</parameterset>
-        
+
 		<param name="performing" value="6.0" />
 		<param name="earlyDeparture" value="0" />
 		<param name="waiting" value="0" />
