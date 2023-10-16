@@ -50,8 +50,10 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -169,7 +171,7 @@ public class SmallScaleCommercialTrafficUtils {
 			writer.close();
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("Could not write the csv file with the data distribution data.", e);
 		}
 	}
 
@@ -239,8 +241,10 @@ public class SmallScaleCommercialTrafficUtils {
 				newPerson.getAttributes().putAttribute("tourStartArea",
 					relatedCarrier.getAttributes().getAttribute("tourStartArea"));
 
-			// TODO: assign correct vehicle type here
-			VehicleUtils.insertVehicleIdsIntoAttributes(newPerson, Map.of(mode, Id.createVehicleId(person.getId().toString())));
+			Id<Vehicle> vehicleId = Id.createVehicleId(person.getId().toString());
+
+			VehicleUtils.insertVehicleIdsIntoAttributes(newPerson, Map.of(mode, vehicleId));
+			VehicleUtils.insertVehicleTypesIntoAttributes(newPerson, Map.of(mode, allVehicles.getVehicles().get(vehicleId).getType().getId()));
 
 			population.addPerson(newPerson);
 		}
