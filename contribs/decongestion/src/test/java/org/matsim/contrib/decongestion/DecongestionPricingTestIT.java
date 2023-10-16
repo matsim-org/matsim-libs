@@ -368,7 +368,7 @@ public class DecongestionPricingTestIT {
 		Config config = ConfigUtils.loadConfig(configFile);
 
 		String outputDirectory = testUtils.getOutputDirectory() + "/";
-		config.controler().setOutputDirectory(outputDirectory);
+		config.controller().setOutputDirectory(outputDirectory);
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 		decongestionSettings.setWriteOutputIteration(1);
@@ -431,7 +431,7 @@ public class DecongestionPricingTestIT {
         System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().toString());
 
 		Assert.assertEquals("Wrong average delay (capacity is set in a way that one of the two agents has to wait 101 sec. Thus the average is 50.5", 50.5, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().get(84), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong toll.", null, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(84));
+		Assert.assertNull("Wrong toll.", info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(84));
 
 	}
 
@@ -509,7 +509,7 @@ public class DecongestionPricingTestIT {
 		Config config = ConfigUtils.loadConfig(configFile);
 
 		String outputDirectory = testUtils.getOutputDirectory() + "/";
-		config.controler().setOutputDirectory(outputDirectory);
+		config.controller().setOutputDirectory(outputDirectory);
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 		decongestionSettings.setWriteOutputIteration(1);

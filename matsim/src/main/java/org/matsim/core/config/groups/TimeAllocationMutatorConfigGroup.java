@@ -29,7 +29,7 @@ import org.matsim.core.utils.misc.Time;
 
 public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGroup {
 
-	public static final String GROUP_NAME = "TimeAllocationMutator";
+	public static final String GROUP_NAME = "timeAllocationMutator";
 
 
 	public TimeAllocationMutatorConfigGroup() {
