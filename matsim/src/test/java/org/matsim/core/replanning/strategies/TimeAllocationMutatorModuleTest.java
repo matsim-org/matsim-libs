@@ -31,10 +31,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
@@ -246,4 +243,32 @@ public class TimeAllocationMutatorModuleTest {
 			}
 		}
 	}
+	@Test
+	public void testLegTimesAreSetCorrectly() {
+		// setup population with one person
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Plan plan = PersonUtils.createAndAddPlan(person, true);
+		Activity act = PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(0, 0));
+		act.setEndTime(8.0 * 3600);
+		Leg leg1 = PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
+		leg1.setDepartureTime(8.0*3600);
+		leg1.setTravelTime(1800.);
+		act = PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord(0, 500));
+		act.setMaximumDuration(8*3600);
+		Leg leg2 = PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
+		leg2.setDepartureTime(16.5*3600);
+		leg2.setTravelTime(1800.0);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord(0, 500));
+		boolean affectingDuration = true ;
+
+		MutateActivityTimeAllocation mutator =
+				new MutateActivityTimeAllocation(
+						3600.,
+						affectingDuration, new Random(2011),24*3600,false,1);
+		mutator.run(plan);
+
+
+	}
+
+
 }

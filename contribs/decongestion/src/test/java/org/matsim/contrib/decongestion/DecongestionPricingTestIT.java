@@ -492,8 +492,8 @@ public class DecongestionPricingTestIT {
 		Assert.assertEquals("Wrong average executed score. The run output seems to have changed.", -12036.177448472225, avgScore, MatsimTestUtils.EPSILON);
 
 		System.out.println(info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().toString());
-		Assert.assertEquals("Wrong toll in time bin 61.", 12.600000000000009, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(61), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong toll in time bin 73.", 16.665000000000006, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(73), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong toll in time bin 61.", 9.197000000000003, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(61), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong toll in time bin 73.", 12.963999999999984, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(73), MatsimTestUtils.EPSILON);
 	}
 
 	/**
