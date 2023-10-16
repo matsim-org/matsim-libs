@@ -8,11 +8,11 @@ import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.events.CarrierShipmentDeliveryEndEvent;
 import org.matsim.contrib.freight.events.CarrierShipmentPickupEndEvent;
-import org.matsim.contrib.freight.events.eventhandler.FreightShipmentDeliveryEndEventHandler;
-import org.matsim.contrib.freight.events.eventhandler.FreightShipmentPickupEndEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.FreightShipmentDeliveryEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.FreightShipmentPickupEventHandler;
 import org.matsim.vehicles.Vehicles;
 
-public class MyShipmentTrackerEventHandler implements ActivityStartEventHandler, FreightShipmentPickupEndEventHandler, FreightShipmentDeliveryEndEventHandler {
+public class MyShipmentTrackerEventHandler implements ActivityStartEventHandler, FreightShipmentPickupEventHandler, FreightShipmentDeliveryEventHandler {
 
     private final Vehicles vehicles;
     private final Network network;
@@ -48,7 +48,7 @@ public class MyShipmentTrackerEventHandler implements ActivityStartEventHandler,
 
     @Override
     public void reset(int iteration) {
-        FreightShipmentPickupEndEventHandler.super.reset(iteration);
+        FreightShipmentPickupEventHandler.super.reset(iteration);
     }
 
     @Override

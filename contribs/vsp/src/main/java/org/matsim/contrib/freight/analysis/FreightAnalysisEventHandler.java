@@ -38,8 +38,8 @@ import org.matsim.contrib.freight.events.CarrierShipmentDeliveryEndEvent;
 import org.matsim.contrib.freight.events.CarrierShipmentPickupEndEvent;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceEndEventHandler;
 import org.matsim.contrib.freight.events.eventhandler.FreightServiceStartEventHandler;
-import org.matsim.contrib.freight.events.eventhandler.FreightShipmentDeliveryEndEventHandler;
-import org.matsim.contrib.freight.events.eventhandler.FreightShipmentPickupEndEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.FreightShipmentDeliveryEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.FreightShipmentPickupEventHandler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.vehicles.Vehicle;
@@ -59,7 +59,7 @@ import java.util.LinkedHashSet;
  * */
 
 @Deprecated(since = "apr23")
-class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, FreightShipmentPickupEndEventHandler, FreightShipmentDeliveryEndEventHandler, FreightServiceStartEventHandler, FreightServiceEndEventHandler {
+class FreightAnalysisEventHandler implements  ActivityStartEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, FreightShipmentPickupEventHandler, FreightShipmentDeliveryEventHandler, FreightServiceStartEventHandler, FreightServiceEndEventHandler {
 
 	private final static Logger log = LogManager.getLogger(FreightAnalysisEventHandler.class);
 	private final Vehicles vehicles;
