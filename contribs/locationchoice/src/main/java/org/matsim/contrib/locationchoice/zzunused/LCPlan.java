@@ -285,4 +285,35 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 		destPlan.score = srcPlan.getScore();
 	}
 
+	@Override
+	public void setPlanId(Id<Plan> planId) {
+		throw new UnsupportedOperationException();
+		
+	}
+
+	@Override
+	public Id<Plan> getId() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int getIterationCreated() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void setIterationCreated(int iteration) {
+		throw new UnsupportedOperationException();		
+	}
+
+	@Override
+	public String getPlanMutator() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void setPlanMutator(String planMutator) {
+		throw new UnsupportedOperationException();		
+	}
+
 }
