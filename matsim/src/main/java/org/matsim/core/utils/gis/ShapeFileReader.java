@@ -31,7 +31,6 @@ import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
@@ -40,6 +39,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -213,7 +213,7 @@ public class ShapeFileReader implements MatsimSomeReader {
 	public Collection<SimpleFeature> getFeatureSet() {
 		return featureSet;
 	}
-	
+
 	public CoordinateReferenceSystem getCoordinateSystem(){
 		return this.crs;
 	}

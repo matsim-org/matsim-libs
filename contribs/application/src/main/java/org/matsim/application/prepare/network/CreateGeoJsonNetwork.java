@@ -45,7 +45,7 @@ public class CreateGeoJsonNetwork implements MATSimAppCommand {
 	@CommandLine.Option(names = "--match-id", description = "Pattern to filter links by id")
 	private String matchId;
 
-	@CommandLine.Option(names = "--mode-filter", split = ",", defaultValue = "car",
+	@CommandLine.Option(names = "--mode-filter", split = ",", defaultValue = "car,freight,drt",
 		description = "Only keep links if they have one of the specified modes. Specify 'none' to disable.")
 	private Set<String> modes;
 

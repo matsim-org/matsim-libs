@@ -1,11 +1,9 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
- * UncheckedIOException.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,25 +17,43 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.utils.io;
+package org.matsim.core.config.groups;
+
+import java.util.Map;
+
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
- * A simple (unchecked) exception class to typically wrap IOExceptions.
- * 
- * @author mrieser
+ * @author awagner
  */
-public class UncheckedIOException extends RuntimeException {
-	private static final long serialVersionUID = 6186620063027481864L;
+public final class PlanInheritanceConfigGroup extends ReflectiveConfigGroup {
 
-	public UncheckedIOException(final String message, final Throwable cause) {
-		super(message, cause);
+	public static final String GROUP_NAME = "planInheritance";
+
+	private static final String ENABLED = "enabled";
+
+	private boolean enabled = false;
+
+	public PlanInheritanceConfigGroup() {
+		super(GROUP_NAME);
 	}
 
-	public UncheckedIOException(final Throwable cause) {
-		super(cause);
+	@Override
+	public Map<String, String> getComments() {
+		Map<String, String> comments = super.getComments();
+		comments.put(ENABLED, "Specifies whether or not PlanInheritance Information should be tracked.");
+		return comments;
+	}
+
+	
+	@StringSetter( ENABLED )
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 	
-	public UncheckedIOException(final String message) {
-		super(message);
+	
+	@StringGetter( ENABLED )
+	public boolean getEnabled() {
+		return this.enabled;
 	}
 }
