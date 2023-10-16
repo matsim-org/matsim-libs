@@ -1,19 +1,18 @@
-package org.matsim.contrib.freight.carrier;
+package org.matsim.freight.carriers;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.freight.events.*;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.freight.carriers.events.CarrierEventsReaders;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-
-import static org.assertj.core.api.Assertions.*;
 
 public class CarrierEventsReadersTest {
 
@@ -41,11 +40,10 @@ public class CarrierEventsReadersTest {
 		eventsManager2.addHandler(collector2);
 		eventsManager2.initProcessing();
 		CarrierEventsReaders.createEventsReader(eventsManager2)
-				.readStream(new ByteArrayInputStream(outputStream.toByteArray()), ControlerConfigGroup.EventsFileFormat.xml);
+				.readStream(new ByteArrayInputStream(outputStream.toByteArray()), ControllerConfigGroup.EventsFileFormat.xml);
 		eventsManager2.finishProcessing();
 
-		assertThat(collector1.getEvents()).usingRecursiveFieldByFieldElementComparator()
-				.containsExactlyElementsOf(collector2.getEvents());
+		Assert.assertEquals(collector1.getEvents(), collector2.getEvents());
 	}
 
 	@Test
@@ -69,11 +67,10 @@ public class CarrierEventsReadersTest {
 		eventsManager2.addHandler(collector2);
 		eventsManager2.initProcessing();
 		CarrierEventsReaders.createEventsReader(eventsManager2)
-				.readStream(new ByteArrayInputStream(outputStream.toByteArray()), ControlerConfigGroup.EventsFileFormat.xml);
+				.readStream(new ByteArrayInputStream(outputStream.toByteArray()), ControllerConfigGroup.EventsFileFormat.xml);
 		eventsManager2.finishProcessing();
 
-		assertThat(collector1.getEvents()).usingRecursiveFieldByFieldElementComparator()
-				.containsExactlyElementsOf(collector2.getEvents());
+		Assert.assertEquals(collector1.getEvents(), collector2.getEvents());
 	}
 
 }
