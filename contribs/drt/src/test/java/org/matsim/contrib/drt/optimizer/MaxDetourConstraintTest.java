@@ -41,8 +41,8 @@ public class MaxDetourConstraintTest {
 		drtConfigGroup.maxTravelTimeBeta = 600;
 		drtConfigGroup.maxWaitTime = 300;
 
-		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		Controler controler = DrtControlerCreator.createControler(config, false);
 
