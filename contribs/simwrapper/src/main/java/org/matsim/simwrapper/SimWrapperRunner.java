@@ -30,6 +30,10 @@ public class SimWrapperRunner implements MATSimAppCommand {
 	@CommandLine.Option(names = "--exclude", split = ",", description = "Exclusion that will be added to the config.")
 	private Set<String> exclude;
 
+	public static void main(String[] args) {
+		new SimWrapperRunner().execute(args);
+	}
+
 	@Override
 	public Integer call() throws Exception {
 		for (Path input : inputPaths) {

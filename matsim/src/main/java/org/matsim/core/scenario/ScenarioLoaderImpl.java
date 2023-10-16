@@ -36,7 +36,6 @@ import org.matsim.core.network.io.NetworkChangeEventsParser;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.lanes.LanesReader;
@@ -50,6 +49,7 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.vehicles.MatsimVehicleReader;
 
 
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.*;
 

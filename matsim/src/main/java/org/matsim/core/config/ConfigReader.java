@@ -20,17 +20,13 @@
 
 package org.matsim.core.config;
 
-import java.io.File;
-import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.util.Stack;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
 
 /**
  * A reader for config-files of MATSim. This reader recognizes the format of the config-file and uses

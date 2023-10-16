@@ -21,13 +21,13 @@
 
 package org.matsim.utils.objectattributes.attributable;
 
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.io.XmlUtils;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesConverter;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Map;
 
 /**
