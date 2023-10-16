@@ -128,8 +128,9 @@ public class Count<T> implements Identifiable<T> {
 	public final HashMap<Integer, Volume> getVolumes() {
 		HashMap<Integer, Volume> res = new HashMap<>();
 		for (Int2DoubleMap.Entry e : volume) {
-			int h = e.getIntKey() / Measurable.HOURLY;
-			res.put(h, new Volume(h + 1, e.getDoubleValue()));
+			// Offset for old API
+			int h = (e.getIntKey() / Measurable.HOURLY) + 1;
+			res.put(h, new Volume(h, e.getDoubleValue()));
 		}
 
 		return res;
