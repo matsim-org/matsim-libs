@@ -253,8 +253,8 @@ public class TimeAllocationMutatorModuleTest {
 		Leg leg1 = PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
 		leg1.setDepartureTime(8.0*3600);
 		leg1.setTravelTime(1800.);
-		act = PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord(0, 500));
-		act.setMaximumDuration(8*3600);
+		Activity act2 = PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord(0, 500));
+		act2.setMaximumDuration(8*3600);
 		Leg leg2 = PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
 		leg2.setDepartureTime(16.5*3600);
 		leg2.setTravelTime(1800.0);
@@ -266,6 +266,12 @@ public class TimeAllocationMutatorModuleTest {
 						3600.,
 						affectingDuration, new Random(2011),24*3600,false,1);
 		mutator.run(plan);
+
+		double firstActEndTime = act.getEndTime().seconds();
+		double secondActDuration = act2.getMaximumDuration().seconds();
+		Assert.assertEquals(firstActEndTime,leg1.getDepartureTime().seconds(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(firstActEndTime+secondActDuration+leg1.getTravelTime().seconds(),leg2.getDepartureTime().seconds(), MatsimTestUtils.EPSILON);
+
 
 
 	}
