@@ -32,7 +32,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * This class contains a simple example how to visualize a scenario with lanes and signalized intersections.
- * 
+ *
  * @author dgrether
  */
 public class VisualizeSignalScenarioWithLanes {
@@ -42,9 +42,9 @@ public class VisualizeSignalScenarioWithLanes {
 	public static void run(boolean startOtfvis) {
 		// --- load the configuration file
 		Config config = ConfigUtils.loadConfig(INPUT_DIR + "config.xml");
-		config.controler().setLastIteration(0);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		
+		config.controller().setLastIteration(0);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+
 		// --- create the scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		// load the information about signals data (i.e. fill the SignalsData object) and add it to the scenario as scenario element

@@ -59,7 +59,7 @@ import org.opengis.referencing.operation.MathTransform;
 /**
  * @author jbischoff
  * @author dgrether
- * 
+ *
  */
 public class CommuterDemandWriter {
 
@@ -122,8 +122,8 @@ public class CommuterDemandWriter {
 
 	private void generatePopulation(Scenario scenario) {
 		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(scenario.getConfig()
-				.planCalcScore());
-		PlanAlgorithm router = 
+				.scoring());
+		PlanAlgorithm router =
 				new PlanRouter(
 				new TripRouterFactoryBuilderWithDefaults().build(
 						scenario ).get(

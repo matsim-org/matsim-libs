@@ -4,7 +4,7 @@ import org.matsim.contrib.pseudosimulation.RunPSim;
 import org.matsim.contrib.pseudosimulation.replanning.factories.DistributedPlanMutatorStrategyFactory;
 import org.matsim.contrib.pseudosimulation.replanning.factories.DistributedPlanSelectorStrategyFactory;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
@@ -115,7 +115,7 @@ public class DistributedPlanStrategyTranslationAndRegistration {
     }
 
     public static void substituteStrategies(Config config, boolean quickReplanning, int selectionInflationFactor) {
-        for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
+        for (ReplanningConfigGroup.StrategySettings settings : config.replanning().getStrategySettings()) {
 
             String classname = settings.getStrategyName();
 

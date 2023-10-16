@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -34,13 +34,13 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 	public void setUp() {
 		TransitConfigGroup transitConfigGroup = new TransitConfigGroup();
 		ScenarioConfigGroup scenarioConfigGroup = new ScenarioConfigGroup();
-		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = new PlanCalcScoreConfigGroup();
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
 
-		PlanCalcScoreConfigGroup.ScoringParameterSet personParams = planCalcScoreConfigGroup.getOrCreateScoringParameters("person");
+		ScoringConfigGroup.ScoringParameterSet personParams = scoringConfigGroup.getOrCreateScoringParameters("person");
 		personParams.setMarginalUtilityOfMoney(1);
 		personParams.setMarginalUtlOfWaitingPt_utils_hr(0.5 * 3600);
 
-		PlanCalcScoreConfigGroup.ScoringParameterSet freightParams = planCalcScoreConfigGroup.getOrCreateScoringParameters("freight");
+		ScoringConfigGroup.ScoringParameterSet freightParams = scoringConfigGroup.getOrCreateScoringParameters("freight");
 		freightParams.setMarginalUtilityOfMoney(444);
 		freightParams.setMarginalUtlOfWaitingPt_utils_hr(1d * 3600);
 
@@ -88,7 +88,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 			population.addPerson(freightWithIncome2);
 		}
 		personScoringParams = new IncomeDependentUtilityOfMoneyPersonScoringParameters(population,
-				planCalcScoreConfigGroup,
+			scoringConfigGroup,
 				scenarioConfigGroup,
 				transitConfigGroup);
 	}

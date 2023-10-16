@@ -18,8 +18,7 @@ import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.NoTransitEm
 import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.TransitEmulator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
@@ -47,14 +46,13 @@ public class RunPSimTest {
 	 */
 	@Test
 	public void testA() {
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
-		config.controler().setCreateGraphs(false);
+		config.controller().setCreateGraphs(false);
 
 		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
 		config.addModule(pSimConfigGroup);
 		pSimConfigGroup.setIterationsPerCycle(20);
-		
-		config.plansCalcRoute().setRoutingRandomness(0.);
+
+		config.routing().setRoutingRandomness(0.);
 
 		//identify selector strategies
 		Field[] selectors = DefaultPlanStrategiesModule.DefaultSelector.class.getDeclaredFields();
@@ -72,7 +70,7 @@ public class RunPSimTest {
 		selectorNames.add( DefaultPlanStrategiesModule.DefaultSelector.SelectExpBeta );
 
 		//lower the weight of non-selector strategies, as we will run many iters
-		for( StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings() ){
+		for( ReplanningConfigGroup.StrategySettings settings : config.replanning().getStrategySettings() ){
 			if( !selectorNames.contains( settings.getStrategyName() ) ){
 				logger.warn( settings.getStrategyName() );
 				settings.setWeight( settings.getWeight() * 20 );
@@ -83,8 +81,8 @@ public class RunPSimTest {
 //		System.exit( -1);
 
 		final String outDir = utils.getOutputDirectory();
-		config.controler().setOutputDirectory( outDir );
-		config.controler().setLastIteration(20);
+		config.controller().setOutputDirectory( outDir );
+		config.controller().setLastIteration(20);
 //		config.controler().setDumpDataAtEnd(false);
 //		config.strategy().setFractionOfIterationsToDisableInnovation( 0.8 ); // crashes
 
@@ -95,12 +93,12 @@ public class RunPSimTest {
 
 		((Controler) runPSim.getMatsimControler()).addOverridingModule(new AbstractModule() {
 			@Override
-			public void install() {		
+			public void install() {
 				this.bind(TransitEmulator.class).to(NoTransitEmulator.class);
 			}
 		});
-		
-		
+
+
 		runPSim.run();
 		double psimScore = execScoreTracker.executedScore;
 		logger.info("RunPSim score was " + psimScore);
@@ -109,36 +107,31 @@ public class RunPSimTest {
 		Population popActual = PopulationUtils.createPopulation( config );
 		PopulationUtils.readPopulation( popActual, outDir + "/output_plans.xml.gz" );
 		new PopulationComparison().compare( popExpected, popActual ) ;
-		Assert.assertEquals("RunPsim score changed.", 138.90472630897597d, psimScore, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("RunPsim score changed.", 134.54001491094124d, psimScore, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("RunPsim score changed.", 134.52369453719413d, psimScore, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("RunPsim score changed.", 132.73129073101293d, psimScore, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("RunPsim score changed.", 138.88788052033888, psimScore, MatsimTestUtils.EPSILON);
 	}
 
 	/**
 	 * For comparison run 2 normal qsim iterations. Psim score should be slightly higher than default Controler score.
-	 * 
+	 *
 	 * Prior to implementing routing mode RunPSimTest tested only that psimScore outperformed default Controler on this
 	 * test for executed score by a margin > 1%. In the last commit in matsim master where the test ran, the psim score
 	 * in testA() was 134.52369453719413 and qsim score in testB was 131.84309487251033).
 	 */
 	@Test
 	public void testB() {
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setLastIteration(2);
-		config.controler().setCreateGraphs(false);
-		config.controler().setDumpDataAtEnd(false);
-		config.plansCalcRoute().setRoutingRandomness(0.);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setLastIteration(2);
+		config.controller().setCreateGraphs(false);
+		config.controller().setDumpDataAtEnd(false);
+		config.routing().setRoutingRandomness(0.);
 		Controler controler = new Controler(config);
 		ExecScoreTracker execScoreTracker = new ExecScoreTracker(controler);
 		controler.addControlerListener(execScoreTracker);
 		controler.run();
-		
+
 		double qsimScore = execScoreTracker.executedScore;
-		logger.info("Default controler score was " + qsimScore );
-//		Assert.assertEquals("Default controler score changed.", 131.84309487251033d, qsimScore, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Default controler score changed.", 131.84350487113088d, qsimScore, MatsimTestUtils.EPSILON);
+		logger.info("Default controller score was " + qsimScore );
+		Assert.assertEquals("Default controller score changed.", 131.85545404187428, qsimScore, MatsimTestUtils.EPSILON);
 	}
 
 	class ExecScoreTracker implements ShutdownListener {
@@ -151,7 +144,7 @@ public class RunPSimTest {
 
 		@Override
 		public void notifyShutdown(ShutdownEvent event) {
-			executedScore = controler.getScoreStats().getScoreHistory().get(ScoreStatsControlerListener.ScoreItem.executed).get(controler.getConfig().controler().getLastIteration());
+			executedScore = controler.getScoreStats().getScoreHistory().get(ScoreStatsControlerListener.ScoreItem.executed).get(controler.getConfig().controller().getLastIteration());
 		}
 
 

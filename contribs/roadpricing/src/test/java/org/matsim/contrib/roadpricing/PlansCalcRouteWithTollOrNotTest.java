@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
+import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.NewControlerModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -68,17 +68,17 @@ public class PlansCalcRouteWithTollOrNotTest {
 	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
 
 	/**
-	 * Tests a few cases where the router can decide if it is better to pay the 
+	 * Tests a few cases where the router can decide if it is better to pay the
 	 * toll or not.
 	 */
 	@Test
 	public void testBestAlternatives() {
 		Config config = matsimTestUtils.createConfig();
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		RoadPricingTestUtils.createNetwork2(scenario);
 
-		log.warn( "access/egress?" + config.plansCalcRoute().getAccessEgressType() );
+		log.warn( "access/egress?" + config.routing().getAccessEgressType() );
 
 		// a basic toll where only the morning hours are tolled
 		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
@@ -97,17 +97,17 @@ public class PlansCalcRouteWithTollOrNotTest {
 		Id<Person> id1 = Id.createPersonId("1");
 
 		// case 1: toll only in morning, it is cheaper to drive around
-		log.warn( "access/egress?" + config.plansCalcRoute().getAccessEgressType() );
+		log.warn( "access/egress?" + config.routing().getAccessEgressType() );
 		runOnAll(testee(scenario, toll), population);
-		log.warn( "access/egress?" + config.plansCalcRoute().getAccessEgressType() );
+		log.warn( "access/egress?" + config.routing().getAccessEgressType() );
 		RoadPricingTestUtils.compareRoutes("2 3 4 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
 		RoadPricingTestUtils.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 
 		// case 2: now add a toll in the afternoon too, so it is cheaper to pay the toll
 		Cost afternoonCost = toll.createAndAddCost(14*3600, 18*3600, 0.12);
-		log.warn( "access/egress? " + config.plansCalcRoute().getAccessEgressType() );
+		log.warn( "access/egress? " + config.routing().getAccessEgressType() );
 		runOnAll(testee(scenario, toll), population);
-		log.warn( "access/egress? " + config.plansCalcRoute().getAccessEgressType() );
+		log.warn( "access/egress? " + config.routing().getAccessEgressType() );
 		RoadPricingTestUtils.compareRoutes("2 5 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
 		RoadPricingTestUtils.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 
@@ -140,7 +140,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		for ( PlanElement pe : planElements ) {
 			log.warn( pe );
 		}
-		if ( config.plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
+		if ( config.routing().getAccessEgressType().equals(AccessEgressType.none) ) {
 			return (Leg) (planElements.get(1));
 		} else {
 			return (Leg) (planElements.get(3));
@@ -163,11 +163,11 @@ public class PlansCalcRouteWithTollOrNotTest {
 //				new ControlerDefaultCoreListenersModule(),
 //				new NewControlerModule())
 //				.getInstance(PlansCalcRouteWithTollOrNot.class);
-		
+
 		Provider<TripRouter> tripRouterProvider = Injector.createInjector(scenario.getConfig(),
-				new RoadPricingModuleDefaults(toll), 
+				new RoadPricingModuleDefaults(toll),
 				new ScenarioByInstanceModule(scenario),
-				new ControlerDefaultCoreListenersModule(), 
+				new ControlerDefaultCoreListenersModule(),
 				new NewControlerModule()).getProvider(TripRouter.class);
 
 			return new PlansCalcRouteWithTollOrNot( toll, tripRouterProvider, TimeInterpretation.create(scenario.getConfig()) ) ;
@@ -229,7 +229,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 
 	private static Leg getLeg3(Config config, Population population, Id<Person> id1) {
 		List<PlanElement> planElements = population.getPersons().get(id1).getPlans().get(0).getPlanElements() ;
-		if ( config.plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
+		if ( config.routing().getAccessEgressType().equals(AccessEgressType.none) ) {
 			return (Leg) (planElements.get(3));
 		} else {
 			List<Trip> trips = TripStructureUtils.getTrips(planElements) ;

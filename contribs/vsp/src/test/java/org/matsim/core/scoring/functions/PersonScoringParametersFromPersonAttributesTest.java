@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
@@ -59,13 +59,13 @@ public class PersonScoringParametersFromPersonAttributesTest {
 	public void setUp() {
 		TransitConfigGroup transitConfigGroup = new TransitConfigGroup();
 		ScenarioConfigGroup scenarioConfigGroup = new ScenarioConfigGroup();
-		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = new PlanCalcScoreConfigGroup();
+		ScoringConfigGroup scoringConfigGroup = new ScoringConfigGroup();
 
-		PlanCalcScoreConfigGroup.ScoringParameterSet personParams = planCalcScoreConfigGroup.getOrCreateScoringParameters("person");
+		ScoringConfigGroup.ScoringParameterSet personParams = scoringConfigGroup.getOrCreateScoringParameters("person");
 		personParams.setMarginalUtilityOfMoney(1);
 		personParams.setMarginalUtlOfWaitingPt_utils_hr(0.5 * 3600);
 
-		PlanCalcScoreConfigGroup.ModeParams modeParamsCar = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.car);
+		ScoringConfigGroup.ModeParams modeParamsCar = new ScoringConfigGroup.ModeParams(TransportMode.car);
 		modeParamsCar.setConstant(-1.0);
 		modeParamsCar.setMarginalUtilityOfTraveling(-0.001);
 		modeParamsCar.setMarginalUtilityOfDistance(-0.002);
@@ -74,14 +74,14 @@ public class PersonScoringParametersFromPersonAttributesTest {
 		modeParamsCar.setDailyUtilityConstant(-0.3);
 		personParams.addModeParams(modeParamsCar);
 
-		PlanCalcScoreConfigGroup.ModeParams modeParamsBike = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.bike);
+		ScoringConfigGroup.ModeParams modeParamsBike = new ScoringConfigGroup.ModeParams(TransportMode.bike);
 		modeParamsBike.setConstant(-0.55);
 		modeParamsBike.setMarginalUtilityOfTraveling(-0.05);
 		modeParamsBike.setMarginalUtilityOfDistance(-0.003);
 		modeParamsBike.setMonetaryDistanceRate(-0.002);
 		personParams.addModeParams(modeParamsBike);
 
-		PlanCalcScoreConfigGroup.ScoringParameterSet freightParams = planCalcScoreConfigGroup.getOrCreateScoringParameters("freight");
+		ScoringConfigGroup.ScoringParameterSet freightParams = scoringConfigGroup.getOrCreateScoringParameters("freight");
 		freightParams.setMarginalUtilityOfMoney(444);
 		freightParams.setMarginalUtlOfWaitingPt_utils_hr(1d * 3600);
 
@@ -140,7 +140,7 @@ public class PersonScoringParametersFromPersonAttributesTest {
 			population.addPerson(freightWithIncome2);
 		}
 		personScoringParams = new PersonScoringParametersFromPersonAttributes(population,
-				planCalcScoreConfigGroup,
+			scoringConfigGroup,
 				scenarioConfigGroup,
 				transitConfigGroup);
 	}

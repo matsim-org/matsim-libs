@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -63,7 +63,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
 
     private GlobalConfigGroup globalConfigGroup;
     private Network network;
-    private ControlerConfigGroup controlerConfigGroup;
+    private ControllerConfigGroup controllerConfigGroup;
     private final CountsConfigGroup config;
     private final Set<String> analyzedModes;
     private final VolumesAnalyzer volumesAnalyzer;
@@ -77,10 +77,10 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
     private int iterationsUsed = 0;
 
     @Inject
-    CountsControlerListener(GlobalConfigGroup globalConfigGroup, Network network, ControlerConfigGroup controlerConfigGroup, CountsConfigGroup countsConfigGroup, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
+    CountsControlerListener(GlobalConfigGroup globalConfigGroup, Network network, ControllerConfigGroup controllerConfigGroup, CountsConfigGroup countsConfigGroup, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
         this.globalConfigGroup = globalConfigGroup;
         this.network = network;
-        this.controlerConfigGroup = controlerConfigGroup;
+        this.controllerConfigGroup = controllerConfigGroup;
         this.config = countsConfigGroup;
         this.volumesAnalyzer = volumesAnalyzer;
         this.analyzedModes = CollectionUtils.stringToSet(this.config.getAnalyzedModes());
@@ -100,7 +100,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if (counts != null && this.config.getWriteCountsInterval() > 0) {
-            if (useVolumesOfIteration(event.getIteration(), controlerConfigGroup.getFirstIteration())) {
+            if (useVolumesOfIteration(event.getIteration(), controllerConfigGroup.getFirstIteration())) {
                 addVolumes(volumesAnalyzer);
             }
 

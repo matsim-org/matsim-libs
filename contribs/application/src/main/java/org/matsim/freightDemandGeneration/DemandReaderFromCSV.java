@@ -31,8 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.controler.FreightUtils;
+import org.matsim.freight.carriers.*;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -648,7 +647,7 @@ public final class DemandReaderFromCSV {
 							.setCapacityDemand(demandForThisLink).setServiceDuration(serviceTime)
 							.setServiceStartTimeWindow(newDemandInformationElement.getFirstJobElementTimeWindow())
 							.build();
-					FreightUtils.getCarriers(scenario).getCarriers()
+					CarriersUtils.getCarriers(scenario).getCarriers()
 							.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getServices()
 							.put(thisService.getId(), thisService);
 				}
@@ -688,7 +687,7 @@ public final class DemandReaderFromCSV {
 								.setCapacityDemand(demandForThisLink).setServiceDuration(serviceTime)
 								.setServiceStartTimeWindow(newDemandInformationElement.getFirstJobElementTimeWindow())
 								.build();
-						FreightUtils.getCarriers(scenario).getCarriers().values().iterator().next().getServices()
+						CarriersUtils.getCarriers(scenario).getCarriers().values().iterator().next().getServices()
 								.put(thisService.getId(), thisService);
 					}
 					distributedDemand = distributedDemand + demandForThisLink;
@@ -740,7 +739,7 @@ public final class DemandReaderFromCSV {
 							.setCapacityDemand(demandForThisLink).setServiceDuration(serviceTime)
 							.setServiceStartTimeWindow(newDemandInformationElement.getFirstJobElementTimeWindow())
 							.build();
-					FreightUtils.getCarriers(scenario).getCarriers()
+					CarriersUtils.getCarriers(scenario).getCarriers()
 							.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getServices()
 							.put(thisService.getId(), thisService);
 				}
@@ -919,7 +918,7 @@ public final class DemandReaderFromCSV {
 							.setPickupServiceTime(serviceTimePickup).setPickupTimeWindow(timeWindowPickup)
 							.setDeliveryServiceTime(serviceTimeDelivery).setDeliveryTimeWindow(timeWindowDelivery)
 							.build();
-					FreightUtils.getCarriers(scenario).getCarriers()
+					CarriersUtils.getCarriers(scenario).getCarriers()
 							.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getShipments()
 							.put(thisShipment.getId(), thisShipment);
 				}
@@ -1021,7 +1020,7 @@ public final class DemandReaderFromCSV {
 								.setPickupServiceTime(serviceTimePickup).setPickupTimeWindow(timeWindowPickup)
 								.setDeliveryServiceTime(serviceTimeDelivery).setDeliveryTimeWindow(timeWindowDelivery)
 								.build();
-						FreightUtils.getCarriers(scenario).getCarriers()
+						CarriersUtils.getCarriers(scenario).getCarriers()
 								.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class))
 								.getShipments().put(thisShipment.getId(), thisShipment);
 					}
@@ -1078,7 +1077,7 @@ public final class DemandReaderFromCSV {
 						.newInstance(idNewShipment, linkPickup.getId(), linkDelivery.getId(), demandForThisLink)
 						.setPickupServiceTime(serviceTimePickup).setPickupTimeWindow(timeWindowPickup)
 						.setDeliveryServiceTime(serviceTimeDelivery).setDeliveryTimeWindow(timeWindowDelivery).build();
-				FreightUtils.getCarriers(scenario).getCarriers()
+				CarriersUtils.getCarriers(scenario).getCarriers()
 						.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getShipments()
 						.put(thisShipment.getId(), thisShipment);
 				distributedDemand = distributedDemand + demandForThisLink;
@@ -1103,10 +1102,10 @@ public final class DemandReaderFromCSV {
 		String newJobId;
 		if (linkDelivery != null) {
 			newJobId = "Shipment_" + linkPickup + "_" + linkDelivery;
-			if (FreightUtils.getCarriers(scenario).getCarriers()
+			if (CarriersUtils.getCarriers(scenario).getCarriers()
 					.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getShipments()
 					.containsKey(Id.create(newJobId, CarrierShipment.class))) {
-				for (int x = 1; FreightUtils.getCarriers(scenario).getCarriers()
+				for (int x = 1; CarriersUtils.getCarriers(scenario).getCarriers()
 						.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getShipments()
 						.containsKey(Id.create(newJobId, CarrierShipment.class)); x++) {
 					newJobId = "Shipment_" + linkPickup + "_" + linkDelivery + "_" + x;
@@ -1114,10 +1113,10 @@ public final class DemandReaderFromCSV {
 			}
 		} else {
 			newJobId = "Service_" + linkPickup;
-			if (FreightUtils.getCarriers(scenario).getCarriers()
+			if (CarriersUtils.getCarriers(scenario).getCarriers()
 					.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getServices()
 					.containsKey(Id.create(newJobId, CarrierShipment.class))) {
-				for (int x = 1; FreightUtils.getCarriers(scenario).getCarriers()
+				for (int x = 1; CarriersUtils.getCarriers(scenario).getCarriers()
 						.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class)).getServices()
 						.containsKey(Id.create(newJobId, CarrierShipment.class)); x++) {
 					newJobId = "Service_" + linkPickup + "_" + x;
@@ -1143,7 +1142,7 @@ public final class DemandReaderFromCSV {
 		if (newDemandInformationElement.getTypeOfDemand().equals("shipment")) {
 			HashMap<Id<CarrierShipment>, CarrierShipment> shipmentsToRemove = new HashMap<Id<CarrierShipment>, CarrierShipment>();
 			ArrayList<CarrierShipment> shipmentsToAdd = new ArrayList<CarrierShipment>();
-			Carrier thisCarrier = FreightUtils.getCarriers(scenario).getCarriers()
+			Carrier thisCarrier = CarriersUtils.getCarriers(scenario).getCarriers()
 					.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class));
 			for (Id<CarrierShipment> baseShipmentId : thisCarrier.getShipments().keySet()) {
 				if (!shipmentsToRemove.containsKey(baseShipmentId)) {
@@ -1194,7 +1193,7 @@ public final class DemandReaderFromCSV {
 		if (newDemandInformationElement.getTypeOfDemand().equals("service")) {
 			HashMap<Id<CarrierService>, CarrierService> servicesToRemove = new HashMap<Id<CarrierService>, CarrierService>();
 			ArrayList<CarrierService> servicesToAdd = new ArrayList<CarrierService>();
-			Carrier thisCarrier = FreightUtils.getCarriers(scenario).getCarriers()
+			Carrier thisCarrier = CarriersUtils.getCarriers(scenario).getCarriers()
 					.get(Id.create(newDemandInformationElement.getCarrierName(), Carrier.class));
 			for (Id<CarrierService> baseServiceId : thisCarrier.getServices().keySet()) {
 				if (!servicesToRemove.containsKey(baseServiceId)) {

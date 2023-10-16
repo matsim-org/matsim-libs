@@ -23,7 +23,7 @@ package org.matsim.contrib.multimodal.router.util;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 
 import jakarta.inject.Provider;
@@ -31,26 +31,26 @@ import java.util.Map;
 
 public class BikeTravelTimeFactory implements Provider<TravelTime> {
 
-	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
+	private final RoutingConfigGroup routingConfigGroup;
 	private final Map<Id<Link>, Double> linkSlopes;	// slope information in %
 
-	public BikeTravelTimeFactory(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
-		this(plansCalcRouteConfigGroup, null);
+	public BikeTravelTimeFactory(RoutingConfigGroup routingConfigGroup) {
+		this(routingConfigGroup, null);
 	}
 
-	public BikeTravelTimeFactory(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup,
-			Map<Id<Link>, Double> linkSlopes) {
-		this.plansCalcRouteConfigGroup = plansCalcRouteConfigGroup;
+	public BikeTravelTimeFactory(RoutingConfigGroup routingConfigGroup,
+															 Map<Id<Link>, Double> linkSlopes) {
+		this.routingConfigGroup = routingConfigGroup;
 		this.linkSlopes = linkSlopes;
 
-		if (plansCalcRouteConfigGroup.getTeleportedModeSpeeds().get(TransportMode.bike) == null) {
+		if (routingConfigGroup.getTeleportedModeSpeeds().get(TransportMode.bike) == null) {
 			throw new RuntimeException("No speed was found for mode bike! Aborting.");
 		}
 	}
 
 	@Override
 	public TravelTime get() {
-		return new BikeTravelTime(this.plansCalcRouteConfigGroup, this.linkSlopes);
+		return new BikeTravelTime(this.routingConfigGroup, this.linkSlopes);
 	}
 
 }

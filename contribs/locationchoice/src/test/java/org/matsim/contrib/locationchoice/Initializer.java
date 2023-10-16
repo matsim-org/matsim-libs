@@ -51,10 +51,10 @@ public class Initializer {
 		preparePlans(scenario);
 
 		this.controler = new Controler(scenario);
-		this.controler.getConfig().controler().setCreateGraphs(false);
-		this.controler.getConfig().controler().setWriteEventsInterval(0); // disables events-writing
+		this.controler.getConfig().controller().setCreateGraphs(false);
+		this.controler.getConfig().controller().setWriteEventsInterval(0); // disables events-writing
 		this.controler.getConfig()
-				.controler()
+				.controller()
 				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		this.controler.run();
 	}
@@ -74,7 +74,7 @@ public class Initializer {
 				.forEach(planElement -> ((Leg)planElement).setRoute(null));
 
 		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(
-				scenario.getConfig().planCalcScore());
+				scenario.getConfig().scoring());
 		PlanAlgorithm router = new PlanRouter(new TripRouterFactoryBuilderWithDefaults().build(scenario).get(), TimeInterpretation.create(scenario.getConfig()));
 		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, scenario);
 		scenario.getPopulation().getPersons().values().forEach(pp4s::run);

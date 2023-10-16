@@ -28,8 +28,8 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 
 public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGroup {
 
-	public static final String GROUP_NAME = "TimeAllocationMutator";
-		
+	public static final String GROUP_NAME = "timeAllocationMutator";
+
 	public TimeAllocationMutatorConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -43,7 +43,7 @@ public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGrou
 				+ "If enabled but no settings are found, regular settings are uses as fallback.");
 		return comments;
 	}
-	
+
 	// ---
 
 	private static final String MUTATION_RANGE = "mutationRange";
@@ -56,9 +56,9 @@ public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGrou
 	public void setMutationRange(final double val) {
 		this.mutationRange = val;
 	}
-	
+
 	// ---
-	
+
 	private static final String MUTATION_AFFECTS_DURATION = "mutationAffectsDuration";
 	private boolean affectingDuration = true;
 	@StringGetter(MUTATION_AFFECTS_DURATION)
@@ -69,9 +69,9 @@ public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGrou
 	public void setAffectingDuration(boolean affectingDuration) {
 		this.affectingDuration = affectingDuration;
 	}
-	
+
 	// ---
-	
+
 	private static final String USE_INDIVIDUAL_SETTINGS_FOR_SUBPOPULATIONS = "useIndividualSettingsForSubpopulations";
 	private boolean useIndividualSettingsForSubpopulations = false;
 //	@StringGetter(USE_INDIVIDUAL_SETTINGS_FOR_SUBPOPULATIONS) // I am disabling the xml usage for the time being, see comment below. kai, may'19
@@ -86,13 +86,13 @@ public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGrou
 		// yyyy see comment under isUseIndividualSettingsForSubpopulations. kai, may'10
 		this.useIndividualSettingsForSubpopulations = useIndividualSettingsForSubpopulations;
 	}
-	
+
 	// ---
-	
+
 	public TimeAllocationMutatorSubpopulationSettings getTimeAllocationMutatorSubpopulationSettings(String subpopulation) {
-		
+
 		if (subpopulation == null) return null;
-		
+
 		Collection<? extends ConfigGroup> configGroups = this.getParameterSets(TimeAllocationMutatorSubpopulationSettings.SET_NAME);
 		for (ConfigGroup group : configGroups) {
 			if (group instanceof TimeAllocationMutatorSubpopulationSettings) {
@@ -100,10 +100,10 @@ public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGrou
 				if (subpopulation.equals(subpopulationSettings.subpopulation)) return subpopulationSettings;
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public ConfigGroup createParameterSet(final String type) {
 		switch (type) {
@@ -113,7 +113,7 @@ public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGrou
 				throw new IllegalArgumentException("unknown set type '" + type + "'");
 		}
 	}
-	
+
 	@Override
 	public void addParameterSet(final ConfigGroup set) {
 		switch (set.getName()) {
@@ -124,22 +124,22 @@ public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGrou
 				throw new IllegalArgumentException( set.getName() );
 		}
 	}
-	
+
 	public static class TimeAllocationMutatorSubpopulationSettings extends ReflectiveConfigGroup {
-		
+
 		public static final String SET_NAME = "subpopulationSettings";
 		private static final String MUTATION_RANGE = "mutationRange";
 		private static final String MUTATION_AFFECTS_DURATION = "mutationAffectsDuration";
 		private static final String SUBPOPULATION = "subpopulation";
-		
+
 		private double mutationRange = 1800.0;
 		private boolean affectingDuration = true;
 		private String subpopulation = null;
-		
+
 		public TimeAllocationMutatorSubpopulationSettings() {
 			super(SET_NAME);
 		}
-		
+
 		@Override
 		public final Map<String, String> getComments() {
 			Map<String,String> comments = super.getComments();
@@ -153,17 +153,17 @@ public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGrou
 		public double getMutationRange() {
 			return this.mutationRange;
 		}
-		
+
 		@StringSetter(MUTATION_RANGE)
 		public void setMutationRange(final double val) {
 			this.mutationRange = val;
 		}
-		
+
 		@StringGetter(MUTATION_AFFECTS_DURATION)
 		public boolean isAffectingDuration() {
 			return affectingDuration;
 		}
-		
+
 		@StringSetter(MUTATION_AFFECTS_DURATION)
 		public void setAffectingDuration(boolean affectingDuration) {
 			this.affectingDuration = affectingDuration;

@@ -27,14 +27,7 @@ import org.matsim.contrib.parking.parkingsearch.manager.LinkLengthBasedParkingMa
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
 import org.matsim.contrib.parking.parkingsearch.manager.ZoneParkingManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.AStarLandmarksFactory;
-import org.matsim.core.router.DijkstraFactory;
-import org.matsim.core.router.FastAStarLandmarksFactory;
-import org.matsim.core.router.FastDijkstraFactory;
-import org.matsim.core.router.speedy.SpeedyALTFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 
 public class ParkingManagerModule extends AbstractModule {
 

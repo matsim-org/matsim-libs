@@ -78,15 +78,15 @@ public final class IterationStopWatch {
 	/** data structures to identify nested operations */
 	private Stack<String> currentMeasuredOperations;
 	private Map<String, List<String>> currentIterationChildren;
-	private Map<Integer, Map<String, List<String>>> children;
-	
+	private final Map<Integer, Map<String, List<String>>> children;
+
 	/** Creates a new IterationStopWatch. */
 	public IterationStopWatch() {
-		this.iterations = new LinkedHashMap<Integer, Map<String, Long>>();
-		this.identifiers = new LinkedList<String>();
-		this.operations = new LinkedList<String>();
+		this.iterations = new LinkedHashMap<>();
+		this.identifiers = new LinkedList<>();
+		this.operations = new LinkedList<>();
 		this.currentIterationValues = null;
-		this.children = new LinkedHashMap<Integer, Map<String, List<String>>>();
+		this.children = new LinkedHashMap<>();
 	}
 
 	/**
@@ -109,18 +109,16 @@ public final class IterationStopWatch {
 	 * Sets the current iteration, so that the times measured using {@link #beginOperation(String)},
 	 * {@link #endOperation(String)} and {@link #timestamp(String)} are assigned to the correct iteration for
 	 * the analysis.
-	 *
-	 * @param iteration
 	 */
 	public void beginIteration(final int iteration) {
-		this.iteration = Integer.valueOf(iteration);
+		this.iteration = iteration;
 		if (this.iterations.get(this.iteration) == null) {
-			this.currentIterationValues = new HashMap<String, Long>();
+			this.currentIterationValues = new HashMap<>();
 			this.iterations.put(this.iteration, this.currentIterationValues);
 			this.nextIdentifierPosition = 0;
 			this.nextOperationPosition = 0;
-			this.currentMeasuredOperations = new Stack<String>();
-			this.currentIterationChildren = new HashMap<String, List<String>>();
+			this.currentMeasuredOperations = new Stack<>();
+			this.currentIterationChildren = new HashMap<>();
 			this.children.put(this.iteration, this.currentIterationChildren);
 		}
         this.beginOperation(OPERATION_ITERATION);
@@ -139,16 +137,16 @@ public final class IterationStopWatch {
 
 		String ident = "BEGIN " + identifier;
 		ensureIdentifier(ident);
-		this.currentIterationValues.put(ident, Long.valueOf(System.currentTimeMillis()));
-		
-		this.currentIterationChildren.put(identifier, new ArrayList<String>());
+		this.currentIterationValues.put(ident, System.currentTimeMillis());
+
+		this.currentIterationChildren.put(identifier, new ArrayList<>());
 
 		// check whether this operation has a parent operation
-		if (this.currentMeasuredOperations.size() > 0) {
+		if (!this.currentMeasuredOperations.isEmpty()) {
 			String parent = this.currentMeasuredOperations.peek();
 			this.currentIterationChildren.get(parent).add(identifier);
 		}
-		
+
 		// add ident to stack
 		this.currentMeasuredOperations.push(identifier);
 	}
@@ -163,9 +161,9 @@ public final class IterationStopWatch {
 		String ident = "END " + identifier;
 		ensureIdentifier(ident);
 		ensureOperation(identifier);
-		this.currentIterationValues.put(ident, Long.valueOf(System.currentTimeMillis()));
-		
-		
+		this.currentIterationValues.put(ident, System.currentTimeMillis());
+
+
 		this.currentMeasuredOperations.pop();
 	}
 
@@ -180,31 +178,30 @@ public final class IterationStopWatch {
 	 */
 	public void timestamp(final String identifier) {
 		ensureIdentifier(identifier);
-		this.currentIterationValues.put(identifier, Long.valueOf(System.currentTimeMillis()));
+		this.currentIterationValues.put(identifier, System.currentTimeMillis());
 	}
 
 	/**
-	 * Writes the gathered data tab-separated into a text file.
+	 * Writes the gathered data into a file.
 	 *
 	 * @param filename The name of a file where to write the gathered data.
+	 * @param delimiter The delimiter to be used as field separator.
 	 */
-	public void writeTextFile(final String filename) {
-
-		try {
-			BufferedWriter writer = IOUtils.getBufferedWriter(filename + ".txt");
+	public void writeSeparatedFile(final String filename, final String delimiter) {
+		try (BufferedWriter writer = IOUtils.getBufferedWriter(filename)) {
 
 			// print header
-			writer.write("Iteration");
+			writer.write("iteration");
 			for (String identifier : this.identifiers) {
-				writer.write('\t');
+				writer.write(delimiter);
 				writer.write(identifier);
 			}
-			writer.write('\t');
+			writer.write(delimiter);
 			for (String identifier : this.operations) {
-				writer.write('\t');
+				writer.write(delimiter);
 				writer.write(identifier);
 			}
-			writer.write("\n");
+			writer.write('\n');
 
 			// print data
 			for (Map.Entry<Integer, Map<String, Long>> entry : this.iterations.entrySet()) {
@@ -215,18 +212,18 @@ public final class IterationStopWatch {
 				// identifiers
 				for (String identifier : this.identifiers) {
 					Long time = data.get(identifier);
-					writer.write('\t');
+					writer.write(delimiter);
 					writer.write(formatMilliTime(time));
 				}
 				// blank separator
-				writer.write('\t');
+				writer.write(delimiter);
 				// durations of operations
 				for (String identifier: this.operations) {
 					Long startTime = data.get("BEGIN " + identifier);
 					Long endTime = data.get("END " + identifier);
-					writer.write('\t');
+					writer.write(delimiter);
 					if (startTime != null && endTime != null) {
-						double diff = (endTime.longValue() - startTime.longValue()) / 1000.0;
+						double diff = (endTime - startTime) / 1000.0;
 						writer.write(Time.writeTime(diff));
 					}
 				}
@@ -235,7 +232,6 @@ public final class IterationStopWatch {
 				writer.write("\n");
 			}
 			writer.flush();
-			writer.close();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -249,13 +245,13 @@ public final class IterationStopWatch {
 	public void writeGraphFile(String filename) {
 
 		int iterations = this.iterations.entrySet().size();
-		Map<String, double[]> arrayMap = new HashMap<String, double[]>();
+		Map<String, double[]> arrayMap = new HashMap<>();
 		for (String identifier : this.operations) arrayMap.put(identifier, new double[iterations]);
 
 		int iter = 0;
 		for(Entry<Integer, Map<String, Long>> entry : this.iterations.entrySet()) {
 			Map<String, Long> data = entry.getValue();
-			
+
 			// children map of current iteration
 			Map<String, List<String>> childrenMap = this.children.get(entry.getKey());
 
@@ -264,18 +260,18 @@ public final class IterationStopWatch {
 				Long startTime = data.get("BEGIN " + identifier);
 				Long endTime = data.get("END " + identifier);
 				if (startTime != null && endTime != null) {
-					double diff = (endTime.longValue() - startTime.longValue());
+					double diff = (endTime - startTime);
 
 					/*
 					 * If the operation has children, subtract their durations since they are
-					 * also included in the plot. Otherwise their duration would be counted twice.
+					 * also included in the plot. Otherwise, their duration would be counted twice.
 					 */
 					for (String child : childrenMap.get(identifier)) {
 						Long childStartTime = data.get("BEGIN " + child);
 						Long childEndTime = data.get("END " + child);
-						diff -= (childEndTime.longValue() - childStartTime.longValue());
+						diff -= (childEndTime - childStartTime);
 					}
-					
+
 					arrayMap.get(identifier)[iter] = diff / 1000.0;
 				} else arrayMap.get(identifier)[iter] = 0.0;
 			}
@@ -304,17 +300,12 @@ public final class IterationStopWatch {
 		chart.getChart().getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.UP_90);
 
 		double[] iterationData = null;
-//		double[] sumData = new double[iterations];
 		for (String operation : this.operations) {
 			double[] data = arrayMap.get(operation);
 			if (operation.equals(OPERATION_ITERATION)) {
 				iterationData = data;
-				continue;
 			} else {
 				chart.addSeries(operation, data);
-//				for (int i = 0; i < iterations; i++) {
-//					sumData[i] += data[i];
-//				}
 			}
 		}
 		if (iterationData != null) {
@@ -330,8 +321,6 @@ public final class IterationStopWatch {
 	 * Make sure the given identifier exists in our collection. If it is missing, insert it at the correct
 	 * place. "Correct" means that it tries to insert this identifier right after the last-requested identifier.
 	 * This should help to write the gathered data out in a natural way.
-	 *
-	 * @param identifier
 	 */
 	private void ensureIdentifier(final String identifier) {
 		int pos = this.identifiers.indexOf(identifier);
@@ -345,8 +334,6 @@ public final class IterationStopWatch {
 
 	/**
 	 * Does the same as {@link #ensureIdentifier(String)}, but for operation-identifiers.
-	 *
-	 * @param identifier
 	 */
 	private void ensureOperation(final String identifier) {
 		int pos = this.operations.indexOf(identifier);
@@ -359,7 +346,7 @@ public final class IterationStopWatch {
 	}
 
 	/**
-	 * Formats the time given in milliseconds (e.g. returned by {@link java.lang.System#currentTimeMillis()}
+	 * Formats the time given in milliseconds (e.g. returned by {@link java.lang.System#currentTimeMillis()})
 	 * nicely for output.
 	 *
 	 * @param millis A time value in milliseconds
@@ -369,7 +356,7 @@ public final class IterationStopWatch {
 		if (millis == null) {
 			return "";
 		}
-		return this.formatter.format(new Date(millis.longValue()));
+		return this.formatter.format(new Date(millis));
 	}
 
 }

@@ -30,11 +30,10 @@ import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.gbl.Gbl;
@@ -58,9 +57,9 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 	private final ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
 
 	private AccessibilityConfigGroup acg;
-	private final PlanCalcScoreConfigGroup cnScoringGroup;
+	private final ScoringConfigGroup cnScoringGroup;
 
-	
+
 	public AccessibilityComputationShutdownListener(Scenario scenario, ActivityFacilities measuringPoints, ActivityFacilities opportunities,
 										   String outputDirectory) {
 	    this.measuringPoints = measuringPoints;
@@ -69,7 +68,7 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 		this.outputDirectory = outputDirectory;
 
 		this.acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-		this.cnScoringGroup = scenario.getConfig().planCalcScore();
+		this.cnScoringGroup = scenario.getConfig().scoring();
 
 		if (cnScoringGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0.) {
 			LOG.error("Marginal utility of distance for car different from zero, but not used in accessibility computations");
@@ -241,10 +240,10 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 			writer.writeField(facility.getCoord().getX());
 			writer.writeField(facility.getCoord().getY());
 			writer.writeField(tuple.getSecond());
-			
+
 			for (String mode : getModes() ) {
 				final double value = accessibilitiesMap.get(tuple).get(mode);
-				if (!Double.isNaN(value)) { 
+				if (!Double.isNaN(value)) {
 					writer.writeField(value) ;
 				} else {
 					writer.writeField(Double.NaN) ;
