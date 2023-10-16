@@ -21,7 +21,6 @@ package org.matsim.contrib.minibus.integration;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,7 +42,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Integration test of the minibus package
- * 
+ *
  * @author aneumann
  */
 public class PControlerTestIT implements TabularFileHandler{
@@ -63,23 +62,23 @@ public class PControlerTestIT implements TabularFileHandler{
 		final String outputPath = utils.getOutputDirectory() + scenarioName + "/";
 
 		final String configFile = inputPath + "config_" + scenarioName + ".xml";
-		
+
 		// ---
 
 		Config config = ConfigUtils.loadConfig(configFile, new PConfigGroup());
 
-		config.controler().setLastIteration(numberOfIterations);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setCreateGraphs(false);
-		config.controler().setOutputDirectory(outputPath);
-		
+		config.controller().setLastIteration(numberOfIterations);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setCreateGraphs(false);
+		config.controller().setOutputDirectory(outputPath);
+
 		// ---
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		ScenarioUtils.loadScenario(scenario);
-		
+
 		// ---
-		
+
 		Controler controler = new Controler(scenario);
 
 		// manipulate config
@@ -90,14 +89,14 @@ public class PControlerTestIT implements TabularFileHandler{
 
 		controler.run();
 
-		// Check standard output files	
+		// Check standard output files
 		List<String> filesToCheckFor = new LinkedList<>();
 		filesToCheckFor.add(outputPath + scenarioName + ".0.actsFromParatransitUsers.txt");
 		filesToCheckFor.add(outputPath + scenarioName + ".pOperatorLogger.txt");
 		filesToCheckFor.add(outputPath + scenarioName + ".pStats.txt");
-		filesToCheckFor.add(outputPath + scenarioName + ".scorestats.txt");
-		filesToCheckFor.add(outputPath + scenarioName + ".stopwatch.txt");
-		filesToCheckFor.add(outputPath + scenarioName + ".traveldistancestats.txt");
+		filesToCheckFor.add(outputPath + scenarioName + ".scorestats.csv");
+		filesToCheckFor.add(outputPath + scenarioName + ".stopwatch.csv");
+		filesToCheckFor.add(outputPath + scenarioName + ".traveldistancestats.csv");
 		filesToCheckFor.add(outputPath + scenarioName + ".pStat_light.gexf.gz");
 		filesToCheckFor.add(outputPath + scenarioName + ".pStat.gexf.gz");
 
@@ -145,6 +144,6 @@ public class PControlerTestIT implements TabularFileHandler{
 
 	@Override
 	public void startRow(String[] row) {
-		this.pStatsResults.add(row);	
-	}		
+		this.pStatsResults.add(row);
+	}
 }

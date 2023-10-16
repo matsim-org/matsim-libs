@@ -105,9 +105,9 @@ public class TinyMultimodalAccessibilityTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 		acg.setUseParallelization(false);
 
-		config.controler().setLastIteration(0);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(0);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		return config;
 	}

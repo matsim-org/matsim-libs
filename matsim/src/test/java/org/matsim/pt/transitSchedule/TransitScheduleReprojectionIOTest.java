@@ -54,7 +54,7 @@ import java.net.URL;
  */
 public class TransitScheduleReprojectionIOTest {
 	private static final Logger log = LogManager.getLogger( TransitScheduleReprojectionIOTest.class ) ;
-	
+
 	private static final String INITIAL_CRS = TransformationFactory.CH1903_LV03_GT;
 	private static final String TARGET_CRS = "EPSG:3857";
 	private static final CoordinateTransformation transformation =
@@ -103,23 +103,23 @@ public class TransitScheduleReprojectionIOTest {
 		}
 
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
-		
+
 		// read same thing via scenario loader:
 		Scenario scenario ;
 		{
 			final Config config = ConfigUtils.createConfig( ExamplesUtils.getTestScenarioURL( "pt-tutorial" ) );
-			config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 			config.transit().setTransitScheduleFile( "transitschedule.xml" );
 			config.transit().setUseTransit( true );
 			config.transit().setInputScheduleCRS( INITIAL_CRS );
 			config.global().setCoordinateSystem( TARGET_CRS );
-			config.controler().setLastIteration( -1 );
-			config.controler().setOutputDirectory( outputDirectory );
+			config.controller().setLastIteration( -1 );
+			config.controller().setOutputDirectory( outputDirectory );
+			config.network().setInputFile("multimodalnetwork.xml");
 			scenario = ScenarioUtils.loadScenario( config );
 		}
-		
+
 		// TODO: test also with loading from Controler C'tor?
-		
+
 		for ( Id<TransitStopFacility> id : originalScenario.getTransitSchedule().getFacilities().keySet() ) {
 			final Coord originalCoord = originalScenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 			final Coord internalCoord = scenario.getTransitSchedule().getFacilities().get( id ).getCoord();
@@ -129,10 +129,10 @@ public class TransitScheduleReprojectionIOTest {
 					transformation.transform(originalCoord),
 					internalCoord);
 		}
-		
+
 		final Controler controler = new Controler( scenario );
 		controler.run();
-		
+
 		Scenario dumpedScenario ;
 		{
 			final Config config = ConfigUtils.createConfig( ExamplesUtils.getTestScenarioURL( "pt-tutorial" ) );
@@ -160,7 +160,7 @@ public class TransitScheduleReprojectionIOTest {
 			originalScenario = ScenarioUtils.createScenario( config );
 			new TransitScheduleReader( originalScenario ).readURL( ConfigGroup.getInputFileURL( config.getContext(), "transitschedule.xml" ) );
 		}
-		
+
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
 
 		// same thing via scenario loader,
@@ -172,23 +172,23 @@ public class TransitScheduleReprojectionIOTest {
 			final String withAttributes = new File( utils.getOutputDirectory() ).getAbsolutePath() + "/transitschedule.xml";
 			// (need the absolute path since later it is put into the config, and that will otherwise be relative to some other context. kai, sep'18)
 			new TransitScheduleWriter( originalScenario.getTransitSchedule() ).writeFile( withAttributes );
-			
+
 			final Config config = ConfigUtils.createConfig( ExamplesUtils.getTestScenarioURL( "pt-tutorial" ) );
-			config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 			config.transit().setTransitScheduleFile( withAttributes );
 			config.transit().setUseTransit( true );
 			config.transit().setInputScheduleCRS( INITIAL_CRS );
+			config.network().setInputFile("multimodalnetwork.xml");
 			// yyyyyy Is it so plausible that this is given here when the test is about having this in the file? kai, sep'18
 			config.global().setCoordinateSystem( TARGET_CRS );
-			config.controler().setLastIteration( -1 );
-			config.controler().setOutputDirectory( outputDirectory );
-			
+			config.controller().setLastIteration( -1 );
+			config.controller().setOutputDirectory( outputDirectory );
+
 			log.info( "" ) ;
 			log.info("just before we are getting the exception:") ;
 			log.info( "context=" + config.getContext() ) ;
 			log.info( "transitScheduleFilename=" + withAttributes ) ;
 			log.info("") ;
-			
+
 			// TODO: test also with loading from Controler C'tor?
 			scenario = ScenarioUtils.loadScenario( config );
 		}

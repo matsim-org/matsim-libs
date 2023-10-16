@@ -78,8 +78,8 @@ public class RunDrtExampleIT {
 			drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 		}
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		RunDrtExample.run(config, false);
 
 		var expectedStats = Stats.newBuilder()
@@ -112,8 +112,8 @@ public class RunDrtExampleIT {
 			drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 		}
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		RunDrtExample.run(config, false);
 
 		var expectedStats = Stats.newBuilder()
@@ -146,9 +146,9 @@ public class RunDrtExampleIT {
 			drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 		}
 
-		config.controler().setLastIteration(3);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setLastIteration(3);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		RunDrtExample.run(config, false);
 
 		var expectedStats = Stats.newBuilder()
@@ -176,8 +176,8 @@ public class RunDrtExampleIT {
 			drtCfg.addParameterSet(drtRequestInsertionRetryParams);
 		}
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		RunDrtExample.run(config, false);
 
 		var expectedStats = Stats.newBuilder()
@@ -199,8 +199,8 @@ public class RunDrtExampleIT {
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		RunDrtExample.run(config, false);
 
 		var expectedStats = Stats.newBuilder()
@@ -213,19 +213,19 @@ public class RunDrtExampleIT {
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
 	}
-	
+
 	@Test
-	public void testRunDrtStopbasedExampleWithFlexibleStopDuration() {		
+	public void testRunDrtStopbasedExampleWithFlexibleStopDuration() {
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
 				"mielec_stop_based_drt_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		
-		Controler controller = DrtControlerCreator.createControler(config, false);		
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+
+		Controler controller = DrtControlerCreator.createControler(config, false);
 
 		// This snippet adds the correction against wait times smaller than the defined stopDuration
 		controller.addOverridingModule(new AbstractDvrpModeModule("drt") {
@@ -235,7 +235,7 @@ public class RunDrtExampleIT {
 				bindModal(StopTimeCalculator.class).toInstance(stopTimeCalculator);
 			}
 		});
-			
+
 		controller.run();
 
 		var expectedStats = Stats.newBuilder()
@@ -257,8 +257,8 @@ public class RunDrtExampleIT {
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		RunDrtExample.run(config, false);
 
 		var expectedStats = Stats.newBuilder()
@@ -279,8 +279,8 @@ public class RunDrtExampleIT {
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		Controler controller = DrtControlerCreator.createControler(config, false);
 

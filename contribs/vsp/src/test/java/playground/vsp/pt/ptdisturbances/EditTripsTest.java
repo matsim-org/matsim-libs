@@ -120,7 +120,7 @@ public class EditTripsTest {
 		Config config = ConfigUtils
 				.loadConfig(configURL);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler()
+		config.controller()
 				.setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
@@ -158,9 +158,8 @@ public class EditTripsTest {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils.loadConfig(configURL);
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler().setOutputDirectory(outputDirectory);
+		config.controller().setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
 		double activityEndTime = 7. * 3600 + 15. * 60;
@@ -171,20 +170,16 @@ public class EditTripsTest {
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
 
-		assertEquals("Travel time has changed", 2990.0,  travelTime, MatsimTestUtils.EPSILON);
-		assertEquals("Number of trip elements has changed", 11 ,trip.size());
+		assertEquals("Travel time has changed", 1344.0,  travelTime, MatsimTestUtils.EPSILON);
+		assertEquals("Number of trip elements has changed", 7 ,trip.size());
 
 		assertEquals("Trip element has changed", "dummy@car_17bOut", trip.get(0));
 		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(1));
 		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(2));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(3));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(4));
-		assertEquals("Trip element has changed", "pt interaction@pt7", trip.get(5));
-		assertEquals("Trip element has changed", "pt interaction@pt7", trip.get(6));
-		assertEquals("Trip element has changed", "tr_334", trip.get(7));
-		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(8));
-		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(9));
-		assertEquals("Trip element has changed", "dummy@work0", trip.get(10));
+		assertEquals("Trip element has changed", "tr_333", trip.get(3));
+		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(4));
+		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(5));
+		assertEquals("Trip element has changed", "dummy@work0", trip.get(6));
 
 	}
 
@@ -198,7 +193,7 @@ public class EditTripsTest {
 		Config config = ConfigUtils
 				.loadConfig(configURL);;
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler()
+		config.controller()
 				.setOutputDirectory(outputDirectory);
 		config.network().setTimeVariantNetwork(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -235,7 +230,7 @@ public class EditTripsTest {
 		Config config = ConfigUtils
 				.loadConfig(configURL);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler()
+		config.controller()
 				.setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
@@ -277,9 +272,8 @@ public class EditTripsTest {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils.loadConfig(configURL);
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler().setOutputDirectory(outputDirectory);
+		config.controller().setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
 		double activityEndTime = 7. * 3600 + 22. * 60;
@@ -296,8 +290,8 @@ public class EditTripsTest {
 		assertEquals("Trip element has changed", "dummy@car_17bOut", trip.get(0));
 		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(1));
 		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(2));
-		assertEquals("Trip element has changed", "pt interaction@pt7", trip.get(3));
-		assertEquals("Trip element has changed", "pt interaction@pt7", trip.get(4));
+		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(3));
+		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(4));
 		assertEquals("Trip element has changed", "tr_334", trip.get(5));
 		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(6));
 		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(7));
@@ -318,10 +312,10 @@ public class EditTripsTest {
 		Config config = ConfigUtils
 				.loadConfig(configURL);;
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler()
+		config.controller()
 				.setOutputDirectory(outputDirectory);
-		config.planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(
-				config.planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - 3);
+		config.scoring().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(
+				config.scoring().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - 3);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
 		double activityEndTime = 7. * 3600 + 22. * 60;
@@ -356,9 +350,8 @@ public class EditTripsTest {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils.loadConfig(configURL);
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler().setOutputDirectory(outputDirectory);
+		config.controller().setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
 		double activityEndTime = 7. * 3600 + 22. * 60;
@@ -375,8 +368,8 @@ public class EditTripsTest {
 		assertEquals("Trip element has changed", "dummy@car_17bOut", trip.get(0));
 		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(1));
 		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(2));
-		assertEquals("Trip element has changed", "pt interaction@pt7", trip.get(3));
-		assertEquals("Trip element has changed", "pt interaction@pt7", trip.get(4));
+		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(3));
+		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(4));
 		assertEquals("Trip element has changed", "tr_334", trip.get(5));
 		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(6));
 		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(7));
@@ -396,7 +389,7 @@ public class EditTripsTest {
 		Config config = ConfigUtils
 				.loadConfig(configURL);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler()
+		config.controller()
 				.setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
@@ -421,7 +414,7 @@ public class EditTripsTest {
 			}
 			assertTrue("Number of used lines ist not plausible", numberOfUsedLines == 1 || numberOfUsedLines == 2);
 		}
-		System.out.println(config.controler().getOutputDirectory());
+		System.out.println(config.controller().getOutputDirectory());
 	}
 
 

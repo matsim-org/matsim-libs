@@ -42,9 +42,9 @@ import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -78,7 +78,7 @@ public class AdvancedMarginalCongestionPricingIT {
 	@Test
 	public final void test0a(){
 
-		PlanCalcScoreConfigGroup plansCalcScoreConfigGroup = new PlanCalcScoreConfigGroup();
+		ScoringConfigGroup plansCalcScoreConfigGroup = new ScoringConfigGroup();
 		ActivityParams activityParams = new ActivityParams("work");
 		activityParams.setTypicalDuration(6 * 3600.);
 		activityParams.setOpeningTime(7 * 3600.);
@@ -143,7 +143,7 @@ public class AdvancedMarginalCongestionPricingIT {
 	@Test
 	public final void test0b(){
 
-		PlanCalcScoreConfigGroup plansCalcScoreConfigGroup = new PlanCalcScoreConfigGroup();
+		ScoringConfigGroup plansCalcScoreConfigGroup = new ScoringConfigGroup();
 		ActivityParams activityParams = new ActivityParams("overnightActivity");
 		activityParams.setTypicalDuration(12 * 3600.);
 
@@ -191,7 +191,7 @@ public class AdvancedMarginalCongestionPricingIT {
 	@Test
 	public final void test0c(){
 
-		PlanCalcScoreConfigGroup plansCalcScoreConfigGroup = new PlanCalcScoreConfigGroup();
+		ScoringConfigGroup plansCalcScoreConfigGroup = new ScoringConfigGroup();
 
 		ActivityParams activityParams1 = new ActivityParams("firstActivityType");
 		activityParams1.setTypicalDuration(12 * 3600.);
@@ -241,7 +241,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config1.xml";
 
 		Config config = ConfigUtils.loadConfig( configFile ) ;
-		config.plansCalcRoute().setAccessEgressType(AccessEgressType.none);
+		config.routing().setAccessEgressType(AccessEgressType.none);
 
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		Controler controler = new Controler( scenario );
@@ -279,7 +279,7 @@ public class AdvancedMarginalCongestionPricingIT {
 
 		final CongestionTollTimeDistanceTravelDisutilityFactory tollDisutilityCalculatorFactory = new CongestionTollTimeDistanceTravelDisutilityFactory(
 				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config),
-				tollHandler, controler.getConfig().planCalcScore());
+				tollHandler, controler.getConfig().scoring());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -296,7 +296,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		});
 
 		controler.addOverridingModule(new OTFVisFileWriterModule());
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 
 		// test if there is only one congestion event and only one money event
@@ -308,11 +308,11 @@ public class AdvancedMarginalCongestionPricingIT {
 		Assert.assertEquals("Wrong delay.", 2.0, delay, MatsimTestUtils.EPSILON);
 
 		double amountFromEvent = moneyEvents.get(0).getAmount();
-		double tripDelayDisutility = delay / 3600. * controler.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
+		double tripDelayDisutility = delay / 3600. * controler.getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
 		// with delay --> 70.570685898554200
 		// without delay --> 70.573360291244900
 		double activityDelayDisutility = 70.573360291244900 - 70.570685898554200;
-		double amount = (-1) * (activityDelayDisutility + tripDelayDisutility) / controler.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+		double amount = (-1) * (activityDelayDisutility + tripDelayDisutility) / controler.getConfig().scoring().getMarginalUtilityOfMoney();
 		Assert.assertEquals("Wrong amount.", amount, amountFromEvent, MatsimTestUtils.EPSILON);
 	 }
 
@@ -323,7 +323,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config2.xml";
 
 		Config config = ConfigUtils.loadConfig( configFile ) ;
-		config.plansCalcRoute().setAccessEgressType(AccessEgressType.none);
+		config.routing().setAccessEgressType(AccessEgressType.none);
 
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		Controler controler = new Controler( scenario );
@@ -360,7 +360,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		final TollHandler tollHandler = new TollHandler(controler.getScenario());
 		final CongestionTollTimeDistanceTravelDisutilityFactory tollDisutilityCalculatorFactory = new CongestionTollTimeDistanceTravelDisutilityFactory(
 				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config),
-				tollHandler, controler.getConfig().planCalcScore());
+				tollHandler, controler.getConfig().scoring());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -376,7 +376,7 @@ public class AdvancedMarginalCongestionPricingIT {
 			}
 		});
 		controler.addOverridingModule(new OTFVisFileWriterModule());
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 
 		// test if there is only one congestion event and only one money event
@@ -388,7 +388,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		Assert.assertEquals("Wrong delay.", 2.0, delay, MatsimTestUtils.EPSILON);
 
 		double amountFromEvent = moneyEvents.get(0).getAmount();
-		double tripDelayDisutility = delay / 3600. * controler.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
+		double tripDelayDisutility = delay / 3600. * controler.getConfig().scoring().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
 
 		// home duration morning: 28800.
 		// home duration evening with delay: (24 * 3600.) - 57705.
@@ -398,7 +398,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		// without delay --> 80.584243964094500
 
 		double activityDelayDisutility = 80.584243964094500 - 80.581739442040600;
-		double amount = (-1) * (activityDelayDisutility + tripDelayDisutility) / controler.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+		double amount = (-1) * (activityDelayDisutility + tripDelayDisutility) / controler.getConfig().scoring().getMarginalUtilityOfMoney();
 		Assert.assertEquals("Wrong amount.", amount, amountFromEvent, MatsimTestUtils.EPSILON);
 	 }
 
@@ -409,7 +409,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config3.xml";
 
 		Config config = ConfigUtils.loadConfig( configFile ) ;
-		config.plansCalcRoute().setAccessEgressType(AccessEgressType.none);
+		config.routing().setAccessEgressType(AccessEgressType.none);
 
 		final Scenario scenario = ScenarioUtils.loadScenario( config);
 		Controler controler = new Controler( scenario );
@@ -446,7 +446,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		final TollHandler tollHandler = new TollHandler(controler.getScenario());
 		final CongestionTollTimeDistanceTravelDisutilityFactory tollDisutilityCalculatorFactory = new CongestionTollTimeDistanceTravelDisutilityFactory(
 				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config),
-				tollHandler, controler.getConfig().planCalcScore());
+				tollHandler, controler.getConfig().scoring());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -462,7 +462,7 @@ public class AdvancedMarginalCongestionPricingIT {
 			}
 		});
 		controler.addOverridingModule(new OTFVisFileWriterModule());
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 
 		// test if there are three congestion events and three money events
@@ -477,7 +477,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config4.xml";
 
 		Config config = ConfigUtils.loadConfig( configFile ) ;
-		config.plansCalcRoute().setAccessEgressType(AccessEgressType.none);
+		config.routing().setAccessEgressType(AccessEgressType.none);
 
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		Controler controler = new Controler( scenario );
@@ -514,7 +514,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		final TollHandler tollHandler = new TollHandler(controler.getScenario());
 		final CongestionTollTimeDistanceTravelDisutilityFactory tollDisutilityCalculatorFactory = new CongestionTollTimeDistanceTravelDisutilityFactory(
 				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config),
-				tollHandler, controler.getConfig().planCalcScore());
+				tollHandler, controler.getConfig().scoring());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -530,7 +530,7 @@ public class AdvancedMarginalCongestionPricingIT {
 			}
 		});
 		controler.addOverridingModule(new OTFVisFileWriterModule());
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 
 		// test if there are three congestion events and three money events

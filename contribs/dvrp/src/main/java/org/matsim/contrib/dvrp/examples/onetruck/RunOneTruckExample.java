@@ -41,7 +41,7 @@ public final class RunOneTruckExample {
 	public static void run(URL configUrl, String trucksFile, boolean otfvis, int lastIteration) {
 		// load config
 		Config config = ConfigUtils.loadConfig(configUrl, new DvrpConfigGroup(), new OTFVisConfigGroup());
-		config.controler().setLastIteration(lastIteration);
+		config.controller().setLastIteration(lastIteration);
 
 		// load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);

@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.controler.FreightUtils;
+import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.contrib.freightreceiver.collaboration.CollaborationUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -15,11 +15,11 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Locale;
 
 /**
@@ -58,7 +58,7 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		String fileName = sc.getConfig().controler().getOutputDirectory() + ReceiverUtils.FILENAME_RECEIVER_SCORES;
+		String fileName = sc.getConfig().controller().getOutputDirectory() + ReceiverUtils.FILENAME_RECEIVER_SCORES;
 		if (fileName.toLowerCase(Locale.ROOT).endsWith(".txt")) {
 			this.out = IOUtils.getBufferedWriter(fileName);
 		} else {
@@ -69,8 +69,8 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-		this.minIteration = event.getServices().getConfig().controler().getFirstIteration();
-		int maxIter = event.getServices().getConfig().controler().getLastIteration();
+		this.minIteration = event.getServices().getConfig().controller().getFirstIteration();
+		int maxIter = event.getServices().getConfig().controller().getLastIteration();
 		int iterations = maxIter - this.minIteration;
 		if (iterations > 5000) iterations = 5000; // limit the history size
 		this.history = new double[4][iterations + 1];
@@ -92,12 +92,12 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 		if ((event.getIteration() + 1) % (ConfigUtils.addOrGetModule(sc.getConfig(), ReceiverConfigGroup.class).getReceiverReplanningInterval()) != 0)
 			return;
 		String dir = event.getServices().getControlerIO().getIterationPath(event.getIteration());
-		FreightUtils.writeCarriers(FreightUtils.getCarriers(sc), dir + File.separator + event.getIteration() + CARRIER_PLANS_XML);
+		CarriersUtils.writeCarriers(CarriersUtils.getCarriers(sc), dir + File.separator + event.getIteration() + CARRIER_PLANS_XML);
 		new ReceiversWriter(ReceiverUtils.getReceivers(sc)).write(dir + File.separator + event.getIteration() + RECEIVER_PLANS_XML);
 	}
 
 	private void writeIterationScores(IterationEndsEvent event) {
-		String fileName = sc.getConfig().controler().getOutputDirectory() + ReceiverUtils.FILENAME_RECEIVER_SCORES;
+		String fileName = sc.getConfig().controller().getOutputDirectory() + ReceiverUtils.FILENAME_RECEIVER_SCORES;
 
 		double sumScoreWorst = 0.0;
 		double sumScoreBest = 0.0;
@@ -228,7 +228,7 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 	}
 
 	static void writeHeadings(Scenario sc) {
-		try(BufferedWriter bw = IOUtils.getBufferedWriter(sc.getConfig().controler().getOutputDirectory() + RECEIVER_STATS_CSV)) {
+		try(BufferedWriter bw = IOUtils.getBufferedWriter(sc.getConfig().controller().getOutputDirectory() + RECEIVER_STATS_CSV)) {
 			bw.write(String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s",
 				"iteration",
 				"receiver_id",
@@ -264,7 +264,7 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 					boolean member = (boolean) receiver.getAttributes().getAttribute(CollaborationUtils.ATTR_GRANDCOALITION_MEMBER);
 
 
-					try (BufferedWriter bw1 = IOUtils.getAppendingBufferedWriter(sc.getConfig().controler().getOutputDirectory() + RECEIVER_STATS_CSV)) {
+					try (BufferedWriter bw1 = IOUtils.getAppendingBufferedWriter(sc.getConfig().controller().getOutputDirectory() + RECEIVER_STATS_CSV)) {
 						bw1.write(String.format("%d,%s,%s,%f,%f,%f,%s,%f,%f,%f,%b,%b",
 							event.getIteration(),
 							receiver.getId(),

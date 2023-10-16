@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -52,7 +53,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -71,7 +72,6 @@ import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -182,7 +182,7 @@ public final class PopulationUtils {
 		public void setRoutingMode(String routingMode) {
 			throw new UnsupportedOperationException() ;
 		}
-		
+
 		@Override
 		public Route getRoute() {
 			// route should be unmodifiable. kai
@@ -381,6 +381,36 @@ public final class PopulationUtils {
 		public void setType(String type) {
 			throw new UnsupportedOperationException();
 		}
+		
+		@Override
+		public Id<Plan> getId() {
+			return this.delegate.getId();
+		}
+
+		@Override
+		public void setPlanId(Id<Plan> planId) {
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public int getIterationCreated() {
+			return this.delegate.getIterationCreated();
+		}
+
+		@Override
+		public void setIterationCreated(int iteration) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public String getPlanMutator() {
+			return this.delegate.getPlanMutator();
+		}
+
+		@Override
+		public void setPlanMutator(String planMutator) {
+			throw new UnsupportedOperationException();
+		}
 
 		@Override
 		public void addLeg(Leg leg) {
@@ -526,10 +556,10 @@ public final class PopulationUtils {
 			double sameModeReward, double sameRouteReward ) {
 		// yyyy should be made configurable somehow (i.e. possibly not a static method any more).  kai, apr'15
 
-		// yy kwa points to: 
+		// yy kwa points to:
 		// Schüssler, N. and K.W. Axhausen (2009b) Accounting for similarities in destination choice modelling: A concept, paper presented at the 9th Swiss Transport Research Conference, Ascona, October 2009.
-		//		und 
-		//  Joh, Chang-Hyeon, Theo A. Arentze and Harry J. P. Timmermans (2001). 
+		//		und
+		//  Joh, Chang-Hyeon, Theo A. Arentze and Harry J. P. Timmermans (2001).
 		// A Position-Sensitive Sequence Alignment Method Illustrated for Space-Time Activity-Diary Data¹, Environment and Planning A 33(2): 313­338.
 
 		// Mahdieh Allahviranloo has some work on activity pattern similarity (iatbr'15)
@@ -581,10 +611,10 @@ public final class PopulationUtils {
 			double sameActivityLocationPenalty, double actTimeParameter ) {
 		// yyyy should be made configurable somehow (i.e. possibly not a static method any more).  kai, apr'15
 
-		// yy kwa points to: 
+		// yy kwa points to:
 		// Schüssler, N. and K.W. Axhausen (2009b) Accounting for similarities in destination choice modelling: A concept, paper presented at the 9th Swiss Transport Research Conference, Ascona, October 2009.
-		//		und 
-		//  Joh, Chang-Hyeon, Theo A. Arentze and Harry J. P. Timmermans (2001). 
+		//		und
+		//  Joh, Chang-Hyeon, Theo A. Arentze and Harry J. P. Timmermans (2001).
 		// A Position-Sensitive Sequence Alignment Method Illustrated for Space-Time Activity-Diary Data¹, Environment and Planning A 33(2): 313­338.
 
 		// Mahdieh Allahviranloo has some work on activity pattern similarity (iatbr'15)
@@ -740,7 +770,7 @@ public final class PopulationUtils {
 		return populationFactory ;
 	}
 
-	// --- plain factories: 
+	// --- plain factories:
 
 	public static Plan createPlan(Person person) {
 		Plan plan = getFactory().createPlan() ;
@@ -767,7 +797,7 @@ public final class PopulationUtils {
 	public static Activity createInteractionActivityFromFacilityId(String type, Id<ActivityFacility> facilityId) {
 		return getFactory().createInteractionActivityFromActivityFacilityId(type, facilityId);
 	}
-	
+
 	public static Activity createActivityFromCoord(String type, Coord coord) {
 		return getFactory().createActivityFromCoord(type, coord) ;
 	}
@@ -775,7 +805,7 @@ public final class PopulationUtils {
 	public static Activity createInteractionActivityFromCoord(String type, Coord coord) {
 		return getFactory().createInteractionActivityFromCoord(type, coord) ;
 	}
-	
+
 	public static Activity createActivityFromCoordAndLinkId(String type, Coord coord, Id<Link> linkId) {
 		Activity act = getFactory().createActivityFromCoord(type, coord) ;
 		act.setLinkId(linkId);
@@ -832,7 +862,7 @@ public final class PopulationUtils {
 	}
 
 	public static Activity createStageActivityFromCoordLinkIdAndModePrefix(final Coord interactionCoord, final Id<Link> interactionLink, String modePrefix ) {
-		Activity act = createInteractionActivityFromCoordAndLinkId(PlanCalcScoreConfigGroup.createStageActivityType(modePrefix), interactionCoord, interactionLink);
+		Activity act = createInteractionActivityFromCoordAndLinkId(ScoringConfigGroup.createStageActivityType(modePrefix), interactionCoord, interactionLink);
 //		act.setMaximumDuration(0.0); // obsolete since this is hard-coded in InteractionActivity
 		return act;
 	}
@@ -849,7 +879,7 @@ public final class PopulationUtils {
 		/*
 		 * By default 'false' to be backwards compatible. As a result, InteractionActivities will be converted to ActivityImpl.
 		 */
-		copyFromTo(in, out, false); 
+		copyFromTo(in, out, false);
 	}
 
 	public static void copyFromTo(final Plan in, final Plan out, final boolean withInteractionActivities) {

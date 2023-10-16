@@ -24,24 +24,21 @@ import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.Permission;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -116,7 +113,7 @@ public final class MatsimTestUtils extends TestWatcher {
 		Config config = ConfigUtils.createConfig();
 		config.setContext(inputResourcePath());
 		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
+		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
@@ -124,7 +121,7 @@ public final class MatsimTestUtils extends TestWatcher {
 		Config config = ConfigUtils.createConfig();
 		config.setContext(classInputResourcePath());
 		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
+		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
@@ -132,7 +129,7 @@ public final class MatsimTestUtils extends TestWatcher {
 		Config config = ConfigUtils.createConfig();
 		config.setContext(packageInputResourcePath());
 		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
+		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
@@ -154,7 +151,7 @@ public final class MatsimTestUtils extends TestWatcher {
 	private URL getResourceNotNull(String pathString) {
 		URL resource = this.testClass.getResource(pathString);
 		if (resource == null) {
-			throw new UncheckedIOException("Not found: "+pathString);
+			throw new UncheckedIOException(new IOException("Not found: "+pathString));
 		}
 		return resource;
 	}
@@ -164,7 +161,7 @@ public final class MatsimTestUtils extends TestWatcher {
 			Config config = ConfigUtils.createConfig();
 			config.setContext(new File(this.getInputDirectory()).toURI().toURL());
 			this.outputDirectory = getOutputDirectory();
-			config.controler().setOutputDirectory(this.outputDirectory);
+			config.controller().setOutputDirectory(this.outputDirectory);
 			return config;
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
@@ -175,7 +172,7 @@ public final class MatsimTestUtils extends TestWatcher {
 		Config config = ConfigUtils.createConfig();
 		config.setContext(context);
 		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
+		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
@@ -194,7 +191,7 @@ public final class MatsimTestUtils extends TestWatcher {
 			config = ConfigUtils.createConfig( customGroups );
 		}
 		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
+		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
@@ -206,14 +203,14 @@ public final class MatsimTestUtils extends TestWatcher {
 			config = ConfigUtils.createConfig( customGroups );
 		}
 		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
+		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
 	public Config createConfig(final ConfigGroup... customGroups) {
 		Config config = ConfigUtils.createConfig( customGroups );
 		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
+		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 

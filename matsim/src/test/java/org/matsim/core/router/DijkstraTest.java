@@ -21,7 +21,7 @@
 package org.matsim.core.router;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
@@ -32,7 +32,7 @@ public class DijkstraTest extends AbstractLeastCostPathCalculatorTest {
 
 	@Override
 	protected LeastCostPathCalculator getLeastCostPathCalculator(final Network network) {
-		FreespeedTravelTimeAndDisutility travelTimeCostCalculator = new FreespeedTravelTimeAndDisutility(new PlanCalcScoreConfigGroup());
+		FreespeedTravelTimeAndDisutility travelTimeCostCalculator = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
 		return new Dijkstra(network, travelTimeCostCalculator, travelTimeCostCalculator);
 	}
 

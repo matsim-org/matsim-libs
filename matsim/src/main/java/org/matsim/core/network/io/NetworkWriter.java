@@ -30,18 +30,18 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public final class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
-	
+
 	private static final Logger log = LogManager.getLogger(NetworkWriter.class);
-	
+
 	private final Network network;
 	private final CoordinateTransformation transformation;
 	private final Map<Class<?>,AttributeConverter<?>> converters = new HashMap<>();

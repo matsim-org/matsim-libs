@@ -14,7 +14,7 @@ public class RunEquil {
 	public static void main(String[] args) {
 		String configFile = "examples/equil/config.xml";
 		Config config = ConfigUtils.loadConfig(configFile);
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 
@@ -31,7 +31,7 @@ public class RunEquil {
 		// People work only 30 minutes in Equil, so the interval for work-time is 6:01 to 6:30
 		final LinkActivityOccupancyCounter atWork = new LinkActivityOccupancyCounter(scenario.getPopulation(), 6*60*60 + 1, 6*60*60 + 30 * 60);
 		controler.getEvents().addHandler(atWork);
-		
+
 		// This one briefly listens in when everyone is already at home again
 		final LinkActivityOccupancyCounter nextNight = new LinkActivityOccupancyCounter(scenario.getPopulation(), 13*60*60 + 45 * 60, 13*60*60 + 47 * 60);
 		controler.getEvents().addHandler(nextNight);
@@ -39,7 +39,7 @@ public class RunEquil {
 		// During this window, most people are already home, a few are still working, and one person is actually seen both at work and at home.
 		final LinkActivityOccupancyCounter middle = new LinkActivityOccupancyCounter(scenario.getPopulation(), 27810, 31440);
 		controler.getEvents().addHandler(middle);
-		
+
 		// This one listens all day
 		final LinkActivityOccupancyCounter allDay = new LinkActivityOccupancyCounter(scenario.getPopulation());
 		controler.getEvents().addHandler(allDay);
@@ -69,7 +69,7 @@ public class RunEquil {
 				System.out.println("---");
 			}
 		});
-		controler.getConfig().controler().setOverwriteFileSetting(
+		controler.getConfig().controller().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );

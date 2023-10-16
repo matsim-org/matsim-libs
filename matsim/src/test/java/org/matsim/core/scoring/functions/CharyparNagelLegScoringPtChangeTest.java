@@ -39,7 +39,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -117,7 +117,7 @@ public class CharyparNagelLegScoringPtChangeTest {
 			final Network network) {
 		final Random random = new Random( seed );
 
-		final PlanCalcScoreConfigGroup conf = new PlanCalcScoreConfigGroup();
+		final ScoringConfigGroup conf = new ScoringConfigGroup();
 		conf.setMarginalUtlOfWaitingPt_utils_hr( random.nextDouble() * 1000 );
 		conf.getModes().get(TransportMode.pt).setMonetaryDistanceRate(random.nextDouble() * 1000);
 		conf.getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(random.nextDouble() * 1000);

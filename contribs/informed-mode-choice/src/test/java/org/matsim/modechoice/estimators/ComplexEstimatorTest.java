@@ -21,7 +21,7 @@ public class ComplexEstimatorTest {
 
 		Config config = TestScenario.loadConfig(utils);
 
-		config.controler().setLastIteration(2);
+		config.controller().setLastIteration(2);
 		Controler controler = MATSimApplication.prepare(TestScenario.class, config, "--complex");
 
 		controler.run();

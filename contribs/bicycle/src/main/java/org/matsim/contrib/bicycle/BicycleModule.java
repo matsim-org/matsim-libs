@@ -86,7 +86,7 @@ public final class BicycleModule extends AbstractModule {
 					LOG.warn("There is an inconsistency in the specified maximum velocity for " + bicycleConfigGroup.getBicycleMode() + ":"
 							     + " Maximum speed specified in the 'bicycle' config group (used for routing): " + bicycleConfigGroup.getMaxBicycleSpeedForRouting() + " vs."
 							     + " maximum speed specified for the vehicle type (used in mobsim): " + mobsimSpeed);
-					if (scenario.getConfig().plansCalcRoute().getRoutingRandomness() == 0.) {
+					if (scenario.getConfig().routing().getRoutingRandomness() == 0.) {
 						throw new RuntimeException("The recommended way to deal with the inconsistency between routing and scoring/mobsim is to have a randomized router. Aborting... ");
 					}
 				}

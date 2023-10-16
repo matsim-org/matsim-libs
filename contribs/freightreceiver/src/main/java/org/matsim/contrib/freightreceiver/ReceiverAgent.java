@@ -22,9 +22,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.controler.FreightUtils;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.Carriers;
 import org.matsim.core.scoring.ScoringFunction;
 
 import java.util.ArrayList;
@@ -70,7 +70,7 @@ class ReceiverAgent {
 			return;
 		}
 
-		Carriers carriers = FreightUtils.getCarriers(scenario);
+		Carriers carriers = CarriersUtils.getCarriers(scenario);
 		double score = 0.0;
 		List<Id<Carrier>> carrierIds = new ArrayList<>();
 

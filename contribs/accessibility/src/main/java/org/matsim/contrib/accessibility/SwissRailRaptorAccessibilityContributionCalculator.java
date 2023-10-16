@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.*;
@@ -44,7 +44,7 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
 	private static final Logger LOG = LogManager.getLogger( SwissRailRaptorAccessibilityContributionCalculator.class );
 	private SwissRailRaptor raptor;
 	private String mode;
-	private PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
+	private ScoringConfigGroup scoringConfigGroup;
 	private Scenario scenario;
 
     Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
@@ -58,7 +58,7 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
     Map<Id<ActivityFacility>, Collection<TransitStopFacility>> stopsPerAggregatedOpportunity = new LinkedHashMap<>();
 
 
-    public SwissRailRaptorAccessibilityContributionCalculator(String mode, PlanCalcScoreConfigGroup planCalcScoreConfigGroup, Scenario scenario) {
+    public SwissRailRaptorAccessibilityContributionCalculator(String mode, ScoringConfigGroup scoringConfigGroup, Scenario scenario) {
 		this.mode = mode;
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
@@ -69,12 +69,12 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
 			this.raptorData = SwissRailRaptorData.create(schedule, null, raptorConfig, ptNetwork, null);
 
 		this.raptor = new SwissRailRaptor.Builder(raptorData, scenario.getConfig()).build();
-		this.planCalcScoreConfigGroup = planCalcScoreConfigGroup;
+		this.scoringConfigGroup = scoringConfigGroup;
 		this.scenario = scenario;
 
-		this.betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		this.betaWalkTT = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
 
-		this.walkSpeed_m_h = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
+		this.walkSpeed_m_h = scenario.getConfig().routing().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
 	}
 
 
@@ -167,8 +167,8 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
             //check whether direct walk time is cheaper
             travelCost = Math.min(travelCost, directWalkCost);
 
-            double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, planCalcScoreConfigGroup);
-            expSum += Math.exp(this.planCalcScoreConfigGroup.getBrainExpBeta() * (-travelCost + modeSpecificConstant));
+            double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, scoringConfigGroup);
+            expSum += Math.exp(this.scoringConfigGroup.getBrainExpBeta() * (-travelCost + modeSpecificConstant));
         }
         return expSum;
 	}
@@ -177,7 +177,7 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
 	@Override
 	public SwissRailRaptorAccessibilityContributionCalculator duplicate() {
 		SwissRailRaptorAccessibilityContributionCalculator swissRailRaptorAccessibilityContributionCalculator =
-				new SwissRailRaptorAccessibilityContributionCalculator(this.mode, this.planCalcScoreConfigGroup, this.scenario);
+				new SwissRailRaptorAccessibilityContributionCalculator(this.mode, this.scoringConfigGroup, this.scenario);
         swissRailRaptorAccessibilityContributionCalculator.aggregatedMeasurePoints = this.aggregatedMeasurePoints;
         swissRailRaptorAccessibilityContributionCalculator.aggregatedOpportunities = this.aggregatedOpportunities;
         swissRailRaptorAccessibilityContributionCalculator.stopsPerAggregatedOpportunity = this.stopsPerAggregatedOpportunity;
