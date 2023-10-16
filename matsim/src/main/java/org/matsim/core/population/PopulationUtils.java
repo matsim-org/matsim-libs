@@ -381,6 +381,36 @@ public final class PopulationUtils {
 		public void setType(String type) {
 			throw new UnsupportedOperationException();
 		}
+		
+		@Override
+		public Id<Plan> getId() {
+			return this.delegate.getId();
+		}
+
+		@Override
+		public void setPlanId(Id<Plan> planId) {
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public int getIterationCreated() {
+			return this.delegate.getIterationCreated();
+		}
+
+		@Override
+		public void setIterationCreated(int iteration) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public String getPlanMutator() {
+			return this.delegate.getPlanMutator();
+		}
+
+		@Override
+		public void setPlanMutator(String planMutator) {
+			throw new UnsupportedOperationException();
+		}
 
 		@Override
 		public void addLeg(Leg leg) {
