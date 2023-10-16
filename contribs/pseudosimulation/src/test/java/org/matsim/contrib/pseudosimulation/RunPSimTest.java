@@ -1,10 +1,6 @@
 
 package org.matsim.contrib.pseudosimulation;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -18,8 +14,7 @@ import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.NoTransitEm
 import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.TransitEmulator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
@@ -30,15 +25,18 @@ import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.pt.config.TransitConfigGroup.TransitRoutingAlgorithmType;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class RunPSimTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private Logger logger = LogManager.getLogger(RunPSimTest.class );
+	private final Logger logger = LogManager.getLogger(RunPSimTest.class );
 
 	private final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial" ),"0.config.xml" ) );
 
