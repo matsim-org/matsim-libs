@@ -12,7 +12,6 @@ import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
-import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -31,7 +30,6 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 	private final DrtEstimatorConfigGroup config;
 	private final DrtConfigGroup drtConfig;
 
-	private final DrtSpeedUpParams speedUpParams;
 	private final SplittableRandom rnd = new SplittableRandom();
 	/**
 	 * Currently valid estimates.
@@ -45,15 +43,15 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 		this.collector = collector;
 		this.config = config;
 		this.drtConfig = drtConfig;
-		this.speedUpParams = this.drtConfig.getDrtSpeedUpParams().isPresent() ? this.drtConfig.getDrtSpeedUpParams().get() : null;
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 
 		// Speed-up iteration need to be ignored for the estimates
-		if (speedUpParams != null &&
-			DrtSpeedUp.isTeleportDrtUsers(speedUpParams, event.getServices().getConfig().controller(), event.getIteration())) {
+		if (drtConfig.getDrtSpeedUpParams().isPresent() &&
+			DrtSpeedUp.isTeleportDrtUsers(drtConfig.getDrtSpeedUpParams().get(),
+				event.getServices().getConfig().controller(), event.getIteration())) {
 			return;
 		}
 
