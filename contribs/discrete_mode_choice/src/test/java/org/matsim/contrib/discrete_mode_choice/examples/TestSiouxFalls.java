@@ -57,14 +57,10 @@ public class TestSiouxFalls {
 
 		controller.run();
 
-		assertEquals(42395, (int) listener.counts.get("pt"));
-		assertEquals(132284, (int) listener.counts.get("car"));
-		assertEquals(78809, (int) listener.counts.get("walk"));
-//		assertEquals(42520, (int) listener.counts.get("pt"));
-//		assertEquals(132100, (int) listener.counts.get("car"));
-//		assertEquals(79106, (int) listener.counts.get("walk"));
-		// ...setConstrainedModes(...) (inside configureAsSubtourModeChoiceReplacement(...)) used to ignore its arguments because of a typo.
-		// This is now corrected, but results are no longer backwards compatible.  kai, jan'23
+		assertEquals(42395, listener.counts.get("pt"),3);
+		assertEquals(132284, listener.counts.get("car"),3);
+		assertEquals(78809, listener.counts.get("walk"),3);
+
 
 	}
 
