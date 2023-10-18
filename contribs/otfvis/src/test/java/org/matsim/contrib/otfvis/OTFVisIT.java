@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.otfvis;
 
@@ -28,7 +28,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.Controler;
@@ -36,17 +35,16 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Collections;
 
-import static org.matsim.core.config.groups.ControlerConfigGroup.*;
+import static org.matsim.core.config.groups.ControllerConfigGroup.*;
 
 /**
  * Simple test case to ensure the converting from eventsfile to .mvi-file
  * Needs somehow a bunch of memory - please use "-Xmx630m"!
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class OTFVisIT {
 
@@ -69,20 +67,20 @@ public class OTFVisIT {
 	@Test
 	public void testOTFVisSnapshotWriterOnQSim() {
 		final Config config = ConfigUtils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controler().setLastIteration(2);
-		config.controler().setWriteEventsInterval(0);
-		config.controler().setWritePlansInterval(0);
-		config.controler().setMobsim("qsim");
-		config.controler().setSnapshotFormat( Collections.singletonList( SnapshotFormat.otfvis ) );
+		config.controller().setLastIteration(2);
+		config.controller().setWriteEventsInterval(0);
+		config.controller().setWritePlansInterval(0);
+		config.controller().setMobsim("qsim");
+		config.controller().setSnapshotFormat( Collections.singletonList( SnapshotFormat.otfvis ) );
 		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setSnapshotPeriod(600);
 		qSimConfigGroup.setSnapshotStyle( SnapshotStyle.equiDist ) ;;
 
 		final Controler controler = new Controler(config);
 		controler.addOverridingModule(new OTFVisFileWriterModule());
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 
 		Assert.assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "otfvis.mvi")).exists());

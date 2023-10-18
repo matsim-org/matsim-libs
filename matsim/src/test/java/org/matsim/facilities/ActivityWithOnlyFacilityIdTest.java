@@ -24,8 +24,8 @@ public class ActivityWithOnlyFacilityIdTest {
         URL scenarioURL = ExamplesUtils.getTestScenarioURL("siouxfalls-2014");
 
         Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(scenarioURL, "config_default.xml"));
-        config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-        config.controler().setLastIteration(1);
+        config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+        config.controller().setLastIteration(1);
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
 

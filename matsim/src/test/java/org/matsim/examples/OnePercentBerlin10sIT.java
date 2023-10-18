@@ -66,7 +66,7 @@ public class OnePercentBerlin10sIT {
 		config.qsim().setStorageCapFactor(0.04);
 		config.qsim().setRemoveStuckVehicles(false);
 		config.qsim().setStuckTime(10.0);
-		config.planCalcScore().setLearningRate(1.0);
+		config.scoring().setLearningRate(1.0);
 
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime);
 
@@ -110,9 +110,9 @@ public class OnePercentBerlin10sIT {
 		config.qsim().setStorageCapFactor(0.04);
 		config.qsim().setRemoveStuckVehicles(false);
 		config.qsim().setStuckTime(10.0);
-		config.planCalcScore().setLearningRate(1.0);
+		config.scoring().setLearningRate(1.0);
 
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 

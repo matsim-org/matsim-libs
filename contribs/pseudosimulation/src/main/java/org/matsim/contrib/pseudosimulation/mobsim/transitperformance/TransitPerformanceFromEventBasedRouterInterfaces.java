@@ -1,6 +1,6 @@
 /*
  * Copyright 2018 Gunnar Flötteröd
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,8 +23,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
-import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
+//import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
+//import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.TransitRouteImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -44,16 +44,16 @@ import com.google.inject.Inject;
  */
 public class TransitPerformanceFromEventBasedRouterInterfaces implements TransitEmulator {
 
-	private WaitTime waitTimes;
-	private StopStopTime stopStopTimes;
+//	private WaitTime waitTimes;
+//	private StopStopTime stopStopTimes;
 	private Map<Id<TransitLine>, TransitLine> transitLines;
 	private Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities;
 
 	@Inject
-	public TransitPerformanceFromEventBasedRouterInterfaces(WaitTime waitTimes, StopStopTime stopStopTimes,
+	public TransitPerformanceFromEventBasedRouterInterfaces(/*WaitTime waitTimes, StopStopTime stopStopTimes,*/
 			TransitSchedule transitSchedule) {
-		this.waitTimes = waitTimes;
-		this.stopStopTimes = stopStopTimes;
+//		this.waitTimes = waitTimes;
+//		this.stopStopTimes = stopStopTimes;
 		this.transitLines = transitSchedule.getTransitLines();
 		this.stopFacilities = transitSchedule.getFacilities();
 	}
@@ -65,8 +65,8 @@ public class TransitPerformanceFromEventBasedRouterInterfaces implements Transit
 		TransitLine line = this.transitLines.get(route.getLineId());
 		TransitRoute transitRoute = line.getRoutes().get(route.getRouteId());
 
-		final double accessTime_s = earliestDepartureTime_s + this.waitTimes.getRouteStopWaitTime(route.getLineId(),
-				transitRoute.getId(), route.getAccessStopId(), earliestDepartureTime_s);
+		final double accessTime_s = earliestDepartureTime_s /*+ this.waitTimes.getRouteStopWaitTime(route.getLineId(),
+				transitRoute.getId(), route.getAccessStopId(), earliestDepartureTime_s)*/;
 		final double egressTime_s = accessTime_s + this.findTransitTravelTime(route, accessTime_s);
 		return new Trip(null, accessTime_s, egressTime_s);
 	}
@@ -99,7 +99,7 @@ public class TransitPerformanceFromEventBasedRouterInterfaces implements Transit
 			Id fromId = transitRoute.getStops().get(i).getStopFacility().getId();
 			TransitRouteStop toStop = transitRoute.getStops().get(i + 1);
 			Id toId = toStop.getStopFacility().getId();
-			travelTime += stopStopTimes.getStopStopTime(fromId, toId, prevStopTime);
+//			travelTime += stopStopTimes.getStopStopTime(fromId, toId, prevStopTime);
 			prevStopTime += travelTime;
 			if (toStop.getStopFacility().getId().equals(dest)) {
 				destinationFound = true;

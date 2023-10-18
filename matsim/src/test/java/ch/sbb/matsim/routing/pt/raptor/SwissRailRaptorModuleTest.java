@@ -1,7 +1,22 @@
-/*
- * Copyright (C) Schweizerische Bundesbahnen SBB, 2018.
- */
-
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package ch.sbb.matsim.routing.pt.raptor;
 
 import java.util.ArrayList;
@@ -26,8 +41,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -78,10 +93,10 @@ public class SwissRailRaptorModuleTest {
     @Test
     public void testInitialization() {
         Config config = ConfigUtils.createConfig();
-        config.controler().setLastIteration(0);
-        config.controler().setOutputDirectory(this.utils.getOutputDirectory());
-        config.controler().setCreateGraphs(false);
-        config.controler().setDumpDataAtEnd(false);
+        config.controller().setLastIteration(0);
+        config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+        config.controller().setCreateGraphs(false);
+        config.controller().setDumpDataAtEnd(false);
         config.transit().setUseTransit(true);
         Scenario scenario = ScenarioUtils.createScenario(config);
         Controler controler = new Controler(scenario);
@@ -141,23 +156,23 @@ public class SwissRailRaptorModuleTest {
 
         // prepare scoring
         Config config = f.config;
-        PlanCalcScoreConfigGroup.ActivityParams homeScoring = new PlanCalcScoreConfigGroup.ActivityParams("home");
+        ScoringConfigGroup.ActivityParams homeScoring = new ScoringConfigGroup.ActivityParams("home");
         homeScoring.setTypicalDuration(16*3600);
-        f.config.planCalcScore().addActivityParams(homeScoring);
-        PlanCalcScoreConfigGroup.ActivityParams workScoring = new PlanCalcScoreConfigGroup.ActivityParams("work");
+        f.config.scoring().addActivityParams(homeScoring);
+        ScoringConfigGroup.ActivityParams workScoring = new ScoringConfigGroup.ActivityParams("work");
         workScoring.setTypicalDuration(8*3600);
-        f.config.planCalcScore().addActivityParams(workScoring);
+        f.config.scoring().addActivityParams(workScoring);
 
-        PlanCalcScoreConfigGroup.ModeParams walk = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.walk);
+        ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
         walk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(walk);
+        f.config.scoring().addModeParams(walk);
 
         // prepare rest of config
 
-        config.controler().setLastIteration(0);
-        config.controler().setOutputDirectory(this.utils.getOutputDirectory());
-        config.controler().setCreateGraphs(false);
-        config.controler().setDumpDataAtEnd(false);
+        config.controller().setLastIteration(0);
+        config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+        config.controller().setCreateGraphs(false);
+        config.controller().setDumpDataAtEnd(false);
         config.qsim().setEndTime(10*3600);
         config.transit().setUseTransit(true);
         Controler controler = new Controler(f.scenario);
@@ -231,7 +246,7 @@ public class SwissRailRaptorModuleTest {
         // :-( :-(  kai, mar'20)
 
     }
-    
+
     /**
      * Test update of SwissRailRaptorData after TransitScheduleChangedEvent
      */
@@ -252,29 +267,29 @@ public class SwissRailRaptorModuleTest {
         plan.addActivity(homeAct);
         plan.addLeg(pf.createLeg(TransportMode.pt));
         plan.addActivity(pf.createActivityFromCoord("work", new Coord(24010, 10000)));
-        
+
         // prepare scoring
         Config config = f.config;
-        PlanCalcScoreConfigGroup.ActivityParams homeScoring = new PlanCalcScoreConfigGroup.ActivityParams("home");
+        ScoringConfigGroup.ActivityParams homeScoring = new ScoringConfigGroup.ActivityParams("home");
         homeScoring.setTypicalDuration(16*3600);
-        f.config.planCalcScore().addActivityParams(homeScoring);
-        PlanCalcScoreConfigGroup.ActivityParams workScoring = new PlanCalcScoreConfigGroup.ActivityParams("work");
+        f.config.scoring().addActivityParams(homeScoring);
+        ScoringConfigGroup.ActivityParams workScoring = new ScoringConfigGroup.ActivityParams("work");
         workScoring.setTypicalDuration(8*3600);
-        f.config.planCalcScore().addActivityParams(workScoring);
+        f.config.scoring().addActivityParams(workScoring);
 
-        f.config.planCalcScore().getOrCreateModeParams(TransportMode.walk).setMarginalUtilityOfTraveling(0.0);
+        f.config.scoring().getOrCreateModeParams(TransportMode.walk).setMarginalUtilityOfTraveling(0.0);
 
         StrategySettings reRoute = new StrategySettings();
         reRoute.setStrategyName("ReRoute");
         reRoute.setWeight(1.0);
-        config.strategy().addStrategySettings(reRoute);
-        config.strategy().setMaxAgentPlanMemorySize(1);
+        config.replanning().addStrategySettings(reRoute);
+        config.replanning().setMaxAgentPlanMemorySize(1);
 
         // prepare rest of config
-        config.controler().setLastIteration(1);
-        config.controler().setOutputDirectory(this.utils.getOutputDirectory());
-        config.controler().setCreateGraphs(false);
-        config.controler().setDumpDataAtEnd(false);
+        config.controller().setLastIteration(1);
+        config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+        config.controller().setCreateGraphs(false);
+        config.controller().setDumpDataAtEnd(false);
         config.qsim().setEndTime(10*3600);
         config.transit().setUseTransit(true);
         Controler controler = new Controler(f.scenario);
@@ -288,12 +303,12 @@ public class SwissRailRaptorModuleTest {
         });
 
         controler.run();
-        
+
         // test that swiss rail raptor was used
         TripRouter tripRouter = controler.getInjector().getInstance(TripRouter.class);
         RoutingModule module = tripRouter.getRoutingModule(TransportMode.pt);
         Assert.assertTrue(module instanceof SwissRailRaptorRoutingModule);
-        
+
         // Check routed plan
         List<PlanElement> planElements = p1.getSelectedPlan().getPlanElements();
         for (PlanElement pe : planElements) {
@@ -317,13 +332,13 @@ public class SwissRailRaptorModuleTest {
         Assert.assertEquals(TransportMode.walk, ((Leg) planElements.get(1)).getMode());
         Assert.assertEquals(TransportMode.pt, ((Leg) planElements.get(3)).getMode());
         Assert.assertEquals(TransportMode.walk, ((Leg) planElements.get(5)).getMode());
-        
+
         // Check route: should return one of the added lines although the removed green line would be faster
         Leg ptLeg = (Leg) planElements.get(3);
         TransitPassengerRoute ptRoute = (TransitPassengerRoute) ptLeg.getRoute();
-        Assert.assertEquals(Id.create("AddedLine" + 1, TransitLine.class), ptRoute.getLineId());        
+        Assert.assertEquals(Id.create("AddedLine" + 1, TransitLine.class), ptRoute.getLineId());
     }
-    
+
     /**
      * Test individual scoring parameters for agents
      */
@@ -333,21 +348,21 @@ public class SwissRailRaptorModuleTest {
         srrConfig.setScoringParameters(ch.sbb.matsim.config.SwissRailRaptorConfigGroup.ScoringParameters.Individual);
 
         Config config = ConfigUtils.createConfig(srrConfig);
-        config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-        config.controler().setLastIteration(0);
-        config.controler().setOutputDirectory(this.utils.getOutputDirectory());
+        config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+        config.controller().setLastIteration(0);
+        config.controller().setOutputDirectory(this.utils.getOutputDirectory());
         config.transit().setUseTransit(true);
 
-        config.planCalcScore().getOrCreateScoringParameters("default").setPerforming_utils_hr(3600.0 * 50.0);
-        config.planCalcScore().getOrCreateScoringParameters("sub").setPerforming_utils_hr(3600.0 * 50.0);
+        config.scoring().getOrCreateScoringParameters("default").setPerforming_utils_hr(3600.0 * 50.0);
+        config.scoring().getOrCreateScoringParameters("sub").setPerforming_utils_hr(3600.0 * 50.0);
 
         for (String mode : Arrays.asList("car", "walk", "pt")) {
-            config.planCalcScore().getOrCreateScoringParameters("default").getOrCreateModeParams(mode);
-            config.planCalcScore().getOrCreateScoringParameters("sub").getOrCreateModeParams(mode);
+            config.scoring().getOrCreateScoringParameters("default").getOrCreateModeParams(mode);
+            config.scoring().getOrCreateScoringParameters("sub").getOrCreateModeParams(mode);
         }
 
-        config.planCalcScore().getOrCreateScoringParameters("default").setMarginalUtlOfWaitingPt_utils_hr(-3600.0 * 30.0);
-        config.planCalcScore().getOrCreateScoringParameters("sub").setMarginalUtlOfWaitingPt_utils_hr(-3600.0 * 10.0);
+        config.scoring().getOrCreateScoringParameters("default").setMarginalUtlOfWaitingPt_utils_hr(-3600.0 * 30.0);
+        config.scoring().getOrCreateScoringParameters("sub").setMarginalUtlOfWaitingPt_utils_hr(-3600.0 * 10.0);
 
         Scenario scenario = ScenarioUtils.createScenario(config);
 
@@ -431,5 +446,5 @@ public class SwissRailRaptorModuleTest {
         }
 
     }
-    
+
 }

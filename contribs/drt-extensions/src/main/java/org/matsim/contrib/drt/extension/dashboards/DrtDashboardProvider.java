@@ -25,7 +25,7 @@ public class DrtDashboardProvider implements DashboardProvider {
 
 			for (DrtConfigGroup drtConfig : multiModeDrtConfigGroup.getModalElements()) {
 
-				result.add(new DrtDashboard(drtConfig, config.getContext(), config.global().getCoordinateSystem(), config.controler().getLastIteration()));
+				result.add(new DrtDashboard(drtConfig, config.getContext(), config.global().getCoordinateSystem(), config.controller().getLastIteration()));
 			}
 		}
 

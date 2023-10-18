@@ -37,7 +37,7 @@ import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.MatsimEventsReader;
@@ -68,7 +68,7 @@ public class PositionEmissionsModule extends AbstractModule {
 		if (config.qsim().getSnapshotPeriod() > 1) {
 			throw new RuntimeException("only snapshot periods of 1s are supported.");
 		}
-		if (!config.controler().getSnapshotFormat().contains(ControlerConfigGroup.SnapshotFormat.positionevents)) {
+		if (!config.controller().getSnapshotFormat().contains(ControllerConfigGroup.SnapshotFormat.positionevents)) {
 			throw new RuntimeException("config.controler.snapshotFormat must be set to 'positionevents'");
 		}
 		if (isNotCorrectSnapshotStyle(config.qsim().getSnapshotStyle())) {

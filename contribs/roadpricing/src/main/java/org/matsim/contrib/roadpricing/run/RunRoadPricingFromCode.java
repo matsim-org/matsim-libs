@@ -43,8 +43,8 @@ public class RunRoadPricingFromCode {
 		parameteres specified) and just remove the road pricing file. */
 		Config config = ConfigUtils.loadConfig(args[0], RoadPricingUtils.createConfigGroup());
 		ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.class).setTollLinksFile(null);
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(10);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(10);
 
 		// prepare scenario:
 
@@ -71,8 +71,8 @@ public class RunRoadPricingFromCode {
 		/* Start with a known config file (with population, network, and scoring
 		parameteres specified) and just remove the road pricing file. */
 		Config config = ConfigUtils.loadConfig(args[0], RoadPricingUtils.createConfigGroup());
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(10);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(10);
 
 		// prepare scenario:
 

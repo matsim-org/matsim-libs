@@ -49,7 +49,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -73,15 +73,15 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
  * This class helps EventsToScore by keeping ScoringFunctions for the entire Population - one per Person -, and dispatching Activities
  * and Legs to the ScoringFunctions. It also gives out the ScoringFunctions, so they can be given other events by EventsToScore.
  * It is not independently useful. Please do not make public.
- * 
+ *
  * @author michaz
  *
  */
  final class ScoringFunctionsForPopulation implements BasicEventHandler {
-	
+
 	private final Population population;
 	private final ScoringFunctionFactory scoringFunctionFactory;
-	
+
 	private final EventsToLegs legsDelegate;
 	private final EventsToActivities actsDelegate;
 
@@ -89,17 +89,17 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	private final IdMap<Person, TDoubleCollection> partialScores = new IdMap<>(Person.class);
 	private final AtomicReference<Throwable> exception = new AtomicReference<>();
 	private final IdMap<Person, Plan> tripRecords = new IdMap<>(Person.class);
-	
+
 	private final Vehicle2DriverEventHandler vehicles2Drivers = new Vehicle2DriverEventHandler();
 
 	@Inject
 	ScoringFunctionsForPopulation(ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
 						 Population population, ScoringFunctionFactory scoringFunctionFactory, Config config) {
-		ControlerConfigGroup controlerConfigGroup = config.controler();
-		
-		if (controlerConfigGroup.getEventTypeToCreateScoringFunctions() == ControlerConfigGroup.EventTypeToCreateScoringFunctions.IterationStarts) {
+		ControllerConfigGroup controllerConfigGroup = config.controller();
+
+		if (controllerConfigGroup.getEventTypeToCreateScoringFunctions() == ControllerConfigGroup.EventTypeToCreateScoringFunctions.IterationStarts) {
 			controlerListenerManager.addControlerListener((IterationStartsListener) event -> init());
-		} else if (controlerConfigGroup.getEventTypeToCreateScoringFunctions() == ControlerConfigGroup.EventTypeToCreateScoringFunctions.BeforeMobsim) {
+		} else if (controllerConfigGroup.getEventTypeToCreateScoringFunctions() == ControllerConfigGroup.EventTypeToCreateScoringFunctions.BeforeMobsim) {
 			controlerListenerManager.addControlerListener((BeforeMobsimListener) event -> init());
 		} else {
 			throw new RuntimeException("Unknown approach when to create the scoring functions for population. Aborting...");
@@ -248,7 +248,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 			TDoubleCollection partialScoresForAgent = this.partialScores.get(agentId);
 			partialScoresForAgent.add(scoringFunction.getScore());
 		}
-		
+
 		Plan plan = this.tripRecords.get( agentId ); // as container for trip
 		if ( plan!= null ) {
 			plan.addActivity( activity );

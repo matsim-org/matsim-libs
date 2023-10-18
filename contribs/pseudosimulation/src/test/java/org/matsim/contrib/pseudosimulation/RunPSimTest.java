@@ -1,10 +1,6 @@
 
 package org.matsim.contrib.pseudosimulation;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -18,8 +14,7 @@ import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.NoTransitEm
 import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.TransitEmulator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
@@ -30,15 +25,18 @@ import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.pt.config.TransitConfigGroup.TransitRoutingAlgorithmType;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class RunPSimTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private Logger logger = LogManager.getLogger(RunPSimTest.class );
+	private final Logger logger = LogManager.getLogger(RunPSimTest.class );
 
 	private final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial" ),"0.config.xml" ) );
 
@@ -47,22 +45,18 @@ public class RunPSimTest {
 	 */
 	@Test
 	public void testA() {
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
-		config.controler().setCreateGraphs(false);
+		config.controller().setCreateGraphs(false);
 
 		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
 		config.addModule(pSimConfigGroup);
 		pSimConfigGroup.setIterationsPerCycle(20);
 
-		config.plansCalcRoute().setRoutingRandomness(0.);
+		config.routing().setRoutingRandomness(0.);
 
 		//identify selector strategies
 		Field[] selectors = DefaultPlanStrategiesModule.DefaultSelector.class.getDeclaredFields();
 		List<String> selectorNames = new ArrayList<>();
-//		for (Field selector : selectors) {
-//			selectorNames.add(selector.toString());
-//			logger.warn( selector.toString() );
-//		}
+
 		// yyyyyy does not work as designed
 		selectorNames.add( DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta );
 		selectorNames.add( DefaultPlanStrategiesModule.DefaultSelector.BestScore );
@@ -72,7 +66,7 @@ public class RunPSimTest {
 		selectorNames.add( DefaultPlanStrategiesModule.DefaultSelector.SelectExpBeta );
 
 		//lower the weight of non-selector strategies, as we will run many iters
-		for( StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings() ){
+		for( ReplanningConfigGroup.StrategySettings settings : config.replanning().getStrategySettings() ){
 			if( !selectorNames.contains( settings.getStrategyName() ) ){
 				logger.warn( settings.getStrategyName() );
 				settings.setWeight( settings.getWeight() * 20 );
@@ -83,8 +77,8 @@ public class RunPSimTest {
 //		System.exit( -1);
 
 		final String outDir = utils.getOutputDirectory();
-		config.controler().setOutputDirectory( outDir );
-		config.controler().setLastIteration(20);
+		config.controller().setOutputDirectory( outDir );
+		config.controller().setLastIteration(20);
 //		config.controler().setDumpDataAtEnd(false);
 //		config.strategy().setFractionOfIterationsToDisableInnovation( 0.8 ); // crashes
 
@@ -109,10 +103,8 @@ public class RunPSimTest {
 		Population popActual = PopulationUtils.createPopulation( config );
 		PopulationUtils.readPopulation( popActual, outDir + "/output_plans.xml.gz" );
 		new PopulationComparison().compare( popExpected, popActual ) ;
-		Assert.assertEquals("RunPsim score changed.", 138.90474624352407, psimScore, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("RunPsim score changed.", 134.54001491094124d, psimScore, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("RunPsim score changed.", 134.52369453719413d, psimScore, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("RunPsim score changed.", 132.73129073101293d, psimScore, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("RunPsim score changed.", 138.86084460860525, psimScore, MatsimTestUtils.EPSILON);
+
 	}
 
 	/**
@@ -124,12 +116,11 @@ public class RunPSimTest {
 	 */
 	@Test
 	public void testB() {
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setLastIteration(2);
-		config.controler().setCreateGraphs(false);
-		config.controler().setDumpDataAtEnd(false);
-		config.plansCalcRoute().setRoutingRandomness(0.);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setLastIteration(2);
+		config.controller().setCreateGraphs(false);
+		config.controller().setDumpDataAtEnd(false);
+		config.routing().setRoutingRandomness(0.);
 		Controler controler = new Controler(config);
 		ExecScoreTracker execScoreTracker = new ExecScoreTracker(controler);
 		controler.addControlerListener(execScoreTracker);
@@ -138,7 +129,7 @@ public class RunPSimTest {
 		double qsimScore = execScoreTracker.executedScore;
 		logger.info("Default controler score was " + qsimScore );
 //		Assert.assertEquals("Default controler score changed.", 131.84309487251033d, qsimScore, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Default controler score changed.", 131.84350487113088d, qsimScore, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Default controler score changed.", 131.8303325803256, qsimScore, MatsimTestUtils.EPSILON);
 	}
 
 	class ExecScoreTracker implements ShutdownListener {
@@ -151,7 +142,7 @@ public class RunPSimTest {
 
 		@Override
 		public void notifyShutdown(ShutdownEvent event) {
-			executedScore = controler.getScoreStats().getScoreHistory().get(ScoreStatsControlerListener.ScoreItem.executed).get(controler.getConfig().controler().getLastIteration());
+			executedScore = controler.getScoreStats().getScoreHistory().get(ScoreStatsControlerListener.ScoreItem.executed).get(controler.getConfig().controller().getLastIteration());
 		}
 
 

@@ -426,8 +426,8 @@ public class SignalsAndLanesOsmNetworkReaderTest {
         //Try-Mini Example to ensure basic usability
         scenario.getConfig().plans().setInputFile(inputfile+"plans_berlinSnippet.xml");
         Controler controler = new Controler( scenario );
-        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        config.controler().setLastIteration(1);
+        config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        config.controller().setLastIteration(1);
         controler.run();
 
         int noSignalGroups = 0;

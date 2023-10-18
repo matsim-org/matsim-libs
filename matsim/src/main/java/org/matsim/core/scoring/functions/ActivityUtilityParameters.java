@@ -21,7 +21,7 @@
 package org.matsim.core.scoring.functions;
 
 import org.matsim.core.api.internal.MatsimParameters;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.utils.misc.OptionalTime;
 
 /**
@@ -114,7 +114,7 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 					throw new RuntimeException("not defined");
 			}
 			// seems to be somewhat overkill to set a computation method that is only used in the builder ... but the builder has a method to
-			// (re)set the 
+			// (re)set the
 		}
 
 

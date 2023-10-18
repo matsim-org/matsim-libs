@@ -22,7 +22,7 @@
 
 package org.matsim.vis.snapshotwriters;
 
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -32,7 +32,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import java.util.Collection;
 
-import static org.matsim.core.config.groups.ControlerConfigGroup.SnapshotFormat;
+import static org.matsim.core.config.groups.ControllerConfigGroup.SnapshotFormat;
 
 public class SnapshotWritersModule extends AbstractModule {
 
@@ -40,13 +40,13 @@ public class SnapshotWritersModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		if (getConfig().controler().getSnapshotFormat().contains(SnapshotFormat.transims)) {
+		if (getConfig().controller().getSnapshotFormat().contains(SnapshotFormat.transims)) {
 			addSnapshotWriterBinding().toProvider(TransimsSnapshotWriterFactory.class);
 		}
-		if (getConfig().controler().getSnapshotFormat().contains(SnapshotFormat.positionevents)) {
+		if (getConfig().controller().getSnapshotFormat().contains(SnapshotFormat.positionevents)) {
 			addSnapshotWriterBinding().toProvider(PositionEventsWriterFactory.class);
 		}
-		if (getConfig().controler().getWriteSnapshotsInterval() != 0) {
+		if (getConfig().controller().getWriteSnapshotsInterval() != 0) {
 			addMobsimListenerBinding().toProvider(SnapshotWriterManagerProvider.class);
 		}
 	}
@@ -54,23 +54,23 @@ public class SnapshotWritersModule extends AbstractModule {
 	private static class SnapshotWriterManagerProvider implements Provider<MobsimListener> {
 
 		private final QSimConfigGroup qSimConfigGroup;
-		private final ControlerConfigGroup controlerConfigGroup;
+		private final ControllerConfigGroup controllerConfigGroup;
 		private final ReplanningContext iterationContext;
 		private final Collection<com.google.inject.Provider<SnapshotWriter>> snapshotWriters;
 
 		@Inject
-		private SnapshotWriterManagerProvider(QSimConfigGroup qSimConfigGroup, ControlerConfigGroup controlerConfigGroup,
+		private SnapshotWriterManagerProvider(QSimConfigGroup qSimConfigGroup, ControllerConfigGroup controllerConfigGroup,
 											  ReplanningContext iterationContext,
 											  Collection<com.google.inject.Provider<SnapshotWriter>> snapshotWriters) {
 			this.qSimConfigGroup = qSimConfigGroup;
-			this.controlerConfigGroup = controlerConfigGroup;
+			this.controllerConfigGroup = controllerConfigGroup;
 			this.iterationContext = iterationContext;
 			this.snapshotWriters = snapshotWriters;
 		}
 
 		@Override
 		public MobsimListener get() {
-			if (iterationContext.getIteration() % controlerConfigGroup.getWriteSnapshotsInterval() == 0) {
+			if (iterationContext.getIteration() % controllerConfigGroup.getWriteSnapshotsInterval() == 0) {
 				SnapshotWriterManager manager = new SnapshotWriterManager((int) qSimConfigGroup.getSnapshotPeriod(), qSimConfigGroup.getFilterSnapshots());
 				for (com.google.inject.Provider<SnapshotWriter> snapshotWriter : this.snapshotWriters) {
 					manager.addSnapshotWriter(snapshotWriter.get());

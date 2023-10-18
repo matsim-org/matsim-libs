@@ -25,7 +25,7 @@ import org.apache.commons.csv.CSVPrinter;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.LinkStatsConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -37,10 +37,10 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 import jakarta.inject.Inject;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
 
 /**
@@ -51,7 +51,7 @@ final class LinkStatsControlerListener implements IterationEndsListener, Iterati
 	@Inject
 	private LinkStatsConfigGroup linkStatsConfigGroup;
 	@Inject
-	private ControlerConfigGroup controlerConfigGroup;
+	private ControllerConfigGroup controllerConfigGroup;
 	@Inject
 	private CalcLinkStats linkStats;
 	@Inject
@@ -71,7 +71,7 @@ final class LinkStatsControlerListener implements IterationEndsListener, Iterati
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		int iteration = event.getIteration();
 
-		if (useVolumesOfIteration(iteration, controlerConfigGroup.getFirstIteration())) {
+		if (useVolumesOfIteration(iteration, controllerConfigGroup.getFirstIteration())) {
 			this.iterationsUsed++;
 			linkStats.addData(volumes, travelTime.get(TransportMode.car));
 		}

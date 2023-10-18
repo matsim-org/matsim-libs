@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -69,7 +69,7 @@ public class PlanRouterTest {
                 install(new TripRouterModule());
                 install(new ScenarioByInstanceModule(scenario));
                 install(new TimeInterpretationModule());
-                addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
+                addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility(config.scoring()));
                 addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
             }
         });
@@ -80,7 +80,7 @@ public class PlanRouterTest {
         ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).setVehicleId(vehicleId);
         testee.run(plan);
 
-        if ( config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
+        if ( config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
       	  Assert.assertEquals("Vehicle Id transferred to new Plan", vehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).getVehicleId());
         } else {
       	  Assert.assertEquals("Vehicle Id transferred to new Plan", vehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(1).getRoute()).getVehicleId());
@@ -110,7 +110,7 @@ public class PlanRouterTest {
             		final Facility toFacility = request.getToFacility();
             		final double departureTime = request.getDepartureTime();
             		final Person person = request.getPerson();
-            		
+
                   List<? extends PlanElement> trip = DefaultRoutingModules.createPureNetworkRouter("car", scenario.getPopulation().getFactory(),
                   		scenario.getNetwork(),
                   		leastCostAlgoFactory.createPathCalculator(scenario.getNetwork(), disutilityFactory.createTravelDisutility(travelTime), travelTime)
@@ -127,7 +127,7 @@ public class PlanRouterTest {
                 install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {
                     @Override
                     public void install() {
-                        addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
+                        addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility(config.scoring()));
                         addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
                         addRoutingModuleBinding("car").toInstance( routingModule );
                     }
@@ -138,7 +138,7 @@ public class PlanRouterTest {
 
         PlanRouter testee = new PlanRouter(tripRouter, TimeInterpretation.create(config));
         testee.run(plan);
-        if ( config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
+        if ( config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
               Assert.assertEquals("Vehicle Id from TripRouter used", newVehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).getVehicleId());
         } else {
               Assert.assertEquals("Vehicle Id from TripRouter used", newVehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(1).getRoute()).getVehicleId());

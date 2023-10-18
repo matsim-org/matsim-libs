@@ -11,9 +11,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.application.commands.RunScenario;
 import org.matsim.application.commands.ShowGUI;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigAliases;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -177,13 +178,13 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		}
 
 		if (iterations > -1)
-			config.controler().setLastIteration(iterations);
+			config.controller().setLastIteration(iterations);
 
 		if (output != null)
-			config.controler().setOutputDirectory(output.toString());
+			config.controller().setOutputDirectory(output.toString());
 
 		if (runId != null)
-			config.controler().setRunId(runId);
+			config.controller().setRunId(runId);
 
 		final Scenario scenario = createScenario(config);
 
@@ -199,7 +200,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		if (post != PostProcessOption.disabled) {
 
-			List<MATSimAppCommand> commands = preparePostProcessing(Path.of(config.controler().getOutputDirectory()), config.controler().getRunId());
+			List<MATSimAppCommand> commands = preparePostProcessing(Path.of(config.controller().getOutputDirectory()), config.controller().getRunId());
 
 			for (MATSimAppCommand command : commands) {
 
@@ -230,6 +231,9 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory()
 				.enable(YAMLGenerator.Feature.MINIMIZE_QUOTES));
 
+		ConfigAliases aliases = new ConfigAliases();
+		Deque<String> emptyStack = new ArrayDeque<>();
+
 		try (BufferedReader reader = Files.newBufferedReader(specs)) {
 
 			JsonNode node = mapper.readTree(reader);
@@ -238,10 +242,10 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 			while (fields.hasNext()) {
 				Map.Entry<String, JsonNode> field = fields.next();
-
-				ConfigGroup group = config.getModules().get(field.getKey());
+				String configGroupName = aliases.resolveAlias(field.getKey(), emptyStack);
+				ConfigGroup group = config.getModules().get(configGroupName);
 				if (group == null) {
-					log.warn("Config group not found: {}", field.getKey());
+					log.warn("Config group not found: {}", configGroupName);
 					continue;
 				}
 
@@ -313,7 +317,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 */
 	protected List<ConfigGroup> getConfigurableModules() {
 		return Lists.newArrayList(
-				new ControlerConfigGroup(),
+				new ControllerConfigGroup(),
 				new GlobalConfigGroup(),
 				new QSimConfigGroup()
 		);
@@ -370,14 +374,14 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		else
 			postfix = "-" + option + "_" + value;
 
-		String outputDir = config.controler().getOutputDirectory();
+		String outputDir = config.controller().getOutputDirectory();
 		if (outputDir.endsWith("/")) {
-			config.controler().setOutputDirectory(outputDir.substring(0, outputDir.length() - 1) + postfix + "/");
+			config.controller().setOutputDirectory(outputDir.substring(0, outputDir.length() - 1) + postfix + "/");
 		} else
-			config.controler().setOutputDirectory(outputDir + postfix);
+			config.controller().setOutputDirectory(outputDir + postfix);
 
 		// dot should not be part of run id
-		config.controler().setRunId(config.controler().getRunId() + postfix.replace(".", ""));
+		config.controller().setRunId(config.controller().getRunId() + postfix.replace(".", ""));
 	}
 
 	/**

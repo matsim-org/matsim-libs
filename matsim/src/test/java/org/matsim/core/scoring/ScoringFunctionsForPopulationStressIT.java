@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.ControlerListenerManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -95,12 +95,12 @@ public class ScoringFunctionsForPopulationStressIT {
 				public void agentStuck(double time) {
 					throw new RuntimeException();
 				}
-				
+
 				@Override
 				public void handleTrip( final TripStructureUtils.Trip trip ) {
 					throw new RuntimeException();
 				}
-				
+
 				@Override
 				public void addMoney(double amount) {
 					throw new RuntimeException();
@@ -132,26 +132,26 @@ public class ScoringFunctionsForPopulationStressIT {
 	@Test
 	public void workWithNewEventsManager() {
 		Config config = ConfigUtils.createConfig();
-		config.parallelEventHandling().setOneThreadPerHandler(true);
+		config.eventsManager().setOneThreadPerHandler(true);
 		work(config);
 	}
 
 	@Test
 	public void workWithOldEventsManager() {
 		Config config = ConfigUtils.createConfig();
-		config.parallelEventHandling().setNumberOfThreads(8);
+		config.eventsManager().setNumberOfThreads(8);
 		work(config);
 	}
 
 	private void work(Config config) {
-		PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams("work");
+		ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setTypicalDuration(100.0);
-		config.planCalcScore().addActivityParams(work);
-		PlanCalcScoreConfigGroup.ModeParams car = new PlanCalcScoreConfigGroup.ModeParams("car");
+		config.scoring().addActivityParams(work);
+		ScoringConfigGroup.ModeParams car = new ScoringConfigGroup.ModeParams("car");
 		car.setMarginalUtilityOfTraveling(0.0);
 		car.setMarginalUtilityOfDistance(0.0);
 		car.setConstant(-1.0);
-		config.planCalcScore().addModeParams(car);
+		config.scoring().addModeParams(car);
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		Id<Person> personId = Id.createPersonId(1);
 		scenario.getPopulation().addPerson(scenario.getPopulation().getFactory().createPerson(personId));
@@ -177,12 +177,12 @@ public class ScoringFunctionsForPopulationStressIT {
 					public void agentStuck(double time) {
 						delegateFunction.agentStuck(time);
 					}
-					
+
 					@Override
 					public void handleTrip( final TripStructureUtils.Trip trip ) {
 						delegateFunction.handleTrip(trip);
 					}
-					
+
 					@Override
 					public void addMoney(double amount) {
 						delegateFunction.addMoney(amount);
@@ -233,10 +233,10 @@ public class ScoringFunctionsForPopulationStressIT {
 		}
 		events.finishProcessing();
 		scoringFunctionsForPopulation.finishScoringFunctions();
-		
+
 		//assert when TypicalDurationScoreComputation.uniform
 //		assertEquals(60.0 * MAX, scoringFunctionsForPopulation.getScoringFunctionForAgent(personId).getScore(), 1.0);
-		
+
 		//assert when TypicalDurationScoreComputation.relative
 		assertEquals(1.0/6.0 * MAX, scoringFunctionsForPopulation.getScoringFunctionForAgent(personId).getScore(), 1.0);
 	}
@@ -251,17 +251,17 @@ public class ScoringFunctionsForPopulationStressIT {
 	@Test @Ignore
 	public void unlikelyTimingOfScoringFunctionStillWorks() {
 		Config config = ConfigUtils.createConfig();
-		config.parallelEventHandling().setNumberOfThreads(8);
-		config.parallelEventHandling().setOneThreadPerHandler(true);
-		config.parallelEventHandling().setSynchronizeOnSimSteps(false);
-		PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams("work");
+		config.eventsManager().setNumberOfThreads(8);
+		config.eventsManager().setOneThreadPerHandler(true);
+		config.eventsManager().setSynchronizeOnSimSteps(false);
+		ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setTypicalDuration(100.0);
-		config.planCalcScore().addActivityParams(work);
-		PlanCalcScoreConfigGroup.ModeParams car = new PlanCalcScoreConfigGroup.ModeParams("car");
+		config.scoring().addActivityParams(work);
+		ScoringConfigGroup.ModeParams car = new ScoringConfigGroup.ModeParams("car");
 		car.setMarginalUtilityOfTraveling(0.0);
 		car.setMarginalUtilityOfDistance(0.0);
 		car.setConstant(-1.0);
-		config.planCalcScore().addModeParams(car);
+		config.scoring().addModeParams(car);
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		Id<Person> personId = Id.createPersonId(1);
 		scenario.getPopulation().addPerson(scenario.getPopulation().getFactory().createPerson(personId));
@@ -302,7 +302,7 @@ public class ScoringFunctionsForPopulationStressIT {
 						}
 						delegateFunction.agentStuck(time);
 					}
-					
+
 					@Override
 					public void handleTrip( final TripStructureUtils.Trip trip ) {
 						try {
@@ -312,7 +312,7 @@ public class ScoringFunctionsForPopulationStressIT {
 						}
 						delegateFunction.handleTrip(trip);
 					}
-					
+
 					@Override
 					public void addMoney(double amount) {
 						try {
@@ -382,10 +382,10 @@ public class ScoringFunctionsForPopulationStressIT {
 		}
 		events.finishProcessing();
 		scoringFunctionsForPopulation.finishScoringFunctions();
-		
+
 		//assert when TypicalDurationScoreComputation.uniform
 //		assertEquals(60.0 * MAX, scoringFunctionsForPopulation.getScoringFunctionForAgent(personId).getScore(), 1.0);
-		
+
 		//assert when TypicalDurationScoreComputation.relative
 		assertEquals(1.0/6.0 * MAX, scoringFunctionsForPopulation.getScoringFunctionForAgent(personId).getScore(), 1.0);
 	}

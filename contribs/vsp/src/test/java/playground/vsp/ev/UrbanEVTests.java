@@ -63,9 +63,9 @@ public class UrbanEVTests {
 	@BeforeClass
 	public static void run() {
 		Scenario scenario = CreateUrbanEVTestScenario.createTestScenario();
-		scenario.getConfig().controler().setOutputDirectory("test/output/playground/vsp/ev/UrbanEVTests/");
+		scenario.getConfig().controller().setOutputDirectory("test/output/playground/vsp/ev/UrbanEVTests/");
 
-		scenario.getConfig().controler().setLastIteration(0);
+		scenario.getConfig().controller().setLastIteration(0);
 
 		//modify population
 		overridePopulation(scenario);

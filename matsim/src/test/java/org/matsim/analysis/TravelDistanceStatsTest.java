@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.matsim.analysis;
 
@@ -21,8 +21,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.PopulationUtils;
@@ -35,9 +36,9 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class TravelDistanceStatsTest {
 
-	HashMap<String, Integer> person3modes = new HashMap<String, Integer>();
-	HashMap<String, Integer> person1modes = new HashMap<String, Integer>();
-	HashMap<String, Integer> person2modes = new HashMap<String, Integer>();
+	HashMap<String, Integer> person3modes = new HashMap<>();
+	HashMap<String, Integer> person1modes = new HashMap<>();
+	HashMap<String, Integer> person2modes = new HashMap<>();
 	private int avglegdis;
 	private int avgtripdis;
 	private Double person1legsum;
@@ -336,13 +337,13 @@ public class TravelDistanceStatsTest {
 
 	private void performTest(IdMap<Person, Plan> map, String outputDirectory) {
 
-		ControlerConfigGroup controlerConfigGroup = new ControlerConfigGroup();
+		ControllerConfigGroup controllerConfigGroup = new ControllerConfigGroup();
 		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(outputDirectory,
 				OverwriteFileSetting.overwriteExistingFiles, CompressionType.gzip);
-		controlerConfigGroup.setCreateGraphs(true);
-		controlerConfigGroup.setFirstIteration(0);
-		controlerConfigGroup.setLastIteration(10);
-		TravelDistanceStats travelDistanceStats = new TravelDistanceStats(controlerConfigGroup, controlerIO);
+		controllerConfigGroup.setCreateGraphs(true);
+		controllerConfigGroup.setFirstIteration(0);
+		controllerConfigGroup.setLastIteration(10);
+		TravelDistanceStats travelDistanceStats = new TravelDistanceStats(controllerConfigGroup, controlerIO, new GlobalConfigGroup());
 		travelDistanceStats.addIteration(0, map);
 		readAndValidateValues(0, person1legsum + person2legsum + person3legsum, 12,
 				person1TotalNumberOfLegs + person2TotalNumberOfLegs + person3TotalNumberOfLegs);
@@ -357,22 +358,23 @@ public class TravelDistanceStatsTest {
 
 	private void readAndValidateValues(int itr, Double legSum, int totalTrip, long totalLeg) {
 
-		String file = utils.getOutputDirectory() + "/TravelDistanceStat" + "/traveldistancestats.txt";
+		String file = utils.getOutputDirectory() + "/TravelDistanceStat" + "/traveldistancestats.csv";
 		BufferedReader br;
 		String line;
 		try {
 			br = new BufferedReader(new FileReader(file));
 			String firstRow = br.readLine();
-			String[] columnNames = firstRow.split("	");
+			String delimiter = new GlobalConfigGroup().getDefaultDelimiter();
+			String[] columnNames = firstRow.split(delimiter);
 			decideColumns(columnNames);
 			int iteration = 0;
 			while ((line = br.readLine()) != null) {
 				if (iteration == itr) {
-					String[] column = line.split("	");
+					String[] column = line.split(delimiter);
 					// checking if column number in greater than 0, because 0th column is always
 					// 'Iteration' and we don't need that --> see decideColumns() method
-					Double avgLegvalue = (avglegdis > 0) ? Double.valueOf(column[avglegdis]) : 0;
-					Double avgTripvalue = (avgtripdis > 0) ? Double.valueOf(column[avgtripdis]) : 0;
+					double avgLegvalue = (avglegdis > 0) ? Double.parseDouble(column[avglegdis]) : 0;
+					double avgTripvalue = (avgtripdis > 0) ? Double.parseDouble(column[avgtripdis]) : 0;
 
 					Assert.assertEquals("avg. Average Trip distance does not match", (legSum / totalTrip), avgTripvalue,
 							0);
@@ -384,7 +386,6 @@ public class TravelDistanceStatsTest {
 				iteration++;
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

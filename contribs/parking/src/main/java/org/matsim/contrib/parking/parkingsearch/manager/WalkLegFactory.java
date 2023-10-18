@@ -43,8 +43,8 @@ public class WalkLegFactory {
 	@Inject
 	public WalkLegFactory(Network network, Config config) {
 		this.network = network;
-		this.beelinedistancefactor = config.plansCalcRoute().getBeelineDistanceFactors().get("walk");
-		this.walkspeed = config.plansCalcRoute().getTeleportedModeSpeeds().get("walk");
+		this.beelinedistancefactor = config.routing().getBeelineDistanceFactors().get("walk");
+		this.walkspeed = config.routing().getTeleportedModeSpeeds().get("walk");
 
 	}
 

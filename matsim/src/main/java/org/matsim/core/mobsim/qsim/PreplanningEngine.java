@@ -22,7 +22,7 @@
 package org.matsim.core.mobsim.qsim;
 
 import static java.util.Comparator.comparing;
-import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.createStageActivityType;
+import static org.matsim.core.config.groups.ScoringConfigGroup.createStageActivityType;
 
 import java.util.ArrayList;
 import java.util.Collections;

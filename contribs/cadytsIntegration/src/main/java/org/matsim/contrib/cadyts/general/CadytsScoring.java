@@ -45,7 +45,7 @@ public class CadytsScoring<T> implements SumScoringFunction.BasicScoring {
 		this.plansTranslator = context.getPlansTranslator();
 		this.matsimCalibrator = context.getCalibrator();
 		this.plan = plan;
-		this.beta = config.planCalcScore().getBrainExpBeta();
+		this.beta = config.scoring().getBrainExpBeta();
 	}
 
 	@Override

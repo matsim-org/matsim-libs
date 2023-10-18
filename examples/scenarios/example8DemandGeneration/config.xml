@@ -11,7 +11,7 @@
 		<param name="inputPlansFile" value="../matsimExamples/tutorial/example8DemandGeneration/population.xml" />
 	</module>
 
-	<module name="controler">
+	<module name="controller">
 		<param name="outputDirectory" value="../matsimExamples/tutorial/example8DemandGeneration/output" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
@@ -23,7 +23,7 @@
 	</module>
 
 
-	<module name="planCalcScore">
+	<module name="scoring">
 
 		<parameterset type="activityParams">
 			<param name="activityType"    value="h" />
@@ -41,6 +41,6 @@
 		</parameterset>
 
 	</module>
-	
+
 
 </config>
