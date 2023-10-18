@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.extension.estimator.run;
 
 import com.google.inject.Singleton;
+import com.google.inject.multibindings.MapBinder;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.extension.estimator.BasicDrtEstimator;
 import org.matsim.contrib.drt.extension.estimator.DrtEstimateAnalyzer;
@@ -8,6 +9,8 @@ import org.matsim.contrib.drt.extension.estimator.DrtEstimator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.DvrpMode;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 
@@ -52,6 +55,11 @@ public class DrtEstimatorModule extends AbstractModule {
 					getter -> new BasicDrtEstimator(getter.getModal(DrtEventSequenceCollector.class), group, cfg)
 				)).in(Singleton.class);
 			}
+
+			// DRT Estimators will be available as Map<DvrpMode, DrtEstimator>
+			MapBinder.newMapBinder(this.binder(), DvrpMode.class, DrtEstimator.class)
+				.addBinding(DvrpModes.mode(getMode()))
+				.to(modalKey(DrtEstimator.class));
 
 			addControlerListenerBinding().to(modalKey(DrtEstimator.class));
 
