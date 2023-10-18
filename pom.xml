@@ -30,7 +30,7 @@
         <maven.compiler.release>17</maven.compiler.release>
         <argLine></argLine>
 
-        <log4j.version>2.20.0</log4j.version>
+        <log4j.version>2.21.0</log4j.version>
         <geotools.version>29.2</geotools.version>
         <jts.version>1.19.0</jts.version>
         <guice.version>7.0.0</guice.version>
@@ -469,7 +469,7 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.10</version>
+                        <version>0.8.11</version>
                         <executions>
                             <execution>
                                 <id>default-prepare-agent</id>
