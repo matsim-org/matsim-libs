@@ -30,7 +30,7 @@ import org.matsim.freight.carriers.events.CarrierShipmentDeliveryEndEvent;
  * @author sschroeder
  *
  */
-public interface FreightShipmentDeliveryEndEventHandler extends EventHandler {
+public interface CarrierShipmentDeliveryEndEventHandler extends EventHandler {
 
 	void handleEvent(CarrierShipmentDeliveryEndEvent event);
 

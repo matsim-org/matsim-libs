@@ -115,7 +115,7 @@ public class CarrierEventsReadersTest {
 	}
 
 	private static class TestEventHandlerTours
-		implements FreightTourStartEventHandler, FreightTourEndEventHandler {
+		implements CarrierTourStartEventHandler, CarrierTourEndEventHandler {
 		private final List<Event> handledEvents = new ArrayList<>();
 
 
@@ -129,7 +129,7 @@ public class CarrierEventsReadersTest {
 	}
 
 	private static class TestEventHandlerServices
-		implements FreightServiceStartEventHandler, FreightServiceEndEventHandler {
+		implements CarrierServiceStartEventHandler, CarrierServiceEndEventHandler {
 		private final List<Event> handledEvents = new ArrayList<>();
 
 		@Override public void handleEvent(CarrierServiceEndEvent event) {
@@ -143,7 +143,7 @@ public class CarrierEventsReadersTest {
 	}
 
 	private static class TestEventHandlerShipments
-		implements FreightShipmentDeliveryStartEventHandler, FreightShipmentDeliveryEndEventHandler, FreightShipmentPickupStartEventHandler, FreightShipmentPickupEndEventHandler {
+		implements CarrierShipmentDeliveryStartEventHandler, CarrierShipmentDeliveryEndEventHandler, CarrierShipmentPickupStartEventHandler, CarrierShipmentPickupEndEventHandler {
 		private final List<Event> handledEvents = new ArrayList<>();
 
 
