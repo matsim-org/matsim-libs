@@ -48,8 +48,8 @@ import java.util.stream.Collectors;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 
-public class OnlineAndOfflineDrtOptimizer implements DrtOptimizer {
-	private final Logger log = LogManager.getLogger(OnlineAndOfflineDrtOptimizer.class);
+public class RollingHorizonOfflineDrtOptimizer implements DrtOptimizer {
+	private final Logger log = LogManager.getLogger(RollingHorizonOfflineDrtOptimizer.class);
 	private final Network network;
 	private final TravelTime travelTime;
 	private final MobsimTimer timer;
@@ -86,12 +86,12 @@ public class OnlineAndOfflineDrtOptimizer implements DrtOptimizer {
 	 * work with other VRP solver). The spontaneous requests will be inserted to the timetable
 	 * via a simple insertion heuristic* *
 	 */
-	public OnlineAndOfflineDrtOptimizer(Network network, TravelTime travelTime, MobsimTimer timer, DrtTaskFactory taskFactory,
-										EventsManager eventsManager, ScheduleTimingUpdater scheduleTimingUpdater,
-										TravelDisutility travelDisutility, DrtConfigGroup drtCfg,
-										Fleet fleet, ForkJoinPool forkJoinPool, VehicleEntry.EntryFactory vehicleEntryFactory,
-										VrpSolver solver, Population plans,
-										double horizon, double interval, Population prebookedTrips) {
+	public RollingHorizonOfflineDrtOptimizer(Network network, TravelTime travelTime, MobsimTimer timer, DrtTaskFactory taskFactory,
+											 EventsManager eventsManager, ScheduleTimingUpdater scheduleTimingUpdater,
+											 TravelDisutility travelDisutility, DrtConfigGroup drtCfg,
+											 Fleet fleet, ForkJoinPool forkJoinPool, VehicleEntry.EntryFactory vehicleEntryFactory,
+											 VrpSolver solver, Population plans,
+											 double horizon, double interval, Population prebookedTrips) {
 		this.network = network;
 		this.travelTime = travelTime;
 		this.timer = timer;
@@ -300,7 +300,7 @@ public class OnlineAndOfflineDrtOptimizer implements DrtOptimizer {
 			}
 		}
 		prebookedRequests.removeAll(newRequests);
-		return newRequests.stream().map(OnlineAndOfflineDrtOptimizer::createFromDrtRequest).collect(Collectors.toList());
+		return newRequests.stream().map(RollingHorizonOfflineDrtOptimizer::createFromDrtRequest).collect(Collectors.toList());
 	}
 
 	private void updateFleetStatus(double now) {
