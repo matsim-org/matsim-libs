@@ -144,6 +144,13 @@ public final class OutputDirectoryHierarchy {
 		return s.toString();
 	}
 
+	public String getIterationFilename(int iteration, String filename, ControlerConfigGroup.CompressionType compression) {
+		if (compression == null) {
+			return getIterationFilename(iteration, filename);
+		}
+		return getIterationFilename(iteration, filename + compression.fileEnding);
+	}
+
 	public final String getIterationFilename(int iteration, Controler.DefaultFiles file) {
 		return getIterationFilename(iteration, file, this.defaultCompressionType);
 	}
@@ -171,6 +178,13 @@ public final class OutputDirectoryHierarchy {
 		}
 		s.append(filename);
 		return s.toString();
+	}
+
+	public String getOutputFilename(String filename, ControlerConfigGroup.CompressionType compression) {
+		if (compression == null) {
+			return getOutputFilename(filename);
+		}
+		return getOutputFilename(filename + compression.fileEnding);
 	}
 
 	public final String getOutputFilenameWithOutputPrefix(final String filename) {

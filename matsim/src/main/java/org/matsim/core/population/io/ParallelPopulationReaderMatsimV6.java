@@ -25,16 +25,17 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesConverter;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -49,18 +50,20 @@ import java.util.concurrent.LinkedBlockingQueue;
 /* deliberately package */  class ParallelPopulationReaderMatsimV6 extends PopulationReaderMatsimV6 {
 
 	static final Logger log = LogManager.getLogger(ParallelPopulationReaderMatsimV6.class);
-	private static int THREADS_LIMIT = 4;
+	private static final int THREADS_LIMIT = 4;
 	private final boolean isPopulationStreaming;
 	private final int numThreads;
-	private final BlockingQueue<List<Tag>> queue;
+	private final BlockingQueue<List<Tag>> tagQueue;
 	private Thread[] threads;
 	private List<Tag> currentPersonXmlData;
 
-	private final String inputCRS;
+	private String inputCRS;
 	private final String targetCRS;
 
 	private boolean reachedPersons = false;
 
+	private final BlockingQueue<CompletableFuture<Person>> personInsertionQueue = new LinkedBlockingQueue<>();
+	private Thread personInsertionThread;
 
 	public ParallelPopulationReaderMatsimV6(
 			final String inputCRS,
@@ -69,33 +72,24 @@ import java.util.concurrent.LinkedBlockingQueue;
 		super(inputCRS, targetCRS, scenario);
 		this.inputCRS = inputCRS;
 		this.targetCRS = targetCRS;
+		this.tagQueue = new LinkedBlockingQueue<>();
 
 		/*
 		 * Check whether population streaming is activated
 		 */
 
-		if (scenario.getPopulation() instanceof StreamingPopulationReader.StreamingPopulation) {
-			log.warn("Population streaming is activated - cannot use " + ParallelPopulationReaderMatsimV6.class.getName() + "!");
+		this.isPopulationStreaming = scenario.getPopulation() instanceof StreamingPopulationReader.StreamingPopulation;
 
-			this.isPopulationStreaming = true;
-			this.numThreads = 1;
-			this.queue = null;
-
-		} else {
-			isPopulationStreaming = false;
-
-			if (scenario.getConfig().global().getNumberOfThreads() > 0) {
-				this.numThreads = Math.min(THREADS_LIMIT,scenario.getConfig().global().getNumberOfThreads());
-			} else this.numThreads = 1;
-
-			this.queue = new LinkedBlockingQueue<>();
-		}
+		// Set threads
+		if (scenario.getConfig().global().getNumberOfThreads() > 0) {
+			this.numThreads = Math.min(THREADS_LIMIT,scenario.getConfig().global().getNumberOfThreads());
+		} else this.numThreads = 1;
 	}
 
 	private static void initObjectAttributeConverters(ParallelPopulationReaderMatsimV6Runner runner, ObjectAttributesConverter converter)
 	{
 		Map<String, AttributeConverter<?>> targetConverter = runner.getObjectAttributesConverter().getConverters();
-		converter.getConverters().entrySet().forEach( e -> targetConverter.put(e.getKey(), e.getValue()));
+		targetConverter.putAll(converter.getConverters());
 	}
 
 	private void initThreads() {
@@ -107,14 +101,20 @@ import java.util.concurrent.LinkedBlockingQueue;
 							this.inputCRS,
 							this.targetCRS,
 							this.scenario,
-							this.queue);
-			initObjectAttributeConverters(runner,this.getObjectAttributesConverter());
+							this.tagQueue,
+							this.isPopulationStreaming);
+			initObjectAttributeConverters(runner, this.getObjectAttributesConverter());
 
 			Thread thread = new Thread(runner);
 			thread.setDaemon(true);
 			thread.setName(ParallelPopulationReaderMatsimV6Runner.class.toString() + i);
 			threads[i] = thread;
 			thread.start();
+		}
+
+		if (this.scenario.getPopulation() instanceof StreamingPopulationReader.StreamingPopulation) {
+			this.personInsertionThread = new Thread(new PersonInserter(this.scenario.getPopulation(), this.personInsertionQueue));
+			this.personInsertionThread.start();
 		}
 	}
 
@@ -124,14 +124,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 		if (PERSON.equals(name) && !this.reachedPersons) {
 			this.reachedPersons = true;
 
-			if (!isPopulationStreaming && this.threads == null) {
+			if (this.threads == null) {
 				log.info("Start parallel population reading...");
 				initThreads();
 			}
 		}
 
-		// if population streaming is activated, use non-parallel reader
-		if (isPopulationStreaming || !this.reachedPersons) {
+		// As long as we have not reached the persons in the xml, use super class
+		if (!this.reachedPersons) {
 			super.startTag(name, atts, context);
 			return;
 		}
@@ -139,14 +139,27 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 		// If it is a new person, create a new person and a list for its attributes.
 		if (PERSON.equals(name)) {
+			// Just create a person, but do not add it here!
 			Person person = this.plans.getFactory().createPerson(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
 			currentPersonXmlData = new ArrayList<>();
 			PersonTag personTag = new PersonTag();
 			personTag.person = person;
 			currentPersonXmlData.add(personTag);
-			this.plans.addPerson(person);
-		} else {
 
+			// If in streaming mode, we need later complete persons
+			if (isPopulationStreaming) {
+				personTag.futurePerson = new CompletableFuture<>();
+				try {
+					this.personInsertionQueue.put(personTag.futurePerson);
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
+			} else {
+				// If not in streaming mode, we can work with a reference
+				// of an unfinished person and add it right now...
+				this.plans.addPerson(person);
+			}
+		} else {
 			// Create a new start tag and add it to the person data.
 			Stack<String> contextCopy = new Stack<>();
 			contextCopy.addAll(context);
@@ -160,10 +173,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
+		if(ATTRIBUTES.equals(name)&&context.peek().equals(POPULATION))
+		{
+			this.inputCRS = ProjectionUtils.getCRS(scenario.getPopulation());
+		}
 
 		// if population streaming is activated, use non-parallel reader
 		// or if not reached the persons in the xml
-		if (isPopulationStreaming || !this.reachedPersons) {
+		if (!this.reachedPersons) {
 			super.endTag(name, content, context);
 			return;
 		}
@@ -172,7 +189,17 @@ import java.util.concurrent.LinkedBlockingQueue;
 		if (POPULATION.equals(name)) {
 			// signal the threads that they should end parsing
 			for (int i = 0; i < this.numThreads; i++) {
-				this.queue.add(List.of(new EndProcessingTag()));
+				this.tagQueue.add(List.of(new EndProcessingTag()));
+			}
+			if(isPopulationStreaming)
+			{
+				CompletableFuture<Person> finishPerson = new CompletableFuture<>();
+				finishPerson.complete(null);
+				try {
+					this.personInsertionQueue.put(finishPerson);
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
 			}
 
 			// wait for the threads to finish
@@ -180,6 +207,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 				for (Thread thread : threads) {
 					thread.join();
 				}
+				if(this.isPopulationStreaming)
+				{
+					this.personInsertionThread.join();
+				}
+
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
@@ -199,7 +231,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 			// if it's a person end tag, add the persons xml data to the queue.
 			if (PERSON.equals(name)) {
-				queue.add(currentPersonXmlData);
+				tagQueue.add(currentPersonXmlData);
 			}
 		}
 	}
@@ -215,6 +247,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 	public final static class PersonTag extends Tag {
 		Person person;
+		CompletableFuture<Person> futurePerson;
 	}
 
 	public final static class EndTag extends Tag {
@@ -225,6 +258,36 @@ import java.util.concurrent.LinkedBlockingQueue;
 	 * Marker Tag to inform the threads that no further data has to be parsed.
 	 */
 	public final static class EndProcessingTag extends Tag {
+	}
+
+	// This class is used to feed the population step by step
+	// with new complete persons while being in streaming mode
+	public final static class PersonInserter implements Runnable {
+		Population population;
+		BlockingQueue<CompletableFuture<Person>> personInsertionQueue;
+
+		PersonInserter(Population population, BlockingQueue<CompletableFuture<Person>> personInsertionQueue)
+		{
+			this.population = population;
+			this.personInsertionQueue = personInsertionQueue;
+		}
+
+		@Override
+		public void run() {
+			while (true) {
+				try {
+					CompletableFuture<Person> finishedPerson = this.personInsertionQueue.take();
+					Person person = finishedPerson.get();
+					if (person == null) {
+						return;
+					}
+					this.population.addPerson(person);
+
+				} catch (InterruptedException | ExecutionException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
 	}
 }
 

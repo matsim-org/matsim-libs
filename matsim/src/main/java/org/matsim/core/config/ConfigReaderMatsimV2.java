@@ -54,6 +54,7 @@ class ConfigReaderMatsimV2 extends MatsimXmlParser {
 	private final Deque<ConfigGroup> moduleStack = new ArrayDeque<>();
 
 	ConfigReaderMatsimV2(final Config config) {
+		super(ValidationType.DTD_ONLY);
 		this.config = config;
 		this.addDefaultAliases();
 	}

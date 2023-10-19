@@ -40,7 +40,7 @@ public class CongestionEventsReader extends MatsimXmlParser{
 	private final EventsManager eventsManager;
 
 	public CongestionEventsReader(EventsManager events) {
-		super();
+		super(ValidationType.NO_VALIDATION);
 		this.eventsManager = events;
 		setValidating(false); // events-files have no DTD, thus they cannot validate
 	}
@@ -103,14 +103,14 @@ public class CongestionEventsReader extends MatsimXmlParser{
 				}
 				else if(attributes.getQName(i).equals(CongestionEvent.ATTRIBUTE_EMERGENCETIME)){
 					emergenceTime = Double.parseDouble(attributes.getValue(i));
-				}				
+				}
 				else {
 					throw new RuntimeException("Unknown event attribute. Aborting...");
 				}
 			}
 			this.eventsManager.processEvent(new CongestionEvent(time, constraint, causingAgentId, affectedAgentId, delay, linkId, emergenceTime));
 		}
-		
+
 		else {
 			// other event type
 		}

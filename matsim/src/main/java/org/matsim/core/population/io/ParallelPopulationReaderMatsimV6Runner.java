@@ -21,10 +21,12 @@
 package org.matsim.core.population.io;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.io.ParallelPopulationReaderMatsimV6.*;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Runnable used by ParallelPopulationReaderMatsimV6.
@@ -36,14 +38,17 @@ import java.util.concurrent.BlockingQueue;
 /* deliberately package */  class ParallelPopulationReaderMatsimV6Runner extends PopulationReaderMatsimV6 implements Runnable {
 
 	private final BlockingQueue<List<Tag>> queue;
+	private boolean isStreaming;
 
 	public ParallelPopulationReaderMatsimV6Runner(
 			final String inputCRS,
 			final String targetCRS,
 			final Scenario scenario,
-			final BlockingQueue<List<Tag>> queue) {
+			final BlockingQueue<List<Tag>> tagQueue,
+			boolean isStreaming) {
 		super(inputCRS ,targetCRS, scenario);
-		this.queue = queue;
+		this.queue = tagQueue;
+		this.isStreaming = isStreaming;
 	}
 
 	@Override
@@ -56,8 +61,10 @@ import java.util.concurrent.BlockingQueue;
 			try {
 				List<Tag> tags;
 				tags = queue.take();
+				PersonTag currentPersonTag = null;
 				for (Tag tag : tags) {
 					if (tag instanceof PersonTag personTag) {
+						currentPersonTag = personTag;
 						this.currperson = personTag.person;
 					} else if (tag instanceof StartTag startTag) {
 						this.startTag(tag.name, startTag.atts, tag.context);
@@ -68,7 +75,14 @@ import java.util.concurrent.BlockingQueue;
 						 * to the population.
 						 */
 						if (PERSON.equals(tag.name)) {
+							if(isStreaming)
+							{
+								CompletableFuture<Person> cf = currentPersonTag.futurePerson;
+								cf.complete(currentPersonTag.person);
+							}
+
 							this.currperson = null;
+							currentPersonTag = null;
 						}
 						// otherwise hand the tag over to the super class
 						else {

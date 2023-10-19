@@ -43,6 +43,7 @@ public class SocialNetworkReader extends MatsimXmlParser {
 	}
 
 	public SocialNetworkReader(final Scenario scenario) {
+		super(ValidationType.DTD_ONLY);
 		this.scenario = scenario;
 		this.elementName = SocialNetwork.ELEMENT_NAME;
 	}
@@ -50,6 +51,7 @@ public class SocialNetworkReader extends MatsimXmlParser {
 	public SocialNetworkReader(
 			final String elementName,
 			final Scenario scenario) {
+		super(ValidationType.DTD_ONLY);
 		this.scenario = scenario;
 		this.elementName = elementName;
 	}

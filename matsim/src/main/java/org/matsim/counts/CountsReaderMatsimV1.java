@@ -57,6 +57,7 @@ public class CountsReaderMatsimV1 extends MatsimXmlParser {
 	public CountsReaderMatsimV1(
 			final CoordinateTransformation coordinateTransformation,
 			final Counts counts) {
+		super(ValidationType.XSD_ONLY);
 		this.coordinateTransformation = coordinateTransformation;
 		this.counts = counts;
 	}

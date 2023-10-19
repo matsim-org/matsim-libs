@@ -36,9 +36,14 @@ public class CarrierEventsReaders {
 
 	public static Map<String, MatsimEventsReader.CustomEventMapper> createCustomEventMappers() {
 		return Map.of(
+				CarrierServiceStartEvent.EVENT_TYPE, CarrierServiceStartEvent::convert,
+				CarrierServiceEndEvent.EVENT_TYPE, CarrierServiceEndEvent::convert,
+				CarrierShipmentDeliveryStartEvent.EVENT_TYPE, CarrierShipmentDeliveryStartEvent::convert,
+				CarrierShipmentDeliveryEndEvent.EVENT_TYPE, CarrierShipmentDeliveryEndEvent::convert,
+				CarrierShipmentPickupStartEvent.EVENT_TYPE, CarrierShipmentPickupStartEvent::convert,
+				CarrierShipmentPickupEndEvent.EVENT_TYPE, CarrierShipmentPickupEndEvent::convert,
 				CarrierTourStartEvent.EVENT_TYPE, CarrierTourStartEvent::convert, //
 				CarrierTourEndEvent.EVENT_TYPE, CarrierTourEndEvent::convert
-				// more will follow later, KMT feb'23
 		);
 	}
 
