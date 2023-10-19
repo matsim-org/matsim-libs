@@ -1,55 +1,24 @@
 package org.matsim.contrib.drt.run.examples;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.PersonScoreEvent;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.drt.optimizer.abort.DrtRejectionModule;
 import org.matsim.contrib.drt.run.*;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEvent;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEventHandler;
-import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.AbortHandler;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
-import org.matsim.core.router.speedy.SpeedyALTFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -57,7 +26,6 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import java.net.URL;
-import java.util.*;
 
 import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.*;
 
@@ -203,229 +171,9 @@ public class DrtAbortTest{
 							 .totalTravelTimeMean(Double.NaN)
 							 .build();
 
-		// I commented this line, because NaN cannot be checked (NaN == NaN always false)
+		// Chengqi: I commented this line, because NaN cannot be checked (NaN == NaN always false)
 //		RunDrtExampleIT.verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
 	}
 
 
-	private static class MyAbortHandler implements AbortHandler, MobsimEngine{
-		public static final String COMPONENT_NAME = "DrtAbortHandler";
-		private static final String delimiter = "============";
-		private final double alpha;
-		private final double beta;
-		@Inject Network network;
-		@Inject Population population;
-		@Inject MobsimTimer mobsimTimer;
-
-		TravelTime travelTime;
-		LeastCostPathCalculator router;
-
-		// TODO we would need a DRT config group here, if we don't want to hardcode the alpha and beta values
-		// DrtConfigGroup drtConfigGroup;
-
-		private InternalInterface internalInterface;
-		private final List<MobsimAgent> agents = new ArrayList<>();
-
-		List<String> drtModes = new ArrayList<>();
-		Map<String,Double> alphas = new HashMap<>();
-		Map<String,Double> betas = new HashMap<>();
-
-		@Inject MyAbortHandler(Network network, Map<String, TravelTime> travelTimeMap, Config config ){
-			travelTime = travelTimeMap.get( TransportMode.car );
-			router = new SpeedyALTFactory().createPathCalculator( network, new OnlyTimeDependentTravelDisutility( travelTime ), travelTime );
-
-			for( DrtConfigGroup modalElement : MultiModeDrtConfigGroup.get( config ).getModalElements() ){
-				drtModes.add( modalElement.mode );
-				alphas.put( modalElement.mode, modalElement.maxTravelTimeAlpha );
-				betas.put( modalElement.mode, modalElement.maxTravelTimeBeta );
-			}
-
-
-			final Collection<DrtConfigGroup> modalElements = MultiModeDrtConfigGroup.get( config ).getModalElements();
-			Gbl.assertIf( modalElements.size() == 1 );
-			var drtCfg = modalElements.iterator().next();
-			this.alpha = drtCfg.maxTravelTimeAlpha;
-			this.beta = drtCfg.maxTravelTimeBeta;
-		}
-
-		@Override public boolean handleAbort( MobsimAgent agent ){
-			log.warn("need to handle abort of agent=" + agent );
-
-//			final String drtMode = "drt";
-
-			PopulationFactory pf = population.getFactory();
-
-			if( drtModes.contains( agent.getMode() ) ) {
-
-//			if ( agent.getMode().equals( drtMode ) ) {
-				// yyyyyy this will have to work for all drt modes!!!
-
-				Plan plan = WithinDayAgentUtils.getModifiablePlan( agent );
-
-				printPlan( "\n current plan=", plan );
-
-				int index = WithinDayAgentUtils.getCurrentPlanElementIndex( agent );
-
-				Id<Link> interactionLink = agent.getCurrentLinkId();
-
-				double now = mobsimTimer.getTimeOfDay();
-
-				Leg leg = (Leg) plan.getPlanElements().get( index );
-
-				Id<Link> originallyPlannedDestinationLink = leg.getRoute().getEndLinkId();
-
-				// (1) The current leg needs to be modified so that it ends at the current location.  And one should somehow tag this
-				// as a failed drt trip.  (There is presumably already a drt rejected event, so this info could also be reconstructed.)
-				{
-					leg.setDepartureTime( now );
-					leg.setTravelTime( 0 );
-					leg.setRoute( pf.getRouteFactories().createRoute( GenericRouteImpl.class, interactionLink, interactionLink ) );
-					// (startLinkId and endLinkId are _only_ in the route)
-				}
-
-				// (2) An interaction activity needs to be inserted.
-				{
-					Coord interactionCoord = network.getLinks().get( interactionLink ).getCoord();
-//					Activity activity = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix( interactionCoord, interactionLink, walkAfterRejectMode );
-					Activity activity = pf.createActivityFromCoord( TripStructureUtils.createStageActivityType( walkAfterRejectMode ), interactionCoord );
-					activity.setMaximumDuration( 1. );
-					plan.getPlanElements().add( index+1, activity );
-					// (inserts at given position; pushes everything else forward)
-				}
-
-				// (3) There needs to be a new teleportation leg from here to there.
-				{
-//					Leg secondLeg = pf.createLeg( walkAfterRejectMode+"_"+agent.getMode() );
-					Leg secondLeg = pf.createLeg( walkAfterRejectMode );
-					secondLeg.setDepartureTime( now );
-					double directTravelTime = VrpPaths.calcAndCreatePath
-							(network.getLinks().get(interactionLink), network.getLinks().get(originallyPlannedDestinationLink), now, router, travelTime).getTravelTime();
-					//TODO Chengqi: it would be better if we can get the alpha beta values from DRT config group directly
- 					// double estimatedTravelTime = drtConfigGroup.maxTravelTimeAlpha * directTravelTime + drtConfigGroup.maxTravelTimeBeta;
-					double estimatedTravelTime = alphas.get( agent.getMode() ) * directTravelTime + betas.get( agent.getMode() );
-					secondLeg.setTravelTime( estimatedTravelTime );
-					secondLeg.setRoute( pf.getRouteFactories().createRoute( GenericRouteImpl.class, interactionLink, originallyPlannedDestinationLink ) );
-					plan.getPlanElements().add( index+2, secondLeg );
-
-				}
-				// (4) reset the agent caches:
-				WithinDayAgentUtils.resetCaches( agent );
-
-				// (5) add the agent to an internal list, which is processed during doSimStep, which formally ends the current
-				// (aborted) leg, and moves the agent forward in its state machine.
-				agents.add( agent );
-
-				printPlan( "plan after splicing=", plan );
-			}
-			return true;
-		}
-		@Override public void doSimStep( double time ){
-			for( MobsimAgent agent : agents ){
-				agent.endLegAndComputeNextState( time );
-				// (we haven't actually thrown an abort event, and are planning not to do this here.  We probably have thrown a drt
-				// rejected event.  The "endLeg..." method will throw a person arrival event.)
-
-				this.internalInterface.arrangeNextAgentState( agent );
-			}
-			agents.clear();
-		}
-		@Override public void onPrepareSim(){
-		}
-		@Override public void afterSim(){
-		}
-		@Override public void setInternalInterface( InternalInterface internalInterface ){
-			this.internalInterface = internalInterface;
-		}
-		private static void printPlan( String x, Plan plan ){
-			log.warn( delimiter );
-			log.warn( x + plan );
-			for( PlanElement planElement : plan.getPlanElements() ){
-				log.warn( planElement );
-			}
-			log.warn( delimiter );
-		}
-	}
-
-	private static class DrtRejectionEventHandler implements PassengerRequestRejectedEventHandler,
-			PassengerRequestSubmittedEventHandler, IterationEndsListener {
-		private final Map<Integer, MutableInt> numberOfRejectionsPerTimeBin = new HashMap<>();
-		private final Map<Integer, MutableInt> numberOfSubmissionsPerTimeBin = new HashMap<>();
-		private final Map<Integer, Double> probabilityOfRejectionPerTimeBin = new HashMap<>();
-
-		// Key parameters
-		private final double timeBinSize = 900;
-		// Time bin to analyze the probability of being rejected
-		private final double rejectionCost = 6;
-		// 12 -> 2 hour of default performing score
-		private final double learningRate = 0.25;
-		// (1 - alpha) * old probability + alpha * new probability (0 < alpha <= 1)
-
-		@Inject private EventsManager events;
-
-		@Override
-		public void handleEvent(PassengerRequestRejectedEvent event) {
-			// Currently, we assume there is only 1 DRT operator with standard DRT mode ("drt")
-			// Because it is a little tricky to get DRT Config Group here (which can only be acquired via DvrpQSimModule),
-			// we just use the simple way. For multi-operator, a map can be introduced to store the data for different DRT modes
-			if (event.getMode().equals(TransportMode.drt)) {
-				int timeBin = getTimeBin(event.getTime());
-				numberOfRejectionsPerTimeBin.computeIfAbsent(timeBin, c -> new MutableInt()).increment();
-			}
-		}
-
-		@Override
-		public void reset(int iteration) {
-			PassengerRequestRejectedEventHandler.super.reset(iteration);
-			if (iteration != 0) {
-				log.warn(probabilityOfRejectionPerTimeBin.values());
-				numberOfSubmissionsPerTimeBin.clear();
-				numberOfRejectionsPerTimeBin.clear();
-			}
-		}
-
-		@Override
-		public void notifyIterationEnds(IterationEndsEvent event) {
-			// Calculate the probability of being rejected at each time bin
-			for (Integer timeBin : numberOfSubmissionsPerTimeBin.keySet()) {
-				double probability = numberOfRejectionsPerTimeBin.getOrDefault(timeBin, new MutableInt()).doubleValue() /
-						numberOfSubmissionsPerTimeBin.get(timeBin).doubleValue();
-				// Apply exponential discount
-				probability = learningRate * probability + (1 - learningRate) * probabilityOfRejectionPerTimeBin.getOrDefault(timeBin, 0.);
-				probabilityOfRejectionPerTimeBin.put(timeBin, probability);
-			}
-		}
-
-		@Override
-		public void handleEvent(PassengerRequestSubmittedEvent event) {
-			if (event.getMode().equals(TransportMode.drt)) {
-				int timeBin = getTimeBin(event.getTime());
-				numberOfSubmissionsPerTimeBin.computeIfAbsent(timeBin, c -> new MutableInt()).increment();
-
-				// Add a cost for potential rejection
-				double extraScore = (-1) * rejectionCost * probabilityOfRejectionPerTimeBin.getOrDefault(getTimeBin(event.getTime()), 0.);
-				events.processEvent(new PersonScoreEvent(event.getTime(), event.getPersonId(), extraScore, "Potential_of_being_rejected"));
-			}
-		}
-
-		private int getTimeBin(double time) {
-			return (int) (Math.floor(time / timeBinSize));
-		}
-
-	}
-
-	private static class DrtRejectionModule extends AbstractModule{
-		@Override public void install() {
-			ConfigUtils.addOrGetModule( this.getConfig(), QSimComponentsConfigGroup.class ).addActiveComponent( MyAbortHandler.COMPONENT_NAME );
-
-			bind( DrtRejectionEventHandler.class ).in( Singleton.class );
-			addEventHandlerBinding().to( DrtRejectionEventHandler.class );
-			addControlerListenerBinding().to( DrtRejectionEventHandler.class );
-
-			this.installQSimModule( new AbstractQSimModule(){
-				@Override protected void configureQSim(){
-					this.addQSimComponentBinding( MyAbortHandler.COMPONENT_NAME ).to( MyAbortHandler.class );
-				}
-			} );
-		}
-	}
 }
