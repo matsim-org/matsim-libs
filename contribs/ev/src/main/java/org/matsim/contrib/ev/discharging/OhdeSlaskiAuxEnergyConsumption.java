@@ -46,7 +46,7 @@ public final class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumptio
 
 	private final TemperatureService temperatureService;
 
-	public OhdeSlaskiAuxEnergyConsumption(TemperatureService temperatureService) {
+	OhdeSlaskiAuxEnergyConsumption(TemperatureService temperatureService) {
 		this.temperatureService = temperatureService;
 	}
 
@@ -59,7 +59,7 @@ public final class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumptio
 		private final TemperatureService temperatureService;
 
 		@Inject
-		public Factory(TemperatureService temperatureService) {
+		Factory(TemperatureService temperatureService) {
 			this.temperatureService = temperatureService;
 		}
 
