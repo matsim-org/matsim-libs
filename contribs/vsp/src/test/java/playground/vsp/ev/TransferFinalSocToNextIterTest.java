@@ -52,8 +52,8 @@ public class TransferFinalSocToNextIterTest {
 	@Test
 	public void test() {
 		//adapt scenario
-		scenario.getConfig().controler().setLastIteration(LAST_ITERATION);
-		scenario.getConfig().controler().setOutputDirectory("test/output/playground/vsp/ev/FinalSoc2VehicleTypeTest/");
+		scenario.getConfig().controller().setLastIteration(LAST_ITERATION);
+		scenario.getConfig().controller().setOutputDirectory("test/output/playground/vsp/ev/FinalSoc2VehicleTypeTest/");
 
 		var vehicle1 = scenario.getVehicles().getVehicles().get(Id.create("Triple Charger_car", Vehicle.class));
 		ElectricVehicleSpecifications.setInitialSoc(vehicle1, INITIAL_SOC);

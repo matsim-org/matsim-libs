@@ -40,7 +40,7 @@ public class GroupMinLossSelectExpBetaFactory extends NonInnovativeStrategyFacto
 
 	private final Scenario sc;
 	private final IncompatiblePlansIdentifierFactory incompatiblePlans;
-	
+
 	@Inject
 	public GroupMinLossSelectExpBetaFactory( Scenario sc , IncompatiblePlansIdentifierFactory incompatiblePlans ) {
 		this.sc = sc;
@@ -57,7 +57,7 @@ public class GroupMinLossSelectExpBetaFactory extends NonInnovativeStrategyFacto
 					new LossWeight(),
 					(JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME ) ),
 				MatsimRandom.getLocalInstance(),
-				sc.getConfig().planCalcScore().getBrainExpBeta()) );
+				sc.getConfig().scoring().getBrainExpBeta()) );
 	}
 }
 

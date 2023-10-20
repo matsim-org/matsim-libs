@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -94,11 +94,11 @@ public class CharyparNagelLegScoringDailyConstantsTest {
 
 			scoring1.handleLeg(leg);
 			scoring1.finish();
-			
+
 			scoring2.handleLeg(leg);
 			scoring2.finish();
 		}
-		
+
 		{
 			final Leg leg = PopulationUtils.createLeg(TransportMode.car);
 			leg.setDepartureTime( 0 );
@@ -131,11 +131,11 @@ public class CharyparNagelLegScoringDailyConstantsTest {
 
 			scoring1.handleLeg(leg);
 			scoring1.finish();
-			
+
 			scoring2.handleLeg(leg);
 			scoring2.finish();
 		}
-		
+
 		{
 			final Leg leg = PopulationUtils.createLeg(TransportMode.bike);
 			leg.setDepartureTime( 0 );
@@ -168,7 +168,7 @@ public class CharyparNagelLegScoringDailyConstantsTest {
 
 			scoring1.handleLeg(leg);
 			scoring1.finish();
-			
+
 			scoring2.handleLeg(leg);
 			scoring2.finish();
 		}
@@ -178,9 +178,9 @@ public class CharyparNagelLegScoringDailyConstantsTest {
 				-12345.678,
 				scoring1.getScore(),
 				MatsimTestUtils.EPSILON );
-		
-		double defaultScore = (legTravelTime1 + legTravelTime2) * new PlanCalcScoreConfigGroup().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.
-				+ legTravelTime3 * new PlanCalcScoreConfigGroup().getModes().get(TransportMode.bike).getMarginalUtilityOfTraveling() / 3600.;
+
+		double defaultScore = (legTravelTime1 + legTravelTime2) * new ScoringConfigGroup().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.
+				+ legTravelTime3 * new ScoringConfigGroup().getModes().get(TransportMode.bike).getMarginalUtilityOfTraveling() / 3600.;
 		Assert.assertEquals(
 				"wrong score; daily constants are not accounted for in the scoring.",
 				-12345.678 + defaultScore,
@@ -189,15 +189,15 @@ public class CharyparNagelLegScoringDailyConstantsTest {
 	}
 
 	private CharyparNagelLegScoring createDefaultPlusConstants(Network network) {
-		
-		final PlanCalcScoreConfigGroup conf = new PlanCalcScoreConfigGroup();
-		
+
+		final ScoringConfigGroup conf = new ScoringConfigGroup();
+
 		conf.getModes().get(TransportMode.car).setDailyUtilityConstant(-10000.);
 		conf.getModes().get(TransportMode.car).setDailyMonetaryConstant(-2345.);
 
 		conf.getModes().get(TransportMode.bike).setDailyUtilityConstant(-.078);
 		conf.getModes().get(TransportMode.bike).setDailyMonetaryConstant(-0.6);
-		
+
 		final ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
 
 		return new CharyparNagelLegScoring(
@@ -207,12 +207,12 @@ public class CharyparNagelLegScoringDailyConstantsTest {
 
 	private static CharyparNagelLegScoring createScoringOnlyConstants(final Network network) {
 
-		final PlanCalcScoreConfigGroup conf = new PlanCalcScoreConfigGroup();
-		
+		final ScoringConfigGroup conf = new ScoringConfigGroup();
+
 		conf.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(0.);
 		conf.getModes().get(TransportMode.car).setDailyUtilityConstant(-10000.);
 		conf.getModes().get(TransportMode.car).setDailyMonetaryConstant(-2345.);
-		
+
 		conf.getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(0.);
 		conf.getModes().get(TransportMode.bike).setDailyUtilityConstant(-.078);
 		conf.getModes().get(TransportMode.bike).setDailyMonetaryConstant(-0.6);

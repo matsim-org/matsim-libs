@@ -24,14 +24,14 @@ public class BestReplyIT {
         		IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "config.xml"),
 				new FrozenTastesConfigGroup()
 		);
-  
+
         // override or add some material:
 		ConfigUtils.loadConfig(config, utils.getPackageInputDirectory() + "/config.xml");
 
-		config.controler().setOutputDirectory( utils.getOutputDirectory() );
-		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-		
-		
+		config.controller().setOutputDirectory( utils.getOutputDirectory() );
+		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+
+
         Scenario scenario = ScenarioUtils.loadScenario(config);
 		RunLocationChoiceBestResponse.run(scenario );
 	}

@@ -49,7 +49,7 @@ import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -132,14 +132,14 @@ public class AccessibilityIntegrationTest {
 		acg.setUseParallelization(false);
 
 		ModeParams ptParams = new ModeParams(TransportMode.transit_walk);
-		config.planCalcScore().addModeParams(ptParams);
+		config.scoring().addModeParams(ptParams);
 
 		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class) ;
 
-		config.plansCalcRoute().setRoutingRandomness(0.);
+		config.routing().setRoutingRandomness(0.);
 
 		final Scenario sc = ScenarioUtils.loadScenario(config);
-		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
+		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.routing(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
 
 		Controler controler = new Controler(sc);
@@ -171,13 +171,13 @@ public class AccessibilityIntegrationTest {
 		acg.setBoundingBoxTop(max);
 		acg.setBoundingBoxLeft(min);
 		acg.setBoundingBoxRight(max);
-		
-		config.plansCalcRoute().setRoutingRandomness(0.);
+
+		config.routing().setRoutingRandomness(0.);
 
 		final Scenario sc = createTestScenario(config);
 
 		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
-		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
+		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.routing(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
 
 		Controler controler = new Controler(sc);
@@ -213,11 +213,11 @@ public class AccessibilityIntegrationTest {
 		acg.setUseOpportunityWeights(true);
 		acg.setWeightExponent(2.);
 
-		config.plansCalcRoute().setRoutingRandomness(0.);
+		config.routing().setRoutingRandomness(0.);
 
 		final Scenario sc = createTestScenarioUsingOpportunityWeights(config) ;
 		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
-		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
+		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.routing(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
 
 		Controler controler = new Controler(sc);
@@ -240,11 +240,11 @@ public class AccessibilityIntegrationTest {
 	public void testWithExtentDeterminedByNetwork() {
 		final Config config = createTestConfig() ;
 
-		config.plansCalcRoute().setRoutingRandomness(0.);
+		config.routing().setRoutingRandomness(0.);
 
 		final Scenario sc = createTestScenario(config) ;
 		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
-		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
+		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.routing(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
 
 		Controler controler = new Controler(sc);
@@ -280,11 +280,11 @@ public class AccessibilityIntegrationTest {
 		//		acg.setShapeFileCellBasedAccessibility(url.getPath()); // yyyyyy todo
 		acg.setShapeFileCellBasedAccessibility(f.getAbsolutePath());
 
-		config.plansCalcRoute().setRoutingRandomness(0.);
+		config.routing().setRoutingRandomness(0.);
 
 		final Scenario sc = createTestScenario(config) ;
 		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
-		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
+		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.routing(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
 
 		Controler controler = new Controler(sc);
@@ -329,10 +329,10 @@ public class AccessibilityIntegrationTest {
 
 		final Scenario sc = createTestScenario(config) ;
 		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
-		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
+		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.routing(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
-		
-		config.plansCalcRoute().setRoutingRandomness(0.);
+
+		config.routing().setRoutingRandomness(0.);
 
 		Controler controler = new Controler(sc);
 
@@ -409,7 +409,7 @@ public class AccessibilityIntegrationTest {
 		config.transit().setVehiclesFile(utils.getClassInputDirectory() + "vehicles.xml");
 
 		ModeParams ptParams = new ModeParams(TransportMode.transit_walk);
-		config.planCalcScore().addModeParams(ptParams);
+		config.scoring().addModeParams(ptParams);
 
 		MatrixBasedPtRouterConfigGroup mbConfig = new MatrixBasedPtRouterConfigGroup();
 		mbConfig.setPtStopsInputFile(utils.getClassInputDirectory() + "ptStops.csv");
@@ -419,9 +419,9 @@ public class AccessibilityIntegrationTest {
 		mbConfig.setUsingTravelTimesAndDistances(true);
 		config.addModule(mbConfig);
 
-		config.controler().setLastIteration(0);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(0);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		return config;
 	}

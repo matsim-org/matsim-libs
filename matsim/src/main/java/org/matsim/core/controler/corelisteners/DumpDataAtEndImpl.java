@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -69,7 +69,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private Config config;
 
 	@Inject
-	private ControlerConfigGroup controlerConfigGroup;
+	private ControllerConfigGroup controllerConfigGroup;
 
 	@Inject
 	private VspExperimentalConfigGroup vspConfig;
@@ -129,7 +129,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		dumpLanes();
 		dumpCounts();
 
-		if (!event.isUnexpected() && this.vspConfig.isWritingOutputEvents() && (this.controlerConfigGroup.getWriteEventsInterval()!=0)) {
+		if (!event.isUnexpected() && this.vspConfig.isWritingOutputEvents() && (this.controllerConfigGroup.getWriteEventsInterval()!=0)) {
 			dumpOutputEvents(event.getIteration());
 		}
 		dumpOutputTrips(event.getIteration());
@@ -137,13 +137,13 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		dumpOutputActivities(event.getIteration());
 		dumpExperiencedPlans(event.getIteration());
 
-		if (controlerConfigGroup.getCleanItersAtEnd() == ControlerConfigGroup.CleanIterations.delete) {
+		if (controllerConfigGroup.getCleanItersAtEnd() == ControllerConfigGroup.CleanIterations.delete) {
 			this.controlerIO.deleteIterationDirectory();
 		}
 	}
 
 	private void dumpOutputEvents(int iteration) {
-		for (ControlerConfigGroup.EventsFileFormat format : this.controlerConfigGroup.getEventsFileFormats()) {
+		for (ControllerConfigGroup.EventsFileFormat format : this.controllerConfigGroup.getEventsFileFormats()) {
 			try{
 				Controler.DefaultFiles file;
 				switch (format) {
@@ -200,7 +200,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
     }
 
 	private void dumpExperiencedPlans(int iteration) {
-		if (this.config.planCalcScore().isWriteExperiencedPlans() ) {
+		if (this.config.scoring().isWriteExperiencedPlans() ) {
 			try {
 				IOUtils.copyFile(this.controlerIO.getIterationFilename(iteration, Controler.DefaultFiles.experiencedPlans),
 						this.controlerIO.getOutputFilename(Controler.DefaultFiles.experiencedPlans));
@@ -306,8 +306,8 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpConfig() {
 		// dump config
-		new ConfigWriter(this.config).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.config, ControlerConfigGroup.CompressionType.none));
-		new ConfigWriter(this.config, ConfigWriter.Verbosity.minimal).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.configReduced, ControlerConfigGroup.CompressionType.none));
+		new ConfigWriter(this.config).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.config, ControllerConfigGroup.CompressionType.none));
+		new ConfigWriter(this.config, ConfigWriter.Verbosity.minimal).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.configReduced, ControllerConfigGroup.CompressionType.none));
 	}
 
 	private void dumpNetwork() {

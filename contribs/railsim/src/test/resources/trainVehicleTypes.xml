@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+	<vehicleType id="Sprinter">
+		<attributes>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.7</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">0.7</attribute>
+		</attributes>
+		<capacity seats="450" standingRoomInPersons="0"/>
+		<length meter="200.0"/>
+		<maximumVelocity meterPerSecond="90"/>
+		<networkMode networkMode="rail"/>
+	</vehicleType>
+
+
+	<vehicleType id="Express">
+		<attributes>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.7</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">0.7</attribute>
+		</attributes>
+		<capacity seats="500" standingRoomInPersons="0"/>
+		<length meter="375.0"/>
+		<maximumVelocity meterPerSecond="55"/>
+		<networkMode networkMode="rail"/>
+	</vehicleType>
+
+	<vehicleType id="Regio">
+		<attributes>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.5</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">0.5</attribute>
+		</attributes>
+		<capacity seats="500" standingRoomInPersons="0"/>
+		<length meter="500.0"/>
+		<maximumVelocity meterPerSecond="44"/>
+		<networkMode networkMode="rail"/>
+	</vehicleType>
+
+	<vehicleType id="Cargo">
+		<attributes>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.2</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">0.2</attribute>
+		</attributes>
+		<capacity seats="40" standingRoomInPersons="0"/>
+		<length meter="1000.0"/>
+		<maximumVelocity meterPerSecond="33"/>
+		<networkMode networkMode="rail"/>
+	</vehicleType>
+
+</vehicleDefinitions>

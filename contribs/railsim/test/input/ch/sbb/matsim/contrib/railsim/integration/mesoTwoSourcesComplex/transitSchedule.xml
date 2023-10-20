@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<stopFacility id="t1_A-B" x="0.0" y="0" linkRefId="t1_A-t1_B" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="t1a_A-B" x="0.0" y="0" linkRefId="t1a_A-t1a_B" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="t2_A-B" x="50000.0" y="0" linkRefId="t2_A-t2_B" isBlocking="false">
+		</stopFacility>
+		<stopFacility id="t3_A-B" x="120000.0" y="0" linkRefId="t3_A-t3_B" isBlocking="false">
+		</stopFacility>
+	</transitStops>
+	<transitLine id="line1">
+		<transitRoute id="line1_route1">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="t1_A-B" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="t2_A-B" arrivalOffset="02:00:00" departureOffset="02:30:00" awaitDeparture="false"/>
+				<stop refId="t3_A-B" arrivalOffset="04:00:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="t1_A-t1_B"/>
+				<link refId="t1_B-t2_A"/>
+				<link refId="t2_A-t2_B"/>
+				<link refId="t2_B-n1"/>
+				<link refId="n1-n2"/>
+				<link refId="n2-n3"/>
+				<link refId="n3-t3_A"/>
+				<link refId="t3_A-t3_B"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:00:00" vehicleRefId="train1"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="line2">
+		<transitRoute id="line2_route1">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="t1a_A-B" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="t2_A-B" arrivalOffset="02:00:00" departureOffset="02:30:00" awaitDeparture="false"/>
+				<stop refId="t3_A-B" arrivalOffset="04:00:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="t1a_A-t1a_B"/>
+				<link refId="t1a_B-t2_A"/>
+				<link refId="t2_A-t2_B"/>
+				<link refId="t2_B-n1"/>
+				<link refId="n1-n2"/>
+				<link refId="n2-n3"/>
+				<link refId="n3-t3_A"/>
+				<link refId="t3_A-t3_B"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:00:01" vehicleRefId="train2"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>

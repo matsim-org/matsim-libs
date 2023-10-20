@@ -82,7 +82,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 		config.network().setInputFile(networkPath.toString());
 		Scenario outputScenario = ScenarioUtils.loadScenario(config);
 		config.plans().setInputFile(freightDataDirectory.toString());
-		config.plansCalcRoute().setRoutingRandomness(0);
+		config.routing().setRoutingRandomness(0);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Network network = scenario.getNetwork();
 		Population originalPlans = scenario.getPopulation();

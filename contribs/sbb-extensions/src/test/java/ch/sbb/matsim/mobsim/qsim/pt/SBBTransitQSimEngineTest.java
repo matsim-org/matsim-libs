@@ -1,7 +1,22 @@
-/*
- * Copyright (C) Schweizerische Bundesbahnen SBB, 2018.
- */
-
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package ch.sbb.matsim.mobsim.qsim.pt;
 
 import java.util.List;
@@ -34,6 +49,8 @@ import org.matsim.core.mobsim.qsim.ActivityEngineModule;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
+import org.matsim.core.mobsim.qsim.pt.DefaultTransitDriverAgentFactory;
+import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -58,7 +75,7 @@ public class SBBTransitQSimEngineTest {
 
         EventsManager eventsManager = EventsUtils.createEventsManager(f.config);
         QSim qSim = new QSimBuilder(f.config).useDefaults().build(f.scenario, eventsManager);
-        SBBTransitQSimEngine trEngine = new SBBTransitQSimEngine(qSim, null);
+        SBBTransitQSimEngine trEngine = new SBBTransitQSimEngine(qSim, null, new TransitStopAgentTracker(eventsManager), new DefaultTransitDriverAgentFactory());
         qSim.addMobsimEngine(trEngine);
 
         trEngine.insertAgentsIntoMobsim();

@@ -20,7 +20,6 @@ package org.matsim.core.mobsim.hermes;
 
 import jakarta.validation.constraints.Positive;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -168,7 +167,7 @@ public final class HermesConfigGroup extends ReflectiveConfigGroup {
     @Override
     protected void checkConsistency(Config config) {
         super.checkConsistency(config);
-        if (config.parallelEventHandling().getOneThreadPerHandler()!=true && config.controler().getMobsim().equals("hermes")){
+        if (config.eventsManager().getOneThreadPerHandler()!=true && config.controller().getMobsim().equals("hermes")){
             LogManager.getLogger(getClass()).warn("Hermes should be run with one thread per handler.");
         }
     }

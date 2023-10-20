@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.freightreceiver;
 
-import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.freight.carriers.TimeWindow;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;

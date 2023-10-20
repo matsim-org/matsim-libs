@@ -27,9 +27,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.controler.FreightUtils;
+import org.matsim.freight.carriers.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -47,18 +45,18 @@ public class IsTheRightCustomerScoredTest {
     public void setUp() {
 
         Config config = ConfigUtils.loadConfig("./scenarios/grid/jointDemand_config.xml");
-        config.controler().setLastIteration(0);
-        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+        config.controller().setLastIteration(0);
+        config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         JointDemandConfigGroup jointDemandConfigGroup = ConfigUtils.addOrGetModule(config, JointDemandConfigGroup.class);
         jointDemandConfigGroup.setMaxJobScore(MAX_JOB_SCORE);
-        FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-        freightConfigGroup.setCarriersFile("jointDemand_carriers_car.xml");
-        freightConfigGroup.setCarriersVehicleTypesFile("jointDemand_vehicleTypes.xml");
+        FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+        freightCarriersConfigGroup.setCarriersFile("jointDemand_carriers_car.xml");
+        freightCarriersConfigGroup.setCarriersVehicleTypesFile("jointDemand_vehicleTypes.xml");
         scenario = ScenarioUtils.loadScenario(config);
-        FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+        CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
 
         //limit the fleet size of carrier pizza_1 so that it can handly only one order/job
-        FreightUtils.getCarriers(scenario).getCarriers().get(Id.create("salamiPizza", Carrier.class)).getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.FINITE);
+        CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create("salamiPizza", Carrier.class)).getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.FINITE);
 
         preparePopulation(scenario);
 
@@ -107,7 +105,7 @@ public class IsTheRightCustomerScoredTest {
         Plan nonCustomerPlan = scenario.getPopulation().getPersons().get(Id.createPersonId("nonCustomer")).getSelectedPlan();
 
         //derive the service activity from the carrier plan and compare the service id (which should contain the customer id) with the person id of the expected customer
-        Carrier pizzaCarrier = FreightUtils.getCarriers(scenario).getCarriers().get(Id.create("salamiPizza", Carrier.class));
+        Carrier pizzaCarrier = CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create("salamiPizza", Carrier.class));
         ScheduledTour tour = (ScheduledTour) pizzaCarrier.getSelectedPlan().getScheduledTours().toArray()[0];
         Id<CarrierService> serviceActivity = tour.getTour().getTourElements().stream()
                 .filter(tourElement -> tourElement instanceof Tour.ServiceActivity)

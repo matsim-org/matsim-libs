@@ -152,39 +152,8 @@ public class InsertionDetourTimeCalculator {
 			return new PickupTimeInfo(departureTime, additionalStopDuration);
 		} else {
 			// case 3: previous waypoint is an ongoing (started) stop
-			// insertion is the beginning of the planned stop (traditionally)
-			
-			/*
-			 * TODO: Generally, DRT is allowed to insert pickups into ongoing stop tasks.
-			 * However, currently, stop tasks have a fixed duration that is never changed.
-			 * This means that a pickup is added to an ongoing task that will end, maybe in
-			 * 20s. The task will then end regardless of the added pickup. The request will,
-			 * hence, have a wait time of 20s although the configured stop duration may be
-			 * 60s. We can even frequently have requests with zero wait time.
-			 * 
-			 * To mitigate the problem, the following steps are necessary:
-			 * - Impose here not the stopTask.beginTime as the time at which the request is inserted,
-			 *   but impose the current time ("now") as the point of insertion.
-			 * - The underlying StopTimeCalculator should make proper use of this information and
-			 *   *extend* the stop task here in the insertion algorithm.
-			 * - This should equally be done in RequestInsertionScheduler where the stop task must be
-			 *   extended according to the information given by StopTimeCalculator.
-			 * - The DrtStopActvity should not be based on the endTime of the stop that is known at 
-			 *   time of construction, but it should depend dynamically on the end time (basically,
-			 *   like a stay task).
-			 * - Finally, all of this means that by adding a pickup to an ongoing stop and, potentially,
-			 *   shifting the end time of the task, we may shift already assigned pick-ups beyond their
-			 *   latestDepartureTime. Testing for this requires to extend the definition of slack times.
-			 *   Specifically, VehicleEntryFactoryImpl only generates the slack *after* the start of the
-			 *   schedule. In an empty schedule this is the slack from the initial stay to the end time
-			 *   of the vehicle service. Hence, we need to introduce a "start slack" that indicates the
-			 *   slack at the very beginning of the schedule (i.e., how far can I extend the start stop
-			 *   if there is any to maintain a valid timing).
-			 */
-			
-			double insertionTime = stopTask.getBeginTime();
-			double departureTime = stopTimeCalculator.updateEndTimeForPickup(vEntry.vehicle, stopTask,
-					insertionTime, request);
+			// insertion is a soon as possible (now)
+			double departureTime = stopTimeCalculator.updateEndTimeForPickup(vEntry.vehicle, stopTask, vEntry.createTime, request);
 			double additionalStopDuration = departureTime - stopTask.getEndTime();
 			return new PickupTimeInfo(departureTime, additionalStopDuration);
 		}

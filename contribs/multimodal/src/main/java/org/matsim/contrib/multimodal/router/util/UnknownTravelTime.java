@@ -22,7 +22,7 @@ package org.matsim.contrib.multimodal.router.util;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
@@ -31,18 +31,18 @@ import org.matsim.vehicles.Vehicle;
  * agent specific parameters are taken into account.
  */
 public class UnknownTravelTime implements TravelTime {
-	
+
 	private final boolean speed;
 	private final boolean speedFactor;
 	private final double value;
-		
-	public UnknownTravelTime(String mode, PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
-		
-		Double speed = plansCalcRouteConfigGroup.getTeleportedModeSpeeds().get(mode);
-		Double speedFactor = plansCalcRouteConfigGroup.getTeleportedModeFreespeedFactors().get(mode);
-		
+
+	public UnknownTravelTime(String mode, RoutingConfigGroup routingConfigGroup) {
+
+		Double speed = routingConfigGroup.getTeleportedModeSpeeds().get(mode);
+		Double speedFactor = routingConfigGroup.getTeleportedModeFreespeedFactors().get(mode);
+
 		if (speed != null && speedFactor != null) {
-			throw new RuntimeException("Speed as well as speed factor was found for mode " + mode + 
+			throw new RuntimeException("Speed as well as speed factor was found for mode " + mode +
 					"!  Don't know which should be used. Aborting.");
 		} else if (speed == null && speedFactor == null) {
 			throw new RuntimeException("Neither speed nor speed factor was found for mode " + mode + "! Aborting.");
@@ -56,10 +56,10 @@ public class UnknownTravelTime implements TravelTime {
 			this.speedFactor = true;
 		}
 	}
-	
+
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		if (speed) return link.getLength() / this.value;			
+		if (speed) return link.getLength() / this.value;
 		else if (speedFactor) return (link.getLength() / link.getFreespeed()) * this.value;
 		else throw new RuntimeException("Neither speed nor speed factor was found! Aborting.");
 	}

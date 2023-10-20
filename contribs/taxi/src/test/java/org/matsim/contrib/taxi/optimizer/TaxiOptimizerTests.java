@@ -43,7 +43,7 @@ public class TaxiOptimizerTests {
 		// mielec taxi mini benchmark contains only the morning peak (6:00 - 12:00) that is shifted by -6 hours (i.e. 0:00 - 6:00).
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_mini_benchmark_config.xml");
 		var config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup());
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(config);
 		Optional.ofNullable(taxiCfg.getTaxiOptimizerParams()).ifPresent(taxiCfg::removeParameterSet);
@@ -52,8 +52,8 @@ public class TaxiOptimizerTests {
 
 		var controler = RunTaxiBenchmark.createControler(config, 1);
 		// RunTaxiBenchmark.createControler() overrides some config params, this is a moment to adjust them
-		config.controler().setWriteEventsInterval(1);
-		config.controler().setDumpDataAtEnd(true);
+		config.controller().setWriteEventsInterval(1);
+		config.controller().setDumpDataAtEnd(true);
 
 		controler.run();
 

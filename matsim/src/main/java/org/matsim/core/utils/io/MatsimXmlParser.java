@@ -35,6 +35,7 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Stack;
@@ -224,8 +225,10 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 					parser.parse(input, this);
 				}
 			}
-		} catch (SAXException | ParserConfigurationException | IOException e) {
+		} catch (IOException e) {
 			throw new UncheckedIOException(e);
+		} catch (SAXException | ParserConfigurationException e) {
+			throw new UncheckedIOException(new IOException(e));
 		}
 	}
 

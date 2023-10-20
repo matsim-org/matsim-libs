@@ -157,6 +157,7 @@ public final class PlanModelService implements StartupListener {
 	/**
 	 * Calculate the estimates for all options. Note that plan model has to be routed before computing estimates.
 	 */
+	@SuppressWarnings("rawtypes")
 	public void calculateEstimates(EstimatorContext context, PlanModel planModel) {
 
 		for (Map.Entry<String, List<ModeEstimate>> e : planModel.getEstimates().entrySet()) {
@@ -208,7 +209,7 @@ public final class PlanModelService implements StartupListener {
 						if (tripEst != null && legMode.equals(c.getMode()))
 							continue;
 
-						LegEstimator<Enum<?>> legEst = (LegEstimator<Enum<?>>) legEstimators.get(legMode);
+						LegEstimator legEst = legEstimators.get(legMode);
 
 						if (legEst == null)
 							throw new IllegalStateException("No leg estimator defined for mode: " + legMode);

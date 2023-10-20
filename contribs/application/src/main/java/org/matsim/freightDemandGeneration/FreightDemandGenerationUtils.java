@@ -29,10 +29,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.options.ShpOptions;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierShipment;
-import org.matsim.contrib.freight.controler.FreightUtils;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierService;
+import org.matsim.freight.carriers.CarrierShipment;
+import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -99,11 +99,11 @@ public class FreightDemandGenerationUtils {
 	static void createDemandLocationsFile(Controler controler) {
 
 		Network network = controler.getScenario().getNetwork();
-		File file = new File(controler.getConfig().controler().getOutputDirectory() + "/outputFacilitiesFile.tsv");
+		File file = new File(controler.getConfig().controller().getOutputDirectory() + "/outputFacilitiesFile.tsv");
 		try (FileWriter writer = new FileWriter(file, true)) {
 			writer.write("id	x	y	type	ServiceLocation	pickupLocation	deliveryLocation\n");
 
-			for (Carrier thisCarrier : FreightUtils.getCarriers(controler.getScenario()).getCarriers().values()) {
+			for (Carrier thisCarrier : CarriersUtils.getCarriers(controler.getScenario()).getCarriers().values()) {
 				for (CarrierService thisService : thisCarrier.getServices().values()) {
 					Coord coord = FreightDemandGenerationUtils
 							.getCoordOfMiddlePointOfLink(network.getLinks().get(thisService.getLocationLinkId()));

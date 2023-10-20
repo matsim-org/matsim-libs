@@ -30,5 +30,11 @@
 			<artifactId>commons-csv</artifactId>
 			<version>1.10.0</version>
 		</dependency>
+        <dependency>
+            <groupId>one.util</groupId>
+            <artifactId>streamex</artifactId>
+            <version>0.8.2</version>
+            <scope>compile</scope>
+        </dependency>
 	</dependencies>
 </project>

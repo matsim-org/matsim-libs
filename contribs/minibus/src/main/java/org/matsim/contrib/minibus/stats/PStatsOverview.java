@@ -21,6 +21,7 @@ package org.matsim.contrib.minibus.stats;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.List;
@@ -45,7 +46,6 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * Calculates at the end of each iteration the following statistics:
@@ -155,8 +155,8 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 			this.pStatsWriter = null;
 		}
 
-		this.minIteration = controler.getConfig().controler().getFirstIteration();
-		int maxIter = controler.getConfig().controler().getLastIteration();
+		this.minIteration = controler.getConfig().controller().getFirstIteration();
+		int maxIter = controler.getConfig().controller().getLastIteration();
 		int iterations = maxIter - this.minIteration;
 		if (iterations > 10000) iterations = 10000; // limit the history size
 		this.history = new double[29][iterations+1];
