@@ -1,9 +1,31 @@
+/*
+ * *********************************************************************** *
+ * project: org.matsim.*
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** *
+ */
+
 package org.matsim.freight.carriers;
 
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.events.EventsUtils;
@@ -12,16 +34,43 @@ import org.matsim.freight.carriers.events.*;
 import org.matsim.freight.carriers.events.eventhandler.*;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
+import org.matsim.vehicles.Vehicle;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * @author Kai Martins-Turner (kturner)
+ * @author Niclas Richter (nixlaos)
+ */
 public class CarrierEventsReadersTest {
+
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
+
+	private final Id<Link> linkId = Id.createLinkId("demoLink");
+	private final Id<Link> linkId2 = Id.createLinkId("demoLink2");
+	private final Id<Carrier> carrierId = Id.create("testCarrier", Carrier.class);
+	private final Id<Vehicle> vehicleId = Id.createVehicleId("myVehicle");
+
+	private final Id<Tour> tourId = Id.create("myCarrierTour", Tour.class);
+	private final CarrierService service = CarrierService.Builder.newInstance(Id.create("service42", CarrierService.class), linkId2 ).build();
+	private final CarrierShipment shipment = CarrierShipment.Builder.newInstance(Id.create("shipment11", CarrierShipment.class), linkId, linkId2,7 ).build();
+
+	private final List<Event> carrierEvents = List.of(
+		new CarrierTourStartEvent(10, carrierId, linkId, vehicleId, tourId),
+		new CarrierTourEndEvent(500, carrierId, linkId, vehicleId, tourId),
+		new CarrierServiceStartEvent(20, carrierId, service, vehicleId),
+		new CarrierServiceEndEvent(25, carrierId, service, vehicleId),
+		new CarrierShipmentPickupStartEvent(100, carrierId, shipment, vehicleId),
+		new CarrierShipmentPickupEndEvent(115, carrierId, shipment, vehicleId),
+		new CarrierShipmentDeliveryStartEvent(210, carrierId, shipment, vehicleId),
+		new CarrierShipmentDeliveryEndEvent(225, carrierId, shipment, vehicleId)
+	);
 
 	@Test
 	public void testWriteReadServiceBasedEvents() {
@@ -112,6 +161,42 @@ public class CarrierEventsReadersTest {
 
 		Assert.assertEquals("Number of tour related carrier events is not correct", 2 , eventHandlerTours.handledEvents.size());
 		Assert.assertEquals("Number of shipments related carrier events is not correct", 20 , testEventHandlerShipments.handledEvents.size());
+	}
+
+
+	/**
+	 * This test is testing the reader with some locally created events (see above).
+	 * This test is inspired by the DrtEventsReaderTest from michalm.
+	 */
+	@Test
+	public void testReader() {
+		var outputStream = new ByteArrayOutputStream();
+		EventWriterXML writer = new EventWriterXML(outputStream);
+		carrierEvents.forEach(writer::handleEvent);
+		writer.closeFile();
+
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		TestEventHandlerTours eventHandlerTours = new TestEventHandlerTours();
+		TestEventHandlerServices eventHandlerServices = new TestEventHandlerServices();
+		TestEventHandlerShipments eventHandlerShipments = new TestEventHandlerShipments();
+
+		eventsManager.addHandler(eventHandlerTours);
+		eventsManager.addHandler(eventHandlerServices);
+		eventsManager.addHandler(eventHandlerShipments);
+
+		eventsManager.initProcessing();
+		CarrierEventsReaders.createEventsReader(eventsManager)
+			.readStream(new ByteArrayInputStream(outputStream.toByteArray()),
+				ControllerConfigGroup.EventsFileFormat.xml);
+		eventsManager.finishProcessing();
+
+		var handledEvents = new ArrayList<Event>();
+		handledEvents.addAll(eventHandlerTours.handledEvents);
+		handledEvents.addAll(eventHandlerServices.handledEvents);
+		handledEvents.addAll(eventHandlerShipments.handledEvents);
+
+		//Please note: This test is sensitive to the order of events as they are added in carrierEvents (input) and the resukts of the handler...
+		Assert.assertArrayEquals(carrierEvents.toArray(), handledEvents.toArray());
 	}
 
 	private static class TestEventHandlerTours
