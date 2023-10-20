@@ -27,7 +27,7 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DrivingEnergyConsumptionEvent extends AbstractEnergyConsumptionEvent {
+public final class DrivingEnergyConsumptionEvent extends AbstractEnergyConsumptionEvent {
 	public static final String EVENT_TYPE = "drivingEnergyConsumption";
 
 	public DrivingEnergyConsumptionEvent(double time, Id<Vehicle> vehicleId, Id<Link> linkId, double energy, double endCharge) {

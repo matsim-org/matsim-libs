@@ -29,7 +29,7 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DischargingModule extends AbstractModule {
+public final class DischargingModule extends AbstractModule {
 	@Override
 	public void install() {
 		bind(DriveEnergyConsumption.Factory.class).toInstance(ev -> new OhdeSlaskiDriveEnergyConsumption());

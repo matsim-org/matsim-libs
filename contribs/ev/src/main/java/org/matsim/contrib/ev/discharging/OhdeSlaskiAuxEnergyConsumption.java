@@ -27,7 +27,7 @@ import org.matsim.contrib.ev.temperature.TemperatureService;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 
-public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
+public final class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 	private static final double a = 1.3;// [W]
 	private static final double b = -63.4;// [W]
 	private static final double c = 1748.1;// [W]
