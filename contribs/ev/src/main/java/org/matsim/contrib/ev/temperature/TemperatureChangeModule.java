@@ -36,7 +36,7 @@ public class TemperatureChangeModule extends AbstractModule {
 
 //	    bind(TemperatureService.class).to(TemperatureServiceImpl.class)(.in( Singleton.class ));
 
-	    // and then make sure that the implementation registers itself?  kai, oct'23
+	    // and then make sure that the implementation registers itself?  But how to actually achieve that?  kai, oct'23
 
 	}
 }
