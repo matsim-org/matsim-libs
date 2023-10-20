@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +17,43 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.replanning.strategies;
+package org.matsim.core.config.groups;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import java.util.Map;
 
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
-public class TimeAllocationMutator implements Provider<PlanStrategy> {
+/**
+ * @author awagner
+ */
+public final class PlanInheritanceConfigGroup extends ReflectiveConfigGroup {
 
-	@Inject private GlobalConfigGroup globalConfigGroup;
-	@Inject private TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup;
-	@Inject private PlansConfigGroup plansConfigGroup;
+	public static final String GROUP_NAME = "planInheritance";
+
+	private static final String ENABLED = "enabled";
+
+	private boolean enabled = false;
+
+	public PlanInheritanceConfigGroup() {
+		super(GROUP_NAME);
+	}
 
 	@Override
-	public PlanStrategy get() {
-		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		TimeAllocationMutatorModule tam = new TimeAllocationMutatorModule( this.timeAllocationMutatorConfigGroup, this.globalConfigGroup);
-		strategy.addStrategyModule(tam);
-		return strategy;
+	public Map<String, String> getComments() {
+		Map<String, String> comments = super.getComments();
+		comments.put(ENABLED, "Specifies whether or not PlanInheritance Information should be tracked.");
+		return comments;
+	}
+
+	
+	@StringSetter( ENABLED )
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+	
+	
+	@StringGetter( ENABLED )
+	public boolean getEnabled() {
+		return this.enabled;
 	}
 }
