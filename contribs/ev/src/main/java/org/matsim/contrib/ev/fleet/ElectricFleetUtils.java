@@ -83,8 +83,7 @@ public final class ElectricFleetUtils {
 		ImmutableMap<Id<Vehicle>, ElectricVehicle> vehicles = fleetSpecification.getVehicleSpecifications()
 											.values()
 											.stream()
-											.map(s -> create(s, driveConsumptionFactory, auxConsumptionFactory,
-						chargingFactory ))
+											.map(s -> create(s, driveConsumptionFactory, auxConsumptionFactory, chargingFactory ))
 											.collect(ImmutableMap.toImmutableMap(ElectricVehicle::getId, v -> v));
 		return () -> vehicles;
 	}
