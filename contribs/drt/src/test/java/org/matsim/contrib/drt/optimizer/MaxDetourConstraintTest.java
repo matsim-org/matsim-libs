@@ -10,6 +10,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -41,17 +42,17 @@ public class MaxDetourConstraintTest {
 		drtConfigGroup.maxTravelTimeBeta = 600;
 		drtConfigGroup.maxWaitTime = 300;
 
-		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		Controler controler = DrtControlerCreator.createControler(config, false);
 
-		for (DrtConfigGroup drtCfg: multiModeDrtConfigGroup.getModalElements()) {
-			controler.addOverridingModule(new AbstractDvrpModeModule(drtCfg.mode) {
+		for (DrtConfigGroup drtCfg : multiModeDrtConfigGroup.getModalElements()) {
+			controler.addOverridingQSimModule(new AbstractDvrpModeQSimModule(drtCfg.mode) {
 				@Override
-				public void install() {
+				protected void configureQSim() {
 					bindModal(InsertionCostCalculator.class).toProvider(modalProvider(
-							getter -> new MaxDetourInsertionCostCalculator(new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class)))));
+						getter -> new MaxDetourInsertionCostCalculator((new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class))))));
 				}
 			});
 		}
