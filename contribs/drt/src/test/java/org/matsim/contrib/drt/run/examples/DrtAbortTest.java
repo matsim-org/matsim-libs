@@ -14,7 +14,7 @@ import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
@@ -27,7 +27,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import java.net.URL;
 
-import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.*;
+import static org.matsim.core.config.groups.ScoringConfigGroup.*;
 
 public class DrtAbortTest{
 	private static final Logger log = LogManager.getLogger(DrtAbortTest.class );
@@ -58,16 +58,16 @@ public class DrtAbortTest{
 				new OTFVisConfigGroup() );
 
 		boolean rejectionModule = true;
-		config.controler().setLastIteration(50);
+		config.controller().setLastIteration(50);
 		config.plans().setInputFile("plans_only_drt_4.0.xml.gz");
 //		config.global().setRandomSeed(9999);
 		{
-			StrategyConfigGroup.StrategySettings settings = new StrategyConfigGroup.StrategySettings();
+			ReplanningConfigGroup.StrategySettings  settings = new ReplanningConfigGroup.StrategySettings();
 			settings.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode);
 			settings.setWeight(0.1);
-			config.strategy().addStrategySettings(settings);
-			config.strategy().setFractionOfIterationsToDisableInnovation(0.9);
-			config.strategy().setMaxAgentPlanMemorySize(5);
+			config.replanning().addStrategySettings(settings);
+			config.replanning().setFractionOfIterationsToDisableInnovation(0.9);
+			config.replanning().setMaxAgentPlanMemorySize(5);
 		}
 		{
 			config.changeMode().setModes( new String[] { TransportMode.drt, TransportMode.bike });
@@ -75,7 +75,7 @@ public class DrtAbortTest{
 		{
 			ModeParams params = new ModeParams( TransportMode.bike );
 			params.setMarginalUtilityOfTraveling(-6.);
-			config.planCalcScore().addModeParams( params );
+			config.scoring().addModeParams( params );
 		}
 
 		for ( DrtConfigGroup drtCfg : MultiModeDrtConfigGroup.get( config ).getModalElements()) {
@@ -91,7 +91,7 @@ public class DrtAbortTest{
 
 		switch ( variant ) {
 			case simpleTest -> {
-				config.controler().setLastIteration(1);
+				config.controller().setLastIteration(1);
 				config.plans().setInputFile("plans_only_drt_rejection_test.xml");
 				// Chengqi: I have created a special plan for the rejection handler test: 3 requests within 1 time bin (6:45 - 7:00)
 				for ( DrtConfigGroup drtCfg : MultiModeDrtConfigGroup.get( config ).getModalElements()) {
@@ -128,13 +128,13 @@ public class DrtAbortTest{
 			default -> throw new IllegalStateException("Unexpected value: " + variant);
 		}
 
-		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
-		config.planCalcScore().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( walkAfterRejectMode ) ).setScoringThisActivityAtAll( false ) );
-		config.planCalcScore().addModeParams( new ModeParams( walkAfterRejectMode ) );
+		config.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( walkAfterRejectMode ) ).setScoringThisActivityAtAll( false ) );
+		config.scoring().addModeParams( new ModeParams( walkAfterRejectMode ) );
 
-		config.planCalcScore().setWriteExperiencedPlans( true );
+		config.scoring().setWriteExperiencedPlans( true );
 
 //		for ( DrtConfigGroup drtCfg : MultiModeDrtConfigGroup.get(config ).getModalElements()) {
 		//relatively high max age to prevent rejections
@@ -145,7 +145,7 @@ public class DrtAbortTest{
 //		}
 
 		MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get( config );
-		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.planCalcScore(), config.plansCalcRoute() );
+		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing() );
 
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory( config );
 		ScenarioUtils.loadScenario(scenario );
