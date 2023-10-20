@@ -23,7 +23,7 @@
 
 import jakarta.inject.Singleton;
 
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 
 public class WithinDayTravelTimeModule extends AbstractModule {
@@ -33,7 +33,7 @@ public class WithinDayTravelTimeModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		if (getConfig().controler().getRoutingAlgorithmType() != ControlerConfigGroup.RoutingAlgorithmType.Dijkstra) {
+		if (getConfig().controller().getRoutingAlgorithmType() != ControllerConfigGroup.RoutingAlgorithmType.Dijkstra) {
 			throw new RuntimeException(
 					"for me, in KNAccidentScenario, this works with Dijkstra (default until spring 2019), and does not work with AStarLandmarks "
 							+ "(default afterwards).  I have not tried the other routing options, nor have I systematically debugged. KN, feb'19");

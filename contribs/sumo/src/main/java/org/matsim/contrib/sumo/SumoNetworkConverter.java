@@ -14,6 +14,7 @@ import org.matsim.contrib.osm.networkReader.LinkProperties;
 import org.matsim.contrib.osm.networkReader.OsmTags;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -131,7 +132,6 @@ public class SumoNetworkConverter implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
 
-
         Network network = NetworkUtils.createNetwork();
         Lanes lanes = LanesUtils.createLanesContainer();
 
@@ -146,7 +146,11 @@ public class SumoNetworkConverter implements Callable<Integer> {
                 LanesUtils.createLanes(link, l2l);
         });
 
-        new NetworkWriter(network).write(output.toAbsolutePath().toString());
+		if (toCRS != null)
+			ProjectionUtils.putCRS(network, toCRS);
+
+		NetworkUtils.writeNetwork(network, output.toAbsolutePath().toString());
+
         new LanesWriter(lanes).write(output.toAbsolutePath().toString().replace(".xml", "-lanes.xml"));
 
         writeGeometry(handler, output.toAbsolutePath().toString().replace(".xml", "-linkGeometries.csv"));

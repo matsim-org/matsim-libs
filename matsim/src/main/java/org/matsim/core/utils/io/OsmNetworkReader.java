@@ -22,6 +22,7 @@ package org.matsim.core.utils.io;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -110,17 +111,17 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private boolean scaleMaxSpeed = false;
 
 	private boolean slowButLowMemory = false;
-	
+
 	private boolean useVspAdjustments = false; // Adjustments discussed on 2018-04-30, kn,ik,dz. apr'18 (Might become default after testing)
-	
+
 	/*package*/ final List<OsmFilter> hierarchyLayers = new ArrayList<>();
 
 	// nodes that are definitely to be kept (e.g. for counts later)
 	private Set<Long> nodeIDsToKeep = null;
-	
+
 	private OsmXmlParser parser;
-	
-	
+
+
 	/**
 	 * Creates a new Reader to convert OSM data into a MATSim network.
 	 *
@@ -141,10 +142,10 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	public OsmNetworkReader(final Network network, final CoordinateTransformation transformation, final boolean useHighwayDefaults) {
 		this(network, transformation, useHighwayDefaults, false);
 	}
-	
+
 	/**
 	 * Creates a new Reader to convert OSM data into a MATSim network.
-	 * 
+	 *
 	 * After discussion, we (kn,ik,dz) introduced some adjustments to links regarding speeds and capacities
 	 * that aim to represent different travel times in urban vs. rural areas better, esp. taking into account
 	 * intersections/traffic lights and their implications on speeds and capacities in urban areas.
@@ -153,7 +154,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * @param transformation A coordinate transformation to be used. OSM-data comes as WGS84, which is often not optimal for MATSim.
 	 * @param useHighwayDefaults Highway defaults are set to standard values, if true.
 	 * @param useVspAdjustments Highway defaults are set to standard VSP values, if true.
-	 * 
+	 *
 	 */
 	public OsmNetworkReader(final Network network, final CoordinateTransformation transformation, final boolean useHighwayDefaults, final boolean useVspAdjustments) {
 		this.network = network;
@@ -173,7 +174,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				this.setHighwayDefaults(3, "primary",       1,  80.0/3.6, 1.0, 1500);
 				this.setHighwayDefaults(3, "primary_link",  1,  60.0/3.6, 1.0, 1500);
 			}
-			
+
 //			this.setHighwayDefaults(4, "secondary",     1,  60.0/3.6, 1.0, 1000);
 //			this.setHighwayDefaults(5, "tertiary",      1,  45.0/3.6, 1.0,  600);
 //			this.setHighwayDefaults(6, "minor",         1,  45.0/3.6, 1.0,  600);
@@ -181,7 +182,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 //			this.setHighwayDefaults(6, "residential",   1,  30.0/3.6, 1.0,  600);
 //			this.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300);
 
-			// Setting the following to considerably smaller values, since there are often traffic signals/non-prio intersections. 
+			// Setting the following to considerably smaller values, since there are often traffic signals/non-prio intersections.
 			// If someone does a systematic study, please report.  kai, jul'16
 			//
 			// We revised the below street types (removed "minor" and put "living_street", "residential", and "unclassified" into
@@ -202,7 +203,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			// changing the speed values failed the evacuation ScenarioGenerator test because of a different network -- DESPITE
 			// the fact that all the speed values are reset to some other value there.  No idea what happens there. kai, jul'16
 		}
-		
+
 		this.parser = new OsmXmlParser(this.nodes, this.ways, this.transform);
 	}
 
@@ -290,9 +291,9 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		}
 		log.info("= end of conversion statistics ====================");
 	}
-	
+
 	/**
-	 * Set a parser for OSM XML data. 
+	 * Set a parser for OSM XML data.
 	 * If no parser is set, the default parser from this class (OsmNetworkReader.OsmXmlParser) is used.
 	 */
 	public void setParser(OsmXmlParser parser) {
@@ -393,24 +394,24 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	public final void setMemoryOptimization(final boolean memoryEnabled) {
 		this.slowButLowMemory = memoryEnabled;
 	}
-	
+
 	public final void setNodeIDsToKeep(Set<Long> nodeIDsToKeep){
 		if(nodeIDsToKeep != null && !nodeIDsToKeep.isEmpty()){
 			this.nodeIDsToKeep = nodeIDsToKeep;
 		}
 	}
-	
+
 	protected void addWayTags(List<String> wayTagsToAdd) {
 		allTags.addAll(wayTagsToAdd);
 	}
-	
+
 	private void convert() {
 		this.network.setCapacityPeriod(3600);
 
 		preprocessOsmData();
-		
+
 		simplifyOsmData();
-		
+
 		createMatsimData();
 
 		// free up memory
@@ -420,10 +421,10 @@ public class OsmNetworkReader implements MatsimSomeReader {
 
 	/**
 	 * This method is called before the network (still based on osm data) gets simplified and before the matsim network is created.
-	 * 
-	 * It cleans the OSM data (removes ways with nodes that does not exist) 
+	 *
+	 * It cleans the OSM data (removes ways with nodes that does not exist)
 	 * and prepares data for simplification (collects information about all ways a node is located on; marks end nodes of ways).
-	 * 
+	 *
 	 * Override/Extend this method to add additional preprocessing of OSM data (see e.g. the signals and lanes reader).
 	 */
 	protected void preprocessOsmData() {
@@ -441,7 +442,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			}
 		}
 		log.info("... done removing " + counter + "ways that have at least one node that was not read previously.");
-		
+
 		log.info("Fill ways and nodes with additional information: the hierarchy layer for ways, end points of ways...");
 		for (OsmWay way : this.ways.values()) {
 			String highway = way.tags.get(TAG_HIGHWAY);
@@ -467,7 +468,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * number of ways they are located at, whether they are endpoints of ways, and
 	 * whether they belong to a certain group of nodes that should be kept anyway
 	 * (e.g. counting stations).
-	 * 
+	 *
 	 * Override/Extend this method when further simplification of OSM data is
 	 * necessary in your reader.
 	 */
@@ -491,19 +492,19 @@ public class OsmNetworkReader implements MatsimSomeReader {
 					}
 				}
 			}
-			
+
 			// mark nodes that can be removed/simplified (no endpoint, no intersections)
 			if (canNodeBeRemoved(node)) {
 				node.used = false;
 			}
-			
+
 			// keep special nodes (e.g. nodes with counts data), also when they don't fulfill hierarchyLayers (e.g. are located on smaller ways)
 			if ((nodeIDsToKeep != null) && nodeIDsToKeep.contains(node.id)) {
 				node.used = true;
 			}
 		}
 		log.info("... done marking OSM nodes that shoud be kept.");
-		
+
 		log.info("Verify we did not mark nodes that build a loop ...");
 		for (OsmWay way : this.ways.values()) {
 			String highway = way.tags.get(TAG_HIGHWAY);
@@ -540,7 +541,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	/**
 	 * This method checks whether the node is an intersection node or an end node of a way and, therefore, can not be removed/simplified.
 	 * Override/extend this when you want to keep more or other nodes, e.g. signalized nodes.
-	 * 
+	 *
 	 * @return whether the node can be simplified (true) or not (false)
 	 */
 	protected boolean canNodeBeRemoved(OsmNode node) {
@@ -561,7 +562,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			}
 		}
 		log.info("... done creating the required nodes.");
-	
+
 		log.info( "Create the links ...") ;
 		this.id = 1;
 		for (OsmWay way : this.ways.values()) {
@@ -576,7 +577,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 						if (toNode != lastToNode) {
 							length += CoordUtils.calcEuclideanDistance(lastToNode.coord, toNode.coord);
 							if (toNode.used) {
-	
+
 								if(this.hierarchyLayers.isEmpty()) {
 									createLink(this.network, way, fromNode, toNode, length);
 								} else {
@@ -591,7 +592,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 										}
 									}
 								}
-	
+
 								fromNode = toNode;
 								length = 0.0;
 							}
@@ -604,14 +605,14 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		log.info("... done creating the links.");
 	}
 
-	private void createLink(final Network network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode, 
+	private void createLink(final Network network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode,
 			final double length) {
 		String highway = way.tags.get(TAG_HIGHWAY);
 
         if ("no".equals(way.tags.get(TAG_ACCESS))) {
              return;
         }
-		
+
 		// load defaults
 		OsmHighwayDefaults defaults = this.highwayDefaults.get(highway);
 		if (defaults == null) {
@@ -624,7 +625,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		double laneCapacity = defaults.laneCapacity;
 		double freespeed = defaults.freespeed;
 		double freespeedFactor = defaults.freespeedFactor;
-		
+
 		boolean oneway = isOneway(way);
 		boolean onewayReverse = isOnewayReverse(way);
 
@@ -667,21 +668,21 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				if(highway.equalsIgnoreCase("primary") || highway.equalsIgnoreCase("secondary") || highway.equalsIgnoreCase("tertiary")
 						|| highway.equalsIgnoreCase("primary_link") || highway.equalsIgnoreCase("secondary_link") || highway.equalsIgnoreCase("tertiary_link")) {
 							if (length > 300.) {
-						freespeed = 80. / 3.6; // Might be different (but also not too much different) in other countries				
+						freespeed = 80. / 3.6; // Might be different (but also not too much different) in other countries
 					} else {
 						freespeed = (10. + 70./300 * length) / 3.6;
 					}
 				}
 			}
 		}
-		
+
 		if (useVspAdjustments) {
 			// Adjustments that KN had been using for a while: For short links, often roundabouts or short u-turns, etc.
 			if (length < 100 ) {
 				laneCapacity = 2 * laneCapacity;
 			}
-		}		
-		
+		}
+
 		// check tag "lanes"
 		String lanesTag = way.tags.get(TAG_LANES);
 		String lanesForwardTag = way.tags.get(TAG_LANES_FORWARD);
@@ -786,7 +787,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			}
 		}
 	}
-	
+
 	protected boolean isOneway(OsmWay way) {
 		String onewayTag = way.tags.get(TAG_ONEWAY);
 		if (onewayTag != null) {
@@ -828,13 +829,13 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		// Was set like this before; rather get this from defaults like for (forward) oneway? tt, aug'17
 		return false;
 	}
-	
+
 	/**
 	 * Override this method if you want to add additional attributes to the node, e.g. elevation (z), or modify parameter values.
 	 */
 	protected void setOrModifyNodeAttributes(Node n, OsmNode node) {
 	}
-	
+
 	/**
 	 * Override this method if you want to add additional attributes to the link, e.g. modes, or modify parameter values.
 	 */
@@ -847,7 +848,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	protected boolean reverseDirectionExists(OsmWay way) {
 		return !isOneway(way);
 	}
-	
+
 	/**
 	 * Override this method if you want to use another way to figure out if one can travel on this link in forward direction.
 	 */
@@ -858,7 +859,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	public static interface OsmFilter {
 		boolean coordInFilter( final Coord coord, final int hierarchyLevel ) ;
 	}
-	
+
 	private static class OsmFilterImpl implements OsmFilter {
 		private final Coord coordNW;
 		private final Coord coordSE;
@@ -880,7 +881,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				(this.coordNW.getY() > coord.getY() && coord.getY() > this.coordSE.getY()));
 		}
 	}
-	
+
 	private static class GeographicallyNonrestrictingOsmFilterImpl implements OsmFilter {
 		private final int hierarchy;
 		GeographicallyNonrestrictingOsmFilterImpl(final int hierarchy) {
@@ -954,7 +955,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		private boolean collectNodes = false;
 
 		public OsmXmlParser(final Map<Long, OsmNode> nodes, final Map<Long, OsmWay> ways, final CoordinateTransformation transform) {
-			super();
+			super(ValidationType.NO_VALIDATION);
 			this.nodes = nodes;
 			this.ways = ways;
 			this.transform = transform;
@@ -1063,7 +1064,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 
 	private static class StringCache {
 		private static final  ConcurrentHashMap<String, String> cache = new ConcurrentHashMap<>(10000);
-		
+
 		/**
 		 * Returns the cached version of the given String. If the strings was
 		 * not yet in the cache, it is added and returned as well.

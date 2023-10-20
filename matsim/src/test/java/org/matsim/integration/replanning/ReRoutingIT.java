@@ -32,8 +32,8 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.ControllerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.ControllerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
@@ -54,21 +54,21 @@ public class ReRoutingIT {
 		config.qsim().setTimeStepSize(10.0);
 		config.qsim().setStuckTime(100.0);
 		config.qsim().setRemoveStuckVehicles(true);
-		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
-		config.controler().setLastIteration(1);
-		/* linear interpolate the into time bins aggregated travel time data to avoid artifacts at the boundaries of time bins: 
+		config.controller().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
+		config.controller().setLastIteration(1);
+		/* linear interpolate the into time bins aggregated travel time data to avoid artifacts at the boundaries of time bins:
 		 * e.g. a first time bin with aggregated travel time of 90 seconds and a second time bin with 45 seconds; time bin size 60;
-		 * i.e. consolidateData-method in TravelTimeCalculator will accept this difference; imagine an requested route starting 2 
+		 * i.e. consolidateData-method in TravelTimeCalculator will accept this difference; imagine an requested route starting 2
 		 * seconds before the end of the first time bin, another route starts 2 seconds after the start of the second time bin; then
-		 * the second one will arrive 41 seconds earlier than the first. Depending on the algorithm, some routers will detect this, 
-		 * some not (see MATSim-730), which is why we decided to test the linear interpolated travel time data here (which does not 
+		 * the second one will arrive 41 seconds earlier than the first. Depending on the algorithm, some routers will detect this,
+		 * some not (see MATSim-730), which is why we decided to test the linear interpolated travel time data here (which does not
 		 * contain this artifacts). theresa, sep'17
 		 * */
 		config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
 
 		/*
 		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
-		 * to store the persons in the population, we have to sort the population manually.  
+		 * to store the persons in the population, we have to sort the population manually.
 		 * cdobler, oct'11
 		 */
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -79,21 +79,10 @@ public class ReRoutingIT {
 	@Test
 	public void testReRoutingDijkstra() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
-		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
+		scenario.getConfig().controller().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.run();
-		this.evaluate();
-	}
-
-	@Test
-	public void testReRoutingFastDijkstra() throws MalformedURLException {
-		Scenario scenario = this.loadScenario();
-		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastDijkstra);
-		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 		this.evaluate();
 	}
@@ -101,21 +90,10 @@ public class ReRoutingIT {
 	@Test
 	public void testReRoutingAStarLandmarks() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
-		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
+		scenario.getConfig().controller().setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.run();
-		this.evaluate();
-	}
-
-	@Test
-	public void testReRoutingFastAStarLandmarks() throws MalformedURLException {
-		Scenario scenario = this.loadScenario();
-		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks);
-		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 		this.evaluate();
 	}
@@ -123,10 +101,10 @@ public class ReRoutingIT {
 	@Test
 	public void testReRoutingSpeedyALT() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
-		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.SpeedyALT);
+		scenario.getConfig().controller().setRoutingAlgorithmType(RoutingAlgorithmType.SpeedyALT);
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 		this.evaluate("plans_speedyALT.xml.gz");
 	}
@@ -154,5 +132,5 @@ public class ReRoutingIT {
 		}
 		Assert.assertTrue("different plans files.", isEqual);
 	}
-	
+
 }

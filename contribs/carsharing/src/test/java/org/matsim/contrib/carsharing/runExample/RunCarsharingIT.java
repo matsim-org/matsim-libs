@@ -19,8 +19,8 @@
 
 package org.matsim.contrib.carsharing.runExample;
 
-import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
-import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import static org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
+import static org.matsim.core.config.groups.RoutingConfigGroup.TeleportedModeParams;
 
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
@@ -66,8 +66,8 @@ public class RunCarsharingIT {
 				new CarsharingConfigGroup(),
 				new DvrpConfigGroup());
 
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 
 		config.network().setInputFile("network.xml");
 
@@ -79,8 +79,8 @@ public class RunCarsharingIT {
 		config.facilities().setInputFile("facilities.xml");
 		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
 
-		config.plansCalcRoute().setAccessEgressType(AccessEgressType.none); // otherwise does not work. kai,feb'16
-		config.plansCalcRoute().setRoutingRandomness(0.);
+		config.routing().setAccessEgressType(AccessEgressType.none); // otherwise does not work. kai,feb'16
+		config.routing().setRoutingRandomness(0.);
 		//		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressType.directWalk);
 
 		CarsharingConfigGroup csConfig = (CarsharingConfigGroup) config.getModule(CarsharingConfigGroup.GROUP_NAME);
@@ -99,25 +99,25 @@ public class RunCarsharingIT {
 		//		config.qsim().setNumberOfThreads(1);
 
 		{
-			ModeRoutingParams params = new ModeRoutingParams(TransportMode.non_network_walk);
+			TeleportedModeParams params = new TeleportedModeParams(TransportMode.non_network_walk);
 			params.setTeleportedModeSpeed(0.83333333333);
 			//			params.setTeleportedModeSpeed( 2.0 );
 			params.setBeelineDistanceFactor(1.3);
-			config.plansCalcRoute().addModeRoutingParams(params);
+			config.routing().addModeRoutingParams(params);
 		}
 		{
-			config.plansCalcRoute().removeModeRoutingParams(TransportMode.walk);
-			ModeRoutingParams params = new ModeRoutingParams(TransportMode.walk);
+			config.routing().removeModeRoutingParams(TransportMode.walk);
+			TeleportedModeParams params = new TeleportedModeParams(TransportMode.walk);
 			params.setTeleportedModeSpeed(0.83333333333);
 			//			params.setTeleportedModeSpeed( 2.0 );
 			params.setBeelineDistanceFactor(1.3);
-			config.plansCalcRoute().addModeRoutingParams(params);
+			config.routing().addModeRoutingParams(params);
 		}
 
 		// ---
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		config.plansCalcRoute().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
+		config.routing().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 
 		// ---
 

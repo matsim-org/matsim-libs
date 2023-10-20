@@ -41,12 +41,12 @@ public class SimulatedAnnealingIT {
 
 		final Controler controler = new Controler(config);
 
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
 
 		SimulatedAnnealingConfigGroup simAnCfg = new SimulatedAnnealingConfigGroup();
-		config.controler().setLastIteration(10);
+		config.controller().setLastIteration(10);
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

@@ -74,7 +74,6 @@
 		<module>dvrp</module>
 		<module>ev</module>
 		<module>emissions</module>
-		<module>eventsBasedPTRouter</module>
 		<module>freight</module>
 		<module>freightreceiver</module>
 		<module>hybridsim</module>
@@ -90,11 +89,13 @@
 		<module>parking</module>
 		<module>protobuf</module>
 		<module>pseudosimulation</module>
+		<module>railsim</module>
 		<module>roadpricing</module>
 		<module>sbb-extensions</module>
 		<module>shared_mobility</module>
 		<module>signals</module>
 		<module>simulatedannealing</module>
+		<module>simwrapper</module>
 		<module>socnetsim</module>
 		<module>sumo</module>
 		<module>taxi</module>

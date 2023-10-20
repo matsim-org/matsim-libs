@@ -32,14 +32,14 @@ import jakarta.inject.Inject;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.scoring.EventsToLegs;
@@ -53,8 +53,8 @@ public class PHbyModeCalculator {
 
     private final Map<Integer,Map<String,TravelTimeAndWaitTime>> phtPerIteration = new TreeMap<>();
     private final boolean writePng;
-    private final OutputDirectoryHierarchy controlerIO;
-    private final static char DEL = '\t';
+    private final OutputDirectoryHierarchy controllerIO;
+		private final String delimiter;
     private final static String FILENAME = "ph_modestats";
 
     private static final String TRAVEL_TIME_SUFFIX = "_travel";
@@ -62,9 +62,10 @@ public class PHbyModeCalculator {
     private static final String STAGE_ACTIVITY = "stageActivity";
 
     @Inject
-    PHbyModeCalculator(ControlerConfigGroup controlerConfigGroup, OutputDirectoryHierarchy controlerIO) {
-        writePng = controlerConfigGroup.isCreateGraphs();
-        this.controlerIO = controlerIO;
+    PHbyModeCalculator(ControllerConfigGroup controllerConfigGroup, OutputDirectoryHierarchy controllerIO, GlobalConfigGroup globalConfig) {
+        this.writePng = controllerConfigGroup.isCreateGraphs();
+        this.controllerIO = controllerIO;
+        this.delimiter = globalConfig.getDefaultDelimiter();
     }
 
     void addIteration(int iteration, IdMap<Person, Plan> map) {
@@ -123,7 +124,7 @@ public class PHbyModeCalculator {
                 .flatMap(i->i.keySet().stream())
                 .collect(Collectors.toSet()));
 
-        try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(controlerIO.getOutputFilename( FILENAME+ ".txt"))), CSVFormat.DEFAULT.withDelimiter(DEL))) {
+        try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(controllerIO.getOutputFilename( FILENAME+ ".csv"))), CSVFormat.DEFAULT.withDelimiter(this.delimiter.charAt(0)))) {
             csvPrinter.print("Iteration");
             for (String mode: allModes) {
                 csvPrinter.print(mode + TRAVEL_TIME_SUFFIX);
@@ -167,7 +168,7 @@ public class PHbyModeCalculator {
                 chart.addSeries(mode + WAIT_TIME_SUFFIX, valueWaitTime);
             }
             chart.addMatsimLogo();
-            chart.saveAsPng(controlerIO.getOutputFilename(FILENAME+ ".png"), 1024, 768);
+            chart.saveAsPng(controllerIO.getOutputFilename(FILENAME+ ".png"), 1024, 768);
 
         }
 

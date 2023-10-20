@@ -55,21 +55,22 @@ jobs:
           - contribs/socnetsim
           - contribs/sumo
           - contribs/pseudosimulation
+          - contribs/railsim
           - contribs/roadpricing
           - contribs/analysis
-          - contribs/eventsBasedPTRouter
           - contribs/hybridsim
           - contribs/informed-mode-choice
           - contribs/otfvis
           - contribs/osm
           - contribs/application
+          - contribs/simwrapper
           - contribs/sbb-extensions
           - contribs/simulatedannealing
           - benchmark
 
     steps:
       - name: Checkout git repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Detect changes against master
         # we only want to build matsim (module) if changes are not limited to contribs

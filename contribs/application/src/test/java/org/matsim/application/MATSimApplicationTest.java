@@ -11,7 +11,7 @@ import org.matsim.application.prepare.population.MergePopulations;
 import org.matsim.application.prepare.population.TrajectoryToPlans;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.io.IOUtils;
@@ -47,7 +47,7 @@ public class MATSimApplicationTest {
 
 		Config config = controler.getConfig();
 
-		assertThat(config.controler().getRunId()).isEqualTo("Test123");
+		assertThat(config.controller().getRunId()).isEqualTo("Test123");
 		assertThat(config.global().getNumberOfThreads()).isEqualTo(4);
 		assertThat(config.plans().getInputCRS()).isEqualTo("EPSG:1234");
 
@@ -60,12 +60,12 @@ public class MATSimApplicationTest {
 
 		Controler controler = MATSimApplication.prepare(TestScenario.class, ConfigUtils.createConfig(), "--yaml", yml.toString());
 
-		assertThat(controler.getConfig().controler().getRunId())
+		assertThat(controler.getConfig().controller().getRunId())
 				.isEqualTo("567");
 
-		PlanCalcScoreConfigGroup score = controler.getConfig().planCalcScore();
+		ScoringConfigGroup score = controler.getConfig().scoring();
 
-		PlanCalcScoreConfigGroup.ScoringParameterSet params = score.getScoringParameters(null);
+		ScoringConfigGroup.ScoringParameterSet params = score.getScoringParameters(null);
 
 		assertThat(params.getOrCreateModeParams("car").getConstant())
 				.isEqualTo(-1);
@@ -81,12 +81,12 @@ public class MATSimApplicationTest {
 		Controler controler = MATSimApplication.prepare(TestScenario.class, ConfigUtils.createConfig(),
 				"--10pct");
 
-		assertThat(controler.getConfig().controler().getRunId())
+		assertThat(controler.getConfig().controller().getRunId())
 				.isEqualTo("run-10pct");
 
 		controler = MATSimApplication.prepare(TestScenario.class, ConfigUtils.createConfig());
 
-		assertThat(controler.getConfig().controler().getRunId())
+		assertThat(controler.getConfig().controller().getRunId())
 				.isEqualTo("run-25pct");
 
 	}
@@ -166,9 +166,9 @@ public class MATSimApplicationTest {
 		Config config = ConfigUtils.createConfig();
 		Path out = Path.of(utils.getOutputDirectory()).resolve("out");
 
-		config.controler().setOutputDirectory(out.toString());
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(1);
+		config.controller().setOutputDirectory(out.toString());
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(1);
 
 		int ret = MATSimApplication.execute(TestScenario.class, config);
 
@@ -181,7 +181,7 @@ public class MATSimApplicationTest {
 	@MATSimApplication.Prepare({
 			TrajectoryToPlans.class, GenerateShortDistanceTrips.class, ExtractRelevantFreightTrips.class, MergePopulations.class
 	})
-	private static final class TestScenario extends MATSimApplication {
+	public static final class TestScenario extends MATSimApplication {
 
 		@CommandLine.Mixin
 		private SampleOptions sample = new SampleOptions(1, 10, 25);
@@ -197,7 +197,7 @@ public class MATSimApplicationTest {
 		@Override
 		protected Config prepareConfig(Config config) {
 
-			config.controler().setRunId(sample.adjustName("run-25pct"));
+			config.controller().setRunId(sample.adjustName("run-25pct"));
 			return config;
 		}
 

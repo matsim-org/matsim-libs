@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.testcases.utils.EventsCollector;
@@ -40,7 +40,7 @@ public class EventWriterJsonTest {
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 		events.initProcessing();
-		new MatsimEventsReader(events).readStream(bios, ControlerConfigGroup.EventsFileFormat.json);
+		new MatsimEventsReader(events).readStream(bios, ControllerConfigGroup.EventsFileFormat.json);
 		events.finishProcessing();
 
 		Assert.assertEquals("there must be 2 events.", 2, collector.getEvents().size());
@@ -72,7 +72,7 @@ public class EventWriterJsonTest {
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 		events.initProcessing();
-		new MatsimEventsReader(events).readStream(bios, ControlerConfigGroup.EventsFileFormat.json);
+		new MatsimEventsReader(events).readStream(bios, ControllerConfigGroup.EventsFileFormat.json);
 		events.finishProcessing();
 
 		Assert.assertEquals("there must be 1 event.", 1, collector.getEvents().size());

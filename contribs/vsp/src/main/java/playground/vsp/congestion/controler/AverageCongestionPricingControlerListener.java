@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 
 package playground.vsp.congestion.controler;
@@ -50,18 +50,18 @@ public class AverageCongestionPricingControlerListener implements StartupListene
 	private final MutableScenario scenario;
 	private TollHandler tollHandler;
 	private CongestionHandlerImplV3 congestionHandler;
-	
+
 	public AverageCongestionPricingControlerListener(MutableScenario scenario, TollHandler tollHandler){
 		this.scenario = scenario;
 		this.tollHandler = tollHandler;
 	}
-	
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		
+
 		EventsManager eventsManager = event.getServices().getEvents();
 		congestionHandler = new CongestionHandlerImplV3(eventsManager, scenario);
-		
+
 		event.getServices().getEvents().addHandler(congestionHandler);
 		event.getServices().getEvents().addHandler(tollHandler);
 
@@ -69,19 +69,19 @@ public class AverageCongestionPricingControlerListener implements StartupListene
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		
+
 		log.info("Set average tolls for each link Id and time bin.");
 		tollHandler.setLinkId2timeBin2avgToll();
-		
+
 		// write out toll statistics every iteration
-		tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");
-		
+		tollHandler.writeTollStats(this.scenario.getConfig().controller().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");
+
 		// write out congestion statistics every iteration
-		congestionHandler.writeCongestionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
-		
+		congestionHandler.writeCongestionStats(this.scenario.getConfig().controller().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
+
 		log.info("Throwing agent money events based on calculated average marginal cost for each link and time bin.");
 		EventsManager events = event.getServices().getEvents();
-		
+
 		for (LinkEnterEvent enterEvent : this.tollHandler.getLinkEnterEvents()) {
 			double amount = tollHandler.getAvgToll(enterEvent.getLinkId(), enterEvent.getTime());
 			PersonMoneyEvent moneyEvent = new PersonMoneyEvent(enterEvent.getTime(), Id.createPersonId(enterEvent.getVehicleId()), amount, "congestionPricing", null);

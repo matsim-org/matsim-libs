@@ -21,15 +21,9 @@ package org.matsim.core.router;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Injector;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup.TeleportedModeParams;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
 import javax.annotation.Nullable;
@@ -46,7 +40,7 @@ public final class DefaultRoutingModules {
 	private DefaultRoutingModules(){} // do not instantiate
 
 	public static RoutingModule createPseudoTransitRouter( String mode, PopulationFactory popFac, Network net, LeastCostPathCalculator routeAlgo,
-			ModeRoutingParams params ) {
+			RoutingConfigGroup.TeleportedModeParams params ) {
 		return new FreespeedFactorRoutingModule(
 				mode,
 				popFac,
@@ -55,7 +49,7 @@ public final class DefaultRoutingModules {
 				params) ;
 	}
 
-	public static RoutingModule createTeleportationRouter( String mode, Scenario scenario, ModeRoutingParams params ) {
+	public static RoutingModule createTeleportationRouter( String mode, Scenario scenario, TeleportedModeParams params ) {
 		return new TeleportationRoutingModule(
 				mode,
 			  scenario,

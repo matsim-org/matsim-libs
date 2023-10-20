@@ -52,7 +52,7 @@ import java.util.Collection;
 
 @RunWith(Parameterized.class)
 public class ActivityFacilitiesSourceTest {
-	
+
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	//    private static final String outDir = "test/output/"+ActivityFacilitiesSourceTest.class.getCanonicalName().replace('.','/')+"/";
@@ -86,14 +86,14 @@ public class ActivityFacilitiesSourceTest {
 		new File(testOutDir).mkdirs();
 
 		Scenario scenario = prepareScenario();
-		scenario.getConfig().controler().setOutputDirectory(testOutDir);
-		scenario.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		scenario.getConfig().controller().setOutputDirectory(testOutDir);
+		scenario.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		// (overwriteExistingFiles is needed here for the parameterized test since otherwise all output directories except for
 		// the last test will be deleted and thus not available for debugging. kai, sep'19)
 		new Controler(scenario).run();
 
 		// checks
-		ActivityFacilities activityFacilities = getFacilities(scenario.getConfig().controler().getOutputDirectory());
+		ActivityFacilities activityFacilities = getFacilities(scenario.getConfig().controller().getOutputDirectory());
 		switch (this.facilitiesSource) {
 			case none:
 				break;
@@ -115,13 +115,13 @@ public class ActivityFacilitiesSourceTest {
 				}
 				break;
 			case onePerActivityLinkInPlansFile:
-				Assert.assertEquals("wrong number of facilities", 4, getFacilities(scenario.getConfig().controler().getOutputDirectory()).getFacilities().size(), MatsimTestUtils.EPSILON);
+				Assert.assertEquals("wrong number of facilities", 4, getFacilities(scenario.getConfig().controller().getOutputDirectory()).getFacilities().size(), MatsimTestUtils.EPSILON);
 				for (ActivityFacility af : activityFacilities.getFacilities().values()){
 					Assert.assertNotNull(af.getLinkId());
 				}
 				break;
 			case onePerActivityLocationInPlansFile:
-				Assert.assertEquals("wrong number of facilities", 2, getFacilities(scenario.getConfig().controler().getOutputDirectory()).getFacilities().size(), MatsimTestUtils.EPSILON);
+				Assert.assertEquals("wrong number of facilities", 2, getFacilities(scenario.getConfig().controller().getOutputDirectory()).getFacilities().size(), MatsimTestUtils.EPSILON);
 				for (ActivityFacility af : activityFacilities.getFacilities().values()){
 					Assert.assertNotNull(af.getCoord());
 					Assert.assertNotNull(af.getLinkId());
@@ -136,13 +136,13 @@ public class ActivityFacilitiesSourceTest {
 		return scenario.getActivityFacilities();
 	}
 
-	
+
 	// create basic scenario
 	private Scenario prepareScenario() {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.plans().setInputFile(null);
-		config.controler().setLastIteration(0);
-		
+		config.controller().setLastIteration(0);
+
 		switch (facilitiesSource) {
 			case fromFile:
 				break;
@@ -158,11 +158,11 @@ public class ActivityFacilitiesSourceTest {
 //				config.facilities().setAssigningLinksToFacilitiesIfMissing(false);
 				break;
 		}
-		
+
 		config.facilities().setFacilitiesSource(facilitiesSource);
-		
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
+
 		if (facilitiesSource.equals(FacilitiesConfigGroup.FacilitiesSource.setInScenario)) {
 			ActivityFacilities facilities = scenario.getActivityFacilities();
 			ActivityFacilitiesFactory factory = facilities.getFactory();
@@ -182,7 +182,7 @@ public class ActivityFacilitiesSourceTest {
 						Id.createLinkId("20")));
 			}
 		}
-		
+
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 
 		String mode = TransportMode.car;
@@ -297,7 +297,7 @@ public class ActivityFacilitiesSourceTest {
 		}
 		return scenario;
 	}
-	
+
 	private boolean assignFacilityIdToActivity(FacilitiesConfigGroup.FacilitiesSource facilitiesSource) {
 		return facilitiesSource.equals(FacilitiesConfigGroup.FacilitiesSource.setInScenario) || facilitiesSource.equals(
 				FacilitiesConfigGroup.FacilitiesSource.fromFile);

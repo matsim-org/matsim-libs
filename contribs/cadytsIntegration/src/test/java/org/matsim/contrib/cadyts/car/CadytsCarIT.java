@@ -38,9 +38,9 @@ import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.utils.CalibrationStatReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ControllerConfigGroup.MobsimType;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.controler.ControlerI;
@@ -89,12 +89,12 @@ public class CadytsCarIT {
 		String outputDir = this.utils.getOutputDirectory();
 
 		Config config = createTestConfig(inputDir, outputDir);
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 
 		StrategySettings strategySettings = new StrategySettings(Id.create(1, StrategySettings.class));
 		strategySettings.setStrategyName(CADYTS_STRATEGY_NAME) ;
 		strategySettings.setWeight(1.0) ;
-		config.strategy().addStrategySettings(strategySettings);
+		config.replanning().addStrategySettings(strategySettings);
 		CadytsConfigGroup cadytsCar = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
 //		cadytsCar.addParam("startTime", "04:00:00");
 		cadytsCar.setStartTime( 4*3600 );
@@ -164,11 +164,11 @@ public class CadytsCarIT {
 
 		final Config config = createTestConfig(inputDir, outputDir);
 
-		config.controler().setLastIteration(lastIteration);
+		config.controller().setLastIteration(lastIteration);
 
-		config.planCalcScore().setBrainExpBeta(beta);
+		config.scoring().setBrainExpBeta(beta);
 
-		config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DefaultSelector.ChangeExpBeta ).setWeight( 1.0 ) );
+		config.replanning().addStrategySettings( new StrategySettings().setStrategyName( DefaultSelector.ChangeExpBeta ).setWeight( 1.0 ) );
 
 		// ===
 
@@ -320,22 +320,22 @@ public class CadytsCarIT {
 		config.global().setRandomSeed(4711) ;
 		config.network().setInputFile(inputDir + "network.xml") ;
 		config.plans().setInputFile(inputDir + "plans5.xml") ;
-		config.controler().setFirstIteration(1) ;
-		config.controler().setLastIteration(10) ;
-		config.controler().setOutputDirectory(outputDir) ;
-		config.controler().setWriteEventsInterval(1) ;
-		config.controler().setMobsim(MobsimType.qsim.toString()) ;
+		config.controller().setFirstIteration(1) ;
+		config.controller().setLastIteration(10) ;
+		config.controller().setOutputDirectory(outputDir) ;
+		config.controller().setWriteEventsInterval(1) ;
+		config.controller().setMobsim(MobsimType.qsim.toString()) ;
 		config.qsim().setFlowCapFactor(1.) ;
 		config.qsim().setStorageCapFactor(1.) ;
 		config.qsim().setStuckTime(10.) ;
 		config.qsim().setRemoveStuckVehicles(false) ;
 		{
 			ActivityParams params = new ActivityParams("h") ;
-			config.planCalcScore().addActivityParams(params ) ;
+			config.scoring().addActivityParams(params ) ;
 			params.setTypicalDuration(12*60*60.) ;
 		}{
 			ActivityParams params = new ActivityParams("w") ;
-			config.planCalcScore().addActivityParams(params ) ;
+			config.scoring().addActivityParams(params ) ;
 			params.setTypicalDuration(8*60*60.) ;
 		}
 		config.counts().setInputFile(inputDir + "counts5.xml");

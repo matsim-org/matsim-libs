@@ -21,7 +21,7 @@
 package org.matsim.core.router.speedy;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.router.AbstractLeastCostPathCalculatorTest;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -33,7 +33,7 @@ public class SpeedyALTTest extends AbstractLeastCostPathCalculatorTest {
 
 	@Override
 	protected LeastCostPathCalculator getLeastCostPathCalculator(final Network network) {
-		FreespeedTravelTimeAndDisutility travelTimeCostCalculator = new FreespeedTravelTimeAndDisutility(new PlanCalcScoreConfigGroup());
+		FreespeedTravelTimeAndDisutility travelTimeCostCalculator = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
 		SpeedyGraph g = new SpeedyGraph(network);
 		SpeedyALTData altData = new SpeedyALTData(g, 16, travelTimeCostCalculator);
 		return new SpeedyALT(altData, travelTimeCostCalculator, travelTimeCostCalculator);

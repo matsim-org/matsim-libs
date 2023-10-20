@@ -15,7 +15,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.application.MATSimApplication;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.modechoice.*;
@@ -52,10 +52,10 @@ public class PtTripFareEstimatorTest {
 
 		Config config = TestScenario.loadConfig(utils);
 
-		Map<String, PlanCalcScoreConfigGroup.ModeParams> modes = config.planCalcScore().getScoringParameters("person").getModes();
+		Map<String, ScoringConfigGroup.ModeParams> modes = config.scoring().getScoringParameters("person").getModes();
 
-		PlanCalcScoreConfigGroup.ModeParams pt = modes.get(TransportMode.pt);
-		PlanCalcScoreConfigGroup.ModeParams walk = modes.get(TransportMode.walk);
+		ScoringConfigGroup.ModeParams pt = modes.get(TransportMode.pt);
+		ScoringConfigGroup.ModeParams walk = modes.get(TransportMode.walk);
 
 		group = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 

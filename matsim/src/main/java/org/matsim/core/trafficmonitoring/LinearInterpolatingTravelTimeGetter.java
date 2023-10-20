@@ -24,10 +24,10 @@ class LinearInterpolatingTravelTimeGetter implements TravelTimeGetter {
 
 	private final TimeSlotComputation travelTimeAggregator ;
 	private final int numSlots;
-	private final int travelTimeBinSize;
+	private final double travelTimeBinSize;
 	private final double halfBinSize;
-	
-	public LinearInterpolatingTravelTimeGetter( int numSlots, int travelTimeBinSize, TimeSlotComputation aggregator ) {
+
+	public LinearInterpolatingTravelTimeGetter( int numSlots, double travelTimeBinSize, TimeSlotComputation aggregator ) {
 		this.numSlots = numSlots;
 		this.travelTimeBinSize = travelTimeBinSize;
 		this.halfBinSize = ((double) travelTimeBinSize) / 2;
@@ -37,18 +37,18 @@ class LinearInterpolatingTravelTimeGetter implements TravelTimeGetter {
 	@Override
 	public double getTravelTime(TravelTimeData travelTimeData, double time) {
 		final int timeSlot = travelTimeAggregator.getTimeSlotIndex(time);
-		
+
 		// if time is in the first half of the first slot we do not interpolate
 		if (time <= halfBinSize) return travelTimeData.getTravelTime(timeSlot, time);
-		
+
 		// if time is in the second half of the last slot we do not interpolate
 		else if (time >= numSlots * travelTimeBinSize - halfBinSize) return travelTimeData.getTravelTime(timeSlot, time);
-		
-		
+
+
 		// time is inbetween, therefore we interpolate
-		int firstSlot; 
+		int firstSlot;
 		int secondSlot;
-		
+
 		// if time lies in the first half of the time slot
 		if (timeSlot * travelTimeBinSize + halfBinSize > time) {
 			firstSlot = timeSlot - 1;
@@ -59,21 +59,21 @@ class LinearInterpolatingTravelTimeGetter implements TravelTimeGetter {
 		}
 
 		// calculate travel times for both time slots
-		double firstTravelTime = travelTimeData.getTravelTime(firstSlot, time); 
+		double firstTravelTime = travelTimeData.getTravelTime(firstSlot, time);
 		double secondTravelTime = travelTimeData.getTravelTime(secondSlot, time);
-		
+
 		// interpolate travel time
-		double dx = time - (firstSlot * travelTimeBinSize + halfBinSize); 
+		double dx = time - (firstSlot * travelTimeBinSize + halfBinSize);
 //		double dy = (secondTravelTime - firstTravelTime) * (travelTimeBinSize - dx) / travelTimeBinSize;
 		/*
-		 * The line above was a bug: we need to divide the change in travel time (i.e. second minus first travel time) by the change in time (i.e. the time bin size) 
-		 * to get the gradient of the line between the midpoint of the first interval and the midpoint of the second interval. 
+		 * The line above was a bug: we need to divide the change in travel time (i.e. second minus first travel time) by the change in time (i.e. the time bin size)
+		 * to get the gradient of the line between the midpoint of the first interval and the midpoint of the second interval.
 		 * Then we have to multiply it by dx to get dy. The last part was wrong (it was multiplied by time bin size minus dx).
-		 * The test (TravelTimeCalculatorTest) only tests one value in each time bin -- namely the starting time of each time bin, which is unfortunately 
+		 * The test (TravelTimeCalculatorTest) only tests one value in each time bin -- namely the starting time of each time bin, which is unfortunately
 		 * always the midpoint on the interpolated lines, i.e. the only time per time bin where the bug has no influence... theresa, sep'17
 		 */
 		double dy = (secondTravelTime - firstTravelTime) * dx / travelTimeBinSize;
-		
+
 		return firstTravelTime + dy;
 	}
 

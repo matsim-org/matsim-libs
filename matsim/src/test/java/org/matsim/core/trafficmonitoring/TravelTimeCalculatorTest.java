@@ -87,7 +87,7 @@ public class TravelTimeCalculatorTest {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		TimeSlotComputation travelTimeAggregator = new TimeSlotComputation( numSlots, binSize );
 		TravelTimeGetter travelTimeGetter = new AveragingTravelTimeGetter( travelTimeAggregator ) ;
-		doTravelTimeCalculatorTest(scenario, new TravelTimeDataArrayFactory(scenario.getNetwork(), numSlots),
+		doTravelTimeCalculatorTest(scenario,
 				travelTimeAggregator, binSize, endTime, compareFile, false, utils.getClassInputDirectory(), travelTimeGetter );
 	}
 
@@ -102,80 +102,11 @@ public class TravelTimeCalculatorTest {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		TimeSlotComputation aggregator = new TimeSlotComputation( numSlots, binSize );
 		TravelTimeGetter travelTimeGetter = new LinearInterpolatingTravelTimeGetter( numSlots, binSize, aggregator );
-		doTravelTimeCalculatorTest(scenario, new TravelTimeDataArrayFactory(scenario.getNetwork(), numSlots),
+		doTravelTimeCalculatorTest(scenario,
 				aggregator, binSize, endTime, compareFile, false, utils.getClassInputDirectory(), travelTimeGetter );
 	}
 
-	@Test public final void testTravelTimeCalculator_HashMap_Optimistic() throws IOException {
-
-		int endTime = 30*3600;
-		int binSize = 15*60;
-		int numSlots = (endTime / binSize) + 1;
-
-		// by default: averaging travel times
-		String compareFile = utils.getClassInputDirectory() + "link10_ttimes.txt";
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		TimeSlotComputation travelTimeAggregator = new TimeSlotComputation( numSlots, binSize );
-		TravelTimeGetter travelTimeGetter = new AveragingTravelTimeGetter( travelTimeAggregator ) ;
-		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
-				travelTimeAggregator, binSize, endTime, compareFile, false, utils.getClassInputDirectory(), travelTimeGetter );
-	}
-
-	@Test public final void testTravelTimeCalculator_HashMap_Optimistic_LinearInterpolation() throws IOException {
-		String compareFile;
-		MutableScenario scenario;
-		TimeSlotComputation aggregator;
-
-		int endTime = 30*3600;
-		int binSize = 15*60;
-		int numSlots = (endTime / binSize) + 1;
-
-		// use linear interpolation
-		compareFile = utils.getClassInputDirectory() + "link10_ttimes_linearinterpolation.txt";
-		scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		aggregator = new TimeSlotComputation(numSlots, binSize);
-		TravelTimeGetter travelTimeGetter = new LinearInterpolatingTravelTimeGetter( numSlots, binSize, aggregator );
-		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
-				aggregator, binSize, endTime, compareFile, false, utils.getClassInputDirectory(), travelTimeGetter );
-	}
-
-//	@Test public final void testTravelTimeCalculator_HashMap_Pessimistic() throws IOException {
-//		String compareFile;
-//		MutableScenario scenario;
-//		TravelTimeAggregator aggregator;
-//
-//		int endTime = 12*3600;
-//		int binSize = 1*60;
-//		int numSlots = (endTime / binSize) + 1;
-//
-//		// by default: averaging travel times
-//		compareFile = getClassInputDirectory() + "link10_ttimes_pessimistic.txt";
-//		scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		aggregator = new PessimisticTravelTimeAggregator(binSize, numSlots);
-//		assertEquals(AveragingTravelTimeGetter.class, aggregator.getTravelTimeGetter().getClass());
-//		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
-//				aggregator, binSize, endTime, compareFile, false);
-//	}
-//
-//	@Test public final void testTravelTimeCalculator_HashMap_Pessimistic_LinearInterpolation() throws IOException {
-//		String compareFile;
-//		MutableScenario scenario;
-//		TravelTimeAggregator aggregator;
-//
-//		int endTime = 12*3600;
-//		int binSize = 1*60;
-//		int numSlots = (endTime / binSize) + 1;
-//
-//		// use linear interpolation
-//		compareFile = getClassInputDirectory() + "link10_ttimes_pessimistic_linearinterpolation.txt";
-//		scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		aggregator = new PessimisticTravelTimeAggregator(binSize, numSlots);
-//		aggregator.connectTravelTimeGetter(new LinearInterpolatingTravelTimeGetter(numSlots, binSize));
-//		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
-//				aggregator, binSize, endTime, compareFile, false);
-//	}
-
-	private static void doTravelTimeCalculatorTest( final MutableScenario scenario, final TravelTimeDataFactory ttDataFactory,
+	private static void doTravelTimeCalculatorTest( final MutableScenario scenario,
 									final TimeSlotComputation aggregator, final int timeBinSize, final int endTime,
 									final String compareFile, final boolean generateNewData, String inputDirectory,
 									TravelTimeGetter travelTimeGetter ) throws IOException {
@@ -195,9 +126,8 @@ public class TravelTimeCalculatorTest {
 		EventsManager events2 = EventsUtils.createEventsManager();
 
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, endTime, scenario.getConfig().travelTimeCalculator());
-		ttcalc.travelTimeGetter = travelTimeGetter ;
-		ttcalc.aggregator = aggregator ;
-		ttcalc.setTtDataFactory( ttDataFactory );
+		ttcalc.travelTimeGetter = travelTimeGetter;
+		ttcalc.aggregator = aggregator;
 		events2.addHandler(ttcalc);
 		events2.initProcessing();
 		for (Event e : collector.getEvents()) {
@@ -288,6 +218,61 @@ public class TravelTimeCalculatorTest {
 		assertEquals(linkTravelTime2, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 3*timeBinSize + offset, null, null), MatsimTestUtils.EPSILON);
 		assertEquals(freeSpeedTT, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 4*timeBinSize + offset, null, null), MatsimTestUtils.EPSILON);
 		assertEquals(freeSpeedTT, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 5*timeBinSize + offset, null, null), MatsimTestUtils.EPSILON);
+	}
+
+	/**
+	 * This method tests the functionality of the consolidateData-method in TravelTimeCalculator
+	 * in combination with double time bins
+	 *
+	 * @author tthunig
+	 */
+	@Test public void testLongTravelTimeInEmptySlotWithDoubleTimeBins() {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Network network = scenario.getNetwork();
+		network.setCapacityPeriod(3600.0);
+		final Node fromNode = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(0, 0));
+		final Node toNode = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord(1000, 0));
+		Link link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, 1000.0, 100.0, 3600.0, 1.0 );
+		double freeSpeedTT = NetworkUtils.getFreespeedTravelTime(link1);
+		Id<Vehicle> vehId = Id.create("1", Vehicle.class);
+
+		double timeBinSize = 0.5; // time bin of 0.5 seconds
+		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, scenario.getConfig().travelTimeCalculator());
+		double firstTimeBinStart = 7.0 * 3600;
+
+		// generate some events that suggest a really long travel time
+		double linkTravelTime1 = 11.5; // 11.5 seconds in first time bin
+		double linkTravelTime2 = 10.2; // 10.2 seconds in forth time bin
+		ttcalc.handleEvent(new LinkEnterEvent(firstTimeBinStart, vehId, link1.getId()));
+		ttcalc.handleEvent(new LinkLeaveEvent(firstTimeBinStart + linkTravelTime1, vehId, link1.getId()));
+		ttcalc.handleEvent(new LinkEnterEvent(firstTimeBinStart + 3*timeBinSize, vehId, link1.getId()));
+		ttcalc.handleEvent(new LinkLeaveEvent(firstTimeBinStart + 3*timeBinSize + linkTravelTime2, vehId, link1.getId()));
+
+		double offset = 0.2; // offset of 0.2 seconds to test another time in the same time bin
+//		System.out.println("firstTimeBinStart - offset (" + (firstTimeBinStart - offset) + "): " + ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart - offset, null, null));
+//		System.out.println("firstTimeBinStart + offset (" + (firstTimeBinStart + offset) + "): " + ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + offset, null, null));
+//		System.out.println("firstTimeBinStart + 1xtimeBinSize + offset (" + (firstTimeBinStart + 1*timeBinSize + offset) + "): " + ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 1*timeBinSize + offset, null, null));
+//		System.out.println("firstTimeBinStart + 2xtimeBinSize + offset (" + (firstTimeBinStart + 2*timeBinSize + offset) + "): " + ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 2*timeBinSize + offset, null, null));
+//		System.out.println("firstTimeBinStart + 3xtimeBinSize + offset (" + (firstTimeBinStart + 3*timeBinSize + offset) + "): " + ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 3*timeBinSize + offset, null, null));
+//		System.out.println("firstTimeBinStart + 4xtimeBinSize + offset (" + (firstTimeBinStart + 4*timeBinSize + offset) + "): " + ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 4*timeBinSize + offset, null, null));
+//		System.out.println("firstTimeBinStart + 5xtimeBinSize + offset (" + (firstTimeBinStart + 5*timeBinSize + offset) + "): " + ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 5*timeBinSize + offset, null, null));
+//		System.out.println("firstTimeBinStart + linkTravelTime1 + offset (" + (firstTimeBinStart + linkTravelTime1 + offset) + "): " + ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + linkTravelTime1 + offset, null, null));
+//		System.out.println("firstTimeBinStart + 3xtimeBinSize + linkTravelTime2 + offset (" + (firstTimeBinStart + 3*timeBinSize + linkTravelTime2 + offset) + "): " + ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 3*timeBinSize + linkTravelTime2 + offset, null, null));
+		assertEquals(linkTravelTime1, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + offset, null, null), MatsimTestUtils.EPSILON);
+		assertEquals(linkTravelTime1-timeBinSize, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 1*timeBinSize + offset, null, null), MatsimTestUtils.EPSILON);
+		assertEquals(linkTravelTime1-2*timeBinSize, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 2*timeBinSize + offset, null, null), MatsimTestUtils.EPSILON);
+		assertEquals(linkTravelTime2, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 3*timeBinSize + offset, null, null), MatsimTestUtils.EPSILON);
+		assertEquals(freeSpeedTT, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 4*timeBinSize + offset, null, null), MatsimTestUtils.EPSILON);
+		assertEquals(freeSpeedTT, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 5*timeBinSize + offset, null, null), MatsimTestUtils.EPSILON);
+
+		/*
+		 * This test results in strange rounding errors when 10.1 or 10.3 are used as linkTravelTime2.
+		 * The measured travel time in the fourth time bin is then 10.099 or 10.299 respectively.
+		 * For a linkTravelTime2 of 10.2 it works fine without rounding errors.
+		 * I assume this results from some double vs. float issue in the way travel times are calculated within MATSim, but I can't find it.
+		 * KN suggested to still commit it with 10.2 and write this comment... :-)
+		 * Theresa, Jul'23
+		 */
 	}
 
 	/**

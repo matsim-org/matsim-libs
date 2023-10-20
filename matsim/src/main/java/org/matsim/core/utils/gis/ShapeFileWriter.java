@@ -26,12 +26,12 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.matsim.core.api.internal.MatsimSomeWriter;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.Collection;
 /**
@@ -43,10 +43,10 @@ import java.util.Collection;
 public class ShapeFileWriter implements MatsimSomeWriter {
 
 	private static final Logger log = LogManager.getLogger(ShapeFileWriter.class);
-	
+
 	public static void writeGeometries(final Collection<SimpleFeature> features, final String filename) {
 		if (features.isEmpty()) {
-			throw new UncheckedIOException("Cannot write empty collection");
+			throw new UncheckedIOException(new IOException("Cannot write empty collection"));
 		}
 		log.info("Writing shapefile to " + filename);
 		try {
@@ -58,7 +58,7 @@ public class ShapeFileWriter implements MatsimSomeWriter {
 
 			DefaultFeatureCollection coll = new DefaultFeatureCollection();
 			coll.addAll(features);
-			
+
 			SimpleFeatureType featureType = features.iterator().next().getFeatureType();
 			datastore.createSchema(featureType);
 			SimpleFeatureStore featureSource = (SimpleFeatureStore) datastore.getFeatureSource();

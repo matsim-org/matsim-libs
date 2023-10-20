@@ -37,7 +37,7 @@
 		<param name="lastIteration" value="100" />
 		<param name="outputDirectory" value="output-minibus-w-transit/test" />
 		<param name="overwriteFiles" value="failIfDirectoryExists" />
-		<param name="routingAlgorithmType" value="FastAStarLandmarks" />
+		<param name="routingAlgorithmType" value="SpeedyALT" />
 		<param name="writeEventsInterval" value="100" />
 		<param name="writePlansInterval" value="100" />
 		<param name="writeSnapshotsInterval" value="0" />
@@ -505,9 +505,6 @@
 
 		<!-- The size of the time bin (in sec) into which the link travel times are aggregated for the router -->
 		<param name="travelTimeBinSize" value="900" />
-
-		<!-- possible values: nullTravelTimeCalculatorArray TravelTimeCalculatorHashMap  -->
-		<param name="travelTimeCalculator" value="TravelTimeCalculatorArray" />
 
 		<!-- How to deal with link entry times at different positions during the time bin. Currently supported: average, linearinterpolation -->
 		<param name="travelTimeGetter" value="average" />
