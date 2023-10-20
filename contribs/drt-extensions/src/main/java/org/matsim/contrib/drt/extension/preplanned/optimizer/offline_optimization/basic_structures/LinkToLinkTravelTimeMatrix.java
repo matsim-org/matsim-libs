@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures;
+package org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures;
 
 import one.util.streamex.EntryStream;
 import org.matsim.api.core.v01.Id;

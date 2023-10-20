@@ -1,13 +1,13 @@
-package org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.vrpSolver;
+package org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.vrp_solver;
 
 import com.google.common.base.Preconditions;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.InsertionCalculator;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures.FleetSchedules;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures.LinkToLinkTravelTimeMatrix;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures.OnlineVehicleInfo;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures.GeneralRequest;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.InsertionCalculator;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures.FleetSchedules;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures.LinkToLinkTravelTimeMatrix;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures.OnlineVehicleInfo;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures.GeneralRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.core.router.util.TravelTime;

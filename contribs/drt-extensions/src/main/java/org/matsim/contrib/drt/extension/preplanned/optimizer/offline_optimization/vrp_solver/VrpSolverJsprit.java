@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.vrpSolver;
+package org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.vrp_solver;
 
 import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
 import com.graphhopper.jsprit.core.problem.Location;
@@ -25,10 +25,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures.FleetSchedules;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures.OnlineVehicleInfo;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures.GeneralRequest;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures.TimetableEntry;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures.FleetSchedules;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures.OnlineVehicleInfo;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures.GeneralRequest;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures.TimetableEntry;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPaths;

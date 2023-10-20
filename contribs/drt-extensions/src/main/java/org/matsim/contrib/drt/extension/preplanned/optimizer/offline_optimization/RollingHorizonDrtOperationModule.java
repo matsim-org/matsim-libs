@@ -1,12 +1,12 @@
-package org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization;
+package org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.vrpSolver.VrpSolver;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.vrpSolver.VrpSolverJsprit;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.vrpSolver.VrpSolverRegretHeuristic;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.vrpSolver.VrpSolverSeqInsertion;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.vrpSolver.ruinAndRecreate.VrpSolverRuinAndRecreate;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.vrp_solver.VrpSolver;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.vrp_solver.VrpSolverJsprit;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.vrp_solver.VrpSolverRegretHeuristic;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.vrp_solver.VrpSolverSeqInsertion;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.vrp_solver.ruinAndRecreate.VrpSolverRuinAndRecreate;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
 import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
 import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;

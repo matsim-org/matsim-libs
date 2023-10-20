@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization;
+package org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization;
 
 import com.google.common.base.Preconditions;
 import org.apache.logging.log4j.LogManager;
@@ -9,11 +9,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.extension.preplanned.optimizer.WaitForStopTask;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures.FleetSchedules;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures.GeneralRequest;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures.OnlineVehicleInfo;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures.TimetableEntry;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.vrpSolver.VrpSolver;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures.FleetSchedules;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures.GeneralRequest;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures.OnlineVehicleInfo;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures.TimetableEntry;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.vrp_solver.VrpSolver;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;

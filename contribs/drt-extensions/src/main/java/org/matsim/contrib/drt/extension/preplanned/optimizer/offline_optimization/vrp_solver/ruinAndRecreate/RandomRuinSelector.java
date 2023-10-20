@@ -1,8 +1,8 @@
-package org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.vrpSolver.ruinAndRecreate;
+package org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.vrp_solver.ruinAndRecreate;
 
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures.GeneralRequest;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures.FleetSchedules;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures.TimetableEntry;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures.GeneralRequest;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures.FleetSchedules;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures.TimetableEntry;
 
 import java.util.ArrayList;
 import java.util.Collections;

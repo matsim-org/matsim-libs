@@ -1,13 +1,13 @@
-package org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization;
+package org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures.FleetSchedules;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures.GeneralRequest;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures.OnlineVehicleInfo;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures.TimetableEntry;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.offlineOptimization.basicStructures.LinkToLinkTravelTimeMatrix;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures.FleetSchedules;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures.GeneralRequest;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures.OnlineVehicleInfo;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures.TimetableEntry;
+import org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.basic_structures.LinkToLinkTravelTimeMatrix;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 import java.util.ArrayList;
