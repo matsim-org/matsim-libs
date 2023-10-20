@@ -56,6 +56,8 @@ public class EnergyConsumptionCollector implements DrivingEnergyConsumptionEvent
 
 	private final Map<Id<Link>, Double> energyConsumptionPerLink = new HashMap<>();
 
+	@Inject EnergyConsumptionCollector(){}  // so that class can only be instantiated via guice.  kai, oct'23
+
 	@Override
 	public void handleEvent(DrivingEnergyConsumptionEvent event) {
 		energyConsumptionPerLink.merge(event.getLinkId(), event.getEnergy(), Double::sum);

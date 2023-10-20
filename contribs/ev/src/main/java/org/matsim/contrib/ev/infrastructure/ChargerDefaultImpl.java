@@ -29,13 +29,13 @@ import org.matsim.contrib.ev.charging.ChargingLogic;
 
 import com.google.common.base.Preconditions;
 
-public class ChargerImpl implements Charger {
+class ChargerDefaultImpl implements Charger {
 
 	private final ChargerSpecification specification;
 	private final Link link;
 	private final ChargingLogic logic;
 
-	public ChargerImpl(ChargerSpecification specification, Link link, ChargingLogic logic) {
+	ChargerDefaultImpl( ChargerSpecification specification, Link link, ChargingLogic logic ) {
 		Preconditions.checkArgument(link.getId().equals(specification.getLinkId()), "link.id != specification.linkId");
 		this.specification = specification;
 		this.link = link;

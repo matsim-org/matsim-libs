@@ -60,7 +60,7 @@ import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
-import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.modal.ModalProviders;
@@ -95,8 +95,8 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 						getter.getModal(DrtRequestInsertionRetryQueue.class)))).asEagerSingleton();
 
 		bindModal(ChargingInfrastructure.class).toProvider(modalProvider(
-				getter -> ChargingInfrastructures.createModalNetworkChargers(getter.get(ChargingInfrastructure.class),
-						getter.getModal(Network.class), getMode()))).asEagerSingleton();
+				getter -> ChargingInfrastructureUtils.createModalNetworkChargers(getter.get(ChargingInfrastructure.class ),
+						getter.getModal(Network.class), getMode() ))).asEagerSingleton();
 
 		// XXX if overridden to something else, make sure that the depots are equipped with chargers
 		//  otherwise vehicles will not re-charge

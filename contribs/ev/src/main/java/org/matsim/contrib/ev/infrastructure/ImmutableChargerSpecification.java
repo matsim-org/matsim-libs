@@ -40,7 +40,7 @@ public class ImmutableChargerSpecification implements ChargerSpecification {
 	private final double plugPower;
 	private final int plugCount;
 
-	private ImmutableChargerSpecification(Builder builder) {
+	private ImmutableChargerSpecification( ChargerSpecificationBuilder builder ) {
 		id = Objects.requireNonNull(builder.id);
 		linkId = Objects.requireNonNull(builder.linkId);
 		chargerType = Objects.requireNonNull(builder.chargerType);
@@ -51,12 +51,12 @@ public class ImmutableChargerSpecification implements ChargerSpecification {
 		Preconditions.checkArgument(plugCount >= 0, "Negative plugCount of charger: %s", id);
 	}
 
-	public static Builder newBuilder() {
-		return new Builder();
+	public static ChargerSpecificationBuilder newBuilder() {
+		return new ChargerSpecificationBuilder();
 	}
 
-	public static Builder newBuilder(ChargerSpecification copy) {
-		Builder builder = new Builder();
+	public static ChargerSpecificationBuilder newBuilder( ChargerSpecification copy ) {
+		ChargerSpecificationBuilder builder = new ChargerSpecificationBuilder();
 		builder.id = copy.getId();
 		builder.linkId = copy.getLinkId();
 		builder.chargerType = copy.getChargerType();
@@ -101,37 +101,37 @@ public class ImmutableChargerSpecification implements ChargerSpecification {
 				.toString();
 	}
 
-	public static final class Builder {
+	public static final class ChargerSpecificationBuilder{
 		private Id<Charger> id;
 		private Id<Link> linkId;
 		private String chargerType;
 		private Double plugPower;
 		private Integer plugCount;
 
-		private Builder() {
+		private ChargerSpecificationBuilder() {
 		}
 
-		public Builder id(Id<Charger> val) {
+		public ChargerSpecificationBuilder id( Id<Charger> val ) {
 			id = val;
 			return this;
 		}
 
-		public Builder linkId(Id<Link> val) {
+		public ChargerSpecificationBuilder linkId( Id<Link> val ) {
 			linkId = val;
 			return this;
 		}
 
-		public Builder chargerType(String val) {
+		public ChargerSpecificationBuilder chargerType( String val ) {
 			chargerType = val;
 			return this;
 		}
 
-		public Builder plugPower(double val) {
+		public ChargerSpecificationBuilder plugPower( double val ) {
 			plugPower = val;
 			return this;
 		}
 
-		public Builder plugCount(int val) {
+		public ChargerSpecificationBuilder plugCount( int val ) {
 			plugCount = val;
 			return this;
 		}
