@@ -44,10 +44,10 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -124,7 +124,7 @@ public class LocationChoiceIT {
 		// (this is now only necessary since the config for all three tests sets MyLocationChoice instead of LocationChoice. Probably
 		// should pull the best response test away from the other (old) test.  kai, feb'13
 
-		controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+		controler.getConfig().controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		controler.run();
 
 		// test that everything worked as expected
@@ -137,7 +137,7 @@ public class LocationChoiceIT {
 		assertEquals("number of plans in person.", 2, person.getPlans().size());
 		Plan newPlan = person.getSelectedPlan();
 		Activity newWork = (Activity) newPlan.getPlanElements().get(2);
-		if (!config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
+		if (!config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 			newWork = (Activity) newPlan.getPlanElements().get(6);
 		}
 		assertNotNull( newWork ) ;
@@ -188,9 +188,9 @@ public class LocationChoiceIT {
 		Config config = ConfigUtils.loadConfig(configFileName, new DestinationChoiceConfigGroup() , new FrozenTastesConfigGroup() ) ;
 
 		config.global().setNumberOfThreads(0);
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(1);
-		config.controler().setMobsim("qsim");
+		config.controller().setFirstIteration(0);
+		config.controller().setLastIteration(1);
+		config.controller().setMobsim("qsim");
 		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue) ;
 
 		final DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule(config, DestinationChoiceConfigGroup.class ) ;
@@ -199,18 +199,18 @@ public class LocationChoiceIT {
 
 		ActivityParams home = new ActivityParams("home");
 		home.setTypicalDuration(12*60*60);
-		config.planCalcScore().addActivityParams(home);
+		config.scoring().addActivityParams(home);
 		ActivityParams work = new ActivityParams("work");
 		work.setTypicalDuration(12*60*60);
-		config.planCalcScore().addActivityParams(work);
+		config.scoring().addActivityParams(work);
 		ActivityParams shop = new ActivityParams("shop");
 		shop.setTypicalDuration(1.*60*60);
-		config.planCalcScore().addActivityParams(shop);
+		config.scoring().addActivityParams(shop);
 
 		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setStrategyName("MyLocationChoice");
 		strategySettings.setWeight(1.0);
-		config.strategy().addStrategySettings(strategySettings);
+		config.replanning().addStrategySettings(strategySettings);
 
 		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setEffectiveLaneWidth(1.) ;
 		config.qsim().setLinkWidthForVis((float)1.) ;

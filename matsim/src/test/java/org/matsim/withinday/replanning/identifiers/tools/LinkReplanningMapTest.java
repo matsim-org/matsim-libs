@@ -27,7 +27,7 @@ import jakarta.inject.Inject;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -58,9 +58,9 @@ public class LinkReplanningMapTest {
 		qSimConfig.setNumberOfThreads(2);
 		qSimConfig.setFlowCapFactor(100.0);	// ensure that agents don't have to wait at an intersection
 		qSimConfig.setStorageCapFactor(100.0);	// ensure that agents don't have to wait at an intersection
-		config.controler().setMobsim("qsim");
-		config.controler().setLastIteration(0);
-		config.controler().setRoutingAlgorithmType( ControlerConfigGroup.RoutingAlgorithmType.Dijkstra );
+		config.controller().setMobsim("qsim");
+		config.controller().setLastIteration(0);
+		config.controller().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
 
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new WithinDayModule());

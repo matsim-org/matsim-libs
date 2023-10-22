@@ -23,18 +23,16 @@ package org.matsim.contrib.pseudosimulation;
 
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
-import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
-import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
-import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
-import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculator;
+//import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
+//import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
+//import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
+//import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
+//import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculator;
 //import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformanceRecorder;
 import org.matsim.contrib.pseudosimulation.mobsim.PSimProvider;
 import org.matsim.contrib.pseudosimulation.mobsim.SwitchingMobsimProvider;
 import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
-import org.matsim.contrib.pseudosimulation.trafficinfo.PSimStopStopTimeCalculator;
 import org.matsim.contrib.pseudosimulation.trafficinfo.PSimTravelTimeCalculator;
-import org.matsim.contrib.pseudosimulation.trafficinfo.PSimWaitTimeCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -43,7 +41,6 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.qsim.QSimProvider;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.router.TransitRouter;
 
 /**
  * @author pieterfourie
@@ -61,8 +58,8 @@ public class RunPSim {
 		//The following line will make the controler use the events manager that doesn't check for event order.
 		//This is essential for pseudo-simulation as the PSim module generates events on a person-basis,
 		//not a system basis
-		config.parallelEventHandling().setSynchronizeOnSimSteps(false);
-		config.parallelEventHandling().setNumberOfThreads(1);
+		config.eventsManager().setSynchronizeOnSimSteps(false);
+		config.eventsManager().setNumberOfThreads(1);
 
 		this.matsimControler = new Controler(scenario);
 
@@ -74,10 +71,10 @@ public class RunPSim {
 			public void install() {
 				bind(MobSimSwitcher.class).toInstance(mobSimSwitcher);
 				bindMobsim().toProvider(SwitchingMobsimProvider.class);
-				bind(WaitTimeCalculator.class).to(PSimWaitTimeCalculator.class);
-				bind(WaitTime.class).toProvider(PSimWaitTimeCalculator.class);
-				bind(StopStopTimeCalculator.class).to(PSimStopStopTimeCalculator.class);
-				bind(StopStopTime.class).toProvider(PSimStopStopTimeCalculator.class);
+//				bind(WaitTimeCalculator.class).to(PSimWaitTimeCalculator.class);
+//				bind(WaitTime.class).toProvider(PSimWaitTimeCalculator.class);
+//				bind(StopStopTimeCalculator.class).to(PSimStopStopTimeCalculator.class);
+//				bind(StopStopTime.class).toProvider(PSimStopStopTimeCalculator.class);
 
 //				bind(TravelTimeCalculator.class).to(PSimTravelTimeCalculator.class);
 				// I made TravelTimeCalculator final, so PSimTravelTimeCalculator can no longer inherit from it.  The following statement binds PSimTravelTimeCalculator
@@ -85,7 +82,7 @@ public class RunPSim {
 
 				bind(PSimTravelTimeCalculator.class).in( Singleton.class ) ;
 				bind(TravelTime.class).toProvider(PSimTravelTimeCalculator.class);
-				bind(TransitRouter.class).toProvider(TransitRouterEventsWSFactory.class);
+//				bind(TransitRouter.class).toProvider(TransitRouterEventsWSFactory.class);
 				bind(PlanCatcher.class).toInstance(new PlanCatcher());
 				bind(PSimProvider.class).toInstance(new PSimProvider(scenario,matsimControler.getEvents()));
 				bind(QSimProvider.class);
@@ -104,7 +101,7 @@ public class RunPSim {
 
 	public static void main(String args[]) {
 		Config config = ConfigUtils.loadConfig(args[0]);
-		config.controler().setCreateGraphs(false);
+		config.controller().setCreateGraphs(false);
 
 		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
 		config.addModule(pSimConfigGroup);

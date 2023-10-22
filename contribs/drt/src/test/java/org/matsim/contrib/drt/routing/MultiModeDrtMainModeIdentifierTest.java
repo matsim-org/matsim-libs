@@ -14,7 +14,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
 
@@ -43,7 +43,7 @@ public class MultiModeDrtMainModeIdentifierTest {
 			Assert.assertEquals(drtMode, mmi.identifyMainMode(testElements));
 		}
 		{
-			String drtStageActivityType = PlanCalcScoreConfigGroup.createStageActivityType(drtMode);
+			String drtStageActivityType = ScoringConfigGroup.createStageActivityType(drtMode);
 			List<PlanElement> testElements = new ArrayList<>();
 
 			// #deleteBeforeRelease : only used to retrofit plans created since the merge of fallback routing module (sep'-dec'19)

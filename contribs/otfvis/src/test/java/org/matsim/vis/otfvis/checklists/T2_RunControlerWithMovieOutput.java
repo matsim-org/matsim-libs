@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * 
+ *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -31,10 +31,10 @@ public class T2_RunControlerWithMovieOutput {
 
 	public static void main(String[] args) {
 		Controler con = new Controler("test/scenarios/equil/config-qsim.xml");
-		con.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		con.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		con.addOverridingModule(new OTFVisFileWriterModule());
 		con.run();
-		System.out.println("\n QSim is done. Output:" + con.getConfig().controler().getOutputDirectory());
+		System.out.println("\n QSim is done. Output:" + con.getConfig().controller().getOutputDirectory());
 	}
 
 }

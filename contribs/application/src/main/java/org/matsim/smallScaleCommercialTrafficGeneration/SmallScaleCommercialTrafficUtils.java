@@ -40,19 +40,20 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.application.options.ShpOptions.Index;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.carrier.Tour.Pickup;
-import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
-import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.controler.FreightUtils;
-import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.Tour.Pickup;
+import org.matsim.freight.carriers.Tour.ServiceActivity;
+import org.matsim.freight.carriers.Tour.TourElement;
+import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -170,7 +171,7 @@ public class SmallScaleCommercialTrafficUtils {
 			writer.close();
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("Could not write the csv file with the data distribution data.", e);
 		}
 	}
 
@@ -187,11 +188,13 @@ public class SmallScaleCommercialTrafficUtils {
 		Map<String, AtomicLong> idCounter = new HashMap<>();
 
 		Population populationFromCarrier = (Population) scenario.getScenarioElement("allpersons");
+		Vehicles allVehicles = VehicleUtils.getOrCreateAllvehicles(scenario);
+
 		for (Person person : populationFromCarrier.getPersons().values()) {
 
 			Plan plan = popFactory.createPlan();
 			String carrierName = person.getId().toString().split("freight_")[1].split("_veh_")[0];
-			Carrier relatedCarrier = FreightUtils.addOrGetCarriers(scenario).getCarriers()
+			Carrier relatedCarrier = CarriersUtils.addOrGetCarriers(scenario).getCarriers()
 				.get(Id.create(carrierName, Carrier.class));
 			String subpopulation = relatedCarrier.getAttributes().getAttribute("subpopulation").toString();
 			final String mode;
@@ -239,11 +242,12 @@ public class SmallScaleCommercialTrafficUtils {
 			if (relatedCarrier.getAttributes().getAsMap().containsKey("tourStartArea"))
 				newPerson.getAttributes().putAttribute("tourStartArea",
 					relatedCarrier.getAttributes().getAttribute("tourStartArea"));
-			VehicleUtils.insertVehicleIdsIntoAttributes(newPerson, (new HashMap<>() {
-				{
-					put(mode, (Id.createVehicleId(person.getId().toString())));
-				}
-			}));
+
+			Id<Vehicle> vehicleId = Id.createVehicleId(person.getId().toString());
+
+			VehicleUtils.insertVehicleIdsIntoAttributes(newPerson, Map.of(mode, vehicleId));
+			VehicleUtils.insertVehicleTypesIntoAttributes(newPerson, Map.of(mode, allVehicles.getVehicles().get(vehicleId).getType().getId()));
+
 			population.addPerson(newPerson);
 		}
 
@@ -460,10 +464,10 @@ public class SmallScaleCommercialTrafficUtils {
 				}
 			}
 			carrierToRemove.forEach(carrier -> carriers.getCarriers().remove(carrier.getId()));
-			FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().putAll(usedVehicleTypes.getVehicleTypes());
+			CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().putAll(usedVehicleTypes.getVehicleTypes());
 
 			carriers.getCarriers().values().forEach(carrier -> {
-				Carrier newCarrier = CarrierUtils
+				Carrier newCarrier = CarriersUtils
 					.createCarrier(Id.create(modelName + "_" + carrier.getId().toString(), Carrier.class));
 				newCarrier.getAttributes().putAttribute("subpopulation", modelTrafficType);
 				if (modelPurpose != null)
@@ -490,7 +494,7 @@ public class SmallScaleCommercialTrafficUtils {
 					newCarrier.getAttributes().putAttribute("tourStartArea",
 						String.join(";", startAreas));
 
-					CarrierUtils.setJspritIterations(newCarrier, 0);
+					CarriersUtils.setJspritIterations(newCarrier, 0);
 					// recalculate score for selectedPlan
 					VehicleRoutingProblem vrp = MatsimJspritFactory
 						.createRoutingProblemBuilder(carrier, scenario.getNetwork()).build();
@@ -500,10 +504,10 @@ public class SmallScaleCommercialTrafficUtils {
 					double costs = solutionCostsCalculator.getCosts(solution) * (-1);
 					carrier.getSelectedPlan().setScore(costs);
 				} else {
-					CarrierUtils.setJspritIterations(newCarrier, CarrierUtils.getJspritIterations(carrier));
+					CarriersUtils.setJspritIterations(newCarrier, CarriersUtils.getJspritIterations(carrier));
 					newCarrier.getCarrierCapabilities().setFleetSize(carrier.getCarrierCapabilities().getFleetSize());
 				}
-				FreightUtils.addOrGetCarriers(scenario).getCarriers().put(newCarrier.getId(), newCarrier);
+				CarriersUtils.addOrGetCarriers(scenario).getCarriers().put(newCarrier.getId(), newCarrier);
 			});
 		}
 	}

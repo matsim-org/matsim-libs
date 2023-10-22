@@ -167,7 +167,7 @@ public final class InformedModeChoiceModule extends AbstractModule {
 		/**
 		 * Adds a {@link LegEstimator} to one or more modes.
 		 */
-		public <T extends Enum<?>> Builder withLegEstimator(Class<? extends LegEstimator<T>> estimator, Class<? extends ModeOptions<T>> option,
+		public <T extends Enum<T>> Builder withLegEstimator(Class<? extends LegEstimator<T>> estimator, Class<? extends ModeOptions<T>> option,
 		                                                    String... modes) {
 
 			for (String mode : modes) {

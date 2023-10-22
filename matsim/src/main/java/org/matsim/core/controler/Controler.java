@@ -194,7 +194,7 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 			//scenario  = ScenarioUtils.createScenario(this.config);
 			//ScenarioUtils.loadScenario(scenario) ;
 		}
-		this.config.parallelEventHandling().makeLocked();
+		this.config.eventsManager().makeLocked();
 		this.scenario = scenario;
 		this.overrides = scenario == null ?
 						 new ScenarioByConfigModule() :

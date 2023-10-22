@@ -1,5 +1,6 @@
 package org.matsim.contrib.shared_mobility;
 
+import java.io.UncheckedIOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -26,13 +27,12 @@ import org.matsim.core.config.CommandLine.ConfigurationException;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.examples.ExamplesUtils;
 
 public class RunIT {
@@ -43,9 +43,9 @@ public class RunIT {
 
 
 		Config config = ConfigUtils.loadConfig(ConfigGroup.getInputFileURL(scenarioUrl, "config_default.xml"));
-		config.controler().setLastIteration(2);
+		config.controller().setLastIteration(2);
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		// We need to add the sharing config group
 		SharingConfigGroup sharingConfig = new SharingConfigGroup();
 		config.addModule(sharingConfig);
@@ -126,23 +126,23 @@ public class RunIT {
 		// We need to add interaction activity types to scoring
 		ActivityParams pickupParams = new ActivityParams(SharingUtils.PICKUP_ACTIVITY);
 		pickupParams.setScoringThisActivityAtAll(false);
-		config.planCalcScore().addActivityParams(pickupParams);
+		config.scoring().addActivityParams(pickupParams);
 
 		ActivityParams dropoffParams = new ActivityParams(SharingUtils.DROPOFF_ACTIVITY);
 		dropoffParams.setScoringThisActivityAtAll(false);
-		config.planCalcScore().addActivityParams(dropoffParams);
+		config.scoring().addActivityParams(dropoffParams);
 
 		ActivityParams bookingParams = new ActivityParams(SharingUtils.BOOKING_ACTIVITY);
 		bookingParams.setScoringThisActivityAtAll(false);
-		config.planCalcScore().addActivityParams(bookingParams);
+		config.scoring().addActivityParams(bookingParams);
 
 		// We need to score car
 		ModeParams carScoringParams = new ModeParams("car");
-		config.planCalcScore().addModeParams(carScoringParams);
+		config.scoring().addModeParams(carScoringParams);
 
 		// We need to score bike
 		ModeParams bikeScoringParams = new ModeParams("bike");
-		config.planCalcScore().addModeParams(bikeScoringParams);
+		config.scoring().addModeParams(bikeScoringParams);
 
 		// Set up controller (no specific settings needed for scenario)
 		Controler controller = new Controler(config);
@@ -157,18 +157,18 @@ public class RunIT {
 
 		OutputData data = countLegs(controller.getControlerIO().getOutputPath() + "/output_events.xml.gz");
 
-		Assert.assertEquals(82689, (long) data.counts.get("car"));
-		Assert.assertEquals(29890, (long) data.counts.get("walk"));
-		Assert.assertEquals(30, (long) data.counts.get("bike"));
-		Assert.assertEquals(19115, (long) data.counts.get("pt"));
+		Assert.assertEquals(82629, (long) data.counts.get("car"));
+		Assert.assertEquals(29739, (long) data.counts.get("walk"));
+		Assert.assertEquals(31, (long) data.counts.get("bike"));
+		Assert.assertEquals(19029, (long) data.counts.get("pt"));
 
 		Assert.assertEquals(21, (long) data.pickupCounts.get("wheels"));
 		Assert.assertEquals(2, (long) data.pickupCounts.get("mobility"));
-		Assert.assertEquals(9, (long) data.pickupCounts.get("velib"));
+		Assert.assertEquals(10, (long) data.pickupCounts.get("velib"));
 
 		Assert.assertEquals(21, (long) data.dropoffCounts.get("wheels"));
 		Assert.assertEquals(0, (long) data.dropoffCounts.getOrDefault("mobility", 0L));
-		Assert.assertEquals(9, (long) data.dropoffCounts.get("velib"));
+		Assert.assertEquals(10, (long) data.dropoffCounts.get("velib"));
 
 		Assert.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("wheels",0L));
 		Assert.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("mobility",0L));

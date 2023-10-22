@@ -22,7 +22,6 @@
  package org.matsim.core.controler;
 
 
-import com.google.inject.Provider;
 import org.junit.Assert;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -31,7 +30,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
-import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -45,8 +43,8 @@ public class OverrideCarTraveltimeTest {
 
     public static void main(String[] args) {
         final Config config = ConfigUtils.createConfig();
-        config.controler().setLastIteration(1);
-        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+        config.controller().setLastIteration(1);
+        config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         Controler controler = new Controler(ScenarioUtils.createScenario(config));
         controler.addOverridingModule(new AbstractModule() {
             @Override

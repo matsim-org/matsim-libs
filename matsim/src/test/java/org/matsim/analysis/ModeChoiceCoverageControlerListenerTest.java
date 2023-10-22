@@ -8,9 +8,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -38,17 +38,17 @@ public class ModeChoiceCoverageControlerListenerTest {
     public void testChangePlanModes() {
 
         Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
-        PlanCalcScoreConfigGroup scoreConfig = new PlanCalcScoreConfigGroup();
+        ScoringConfigGroup scoreConfig = new ScoringConfigGroup();
         TransportPlanningMainModeIdentifier transportId = new TransportPlanningMainModeIdentifier();
 
-        ControlerConfigGroup controlerConfigGroup = new ControlerConfigGroup();
+        ControllerConfigGroup controllerConfigGroup = new ControllerConfigGroup();
         OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(utils.getOutputDirectory() + "/ModeChoiceCoverageControlerListener",
                 OverwriteFileSetting.overwriteExistingFiles, CompressionType.gzip);
 
         Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
         population.addPerson(person);
 
-        ModeChoiceCoverageControlerListener modeCC = new ModeChoiceCoverageControlerListener(controlerConfigGroup, population, controlerIO, scoreConfig, transportId);
+        ModeChoiceCoverageControlerListener modeCC = new ModeChoiceCoverageControlerListener(controllerConfigGroup, population, controlerIO, scoreConfig, transportId);
         modeCC.notifyStartup(new StartupEvent(null));
 
         // Iteration 0: walk - walk
@@ -95,10 +95,10 @@ public class ModeChoiceCoverageControlerListenerTest {
     @Test
     public void testTwoAgents() {
         Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
-        PlanCalcScoreConfigGroup scoreConfig = new PlanCalcScoreConfigGroup();
+        ScoringConfigGroup scoreConfig = new ScoringConfigGroup();
         TransportPlanningMainModeIdentifier transportId = new TransportPlanningMainModeIdentifier();
 
-        ControlerConfigGroup controlerConfigGroup = new ControlerConfigGroup();
+        ControllerConfigGroup controllerConfigGroup = new ControllerConfigGroup();
         OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(utils.getOutputDirectory() + "/ModeChoiceCoverageControlerListener",
                 OverwriteFileSetting.overwriteExistingFiles, CompressionType.gzip);
 
@@ -108,7 +108,7 @@ public class ModeChoiceCoverageControlerListenerTest {
         population.addPerson(person2);
 
 
-        ModeChoiceCoverageControlerListener modeCC = new ModeChoiceCoverageControlerListener(controlerConfigGroup, population, controlerIO, scoreConfig, transportId);
+        ModeChoiceCoverageControlerListener modeCC = new ModeChoiceCoverageControlerListener(controllerConfigGroup, population, controlerIO, scoreConfig, transportId);
         modeCC.notifyStartup(new StartupEvent(null));
 
         // Iteration 0: walk - walk
@@ -166,17 +166,17 @@ public class ModeChoiceCoverageControlerListenerTest {
     public void testDifferentLevels() {
 
         Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
-        PlanCalcScoreConfigGroup scoreConfig = new PlanCalcScoreConfigGroup();
+        ScoringConfigGroup scoreConfig = new ScoringConfigGroup();
         TransportPlanningMainModeIdentifier transportId = new TransportPlanningMainModeIdentifier();
 
-        ControlerConfigGroup controlerConfigGroup = new ControlerConfigGroup();
+        ControllerConfigGroup controllerConfigGroup = new ControllerConfigGroup();
         OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(utils.getOutputDirectory() + "/ModeChoiceCoverageControlerListener",
                 OverwriteFileSetting.overwriteExistingFiles, CompressionType.gzip);
 
         Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
         population.addPerson(person);
 
-        ModeChoiceCoverageControlerListener modeCC = new ModeChoiceCoverageControlerListener(controlerConfigGroup, population, controlerIO, scoreConfig, transportId);
+        ModeChoiceCoverageControlerListener modeCC = new ModeChoiceCoverageControlerListener(controllerConfigGroup, population, controlerIO, scoreConfig, transportId);
         modeCC.notifyStartup(new StartupEvent(null));
 
         // After 1 iteration

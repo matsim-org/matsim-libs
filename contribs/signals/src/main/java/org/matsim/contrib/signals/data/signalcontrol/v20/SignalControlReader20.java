@@ -19,7 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data.signalcontrol.v20;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 
 import javax.xml.XMLConstants;
 import jakarta.xml.bind.JAXBContext;
@@ -34,7 +36,6 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerD
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.signalcontrol20.XMLSignalControl;
 import org.matsim.jaxb.signalcontrol20.XMLSignalGroupSettingsType;
 import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType;
@@ -63,7 +64,7 @@ public final class SignalControlReader20 extends AbstractSignalsReader{
 			u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/signalControl_v2.0.xsd")));
 			return (XMLSignalControl) u.unmarshal(stream);
 		} catch (JAXBException | SAXException e) {
-			throw new UncheckedIOException(e);
+			throw new UncheckedIOException(new IOException(e));
 		}
 	}
 

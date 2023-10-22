@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.noise;
 
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -35,9 +35,9 @@ import com.google.inject.Inject;
 public final class NoiseTollTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
 
 	private TravelDisutilityFactory travelDisutilityFactoryDelegate;
-	
+
 	@Inject private NoiseContext noiseContext;
-	@Inject private PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
+	@Inject private RoutingConfigGroup routingConfigGroup;
 
 	public NoiseTollTimeDistanceTravelDisutilityFactory( TravelDisutilityFactory travelDisutilityFactoryDelegate ) {
 		this.travelDisutilityFactoryDelegate = travelDisutilityFactoryDelegate;
@@ -48,12 +48,12 @@ public final class NoiseTollTimeDistanceTravelDisutilityFactory implements Trave
 
 		if ( travelDisutilityFactoryDelegate instanceof RandomizingTimeDistanceTravelDisutilityFactory ){
                 }
-		
+
 		return new NoiseTollTimeDistanceTravelDisutility(
 				travelDisutilityFactoryDelegate.createTravelDisutility(timeCalculator ),
-				new NoiseTollCalculator(noiseContext), this.noiseContext.getScenario().getConfig().planCalcScore().getMarginalUtilityOfMoney(),
-				plansCalcRouteConfigGroup.getRoutingRandomness()!=0.
+				new NoiseTollCalculator(noiseContext), this.noiseContext.getScenario().getConfig().scoring().getMarginalUtilityOfMoney(),
+				routingConfigGroup.getRoutingRandomness()!=0.
 			);
 	}
-	
+
 }

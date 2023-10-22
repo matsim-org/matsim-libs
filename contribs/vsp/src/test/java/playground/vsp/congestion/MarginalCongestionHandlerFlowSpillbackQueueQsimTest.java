@@ -56,7 +56,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -317,7 +317,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 
 		Config config = ConfigUtils.loadConfig( configFile ) ;
 
-		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.none);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		Controler controler = new Controler( scenario );
@@ -326,7 +326,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 
 		final CongestionTollTimeDistanceTravelDisutilityFactory tollDisutilityCalculatorFactory = new CongestionTollTimeDistanceTravelDisutilityFactory(
 				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config),
-				tollHandler, controler.getConfig().planCalcScore());
+				tollHandler, controler.getConfig().scoring());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -402,14 +402,14 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 			@Override
 			public void notifyIterationStarts(IterationStartsEvent event) {
 				// last but one iteration
-				if(((event.getServices().getConfig().controler().getLastIteration())-(event.getIteration()))==1){
+				if(((event.getServices().getConfig().controller().getLastIteration())-(event.getIteration()))==1){
 					avgValue1 = tollHandler.getAvgToll(linkId2_, 28800);
 					avgValue2 = tollHandler.getAvgToll(linkId2_, 29700);
 					avgOldValue1 = tollHandler.getAvgTollOldValue(linkId2_, 28800);
 					avgOldValue2 = tollHandler.getAvgTollOldValue(linkId2_, 28800);
 				}
 				// last iteration
-				else if(((event.getServices().getConfig().controler().getLastIteration())-(event.getIteration()))==0){
+				else if(((event.getServices().getConfig().controller().getLastIteration())-(event.getIteration()))==0){
 					avgValue3 = tollHandler.getAvgToll(linkId2_, 28800);
 					avgValue4 = tollHandler.getAvgToll(linkId2_, 29700);
 					avgOldValue3 = tollHandler.getAvgTollOldValue(linkId2_, 28800);
@@ -419,7 +419,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 
 		});
 
-		controler.getConfig().controler().setOverwriteFileSetting(
+		controler.getConfig().controller().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		controler.run();
 

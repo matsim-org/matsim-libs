@@ -43,7 +43,7 @@ public class RunPreplannedDrtExample {
 			Map<String, PreplannedSchedules> preplannedSchedulesByMode) {
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
-		config.controler().setLastIteration(lastIteration);
+		config.controller().setLastIteration(lastIteration);
 
 		Controler controler = PreplannedDrtControlerCreator.createControler(config, otfvis);
 

@@ -43,13 +43,13 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.Vehicle;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -100,7 +100,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
-	// general trip counter.  Would, in theory, not necessary to do this per StatType, but I find it too brittle 
+	// general trip counter.  Would, in theory, not necessary to do this per StatType, but I find it too brittle
 	// to avoid under- or over-counting with respect to loops.
 	//	private final Map<StatType,Integer> legCount = new TreeMap<StatType,Integer>() ;
 

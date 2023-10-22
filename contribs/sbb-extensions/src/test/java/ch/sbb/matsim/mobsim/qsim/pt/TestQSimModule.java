@@ -1,13 +1,31 @@
-/*
- * Copyright (C) Schweizerische Bundesbahnen SBB, 2018.
- */
-
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package ch.sbb.matsim.mobsim.qsim.pt;
 
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import org.matsim.core.config.Config;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
-import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.pt.*;
 import org.matsim.core.replanning.ReplanningContext;
 
 /**
@@ -29,7 +47,14 @@ public class TestQSimModule extends AbstractQSimModule {
     protected void configureQSim() {
         bind(ReplanningContext.class).toInstance(context);
         bind(TransitStopHandlerFactory.class).to(ComplexTransitStopHandlerFactory.class);
+		bind(TransitDriverAgentFactory.class).to(DefaultTransitDriverAgentFactory.class);
     }
+
+	@Provides
+	@Singleton
+	public TransitStopAgentTracker transitStopAgentTracker(QSim qSim) {
+		return new TransitStopAgentTracker(qSim.getEventsManager());
+	}
 
     public static final class DummyReplanningContext implements ReplanningContext {
 

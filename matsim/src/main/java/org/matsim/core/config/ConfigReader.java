@@ -20,17 +20,13 @@
 
 package org.matsim.core.config;
 
-import java.io.File;
-import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.util.Stack;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
 
 /**
  * A reader for config-files of MATSim. This reader recognizes the format of the config-file and uses
@@ -45,6 +41,7 @@ public final class ConfigReader extends MatsimXmlParser {
 	private final static String CONFIG_V1 = "config_v1.dtd";
 	private final static String CONFIG_V2 = "config_v2.dtd";
 
+	private final ConfigAliases aliases = new ConfigAliases();
 	private final Config config;
 	private MatsimXmlParser delegate = null;
 
@@ -62,6 +59,10 @@ public final class ConfigReader extends MatsimXmlParser {
 	public ConfigReader(final Config config) {
 		super(ValidationType.DTD_ONLY);
 		this.config = config;
+	}
+
+	public ConfigAliases getConfigAliases() {
+		return this.aliases;
 	}
 
 	@Override

@@ -19,21 +19,7 @@
 
 package org.matsim.contrib.drt.analysis;
 
-import static java.util.stream.Collectors.toList;
-
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.logging.log4j.LogManager;
@@ -60,12 +46,13 @@ import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.EventSequence;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
-import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileCalculator;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
@@ -77,7 +64,20 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.common.base.Preconditions;
+import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author jbischoff
@@ -110,7 +110,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		this.vehicleOccupancyProfileCalculator = vehicleOccupancyProfileCalculator;
 		this.drtCfg = drtCfg;
 		this.qSimCfg = config.qsim();
-		runId = Optional.ofNullable(config.controler().getRunId()).orElse(notAvailableString);
+		runId = Optional.ofNullable(config.controller().getRunId()).orElse(notAvailableString);
 		maxcap = findMaxVehicleCapacity(fleet);
 
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -153,7 +153,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		boolean createGraphs = event.getServices().getConfig().controler().isCreateGraphs();
+		boolean createGraphs = event.getServices().getConfig().controller().isCreateGraphs();
 
 		writeAndPlotWaitTimeEstimateComparison(drtEventSequenceCollector.getPerformedRequestSequences().values(),
 				filename(event, "waitTimeComparison", ".png"), filename(event, "waitTimeComparison", ".csv"), createGraphs);
@@ -166,11 +166,12 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 				.sorted(Comparator.comparing(leg -> leg.departureTime))
 				.collect(toList());
 
-		List<EventSequence> rejectionEvents = drtEventSequenceCollector.getRejectedRequestSequences()
-				.values()
-				.stream()
-				.sorted(Comparator.comparing(rejectionEvent -> rejectionEvent.getRejected().get().getTime()))
-				.collect(Collectors.toList());
+		List<PassengerRequestRejectedEvent> rejectionEvents = drtEventSequenceCollector.getRejectedRequestSequences()
+			.values()
+			.stream()
+			.map(eventSequence -> eventSequence.getRejected().get())
+			.sorted(Comparator.comparing(rejectionEvent -> rejectionEvent.getTime()))
+			.collect(toList());
 
 		collection2Text(drtEventSequenceCollector.getRejectedRequestSequences().values(), filename(event, "drt_rejections", ".csv"),
 				String.join(delimiter, "time", "personId", "fromLinkId", "toLinkId", "fromX", "fromY", "toX", "toY"), seq -> {
@@ -451,25 +452,26 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		return splitLegs;
 	}
 
-	private static Map<Double, List<EventSequence>> splitEventsIntoBins(Collection<EventSequence> rejectionEvents, int startTime, int endTime, int binSize_s) {
-		Map<Double, List<EventSequence>> rejections = new TreeMap<>();
+	private static Map<Double, List<PassengerRequestRejectedEvent>> splitEventsIntoBins(List<PassengerRequestRejectedEvent> rejectionEvents, int binSize_s) {
+		Map<Double, List<PassengerRequestRejectedEvent>> rejections = new TreeMap<>();
+
+		int startTime = ((int)(rejectionEvents.get(0).getTime() / binSize_s)) * binSize_s;
+		int endTime = ((int)(rejectionEvents.get(rejectionEvents.size() - 1).getTime() / binSize_s) + 1) * binSize_s;
 
 		for (int time = startTime; time < endTime; time = time + binSize_s) {
 
 			// rejection list in this timebin
-			List<EventSequence> rejectionList = new ArrayList<>();
+			List<PassengerRequestRejectedEvent> rejectionList = new ArrayList<>();
 
 			//Iterate through each rejection
-			for (EventSequence seq : rejectionEvents){
-				if (seq.getRejected().isPresent()) {
-					double rejectionTime = seq.getRejected().get().getTime();
-					if (rejectionTime > endTime || rejectionTime < startTime) {
-						LogManager.getLogger(DrtAnalysisControlerListener.class).error("wrong end / start Times for analysis");
-					}
+			for (PassengerRequestRejectedEvent rejectedEvent : rejectionEvents){
+				double rejectionTime = rejectedEvent.getTime();
+				if (rejectionTime > endTime || rejectionTime < startTime) {
+					LogManager.getLogger(DrtAnalysisControlerListener.class).error("wrong end / start Times for analysis");
+				}
 
-					if (rejectionTime > time && rejectionTime < time + binSize_s) {
-						rejectionList.add(seq);
-					}
+				if (rejectionTime > time && rejectionTime < time + binSize_s) {
+					rejectionList.add(rejectedEvent);
 				}
 			}
 			rejections.put((double)time, rejectionList);
@@ -711,7 +713,6 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 						format.format(max) + ""));
 
 			}
-
 			bw.flush();
 			bw.close();
 			if (createGraphs) {
@@ -733,12 +734,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 
 	}
 
-	private static void analyseRejections(String fileName, List<EventSequence> rejectionEvents, int binsize_s, boolean createGraphs, String delimiter) {
+	private static void analyseRejections(String fileName, List<PassengerRequestRejectedEvent> rejectionEvents, int binsize_s, boolean createGraphs, String delimiter) {
 		if (rejectionEvents.size() == 0)
 			return;
-		int startTime = ((int)(rejectionEvents.get(0).getSubmitted().getTime() / binsize_s)) * binsize_s;
-		int endTime = ((int)(rejectionEvents.get(rejectionEvents.size() - 1).getSubmitted().getTime() / binsize_s) + 1) * binsize_s;
-		Map<Double, List<EventSequence>> splitEvents = splitEventsIntoBins(rejectionEvents,startTime, endTime, binsize_s);
+
+		Map<Double, List<PassengerRequestRejectedEvent>> splitEvents = splitEventsIntoBins(rejectionEvents, binsize_s);
 
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -755,7 +755,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		try {
 			bw.write(String.join(delimiter, "timebin", "rejections"));
 
-			for(Map.Entry<Double, List<EventSequence>> e : splitEvents.entrySet()){
+			for(Map.Entry<Double, List<PassengerRequestRejectedEvent>> e : splitEvents.entrySet()){
 				int drt_numOfRejection = 0;
 				if (!e.getValue().isEmpty()) {
 					drt_numOfRejection = e.getValue().size();
@@ -766,7 +766,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 				rejections.addOrUpdate(h, Double.valueOf(drt_numOfRejection));
 				bw.newLine();
 				bw.write(String.join(delimiter, Time.writeTime(e.getKey()) + "",//
-						 format.format(drt_numOfRejection) +""));
+					format.format(drt_numOfRejection) +""));
 			}
 
 			bw.flush();

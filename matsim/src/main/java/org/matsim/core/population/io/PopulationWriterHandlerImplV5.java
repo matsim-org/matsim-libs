@@ -99,12 +99,12 @@ import org.matsim.core.utils.misc.Time;
 		}
 		PopulationWriterHandlerImplV5.endPerson(out);
 		this.writeSeparator(out);
-		out.flush();
 	}
 
 	@Override
 	public void endPlans(final BufferedWriter out) throws IOException {
 		out.write("</population>\n");
+		out.flush();
 	}
 
 	private static void startPerson(final Person person, final BufferedWriter out) throws IOException {

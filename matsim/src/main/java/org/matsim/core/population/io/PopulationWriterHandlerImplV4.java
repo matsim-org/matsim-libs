@@ -82,6 +82,7 @@ import org.matsim.core.utils.misc.Time;
 	@Override
 	public void endPlans(final BufferedWriter out) throws IOException {
 		out.write("</plans>\n");
+		out.flush();
 	}
 
 	//////////////////////////////////////////////////////////////////////

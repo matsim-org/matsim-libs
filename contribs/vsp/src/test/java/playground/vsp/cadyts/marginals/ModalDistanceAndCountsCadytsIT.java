@@ -82,51 +82,51 @@ public class ModalDistanceAndCountsCadytsIT {
 		Config config = ConfigUtils.createConfig();
 		String[] modes = new String[]{TransportMode.car, TransportMode.bike};
 
-		config.controler().setOutputDirectory(this.utils.getOutputDirectory());
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(40);
+		config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(40);
 
 		config.counts().setWriteCountsInterval(1);
 		config.counts().setAverageCountsOverIterations(1);
 
-		PlanCalcScoreConfigGroup.ActivityParams home = new PlanCalcScoreConfigGroup.ActivityParams("home");
+		ScoringConfigGroup.ActivityParams home = new ScoringConfigGroup.ActivityParams("home");
 		home.setMinimalDuration(3600);
 		home.setTypicalDuration(3600);
 		home.setEarliestEndTime(0);
-		config.planCalcScore().addActivityParams(home);
+		config.scoring().addActivityParams(home);
 
-		PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams("work");
+		ScoringConfigGroup.ActivityParams work = new ScoringConfigGroup.ActivityParams("work");
 		work.setMinimalDuration(3600);
 		work.setTypicalDuration(3600);
 		work.setEarliestEndTime(0);
 		work.setOpeningTime(3600);
 		work.setClosingTime(10 * 3600);
-		config.planCalcScore().addActivityParams(work);
+		config.scoring().addActivityParams(work);
 
 		// have random selection of plans to generate heterogenity in the beginning, so that cadyts can calibrate its correction
-		StrategyConfigGroup.StrategySettings selectRandom = new StrategyConfigGroup.StrategySettings();
+		ReplanningConfigGroup.StrategySettings selectRandom = new ReplanningConfigGroup.StrategySettings();
 		selectRandom.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.SelectRandom);
 		selectRandom.setDisableAfter(33);
 		selectRandom.setWeight(0.5);
-		config.strategy().addStrategySettings(selectRandom);
+		config.replanning().addStrategySettings(selectRandom);
 
 		// have change exp beta, so that mode distribution converges at the end of the simulation
-		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
+		ReplanningConfigGroup.StrategySettings changeExpBeta = new ReplanningConfigGroup.StrategySettings();
 		changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
 		changeExpBeta.setDisableAfter(38);
 		changeExpBeta.setWeight(0.5);
-		config.strategy().addStrategySettings(changeExpBeta);
+		config.replanning().addStrategySettings(changeExpBeta);
 
 		// at the end of the scenario pick the plans with the best score
-		StrategyConfigGroup.StrategySettings bestScore = new StrategyConfigGroup.StrategySettings();
+		ReplanningConfigGroup.StrategySettings bestScore = new ReplanningConfigGroup.StrategySettings();
 		bestScore.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.BestScore);
 		bestScore.setWeight(0.1);
-		config.strategy().addStrategySettings(bestScore);
+		config.replanning().addStrategySettings(bestScore);
 
 		// remove teleported bike
-		config.plansCalcRoute().removeModeRoutingParams(TransportMode.bike);
-		config.plansCalcRoute().setNetworkModes(Arrays.asList(modes));
-		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
+		config.routing().removeModeRoutingParams(TransportMode.bike);
+		config.routing().setNetworkModes(Arrays.asList(modes));
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setMainModes(Arrays.asList(modes));
 		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);

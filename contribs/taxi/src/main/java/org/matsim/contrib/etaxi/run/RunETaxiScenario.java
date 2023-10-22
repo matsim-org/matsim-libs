@@ -58,7 +58,7 @@ public class RunETaxiScenario {
 				new MultiModeTaxiConfigGroup(ETaxiConfigGroups::createWithCustomETaxiOptimizerParams),
 				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup());
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		createControler(config, otfvis).run();
 	}
 

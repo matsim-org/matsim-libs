@@ -22,9 +22,8 @@ package org.matsim.core.config;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Map;
-
-import org.matsim.core.utils.io.UncheckedIOException;
 
 /*package*/ class ConfigWriterHandlerImplV1 extends ConfigWriterHandler {
 
@@ -75,9 +74,9 @@ import org.matsim.core.utils.io.UncheckedIOException;
 			out.write("\t<module");
 			out.write(" name=\"" + module.getName() + "\" >");
 			out.write(this.newline);
-			
+
 			boolean lastHadComment = false;
-			
+
 			for (Map.Entry<String, String> entry : params.entrySet()) {
 				if (comments.get(entry.getKey()) != null) {
 					out.write(this.newline);

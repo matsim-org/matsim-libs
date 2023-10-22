@@ -19,8 +19,8 @@ public class SlaveScoreStats implements ScoreStats {
     int firstIter;
 
     public SlaveScoreStats(Config config) {
-        firstIter = config.controler().getFirstIteration();
-        int size = config.controler().getLastIteration() - firstIter+1;
+        firstIter = config.controller().getFirstIteration();
+        int size = config.controller().getLastIteration() - firstIter+1;
         this.history = new double[4][size];
     }
 
@@ -41,6 +41,6 @@ public class SlaveScoreStats implements ScoreStats {
 public Map<ScoreItem, Map<Integer, Double>> getScoreHistory() {
 	throw new RuntimeException("not implemented") ;
 }
-    
-    
+
+
 }

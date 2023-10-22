@@ -11,8 +11,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
@@ -24,7 +23,7 @@ class FallbackRoutingModuleDefaultImpl implements  FallbackRoutingModule {
 	@Deprecated // #deleteBeforeRelease : only used to retrofit plans created since the merge of fallback routing module (sep'-dec'19)
 	public static final String _fallback = "_fallback";
 
-	@Inject private PlansCalcRouteConfigGroup pcrCfg;
+	@Inject private RoutingConfigGroup pcrCfg;
 	@Inject private Config config ;
 	@Inject private Population population ;
 	@Inject private Network network ;
@@ -34,7 +33,7 @@ class FallbackRoutingModuleDefaultImpl implements  FallbackRoutingModule {
 		final Facility toFacility = request.getToFacility();
 		final double departureTime = request.getDepartureTime();
 		final Person person = request.getPerson();
-		
+
 		Leg leg = population.getFactory().createLeg( TransportMode.walk ) ;
 		Coord fromCoord = FacilitiesUtils.decideOnCoord( fromFacility, network, config );
 		Coord toCoord = FacilitiesUtils.decideOnCoord( toFacility, network, config ) ;
@@ -45,7 +44,7 @@ class FallbackRoutingModuleDefaultImpl implements  FallbackRoutingModule {
 		 * would be better if we would try the walkRouter first and fall back to "UltimateFallbackRoutingModule" or a
 		 * handwritten teleported walk like below only if the walkRouter returns null. - gl/kn-dec'19
 		 */
-		NetworkRoutingInclAccessEgressModule.routeBushwhackingLeg( person, leg, fromCoord, toCoord, departureTime, dpLinkId, arLinkId, population.getFactory(), 
+		NetworkRoutingInclAccessEgressModule.routeBushwhackingLeg( person, leg, fromCoord, toCoord, departureTime, dpLinkId, arLinkId, population.getFactory(),
 				pcrCfg.getModeRoutingParams().get(TransportMode.walk) ) ;
 		return Collections.singletonList( leg ) ;
 	}

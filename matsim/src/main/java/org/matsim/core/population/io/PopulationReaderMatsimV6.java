@@ -396,9 +396,9 @@ import com.google.inject.Inject;
 				Coord toCoord = getCoord(this.curract);
 				if (fromCoord != null && toCoord != null) {
 					double dist = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
-					if ( this.scenario.getConfig().plansCalcRoute().
+					if ( this.scenario.getConfig().routing().
 							getModeRoutingParams().containsKey(  this.currleg.getMode()  ) ) {
-						double estimatedNetworkDistance = dist * this.scenario.getConfig().plansCalcRoute().
+						double estimatedNetworkDistance = dist * this.scenario.getConfig().routing().
 								getModeRoutingParams().get( this.currleg.getMode() ).getBeelineDistanceFactor() ;
 						this.currRoute.setDistance(estimatedNetworkDistance);
 					}
@@ -507,9 +507,9 @@ import com.google.inject.Inject;
 				Coord toCoord = getCoord(this.curract);
 				if (fromCoord != null && toCoord != null) {
 					double dist = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
-					if ( this.scenario.getConfig().plansCalcRoute().
+					if ( this.scenario.getConfig().routing().
 							getModeRoutingParams().containsKey(  this.currleg.getMode()  ) ) {
-						double estimatedNetworkDistance = dist * this.scenario.getConfig().plansCalcRoute().
+						double estimatedNetworkDistance = dist * this.scenario.getConfig().routing().
 								getModeRoutingParams().get( this.currleg.getMode() ).getBeelineDistanceFactor() ;
 						this.currRoute.setDistance(estimatedNetworkDistance);
 					}
