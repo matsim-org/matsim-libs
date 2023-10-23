@@ -16,10 +16,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-class RebalancingShipmentsStrategyFactory {
+class RebalancingStrategyFactory {
 
 
-	RebalancingShipmentsStrategyFactory() {
+	RebalancingStrategyFactory() {
 	}
 
 	GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
