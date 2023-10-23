@@ -13,14 +13,20 @@ class PartOne{
 	private static final Logger log = LogManager.getLogger( PartOne.class ) ;
 
 	public static void main(String[] args){
+
+//		// traditional constructor injection:
+//		Helper helper = new MyHelper1();
+//		Simulation sim = new MySimulation1( helper );
+
+		// guice injection:
 		Injector injector = Guice.createInjector( new AbstractModule(){
 			@Override protected void configure(){
 				bind(Simulation.class).to( MySimulation1.class ) ;
 				bind( Helper.class ).to( MyHelper1.class ) ;
-//				MapBinder<String,TravelTime>.newMapBinder( this, "car",   )
 			}
 		} );
 		Simulation sim = injector.getInstance(Simulation.class);
+
 		sim.run() ;
 	}
 
@@ -33,15 +39,20 @@ class PartOne{
 	}
 
 	static class MySimulation1 implements Simulation {
-		// arguments that would normally be in the constructor can now be obtained via @Inject !
-		@Inject Helper helper ;
+		private final Helper helper;
+		@Inject MySimulation1( Helper helper ) {
+			this.helper = helper;
+		}
 		@Override public void run() {
 			log.info( "called MySimulation1 run method") ;
 			helper.getAccessToSomething() ;
 		}
 	}
 	static class MySimulation2 implements Simulation {
-		@Inject Helper helper ;
+		private final Helper helper;
+		@Inject MySimulation2( Helper helper ) {
+			this.helper = helper;
+		}
 		@Override public void run() {
 			log.info( "called MySimulation2 run method") ;
 			helper.getAccessToSomething() ;
