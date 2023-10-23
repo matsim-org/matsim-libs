@@ -20,9 +20,7 @@
 package org.matsim.contrib.common.timeprofile;
 
 import java.awt.Paint;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 import org.jfree.chart.JFreeChart;
@@ -77,18 +75,72 @@ public class ProfileWriter implements IterationEndsListener {
 		String file = filename(outputFile);
 		String timeFormat = Time.TIMEFORMAT_HHMMSS;
 
+		int startTime = 0;
+		int endTime = 0;
+
 		try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".txt"),
 			matsimServices.getConfig().global().getDefaultDelimiter().charAt(0))) {
 			String[] profileHeader = profiles.keySet().toArray(new String[0]);
 			writer.writeNext(new CSVLineBuilder().add("time").addAll(profileHeader));
-			for (int i = 0; i < times.length; i++) {
+			double[] stay = profiles.get("STAY");
+
+			//filter the time before operation and set that time as start time
+			for (int i = 0; i < times.length; i++){
+				if (stay != null && stay.length > 0){
+					double numOfStay = stay [i];
+					if (numOfStay != 0){
+						startTime = i;
+						break;
+					}
+				}
+			}
+			//filter the time after operation and set that time as end time
+			for (int i = times.length - 1; i > 0; i--){
+				if (stay != null && stay.length > 0){
+					double numOfStay = stay [i];
+					if (numOfStay != 0){
+						endTime = i;
+						break;
+					}
+				}
+			}
+
+			for (int i = startTime; i <= endTime; i++) {
 				var line = new CSVLineBuilder().add(Time.writeTime(times[i], timeFormat)).addAll(cells(profiles, i));
 				writer.writeNext(line);
 			}
 		}
 
+		//choose profiles which only happened during operation time
+		Map<String, double[]> profilesInOperationTime = new HashMap<>();
+		Set<String> profilesKeys = profiles.keySet();
+		for (String key : profilesKeys){
+			List<Double> arrayList = new ArrayList<>();
+			for(double value : profiles.get(key)) {
+				arrayList.add(value);
+			}
+			List<Double> subList = arrayList.subList(startTime,endTime + 1);
+			double[] newArray = new double[subList.size()];
+			for (int i = 0; i < subList.size(); i++){
+				newArray[i] = subList.get(i);
+			}
+			profilesInOperationTime.put(key,newArray);
+		}
+
+		//choose operation time
+		List<Double> timesArrayList = new ArrayList<>();
+		for (double value : times){
+			timesArrayList.add(value);
+		}
+		List<Double> operationTimesArrayList = timesArrayList.subList(startTime,endTime + 1);
+		double[] operationsTimes = new double[operationTimesArrayList.size()];
+		for (int i = 0; i < operationTimesArrayList.size(); i++){
+			operationsTimes[i] = operationTimesArrayList.get(i);
+		}
+
+
 		if (this.matsimServices.getConfig().controller().isCreateGraphs()) {
-			DefaultTableXYDataset xyDataset = createXYDataset(times, profiles);
+			DefaultTableXYDataset xyDataset = createXYDataset(operationsTimes, profilesInOperationTime);
 			generateImage(xyDataset, TimeProfileCharts.ChartType.Line);
 			generateImage(xyDataset, TimeProfileCharts.ChartType.StackedArea);
 		}
