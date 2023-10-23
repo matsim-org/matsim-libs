@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -21,14 +21,14 @@ public class RunPCreateDrivingAgents {
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
 
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 
 		ActivityParams home = new ActivityParams("home");
 		home.setTypicalDuration(16 * 60 * 60);
-		config.planCalcScore().addActivityParams(home);
+		config.scoring().addActivityParams(home);
 		ActivityParams work = new ActivityParams("work");
 		work.setTypicalDuration(8 * 60 * 60);
-		config.planCalcScore().addActivityParams(work);
+		config.scoring().addActivityParams(work);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
@@ -37,7 +37,7 @@ public class RunPCreateDrivingAgents {
 		fillScenario(scenario);
 
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 
 

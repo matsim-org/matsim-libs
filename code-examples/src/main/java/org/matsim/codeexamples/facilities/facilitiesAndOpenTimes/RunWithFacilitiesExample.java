@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -60,21 +60,21 @@ public final class RunWithFacilitiesExample {
 
 	void run() { 
 		final Config config = ConfigUtils.createConfig() ;
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
-		config.controler().setLastIteration(0);
+		config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setLastIteration(0);
 		{		
 			ActivityParams params = new ActivityParams("home") ;
 			params.setTypicalDuration(12.*3600);
 			params.setTypicalDurationScoreComputation( TypicalDurationScoreComputation.relative );
 			// note no opening/closing times for the activity type (given by facility)
-			config.planCalcScore().addActivityParams(params);
+			config.scoring().addActivityParams(params);
 		}
 		{
 			ActivityParams params = new ActivityParams("shop") ;
 			params.setTypicalDuration(1.*3600);
 			params.setTypicalDurationScoreComputation( TypicalDurationScoreComputation.relative );
 			// note no opening/closing times for the activity type (given by facility)
-			config.planCalcScore().addActivityParams(params);
+			config.scoring().addActivityParams(params);
 		}
 
 		scenario = ScenarioUtils.createScenario( config ) ;

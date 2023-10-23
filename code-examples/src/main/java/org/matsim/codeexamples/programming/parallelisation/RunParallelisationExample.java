@@ -77,12 +77,12 @@ public class RunParallelisationExample {
 		Config config = ConfigUtils.createConfig();
 		String configFilename = "examples/siouxfalls-2014/config_default.xml";
 		ConfigUtils.loadConfig(config, configFilename);
-		config.controler().setLastIteration(10);
+		config.controller().setLastIteration(10);
 		/*====================================================================*/
 		/* Setting parallelisation: */
 		config.qsim().setNumberOfThreads(1);					/* Mobility simulation */
 		config.global().setNumberOfThreads(1); 					/* Replanning */
-		config.parallelEventHandling().setNumberOfThreads(1);	/* Events handling. */
+		config.eventsManager().setNumberOfThreads(1);	/* Events handling. */
 		/*====================================================================*/
 		Scenario sc = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(sc);
@@ -91,16 +91,16 @@ public class RunParallelisationExample {
 		Gbl.printElapsedTime();
 		
 		/* Running multi-threaded. First delete the output directory. */
-		IOUtils.deleteDirectoryRecursively(new File(config.controler().getOutputDirectory()).toPath());
+		IOUtils.deleteDirectoryRecursively(new File(config.controller().getOutputDirectory()).toPath());
 		Gbl.startMeasurement();
 		config = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(config, configFilename);
-		config.controler().setLastIteration(10);
+		config.controller().setLastIteration(10);
 		/*====================================================================*/
 		/* Setting parallelisation: */
 		config.qsim().setNumberOfThreads(2);					/* Mobility simulation */
 		config.global().setNumberOfThreads(2); 					/* Replanning */
-		config.parallelEventHandling().setNumberOfThreads(2);	/* Events handling. */
+		config.eventsManager().setNumberOfThreads(2);	/* Events handling. */
 		/*====================================================================*/
 		sc = ScenarioUtils.loadScenario(config);
 		controler = new Controler(sc);

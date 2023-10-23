@@ -21,11 +21,11 @@ package org.matsim.codeexamples.programming.controlerListener;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.UncheckedIOException;
 
 import org.junit.Test;
 import org.matsim.codeexamples.programming.controlerListener.RunControlerListenerExample;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 public class ControlerListenerExampleTest {
 	

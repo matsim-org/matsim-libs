@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -58,14 +58,14 @@ public class RunOwnPrepareForSimExample {
 		
 		Config config = ConfigUtils.createConfig();
 		
-		config.controler().setOutputDirectory("output/ownPrepareForSimExample/");
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setOutputDirectory("output/ownPrepareForSimExample/");
+		config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 		
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
-		config.planCalcScore().addActivityParams(dummyAct);
+		config.scoring().addActivityParams(dummyAct);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		

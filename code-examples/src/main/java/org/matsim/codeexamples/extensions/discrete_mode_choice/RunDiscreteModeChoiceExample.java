@@ -8,8 +8,8 @@ import org.matsim.contribs.discrete_mode_choice.modules.*;
 import org.matsim.contribs.discrete_mode_choice.modules.config.DiscreteModeChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -17,7 +17,7 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-import static org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import static org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 
 public final class RunDiscreteModeChoiceExample{
 	// The code below works with v14 since approx jun'21.  kai
@@ -29,23 +29,23 @@ public final class RunDiscreteModeChoiceExample{
 
 		Config config = ConfigUtils.loadConfig( args );
 
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 
-		config.controler().setLastIteration( 2 );
+		config.controller().setLastIteration( 2 );
 
 		String modeB = "modeB";
 		String modeC = "modeC";
 		final String[] modes = {TransportMode.car, modeB, modeC};
 
-		config.plansCalcRoute().addTeleportedModeParams( new PlansCalcRouteConfigGroup.TeleportedModeParams(modeB).setTeleportedModeSpeed(10. ) );
-		config.plansCalcRoute().addTeleportedModeParams( new PlansCalcRouteConfigGroup.TeleportedModeParams(modeC).setTeleportedModeSpeed(10. ) );
-		config.plansCalcRoute().addTeleportedModeParams( new PlansCalcRouteConfigGroup.TeleportedModeParams(TransportMode.walk).setTeleportedModeSpeed(4./3.6 ) );
+		config.routing().addTeleportedModeParams( new RoutingConfigGroup.TeleportedModeParams(modeB).setTeleportedModeSpeed(10. ) );
+		config.routing().addTeleportedModeParams( new RoutingConfigGroup.TeleportedModeParams(modeC).setTeleportedModeSpeed(10. ) );
+		config.routing().addTeleportedModeParams( new RoutingConfigGroup.TeleportedModeParams(TransportMode.walk).setTeleportedModeSpeed(4./3.6 ) );
 
-		config.planCalcScore().addModeParams( new PlanCalcScoreConfigGroup.ModeParams( modeB ).setConstant( 13. ) );
-		config.planCalcScore().addModeParams( new PlanCalcScoreConfigGroup.ModeParams( modeC ).setConstant( 12. ) );
+		config.scoring().addModeParams( new ScoringConfigGroup.ModeParams( modeB ).setConstant( 13. ) );
+		config.scoring().addModeParams( new ScoringConfigGroup.ModeParams( modeC ).setConstant( 12. ) );
 
 		// the following is first inlined and then adapted from DiscreteModeChoiceConfigurator.configureAsSubtourModeChoiceReplacement( config );
-		config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DiscreteModeChoiceModule.STRATEGY_NAME ).setWeight( 1. ) );
+		config.replanning().addStrategySettings( new StrategySettings().setStrategyName( DiscreteModeChoiceModule.STRATEGY_NAME ).setWeight( 1. ) );
 		{
 			DiscreteModeChoiceConfigGroup dmcConfig = ConfigUtils.addOrGetModule( config, DiscreteModeChoiceConfigGroup.class );
 

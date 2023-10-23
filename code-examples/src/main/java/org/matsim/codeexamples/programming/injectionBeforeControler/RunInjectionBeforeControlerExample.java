@@ -27,7 +27,7 @@ public class RunInjectionBeforeControlerExample {
 	public static void main(String[] args) {
 
 		Config config = ConfigUtils.createConfig() ;
-		config.controler().setLastIteration(1);
+		config.controller().setLastIteration(1);
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 
 		com.google.inject.Injector injector = createMinimalMatsimInjector( config, scenario );

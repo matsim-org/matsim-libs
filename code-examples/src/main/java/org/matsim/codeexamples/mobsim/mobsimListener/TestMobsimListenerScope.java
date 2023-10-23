@@ -27,8 +27,8 @@ class TestMobsimListenerScope{
 	public static void main( String[] args ){
 
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-		config.controler().setLastIteration( 2 );
+		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setLastIteration( 2 );
 
 		Scenario scenario = ScenarioUtils.createScenario( config );
 

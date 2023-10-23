@@ -12,7 +12,7 @@ class RunWithCommandLineOptionsExample{
 	public static void main( String[] args ){
 		Config config = ConfigUtils.createConfig() ;
 
-		log.warn( config.controler().getOutputDirectory() ) ;
+		log.warn( config.controller().getOutputDirectory() ) ;
 
 		try{
 			CommandLine.Builder bld = new CommandLine.Builder( args ) ;
@@ -22,7 +22,7 @@ class RunWithCommandLineOptionsExample{
 			throw new RuntimeException( e ) ;
 		}
 
-		log.warn( config.controler().getOutputDirectory() ) ;
+		log.warn( config.controller().getOutputDirectory() ) ;
 
 	}
 

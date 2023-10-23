@@ -35,9 +35,9 @@ class RunScoringExample {
 		final URL url = ExamplesUtils.getTestScenarioURL("pt-simple");
 		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( url, "config.xml" ) );
 		
-		config.controler().setOverwriteFileSetting( deleteDirectoryIfExists );
+		config.controller().setOverwriteFileSetting( deleteDirectoryIfExists );
 		
-		config.planCalcScore().setWriteExperiencedPlans( true );
+		config.scoring().setWriteExperiencedPlans( true );
 		
 		// ---
 		

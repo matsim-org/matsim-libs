@@ -18,8 +18,8 @@ class RunReuseDefaultBindingsExample1{
 	public static void main( String[] args ){
 
 		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) ) ;
-		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-		config.controler().setLastIteration( 0 );
+		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setLastIteration( 0 );
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 

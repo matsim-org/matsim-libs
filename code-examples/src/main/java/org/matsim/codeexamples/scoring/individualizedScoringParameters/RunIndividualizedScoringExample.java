@@ -17,7 +17,7 @@ public class RunIndividualizedScoringExample{
 		final Config config;
 		if ( args==null || args.length==0 || args[0]==null ){
 			config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
-			config.controler().setOutputDirectory( "output/exampleIndividualScores/" );
+			config.controller().setOutputDirectory( "output/exampleIndividualScores/" );
 		} else {
 			config = ConfigUtils.loadConfig( args );
 		}

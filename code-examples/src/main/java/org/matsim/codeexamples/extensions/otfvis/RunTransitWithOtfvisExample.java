@@ -51,7 +51,7 @@ public class RunTransitWithOtfvisExample {
 			}
 		}
 		
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists ) ;
+		config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists ) ;
 
 		config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;
 		config.qsim().setVehicleBehavior( QSimConfigGroup.VehicleBehavior.teleport ) ;

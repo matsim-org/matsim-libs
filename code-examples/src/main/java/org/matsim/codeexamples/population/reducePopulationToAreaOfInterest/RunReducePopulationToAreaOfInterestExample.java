@@ -37,7 +37,7 @@ class RunReducePopulationToAreaOfInterestExample{
 	public static void main( String[] args ){
 
 		Config config = ConfigUtils.loadConfig( "scenarios/equil/config.xml" ) ;
-		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 

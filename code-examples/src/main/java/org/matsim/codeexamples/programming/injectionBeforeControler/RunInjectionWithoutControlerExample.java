@@ -32,7 +32,7 @@ public class RunInjectionWithoutControlerExample{
 
 		// create a config:
 		Config config = ConfigUtils.createConfig() ;
-		config.controler().setOverwriteFileSetting( deleteDirectoryIfExists );
+		config.controller().setOverwriteFileSetting( deleteDirectoryIfExists );
 
 		// create a scenario:
 		final Scenario scenario = ScenarioUtils.createScenario(config);

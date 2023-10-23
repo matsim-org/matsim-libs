@@ -40,7 +40,7 @@ public class RunWithinDayReplanningFromPlansExample {
 		final Scenario scenario = ScenarioUtils.createScenario( config );
 		final Controler controler = new Controler( scenario );
 
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		// (need to make sure that test fails if it does not get the output directory right! kai, nov'15)
 
 		// define the travel time collector (/predictor) that you want to use for routing:

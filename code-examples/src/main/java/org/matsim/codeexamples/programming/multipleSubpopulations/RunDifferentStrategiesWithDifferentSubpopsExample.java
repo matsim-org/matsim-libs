@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -30,7 +30,7 @@ public final class RunDifferentStrategiesWithDifferentSubpopsExample{
 	public static void main( String[] args ){
 
 		Config config = ConfigUtils.createConfig() ;
-		config.controler().setLastIteration(2);
+		config.controller().setLastIteration(2);
 
 		// use the default subtour mode choice for subpop1:
 		{
@@ -38,7 +38,7 @@ public final class RunDifferentStrategiesWithDifferentSubpopsExample{
 			settings.setStrategyName( DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice ) ;
 			settings.setSubpopulation( "subpop1" );
 			settings.setWeight( 0.2 );
-			config.strategy().addStrategySettings( settings );
+			config.replanning().addStrategySettings( settings );
 
 			config.subtourModeChoice().setModes( new String[]{ TransportMode.car, TransportMode.pt, TransportMode.bike} );
 		}
@@ -49,7 +49,7 @@ public final class RunDifferentStrategiesWithDifferentSubpopsExample{
 			settings.setStrategyName( "subtourModeChoice2" );
 			settings.setSubpopulation( "subpop2" );
 			settings.setWeight( 0.2 );
-			config.strategy().addStrategySettings( settings );
+			config.replanning().addStrategySettings( settings );
 		}
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;

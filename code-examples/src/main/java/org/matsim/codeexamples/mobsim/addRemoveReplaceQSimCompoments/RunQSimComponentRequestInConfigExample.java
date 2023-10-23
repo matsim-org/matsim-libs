@@ -22,8 +22,8 @@ class RunQSimComponentRequestInConfigExample{
 	public static void main( String[] args ){
 
 		Config config = ConfigUtils.createConfig() ;
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
-		config.controler().setLastIteration( 2 );
+		config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setLastIteration( 2 );
 
 		QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule( config, QSimComponentsConfigGroup.class );
 

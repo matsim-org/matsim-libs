@@ -45,7 +45,7 @@ public class RunEventsHandlingExample {
 
 		//path to events file. For this you first need to run a simulation.
 		Config config = ConfigUtils.loadConfig("scenarios/equil/config.xml");
-		config.controler().setLastIteration(5);
+		config.controller().setLastIteration(5);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		controler.run();

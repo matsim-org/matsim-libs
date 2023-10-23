@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -63,7 +63,7 @@ public class RunTeleportationMobsimWithCustomRoutingExample {
 		// ... and add local changes:
 		tuneConfig( config );
 		
-		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 
 		// load the scenario:
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
@@ -110,12 +110,12 @@ public class RunTeleportationMobsimWithCustomRoutingExample {
 		scoreTelepInteract.setTypicalDuration( 2 * 60 );
 		scoreTelepInteract.setOpeningTime( 0 );
 		scoreTelepInteract.setClosingTime( 0 );
-		config.planCalcScore().addActivityParams( scoreTelepInteract );
+		config.scoring().addActivityParams( scoreTelepInteract );
 
 
-		final PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams(
+		final ScoringConfigGroup.ModeParams modeParams = new ScoringConfigGroup.ModeParams(
 				MyRoutingModule.TELEPORTATION_LEG_MODE);
-		config.planCalcScore().addModeParams(modeParams);
+		config.scoring().addModeParams(modeParams);
 	}
 
 	private static ActivityFacility createFacility(

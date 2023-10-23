@@ -14,8 +14,8 @@ class RunTerminationCriterionExample{
 	public static void main( String[] args ){
 
 		Config config = ConfigUtils.createConfig();
-		config.controler().setLastIteration( 100 );
-		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setLastIteration( 100 );
+		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 

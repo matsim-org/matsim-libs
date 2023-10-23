@@ -41,7 +41,7 @@ public class MyExpBetaPlanChangerForRemovalProvider implements Provider<ExpBetaP
 
     @Override
     public ExpBetaPlanChanger<Plan, Person> get() {
-        return new ExpBetaPlanChanger<>( - config.planCalcScore().getBrainExpBeta());
+        return new ExpBetaPlanChanger<>( - config.scoring().getBrainExpBeta());
     }
 	
 }

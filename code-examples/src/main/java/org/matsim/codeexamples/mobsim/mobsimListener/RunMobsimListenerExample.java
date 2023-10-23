@@ -21,9 +21,9 @@ public class RunMobsimListenerExample {
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig("scenarios/equil/config.xml");
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(1);
-		config.controler().setOutputDirectory(outputDirectory);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(1);
+		config.controller().setOutputDirectory(outputDirectory);
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

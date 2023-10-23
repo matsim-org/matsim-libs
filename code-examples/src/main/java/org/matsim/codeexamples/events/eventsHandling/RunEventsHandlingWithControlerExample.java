@@ -49,7 +49,7 @@ public class RunEventsHandlingWithControlerExample {
 			config = ConfigUtils.loadConfig( args[0] ) ;
 		}
 		
-		config.controler().setOutputDirectory(outputDirectory);
+		config.controller().setOutputDirectory(outputDirectory);
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 

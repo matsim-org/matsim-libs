@@ -32,8 +32,8 @@ public class ScenarioElementAndInjection{
 		// not really a test in its current form!
 
 		Config config = ConfigUtils.createConfig() ;
-		config.controler().setOutputDirectory( utils.getOutputDirectory() );
-		config.controler().setLastIteration( 2 );
+		config.controller().setOutputDirectory( utils.getOutputDirectory() );
+		config.controller().setLastIteration( 2 );
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 
