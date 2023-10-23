@@ -46,10 +46,10 @@ public class RunRandomizingRouterExample {
 		// this is an example script that was never tested!!
 
 		Config config = ConfigUtils.createConfig() ;
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
-		config.controler().setLastIteration(1);
+		config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setLastIteration(1);
 
-		config.plansCalcRoute().setRoutingRandomness( 3. );
+		config.routing().setRoutingRandomness( 3. );
 		// (This is currently the default anyways. kai, mar'20)
 
 		Scenario scenario = ScenarioUtils.createScenario(config) ;

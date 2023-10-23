@@ -24,10 +24,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
-import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
-import org.matsim.contrib.freight.controler.CarrierModule;
-import org.matsim.contrib.freight.controler.FreightUtils;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
+import org.matsim.freight.carriers.CarrierPlanXmlWriterV2;
+import org.matsim.freight.carriers.controler.CarrierModule;
+import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -43,7 +43,7 @@ import java.util.concurrent.ExecutionException;
 
 
 /**
- * @see org.matsim.contrib.freight
+ * @see org.matsim.freight.carriers
  */
 public class RunFreightWithEmissionExample {
 
@@ -56,13 +56,13 @@ public class RunFreightWithEmissionExample {
 		config.plans().setInputFile( null ); // remove passenger input
 
 		//more general settings
-		config.controler().setOutputDirectory("./output/freightWEmissions" );
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory("./output/freightWEmissions" );
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
-		config.controler().setLastIteration(0 );		// yyyyyy iterations currently do not work; needs to be fixed.
+		config.controller().setLastIteration(0 );		// yyyyyy iterations currently do not work; needs to be fixed.
 
 		//freight settings
-		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;
+		FreightCarriersConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightCarriersConfigGroup.class ) ;
 		freightConfigGroup.setCarriersFile( "singleCarrierWithoutRoutes.xml");
 		freightConfigGroup.setCarriersVehicleTypesFile( "vehicleTypes.xml");
 
@@ -82,10 +82,10 @@ public class RunFreightWithEmissionExample {
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 
 		//load carriers according to freight config
-		FreightUtils.loadCarriersAccordingToFreightConfig( scenario );
+		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
 
 		// how to set the capacity of the "light" vehicle type to "1":
-//		FreightUtils.getCarrierVehicleTypes( scenario ).getVehicleTypes().get( Id.create("light", VehicleType.class ) ).getCapacity().setOther( 1 );
+//		CarriersUtils.getCarrierVehicleTypes( scenario ).getVehicleTypes().get( Id.create("light", VehicleType.class ) ).getCapacity().setOther( 1 );
 
 		//prepare network for emission calculation
 		for (Link link : scenario.getNetwork().getLinks().values()) {
@@ -99,14 +99,14 @@ public class RunFreightWithEmissionExample {
 
 		//prepare vehicles for emission calculation
 		{
-			VehicleType lightVehType = FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().get(Id.create("light", VehicleType.class));
+			VehicleType lightVehType = CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().get(Id.create("light", VehicleType.class));
 			VehicleUtils.setHbefaVehicleCategory(lightVehType.getEngineInformation(), HbefaVehicleCategory.HEAVY_GOODS_VEHICLE.toString());
 			VehicleUtils.setHbefaTechnology(lightVehType.getEngineInformation(), "diesel");
 			VehicleUtils.setHbefaSizeClass(lightVehType.getEngineInformation(), "RT ≤7,5t");
 			VehicleUtils.setHbefaEmissionsConcept(lightVehType.getEngineInformation(), "HGV D Euro-VI");
 		}
 		{
-			VehicleType heavyVehType = FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().get(Id.create("heavy", VehicleType.class));
+			VehicleType heavyVehType = CarriersUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().get(Id.create("heavy", VehicleType.class));
 			VehicleUtils.setHbefaVehicleCategory(heavyVehType.getEngineInformation(), HbefaVehicleCategory.HEAVY_GOODS_VEHICLE.toString());
 			VehicleUtils.setHbefaTechnology(heavyVehType.getEngineInformation(), "diesel");
 			VehicleUtils.setHbefaSizeClass(heavyVehType.getEngineInformation(), "RT >32t");
@@ -114,14 +114,14 @@ public class RunFreightWithEmissionExample {
 		}
 
 		// output before jsprit run (not necessary)
-		new CarrierPlanXmlWriterV2(FreightUtils.getCarriers( scenario )).write( "output/jsprit_unplannedCarriers.xml" ) ;
+		new CarrierPlanXmlWriterV2(CarriersUtils.getCarriers( scenario )).write( "output/jsprit_unplannedCarriers.xml" ) ;
 		// (this will go into the standard "output" directory.  note that this may be removed if this is also used as the configured output dir.)
 
 		//Solving the VRP (generate carrier's tour plans)
-		FreightUtils.runJsprit( scenario );
+		CarriersUtils.runJsprit( scenario );
 
 		// output after jsprit run (not necessary)
-		new CarrierPlanXmlWriterV2(FreightUtils.getCarriers( scenario )).write( "output/jsprit_plannedCarriers.xml" ) ;
+		new CarrierPlanXmlWriterV2(CarriersUtils.getCarriers( scenario )).write( "output/jsprit_plannedCarriers.xml" ) ;
 		// (this will go into the standard "output" directory.  note that this may be removed if this is also used as the configured output dir.)
 
 		//MATSim configuration:

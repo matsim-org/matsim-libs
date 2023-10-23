@@ -66,8 +66,8 @@ public class RunOwnMobsimAgentWithPerceptionExample {
 		} else {
 			URL url = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml");;
 			config = ConfigUtils.loadConfig(url) ;
-			config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-			config.controler().setLastIteration(0);
+			config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+			config.controller().setLastIteration(0);
 		}
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;

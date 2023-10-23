@@ -17,10 +17,10 @@ import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
@@ -53,10 +53,10 @@ class RunDrtExample{
 			config = ConfigUtils.loadConfig( args );
 		} else {
 			config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "dvrp-grid" ), "multi_mode_one_shared_taxi_config.xml" ) );
-			config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+			config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		}
 		
-		config.controler().setLastIteration( 1 );
+		config.controller().setLastIteration( 1 );
 
 		config.qsim().setSimStarttimeInterpretation( QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime );
 		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
@@ -108,24 +108,24 @@ class RunDrtExample{
 		}
 
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
-			DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore(), config.plansCalcRoute());
+			DrtConfigs.adjustDrtConfig(drtCfg, config.scoring(), config.routing());
 		}
 		{
 			// clear strategy settings from config file:
-			config.strategy().clearStrategySettings();
+			config.replanning().clearStrategySettings();
 
 			// configure mode innovation so that travellers start using drt:
-			config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DefaultStrategy.ChangeSingleTripMode ).setWeight( 0.1 ) );
+			config.replanning().addStrategySettings( new StrategySettings().setStrategyName( DefaultStrategy.ChangeSingleTripMode ).setWeight( 0.1 ) );
 			config.changeMode().setModes( new String[]{TransportMode.car, DRT_A, DRT_B, DRT_C} );
 
 			// have a "normal" plans choice strategy:
-			config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DefaultSelector.ChangeExpBeta ).setWeight( 1. ) );
+			config.replanning().addStrategySettings( new StrategySettings().setStrategyName( DefaultSelector.ChangeExpBeta ).setWeight( 1. ) );
 		}
 		{
 			// add params so that scoring works:
-			config.planCalcScore().addModeParams( new ModeParams( DRT_A ) );
-			config.planCalcScore().addModeParams( new ModeParams( DRT_B ) );
-			config.planCalcScore().addModeParams( new ModeParams( DRT_C ) );
+			config.scoring().addModeParams( new ModeParams( DRT_A ) );
+			config.scoring().addModeParams( new ModeParams( DRT_B ) );
+			config.scoring().addModeParams( new ModeParams( DRT_C ) );
 		}
 		Scenario scenario = ScenarioUtils.createScenario( config ) ;
 		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory( DrtRoute.class, new DrtRouteFactory() );

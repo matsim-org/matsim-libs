@@ -23,9 +23,9 @@ public class RunReplaceAgentFactoryExampleTest {
 		try {
 			final RunReplaceAgentFactoryExample main = new RunReplaceAgentFactoryExample();;
 			final Config config = main.prepareConfig();
-			config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-			config.controler().setLastIteration( 2 );
-			config.controler().setOutputDirectory( utils.getOutputDirectory() );
+			config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+			config.controller().setLastIteration( 2 );
+			config.controller().setOutputDirectory( utils.getOutputDirectory() );
 			
 			Controler controler = main.prepareControler() ;
 			

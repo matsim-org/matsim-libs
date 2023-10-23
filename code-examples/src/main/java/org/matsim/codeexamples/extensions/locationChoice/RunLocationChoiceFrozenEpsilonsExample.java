@@ -27,7 +27,7 @@ import org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastes;
 import org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -36,7 +36,7 @@ class RunLocationChoiceFrozenEpsilonsExample{
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig( args );
 
-		config.strategy().addStrategySettings( new StrategyConfigGroup.StrategySettings().setStrategyName( FrozenTastes.LOCATION_CHOICE_PLAN_STRATEGY )
+		config.replanning().addStrategySettings( new ReplanningConfigGroup.StrategySettings().setStrategyName( FrozenTastes.LOCATION_CHOICE_PLAN_STRATEGY )
 												 .setWeight( 0.1 ) );
 
 		final FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule(config, FrozenTastesConfigGroup.class ) ;

@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -55,15 +55,15 @@ class RunIncomeDependentScoringExample{
 		final Config config;
 		if ( args==null || args.length==0 || args[0]==null ){
 			config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
-			config.controler().setOutputDirectory( "output/ownMoneyScoring/" );
-			config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+			config.controller().setOutputDirectory( "output/ownMoneyScoring/" );
+			config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		} else {
 			config = ConfigUtils.loadConfig( args );
 		}
 
-		PlanCalcScoreConfigGroup.ModeParams params = new PlanCalcScoreConfigGroup.ModeParams( "car" );
+		ScoringConfigGroup.ModeParams params = new ScoringConfigGroup.ModeParams( "car" );
 		params.setDailyMonetaryConstant( 10. );
-		config.planCalcScore().addModeParams( params );
+		config.scoring().addModeParams( params );
 
 		// ---
 
@@ -121,9 +121,9 @@ class RunIncomeDependentScoringExample{
 //		// yyyy TODO move to matsim core.  kai, jun'22
 //
 //		final Map<String,Map<String,ActivityUtilityParameters>> actParamsBySubpop = new LinkedHashMap<>();
-//		for( Map.Entry<String, PlanCalcScoreConfigGroup.ScoringParameterSet> entry : scoringConfig.getScoringParametersPerSubpopulation().entrySet() ){
+//		for( Map.Entry<String, ScoringConfigGroup.ScoringParameterSet> entry : scoringConfig.getScoringParametersPerSubpopulation().entrySet() ){
 //			Map<String, ActivityUtilityParameters> newParams = new TreeMap<>();
-//			for ( PlanCalcScoreConfigGroup.ActivityParams params : entry.getValue().getActivityParams()) {
+//			for ( ScoringConfigGroup.ActivityParams params : entry.getValue().getActivityParams()) {
 //				ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder(params) ;
 //				newParams.put(params.getActivityType(), factory.build() ) ;
 //			}

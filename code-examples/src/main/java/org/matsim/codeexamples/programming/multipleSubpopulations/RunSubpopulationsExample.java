@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.PopulationUtils;
@@ -83,8 +83,8 @@ public class RunSubpopulationsExample {
 			config = ConfigUtils.loadConfig( args );
 		} else {
 			config = ConfigUtils.loadConfig( "scenarios/equil-extended/config-with-subpopulation.xml" );
-			config.controler().setOutputDirectory( "./output/example" );
-			config.controler().setLastIteration( 1 );
+			config.controller().setOutputDirectory( "./output/example" );
+			config.controller().setLastIteration( 1 );
 		}
 
 //		Config config = ConfigUtils.createConfig();
@@ -100,27 +100,27 @@ public class RunSubpopulationsExample {
 		{
 			/* Set up the 'time' subpopulation to only consider time allocation 
 			 * as a strategy, 20% of the time, and the balance using ChangeExpBeta. */
-			config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DefaultStrategy.TimeAllocationMutator ).setSubpopulation(SUBPOP1_NAME ).setWeight(0.2 ) );
-			config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DefaultSelector.ChangeExpBeta ).setSubpopulation(SUBPOP1_NAME ).setWeight(0.8 ) );
+			config.replanning().addStrategySettings( new StrategySettings().setStrategyName( DefaultStrategy.TimeAllocationMutator ).setSubpopulation(SUBPOP1_NAME ).setWeight(0.2 ) );
+			config.replanning().addStrategySettings( new StrategySettings().setStrategyName( DefaultSelector.ChangeExpBeta ).setSubpopulation(SUBPOP1_NAME ).setWeight(0.8 ) );
 		}
 		{
 			/* Set up the `reroute' subpopulation to consider rerouting as a 
 			 * strategy, 20% of the time, and the balance using ChangeExpBeta. */
-			config.strategy().addStrategySettings( new StrategySettings( ).setStrategyName( DefaultStrategy.ReRoute ).setSubpopulation(SUBPOP2_NAME ).setWeight(0.2 ) );
-			config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DefaultSelector.ChangeExpBeta ).setSubpopulation(SUBPOP2_NAME ).setWeight(0.8 ) );
+			config.replanning().addStrategySettings( new StrategySettings( ).setStrategyName( DefaultStrategy.ReRoute ).setSubpopulation(SUBPOP2_NAME ).setWeight(0.2 ) );
+			config.replanning().addStrategySettings( new StrategySettings().setStrategyName( DefaultSelector.ChangeExpBeta ).setSubpopulation(SUBPOP2_NAME ).setWeight(0.8 ) );
 		}
 		{
-			PlanCalcScoreConfigGroup.ScoringParameterSet scoringParams = config.planCalcScore().getOrCreateScoringParameters( SUBPOP1_NAME );
+			ScoringConfigGroup.ScoringParameterSet scoringParams = config.scoring().getOrCreateScoringParameters( SUBPOP1_NAME );
 			scoringParams.setPerforming_utils_hr( 6. );
-			scoringParams.addModeParams( new PlanCalcScoreConfigGroup.ModeParams( "car" ).setMarginalUtilityOfTraveling( 0. ) );
+			scoringParams.addModeParams( new ScoringConfigGroup.ModeParams( "car" ).setMarginalUtilityOfTraveling( 0. ) );
 		}
 		{
-			PlanCalcScoreConfigGroup.ScoringParameterSet scoringParams = config.planCalcScore().getOrCreateScoringParameters( SUBPOP2_NAME );
+			ScoringConfigGroup.ScoringParameterSet scoringParams = config.scoring().getOrCreateScoringParameters( SUBPOP2_NAME );
 			scoringParams.setPerforming_utils_hr( 12. );
-			scoringParams.addModeParams( new PlanCalcScoreConfigGroup.ModeParams( "car" ).setMarginalUtilityOfTraveling( -3. ) );
+			scoringParams.addModeParams( new ScoringConfigGroup.ModeParams( "car" ).setMarginalUtilityOfTraveling( -3. ) );
 		}
 
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		
 		/* Run the model. */
 		Controler controler = new Controler(config);

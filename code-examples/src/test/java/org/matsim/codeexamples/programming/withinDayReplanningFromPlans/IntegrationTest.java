@@ -19,11 +19,11 @@
 package org.matsim.codeexamples.programming.withinDayReplanningFromPlans;
 
 import java.io.File;
+import java.io.UncheckedIOException;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.codeexamples.withinday.withinDayReplanningFromPlans.RunWithinDayReplanningFromPlansExample;
 

@@ -18,9 +18,9 @@ public class RunMultipleModesExampleTest{
 		try{
 			Config config = RunMultipleModesExample.prepareConfig() ;
 
-			config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-			config.controler().setOutputDirectory( utils.getOutputDirectory() );
-			config.controler().setLastIteration( 2 );
+			config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+			config.controller().setOutputDirectory( utils.getOutputDirectory() );
+			config.controller().setLastIteration( 2 );
 
 			Scenario scenario = RunMultipleModesExample.prepareScenario( config );
 

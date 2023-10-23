@@ -51,15 +51,15 @@ public class RunSimpleAdaptiveSignalExample {
 		}
 		// load the daganzo example
 		final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("daganzo"), "config.xml"));
-		config.controler().setOutputDirectory(outputDir);
-		config.controler().setWriteEventsInterval(config.controler().getLastIteration());
+		config.controller().setOutputDirectory(outputDir);
+		config.controller().setWriteEventsInterval(config.controller().getLastIteration());
 		config.qsim().setUsingFastCapacityUpdate(false);
 		config.vspExperimental().setWritingOutputEvents(true);
 		// remove unmaterialized module from the config
 		config.removeModule("otfvis");
 		final Controler controler = new Controler(config);
 		
-		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists ) ;
+		controler.getConfig().controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists ) ;
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

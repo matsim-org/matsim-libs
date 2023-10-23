@@ -3,7 +3,7 @@ package org.matsim.codeexamples.scoring.subpopulations;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 
 class RunScoringBySubpopulationExample{
 
@@ -13,15 +13,15 @@ class RunScoringBySubpopulationExample{
 
 		Config config = ConfigUtils.createConfig() ;
 		{
-			PlanCalcScoreConfigGroup.ScoringParameterSet params = config.planCalcScore().getOrCreateScoringParameters( "employed" );
+			ScoringConfigGroup.ScoringParameterSet params = config.scoring().getOrCreateScoringParameters( "employed" );
 			{
-				PlanCalcScoreConfigGroup.ActivityParams actParams = new PlanCalcScoreConfigGroup.ActivityParams();
+				ScoringConfigGroup.ActivityParams actParams = new ScoringConfigGroup.ActivityParams();
 				actParams.setActivityType( "home" );
 				// ...
 				params.addActivityParams( actParams );
 			}
 			{
-				PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams( TransportMode.car ) ;
+				ScoringConfigGroup.ModeParams modeParams = new ScoringConfigGroup.ModeParams( TransportMode.car ) ;
 				modeParams.setMarginalUtilityOfTraveling( -6. ) ;
 				// ...
 				params.addModeParams( modeParams );

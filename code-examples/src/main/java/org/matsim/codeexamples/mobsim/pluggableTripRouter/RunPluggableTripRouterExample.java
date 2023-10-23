@@ -35,7 +35,7 @@ public class RunPluggableTripRouterExample {
 		} else {
 			config = ConfigUtils.loadConfig(args[0]);
 		}
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		final Controler controler = new Controler(config);
 		
 		final MySimulationObserver observer = new MySimulationObserver();

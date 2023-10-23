@@ -26,12 +26,12 @@ import org.matsim.core.config.CommandLine.ConfigurationException;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ScoringParameterSet;
+import org.matsim.core.config.groups.RoutingConfigGroup.ModeRoutingParams;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -57,12 +57,12 @@ public class RunPseudoRandomExperiment {
 		Config config = ConfigUtils.createConfig();
 
 		// Some initial setup
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(300);
-		config.controler().setOutputDirectory("simulation_output");
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(300);
+		config.controller().setOutputDirectory("simulation_output");
 
 		// Setting up the activity scoring parameters ...
-		ScoringParameterSet scoringParameters = config.planCalcScore().getOrCreateScoringParameters(null);
+		ScoringParameterSet scoringParameters = config.scoring().getOrCreateScoringParameters(null);
 
 		// ... for generic activity
 		ActivityParams homeParams = scoringParameters.getOrCreateActivityParams("generic");
@@ -82,9 +82,9 @@ public class RunPseudoRandomExperiment {
 		ptParams.setMonetaryDistanceRate(0.0);
 
 		// Setting up replanning ...
-		StrategyConfigGroup strategyConfig = config.strategy();
-		strategyConfig.clearStrategySettings();
-		strategyConfig.setMaxAgentPlanMemorySize(3);
+		ReplanningConfigGroup replanningConfig = config.replanning();
+		replanningConfig.clearStrategySettings();
+		replanningConfig.setMaxAgentPlanMemorySize(3);
 
 		double innovationRate = cmd.getOption("innovation-rate").map(Double::parseDouble).orElse(0.1);
 
@@ -92,28 +92,28 @@ public class RunPseudoRandomExperiment {
 		StrategySettings selectionStrategy = new StrategySettings();
 		selectionStrategy.setStrategyName(cmd.getOption("selection-strategy").orElse("ChangeExpBeta"));
 		selectionStrategy.setWeight(1.0 - innovationRate);
-		strategyConfig.addStrategySettings(selectionStrategy);
+		replanningConfig.addStrategySettings(selectionStrategy);
 
 		// ... for innovation
 		StrategySettings innovationStrategy = new StrategySettings();
 		innovationStrategy.setStrategyName(cmd.getOption("innovation-strategy").orElse("RandomMode"));
 		innovationStrategy.setWeight(innovationRate);
-		strategyConfig.addStrategySettings(innovationStrategy);
+		replanningConfig.addStrategySettings(innovationStrategy);
 
 		config.changeMode().setModes(new String[] { "car", "pt" });
 
 		// Setting up routing ...
-		config.plansCalcRoute().setNetworkModes(Collections.emptySet());
+		config.routing().setNetworkModes(Collections.emptySet());
 		config.qsim().setMainModes(Collections.emptySet());
 		config.travelTimeCalculator().setAnalyzedModes(Collections.emptySet());
 		config.linkStats().setWriteLinkStatsInterval(0);
 
 		// ... for car ...
-		var carRoutingParams = config.plansCalcRoute().getOrCreateModeRoutingParams("car");
+		var carRoutingParams = config.routing().getOrCreateModeRoutingParams("car");
 		carRoutingParams.setTeleportedModeFreespeedFactor(1.0);
 
 		// ... and for public transport
-		var ptRoutingParams = config.plansCalcRoute().getOrCreateModeRoutingParams("pt");
+		var ptRoutingParams = config.routing().getOrCreateModeRoutingParams("pt");
 		ptRoutingParams.setTeleportedModeFreespeedFactor(1.0);
 
 		// Set configuration options

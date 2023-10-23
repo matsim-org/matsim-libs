@@ -19,9 +19,10 @@
 package org.matsim.codeexamples.config.external;
 
 import java.io.File;
+import java.io.UncheckedIOException;
+
 import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * @author vsp-gleich

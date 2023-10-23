@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import static org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 
 final class RunMultipleModesExample{
 
@@ -72,7 +72,7 @@ final class RunMultipleModesExample{
 			StrategySettings stratSets = new StrategySettings(  ) ;
 			stratSets.setStrategyName( DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice );
 			stratSets.setWeight( 1. );
-			config.strategy().addStrategySettings( stratSets );
+			config.replanning().addStrategySettings( stratSets );
 
 //			config.changeMode().setModes( new String [] { TransportMode.car, TransportMode.bike} );
 			config.subtourModeChoice().setModes(  new String [] { TransportMode.car, TransportMode.bike} );
@@ -81,18 +81,18 @@ final class RunMultipleModesExample{
 		{ // configure the bike mode:
 
 			// add it to the list of network routing modes:
-			config.plansCalcRoute().setNetworkModes( Arrays.asList( TransportMode.car, TransportMode.bike ) );
+			config.routing().setNetworkModes( Arrays.asList( TransportMode.car, TransportMode.bike ) );
 
 			// one also needs to remove the default teleportation bike router:
-			config.plansCalcRoute().removeTeleportedModeParams( TransportMode.bike );
+			config.routing().removeTeleportedModeParams( TransportMode.bike );
 
-			// say that the the travel times need to be analyzed also for the bike mode:
+			// say that the travel times need to be analyzed also for the bike mode:
 //			config.travelTimeCalculator().setAnalyzedModes( new LinkedHashSet<>( Arrays.asList( TransportMode.bike, TransportMode.car ) ) ) ;
 			// no longer needed; by default all network modes are analyzed
 
 			// set up bike scoring:
 			ModeParams params = new ModeParams( TransportMode.bike ) ;
-			config.planCalcScore().addModeParams( params );
+			config.scoring().addModeParams( params );
 
 			// set up the bike qsim
 			config.qsim().setMainModes( new HashSet<>( Arrays.asList( TransportMode.car, TransportMode.bike ) ) ) ;
@@ -101,7 +101,7 @@ final class RunMultipleModesExample{
 //		config.travelTimeCalculator().setSeparateModes( true ); // otherwise, router will use speeds averaged over modes.  For 11.x, this is the default.
 //		config.travelTimeCalculator().setSeparateModes( false ); // this used to be the default
 
-//		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
+//		config.routing().setInsertingAccessEgressWalk( true );
 
 		return config ;
 	}

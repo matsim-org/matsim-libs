@@ -40,10 +40,10 @@ public class RunMinibusTest {
 
         Config config = runner.getConfig();
 
-        config.controler().setOutputDirectory( utils.getOutputDirectory() );
-        config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+        config.controller().setOutputDirectory( utils.getOutputDirectory() );
+        config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 
-        config.controler().setLastIteration( 1 );
+        config.controller().setLastIteration( 1 );
 
         runner.run();
     }
