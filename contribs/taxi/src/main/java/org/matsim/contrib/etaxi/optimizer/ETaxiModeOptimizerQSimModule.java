@@ -35,7 +35,7 @@ import org.matsim.contrib.etaxi.ETaxiActionCreator;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.util.ETaxiStayTaskEndTimeCalculator;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
-import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureUtils;
 import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -91,8 +91,8 @@ public class ETaxiModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 				});
 
 		bindModal(ChargingInfrastructure.class).toProvider(modalProvider(
-				getter -> ChargingInfrastructures.createModalNetworkChargers(getter.get(ChargingInfrastructure.class),
-						getter.getModal(Network.class), getMode()))).asEagerSingleton();
+				getter -> ChargingInfrastructureUtils.createModalNetworkChargers(getter.get(ChargingInfrastructure.class ),
+						getter.getModal(Network.class), getMode() ))).asEagerSingleton();
 
 		addModalComponent(ETaxiScheduler.class,
 				new ModalProviders.AbstractProvider<>(taxiCfg.getMode(), DvrpModes::mode) {

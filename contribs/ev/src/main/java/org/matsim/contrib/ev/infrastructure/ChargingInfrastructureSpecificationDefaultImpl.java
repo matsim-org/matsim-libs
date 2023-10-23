@@ -18,34 +18,36 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.ev.fleet;
+package org.matsim.contrib.ev.infrastructure;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.contrib.common.collections.SpecificationContainer;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public final class ElectricFleetSpecificationImpl implements ElectricFleetSpecification {
-	private final Map<Id<Vehicle>, ElectricVehicleSpecification> specifications = new LinkedHashMap<>();
+final class ChargingInfrastructureSpecificationDefaultImpl implements ChargingInfrastructureSpecification {
+	private final SpecificationContainer<Charger, ChargerSpecification> container = new SpecificationContainer<>();
 
 	@Override
-	public Map<Id<Vehicle>, ElectricVehicleSpecification> getVehicleSpecifications() {
-		return Collections.unmodifiableMap(specifications);
+	public Map<Id<Charger>, ChargerSpecification> getChargerSpecifications() {
+		return container.getSpecifications();
 	}
 
 	@Override
-	public void addVehicleSpecification(ElectricVehicleSpecification specification) {
-		specifications.put(specification.getId(), specification);
+	public void addChargerSpecification(ChargerSpecification specification) {
+		container.addSpecification(specification);
 	}
 
 	@Override
-	public void clear() {
-		specifications.clear();
+	public void replaceChargerSpecification(ChargerSpecification specification) {
+		container.replaceSpecification(specification);
+	}
+
+	@Override
+	public void removeChargerSpecification(Id<Charger> chargerId) {
+		container.removeSpecification(chargerId);
 	}
 }
-

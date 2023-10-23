@@ -33,23 +33,11 @@ import com.google.common.collect.ImmutableList;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class ElectricVehicleSpecificationImpl implements ElectricVehicleSpecification {
-	public static final String EV_ENGINE_HBEFA_TECHNOLOGY = "electricity";
-
-	public static final String INITIAL_SOC = "initialSoc";// in [0, 1]
-	public static final String CHARGER_TYPES = "chargerTypes";
-
-	public static void createAndAddVehicleSpecificationsFromMatsimVehicles(ElectricFleetSpecification fleetSpecification,
-			Collection<Vehicle> vehicles) {
-		vehicles.stream()
-				.filter(vehicle -> EV_ENGINE_HBEFA_TECHNOLOGY.equals(VehicleUtils.getHbefaTechnology(vehicle.getType().getEngineInformation())))
-				.map(ElectricVehicleSpecificationImpl::new)
-				.forEach(fleetSpecification::addVehicleSpecification);
-	}
+final class ElectricVehicleSpecificationDefaultImpl implements ElectricVehicleSpecification {
 
 	private final Vehicle matsimVehicle;
 
-	public ElectricVehicleSpecificationImpl(Vehicle matsimVehicle) {
+	ElectricVehicleSpecificationDefaultImpl( Vehicle matsimVehicle ) {
 		this.matsimVehicle = matsimVehicle;
 		//provided per vehicle type (in engine info)
 		Preconditions.checkArgument(getInitialSoc() >= 0 && getInitialSoc() <= 1, "Invalid initialCharge or batteryCapacity of vehicle: %s", getId());
@@ -68,12 +56,12 @@ public class ElectricVehicleSpecificationImpl implements ElectricVehicleSpecific
 	@Override
 	public ImmutableList<String> getChargerTypes() {
 		var engineInfo = matsimVehicle.getType().getEngineInformation();
-		return ImmutableList.copyOf((Collection<String>)engineInfo.getAttributes().getAttribute(CHARGER_TYPES));
+		return ImmutableList.copyOf((Collection<String>)engineInfo.getAttributes().getAttribute( ElectricFleetUtils.CHARGER_TYPES ) );
 	}
 
 	@Override
 	public double getInitialSoc() {
-		return (double)matsimVehicle.getAttributes().getAttribute(INITIAL_SOC);
+		return (double)matsimVehicle.getAttributes().getAttribute( ElectricFleetUtils.INITIAL_SOC );
 	}
 
 	@Override
