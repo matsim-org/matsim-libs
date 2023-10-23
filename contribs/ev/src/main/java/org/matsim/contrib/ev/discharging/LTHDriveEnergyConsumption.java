@@ -32,7 +32,7 @@ import org.matsim.core.gbl.Gbl;
 
 import com.google.common.primitives.Doubles;
 
-public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
+public final class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 
 	private final PiecewiseBicubicSplineInterpolatingFunction function;
 

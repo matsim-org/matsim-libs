@@ -34,12 +34,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-public class ChargerOccupancyTimeProfileCollectorProvider implements Provider<MobsimListener> {
+public final class ChargerOccupancyTimeProfileCollectorProvider implements Provider<MobsimListener> {
 	private final ChargingInfrastructure chargingInfrastructure;
 	private final MatsimServices matsimServices;
 
 	@Inject
-	public ChargerOccupancyTimeProfileCollectorProvider(ChargingInfrastructure chargingInfrastructure, MatsimServices matsimServices) {
+	ChargerOccupancyTimeProfileCollectorProvider(ChargingInfrastructure chargingInfrastructure, MatsimServices matsimServices) {
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.matsimServices = matsimServices;
 	}

@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2022 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,17 +20,36 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import java.util.Collection;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
 
-import org.matsim.vehicles.EngineInformation;
-import org.matsim.vehicles.Vehicle;
+final class BatteryDefaultImpl implements Battery {
+	private final double capacity;
+	private double charge;
 
-public class ElectricVehicleSpecifications {
-	public static void setInitialSoc(Vehicle vehicle, double initialSoc) {
-		vehicle.getAttributes().putAttribute(ElectricVehicleSpecificationImpl.INITIAL_SOC, initialSoc);
+	BatteryDefaultImpl( double capacity, double charge ) {
+		this.capacity = capacity;
+		this.charge = charge;
 	}
 
-	public static void setChargerTypes(EngineInformation engineInformation, Collection<String> chargerTypes) {
-		engineInformation.getAttributes().putAttribute(ElectricVehicleSpecificationImpl.CHARGER_TYPES, chargerTypes);
+	@Override
+	public double getCapacity() {
+		return capacity;
+	}
+
+	@Override
+	public double getCharge() {
+		return charge;
+	}
+
+	@Override
+	public void setCharge(double charge) {
+		Preconditions.checkArgument(charge >= 0 && charge <= capacity, "Charge outside allowed range (SOC=%s)", charge / capacity);
+		this.charge = charge;
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this).add("capacity", capacity).add("charge", charge).toString();
 	}
 }
