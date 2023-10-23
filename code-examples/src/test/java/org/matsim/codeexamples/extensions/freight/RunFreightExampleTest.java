@@ -22,11 +22,11 @@ public class RunFreightExampleTest{
 	public void testMain(){
 		try{
 			String[] args = { IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ), "config.xml" ).toString() ,
-					"--config:controler.outputDirectory", utils.getOutputDirectory(),
-					"--config:controler.lastIteration", "0",
+					"--config:controller.outputDirectory", utils.getOutputDirectory(),
+					"--config:controller.lastIteration", "0",
 					"--config:plans.inputPlansFile", "null",
-					"--config:freight.carriersFile", "singleCarrierFiveActivitiesWithoutRoutes.xml",
-					"--config:freight.carriersVehicleTypeFile", "vehicleTypes.xml"
+					"--config:freightCarriers.carriersFile", "singleCarrierFiveActivitiesWithoutRoutes.xml",
+					"--config:freightCarriers.carriersVehicleTypeFile", "vehicleTypes.xml"
 			};
 			RunFreightExample.run(args, false);
 			{

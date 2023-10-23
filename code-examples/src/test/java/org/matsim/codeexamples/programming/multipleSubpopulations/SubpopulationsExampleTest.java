@@ -56,8 +56,8 @@ public class SubpopulationsExampleTest {
 //					, "--config:controler.lastIteration=1"
 //			} );
 			RunSubpopulationsExample.main( new String[]{"scenarios/equil-extended/config-with-subpopulation.xml"
-					, "--config:controler.outputDirectory=" + utils.getOutputDirectory()
-					, "--config:controler.lastIteration=1"
+					, "--config:controller.outputDirectory=" + utils.getOutputDirectory()
+					, "--config:controller.lastIteration=1"
 			} );
 //			{
 //				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
