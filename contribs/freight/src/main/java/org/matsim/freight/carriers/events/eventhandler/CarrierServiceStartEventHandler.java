@@ -22,16 +22,11 @@
 package org.matsim.freight.carriers.events.eventhandler;
 
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.freight.carriers.events.CarrierShipmentDeliveryEndEvent;
+import org.matsim.freight.carriers.events.CarrierServiceStartEvent;
 
-/**
- * Interface to listen to shipmentDeliveredEvents.
- *
- * @author sschroeder
- *
- */
-public interface FreightShipmentDeliveryEventHandler extends EventHandler {
 
-	void handleEvent(CarrierShipmentDeliveryEndEvent event);
+public interface CarrierServiceStartEventHandler extends EventHandler {
+
+	void handleEvent( CarrierServiceStartEvent event );
 
 }

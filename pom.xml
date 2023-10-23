@@ -177,7 +177,7 @@
             <dependency>
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-bom</artifactId>
-                <version>4.0.3</version>
+                <version>4.0.4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -346,7 +346,7 @@
 							</excludes>
 						</requireReleaseDeps>
                         <requireMavenVersion>
-                            <version>3.6.3</version>
+                            <version>3.8</version>
                         </requireMavenVersion>
                     </rules>
                 </configuration>

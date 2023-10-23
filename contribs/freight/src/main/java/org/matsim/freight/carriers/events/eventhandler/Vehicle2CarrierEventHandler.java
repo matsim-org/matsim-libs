@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author kturner
  */
-public final class Vehicle2CarrierEventHandler implements FreightTourStartEventHandler, FreightTourEndEventHandler {
+public final class Vehicle2CarrierEventHandler implements CarrierTourStartEventHandler, CarrierTourEndEventHandler {
 
 
 	// Comment from Janek (in https://github.com/matsim-org/matsim-libs/pull/2128)
