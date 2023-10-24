@@ -35,7 +35,7 @@ import java.util.*;
  * */
 public class BasicDrtAbortHandler implements AbortHandler, MobsimEngine {
 	public static final String COMPONENT_NAME = "DrtAbortHandler";
-	static final String walkAfterRejectMode = "walkAfterReject";
+	public static final String walkAfterRejectMode = "walkAfterReject";
 	private static final String delimiter = "============";
 	@Inject
 	Network network;

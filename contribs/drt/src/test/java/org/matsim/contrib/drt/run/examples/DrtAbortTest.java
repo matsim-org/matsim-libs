@@ -27,6 +27,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import java.net.URL;
 
+import static org.matsim.contrib.drt.optimizer.abort.BasicDrtAbortHandler.walkAfterRejectMode;
 import static org.matsim.core.config.groups.ScoringConfigGroup.*;
 
 public class DrtAbortTest{
@@ -35,7 +36,7 @@ public class DrtAbortTest{
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	static final String walkAfterRejectMode = "walkAfterReject";
+//	static final String walkAfterRejectMode = "walkAfterReject";
 
 	enum Variant {simpleTest, iterations, benchmark };
 
