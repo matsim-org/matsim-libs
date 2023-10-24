@@ -112,7 +112,7 @@ public class ProfileWriter implements IterationEndsListener {
 		}
 
 		//choose profiles which only happened during operation time
-		Map<String, double[]> profilesInOperationTime = new HashMap<>();
+		Map<String, double[]> profilesInOperationTime = new LinkedHashMap<>();
 		Set<String> profilesKeys = profiles.keySet();
 		for (String key : profilesKeys){
 			List<Double> arrayList = new ArrayList<>();
