@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.vrp_solver.ruinAndRecreate;
+package org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.vrp_solver.ruin_and_recreate;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

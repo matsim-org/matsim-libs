@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.vrp_solver.ruinAndRecreate;
+package org.matsim.contrib.drt.extension.preplanned.optimizer.offline_optimization.vrp_solver.ruin_and_recreate;
 
 public interface RecreateSolutionAcceptor {
 
