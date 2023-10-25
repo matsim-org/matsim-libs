@@ -22,7 +22,6 @@ final class CountsWriterV2 extends MatsimXmlWriter {
 
 	private static final Logger logger = LogManager.getLogger(CountsWriterV2.class);
 
-
 	private final Counts<?> counts;
 
 	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
