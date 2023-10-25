@@ -124,6 +124,9 @@ public class CountsV2Test {
 
 		assertThat(volumes.aggregateAtHour(2).isEmpty())
 			.isTrue();
+
+		assertThat(volumes.aggregateDaily())
+			.isEqualTo(500);
 	}
 
 	public void generateDummyCounts(Counts<Link> counts) {

@@ -104,8 +104,8 @@ public final class Measurable implements Iterable<Int2DoubleMap.Entry> {
 	 * Return sum of values or daily value.
 	 */
 	public double aggregateDaily() {
-		if (interval != DAILY)
-			return values.get(24 * HOURLY);
+		if (interval == DAILY)
+			return values.get(0);
 
 		return values.values().doubleStream().sum();
 	}

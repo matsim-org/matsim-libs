@@ -108,6 +108,18 @@ public final class MeasurementLocation<T> implements Attributable, Iterable<Meas
 		return stationName;
 	}
 
+	/**
+	 * Returns the display name of this location. If the station name is set, it is returned. Otherwise the id is returned.
+	 */
+	public String getDisplayName() {
+		if (stationName != null)
+			return stationName;
+		if (id != null)
+			return id;
+
+		return description;
+	}
+
 	public void setId(String id) {
 		this.id = id;
 	}
