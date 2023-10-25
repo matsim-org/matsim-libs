@@ -19,12 +19,8 @@
  */
 package org.matsim.contrib.common.timeprofile;
 
-import java.awt.Paint;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.DefaultTableXYDataset;
@@ -38,8 +34,10 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
+import java.awt.*;
+import java.util.List;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * @author michalm (Michal Maciejewski)
@@ -77,18 +75,53 @@ public class ProfileWriter implements IterationEndsListener {
 		String file = filename(outputFile);
 		String timeFormat = Time.TIMEFORMAT_HHMMSS;
 
+		int startTime = 0;
+		int endTime = times.length;
+
 		try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".txt"),
 			matsimServices.getConfig().global().getDefaultDelimiter().charAt(0))) {
 			String[] profileHeader = profiles.keySet().toArray(new String[0]);
 			writer.writeNext(new CSVLineBuilder().add("time").addAll(profileHeader));
-			for (int i = 0; i < times.length; i++) {
+			{
+				//filter time windows: start with the first time we have 1+ vehicles in operation and end at with last such time window.
+				//if there is a 'lunch' break in the fleet operation, this will remain included
+				for (int i = 0; i < times.length; i++){
+					int timeWindowIdx = i;
+					//get profileSum = total nr of vehicles operating in time window
+					double profileSum = profiles.values().stream()
+						.mapToDouble(profile -> profile[timeWindowIdx])
+						.sum();
+					if (profileSum > 0){
+						startTime = i;
+						break;
+					}
+				}
+				for (int i = times.length - 1; i > 0; i--){
+					int timeWindowIdx = i;
+					//get profileSum = total nr of vehicles operating in time window
+					double profileSum = profiles.values().stream()
+						.mapToDouble(profile -> profile[timeWindowIdx])
+						.sum();
+					if (profileSum > 0){
+						endTime = i;
+						break;
+					}
+				}
+			}
+			for (int i = startTime; i < endTime; i++) {
 				var line = new CSVLineBuilder().add(Time.writeTime(times[i], timeFormat)).addAll(cells(profiles, i));
 				writer.writeNext(line);
 			}
 		}
 
 		if (this.matsimServices.getConfig().controller().isCreateGraphs()) {
-			DefaultTableXYDataset xyDataset = createXYDataset(times, profiles);
+			int finalStartTime = startTime;
+			int finalEndTime = endTime;
+			//add reduced double array one after each other and into a LinkedHashMap because otherwise the order of profiles gets messed up later
+			Map<String, double[]> filteredProfiles = new LinkedHashMap<>();
+			profiles.entrySet().forEach( e -> filteredProfiles.put(e.getKey(), Arrays.copyOfRange(e.getValue(), finalStartTime, finalEndTime)));
+			//create dataset only for time windows where we have 1+ vehicles in operation
+			DefaultTableXYDataset xyDataset = createXYDataset(Arrays.copyOfRange(times, startTime, endTime), filteredProfiles);
 			generateImage(xyDataset, TimeProfileCharts.ChartType.Line);
 			generateImage(xyDataset, TimeProfileCharts.ChartType.StackedArea);
 		}
