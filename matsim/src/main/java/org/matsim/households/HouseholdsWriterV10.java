@@ -26,15 +26,14 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.algorithms.HouseholdAlgorithm;
 import org.matsim.utils.objectattributes.AttributeConverter;
-import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 import org.matsim.vehicles.Vehicle;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +45,7 @@ import java.util.Map;
  */
 public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlgorithm{
 	private static final Logger log = LogManager.getLogger( HouseholdsWriterV10.class ) ;
-	
+
 	private List<Tuple<String, String>> atts = new ArrayList<>();
 	private Households households;
 	private final Map<Class<?>,AttributeConverter<?>> attributeConverters = new HashMap<>();
@@ -75,14 +74,14 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlg
 		this.writeXmlHead();
 		this.writeHeader();
 	}
-	
+
 	/*package*/ void writeEndAndCloseFile(){
-		
+
 		this.writeEndTag(HouseholdsSchemaV10Names.HOUSEHOLDS);
 		this.close();
 	}
-	
-	
+
+
 	private void writeHeader(){
 		atts.clear();
 		atts.add(createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
@@ -90,7 +89,7 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlg
 		atts.add(createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "households_v1.0.xsd"));
 		this.writeStartTag(HouseholdsSchemaV10Names.HOUSEHOLDS, atts);
 	}
-	
+
 	private void writeHouseholds(Households basicHouseholds) throws UncheckedIOException {
 		Counter counter = new Counter("[HouseholdsWriter] wrote household # ");
 		for (Household h : basicHouseholds.getHouseholds().values()) {

@@ -35,10 +35,10 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Stack;
-import java.util.zip.GZIPInputStream;
 
 /**
  * An abstract XML-Parser which can be easily extended for reading custom XML-formats. This class handles all the low level
@@ -169,15 +169,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 		this.theSource = url.toString();
 		log.info("starting to parse xml from url " + this.theSource + " ...");
 		System.out.flush();
-		if (url.getFile().endsWith(".gz")) {
-			try {
-				parse(new InputSource(new GZIPInputStream(url.openStream())));
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		} else {
-			parse(new InputSource(url.toExternalForm()));
-		}
+		parse(new InputSource(IOUtils.getBufferedReader(this.theSource)));
 	}
 
 	public final void parse(final InputStream stream) throws UncheckedIOException {
@@ -233,8 +225,10 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 					parser.parse(input, this);
 				}
 			}
-		} catch (SAXException | ParserConfigurationException | IOException e) {
+		} catch (IOException e) {
 			throw new UncheckedIOException(e);
+		} catch (SAXException | ParserConfigurationException e) {
+			throw new UncheckedIOException(new IOException(e));
 		}
 	}
 

@@ -37,14 +37,14 @@ public class RunConfigurableQNetworkFactoryExampleTest {
 	public final void testMain() {
 		try {
 			Config config = ConfigUtils.createConfig() ;
-			config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
-			config.controler().setLastIteration(5);
+			config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+			config.controller().setLastIteration(5);
 			RunConfigurableQNetworkFactoryExample.run(config);
 		} catch ( Exception ee ) {
 			throw new RuntimeException("something went wrong", ee);
 		}
-		
-		
+
+
 	}
 
 }

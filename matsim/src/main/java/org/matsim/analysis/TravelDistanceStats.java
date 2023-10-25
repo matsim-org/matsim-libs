@@ -27,17 +27,18 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 import jakarta.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.DoubleSummaryStatistics;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -58,10 +59,11 @@ import java.util.stream.Collectors;
 
 public class TravelDistanceStats {
 
-	private final ControlerConfigGroup controlerConfigGroup;
-	final private BufferedWriter out;
-	final private String legStatsPngName;
-	final private String tripStatsPngName;
+	private final ControllerConfigGroup controllerConfigGroup;
+	private final BufferedWriter out;
+	private final String legStatsPngName;
+	private final String tripStatsPngName;
+	private final String delimiter;
 
 	private double[] legStatsHistory = null;
 	private double[] tripStatsHistory = null;
@@ -69,10 +71,12 @@ public class TravelDistanceStats {
 	private final static Logger log = LogManager.getLogger(TravelDistanceStats.class);
 
 	@Inject
-	TravelDistanceStats(ControlerConfigGroup controlerConfigGroup, OutputDirectoryHierarchy controlerIO) {
-		this(controlerConfigGroup, controlerIO.getOutputFilename("traveldistancestats"),
+	TravelDistanceStats(ControllerConfigGroup controllerConfigGroup, OutputDirectoryHierarchy controlerIO, GlobalConfigGroup globalConfig) {
+		this(controllerConfigGroup, controlerIO.getOutputFilename("traveldistancestats"),
 				controlerIO.getOutputFilename("traveldistancestats") + "legs",
-				controlerIO.getOutputFilename("traveldistancestats") + "trips", controlerConfigGroup.isCreateGraphs());
+				controlerIO.getOutputFilename("traveldistancestats") + "trips",
+				controllerConfigGroup.isCreateGraphs(),
+				globalConfig.getDefaultDelimiter());
 	}
 
 	/**
@@ -80,30 +84,31 @@ public class TravelDistanceStats {
 	 * @param createPNG true if in every iteration, the distance statistics should be visualized in a graph and written to disk.
 	 * @throws UncheckedIOException
 	 */
-	public TravelDistanceStats(final Config config, final String filename, final boolean createPNG) throws UncheckedIOException {
-        this(config.controler(), filename, filename + "legs", filename + "trips", createPNG);
+	public TravelDistanceStats(final Config config, final String filename, final boolean createPNG, final String delimiter) throws UncheckedIOException {
+        this(config.controller(), filename, filename + "legs", filename + "trips", createPNG, delimiter);
     }
 
-    private TravelDistanceStats(ControlerConfigGroup controlerConfigGroup, String travelDistanceStatsFileName,
-    		String legStatsPngName, String tripStatsPngName, boolean createPNG) {
-		this.controlerConfigGroup = controlerConfigGroup;
+	private TravelDistanceStats(ControllerConfigGroup controllerConfigGroup, String travelDistanceStatsFileName,
+																String legStatsPngName, String tripStatsPngName, boolean createPNG, String delimiter) {
+		this.controllerConfigGroup = controllerConfigGroup;
 		this.legStatsPngName = legStatsPngName;
 		this.tripStatsPngName = tripStatsPngName;
+		this.delimiter = delimiter;
 		if (createPNG) {
-			int iterations = controlerConfigGroup.getLastIteration() - controlerConfigGroup.getFirstIteration();
+			int iterations = controllerConfigGroup.getLastIteration() - controllerConfigGroup.getFirstIteration();
 			if (iterations > 5000) {
 				iterations = 5000; // limit the history size
 			}
 			this.legStatsHistory = new double[iterations+1];
 			this.tripStatsHistory = new double[iterations+1];
 		}
-		if (travelDistanceStatsFileName.toLowerCase(Locale.ROOT).endsWith(".txt")) {
+		if (travelDistanceStatsFileName.toLowerCase(Locale.ROOT).endsWith(".csv")) {
 			this.out = IOUtils.getBufferedWriter(travelDistanceStatsFileName);
 		} else {
-			this.out = IOUtils.getBufferedWriter(travelDistanceStatsFileName + ".txt");
+			this.out = IOUtils.getBufferedWriter(travelDistanceStatsFileName + ".csv");
 		}
 		try {
-            this.out.write("ITERATION\tavg. Average Leg distance\tavg. Average Trip distance\n");
+			this.out.write("ITERATION" + this.delimiter + "avg. Average Leg distance" + this.delimiter + "avg. Average Trip distance\n");
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -149,22 +154,22 @@ public class TravelDistanceStats {
 		log.info("(and teleported legs whose route contains a distance.)");// TODO: still valid?
 
 		try {
-            this.out.write(iteration + "\t" + legStats.getAverage() + "\t" + tripStats.getAverage() + "\t" + "\n");
+			this.out.write(iteration + this.delimiter + legStats.getAverage() + this.delimiter + tripStats.getAverage() + "\n");
 			this.out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 		if (this.legStatsHistory != null) {
-			int index = iteration - controlerConfigGroup.getFirstIteration();
+			int index = iteration - controllerConfigGroup.getFirstIteration();
             this.legStatsHistory[index] = legStats.getAverage();
 
-			if (iteration != controlerConfigGroup.getFirstIteration()) {
+			if (iteration != controllerConfigGroup.getFirstIteration()) {
 				// create chart when data of more than one iteration is available.
 				XYLineChart chart = new XYLineChart("Leg Travel Distance Statistics", "iteration", "average of the average leg distance per plan ");
 				double[] iterations = new double[index + 1];
 				for (int i = 0; i <= index; i++) {
-					iterations[i] = i + controlerConfigGroup.getFirstIteration();
+					iterations[i] = i + controllerConfigGroup.getFirstIteration();
 				}
 				double[] values = new double[index + 1];
 				System.arraycopy(this.legStatsHistory, 0, values, 0, index + 1);
@@ -179,15 +184,15 @@ public class TravelDistanceStats {
 		}
 
 		if (this.tripStatsHistory != null) {
-			int index = iteration - controlerConfigGroup.getFirstIteration();
+			int index = iteration - controllerConfigGroup.getFirstIteration();
             this.tripStatsHistory[index] = tripStats.getAverage();
 
-			if (iteration != controlerConfigGroup.getFirstIteration()) {
+			if (iteration != controllerConfigGroup.getFirstIteration()) {
 				// create chart when data of more than one iteration is available.
 				XYLineChart chart = new XYLineChart("Trip Travel Distance Statistics", "iteration", "average of the average trip distance per plan ");
 				double[] iterations = new double[index + 1];
 				for (int i = 0; i <= index; i++) {
-					iterations[i] = i + controlerConfigGroup.getFirstIteration();
+					iterations[i] = i + controllerConfigGroup.getFirstIteration();
 				}
 				double[] values = new double[index + 1];
 				System.arraycopy(this.tripStatsHistory, 0, values, 0, index + 1);

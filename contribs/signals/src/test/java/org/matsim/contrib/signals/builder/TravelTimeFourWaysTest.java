@@ -48,16 +48,16 @@ import static org.matsim.utils.eventsfilecomparison.EventsFileComparator.*;
 public class TravelTimeFourWaysTest {
 
 	private static final String EVENTSFILE = "events.xml.gz";
-	
+
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
-	
+
 	@Test
 	public void testTrafficLightIntersection4arms() {
 		Scenario scenario = this.createTestScenario();
 		scenario.getConfig().plans().setInputFile("plans.xml.gz");
 		ScenarioUtils.loadScenario(scenario);
-				
+
 		runQSimWithSignals(scenario);
 	}
 
@@ -72,13 +72,13 @@ public class TravelTimeFourWaysTest {
 
 	private Scenario createTestScenario(){
 		Config conf = ConfigUtils.createConfig(testUtils.classInputResourcePath());
-		conf.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		conf.controler().setMobsim("qsim");
+		conf.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		conf.controller().setMobsim("qsim");
 		conf.network().setInputFile("network.xml.gz");
 		conf.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 		conf.qsim().setUseLanes(true);
 	    conf.qsim().setUsingFastCapacityUpdate(false);
-	    
+
 		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class );
 		signalsConfig.setUseSignalSystems(true);
 		signalsConfig.setSignalSystemFile("testSignalSystems_v2.0.xml");
@@ -86,7 +86,7 @@ public class TravelTimeFourWaysTest {
 		signalsConfig.setSignalControlFile("testSignalControl_v2.0.xml");
 		signalsConfig.setUseAmbertimes(true);
 		signalsConfig.setAmberTimesFile("testAmberTimes_v1.0.xml");
-	
+
 		Scenario scenario = ScenarioUtils.createScenario(conf);
 		scenario.addScenarioElement( SignalsData.ELEMENT_NAME , new SignalsDataLoader(scenario.getConfig()).loadSignalsData());
 		return scenario;
@@ -103,7 +103,7 @@ public class TravelTimeFourWaysTest {
 //				install(new ScenarioByInstanceModule(scenario));
 //			}
 //		}), new SignalsModule()));
-	
+
 //		EventsManager events = injector.getInstance(EventsManager.class);
 //		events.initProcessing();
 
@@ -122,10 +122,10 @@ public class TravelTimeFourWaysTest {
 				.addOverridingModule( new SignalsModule() )
 				.addOverridingQSimModule( new SignalsQSimModule() )
 				.build( scenario, events ).run();
-		
+
 		eventsXmlWriter.closeFile();
 //	    Assert.assertEquals("different events files", EventsFileComparator.compareAndReturnInt(this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut), 0);
 		Assert.assertEquals( Result.FILES_ARE_EQUAL, new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut ) );
 	}
-	
+
 }

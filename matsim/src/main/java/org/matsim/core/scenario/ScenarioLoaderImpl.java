@@ -36,7 +36,6 @@ import org.matsim.core.network.io.NetworkChangeEventsParser;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.lanes.LanesReader;
@@ -50,6 +49,7 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.vehicles.MatsimVehicleReader;
 
 
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.*;
 
@@ -220,7 +220,7 @@ class ScenarioLoaderImpl {
 							"file is used for the 10pct and the 1pct scenario. The material that is still there will follow.  kai, jun'19"
 			);
 
-			final String outputDirectory = this.config.controler().getOutputDirectory();
+			final String outputDirectory = this.config.controller().getOutputDirectory();
 //			final File outDir = new File( outputDirectory );
 //			if ( outDir.exists() && outDir.canWrite() ){
 //				// since ScenarioLoader is supposed to only read material,  there are cases where the output directory does not exist at
@@ -338,7 +338,7 @@ class ScenarioLoaderImpl {
 		if ( vehiclesFile != null ) {
 			log.info("loading vehicles from " + vehiclesFile );
 			new MatsimVehicleReader(this.scenario.getVehicles()).readURL(IOUtils.extendUrl(this.config.getContext(), vehiclesFile ) );
-		} 
+		}
 		else {
 			log.info("no vehicles file set in config, not loading any vehicles");
 		}

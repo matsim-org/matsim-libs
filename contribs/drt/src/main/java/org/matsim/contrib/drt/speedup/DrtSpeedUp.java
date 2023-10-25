@@ -34,7 +34,7 @@ import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams.WaitingTimeUpdateDuringSpeedUp;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -49,7 +49,7 @@ import com.google.common.base.Preconditions;
 public final class DrtSpeedUp implements IterationStartsListener, IterationEndsListener {
 	private static final Logger log = LogManager.getLogger(DrtSpeedUp.class);
 
-	public static boolean isTeleportDrtUsers(DrtSpeedUpParams drtSpeedUpParams, ControlerConfigGroup controlerConfig,
+	public static boolean isTeleportDrtUsers(DrtSpeedUpParams drtSpeedUpParams, ControllerConfigGroup controlerConfig,
 			int iteration) {
 		int lastIteration = controlerConfig.getLastIteration();
 		if (iteration < drtSpeedUpParams.fractionOfIterationsSwitchOn * lastIteration
@@ -63,7 +63,7 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 
 	private final String mode;
 	private final DrtSpeedUpParams drtSpeedUpParams;
-	private final ControlerConfigGroup controlerConfig;
+	private final ControllerConfigGroup controlerConfig;
 	private final Network network;
 	private final FleetSpecification fleetSpecification;
 	private final DrtEventSequenceCollector drtEventSequenceCollector;
@@ -76,7 +76,7 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 	private double currentAvgWaitingTime;
 	private double currentAvgInVehicleBeelineSpeed;
 
-	public DrtSpeedUp(String mode, DrtSpeedUpParams drtSpeedUpParams, ControlerConfigGroup controlerConfig,
+	public DrtSpeedUp(String mode, DrtSpeedUpParams drtSpeedUpParams, ControllerConfigGroup controlerConfig,
 			Network network, FleetSpecification fleetSpecification,
 			DrtEventSequenceCollector drtEventSequenceCollector) {
 		this.mode = mode;

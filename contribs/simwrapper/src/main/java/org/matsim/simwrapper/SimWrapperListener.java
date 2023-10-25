@@ -26,7 +26,10 @@ import java.util.stream.StreamSupport;
 public class SimWrapperListener implements StartupListener, ShutdownListener {
 
 	private static final Logger log = LogManager.getLogger(SimWrapper.class);
-
+	/**
+	 * Run priority of SimWrapper. Generally, it should run after alls other listeners.
+	 */
+	public static double PRIORITY = -1000;
 	private final SimWrapper simWrapper;
 	private final Config config;
 
@@ -34,6 +37,11 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 	public SimWrapperListener(SimWrapper simWrapper, Config config) {
 		this.simWrapper = simWrapper;
 		this.config = config;
+	}
+
+	@Override
+	public double priority() {
+		return PRIORITY;
 	}
 
 	@Override
@@ -101,7 +109,7 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 		List<DashboardProvider> result = new ArrayList<>();
 		for (ClassPath.ClassInfo info : classes) {
 			Class<?> clazz = info.load();
-			if (clazz.isAssignableFrom(DashboardProvider.class)) {
+			if (DashboardProvider.class.isAssignableFrom(clazz)) {
 				try {
 					Constructor<?> c = clazz.getDeclaredConstructor();
 					DashboardProvider o = (DashboardProvider) c.newInstance();

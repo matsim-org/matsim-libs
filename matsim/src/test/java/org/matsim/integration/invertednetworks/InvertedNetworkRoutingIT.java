@@ -36,11 +36,11 @@ public class InvertedNetworkRoutingIT {
 	@Test
 	public final void testLanesInvertedNetworkRouting() {
 		InvertedNetworkRoutingTestFixture f = new InvertedNetworkRoutingTestFixture(false, true, false);
-		f.scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
+		f.scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
 		f.scenario.getConfig().travelTimeCalculator().setSeparateModes( false );
 		Controler c = new Controler(f.scenario);
-		c.getConfig().controler().setDumpDataAtEnd(false);
-		c.getConfig().controler().setCreateGraphs(false);
+		c.getConfig().controller().setDumpDataAtEnd(false);
+		c.getConfig().controller().setCreateGraphs(false);
 		final InvertedNetworkRoutingTestEventHandler testHandler = new InvertedNetworkRoutingTestEventHandler();
 		c.addControlerListener(new StartupListener(){
 			@Override
@@ -56,11 +56,11 @@ public class InvertedNetworkRoutingIT {
 	@Test
 	public final void testModesInvertedNetworkRouting() {
 		InvertedNetworkRoutingTestFixture f = new InvertedNetworkRoutingTestFixture(true, false, false);
-		f.scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
+		f.scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
 		f.scenario.getConfig().travelTimeCalculator().setSeparateModes( false );
 		Controler c = new Controler(f.scenario);
-		c.getConfig().controler().setDumpDataAtEnd(false);
-		c.getConfig().controler().setCreateGraphs(false);
+		c.getConfig().controller().setDumpDataAtEnd(false);
+		c.getConfig().controller().setCreateGraphs(false);
 		final InvertedNetworkRoutingTestEventHandler testHandler = new InvertedNetworkRoutingTestEventHandler();
 		c.addControlerListener(new StartupListener(){
 			@Override
@@ -75,13 +75,13 @@ public class InvertedNetworkRoutingIT {
 	@Test
 	public final void testModesNotInvertedNetworkRouting() {
 		InvertedNetworkRoutingTestFixture f = new InvertedNetworkRoutingTestFixture(true, false, false);
-		f.scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
-		f.scenario.getConfig().controler().setLinkToLinkRoutingEnabled(false);
+		f.scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
+		f.scenario.getConfig().controller().setLinkToLinkRoutingEnabled(false);
 		f.scenario.getConfig().travelTimeCalculator().setCalculateLinkToLinkTravelTimes(false);
 		Controler c = new Controler(f.scenario);
 		//c.addOverridingModule(new InvertedNetworkRoutingGuiceModule());
-		c.getConfig().controler().setDumpDataAtEnd(false);
-		c.getConfig().controler().setCreateGraphs(false);
+		c.getConfig().controller().setDumpDataAtEnd(false);
+		c.getConfig().controller().setCreateGraphs(false);
 		final InvertedNetworkRoutingTestEventHandler testHandler = new InvertedNetworkRoutingTestEventHandler();
 		c.addControlerListener(new StartupListener(){
 			@Override

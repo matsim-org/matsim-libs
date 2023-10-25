@@ -34,6 +34,7 @@ import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
@@ -42,8 +43,8 @@ import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
@@ -80,7 +81,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	public boolean useModeFilteredSubnetwork = false;
 
 	@Parameter
-	@Comment("Bus stop duration. Must be positive.")
+	@Comment("Minimum vehicle stop duration. Must be positive.")
 	@Positive
 	public double stopDuration = Double.NaN;// seconds
 
@@ -128,6 +129,15 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Parameter
 	@Comment("Idle vehicles return to the nearest of all start links. See: DvrpVehicle.getStartLink()")
 	public boolean idleVehiclesReturnToDepots = false;
+
+	@Parameter
+	@Comment("Specifies the duration (seconds) a vehicle needs to be idle in order to get send back to the depot." +
+		"Please be aware, that returnToDepotEvaluationInterval describes the minimal time a vehicle will be idle before it gets send back to depot.")
+	public double returnToDepotTimeout = 60;
+
+	@Parameter
+	@Comment("Specifies the time interval (seconds) a vehicle gets evaluated to be send back to depot.")
+	public double returnToDepotEvaluationInterval = 60;
 
 	public enum OperationalScheme {
 		stopbased, door2door, serviceAreaBased
@@ -216,13 +226,16 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(DrtZonalSystemParams.SET_NAME, DrtZonalSystemParams::new, () -> zonalSystemParams,
 				params -> zonalSystemParams = (DrtZonalSystemParams)params);
 
-		//insertion search params (one of: extensive, selective)
+		//insertion search params (one of: extensive, selective, repeated selective)
 		addDefinition(ExtensiveInsertionSearchParams.SET_NAME, ExtensiveInsertionSearchParams::new,
 				() -> drtInsertionSearchParams,
 				params -> drtInsertionSearchParams = (ExtensiveInsertionSearchParams)params);
 		addDefinition(SelectiveInsertionSearchParams.SET_NAME, SelectiveInsertionSearchParams::new,
 				() -> drtInsertionSearchParams,
 				params -> drtInsertionSearchParams = (SelectiveInsertionSearchParams)params);
+		addDefinition(RepeatedSelectiveInsertionSearchParams.SET_NAME, RepeatedSelectiveInsertionSearchParams::new,
+				() -> drtInsertionSearchParams,
+				params -> drtInsertionSearchParams = (RepeatedSelectiveInsertionSearchParams)params);
 
 		//drt fare (optional)
 		addDefinition(DrtFareParams.SET_NAME, DrtFareParams::new, () -> drtFareParams,
@@ -269,6 +282,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 					+ " in order to speed up the DRT route update during the replanning phase.");
 		}
 
+		if (this.idleVehiclesReturnToDepots && this.returnToDepotTimeout < this.returnToDepotEvaluationInterval) {
+			log.warn("idleVehiclesReturnToDepots is active and returnToDepotTimeout < returnToDepotEvaluationInterval. " +
+				"Vehicles will be send back to depot after {} seconds",returnToDepotEvaluationInterval);
+		}
+
 		Verify.verify(getParameterSets(MinCostFlowRebalancingStrategyParams.SET_NAME).size() <= 1,
 				"More than one rebalancing parameter sets is specified");
 
@@ -307,7 +325,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	}
 
 	/**
-	 * Convenience method that brings syntax closer to syntax in, e.g., {@link PlansCalcRouteConfigGroup} or {@link PlanCalcScoreConfigGroup}
+	 * Convenience method that brings syntax closer to syntax in, e.g., {@link RoutingConfigGroup} or {@link ScoringConfigGroup}
 	 */
 	public final void addDrtInsertionSearchParams(final DrtInsertionSearchParams pars) {
 		addParameterSet(pars);

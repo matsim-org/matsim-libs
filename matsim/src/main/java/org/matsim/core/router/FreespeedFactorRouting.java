@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -38,9 +38,9 @@ import org.matsim.vehicles.Vehicle;
 
 class FreespeedFactorRouting implements Provider<RoutingModule> {
 
-	private final PlansCalcRouteConfigGroup.ModeRoutingParams params;
+	private final RoutingConfigGroup.TeleportedModeParams params;
 
-	public FreespeedFactorRouting(PlansCalcRouteConfigGroup.ModeRoutingParams params) {
+	public FreespeedFactorRouting( RoutingConfigGroup.TeleportedModeParams params ) {
 		this.params = params;
 	}
 

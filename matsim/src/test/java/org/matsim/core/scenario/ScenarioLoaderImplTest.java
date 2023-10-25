@@ -97,33 +97,6 @@ public class ScenarioLoaderImplTest {
 		Assert.assertTrue( caughtException );
 	}
 
-	@Test
-	public void testLoadScenario_loadTransitLinesAttributes() {
-		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(this.util.classInputResourcePath(), "transitConfig.xml"));
-		config.transit().setTransitLinesAttributesFile("transitLinesAttributes.xml");
-		config.transit().setInsistingOnUsingDeprecatedAttributeFiles(true);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Assert.assertEquals(
-				"unexpected attribute value",
-				"world",
-				TransitScheduleUtils.getLineAttribute(
-						scenario.getTransitSchedule().getTransitLines().get(Id.create("Blue Line", TransitLine.class)),
-						"hello"));
-	}
-
-	@Test
-	public void testLoadScenario_loadTransitStopsAttributes() {
-		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(this.util.classInputResourcePath(), "transitConfig.xml"));
-		config.transit().setTransitStopsAttributesFile("transitStopsAttributes.xml");
-		config.transit().setInsistingOnUsingDeprecatedAttributeFiles(true);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Assert.assertEquals(
-				"unexpected attribute value",
-				Boolean.TRUE,
-				TransitScheduleUtils.getStopFacilityAttribute(
-						scenario.getTransitSchedule().getFacilities().get(Id.create(1, TransitStopFacility.class)),
-						"hasP+R"));
-	}
 
 	@Test
 	public void testLoadScenario_loadFacilitiesAttributes() {

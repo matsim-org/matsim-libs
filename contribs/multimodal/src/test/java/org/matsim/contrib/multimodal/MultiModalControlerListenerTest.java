@@ -52,8 +52,8 @@ import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -69,7 +69,7 @@ public class MultiModalControlerListenerTest {
 
 	private static final Logger log = LogManager.getLogger(MultiModalControlerListenerTest.class);
 
-	@Rule 
+	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@SuppressWarnings("static-method")
@@ -89,10 +89,10 @@ public class MultiModalControlerListenerTest {
 
 		config.qsim().setEndTime(24 * 3600);
 
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 		// doesn't matter - MultiModalModule sets the mobsim unconditionally. it just can't be something
 		// which the ControlerDefaultsModule knows about. Try it, you will get an error. Quite safe.
-		config.controler().setMobsim("myMobsim");
+		config.controller().setMobsim("myMobsim");
 
 		MultiModalConfigGroup multiModalConfigGroup = new MultiModalConfigGroup();
 		multiModalConfigGroup.setMultiModalSimulationEnabled(true);
@@ -102,19 +102,19 @@ public class MultiModalControlerListenerTest {
 
 		ActivityParams homeParams = new ActivityParams("home");
 		homeParams.setTypicalDuration(16*3600);
-		config.planCalcScore().addActivityParams(homeParams);
+		config.scoring().addActivityParams(homeParams);
 
 		// set default walk speed; according to Weidmann 1.34 [m/s]
 		double defaultWalkSpeed = 1.34;
-		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
+		config.routing().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
 
 		// set default bike speed; Parkin and Rotheram according to 6.01 [m/s]
 		double defaultBikeSpeed = 6.01;
-		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.bike, defaultBikeSpeed);
+		config.routing().setTeleportedModeSpeed(TransportMode.bike, defaultBikeSpeed);
 
 		// set unkown mode speed
 		double unknownModeSpeed = 2.0;
-		config.plansCalcRoute().setTeleportedModeSpeed("other", unknownModeSpeed);
+		config.routing().setTeleportedModeSpeed("other", unknownModeSpeed);
 
         config.travelTimeCalculator().setFilterModes(true);
 
@@ -164,10 +164,10 @@ public class MultiModalControlerListenerTest {
 		scenario.getPopulation().addPerson(createPerson(scenario, "p3", "other"));
 
 		Controler controler = new Controler(scenario);
-        controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		// controler listener that initializes the multi-modal simulation
         controler.addOverridingModule(new MultiModalModule());
@@ -211,11 +211,11 @@ public class MultiModalControlerListenerTest {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "config.xml"));
 		ConfigUtils.loadConfig(config, inputDir + "config_berlin_multimodal.xml");
 		config.addModule(new MultiModalConfigGroup());
-		config.controler().setOutputDirectory(this.utils.getOutputDirectory());
+		config.controller().setOutputDirectory(this.utils.getOutputDirectory());
 
 		// doesn't matter - MultiModalModule sets the mobsim unconditionally. it just can't be something
 		// which the ControlerDefaultsModule knows about. Try it, you will get an error. Quite safe.
-		config.controler().setMobsim("myMobsim");
+		config.controller().setMobsim("myMobsim");
 
 //		config.qsim().setRemoveStuckVehicles(true); // but why?  kai, feb'16
 		config.qsim().setRemoveStuckVehicles(false);
@@ -251,10 +251,10 @@ public class MultiModalControlerListenerTest {
 		PrepareMultiModalScenario.run(scenario);
 
 		Controler controler = new Controler(scenario);
-        controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		// controler listener that initializes the multi-modal simulation
         controler.addOverridingModule(new MultiModalModule());
@@ -268,16 +268,16 @@ public class MultiModalControlerListenerTest {
 
         LinkModeChecker linkModeChecker = new LinkModeChecker(controler.getScenario().getNetwork());
 		controler.getEvents().addHandler(linkModeChecker);
-		
+
 		controler.run();
-		
-		/* NOTE: When I introduced access/egress legs, nearly everything in the following (besides bikeCount) changed.   
+
+		/* NOTE: When I introduced access/egress legs, nearly everything in the following (besides bikeCount) changed.
 		 * After setting removeStuckVehicles from true to false, the counts were stable.  So with access/egress legs, a
 		 * different number of vehicles got lost ... which makes sense, because they enter/leave the traffic at different times.
-		 *  
+		 *
 		 * Also, after not losing vehicles vehicles any more, the travel times for the uncongested modes bike and walk were stable.
 		 * Predictably, the travel time for the congested mode changes.
-		 * 
+		 *
 		 * kai, feb'16
 		 */
 
@@ -310,7 +310,7 @@ public class MultiModalControlerListenerTest {
 		LogManager.getLogger( this.getClass() ).warn( "carTravelTime: " + carTravelTime ) ;
 		LogManager.getLogger( this.getClass() ).warn( "bikeTravelTime: " + bikeTravelTime ) ;
 		LogManager.getLogger( this.getClass() ).warn( "walkTravelTime: " + walkTravelTime ) ;
-		if ( !config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
+		if ( !config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 			Assert.assertEquals(
 					"unexpected total travel time for car mode with number of threads "+numberOfThreads,
 					1.1186864E8, carTravelTime, MatsimTestUtils.EPSILON);
@@ -407,7 +407,7 @@ public class MultiModalControlerListenerTest {
 		public void handleEvent(LinkLeaveEvent event) {
 			Link link = this.network.getLinks().get(event.getLinkId());
 			String mode = this.vehModes.get(event.getVehicleId());
-			
+
 			if (!link.getAllowedModes().contains(mode)) {
 				log.error(mode);
 			}

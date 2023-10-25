@@ -37,7 +37,7 @@
 		<param name="flowCapacityFactor" value="100.0"/>
 	</module>
 
-	<module name="controler">
+	<module name="controller">
 		<param name="outputDirectory" value="test/output/mielec_taxi_benchmark"/>
 		<param name="overwriteFiles" value="deleteDirectoryIfExists"/>
 		<param name="writeEventsInterval" value="0"/>
@@ -49,13 +49,13 @@
 		<param name="lastIteration" value="0"/>
 	</module>
 
-	<module name="planCalcScore">
+	<module name="scoring">
 		<param name="activityType_0" value="dummy"/>
 		<param name="activityTypicalDuration_0" value="24:00:00"/>
 		<param name="traveling_taxi" value="-6"/>
 	</module>
 
-	<module name="strategy">
+	<module name="replanning">
 		<!-- We focus only on DynAgents. "Standard" agents do not change their behaviour -->
 		<param name="maxAgentPlanMemorySize" value="1"/>
 		<param name="ModuleProbability_1" value="1.0"/>

@@ -25,7 +25,7 @@ public final class MapPlot extends Viz {
 	/**
 	 * Set the shape url, providing the path.
 	 */
-	public MapPlot setShapes(String file) {
+	public MapPlot setShape(String file) {
 		shapes = file;
 		return this;
 	}
@@ -58,6 +58,8 @@ public final class MapPlot extends Viz {
 		public DisplaySettings fill = new DisplaySettings();
 
 		public DisplaySettings fillHeight = new DisplaySettings();
+
+		public DisplaySettings radius = new DisplaySettings();
 
 	}
 

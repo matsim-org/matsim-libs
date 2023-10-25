@@ -71,7 +71,7 @@ public class NoiseAnalysis implements MATSimAppCommand {
 		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
 
 		config.global().setCoordinateSystem(crs.getInputCRS());
-		config.controler().setRunId(runId);
+		config.controller().setRunId(runId);
 		if (!runId.equals("")) {
 			config.network().setInputFile(runDirectory + runId + ".output_network.xml.gz");
 			config.plans().setInputFile(runDirectory + runId + ".output_plans.xml.gz");
@@ -79,7 +79,7 @@ public class NoiseAnalysis implements MATSimAppCommand {
 			config.network().setInputFile(runDirectory + "output_network.xml.gz");
 			config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		}
-		config.controler().setOutputDirectory(runDirectory);
+		config.controller().setOutputDirectory(runDirectory);
 
 		// adjust the default noise parameters
 		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);

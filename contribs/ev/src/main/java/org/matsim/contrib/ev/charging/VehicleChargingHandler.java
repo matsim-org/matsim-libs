@@ -42,8 +42,8 @@ import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
-import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureUtils;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.vehicles.Vehicle;
 
@@ -60,7 +60,7 @@ public class VehicleChargingHandler
 		ChargingEndEventHandler, MobsimScopeEventHandler {
 
 	public static final String CHARGING_IDENTIFIER = " charging";
-	public static final String CHARGING_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType(
+	public static final String CHARGING_INTERACTION = ScoringConfigGroup.createStageActivityType(
 			CHARGING_IDENTIFIER);
 	private final Map<Id<Person>, Id<Vehicle>> lastVehicleUsed = new HashMap<>();
 	private final Map<Id<Vehicle>, Id<Charger>> vehiclesAtChargers = new HashMap<>();
@@ -73,7 +73,7 @@ public class VehicleChargingHandler
 	VehicleChargingHandler(ChargingInfrastructure chargingInfrastructure, ElectricFleet electricFleet) {
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.electricFleet = electricFleet;
-		chargersAtLinks = ChargingInfrastructures.getChargersAtLinks(chargingInfrastructure);
+		chargersAtLinks = ChargingInfrastructureUtils.getChargersAtLinks(chargingInfrastructure );
 	}
 
 	/**

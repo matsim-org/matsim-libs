@@ -50,7 +50,7 @@ public final class RoadPricingTravelDisutilityFactory implements TravelDisutilit
 	}
 
 	public RoadPricingTravelDisutilityFactory(TravelDisutilityFactory previousTravelDisutilityFactory, RoadPricingScheme scheme, Config config) {
-		this( previousTravelDisutilityFactory, scheme, config.planCalcScore().getMarginalUtilityOfMoney() ) ;
+		this( previousTravelDisutilityFactory, scheme, config.scoring().getMarginalUtilityOfMoney() ) ;
 	}
 
 	@Override

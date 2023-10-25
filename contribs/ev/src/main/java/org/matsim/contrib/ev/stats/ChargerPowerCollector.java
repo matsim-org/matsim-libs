@@ -53,7 +53,7 @@ import com.google.inject.Inject;
 /*
  * created by jbischoff, 26.10.2018
  */
-public class ChargerPowerCollector
+public final class ChargerPowerCollector
 		implements ChargingStartEventHandler, ChargingEndEventHandler, MobsimScopeEventHandler, MobsimBeforeCleanupListener {
 
 	@Inject
@@ -64,6 +64,8 @@ public class ChargerPowerCollector
 	private ChargingInfrastructure chargingInfrastructure;
 	@Inject
 	private ElectricFleet fleet;
+
+	@Inject ChargerPowerCollector(){} // this forces instantiation via guice.  kai, oct'23
 
 	private record TimeCharge(double time, double charge) {
 	}

@@ -55,8 +55,8 @@ public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV1FallbackToAverage {
 			var configUrl = IOUtils.extendUrl( scenarioUrl, "config_detailed.xml" );
 			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String [] { configUrl.toString() } );
 
-			config.controler().setOutputDirectory( utils.getOutputDirectory() );
-			config.controler().setLastIteration( 1 );
+			config.controller().setOutputDirectory( utils.getOutputDirectory() );
+			config.controller().setLastIteration( 1 );
 			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 			emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 			emissionsConfig.setDetailedVsAverageLookupBehavior(

@@ -37,7 +37,6 @@ import org.matsim.core.utils.collections.CollectionUtils;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
-import java.util.Map;
 
 
 /**
@@ -60,7 +59,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 			}
 			// go through all modes:
 			//			for (final String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModesAsString() )) {
-			for (final String mode : getConfig().plansCalcRoute().getNetworkModes() ) {
+			for (final String mode : getConfig().routing().getNetworkModes() ) {
 
 				// generate and bind the observer:
 				bind(TravelTimeCalculator.class).annotatedWith(Names.named(mode)).toProvider(new SingleModeTravelTimeCalculatorProvider(mode)).in(Singleton.class);
@@ -89,7 +88,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 			// bind the TravelTime objects.  In this case, this just passes on the same information from TravelTimeCalculator to each individual mode:
 			if (getConfig().travelTimeCalculator().isCalculateLinkTravelTimes()) {
 //				for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModesAsString() )) {
-				for ( String mode : getConfig().plansCalcRoute().getNetworkModes() ) {
+				for ( String mode : getConfig().routing().getNetworkModes() ) {
 					addTravelTimeBinding(mode).toProvider(ObservedLinkTravelTimes.class);
 				}
 			}

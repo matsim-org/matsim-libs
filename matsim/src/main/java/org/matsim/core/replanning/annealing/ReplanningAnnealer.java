@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -91,9 +91,9 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 				this.currentValues.put(av.getAnnealParameter(), av.getStartValue());
 				header.add(av.getAnnealParameter().name());
 				if (av.getAnnealParameter().equals(AnnealParameterOption.globalInnovationRate)) {
-					header.addAll(this.config.strategy().getStrategySettings().stream()
+					header.addAll(this.config.replanning().getStrategySettings().stream()
 							.filter(s -> Objects.equals(av.getDefaultSubpopulation(), s.getSubpopulation()))
-							.map(StrategyConfigGroup.StrategySettings::getStrategyName)
+							.map(ReplanningConfigGroup.StrategySettings::getStrategyName)
 							.collect(Collectors.toList()));
 				}
 			} else { // if disabled, better remove it
@@ -112,7 +112,7 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		this.currentIter = event.getIteration() - this.config.controler().getFirstIteration();
+		this.currentIter = event.getIteration() - this.config.controller().getFirstIteration();
 		Map<String, String> annealStats = new HashMap<>();
 		for (AnnealingVariable av : this.saConfig.getAnnealingVariables().values()) {
 			if (this.currentIter > 0) {
@@ -140,7 +140,7 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 						break;
 					case linear:
 						double slope = (av.getStartValue() - av.getEndValue())
-								/ (this.config.controler().getFirstIteration() - this.innovationStop);
+								/ (this.config.controller().getFirstIteration() - this.innovationStop);
 						this.currentValues.compute(av.getAnnealParameter(), (k, v) ->
 								this.currentIter * slope + av.getStartValue());
 						break;
@@ -180,13 +180,13 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 	private void anneal(IterationStartsEvent event, AnnealingVariable av, double annealValue, Map<String, String> annealStats) {
 		switch (av.getAnnealParameter()) {
 			case BrainExpBeta:
-				this.config.planCalcScore().setBrainExpBeta(annealValue);
+				this.config.scoring().setBrainExpBeta(annealValue);
 				break;
 			case PathSizeLogitBeta:
-				this.config.planCalcScore().setPathSizeLogitBeta(annealValue);
+				this.config.scoring().setPathSizeLogitBeta(annealValue);
 				break;
 			case learningRate:
-				this.config.planCalcScore().setLearningRate(annealValue);
+				this.config.scoring().setLearningRate(annealValue);
 				break;
 			case globalInnovationRate:
 				if (this.currentIter > this.innovationStop) {
@@ -195,7 +195,7 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 				List<Double> annealValues = annealReplanning(annealValue,
 						event.getServices().getStrategyManager(), av.getDefaultSubpopulation());
 				int i = 0;
-				for (StrategyConfigGroup.StrategySettings ss : this.config.strategy().getStrategySettings()) {
+				for (ReplanningConfigGroup.StrategySettings ss : this.config.replanning().getStrategySettings()) {
 					if (Objects.equals(ss.getSubpopulation(), av.getDefaultSubpopulation())) {
 						annealStats.put(ss.getStrategyName(), String.format(Locale.US, "%.4f", annealValues.get(i)));
 						i++;
@@ -262,9 +262,9 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 		if (this.currentIter == this.innovationStop + 1 && stratType.equals(StratType.allInnovation)) {
 			return 0.0;
 		}
-		Collection<StrategyConfigGroup.StrategySettings> strategies = config.strategy().getStrategySettings();
+		Collection<ReplanningConfigGroup.StrategySettings> strategies = config.replanning().getStrategySettings();
 		double totalWeights = 0.0;
-		for (StrategyConfigGroup.StrategySettings strategy : strategies) {
+		for (ReplanningConfigGroup.StrategySettings strategy : strategies) {
 			if (Objects.equals(strategy.getSubpopulation(), subpopulation)) {
 				switch (stratType) {
 					case allSelectors:
@@ -289,12 +289,12 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 	}
 
 	private int getInnovationStop(Config config) {
-		int globalInnovationDisableAfter = (int) ((config.controler().getLastIteration() - config.controler().getFirstIteration())
-				* config.strategy().getFractionOfIterationsToDisableInnovation() + config.controler().getFirstIteration());
+		int globalInnovationDisableAfter = (int) ((config.controller().getLastIteration() - config.controller().getFirstIteration())
+				* config.replanning().getFractionOfIterationsToDisableInnovation() + config.controller().getFirstIteration());
 
 		int innoStop = -1;
 
-		for (StrategyConfigGroup.StrategySettings strategy : config.strategy().getStrategySettings()) {
+		for (ReplanningConfigGroup.StrategySettings strategy : config.replanning().getStrategySettings()) {
 			// check if this modules should be disabled after some iterations
 			int maxIter = strategy.getDisableAfter();
 			if ((maxIter > globalInnovationDisableAfter || maxIter == -1) && isInnovationStrategy(strategy.getStrategyName())) {
@@ -312,20 +312,20 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 			}
 		}
 
-		return Math.min(innoStop, config.controler().getLastIteration());
+		return Math.min(innoStop, config.controller().getLastIteration());
 	}
 
 	private void checkAndFixStartValue(ReplanningAnnealerConfigGroup.AnnealingVariable av, StartupEvent event) {
 		double configValue;
 		switch (av.getAnnealParameter()) {
 			case BrainExpBeta:
-				configValue = this.config.planCalcScore().getBrainExpBeta();
+				configValue = this.config.scoring().getBrainExpBeta();
 				break;
 			case PathSizeLogitBeta:
-				configValue = this.config.planCalcScore().getPathSizeLogitBeta();
+				configValue = this.config.scoring().getPathSizeLogitBeta();
 				break;
 			case learningRate:
-				configValue = this.config.planCalcScore().getLearningRate();
+				configValue = this.config.scoring().getLearningRate();
 				break;
 			case globalInnovationRate:
 				double innovationWeights = getStrategyWeights(this.config, av.getDefaultSubpopulation(), StratType.allInnovation);
@@ -362,8 +362,8 @@ public class ReplanningAnnealer implements IterationStartsListener, StartupListe
 			stratMan.changeWeightOfStrategy(strategy, subpopulation, weight);
 		}
 		// adapt also in config for the record
-		Collection<StrategyConfigGroup.StrategySettings> strategiesConfig = config.strategy().getStrategySettings();
-		for (StrategyConfigGroup.StrategySettings strategy : strategiesConfig) {
+		Collection<ReplanningConfigGroup.StrategySettings> strategiesConfig = config.replanning().getStrategySettings();
+		for (ReplanningConfigGroup.StrategySettings strategy : strategiesConfig) {
 			if (Objects.equals(strategy.getSubpopulation(), subpopulation)) {
 				double weight = strategy.getWeight();
 				if (isInnovationStrategy(strategy.toString())) {

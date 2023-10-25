@@ -4,7 +4,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.application.MATSimApplication;
-import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -23,7 +22,7 @@ public class DashboardTests {
 	private void run(Dashboard... dashboards) {
 
 		Config config = TestScenario.loadConfig(utils);
-		config.controler().setLastIteration(2);
+		config.controller().setLastIteration(2);
 
 		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
 		group.defaultParams().sampleSize = 0.001;
