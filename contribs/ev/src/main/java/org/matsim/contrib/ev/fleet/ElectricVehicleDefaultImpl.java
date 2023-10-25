@@ -20,8 +20,6 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import java.util.Objects;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
@@ -31,27 +29,18 @@ import org.matsim.vehicles.Vehicle;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 
-public class ElectricVehicleImpl implements ElectricVehicle {
-	public static ElectricVehicle create(ElectricVehicleSpecification vehicleSpecification,
-			DriveEnergyConsumption.Factory driveFactory, AuxEnergyConsumption.Factory auxFactory,
-			ChargingPower.Factory chargingFactory) {
-		ElectricVehicleImpl ev = new ElectricVehicleImpl(vehicleSpecification);
-		ev.driveEnergyConsumption = Objects.requireNonNull(driveFactory.create(ev));
-		ev.auxEnergyConsumption = Objects.requireNonNull(auxFactory.create(ev));
-		ev.chargingPower = Objects.requireNonNull(chargingFactory.create(ev));
-		return ev;
-	}
+final class ElectricVehicleDefaultImpl implements ElectricVehicle {
 
 	private final ElectricVehicleSpecification vehicleSpecification;
 	private final Battery battery;
 
-	private DriveEnergyConsumption driveEnergyConsumption;
-	private AuxEnergyConsumption auxEnergyConsumption;
-	private ChargingPower chargingPower;
+	DriveEnergyConsumption driveEnergyConsumption;
+	AuxEnergyConsumption auxEnergyConsumption;
+	ChargingPower chargingPower;
 
-	private ElectricVehicleImpl(ElectricVehicleSpecification vehicleSpecification) {
+	ElectricVehicleDefaultImpl( ElectricVehicleSpecification vehicleSpecification ) {
 		this.vehicleSpecification = vehicleSpecification;
-		battery = new BatteryImpl(vehicleSpecification.getBatteryCapacity(), vehicleSpecification.getInitialCharge());
+		battery = new BatteryDefaultImpl(vehicleSpecification.getBatteryCapacity(), vehicleSpecification.getInitialCharge());
 	}
 
 	@Override

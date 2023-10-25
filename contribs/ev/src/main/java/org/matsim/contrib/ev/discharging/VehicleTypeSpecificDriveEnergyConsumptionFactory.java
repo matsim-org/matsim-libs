@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.vehicles.VehicleType;
 
-public class VehicleTypeSpecificDriveEnergyConsumptionFactory implements DriveEnergyConsumption.Factory {
+public final class VehicleTypeSpecificDriveEnergyConsumptionFactory implements DriveEnergyConsumption.Factory {
 
 	private final Map<Id<VehicleType>, DriveEnergyConsumption.Factory> consumptionMap = new HashMap<>();
 

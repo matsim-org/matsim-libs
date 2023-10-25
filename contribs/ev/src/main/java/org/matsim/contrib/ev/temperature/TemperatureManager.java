@@ -51,7 +51,7 @@ public class TemperatureManager implements MobsimBeforeSimStepListener, MobsimIn
 	private final EventsManager events;
 
 	@Inject
-	public TemperatureManager(Config config, EventsManager events) {
+	TemperatureManager(Config config, EventsManager events) {
 		this.events = events;
 		TemperatureChangeConfigGroup temperatureChangeConfigGroup = (TemperatureChangeConfigGroup)config.getModules()
 				.get(TemperatureChangeConfigGroup.GROUP_NAME);

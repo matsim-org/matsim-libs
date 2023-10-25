@@ -1,9 +1,9 @@
-/*
- * *********************************************************************** *
+/* *********************************************************************** *
  * project: org.matsim.*
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,37 +15,18 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** *
- */
+ * *********************************************************************** */
 
-package org.matsim.contrib.ev.fleet;
+package org.matsim.contrib.parking.parkingsearch.events;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.core.events.handler.EventHandler;
 
 /**
- * @author Michal Maciejewski (michalm)
+ * @author jbischoff
  */
-public final class ElectricFleetSpecificationImpl implements ElectricFleetSpecification {
-	private final Map<Id<Vehicle>, ElectricVehicleSpecification> specifications = new LinkedHashMap<>();
 
-	@Override
-	public Map<Id<Vehicle>, ElectricVehicleSpecification> getVehicleSpecifications() {
-		return Collections.unmodifiableMap(specifications);
-	}
+public interface StartWaitingForParkingEventHandler extends EventHandler {
 
-	@Override
-	public void addVehicleSpecification(ElectricVehicleSpecification specification) {
-		specifications.put(specification.getId(), specification);
-	}
+	public void handleEvent(StartWaitingForParkingEvent event);
 
-	@Override
-	public void clear() {
-		specifications.clear();
-	}
 }
-

@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2022 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,19 +18,36 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.ev.fleet;
+package org.matsim.contrib.ev.infrastructure;
 
-import java.util.Collection;
+import java.util.Map;
 
-import org.matsim.vehicles.EngineInformation;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.common.collections.SpecificationContainer;
 
-public class ElectricVehicleSpecifications {
-	public static void setInitialSoc(Vehicle vehicle, double initialSoc) {
-		vehicle.getAttributes().putAttribute(ElectricVehicleSpecificationImpl.INITIAL_SOC, initialSoc);
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+final class ChargingInfrastructureSpecificationDefaultImpl implements ChargingInfrastructureSpecification {
+	private final SpecificationContainer<Charger, ChargerSpecification> container = new SpecificationContainer<>();
+
+	@Override
+	public Map<Id<Charger>, ChargerSpecification> getChargerSpecifications() {
+		return container.getSpecifications();
 	}
 
-	public static void setChargerTypes(EngineInformation engineInformation, Collection<String> chargerTypes) {
-		engineInformation.getAttributes().putAttribute(ElectricVehicleSpecificationImpl.CHARGER_TYPES, chargerTypes);
+	@Override
+	public void addChargerSpecification(ChargerSpecification specification) {
+		container.addSpecification(specification);
+	}
+
+	@Override
+	public void replaceChargerSpecification(ChargerSpecification specification) {
+		container.replaceSpecification(specification);
+	}
+
+	@Override
+	public void removeChargerSpecification(Id<Charger> chargerId) {
+		container.removeSpecification(chargerId);
 	}
 }

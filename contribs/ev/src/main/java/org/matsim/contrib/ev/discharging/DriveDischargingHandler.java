@@ -44,7 +44,7 @@ import com.google.inject.Inject;
  * calculating the drive-related energy consumption. However, the time spent on the first link is used by the time-based
  * idle discharge process (see {@link IdleDischargingHandler}).
  */
-public class DriveDischargingHandler
+public final class DriveDischargingHandler
 		implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, MobsimScopeEventHandler {
 	private static class EvDrive {
 		private final Id<Vehicle> vehicleId;

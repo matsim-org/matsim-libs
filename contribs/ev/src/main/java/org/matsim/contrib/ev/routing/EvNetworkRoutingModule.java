@@ -36,10 +36,7 @@ import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.VehicleChargingHandler;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
-import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.fleet.ElectricVehicleImpl;
-import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
+import org.matsim.contrib.ev.fleet.*;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
 import org.matsim.contrib.common.util.StraightLineKnnFinder;
@@ -180,10 +177,10 @@ final class EvNetworkRoutingModule implements RoutingModule {
 		Map<Link, Double> consumptions = new LinkedHashMap<>();
 		NetworkRoute route = (NetworkRoute)basicLeg.getRoute();
 		List<Link> links = NetworkUtils.getLinks(network, route.getLinkIds());
-		ElectricVehicle pseudoVehicle = ElectricVehicleImpl.create(ev, driveConsumptionFactory, auxConsumptionFactory,
+		ElectricVehicle pseudoVehicle = ElectricFleetUtils.create(ev, driveConsumptionFactory, auxConsumptionFactory,
 				v -> charger -> {
 					throw new UnsupportedOperationException();
-				});
+				} );
 		DriveEnergyConsumption driveEnergyConsumption = pseudoVehicle.getDriveEnergyConsumption();
 		AuxEnergyConsumption auxEnergyConsumption = pseudoVehicle.getAuxEnergyConsumption();
 		double linkEnterTime = basicLeg.getDepartureTime().seconds();

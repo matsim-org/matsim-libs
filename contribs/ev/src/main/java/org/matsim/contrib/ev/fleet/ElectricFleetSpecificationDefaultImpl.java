@@ -20,36 +20,32 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Preconditions;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-public class BatteryImpl implements Battery {
-	private final double capacity;
-	private double charge;
+import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.Vehicle;
 
-	public BatteryImpl(double capacity, double charge) {
-		this.capacity = capacity;
-		this.charge = charge;
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+final class ElectricFleetSpecificationDefaultImpl implements ElectricFleetSpecification {
+	private final Map<Id<Vehicle>, ElectricVehicleSpecification> specifications = new LinkedHashMap<>();
+
+	@Override
+	public Map<Id<Vehicle>, ElectricVehicleSpecification> getVehicleSpecifications() {
+		return Collections.unmodifiableMap(specifications);
 	}
 
 	@Override
-	public double getCapacity() {
-		return capacity;
+	public void addVehicleSpecification(ElectricVehicleSpecification specification) {
+		specifications.put(specification.getId(), specification);
 	}
 
 	@Override
-	public double getCharge() {
-		return charge;
-	}
-
-	@Override
-	public void setCharge(double charge) {
-		Preconditions.checkArgument(charge >= 0 && charge <= capacity, "Charge outside allowed range (SOC=%s)", charge / capacity);
-		this.charge = charge;
-	}
-
-	@Override
-	public String toString() {
-		return MoreObjects.toStringHelper(this).add("capacity", capacity).add("charge", charge).toString();
+	public void clear() {
+		specifications.clear();
 	}
 }
+

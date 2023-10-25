@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2022 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,32 +20,36 @@
 
 package org.matsim.contrib.ev.fleet;
 
-import static org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationImpl.INITIAL_SOC;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
 
-import org.matsim.vehicles.MatsimVehicleReader;
-import org.matsim.vehicles.MatsimVehicleWriter;
-import org.matsim.vehicles.VehicleUtils;
+final class BatteryDefaultImpl implements Battery {
+	private final double capacity;
+	private double charge;
 
-/**
- * @author Michal Maciejewski (michalm)
- */
-public class ConvertInitialChargeToInitialSoc {
-	private static final String INITIAL_ENERGY_kWh = "initialEnergyInKWh";
+	BatteryDefaultImpl( double capacity, double charge ) {
+		this.capacity = capacity;
+		this.charge = charge;
+	}
 
-	public static void run(String file) {
-		var vehicles = VehicleUtils.createVehiclesContainer();
-		var reader = new MatsimVehicleReader(vehicles);
-		reader.readFile(file);
+	@Override
+	public double getCapacity() {
+		return capacity;
+	}
 
-		for (var v : vehicles.getVehicles().values()) {
-			double battery_kWh = VehicleUtils.getEnergyCapacity(v.getType().getEngineInformation());
-			double initial_kWh = (double)v.getAttributes().getAttribute(INITIAL_ENERGY_kWh);
-			double initial_soc = initial_kWh / battery_kWh;
-			v.getAttributes().removeAttribute(INITIAL_ENERGY_kWh);
-			v.getAttributes().putAttribute(INITIAL_SOC, initial_soc);
-		}
+	@Override
+	public double getCharge() {
+		return charge;
+	}
 
-		var writer = new MatsimVehicleWriter(vehicles);
-		writer.writeFile(file);
+	@Override
+	public void setCharge(double charge) {
+		Preconditions.checkArgument(charge >= 0 && charge <= capacity, "Charge outside allowed range (SOC=%s)", charge / capacity);
+		this.charge = charge;
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this).add("capacity", capacity).add("charge", charge).toString();
 	}
 }

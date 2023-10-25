@@ -37,8 +37,10 @@ import com.google.common.collect.ImmutableMap;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class ChargingInfrastructures {
-	static final Logger log = LogManager.getLogger(ChargingInfrastructures.class);
+public class ChargingInfrastructureUtils{
+	static final Logger log = LogManager.getLogger( ChargingInfrastructureUtils.class );
+
+	private ChargingInfrastructureUtils(){} // do not instantiate
 
 	public static ChargingInfrastructure createChargingInfrastructure(
 			ChargingInfrastructureSpecification infrastructureSpecification, Function<Id<Link>, Link> linkProvider,
@@ -46,7 +48,7 @@ public class ChargingInfrastructures {
 		var chargers = infrastructureSpecification.getChargerSpecifications()
 				.values()
 				.stream()
-				.map(s -> new ChargerImpl(s, linkProvider.apply(s.getLinkId()), chargingLogicFactory.create(s)))
+				.map(s -> new ChargerDefaultImpl(s, linkProvider.apply(s.getLinkId() ), chargingLogicFactory.create(s )) )
 				.collect(ImmutableMap.toImmutableMap(Charger::getId, c -> (Charger)c));
 		return () -> chargers;
 	}
@@ -72,7 +74,7 @@ public class ChargingInfrastructures {
 		var reachableLinks = network.getLinks();
 		var filteredChargers = infrastructure.getChargers().values().stream().map(c -> {
 			var link = reachableLinks.get(c.getLink().getId());
-			return link == null ? null : new ChargerImpl(c.getSpecification(), link, c.getLogic());
+			return link == null ? null : new ChargerDefaultImpl(c.getSpecification(), link, c.getLogic());
 		}).filter(Objects::nonNull).collect(ImmutableMap.toImmutableMap(Charger::getId, c -> (Charger)c));
 
 		int chargerCount = infrastructure.getChargers().size();
