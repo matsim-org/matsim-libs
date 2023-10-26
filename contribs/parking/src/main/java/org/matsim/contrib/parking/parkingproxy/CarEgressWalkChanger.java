@@ -119,14 +119,15 @@ class CarEgressWalkChanger implements BeforeMobsimListener {
 	 * by that time (calling this method twice, first with {@code false}, then with {@code true} should yield the original plans)
 	 */
 	private void changeEgressTimesByGridcell(Collection<? extends Person> population, boolean reverse) {
-		int sign = reverse ? -1 : 1;
 		for (Person p : population) {
 			for (LegActPair walkActPair : this.egressFinder.findEgressWalks(p.getSelectedPlan())) {
-				double penalty = sign * this.observer.getPenaltyCalculator().getPenalty(walkActPair.leg.getDepartureTime().seconds(), walkActPair.act.getCoord());
-				setTimes(walkActPair, penalty);
 				if (reverse) {
+					double penalty = Math.round((double) walkActPair.leg.getAttributes().getAttribute(PENALTY_ATTRIBUTE));
+					setTimes(walkActPair, -penalty);
 					walkActPair.leg.getAttributes().removeAttribute(PENALTY_ATTRIBUTE);
 				} else {
+					double penalty = this.observer.getPenaltyCalculator().getPenalty(walkActPair.leg.getDepartureTime().seconds(), walkActPair.act.getCoord());
+					setTimes(walkActPair, penalty);
 					walkActPair.leg.getAttributes().putAttribute(PENALTY_ATTRIBUTE, penalty);
 				}
 			}
