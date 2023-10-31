@@ -41,6 +41,11 @@ public class AttributesTest {
 		attributes.putAttribute( "the answer" , 42 );
 		attributes.putAttribute( "1 the begin" , 1L );
 
+		Assert.assertTrue(attributes.hasAttribute("1 the begin"));
+		Assert.assertTrue(attributes.hasAttribute("the answer"));
+
+		Assert.assertFalse(attributes.hasAttribute("unknown"));
+
 		Assert.assertEquals( "unexpected number of elements in "+attributes ,
 				4 , attributes.size() );
 

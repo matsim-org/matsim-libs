@@ -107,6 +107,11 @@ public final class AttributesImpl implements Attributes {
 		return prev;
 	}
 
+	public boolean hasAttribute( final String attribute ) {
+		final int insertion = Arrays.binarySearch( keys , attribute );
+		return insertion >= 0;
+	}
+
 	public void clear() {
 		keys = EMPTY_KEYS;
 		values = EMPTY_VALUES;

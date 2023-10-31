@@ -34,6 +34,8 @@ public interface Attributes {
 
 	public Object removeAttribute( final String attribute );
 
+	public boolean hasAttribute( final String attribute );
+
 	public void clear();
 
 	public Map<String, Object> getAsMap();

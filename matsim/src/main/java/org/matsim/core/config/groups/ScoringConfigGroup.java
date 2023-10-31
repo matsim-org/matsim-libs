@@ -20,14 +20,7 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,6 +33,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * Design decisions:
@@ -1246,6 +1240,95 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			return this ;
 		}
 
+
+	}
+
+	/**
+	 * Stores attribute dependent parameters for scoring.
+	 */
+	public static class AttributeDependentParameterSet extends ReflectiveConfigGroup {
+
+		public static final String SET_TYPE = "attributeDependentParameters";
+
+		private AttributeDependentParameterSet() {
+			super(SET_TYPE, true);
+		}
+
+		/**
+		 * Gets the attribute value for certain attribute.
+		 */
+		public String getAttributeValue(String attr) {
+			return this.getParams().get(attr);
+		}
+
+
+		/**
+		 * Set attribute value for specific attribute.
+		 */
+		public AttributeDependentParameterSet setAttributeValue(String attr, String value) {
+			this.getParams().put(attr, value);
+			return this;
+		}
+
+		/**
+		 * Checks if the given attributes match the config. If true these parameters are applicable to tbe object.
+		 */
+		public boolean matchObject(Attributes attr) {
+
+			// TODO: special case int <-> double
+			// boolean values
+			// allow lists
+
+			for (Map.Entry<String, String> e : this.getParams().entrySet()) {
+				if (!attr.hasAttribute(e.getKey()))
+					return false;
+
+				Object objValue = attr.getAttribute(e.getKey());
+
+				// compare as string
+				if (!Objects.toString(objValue).equals(e.getValue()))
+					return false;
+
+			}
+
+			return true;
+		}
+
+		@Override
+		public ConfigGroup createParameterSet(final String type) {
+            return switch (type) {
+                case ModeParams.SET_TYPE -> new ModeParams();
+                default -> throw new IllegalArgumentException(type);
+            };
+		}
+
+
+		/**
+		 * Return the mode params of a specific mode, or mull of they don't exist.
+		 */
+		public ModeParams getModeParams(final String mode) {
+			for (ConfigGroup parameterSet : getParameterSets(ModeParams.SET_TYPE)) {
+				ModeParams params = (ModeParams) parameterSet;
+				if (params.getMode().equals(mode)) {
+					return params;
+				}
+			}
+
+			return null;
+		}
+
+		public void addModeParams(final ModeParams params) {
+			final ModeParams previous = getModeParams(params.getMode());
+
+			if (previous != null) {
+				final boolean removed = removeParameterSet(previous);
+				if (!removed)
+					throw new RuntimeException("problem replacing mode params ");
+				log.info("mode parameters for mode " + previous.getMode() + " were just overwritten.");
+			}
+
+			super.addParameterSet(params);
+		}
 
 	}
 

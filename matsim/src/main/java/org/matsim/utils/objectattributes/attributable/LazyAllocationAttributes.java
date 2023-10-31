@@ -32,12 +32,12 @@ public final class LazyAllocationAttributes implements Attributes {
 
 	private final Consumer<Attributes> consumer;
 	private final Supplier<Attributes> supplier;
-	
+
 	public LazyAllocationAttributes(final Consumer<Attributes> consumer, final Supplier<Attributes> supplier) {
 		this.consumer = consumer;
 		this.supplier = supplier;
 	}
-	
+
 	@Override
 	public Object putAttribute(String attribute, Object value) {
 		Attributes attributes = this.supplier.get();
@@ -57,6 +57,11 @@ public final class LazyAllocationAttributes implements Attributes {
 	@Override
 	public Object removeAttribute(String attribute) {
 		return null;
+	}
+
+	@Override
+	public boolean hasAttribute(String attribute) {
+		return false;
 	}
 
 	@Override
