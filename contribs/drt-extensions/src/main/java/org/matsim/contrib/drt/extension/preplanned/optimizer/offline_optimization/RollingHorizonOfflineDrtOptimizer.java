@@ -69,9 +69,12 @@ public class RollingHorizonOfflineDrtOptimizer implements DrtOptimizer {
 	private final VrpSolver solver;
 
 	private final double horizon;
-	private final double interval; // Must be smaller than or equal to the horizon
-	private double serviceStartTime = Double.MAX_VALUE;  // Start time of the whole DRT service (will be set to the earliest starting time of all the fleet)
-	private double serviceEndTime = 0; // End time of the whole DRT service (will be set to the latest ending time of all the fleet)
+	private final double interval;
+	// Must be smaller than or equal to the horizon
+	private double serviceStartTime = Double.MAX_VALUE;
+	// Start time of the whole DRT service (will be set to the earliest starting time of all the fleet)
+	private double serviceEndTime = 0;
+	// End time of the whole DRT service (will be set to the latest ending time of all the fleet)
 
 	private final List<DrtRequest> prebookedRequests = new ArrayList<>();
 
@@ -121,6 +124,13 @@ public class RollingHorizonOfflineDrtOptimizer implements DrtOptimizer {
 
 		DrtRequest drtRequest = (DrtRequest) request;
 		Id<Person> passengerId = drtRequest.getPassengerId();
+
+		if (fleetSchedules == null) {
+			eventsManager.processEvent(new PassengerRequestRejectedEvent(timer.getTimeOfDay(), mode, request.getId(),
+				passengerId, "DRT fleet not yet starts its service"));
+			return;
+		}
+
 		openRequests.put(((DrtRequest) request).getPassengerId(), drtRequest);
 
 		if (fleetSchedules.requestIdToVehicleMap().containsKey(passengerId)
