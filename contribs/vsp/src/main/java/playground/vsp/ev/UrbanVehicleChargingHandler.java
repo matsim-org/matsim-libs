@@ -115,9 +115,14 @@ class UrbanVehicleChargingHandler
 			if (tuple != null) {
 				Id<Vehicle> evId = Id.create(tuple.getFirst(), Vehicle.class);
 				if(vehiclesAtChargers.remove(evId) != null){ //if null, vehicle is fully charged and de-plugged already (see handleEvent(ChargingEndedEvent) )
+					//this is not necessarily true as vehicles can be also queued and waiting for plug in Nov23 Ashraf
 					Id<Charger> chargerId = tuple.getSecond();
 					Charger c = chargingInfrastructure.getChargers().get(chargerId);
 					c.getLogic().removeVehicle(electricFleet.getElectricVehicles().get(evId), event.getTime());
+				}else {
+					Id<Charger> chargerId = tuple.getSecond();
+					Charger c = chargingInfrastructure.getChargers().get(chargerId);
+					if(c.getLogic().getQueuedVehicles().contains(electricFleet.getElectricVehicles().get(evId)))c.getLogic().removeVehicle(electricFleet.getElectricVehicles().get(evId), event.getTime());// so it is important to remove the vehicle from queue as well.
 				}
 			} else {
 				throw new RuntimeException("there is something wrong with the charging procedure of person=" + event.getPersonId() + " on link= " + event.getLinkId());
@@ -134,6 +139,7 @@ class UrbanVehicleChargingHandler
 	public void handleEvent(ChargingEndEvent event) {
 		vehiclesAtChargers.remove(event.getVehicleId());
 		//Charging has ended before activity ends
+		// again this will only fire if the vehicle is picked from queue and plugged in//ashraf Nov2023
 	}
 
 	@Override
