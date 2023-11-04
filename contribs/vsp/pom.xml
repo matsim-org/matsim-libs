@@ -125,7 +125,7 @@
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-set</artifactId>
-			<version>0.48.3</version>
+			<version>0.49.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
