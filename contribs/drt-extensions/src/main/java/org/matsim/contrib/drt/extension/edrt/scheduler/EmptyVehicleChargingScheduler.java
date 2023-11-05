@@ -32,18 +32,22 @@ import org.matsim.contrib.evrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
  * @author michalm
  */
 public class EmptyVehicleChargingScheduler {
+	private static final Random RND = MatsimRandom.getLocalInstance();
 	private final MobsimTimer timer;
 	private final EDrtTaskFactoryImpl taskFactory;
-	private final Map<Id<Link>, Charger> linkToChargerMap;
+	private final Map<Id<Link>, List<Charger>> linkToChargerMap;
 
 	public EmptyVehicleChargingScheduler(MobsimTimer timer, DrtTaskFactory taskFactory,
 			ChargingInfrastructure chargingInfrastructure) {
@@ -52,14 +56,16 @@ public class EmptyVehicleChargingScheduler {
 		linkToChargerMap = chargingInfrastructure.getChargers()
 				.values()
 				.stream()
-				.collect(Collectors.toMap(c -> c.getLink().getId(), c -> c));
+				.collect(Collectors.groupingBy(c -> c.getLink().getId()));
 	}
 
 	public void chargeVehicle(DvrpVehicle vehicle) {
 		DrtStayTask currentTask = (DrtStayTask)vehicle.getSchedule().getCurrentTask();
 		Link currentLink = currentTask.getLink();
-		Charger charger = linkToChargerMap.get(currentLink.getId());
-		if (charger != null) {
+		List<Charger> chargers = linkToChargerMap.get(currentLink.getId());
+		if (chargers != null) {
+			// Pick a random charger of all available chargers at this link
+			Charger charger = chargers.get(RND.nextInt(chargers.size()));
 			ElectricVehicle ev = ((EvDvrpVehicle)vehicle).getElectricVehicle();
 			if (!charger.getLogic().getChargingStrategy().isChargingCompleted(ev)) {
 				chargeVehicleImpl(vehicle, charger);
