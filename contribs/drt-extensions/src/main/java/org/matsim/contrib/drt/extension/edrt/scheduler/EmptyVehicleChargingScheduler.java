@@ -66,7 +66,7 @@ public class EmptyVehicleChargingScheduler {
 			Optional<Charger> freeCharger = chargers.stream().filter(c -> c.getLogic().getPluggedVehicles().isEmpty()).findFirst();
 
 			// Empty charger or at least smallest queue charger
-			Charger charger = freeCharger.orElseGet(() -> chargers.stream().min(Comparator.comparing(e -> e.getLogic().getQueuedVehicles().size())).orElseThrow());
+			Charger charger = freeCharger.orElseGet(() -> chargers.stream().min(Comparator.comparingInt(e -> e.getLogic().getQueuedVehicles().size())).orElseThrow());
 			ElectricVehicle ev = ((EvDvrpVehicle)vehicle).getElectricVehicle();
 			if (!charger.getLogic().getChargingStrategy().isChargingCompleted(ev)) {
 				chargeVehicleImpl(vehicle, charger);
