@@ -37,6 +37,7 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -62,14 +63,18 @@ public class EmptyVehicleChargingScheduler {
 		Link currentLink = currentTask.getLink();
 		List<Charger> chargers = linkToChargersMap.get(currentLink.getId());
 		if (chargers != null) {
-			// Take the charger with the smallest queue
-			Charger charger = chargers.stream().min(Comparator.comparing(e -> e.getLogic().getQueuedVehicles().size())).orElseThrow();
+			Optional<Charger> freeCharger = chargers.stream().filter(c -> c.getLogic().getPluggedVehicles().isEmpty()).findFirst();
+
+			// Empty charger or at least smallest queue charger
+			Charger charger = freeCharger.orElseGet(() -> chargers.stream().min(Comparator.comparing(e -> e.getLogic().getQueuedVehicles().size())).orElseThrow());
 			ElectricVehicle ev = ((EvDvrpVehicle)vehicle).getElectricVehicle();
 			if (!charger.getLogic().getChargingStrategy().isChargingCompleted(ev)) {
 				chargeVehicleImpl(vehicle, charger);
 			}
 		}
 	}
+
+
 
 	private void chargeVehicleImpl(DvrpVehicle vehicle, Charger charger) {
 		Schedule schedule = vehicle.getSchedule();
