@@ -114,15 +114,16 @@ class UrbanVehicleChargingHandler
 			Tuple<Id<Vehicle>, Id<Charger>> tuple = chargingProcedures.get(event.getLinkId()).remove(event.getPersonId());
 			if (tuple != null) {
 				Id<Vehicle> evId = Id.create(tuple.getFirst(), Vehicle.class);
+				ElectricVehicle ev = electricFleet.getElectricVehicles().get(evId);
 				if(vehiclesAtChargers.remove(evId) != null){ //if null, vehicle is fully charged and de-plugged already (see handleEvent(ChargingEndedEvent) )
 					//this is not necessarily true as vehicles can be also queued and waiting for plug in Nov23 Ashraf
 					Id<Charger> chargerId = tuple.getSecond();
 					Charger c = chargingInfrastructure.getChargers().get(chargerId);
-					c.getLogic().removeVehicle(electricFleet.getElectricVehicles().get(evId), event.getTime());
+					c.getLogic().removeVehicle(ev, event.getTime());
 				}else {
 					Id<Charger> chargerId = tuple.getSecond();
 					Charger c = chargingInfrastructure.getChargers().get(chargerId);
-					if(c.getLogic().getQueuedVehicles().contains(electricFleet.getElectricVehicles().get(evId)))c.getLogic().removeVehicle(electricFleet.getElectricVehicles().get(evId), event.getTime());// so it is important to remove the vehicle from queue as well.
+					if(c.getLogic().getQueuedVehicles().contains(ev))c.getLogic().removeVehicle(ev, event.getTime());// so it is important to remove the vehicle from queue as well.
 				}
 			} else {
 				throw new RuntimeException("there is something wrong with the charging procedure of person=" + event.getPersonId() + " on link= " + event.getLinkId());
