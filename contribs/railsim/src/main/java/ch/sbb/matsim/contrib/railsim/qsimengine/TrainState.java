@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * Stores the mutable current state of a train.
  */
-final class TrainState {
+final class TrainState implements TrainPosition {
 
 	/**
 	 * Driver of the train.
@@ -164,4 +164,28 @@ final class TrainState {
 			speed, acceleration, targetSpeed);
 	}
 
+	@Override
+	public MobsimDriverAgent getDriver() {
+		return driver;
+	}
+
+	@Override
+	public Id<Link> getHeadLink() {
+		return headLink;
+	}
+
+	@Override
+	public Id<Link> getTailLink() {
+		return tailLink;
+	}
+
+	@Override
+	public double getHeadPosition() {
+		return headPosition;
+	}
+
+	@Override
+	public double getTailPosition() {
+		return tailPosition;
+	}
 }

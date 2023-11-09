@@ -162,6 +162,13 @@ public final class RailLink implements HasLinkId {
 		return isExitLink;
 	}
 
+	/**
+	 * Length in meter.
+	 */
+	public double getLength() {
+		return length;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

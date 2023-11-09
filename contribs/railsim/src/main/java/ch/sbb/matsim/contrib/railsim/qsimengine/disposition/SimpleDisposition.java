@@ -21,7 +21,7 @@ package ch.sbb.matsim.contrib.railsim.qsimengine.disposition;
 
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailLink;
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailResourceManager;
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimTransitDriverAgent;
+import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
 import jakarta.inject.Inject;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -49,35 +49,63 @@ public class SimpleDisposition implements TrainDisposition {
 		// Nothing to do.
 	}
 
-	@Nullable
 	@Override
-	public List<RailLink> requestRoute(double time, RailsimTransitDriverAgent driver, List<RailLink> segment, RailLink entry, RailLink exit) {
+	public DispositionResponse requestNextSegment(double time, TrainPosition position, List<RailLink> segment) {
 
 		// Only re-routes if the link segment is occupied
-		for (RailLink link : segment) {
-			if (!resources.isBlockedBy(link, driver) && !resources.hasCapacity(link.getLinkId()))
-				return router.calcRoute(entry, exit);
-		}
+//		for (RailLink link : segment) {
+//			if (!resources.isBlockedBy(link, driver) && !resources.hasCapacity(link.getLinkId()))
+//				return router.calcRoute(entry, exit);
+//		}
 
-		return null;
-	}
+		// This code was in rail engine, now needs to be part of disposition
+		/*
+			if (state.pt != null && RailsimCalc.considerReRouting(links, resources.getLink(state.headLink))) {
 
-	@Override
-	public List<RailLink> blockRailSegment(double time, MobsimDriverAgent driver, List<RailLink> segment) {
+			int start = -1;
+			int end = -1;
+			RailLink entry = null;
+			RailLink exit = null;
 
-		List<RailLink> blocked = new ArrayList<>();
+			for (int i = Math.max(0, state.routeIdx - 1); i < state.route.size(); i++) {
+				RailLink l = state.route.get(i);
+
+				if (l.isEntryLink()) {
+					entry = l;
+					start = i;
+				} else if (start > -1 && l.isBlockedBy(state.driver)) {
+					// check if any link beyond entry is already blocked
+					// if that is the case re-route is not possible anymore
+					break;
+				} else if (start > -1 && l.isExitLink()) {
+					exit = l;
+					end = i;
+					break;
+				}
+			}
+
+			// there might be no exit link if this is the end of the route
+			// exit will be set to null if re-route is too late
+			// network could be wrong as well, but hard to verify
+			if (exit != null) {
+				....
+			}
+		 */
+
+
+		double reserveDist = 0;
 
 		// Iterate all links that need to be blocked
 		for (RailLink link : segment) {
 
 			// Check if single link can be reserved
-			if (resources.tryBlockTrack(time, driver, link)) {
-				blocked.add(link);
+			if (resources.tryBlockTrack(time, position.getDriver(), link)) {
+				reserveDist += link.getLength();
 			} else
 				break;
 		}
 
-		return blocked;
+		return new DispositionResponse(reserveDist, null);
 	}
 
 	@Override

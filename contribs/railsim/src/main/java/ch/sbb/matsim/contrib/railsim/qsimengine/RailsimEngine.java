@@ -26,6 +26,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.DispositionResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -301,69 +302,37 @@ final class RailsimEngine implements Steppable {
 		if (links.isEmpty())
 			return true;
 
-		if (state.pt != null && RailsimCalc.considerReRouting(links, resources.getLink(state.headLink))) {
 
-			int start = -1;
-			int end = -1;
-			RailLink entry = null;
-			RailLink exit = null;
+		DispositionResponse response = disposition.requestNextSegment(time, state, links);
 
-			for (int i = Math.max(0, state.routeIdx - 1); i < state.route.size(); i++) {
-				RailLink l = state.route.get(i);
+		// Disposition assigned a detour
+		if (state.pt != null && response.detour() != null) {
 
-				if (l.isEntryLink()) {
-					entry = l;
-					start = i;
-				} else if (start > -1 && l.isBlockedBy(state.driver)) {
-					// check if any link beyond entry is already blocked
-					// if that is the case re-route is not possible anymore
-					break;
-				} else if (start > -1 && l.isExitLink()) {
-					exit = l;
-					end = i;
-					break;
-				}
+			// check if this route is different
+			List<RailLink> subRoute = state.route.subList(response.detour().startIdx(), response.detour().endIdx());
+
+			TransitStopFacility newStop = state.pt.addDetour(subRoute, response.detour().newRoute());
+
+			subRoute.clear();
+			subRoute.addAll(response.detour().newRoute());
+
+
+			if (newStop != null) {
+				state.nextStop = newStop;
 			}
 
-			// there might be no exit link if this is the end of the route
-			// exit will be set to null if re-route is too late
-			// network could be wrong as well, but hard to verify
-			if (exit != null) {
+			createEvent(new RailsimDetourEvent(
+				time, state.driver.getVehicle().getId(),
+				state.route.get(response.detour().startIdx()).getLinkId(),
+				state.route.get(response.detour().endIdx()).getLinkId(),
+				response.detour().newRoute().stream().map(RailLink::getLinkId).toList(),
+				newStop != null ? newStop.getId() : null
+			));
 
-				// check if this route is different
-				List<RailLink> subRoute = state.route.subList(start + 1, end);
-
-				List<RailLink> detour = disposition.requestRoute(time, state.pt, subRoute, entry, exit);
-
-				if (detour != null && !subRoute.equals(detour)) {
-
-					TransitStopFacility newStop = state.pt.addDetour(subRoute, detour);
-
-					subRoute.clear();
-					subRoute.addAll(detour);
-
-					if (newStop != null) {
-						state.nextStop = newStop;
-					}
-
-					createEvent(new RailsimDetourEvent(
-						time, state.driver.getVehicle().getId(),
-						entry.getLinkId(), exit.getLinkId(),
-						detour.stream().map(RailLink::getLinkId).toList(),
-						newStop != null ? newStop.getId() : null
-					));
-
-					// Block links again using the updated route
-					links = RailsimCalc.calcLinksToBlock(state, resources.getLink(state.headLink));
-
-				}
-			}
 		}
 
-		List<RailLink> blocked = disposition.blockRailSegment(time, state.driver, links);
-
 		// Only continue successfully if all requested link have been blocked
-		return links.size() == blocked.size();
+		return FuzzyUtils.equals(response.reservedDist(), links.stream().mapToDouble(RailLink::getLength).sum());
 	}
 
 	private void enterLink(double time, UpdateEvent event) {
