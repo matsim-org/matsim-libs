@@ -58,6 +58,7 @@ public final class RailLink implements HasLinkId {
 	 */
 	@Nullable
 	final Id<RailResource> resource;
+	final ResourceType resourceType;
 
 	public RailLink(Link link) {
 		id = link.getId();
@@ -69,6 +70,7 @@ public final class RailLink implements HasLinkId {
 		minimumHeadwayTime = RailsimUtils.getMinimumHeadwayTime(link);
 		String resourceId = RailsimUtils.getResourceId(link);
 		resource = resourceId != null ? Id.create(resourceId, RailResource.class) : null;
+		resourceType = RailsimUtils.getResourceType(link);
 		isEntryLink = RailsimUtils.isEntryLink(link);
 		isExitLink = RailsimUtils.isExitLink(link);
 	}
