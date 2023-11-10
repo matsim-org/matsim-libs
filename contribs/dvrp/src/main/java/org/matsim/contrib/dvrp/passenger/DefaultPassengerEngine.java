@@ -124,10 +124,11 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 		Route route = ((Leg)((PlanAgent)passenger).getCurrentPlanElement()).getRoute();
 		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
 				passenger.getId(), route, getLink(fromLinkId), getLink(toLinkId), now, now);
-		validateAndSubmitRequest(passenger, request, now);
 		
 		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerId()));
 
+		validateAndSubmitRequest(passenger, request, now);
+		
 		return true;
 	}
 

@@ -40,8 +40,10 @@ import jakarta.inject.Provider;
  * @author Michal Maciejewski (michalm)
  * @author Sebastian Hörl, IRT SystemX (sebhoerl)
  * 
- * This class is based on DefaultPassengerEngine, but is able to handle prebooked requests in combination with 
- * PrebookingStopActivity. This means that persons may depart (PersonDepartureEvent) after the vehicle has arrived.
+ *         This class is based on DefaultPassengerEngine, but is able to handle
+ *         prebooked requests in combination with PrebookingStopActivity. This
+ *         means that persons may depart (PersonDepartureEvent) after the
+ *         vehicle has arrived.
  */
 public final class PrebookingPassengerEngine implements PassengerEngine, PassengerRequestRejectedEventHandler {
 
@@ -60,13 +62,14 @@ public final class PrebookingPassengerEngine implements PassengerEngine, Passeng
 
 	private final PrebookingManager prebookingManager;
 
-	//accessed in doSimStep() and handleDeparture() (no need to sync)
+	// accessed in doSimStep() and handleDeparture() (no need to sync)
 	private final Map<Id<Request>, MobsimPassengerAgent> activePassengers = new HashMap<>();
-	
-	 // prebooking: holds vehicle stop activities for requests that have not arrived at departure point yet
+
+	// prebooking: holds vehicle stop activities for requests that have not arrived
+	// at departure point yet
 	private final Map<Id<Request>, PassengerPickupActivity> waitingForPassenger = new HashMap<>();
 
-	//accessed in doSimStep() and handleEvent() (potential data races)
+	// accessed in doSimStep() and handleEvent() (potential data races)
 	private final Queue<PassengerRequestRejectedEvent> rejectedRequestsEvents = new ConcurrentLinkedQueue<>();
 
 	// prebooking: pass PrebookingManager
@@ -96,23 +99,24 @@ public final class PrebookingPassengerEngine implements PassengerEngine, Passeng
 	}
 
 	@Override
-	public void doSimStep(double time) {		
-		// prebooking: converted the initial while into an iterator to selectively clear the
+	public void doSimStep(double time) {
+		// prebooking: converted the initial while into an iterator to selectively clear
+		// the
 		// list. If prebooked requests are rejected (by the optimizer, through an
 		// event) after submission, but before departure, the PassengerEngine does not
 		// know this agent yet. Hence, we wait with setting the state to abort until the
 		// agent has arrived here (if ever). An alternative approach would be to save
 		// the ID to a list and then set the state to abort once the agent shows up (may
 		// be less memory consumption if we only need to save the IDs)
-		
+
 		Iterator<PassengerRequestRejectedEvent> iterator = rejectedRequestsEvents.iterator();
 		while (iterator.hasNext()) {
 			PassengerRequestRejectedEvent event = iterator.next();
 			MobsimPassengerAgent passenger = activePassengers.remove(event.getRequestId());
-			
+
 			if (passenger != null) {
-				//not much else can be done for immediate requests
-				//set the passenger agent to abort - the event will be thrown by the QSim
+				// not much else can be done for immediate requests
+				// set the passenger agent to abort - the event will be thrown by the QSim
 				passenger.setStateToAbort(mobsimTimer.getTimeOfDay());
 				internalInterface.arrangeNextAgentState(passenger);
 				iterator.remove();
@@ -130,43 +134,47 @@ public final class PrebookingPassengerEngine implements PassengerEngine, Passeng
 			return false;
 		}
 
-		MobsimPassengerAgent passenger = (MobsimPassengerAgent)agent;
+		MobsimPassengerAgent passenger = (MobsimPassengerAgent) agent;
 		internalInterface.registerAdditionalAgentOnLink(passenger);
 
 		Id<Link> toLinkId = passenger.getDestinationLinkId();
-		
+
 		// prebooking: try to find a prebooked requests that is associated to this leg
-		Leg leg = (Leg)((PlanAgent)passenger).getCurrentPlanElement();
+		Leg leg = (Leg) ((PlanAgent) passenger).getCurrentPlanElement();
 		PassengerRequest request = prebookingManager.consumePrebookedRequest(agent, leg);
-		
+
 		if (request == null) { // prebooking: immediate request, default behavior
-			request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
-					passenger.getId(), leg.getRoute(), getLink(fromLinkId), getLink(toLinkId), now, now);
+			request = requestCreator.createRequest(internalPassengerHandling.createRequestId(), passenger.getId(),
+					leg.getRoute(), getLink(fromLinkId), getLink(toLinkId), now, now);
+
+			// must come before validate* (to come before rejection event)
+			eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerId()));
+
 			validateAndSubmitRequest(passenger, request, now);
 		} else { // prebooking: found a prebooked request for this customer departure
+			eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerId()));
+
 			activePassengers.put(request.getId(), passenger);
-			
+
 			PassengerPickupActivity pickupActivity = waitingForPassenger.remove(request.getId());
 			if (pickupActivity != null) {
 				// prebooking: the vehicle is already waiting for the customer, notify it
 				pickupActivity.notifyPassengerIsReadyForDeparture(passenger, now);
 			}
 		}
-		
-		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerId()));
-		
+
 		return true;
 	}
 
 	private void validateAndSubmitRequest(MobsimPassengerAgent passenger, PassengerRequest request, double now) {
 		activePassengers.put(request.getId(), passenger);
 		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
-			//need to synchronise to address cases where requestSubmitted() may:
+			// need to synchronise to address cases where requestSubmitted() may:
 			// - be called from outside DepartureHandlers
 			// - interfere with VrpOptimizer.nextTask()
 			// - impact VrpAgentLogic.computeNextAction()
 			synchronized (optimizer) {
-				//optimizer can also reject request if cannot handle it
+				// optimizer can also reject request if cannot handle it
 				// (async operation, notification comes via the events channel)
 				optimizer.requestSubmitted(request);
 			}
@@ -183,20 +191,21 @@ public final class PrebookingPassengerEngine implements PassengerEngine, Passeng
 	public boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
 			Id<Request> requestId, double now) {
 		if (!activePassengers.containsKey(requestId)) {
-			// prebooking: vehicle queries customer, which has not departed yet, note it down
+			// prebooking: vehicle queries customer, which has not departed yet, note it
+			// down
 			waitingForPassenger.put(requestId, pickupActivity);
 			return false;
 		}
-		
+
 		boolean pickedUp = internalPassengerHandling.tryPickUpPassenger(driver, activePassengers.get(requestId),
 				requestId, now);
-		
+
 		// prebooking: commented the following line, this is a valid situation now!
 		// Verify.verify(pickedUp, "Not possible without prebooking");
-		
+
 		return pickedUp;
 	}
-	
+
 	/*
 	 * prebooking: new method that does not actually pick up a passenger but only
 	 * announces that a vehicle would like to. This is necessary to get the
@@ -211,7 +220,7 @@ public final class PrebookingPassengerEngine implements PassengerEngine, Passeng
 
 		return true;
 	}
-	
+
 	@Override
 	public void dropOffPassenger(MobsimDriverAgent driver, Id<Request> requestId, double now) {
 		internalPassengerHandling.dropOffPassenger(driver, activePassengers.remove(requestId), requestId, now);

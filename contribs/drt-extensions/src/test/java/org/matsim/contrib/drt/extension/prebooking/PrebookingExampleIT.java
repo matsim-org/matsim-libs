@@ -1,17 +1,27 @@
 package org.matsim.contrib.drt.extension.prebooking;
 
+import static org.junit.Assert.assertEquals;
+
 import java.net.URL;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.drt.extension.edrt.run.EDrtControlerCreator;
 import org.matsim.contrib.drt.extension.prebooking.logic.FixedSharePrebookingLogic;
+import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
+import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.ev.EvConfigGroup;
@@ -57,7 +67,15 @@ public class PrebookingExampleIT {
 		controller.addOverridingModule(new PrebookingModule());
 		FixedSharePrebookingLogic.install("drt", 0.5, 4.0 * 3600.0, controller);
 
+		Tracker tracker = new Tracker();
+		tracker.install(controller);
+		
 		controller.run();
+		
+		assertEquals(157, tracker.immediateScheduled);
+		assertEquals(205, tracker.prebookedScheduled);
+		assertEquals(26, tracker.immediateRejected);
+		assertEquals(0, tracker.prebookedRejected);
 	}
 
 	@Test
@@ -101,6 +119,50 @@ public class PrebookingExampleIT {
 		controler.addOverridingModule(new ElectricPrebookingModule());
 		FixedSharePrebookingLogic.install("drt", 0.5, 4.0 * 3600.0, controler);
 
+		Tracker tracker = new Tracker();
+		tracker.install(controler);
+		
 		controler.run();
+
+		assertEquals(74, tracker.immediateScheduled);
+		assertEquals(178, tracker.prebookedScheduled);
+		assertEquals(109, tracker.immediateRejected);
+		assertEquals(27, tracker.prebookedRejected);
+	}
+	
+	static private class Tracker implements PassengerRequestRejectedEventHandler, PassengerRequestScheduledEventHandler {
+		int immediateScheduled = 0;
+		int prebookedScheduled = 0;
+		int immediateRejected = 0;
+		int prebookedRejected = 0;
+		
+		@Override
+		public void handleEvent(PassengerRequestScheduledEvent event) {
+			if (event.getRequestId().toString().contains("prebooked")) {
+				prebookedScheduled++;
+			} else {
+				immediateScheduled++;
+			}
+		}
+
+		@Override
+		public void handleEvent(PassengerRequestRejectedEvent event) {
+			if (event.getRequestId().toString().contains("prebooked")) {
+				prebookedRejected++;
+			} else {
+				immediateRejected++;
+			}
+		}
+		
+		void install(Controler controller) {
+			Tracker thisTracker = this;
+			
+			controller.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					addEventHandlerBinding().toInstance(thisTracker);
+				}
+			});
+		}
 	}
 }

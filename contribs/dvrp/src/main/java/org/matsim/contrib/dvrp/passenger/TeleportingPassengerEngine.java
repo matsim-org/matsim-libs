@@ -144,6 +144,8 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 		Route route = ((Leg)((PlanAgent)passenger).getCurrentPlanElement()).getRoute();
 		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
 				passenger.getId(), route, getLink(fromLinkId), getLink(toLinkId), now, now);
+		
+		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerId()));
 
 		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
 			Route teleportedRoute = adaptLegRouteForTeleportation(passenger, request, now);
@@ -157,8 +159,6 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 			internalInterface.arrangeNextAgentState(passenger);
 		}
 		
-		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerId()));
-
 		return true;
 	}
 

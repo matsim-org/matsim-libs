@@ -166,12 +166,13 @@ public final class PassengerEngineWithPrebooking
 		//TODO what if it was already rejected while prebooking??
 
 		PassengerRequest prebookedRequest = prebookedRequests.get(0);
+		
+		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, prebookedRequest.getId(), prebookedRequest.getPassengerId()));
+		
 		PassengerPickupActivity awaitingPickup = awaitingPickups.remove(prebookedRequest.getId());
 		if (awaitingPickup != null) {
 			awaitingPickup.notifyPassengerIsReadyForDeparture(passenger, now);
 		}
-		
-		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, prebookedRequest.getId(), prebookedRequest.getPassengerId()));
 		
 		return true;
 	}
