@@ -21,6 +21,7 @@ package ch.sbb.matsim.contrib.railsim.qsimengine.disposition;
 
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailLink;
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailResourceManager;
+import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimCalc;
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
 import jakarta.inject.Inject;
@@ -50,7 +51,13 @@ public class SimpleDisposition implements TrainDisposition {
 	}
 
 	@Override
-	public DispositionResponse requestNextSegment(double time, TrainPosition position, List<RailLink> segment) {
+	public DispositionResponse requestNextSegment(double time, TrainPosition position, double dist) {
+
+		// Try to reserve 1m more dist than necessary, otherwise infinite loop with always the same reservation would occur
+		// makes sure always more than request is reserved
+
+		List<RailLink> segment = RailsimCalc.calcLinksToBlock(position,
+			resources.getLink(position.getHeadLink()), dist + 1);
 
 		// Only re-routes if the link segment is occupied
 //		for (RailLink link : segment) {
@@ -92,7 +99,7 @@ public class SimpleDisposition implements TrainDisposition {
 			}
 		 */
 
-		// Assume rest of link is already reserved (fix block)
+		// Assume rest of link is already reserved (fixed block)
 		double reserveDist = resources.getLink(position.getHeadLink()).getLength() - position.getHeadPosition();
 		boolean stop = false;
 

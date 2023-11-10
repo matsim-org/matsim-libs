@@ -297,13 +297,9 @@ final class RailsimEngine implements Steppable {
 	 */
 	private boolean blockLinkTracks(double time, TrainState state) {
 
-		List<RailLink> links = RailsimCalc.calcLinksToBlock(state, resources.getLink(state.headLink));
+		double reserveDist = RailsimCalc.calcReservationDistance(state, resources.getLink(state.headLink));
 
-		if (links.isEmpty())
-			return true;
-
-
-		DispositionResponse response = disposition.requestNextSegment(time, state, links);
+		DispositionResponse response = disposition.requestNextSegment(time, state, reserveDist);
 
 		// Disposition assigned a detour
 		if (state.pt != null && response.detour() != null) {
@@ -559,10 +555,15 @@ final class RailsimEngine implements Steppable {
 		// (3) next link needs reservation
 		double reserveDist = Double.POSITIVE_INFINITY;
 		if (!state.isRouteAtEnd() && !event.isAwaitingReservation()) {
-			reserveDist = RailsimCalc.nextLinkReservation(state, currentLink);
 
-			// TODO: replace by distance calculation only
-			// use state.approvedDist instead of reserveDist
+			// Check first if more distance than for the next stop is needed
+			double nextStop = RailsimCalc.calcDistToNextStop(state, currentLink);
+
+			if (!FuzzyUtils.equals(state.approvedDist, nextStop)) {
+				double requiredDist = RailsimCalc.calcReservationDistance(state, currentLink);
+				// when the approved distance is equal to the required distance, new reservation needs to be made
+				reserveDist = state.approvedDist - requiredDist;
+			}
 
 			if (reserveDist < 0)
 				reserveDist = 0;
@@ -570,11 +571,7 @@ final class RailsimEngine implements Steppable {
 			// Outside of block track the reserve distance is always greater 0
 			// infinite loops would occur otherwise
 			if (!(event.type != UpdateEvent.Type.BLOCK_TRACK || FuzzyUtils.greaterThan(reserveDist, 0))) {
-				// There are here for debugging
-				List<RailLink> tmp = RailsimCalc.calcLinksToBlock(state, currentLink);
-				double r = RailsimCalc.nextLinkReservation(state, currentLink);
-
-				throw new AssertionError("Reserve distance must be positive, but was " + r);
+				throw new AssertionError("Reserve distance must be positive, but was " + reserveDist);
 			}
 		}
 

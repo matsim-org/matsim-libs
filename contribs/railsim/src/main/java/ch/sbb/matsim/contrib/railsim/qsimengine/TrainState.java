@@ -156,10 +156,8 @@ final class TrainState implements TrainPosition {
 		return routeIdx >= route.size();
 	}
 
-	/**
-	 * Check whether to stop at certain link.
-	 */
-	boolean isStop(Id<Link> link) {
+	@Override
+	public boolean isStop(Id<Link> link) {
 		return nextStop != null && nextStop.getLinkId().equals(link);
 	}
 
@@ -193,5 +191,20 @@ final class TrainState implements TrainPosition {
 	@Override
 	public double getTailPosition() {
 		return tailPosition;
+	}
+
+	@Override
+	public int getRouteIndex() {
+		return routeIdx;
+	}
+
+	@Override
+	public int getRouteSize() {
+		return route.size();
+	}
+
+	@Override
+	public RailLink getRoute(int idx) {
+		return route.get(idx);
 	}
 }

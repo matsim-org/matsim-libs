@@ -40,11 +40,9 @@ public interface TrainDisposition {
 	 * Request the next segment to be reserved.
 	 * @param time current time
 	 * @param position position information
-	 * @param segment links of the segment that should be blocked
+	 * @param dist distance in meter the train is requesting
 	 */
-	default DispositionResponse requestNextSegment(double time, TrainPosition position, List<RailLink> segment) {
-		return null;
-	}
+	DispositionResponse requestNextSegment(double time, TrainPosition position, double dist);
 
 
 	/**

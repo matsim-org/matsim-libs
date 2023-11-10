@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Utility class holding static calculation methods related to state (updates).
  */
-final class RailsimCalc {
+public final class RailsimCalc {
 
 	private RailsimCalc() {
 	}
@@ -162,87 +162,75 @@ final class RailsimCalc {
 	}
 
 	/**
-	 * Calculate when the reservation function should be triggered.
-	 * Should return {@link Double#POSITIVE_INFINITY} if this distance is far in the future and can be checked at later point.
-	 *
-	 * @param state       current train state
-	 * @param currentLink the link where the train head is on
-	 * @return travel distance after which reservations should be updated.
+	 * Calculate the minimum distance that needs to be reserved for the train, such that it can stop safely.
 	 */
-	 static double nextLinkReservation(TrainState state, RailLink currentLink) {
-
-		// on way to pt stop, no need to reserve anymore
-		if (state.isStop(currentLink.getLinkId()) && FuzzyUtils.lessThan(state.headPosition, currentLink.length))
-			return Double.POSITIVE_INFINITY;
+	static double calcReservationDistance(TrainState state, RailLink currentLink) {
 
 		double assumedSpeed = calcPossibleMaxSpeed(state);
 
-		// time needed for full stop
-		double stopTime = assumedSpeed / state.train.deceleration();
+		// stop at end of link
+		if (state.isStop(currentLink.getLinkId()))
+			return currentLink.length - state.headPosition;
 
-		assert stopTime > 0 : "Stop time can not be negative";
+		double stopTime = assumedSpeed / state.train.deceleration();
 
 		// safety distance
 		double safety = RailsimCalc.calcTraveledDist(assumedSpeed, stopTime, -state.train.deceleration());
 
+		double distToNextStop = currentLink.length - state.headPosition;
 		int idx = state.routeIdx;
-		double dist = currentLink.length - state.headPosition;
 
-		RailLink nextLink = null;
-		// need to check beyond safety distance
-		while (FuzzyUtils.lessEqualThan(dist, safety * 2) && idx < state.route.size()) {
-			nextLink = state.route.get(idx++);
+		while (idx < state.route.size()) {
+			RailLink nextLink = state.route.get(idx++);
+			distToNextStop += nextLink.length;
 
-			if (!nextLink.isBlockedBy(state.driver))
-				return dist - safety;
-
-			// No reservation beyond pt stop
 			if (state.isStop(nextLink.getLinkId()))
 				break;
-
-			dist += nextLink.length;
 		}
 
-		// No reservation needed after the end
-		if (idx == state.route.size() || (nextLink != null && state.isStop(nextLink.getLinkId())))
-			return Double.POSITIVE_INFINITY;
-
-		return dist - safety;
+		return Math.min(safety, distToNextStop);
 	}
 
 	/**
 	 * Links that need to be blocked or otherwise stop needs to be initiated.
 	 */
-	static List<RailLink> calcLinksToBlock(TrainState state, RailLink currentLink) {
+	public static List<RailLink> calcLinksToBlock(TrainPosition position, RailLink currentLink, double reserveDist) {
 
 		List<RailLink> result = new ArrayList<>();
 
-		// Currently driving to pt stop
-		if (state.isStop(currentLink.getLinkId()) && FuzzyUtils.lessThan(state.headPosition, currentLink.length))
-			return result;
+		double dist = currentLink.length - position.getHeadPosition();
 
-		double assumedSpeed = calcPossibleMaxSpeed(state);
-		double stopTime = assumedSpeed / state.train.deceleration();
-
-		// safety distance
-		double safety = RailsimCalc.calcTraveledDist(assumedSpeed, stopTime, -state.train.deceleration());
-
-		int idx = state.routeIdx;
-
-		// dist to next
-		double dist = currentLink.length - state.headPosition;
-
-		while (FuzzyUtils.lessEqualThan(dist, safety) && idx < state.route.size()) {
-			RailLink nextLink = state.route.get(idx++);
-			result.add(nextLink);
+		int idx = position.getRouteIndex();
+		while (FuzzyUtils.lessThan(dist, reserveDist) && idx < position.getRouteSize()) {
+			RailLink nextLink = position.getRoute(idx++);
 			dist += nextLink.length;
 
-			// Beyond pt stop links don't need to be reserved
-			if (state.isStop(nextLink.getLinkId()))
+			result.add(nextLink);
+
+			// Don't block beyond stop
+			if (position.isStop(nextLink.getLinkId()))
 				break;
 		}
 
 		return result;
+	}
+
+	/**
+	 * Calculate distance to the next stop.
+	 */
+	public static double calcDistToNextStop(TrainPosition position, RailLink currentLink) {
+		double dist = currentLink.length - position.getHeadPosition();
+
+		int idx = position.getRouteIndex();
+		while (idx < position.getRouteSize()) {
+			RailLink nextLink = position.getRoute(idx++);
+			dist += nextLink.length;
+
+			if (position.isStop(nextLink.getLinkId()))
+				break;
+		}
+
+		return dist;
 	}
 
 	/**
@@ -257,7 +245,7 @@ final class RailsimCalc {
 	/**
 	 * Maximum speed of the next upcoming links.
 	 */
-	private static double calcPossibleMaxSpeed(TrainState state) {
+	static double calcPossibleMaxSpeed(TrainState state) {
 
 		double safety = RailsimCalc.calcTraveledDist(state.train.maxVelocity(), state.train.maxVelocity() / state.train.deceleration(), -state.train.deceleration());
 		double maxSpeed = state.allowedMaxSpeed;
