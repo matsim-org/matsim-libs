@@ -1,7 +1,11 @@
 package org.matsim.contrib.drt.extension.prebooking.logic;
 
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -18,11 +22,16 @@ import org.matsim.core.mobsim.qsim.agents.HasModifiablePlan;
  */
 public class PopulationIterator implements Iterator<PersonItem> {
 	private final QSim qsim;
-	private final Iterator<? extends Person> internalIterator;
+	//private final Iterator<? extends Person> internalIterator;
+	private final Iterator<Id<Person>> internalIterator;
 
 	private PopulationIterator(Population population, QSim qsim) {
 		this.qsim = qsim;
-		this.internalIterator = population.getPersons().values().iterator();
+		
+		List<Id<Person>> personIds = new LinkedList<>(population.getPersons().keySet());
+		Collections.sort(personIds);
+		
+		this.internalIterator = personIds.iterator();
 	}
 
 	@Override
@@ -32,8 +41,8 @@ public class PopulationIterator implements Iterator<PersonItem> {
 
 	@Override
 	public PersonItem next() {
-		Person person = internalIterator.next();
-		MobsimAgent agent = qsim.getAgents().get(person.getId());
+		Id<Person> personId = internalIterator.next();
+		MobsimAgent agent = qsim.getAgents().get(personId);
 		Plan plan = ((HasModifiablePlan) agent).getModifiablePlan();
 		return new PersonItem(agent, plan);
 	}
