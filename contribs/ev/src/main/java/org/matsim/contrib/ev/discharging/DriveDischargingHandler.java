@@ -20,9 +20,12 @@
 package org.matsim.contrib.ev.discharging;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
@@ -35,6 +38,8 @@ import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MobsimScopeEventHandler;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -45,7 +50,8 @@ import com.google.inject.Inject;
  * idle discharge process (see {@link IdleDischargingHandler}).
  */
 public final class DriveDischargingHandler
-		implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, MobsimScopeEventHandler {
+		implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, MobsimScopeEventHandler,
+		MobsimAfterSimStepListener {
 	private static class EvDrive {
 		private final Id<Vehicle> vehicleId;
 		private final ElectricVehicle ev;
@@ -66,6 +72,7 @@ public final class DriveDischargingHandler
 	private final EventsManager eventsManager;
 	private final Map<Id<Vehicle>, ? extends ElectricVehicle> eVehicles;
 	private final Map<Id<Vehicle>, EvDrive> evDrives;
+	private final List<Event> eventQueue = new LinkedList<>();
 
 	@Inject
 	DriveDischargingHandler(ElectricFleet data, Network network, EventsManager eventsManager) {
@@ -104,6 +111,7 @@ public final class DriveDischargingHandler
 	// (for instance, AUX discharging and battery charging modifies charge outside event handling
 	// (as MobsimAfterSimStepListeners)
 	//TODO In the long term, it will be safer to move the discharging procedure to a MobsimAfterSimStepListener
+	// -> has been implemented now as a hack /sebhoerl
 	private EvDrive dischargeVehicle(Id<Vehicle> vehicleId, Id<Link> linkId, double eventTime) {
 		EvDrive evDrive = evDrives.get(vehicleId);
 		if (evDrive != null && !evDrive.isOnFirstLink()) {// handle only our EVs, except for the first link
@@ -115,9 +123,15 @@ public final class DriveDischargingHandler
 			//Energy consumption may be negative on links with negative slope
 			ev.getBattery()
 					.dischargeEnergy(energy,
-							missingEnergy -> eventsManager.processEvent(new MissingEnergyEvent(eventTime, ev.getId(), link.getId(), missingEnergy)));
-			eventsManager.processEvent(new DrivingEnergyConsumptionEvent(eventTime, vehicleId, linkId, energy, ev.getBattery().getCharge()));
+							missingEnergy -> eventQueue.add(new MissingEnergyEvent(eventTime, ev.getId(), link.getId(), missingEnergy)));
+			eventQueue.add(new DrivingEnergyConsumptionEvent(eventTime, vehicleId, linkId, energy, ev.getBattery().getCharge()));
 		}
 		return evDrive;
+	}
+
+	@Override
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
+		eventQueue.forEach(eventsManager::processEvent);
+		eventQueue.clear();
 	}
 }

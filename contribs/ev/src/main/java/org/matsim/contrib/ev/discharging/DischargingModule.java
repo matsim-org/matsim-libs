@@ -41,6 +41,7 @@ public final class DischargingModule extends AbstractModule {
 			protected void configureQSim() {
 				this.bind(DriveDischargingHandler.class).in( Singleton.class );
 				addMobsimScopeEventHandlerBinding().to(DriveDischargingHandler.class);
+				addMobsimListenerBinding().to(DriveDischargingHandler.class);
 				// event handlers are not qsim components
 
 				this.bind(IdleDischargingHandler.class).in( Singleton.class );
