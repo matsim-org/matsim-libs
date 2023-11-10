@@ -106,9 +106,9 @@ public class PrebookingAnalysisHandler implements PassengerRequestBookedEventHan
 	private class Sequence {
 		final PassengerRequestBookedEvent booked;
 		PassengerRequestSubmittedEvent submitted;
-		PassengerWaitingEvent waiting;
 		PassengerRequestScheduledEvent scheduled;
 		PassengerRequestRejectedEvent rejected;
+		PassengerWaitingEvent waiting;
 
 		Sequence(PassengerRequestBookedEvent booked) {
 			this.booked = booked;
