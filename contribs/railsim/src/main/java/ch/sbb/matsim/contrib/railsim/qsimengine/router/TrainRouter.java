@@ -73,7 +73,8 @@ public final class TrainRouter {
 	private final class DisUtility implements TravelDisutility {
 		@Override
 		public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
-			return resources.hasCapacity(link.getId()) ? 0 : 1;
+			// only works with fixed block
+			return resources.hasCapacity(link.getId(), null) ? 0 : 1;
 		}
 
 		@Override

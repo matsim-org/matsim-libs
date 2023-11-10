@@ -17,8 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package ch.sbb.matsim.contrib.railsim.qsimengine;
+package ch.sbb.matsim.contrib.railsim.qsimengine.resources;
 
+import ch.sbb.matsim.contrib.railsim.qsimengine.RailLink;
+import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 import java.util.HashSet;
@@ -27,9 +29,9 @@ import java.util.Set;
 
 
 /**
- * A resource representing multiple {@link RailLink}.
+ * Fixed block where each track is exclusively reserved by one agent.
  */
-public class RailResource {
+public final class FixedBlockResource implements RailResource {
 
 	/**
 	 * Links belonging to this resource.
@@ -46,17 +48,38 @@ public class RailResource {
 	 */
 	int capacity;
 
-	public RailResource(List<RailLink> links) {
+	public FixedBlockResource(List<RailLink> links) {
 		this.links = links;
 		this.reservations = new HashSet<>();
 		this.capacity = links.stream().mapToInt(RailLink::getNumberOfTracks).min().orElseThrow();
 	}
 
+	@Override
+	public List<RailLink> getLinks() {
+		return links;
+	}
+
 	/**
 	 * Whether an agent is able to block this resource.
 	 */
-	boolean hasCapacity() {
+	@Override
+	public boolean hasCapacity(double time, TrainPosition position) {
 		return reservations.size() < capacity;
+	}
+
+	@Override
+	public boolean isReservedBy(MobsimDriverAgent driver) {
+		return reservations.contains(driver);
+	}
+
+	@Override
+	public void reserve(TrainPosition position) {
+		reservations.add(position.getDriver());
+	}
+
+	@Override
+	public void release(MobsimDriverAgent driver) {
+		reservations.remove(driver);
 	}
 
 }

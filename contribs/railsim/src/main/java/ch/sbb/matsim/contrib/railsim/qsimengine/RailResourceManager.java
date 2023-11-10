@@ -21,6 +21,8 @@ package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.FixedBlockResource;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResource;
 import jakarta.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -75,7 +77,7 @@ public final class RailResourceManager {
 
 		resources = new IdMap<>(RailResource.class, collect.size());
 		for (Map.Entry<Id<RailResource>, List<RailLink>> e : collect.entrySet()) {
-			resources.put(e.getKey(), new RailResource(e.getValue()));
+			resources.put(e.getKey(), new FixedBlockResource(e.getValue()));
 		}
 	}
 
@@ -99,13 +101,14 @@ public final class RailResourceManager {
 	 *
 	 * @return true if the resource is now blocked or was blocked for this driver already.
 	 */
-	private boolean tryBlockResource(RailResource resource, MobsimDriverAgent driver) {
+	private boolean tryBlockResource(RailResource resource, TrainPosition position) {
 
-		if (resource.reservations.contains(driver))
+		if (resource.isReservedBy(position.getDriver()))
 			return true;
 
-		if (resource.hasCapacity()) {
-			resource.reservations.add(driver);
+		// FIXME: pass actual time
+		if (resource.hasCapacity(0, position)) {
+			resource.reserve(position);
 			return true;
 		}
 
@@ -119,8 +122,8 @@ public final class RailResourceManager {
 	 */
 	private boolean tryReleaseResource(RailResource resource, MobsimDriverAgent driver) {
 
-		if (resource.links.stream().noneMatch(l -> l.isBlockedBy(driver))) {
-			resource.reservations.remove(driver);
+		if (resource.getLinks().stream().noneMatch(l -> l.isBlockedBy(driver))) {
+			resource.release(driver);
 			return true;
 		}
 
@@ -130,9 +133,9 @@ public final class RailResourceManager {
 	/**
 	 * Try to block a track and the underlying resource and return whether it was successful.
 	 */
-	public boolean tryBlockTrack(double time, MobsimDriverAgent driver, RailLink link) {
+	public boolean tryBlockTrack(double time, TrainPosition position, RailLink link) {
 
-		if (link.isBlockedBy(driver))
+		if (link.isBlockedBy(position.getDriver()))
 			return true;
 
 		Id<RailResource> resourceId = link.getResourceId();
@@ -141,15 +144,15 @@ public final class RailResourceManager {
 			RailResource resource = getResource(resourceId);
 
 			// resource is required
-			if (!tryBlockResource(resource, driver)) {
+			if (!tryBlockResource(resource, position)) {
 				return false;
 			}
 		}
 
 		if (link.hasFreeTrack()) {
-			int track = link.blockTrack(driver);
+			int track = link.blockTrack(position.getDriver());
 			eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), link.getLinkId(),
-				driver.getVehicle().getId(), TrackState.BLOCKED, track));
+				position.getDriver().getVehicle().getId(), TrackState.BLOCKED, track));
 
 			return true;
 		}
@@ -160,7 +163,7 @@ public final class RailResourceManager {
 	/**
 	 * Checks whether a link or underlying resource has remaining capacity.
 	 */
-	public boolean hasCapacity(Id<Link> link) {
+	public boolean hasCapacity(Id<Link> link, TrainPosition position) {
 
 		RailLink l = getLink(link);
 
@@ -169,7 +172,8 @@ public final class RailResourceManager {
 
 		RailResource res = getResource(l.getResourceId());
 		if (res != null) {
-			return res.hasCapacity();
+			// FIXME: pass actual driver and time
+			return res.hasCapacity(0, position);
 		}
 
 		return true;

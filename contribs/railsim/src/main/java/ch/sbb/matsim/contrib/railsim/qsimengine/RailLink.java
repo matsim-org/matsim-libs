@@ -20,6 +20,7 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.HasLinkId;
 import org.matsim.api.core.v01.network.Link;

@@ -99,7 +99,7 @@ public class SimpleDisposition implements TrainDisposition {
 		for (RailLink link : segment) {
 
 			// Check if single link can be reserved
-			if (resources.tryBlockTrack(time, position.getDriver(), link)) {
+			if (resources.tryBlockTrack(time, position, link)) {
 				reserveDist += link.getLength();
 			} else
 				break;
