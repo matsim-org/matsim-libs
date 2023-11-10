@@ -199,7 +199,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			+ "(prebooked) future task and wait for the planned stop to begin, or wait at the current"
 			+ "position and depart to arrive on time at the following stop. The latter behavior (not"
 			+ "the default) may lead to larger ucnertainty in highly congested scenarios.")
-	public boolean scheduleWaitBeforeDrive = false;
+	public boolean scheduleWaitBeforeDrive = false; // in the future, this could also become a double value indicating
+													// how many minutes before the next stop the vehicle should plan to
+													// be there
 
 	@NotNull
 	private DrtInsertionSearchParams drtInsertionSearchParams;
