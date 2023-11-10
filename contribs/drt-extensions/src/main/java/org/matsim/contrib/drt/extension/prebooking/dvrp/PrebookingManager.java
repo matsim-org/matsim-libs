@@ -188,10 +188,6 @@ public class PrebookingManager implements MobsimEngine {
 		}
 	}
 
-	void notifyDropoff(Id<Request> requestId) {
-		requests.remove(requestId);
-	}
-
 	// Engine code
 
 	@Override
