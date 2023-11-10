@@ -156,6 +156,8 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 			passenger.setStateToAbort(mobsimTimer.getTimeOfDay());
 			internalInterface.arrangeNextAgentState(passenger);
 		}
+		
+		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerId()));
 
 		return true;
 	}

@@ -35,10 +35,10 @@ public class PopulationIterator implements Iterator<PersonItem> {
 		Person person = internalIterator.next();
 		MobsimAgent agent = qsim.getAgents().get(person.getId());
 		Plan plan = ((HasModifiablePlan) agent).getModifiablePlan();
-		return new PersonItem(person, plan);
+		return new PersonItem(agent, plan);
 	}
 
-	public record PersonItem(Person person, Plan plan) {
+	public record PersonItem(MobsimAgent agent, Plan plan) {
 	}
 
 	static public PopulationIterator create(Population population, QSim qsim) {

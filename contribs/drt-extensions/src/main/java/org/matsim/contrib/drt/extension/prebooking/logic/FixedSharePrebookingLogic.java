@@ -72,7 +72,7 @@ public class FixedSharePrebookingLogic extends TimedPrebookingLogic {
 						double submissionTime = Double.isFinite(submissionSlack)
 								? leg.getDepartureTime().seconds() - submissionSlack
 								: timeInterpretation.getSimulationStartTime();
-						queue.schedule(submissionTime, item.person(), leg, earliestDepartureTime);
+						queue.schedule(submissionTime, item.agent(), leg, earliestDepartureTime);
 					}
 				}
 

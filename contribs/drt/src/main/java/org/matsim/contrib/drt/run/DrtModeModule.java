@@ -26,6 +26,8 @@ import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingModule;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
+import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
@@ -82,6 +84,10 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 							getter.getModal(DrtEventSequenceCollector.class)))).asEagerSingleton();
 			addControlerListenerBinding().to(modalKey(DrtSpeedUp.class));
 		});
+		
+		bindModal(PassengerStopDurationProvider.class).toProvider(modalProvider(getter -> {
+			return StaticPassengerStopDurationProvider.of(drtCfg.stopDuration, 0.0);
+		}));
 		
 		bindModal(DefaultStopTimeCalculator.class).toProvider(modalProvider(getter -> {
 			return new DefaultStopTimeCalculator(drtCfg.stopDuration);

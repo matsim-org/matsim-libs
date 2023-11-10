@@ -6,8 +6,6 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.drt.extension.prebooking.events.PassengerEnteringVehicleEvent;
-import org.matsim.contrib.drt.extension.prebooking.events.PassengerEnteringVehicleEventHandler;
 import org.matsim.contrib.drt.extension.prebooking.events.PassengerRequestBookedEvent;
 import org.matsim.contrib.drt.extension.prebooking.events.PassengerRequestBookedEventHandler;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -17,10 +15,12 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEventHandler;
+import org.matsim.contrib.dvrp.passenger.PassengerWaitingEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerWaitingEventHandler;
 
 public class PrebookingAnalysisHandler implements PassengerRequestBookedEventHandler,
 		PassengerRequestSubmittedEventHandler, PassengerRequestScheduledEventHandler,
-		PassengerRequestRejectedEventHandler, PassengerEnteringVehicleEventHandler {
+		PassengerRequestRejectedEventHandler, PassengerWaitingEventHandler {
 	private final String mode;
 	private final IdMap<Request, Sequence> sequences = new IdMap<>(Request.class);
 
@@ -73,7 +73,7 @@ public class PrebookingAnalysisHandler implements PassengerRequestBookedEventHan
 	}
 
 	@Override
-	public void handleEvent(PassengerEnteringVehicleEvent event) {
+	public void handleEvent(PassengerWaitingEvent event) {
 		if (!event.getMode().equals(mode)) {
 			return;
 		}
@@ -81,7 +81,7 @@ public class PrebookingAnalysisHandler implements PassengerRequestBookedEventHan
 		Sequence sequence = sequences.get(event.getRequestId());
 
 		if (sequence != null) {
-			sequence.entering = event;
+			sequence.waiting = event;
 		}
 	}
 
@@ -93,7 +93,7 @@ public class PrebookingAnalysisHandler implements PassengerRequestBookedEventHan
 					sequence.submitted != null ? sequence.submitted.getTime() : null,
 					sequence.scheduled != null ? sequence.scheduled.getTime() : null,
 					sequence.rejected != null ? sequence.rejected.getTime() : null,
-					sequence.entering != null ? sequence.entering.getTime() : null));
+					sequence.waiting != null ? sequence.waiting.getTime() : null));
 		}
 
 		return records;
@@ -106,7 +106,7 @@ public class PrebookingAnalysisHandler implements PassengerRequestBookedEventHan
 	private class Sequence {
 		final PassengerRequestBookedEvent booked;
 		PassengerRequestSubmittedEvent submitted;
-		PassengerEnteringVehicleEvent entering;
+		PassengerWaitingEvent waiting;
 		PassengerRequestScheduledEvent scheduled;
 		PassengerRequestRejectedEvent rejected;
 

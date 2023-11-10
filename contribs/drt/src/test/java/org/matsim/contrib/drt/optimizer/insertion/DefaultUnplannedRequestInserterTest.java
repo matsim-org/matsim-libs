@@ -49,6 +49,7 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler.PickupDropoffTaskPair;
+import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -287,7 +288,7 @@ public class DefaultUnplannedRequestInserterTest {
 			DrtInsertionSearch insertionSearch, RequestInsertionScheduler insertionScheduler) {
 		return new DefaultUnplannedRequestInserter(mode, fleet, () -> now, eventsManager, insertionScheduler,
 				vehicleEntryFactory, insertionRetryQueue, insertionSearch, DrtOfferAcceptor.DEFAULT_ACCEPTOR,
-				rule.forkJoinPool);
+				rule.forkJoinPool, StaticPassengerStopDurationProvider.of(10.0, 0.0));
 	}
 
 	private Link link(String id) {

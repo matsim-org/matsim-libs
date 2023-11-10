@@ -54,6 +54,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 
 	private final String mode;
 	private final MobsimTimer mobsimTimer;
+	private final EventsManager eventsManager;
 
 	private final PassengerRequestCreator requestCreator;
 	private final VrpOptimizer optimizer;
@@ -79,6 +80,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 		this.optimizer = optimizer;
 		this.network = network;
 		this.requestValidator = requestValidator;
+		this.eventsManager = eventsManager;
 
 		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
 	}
@@ -123,6 +125,9 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
 				passenger.getId(), route, getLink(fromLinkId), getLink(toLinkId), now, now);
 		validateAndSubmitRequest(passenger, request, now);
+		
+		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerId()));
+
 		return true;
 	}
 

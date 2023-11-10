@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.extension.prebooking.events;
+package org.matsim.contrib.dvrp.passenger;
 
 import java.util.Map;
 import java.util.Objects;
@@ -26,19 +26,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.dvrp.passenger.AbstractPassengerRequestEvent;
 
 /**
- * When using prebooking in DRT, it is sometimes difficult to correctly
- * attribute which request is being consumed when a customer enters a vehicle.
- * The PassengerEnteringEvent provides exactly this information.
- * 
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
-public class PassengerEnteringVehicleEvent extends AbstractPassengerRequestEvent {
-	public static final String EVENT_TYPE = "passenger entering vehicle";
+public class PassengerWaitingEvent extends AbstractPassengerRequestEvent {
+	public static final String EVENT_TYPE = "passenger waiting";
 
-	public PassengerEnteringVehicleEvent(double time, String mode, Id<Request> requestId, Id<Person> personId) {
+	public PassengerWaitingEvent(double time, String mode, Id<Request> requestId, Id<Person> personId) {
 		super(time, mode, requestId, personId);
 	}
 
@@ -47,12 +42,12 @@ public class PassengerEnteringVehicleEvent extends AbstractPassengerRequestEvent
 		return EVENT_TYPE;
 	}
 
-	public static PassengerEnteringVehicleEvent convert(GenericEvent event) {
+	public static PassengerWaitingEvent convert(GenericEvent event) {
 		Map<String, String> attributes = event.getAttributes();
 		double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));
 		String mode = Objects.requireNonNull(attributes.get(ATTRIBUTE_MODE));
 		Id<Request> requestId = Id.create(attributes.get(ATTRIBUTE_REQUEST), Request.class);
 		Id<Person> personId = Id.createPersonId(attributes.get(ATTRIBUTE_PERSON));
-		return new PassengerEnteringVehicleEvent(time, mode, requestId, personId);
+		return new PassengerWaitingEvent(time, mode, requestId, personId);
 	}
 }

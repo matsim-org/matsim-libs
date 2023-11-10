@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.extension.prebooking.dvrp.PrebookingManager;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
@@ -41,7 +41,7 @@ public abstract class TimedPrebookingLogic implements MobsimInitializedListener,
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent event) {
 		queue.getScheduledItems(event.getSimulationTime()).forEach(item -> {
-			prebookingManager.prebook(item.person(), item.leg(), item.departuretime());
+			prebookingManager.prebook(item.agent(), item.leg(), item.departuretime());
 		});
 	}
 
@@ -49,8 +49,8 @@ public abstract class TimedPrebookingLogic implements MobsimInitializedListener,
 		private PriorityQueue<ScheduledItem> queue = new PriorityQueue<>();
 		private int sequence = 0;
 
-		public void schedule(double submissionTime, Person person, Leg leg, double departureTime) {
-			queue.add(new ScheduledItem(submissionTime, person, leg, departureTime, sequence++));
+		public void schedule(double submissionTime, MobsimAgent agent, Leg leg, double departureTime) {
+			queue.add(new ScheduledItem(submissionTime, agent, leg, departureTime, sequence++));
 		}
 
 		public Collection<ScheduledItem> getScheduledItems(double time) {
@@ -70,7 +70,7 @@ public abstract class TimedPrebookingLogic implements MobsimInitializedListener,
 
 	}
 
-	private record ScheduledItem(double submissionTime, Person person, Leg leg, double departuretime, int sequence)
+	private record ScheduledItem(double submissionTime, MobsimAgent agent, Leg leg, double departuretime, int sequence)
 			implements Comparable<ScheduledItem> {
 		@Override
 		public int compareTo(ScheduledItem o) {

@@ -176,12 +176,13 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			.collect(toList());
 
 		collection2Text(drtEventSequenceCollector.getRejectedRequestSequences().values(), filename(event, "drt_rejections", ".csv"),
-				String.join(delimiter, "time", "personId", "fromLinkId", "toLinkId", "fromX", "fromY", "toX", "toY"), seq -> {
+				String.join(delimiter, "time", "personId", "requestId", "fromLinkId", "toLinkId", "fromX", "fromY", "toX", "toY"), seq -> {
 					DrtRequestSubmittedEvent submission = seq.getSubmitted();
 					Coord fromCoord = network.getLinks().get(submission.getFromLinkId()).getToNode().getCoord();
 					Coord toCoord = network.getLinks().get(submission.getToLinkId()).getToNode().getCoord();
 					return String.join(delimiter, submission.getTime() + "",//
 							submission.getPersonId() + "",//
+							submission.getRequestId() + "",//
 							submission.getFromLinkId() + "",//
 							submission.getToLinkId() + "",//
 							fromCoord.getX() + "",//
@@ -215,6 +216,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 					"submissionTime", // 
 					"departureTime",//
 					"personId",//
+					"requestId",//
 					"vehicleId",//
 					"fromLinkId",//
 					"fromX",//
@@ -236,6 +238,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 					(Double)leg.submissionTime + "",//
 					(Double)leg.departureTime + "",//
 					leg.person + "",//
+					leg.request + "",//
 					leg.vehicle + "",//
 					leg.fromLinkId + "",//
 					format.format(leg.fromCoord.getX()),//

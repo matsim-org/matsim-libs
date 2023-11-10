@@ -62,6 +62,7 @@ public final class PassengerEngineWithPrebooking
 
 	private final String mode;
 	private final MobsimTimer mobsimTimer;
+	private final EventsManager eventsManager;
 	private final PreplanningEngine preplanningEngine;
 
 	private final PassengerRequestCreator requestCreator;
@@ -87,6 +88,7 @@ public final class PassengerEngineWithPrebooking
 		this.optimizer = optimizer;
 		this.network = network;
 		this.requestValidator = requestValidator;
+		this.eventsManager = eventsManager;
 
 		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
 	}
@@ -168,6 +170,9 @@ public final class PassengerEngineWithPrebooking
 		if (awaitingPickup != null) {
 			awaitingPickup.notifyPassengerIsReadyForDeparture(passenger, now);
 		}
+		
+		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, prebookedRequest.getId(), prebookedRequest.getPassengerId()));
+		
 		return true;
 	}
 

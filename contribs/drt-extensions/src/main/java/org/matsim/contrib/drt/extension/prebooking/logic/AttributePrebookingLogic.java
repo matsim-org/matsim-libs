@@ -83,7 +83,7 @@ public class AttributePrebookingLogic extends TimedPrebookingLogic {
 					Leg leg = (Leg) element;
 
 					if (leg.getMode().equals(mode)) {
-						Verify.verify(!foundLeg, "Person " + item.person().getId().toString()
+						Verify.verify(!foundLeg, "Person " + item.agent().getId().toString()
 								+ " has at least two drt legs in one trip.");
 						foundLeg = true;
 
@@ -92,7 +92,7 @@ public class AttributePrebookingLogic extends TimedPrebookingLogic {
 						}
 
 						if (submissionTime != null) {
-							queue.schedule(submissionTime, item.person(), leg, plannedDepartureTime);
+							queue.schedule(submissionTime, item.agent(), leg, plannedDepartureTime);
 						}
 					}
 				}

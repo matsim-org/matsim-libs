@@ -43,9 +43,8 @@ class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
 				DrtActionCreator delegate = getter.getModal(DrtActionCreator.class);
 				PassengerStopDurationProvider stopDurationProvider = getter
 						.getModal(PassengerStopDurationProvider.class);
-				PrebookingManager prebookingManager = getter.getModal(PrebookingManager.class);
 
-				return new PrebookingActionCreator(passengerEngine, delegate, stopDurationProvider, prebookingManager);
+				return new PrebookingActionCreator(passengerEngine, delegate, stopDurationProvider);
 			})).in(Singleton.class);
 			bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(PrebookingActionCreator.class));
 		} else {

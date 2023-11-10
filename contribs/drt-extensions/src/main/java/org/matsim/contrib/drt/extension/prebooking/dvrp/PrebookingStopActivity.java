@@ -3,6 +3,7 @@ package org.matsim.contrib.drt.extension.prebooking.dvrp;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -36,15 +37,16 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 	private final IdMap<Request, Double> leaveTimes = new IdMap<>(Request.class);
 	private final Set<Id<Request>> enteredRequests = new HashSet<>();
 
-	private final PrebookingManager prebookingManager;
 	private final PrebookingPassengerEngine passengerEngine;
+	
 	private final PassengerStopDurationProvider stopDurationProvider;
+	private final Supplier<Double> endTime;
 
 	public PrebookingStopActivity(PrebookingPassengerEngine passengerEngine, DynAgent driver, StayTask task,
 			Map<Id<Request>, ? extends AcceptedDrtRequest> dropoffRequests,
 			Map<Id<Request>, ? extends AcceptedDrtRequest> pickupRequests, String activityType,
-			PassengerStopDurationProvider stopDurationProvider, DvrpVehicle vehicle,
-			PrebookingManager prebookingManager) {
+			Supplier<Double> endTime, PassengerStopDurationProvider stopDurationProvider, 
+			DvrpVehicle vehicle) {
 		super(activityType);
 		this.passengerEngine = passengerEngine;
 		this.driver = driver;
@@ -52,12 +54,12 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 		this.pickupRequests = pickupRequests;
 		this.stopDurationProvider = stopDurationProvider;
 		this.vehicle = vehicle;
-		this.prebookingManager = prebookingManager;
+		this.endTime = endTime;
 	}
 
 	@Override
 	protected boolean isLastStep(double now) {
-		return updatePickupRequests(now) && leaveTimes.size() == 0;
+		return updatePickupRequests(now) && leaveTimes.size() == 0 && now >= endTime.get();
 	}
 
 	@Override
@@ -118,8 +120,6 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 	}
 
 	private void queuePickup(AcceptedDrtRequest request, double now) {
-		prebookingManager.notifyEntering(now, request);
-
 		double enterTime = now + stopDurationProvider.calcPickupDuration(vehicle, request.getRequest());
 		enterTimes.put(request.getId(), enterTime);
 	}

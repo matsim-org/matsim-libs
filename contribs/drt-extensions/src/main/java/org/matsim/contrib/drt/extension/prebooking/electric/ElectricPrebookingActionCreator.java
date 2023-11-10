@@ -27,7 +27,6 @@ public class ElectricPrebookingActionCreator implements VrpAgentLogic.DynActionC
 	private final PrebookingPassengerEngine passengerEngine;
 	private final PassengerStopDurationProvider stopDurationProvider;
 	private final MobsimTimer timer;
-	private final PrebookingManager prebookingManager;
 
 	public ElectricPrebookingActionCreator(PrebookingPassengerEngine passengerEngine,
 			VrpAgentLogic.DynActionCreator delegate, PassengerStopDurationProvider stopDurationProvider,
@@ -36,7 +35,6 @@ public class ElectricPrebookingActionCreator implements VrpAgentLogic.DynActionC
 		this.passengerEngine = passengerEngine;
 		this.stopDurationProvider = stopDurationProvider;
 		this.timer = timer;
-		this.prebookingManager = prebookingManager;
 	}
 
 	@Override
@@ -50,8 +48,8 @@ public class ElectricPrebookingActionCreator implements VrpAgentLogic.DynActionC
 			stopTask.initTaskTracker(new OfflineETaskTracker((EvDvrpVehicle) vehicle, timer));
 
 			return new PrebookingStopActivity(passengerEngine, dynAgent, stopTask, stopTask.getDropoffRequests(),
-					stopTask.getPickupRequests(), DrtActionCreator.DRT_STOP_NAME, stopDurationProvider, vehicle,
-					prebookingManager);
+					stopTask.getPickupRequests(), DrtActionCreator.DRT_STOP_NAME, () -> stopTask.getEndTime(),
+					stopDurationProvider, vehicle);
 		}
 
 		return delegate.createAction(dynAgent, vehicle, now);

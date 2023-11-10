@@ -1,5 +1,6 @@
 package org.matsim.contrib.drt.extension.prebooking.dvrp;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -10,10 +11,8 @@ import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.drt.extension.prebooking.events.PassengerEnteringVehicleEvent;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.drt.extension.prebooking.events.PassengerRequestBookedEvent;
-import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
@@ -22,7 +21,9 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 import com.google.common.base.Preconditions;
@@ -46,23 +47,12 @@ import com.google.common.base.Verify;
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class PrebookingManager implements MobsimEngine {
-	private static final String PREBOOKED_REQUEST_PREFIX = "prebookedRequestId";
-
 	private final String mode;
 
 	private final Network network;
 	private final EventsManager eventsManager;
 
-	private final PassengerRequestCreator requestCreator;
-	private final PassengerRequestValidator requestValidator;
 	private final VrpOptimizer optimizer;
-
-	private final AtomicInteger currentRequestIndex = new AtomicInteger(-1);
-
-	private final String requestAttribute;
-
-	private final List<PrebookingQueueItem> prebookingQueue = new LinkedList<>();
-	private final IdMap<Request, PassengerRequest> prebookedRequests = new IdMap<>(Request.class);
 
 	public PrebookingManager(String mode, Network network, PassengerRequestCreator requestCreator,
 			VrpOptimizer optimizer, PassengerRequestValidator requestValidator, EventsManager eventsManager) {
@@ -75,17 +65,11 @@ public class PrebookingManager implements MobsimEngine {
 		this.eventsManager = eventsManager;
 	}
 
-	PassengerRequest consumePrebookedRequest(MobsimAgent agent, Leg leg) {
-		Verify.verify(leg.getMode().equals(mode), "Invalid mode for this prebooking manager");
+	// Functionality for ID management
 
-		String rawRequestId = (String) leg.getAttributes().getAttribute(requestAttribute);
-
-		if (rawRequestId == null) {
-			return null;
-		}
-
-		return prebookedRequests.remove(Id.create(rawRequestId, Request.class));
-	}
+	private static final String PREBOOKED_REQUEST_PREFIX = "prebookedRequestId";
+	private final AtomicInteger currentRequestIndex = new AtomicInteger(-1);
+	private final String requestAttribute;
 
 	private Id<Request> createRequestId() {
 		return Id.create(mode + "_prebooked_" + currentRequestIndex.incrementAndGet(), Request.class);
@@ -95,32 +79,34 @@ public class PrebookingManager implements MobsimEngine {
 		return requestId.toString().startsWith(mode + "_prebooked_");
 	}
 
-	public void prebook(Person person, Leg leg, double earliestDepartureTime) {
+	public Id<Request> getRequestId(Leg leg) {
+		String rawRequestId = (String) leg.getAttributes().getAttribute(requestAttribute);
+
+		if (rawRequestId == null) {
+			return null;
+		}
+
+		return Id.create(rawRequestId, Request.class);
+	}
+
+	// Booking functionality
+
+	private final PassengerRequestCreator requestCreator;
+	private final PassengerRequestValidator requestValidator;
+	private final List<QueueItem> queue = new LinkedList<>();
+
+	public void prebook(MobsimAgent person, Leg leg, double earliestDepartureTime) {
 		Verify.verify(leg.getMode().equals(mode), "Invalid mode for this prebooking manager");
 
-		synchronized (prebookingQueue) {
-			this.prebookingQueue.add(new PrebookingQueueItem(person, leg, earliestDepartureTime));
+		synchronized (queue) {
+			queue.add(new QueueItem(person, leg, earliestDepartureTime));
 		}
 	}
 
-	private Link getLink(Id<Link> linkId) {
-		return Preconditions.checkNotNull(network.getLinks().get(linkId),
-				"Link id=%s does not exist in network for mode %s. Agent departs from a link that does not belong to that network?",
-				linkId, mode);
-	}
-
-	private record PrebookingQueueItem(Person person, Leg leg, double earliestDepartureTime) {
-	}
-
-	@Override
-	public void onPrepareSim() {
-	}
-
-	@Override
-	public void doSimStep(double now) {
-		synchronized (prebookingQueue) {
-			for (PrebookingQueueItem item : prebookingQueue) {
-				Verify.verify(item.leg.getMode().equals(mode), "Invalid mode for this prebooking manager");
+	private void processQueue(double now) {
+		synchronized (queue) {
+			for (QueueItem item : queue) {
+				Verify.verify(!item.person.getState().equals(State.ABORT), "Cannot prebook aborted agent");
 
 				Id<Request> requestId = createRequestId();
 
@@ -131,6 +117,16 @@ public class PrebookingManager implements MobsimEngine {
 						getLink(item.leg.getRoute().getEndLinkId()), item.earliestDepartureTime, now);
 
 				Set<String> violations = requestValidator.validateRequest(request);
+
+				Plan plan = WithinDayAgentUtils.getModifiablePlan(item.person);
+				int currentLegIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(item.person);
+				int prebookingLegIndex = plan.getPlanElements().indexOf(item.leg);
+
+				if (prebookingLegIndex <= currentLegIndex) {
+					violations = new HashSet<>(violations);
+					violations.add("past leg");
+				}
+
 				if (!violations.isEmpty()) {
 					String cause = String.join(", ", violations);
 					eventsManager.processEvent(new PassengerRequestRejectedEvent(now, mode, request.getId(),
@@ -141,17 +137,70 @@ public class PrebookingManager implements MobsimEngine {
 					}
 
 					item.leg.getAttributes().putAttribute(requestAttribute, request.getId().toString());
-					prebookedRequests.put(request.getId(), request);
+					requests.put(requestId, new RequestItem(request));
 				}
 			}
 
-			prebookingQueue.clear();
+			queue.clear();
 		}
 	}
-	
-	void notifyEntering(double now, AcceptedDrtRequest request) {
-		eventsManager
-				.processEvent(new PassengerEnteringVehicleEvent(now, mode, request.getId(), request.getPassengerId()));
+
+	private Link getLink(Id<Link> linkId) {
+		return Preconditions.checkNotNull(network.getLinks().get(linkId),
+				"Link id=%s does not exist in network for mode %s. Agent departs from a link that does not belong to that network?",
+				linkId, mode);
+	}
+
+	private record QueueItem(MobsimAgent person, Leg leg, double earliestDepartureTime) {
+	}
+
+	// Interface with PassengerEngine
+
+	PassengerRequest consumePrebookedRequest(MobsimAgent agent, Leg leg) {
+		Verify.verify(leg.getMode().equals(mode), "Invalid mode for this prebooking manager");
+
+		Id<Request> requestId = getRequestId(leg);
+
+		if (requestId == null) {
+			return null;
+		}
+
+		RequestItem item = requests.get(requestId);
+
+		if (item == null) {
+			return null;
+		}
+
+		return item.request;
+	}
+
+	// Housekeeping of requests
+
+	private IdMap<Request, RequestItem> requests = new IdMap<>(Request.class);
+
+	private class RequestItem {
+		// this class looks minimal for now, but will be extended with canceling
+		// functionality
+		final PassengerRequest request;
+
+		RequestItem(PassengerRequest request) {
+			this.request = request;
+		}
+	}
+
+	void notifyDropoff(Id<Request> requestId) {
+		requests.remove(requestId);
+	}
+
+	// Engine code
+
+	@Override
+	public void doSimStep(double now) {
+		processQueue(now);
+	}
+
+	@Override
+	public void onPrepareSim() {
 	}
 
 	@Override
@@ -160,5 +209,5 @@ public class PrebookingManager implements MobsimEngine {
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
-	};
+	}
 }

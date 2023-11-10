@@ -20,6 +20,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
+import org.matsim.contrib.dvrp.passenger.PassengerWaitingEvent;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -46,6 +47,7 @@ public final class PrebookingPassengerEngine implements PassengerEngine, Passeng
 
 	private final String mode;
 	private final MobsimTimer mobsimTimer;
+	private final EventsManager eventsManager;
 
 	private final PassengerRequestCreator requestCreator;
 	private final VrpOptimizer optimizer;
@@ -77,6 +79,7 @@ public final class PrebookingPassengerEngine implements PassengerEngine, Passeng
 		this.optimizer = optimizer;
 		this.network = network;
 		this.requestValidator = requestValidator;
+		this.eventsManager = eventsManager;
 		this.prebookingManager = prebookingManager;
 
 		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
@@ -149,6 +152,8 @@ public final class PrebookingPassengerEngine implements PassengerEngine, Passeng
 				pickupActivity.notifyPassengerIsReadyForDeparture(passenger, now);
 			}
 		}
+		
+		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerId()));
 		
 		return true;
 	}
