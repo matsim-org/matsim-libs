@@ -141,7 +141,7 @@ public final class PrebookingPassengerEngine implements PassengerEngine, Passeng
 
 		// prebooking: try to find a prebooked requests that is associated to this leg
 		Leg leg = (Leg) ((PlanAgent) passenger).getCurrentPlanElement();
-		PassengerRequest request = prebookingManager.consumePrebookedRequest(agent, leg);
+		PassengerRequest request = prebookingManager.retrievePrebookedRequest(agent, leg);
 
 		if (request == null) { // prebooking: immediate request, default behavior
 			request = requestCreator.createRequest(internalPassengerHandling.createRequestId(), passenger.getId(),

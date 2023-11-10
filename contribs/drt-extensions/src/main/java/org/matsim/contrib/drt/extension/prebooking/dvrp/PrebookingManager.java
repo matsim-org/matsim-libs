@@ -156,7 +156,7 @@ public class PrebookingManager implements MobsimEngine {
 
 	// Interface with PassengerEngine
 
-	PassengerRequest consumePrebookedRequest(MobsimAgent agent, Leg leg) {
+	PassengerRequest retrievePrebookedRequest(MobsimAgent agent, Leg leg) {
 		Verify.verify(leg.getMode().equals(mode), "Invalid mode for this prebooking manager");
 
 		Id<Request> requestId = getRequestId(leg);
@@ -165,7 +165,7 @@ public class PrebookingManager implements MobsimEngine {
 			return null;
 		}
 
-		RequestItem item = requests.get(requestId);
+		RequestItem item = requests.remove(requestId);
 
 		if (item == null) {
 			return null;
