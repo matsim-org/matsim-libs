@@ -48,6 +48,7 @@ public class PrebookingExampleIT {
 	@Test
 	public void testDrtWithPrebooking() {
 		Id.resetCaches();
+		
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl,
 				new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new), new DvrpConfigGroup(),
@@ -80,6 +81,8 @@ public class PrebookingExampleIT {
 
 	@Test
 	public void testElectricDrtWithPrebooking() {
+		Id.resetCaches();
+		
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_edrt_config.xml");
 
 		Config config = ConfigUtils.loadConfig(configUrl,
