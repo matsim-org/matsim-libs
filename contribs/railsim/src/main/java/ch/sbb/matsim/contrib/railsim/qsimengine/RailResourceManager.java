@@ -22,6 +22,7 @@ package ch.sbb.matsim.contrib.railsim.qsimengine;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.FixedBlockResource;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.MovingBlockResource;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResource;
 import jakarta.inject.Inject;
 import org.matsim.api.core.v01.Id;
@@ -77,7 +78,12 @@ public final class RailResourceManager {
 
 		resources = new IdMap<>(RailResource.class, collect.size());
 		for (Map.Entry<Id<RailResource>, List<RailLink>> e : collect.entrySet()) {
-			resources.put(e.getKey(), new FixedBlockResource(e.getValue()));
+			if (e.getValue().stream().allMatch(l -> l.resourceType == ResourceType.movingBlock))
+				resources.put(e.getKey(), new MovingBlockResource(e.getValue()));
+			else if (e.getValue().stream().allMatch(l -> l.resourceType == ResourceType.movingBlock))
+				throw new IllegalStateException("Cannot mix moving and fixed block resources.");
+			else
+				resources.put(e.getKey(), new FixedBlockResource(e.getValue()));
 		}
 	}
 
@@ -134,7 +140,13 @@ public final class RailResourceManager {
 	 * Try to block a track and the underlying resource and return whether it was successful.
 	 */
 	public boolean tryBlockTrack(double time, TrainPosition position, RailLink link) {
+		if (link.isMovingBlock())
+			return tryBlockTrackMoving(time, position, link);
 
+		return tryBlockTrackFixed(time, position, link);
+	}
+
+	private boolean tryBlockTrackFixed(double time, TrainPosition position, RailLink link) {
 		if (link.isBlockedBy(position.getDriver()))
 			return true;
 
@@ -158,6 +170,10 @@ public final class RailResourceManager {
 		}
 
 		return false;
+	}
+
+	private boolean tryBlockTrackMoving(double time, TrainPosition position, RailLink link) {
+		throw new UnsupportedOperationException("Not implemented yet.");
 	}
 
 	/**

@@ -92,8 +92,9 @@ public class SimpleDisposition implements TrainDisposition {
 			}
 		 */
 
-
-		double reserveDist = 0;
+		// Assume rest of link is already reserved (fix block)
+		double reserveDist = resources.getLink(position.getHeadLink()).getLength() - position.getHeadPosition();
+		boolean stop = false;
 
 		// Iterate all links that need to be blocked
 		for (RailLink link : segment) {
@@ -101,11 +102,13 @@ public class SimpleDisposition implements TrainDisposition {
 			// Check if single link can be reserved
 			if (resources.tryBlockTrack(time, position, link)) {
 				reserveDist += link.getLength();
-			} else
+			} else {
+				stop = true;
 				break;
+			}
 		}
 
-		return new DispositionResponse(reserveDist, null);
+		return new DispositionResponse(reserveDist, stop, null);
 	}
 
 	@Override

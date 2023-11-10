@@ -103,9 +103,14 @@ final class TrainState implements TrainPosition {
 	double headPosition;
 
 	/**
-	 * * Distance in meters away from the {@code tailLink}s {@code fromNode}.
+	 * Distance in meters away from the {@code tailLink}s {@code fromNode}.
 	 */
 	double tailPosition;
+
+	/**
+	 * Distance in meters, which are approved by dispatcher.
+	 */
+	double approvedDist;
 
 	/**
 	 * Speed in m/s.
@@ -140,6 +145,7 @@ final class TrainState implements TrainPosition {
 			", allowedMaxSpeed=" + allowedMaxSpeed +
 			", headPosition=" + headPosition +
 			", tailPosition=" + tailPosition +
+			", approvedDist=" + approvedDist +
 			", speed=" + speed +
 			", acceleration=" + acceleration +
 			'}';

@@ -172,6 +172,13 @@ public final class RailLink implements HasLinkId {
 		return length;
 	}
 
+	/**
+	 * Link allows for moving block logic.
+	 */
+	public boolean isMovingBlock() {
+		return resourceType == ResourceType.movingBlock;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

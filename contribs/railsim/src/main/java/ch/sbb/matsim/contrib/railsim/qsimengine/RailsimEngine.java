@@ -316,7 +316,6 @@ final class RailsimEngine implements Steppable {
 			subRoute.clear();
 			subRoute.addAll(response.detour().newRoute());
 
-
 			if (newStop != null) {
 				state.nextStop = newStop;
 			}
@@ -331,8 +330,10 @@ final class RailsimEngine implements Steppable {
 
 		}
 
+		state.approvedDist = response.approvedDist();
+
 		// Only continue successfully if all requested link have been blocked
-		return FuzzyUtils.equals(response.reservedDist(), links.stream().mapToDouble(RailLink::getLength).sum());
+		return !response.stopSignal();
 	}
 
 	private void enterLink(double time, UpdateEvent event) {
@@ -498,6 +499,7 @@ final class RailsimEngine implements Steppable {
 
 		state.headPosition += dist;
 		state.tailPosition += dist;
+		state.approvedDist -= dist;
 
 		if (Double.isFinite(state.targetDecelDist)) {
 			state.targetDecelDist -= dist;
@@ -510,6 +512,7 @@ final class RailsimEngine implements Steppable {
 		assert FuzzyUtils.lessEqualThan(state.headPosition, resources.getLink(state.headLink).length) : "Illegal state update. Head position must be smaller than link length";
 		assert FuzzyUtils.greaterEqualThan(state.headPosition, 0) : "Head position must be positive";
 		assert FuzzyUtils.lessEqualThan(state.speed, state.allowedMaxSpeed) : "Speed must be less equal than the allowed speed";
+		assert FuzzyUtils.greaterEqualThan(state.approvedDist, 0) : "Approved distance must be positive";
 
 		state.timestamp = time;
 
@@ -557,6 +560,9 @@ final class RailsimEngine implements Steppable {
 		double reserveDist = Double.POSITIVE_INFINITY;
 		if (!state.isRouteAtEnd() && !event.isAwaitingReservation()) {
 			reserveDist = RailsimCalc.nextLinkReservation(state, currentLink);
+
+			// TODO: replace by distance calculation only
+			// use state.approvedDist instead of reserveDist
 
 			if (reserveDist < 0)
 				reserveDist = 0;
