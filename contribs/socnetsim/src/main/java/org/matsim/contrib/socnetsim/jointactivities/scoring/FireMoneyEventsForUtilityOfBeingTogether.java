@@ -47,7 +47,7 @@ import org.matsim.contrib.socnetsim.framework.scoring.BeingTogetherScoring;
 import org.matsim.contrib.socnetsim.run.ScoringFunctionConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.api.core.v01.events.HasPersonId;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.utils.collections.MapUtils;
@@ -94,7 +94,7 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 				module.getActTypeFilterForJointScoring(),
 				module.getModeFilterForJointScoring(),
 				getPersonOverlapScorerFactory( sc ),
-				sc.getConfig().planCalcScore().getMarginalUtilityOfMoney(),
+				sc.getConfig().scoring().getMarginalUtilityOfMoney(),
 				sc.getActivityFacilities(),
 				(SocialNetwork) sc.getScenarioElement( SocialNetwork.ELEMENT_NAME ) );
 
@@ -123,7 +123,7 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 								return new BeingTogetherScoring.LinearOverlapScorer( 0 );
 							}
 							final double typicalDuration =
-								getTypicalDuration( 
+								getTypicalDuration(
 										scenario,
 										person,
 										scoringFunctionConf.getActivityTypeForContactInDesires() );
@@ -151,14 +151,14 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 
 		if ( typicalDuration != null ) return typicalDuration;
 
-		final ActivityParams params = scenario.getConfig().planCalcScore().getActivityParams( type );
-		
+		final ActivityParams params = scenario.getConfig().scoring().getActivityParams( type );
+
 		if ( params == null ) {
 			//throw new RuntimeException( "could not find typical duration for Person "+person.getId()+" for type "+type );
 			// not that nice, but needed for agents that might not have a preference. BeingTogetherScoring knows how to handle that
 			return Double.NEGATIVE_INFINITY;
 		}
-		
+
 		return params.getTypicalDuration().seconds();
 	}
 

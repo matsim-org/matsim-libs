@@ -44,8 +44,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 /**
  * @author jbischoff
  * Sample main file for setting up an Matsim run with parking. Check the output events for Parking events and the scores.
- * 
- * 
+ *
+ *
  */
 public class RunParkingChoiceExample {
 
@@ -58,12 +58,12 @@ public class RunParkingChoiceExample {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+		controler.getConfig().controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 
 		// ---
 
 		// we need some settings to walk from parking to destination:
-		ParkingScore parkingScoreManager = new ParkingScoreManager(new WalkTravelTime(controler.getConfig().plansCalcRoute()), scenario);
+		ParkingScore parkingScoreManager = new ParkingScoreManager(new WalkTravelTime(controler.getConfig().routing()), scenario);
 		parkingScoreManager.setParkingScoreScalingFactor(1);
 		parkingScoreManager.setParkingBetas(new ParkingBetaExample());
 

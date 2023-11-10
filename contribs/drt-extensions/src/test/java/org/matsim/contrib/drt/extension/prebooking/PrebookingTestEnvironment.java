@@ -51,10 +51,10 @@ import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
 import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -206,9 +206,9 @@ public class PrebookingTestEnvironment {
 	}
 
 	private void buildConfig(Config config) {
-		config.controler().setOutputDirectory("drt_test_output");
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(0);
+		config.controller().setOutputDirectory("drt_test_output");
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(0);
 
 		config.qsim().setStartTime(0.0);
 		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
@@ -217,11 +217,11 @@ public class PrebookingTestEnvironment {
 		config.qsim().setSimEndtimeInterpretation(EndtimeInterpretation.onlyUseEndtime);
 
 		ModeParams drtParams = new ModeParams("drt");
-		config.planCalcScore().addModeParams(drtParams);
+		config.scoring().addModeParams(drtParams);
 
 		ActivityParams genericParams = new ActivityParams("generic");
 		genericParams.setScoringThisActivityAtAll(false);
-		config.planCalcScore().addActivityParams(genericParams);
+		config.scoring().addActivityParams(genericParams);
 
 		DvrpConfigGroup dvrpConfig = new DvrpConfigGroup();
 		config.addModule(dvrpConfig);
@@ -243,7 +243,7 @@ public class PrebookingTestEnvironment {
 		DrtInsertionSearchParams searchParams = new SelectiveInsertionSearchParams();
 		modeConfig.addDrtInsertionSearchParams(searchParams);
 
-		DrtConfigs.adjustMultiModeDrtConfig(drtConfig, config.planCalcScore(), config.plansCalcRoute());
+		DrtConfigs.adjustMultiModeDrtConfig(drtConfig, config.scoring(), config.routing());
 	}
 
 	private void buildPopulation(Scenario scenario) {

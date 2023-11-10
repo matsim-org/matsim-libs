@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.DefaultRoutingRequest;
@@ -1685,9 +1685,9 @@ public class RaptorStopFinderTest {
             routingModules.put("zoomer",
                     new TeleportationRoutingModule("zoomer", f0.scenario, 1000., 1.));
 
-            PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("zoomer");
+            ScoringConfigGroup.ModeParams modeParams = new ScoringConfigGroup.ModeParams("zoomer");
             modeParams.setMarginalUtilityOfTraveling(0.);
-            f0.scenario.getConfig().planCalcScore().addModeParams(modeParams);
+            f0.scenario.getConfig().scoring().addModeParams(modeParams);
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet zoomerAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -1751,9 +1751,9 @@ public class RaptorStopFinderTest {
             routingModules.put("zoomer",
                     new TeleportationRoutingModule("zoomer", f0.scenario, 1000., 1.));
 
-            PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("zoomer");
+            ScoringConfigGroup.ModeParams modeParams = new ScoringConfigGroup.ModeParams("zoomer");
             modeParams.setMarginalUtilityOfTraveling(0.);
-            f0.scenario.getConfig().planCalcScore().addModeParams(modeParams);
+            f0.scenario.getConfig().scoring().addModeParams(modeParams);
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet zoomerAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();

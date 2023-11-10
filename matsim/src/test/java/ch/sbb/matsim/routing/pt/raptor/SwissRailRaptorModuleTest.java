@@ -41,8 +41,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -93,10 +93,10 @@ public class SwissRailRaptorModuleTest {
     @Test
     public void testInitialization() {
         Config config = ConfigUtils.createConfig();
-        config.controler().setLastIteration(0);
-        config.controler().setOutputDirectory(this.utils.getOutputDirectory());
-        config.controler().setCreateGraphs(false);
-        config.controler().setDumpDataAtEnd(false);
+        config.controller().setLastIteration(0);
+        config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+        config.controller().setCreateGraphs(false);
+        config.controller().setDumpDataAtEnd(false);
         config.transit().setUseTransit(true);
         Scenario scenario = ScenarioUtils.createScenario(config);
         Controler controler = new Controler(scenario);
@@ -156,23 +156,23 @@ public class SwissRailRaptorModuleTest {
 
         // prepare scoring
         Config config = f.config;
-        PlanCalcScoreConfigGroup.ActivityParams homeScoring = new PlanCalcScoreConfigGroup.ActivityParams("home");
+        ScoringConfigGroup.ActivityParams homeScoring = new ScoringConfigGroup.ActivityParams("home");
         homeScoring.setTypicalDuration(16*3600);
-        f.config.planCalcScore().addActivityParams(homeScoring);
-        PlanCalcScoreConfigGroup.ActivityParams workScoring = new PlanCalcScoreConfigGroup.ActivityParams("work");
+        f.config.scoring().addActivityParams(homeScoring);
+        ScoringConfigGroup.ActivityParams workScoring = new ScoringConfigGroup.ActivityParams("work");
         workScoring.setTypicalDuration(8*3600);
-        f.config.planCalcScore().addActivityParams(workScoring);
+        f.config.scoring().addActivityParams(workScoring);
 
-        PlanCalcScoreConfigGroup.ModeParams walk = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.walk);
+        ScoringConfigGroup.ModeParams walk = new ScoringConfigGroup.ModeParams(TransportMode.walk);
         walk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(walk);
+        f.config.scoring().addModeParams(walk);
 
         // prepare rest of config
 
-        config.controler().setLastIteration(0);
-        config.controler().setOutputDirectory(this.utils.getOutputDirectory());
-        config.controler().setCreateGraphs(false);
-        config.controler().setDumpDataAtEnd(false);
+        config.controller().setLastIteration(0);
+        config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+        config.controller().setCreateGraphs(false);
+        config.controller().setDumpDataAtEnd(false);
         config.qsim().setEndTime(10*3600);
         config.transit().setUseTransit(true);
         Controler controler = new Controler(f.scenario);
@@ -270,26 +270,26 @@ public class SwissRailRaptorModuleTest {
 
         // prepare scoring
         Config config = f.config;
-        PlanCalcScoreConfigGroup.ActivityParams homeScoring = new PlanCalcScoreConfigGroup.ActivityParams("home");
+        ScoringConfigGroup.ActivityParams homeScoring = new ScoringConfigGroup.ActivityParams("home");
         homeScoring.setTypicalDuration(16*3600);
-        f.config.planCalcScore().addActivityParams(homeScoring);
-        PlanCalcScoreConfigGroup.ActivityParams workScoring = new PlanCalcScoreConfigGroup.ActivityParams("work");
+        f.config.scoring().addActivityParams(homeScoring);
+        ScoringConfigGroup.ActivityParams workScoring = new ScoringConfigGroup.ActivityParams("work");
         workScoring.setTypicalDuration(8*3600);
-        f.config.planCalcScore().addActivityParams(workScoring);
+        f.config.scoring().addActivityParams(workScoring);
 
-        f.config.planCalcScore().getOrCreateModeParams(TransportMode.walk).setMarginalUtilityOfTraveling(0.0);
+        f.config.scoring().getOrCreateModeParams(TransportMode.walk).setMarginalUtilityOfTraveling(0.0);
 
         StrategySettings reRoute = new StrategySettings();
         reRoute.setStrategyName("ReRoute");
         reRoute.setWeight(1.0);
-        config.strategy().addStrategySettings(reRoute);
-        config.strategy().setMaxAgentPlanMemorySize(1);
+        config.replanning().addStrategySettings(reRoute);
+        config.replanning().setMaxAgentPlanMemorySize(1);
 
         // prepare rest of config
-        config.controler().setLastIteration(1);
-        config.controler().setOutputDirectory(this.utils.getOutputDirectory());
-        config.controler().setCreateGraphs(false);
-        config.controler().setDumpDataAtEnd(false);
+        config.controller().setLastIteration(1);
+        config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+        config.controller().setCreateGraphs(false);
+        config.controller().setDumpDataAtEnd(false);
         config.qsim().setEndTime(10*3600);
         config.transit().setUseTransit(true);
         Controler controler = new Controler(f.scenario);
@@ -348,21 +348,21 @@ public class SwissRailRaptorModuleTest {
         srrConfig.setScoringParameters(ch.sbb.matsim.config.SwissRailRaptorConfigGroup.ScoringParameters.Individual);
 
         Config config = ConfigUtils.createConfig(srrConfig);
-        config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-        config.controler().setLastIteration(0);
-        config.controler().setOutputDirectory(this.utils.getOutputDirectory());
+        config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+        config.controller().setLastIteration(0);
+        config.controller().setOutputDirectory(this.utils.getOutputDirectory());
         config.transit().setUseTransit(true);
 
-        config.planCalcScore().getOrCreateScoringParameters("default").setPerforming_utils_hr(3600.0 * 50.0);
-        config.planCalcScore().getOrCreateScoringParameters("sub").setPerforming_utils_hr(3600.0 * 50.0);
+        config.scoring().getOrCreateScoringParameters("default").setPerforming_utils_hr(3600.0 * 50.0);
+        config.scoring().getOrCreateScoringParameters("sub").setPerforming_utils_hr(3600.0 * 50.0);
 
         for (String mode : Arrays.asList("car", "walk", "pt")) {
-            config.planCalcScore().getOrCreateScoringParameters("default").getOrCreateModeParams(mode);
-            config.planCalcScore().getOrCreateScoringParameters("sub").getOrCreateModeParams(mode);
+            config.scoring().getOrCreateScoringParameters("default").getOrCreateModeParams(mode);
+            config.scoring().getOrCreateScoringParameters("sub").getOrCreateModeParams(mode);
         }
 
-        config.planCalcScore().getOrCreateScoringParameters("default").setMarginalUtlOfWaitingPt_utils_hr(-3600.0 * 30.0);
-        config.planCalcScore().getOrCreateScoringParameters("sub").setMarginalUtlOfWaitingPt_utils_hr(-3600.0 * 10.0);
+        config.scoring().getOrCreateScoringParameters("default").setMarginalUtlOfWaitingPt_utils_hr(-3600.0 * 30.0);
+        config.scoring().getOrCreateScoringParameters("sub").setMarginalUtlOfWaitingPt_utils_hr(-3600.0 * 10.0);
 
         Scenario scenario = ScenarioUtils.createScenario(config);
 

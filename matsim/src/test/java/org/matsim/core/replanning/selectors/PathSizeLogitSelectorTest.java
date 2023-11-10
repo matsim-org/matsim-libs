@@ -60,8 +60,8 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 
 	@Before public void setUp() {
 		this.config = utils.loadConfig((String)null); // required for planCalcScore.beta to be defined
-		config.planCalcScore().setBrainExpBeta(2.0);
-		config.planCalcScore().setPathSizeLogitBeta(2.0);
+		config.scoring().setBrainExpBeta(2.0);
+		config.scoring().setPathSizeLogitBeta(2.0);
 		this.network = null;
 	}
 
@@ -72,7 +72,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 
 	@Override
 	protected PlanSelector<Plan,Person> getPlanSelector() {
-		return new PathSizeLogitSelector(config.planCalcScore(), createNetwork());
+		return new PathSizeLogitSelector(config.scoring(), createNetwork());
 	}
 
 	@Override
@@ -287,7 +287,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		p3.setScore(-10.0);
 		person.addPlan(p3);
 
-		PathSizeLogitSelector selector = new PathSizeLogitSelector(this.config.planCalcScore(), network);
+		PathSizeLogitSelector selector = new PathSizeLogitSelector(this.config.scoring(), network);
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;

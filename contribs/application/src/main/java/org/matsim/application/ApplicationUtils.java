@@ -6,7 +6,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
-import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -129,8 +128,8 @@ public class ApplicationUtils {
 
 		Config config = ConfigUtils.createConfig();
 		config.global().setCoordinateSystem(crs.getInputCRS());
-		config.controler().setOutputDirectory(runDirectory.toString());
-		config.controler().setRunId(resolvedRunId);
+		config.controller().setOutputDirectory(runDirectory.toString());
+		config.controller().setRunId(resolvedRunId);
 
 		config.plans().setInputFile(populationFile.toString());
 		config.network().setInputFile(networkFile.toString());

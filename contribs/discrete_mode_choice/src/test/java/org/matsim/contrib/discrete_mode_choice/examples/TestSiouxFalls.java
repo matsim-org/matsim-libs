@@ -28,16 +28,15 @@ public class TestSiouxFalls {
 		URL scenarioURL = ExamplesUtils.getTestScenarioURL("siouxfalls-2014");
 
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(scenarioURL, "config_default.xml"));
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		DiscreteModeChoiceConfigurator.configureAsSubtourModeChoiceReplacement(config);
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(1);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(1);
 		// save some bandwidth/time:
-		config.controler().setCreateGraphs( false );
-		config.controler().setWritePlansInterval( 0 );
-		config.controler().setWriteEventsInterval( 0 );
-		config.controler().setDumpDataAtEnd( false );
+		config.controller().setCreateGraphs( false );
+		config.controller().setWritePlansInterval( 0 );
+		config.controller().setWriteEventsInterval( 0 );
+		config.controller().setDumpDataAtEnd( false );
 
 		config.qsim().setFlowCapFactor(10000.0);
 		config.qsim().setStorageCapFactor(10000.0);
@@ -57,14 +56,14 @@ public class TestSiouxFalls {
 
 		controller.run();
 
-		assertEquals(42395, (int) listener.counts.get("pt"));
-		assertEquals(132284, (int) listener.counts.get("car"));
-		assertEquals(78809, (int) listener.counts.get("walk"));
-//		assertEquals(42520, (int) listener.counts.get("pt"));
-//		assertEquals(132100, (int) listener.counts.get("car"));
-//		assertEquals(79106, (int) listener.counts.get("walk"));
-		// ...setConstrainedModes(...) (inside configureAsSubtourModeChoiceReplacement(...)) used to ignore its arguments because of a typo.
-		// This is now corrected, but results are no longer backwards compatible.  kai, jan'23
+
+		System.out.println((int) listener.counts.get("pt"));
+		System.out.println((int) listener.counts.get("car"));
+		System.out.println(listener.counts.get("walk"));
+
+		assertEquals(44195, listener.counts.get("pt"), 2);
+		assertEquals(132316, listener.counts.get("car"), 2);
+		assertEquals(82139, listener.counts.get("walk"), 2);
 
 	}
 

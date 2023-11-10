@@ -110,10 +110,10 @@ public final class NoiseOfflineCalculation{
 		EventWriterXML eventWriter = null;
 		if (noiseContext.getNoiseParams().isThrowNoiseEventsAffected() || noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
 			String eventsFile;
-			if (this.scenario.getConfig().controler().getRunId() == null || this.scenario.getConfig().controler().getRunId().equals("")) {
+			if (this.scenario.getConfig().controller().getRunId() == null || this.scenario.getConfig().controller().getRunId().equals("")) {
 				eventsFile = outputFilePath + "noise.output_events.offline.xml.gz";
 			} else {
-				eventsFile = outputFilePath + this.scenario.getConfig().controler().getRunId() + ".noise.output_events.offline.xml.gz";
+				eventsFile = outputFilePath + this.scenario.getConfig().controller().getRunId() + ".noise.output_events.offline.xml.gz";
 			}
 			eventWriter = new EventWriterXML(eventsFile);
 			events.addHandler(eventWriter);
@@ -123,10 +123,10 @@ public final class NoiseOfflineCalculation{
 		log.info("Reading events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		String eventsFile;
-		if (this.scenario.getConfig().controler().getRunId() == null || this.scenario.getConfig().controler().getRunId().equals("")) {
-			eventsFile = this.scenario.getConfig().controler().getOutputDirectory() + "output_events.xml.gz";
+		if (this.scenario.getConfig().controller().getRunId() == null || this.scenario.getConfig().controller().getRunId().equals("")) {
+			eventsFile = this.scenario.getConfig().controller().getOutputDirectory() + "output_events.xml.gz";
 		} else {
-			eventsFile = this.scenario.getConfig().controler().getOutputDirectory() + this.scenario.getConfig().controler().getRunId() + ".output_events.xml.gz";
+			eventsFile = this.scenario.getConfig().controller().getOutputDirectory() + this.scenario.getConfig().controller().getRunId() + ".output_events.xml.gz";
 		}
 		reader.readFile(eventsFile);
 		log.info("Reading events file... Done.");

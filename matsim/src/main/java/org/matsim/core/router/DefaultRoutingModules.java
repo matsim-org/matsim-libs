@@ -21,8 +21,8 @@ package org.matsim.core.router;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.TeleportedModeParams;
+import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup.TeleportedModeParams;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
@@ -40,7 +40,7 @@ public final class DefaultRoutingModules {
 	private DefaultRoutingModules(){} // do not instantiate
 
 	public static RoutingModule createPseudoTransitRouter( String mode, PopulationFactory popFac, Network net, LeastCostPathCalculator routeAlgo,
-			PlansCalcRouteConfigGroup.TeleportedModeParams params ) {
+			RoutingConfigGroup.TeleportedModeParams params ) {
 		return new FreespeedFactorRoutingModule(
 				mode,
 				popFac,

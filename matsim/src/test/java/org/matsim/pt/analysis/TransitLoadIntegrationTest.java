@@ -46,7 +46,7 @@ public class TransitLoadIntegrationTest {
 	@Test
 	public void testIntegration() {
 		final Config cfg = this.util.loadConfig("test/scenarios/pt-tutorial/0.config.xml");
-		cfg.controler().setLastIteration(0);
+		cfg.controller().setLastIteration(0);
 		cfg.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 		final Scenario s = ScenarioUtils.loadScenario(cfg);
 		final Controler c = new Controler(s);
@@ -59,10 +59,10 @@ public class TransitLoadIntegrationTest {
 			}
 		});
 
-		cfg.controler().setWritePlansInterval(0);
-        c.getConfig().controler().setCreateGraphs(false);
-        c.getConfig().controler().setWriteEventsInterval(0);
-		c.getConfig().controler().setDumpDataAtEnd(false);
+		cfg.controller().setWritePlansInterval(0);
+        c.getConfig().controller().setCreateGraphs(false);
+        c.getConfig().controller().setWriteEventsInterval(0);
+		c.getConfig().controller().setDumpDataAtEnd(false);
 		c.run();
 
 		TransitLine line = s.getTransitSchedule().getTransitLines().get(Id.create("Blue Line", TransitLine.class));

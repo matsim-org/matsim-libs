@@ -36,8 +36,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.DefaultRoutingModules;
@@ -398,7 +398,7 @@ public class SwissRailRaptorTest {
          */
         Fixture f = new Fixture();
         f.init();
-        f.config.planCalcScore().setUtilityOfLineSwitch(0);
+        f.config.scoring().setUtilityOfLineSwitch(0);
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(new Coord(11900, 5100)), new FakeFacility(new Coord(24100, 4950)), 6.0*3600 - 5.0*60, null));
@@ -413,7 +413,7 @@ public class SwissRailRaptorTest {
 
         Config config = ConfigUtils.createConfig();
         double transferUtility = 300.0 * raptorParams.getMarginalUtilityOfTravelTime_utl_s(TransportMode.pt); // corresponds to 5 minutes transit travel time
-        config.planCalcScore().setUtilityOfLineSwitch(transferUtility);
+        config.scoring().setUtilityOfLineSwitch(transferUtility);
         raptorParams = RaptorUtils.createParameters(config);
         Assert.assertEquals(-transferUtility, raptorParams.getTransferPenaltyFixCostPerTransfer(), 0.0);
         router = createTransitRouter(f.schedule, config, f.network);
@@ -437,7 +437,7 @@ public class SwissRailRaptorTest {
          */
         Fixture f = new Fixture();
         f.init();
-        f.config.planCalcScore().setUtilityOfLineSwitch(0);
+        f.config.scoring().setUtilityOfLineSwitch(0);
         f.config.transitRouter().setAdditionalTransferTime(0);
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(new Coord(11900, 5100)), new FakeFacility(new Coord(24100, 4950)), 6.0*3600 - 5.0*60, null));
@@ -552,7 +552,7 @@ public class SwissRailRaptorTest {
             Assert.assertEquals(1895.0, legDuration, 0.0);
 
             RoutingModule walkRoutingModule = DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, f.scenario,
-                    f.config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk));
+                    f.config.routing().getModeRoutingParams().get(TransportMode.walk));
 
             TransitRouterWrapper wrapper = new TransitRouterWrapper(
                     router,
@@ -590,7 +590,7 @@ public class SwissRailRaptorTest {
             Assert.assertEquals(5500.0, legDuration, 0.0);
 
             RoutingModule walkRoutingModule = DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, f.scenario,
-                    f.config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk));
+                    f.config.routing().getModeRoutingParams().get(TransportMode.walk));
 
             TransitRouterWrapper wrapper = new TransitRouterWrapper(
                     router,
@@ -619,7 +619,7 @@ public class SwissRailRaptorTest {
             Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
 
             RoutingModule walkRoutingModule = DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, f.scenario,
-                    f.config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk));
+                    f.config.routing().getModeRoutingParams().get(TransportMode.walk));
 
             TransitRouterWrapper routingModule = new TransitRouterWrapper(
                     router,
@@ -900,12 +900,12 @@ public class SwissRailRaptorTest {
         Config config = ConfigUtils.createConfig(srrConfig);
         config.transitRouter().setDirectWalkFactor(1.0);
 
-        double beelineDistanceFactor = config.plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
-        PlansCalcRouteConfigGroup.TeleportedModeParams walkParameters = new PlansCalcRouteConfigGroup.TeleportedModeParams(TransportMode.walk);
+        double beelineDistanceFactor = config.routing().getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
+        RoutingConfigGroup.TeleportedModeParams walkParameters = new RoutingConfigGroup.TeleportedModeParams(TransportMode.walk);
         walkParameters.setTeleportedModeSpeed(beelineDistanceFactor); // set it such that the beelineWalkSpeed is exactly 1
-        config.plansCalcRoute().addParameterSet(walkParameters);
+        config.routing().addParameterSet(walkParameters);
 
-        config.planCalcScore().setUtilityOfLineSwitch(-transferFixedCost);
+        config.scoring().setUtilityOfLineSwitch(-transferFixedCost);
         srrConfig.setTransferPenaltyBaseCost(transferFixedCost);
         srrConfig.setTransferPenaltyCostPerTravelTimeHour(transferRelativeCostFactor);
 
@@ -934,11 +934,11 @@ public class SwissRailRaptorTest {
 
         ModeParams railParams = new ModeParams("rail");
         railParams.setMarginalUtilityOfTraveling(-6.0);
-        f.config.planCalcScore().addModeParams(railParams);
+        f.config.scoring().addModeParams(railParams);
 
         ModeParams roadParams = new ModeParams("road");
         roadParams.setMarginalUtilityOfTraveling(-6.0);
-        f.config.planCalcScore().addModeParams(roadParams);
+        f.config.scoring().addModeParams(roadParams);
 
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         Coord toCoord = new Coord(16100, 10050);
@@ -996,11 +996,11 @@ public class SwissRailRaptorTest {
 
             ModeParams railParams = new ModeParams("rail");
             railParams.setMarginalUtilityOfTraveling(-6.0);
-            config.planCalcScore().addModeParams(railParams);
+            config.scoring().addModeParams(railParams);
 
             ModeParams roadParams = new ModeParams("road");
             roadParams.setMarginalUtilityOfTraveling(-6.0);
-            config.planCalcScore().addModeParams(roadParams);
+            config.scoring().addModeParams(roadParams);
         }
 
         { // test with similar costs, the red line should still be cheaper
@@ -1028,7 +1028,7 @@ public class SwissRailRaptorTest {
             // (the access/egress legs to red are each 2 meters shorter than to green line, which adds a little additional penalty for the green line, about 0.02)
             ModeParams roadParams = new ModeParams("road");
             roadParams.setMarginalUtilityOfTraveling(2.83);
-            config.planCalcScore().addModeParams(roadParams);
+            config.scoring().addModeParams(roadParams);
 
             TransitRouter router = createTransitRouter(f.schedule, config, f.network);
             List<? extends PlanElement> legs = router.calcRoute(DefaultRoutingRequest.withoutAttributes(new FakeFacility(fromCoord), new FakeFacility(toCoord), 6.0 * 3600 - 5 * 60, null));
@@ -1263,10 +1263,10 @@ public class SwissRailRaptorTest {
             this.config.transitRouter().setSearchRadius(500.0);
             this.config.transitRouter().setMaxBeelineWalkConnectionDistance(100.0);
 
-            double beelineDistanceFactor = this.config.plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
-            PlansCalcRouteConfigGroup.TeleportedModeParams walkParameters = new PlansCalcRouteConfigGroup.TeleportedModeParams(TransportMode.walk);
+            double beelineDistanceFactor = this.config.routing().getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
+            RoutingConfigGroup.TeleportedModeParams walkParameters = new RoutingConfigGroup.TeleportedModeParams(TransportMode.walk);
             walkParameters.setTeleportedModeSpeed(beelineDistanceFactor); // set it such that the beelineWalkSpeed is exactly 1
-            this.config.plansCalcRoute().addParameterSet(walkParameters);
+            this.config.routing().addParameterSet(walkParameters);
 
             // network
             Network network = this.scenario.getNetwork();

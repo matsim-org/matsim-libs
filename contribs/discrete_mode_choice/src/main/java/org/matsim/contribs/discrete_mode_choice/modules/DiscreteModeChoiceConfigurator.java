@@ -10,8 +10,8 @@ import org.matsim.contribs.discrete_mode_choice.modules.ModelModule.ModelType;
 import org.matsim.contribs.discrete_mode_choice.modules.config.DiscreteModeChoiceConfigGroup;
 import org.matsim.contribs.discrete_mode_choice.replanning.NonSelectedPlanSelector;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
@@ -19,7 +19,7 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.Default
 /**
  * Utility class that makes it possible to set up various was of using the
  * Discrete Mode Choice extension with MATSim.
- * 
+ *
  * @author sebhoerl
  */
 public final class DiscreteModeChoiceConfigurator {
@@ -28,7 +28,7 @@ public final class DiscreteModeChoiceConfigurator {
 	}
 
 	static public void configureAsSubtourModeChoiceReplacement(Config config) {
-		for (StrategySettings strategy : config.strategy().getStrategySettings()) {
+		for (StrategySettings strategy : config.replanning().getStrategySettings()) {
 			if (strategy.getStrategyName().equals(DefaultStrategy.SubtourModeChoice)) {
 				strategy.setStrategyName(DiscreteModeChoiceModule.STRATEGY_NAME);
 			}
@@ -89,24 +89,24 @@ public final class DiscreteModeChoiceConfigurator {
 	}
 
 	static public void configureAsModeChoiceInTheLoop(Config config, double replanningRate) {
-		StrategyConfigGroup strategyConfigGroup = config.strategy();
-		strategyConfigGroup.clearStrategySettings();
+		ReplanningConfigGroup replanningConfigGroup = config.replanning();
+		replanningConfigGroup.clearStrategySettings();
 
-		strategyConfigGroup.setMaxAgentPlanMemorySize(1);
-		strategyConfigGroup.setFractionOfIterationsToDisableInnovation(Double.POSITIVE_INFINITY);
-		strategyConfigGroup.setPlanSelectorForRemoval(NonSelectedPlanSelector.NAME);
+		replanningConfigGroup.setMaxAgentPlanMemorySize(1);
+		replanningConfigGroup.setFractionOfIterationsToDisableInnovation(Double.POSITIVE_INFINITY);
+		replanningConfigGroup.setPlanSelectorForRemoval(NonSelectedPlanSelector.NAME);
 
 		StrategySettings dmcStrategy = new StrategySettings();
 		dmcStrategy.setStrategyName(DiscreteModeChoiceModule.STRATEGY_NAME);
 		dmcStrategy.setWeight(replanningRate);
-		strategyConfigGroup.addStrategySettings(dmcStrategy);
+		replanningConfigGroup.addStrategySettings(dmcStrategy);
 
 		StrategySettings selectorStrategy = new StrategySettings();
 		selectorStrategy.setStrategyName(DefaultSelector.KeepLastSelected);
 		selectorStrategy.setWeight(1.0 - replanningRate);
-		strategyConfigGroup.addStrategySettings(selectorStrategy);
+		replanningConfigGroup.addStrategySettings(selectorStrategy);
 
-		checkModeChoiceInTheLoop(strategyConfigGroup);
+		checkModeChoiceInTheLoop(replanningConfigGroup);
 
 		DiscreteModeChoiceConfigGroup dmcConfig = (DiscreteModeChoiceConfigGroup) config.getModules()
 				.get(DiscreteModeChoiceConfigGroup.GROUP_NAME);
@@ -119,15 +119,15 @@ public final class DiscreteModeChoiceConfigurator {
 		dmcConfig.setEnforceSinglePlan(true);
 	}
 
-	public static void checkModeChoiceInTheLoop(StrategyConfigGroup strategyConfigGroup) {
-		if (strategyConfigGroup.getMaxAgentPlanMemorySize() != 1) {
+	public static void checkModeChoiceInTheLoop(ReplanningConfigGroup replanningConfigGroup) {
+		if (replanningConfigGroup.getMaxAgentPlanMemorySize() != 1) {
 			throw new IllegalStateException(
 					"Option strategy.maxAgentPlanMemorySize should be 1 if mode-choice-in-the-loop is enforced.");
 		}
 
 		Set<String> activeStrategies = new HashSet<>();
 
-		for (StrategySettings strategySettings : strategyConfigGroup.getStrategySettings()) {
+		for (StrategySettings strategySettings : replanningConfigGroup.getStrategySettings()) {
 			if (strategySettings.getDisableAfter() != 0) {
 				activeStrategies.add(strategySettings.getStrategyName());
 			}
@@ -146,14 +146,14 @@ public final class DiscreteModeChoiceConfigurator {
 		activeStrategies.remove(DefaultSelector.KeepLastSelected);
 		activeStrategies.remove(DiscreteModeChoiceModule.STRATEGY_NAME);
 		activeStrategies.remove(DefaultStrategy.ReRoute);
-		
+
 		if (activeStrategies.size() > 0) {
 			throw new IllegalStateException(
 					"All these strategies should be disabled (disableAfter == 0) if mode-choice-in-the-loop is enforced: "
 							+ activeStrategies);
 		}
 
-		if (!strategyConfigGroup.getPlanSelectorForRemoval().equals(NonSelectedPlanSelector.NAME)) {
+		if (!replanningConfigGroup.getPlanSelectorForRemoval().equals(NonSelectedPlanSelector.NAME)) {
 			throw new IllegalStateException(
 					"Removal selector should be NonSelectedPlanSelector if mode-choice-in-the-loop is enforced.");
 		}

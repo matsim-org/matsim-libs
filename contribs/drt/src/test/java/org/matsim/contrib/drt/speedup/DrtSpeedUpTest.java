@@ -54,7 +54,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.network.NetworkUtils;
 
@@ -66,7 +66,7 @@ import com.google.common.collect.ImmutableMap;
  */
 public class DrtSpeedUpTest {
 	private final DrtSpeedUpParams drtSpeedUpParams = new DrtSpeedUpParams();
-	private final ControlerConfigGroup controlerConfig = new ControlerConfigGroup();
+	private final ControllerConfigGroup controlerConfig = new ControllerConfigGroup();
 
 	@Test
 	public final void test_computeMovingAverage() {

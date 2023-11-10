@@ -7,13 +7,12 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
 	</module>
-	
+
   <module name="travelTimeCalculator" >
     <param name="travelTimeBinSize" value="900" />
-    <param name="travelTimeCalculator" value="TravelTimeCalculatorArray" />
   </module>
-  
-  
+
+
 	<module name="network">
 		<param name="inputNetworkFile" value="test/scenarios/equil/network.xml" />
 	</module>
@@ -21,7 +20,7 @@
 	<module name="plans">
 		<param name="inputPlansFile" value="test/input/org/matsim/contrib/locationchoice/plans.xml" />
 	</module>
-	
+
 	<module name="locationchoice">
 		<param name="restraintFcnFactor" value="0.131687242798"/> <!-- factor of the fac.cap.restraint function -->
 		<param name="restraintFcnExp" value="5.0"/> <!-- exponent of the fac.cap.restraint function -->
@@ -31,12 +30,12 @@
 		<param name="maxRecursions" value="10"/> <!-- positive integer, if 0 := universal choice set -->
 		<param name="algorithm" value="random" />
 	</module>
-		
+
 	<module name="facilities" >
 		<param name="inputFacilitiesFile" value="test/scenarios/equil/facilities.xml" />
 		<param name="facilitiesSource" value="fromFile" />
-	</module>	
-	
+	</module>
+
 	<module name="qsim">
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="07:00:00" />
@@ -63,5 +62,5 @@
 		<param name="activityEarliestEndTime_1" value="" />
 		<param name="activityClosingTime_1"     value="18:00:00" />
 	</module>
-	
+
 </config>

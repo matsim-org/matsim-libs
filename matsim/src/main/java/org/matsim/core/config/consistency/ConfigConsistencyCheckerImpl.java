@@ -23,11 +23,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.ControllerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.ControllerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -68,29 +68,29 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 	}
 
 	/*package because of test */ static void checkPlanCalcScore(final Config c) {
-		ModeParams ptModeParams = c.planCalcScore().getModes().get(TransportMode.pt);
+		ModeParams ptModeParams = c.scoring().getModes().get(TransportMode.pt);
 		if (ptModeParams!=null && ptModeParams.getMarginalUtilityOfTraveling() > 0) {
-			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingPt is > 0. This values specifies a utility. " +
+			log.warn(ScoringConfigGroup.GROUP_NAME + ".travelingPt is > 0. This values specifies a utility. " +
 					"Typically, this should be a disutility, i.e. have a negative value.");
 		}
-		ModeParams carModeParams = c.planCalcScore().getModes().get(TransportMode.car);
+		ModeParams carModeParams = c.scoring().getModes().get(TransportMode.car);
 		if (carModeParams!=null && carModeParams.getMarginalUtilityOfTraveling() > 0) {
-			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".traveling is > 0. This values specifies a utility. " +
+			log.warn(ScoringConfigGroup.GROUP_NAME + ".traveling is > 0. This values specifies a utility. " +
 			"Typically, this should be a disutility, i.e. have a negative value.");
 		}
-		ModeParams bikeModeParams = c.planCalcScore().getModes().get(TransportMode.bike);
+		ModeParams bikeModeParams = c.scoring().getModes().get(TransportMode.bike);
 		if (bikeModeParams!=null && bikeModeParams.getMarginalUtilityOfTraveling() > 0) {
-			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingBike is > 0. This values specifies a utility. " +
+			log.warn(ScoringConfigGroup.GROUP_NAME + ".travelingBike is > 0. This values specifies a utility. " +
 			"Typically, this should be a disutility, i.e. have a negative value.");
 		}
-		ModeParams walkModeParams = c.planCalcScore().getModes().get(TransportMode.walk);
+		ModeParams walkModeParams = c.scoring().getModes().get(TransportMode.walk);
 		if (walkModeParams!=null && walkModeParams.getMarginalUtilityOfTraveling() > 0) {
-			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingWalk is > 0. This values specifies a utility. " +
+			log.warn(ScoringConfigGroup.GROUP_NAME + ".travelingWalk is > 0. This values specifies a utility. " +
 			"Typically, this should be a disutility, i.e. have a negative value.");
 		}
-		
-			
-		ActivityParams ptAct = c.planCalcScore().getActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE) ;
+
+
+		ActivityParams ptAct = c.scoring().getActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE) ;
 		if ( ptAct != null ) {
 //			if ( ptAct.getClosingTime()!=0. && ptAct.getClosingTime()!=Time.getUndefinedTime() ) {
 //				if ( !c.vspExperimental().isAbleToOverwritePtInteractionParams()==true ) {
@@ -105,12 +105,12 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 				}
 			}
 		}
-		
+
 	}
 
 	private static void checkEventsFormatLanesSignals(final Config c) {
 		if (c.qsim().isUseLanes()) {
-			if (!c.controler().getEventsFileFormats().contains(EventsFileFormat.xml)){
+			if (!c.controller().getEventsFileFormats().contains(EventsFileFormat.xml)){
 				log.error("Xml events are not enabled, but lanes and possibly signal systems" +
 						"are enalbed. Events from this features will only be written to the xml format, consider" +
 						"to add xml events in the controler config module");
@@ -119,7 +119,7 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 	}
 
 	private static void checkScenarioFeaturesEnabled(final Config c) {
-		if (! ("qsim".equals(c.controler().getMobsim()) ||  c.qsim() != null)){
+		if (! ("qsim".equals(c.controller().getMobsim()) ||  c.qsim() != null)){
 		  log.warn("The signal system implementation is only supported by the org.matsim.ptproject.qsim mobility simulation that is not activated. Please make sure you are using the correct" +
 		  		"mobility simulation. This warning can be ingored if a customized mobility simulation developed outside of org.matsim is used and set correctly.");
 		}
@@ -127,7 +127,7 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 
 
 	private static void checkTravelTimeCalculationRoutingConfiguration(final Config config){
-		if (config.controler().isLinkToLinkRoutingEnabled() &&
+		if (config.controller().isLinkToLinkRoutingEnabled() &&
 				!config.travelTimeCalculator().isCalculateLinkToLinkTravelTimes()){
 			throw new IllegalStateException("LinkToLinkRouting is activated in config and" +
 					" link to link traveltime calculation is not enabled but required!");
@@ -135,7 +135,7 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 
 		if (config.travelTimeCalculator().isCalculateLinkTravelTimes() &&
 				config.travelTimeCalculator().isCalculateLinkToLinkTravelTimes() &&
-				!config.controler().isLinkToLinkRoutingEnabled()) {
+				!config.controller().isLinkToLinkRoutingEnabled()) {
 			log.warn("Config enables link travel time calculation and link to link " +
 					"travel time calculation. This requires at least twice as much memory as " +
 					"if only one method is used, however it might be necessary to enable " +
@@ -153,17 +153,17 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 					"available if using the remove stuck vehicles option!");
 		}
 
-		if ( config.controler().isLinkToLinkRoutingEnabled() &&
-				config.controler().getRoutingAlgorithmType() != RoutingAlgorithmType.Dijkstra ) {
+		if ( config.controller().isLinkToLinkRoutingEnabled() &&
+				config.controller().getRoutingAlgorithmType() != RoutingAlgorithmType.Dijkstra ) {
 			log.warn("We don't know if non-Dijkstra routing works together with LinkToLink routing.");
 		}
-		
+
 	}
 
 
 	private static void checkLaneDefinitionRoutingConfiguration(final Config config) {
 		if ((config.qsim().isUseLanes()) &&
-		    !config.controler().isLinkToLinkRoutingEnabled()){
+		    !config.controller().isLinkToLinkRoutingEnabled()){
 		  	log.warn("Using lanes without enabling linktolinkrouting might not lead to expected simulation results");
 		}
 	}

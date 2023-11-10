@@ -22,23 +22,23 @@
 		<param name="transitModes" value="pt" />
 	</module>
 
-	<module name="TimeAllocationMutator">
+	<module name="timeAllocationMutator">
 	        <param name="mutationRange" value="7200.0"/>
 	</module>
 
-	<module name="controler">
+	<module name="controller">
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
 		<param name="eventsFileFormat" value="xml" />
 		<param name="writeEventsInterval" value="1" />
 		<param name="writePlansInterval" value="50" />
 	</module>
-	
+
 	<module name="qsim">
 		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
 		<param name="startTime" value="05:00:00" />
 		<param name="endTime" value="18:00:00" />
-		<param name="snapshotperiod" value="00:00:00"/> 
+		<param name="snapshotperiod" value="00:00:00"/>
 		<param name="removeStuckVehicles" value="false" />
 		<param name="vehicleBehavior" value="wait" />
 		<param name="flowCapacityFactor" value="1.0" />
@@ -46,8 +46,8 @@
 		<param name="snapshotStyle" value="queue" />
 	</module>
 
-	<module name="planCalcScore">
-		<param name="BrainExpBeta" value="1.0" />
+	<module name="scoring">
+		<param name="brainExpBeta" value="1.0" />
 
 		<parameterset type="scoringParameters">
 		<param name="lateArrival" value="-18" />
@@ -80,8 +80,8 @@
 		</parameterset>
 
 	</module>
-	
-	<module name="strategy">
+
+	<module name="replanning">
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
 
 		<parameterset type="strategysettings">
@@ -115,6 +115,6 @@
 		<!-- the radius in which stop locations are searched, given a start or target coordinate -->
 		<param name="searchRadius" value="10000.0" />
 	</module>
-	
+
 
 </config>

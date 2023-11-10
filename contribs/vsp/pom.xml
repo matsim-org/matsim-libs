@@ -102,7 +102,7 @@
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-core</artifactId>
-			<version>0.48.3</version>
+			<version>${osmosis.version}</version>
 			<exclusions>
 				<!-- needed to compile in IntelliJ with Eclipse compiler -->
 				<!-- see: https://bugs.eclipse.org/bugs/show_bug.cgi?id=536928 -->
@@ -115,22 +115,22 @@
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-xml</artifactId>
-			<version>0.48.3</version>
+			<version>${osmosis.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-tagfilter</artifactId>
-			<version>0.48.3</version>
+			<version>${osmosis.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-set</artifactId>
-			<version>0.48.3</version>
+			<version>${osmosis.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-areafilter</artifactId>
-			<version>0.48.3</version>
+			<version>${osmosis.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
@@ -174,12 +174,12 @@
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-graphics</artifactId>
-			<version>21</version>
+			<version>21.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.graphhopper</groupId>
 			<artifactId>graphhopper-core</artifactId>
-			<version>7.0</version>
+			<version>8.0</version>
 		</dependency>
 		<!-- Enforce version -->
 		<dependency>
