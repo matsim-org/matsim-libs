@@ -21,14 +21,16 @@ package org.matsim.contrib.taxi.optimizer;
 
 import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.OCCUPIED_DRIVE;
 
-import java.util.LinkedList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Queue;
+import java.util.TreeSet;
 
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -43,7 +45,11 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	private final Fleet fleet;
 	private final TaxiScheduler scheduler;
 
-	private final Queue<DrtRequest> unplannedRequests = new LinkedList<>();
+	private final Collection<DrtRequest> unplannedRequests = new TreeSet<>(
+			Comparator.comparing(PassengerRequest::getEarliestStartTime) //
+					.thenComparing(PassengerRequest::getLatestStartTime) //
+					.thenComparing(Request::getSubmissionTime) //
+					.thenComparing(Request::getId));
 
 	private final UnplannedRequestInserter requestInserter;
 
