@@ -61,7 +61,7 @@ public class RunEDrtScenario {
 				@Override
 				public void install() {
 					bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
-							new EDrtVehicleDataEntryFactoryProvider(drtCfg, MIN_RELATIVE_SOC));
+							new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
 				}
 			});
 		}

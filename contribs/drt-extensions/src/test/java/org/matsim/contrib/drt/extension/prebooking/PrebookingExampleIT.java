@@ -53,7 +53,6 @@ public class PrebookingExampleIT {
 		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
 			DrtWithExtensionsConfigGroup extensionsConfig = (DrtWithExtensionsConfigGroup) drtCfg;
 			DrtPrebookingParams prebookingParams = new DrtPrebookingParams();
-			extensionsConfig.advanceRequestPlanningHorizon = Double.POSITIVE_INFINITY;
 			extensionsConfig.addParameterSet(prebookingParams);
 		}
 
@@ -95,13 +94,12 @@ public class PrebookingExampleIT {
 				@Override
 				public void install() {
 					bind(EDrtVehicleDataEntryFactoryProvider.class)
-							.toInstance(new EDrtVehicleDataEntryFactoryProvider(drtCfg, 0.2));
+							.toInstance(new EDrtVehicleDataEntryFactoryProvider(0.2));
 				}
 			});
 
 			DrtWithExtensionsConfigGroup extensionsConfig = (DrtWithExtensionsConfigGroup) drtCfg;
 			DrtPrebookingParams prebookingParams = new DrtPrebookingParams();
-			extensionsConfig.advanceRequestPlanningHorizon = Double.POSITIVE_INFINITY;
 			extensionsConfig.addParameterSet(prebookingParams);
 		}
 

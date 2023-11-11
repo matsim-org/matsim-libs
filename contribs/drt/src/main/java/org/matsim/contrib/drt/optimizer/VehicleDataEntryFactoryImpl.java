@@ -25,7 +25,6 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseT
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
@@ -37,33 +36,13 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 /**
  * @author michalm
  */
 public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
-	private final double lookAhead;
-
-	public VehicleDataEntryFactoryImpl(DrtConfigGroup drtCfg) {
-		if (drtCfg.rejectRequestIfMaxWaitOrTravelTimeViolated && drtCfg.advanceRequestPlanningHorizon == 0.0) {
-			lookAhead = drtCfg.maxWaitTime - drtCfg.stopDuration;
-			Preconditions.checkArgument(lookAhead >= 0,
-					"maxWaitTime must not be smaller than stopDuration");
-		} else {
-			// if no rejection due to max wait time, the look ahead is infinite
-			// also if prebooking is used, because we may want to schedule prebooked
-			// requests to vehicles with service times starting in the future
-			lookAhead = Double.POSITIVE_INFINITY;
-		}
-	}
-
 	public VehicleEntry create(DvrpVehicle vehicle, double currentTime) {
-		if (isNotEligibleForRequestInsertion(vehicle, currentTime)) {
-			return null;
-		}
-
 		Schedule schedule = vehicle.getSchedule();
 		final LinkTimePair start;
 		final Task startTask;
@@ -124,10 +103,6 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 
 		return new VehicleEntry(vehicle, new Waypoint.Start(startTask, start.link, start.time, outgoingOccupancy),
 				ImmutableList.copyOf(stops), slackTimes, precedingStayTimes, currentTime);
-	}
-
-	public boolean isNotEligibleForRequestInsertion(DvrpVehicle vehicle, double currentTime) {
-		return currentTime + lookAhead < vehicle.getServiceBeginTime() || currentTime >= vehicle.getServiceEndTime();
 	}
 
 	static double[] computeSlackTimes(DvrpVehicle vehicle, double now, Waypoint.Stop[] stops, Waypoint.Stop start, List<Double> precedingStayTimes) {

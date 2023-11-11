@@ -238,7 +238,6 @@ public class PrebookingTestEnvironment {
 		modeConfig.stopDuration = stopDuration;
 		modeConfig.idleVehiclesReturnToDepots = false;
 		modeConfig.vehiclesFile = null;
-		modeConfig.advanceRequestPlanningHorizon = planningHorizon;
 
 		DrtInsertionSearchParams searchParams = new SelectiveInsertionSearchParams();
 		modeConfig.addDrtInsertionSearchParams(searchParams);

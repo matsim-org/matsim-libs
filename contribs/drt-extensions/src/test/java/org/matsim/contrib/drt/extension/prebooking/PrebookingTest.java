@@ -52,7 +52,6 @@ public class PrebookingTest {
 		DrtWithExtensionsConfigGroup drtConfig = (DrtWithExtensionsConfigGroup) MultiModeDrtConfigGroup
 				.get(controller.getConfig()).getModalElements().stream().findFirst().get();
 		DrtPrebookingParams prebookingParams = new DrtPrebookingParams();
-		drtConfig.advanceRequestPlanningHorizon = Double.POSITIVE_INFINITY;
 		drtConfig.addParameterSet(prebookingParams);
 		controller.addOverridingModule(new PrebookingModule());
 		AttributePrebookingLogic.install("drt", controller);

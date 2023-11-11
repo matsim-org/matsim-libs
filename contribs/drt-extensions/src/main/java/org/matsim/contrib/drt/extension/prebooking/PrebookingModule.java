@@ -35,9 +35,6 @@ public class PrebookingModule extends AbstractModule {
 				DrtWithExtensionsConfigGroup extensionsConfig = (DrtWithExtensionsConfigGroup) modeConfig;
 
 				if (extensionsConfig.getDrtPrebookingParams().isPresent()) {
-					Verify.verify(modeConfig.advanceRequestPlanningHorizon == Double.POSITIVE_INFINITY,
-							"Prebooked modes should have advanceRequestPlanningHorizon set to Double.POSITIVE_INFINITY. The submission time to the optimizer will be managed by the prebooking logic.");
-
 					install(new PrebookingModeModule(modeConfig.getMode(), isElectric));
 				}
 			}

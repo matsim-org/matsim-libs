@@ -191,9 +191,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Comment("Store planned unshared drt route as a link sequence")
 	public boolean storeUnsharedPath = false; // If true, the planned unshared path is stored and exported in plans
 
-	@PositiveOrZero
-	public double advanceRequestPlanningHorizon = 0; // beta-feature; planning horizon for advance (prebooked) requests
-
 	@Parameter
 	@Comment("When working with prebooked requests, defines whether vehicles drive immediately to the next"
 			+ "(prebooked) future task and wait for the planned stop to begin, or wait at the current"
