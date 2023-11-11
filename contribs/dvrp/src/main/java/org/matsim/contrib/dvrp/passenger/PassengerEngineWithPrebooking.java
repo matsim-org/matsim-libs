@@ -300,4 +300,25 @@ public final class PassengerEngineWithPrebooking
 			}
 		};
 	}
+
+	/*
+	 * This method has been retrofitted with the new prebooking implementation in
+	 * Nov 2023. Not sure if this is the right way to do it, this class doesn't seem
+	 * to be tested anywhere. /sebhoerl
+	 */
+	@Override
+	public boolean notifyWaitForPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver, Id<Request> requestId) {
+		Id<Link> linkId = driver.getCurrentLinkId();
+		RequestEntry requestEntry = activeRequests.get(requestId);
+		MobsimPassengerAgent passenger = requestEntry.passenger;
+
+		if (passenger.getCurrentLinkId() != linkId
+				|| passenger.getState() != MobsimAgent.State.LEG
+				|| !passenger.getMode().equals(mode)) {
+			awaitingPickups.put(requestId, pickupActivity);
+			return false;// wait for the passenger
+		}
+		
+		return true; // passenger present?
+	}
 }

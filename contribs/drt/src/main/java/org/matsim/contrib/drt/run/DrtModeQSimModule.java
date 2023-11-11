@@ -25,6 +25,7 @@ import com.google.inject.Provider;
 import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
+import org.matsim.contrib.dvrp.passenger.AdvanceRequestProvider;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
@@ -79,5 +80,7 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 				return new DrtRequestCreator(getMode(), events);
 			}
 		}).asEagerSingleton();
+		
+		bindModal(AdvanceRequestProvider.class).toInstance(AdvanceRequestProvider.NONE);
 	}
 }

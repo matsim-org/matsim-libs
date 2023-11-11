@@ -1,13 +1,13 @@
 package org.matsim.contrib.drt.extension.prebooking.electric;
 
 import org.matsim.contrib.drt.extension.prebooking.dvrp.PrebookingManager;
-import org.matsim.contrib.drt.extension.prebooking.dvrp.PrebookingPassengerEngine;
 import org.matsim.contrib.drt.extension.prebooking.dvrp.PrebookingStopActivity;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dynagent.DynAction;
@@ -24,15 +24,15 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  */
 public class ElectricPrebookingActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final VrpAgentLogic.DynActionCreator delegate;
-	private final PrebookingPassengerEngine passengerEngine;
+	private final PassengerHandler passengerHandler;
 	private final PassengerStopDurationProvider stopDurationProvider;
 	private final MobsimTimer timer;
 
-	public ElectricPrebookingActionCreator(PrebookingPassengerEngine passengerEngine,
+	public ElectricPrebookingActionCreator(PassengerHandler passengerHandler,
 			VrpAgentLogic.DynActionCreator delegate, PassengerStopDurationProvider stopDurationProvider,
 			MobsimTimer timer, PrebookingManager prebookingManager) {
 		this.delegate = delegate;
-		this.passengerEngine = passengerEngine;
+		this.passengerHandler = passengerHandler;
 		this.stopDurationProvider = stopDurationProvider;
 		this.timer = timer;
 	}
@@ -47,7 +47,7 @@ public class ElectricPrebookingActionCreator implements VrpAgentLogic.DynActionC
 			// added for electric
 			stopTask.initTaskTracker(new OfflineETaskTracker((EvDvrpVehicle) vehicle, timer));
 
-			return new PrebookingStopActivity(passengerEngine, dynAgent, stopTask, stopTask.getDropoffRequests(),
+			return new PrebookingStopActivity(passengerHandler, dynAgent, stopTask, stopTask.getDropoffRequests(),
 					stopTask.getPickupRequests(), DrtActionCreator.DRT_STOP_NAME, () -> stopTask.getEndTime(),
 					stopDurationProvider, vehicle);
 		}

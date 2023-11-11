@@ -46,7 +46,7 @@ public class PrebookingModeModule extends AbstractDvrpModeModule {
 		}));
 
 		// install QSim bindings / overrides
-		installOverridingQSimModule(new PrebookingModeQSimModule(getMode(), drtConfig, isElectric));
+		installOverridingQSimModule(new PrebookingModeQSimModule(getMode(), isElectric));
 
 		// analysis
 		install(new PrebookingModeAnalysisModule(getMode()));

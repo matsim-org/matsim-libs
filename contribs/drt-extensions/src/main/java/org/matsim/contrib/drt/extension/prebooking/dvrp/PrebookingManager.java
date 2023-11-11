@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.annotation.Nullable;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
@@ -15,6 +17,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.drt.extension.prebooking.events.PassengerRequestBookedEvent;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.passenger.AdvanceRequestProvider;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
@@ -46,7 +49,7 @@ import com.google.common.base.Verify;
  * 
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
-public class PrebookingManager implements MobsimEngine {
+public class PrebookingManager implements MobsimEngine, AdvanceRequestProvider {
 	private final String mode;
 
 	private final Network network;
@@ -156,7 +159,9 @@ public class PrebookingManager implements MobsimEngine {
 
 	// Interface with PassengerEngine
 
-	PassengerRequest retrievePrebookedRequest(MobsimAgent agent, Leg leg) {
+	@Override
+	@Nullable
+	public PassengerRequest retrieveRequest(MobsimAgent agent, Leg leg) {
 		Verify.verify(leg.getMode().equals(mode), "Invalid mode for this prebooking manager");
 
 		Id<Request> requestId = getRequestId(leg);

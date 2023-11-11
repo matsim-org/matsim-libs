@@ -186,6 +186,12 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 	}
 
 	@Override
+	public boolean notifyWaitForPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
+			Id<Request> requestId) {
+		throw new UnsupportedOperationException("No notifying when teleporting");
+	}
+
+	@Override
 	public boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
 			Id<Request> requestId, double now) {
 		throw new UnsupportedOperationException("No picking-up when teleporting");

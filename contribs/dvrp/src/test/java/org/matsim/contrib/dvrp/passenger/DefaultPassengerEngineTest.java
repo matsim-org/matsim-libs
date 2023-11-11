@@ -178,6 +178,7 @@ public class DefaultPassengerEngineTest {
 						bindModal(PassengerRequestCreator.class).to(OneTaxiRequest.OneTaxiRequestCreator.class)
 								.asEagerSingleton();
 						bindModal(PassengerRequestValidator.class).toInstance(requestValidator);
+						bindModal(AdvanceRequestProvider.class).toInstance(AdvanceRequestProvider.NONE);
 
 						//supply
 						addQSimComponentBinding(DynActivityEngine.COMPONENT_NAME).to(DynActivityEngine.class);

@@ -7,6 +7,8 @@ import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dynagent.DynAction;
@@ -24,13 +26,13 @@ import org.matsim.contrib.dynagent.DynAgent;
  */
 public class PrebookingActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final VrpAgentLogic.DynActionCreator delegate;
-	private final PrebookingPassengerEngine passengerEngine;
+	private final PassengerHandler passengerHandler;
 	private final PassengerStopDurationProvider stopDurationProvider;
 
-	public PrebookingActionCreator(PrebookingPassengerEngine passengerEngine, VrpAgentLogic.DynActionCreator delegate,
+	public PrebookingActionCreator(PassengerHandler passengerHandler, VrpAgentLogic.DynActionCreator delegate,
 			PassengerStopDurationProvider stopDurationProvider) {
 		this.delegate = delegate;
-		this.passengerEngine = passengerEngine;
+		this.passengerHandler = passengerHandler;
 		this.stopDurationProvider = stopDurationProvider;
 	}
 
@@ -40,7 +42,7 @@ public class PrebookingActionCreator implements VrpAgentLogic.DynActionCreator {
 
 		if (getBaseTypeOrElseThrow(task).equals(DrtTaskBaseType.STOP)) {
 			DrtStopTask stopTask = (DrtStopTask) task;
-			return new PrebookingStopActivity(passengerEngine, dynAgent, stopTask, stopTask.getDropoffRequests(),
+			return new PrebookingStopActivity(passengerHandler, dynAgent, stopTask, stopTask.getDropoffRequests(),
 					stopTask.getPickupRequests(), DrtActionCreator.DRT_STOP_NAME, () -> stopTask.getEndTime(), stopDurationProvider, vehicle);
 		}
 

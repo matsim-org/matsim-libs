@@ -12,6 +12,7 @@ import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerPickupActivity;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dynagent.DynAgent;
@@ -37,18 +38,18 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 	private final IdMap<Request, Double> leaveTimes = new IdMap<>(Request.class);
 	private final Set<Id<Request>> enteredRequests = new HashSet<>();
 
-	private final PrebookingPassengerEngine passengerEngine;
+	private final PassengerHandler passengerHandler;
 	
 	private final PassengerStopDurationProvider stopDurationProvider;
 	private final Supplier<Double> endTime;
 
-	public PrebookingStopActivity(PrebookingPassengerEngine passengerEngine, DynAgent driver, StayTask task,
+	public PrebookingStopActivity(PassengerHandler passengerHandler, DynAgent driver, StayTask task,
 			Map<Id<Request>, ? extends AcceptedDrtRequest> dropoffRequests,
 			Map<Id<Request>, ? extends AcceptedDrtRequest> pickupRequests, String activityType,
 			Supplier<Double> endTime, PassengerStopDurationProvider stopDurationProvider, 
 			DvrpVehicle vehicle) {
 		super(activityType);
-		this.passengerEngine = passengerEngine;
+		this.passengerHandler = passengerHandler;
 		this.driver = driver;
 		this.dropoffRequests = dropoffRequests;
 		this.pickupRequests = pickupRequests;
@@ -84,7 +85,7 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 			var entry = iterator.next();
 
 			if (entry.getValue() <= now) { // Request should leave now
-				passengerEngine.dropOffPassenger(driver, entry.getKey(), now);
+				passengerHandler.dropOffPassenger(driver, entry.getKey(), now);
 				iterator.remove();
 			}
 		}
@@ -96,7 +97,7 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 				// this is a new request that has been added after the activity has been created
 				// or that had not arrived yet
 
-				if (passengerEngine.queryPassengerReady(this, request.getId())) {
+				if (passengerHandler.notifyWaitForPassenger(this, this.driver, request.getId())) {
 					// agent starts to enter
 					queuePickup(request, now);
 				}
@@ -110,7 +111,7 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 
 			if (entry.getValue() <= now) {
 				// let agent enter now
-				Verify.verify(passengerEngine.tryPickUpPassenger(this, driver, entry.getKey(), now));
+				Verify.verify(passengerHandler.tryPickUpPassenger(this, driver, entry.getKey(), now));
 				enteredRequests.add(entry.getKey());
 				iterator.remove();
 			}
