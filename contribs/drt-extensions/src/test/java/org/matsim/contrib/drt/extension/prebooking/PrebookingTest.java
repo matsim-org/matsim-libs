@@ -85,7 +85,7 @@ public class PrebookingTest {
 		var taskInfo = environment.getTaskInfo().get("vehicleA");
 		assertEquals("STAY", taskInfo.get(0).type);
 		assertEquals("DRIVE", taskInfo.get(1).type);
-		assertEquals("WAIT", taskInfo.get(2).type);
+		assertEquals("STAY", taskInfo.get(2).type);
 		assertEquals("STOP", taskInfo.get(3).type);
 		assertEquals("DRIVE", taskInfo.get(4).type);
 		assertEquals("STOP", taskInfo.get(5).type);
@@ -124,7 +124,7 @@ public class PrebookingTest {
 		var taskInfo = environment.getTaskInfo().get("vehicleA");
 		assertEquals("STAY", taskInfo.get(0).type);
 		assertEquals("DRIVE", taskInfo.get(1).type);
-		assertEquals("WAIT", taskInfo.get(2).type);
+		assertEquals("STAY", taskInfo.get(2).type);
 		assertEquals("STOP", taskInfo.get(3).type);
 		assertEquals("DRIVE", taskInfo.get(4).type);
 		assertEquals("STOP", taskInfo.get(5).type);
