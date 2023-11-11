@@ -51,9 +51,4 @@ public class ShiftDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
                                                            Link link, OperationFacility facility) {
         return new WaitForShiftStayTask(beginTime, endTime, link, facility);
     }
-
-	@Override
-	public DrtWaitTask createWaitTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link) {
-		return delegate.createWaitTask(vehicle, beginTime, endTime, link);
-	}
 }
