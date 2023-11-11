@@ -33,7 +33,6 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.drt.schedule.DrtWaitTask;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
@@ -56,7 +55,7 @@ import com.google.common.collect.ImmutableSet;
  */
 public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 	private final DrtConfigGroup drtCfg;
-	private ImmutableSet<Task.TaskType> passengerServingTaskTypes = ImmutableSet.of(DrtDriveTask.TYPE, DefaultDrtStopTask.TYPE, DrtWaitTask.TYPE);
+	private ImmutableSet<Task.TaskType> passengerServingTaskTypes = ImmutableSet.of(DrtDriveTask.TYPE, DefaultDrtStopTask.TYPE, DrtStayTask.TYPE);
 
 	private static final Comparator<Task.TaskType> taskTypeComparator = Comparator.comparing(type -> {
 		//we want the following order on the plot: STAY, RELOCATE, other

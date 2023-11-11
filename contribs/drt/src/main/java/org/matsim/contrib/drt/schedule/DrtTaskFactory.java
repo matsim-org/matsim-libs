@@ -31,6 +31,4 @@ public interface DrtTaskFactory {
 	DrtStopTask createStopTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link);
 
 	DrtStayTask createStayTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link);
-	
-	DrtWaitTask createWaitTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link);
 }

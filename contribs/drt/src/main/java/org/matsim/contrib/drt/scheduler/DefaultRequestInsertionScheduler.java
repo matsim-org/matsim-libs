@@ -34,7 +34,6 @@ import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
-import org.matsim.contrib.drt.schedule.DrtWaitTask;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
@@ -442,7 +441,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 			
 			if (DrtTaskBaseType.DRIVE.isBaseTypeOf(task.getTaskType())) {
 				driveCount++;
-			} else if (DrtWaitTask.TYPE.equals(task.getTaskType())) {
+			} else if (DrtStayTask.TYPE.equals(task.getTaskType())) {
 				waitCount++;
 			} else {
 				throw new IllegalStateException("Invalid schedule structure: expected WAIT or DRIVE task");
@@ -468,7 +467,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 		}
 		
 		if (departureTask.getEndTime() < earliestNextStartTime) {
-			DrtWaitTask waitTask = taskFactory.createWaitTask(vehicle, departureTask.getEndTime(),
+			DrtStayTask waitTask = taskFactory.createStayTask(vehicle, departureTask.getEndTime(),
 					earliestNextStartTime, waitLink);
 			schedule.addTask(departureTask.getTaskIdx() + 1, waitTask);
 			return waitTask;
@@ -487,7 +486,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 			
 			if (driveDepartureTime > departureTask.getEndTime()) {
 				// makes sense to insert a wait task before departure
-				DrtWaitTask waitTask = taskFactory.createWaitTask(vehicle, departureTask.getEndTime(),
+				DrtStayTask waitTask = taskFactory.createStayTask(vehicle, departureTask.getEndTime(),
 						driveDepartureTime, path.getFromLink());
 				schedule.addTask(departureTask.getTaskIdx() + 1, waitTask);
 				
@@ -500,7 +499,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 		schedule.addTask(leadingTask.getTaskIdx() + 1, driveTask);
 		
 		if (driveTask.getEndTime() < latestArrivalTime) {
-			DrtWaitTask waitTask = taskFactory.createWaitTask(vehicle, driveTask.getEndTime(), latestArrivalTime,
+			DrtStayTask waitTask = taskFactory.createStayTask(vehicle, driveTask.getEndTime(), latestArrivalTime,
 					path.getToLink());
 			schedule.addTask(driveTask.getTaskIdx() + 1, waitTask);
 			return waitTask;
