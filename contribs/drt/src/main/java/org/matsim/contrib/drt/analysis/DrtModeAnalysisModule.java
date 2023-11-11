@@ -55,7 +55,7 @@ import com.google.common.collect.ImmutableSet;
  */
 public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 	private final DrtConfigGroup drtCfg;
-	private ImmutableSet<Task.TaskType> passengerServingTaskTypes = ImmutableSet.of(DrtDriveTask.TYPE, DefaultDrtStopTask.TYPE, DrtStayTask.TYPE);
+	private ImmutableSet<Task.TaskType> passengerServingTaskTypes = ImmutableSet.of(DrtDriveTask.TYPE, DefaultDrtStopTask.TYPE);
 
 	private static final Comparator<Task.TaskType> taskTypeComparator = Comparator.comparing(type -> {
 		//we want the following order on the plot: STAY, RELOCATE, other
