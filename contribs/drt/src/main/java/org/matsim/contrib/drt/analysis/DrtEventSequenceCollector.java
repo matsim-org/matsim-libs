@@ -208,7 +208,7 @@ public class DrtEventSequenceCollector
 		if (event.getLegMode().equals(mode)) {
 			// note down the departure event here, for now we don't know which request it
 			// belongs to, see below
-			Verify.verify(!latestDepartures.containsKey(event.getPersonId()),
+			Preconditions.checkState(!latestDepartures.containsKey(event.getPersonId()),
 					"Attempt to register a departure event for " + mode + " and person " + event.getPersonId()
 							+ ", but there is still a departure that has not been consumed");
 			latestDepartures.put(event.getPersonId(), event);

@@ -30,7 +30,6 @@ import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
 
 /**
  * This class manages prebooked requests. One instance of PrebookingManager
@@ -99,7 +98,7 @@ public class PrebookingManager implements MobsimEngine, AdvanceRequestProvider {
 	private final List<QueueItem> queue = new LinkedList<>();
 
 	public void prebook(MobsimAgent person, Leg leg, double earliestDepartureTime) {
-		Verify.verify(leg.getMode().equals(mode), "Invalid mode for this prebooking manager");
+		Preconditions.checkArgument(leg.getMode().equals(mode), "Invalid mode for this prebooking manager");
 
 		synchronized (queue) {
 			queue.add(new QueueItem(person, leg, earliestDepartureTime));
@@ -109,7 +108,7 @@ public class PrebookingManager implements MobsimEngine, AdvanceRequestProvider {
 	private void processQueue(double now) {
 		synchronized (queue) {
 			for (QueueItem item : queue) {
-				Verify.verify(!item.person.getState().equals(State.ABORT), "Cannot prebook aborted agent");
+				Preconditions.checkState(!item.person.getState().equals(State.ABORT), "Cannot prebook aborted agent");
 
 				Id<Request> requestId = createRequestId();
 
@@ -162,7 +161,7 @@ public class PrebookingManager implements MobsimEngine, AdvanceRequestProvider {
 	@Override
 	@Nullable
 	public PassengerRequest retrieveRequest(MobsimAgent agent, Leg leg) {
-		Verify.verify(leg.getMode().equals(mode), "Invalid mode for this prebooking manager");
+		Preconditions.checkArgument(leg.getMode().equals(mode), "Invalid mode for this prebooking manager");
 
 		Id<Request> requestId = getRequestId(leg);
 

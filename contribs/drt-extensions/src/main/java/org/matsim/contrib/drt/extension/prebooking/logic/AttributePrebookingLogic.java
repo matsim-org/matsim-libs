@@ -12,7 +12,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeTracker;
 
-import com.google.common.base.Verify;
+import com.google.common.base.Preconditions;
 
 /**
  * This class represents a prebooking logic that will search for the
@@ -83,7 +83,7 @@ public class AttributePrebookingLogic extends TimedPrebookingLogic {
 					Leg leg = (Leg) element;
 
 					if (leg.getMode().equals(mode)) {
-						Verify.verify(!foundLeg, "Person " + item.agent().getId().toString()
+						Preconditions.checkState(!foundLeg, "Person " + item.agent().getId().toString()
 								+ " has at least two drt legs in one trip.");
 						foundLeg = true;
 
