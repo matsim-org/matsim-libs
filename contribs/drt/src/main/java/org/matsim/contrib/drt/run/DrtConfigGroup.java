@@ -199,6 +199,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	public boolean scheduleWaitBeforeDrive = false; // in the future, this could also become a double value indicating
 													// how many minutes before the next stop the vehicle should plan to
 													// be there
+	
+	@Parameter
+	@Comment("Enables prebooking functionality")
+	public boolean prebooking = false;
 
 	@NotNull
 	private DrtInsertionSearchParams drtInsertionSearchParams;

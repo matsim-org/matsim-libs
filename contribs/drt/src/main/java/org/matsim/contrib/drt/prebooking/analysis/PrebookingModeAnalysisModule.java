@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.prebooking.analysis;
+package org.matsim.contrib.drt.prebooking.analysis;
 
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.core.api.experimental.events.EventsManager;

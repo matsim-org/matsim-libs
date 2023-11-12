@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.prebooking.analysis;
+package org.matsim.contrib.drt.prebooking.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

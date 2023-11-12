@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.prebooking.dvrp;
+package org.matsim.contrib.drt.prebooking;
 
 import java.util.HashSet;
 import java.util.Map;

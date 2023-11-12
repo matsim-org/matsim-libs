@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.prebooking.analysis;
+package org.matsim.contrib.drt.prebooking.analysis;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -6,8 +6,8 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.drt.extension.prebooking.events.PassengerRequestBookedEvent;
-import org.matsim.contrib.drt.extension.prebooking.events.PassengerRequestBookedEventHandler;
+import org.matsim.contrib.drt.prebooking.PassengerRequestBookedEvent;
+import org.matsim.contrib.drt.prebooking.PassengerRequestBookedEventHandler;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;

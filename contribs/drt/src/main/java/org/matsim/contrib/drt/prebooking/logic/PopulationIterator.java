@@ -1,11 +1,11 @@
-package org.matsim.contrib.drt.extension.prebooking.logic;
+package org.matsim.contrib.drt.prebooking.logic;
 
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.drt.extension.prebooking.logic.PopulationIterator.PersonItem;
+import org.matsim.contrib.drt.prebooking.logic.PopulationIterator.PersonItem;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.HasModifiablePlan;

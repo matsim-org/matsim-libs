@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.prebooking.dvrp;
+package org.matsim.contrib.drt.prebooking;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -14,7 +14,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.drt.extension.prebooking.events.PassengerRequestBookedEvent;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.AdvanceRequestProvider;

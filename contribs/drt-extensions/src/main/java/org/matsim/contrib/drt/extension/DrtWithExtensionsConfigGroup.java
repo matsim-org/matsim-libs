@@ -19,13 +19,13 @@
 
 package org.matsim.contrib.drt.extension;
 
-import org.matsim.contrib.drt.extension.companions.DrtCompanionParams;
-import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
-import org.matsim.contrib.drt.extension.prebooking.DrtPrebookingParams;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
-import java.util.Optional;
+
+import org.matsim.contrib.drt.extension.companions.DrtCompanionParams;
+import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 
 /**
  * @author Steffen Axer
@@ -39,9 +39,6 @@ public class DrtWithExtensionsConfigGroup extends DrtConfigGroup {
 
 	@Nullable
 	private DrtOperationsParams drtOperationsParams;
-	
-	@Nullable
-	private DrtPrebookingParams drtPrebookingParams;
 
 	public DrtWithExtensionsConfigGroup() {
 		// Optional
@@ -51,10 +48,6 @@ public class DrtWithExtensionsConfigGroup extends DrtConfigGroup {
 		// Optional
 		addDefinition(DrtOperationsParams.SET_NAME, DrtOperationsParams::new, () -> drtOperationsParams,
 				params -> drtOperationsParams = (DrtOperationsParams) params);
-
-		// Optional
-		addDefinition(DrtPrebookingParams.SET_NAME, DrtPrebookingParams::new, () -> drtPrebookingParams,
-				params -> drtPrebookingParams = (DrtPrebookingParams) params);
 	}
 
 	public Optional<DrtCompanionParams> getDrtCompanionParams() {
@@ -63,10 +56,6 @@ public class DrtWithExtensionsConfigGroup extends DrtConfigGroup {
 
 	public Optional<DrtOperationsParams> getDrtOperationsParams() {
 		return Optional.ofNullable(drtOperationsParams);
-	}
-
-	public Optional<DrtPrebookingParams> getDrtPrebookingParams() {
-		return Optional.ofNullable(drtPrebookingParams);
 	}
 	
 }

@@ -21,8 +21,17 @@ package org.matsim.contrib.drt.extension.edrt.run;
 import java.net.URL;
 
 import org.junit.Test;
+import org.matsim.contrib.drt.prebooking.logic.FixedSharePrebookingLogic;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
  * @author michalm
@@ -32,5 +41,21 @@ public class RunEDrtScenarioIT {
 	public void test() {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_edrt_config.xml");
 		RunEDrtScenario.run(configUrl, false);
+	}
+	
+	@Test
+	public void testWithPrebooking() {
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_edrt_config.xml");
+		
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup(), new EvConfigGroup());
+		
+		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(config);
+		drtConfig.prebooking = true;
+		
+		Controler controller = RunEDrtScenario.createControler(config, false);
+		FixedSharePrebookingLogic.install(drtConfig.mode, 0.5, 4.0 * 3600.0, controller);
+		
+		controller.run();
 	}
 }

@@ -1,11 +1,11 @@
-package org.matsim.contrib.drt.extension.prebooking.logic;
+package org.matsim.contrib.drt.prebooking.logic;
 
 import java.util.Random;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.drt.extension.prebooking.dvrp.PrebookingManager;
+import org.matsim.contrib.drt.prebooking.PrebookingManager;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.qsim.QSim;

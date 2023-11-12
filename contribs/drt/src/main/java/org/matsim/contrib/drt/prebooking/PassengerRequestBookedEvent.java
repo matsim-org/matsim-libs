@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.prebooking.events;
+package org.matsim.contrib.drt.prebooking;
 
 import java.util.Map;
 import java.util.Objects;

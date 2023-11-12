@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.prebooking.logic;
+package org.matsim.contrib.drt.prebooking.logic;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.contrib.drt.extension.prebooking.dvrp.PrebookingManager;
+import org.matsim.contrib.drt.prebooking.PrebookingManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;

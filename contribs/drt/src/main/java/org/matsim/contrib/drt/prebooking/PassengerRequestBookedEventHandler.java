@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.prebooking.events;
+package org.matsim.contrib.drt.prebooking;
 
 import org.matsim.core.events.handler.EventHandler;
 

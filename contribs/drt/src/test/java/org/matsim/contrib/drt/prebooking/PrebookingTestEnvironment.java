@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.prebooking;
+package org.matsim.contrib.drt.prebooking;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -19,12 +19,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
-import org.matsim.contrib.drt.extension.prebooking.logic.AttributePrebookingLogic;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
+import org.matsim.contrib.drt.prebooking.logic.AttributePrebookingLogic;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -59,8 +58,11 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 public class PrebookingTestEnvironment {
+	private final MatsimTestUtils utils;
+	
 	private final int width = 10;
 	private final int height = 10;
 
@@ -73,8 +75,11 @@ public class PrebookingTestEnvironment {
 	private double detourRelative = 1.3;
 	private double detourAbsolute = 300.0;
 	private double stopDuration = 60.0;
-	private double planningHorizon = 1800.0;
 	private double endTime = 30.0 * 3600.0;
+	
+	public PrebookingTestEnvironment(MatsimTestUtils utils) {
+		this.utils = utils;
+	}
 
 	public PrebookingTestEnvironment configure(double maximumWaitTime, double detourRelative, double detourAbsolute,
 			double stopDuration) {
@@ -87,11 +92,6 @@ public class PrebookingTestEnvironment {
 
 	public PrebookingTestEnvironment endTime(double endTime) {
 		this.endTime = endTime;
-		return this;
-	}
-
-	public PrebookingTestEnvironment planningHorizon(double planningHorizon) {
-		this.planningHorizon = planningHorizon;
 		return this;
 	}
 
@@ -206,7 +206,7 @@ public class PrebookingTestEnvironment {
 	}
 
 	private void buildConfig(Config config) {
-		config.controller().setOutputDirectory("drt_test_output");
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(0);
 
@@ -229,7 +229,7 @@ public class PrebookingTestEnvironment {
 		MultiModeDrtConfigGroup drtConfig = new MultiModeDrtConfigGroup();
 		config.addModule(drtConfig);
 
-		DrtConfigGroup modeConfig = new DrtWithExtensionsConfigGroup();
+		DrtConfigGroup modeConfig = new DrtConfigGroup();
 		drtConfig.addParameterSet(modeConfig);
 		modeConfig.mode = "drt";
 		modeConfig.maxWaitTime = maximumWaitTime;

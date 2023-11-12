@@ -1,33 +1,35 @@
-package org.matsim.contrib.drt.extension.prebooking;
+package org.matsim.contrib.drt.prebooking;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
-import org.matsim.contrib.drt.extension.prebooking.PrebookingTestEnvironment.RequestInfo;
-import org.matsim.contrib.drt.extension.prebooking.logic.AttributePrebookingLogic;
+import org.matsim.contrib.drt.prebooking.PrebookingTestEnvironment.RequestInfo;
+import org.matsim.contrib.drt.prebooking.logic.AttributePrebookingLogic;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author Sebastian Hörl (sebhoerl) / IRT SystemX
  */
 public class PrebookingTest {
+	@Rule
+	MatsimTestUtils utils = new MatsimTestUtils();
+	
 	@Test
 	public void withoutPrebookedRequests() {
 		/*-
 		 * Standard test running with prebooking but without any prebooked requests
 		 */
 
-		PrebookingTestEnvironment environment = new PrebookingTestEnvironment() //
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.addVehicle("vehicleA", 1, 1) //
 				.addRequest("personA", 0, 0, 5, 5, 2000.0) //
 				.configure(600.0, 1.3, 600.0, 60.0) //
 				.endTime(10.0 * 3600.0);
 
 		Controler controller = environment.build();
-		controller.addOverridingModule(new PrebookingModule());
 		controller.run();
 
 		RequestInfo requestInfo = environment.getRequestInfo().get("personA");
@@ -49,11 +51,8 @@ public class PrebookingTest {
 	}
 	
 	private void installPrebooking(Controler controller) {
-		DrtWithExtensionsConfigGroup drtConfig = (DrtWithExtensionsConfigGroup) MultiModeDrtConfigGroup
-				.get(controller.getConfig()).getModalElements().stream().findFirst().get();
-		DrtPrebookingParams prebookingParams = new DrtPrebookingParams();
-		drtConfig.addParameterSet(prebookingParams);
-		controller.addOverridingModule(new PrebookingModule());
+		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(controller.getConfig());
+		drtConfig.prebooking = true;
 		AttributePrebookingLogic.install("drt", controller);
 	}
 
@@ -65,12 +64,11 @@ public class PrebookingTest {
 		 * the person to enter instead of a fixed stop duration).
 		 */
 
-		PrebookingTestEnvironment environment = new PrebookingTestEnvironment() //
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.addVehicle("vehicleA", 1, 1) //
 				// 1800 indicated but only departing 2000
 				.addRequest("personA", 0, 0, 5, 5, 2000.0, 0.0, 2000.0 - 200.0) //
 				.configure(600.0, 1.3, 600.0, 60.0) //
-				.planningHorizon(7200.0) //
 				.endTime(10.0 * 3600.0);
 
 		Controler controller = environment.build();
@@ -104,12 +102,11 @@ public class PrebookingTest {
 		 * will pickup up agent and then depart after the duration to enter the vehicle.
 		 */
 
-		PrebookingTestEnvironment environment = new PrebookingTestEnvironment() //
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.addVehicle("vehicleA", 1, 1) //
 				// 2200 indicated but already departing 2000
 				.addRequest("personA", 0, 0, 5, 5, 2000.0, 0.0, 2000.0 + 200.0) //
 				.configure(600.0, 1.3, 600.0, 60.0) //
-				.planningHorizon(7200.0) //
 				.endTime(10.0 * 3600.0);
 
 		Controler controller = environment.build();
@@ -143,12 +140,11 @@ public class PrebookingTest {
 		 * - First the early one is submitted, then the late one
 		 * - First the early one is picked up and dropped off, then the late one.
 		 */
-		PrebookingTestEnvironment environment = new PrebookingTestEnvironment() //
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.addVehicle("vehicleA", 1, 1) //
 				.addRequest("earlyRequest", 0, 0, 5, 5, 2000.0, 0.0) //
 				.addRequest("lateRequest", 2, 2, 3, 3, 4000.0, 1000.0) //
 				.configure(600.0, 1.3, 600.0, 60.0) //
-				.planningHorizon(7200.0) //
 				.endTime(10.0 * 3600.0);
 
 		Controler controller = environment.build();
@@ -178,12 +174,11 @@ public class PrebookingTest {
 		 * - First the early one is picked up and dropped off, then the late one.
 		 */
 
-		PrebookingTestEnvironment environment = new PrebookingTestEnvironment() //
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.addVehicle("vehicleA", 1, 1) //
 				.addRequest("earlyRequest", 0, 0, 5, 5, 2000.0, 1000.0) //
 				.addRequest("lateRequest", 2, 2, 3, 3, 4000.0, 0.0) //
 				.configure(600.0, 1.3, 600.0, 60.0) //
-				.planningHorizon(7200.0) //
 				.endTime(10.0 * 3600.0);
 
 		Controler controller = environment.build();
@@ -214,12 +209,11 @@ public class PrebookingTest {
 		 * - In total four stops (P,D,P,D)
 		 */
 
-		PrebookingTestEnvironment environment = new PrebookingTestEnvironment() //
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.addVehicle("vehicleA", 1, 1) //
 				.addRequest("earlyRequest", 1, 1, 5, 5, 2000.0, 1000.0) //
 				.addRequest("lateRequest", 1, 1, 5, 5, 4000.0, 1100.0) //
 				.configure(600.0, 1.3, 600.0, 60.0) //
-				.planningHorizon(7200.0) //
 				.endTime(10.0 * 3600.0);
 
 		Controler controller = environment.build();
@@ -253,12 +247,11 @@ public class PrebookingTest {
 		 * - In total two stops (P,D)
 		 */
 
-		PrebookingTestEnvironment environment = new PrebookingTestEnvironment() //
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.addVehicle("vehicleA", 1, 1) //
 				.addRequest("requestA", 1, 1, 5, 5, 2000.0, 1000.0) //
 				.addRequest("requestB", 1, 1, 5, 5, 2000.0, 1100.0) //
 				.configure(600.0, 1.3, 600.0, 60.0) //
-				.planningHorizon(7200.0) //
 				.endTime(10.0 * 3600.0);
 
 		Controler controller = environment.build();
@@ -295,12 +288,11 @@ public class PrebookingTest {
 		 * - In total two stops (P,D)
 		 */
 
-		PrebookingTestEnvironment environment = new PrebookingTestEnvironment() //
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.addVehicle("vehicleA", 1, 1) //
 				.addRequest("requestA", 1, 1, 5, 5, 2000.0, 1000.0) //
 				.addRequest("requestB", 1, 1, 5, 5, 2020.0, 1100.0) //
 				.configure(600.0, 1.3, 600.0, 60.0) //
-				.planningHorizon(7200.0) //
 				.endTime(10.0 * 3600.0);
 
 		Controler controller = environment.build();
@@ -340,12 +332,11 @@ public class PrebookingTest {
 		 * - In total three stops (P, P, D)
 		 */
 
-		PrebookingTestEnvironment environment = new PrebookingTestEnvironment() //
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.addVehicle("vehicleA", 1, 1) //
 				.addRequest("requestA", 1, 1, 5, 5, 2000.0, 1000.0) //
 				.addRequest("requestB", 1, 1, 5, 5, 2080.0, 1100.0) //
 				.configure(600.0, 1.3, 600.0, 60.0) //
-				.planningHorizon(7200.0) //
 				.endTime(10.0 * 3600.0);
 
 		Controler controller = environment.build();
@@ -405,12 +396,11 @@ public class PrebookingTest {
 		 * - In total two stops (P, D)
 		 */
 
-		PrebookingTestEnvironment environment = new PrebookingTestEnvironment() //
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.addVehicle("vehicleA", 1, 1) //
 				.addRequest("requestA", 1, 1, 5, 5, 2020.0, 1000.0) //
 				.addRequest("requestB", 1, 1, 5, 5, 2000.0, 1100.0) //
 				.configure(600.0, 1.3, 600.0, 60.0) //
-				.planningHorizon(7200.0) //
 				.endTime(10.0 * 3600.0);
 
 		Controler controller = environment.build();
@@ -452,12 +442,11 @@ public class PrebookingTest {
 		 * - In total three stops (P,P,D)
 		 */
 
-		PrebookingTestEnvironment environment = new PrebookingTestEnvironment() //
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.addVehicle("vehicleA", 1, 1) //
 				.addRequest("requestA", 1, 1, 5, 5, 2020.0, 1000.0) //
 				.addRequest("requestB", 1, 1, 5, 5, 1470.0, 1100.0) //
 				.configure(300.0, 2.0, 1800.0, 60.0) //
-				.planningHorizon(7200.0) //
 				.endTime(10.0 * 3600.0);
 
 		Controler controller = environment.build();
