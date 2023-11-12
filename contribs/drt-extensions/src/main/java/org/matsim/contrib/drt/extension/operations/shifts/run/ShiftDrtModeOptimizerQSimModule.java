@@ -173,7 +173,8 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 		})).in(Singleton.class);
 
 		bindModal(ShiftDrtActionCreator.class).toProvider(modalProvider((getter) -> {
-			VrpAgentLogic.DynActionCreator delegate = drtCfg.prebooking ? getter.getModal(PrebookingActionCreator.class)
+			VrpAgentLogic.DynActionCreator delegate = drtCfg.getPrebookingParams().isPresent()
+					? getter.getModal(PrebookingActionCreator.class)
 					: getter.getModal(DrtActionCreator.class);
 			
 			// adds shift tasks
