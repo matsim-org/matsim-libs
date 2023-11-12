@@ -21,7 +21,8 @@ package org.matsim.contrib.drt.extension.edrt.run;
 import java.net.URL;
 
 import org.junit.Test;
-import org.matsim.contrib.drt.prebooking.logic.FixedSharePrebookingLogic;
+import org.matsim.contrib.drt.prebooking.PrebookingParams;
+import org.matsim.contrib.drt.prebooking.logic.ProbabilityBasedPrebookingLogic;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -51,10 +52,10 @@ public class RunEDrtScenarioIT {
 				new OTFVisConfigGroup(), new EvConfigGroup());
 		
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(config);
-		drtConfig.prebooking = true;
+		drtConfig.addParameterSet(new PrebookingParams());
 		
 		Controler controller = RunEDrtScenario.createControler(config, false);
-		FixedSharePrebookingLogic.install(drtConfig.mode, 0.5, 4.0 * 3600.0, controller);
+		ProbabilityBasedPrebookingLogic.install(controller, drtConfig, 0.5, 4.0 * 3600.0);
 		
 		controller.run();
 	}

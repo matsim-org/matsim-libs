@@ -138,12 +138,13 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 				}).asEagerSingleton();
 
 		bindModal(DrtScheduleInquiry.class).to(DrtScheduleInquiry.class).asEagerSingleton();
-
+		
+		boolean scheduleWaitBeforeDrive = drtCfg.getPrebookingParams().map(p -> p.scheduleWaitBeforeDrive).orElse(false);
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
 						getter -> new DefaultRequestInsertionScheduler(getter.getModal(Fleet.class),
 								getter.get(MobsimTimer.class), getter.getModal(TravelTime.class),
 								getter.getModal(ScheduleTimingUpdater.class), getter.getModal(DrtTaskFactory.class),
-								getter.getModal(StopTimeCalculator.class), drtCfg.scheduleWaitBeforeDrive)))
+								getter.getModal(StopTimeCalculator.class), scheduleWaitBeforeDrive)))
 				.asEagerSingleton();
 
 		bindModal(DrtOfferAcceptor.class).toInstance(DrtOfferAcceptor.DEFAULT_ACCEPTOR);
@@ -160,7 +161,7 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 					timer);
 		})).in(Singleton.class);
 		
-		if (!drtCfg.prebooking) {
+		if (drtCfg.getPrebookingParams().isEmpty()) {
 			bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(DrtActionCreator.class));
 		} else {
 			bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(PrebookingActionCreator.class));

@@ -170,11 +170,12 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(DrtScheduleInquiry.class).to(DrtScheduleInquiry.class).asEagerSingleton();
 
+		boolean scheduleWaitBeforeDrive = drtCfg.getPrebookingParams().map(p -> p.scheduleWaitBeforeDrive).orElse(false);
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
 						getter -> new DefaultRequestInsertionScheduler(getter.getModal(Fleet.class),
 								getter.get(MobsimTimer.class), getter.getModal(TravelTime.class),
 								getter.getModal(ScheduleTimingUpdater.class), getter.getModal(DrtTaskFactory.class),
-								getter.getModal(StopTimeCalculator.class), drtCfg.scheduleWaitBeforeDrive)))
+								getter.getModal(StopTimeCalculator.class), scheduleWaitBeforeDrive)))
 				.asEagerSingleton();
 
 		bindModal(DrtOfferAcceptor.class).toInstance(DrtOfferAcceptor.DEFAULT_ACCEPTOR);
@@ -192,7 +193,8 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		})).in(Singleton.class);
 		
 		bindModal(EDrtActionCreator.class).toProvider(modalProvider(getter -> {
-			VrpAgentLogic.DynActionCreator delegate = drtCfg.prebooking ? getter.getModal(PrebookingActionCreator.class)
+			VrpAgentLogic.DynActionCreator delegate = drtCfg.getPrebookingParams().isPresent()
+					? getter.getModal(PrebookingActionCreator.class)
 					: getter.getModal(DrtActionCreator.class);
 
 			// EDrtActionCreator wraps around delegate and initializes consumption trackers

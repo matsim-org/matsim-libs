@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.drt.prebooking.PrebookingTestEnvironment.RequestInfo;
-import org.matsim.contrib.drt.prebooking.logic.AttributePrebookingLogic;
+import org.matsim.contrib.drt.prebooking.logic.AttributeBasedPrebookingLogic;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
@@ -52,8 +52,8 @@ public class PrebookingTest {
 	
 	private void installPrebooking(Controler controller) {
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(controller.getConfig());
-		drtConfig.prebooking = true;
-		AttributePrebookingLogic.install("drt", controller);
+		drtConfig.addParameterSet(new PrebookingParams());
+		AttributeBasedPrebookingLogic.install(controller, drtConfig);
 	}
 
 	@Test

@@ -125,7 +125,7 @@ public class PrebookingManager implements MobsimEngine, AdvanceRequestProvider {
 
 				if (prebookingLegIndex <= currentLegIndex) {
 					violations = new HashSet<>(violations);
-					violations.add("past leg");
+					violations.add("past leg"); // the leg for which the booking was made has already happened
 				}
 
 				if (!violations.isEmpty()) {

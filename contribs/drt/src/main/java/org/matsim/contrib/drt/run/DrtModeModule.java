@@ -96,7 +96,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			return new DefaultStopTimeCalculator(drtCfg.stopDuration);
 		})).in(Singleton.class);
 		
-		if (!drtCfg.prebooking) {
+		if (drtCfg.getPrebookingParams().isEmpty()) {
 			bindModal(StopTimeCalculator.class).toProvider(modalProvider(getter -> {
 				return new DefaultStopTimeCalculator(drtCfg.stopDuration);
 			})).in(Singleton.class);

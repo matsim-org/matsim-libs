@@ -37,15 +37,16 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
-import org.matsim.contrib.drt.prebooking.logic.FixedSharePrebookingLogic;
+import org.matsim.contrib.drt.prebooking.PrebookingParams;
+import org.matsim.contrib.drt.prebooking.logic.ProbabilityBasedPrebookingLogic;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.stops.CorrectedStopTimeCalculator;
 import org.matsim.contrib.drt.stops.CumulativeStopTimeCalculator;
 import org.matsim.contrib.drt.stops.MinimumStopDurationAdapter;
-import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
+import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
@@ -332,10 +333,10 @@ public class RunDrtExampleIT {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(config);
-		drtConfig.prebooking = true;
+		drtConfig.addParameterSet(new PrebookingParams());
 		
 		Controler controller = DrtControlerCreator.createControler(config, false);
-		FixedSharePrebookingLogic.install(drtConfig.mode, 0.5, 4.0 * 3600.0, controller);
+		ProbabilityBasedPrebookingLogic.install(controller, drtConfig, 0.5, 4.0 * 3600.0);
 		
 		PrebookingTracker tracker = new PrebookingTracker();
 		tracker.install(controller);

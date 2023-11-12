@@ -75,7 +75,7 @@ public class PreplannedDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimMo
 					timer);
 		})).in(Singleton.class);
 
-		Preconditions.checkState(!drtCfg.prebooking, "cannot use preplanned schedules with prebooking");
+		Preconditions.checkState(drtCfg.getPrebookingParams().isEmpty(), "cannot use preplanned schedules with prebooking");
 		bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(DrtActionCreator.class));
 
 		bindModal(VrpOptimizer.class).to(modalKey(DrtOptimizer.class));

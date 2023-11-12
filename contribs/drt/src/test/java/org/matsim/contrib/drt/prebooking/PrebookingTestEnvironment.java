@@ -23,7 +23,7 @@ import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
-import org.matsim.contrib.drt.prebooking.logic.AttributePrebookingLogic;
+import org.matsim.contrib.drt.prebooking.logic.AttributeBasedPrebookingLogic;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -62,7 +62,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class PrebookingTestEnvironment {
 	private final MatsimTestUtils utils;
-	
+
 	private final int width = 10;
 	private final int height = 10;
 
@@ -76,7 +76,7 @@ public class PrebookingTestEnvironment {
 	private double detourAbsolute = 300.0;
 	private double stopDuration = 60.0;
 	private double endTime = 30.0 * 3600.0;
-	
+
 	public PrebookingTestEnvironment(MatsimTestUtils utils) {
 		this.utils = utils;
 	}
@@ -272,12 +272,13 @@ public class PrebookingTestEnvironment {
 			plan.addLeg(firstLeg);
 
 			if (!Double.isNaN(request.submissionTime)) {
-				firstActivity.getAttributes().putAttribute(AttributePrebookingLogic.SUBMISSION_TIME_ATTRIBUTE,
+				firstActivity.getAttributes().putAttribute(AttributeBasedPrebookingLogic.getSubmissionAttribute("drt"),
 						request.submissionTime);
 			}
 
 			if (!Double.isNaN(request.plannedDepartureTime)) {
-				firstActivity.getAttributes().putAttribute(AttributePrebookingLogic.PLANNED_DEPARTURE_ATTRIBUTE,
+				firstActivity.getAttributes().putAttribute(
+						AttributeBasedPrebookingLogic.getPlannedDepartureAttribute("drt"),
 						request.plannedDepartureTime);
 			}
 

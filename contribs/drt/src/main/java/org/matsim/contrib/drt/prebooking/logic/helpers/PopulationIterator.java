@@ -1,11 +1,11 @@
-package org.matsim.contrib.drt.prebooking.logic;
+package org.matsim.contrib.drt.prebooking.logic.helpers;
 
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.drt.prebooking.logic.PopulationIterator.PersonItem;
+import org.matsim.contrib.drt.prebooking.logic.helpers.PopulationIterator.PersonItem;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.HasModifiablePlan;
@@ -41,7 +41,17 @@ public class PopulationIterator implements Iterator<PersonItem> {
 	public record PersonItem(MobsimAgent agent, Plan plan) {
 	}
 
-	static public PopulationIterator create(Population population, QSim qsim) {
-		return new PopulationIterator(population, qsim);
+	static public class PopulationIteratorFactory {
+		private final Population population;
+		private final QSim qsim;
+
+		public PopulationIteratorFactory(Population population, QSim qsim) {
+			this.population = population;
+			this.qsim = qsim;
+		}
+
+		public PopulationIterator create() {
+			return new PopulationIterator(population, qsim);
+		}
 	}
 }
