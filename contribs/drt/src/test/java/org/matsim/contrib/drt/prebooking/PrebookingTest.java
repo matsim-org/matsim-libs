@@ -15,7 +15,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class PrebookingTest {
 	@Rule
-	MatsimTestUtils utils = new MatsimTestUtils();
+	public MatsimTestUtils utils = new MatsimTestUtils();
 	
 	@Test
 	public void withoutPrebookedRequests() {
