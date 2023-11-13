@@ -22,8 +22,10 @@ package lsp.resourceImplementations.transshipmentHub;
 
 import lsp.LSPResource;
 import lsp.LSPSimulationTracker;
+import lsp.LSPUtils;
 import lsp.LogisticChainElement;
 import lsp.events.HandlingInHubStartsEvent;
+import lsp.resourceImplementations.ResourceImplementationUtils;
 import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -115,19 +117,29 @@ public class TransshipmentHubTourEndEventHandler implements AfterMobsimListener,
 		}
 		if ((event.getLinkId() == this.linkId)) {
 			assert tour != null;
-			if (allShipmentsOfTourEndInOnePoint(tour)) {
-				for (TourElement tourElement : tour.getTourElements()) {
-					if (tourElement instanceof ServiceActivity serviceActivity) {
-						if (serviceActivity.getLocation() == transshipmentHubResource.getStartLinkId()
-								&& allServicesAreInOnePoint(tour)
-								&& (tour.getStartLinkId() != transshipmentHubResource.getStartLinkId())) {
-							logHandlingInHub(serviceActivity.getService(), event.getTime());
-						} else {
-//							logHandlingInHub(serviceActivity.getService(), event.getTime() + getUnloadEndTime(tour)); //TODO: Das liefert eine RunTimeException, weil es Events gibt, die in der Zwischenzeit stattfinden -> Eventsstream ist nicht chronologisch...
+
+			if (ResourceImplementationUtils.getCarrierType(carrier) == ResourceImplementationUtils.CARRIER_TYPE.mainRunCarrier) {
+				if (allShipmentsOfTourEndInOnePoint(tour)) {
+					for (TourElement tourElement : tour.getTourElements()) {
+						if (tourElement instanceof ServiceActivity serviceActivity) {
+							if (serviceActivity.getLocation() == transshipmentHubResource.getStartLinkId()
+									&& allServicesAreInOnePoint(tour)
+									&& (tour.getStartLinkId() != transshipmentHubResource.getStartLinkId())) {
+								logHandlingInHub(serviceActivity.getService(), event.getTime());
+							}
 						}
 					}
 				}
+			} else if ((ResourceImplementationUtils.getCarrierType(carrier) == ResourceImplementationUtils.CARRIER_TYPE.collectionCarrier)) {
+				for (TourElement tourElement : tour.getTourElements()) {
+					if (tourElement instanceof ServiceActivity serviceActivity ) {
+						if (tour.getEndLinkId() == transshipmentHubResource.getStartLinkId())
+							logHandlingInHub(serviceActivity.getService(), event.getTime());
+					}
+				}
 			}
+
+
 		}
 	}
 
