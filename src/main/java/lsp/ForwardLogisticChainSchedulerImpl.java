@@ -49,7 +49,7 @@ import java.util.ArrayList;
 	 */
 	private final ArrayList<ResourceNeighbours> neighbourList;
 	private LSP lsp;
-	private int bufferTime;
+	private int bufferTime = 0;
 
 	ForwardLogisticChainSchedulerImpl() {
 		this.sortedResourceList = new ArrayList<>();
@@ -145,11 +145,6 @@ import java.util.ArrayList;
 			}
 		}
 		return null;
-	}
-
-	@Override
-	public void setBufferTime(int bufferTime) {
-		this.bufferTime = bufferTime;
 	}
 
 	/**

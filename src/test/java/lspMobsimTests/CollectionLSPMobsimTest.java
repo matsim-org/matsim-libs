@@ -143,7 +143,7 @@ public class CollectionLSPMobsimTest {
 			collectionLSPBuilder.setInitialPlan(collectionPlan);
 			resourcesList.add(collectionResource);
 			LogisticChainScheduler simpleScheduler = createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
-			simpleScheduler.setBufferTime(300);
+			
 			collectionLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 			collectionLSP = collectionLSPBuilder.build();
 		}

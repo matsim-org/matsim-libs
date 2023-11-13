@@ -236,7 +236,7 @@ public class CompleteLSPMobsimTest {
 
 
 		LogisticChainScheduler simpleScheduler = ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
-		simpleScheduler.setBufferTime(300);
+		
 		completeLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 		completeLSP = completeLSPBuilder.build();
 
