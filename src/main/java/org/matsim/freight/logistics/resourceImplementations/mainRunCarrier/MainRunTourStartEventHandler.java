@@ -35,9 +35,9 @@ import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.Tour.ServiceActivity;
 import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
-import org.matsim.freight.carriers.events.eventhandler.FreightTourStartEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierTourStartEventHandler;
 
-public class MainRunTourStartEventHandler implements AfterMobsimListener, FreightTourStartEventHandler, LSPSimulationTracker<LSPShipment> {
+public class MainRunTourStartEventHandler implements AfterMobsimListener, CarrierTourStartEventHandler, LSPSimulationTracker<LSPShipment> {
 // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way to do the junit testing. kmt jun'23
 
 

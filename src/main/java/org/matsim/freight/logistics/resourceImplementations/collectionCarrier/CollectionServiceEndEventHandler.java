@@ -33,9 +33,9 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.freight.carriers.CarrierService;
 import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
-import org.matsim.freight.carriers.events.eventhandler.FreightServiceEndEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierServiceEndEventHandler;
 
-public class CollectionServiceEndEventHandler implements AfterMobsimListener, FreightServiceEndEventHandler, LSPSimulationTracker<LSPShipment> {
+public class CollectionServiceEndEventHandler implements AfterMobsimListener, CarrierServiceEndEventHandler, LSPSimulationTracker<LSPShipment> {
 // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way to do the junit testing. kmt jun'23
 
 	private final CarrierService carrierService;

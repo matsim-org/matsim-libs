@@ -41,7 +41,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
-import org.matsim.freight.carriers.events.eventhandler.FreightServiceEndEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierServiceEndEventHandler;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
@@ -208,7 +208,7 @@ import java.util.*;
 	}
 
 
-	/*package-private*/ static class TipScorer implements LSPScorer, LSPSimulationTracker<LSP>, FreightServiceEndEventHandler {
+	/*package-private*/ static class TipScorer implements LSPScorer, LSPSimulationTracker<LSP>, CarrierServiceEndEventHandler {
 				
 		private static final Logger log = LogManager.getLogger(TipScorer.class);
 

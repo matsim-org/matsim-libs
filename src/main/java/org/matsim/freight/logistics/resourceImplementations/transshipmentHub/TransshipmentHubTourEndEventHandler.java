@@ -33,13 +33,13 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.Tour.ServiceActivity;
 import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
-import org.matsim.freight.carriers.events.eventhandler.FreightTourEndEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierTourEndEventHandler;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TransshipmentHubTourEndEventHandler implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, FreightTourEndEventHandler {
+public class TransshipmentHubTourEndEventHandler implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, CarrierTourEndEventHandler {
 // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way to do the junit testing. kmt jun'23
 
 	private final Scenario scenario;

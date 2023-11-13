@@ -50,8 +50,8 @@ import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
-import org.matsim.freight.carriers.events.eventhandler.FreightServiceEndEventHandler;
-import org.matsim.freight.carriers.events.eventhandler.FreightTourEndEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierServiceEndEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierTourEndEventHandler;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
@@ -511,7 +511,7 @@ import java.util.*;
 
 	enum SolutionType {onePlan_withHub, onePlan_direct, twoPlans_directAndHub}
 
-	private static class MyLSPScorer implements LSPScorer, FreightTourEndEventHandler, FreightServiceEndEventHandler {
+	private static class MyLSPScorer implements LSPScorer, CarrierTourEndEventHandler, CarrierServiceEndEventHandler {
 		private double score = 0.;
 
 		@Override

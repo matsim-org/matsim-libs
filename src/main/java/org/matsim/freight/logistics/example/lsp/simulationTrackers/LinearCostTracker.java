@@ -35,9 +35,9 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
 import org.matsim.freight.carriers.events.CarrierServiceStartEvent;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
-import org.matsim.freight.carriers.events.eventhandler.FreightServiceEndEventHandler;
-import org.matsim.freight.carriers.events.eventhandler.FreightServiceStartEventHandler;
-import org.matsim.freight.carriers.events.eventhandler.FreightTourStartEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierServiceEndEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierServiceStartEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierTourStartEventHandler;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,9 +45,9 @@ import java.util.Collection;
 /*package-private*/ class LinearCostTracker implements AfterMobsimListener, LSPSimulationTracker<LogisticChain>,
 		LinkEnterEventHandler,
 		VehicleLeavesTrafficEventHandler,
-		FreightTourStartEventHandler,
-		FreightServiceStartEventHandler,
-		FreightServiceEndEventHandler,
+		CarrierTourStartEventHandler,
+		CarrierServiceStartEventHandler,
+		CarrierServiceEndEventHandler,
 		LinkLeaveEventHandler {
 
 	private final Collection<EventHandler> eventHandlers;
@@ -155,22 +155,22 @@ import java.util.Collection;
 	}
 	@Override public void handleEvent( CarrierTourStartEvent event ){
 		for( EventHandler eventHandler : this.eventHandlers ){
-			if ( eventHandler instanceof FreightTourStartEventHandler) {
-				((FreightTourStartEventHandler) eventHandler).handleEvent( event );
+			if ( eventHandler instanceof CarrierTourStartEventHandler) {
+				((CarrierTourStartEventHandler) eventHandler).handleEvent( event );
 			}
 		}
 	}
 	@Override public void handleEvent( CarrierServiceEndEvent event ){
 		for( EventHandler eventHandler : this.eventHandlers ){
-			if ( eventHandler instanceof FreightServiceEndEventHandler) {
-				((FreightServiceEndEventHandler) eventHandler).handleEvent( event );
+			if ( eventHandler instanceof CarrierServiceEndEventHandler) {
+				((CarrierServiceEndEventHandler) eventHandler).handleEvent( event );
 			}
 		}
 	}
 	@Override public void handleEvent( CarrierServiceStartEvent event ){
 		for( EventHandler eventHandler : this.eventHandlers ){
-			if ( eventHandler instanceof FreightServiceStartEventHandler) {
-				((FreightServiceStartEventHandler) eventHandler).handleEvent( event );
+			if ( eventHandler instanceof CarrierServiceStartEventHandler) {
+				((CarrierServiceStartEventHandler) eventHandler).handleEvent( event );
 			}
 		}
 	}
