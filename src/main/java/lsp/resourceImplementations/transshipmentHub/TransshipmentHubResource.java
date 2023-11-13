@@ -69,7 +69,7 @@ public class TransshipmentHubResource extends LSPDataObject<LSPResource> impleme
 		TransshipmentHubTourEndEventHandler eventHandler = new TransshipmentHubTourEndEventHandler(this, scenario);
 		transshipmentHubScheduler.setTransshipmentHubTourEndEventHandler(eventHandler );
 		this.clientElements = builder.getClientElements();
-		this.addSimulationTracker(eventHandler);
+//		this.addSimulationTracker(eventHandler); // Is already registered in the eventHandler itself --> Is even that necessary there?  KMT Nov 23
 	}
 
 	@Override
