@@ -72,6 +72,7 @@ public class MultipleIterationsSecondReloadLSPMobsimTest {
 
 	@Before
 	public void initialize() {
+		//Todo/Fixme: In the result there only the second hub is used. -- see Issue #170.  KMT Nov'23
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -317,5 +318,6 @@ public class MultipleIterationsSecondReloadLSPMobsimTest {
 	@Test
 	public void compareEvents(){
 		MatsimTestUtils.assertEqualEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
+		//Please note, that this result contains also reloding / hubHandlingStarts after the main run (even if there is no further distribution carrier)
 	}
 }
