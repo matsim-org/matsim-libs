@@ -25,11 +25,11 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
-import org.matsim.freight.carriers.events.eventhandler.FreightTourStartEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierTourStartEventHandler;
 
 import java.util.Collection;
 
-/*package-private*/ class TourStartHandler implements FreightTourStartEventHandler {
+/*package-private*/ class TourStartHandler implements CarrierTourStartEventHandler {
 
 	private static final Logger log = LogManager.getLogger(TourStartHandler.class);
 	private final Carriers carriers;

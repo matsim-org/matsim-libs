@@ -32,9 +32,9 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.freight.carriers.CarrierService;
 import org.matsim.freight.carriers.events.CarrierServiceStartEvent;
-import org.matsim.freight.carriers.events.eventhandler.FreightServiceStartEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierServiceStartEventHandler;
 
-public class DistributionServiceStartEventHandler implements AfterMobsimListener, FreightServiceStartEventHandler, LSPSimulationTracker<LSPShipment> {
+public class DistributionServiceStartEventHandler implements AfterMobsimListener, CarrierServiceStartEventHandler, LSPSimulationTracker<LSPShipment> {
 // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way to do the junit testing. kmt jun'23
 
 	private final CarrierService carrierService;

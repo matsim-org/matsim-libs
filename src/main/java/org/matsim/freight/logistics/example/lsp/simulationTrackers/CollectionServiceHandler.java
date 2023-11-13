@@ -25,8 +25,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.freight.carriers.CarrierService;
 import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
 import org.matsim.freight.carriers.events.CarrierServiceStartEvent;
-import org.matsim.freight.carriers.events.eventhandler.FreightServiceEndEventHandler;
-import org.matsim.freight.carriers.events.eventhandler.FreightServiceStartEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierServiceEndEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierServiceStartEventHandler;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 
-/*package-private*/ class CollectionServiceHandler implements FreightServiceStartEventHandler, FreightServiceEndEventHandler {
+/*package-private*/ class CollectionServiceHandler implements CarrierServiceStartEventHandler, CarrierServiceEndEventHandler {
 
 	private final Collection<ServiceTuple> tuples;
 	private final Vehicles allVehicles;
