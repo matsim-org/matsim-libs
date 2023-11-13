@@ -28,6 +28,8 @@ public class ConflictModule extends AbstractModule {
 
 	@Override
 	public void install() {
+		// initialize the builder
+		getMultibinder(binder());
 	}
 
 	@Provides
