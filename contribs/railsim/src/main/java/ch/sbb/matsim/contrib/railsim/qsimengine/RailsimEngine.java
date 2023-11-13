@@ -211,6 +211,8 @@ final class RailsimEngine implements Steppable {
 
 		boolean allBlocked = blockLinkTracks(time, state);
 
+		// TODO: whether link is blocked should not be checked directly
+
 		// Driver can advance if the next link is already free
 		if (allBlocked || (nextLink != null && nextLink.isBlockedBy(state.driver))) {
 
@@ -327,9 +329,10 @@ final class RailsimEngine implements Steppable {
 		}
 
 		state.approvedDist = response.approvedDist();
+		state.approvedSpeed = response.approvedSpeed();
 
-		// Only continue successfully if all requested link have been blocked
-		return !response.stopSignal();
+		// Return whether the train has to stop
+		return response.approvedSpeed() != 0;
 	}
 
 	private void enterLink(double time, UpdateEvent event) {
@@ -646,7 +649,28 @@ final class RailsimEngine implements Steppable {
 		state.targetSpeed = state.allowedMaxSpeed;
 		state.targetDecelDist = Double.POSITIVE_INFINITY;
 
-		for (int i = state.routeIdx; i <= state.route.size(); i++) {
+		boolean stop = false;
+
+		// Set speed approved by disposition
+		if (state.approvedSpeed < minAllowed) {
+
+			RailsimCalc.SpeedTarget target = RailsimCalc.calcTargetSpeed(state.approvedDist,
+				state.train.acceleration(), state.train.deceleration(),
+				state.speed, state.allowedMaxSpeed, state.approvedSpeed);
+
+			assert FuzzyUtils.greaterEqualThan(target.decelDist(), 0) : "Decel dist is " + target.decelDist() + ", stopping is not possible";
+
+			if (FuzzyUtils.equals(target.decelDist(), 0)) {
+				state.targetSpeed = state.approvedSpeed;
+				state.targetDecelDist = Double.POSITIVE_INFINITY;
+				stop = true;
+			} else {
+				state.targetSpeed = target.targetSpeed();
+				state.targetDecelDist = target.decelDist();
+			}
+		}
+
+		for (int i = state.routeIdx; i <= state.route.size() && !stop; i++) {
 
 			RailLink link;
 			double allowed;
@@ -659,8 +683,6 @@ final class RailsimEngine implements Steppable {
 				// If the previous link is a transit stop the speed needs to be 0 at the next link
 				// train stops at the very end of a link
 				if (i > 0 && state.isStop(state.route.get(i - 1).getLinkId()))
-					allowed = 0;
-				else if (!resources.isBlockedBy(link, state.driver))
 					allowed = 0;
 				else
 					allowed = link.getAllowedFreespeed(state.driver);
@@ -695,7 +717,7 @@ final class RailsimEngine implements Steppable {
 			if (link != null)
 				dist += link.length;
 
-			if (dist >= window)
+			if (FuzzyUtils.greaterEqualThan(dist, window))
 				break;
 
 			minAllowed = allowed;

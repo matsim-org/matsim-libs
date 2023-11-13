@@ -53,11 +53,8 @@ public class SimpleDisposition implements TrainDisposition {
 	@Override
 	public DispositionResponse requestNextSegment(double time, TrainPosition position, double dist) {
 
-		// Try to reserve 1m more dist than necessary, otherwise infinite loop with always the same reservation would occur
-		// makes sure always more than request is reserved
-
 		List<RailLink> segment = RailsimCalc.calcLinksToBlock(position,
-			resources.getLink(position.getHeadLink()), dist + 1);
+			resources.getLink(position.getHeadLink()), dist);
 
 		// Only re-routes if the link segment is occupied
 //		for (RailLink link : segment) {
@@ -115,7 +112,7 @@ public class SimpleDisposition implements TrainDisposition {
 			}
 		}
 
-		return new DispositionResponse(reserveDist, stop, null);
+		return new DispositionResponse(reserveDist, stop ? 0 : Double.POSITIVE_INFINITY, null);
 	}
 
 	@Override

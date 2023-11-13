@@ -113,6 +113,11 @@ final class TrainState implements TrainPosition {
 	double approvedDist;
 
 	/**
+	 * Speed in m/s, which is approved after reaching {@link #approvedDist}.
+	 */
+	double approvedSpeed;
+
+	/**
 	 * Speed in m/s.
 	 */
 	double speed;

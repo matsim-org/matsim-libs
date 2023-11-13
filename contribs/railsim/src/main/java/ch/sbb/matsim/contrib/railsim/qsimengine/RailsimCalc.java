@@ -193,15 +193,19 @@ public final class RailsimCalc {
 
 	/**
 	 * Links that need to be blocked or otherwise stop needs to be initiated.
+	 * This method is only valid for fixed block resources.
 	 */
 	public static List<RailLink> calcLinksToBlock(TrainPosition position, RailLink currentLink, double reserveDist) {
 
 		List<RailLink> result = new ArrayList<>();
 
+		// Assume current distance left on link is already reserved (only for fixed block)
 		double dist = currentLink.length - position.getHeadPosition();
 
 		int idx = position.getRouteIndex();
-		while (FuzzyUtils.lessThan(dist, reserveDist) && idx < position.getRouteSize()) {
+
+		// This function always needs to provide more reserve distance than requested (except when it will stop)
+		while (FuzzyUtils.lessEqualThan(dist, reserveDist) && idx < position.getRouteSize()) {
 			RailLink nextLink = position.getRoute(idx++);
 			dist += nextLink.length;
 

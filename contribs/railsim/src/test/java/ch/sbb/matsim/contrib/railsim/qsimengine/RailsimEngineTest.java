@@ -143,10 +143,8 @@ public class RailsimEngineTest {
 
 		test.doSimStepUntil(600);
 
-		//FIXME: regio2 is delayed for some reason
-
 		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio1", 294, 600, 0)
+			.hasTrainState("regio1", 293, 600, 0)
 			.hasTrainState("regio2", 358, 1000, 0);
 
 
@@ -158,7 +156,7 @@ public class RailsimEngineTest {
 		test.doStateUpdatesUntil(600, 1);
 
 		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio1", 294, 600, 0)
+			.hasTrainState("regio1", 293, 600, 0)
 			.hasTrainState("regio2", 358, 1000, 0);
 
 	}
