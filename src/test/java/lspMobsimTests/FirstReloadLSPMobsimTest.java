@@ -143,7 +143,7 @@ public class FirstReloadLSPMobsimTest {
 
 		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance(Id.create("CollectionLSP", LSP.class));
 		completeLSPBuilder.setInitialPlan(completePlan);
-		ArrayList<LSPResource> resourcesList = new ArrayList<>();
+		LinkedList<LSPResource> resourcesList = new LinkedList<>();
 		resourcesList.add(collectionResource);
 		resourcesList.add(firstTranshipmentHubResource);
 

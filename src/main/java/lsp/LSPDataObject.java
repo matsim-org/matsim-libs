@@ -9,10 +9,11 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 
 public class LSPDataObject<T> implements HasSimulationTrackers<T>, Attributable, Identifiable<T> {
 
-	private final Collection<LSPSimulationTracker<T>> trackers = new ArrayList<>();
+	private final Collection<LSPSimulationTracker<T>> trackers = new LinkedList<>();
 	private final Attributes attributes = new AttributesImpl();
 	private final Id<T> id;
 
