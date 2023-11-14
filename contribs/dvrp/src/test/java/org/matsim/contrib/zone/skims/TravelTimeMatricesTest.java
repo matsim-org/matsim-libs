@@ -69,7 +69,7 @@ public class TravelTimeMatricesTest {
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("CA"), nodeC, nodeA, 600, 15, 80, 1);
 
 		double maxDistance = 300;// B->A->C and C->A->B are pruned by  the limit
-		var matrix = TravelTimeMatrices.calculateTravelTimeSparseMatrix(routingParams(network), maxDistance, 0, 0);
+		var matrix = TravelTimeMatrices.calculateTravelTimeSparseMatrix(routingParams(network), maxDistance, 0, 0).orElseThrow();
 
 		assertThat(matrix.get(nodeA, nodeA)).isEqualTo(0);
 		assertThat(matrix.get(nodeA, nodeB)).isEqualTo(10);
@@ -97,7 +97,7 @@ public class TravelTimeMatricesTest {
 
 		// 20 s (max TT) corresponds to 300 m (max distance) in another test (see: travelTimeSparseMatrix_maxDistance())
 		double maxTravelTime = 20;// B->A->C and C->A->B are pruned by  the limit
-		var matrix = TravelTimeMatrices.calculateTravelTimeSparseMatrix(routingParams(network), 0, maxTravelTime, 0);
+		var matrix = TravelTimeMatrices.calculateTravelTimeSparseMatrix(routingParams(network), 0, maxTravelTime, 0).orElseThrow();
 
 		assertThat(matrix.get(nodeA, nodeA)).isEqualTo(0);
 		assertThat(matrix.get(nodeA, nodeB)).isEqualTo(10);
