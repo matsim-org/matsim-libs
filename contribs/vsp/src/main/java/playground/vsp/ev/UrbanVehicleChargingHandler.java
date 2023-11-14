@@ -20,9 +20,14 @@
 package playground.vsp.ev;
 
 import com.google.common.collect.ImmutableListMultimap;
+import jakarta.inject.Inject;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.ev.charging.*;
@@ -35,8 +40,9 @@ import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
-import jakarta.inject.Inject;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -114,10 +120,11 @@ class UrbanVehicleChargingHandler
 			Tuple<Id<Vehicle>, Id<Charger>> tuple = chargingProcedures.get(event.getLinkId()).remove(event.getPersonId());
 			if (tuple != null) {
 				Id<Vehicle> evId = Id.create(tuple.getFirst(), Vehicle.class);
-				if(vehiclesAtChargers.remove(evId) != null){ //if null, vehicle is fully charged and de-plugged already (see handleEvent(ChargingEndedEvent) )
-					Id<Charger> chargerId = tuple.getSecond();
-					Charger c = chargingInfrastructure.getChargers().get(chargerId);
-					c.getLogic().removeVehicle(electricFleet.getElectricVehicles().get(evId), event.getTime());
+				ElectricVehicle ev = electricFleet.getElectricVehicles().get(evId);
+				Id<Charger> chargerId = tuple.getSecond();
+				Charger c = chargingInfrastructure.getChargers().get(chargerId);
+				if(vehiclesAtChargers.remove(evId) != null || c.getLogic().getQueuedVehicles().contains(ev)){
+					c.getLogic().removeVehicle(ev, event.getTime());
 				}
 			} else {
 				throw new RuntimeException("there is something wrong with the charging procedure of person=" + event.getPersonId() + " on link= " + event.getLinkId());
