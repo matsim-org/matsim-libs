@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.AgentTracker;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
@@ -184,8 +185,10 @@ public final class EditTrips {
 		} else if ( currentLeg.getRoute() instanceof GenericRouteImpl ) {
 			// teleported leg
 			replanCurrentLegWithGenericRoute(newAct, routingMode, currentLeg, now, agent);
+			// yyyy ignores newAct and pulls the next activity from the plan, other than the other parallel methods for other route types.  kai, mar'23
 		} else {
-			throw new ReplanningException("not implemented for the route type of the current leg") ;
+			log.warn("replanning not explicitly implemented for the route type of the current leg; falling back on generic method");
+			replanFromCurrentLegWithUnknownRouteType( newAct, routingMode, currentLeg, now, agent, routingAttributes );
 		}
 		WithinDayAgentUtils.resetCaches(agent);
 	}
@@ -222,6 +225,21 @@ public final class EditTrips {
 		WithinDayAgentUtils.resetCaches(agent);
 	}
 
+
+	private void replanFromCurrentLegWithUnknownRouteType( Activity newAct, String mainMode, Leg currentLeg, double now, MobsimAgent agent, Attributes routingAttributes ) {
+		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
+		List<PlanElement> planElements = plan.getPlanElements() ;
+		Person person = plan.getPerson() ;
+		PassengerAgent ptPassengerAgent = (PassengerAgent) agent;
+		MobsimVehicle mobsimVehicle = ptPassengerAgent.getVehicle();
+		if ( mobsimVehicle != null ) {
+			throw new ReplanningException( "agent has already boarded vehicle; don't know what to do." );
+		}
+
+
+	}
+
+
 	private void replanCurrentLegWithTransitRoute(Activity newAct, String routingMode, Leg currentLeg, double now, MobsimAgent agent, Attributes routingAttributes) {
 		log.debug("entering replanCurrentLegWithTransitRoute for agentId=" + agent.getId()) ;
 
@@ -240,38 +258,26 @@ public final class EditTrips {
 		TransitPassengerRoute oldPtRoute = (TransitPassengerRoute) currentLeg.getRoute();
 
 		/*
-		 * In AbstractTransitDriverAgent nextStop is moved forward only at departure, so
-		 * while the vehicle stops "nextStop" is the stop where the vehicle stops at.
-		 * (see AbstractTransitDriverAgent.depart() and
-		 * AbstractTransitDriverAgent.processEventVehicleArrives())
-		 *
-		 * So if the vehicle stops at a stop facility, driver.getNextTransitStop() will
-		 * return that stop facility and we can replan the agent from that stop facility.
-		 * gl may'19
-		 */
+		 * In AbstractTransitDriverAgent nextStop is moved forward only at departure, so while the vehicle stops "nextStop" is the stop where
+		 * the vehicle stops at. (see AbstractTransitDriverAgent.depart() and AbstractTransitDriverAgent.processEventVehicleArrives())
 
-		/*
-		 * TODO: Routing with the current vehicle as a start: If the agent is currently
-		 * on a delayed bus, the router won't find that bus when looking for shortest
-		 * paths from the next stop, because it assumes the bus has already departed. It
-		 * will suggest to take another later bus even if staying on the current
-		 * (delayed) bus is better. A real-time schedule based router would solve this
-		 * apart from transfer times and disutilities (it won't take into account that
-		 * staying on the same bus is one transfer less than getting off at the next
-		 * stop and taking another bus from there). Otherwise one might route from all
-		 * following stop facilities the delayed bus will still serve (high computation
-		 * time, maybe less so with some special kind of many-to-one tree) or move only
-		 * the corresponding departure in the schedule (high computation time for
-		 * preparing the Raptor router's internal data structures, probably worst
-		 * option). Not solving this will likely lead to change of routes without a
-		 * proper reason / some kind of oscillation between two best or at least
-		 * similarly good paths.
-		 *
-		 * Idea 1: Use scheduled departure time instead of real current time to keep
-		 * (delayed) bus the passenger is sitting on available from the router's
-		 * perspective. Idea 2: Use input schedule file which has real (delayed)
-		 * departure times as far as known at the time of withinday-replanning.
-		 *
+		 * So if the vehicle stops at a stop facility, driver.getNextTransitStop() will return that stop facility and we can replan the agent
+		 * from that stop facility. gl may'19
+
+		 * TODO: Routing with the current vehicle as a start: If the agent is currently on a delayed bus, the router won't find that bus when
+		 * looking for shortest paths from the next stop, because it assumes the bus has already departed. It will suggest to take another
+		 * later bus even if staying on the current (delayed) bus is better. A real-time schedule based router would solve this apart from
+		 * transfer times and disutilities (it won't take into account that staying on the same bus is one transfer less than getting off at
+		 * the next stop and taking another bus from there). Otherwise one might route from all following stop facilities the delayed bus will
+		 * still serve (high computation time, maybe less so with some special kind of many-to-one tree) or move only the corresponding
+		 * departure in the schedule (high computation time for preparing the Raptor router's internal data structures, probably worst
+		 * option). Not solving this will likely lead to change of routes without a proper reason / some kind of oscillation between two best
+		 * or at least similarly good paths.
+
+		 * Idea 1: Use scheduled departure time instead of real current time to keep (delayed) bus the passenger is sitting on available from
+		 * the router's perspective. Idea 2: Use input schedule file which has real (delayed) departure times as far as known at the time of
+		 * withinday-replanning.
+
 		 * gl may'19
 		 */
 
@@ -281,6 +287,8 @@ public final class EditTrips {
 		List<? extends PlanElement> newTripElements = null;
 		// (1) get new trip from current position to new activity:
 		if (mobsimVehicle == null) {
+			// this is (I think) the situation where the agent is on the pt leg, but has not yet boarded a vehicle.  kai, mar'23
+
 			currentOrNextStop = scenario.getTransitSchedule().getFacilities().get(oldPtRoute.getAccessStopId());
 			log.debug( "agent with ID=" + agent.getId() + " is waiting at a stop=" + currentOrNextStop ) ;
 			newTripElements = newTripToNewActivity(currentOrNextStop, newAct, routingMode, now, person, routingAttributes );
@@ -469,6 +477,7 @@ public final class EditTrips {
 	 * hypothetically something else than teleportation.
 	 */
 	private void replanCurrentLegWithGenericRoute(Activity newAct, String routingMode, Leg currentLeg, double now, MobsimAgent agent) {
+		// this pulls the next activity from the plan, other than the other parallel methods for other route types.  kai, mar'23
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
 
@@ -604,12 +613,13 @@ public final class EditTrips {
 		WithinDayAgentUtils.resetCaches(agent);
 
 	}
-	public static boolean insertEmptyTrip( Plan plan, Activity fromActivity, Activity toActivity, String mainMode, PopulationFactory pf ) {
+	public static Trip insertEmptyTrip( Plan plan, Activity fromActivity, Activity toActivity, String mainMode, PopulationFactory pf ) {
 		List<Leg> list = Collections.singletonList( pf.createLeg( mainMode ) ) ;
-		TripRouter.insertTrip(plan, fromActivity, list, toActivity ) ;
-		return true ;
+		List<PlanElement> planElements = TripRouter.insertTrip( plan, fromActivity, list, toActivity );
+		TripStructureUtils.Trip trip = new Trip( fromActivity, planElements, toActivity );
+		return trip;
 	}
-	public final boolean insertEmptyTrip( Plan plan, Activity fromActivity, Activity toActivity, String mainMode ) {
+	public final Trip insertEmptyTrip( Plan plan, Activity fromActivity, Activity toActivity, String mainMode ) {
 		return insertEmptyTrip( plan, fromActivity, toActivity, mainMode, this.pf ) ;
 	}
 	/**

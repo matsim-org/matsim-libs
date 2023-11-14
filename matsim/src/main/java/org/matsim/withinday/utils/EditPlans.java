@@ -232,7 +232,6 @@ public final class EditPlans {
 		String mode = TripStructureUtils.identifyMainMode( EditTrips.findCurrentTrip(agent ).getTripElements() ) ;
 		insertActivity( agent, index, activity, mode, mode ) ;
 	}
-
 	// === internal utility methods: ===
 	private void checkIfNotStageActivity(Activity origAct) {
 		if( StageActivityTypeIdentifier.isStageActivity(origAct.getType()) ){

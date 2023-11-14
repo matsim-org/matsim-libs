@@ -25,14 +25,22 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.google.inject.Inject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
@@ -50,18 +58,36 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.framework.PassengerAgent;
+import org.matsim.core.mobsim.qsim.AbortHandler;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.modal.AbstractModalQSimModule;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import com.google.common.base.MoreObjects;
+import org.matsim.withinday.utils.EditPlans;
+import org.matsim.withinday.utils.EditTrips;
 
 /**
  * @author jbischoff
  * @author Sebastian Hörl, IRT SystemX (sebhoerl)
  */
 public class RunDrtExampleIT {
+	private static final Logger log = LogManager.getLogger(RunDrtExampleIT.class);
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -181,12 +207,12 @@ public class RunDrtExampleIT {
 		RunDrtExample.run(config, false);
 
 		var expectedStats = Stats.newBuilder()
-				.rejectionRate(0.0)
-				.rejections(1)
-				.waitAverage(305.97)
-				.inVehicleTravelTimeMean(378.18)
-				.totalTravelTimeMean(684.16)
-				.build();
+					 .rejectionRate(0.0)
+					 .rejections(1)
+					 .waitAverage(305.97)
+					 .inVehicleTravelTimeMean(378.18)
+					 .totalTravelTimeMean(684.16)
+					 .build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
 	}
@@ -314,7 +340,7 @@ public class RunDrtExampleIT {
 	 * rejectionRate, rejections, waitAverage, inVehicleTravelTimeMean, & totalTravelTimeMean
 	 */
 
-	private void verifyDrtCustomerStatsCloseToExpectedStats(String outputDirectory, Stats expectedStats) {
+	static void verifyDrtCustomerStatsCloseToExpectedStats( String outputDirectory, Stats expectedStats ) {
 
 		String filename = outputDirectory + "/drt_customer_stats_drt.csv";
 
@@ -345,7 +371,7 @@ public class RunDrtExampleIT {
 		assertThat(actualStats).usingRecursiveComparison().isEqualTo(expectedStats);
 	}
 
-	private static class Stats {
+	static class Stats {
 		private final double rejectionRate;
 		private final double rejections;
 		private final double waitAverage;
@@ -415,4 +441,5 @@ public class RunDrtExampleIT {
 			}
 		}
 	}
+
 }

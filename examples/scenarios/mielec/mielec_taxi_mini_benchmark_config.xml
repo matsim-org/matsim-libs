@@ -54,7 +54,9 @@
 	<module name="replanning">
 		<!-- We focus only on DynAgents. "Standard" agents do not change their behaviour -->
 		<param name="maxAgentPlanMemorySize" value="1"/>
-		<param name="ModuleProbability_1" value="1.0"/>
-		<param name="Module_1" value="KeepLastSelected"/>
+		<parameterset type="strategysettings" >
+			<param name="strategyName" value="KeepLastSelected" />
+			<param name="weight" value="1.0" />
+		</parameterset>
 	</module>
 </config>

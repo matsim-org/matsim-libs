@@ -385,12 +385,14 @@ public final class TripStructureUtils {
 		private final List<PlanElement> trip;
 		private final List<Leg> legs;
 
-		Trip( 	final Activity originActivity,
-			     final List<PlanElement> trip,
+		public Trip( 	final Activity originActivity,
+			     final List<PlanElement> planElements,
 			     final Activity destinationActivity) {
+			// (this is needed "public" quite often.  Since there is no reason given why it should not be public, I am making it public now.  kai, mar'23)
+
 			this.originActivity = originActivity;
-			this.trip = trip;
-			this.legs = extractLegs( trip );
+			this.trip = planElements;
+			this.legs = extractLegs( planElements );
 			this.destinationActivity = destinationActivity;
 		}
 

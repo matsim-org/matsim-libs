@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<!DOCTYPE vehicles SYSTEM "http://matsim.org/files/dtd/dvrp_vehicles_v1.dtd">
+
+<vehicles>
+	<vehicle id="drt_veh_1_1" start_link="123" t_0="21600" t_1="104400" capacity="4"/>
+</vehicles>
