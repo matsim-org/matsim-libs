@@ -23,12 +23,8 @@ package org.matsim.contrib.ev.charging;
  *  This is an events based approach to trigger vehicle charging. Vehicles will be charged as soon as a person begins a charging activity.
  */
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.ImmutableListMultimap;
 import jakarta.inject.Inject;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -47,7 +43,9 @@ import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.common.collect.ImmutableListMultimap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This is an events based approach to trigger vehicle charging. Vehicles will be charged as soon as a person begins a charging activity.
@@ -57,7 +55,7 @@ import com.google.common.collect.ImmutableListMultimap;
  */
 public class VehicleChargingHandler
 		implements ActivityStartEventHandler, ActivityEndEventHandler, PersonLeavesVehicleEventHandler,
-		ChargingEndEventHandler, MobsimScopeEventHandler {
+		ChargingEndEventHandler, MobsimScopeEventHandler, ChargingListener {
 
 	public static final String CHARGING_IDENTIFIER = " charging";
 	public static final String CHARGING_INTERACTION = ScoringConfigGroup.createStageActivityType(
@@ -107,10 +105,11 @@ public class VehicleChargingHandler
 			Id<Vehicle> vehicleId = lastVehicleUsed.get(event.getPersonId());
 			if (vehicleId != null) {
 				Id<Vehicle> evId = Id.create(vehicleId, Vehicle.class);
+				ElectricVehicle ev = electricFleet.getElectricVehicles().get(evId);
 				Id<Charger> chargerId = vehiclesAtChargers.remove(evId);
-				if (chargerId != null) {
-					Charger c = chargingInfrastructure.getChargers().get(chargerId);
-					c.getLogic().removeVehicle(electricFleet.getElectricVehicles().get(evId), event.getTime());
+				Charger c = chargingInfrastructure.getChargers().get(chargerId);
+				if(vehiclesAtChargers.remove(evId) != null || c.getLogic().getQueuedVehicles().contains(ev)){
+					c.getLogic().removeVehicle(ev, event.getTime());
 				}
 			}
 		}
