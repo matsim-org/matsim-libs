@@ -37,7 +37,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class ExampleMultipleTwoEchelonChainsReplanning {
+final class ExampleMultipleTwoEchelonChainsReplanning {
 
 	private static final Logger log = LogManager.getLogger(ExampleMultipleTwoEchelonChainsReplanning.class);
 
@@ -96,9 +96,9 @@ public class ExampleMultipleTwoEchelonChainsReplanning {
 				bind(LSPStrategyManager.class).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
-					strategyManager.addStrategy(new ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
+					strategyManager.addStrategy( ProximityStrategyFactory.createStrategy( scenario.getNetwork() ), null, 1);
 					strategyManager.setMaxPlansPerAgent(5);
-					strategyManager.setPlanSelectorForRemoval(new WorstPlanForRemovalSelector());
+					strategyManager.setPlanSelectorForRemoval(new LSPWorstPlanForRemovalSelector() );
 					return strategyManager;
 				});
 			}

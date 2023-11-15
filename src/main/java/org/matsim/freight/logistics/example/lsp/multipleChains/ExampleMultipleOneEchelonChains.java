@@ -33,7 +33,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class ExampleMultipleOneEchelonChains {
+final class ExampleMultipleOneEchelonChains {
 
 	private static final Logger log = LogManager.getLogger(ExampleMultipleOneEchelonChains.class);
 

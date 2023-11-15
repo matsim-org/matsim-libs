@@ -34,7 +34,7 @@ import java.util.List;
 
 import static org.matsim.freight.logistics.example.lsp.multipleChains.MultipleChainsUtils.createLSPShipmentsFromCarrierShipments;
 
-public class ExampleGroceryDeliveryMultipleChains {
+final class ExampleGroceryDeliveryMultipleChains {
 
 	private static final Logger log = LogManager.getLogger(ExampleGroceryDeliveryMultipleChains.class);
 	static double HUBCOSTS_FIX = 100;
@@ -78,7 +78,7 @@ public class ExampleGroceryDeliveryMultipleChains {
 //					strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 1);
 //					strategyManager.addStrategy(new ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
 //					strategyManager.setMaxPlansPerAgent(5);
-					strategyManager.setPlanSelectorForRemoval(new WorstPlanForRemovalSelector());
+					strategyManager.setPlanSelectorForRemoval(new LSPWorstPlanForRemovalSelector() );
 					return strategyManager;
 				});
 			}

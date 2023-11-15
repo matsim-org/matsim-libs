@@ -8,7 +8,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class WorstPlanForRemovalSelector implements PlanSelector<LSPPlan, LSP> {
+class LSPWorstPlanForRemovalSelector implements PlanSelector<LSPPlan, LSP> {
 
 	private static final String UNDEFINED_TYPE = "undefined";
 

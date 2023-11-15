@@ -33,7 +33,7 @@ import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
 
-public class ExampleMultipleMixedEchelonChains {
+final class ExampleMultipleMixedEchelonChains {
 
 	private static final Logger log = LogManager.getLogger(ExampleMultipleMixedEchelonChains.class);
 
