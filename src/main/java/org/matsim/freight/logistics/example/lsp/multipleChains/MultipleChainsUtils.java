@@ -14,7 +14,9 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toMap;
 
-public class MultipleChainsUtils {
+class MultipleChainsUtils {
+	private MultipleChainsUtils(){
+	}
 	public static RandomLogisticChainShipmentAssigner createRandomLogisticChainShipmentAssigner() {
 		return new RandomLogisticChainShipmentAssigner();
 	}

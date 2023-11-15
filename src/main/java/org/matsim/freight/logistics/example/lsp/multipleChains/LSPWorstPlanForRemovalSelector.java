@@ -8,8 +8,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-class WorstPlanForRemovalSelector implements PlanSelector<LSPPlan, LSP> {
-	// this could/should/might be public.  But probably in a different package.  And why can we not use the central version (for person plans)?
+class LSPWorstPlanForRemovalSelector implements PlanSelector<LSPPlan, LSP> {
 
 	private static final String UNDEFINED_TYPE = "undefined";
 

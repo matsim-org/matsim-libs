@@ -18,15 +18,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-class ProximityStrategyFactory {
+final class ProximityStrategyFactory {
 
-	private final Network network;
+	private ProximityStrategyFactory() { } // class contains only static methods; do not instantiate
 
-	ProximityStrategyFactory(Network network) {
-		this.network = network;
-	}
-
-	GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
+	static GenericPlanStrategy<LSPPlan, LSP> createStrategy( Network network ) {
 
 		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup()));
 		GenericPlanStrategyModule<LSPPlan> randomModule = new GenericPlanStrategyModule<>() {

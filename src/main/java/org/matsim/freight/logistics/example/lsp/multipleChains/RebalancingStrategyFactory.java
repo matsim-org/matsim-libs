@@ -19,10 +19,13 @@ import java.util.Map;
 class RebalancingStrategyFactory {
 
 
-	RebalancingStrategyFactory() {
-	}
+	private RebalancingStrategyFactory() { } // class contains only static methods; do not instantiate
 
-	GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
+	static GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
+		// yyyy using factory method instead of constructor is a universally accepted approach.  but should be static.
+		// Please refactor.  Thanks!  kai, nov'23
+
+
 		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup()));
 		GenericPlanStrategyModule<LSPPlan> loadBalancingModule = new GenericPlanStrategyModule<>() {
 

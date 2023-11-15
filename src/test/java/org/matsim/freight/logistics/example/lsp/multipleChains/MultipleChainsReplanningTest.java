@@ -93,7 +93,7 @@ public class MultipleChainsReplanningTest {
 				});
 				bind(LSPStrategyManager.class).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-					strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 1);
+					strategyManager.addStrategy( RandomShiftingStrategyFactory.createStrategy(), null, 1);
 					return strategyManager;
 				});
 			}
