@@ -35,7 +35,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class ExampleMultipleOneEchelonChainsReplanning {
+final class ExampleMultipleOneEchelonChainsReplanning {
 
 	private static final Logger log = LogManager.getLogger(ExampleMultipleOneEchelonChainsReplanning.class);
 
@@ -96,7 +96,7 @@ public class ExampleMultipleOneEchelonChainsReplanning {
 //					strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 1);
 //					strategyManager.addStrategy(new ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
 					strategyManager.setMaxPlansPerAgent(5);
-					strategyManager.setPlanSelectorForRemoval(new WorstPlanForRemovalSelector());
+					strategyManager.setPlanSelectorForRemoval(new LSPWorstPlanForRemovalSelector() );
 					return strategyManager;
 				});
 			}
