@@ -20,7 +20,7 @@
 package ch.sbb.matsim.contrib.railsim;
 
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
-import ch.sbb.matsim.contrib.railsim.qsimengine.ResourceType;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.ResourceType;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.VehicleType;
 

@@ -27,6 +27,8 @@ import java.util.Queue;
 import java.util.stream.Collectors;
 
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.DispositionResponse;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -214,7 +216,7 @@ final class RailsimEngine implements Steppable {
 		// TODO: whether link is blocked should not be checked directly
 
 		// Driver can advance if the next link is already free
-		if (allBlocked || (nextLink != null && nextLink.isBlockedBy(state.driver))) {
+		if (allBlocked || (nextLink != null && resources.isBlockedBy(nextLink, state.driver))) {
 
 			if (allBlocked)
 				event.checkReservation = -1;
@@ -362,7 +364,7 @@ final class RailsimEngine implements Steppable {
 
 			// Free all reservations
 			for (RailLink link : state.route) {
-				if (link.isBlockedBy(state.driver)) {
+				if (resources.isBlockedBy(link, state.driver)) {
 					disposition.unblockRailLink(time, state.driver, link);
 				}
 			}
@@ -381,7 +383,7 @@ final class RailsimEngine implements Steppable {
 
 			RailLink currentLink = state.route.get(state.routeIdx);
 			// If this linked is blocked the driver can continue
-			if (!currentLink.isBlockedBy(state.driver)) {
+			if (!resources.isBlockedBy(currentLink, state.driver)) {
 				event.waitingForLink = true;
 				event.type = UpdateEvent.Type.WAIT_FOR_RESERVATION;
 				event.plannedTime = time + config.pollInterval;
@@ -401,7 +403,7 @@ final class RailsimEngine implements Steppable {
 
 		RailLink link = resources.getLink(state.headLink);
 
-		assert link.isBlockedBy(state.driver) : "Link has to be blocked by driver when entered";
+		assert resources.isBlockedBy(link, state.driver) : "Link has to be blocked by driver when entered";
 
 		decideTargetSpeed(event, state);
 

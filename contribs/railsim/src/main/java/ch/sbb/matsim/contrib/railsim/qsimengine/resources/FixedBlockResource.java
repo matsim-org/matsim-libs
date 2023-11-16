@@ -19,19 +19,19 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine.resources;
 
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailLink;
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 /**
  * Fixed block where each track is exclusively reserved by one agent.
  */
-public final class FixedBlockResource implements RailResource {
+final class FixedBlockResource implements RailResourceInternal {
+
+	private final Id<RailResource> id;
 
 	/**
 	 * Links belonging to this resource.
@@ -39,7 +39,12 @@ public final class FixedBlockResource implements RailResource {
 	final List<RailLink> links;
 
 	/**
-	 * Agents holding this resource exclusively.
+	 * Reservations per link and per track.
+	 */
+	final Map<RailLink, MobsimDriverAgent[]> tracks;
+
+	/**
+	 * Tracks drivers that have at least one reservation on any link os this resource.
 	 */
 	final Set<MobsimDriverAgent> reservations;
 
@@ -48,10 +53,21 @@ public final class FixedBlockResource implements RailResource {
 	 */
 	int capacity;
 
-	public FixedBlockResource(List<RailLink> links) {
+	FixedBlockResource(Id<RailResource> id, List<RailLink> links) {
+		this.id = id;
 		this.links = links;
-		this.reservations = new HashSet<>();
-		this.capacity = links.stream().mapToInt(RailLink::getNumberOfTracks).min().orElseThrow();
+		this.capacity = links.stream().mapToInt(l -> l.tracks).min().orElseThrow();
+		this.reservations = new HashSet<>(capacity);
+		this.tracks = new HashMap<>(links.size());
+
+		for (RailLink link : links) {
+			tracks.put(link, new MobsimDriverAgent[link.tracks]);
+		}
+	}
+
+	@Override
+	public ResourceType getType() {
+		return ResourceType.fixedBlock;
 	}
 
 	@Override
@@ -63,23 +79,80 @@ public final class FixedBlockResource implements RailResource {
 	 * Whether an agent is able to block this resource.
 	 */
 	@Override
-	public boolean hasCapacity(double time, TrainPosition position) {
+	public boolean hasCapacity(RailLink link, TrainPosition position) {
+
+		// there is no need to check the individual tracks here
+		if (reservations.contains(position.getDriver())) {
+			return true;
+		}
+
 		return reservations.size() < capacity;
 	}
 
 	@Override
-	public boolean isReservedBy(MobsimDriverAgent driver) {
-		return reservations.contains(driver);
+	public boolean isReservedBy(RailLink link, MobsimDriverAgent driver) {
+		MobsimDriverAgent[] state = tracks.get(link);
+		for (MobsimDriverAgent reserved : state) {
+			if (reserved == driver) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Override
-	public void reserve(TrainPosition position) {
+	public int reserve(RailLink link, TrainPosition position) {
+
 		reservations.add(position.getDriver());
+
+		if (reservations.size() > capacity) {
+			throw new IllegalStateException("Too many reservations. Capacity needs to be checked before calling reserve.");
+		}
+
+		MobsimDriverAgent[] state = tracks.get(link);
+		for (int i = 0; i < state.length; i++) {
+			if (state[i] == null) {
+				state[i] = position.getDriver();
+				return i;
+			}
+		}
+
+		throw new IllegalStateException("No track was free.");
 	}
 
 	@Override
-	public void release(MobsimDriverAgent driver) {
-		reservations.remove(driver);
+	public int release(RailLink link, MobsimDriverAgent driver) {
+
+		MobsimDriverAgent[] state = tracks.get(link);
+		int track = -1;
+		for (int i = 0; i < state.length; i++) {
+			if (state[i] == driver) {
+				state[i] = null;
+				track = i;
+				break;
+			}
+		}
+
+		if (track == -1)
+			throw new AssertionError("Driver " + driver + " has not reserved the track.");
+
+		boolean allFree = true;
+		for (MobsimDriverAgent[] others : tracks.values()) {
+			for (MobsimDriverAgent other : others) {
+				if (other == driver) {
+					allFree = false;
+					break;
+				}
+			}
+		}
+
+		// if the driver has no more reservations, remove it from the set
+		if (allFree) {
+			reservations.remove(driver);
+		}
+
+		return track;
 	}
 
 }

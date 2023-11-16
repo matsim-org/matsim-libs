@@ -19,8 +19,8 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine.router;
 
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailLink;
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailResourceManager;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import jakarta.inject.Inject;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;

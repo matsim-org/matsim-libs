@@ -1,4 +1,4 @@
-package ch.sbb.matsim.contrib.railsim.qsimengine;
+package ch.sbb.matsim.contrib.railsim.qsimengine.resources;
 
 /**
  * Describes the type of resource.

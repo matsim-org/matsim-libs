@@ -19,16 +19,14 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine.disposition;
 
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailLink;
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailResourceManager;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimCalc;
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
 import jakarta.inject.Inject;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -96,6 +94,8 @@ public class SimpleDisposition implements TrainDisposition {
 			}
 		 */
 
+		// TODO: resource manager should return the reserved distances
+
 		// Assume rest of link is already reserved (fixed block)
 		double reserveDist = resources.getLink(position.getHeadLink()).getLength() - position.getHeadPosition();
 		boolean stop = false;
@@ -119,6 +119,6 @@ public class SimpleDisposition implements TrainDisposition {
 	public void unblockRailLink(double time, MobsimDriverAgent driver, RailLink link) {
 
 		// put resource handling into release track
-		resources.releaseTrack(time, driver, link);
+		resources.releaseTrack(time, link, driver);
 	}
 }

@@ -1,7 +1,7 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine.resources;
 
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailLink;
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 import java.util.List;
@@ -9,12 +9,19 @@ import java.util.List;
 /**
  * A moving block, which allows multiple trains and needs to make sure that they don't collide.
  */
-public final class MovingBlockResource implements RailResource {
+final class MovingBlockResource implements RailResourceInternal {
 
+	private final Id<RailResource> id;
 	final List<RailLink> links;
 
-	public MovingBlockResource(List<RailLink> links) {
+	MovingBlockResource(Id<RailResource> id, List<RailLink> links) {
+		this.id = id;
 		this.links = links;
+	}
+
+	@Override
+	public ResourceType getType() {
+		return ResourceType.movingBlock;
 	}
 
 	@Override
@@ -23,22 +30,22 @@ public final class MovingBlockResource implements RailResource {
 	}
 
 	@Override
-	public boolean hasCapacity(double time, TrainPosition position) {
-		return false;
+	public boolean hasCapacity(RailLink link, TrainPosition position) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public boolean isReservedBy(MobsimDriverAgent driver) {
-		return false;
+	public boolean isReservedBy(RailLink link, MobsimDriverAgent driver) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public void reserve(TrainPosition position) {
-
+	public int reserve(RailLink link, TrainPosition position) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public void release(MobsimDriverAgent driver) {
-
+	public int release(RailLink link, MobsimDriverAgent driver) {
+		throw new UnsupportedOperationException();
 	}
 }

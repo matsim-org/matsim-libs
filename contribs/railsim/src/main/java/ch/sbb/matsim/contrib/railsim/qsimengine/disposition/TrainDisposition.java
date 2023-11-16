@@ -19,11 +19,10 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine.disposition;
 
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailLink;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 /**
