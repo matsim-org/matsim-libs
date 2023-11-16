@@ -22,7 +22,6 @@ package ch.sbb.matsim.contrib.railsim.qsimengine.resources;
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
-import ch.sbb.matsim.contrib.railsim.qsimengine.TrackState;
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
 import jakarta.inject.Inject;
 import org.matsim.api.core.v01.Id;
@@ -119,23 +118,32 @@ public final class RailResourceManager {
 	}
 
 	/**
-	 * Try to block a track and the underlying resource and return whether it was successful.
+	 * Try to block a track and the underlying resource and return the allowed distance.
 	 */
-	public boolean tryBlockTrack(double time, TrainPosition position, RailLink link) {
-		if (link.resource.isReservedBy(link, position.getDriver()))
-			return true;
+	public double tryBlockLink(double time, TrainPosition position, RailLink link) {
+
+		double reservedDist = link.resource.getReservedDist(link, position.getDriver());
+		if (reservedDist > 0) {
+
+			// TODO: retrieving reserved dist might already depend on position
+			// subtraction should be higher up
+
+			if (link.getLinkId().equals(position.getHeadLink()))
+				return reservedDist - position.getHeadPosition();
+
+			return reservedDist;
+		}
 
 		if (link.resource.hasCapacity(link, position)) {
 
-			int track = link.resource.reserve(link, position);
-			if (track >= 0)
-				eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), link.getLinkId(),
-					position.getDriver().getVehicle().getId(), TrackState.BLOCKED, track));
+			double dist = link.resource.reserve(link, position);
+			eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), link.getLinkId(),
+				position.getDriver().getVehicle().getId(), link.resource.getState(link)));
 
-			return true;
+			return dist;
 		}
 
-		return false;
+		return 0;
 	}
 
 	/**
@@ -150,17 +158,17 @@ public final class RailResourceManager {
 	 * Whether a driver already reserved a link.
 	 */
 	public boolean isBlockedBy(RailLink link, MobsimDriverAgent driver) {
-		return link.resource.isReservedBy(link, driver);
+		return link.resource.getReservedDist(link, driver) > 0;
 	}
 
 	/**
 	 * Release a non-free track to be free again.
 	 */
-	public void releaseTrack(double time, RailLink link, MobsimDriverAgent driver) {
+	public void releaseLink(double time, RailLink link, MobsimDriverAgent driver) {
 
-		int track = link.resource.release(link, driver);
+		link.resource.release(link, driver);
 
 		eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), link.getLinkId(), driver.getVehicle().getId(),
-			TrackState.FREE, track));
+			link.resource.getState(link)));
 	}
 }

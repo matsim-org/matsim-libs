@@ -46,7 +46,6 @@ public interface TrainDisposition {
 
 	/**
 	 * Inform the resource manager that the train has passed a link that can now be unblocked.
-	 * This needs to be called after track states have been updated already.
 	 */
 	void unblockRailLink(double time, MobsimDriverAgent driver, RailLink link);
 

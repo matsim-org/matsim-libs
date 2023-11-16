@@ -75,9 +75,16 @@ final class FixedBlockResource implements RailResourceInternal {
 		return links;
 	}
 
-	/**
-	 * Whether an agent is able to block this resource.
-	 */
+	@Override
+	public ResourceState getState(RailLink link) {
+		if (reservations.isEmpty())
+			return ResourceState.EMPTY;
+		if (reservations.size() < capacity)
+			return ResourceState.IN_USE;
+
+		return ResourceState.EXHAUSTED;
+	}
+
 	@Override
 	public boolean hasCapacity(RailLink link, TrainPosition position) {
 
@@ -90,19 +97,19 @@ final class FixedBlockResource implements RailResourceInternal {
 	}
 
 	@Override
-	public boolean isReservedBy(RailLink link, MobsimDriverAgent driver) {
+	public double getReservedDist(RailLink link, MobsimDriverAgent driver) {
 		MobsimDriverAgent[] state = tracks.get(link);
 		for (MobsimDriverAgent reserved : state) {
 			if (reserved == driver) {
-				return true;
+				return link.length;
 			}
 		}
 
-		return false;
+		return 0;
 	}
 
 	@Override
-	public int reserve(RailLink link, TrainPosition position) {
+	public double reserve(RailLink link, TrainPosition position) {
 
 		reservations.add(position.getDriver());
 
@@ -114,7 +121,7 @@ final class FixedBlockResource implements RailResourceInternal {
 		for (int i = 0; i < state.length; i++) {
 			if (state[i] == null) {
 				state[i] = position.getDriver();
-				return i;
+				return link.length;
 			}
 		}
 
@@ -122,7 +129,7 @@ final class FixedBlockResource implements RailResourceInternal {
 	}
 
 	@Override
-	public int release(RailLink link, MobsimDriverAgent driver) {
+	public void release(RailLink link, MobsimDriverAgent driver) {
 
 		MobsimDriverAgent[] state = tracks.get(link);
 		int track = -1;
@@ -151,8 +158,6 @@ final class FixedBlockResource implements RailResourceInternal {
 		if (allFree) {
 			reservations.remove(driver);
 		}
-
-		return track;
 	}
 
 }

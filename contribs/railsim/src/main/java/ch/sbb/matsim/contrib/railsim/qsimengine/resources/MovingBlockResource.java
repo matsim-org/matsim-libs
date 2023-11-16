@@ -30,22 +30,27 @@ final class MovingBlockResource implements RailResourceInternal {
 	}
 
 	@Override
+	public ResourceState getState(RailLink link) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public boolean hasCapacity(RailLink link, TrainPosition position) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public boolean isReservedBy(RailLink link, MobsimDriverAgent driver) {
+	public double getReservedDist(RailLink link, MobsimDriverAgent driver) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public int reserve(RailLink link, TrainPosition position) {
+	public double reserve(RailLink link, TrainPosition position) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public int release(RailLink link, MobsimDriverAgent driver) {
+	public void release(RailLink link, MobsimDriverAgent driver) {
 		throw new UnsupportedOperationException();
 	}
 }

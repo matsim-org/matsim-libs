@@ -51,8 +51,8 @@ public class SimpleDisposition implements TrainDisposition {
 	@Override
 	public DispositionResponse requestNextSegment(double time, TrainPosition position, double dist) {
 
-		List<RailLink> segment = RailsimCalc.calcLinksToBlock(position,
-			resources.getLink(position.getHeadLink()), dist);
+		RailLink currentLink = resources.getLink(position.getHeadLink());
+		List<RailLink> segment = RailsimCalc.calcLinksToBlock(position, currentLink, dist);
 
 		// Only re-routes if the link segment is occupied
 //		for (RailLink link : segment) {
@@ -94,19 +94,27 @@ public class SimpleDisposition implements TrainDisposition {
 			}
 		 */
 
-		// TODO: resource manager should return the reserved distances
+		// TODO: for moving block the logic might needs to be changed
 
-		// Assume rest of link is already reserved (fixed block)
-		double reserveDist = resources.getLink(position.getHeadLink()).getLength() - position.getHeadPosition();
+		double reserveDist = resources.tryBlockLink(time, position, currentLink);
+
+		// need to stop on current link, this should only occur with moving block
+		if (reserveDist < currentLink.getLength() - position.getHeadPosition()) {
+			throw new IllegalStateException("Not possible with fixed blocks.");
+//			return new DispositionResponse(reserveDist, 0, null);
+		}
+
 		boolean stop = false;
 
 		// Iterate all links that need to be blocked
 		for (RailLink link : segment) {
 
-			// Check if single link can be reserved
-			if (resources.tryBlockTrack(time, position, link)) {
-				reserveDist += link.getLength();
-			} else {
+			dist = resources.tryBlockLink(time, position, link);
+			reserveDist += dist;
+
+			// If the link is not fully reserved then stop
+			// TODO: there might be a better advised speed
+			if (dist < link.getLength()) {
 				stop = true;
 				break;
 			}
@@ -119,6 +127,6 @@ public class SimpleDisposition implements TrainDisposition {
 	public void unblockRailLink(double time, MobsimDriverAgent driver, RailLink link) {
 
 		// put resource handling into release track
-		resources.releaseTrack(time, link, driver);
+		resources.releaseLink(time, link, driver);
 	}
 }

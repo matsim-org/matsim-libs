@@ -45,7 +45,7 @@ public final class RailsimCsvWriter {
 	 * Write {@link RailsimLinkStateChangeEvent} to a csv file.
 	 */
 	public static void writeLinkStatesCsv(List<RailsimLinkStateChangeEvent> events, String filename) throws UncheckedIOException {
-		String[] header = {"link", "time", "state", "vehicle", "track"};
+		String[] header = {"link", "time", "state", "vehicle"};
 
 		try (CSVPrinter csv = new CSVPrinter(IOUtils.getBufferedWriter(filename), CSVFormat.DEFAULT.builder().setHeader(header).build())) {
 			for (RailsimLinkStateChangeEvent event : events) {
@@ -53,7 +53,6 @@ public final class RailsimCsvWriter {
 				csv.print(event.getTime());
 				csv.print(event.getState().toString());
 				csv.print(event.getVehicleId() != null ? event.getVehicleId().toString() : "");
-				csv.print(event.getTrack());
 				csv.println();
 			}
 		} catch (IOException e) {

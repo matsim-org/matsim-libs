@@ -1,9 +1,5 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine.resources;
 
-import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
-import org.matsim.api.core.v01.Identifiable;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-
 import java.util.List;
 
 /**
@@ -20,5 +16,10 @@ public interface RailResource {
 	 * The links that are represented by this resource.
 	 */
 	List<RailLink> getLinks();
+
+	/**
+	 * State of a specific link.
+	 */
+	ResourceState getState(RailLink link);
 
 }

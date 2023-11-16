@@ -15,18 +15,20 @@ interface RailResourceInternal extends RailResource {
 	boolean hasCapacity(RailLink link, TrainPosition position);
 
 	/**
-	 * Whether an agent is able to block this resource.
+	 * The reserved distance on this link for an agent. Returns 0 if the agent has no reservation.
 	 */
-	boolean isReservedBy(RailLink link, MobsimDriverAgent driver);
+	double getReservedDist(RailLink link, MobsimDriverAgent driver);
 
 	/**
 	 * Reserves this resource for the given agent.
+	 *
+	 * @return the reserved distance on this link
 	 */
-	int reserve(RailLink link, TrainPosition position);
+	double reserve(RailLink link, TrainPosition position);
 
 	/**
 	 * Releases this resource for the given agent.
 	 */
-	int release(RailLink link, MobsimDriverAgent driver);
+	void release(RailLink link, MobsimDriverAgent driver);
 
 }
