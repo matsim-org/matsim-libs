@@ -39,16 +39,19 @@ public class DisallowedNextLinks {
 	public boolean addDisallowedLinkSequence(String mode, List<Id<Link>> linkSequence) {
 		List<List<Id<Link>>> linkSequences = this.linkIdSequencesMap.computeIfAbsent(mode, m -> new ArrayList<>());
 
-		boolean result = false;
 		// prevent adding empty/duplicate link id sequences, or duplicate link ids
-		if (!linkSequence.isEmpty() && new HashSet<>(linkSequence).size() == linkSequence.size()
-				&& !linkSequences.contains(linkSequence)) {
-			result = linkSequences.add(ImmutableList.copyOf(linkSequence));
-			if (result) { // sorting is required for a.equals(b) <=> a.hashCode() == b.hashCode()
-				Collections.sort(linkSequences, (l, r) -> l.toString().compareTo(r.toString()));
-			}
+		if (linkSequence.isEmpty() || new HashSet<>(linkSequence).size() != linkSequence.size()
+				|| linkSequences.contains(linkSequence)) {
+			return false;
 		}
-		return result;
+
+		if (!linkSequences.add(ImmutableList.copyOf(linkSequence))) {
+			return false;
+		}
+
+		// sorting is required for a.equals(b) <=> a.hashCode() == b.hashCode()
+		Collections.sort(linkSequences, (l, r) -> l.toString().compareTo(r.toString()));
+		return true;
 	}
 
 	public List<List<Id<Link>>> getDisallowedLinkSequences(String mode) {
