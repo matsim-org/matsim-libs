@@ -50,6 +50,13 @@ public class Depots {
 		if (!STAY.isBaseTypeOf(currentTask)) {
 			return false;
 		}
+		
+		// only if stay task is last task: with prebooking we may also idle during the day, but
+		// currently all the downstream relocation/charging logic assumes that we only stay at 
+		// the end of the schedule
+		if (currentTask.getTaskIdx() < schedule.getTaskCount() - 1) {
+			return false;
+		}
 
 		// previous task was STOP
 		int previousTaskIdx = currentTask.getTaskIdx() - 1;
