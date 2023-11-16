@@ -38,7 +38,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
-import org.matsim.pt.config.TransitConfigGroup.TransitRoutingAlgorithmType;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -105,11 +104,8 @@ public class SubsidyTestIT implements TabularFileHandler {
 
 		// Check final iteration
 		String actual = this.pStatsResults.get(2)[9];
-		// flaky (non-deterministic) test... allow two results
-		if (!"174413625.6239444000".equals(actual) && !"174413625.7708889500".equals(actual)) {
-			Assert.fail("Wrong number of budget (final iteration: " + actual);
-		}
-//		Assert.assertEquals("Number of budget (final iteration)", "174413625.6239444000", this.pStatsResults.get(2)[9]);
+		// flaky (non-deterministic) test... allow multiple results
+		Assert.assertEquals("Number of budget (final iteration)", 174413625.6, Double.parseDouble(actual), 1);
 	}
 
 	@Override

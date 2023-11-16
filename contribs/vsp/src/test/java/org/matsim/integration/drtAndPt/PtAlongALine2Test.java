@@ -235,7 +235,6 @@ public class PtAlongALine2Test {
 				drtConfigGroup.maxWaitTime = Double.MAX_VALUE;
 				drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
 				drtConfigGroup.useModeFilteredSubnetwork = true;
-				drtConfigGroup.advanceRequestPlanningHorizon = 99999;
 
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 				mm.addParameterSet(drtConfigGroup);

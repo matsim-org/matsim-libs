@@ -257,20 +257,22 @@ class ScenarioLoaderImpl {
 		else {
 			log.info("no households file set in config, not loading households");
 		}
-		final String fn = this.config.households().getInputHouseholdAttributesFile();
-		if ((this.config.households() != null) && ( fn != null)) {
-			if (!this.config.households().isInsistingOnUsingDeprecatedHouseholdsAttributeFile()) {
-				throw new RuntimeException(HouseholdsConfigGroup.HOUSEHOLD_ATTRIBUTES_DEPRECATION_MESSAGE);
-			}
+		if ((this.config.households() != null)) {
+			final String fn = this.config.households().getInputHouseholdAttributesFile();
+			if(( fn != null)) {
+				if (!this.config.households().isInsistingOnUsingDeprecatedHouseholdsAttributeFile()) {
+					throw new RuntimeException(HouseholdsConfigGroup.HOUSEHOLD_ATTRIBUTES_DEPRECATION_MESSAGE);
+				}
 
-			URL householdAttributesFileName = ConfigGroup.getInputFileURL(this.config.getContext(), fn ) ;
-			log.info("loading household attributes from " + householdAttributesFileName);
-			parseObjectAttributesToAttributable(
-					householdAttributesFileName,
-					this.scenario.getHouseholds().getHouseholds().values(),
-					"householdAttributes not empty after going through all households, meaning that it contains material for householdIDs that " +
-							"are not in the container.  This is not necessarily a bug so we will continue, but note that such material " +
-							"will no longer be contained in the output_* files.");
+				URL householdAttributesFileName = ConfigGroup.getInputFileURL(this.config.getContext(), fn ) ;
+				log.info("loading household attributes from " + householdAttributesFileName);
+				parseObjectAttributesToAttributable(
+						householdAttributesFileName,
+						this.scenario.getHouseholds().getHouseholds().values(),
+						"householdAttributes not empty after going through all households, meaning that it contains material for householdIDs that " +
+								"are not in the container.  This is not necessarily a bug so we will continue, but note that such material " +
+								"will no longer be contained in the output_* files.");
+			}
 		}
 		else {
 			log.info("no household-attributes file set in config, not loading any household attributes");

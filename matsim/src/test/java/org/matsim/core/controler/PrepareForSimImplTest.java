@@ -19,10 +19,7 @@
 
 package org.matsim.core.controler;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -55,6 +52,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
 import com.google.inject.Provider;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Mostly tests adaptation of old plans to routing mode and the related replacement of helper modes for access and egress
@@ -758,6 +760,48 @@ public class PrepareForSimImplTest {
 			Assert.assertEquals("wrong routing mode!", TransportMode.drt, TripStructureUtils.getRoutingMode(leg4));
 			Assert.assertEquals("wrong routing mode!", TransportMode.drt, TripStructureUtils.getRoutingMode(leg5));
 		}
+	}
+
+	@Test
+	public void vehicleTypes() {
+
+		Config config = ConfigUtils.createConfig();
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		createAndAddNetwork(scenario);
+		Population pop = scenario.getPopulation();
+		PopulationFactory f = pop.getFactory();
+
+		// add truck type
+		VehicleType truckType = scenario.getVehicles().getFactory().createVehicleType(Id.create("truck", VehicleType.class));
+		scenario.getVehicles().addVehicleType(truckType);
+
+		// Create test person
+		Person p1 = f.createPerson(Id.createPersonId("1"));
+		{
+			VehicleUtils.insertVehicleTypesIntoAttributes(p1, Map.of(TransportMode.car, Id.create("truck", VehicleType.class)));
+
+			Plan plan = f.createPlan();
+			Activity act = f.createActivityFromCoord("home", new Coord(0, 0));
+			act.setEndTime(3600);
+			plan.addActivity(act);
+			plan.addLeg(f.createLeg(TransportMode.car));
+			plan.addActivity(f.createActivityFromCoord("work", new Coord(1000, 0)));
+			p1.addPlan(plan);
+			pop.addPerson(p1);
+		}
+
+		// run prepare
+		final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(),
+			pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(),
+			config.plans(), new MainModeIdentifierImpl(), TimeInterpretation.create(config));
+
+		prepareForSimImpl.run();
+
+		Id<Vehicle> id = VehicleUtils.getVehicleId(p1, TransportMode.car);
+		assertThat(scenario.getVehicles().getVehicles().get(id).getType())
+			.isEqualTo(truckType);
+
 	}
 
 	private class DummyTripRouterProvider implements Provider<TripRouter> {

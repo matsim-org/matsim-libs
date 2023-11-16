@@ -29,11 +29,11 @@ import org.matsim.freight.carriers.CarrierService;
 import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
 import org.matsim.freight.carriers.events.CarrierServiceStartEvent;
-import org.matsim.freight.carriers.events.eventhandler.FreightServiceEndEventHandler;
-import org.matsim.freight.carriers.events.eventhandler.FreightServiceStartEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierServiceEndEventHandler;
+import org.matsim.freight.carriers.events.eventhandler.CarrierServiceStartEventHandler;
 import org.matsim.vehicles.Vehicles;
 
- class MyServiceTrackerEventHandler implements ActivityStartEventHandler, FreightServiceStartEventHandler, FreightServiceEndEventHandler {
+ class MyServiceTrackerEventHandler implements ActivityStartEventHandler, CarrierServiceStartEventHandler, CarrierServiceEndEventHandler {
     private final Vehicles vehicles;
     private final Network network;
     private final Carriers carriers;

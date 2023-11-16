@@ -85,7 +85,7 @@ public class CarrierShipmentDeliveryStartEvent extends AbstractCarrierEvent {
 		Id<Link> shipmentTo = Id.createLinkId(attributes.get(ATTRIBUTE_LINK));
 		int size = Integer.parseInt(attributes.get(ATTRIBUTE_CAPACITYDEMAND));
 		CarrierShipment shipment = CarrierShipment.Builder.newInstance(shipmentId, null, shipmentTo, size)
-				.setDeliveryServiceTime(Double.parseDouble(attributes.get(ATTRIBUTE_SERVICE_DURATION)))
+				.setDeliveryServiceTime(Double.parseDouble(attributes.get(ATTRIBUTE_DROPOFF_DURATION)))
 				.build();
 		Id<Vehicle> vehicleId = Id.createVehicleId(attributes.get(ATTRIBUTE_VEHICLE));
 		return new CarrierShipmentDeliveryStartEvent(time, carrierId, shipment, vehicleId);

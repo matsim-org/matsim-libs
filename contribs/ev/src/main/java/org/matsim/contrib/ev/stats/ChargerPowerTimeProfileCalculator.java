@@ -19,7 +19,7 @@ import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
 
-public class ChargerPowerTimeProfileCalculator implements ChargingStartEventHandler, ChargingEndEventHandler {
+public final class ChargerPowerTimeProfileCalculator implements ChargingStartEventHandler, ChargingEndEventHandler {
 
 	private final Map<Id<Charger>, double[]> chargerProfiles = new HashMap<>();
 	private final Map<Id<Vehicle>, Double> chargingStartTimeMap = new HashMap<>();
@@ -35,7 +35,7 @@ public class ChargerPowerTimeProfileCalculator implements ChargingStartEventHand
 	 * @author mattiasingelstrom
 	 */
 	@Inject
-	public ChargerPowerTimeProfileCalculator(Config config) {
+	ChargerPowerTimeProfileCalculator(Config config) {
 		int chargeTimeStep = ConfigUtils.addOrGetModule(config, EvConfigGroup.class).chargeTimeStep;
 		qsimEndTime = ConfigUtils.addOrGetModule(config, QSimConfigGroup.class).getEndTime().orElse(0.0);
 		timeDiscretizer = new TimeDiscretizer((int)Math.ceil(qsimEndTime), chargeTimeStep);

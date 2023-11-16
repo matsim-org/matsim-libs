@@ -39,13 +39,13 @@ import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-public class IndividualChargeTimeProfileCollectorProvider implements Provider<MobsimListener> {
+public final class IndividualChargeTimeProfileCollectorProvider implements Provider<MobsimListener> {
 	private final ElectricFleet evFleet;
 	private final MatsimServices matsimServices;
 	private final int maxVehicleColumns;
 
 	@Inject
-	public IndividualChargeTimeProfileCollectorProvider(ElectricFleet evFleet, MatsimServices matsimServices, Config config) {
+	IndividualChargeTimeProfileCollectorProvider(ElectricFleet evFleet, MatsimServices matsimServices, Config config) {
 		this.evFleet = evFleet;
 		this.matsimServices = matsimServices;
 		maxVehicleColumns = ConfigUtils.addOrGetModule(config, EvConfigGroup.class).numberOfIndividualTimeProfiles;

@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.extension.operations.eshifts.run;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.extension.edrt.EDrtActionCreator;
 import org.matsim.contrib.drt.extension.edrt.optimizer.EDrtVehicleDataEntryFactory;
 import org.matsim.contrib.drt.extension.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.drt.extension.edrt.scheduler.EmptyVehicleChargingScheduler;
@@ -20,22 +21,28 @@ import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DefaultShif
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DrtShiftDispatcher;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DrtShiftDispatcherImpl;
 import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftVehicleDataEntryFactory;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtActionCreator;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtTaskFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShifts;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.prebooking.PrebookingActionCreator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
+import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
+import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
+
+import com.google.inject.Singleton;
 
 /**
  * @author nkuehnel / MOIA
@@ -69,7 +76,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 						new EDrtAssignShiftToVehicleLogic(new DefaultAssignShiftToVehicleLogic(drtShiftParams), drtShiftParams)),
 						getter.getModal(Fleet.class)))).asEagerSingleton();
 
-		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter -> new ShiftVehicleDataEntryFactory(new EDrtVehicleDataEntryFactory(drtCfg, 0)))).asEagerSingleton();
+		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter -> new ShiftVehicleDataEntryFactory(new EDrtVehicleDataEntryFactory(0)))).asEagerSingleton();
 
 		final ShiftEDrtTaskFactoryImpl taskFactory = new ShiftEDrtTaskFactoryImpl(new EDrtTaskFactoryImpl());
 		bindModal(DrtTaskFactory.class).toInstance(taskFactory);
@@ -81,10 +88,26 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 						getter.get(MobsimTimer.class), taskFactory, drtShiftParams, getter.getModal(ChargingInfrastructure.class),
 						getter.getModal(OperationFacilities.class), getter.getModal(Fleet.class))
 		)).asEagerSingleton();
+		
+		// See EDrtModeOptimizerQSimModule
+		bindModal(VrpLegFactory.class).toProvider(modalProvider(getter -> {
+			DvrpConfigGroup dvrpCfg = getter.get(DvrpConfigGroup.class);
+			MobsimTimer timer = getter.get(MobsimTimer.class);
+			
+			// Makes basic DrtActionCreator create legs with consumption tracker
+			return v -> EDrtActionCreator.createLeg(dvrpCfg.mobsimMode, v, timer);
+		})).in(Singleton.class);
+		
+		bindModal(ShiftEDrtActionCreator.class).toProvider(modalProvider(getter -> {
+			VrpAgentLogic.DynActionCreator delegate = drtCfg.getPrebookingParams().isPresent()
+					? getter.getModal(PrebookingActionCreator.class)
+					: getter.getModal(DrtActionCreator.class);
 
-		bindModal(VrpAgentLogic.DynActionCreator.class).toProvider(modalProvider(
-				getter -> new ShiftEDrtActionCreator(getter.getModal(PassengerHandler.class),
-						getter.get(MobsimTimer.class), getter.get(DvrpConfigGroup.class)))
-		).asEagerSingleton();
+			return new ShiftEDrtActionCreator(
+					new ShiftDrtActionCreator(getter.getModal(PassengerHandler.class), delegate),
+					getter.get(MobsimTimer.class), getter.getModal(PassengerHandler.class));
+		})).asEagerSingleton();
+		
+		bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(ShiftEDrtActionCreator.class));
 	}
 }
