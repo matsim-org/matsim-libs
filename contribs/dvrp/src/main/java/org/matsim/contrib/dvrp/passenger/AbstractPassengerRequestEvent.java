@@ -68,7 +68,7 @@ public abstract class AbstractPassengerRequestEvent extends Event {
 	 * @return ids of the passengers (persons)
 	 */
 	public final List<Id<Person>> getPersonIds() {
-		return Collections.unmodifiableList(personIds);
+		return List.copyOf(personIds);
 	}
 
 	@Override

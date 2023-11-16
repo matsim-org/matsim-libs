@@ -46,4 +46,6 @@ public interface PassengerRequest extends Request {
 	List<Id<Person>> getPassengerIds();
 
 	String getMode();
+
+	int getPartySize();
 }

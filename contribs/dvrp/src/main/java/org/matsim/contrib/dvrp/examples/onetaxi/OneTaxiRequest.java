@@ -82,12 +82,17 @@ public final class OneTaxiRequest implements PassengerRequest {
 
 	@Override
 	public List<Id<Person>> getPassengerIds() {
-		return Collections.unmodifiableList(passengerIds);
+		return List.copyOf(passengerIds);
 	}
 
 	@Override
 	public String getMode() {
 		return mode;
+	}
+
+	@Override
+	public int getPartySize() {
+		return passengerIds.size();
 	}
 
 	public static final class OneTaxiRequestCreator implements PassengerRequestCreator {

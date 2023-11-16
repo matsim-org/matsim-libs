@@ -101,7 +101,7 @@ public class ChargingBreakActivity extends FirstLastSimStepDynActivity implement
 
     private AcceptedDrtRequest getRequestForPassengers(List<Id<Person>> passengerIds) {
         return pickupRequests.values().stream()
-                .filter(r -> r.getPassengerIds().containsAll(passengerIds))
+                .filter(r -> r.getPassengerIds().size() == passengerIds.size() && r.getPassengerIds().containsAll(passengerIds))
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("I am waiting for different passengers!"));
     }

@@ -285,8 +285,8 @@ public class DrtSpeedUpTest {
 				MODE, requestId.toString());
 		var departureEvent = mock(PersonDepartureEvent.class);
 
-		return new EventSequence(Map.of(personId, departureEvent), submittedEvent, mock(PassengerRequestScheduledEvent.class),
-				Map.of(personId, pickupEvent), Map.of(personId, dropoffEvent), List.of(drtFare));
+		return new EventSequence(personId, departureEvent, submittedEvent, mock(PassengerRequestScheduledEvent.class),
+				pickupEvent, dropoffEvent, List.of(drtFare));
 	}
 
 	DvrpVehicleSpecification vehicleSpecification(String id) {

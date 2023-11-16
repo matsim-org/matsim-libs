@@ -229,7 +229,7 @@ public class InsertionGenerator {
 			// i -> pickup -> i+1 && j -> dropoff -> j+1
 			// check the capacity constraints if i < j (already validated for `i == j`)
 			Waypoint.Stop currentStop = currentStop(vEntry, j);
-			if (vEntry.vehicle.getCapacity() - currentStop.outgoingOccupancy < request.getPassengerIds().size()) {
+			if (currentStop.outgoingOccupancy + request.getPassengerIds().size() > vEntry.vehicle.getCapacity()) {
 				if (request.getToLink() == currentStop.task.getLink()) {
 					//special case -- we can insert dropoff exactly at node j
 					addInsertion(insertions,

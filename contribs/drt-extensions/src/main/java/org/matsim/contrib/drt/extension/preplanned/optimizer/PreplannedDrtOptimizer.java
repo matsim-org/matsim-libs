@@ -201,7 +201,7 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 									  Map<PreplannedRequestKey, PreplannedRequest> unassignedRequests) {
 	}
 
-	public record PreplannedRequestKey(List<Id<Person>> passengerIds, Id<Link> fromLinkId, Id<Link> toLinkId) {
+	public record PreplannedRequestKey(Set<Id<Person>> passengerIds, Id<Link> fromLinkId, Id<Link> toLinkId) {
 	}
 
 	// also input to the external optimiser
@@ -210,7 +210,7 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 	}
 
 	static PreplannedRequest createFromRequest(DrtRequest request) {
-		return new PreplannedRequest(new PreplannedRequestKey(request.getPassengerIds(), request.getFromLink().getId(),
+		return new PreplannedRequest(new PreplannedRequestKey(Set.copyOf(request.getPassengerIds()), request.getFromLink().getId(),
 				request.getToLink().getId()), request.getEarliestStartTime(), request.getLatestStartTime(),
 				request.getLatestArrivalTime());
 	}

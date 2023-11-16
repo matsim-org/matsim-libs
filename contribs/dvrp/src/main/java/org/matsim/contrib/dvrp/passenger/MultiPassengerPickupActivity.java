@@ -78,7 +78,7 @@ public class MultiPassengerPickupActivity extends FirstLastSimStepDynActivity im
 	private PassengerRequest getRequestForPassenger(List<Id<Person>> passengerIds) {
 		return requests.values()
 				.stream()
-				.filter(r -> r.getPassengerIds().containsAll(passengerIds))
+				.filter(r -> r.getPassengerIds().size() == passengerIds.size() && r.getPassengerIds().containsAll(passengerIds))
 				.findAny()
 				.orElseThrow(() -> new IllegalArgumentException("I am waiting for different passengers!"));
 	}
