@@ -24,8 +24,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingModule;
+import org.matsim.contrib.drt.prebooking.analysis.PrebookingModeAnalysisModule;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
+import org.matsim.contrib.drt.stops.MinimumStopDurationAdapter;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
+import org.matsim.contrib.drt.stops.PrebookingStopTimeCalculator;
+import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
@@ -82,12 +87,27 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 							getter.getModal(DrtEventSequenceCollector.class)))).asEagerSingleton();
 			addControlerListenerBinding().to(modalKey(DrtSpeedUp.class));
 		});
-
+		
+		bindModal(PassengerStopDurationProvider.class).toProvider(modalProvider(getter -> {
+			return StaticPassengerStopDurationProvider.of(drtCfg.stopDuration, 0.0);
+		}));
+		
 		bindModal(DefaultStopTimeCalculator.class).toProvider(modalProvider(getter -> {
 			return new DefaultStopTimeCalculator(drtCfg.stopDuration);
 		})).in(Singleton.class);
-
-		bindModal(StopTimeCalculator.class).to(modalKey(DefaultStopTimeCalculator.class));
+		
+		if (drtCfg.getPrebookingParams().isEmpty()) {
+			bindModal(StopTimeCalculator.class).toProvider(modalProvider(getter -> {
+				return new DefaultStopTimeCalculator(drtCfg.stopDuration);
+			})).in(Singleton.class);
+		} else {
+			bindModal(StopTimeCalculator.class).toProvider(modalProvider(getter -> {
+				PassengerStopDurationProvider provider = getter.getModal(PassengerStopDurationProvider.class);
+				return new MinimumStopDurationAdapter(new PrebookingStopTimeCalculator(provider), drtCfg.stopDuration);
+			}));
+			
+			install(new PrebookingModeAnalysisModule(getMode()));
+		}
 
 		install(new AdaptiveTravelTimeMatrixModule(drtCfg.mode));
 	}
