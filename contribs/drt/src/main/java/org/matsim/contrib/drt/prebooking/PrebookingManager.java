@@ -1,8 +1,10 @@
 package org.matsim.contrib.drt.prebooking;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -10,16 +12,25 @@ import javax.annotation.Nullable;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
+import org.matsim.api.core.v01.IdSet;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
+import org.matsim.contrib.drt.prebooking.unscheduler.RequestUnscheduler;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.AdvanceRequestProvider;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -29,6 +40,7 @@ import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 
 /**
  * This class manages prebooked requests. One instance of PrebookingManager
@@ -47,16 +59,19 @@ import com.google.common.base.Preconditions;
  * 
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
-public class PrebookingManager implements MobsimEngine, AdvanceRequestProvider {
+public class PrebookingManager implements MobsimEngine, AdvanceRequestProvider, PassengerRequestScheduledEventHandler,
+		PassengerRequestRejectedEventHandler, PersonStuckEventHandler {
 	private final String mode;
 
 	private final Network network;
 	private final EventsManager eventsManager;
 
 	private final VrpOptimizer optimizer;
+	private final RequestUnscheduler unscheduler;
 
 	public PrebookingManager(String mode, Network network, PassengerRequestCreator requestCreator,
-			VrpOptimizer optimizer, PassengerRequestValidator requestValidator, EventsManager eventsManager) {
+			VrpOptimizer optimizer, PassengerRequestValidator requestValidator, EventsManager eventsManager,
+			RequestUnscheduler unscheduler) {
 		this.network = network;
 		this.mode = mode;
 		this.requestCreator = requestCreator;
@@ -64,6 +79,7 @@ public class PrebookingManager implements MobsimEngine, AdvanceRequestProvider {
 		this.requestAttribute = PREBOOKED_REQUEST_PREFIX + ":" + mode;
 		this.requestValidator = requestValidator;
 		this.eventsManager = eventsManager;
+		this.unscheduler = unscheduler;
 	}
 
 	// Functionality for ID management
@@ -180,14 +196,184 @@ public class PrebookingManager implements MobsimEngine, AdvanceRequestProvider {
 	// Housekeeping of requests
 
 	private IdMap<Request, RequestItem> requests = new IdMap<>(Request.class);
+	private IdSet<Request> unscheduleUponVehicleAssignment = new IdSet<>(Request.class);
 
 	private class RequestItem {
-		// this class looks minimal for now, but will be extended with canceling
-		// functionality
 		final PassengerRequest request;
+
+		Id<DvrpVehicle> vehicleId = null;
+		boolean onboard = false;
 
 		RequestItem(PassengerRequest request) {
 			this.request = request;
+		}
+	}
+
+	void notifyPickup(double now, AcceptedDrtRequest request) {
+		RequestItem item = requests.get(request.getId());
+
+		if (item != null) {
+			// may be null, we treat all (also non-prebooked) requests here
+			item.onboard = true;
+		}
+	}
+
+	void notifyDropoff(Id<Request> requestId) {
+		requests.remove(requestId);
+	}
+
+	@Override
+	public void handleEvent(PassengerRequestScheduledEvent event) {
+		RequestItem item = requests.get(event.getRequestId());
+
+		if (item != null) {
+			item.vehicleId = event.getVehicleId();
+		}
+
+		if (unscheduleUponVehicleAssignment.contains(event.getRequestId())) {
+			// this is the case if a request has been rejected / canceled after submission
+			// but before scheduling
+			unscheduler.unscheduleRequest(event.getTime(), event.getVehicleId(), event.getRequestId());
+			unscheduleUponVehicleAssignment.remove(event.getRequestId());
+		}
+	}
+
+	// Functionality for canceling requests
+
+	private static final String CANCEL_REASON = "canceled";
+	private final List<CancelItem> cancelQueue = new LinkedList<>();
+
+	private void processCanceledRequests(double now) {
+		synchronized (cancelQueue) {
+			for (CancelItem cancelItem : cancelQueue) {
+				Id<Request> requestId = cancelItem.requestId;
+				RequestItem item = requests.remove(requestId);
+
+				if (item != null) { // might be null if abandoned before canceling
+					Verify.verify(!item.onboard);
+
+					// unschedule if requests is scheduled already
+					if (item.vehicleId != null) {
+						unscheduler.unscheduleRequest(now, item.vehicleId, requestId);
+					} else {
+						unscheduleUponVehicleAssignment.add(requestId);
+					}
+
+					String reason = CANCEL_REASON;
+
+					if (cancelItem.reason != null) {
+						reason = CANCEL_REASON + ":" + cancelItem.reason;
+					}
+
+					eventsManager.processEvent(new PassengerRequestRejectedEvent(now, mode, requestId,
+							item.request.getPassengerId(), reason));
+				}
+			}
+
+			cancelQueue.clear();
+		}
+	}
+
+	public boolean cancel(Leg leg) {
+		return cancel(leg, null);
+	}
+
+	public boolean cancel(Leg leg, String reason) {
+		Id<Request> requestId = getRequestId(leg);
+
+		if (requestId != null) {
+			return cancel(requestId);
+		}
+
+		return false;
+	}
+
+	public boolean cancel(Id<Request> requestId) {
+		return cancel(requestId, null);
+	}
+
+	public boolean cancel(Id<Request> requestId, String reason) {
+		RequestItem item = requests.get(requestId);
+
+		if (item != null) {
+			if (!item.onboard) {
+				synchronized (cancelQueue) {
+					cancelQueue.add(new CancelItem(requestId, reason));
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private record CancelItem(Id<Request> requestId, String reason) {
+	}
+
+	// Functionality for abandoning requests
+
+	private static final String ABANDONED_REASON = "abandoned by vehicle";
+	private final List<Id<Request>> abandonQueue = new LinkedList<>();
+
+	void abandon(Id<Request> requestId) {
+		synchronized (abandonQueue) {
+			RequestItem item = Objects.requireNonNull(requests.get(requestId));
+			Verify.verify(!item.onboard, "Cannot abandon request, person has already entered");
+			abandonQueue.add(requestId);
+		}
+	}
+
+	private void processAbandonedRequests(double now) {
+		synchronized (abandonQueue) {
+			for (Id<Request> requestId : abandonQueue) {
+				RequestItem item = Objects.requireNonNull(requests.remove(requestId));
+				Verify.verify(!item.onboard);
+
+				// remove request from scheduled if already scheduled
+				if (item.vehicleId != null) {
+					unscheduler.unscheduleRequest(now, item.vehicleId, item.request.getId());
+				} else {
+					unscheduleUponVehicleAssignment.add(item.request.getId());
+				}
+
+				eventsManager.processEvent(new PassengerRequestRejectedEvent(now, mode, item.request.getId(),
+						item.request.getPassengerId(), ABANDONED_REASON));
+			}
+
+			abandonQueue.clear();
+		}
+	}
+
+	// React to external rejections or stuck agents
+
+	@Override
+	public void handleEvent(PassengerRequestRejectedEvent event) {
+		RequestItem item = requests.remove(event.getRequestId());
+
+		if (item != null) {
+			Verify.verify(!item.onboard);
+
+			// unschedule if already scheduled
+			if (item.vehicleId != null) {
+				unscheduler.unscheduleRequest(event.getTime(), item.vehicleId, event.getRequestId());
+			} else {
+				unscheduleUponVehicleAssignment.add(event.getRequestId());
+			}
+		}
+	}
+
+	@Override
+	public void handleEvent(PersonStuckEvent event) {
+		Iterator<RequestItem> iterator = requests.values().iterator();
+
+		while (iterator.hasNext()) {
+			RequestItem item = iterator.next();
+
+			if (item.request.getPassengerId().equals(event.getPersonId())) {
+				cancel(item.request.getId());
+			}
+			
+			queue.clear();
 		}
 	}
 
@@ -195,15 +381,19 @@ public class PrebookingManager implements MobsimEngine, AdvanceRequestProvider {
 
 	@Override
 	public void doSimStep(double now) {
+		processAbandonedRequests(now);
+		processCanceledRequests(now);
 		processQueue(now);
 	}
 
 	@Override
 	public void onPrepareSim() {
+		eventsManager.addHandler(this);
 	}
 
 	@Override
 	public void afterSim() {
+		eventsManager.removeHandler(this);
 	}
 
 	@Override

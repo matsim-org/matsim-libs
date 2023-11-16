@@ -54,7 +54,7 @@ public class PrebookingAnalysisHandler implements PassengerRequestBookedEventHan
 
 		Sequence sequence = sequences.get(event.getRequestId());
 
-		if (sequence != null) {
+		if (sequence != null && sequence.rejected == null) { // only use first
 			sequence.rejected = event;
 		}
 	}
@@ -93,14 +93,15 @@ public class PrebookingAnalysisHandler implements PassengerRequestBookedEventHan
 					sequence.submitted != null ? sequence.submitted.getTime() : null,
 					sequence.scheduled != null ? sequence.scheduled.getTime() : null,
 					sequence.rejected != null ? sequence.rejected.getTime() : null,
-					sequence.waiting != null ? sequence.waiting.getTime() : null));
+					sequence.waiting != null ? sequence.waiting.getTime() : null,
+					sequence.rejected != null ? sequence.rejected.getCause() : null));
 		}
 
 		return records;
 	}
 
 	public record RequestRecord(Id<Request> requestId, Id<Person> personId, Double submissionTime, Double scheduledTime,
-			Double rejectedTime, Double enteringTime) {
+			Double rejectedTime, Double departureTime, String rejectedReason) {
 	}
 
 	private class Sequence {
