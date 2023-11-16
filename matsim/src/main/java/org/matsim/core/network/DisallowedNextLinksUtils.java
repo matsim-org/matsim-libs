@@ -1,7 +1,6 @@
 package org.matsim.core.network;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -56,34 +55,28 @@ public class DisallowedNextLinksUtils {
 	private static List<String> getErrors(Map<Id<Link>, ? extends Link> links, Id<Link> linkId,
 			DisallowedNextLinks disallowedNextLinks) {
 
-		List<String> errors = null;
+		List<String> errors = new ArrayList<>();
 
 		Link link = links.get(linkId);
 		for (Entry<String, List<List<Id<Link>>>> entry : disallowedNextLinks.getAsMap().entrySet()) {
 			List<List<Id<Link>>> linkSequences = entry.getValue();
 			for (List<Id<Link>> linkSequence : linkSequences) {
-				if (errors == null) {
-					errors = new ArrayList<>();
-				}
 				errors.addAll(isNextLinkSequenceOf(links, link, linkSequence));
 			}
 		}
-		return errors != null ? errors : Collections.emptyList();
+		return errors;
 	}
 
 	private static List<String> isNextLinkSequenceOf(Map<Id<Link>, ? extends Link> links,
 			Link link, List<Id<Link>> nextLinkIds) {
 
-		List<String> messages = null;
+		List<String> messages = new ArrayList<>();
 
 		Link lastLink = link;
 		for (Id<Link> nextLinkId : nextLinkIds) {
 
 			// all link ids in disallowedNextLinks need be subsequent links
 			if (!isNextLinkOf(lastLink, nextLinkId)) {
-				if (messages == null) {
-					messages = new ArrayList<>();
-				}
 				messages.add(String.format("Link %s had a next link sequence that is not valid sequence: %s",
 						link.getId(), nextLinkIds));
 			}
@@ -91,15 +84,12 @@ public class DisallowedNextLinksUtils {
 
 			// all link ids in disallowedNextLinks need to exist
 			if (lastLink == null) {
-				if (messages == null) {
-					messages = new ArrayList<>();
-				}
 				messages.add(String.format("Link %s had a next link sequence with (a) missing link(s): %s",
 						link.getId(), nextLinkId));
 			}
 		}
 
-		return messages != null ? messages : Collections.emptyList();
+		return messages;
 	}
 
 	private static boolean isNextLinkOf(Link link, Id<Link> nextLinkId) {
