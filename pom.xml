@@ -36,6 +36,7 @@
         <jts.version>1.19.0</jts.version>
         <guice.version>7.0.0</guice.version>
         <jackson.version>2.16.0</jackson.version>
+        <jogl.version>2.5.0</jogl.version>
     </properties>
 
     <scm>
@@ -56,10 +57,17 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
+
         <repository>
             <id>matsim</id>
             <url>https://repo.matsim.org/repository/matsim</url>
         </repository>
+
+            <repository>
+                <id>jogl</id>
+                <url>https://jogamp.org/deployment/maven/</url>
+            </repository>
+
     </repositories>
 
     <distributionManagement>
@@ -250,16 +258,22 @@
                 <version>3.0.2</version>
             </dependency>
 
+            <!--		Using the -main version means that the native libraries are loaded automagically.  See-->
+            <!--		https://jogamp.org/wiki/index.php/Maven#Add_dependencies_on_the_correct_packages-->
             <dependency>
                 <groupId>org.jogamp.gluegen</groupId>
-                <artifactId>gluegen-rt</artifactId>
-                <version>2.4.0-matsim-1</version>
+<!--                <artifactId>gluegen-rt</artifactId>-->
+                <artifactId>gluegen-rt-main</artifactId>
+<!--                <version>2.4.0-matsim-1</version>-->
+                <version>${jogl.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.jogamp.jogl</groupId>
-                <artifactId>jogl-all</artifactId>
-                <version>2.4.0-matsim-1</version>
+<!--                <artifactId>jogl-all</artifactId>-->
+                <artifactId>jogl-all-main</artifactId>
+<!--                <version>2.4.0-matsim-1</version>-->
+                <version>${jogl.version}</version>
             </dependency>
 
             <dependency>
