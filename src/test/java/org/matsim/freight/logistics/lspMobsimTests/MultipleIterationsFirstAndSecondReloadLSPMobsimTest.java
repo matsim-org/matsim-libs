@@ -63,7 +63,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 
-public class MultipleIterationsFisrtAndSecondReloadLSPMobsimTest {
+public class MultipleIterationsFirstAndSecondReloadLSPMobsimTest {
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
