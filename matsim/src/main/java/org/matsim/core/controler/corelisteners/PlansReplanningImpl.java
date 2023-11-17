@@ -59,7 +59,7 @@ final class PlansReplanningImpl implements PlansReplanning, ReplanningListener {
 
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
-		population.getPersons().values().forEach(ReplanningUtils::setInitialPlan);
+		conflictManager.initializeReplanning(population);
 		strategyManager.run(population, event.getIteration(), replanningContextProvider.get());
 		conflictManager.run(population, event.getIteration());
 	}

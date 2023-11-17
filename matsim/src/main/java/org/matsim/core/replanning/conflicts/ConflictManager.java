@@ -41,6 +41,12 @@ public class ConflictManager {
 		this.random = random;
 		this.writer = writer;
 	}
+	
+	public void initializeReplanning(Population population) {
+		if (resolvers.size() > 0) { // only require if active
+			population.getPersons().values().forEach(ReplanningUtils::setInitialPlan);
+		}
+	}
 
 	public void run(Population population, int iteration) {
 		if (resolvers.size() == 0) {

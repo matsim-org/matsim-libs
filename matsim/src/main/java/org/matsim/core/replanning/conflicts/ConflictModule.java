@@ -49,7 +49,7 @@ public class ConflictModule extends AbstractModule {
 					+ ". This will likely cause problems with the conflict logic if you are not sure what you are doing.");
 		}
 
-		Random random = MatsimRandom.getLocalInstance();
+		Random random = MatsimRandom.getRandom(); // no need for local instance, not parallel!
 		return new ConflictManager(resolvers, writer, random);
 	}
 
