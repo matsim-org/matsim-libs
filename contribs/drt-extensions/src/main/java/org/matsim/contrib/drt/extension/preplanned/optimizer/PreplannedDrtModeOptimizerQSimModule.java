@@ -34,11 +34,16 @@ import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
+import org.matsim.contrib.dvrp.tracker.OnlineTrackerListener;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
+import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
+
+import com.google.common.base.Preconditions;
+import com.google.inject.Singleton;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -61,10 +66,17 @@ public class PreplannedDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimMo
 				getter.getModal(ScheduleTimingUpdater.class))));
 
 		bindModal(DrtTaskFactory.class).toInstance(new DrtTaskFactoryImpl());
+		
+		bindModal(VrpLegFactory.class).toProvider(modalProvider(getter -> {
+			DvrpConfigGroup dvrpCfg = getter.get(DvrpConfigGroup.class);
+			MobsimTimer timer = getter.get(MobsimTimer.class);
 
-		bindModal(VrpAgentLogic.DynActionCreator.class).toProvider(modalProvider(
-				getter -> new DrtActionCreator(getter.getModal(PassengerHandler.class), getter.get(MobsimTimer.class),
-						getter.get(DvrpConfigGroup.class)))).asEagerSingleton();
+			return v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.mobsimMode, v, OnlineTrackerListener.NO_LISTENER,
+					timer);
+		})).in(Singleton.class);
+
+		Preconditions.checkState(drtCfg.getPrebookingParams().isEmpty(), "cannot use preplanned schedules with prebooking");
+		bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(DrtActionCreator.class));
 
 		bindModal(VrpOptimizer.class).to(modalKey(DrtOptimizer.class));
 

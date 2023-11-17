@@ -19,12 +19,13 @@
 
 package org.matsim.contrib.drt.extension;
 
+import java.util.Optional;
+
+import javax.annotation.Nullable;
+
 import org.matsim.contrib.drt.extension.companions.DrtCompanionParams;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-
-import javax.annotation.Nullable;
-import java.util.Optional;
 
 /**
  * @author Steffen Axer
@@ -56,5 +57,5 @@ public class DrtWithExtensionsConfigGroup extends DrtConfigGroup {
 	public Optional<DrtOperationsParams> getDrtOperationsParams() {
 		return Optional.ofNullable(drtOperationsParams);
 	}
-
+	
 }

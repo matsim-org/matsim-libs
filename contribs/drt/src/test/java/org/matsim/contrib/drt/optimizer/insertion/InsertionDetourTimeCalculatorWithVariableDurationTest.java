@@ -20,8 +20,11 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableTable;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -42,9 +45,8 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.testcases.fakes.FakeLink;
 
-import java.util.Collections;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableTable;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -274,7 +276,8 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {
-		return new VehicleEntry(null, start, ImmutableList.copyOf(stops), null, 0);
+		List<Double> precedingStayTimes = Collections.nCopies(stops.length, 0.0);
+		return new VehicleEntry(null, start, ImmutableList.copyOf(stops), null, precedingStayTimes, 0);
 	}
 
 	private InsertionWithDetourData insertion(VehicleEntry entry, int pickupIdx, int dropoffIdx,
