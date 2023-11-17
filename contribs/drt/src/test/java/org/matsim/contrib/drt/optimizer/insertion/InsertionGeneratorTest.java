@@ -39,7 +39,6 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
-import org.matsim.contrib.drt.stops.DefaultPassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
@@ -82,6 +81,7 @@ public class InsertionGeneratorTest {
 					Id.createPersonId("person4"),
 					Id.createPersonId("person5")
 			)).build();
+	private final DrtRequest prebookedRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).earliestStartTime(100).build();
 
 	private final Link depotLink = link("depot");
 	private final DvrpVehicleSpecification vehicleSpecification = ImmutableDvrpVehicleSpecification.newBuilder()
@@ -227,7 +227,10 @@ public class InsertionGeneratorTest {
 		double[] slackTimes = { 0, 0, // impossible insertions: 00, 01, 02 (pickup at 0 is not possible)
 				500, // additional impossible insertions: 11 (too long total detour); however 12 is possible
 				1000 }; // 22 is possible
-		VehicleEntry entry = new VehicleEntry(vehicle, start, ImmutableList.of(stop0, stop1), slackTimes, 0);
+
+		List<Double> precedingStayTimes = Arrays.asList(0.0, 0.0);
+
+		VehicleEntry entry = new VehicleEntry(vehicle, start, ImmutableList.of(stop0, stop1), slackTimes, precedingStayTimes, 0);
 
 		var insertions = new ArrayList<InsertionWithDetourData>();
 		{//12
@@ -362,6 +365,52 @@ public class InsertionGeneratorTest {
 				new Insertion(drtRequest, entry, 2, 2));
 	}
 
+	@Test
+	public void startEmpty_prebookedRequest() {
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0);
+		VehicleEntry entry = entry(start);
+		assertInsertionsOnly(prebookedRequest, entry,
+			new Insertion(prebookedRequest, entry, 0, 0));
+	}
+
+	@Test
+	public void startEmpty_onlineRequest_beforeAlreadyPrebookedOtherRequest() {
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0);
+		Waypoint.Stop stop0 = stop(200, fromLink, 1);
+		Waypoint.Stop stop1 = stop(400, link("stop"), 0);
+		VehicleEntry entry = entry(start, stop0, stop1);
+		assertInsertionsOnly(drtRequest, entry,
+			new Insertion(drtRequest, entry, 0, 0),
+			new Insertion(drtRequest, entry, 0, 1),
+			new Insertion(drtRequest, entry, 0, 2),
+			new Insertion(drtRequest, entry, 1, 1),
+			new Insertion(drtRequest, entry, 1, 2),
+			new Insertion(drtRequest, entry, 2, 2)
+		);
+	}
+
+	@Test
+	public void startEmpty_prebookedRequest_inMiddleOfAlreadyPrebookedOtherRequest() {
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0);
+		Waypoint.Stop stop0 = stop(50, fromLink, 1);
+		Waypoint.Stop stop1 = stop(300, link("stop"), 0);
+		VehicleEntry entry = entry(start, stop0, stop1);
+		assertInsertionsOnly(prebookedRequest, entry,
+			new Insertion(prebookedRequest, entry, 1, 1),
+			new Insertion(prebookedRequest, entry, 1, 2),
+			new Insertion(prebookedRequest, entry, 2, 2));
+	}
+
+	@Test
+	public void startEmpty_prebookedRequest_afterAlreadyPrebookedOtherRequest() {
+		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, 0);
+		Waypoint.Stop stop0 = stop(20, fromLink, 1);
+		Waypoint.Stop stop1 = stop(70, link("stop"), 0);
+		VehicleEntry entry = entry(start, stop0, stop1);
+		assertInsertionsOnly(prebookedRequest, entry,
+			new Insertion(prebookedRequest, entry, 2, 2));
+	}
+
 
 	@Test
 	public void startEmpty_smallGroup() {
@@ -451,6 +500,7 @@ public class InsertionGeneratorTest {
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {
 		var slackTimes = new double[stops.length + 2];
 		Arrays.fill(slackTimes, Double.POSITIVE_INFINITY);
-		return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), slackTimes, 0);
+		List<Double> precedingStayTimes = Collections.nCopies(stops.length, 0.0);
+		return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), slackTimes, precedingStayTimes, 0);
 	}
 }

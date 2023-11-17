@@ -102,6 +102,7 @@ public class DefaultPassengerEngineTest {
 				Collections.singleton(fixture.PERSON_ID),
 				new ActivityEndEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
+				new PassengerWaitingEvent(departureTime, MODE, requestId, fixture.PERSON_ID),
 				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, List.of(fixture.PERSON_ID), VEHICLE_ID, 0,
 						scheduledDropoffTime),
 				new PersonEntersVehicleEvent(pickupStartTime, fixture.PERSON_ID, Id.createVehicleId(VEHICLE_ID)),
@@ -125,8 +126,9 @@ public class DefaultPassengerEngineTest {
 				Collections.singleton(fixture.PERSON_ID),
 				new ActivityEndEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
+				new PassengerWaitingEvent(departureTime, MODE, requestId, fixture.PERSON_ID),
 				new PassengerRequestRejectedEvent(0, MODE, requestId, List.of(fixture.PERSON_ID), "invalid"),
-				new PersonStuckEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
+				new PersonStuckEvent(1, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
 	}
 
 	@Test
@@ -142,8 +144,9 @@ public class DefaultPassengerEngineTest {
 				Collections.singleton(fixture.PERSON_ID),
 				new ActivityEndEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
+				new PassengerWaitingEvent(departureTime, MODE, requestId, fixture.PERSON_ID),
 				new PassengerRequestRejectedEvent(0, MODE, requestId, List.of(fixture.PERSON_ID), "rejecting_all_requests"),
-				new PersonStuckEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
+				new PersonStuckEvent(1, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
 	}
 
 	private static class RejectingOneTaxiOptimizer implements VrpOptimizer {
@@ -181,6 +184,7 @@ public class DefaultPassengerEngineTest {
 						bindModal(PassengerRequestCreator.class).to(OneTaxiRequest.OneTaxiRequestCreator.class)
 								.asEagerSingleton();
 						bindModal(PassengerRequestValidator.class).toInstance(requestValidator);
+						bindModal(AdvanceRequestProvider.class).toInstance(AdvanceRequestProvider.NONE);
 
 						//supply
 						addQSimComponentBinding(DynActivityEngine.COMPONENT_NAME).to(DynActivityEngine.class);

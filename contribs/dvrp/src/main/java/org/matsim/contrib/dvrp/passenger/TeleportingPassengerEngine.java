@@ -145,6 +145,8 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
 				List.of(passenger.getId()), route, getLink(fromLinkId), getLink(toLinkId), now, now);
 
+		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerId()));
+
 		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
 			Route teleportedRoute = adaptLegRouteForTeleportation(List.of(passenger), request, now);
 			eventsManager.processEvent(new PassengerPickedUpEvent(now, mode, request.getId(), passenger.getId(), null));
@@ -183,6 +185,12 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 		return Preconditions.checkNotNull(network.getLinks().get(linkId),
 				"Link id=%s does not exist in network for mode %s. Agent departs from a link that does not belong to that network?",
 				linkId, mode);
+	}
+
+	@Override
+	public boolean notifyWaitForPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
+			Id<Request> requestId) {
+		throw new UnsupportedOperationException("No notifying when teleporting");
 	}
 
 	@Override

@@ -25,7 +25,7 @@ import org.assertj.core.data.Percentage;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.EvUnits;
-import org.matsim.contrib.ev.fleet.ElectricVehicleImpl;
+import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
@@ -96,11 +96,11 @@ public class VariableSpeedChargingTest {
 				.plugCount(1)
 				.build();
 
-		var electricVehicle = ElectricVehicleImpl.create(specification, ev -> (link, travelTime, linkEnterTime) -> {
+		var electricVehicle = ElectricFleetUtils.create(specification, ev -> ( link, travelTime, linkEnterTime) -> {
 			throw new UnsupportedOperationException();
 		}, ev -> (beginTime, duration, linkId) -> {
 			throw new UnsupportedOperationException();
-		}, VariableSpeedCharging::createForTesla);
+		}, VariableSpeedCharging::createForTesla );
 		Assertions.assertThat(electricVehicle.getChargingPower().calcChargingPower(charger))
 				.isCloseTo(EvUnits.kW_to_W(expectedChargingPower_kW), Percentage.withPercentage(1e-13));
 	}

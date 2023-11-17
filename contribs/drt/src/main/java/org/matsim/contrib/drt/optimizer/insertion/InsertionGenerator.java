@@ -160,14 +160,42 @@ public class InsertionGenerator {
 		}
 
 		int occupancy = vEntry.start.occupancy;
+
 		for (int i = 0; i < stopCount; i++) {// insertions up to before last stop
 			Waypoint.Stop nextStop = nextStop(vEntry, i);
 
-			if (occupancy + drtRequest.getPassengerIds().size() <= vEntry.vehicle.getCapacity()) {// only not fully loaded arcs
+			// (1) only not fully loaded arcs
+			boolean allowed = occupancy + drtRequest.getPassengerIds().size() <= vEntry.vehicle.getCapacity();
+
+			// (2) check if the request wants to depart after the departure time of the next
+			// stop. We can early on filter out the current insertion, because we will
+			// neither be able to insert our stop before the next stop nor merge the request
+			// into it.
+			allowed &= drtRequest.getEarliestStartTime() <= nextStop.getDepartureTime();
+
+			if (allowed) {
 				if (drtRequest.getFromLink() != nextStop.task.getLink()) {// next stop at different link
 					generateDropoffInsertions(drtRequest, vEntry, i, insertions);
+				} else {
+					// this is the case where we insert a new request *before* a stop that is
+					// on the same link as the pickup link. Initially, the reasoning was that the
+					// new request will be merged *into* the existing task if all constraints hold,
+					// i.e. the request will be appended. So only the insertion *after* this task is
+					// necessary to evaluate. However, with prebooking, the situation is different:
+					// if the next task is prebooked (in the future), we may want to insert another
+					// task here on the same link (maybe a pickup followed by its dropoff) but much
+					// earlier. In that case it is actually a valid insertion.
+
+					if (drtRequest.getEarliestStartTime() < nextStop.getArrivalTime()) {
+						// the new request wants to depart before the start of the next stop, which may
+						// be a viable insertion. Note that if the requested wanted to depart after the
+						// start of the next stop, but before its end, this is a special case that is
+						// covered further downstream as a special case of merging the pickup into the
+						// existing stop task.
+
+						generateDropoffInsertions(drtRequest, vEntry, i, insertions);
+					}
 				}
-				// else: do not evaluate insertion _before_stop i, evaluate only insertion _after_ stop i
 			}
 
 			occupancy = nextStop.outgoingOccupancy;
@@ -184,12 +212,13 @@ public class InsertionGenerator {
 		double toPickupDepartureTime = pickupInsertion.previousWaypoint.getDepartureTime();
 		double toPickupTT = detourTimeEstimator.estimateTime(pickupInsertion.previousWaypoint.getLink(),
 				request.getFromLink(), toPickupDepartureTime);
+		double earliestPickupStartTime = Math.max(toPickupDepartureTime + toPickupTT, request.getEarliestStartTime());
 		double fromPickupTT = detourTimeEstimator.estimateTime(request.getFromLink(),
 				pickupInsertion.nextWaypoint.getLink(),
-				toPickupDepartureTime + toPickupTT); //TODO stopDuration not included
+				earliestPickupStartTime); //TODO stopDuration not included
 		var pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT,
 				fromPickupTT, true, request);
-		
+
 		if (i == 0 && !checkStartSlack(vEntry, request, pickupDetourInfo)) {
 			// Inserting at schedule start and extending an ongoing stop task further than allowed
 			return;
@@ -217,7 +246,7 @@ public class InsertionGenerator {
 		//calculate it once for all j > i
 		pickupInsertion = createPickupInsertion(request, vEntry, i, false);
 		fromPickupTT = detourTimeEstimator.estimateTime(request.getFromLink(), pickupInsertion.nextWaypoint.getLink(),
-				toPickupDepartureTime + toPickupTT); //TODO stopDuration not included
+				earliestPickupStartTime); //TODO stopDuration not included
 		pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT, fromPickupTT,
 				false, request);
 
@@ -266,24 +295,24 @@ public class InsertionGenerator {
 	private Waypoint.Stop nextStop(VehicleEntry entry, int insertionIdx) {
 		return entry.stops.get(insertionIdx);
 	}
-	
+
 	private boolean checkStartSlack(VehicleEntry vEntry, DrtRequest request, PickupDetourInfo pickupDetourInfo) {
 		if (vEntry.start.task.isEmpty()) {
 			return true;
 		}
-		
+
 		Task startTask = vEntry.start.task.get();
-		
+
 		if (!DrtTaskBaseType.STOP.isBaseTypeOf(startTask)) {
 			return true;
 		}
-		
+
 		DrtStopTask stopTask = (DrtStopTask) startTask;
-		
+
 		if (stopTask.getLink() != request.getFromLink()) {
 			return true;
 		}
-		
+
 		return vEntry.getStartSlackTime() >= pickupDetourInfo.departureTime - stopTask.getEndTime();
 	}
 

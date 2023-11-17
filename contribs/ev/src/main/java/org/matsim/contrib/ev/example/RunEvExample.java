@@ -71,8 +71,11 @@ public class RunEvExample {
 				install( new EvModule() );
 
 				addRoutingModuleBinding( TransportMode.car ).toProvider(new EvNetworkRoutingProvider(TransportMode.car) );
-				// a router that inserts charging activities when the battery is run empty.  there may be some other way to insert
-				// charging activities, based on the situation.  kai, dec'22
+				// a router that inserts charging activities INTO THE ROUTE when the battery is run empty.  This assumes that a full
+				// charge at the start of the route is not sufficient to drive the route.   There are other settings where the
+				// situation is different, e.g. urban, where there may be a CHAIN of activities, and charging in general is done in
+				// parallel with some of these activities.   That second situation is adressed by some "ev" code in the vsp contrib.
+				// kai, dec'22
 			}
 		} );
 

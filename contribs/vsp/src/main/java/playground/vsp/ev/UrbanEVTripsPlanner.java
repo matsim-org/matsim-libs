@@ -54,10 +54,7 @@ import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
-import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.fleet.ElectricVehicleImpl;
-import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
+import org.matsim.contrib.ev.fleet.*;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
 import org.matsim.core.config.Config;
@@ -208,8 +205,8 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 				 */
 				ElectricVehicleSpecification evSpec = electricFleetSpecification.getVehicleSpecifications().get(Id.create(ev, Vehicle.class));
 				Leg legWithCriticalSOC;
-				ElectricVehicle pseudoVehicle = ElectricVehicleImpl.create(evSpec, driveConsumptionFactory, auxConsumptionFactory,
-						chargingPowerFactory);
+				ElectricVehicle pseudoVehicle = ElectricFleetUtils.create(evSpec, driveConsumptionFactory, auxConsumptionFactory,
+						chargingPowerFactory );
 				//TODO: erase hardcoding of car mode!
 				List<Leg> evCarLegs = TripStructureUtils.getLegs(modifiablePlan)
 						.stream()

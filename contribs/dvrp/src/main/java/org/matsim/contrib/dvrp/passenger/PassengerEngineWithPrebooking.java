@@ -57,6 +57,7 @@ public final class PassengerEngineWithPrebooking
 
 	private final String mode;
 	private final MobsimTimer mobsimTimer;
+	private final EventsManager eventsManager;
 	private final PreplanningEngine preplanningEngine;
 
 	private final PassengerRequestCreator requestCreator;
@@ -82,6 +83,7 @@ public final class PassengerEngineWithPrebooking
 		this.optimizer = optimizer;
 		this.network = network;
 		this.requestValidator = requestValidator;
+		this.eventsManager = eventsManager;
 
 		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
 	}
@@ -160,10 +162,14 @@ public final class PassengerEngineWithPrebooking
 		//TODO what if it was already rejected while prebooking??
 
 		PassengerRequest prebookedRequest = prebookedRequests.get(0);
+		
+		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, prebookedRequest.getId(), prebookedRequest.getPassengerId()));
+		
 		PassengerPickupActivity awaitingPickup = awaitingPickups.remove(prebookedRequest.getId());
 		if (awaitingPickup != null) {
 			awaitingPickup.notifyPassengersAreReadyForDeparture(List.of(passenger), now);
 		}
+		
 		return true;
 	}
 
@@ -289,5 +295,26 @@ public final class PassengerEngineWithPrebooking
 						getModalInstance(Network.class), getModalInstance(PassengerRequestValidator.class));
 			}
 		};
+	}
+
+	/*
+	 * This method has been retrofitted with the new prebooking implementation in
+	 * Nov 2023. Not sure if this is the right way to do it, this class doesn't seem
+	 * to be tested anywhere. /sebhoerl
+	 */
+	@Override
+	public boolean notifyWaitForPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver, Id<Request> requestId) {
+		Id<Link> linkId = driver.getCurrentLinkId();
+		RequestEntry requestEntry = activeRequests.get(requestId);
+		MobsimPassengerAgent passenger = requestEntry.passenger;
+
+		if (passenger.getCurrentLinkId() != linkId
+				|| passenger.getState() != MobsimAgent.State.LEG
+				|| !passenger.getMode().equals(mode)) {
+			awaitingPickups.put(requestId, pickupActivity);
+			return false;// wait for the passenger
+		}
+		
+		return true; // passenger present?
 	}
 }

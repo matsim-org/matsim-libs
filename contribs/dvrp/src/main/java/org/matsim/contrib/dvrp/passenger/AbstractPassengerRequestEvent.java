@@ -46,7 +46,7 @@ public abstract class AbstractPassengerRequestEvent extends Event {
 	private final Id<Request> requestId;
 	private final List<Id<Person>> personIds;
 
-	AbstractPassengerRequestEvent(double time, String mode, Id<Request> requestId, List<Id<Person>> personIds) {
+	protected AbstractPassengerRequestEvent(double time, String mode, Id<Request> requestId, List<Id<Person>> personIds) {
 		super(time);
 		this.mode = mode;
 		this.requestId = requestId;

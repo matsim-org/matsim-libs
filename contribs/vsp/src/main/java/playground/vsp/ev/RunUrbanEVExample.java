@@ -50,7 +50,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.fleet.ElectricVehicleSpecifications;
+import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.RoutingConfigGroup;
@@ -144,11 +144,11 @@ public class RunUrbanEVExample {
 					VehicleType.class)); //TODO should at least have a suffix "_car"
 			VehicleUtils.setHbefaTechnology(carVehicleType.getEngineInformation(), "electricity");
 			VehicleUtils.setEnergyCapacity(carVehicleType.getEngineInformation(), CAR_BATTERY_CAPACITY_kWh);
-			ElectricVehicleSpecifications.setChargerTypes(carVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default"));
+			ElectricFleetUtils.setChargerTypes(carVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default" ) );
 			scenario.getVehicles().addVehicleType(carVehicleType);
 			Vehicle carVehicle = vehicleFactory.createVehicle(VehicleUtils.createVehicleId(person, TransportMode.car),
 					carVehicleType);
-			ElectricVehicleSpecifications.setInitialSoc(carVehicle, CAR_INITIAL_SOC);
+			ElectricFleetUtils.setInitialSoc(carVehicle, CAR_INITIAL_SOC );
 			scenario.getVehicles().addVehicle(carVehicle);
 
 			VehicleType bikeVehicleType = vehicleFactory.createVehicleType(
