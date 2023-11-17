@@ -11,6 +11,13 @@
 	<artifactId>vsp</artifactId>
 	<name>vsp</name>
 
+	<repositories>
+		<repository>
+			<id>jogl</id>
+			<url>https://jogamp.org/deployment/maven/</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>

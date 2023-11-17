@@ -57,10 +57,17 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
+
         <repository>
             <id>matsim</id>
             <url>https://repo.matsim.org/repository/matsim</url>
         </repository>
+
+            <repository>
+                <id>jogl</id>
+                <url>https://jogamp.org/deployment/maven/</url>
+            </repository>
+
     </repositories>
 
     <distributionManagement>
