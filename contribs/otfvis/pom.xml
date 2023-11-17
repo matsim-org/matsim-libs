@@ -31,7 +31,8 @@
 	<artifactId>otfvis</artifactId>
 	<name>otfvis</name>
 	<properties>
-		<jogl.version>2.5.0</jogl.version>
+<!--		<jogl.version>2.5.0</jogl.version>-->
+<!--		(This is already in the pom.xml of matsim-all.  kai, nov'23)-->
 
 <!--		<jogl.version>2.4.0-matsim-1</jogl.version>-->
 <!--		(This version has problems with the mac osx ARM architecture.  One can make it work when using an x86 implementation of Java ... it-->
@@ -60,11 +61,15 @@
 
 <!--		Using the -main version means that the native libraries are loaded automagically.  See-->
 <!--		https://jogamp.org/wiki/index.php/Maven#Add_dependencies_on_the_correct_packages-->
-		<dependency>
-			<groupId>org.jogamp.gluegen</groupId>
-			<artifactId>gluegen-rt-main</artifactId>
-			<version>${jogl.version}</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.jogamp.gluegen</groupId>-->
+<!--			<artifactId>gluegen-rt-main</artifactId>-->
+<!--			<version>${jogl.version}</version>-->
+<!--		</dependency>-->
+<!--		(This is already in pom.xml of matsim-all.  kai, nov'23)-->
+
+
+
 <!--		<dependency>-->
 <!--			<groupId>org.jogamp.gluegen</groupId>-->
 <!--			<artifactId>gluegen-rt</artifactId>-->
@@ -95,11 +100,14 @@
 <!--			<version>${jogl.version}</version>-->
 <!--			<classifier>natives-linux-amd64</classifier>-->
 <!--		</dependency>-->
-		<dependency>
-			<groupId>org.jogamp.jogl</groupId>
-			<artifactId>jogl-all-main</artifactId>
-			<version>${jogl.version}</version>
-		</dependency>
+
+<!--		<dependency>-->
+<!--			<groupId>org.jogamp.jogl</groupId>-->
+<!--			<artifactId>jogl-all-main</artifactId>-->
+<!--			<version>${jogl.version}</version>-->
+<!--		</dependency>-->
+<!--		(This is already in pom.xml of matsim-all.  kai, nov'23)-->
+
 <!--		<dependency>-->
 <!--			<groupId>org.jogamp.jogl</groupId>-->
 <!--			<artifactId>jogl-all</artifactId>-->
