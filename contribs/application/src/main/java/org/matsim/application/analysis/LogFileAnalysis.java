@@ -187,11 +187,6 @@ public class LogFileAnalysis implements MATSimAppCommand {
 
 		writer.write("""
 			<style>
-			.dash-row.row-warnings .dash-card-frame {
-				margin-top: 0;
-				margin-bottom: 0;
-				padding: 0 0.4em;
-			}
 			.dash-row.row-warnings .no-warnings {
 				color: #4BB543;
 				font-weight: bold;
