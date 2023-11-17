@@ -122,7 +122,7 @@ public final class OTFVisFrame extends JFrame {
 		log.warn("--add-exports java.base/java.lang=ALL-UNNAMED");
 		log.warn("--add-exports java.desktop/sun.awt=ALL-UNNAMED");
 		log.warn("--add-exports java.desktop/sun.java2d=ALL-UNNAMED");
-		log.warn("See https://github.com/matsim-org/matsim-libs/pull/2940 and/or https://jogamp.org/bugzilla/show_bug.cgi?id=1317#c21 .")
+		log.warn("See https://github.com/matsim-org/matsim-libs/pull/2940 and/or https://jogamp.org/bugzilla/show_bug.cgi?id=1317#c21 .");
 
 		getContentPane().add(compositePanel, BorderLayout.CENTER);
 	}
