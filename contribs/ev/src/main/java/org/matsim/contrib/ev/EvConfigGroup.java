@@ -49,7 +49,7 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 	public int minimumChargeTime = 1200;
 
 	@Parameter("enforceChargingInteractionDuration")
-	@Comment("If true, prolongs the charging interaction for the amount of time waiting in the charger queue, i.e." +
+	@Comment("If true, prolongs the charging interaction for the amount of time waiting in the charger queue (plus 1 second), i.e." +
 		"enforces that charging interactions are undertaken as long as initially planned (by EVNetworkRoutingModule). Default is false.")
 	public boolean enforceChargingInteractionDuration = false;
 
