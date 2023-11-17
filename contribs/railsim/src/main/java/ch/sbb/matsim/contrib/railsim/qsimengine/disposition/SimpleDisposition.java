@@ -20,6 +20,7 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine.disposition;
 
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResource;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimCalc;
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
@@ -95,21 +96,30 @@ public class SimpleDisposition implements TrainDisposition {
 		 */
 
 		// TODO: for moving block the logic might needs to be changed
-
 		double reserveDist = resources.tryBlockLink(time, position, currentLink);
 
-		// need to stop on current link, this should only occur with moving block
-		if (reserveDist < currentLink.getLength() - position.getHeadPosition()) {
-			throw new IllegalStateException("Not possible with fixed blocks.");
-//			return new DispositionResponse(reserveDist, 0, null);
-		}
+		if (reserveDist == RailResource.NO_RESERVATION)
+			return new DispositionResponse(0, 0, null);
+
+
+		// TODO: loop and check of first link might be merged into one
 
 		boolean stop = false;
-
 		// Iterate all links that need to be blocked
 		for (RailLink link : segment) {
 
+			// first link does not need to be blocked again
+			if (link == currentLink)
+				continue;
+
 			dist = resources.tryBlockLink(time, position, link);
+
+			if (dist == RailResource.NO_RESERVATION) {
+				stop = true;
+				break;
+			}
+
+			// partial reservation
 			reserveDist += dist;
 
 			// If the link is not fully reserved then stop

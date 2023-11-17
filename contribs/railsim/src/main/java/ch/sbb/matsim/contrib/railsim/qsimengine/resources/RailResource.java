@@ -8,6 +8,11 @@ import java.util.List;
 public interface RailResource {
 
 	/**
+	 * Constant returned if no reservation is present.
+	 */
+	double NO_RESERVATION = -1;
+
+	/**
 	 * Type of resource.
 	 */
 	ResourceType getType();

@@ -213,7 +213,7 @@ final class RailsimEngine implements Steppable {
 
 		boolean allBlocked = blockLinkTracks(time, state);
 
-		// TODO: whether link is blocked should not be checked directly
+		// TODO: this might depend on the reserved distance and not the whole link
 
 		// Driver can advance if the next link is already free
 		if (allBlocked || (nextLink != null && resources.isBlockedBy(nextLink, state))) {
@@ -332,6 +332,10 @@ final class RailsimEngine implements Steppable {
 
 		state.approvedDist = response.approvedDist();
 		state.approvedSpeed = response.approvedSpeed();
+
+		assert FuzzyUtils.greaterEqualThan(state.approvedDist, 0) : "Approved distance must be positive, but was " + response.approvedDist();
+
+		// TODO: approved dist can be partially of the needed reserved dist, probably need to stop then
 
 		// Return whether the train has to stop
 		return response.approvedSpeed() != 0;
@@ -576,7 +580,11 @@ final class RailsimEngine implements Steppable {
 			// Outside of block track the reserve distance is always greater 0
 			// infinite loops would occur otherwise
 			if (!(event.type != UpdateEvent.Type.BLOCK_TRACK || FuzzyUtils.greaterThan(reserveDist, 0))) {
-				throw new AssertionError("Reserve distance must be positive, but was " + reserveDist);
+				// TODO: this will lead to polling, which can happen with moving block
+				// probably should be handled at different place
+
+				reserveDist = 100;
+//				throw new AssertionError("Reserve distance must be positive, but was " + reserveDist);
 			}
 		}
 

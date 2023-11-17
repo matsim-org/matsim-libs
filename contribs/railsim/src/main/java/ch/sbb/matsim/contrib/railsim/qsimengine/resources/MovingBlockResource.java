@@ -60,10 +60,6 @@ final class MovingBlockResource implements RailResourceInternal {
 	@Override
 	public boolean hasCapacity(RailLink link, TrainPosition position) {
 
-		// No capacity for entering this segment
-		if (!reservations.containsKey(position.getDriver()) && queues.size() >= capacity)
-			return false;
-
 		TrainEntry entry = reservations.get(position.getDriver());
 
 		// under this condition a new queue would be created
@@ -88,10 +84,8 @@ final class MovingBlockResource implements RailResourceInternal {
 			return entry.reservedDistance - diff;
 		}
 
-		// TODO: what happens if the head link has changed?
-		// normally new reservations needs to be made, for now it is 0
-		// what if this link is at the tail and already passed ?
-		return 0;
+		// return the whole distance, this assumes the train is not using it yet
+		return entry.reservedDistance;
 	}
 
 	@Override
@@ -141,7 +135,11 @@ final class MovingBlockResource implements RailResourceInternal {
 
 		// tail is on the same link
 		if (Objects.equals(inFront.position.getTailLink(), link.getLinkId())) {
-			return link.length - position.getTailPosition();
+
+			if (link.getLinkId().equals(position.getHeadLink()))
+				return inFront.position.getTailPosition() - position.getHeadPosition();
+			else
+				return inFront.position.getTailPosition();
 		}
 
 		// train is moving on this link, and it is not the tail -> no capacity at all

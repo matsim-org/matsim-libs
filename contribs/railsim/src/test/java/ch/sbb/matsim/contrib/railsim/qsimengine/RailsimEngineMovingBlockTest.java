@@ -69,7 +69,7 @@ public class RailsimEngineMovingBlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 120, "l1-2", "l6-7");
 
 		try {
-			test.doSimStepUntil(400);
+			test.doSimStepUntil(10_000);
 		} catch (Error e) {
 			test.debugFiles(collector, "movingBlock");
 			throw e;
@@ -80,7 +80,7 @@ public class RailsimEngineMovingBlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo", 60, "l1-2", "l6-7");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 120, "l1-2", "l6-7");
 
-		test.doStateUpdatesUntil(400, 1);
+		test.doStateUpdatesUntil(10_000, 1);
 
 
 		// TODO: add assertions

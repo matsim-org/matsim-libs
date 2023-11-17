@@ -126,6 +126,11 @@ final class FixedBlockResource implements RailResourceInternal {
 		for (int i = 0; i < state.length; i++) {
 			if (state[i] == null) {
 				state[i] = position.getDriver();
+
+				// departing train are initialized somewhere on a link
+				if (link.getLinkId().equals(position.getHeadLink()))
+					return link.length - position.getHeadPosition();
+
 				return link.length;
 			}
 		}

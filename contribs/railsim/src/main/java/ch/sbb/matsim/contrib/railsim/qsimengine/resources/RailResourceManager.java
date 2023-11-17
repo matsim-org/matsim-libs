@@ -123,7 +123,7 @@ public final class RailResourceManager {
 	public double tryBlockLink(double time, TrainPosition position, RailLink link) {
 
 		double reservedDist = link.resource.getReservedDist(link, position);
-		if (reservedDist > RailResourceInternal.NO_RESERVATION) {
+		if (reservedDist != RailResourceInternal.NO_RESERVATION) {
 			return reservedDist;
 		}
 
@@ -136,7 +136,7 @@ public final class RailResourceManager {
 			return dist;
 		}
 
-		return 0;
+		return RailResourceInternal.NO_RESERVATION;
 	}
 
 	/**

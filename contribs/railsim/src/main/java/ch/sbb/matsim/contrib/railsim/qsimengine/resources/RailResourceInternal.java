@@ -10,11 +10,6 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 interface RailResourceInternal extends RailResource {
 
 	/**
-	 * Constant returned if no reservation is present.
-	 */
-	double NO_RESERVATION = -1;
-
-	/**
 	 * Whether an agent is able to block this resource.
 	 */
 	boolean hasCapacity(RailLink link, TrainPosition position);
