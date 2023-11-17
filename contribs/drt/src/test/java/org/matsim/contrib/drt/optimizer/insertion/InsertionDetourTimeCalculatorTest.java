@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
@@ -36,7 +37,6 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
-import org.matsim.contrib.drt.stops.DefaultPassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -234,7 +234,8 @@ public class InsertionDetourTimeCalculatorTest {
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {
-		return new VehicleEntry(null, start, ImmutableList.copyOf(stops), null, 0);
+		List<Double> precedingStayTimes = Collections.nCopies(stops.length, 0.0);
+		return new VehicleEntry(null, start, ImmutableList.copyOf(stops), null, precedingStayTimes, 0);
 	}
 
 	private InsertionDetourData detourData(double toPickupTT, double fromPickupTT, double toDropoffTT,

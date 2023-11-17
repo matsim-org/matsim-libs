@@ -121,9 +121,9 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		this.delimiter = config.global().getDefaultDelimiter();
 	}
 
-	private record DrtLeg(Id<Request> request, double departureTime, Id<Person> person, Id<DvrpVehicle> vehicle, Id<Link> fromLinkId, Coord fromCoord,
+	private record DrtLeg(Id<Request> request, double submissionTime, double departureTime, Id<Person> person, Id<DvrpVehicle> vehicle, Id<Link> fromLinkId, Coord fromCoord,
 						  Id<Link> toLinkId, Coord toCoord, double waitTime, double unsharedDistanceEstimate_m, double unsharedTimeEstimate_m,
-						  double arrivalTime, double fare, double latestDepartureTime, double latestArrivalTime) {
+						  double arrivalTime, double fare, double earliestDepartureTime, double latestDepartureTime, double latestArrivalTime) {
 	}
 
 	private static DrtLeg newDrtLeg(EventSequence sequence, Function<Id<Link>, ? extends Link> linkProvider) {
@@ -132,6 +132,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		PersonDepartureEvent departureEvent = sequence.getDeparture().get();
 		PassengerPickedUpEvent pickedUpEvent = sequence.getPickedUp().get();
 		var request = submittedEvent.getRequestId();
+		var submissionTime = submittedEvent.getTime();
 		var departureTime = departureEvent.getTime();
 		var person = submittedEvent.getPersonId();
 		var vehicle = pickedUpEvent.getVehicleId();
@@ -145,10 +146,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		var arrivalTime = sequence.getDroppedOff().get().getTime();
 		// PersonMoneyEvent has negative amount because the agent's money is reduced -> for the operator that is a positive amount
 		var fare = sequence.getDrtFares().stream().mapToDouble(PersonMoneyEvent::getAmount).sum();
+		var earliestDepartureTime = sequence.getSubmitted().getEarliestDepartureTime();
 		var latestDepartureTime = sequence.getSubmitted().getLatestPickupTime();
 		var latestArrivalTime = sequence.getSubmitted().getLatestDropoffTime();
-		return new DrtLeg(request, departureTime, person, vehicle, fromLinkId, fromCoord, toLinkId, toCoord, waitTime, unsharedDistanceEstimate_m,
-				unsharedTimeEstimate_m, arrivalTime, fare, latestDepartureTime, latestArrivalTime);
+		return new DrtLeg(request, submissionTime, departureTime, person, vehicle, fromLinkId, fromCoord, toLinkId, toCoord, waitTime, unsharedDistanceEstimate_m,
+				unsharedTimeEstimate_m, arrivalTime, fare, earliestDepartureTime, latestDepartureTime, latestArrivalTime);
 	}
 
 	@Override
@@ -174,12 +176,13 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			.collect(toList());
 
 		collection2Text(drtEventSequenceCollector.getRejectedRequestSequences().values(), filename(event, "drt_rejections", ".csv"),
-				String.join(delimiter, "time", "personId", "fromLinkId", "toLinkId", "fromX", "fromY", "toX", "toY"), seq -> {
+				String.join(delimiter, "time", "personId", "requestId", "fromLinkId", "toLinkId", "fromX", "fromY", "toX", "toY"), seq -> {
 					DrtRequestSubmittedEvent submission = seq.getSubmitted();
 					Coord fromCoord = network.getLinks().get(submission.getFromLinkId()).getToNode().getCoord();
 					Coord toCoord = network.getLinks().get(submission.getToLinkId()).getToNode().getCoord();
 					return String.join(delimiter, submission.getTime() + "",//
 							submission.getPersonId() + "",//
+							submission.getRequestId() + "",//
 							submission.getFromLinkId() + "",//
 							submission.getToLinkId() + "",//
 							fromCoord.getX() + "",//
@@ -209,8 +212,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		String occStats = summarizeDetailedOccupancyStats(drtVehicleStats.getVehicleStates(), delimiter, maxcap);
 		writeIterationVehicleStats(vehStats, occStats, event.getIteration());
 		if (drtCfg.plotDetailedCustomerStats) {
-			String header = String.join(delimiter, "departureTime",//
+			String header = String.join(delimiter, // 
+					"submissionTime", // 
+					"departureTime",//
 					"personId",//
+					"requestId",//
 					"vehicleId",//
 					"fromLinkId",//
 					"fromX",//
@@ -224,12 +230,15 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 					"travelDistance_m",//
 					"directTravelDistance_m",//
 					"fareForLeg", //
+					"earliestDepartureTime",
 					"latestDepartureTime", //
 					"latestArrivalTime");
 
 			collection2Text(legs, filename(event, "drt_legs", ".csv"), header, leg -> String.join(delimiter,//
+					(Double)leg.submissionTime + "",//
 					(Double)leg.departureTime + "",//
 					leg.person + "",//
+					leg.request + "",//
 					leg.vehicle + "",//
 					leg.fromLinkId + "",//
 					format.format(leg.fromCoord.getX()),//
@@ -243,6 +252,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 					format.format(drtVehicleStats.getTravelDistances().get(leg.request)),//
 					format.format(leg.unsharedDistanceEstimate_m),//
 					format.format(leg.fare), //
+					format.format(leg.earliestDepartureTime), //
 					format.format(leg.latestDepartureTime), //
 					format.format(leg.latestArrivalTime)));
 		}
@@ -365,7 +375,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			for (EventSequence seq : performedRequestEventSequences) {
 				if (seq.getPickedUp().isPresent()) {
 					double actualWaitTime = seq.getPickedUp().get().getTime() - seq.getDeparture().get().getTime();
-					double estimatedWaitTime = seq.getScheduled().get().getPickupTime() - seq.getDeparture().get().getTime();
+					double estimatedWaitTime = seq.getScheduled().get().getPickupTime() - seq.getSubmitted().getEarliestDepartureTime();
 					bw.append(line(seq.getSubmitted().getRequestId(), actualWaitTime, estimatedWaitTime, actualWaitTime - estimatedWaitTime));
 					times.add(actualWaitTime, estimatedWaitTime);
 				}

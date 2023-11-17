@@ -81,7 +81,6 @@ public class MultiModeTaxiModule extends AbstractModule {
 		drtCfg.drtServiceAreaShapeFile = null;
 		drtCfg.plotDetailedCustomerStats = taxiCfg.detailedStats || taxiCfg.timeProfiles;
 		drtCfg.numberOfThreads = taxiCfg.numberOfThreads;
-		drtCfg.advanceRequestPlanningHorizon = 0;
 		drtCfg.storeUnsharedPath = false;
 
 		taxiCfg.getTaxiFareParams().ifPresent(taxiFareParams -> {

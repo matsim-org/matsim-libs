@@ -76,7 +76,7 @@ public class OverviewDashboard implements Dashboard {
 			viz.title = "Score";
 			viz.dataset = data.output("*.scorestats.csv");
 			viz.description = "per Iteration";
-			viz.x = "ITERATION";
+			viz.x = "iteration";
 			viz.columns = List.of("avg_executed", "avg_worst", "avg_best");
 			viz.xAxisName = "Iteration";
 			viz.yAxisName = "Score";
@@ -88,7 +88,7 @@ public class OverviewDashboard implements Dashboard {
 				viz.title = "Mode Share Progression";
 				viz.description = "per Iteration";
 				viz.dataset = data.output("*.modestats.csv");
-				viz.x = "Iteration";
+				viz.x = "iteration";
 				viz.xAxisName = "Iteration";
 				viz.yAxisName = "Share";
 				viz.width = 2d;

@@ -71,7 +71,7 @@ public class InsertionCostCalculatorTest {
 	}
 
 	private VehicleEntry entry(double[] slackTimes) {
-		return new VehicleEntry(null, null, null, slackTimes, 0);
+		return new VehicleEntry(null, null, null, slackTimes, null, 0);
 	}
 
 	private Link link(String id) {
