@@ -49,8 +49,8 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
-import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
+import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -63,7 +63,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 
-public class MultipleShipmentsSecondReloadLSPMobsimTest {
+public class MultipleIterationsFisrtAndSecondReloadLSPMobsimTest {
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
@@ -71,6 +71,7 @@ public class MultipleShipmentsSecondReloadLSPMobsimTest {
 
 	@Before
 	public void initialize() {
+		//Todo/Fixme: In the result there only the second hub is used. -- see Issue #170.  KMT Nov'23
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -285,7 +286,7 @@ public class MultipleShipmentsSecondReloadLSPMobsimTest {
 			}
 		} );
 		config.controller().setFirstIteration(0);
-		config.controller().setLastIteration(4);
+		config.controller().setLastIteration(1 + MatsimRandom.getRandom().nextInt(10));
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
@@ -316,5 +317,6 @@ public class MultipleShipmentsSecondReloadLSPMobsimTest {
 	@Test
 	public void compareEvents(){
 		MatsimTestUtils.assertEqualEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
+		//Please note, that this result contains also reloding / hubHandlingStarts after the main run (even if there is no further distribution carrier)
 	}
 }
