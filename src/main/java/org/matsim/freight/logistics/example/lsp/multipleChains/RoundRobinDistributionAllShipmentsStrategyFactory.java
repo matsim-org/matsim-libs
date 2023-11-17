@@ -39,7 +39,7 @@ import java.util.Map;
 
 	private RoundRobinDistributionAllShipmentsStrategyFactory() { } // class contains only static methods; do not instantiate
 
-	/*package-private*/ GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
+	/*package-private*/ static GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
 		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup()));
 		GenericPlanStrategyModule<LSPPlan> roundRobinModule = new GenericPlanStrategyModule<>() {
 

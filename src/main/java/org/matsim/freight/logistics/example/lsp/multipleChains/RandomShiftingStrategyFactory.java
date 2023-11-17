@@ -21,8 +21,6 @@ class RandomShiftingStrategyFactory {
 	private RandomShiftingStrategyFactory() {} // class contains only static methods; do not instantiate.
 
 	static GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
-		// yyyy using factory method instead of constructor is a universally accepted approach.  but should be static.
-		// Please refactor.  Thanks!  kai, nov'23
 
 		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup()));
 		GenericPlanStrategyModule<LSPPlan> randomModule = new GenericPlanStrategyModule<>() {

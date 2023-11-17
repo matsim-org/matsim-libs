@@ -90,11 +90,11 @@ final class ExampleMultipleOneEchelonChainsReplanning {
 				bind(LSPStrategyManager.class).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
 					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
-//					strategyManager.addStrategy(new RoundRobinDistributionAllShipmentsStrategyFactory().createStrategy(), null, 1);
-//					strategyManager.addStrategy(new RandomDistributionAllShipmentsStrategyFactory().createStrategy(), null, 1);
-//					strategyManager.addStrategy(new RebalancingShipmentsStrategyFactory().createStrategy(), null, 1);
-//					strategyManager.addStrategy(new RandomShiftingStrategyFactory().createStrategy(), null, 1);
-//					strategyManager.addStrategy(new ProximityStrategyFactory(scenario.getNetwork()).createStrategy(), null, 1);
+//					strategyManager.addStrategy(RoundRobinDistributionAllShipmentsStrategyFactory.createStrategy(), null, 1);
+//					strategyManager.addStrategy(RandomDistributionAllShipmentsStrategyFactory.createStrategy(), null, 1);
+//					strategyManager.addStrategy(RebalancingStrategyFactory.createStrategy(), null, 1);
+					strategyManager.addStrategy(RandomShiftingStrategyFactory.createStrategy(), null, 1);
+//					strategyManager.addStrategy(ProximityStrategyFactory.createStrategy(scenario.getNetwork()), null, 1);
 					strategyManager.setMaxPlansPerAgent(5);
 					strategyManager.setPlanSelectorForRemoval(new LSPWorstPlanForRemovalSelector() );
 					return strategyManager;
