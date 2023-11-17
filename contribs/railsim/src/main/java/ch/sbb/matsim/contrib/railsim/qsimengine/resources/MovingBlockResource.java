@@ -40,7 +40,7 @@ final class MovingBlockResource implements RailResourceInternal {
 	}
 
 	@Override
-	public double getReservedDist(RailLink link, MobsimDriverAgent driver) {
+	public double getReservedDist(RailLink link, TrainPosition position) {
 		throw new UnsupportedOperationException();
 	}
 

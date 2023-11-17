@@ -97,15 +97,20 @@ final class FixedBlockResource implements RailResourceInternal {
 	}
 
 	@Override
-	public double getReservedDist(RailLink link, MobsimDriverAgent driver) {
+	public double getReservedDist(RailLink link, TrainPosition position) {
 		MobsimDriverAgent[] state = tracks.get(link);
 		for (MobsimDriverAgent reserved : state) {
-			if (reserved == driver) {
+			if (reserved == position.getDriver()) {
+
+				// If train is currently on the link, only the remaining distance is returned
+				if (link.getLinkId().equals(position.getHeadLink()))
+					return link.length - position.getHeadPosition();
+
 				return link.length;
 			}
 		}
 
-		return 0;
+		return RailResourceInternal.NO_RESERVATION;
 	}
 
 	@Override

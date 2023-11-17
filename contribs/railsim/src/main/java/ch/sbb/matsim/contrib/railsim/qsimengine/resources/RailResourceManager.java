@@ -122,15 +122,8 @@ public final class RailResourceManager {
 	 */
 	public double tryBlockLink(double time, TrainPosition position, RailLink link) {
 
-		double reservedDist = link.resource.getReservedDist(link, position.getDriver());
-		if (reservedDist > 0) {
-
-			// TODO: retrieving reserved dist might already depend on position
-			// subtraction should be higher up
-
-			if (link.getLinkId().equals(position.getHeadLink()))
-				return reservedDist - position.getHeadPosition();
-
+		double reservedDist = link.resource.getReservedDist(link, position);
+		if (reservedDist > RailResourceInternal.NO_RESERVATION) {
 			return reservedDist;
 		}
 
@@ -157,8 +150,8 @@ public final class RailResourceManager {
 	/**
 	 * Whether a driver already reserved a link.
 	 */
-	public boolean isBlockedBy(RailLink link, MobsimDriverAgent driver) {
-		return link.resource.getReservedDist(link, driver) > 0;
+	public boolean isBlockedBy(RailLink link, TrainPosition position) {
+		return link.resource.getReservedDist(link, position) > RailResourceInternal.NO_RESERVATION;
 	}
 
 	/**

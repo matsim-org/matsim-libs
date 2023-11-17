@@ -216,7 +216,7 @@ final class RailsimEngine implements Steppable {
 		// TODO: whether link is blocked should not be checked directly
 
 		// Driver can advance if the next link is already free
-		if (allBlocked || (nextLink != null && resources.isBlockedBy(nextLink, state.driver))) {
+		if (allBlocked || (nextLink != null && resources.isBlockedBy(nextLink, state))) {
 
 			if (allBlocked)
 				event.checkReservation = -1;
@@ -264,7 +264,7 @@ final class RailsimEngine implements Steppable {
 		state.tailPosition = firstLink.length - state.train.length();
 
 		// reserve links and start if first one is free
-		if (blockLinkTracks(time, state) || resources.isBlockedBy(firstLink, state.driver)) {
+		if (blockLinkTracks(time, state) || resources.isBlockedBy(firstLink, state)) {
 
 			createEvent(new PersonEntersVehicleEvent(time, state.driver.getId(), state.driver.getVehicle().getId()));
 			createEvent(new VehicleEntersTrafficEvent(time, state.driver.getId(),
@@ -364,7 +364,7 @@ final class RailsimEngine implements Steppable {
 
 			// Free all reservations
 			for (RailLink link : state.route) {
-				if (resources.isBlockedBy(link, state.driver)) {
+				if (resources.isBlockedBy(link, state)) {
 					disposition.unblockRailLink(time, state.driver, link);
 				}
 			}
@@ -383,7 +383,7 @@ final class RailsimEngine implements Steppable {
 
 			RailLink currentLink = state.route.get(state.routeIdx);
 			// If this linked is blocked the driver can continue
-			if (!resources.isBlockedBy(currentLink, state.driver)) {
+			if (!resources.isBlockedBy(currentLink, state)) {
 				event.waitingForLink = true;
 				event.type = UpdateEvent.Type.WAIT_FOR_RESERVATION;
 				event.plannedTime = time + config.pollInterval;
@@ -403,7 +403,7 @@ final class RailsimEngine implements Steppable {
 
 		RailLink link = resources.getLink(state.headLink);
 
-		assert resources.isBlockedBy(link, state.driver) : "Link has to be blocked by driver when entered";
+		assert resources.isBlockedBy(link, state) : "Link has to be blocked by driver when entered";
 
 		decideTargetSpeed(event, state);
 
