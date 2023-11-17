@@ -18,6 +18,11 @@ public interface TrainPosition {
 	MobsimDriverAgent getDriver();
 
 	/**
+	 * The train type.
+	 */
+	TrainInfo getTrain();
+
+	/**
 	 * The link the where the head of the train is on. Can be null if not yet departed.
 	 */
 	@Nullable

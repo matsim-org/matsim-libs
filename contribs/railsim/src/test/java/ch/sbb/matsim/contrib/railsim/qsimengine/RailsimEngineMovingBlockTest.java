@@ -64,16 +64,21 @@ public class RailsimEngineMovingBlockTest {
 	public void multipleTrains() {
 
 		RailsimTestUtils.Holder test = getTestEngine("networkMovingBlocks.xml");
-		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "train", 0, "l1-2", "l6-7");
-		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "train", 60, "l1-2", "l6-7");
-		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "train", 120, "l1-2", "l6-7");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "l1-2", "l6-7");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo", 60, "l1-2", "l6-7");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 120, "l1-2", "l6-7");
 
-		test.doSimStepUntil(400);
+		try {
+			test.doSimStepUntil(400);
+		} catch (Error e) {
+			test.debugFiles(collector, "movingBlock");
+			throw e;
+		}
 
 		test = getTestEngine("networkMovingBlocks.xml");
-		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "train", 0, "l1-2", "l6-7");
-		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "train", 60, "l1-2", "l6-7");
-		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "train", 120, "l1-2", "l6-7");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "l1-2", "l6-7");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo", 60, "l1-2", "l6-7");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 120, "l1-2", "l6-7");
 
 		test.doStateUpdatesUntil(400, 1);
 

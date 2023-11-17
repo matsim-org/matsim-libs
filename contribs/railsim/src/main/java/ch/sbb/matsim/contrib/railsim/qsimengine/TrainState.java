@@ -180,6 +180,11 @@ final class TrainState implements TrainPosition {
 	}
 
 	@Override
+	public TrainInfo getTrain() {
+		return train;
+	}
+
+	@Override
 	public Id<Link> getHeadLink() {
 		return headLink;
 	}

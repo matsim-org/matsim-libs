@@ -36,22 +36,22 @@ final class FixedBlockResource implements RailResourceInternal {
 	/**
 	 * Links belonging to this resource.
 	 */
-	final List<RailLink> links;
+	private final List<RailLink> links;
 
 	/**
 	 * Reservations per link and per track.
 	 */
-	final Map<RailLink, MobsimDriverAgent[]> tracks;
+	private final Map<RailLink, MobsimDriverAgent[]> tracks;
 
 	/**
 	 * Tracks drivers that have at least one reservation on any link os this resource.
 	 */
-	final Set<MobsimDriverAgent> reservations;
+	private final Set<MobsimDriverAgent> reservations;
 
 	/**
 	 * Maximum number of reservations.
 	 */
-	int capacity;
+	private final int capacity;
 
 	FixedBlockResource(Id<RailResource> id, List<RailLink> links) {
 		this.id = id;
