@@ -124,7 +124,7 @@ public class MultipleShipmentsCollectionLSPMobsimTest {
 		resourcesList.add(collectionResource);
 
 		LogisticChainScheduler simpleScheduler = ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
-		
+		simpleScheduler.setBufferTime(300);
 		collectionLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 		collectionLSP = collectionLSPBuilder.build();
 

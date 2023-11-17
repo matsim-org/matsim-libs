@@ -189,7 +189,7 @@ public class MultipleIterationsMainRunLSPMobsimTest {
 		resourcesList.add(mainRunResource);
 
 		LogisticChainScheduler simpleScheduler = ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(resourcesList);
-		
+		simpleScheduler.setBufferTime(300);
 		completeLSPBuilder.setLogisticChainScheduler(simpleScheduler);
 		lsp = completeLSPBuilder.build();
 

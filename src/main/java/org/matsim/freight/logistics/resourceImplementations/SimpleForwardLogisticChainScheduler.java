@@ -50,7 +50,7 @@ import java.util.List;
 
 	private final List<LSPResource> resources;
 	private LSP lsp;
-	private int bufferTime = 0;
+	private int bufferTime;
 
 	SimpleForwardLogisticChainScheduler(List<LSPResource> resources) {
 		this.resources = resources;
@@ -95,4 +95,8 @@ import java.util.List;
 		return null;
 	}
 
+	@Override
+	public void setBufferTime(int bufferTime) {
+		this.bufferTime = bufferTime;
+	}
 }
