@@ -74,16 +74,19 @@
 <!--			<artifactId>core</artifactId>-->
 <!--			<version>3.0.1</version>-->
 <!--		</dependency>-->
-		<dependency>
-			<groupId>org.jogamp.gluegen</groupId>
-			<artifactId>gluegen-rt-main</artifactId>
-			<version>2.3.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jogamp.jogl</groupId>
-			<artifactId>jogl-all-main</artifactId>
-			<version>2.3.2</version>
-		</dependency>
+
+<!--		<dependency>-->
+<!--			<groupId>org.jogamp.gluegen</groupId>-->
+<!--			<artifactId>gluegen-rt-main</artifactId>-->
+<!--			<version>2.3.2</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>org.jogamp.jogl</groupId>-->
+<!--			<artifactId>jogl-all-main</artifactId>-->
+<!--			<version>2.3.2</version>-->
+<!--		</dependency>-->
+<!--		(Do not repeat the jogl dependencies.  They are defined in contrib/otfvis/pom.xml (and enforced from matsim-all/pom.xml).  kai, nov'23)-->
+
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>otfvis</artifactId>
