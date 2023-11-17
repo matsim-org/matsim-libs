@@ -4,6 +4,7 @@ import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 /**
@@ -21,7 +22,7 @@ final class MovingBlockResource implements RailResourceInternal {
 	private final Map<RailLink, List<TrainEntry>> queues = new HashMap<>();
 
 	/**
-	 * Currently moving trains per link.
+	 * Links that are reserved by trains.
 	 */
 	private final Map<RailLink, Set<MobsimDriverAgent>> moving = new HashMap<>();
 
@@ -58,11 +59,20 @@ final class MovingBlockResource implements RailResourceInternal {
 
 	@Override
 	public boolean hasCapacity(RailLink link, TrainPosition position) {
-		// Train already present will have capacity
-		if (reservations.containsKey(position.getDriver()))
-			return true;
 
-		return queues.size() < capacity;
+		// No capacity for entering this segment
+		if (!reservations.containsKey(position.getDriver()) && queues.size() >= capacity)
+			return false;
+
+		TrainEntry entry = reservations.get(position.getDriver());
+
+		// under this condition a new queue would be created
+		if (entry == null && !queues.containsKey(link))
+			return queues.size() < capacity;
+
+		double dist = checkReserve(link, entry, position);
+
+		return dist > 0;
 	}
 
 	@Override
@@ -78,6 +88,9 @@ final class MovingBlockResource implements RailResourceInternal {
 			return entry.reservedDistance - diff;
 		}
 
+		// TODO: what happens if the head link has changed?
+		// normally new reservations needs to be made, for now it is 0
+		// what if this link is at the tail and already passed ?
 		return 0;
 	}
 
@@ -96,30 +109,48 @@ final class MovingBlockResource implements RailResourceInternal {
 		}
 
 		TrainEntry self = reservations.get(position.getDriver());
-		List<TrainEntry> queue = queues.get(self.entryLink);
 
+		double dist = checkReserve(link, self, position);
+
+		self.reservedDistance = dist;
+		self.lastHeadPosition = position.getHeadPosition();
+		self.lastLink = link;
+
+		return dist;
+	}
+
+
+	/**
+	 * Compute the distance that can be reserved without actually reserving it.
+	 */
+	private double checkReserve(RailLink link, @Nullable TrainEntry entry, TrainPosition position) {
+
+		List<TrainEntry> queue = queues.get(entry != null ? entry.entryLink : link);
 
 		// Approve whole link length for the first train in the queue
-		int idx = queue.indexOf(self);
+		int idx = entry != null ? queue.indexOf(entry) : queue.size();
 		if (idx == 0) {
-
 			if (link.getLinkId().equals(position.getHeadLink()))
-				self.reservedDistance = link.length - position.getHeadPosition();
+				return link.length - position.getHeadPosition();
 			else
-				self.reservedDistance = link.length;
-
-			self.lastHeadPosition = position.getHeadPosition();
-			self.lastLink = link;
-
-			return self.reservedDistance;
+				return link.length;
 		}
 
 		// The train in front of this one
 		TrainEntry inFront = queue.get(idx - 1);
 
-		// TODO: implement
+		// tail is on the same link
+		if (Objects.equals(inFront.position.getTailLink(), link.getLinkId())) {
+			return link.length - position.getTailPosition();
+		}
 
-		return 0;
+		// train is moving on this link, and it is not the tail -> no capacity at all
+		if (moving.get(link).contains(inFront.position.getDriver())) {
+			return 0;
+		}
+
+		// might only happen if train passed the link completely already
+		throw new IllegalStateException("This situation is not yet tested/implemented.");
 	}
 
 	@Override
