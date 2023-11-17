@@ -30,5 +30,14 @@ public interface LogisticChainScheduler extends HasBackpointer<LSP> {
 
 	void scheduleLogisticChain();
 
+	/**
+	 * The buffer time is <b>only taken into account in planning / scheduling</b>.
+	 * The idea is to ensure that the goods are available for the next ressource "in time", because the scheduling does not take into account
+	 * any congestion during the simulation. E.g. if multiple vehicle are leaving the depot at the same time and thus influence each other.<br>
+	 * It is <b> not </b> intended to be available as buffer in the simulation itself -> It does not influence the events and shipmentLogs.
+	 * As a consequence, the transportation (in simulation, events, ...) is in many cases earlier than scheduled.
+	 * (Information from TM after asking; KMT 17.11.23)
+	 * @param bufferTime for scheduling [in sec]
+	 */
 	void setBufferTime(int bufferTime);
 }
