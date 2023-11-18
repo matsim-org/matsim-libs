@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
@@ -23,10 +25,21 @@ import com.google.common.collect.ImmutableList;
  */
 public class DisallowedNextLinks {
 
+	private static final Logger LOG = LogManager.getLogger(DisallowedNextLinks.class);
+
+	private static boolean warnedAboutNotConsideredInRouting = false; // ! remove, if routing considers this
+
 	// Actually, it could be Map<String, Set<List<Id<Link>>>>, as the order of the
 	// next links sequences does not matter. However, we choose to store them in a
 	// list in favor of a smaller memory footprint.
 	private final Map<String, List<List<Id<Link>>>> linkIdSequencesMap = new HashMap<>();
+
+	public DisallowedNextLinks() { // ! remove constructor, if routing considers this
+		if (!warnedAboutNotConsideredInRouting) {
+			warnedAboutNotConsideredInRouting = true;
+			LOG.warn("Considering DisallowedNextLinks in routing is not yet implemented!");
+		}
+	}
 
 	/**
 	 * Add a sequence of subsequent links to be disallowed from the current link.
