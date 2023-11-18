@@ -49,7 +49,10 @@ public class DisallowedNextLinks {
 			return false;
 		}
 
-		// sorting is required for a.equals(b) <=> a.hashCode() == b.hashCode()
+		// Semantically, the order does not matter. But despite using a list, we want
+		// DisallowedNextLinks objects to have a working equal method. To ensure, that
+		// DisallowedNextLinks are equal, even if links are added in a different order,
+		// we sort the internal list.
 		Collections.sort(linkSequences, (l, r) -> l.toString().compareTo(r.toString()));
 		return true;
 	}
