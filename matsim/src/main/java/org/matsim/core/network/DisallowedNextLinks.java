@@ -82,10 +82,9 @@ public class DisallowedNextLinks {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof DisallowedNextLinks dnl) {
-			if (!this.linkIdSequencesMap.keySet().equals(dnl.linkIdSequencesMap.keySet())) {
-				return false;
-			}
+		if (obj instanceof DisallowedNextLinks dnl
+				// both linkIdSequences have same modes
+				&& this.linkIdSequencesMap.keySet().equals(dnl.linkIdSequencesMap.keySet())) {
 			for (Entry<String, List<List<Id<Link>>>> entry : this.linkIdSequencesMap.entrySet()) {
 				String mode = entry.getKey();
 				List<List<Id<Link>>> linkSequences = entry.getValue();
