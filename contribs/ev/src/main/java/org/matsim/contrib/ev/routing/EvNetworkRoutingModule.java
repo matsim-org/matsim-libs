@@ -18,12 +18,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.ev.routing;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -32,14 +26,17 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.common.util.StraightLineKnnFinder;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.VehicleChargingHandler;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
-import org.matsim.contrib.ev.fleet.*;
+import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
+import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
-import org.matsim.contrib.common.util.StraightLineKnnFinder;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
@@ -53,6 +50,8 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.*;
 
 /**
  * This network Routing module adds stages for re-charging into the Route.
@@ -156,8 +155,10 @@ final class EvNetworkRoutingModule implements RoutingModule {
 					stagedRoute.add(lastLeg);
 					Activity chargeAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(selectedChargerLink.getCoord(),
 							selectedChargerLink.getId(), stageActivityModePrefix);
-					chargeAct = PopulationUtils.createActivity(chargeAct); // createStageActivity... creates a InteractionActivity where duration cannot be set.
-					double maxPowerEstimate = Math.min(selectedCharger.getPlugPower(), ev.getBatteryCapacity() / 3.6);
+					// createStageActivity... creates a InteractionActivity where duration cannot be set.
+					chargeAct = PopulationUtils.createActivity(chargeAct);
+					// assume that the battery is compatible with a power that allows for full charge within one hour (cf. FixedSpeedCharging)
+					double maxPowerEstimate = Math.min(selectedCharger.getPlugPower(), ev.getBatteryCapacity() / 3600);
 					double estimatedChargingTime = (ev.getBatteryCapacity() * 1.5) / maxPowerEstimate;
 					chargeAct.setMaximumDuration(Math.max(evConfigGroup.minimumChargeTime, estimatedChargingTime));
 					lastArrivaltime += chargeAct.getMaximumDuration().seconds();
