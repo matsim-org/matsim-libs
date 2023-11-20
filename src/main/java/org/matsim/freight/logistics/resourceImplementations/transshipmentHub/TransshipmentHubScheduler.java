@@ -80,7 +80,7 @@ import java.util.ArrayList;
 			}
 		}
 		ShipmentPlanElement handle = builder.build();
-		String idString = handle.getResourceId() + "" + handle.getLogisticChainElement().getId() + "" + handle.getElementType();
+		String idString = handle.getResourceId() + String.valueOf(handle.getLogisticChainElement().getId()) + handle.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, handle);
 	}
@@ -109,7 +109,7 @@ import java.util.ArrayList;
 		this.transshipmentHubResource = transshipmentHubResource;
 	}
 
-	public void setEventHandler(TransshipmentHubTourEndEventHandler eventHandler) {
+	public void setTransshipmentHubTourEndEventHandler( TransshipmentHubTourEndEventHandler eventHandler ) {
 		this.eventHandler = eventHandler;
 	}
 

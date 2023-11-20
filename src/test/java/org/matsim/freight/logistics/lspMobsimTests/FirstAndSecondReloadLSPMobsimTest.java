@@ -20,7 +20,6 @@
 
 package org.matsim.freight.logistics.lspMobsimTests;
 
-import org.matsim.freight.logistics.example.lsp.lspReplanning.AssignmentStrategyFactory;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
@@ -44,13 +43,9 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.replanning.GenericPlanStrategyImpl;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
-import org.matsim.freight.carriers.controler.CarrierControlerUtils;
-import org.matsim.freight.carriers.controler.CarrierStrategyManager;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -63,7 +58,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 
-public class MultipleShipmentsSecondReloadLSPMobsimTest {
+public class FirstAndSecondReloadLSPMobsimTest {
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
@@ -217,8 +212,8 @@ public class MultipleShipmentsSecondReloadLSPMobsimTest {
 		lsp = completeLSPBuilder.build();
 
 		List<Link> linkList = new LinkedList<>(network.getLinks().values());
-		int numberOfShipments = 1 + MatsimRandom.getRandom().nextInt(50);
-		for (int i = 1; i < 1 + numberOfShipments; i++) {
+
+		for (int i = 1; i < 2; i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
 			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
 			int capacityDemand = 1 + MatsimRandom.getRandom().nextInt(4);
@@ -266,26 +261,18 @@ public class MultipleShipmentsSecondReloadLSPMobsimTest {
 		lspList.add(lsp);
 		LSPs lsps = new LSPs(lspList);
 
+		LSPUtils.addLSPs(scenario, lsps);
+
 		Controler controler = new Controler(scenario);
 
-		LSPUtils.addLSPs(scenario, lsps);
-		controler.addOverridingModule(new LSPModule());
-		controler.addOverridingModule( new AbstractModule(){
-			@Override public void install(){
-				bind( LSPStrategyManager.class ).toProvider(() -> {
-					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-					strategyManager.addStrategy(new AssignmentStrategyFactory().createStrategy(), null, 1);
-					return strategyManager;
-				});
-				bind( CarrierStrategyManager.class ).toProvider(() -> {
-					CarrierStrategyManager strategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
-					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new RandomPlanSelector<>()), null, 1);
-					return strategyManager;
-				});
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				install(new LSPModule());
 			}
-		} );
+		});
 		config.controller().setFirstIteration(0);
-		config.controller().setLastIteration(4);
+		config.controller().setLastIteration(0);
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23

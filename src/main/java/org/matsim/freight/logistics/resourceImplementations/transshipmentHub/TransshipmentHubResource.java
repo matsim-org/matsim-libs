@@ -67,9 +67,8 @@ public class TransshipmentHubResource extends LSPDataObject<LSPResource> impleme
 		this.transshipmentHubScheduler = builder.getTransshipmentHubScheduler();
 		transshipmentHubScheduler.setTranshipmentHub(this);
 		TransshipmentHubTourEndEventHandler eventHandler = new TransshipmentHubTourEndEventHandler(this, scenario);
-		transshipmentHubScheduler.setEventHandler(eventHandler);
+		transshipmentHubScheduler.setTransshipmentHubTourEndEventHandler(eventHandler );
 		this.clientElements = builder.getClientElements();
-		this.addSimulationTracker(eventHandler);
 	}
 
 	@Override

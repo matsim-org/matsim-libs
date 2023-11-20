@@ -103,7 +103,6 @@ public class LSPModule extends AbstractModule {
 
 		// the scorers are necessary to run a zeroth iteration to the end:
 		bind( CarrierScoringFunctionFactory.class ).to( CarrierScoringFactoryDummyImpl.class );
-//		bind( CarrierScoringFunctionFactory.class ).to( CarrierScoringFunctionFactoryImpl.class );
 		bind( LSPScorerFactory.class ).to( LSPScoringFunctionFactoryDummyImpl.class );
 
 		// for iterations, one needs to replace the following with something meaningful.  If nothing else, there are "empty implementations" that do nothing.  kai, jul'22
