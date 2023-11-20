@@ -276,7 +276,7 @@ public class DrtSpeedUpTest {
 		var personId = Id.create(id, Person.class);
 
 		var submittedEvent = new DrtRequestSubmittedEvent(submittedTime, MODE, requestId, List.of(personId), linkAB.getId(),
-				linkBC.getId(), Double.NaN, Double.NaN, Double.NaN, Double.NaN);
+				linkBC.getId(), Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN);
 		var pickupEvent = new PassengerPickedUpEvent(submittedTime + waitTime, MODE, requestId, null, null);
 		double rideTime = DistanceUtils.calculateDistance(linkBC, linkAB) / inVehicleSpeed;
 		var dropoffEvent = new PassengerDroppedOffEvent(submittedTime + waitTime + rideTime, MODE, requestId, null,
@@ -285,7 +285,8 @@ public class DrtSpeedUpTest {
 				MODE, requestId.toString());
 		var departureEvent = mock(PersonDepartureEvent.class);
 
-		return new EventSequence(personId, departureEvent, submittedEvent, mock(PassengerRequestScheduledEvent.class),
+
+		return new EventSequence(Id.createPersonId("r1"), departureEvent, submittedEvent, mock(PassengerRequestScheduledEvent.class),
 				pickupEvent, dropoffEvent, List.of(drtFare));
 	}
 

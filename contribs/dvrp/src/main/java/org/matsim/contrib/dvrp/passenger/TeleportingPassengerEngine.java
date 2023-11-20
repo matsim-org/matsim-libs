@@ -145,7 +145,7 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
 				List.of(passenger.getId()), route, getLink(fromLinkId), getLink(toLinkId), now, now);
 
-		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerId()));
+		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerIds()));
 
 		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
 			Route teleportedRoute = adaptLegRouteForTeleportation(List.of(passenger), request, now);
@@ -188,7 +188,7 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 	}
 
 	@Override
-	public boolean notifyWaitForPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
+	public boolean notifyWaitForPassengers(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
 			Id<Request> requestId) {
 		throw new UnsupportedOperationException("No notifying when teleporting");
 	}

@@ -36,15 +36,15 @@ import com.google.common.base.Preconditions;
  * need to pass a person, a leg with the respective DRT mode, the
  * requested/expected earliest departure time, and the time at which the request
  * should be submitted / taken into account in the system.
- * 
+ *
  * Preplanned requests can be submitted any time before the planned
  * departure/submission times.
- * 
+ *
  * Internally, the prebooking manager will create a request identifier and
  * return the request once the agent actually wants to depart on the planned
  * leg. The link between a leg and a request is managed by inserting a special
  * attribute in the leg instance.
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class PrebookingManager implements MobsimEngine, AdvanceRequestProvider {
@@ -113,7 +113,7 @@ public class PrebookingManager implements MobsimEngine, AdvanceRequestProvider {
 
 				eventsManager.processEvent(new PassengerRequestBookedEvent(now, mode, requestId, item.person.getId()));
 
-				PassengerRequest request = requestCreator.createRequest(requestId, item.person.getId(),
+				PassengerRequest request = requestCreator.createRequest(requestId, List.of(item.person.getId()),
 						item.leg.getRoute(), getLink(item.leg.getRoute().getStartLinkId()),
 						getLink(item.leg.getRoute().getEndLinkId()), item.earliestDepartureTime, now);
 
@@ -131,7 +131,7 @@ public class PrebookingManager implements MobsimEngine, AdvanceRequestProvider {
 				if (!violations.isEmpty()) {
 					String cause = String.join(", ", violations);
 					eventsManager.processEvent(new PassengerRequestRejectedEvent(now, mode, request.getId(),
-							request.getPassengerId(), cause));
+							request.getPassengerIds(), cause));
 				} else {
 					synchronized (optimizer) {
 						optimizer.requestSubmitted(request);

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Coord;
@@ -379,13 +380,13 @@ public class PrebookingTestEnvironment {
 			PassengerDroppedOffEventHandler, PassengerRequestRejectedEventHandler {
 		@Override
 		public void handleEvent(DrtRequestSubmittedEvent event) {
-			requestInfo.computeIfAbsent(event.getPersonId().toString(), id -> new RequestInfo()).submissionTime = event
+			requestInfo.computeIfAbsent(event.getPersonIds().stream().map(Object::toString).collect(Collectors.joining("-")), id -> new RequestInfo()).submissionTime = event
 					.getTime();
 		}
 
 		@Override
 		public void handleEvent(PassengerRequestRejectedEvent event) {
-			requestInfo.computeIfAbsent(event.getPersonId().toString(), id -> new RequestInfo()).rejected = true;
+			requestInfo.computeIfAbsent(event.getPersonIds().stream().map(Object::toString).collect(Collectors.joining("-")), id -> new RequestInfo()).rejected = true;
 		}
 
 		@Override

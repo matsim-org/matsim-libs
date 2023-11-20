@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -85,6 +86,28 @@ public class DrtEventSequenceCollector
 		PersonMoneyEventHandler, PersonDepartureEventHandler {
 
 	public static class EventSequence {
+
+		public static class PersonEvents {
+
+			@Nullable
+			private PersonDepartureEvent departure;
+			@Nullable
+			private PassengerPickedUpEvent pickedUp;
+			@Nullable
+			private PassengerDroppedOffEvent droppedOff;
+
+			public Optional<PersonDepartureEvent> getDeparture() {
+				return Optional.ofNullable(departure);
+			}
+
+			public Optional<PassengerPickedUpEvent> getPickedUp() {
+				return Optional.ofNullable(pickedUp);
+			}
+
+			public Optional<PassengerDroppedOffEvent> getDroppedOff() {
+				return Optional.ofNullable(droppedOff);
+			}
+		}
 		private final DrtRequestSubmittedEvent submitted;
 
 		@Nullable
@@ -92,12 +115,8 @@ public class DrtEventSequenceCollector
 		@Nullable
 		private PassengerRequestRejectedEvent rejected;
 
-		@Nullable
-		private PersonDepartureEvent departure;
-		@Nullable
-		private PassengerPickedUpEvent pickedUp;
-		@Nullable
-		private PassengerDroppedOffEvent droppedOff;
+		private final Map<Id<Person>, PersonEvents> personEvents = new HashMap<>();
+
 		@Nullable
 		private List<PersonMoneyEvent> drtFares = new LinkedList<>();
 
@@ -105,15 +124,17 @@ public class DrtEventSequenceCollector
 			this.submitted = Objects.requireNonNull(submitted);
 		}
 
-		public EventSequence(PersonDepartureEvent departure, DrtRequestSubmittedEvent submitted,
+		public EventSequence(Id<Person> personId, PersonDepartureEvent departure, DrtRequestSubmittedEvent submitted,
 				PassengerRequestScheduledEvent scheduled, PassengerPickedUpEvent pickedUp,
 				PassengerDroppedOffEvent droppedOff, List<PersonMoneyEvent> drtFares) {
 			this.submitted = Objects.requireNonNull(submitted);
 			this.scheduled = scheduled;
-			this.departure = departure;
-			this.pickedUp = pickedUp;
-			this.droppedOff = droppedOff;
 			this.drtFares = new ArrayList<>(drtFares);
+			PersonEvents personEvents = new PersonEvents();
+			personEvents.departure = departure;
+			personEvents.pickedUp = pickedUp;
+			personEvents.droppedOff = droppedOff;
+			this.personEvents.put(personId, personEvents);
 		}
 
 		public DrtRequestSubmittedEvent getSubmitted() {
@@ -128,24 +149,17 @@ public class DrtEventSequenceCollector
 			return Optional.ofNullable(rejected);
 		}
 
-		public Optional<PersonDepartureEvent> getDeparture() {
-			return Optional.ofNullable(departure);
+		public Map<Id<Person>, PersonEvents> getPersonEvents() {
+			return personEvents;
 		}
 
-		public Optional<PassengerPickedUpEvent> getPickedUp() {
-			return Optional.ofNullable(pickedUp);
-		}
-
-		public Optional<PassengerDroppedOffEvent> getDroppedOff() {
-			return Optional.ofNullable(droppedOff);
-		}
 
 		public List<PersonMoneyEvent> getDrtFares() {
 			return Collections.unmodifiableList(drtFares);
 		}
 
 		public boolean isCompleted() {
-			return droppedOff != null;
+			return personEvents.values().stream().allMatch(pe -> pe.droppedOff != null);
 		}
 	}
 
@@ -155,7 +169,7 @@ public class DrtEventSequenceCollector
 	private final List<PersonMoneyEvent> drtFarePersonMoneyEvents = new ArrayList<>();
 
 	private final Map<Id<Person>, PersonDepartureEvent> latestDepartures = new HashMap<>();
-	private final Map<Id<Request>, PersonDepartureEvent> waitingForSubmission = new HashMap<>(); 
+	private final Map<Id<Request>, List<PersonDepartureEvent>> waitingForSubmission = new HashMap<>();
 
 	public DrtEventSequenceCollector(String mode) {
 		this.mode = mode;
@@ -175,8 +189,8 @@ public class DrtEventSequenceCollector
 	public Map<Id<Request>, EventSequence> getPerformedRequestSequences() {
 		return sequences.entrySet().stream() //
 				.filter(e -> e.getValue().getRejected().isEmpty()) //
-				.filter(e -> e.getValue().getDeparture().isPresent()) //
-				.filter(e -> e.getValue().getPickedUp().isPresent()) //
+				.filter(e -> e.getValue().personEvents.values().stream().allMatch(pe -> pe.departure != null)) //
+				.filter(e -> e.getValue().personEvents.values().stream().allMatch(pe -> pe.pickedUp != null)) //
 				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 	}
 
@@ -197,9 +211,16 @@ public class DrtEventSequenceCollector
 		if (event.getMode().equals(mode)) {
 			EventSequence sequence = new EventSequence(event);
 			sequences.put(event.getRequestId(), sequence);
-			
+
 			// if we already have a departure
-			sequence.departure = waitingForSubmission.remove(event.getRequestId());
+			List<PersonDepartureEvent> waiting = waitingForSubmission.remove(event.getRequestId());
+			if(waiting != null) {
+				for (PersonDepartureEvent departure : waiting) {
+					sequence.getPersonEvents().computeIfAbsent(
+							departure.getPersonId(), personId -> new EventSequence.PersonEvents()
+					).departure = departure;
+				}
+			}
 		}
 	}
 
@@ -218,21 +239,23 @@ public class DrtEventSequenceCollector
 	@Override
 	public void handleEvent(PassengerWaitingEvent event) {
 		if (event.getMode().equals(mode)) {
-			// must exist, otherwise something is wrong
-			PersonDepartureEvent departureEvent = Objects.requireNonNull(latestDepartures.remove(event.getPersonId()));
-
 			EventSequence sequence = sequences.get(event.getRequestId());
-			if (sequence != null) {
-				// prebooked request, we already have the submission
-				Verify.verifyNotNull(sequence.submitted);
-				sequence.departure = departureEvent;
-			} else {
-				// immediate request, submission event should come soon
-				waitingForSubmission.put(event.getRequestId(), departureEvent);
+			for (Id<Person> personId : event.getPersonIds()) {
+				// must exist, otherwise something is wrong
+				PersonDepartureEvent departureEvent = Objects.requireNonNull(latestDepartures.remove(personId));
+
+				if (sequence != null) {
+					// prebooked request, we already have the submission
+					Verify.verifyNotNull(sequence.submitted);
+					sequence.personEvents.computeIfAbsent(personId, p -> new EventSequence.PersonEvents()).departure = departureEvent;
+				} else {
+					// immediate request, submission event should come soon
+					waitingForSubmission.computeIfAbsent(event.getRequestId(), requestId -> new ArrayList<>()).add(departureEvent);
+				}
 			}
 		}
 	}
-	
+
 	@Override
 	public void handleEvent(PassengerRequestScheduledEvent event) {
 		if (event.getMode().equals(mode)) {
@@ -250,14 +273,14 @@ public class DrtEventSequenceCollector
 	@Override
 	public void handleEvent(PassengerPickedUpEvent event) {
 		if (event.getMode().equals(mode)) {
-			sequences.get(event.getRequestId()).pickedUp = event;
+			sequences.get(event.getRequestId()).personEvents.get(event.getPersonId()).pickedUp = event;
 		}
 	}
 
 	@Override
 	public void handleEvent(PassengerDroppedOffEvent event) {
 		if (event.getMode().equals(mode)) {
-			sequences.get(event.getRequestId()).droppedOff = event;
+			sequences.get(event.getRequestId()).personEvents.get(event.getPersonId()).droppedOff = event;
 		}
 	}
 

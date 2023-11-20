@@ -199,14 +199,17 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 			double beelineDistance = DistanceUtils.calculateDistance(depLink.getToNode(), arrLink.getToNode());
 
 			for (Id<Person> personId : submittedEvent.getPersonIds()) {
-				if(sequence.getPickedUp().containsKey(personId) && sequence.getDroppedOff().containsKey(personId)) {
-					double pickupTime = sequence.getPickedUp().get(personId).getTime();
-					double waitTime = pickupTime - sequence.getSubmitted().getTime();
-					double rideTime = sequence.getDroppedOff().get(personId).getTime() - pickupTime;
+				if(sequence.getPersonEvents().containsKey(personId)) {
+					DrtEventSequenceCollector.EventSequence.PersonEvents personEvents = sequence.getPersonEvents().get(personId);
+					if(personEvents.getPickedUp().isPresent() && personEvents.getDroppedOff().isPresent()) {
+						double pickupTime = personEvents.getPickedUp().get().getTime();
+						double waitTime = pickupTime - sequence.getSubmitted().getTime();
+						double rideTime = personEvents.getDroppedOff().get().getTime() - pickupTime;
 
-					//TODO I would map unshared_ride_time to rideTime -- should be more precise
-					meanInVehicleBeelineSpeed.increment(beelineDistance / rideTime);
-					meanWaitTime.increment(waitTime);
+						//TODO I would map unshared_ride_time to rideTime -- should be more precise
+						meanInVehicleBeelineSpeed.increment(beelineDistance / rideTime);
+						meanWaitTime.increment(waitTime);
+					}
 				}
 			}
 		}

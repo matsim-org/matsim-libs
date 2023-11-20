@@ -162,14 +162,14 @@ public final class PassengerEngineWithPrebooking
 		//TODO what if it was already rejected while prebooking??
 
 		PassengerRequest prebookedRequest = prebookedRequests.get(0);
-		
-		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, prebookedRequest.getId(), prebookedRequest.getPassengerId()));
-		
+
+		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, prebookedRequest.getId(), prebookedRequest.getPassengerIds()));
+
 		PassengerPickupActivity awaitingPickup = awaitingPickups.remove(prebookedRequest.getId());
 		if (awaitingPickup != null) {
 			awaitingPickup.notifyPassengersAreReadyForDeparture(List.of(passenger), now);
 		}
-		
+
 		return true;
 	}
 
@@ -303,7 +303,7 @@ public final class PassengerEngineWithPrebooking
 	 * to be tested anywhere. /sebhoerl
 	 */
 	@Override
-	public boolean notifyWaitForPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver, Id<Request> requestId) {
+	public boolean notifyWaitForPassengers(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver, Id<Request> requestId) {
 		Id<Link> linkId = driver.getCurrentLinkId();
 		RequestEntry requestEntry = activeRequests.get(requestId);
 		MobsimPassengerAgent passenger = requestEntry.passenger;
@@ -314,7 +314,7 @@ public final class PassengerEngineWithPrebooking
 			awaitingPickups.put(requestId, pickupActivity);
 			return false;// wait for the passenger
 		}
-		
+
 		return true; // passenger present?
 	}
 }

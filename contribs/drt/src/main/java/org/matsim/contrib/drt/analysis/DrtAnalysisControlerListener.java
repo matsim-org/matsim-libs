@@ -78,6 +78,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -131,15 +132,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		Preconditions.checkArgument(sequence.isCompleted());
 		List<DrtLeg> legs = new ArrayList<>();
 		DrtRequestSubmittedEvent submittedEvent = sequence.getSubmitted();
-		Map<Id<Person>, PersonDepartureEvent> departureEvents = sequence.getDepartures();
-		Map<Id<Person>, PassengerPickedUpEvent> pickedUpEvents = sequence.getPickedUp();
-		Map<Id<Person>, PassengerDroppedOffEvent> droppedOffEvents = sequence.getDroppedOff();
+
+		Map<Id<Person>, EventSequence.PersonEvents> personEvents = sequence.getPersonEvents();
 
 		var request = submittedEvent.getRequestId();
 		var submissionTime = submittedEvent.getTime();
-		var departureTime = departureEvent.getTime();
-		var person = submittedEvent.getPersonId();
-		var vehicle = pickedUpEvent.getVehicleId();
 		var fromLinkId = submittedEvent.getFromLinkId();
 		var fromCoord = linkProvider.apply(fromLinkId).getToNode().getCoord();
 		var toLinkId = submittedEvent.getToLinkId();
@@ -153,10 +150,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 		var latestArrivalTime = sequence.getSubmitted().getLatestDropoffTime();
 
 		for (Id<Person> person : submittedEvent.getPersonIds()) {
-			var departureTime = departureEvents.get(person).getTime();
-			var vehicle = pickedUpEvents.get(person).getVehicleId();
-			var waitTime = pickedUpEvents.get(person).getTime() - departureEvents.get(person).getTime();
-			var arrivalTime = droppedOffEvents.get(person).getTime();
+			var departureTime = personEvents.get(person).getDeparture().get().getTime();
+			PassengerPickedUpEvent pickedUp = personEvents.get(person).getPickedUp().get();
+			var vehicle = pickedUp.getVehicleId();
+			var waitTime = pickedUp.getTime() -  personEvents.get(person).getDeparture().get().getTime();
+			var arrivalTime = personEvents.get(person).getDroppedOff().get().getTime();
 			legs.add(new DrtLeg(request, submissionTime, departureTime, person, vehicle, fromLinkId, fromCoord, toLinkId, toCoord, waitTime, unsharedDistanceEstimate_m,
 					unsharedTimeEstimate_m, arrivalTime, fare, earliestDepartureTime, latestDepartureTime, latestArrivalTime));
 		}
@@ -386,11 +384,14 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			for (EventSequence seq : performedRequestEventSequences) {
 				List<Id<Person>> personIds = seq.getSubmitted().getPersonIds();
 				for (Id<Person> person : personIds) {
-					if(seq.getPickedUp().containsKey(person) && seq.getDepartures().containsKey(person)) {
-						double actualWaitTime = seq.getPickedUp().get().getTime() - seq.getDeparture().get().getTime();
-						double estimatedWaitTime = seq.getScheduled().get().getPickupTime() - seq.getSubmitted().getEarliestDepartureTime();
-						bw.append(line(seq.getSubmitted().getRequestId(), actualWaitTime, estimatedWaitTime, actualWaitTime - estimatedWaitTime));
-						times.add(actualWaitTime, estimatedWaitTime);
+					if(seq.getPersonEvents().containsKey(person)) {
+						EventSequence.PersonEvents personEvents = seq.getPersonEvents().get(person);
+						if(personEvents.getPickedUp().isPresent() && personEvents.getDeparture().isPresent()) {
+							double actualWaitTime = personEvents.getPickedUp().get().getTime() - personEvents.getDeparture().get().getTime();
+							double estimatedWaitTime = seq.getScheduled().get().getPickupTime() - seq.getSubmitted().getEarliestDepartureTime();
+							bw.append(line(seq.getSubmitted().getRequestId(), actualWaitTime, estimatedWaitTime, actualWaitTime - estimatedWaitTime));
+							times.add(actualWaitTime, estimatedWaitTime);
+						}
 					}
 				}
 			}

@@ -77,6 +77,7 @@ public class GroupPassengerEngineTest {
 				new PersonDepartureEvent(departureTime, person2, fixture.linkAB.getId(), MODE, MODE),
 				new ActivityEndEvent(departureTime, person1, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(departureTime, person1, fixture.linkAB.getId(), MODE, MODE),
+				new PassengerWaitingEvent(departureTime, MODE, requestId, List.of(person1, person2)),
 				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, List.of(person1, person2), VEHICLE_ID, 0,
 						scheduledDropoffTime),
 				new PersonEntersVehicleEvent(pickupStartTime, person1, Id.createVehicleId(VEHICLE_ID)),

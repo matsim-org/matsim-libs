@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.passenger;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.google.common.base.Verify;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -152,12 +153,12 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 					List.of(passenger.getId()), route, getLink(fromLinkId), getLink(toLinkId), now, now);
 
 			// must come before validateAndSubmitRequest (to come before rejection event)
-			eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), passenger.getId()));
+			eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), List.of(passenger.getId())));
 			activePassengers.put(request.getId(), List.of(passenger));
 
 			validateAndSubmitRequest(List.of(passenger), request, now);
 		} else { // advance request
-			eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), passenger.getId()));
+			eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), List.of(passenger.getId())));
 			activePassengers.put(request.getId(), List.of(passenger));
 
 			PassengerPickupActivity pickupActivity = waitingForPassenger.remove(request.getId());
@@ -209,7 +210,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	 * notified once the agent arrives for departure.
 	 */
 	@Override
-	public boolean notifyWaitForPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver, Id<Request> requestId) {
+	public boolean notifyWaitForPassengers(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver, Id<Request> requestId) {
 		if (!activePassengers.containsKey(requestId)) {
 			waitingForPassenger.put(requestId, pickupActivity);
 			return false;

@@ -90,7 +90,7 @@ public class DrtStopActivity extends FirstLastSimStepDynActivity implements Pass
 			return;// pick up only at the end of stop activity
 		}
 
-		var request = getRequestForPassenger(passengers.stream().map(Identifiable::getId).toList());
+		var request = getRequestForPassengers(passengers.stream().map(Identifiable::getId).toList());
 		if (passengerHandler.tryPickUpPassengers(this, driver, request.getId(), now)) {
 			passengersPickedUp++;
 		} else {
@@ -98,10 +98,10 @@ public class DrtStopActivity extends FirstLastSimStepDynActivity implements Pass
 		}
 	}
 
-	private AcceptedDrtRequest getRequestForPassenger(List<Id<Person>> passengerIds) {
+	private AcceptedDrtRequest getRequestForPassengers(List<Id<Person>> passengerIds) {
 		return pickupRequests.values()
 				.stream()
-				.filter(r -> r.getPassengerIds().containsAll(passengerIds))
+				.filter(r -> r.getPassengerIds().size() == passengerIds.size() && r.getPassengerIds().containsAll(passengerIds))
 				.findAny()
 				.orElseThrow(() -> new IllegalArgumentException("I am waiting for different passengers!"));
 	}
