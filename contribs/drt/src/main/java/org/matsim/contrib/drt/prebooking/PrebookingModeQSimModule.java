@@ -95,12 +95,15 @@ public class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
 					timingUpdater, prebookingParams.scheduleWaitBeforeDrive);
 		})).in(Singleton.class);
 
-		if (prebookingParams.unschedulingMode.equals(UnschedulingMode.StopBased)) {
+		switch (prebookingParams.unschedulingMode) {
+		case StopBased:
 			bindModal(RequestUnscheduler.class).to(modalKey(SimpleRequestUnscheduler.class));
-		} else if (prebookingParams.unschedulingMode.equals(UnschedulingMode.Routing)) {
+			break;
+		case Routing:
 			bindModal(RequestUnscheduler.class).to(modalKey(ComplexRequestUnscheduler.class));
-		} else {
-			throw new IllegalStateException();
+			break;
+		default:
+			throw new IllegalStateException("No binding for selected RequestUnscheduler");
 		}
 	}
 }
