@@ -3,7 +3,6 @@ package org.matsim.contrib.drt.prebooking;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.prebooking.PrebookingParams.UnschedulingMode;
 import org.matsim.contrib.drt.prebooking.abandon.AbandonVoter;
 import org.matsim.contrib.drt.prebooking.abandon.MaximumDelayAbandonVoter;
 import org.matsim.contrib.drt.prebooking.logic.helpers.PopulationIterator.PopulationIteratorFactory;
@@ -23,6 +22,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
@@ -57,9 +57,10 @@ public class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
 			PassengerRequestValidator requestValidator = getter.getModal(PassengerRequestValidator.class);
 			EventsManager eventsManager = getter.get(EventsManager.class);
 			RequestUnscheduler requestUnscheduler = getter.getModal(RequestUnscheduler.class);
+			MobsimTimer mobsimTimer = getter.get(MobsimTimer.class);
 
-			return new PrebookingManager(getMode(), network, requestCreator, optimizer, requestValidator, eventsManager,
-					requestUnscheduler);
+			return new PrebookingManager(getMode(), network, requestCreator, optimizer, mobsimTimer, requestValidator,
+					eventsManager, requestUnscheduler);
 		})).in(Singleton.class);
 		addModalQSimComponentBinding().to(modalKey(PrebookingManager.class));
 
