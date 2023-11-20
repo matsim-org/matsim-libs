@@ -197,6 +197,11 @@ public class DrtInsertionModule extends AbstractDvrpModeQSimModule {
 		this.vehicleRangeSupplierClass = rangeSupplierClass;
 		return this;
 	}
+	
+	public DrtInsertionModule withRangeEstimationFactor(double rangeEstimationFactor) {
+		this.rangeEstimationFactor = rangeEstimationFactor;
+		return this;
+	}
 
 	private void configureRangeContraint(List<Key<? extends DrtInsertionConstraint>> constraintBindings) {
 		if (useRangeConstraint) {
@@ -345,7 +350,7 @@ public class DrtInsertionModule extends AbstractDvrpModeQSimModule {
 		return this;
 	}
 
-	public DrtInsertionModule withEstimatedDistanceObjective(double estimationFactor) {
+	public DrtInsertionModule withDistanceObjectiveFactor(double estimationFactor) {
 		this.distanceObjectiveEstimationFactor = estimationFactor;
 		return this;
 	}

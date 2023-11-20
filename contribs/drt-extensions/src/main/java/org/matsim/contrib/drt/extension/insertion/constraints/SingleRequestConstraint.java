@@ -6,21 +6,21 @@ import org.matsim.contrib.drt.extension.insertion.DrtInsertionConstraint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEventHandler;
 import org.matsim.core.events.MobsimScopeEventHandler;
 
 public class SingleRequestConstraint
-		implements DrtInsertionConstraint, PassengerRequestRejectedEventHandler, MobsimScopeEventHandler {
-	private final IdSet<Person> rejectedPersons = new IdSet<>(Person.class);
-
-	@Override
-	public void handleEvent(PassengerRequestRejectedEvent event) {
-		rejectedPersons.add(event.getPersonId());
-	}
+		implements DrtInsertionConstraint, PassengerRequestSubmittedEventHandler, MobsimScopeEventHandler {
+	private final IdSet<Person> observedPersons = new IdSet<>(Person.class);
 
 	@Override
 	public boolean checkInsertion(DrtRequest drtRequest, Insertion insertion, DetourTimeInfo detourTimeInfo) {
-		return !rejectedPersons.contains(drtRequest.getPassengerId());
+		return !observedPersons.contains(drtRequest.getPassengerId());
+	}
+
+	@Override
+	public void handleEvent(PassengerRequestSubmittedEvent event) {
+		observedPersons.add(event.getPersonId());
 	}
 }
