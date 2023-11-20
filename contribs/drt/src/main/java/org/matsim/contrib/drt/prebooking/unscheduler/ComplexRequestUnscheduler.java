@@ -91,6 +91,7 @@ public class ComplexRequestUnscheduler implements RequestUnscheduler {
 
 		Verify.verifyNotNull(pickupStopTask, "Could not find request that I'm supposed to unschedule");
 		Verify.verifyNotNull(dropoffStopTask, "Could not find request that I'm supposed to unschedule");
+		Verify.verifyNotNull(pickupStop);
 		Verify.verifyNotNull(dropoffStop);
 
 		// remove request from stop, this we do in any case
@@ -102,7 +103,7 @@ public class ComplexRequestUnscheduler implements RequestUnscheduler {
 		// removed the pickup and the StopAction will handle the situation
 		// - or we found a stop, then it is not started yet and we can remove it
 
-		boolean removePickup = pickupStop != null && pickupStopTask.getPickupRequests().size() == 0
+		boolean removePickup = pickupStopTask.getPickupRequests().size() == 0
 				&& pickupStopTask.getDropoffRequests().size() == 0;
 		boolean removeDropoff = dropoffStopTask.getPickupRequests().size() == 0
 				&& dropoffStopTask.getDropoffRequests().size() == 0;
