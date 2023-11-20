@@ -64,6 +64,9 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 		return labels.get(ins);
 	}
 
+	/**
+	 * Sum two arrays element-wise into new array.
+	 */
 	private static int[] sum(int[] a, int[] b) {
 		int[] counts = new int[a.length];
 		for (int i = 0; i < counts.length; i++) {
@@ -124,7 +127,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 		for (Map.Entry<Id<Link>, MeasurementLocation<Link>> entry : counts.getMeasureLocations().entrySet()) {
 			Id<Link> key = entry.getKey();
 
-			Int2DoubleMap countVolume = aggregateObserved(entry.getValue(), modes);
+			Int2DoubleMap countVolume =  aggregateObserved(entry.getValue(), modes);
 
 			String name = entry.getValue().getDisplayName();
 
@@ -168,9 +171,11 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 					row.setDouble("observed_traffic_volume", observedTrafficVolumeAtHour);
 					row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeAtHour);
 				}
-			} else
+			} else {
 				// Get the daily values
 				observedTrafficVolumeByDay = countVolume.get(24);
+				simulatedTrafficVolumeByDay = Arrays.stream(volumesForLink).sum() / this.sample.getSample();
+			}
 
 			Row row = dailyTrafficVolume.appendRow();
 			row.setString("link_id", key.toString());
