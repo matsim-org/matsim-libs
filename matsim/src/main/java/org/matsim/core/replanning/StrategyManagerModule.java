@@ -35,6 +35,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.choosers.StrategyChooser;
 import org.matsim.core.replanning.choosers.WeightedStrategyChooser;
+import org.matsim.core.replanning.conflicts.ConflictModule;
 import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
@@ -92,6 +93,8 @@ public class StrategyManagerModule extends AbstractModule {
 				// (settings is the key ... ok.  The Key.get(...) returns the PlanStrategy that was registered under its name at (*) above.)
 			}
 		}
+		
+		install(new ConflictModule());
 	}
 
 	/**
