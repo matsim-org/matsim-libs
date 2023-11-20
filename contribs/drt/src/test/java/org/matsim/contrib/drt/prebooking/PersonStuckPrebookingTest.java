@@ -36,7 +36,7 @@ import org.matsim.testcases.MatsimTestUtils;
 /**
  * @author Sebastian Hörl (sebhoerl) / IRT SystemX
  */
-public class StuckPrebookingTest {
+public class PersonStuckPrebookingTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
