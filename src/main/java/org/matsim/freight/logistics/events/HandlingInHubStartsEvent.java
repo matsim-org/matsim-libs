@@ -41,8 +41,6 @@ public final class HandlingInHubStartsEvent extends AbstractLspEvent {
 	private final Id<LSPResource> hubId;
 	private final double expHandlingDuration;
 
-	//TODO: Add more information about the handling, e.g. expected duration of handling.  KMT after mtg with kn, jul' 23
-
 	public HandlingInHubStartsEvent(double time, Id<Link> linkId, Id<LSPShipment> lspShipmentId, Id<LSPResource> hubId, double expHandlingDuration) {
 		super(time, linkId, lspShipmentId);
 		this.hubId = hubId;

@@ -66,16 +66,6 @@ public class LSPModule extends AbstractModule {
 		bind( CarrierAgentTracker.class ).in( Singleton.class );
 		addEventHandlerBinding().to( CarrierAgentTracker.class );
 
-//		Multibinder<FreightEventCreator> freightEventCreatorMultibinder = Multibinder.newSetBinder( this.binder(), FreightEventCreator.class );
-//		for( FreightEventCreator freightEventCreator : FreightEventCreatorUtils.getStandardEventCreators() ){
-//			freightEventCreatorMultibinder.addBinding().toInstance( freightEventCreator );
-//		}
-//
-//		Multibinder<LspEventCreator> logisticEventCreatorMultibinder = Multibinder.newSetBinder( this.binder(), LspEventCreator.class );
-//		for( LspEventCreator logisticEventCreator : LspEventCreatorUtils.getStandardEventCreators() ){
-//			logisticEventCreatorMultibinder.addBinding().toInstance( logisticEventCreator );
-//		}
-
 		// this switches on certain qsim components:
 		QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule(getConfig(), QSimComponentsConfigGroup.class);
 		List<String> abc = qsimComponents.getActiveComponents();
@@ -113,7 +103,6 @@ public class LSPModule extends AbstractModule {
 
 		// the scorers are necessary to run a zeroth iteration to the end:
 		bind( CarrierScoringFunctionFactory.class ).to( CarrierScoringFactoryDummyImpl.class );
-//		bind( CarrierScoringFunctionFactory.class ).to( CarrierScoringFunctionFactoryImpl.class );
 		bind( LSPScorerFactory.class ).to( LSPScoringFunctionFactoryDummyImpl.class );
 
 		// for iterations, one needs to replace the following with something meaningful.  If nothing else, there are "empty implementations" that do nothing.  kai, jul'22
