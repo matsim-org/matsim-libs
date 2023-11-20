@@ -38,6 +38,7 @@ import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSele
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
+import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
@@ -191,9 +192,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Comment("Store planned unshared drt route as a link sequence")
 	public boolean storeUnsharedPath = false; // If true, the planned unshared path is stored and exported in plans
 
-	@PositiveOrZero
-	public double advanceRequestPlanningHorizon = 0; // beta-feature; planning horizon for advance (prebooked) requests
-
 	@NotNull
 	private DrtInsertionSearchParams drtInsertionSearchParams;
 
@@ -208,6 +206,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	@Nullable
 	private DrtSpeedUpParams drtSpeedUpParams;
+
+	@Nullable
+	private PrebookingParams prebookingParams;
 
 	@Nullable
 	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
@@ -249,6 +250,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(DrtRequestInsertionRetryParams.SET_NAME, DrtRequestInsertionRetryParams::new,
 				() -> drtRequestInsertionRetryParams,
 				params -> drtRequestInsertionRetryParams = (DrtRequestInsertionRetryParams)params);
+		
+		//prebooking (optional)
+		addDefinition(PrebookingParams.SET_NAME, PrebookingParams::new,
+				() -> prebookingParams,
+				params -> prebookingParams = (PrebookingParams)params);
 	}
 
 	@Override
@@ -322,6 +328,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	public Optional<DrtRequestInsertionRetryParams> getDrtRequestInsertionRetryParams() {
 		return Optional.ofNullable(drtRequestInsertionRetryParams);
+	}
+
+	public Optional<PrebookingParams> getPrebookingParams() {
+		return Optional.ofNullable(prebookingParams);
 	}
 
 	/**

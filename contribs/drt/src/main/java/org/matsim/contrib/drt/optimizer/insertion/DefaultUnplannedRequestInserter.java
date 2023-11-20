@@ -38,6 +38,7 @@ import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
@@ -63,22 +64,23 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final DrtInsertionSearch insertionSearch;
 	private final DrtRequestInsertionRetryQueue insertionRetryQueue;
 	private final DrtOfferAcceptor drtOfferAcceptor;
-	private final ForkJoinPool forkJoinPool;
+	private final ForkJoinPool forkJoinPool;	
+	private final PassengerStopDurationProvider stopDurationProvider;
 
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
 			EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
 			VehicleEntry.EntryFactory vehicleEntryFactory, DrtInsertionSearch insertionSearch,
 			DrtRequestInsertionRetryQueue insertionRetryQueue, DrtOfferAcceptor drtOfferAcceptor,
-			ForkJoinPool forkJoinPool) {
+			ForkJoinPool forkJoinPool, PassengerStopDurationProvider stopDurationProvider) {
 		this(drtCfg.getMode(), fleet, mobsimTimer::getTimeOfDay, eventsManager, insertionScheduler, vehicleEntryFactory,
-				insertionRetryQueue, insertionSearch, drtOfferAcceptor, forkJoinPool);
+				insertionRetryQueue, insertionSearch, drtOfferAcceptor, forkJoinPool, stopDurationProvider);
 	}
 
 	@VisibleForTesting
 	DefaultUnplannedRequestInserter(String mode, Fleet fleet, DoubleSupplier timeOfDay, EventsManager eventsManager,
 			RequestInsertionScheduler insertionScheduler, VehicleEntry.EntryFactory vehicleEntryFactory,
 			DrtRequestInsertionRetryQueue insertionRetryQueue, DrtInsertionSearch insertionSearch,
-			DrtOfferAcceptor drtOfferAcceptor, ForkJoinPool forkJoinPool) {
+			DrtOfferAcceptor drtOfferAcceptor, ForkJoinPool forkJoinPool, PassengerStopDurationProvider stopDurationProvider) {
 		this.mode = mode;
 		this.fleet = fleet;
 		this.timeOfDay = timeOfDay;
@@ -89,6 +91,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		this.insertionSearch = insertionSearch;
 		this.drtOfferAcceptor = drtOfferAcceptor;
 		this.forkJoinPool = forkJoinPool;
+		this.stopDurationProvider = stopDurationProvider;
 	}
 
 	@Override
@@ -150,11 +153,17 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 			} else {
 				vehicleEntries.remove(vehicle.getId());
 			}
+			
+			double expectedPickupTime = pickupDropoffTaskPair.pickupTask.getBeginTime();
+			expectedPickupTime = Math.max(expectedPickupTime, acceptedRequest.get().getEarliestStartTime());
+			expectedPickupTime += stopDurationProvider.calcPickupDuration(vehicle, req);
+
+			double expectedDropoffTime = pickupDropoffTaskPair.dropoffTask.getBeginTime();
+			expectedDropoffTime += stopDurationProvider.calcDropoffDuration(vehicle, req);
 
 			eventsManager.processEvent(
 					new PassengerRequestScheduledEvent(now, mode, req.getId(), req.getPassengerId(), vehicle.getId(),
-							pickupDropoffTaskPair.pickupTask.getEndTime(),
-							pickupDropoffTaskPair.dropoffTask.getBeginTime()));
+							expectedPickupTime, expectedDropoffTime));
 		}
 	}
 }
