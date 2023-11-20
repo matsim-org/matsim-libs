@@ -20,6 +20,7 @@
 
 package org.matsim.freight.logistics.lspMobsimTests;
 
+import org.matsim.freight.logistics.example.lsp.lspReplanning.AssignmentStrategyFactory;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
@@ -43,9 +44,13 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.replanning.GenericPlanStrategyImpl;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
+import org.matsim.freight.carriers.controler.CarrierStrategyManager;
+import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -58,7 +63,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 
-public class SecondReloadLSPMobsimTest {
+public class MultipleIterationsFirstAndSecondReloadLSPMobsimTest {
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
@@ -66,6 +71,7 @@ public class SecondReloadLSPMobsimTest {
 
 	@Before
 	public void initialize() {
+		//Todo/Fixme: In the result there only the second hub is used. -- see Issue #170.  KMT Nov'23
 		Config config = new Config();
 		config.addCoreModules();
 
@@ -212,8 +218,8 @@ public class SecondReloadLSPMobsimTest {
 		lsp = completeLSPBuilder.build();
 
 		List<Link> linkList = new LinkedList<>(network.getLinks().values());
-
-		for (int i = 1; i < 2; i++) {
+		int numberOfShipments = 1 + MatsimRandom.getRandom().nextInt(50);
+		for (int i = 1; i < 1 + numberOfShipments; i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
 			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
 			int capacityDemand = 1 + MatsimRandom.getRandom().nextInt(4);
@@ -261,18 +267,26 @@ public class SecondReloadLSPMobsimTest {
 		lspList.add(lsp);
 		LSPs lsps = new LSPs(lspList);
 
-		LSPUtils.addLSPs(scenario, lsps);
-
 		Controler controler = new Controler(scenario);
 
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				install(new LSPModule());
+		LSPUtils.addLSPs(scenario, lsps);
+		controler.addOverridingModule(new LSPModule());
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install(){
+				bind( LSPStrategyManager.class ).toProvider(() -> {
+					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
+					strategyManager.addStrategy(new AssignmentStrategyFactory().createStrategy(), null, 1);
+					return strategyManager;
+				});
+				bind( CarrierStrategyManager.class ).toProvider(() -> {
+					CarrierStrategyManager strategyManager = CarrierControlerUtils.createDefaultCarrierStrategyManager();
+					strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new RandomPlanSelector<>()), null, 1);
+					return strategyManager;
+				});
 			}
-		});
+		} );
 		config.controller().setFirstIteration(0);
-		config.controller().setLastIteration(0);
+		config.controller().setLastIteration(1 + MatsimRandom.getRandom().nextInt(10));
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
@@ -303,5 +317,6 @@ public class SecondReloadLSPMobsimTest {
 	@Test
 	public void compareEvents(){
 		MatsimTestUtils.assertEqualEventsFiles(utils.getClassInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
+		//Please note, that this result contains also reloding / hubHandlingStarts after the main run (even if there is no further distribution carrier)
 	}
 }

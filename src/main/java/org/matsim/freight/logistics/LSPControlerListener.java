@@ -70,8 +70,14 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 		for (LSP lsp : lsps.getLSPs().values()) {
 			((LSPImpl) lsp).setScorer( lspScoringFunctionFactory.createScoringFunction() );
 
+
 			// simulation trackers of lsp:
 			registerSimulationTrackers(lsp );
+
+			// simulation trackers of resources:
+			for (LSPResource resource : lsp.getResources()) {
+				registerSimulationTrackers(resource);
+			}
 
 			// simulation trackers of shipments:
 			for (LSPShipment shipment : lsp.getShipments()) {
@@ -94,15 +100,16 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 		}
 	}
 
-	private void registerSimulationTrackers( HasSimulationTrackers<?> lsp ) {
+	private void registerSimulationTrackers( HasSimulationTrackers<?> hasSimulationTrackers) {
 		// get all simulation trackers ...
-		for (LSPSimulationTracker<?> simulationTracker : lsp.getSimulationTrackers()) {
+		for (LSPSimulationTracker<?> simulationTracker : hasSimulationTrackers.getSimulationTrackers()) {
 			// ... register them ...
 			if (!registeredHandlers.contains(simulationTracker)) {
 				log.warn("adding eventsHandler: " + simulationTracker);
 				eventsManager.addHandler(simulationTracker);
 				registeredHandlers.add(simulationTracker);
 				matsimServices.addControlerListener(simulationTracker);
+				simulationTracker.setEventsManager( eventsManager );
 			} else {
 				log.warn("not adding eventsHandler since already added: " + simulationTracker);
 			}
@@ -181,4 +188,5 @@ class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener,
 		new LSPPlanXmlWriter(LSPUtils.getLSPs(scenario)).write(controlerIO.getOutputPath() + "/output_lsps.xml.gz");
 		new CarrierPlanWriter(CarriersUtils.getCarriers(scenario)).write(controlerIO.getOutputPath() + "/output_carriers.xml.gz");
 	}
+
 }
