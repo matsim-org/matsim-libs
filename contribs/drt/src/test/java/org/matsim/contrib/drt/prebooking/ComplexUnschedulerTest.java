@@ -3,6 +3,7 @@ package org.matsim.contrib.drt.prebooking;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.prebooking.unscheduler.ComplexRequestUnscheduler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
@@ -37,6 +39,7 @@ import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.network.NetworkUtils;
@@ -78,7 +81,7 @@ public class ComplexUnschedulerTest {
 		fixture.addDrive("f60");
 		fixture.addWait(300.0);
 		fixture.addStop(60.0).addDropoffRequest(otherRequest1);
-		fixture.addStay(1000.0);
+		fixture.addFinalStay(30.0 * 3600.0);
 
 		schedule.nextTask();
 		schedule.nextTask();
@@ -89,19 +92,22 @@ public class ComplexUnschedulerTest {
 		unscheduler.unscheduleRequest(100.0, fixture.vehicle.getId(), unscheduleRequest.getId());
 
 		assertEquals(13, schedule.getTaskCount());
-		assertTrue(schedule.getTasks().get(0) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(1) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(2) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(3) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(4) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(5) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(6) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(7) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(8) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(9) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(10) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(11) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(12) instanceof DrtStayTask);
+
+		assertTasks(schedule, Arrays.asList( //
+				new ReferenceTask(DrtDriveTask.class, 0.0, 10001.0), // 0
+				new ReferenceTask(DrtStayTask.class, 10001.0, 10301.0), // 1
+				new ReferenceTask(DefaultDrtStopTask.class, 10301.0, 10361.0), // 2
+				new ReferenceTask(DrtDriveTask.class, 10361.0, 20362.0), // 3
+				new ReferenceTask(DrtStayTask.class, 20362.0, 20662.0), // 4
+				new ReferenceTask(DefaultDrtStopTask.class, 20662.0, 20722.0), // 5
+				new ReferenceTask(DrtDriveTask.class, 20722.0, 50723.0), // 6
+				new ReferenceTask(DrtStayTask.class, 50723.0, 51745.0), // 7
+				new ReferenceTask(DefaultDrtStopTask.class, 51745.0, 51805.0), // 8
+				new ReferenceTask(DrtDriveTask.class, 51805.0, 61806.0), // 9
+				new ReferenceTask(DrtStayTask.class, 61806.0, 62106.0), // 10
+				new ReferenceTask(DefaultDrtStopTask.class, 62106.0, 62166.0), // 11
+				new ReferenceTask(DrtStayTask.class, 62166.0, 30.0 * 3600.0) // 12
+		));
 
 		DrtDriveTask insertedDriveTask = (DrtDriveTask) schedule.getTasks().get(6);
 		assertEquals("f20", insertedDriveTask.getPath().getFromLink().getId().toString());
@@ -135,7 +141,7 @@ public class ComplexUnschedulerTest {
 		fixture.addDrive("f60");
 		fixture.addWait(300.0); // replace end
 		fixture.addStop(60.0).addDropoffRequest(otherRequest1); // f60
-		fixture.addStay(1000.0);
+		fixture.addFinalStay(30.0 * 3600.0);
 
 		schedule.nextTask();
 		schedule.nextTask();
@@ -146,19 +152,22 @@ public class ComplexUnschedulerTest {
 		unscheduler.unscheduleRequest(100.0, fixture.vehicle.getId(), unscheduleRequest.getId());
 
 		assertEquals(13, schedule.getTaskCount());
-		assertTrue(schedule.getTasks().get(0) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(1) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(2) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(3) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(4) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(5) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(6) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(7) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(8) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(9) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(10) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(11) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(12) instanceof DrtStayTask);
+
+		assertTasks(schedule, Arrays.asList( //
+				new ReferenceTask(DrtDriveTask.class, 0.0, 10001.0), // 0
+				new ReferenceTask(DrtStayTask.class, 10001.0, 10301.0), // 1
+				new ReferenceTask(DefaultDrtStopTask.class, 10301.0, 10361.0), // 2
+				new ReferenceTask(DrtDriveTask.class, 10361.0, 30362.0), // 3
+				new ReferenceTask(DrtStayTask.class, 30362.0, 31023.0), // 4
+				new ReferenceTask(DefaultDrtStopTask.class, 31023.0, 31083.0), // 5
+				new ReferenceTask(DrtDriveTask.class, 31083.0, 41084.0), // 6
+				new ReferenceTask(DrtStayTask.class, 41084.0, 41384.0), // 7
+				new ReferenceTask(DefaultDrtStopTask.class, 41384.0, 41444.0), // 8
+				new ReferenceTask(DrtDriveTask.class, 41444.0, 61445.0), // 9
+				new ReferenceTask(DrtStayTask.class, 61445.0, 62106.0), // 10
+				new ReferenceTask(DefaultDrtStopTask.class, 62106.0, 62166.0), // 11
+				new ReferenceTask(DrtStayTask.class, 62166.0, 30.0 * 3600.0) // 12
+		));
 
 		DrtDriveTask insertedDriveTask = (DrtDriveTask) schedule.getTasks().get(3);
 		assertEquals("f10", insertedDriveTask.getPath().getFromLink().getId().toString());
@@ -196,7 +205,7 @@ public class ComplexUnschedulerTest {
 		fixture.addDrive("f60"); // replace start
 		fixture.addWait(300.0);
 		fixture.addStop(60.0).addDropoffRequest(unscheduleRequest); // f60 // replace end
-		fixture.addStay(1000.0);
+		fixture.addFinalStay(30.0 * 3600.0);
 
 		schedule.nextTask();
 		schedule.nextTask();
@@ -206,20 +215,21 @@ public class ComplexUnschedulerTest {
 
 		unscheduler.unscheduleRequest(100.0, fixture.vehicle.getId(), unscheduleRequest.getId());
 
-		assertEquals(13, schedule.getTaskCount());
-		assertTrue(schedule.getTasks().get(0) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(1) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(2) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(3) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(4) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(5) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(6) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(7) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(8) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(9) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(10) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(11) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(12) instanceof DrtStayTask);
+		assertTasks(schedule, Arrays.asList( //
+				new ReferenceTask(DrtDriveTask.class, 0.0, 10001.0), // 0
+				new ReferenceTask(DrtStayTask.class, 10001.0, 10301.0), // 1
+				new ReferenceTask(DefaultDrtStopTask.class, 10301.0, 10361.0), // 2
+				new ReferenceTask(DrtDriveTask.class, 10361.0, 30362.0), // 3
+				new ReferenceTask(DrtStayTask.class, 30362.0, 31023.0), // 4
+				new ReferenceTask(DefaultDrtStopTask.class, 31023.0, 31083.0), // 5
+				new ReferenceTask(DrtDriveTask.class, 31083.0, 41084.0), // 6
+				new ReferenceTask(DrtStayTask.class, 41084.0, 41384.0), // 7
+				new ReferenceTask(DefaultDrtStopTask.class, 41384.0, 41444.0), // 8
+				new ReferenceTask(DrtDriveTask.class, 41444.0, 51445.0), // 9
+				new ReferenceTask(DrtStayTask.class, 51445.0, 51745.0), // 10
+				new ReferenceTask(DefaultDrtStopTask.class, 51745.0, 51805.0), // 11
+				new ReferenceTask(DrtStayTask.class, 51805.0, 30.0 * 3600.0) // 12
+		));
 
 		DrtDriveTask insertedDriveTask = (DrtDriveTask) schedule.getTasks().get(3);
 		assertEquals("f10", insertedDriveTask.getPath().getFromLink().getId().toString());
@@ -232,7 +242,7 @@ public class ComplexUnschedulerTest {
 		DrtStayTask stayTask = (DrtStayTask) schedule.getTasks().get(12);
 		assertEquals("f50", stayTask.getLink().getId().toString());
 	}
-	
+
 	@Test
 	public void testRemoveAtBeginningWithWaitSecond() {
 		Fixture fixture = new Fixture();
@@ -260,7 +270,7 @@ public class ComplexUnschedulerTest {
 		fixture.addDrive("f60");
 		fixture.addWait(300.0); // replace end
 		fixture.addStop(60.0).addDropoffRequest(otherRequest1); // f60
-		fixture.addStay(1000.0);
+		fixture.addFinalStay(30.0 * 3600.0);
 
 		schedule.nextTask();
 		schedule.nextTask();
@@ -268,24 +278,27 @@ public class ComplexUnschedulerTest {
 		ComplexRequestUnscheduler unscheduler = new ComplexRequestUnscheduler(fixture.lookup, fixture.entryFactory,
 				fixture.taskFactory, fixture.router, fixture.travelTime, fixture.timingUpdater, false);
 
-		unscheduler.unscheduleRequest(500.0, fixture.vehicle.getId(), unscheduleRequest.getId());
+		unscheduler.unscheduleRequest(10100.0, fixture.vehicle.getId(), unscheduleRequest.getId());
 
 		assertEquals(15, schedule.getTaskCount());
-		assertTrue(schedule.getTasks().get(0) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(1) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(2) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(3) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(4) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(5) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(6) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(7) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(8) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(9) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(10) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(11) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(12) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(13) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(14) instanceof DrtStayTask);
+
+		assertTasks(schedule, Arrays.asList( //
+				new ReferenceTask(DrtDriveTask.class, 0.0, 10001.0), // 0
+				new ReferenceTask(DrtStayTask.class, 10001.0, 10100.0), // 1
+				new ReferenceTask(DrtDriveTask.class, 10100.0, 20101.0), // 2
+				new ReferenceTask(DrtStayTask.class, 20101.0, 20662.0), // 3
+				new ReferenceTask(DefaultDrtStopTask.class, 20662.0, 20722.0), // 4
+				new ReferenceTask(DrtDriveTask.class, 20722.0, 30723.0), // 5
+				new ReferenceTask(DrtStayTask.class, 30723.0, 31023.0), // 6
+				new ReferenceTask(DefaultDrtStopTask.class, 31023.0, 31083.0), // 7
+				new ReferenceTask(DrtDriveTask.class, 31083.0, 41084.0), // 8
+				new ReferenceTask(DrtStayTask.class, 41084.0, 41384.0), // 9
+				new ReferenceTask(DefaultDrtStopTask.class, 41384.0, 41444.0), // 10
+				new ReferenceTask(DrtDriveTask.class, 41444.0, 61445.0), // 11
+				new ReferenceTask(DrtStayTask.class, 61445.0, 62106.0), // 12
+				new ReferenceTask(DefaultDrtStopTask.class, 62106.0, 62166.0), // 13
+				new ReferenceTask(DrtStayTask.class, 62166.0, 30.0 * 3600.0) // 14
+		));
 
 		DrtDriveTask insertedDriveTask = (DrtDriveTask) schedule.getTasks().get(2);
 		assertEquals("f10", insertedDriveTask.getPath().getFromLink().getId().toString());
@@ -295,7 +308,7 @@ public class ComplexUnschedulerTest {
 		assertEquals("f40", insertedDriveTask2.getPath().getFromLink().getId().toString());
 		assertEquals("f60", insertedDriveTask2.getPath().getToLink().getId().toString());
 	}
-	
+
 	@Test
 	public void testRemoveAtBeginningWithWaitFirst() {
 		Fixture fixture = new Fixture();
@@ -323,7 +336,7 @@ public class ComplexUnschedulerTest {
 		fixture.addDrive("f60");
 		fixture.addWait(300.0); // replace end
 		fixture.addStop(60.0).addDropoffRequest(otherRequest1); // f60
-		fixture.addStay(1000.0);
+		fixture.addFinalStay(30.0 * 3600.0);
 
 		schedule.nextTask();
 
@@ -333,20 +346,23 @@ public class ComplexUnschedulerTest {
 		unscheduler.unscheduleRequest(500.0, fixture.vehicle.getId(), unscheduleRequest.getId());
 
 		assertEquals(14, schedule.getTaskCount());
-		assertTrue(schedule.getTasks().get(0) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(1) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(2) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(3) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(4) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(5) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(6) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(7) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(8) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(9) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(10) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(11) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(12) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(13) instanceof DrtStayTask);
+
+		assertTasks(schedule, Arrays.asList( //
+				new ReferenceTask(DrtStayTask.class, 0.0, 500.0), // 0
+				new ReferenceTask(DrtDriveTask.class, 500.0, 20501.0), // 1
+				new ReferenceTask(DrtStayTask.class, 20501.0, 20662.0), // 2
+				new ReferenceTask(DefaultDrtStopTask.class, 20662.0, 20722.0), // 3
+				new ReferenceTask(DrtDriveTask.class, 20722.0, 30723.0), // 4
+				new ReferenceTask(DrtStayTask.class, 30723.0, 31023.0), // 5
+				new ReferenceTask(DefaultDrtStopTask.class, 31023.0, 31083.0), // 6
+				new ReferenceTask(DrtDriveTask.class, 31083.0, 41084.0), // 7
+				new ReferenceTask(DrtStayTask.class, 41084.0, 41384.0), // 8
+				new ReferenceTask(DefaultDrtStopTask.class, 41384.0, 41444.0), // 9
+				new ReferenceTask(DrtDriveTask.class, 41444.0, 61445.0), // 10
+				new ReferenceTask(DrtStayTask.class, 61445.0, 62106.0), // 11
+				new ReferenceTask(DefaultDrtStopTask.class, 62106.0, 62166.0), // 12
+				new ReferenceTask(DrtStayTask.class, 62166.0, 30.0 * 3600.0) // 13
+		));
 
 		DrtDriveTask insertedDriveTask = (DrtDriveTask) schedule.getTasks().get(1);
 		assertEquals("f0", insertedDriveTask.getPath().getFromLink().getId().toString());
@@ -356,7 +372,7 @@ public class ComplexUnschedulerTest {
 		assertEquals("f40", insertedDriveTask2.getPath().getFromLink().getId().toString());
 		assertEquals("f60", insertedDriveTask2.getPath().getToLink().getId().toString());
 	}
-	
+
 	@Test
 	public void testRemoveAtBeginningWithDriveDiversion() {
 		Fixture fixture = new Fixture();
@@ -384,16 +400,16 @@ public class ComplexUnschedulerTest {
 		fixture.addDrive("f60");
 		fixture.addWait(300.0); // replace end
 		fixture.addStop(60.0).addDropoffRequest(otherRequest1); // f60
-		fixture.addStay(1000.0);
+		fixture.addFinalStay(30.0 * 3600.0);
 
 		schedule.nextTask();
-		
+
 		OnlineDriveTaskTracker tracker = Mockito.mock(OnlineDriveTaskTracker.class);
 		schedule.getTasks().get(0).initTaskTracker(tracker);
-		
+
 		LinkTimePair diversionPoint = new LinkTimePair(fixture.network.getLinks().get(Id.createLinkId("f5")), 20.0);
 		Mockito.when(tracker.getDiversionPoint()).thenReturn(diversionPoint);
-		
+
 		Mockito.doAnswer(invocation -> {
 			VrpPathWithTravelData path = invocation.getArgument(0);
 			DriveTask task = (DriveTask) schedule.getTasks().get(0);
@@ -408,19 +424,22 @@ public class ComplexUnschedulerTest {
 		unscheduler.unscheduleRequest(500.0, fixture.vehicle.getId(), unscheduleRequest.getId());
 
 		assertEquals(13, schedule.getTaskCount());
-		assertTrue(schedule.getTasks().get(0) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(1) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(2) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(3) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(4) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(5) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(6) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(7) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(8) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(9) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(10) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(11) instanceof DrtStopTask);
-		assertTrue(schedule.getTasks().get(12) instanceof DrtStayTask);
+
+		assertTasks(schedule, Arrays.asList( //
+				new ReferenceTask(DrtDriveTask.class, 0.0, 15019.0), // 0
+				new ReferenceTask(DrtStayTask.class, 15019.0, 20662.0), // 1
+				new ReferenceTask(DefaultDrtStopTask.class, 20662.0, 20722.0), // 2
+				new ReferenceTask(DrtDriveTask.class, 20722.0, 30723.0), // 3
+				new ReferenceTask(DrtStayTask.class, 30723.0, 31023.0), // 4
+				new ReferenceTask(DefaultDrtStopTask.class, 31023.0, 31083.0), // 5
+				new ReferenceTask(DrtDriveTask.class, 31083.0, 41084.0), // 6
+				new ReferenceTask(DrtStayTask.class, 41084.0, 41384.0), // 7
+				new ReferenceTask(DefaultDrtStopTask.class, 41384.0, 41444.0), // 8
+				new ReferenceTask(DrtDriveTask.class, 41444.0, 61445.0), // 9
+				new ReferenceTask(DrtStayTask.class, 61445.0, 62106.0), // 10
+				new ReferenceTask(DefaultDrtStopTask.class, 62106.0, 62166.0), // 11
+				new ReferenceTask(DrtStayTask.class, 62166.0, 30.0 * 3600.0) // 12
+		));
 
 		DrtDriveTask insertedDriveTask = (DrtDriveTask) schedule.getTasks().get(0);
 		assertEquals("f0", insertedDriveTask.getPath().getFromLink().getId().toString());
@@ -430,7 +449,7 @@ public class ComplexUnschedulerTest {
 		assertEquals("f40", insertedDriveTask2.getPath().getFromLink().getId().toString());
 		assertEquals("f60", insertedDriveTask2.getPath().getToLink().getId().toString());
 	}
-	
+
 	@Test
 	public void testRemoveAllStartWithWait() {
 		Fixture fixture = new Fixture();
@@ -444,23 +463,26 @@ public class ComplexUnschedulerTest {
 		fixture.addDrive("f20");
 		fixture.addWait(300.0);
 		fixture.addStop(60.0).addDropoffRequest(unscheduleRequest); // f50
-		fixture.addStay(1000.0);
+		fixture.addFinalStay(30.0 * 3600.0);
 
 		schedule.nextTask();
-		
+
 		ComplexRequestUnscheduler unscheduler = new ComplexRequestUnscheduler(fixture.lookup, fixture.entryFactory,
 				fixture.taskFactory, fixture.router, fixture.travelTime, fixture.timingUpdater, false);
 
 		unscheduler.unscheduleRequest(0.0, fixture.vehicle.getId(), unscheduleRequest.getId());
 
 		assertEquals(2, schedule.getTaskCount());
-		assertTrue(schedule.getTasks().get(0) instanceof DrtStayTask);
-		assertTrue(schedule.getTasks().get(1) instanceof DrtStayTask);
-		
+
+		assertTasks(schedule, Arrays.asList( //
+				new ReferenceTask(DrtStayTask.class, 0.0, 0.0), // 0
+				new ReferenceTask(DrtStayTask.class, 0.0, 30.0 * 3600.0) // 1
+		));
+
 		assertEquals("f0", ((StayTask) schedule.getTasks().get(0)).getLink().getId().toString());
 		assertEquals("f0", ((StayTask) schedule.getTasks().get(1)).getLink().getId().toString());
 	}
-	
+
 	@Test
 	public void testRemoveAllStartWithDrive() {
 		Fixture fixture = new Fixture();
@@ -474,16 +496,16 @@ public class ComplexUnschedulerTest {
 		fixture.addDrive("f20");
 		fixture.addWait(300.0);
 		fixture.addStop(60.0).addDropoffRequest(unscheduleRequest); // f50
-		fixture.addStay(1000.0);
+		fixture.addFinalStay(30.0 * 3600.0);
 
 		schedule.nextTask();
-		
+
 		OnlineDriveTaskTracker tracker = Mockito.mock(OnlineDriveTaskTracker.class);
 		schedule.getTasks().get(0).initTaskTracker(tracker);
-		
+
 		LinkTimePair diversionPoint = new LinkTimePair(fixture.network.getLinks().get(Id.createLinkId("f5")), 20.0);
 		Mockito.when(tracker.getDiversionPoint()).thenReturn(diversionPoint);
-		
+
 		Mockito.doAnswer(invocation -> {
 			VrpPathWithTravelData path = invocation.getArgument(0);
 			DriveTask task = (DriveTask) schedule.getTasks().get(0);
@@ -491,21 +513,45 @@ public class ComplexUnschedulerTest {
 			task.pathDiverted(divertedPath, path.getArrivalTime());
 			return null;
 		}).when(tracker).divertPath(Mockito.any());
-		
+
 		ComplexRequestUnscheduler unscheduler = new ComplexRequestUnscheduler(fixture.lookup, fixture.entryFactory,
 				fixture.taskFactory, fixture.router, fixture.travelTime, fixture.timingUpdater, false);
 
 		unscheduler.unscheduleRequest(0.0, fixture.vehicle.getId(), unscheduleRequest.getId());
 
 		assertEquals(2, schedule.getTaskCount());
-		assertTrue(schedule.getTasks().get(0) instanceof DrtDriveTask);
-		assertTrue(schedule.getTasks().get(1) instanceof DrtStayTask);
-		
+
+		assertTasks(schedule, Arrays.asList( //
+				new ReferenceTask(DrtDriveTask.class, 0.0, 19.0), // 0
+				new ReferenceTask(DrtStayTask.class, 19.0, 30.0 * 3600.0) // 1
+		));
+
 		DrtDriveTask driveTask = (DrtDriveTask) schedule.getTasks().get(0);
 		assertEquals("f0", driveTask.getPath().getFromLink().getId().toString());
 		assertEquals("f5", driveTask.getPath().getToLink().getId().toString());
-		
+
 		assertEquals("f5", ((StayTask) schedule.getTasks().get(1)).getLink().getId().toString());
+	}
+
+	record ReferenceTask(Class<? extends Task> taskType, double startTime, double endTime) {
+	}
+
+	private static void assertTasks(Schedule schedule, List<ReferenceTask> references) {
+		for (int i = 0; i < references.size(); i++) {
+			Task task = schedule.getTasks().get(i);
+			ReferenceTask reference = references.get(i);
+
+			assertEquals("wrong type in task " + i, reference.taskType, task.getClass());
+			assertEquals("wrong begin time in task " + i, reference.startTime, task.getBeginTime(), 1e-3);
+			assertEquals("wrong end time in task " + i, reference.endTime, task.getEndTime(), 1e-3);
+
+			if (i > 0) {
+				assertEquals("wrong transition from " + (i - 1) + " to " + i, schedule.getTasks().get(i).getBeginTime(),
+						schedule.getTasks().get(i - 1).getEndTime(), 1e-3);
+			}
+
+			assertTrue("invalid task " + i, task.getEndTime() >= task.getBeginTime());
+		}
 	}
 
 	private Network createNetwork() {
@@ -606,6 +652,15 @@ public class ComplexUnschedulerTest {
 			schedule.addTask(task);
 
 			currentTime += duration;
+			return task;
+		}
+
+		DrtStayTask addFinalStay(double until) {
+			DrtStayTask task = taskFactory.createStayTask(vehicle, currentTime, Math.max(currentTime, until),
+					currentLink);
+			schedule.addTask(task);
+
+			currentTime = Math.max(currentTime, until);
 			return task;
 		}
 
