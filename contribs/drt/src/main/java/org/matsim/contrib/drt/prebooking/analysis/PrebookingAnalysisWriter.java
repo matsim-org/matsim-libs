@@ -24,7 +24,8 @@ public class PrebookingAnalysisWriter {
 					"submission_time", //
 					"scheduled_time", //
 					"rejected_time", //
-					"entering_time" //
+					"departure_time", //
+					"rejected_reason" //
 			}) + "\n");
 
 			for (var record : records) {
@@ -34,7 +35,8 @@ public class PrebookingAnalysisWriter {
 						record.submissionTime() == null ? "" : String.valueOf(record.submissionTime()), //
 						record.scheduledTime() == null ? "" : String.valueOf(record.scheduledTime()), //
 						record.rejectedTime() == null ? "" : String.valueOf(record.rejectedTime()), //
-						record.enteringTime() == null ? "" : String.valueOf(record.enteringTime()) //
+						record.departureTime() == null ? "" : String.valueOf(record.departureTime()), //
+						record.rejectedReason() //
 				}) + "\n");
 			}
 

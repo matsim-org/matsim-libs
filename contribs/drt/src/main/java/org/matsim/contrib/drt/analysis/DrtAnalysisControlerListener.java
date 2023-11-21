@@ -35,7 +35,6 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYSeries;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -51,7 +50,6 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.core.config.Config;
@@ -78,7 +76,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -103,8 +100,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	private final String delimiter;
 
 	DrtAnalysisControlerListener(Config config, DrtConfigGroup drtCfg, FleetSpecification fleet, DrtVehicleDistanceStats drtVehicleStats,
-								 MatsimServices matsimServices, Network network, DrtEventSequenceCollector drtEventSequenceCollector,
-								 VehicleOccupancyProfileCalculator vehicleOccupancyProfileCalculator) {
+			MatsimServices matsimServices, Network network, DrtEventSequenceCollector drtEventSequenceCollector,
+			VehicleOccupancyProfileCalculator vehicleOccupancyProfileCalculator) {
 		this.drtVehicleStats = drtVehicleStats;
 		this.matsimServices = matsimServices;
 		this.network = network;
@@ -185,10 +182,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 				.collect(toList());
 
 		collection2Text(drtEventSequenceCollector.getRejectedRequestSequences().values(), filename(event, "drt_rejections", ".csv"),
-				String.join(delimiter, "time", "personIds", "requestId", "fromLinkId", "toLinkId", "fromX", "fromY", "toX", "toY"), seq -> {
+				String.join(delimiter, "time", "personIds", "requestId", "fromLinkId", "toLinkId", "fromX", "fromY", "toX", "toY", "cause"), seq -> {
 					DrtRequestSubmittedEvent submission = seq.getSubmitted();
 					Coord fromCoord = network.getLinks().get(submission.getFromLinkId()).getToNode().getCoord();
 					Coord toCoord = network.getLinks().get(submission.getToLinkId()).getToNode().getCoord();
+					PassengerRequestRejectedEvent rejection = seq.getRejected().get();
 					return String.join(delimiter, submission.getTime() + "",//
 							submission.getPersonIds().stream().map(Object::toString).collect(Collectors.joining("-")) + "",//
 							submission.getRequestId() + "",//
@@ -197,7 +195,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 							fromCoord.getX() + "",//
 							fromCoord.getY() + "",//
 							toCoord.getX() + "",//
-							toCoord.getY() + "");
+							toCoord.getY() + "",//
+							rejection.getCause());
 				});
 
 		double rejectionRate = (double) drtEventSequenceCollector.getRejectedRequestSequences().size()
