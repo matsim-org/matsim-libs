@@ -121,7 +121,7 @@ public class DrtRequest implements PassengerRequest {
 	}
 
 	@Override
-	public int getPartySize() {
+	public int getPassengerCount() {
 		return passengerIds.size();
 	}
 
