@@ -358,6 +358,8 @@ public class PrebookingTestEnvironment {
 		public double submissionTime = Double.NaN;
 		public double pickupTime = Double.NaN;
 		public double dropoffTime = Double.NaN;
+
+		public List<Double> submissionTimes = new LinkedList<>();
 	}
 
 	private Map<String, RequestInfo> requestInfo = new HashMap<>();
@@ -381,6 +383,9 @@ public class PrebookingTestEnvironment {
 		public void handleEvent(DrtRequestSubmittedEvent event) {
 			requestInfo.computeIfAbsent(event.getPersonId().toString(), id -> new RequestInfo()).submissionTime = event
 					.getTime();
+			requestInfo.computeIfAbsent(event.getPersonId().toString(), id -> new RequestInfo()).submissionTimes
+					.add(event.getTime());
+
 		}
 
 		@Override

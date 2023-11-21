@@ -50,10 +50,19 @@ public class PrebookingTest {
 		assertEquals(2146.0, taskInfo.get(2).endTime, 1e-3);
 	}
 	
-	private void installPrebooking(Controler controller) {
+	static PrebookingParams installPrebooking(Controler controller) {
+		return installPrebooking(controller, true);
+	}
+
+	static PrebookingParams installPrebooking(Controler controller, boolean installLogic) {
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(controller.getConfig());
 		drtConfig.addParameterSet(new PrebookingParams());
-		AttributeBasedPrebookingLogic.install(controller, drtConfig);
+		
+		if (installLogic) {
+			AttributeBasedPrebookingLogic.install(controller, drtConfig);
+		}
+		
+		return drtConfig.getPrebookingParams().get();
 	}
 
 	@Test

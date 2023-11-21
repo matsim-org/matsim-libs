@@ -176,10 +176,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 			.collect(toList());
 
 		collection2Text(drtEventSequenceCollector.getRejectedRequestSequences().values(), filename(event, "drt_rejections", ".csv"),
-				String.join(delimiter, "time", "personId", "requestId", "fromLinkId", "toLinkId", "fromX", "fromY", "toX", "toY"), seq -> {
+				String.join(delimiter, "time", "personId", "requestId", "fromLinkId", "toLinkId", "fromX", "fromY", "toX", "toY", "cause"), seq -> {
 					DrtRequestSubmittedEvent submission = seq.getSubmitted();
 					Coord fromCoord = network.getLinks().get(submission.getFromLinkId()).getToNode().getCoord();
 					Coord toCoord = network.getLinks().get(submission.getToLinkId()).getToNode().getCoord();
+					PassengerRequestRejectedEvent rejection = seq.getRejected().get();
 					return String.join(delimiter, submission.getTime() + "",//
 							submission.getPersonId() + "",//
 							submission.getRequestId() + "",//
@@ -188,7 +189,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 							fromCoord.getX() + "",//
 							fromCoord.getY() + "",//
 							toCoord.getX() + "",//
-							toCoord.getY() + "");
+							toCoord.getY() + "",//
+							rejection.getCause());
 				});
 
 		double rejectionRate = (double)drtEventSequenceCollector.getRejectedRequestSequences().size()
