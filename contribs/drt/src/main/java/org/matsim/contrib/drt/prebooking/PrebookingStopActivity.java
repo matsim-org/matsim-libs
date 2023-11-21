@@ -1,12 +1,14 @@
 package org.matsim.contrib.drt.prebooking;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.prebooking.abandon.AbandonVoter;
@@ -41,7 +43,7 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 
 	private final PrebookingManager prebookingManager;
 	private final PassengerHandler passengerHandler;
-	
+
 	private final PassengerStopDurationProvider stopDurationProvider;
 	private final AbandonVoter abandonVoter;
 
@@ -91,7 +93,7 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 			var entry = iterator.next();
 
 			if (entry.getValue() <= now) { // Request should leave now
-				passengerHandler.dropOffPassenger(driver, entry.getKey(), now);
+				passengerHandler.dropOffPassengers(driver, entry.getKey(), now);
 				prebookingManager.notifyDropoff(entry.getKey());
 				iterator.remove();
 			}
@@ -108,7 +110,7 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 				// this is a new request that has been added after the activity has been created
 				// or that had not arrived yet
 
-				if (passengerHandler.notifyWaitForPassenger(this, this.driver, request.getId())) {
+				if (passengerHandler.notifyWaitForPassengers(this, this.driver, request.getId())) {
 					// agent starts to enter
 					queuePickup(request, now);
 				} else if (now > request.getEarliestStartTime()) {
@@ -126,7 +128,7 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 
 			if (entry.getValue() <= now) {
 				// let agent enter now
-				Verify.verify(passengerHandler.tryPickUpPassenger(this, driver, entry.getKey(), now));
+				Verify.verify(passengerHandler.tryPickUpPassengers(this, driver, entry.getKey(), now));
 				enteredRequests.add(entry.getKey());
 				enterIterator.remove();
 			}
@@ -147,13 +149,17 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 	}
 
 	@Override
-	public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now) {
-		var request = getRequestForPassenger(passenger.getId());
+	public void notifyPassengersAreReadyForDeparture(List<MobsimPassengerAgent> passengers, double now) {
+		var request = getRequestForPassengers(passengers.stream().map(Identifiable::getId).toList());
 		queuePickup(request, now);
 	}
 
-	private AcceptedDrtRequest getRequestForPassenger(Id<Person> passengerId) {
-		return pickupRequests.values().stream().filter(r -> passengerId.equals(r.getPassengerId())).findAny()
+
+	private AcceptedDrtRequest getRequestForPassengers(List<Id<Person>> passengerIds) {
+		return pickupRequests.values()
+				.stream()
+				.filter(r -> r.getPassengerIds().size() == passengerIds.size() && r.getPassengerIds().containsAll(passengerIds))
+				.findAny()
 				.orElseThrow(() -> new IllegalArgumentException("I am waiting for different passengers!"));
 	}
 }

@@ -89,7 +89,7 @@ public class PrebookingAnalysisHandler implements PassengerRequestBookedEventHan
 		List<RequestRecord> records = new LinkedList<>();
 
 		for (Sequence sequence : sequences) {
-			records.add(new RequestRecord(sequence.booked.getRequestId(), sequence.booked.getPersonId(),
+			records.add(new RequestRecord(sequence.booked.getRequestId(), sequence.booked.getPersonIds(),
 					sequence.submitted != null ? sequence.submitted.getTime() : null,
 					sequence.scheduled != null ? sequence.scheduled.getTime() : null,
 					sequence.rejected != null ? sequence.rejected.getTime() : null,
@@ -100,7 +100,7 @@ public class PrebookingAnalysisHandler implements PassengerRequestBookedEventHan
 		return records;
 	}
 
-	public record RequestRecord(Id<Request> requestId, Id<Person> personId, Double submissionTime, Double scheduledTime,
+	public record RequestRecord(Id<Request> requestId, List<Id<Person>> personIds, Double submissionTime, Double scheduledTime,
 			Double rejectedTime, Double departureTime, String rejectedReason) {
 	}
 

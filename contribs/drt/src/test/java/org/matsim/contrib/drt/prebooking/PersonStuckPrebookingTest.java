@@ -76,7 +76,7 @@ public class PersonStuckPrebookingTest {
 		/*
 		 * Agent personA is performing three drt legs during the day. Agent personB does
 		 * exactly the same in parallel, both prebook there requests.
-		 * 
+		 *
 		 * We cancel the first request of personA. We check that the other reservations
 		 * are automatically rejected as soon as the person is stuck.
 		 */
@@ -198,14 +198,14 @@ public class PersonStuckPrebookingTest {
 
 		@Override
 		public void handleEvent(PassengerRequestSubmittedEvent event) {
-			if (event.getPersonId().equals(personId)) {
+			if (event.getPersonIds().contains(personId)) {
 				submittedCount++;
 			}
 		}
 
 		@Override
 		public void handleEvent(PassengerRequestRejectedEvent event) {
-			if (event.getPersonId().equals(personId)) {
+			if (event.getPersonIds().contains(personId)) {
 				rejectedCount++;
 			}
 		}

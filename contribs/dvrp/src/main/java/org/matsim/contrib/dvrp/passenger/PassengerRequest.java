@@ -24,6 +24,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.optimizer.Request;
 
+import java.util.List;
+
 public interface PassengerRequest extends Request {
 	/**
 	 * @return beginning of the time window (inclusive) - earliest time when the passenger can be picked up
@@ -41,7 +43,9 @@ public interface PassengerRequest extends Request {
 
 	Link getToLink();
 
-	Id<Person> getPassengerId();
+	List<Id<Person>> getPassengerIds();
 
 	String getMode();
+
+	int getPassengerCount();
 }

@@ -3,6 +3,7 @@ package org.matsim.contrib.drt.prebooking.analysis;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.matsim.core.utils.io.IOUtils;
 
@@ -30,7 +31,7 @@ public class PrebookingAnalysisWriter {
 			for (var record : records) {
 				writer.write(String.join(",", new String[] { //
 						record.requestId().toString(), //
-						record.personId().toString(), //
+						record.personIds().stream().map(Object::toString).collect(Collectors.joining("-")), //
 						record.submissionTime() == null ? "" : String.valueOf(record.submissionTime()), //
 						record.scheduledTime() == null ? "" : String.valueOf(record.scheduledTime()), //
 						record.rejectedTime() == null ? "" : String.valueOf(record.rejectedTime()), //

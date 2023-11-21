@@ -64,7 +64,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final DrtInsertionSearch insertionSearch;
 	private final DrtRequestInsertionRetryQueue insertionRetryQueue;
 	private final DrtOfferAcceptor drtOfferAcceptor;
-	private final ForkJoinPool forkJoinPool;	
+	private final ForkJoinPool forkJoinPool;
 	private final PassengerStopDurationProvider stopDurationProvider;
 
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
@@ -127,12 +127,12 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		if (best.isEmpty()) {
 			if (!insertionRetryQueue.tryAddFailedRequest(req, now)) {
 				eventsManager.processEvent(
-						new PassengerRequestRejectedEvent(now, mode, req.getId(), req.getPassengerId(),
+						new PassengerRequestRejectedEvent(now, mode, req.getId(), req.getPassengerIds(),
 								NO_INSERTION_FOUND_CAUSE));
 				log.debug("No insertion found for drt request "
 						+ req
-						+ " from passenger id="
-						+ req.getPassengerId()
+						+ " with passenger ids="
+						+ req.getPassengerIds().stream().map(Object::toString).collect(Collectors.joining(","))
 						+ " fromLinkId="
 						+ req.getFromLink().getId());
 			}
@@ -153,7 +153,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 			} else {
 				vehicleEntries.remove(vehicle.getId());
 			}
-			
+
 			double expectedPickupTime = pickupDropoffTaskPair.pickupTask.getBeginTime();
 			expectedPickupTime = Math.max(expectedPickupTime, acceptedRequest.get().getEarliestStartTime());
 			expectedPickupTime += stopDurationProvider.calcPickupDuration(vehicle, req);
@@ -162,7 +162,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 			expectedDropoffTime += stopDurationProvider.calcDropoffDuration(vehicle, req);
 
 			eventsManager.processEvent(
-					new PassengerRequestScheduledEvent(now, mode, req.getId(), req.getPassengerId(), vehicle.getId(),
+					new PassengerRequestScheduledEvent(now, mode, req.getId(), req.getPassengerIds(), vehicle.getId(),
 							expectedPickupTime, expectedDropoffTime));
 		}
 	}
