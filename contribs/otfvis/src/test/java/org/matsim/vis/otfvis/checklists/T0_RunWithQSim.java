@@ -28,7 +28,7 @@ import org.matsim.contrib.otfvis.OTFVis;
 public class T0_RunWithQSim {
 
 	public static void main(String[] args) {
-		OTFVis.playConfig("test/scenarios/equil/config-qsim.xml");
+		OTFVis.playConfig("contribs/otfvis/test/scenarios/equil/config-qsim.xml");
 	}
 
 }
