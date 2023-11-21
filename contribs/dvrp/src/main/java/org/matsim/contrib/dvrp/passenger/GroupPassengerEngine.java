@@ -142,7 +142,7 @@ public class GroupPassengerEngine implements PassengerEngine, PassengerRequestRe
 			// must come before validateAndSubmitRequest (to come before rejection event)
 			eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), group.stream().map(Identifiable::getId).toList()));
 
-			validateAndSubmitRequest(List.copyOf(group), request, mobsimTimer.getTimeOfDay());
+			validateAndSubmitRequest(group, request, mobsimTimer.getTimeOfDay());
 		}
 		currentDepartures.clear();
 	}

@@ -154,7 +154,7 @@ public class InsertionGenerator {
 		int stopCount = vEntry.stops.size();
 		List<InsertionWithDetourData> insertions = new ArrayList<>();
 
-		if (drtRequest.getPassengerIds().size() > vEntry.vehicle.getCapacity()) {
+		if (drtRequest.getPassengerCount() > vEntry.vehicle.getCapacity()) {
 			//exit early
 			return Collections.EMPTY_LIST;
 		}
@@ -165,7 +165,7 @@ public class InsertionGenerator {
 			Waypoint.Stop nextStop = nextStop(vEntry, i);
 
 			// (1) only not fully loaded arcs
-			boolean allowed = occupancy + drtRequest.getPassengerIds().size() <= vEntry.vehicle.getCapacity();
+			boolean allowed = occupancy + drtRequest.getPassengerCount() <= vEntry.vehicle.getCapacity();
 
 			// (2) check if the request wants to depart after the departure time of the next
 			// stop. We can early on filter out the current insertion, because we will
@@ -258,7 +258,7 @@ public class InsertionGenerator {
 			// i -> pickup -> i+1 && j -> dropoff -> j+1
 			// check the capacity constraints if i < j (already validated for `i == j`)
 			Waypoint.Stop currentStop = currentStop(vEntry, j);
-			if (currentStop.outgoingOccupancy + request.getPassengerIds().size() > vEntry.vehicle.getCapacity()) {
+			if (currentStop.outgoingOccupancy + request.getPassengerCount() > vEntry.vehicle.getCapacity()) {
 				if (request.getToLink() == currentStop.task.getLink()) {
 					//special case -- we can insert dropoff exactly at node j
 					addInsertion(insertions,
