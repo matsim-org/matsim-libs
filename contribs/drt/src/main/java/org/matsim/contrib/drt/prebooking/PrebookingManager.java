@@ -137,19 +137,19 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 
 	// Event handling: We don't want to process events in notifyMobsimAfterSimStep,
 	// so we do it at the next time step
-	private record RejectionItem(Id<Request> requestId, Id<Person> personId, String cause) {
+	private record RejectionItem(Id<Request> requestId, List<Id<Person>> personIds, String cause) {
 	}
 
 	private final ConcurrentLinkedQueue<RejectionItem> rejections = new ConcurrentLinkedQueue<>();
 
 	private void processRejection(PassengerRequest request, String cause) {
-		rejections.add(new RejectionItem(request.getId(), request.getPassengerId(), cause));
+		rejections.add(new RejectionItem(request.getId(), request.getPassengerIds(), cause));
 	}
 
 	private void flushRejections(double now) {
 		for (RejectionItem item : rejections) {
 			eventsManager.processEvent(
-					new PassengerRequestRejectedEvent(now, mode, item.requestId, item.personId, item.cause));
+					new PassengerRequestRejectedEvent(now, mode, item.requestId, item.personIds, item.cause));
 		}
 
 		rejections.clear();
@@ -394,10 +394,10 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 	// Stuck
 
 	private void processStuckAgents(double now) {
-		bookingQueue.removeIf(request -> stuckPersonsIds.contains(request.getPassengerId()));
+		bookingQueue.removeIf(request -> stuckPersonsIds.containsAll(request.getPassengerIds()));
 
 		for (RequestItem item : requests.values()) {
-			if (stuckPersonsIds.contains(item.request.getPassengerId())) {
+			if (stuckPersonsIds.containsAll(item.request.getPassengerIds())) {
 				cancel(item.request.getId());
 			}
 		}

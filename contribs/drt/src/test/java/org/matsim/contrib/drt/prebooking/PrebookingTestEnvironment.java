@@ -382,9 +382,10 @@ public class PrebookingTestEnvironment {
 			PassengerDroppedOffEventHandler, PassengerRequestRejectedEventHandler {
 		@Override
 		public void handleEvent(DrtRequestSubmittedEvent event) {
-			requestInfo.computeIfAbsent(event.getPersonIds().stream().map(Object::toString).collect(Collectors.joining("-")), id -> new RequestInfo()).submissionTime = event
+			String ids = event.getPersonIds().stream().map(Object::toString).collect(Collectors.joining("-"));
+			requestInfo.computeIfAbsent(ids, id -> new RequestInfo()).submissionTime = event
 					.getTime();
-			requestInfo.computeIfAbsent(event.getPersonId().toString(), id -> new RequestInfo()).submissionTimes
+			requestInfo.computeIfAbsent(ids, id -> new RequestInfo()).submissionTimes
 					.add(event.getTime());
 
 		}
