@@ -137,20 +137,22 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 
 	// Event handling: We don't want to process events in notifyMobsimAfterSimStep,
 	// so we do it at the next time step
-	private record RejectionItem(Id<Request> requestId, String cause) {
+	private record RejectionItem(Id<Request> requestId, Id<Person> personId, String cause) {
 	}
 
 	private final ConcurrentLinkedQueue<RejectionItem> rejections = new ConcurrentLinkedQueue<>();
 
-	private void processRejection(double now, PassengerRequest request, String cause) {
-		eventsManager.processEvent(
-				new PassengerRequestRejectedEvent(now, mode, request.getId(), request.getPassengerId(), cause));
-		// processEventQueue.add(event);
+	private void processRejection(PassengerRequest request, String cause) {
+		rejections.add(new RejectionItem(request.getId(), request.getPassengerId(), cause));
 	}
 
-	private void flushEvents() {
-		// eventsManager.processEvents(processEventQueue);
-		// processEventQueue.clear();
+	private void flushRejections(double now) {
+		for (RejectionItem item : rejections) {
+			eventsManager.processEvent(
+					new PassengerRequestRejectedEvent(now, mode, item.requestId, item.personId, item.cause));
+		}
+
+		rejections.clear();
 	}
 
 	// Booking functionality
@@ -187,7 +189,7 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 
 		if (!violations.isEmpty()) {
 			String cause = String.join(", ", violations);
-			processRejection(now, request, cause);
+			processRejection(request, cause);
 		} else {
 			leg.getAttributes().putAttribute(requestAttribute, request.getId().toString());
 			bookingQueue.add(request);
@@ -310,7 +312,7 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 					reason = CANCEL_REASON + ":" + cancelItem.reason;
 				}
 
-				processRejection(now, item.request, reason);
+				processRejection(item.request, reason);
 			}
 		}
 
@@ -361,7 +363,7 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 				unscheduleUponVehicleAssignment.add(item.request.getId());
 			}
 
-			processRejection(now, item.request, ABANDONED_REASON);
+			processRejection(item.request, ABANDONED_REASON);
 		}
 
 		abandonQueue.clear();
@@ -412,8 +414,8 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 
 	@Override
 	public void doSimStep(double now) {
-		// avoid method as it runs in parallel with events, only process our events
-		flushEvents();
+		// avoid method as it runs in parallel with events, only process rejections
+		flushRejections(now);
 	}
 
 	@Override
