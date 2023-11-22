@@ -46,7 +46,7 @@ public final class SimWrapper {
 	private final List<Dashboard> dashboards = new ArrayList<>();
 
 	/**
-	 * Use {@link #create(SimWrapperConfigGroup)}.
+	 * Use {@link #create(org.matsim.core.config.Config)}.
 	 */
 	private SimWrapper(org.matsim.core.config.Config config) {
 		this.matsimConfig = config;
@@ -143,6 +143,7 @@ public final class SimWrapper {
 
 			d.configure(yaml.header, layout);
 			yaml.layout = layout.create(data);
+			yaml.subtabs = layout.getTabs();
 
 			Path out = dir.resolve("dashboard-" + i + ".yaml");
 			writer.writeValue(out.toFile(), yaml);
@@ -206,6 +207,7 @@ public final class SimWrapper {
 	private static final class YAML {
 
 		private final Header header = new Header();
+		private Collection<Layout.Tab> subtabs;
 		private Map<String, List<Viz>> layout;
 
 	}
@@ -216,12 +218,16 @@ public final class SimWrapper {
 	public static final class Config {
 
 		public boolean hideLeftBar = false;
+		public boolean hideBreadcrumbs = false;
+		public boolean hideFiles = false;
 		public boolean fullWidth = true;
 
 		public String header;
 		public String footer_en;
 		public String footer_de;
 		public String css;
+
+		public String theme;
 
 	}
 }

@@ -10,4 +10,9 @@ public final class Header {
 	public String title;
 	public String description;
 
+	/**
+	 * Enable dashboard to fill the whole screen.
+	 */
+	public boolean fullScreen = false;
+
 }

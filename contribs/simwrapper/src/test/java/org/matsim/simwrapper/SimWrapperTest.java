@@ -121,4 +121,38 @@ public class SimWrapperTest {
 				.hasSameTextualContentAs(new File(utils.getPackageInputDirectory(), "dashboard-0.yaml"));
 
 	}
+
+	@Test
+	public void subTabs() throws IOException {
+
+		SimWrapper simWrapper = SimWrapper.create();
+
+		simWrapper.addDashboard((header, layout) -> {
+
+			header.title = "Simwrapper Test Dashboard";
+			header.fullScreen = true;
+
+			layout.row("first", "Tab #1").el(TextBlock.class, (viz, data) -> {
+				viz.title = "TextBlock";
+				viz.file = "example.csv";
+			});
+
+			layout.row("second").el(TextBlock.class, (viz, data) -> {
+				viz.title = "TextBlock";
+				viz.file = "example.csv";
+			});
+
+			layout.tab("Tab #2", "Zweiter Tab")
+				.add("second");
+
+		});
+
+		String outputDirectory = utils.getOutputDirectory();
+
+		simWrapper.generate(Path.of(outputDirectory));
+
+		Assertions.assertThat(new File(outputDirectory, "dashboard-0.yaml"))
+			.hasSameTextualContentAs(new File(utils.getPackageInputDirectory(), "dashboard-1.yaml"));
+
+	}
 }
