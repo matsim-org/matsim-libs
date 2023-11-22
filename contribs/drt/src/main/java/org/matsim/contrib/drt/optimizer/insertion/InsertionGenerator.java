@@ -20,6 +20,7 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
@@ -152,14 +153,20 @@ public class InsertionGenerator {
 	public List<InsertionWithDetourData> generateInsertions(DrtRequest drtRequest, VehicleEntry vEntry) {
 		int stopCount = vEntry.stops.size();
 		List<InsertionWithDetourData> insertions = new ArrayList<>();
+
+		if (drtRequest.getPassengerCount() > vEntry.vehicle.getCapacity()) {
+			//exit early
+			return Collections.EMPTY_LIST;
+		}
+
 		int occupancy = vEntry.start.occupancy;
-		
+
 		for (int i = 0; i < stopCount; i++) {// insertions up to before last stop
 			Waypoint.Stop nextStop = nextStop(vEntry, i);
-			
+
 			// (1) only not fully loaded arcs
-			boolean allowed = occupancy < vEntry.vehicle.getCapacity();
-			
+			boolean allowed = occupancy + drtRequest.getPassengerCount() <= vEntry.vehicle.getCapacity();
+
 			// (2) check if the request wants to depart after the departure time of the next
 			// stop. We can early on filter out the current insertion, because we will
 			// neither be able to insert our stop before the next stop nor merge the request
@@ -211,7 +218,7 @@ public class InsertionGenerator {
 				earliestPickupStartTime); //TODO stopDuration not included
 		var pickupDetourInfo = detourTimeCalculator.calcPickupDetourInfo(vEntry, pickupInsertion, toPickupTT,
 				fromPickupTT, true, request);
-		
+
 		if (i == 0 && !checkStartSlack(vEntry, request, pickupDetourInfo)) {
 			// Inserting at schedule start and extending an ongoing stop task further than allowed
 			return;
@@ -251,7 +258,7 @@ public class InsertionGenerator {
 			// i -> pickup -> i+1 && j -> dropoff -> j+1
 			// check the capacity constraints if i < j (already validated for `i == j`)
 			Waypoint.Stop currentStop = currentStop(vEntry, j);
-			if (currentStop.outgoingOccupancy == vEntry.vehicle.getCapacity()) {
+			if (currentStop.outgoingOccupancy + request.getPassengerCount() > vEntry.vehicle.getCapacity()) {
 				if (request.getToLink() == currentStop.task.getLink()) {
 					//special case -- we can insert dropoff exactly at node j
 					addInsertion(insertions,
@@ -288,24 +295,24 @@ public class InsertionGenerator {
 	private Waypoint.Stop nextStop(VehicleEntry entry, int insertionIdx) {
 		return entry.stops.get(insertionIdx);
 	}
-	
+
 	private boolean checkStartSlack(VehicleEntry vEntry, DrtRequest request, PickupDetourInfo pickupDetourInfo) {
 		if (vEntry.start.task.isEmpty()) {
 			return true;
 		}
-		
+
 		Task startTask = vEntry.start.task.get();
-		
+
 		if (!DrtTaskBaseType.STOP.isBaseTypeOf(startTask)) {
 			return true;
 		}
-		
+
 		DrtStopTask stopTask = (DrtStopTask) startTask;
-		
+
 		if (stopTask.getLink() != request.getFromLink()) {
 			return true;
 		}
-		
+
 		return vEntry.getStartSlackTime() >= pickupDetourInfo.departureTime - stopTask.getEndTime();
 	}
 

@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -33,8 +35,8 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 public class PassengerWaitingEvent extends AbstractPassengerRequestEvent {
 	public static final String EVENT_TYPE = "passenger waiting";
 
-	public PassengerWaitingEvent(double time, String mode, Id<Request> requestId, Id<Person> personId) {
-		super(time, mode, requestId, personId);
+	public PassengerWaitingEvent(double time, String mode, Id<Request> requestId, List<Id<Person>> personIds) {
+		super(time, mode, requestId, personIds);
 	}
 
 	@Override
@@ -47,7 +49,11 @@ public class PassengerWaitingEvent extends AbstractPassengerRequestEvent {
 		double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));
 		String mode = Objects.requireNonNull(attributes.get(ATTRIBUTE_MODE));
 		Id<Request> requestId = Id.create(attributes.get(ATTRIBUTE_REQUEST), Request.class);
-		Id<Person> personId = Id.createPersonId(attributes.get(ATTRIBUTE_PERSON));
-		return new PassengerWaitingEvent(time, mode, requestId, personId);
+		String[] personIdsAttribute = attributes.get(ATTRIBUTE_PERSON).split(",");
+		List<Id<Person>> personIds = new ArrayList<>();
+		for (String person : personIdsAttribute) {
+			personIds.add(Id.create(person, Person.class));
+		}
+		return new PassengerWaitingEvent(time, mode, requestId, personIds);
 	}
 }

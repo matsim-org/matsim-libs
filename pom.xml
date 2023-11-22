@@ -30,12 +30,13 @@
         <maven.compiler.release>17</maven.compiler.release>
         <argLine></argLine>
 
-        <log4j.version>2.21.1</log4j.version>
+        <log4j.version>2.22.0</log4j.version>
         <geotools.version>29.2</geotools.version>
 		<osmosis.version>0.49.1</osmosis.version>
         <jts.version>1.19.0</jts.version>
         <guice.version>7.0.0</guice.version>
-        <jackson.version>2.15.3</jackson.version>
+        <jackson.version>2.16.0</jackson.version>
+        <jogl.version>2.5.0</jogl.version>
     </properties>
 
     <scm>
@@ -56,10 +57,17 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
+
         <repository>
             <id>matsim</id>
             <url>https://repo.matsim.org/repository/matsim</url>
         </repository>
+
+            <repository>
+                <id>jogl</id>
+                <url>https://jogamp.org/deployment/maven/</url>
+            </repository>
+
     </repositories>
 
     <distributionManagement>
@@ -109,7 +117,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
-                <version>1.24.0</version>
+                <version>1.25.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-logging</groupId>
@@ -250,16 +258,22 @@
                 <version>3.0.2</version>
             </dependency>
 
+            <!--		Using the -main version means that the native libraries are loaded automagically.  See-->
+            <!--		https://jogamp.org/wiki/index.php/Maven#Add_dependencies_on_the_correct_packages-->
             <dependency>
                 <groupId>org.jogamp.gluegen</groupId>
-                <artifactId>gluegen-rt</artifactId>
-                <version>2.4.0-matsim-1</version>
+<!--                <artifactId>gluegen-rt</artifactId>-->
+                <artifactId>gluegen-rt-main</artifactId>
+<!--                <version>2.4.0-matsim-1</version>-->
+                <version>${jogl.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.jogamp.jogl</groupId>
-                <artifactId>jogl-all</artifactId>
-                <version>2.4.0-matsim-1</version>
+<!--                <artifactId>jogl-all</artifactId>-->
+                <artifactId>jogl-all-main</artifactId>
+<!--                <version>2.4.0-matsim-1</version>-->
+                <version>${jogl.version}</version>
             </dependency>
 
             <dependency>
@@ -309,7 +323,7 @@
 			<dependency>
 				<groupId>net.bytebuddy</groupId>
 				<artifactId>byte-buddy</artifactId>
-				<version>1.14.9</version>
+				<version>1.14.10</version>
 				<scope>test</scope>
 			</dependency>
 

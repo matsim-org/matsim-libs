@@ -10,7 +10,7 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
  */
 public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 	public enum PassengerEngineType {
-		DEFAULT, WITH_PREBOOKING, TELEPORTING
+		DEFAULT, WITH_PREBOOKING, TELEPORTING, WITH_GROUPS
 	}
 
 	private final PassengerEngineType type;
@@ -42,6 +42,10 @@ public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 			}
 			case TELEPORTING -> {
 				addModalComponent( PassengerEngine.class, TeleportingPassengerEngine.createProvider( getMode() ) );
+				return;
+			}
+			case WITH_GROUPS -> {
+				addModalComponent( PassengerEngine.class, GroupPassengerEngine.createProvider( getMode() ) );
 				return;
 			}
 			default -> throw new IllegalStateException( "Type: " + type + " is not supported" );

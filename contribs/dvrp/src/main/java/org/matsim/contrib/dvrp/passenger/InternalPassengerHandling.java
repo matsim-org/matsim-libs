@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.passenger;
 
 import static java.lang.String.format;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -70,39 +71,50 @@ class InternalPassengerHandling {
 			LOGGER.warn(format("Request: %s of mode: %s will not be served. Agent will get stuck. Cause: %s",
 					request.getId(), mode, cause));
 			eventsManager.processEvent(
-					new PassengerRequestRejectedEvent(now, mode, request.getId(), request.getPassengerId(), cause));
+					new PassengerRequestRejectedEvent(now, mode, request.getId(), request.getPassengerIds(), cause));
 		}
 		return violations.isEmpty();
 	}
 
-	boolean tryPickUpPassenger(MobsimDriverAgent driver, MobsimPassengerAgent passenger, Id<Request> requestId,
+	boolean tryPickUpPassengers(MobsimDriverAgent driver, List<MobsimPassengerAgent> passengers, Id<Request> requestId,
 			double now) {
-		if (internalInterface.unregisterAdditionalAgentOnLink(passenger.getId(), driver.getCurrentLinkId()) == null) {
-			//only possible with prebooking
-			return false;
+
+		//ensure for every passenger first
+		for (MobsimPassengerAgent passenger : passengers) {
+			if (internalInterface.unregisterAdditionalAgentOnLink(passenger.getId(), driver.getCurrentLinkId()) == null) {
+				//only possible with prebooking
+				return false;
+			}
 		}
 
-		MobsimVehicle mobVehicle = driver.getVehicle();
-		mobVehicle.addPassenger(passenger);
-		passenger.setVehicle(mobVehicle);
+		for (MobsimPassengerAgent passenger : passengers) {
 
-		Id<DvrpVehicle> vehicleId = Id.create(mobVehicle.getId(), DvrpVehicle.class);
-		eventsManager.processEvent(new PersonEntersVehicleEvent(now, passenger.getId(), mobVehicle.getId()));
-		eventsManager.processEvent(new PassengerPickedUpEvent(now, mode, requestId, passenger.getId(), vehicleId));
+			MobsimVehicle mobVehicle = driver.getVehicle();
+			mobVehicle.addPassenger(passenger);
+			passenger.setVehicle(mobVehicle);
+
+			Id<DvrpVehicle> vehicleId = Id.create(mobVehicle.getId(), DvrpVehicle.class);
+			eventsManager.processEvent(new PersonEntersVehicleEvent(now, passenger.getId(), mobVehicle.getId()));
+			eventsManager.processEvent(new PassengerPickedUpEvent(now, mode, requestId, passenger.getId(), vehicleId));
+		}
+
 		return true;
 	}
 
-	void dropOffPassenger(MobsimDriverAgent driver, MobsimPassengerAgent passenger, Id<Request> requestId, double now) {
+	void dropOffPassengers(MobsimDriverAgent driver, List<MobsimPassengerAgent> passengers, Id<Request> requestId, double now) {
 		MobsimVehicle mobVehicle = driver.getVehicle();
-		mobVehicle.removePassenger(passenger);
-		passenger.setVehicle(null);
-
 		Id<DvrpVehicle> vehicleId = Id.create(mobVehicle.getId(), DvrpVehicle.class);
-		eventsManager.processEvent(new PassengerDroppedOffEvent(now, mode, requestId, passenger.getId(), vehicleId));
-		eventsManager.processEvent(new PersonLeavesVehicleEvent(now, passenger.getId(), mobVehicle.getId()));
 
-		passenger.notifyArrivalOnLinkByNonNetworkMode(passenger.getDestinationLinkId());
-		passenger.endLegAndComputeNextState(now);
-		internalInterface.arrangeNextAgentState(passenger);
+		for (MobsimPassengerAgent passenger : passengers) {
+			mobVehicle.removePassenger(passenger);
+			passenger.setVehicle(null);
+
+			eventsManager.processEvent(new PassengerDroppedOffEvent(now, mode, requestId, passenger.getId(), vehicleId));
+			eventsManager.processEvent(new PersonLeavesVehicleEvent(now, passenger.getId(), mobVehicle.getId()));
+
+			passenger.notifyArrivalOnLinkByNonNetworkMode(passenger.getDestinationLinkId());
+			passenger.endLegAndComputeNextState(now);
+			internalInterface.arrangeNextAgentState(passenger);
+		}
 	}
 }
