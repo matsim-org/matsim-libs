@@ -37,8 +37,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -81,16 +81,16 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 
 		Config config = ConfigUtils.createConfig();
 
-		config.controler().setOutputDirectory(this.utils.getOutputDirectory());
+		config.controller().setOutputDirectory(this.utils.getOutputDirectory());
 
 		config.qsim().setEndTime(24 * 3600);
 
-		config.controler().setLastIteration(0);
-		config.controler().setRoutingAlgorithmType( ControlerConfigGroup.RoutingAlgorithmType.Dijkstra );
+		config.controller().setLastIteration(0);
+		config.controller().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
 
 		ActivityParams homeParams = new ActivityParams("home");
 		homeParams.setTypicalDuration(16*3600);
-		config.planCalcScore().addActivityParams(homeParams);
+		config.scoring().addActivityParams(homeParams);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
@@ -101,10 +101,10 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 		population.addPerson(createPerson(scenario, "p02"));
 
 		Controler controler = new Controler(scenario);
-        controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.getConfig().controler().setOverwriteFileSetting(
+        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
+		controler.getConfig().controller().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

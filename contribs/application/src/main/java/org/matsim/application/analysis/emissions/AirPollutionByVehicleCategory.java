@@ -135,8 +135,8 @@ public class AirPollutionByVehicleCategory implements MATSimAppCommand {
 		config.transit().setVehiclesFile(globFile(runDirectory, runId, "transitVehicles"));
 		config.global().setCoordinateSystem(crs.getInputCRS());
 		config.plans().setInputFile(null);
-		config.parallelEventHandling().setNumberOfThreads(null);
-		config.parallelEventHandling().setEstimatedNumberOfEvents(null);
+		config.eventsManager().setNumberOfThreads(null);
+		config.eventsManager().setEstimatedNumberOfEvents(null);
 		config.global().setNumberOfThreads(1);
 
 		EmissionsConfigGroup eConfig = ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);

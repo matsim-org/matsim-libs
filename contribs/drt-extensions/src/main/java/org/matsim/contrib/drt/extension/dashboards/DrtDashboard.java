@@ -140,11 +140,6 @@ public class DrtDashboard implements Dashboard {
 				viz.center = data.context().getCenter();
 				viz.zoom = data.context().mapZoomLevel;
 			})
-		//TODO group rejections per time bin. better put it into the plot with wait stats over daty time.
-//			.el(Line.class, (viz, data) -> {
-//				viz.dataset = data.output("ITERS/it." + lastIteration + "/*rejections_" +  drtConfigGroup.mode + ".csv");
-//				viz.x = "time";
-//			})
 		;
 
 //		This plot is not absolutely necesarry given the hex plots
@@ -163,12 +158,13 @@ public class DrtDashboard implements Dashboard {
 				viz.title = "Final Demand and Wait Stats over day time";
 				viz.description = "Number of rides (customers) is displayed in bars, wait statistics in lines";
 
-				Plotly.DataSet dataset = viz.addDataset(data.output("*_waitStats_" + drtConfigGroup.mode + ".csv"));
+				Plotly.DataSet waitStats = viz.addDataset(data.output("*_waitStats_" + drtConfigGroup.mode + ".csv"));
+				Plotly.DataSet rejections = viz.addDataset(data.output("*drt_rejections_perTimeBin_" +  drtConfigGroup.mode + ".csv"));
 
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.xAxis(Axis.builder().title("Time Bin").build())
 					.yAxis(Axis.builder().title("Wait Time [s]").build())
-					.yAxis2(Axis.builder().title("Nr of Rides")
+					.yAxis2(Axis.builder().title("Nr of Rides/Rejections")
 						.side(Axis.Side.right)
 						.overlaying(ScatterTrace.YAxis.Y)
 						.build())
@@ -179,7 +175,7 @@ public class DrtDashboard implements Dashboard {
 						.mode(ScatterTrace.Mode.LINE)
 						.name("Average")
 						.build(),
-					dataset.mapping()
+					waitStats.mapping()
 						.x("timebin")
 						.y("average_wait")
 				);
@@ -188,7 +184,7 @@ public class DrtDashboard implements Dashboard {
 						.mode(ScatterTrace.Mode.LINE)
 						.name("P5")
 						.build(),
-					dataset.mapping()
+					waitStats.mapping()
 						.x("timebin")
 						.y("p_5")
 				);
@@ -197,7 +193,7 @@ public class DrtDashboard implements Dashboard {
 						.mode(ScatterTrace.Mode.LINE)
 						.name("P95")
 						.build(),
-					dataset.mapping()
+					waitStats.mapping()
 						.x("timebin")
 						.y("p_95")
 				);
@@ -207,9 +203,19 @@ public class DrtDashboard implements Dashboard {
 						.yAxis(ScatterTrace.YAxis.Y2.toString())
 						.name("Rides")
 						.build(),
-					dataset.mapping()
+					waitStats.mapping()
 						.x("timebin")
 						.y("legs")
+				);
+
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
+						.opacity(0.3)
+						.yAxis(ScatterTrace.YAxis.Y2.toString())
+						.name("Rejections")
+						.build(),
+					rejections.mapping()
+						.x("timebin")
+						.y("rejections")
 				);
 
 			})
@@ -248,7 +254,7 @@ public class DrtDashboard implements Dashboard {
 						dataset.mapping()
 							.x("iteration")
 							.y("rejections")
-						.color(Plotly.ColorScheme.RdBu)
+//						.color(Plotly.ColorScheme.RdBu)
 					);
 
 					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
@@ -257,7 +263,7 @@ public class DrtDashboard implements Dashboard {
 						dataset.mapping()
 							.x("iteration")
 							.y("rides")
-						.color(Plotly.ColorScheme.RdBu)
+//						.color(Plotly.ColorScheme.RdBu)
 					);
 
 				})
@@ -294,7 +300,7 @@ public class DrtDashboard implements Dashboard {
 						dataset.mapping()
 							.x("iteration")
 							.y("inVehicleTravelTime_mean")
-						.color(Plotly.ColorScheme.RdBu)
+//						.color(Plotly.ColorScheme.RdBu)
 					);
 
 					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
@@ -304,7 +310,7 @@ public class DrtDashboard implements Dashboard {
 						dataset.mapping()
 							.x("iteration")
 							.y("wait_average")
-						.color(Plotly.ColorScheme.RdBu)
+//						.color(Plotly.ColorScheme.RdBu)
 					);
 				})
 				.el(Line.class, (viz, data) -> {

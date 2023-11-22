@@ -23,7 +23,7 @@ package org.matsim.contrib.freightreceiver;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.freight.carriers.Carrier;
 
 import java.util.*;
 

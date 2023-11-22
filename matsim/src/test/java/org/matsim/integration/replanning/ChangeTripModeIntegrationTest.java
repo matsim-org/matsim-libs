@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.NewControlerModule;
@@ -81,7 +81,7 @@ public class ChangeTripModeIntegrationTest {
 		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setStrategyName("ChangeTripMode");
 		strategySettings.setWeight(1.0);
-		config.strategy().addStrategySettings(strategySettings);
+		config.replanning().addStrategySettings(strategySettings);
 		//		config.setParam("changeMode", "modes", "car,walk");
 		String[] str = {"car","walk"} ;
 		config.changeMode().setModes(str);

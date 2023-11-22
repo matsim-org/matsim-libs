@@ -54,7 +54,7 @@ public final class RailsimLinkStateControlerListener implements IterationEndsLis
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		String railLinkStatesCsvFilename = this.controlerIO.getIterationFilename(event.getIteration(), "railsimLinkStates.csv", this.scenario.getConfig().controler().getCompressionType());
+		String railLinkStatesCsvFilename = this.controlerIO.getIterationFilename(event.getIteration(), "railsimLinkStates.csv", this.scenario.getConfig().controller().getCompressionType());
 		RailsimCsvWriter.writeLinkStatesCsv(this.analysis.events, railLinkStatesCsvFilename);
 	}
 

@@ -85,7 +85,7 @@ public class NetworkRoutingModuleTest {
 		fromAct.setLinkId(Id.create("1", Link.class));
 		Activity toAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 3000));
 		toAct.setLinkId(Id.create("3", Link.class));
-		
+
 		TravelTime timeObject = TravelTimeCalculator.create(f.s.getNetwork(), f.s.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
 
 		{
@@ -113,10 +113,10 @@ public class NetworkRoutingModuleTest {
 			Assert.assertEquals(0.3333333333, route.getTravelCost(), 1e-8 ) ;
 		}
 		// and now with a monetary distance rate different from zero:
-		
+
 		{
 			double monetaryDistanceRateCar = -1.;
-			f.s.getConfig().planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
+			f.s.getConfig().scoring().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
 
                         TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car,
                                         f.s.getConfig() ).createTravelDisutility(timeObject );
@@ -132,8 +132,8 @@ public class NetworkRoutingModuleTest {
 
 			List<? extends PlanElement> result = router.calcRoute( DefaultRoutingRequest.withoutAttributes( FacilitiesUtils.toFacility(fromAct, f.s.getActivityFacilities() ), FacilitiesUtils.toFacility(toAct,
 				  f.s.getActivityFacilities() ), 7.*3600, person ) ) ;
-			
-			Assert.assertEquals( 1, result.size() ) ; 
+
+			Assert.assertEquals( 1, result.size() ) ;
 			Leg leg = (Leg) result.get(0) ;
 
 			Assert.assertEquals(100.0, leg.getTravelTime().seconds(), 1e-8);
@@ -148,7 +148,7 @@ public class NetworkRoutingModuleTest {
 		public final Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Fixture() {
-			s.getConfig().plansCalcRoute().setRoutingRandomness( 0. );
+			s.getConfig().routing().setRoutingRandomness( 0. );
 
 			Network net = this.s.getNetwork();
 			NetworkFactory nf = net.getFactory();

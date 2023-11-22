@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.matsim.analysis;
 
@@ -23,14 +23,14 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
+import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -48,9 +48,9 @@ public class ModeStatsControlerListenerTest {
 	int non_network_walk;
 	int ride;
 	int walk;
-	HashMap<String, Integer> person3modes = new HashMap<String, Integer>();
-	HashMap<String, Integer> person1modes = new HashMap<String, Integer>();
-	HashMap<String, Integer> person2modes = new HashMap<String, Integer>();
+	HashMap<String, Integer> person3modes = new HashMap<>();
+	HashMap<String, Integer> person1modes = new HashMap<>();
+	HashMap<String, Integer> person2modes = new HashMap<>();
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -60,7 +60,7 @@ public class ModeStatsControlerListenerTest {
 
 		Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		final List<PlanElement> planElem = new ArrayList<PlanElement>();
-		PlanCalcScoreConfigGroup scoreConfig = new PlanCalcScoreConfigGroup();
+		ScoringConfigGroup scoreConfig = new ScoringConfigGroup();
 		TransportPlanningMainModeIdentifier transportId = new TransportPlanningMainModeIdentifier();
 		ModeParams modeParam1 = new ModeParams(TransportMode.walk);
 		ModeParams modeParam2 = new ModeParams(TransportMode.car);
@@ -344,25 +344,24 @@ public class ModeStatsControlerListenerTest {
 		person3.addPlan(plan3);
 		population.addPerson(person3);
 
-		performTest(population, transportId, scoreConfig, utils.getOutputDirectory() + "/ModeStatsControlerListener",
-				planElem);
+		performTest(population, transportId, utils.getOutputDirectory() + "/ModeStatsControlerListener");
 	}
 
 	private void performTest(Population population, TransportPlanningMainModeIdentifier transportId,
-			PlanCalcScoreConfigGroup scoreConfig, String outputDirectory, List<PlanElement> planElem) {
+													 String outputDirectory) {
 
-		ControlerConfigGroup controlerConfigGroup = new ControlerConfigGroup();
+		ControllerConfigGroup controllerConfigGroup = new ControllerConfigGroup();
 		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(outputDirectory,
 				OverwriteFileSetting.overwriteExistingFiles, CompressionType.gzip);
-		controlerConfigGroup.setCreateGraphs(true);
-		controlerConfigGroup.setFirstIteration(0);
-		ModeStatsControlerListener modStatListner = new ModeStatsControlerListener(controlerConfigGroup, population,
-				controlerIO, scoreConfig, transportId);
+		controllerConfigGroup.setCreateGraphs(true);
+		controllerConfigGroup.setFirstIteration(0);
+		ModeStatsControlerListener modStatListner = new ModeStatsControlerListener(controllerConfigGroup, population,
+				controlerIO, new GlobalConfigGroup(), transportId);
 
 		StartupEvent eventStart = new StartupEvent(null);
 		modStatListner.notifyStartup(eventStart);
 
-		HashMap<String, Integer> modesIter0 = new HashMap<String, Integer>();
+		HashMap<String, Integer> modesIter0 = new HashMap<>();
 
 		IterationEndsEvent event0 = new IterationEndsEvent(null, 0, false);
 		modStatListner.notifyIterationEnds(event0);
@@ -373,7 +372,7 @@ public class ModeStatsControlerListenerTest {
 		person3modes.forEach((k, v) -> modesIter0.merge(k, v, Integer::sum));
 
 		readAndcompareValues(modesIter0, 0);
-		
+
 		//Remove one person
 		population.getPersons().remove(Id.create("2", Person.class));
 
@@ -412,7 +411,7 @@ public class ModeStatsControlerListenerTest {
 	//sum of the scores of each mode should add up to 1
 	private void readAndcompareValues(HashMap<String, Integer> modes, int itr) {
 
-		String file = utils.getOutputDirectory() + "/ModeStatsControlerListener" + "/modestats.txt";
+		String file = utils.getOutputDirectory() + "/ModeStatsControlerListener" + "/modestats.csv";
 		BufferedReader br;
 		String line;
 		int totalTrips = modes.get(TransportMode.car) + modes.get(TransportMode.bike) + modes.get(TransportMode.pt)
@@ -421,21 +420,22 @@ public class ModeStatsControlerListenerTest {
 		try {
 			br = new BufferedReader(new FileReader(file));
 			String firstRow = br.readLine();
-			String[] columnNames = firstRow.split("	");
+			String delimiter = new GlobalConfigGroup().getDefaultDelimiter();
+			String[] columnNames = firstRow.split(delimiter);
 			decideColumns(columnNames);
 			int iteration = 0;
 			while ((line = br.readLine()) != null) {
 				if (iteration == itr) {
-					String[] column = line.split("	");
+					String[] column = line.split(delimiter);
 					// checking if column number in greater than 0, because 0th column is always 'Iteration' and we don't need that --> see decideColumns() method
-					Double carvalue = (car > 0) ? Double.valueOf(column[car]) : 0;
-					Double walkvalue = (walk > 0) ? Double.valueOf(column[walk]) : 0;
-					Double ptvalue = (pt > 0) ? Double.valueOf(column[pt]) : 0;
-					Double bikevalue = (bike > 0) ? Double.valueOf(column[bike]) : 0;
-					Double non_network_walkvalue = (non_network_walk > 0) ? Double.valueOf(column[non_network_walk])
+					double carvalue = (car > 0) ? Double.parseDouble(column[car]) : 0;
+					double walkvalue = (walk > 0) ? Double.parseDouble(column[walk]) : 0;
+					double ptvalue = (pt > 0) ? Double.parseDouble(column[pt]) : 0;
+					double bikevalue = (bike > 0) ? Double.parseDouble(column[bike]) : 0;
+					double non_network_walkvalue = (non_network_walk > 0) ? Double.valueOf(column[non_network_walk])
 							: 0;
-					Double othervalue = (other > 0) ? Double.valueOf(column[other]) : 0;
-					Double ridevalue = (ride > 0) ? Double.valueOf(column[ride]) : 0;
+					double othervalue = (other > 0) ? Double.parseDouble(column[other]) : 0;
+					double ridevalue = (ride > 0) ? Double.parseDouble(column[ride]) : 0;
 					Assert.assertEquals("car mode has an unexpected score",
 							(modes.get(TransportMode.car).doubleValue() / totalTrips), carvalue, 0);
 					Assert.assertEquals("walk mode has an unexpected score",
@@ -461,7 +461,6 @@ public class ModeStatsControlerListenerTest {
 				iteration++;
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

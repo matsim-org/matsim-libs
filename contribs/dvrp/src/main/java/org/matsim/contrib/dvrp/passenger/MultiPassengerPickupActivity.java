@@ -19,9 +19,13 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.StayTask;
@@ -35,7 +39,7 @@ public class MultiPassengerPickupActivity extends FirstLastSimStepDynActivity im
 	private final Map<Id<Request>, ? extends PassengerRequest> requests;
 	private final double expectedEndTime;
 
-	private int passengersPickedUp = 0;
+	private int requestsPickedUp = 0;
 
 	public MultiPassengerPickupActivity(PassengerHandler passengerHandler, DynAgent driver, StayTask pickupTask,
 			Map<Id<Request>, ? extends PassengerRequest> requests, String activityType) {
@@ -49,32 +53,32 @@ public class MultiPassengerPickupActivity extends FirstLastSimStepDynActivity im
 
 	@Override
 	protected boolean isLastStep(double now) {
-		return passengersPickedUp == requests.size() && now >= expectedEndTime;
+		return requestsPickedUp == requests.size() && now >= expectedEndTime;
 	}
 
 	@Override
 	protected void beforeFirstStep(double now) {
 		for (PassengerRequest request : requests.values()) {
-			if (passengerHandler.tryPickUpPassenger(this, driver, request.getId(), now)) {
-				passengersPickedUp++;
+			if (passengerHandler.tryPickUpPassengers(this, driver, request.getId(), now)) {
+				requestsPickedUp++;
 			}
 		}
 	}
 
 	@Override
-	public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now) {
-		PassengerRequest request = getRequestForPassenger(passenger.getId());
-		if (passengerHandler.tryPickUpPassenger(this, driver, request.getId(), now)) {
-			passengersPickedUp++;
+	public void notifyPassengersAreReadyForDeparture(List<MobsimPassengerAgent> passengers, double now) {
+		PassengerRequest request = getRequestForPassenger(passengers.stream().map(Identifiable::getId).toList());
+		if (passengerHandler.tryPickUpPassengers(this, driver, request.getId(), now)) {
+			requestsPickedUp++;
 		} else {
 			throw new IllegalStateException("The passenger is not on the link or not available for departure!");
 		}
 	}
 
-	private PassengerRequest getRequestForPassenger(Id<Person> passengerId) {
+	private PassengerRequest getRequestForPassenger(List<Id<Person>> passengerIds) {
 		return requests.values()
 				.stream()
-				.filter(r -> passengerId.equals(r.getPassengerId()))
+				.filter(r -> r.getPassengerIds().size() == passengerIds.size() && r.getPassengerIds().containsAll(passengerIds))
 				.findAny()
 				.orElseThrow(() -> new IllegalArgumentException("I am waiting for different passengers!"));
 	}

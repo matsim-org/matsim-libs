@@ -22,7 +22,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.parking.parkingproxy.ParkingProxyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
+import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -31,21 +31,21 @@ import org.matsim.contrib.parking.parkingproxy.config.ParkingProxyConfigGroup;
 public class RunWithParkingProxy {
 
 	public static void main(String[] args) {
-		
+
 		ParkingProxyConfigGroup parkingConfig = new ParkingProxyConfigGroup();
 		Config config = ConfigUtils.loadConfig(args, parkingConfig);
 
 		//config.controler().setLastIteration(100);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		config.plansCalcRoute().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
-		config.planCalcScore().setWriteExperiencedPlans(true);
-		
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.routing().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
+		config.scoring().setWriteExperiencedPlans(true);
+
 		Scenario scen = ScenarioUtils.loadScenario(config);
-		
+
 		Controler controler = new Controler(scen);
-		
+
 		controler.addOverridingModule(new ParkingProxyModule(scen) );
-		
+
 		controler.run();
 	}
 

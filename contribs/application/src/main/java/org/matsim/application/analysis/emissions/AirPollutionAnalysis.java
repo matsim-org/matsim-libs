@@ -142,8 +142,8 @@ public class AirPollutionAnalysis implements MATSimAppCommand {
 		config.transit().setTransitScheduleFile(ApplicationUtils.matchInput("transitSchedule", input.getRunDirectory()).toAbsolutePath().toString());
 		config.transit().setVehiclesFile(ApplicationUtils.matchInput("transitVehicles", input.getRunDirectory()).toAbsolutePath().toString());
 		config.plans().setInputFile(null);
-		config.parallelEventHandling().setNumberOfThreads(null);
-		config.parallelEventHandling().setEstimatedNumberOfEvents(null);
+		config.eventsManager().setNumberOfThreads(null);
+		config.eventsManager().setEstimatedNumberOfEvents(null);
 		config.global().setNumberOfThreads(1);
 
 		return config;

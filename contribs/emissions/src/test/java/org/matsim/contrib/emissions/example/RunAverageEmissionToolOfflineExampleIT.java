@@ -30,7 +30,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result;
 
 import java.net.URL;
@@ -50,7 +49,7 @@ public class RunAverageEmissionToolOfflineExampleIT{
 		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv1" );
 		URL configUrl = IOUtils.extendUrl( scenarioUrl, "config_average.xml" );
 		Config config = offlineExample.prepareConfig( new String [] {configUrl.toString()} );
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		emissionsConfig.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
@@ -71,7 +70,7 @@ public class RunAverageEmissionToolOfflineExampleIT{
 		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv2" );
 		URL configUrl = IOUtils.extendUrl( scenarioUrl, "config_average.xml" );
 		Config config = offlineExample.prepareConfig( new String [] {configUrl.toString()} );
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		emissionsConfig.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.asEngineInformationAttributes );
@@ -98,7 +97,7 @@ public class RunAverageEmissionToolOfflineExampleIT{
 		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv2" );
 		URL configUrl = IOUtils.extendUrl( scenarioUrl, "config_average.xml" );
 		Config config = offlineExample.prepareConfig( new String [] {configUrl.toString()} );
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		emissionsConfig.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
@@ -120,7 +119,7 @@ public class RunAverageEmissionToolOfflineExampleIT{
 		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv2" );
 		URL configUrl = IOUtils.extendUrl( scenarioUrl, "config_average.xml" );
 		Config config = offlineExample.prepareConfig( new String [] {configUrl.toString()} );
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.csv");

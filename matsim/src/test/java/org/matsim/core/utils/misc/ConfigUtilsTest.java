@@ -91,7 +91,7 @@ public class ConfigUtilsTest {
 		final URL url = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" );
 		final String [] typedArgs = {"--config:controler.outputDirectory=abc"} ;
 		Config config = ConfigUtils.loadConfig( url, typedArgs );
-		Assert.assertEquals("abc", config.controler().getOutputDirectory());
+		Assert.assertEquals("abc", config.controller().getOutputDirectory());
 	}
 	@Test
 	public void loadConfigWithTypedArgsWithTypo(){

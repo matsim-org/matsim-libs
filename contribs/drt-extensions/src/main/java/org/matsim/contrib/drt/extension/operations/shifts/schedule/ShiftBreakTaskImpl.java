@@ -63,4 +63,14 @@ public class ShiftBreakTaskImpl extends DefaultStayTask implements ShiftBreakTas
 	public void addPickupRequest(AcceptedDrtRequest request) {
 		delegate.addPickupRequest(request);
 	}
+
+	@Override
+	public void removePickupRequest(Id<Request> requestId) {
+		delegate.removePickupRequest(requestId);
+	}
+
+	@Override
+	public void removeDropoffRequest(Id<Request> requestId) {
+		delegate.removeDropoffRequest(requestId);
+	}
 }

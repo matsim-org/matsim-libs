@@ -36,20 +36,10 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlanWriter;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierUtils;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.carrier.CarrierConstants;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.TimeWindow;
-import org.matsim.contrib.freight.carrier.Tour;
-import org.matsim.contrib.freight.jsprit.VRPTransportCostsFactory;
+import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.jsprit.VRPTransportCostsFactory;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.population.PopulationUtils;
@@ -127,7 +117,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 		if (!scenario.getVehicles().getVehicleTypes().containsKey(carrierVehicle.getType().getId()))
 			scenario.getVehicles().addVehicleType(carrierVehicle.getType());
 		Id<Vehicle> vid = Id.createVehicleId(driverPerson.getId());
-		VehicleUtils.insertVehicleIdsIntoAttributes(driverPerson, Map.of(CarrierUtils.getCarrierMode(carrier), vid));
+		VehicleUtils.insertVehicleIdsIntoAttributes(driverPerson, Map.of(CarriersUtils.getCarrierMode(carrier), vid));
 		scenario.getVehicles()
 				.addVehicle(scenario.getVehicles().getFactory().createVehicle(vid, carrierVehicle.getType()));
 		freightVehicles.add(vid);
@@ -211,7 +201,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 	 */
 	private Plan createPlainPlanFromTour(Carrier carrier, ScheduledTour scheduledTour) {
 
-		String carrierMode = CarrierUtils.getCarrierMode(carrier);
+		String carrierMode = CarriersUtils.getCarrierMode(carrier);
 
 		// Create empty plan
 		Plan plan = PopulationUtils.createPlan();
@@ -223,7 +213,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 		plan.addActivity(startActivity);
 
 		for (Tour.TourElement tourElement : scheduledTour.getTour().getTourElements()) {
-			if (tourElement instanceof org.matsim.contrib.freight.carrier.Tour.Leg) {
+			if (tourElement instanceof Tour.Leg) {
 
 				// Take information from scheduled leg and create a defaultLeg
 				Tour.Leg tourLeg = (Tour.Leg) tourElement;
@@ -301,7 +291,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
         createAndAddFreightAgents(this.carriers, this.scenario.getPopulation());
 
         event.getServices().getInjector().getInstance(ScoreCommercialJobs.class).prepareTourArrivalsForDay();
-        String dir = event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/";
+        String dir = event.getServices().getConfig().controller().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/";
         log.info("writing carrier file of iteration " + event.getIteration() + " to " + dir);
         CarrierPlanWriter planWriter = new CarrierPlanWriter(carriers);
         planWriter.write(dir + "carriers_it" + event.getIteration() + ".xml");
@@ -415,7 +405,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 				log.info("Toggle " + ChangeCommercialJobOperator.SELECTOR_NAME);
 			}
 
-			Collection<StrategySettings> allStrategies = this.scenario.getConfig().strategy().getStrategySettings();
+			Collection<StrategySettings> allStrategies = this.scenario.getConfig().replanning().getStrategySettings();
 
 			for (StrategySettings strategy : allStrategies) {
 				if (strategy.getStrategyName().equals(ChangeCommercialJobOperator.SELECTOR_NAME)) {

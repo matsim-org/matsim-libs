@@ -21,20 +21,23 @@ package org.matsim.contrib.drt.extension.edrt.scheduler;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.extension.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.drt.extension.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
-import org.matsim.contrib.evrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.contrib.evrp.EvDvrpVehicle;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -43,29 +46,35 @@ import java.util.stream.Collectors;
 public class EmptyVehicleChargingScheduler {
 	private final MobsimTimer timer;
 	private final EDrtTaskFactoryImpl taskFactory;
-	private final Map<Id<Link>, Charger> linkToChargerMap;
+	private final Map<Id<Link>, List<Charger>> linkToChargersMap;
 
 	public EmptyVehicleChargingScheduler(MobsimTimer timer, DrtTaskFactory taskFactory,
 			ChargingInfrastructure chargingInfrastructure) {
 		this.timer = timer;
 		this.taskFactory = (EDrtTaskFactoryImpl)taskFactory;
-		linkToChargerMap = chargingInfrastructure.getChargers()
+		linkToChargersMap = chargingInfrastructure.getChargers()
 				.values()
 				.stream()
-				.collect(Collectors.toMap(c -> c.getLink().getId(), c -> c));
+				.collect(Collectors.groupingBy(c -> c.getLink().getId()));
 	}
 
 	public void chargeVehicle(DvrpVehicle vehicle) {
 		DrtStayTask currentTask = (DrtStayTask)vehicle.getSchedule().getCurrentTask();
 		Link currentLink = currentTask.getLink();
-		Charger charger = linkToChargerMap.get(currentLink.getId());
-		if (charger != null) {
+		List<Charger> chargers = linkToChargersMap.get(currentLink.getId());
+		if (chargers != null) {
+			Optional<Charger> freeCharger = chargers.stream().filter(c -> c.getLogic().getPluggedVehicles().isEmpty()).findFirst();
+
+			// Empty charger or at least smallest queue charger
+			Charger charger = freeCharger.orElseGet(() -> chargers.stream().min(Comparator.comparingInt(e -> e.getLogic().getQueuedVehicles().size())).orElseThrow());
 			ElectricVehicle ev = ((EvDvrpVehicle)vehicle).getElectricVehicle();
 			if (!charger.getLogic().getChargingStrategy().isChargingCompleted(ev)) {
 				chargeVehicleImpl(vehicle, charger);
 			}
 		}
 	}
+
+
 
 	private void chargeVehicleImpl(DvrpVehicle vehicle, Charger charger) {
 		Schedule schedule = vehicle.getSchedule();

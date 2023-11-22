@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -172,6 +173,24 @@ public final class PlanWithCachedJointPlan implements Plan {
 	public void setType(String type) {
 		this.delegate.setType(type);
 	}
+	
+	@Override
+	public Id<Plan> getId() { return null; }
+
+	@Override
+	public void setPlanId(Id<Plan> planId) { /* nothing to do here */ }
+	
+	@Override
+	public int getIterationCreated() { return -1; }
+
+	@Override
+	public void setIterationCreated(int iteration) { /* nothing to do here */ }
+
+	@Override
+	public String getPlanMutator() { return null; }
+
+	@Override
+	public void setPlanMutator(String planMutator) { /* nothing to do here */ }
 
 	@Override
 	public Person getPerson() {

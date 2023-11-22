@@ -17,8 +17,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.ev;
-
 /**
  * All values used in this package use SI base and derived units. In particular:
  * <ul>
@@ -34,3 +32,5 @@ package org.matsim.contrib.ev;
  * Consequently, energy consumption is measured in [J/m], rather than [kWh/100km] or [Wh/km], as typically done in
  * transport.
  */
+package org.matsim.contrib.ev;
+

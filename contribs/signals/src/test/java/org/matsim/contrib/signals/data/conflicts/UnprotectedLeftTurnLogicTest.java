@@ -43,14 +43,14 @@ public class UnprotectedLeftTurnLogicTest {
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
-	
+
 	@Test
 	public void testSingleIntersectionScenarioWithLeftTurns() {
 		// run scenarios from files
 		AnalyzeSingleIntersectionLeftTurnDelays restrictedLeftTurns = runSimulation(IntersectionLogic.CONFLICTING_DIRECTIONS_AND_TURN_RESTRICTIONS);
 		AnalyzeSingleIntersectionLeftTurnDelays unrestrictedLeftTurns = runSimulation(IntersectionLogic.CONFLICTING_DIRECTIONS_NO_TURN_RESTRICTIONS);
 		AnalyzeSingleIntersectionLeftTurnDelays noLogic = runSimulation(IntersectionLogic.NONE);
-		
+
 		double leftTurnDelayWTurnRestriction = restrictedLeftTurns.getLeftTurnDelay();
 		double leftTurnDelayWoTurnRestriction = unrestrictedLeftTurns.getLeftTurnDelay();
 		double leftTurnDelayWithoutLogic = noLogic.getLeftTurnDelay();
@@ -69,30 +69,30 @@ public class UnprotectedLeftTurnLogicTest {
 				SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
 		signalsConfigGroup.setSignalControlFile("signalControlFixedTime.xml");
 		signalsConfigGroup.setIntersectionLogic(intersectionLogic);
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory() + intersectionLogic + "/");
-		
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory() + intersectionLogic + "/");
+
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
-		
+
 		Controler controler = new Controler( scenario );
-        
+
 		// add the signals module
 //		controler.addOverridingModule(new SignalsModule());
 		Signals.configure(controler);
-				
+
 		// add analysis tools
 		AnalyzeSingleIntersectionLeftTurnDelays handler = new AnalyzeSingleIntersectionLeftTurnDelays();
-		controler.addOverridingModule(new AbstractModule() {			
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				this.addEventHandlerBinding().toInstance(handler);
 			}
 		});
-		
+
 		// run the simulation
 		controler.run();
-		
+
 		return handler;
 	}
-	
+
 }

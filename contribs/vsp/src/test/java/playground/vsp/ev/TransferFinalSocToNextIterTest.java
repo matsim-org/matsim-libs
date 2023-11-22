@@ -28,9 +28,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
-import org.matsim.contrib.ev.fleet.ElectricVehicleSpecificationImpl;
-import org.matsim.contrib.ev.fleet.ElectricVehicleSpecifications;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -52,11 +51,11 @@ public class TransferFinalSocToNextIterTest {
 	@Test
 	public void test() {
 		//adapt scenario
-		scenario.getConfig().controler().setLastIteration(LAST_ITERATION);
-		scenario.getConfig().controler().setOutputDirectory("test/output/playground/vsp/ev/FinalSoc2VehicleTypeTest/");
+		scenario.getConfig().controller().setLastIteration(LAST_ITERATION);
+		scenario.getConfig().controller().setOutputDirectory("test/output/playground/vsp/ev/FinalSoc2VehicleTypeTest/");
 
 		var vehicle1 = scenario.getVehicles().getVehicles().get(Id.create("Triple Charger_car", Vehicle.class));
-		ElectricVehicleSpecifications.setInitialSoc(vehicle1, INITIAL_SOC);
+		ElectricFleetUtils.setInitialSoc(vehicle1, INITIAL_SOC );
 
 		//controler
 		Controler controler = RunUrbanEVExample.prepareControler(scenario);
@@ -69,7 +68,7 @@ public class TransferFinalSocToNextIterTest {
 		// testSOCIsDumpedIntoVehicleType
 		//agent has driven the car so SOC should have changed and should be dumped into the vehicle type
 		var vehicle = scenario.getVehicles().getVehicles().get(Id.create("Triple Charger_car", Vehicle.class));
-		var evSpec = new ElectricVehicleSpecificationImpl(vehicle);
+		var evSpec = ElectricFleetUtils.createElectricVehicleSpecificationDefaultImpl(vehicle );
 		Assert.assertNotEquals(evSpec.getInitialSoc(), INITIAL_SOC);
 		Assert.assertEquals(0.7273605127621898, evSpec.getInitialSoc(), MatsimTestUtils.EPSILON); //should not be fully charged
 
@@ -86,7 +85,7 @@ public class TransferFinalSocToNextIterTest {
 
 		SOCHandler(Scenario scenario) {
 			var car = scenario.getVehicles().getVehicles().get(Id.create("Triple Charger_car", Vehicle.class));
-			evSpec = new ElectricVehicleSpecificationImpl(car);
+			evSpec = ElectricFleetUtils.createElectricVehicleSpecificationDefaultImpl(car );
 		}
 
 		@Override

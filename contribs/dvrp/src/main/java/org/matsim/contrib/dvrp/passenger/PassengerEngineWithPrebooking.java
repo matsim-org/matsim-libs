@@ -19,12 +19,7 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
@@ -62,6 +57,7 @@ public final class PassengerEngineWithPrebooking
 
 	private final String mode;
 	private final MobsimTimer mobsimTimer;
+	private final EventsManager eventsManager;
 	private final PreplanningEngine preplanningEngine;
 
 	private final PassengerRequestCreator requestCreator;
@@ -87,6 +83,7 @@ public final class PassengerEngineWithPrebooking
 		this.optimizer = optimizer;
 		this.network = network;
 		this.requestValidator = requestValidator;
+		this.eventsManager = eventsManager;
 
 		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
 	}
@@ -137,11 +134,12 @@ public final class PassengerEngineWithPrebooking
 		double now = mobsimTimer.getTimeOfDay();
 		//TODO have a separate request creator for prebooking (accept TripInfo instead of Route)
 		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
-				passenger.getId(), tripInfo.getOriginalRequest().getPlannedRoute(),
+				List.of(passenger.getId()), tripInfo.getOriginalRequest().getPlannedRoute(),
 				getLink(tripInfo.getPickupLocation().getLinkId()), getLink(tripInfo.getDropoffLocation().getLinkId()),
 				tripInfo.getExpectedBoardingTime(), now);
 		validateAndSubmitRequest(passenger, request, tripInfo.getOriginalRequest(), now);
-		advanceRequests.put(request.getPassengerId(), request);
+		// hard assumption that with this engine, passenger ids is always a singleton. nkuehnel oct '23
+		advanceRequests.put(request.getPassengerIds().stream().findFirst().orElseThrow(), request);
 	}
 	private Link getLink(Id<Link> linkId) {
 		return Preconditions.checkNotNull(network.getLinks().get(linkId),
@@ -164,10 +162,14 @@ public final class PassengerEngineWithPrebooking
 		//TODO what if it was already rejected while prebooking??
 
 		PassengerRequest prebookedRequest = prebookedRequests.get(0);
+
+		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, prebookedRequest.getId(), prebookedRequest.getPassengerIds()));
+
 		PassengerPickupActivity awaitingPickup = awaitingPickups.remove(prebookedRequest.getId());
 		if (awaitingPickup != null) {
-			awaitingPickup.notifyPassengerIsReadyForDeparture(passenger, now);
+			awaitingPickup.notifyPassengersAreReadyForDeparture(List.of(passenger), now);
 		}
+
 		return true;
 	}
 
@@ -197,7 +199,7 @@ public final class PassengerEngineWithPrebooking
 	// ================ PICKUP / DROPOFF
 
 	@Override
-	public boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
+	public boolean tryPickUpPassengers(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
 			Id<Request> requestId, double now) {
 		Id<Link> linkId = driver.getCurrentLinkId();
 		RequestEntry requestEntry = activeRequests.get(requestId);
@@ -210,7 +212,7 @@ public final class PassengerEngineWithPrebooking
 			return false;// wait for the passenger
 		}
 
-		if (!internalPassengerHandling.tryPickUpPassenger(driver, passenger, requestId, now)) {
+		if (!internalPassengerHandling.tryPickUpPassengers(driver, List.of(passenger), requestId, now)) {
 			// the passenger has already been picked up and is on another taxi trip
 			// seems there have been at least 2 requests made by this passenger for this location
 			awaitingPickups.put(requestId, pickupActivity);
@@ -221,8 +223,8 @@ public final class PassengerEngineWithPrebooking
 	}
 
 	@Override
-	public void dropOffPassenger(MobsimDriverAgent driver, Id<Request> requestId, double now) {
-		internalPassengerHandling.dropOffPassenger(driver, activeRequests.remove(requestId).passenger, requestId, now);
+	public void dropOffPassengers(MobsimDriverAgent driver, Id<Request> requestId, double now) {
+		internalPassengerHandling.dropOffPassengers(driver, List.of(activeRequests.remove(requestId).passenger), requestId, now);
 	}
 
 	// ================ REJECTED/SCHEDULED EVENTS
@@ -293,5 +295,26 @@ public final class PassengerEngineWithPrebooking
 						getModalInstance(Network.class), getModalInstance(PassengerRequestValidator.class));
 			}
 		};
+	}
+
+	/*
+	 * This method has been retrofitted with the new prebooking implementation in
+	 * Nov 2023. Not sure if this is the right way to do it, this class doesn't seem
+	 * to be tested anywhere. /sebhoerl
+	 */
+	@Override
+	public boolean notifyWaitForPassengers(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver, Id<Request> requestId) {
+		Id<Link> linkId = driver.getCurrentLinkId();
+		RequestEntry requestEntry = activeRequests.get(requestId);
+		MobsimPassengerAgent passenger = requestEntry.passenger;
+
+		if (passenger.getCurrentLinkId() != linkId
+				|| passenger.getState() != MobsimAgent.State.LEG
+				|| !passenger.getMode().equals(mode)) {
+			awaitingPickups.put(requestId, pickupActivity);
+			return false;// wait for the passenger
+		}
+
+		return true; // passenger present?
 	}
 }

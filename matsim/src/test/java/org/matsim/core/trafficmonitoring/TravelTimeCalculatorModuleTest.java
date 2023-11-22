@@ -98,7 +98,7 @@ public class TravelTimeCalculatorModuleTest {
 		Config config = ConfigUtils.createConfig();
 
 //		config.travelTimeCalculator().setAnalyzedModesAsString("car,bike" );
-		config.plansCalcRoute().setNetworkModes( new LinkedHashSet<>( Arrays.asList( TransportMode.car, TransportMode.bike ) ) );
+		config.routing().setNetworkModes( new LinkedHashSet<>( Arrays.asList( TransportMode.car, TransportMode.bike ) ) );
 		// (this is now newly taken from the router network modes. kai, feb'19)
 
 		config.travelTimeCalculator().setSeparateModes(true);
