@@ -241,18 +241,18 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	public enum NodeTransition {
 		emptyBufferAfterBufferRandomDistribution_dontBlockNode,
 		emptyBufferAfterBufferRandomDistribution_nodeBlockedWhenSingleOutlinkFull,
-		moveVehByVehRandomDistribution_dontBlockNode, 
-		moveVehByVehRandomDistribution_nodeBlockedWhenSingleOutlinkFull, 
+		moveVehByVehRandomDistribution_dontBlockNode,
+		moveVehByVehRandomDistribution_nodeBlockedWhenSingleOutlinkFull,
 		moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull
-		/* note: moveVehByVehDeterministicPriorities is not implemented for the case when the node is not blocked 
+		/* note: moveVehByVehDeterministicPriorities is not implemented for the case when the node is not blocked
 		 * as soon as a single outlink is full
 		 * theresa, jun'20
 		 */
 	}
 	private NodeTransition nodeTransitionLogic = NodeTransition.emptyBufferAfterBufferRandomDistribution_dontBlockNode;
-	
+
 	// ---
-	
+
 	public QSimConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -602,7 +602,8 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter(SEEP_MODE)
 	private void setSeepModes(String value) {
-		setSeepModes(Arrays.asList(value.split(",")));
+		Set<String> modes = Arrays.stream(value.split(",")).map(String::trim).collect(Collectors.toSet());
+		setSeepModes(Arrays.stream(modes));
 	}
 
 	public Collection<String> getSeepModes() {
@@ -643,16 +644,16 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		// yyyyyy this should better become a threshold number!  kai, aug'16
 		return this.usingTravelTimeCheckInTeleportation = val ;
 	}
-	
+
 	static final String PCU_THRESHOLD_FOR_FLOW_CAPACITY_EASING = //
 			"Flow capacity easing is activated for vehicles of size equal or smaller than the specified threshold. "
 			+ "Introduced to minimise the chances of buses being severely delayed in downsampled scenarios";
-	
-	
+
+
 	public double getPcuThresholdForFlowCapacityEasing() {
 		return pcuThresholdForFlowCapacityEasing;
 	}
-	
+
 	/**
 	 * @param pcuThresholdForFlowCapacityEasing -- {@value #PCU_THRESHOLD_FOR_FLOW_CAPACITY_EASING}
 	 */
@@ -687,5 +688,5 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 //		// yyyy do we really need this switch?  Quite in general, please try to avoid boolean switches.  kai, may'18
 //		this.creatingVehiclesForAllNetworkModes = creatingVehiclesForAllNetworkModes;
 //	}
-	
+
 }
