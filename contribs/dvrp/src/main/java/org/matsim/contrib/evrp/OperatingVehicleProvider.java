@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLookup;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
+import org.matsim.contrib.ev.discharging.IdleDischargingHandler;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 import com.google.inject.Inject;
@@ -33,7 +33,7 @@ import com.google.inject.Inject;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class OperatingVehicleProvider implements AuxDischargingHandler.VehicleProvider {
+public class OperatingVehicleProvider implements IdleDischargingHandler.VehicleProvider {
 	private final DvrpVehicleLookup dvrpVehicleLookup;
 
 	@Inject

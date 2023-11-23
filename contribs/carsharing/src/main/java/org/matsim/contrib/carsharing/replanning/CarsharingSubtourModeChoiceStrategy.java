@@ -1,7 +1,7 @@
 package org.matsim.contrib.carsharing.replanning;
 
 import com.google.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
@@ -28,7 +28,7 @@ public class CarsharingSubtourModeChoiceStrategy implements PlanStrategy {
 	public CarsharingSubtourModeChoiceStrategy(final Scenario scenario, Provider<TripRouter> tripRouterProvider, MembershipContainer memberships, TimeInterpretation timeInterpretation) {
 		this.strategy = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
 
-		//addStrategyModule( new TripsToLegsModule(controler.getConfig() ) );   
+		//addStrategyModule( new TripsToLegsModule(controler.getConfig() ) );
 		CarsharingSubTourPermissableModesCalculator cpmc =
 				new CarsharingSubTourPermissableModesCalculator(scenario, scenario.getConfig().subtourModeChoice().getModes(), memberships);
 		SubtourModeChoice smc = new SubtourModeChoice(scenario.getConfig().global(), scenario.getConfig().subtourModeChoice(), cpmc);

@@ -27,10 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -60,7 +61,7 @@ import com.google.common.base.Preconditions;
  * @author thibautd
  */
 public final class TripRouter implements MatsimExtensionPoint {
-	private static final Logger log = Logger.getLogger(TripRouter.class );
+	private static final Logger log = LogManager.getLogger(TripRouter.class );
 
 	private final Map<String, RoutingModule> routingModules = new HashMap<>();
 	private final FallbackRoutingModule fallbackRoutingModule;
@@ -178,7 +179,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 					departureTime,
 					person,
 					routingAttributes);
-					
+
 			List<? extends PlanElement> trip = module.calcRoute(request);
 
 			if ( trip == null ) {

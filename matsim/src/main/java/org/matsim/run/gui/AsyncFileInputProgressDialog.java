@@ -33,7 +33,8 @@ import javax.swing.JDialog;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * A dialog showing the progress on how far a {@link FileInputStream} has been consumed
@@ -43,7 +44,7 @@ import org.apache.log4j.Logger;
  */
 /*package*/ class AsyncFileInputProgressDialog extends JDialog {
 
-	private final static Logger log = Logger.getLogger(AsyncFileInputProgressDialog.class);
+	private final static Logger log = LogManager.getLogger(AsyncFileInputProgressDialog.class);
 
 	private static final long serialVersionUID = 1L;
 

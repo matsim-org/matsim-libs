@@ -23,7 +23,8 @@ package org.matsim.contrib.cadyts.car;
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.supply.SimResults;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -43,8 +44,8 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.counts.Counts;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
@@ -57,11 +58,11 @@ import static org.matsim.contrib.cadyts.general.CadytsBuilderImpl.*;
  */
 public class CadytsContext implements CadytsContextI<Link>, StartupListener, IterationEndsListener, BeforeMobsimListener {
 
-	private final static Logger log = Logger.getLogger(CadytsContext.class);
+	private final static Logger log = LogManager.getLogger(CadytsContext.class);
 
 	private final static String LINKOFFSET_FILENAME = "linkCostOffsets.xml";
 	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
-	
+
 	private final double countsScaleFactor;
 	private final Counts<Link> calibrationCounts;
 	private final boolean writeAnalysisFile;
@@ -107,11 +108,11 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	public PlansTranslator<Link> getPlansTranslator() {
 		return this.plansTranslator;
 	}
-	
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.simResults = new SimResultsContainerImpl(volumesAnalyzer, this.countsScaleFactor);
-		
+
 		// this collects events and generates cadyts plans from it
 		this.plansTranslator = new PlansTranslatorBasedOnEvents(scenario);
 		this.eventsManager.addHandler(plansTranslator);

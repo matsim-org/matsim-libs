@@ -25,7 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.misc.Counter;
@@ -38,7 +39,7 @@ import org.matsim.core.utils.misc.Counter;
 public final class ParallelPersonAlgorithmUtils {
 	private ParallelPersonAlgorithmUtils(){} // do not instantiate
 
-	private final static Logger log = Logger.getLogger(ParallelPersonAlgorithmUtils.class);
+	private final static Logger log = LogManager.getLogger(ParallelPersonAlgorithmUtils.class);
 	
 	public interface PersonAlgorithmProvider {
 		public PersonAlgorithm getPersonAlgorithm();

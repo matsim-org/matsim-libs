@@ -26,7 +26,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -44,8 +45,7 @@ import org.xml.sax.SAXException;
  */
 public class SignalSystemsData20ReaderWriterTest {
 	
-	private static final Logger log = Logger
-			.getLogger(SignalSystemsData20ReaderWriterTest.class);
+	private static final Logger log = LogManager.getLogger(SignalSystemsData20ReaderWriterTest.class);
 	
   private static final String TESTXML  = "testSignalSystems_v2.0.xml";
   

@@ -20,22 +20,25 @@
 
 package org.matsim.core.population.routes;
 
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.routes.AbstractRoute;
-import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
-
-import org.junit.Assert;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author mrieser
  */
-public class NetworkFactoryTest extends MatsimTestCase {
+public class NetworkFactoryTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/*package*/ static class CarRouteMock extends AbstractRoute implements Cloneable {
 		CarRouteMock(final Id<Link> startLinkId, final Id<Link> endLinkId) {
@@ -84,7 +87,7 @@ public class NetworkFactoryTest extends MatsimTestCase {
 		public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 			return new CarRouteMock(startLinkId, endLinkId);
 		}
-		
+
 		@Override
 		public String getCreatedRouteType() {
 			return "carMock";
@@ -97,15 +100,15 @@ public class NetworkFactoryTest extends MatsimTestCase {
 		public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 			return new PtRouteMock(startLinkId, endLinkId);
 		}
-		
+
 		@Override
 		public String getCreatedRouteType() {
 			return "ptMock";
 		}
 
 	}
-	
-	public void testSetRouteFactory() {
+
+	@Test public void testSetRouteFactory() {
 		PopulationFactory factory = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
 
 		// test default

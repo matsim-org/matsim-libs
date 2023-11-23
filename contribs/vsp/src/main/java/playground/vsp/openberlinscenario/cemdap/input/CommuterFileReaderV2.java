@@ -24,7 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -33,7 +34,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
  * @author dziemke
  */
 public class CommuterFileReaderV2 {
-	private static final Logger LOG = Logger.getLogger(CommuterFileReaderV2.class);
+	private static final Logger LOG = LogManager.getLogger(CommuterFileReaderV2.class);
 	
 	private Map<String, Map<String, CommuterRelationV2>> relationsMap = new HashMap<>();
 	

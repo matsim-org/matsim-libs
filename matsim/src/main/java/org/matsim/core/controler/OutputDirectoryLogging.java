@@ -22,7 +22,8 @@ package org.matsim.core.controler;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Appender;
@@ -34,7 +35,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 
 /**
- * 
+ *
  * Put MATSim logs into the output directory.
  * This is static, like Loggers.
  * Call initLogging with either an OutputDirectoryHierarchy or simply with a pathname.
@@ -42,7 +43,7 @@ import org.matsim.core.utils.io.CollectLogMessagesAppender;
  * Call catchLogEntries() before either of the initLogging methods to memorize log entries between that call and the init
  * call and put them into the log file. Useful if creating the log directory only happens after some set-up which
  * allready produces log messages.
- * 
+ *
  * @author dgrether, michaz
  *
  */
@@ -53,7 +54,7 @@ public final class OutputDirectoryLogging {
 
 	public static final String WARNLOGFILE = "logfileWarningsErrors.log";
 
-	private static Logger log = Logger.getLogger(OutputDirectoryLogging.class);
+	private static Logger log = LogManager.getLogger(OutputDirectoryLogging.class);
 
 	/**
 	 * This variable is used to store the log4j output before it can be written
@@ -157,6 +158,7 @@ public final class OutputDirectoryLogging {
 		}
 		Gbl.printSystemInfo();
 		Gbl.printBuildInfo();
+		Gbl.printRunCommand();
 	}
 
 	/**

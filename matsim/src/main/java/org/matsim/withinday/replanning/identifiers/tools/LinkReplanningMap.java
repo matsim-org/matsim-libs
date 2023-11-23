@@ -25,9 +25,10 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -60,13 +61,13 @@ import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
  * since it cannot be guaranteed that all replanning operations are
  * valid anymore.
  * </p>
- * 
+ *
  * @author cdobler
  */
-public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, 
+public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStartEventHandler, ActivityEndEventHandler,
 		MobsimAfterSimStepListener {
 
-	private static final Logger log = Logger.getLogger(LinkReplanningMap.class);
+	private static final Logger log = LogManager.getLogger(LinkReplanningMap.class);
 
 	private final EarliestLinkExitTimeProvider earliestLinkExitTimeProvider;
 
@@ -88,7 +89,7 @@ public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStart
 		eventsManager.addHandler(this);
 		log.info("Note that the LinkReplanningMap has to be registered as an EventHandler and a SimulationListener!");
 		this. earliestLinkExitTimeProvider = earliestLinkExitTimeProvider;
-		
+
 		this.legJustStartedAgents = new HashSet<Id<Person>>();
 	}
 
@@ -96,23 +97,23 @@ public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStart
 	public void handleEvent(PersonStuckEvent event) {
 		this.legJustStartedAgents.remove(event.getPersonId());
 	}
-	
+
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		checkTime(event.getTime());
-		this.legJustStartedAgents.add(event.getPersonId());	
+		this.legJustStartedAgents.add(event.getPersonId());
 	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		this.legJustStartedAgents.remove(event.getPersonId());
 	}
-	
+
 	@Override
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		checkTime(e.getSimulationTime());
 	}
-	
+
 	/*
 	 * If time > currentTime, then legJustStartedAgents is not up to date
 	 * anymore, therefore we clear all entries and update currentTime.
@@ -123,19 +124,19 @@ public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStart
 			this.legJustStartedAgents.clear();
 		}
 	}
-	
+
 	@Override
 	public void reset(int iteration) {
 		currentTime = 0.0;
 		this.legJustStartedAgents.clear();
 	}
-	
+
 	/**
 	 * @param time
 	 * @return a list of agents who might need a replanning
 	 */
 	public Set<Id<Person>> getReplanningAgents(final double time) {
-		
+
 		Set<Id<Person>> set = this.earliestLinkExitTimeProvider.getEarliestLinkExitTimesPerTimeStep(time);
 		if (set != null) return Collections.unmodifiableSet(set);
 		else return new HashSet<>();
@@ -148,7 +149,7 @@ public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStart
 	public Set<Id<Person>> getUnrestrictedReplanningAgents(final double time) {
 		return this.filterAgents(time, TimeFilterMode.UNRESTRICTED);
 	}
-	
+
 	/**
 	 * @param time
 	 * @return a list of agents who might need a restricted replanning and use the given transport mode
@@ -156,16 +157,16 @@ public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStart
 	public Set<Id<Person>> getRestrictedReplanningAgents(final double time) {
 		return this.filterAgents(time, TimeFilterMode.RESTRICTED);
 	}
-	
+
 	private Set<Id<Person>> filterAgents(final double time, final TimeFilterMode timeMode) {
-		
+
 		Set<Id<Person>> set = new HashSet<>();
-		
+
 		Set<Entry<OptionalTime, Set<Id<Person>>>> entries = this.earliestLinkExitTimeProvider.getEarliestLinkExitTimesPerTimeStep().entrySet();
-		
+
 		for (Entry<OptionalTime, Set<Id<Person>>> entry : entries) {
 			OptionalTime earliestLinkExitTime = entry.getKey();
-			
+
 			// check time
 			if (timeMode == TimeFilterMode.RESTRICTED) {
 				if (time <= earliestLinkExitTime.seconds()) continue;
@@ -174,17 +175,17 @@ public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStart
 			} else {
 				throw new RuntimeException("Unexpected TimeFilterMode was found: " + timeMode.toString());
 			}
-			
+
 			// non of the checks fails therefore add agents to the set
 			set.addAll(entry.getValue());
 		}
 
 		return set;
 	}
-	
+
 	/**
 	 * @return A list of all agents that are currently performing a leg. Note that
-	 * some of them might be limited in the available replanning operations! 
+	 * some of them might be limited in the available replanning operations!
 	 */
 	public Set<Id<Person>> getLegPerformingAgents() {
 		return Collections.unmodifiableSet(this.earliestLinkExitTimeProvider.getEarliestLinkExitTimes().keySet());

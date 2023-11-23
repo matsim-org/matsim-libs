@@ -19,12 +19,12 @@
 
 package org.matsim.contrib.ev.charging;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
-
-import java.util.Map;
+import org.matsim.vehicles.Vehicle;
 
 public class QuitQueueAtChargerEvent extends Event {
 	public static final String EVENT_TYPE = "quit_queue_at_charger";
@@ -32,9 +32,9 @@ public class QuitQueueAtChargerEvent extends Event {
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 
 	private final Id<Charger> chargerId;
-	private final Id<ElectricVehicle> vehicleId;
+	private final Id<Vehicle> vehicleId;
 
-	public QuitQueueAtChargerEvent(double time, Id<Charger> chargerId, Id<ElectricVehicle> vehicleId) {
+	public QuitQueueAtChargerEvent(double time, Id<Charger> chargerId, Id<Vehicle> vehicleId) {
 		super(time);
 		this.chargerId = chargerId;
 		this.vehicleId = vehicleId;
@@ -44,7 +44,7 @@ public class QuitQueueAtChargerEvent extends Event {
 		return chargerId;
 	}
 
-	public Id<ElectricVehicle> getVehicleId() {
+	public Id<Vehicle> getVehicleId() {
 		return vehicleId;
 	}
 

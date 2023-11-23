@@ -23,7 +23,8 @@ package org.matsim.codeexamples.simpleResponsiveSignalEngine;
 
 import java.util.SortedMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,7 +45,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class FixResponsiveSignalResultsIT {
 
-	private static final Logger LOG = Logger.getLogger(FixResponsiveSignalResultsIT.class);
+	private static final Logger LOG = LogManager.getLogger(FixResponsiveSignalResultsIT.class);
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();

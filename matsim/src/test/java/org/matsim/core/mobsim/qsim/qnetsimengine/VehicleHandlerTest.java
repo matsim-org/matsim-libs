@@ -19,11 +19,12 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim.qnetsimengine;
+package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Arrays;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -43,17 +44,22 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 import com.google.inject.Provides;
 
 public class VehicleHandlerTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 	@Test
 	public void testVehicleHandler() {
 		// This is a test where there is a link with a certain parking capacity. As soon
@@ -68,19 +74,19 @@ public class VehicleHandlerTest {
 		// previous ones is leaving, and so on ...
 
 		Result result;
-		
+
 		result = runTestScenario(4);
 		Assert.assertEquals(20203.0, result.latestArrivalTime, 1e-3);
 		Assert.assertEquals(3, result.initialCount);
-		
+
 		result = runTestScenario(3);
 		Assert.assertEquals(20203.0, result.latestArrivalTime, 1e-3);
 		Assert.assertEquals(3, result.initialCount);
-		
+
 		result = runTestScenario(2);
 		Assert.assertEquals(23003.0, result.latestArrivalTime, 1e-3);
 		Assert.assertEquals(3, result.initialCount);
-		
+
 		result = runTestScenario(1);
 		Assert.assertEquals(33003.0, result.latestArrivalTime, 1e-3);
 		Assert.assertEquals(3, result.initialCount);
@@ -114,13 +120,13 @@ public class VehicleHandlerTest {
 		});
 
 		controler.run();
-		
+
 		Result result = new Result();
 		result.latestArrivalTime = arrivalHandler.latestArrivalTime;
 		result.initialCount = vehicleHandler.initialCount;
 		return result;
 	}
-	
+
 	private class Result {
 		double latestArrivalTime;
 		long initialCount;
@@ -179,13 +185,14 @@ public class VehicleHandlerTest {
 
 	private Scenario createScenario() {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(0);
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(0);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		ActivityParams genericParams = new ActivityParams("generic");
 		genericParams.setTypicalDuration(1.0);
 
-		config.planCalcScore().addActivityParams(genericParams);
+		config.scoring().addActivityParams(genericParams);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 

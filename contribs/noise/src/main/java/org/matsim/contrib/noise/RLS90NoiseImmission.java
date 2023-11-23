@@ -3,7 +3,8 @@ package org.matsim.contrib.noise;
 import com.google.inject.Inject;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.algorithm.Angle;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -18,7 +19,7 @@ import java.util.Map;
 
 class RLS90NoiseImmission implements NoiseImmission {
 
-    private final static Logger log = Logger.getLogger(RLS90NoiseImmission.class);
+    private final static Logger log = LogManager.getLogger(RLS90NoiseImmission.class);
 
     private final NoiseConfigGroup noiseParams;
     private final NoiseContext noiseContext;

@@ -22,7 +22,8 @@ package org.matsim.core.population;
 
 import static org.junit.Assert.*;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -42,7 +43,7 @@ import org.matsim.core.population.routes.RouteUtils;
 
 public class PlanImplTest {
 
-	static private final Logger log = Logger.getLogger(PlanImplTest.class);
+	static private final Logger log = LogManager.getLogger(PlanImplTest.class);
 
 	/**
 	 * @author mrieser

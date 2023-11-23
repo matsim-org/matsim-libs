@@ -33,11 +33,14 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.EventSequence;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -57,7 +60,7 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 	private final DrtZonalSystem zones;
 	private static final String zoneIdForOutsideOfZonalSystem = "outsideOfDrtZonalSystem";
 	private static final String notAvailableString = "NaN";
-	private static final Logger log = Logger.getLogger(DrtZonalWaitTimesAnalyzer.class);
+	private static final Logger log = LogManager.getLogger(DrtZonalWaitTimesAnalyzer.class);
 
 	public DrtZonalWaitTimesAnalyzer(DrtConfigGroup configGroup, DrtEventSequenceCollector requestAnalyzer,
 			DrtZonalSystem zones) {
@@ -137,11 +140,13 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 		zoneStats.put(zoneIdForOutsideOfZonalSystem, new DescriptiveStatistics());
 
 		for (EventSequence seq : requestAnalyzer.getPerformedRequestSequences().values()) {
-			if (seq.getPickedUp().isPresent()) {
-				DrtZone zone = zones.getZoneForLinkId(seq.getSubmitted().getFromLinkId());
-				final String zoneStr = zone != null ? zone.getId() : zoneIdForOutsideOfZonalSystem;
-				double waitTime = seq.getPickedUp().get().getTime() - seq.getSubmitted().getTime();
-				zoneStats.get(zoneStr).addValue(waitTime);
+			for (Map.Entry<Id<Person>, EventSequence.PersonEvents> entry : seq.getPersonEvents().entrySet()) {
+				if(entry.getValue().getPickedUp().isPresent()) {
+					DrtZone zone = zones.getZoneForLinkId(seq.getSubmitted().getFromLinkId());
+					final String zoneStr = zone != null ? zone.getId() : zoneIdForOutsideOfZonalSystem;
+					double waitTime = entry.getValue().getPickedUp().get() .getTime() - seq.getSubmitted().getTime();
+					zoneStats.get(zoneStr).addValue(waitTime);
+				}
 			}
 		}
 		return zoneStats;

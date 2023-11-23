@@ -25,7 +25,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.matsim.api.core.v01.Id;
@@ -48,8 +49,7 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
 public class ActivityToModeAnalysis extends AbstractAnalysisModule {
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger
-			.getLogger(ActivityToModeAnalysis.class);
+	private static final Logger log = LogManager.getLogger(ActivityToModeAnalysis.class);
 	private Network net;
 	private ActivityToModeAnalysisHandler handler;
 	private ActivityToModeWithPlanCoordHandler handlerPlanCoord;

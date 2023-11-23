@@ -1,6 +1,7 @@
 package org.matsim.contrib.analysis.vsp.qgis.utils;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 
@@ -8,7 +9,7 @@ import java.awt.*;
  * @author gthunig on 22.05.2017.
  */
 public class ColorRangeUtils {
-    public static final Logger log = Logger.getLogger(ColorRangeUtils.class);
+    public static final Logger log = LogManager.getLogger(ColorRangeUtils.class);
 
     public enum ColorRange {
         DEFAULT_RED_TO_BLUE, RED_TO_GREEN, GREEN_TO_RED, GREEN_TO_BLUE, BLUE_TO_GREEN, BLUE_TO_RED, RED_TO_BLUE,

@@ -22,7 +22,8 @@ package org.matsim.matrices;
 
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -35,8 +36,8 @@ import org.xml.sax.Attributes;
  */
 public class MatsimMatricesReader extends MatsimXmlParser {
 
-	private final static Logger log = Logger.getLogger(MatsimMatricesReader.class);
-	
+	private final static Logger log = LogManager.getLogger(MatsimMatricesReader.class);
+
 	private final static String MATRICES_V1 = "matrices_v1.dtd";
 
 	private final Matrices matrices;
@@ -50,6 +51,7 @@ public class MatsimMatricesReader extends MatsimXmlParser {
 	 * @param scenario The scenario containing the world/layers the matrices reference to.
 	 */
 	public MatsimMatricesReader(final Matrices matrices, final Scenario scenario) {
+		super(ValidationType.DTD_ONLY);
 		this.matrices = matrices;
 		this.scenario = scenario;
 	}

@@ -20,34 +20,42 @@
 
 package org.matsim.core.events;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author mrieser
  */
-public class PersonStuckEventTest extends MatsimTestCase {
+public class PersonStuckEventTest {
 
-	public void testWriteReadXml() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testWriteReadXml() {
 		final PersonStuckEvent event1 = new PersonStuckEvent(81153.3, Id.create("a007", Person.class), Id.create("link1", Link.class), TransportMode.walk);
-		final PersonStuckEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
-		assertEquals(event1.getTime(), event2.getTime(), EPSILON);
+		final PersonStuckEvent event2 = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", event1);
+		assertEquals(event1.getTime(), event2.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals(event1.getPersonId(), event2.getPersonId());
 		assertEquals(event1.getLinkId(), event2.getLinkId());
 		assertEquals(event1.getLegMode(), event2.getLegMode());
 	}
-	
-	public void testWriteReadXmlWithLinkIdNull() {
+
+	@Test public void testWriteReadXmlWithLinkIdNull() {
 		final PersonStuckEvent event1 = new PersonStuckEvent(81153.3, Id.create("a007", Person.class), null, TransportMode.walk);
-		final PersonStuckEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
-		assertEquals(event1.getTime(), event2.getTime(), EPSILON);
+		final PersonStuckEvent event2 = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", event1);
+		assertEquals(event1.getTime(), event2.getTime(), MatsimTestUtils.EPSILON);
 		assertEquals(event1.getPersonId(), event2.getPersonId());
 		assertEquals(event1.getLinkId(), null);
 		assertEquals(event1.getLegMode(), event2.getLegMode());
 	}
-	
+
 }

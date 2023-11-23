@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v6.dtd">
+
+<population desc="Plans_Test1">
+
+	<attributes>
+		<attribute name="coordinateReferenceSystem" class="java.lang.String">Atlantis</attribute>
+	</attributes>
+
+
+<!-- ====================================================================== -->
+
+	<person id="Triple Charger">
+		<attributes>
+		</attributes>
+		<plan selected="yes">
+			<activity type="home" link="1" max_dur="03:00:00" >
+			</activity>
+			<leg mode="car">
+			</leg>
+			<activity type="work" link="90" max_dur="01:00:00" >
+			</activity>
+			<leg mode="car">
+			</leg>
+			<activity type="work" link="1" max_dur="00:50:00" >
+			</activity>
+			<leg mode="car">
+			</leg>
+			<activity type="work" link="90" max_dur="00:50:00" >
+			</activity>
+			<leg mode="car" >
+			</leg>
+			<activity type="work" link="1" max_dur="00:50:00" >
+			</activity>
+			<leg mode="car">
+			</leg>
+			<activity type="work" link="90" max_dur="00:50:00" >
+			</activity>
+			<leg mode="car">
+			</leg>
+			<activity type="work" link="1" max_dur="00:50:00" >
+			</activity>
+			<leg mode="car">
+			</leg>
+			<activity type="work" link="90" max_dur="00:50:00" >
+			</activity>
+			<leg mode="car" >
+			</leg>
+			<activity type="work" link="1" max_dur="00:50:00" >
+			</activity>
+			<leg mode="car" >
+			</leg>
+			<activity type="work" link="90" max_dur="00:50:00" >
+			</activity>
+			<leg mode="car" >
+			</leg>
+			<activity type="work" link="1" max_dur="00:50:00" >
+			</activity>
+			<leg mode="car" >
+			</leg>
+			<activity type="work" link="90" max_dur="00:50:00" >
+			</activity>
+			<leg mode="car" >
+			</leg>
+			<activity type="work" link="1" max_dur="00:50:00" >
+			</activity>
+			<leg mode="car" >
+			</leg>
+			<activity type="work" link="90" max_dur="00:50:00" >
+			</activity>
+			<leg mode="car" >
+			</leg>
+			<activity type="work" link="1" max_dur="00:50:00" >
+			</activity>
+			<leg mode="car" >
+			</leg>
+			<activity type="work" link="90" max_dur="00:50:00" >
+			</activity>
+			<leg mode="car" >
+			</leg>
+			<activity type="home" link="1" max_dur="00:50:00" >
+			</activity>
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+</population>

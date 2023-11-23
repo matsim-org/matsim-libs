@@ -9,7 +9,8 @@ import de.topobyte.osm4j.core.model.impl.Node;
 import de.topobyte.osm4j.core.model.impl.Tag;
 import de.topobyte.osm4j.core.model.impl.Way;
 import de.topobyte.osm4j.pbf.seq.PbfWriter;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -30,7 +31,7 @@ public class Utils {
 	static final CoordinateTransformation transformation = new IdentityTransformation();
 	static final String MOTORWAY = "motorway";
 	static final String TERTIARY = "tertiary";
-	private static final Logger log = Logger.getLogger(Utils.class);
+	private static final Logger log = LogManager.getLogger(Utils.class);
 
 
 	static void writeOsmData(OsmData data, Path file) {

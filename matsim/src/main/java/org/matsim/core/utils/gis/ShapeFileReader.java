@@ -20,7 +20,8 @@
 
 package org.matsim.core.utils.gis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.data.DataStore;
 import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;
@@ -30,7 +31,6 @@ import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
@@ -39,6 +39,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,7 +51,7 @@ import java.util.List;
  * @author mrieser // switch to GeoTools 2.7.3
  */
 public class ShapeFileReader implements MatsimSomeReader {
-    	private static final Logger log = Logger.getLogger(ShapeFileReader.class);
+    	private static final Logger log = LogManager.getLogger(ShapeFileReader.class);
 
 	private SimpleFeatureSource featureSource = null;
 
@@ -212,7 +213,7 @@ public class ShapeFileReader implements MatsimSomeReader {
 	public Collection<SimpleFeature> getFeatureSet() {
 		return featureSet;
 	}
-	
+
 	public CoordinateReferenceSystem getCoordinateSystem(){
 		return this.crs;
 	}

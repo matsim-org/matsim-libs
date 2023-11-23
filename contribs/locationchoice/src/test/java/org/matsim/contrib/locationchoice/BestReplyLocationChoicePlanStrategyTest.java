@@ -33,19 +33,19 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.testcases.MatsimTestUtils;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 public class BestReplyLocationChoicePlanStrategyTest {
-	
+
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
-		
+
 	@Test
 	public void testOne() {
-		
+
 //		Config config = ConfigUtils.loadConfig(this.utils.getPackageInputDirectory() + "config.xml");
 //		Scenario scenario = ScenarioUtils.loadScenario(config);
-//		
+//
 //		// joint context (based on scenario):
 //		final DestinationChoiceBestResponseContext lcContext = new DestinationChoiceBestResponseContext(scenario) ;
 //		lcContext.init();
@@ -56,14 +56,14 @@ public class BestReplyLocationChoicePlanStrategyTest {
 //		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
 //  		computer.readOrCreateMaxDCScore(controler, lcContext.kValsAreRead());
 //  		final ObjectAttributes personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
-//		
+//
 //		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
 //		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
 //		controler.getTestScenarioURL().addScenarioElement(DestinationChoiceBestResponseContext.ELEMENT_NAME, lcContext);
 //		controler.getTestScenarioURL().addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME, dcScore);
-//		
-//		BestReplyLocationChoicePlanStrategy planStrategy = new BestReplyLocationChoicePlanStrategy(scenario);	
-//		
+//
+//		BestReplyLocationChoicePlanStrategy planStrategy = new BestReplyLocationChoicePlanStrategy(scenario);
+//
 //		planStrategy.init(new ReplanningContextImpl(scenario));
 //
 //		for (Person person : scenario.getPopulation().getPersons().values()) planStrategy.run(person);

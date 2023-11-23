@@ -26,7 +26,6 @@ import com.graphhopper.GraphHopper;
 import com.graphhopper.ResponsePath;
 import com.graphhopper.config.CHProfile;
 import com.graphhopper.config.Profile;
-import com.graphhopper.routing.util.CarFlagEncoder;
 import com.graphhopper.util.Instruction;
 import com.graphhopper.util.InstructionList;
 import org.apache.logging.log4j.LogManager;
@@ -161,7 +160,6 @@ public class LinkTurnDirectionAttributesFromGraphHopper implements Callable<Inte
         hopper.setGraphHopperLocation(ghLoc);
         // specify where to store graphhopper files
         hopper.setGraphHopperLocation("target/routing-graph-cache");
-        hopper.getEncodingManagerBuilder().add(new CarFlagEncoder());
 
         // see docs/core/profiles.md to learn more about profiles
         hopper.setProfiles(new Profile("car").setVehicle("car").setWeighting("fastest").setTurnCosts(false));

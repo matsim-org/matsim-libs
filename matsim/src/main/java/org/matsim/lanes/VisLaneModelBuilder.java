@@ -38,7 +38,7 @@ import org.matsim.vis.vecmathutils.VectorUtils;
  */
 public final class VisLaneModelBuilder {
 	
-//	private static final Logger log = Logger.getLogger(VisLaneModelBuilder.class);
+//	private static final Logger log = LogManager.getLogger(VisLaneModelBuilder.class);
 
 	public void recalculatePositions(VisLinkWLanes linkData, SnapshotLinkWidthCalculator linkWidthCalculator) {
 //		log.error("recalculatePositions...");

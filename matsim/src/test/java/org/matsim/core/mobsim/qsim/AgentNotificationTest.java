@@ -27,7 +27,7 @@ import static org.junit.Assume.assumeThat;
 
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
@@ -52,7 +52,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -85,7 +85,7 @@ public class AgentNotificationTest {
 
 		@Inject
 		MessageQueue messageQueue;
-		
+
 		@Inject
 		TimeInterpretation timeInterpretation;
 
@@ -265,11 +265,11 @@ public class AgentNotificationTest {
 	@Test
 	public void testAgentNotification() {
 		Scenario scenario = createSimpleScenario();
-		
+
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsCollector handler = new EventsCollector();
 		eventsManager.addHandler(handler);
-		
+
 		new QSimBuilder(scenario.getConfig()) //
 			.useDefaults() //
 			.removeModule(PopulationModule.class) //
@@ -277,7 +277,7 @@ public class AgentNotificationTest {
 				@Override
 				protected void configureQSim() {
 					bind(PopulationAgentSource.class).asEagerSingleton();
-					addNamedComponent(PopulationAgentSource.class, PopulationModule.COMPONENT_NAME);
+					addQSimComponentBinding( PopulationModule.COMPONENT_NAME ).to( PopulationAgentSource.class );
 					bind(AgentFactory.class).to(MyAgentFactory.class).asEagerSingleton();
 					bind( QVehicleFactory.class ).toProvider( () -> QVehicleImpl::new ) ;
 				}
@@ -287,7 +287,7 @@ public class AgentNotificationTest {
 			} ) //
 			.build(scenario, eventsManager) //
 			.run();
-		
+
 		assumeThat(handler.getEvents(), hasItem(
 				is(both(eventWithTime(25200.0)).and(instanceOf(PersonDepartureEvent.class)))));
 		assertThat(handler.getEvents(), hasItem(
@@ -306,10 +306,10 @@ public class AgentNotificationTest {
 	private static Scenario createSimpleScenario() {
 		final Config config = ConfigUtils.createConfig();
 
-		ModeRoutingParams params = new ModeRoutingParams( TransportMode.walk ) ;
+		RoutingConfigGroup.TeleportedModeParams params = new RoutingConfigGroup.TeleportedModeParams( TransportMode.walk ) ;
 		params.setBeelineDistanceFactor(1.3);
 		params.setTeleportedModeSpeed(1.);
-		config.plansCalcRoute().addModeRoutingParams( params );
+		config.routing().addModeRoutingParams( params );
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 

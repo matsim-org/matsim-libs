@@ -20,7 +20,8 @@
 
 package org.matsim.core.router.util;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -35,7 +36,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
  */
 public class PreProcessEuclidean extends PreProcessDijkstra {
 
-	private static final Logger log = Logger.getLogger(PreProcessEuclidean.class);
+	private static final Logger log = LogManager.getLogger(PreProcessEuclidean.class);
 
 	// Must be initialized to MAX_VALUE, otherwise updateMaxFreeSpeed(...) does
 	// not change minTravelCostPerLength

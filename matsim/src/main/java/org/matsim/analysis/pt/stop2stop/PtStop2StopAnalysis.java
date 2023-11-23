@@ -21,7 +21,8 @@ package org.matsim.analysis.pt.stop2stop;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
@@ -69,7 +70,7 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
     private final Vehicles transitVehicles; // for vehicle capacity
     private final Map<Id<Vehicle>, PtVehicleData> transitVehicle2temporaryVehicleData = new HashMap<>();
     private final List<Stop2StopEntry> stop2StopEntriesForEachDeparture; // the output
-    private static final Logger log = Logger.getLogger(PtStop2StopAnalysis.class);
+    private static final Logger log = LogManager.getLogger(PtStop2StopAnalysis.class);
 
     public PtStop2StopAnalysis(Vehicles transitVehicles) {
         this.transitVehicles = transitVehicles;

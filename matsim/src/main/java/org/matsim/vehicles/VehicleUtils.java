@@ -20,14 +20,14 @@
 
 package org.matsim.vehicles;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,10 +37,11 @@ import java.util.Map;
  *
  */
 public final class VehicleUtils {
-	private static final Logger log = Logger.getLogger( VehicleUtils.class ) ;
+	private static final Logger log = LogManager.getLogger( VehicleUtils.class ) ;
 
 	private static final VehicleType DEFAULT_VEHICLE_TYPE = VehicleUtils.getFactory().createVehicleType(Id.create("defaultVehicleType", VehicleType.class));
 	private static final String VEHICLE_ATTRIBUTE_KEY = "vehicles";
+	private static final String VEHICLE_TYPES_ATTRIBUTE_KEY = "vehicleTypes";
 
 	// should remain under the hood --> should remain private
 	private static final String DOOR_OPERATION_MODE = "doorOperationMode" ;
@@ -56,6 +57,7 @@ public final class VehicleUtils {
 	private static final String COST_PER_SECOND_WAITING = "costsPerSecondWaiting";
 	private static final String COST_PER_SECOND_INSERVICE = "costsPerSecondInService";
 	private static final String FUEL_TYPE = "fuelType";
+
 	public static VehicleType createVehicleType( Id<VehicleType> typeId ){
 		return new VehicleType( typeId );
 	}
@@ -114,6 +116,21 @@ public final class VehicleUtils {
 	}
 
 	/**
+	 * Checks whether a person has a vehicle id for mode - without throwing an
+	 * exception if not.
+	 *
+	 * @param person the person one wants to check for a vehicle id
+	 * @param mode   the mode for the vehicle id to check
+	 * @return whether person has a vehicle id for that mode
+	 *
+	 * @see {@link VehicleUtils#getVehicleId(Person, String)}
+	 */
+	public static boolean hasVehicleId(Person person, String mode) {
+		PersonVehicles personVehicles = (PersonVehicles) person.getAttributes().getAttribute(VehicleUtils.VEHICLE_ATTRIBUTE_KEY);
+		return personVehicles != null && personVehicles.getVehicle(mode) != null;
+	}
+
+	/**
 	 * Retrieves vehicleIds of all vehicles that are assigned to the person.
 	 *
 	 * @param person the person one wants to retrieve vehicles for
@@ -129,6 +146,15 @@ public final class VehicleUtils {
 					"\n VehicleUtils.insertVehicleIdIntoAttributes does this for you.");
 		}
 		return personVehicles.getModeVehicles();
+	}
+
+	/**
+	 * Retrieve the optional vehicle types per mode that might be assigned to a person.
+	 * Returns null if this is not defined.
+	 */
+	public static Map<String, Id<VehicleType>> getVehicleTypes(Person person) {
+		var personVehicles = (PersonVehicleTypes) person.getAttributes().getAttribute(VehicleUtils.VEHICLE_TYPES_ATTRIBUTE_KEY);
+		return personVehicles != null ? personVehicles.getModeVehicleTypes() : null;
 	}
 
 	/**
@@ -163,13 +189,32 @@ public final class VehicleUtils {
 		Map<String, Id<Vehicle>> modeToVehicleCopy = new HashMap<>(modeToVehicle);
 		PersonVehicles personVehicles;
 		if (attr == null) {
-			personVehicles = new PersonVehicles(modeToVehicleCopy);
+			personVehicles = new PersonVehicles();
 		} else {
 			personVehicles = (PersonVehicles) attr;
 		}
 		personVehicles.addModeVehicleList(modeToVehicleCopy);
 		person.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_KEY, personVehicles);
 	}
+
+	/**
+	 * Attaches vehicle types to a person, so that the router knows which vehicle to use for which mode and person.
+	 * @param modeToVehicleType mode string mapped to vehicle type ids. The provided map is copied and stored as unmodifiable map.
+	 */
+	public static void insertVehicleTypesIntoAttributes(Person person, Map<String, Id<VehicleType>> modeToVehicleType) {
+		Object attr = person.getAttributes().getAttribute(VEHICLE_TYPES_ATTRIBUTE_KEY);
+
+		Map<String, Id<VehicleType>> modeToTypesCopy = new HashMap<>(modeToVehicleType);
+		PersonVehicleTypes personVehiclesTypes;
+		if (attr == null) {
+			personVehiclesTypes = new PersonVehicleTypes();
+		} else {
+			personVehiclesTypes = (PersonVehicleTypes) attr;
+		}
+		personVehiclesTypes.putModeVehicleTypes(modeToTypesCopy);
+		person.getAttributes().putAttribute(VEHICLE_TYPES_ATTRIBUTE_KEY, personVehiclesTypes);
+	}
+
 	//******** general VehicleType attributes ************
 
 	public static VehicleType.DoorOperationMode getDoorOperationMode( VehicleType vehicleType ){
@@ -297,7 +342,7 @@ public final class VehicleUtils {
 		costInformation.getAttributes().putAttribute(COST_PER_SECOND_INSERVICE, costsPerSecond);
 	}
 
-	public static VehicleImpl createVehicle( Id<Vehicle> id , VehicleType type ){
+	public static Vehicle createVehicle( Id<Vehicle> id , VehicleType type ){
 		return new VehicleImpl( id , type );
 	}
 
@@ -358,5 +403,9 @@ public final class VehicleUtils {
 			log.info( "unable to find vehicle for vehicleId=" + vehicleId + "; will return null") ;
 		}
 		return vehicle ;
+	}
+	public static void writeVehicles( Vehicles vehicles, String filename ) {
+		new MatsimVehicleWriter( vehicles ).writeFile( filename );
+
 	}
 }

@@ -24,7 +24,8 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -32,13 +33,13 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.utils.misc.Counter;
 
-/** See "http://www.ivt.ethz.ch/vpl/publications/reports/ab283.pdf"
+/** See <a href="https://doi.org/10.3929/ethz-b-000023532">https://doi.org/10.3929/ethz-b-000023532</a>
  * for a description of node types. It's the graph matching paper.
  *
  * @author balmermi
  **/
 public final class NetworkCalcTopoType implements NetworkRunnable {
-	private static final Logger log = Logger.getLogger(NetworkCalcTopoType.class) ;
+	private static final Logger log = LogManager.getLogger(NetworkCalcTopoType.class) ;
 
 	public final static Integer EMPTY        = 0;
 	public final static Integer SOURCE       = 1;

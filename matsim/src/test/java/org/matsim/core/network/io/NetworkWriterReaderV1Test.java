@@ -20,12 +20,12 @@
 
 package org.matsim.core.network.io;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.AbstractNetworkWriterReaderTest;
-
-import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  * @author mrieser
@@ -36,7 +36,7 @@ public class NetworkWriterReaderV1Test extends AbstractNetworkWriterReaderTest {
 	protected void writeNetwork(final Network network, final String filename) {
 		new NetworkWriter(network).writeFileV1(filename);
 	}
-	
+
 	@Override
 	protected void readNetwork(final Scenario scenario, final String filename) {
 		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario.getNetwork());

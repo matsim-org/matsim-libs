@@ -21,7 +21,8 @@ package org.matsim.core.mobsim.jdeqsim;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -39,7 +40,7 @@ import org.matsim.core.utils.timing.TimeInterpretation;
  */
 public class Vehicle extends SimUnit {
 
-	private static final Logger log = Logger.getLogger(Vehicle.class);
+	private static final Logger log = LogManager.getLogger(Vehicle.class);
 	private Person ownerPerson = null;
 	private Leg currentLeg = null;
 	private int legIndex;

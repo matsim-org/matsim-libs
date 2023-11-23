@@ -19,9 +19,10 @@
  * *********************************************************************** */
 package org.matsim.integration.invertednetworks;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,7 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -53,7 +54,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class LanesIT {
 
-	private static final Logger log = Logger.getLogger(LanesIT.class);
+	private static final Logger log = LogManager.getLogger(LanesIT.class);
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
@@ -65,11 +66,11 @@ public class LanesIT {
 		config.network().setInputFile("network.xml");
 		config.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 		config.plans().setInputFile("population.xml");
-		config.controler().setRoutingAlgorithmType(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra);
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "output");
+		config.controller().setRoutingAlgorithmType(ControllerConfigGroup.RoutingAlgorithmType.Dijkstra);
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory() + "output");
 		final int lastIteration = 50;
-		config.controler().setLastIteration(lastIteration);
-		config.controler().setCreateGraphs(false);
+		config.controller().setLastIteration(lastIteration);
+		config.controller().setCreateGraphs(false);
 		config.vspExperimental().setWritingOutputEvents(false);
 		config.travelTimeCalculator().setSeparateModes( false );
 		// ---
@@ -132,11 +133,11 @@ public class LanesIT {
 		}
 
 		@Override
-		public void notifyShutdown(ShutdownEvent event) {			
+		public void notifyShutdown(ShutdownEvent event) {
 			log.info( "link34:" + percent34 );
 			log.info( "link35:" + percent35 );
 			log.info( "link36:" + percent36 );
-			
+
 			// The lanes attached to link 23 should distribute the 3600 veh/h capacity as follows:
 			Assert.assertEquals("lane to link 34 should have approx. 600 veh/h, i.e. 16.6% of the total flow", 16.6, percent34, 1);
 			Assert.assertEquals("lane to link 35 should have approx. 1200 veh/h, i.e. 33.3% of the total flow", 33.3, percent35, 1);

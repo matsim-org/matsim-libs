@@ -22,6 +22,7 @@ package org.matsim.vehicles;
 
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * @author dgrether
@@ -36,7 +37,7 @@ public final class VehicleCapacity implements Attributable {
 	private Integer standingRoom = 0 ;
 	private Double volumeInCubicMeters = Double.POSITIVE_INFINITY ;
 	private Double weightInTons = Double.POSITIVE_INFINITY ;
-	private Attributes attributes = new Attributes() ;
+	private Attributes attributes = new AttributesImpl() ;
 	private Double other = Double.POSITIVE_INFINITY ;
 
 	/* package-private */ VehicleCapacity(){ }

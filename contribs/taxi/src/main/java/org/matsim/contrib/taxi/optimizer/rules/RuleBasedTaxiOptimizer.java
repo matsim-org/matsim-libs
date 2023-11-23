@@ -55,7 +55,7 @@ public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
 		this.idleTaxiRegistry = zonalRegisters.idleTaxiRegistry;
 		this.unplannedRequestRegistry = zonalRegisters.unplannedRequestRegistry;
 
-		if (taxiCfg.isVehicleDiversion()) {
+		if (taxiCfg.vehicleDiversion) {
 			// hmmmm, change into warning?? or even allow it (e.g. for empty taxi relocaton)??
 			throw new RuntimeException("Diversion is not supported by RuleBasedTaxiOptimizer");
 		}

@@ -23,7 +23,8 @@
  */
 package org.matsim.contrib.accessibility.osm;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.MapUtils;
@@ -58,7 +59,7 @@ import java.util.Map;
  * @author dziemke
  */
 public class OsmPoiReader {
-	private final static Logger LOG = Logger.getLogger(OsmPoiReader.class);
+	private final static Logger LOG = LogManager.getLogger(OsmPoiReader.class);
 	
 	private File inputFile;
 	private ActivityFacilities facilities;
@@ -119,7 +120,7 @@ public class OsmPoiReader {
 	
 	//------------------------------------------------------------------------------------------------------
 	public class OsmPoiSink implements Sink {
-		private final Logger LOG = Logger.getLogger(OsmPoiSink.class);
+		private final Logger LOG = LogManager.getLogger(OsmPoiSink.class);
 		
 		private final CoordinateTransformation ct;
 		private Map<String, String> typeMap = new HashMap<>();

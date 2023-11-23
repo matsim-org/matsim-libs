@@ -26,7 +26,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -44,7 +45,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author michalm (Michal Maciejewski)
  */
 public class DvrpRoutingModule implements RoutingModule {
-	private static final Logger logger = Logger.getLogger(DvrpRoutingModule.class);
+	private static final Logger logger = LogManager.getLogger(DvrpRoutingModule.class);
 
 	public interface AccessEgressFacilityFinder {
 		Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility,
@@ -77,8 +78,7 @@ public class DvrpRoutingModule implements RoutingModule {
 
 		Optional<Pair<Facility, Facility>> stops = stopFinder.findFacilities(
 				Objects.requireNonNull(fromFacility, "fromFacility is null"),
-				Objects.requireNonNull(toFacility, "toFacility is null"),
-				request.getAttributes());
+				Objects.requireNonNull(toFacility, "toFacility is null"), request.getAttributes());
 		if (stops.isEmpty()) {
 			logger.debug("No access/egress stops found, agent will use fallback mode as leg mode (usually "
 					+ TransportMode.walk
@@ -106,28 +106,29 @@ public class DvrpRoutingModule implements RoutingModule {
 		double now = departureTime;
 
 		// access (sub-)trip:
-		List<? extends PlanElement> accessTrip = accessRouter.calcRoute(DefaultRoutingRequest.of(fromFacility, accessFacility, now, person, request.getAttributes()));
+		List<? extends PlanElement> accessTrip = accessRouter.calcRoute(
+				DefaultRoutingRequest.of(fromFacility, accessFacility, now, person, request.getAttributes()));
 		if (!accessTrip.isEmpty()) {
 			trip.addAll(accessTrip);
 			now = timeInterpretation.decideOnElementsEndTime(accessTrip, now).seconds();
 
 			// interaction activity:
 			trip.add(createDrtStageActivity(accessFacility, now));
-			now++;
 		}
 
 		// dvrp proper leg:
-		List<? extends PlanElement> drtLeg = mainRouter.calcRoute(DefaultRoutingRequest.of(accessFacility, egressFacility, now, person, request.getAttributes()));
+		List<? extends PlanElement> drtLeg = mainRouter.calcRoute(
+				DefaultRoutingRequest.of(accessFacility, egressFacility, now, person, request.getAttributes()));
 		trip.addAll(drtLeg);
 		now = timeInterpretation.decideOnElementsEndTime(drtLeg, now).seconds();
 
-		now++;
-		List<? extends PlanElement> egressTrip = egressRouter.calcRoute(DefaultRoutingRequest.of(egressFacility, toFacility, now, person, request.getAttributes()));
+		// egress (sub-)trip:
+		List<? extends PlanElement> egressTrip = egressRouter.calcRoute(
+				DefaultRoutingRequest.of(egressFacility, toFacility, now, person, request.getAttributes()));
 		if (!egressTrip.isEmpty()) {
 			// interaction activity:
 			trip.add(createDrtStageActivity(egressFacility, now));
 
-			// egress (sub-)trip:
 			trip.addAll(egressTrip);
 		}
 

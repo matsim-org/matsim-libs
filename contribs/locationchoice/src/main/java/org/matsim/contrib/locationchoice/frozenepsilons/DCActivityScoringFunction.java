@@ -25,7 +25,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -43,7 +44,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 
 // needs to be re-designed with delegation instead of inheritance. kai, oct'14
 class DCActivityScoringFunction extends org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring {
-	static final Logger log = Logger.getLogger(DCActivityScoringFunction.class);
+	static final Logger log = LogManager.getLogger(DCActivityScoringFunction.class);
 	private DestinationScoring destinationChoiceScoring;	
 	private final ActivityFacilities facilities;
 	private Plan plan;

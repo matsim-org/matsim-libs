@@ -18,12 +18,13 @@
  * *********************************************************************** */
 package playground.vsp.scoring;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -33,7 +34,7 @@ import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -42,23 +43,20 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * This class is an adoption of {@link org.matsim.core.scoring.functions.SubpopulationScoringParameters}.
  * It additionaly allows for person-specific marginalUtilityOfMoney.
- * In order to use this, you need to provide an attribute {@link #PERSONAL_INCOME_ATTRIBUTE_NAME} for persons that have
- * a specific income. Persons in the population, that have no attribute {@link #PERSONAL_INCOME_ATTRIBUTE_NAME} will use the
+ * For marginalUtilityOfMoney an attribute {@link org.matsim.core.population.PersonUtils#getIncome(Person)} for persons that have a specific
+ * income is used. Persons in the population, that have no attribute {@link org.matsim.core.population.PersonUtils#getIncome(Person)} will use the
  * default marginal utility set in their subpopulation's scoring parameters.
  * <p>
  * The person specific marginal utility is computed by subpopulationMgnUtilityOfMoney * AVERAGE_INCOME / PERSONAL_INCOME
  * where
- * AVERAGE_INCOME is computed as the average of all values of the attribute {@link #PERSONAL_INCOME_ATTRIBUTE_NAME} that are contained in the population.
+ * AVERAGE_INCOME is computed as the average of all values of the attribute {@link org.matsim.core.population.PersonUtils#getIncome(Person)} that are contained in the population.
  * <p>
  * If you want to distinguish between 'rich' areas and 'poor' areas, make use of the subpopulation feature and set subpopulation-specific mgnUtilityOfMoney in
  * the #PlanCalcScoreConfigGroup
  */
 public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements ScoringParametersForPerson {
-    Logger log = Logger.getLogger(IncomeDependentUtilityOfMoneyPersonScoringParameters.class);
-
-    public static final String PERSONAL_INCOME_ATTRIBUTE_NAME = "income";
-
-    private final PlanCalcScoreConfigGroup config;
+    Logger log = LogManager.getLogger(IncomeDependentUtilityOfMoneyPersonScoringParameters.class);
+    private final ScoringConfigGroup config;
     private final ScenarioConfigGroup scConfig;
     private final TransitConfigGroup transitConfigGroup;
     private final Map<Id<Person>, ScoringParameters> params = new IdMap<>(Person.class);
@@ -66,15 +64,15 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
     private final Map<String, Map<String, ActivityUtilityParameters>> activityParamsPerSubpopulation = new ConcurrentHashMap<>();
 
     @Inject
-    IncomeDependentUtilityOfMoneyPersonScoringParameters(Population population, PlanCalcScoreConfigGroup planCalcScoreConfigGroup, ScenarioConfigGroup scenarioConfigGroup, TransitConfigGroup transitConfigGroup) {
-        this.config = planCalcScoreConfigGroup;
+    IncomeDependentUtilityOfMoneyPersonScoringParameters(Population population, ScoringConfigGroup scoringConfigGroup, ScenarioConfigGroup scenarioConfigGroup, TransitConfigGroup transitConfigGroup) {
+        this.config = scoringConfigGroup;
         this.scConfig = scenarioConfigGroup;
         this.transitConfigGroup = transitConfigGroup;
         this.globalAvgIncome = computeAvgIncome(population);
     }
 
     private double computeAvgIncome(Population population) {
-        log.info("read income attribute '" + PERSONAL_INCOME_ATTRIBUTE_NAME + "' of all agents and compute global average.\n" +
+        log.info("reading income attribute using " + PersonUtils.class + " of all agents and compute global average.\n" +
                 "Make sure to set this attribute only to appropriate agents (i.e. true 'persons' and not freight agents) \n" +
                 "Income values <= 0 are ignored. Agents that have negative or 0 income will use the marginalUtilityOfMOney in their subpopulation's scoring params..");
         OptionalDouble averageIncome = population.getPersons().values().stream()
@@ -112,13 +110,13 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
              * point of view than giving each ScoringFunction its own copy of the params.
              */
 
-            PlanCalcScoreConfigGroup.ScoringParameterSet subpopulationScoringParams = this.config.getScoringParameters(subpopulation);
+            ScoringConfigGroup.ScoringParameterSet subpopulationScoringParams = this.config.getScoringParameters(subpopulation);
             // (we can set scoring params per subpopulation, so retrieve them as starting point.  kai, apr'22)
 
             // save the activityParams of the subpopulation so we need to build them only once.
             this.activityParamsPerSubpopulation.computeIfAbsent(subpopulation, k -> {
                 Map<String, ActivityUtilityParameters> activityParams = new TreeMap<>();
-                for (PlanCalcScoreConfigGroup.ActivityParams params : subpopulationScoringParams.getActivityParams()) {
+                for (ScoringConfigGroup.ActivityParams params : subpopulationScoringParams.getActivityParams()) {
                     ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder(params);
                     activityParams.put(params.getActivityType(), factory.build());
                 }
@@ -132,7 +130,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
 
             if (transitConfigGroup.isUseTransit()) {
                 // this is the PT stage activity:
-                PlanCalcScoreConfigGroup.ActivityParams transitActivityParams = new PlanCalcScoreConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
+                ScoringConfigGroup.ActivityParams transitActivityParams = new ScoringConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
                 transitActivityParams.setTypicalDuration(120.0);
                 transitActivityParams.setOpeningTime(0.);
                 transitActivityParams.setClosingTime(0.);

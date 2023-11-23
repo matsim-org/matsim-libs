@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -32,7 +33,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @author sebhoerl
  */
 public class ScheduleWaitingTimeEstimator implements PTWaitingTimeEstimator {
-	private static final Logger logger = Logger.getLogger(ScheduleWaitingTimeEstimator.class);
+	private static final Logger logger = LogManager.getLogger(ScheduleWaitingTimeEstimator.class);
 
 	private final TransitSchedule transitSchedule;
 	private final Map<Tuple<Id<TransitLine>, Id<TransitRoute>>, List<Double>> orderedDepartureTimes = new HashMap<>();

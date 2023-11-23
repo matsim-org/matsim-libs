@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.utils;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -40,7 +41,7 @@ import java.util.SortedMap;
 public final class EmissionWriter {
 	// is this useful as a publicly available class?  kai, jan'19
 
-	private static final Logger logger = Logger.getLogger(EmissionWriter.class);
+	private static final Logger logger = LogManager.getLogger(EmissionWriter.class);
 	
 
 	public EmissionWriter(){

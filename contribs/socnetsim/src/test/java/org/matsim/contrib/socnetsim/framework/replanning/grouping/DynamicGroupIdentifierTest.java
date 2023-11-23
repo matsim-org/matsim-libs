@@ -63,7 +63,7 @@ public class DynamicGroupIdentifierTest {
 
 	@Test
 	public void testNGroupsNoJointPlansCompleteSocialNet() {
-		//Logger.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
+		//LogManager.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		scenario.addScenarioElement( JointPlans.ELEMENT_NAME , new JointPlans() );
 
@@ -93,7 +93,7 @@ public class DynamicGroupIdentifierTest {
 
 	@Test
 	public void testNGroupsWithJointPlansNoSocialNet() {
-		//Logger.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
+		//LogManager.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 
 		final JointPlans jointPlans = new JointPlans();
@@ -140,7 +140,7 @@ public class DynamicGroupIdentifierTest {
 
 	@Test
 	public void testNGroupsWithJointPlansCompleteSocialNet() {
-		//Logger.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
+		//LogManager.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 
 		final JointPlans jointPlans = new JointPlans();

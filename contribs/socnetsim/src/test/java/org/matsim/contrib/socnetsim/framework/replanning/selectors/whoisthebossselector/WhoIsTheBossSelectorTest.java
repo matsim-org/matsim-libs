@@ -28,8 +28,9 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -52,11 +53,6 @@ import org.matsim.contrib.socnetsim.framework.replanning.selectors.ScoreWeight;
  * @author thibautd
  */
 public class WhoIsTheBossSelectorTest {
-
-	@Before
-	public void enableTrace() {
-		if ( false ) Logger.getLogger(WhoIsTheBossSelector.class).setLevel( Level.TRACE );
-	}
 
 	@Test
 	public void testOnePlanSelectedForEachAgent() throws Exception {

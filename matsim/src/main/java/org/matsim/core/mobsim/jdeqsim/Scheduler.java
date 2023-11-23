@@ -19,7 +19,8 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 
 /**
@@ -29,7 +30,7 @@ import org.matsim.core.gbl.Gbl;
  */
 public class Scheduler {
 	
-	private static final Logger log = Logger.getLogger(Scheduler.class);
+	private static final Logger log = LogManager.getLogger(Scheduler.class);
 	private double simTime = 0;
 	protected final MessageQueue queue;
 	private double simulationStartTime = System.currentTimeMillis();

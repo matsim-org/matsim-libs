@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -43,7 +43,7 @@ import org.matsim.contrib.hybridsim.utils.IdIntMapper;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -67,7 +67,7 @@ public class RunExample {
 	public static String REMOTE_HOST = "localhost";
 	public static int REMOTE_PORT = 9000;
 
-    private static final Logger log = Logger.getLogger(RunExample.class);
+    private static final Logger log = LogManager.getLogger(RunExample.class);
 
     private static final IdIntMapper idIntMapper = new IdIntMapper();
 
@@ -79,12 +79,9 @@ public class RunExample {
 			REMOTE_PORT = Integer.parseInt(args[1]);
 		}
 
-        Logger.getRootLogger().setLevel(Level.INFO);//Make output less verbose as netty is so blathering
-
-
 		Config c = ConfigUtils.createConfig();
-		c.controler().setLastIteration(0);
-		c.controler().setWriteEventsInterval(1);
+		c.controller().setLastIteration(0);
+		c.controller().setWriteEventsInterval(1);
 
         c.qsim().setEndTime(3600);
 
@@ -96,7 +93,7 @@ public class RunExample {
 		createHybridsimScenario(sc); //enable for grpc_jps_as_a_service branch
 
 		final Controler controller = new Controler(sc);
-		controller.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controller.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		final EventsManager eventsManager = EventsUtils.createEventsManager();
 
@@ -330,7 +327,7 @@ public class RunExample {
 	}
 
 	private static void enrichConfig(Config c) {
-		PlanCalcScoreConfigGroup.ActivityParams pre = new PlanCalcScoreConfigGroup.ActivityParams("origin");
+		ScoringConfigGroup.ActivityParams pre = new ScoringConfigGroup.ActivityParams("origin");
 		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when
 		// running a simulation one gets
 		// "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"
@@ -342,18 +339,18 @@ public class RunExample {
 		pre.setLatestStartTime(49);
 		pre.setOpeningTime(49);
 
-		PlanCalcScoreConfigGroup.ActivityParams post = new PlanCalcScoreConfigGroup.ActivityParams("destination");
+		ScoringConfigGroup.ActivityParams post = new ScoringConfigGroup.ActivityParams("destination");
 		post.setTypicalDuration(49); // dito
 		post.setMinimalDuration(49);
 		post.setClosingTime(49);
 		post.setEarliestEndTime(49);
 		post.setLatestStartTime(49);
 		post.setOpeningTime(49);
-		c.planCalcScore().addActivityParams(pre);
-		c.planCalcScore().addActivityParams(post);
+		c.scoring().addActivityParams(pre);
+		c.scoring().addActivityParams(post);
 
-		c.planCalcScore().setLateArrival_utils_hr(0.);
-		c.planCalcScore().setPerforming_utils_hr(0.);
+		c.scoring().setLateArrival_utils_hr(0.);
+		c.scoring().setPerforming_utils_hr(0.);
 	}
 
 	private static void createPopulation(Scenario sc) {

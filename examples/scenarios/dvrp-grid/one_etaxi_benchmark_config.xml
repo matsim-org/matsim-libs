@@ -21,7 +21,7 @@
 			<parameterset type="RuleBasedETaxiOptimizer">
 				<parameterset type="RuleBasedTaxiOptimizer"/>
 
-				<param name="minRelativeSoc" value="0.7"/>
+				<param name="minSoc" value="0.7"/>
 				<param name="socCheckTimeStep" value="60"/>
 			</parameterset>
 		</parameterset>
@@ -33,9 +33,12 @@
 		<param name="auxDischargeTimeStep" value="60"/>
 
 		<param name="chargersFile" value="one_etaxi_chargers.xml"/>
-		<param name="vehiclesFile" value="one_etaxi_evehicles.xml"/>
 
 		<param name="timeProfiles" value="true"/>
+	</module>
+
+	<module name="vehicles">
+		<param name="vehiclesFile" value="one_etaxi_evehicles.xml"/>
 	</module>
 
 	<module name="network">
@@ -53,7 +56,7 @@
 		<param name="flowCapacityFactor" value="100.0"/>
 	</module>
 
-	<module name="controler">
+	<module name="controller">
 		<param name="outputDirectory" value="test/output/one_etaxi_benchmark"/>
 		<param name="overwriteFiles" value="deleteDirectoryIfExists"/>
 		<param name="writeEventsInterval" value="0"/>
@@ -65,13 +68,13 @@
 		<param name="lastIteration" value="0"/>
 	</module>
 
-	<module name="planCalcScore">
+	<module name="scoring">
 		<param name="activityType_0" value="dummy"/>
 		<param name="activityTypicalDuration_0" value="24:00:00"/>
 		<param name="traveling_taxi" value="-6"/>
 	</module>
 
-	<module name="strategy">
+	<module name="replanning">
 		<!-- We focus only on DynAgents. "Standard" agents do not change their behaviour -->
 		<param name="maxAgentPlanMemorySize" value="1"/>
 		<param name="ModuleProbability_1" value="1.0"/>

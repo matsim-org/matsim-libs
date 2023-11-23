@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package playground.vsp.analysis.modules.ptTripAnalysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 
 /**
@@ -27,7 +28,7 @@ import org.locationtech.jts.geom.Geometry;
  *
  */
 public abstract class AbstractAnalysisTripSet {
-	private static final Logger log = Logger.getLogger(AbstractAnalysisTripSet.class);
+	private static final Logger log = LogManager.getLogger(AbstractAnalysisTripSet.class);
 	
 	private String mode;
 	private Geometry zone;

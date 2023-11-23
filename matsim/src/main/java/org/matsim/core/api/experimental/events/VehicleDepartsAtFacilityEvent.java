@@ -20,12 +20,12 @@
 
 package org.matsim.core.api.experimental.events;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.Map;
 
 /**
  * @author mrieser
@@ -53,13 +53,6 @@ public final class VehicleDepartsAtFacilityEvent extends Event {
 		this.delay = delay;
 	}
 
-	/*
-	 * Why is this getter deprecated? There is no obvious and simple alternative way to find the delay. The only
-	 * alternative seems to be to try to indentify the transitLine, transitRoute and departure and its TransitRouteStop.
-	 * That is cumbersome and not even a unique value (imagine the vehicle serves the same stop multiple times).
-	 * vsp-gleich april'21
-	 */
-	@Deprecated
 	public double getDelay() {
 		return this.delay;
 	}

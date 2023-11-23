@@ -25,7 +25,8 @@ package org.matsim.contrib.signals.builder;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.controller.SignalControllerFactory;
@@ -51,14 +52,14 @@ import com.google.inject.multibindings.MapBinder;
  * signal controllers, you can add a respective factory by calling the method
  * addSignalControllerFactory. It is also possible to use different control
  * schemes in one scenario at different intersections (i.e. signal systems).
- * 
+ *
  * @author tthunig
  */
 class SignalsModule extends AbstractModule {
 	// This is no longer public since there is now also material that needs to be injected at the QSim level (see
 	// Signals.configure(...)), and making SignalsModule nonpublic seems the best way of forcibly notifying users.  kai, nov'18
 
-	private static final Logger log = Logger.getLogger( SignalsModule.class ) ;
+	private static final Logger log = LogManager.getLogger( SignalsModule.class ) ;
 
 	private MapBinder<String, SignalControllerFactory> signalControllerFactoryMultibinder;
 	private Map<String, Class<? extends SignalControllerFactory>> signalControllerFactoryClassNames = new HashMap<>();
@@ -69,7 +70,7 @@ class SignalsModule extends AbstractModule {
 		signalControllerFactoryClassNames.put(SylviaSignalController.IDENTIFIER, SylviaSignalController.SylviaFactory.class);
 		signalControllerFactoryClassNames.put(LaemmerSignalController.IDENTIFIER, LaemmerSignalController.LaemmerFactory.class);
 	}
-	
+
 	@Override
 	public void install() {
 
@@ -78,7 +79,7 @@ class SignalsModule extends AbstractModule {
 		// yyyy move to individual config files???  kai, feb'19
 
 		this.signalControllerFactoryMultibinder = MapBinder.newMapBinder(binder(), new TypeLiteral<String>() {}, new TypeLiteral<SignalControllerFactory>() {});
-		
+
 		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
 			// bindings for sensor-based signals (also works for fixed-time signals)
 			bind(SignalModelFactory.class).to(SignalModelFactoryImpl.class);
@@ -92,7 +93,7 @@ class SignalsModule extends AbstractModule {
 				 * configure()... theresa, aug'18 */
 				signalControllerFactoryMultibinder.addBinding(identifier).to(signalControllerFactoryClassNames.get(identifier));
 			}
-			
+
 			// general signal bindings
 			bind(SignalSystemsManager.class).toProvider(FromDataBuilder.class).in(Singleton.class);
 			addMobsimListenerBinding().to(QSimSignalEngine.class);
@@ -107,16 +108,16 @@ class SignalsModule extends AbstractModule {
 				throw new RuntimeException("Fast flow capacity update does not support signals");
 			}
 		}
-		if (getConfig().controler().isLinkToLinkRoutingEnabled()){
+		if (getConfig().controller().isLinkToLinkRoutingEnabled()){
 			//use the extended NetworkWithSignalsTurnInfoBuilder (instead of NetworkTurnInfoBuilder)
 			//michalm, jan'17
 			bind(NetworkTurnInfoBuilderI.class).to(NetworkWithSignalsTurnInfoBuilder.class);
 		}
 	}
-	
+
 	/**
 	 * Call this method when you want to add your own SignalController. E.g. via signalsModule.addSignalControllerFactory().to(LaemmerSignalController.LaemmerFactory.class)
-	 * 
+	 *
 	 * @param signalControllerFactoryClassName
 	 */
 	final void addSignalControllerFactory(String key, Class<? extends SignalControllerFactory> signalControllerFactoryClassName) {

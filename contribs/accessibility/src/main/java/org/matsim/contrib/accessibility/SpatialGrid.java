@@ -23,7 +23,8 @@
  */
 package org.matsim.contrib.accessibility;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
@@ -48,7 +49,7 @@ public final class SpatialGrid{
 	// yy this class was set to deprecated by DZ.  Quite possibly, we decided this together.  Still, I can't remember the reason.  Could you please
 	// write down a half-sentence of justification?  Thanks.  kai, feb'20
 
-	private static final Logger LOG = Logger.getLogger(SpatialGrid.class);
+	private static final Logger LOG = LogManager.getLogger(SpatialGrid.class);
 	
 	private double[][] matrix;
 	

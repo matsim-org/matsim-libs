@@ -19,8 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.replanning.modules;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -55,11 +56,6 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 	private Config config;
 	private TripRouter tripRouter;
 	private Random random;
-
-	@Before
-	public void configureLogging() {
-		Logger.getLogger( JointTripInsertorAndRemoverAlgorithm.class ).setLevel( Level.TRACE );
-	}
 
 	@Before
 	public void init() {

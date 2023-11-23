@@ -20,7 +20,8 @@
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
 
-//import org.apache.log4j.Logger;
+//import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 class ScoringPenalty {
@@ -30,7 +31,7 @@ class ScoringPenalty {
 	private FacilityPenalty facilityPenalty = null;
 	private double score = 0.0;
 
-	//private static final Logger log = Logger.getLogger(Penalty.class);
+	//private static final Logger log = LogManager.getLogger(Penalty.class);
 
 	public ScoringPenalty(double startTime, double endTime, FacilityPenalty facilityPenalty, double score) {
 		this.startTime = startTime;

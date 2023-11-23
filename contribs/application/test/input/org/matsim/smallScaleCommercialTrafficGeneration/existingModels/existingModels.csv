@@ -1,0 +1,3 @@
+model	sampleSize	smallScaleCommercialTrafficType	purpose	vehicleType	networkMode
+exampleServiceCarrier	1.0	commercialPersonTraffic	2		car
+exampleShipmentCarrier	1.0	goodsTraffic	3	vehTyp3	freight

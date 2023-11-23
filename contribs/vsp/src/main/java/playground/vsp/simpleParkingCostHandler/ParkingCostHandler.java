@@ -80,6 +80,7 @@ final class ParkingCostHandler implements TransitDriverStartsEventHandler, Activ
        this.personId2lastLeaveVehicleTime.clear();
        this.personId2previousActivity.clear();
        this.personId2relevantModeLinkId.clear();
+       this.hasAlreadyPaidDailyResidentialParkingCosts.clear();
        this.ptDrivers.clear();
     }
 
@@ -141,7 +142,7 @@ final class ParkingCostHandler implements TransitDriverStartsEventHandler, Activ
 
 							if (residentialParkingFeePerDay > 0.) {
 								double amount = -1. * residentialParkingFeePerDay;
-								events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), amount, "parking", "city"));
+								events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), amount, "residential parking", "city", "link " + link.getId().toString()));
 							}
 						}
 
@@ -201,7 +202,7 @@ final class ParkingCostHandler implements TransitDriverStartsEventHandler, Activ
 
 						if (costs > 0.) {
 							double amount = -1. * costs;
-							events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), amount, "parking", "city"));
+							events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), amount, "non-residential parking", "city", "link " + link.getId().toString()));
 						}
 
 					}

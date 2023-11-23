@@ -23,7 +23,8 @@
 
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -77,7 +78,7 @@ public final class SumScoringFunction implements ScoringFunction {
 		void handleEvent( final Event event ) ;
 	}
 
-	private static final  Logger log = Logger.getLogger(SumScoringFunction.class);
+	private static final  Logger log = LogManager.getLogger(SumScoringFunction.class);
 
 	private ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<>();
 	private ArrayList<ActivityScoring> activityScoringFunctions = new ArrayList<>();

@@ -24,7 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.population.io.StreamingPopulationReader.StreamingPopulation;
 import org.matsim.core.scenario.ProjectionUtils;
@@ -32,6 +33,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.utils.FeatureFlags;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -57,9 +59,9 @@ public final class PopulationReader extends MatsimXmlParser {
 	private MatsimXmlParser delegate = null;
 	private final Scenario scenario;
 
-	private Map<Class<?>, AttributeConverter<?>> attributeConverters = new HashMap<>();
+	private final Map<Class<?>, AttributeConverter<?>> attributeConverters = new HashMap<>();
 
-	private static final Logger log = Logger.getLogger(PopulationReader.class);
+	private static final Logger log = LogManager.getLogger(PopulationReader.class);
 
 	public PopulationReader(final Scenario scenario) {
 		this(null, null, scenario);
@@ -74,6 +76,7 @@ public final class PopulationReader extends MatsimXmlParser {
 				final String targetCRS,
 				final Scenario scenario,
 				boolean streaming ) {
+		super(ValidationType.DTD_ONLY);
 		if ( !streaming && scenario.getPopulation() instanceof StreamingPopulation ) {
 			throw new RuntimeException("MatsimPopulationReader called directly with an instance of StreamingPopulation "
 					+ "in scenario.  Call via StreamingPopulationReader or ask for help.  kai, jul'16") ;
@@ -114,12 +117,21 @@ public final class PopulationReader extends MatsimXmlParser {
 
 		switch ( doctype ) {
 			case POPULATION_V6:
-				this.delegate =
+				if (FeatureFlags.useParallelIO()) {
+					this.delegate =
+						new ParallelPopulationReaderMatsimV6(
+							inputCRS,
+							targetCRS,
+							this.scenario);
+					((ParallelPopulationReaderMatsimV6) delegate).putAttributeConverters(attributeConverters);
+				} else {
+					this.delegate =
 						new PopulationReaderMatsimV6(
-						        inputCRS,
-						        targetCRS,
-								this.scenario);
-				((PopulationReaderMatsimV6) delegate).putAttributeConverters( attributeConverters );
+							inputCRS,
+							targetCRS,
+							this.scenario);
+					((PopulationReaderMatsimV6) delegate).putAttributeConverters(attributeConverters);
+				}
 				log.info("using population_v6-reader.");
 				break;
 			case POPULATION_V5:

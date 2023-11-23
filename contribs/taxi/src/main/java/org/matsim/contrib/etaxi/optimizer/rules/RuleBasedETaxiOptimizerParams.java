@@ -19,34 +19,34 @@
 
 package org.matsim.contrib.etaxi.optimizer.rules;
 
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.Positive;
-
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import org.matsim.core.config.ConfigGroup;
 
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.Positive;
+
 public final class RuleBasedETaxiOptimizerParams extends AbstractTaxiOptimizerParams {
 	public static final String SET_NAME = "RuleBasedETaxiOptimizer";
 
-	public static final String MIN_RELATIVE_SOC = "minRelativeSoc";
-	static final String MIN_RELATIVE_SOC_EXP = "Taxis with SOC below this level are considered undercharged"
+	@Parameter
+	@Comment("Taxis with SOC below this level are considered undercharged"
 			+ " and should be recharged. The value must be in (0, 1]."
-			+ " The default value is 0.3 (used for simulating Nissan Leaf taxis).";
+			+ " The default value is 0.3 (used for simulating Nissan Leaf taxis).")
 	// 30% SOC (=6 kWh) is enough to travel 40 km (all AUX off);
 	// alternatively, in cold winter, it is enough to travel for 1 hour
 	// (for approx. 20 km => 3kWh) with 3 kW-heating on
 	@Positive
 	@DecimalMax("1.0")
-	private double minRelativeSoc = 0.3;
+	public double minSoc = 0.3;
 
-	public static final String SOC_CHECK_TIME_STEP = "socCheckTimeStep";
-	static final String SOC_CHECK_TIME_STEP_EXP = "Specifies how often idle vehicles are checked if they have become"
+	@Parameter
+	@Comment("Specifies how often idle vehicles are checked if they have become"
 			+ " undercharged. Undercharged ones will be immediately sent to the nearest charging stations."
-			+ " The default value is 300 (used for simulating Nissan Leaf taxis).";
+			+ " The default value is 300 (used for simulating Nissan Leaf taxis).")
 	// in cold winter, 3kW heating consumes 1.25% SOC every 5 min
 	@Positive
-	private int socCheckTimeStep = 300;
+	public int socCheckTimeStep = 300;
 
 	private RuleBasedTaxiOptimizerParams ruleBasedTaxiOptimizerParams;
 
@@ -76,42 +76,5 @@ public final class RuleBasedETaxiOptimizerParams extends AbstractTaxiOptimizerPa
 	@Override
 	public int getReoptimizationTimeStep() {
 		return ruleBasedTaxiOptimizerParams.getReoptimizationTimeStep();
-	}
-
-	@Override
-	public void setReoptimizationTimeStep(int reoptimizationTimeStep) {
-		ruleBasedTaxiOptimizerParams.setReoptimizationTimeStep(reoptimizationTimeStep);
-	}
-
-	/**
-	 * @return {@value #MIN_RELATIVE_SOC_EXP}
-	 */
-	@StringGetter(MIN_RELATIVE_SOC)
-	public double getMinRelativeSoc() {
-		return minRelativeSoc;
-	}
-
-	/**
-	 * @param minRelativeSoc {@value #MIN_RELATIVE_SOC_EXP}
-	 */
-	@StringSetter(MIN_RELATIVE_SOC)
-	public void setMinRelativeSoc(double minRelativeSoc) {
-		this.minRelativeSoc = minRelativeSoc;
-	}
-
-	/**
-	 * @return {@value #SOC_CHECK_TIME_STEP_EXP}
-	 */
-	@StringGetter(SOC_CHECK_TIME_STEP)
-	public int getSocCheckTimeStep() {
-		return socCheckTimeStep;
-	}
-
-	/**
-	 * @param socCheckTimeStep {@value #SOC_CHECK_TIME_STEP_EXP}
-	 */
-	@StringSetter(SOC_CHECK_TIME_STEP)
-	public void setSocCheckTimeStep(int socCheckTimeStep) {
-		this.socCheckTimeStep = socCheckTimeStep;
 	}
 }

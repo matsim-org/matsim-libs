@@ -21,7 +21,8 @@ package org.matsim.contrib.minibus.performance;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
@@ -39,7 +40,7 @@ import org.matsim.vehicles.MatsimVehicleReader;
  */
 public class PTransitLineMerger {
 	
-	private static final Logger log = Logger.getLogger(PTransitLineMerger.class);
+	private static final Logger log = LogManager.getLogger(PTransitLineMerger.class);
 	
 	/**
 	 * Merges all routes of a transit line that have the same sequence of stops. Does not respect the time profile of the routes.

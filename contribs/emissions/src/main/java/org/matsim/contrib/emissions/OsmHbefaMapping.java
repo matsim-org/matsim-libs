@@ -26,7 +26,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkUtils;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -109,6 +111,12 @@ public class OsmHbefaMapping extends HbefaRoadTypeMapping {
         //TODO: could make distinction between national and city, based on shapefile, or regions.
         double freeVelocity_kmh = speed * 3.6;
 
+        /*
+         * speed attributes are sometimes rounded beforehand.
+         * make sure the speed is a multiple of 10, as the HBEFA emission key factors are and otherwise we get problems later...
+         */
+		freeVelocity_kmh = Math.round(freeVelocity_kmh/10.0) * 10;
+
         if (type.equals("unclassified") || type.equals("road")) {
             if (freeVelocity_kmh <= 50) type = "living";
             else if (freeVelocity_kmh == 60) type = "tertiary";
@@ -116,6 +124,16 @@ public class OsmHbefaMapping extends HbefaRoadTypeMapping {
             else if (freeVelocity_kmh <= 90) type = "primary";
             else type = "motorway";
         }
+
+
+
+        //sometimes link type is smth like 'motorway_link' or 'living_street' or 'primary|railway.tram'. We only care about the first part, here
+		int idx = Arrays.asList(type.indexOf('.'), type.indexOf('|'), type.indexOf('_'), type.indexOf(','))
+				.stream()
+				.filter(i -> i>= 0) //if chrc is not in String indexOf returns -1
+				.min(Integer::compare)
+				.orElse(type.length());
+        type = type.substring(0, idx);
 
         //specify that if speed > 90 and primary or motorway, then Nat.
         if (type.equals("motorway") || type.equals("primary") && freeVelocity_kmh >= 90) {

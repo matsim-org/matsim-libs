@@ -24,7 +24,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams;
 import org.matsim.contrib.minibus.PConfigGroup.RouteDesignScoreParams.LogRouteDesignScore;
@@ -44,7 +45,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 class StopServedMultipleTimesPenalty implements RouteDesignScoringFunction {
 
-	private static final Logger log = Logger.getLogger(StopServedMultipleTimesPenalty.class);
+	private static final Logger log = LogManager.getLogger(StopServedMultipleTimesPenalty.class);
 	private final RouteDesignScoreParams params;
 
 	public StopServedMultipleTimesPenalty(RouteDesignScoreParams params) {

@@ -27,7 +27,8 @@ import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.GLUquadric;
 import com.jogamp.opengl.util.awt.TextRenderer;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -83,7 +84,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	private static boolean includeRoutes = true ;
 
-	private static final Logger log = Logger.getLogger(QueryAgentPlan.class);
+	private static final Logger log = LogManager.getLogger(QueryAgentPlan.class);
 
 	private Id<Person> agentId;
 

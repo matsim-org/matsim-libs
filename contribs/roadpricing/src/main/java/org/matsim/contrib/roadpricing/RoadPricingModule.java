@@ -1,6 +1,7 @@
 package org.matsim.contrib.roadpricing;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -12,7 +13,7 @@ import org.matsim.contrib.roadpricing.RoadPricingModuleDefaults.TravelDisutility
 import com.google.inject.Singleton;
 
 public final class RoadPricingModule extends AbstractModule {
-	final private static Logger LOG = Logger.getLogger(RoadPricingModule.class);
+	final private static Logger LOG = LogManager.getLogger(RoadPricingModule.class);
 	
 	private RoadPricingScheme scheme;
 

@@ -29,10 +29,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup.EventsFileFormat;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -52,15 +53,15 @@ import org.matsim.core.utils.io.IOUtils;
 final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 	IterationEndsListener, ShutdownListener {
 
-	final static private Logger log = Logger.getLogger(EventsHandlingImpl.class);
-	
+	final static private Logger log = LogManager.getLogger(EventsHandlingImpl.class);
+
 	private final EventsManager eventsManager;
 	private List<EventWriter> eventWriters = new LinkedList<>();
 
 	private int writeEventsInterval;
-    
+
 	private Set<EventsFileFormat> eventsFileFormats ;
-	
+
 	private OutputDirectoryHierarchy controlerIO ;
 
 	private int writeMoreUntilIteration;
@@ -68,7 +69,7 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 	@Inject
 	EventsHandlingImpl(
 			final EventsManager eventsManager,
-			final ControlerConfigGroup config,
+			final ControllerConfigGroup config,
 			final OutputDirectoryHierarchy controlerIO) {
 		this.eventsManager = eventsManager;
 		this.writeEventsInterval = config.getWriteEventsInterval();
@@ -117,11 +118,11 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 			}
 		}
 	}
-	
+
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		/*
-		 * Events that are produced after the Mobsim has ended, e.g. by the RoadProcing 
+		 * Events that are produced after the Mobsim has ended, e.g. by the RoadProcing
 		 * module, should also be written to the events file.
 		 */
 		for (EventWriter writer : this.eventWriters) {
@@ -137,5 +138,5 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 			writer.closeFile();
 		}
 	}
-	
+
 }

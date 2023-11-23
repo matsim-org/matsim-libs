@@ -23,7 +23,8 @@
  */
 package org.matsim.core.network.algorithms.intersectionSimplifier;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
@@ -39,7 +40,7 @@ import org.matsim.core.network.io.NetworkWriter;
  * @author jwjoubert
  */
 public class RunIntersectionSimplifier {
-	final private static Logger LOG = Logger.getLogger(RunIntersectionSimplifier.class);
+	final private static Logger LOG = LogManager.getLogger(RunIntersectionSimplifier.class);
 
 	/**
 	 * @param args

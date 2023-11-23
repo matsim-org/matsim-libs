@@ -20,10 +20,9 @@ package org.matsim.contrib.parking.parkingchoice.lib.obj.network;
 
 import org.matsim.api.core.v01.Coord;
 /**
- * 
+ *
  * @author rashid_waraich
  *
- * @param <T>
  */
 public class EnclosingRectangle {
 
@@ -31,7 +30,7 @@ public class EnclosingRectangle {
 	double minY = Double.MAX_VALUE;
 	double maxX = Double.MIN_VALUE;
 	double maxY = Double.MIN_VALUE;
-	
+
 	public void registerCoord(Coord coord){
 		if (coord.getX() < minX) {
 			minX = coord.getX();
@@ -65,5 +64,5 @@ public class EnclosingRectangle {
 	public double getMaxY() {
 		return maxY;
 	}
-	
+
 }

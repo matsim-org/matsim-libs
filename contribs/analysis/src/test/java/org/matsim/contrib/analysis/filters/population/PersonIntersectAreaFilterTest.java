@@ -20,8 +20,13 @@
 
 package org.matsim.contrib.analysis.filters.population;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashMap;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -37,16 +42,20 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Some tests for org.matsim.population.filters.PersonIntersectAreaFilter.
  *
  * @author mrieser
  */
-public class PersonIntersectAreaFilterTest extends MatsimTestCase {
+public class PersonIntersectAreaFilterTest {
 
-	public void testFilter() throws Exception {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testFilter() throws Exception {
 		/* create a simple network where agents can drive from the lower left
 		 * to the upper right */
 		Network network = NetworkUtils.createNetwork();

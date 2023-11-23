@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * Optimized data structure used in the location choice contribution. There, a huge amount of plans are created and
@@ -69,8 +70,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	/*package*/ OptionalTime[] arrTimes;
 	/*package*/ OptionalTime[] travTimes;
 	/*package*/ String[] modes;
+	/*package*/ String[] routingModes;
 	
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 	@Override
 	public final Attributes getAttributes() {
 		return this.attributes;
@@ -281,6 +283,37 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		destPlan.type = srcPlan.getType();
 		destPlan.person = srcPlan.getPerson();
 		destPlan.score = srcPlan.getScore();
+	}
+
+	@Override
+	public void setPlanId(Id<Plan> planId) {
+		throw new UnsupportedOperationException();
+		
+	}
+
+	@Override
+	public Id<Plan> getId() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int getIterationCreated() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void setIterationCreated(int iteration) {
+		throw new UnsupportedOperationException();		
+	}
+
+	@Override
+	public String getPlanMutator() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void setPlanMutator(String planMutator) {
+		throw new UnsupportedOperationException();		
 	}
 
 }

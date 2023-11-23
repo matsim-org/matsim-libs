@@ -22,7 +22,8 @@ package org.matsim.contrib.socnetsim.jointtrips.replanning.modules;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -47,7 +48,7 @@ import org.matsim.core.utils.timing.TimeInterpretation;
  */
 public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm<JointPlan> {
 	private static final Logger log =
-		Logger.getLogger(SynchronizeCoTravelerPlansAlgorithm.class);
+		LogManager.getLogger(SynchronizeCoTravelerPlansAlgorithm.class);
 
 	private final Set<String> stageTypes;
 	private final TimeInterpretation timeInterpretation;

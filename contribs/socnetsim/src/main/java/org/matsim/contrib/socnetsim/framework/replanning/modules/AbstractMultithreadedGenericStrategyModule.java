@@ -25,7 +25,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.utils.misc.Counter;
@@ -37,7 +38,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.GenericStrategyModule;
  * @author thibautd
  */
 public abstract class AbstractMultithreadedGenericStrategyModule<T> implements GenericStrategyModule<T> {
-	static final private Logger log = Logger.getLogger(AbstractMultithreadedGenericStrategyModule.class);
+	static final private Logger log = LogManager.getLogger(AbstractMultithreadedGenericStrategyModule.class);
 	private int numOfThreads;
 	private final String name;
 

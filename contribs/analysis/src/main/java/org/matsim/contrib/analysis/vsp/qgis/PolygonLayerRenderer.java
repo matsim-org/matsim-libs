@@ -1,13 +1,14 @@
 package org.matsim.contrib.analysis.vsp.qgis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.analysis.vsp.qgis.utils.AccessibilityRuleWithFilterCreator;
 import org.matsim.contrib.analysis.vsp.qgis.utils.ColorRangeUtils;
 
 import java.awt.*;
 
 public class PolygonLayerRenderer extends QGisRenderer {
-    public static final Logger log = Logger.getLogger(PolygonLayerRenderer.class);
+    public static final Logger log = LogManager.getLogger(PolygonLayerRenderer.class);
 
     private String nameOfAccessibilityLayer;
     private double lowerBound;

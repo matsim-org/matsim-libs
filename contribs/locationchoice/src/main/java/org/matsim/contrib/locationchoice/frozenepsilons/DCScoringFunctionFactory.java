@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
@@ -32,12 +33,12 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 
 class DCScoringFunctionFactory implements ScoringFunctionFactory {
-	
-	private final static Logger log = Logger.getLogger(DCScoringFunctionFactory.class);
-	
+
+	private final static Logger log = LogManager.getLogger(DCScoringFunctionFactory.class);
+
 	private final Scenario scenario;
 	private final DestinationChoiceContext lcContext;
-	
+
 	private boolean usingConfigParamsForScoring = true;
 	private boolean usingIndividualScoringParameters = true;
 	private ScoringParameters nonPersonalizedScoringParameters = null;
@@ -46,7 +47,7 @@ class DCScoringFunctionFactory implements ScoringFunctionFactory {
 		this.scenario = scenario;
 		this.lcContext = lcContext;
 		log.info("creating DCScoringFunctionFactory");
-		
+
 		// configure ScoringFunction according to config
 		FrozenTastesConfigGroup dccg = (FrozenTastesConfigGroup) scenario.getConfig().getModule( FrozenTastesConfigGroup.GROUP_NAME );
 		if (dccg != null) {
@@ -54,7 +55,7 @@ class DCScoringFunctionFactory implements ScoringFunctionFactory {
 			this.setUsingIndividualScoringParameters(dccg.getUseIndividualScoringParameters());
 		} else log.warn("No DestinationChoiceConfigGroup was found in the config - cannot configure DCScoringFunctionFactory according to it!");
 	}
-	
+
 	public void setUsingConfigParamsForScoring(boolean val) {
 		this.usingConfigParamsForScoring = val;
 	}
@@ -64,15 +65,15 @@ class DCScoringFunctionFactory implements ScoringFunctionFactory {
 		if (!this.usingIndividualScoringParameters) {
 			Config config = this.scenario.getConfig();
 			String subPopulationAttributeName = null;
-			this.nonPersonalizedScoringParameters = new ScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(subPopulationAttributeName), config.scenario()).build();
+			this.nonPersonalizedScoringParameters = new ScoringParameters.Builder(config.scoring(), config.scoring().getScoringParameters(subPopulationAttributeName), config.scenario()).build();
 		}
 	}
-	
+
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
-		
+
 		SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-		
+
 		SumScoringFunction.BasicScoring scoringFunction;
 		if (this.usingConfigParamsForScoring) {
 			scoringFunction = new DCActivityWOFacilitiesScoringFunction(person, this.lcContext);
@@ -82,7 +83,7 @@ class DCScoringFunctionFactory implements ScoringFunctionFactory {
 			scoringFunction = new DCActivityScoringFunction(person.getSelectedPlan(), this.lcContext);
 		}
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
-		
+
 		if (this.usingIndividualScoringParameters) {
 			ScoringParameters scoringParameters = new ScoringParameters.Builder(this.scenario, person ).build();
 			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(scoringParameters, this.scenario.getNetwork(), this.scenario.getConfig().transit().getTransitModes()));
@@ -91,7 +92,7 @@ class DCScoringFunctionFactory implements ScoringFunctionFactory {
 			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(this.nonPersonalizedScoringParameters, this.scenario.getNetwork(), this.scenario.getConfig().transit().getTransitModes()));
 			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(this.nonPersonalizedScoringParameters));
 		}
-		
+
 		return scoringFunctionAccumulator;
 	}
 }

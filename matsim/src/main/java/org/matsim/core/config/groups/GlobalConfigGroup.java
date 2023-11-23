@@ -23,11 +23,12 @@ package org.matsim.core.config.groups;
 import java.util.Map;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 public final class GlobalConfigGroup extends ReflectiveConfigGroup {
-	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);
+	private static final Logger log = LogManager.getLogger(GlobalConfigGroup.class);
 
 	public static final String GROUP_NAME = "global";
 

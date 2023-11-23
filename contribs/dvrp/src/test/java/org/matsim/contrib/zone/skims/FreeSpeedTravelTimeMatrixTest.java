@@ -48,7 +48,9 @@ public class FreeSpeedTravelTimeMatrixTest {
 
 	@Test
 	public void matrix() {
-		DvrpTravelTimeMatrixParams params = new DvrpTravelTimeMatrixParams().setCellSize(100).setMaxNeighborDistance(0);
+		DvrpTravelTimeMatrixParams params = new DvrpTravelTimeMatrixParams();
+		params.cellSize = 100;
+		params.maxNeighborDistance = 0;
 		var matrix = FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, params, 1, 1);
 
 		// distances between central nodes: A and B
@@ -66,8 +68,9 @@ public class FreeSpeedTravelTimeMatrixTest {
 
 	@Test
 	public void sparseMatrix() {
-		DvrpTravelTimeMatrixParams params = new DvrpTravelTimeMatrixParams().setCellSize(100)
-				.setMaxNeighborDistance(9999);
+		DvrpTravelTimeMatrixParams params = new DvrpTravelTimeMatrixParams();
+		params.cellSize = 100;
+		params.maxNeighborDistance = 9999;
 		var matrix = FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, params, 1, 1);
 
 		// distances between central nodes: A and B

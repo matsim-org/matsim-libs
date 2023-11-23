@@ -24,7 +24,8 @@
 
 package playground.vsp.congestion.controler;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -36,7 +37,7 @@ import org.matsim.core.events.handler.EventHandler;
  */
 
 public class CongestionAnalysisControlerListener implements StartupListener {
-	private final Logger log = Logger.getLogger(CongestionAnalysisControlerListener.class);
+	private final Logger log = LogManager.getLogger(CongestionAnalysisControlerListener.class);
 
 	private EventHandler congestionHandler;
 	

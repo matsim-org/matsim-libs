@@ -20,7 +20,8 @@
 
 package org.matsim.facilities.algorithms;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -37,7 +38,7 @@ import java.util.Set;
 
 public class WorldConnectLocations {
 
-	private final static Logger log = Logger.getLogger(WorldConnectLocations.class);
+	private final static Logger log = LogManager.getLogger(WorldConnectLocations.class);
 
 	private final Config config;
 

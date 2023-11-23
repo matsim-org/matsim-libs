@@ -3,7 +3,8 @@ package playground.vsp.andreas.utils.pt;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -31,7 +32,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public class TransitLineRemover {
 	
-	private static final Logger log = Logger.getLogger(TransitLineRemover.class);
+	private static final Logger log = LogManager.getLogger(TransitLineRemover.class);
 
 	public static void main(String[] args) {
 		final String SCHEDULEFILE = "e:/_shared-svn/andreas/paratransit/input/trb_2012/transitSchedules/transitSchedule_basecase.xml.gz";

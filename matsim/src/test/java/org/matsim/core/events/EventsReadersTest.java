@@ -20,10 +20,14 @@
 
 package org.matsim.core.events;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -43,10 +47,15 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
-public class EventsReadersTest extends MatsimTestCase {
+
+public class EventsReadersTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 
 	static class TestHandler implements ActivityEndEventHandler, PersonDepartureEventHandler, VehicleEntersTrafficEventHandler,
@@ -134,24 +143,24 @@ public class EventsReadersTest extends MatsimTestCase {
 
 	}
 
-	public final void testXmlReader() throws SAXException, ParserConfigurationException, IOException {
+	@Test public final void testXmlReader() throws SAXException, ParserConfigurationException, IOException {
 		EventsManager events = EventsUtils.createEventsManager();
 		TestHandler handler = new TestHandler();
 		events.addHandler(handler);
 		events.initProcessing();
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.readFile(getClassInputDirectory() + "events.xml");
+		reader.readFile(utils.getClassInputDirectory() + "events.xml");
 		events.finishProcessing();
 		assertEquals("number of read events", 8, handler.eventCounter);
 	}
 
-	public final void testAutoFormatReaderXml() {
+	@Test public final void testAutoFormatReaderXml() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TestHandler handler = new TestHandler();
 		events.addHandler(handler);
 		events.initProcessing();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(getClassInputDirectory() + "events.xml");
+		reader.readFile(utils.getClassInputDirectory() + "events.xml");
 		events.finishProcessing();
 		assertEquals("number of read events", 8, handler.eventCounter);
 	}

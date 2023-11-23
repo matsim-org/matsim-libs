@@ -29,7 +29,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.vis.otfvis.caching.SceneLayer;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.snapshotwriters.VisLink;
@@ -61,7 +62,7 @@ public class OTFConnectionManager implements Serializable {
 
 	private static final long serialVersionUID = 6481835753628883014L;
 
-	private static final Logger log = Logger.getLogger(OTFConnectionManager.class);
+	private static final Logger log = LogManager.getLogger(OTFConnectionManager.class);
 
 	public OTFConnectionManager() {
 		

@@ -20,7 +20,8 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -44,7 +45,7 @@ import java.util.Random;
  * Represents a node in the QSimulation.
  */
 final class QNodeImpl extends AbstractQNode {
-	private static final Logger log = Logger.getLogger(QNodeImpl.class);
+	private static final Logger log = LogManager.getLogger(QNodeImpl.class);
 	public static class Builder {
 		private final NetsimInternalInterface netsimEngine;
 		private final NetsimEngineContext context;

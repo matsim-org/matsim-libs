@@ -20,7 +20,14 @@
 
 package org.matsim.analysis;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -44,12 +51,14 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 
-public class CalcLegTimesTest extends MatsimTestCase {
+public class CalcLegTimesTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	public static final String BASE_FILE_NAME = "legdurations.txt";
 	public final Id<Person> DEFAULT_PERSON_ID = Id.create(123, Person.class);
@@ -58,10 +67,8 @@ public class CalcLegTimesTest extends MatsimTestCase {
 	private Population population = null;
 	private Network network = null;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		super.loadConfig(null);
+	@Before public void setUp() {
+		utils.loadConfig((String)null);
 
 		MutableScenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.population = s.getPopulation();
@@ -90,14 +97,12 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		this.network.addLink(link);
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	@After public void tearDown() {
 		this.population = null;
 		this.network = null;
 	}
 
-	public void testNoEvents() throws IOException {
+	@Test public void testNoEvents() throws IOException {
 
 		CalcLegTimes testee = new CalcLegTimes();
 
@@ -109,7 +114,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		this.runTest(testee);
 	}
 
-	public void testAveraging() throws IOException {
+	@Test public void testAveraging() throws IOException {
 
 		CalcLegTimes testee = new CalcLegTimes();
 
@@ -125,7 +130,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
 				.seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 		testee.handleEvent(new ActivityStartEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act2", null));
-		
+
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("07:00:00"));
 		leg.setTravelTime( Time.parseTime("07:10:00") - leg.getDepartureTime().seconds());
@@ -143,7 +148,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
 				.seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 		testee.handleEvent(new ActivityStartEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act4", null));
-		
+
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("30:12:00"));
 		leg.setTravelTime( Time.parseTime("30:12:01") - leg.getDepartureTime().seconds());
@@ -158,10 +163,10 @@ public class CalcLegTimesTest extends MatsimTestCase {
 
 	private void runTest( CalcLegTimes calcLegTimes ) throws IOException {
 
-		calcLegTimes.writeStats(this.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME);
+		calcLegTimes.writeStats(utils.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME);
 
-		Assert.assertEquals(readResult(this.getInputDirectory() + CalcLegTimesTest.BASE_FILE_NAME),
-				readResult(this.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME));
+		Assert.assertEquals(readResult(utils.getInputDirectory() + CalcLegTimesTest.BASE_FILE_NAME),
+				readResult(utils.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME));
 
 	}
 

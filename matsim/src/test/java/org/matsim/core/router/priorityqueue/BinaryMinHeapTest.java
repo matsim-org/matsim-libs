@@ -25,7 +25,8 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,7 +35,7 @@ import org.junit.Test;
  */
 public class BinaryMinHeapTest {
 	
-	protected static final Logger log = Logger.getLogger(BinaryMinHeapTest.class);
+	protected static final Logger log = LogManager.getLogger(BinaryMinHeapTest.class);
 	
 	private int maxElements = 10;
 	

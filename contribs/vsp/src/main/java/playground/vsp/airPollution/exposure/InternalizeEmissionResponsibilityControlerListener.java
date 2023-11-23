@@ -20,7 +20,8 @@
 
 package playground.vsp.airPollution.exposure;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
@@ -40,7 +41,7 @@ import com.google.inject.Inject;
  *
  */
 public class InternalizeEmissionResponsibilityControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
-	private static final Logger logger = Logger.getLogger(InternalizeEmissionResponsibilityControlerListener.class);
+	private static final Logger logger = LogManager.getLogger(InternalizeEmissionResponsibilityControlerListener.class);
 
 	private final Double timeBinSize;
 

@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PC2Parking;
-import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
 import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.IntegerValueHashMap;
@@ -47,8 +46,8 @@ import org.matsim.core.utils.misc.OptionalTime;
 public final class ParkingChoiceSimulation
 		implements PersonDepartureEventHandler, PersonArrivalEventHandler, ActivityEndEventHandler {
 
-	
-	
+
+
 	private ParkingInfrastructure parkingInfrastructureManager;
 	private Scenario scenario;
 	private IntegerValueHashMap<Id<Person>> currentPlanElementIndex;
@@ -62,7 +61,6 @@ public final class ParkingChoiceSimulation
 
 	@Override
 	public void reset(int iteration) {
-		DebugLib.emptyFunctionForSettingBreakPoint();
 	}
 
 	@Override
@@ -80,7 +78,6 @@ public final class ParkingChoiceSimulation
 			}
 
 			if (isFirstCarDepartureOfDay(event.getPersonId())) {
-				DebugLib.emptyFunctionForSettingBreakPoint();
 				ParkingOperationRequestAttributes parkingAttributes = new ParkingOperationRequestAttributes();
 				parkingAttributes.personId = event.getPersonId();
 				// this is a trick to get the correct departure time
@@ -132,25 +129,25 @@ public final class ParkingChoiceSimulation
 
 				double endTime= activityBeforeNextCarLeg.getEndTime().seconds();
 				double parkingDuration=0;
-				
+
 				if (endTime==Double.NEGATIVE_INFINITY || endTime==Double.POSITIVE_INFINITY){
 					// try to estimate parking duration
-					
+
 					Person person = scenario.getPopulation().getPersons().get(personId);
 					List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
-					
+
 					for (int i = currentPlanElementIndex.get(personId); i < planElements.size(); i++) {
 						if (planElements.get(i) instanceof Activity) {
 							parkingDuration+= ((Activity)planElements.get(i)).getMaximumDuration().seconds();
 						}
-						
+
 						if (planElements.get(i) == activityBeforeNextCarLeg) {
 							endTime=event.getTime()+parkingDuration;
 							break;
 						}
 					}
 				}
-				
+
 				parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(event.getTime(),
 						endTime);
 			}
@@ -173,7 +170,7 @@ public final class ParkingChoiceSimulation
 
 		currentPlanElementIndex.increment(personId);
 	}
-	
+
 	private boolean isNotTransitAgent(Id<Person> persondId) {
 		return (Integer.parseInt(persondId.toString())< 1000000000);
 	}
@@ -185,7 +182,6 @@ public final class ParkingChoiceSimulation
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			if (PopulationUtils.hasCarLeg(person.getSelectedPlan()) && isNotTransitAgent(person.getId())) {
-				DebugLib.traceAgent(person.getId());
 				ParkingOperationRequestAttributes parkingAttributes = new ParkingOperationRequestAttributes();
 
 				Activity firstActivityOfDayBeforeDepartingWithCar = PopulationUtils
@@ -220,11 +216,11 @@ public final class ParkingChoiceSimulation
 
 	private boolean isFirstCarDepartureOfDay(Id<Person> personId) {
 		Person person = scenario.getPopulation().getPersons().get(personId);
-		
+
 		if (person==null){
-			DebugLib.stopSystemAndReportInconsistency();
+			throw new Error("system is in inconsistent state");
 		}
-		
+
 		List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
 		for (int i = currentPlanElementIndex.get(personId) - 1; i >= 0; i--) {
 			if (planElements.get(i) instanceof Leg) {

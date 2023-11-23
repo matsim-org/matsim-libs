@@ -30,7 +30,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -61,7 +62,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.selectors.highestweight
  */
 public class FullyExploredPlansProvider {
 	private static final Logger log =
-		Logger.getLogger(FullyExploredPlansProvider.class);
+		LogManager.getLogger(FullyExploredPlansProvider.class);
 
 	private static final String CACHE_DIRECTORY = "test/output/cache/"+FullyExploredPlansProvider.class.getName()+"/";
 

@@ -35,12 +35,11 @@ import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ArgumentParser;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.TransimsSnapshotWriter;
 
-import static org.matsim.core.config.groups.ControlerConfigGroup.*;
+import static org.matsim.core.config.groups.ControllerConfigGroup.*;
 
 /**
  * Converts  an events file to a snapshot file.
@@ -190,7 +189,7 @@ public class Events2Snapshot {
 		this.events = EventsUtils.createEventsManager();
 
 		// create SnapshotGenerator
-		this.visualizer = new SnapshotGenerator(this.network, this.config.qsim().getSnapshotPeriod(), 
+		this.visualizer = new SnapshotGenerator(this.network, this.config.qsim().getSnapshotPeriod(),
 				this.config.qsim());
 		this.events.addHandler(this.visualizer);
 	}
@@ -205,7 +204,7 @@ public class Events2Snapshot {
 			this.visualizer.addSnapshotWriter(this.writer);
 		}
 
-		Collection<SnapshotFormat> snapshotFormats = this.config.controler().getSnapshotFormat();
+		Collection<SnapshotFormat> snapshotFormats = this.config.controller().getSnapshotFormat();
 
 		for( SnapshotFormat snapshotFormat : snapshotFormats ){
 			switch( snapshotFormat ){

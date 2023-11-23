@@ -23,7 +23,8 @@ package org.matsim.contrib.locationchoice.frozenepsilons;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -40,7 +41,7 @@ import org.matsim.facilities.ActivityOption;
 class EventsToFacilityLoad implements ActivityStartEventHandler, ActivityEndEventHandler {
 
 	private TreeMap<Id, FacilityPenalty> facilityPenalties;
-	private final static Logger log = Logger.getLogger(EventsToFacilityLoad.class);
+	private final static Logger log = LogManager.getLogger(EventsToFacilityLoad.class);
 
 	EventsToFacilityLoad( final ActivityFacilities facilities, TreeMap<Id, FacilityPenalty> facilityPenalties, FrozenTastesConfigGroup config ) {
 		this.facilityPenalties = facilityPenalties;

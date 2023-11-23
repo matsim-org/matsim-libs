@@ -27,10 +27,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -65,7 +66,7 @@ import org.matsim.core.utils.misc.OptionalTime;
 public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler,
 		PersonDepartureEventHandler, PersonStuckEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
-	private static final Logger log = Logger.getLogger(EarliestLinkExitTimeProvider.class);
+	private static final Logger log = LogManager.getLogger(EarliestLinkExitTimeProvider.class);
 
 	/*
 	 * We have to create an internal TransportModeProvider and delegate the events to it.
@@ -166,7 +167,7 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 	public void handleEvent(LinkLeaveEvent event) {
 		this.removeEarliestLinkExitTimesAtTime(delegate.getDriverOfVehicle(event.getVehicleId()));
 	}
-	
+
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		this.transportModeProvider.handleEvent(event);

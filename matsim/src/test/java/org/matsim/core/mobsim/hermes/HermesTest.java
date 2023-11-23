@@ -73,7 +73,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.testcases.utils.LogCounter;
 
@@ -143,8 +143,8 @@ public class HermesTest {
 
 		/* finish */
 		Assert.assertEquals("wrong number of link enter events.", 2, collector.events.size());
-		Assert.assertEquals("wrong time in first event.", 6.0*3600, collector.events.get(0).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in second event.", 6.0*3600 + 11, collector.events.get(1).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in first event.", 6.0*3600, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in second event.", 6.0*3600 + 11, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON);
 	}
 
 
@@ -180,7 +180,7 @@ public class HermesTest {
 			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		}
 		f.plans.addPerson(person);
-		
+
 		/* build events */
 		EventsManager events = EventsUtils.createEventsManager();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
@@ -191,8 +191,8 @@ public class HermesTest {
 //
 //		/* finish */
 		Assert.assertEquals("wrong number of link enter events.", 2, collector.events.size());
-		Assert.assertEquals("wrong time in first event.", 6.0*3600, collector.events.get(0).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in second event.", 6.0*3600 + 11, collector.events.get(1).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in first event.", 6.0*3600, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in second event.", 6.0*3600 + 11, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -231,10 +231,10 @@ public class HermesTest {
 
 		/* finish */
 		Assert.assertEquals("wrong number of link enter events.", 4, collector.events.size());
-		Assert.assertEquals("wrong time in first event.", 6.0*3600, collector.events.get(0).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in second event.", 6.0*3600 + 11, collector.events.get(1).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in first event.", 7.0*3600, collector.events.get(2).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in second event.", 7.0*3600 + 11, collector.events.get(3).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in first event.", 6.0*3600, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in second event.", 6.0*3600 + 11, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in first event.", 7.0*3600, collector.events.get(2).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in second event.", 7.0*3600 + 11, collector.events.get(3).getTime(), MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -275,10 +275,10 @@ public class HermesTest {
 		Assert.assertEquals("wrong type of event.", TeleportationArrivalEvent.class, allEvents.get(2).getClass());
 		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(3).getClass());
 		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(4).getClass());
-		Assert.assertEquals("wrong time in event.", 6.0 * 3600 + 0, allEvents.get(0).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in event.", 6.0 * 3600 + 0, allEvents.get(1).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in event.", 6.0 * 3600 + 13, allEvents.get(2).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in event.", 6.0 * 3600 + 13, allEvents.get(3).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in event.", 6.0 * 3600 + 0, allEvents.get(0).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in event.", 6.0 * 3600 + 0, allEvents.get(1).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in event.", 6.0 * 3600 + 13, allEvents.get(2).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in event.", 6.0 * 3600 + 13, allEvents.get(3).getTime(), MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -318,8 +318,8 @@ public class HermesTest {
 
 		/* finish */
 		Assert.assertEquals("wrong number of link enter events.", 2, collector.events.size());
-		Assert.assertEquals("wrong time in first event.", 0.0*3600, collector.events.get(0).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in second event.", 0.0*3600 + 11, collector.events.get(1).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in first event.", 0.0*3600, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in second event.", 0.0*3600 + 11, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -378,19 +378,19 @@ public class HermesTest {
 		Assert.assertEquals("wrong type of 8th event.", ActivityStartEvent.class, allEvents.get(7).getClass());
 
 
-		Assert.assertEquals("wrong time in 1st event.", 6.0*3600 + 0, allEvents.get(0).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in 2nd event.", 6.0*3600 + 0, allEvents.get(1).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in 3rd event.", 6.0*3600 + 0, allEvents.get(2).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in 4th event.", 6.0*3600 + 0, allEvents.get(3).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in 1st event.", 6.0*3600 + 0, allEvents.get(0).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in 2nd event.", 6.0*3600 + 0, allEvents.get(1).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in 3rd event.", 6.0*3600 + 0, allEvents.get(2).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in 4th event.", 6.0*3600 + 0, allEvents.get(3).getTime(), MatsimTestUtils.EPSILON);
 
 		Assert.assertEquals("wrong time in 5th event.", 6.0 * 3600 + 0, allEvents.get(4).getTime(),
-				MatsimTestCase.EPSILON);
+				MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong time in 6th event.", 6.0 * 3600 + 0, allEvents.get(5).getTime(),
-				MatsimTestCase.EPSILON);
+				MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong time in 7th event.", 6.0 * 3600 + 0, allEvents.get(6).getTime(),
-				MatsimTestCase.EPSILON);
+				MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong time in 8th event.", 6.0 * 3600 + 0, allEvents.get(7).getTime(),
-				MatsimTestCase.EPSILON);
+				MatsimTestUtils.EPSILON);
 
 
 		Assert.assertEquals("wrong link in 1st event.", f.link1.getId(), ((ActivityEndEvent) allEvents.get(0)).getLinkId() );
@@ -669,8 +669,8 @@ public class HermesTest {
 		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(9).getClass()); // link4
 		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(10).getClass());
 		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(11).getClass()); // link1 again
-		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(12).getClass());	
-		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(13).getClass());	
+		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(12).getClass());
+		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(13).getClass());
 		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(14).getClass());
 		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(15).getClass());
 	}
@@ -846,8 +846,8 @@ public class HermesTest {
 		Hermes sim = createHermes(scenario, events);
 		HermesConfigGroup.SIM_STEPS = 11 * 3600;
 		sim.run();
-		Assert.assertEquals(7.0*3600, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals(11.0*3600, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals(7.0*3600, collector.firstEvent.getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(11.0*3600, collector.lastEvent.getTime(), MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -940,7 +940,7 @@ public class HermesTest {
 		Hermes sim = createHermes(scenario, events);
 		HermesConfigGroup.SIM_STEPS = (int) simEndTime;
 		sim.run();
-		Assert.assertEquals(simEndTime, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals(simEndTime, collector.lastEvent.getTime(), MatsimTestUtils.EPSILON);
 		// besides this, the important thing is that no (Runtime)Exception is thrown during this test
 	}
 

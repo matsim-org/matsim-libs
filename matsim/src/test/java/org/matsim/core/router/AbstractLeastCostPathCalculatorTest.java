@@ -20,6 +20,14 @@
 
 package org.matsim.core.router;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -30,23 +38,24 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
 
 /**
  * @author mrieser
  */
-public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase {
+public abstract class AbstractLeastCostPathCalculatorTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	protected abstract LeastCostPathCalculator getLeastCostPathCalculator(final Network network);
 
 	private static final String MODE_RESTRICTION_NOT_SUPPORTED = "Router algo does not support mode restrictions. ";
 
-	public void testCalcLeastCostPath_Normal() throws SAXException, ParserConfigurationException, IOException {
-		Config config = loadConfig(null);
+	@Test public void testCalcLeastCostPath_Normal() throws SAXException, ParserConfigurationException, IOException {
+		Config config = utils.loadConfig((String)null);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
@@ -67,8 +76,8 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		assertEquals(network.getLinks().get(Id.create("22", Link.class)), path.links.get(2));
 	}
 
-	public void testCalcLeastCostPath_SameFromTo() throws SAXException, ParserConfigurationException, IOException {
-		Scenario scenario = ScenarioUtils.createScenario(loadConfig(null));
+	@Test public void testCalcLeastCostPath_SameFromTo() throws SAXException, ParserConfigurationException, IOException {
+		Scenario scenario = ScenarioUtils.createScenario(utils.loadConfig((String)null));
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
 		Node node12 = network.getNodes().get(Id.create("12", Node.class));

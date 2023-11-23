@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.roadpricing;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -40,7 +41,7 @@ public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme
 	// needs to be public. kai, sep'14
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(RoadPricingSchemeUsingTollFactor.class);
+	private static final Logger log = LogManager.getLogger(RoadPricingSchemeUsingTollFactor.class);
 
 	private RoadPricingScheme delegate;
 	private final TollFactor tollFactor;

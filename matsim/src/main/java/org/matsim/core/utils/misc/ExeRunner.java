@@ -30,7 +30,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -40,7 +41,7 @@ import org.apache.log4j.Logger;
  */
 public abstract class ExeRunner {
 
-	/*package*/ final static Logger log = Logger.getLogger(ExeRunner.class);
+	/*package*/ final static Logger log = LogManager.getLogger(ExeRunner.class);
 
 	/**
 	 * Runs an executable and waits until the executable finishes or until

@@ -41,7 +41,7 @@ import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.testcases.MatsimTestUtils;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
  * Tests that the re-planning process of MATSim generates the same results every time, even when
@@ -69,26 +69,26 @@ public class DeterministicMultithreadedReplanningIT {
 	public void testTimeAllocationMutator() {
 		int lastIteration = 5;
 		Config config = testUtils.loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setLastIteration(lastIteration);
+		config.controller().setLastIteration(lastIteration);
 		config.global().setNumberOfThreads(4); // just use any number > 1
 
 
 		{
 			StrategyManager strategyManager = new StrategyManager();
-			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "/run1/");
+			config.controller().setOutputDirectory(testUtils.getOutputDirectory() + "/run1/");
 			TestControler controler = new TestControler(config, strategyManager);
 			PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new TimeAllocationMutatorModule(TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario() ), config.plans(), config.timeAllocationMutator(), config.global()) );
+			strategy.addStrategyModule(new TimeAllocationMutatorModule( config.timeAllocationMutator(), config.global()) );
 			strategyManager.addStrategy( strategy, null, 1.0 );
 			controler.run();
 		}
 
 		{
 			StrategyManager strategyManager = new StrategyManager();
-			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "/run2/");
+			config.controller().setOutputDirectory(testUtils.getOutputDirectory() + "/run2/");
 			TestControler controler = new TestControler(config, strategyManager);
 			PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new TimeAllocationMutatorModule(TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario() ), config.plans(), config.timeAllocationMutator(), config.global()) );
+			strategy.addStrategyModule(new TimeAllocationMutatorModule(config.timeAllocationMutator(), config.global()) );
 			strategyManager.addStrategy( strategy, null, 1.0 );
 			controler.run();
 		}
@@ -116,7 +116,7 @@ public class DeterministicMultithreadedReplanningIT {
 	public void testReRouteTimeAllocationMutator() {
 		int lastIteration = 5;
 		Config config = testUtils.loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setLastIteration(lastIteration);
+		config.controller().setLastIteration(lastIteration);
 		config.global().setNumberOfThreads(4); // just use any number > 1
 
 		{
@@ -126,10 +126,10 @@ public class DeterministicMultithreadedReplanningIT {
 			PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			strategyManager.addStrategy( strategy, null, 1.0 );
 
-			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "/run1/");
+			config.controller().setOutputDirectory(testUtils.getOutputDirectory() + "/run1/");
 			TestControler controler = new TestControler(config, strategyManager);
 			strategy.addStrategyModule(new ReRoute(controler.getScenario(), TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario()), TimeInterpretation.create(config))); // finish strategy configuration
-			strategy.addStrategyModule(new TimeAllocationMutatorModule(TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario() ), config.plans(), config.timeAllocationMutator(), config.global()) );
+			strategy.addStrategyModule(new TimeAllocationMutatorModule( config.timeAllocationMutator(), config.global()) );
 			controler.run();
 		}
 		{
@@ -139,28 +139,28 @@ public class DeterministicMultithreadedReplanningIT {
 			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
 			strategyManager2.addStrategy( strategy2, null, 1.0 );
 
-			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "/run2/");
+			config.controller().setOutputDirectory(testUtils.getOutputDirectory() + "/run2/");
 			TestControler controler2 = new TestControler(config, strategyManager2);
 			strategy2.addStrategyModule(new ReRoute(controler2.getScenario(), TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler2.getScenario()), TimeInterpretation.create(config))); // finish strategy configuration
-			strategy2.addStrategyModule(new TimeAllocationMutatorModule(TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler2.getScenario() ), config.plans(), config.timeAllocationMutator(), config.global()) );
+			strategy2.addStrategyModule(new TimeAllocationMutatorModule(config.timeAllocationMutator(), config.global()) );
 			controler2.run();
 		}
 
 		for (int i = 0; i <= lastIteration; i++) {
-			
+
 			long cksum1 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".events.xml.gz");
 			long cksum2 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".events.xml.gz");
-			
+
 			Assert.assertEquals("The checksums of events must be the same in iteration " + i + ", even when multiple threads are used.", cksum1, cksum2);
 		}
-		
+
 		for (int i = 0; i < 2; i++) {
 			long pcksum1 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run1/ITERS/it."+ i +"/"+ i +".plans.xml.gz");
 			long pcksum2 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "/run2/ITERS/it."+ i +"/"+ i +".plans.xml.gz");
 			Assert.assertEquals("The checksums of plans must be the same in iteration " + i + ", even when multiple threads are used.", pcksum1, pcksum2);
 		}
 	}
-	
+
 	/**
 	 * Tests that the generic {@link ReRoute} generates always the same results
 	 * REGARDLESS the number of threads using only one agent.
@@ -172,7 +172,7 @@ public class DeterministicMultithreadedReplanningIT {
 		Config config = testUtils.loadConfig("test/scenarios/equil/config.xml");
 		// yy this seems to be taking the input from the matsim-examples module.  No idea by what automagic it ends up there.  kai, feb'19
 
-		config.controler().setLastIteration(lastIteration);
+		config.controller().setLastIteration(lastIteration);
 		config.global().setNumberOfThreads(4); // just use any number > 1
 		config.plans().setInputFile(IOUtils.extendUrl(testUtils.classInputResourcePath(), "plans1.xml").toString());
 		{
@@ -181,7 +181,7 @@ public class DeterministicMultithreadedReplanningIT {
 			StrategyManager strategyManager = new StrategyManager();
 			strategyManager.addStrategy( strategy, null, 1.0 );
 
-			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "/run1/");
+			config.controller().setOutputDirectory(testUtils.getOutputDirectory() + "/run1/");
 			TestControler controler = new TestControler(config, strategyManager);
 			strategy.addStrategyModule(new ReRoute(controler.getScenario(), TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario()), TimeInterpretation.create(config)));
 			controler.run();
@@ -193,7 +193,7 @@ public class DeterministicMultithreadedReplanningIT {
 			StrategyManager strategyManager2 = new StrategyManager();
 			strategyManager2.addStrategy( strategy2, null, 1.0 );
 
-			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "/run2/");
+			config.controller().setOutputDirectory(testUtils.getOutputDirectory() + "/run2/");
 			TestControler controler2 = new TestControler(config, strategyManager2);
 			strategy2.addStrategyModule(new ReRoute(controler2.getScenario(), TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler2.getScenario()), TimeInterpretation.create(config)));
 
@@ -224,7 +224,7 @@ public class DeterministicMultithreadedReplanningIT {
 	public void testReRoute() {
 		int lastIteration = 5;
 		Config config = testUtils.loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setLastIteration(lastIteration);
+		config.controller().setLastIteration(lastIteration);
 		config.global().setNumberOfThreads(4); // just use any number > 1
 
 		{
@@ -233,7 +233,7 @@ public class DeterministicMultithreadedReplanningIT {
 			StrategyManager strategyManager = new StrategyManager();
 			strategyManager.addStrategy( strategy, null, 1.0 );
 
-			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "/run1/");
+			config.controller().setOutputDirectory(testUtils.getOutputDirectory() + "/run1/");
 			TestControler controler = new TestControler(config, strategyManager);
 			strategy.addStrategyModule(new ReRoute(controler.getScenario(), TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario()), TimeInterpretation.create(config)));
 			controler.run();
@@ -246,7 +246,7 @@ public class DeterministicMultithreadedReplanningIT {
 			StrategyManager strategyManager2 = new StrategyManager();
 			strategyManager2.addStrategy( strategy2, null, 1.0 );
 
-			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "/run2/");
+			config.controller().setOutputDirectory(testUtils.getOutputDirectory() + "/run2/");
 			TestControler controler2 = new TestControler(config, strategyManager2);
 			strategy2.addStrategyModule(new ReRoute(controler2.getScenario(), TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler2.getScenario()), TimeInterpretation.create(config)));
 			controler2.run();
@@ -275,7 +275,7 @@ public class DeterministicMultithreadedReplanningIT {
 	private static class TestControler {
 		Controler controler ;
 
-		private StrategyManager manager;
+		private final StrategyManager manager;
 
 		public TestControler(final Config config, final StrategyManager manager) {
 			this( ScenarioUtils.loadScenario( config ) , manager );
@@ -283,9 +283,9 @@ public class DeterministicMultithreadedReplanningIT {
 
 		public TestControler(final Scenario scenario, final StrategyManager manager) {
 			controler = new Controler( scenario ) ;
-			controler.getConfig().controler().setCreateGraphs(false);
-			controler.getConfig().controler().setWriteEventsInterval(1);
-			controler.getConfig().controler().setDumpDataAtEnd(false);
+			controler.getConfig().controller().setCreateGraphs(false);
+			controler.getConfig().controller().setWriteEventsInterval(1);
+			controler.getConfig().controller().setDumpDataAtEnd(false);
 			this.manager = manager ;
 			controler.addOverridingModule(new AbstractModule() {
                 @Override

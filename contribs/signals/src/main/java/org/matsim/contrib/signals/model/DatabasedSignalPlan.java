@@ -34,7 +34,7 @@ import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
  *
  */
 public final class DatabasedSignalPlan implements SignalPlan {
-//	private static final Logger log = Logger.getLogger(DatabasedSignalPlan.class);
+//	private static final Logger log = LogManager.getLogger(DatabasedSignalPlan.class);
 	
 	private SignalPlanData data;
 	private int cycle;

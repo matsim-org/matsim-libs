@@ -18,12 +18,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.ev.routing;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -32,17 +26,17 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.common.util.StraightLineKnnFinder;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.VehicleChargingHandler;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
+import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.fleet.ElectricVehicleImpl;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
-import org.matsim.contrib.common.util.StraightLineKnnFinder;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
@@ -55,6 +49,9 @@ import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
+import org.matsim.vehicles.Vehicle;
+
+import java.util.*;
 
 /**
  * This network Routing module adds stages for re-charging into the Route.
@@ -64,7 +61,7 @@ import org.matsim.facilities.Facility;
  * @author jfbischoff
  */
 
-public final class EvNetworkRoutingModule implements RoutingModule {
+final class EvNetworkRoutingModule implements RoutingModule {
 
 	private final String mode;
 
@@ -80,7 +77,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 	private final String vehicleSuffix;
 	private final EvConfigGroup evConfigGroup;
 
-	public EvNetworkRoutingModule(final String mode, final Network network, RoutingModule delegate,
+	EvNetworkRoutingModule(final String mode, final Network network, RoutingModule delegate,
 			ElectricFleetSpecification electricFleet,
 			ChargingInfrastructureSpecification chargingInfrastructureSpecification, TravelTime travelTime,
 			DriveEnergyConsumption.Factory driveConsumptionFactory, AuxEnergyConsumption.Factory auxConsumptionFactory,
@@ -107,7 +104,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 		final Person person = request.getPerson();
 
 		List<? extends PlanElement> basicRoute = delegate.calcRoute(request);
-		Id<ElectricVehicle> evId = Id.create(person.getId() + vehicleSuffix, ElectricVehicle.class);
+		Id<Vehicle> evId = Id.create(person.getId() + vehicleSuffix, Vehicle.class);
 		if (!electricFleet.getVehicleSpecifications().containsKey(evId)) {
 			return basicRoute;
 		} else {
@@ -158,9 +155,12 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 					stagedRoute.add(lastLeg);
 					Activity chargeAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(selectedChargerLink.getCoord(),
 							selectedChargerLink.getId(), stageActivityModePrefix);
-					double maxPowerEstimate = Math.min(selectedCharger.getPlugPower(), ev.getBatteryCapacity() / 3.6);
+					// createStageActivity... creates a InteractionActivity where duration cannot be set.
+					chargeAct = PopulationUtils.createActivity(chargeAct);
+					// assume that the battery is compatible with a power that allows for full charge within one hour (cf. FixedSpeedCharging)
+					double maxPowerEstimate = Math.min(selectedCharger.getPlugPower(), ev.getBatteryCapacity() / 3600);
 					double estimatedChargingTime = (ev.getBatteryCapacity() * 1.5) / maxPowerEstimate;
-					chargeAct.setMaximumDuration(Math.max(evConfigGroup.getMinimumChargeTime(), estimatedChargingTime));
+					chargeAct.setMaximumDuration(Math.max(evConfigGroup.minimumChargeTime, estimatedChargingTime));
 					lastArrivaltime += chargeAct.getMaximumDuration().seconds();
 					stagedRoute.add(chargeAct);
 					lastFrom = nexttoFacility;
@@ -178,25 +178,20 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 		Map<Link, Double> consumptions = new LinkedHashMap<>();
 		NetworkRoute route = (NetworkRoute)basicLeg.getRoute();
 		List<Link> links = NetworkUtils.getLinks(network, route.getLinkIds());
-		ElectricVehicle pseudoVehicle = ElectricVehicleImpl.create(ev, driveConsumptionFactory, auxConsumptionFactory,
+		ElectricVehicle pseudoVehicle = ElectricFleetUtils.create(ev, driveConsumptionFactory, auxConsumptionFactory,
 				v -> charger -> {
 					throw new UnsupportedOperationException();
-				});
+				} );
 		DriveEnergyConsumption driveEnergyConsumption = pseudoVehicle.getDriveEnergyConsumption();
 		AuxEnergyConsumption auxEnergyConsumption = pseudoVehicle.getAuxEnergyConsumption();
-		double lastSoc = pseudoVehicle.getBattery().getSoc();
 		double linkEnterTime = basicLeg.getDepartureTime().seconds();
 		for (Link l : links) {
 			double travelT = travelTime.getLinkTravelTime(l, basicLeg.getDepartureTime().seconds(), null, null);
 
 			double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, linkEnterTime)
 					+ auxEnergyConsumption.calcEnergyConsumption(basicLeg.getDepartureTime().seconds(), travelT, l.getId());
-			pseudoVehicle.getBattery().changeSoc(-consumption);
-			double currentSoc = pseudoVehicle.getBattery().getSoc();
 			// to accomodate for ERS, where energy charge is directly implemented in the consumption model
-			double consumptionDiff = (lastSoc - currentSoc);
-			lastSoc = currentSoc;
-			consumptions.put(l, consumptionDiff);
+			consumptions.put(l, consumption);
 			linkEnterTime += travelT;
 		}
 		return consumptions;

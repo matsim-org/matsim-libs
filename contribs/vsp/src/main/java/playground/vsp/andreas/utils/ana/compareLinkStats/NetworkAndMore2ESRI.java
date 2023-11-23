@@ -19,7 +19,8 @@
 
 package playground.vsp.andreas.utils.ana.compareLinkStats;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -34,7 +35,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class NetworkAndMore2ESRI extends Links2ESRIShape{
 
-	private static Logger log = Logger.getLogger(Links2ESRIShape.class);
+	private static Logger log = LogManager.getLogger(Links2ESRIShape.class);
 
 	public NetworkAndMore2ESRI(Network network, String filename) {
 		super(network, filename, "DHDN_GK4");

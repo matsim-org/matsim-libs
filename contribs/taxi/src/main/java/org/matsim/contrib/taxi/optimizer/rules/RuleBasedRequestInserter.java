@@ -79,30 +79,25 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 	}
 
 	private boolean isReduceTP(Collection<DrtRequest> unplannedRequests) {
-		switch (params.getGoal()) {
-			case MIN_PICKUP_TIME:
-				return true;
+		return switch (params.goal) {
+			case MIN_PICKUP_TIME -> true;
 
-			case MIN_WAIT_TIME:
-				return false;
+			case MIN_WAIT_TIME -> false;
 
-			case DEMAND_SUPPLY_EQUIL:
+			case DEMAND_SUPPLY_EQUIL -> {
 				double now = timer.getTimeOfDay();
 				long awaitingReqCount = unplannedRequests.stream()
 						.filter(r -> ((PassengerRequest)r).getEarliestStartTime() <= now)//urgent requests
 						.count();
-				return awaitingReqCount > idleTaxiRegistry.getVehicleCount();
-
-			default:
-				throw new IllegalStateException();
-		}
+				yield awaitingReqCount > idleTaxiRegistry.getVehicleCount();}
+		};
 	}
 
 	// request-initiated scheduling
 	private void scheduleUnplannedRequestsImpl(Collection<DrtRequest> unplannedRequests) {
 		// vehicles are not immediately removed so calculate 'idleCount' locally
 		int idleCount = idleTaxiRegistry.getVehicleCount();
-		int nearestVehiclesLimit = params.getNearestVehiclesLimit();
+		int nearestVehiclesLimit = params.nearestVehiclesLimit;
 
 		Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
 		while (reqIter.hasNext() && idleCount > 0) {
@@ -134,7 +129,7 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 
 	// vehicle-initiated scheduling
 	private void scheduleIdleVehiclesImpl(Collection<DrtRequest> unplannedRequests) {
-		int nearestRequestsLimit = params.getNearestRequestsLimit();
+		int nearestRequestsLimit = params.nearestRequestsLimit;
 		Iterator<DvrpVehicle> vehIter = idleTaxiRegistry.vehicles().iterator();
 		while (vehIter.hasNext() && !unplannedRequests.isEmpty()) {
 			DvrpVehicle veh = vehIter.next();

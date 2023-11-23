@@ -21,7 +21,8 @@ package org.matsim.households;
 
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.misc.Counter;
 
 
@@ -33,7 +34,7 @@ import org.matsim.core.utils.misc.Counter;
 public class HouseholdsStreamingReaderV10 extends AbstractHouseholdsReaderV10 {
 
 	
-	private static final Logger log = Logger.getLogger(HouseholdsStreamingReaderV10.class);
+	private static final Logger log = LogManager.getLogger(HouseholdsStreamingReaderV10.class);
 	
 	private HouseholdsWriterV10 hhWriter;
 	private HouseholdsAlgorithmRunner algoRunner;

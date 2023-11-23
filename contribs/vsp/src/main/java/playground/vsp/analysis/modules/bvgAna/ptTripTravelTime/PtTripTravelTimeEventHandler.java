@@ -22,8 +22,9 @@ package playground.vsp.analysis.modules.bvgAna.ptTripTravelTime;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -47,7 +48,7 @@ import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
  */
 public class PtTripTravelTimeEventHandler implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler{
 	
-	private final Logger log = Logger.getLogger(PtTripTravelTimeEventHandler.class);
+	private final Logger log = LogManager.getLogger(PtTripTravelTimeEventHandler.class);
 //	private final Level logLevel = Level.DEBUG;
 	
 	private PtDriverIdAnalyzer ptDriverIdAnalyzer;

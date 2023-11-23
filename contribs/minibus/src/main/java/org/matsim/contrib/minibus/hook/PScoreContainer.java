@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.hook;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.fare.StageContainer;
 import org.matsim.contrib.minibus.fare.TicketMachineI;
@@ -33,7 +34,7 @@ import org.matsim.vehicles.Vehicle;
 final class PScoreContainer {
 
     @SuppressWarnings("unused")
-    private final static Logger log = Logger.getLogger(PScoreContainer.class);
+    private final static Logger log = LogManager.getLogger(PScoreContainer.class);
 
     private final Id<Vehicle> vehicleId;
     private final TicketMachineI ticketMachine;

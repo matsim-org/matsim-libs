@@ -20,7 +20,8 @@
 package org.matsim.core.scenario;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -35,7 +36,6 @@ import org.matsim.core.network.io.NetworkChangeEventsParser;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.lanes.LanesReader;
@@ -49,6 +49,7 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.vehicles.MatsimVehicleReader;
 
 
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.*;
 
@@ -74,7 +75,7 @@ import static org.matsim.core.config.groups.PlansConfigGroup.PERSON_ATTRIBUTES_D
 // deliberately non-public.  Use method in ScenarioUtils.
 class ScenarioLoaderImpl {
 
-	private static final Logger log = Logger.getLogger(ScenarioLoaderImpl.class);
+	private static final Logger log = LogManager.getLogger(ScenarioLoaderImpl.class);
 
 	private final Config config;
 
@@ -219,7 +220,7 @@ class ScenarioLoaderImpl {
 							"file is used for the 10pct and the 1pct scenario. The material that is still there will follow.  kai, jun'19"
 			);
 
-			final String outputDirectory = this.config.controler().getOutputDirectory();
+			final String outputDirectory = this.config.controller().getOutputDirectory();
 //			final File outDir = new File( outputDirectory );
 //			if ( outDir.exists() && outDir.canWrite() ){
 //				// since ScenarioLoader is supposed to only read material,  there are cases where the output directory does not exist at
@@ -248,26 +249,30 @@ class ScenarioLoaderImpl {
 		if ( (this.config.households() != null) && (this.config.households().getInputFile() != null) ) {
 			URL householdsFile = this.config.households().getInputFileURL(this.config.getContext());
 			log.info("loading households from " + householdsFile);
-			new HouseholdsReaderV10(this.scenario.getHouseholds()).parse(householdsFile);
+			HouseholdsReaderV10 reader = new HouseholdsReaderV10(this.scenario.getHouseholds());
+			reader.putAttributeConverters(this.attributeConverters);
+			reader.parse(householdsFile);
 			log.info("households loaded.");
 		}
 		else {
 			log.info("no households file set in config, not loading households");
 		}
-		final String fn = this.config.households().getInputHouseholdAttributesFile();
-		if ((this.config.households() != null) && ( fn != null)) {
-			if (!this.config.households().isInsistingOnUsingDeprecatedHouseholdsAttributeFile()) {
-				throw new RuntimeException(HouseholdsConfigGroup.HOUSEHOLD_ATTRIBUTES_DEPRECATION_MESSAGE);
-			}
+		if ((this.config.households() != null)) {
+			final String fn = this.config.households().getInputHouseholdAttributesFile();
+			if(( fn != null)) {
+				if (!this.config.households().isInsistingOnUsingDeprecatedHouseholdsAttributeFile()) {
+					throw new RuntimeException(HouseholdsConfigGroup.HOUSEHOLD_ATTRIBUTES_DEPRECATION_MESSAGE);
+				}
 
-			URL householdAttributesFileName = ConfigGroup.getInputFileURL(this.config.getContext(), fn ) ;
-			log.info("loading household attributes from " + householdAttributesFileName);
-			parseObjectAttributesToAttributable(
-					householdAttributesFileName,
-					this.scenario.getHouseholds().getHouseholds().values(),
-					"householdAttributes not empty after going through all households, meaning that it contains material for householdIDs that " +
-							"are not in the container.  This is not necessarily a bug so we will continue, but note that such material " +
-							"will no longer be contained in the output_* files.");
+				URL householdAttributesFileName = ConfigGroup.getInputFileURL(this.config.getContext(), fn ) ;
+				log.info("loading household attributes from " + householdAttributesFileName);
+				parseObjectAttributesToAttributable(
+						householdAttributesFileName,
+						this.scenario.getHouseholds().getHouseholds().values(),
+						"householdAttributes not empty after going through all households, meaning that it contains material for householdIDs that " +
+								"are not in the container.  This is not necessarily a bug so we will continue, but note that such material " +
+								"will no longer be contained in the output_* files.");
+			}
 		}
 		else {
 			log.info("no household-attributes file set in config, not loading any household attributes");
@@ -333,7 +338,7 @@ class ScenarioLoaderImpl {
 		if ( vehiclesFile != null ) {
 			log.info("loading vehicles from " + vehiclesFile );
 			new MatsimVehicleReader(this.scenario.getVehicles()).readURL(IOUtils.extendUrl(this.config.getContext(), vehiclesFile ) );
-		} 
+		}
 		else {
 			log.info("no vehicles file set in config, not loading any vehicles");
 		}

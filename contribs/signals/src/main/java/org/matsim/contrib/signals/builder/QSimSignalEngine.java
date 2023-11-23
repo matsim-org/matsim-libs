@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.builder;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -44,7 +45,7 @@ import org.matsim.contrib.signals.model.SignalSystemsManager;
  */ 
 class QSimSignalEngine implements SignalEngine {
 
-	private static final Logger log = Logger.getLogger(QSimSignalEngine.class);
+	private static final Logger log = LogManager.getLogger(QSimSignalEngine.class);
 
 	private SignalSystemsManager signalManager;
 

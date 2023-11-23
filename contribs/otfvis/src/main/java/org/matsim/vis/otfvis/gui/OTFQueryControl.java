@@ -35,7 +35,8 @@ import javax.swing.JTextField;
 
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServer;
@@ -65,7 +66,7 @@ import org.matsim.vis.otfvis.opengl.queries.QuerySpinne;
  */
 public class OTFQueryControl implements GLEventListener {
 
-	private static final Logger log = Logger.getLogger(OTFQueryControl.class);
+	private static final Logger log = LogManager.getLogger(OTFQueryControl.class);
 
 	private JTextField textField;
 

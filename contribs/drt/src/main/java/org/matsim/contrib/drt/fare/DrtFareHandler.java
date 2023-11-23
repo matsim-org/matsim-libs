@@ -44,6 +44,11 @@ import com.google.inject.Inject;
  * Note that these fares are scored in excess to anything set in the modeparams in the config file.
  */
 public class DrtFareHandler implements DrtRequestSubmittedEventHandler, PassengerDroppedOffEventHandler {
+	public static PersonMoneyEvent createMoneyEvent(PassengerDroppedOffEvent e, double fee, String reference) {
+		return new PersonMoneyEvent(e.getTime(), e.getPersonId(), -fee, PERSON_MONEY_EVENT_PURPOSE_DRT_FARE,
+				e.getMode(), reference);
+	}
+
 	@Inject
 	private EventsManager events;
 
@@ -64,11 +69,11 @@ public class DrtFareHandler implements DrtRequestSubmittedEventHandler, Passenge
 	 */
 	public DrtFareHandler(String mode, DrtFareParams drtFareParams) {
 		this.mode = mode;
-		this.distanceFare_Meter = drtFareParams.getDistanceFare_m();
-		this.baseFare = drtFareParams.getBaseFare();
-		this.minFarePerTrip = drtFareParams.getMinFarePerTrip();
-		this.dailyFee = drtFareParams.getDailySubscriptionFee();
-		this.timeFare_sec = drtFareParams.getTimeFare_h() / 3600.0;
+		this.distanceFare_Meter = drtFareParams.distanceFare_m;
+		this.baseFare = drtFareParams.baseFare;
+		this.minFarePerTrip = drtFareParams.minFarePerTrip;
+		this.dailyFee = drtFareParams.dailySubscriptionFee;
+		this.timeFare_sec = drtFareParams.timeFare_h / 3600.0;
 	}
 
 	DrtFareHandler(String mode, DrtFareParams drtFareParams, EventsManager events) {
@@ -87,8 +92,7 @@ public class DrtFareHandler implements DrtRequestSubmittedEventHandler, Passenge
 		if (event.getMode().equals(mode)) {
 			if (!dailyFeeCharged.contains(event.getPersonId())) {
 				dailyFeeCharged.add(event.getPersonId());
-				events.processEvent(
-						new PersonMoneyEvent(event.getTime(), event.getPersonId(), -dailyFee, PERSON_MONEY_EVENT_PURPOSE_DRT_FARE, mode, PERSON_MONEY_EVENT_REFERENCE_DRT_FARE_DAILY_FEE));
+				events.processEvent(createMoneyEvent(event, dailyFee, PERSON_MONEY_EVENT_REFERENCE_DRT_FARE_DAILY_FEE));
 			}
 
 			DrtRequestSubmittedEvent submission = requestSubmissions.get(event.getRequestId());
@@ -96,8 +100,7 @@ public class DrtFareHandler implements DrtRequestSubmittedEventHandler, Passenge
 					+ timeFare_sec * submission.getUnsharedRideTime()
 					+ baseFare;
 			double actualFare = Math.max(fare, minFarePerTrip);
-			events.processEvent(
-					new PersonMoneyEvent(event.getTime(), event.getPersonId(), -actualFare, PERSON_MONEY_EVENT_PURPOSE_DRT_FARE, mode, event.getRequestId().toString()));
+			events.processEvent(createMoneyEvent(event, actualFare, event.getRequestId() + ""));
 		}
 	}
 

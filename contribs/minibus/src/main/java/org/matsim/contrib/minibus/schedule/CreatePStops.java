@@ -29,7 +29,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -58,7 +59,7 @@ import org.opengis.feature.simple.SimpleFeature;
  */
 public final class CreatePStops{
 	
-	private final static Logger log = Logger.getLogger(CreatePStops.class);
+	private final static Logger log = LogManager.getLogger(CreatePStops.class);
 	
 	private final Network net;
 	private final PConfigGroup pConfigGroup;

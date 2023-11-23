@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.accessibility.osm;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -64,7 +65,7 @@ import java.util.Map;
  * @author dziemke
  */
 class CombinedOsmSink implements Sink {
-	private final Logger log = Logger.getLogger(CombinedOsmSink.class);
+	private final Logger log = LogManager.getLogger(CombinedOsmSink.class);
 	
 	private Map<Long, NodeContainer> nodeMap;
 	private Map<Long, WayContainer> wayMap;

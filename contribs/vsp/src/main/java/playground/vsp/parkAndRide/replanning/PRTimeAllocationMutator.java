@@ -37,7 +37,7 @@ public class PRTimeAllocationMutator extends AbstractMultithreadedModule {
 	public final static String CONFIG_GROUP = "TimeAllocationMutator";
 	public final static String CONFIG_MUTATION_RANGE = "mutationRange";
 
-//	private final static Logger log = Logger.getLogger(TimeAllocationMutator.class);
+//	private final static Logger log = LogManager.getLogger(TimeAllocationMutator.class);
 
 	private Double mutationRange = 1800.;
 	private boolean useActivityDurations = true;

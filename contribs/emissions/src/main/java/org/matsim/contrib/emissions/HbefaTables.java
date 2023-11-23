@@ -24,7 +24,8 @@ package org.matsim.contrib.emissions;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
 import java.io.IOException;
@@ -36,7 +37,7 @@ import java.util.function.Function;
 
 public abstract class HbefaTables {
 
-    private static final Logger logger = Logger.getLogger(HbefaTables.class);
+    private static final Logger logger = LogManager.getLogger(HbefaTables.class);
 
     static Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> loadAverageWarm(URL file) {
 

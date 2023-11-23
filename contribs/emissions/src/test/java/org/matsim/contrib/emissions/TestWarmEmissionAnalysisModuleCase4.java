@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.emissions;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -81,7 +82,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 	// single class before was so large that I could not fully comprehend it, there may now be errors in the ripped-apart classes.  Hopefully, over time,
 	// this will help to sort things out.  kai, feb'20
 
-	private static final Logger log = Logger.getLogger( TestWarmEmissionAnalysisModuleCase4.class );
+	private static final Logger log = LogManager.getLogger( TestWarmEmissionAnalysisModuleCase4.class );
 
 	private final HandlerToTestEmissionAnalysisModules emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 

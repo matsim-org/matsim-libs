@@ -22,8 +22,9 @@ package playground.vsp.analysis.modules.bvgAna.anaLevel0;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -36,7 +37,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  */
 public class TransitScheduleDataProvider {
 	
-	private final Logger log = Logger.getLogger(TransitScheduleDataProvider.class);
+	private final Logger log = LogManager.getLogger(TransitScheduleDataProvider.class);
 //	private final Level logLevel = Level.DEBUG;
 
 	private TransitSchedule transitSchedule;

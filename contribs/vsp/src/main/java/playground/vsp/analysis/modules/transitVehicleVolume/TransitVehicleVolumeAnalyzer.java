@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.vsp.analysis.modules.transitVehicleVolume;
 
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,7 +27,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ServiceConfigurationError;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Coordinate;
@@ -39,7 +41,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
@@ -53,7 +54,7 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  */
 public class TransitVehicleVolumeAnalyzer extends AbstractAnalysisModule {
 
-	private static final Logger log = Logger.getLogger(TransitVehicleVolumeAnalyzer.class);
+	private static final Logger log = LogManager.getLogger(TransitVehicleVolumeAnalyzer.class);
 	private Scenario sc;
 	private TransitVehicleVolumeHandler handler;
 	private HashMap<String, Map<Id, Double>> mode2Link2Total;
@@ -89,13 +90,13 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalysisModule {
 	public void postProcessData() {
 		this.createTotals();
 	}
-	
+
 	private void createTotals() {
 		// count totals
 		this.mode2Link2Total = new HashMap<String, Map<Id, Double>>();
 		Double total;
 		for(Entry<String, Counts<Link>> e: this.handler.getMode2Counts().entrySet()){
-			Map<Id, Double> temp = new HashMap<Id, Double>(); 
+			Map<Id, Double> temp = new HashMap<Id, Double>();
 			for(Count<Link> c: e.getValue().getCounts().values()){
 				total = new Double(0.);
 				for(Volume v: c.getVolumes().values()){
@@ -113,7 +114,7 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalysisModule {
 			writeModeShape(e.getKey(), e.getValue(), this.mode2Link2Total.get(e.getKey()), outputFolder + e.getKey() + ".shp", this.targetCoordinateSystem);
 		}
 	}
-	
+
 	private void writeModeShape(String name, Counts<Link> counts, Map<Id, Double> mode2Total, String file, String targetCoordinateSystem){
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 		b.setCRS(MGC.getCRS(targetCoordinateSystem));
@@ -125,9 +126,9 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalysisModule {
 			b.add(String.valueOf(i), Double.class);
 		}
 		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
-		
+
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		
+
 		Object[] featureAttribs;
 		for(Count c: counts.getCounts().values()){
 			featureAttribs = new Object[2 + this.handler.getMaxTimeSlice() + 1];

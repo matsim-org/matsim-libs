@@ -24,7 +24,8 @@ package org.matsim.contrib.emissions.analysis;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -61,7 +62,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class EmissionGridAnalyzer {
 
     private static final Double minimumThreshold = 1e-6;
-    private static final Logger logger = Logger.getLogger(EmissionGridAnalyzer.class);
+    private static final Logger logger = LogManager.getLogger(EmissionGridAnalyzer.class);
 
     private final double binSize;
     private final double smoothingRadius;

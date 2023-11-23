@@ -31,6 +31,8 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.core.events.ParallelEventsManager;
 
+import java.util.List;
+
 /**
  * @author jbischoff
  */
@@ -43,11 +45,11 @@ public class DrtFareHandlerTest {
 	public void testDrtFareHandler() {
 		String mode = "mode_0";
 		DrtFareParams fareParams = new DrtFareParams();
-		fareParams.setBaseFare(1);
-		fareParams.setMinFarePerTrip(1.5);
-		fareParams.setDailySubscriptionFee(1);
-		fareParams.setDistanceFare_m(1.0 / 1000.0);
-		fareParams.setTimeFare_h(15);
+		fareParams.baseFare = 1;
+		fareParams.minFarePerTrip = 1.5;
+		fareParams.dailySubscriptionFee = 1;
+		fareParams.distanceFare_m = 1.0 / 1000.0;
+		fareParams.timeFare_h = 15;
 
 		ParallelEventsManager events = new ParallelEventsManager(false);
 		events.addHandler(new DrtFareHandler(mode, fareParams, events));
@@ -69,8 +71,8 @@ public class DrtFareHandlerTest {
 		var personId = Id.createPersonId("p1");
 		{
 			var requestId = Id.create(0, Request.class);
-			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId, personId, Id.createLinkId("12"),
-					Id.createLinkId("23"), 240, 1000, 0.0, 0.0));
+			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId, List.of(personId), Id.createLinkId("12"),
+					Id.createLinkId("23"), 240, 1000, 0.0, 0.0, 0.0));
 			events.processEvent(new PassengerDroppedOffEvent(300.0, mode, requestId, personId, null));
 			events.flush();
 
@@ -80,8 +82,8 @@ public class DrtFareHandlerTest {
 		{
 			// test minFarePerTrip
 			var requestId = Id.create(1, Request.class);
-			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId, personId, Id.createLinkId("45"),
-					Id.createLinkId("56"), 24, 100, 0.0, 0.0));
+			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId, List.of(personId), Id.createLinkId("45"),
+					Id.createLinkId("56"), 24, 100, 0.0, 0.0, 0.0));
 			events.processEvent(new PassengerDroppedOffEvent(300.0, mode, requestId, personId, null));
 			events.finishProcessing();
 

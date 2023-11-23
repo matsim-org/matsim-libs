@@ -23,7 +23,8 @@ package org.matsim.core.network.algorithms;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -44,7 +45,7 @@ public final class NetworkScenarioCut implements NetworkRunnable {
 	private final double radius;
 	private final Coord center;
 
-	private final static Logger log = Logger.getLogger(NetworkScenarioCut.class);
+	private final static Logger log = LogManager.getLogger(NetworkScenarioCut.class);
 
 	public NetworkScenarioCut(final Coord min, final Coord max) {
 		super();

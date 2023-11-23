@@ -1,7 +1,8 @@
 package org.matsim.contrib.noise;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.index.strtree.STRtree;
 import org.matsim.core.config.Config;
@@ -11,7 +12,7 @@ import java.util.Collection;
 
 public class BarrierContext {
 
-    Logger logger = Logger.getLogger(BarrierContext.class);
+    Logger logger = LogManager.getLogger(BarrierContext.class);
 
     private final STRtree noiseBarriers;
 

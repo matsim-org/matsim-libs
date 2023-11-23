@@ -20,7 +20,8 @@
 
 package org.matsim.analysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -33,12 +34,12 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -50,10 +51,10 @@ import java.util.TreeMap;
  * Also calculates the average leg duration.
  * Legs ended because of vehicles being stuck are not counted.
  */
-public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalEventHandler, 
+public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalEventHandler,
 	ActivityEndEventHandler, ActivityStartEventHandler {
 
-	private final static Logger log = Logger.getLogger(CalcLegTimes.class);
+	private final static Logger log = LogManager.getLogger(CalcLegTimes.class);
 
 	private static final int SLOT_SIZE = 300;    // 5-min slots
 	private static final int MAXINDEX = 12; // slots 0..11 are regular slots, slot 12 is anything above
@@ -78,7 +79,7 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 	public void handleEvent(ActivityEndEvent event) {
 		this.previousActivityTypes.put(event.getPersonId(), event.getActType());
 	}
-	
+
 	@Override
 	public void handleEvent(final PersonDepartureEvent event) {
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
@@ -114,7 +115,7 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 		}
 	}
 
-	
+
 	@Override
 	public void reset(final int iteration) {
 		this.previousActivityTypes.clear();

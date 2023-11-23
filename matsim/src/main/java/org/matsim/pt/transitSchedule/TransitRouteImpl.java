@@ -33,6 +33,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 
 /**
@@ -49,7 +50,7 @@ public class TransitRouteImpl implements TransitRoute {
 	private final Map<Id<Departure>, Departure> departures = new TreeMap<>();
 	private String transportMode;
 	private String direction;
-	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new AttributesImpl();
 
 	protected TransitRouteImpl(final Id<TransitRoute> id, final NetworkRoute route, final List<TransitRouteStop> stops, final String transportMode) {
 		this.routeId = id;

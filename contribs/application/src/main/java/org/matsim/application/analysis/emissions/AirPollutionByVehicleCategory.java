@@ -40,7 +40,6 @@ import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.DetailedVsAverageLookupBehavior;
-import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.HbefaRoadTypeSource;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.NonScenarioVehicles;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -65,12 +64,16 @@ import java.util.Map;
 import static org.matsim.application.ApplicationUtils.globFile;
 
 
+/**
+ * @deprecated Use {@link AirPollutionAnalysis}
+ */
 @CommandLine.Command(
 		name = "air-pollution-by-vehicle",
 		description = "Run offline air pollution analysis assuming default vehicles",
 		mixinStandardHelpOptions = true,
 		showDefaultValues = true
 )
+@Deprecated
 public class AirPollutionByVehicleCategory implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(AirPollutionByVehicleCategory.class);
@@ -132,15 +135,15 @@ public class AirPollutionByVehicleCategory implements MATSimAppCommand {
 		config.transit().setVehiclesFile(globFile(runDirectory, runId, "transitVehicles"));
 		config.global().setCoordinateSystem(crs.getInputCRS());
 		config.plans().setInputFile(null);
-		config.parallelEventHandling().setNumberOfThreads(null);
-		config.parallelEventHandling().setEstimatedNumberOfEvents(null);
+		config.eventsManager().setNumberOfThreads(null);
+		config.eventsManager().setEstimatedNumberOfEvents(null);
 		config.global().setNumberOfThreads(1);
 
 		EmissionsConfigGroup eConfig = ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
 		eConfig.setDetailedVsAverageLookupBehavior(lookupBehavior);
 		eConfig.setAverageColdEmissionFactorsFile(this.hbefaColdFile.toString());
 		eConfig.setAverageWarmEmissionFactorsFile(this.hbefaWarmFile.toString());
-		eConfig.setHbefaRoadTypeSource(HbefaRoadTypeSource.fromLinkAttributes);
+//		eConfig.setHbefaRoadTypeSource(HbefaRoadTypeSource.fromLinkAttributes);
 		eConfig.setNonScenarioVehicles(NonScenarioVehicles.ignore);
 
 		final String eventsFile = globFile(runDirectory, runId, "events");

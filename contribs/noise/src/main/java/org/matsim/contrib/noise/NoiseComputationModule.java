@@ -21,7 +21,8 @@ package org.matsim.contrib.noise;
 
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 
@@ -29,7 +30,7 @@ import org.matsim.core.controler.AbstractModule;
 * @author ikaddoura
 */
 public final class NoiseComputationModule extends AbstractModule {
-	private static final Logger log = Logger.getLogger(NoiseComputationModule.class);
+	private static final Logger log = LogManager.getLogger(NoiseComputationModule.class);
 
 
 	@Override

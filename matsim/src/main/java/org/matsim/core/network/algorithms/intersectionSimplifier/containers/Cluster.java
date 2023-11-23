@@ -23,7 +23,8 @@ package org.matsim.core.network.algorithms.intersectionSimplifier.containers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
@@ -39,7 +40,7 @@ import org.matsim.api.core.v01.Identifiable;
  * @author jwjoubert
  */
 public class Cluster implements Identifiable<Cluster>{
-	private final Logger log = Logger.getLogger(Cluster.class);
+	private final Logger log = LogManager.getLogger(Cluster.class);
 	
 	private Id<Cluster> clusterId;
 	private Coord centerOfGravity;

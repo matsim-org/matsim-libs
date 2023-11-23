@@ -24,10 +24,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
@@ -55,33 +56,33 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialRep
 @Singleton
 public class WithinDayEngine implements MobsimEngine, ActivityEndReschedulerProvider {
 
-	private static final Logger log = Logger.getLogger(WithinDayEngine.class);
+	private static final Logger log = LogManager.getLogger(WithinDayEngine.class);
 
 	private final EventsManager eventsManager;
-	
+
 	private boolean initialReplanning = true;
 	private boolean duringActivityReplanning = true;
 	private boolean duringLegReplanning = true;
 
 	private boolean initialReplanningPerformed = false;
-	
+
 	private InitialReplanningModule initialReplanningModule;
 	private DuringActivityReplanningModule duringActivityReplanningModule;
 	private DuringLegReplanningModule duringLegReplanningModule;
-	
+
 	private ParallelInitialReplanner parallelInitialReplanner;
 	private ParallelDuringActivityReplanner parallelDuringActivityReplanner;
 	private ParallelDuringLegReplanner parallelDuringLegReplanner;
-	
+
 	private Map<WithinDayDuringActivityReplannerFactory, Tuple<Double, Double>> duringActivityReplannerFactory;
 	private Map<WithinDayDuringLegReplannerFactory, Tuple<Double, Double>> duringLegReplannerFactory;
-	
+
 	private InternalInterface internalInterface;
 
 	@Inject
 	public WithinDayEngine(EventsManager eventsManager, GlobalConfigGroup globalConfigGroup) {
 		this.eventsManager = eventsManager;
-		
+
 		this.duringActivityReplannerFactory = new LinkedHashMap<>();
 		this.duringLegReplannerFactory = new LinkedHashMap<>();
 
@@ -123,15 +124,15 @@ public class WithinDayEngine implements MobsimEngine, ActivityEndReschedulerProv
 	public void addIntialReplannerFactory(WithinDayInitialReplannerFactory factory) {
 		this.parallelInitialReplanner.addWithinDayReplannerFactory(factory);
 	}
-	
-	public void addDuringActivityReplannerFactory(WithinDayDuringActivityReplannerFactory factory) {		
+
+	public void addDuringActivityReplannerFactory(WithinDayDuringActivityReplannerFactory factory) {
 		this.parallelDuringActivityReplanner.addWithinDayReplannerFactory(factory);
 	}
-	
-	public void addDuringLegReplannerFactory(WithinDayDuringLegReplannerFactory factory) {		
+
+	public void addDuringLegReplannerFactory(WithinDayDuringLegReplannerFactory factory) {
 		this.parallelDuringLegReplanner.addWithinDayReplannerFactory(factory);
 	}
-	
+
 	public void removeInitialReplannerFactory(WithinDayInitialReplannerFactory factory) {
 		this.parallelInitialReplanner.removeWithinDayReplannerFactory(factory);
 	}
@@ -139,16 +140,16 @@ public class WithinDayEngine implements MobsimEngine, ActivityEndReschedulerProv
 	public void removeDuringActivityReplannerFactory(WithinDayDuringActivityReplannerFactory factory) {
 		this.parallelDuringActivityReplanner.removeWithinDayReplannerFactory(factory);
 	}
-	
+
 	public void removeDuringLegReplannerFactory(WithinDayDuringLegReplannerFactory factory) {
 		this.parallelDuringLegReplanner.removeWithinDayReplannerFactory(factory);
 	}
-	
+
 	public void addTimedDuringActivityReplannerFactory(WithinDayDuringActivityReplannerFactory factory, double startReplanning, double endReplanning) {
 		Tuple<Double, Double> tuple = new Tuple<Double, Double>(startReplanning, endReplanning);
 		this.duringActivityReplannerFactory.put(factory, tuple);
 	}
-	
+
 	public void addTimedDuringLegReplannerFactory(WithinDayDuringLegReplannerFactory factory, double startReplanning, double endReplanning) {
 		Tuple<Double, Double> tuple = new Tuple<Double, Double>(startReplanning, endReplanning);
 		this.duringLegReplannerFactory.put(factory, tuple);
@@ -156,17 +157,17 @@ public class WithinDayEngine implements MobsimEngine, ActivityEndReschedulerProv
 
 	@Override
 	public void doSimStep(double time) {
-	
+
 		/*
 		 * Initial replanning (so far?) cannot be performed in the onPrepareSim()
 		 * method since the identifiers and replanners do not know the agents at
-		 * that point in time. 
+		 * that point in time.
 		 */
 		if (!initialReplanningPerformed && isInitialReplanning()) {
 			initialReplanningModule.doReplanning(Double.NEGATIVE_INFINITY);//-Inf == before any feasible time step
 			initialReplanningPerformed = true;
 		}
-		
+
 		for (Entry<WithinDayDuringActivityReplannerFactory, Tuple<Double, Double>> entry : duringActivityReplannerFactory.entrySet()) {
 			if (entry.getValue().getFirst() == time) this.parallelDuringActivityReplanner.addWithinDayReplannerFactory(entry.getKey());
 			if (entry.getValue().getSecond() == time) this.parallelDuringActivityReplanner.removeWithinDayReplannerFactory(entry.getKey());
@@ -175,7 +176,7 @@ public class WithinDayEngine implements MobsimEngine, ActivityEndReschedulerProv
 			if (entry.getValue().getFirst() == time) this.parallelDuringLegReplanner.addWithinDayReplannerFactory(entry.getKey());
 			if (entry.getValue().getSecond() == time) this.parallelDuringLegReplanner.removeWithinDayReplannerFactory(entry.getKey());
 		}
-		
+
 		if (isDuringActivityReplanning()) {
 			duringActivityReplanningModule.doReplanning(time);
 		}
@@ -190,12 +191,12 @@ public class WithinDayEngine implements MobsimEngine, ActivityEndReschedulerProv
 		this.parallelInitialReplanner.onPrepareSim();
 		this.parallelDuringActivityReplanner.onPrepareSim();
 		this.parallelDuringLegReplanner.onPrepareSim();
-		
+
 		// reset all replanners
 		this.parallelInitialReplanner.resetReplanners();
 		this.parallelDuringActivityReplanner.resetReplanners();
 		this.parallelDuringLegReplanner.resetReplanners();
-		
+
 		this.initialReplanningPerformed = false;
 	}
 
@@ -210,8 +211,8 @@ public class WithinDayEngine implements MobsimEngine, ActivityEndReschedulerProv
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
 	}
-	
-	
+
+
 	@Override
 	public ActivityEndRescheduler getActivityRescheduler() {
 		return this.internalInterface.getMobsim();

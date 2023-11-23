@@ -5,7 +5,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.geojson.GeoJSONUtil;
@@ -26,7 +27,7 @@ import org.opengis.referencing.operation.TransformException;
  */
 class FeatureNoiseBarriersReader {
 
-    private final static Logger logger = Logger.getLogger(FeatureNoiseBarriersReader.class);
+    private final static Logger logger = LogManager.getLogger(FeatureNoiseBarriersReader.class);
     private static final double HEIGHT_PER_LEVEL = 3.5;
     private final static String LEVELS = "levels";
     private final static String HEIGHT = "height";

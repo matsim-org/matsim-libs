@@ -27,7 +27,8 @@ import java.util.Set;
 import jakarta.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,7 +45,7 @@ import org.xml.sax.SAXException;
 * 
 */
 public class SignalGroups20ReaderWriterTest {
-	private static final Logger log = Logger.getLogger(SignalGroups20ReaderWriterTest.class);
+	private static final Logger log = LogManager.getLogger(SignalGroups20ReaderWriterTest.class);
 
 	private static final String TESTXML = "testSignalGroups_v2.0.xml";
 

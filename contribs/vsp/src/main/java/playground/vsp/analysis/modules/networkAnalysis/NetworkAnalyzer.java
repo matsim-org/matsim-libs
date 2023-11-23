@@ -14,7 +14,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Coordinate;
@@ -64,7 +65,7 @@ import playground.vsp.analysis.modules.networkAnalysis.utils.QGisProjectFileWrit
 
 public class NetworkAnalyzer extends AbstractAnalysisModule{
 
-	private Logger log = Logger.getLogger(NetworkAnalyzer.class);
+	private Logger log = LogManager.getLogger(NetworkAnalyzer.class);
 	
 	private Scenario scenario;
 	private Network network;

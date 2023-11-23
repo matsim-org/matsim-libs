@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.vis.otfvis.gui;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.jxmapviewer.viewer.TileFactory;
@@ -47,7 +48,7 @@ public final class OTFVisFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger log = Logger.getLogger(OTFVisFrame.class);
+	private static final Logger log = LogManager.getLogger(OTFVisFrame.class);
 	private final Component canvas;
 
 	private final OTFOGLDrawer mainDrawer;
@@ -114,6 +115,15 @@ public final class OTFVisFrame extends JFrame {
 		buildMenu(saver);
 		log.info("created HostControlBar");
 		log.info("created drawer");
+
+		log.warn("under win, the following tends to fail with com.jogamp.opengl.GLException: ");
+		log.warn("Unable to determine GraphicsConfiguration: WindowsWGLGraphicsConfiguration ...");
+		log.warn("It then seems to help to add the following to the Java VM options: ");
+		log.warn("--add-exports java.base/java.lang=ALL-UNNAMED");
+		log.warn("--add-exports java.desktop/sun.awt=ALL-UNNAMED");
+		log.warn("--add-exports java.desktop/sun.java2d=ALL-UNNAMED");
+		log.warn("See https://github.com/matsim-org/matsim-libs/pull/2940 and/or https://jogamp.org/bugzilla/show_bug.cgi?id=1317#c21 .");
+
 		getContentPane().add(compositePanel, BorderLayout.CENTER);
 	}
 

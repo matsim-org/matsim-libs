@@ -26,7 +26,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -53,7 +54,7 @@ import playground.vsp.openberlinscenario.cemdap.LogToOutputSaver;
 public class CemdapOutput2MatsimPlansConverter {
 
 	public static final String activityZoneId_attributeKey = "zoneId";
-	private static final Logger LOG = Logger.getLogger(CemdapOutput2MatsimPlansConverter.class);
+	private static final Logger LOG = LogManager.getLogger(CemdapOutput2MatsimPlansConverter.class);
 	
 
 	public static void main(String[] args) throws IOException {

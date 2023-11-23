@@ -19,15 +19,10 @@
 
 package org.matsim.contrib.taxi.optimizer.rules;
 
-import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.createDefaultTaxiConfigVariants;
 import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.runBenchmark;
-
-import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.PreloadedBenchmark;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.TaxiConfigVariant;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter.Goal;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -36,27 +31,32 @@ public class RuleBasedTaxiOptimizerIT {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testRuleBased() {
-		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
-		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(false);
+	public void testRuleBased_dse() {
 		RuleBasedTaxiOptimizerParams params = new RuleBasedTaxiOptimizerParams();
+		params.goal = Goal.DEMAND_SUPPLY_EQUIL;
+		params.nearestRequestsLimit = 99999;
+		params.nearestVehiclesLimit = 99999;
+		params.cellSize = 99999.;
+		runBenchmark(false, params, utils);
+	}
 
-		params.setGoal(Goal.DEMAND_SUPPLY_EQUIL);
-		params.setNearestRequestsLimit(99999);
-		params.setNearestVehiclesLimit(99999);
-		params.setCellSize(99999.);
-		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_A");
+	@Test
+	public void testRuleBased_minWaitTime() {
+		RuleBasedTaxiOptimizerParams params = new RuleBasedTaxiOptimizerParams();
+		params.goal = Goal.MIN_WAIT_TIME;
+		params.nearestRequestsLimit = 10;
+		params.nearestVehiclesLimit = 10;
+		params.cellSize = 1000.;
+		runBenchmark(false, params, utils);
+	}
 
-		params.setGoal(Goal.MIN_WAIT_TIME);
-		params.setNearestRequestsLimit(10);
-		params.setNearestVehiclesLimit(10);
-		params.setCellSize(1000.);
-		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_B");
-
-		params.setGoal(Goal.MIN_PICKUP_TIME);
-		params.setNearestRequestsLimit(1);
-		params.setNearestVehiclesLimit(1);
-		params.setCellSize(100.);
-		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_C");
+	@Test
+	public void testRuleBased_minPickupTime() {
+		RuleBasedTaxiOptimizerParams params = new RuleBasedTaxiOptimizerParams();
+		params.goal = Goal.MIN_PICKUP_TIME;
+		params.nearestRequestsLimit = 1;
+		params.nearestVehiclesLimit = 1;
+		params.cellSize = 100.;
+		runBenchmark(false, params, utils);
 	}
 }

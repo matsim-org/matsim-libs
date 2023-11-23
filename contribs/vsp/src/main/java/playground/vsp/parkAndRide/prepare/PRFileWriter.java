@@ -29,7 +29,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -40,7 +41,7 @@ import playground.vsp.parkAndRide.PRFacility;
  *
  */
 public class PRFileWriter {
-	private static final Logger log = Logger.getLogger(PRFileWriter.class);
+	private static final Logger log = LogManager.getLogger(PRFileWriter.class);
 
 	public void write(List<PRFacility> parkAndRideFacilities, String prFacilitiesFile) {
 		File file = new File(prFacilitiesFile);

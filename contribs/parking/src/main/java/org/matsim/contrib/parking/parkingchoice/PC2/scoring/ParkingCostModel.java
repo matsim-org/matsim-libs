@@ -20,7 +20,6 @@ package org.matsim.contrib.parking.parkingchoice.PC2.scoring;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.facilities.Facility;
 
 public interface ParkingCostModel {
 

@@ -22,7 +22,8 @@ package org.matsim.core.utils.misc;
 import java.io.IOException;
 import java.net.URL;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,7 +38,7 @@ import static org.hamcrest.CoreMatchers.*;
  * @author mrieser
  */
 public class ConfigUtilsTest {
-	private static final Logger log = Logger.getLogger( ConfigUtilsTest.class ) ;
+	private static final Logger log = LogManager.getLogger( ConfigUtilsTest.class ) ;
 
 	@Rule
 	public MatsimTestUtils util = new MatsimTestUtils();
@@ -90,7 +91,7 @@ public class ConfigUtilsTest {
 		final URL url = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" );
 		final String [] typedArgs = {"--config:controler.outputDirectory=abc"} ;
 		Config config = ConfigUtils.loadConfig( url, typedArgs );
-		Assert.assertEquals("abc", config.controler().getOutputDirectory());
+		Assert.assertEquals("abc", config.controller().getOutputDirectory());
 	}
 	@Test
 	public void loadConfigWithTypedArgsWithTypo(){

@@ -23,6 +23,7 @@ package org.matsim.contrib.dvrp.passenger;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
@@ -42,7 +43,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiRequest.OneTaxiRequestCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
@@ -81,7 +82,7 @@ public class PassengerEngineTestFixture {
 		eventsManager.initProcessing();
 	}
 
-	void addPersonWithLeg(Link fromLink, Link toLink, double departureTime) {
+	void addPersonWithLeg(Link fromLink, Link toLink, double departureTime, Id<Person> person_id) {
 		PopulationFactory factory = scenario.getPopulation().getFactory();
 		Plan plan = factory.createPlan();
 
@@ -99,15 +100,18 @@ public class PassengerEngineTestFixture {
 
 		plan.addActivity(factory.createActivityFromLinkId(END_ACTIVITY, toLink.getId()));
 
-		Person person = factory.createPerson(PERSON_ID);
+		Person person = factory.createPerson(person_id);
 		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
 	}
 
-	void assertPassengerEvents(Event... events) {
+	void assertPassengerEvents(Collection<Id<Person>> personIds, Event... events) {
 		assertThat(recordedEvents.size()).isGreaterThanOrEqualTo(events.length);
 		var recordedPassengerEvents = recordedEvents.stream()
-				.filter(e -> e instanceof HasPersonId && ((HasPersonId)e).getPersonId().equals(PERSON_ID));
+				.filter(e ->
+						e instanceof HasPersonId && personIds.contains(((HasPersonId)e).getPersonId()) ||
+								e instanceof AbstractPassengerRequestEvent
+				);
 		assertThat(recordedPassengerEvents).usingRecursiveFieldByFieldElementComparator().containsExactly(events);
 	}
 }

@@ -40,7 +40,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.AttributesBuilder;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
@@ -75,8 +75,8 @@ public class TransitScheduleReaderV1Test {
 		assertEquals(1, schedule.getFacilities().size());
 		TransitStopFacility stop = schedule.getFacilities().get(Id.create("stop1", TransitStopFacility.class));
 		assertNotNull(stop);
-		assertEquals(79.0, stop.getCoord().getX(), MatsimTestCase.EPSILON);
-		assertEquals(80.0, stop.getCoord().getY(), MatsimTestCase.EPSILON);
+		assertEquals(79.0, stop.getCoord().getX(), MatsimTestUtils.EPSILON);
+		assertEquals(80.0, stop.getCoord().getY(), MatsimTestUtils.EPSILON);
 		assertNull(stop.getLinkId());
 		assertNull(stop.getName());
 		assertFalse(stop.getIsBlockingLane());
@@ -109,8 +109,8 @@ public class TransitScheduleReaderV1Test {
 		assertEquals(1, schedule.getFacilities().size());
 		TransitStopFacility stop = schedule.getFacilities().get(Id.create("stop1", TransitStopFacility.class));
 		assertNotNull(stop);
-		assertEquals(79.0, stop.getCoord().getX(), MatsimTestCase.EPSILON);
-		assertEquals(80.0, stop.getCoord().getY(), MatsimTestCase.EPSILON);
+		assertEquals(79.0, stop.getCoord().getX(), MatsimTestUtils.EPSILON);
+		assertEquals(80.0, stop.getCoord().getY(), MatsimTestUtils.EPSILON);
 		assertEquals(link3.getId(), stop.getLinkId());
 	}
 
@@ -165,8 +165,8 @@ public class TransitScheduleReaderV1Test {
 		assertEquals(1, schedule.getFacilities().size());
 		TransitStopFacility stop = schedule.getFacilities().get(Id.create("stop1", TransitStopFacility.class));
 		assertNotNull(stop);
-		assertEquals(79.0, stop.getCoord().getX(), MatsimTestCase.EPSILON);
-		assertEquals(80.0, stop.getCoord().getY(), MatsimTestCase.EPSILON);
+		assertEquals(79.0, stop.getCoord().getX(), MatsimTestUtils.EPSILON);
+		assertEquals(80.0, stop.getCoord().getY(), MatsimTestUtils.EPSILON);
 		assertEquals("some stop name", stop.getName());
 	}
 
@@ -191,8 +191,8 @@ public class TransitScheduleReaderV1Test {
 		assertEquals(1, schedule.getFacilities().size());
 		TransitStopFacility stop = schedule.getFacilities().get(Id.create("stop1", TransitStopFacility.class));
 		assertNotNull(stop);
-		assertEquals(79.0, stop.getCoord().getX(), MatsimTestCase.EPSILON);
-		assertEquals(80.0, stop.getCoord().getY(), MatsimTestCase.EPSILON);
+		assertEquals(79.0, stop.getCoord().getX(), MatsimTestUtils.EPSILON);
+		assertEquals(80.0, stop.getCoord().getY(), MatsimTestUtils.EPSILON);
 		assertTrue(stop.getIsBlockingLane());
 	}
 
@@ -223,12 +223,12 @@ public class TransitScheduleReaderV1Test {
 		assertEquals(2, schedule.getFacilities().size());
 		TransitStopFacility stop1 = schedule.getFacilities().get(Id.create("stop1", TransitStopFacility.class));
 		assertNotNull(stop1);
-		assertEquals(79.0, stop1.getCoord().getX(), MatsimTestCase.EPSILON);
-		assertEquals(80.0, stop1.getCoord().getY(), MatsimTestCase.EPSILON);
+		assertEquals(79.0, stop1.getCoord().getX(), MatsimTestUtils.EPSILON);
+		assertEquals(80.0, stop1.getCoord().getY(), MatsimTestUtils.EPSILON);
 		TransitStopFacility stop2 = schedule.getFacilities().get(Id.create("stop2", TransitStopFacility.class));
 		assertNotNull(stop2);
-		assertEquals(51.0, stop2.getCoord().getX(), MatsimTestCase.EPSILON);
-		assertEquals(42.0, stop2.getCoord().getY(), MatsimTestCase.EPSILON);
+		assertEquals(51.0, stop2.getCoord().getX(), MatsimTestUtils.EPSILON);
+		assertEquals(42.0, stop2.getCoord().getY(), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
@@ -604,20 +604,20 @@ public class TransitScheduleReaderV1Test {
 
 		assertNotNull(stop1);
 		assertEquals(schedule.getFacilities().get(stopId1), stop1.getStopFacility());
-		assertEquals(60.0, stop1.getArrivalOffset().seconds(), MatsimTestCase.EPSILON);
+		assertEquals(60.0, stop1.getArrivalOffset().seconds(), MatsimTestUtils.EPSILON);
 		assertTrue(stop1.getDepartureOffset().isUndefined());
 
 		TransitRouteStop stop2 = route.getStops().get(1);
 		assertNotNull(stop2);
 		assertEquals(schedule.getFacilities().get(stopId2), stop2.getStopFacility());
 		assertTrue(stop2.getArrivalOffset().isUndefined());
-		assertEquals(90.0, stop2.getDepartureOffset().seconds(), MatsimTestCase.EPSILON);
+		assertEquals(90.0, stop2.getDepartureOffset().seconds(), MatsimTestUtils.EPSILON);
 
 		TransitRouteStop stop3 = route.getStops().get(2);
 		assertNotNull(stop3);
 		assertEquals(schedule.getFacilities().get(stopId3), stop3.getStopFacility());
-		assertEquals(120.0, stop3.getArrivalOffset().seconds(), MatsimTestCase.EPSILON);
-		assertEquals(150.0, stop3.getDepartureOffset().seconds(), MatsimTestCase.EPSILON);
+		assertEquals(120.0, stop3.getArrivalOffset().seconds(), MatsimTestUtils.EPSILON);
+		assertEquals(150.0, stop3.getDepartureOffset().seconds(), MatsimTestUtils.EPSILON);
 
 		TransitRouteStop stop4 = route.getStops().get(3);
 		assertNotNull(stop4);
@@ -984,7 +984,7 @@ public class TransitScheduleReaderV1Test {
 		Departure dep1 = route.getDepartures().get(depId1);
 		assertNotNull(dep1);
 		assertEquals(depId1, dep1.getId());
-		assertEquals(Time.parseTime(depTime1), dep1.getDepartureTime(), MatsimTestCase.EPSILON);
+		assertEquals(Time.parseTime(depTime1), dep1.getDepartureTime(), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
@@ -1032,11 +1032,11 @@ public class TransitScheduleReaderV1Test {
 		Departure dep1 = route.getDepartures().get(depId1);
 		assertNotNull(dep1);
 		assertEquals(depId1, dep1.getId());
-		assertEquals(Time.parseTime(depTime1), dep1.getDepartureTime(), MatsimTestCase.EPSILON);
+		assertEquals(Time.parseTime(depTime1), dep1.getDepartureTime(), MatsimTestUtils.EPSILON);
 		Departure dep2 = route.getDepartures().get(depId2);
 		assertNotNull(dep2);
 		assertEquals(depId2, dep2.getId());
-		assertEquals(Time.parseTime(depTime2), dep2.getDepartureTime(), MatsimTestCase.EPSILON);
+		assertEquals(Time.parseTime(depTime2), dep2.getDepartureTime(), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
@@ -1084,12 +1084,12 @@ public class TransitScheduleReaderV1Test {
 		Departure dep1 = route.getDepartures().get(depId1);
 		assertNotNull(dep1);
 		assertEquals(depId1, dep1.getId());
-		assertEquals(Time.parseTime(depTime1), dep1.getDepartureTime(), MatsimTestCase.EPSILON);
+		assertEquals(Time.parseTime(depTime1), dep1.getDepartureTime(), MatsimTestUtils.EPSILON);
 		assertEquals(Id.create("v 975", Vehicle.class), dep1.getVehicleId());
 		Departure dep2 = route.getDepartures().get(depId2);
 		assertNotNull(dep2);
 		assertEquals(depId2, dep2.getId());
-		assertEquals(Time.parseTime(depTime2), dep2.getDepartureTime(), MatsimTestCase.EPSILON);
+		assertEquals(Time.parseTime(depTime2), dep2.getDepartureTime(), MatsimTestUtils.EPSILON);
 		assertNull(dep2.getVehicleId());
 	}
 

@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.hermes;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -29,7 +30,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.EventArray;
-import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.utils.collections.IntArrayMap;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -56,26 +56,26 @@ class Realm {
     // line id of a particular route
     private final int[] line_of_route;
     // queue of sorted events by time
-    private EventArray sorted_events;
+    private EventArray sortedEvents;
     // MATSim event manager.
     private final EventsManager eventsManager;
     // Current timestamp
     private int secs;
-    Logger log = Logger.getLogger(Realm.class);
+    Logger log = LogManager.getLogger(Realm.class);
 
-    public Realm(ScenarioImporter scenario, EventsManager eventsManager) throws Exception {
-    	this.si = scenario;
-        this.links = scenario.hermes_links;
+    public Realm(ScenarioImporter scenario, EventsManager eventsManager) {
+        this.si = scenario;
+        this.links = scenario.hermesLinks;
         // The plus one is necessary because we peek into the next slot on each tick.
         this.delayedLinksByWakeupTime = new ArrayList<>();
         this.delayedAgentsByWakeupTime = new ArrayList<>();
-        this.agent_stops = scenario.agent_stops;
-        this.route_stops_by_route_no = scenario.route_stops_by_route_no;
-        this.line_of_route = scenario.line_of_route;
-        this.sorted_events = new EventArray();
+        this.agent_stops = scenario.agentStops;
+        this.route_stops_by_route_no = scenario.routeStopsByRouteNo;
+        this.line_of_route = scenario.lineOfRoute;
+        this.sortedEvents = new EventArray();
         this.eventsManager = eventsManager;
 
-	// the last position is to store events that will not happen...
+        // the last position is to store events that will not happen...
         for (int i = 0; i <= HermesConfigGroup.SIM_STEPS + 1; i++) {
             delayedLinksByWakeupTime.add(new ArrayDeque<>());
             delayedAgentsByWakeupTime.add(new ArrayDeque<>());
@@ -88,12 +88,12 @@ class Realm {
         }
     }
 
-    private void add_delayed_agent(Agent agent, int until) {
+    private void addDelayedAgent(Agent agent, int until) {
         if (HermesConfigGroup.DEBUG_REALMS) log(secs, String.format("agent %d delayed until %d", agent.id, until));
         delayedAgentsByWakeupTime.get(Math.min(until, HermesConfigGroup.SIM_STEPS + 1)).add(agent);
     }
 
-    private void add_delayed_link(HLink link, int until) {
+    private void addDelayedLink(HLink link, int until) {
         if (HermesConfigGroup.DEBUG_REALMS)
             log(secs, String.format("link %d delayed until %d size %d peek agent %d", link.id(), until, link.queue().size(), link.queue().peek().id));
         delayedLinksByWakeupTime.get(Math.min(until, HermesConfigGroup.SIM_STEPS + 1)).add(link);
@@ -119,20 +119,20 @@ class Realm {
 
     protected boolean processAgentLink(Agent agent, long planentry, int currLinkId) {
         int linkid = Agent.getLinkPlanEntry(planentry);
-        int velocity = Agent.getVelocityPlanEntry(planentry);
+        double velocity = Agent.getVelocityPlanEntry(planentry);
         HLink next = links[linkid];
         int prev_finishtime = agent.linkFinishTime;
         // this ensures that if no velocity is provided for the vehicle, we use the link
         velocity = velocity == 0 ? next.velocity() : velocity;
         // the max(1, ...) ensures that a link hop takes at least on step.
-        int traveltime = HermesConfigGroup.LINK_ADVANCE_DELAY + Math.max(1, next.length() / Math.min(velocity, next.velocity()));
+        int traveltime = (HermesConfigGroup.LINK_ADVANCE_DELAY + (int) Math.round(Math.max(1, next.length() / Math.min(velocity, next.velocity()))));
         agent.linkFinishTime = secs + traveltime;
         float storageCapacityPCU = agent.getStorageCapacityPCUE();
         if (next.push(agent,secs,storageCapacityPCU)) {
             advanceAgentandSetEventTime(agent);
             // If the agent we just added is the head, add to delayed links
             if (currLinkId != next.id() && next.queue().peek() == agent) {
-                add_delayed_link(next, Math.max(agent.linkFinishTime, secs + 1));
+                addDelayedLink(next, Math.max(agent.linkFinishTime, secs + 1));
             }
             return true;
         } else {
@@ -148,7 +148,7 @@ class Realm {
 
     protected boolean processAgentSleepUntil(Agent agent, long planentry) {
         int sleep = Agent.getSleepPlanEntry(planentry);
-        add_delayed_agent(agent, Math.max(sleep, secs + 1));
+        addDelayedAgent(agent, Math.max(sleep, secs + 1));
         updateCapacities(agent);
         advanceAgentandSetEventTime(agent);
         return true;
@@ -188,7 +188,7 @@ class Realm {
     }
 
     protected boolean processAgentStopArrive(Agent agent, long planentry) {
-        add_delayed_agent(agent, secs + 1);
+        addDelayedAgent(agent, secs + 1);
         advanceAgentandSetEventTime(agent);
         // Although we want the agent to be processed in the next tick, we
         // return true to remove the vehicle from the link that it is currently.
@@ -200,12 +200,12 @@ class Realm {
         int departure = Agent.getDeparture(planentry);
 
         // consume stop delay
-        add_delayed_agent(agent, Math.max(secs + 1, departure));
+        addDelayedAgent(agent, Math.max(secs + 1, departure));
         advanceAgent(agent);
 
         // drop agents
         for (Agent out : agent.egress(stopid)) {
-            add_delayed_agent(out, secs + 1);
+            addDelayedAgent(out, secs + 1);
             // consume access, activate egress
             advanceAgentandSetEventTime(out);
             // set driver in agent's event
@@ -281,7 +281,7 @@ class Realm {
         }
         // -1 is used in the processAgent because the agent is not in a link currently.
         if (!finished && !processAgent(agent, -1)) {
-            add_delayed_agent(agent, secs + 1);
+            addDelayedAgent(agent, secs + 1);
             return 0;
         }
         return 1;
@@ -310,15 +310,15 @@ class Realm {
         // If there is at least one agent in the link that could not be processed
         // In addition we check if this agent was not added in this tick.
         if (agent != null) {
-            add_delayed_link(link, Math.max(agent.linkFinishTime, secs + 1));
+            addDelayedLink(link, Math.max(agent.linkFinishTime, secs + 1));
         }
         return routed;
     }
 
     public void run() throws Exception {
-    	int routed = 0;
-        Agent agent = null;
-        HLink link = null;
+        int routed = 0;
+        Agent agent;
+        HLink link;
 
         while (secs != HermesConfigGroup.SIM_STEPS) {
             if (secs % 3600 == 0) {
@@ -334,7 +334,7 @@ class Realm {
             delayedAgentsByWakeupTime.set(secs, null);
             if (si.isDeterministicPt()) {
                 for (Event e : si.getDeterministicPtEvents().get(secs)) {
-                    sorted_events.add(e);
+                    sortedEvents.add(e);
                 }
                 si.getDeterministicPtEvents().get(secs).clear();
             }
@@ -349,9 +349,9 @@ class Realm {
             if (HermesConfigGroup.DEBUG_REALMS && routed > 0) {
                 log(secs, String.format("Processed %d agents", routed));
             }
-            if (HermesConfigGroup.CONCURRENT_EVENT_PROCESSING && secs % 3600 == 0 && sorted_events.size() > 0) {
-                eventsManager.processEvents(sorted_events);
-                sorted_events = new EventArray();
+            if (HermesConfigGroup.CONCURRENT_EVENT_PROCESSING && secs % 3600 == 0 && sortedEvents.size() > 0) {
+                eventsManager.processEvents(sortedEvents);
+                sortedEvents = new EventArray();
             }
 
             routed = 0;
@@ -359,51 +359,54 @@ class Realm {
         }
     }
 
-    public void setEventTime(Agent agent, int eventid, int time, boolean lastevent) {
-        if (eventid != 0) {
-        	EventArray agentevents = agent.events();
-            Event event = agentevents.get(eventid);
+    public void setEventTime(Agent agent, int agentId, int time, boolean lastEvent) {
+        if (agentId != 0) {
+            EventArray agentEvents = agent.events();
+            Event event = agentEvents.get(agentId);
 
-            for (; agent.eventsIndex <= eventid; agent.eventsIndex++) {
-            	agentevents.get(agent.eventsIndex).setTime(time);
+            for (; agent.eventsIndex <= agentId; agent.eventsIndex++) {
+                agentEvents.get(agent.eventsIndex).setTime(time);
                 if (HermesConfigGroup.DEBUG_REALMS)
-                    log(secs, String.format("agent %d setEventTime (eventsIndex=%d) %s", agent.id, agent.eventsIndex, agentevents.get(agent.eventsIndex).toString()));
-                sorted_events.add(agentevents.get(agent.eventsIndex));
+                    log(secs, String.format("agent %d setEventTime (eventsIndex=%d) %s", agent.id, agent.eventsIndex, agentEvents.get(agent.eventsIndex).toString()));
+                sortedEvents.add(agentEvents.get(agent.eventsIndex));
             }
 
             // Fix delay for PT events.
-            if (event instanceof VehicleArrivesAtFacilityEvent) {
-                VehicleArrivesAtFacilityEvent vaafe = (VehicleArrivesAtFacilityEvent) event;
+            if (event instanceof VehicleArrivesAtFacilityEvent vaafe) {
                 vaafe.setDelay(vaafe.getTime() - vaafe.getDelay());
 
+            } else if (event instanceof VehicleDepartsAtFacilityEvent vdafe) {
+                vdafe.setDelay(vdafe.getTime() - vdafe.getDelay());
             }
-            else if (event instanceof VehicleDepartsAtFacilityEvent) {
-			    VehicleDepartsAtFacilityEvent vdafe = (VehicleDepartsAtFacilityEvent) event;
-			    vdafe.setDelay(vdafe.getTime() - vdafe.getDelay());
-		    }
-		    // This removes actend that is not issued by QSim.
-		    else if (lastevent && event instanceof ActivityEndEvent) {
-		        sorted_events.removeLast();
-		    }
+            // This removes actend that is not issued by QSim.
+            else if (lastEvent && event instanceof ActivityEndEvent) {
+                sortedEvents.removeLast();
+            }
         }
     }
 
-    public void setEventVehicle(Agent agent, int eventid, int vehicleid) {
-        if (eventid != 0) {
-            Event event = agent.events().get(eventid);
-            Id<Vehicle> vid = Id.get(si.matsim_id(vehicleid,  true), Vehicle.class);
+    public void setEventVehicle(Agent agent, int eventId, int vehicleId) {
+        if (eventId != 0) {
+            Event event = agent.events().get(eventId);
+            Id<Vehicle> vid = Id.get(si.matsim_id(vehicleId, true), Vehicle.class);
             if (event instanceof PersonEntersVehicleEvent) {
-                ((PersonEntersVehicleEvent)event).setVehicleId(vid);
+                ((PersonEntersVehicleEvent) event).setVehicleId(vid);
             } else if (event instanceof PersonLeavesVehicleEvent) {
-                ((PersonLeavesVehicleEvent)event).setVehicleId(vid);
+                ((PersonLeavesVehicleEvent) event).setVehicleId(vid);
             } else {
                 throw new RuntimeException(
-                    String.format("vehicle id could not be set for event: %d", eventid));
+                        String.format("vehicle id could not be set for event: %d", eventId));
             }
         }
     }
 
     ArrayList<ArrayDeque<HLink>> delayedLinks() { return this.delayedLinksByWakeupTime; }
-    ArrayList<ArrayDeque<Agent>> delayedAgents() { return this.delayedAgentsByWakeupTime; }
-    EventArray getSortedEvents() { return this.sorted_events; }
+
+    ArrayList<ArrayDeque<Agent>> delayedAgents() {
+        return this.delayedAgentsByWakeupTime;
+    }
+
+    EventArray getSortedEvents() {
+        return this.sortedEvents;
+    }
 }

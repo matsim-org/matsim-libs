@@ -1,0 +1,86 @@
+type: plotly
+traces:
+- fill: none
+  "y": []
+  x: []
+  mode: markers
+  marker:
+    size:
+    - 6.0
+    cauto: true
+    autocolorscale: true
+    showscale: true
+    opacity: 1.0
+    symbol: bowtie
+    sizemode: diameter
+  line:
+    width: 2.0
+    smoothing: 1.0
+    shape: linear
+    dash: longdash
+    simplify: true
+    context:
+      shape: linear
+      width: 2.0
+      smoothing: 1.0
+      simplify: true
+      dash: longdash
+  yaxis: "y"
+  whiskerwidth: 0.0
+  type: scatter
+- fill: none
+  "y": []
+  x: []
+  mode: markers
+  hoverlabel:
+    font:
+      fontfamily: Open Sans
+      size: 12
+      color: '#444'
+    namelength: 15
+  line:
+    width: 1.0
+    smoothing: 0.5
+    shape: linear
+    dash: solid
+    simplify: true
+    context:
+      shape: linear
+      width: 1.0
+      smoothing: 0.5
+      simplify: true
+      dash: solid
+  whiskerwidth: 0.0
+  decreasing:
+    changeline:
+      color: '#3D9970'
+      width: 10
+  type: scatter
+- x: []
+  nbinsx: 0
+  nbinsy: 0
+  autobinx: true
+  autobiny: false
+  histnorm: density
+  histfunc: count
+  type: histogram
+config:
+  responsive: true
+layout:
+  hoverdistance: 5
+  margin:
+    left: 5
+    right: 80
+    top: 100
+    bottom: 80
+    autoexpand: true
+  paperbgcolor: black
+  grid:
+    rows: 80
+    roworder: top to bottom
+    pattern: coupled
+    columns: 80
+    xgap: 100.0
+    ygap: 80.0
+    xside: bottom
+    yside: left

@@ -27,7 +27,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.ToDoubleFunction;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.ZonalDemandEstimator;
@@ -39,7 +40,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
  * if demand > 0 => equally distribute all available vehicles
  */
 public class EqualRebalancableVehicleDistributionTargetCalculator implements RebalancingTargetCalculator {
-	private static final Logger log = Logger.getLogger(EqualRebalancableVehicleDistributionTargetCalculator.class);
+	private static final Logger log = LogManager.getLogger(EqualRebalancableVehicleDistributionTargetCalculator.class);
 
 	private final ZonalDemandEstimator demandEstimator;
 	private final DrtZonalSystem zonalSystem;

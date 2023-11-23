@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.routeProvider;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -48,7 +49,7 @@ import java.util.Map.Entry;
  */
 final class RandomStopProvider {
 	
-	private final static Logger log = Logger.getLogger(RandomStopProvider.class);
+	private final static Logger log = LogManager.getLogger(RandomStopProvider.class);
 	
 	private final double gridSize;
 	private LinkedHashMap<TransitStopFacility, Double> stops2Weight;

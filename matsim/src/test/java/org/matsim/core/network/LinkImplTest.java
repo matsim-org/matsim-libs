@@ -24,7 +24,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -41,7 +42,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
  */
 public class LinkImplTest {
 
-	private final static Logger log = Logger.getLogger(LinkImplTest.class);
+	private final static Logger log = LogManager.getLogger(LinkImplTest.class);
 	private static final double EPSILON = 1e-7;
 
 

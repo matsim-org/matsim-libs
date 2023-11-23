@@ -20,7 +20,8 @@
 
 package org.matsim.core.network.algorithms;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -61,7 +62,7 @@ import java.util.function.BiPredicate;
  */
 public final class NetworkSimplifier {
 
-	private static final Logger log = Logger.getLogger(NetworkSimplifier.class);
+	private static final Logger log = LogManager.getLogger(NetworkSimplifier.class);
 	private boolean mergeLinksWithDifferentAttributes = false;
 	private Collection<Integer> nodeTopoToMerge = Arrays.asList( NetworkCalcTopoType.PASS1WAY , NetworkCalcTopoType.PASS2WAY );
 

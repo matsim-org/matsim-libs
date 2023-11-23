@@ -19,13 +19,13 @@
 
 package org.matsim.contrib.taxi.optimizer.rules;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -35,8 +35,8 @@ import org.matsim.contrib.zone.Zone;
 
 public class UnplannedRequestZonalRegistry {
 	private final ZonalSystem zonalSystem;
-	private final Map<Id<Zone>, List<Zone>> zonesSortedByDistance;
-	private final Map<Id<Zone>, Map<Id<Request>, DrtRequest>> requestsInZones;
+	private final IdMap<Zone, List<Zone>> zonesSortedByDistance;
+	private final IdMap<Zone, Map<Id<Request>, DrtRequest>> requestsInZones = new IdMap<>(Zone.class);
 
 	private int requestCount = 0;
 
@@ -44,7 +44,6 @@ public class UnplannedRequestZonalRegistry {
 		this.zonalSystem = zonalSystem;
 		zonesSortedByDistance = ZonalSystems.initZonesByDistance(zonalSystem.getZones());
 
-		requestsInZones = new HashMap<>(zonalSystem.getZones().size());
 		for (Id<Zone> id : zonalSystem.getZones().keySet()) {
 			requestsInZones.put(id, new LinkedHashMap<>());//LinkedHashMap to preserve iteration order
 		}

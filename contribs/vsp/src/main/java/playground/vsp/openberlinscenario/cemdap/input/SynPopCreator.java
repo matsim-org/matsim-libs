@@ -28,7 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -56,7 +57,7 @@ import playground.vsp.openberlinscenario.cemdap.LogToOutputSaver;
  * @author dziemke
  */
 public class SynPopCreator {
-	private static final Logger LOG = Logger.getLogger(SynPopCreator.class);
+	private static final Logger LOG = LogManager.getLogger(SynPopCreator.class);
 	
 	private static final Random random = MatsimRandom.getLocalInstance(); // Make sure that stream of random variables is reproducible.
 

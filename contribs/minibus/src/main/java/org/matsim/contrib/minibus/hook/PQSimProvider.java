@@ -19,10 +19,11 @@
 
 package org.matsim.contrib.minibus.hook;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -41,7 +42,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 class PQSimProvider implements Provider<Mobsim> {
 
 	@SuppressWarnings("unused")
-	private final static Logger log = Logger.getLogger(PQSimProvider.class);
+	private final static Logger log = LogManager.getLogger(PQSimProvider.class);
 
 	@Inject Scenario scenario ;
 	@Inject EventsManager eventsManager ;
@@ -54,7 +55,7 @@ class PQSimProvider implements Provider<Mobsim> {
 		if (conf == null) {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
-		
+
 		return new QSimBuilder(config) //
 				.useDefaults()
 				.addOverridingQSimModule(new MinibusPopulationModule())

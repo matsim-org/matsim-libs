@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.DetailedVsAverageLookupBehavior;
-import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.HbefaRoadTypeSource;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -64,8 +63,8 @@ public class TestColdEmissionsFallbackBehaviour {
 	private static final Double parkingDuration = 1.;
 	private static final int distance = 1;
 
-	//This are the expected values and extracted from  "./scenarios/sampleScenario/sample_41_EFA_ColdStart_vehcat_2020average.txt" and
-	// "./scenarios/sampleScenario/sample_41_EFA_ColdStart_SubSegm_2020detailed.txt"
+	//This are the expected values and extracted from  "./scenarios/sampleScenario/sample_41_EFA_ColdStart_vehcat_2020average.csv" and
+	// "./scenarios/sampleScenario/sample_41_EFA_ColdStart_SubSegm_2020detailed.csv"
 	//Both for AmbientConditionPattern 0-1h, 0-1km
 	private final double emissionsFactorInGrammPerKilometer_Detailed = 3.337293625; 		//detailed table
 	private final double emissionsFactorInGrammPerKilometer_TechnologyAverage = 3.27173543;	//detailed table
@@ -257,11 +256,11 @@ public class TestColdEmissionsFallbackBehaviour {
 		Config config = ConfigUtils.loadConfig( configUrl );
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		emissionsConfig.setDetailedVsAverageLookupBehavior(lookupBehavior);
-		emissionsConfig.setHbefaRoadTypeSource( HbefaRoadTypeSource.fromLinkAttributes );							//Somehow needed even if deprecated, since a null pointer exception ids thrown when not set :( . kmt mar'20
-		emissionsConfig.setAverageColdEmissionFactorsFile("sample_41_EFA_ColdStart_vehcat_2020average.txt");
-		emissionsConfig.setDetailedColdEmissionFactorsFile("sample_41_EFA_ColdStart_SubSegm_2020detailed.txt");
-		emissionsConfig.setAverageWarmEmissionFactorsFile( "sample_41_EFA_HOT_vehcat_2020average.txt" );
-		emissionsConfig.setDetailedWarmEmissionFactorsFile("sample_41_EFA_HOT_SubSegm_2020detailed.txt");
+//		emissionsConfig.setHbefaRoadTypeSource( HbefaRoadTypeSource.fromLinkAttributes );							//Somehow needed even if deprecated, since a null pointer exception ids thrown when not set :( . kmt mar'20
+		emissionsConfig.setAverageColdEmissionFactorsFile("sample_41_EFA_ColdStart_vehcat_2020average.csv");
+		emissionsConfig.setDetailedColdEmissionFactorsFile("sample_41_EFA_ColdStart_SubSegm_2020detailed.csv");
+		emissionsConfig.setAverageWarmEmissionFactorsFile( "sample_41_EFA_HOT_vehcat_2020average.csv" );
+		emissionsConfig.setDetailedWarmEmissionFactorsFile("sample_41_EFA_HOT_SubSegm_2020detailed.csv");
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 

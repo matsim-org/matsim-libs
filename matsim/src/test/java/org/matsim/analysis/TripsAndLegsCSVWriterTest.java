@@ -61,7 +61,7 @@ import java.util.*;
  *
  */
 public class TripsAndLegsCSVWriterTest {
-	
+
 	Config config = ConfigUtils.createConfig();
 	Scenario scenario = ScenarioUtils.createScenario(config);
 	Id<Person> person1 = Id.create("person1", Person.class);
@@ -69,11 +69,11 @@ public class TripsAndLegsCSVWriterTest {
 	Id<Person> person3 = Id.create("person3", Person.class);
 	Id<Person> person4 = Id.create("person4", Person.class);
 	Id<Person> person5 = Id.create("person5", Person.class);
-	
+
 	final Id<Link> link1 = Id.create(10723, Link.class);
 	final Id<Link> link2 = Id.create(123160, Link.class);
 	final Id<Link> link3 = Id.create(130181, Link.class);
-	
+
 	// initialize column array index with negative value -> note if they have been set
 	private int dep_time = -1;
 	private int trav_time = -1;
@@ -107,17 +107,17 @@ public class TripsAndLegsCSVWriterTest {
 	private int person = -1;
 	private int transitStopsVisited = -1;
 	private int isIntermodalWalkPt = -1;
-	
+
 	final IdMap<Person, Plan> map = new IdMap<>(Person.class);
 	ArrayList<Object> legsfromplan = new ArrayList<>();
 	Map<String, Object> persontrips = new HashMap<>();
-	
+
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testTripsAndLegsCSVWriter() {
-		
+
 		Plans plans = new Plans();
 
 		/****************************
@@ -139,13 +139,13 @@ public class TripsAndLegsCSVWriterTest {
 		/************************
 		 * Plan 4-----creating plan 4
 		 **************************************/
-		Plan plan4 = plans.createPlanFour();		
+		Plan plan4 = plans.createPlanFour();
 
 		/************************
 		 * Plan 5-----creating plan 5
 		 **************************************/
 		Plan plan5 = plans.createPlanFive();
-		
+
 		map.put(person1, plan1);
 		map.put(person2, plan2);
 		map.put(person3, plan3);
@@ -162,7 +162,7 @@ public class TripsAndLegsCSVWriterTest {
 		performTest(utils.getOutputDirectory() + "/trip.csv",
 				utils.getOutputDirectory() + "/leg.csv", map, new RoutingModeMainModeIdentifier());
 	}
-	
+
 	private void performTest(String tripsFilename, String legsFilename, IdMap<Person, Plan> map, AnalysisMainModeIdentifier mainModeIdentifier) {
 		TripsAndLegsCSVWriter.NoTripWriterExtension tripsWriterExtension = new NoTripWriterExtension();
 		TripsAndLegsCSVWriter.NoLegsWriterExtension legWriterExtension = new NoLegsWriterExtension();
@@ -180,13 +180,13 @@ public class TripsAndLegsCSVWriterTest {
 				customLegsWriterExtension, mainModeIdentifier, timeWriter);
 		tripsAndLegsWriterTest.write(map, tripsFilename, legsFilename);
 	}
-	
+
 	/***********************************************************
 	 * Reading all the trips from the plans file.
 	 ***********************************************************/
 	private void readTripsFromPlansFile(IdMap<Person, Plan> map, AnalysisMainModeIdentifier mainModeIdentifier) {
 		//double trav_time = 0;
-		
+
 		for (Map.Entry<Id<Person>, Plan> entry : map.entrySet()) {
 			int tripno = 1;
 			Plan plan = entry.getValue();
@@ -223,7 +223,7 @@ public class TripsAndLegsCSVWriterTest {
 				}else {
 					 end_x = end_coord.getX();
 					 end_y = end_coord.getY();
-				}	
+				}
 				Id<ActivityFacility> start_facility_id = trip.getOriginActivity().getFacilityId();
 				Id<ActivityFacility> end_facility_id = trip.getDestinationActivity().getFacilityId();
 				String start_activity_type = trip.getOriginActivity().getType();
@@ -251,13 +251,15 @@ public class TripsAndLegsCSVWriterTest {
 					}
 					if (leg.getRoute() instanceof TransitPassengerRoute) {
 						TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
-						first_pt_boarding_stop =  first_pt_boarding_stop != null ? first_pt_boarding_stop : route.getAccessStopId().toString();		
+						first_pt_boarding_stop =  first_pt_boarding_stop != null ? first_pt_boarding_stop : route.getAccessStopId().toString();
 				        last_pt_egress_stop = route.getEgressStopId().toString();
 					}
 				}
 
-				String mainMode = mainModeIdentifier.getClass().equals(RoutingModeMainModeIdentifier.class) ?
-						"" : mainModeIdentifier.identifyMainMode(trip.getTripElements());
+				String mainMode = mainModeIdentifier == null ? "" : mainModeIdentifier.identifyMainMode(trip.getTripElements());
+				// null is replaced with "" in the writer
+				if (mainMode == null)
+					mainMode = "";
 
 				Set<String> keyset = modeDistance.keySet();
 				Iterator<String> keysetitr = keyset.iterator();
@@ -284,7 +286,7 @@ public class TripsAndLegsCSVWriterTest {
 				if(transitStopsVisited != null) {
 					transitStopsVisited = transitStopsVisited.substring(0, transitStopsVisited.length() - 1);
 				}
-				
+
 				StringBuffer modestrim = new StringBuffer(modes.toString());
 				modestrim.deleteCharAt(modestrim.length()-1);
 				tripvalues.put("start_link", start_link);
@@ -317,7 +319,7 @@ public class TripsAndLegsCSVWriterTest {
 			}
 		}
 	}
-	
+
 	/***********************************************************
 	 * Reading all the legs from the plans file.
 	 ***********************************************************/
@@ -405,10 +407,10 @@ public class TripsAndLegsCSVWriterTest {
 			}
 		}
 	}
-	
+
 	/*******************Reading and validating the legs output file************************/
 	private void readAndValidateLegs(ArrayList<Object> legsfromplan, String legFile) {
-		
+
 		BufferedReader br;
 		String line;
 		try {
@@ -447,9 +449,9 @@ public class TripsAndLegsCSVWriterTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-				
+
 	}
-	
+
 	/*******************Reading and validating the trips output file************************/
 	private void readAndValidateTrips(Map<String, Object> persontrips, String tripFile) {
 
@@ -587,31 +589,31 @@ public class TripsAndLegsCSVWriterTest {
 			case "trip_id":
 				trip_id = i;
 				break;
-			
+
 			case "distance":
 				distance = i;
 				break;
-				
+
 			case "mode":
 				mode = i;
 				break;
-				
+
 			case "wait_time":
 				wait_time = i;
 				break;
-				
+
 			case "access_stop_id":
 				access_stop_id = i;
 				break;
-				
+
 			case "egress_stop_id":
 				egress_stop_id = i;
 				break;
-				
+
 			case "transit_line":
 				transit_line = i;
 				break;
-				
+
 			case "transit_route":
 				transit_route = i;
 				break;
@@ -623,11 +625,11 @@ public class TripsAndLegsCSVWriterTest {
 			case "first_pt_boarding_stop":
 				first_pt_boarding_stop = i;
 				break;
-				
+
 			case "last_pt_egress_stop":
 				last_pt_egress_stop = i;
 				break;
-				
+
 			case "trip_number":
 				trip_number = i;
 				break;
@@ -655,7 +657,7 @@ public class TripsAndLegsCSVWriterTest {
 
 		Network network = NetworkUtils.createNetwork();
 		NetworkFactory factory = network.getFactory();
-		
+
 		Node n0, n1, n2, n3;
 		network.addNode(n0 = factory.createNode(Id.createNodeId(0), new Coord(30.0, 50.0)));
 		network.addNode(n1 = factory.createNode(Id.createNodeId(1), new Coord(100.0, 120.0)));
@@ -696,9 +698,9 @@ public class TripsAndLegsCSVWriterTest {
 			values.add(transitStopsVisited);
 			return values;
 		}
-		
+
 	}
-	
+
 	static class CustomLegsWriterExtesion implements TripsAndLegsCSVWriter.CustomLegsWriterExtension {
 		@Override
 		public String[] getAdditionalLegHeader() {

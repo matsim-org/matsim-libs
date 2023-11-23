@@ -88,7 +88,7 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.core.utils.timing.TimeInterpretation;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.testcases.utils.LogCounter;
 import org.matsim.vehicles.Vehicle;
@@ -107,7 +107,7 @@ public class QSimTest {
 		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
 		this.numberOfThreads = numberOfThreads;
 	}
-//	
+//
 	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}; numberOfThreads == {1};")
 	public static Collection<Object[]> parameterObjects () {
 		Object[][] capacityUpdates = new Object [][] {
@@ -171,8 +171,8 @@ public class QSimTest {
 
 		/* finish */
 		Assert.assertEquals("wrong number of link enter events.", 2, collector.events.size());
-		Assert.assertEquals("wrong time in first event.", 6.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in second event.", 6.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in first event.", 6.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in second event.", 6.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON);
 	}
 
 
@@ -208,7 +208,7 @@ public class QSimTest {
 			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		}
 		f.plans.addPerson(person);
-		
+
 		/* build events */
 		EventsManager events = EventsUtils.createEventsManager();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
@@ -222,8 +222,8 @@ public class QSimTest {
 		} catch( Exception ee ) {
 			// this is the expected behavior, so stop here
 		}
-		
-		 /* What happens is the following: The last leg is not routed ... it would not be 
+
+		 /* What happens is the following: The last leg is not routed ... it would not be
 		  * possible even if desired since we do not know where to go. It does fail,
 		  * however, in the vehicle generation part of PrepareForSim, since when there
 		  * is no route, it does not know where to put the vehicle. */
@@ -239,8 +239,8 @@ public class QSimTest {
 //
 //		/* finish */
 		Assert.assertEquals("wrong number of link enter events.", 2, collector.events.size());
-		Assert.assertEquals("wrong time in first event.", 6.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in second event.", 6.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in first event.", 6.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in second event.", 6.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -279,10 +279,10 @@ public class QSimTest {
 
 		/* finish */
 		Assert.assertEquals("wrong number of link enter events.", 4, collector.events.size());
-		Assert.assertEquals("wrong time in first event.", 6.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in second event.", 6.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in first event.", 7.0*3600 + 1, collector.events.get(2).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in second event.", 7.0*3600 + 12, collector.events.get(3).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in first event.", 6.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in second event.", 6.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in first event.", 7.0*3600 + 1, collector.events.get(2).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in second event.", 7.0*3600 + 12, collector.events.get(3).getTime(), MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -323,10 +323,10 @@ public class QSimTest {
 		Assert.assertEquals("wrong type of event.", TeleportationArrivalEvent.class, allEvents.get(2).getClass());
 		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(3).getClass());
 		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(4).getClass());
-		Assert.assertEquals("wrong time in event.", 6.0*3600 + 0, allEvents.get(0).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in event.", 6.0*3600 + 0, allEvents.get(1).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in event.", 6.0*3600 + 15, allEvents.get(2).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in event.", 6.0*3600 + 15, allEvents.get(3).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in event.", 6.0*3600 + 0, allEvents.get(0).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in event.", 6.0*3600 + 0, allEvents.get(1).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in event.", 6.0*3600 + 15, allEvents.get(2).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in event.", 6.0*3600 + 15, allEvents.get(3).getTime(), MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -366,8 +366,8 @@ public class QSimTest {
 
 		/* finish */
 		Assert.assertEquals("wrong number of link enter events.", 2, collector.events.size());
-		Assert.assertEquals("wrong time in first event.", 0.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in second event.", 0.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in first event.", 0.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in second event.", 0.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -426,19 +426,19 @@ public class QSimTest {
 		Assert.assertEquals("wrong type of 8th event.", ActivityStartEvent.class, allEvents.get(7).getClass());
 
 
-		Assert.assertEquals("wrong time in 1st event.", 6.0*3600 + 0, allEvents.get(0).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in 2nd event.", 6.0*3600 + 0, allEvents.get(1).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in 3rd event.", 6.0*3600 + 0, allEvents.get(2).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in 4th event.", 6.0*3600 + 0, allEvents.get(3).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in 1st event.", 6.0*3600 + 0, allEvents.get(0).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in 2nd event.", 6.0*3600 + 0, allEvents.get(1).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in 3rd event.", 6.0*3600 + 0, allEvents.get(2).getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong time in 4th event.", 6.0*3600 + 0, allEvents.get(3).getTime(), MatsimTestUtils.EPSILON);
 
 		Assert.assertEquals("wrong time in 5th event.", 6.0 * 3600 + 0, allEvents.get(4).getTime(),
-				MatsimTestCase.EPSILON);
+				MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong time in 6th event.", 6.0 * 3600 + 0, allEvents.get(5).getTime(),
-				MatsimTestCase.EPSILON);
+				MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong time in 7th event.", 6.0 * 3600 + 0, allEvents.get(6).getTime(),
-				MatsimTestCase.EPSILON);
+				MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong time in 8th event.", 6.0 * 3600 + 0, allEvents.get(7).getTime(),
-				MatsimTestCase.EPSILON);
+				MatsimTestUtils.EPSILON);
 
 
 		Assert.assertEquals("wrong link in 1st event.", f.link1.getId(), ((ActivityEndEvent) allEvents.get(0)).getLinkId() );
@@ -848,7 +848,7 @@ public class QSimTest {
 		//		} else {
 		//			Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
 		//			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
-		//			Assert.assertEquals(1000, volume[8]); // all the rest	
+		//			Assert.assertEquals(1000, volume[8]); // all the rest
 		//		}
 
 	}
@@ -1094,7 +1094,7 @@ public class QSimTest {
 
 		sim.getSimTimer().setTime(100.0);
 		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(person.getSelectedPlan(), sim, sim.getChildInjector().getInstance(TimeInterpretation.class));
-		sim.insertAgentIntoMobsim(agent); 
+		sim.insertAgentIntoMobsim(agent);
 		agent.endActivityAndComputeNextState(100.0);
 		sim.internalInterface.arrangeNextAgentState(agent);
 		sim.getSimTimer().setTime(101.0);
@@ -1162,8 +1162,8 @@ public class QSimTest {
 		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(9).getClass()); // link4
 		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(10).getClass());
 		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(11).getClass()); // link1 again
-		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(12).getClass());	
-		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(13).getClass());	
+		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(12).getClass());
+		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(13).getClass());
 		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(14).getClass());
 		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(15).getClass());
 	}
@@ -1417,8 +1417,8 @@ public class QSimTest {
 		// first test without special settings
 		QSim sim = createQSim(scenario, events);
 		sim.run();
-		Assert.assertEquals(act1.getEndTime().seconds(), collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals(act1.getEndTime().seconds() + leg.getRoute().getTravelTime().seconds(), collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals(act1.getEndTime().seconds(), collector.firstEvent.getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(act1.getEndTime().seconds() + leg.getRoute().getTravelTime().seconds(), collector.lastEvent.getTime(), MatsimTestUtils.EPSILON);
 		collector.reset(0);
 
 		// second test with special start/end times
@@ -1426,8 +1426,8 @@ public class QSimTest {
 		config.qsim().setEndTime(11.0*3600);
 		sim = createQSim(scenario, events);
 		sim.run();
-		Assert.assertEquals(8.0*3600, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals(11.0*3600, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals(8.0*3600, collector.firstEvent.getTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(11.0*3600, collector.lastEvent.getTime(), MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -1523,14 +1523,14 @@ public class QSimTest {
 		config.qsim().setEndTime(simEndTime);
 		QSim sim = createQSim(scenario, events);
 		sim.run();
-		Assert.assertEquals(simEndTime, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals(simEndTime, collector.lastEvent.getTime(), MatsimTestUtils.EPSILON);
 		// besides this, the important thing is that no (Runtime)Exception is thrown during this test
 	}
-	
+
 	/**
 	 * Tests that the reduced flow capacity from the kinematic waves traffic dynamics can be reached (but not exceeded) by
 	 * agents driving over a link.
-	 * 
+	 *
 	 *
 	 * @author ikaddoura based on mrieser
 	 */
@@ -1586,11 +1586,11 @@ public class QSimTest {
 		Assert.assertEquals(1920, volume[6]); // because of the kinematic waves and the 'reduce flow capacity behavior' we should have much less than half of the maximum flow in this hour
 		Assert.assertEquals(3840, volume[7]); // because of the kinematic waves and the 'reduce flow capacity behavior' we should have much less than the maximum flow in this hour
 	}
-	
+
 	/**
 	 * Tests that the reduced flow capacity from the kinematic waves traffic dynamics can be reached (but not exceeded) by
 	 * agents driving over a link.
-	 * 
+	 *
 	 *
 	 * @author ikaddoura based on mrieser
 	 */

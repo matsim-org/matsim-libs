@@ -1,14 +1,14 @@
 package org.matsim.integration.drtAndPt;
 
 import static java.util.stream.Collectors.toList;
-import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -36,9 +36,9 @@ import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
+import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
@@ -50,6 +50,7 @@ import org.matsim.core.mobsim.qsim.ActivityEngineModule;
 import org.matsim.core.mobsim.qsim.ActivityEngineWithWakeup;
 import org.matsim.core.mobsim.qsim.PreplanningEngine;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
+import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
@@ -65,7 +66,7 @@ import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressPar
 
 //@RunWith(Parameterized.class)
 public class PtAlongALine2Test {
-	private static final Logger log = Logger.getLogger(PtAlongALine2Test.class);
+	private static final Logger log = LogManager.getLogger(PtAlongALine2Test.class);
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -106,28 +107,28 @@ public class PtAlongALine2Test {
 
 		// === GBL: ===
 
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 
 		// === ROUTER: ===
 
-		config.plansCalcRoute().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
+		config.routing().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		// (as of today, will also influence router. kai, jun'19)
 
 		if (drtMode == DrtMode.teleportBeeline) {// (configure teleportation router)
-			config.plansCalcRoute()
+			config.routing()
 					.addModeRoutingParams(
-							new ModeRoutingParams().setMode(TransportMode.drt).setTeleportedModeSpeed(100. / 3.6));
+							new RoutingConfigGroup.TeleportedModeParams().setMode(TransportMode.drt ).setTeleportedModeSpeed(100. / 3.6 ) );
 			if (drt2) {
-				config.plansCalcRoute()
+				config.routing()
 						.addModeRoutingParams(
-								new ModeRoutingParams().setMode("drt2").setTeleportedModeSpeed(100. / 3.6));
+								new RoutingConfigGroup.TeleportedModeParams().setMode("drt2" ).setTeleportedModeSpeed(100. / 3.6 ) );
 			}
 			if (drt3) {
-				config.plansCalcRoute()
+				config.routing()
 						.addModeRoutingParams(
-								new ModeRoutingParams().setMode("drt3").setTeleportedModeSpeed(100. / 3.6));
+								new RoutingConfigGroup.TeleportedModeParams().setMode("drt3" ).setTeleportedModeSpeed(100. / 3.6 ) );
 			}
 			// teleportation router for walk or bike is automatically defined.
 		} else if (drtMode == DrtMode.teleportBasedOnNetworkRoute) {// (route as network route)
@@ -139,15 +140,15 @@ public class PtAlongALine2Test {
 			if (drt3) {
 				networkModes.add("drt3");
 			}
-			config.plansCalcRoute().setNetworkModes(networkModes);
+			config.routing().setNetworkModes(networkModes);
 		}
 
-		config.plansCalcRoute()
-				.addModeRoutingParams(new ModeRoutingParams().setMode("walk").setTeleportedModeSpeed(5. / 3.6));
+		config.routing()
+				.addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams().setMode("walk" ).setTeleportedModeSpeed(5. / 3.6 ) );
 
 		// set up walk2 so we don't need walk in raptor:
-		config.plansCalcRoute()
-				.addModeRoutingParams(new ModeRoutingParams().setMode("walk2").setTeleportedModeSpeed(5. / 3.6));
+		config.routing()
+				.addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams().setMode("walk2" ).setTeleportedModeSpeed(5. / 3.6 ) );
 
 		// === RAPTOR: ===
 		{
@@ -195,21 +196,21 @@ public class PtAlongALine2Test {
 
 		// === SCORING: ===
 
-		double margUtlTravPt = config.planCalcScore().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling();
+		double margUtlTravPt = config.scoring().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling();
 		if (drtMode != DrtMode.none) {
 			// (scoring parameters for drt modes)
-			config.planCalcScore()
+			config.scoring()
 					.addModeParams(new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling(margUtlTravPt));
 			if (drt2) {
-				config.planCalcScore()
+				config.scoring()
 						.addModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
 			}
 			if (drt3) {
-				config.planCalcScore()
+				config.scoring()
 						.addModeParams(new ModeParams("drt3").setMarginalUtilityOfTraveling(margUtlTravPt));
 			}
 		}
-		config.planCalcScore().addModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
+		config.scoring().addModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
 
 		// === QSIM: ===
 
@@ -222,47 +223,52 @@ public class PtAlongALine2Test {
 			// (configure full drt if applicable)
 
 			DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
-			dvrpConfig.setNetworkModes(ImmutableSet.copyOf(Arrays.asList(TransportMode.drt, "drt2", "drt3")));
+			dvrpConfig.networkModes = ImmutableSet.copyOf(Arrays.asList(TransportMode.drt, "drt2", "drt3"));
 
 			MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 			{
-				DrtConfigGroup drtConfigGroup = new DrtConfigGroup().setMode(TransportMode.drt)
-						.setMaxTravelTimeAlpha(2.0)
-						.setMaxTravelTimeBeta(5. * 60.)
-						.setStopDuration(60.)
-						.setMaxWaitTime(Double.MAX_VALUE)
-						.setRejectRequestIfMaxWaitOrTravelTimeViolated(false)
-						.setUseModeFilteredSubnetwork(true)
-						.setAdvanceRequestPlanningHorizon(99999);
+				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
+				drtConfigGroup.mode = TransportMode.drt;
+				drtConfigGroup.maxTravelTimeAlpha = 2.0;
+				drtConfigGroup.maxTravelTimeBeta = 5. * 60.;
+				drtConfigGroup.stopDuration = 60.;
+				drtConfigGroup.maxWaitTime = Double.MAX_VALUE;
+				drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+				drtConfigGroup.useModeFilteredSubnetwork = true;
+
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 				mm.addParameterSet(drtConfigGroup);
 
 			}
 			if (drt2) {
-				DrtConfigGroup drtConfigGroup = new DrtConfigGroup().setMode("drt2")
-						.setMaxTravelTimeAlpha(1.3)
-						.setMaxTravelTimeBeta(5. * 60.)
-						.setStopDuration(60.)
-						.setMaxWaitTime(Double.MAX_VALUE)
-						.setRejectRequestIfMaxWaitOrTravelTimeViolated(false)
-						.setUseModeFilteredSubnetwork(true);
+				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
+				drtConfigGroup.mode = "drt2";
+				drtConfigGroup.maxTravelTimeAlpha = 1.3;
+				drtConfigGroup.maxTravelTimeBeta = 5. * 60.;
+				drtConfigGroup.stopDuration = 60.;
+				drtConfigGroup.maxWaitTime = Double.MAX_VALUE;
+				drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+				drtConfigGroup.useModeFilteredSubnetwork = true;
+
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 				mm.addParameterSet(drtConfigGroup);
 			}
 			if (drt3) {
-				DrtConfigGroup drtConfigGroup = new DrtConfigGroup().setMode("drt3")
-						.setMaxTravelTimeAlpha(1.3)
-						.setMaxTravelTimeBeta(5. * 60.)
-						.setStopDuration(60.)
-						.setMaxWaitTime(Double.MAX_VALUE)
-						.setRejectRequestIfMaxWaitOrTravelTimeViolated(false)
-						.setUseModeFilteredSubnetwork(true);
+				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
+				drtConfigGroup.mode = "drt3";
+				drtConfigGroup.maxTravelTimeAlpha = 1.3;
+				drtConfigGroup.maxTravelTimeBeta = 5. * 60.;
+				drtConfigGroup.stopDuration = 60.;
+				drtConfigGroup.maxWaitTime = Double.MAX_VALUE;
+				drtConfigGroup.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+				drtConfigGroup.useModeFilteredSubnetwork = true;
+
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 				mm.addParameterSet(drtConfigGroup);
 			}
 
 			for (DrtConfigGroup drtConfigGroup : mm.getModalElements()) {
-				DrtConfigs.adjustDrtConfig(drtConfigGroup, config.planCalcScore(), config.plansCalcRoute());
+				DrtConfigs.adjustDrtConfig(drtConfigGroup, config.scoring(), config.routing());
 			}
 		}
 
@@ -411,6 +417,13 @@ public class PtAlongALine2Test {
 			controler.addOverridingModule(new OTFVisLiveModule());
 			// !! does not work together with parameterized tests :-( !!
 		}
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(AnalysisMainModeIdentifier.class).to(PtAlongALineAnalysisMainModeIdentifier.class);
+			}
+		});
 
 		controler.run();
 
@@ -579,22 +592,22 @@ public class PtAlongALine2Test {
 
 		// === GBL: ===
 
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 
 		// === ROUTER: ===
 
-		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		// (as of today, will also influence router. kai, jun'19)
 
-		config.plansCalcRoute().setNetworkModes(new HashSet<>(Arrays.asList(TransportMode.drt, "drt2")));
+		config.routing().setNetworkModes(new HashSet<>(Arrays.asList(TransportMode.drt, "drt2")));
 
 		// set up walk2 so we don't use faulty walk in raptor:
-		config.plansCalcRoute().addModeRoutingParams(new ModeRoutingParams("walk2").setTeleportedModeSpeed(5. / 3.6));
+		config.routing().addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams("walk2").setTeleportedModeSpeed(5. / 3.6 ) );
 
-		config.plansCalcRoute()
-				.addModeRoutingParams(new ModeRoutingParams(TransportMode.walk).setTeleportedModeSpeed(0.));
+		config.routing()
+				.addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams(TransportMode.walk).setTeleportedModeSpeed(0. ) );
 		// (when specifying "walk2", all default routing params are cleared.  However, swiss rail raptor needs "walk" to function. kai, feb'20)
 
 		// === RAPTOR: ===
@@ -633,14 +646,14 @@ public class PtAlongALine2Test {
 
 		// === SCORING: ===
 		{
-			double margUtlTravPt = config.planCalcScore()
+			double margUtlTravPt = config.scoring()
 					.getModes()
 					.get(TransportMode.pt)
 					.getMarginalUtilityOfTraveling();
-			config.planCalcScore()
+			config.scoring()
 					.addModeParams(new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling(margUtlTravPt));
-			config.planCalcScore().addModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
-			config.planCalcScore().addModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
+			config.scoring().addModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
+			config.scoring().addModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
 		}
 		// === QSIM: ===
 
@@ -722,6 +735,13 @@ public class PtAlongALine2Test {
 			}
 		});
 
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(AnalysisMainModeIdentifier.class).to(PtAlongALineAnalysisMainModeIdentifier.class);
+			}
+		});
+
 		controler.run();
 	}
 
@@ -734,22 +754,22 @@ public class PtAlongALine2Test {
 
 		// === GBL: ===
 
-		config.controler().setLastIteration(0);
+		config.controller().setLastIteration(0);
 
 		// === ROUTER: ===
 
-		config.plansCalcRoute().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
+		config.routing().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		// (as of today, will also influence router. kai, jun'19)
 
 		// remove teleportation walk router:
-		config.plansCalcRoute().removeModeRoutingParams(TransportMode.walk);
+		config.routing().removeModeRoutingParams(TransportMode.walk);
 
 		// add network walk router:
-		Set<String> networkModes = new HashSet<>(config.plansCalcRoute().getNetworkModes());
+		Set<String> networkModes = new HashSet<>(config.routing().getNetworkModes());
 		networkModes.add(TransportMode.walk);
-		config.plansCalcRoute().setNetworkModes(networkModes);
+		config.routing().setNetworkModes(networkModes);
 
 		// === RAPTOR: ===
 		{
@@ -787,6 +807,13 @@ public class PtAlongALine2Test {
 
 		// This will start otfvis.  Comment out if not needed.
 		//		controler.addOverridingModule( new OTFVisLiveModule() );
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(AnalysisMainModeIdentifier.class).to(PtAlongALineAnalysisMainModeIdentifier.class);
+			}
+		});
 
 		controler.run();
 	}

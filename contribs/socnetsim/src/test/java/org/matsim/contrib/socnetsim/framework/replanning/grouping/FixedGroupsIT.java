@@ -19,8 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.grouping;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -56,7 +57,6 @@ public class FixedGroupsIT {
 		Collection<ReplanningGroup> previous = null;
 
 		// avoid spamming the log file
-		Logger.getLogger( FixedGroupsIdentifier.class ).setLevel( Level.ERROR );
 		for (int i=0; i < 100; i++) {
 			final FixedGroupsIdentifier identifier =
 				FixedGroupsIdentifierFileParser.readCliquesFile(

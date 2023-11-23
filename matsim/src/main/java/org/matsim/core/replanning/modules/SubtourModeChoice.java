@@ -49,6 +49,7 @@ import org.matsim.core.router.TripStructureUtils;
 public class SubtourModeChoice extends AbstractMultithreadedModule {
 
 	private final double probaForChangeSingleTripMode;
+	private final double coordDist;
 
 	public enum Behavior {fromAllModesToSpecifiedModes, fromSpecifiedModesToSpecifiedModes, betweenAllAndFewerConstraints}
 
@@ -65,7 +66,7 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 				subtourModeChoiceConfigGroup.getModes(),
 				subtourModeChoiceConfigGroup.getChainBasedModes(),
 				subtourModeChoiceConfigGroup.getProbaForRandomSingleTripMode(),
-				permissibleModesCalculator
+				permissibleModesCalculator, subtourModeChoiceConfigGroup.getCoordDistance()
 		);
 		this.setBehavior(subtourModeChoiceConfigGroup.getBehavior());
 	}
@@ -75,12 +76,14 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 			final String[] modes,
 			final String[] chainBasedModes,
 			double probaForChangeSingleTripMode,
-			PermissibleModesCalculator permissibleModesCalculator) {
+			PermissibleModesCalculator permissibleModesCalculator,
+			double coordDist) {
 		super(numberOfThreads);
 		this.modes = modes.clone();
 		this.chainBasedModes = chainBasedModes.clone();
 		this.permissibleModesCalculator = permissibleModesCalculator;
 		this.probaForChangeSingleTripMode = probaForChangeSingleTripMode;
+		this.coordDist = coordDist;
 	}
 	
 	@Deprecated // only use when backwards compatibility is needed. kai, may'18
@@ -101,7 +104,7 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 						this.permissibleModesCalculator,
 						this.modes,
 						this.chainBasedModes,
-						MatsimRandom.getLocalInstance(), behavior, probaForChangeSingleTripMode);
+						MatsimRandom.getLocalInstance(), behavior, probaForChangeSingleTripMode, coordDist);
 		return chooseRandomLegMode;
 	}
 

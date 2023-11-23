@@ -28,7 +28,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -51,7 +52,7 @@ import org.matsim.pt.PtConstants;
 
 final class PersonActivityTracker implements ActivityEndEventHandler , ActivityStartEventHandler {
 
-	private static final Logger log = Logger.getLogger(PersonActivityTracker.class);
+	private static final Logger log = LogManager.getLogger(PersonActivityTracker.class);
 	
 	private final NoiseContext noiseContext;
 	
@@ -137,10 +138,10 @@ final class PersonActivityTracker implements ActivityEndEventHandler , ActivityS
 			if (!event.getActType().toString().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 				
 				if (this.consideredActivityTypes.contains(event.getActType()) || consideredActivityPrefix(event.getActType(), this.consideredActivityTypes)) {
-//					Logger.getLogger(this.getClass()).warn( "event:" + event ) ;
-//					Logger.getLogger(this.getClass()).warn( "personId:" + event.getDriverId() ) ;
-//					Logger.getLogger(this.getClass()).warn( "map:" + this.personId2currentActNr ) ;
-//					Logger.getLogger(this.getClass()).warn( "nr:" + this.personId2currentActNr.get( event.getDriverId() ) ) ;
+//					LogManager.getLogger(this.getClass()).warn( "event:" + event ) ;
+//					LogManager.getLogger(this.getClass()).warn( "personId:" + event.getDriverId() ) ;
+//					LogManager.getLogger(this.getClass()).warn( "map:" + this.personId2currentActNr ) ;
+//					LogManager.getLogger(this.getClass()).warn( "nr:" + this.personId2currentActNr.get( event.getDriverId() ) ) ;
 					
 //					int newActNr = this.personId2currentActNr.get(event.getDriverId()) + 1;
 					// I had null pointer exceptions with the previous line.  Presumably, some agents were not initialized.  Thus

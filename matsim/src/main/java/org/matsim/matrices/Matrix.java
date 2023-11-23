@@ -25,7 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public final class Matrix {
 
@@ -40,7 +41,7 @@ public final class Matrix {
 	private final TreeMap<String,ArrayList<Entry>> fromLocs = new TreeMap<>();
 	private final TreeMap<String,ArrayList<Entry>> toLocs = new TreeMap<>();
 
-	private static final Logger log = Logger.getLogger(Matrix.class);
+	private static final Logger log = LogManager.getLogger(Matrix.class);
 
 	private long counter = 0;
 	private long nextMsg = 1;

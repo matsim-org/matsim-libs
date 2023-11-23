@@ -34,7 +34,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -80,7 +81,7 @@ import playground.vsp.andreas.bvgAna.level3.AgentId2StopDifferenceMap;
 
 public class RunAnalyses {
 
-	private final static Logger log = Logger.getLogger(RunAnalyses.class);
+	private final static Logger log = LogManager.getLogger(RunAnalyses.class);
 
 	private final static String networkFilename = "/Volumes/Data/projects/bvg2010/runs/2010-11-21-run01/output_network.xml.gz";
 	private final static String plansFilename = "/Volumes/Data/projects/bvg2010/runs/2010-11-21-run01/output_plans.xml.gz";

@@ -22,13 +22,13 @@ package playground.vsp.planselectors;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import javax.inject.Inject;
-import org.apache.log4j.Logger;
+import jakarta.inject.Inject;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
@@ -47,13 +47,13 @@ public class InitialPlanKeeperPlanRemoval implements PlanSelector<Plan, Person> 
     private final WorstPlanForRemovalSelector delegate;
 
     @Inject
-    public InitialPlanKeeperPlanRemoval(StrategyConfigGroup strategyConfigGroup, Population population){
+    public InitialPlanKeeperPlanRemoval(ReplanningConfigGroup replanningConfigGroup, Population population){
         this.delegate = new WorstPlanForRemovalSelector();
-        if ( strategyConfigGroup.getMaxAgentPlanMemorySize() < 12) {
-            Logger.getLogger(InitialPlanKeeperPlanRemoval.class).warn("A plans remover is used which keeps the initial plans or at least their copy \n " +
-                    "and maximum number of plans in the choice set is limited to "+ strategyConfigGroup.getMaxAgentPlanMemorySize()+
+        if ( replanningConfigGroup.getMaxAgentPlanMemorySize() < 12) {
+            LogManager.getLogger(InitialPlanKeeperPlanRemoval.class).warn("A plans remover is used which keeps the initial plans or at least their copy \n " +
+                    "and maximum number of plans in the choice set is limited to "+ replanningConfigGroup.getMaxAgentPlanMemorySize()+
             ".\n Lower number of plans in choice set is likely to end up in infinite loop. Setting it to 15.");
-            strategyConfigGroup.setMaxAgentPlanMemorySize(15);
+            replanningConfigGroup.setMaxAgentPlanMemorySize(15);
         }
 
         for (Person person : population.getPersons().values()){

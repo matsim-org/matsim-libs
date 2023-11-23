@@ -31,7 +31,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -55,7 +56,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.selectors.WeightCalcula
  */
 public class WhoIsTheBossSelector implements GroupLevelPlanSelector {
 	private static final Logger log =
-		Logger.getLogger(WhoIsTheBossSelector.class);
+		LogManager.getLogger(WhoIsTheBossSelector.class);
 
 	private final Random random;
 	private final boolean forbidBlockingCombinations;

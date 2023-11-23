@@ -47,6 +47,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * @author michalm (Michal Maciejewski)
  */
 public class DrtRoute extends AbstractRoute {
+  	private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	public final static String ROUTE_TYPE = TransportMode.drt;
 	private RouteDescription routeDescription = null;
 
@@ -89,7 +90,7 @@ public class DrtRoute extends AbstractRoute {
 	@Override
 	public String getRouteDescription() {
 		try {
-			return new ObjectMapper().writeValueAsString(routeDescription);
+			return OBJECT_MAPPER.writeValueAsString(routeDescription);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
@@ -109,7 +110,7 @@ public class DrtRoute extends AbstractRoute {
 			// Handle new routeDescription (json)
 		} else if (routeDescription.startsWith("{")) {
 			try {
-				this.routeDescription = new ObjectMapper().readValue(routeDescription, RouteDescription.class);
+				this.routeDescription = OBJECT_MAPPER.readValue(routeDescription, RouteDescription.class);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}

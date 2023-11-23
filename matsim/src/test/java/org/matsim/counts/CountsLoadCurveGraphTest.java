@@ -20,12 +20,20 @@
 
 package org.matsim.counts;
 
+import static org.junit.Assert.assertNotNull;
+
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraph;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class CountsLoadCurveGraphTest extends MatsimTestCase {
+public class CountsLoadCurveGraphTest {
 
-	public void testCreateChart() {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testCreateChart() {
 		CountsFixture fixture = new CountsFixture();
 		fixture.setUp();
 

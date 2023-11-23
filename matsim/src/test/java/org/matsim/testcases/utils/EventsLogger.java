@@ -21,8 +21,9 @@ package org.matsim.testcases.utils;
 
 import java.util.Map;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.events.handler.BasicEventHandler;
 
@@ -33,7 +34,7 @@ import org.matsim.core.events.handler.BasicEventHandler;
  */
 public class EventsLogger implements BasicEventHandler {
 
-	private final static Logger log = Logger.getLogger(EventsLogger.class);
+	private final static Logger log = LogManager.getLogger(EventsLogger.class);
 	private final Level level;
 
 	public EventsLogger() {

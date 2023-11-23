@@ -20,14 +20,17 @@
 
 package org.matsim.contrib.drt.passenger;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Supplier;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerPickupActivity;
-import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.dynagent.FirstLastSimStepDynActivity;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
@@ -42,11 +45,11 @@ public class DrtStopActivity extends FirstLastSimStepDynActivity implements Pass
 	private final DynAgent driver;
 	private final Map<Id<Request>, ? extends AcceptedDrtRequest> dropoffRequests;
 	private final Map<Id<Request>, ? extends AcceptedDrtRequest> pickupRequests;
-	private final double expectedEndTime;
+	private final Supplier<Double> endTime;
 
 	private int passengersPickedUp = 0;
 
-	public DrtStopActivity(PassengerHandler passengerHandler, DynAgent driver, StayTask task,
+	public DrtStopActivity(PassengerHandler passengerHandler, DynAgent driver, Supplier<Double> endTime,
 			Map<Id<Request>, ? extends AcceptedDrtRequest> dropoffRequests,
 			Map<Id<Request>, ? extends AcceptedDrtRequest> pickupRequests, String activityType) {
 		super(activityType);
@@ -54,27 +57,27 @@ public class DrtStopActivity extends FirstLastSimStepDynActivity implements Pass
 		this.driver = driver;
 		this.dropoffRequests = dropoffRequests;
 		this.pickupRequests = pickupRequests;
-		this.expectedEndTime = task.getEndTime();
+		this.endTime = endTime;
 	}
 
 	@Override
 	protected boolean isLastStep(double now) {
-		return passengersPickedUp == pickupRequests.size() && now >= expectedEndTime;
+		return passengersPickedUp == pickupRequests.size() && now >= endTime.get();
 	}
 
 	@Override
 	protected void beforeFirstStep(double now) {
 		// TODO probably we should simulate it more accurately (passenger by passenger, not all at once...)
 		for (var request : dropoffRequests.values()) {
-			passengerHandler.dropOffPassenger(driver, request.getId(), now);
+			passengerHandler.dropOffPassengers(driver, request.getId(), now);
 		}
 	}
 
 	@Override
 	protected void simStep(double now) {
-		if (now == expectedEndTime) {
+		if (now == endTime.get()) {
 			for (var request : pickupRequests.values()) {
-				if (passengerHandler.tryPickUpPassenger(this, driver, request.getId(), now)) {
+				if (passengerHandler.tryPickUpPassengers(this, driver, request.getId(), now)) {
 					passengersPickedUp++;
 				}
 			}
@@ -82,23 +85,23 @@ public class DrtStopActivity extends FirstLastSimStepDynActivity implements Pass
 	}
 
 	@Override
-	public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now) {
-		if (now < expectedEndTime) {
+	public void notifyPassengersAreReadyForDeparture(List<MobsimPassengerAgent> passengers, double now) {
+		if (now < endTime.get()) {
 			return;// pick up only at the end of stop activity
 		}
 
-		var request = getRequestForPassenger(passenger.getId());
-		if (passengerHandler.tryPickUpPassenger(this, driver, request.getId(), now)) {
+		var request = getRequestForPassengers(passengers.stream().map(Identifiable::getId).toList());
+		if (passengerHandler.tryPickUpPassengers(this, driver, request.getId(), now)) {
 			passengersPickedUp++;
 		} else {
 			throw new IllegalStateException("The passenger is not on the link or not available for departure!");
 		}
 	}
 
-	private AcceptedDrtRequest getRequestForPassenger(Id<Person> passengerId) {
+	private AcceptedDrtRequest getRequestForPassengers(List<Id<Person>> passengerIds) {
 		return pickupRequests.values()
 				.stream()
-				.filter(r -> passengerId.equals(r.getPassengerId()))
+				.filter(r -> r.getPassengerIds().size() == passengerIds.size() && r.getPassengerIds().containsAll(passengerIds))
 				.findAny()
 				.orElseThrow(() -> new IllegalArgumentException("I am waiting for different passengers!"));
 	}

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+	<module name="testModule" >
+		<!-- boolean -->
+		<param name="booleanField" value="false" />
+		<!-- byte -->
+		<param name="byteField" value="0" />
+		<!-- char -->
+		<param name="charField" value=" " />
+		<param name="coordField" value="null" />
+		<param name="doubleField" value="0.0" />
+		<!-- Possible values: VALUE1,VALUE2 -->
+		<param name="enumField" value="null" />
+		<!-- float -->
+		<param name="floatField" value="0.0" />
+		<param name="idField" value="null" />
+		<!-- int -->
+		<param name="intField" value="0" />
+		<param name="list" value="str1, , str2" />
+		<!-- long -->
+		<param name="longField" value="0" />
+		<!-- set -->
+		<param name="setField" value="str1, , str2" />
+		<!-- short -->
+		<param name="shortField" value="0" />
+	</module>
+
+</config>

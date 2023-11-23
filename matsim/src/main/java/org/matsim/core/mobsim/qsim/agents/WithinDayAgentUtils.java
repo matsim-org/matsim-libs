@@ -20,7 +20,8 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -64,7 +65,7 @@ public final class WithinDayAgentUtils {
 			// do not instantiate: static methods only
 		}
 
-	private static final Logger log = Logger.getLogger( WithinDayAgentUtils.class );
+	private static final Logger log = LogManager.getLogger( WithinDayAgentUtils.class );
 
 	public static Integer getCurrentPlanElementIndex(MobsimAgent agent) {
 		//		if (agent instanceof PersonDriverAgentImpl) {

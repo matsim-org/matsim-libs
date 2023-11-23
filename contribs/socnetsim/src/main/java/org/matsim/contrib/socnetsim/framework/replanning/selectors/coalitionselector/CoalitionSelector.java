@@ -26,7 +26,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -48,7 +49,7 @@ import org.matsim.core.utils.misc.Counter;
  * @author thibautd
  */
 public class CoalitionSelector implements GroupLevelPlanSelector {
-	private static final Logger log = Logger.getLogger( CoalitionSelector.class );
+	private static final Logger log = LogManager.getLogger( CoalitionSelector.class );
 	
 	private final ConflictSolver conflictSolver;
 	private final WeightCalculator weight;

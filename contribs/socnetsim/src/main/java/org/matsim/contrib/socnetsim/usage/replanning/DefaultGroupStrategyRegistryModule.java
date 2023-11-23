@@ -22,7 +22,8 @@ package org.matsim.contrib.socnetsim.usage.replanning;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
@@ -37,7 +38,7 @@ import java.util.Map;
  * @author thibautd
  */
 public class DefaultGroupStrategyRegistryModule extends AbstractModule {
-	private static final  Logger log = Logger.getLogger( DefaultGroupStrategyRegistryModule.class );
+	private static final  Logger log = LogManager.getLogger( DefaultGroupStrategyRegistryModule.class );
 
 	@Override
     public void install() {

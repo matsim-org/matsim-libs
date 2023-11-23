@@ -19,7 +19,16 @@
  * *********************************************************************** */
 package org.matsim.lanes.data;
 
-import org.apache.log4j.Logger;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -31,19 +40,20 @@ import org.matsim.lanes.Lanes;
 import org.matsim.lanes.LanesReader;
 import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.lanes.LanesWriter;
-import org.matsim.testcases.MatsimTestCase;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Tests the reader and writer for lanes
  * @author dgrether
  *
  */
-public class LanesReaderWriterTest extends MatsimTestCase {
+public class LanesReaderWriterTest {
 
-	private static final Logger log = Logger.getLogger(LanesReaderWriterTest.class);
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	private static final Logger log = LogManager.getLogger(LanesReaderWriterTest.class);
 
 	private static final String FILENAME = "testLanes.xml";
 
@@ -69,21 +79,21 @@ public class LanesReaderWriterTest extends MatsimTestCase {
 		}
 	}
 
-	public void testReader20() {
+	@Test public void testReader20() {
 		Fixture f = new Fixture();
 		LanesReader reader = new LanesReader(f.scenario);
-		reader.readFile(this.getClassInputDirectory() + FILENAME);
+		reader.readFile(utils.getClassInputDirectory() + FILENAME);
 		checkContent(f.scenario.getLanes());
 	}
-	
-	public void testWriter20() {
+
+	@Test public void testWriter20() {
 		Fixture f = new Fixture();
-		String testoutput = this.getOutputDirectory() + "testLaneDefinitions2.0out.xml.gz";
+		String testoutput = utils.getOutputDirectory() + "testLaneDefinitions2.0out.xml.gz";
 		log.debug("reading file...");
 		// read the test file
 		LanesReader reader = new LanesReader(
 				f.scenario);
-		reader.readFile(this.getClassInputDirectory() + FILENAME);
+		reader.readFile(utils.getClassInputDirectory() + FILENAME);
 
 		// write the test file
 		log.debug("write the test file...");
@@ -111,14 +121,14 @@ public class LanesReaderWriterTest extends MatsimTestCase {
 		Lane lane = lanes.get(0);
 		assertEquals(laneId3, lane.getId());
 		assertEquals(linkId1, lane.getToLinkIds().get(0));
-		assertEquals(45.0, lane.getStartsAtMeterFromLinkEnd(), EPSILON);
-		assertEquals(1.0, lane.getNumberOfRepresentedLanes());
-		assertEquals(0.725, lane.getCapacityVehiclesPerHour(), EPSILON);
+		assertEquals(45.0, lane.getStartsAtMeterFromLinkEnd(), MatsimTestUtils.EPSILON);
+		assertEquals(1.0, lane.getNumberOfRepresentedLanes(), 0);
+		assertEquals(0.725, lane.getCapacityVehiclesPerHour(), MatsimTestUtils.EPSILON);
 		lane = lanes.get(1);
 		assertEquals(laneId5, lane.getId());
-		assertEquals(60.0, lane.getStartsAtMeterFromLinkEnd(), EPSILON);
-		assertEquals(2.5, lane.getNumberOfRepresentedLanes());
-		assertEquals(2, lane.getCapacityVehiclesPerHour(), EPSILON);
+		assertEquals(60.0, lane.getStartsAtMeterFromLinkEnd(), MatsimTestUtils.EPSILON);
+		assertEquals(2.5, lane.getNumberOfRepresentedLanes(), 0);
+		assertEquals(2, lane.getCapacityVehiclesPerHour(), MatsimTestUtils.EPSILON);
 		//check a lanes2linkassignment using default values
 		l2la = assignments.get(1);
 		assertNotNull(l2la);
@@ -128,9 +138,9 @@ public class LanesReaderWriterTest extends MatsimTestCase {
 		lane = lanes.get(0);
 		assertEquals(laneId1, lane.getId());
 		assertEquals(linkId1, lane.getToLinkIds().get(0));
-		assertEquals(45.0, lane.getStartsAtMeterFromLinkEnd(), EPSILON);
-		assertEquals(1900.0, lane.getCapacityVehiclesPerHour(), EPSILON);
-		assertEquals(1.0, lane.getNumberOfRepresentedLanes());
+		assertEquals(45.0, lane.getStartsAtMeterFromLinkEnd(), MatsimTestUtils.EPSILON);
+		assertEquals(1900.0, lane.getCapacityVehiclesPerHour(), MatsimTestUtils.EPSILON);
+		assertEquals(1.0, lane.getNumberOfRepresentedLanes(), 0);
 	}
 
 }

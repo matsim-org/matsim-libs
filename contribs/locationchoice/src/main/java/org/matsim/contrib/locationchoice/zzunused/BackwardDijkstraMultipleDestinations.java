@@ -21,7 +21,8 @@ package org.matsim.contrib.locationchoice.zzunused;
 
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -38,7 +39,7 @@ import org.matsim.vehicles.Vehicle;
 @Deprecated // (I think)
 class BackwardDijkstraMultipleDestinations extends Dijkstra {
 
-	private final static Logger log = Logger.getLogger(BackwardDijkstraMultipleDestinations.class);
+	private final static Logger log = LogManager.getLogger(BackwardDijkstraMultipleDestinations.class);
 	final TravelDisutility costFunction;
 	final TravelTime timeFunction;
 	private int iterationID = Integer.MIN_VALUE + 1;

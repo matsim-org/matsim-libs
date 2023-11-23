@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package playground.vsp.analysis.modules.act2mode;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 
 /**
@@ -28,7 +29,7 @@ import org.matsim.api.core.v01.Coord;
 public class ActivityToMode {
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(ActivityToMode.class);
+	private static final Logger log = LogManager.getLogger(ActivityToMode.class);
 	private Double time;
 	private String mode;
 	private String actType;

@@ -34,12 +34,6 @@ public class UniformHistogram extends AbstractHistogram<Double> {
 		this.binSize = binSize;
 	}
 
-	public void addValues(double[] values) {
-		for (double v : values) {
-			addValue(v);
-		}
-	}
-
 	public void addValue(double value) {
 		increment(Math.min((int)(value / binSize), counts.length - 1));
 	}

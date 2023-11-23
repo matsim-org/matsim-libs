@@ -42,50 +42,50 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * 
+ *
  * Tests the functionality of adding subsidies to the operator's score.
- * 
+ *
 * @author ikaddoura
 */
 
 public class SubsidyContextTestIT implements TabularFileHandler {
-	
+
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final ArrayList<String[]> pStatsResults = new ArrayList<>();
 	private String gridScenarioDirectory ="../../example-scenario/input/";
-	
+
 	@Ignore
 	@Test
 	public final void testDefaultPControler() {
-			
+
 		Config config1 = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config.xml", new PConfigGroup() ) ;
-		
+
 		config1.network().setInputFile(gridScenarioDirectory  + "network.xml");
 		config1.transit().setVehiclesFile(gridScenarioDirectory + "transitVehicles.xml");
 		config1.transit().setTransitScheduleFile(gridScenarioDirectory + "transitSchedule_10min.xml");
 		config1.plans().setInputFile(gridScenarioDirectory + "population_1000_per_hour_each_from_6_to_10.xml.gz");
-		config1.controler().setOutputDirectory(utils.getOutputDirectory());
-		
-		Scenario scenario1 = ScenarioUtils.loadScenario(config1);	
+		config1.controller().setOutputDirectory(utils.getOutputDirectory());
+
+		Scenario scenario1 = ScenarioUtils.loadScenario(config1);
 		Controler controler1 = new Controler(scenario1);
-		
-		controler1.getConfig().controler().setCreateGraphs(true);
-		controler1.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-		
+
+		controler1.getConfig().controller().setCreateGraphs(true);
+		controler1.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+
 		controler1.addOverridingModule(new PModule()) ;
 		controler1.run();
-		
-		// Check standard output files	
-		
+
+		// Check standard output files
+
 		List<String> filesToCheckFor = new LinkedList<>();
 		filesToCheckFor.add(utils.getOutputDirectory() + "0.actsFromParatransitUsers.txt");
 		filesToCheckFor.add(utils.getOutputDirectory() + "pOperatorLogger.txt");
 		filesToCheckFor.add(utils.getOutputDirectory() + "pStats.txt");
-		filesToCheckFor.add(utils.getOutputDirectory() + "scorestats.txt");
-		filesToCheckFor.add(utils.getOutputDirectory() + "stopwatch.txt");
-		filesToCheckFor.add(utils.getOutputDirectory() + "traveldistancestats.txt");
+		filesToCheckFor.add(utils.getOutputDirectory() + "scorestats.csv");
+		filesToCheckFor.add(utils.getOutputDirectory() + "stopwatch.csv");
+		filesToCheckFor.add(utils.getOutputDirectory() + "traveldistancestats.csv");
 		filesToCheckFor.add(utils.getOutputDirectory() + "pStat_light.gexf.gz");
 		filesToCheckFor.add(utils.getOutputDirectory() + "pStat.gexf.gz");
 
@@ -112,42 +112,42 @@ public class SubsidyContextTestIT implements TabularFileHandler {
 		Assert.assertEquals("Number of +coops (final iteration)", "4", this.pStatsResults.get(31)[2]);
 		Assert.assertEquals("Number of +routes (final iteration)", "6", this.pStatsResults.get(31)[4]);
 		Assert.assertEquals("Number of +pax (final iteration)", "3610", this.pStatsResults.get(31)[6]);
-		Assert.assertEquals("Number of +veh (final iteration)", "16", this.pStatsResults.get(31)[8]);		
+		Assert.assertEquals("Number of +veh (final iteration)", "16", this.pStatsResults.get(31)[8]);
 	}
-	
+
 	@Ignore
 	@Test
 	public final void testSubsidyPControler() {
-		
+
 		Config config2 = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config.xml", new PConfigGroup() ) ;
-		
+
 		PConfigGroup pConfig2 = (PConfigGroup) config2.getModules().get(PConfigGroup.GROUP_NAME);
 		pConfig2.setSubsidyApproach("perPassenger");
-		
+
 		config2.network().setInputFile(gridScenarioDirectory  + "network.xml");
 		config2.transit().setVehiclesFile(gridScenarioDirectory + "transitVehicles.xml");
 		config2.transit().setTransitScheduleFile(gridScenarioDirectory + "transitSchedule_10min.xml");
 		config2.plans().setInputFile(gridScenarioDirectory + "population_1000_per_hour_each_from_6_to_10.xml.gz");
-		config2.controler().setOutputDirectory(utils.getOutputDirectory());
-		
-		Scenario scenario2 = ScenarioUtils.loadScenario(config2);	
+		config2.controller().setOutputDirectory(utils.getOutputDirectory());
+
+		Scenario scenario2 = ScenarioUtils.loadScenario(config2);
 		Controler controler2 = new Controler(scenario2);
-		
-		controler2.getConfig().controler().setCreateGraphs(true);
-		controler2.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-		
+
+		controler2.getConfig().controller().setCreateGraphs(true);
+		controler2.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+
 		controler2.addOverridingModule(new PModule()) ;
 		controler2.run();
-		
-		// Check standard output files	
-		
+
+		// Check standard output files
+
 		List<String> filesToCheckFor = new LinkedList<>();
 		filesToCheckFor.add(utils.getOutputDirectory() + "0.actsFromParatransitUsers.txt");
 		filesToCheckFor.add(utils.getOutputDirectory() + "pOperatorLogger.txt");
 		filesToCheckFor.add(utils.getOutputDirectory() + "pStats.txt");
-		filesToCheckFor.add(utils.getOutputDirectory() + "scorestats.txt");
-		filesToCheckFor.add(utils.getOutputDirectory() + "stopwatch.txt");
-		filesToCheckFor.add(utils.getOutputDirectory() + "traveldistancestats.txt");
+		filesToCheckFor.add(utils.getOutputDirectory() + "scorestats.csv");
+		filesToCheckFor.add(utils.getOutputDirectory() + "stopwatch.csv");
+		filesToCheckFor.add(utils.getOutputDirectory() + "traveldistancestats.csv");
 		filesToCheckFor.add(utils.getOutputDirectory() + "pStat_light.gexf.gz");
 		filesToCheckFor.add(utils.getOutputDirectory() + "pStat.gexf.gz");
 
@@ -175,13 +175,13 @@ public class SubsidyContextTestIT implements TabularFileHandler {
 		Assert.assertEquals("Number of +coops (final iteration)", "4", this.pStatsResults.get(31)[2]);
 		Assert.assertEquals("Number of +routes (final iteration)", "51", this.pStatsResults.get(31)[4]);
 		Assert.assertEquals("Number of +pax (final iteration)", "9951", this.pStatsResults.get(31)[6]);
-		Assert.assertEquals("Number of +veh (final iteration)", "260", this.pStatsResults.get(31)[8]);		
+		Assert.assertEquals("Number of +veh (final iteration)", "260", this.pStatsResults.get(31)[8]);
 	}
-	
+
 	@Override
 	public void startRow(String[] row) {
-		this.pStatsResults.add(row);	
+		this.pStatsResults.add(row);
 	}
-	
+
 }
 

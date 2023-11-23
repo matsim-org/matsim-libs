@@ -2,12 +2,13 @@
 package playground.vsp.andreas.mzilske.osm;
 
 import java.util.Calendar;
-import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openstreetmap.osmosis.core.OsmosisRuntimeException;
 import org.openstreetmap.osmosis.core.container.v0_6.BoundContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.NodeContainer;
@@ -63,7 +64,7 @@ public class JOSMTolerantFastXMLParser {
 	private static final String ATTRIBUTE_NAME_BOX = "box";
 	private static final String ATTRIBUTE_NAME_ORIGIN = "origin";
 
-	private static final Logger LOG = Logger.getLogger(JOSMTolerantFastXMLParser.class.getName());
+	private static final Logger LOG = LogManager.getLogger(JOSMTolerantFastXMLParser.class);
 
 
 	/**
@@ -380,7 +381,7 @@ public class JOSMTolerantFastXMLParser {
 				fileVersion = reader.getAttributeValue(null, ATTRIBUTE_NAME_VERSION);
 
 				if (!XmlConstants.OSM_VERSION.equals(fileVersion)) {
-					LOG.warning(
+					LOG.warn(
 							"Expected version " + XmlConstants.OSM_VERSION
 							+ " but received " + fileVersion + "."
 					);

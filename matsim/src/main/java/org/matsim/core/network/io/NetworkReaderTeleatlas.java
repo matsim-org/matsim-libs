@@ -22,7 +22,8 @@ package org.matsim.core.network.io;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
@@ -55,7 +56,7 @@ public final class NetworkReaderTeleatlas implements MatsimSomeReader {
 	// member variables
 	// ////////////////////////////////////////////////////////////////////
 
-	private final static Logger log = Logger.getLogger(NetworkReaderTeleatlas.class);
+	private final static Logger log = LogManager.getLogger(NetworkReaderTeleatlas.class);
 
 	private final Network network;
 

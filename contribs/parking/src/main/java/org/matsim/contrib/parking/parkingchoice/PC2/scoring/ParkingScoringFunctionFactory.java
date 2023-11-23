@@ -19,20 +19,17 @@
 
 package org.matsim.contrib.parking.parkingchoice.PC2.scoring;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
 /**
  * The parking scoring function adds a term to the original scoring function
  * (creates wrapper around original scoring function factory).
- * 
+ *
  * rashid_waraich
- * 
+ *
  */
 
 public class ParkingScoringFunctionFactory implements ScoringFunctionFactory {

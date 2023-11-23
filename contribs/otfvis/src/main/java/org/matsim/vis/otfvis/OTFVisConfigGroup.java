@@ -150,9 +150,10 @@ public class OTFVisConfigGroup extends ConfigGroup {
 	/**
 	 * @param delay_ms the delay_ms to set
 	 */
-	public void setDelay_ms(final int delay_ms) {
+	public OTFVisConfigGroup setDelay_ms(final int delay_ms) {
 		this.setModified();
 		this.delay_ms = delay_ms;
+		return this;
 	}
 
 	/**
@@ -162,16 +163,10 @@ public class OTFVisConfigGroup extends ConfigGroup {
 		// yy called from nowhere (as far as I can tell).  kai, jul'16
 		return this.modified;
 	}
-	/**
-	 * @param modified the modified to set
-	 */
 	private void setModified() {
 		this.modified = true;
 	}
 
-	/**
-	 * @param modified the modified to unset
-	 */
 	public void clearModified() {
 		this.modified = false;
 	}
@@ -297,54 +292,60 @@ public class OTFVisConfigGroup extends ConfigGroup {
 		return this.agentSize;
 	}
 
-	public void setAgentSize(final float agentSize) {
+	public OTFVisConfigGroup setAgentSize(final float agentSize) {
 		if(this.agentSize != agentSize) setModified();
 		this.agentSize = agentSize;
+		return this;
 	}
 
 	public String getMiddleMouseFunc() {
 		return this.middleMouseFunc;
 	}
 
-	public void setMiddleMouseFunc(final String middleMouseFunc) {
+	public OTFVisConfigGroup setMiddleMouseFunc(final String middleMouseFunc) {
 		if(this.middleMouseFunc.equals(middleMouseFunc)) setModified();
 		this.middleMouseFunc = middleMouseFunc;
+		return this;
 	}
 
 	public String getLeftMouseFunc() {
 		return this.leftMouseFunc;
 	}
 
-	public void setLeftMouseFunc(final String leftMouseFunc) {
+	public OTFVisConfigGroup setLeftMouseFunc(final String leftMouseFunc) {
 		if(this.leftMouseFunc.equals(leftMouseFunc)) setModified();
 		this.leftMouseFunc = leftMouseFunc;
+		return this;
 	}
 
 	public String getRightMouseFunc() {
 		return this.rightMouseFunc;
 	}
 
-	public void setRightMouseFunc(final String rightMouseFunc) {
+	public OTFVisConfigGroup setRightMouseFunc(final String rightMouseFunc) {
 		if(this.rightMouseFunc.equals(rightMouseFunc)) setModified();
 		this.rightMouseFunc = rightMouseFunc;
+		return this;
 	}
 
 	public int getBigTimeStep() {
 		return this.bigTimeStep;
 	}
 
-	public void setBigTimeStep(final int bigTimeStep) {
+	public OTFVisConfigGroup setBigTimeStep(final int bigTimeStep) {
 		if(this.bigTimeStep != bigTimeStep) setModified();
 		this.bigTimeStep = bigTimeStep;
+		return this;
 	}
 
 	public String getQueryType() {
 		return this.queryType;
 	}
 	
-	public void setQueryType(final String queryType) {
+	public OTFVisConfigGroup setQueryType( final String queryType ) {
 		setModified() ;
 		this.queryType = queryType;
+		return this;
 	}
 
 	public boolean isMultipleSelect() {
@@ -352,85 +353,95 @@ public class OTFVisConfigGroup extends ConfigGroup {
 	}
 
 
-	public void setMultipleSelect(final boolean multipleSelect) {
+	public OTFVisConfigGroup setMultipleSelect(final boolean multipleSelect) {
 		setModified() ;
 		this.multipleSelect = multipleSelect;
+		return this;
 	}
 
 	public Color getNetworkColor() {
 		return this.networkColor;
 	}
 
-	public void setNetworkColor(final Color networkColor) {
+	public OTFVisConfigGroup setNetworkColor(final Color networkColor) {
 		setModified();
 		this.networkColor = new Color(networkColor.getRed(), networkColor.getGreen(), networkColor.getBlue(), 128);
+		return this;
 	}
 
 	public Color getBackgroundColor() {
 		return this.backgroundColor;
 	}
 
-	public void setBackgroundColor(final Color bgColor) {
+	public OTFVisConfigGroup setBackgroundColor(final Color bgColor) {
 		setModified();
 		this.backgroundColor = bgColor;
+		return this;
 	}
 
 	public float getLinkWidth() {
 		return this.linkWidth;
 	}
 
-	public void setLinkWidth(final float linkWidth) {
+	public OTFVisConfigGroup setLinkWidth(final float linkWidth) {
 		setModified();
 		this.linkWidth = linkWidth;
+		return this;
 	}
 
 	public boolean isDrawNonMovingItems() {
 		return this.showParking;
 	}
 
-	public void setDrawNonMovingItems(final boolean showParking) {
+	public OTFVisConfigGroup setDrawNonMovingItems(final boolean showParking) {
 		setModified();
 		this.showParking = showParking;
+		return this;
 	}
 
 	public boolean isDrawingLinkIds() {
 		return this.drawLinkIds;
 	}
 
-	public void setDrawLinkIds(final boolean drawLinkIds) {
+	public OTFVisConfigGroup setDrawLinkIds(final boolean drawLinkIds) {
 		setModified();
 		this.drawLinkIds = drawLinkIds;
+		return this;
 	}
 
-	public void setDrawOverlays(final boolean drawOverlays) {
+	public OTFVisConfigGroup setDrawOverlays(final boolean drawOverlays) {
 		setModified();
 		this.drawOverlays = drawOverlays;
+		return this;
 	}
 
 	public boolean drawOverlays() {
 		return this.drawOverlays;
 	}
-	public void setDrawTime(final boolean draw) {
+	public OTFVisConfigGroup setDrawTime(final boolean draw) {
 		setModified();
 		this.drawTime = draw;
+		return this;
 	}
 
 	public boolean drawTime() {
 		return this.drawTime;
 	}
 
-	public boolean setRenderImages(final boolean render) {
+	public OTFVisConfigGroup setRenderImages( final boolean render ) {
 		setModified();
-		return this.renderImages = render;
+		this.renderImages = render;
+		return this;
 	}
 
 	public boolean getRenderImages() {
 		return this.renderImages;
 	}
 
-	public void setDrawScaleBar(final boolean drawScaleBar) {
+	public OTFVisConfigGroup setDrawScaleBar(final boolean drawScaleBar) {
 		setModified();
 		this.drawScaleBar = drawScaleBar;
+		return this;
 	}
 
 	public boolean drawScaleBar() {
@@ -445,18 +456,20 @@ public class OTFVisConfigGroup extends ConfigGroup {
 		this.showTeleportedAgents = showTeleportation;
 	}
 
-	public void setDrawTransitFacilities(final boolean drawTransitFacilities) {
+	public OTFVisConfigGroup setDrawTransitFacilities(final boolean drawTransitFacilities) {
 		setModified() ;
 		this.drawTransitFacilities = drawTransitFacilities;
+		return this;
 	}
 
 	public boolean isDrawTransitFacilities() {
 		return this.drawTransitFacilities;
 	}
 
-	public void setDrawTransitFacilityIds(final boolean drawTransitFacilityIds) {
+	public OTFVisConfigGroup setDrawTransitFacilityIds(final boolean drawTransitFacilityIds) {
 		setModified() ;
 		this.drawTransitFacilityIds = drawTransitFacilityIds;
+		return this;
 	}
 
 	public boolean isDrawTransitFacilityIds() {
@@ -467,21 +480,24 @@ public class OTFVisConfigGroup extends ConfigGroup {
 		return this.scaleQuadTreeRect;
 	}
 
-	public void setScaleQuadTreeRect(final boolean doScale){
+	public OTFVisConfigGroup setScaleQuadTreeRect(final boolean doScale){
 		setModified() ;
 		this.scaleQuadTreeRect = doScale;
+		return this;
 	}
 
 	public ColoringScheme getColoringScheme() {
 		return this.coloring ;
 	}
-	public void setColoringScheme( ColoringScheme value ) {
+	public OTFVisConfigGroup setColoringScheme( ColoringScheme value ) {
 		this.setModified() ;
 		this.coloring = value ;
+		return this;
 	}
 
-	public void setEffectiveLaneWidth(Double effectiveLaneWidth) {
+	public OTFVisConfigGroup setEffectiveLaneWidth(Double effectiveLaneWidth) {
 		this.effectiveLaneWidth = effectiveLaneWidth ;
+		return this;
 	}
 	public Double getEffectiveLaneWidth() {
 		return this.effectiveLaneWidth ;
@@ -491,32 +507,37 @@ public class OTFVisConfigGroup extends ConfigGroup {
 		return linkWidthIsProportionalTo;
 	}
 
-	public void setLinkWidthIsProportionalTo(String linkWidthIsProportionalTo) {
+	public OTFVisConfigGroup setLinkWidthIsProportionalTo(String linkWidthIsProportionalTo) {
 		this.linkWidthIsProportionalTo = linkWidthIsProportionalTo;
+		return this;
 	}
 
 	public int getMaximumZoom() {
 		return maximumZoom;
 	}
 
-	public void setMaximumZoom(int maximumZoom) {
+	public OTFVisConfigGroup setMaximumZoom(int maximumZoom) {
 		this.maximumZoom = maximumZoom;
+		return this;
 	}
 
 	public boolean isMapOverlayMode() {
 		return mapOverlayMode;
 	}
 
-	public void setMapOverlayMode(boolean mapOverlayMode) {
+	public OTFVisConfigGroup setMapOverlayMode(boolean mapOverlayMode) {
 		this.mapOverlayMode = mapOverlayMode;
+		return this;
 	}
 	
-	public void setMapBaseUrl(String mapBaseURL) {
+	public OTFVisConfigGroup setMapBaseUrl(String mapBaseURL) {
 		this.mapBaseURL = mapBaseURL;
+		return this;
 	}
 
-	public void setMapLayer(String mapLayer) {
+	public OTFVisConfigGroup setMapLayer(String mapLayer) {
 		this.mapLayer = mapLayer;
+		return this;
 	}
 
 	public String getMapBaseURL() {

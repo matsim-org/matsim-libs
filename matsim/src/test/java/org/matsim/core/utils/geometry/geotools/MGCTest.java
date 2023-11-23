@@ -21,19 +21,25 @@
 
  package org.matsim.core.utils.geometry.geotools;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * 
+ *
  * @author laemmel
  *
  */
-public class MGCTest extends MatsimTestCase {
+public class MGCTest {
 
-	public void testCoord2CoordinateAndViceVersa(){
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testCoord2CoordinateAndViceVersa(){
 		double x = 123.456789;
 		double y = 987.654321;
 		double delta = 0.0000001;
@@ -42,11 +48,11 @@ public class MGCTest extends MatsimTestCase {
 		Coord coord3 = MGC.coordinate2Coord(coord2);
 		double x1 = coord3.getX();
 		double y1 = coord3.getY();
-		junit.framework.Assert.assertEquals(x,x1,delta);
-		junit.framework.Assert.assertEquals(y,y1,delta);
+		org.junit.Assert.assertEquals(x,x1,delta);
+		org.junit.Assert.assertEquals(y,y1,delta);
 	}
 
-	public void testCoord2PointAndViceVersa(){
+	@Test public void testCoord2PointAndViceVersa(){
 		double x = 123.456789;
 		double y = 987.654321;
 		double delta = 0.0000001;
@@ -55,48 +61,69 @@ public class MGCTest extends MatsimTestCase {
 		Coord coord2 = MGC.point2Coord(p);
 		double x1 = coord2.getX();
 		double y1 = coord2.getY();
-		junit.framework.Assert.assertEquals(x,x1,delta);
-		junit.framework.Assert.assertEquals(y,y1,delta);
+		org.junit.Assert.assertEquals(x,x1,delta);
+		org.junit.Assert.assertEquals(y,y1,delta);
 
 	}
 
-	public void testGetUTMEPSGCodeForWGS84Coordinate() {
+	@Test public void testGetUTMEPSGCodeForWGS84Coordinate() {
 		{
 			//Hamburg - should be UTM 32 North --> EPSG:32632
 			double lat = 53.562021;
 			double lon = 9.961533;
 			String epsg = MGC.getUTMEPSGCodeForWGS84Coordinate(lon, lat);
-			junit.framework.Assert.assertEquals("EPSG:32632", epsg);
+			org.junit.Assert.assertEquals("EPSG:32632", epsg);
 		}
 		{
 			//Cupertino - should be UTM 10 North --> EPSG:32610
 			double lat = 37.333488;
 			double lon  = -122.029710;
 			String epsg = MGC.getUTMEPSGCodeForWGS84Coordinate(lon, lat);
-			junit.framework.Assert.assertEquals("EPSG:32610", epsg);
+			org.junit.Assert.assertEquals("EPSG:32610", epsg);
+		}
+		{
+			//Anchorage - should be UTM 6 North --> EPSG:32606
+			double lat = 61.2176;
+			double lon  = -149.8997;
+			String epsg = MGC.getUTMEPSGCodeForWGS84Coordinate(lon, lat);
+			org.junit.Assert.assertEquals("EPSG:32606", epsg);
+		}
+		{
+			//Lourdes (France) - should be UTM 30 North --> EPSG:32630
+			double lat = 43.1;
+			double lon  = -0.05;
+			String epsg = MGC.getUTMEPSGCodeForWGS84Coordinate(lon, lat);
+			org.junit.Assert.assertEquals("EPSG:32630", epsg);
+		}
+		{
+			//east of Lourdes (France) - should be UTM 31 North --> EPSG:32631
+			double lat = 43.1;
+			double lon  = 0.05;
+			String epsg = MGC.getUTMEPSGCodeForWGS84Coordinate(lon, lat);
+			org.junit.Assert.assertEquals("EPSG:32631", epsg);
 		}
 		{
 			//Padang - should be UTM 47 South --> EPSG:32747
 			double lat = -0.959484;
 			double lon  =  100.354052;
 			String epsg = MGC.getUTMEPSGCodeForWGS84Coordinate(lon, lat);
-			junit.framework.Assert.assertEquals("EPSG:32747", epsg);			
+			org.junit.Assert.assertEquals("EPSG:32747", epsg);
 		}
 	}
 
-	public void testGetCRS(){
+	@Test public void testGetCRS(){
 		// CH1903_LV03 Id
-		junit.framework.Assert.assertNotNull(MGC.getCRS("EPSG:21781"));
+		org.junit.Assert.assertNotNull(MGC.getCRS("EPSG:21781"));
 
 		try {
 			MGC.getCRS("");
-			junit.framework.Assert.fail("IllegalArgumentException expected");
+			org.junit.Assert.fail("IllegalArgumentException expected");
 		} catch (IllegalArgumentException expected) { }
 
 		// unknown EPSG Id
 		try {
 			MGC.getCRS("EPSG:MATSim");
-			junit.framework.Assert.fail("IllegalArgumentException expected");
+			org.junit.Assert.fail("IllegalArgumentException expected");
 		} catch (IllegalArgumentException expected) { }
 
 	}

@@ -24,7 +24,7 @@ public class ParkCSVehicles implements AgentSource {
 	private Map<String, VehicleType> modeVehicleTypes;
 	private Collection<String> mainModes;
 	private CarsharingSupplyInterface carsharingSupply;
-	//private final static Logger log = Logger.getLogger(ParkCSVehicles.class);
+	//private final static Logger log = LogManager.getLogger(ParkCSVehicles.class);
 	
 	public ParkCSVehicles(QSim qSim,
 			CarsharingSupplyInterface carsharingSupply) {

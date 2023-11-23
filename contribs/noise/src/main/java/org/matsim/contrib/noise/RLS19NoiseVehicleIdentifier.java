@@ -1,18 +1,19 @@
 package org.matsim.contrib.noise;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.matsim.vehicles.VehicleUtils.getOrCreateAllvehicles;
 
 public class RLS19NoiseVehicleIdentifier implements NoiseVehicleIdentifier {
 
-    private final Logger logger = Logger.getLogger(RLS19NoiseVehicleIdentifier.class);
+    private final Logger logger = LogManager.getLogger(RLS19NoiseVehicleIdentifier.class);
 
     boolean warn = true;
 

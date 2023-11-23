@@ -20,12 +20,17 @@
 
 package org.matsim.pt.transitSchedule;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -42,20 +47,24 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
 
 /**
  * @author mrieser
  */
-public class TransitScheduleReaderTest extends MatsimTestCase {
+public class TransitScheduleReaderTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	private static final String INPUT_TEST_FILE_TRANSITSCHEDULE = "transitSchedule.xml";
 	private static final String INPUT_TEST_FILE_NETWORK = "network.xml";
 
-	public void testReadFileV1() throws SAXException, ParserConfigurationException, IOException {
-		final String inputDir = getClassInputDirectory();
+	@Test public void testReadFileV1() throws SAXException, ParserConfigurationException, IOException {
+		final String inputDir = utils.getClassInputDirectory();
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
@@ -89,8 +98,8 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 		assertEquals("wrong number of links in route.", 4, route.getLinkIds().size());
 	}
 
-	public void testReadFile() throws IOException, SAXException, ParserConfigurationException {
-		final String inputDir = getClassInputDirectory();
+	@Test public void testReadFile() throws IOException, SAXException, ParserConfigurationException {
+		final String inputDir = utils.getClassInputDirectory();
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);

@@ -90,9 +90,24 @@ public class TimeBinMapTest {
 
         TimeBinMap.TimeBin<String> bin = map.getTimeBin(15);
 
-        assertFalse(bin.hasValue());
-        bin.setValue(testValue);
-        assertTrue(bin.hasValue());
-        assertEquals(testValue, bin.getValue());
-    }
+		assertFalse(bin.hasValue());
+		bin.setValue(testValue);
+		assertTrue(bin.hasValue());
+		assertEquals(testValue, bin.getValue());
+	}
+
+	@Test
+	public void timeBin_getValue() {
+
+		final String testValue = "some-value";
+
+		TimeBinMap<String> map = new TimeBinMap<>(10);
+
+		TimeBinMap.TimeBin<String> bin = map.getTimeBin(15);
+		assertFalse(bin.hasValue());
+		var computedValue = bin.computeIfAbsent(() -> testValue);
+		assertEquals(testValue, computedValue);
+		var storedValue = bin.getValue();
+		assertEquals(testValue, storedValue);
+	}
 }

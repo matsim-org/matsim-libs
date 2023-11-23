@@ -14,6 +14,7 @@ import org.matsim.contrib.osm.networkReader.LinkProperties;
 import org.matsim.contrib.osm.networkReader.OsmTags;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -59,12 +60,16 @@ public class SumoNetworkConverter implements Callable<Integer> {
     @CommandLine.Option(names = "--to-crs", description = "Desired output coordinate system", required = true)
     private String toCRS;
 
-    private SumoNetworkConverter(List<Path> input, Path output, Path shapeFile, String fromCRS, String toCRS) {
+    @CommandLine.Option(names = "--free-speed-factor", description = "Free-speed reduction for urban links", defaultValue = "0.9")
+    private double freeSpeedFactor = LinkProperties.DEFAULT_FREESPEED_FACTOR;
+
+    private SumoNetworkConverter(List<Path> input, Path output, Path shapeFile, String fromCRS, String toCRS, double freeSpeedFactor) {
         this.input = input;
         this.output = output;
         this.shapeFile = shapeFile;
         this.fromCRS = fromCRS;
         this.toCRS = toCRS;
+        this.freeSpeedFactor = freeSpeedFactor;
     }
 
     private SumoNetworkConverter() {
@@ -79,7 +84,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
      * @param toCRS   desired coordinate system of network
      */
     public static SumoNetworkConverter newInstance(List<Path> input, Path output, String fromCRS, String toCRS) {
-        return new SumoNetworkConverter(input, output, null, fromCRS, toCRS);
+        return new SumoNetworkConverter(input, output, null, fromCRS, toCRS, LinkProperties.DEFAULT_FREESPEED_FACTOR);
     }
 
     /**
@@ -89,7 +94,15 @@ public class SumoNetworkConverter implements Callable<Integer> {
      * @see #newInstance(List, Path, String, String)
      */
     public static SumoNetworkConverter newInstance(List<Path> input, Path output, Path shapeFile, String fromCRS, String toCRS) {
-        return new SumoNetworkConverter(input, output, shapeFile, fromCRS, toCRS);
+        return new SumoNetworkConverter(input, output, shapeFile, fromCRS, toCRS, LinkProperties.DEFAULT_FREESPEED_FACTOR);
+    }
+
+    /**
+     * Creates a new instance.
+     * @see #newInstance(List, Path, Path, String, String, double)
+     */
+    public static SumoNetworkConverter newInstance(List<Path> input, Path output, Path shapeFile, String inputCRS, String targetCRS, double freeSpeedFactor) {
+        return new SumoNetworkConverter(input, output, shapeFile, inputCRS, targetCRS, freeSpeedFactor);
     }
 
     /**
@@ -119,7 +132,6 @@ public class SumoNetworkConverter implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
 
-
         Network network = NetworkUtils.createNetwork();
         Lanes lanes = LanesUtils.createLanesContainer();
 
@@ -134,7 +146,11 @@ public class SumoNetworkConverter implements Callable<Integer> {
                 LanesUtils.createLanes(link, l2l);
         });
 
-        new NetworkWriter(network).write(output.toAbsolutePath().toString());
+		if (toCRS != null)
+			ProjectionUtils.putCRS(network, toCRS);
+
+		NetworkUtils.writeNetwork(network, output.toAbsolutePath().toString());
+
         new LanesWriter(lanes).write(output.toAbsolutePath().toString().replace(".xml", "-lanes.xml"));
 
         writeGeometry(handler, output.toAbsolutePath().toString().replace(".xml", "-linkGeometries.csv"));
@@ -292,7 +308,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
                 continue;
             }
 
-            link.setFreespeed(LinkProperties.calculateSpeedIfSpeedTag(speed, LinkProperties.DEFAULT_FREESPEED_FACTOR));
+            link.setFreespeed(LinkProperties.calculateSpeedIfSpeedTag(speed, freeSpeedFactor));
             link.setCapacity(LinkProperties.getLaneCapacity(link.getLength(), prop) * link.getNumberOfLanes());
 
             lanes.addLanesToLinkAssignment(l2l);

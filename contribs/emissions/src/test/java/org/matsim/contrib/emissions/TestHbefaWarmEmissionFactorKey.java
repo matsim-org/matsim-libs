@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.emissions;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -30,7 +31,7 @@ import static org.matsim.contrib.emissions.Pollutant.FC;
 
 
 public class TestHbefaWarmEmissionFactorKey{
-	private static final Logger log = Logger.getLogger( TestHbefaWarmEmissionFactorKey.class );
+	private static final Logger log = LogManager.getLogger( TestHbefaWarmEmissionFactorKey.class );
 
 	/*
  	* test for playground.vsp.emissions.types.HbefaWarmEmissionFactorKey

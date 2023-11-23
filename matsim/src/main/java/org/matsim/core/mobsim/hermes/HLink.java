@@ -25,25 +25,28 @@ class HLink {
 	private float currentCapacity;
 	private final int initialCapacity;
 
+	// Id of the link.
+	private final int id;
+
 	// The whole purpose of this implementation is to have a dynamically sized queue that never goes over the capacity
 	// restriction. This becomes a big memory waste when large scenarios are used. This implementation is inspired in
 	// Java's implementation of ArrayDequeue.
-	public class AgentQueue implements Iterable<Agent> {
+	public static class AgentQueue implements Iterable<Agent> {
 
 		// the storage
 		private Agent[] array;
 		// the max capacity of the queue
-		private int maxcapacity;
+		private int maxCapacity;
 
 		// Pop/peak from head
 		private int head;
 		// Push to tail
 		private int tail;
-	    // Number of elements in the queue
-	    private int size;
+		// Number of elements in the queue
+		private int size;
 
-		public AgentQueue(int maxcapacity, int initialcapacity) {
-			this.maxcapacity = maxcapacity;
+		public AgentQueue(int maxCapacity, int initialcapacity) {
+			this.maxCapacity = maxCapacity;
 			this.array = new Agent[initialcapacity];
 		}
 
@@ -54,10 +57,9 @@ class HLink {
 			return number;
 		}
 
-		public boolean forcePush(Agent agent){
-			maxcapacity++;
-			boolean result = push(agent);
-			return result;
+		public boolean forcePush(Agent agent) {
+			maxCapacity++;
+			return push(agent);
 		}
 
 		public boolean push(Agent agent) {
@@ -113,10 +115,10 @@ class HLink {
 
 		@Override
 		public Iterator<Agent> iterator() {
-			return new Iterator<Agent>() {
+			return new Iterator<>() {
 
 				private int idx = head;
-	            private int left = size;
+				private int left = size;
 
 				@Override
 				public boolean hasNext() {
@@ -133,12 +135,9 @@ class HLink {
 		}
 
 		public int capacity() {
-			return maxcapacity;
+			return maxCapacity;
 		}
 	}
-
-    // Id of the link.
-    private int id;
     // Length of the link in meters.
     private final int length;
     // Max velocity within the link (meters per second).

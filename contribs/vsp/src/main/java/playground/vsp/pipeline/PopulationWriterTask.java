@@ -1,6 +1,7 @@
 package playground.vsp.pipeline;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -38,7 +39,7 @@ public class PopulationWriterTask implements PersonSink {
 		final PersonAlgorithm algo = populationWriter;
 		reader.addAlgorithm(algo);
 		populationWriter.startStreaming(filename);
-		Logger.getLogger(this.getClass()).info("Will write to: " + filename ) ;
+		LogManager.getLogger(this.getClass()).info("Will write to: " + filename ) ;
 	}
 
 	@Override
@@ -49,7 +50,7 @@ public class PopulationWriterTask implements PersonSink {
 	@Override
 	public void complete() {
 		populationWriter.closeStreaming();
-		Logger.getLogger(this.getClass()).info("... writing to " + filename + " completed.") ;
+		LogManager.getLogger(this.getClass()).info("... writing to " + filename + " completed.") ;
 	}
 
 }

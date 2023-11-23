@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.run;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -45,7 +46,7 @@ import org.matsim.facilities.algorithms.WorldConnectLocations;
  */
 public class RunUtils {
 	static final Logger log =
-		Logger.getLogger(RunUtils.class);
+		LogManager.getLogger(RunUtils.class);
 
 	private RunUtils() {}
 

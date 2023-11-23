@@ -20,10 +20,14 @@
 
 package org.matsim.contrib.ev.stats;
 
+import com.google.inject.Provider;
+import org.matsim.contrib.common.timeprofile.ProfileWriter;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.ChargingEventSequenceCollector;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 import com.google.inject.Inject;
@@ -43,22 +47,37 @@ public class EvStatsModule extends AbstractModule {
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				if (evCfg.getTimeProfiles()) {
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							SocHistogramTimeProfileCollectorProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							IndividualSocTimeProfileCollectorProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							ChargerOccupancyTimeProfileCollectorProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(ChargerOccupancyXYDataProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							VehicleTypeAggregatedSocTimeProfileCollectorProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).to(EvMobsimListener.class);
+				if (evCfg.timeProfiles) {
+					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(SocHistogramTimeProfileCollectorProvider.class);
+					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(IndividualChargeTimeProfileCollectorProvider.class);
+					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(ChargerOccupancyTimeProfileCollectorProvider.class);
+					addQSimComponentBinding(EvModule.EV_COMPONENT).to(ChargerOccupancyXYDataCollector.class).asEagerSingleton();
+					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(VehicleTypeAggregatedChargeTimeProfileCollectorProvider.class);
 
 					bind(ChargerPowerCollector.class).asEagerSingleton();
 					addMobsimScopeEventHandlerBinding().to(ChargerPowerCollector.class);
+					addQSimComponentBinding(EvModule.EV_COMPONENT).to(ChargerPowerCollector.class);
+
+					bind(EnergyConsumptionCollector.class).asEagerSingleton();
+					addMobsimScopeEventHandlerBinding().to(EnergyConsumptionCollector.class);
+					addQSimComponentBinding(EvModule.EV_COMPONENT).to(EnergyConsumptionCollector.class);
 					// add more time profiles if necessary
 				}
+			}
+		});
+		bind(ChargerPowerTimeProfileCalculator.class).asEagerSingleton();
+		addEventHandlerBinding().to(ChargerPowerTimeProfileCalculator.class);
+		addControlerListenerBinding().toProvider(new Provider<>() {
+			@Inject
+			private ChargerPowerTimeProfileCalculator calculator;
+			@Inject
+			private MatsimServices matsimServices;
+
+			@Override
+			public ControlerListener get() {
+				var profileView = new ChargerPowerTimeProfileView(calculator);
+				return new ProfileWriter(matsimServices,"ev",profileView,"charger_power_time_profiles");
+
 			}
 		});
 	}

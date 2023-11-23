@@ -61,7 +61,8 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 	 * @return maximum travel time
 	 */
 	static double getMaxTravelTime(DrtConfigGroup drtCfg, double unsharedRideTime) {
-		return Math.min(unsharedRideTime + drtCfg.getMaxAbsoluteDetour(), drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta());
+		return Math.min(unsharedRideTime + drtCfg.maxAbsoluteDetour,
+				drtCfg.maxTravelTimeAlpha * unsharedRideTime + drtCfg.maxTravelTimeBeta);
 	}
 
 	public Route createRoute(double departureTime, Link accessActLink, Link egressActLink, Person person,
@@ -76,9 +77,9 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 		route.setDistance(unsharedDistance);
 		route.setTravelTime(maxTravelTime);
 		route.setDirectRideTime(unsharedRideTime);
-		route.setMaxWaitTime(drtCfg.getMaxWaitTime());
+		route.setMaxWaitTime(drtCfg.maxWaitTime);
 
-		if (this.drtCfg.getStoreUnsharedPath()) {
+		if (this.drtCfg.storeUnsharedPath) {
 			route.setUnsharedPath(unsharedPath);
 		}
 

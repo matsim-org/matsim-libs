@@ -20,15 +20,17 @@
 
 package org.matsim.run;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
@@ -41,7 +43,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Simple test case to ensure that {@link org.matsim.run.XY2Links} functions properly, e.g. really
@@ -50,14 +52,18 @@ import org.matsim.testcases.MatsimTestCase;
  *
  * @author mrieser
  */
-public class XY2LinksTest extends MatsimTestCase {
+public class XY2LinksTest {
 
-	public void testMain() throws Exception {
-		Config config = loadConfig(null);
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testMain() throws Exception {
+		Config config = utils.loadConfig((String)null);
 		final String NETWORK_FILE = "test/scenarios/equil/network.xml";
-		final String PLANS_FILE_TESTINPUT = getOutputDirectory() + "plans.in.xml";
-		final String PLANS_FILE_TESTOUTPUT = getOutputDirectory() + "plans.out.xml";
-		final String CONFIG_FILE = getOutputDirectory() + "config.xml";
+		final String PLANS_FILE_TESTINPUT = utils.getOutputDirectory() + "plans.in.xml";
+		final String PLANS_FILE_TESTOUTPUT = utils.getOutputDirectory() + "plans.out.xml";
+		final String CONFIG_FILE = utils.getOutputDirectory() + "config.xml";
 
 		// prepare data like world and network
 		MutableScenario scenario =  (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());

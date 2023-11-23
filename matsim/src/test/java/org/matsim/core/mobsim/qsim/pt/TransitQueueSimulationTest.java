@@ -28,7 +28,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -87,7 +88,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -110,7 +111,7 @@ public class TransitQueueSimulationTest {
         final Config config = ConfigUtils.createConfig();
         config.transit().setUseTransit(true);
         config.qsim().setEndTime(8.0*3600);
-        
+
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
         // setup: network
@@ -136,9 +137,9 @@ public class TransitQueueSimulationTest {
         vehicleType.getCapacity().setSeats(Integer.valueOf(101));
         vehicleType.getCapacity().setStandingRoom(Integer.valueOf(0));
 //        vehicleType.setCapacity(capacity);
-        
+
         vehicles.addVehicleType(vehicleType);
-        
+
         vehicles.addVehicle(vb.createVehicle(Id.create("veh1", Vehicle.class), vehicleType));
         vehicles.addVehicle(vb.createVehicle(Id.create("veh2", Vehicle.class), vehicleType));
         vehicles.addVehicle(vb.createVehicle(Id.create("veh3", Vehicle.class), vehicleType));
@@ -228,11 +229,11 @@ public class TransitQueueSimulationTest {
         });
         assertEquals(5, agents.size());
         assertTrue(agents.get(0) instanceof TransitDriverAgent);
-        assertEquals(6.0*3600, agents.get(0).getActivityEndTime(), MatsimTestCase.EPSILON);
-        assertEquals(7.0*3600, agents.get(1).getActivityEndTime(), MatsimTestCase.EPSILON);
-        assertEquals(8.0*3600, agents.get(2).getActivityEndTime(), MatsimTestCase.EPSILON);
-        assertEquals(8.5*3600, agents.get(3).getActivityEndTime(), MatsimTestCase.EPSILON);
-        assertEquals(9.0*3600, agents.get(4).getActivityEndTime(), MatsimTestCase.EPSILON);
+        assertEquals(6.0*3600, agents.get(0).getActivityEndTime(), MatsimTestUtils.EPSILON);
+        assertEquals(7.0*3600, agents.get(1).getActivityEndTime(), MatsimTestUtils.EPSILON);
+        assertEquals(8.0*3600, agents.get(2).getActivityEndTime(), MatsimTestUtils.EPSILON);
+        assertEquals(8.5*3600, agents.get(3).getActivityEndTime(), MatsimTestUtils.EPSILON);
+        assertEquals(9.0*3600, agents.get(4).getActivityEndTime(), MatsimTestUtils.EPSILON);
     }
 
     /**
@@ -245,7 +246,7 @@ public class TransitQueueSimulationTest {
         config.transit().setUseTransit(true);
 
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-        
+
         // setup: network
         Network network = scenario.getNetwork();
         Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
@@ -293,7 +294,7 @@ public class TransitQueueSimulationTest {
 				.useDefaults() //
 				.build(scenario, events);
         qSim.run();
-        
+
         TransitQSimEngine transitEngine = qSim.getChildInjector().getInstance(TransitQSimEngine.class);
 
         // check everything
@@ -310,9 +311,9 @@ public class TransitQueueSimulationTest {
         // setup: config
         final Config config = ConfigUtils.createConfig();
         config.transit().setUseTransit(true);
-        
+
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-   
+
         // setup: network
         Network network = scenario.getNetwork();
         Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
@@ -381,7 +382,7 @@ public class TransitQueueSimulationTest {
         final Config config = ConfigUtils.createConfig();
         config.transit().setUseTransit(true);
         config.qsim().setEndTime(8.0*3600);
-        
+
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
         // setup: network
@@ -497,12 +498,12 @@ public class TransitQueueSimulationTest {
 
         data = spyData.get(1);
         assertEquals(stop1, data.stopFacility);
-        assertEquals(0.0, data.returnedDelay, MatsimTestCase.EPSILON);
-        assertEquals(lastTime + lastDelay, data.time, MatsimTestCase.EPSILON);
+        assertEquals(0.0, data.returnedDelay, MatsimTestUtils.EPSILON);
+        assertEquals(lastTime + lastDelay, data.time, MatsimTestUtils.EPSILON);
 
         data = spyData.get(2);
         assertEquals(stop2, data.stopFacility);
-        assertEquals(0.0, data.returnedDelay, MatsimTestCase.EPSILON);
+        assertEquals(0.0, data.returnedDelay, MatsimTestUtils.EPSILON);
 
         data = spyData.get(3);
         assertEquals(stop3, data.stopFacility);
@@ -512,8 +513,8 @@ public class TransitQueueSimulationTest {
 
         data = spyData.get(4);
         assertEquals(stop3, data.stopFacility);
-        assertEquals(0.0, data.returnedDelay, MatsimTestCase.EPSILON);
-        assertEquals(lastTime + lastDelay, data.time, MatsimTestCase.EPSILON);
+        assertEquals(0.0, data.returnedDelay, MatsimTestUtils.EPSILON);
+        assertEquals(lastTime + lastDelay, data.time, MatsimTestUtils.EPSILON);
 
         data = spyData.get(5);
         assertEquals(stop4, data.stopFacility);
@@ -523,8 +524,8 @@ public class TransitQueueSimulationTest {
 
         data = spyData.get(6);
         assertEquals(stop4, data.stopFacility);
-        assertEquals(0.0, data.returnedDelay, MatsimTestCase.EPSILON);
-        assertEquals(lastTime + lastDelay, data.time, MatsimTestCase.EPSILON);
+        assertEquals(0.0, data.returnedDelay, MatsimTestUtils.EPSILON);
+        assertEquals(lastTime + lastDelay, data.time, MatsimTestUtils.EPSILON);
     }
 
     private void setDefaultLinkAttributes(final Link link) {
@@ -550,12 +551,12 @@ public class TransitQueueSimulationTest {
 				.build(scenario, events);
 
 			TransitQSimEngine transitEngine = qSim.getChildInjector().getInstance(TransitQSimEngine.class);
-			
+
             qSim.addAgentSource(new AgentSource() {
                 @Override
                 public void insertAgentsIntoMobsim() {
-                    TestHandleStopSimulation.this.driver = new SpyDriver(TestHandleStopSimulation.this.line, 
-                    		TestHandleStopSimulation.this.route, TestHandleStopSimulation.this.departure, 
+                    TestHandleStopSimulation.this.driver = new SpyDriver(TestHandleStopSimulation.this.line,
+                    		TestHandleStopSimulation.this.route, TestHandleStopSimulation.this.departure,
                     		transitEngine.getAgentTracker(), transitEngine);
 
                     VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("transitVehicleType", VehicleType.class ) );
@@ -571,7 +572,7 @@ public class TransitQueueSimulationTest {
                     TestHandleStopSimulation.this.driver.setVehicle(veh);
                     TestHandleStopSimulation.this.departure.setVehicleId(veh.getVehicle().getId());
                     qSim.addParkedVehicle(veh, route.getRoute().getStartLinkId());
-                    qSim.insertAgentIntoMobsim(TestHandleStopSimulation.this.driver); 
+                    qSim.insertAgentIntoMobsim(TestHandleStopSimulation.this.driver);
                 }
             });
 
@@ -612,7 +613,7 @@ public class TransitQueueSimulationTest {
     }
 
     private static class SpyHandleStopData {
-        private static final Logger log = Logger.getLogger(TransitQueueSimulationTest.SpyHandleStopData.class);
+        private static final Logger log = LogManager.getLogger(TransitQueueSimulationTest.SpyHandleStopData.class);
 
         public final TransitStopFacility stopFacility;
         public final double time;
@@ -632,7 +633,7 @@ public class TransitQueueSimulationTest {
         config.transit().setUseTransit(true);
 
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-      
+
         // build simple network with 2 links
         Network network = scenario.getNetwork();
         Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0.0, 0.0));
@@ -687,8 +688,8 @@ public class TransitQueueSimulationTest {
 				.useDefaults() //
 				.build(scenario, events) //
 				.run();
-        assertEquals(depTime, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
-        assertEquals(depTime + 101.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
+        assertEquals(depTime, collector.firstEvent.getTime(), MatsimTestUtils.EPSILON);
+        assertEquals(depTime + 101.0, collector.lastEvent.getTime(), MatsimTestUtils.EPSILON);
         collector.reset(0);
 
         // second test with special start/end times
@@ -700,8 +701,8 @@ public class TransitQueueSimulationTest {
 			.useDefaults() //
 			.build(scenario, events) //
 			.run();
-        assertEquals(depTime + 20.0, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
-        assertEquals(depTime + 90.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
+        assertEquals(depTime + 20.0, collector.firstEvent.getTime(), MatsimTestUtils.EPSILON);
+        assertEquals(depTime + 90.0, collector.lastEvent.getTime(), MatsimTestUtils.EPSILON);
     }
 
     /*package*/ final static class FirstLastEventCollector implements BasicEventHandler {
@@ -729,7 +730,7 @@ public class TransitQueueSimulationTest {
         config.transit().setUseTransit(true);
 
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-     
+
         // build simple network with 2 links
         Network network = scenario.getNetwork();
         Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0.0, 0.0));

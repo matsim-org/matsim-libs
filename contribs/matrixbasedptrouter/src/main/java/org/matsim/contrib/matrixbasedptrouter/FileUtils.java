@@ -4,7 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
@@ -15,7 +16,7 @@ import org.matsim.matrices.Matrix;
 
 final class FileUtils {
 
-	private static final Logger log = Logger.getLogger(FileUtils.class);
+	private static final Logger log = LogManager.getLogger(FileUtils.class);
 
 	static QuadTree<PtStop> readPtStops(String ptStopInputFile, final BoundingBox bb) {
 

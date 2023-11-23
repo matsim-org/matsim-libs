@@ -19,12 +19,13 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -51,7 +52,11 @@ public class RunConfigurableQNetworkFactoryExample {
 		controler.addOverridingQSimModule( new AbstractQSimModule(){
 			@Override public void configureQSim() {
 				final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
-				factory.setLinkSpeedCalculator(new DefaultLinkSpeedCalculator()); // You would obviously set something else than the default
+				factory.setLinkSpeedCalculator( new LinkSpeedCalculator(){
+					@Override public double getMaximumVelocity( QVehicle vehicle, Link link, double time ){
+						return 1.; // replace by something meaningful
+					}
+				} );
 				factory.setTurnAcceptanceLogic(new DefaultTurnAcceptanceLogic()); // You would obviously set something else than the default
 				bind(QNetworkFactory.class).toInstance(factory);
 				// NOTE: Other than when using a provider, this uses the same factory instance over all iterations, re-configuring

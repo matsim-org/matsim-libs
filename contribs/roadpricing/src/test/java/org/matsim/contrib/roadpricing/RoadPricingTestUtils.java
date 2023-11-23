@@ -22,6 +22,7 @@ package org.matsim.contrib.roadpricing;
 
 import java.util.List;
 
+import org.junit.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -50,7 +51,6 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 
-import junit.framework.TestCase;
 
 /**
  * Some static methods to set up the road pricing scenarios in the test cases.
@@ -82,7 +82,7 @@ import junit.framework.TestCase;
 		Node node6 = NetworkUtils.createAndAddNode(network, Id.create(6, Node.class), new Coord((double) 500, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
-		
+
 		// freespeed 18km/h = 5m/s --> 20s for 100m
 		NetworkUtils.createAndAddLink(network,Id.create(0, Link.class), fromNode, toNode, (double) 100, (double) 5, (double) 100, (double) 1 );
 		final Node fromNode1 = node2;
@@ -274,17 +274,17 @@ import junit.framework.TestCase;
 	}
 
 	protected static void compareRoutes(final String expectedRoute, final NetworkRoute realRoute) {
-		TestCase.assertNotNull(expectedRoute) ;
-		TestCase.assertNotNull(realRoute);
-		TestCase.assertNotNull(realRoute.getLinkIds()) ;
+		Assert.assertNotNull(expectedRoute) ;
+		Assert.assertNotNull(realRoute);
+		Assert.assertNotNull(realRoute.getLinkIds()) ;
 
 		StringBuilder strBuilder = new StringBuilder();
-		
+
 		for (Id<Link> linkId : realRoute.getLinkIds()) {
 			strBuilder.append(linkId.toString());
 			strBuilder.append(' ');
 		}
 		String route = strBuilder.toString();
-		TestCase.assertEquals(expectedRoute + " ", route);
+		Assert.assertEquals(expectedRoute + " ", route);
 	}
 }

@@ -20,7 +20,8 @@
 
 package org.matsim.core.trafficmonitoring;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -51,7 +52,7 @@ class DepartureDelayAverageCalculator implements PersonDepartureEventHandler, Li
 	
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	
-	private static final Logger log = Logger.getLogger(DepartureDelayAverageCalculator.class);
+	private static final Logger log = LogManager.getLogger(DepartureDelayAverageCalculator.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// Constructor

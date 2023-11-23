@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<stopFacility id="stop_A0" x="0" y="1000" linkRefId="A0">
+		</stopFacility>
+		<stopFacility id="stop_A5" x="0" y="-1500" linkRefId="A5">
+		</stopFacility>
+		<stopFacility id="stop_B0" x="-1000" y="0" linkRefId="B0">
+		</stopFacility>
+		<stopFacility id="stop_B5" x="1500" y="0" linkRefId="B5">
+		</stopFacility>
+	</transitStops>
+	<transitLine id="line1">
+		<transitRoute id="line1_route1">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="stop_A0" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="stop_A5" arrivalOffset="01:00:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="A0"/>
+				<link refId="A1"/>
+				<link refId="A2"/>
+				<link refId="A3"/>
+				<link refId="A4"/>
+				<link refId="A5"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:00:00" vehicleRefId="train1"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="line2">
+		<transitRoute id="line2_route1">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="stop_B0" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="stop_B5" arrivalOffset="01:00:00" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="B0"/>
+				<link refId="B1"/>
+				<link refId="B2"/>
+				<link refId="B3"/>
+				<link refId="B4"/>
+				<link refId="B5"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:00:01" vehicleRefId="train2"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>

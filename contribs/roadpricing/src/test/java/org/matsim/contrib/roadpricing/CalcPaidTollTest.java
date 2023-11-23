@@ -22,7 +22,8 @@ package org.matsim.contrib.roadpricing;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,7 +53,7 @@ public class CalcPaidTollTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	static private final Logger log = Logger.getLogger(CalcPaidTollTest.class);
+	static private final Logger log = LogManager.getLogger(CalcPaidTollTest.class);
 
 	@Test
 	public void testDistanceToll() {

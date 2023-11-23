@@ -30,7 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
@@ -64,7 +65,7 @@ import org.matsim.core.utils.io.IOUtils;
  * @author jwjoubert
  */
 public class ConcaveHull {
-	private final static Logger LOG = Logger.getLogger(ConcaveHull.class);
+	private final static Logger LOG = LogManager.getLogger(ConcaveHull.class);
 	private GeometryFactory geomFactory;
 	private GeometryCollection filteredPoints;
 	private double threshold;

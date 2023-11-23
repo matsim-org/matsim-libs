@@ -24,7 +24,8 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author droeder
@@ -33,8 +34,7 @@ import org.apache.log4j.Logger;
 public class DistCluster2ActCnt {
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger
-			.getLogger(DistCluster2ActCnt.class);
+	private static final Logger log = LogManager.getLogger(DistCluster2ActCnt.class);
 
 	private Map<String, SortedMap<String, Double>> dist2act2cnt;
 	

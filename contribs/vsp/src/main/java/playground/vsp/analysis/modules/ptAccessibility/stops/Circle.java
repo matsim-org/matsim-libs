@@ -21,7 +21,8 @@ package playground.vsp.analysis.modules.ptAccessibility.stops;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
@@ -34,7 +35,7 @@ import org.matsim.api.core.v01.Coord;
 public class Circle {
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(Circle.class);
+	private static final Logger log = LogManager.getLogger(Circle.class);
 
 	private List<Coordinate> circle;
 	

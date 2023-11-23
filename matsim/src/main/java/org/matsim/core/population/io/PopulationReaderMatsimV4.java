@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -54,7 +55,7 @@ import org.xml.sax.Attributes;
 
 /**
  * A reader for plans files of MATSim according to <code>plans_v4.dtd</code>.
- * 
+ *
  * @author mrieser
  * @author balmermi
  */
@@ -96,7 +97,7 @@ import org.xml.sax.Attributes;
 
 	private Activity prevAct = null;
 
-	private final static Logger log = Logger.getLogger(PopulationReaderMatsimV4.class);
+	private final static Logger log = LogManager.getLogger(PopulationReaderMatsimV4.class);
 
 	public PopulationReaderMatsimV4(final Scenario scenario) {
 		this(new IdentityTransformation(), scenario);
@@ -105,6 +106,7 @@ import org.xml.sax.Attributes;
 	public PopulationReaderMatsimV4(
 			final CoordinateTransformation coordinateTransformation,
 			final Scenario scenario) {
+		super(ValidationType.DTD_ONLY);
 		this.coordinateTransformation = coordinateTransformation;
 		this.scenario = scenario;
 		this.plans = scenario.getPopulation();

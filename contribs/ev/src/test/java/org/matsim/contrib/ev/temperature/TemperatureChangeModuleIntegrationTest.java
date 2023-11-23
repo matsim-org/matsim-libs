@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.ev.temperature;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -49,7 +49,7 @@ public class TemperatureChangeModuleIntegrationTest {
 
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "/config.xml",
 				new TemperatureChangeConfigGroup());
-		config.controler()
+		config.controller()
 				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 		Scenario scenario = ScenarioUtils.loadScenario(config);

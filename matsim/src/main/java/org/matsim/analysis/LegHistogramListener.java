@@ -20,16 +20,16 @@
 
 package org.matsim.analysis;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Integrates the {@link org.matsim.analysis.LegHistogram} into the
@@ -41,10 +41,10 @@ import javax.inject.Inject;
 final class LegHistogramListener implements IterationEndsListener, IterationStartsListener {
 
 	@Inject private LegHistogram histogram;
-	@Inject private ControlerConfigGroup controlerConfigGroup;
+	@Inject private ControllerConfigGroup controllerConfigGroup;
 	@Inject private OutputDirectoryHierarchy controlerIO;
 
-	static private final Logger log = Logger.getLogger(LegHistogramListener.class);
+	static private final Logger log = LogManager.getLogger(LegHistogramListener.class);
 
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
@@ -55,7 +55,7 @@ final class LegHistogramListener implements IterationEndsListener, IterationStar
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		this.histogram.write(controlerIO.getIterationFilename(event.getIteration(), "legHistogram.txt"));
 		this.printStats();
-		if (controlerConfigGroup.isCreateGraphs()) {
+		if (controllerConfigGroup.isCreateGraphs()) {
 			LegHistogramChart.writeGraphic(this.histogram, controlerIO.getIterationFilename(event.getIteration(), "legHistogram_all.png"));
 			for (String legMode : this.histogram.getLegModes()) {
 				LegHistogramChart.writeGraphic(this.histogram, controlerIO.getIterationFilename(event.getIteration(), "legHistogram_" + legMode + ".png"), legMode);

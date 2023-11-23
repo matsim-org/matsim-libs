@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -42,8 +42,8 @@ import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
-import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureUtils;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.vehicles.Vehicle;
 
@@ -52,27 +52,28 @@ import com.google.common.collect.ImmutableListMultimap;
 /**
  * This is an events based approach to trigger vehicle charging. Vehicles will be charged as soon as a person begins a charging activity.
  * <p>
- * Do not use this class for charging DVRP vehicles (DynAgents). In that case, vehicle charging is simulated with ChargingActivity (DynActivity)
+ * Do not use this class for charging DVRP vehicles (DynAgents). In that case, vehicle charging is simulated with ChargingActivity (DynActivity).
+ * (It may work together, but that would need to be tested. kai based on michal, dec'22)
  */
 public class VehicleChargingHandler
 		implements ActivityStartEventHandler, ActivityEndEventHandler, PersonLeavesVehicleEventHandler,
 		ChargingEndEventHandler, MobsimScopeEventHandler {
 
 	public static final String CHARGING_IDENTIFIER = " charging";
-	public static final String CHARGING_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType(
+	public static final String CHARGING_INTERACTION = ScoringConfigGroup.createStageActivityType(
 			CHARGING_IDENTIFIER);
 	private final Map<Id<Person>, Id<Vehicle>> lastVehicleUsed = new HashMap<>();
-	private final Map<Id<ElectricVehicle>, Id<Charger>> vehiclesAtChargers = new HashMap<>();
+	private final Map<Id<Vehicle>, Id<Charger>> vehiclesAtChargers = new HashMap<>();
 
 	private final ChargingInfrastructure chargingInfrastructure;
 	private final ElectricFleet electricFleet;
 	private final ImmutableListMultimap<Id<Link>, Charger> chargersAtLinks;
 
 	@Inject
-	public VehicleChargingHandler(ChargingInfrastructure chargingInfrastructure, ElectricFleet electricFleet) {
+	VehicleChargingHandler(ChargingInfrastructure chargingInfrastructure, ElectricFleet electricFleet) {
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.electricFleet = electricFleet;
-		chargersAtLinks = ChargingInfrastructures.getChargersAtLinks(chargingInfrastructure);
+		chargersAtLinks = ChargingInfrastructureUtils.getChargersAtLinks(chargingInfrastructure );
 	}
 
 	/**
@@ -85,7 +86,7 @@ public class VehicleChargingHandler
 		if (event.getActType().endsWith(CHARGING_INTERACTION)) {
 			Id<Vehicle> vehicleId = lastVehicleUsed.get(event.getPersonId());
 			if (vehicleId != null) {
-				Id<ElectricVehicle> evId = Id.create(vehicleId, ElectricVehicle.class);
+				Id<Vehicle> evId = Id.create(vehicleId, Vehicle.class);
 				if (electricFleet.getElectricVehicles().containsKey(evId)) {
 					ElectricVehicle ev = electricFleet.getElectricVehicles().get(evId);
 					List<Charger> chargers = chargersAtLinks.get(event.getLinkId());
@@ -105,7 +106,7 @@ public class VehicleChargingHandler
 		if (event.getActType().endsWith(CHARGING_INTERACTION)) {
 			Id<Vehicle> vehicleId = lastVehicleUsed.get(event.getPersonId());
 			if (vehicleId != null) {
-				Id<ElectricVehicle> evId = Id.create(vehicleId, ElectricVehicle.class);
+				Id<Vehicle> evId = Id.create(vehicleId, Vehicle.class);
 				Id<Charger> chargerId = vehiclesAtChargers.remove(evId);
 				if (chargerId != null) {
 					Charger c = chargingInfrastructure.getChargers().get(chargerId);

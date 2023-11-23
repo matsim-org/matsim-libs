@@ -23,7 +23,8 @@ package org.matsim.utils.gis.matsim2esri.network;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -48,7 +49,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class Links2ESRIShape {
 
-	private static final  Logger log = Logger.getLogger(Links2ESRIShape.class);
+	private static final  Logger log = LogManager.getLogger(Links2ESRIShape.class);
 
 	private final FeatureGenerator featureGenerator;
 	private final Network network;

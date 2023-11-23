@@ -34,7 +34,7 @@ import java.util.NoSuchElementException;
 public class AttributesTest {
 	@Test
 	public void testInsertion() {
-		final Attributes attributes = new Attributes();
+		final Attributes attributes = new AttributesImpl();
 
 		attributes.putAttribute( "sun" , "nice" );
 		attributes.putAttribute( "rain is nice" , false );
@@ -63,7 +63,7 @@ public class AttributesTest {
 
 	@Test
 	public void testReplacement() {
-		final Attributes attributes = new Attributes();
+		final Attributes attributes = new AttributesImpl();
 
 		attributes.putAttribute( "sun" , "nice" );
 		attributes.putAttribute( "rain is nice" , false );
@@ -86,7 +86,7 @@ public class AttributesTest {
 
 	@Test
 	public void testRemoval() {
-		final Attributes attributes = new Attributes();
+		final Attributes attributes = new AttributesImpl();
 
 		attributes.putAttribute( "sun" , "nice" );
 		attributes.putAttribute( "rain is nice" , false );
@@ -108,7 +108,7 @@ public class AttributesTest {
 
 	@Test
 	public void testGetAsMap() {
-		final Attributes attributes = new Attributes();
+		final Attributes attributes = new AttributesImpl();
 
 		attributes.putAttribute( "sun" , "nice" );
 		attributes.putAttribute( "rain is nice" , false );

@@ -29,12 +29,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueingLogic implements ChargingWithAssignmentLogic {
-	private final Map<Id<ElectricVehicle>, ElectricVehicle> assignedVehicles = new LinkedHashMap<>();
+public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueingLogic
+		implements ChargingWithAssignmentLogic {
+	private final Map<Id<Vehicle>, ElectricVehicle> assignedVehicles = new LinkedHashMap<>();
 
 	public ChargingWithQueueingAndAssignmentLogic(ChargerSpecification charger, ChargingStrategy chargingStrategy,
 			EventsManager eventsManager) {

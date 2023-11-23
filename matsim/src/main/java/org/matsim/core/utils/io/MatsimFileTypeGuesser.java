@@ -21,13 +21,15 @@
 package org.matsim.core.utils.io;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Locale;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -41,7 +43,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class MatsimFileTypeGuesser extends DefaultHandler {
 
-	private static final Logger log = Logger.getLogger(MatsimFileTypeGuesser.class);
+	private static final Logger log = LogManager.getLogger(MatsimFileTypeGuesser.class);
 	/**
 	 * This enum only informs about the correct container, not about the version of the input file.
 	 */
@@ -138,9 +140,9 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		} catch (SAXException e) {
-			throw new UncheckedIOException(e);
+			throw new UncheckedIOException(new IOException(e));
 		} catch (ParserConfigurationException e) {
-			throw new UncheckedIOException(e);
+			throw new UncheckedIOException(new IOException (e));
 		} catch (XMLTypeDetectionException e) {
 			this.xmlPublicId = e.publicId;
 			this.xmlSystemId = e.systemId;

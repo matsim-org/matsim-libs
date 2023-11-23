@@ -21,6 +21,7 @@
 package org.matsim.contrib.ev.fleet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.Vehicle;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -32,5 +33,5 @@ import com.google.common.collect.ImmutableMap;
  * @author michalm
  */
 public interface ElectricFleet {
-	ImmutableMap<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles();
+	ImmutableMap<Id<Vehicle>, ElectricVehicle> getElectricVehicles();
 }

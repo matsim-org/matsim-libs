@@ -5,7 +5,8 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.routes.TransitPassengerRoute;
 
@@ -21,7 +22,7 @@ import org.matsim.pt.routes.TransitPassengerRoute;
  */
 public class GenericPtRouteFixer {
 
-	private final static Logger log = Logger.getLogger(GenericPtRouteFixer.class);
+	private final static Logger log = LogManager.getLogger(GenericPtRouteFixer.class);
 	
 	/**
 	 * The route type in {@link TransitPassengerRoute} is not visible. 

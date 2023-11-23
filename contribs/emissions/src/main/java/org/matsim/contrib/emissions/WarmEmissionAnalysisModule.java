@@ -21,7 +21,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
@@ -46,7 +47,7 @@ import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsC
 public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator{
 	// cannot make non-public: used at least twice outside package.  kai, jan'19
 
-	private static final Logger logger = Logger.getLogger(WarmEmissionAnalysisModule.class);
+	private static final Logger logger = LogManager.getLogger(WarmEmissionAnalysisModule.class);
 
 	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>  avgHbefaWarmTable;
 	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
@@ -153,25 +154,20 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					Set<String> stopgoSet = new HashSet<>();
 					for (HbefaWarmEmissionFactorKey key : detailedHbefaWarmTable.keySet()) {
 						String syntheticKey = key.getRoadCategory() + "--" + key.getVehicleCategory() + "--" + key.getVehicleAttributes() + "--" + key.getComponent();
-						switch (key.getTrafficSituation()) {
-							case FREEFLOW:
-								freeflowSet.add(syntheticKey);
-								break;
-							case STOPANDGO:
-								stopgoSet.add(syntheticKey);
-								break;
-							default:
-								// do nothing
+						switch ( key.getTrafficSituation() ) {
+							case FREEFLOW -> freeflowSet.add( syntheticKey );
+							case STOPANDGO -> stopgoSet.add( syntheticKey );
+							default -> { } // do nothing
 						}
 					}
 					for (String syntheticKey : freeflowSet) {
 						if (!stopgoSet.contains(syntheticKey)) {
-							throw new RuntimeException("inconsistent");
+							throw new RuntimeException("inconsistent Freeflow and Stop&Go entries in detailed HBEFA table - Stop&Go entry missing ");
 						}
 					}
 					for (String syntheticKey : stopgoSet) {
 						if (!freeflowSet.contains(syntheticKey)) {
-							throw new RuntimeException("inconsistent");
+							throw new RuntimeException("inconsistent Freeflow and Stop&Go entries in detailed HBEFA table - Freeflow entry missing");
 						}
 					}
 					break;
@@ -272,12 +268,13 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		double averageSpeed_kmh = (linkLength_m / 1000) / (travelTime_sec / 3600);
 
+
 		// hedge against odd average speeds:
 		if(averageSpeed_kmh <= 0.0){
 			throw new RuntimeException("Average speed has been calculated to 0.0 or a negative value. Aborting...");
 		}
 		if ((averageSpeed_kmh - freeVelocity_ms * 3.6) > 1.0){
-			if (ecg.handlesHighAverageSpeeds()) {
+			if (ecg.getHandleHighAverageSpeeds()) {
 				logger.warn("averageSpeed was capped from " + averageSpeed_kmh + " to" + freeVelocity_ms * 3.6 );
 				averageSpeed_kmh = freeVelocity_ms * 3.6;
 			} else {
@@ -372,179 +369,179 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 	private HbefaWarmEmissionFactor getEf(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, HbefaWarmEmissionFactorKey efkey) {
 
-		switch (ecg.getDetailedVsAverageLookupBehavior()) {
-			case onlyTryDetailedElseAbort:
-				if (detailedReadingInfoCnt <= 1) {
-					logger.info("try reading detailed values");
-					logger.info(Gbl.ONLYONCE);
-					logger.info(Gbl.FUTURE_SUPPRESSED);
+		switch ( ecg.getDetailedVsAverageLookupBehavior() ) {
+			case onlyTryDetailedElseAbort -> {
+				if ( detailedReadingInfoCnt <= 1 ) {
+					logger.info( "try reading detailed values" );
+					logger.info( Gbl.ONLYONCE );
+					logger.info( Gbl.FUTURE_SUPPRESSED );
 					detailedReadingInfoCnt++;
 				}
-				if (this.detailedHbefaWarmTable.get(efkey) != null) {
-					HbefaWarmEmissionFactor ef = this.detailedHbefaWarmTable.get(efkey);
-					logger.debug("Lookup result for " + efkey + " is " + ef.toString());
+				if ( this.detailedHbefaWarmTable.get( efkey ) != null ) {
+					HbefaWarmEmissionFactor ef = this.detailedHbefaWarmTable.get( efkey );
+					logger.debug( "Lookup result for " + efkey + " is " + ef.toString() );
 					return ef;
 				} else {
-					if (detailedTransformToHbefa4Cnt <= 1) {
-						logger.info("try to rewrite from HBEFA3 to HBEFA4 and lookup in detailed table again");
-						logger.info(Gbl.ONLYONCE);
-						logger.info(Gbl.FUTURE_SUPPRESSED);
+					if ( detailedTransformToHbefa4Cnt <= 1 ) {
+						logger.info( "try to rewrite from HBEFA3 to HBEFA4 and lookup in detailed table again" );
+						logger.info( Gbl.ONLYONCE );
+						logger.info( Gbl.FUTURE_SUPPRESSED );
 						detailedTransformToHbefa4Cnt++;
 					}
-					HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey(efkey);
-					HbefaVehicleAttributes attribs2 = EmissionUtils.tryRewriteHbefa3toHbefa4(vehicleInformationTuple);
+					HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey( efkey );
+					HbefaVehicleAttributes attribs2 = EmissionUtils.tryRewriteHbefa3toHbefa4( vehicleInformationTuple );
 					// put this into a new key ...
-					efkey2.setVehicleAttributes(attribs2);
+					efkey2.setVehicleAttributes( attribs2 );
 					// ... and try to look up:
-					if (this.detailedHbefaWarmTable.get(efkey2) != null) {
-						HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get(efkey2);
-						logger.debug("Lookup result for " + efkey + " is " + ef2.toString());
+					if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
+						HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey2 );
+						logger.debug( "Lookup result for " + efkey + " is " + ef2.toString() );
 						return ef2;
 					}
 				}
-				break;
-			case tryDetailedThenTechnologyAverageElseAbort:
+			}
+			case tryDetailedThenTechnologyAverageElseAbort -> {
 				//Look up detailed values
-				if (detailedReadingInfoCnt <= 1) {
-					logger.info("try reading detailed values");
-					logger.info(Gbl.ONLYONCE);
-					logger.info(Gbl.FUTURE_SUPPRESSED);
+				if ( detailedReadingInfoCnt <= 1 ) {
+					logger.info( "try reading detailed values" );
+					logger.info( Gbl.ONLYONCE );
+					logger.info( Gbl.FUTURE_SUPPRESSED );
 					detailedReadingInfoCnt++;
 				}
-				if (this.detailedHbefaWarmTable.get(efkey) != null) {
-					HbefaWarmEmissionFactor ef = this.detailedHbefaWarmTable.get(efkey);
-					logger.debug("Lookup result for " + efkey + " is " + ef.toString());
+				if ( this.detailedHbefaWarmTable.get( efkey ) != null ) {
+					HbefaWarmEmissionFactor ef = this.detailedHbefaWarmTable.get( efkey );
+					logger.debug( "Lookup result for " + efkey + " is " + ef.toString() );
 					return ef;
 				} else {
-					if (detailedTransformToHbefa4Cnt <= 1) {
-						logger.info("try to rewrite from HBEFA3 to HBEFA4 and lookup in detailed table again");
-						logger.info(Gbl.ONLYONCE);
-						logger.info(Gbl.FUTURE_SUPPRESSED);
+					if ( detailedTransformToHbefa4Cnt <= 1 ) {
+						logger.info( "try to rewrite from HBEFA3 to HBEFA4 and lookup in detailed table again" );
+						logger.info( Gbl.ONLYONCE );
+						logger.info( Gbl.FUTURE_SUPPRESSED );
 						detailedTransformToHbefa4Cnt++;
 					}
-					HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey(efkey);
-					HbefaVehicleAttributes attribs2 = EmissionUtils.tryRewriteHbefa3toHbefa4(vehicleInformationTuple);
+					HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey( efkey );
+					HbefaVehicleAttributes attribs2 = EmissionUtils.tryRewriteHbefa3toHbefa4( vehicleInformationTuple );
 					// put this into a new key ...
-					efkey2.setVehicleAttributes(attribs2);
+					efkey2.setVehicleAttributes( attribs2 );
 					// ... and try to look up:
-					if (this.detailedHbefaWarmTable.get(efkey2) != null) {
-						HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get(efkey2);
-						logger.debug("Lookup result for " + efkey + " is " + ef2.toString());
+					if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
+						HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey2 );
+						logger.debug( "Lookup result for " + efkey + " is " + ef2.toString() );
 						return ef2;
 					}
 
 					//if not possible, try "<technology>; average; average":
-					if (ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort || ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable) {
-						attribs2.setHbefaSizeClass("average");
-						attribs2.setHbefaEmConcept("average");
-						if (detailedFallbackTechAverageWarnCnt <= 1) {
-							logger.warn("did not find emission factor for efkey=" + efkey);
-							logger.warn(" re-written to " + efkey2);
-							logger.warn("will try it with '<technology>; average; average'");
-							logger.warn(Gbl.ONLYONCE);
-							logger.warn(Gbl.FUTURE_SUPPRESSED);
+					if ( ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort || ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ) {
+						attribs2.setHbefaSizeClass( "average" );
+						attribs2.setHbefaEmConcept( "average" );
+						if ( detailedFallbackTechAverageWarnCnt <= 1 ) {
+							logger.warn( "did not find emission factor for efkey=" + efkey );
+							logger.warn( " re-written to " + efkey2 );
+							logger.warn( "will try it with '<technology>; average; average'" );
+							logger.warn( Gbl.ONLYONCE );
+							logger.warn( Gbl.FUTURE_SUPPRESSED );
 							detailedFallbackTechAverageWarnCnt++;
 						}
-						if (this.detailedHbefaWarmTable.get(efkey2) != null) {
-							HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get(efkey2);
-							logger.debug("Lookup result for " + efkey + " is " + ef2.toString());
+						if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
+							HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey2 );
+							logger.debug( "Lookup result for " + efkey + " is " + ef2.toString() );
 							return ef2;
 						}
 						//lookups of type "<technology>; average; average" should, I think, just be entered as such. kai, feb'20
-						logger.error("That also did not worked ");
+						logger.error( "That also did not worked " );
 					}
 				}
-				break;
-			case tryDetailedThenTechnologyAverageThenAverageTable:
+			}
+			case tryDetailedThenTechnologyAverageThenAverageTable -> {
 				//Look up detailed values
-				if (detailedReadingInfoCnt <= 1) {
-					logger.info("try reading detailed values");
-					logger.info(Gbl.ONLYONCE);
-					logger.info(Gbl.FUTURE_SUPPRESSED);
+				if ( detailedReadingInfoCnt <= 1 ) {
+					logger.info( "try reading detailed values" );
+					logger.info( Gbl.ONLYONCE );
+					logger.info( Gbl.FUTURE_SUPPRESSED );
 					detailedReadingInfoCnt++;
 				}
-				if (this.detailedHbefaWarmTable.get(efkey) != null) {
-					HbefaWarmEmissionFactor ef = this.detailedHbefaWarmTable.get(efkey);
-					logger.debug("Lookup result for " + efkey + " is " + ef.toString());
+				if ( this.detailedHbefaWarmTable.get( efkey ) != null ) {
+					HbefaWarmEmissionFactor ef = this.detailedHbefaWarmTable.get( efkey );
+					logger.debug( "Lookup result for " + efkey + " is " + ef.toString() );
 					return ef;
 				} else {
-					if (detailedTransformToHbefa4Cnt <= 1) {
-						logger.info("try to rewrite from HBEFA3 to HBEFA4 and lookup in detailed table again");
-						logger.info(Gbl.ONLYONCE);
-						logger.info(Gbl.FUTURE_SUPPRESSED);
+					if ( detailedTransformToHbefa4Cnt <= 1 ) {
+						logger.info( "try to rewrite from HBEFA3 to HBEFA4 and lookup in detailed table again" );
+						logger.info( Gbl.ONLYONCE );
+						logger.info( Gbl.FUTURE_SUPPRESSED );
 						detailedTransformToHbefa4Cnt++;
 					}
-					HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey(efkey);
-					HbefaVehicleAttributes attribs2 = EmissionUtils.tryRewriteHbefa3toHbefa4(vehicleInformationTuple);
+					HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey( efkey );
+					HbefaVehicleAttributes attribs2 = EmissionUtils.tryRewriteHbefa3toHbefa4( vehicleInformationTuple );
 					// put this into a new key ...
-					efkey2.setVehicleAttributes(attribs2);
+					efkey2.setVehicleAttributes( attribs2 );
 					// ... and try to look up:
-					if (this.detailedHbefaWarmTable.get(efkey2) != null) {
-						HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get(efkey2);
-						logger.debug("Lookup result for " + efkey + " is " + ef2.toString());
+					if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
+						HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey2 );
+						logger.debug( "Lookup result for " + efkey + " is " + ef2.toString() );
 						return ef2;
 					}
 
 					//if not possible, try "<technology>; average; average":
-					if (ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort || ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable) {
-						attribs2.setHbefaSizeClass("average");
-						attribs2.setHbefaEmConcept("average");
-						if (detailedFallbackTechAverageWarnCnt <= 1) {
-							logger.warn("did not find emission factor for efkey=" + efkey);
-							logger.warn(" re-written to " + efkey2);
-							logger.warn("will try it with '<technology>; average; average'");
-							logger.warn(Gbl.ONLYONCE);
-							logger.warn(Gbl.FUTURE_SUPPRESSED);
+					if ( ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort || ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ) {
+						attribs2.setHbefaSizeClass( "average" );
+						attribs2.setHbefaEmConcept( "average" );
+						if ( detailedFallbackTechAverageWarnCnt <= 1 ) {
+							logger.warn( "did not find emission factor for efkey=" + efkey );
+							logger.warn( " re-written to " + efkey2 );
+							logger.warn( "will try it with '<technology>; average; average'" );
+							logger.warn( Gbl.ONLYONCE );
+							logger.warn( Gbl.FUTURE_SUPPRESSED );
 							detailedFallbackTechAverageWarnCnt++;
 						}
-						if (this.detailedHbefaWarmTable.get(efkey2) != null) {
-							HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get(efkey2);
-							logger.debug("Lookup result for " + efkey + " is " + ef2.toString());
+						if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
+							HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey2 );
+							logger.debug( "Lookup result for " + efkey + " is " + ef2.toString() );
 							return ef2;
 						}
 						//lookups of type "<technology>; average; average" should, I think, just be entered as such. kai, feb'20
 					}
 				}
-				if (detailedFallbackAverageTableWarnCnt <= 1) {
-					logger.warn("That also did not work.");
-					logger.warn("Now trying with setting to vehicle attributes to \"average; average; average\" and try it with the average table");
-					logger.warn(Gbl.ONLYONCE);
-					logger.warn(Gbl.FUTURE_SUPPRESSED);
+				if ( detailedFallbackAverageTableWarnCnt <= 1 ) {
+					logger.warn( "That also did not work." );
+					logger.warn( "Now trying with setting to vehicle attributes to \"average; average; average\" and try it with the average table" );
+					logger.warn( Gbl.ONLYONCE );
+					logger.warn( Gbl.FUTURE_SUPPRESSED );
 					detailedFallbackAverageTableWarnCnt++;
 				}
-				HbefaWarmEmissionFactorKey efkey3 = new HbefaWarmEmissionFactorKey(efkey);
-				efkey3.setVehicleAttributes(new HbefaVehicleAttributes());
-				if (this.avgHbefaWarmTable.get(efkey3) != null) {
-					HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get(efkey3);
-					logger.debug("Lookup result for " + efkey3 + " is " + ef.toString());
-					Gbl.assertNotNull(ef);
+				HbefaWarmEmissionFactorKey efkey3 = new HbefaWarmEmissionFactorKey( efkey );
+				efkey3.setVehicleAttributes( new HbefaVehicleAttributes() );
+				if ( this.avgHbefaWarmTable.get( efkey3 ) != null ) {
+					HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get( efkey3 );
+					logger.debug( "Lookup result for " + efkey3 + " is " + ef.toString() );
+					Gbl.assertNotNull( ef );
 					return ef;
 				}
-				break;
-			case directlyTryAverageTable:
-				if (averageReadingInfoCnt <= 1) {
-					logger.info("try reading average values");
-					logger.info(Gbl.ONLYONCE);
-					logger.info(Gbl.FUTURE_SUPPRESSED);
+			}
+			case directlyTryAverageTable -> {
+				if ( averageReadingInfoCnt <= 1 ) {
+					logger.info( "try reading average values" );
+					logger.info( Gbl.ONLYONCE );
+					logger.info( Gbl.FUTURE_SUPPRESSED );
 					averageReadingInfoCnt++;
 				}
-				efkey.setVehicleAttributes(new HbefaVehicleAttributes());
-				if (this.avgHbefaWarmTable.get(efkey) != null) {
-					HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get(efkey);
-					logger.debug("Lookup result for " + efkey + " is " + ef.toString());
-					Gbl.assertNotNull(ef);
+				efkey.setVehicleAttributes( new HbefaVehicleAttributes() );
+				if ( this.avgHbefaWarmTable.get( efkey ) != null ) {
+					HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get( efkey );
+					logger.debug( "Lookup result for " + efkey + " is " + ef.toString() );
+					Gbl.assertNotNull( ef );
 					return ef;
 				} else {
-					logger.warn("did not find average emission factor for efkey=" + efkey);
-					List<HbefaWarmEmissionFactorKey> list = new ArrayList<>(this.avgHbefaWarmTable.keySet());
-					list.sort(Comparator.comparing(HbefaWarmEmissionFactorKey::toString));
-					for (HbefaWarmEmissionFactorKey key : list) {
-						logger.warn(key.toString());
+					logger.warn( "did not find average emission factor for efkey=" + efkey );
+					List<HbefaWarmEmissionFactorKey> list = new ArrayList<>( this.avgHbefaWarmTable.keySet() );
+					list.sort( Comparator.comparing( HbefaWarmEmissionFactorKey::toString ) );
+					for ( HbefaWarmEmissionFactorKey key : list ) {
+						logger.warn( key.toString() );
 					}
 				}
-				break;
-			default:
-				throw new IllegalStateException("Unexpected value: " + ecg.getDetailedVsAverageLookupBehavior());
+			}
+			default ->
+					throw new IllegalStateException( "Unexpected value: " + ecg.getDetailedVsAverageLookupBehavior() );
 		}
 
 		throw new RuntimeException("Was not able to lookup emissions factor. Maybe you wanted to look up detailed values and did not specify this in " +
@@ -605,31 +602,26 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		kmCounter = kmCounter + linkLength_km;
 		emissionEventCounter++;
 
-		switch (hbefaTrafficSituation) { // both speeds are assumed to be not very different > only freeFlow on link
-			case FREEFLOW: {
+		switch ( hbefaTrafficSituation ) { // both speeds are assumed to be not very different > only freeFlow on link
+			case FREEFLOW -> {
 				freeFlowCounter++;
 				freeFlowKmCounter += linkLength_km;
-				break;
 			}
-			case HEAVY: {
+			case HEAVY -> {
 				saturatedCounter++;
 				saturatedKmCounter += linkLength_km;
-				break;
 			}
-			case SATURATED: {
+			case SATURATED -> {
 				heavyFlowCounter++;
 				heavyFlowKmCounter += linkLength_km;
-				break;
 			}
-			case STOPANDGO: {
+			case STOPANDGO -> {
 				stopGoCounter++;
 				stopGoKmCounter += linkLength_km;
-				break;
 			}
-			case STOPANDGO_HEAVY: {
+			case STOPANDGO_HEAVY -> {
 				heavyStopGoCounter++;
 				heavyStopGoKmCounter += linkLength_km;
-				break;
 			}
 		}
 	}

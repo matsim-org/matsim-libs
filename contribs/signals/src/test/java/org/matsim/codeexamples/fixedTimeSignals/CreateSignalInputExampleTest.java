@@ -23,7 +23,8 @@ package org.matsim.codeexamples.fixedTimeSignals;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,7 +36,7 @@ import org.matsim.testcases.MatsimTestUtils;
  *
  */
 public class CreateSignalInputExampleTest {
-	private static final Logger log = Logger.getLogger( CreateSignalInputExampleTest.class ) ;
+	private static final Logger log = LogManager.getLogger( CreateSignalInputExampleTest.class ) ;
 
 	private static final String DIR_TO_COMPARE_WITH = "./examples/tutorial/example90TrafficLights/useSignalInput/woLanes/";
 

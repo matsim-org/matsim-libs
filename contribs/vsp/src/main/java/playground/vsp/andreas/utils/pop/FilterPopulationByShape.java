@@ -24,7 +24,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.MultiPolygon;
@@ -62,7 +63,7 @@ import org.opengis.feature.simple.SimpleFeature;
  */
 public class FilterPopulationByShape implements LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
-	private final static Logger log = Logger.getLogger(FilterPopulationByShape.class);
+	private final static Logger log = LogManager.getLogger(FilterPopulationByShape.class);
 	private GeometryFactory factory;
 	private Geometry areaToExclude;
 	private Geometry areaToInclude;

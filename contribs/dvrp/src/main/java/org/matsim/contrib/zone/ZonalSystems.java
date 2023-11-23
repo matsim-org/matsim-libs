@@ -33,6 +33,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.util.DistanceUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -63,8 +64,8 @@ public class ZonalSystems {
 				.collect(toMap(Pair::getValue, Pair::getKey, chooseMoreCentralNode));
 	}
 
-	public static Map<Id<Zone>, List<Zone>> initZonesByDistance(Map<Id<Zone>, Zone> zones) {
-		Map<Id<Zone>, List<Zone>> zonesByDistance = Maps.newHashMapWithExpectedSize(zones.size());
+	public static IdMap<Zone, List<Zone>> initZonesByDistance(Map<Id<Zone>, Zone> zones) {
+		IdMap<Zone, List<Zone>> zonesByDistance = new IdMap<>(Zone.class);
 		for (final Zone currentZone : zones.values()) {
 			List<Zone> sortedZones = zones.values()
 					.stream()

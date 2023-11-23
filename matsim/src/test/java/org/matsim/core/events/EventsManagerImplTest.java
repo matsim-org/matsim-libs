@@ -19,7 +19,8 @@
 
 package org.matsim.core.events;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.events.Event;
@@ -31,7 +32,7 @@ import org.matsim.core.events.handler.EventHandler;
  */
 public class EventsManagerImplTest {
 
-	private final static Logger log = Logger.getLogger(EventsManagerImplTest.class);
+	private final static Logger log = LogManager.getLogger(EventsManagerImplTest.class);
 
 	/**
 	 * @author mrieser

@@ -24,7 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -54,7 +55,7 @@ import org.matsim.core.router.StageActivityTypeIdentifier;
 public class ModalTripTravelTimeHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler, 
 TransitDriverStartsEventHandler, ActivityStartEventHandler {
 
-	private static final Logger LOGGER = Logger.getLogger(ModalTripTravelTimeHandler.class);
+	private static final Logger LOGGER = LogManager.getLogger(ModalTripTravelTimeHandler.class);
 	private static final int MAX_STUCK_AND_ABORT_WARNINGS = 5;
 	private final SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2TravelTimes = new TreeMap<>();
 	private final Map<Id<Person>, Double> personId2DepartureTime = new HashMap<>();

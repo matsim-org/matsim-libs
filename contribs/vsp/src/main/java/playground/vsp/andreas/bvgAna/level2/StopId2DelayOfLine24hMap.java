@@ -23,8 +23,9 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
@@ -42,7 +43,7 @@ import playground.vsp.andreas.bvgAna.level1.StopId2RouteId2DelayAtStopMapData;
  */
 public class StopId2DelayOfLine24hMap implements VehicleDepartsAtFacilityEventHandler, TransitDriverStartsEventHandler{
 	
-	private final Logger log = Logger.getLogger(StopId2DelayOfLine24hMap.class);
+	private final Logger log = LogManager.getLogger(StopId2DelayOfLine24hMap.class);
 //	private final Level logLevel = Level.DEBUG;
 	
 	private final StopId2RouteId2DelayAtStopMap stopId2RouteId2DelayAtStopMap = new StopId2RouteId2DelayAtStopMap();

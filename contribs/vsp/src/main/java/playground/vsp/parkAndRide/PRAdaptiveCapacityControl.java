@@ -42,7 +42,7 @@ import java.util.Map;
  */
 public class PRAdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHandler, LinkLeaveEventHandler {
 	
-//	private static final Logger log = Logger.getLogger(PRAdaptiveCapacityControl.class);
+//	private static final Logger log = LogManager.getLogger(PRAdaptiveCapacityControl.class);
 	private Map<Id, Integer> prId2vehicles = new HashMap<Id, Integer>();
 	private Map<Id, SignalizeableItem> prId2ampel = new HashMap<Id, SignalizeableItem>();
 	private Map<Id<PRFacility>, PRFacility> id2prFacility = new HashMap<>();

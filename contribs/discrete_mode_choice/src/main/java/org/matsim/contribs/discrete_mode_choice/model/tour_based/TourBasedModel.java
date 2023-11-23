@@ -7,7 +7,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contribs.discrete_mode_choice.components.tour_finder.TourFinder;
 import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceModel;
@@ -30,7 +31,7 @@ import org.matsim.core.utils.timing.TimeTracker;
  * @author sebhoerl
  */
 public class TourBasedModel implements DiscreteModeChoiceModel {
-	final private static Logger logger = Logger.getLogger(TourBasedModel.class);
+	final private static Logger logger = LogManager.getLogger(TourBasedModel.class);
 
 	final private TourFinder tourFinder;
 	final private TourFilter tourFilter;

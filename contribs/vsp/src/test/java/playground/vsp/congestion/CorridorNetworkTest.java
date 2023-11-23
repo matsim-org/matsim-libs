@@ -22,7 +22,8 @@ package playground.vsp.congestion;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -184,7 +185,7 @@ public class CorridorNetworkTest {
 		events.addHandler( new BasicEventHandler(){
 			@Override public void reset(int iteration) { }
 			@Override public void handleEvent(Event event) {
-				Logger.getLogger( CorridorNetworkTest.class ).warn( event );
+				LogManager.getLogger( CorridorNetworkTest.class ).warn( event );
 			}
 		});
 		

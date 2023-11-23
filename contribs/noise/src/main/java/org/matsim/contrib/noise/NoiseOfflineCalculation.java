@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.noise;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
@@ -43,7 +44,7 @@ import java.io.IOException;
  *
  */
 public final class NoiseOfflineCalculation{
-	private static final Logger log = Logger.getLogger( NoiseOfflineCalculation.class );
+	private static final Logger log = LogManager.getLogger( NoiseOfflineCalculation.class );
 
 	private String outputDirectory;
 	private Scenario scenario;
@@ -109,10 +110,10 @@ public final class NoiseOfflineCalculation{
 		EventWriterXML eventWriter = null;
 		if (noiseContext.getNoiseParams().isThrowNoiseEventsAffected() || noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
 			String eventsFile;
-			if (this.scenario.getConfig().controler().getRunId() == null || this.scenario.getConfig().controler().getRunId().equals("")) {
+			if (this.scenario.getConfig().controller().getRunId() == null || this.scenario.getConfig().controller().getRunId().equals("")) {
 				eventsFile = outputFilePath + "noise.output_events.offline.xml.gz";
 			} else {
-				eventsFile = outputFilePath + this.scenario.getConfig().controler().getRunId() + ".noise.output_events.offline.xml.gz";
+				eventsFile = outputFilePath + this.scenario.getConfig().controller().getRunId() + ".noise.output_events.offline.xml.gz";
 			}
 			eventWriter = new EventWriterXML(eventsFile);
 			events.addHandler(eventWriter);
@@ -122,10 +123,10 @@ public final class NoiseOfflineCalculation{
 		log.info("Reading events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		String eventsFile;
-		if (this.scenario.getConfig().controler().getRunId() == null || this.scenario.getConfig().controler().getRunId().equals("")) {
-			eventsFile = this.scenario.getConfig().controler().getOutputDirectory() + "output_events.xml.gz";
+		if (this.scenario.getConfig().controller().getRunId() == null || this.scenario.getConfig().controller().getRunId().equals("")) {
+			eventsFile = this.scenario.getConfig().controller().getOutputDirectory() + "output_events.xml.gz";
 		} else {
-			eventsFile = this.scenario.getConfig().controler().getOutputDirectory() + this.scenario.getConfig().controler().getRunId() + ".output_events.xml.gz";
+			eventsFile = this.scenario.getConfig().controller().getOutputDirectory() + this.scenario.getConfig().controller().getRunId() + ".output_events.xml.gz";
 		}
 		reader.readFile(eventsFile);
 		log.info("Reading events file... Done.");

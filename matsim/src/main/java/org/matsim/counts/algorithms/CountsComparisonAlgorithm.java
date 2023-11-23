@@ -20,7 +20,8 @@
 
 package org.matsim.counts.algorithms;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -75,7 +76,7 @@ public class CountsComparisonAlgorithm {
 
 	private double countsScaleFactor;
 
-	private final static Logger log = Logger.getLogger(CountsComparisonAlgorithm.class);
+	private final static Logger log = LogManager.getLogger(CountsComparisonAlgorithm.class);
 
 	public CountsComparisonAlgorithm(final VolumesAnalyzer volumes, final Counts<Link> counts, final Network network, final double countsScaleFactor) {
 		this.counts = counts;

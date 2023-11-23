@@ -22,7 +22,8 @@ package playground.vsp.demandde.commuterDemandCottbus;
 import java.io.File;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
@@ -42,7 +43,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class CommuterGenerator {
 	
-	private static final Logger log = Logger.getLogger(CommuterGenerator.class);
+	private static final Logger log = LogManager.getLogger(CommuterGenerator.class);
 	
 	public static void main(String[] args) throws Exception {
 		

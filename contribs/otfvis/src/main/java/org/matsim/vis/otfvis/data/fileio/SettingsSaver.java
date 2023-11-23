@@ -34,7 +34,8 @@ import java.util.Locale;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
@@ -46,7 +47,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  */
 public class SettingsSaver {
 
-	private static final Logger log = Logger.getLogger(SettingsSaver.class);
+	private static final Logger log = LogManager.getLogger(SettingsSaver.class);
 
 	private final String fileName;
 

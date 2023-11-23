@@ -3,7 +3,8 @@ package playground.vsp.andreas.utils.net;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
@@ -15,7 +16,7 @@ import org.matsim.core.api.internal.NetworkRunnable;
  */
 public class NetworkRemoveUnusedNodes implements NetworkRunnable {
 
-	private static final Logger log = Logger.getLogger(NetworkRemoveUnusedNodes.class);
+	private static final Logger log = LogManager.getLogger(NetworkRemoveUnusedNodes.class);
 
 	@Override
 	public void run(final Network network) {

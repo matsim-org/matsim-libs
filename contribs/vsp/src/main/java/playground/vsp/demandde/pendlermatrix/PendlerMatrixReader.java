@@ -24,7 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
@@ -49,7 +50,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 public class PendlerMatrixReader {
 
-	private static final Logger log = Logger.getLogger(PendlerMatrixReader.class);
+	private static final Logger log = LogManager.getLogger(PendlerMatrixReader.class);
 
 	private static final String PV_EINPENDLERMATRIX = "../../detailedEval/eingangsdaten/Pendlermatrizen/EinpendlerMUC_843_062004.csv";
 
@@ -145,7 +146,7 @@ public class PendlerMatrixReader {
 
 	private void readMatrix(final String filename) {
 
-		Logger.getLogger(this.getClass()).warn("this method may read double entries in the Pendlermatrix (such as Nuernberg) twice. " +
+		LogManager.getLogger(this.getClass()).warn("this method may read double entries in the Pendlermatrix (such as Nuernberg) twice. " +
 						"If this may be a problem, you need to check.  kai, apr'11");
 
 		System.out.println("======================" + "\n"

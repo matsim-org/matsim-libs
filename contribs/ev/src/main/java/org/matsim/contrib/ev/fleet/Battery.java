@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.ev.fleet;
 
+import java.util.function.DoubleConsumer;
+
 public interface Battery {
 	/**
 	 * @return Battery Capacity [J]
@@ -27,21 +29,28 @@ public interface Battery {
 	double getCapacity();
 
 	/**
-	 * @return Vehicle State of Charge [J]
+	 * @return charge [J]
 	 */
-	double getSoc();
+	double getCharge();
 
 	/**
-	 * @param soc Vehicle State of Charge [J]
+	 * @param charge charge [J]
 	 */
-	void setSoc(double soc);
+	void setCharge(double charge);
 
-	/**
-	 * Changes SOC, making sure the charge level does not increase above the battery capacity or decrease below 0.
-	 *
-	 * @param energy change in energy [J], can be negative or positive
-	 */
-	default void changeSoc(double energy) {
-		setSoc(Math.max(0, Math.min(getSoc() + energy, getCapacity())));
+	default double getSoc() {
+		return getCharge() / getCapacity();
+	}
+
+	// energy [J], positive value reduces the battery charge
+	// missingEnergyNotifier -- meant for emitting a MissingEnergyEvent, logging a warning or throwing an exception
+	default void dischargeEnergy(double energy, DoubleConsumer missingEnergyNotifier) {
+		double oldCharge = getCharge();
+		if (oldCharge < energy) {
+			missingEnergyNotifier.accept(energy - oldCharge);
+			setCharge(0);
+		} else {
+			setCharge(oldCharge - energy);
+		}
 	}
 }

@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PC2Parking;
-import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
 
 public class ParkingArrivalEvent extends Event {
 
@@ -39,7 +38,7 @@ public class ParkingArrivalEvent extends Event {
 	public final static String PARKING_SCORE = "parkingScore";
 	private Coord destCoordinate;
 	private double score;
-	
+
 	// yyyyyy the parking arrival event returns person id, not vehicle id.  Do we change to vehicle id, or add the vehicle
 	// id to the event?  It is used for the walk distance; for that we need the person id. kai, jul'15
 
@@ -47,11 +46,7 @@ public class ParkingArrivalEvent extends Event {
 		super(time);
 		this.destCoordinate = destCoordinate;
 		this.score = score;
-		
-		if (time>110000){
-			DebugLib.emptyFunctionForSettingBreakPoint();
-		}
-		
+
 		this.parkingId = parkingId;
 		this.personId = personId;
 	}
@@ -60,7 +55,7 @@ public class ParkingArrivalEvent extends Event {
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
-	
+
 	@Override
 	public Map<String, String> getAttributes() {
 		final Map<String, String> attributes = super.getAttributes();
@@ -73,27 +68,27 @@ public class ParkingArrivalEvent extends Event {
 			attributes.put(DEST_COORD_X, Double.toString(destCoordinate.getX()));
 			attributes.put(DEST_COORD_Y, Double.toString(destCoordinate.getY()));
 		}
-		
+
 		attributes.put(PARKING_SCORE, Double.toString(score));
 		return attributes;
 	}
-	
+
 	public static Coord getDestCoord(Map<String, String> attributes){
 		String destCoordXString = attributes.get(ParkingArrivalEvent.DEST_COORD_X);
 		String destCoordYString = attributes.get(ParkingArrivalEvent.DEST_COORD_Y);
-		
+
 		if (destCoordXString==null || destCoordYString==null){
 			return null;
 		} else {
 			return new Coord(Double.parseDouble(destCoordXString), Double.parseDouble(destCoordYString));
 		}
 	}
-	
+
 	public static double getScore(Map<String, String> attributes){
 		String scoreString = attributes.get(ParkingArrivalEvent.PARKING_SCORE);
 		return Double.parseDouble(scoreString);
 	}
-	
+
 	public static Id<Person> getPersonId(Map<String, String> attributes){
 		String personIdString = attributes.get(ParkingArrivalEvent.ATTRIBUTE_PERSON_ID);
 		if (personIdString==null){
@@ -102,7 +97,7 @@ public class ParkingArrivalEvent extends Event {
 			return Id.create(personIdString, Person.class);
 		}
 	}
-	
+
 	public static Id<PC2Parking> getParkingId(Map<String, String> attributes){
 		String parkingIdString = attributes.get(ParkingArrivalEvent.ATTRIBUTE_PARKING_ID);
 		if (parkingIdString==null){

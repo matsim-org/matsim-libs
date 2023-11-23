@@ -20,10 +20,11 @@
 
 package org.matsim.core.events;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -36,7 +37,7 @@ import org.matsim.testcases.utils.EventsCollector;
  *
  * @author mrieser
  */
-public abstract class XmlEventsTester extends TestCase {
+public abstract class XmlEventsTester {
 
 	/**
 	 * Writes out the given event to the specified file in the XML format,

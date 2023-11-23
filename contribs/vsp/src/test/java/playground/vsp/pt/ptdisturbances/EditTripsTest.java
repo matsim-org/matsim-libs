@@ -29,9 +29,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -101,13 +102,13 @@ import com.google.inject.Inject;
 
 public class EditTripsTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils(); 
-	private static final Logger log = Logger.getLogger(EditTripsTest.class);
-	// this is messy, but DisturbanceAndReplanningEngine needs to be static and there is no 
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	private static final Logger log = LogManager.getLogger(EditTripsTest.class);
+	// this is messy, but DisturbanceAndReplanningEngine needs to be static and there is no
 	// constructor or similar to pass the replanning time
 	private static double testReplanTime = 0;
 	private final URL configURL = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("ptdisturbances"),"config.xml");
-	
+
 
 	/**
 	 * Case 1.1.1
@@ -119,19 +120,19 @@ public class EditTripsTest {
 		Config config = ConfigUtils
 				.loadConfig(configURL);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler()
+		config.controller()
 				.setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
 		double activityEndTime = 7. * 3600 + 40. * 60;
 		Person person = buildPerson(scenario, activityEndTime);
-		
+
 		scenario.getPopulation().addPerson(person);
 		testReplanTime = 7. * 3600 + 51. * 60;
-		run(config, scenario, false, trips, arrivalTimes);
+		run( scenario, false, trips, arrivalTimes );
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
-		
+
 		assertEquals("Travel time has changed", 1490.0,  travelTime, MatsimTestUtils.EPSILON);
 		assertEquals("Number of trip elements has changed", 7 ,trip.size());
 
@@ -142,11 +143,11 @@ public class EditTripsTest {
 		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(4));
 		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(5));
 		assertEquals("Trip element has changed", "dummy@work0", trip.get(6));
-		
-		
+
+
 	}
 
-	
+
 
 	/**
 	 * Case 1.1.2 Looks awkward in otfvis, because after replanning there suddenly
@@ -157,34 +158,29 @@ public class EditTripsTest {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils.loadConfig(configURL);
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler().setOutputDirectory(outputDirectory);
+		config.controller().setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
 		double activityEndTime = 7. * 3600 + 15. * 60;
 		Person person = buildPerson(scenario, activityEndTime);
 		scenario.getPopulation().addPerson(person);
 		testReplanTime = 7. * 3600 + 30. * 60;
-		run(config, scenario, false, trips, arrivalTimes);
+		run( scenario, false, trips, arrivalTimes );
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
-		
-		assertEquals("Travel time has changed", 2990.0,  travelTime, MatsimTestUtils.EPSILON);
-		assertEquals("Number of trip elements has changed", 11 ,trip.size());
+
+		assertEquals("Travel time has changed", 1344.0,  travelTime, MatsimTestUtils.EPSILON);
+		assertEquals("Number of trip elements has changed", 7 ,trip.size());
 
 		assertEquals("Trip element has changed", "dummy@car_17bOut", trip.get(0));
 		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(1));
 		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(2));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(3));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(4));
-		assertEquals("Trip element has changed", "pt interaction@pt7", trip.get(5));
-		assertEquals("Trip element has changed", "pt interaction@pt7", trip.get(6));
-		assertEquals("Trip element has changed", "tr_334", trip.get(7));
-		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(8));
-		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(9));
-		assertEquals("Trip element has changed", "dummy@work0", trip.get(10));
-		
+		assertEquals("Trip element has changed", "tr_333", trip.get(3));
+		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(4));
+		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(5));
+		assertEquals("Trip element has changed", "dummy@work0", trip.get(6));
+
 	}
 
 	/**
@@ -197,7 +193,7 @@ public class EditTripsTest {
 		Config config = ConfigUtils
 				.loadConfig(configURL);;
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler()
+		config.controller()
 				.setOutputDirectory(outputDirectory);
 		config.network().setTimeVariantNetwork(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -206,10 +202,10 @@ public class EditTripsTest {
 		Person person = buildPerson(scenario, activityEndTime);
 		scenario.getPopulation().addPerson(person);
 		testReplanTime = 7. * 3600 + 23. * 60;
-		run(config, scenario, false, trips, arrivalTimes);
+		run( scenario, false, trips, arrivalTimes );
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
-		
+
 		assertEquals("Travel time has changed", 1044.0,  travelTime, MatsimTestUtils.EPSILON);
 		assertEquals("Number of trip elements has changed", 7 ,trip.size());
 
@@ -220,8 +216,8 @@ public class EditTripsTest {
 		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(4));
 		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(5));
 		assertEquals("Trip element has changed", "dummy@work0", trip.get(6));
-		
-		
+
+
 	}
 
 	/**
@@ -234,7 +230,7 @@ public class EditTripsTest {
 		Config config = ConfigUtils
 				.loadConfig(configURL);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler()
+		config.controller()
 				.setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
@@ -242,10 +238,10 @@ public class EditTripsTest {
 		Person person = buildPerson(scenario, activityEndTime);
 		scenario.getPopulation().addPerson(person);
 		testReplanTime = 7. * 3600 + 33. * 60;
-		run(config, scenario, false, trips, arrivalTimes);
+		run( scenario, false, trips, arrivalTimes );
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
-		
+
 		assertEquals("Travel time has changed", 1077.0,  travelTime, MatsimTestUtils.EPSILON);
 		assertEquals("Number of trip elements has changed", 12 ,trip.size());
 
@@ -261,12 +257,12 @@ public class EditTripsTest {
 		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(9));
 		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(10));
 		assertEquals("Trip element has changed", "dummy@work0", trip.get(11));
-		
-		
+
+
 	}
 
 	/**
-	 * Case 2.1 
+	 * Case 2.1
 	 * Does what the name suggests although waiting at the first stop for
 	 * the first undisturbed departure leads to boarding the very same bus.
 	 * This is due to the utility params for walk, pt_wait and pt being equal/indifferent.
@@ -276,61 +272,18 @@ public class EditTripsTest {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils.loadConfig(configURL);
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler().setOutputDirectory(outputDirectory);
+		config.controller().setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
 		double activityEndTime = 7. * 3600 + 22. * 60;
 		Person person = buildPerson(scenario, activityEndTime);
 		scenario.getPopulation().addPerson(person);
 		testReplanTime = 7. * 3600 + 25. * 60;
-		run(config, scenario, false, trips, arrivalTimes);
+		run( scenario, false, trips, arrivalTimes );
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
-		
-		assertEquals("Travel time has changed", 2570.0,  travelTime, MatsimTestUtils.EPSILON);
-		assertEquals("Number of trip elements has changed", 9 ,trip.size());
 
-		assertEquals("Trip element has changed", "dummy@car_17bOut", trip.get(0));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(1));
-		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(2));
-		assertEquals("Trip element has changed", "pt interaction@pt7", trip.get(3));
-		assertEquals("Trip element has changed", "pt interaction@pt7", trip.get(4));
-		assertEquals("Trip element has changed", "tr_334", trip.get(5));
-		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(6));
-		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(7));
-		assertEquals("Trip element has changed", "dummy@work0", trip.get(8));
-		
-		
-	}
-	
-	/**
-	 * Case 2.2 
-	 * Same as  {@link #testAgentIsAtTeleportLegAndLeavesStop()} but marginal utility of travelling worse for walk than for
-	 * pt_wait and pt. Strangely only works with walk being significantly worse, does not work with small differences.
-	 */
-	@Test
-	public void testAgentIsAtTeleportLegAndWaitsAtStop_walkUnattractive() {
-		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
-		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
-		Config config = ConfigUtils
-				.loadConfig(configURL);;
-		String outputDirectory = utils.getOutputDirectory();
-		config.controler()
-				.setOutputDirectory(outputDirectory);
-		config.planCalcScore().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(
-				config.planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - 3);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		scenario.getPopulation().getPersons().clear();
-		double activityEndTime = 7. * 3600 + 22. * 60;
-		Person person = buildPerson(scenario, activityEndTime);
-		scenario.getPopulation().addPerson(person);
-		testReplanTime = 7. * 3600 + 25. * 60;
-		run(config, scenario, false, trips, arrivalTimes);
-		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
-		List<String> trip = trips.get(person.getId());
-		
 		assertEquals("Travel time has changed", 2570.0,  travelTime, MatsimTestUtils.EPSILON);
 		assertEquals("Number of trip elements has changed", 9 ,trip.size());
 
@@ -343,8 +296,50 @@ public class EditTripsTest {
 		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(6));
 		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(7));
 		assertEquals("Trip element has changed", "dummy@work0", trip.get(8));
-		
-		
+
+
+	}
+
+	/**
+	 * Case 2.2
+	 * Same as  {@link #testAgentIsAtTeleportLegAndLeavesStop()} but marginal utility of travelling worse for walk than for
+	 * pt_wait and pt. Strangely only works with walk being significantly worse, does not work with small differences.
+	 */
+	@Test
+	public void testAgentIsAtTeleportLegAndWaitsAtStop_walkUnattractive() {
+		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
+		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
+		Config config = ConfigUtils
+				.loadConfig(configURL);;
+		String outputDirectory = utils.getOutputDirectory();
+		config.controller()
+				.setOutputDirectory(outputDirectory);
+		config.scoring().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(
+				config.scoring().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - 3);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		scenario.getPopulation().getPersons().clear();
+		double activityEndTime = 7. * 3600 + 22. * 60;
+		Person person = buildPerson(scenario, activityEndTime);
+		scenario.getPopulation().addPerson(person);
+		testReplanTime = 7. * 3600 + 25. * 60;
+		run( scenario, false, trips, arrivalTimes );
+		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
+		List<String> trip = trips.get(person.getId());
+
+		assertEquals("Travel time has changed", 2570.0,  travelTime, MatsimTestUtils.EPSILON);
+		assertEquals("Number of trip elements has changed", 9 ,trip.size());
+
+		assertEquals("Trip element has changed", "dummy@car_17bOut", trip.get(0));
+		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(1));
+		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(2));
+		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(3));
+		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(4));
+		assertEquals("Trip element has changed", "tr_334", trip.get(5));
+		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(6));
+		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(7));
+		assertEquals("Trip element has changed", "dummy@work0", trip.get(8));
+
+
 	}
 
 	/**
@@ -355,38 +350,37 @@ public class EditTripsTest {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils.loadConfig(configURL);
-		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler().setOutputDirectory(outputDirectory);
+		config.controller().setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
 		double activityEndTime = 7. * 3600 + 22. * 60;
 		Person person = buildPerson(scenario, activityEndTime);
 		scenario.getPopulation().addPerson(person);
 		testReplanTime = 7. * 3600 + 25. * 60;
-		run(config, scenario, false, trips, arrivalTimes);
+		run( scenario, false, trips, arrivalTimes );
 		double travelTime = arrivalTimes.get(person.getId()) - activityEndTime;
 		List<String> trip = trips.get(person.getId());
-		
+
 		assertEquals("Travel time has changed", 2570.0,  travelTime, MatsimTestUtils.EPSILON);
 		assertEquals("Number of trip elements has changed", 9 ,trip.size());
 
 		assertEquals("Trip element has changed", "dummy@car_17bOut", trip.get(0));
 		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(1));
 		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(2));
-		assertEquals("Trip element has changed", "pt interaction@pt7", trip.get(3));
-		assertEquals("Trip element has changed", "pt interaction@pt7", trip.get(4));
+		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(3));
+		assertEquals("Trip element has changed", "pt interaction@pt6c", trip.get(4));
 		assertEquals("Trip element has changed", "tr_334", trip.get(5));
 		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(6));
 		assertEquals("Trip element has changed", "pt interaction@pt8", trip.get(7));
 		assertEquals("Trip element has changed", "dummy@work0", trip.get(8));
-		
+
 
 	}
-	
+
 	/**
 	 * Case 3
-	 * Simulates 900 agents so this case should include every possible state of an agent. Current and future trips are replanned. 
+	 * Simulates 900 agents so this case should include every possible state of an agent. Current and future trips are replanned.
 	 */
 	@Test
 	public void testOneAgentEveryFourSeconds() {
@@ -395,7 +389,7 @@ public class EditTripsTest {
 		Config config = ConfigUtils
 				.loadConfig(configURL);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler()
+		config.controller()
 				.setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
@@ -404,14 +398,14 @@ public class EditTripsTest {
 			scenario.getPopulation().addPerson(person);
 		}
 		testReplanTime = 7. * 3600 + 33. * 60;
-		run(config, scenario, false, trips, arrivalTimes);
+		run( scenario, false, trips, arrivalTimes );
 		for (Id<?> personId : arrivalTimes.keySet()) {
 			String[] parts = personId.toString().split("_");
 			double activityEndTime = Double.parseDouble(parts[1]);
 			double travelTime = arrivalTimes.get(personId) - activityEndTime;
 			assertTrue(travelTime < 50. * 60);
 			assertTrue(travelTime > 15. * 60);
-			
+
 			int numberOfUsedLines = 0;
 			for (int ii = 0; ii < trips.get(personId).size(); ii++) {
 				if (trips.get(personId).get(ii).startsWith("tr_")) {
@@ -420,11 +414,11 @@ public class EditTripsTest {
 			}
 			assertTrue("Number of used lines ist not plausible", numberOfUsedLines == 1 || numberOfUsedLines == 2);
 		}
-		System.out.println(config.controler().getOutputDirectory());
+		System.out.println(config.controller().getOutputDirectory());
 	}
-	
-	
-	
+
+
+
 
 	public static Person buildPerson(Scenario scenario, double endTime) {
 
@@ -447,10 +441,11 @@ public class EditTripsTest {
 		plan.addActivity(act1);
 		return person;
 	}
-	
 
 
-	void run(Config config, Scenario scenario, boolean openOTFVis, HashMap<Id<Person>, List<String>> trips, HashMap<Id<Person>, Double> arrivalTimes) {
+
+	void run( Scenario scenario, boolean openOTFVis, HashMap<Id<Person>, List<String>> trips, HashMap<Id<Person>, Double> arrivalTimes ) {
+		Config config = scenario.getConfig();
 
 		RunExamplePtDisturbances.adaptConfig(config);
 
@@ -459,16 +454,15 @@ public class EditTripsTest {
 		config.transit().setBoardingAcceptance(BoardingAcceptance.checkStopOnly);
 
 		SignalSystemsConfigGroup signalSystemsConfigGroup = adaptConfigForSignals(config);
-		
-//		Scenario scenario = ScenarioUtils.loadScenario(config) ;
+
 		buildSignals(scenario, signalSystemsConfigGroup);
 
 		Controler controler = new Controler(scenario);
-		
+
 		Signals.configure( controler ) ;
-		
+
 		// We need to direct to our local DisturbanceAndReplanningEngine, because it is hard to access,
-		// so we cannot re-use the one in RunMatsim and configure it via constructor or similar 
+		// so we cannot re-use the one in RunMatsim and configure it via constructor or similar
 		{
 			QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule(config,
 					QSimComponentsConfigGroup.class);
@@ -484,20 +478,20 @@ public class EditTripsTest {
 				protected void configureQSim() {
 					// the following registers the component under the name "...NAME":
 					this.addQSimComponentBinding(DisturbanceAndReplanningEngine.NAME)
-							.to(DisturbanceAndReplanningEngine.class); 
+							.to(DisturbanceAndReplanningEngine.class);
 //					bind(TransitStopHandlerFactory.class).to(SimpleTransitStopHandlerFactory.class);
 				}
 			});
-			
-			
+
+
 			HandlerForTests handlerForTests = new HandlerForTests(trips, arrivalTimes);
 
 			controler.addOverridingModule(new AbstractModule(){
 				@Override public void install() {
-					this.addEventHandlerBinding().toInstance( handlerForTests ); 
+					this.addEventHandlerBinding().toInstance( handlerForTests );
 				}
 			});
-			
+
 
 //			controler.addOverridingModule( new SwissRailRaptorModule() );
 		}
@@ -528,13 +522,13 @@ public class EditTripsTest {
 
 	private SignalSystemsConfigGroup adaptConfigForSignals(Config config) {
 		// add the signal config group to the config file
-		SignalSystemsConfigGroup signalSystemsConfigGroup = 
+		SignalSystemsConfigGroup signalSystemsConfigGroup =
 				ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
-		
+
 		/* the following makes the contrib load the signal input files, but not to do anything with them
 		 * (this switch will eventually go away) */
 		signalSystemsConfigGroup.setUseSignalSystems(true);
-		
+
 		config.qsim().setUsingFastCapacityUpdate(false); // otherwise inject error message "Fast flow capacity update does not support signals"
 		return signalSystemsConfigGroup;
 	}
@@ -542,11 +536,11 @@ public class EditTripsTest {
 	private void buildSignals(Scenario scenario, SignalSystemsConfigGroup signalSystemsConfigGroup) {
 		SignalsData signalsData = SignalUtils.createSignalsData(signalSystemsConfigGroup);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, signalsData);
-		
+
 		SignalSystemsData systems = signalsData.getSignalSystemsData();
 		SignalGroupsData groups = signalsData.getSignalGroupsData();
 		SignalControlData control = signalsData.getSignalControlData();
-		
+
 		// create signal system pt3 (at node pt3Signal)
 		Id<SignalSystem> idSignalSystem = Id.create("pt3", SignalSystem.class);
 		SignalSystemData sys = systems.getFactory().createSignalSystemData(idSignalSystem);
@@ -560,15 +554,15 @@ public class EditTripsTest {
 		signal.setLinkId(Id.create("pt6b", Link.class));
 		// create a single signal group for each signal of system pt3, i.e. for signal 1
 		SignalUtils.createAndAddSignalGroups4Signals(groups, sys);
-		
+
 		// create a signal control for the system
 		SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(idSignalSystem);
 		// add it to the overall signal control container
 		control.addSignalSystemControllerData(controller);
 		// declare the control as a fixed time control
 		controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-		
-		/* create a first signal plan for the system control (a signal system control (i.e. an intersection) 
+
+		/* create a first signal plan for the system control (a signal system control (i.e. an intersection)
 		 * can have different (non-overlapping) plans for different times of the day) */
 		SignalPlanData plan1 = control.getFactory().createSignalPlanData(Id.create("1", SignalPlan.class));
 		// add the (first) plan to the system control
@@ -657,17 +651,17 @@ public class EditTripsTest {
 		}
 
 	}
-	
+
 	private static class HandlerForTests implements ActivityStartEventHandler, ActivityEndEventHandler, PersonEntersVehicleEventHandler
-	{		
+	{
 		private HashMap<Id<Person>, List<String>> trips;
 		private HashMap<Id<Person>, Double> arrivalTimes;
-		
+
 		public HandlerForTests (HashMap<Id<Person>, List<String>> trips, HashMap<Id<Person>, Double> arrivalTimes) {
 			this.trips = trips;
 			this.arrivalTimes = arrivalTimes;
 		}
-		
+
 		@Override
 		public void handleEvent(ActivityEndEvent event) {
 			if (event.getPersonId().toString().startsWith("testAgent")) {
@@ -676,15 +670,15 @@ public class EditTripsTest {
 					trip.add(event.getActType()+"@"+event.getLinkId());
 					trips.put(event.getPersonId(), trip);
 				}
-				
+
 				else {
 					List<String> trip = trips.get(event.getPersonId());
 					trip.add(event.getActType()+"@"+event.getLinkId());
 				}
 			}
-			
+
 		}
-		
+
 		@Override
 		public void handleEvent(ActivityStartEvent event) {
 			arrivalTimes.put(event.getPersonId(), event.getTime());
@@ -692,7 +686,7 @@ public class EditTripsTest {
 				List<String> trip = trips.get(event.getPersonId());
 				trip.add(event.getActType()+"@"+event.getLinkId());
 			}
-			
+
 		}
 
 
@@ -704,7 +698,7 @@ public class EditTripsTest {
 			}
 
 		}
-		
+
 		@Override
 		public void reset(int iteration) {
 			arrivalTimes.clear();
@@ -712,7 +706,7 @@ public class EditTripsTest {
 		}
 
 	}
-	
 
-	
+
+
 }

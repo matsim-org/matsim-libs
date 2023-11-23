@@ -20,9 +20,13 @@
 
 package org.matsim.core.network.io;
 
+import static org.junit.Assert.*;
+
 import java.util.Set;
 import java.util.Stack;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -31,18 +35,21 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.AttributesBuilder;
 import org.xml.sax.Attributes;
 
-public class NetworkReaderMatsimV1Test extends MatsimTestCase {
+public class NetworkReaderMatsimV1Test {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	/**
 	 * @author mrieser
 	 */
-	public void testAllowedModes_singleMode() {
+	@Test public void testAllowedModes_singleMode() {
 		Link link = prepareTestAllowedModes("car");
 		Set<String> modes = link.getAllowedModes();
 		assertEquals("wrong number of allowed modes.", 1, modes.size());
@@ -58,7 +65,7 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 	/**
 	 * @author mrieser
 	 */
-	public void testAllowedModes_emptyMode() {
+	@Test public void testAllowedModes_emptyMode() {
 		Link link = prepareTestAllowedModes("");
 		Set<String> modes = link.getAllowedModes();
 		assertEquals("wrong number of allowed modes.", 0, modes.size());
@@ -67,7 +74,7 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 	/**
 	 * @author mrieser
 	 */
-	public void testAllowedModes_multipleModes() {
+	@Test public void testAllowedModes_multipleModes() {
 		Link link = prepareTestAllowedModes("car,bus");
 		Set<String> modes = link.getAllowedModes();
 		assertEquals("wrong number of allowed modes.", 2, modes.size());

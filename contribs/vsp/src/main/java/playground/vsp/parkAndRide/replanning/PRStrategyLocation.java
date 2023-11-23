@@ -39,36 +39,36 @@ import playground.vsp.parkAndRide.PRConfigGroup;
 import playground.vsp.parkAndRide.PRFacility;
 import playground.vsp.parkAndRide.PRFileReader;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
 
 /**
  * A way of plugging park-and-ride strategy modules together. Via config file: <param name="Module_#" value="playground.vsp.parkAndRide.replanning.PRStrategyLocation" />
- * 
+ *
  * @author ikaddoura
  *
  */
 public class PRStrategyLocation implements PlanStrategy {
 
 	PlanStrategyImpl planStrategyDelegate = null ;
-	
+
 	public PRStrategyLocation(MatsimServices controler, Provider<TripRouter> tripRouterProvider) {
-		
+
 		PRConfigGroup prSettings = (PRConfigGroup) controler.getConfig().getModule(PRConfigGroup.GROUP_NAME);
 		PRFileReader prReader = new PRFileReader(prSettings.getInputFile());
 		Map<Id<PRFacility>, PRFacility> id2prFacility = prReader.getId2prFacility();
-		
+
 		RandomPlanSelector planSelector = new RandomPlanSelector();
 		planStrategyDelegate = new PlanStrategyImpl( planSelector );
-				
+
 		TransitActsRemoverStrategy transitActsRemoveModule = new TransitActsRemoverStrategy(controler.getConfig());
 		planStrategyDelegate.addStrategyModule(transitActsRemoveModule) ;
 
 		PRLocationStrategyMod prLocationMod = new PRLocationStrategyMod(controler, id2prFacility, prSettings.getGravity(), prSettings.getTypicalDuration());
 		planStrategyDelegate.addStrategyModule(prLocationMod);
-		
+
 		ReRoute reRouteModule = new ReRoute( controler.getScenario(), tripRouterProvider, TimeInterpretation.create(controler.getConfig())) ;
 		planStrategyDelegate.addStrategyModule(reRouteModule) ;
-		
+
 	}
 
 	@Override

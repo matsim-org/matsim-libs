@@ -20,11 +20,9 @@
 
 package org.matsim.contrib.drt.fare;
 
-import java.util.Map;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 import jakarta.validation.constraints.PositiveOrZero;
-
-import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author jbischoff
@@ -34,89 +32,32 @@ public final class DrtFareParams extends ReflectiveConfigGroup {
 
 	public static final String SET_NAME = "drtfare";
 
-	public static final String BASEFARE = "basefare";
-	public static final String MINFARE_PER_TRIP = "minFarePerTrip";
-	public static final String DAILY_FEE = "dailySubscriptionFee";
-	public static final String TIMEFARE = "timeFare_h";
-	public static final String DISTANCEFARE = "distanceFare_m";
-	public static final String MODE = "mode";
+	@Parameter("basefare")
+	@Comment("Basefare per trip (positive or zero value)")
+	@PositiveOrZero
+	public double baseFare;
 
+	@Parameter
+	@Comment("Minimum fare per trip (paid instead of the sum of base, time and distance fare if that sum would be lower than the minimum fare, positive or zero value).")
 	@PositiveOrZero
-	private double baseFare;
+	public double minFarePerTrip = 0.0;
+
+	@Parameter
+	@Comment("Daily subscription fee (positive or zero value)")
 	@PositiveOrZero
-	private double minFarePerTrip = 0.0;
+	public double dailySubscriptionFee;
+
+	@Parameter
+	@Comment("drt fare per hour (positive or zero value)")
 	@PositiveOrZero
-	private double dailySubscriptionFee;
+	public double timeFare_h;
+
+	@Parameter
+	@Comment("drt fare per meter (positive or zero value)")
 	@PositiveOrZero
-	private double timeFare_h;
-	@PositiveOrZero
-	private double distanceFare_m;
+	public double distanceFare_m;
 
 	public DrtFareParams() {
 		super(SET_NAME);
-
-	}
-
-	@Override
-	public Map<String, String> getComments() {
-		Map<String, String> map = super.getComments();
-		map.put(BASEFARE, "Basefare per trip (positive or zero value)");
-		map.put(MINFARE_PER_TRIP,
-				"Minimum fare per trip (paid instead of the sum of base, time and distance fare if that sum would be lower than the minimum fare, positive or zero value).");
-		map.put(DAILY_FEE, "Daily subscription fee (positive or zero value)");
-		map.put(TIMEFARE, "drt fare per hour (positive or zero value)");
-		map.put(DISTANCEFARE, "drt fare per meter (positive or zero value)");
-		map.put(MODE, "transport mode for which the fare applies. Default: drt");
-		return map;
-	}
-
-	@StringGetter(BASEFARE)
-	public double getBaseFare() {
-		return baseFare;
-	}
-
-	@StringSetter(BASEFARE)
-	public void setBaseFare(double baseFare) {
-		this.baseFare = baseFare;
-	}
-
-	@StringGetter(MINFARE_PER_TRIP)
-	public double getMinFarePerTrip() {
-		return minFarePerTrip;
-	}
-
-	@StringSetter(MINFARE_PER_TRIP)
-	public void setMinFarePerTrip(double minFarePerTrip) {
-		this.minFarePerTrip = minFarePerTrip;
-	}
-
-	@StringGetter(DAILY_FEE)
-	public double getDailySubscriptionFee() {
-		return dailySubscriptionFee;
-	}
-
-	@StringSetter(DAILY_FEE)
-	public void setDailySubscriptionFee(double dailySubscriptionFee) {
-		this.dailySubscriptionFee = dailySubscriptionFee;
-	}
-
-	@StringGetter(TIMEFARE)
-	public double getTimeFare_h() {
-		return timeFare_h;
-	}
-
-	@StringSetter(TIMEFARE)
-	public void setTimeFare_h(double timeFare_h) {
-		this.timeFare_h = timeFare_h;
-	}
-
-	@StringGetter(DISTANCEFARE)
-	public double getDistanceFare_m() {
-		return distanceFare_m;
-	}
-
-	@StringSetter(DISTANCEFARE)
-	public void setDistanceFare_m(double distanceFare_m) {
-		this.distanceFare_m = distanceFare_m;
 	}
 }

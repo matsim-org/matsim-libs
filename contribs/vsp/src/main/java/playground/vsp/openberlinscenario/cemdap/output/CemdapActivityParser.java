@@ -23,7 +23,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
@@ -34,7 +35,7 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class CemdapActivityParser {
 
-	private final static Logger LOG = Logger.getLogger(CemdapActivityParser.class);
+	private final static Logger LOG = LogManager.getLogger(CemdapActivityParser.class);
 
 	// Cemdap activity file columns
 //	private static final int HH_ID = 0;

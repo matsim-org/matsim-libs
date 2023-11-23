@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.stats.abtractPAnalysisModules;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -41,7 +42,7 @@ import java.util.HashMap;
  */
 final class AverageWaitingTimeSecondsPerMode extends AbstractPAnalyisModule implements PersonDepartureEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler{
 	
-	private final static Logger log = Logger.getLogger(AverageWaitingTimeSecondsPerMode.class);
+	private final static Logger log = LogManager.getLogger(AverageWaitingTimeSecondsPerMode.class);
 	
 	private HashMap<Id<Vehicle>, String> vehId2ptModeMap;
 	private HashMap<String, Double> ptMode2SecondsTravelledMap;

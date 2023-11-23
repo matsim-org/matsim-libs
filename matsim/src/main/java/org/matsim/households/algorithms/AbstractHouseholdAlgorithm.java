@@ -20,14 +20,15 @@
 
 package org.matsim.households.algorithms;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 
 public abstract class AbstractHouseholdAlgorithm implements HouseholdAlgorithm{
 
-	private final static Logger log = Logger.getLogger(AbstractHouseholdAlgorithm.class);
+	private final static Logger log = LogManager.getLogger(AbstractHouseholdAlgorithm.class);
 	
 	public final void run(final Households households) {
 		log.info("Running " + this.getClass().getName() + " algorithm...");

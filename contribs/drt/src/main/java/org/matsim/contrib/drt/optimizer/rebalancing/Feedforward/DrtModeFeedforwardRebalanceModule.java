@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.Feedforward;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZoneTargetLinkSelector;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
@@ -36,7 +37,7 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
  * @author michalm (Michal Maciejewski)
  */
 public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
-	private static final Logger log = Logger.getLogger(DrtModeFeedforwardRebalanceModule.class);
+	private static final Logger log = LogManager.getLogger(DrtModeFeedforwardRebalanceModule.class);
 	private final DrtConfigGroup drtCfg;
 
 	public DrtModeFeedforwardRebalanceModule(DrtConfigGroup drtCfg) {

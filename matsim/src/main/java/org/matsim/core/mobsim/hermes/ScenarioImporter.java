@@ -19,36 +19,17 @@
 
 package org.matsim.core.mobsim.hermes;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
-import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.events.EventArray;
 import org.matsim.core.mobsim.hermes.Agent.PlanArray;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -59,28 +40,17 @@ import org.matsim.core.utils.collections.IntArrayMap;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.routes.TransitPassengerRoute;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 class ScenarioImporter {
 
-	final private static Logger log = Logger.getLogger(Hermes.class);
+	final private static Logger log = LogManager.getLogger(Hermes.class);
 
 	private static ScenarioImporter instance;
 
@@ -89,41 +59,35 @@ class ScenarioImporter {
 	// Scenario loaded by matsim;
 	private final Scenario scenario;
 
-	protected int agent_persons;
-
+	private final Map<Id<VehicleType>, Integer> vehicleTypeMapping = new HashMap<>();
+	protected int agentPersons;
 	// hermes route numbers for each line/route. Should be used as follows:
 	// route_numbers.get(line id).get(route id) -> hermes-route-number
-	protected IdMap<TransitLine, ArrayMap<Id<TransitRoute>, Integer>> route_numbers;
-
+	protected IdMap<TransitLine, ArrayMap<Id<TransitRoute>, Integer>> routeNumbers;
 	// matsim stop ids (Id<TransitStopFacility>.index) per route number. Should be used as follows:
 	// int[] stop_ids = route_stops_by_route_no[route_no]
 	// route_stops_by_route_no[route_no][station_index] -> transit_stop_facility.id.index
-	protected int[][] route_stops_by_route_no;
-
+	protected int[][] routeStopsByRouteNo;
 	// matsim line id (Id<TransitLine>.index) of a particular hermes route. Should be used as follows:
 	// line_of_route[route_no] -> transit_line.id.index
-	protected int[] line_of_route;
-
+	protected int[] lineOfRoute;
 	// matsim route id (Id<TransitRoute>.index) of a particular hermes route number. Should be used as follows:
-	// route_of_route[route_no] -> transit_route.id.index
-	protected int[] route_of_route;
-
+	// routeOfRoute[route_no] -> transit_route.id.index
+	protected int[] routeOfRoute;
 	// Array of links that define the network.
-	protected HLink[] hermes_links;
-
-	// Array of agents that participate in the simulation.
-	// Note: in order to make MATSim Agent ids, some positions in the array might be null.
-	protected Agent[] hermes_agents;
+	protected HLink[] hermesLinks;
 
 	protected Realm realm;
 	private final boolean deterministicPt;
 	// Agents waiting in pt stations. Should be used as follows:
 	// agent_stops.get(curr station id).get(line id) -> queue of agents
-	protected IdMap<TransitStopFacility, IntArrayMap<ArrayDeque<Agent>>> agent_stops;
+	protected IdMap<TransitStopFacility, IntArrayMap<ArrayDeque<Agent>>> agentStops;
 
 	private float[] flowCapacityPCEs;
 	private float[] storageCapacityPCEs;
-	private Map<Id<VehicleType>, Integer> vehicleTypeMapping = new HashMap<>();
+	// Array of agents that participate in the simulation.
+	// Note: in order to make MATSim Agent ids, some positions in the array might be null.
+	protected Agent[] hermesAgents;
 	protected final EventsManager eventsManager;
 	private final int numberOfThreads;
 	private final List<List<Event>> deterministicPtEvents;
@@ -187,7 +151,7 @@ class ScenarioImporter {
 			resetThread.join();
 		}
 
-		log.info(String.format("Hermes reset took %d ms  (%d agents %d links)", System.currentTimeMillis() - time, hermes_agents.length, hermes_links.length));
+		log.info(String.format("Hermes reset took %d ms  (%d agents %d links)", System.currentTimeMillis() - time, hermesAgents.length, hermesLinks.length));
 		time = System.currentTimeMillis();
 		generatePlans();
 		log.info(String.format("Hermes generatePlans took %d ms", System.currentTimeMillis() - time));
@@ -203,20 +167,19 @@ class ScenarioImporter {
 			public void run() {
 				log.info("resetting hermes...");
 				// reset links
-				for (int i = 0; i < hermes_links.length; i++) {
-					HLink link = hermes_links[i];
+				for (HLink link : hermesLinks) {
 					if (link != null) {
 						link.reset();
 					}
 				}
 				// reset agent plans and events
-				for (int i = 0; i < hermes_agents.length; i++) {
-					if (hermes_agents[i] != null) {
-						hermes_agents[i].reset();
+				for (Agent hermes_agent : hermesAgents) {
+					if (hermes_agent != null) {
+						hermes_agent.reset();
 					}
 				}
 				// reset agent_stops
-				for (IntArrayMap<ArrayDeque<Agent>> station_id : agent_stops) {
+				for (IntArrayMap<ArrayDeque<Agent>> station_id : agentStops) {
 					for (ArrayDeque<Agent> agents_per_line : station_id.values()) {
 						agents_per_line.clear();
 					}
@@ -232,7 +195,7 @@ class ScenarioImporter {
 		Network network = scenario.getNetwork();
 		Collection<? extends org.matsim.api.core.v01.network.Link> matsim_links =
 				network.getLinks().values();
-		hermes_links = new HLink[Id.getNumberOfIds(org.matsim.api.core.v01.network.Link.class)];
+		hermesLinks = new HLink[Id.getNumberOfIds(org.matsim.api.core.v01.network.Link.class)];
 
 		for (org.matsim.api.core.v01.network.Link matsim_link : matsim_links) {
 			int length = Math.max(1, (int) Math.round(matsim_link.getLength()));
@@ -246,7 +209,7 @@ class ScenarioImporter {
 				throw new RuntimeException("exceeded maximum number of links");
 			}
 
-			hermes_links[link_id] = new HLink(link_id, storageCapacity, length, speed, effectiveflowCapacityPerSec, scenario.getConfig().hermes().getStuckTime());
+			hermesLinks[link_id] = new HLink(link_id, storageCapacity, length, speed, effectiveflowCapacityPerSec, scenario.getConfig().hermes().getStuckTime());
 		}
 	}
 
@@ -258,21 +221,21 @@ class ScenarioImporter {
 			routeCount += tl.getRoutes().size();
 		}
 
-		this.line_of_route = new int[routeCount];
-		this.route_of_route = new int[routeCount];
-		this.route_stops_by_route_no = new int[routeCount][];
+		this.lineOfRoute = new int[routeCount];
+		this.routeOfRoute = new int[routeCount];
+		this.routeStopsByRouteNo = new int[routeCount][];
 
-		this.route_numbers = new IdMap<>(TransitLine.class);
+		this.routeNumbers = new IdMap<>(TransitLine.class);
 		int routeNo = 0;
 		for (TransitLine tl : ts.getTransitLines().values()) {
 			ArrayMap<Id<TransitRoute>, Integer> routesMap = new ArrayMap<>();
-			this.route_numbers.put(tl.getId(), routesMap);
+			this.routeNumbers.put(tl.getId(), routesMap);
 			int lineId = tl.getId().index();
 			for (TransitRoute tr : tl.getRoutes().values()) {
 				routesMap.put(tr.getId(), routeNo);
 				int routeId = tr.getId().index();
-				this.line_of_route[routeNo] = lineId;
-				this.route_of_route[routeNo] = routeId;
+				this.lineOfRoute[routeNo] = lineId;
+				this.routeOfRoute[routeNo] = routeId;
 
 				List<TransitRouteStop> stops = tr.getStops();
 				int[] tr_stops = new int[stops.size()];
@@ -281,7 +244,7 @@ class ScenarioImporter {
 					int sid = trs.getStopFacility().getId().index();
 					tr_stops[i] = sid;
 				}
-				this.route_stops_by_route_no[routeNo] = tr_stops;
+				this.routeStopsByRouteNo[routeNo] = tr_stops;
 				routeNo++;
 			}
 		}
@@ -291,7 +254,7 @@ class ScenarioImporter {
 		initRoutesStations();
 
 		// Initialize agent_stops.
-		this.agent_stops = new IdMap<>(TransitStopFacility.class);
+		this.agentStops = new IdMap<>(TransitStopFacility.class);
 
 		TransitSchedule ts = this.scenario.getTransitSchedule();
 		for (TransitLine line : ts.getTransitLines().values()) {
@@ -301,18 +264,18 @@ class ScenarioImporter {
 					TransitRouteStop routeStop = stops.get(i);
 					TransitStopFacility stopFacility = routeStop.getStopFacility();
 
-					IntArrayMap<ArrayDeque<Agent>> linesMap = this.agent_stops.computeIfAbsent(stopFacility.getId(), k -> new IntArrayMap<>());
+					IntArrayMap<ArrayDeque<Agent>> linesMap = this.agentStops.computeIfAbsent(stopFacility.getId(), k -> new IntArrayMap<>());
 					linesMap.computeIfAbsent(line.getId().index(), k -> new ArrayDeque<>());
 				}
 			}
 		}
 	}
 
-	private void generateRealms() throws Exception {
+	private void generateRealms() {
 		realm = new Realm(this, eventsManager);
 
 		// Put agents in their initial location (link or activity center)
-		for (Agent agent : hermes_agents) {
+		for (Agent agent : hermesAgents) {
 			// Some agents might not have plans.
 			if (agent == null || agent.plan.size() == 0) {
 				continue;
@@ -323,9 +286,9 @@ class ScenarioImporter {
 			switch (type) {
 				case Agent.LinkType:
 					int linkid = Agent.getLinkPlanEntry(planentry);
-					int velocity = Agent.getVelocityPlanEntry(planentry);
-					HLink link = hermes_links[linkid];
-					agent.linkFinishTime = link.length() / Math.min(velocity, link.velocity());
+					double velocity = Agent.getVelocityPlanEntry(planentry);
+					HLink link = hermesLinks[linkid];
+					agent.linkFinishTime = (int) Math.round(link.length() / Math.min(velocity, link.velocity()));
 					link.push(agent, 0, getStorageCapacityPCE(Agent.getLinkPCEEntry(planentry)));
 					break;
 				case Agent.SleepForType:
@@ -334,11 +297,11 @@ class ScenarioImporter {
 					realm.delayedAgents().get(Math.min(sleep, scenario.getConfig().hermes().getEndTime() + 1)).add(agent);
 					break;
 				default:
-					Logger.getLogger(getClass()).error(String.format("ERROR -> unknown plan element type %d", type));
+					LogManager.getLogger(getClass()).error(String.format("ERROR -> unknown plan element type %d", type));
 			}
 		}
 
-		for (HLink link : this.hermes_links) {
+		for (HLink link : this.hermesLinks) {
 			if (link != null) {
 				int nextwakeup = link.nexttime();
 				if (nextwakeup > 0) {
@@ -409,8 +372,8 @@ class ScenarioImporter {
 		Id<VehicleType> vtypeid = v == null ? VehicleUtils.getDefaultVehicleType().getId() : v.getType().getId();
 		int pcuCategory = this.vehicleTypeMapping.get(vtypeid);
 		Id<Vehicle> vid = v == null ? Id.createVehicleId("v" + person.getId()) : v.getId();
-		int velocity = v == null ?
-				HermesConfigGroup.MAX_VEHICLE_VELOCITY : (int) Math.round(v.getType().getMaximumVelocity());
+		double velocity = v == null ?
+				HermesConfigGroup.MAX_VEHICLE_VELOCITY : v.getType().getMaximumVelocity();
 		int egressId = endLId.index();
 
 		//initial capacity setting
@@ -440,7 +403,7 @@ class ScenarioImporter {
 	}
 
 	private void populateStops(int srcStopId, int lineId) {
-		IntArrayMap<ArrayDeque<Agent>> agents = this.agent_stops.get(srcStopId);
+		IntArrayMap<ArrayDeque<Agent>> agents = this.agentStops.get(srcStopId);
 		agents.computeIfAbsent(lineId, k -> new ArrayDeque<>());
 	}
 
@@ -454,7 +417,7 @@ class ScenarioImporter {
 		int lineid = troute.getLineId().index();
 		int accessid = access.index();
 		int egressid = egress.index();
-		int routeNo = this.route_numbers.get(troute.getLineId()).get(troute.getRouteId());
+		int routeNo = this.routeNumbers.get(troute.getLineId()).get(troute.getRouteId());
 
 		populateStops(accessid, lineid);
 
@@ -520,7 +483,7 @@ class ScenarioImporter {
 	}
 
 	private void generateAgent(
-			int agent_id,
+			int agentId,
 			int capacity,
 			PlanArray flatplan,
 			EventArray events) {
@@ -529,10 +492,10 @@ class ScenarioImporter {
 			throw new RuntimeException("exceeded maximum number of agent events");
 		}
 
-		hermes_agents[agent_id] = new Agent(agent_id, capacity, flatplan, events);
+		hermesAgents[agentId] = new Agent(agentId, capacity, flatplan, events);
 	}
 
-	private double delay_helper(double expected, OptionalTime delay_a, OptionalTime delay_b) {
+	private double delayHelper(double expected, OptionalTime delay_a, OptionalTime delay_b) {
 		if (delay_a.isDefined()) {
 			return expected + delay_a.seconds();
 		} else if (delay_b.isDefined()) {
@@ -543,11 +506,11 @@ class ScenarioImporter {
 	}
 
 	private double arrivalOffsetHelper(Departure depart, TransitRouteStop trs) {
-		return delay_helper(depart.getDepartureTime(), trs.getArrivalOffset(), trs.getDepartureOffset());
+		return delayHelper(depart.getDepartureTime(), trs.getArrivalOffset(), trs.getDepartureOffset());
 	}
 
 	private double departureOffsetHelper(Departure depart, TransitRouteStop trs) {
-		return delay_helper(depart.getDepartureTime(), trs.getDepartureOffset(), trs.getArrivalOffset());
+		return delayHelper(depart.getDepartureTime(), trs.getDepartureOffset(), trs.getArrivalOffset());
 	}
 
 	private static class TransitRouteContext {
@@ -738,7 +701,7 @@ class ScenarioImporter {
 			Departure depart) {
 
 		Vehicle v = this.scenario.getTransitVehicles().getVehicles().get(depart.getVehicleId());
-		int routeNo = this.route_numbers.get(tl.getId()).get(tr.getId());
+		int routeNo = this.routeNumbers.get(tl.getId()).get(tr.getId());
 
 		TransitRouteContext context = new TransitRouteContext(agent, tl, tr, routeNo, depart, this.scenario.getNetwork());
 		PlanArray flatplan = agent.plan;
@@ -824,7 +787,7 @@ class ScenarioImporter {
 			TransitRoute tr,
 			Departure depart) {
 
-		int routeNo = this.route_numbers.get(tl.getId()).get(tr.getId());
+		int routeNo = this.routeNumbers.get(tl.getId()).get(tr.getId());
 		TransitRouteContext context = new TransitRouteContext(agent, tl, tr, routeNo, depart, this.scenario.getNetwork());
 		PlanArray flatplan = agent.plan;
 		EventArray flatevents = agent.events;
@@ -868,12 +831,12 @@ class ScenarioImporter {
 				for (Departure depart : tr.getDepartures().values()) {
 					Vehicle v = vehicles.get(depart.getVehicleId());
 					int hermes_id = hermes_id(v.getId().index(), true);
-					Agent agent = hermes_agents[hermes_id];
+					Agent agent = hermesAgents[hermes_id];
 					float storageCapacityPCUE = deterministicPt ? 0.1f : (float) v.getType().getPcuEquivalents();
 					float flowCapacityPCUE = deterministicPt ? 0.1f : (float) (v.getType().getPcuEquivalents() / v.getType().getFlowEfficiencyFactor());
 					// for pt vehicles, storage and flow capacities are never updated
-					hermes_agents[hermes_id].setStorageCapacityPCUE(storageCapacityPCUE);
-					hermes_agents[hermes_id].setFlowCapacityPCUE(flowCapacityPCUE);
+					hermesAgents[hermes_id].setStorageCapacityPCUE(storageCapacityPCUE);
+					hermesAgents[hermes_id].setFlowCapacityPCUE(flowCapacityPCUE);
 					if (deterministicPt) {
 						generateDeterministicVehicleTrip(agent, tl, tr, depart);
 					} else {
@@ -889,10 +852,10 @@ class ScenarioImporter {
 		Population population = scenario.getPopulation();
 		population.getPersons().values().parallelStream().forEach((person) -> {
 			int hermes_id = hermes_id(person.getId().index(), false);
-			PlanArray plan = hermes_agents[hermes_id].plan();
-			EventArray events = hermes_agents[hermes_id].events();
+			PlanArray plan = hermesAgents[hermes_id].plan();
+			EventArray events = hermesAgents[hermes_id].events();
 			for (PlanElement element : person.getSelectedPlan().getPlanElements()) {
-				processPlanElement(person, plan, events, element, hermes_agents[hermes_id]);
+				processPlanElement(person, plan, events, element, hermesAgents[hermes_id]);
 			}
 		});
 	}
@@ -900,14 +863,14 @@ class ScenarioImporter {
 	private void generateAgents() {
 		Population population = scenario.getPopulation();
 		Map<Id<Vehicle>, Vehicle> vehicles = scenario.getTransitVehicles().getVehicles();
-		agent_persons = Id.getNumberOfIds(Person.class);
-		int nagents = agent_persons + Id.getNumberOfIds(Vehicle.class);
-		hermes_agents = new Agent[nagents];
+		agentPersons = Id.getNumberOfIds(Person.class);
+		int nagents = agentPersons + Id.getNumberOfIds(Vehicle.class);
+		hermesAgents = new Agent[nagents];
 
 		// Generate persons
 		for (Person person : population.getPersons().values()) {
 			int hermes_id = hermes_id(person.getId().index(), false);
-			assert hermes_agents[hermes_id] == null;
+			assert hermesAgents[hermes_id] == null;
 			generateAgent(hermes_id, 0, new PlanArray(), new EventArray());
 		}
 
@@ -916,14 +879,14 @@ class ScenarioImporter {
 			VehicleCapacity vc = vehicle.getType().getCapacity();
 			int capacity = vc.getSeats() + vc.getStandingRoom();
 			int hermes_id = hermes_id(vehicle.getId().index(), true);
-			assert hermes_agents[hermes_id] == null;
+			assert hermesAgents[hermes_id] == null;
 			generateAgent(hermes_id, capacity, new PlanArray(), new EventArray());
 		}
 	}
 
 	public int matsim_id(int hermes_id, boolean is_vehicle) {
 		if (is_vehicle) {
-			return hermes_id - agent_persons;
+			return hermes_id - agentPersons;
 		} else {
 			return hermes_id;
 		}
@@ -931,7 +894,7 @@ class ScenarioImporter {
 
 	public int hermes_id(int matsim_id, boolean is_vehicle) {
 		if (is_vehicle) {
-			return matsim_id + agent_persons;
+			return matsim_id + agentPersons;
 		} else {
 			return matsim_id;
 		}

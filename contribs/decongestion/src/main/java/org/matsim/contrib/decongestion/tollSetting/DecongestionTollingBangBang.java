@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.decongestion.tollSetting;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.inject.Inject;
 
@@ -36,7 +37,7 @@ import org.matsim.contrib.decongestion.data.LinkInfo;
 
 public class DecongestionTollingBangBang implements DecongestionTollSetting {
 	
-	private static final Logger log = Logger.getLogger(DecongestionTollingBangBang.class);
+	private static final Logger log = LogManager.getLogger(DecongestionTollingBangBang.class);
 	private int tollUpdateCounter = 0;
 
 	@Inject

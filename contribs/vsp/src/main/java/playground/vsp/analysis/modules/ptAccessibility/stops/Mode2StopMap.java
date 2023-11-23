@@ -21,7 +21,8 @@ package playground.vsp.analysis.modules.ptAccessibility.stops;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -33,7 +34,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class Mode2StopMap {
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(Mode2StopMap.class);
+	private static final Logger log = LogManager.getLogger(Mode2StopMap.class);
 	private HashMap<String, PtStopMap> mode2StopMap;
 	private Map<String, Circle> distCluster;
 

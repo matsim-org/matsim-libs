@@ -2,12 +2,11 @@ package org.matsim.contrib.pseudosimulation;
 
 
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.pseudosimulation.mobsim.PSimProvider;
 import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -55,10 +54,10 @@ public class MobSimSwitcher implements IterationEndsListener,
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		if (determineIfQSimIter(event.getIteration())) {
-			Logger.getLogger(this.getClass()).warn("Running full queue simulation");
+			LogManager.getLogger(this.getClass()).warn("Running full queue simulation");
 
 		} else {
-			Logger.getLogger(this.getClass()).info("Running PSim");
+			LogManager.getLogger(this.getClass()).info("Running PSim");
 			plancatcher.init();
 			for (Person person : scenario.getPopulation().getPersons().values()) {
 					plancatcher.addPlansForPsim(person.getSelectedPlan());
@@ -69,7 +68,7 @@ public class MobSimSwitcher implements IterationEndsListener,
 
 	private boolean determineIfQSimIter(int iteration) {
 
-		if (iteration == scenario.getConfig().controler().getLastIteration() || iteration == scenario.getConfig().controler().getFirstIteration() ) {
+		if (iteration == scenario.getConfig().controller().getLastIteration() || iteration == scenario.getConfig().controller().getFirstIteration() ) {
 			isQSimIteration = true;
 			return isQSimIteration;
 		}

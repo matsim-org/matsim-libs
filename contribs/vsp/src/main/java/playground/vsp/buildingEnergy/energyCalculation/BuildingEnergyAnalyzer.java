@@ -25,7 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import playground.vsp.analysis.modules.simpleTripAnalyzer.SimpleTripAnalyzerModule;
@@ -46,8 +47,7 @@ import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyMATSimDataR
 public class BuildingEnergyAnalyzer {
 
 
-	private static final Logger log = Logger
-			.getLogger(BuildingEnergyAnalyzer.class);
+	private static final Logger log = LogManager.getLogger(BuildingEnergyAnalyzer.class);
 	/*package*/ static final String all = "--complete--";
 	private List<String> runIds;
 	private String baseRunId;

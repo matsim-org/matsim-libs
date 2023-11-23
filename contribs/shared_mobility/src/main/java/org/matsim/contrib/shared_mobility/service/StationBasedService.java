@@ -109,7 +109,9 @@ public class StationBasedService implements SharingService {
 		Coord coord = vehicle.getLink().getCoord();
 		availableVehicles.put(coord.getX(), coord.getY(), vehicle);
 
-		SharingStation station = vehicleStationMap.get(vehicle.getId());
+		Id<SharingStation> stationId = this.linkStationMap.get(link.getId());
+		SharingStation station = this.stations.get(stationId);
+		this.vehicleStationMap.put(vehicle.getId(), station);
 
 		if (station.getFreeCapacity() == 1) {
 			// Station becomes full no, so remove it from available stations

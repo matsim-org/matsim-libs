@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.minibus.replanning;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.fare.StageContainer;
 import org.matsim.contrib.minibus.fare.StageContainerHandler;
@@ -44,7 +45,7 @@ import java.util.Map.Entry;
  */
 public final class ReduceTimeServedRFare extends AbstractPStrategyModule implements StageContainerHandler{
 	
-	private final static Logger log = Logger.getLogger(ReduceTimeServedRFare.class);
+	private final static Logger log = LogManager.getLogger(ReduceTimeServedRFare.class);
 	
 	public static final String STRATEGY_NAME = "ReduceTimeServedRFare";
 

@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.bicycle.network;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -27,6 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.bicycle.BicycleUtils;
+import org.matsim.contrib.osm.networkReader.OsmBicycleReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -42,15 +44,15 @@ import java.util.Set;
 
 /**
  * @author dziemke
- * @deprecated This class is replaced by OsmBicycleReader in the osm-contrib. Use org.matsim.contribs.osm.networkReader.OsmBicycleReader instead
+ * @deprecated This class is replaced by OsmBicycleReader in the osm-contrib. Use {@link OsmBicycleReader} instead
  */
 @Deprecated
 public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
-	private final static Logger LOG = Logger.getLogger(BicycleOsmNetworkReaderV2.class);
+	private final static Logger LOG = LogManager.getLogger(BicycleOsmNetworkReaderV2.class);
 
 	private ElevationDataParser elevationDataParser;
 
-	private final static String TAG_HIGHWAY = "highway";
+//	private final static String TAG_HIGHWAY = "highway";
 	private final static String TAG_BICYCLE = "bicycle";
 	private final static String TAG_ONEWAYBICYCLE = "oneway:bicycle";
 	
@@ -61,8 +63,6 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 	private int countBicycle = 0;
 
 	private final String bicycleAsTransportModeName;
-	private final List<String> bicycleWayTags = Arrays.asList(BicycleUtils.CYCLEWAY, BicycleUtils.SURFACE, BicycleUtils.SMOOTHNESS, TAG_BICYCLE, TAG_ONEWAYBICYCLE);
-	private final int maxWarnCount = 5;
 	private int warnCount = 0;
 
 	// OSM Reader is using hierarchy until 8, why following hierarchies are not starting with 9? Amit Feb'18
@@ -119,7 +119,8 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		// If "useHighwayDefaults" is set to true, super sets defaults for all "roads" ("motorway" to "residential", except "service")
 		// and all "link roads" and "living_street" (part of "special road types"). Hierachies 1 to 6 are used.
 		super(network, transformation, useHighwayDefaults, useVspAdjustments);
-		super.addWayTags(bicycleWayTags);
+			List<String> bicycleWayTags = Arrays.asList( BicycleUtils.CYCLEWAY, BicycleUtils.SURFACE, BicycleUtils.SMOOTHNESS, TAG_BICYCLE, TAG_ONEWAYBICYCLE );
+			super.addWayTags( bicycleWayTags );
 		
 //		double bicyclePCU = 0.2; // Use the same in your run
 			this.bicycleAsTransportModeName = bicycleAsTransportModeName;
@@ -234,13 +235,14 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 			l.getAttributes().putAttribute(BicycleUtils.SURFACE, surface);
 			this.countSurfaceDirect++;
 		} else {
+			int maxWarnCount = 5;
 			if (highwayType != null) {
 				// it used to be '&&' instead of '||' which will always be false. Most likely, it must be '||'. Amit Feb'18
 				if (defaults.hierarchy == 3 || defaults.hierarchy == 4) { // 3 = primary, 4 = secondary
 					l.getAttributes().putAttribute(BicycleUtils.SURFACE, "asphalt");
 					this.countSurfaceInferred++;
 				} else {
-					if (warnCount <= maxWarnCount){
+					if (warnCount <= maxWarnCount ){
 						LOG.warn("Link did not get a surface.");
 						LOG.warn(Gbl.FUTURE_SUPPRESSED);
 						warnCount++;

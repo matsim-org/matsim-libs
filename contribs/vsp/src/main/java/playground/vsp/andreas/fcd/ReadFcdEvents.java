@@ -23,7 +23,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -48,7 +49,7 @@ public class ReadFcdEvents implements TabularFileHandler {
 
 	}
 
-	private static final Logger log = Logger.getLogger(ReadFcdEvents.class);
+	private static final Logger log = LogManager.getLogger(ReadFcdEvents.class);
 
 	private TabularFileParserConfig tabFileParserConfig;
 	private LinkedList<FcdEvent> fcdEventList = new LinkedList<FcdEvent>();

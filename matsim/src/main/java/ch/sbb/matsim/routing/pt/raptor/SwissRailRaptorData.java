@@ -1,10 +1,27 @@
-/*
- * Copyright (C) Schweizerische Bundesbahnen SBB, 2017.
- */
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 
 package ch.sbb.matsim.routing.pt.raptor;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -42,7 +59,7 @@ import java.util.function.Supplier;
  */
 public class SwissRailRaptorData {
 
-    private static final Logger log = Logger.getLogger(SwissRailRaptorData.class);
+    private static final Logger log = LogManager.getLogger(SwissRailRaptorData.class);
 
     final RaptorStaticConfig config;
     final int countStops;
@@ -328,9 +345,7 @@ public class SwissRailRaptorData {
             // e.g. when starting at a single stop, users would expect that the stop facility
             // in the opposite direction could be reached within a minute or so by walk. But the algorithm
             // would find this if the transfers are missing.
-            if (couldHaveTransferredOneStopEarlierInOppositeDirection(fromRouteStop, toRouteStop, maxBeelineWalkConnectionDistance)) {
-                return false;
-            }
+			return !couldHaveTransferredOneStopEarlierInOppositeDirection(fromRouteStop, toRouteStop, maxBeelineWalkConnectionDistance);
         }
         // if we failed all other checks, it looks like this transfer is useful
         return true;
@@ -541,18 +556,18 @@ public class SwissRailRaptorData {
             this.transferDistance = (int) Math.ceil(transferDistance);
         }
     }
-    
+
     /*
-     * synchronized in order to avoid that multiple quad trees for the very same stop filter attribute/value combination are prepared at the same time 
+     * synchronized in order to avoid that multiple quad trees for the very same stop filter attribute/value combination are prepared at the same time
      */
 	public synchronized void prepareStopFilterQuadTreeIfNotExistent(String stopFilterAttribute, String stopFilterValue) {
 		// if stopFilterAttribute/stopFilterValue combination exists
 		// we do not have to do anything
-		Map<String, QuadTree<TransitStopFacility>> filteredQTs = 
+		Map<String, QuadTree<TransitStopFacility>> filteredQTs =
 		        this.stopFilterAttribute2Value2StopsQT.computeIfAbsent(stopFilterAttribute, key -> new HashMap<>());
 		if (filteredQTs.containsKey(stopFilterValue))
 		    return;
-		
+
 	    Set<TransitStopFacility> stops = routeStopsPerStopFacility.keySet();
         QuadTree<TransitStopFacility> stopsQTFiltered = new QuadTree<>(stopsQT.getMinEasting(), stopsQT.getMinNorthing(), stopsQT.getMaxEasting(), stopsQT.getMaxNorthing());
         for (TransitStopFacility stopFacility : stops) {
@@ -570,7 +585,7 @@ public class SwissRailRaptorData {
 	public class CachingTransferProvider implements Supplier<Transfer> {
 
 	    private RTransfer raptorTransfer = null;
-	    private Transfer transfer = new Transfer();
+	    private final Transfer transfer = new Transfer();
 
       public CachingTransferProvider() {
       }

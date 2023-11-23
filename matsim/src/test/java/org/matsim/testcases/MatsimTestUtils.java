@@ -19,33 +19,31 @@
 
 package org.matsim.testcases;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.Permission;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Some helper methods for writing JUnit 4 tests in MATSim.
@@ -54,16 +52,16 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
  * @author mrieser
  */
 public final class MatsimTestUtils extends TestWatcher {
-	private static final Logger log = Logger.getLogger(MatsimTestUtils.class);
+	private static final Logger log = LogManager.getLogger(MatsimTestUtils.class);
 
 	/**
 	 * A constant for the exactness when comparing doubles.
 	 */
 	public static final double EPSILON = 1e-10;
 
-	public static void compareFilesLineByLine(String inputFilename, String outputFilename) {
+	public static void assertEqualFilesLineByLine(String inputFilename, String outputFilename) {
 		try (BufferedReader readerV1Input = IOUtils.getBufferedReader(inputFilename);
-				BufferedReader readerV1Output = IOUtils.getBufferedReader(outputFilename);) {
+				BufferedReader readerV1Output = IOUtils.getBufferedReader(outputFilename)) {
 
 			String lineInput;
 			String lineOutput;
@@ -115,7 +113,7 @@ public final class MatsimTestUtils extends TestWatcher {
 		Config config = ConfigUtils.createConfig();
 		config.setContext(inputResourcePath());
 		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
+		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
@@ -123,7 +121,7 @@ public final class MatsimTestUtils extends TestWatcher {
 		Config config = ConfigUtils.createConfig();
 		config.setContext(classInputResourcePath());
 		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
+		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
@@ -131,7 +129,7 @@ public final class MatsimTestUtils extends TestWatcher {
 		Config config = ConfigUtils.createConfig();
 		config.setContext(packageInputResourcePath());
 		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
+		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
@@ -153,7 +151,7 @@ public final class MatsimTestUtils extends TestWatcher {
 	private URL getResourceNotNull(String pathString) {
 		URL resource = this.testClass.getResource(pathString);
 		if (resource == null) {
-			throw new UncheckedIOException("Not found: "+pathString);
+			throw new UncheckedIOException(new IOException("Not found: "+pathString));
 		}
 		return resource;
 	}
@@ -163,7 +161,7 @@ public final class MatsimTestUtils extends TestWatcher {
 			Config config = ConfigUtils.createConfig();
 			config.setContext(new File(this.getInputDirectory()).toURI().toURL());
 			this.outputDirectory = getOutputDirectory();
-			config.controler().setOutputDirectory(this.outputDirectory);
+			config.controller().setOutputDirectory(this.outputDirectory);
 			return config;
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
@@ -174,7 +172,7 @@ public final class MatsimTestUtils extends TestWatcher {
 		Config config = ConfigUtils.createConfig();
 		config.setContext(context);
 		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
+		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
@@ -193,7 +191,7 @@ public final class MatsimTestUtils extends TestWatcher {
 			config = ConfigUtils.createConfig( customGroups );
 		}
 		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
+		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
@@ -205,14 +203,14 @@ public final class MatsimTestUtils extends TestWatcher {
 			config = ConfigUtils.createConfig( customGroups );
 		}
 		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
+		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
 	public Config createConfig(final ConfigGroup... customGroups) {
 		Config config = ConfigUtils.createConfig( customGroups );
 		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
+		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
@@ -261,7 +259,7 @@ public final class MatsimTestUtils extends TestWatcher {
 	public String getClassInputDirectory() {
 		if (this.classInputDirectory == null) {
 
-			Logger.getLogger(this.getClass()).info( "user.dir = " + System.getProperty("user.dir") ) ;
+			LogManager.getLogger(this.getClass()).info( "user.dir = " + System.getProperty("user.dir") ) ;
 
 			this.classInputDirectory = "test/input/" +
 											   this.testClass.getCanonicalName().replace('.', '/') + "/";
@@ -336,36 +334,13 @@ public final class MatsimTestUtils extends TestWatcher {
 		this.testMethodName = null;
 	}
 
-	public static class ExitTrappedException extends SecurityException {
-		private static final long serialVersionUID = 1L;
+  public static void assertEqualEventsFiles( String filename1, String filename2 ) {
+		Assert.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL ,EventsFileComparator.compare(filename1, filename2) );
 	}
 
-  public static void forbidSystemExitCall() {
-    final SecurityManager securityManager = new SecurityManager() {
-      @Override
-			public void checkPermission(Permission permission) {
-      	if (permission.getName().startsWith("exitVM")) {
-          throw new ExitTrappedException();
-        }
-      }
-    };
-    System.setSecurityManager(securityManager);
-  }
-
-  public static void enableSystemExitCall() {
-    System.setSecurityManager(null);
-  }
-
-  public static int compareEventsFiles( String filename1, String filename2 ) {
-	  return EventsFileComparator.compareAndReturnInt(filename1, filename2) ;
-  }
-  public static void compareFilesBasedOnCRC( String filename1, String filename2 ) {
+  public static void assertEqualFilesBasedOnCRC( String filename1, String filename2 ) {
 	  long checksum1 = CRCChecksum.getCRCFromFile(filename1) ;
 	  long checksum2 = CRCChecksum.getCRCFromFile(filename2) ;
 	  Assert.assertEquals( "different file checksums", checksum1, checksum2 );
   }
-  public static boolean comparePopulations( Population pop1, Population pop2 ) {
-	  return PopulationUtils.equalPopulation(pop1, pop2) ;
-  }
-
 }

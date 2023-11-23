@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -33,7 +34,7 @@ import java.util.Set;
  * @author thibautd
  */
 public class ProportionBasedConflictSolver implements CoalitionSelector.ConflictSolver {
-	private static final Logger log = Logger.getLogger( ProportionBasedConflictSolver.class );
+	private static final Logger log = LogManager.getLogger( ProportionBasedConflictSolver.class );
 	private final SocialNetwork socialNetwork;
 	private final boolean tabuFriends;
 

@@ -23,9 +23,10 @@ import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -35,7 +36,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 
 class ActivityEngineDefaultImpl implements ActivityEngine {
-	private static final Logger log = Logger.getLogger( ActivityEngineDefaultImpl.class ) ;
+	private static final Logger log = LogManager.getLogger( ActivityEngineDefaultImpl.class ) ;
 
 	private final EventsManager eventsManager;
 
@@ -88,7 +89,7 @@ class ActivityEngineDefaultImpl implements ActivityEngine {
 		}
 		return cmp;
 	});
-	
+
 	// See handleActivity for the reason for this.
 	private boolean beforeFirstSimStep = true;
 
@@ -130,16 +131,16 @@ class ActivityEngineDefaultImpl implements ActivityEngine {
 		this.internalInterface = internalInterface;
 	}
 
-	
+
 	/**
-	 * 
+	 *
 	 * This method is called by QSim to pass in agents which then "live" in the activity layer until they are handed out again
 	 * through the internalInterface.
-	 * 
+	 *
 	 * It is called not before onPrepareSim() and not after afterSim(), but it may be called before, after, or from doSimStep(),
 	 * and even from itself (i.e. it must be reentrant), since internalInterface.arrangeNextAgentState() may trigger
 	 * the next Activity.
-	 * 
+	 *
 	 */
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
@@ -184,8 +185,8 @@ class ActivityEngineDefaultImpl implements ActivityEngine {
 		if ( agent.getState()!=State.ACTIVITY ) {
 			return ;
 		}
-		
-		
+
+
 		double newActivityEndTime = agent.getActivityEndTime();
 		AgentEntry oldEntry = removeAgentFromQueue(agent);
 

@@ -43,7 +43,7 @@ public final class Matrix {
 	private final int[] zoneIndex2matrixIndex = new int[Id.getNumberOfIds(Zone.class)];
 	private final short[][] matrix;
 
-	Matrix(Set<Zone> zones) {
+	public Matrix(Set<Zone> zones) {
 		//to make sure we do not refer to zones added later
 		Arrays.fill(zoneIndex2matrixIndex, -1);
 
@@ -67,7 +67,7 @@ public final class Matrix {
 		return Short.toUnsignedInt(shortValue);
 	}
 
-	public void set(Zone fromZone, Zone toZone, double value) {
+	void set(Zone fromZone, Zone toZone, double value) {
 		checkArgument(Double.isFinite(value) && value >= 0 && value < MAX_UNSIGNED_SHORT);
 		matrix[matrixIndex(fromZone)][matrixIndex(toZone)] = (short)value;
 	}

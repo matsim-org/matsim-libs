@@ -28,7 +28,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -53,7 +54,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	
 	private int numberOfThreads = 8;
 
-	private static final Logger log = Logger.getLogger(PreProcessLandmarks.class);
+	private static final Logger log = LogManager.getLogger(PreProcessLandmarks.class);
 
 	public PreProcessLandmarks(final TravelDisutility costFunction) {
 		this(costFunction, new Rectangle2D.Double());

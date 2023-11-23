@@ -29,7 +29,8 @@ import java.util.List;
 import jakarta.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataImpl;
@@ -50,7 +51,7 @@ import org.xml.sax.SAXException;
  */
 public final class SylviaPreprocessData {
 
-	private static final Logger log = Logger.getLogger(SylviaPreprocessData.class);
+	private static final Logger log = LogManager.getLogger(SylviaPreprocessData.class);
 
 	public static final String FIXED_TIME_PREFIX = "fixed_time_plan_";
 

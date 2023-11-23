@@ -30,36 +30,37 @@ import com.google.inject.name.Names;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.choosers.StrategyChooser;
 import org.matsim.core.replanning.choosers.WeightedStrategyChooser;
+import org.matsim.core.replanning.conflicts.ConflictModule;
 import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
 public class StrategyManagerModule extends AbstractModule {
 	@Override
 	public void install() {
 		int externalCounter = 0;
-		
+
 		install(new DefaultPlanStrategiesModule());
 		// (does commands of type "bind(PlanStrategy.class).annotatedWith(Names.named(strategyName))", i.e.
 		// plan strategies can be looked up under their names (*))
-		
+
 		bind(StrategyManager.class).in(Singleton.class);
 		bind(new TypeLiteral<StrategyChooser<Plan, Person>>() {}).to(new TypeLiteral<WeightedStrategyChooser<Plan, Person>>() {}).asEagerSingleton();
 		bind(ReplanningContext.class).to(ReplanningContextImpl.class).asEagerSingleton();
-		
-		MapBinder<StrategyConfigGroup.StrategySettings, PlanStrategy> planStrategyMapBinder = MapBinder.newMapBinder(binder(), StrategyConfigGroup.StrategySettings.class, PlanStrategy.class);
+
+		MapBinder<ReplanningConfigGroup.StrategySettings, PlanStrategy> planStrategyMapBinder = MapBinder.newMapBinder(binder(), ReplanningConfigGroup.StrategySettings.class, PlanStrategy.class);
 		// (this will bind a Map that has StrategySettings as key, and PlanStrategy as value.  Not sure why StrategySettings as key, and not just the name, but possibly this is mean to allow adding
 		// the same strategy multiple times, with possibly different settings.)
-		
-		for (StrategyConfigGroup.StrategySettings settings : getConfig().strategy().getStrategySettings()) {
+
+		for (ReplanningConfigGroup.StrategySettings settings : getConfig().replanning().getStrategySettings()) {
 			String name = settings.getStrategyName() ;
 			if (name.equals("ExternalModule")) {
 				// plan strategy is some external executable:
@@ -92,8 +93,10 @@ public class StrategyManagerModule extends AbstractModule {
 				// (settings is the key ... ok.  The Key.get(...) returns the PlanStrategy that was registered under its name at (*) above.)
 			}
 		}
+		
+		install(new ConflictModule());
 	}
-	
+
 	/**
 	 * If plan strategy comes from some external executable.  E.g. some external router that is not in Java.
 	 */

@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.analysis.kai;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -42,13 +43,13 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.Vehicle;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -59,7 +60,7 @@ import java.util.Map.Entry;
 public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonMoneyEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler,
 									  VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
-	private final static Logger log = Logger.getLogger(KNAnalysisEventsHandler.class);
+	private final static Logger log = LogManager.getLogger(KNAnalysisEventsHandler.class);
 
 	public static final String PAYMENTS = "payments";
 	public static final String TRAV_TIME = "travTime" ;
@@ -99,7 +100,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
-	// general trip counter.  Would, in theory, not necessary to do this per StatType, but I find it too brittle 
+	// general trip counter.  Would, in theory, not necessary to do this per StatType, but I find it too brittle
 	// to avoid under- or over-counting with respect to loops.
 	//	private final Map<StatType,Integer> legCount = new TreeMap<StatType,Integer>() ;
 
@@ -666,9 +667,9 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 			if ( wrnCnt==0 ) {
 				wrnCnt++ ;
 				//				throw new RuntimeException("vehicle arrival for vehicle that never entered link.  teleportation?") ;
-				Logger.getLogger(this.getClass()).warn("vehicle arrival for vehicle that never entered link.  I think this can happen with departures "
+				LogManager.getLogger(this.getClass()).warn("vehicle arrival for vehicle that never entered link.  I think this can happen with departures "
 											     + "that have empty routes, i.e. go to a location on the same link. kai, may'14");
-				Logger.getLogger(this.getClass()).warn( Gbl.ONLYONCE ) ;
+				LogManager.getLogger(this.getClass()).warn( Gbl.ONLYONCE ) ;
 			}
 		}
 	}

@@ -19,7 +19,9 @@
 
 package org.matsim.contrib.ev.discharging;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -31,22 +33,25 @@ import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MobsimScopeEventHandler;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
 
 /**
- * Because in QSim and JDEQSim vehicles enter and leave traffic at the end of links, we skip the first link when
+ * Because in QSim vehicles enter and leave traffic at the end of links, we skip the first link when
  * calculating the drive-related energy consumption. However, the time spent on the first link is used by the time-based
- * aux discharge process (see {@link AuxDischargingHandler}).
+ * idle discharge process (see {@link IdleDischargingHandler}).
  */
-public class DriveDischargingHandler
-		implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler,
-		MobsimScopeEventHandler {
+public final class DriveDischargingHandler
+	implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, MobsimScopeEventHandler,
+	MobsimAfterSimStepListener {
+
 	private static class EvDrive {
 		private final Id<Vehicle> vehicleId;
 		private final ElectricVehicle ev;
@@ -64,13 +69,17 @@ public class DriveDischargingHandler
 	}
 
 	private final Network network;
-	private final Map<Id<ElectricVehicle>, ? extends ElectricVehicle> eVehicles;
+	private final EventsManager eventsManager;
+	private final Map<Id<Vehicle>, ? extends ElectricVehicle> eVehicles;
 	private final Map<Id<Vehicle>, EvDrive> evDrives;
-	private final Map<Id<Link>, Double> energyConsumptionPerLink = new HashMap<>();
+
+	private final List<LinkLeaveEvent> linkLeaveEvents = new ArrayList<>();
+	private final List<VehicleLeavesTrafficEvent> trafficLeaveEvents = new ArrayList<>();
 
 	@Inject
-	public DriveDischargingHandler(ElectricFleet data, Network network, EvConfigGroup evCfg) {
+	DriveDischargingHandler(ElectricFleet data, Network network, EventsManager eventsManager) {
 		this.network = network;
+		this.eventsManager = eventsManager;
 		eVehicles = data.getElectricVehicles();
 		evDrives = new HashMap<>(eVehicles.size() / 10);
 	}
@@ -86,43 +95,49 @@ public class DriveDischargingHandler
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		EvDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime());
-		if (evDrive != null) {
-			evDrive.movedOverNodeTime = event.getTime();
-		}
+		linkLeaveEvents.add(event);
 	}
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		EvDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime());
-		if (evDrive != null) {
-			evDrives.remove(evDrive.vehicleId);
-		}
+		trafficLeaveEvents.add(event);
 	}
 
-	//XXX The current implementation is thread-safe because no other EventHandler modifies battery SOC
-	// (for instance, AUX discharging and battery charging modifies SOC outside event handling
-	// (as MobsimAfterSimStepListeners)
-	//TODO In the long term, it will be safer to move the discharging procedure to a MobsimAfterSimStepListener
+	@Override
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
+		// We want to process events in the main thread (instead of the event handling threads).
+		// This is to eliminate race conditions, where the battery is read/modified by many threads without proper synchronisation
+		for (var event : linkLeaveEvents) {
+			EvDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime());
+			if (evDrive != null) {
+				evDrive.movedOverNodeTime = event.getTime();
+			}
+		}
+		linkLeaveEvents.clear();
+
+		for (var event : trafficLeaveEvents) {
+			EvDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime());
+			if (evDrive != null) {
+				evDrives.remove(evDrive.vehicleId);
+			}
+		}
+		trafficLeaveEvents.clear();
+	}
+
 	private EvDrive dischargeVehicle(Id<Vehicle> vehicleId, Id<Link> linkId, double eventTime) {
 		EvDrive evDrive = evDrives.get(vehicleId);
 		if (evDrive != null && !evDrive.isOnFirstLink()) {// handle only our EVs, except for the first link
 			Link link = network.getLinks().get(linkId);
 			double tt = eventTime - evDrive.movedOverNodeTime;
 			ElectricVehicle ev = evDrive.ev;
-			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt, eventTime - tt)
-					+ ev.getAuxEnergyConsumption().calcEnergyConsumption(eventTime - tt, tt, linkId);
-			//Energy consumption might be negative on links with negative slope
-			ev.getBattery().changeSoc(-energy);
-
-			//FIXME emit a DriveOnLinkEnergyConsumptionEvent instead of calculating it here...
-			double linkConsumption = energy + energyConsumptionPerLink.getOrDefault(linkId, 0.0);
-			energyConsumptionPerLink.put(linkId, linkConsumption);
+			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt, eventTime - tt) + ev.getAuxEnergyConsumption()
+				.calcEnergyConsumption(eventTime - tt, tt, linkId);
+			//Energy consumption may be negative on links with negative slope
+			ev.getBattery()
+				.dischargeEnergy(energy,
+					missingEnergy -> eventsManager.processEvent(new MissingEnergyEvent(eventTime, ev.getId(), link.getId(), missingEnergy)));
+			eventsManager.processEvent(new DrivingEnergyConsumptionEvent(eventTime, vehicleId, linkId, energy, ev.getBattery().getCharge()));
 		}
 		return evDrive;
-	}
-
-	public Map<Id<Link>, Double> getEnergyConsumptionPerLink() {
-		return energyConsumptionPerLink;
 	}
 }

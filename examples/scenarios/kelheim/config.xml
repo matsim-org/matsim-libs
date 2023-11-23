@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+    <module name="timeAllocationMutator">
+        <param name="mutationRange" value="7200.0"/>
+    </module>
+
+    <module name="controller">
+        <param name="lastIteration" value="1000"/>
+        <param name="overwriteFiles" value="failIfDirectoryExists"/>
+        <param name="runId" value="kelheim-mini"/>
+        <param name="outputDirectory" value="./output/output-kelheim-mini"/>
+        <param name="writeEventsInterval" value="0"/>
+        <param name="writePlansInterval" value="0"/>
+        <param name="enableLinkToLinkRouting" value="false" />
+        <param name="routingAlgorithmType" value="SpeedyALT"/>
+    </module>
+
+    <module name="global">
+        <param name="coordinateSystem" value="EPSG:25832"/>
+        <param name="insistingOnDeprecatedConfigVersion" value="false"/>
+        <param name="numberOfThreads" value="4"/>
+    </module>
+
+    <module name="network">
+        <param name="inputNetworkFile" value="network-with-pt.xml.gz"/>
+        <param name="laneDefinitionsFile" value="null" />
+    </module>
+
+    <module name="plans">
+        <param name="inputPlansFile" value="1pct.plans.xml.gz"/>
+        <param name="removingUnnecessaryPlanAttributes" value="true"/>
+    </module>
+
+    <module name="vehicles">
+        <param name="vehiclesFile" value="vehicle-types.xml"/>
+    </module>
+
+
+    <module name="transit">
+        <param name="transitScheduleFile" value="transitSchedule.xml.gz"/>
+        <param name="vehiclesFile" value="transitVehicles.xml.gz"/>
+        <param name="useTransit" value="true"/>
+    </module>
+
+    <module name="routing">
+        <param name="networkModes" value="car,ride,freight"/>
+        <parameterset type="teleportedModeParameters">
+            <param name="beelineDistanceFactor" value="1.3"/>
+            <param name="mode" value="walk"/>
+            <param name="teleportedModeSpeed" value="1.0555556"/>
+        </parameterset>
+        <parameterset type="teleportedModeParameters">
+            <param name="beelineDistanceFactor" value="1.3"/>
+            <param name="mode" value="bike"/>
+            <param name="teleportedModeSpeed" value="3.1388889"/>
+        </parameterset>
+    </module>
+
+    <module name="qsim">
+        <param name="endTime" value="36:00:00"/>
+        <param name="flowCapacityFactor" value="0.01"/>
+        <param name="mainMode" value="car,freight"/>
+        <param name="numberOfThreads" value="4"/>
+        <param name="startTime" value="00:00:00"/>
+        <param name="storageCapacityFactor" value="0.01"/>
+        <param name="stuckTime" value="30.0"/>
+        <param name="trafficDynamics" value="queue"/>
+        <param name="linkDynamics" value="FIFO"/>
+        <param name="useLanes" value="false" />
+
+        <param name="vehiclesSource" value="modeVehicleTypesFromVehiclesData"/>
+        <param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true"/>
+    </module>
+
+    <module name="replanning">
+        <param name="fractionOfIterationsToDisableInnovation" value="0.9"/>
+        <parameterset type="strategysettings">
+            <param name="strategyName" value="ChangeExpBeta"/>
+            <param name="subpopulation" value="person"/>
+            <param name="weight" value="0.85"/>
+        </parameterset>
+        <parameterset type="strategysettings">
+            <param name="disableAfterIteration" value="840"/>
+            <param name="strategyName" value="ReRoute"/>
+            <param name="subpopulation" value="person"/>
+            <param name="weight" value="0.10"/>
+        </parameterset>
+        <!-- Fade out subtour mode choice strategy between 0.80 - 0.9  -->
+        <parameterset type="strategysettings">
+            <param name="strategyName" value="ChangeSingleTripMode"/>
+            <param name="subpopulation" value="person"/>
+            <param name="weight" value="0.10"/>
+        </parameterset>
+        <parameterset type="strategysettings">
+            <param name="strategyName" value="TimeAllocationMutator"/>
+            <param name="subpopulation" value="person"/>
+            <param name="weight" value="0.025"/>
+        </parameterset>
+
+        <parameterset type="strategysettings" >
+            <param name="strategyName" value="ChangeExpBeta" />
+            <param name="subpopulation" value="freight" />
+            <param name="weight" value="0.95" />
+        </parameterset>
+        <parameterset type="strategysettings" >
+            <param name="strategyName" value="ReRoute" />
+            <param name="subpopulation" value="freight" />
+            <param name="weight" value="0.05" />
+        </parameterset>
+    </module>
+
+    <module name="subtourModeChoice">
+        <param name="chainBasedModes" value="car,bike"/>
+        <param name="modes" value="car,pt,bike,walk"/>
+        <param name="considerCarAvailability" value="true"/>
+    </module>
+
+    <module name="changeMode">
+        <param name="modes" value="car,ride,pt,bike,walk" />
+        <param name="ignoreCarAvailability" value="false" />
+    </module>
+
+    <module name="transitRouter">
+        <param name="extensionRadius" value="500.0"/>
+    </module>
+
+    <module name="travelTimeCalculator">
+        <param name="analyzedModes" value="car,freight"/>
+
+        <!-- Not implemented for link2link routing -->
+        <param name="separateModes" value="false"/>
+
+        <!-- Needed for lane specific routing times -->
+        <param name="calculateLinkToLinkTravelTimes" value="false" />
+        <param name="calculateLinkTravelTimes" value="true" />
+    </module>
+
+    <module name="vspExperimental">
+        <param name="vspDefaultsCheckingLevel" value="warn"/>
+    </module>
+
+    <module name="scoring">
+        <param name="fractionOfIterationsToStartScoreMSA" value="1.0"/>
+        <param name="writeExperiencedPlans" value="true" />
+
+        <parameterset type="scoringParameters">
+
+            <param name="waitingPt" value="-2.0" />
+
+            <parameterset type="modeParams">
+                <param name="constant" value="0.4127849992415157"/>
+                <param name="marginalUtilityOfTraveling_util_hr" value="-0.5"/>
+                <param name="mode" value="car"/>
+                <param name="monetaryDistanceRate" value="-0.0002"/>
+                <param name="dailyMonetaryConstant" value="-5.3"/>
+            </parameterset>
+
+            <parameterset type="modeParams" >
+                <param name="constant" value="-3.8727356227011978" />
+                <param name="dailyMonetaryConstant" value="-0.0" />
+                <param name="dailyUtilityConstant" value="0.0" />
+                <param name="marginalUtilityOfDistance_util_m" value="0.0" />
+                <param name="marginalUtilityOfTraveling_util_hr" value="-0.5" />
+                <param name="mode" value="ride" />
+                <param name="monetaryDistanceRate" value="-2.0E-4" />
+            </parameterset>
+
+            <parameterset type="modeParams" >
+                <param name="constant" value="0.9145722430234507" />
+                <param name="dailyMonetaryConstant" value="0.0" />
+                <param name="dailyUtilityConstant" value="0.0" />
+                <param name="marginalUtilityOfDistance_util_m" value="0.0" />
+                <param name="marginalUtilityOfTraveling_util_hr" value="-3.5" />
+                <param name="mode" value="pt" />
+                <param name="monetaryDistanceRate" value="0.0" />
+            </parameterset>
+
+            <parameterset type="modeParams">
+                <param name="constant" value="-2.6694607546031124" />
+                <param name="dailyMonetaryConstant" value="0.0" />
+                <param name="dailyUtilityConstant" value="0.0" />
+                <param name="marginalUtilityOfDistance_util_m" value="0.0" />
+                <param name="marginalUtilityOfTraveling_util_hr" value="-5.0" />
+                <param name="mode" value="bike" />
+                <param name="monetaryDistanceRate" value="0.0" />
+            </parameterset>
+
+            <parameterset type="modeParams">
+                <param name="constant" value="0.0" />
+                <param name="dailyMonetaryConstant" value="0.0" />
+                <param name="dailyUtilityConstant" value="0.0" />
+                <param name="marginalUtilityOfDistance_util_m" value="0.0" />
+                <param name="marginalUtilityOfTraveling_util_hr" value="-5.0" />
+                <param name="mode" value="walk" />
+                <param name="monetaryDistanceRate" value="0.0" />
+            </parameterset>
+
+            <parameterset type="modeParams" >
+                <param name="constant" value="0.0" />
+                <param name="dailyMonetaryConstant" value="0.0" />
+                <param name="dailyUtilityConstant" value="0.0" />
+                <param name="marginalUtilityOfDistance_util_m" value="0.0" />
+                <param name="marginalUtilityOfTraveling_util_hr" value="-10.0" />
+                <param name="mode" value="freight" />
+                <param name="monetaryDistanceRate" value="-0.002" />
+            </parameterset>
+
+        </parameterset>
+    </module>
+
+    <module name="transitRouter">
+        <!-- Factor with which direct walk generalized cost is multiplied before it is compared to the pt generalized cost.  Set to a very high value to reduce direct walk results. -->
+        <param name="directWalkFactor" value="1.0"/>
+        <!-- maximum beeline distance between stops that agents could transfer to by walking -->
+        <param name="maxBeelineWalkConnectionDistance" value="300.0"/>
+    </module>
+</config>

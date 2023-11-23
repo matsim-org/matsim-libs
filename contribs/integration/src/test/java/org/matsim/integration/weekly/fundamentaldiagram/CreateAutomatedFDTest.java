@@ -31,7 +31,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
@@ -153,7 +154,7 @@ public class CreateAutomatedFDTest {
 	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> mode2FlowData;
 	GlobalFlowDynamicsUpdator globalFlowDynamicsUpdator;
 
-	private final static Logger LOG = Logger.getLogger(CreateAutomatedFDTest.class);
+	private final static Logger LOG = LogManager.getLogger(CreateAutomatedFDTest.class);
 
 	private void run(final boolean isUsingFastCapacityUpdate) {
 

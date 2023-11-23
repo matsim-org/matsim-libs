@@ -22,7 +22,8 @@ package playground.vsp.andreas.fcd;
 import java.io.IOException;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -32,7 +33,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 public class ReadFcdNetwork implements TabularFileHandler{
 
-	private static final Logger log = Logger.getLogger(ReadFcdNetwork.class);
+	private static final Logger log = LogManager.getLogger(ReadFcdNetwork.class);
 	
 	private TabularFileParserConfig tabFileParserConfig;
 	private TreeMap<Id, FcdNetworkPoint> networkMap = new TreeMap<Id, FcdNetworkPoint>();

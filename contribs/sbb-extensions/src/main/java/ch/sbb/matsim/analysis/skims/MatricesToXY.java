@@ -1,7 +1,22 @@
-/*
- * Copyright (C) Schweizerische Bundesbahnen SBB, 2018.
- */
-
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package ch.sbb.matsim.analysis.skims;
 
 import java.io.BufferedWriter;
@@ -10,7 +25,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -27,7 +43,7 @@ import org.opengis.feature.simple.SimpleFeature;
  */
 public class MatricesToXY {
 
-    private final static Logger log = Logger.getLogger(MatricesToXY.class);
+    private final static Logger log = LogManager.getLogger(MatricesToXY.class);
 
     public static void main(String[] args) throws IOException {
         String zonesShapeFilename = args[0]; // path to a shape-file, e.g. /path/to/my-zones.shp

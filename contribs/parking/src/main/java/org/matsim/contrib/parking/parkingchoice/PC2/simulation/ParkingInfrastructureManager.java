@@ -32,7 +32,6 @@ import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PrivateParkin
 import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PublicParking;
 import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.RentableParking;
 import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingScore;
-import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.SortableMapObject;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.network.EnclosingRectangle;
@@ -40,6 +39,8 @@ import org.matsim.contrib.parking.parkingchoice.lib.obj.network.QuadTreeInitiali
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
+
+import com.google.common.base.Verify;
 
 // TODO: make abstract and create algorithm in Zuerich case -> provide protected helper methods already here.
 public final class ParkingInfrastructureManager implements ParkingInfrastructure {
@@ -88,7 +89,8 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 
 		for (PublicParking parking : publicParkings) {
 			if (parking.getAvailableParkingCapacity() <= 0) {
-				DebugLib.stopSystemAndReportInconsistency("parking capacity non-positive: " + parking.getId());
+				throw new Error("system is in inconsistent state: " +
+				"parking capacity non-positive: " + parking.getId());
 			}
 
 			allPublicParkingRect.registerCoord(parking.getCoordinate());
@@ -161,7 +163,7 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 			// capacity, which should be > 0. kai, jul15)
 
 			if (parking.getAvailableParkingCapacity() == 0) {
-				DebugLib.stopSystemAndReportInconsistency();
+				throw new Error("system is in inconsistent state.");
 			}
 		}
 
@@ -183,7 +185,7 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 			parking = quadTree.getClosest(destCoordinate.getX(), destCoordinate.getY());
 
 			if (parking == null) {
-				DebugLib.stopSystemAndReportInconsistency(
+				throw new Error("system is in inconsistent state: " +
 						"not enough parking available for parkingGroupName:" + groupName);
 			}
 		}
@@ -252,7 +254,7 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 
 				if (distance > 100000000) {
 					// stop infinite loop
-					DebugLib.stopSystemAndReportInconsistency(
+					throw new Error("system is in inconsistent state: " +
 							"not enough public parking in scenario - introduce dummy parking to solve problem");
 				}
 
@@ -275,10 +277,6 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 			finalScore = poll.getWeight();
 			selectedParking = poll.getKey();
 
-			if (selectedParking instanceof RentableParking) {
-				DebugLib.emptyFunctionForSettingBreakPoint();
-			}
-
 			if (rentablePrivateParking.containsKey(parkingOperationRequestAttributes.personId)) {
 				RentableParking rentableParking = rentablePrivateParking
 						.get(parkingOperationRequestAttributes.personId);
@@ -295,15 +293,6 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 						selectedParking = rentableParking;
 					}
 				}
-			}
-
-			if (finalScore>0){
-				DebugLib.emptyFunctionForSettingBreakPoint();
-			}
-			
-			
-			if (selectedParking instanceof RentableParking) {
-				DebugLib.emptyFunctionForSettingBreakPoint();
 			}
 
 			// this puts the personId (!!!! yyyyyy) at the parking location:
@@ -397,8 +386,6 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 
 				if (!rp.isRentable(parkingOperationRequestAttributes.arrivalTime)) {
 					deleteList.add(rp);
-				} else {
-					DebugLib.emptyFunctionForSettingBreakPoint();
 				}
 			}
 		}
@@ -436,14 +423,16 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 					parking);
 
 			if (!wasRemoved) {
-				DebugLib.stopSystemAndReportInconsistency(parking.getId().toString());
+				throw new Error("system is in inconsistent state: " +
+				parking.getId().toString());
 			}
 
 			wasRemoved = publicParkingGroupQuadTrees.get(parking.getGroupName()).remove(parking.getCoordinate().getX(),
 					parking.getCoordinate().getY(), parking);
 
 			if (!wasRemoved) {
-				DebugLib.stopSystemAndReportInconsistency(parking.getId().toString());
+				throw new Error("system is in inconsistent state: " +
+				parking.getId().toString());
 			}
 
 			Collection<PC2Parking> collection = publicParkingsQuadTree.getDisk(parking.getCoordinate().getX(),
@@ -459,7 +448,7 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 						// locations are
 						// on top of each other)
 
-						DebugLib.stopSystemAndReportInconsistency();
+						throw new Error("system is in inconsistent state: ")						;
 					}
 				}
 			}
@@ -467,7 +456,7 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 
 		int endAvailability = parking.getAvailableParkingCapacity();
 
-		DebugLib.assertTrue(startAvailability - 1 == endAvailability, "not equal");
+		Verify.verify(startAvailability - 1 == endAvailability, "not equal");
 
 	}
 
@@ -514,9 +503,6 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 		// allows to bypass parkedVehicles.remove(personId);
 		// in personCarDepartureEvent(...). kai, jul'15
 
-		if (parking == null) {
-			DebugLib.emptyFunctionForSettingBreakPoint();
-		}
 		int startAvailability = parking.getAvailableParkingCapacity();
 
 		parking.unparkVehicle();
@@ -540,7 +526,7 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 
 		int endAvailability = parking.getAvailableParkingCapacity();
 
-		DebugLib.assertTrue(startAvailability + 1 == endAvailability, "not equal");
+		Verify.verify(startAvailability + 1 == endAvailability, "not equal");
 
 		eventsManager.processEvent(new ParkingDepartureEvent(departureTime, parking.getId(), personId));
 	}

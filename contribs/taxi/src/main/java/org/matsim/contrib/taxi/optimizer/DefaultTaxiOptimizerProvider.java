@@ -76,49 +76,47 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 
 	@Override
 	public TaxiOptimizer get() {
-		switch (taxiCfg.getTaxiOptimizerParams().getName()) {
-			case AssignmentTaxiOptimizerParams.SET_NAME: {
+		return switch (taxiCfg.getTaxiOptimizerParams().getName()) {
+			case AssignmentTaxiOptimizerParams.SET_NAME -> {
 				var requestInserter = new AssignmentRequestInserter(fleet, network, timer, travelTime, travelDisutility,
 						scheduler, (AssignmentTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams());
-				return new DefaultTaxiOptimizer(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater,
+				yield new DefaultTaxiOptimizer(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater,
 						requestInserter);
 			}
 
-			case FifoTaxiOptimizerParams.SET_NAME: {
+			case FifoTaxiOptimizerParams.SET_NAME -> {
 				var requestInserter = new FifoRequestInserter(network, fleet, timer, travelTime, travelDisutility,
 						scheduler);
-				return new DefaultTaxiOptimizer(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater,
+				yield new DefaultTaxiOptimizer(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater,
 						requestInserter);
 			}
 
-			case RuleBasedTaxiOptimizerParams.SET_NAME: {
+			case RuleBasedTaxiOptimizerParams.SET_NAME -> {
 				var zonalRegisters = createZonalRegisters(
 						((RuleBasedTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()));
 				var requestInserter = new RuleBasedRequestInserter(scheduler, timer, network, travelTime,
 						travelDisutility, ((RuleBasedTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()),
 						zonalRegisters);
-				return new RuleBasedTaxiOptimizer(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater,
+				yield new RuleBasedTaxiOptimizer(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater,
 						zonalRegisters, requestInserter);
 			}
 
-			case ZonalTaxiOptimizerParams.SET_NAME: {
+			case ZonalTaxiOptimizerParams.SET_NAME -> {
 				var zonalRegisters = createZonalRegisters(
 						((ZonalTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getRuleBasedTaxiOptimizerParams());
 				var requestInserter = new ZonalRequestInserter(fleet, scheduler, timer, network, travelTime,
 						travelDisutility, ((ZonalTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()), zonalRegisters,
 						context);
-				return new RuleBasedTaxiOptimizer(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater,
+				yield new RuleBasedTaxiOptimizer(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater,
 						zonalRegisters, requestInserter);
 			}
 
-			default:
-				throw new RuntimeException(
-						"Unsupported taxi optimizer type: " + taxiCfg.getTaxiOptimizerParams().getName());
-		}
+			default -> throw new IllegalArgumentException();
+		};
 	}
 
 	private ZonalRegisters createZonalRegisters(RuleBasedTaxiOptimizerParams params) {
-		ZonalSystem zonalSystem = new SquareGridSystem(network.getNodes().values(), params.getCellSize());
+		ZonalSystem zonalSystem = new SquareGridSystem(network.getNodes().values(), params.cellSize);
 		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, scheduler.getScheduleInquiry());
 		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
 		return new ZonalRegisters(idleTaxiRegistry, unplannedRequestRegistry);

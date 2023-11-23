@@ -1,6 +1,7 @@
 package playground.vsp.demandde.unternehmen;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,7 +18,7 @@ import java.util.List;
  */
 public class CompanyDataRetriever {
 
-    private static final Logger log = Logger.getLogger(CompanyDataRetriever.class);
+    private static final Logger log = LogManager.getLogger(CompanyDataRetriever.class);
 
     private static final String WEBSITE_URL = "http://www.bundesanzeiger-verlag.de";
     private static final String COMPANY_URL = "/betrifft-unternehmen/unternehmensdaten/deutsche-unternehmensdaten/" +

@@ -65,7 +65,7 @@ public class ScoringFunctionsForPopulationTest {
 		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
 		ScoringFunctionFactory scoringFunctionFactory = agentId -> new RecordingScoringFunction();
 
-		ScoringFunctionsForPopulation sf = new ScoringFunctionsForPopulation(controlerListenerManager, eventsManager, eventsToActivities, eventsToLegs, population, scoringFunctionFactory);
+		ScoringFunctionsForPopulation sf = new ScoringFunctionsForPopulation(controlerListenerManager, eventsManager, eventsToActivities, eventsToLegs, population, scoringFunctionFactory, scenario.getConfig());
 		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
 		ScoringFunction s = sf.getScoringFunctionForAgent(personId);
 		Assert.assertEquals(RecordingScoringFunction.class, s.getClass());
@@ -119,7 +119,7 @@ public class ScoringFunctionsForPopulationTest {
 		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
 		ScoringFunctionFactory scoringFunctionFactory = agentId -> new RecordingScoringFunction();
 
-		ScoringFunctionsForPopulation sf = new ScoringFunctionsForPopulation(controlerListenerManager, eventsManager, eventsToActivities, eventsToLegs, population, scoringFunctionFactory);
+		ScoringFunctionsForPopulation sf = new ScoringFunctionsForPopulation(controlerListenerManager, eventsManager, eventsToActivities, eventsToLegs, population, scoringFunctionFactory, scenario.getConfig());
 		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
 		ScoringFunction s = sf.getScoringFunctionForAgent(personId);
 

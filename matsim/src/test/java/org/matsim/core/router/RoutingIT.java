@@ -22,7 +22,8 @@ package org.matsim.core.router;
 
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,8 +53,8 @@ import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class RoutingIT {
-	/*package*/ static final Logger log = Logger.getLogger(RoutingIT.class);
-	
+	/*package*/ static final Logger log = LogManager.getLogger(RoutingIT.class);
+
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private interface RouterProvider {
@@ -70,19 +71,6 @@ public class RoutingIT {
 			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
 				return new DijkstraFactory();
-			}
-		});
-	}
-	@Test
-	public void testFastDijkstra() {
-		doTest(new RouterProvider() {
-			@Override
-			public String getName() {
-				return "FastDijkstra";
-			}
-			@Override
-			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				return new FastDijkstraFactory();
 			}
 		});
 	}
@@ -112,20 +100,8 @@ public class RoutingIT {
 			}
 		});
 	}
+
 	@Test
-	public void testFastDijkstraPruneDeadEnds() {
-		doTest(new RouterProvider() {
-			@Override
-			public String getName() {
-				return "FastDijkstraPruneDeadends";
-			}
-			@Override
-			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				return new FastDijkstraFactory();
-			}
-		});
-	}
-	@Test	
 	public void testAStarEuclidean() {
 		doTest(new RouterProvider() {
 			@Override
@@ -139,19 +115,6 @@ public class RoutingIT {
 		});
 	}
 	@Test
-	public void testFastAStarEuclidean() {
-		doTest(new RouterProvider() {
-			@Override
-			public String getName() {
-				return "FastAStarEuclidean";
-			}
-			@Override
-			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				return new FastAStarEuclideanFactory();
-			}
-		});
-	}
-	@Test	
 	public void testAStarLandmarks() {
 		doTest(new RouterProvider() {
 			@Override
@@ -164,19 +127,7 @@ public class RoutingIT {
 			}
 		});
 	}
-	@Test
-	public void testFastAStarLandmarks() {
-		doTest(new RouterProvider() {
-			@Override
-			public String getName() {
-				return "FastAStarLandmarks";
-			}
-			@Override
-			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				return new FastAStarLandmarksFactory(2);
-			}
-		});
-	}
+
 	@Test
 	public void testSpeedyALT() {
 		doTest(new RouterProvider() {
@@ -199,13 +150,13 @@ public class RoutingIT {
 //		final String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
 		final String inPlansName = utils.getClassInputDirectory() + "/plans.xml.gz" ;
 		new PopulationReader(scenario).readFile(inPlansName);
-			
+
 		calcRoute(provider, scenario);
 
 		final Scenario referenceScenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(referenceScenario.getNetwork()).readFile(config.network().getInputFile());
 		new PopulationReader(referenceScenario).readFile(inPlansName);
-		
+
 		final boolean isEqual = PopulationUtils.equalPopulation(referenceScenario.getPopulation(), scenario.getPopulation());
 		if ( !isEqual ) {
 			new PopulationWriter(referenceScenario.getPopulation(), scenario.getNetwork()).write(this.utils.getOutputDirectory() + "/reference_population.xml.gz");
@@ -222,7 +173,7 @@ public class RoutingIT {
 
 		final FreespeedTravelTimeAndDisutility calculator =
 				new FreespeedTravelTimeAndDisutility(
-						scenario.getConfig().planCalcScore() );
+						scenario.getConfig().scoring() );
 		final LeastCostPathCalculatorFactory factory1 = provider.getFactory(
 				scenario.getNetwork(),
 				calculator,
@@ -250,7 +201,7 @@ public class RoutingIT {
 
 		final TripRouter tripRouter = injector.getInstance(TripRouter.class);
 		final PersonAlgorithm router = new PlanRouter(tripRouter, injector.getInstance(TimeInterpretation.class));
-		
+
 		for ( Person p : scenario.getPopulation().getPersons().values() ) {
 			router.run(p);
 		}

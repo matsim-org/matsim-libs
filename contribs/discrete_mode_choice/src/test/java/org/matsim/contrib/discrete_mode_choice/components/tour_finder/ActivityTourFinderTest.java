@@ -13,7 +13,7 @@ import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceTrip;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 public class ActivityTourFinderTest {
 	private List<DiscreteModeChoiceTrip> createFixture(String... activityTypes) {
@@ -35,7 +35,7 @@ public class ActivityTourFinderTest {
 		for (Trip trip : trips) {
 			String initialMode = trip.getLegsOnly().get(0).getMode();
 			modeChoiceTrips.add(new DiscreteModeChoiceTrip(trip.getOriginActivity(), trip.getDestinationActivity(),
-					initialMode, trip.getTripElements(), 0, 0, 0, new Attributes()));
+					initialMode, trip.getTripElements(), 0, 0, 0, new AttributesImpl()));
 		}
 
 		return modeChoiceTrips;

@@ -26,7 +26,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConstants;
@@ -53,7 +54,7 @@ import org.matsim.vehicles.Vehicle;
  */
 public final class CreateOperatorFromTransitSchedule implements PStrategy {
 	
-	private final static Logger log = Logger.getLogger(CreateOperatorFromTransitSchedule.class);
+	private final static Logger log = LogManager.getLogger(CreateOperatorFromTransitSchedule.class);
 	private static final String STRATEGY_NAME = "CreateOperatorFromSchedule";
 
 	private final OperatorFactory operatorFactory;

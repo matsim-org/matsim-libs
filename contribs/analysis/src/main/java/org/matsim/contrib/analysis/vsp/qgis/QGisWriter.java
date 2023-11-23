@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Envelope;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -18,7 +19,7 @@ import org.matsim.core.utils.io.AbstractMatsimWriter;
 
 public class QGisWriter extends AbstractMatsimWriter implements MatsimWriter {
 
-	private static final Logger log = Logger.getLogger( QGisWriter.class );
+	private static final Logger log = LogManager.getLogger( QGisWriter.class );
 	
 	private QGisFileWriter handler;
 	

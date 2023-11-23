@@ -21,8 +21,9 @@ package playground.vsp.analysis.modules.bvgAna.ptTripTravelTime;
 
 import java.util.LinkedList;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -38,7 +39,7 @@ import org.matsim.core.utils.collections.Tuple;
  */
 public class PtTripTravelTimeData {
 	
-	private final Logger log = Logger.getLogger(PtTripTravelTimeData.class);
+	private final Logger log = LogManager.getLogger(PtTripTravelTimeData.class);
 //	private final Level logLevel = Level.DEBUG;
 
 	private ActivityEndEvent startAct;

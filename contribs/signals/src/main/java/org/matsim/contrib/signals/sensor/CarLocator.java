@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.sensor;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.lanes.Lane;
 
@@ -37,7 +38,7 @@ final class CarLocator {
 	/** time when the vehicle will be at the given distance in front of the links to node */
 	private double earliestTimeInDistance;
 	
-	private static final Logger log = Logger.getLogger(CarLocator.class);
+	private static final Logger log = LogManager.getLogger(CarLocator.class);
 
 	public CarLocator(Link link, double enterTime, double distance){
 		double dist = this.checkDistance(link.getLength(), distance);

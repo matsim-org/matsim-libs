@@ -7,7 +7,8 @@ import de.topobyte.osm4j.core.model.impl.Node;
 import de.topobyte.osm4j.core.model.impl.Tag;
 import de.topobyte.osm4j.core.model.impl.Way;
 import de.topobyte.osm4j.pbf.seq.PbfWriter;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -33,7 +34,7 @@ import static org.junit.Assert.*;
 
 public class SupersonicOsmNetworkReaderTest {
 
-	private static final Logger log = Logger.getLogger(SupersonicOsmNetworkReaderTest.class);
+	private static final Logger log = LogManager.getLogger(SupersonicOsmNetworkReaderTest.class);
 	private static final CoordinateTransformation transformation = new IdentityTransformation();
 	private static final String MOTORWAY = "motorway";
 	private static final String TERTIARY = "tertiary";

@@ -20,9 +20,13 @@
 
 package org.matsim.core.controler;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -37,8 +41,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -53,12 +57,16 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class TransitControlerIntegrationTest extends MatsimTestCase {
+public class TransitControlerIntegrationTest {
 
-	public void testTransitRouteCopy() {
-		Config config = super.loadConfig(null);
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+
+	@Test public void testTransitRouteCopy() {
+		Config config = utils.loadConfig((String)null);
 		config.transit().setUseTransit(true);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
@@ -129,25 +137,25 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 		population.addPerson(person1);
 
 		// prepare config
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(1);
+		config.controller().setFirstIteration(0);
+		config.controller().setLastIteration(1);
 
 		ActivityParams params = new ActivityParams("h");
 		params.setTypicalDuration(16.0*3600);
-		config.planCalcScore().addActivityParams(params);
+		config.scoring().addActivityParams(params);
 		params = new ActivityParams("w");
 		params.setTypicalDuration(8.0*3600);
-		config.planCalcScore().addActivityParams(params);
+		config.scoring().addActivityParams(params);
 
 		StrategySettings tam = new StrategySettings(Id.create(1, StrategySettings.class));
 		tam.setStrategyName("TimeAllocationMutator");
 		tam.setWeight(1.0);
-		config.strategy().addStrategySettings(tam);
+		config.replanning().addStrategySettings(tam);
 
 		// run
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
+		controler.getConfig().controller().setCreateGraphs(false);
 		controler.run();
 
 		// checks

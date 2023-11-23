@@ -32,6 +32,10 @@ public interface Leg extends PlanElement {
      */
     public void setMode(String mode);
 
+    public String getRoutingMode();
+
+    public void setRoutingMode(String routingMode);
+
     public Route getRoute();
 
     public void setRoute(Route route);

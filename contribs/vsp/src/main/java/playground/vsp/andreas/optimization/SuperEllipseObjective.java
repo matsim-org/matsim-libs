@@ -24,7 +24,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 
 /**
@@ -74,7 +75,7 @@ public class SuperEllipseObjective implements Objective {
 	public static final String B_name = "b";
 	public static final String COVER_name = "cover";
 
-	private final static Logger log = Logger.getLogger(SuperEllipseObjective.class);
+	private final static Logger log = LogManager.getLogger(SuperEllipseObjective.class);
 	
 	//////////////////////////////////////////////////////////////////////
 	// member variables

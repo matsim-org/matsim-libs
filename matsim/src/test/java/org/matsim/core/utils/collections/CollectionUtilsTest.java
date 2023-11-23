@@ -23,7 +23,8 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -34,7 +35,7 @@ import org.matsim.api.core.v01.network.Link;
  */
 public class CollectionUtilsTest {
 
-	private final static Logger log = Logger.getLogger(CollectionUtilsTest.class);
+	private final static Logger log = LogManager.getLogger(CollectionUtilsTest.class);
 
 	@Test
 	public void testSetToString() {

@@ -19,7 +19,8 @@
 
 package org.matsim.vehicles;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.utils.objectattributes.AttributeConverter;
@@ -36,7 +37,7 @@ import java.util.Stack;
  * @author dgrether
  */
 public final class MatsimVehicleReader implements MatsimReader{
-	private final static Logger log = Logger.getLogger( MatsimVehicleReader.class );
+	private final static Logger log = LogManager.getLogger( MatsimVehicleReader.class );
 	private final VehicleReader reader;
 
 	public MatsimVehicleReader( final Vehicles vehicles ) {
@@ -65,7 +66,8 @@ public final class MatsimVehicleReader implements MatsimReader{
 		private Map<Class<?>, AttributeConverter<?>> converters = new HashMap<>();
 
 		public VehicleReader( Vehicles vehicles ) {
-			this.vehicles = vehicles ;
+			super(ValidationType.XSD_ONLY);
+			this.vehicles = vehicles;
 		}
 
 		@Override

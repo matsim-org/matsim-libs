@@ -31,7 +31,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -44,7 +45,7 @@ import playground.vsp.openberlinscenario.cemdap.LogToOutputSaver;
  * @author dziemke
  */
 public class ZoneAndLOSGeneratorV2 {
-	private static final Logger LOG = Logger.getLogger(ZoneAndLOSGeneratorV2.class);
+	private static final Logger LOG = LogManager.getLogger(ZoneAndLOSGeneratorV2.class);
 
 	// Storage objects
 	private final Set<String> municipalities = new HashSet<>();

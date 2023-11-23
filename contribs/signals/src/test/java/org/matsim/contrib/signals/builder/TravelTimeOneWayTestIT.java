@@ -21,7 +21,8 @@ package org.matsim.contrib.signals.builder;
 
 import java.util.Collections;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -63,7 +64,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class TravelTimeOneWayTestIT {
 
-	private static final Logger log = Logger.getLogger(TravelTimeOneWayTestIT.class);
+	private static final Logger log = LogManager.getLogger(TravelTimeOneWayTestIT.class);
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
@@ -77,12 +78,12 @@ public class TravelTimeOneWayTestIT {
 	public void testSignalOutflow_woLanes() {
 		runAndTestDifferentGreensplitSignals(this.loadAllGreenScenario(false));
 	}
-	
+
 	@Test
 	public void testAllGreenSignalVsNoSignal_withLanes() {
 		runAndCompareAllGreenWithNoSignals(this.loadAllGreenScenario(true));
 	}
-	
+
 	@Test
 	public void testAllGreenSignalVsNoSignal_woLanes() {
 		runAndCompareAllGreenWithNoSignals(this.loadAllGreenScenario(false));
@@ -90,8 +91,8 @@ public class TravelTimeOneWayTestIT {
 
 	private Scenario loadAllGreenScenario(boolean useLanes) {
 		Config conf = ConfigUtils.createConfig(testUtils.classInputResourcePath());
-		conf.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		conf.controler().setMobsim("qsim");
+		conf.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		conf.controller().setMobsim("qsim");
 		conf.network().setInputFile("network.xml");
 		conf.plans().setInputFile("plans.xml.gz");
 		conf.qsim().setStuckTime(1000);
@@ -121,7 +122,7 @@ public class TravelTimeOneWayTestIT {
 		StubLinkEnterEventHandler stubLinkEnterEventHandler = new StubLinkEnterEventHandler();
 		runQsimWithSignals(scenario, stubLinkEnterEventHandler);
 		MeasurementPoint resultsWithSignals = stubLinkEnterEventHandler.beginningOfLink2;
-		
+
 		// without signals
 		EventsManager events = EventsUtils.createEventsManager();
 		StubLinkEnterEventHandler eventHandler = new StubLinkEnterEventHandler();
@@ -139,7 +140,7 @@ public class TravelTimeOneWayTestIT {
 		} else {
 			Assert.fail("seems like no LinkEnterEvent was handled, as this.beginningOfLink2 is not set.");
 		}
-		
+
 		// compare values
 		Assert.assertEquals(5000.0, resultsWithSignals.numberOfVehPassed, MatsimTestUtils.EPSILON);
 		Assert.assertEquals(resultsWithSignals.firstVehPassTime_s, resultsWoSignals.firstVehPassTime_s, MatsimTestUtils.EPSILON);
@@ -162,7 +163,7 @@ public class TravelTimeOneWayTestIT {
 
 			StubLinkEnterEventHandler stubLinkEnterEventHandler = new StubLinkEnterEventHandler();
 			runQsimWithSignals(scenario, stubLinkEnterEventHandler);
-			
+
 			log.debug("circulationTime: " + circulationTime);
 			log.debug("dropping  : " + dropping);
 
@@ -182,7 +183,7 @@ public class TravelTimeOneWayTestIT {
 				install(new ScenarioByInstanceModule(scenario));
 			}
 		}), new SignalsModule()));
-	
+
 		EventsManager events = injector.getInstance(EventsManager.class);
 		events.initProcessing();
 		for (EventHandler handler : eventHandlers){

@@ -2,7 +2,8 @@ package playground.vsp.cadyts.marginals;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import com.google.inject.Inject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -32,7 +33,7 @@ public class ModalDistanceCadytsContext implements CadytsContextI<Id<DistanceDis
 
 	private static final String LINKOFFSET_FILENAME = "linkCostOffsets" + ModalDistanceCadytsBuilder.MARGINALS + ".xml";
 	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis" + ModalDistanceCadytsBuilder.MARGINALS + ".txt";
-	private Logger logger = Logger.getLogger(ModalDistanceCadytsContext.class);
+	private Logger logger = LogManager.getLogger(ModalDistanceCadytsContext.class);
 
 	@Inject
 	private Config config;

@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.accessibility.osm;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.MapUtils;
@@ -48,7 +49,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 class AmenitySink implements Sink {
-	private final Logger log = Logger.getLogger(AmenitySink.class);
+	private final Logger log = LogManager.getLogger(AmenitySink.class);
 	private final CoordinateTransformation ct;
 	private Map<Long, NodeContainer> nodeMap;
 	private Map<Long, WayContainer> wayMap;

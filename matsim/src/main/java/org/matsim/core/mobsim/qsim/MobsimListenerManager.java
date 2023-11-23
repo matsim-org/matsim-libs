@@ -20,7 +20,8 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
@@ -34,7 +35,7 @@ import javax.swing.event.EventListenerList;
 
 class MobsimListenerManager implements MatsimManager {
 
-	private final static Logger log = Logger.getLogger(MobsimListenerManager.class);
+	private final static Logger log = LogManager.getLogger(MobsimListenerManager.class);
 
 	private final Mobsim sim;
 

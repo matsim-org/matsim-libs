@@ -71,7 +71,7 @@ class MultiInsertionDetourPathCalculator implements MobsimBeforeCleanupListener 
 		fromPickupPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility, true);
 		toDropoffPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility, true);
 		fromDropoffPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility, true);
-		executorService = Executors.newFixedThreadPool(Math.min(drtCfg.getNumberOfThreads(), MAX_THREADS));
+		executorService = Executors.newFixedThreadPool(Math.min(drtCfg.numberOfThreads, MAX_THREADS));
 	}
 
 	@VisibleForTesting

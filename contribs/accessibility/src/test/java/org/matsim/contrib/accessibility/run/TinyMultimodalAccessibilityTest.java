@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.accessibility.run;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -62,7 +63,7 @@ import java.util.*;
  */
 public class TinyMultimodalAccessibilityTest {
 
-	private static final Logger LOG = Logger.getLogger(TinyMultimodalAccessibilityTest.class);
+	private static final Logger LOG = LogManager.getLogger(TinyMultimodalAccessibilityTest.class);
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -104,9 +105,9 @@ public class TinyMultimodalAccessibilityTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 		acg.setUseParallelization(false);
 
-		config.controler().setLastIteration(0);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(0);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		return config;
 	}

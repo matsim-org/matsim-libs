@@ -20,22 +20,23 @@
 
 package org.matsim.analysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.utils.misc.Time;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 class LegTimesControlerListener implements AfterMobsimListener {
 
-	private static final  Logger log = Logger.getLogger(LegTimesControlerListener.class);
-	
+	private static final  Logger log = LogManager.getLogger(LegTimesControlerListener.class);
+
 	private final CalcLegTimes legTimes;
 
 	private final OutputDirectoryHierarchy controlerIO;
-	
+
 	@Inject
     LegTimesControlerListener(CalcLegTimes legTimes, OutputDirectoryHierarchy controlerIO) {
 		this.legTimes = legTimes;

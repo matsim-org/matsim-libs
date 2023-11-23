@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.analysis.kai;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -168,7 +169,7 @@ public class KNAnalysisEventsHandlerTest {
 		// actual test: compare checksums of the files
 		for ( StatType type : StatType.values() ) {
 			final String str = KNAnalysisEventsHandlerTest.BASE_FILE_NAME + type.toString() + ".txt" ;
-			Logger.getLogger(this.getClass()).info( "comparing " + str );
+			LogManager.getLogger(this.getClass()).info( "comparing " + str );
 			final long expectedChecksum = CRCChecksum.getCRCFromFile(utils.getInputDirectory() + str);
 			final long actualChecksum = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + str);
 			Assert.assertEquals("Output files differ.", expectedChecksum, actualChecksum);

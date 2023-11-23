@@ -121,6 +121,13 @@ public class IdMapTest {
 		Assert.assertTrue(map.containsKey(Id.create(5, Person.class)));
 		Assert.assertFalse(map.containsKey(Id.create(6, Person.class)));
 
+		Assert.assertTrue(map.containsKey(Id.create(1, Person.class).index()));
+		Assert.assertTrue(map.containsKey(Id.create(2, Person.class).index()));
+		Assert.assertFalse(map.containsKey(Id.create(3, Person.class).index()));
+		Assert.assertTrue(map.containsKey(Id.create(4, Person.class).index()));
+		Assert.assertTrue(map.containsKey(Id.create(5, Person.class).index()));
+		Assert.assertFalse(map.containsKey(Id.create(6, Person.class).index()));
+
 		Assert.assertTrue(map.containsKey((Object) Id.create(1, Person.class)));
 		Assert.assertTrue(map.containsKey((Object) Id.create(2, Person.class)));
 		Assert.assertFalse(map.containsKey((Object) Id.create(3, Person.class)));

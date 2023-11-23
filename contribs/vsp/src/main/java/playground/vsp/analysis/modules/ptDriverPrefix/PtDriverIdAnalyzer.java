@@ -27,7 +27,8 @@ package playground.vsp.analysis.modules.ptDriverPrefix;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.MutableScenario;
@@ -40,7 +41,7 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  *
  */
 public class PtDriverIdAnalyzer extends AbstractAnalysisModule{
-	private final static Logger log = Logger.getLogger(PtDriverIdAnalyzer.class);
+	private final static Logger log = LogManager.getLogger(PtDriverIdAnalyzer.class);
 	private MutableScenario scenario;
 	
 	private PtDriverIdHandler ptDriverPrefixHandler;
