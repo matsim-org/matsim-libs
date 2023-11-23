@@ -194,6 +194,41 @@ public final class RailsimCalc {
 	}
 
 	/**
+	 * Calculate the projected driven distance, based on current position and state.
+	 */
+	public static double projectedDistance(double time,  TrainPosition position) {
+
+		if (!(position instanceof TrainState state))
+			throw new IllegalArgumentException("Position must be a TrainState.");
+
+		double elapsed = time - state.timestamp;
+
+		if (elapsed == 0)
+			return 0;
+
+		double accelTime = (state.targetSpeed - state.speed) / state.acceleration;
+
+		double dist;
+		if (state.acceleration == 0) {
+			dist = state.speed * elapsed;
+
+		} else if (accelTime < elapsed) {
+			// Travelled distance under constant acceleration
+			dist = RailsimCalc.calcTraveledDist(state.speed, accelTime, state.acceleration);
+
+			// Remaining time at constant speed
+			if (state.acceleration > 0)
+				dist += RailsimCalc.calcTraveledDist(state.targetSpeed, elapsed - accelTime, 0);
+
+		} else {
+			// Acceleration was constant the whole time
+			dist = RailsimCalc.calcTraveledDist(state.speed, elapsed, state.acceleration);
+		}
+
+		return dist;
+	}
+
+	/**
 	 * Links that need to be blocked or otherwise stop needs to be initiated.
 	 * This method is only valid for fixed block resources.
 	 */

@@ -86,7 +86,7 @@ final class FixedBlockResource implements RailResourceInternal {
 	}
 
 	@Override
-	public boolean hasCapacity(RailLink link, int track, TrainPosition position) {
+	public boolean hasCapacity(double time, RailLink link, int track, TrainPosition position) {
 
 		if (track != RailResourceManager.ANY_TRACK)
 			throw new IllegalArgumentException("Fixed block does not support choosing individual tracks.");
@@ -104,11 +104,6 @@ final class FixedBlockResource implements RailResourceInternal {
 		MobsimDriverAgent[] state = tracks.get(link);
 		for (MobsimDriverAgent reserved : state) {
 			if (reserved == position.getDriver()) {
-
-				// If train is currently on the link, only the remaining distance is returned
-				if (link.getLinkId().equals(position.getHeadLink()))
-					return link.length - position.getHeadPosition();
-
 				return link.length;
 			}
 		}
@@ -117,7 +112,7 @@ final class FixedBlockResource implements RailResourceInternal {
 	}
 
 	@Override
-	public double reserve(RailLink link, int track, TrainPosition position) {
+	public double reserve(double time, RailLink link, int track, TrainPosition position) {
 
 		if (track != RailResourceManager.ANY_TRACK)
 			throw new IllegalArgumentException("Fixed block does not support choosing individual tracks.");
@@ -132,11 +127,6 @@ final class FixedBlockResource implements RailResourceInternal {
 		for (int i = 0; i < state.length; i++) {
 			if (state[i] == null) {
 				state[i] = position.getDriver();
-
-				// departing train are initialized somewhere on a link
-				if (link.getLinkId().equals(position.getHeadLink()))
-					return link.length - position.getHeadPosition();
-
 				return link.length;
 			}
 		}

@@ -128,28 +128,32 @@ public final class RailResourceManager {
 	public double tryBlockLink(double time, RailLink link, int track, TrainPosition position) {
 
 		double reservedDist = link.resource.getReservedDist(link, position);
-		if (reservedDist != RailResourceInternal.NO_RESERVATION) {
+
+		// return only fully reserved links
+		if (reservedDist != RailResourceInternal.NO_RESERVATION && reservedDist == link.length) {
 			return reservedDist;
 		}
 
-		if (link.resource.hasCapacity(link, track, position)) {
+		if (link.resource.hasCapacity(time, link, track, position)) {
 
-			double dist = link.resource.reserve(link, track, position);
+			double dist = link.resource.reserve(time, link, track, position);
 			eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), link.getLinkId(),
 				position.getDriver().getVehicle().getId(), link.resource.getState(link)));
+
+			assert dist >= 0: "Reserved distance must be equal or larger than 0.";
 
 			return dist;
 		}
 
-		return RailResourceInternal.NO_RESERVATION;
+		return reservedDist;
 	}
 
 	/**
 	 * Checks whether a link or underlying resource has remaining capacity.
 	 */
-	public boolean hasCapacity(Id<Link> link, int track, TrainPosition position) {
+	public boolean hasCapacity(double time, Id<Link> link, int track, TrainPosition position) {
 		RailLink l = getLink(link);
-		return l.resource.hasCapacity(l, track, position);
+		return l.resource.hasCapacity(time, l, track, position);
 	}
 
 	/**

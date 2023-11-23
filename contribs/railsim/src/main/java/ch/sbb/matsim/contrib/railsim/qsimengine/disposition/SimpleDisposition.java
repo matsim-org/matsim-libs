@@ -101,8 +101,8 @@ public class SimpleDisposition implements TrainDisposition {
 		if (reserveDist == RailResource.NO_RESERVATION)
 			return new DispositionResponse(0, 0, null);
 
-
-		// TODO: loop and check of first link might be merged into one
+		// remove already used distance
+		reserveDist -= position.getHeadPosition();
 
 		boolean stop = false;
 		// Iterate all links that need to be blocked

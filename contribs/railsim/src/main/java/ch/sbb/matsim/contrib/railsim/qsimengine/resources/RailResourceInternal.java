@@ -12,7 +12,7 @@ interface RailResourceInternal extends RailResource {
 	/**
 	 * Whether an agent is able to block this resource.
 	 */
-	boolean hasCapacity(RailLink link, int track, TrainPosition position);
+	boolean hasCapacity(double time, RailLink link, int track, TrainPosition position);
 
 	/**
 	 * The reserved distance on this link for an agent. Returns 0 if the agent has no reservation.
@@ -25,7 +25,7 @@ interface RailResourceInternal extends RailResource {
 	 *
 	 * @return the reserved distance on this link
 	 */
-	double reserve(RailLink link, int track, TrainPosition position);
+	double reserve(double time, RailLink link, int track, TrainPosition position);
 
 	/**
 	 * Releases this resource for the given agent.

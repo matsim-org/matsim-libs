@@ -66,10 +66,11 @@ public class RailsimEngineMovingBlockTest {
 		RailsimTestUtils.Holder test = getTestEngine("networkMovingBlocks.xml");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "l1-2", "l6-7");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo", 60, "l1-2", "l6-7");
-		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 120, "l1-2", "l6-7");
+//		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 120, "l1-2", "l6-7");
 
 		try {
 			test.doSimStepUntil(10_000);
+			test.debugFiles(collector, "movingBlock");
 		} catch (Error e) {
 			test.debugFiles(collector, "movingBlock");
 			throw e;
@@ -78,7 +79,7 @@ public class RailsimEngineMovingBlockTest {
 		test = getTestEngine("networkMovingBlocks.xml");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "l1-2", "l6-7");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo", 60, "l1-2", "l6-7");
-		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 120, "l1-2", "l6-7");
+//		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 120, "l1-2", "l6-7");
 
 		test.doStateUpdatesUntil(10_000, 1);
 

@@ -335,7 +335,9 @@ final class RailsimEngine implements Steppable {
 
 		assert FuzzyUtils.greaterEqualThan(state.approvedDist, 0) : "Approved distance must be positive, but was " + response.approvedDist();
 
-		// TODO: approved dist can be partially of the needed reserved dist, probably need to stop then
+		// Stop when the approved distance is not enough
+		if (state.approvedDist < reserveDist)
+			state.approvedSpeed = 0;
 
 		// Return whether the train has to stop
 		return response.approvedSpeed() != 0;

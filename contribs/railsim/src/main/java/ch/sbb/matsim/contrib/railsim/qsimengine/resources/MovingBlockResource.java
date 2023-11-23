@@ -1,5 +1,6 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine.resources;
 
+import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimCalc;
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -58,10 +59,10 @@ final class MovingBlockResource implements RailResourceInternal {
 	public ResourceState getState(RailLink link) {
 		// All links have the same state
 		int used = 0;
-        for (Track track : tracks) {
-            if (track.incoming == null)
-                used++;
-        }
+		for (Track track : tracks) {
+			if (track.incoming == null)
+				used++;
+		}
 
 		if (used == 0)
 			return ResourceState.EMPTY;
@@ -70,13 +71,13 @@ final class MovingBlockResource implements RailResourceInternal {
 	}
 
 	@Override
-	public boolean hasCapacity(RailLink link, int track, TrainPosition position) {
+	public boolean hasCapacity(double time, RailLink link, int track, TrainPosition position) {
 
 		TrainEntry entry = reservations.get(position.getDriver());
 
 		// No entry yet
 		if (entry == null && track == RailResourceManager.ANY_TRACK) {
-			track = chooseTrack(link, position);
+			track = chooseTrack(link);
 
 			// No track was available
 			if (track == RailResourceManager.ANY_TRACK)
@@ -88,7 +89,7 @@ final class MovingBlockResource implements RailResourceInternal {
 		}
 
 		// entry should store track
-		double dist = checkReserve(link, track, entry, position);
+		double dist = checkReserve(time, link, track, entry, position);
 
 		return dist > 0;
 	}
@@ -100,18 +101,11 @@ final class MovingBlockResource implements RailResourceInternal {
 		if (entry == null)
 			return NO_RESERVATION;
 
-		// return remaining reserved distance
-		if (entry.lastLink.getLinkId().equals(position.getHeadLink())) {
-			double diff = position.getHeadPosition() - entry.lastHeadPosition;
-			return entry.reservedDistance - diff;
-		}
-
-		// return the whole distance, this assumes the train is not using it yet
 		return entry.reservedDistance;
 	}
 
 	@Override
-	public double reserve(RailLink link, int track, TrainPosition position) {
+	public double reserve(double time, RailLink link, int track, TrainPosition position) {
 
 		moving.get(link).add(position.getDriver());
 
@@ -119,7 +113,7 @@ final class MovingBlockResource implements RailResourceInternal {
 		if (!reservations.containsKey(position.getDriver())) {
 
 			if (track == RailResourceManager.ANY_TRACK)
-				track = chooseTrack(link, position);
+				track = chooseTrack(link);
 
 			TrainEntry e = new TrainEntry(track, position);
 			Track t = tracks[track];
@@ -135,11 +129,9 @@ final class MovingBlockResource implements RailResourceInternal {
 
 		TrainEntry self = reservations.get(position.getDriver());
 
-		double dist = checkReserve(link, self.track, self, position);
+		double dist = checkReserve(time, link, self.track, self, position);
 
 		self.reservedDistance = dist;
-		self.lastHeadPosition = position.getHeadPosition();
-		self.lastLink = link;
 
 		return dist;
 	}
@@ -147,7 +139,7 @@ final class MovingBlockResource implements RailResourceInternal {
 	/**
 	 * Chooses a track for trains that don't have one yet.
 	 */
-	private int chooseTrack(RailLink link, TrainPosition position) {
+	private int chooseTrack(RailLink link) {
 		int same = -1;
 		int available = -1;
 		int free = 0;
@@ -171,17 +163,15 @@ final class MovingBlockResource implements RailResourceInternal {
 	/**
 	 * Compute the distance that can be reserved without actually reserving it.
 	 */
-	private double checkReserve(RailLink link, int track, @Nullable TrainEntry entry, TrainPosition position) {
+	private double checkReserve(double time, RailLink link, int track,
+								@Nullable TrainEntry entry, TrainPosition position) {
 
 		List<TrainEntry> queue = tracks[track].queue;
 
 		// Approve whole link length for the first train in the queue
 		int idx = entry != null ? queue.indexOf(entry) : queue.size();
 		if (idx == 0) {
-			if (link.getLinkId().equals(position.getHeadLink()))
-				return link.length - position.getHeadPosition();
-			else
-				return link.length;
+			return link.length;
 		}
 
 		// The train in front of this one
@@ -190,10 +180,11 @@ final class MovingBlockResource implements RailResourceInternal {
 		// tail is on the same link
 		if (Objects.equals(inFront.position.getTailLink(), link.getLinkId())) {
 
-			if (link.getLinkId().equals(position.getHeadLink()))
-				return inFront.position.getTailPosition() - position.getHeadPosition();
-			else
-				return inFront.position.getTailPosition();
+			// available distance can be at most the link length
+            return Math.min(
+				link.length,
+				inFront.position.getTailPosition() + RailsimCalc.projectedDistance(time, inFront.position)
+			);
 		}
 
 		// train is moving on this link, and it is not the tail -> no capacity at all
@@ -241,8 +232,6 @@ final class MovingBlockResource implements RailResourceInternal {
 		final TrainPosition position;
 
 		double reservedDistance;
-		double lastHeadPosition;
-		RailLink lastLink;
 
 		public TrainEntry(int track, TrainPosition position) {
 			this.track = track;
