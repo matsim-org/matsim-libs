@@ -96,7 +96,7 @@ public class SimpleDisposition implements TrainDisposition {
 		 */
 
 		// TODO: for moving block the logic might needs to be changed
-		double reserveDist = resources.tryBlockLink(time, position, currentLink);
+		double reserveDist = resources.tryBlockLink(time, currentLink, RailResourceManager.ANY_TRACK, position);
 
 		if (reserveDist == RailResource.NO_RESERVATION)
 			return new DispositionResponse(0, 0, null);
@@ -112,7 +112,7 @@ public class SimpleDisposition implements TrainDisposition {
 			if (link == currentLink)
 				continue;
 
-			dist = resources.tryBlockLink(time, position, link);
+			dist = resources.tryBlockLink(time, link, RailResourceManager.ANY_TRACK, position);
 
 			if (dist == RailResource.NO_RESERVATION) {
 				stop = true;

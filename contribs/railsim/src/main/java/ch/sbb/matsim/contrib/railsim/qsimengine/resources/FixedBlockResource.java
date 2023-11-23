@@ -86,7 +86,10 @@ final class FixedBlockResource implements RailResourceInternal {
 	}
 
 	@Override
-	public boolean hasCapacity(RailLink link, TrainPosition position) {
+	public boolean hasCapacity(RailLink link, int track, TrainPosition position) {
+
+		if (track != RailResourceManager.ANY_TRACK)
+			throw new IllegalArgumentException("Fixed block does not support choosing individual tracks.");
 
 		// there is no need to check the individual tracks here
 		if (reservations.contains(position.getDriver())) {
@@ -114,7 +117,10 @@ final class FixedBlockResource implements RailResourceInternal {
 	}
 
 	@Override
-	public double reserve(RailLink link, TrainPosition position) {
+	public double reserve(RailLink link, int track, TrainPosition position) {
+
+		if (track != RailResourceManager.ANY_TRACK)
+			throw new IllegalArgumentException("Fixed block does not support choosing individual tracks.");
 
 		reservations.add(position.getDriver());
 

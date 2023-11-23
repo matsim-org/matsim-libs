@@ -40,6 +40,11 @@ import java.util.*;
  */
 public final class RailResourceManager {
 
+	/**
+	 * Constant that can be used as track number to indicate that any track is allowed.
+	 */
+	public static final int ANY_TRACK = -1;
+
 	private final EventsManager eventsManager;
 
 	/**
@@ -120,16 +125,16 @@ public final class RailResourceManager {
 	/**
 	 * Try to block a track and the underlying resource and return the allowed distance.
 	 */
-	public double tryBlockLink(double time, TrainPosition position, RailLink link) {
+	public double tryBlockLink(double time, RailLink link, int track, TrainPosition position) {
 
 		double reservedDist = link.resource.getReservedDist(link, position);
 		if (reservedDist != RailResourceInternal.NO_RESERVATION) {
 			return reservedDist;
 		}
 
-		if (link.resource.hasCapacity(link, position)) {
+		if (link.resource.hasCapacity(link, track, position)) {
 
-			double dist = link.resource.reserve(link, position);
+			double dist = link.resource.reserve(link, track, position);
 			eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), link.getLinkId(),
 				position.getDriver().getVehicle().getId(), link.resource.getState(link)));
 
@@ -142,9 +147,9 @@ public final class RailResourceManager {
 	/**
 	 * Checks whether a link or underlying resource has remaining capacity.
 	 */
-	public boolean hasCapacity(Id<Link> link, TrainPosition position) {
+	public boolean hasCapacity(Id<Link> link, int track, TrainPosition position) {
 		RailLink l = getLink(link);
-		return l.resource.hasCapacity(l, position);
+		return l.resource.hasCapacity(l, track, position);
 	}
 
 	/**

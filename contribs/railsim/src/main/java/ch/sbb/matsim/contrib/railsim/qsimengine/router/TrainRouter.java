@@ -74,7 +74,7 @@ public final class TrainRouter {
 		@Override
 		public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
 			// only works with fixed block
-			return resources.hasCapacity(link.getId(), null) ? 0 : 1;
+			return resources.hasCapacity(link.getId(), RailResourceManager.ANY_TRACK, null) ? 0 : 1;
 		}
 
 		@Override
