@@ -603,7 +603,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(SEEP_MODE)
 	private void setSeepModes(String value) {
 		Set<String> modes = Arrays.stream(value.split(",")).map(String::trim).collect(Collectors.toSet());
-		setSeepModes(Arrays.stream(modes));
+		setSeepModes(modes);
 	}
 
 	public Collection<String> getSeepModes() {
