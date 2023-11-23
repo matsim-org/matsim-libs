@@ -14,12 +14,7 @@ final class MovingBlockResource implements RailResourceInternal {
 
 	private final Id<RailResource> id;
 	private final List<RailLink> links;
-	private final int capacity;
-
-	/**
-	 * Trains on this segment by their incoming link.
-	 */
-	private final Map<RailLink, List<TrainEntry>> queues = new HashMap<>();
+	private final Track[] tracks;
 
 	/**
 	 * Links that are reserved by trains.
@@ -34,7 +29,14 @@ final class MovingBlockResource implements RailResourceInternal {
 	MovingBlockResource(Id<RailResource> id, List<RailLink> links) {
 		this.id = id;
 		this.links = links;
-		this.capacity = links.stream().mapToInt(l -> l.tracks).min().orElseThrow();
+
+		int capacity = links.stream().mapToInt(l -> l.tracks).min().orElseThrow();
+		this.tracks = new Track[capacity];
+
+		for (int i = 0; i < capacity; i++) {
+			tracks[i] = new Track();
+		}
+
 		this.reservations = new HashMap<>();
 
 		for (RailLink link : links) {
@@ -54,7 +56,17 @@ final class MovingBlockResource implements RailResourceInternal {
 
 	@Override
 	public ResourceState getState(RailLink link) {
-		return queues.isEmpty() ? ResourceState.EMPTY : ResourceState.IN_USE;
+		// All links have the same state
+		int used = 0;
+        for (Track track : tracks) {
+            if (track.incoming == null)
+                used++;
+        }
+
+		if (used == 0)
+			return ResourceState.EMPTY;
+
+		return ResourceState.IN_USE;
 	}
 
 	@Override
@@ -62,11 +74,21 @@ final class MovingBlockResource implements RailResourceInternal {
 
 		TrainEntry entry = reservations.get(position.getDriver());
 
-		// under this condition a new queue would be created
-		if (entry == null && !queues.containsKey(link))
-			return queues.size() < capacity;
+		// No entry yet
+		if (entry == null && track == RailResourceManager.ANY_TRACK) {
+			track = chooseTrack(link, position);
 
-		double dist = checkReserve(link, entry, position);
+			// No track was available
+			if (track == RailResourceManager.ANY_TRACK)
+				return false;
+		} else if (entry != null && track == RailResourceManager.ANY_TRACK) {
+			track = entry.track;
+		} else if (entry != null && track != entry.track) {
+			throw new IllegalStateException("Train is already on a different track.");
+		}
+
+		// entry should store track
+		double dist = checkReserve(link, track, entry, position);
 
 		return dist > 0;
 	}
@@ -96,15 +118,24 @@ final class MovingBlockResource implements RailResourceInternal {
 		// store trains incoming link
 		if (!reservations.containsKey(position.getDriver())) {
 
-			TrainEntry e = new TrainEntry(link, position);
+			if (track == RailResourceManager.ANY_TRACK)
+				track = chooseTrack(link, position);
+
+			TrainEntry e = new TrainEntry(track, position);
+			Track t = tracks[track];
 
 			reservations.put(position.getDriver(), e);
-			queues.computeIfAbsent(link, l -> new ArrayList<>()).add(e);
+
+			// Mark this as used by this direction
+			if (t.incoming == null)
+				t.incoming = link;
+
+			t.queue.add(e);
 		}
 
 		TrainEntry self = reservations.get(position.getDriver());
 
-		double dist = checkReserve(link, self, position);
+		double dist = checkReserve(link, self.track, self, position);
 
 		self.reservedDistance = dist;
 		self.lastHeadPosition = position.getHeadPosition();
@@ -113,13 +144,36 @@ final class MovingBlockResource implements RailResourceInternal {
 		return dist;
 	}
 
+	/**
+	 * Chooses a track for trains that don't have one yet.
+	 */
+	private int chooseTrack(RailLink link, TrainPosition position) {
+		int same = -1;
+		int available = -1;
+		int free = 0;
+
+		for (int i = 0; i < tracks.length; i++) {
+			if (tracks[i].incoming == link)
+				same = i;
+			else if (tracks[i].incoming == null) {
+				available = i;
+				free++;
+			}
+		}
+
+		// If there is more than one free track, a new one is opened
+		if (same != -1)
+			return free > 1 ? available : same;
+
+		return available;
+	}
 
 	/**
 	 * Compute the distance that can be reserved without actually reserving it.
 	 */
-	private double checkReserve(RailLink link, @Nullable TrainEntry entry, TrainPosition position) {
+	private double checkReserve(RailLink link, int track, @Nullable TrainEntry entry, TrainPosition position) {
 
-		List<TrainEntry> queue = queues.get(entry != null ? entry.entryLink : link);
+		List<TrainEntry> queue = tracks[track].queue;
 
 		// Approve whole link length for the first train in the queue
 		int idx = entry != null ? queue.indexOf(entry) : queue.size();
@@ -166,17 +220,15 @@ final class MovingBlockResource implements RailResourceInternal {
 
 		// Remove this train from the incoming map
 		if (allFree) {
-			Iterator<Map.Entry<RailLink, List<TrainEntry>>> it = queues.entrySet().iterator();
-			while (it.hasNext()) {
-				Map.Entry<RailLink, List<TrainEntry>> e = it.next();
-				e.getValue().removeIf(p -> p.position.getDriver() == driver);
 
-				// Remove the whole entry if no more trains are incoming
-				if (e.getValue().isEmpty())
-					it.remove();
-			}
+			TrainEntry entry = reservations.remove(driver);
 
-			reservations.remove(driver);
+			Track track = tracks[entry.track];
+			track.queue.removeIf(p -> p.position.getDriver() == driver);
+
+			// This track is completely free again
+			if (track.queue.isEmpty())
+				track.incoming = null;
 		}
 	}
 
@@ -185,16 +237,33 @@ final class MovingBlockResource implements RailResourceInternal {
 	 */
 	private static final class TrainEntry {
 
-		final RailLink entryLink;
+		final int track;
 		final TrainPosition position;
 
 		double reservedDistance;
 		double lastHeadPosition;
 		RailLink lastLink;
 
-		public TrainEntry(RailLink entryLink, TrainPosition position) {
-			this.entryLink = entryLink;
+		public TrainEntry(int track, TrainPosition position) {
+			this.track = track;
 			this.position = position;
 		}
+	}
+
+	/**
+	 * One instance for each available track.
+	 */
+	private static final class Track {
+
+		/**
+		 * Link used to enter this track, which indicates the direction.
+		 */
+		private RailLink incoming;
+
+		/**
+		 * Train currently on this track.
+		 */
+		private final List<TrainEntry> queue = new ArrayList<>();
+
 	}
 }
