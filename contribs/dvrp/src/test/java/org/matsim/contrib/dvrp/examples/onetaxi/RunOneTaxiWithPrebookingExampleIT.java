@@ -142,7 +142,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 					if (event instanceof AgentWakeupEvent) {
 						wakeupEvents.put(((AgentWakeupEvent)event).getPersonId(), (AgentWakeupEvent)event);
 					} else if (event instanceof PassengerRequestScheduledEvent) {
-						requestScheduledEvents.put(((PassengerRequestScheduledEvent)event).getPersonId(),
+						requestScheduledEvents.put(((PassengerRequestScheduledEvent)event).getPersonIds().stream().findFirst().orElseThrow(),
 								(PassengerRequestScheduledEvent)event);
 					} else if (event instanceof ActivityEndEvent && ((ActivityEndEvent)event).getActType()
 							.equals("dummy")) {
@@ -239,7 +239,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 		PassengerRequestScheduledEvent event = events.get(Id.createPersonId(personId));
 		assertThat(event.getVehicleId().toString()).isEqualTo("taxi_one");
 		assertThat(event.getPickupTime()).isCloseTo(pickupTime, Offset.offset(0.01));
-		assertThat(event.getPersonId().toString()).isEqualTo(personId);
+		assertThat(event.getPersonIds().get(0).toString()).isEqualTo(personId);
 		assertThat(event.getRequestId().toString()).isEqualTo(requestId);
 	}
 

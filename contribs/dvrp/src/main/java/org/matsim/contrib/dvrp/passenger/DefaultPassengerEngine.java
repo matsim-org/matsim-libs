@@ -19,12 +19,10 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.google.common.base.Verify;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -67,7 +65,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	private InternalInterface internalInterface;
 
 	//accessed in doSimStep() and handleDeparture() (no need to sync)
-	private final Map<Id<Request>, MobsimPassengerAgent> activePassengers = new HashMap<>();
+	private final Map<Id<Request>, List<MobsimPassengerAgent>> activePassengers = new HashMap<>();
 
 	// holds vehicle stop activities for requests that have not arrived at departure point yet
 	private final Map<Id<Request>, PassengerPickupActivity> waitingForPassenger = new HashMap<>();
@@ -116,12 +114,15 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 				break;
 			}
 
-			MobsimPassengerAgent passenger = activePassengers.remove(event.getRequestId());
-			if (passenger != null) {
+			List<MobsimPassengerAgent> passengers = activePassengers.remove(event.getRequestId());
+
+			if (passengers != null) {
 				// not much else can be done for immediate requests
 				// set the passenger agent to abort - the event will be thrown by the QSim
-				passenger.setStateToAbort(time);
-				internalInterface.arrangeNextAgentState(passenger);
+				for (MobsimPassengerAgent passenger: passengers) {
+					passenger.setStateToAbort(mobsimTimer.getTimeOfDay());
+					internalInterface.arrangeNextAgentState(passenger);
+				}
 				iterator.remove();
 			}
 		}
@@ -148,29 +149,30 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 
 		if (request == null) { // immediate request
 			Route route = ((Leg)((PlanAgent)passenger).getCurrentPlanElement()).getRoute();
-			request = requestCreator.createRequest(internalPassengerHandling.createRequestId(), passenger.getId(), route, getLink(fromLinkId),
-				getLink(toLinkId), now, now);
+			request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
+					List.of(passenger.getId()), route, getLink(fromLinkId), getLink(toLinkId), now, now);
 
 			// must come before validateAndSubmitRequest (to come before rejection event)
-			eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerId()));
-			activePassengers.put(request.getId(), passenger);
+			eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), List.of(passenger.getId())));
+			activePassengers.put(request.getId(), List.of(passenger));
 
-			validateAndSubmitRequest(passenger, request, now);
+			validateAndSubmitRequest(List.of(passenger), request, now);
 		} else { // advance request
-			eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerId()));
-			activePassengers.put(request.getId(), passenger);
+			eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), List.of(passenger.getId())));
+			activePassengers.put(request.getId(), List.of(passenger));
 
 			PassengerPickupActivity pickupActivity = waitingForPassenger.remove(request.getId());
 			if (pickupActivity != null) {
 				// the vehicle is already waiting for the request, notify it
-				pickupActivity.notifyPassengerIsReadyForDeparture(passenger, now);
+				pickupActivity.notifyPassengersAreReadyForDeparture(List.of(passenger), now);
 			}
 		}
 
 		return true;
 	}
 
-	private void validateAndSubmitRequest(MobsimPassengerAgent passenger, PassengerRequest request, double now) {
+	private void validateAndSubmitRequest(List<MobsimPassengerAgent> passengers, PassengerRequest request, double now) {
+		activePassengers.put(request.getId(), passengers);
 		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
 			//need to synchronise to address cases where requestSubmitted() may:
 			// - be called from outside DepartureHandlers
@@ -208,7 +210,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	 * notified once the agent arrives for departure.
 	 */
 	@Override
-	public boolean notifyWaitForPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver, Id<Request> requestId) {
+	public boolean notifyWaitForPassengers(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver, Id<Request> requestId) {
 		if (!activePassengers.containsKey(requestId)) {
 			waitingForPassenger.put(requestId, pickupActivity);
 			return false;
@@ -218,13 +220,17 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	}
 
 	@Override
-	public boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver, Id<Request> requestId, double now) {
-		return internalPassengerHandling.tryPickUpPassenger(driver, activePassengers.get(requestId), requestId, now);
+	public boolean tryPickUpPassengers(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
+			Id<Request> requestId, double now) {
+		boolean pickedUp = internalPassengerHandling.tryPickUpPassengers(driver, activePassengers.get(requestId),
+				requestId, now);
+		Verify.verify(pickedUp, "Not possible without prebooking");
+		return pickedUp;
 	}
 
 	@Override
-	public void dropOffPassenger(MobsimDriverAgent driver, Id<Request> requestId, double now) {
-		internalPassengerHandling.dropOffPassenger(driver, activePassengers.remove(requestId), requestId, now);
+	public void dropOffPassengers(MobsimDriverAgent driver, Id<Request> requestId, double now) {
+		internalPassengerHandling.dropOffPassengers(driver, activePassengers.remove(requestId), requestId, now);
 	}
 
 	@Override

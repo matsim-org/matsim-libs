@@ -31,6 +31,8 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import java.util.List;
+
 /**
  * @author michalm
  */
@@ -45,19 +47,19 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 	}
 
 	@Override
-	public DrtRequest createRequest(Id<Request> id, Id<Person> passengerId, Route route, Link fromLink, Link toLink,
-			double departureTime, double submissionTime) {
+	public DrtRequest createRequest(Id<Request> id, List<Id<Person>> passengerIds, Route route, Link fromLink, Link toLink,
+									double departureTime, double submissionTime) {
 		DrtRoute drtRoute = (DrtRoute)route;
 		double latestDepartureTime = departureTime + drtRoute.getMaxWaitTime();
 		double latestArrivalTime = departureTime + drtRoute.getTravelTime().seconds();
 
 		eventsManager.processEvent(
-				new DrtRequestSubmittedEvent(submissionTime, mode, id, passengerId, fromLink.getId(), toLink.getId(),
+				new DrtRequestSubmittedEvent(submissionTime, mode, id, passengerIds, fromLink.getId(), toLink.getId(),
 						drtRoute.getDirectRideTime(), drtRoute.getDistance(), departureTime, latestDepartureTime, latestArrivalTime));
 
 		DrtRequest request = DrtRequest.newBuilder()
 				.id(id)
-				.passengerId(passengerId)
+				.passengerIds(passengerIds)
 				.mode(mode)
 				.fromLink(fromLink)
 				.toLink(toLink)

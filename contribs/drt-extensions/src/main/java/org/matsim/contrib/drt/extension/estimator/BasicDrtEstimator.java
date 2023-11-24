@@ -5,7 +5,9 @@ import org.apache.commons.math3.stat.regression.RegressionResults;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.extension.estimator.run.DrtEstimatorConfigGroup;
 import org.matsim.contrib.drt.fare.DrtFareParams;
@@ -16,6 +18,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.misc.OptionalTime;
 
+import java.util.Map;
 import java.util.SplittableRandom;
 
 /**
@@ -64,19 +67,21 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 
 		for (DrtEventSequenceCollector.EventSequence seq : collector.getPerformedRequestSequences().values()) {
 
-			if (seq.getPickedUp().isPresent() && seq.getDroppedOff().isPresent()) {
+			Map<Id<Person>, DrtEventSequenceCollector.EventSequence.PersonEvents> personEvents = seq.getPersonEvents();
+			for (Map.Entry<Id<Person>, DrtEventSequenceCollector.EventSequence.PersonEvents> entry : personEvents.entrySet()) {
+				if (entry.getValue().getPickedUp().isPresent() && entry.getValue().getDroppedOff().isPresent()) {
+					double waitTime = entry.getValue().getPickedUp().get().getTime() - seq.getSubmitted().getTime();
+					est.waitTime.addValue(waitTime);
 
-				double waitTime = seq.getPickedUp().get().getTime() - seq.getSubmitted().getTime();
-				est.waitTime.addValue(waitTime);
+					double unsharedTime = seq.getSubmitted().getUnsharedRideTime();
+					double travelTime = entry.getValue().getDroppedOff().get().getTime() - entry.getValue().getPickedUp().get().getTime();
 
-				double unsharedTime = seq.getSubmitted().getUnsharedRideTime();
-				double travelTime = seq.getDroppedOff().get().getTime() - seq.getPickedUp().get().getTime();
+					est.detour.addValue(travelTime / unsharedTime);
 
-				est.detour.addValue(travelTime / unsharedTime);
-
-				double fare = seq.getDrtFares().stream().mapToDouble(PersonMoneyEvent::getAmount).sum();
-				est.fare.addData(seq.getSubmitted().getUnsharedRideDistance(), fare);
-				n++;
+					double fare = seq.getDrtFares().stream().mapToDouble(PersonMoneyEvent::getAmount).sum();
+					est.fare.addData(seq.getSubmitted().getUnsharedRideDistance(), fare);
+					n++;
+				}
 			}
 		}
 

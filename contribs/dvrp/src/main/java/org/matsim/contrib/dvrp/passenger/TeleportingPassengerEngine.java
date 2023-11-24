@@ -20,10 +20,7 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
@@ -35,6 +32,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.run.DvrpModes;
@@ -120,8 +118,10 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 		//first process passenger dropoff events
 		while (!teleportedRequests.isEmpty() && teleportedRequests.peek().getLeft() <= time) {
 			PassengerRequest request = teleportedRequests.poll().getRight();
-			eventsManager.processEvent(
-					new PassengerDroppedOffEvent(time, mode, request.getId(), request.getPassengerId(), null));
+			for (Id<Person> passenger : request.getPassengerIds()) {
+				eventsManager.processEvent(
+						new PassengerDroppedOffEvent(time, mode, request.getId(), passenger, null));
+			}
 		}
 
 		//then end teleported rides
@@ -143,12 +143,12 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 		Id<Link> toLinkId = passenger.getDestinationLinkId();
 		Route route = ((Leg)((PlanAgent)passenger).getCurrentPlanElement()).getRoute();
 		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
-				passenger.getId(), route, getLink(fromLinkId), getLink(toLinkId), now, now);
-		
-		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerId()));
+				List.of(passenger.getId()), route, getLink(fromLinkId), getLink(toLinkId), now, now);
+
+		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerIds()));
 
 		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
-			Route teleportedRoute = adaptLegRouteForTeleportation(passenger, request, now);
+			Route teleportedRoute = adaptLegRouteForTeleportation(List.of(passenger), request, now);
 			eventsManager.processEvent(new PassengerPickedUpEvent(now, mode, request.getId(), passenger.getId(), null));
 			teleportationEngine.handleDeparture(now, passenger, fromLinkId);
 			teleportedRequests.add(ImmutablePair.of(now + teleportedRoute.getTravelTime().seconds(), request));
@@ -158,24 +158,26 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 			passenger.setStateToAbort(mobsimTimer.getTimeOfDay());
 			internalInterface.arrangeNextAgentState(passenger);
 		}
-		
+
 		return true;
 	}
 
-	private Route adaptLegRouteForTeleportation(MobsimPassengerAgent passenger, PassengerRequest request, double now) {
+	private Route adaptLegRouteForTeleportation(List<MobsimPassengerAgent> passengers, PassengerRequest request, double now) {
 		Route teleportedRoute = teleportedRouteCalculator.calculateRoute(request);
 
-		Leg leg = (Leg)WithinDayAgentUtils.getCurrentPlanElement(passenger);//side effect: makes the plan modifiable
-		Route originalRoute = leg.getRoute();
-		Verify.verify(originalRoute.getStartLinkId().equals(teleportedRoute.getStartLinkId()));
-		Verify.verify(originalRoute.getEndLinkId().equals(teleportedRoute.getEndLinkId()));
-		Verify.verify(teleportedRoute.getTravelTime().isDefined());
+		for (MobsimPassengerAgent passenger : passengers) {
+			Leg leg = (Leg)WithinDayAgentUtils.getCurrentPlanElement(passenger);//side effect: makes the plan modifiable
+			Route originalRoute = leg.getRoute();
+			Verify.verify(originalRoute.getStartLinkId().equals(teleportedRoute.getStartLinkId()));
+			Verify.verify(originalRoute.getEndLinkId().equals(teleportedRoute.getEndLinkId()));
+			Verify.verify(teleportedRoute.getTravelTime().isDefined());
 
-		leg.getAttributes().putAttribute(ORIGINAL_ROUTE_ATTRIBUTE, originalRoute);
-		leg.setRoute(teleportedRoute);
+			leg.getAttributes().putAttribute(ORIGINAL_ROUTE_ATTRIBUTE, originalRoute);
+			leg.setRoute(teleportedRoute);
+		}
 
 		eventsManager.processEvent(new PassengerRequestScheduledEvent(mobsimTimer.getTimeOfDay(), mode, request.getId(),
-				request.getPassengerId(), null, now, now + teleportedRoute.getTravelTime().seconds()));
+				request.getPassengerIds(), null, now, now + teleportedRoute.getTravelTime().seconds()));
 		return teleportedRoute;
 	}
 
@@ -186,19 +188,19 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 	}
 
 	@Override
-	public boolean notifyWaitForPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
+	public boolean notifyWaitForPassengers(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
 			Id<Request> requestId) {
 		throw new UnsupportedOperationException("No notifying when teleporting");
 	}
 
 	@Override
-	public boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
+	public boolean tryPickUpPassengers(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
 			Id<Request> requestId, double now) {
 		throw new UnsupportedOperationException("No picking-up when teleporting");
 	}
 
 	@Override
-	public void dropOffPassenger(MobsimDriverAgent driver, Id<Request> requestId, double now) {
+	public void dropOffPassengers(MobsimDriverAgent driver, Id<Request> requestId, double now) {
 		throw new UnsupportedOperationException("No dropping-off when teleporting");
 	}
 
