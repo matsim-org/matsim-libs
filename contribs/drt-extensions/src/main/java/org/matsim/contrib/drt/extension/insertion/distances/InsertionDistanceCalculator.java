@@ -1,5 +1,6 @@
 package org.matsim.contrib.drt.extension.insertion.distances;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.Waypoint.End;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -29,8 +31,8 @@ public class InsertionDistanceCalculator {
 
 			for (Task task : schedule.getTasks()) {
 				if (task instanceof DrtStopTask) {
-					occupancy += ((DrtStopTask) task).getPickupRequests().size();
-					occupancy -= ((DrtStopTask) task).getDropoffRequests().size();
+					occupancy += getPassengers(((DrtStopTask) task).getPickupRequests().values());
+					occupancy -= getPassengers(((DrtStopTask) task).getDropoffRequests().values());
 				}
 
 				if (task instanceof DriveTask) {
@@ -47,6 +49,10 @@ public class InsertionDistanceCalculator {
 		}
 
 		return new VehicleDistance(occupiedDistance, emptyDistance, passengerDistance);
+	}
+
+	private int getPassengers(Collection<AcceptedDrtRequest> requests) {
+		return requests.stream().mapToInt(r -> r.getPassengerIds().size()).sum();
 	}
 
 	public VehicleDistance calculateInsertionDistance(Insertion insertion, DetourTimeInfo detourTimeInfo,
@@ -102,8 +108,8 @@ public class InsertionDistanceCalculator {
 				Task task = insertion.vehicleEntry.vehicle.getSchedule().getTasks().get(index);
 
 				if (task instanceof DrtStopTask) {
-					occupancy += ((DrtStopTask) task).getPickupRequests().size();
-					occupancy -= ((DrtStopTask) task).getDropoffRequests().size();
+					occupancy += getPassengers(((DrtStopTask) task).getPickupRequests().values());
+					occupancy -= getPassengers(((DrtStopTask) task).getDropoffRequests().values());
 				}
 
 				if (task instanceof DriveTask) {
@@ -149,8 +155,8 @@ public class InsertionDistanceCalculator {
 				Task task = insertion.vehicleEntry.vehicle.getSchedule().getTasks().get(index);
 
 				if (task instanceof DrtStopTask) {
-					occupancy += ((DrtStopTask) task).getPickupRequests().size();
-					occupancy -= ((DrtStopTask) task).getDropoffRequests().size();
+					occupancy += getPassengers(((DrtStopTask) task).getPickupRequests().values());
+					occupancy -= getPassengers(((DrtStopTask) task).getDropoffRequests().values());
 				}
 
 				if (task instanceof DriveTask) {
