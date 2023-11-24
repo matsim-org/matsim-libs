@@ -1,5 +1,6 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
+import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SimpleDisposition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
@@ -73,7 +74,7 @@ public class RailsimEngineMovingBlockTest {
 //		test.debugFiles(collector, "movingBlock");
 
 		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio", 2370, 200,  0)
+			.hasTrainState("regio", 2370, 200, 0)
 			.hasTrainState("cargo", 3268, 200, 0)
 			.hasTrainState("sprinter", 3345, 200, 0);
 
@@ -85,7 +86,7 @@ public class RailsimEngineMovingBlockTest {
 		test.doStateUpdatesUntil(5_000, 1);
 
 		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("regio", 2370, 200,  0)
+			.hasTrainState("regio", 2370, 200, 0)
 			.hasTrainState("cargo", 3268, 200, 0)
 			.hasTrainState("sprinter", 3345, 200, 0);
 
@@ -102,7 +103,7 @@ public class RailsimEngineMovingBlockTest {
 //		test.debugFiles(collector, "opposite");
 
 		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("sprinter", 1559, 200,  0)
+			.hasTrainState("sprinter", 1559, 200, 0)
 			.hasTrainState("sprinter2", 1368, 200, 0);
 
 		test = getTestEngine("networkMovingBlocks.xml");
@@ -112,9 +113,41 @@ public class RailsimEngineMovingBlockTest {
 		test.doStateUpdatesUntil(2_000, 1);
 
 		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("sprinter", 1559, 200,  0)
+			.hasTrainState("sprinter", 1559, 200, 0)
 			.hasTrainState("sprinter2", 1368, 200, 0);
 
 	}
 
+	@Test
+	public void multiTrack() {
+
+		// This test increased capacity
+		RailsimTestUtils.Holder test = getTestEngine("networkMovingBlocks.xml", l -> RailsimUtils.setTrainCapacity(l, 3));
+
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "l1-2", "l6-7");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo", 60, "l1-2", "l6-7");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 120, "l1-2", "l6-7");
+
+		test.doSimStepUntil(5_000);
+//		test.debugFiles(collector, "multiTrack");
+
+		RailsimTestUtils.assertThat(collector)
+			.hasTrainState("regio", 2370, 200, 0)
+			.hasTrainState("cargo", 3268, 200, 0)
+			.hasTrainState("sprinter", 1984, 200, 0);
+
+		test = getTestEngine("networkMovingBlocks.xml", l -> RailsimUtils.setTrainCapacity(l, 3));
+
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "l1-2", "l6-7");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo", 60, "l1-2", "l6-7");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 120, "l1-2", "l6-7");
+
+		test.doStateUpdatesUntil(5_000, 1);
+
+		RailsimTestUtils.assertThat(collector)
+			.hasTrainState("regio", 2370, 200, 0)
+			.hasTrainState("cargo", 3268, 200, 0)
+			.hasTrainState("sprinter", 1984, 200, 0);
+
+	}
 }
