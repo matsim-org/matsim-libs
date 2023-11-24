@@ -103,6 +103,12 @@ public final class RailsimCalc {
 			return new SpeedTarget(finalSpeed, Double.POSITIVE_INFINITY);
 		}
 
+		// Distance could be zero, speeds must be already equal then
+		if (FuzzyUtils.equals(dist, 0)) {
+			assert FuzzyUtils.equals(currentSpeed, finalSpeed) : "Current speed must be equal to allowed speed";
+			return new SpeedTarget(finalSpeed, 0);
+		}
+
 		double timeDecel = (allowedSpeed - finalSpeed) / deceleration;
 		double distDecel = calcTraveledDist(allowedSpeed, timeDecel, -deceleration);
 

@@ -111,6 +111,7 @@ public class RailsimEngineMovingBlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter2", 400, "l6-5", "l2-1");
 
 		test.doStateUpdatesUntil(2_000, 1);
+//		test.debugFiles(collector, "opposite_detailed");
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("sprinter", 1559, 200, 0)
