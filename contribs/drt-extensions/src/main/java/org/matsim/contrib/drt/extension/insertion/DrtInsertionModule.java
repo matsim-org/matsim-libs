@@ -3,6 +3,8 @@ package org.matsim.contrib.drt.extension.insertion;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.insertion.ConfigurableCostCalculatorStrategy.SoftInsertionParams;
 import org.matsim.contrib.drt.extension.insertion.constraints.ExclusivityConstraint;
@@ -197,7 +199,7 @@ public class DrtInsertionModule extends AbstractDvrpModeQSimModule {
 		this.vehicleRangeSupplierClass = rangeSupplierClass;
 		return this;
 	}
-	
+
 	public DrtInsertionModule withRangeEstimationFactor(double rangeEstimationFactor) {
 		this.rangeEstimationFactor = rangeEstimationFactor;
 		return this;
@@ -430,8 +432,17 @@ public class DrtInsertionModule extends AbstractDvrpModeQSimModule {
 			TravelDisutility travelDisutility = new OnlyTimeDependentTravelDisutility(travelTime);
 			Network network = getter.getModal(Network.class);
 
+			printDistanceWarning();
+
 			return new RoutingDistanceCalculator(factory.createPathCalculator(network, travelDisutility, travelTime),
 					travelTime);
 		}));
+	}
+
+	private final static Logger logger = LogManager.getLogger(DrtInsertionModule.class);
+
+	private static void printDistanceWarning() {
+		logger.warn(
+				"Depending on your configruation, distance-based objectives and constraints may be very impacting on performance. The features should be considered experimental. See discussion of #2947 on Github.");
 	}
 }
