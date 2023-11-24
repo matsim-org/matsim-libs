@@ -20,6 +20,7 @@
 
 package org.matsim.analysis;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -48,31 +49,31 @@ import org.matsim.core.utils.charts.StackedBarChart;
  */
 public class PHbyModeCalculator {
 
-    private final Map<Integer,Map<String,TravelTimeAndWaitTime>> phtPerIteration = new TreeMap<>();
-    private final boolean writePng;
-    private final OutputDirectoryHierarchy controllerIO;
+	private final Map<Integer,Map<String,TravelTimeAndWaitTime>> phtPerIteration = new TreeMap<>();
+	private final boolean writePng;
+	private final OutputDirectoryHierarchy controllerIO;
 		private final String delimiter;
-    private final static String FILENAME = "ph_modestats";
+	private final static String FILENAME = "ph_modestats";
 
-    private static final String TRAVEL_TIME_SUFFIX = "_travel";
-    private static final String WAIT_TIME_SUFFIX = "_wait";
-    private static final String STAGE_ACTIVITY = "stageActivity";
+	private static final String TRAVEL_TIME_SUFFIX = "_travel";
+	private static final String WAIT_TIME_SUFFIX = "_wait";
+	private static final String STAGE_ACTIVITY = "stageActivity";
 
-    @Inject
-    PHbyModeCalculator(ControllerConfigGroup controllerConfigGroup, OutputDirectoryHierarchy controllerIO, GlobalConfigGroup globalConfig) {
-        this.writePng = controllerConfigGroup.isCreateGraphs();
-        this.controllerIO = controllerIO;
-        this.delimiter = globalConfig.getDefaultDelimiter();
-    }
+	@Inject
+	PHbyModeCalculator(ControllerConfigGroup controllerConfigGroup, OutputDirectoryHierarchy controllerIO, GlobalConfigGroup globalConfig) {
+		this.writePng = controllerConfigGroup.isCreateGraphs();
+		this.controllerIO = controllerIO;
+		this.delimiter = globalConfig.getDefaultDelimiter();
+	}
 
-    void addIteration(int iteration, IdMap<Person, Plan> map) {
-        Map<String,TravelTimeAndWaitTime> phtbyMode = map.values()
-                .parallelStream()
-                .flatMap(plan -> plan.getPlanElements().stream())
-                .map(PHbyModeCalculator::mapPlanElementToEntry)
-                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue, TravelTimeAndWaitTime::sum));
-        phtPerIteration.put(iteration,phtbyMode);
-    }
+	void addIteration(int iteration, IdMap<Person, Plan> map) {
+		Map<String,TravelTimeAndWaitTime> phtbyMode = map.values()
+				.parallelStream()
+				.flatMap(plan -> plan.getPlanElements().stream())
+				.map(PHbyModeCalculator::mapPlanElementToEntry)
+				.collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue, TravelTimeAndWaitTime::sum));
+		phtPerIteration.put(iteration,phtbyMode);
+	}
 
 	private static AbstractMap.SimpleEntry<String, TravelTimeAndWaitTime> mapPlanElementToEntry(PlanElement pe) {
 		if (pe instanceof Leg leg) {
@@ -105,19 +106,21 @@ public class PHbyModeCalculator {
 		return new AbstractMap.SimpleEntry<>(STAGE_ACTIVITY, new TravelTimeAndWaitTime(0.0, 0.0));
 	}
 
-    void writeOutput() {
+	void writeOutput() {
 		writeCsv();
 		if(writePng){
 			writePng();
 		}
-    }
+	}
 
 	private void writeCsv() {
 		TreeSet<String> allModes = getAllModes();
 		try {
-			CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(controllerIO.getOutputFilename( FILENAME+ ".csv"))), CSVFormat.DEFAULT.withDelimiter(this.delimiter.charAt(0)));
+			BufferedWriter writer = Files.newBufferedWriter(Paths.get(controllerIO.getOutputFilename(FILENAME + ".csv")));
+			CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.Builder.create().setDelimiter((this.delimiter.charAt(0))).build());
 			writeHeader(csvPrinter, allModes);
 			writeValues(csvPrinter, allModes);
+			csvPrinter.close();
 		} catch (IOException e) {
 			LogManager.getLogger(getClass()).error("Could not write PH Modestats.");
 		}
@@ -179,8 +182,8 @@ public class PHbyModeCalculator {
 
 	private record TravelTimeAndWaitTime(double travelTime, double waitTime){
 		private static TravelTimeAndWaitTime sum(TravelTimeAndWaitTime object1, TravelTimeAndWaitTime object2) {
-    		return new TravelTimeAndWaitTime(object1.travelTime + object2.travelTime, object1.waitTime + object2.waitTime);
-    	}
-    }
+			return new TravelTimeAndWaitTime(object1.travelTime + object2.travelTime, object1.waitTime + object2.waitTime);
+		}
+	}
 }
 

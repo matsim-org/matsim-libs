@@ -56,6 +56,7 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
 
     @Inject
     Scenario scenario;
+
 	@Inject
 	private ExperiencedPlansService experiencedPlansService;
 
