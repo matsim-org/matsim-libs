@@ -71,7 +71,20 @@ public class SkillsConstraint implements DrtInsertionConstraint {
 
 		public RequestRequirementsSupplier build() {
 			var data = builder.build();
-			return r -> data.get(r.getPassengerId());
+
+			return request -> {
+				ImmutableSet.Builder<String> builder = ImmutableSet.builder();
+
+				for (Id<Person> passengerId : request.getPassengerIds()) {
+					var passengerRequirements = data.get(passengerId);
+
+					if (passengerRequirements != null) {
+						builder.addAll(passengerRequirements);
+					}
+				}
+
+				return builder.build();
+			};
 		}
 	}
 }

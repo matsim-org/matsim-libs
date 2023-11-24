@@ -1,5 +1,6 @@
 package org.matsim.contrib.drt.extension.insertion.constraints;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdSet;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.extension.insertion.DrtInsertionConstraint;
@@ -16,11 +17,17 @@ public class SingleRequestConstraint
 
 	@Override
 	public boolean checkInsertion(DrtRequest drtRequest, Insertion insertion, DetourTimeInfo detourTimeInfo) {
-		return !observedPersons.contains(drtRequest.getPassengerId());
+		for (Id<Person> passengerId : drtRequest.getPassengerIds()) {
+			if (observedPersons.contains(passengerId)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	@Override
 	public void handleEvent(PassengerRequestSubmittedEvent event) {
-		observedPersons.add(event.getPersonId());
+		observedPersons.addAll(event.getPersonIds());
 	}
 }
