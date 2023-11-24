@@ -51,6 +51,7 @@ public final class RailsimCalc {
 
 	/**
 	 * Calculate time needed to advance distance {@code dist}. Depending on acceleration and max speed.
+	 * If dist can never be reached, will return time needed to stop.
 	 */
 	static double calcRequiredTime(TrainState state, double dist) {
 
@@ -86,7 +87,7 @@ public final class RailsimCalc {
 			} else if (dist <= max) {
 				return solveTraveledDist(state.speed, dist, state.acceleration);
 			} else
-				return Double.POSITIVE_INFINITY;
+				return decelTime;
 		}
 	}
 

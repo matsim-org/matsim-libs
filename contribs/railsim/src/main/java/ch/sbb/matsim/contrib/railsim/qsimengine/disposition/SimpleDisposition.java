@@ -95,11 +95,15 @@ public class SimpleDisposition implements TrainDisposition {
 			}
 		 */
 
-		// TODO: for moving block the logic might needs to be changed
 		double reserveDist = resources.tryBlockLink(time, currentLink, RailResourceManager.ANY_TRACK, position);
 
 		if (reserveDist == RailResource.NO_RESERVATION)
 			return new DispositionResponse(0, 0, null);
+
+		// current link only partial reserved
+		if (reserveDist < currentLink.length) {
+			return new DispositionResponse(reserveDist - position.getHeadPosition(), 0, null);
+		}
 
 		// remove already used distance
 		reserveDist -= position.getHeadPosition();
@@ -123,7 +127,7 @@ public class SimpleDisposition implements TrainDisposition {
 			reserveDist += dist;
 
 			// If the link is not fully reserved then stop
-			// TODO: there might be a better advised speed
+			// there might be a better advised speed (speed of train in-front)
 			if (dist < link.getLength()) {
 				stop = true;
 				break;

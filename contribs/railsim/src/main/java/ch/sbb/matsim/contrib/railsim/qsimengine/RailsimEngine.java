@@ -213,10 +213,8 @@ final class RailsimEngine implements Steppable {
 
 		boolean allBlocked = blockLinkTracks(time, state);
 
-		// TODO: this might depend on the reserved distance and not the whole link
-
-		// Driver can advance if the next link is already free
-		if (allBlocked || (nextLink != null && resources.isBlockedBy(nextLink, state))) {
+		// Driver can advance if there is approved distance
+		if (allBlocked || FuzzyUtils.greaterThan(state.approvedDist, 0)) {
 
 			if (allBlocked)
 				event.checkReservation = -1;
@@ -224,8 +222,11 @@ final class RailsimEngine implements Steppable {
 				event.checkReservation = time + config.pollInterval;
 			}
 
-			// Train already waits at the end of previous link
-			if (event.waitingForLink) {
+			// Train already waits at the end of previous link, next link is already blocked
+			if (event.waitingForLink &&
+				nextLink != null &&
+				resources.isBlockedBy(nextLink, state) &&
+				FuzzyUtils.equals(resources.getLink(state.headLink).length, state.headPosition)) {
 
 				enterLink(time, event);
 				event.waitingForLink = false;
@@ -243,7 +244,7 @@ final class RailsimEngine implements Steppable {
 			event.checkReservation = time + config.pollInterval;
 
 			// If train is already standing still and waiting, there is no update needed.
-			if (event.waitingForLink) {
+			if (event.waitingForLink && FuzzyUtils.equals(state.speed, 0)) {
 				event.plannedTime = time + config.pollInterval;
 			} else {
 				decideNextUpdate(event);
@@ -340,7 +341,7 @@ final class RailsimEngine implements Steppable {
 			state.approvedSpeed = 0;
 
 		// Return whether the train has to stop
-		return response.approvedSpeed() != 0;
+		return state.approvedSpeed != 0;
 	}
 
 	private void enterLink(double time, UpdateEvent event) {
@@ -401,15 +402,14 @@ final class RailsimEngine implements Steppable {
 		createEvent(new LinkLeaveEvent(time, state.driver.getVehicle().getId(), state.headLink));
 
 		// Get link and increment
-		state.headPosition = 0;
 		state.headLink = state.route.get(state.routeIdx++).getLinkId();
+
+		assert resources.isBlockedBy(resources.getLink(state.headLink), state) : "Link has to be blocked by driver when entered";
+
+		state.headPosition = 0;
 
 		state.driver.notifyMoveOverNode(state.headLink);
 		createEvent(new LinkEnterEvent(time, state.driver.getVehicle().getId(), state.headLink));
-
-		RailLink link = resources.getLink(state.headLink);
-
-		assert resources.isBlockedBy(link, state) : "Link has to be blocked by driver when entered";
 
 		decideTargetSpeed(event, state);
 
@@ -576,17 +576,14 @@ final class RailsimEngine implements Steppable {
 				reserveDist = state.approvedDist - requiredDist;
 			}
 
+			// With moving blocks the reserve distance might not be set to 0, but rather the accel or decel distance
 			if (reserveDist < 0)
 				reserveDist = 0;
 
 			// Outside of block track the reserve distance is always greater 0
 			// infinite loops would occur otherwise
 			if (!(event.type != UpdateEvent.Type.BLOCK_TRACK || FuzzyUtils.greaterThan(reserveDist, 0))) {
-				// TODO: this will lead to polling, which can happen with moving block
-				// probably should be handled at different place
-
-				reserveDist = 100;
-//				throw new AssertionError("Reserve distance must be positive, but was " + reserveDist);
+				throw new AssertionError("Reserve distance must be positive, but was " + reserveDist);
 			}
 		}
 
