@@ -56,7 +56,6 @@ public class TestSiouxFalls {
 
 		controller.run();
 
-
 		System.out.println((int) listener.counts.get("pt"));
 		System.out.println((int) listener.counts.get("car"));
 		System.out.println(listener.counts.get("walk"));
