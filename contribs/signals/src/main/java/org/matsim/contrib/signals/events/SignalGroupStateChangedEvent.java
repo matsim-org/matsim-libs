@@ -20,58 +20,56 @@
 package org.matsim.contrib.signals.events;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 
-
 /**
  * @author dgrether
- *
  */
 public final class SignalGroupStateChangedEvent extends Event {
-	
-	public final static String EVENT_TYPE = "signalGroupStateChangedEvent";
-	
-	public final static String ATTRIBUTE_SIGNALSYSTEM_ID = "signalSystemId";
-	public final static String ATTRIBUTE_SIGNALGROUP_ID = "signalGroupId";
-	public final static String ATTRIBUTE_SIGNALGROUP_STATE = "signalGroupState";
-	
-	private SignalGroupState newState;
-	private Id<SignalGroup> signalGroupId;
-	private Id<SignalSystem> signalSystemId;
 
-	public SignalGroupStateChangedEvent(double time, Id<SignalSystem> systemId, Id<SignalGroup> groupId, SignalGroupState newState) {
-		super(time);
-		this.signalSystemId = systemId;
-		this.signalGroupId = groupId;
-		this.newState = newState;
-	}
-	
-	public Id<SignalGroup> getSignalGroupId() {
-		return signalGroupId;
-	}
-	
-	public Id<SignalSystem> getSignalSystemId() {
-		return signalSystemId;
-	}
+  public static final String EVENT_TYPE = "signalGroupStateChangedEvent";
 
-	public SignalGroupState getNewState() {
-		return this.newState;
-	}
-	
-	public String getEventType() {
-		return SignalGroupStateChangedEvent.EVENT_TYPE;
-	}
-	
-	public Map<String, String> getAttributes() {
-		Map<String, String> m = super.getAttributes();
-		m.put(ATTRIBUTE_SIGNALSYSTEM_ID, this.signalSystemId.toString());
-		m.put(ATTRIBUTE_SIGNALGROUP_ID, this.signalGroupId.toString());
-		m.put(ATTRIBUTE_SIGNALGROUP_STATE, this.newState.toString());
-		return m;
-	}
+  public static final String ATTRIBUTE_SIGNALSYSTEM_ID = "signalSystemId";
+  public static final String ATTRIBUTE_SIGNALGROUP_ID = "signalGroupId";
+  public static final String ATTRIBUTE_SIGNALGROUP_STATE = "signalGroupState";
+
+  private SignalGroupState newState;
+  private Id<SignalGroup> signalGroupId;
+  private Id<SignalSystem> signalSystemId;
+
+  public SignalGroupStateChangedEvent(
+      double time, Id<SignalSystem> systemId, Id<SignalGroup> groupId, SignalGroupState newState) {
+    super(time);
+    this.signalSystemId = systemId;
+    this.signalGroupId = groupId;
+    this.newState = newState;
+  }
+
+  public Id<SignalGroup> getSignalGroupId() {
+    return signalGroupId;
+  }
+
+  public Id<SignalSystem> getSignalSystemId() {
+    return signalSystemId;
+  }
+
+  public SignalGroupState getNewState() {
+    return this.newState;
+  }
+
+  public String getEventType() {
+    return SignalGroupStateChangedEvent.EVENT_TYPE;
+  }
+
+  public Map<String, String> getAttributes() {
+    Map<String, String> m = super.getAttributes();
+    m.put(ATTRIBUTE_SIGNALSYSTEM_ID, this.signalSystemId.toString());
+    m.put(ATTRIBUTE_SIGNALGROUP_ID, this.signalGroupId.toString());
+    m.put(ATTRIBUTE_SIGNALGROUP_STATE, this.newState.toString());
+    return m;
+  }
 }

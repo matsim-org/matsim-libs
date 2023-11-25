@@ -21,53 +21,53 @@
 package org.matsim.deprecated.scoring.functions;
 
 import org.matsim.core.scoring.functions.ScoringParameters;
-import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.MoneyScoring;
 
 /**
- * This is a re-implementation of the original CharyparNagel function, based on a
- * modular approach.
+ * This is a re-implementation of the original CharyparNagel function, based on a modular approach.
+ *
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant should be used.  kai, aug'18
+@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant
+// should be used.  kai, aug'18
 public class CharyparNagelMoneyScoring implements MoneyScoring {
 
-	private static final double INITIAL_SCORE = 0.0;
+  private static final double INITIAL_SCORE = 0.0;
 
-	private double score;
+  private double score;
 
-	private final double marginalUtilityOfMoney;
-	
-	@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant should be used.  kai, aug'18
-	public CharyparNagelMoneyScoring(final ScoringParameters params) {
-		this.marginalUtilityOfMoney = params.marginalUtilityOfMoney;
-		this.reset();
-	}
-	
-	@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant should be used.  kai, aug'18
-	public CharyparNagelMoneyScoring(final double marginalUtilityOfMoney) {
-		this.marginalUtilityOfMoney = marginalUtilityOfMoney;
-		this.reset();
-	}
+  private final double marginalUtilityOfMoney;
 
-	@Override
-	public void reset() {
-		this.score = INITIAL_SCORE;
-	}
+  @Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant
+  // should be used.  kai, aug'18
+  public CharyparNagelMoneyScoring(final ScoringParameters params) {
+    this.marginalUtilityOfMoney = params.marginalUtilityOfMoney;
+    this.reset();
+  }
 
-	@Override
-	public void addMoney(final double amount) {
-		this.score += amount * this.marginalUtilityOfMoney ; // linear mapping of money to score
-	}
+  @Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant
+  // should be used.  kai, aug'18
+  public CharyparNagelMoneyScoring(final double marginalUtilityOfMoney) {
+    this.marginalUtilityOfMoney = marginalUtilityOfMoney;
+    this.reset();
+  }
 
-	@Override
-	public void finish() {
-	}
+  @Override
+  public void reset() {
+    this.score = INITIAL_SCORE;
+  }
 
-	@Override
-	public double getScore() {
-		return this.score;
-	}
+  @Override
+  public void addMoney(final double amount) {
+    this.score += amount * this.marginalUtilityOfMoney; // linear mapping of money to score
+  }
 
+  @Override
+  public void finish() {}
+
+  @Override
+  public double getScore() {
+    return this.score;
+  }
 }

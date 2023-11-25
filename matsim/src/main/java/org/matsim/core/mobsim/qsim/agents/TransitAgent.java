@@ -21,7 +21,6 @@
 package org.matsim.core.mobsim.qsim.agents;
 
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -47,169 +46,210 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author mrieser
  */
-public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent, HasPerson, HasModifiablePlan {
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(TransitAgent.class);
+public final class TransitAgent
+    implements MobsimDriverPassengerAgent, PlanAgent, HasPerson, HasModifiablePlan {
+  @SuppressWarnings("unused")
+  private static final Logger log = LogManager.getLogger(TransitAgent.class);
 
-	private BasicPlanAgentImpl basicAgentDelegate ;
-	private PlanBasedDriverAgentImpl driverAgentDelegate ;
-	private TransitAgentImpl transitAgentDelegate ;
+  private BasicPlanAgentImpl basicAgentDelegate;
+  private PlanBasedDriverAgentImpl driverAgentDelegate;
+  private TransitAgentImpl transitAgentDelegate;
 
-	public static TransitAgent createTransitAgent(Person p, Netsim simulation, TimeInterpretation timeInterpretation) {
-		TransitAgent agent = new TransitAgent(p, simulation, timeInterpretation);
-		return agent;
-	}
+  public static TransitAgent createTransitAgent(
+      Person p, Netsim simulation, TimeInterpretation timeInterpretation) {
+    TransitAgent agent = new TransitAgent(p, simulation, timeInterpretation);
+    return agent;
+  }
 
-	private TransitAgent(final Person p, final Netsim simulation, TimeInterpretation timeInterpretation) {
-		basicAgentDelegate = new BasicPlanAgentImpl( p.getSelectedPlan(), simulation.getScenario(), simulation.getEventsManager(), 
-				simulation.getSimTimer(), timeInterpretation ) ;
-		driverAgentDelegate = new PlanBasedDriverAgentImpl( basicAgentDelegate ) ;
-		transitAgentDelegate = new TransitAgentImpl( basicAgentDelegate, simulation.getScenario().getConfig().transit().getBoardingAcceptance() );
-	}
+  private TransitAgent(
+      final Person p, final Netsim simulation, TimeInterpretation timeInterpretation) {
+    basicAgentDelegate =
+        new BasicPlanAgentImpl(
+            p.getSelectedPlan(),
+            simulation.getScenario(),
+            simulation.getEventsManager(),
+            simulation.getSimTimer(),
+            timeInterpretation);
+    driverAgentDelegate = new PlanBasedDriverAgentImpl(basicAgentDelegate);
+    transitAgentDelegate =
+        new TransitAgentImpl(
+            basicAgentDelegate,
+            simulation.getScenario().getConfig().transit().getBoardingAcceptance());
+  }
 
-	@Override
-	public final void endLegAndComputeNextState(double now) {
-		basicAgentDelegate.endLegAndComputeNextState(now);
-	}
-	@Override
-	public final void setStateToAbort(double now) {
-		basicAgentDelegate.setStateToAbort(now);
-	}
-	@Override
-	public final void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
-		basicAgentDelegate.notifyArrivalOnLinkByNonNetworkMode(linkId);
-	}
-	@Override
-	public final void endActivityAndComputeNextState(double now) {
-		basicAgentDelegate.endActivityAndComputeNextState(now);
-	}
-	@Override
-	public final Id<Vehicle> getPlannedVehicleId() {
-		return basicAgentDelegate.getPlannedVehicleId();
-	}
-	@Override
-	public final String getMode() {
-		return basicAgentDelegate.getMode();
-	}
-	@Override
-	public String toString() {
-		return basicAgentDelegate.toString();
-	}
-	@Override
-	public final OptionalTime getExpectedTravelTime() {
-		return basicAgentDelegate.getExpectedTravelTime();
-	}
-	@Override
-	public final Double getExpectedTravelDistance() {
-		return basicAgentDelegate.getExpectedTravelDistance();
-	}	
-	@Override
-	public final PlanElement getCurrentPlanElement() {
-		return basicAgentDelegate.getCurrentPlanElement();
-	}
-	@Override
-	public final PlanElement getNextPlanElement() {
-		return basicAgentDelegate.getNextPlanElement();
-	}
-	@Override
-	public final Plan getCurrentPlan() {
-		return basicAgentDelegate.getCurrentPlan();
-	}
-	@Override
-	public final Id<Person> getId() {
-		return basicAgentDelegate.getId();
-	}
-	@Override
-	public final Person getPerson() {
-		return basicAgentDelegate.getPerson();
-	}
-	@Override
-	public final MobsimVehicle getVehicle() {
-		return basicAgentDelegate.getVehicle();
-	}
-	@Override
-	public final void setVehicle(MobsimVehicle vehicle) {
-		basicAgentDelegate.setVehicle(vehicle);
-	}
-	@Override
-	public final Id<Link> getCurrentLinkId() {
-		return basicAgentDelegate.getCurrentLinkId();
-	}
-	@Override
-	public final Id<Link> getDestinationLinkId() {
-		return basicAgentDelegate.getDestinationLinkId();
-	}
-	@Override
-	public final double getActivityEndTime() {
-		return basicAgentDelegate.getActivityEndTime();
-	}
-	@Override
-	public final State getState() {
-		return basicAgentDelegate.getState();
-	}
-	@Override
-	public final void notifyMoveOverNode(Id<Link> newLinkId) {
-		driverAgentDelegate.notifyMoveOverNode(newLinkId);
-	}
-	@Override
-	public final Id<Link> chooseNextLinkId() {
-		return driverAgentDelegate.chooseNextLinkId();
-	}
-	@Override
-	public final boolean isWantingToArriveOnCurrentLink() {
-		return driverAgentDelegate.isWantingToArriveOnCurrentLink();
-	}
-	@Override
-	public final boolean getExitAtStop(TransitStopFacility stop) {
-		return transitAgentDelegate.getExitAtStop(stop);
-	}
-	@Override
-	public final boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute, List<TransitRouteStop> stopsToCome,
-			TransitVehicle transitVehicle) {
-		return transitAgentDelegate.getEnterTransitRoute(line, transitRoute, stopsToCome, transitVehicle);
-	}
-	@Override
-	public final double getWeight() {
-		return transitAgentDelegate.getWeight();
-	}
-	@Override
-	public final Id<TransitStopFacility> getDesiredAccessStopId() {
-		return transitAgentDelegate.getDesiredAccessStopId();
-	}
-	@Override
-	public final Id<TransitStopFacility> getDesiredDestinationStopId() {
-		return transitAgentDelegate.getDesiredDestinationStopId();
-	}
+  @Override
+  public final void endLegAndComputeNextState(double now) {
+    basicAgentDelegate.endLegAndComputeNextState(now);
+  }
 
-	@Override
-	public final PlanElement getPreviousPlanElement() {
-		return this.basicAgentDelegate.getPreviousPlanElement();
-	}
+  @Override
+  public final void setStateToAbort(double now) {
+    basicAgentDelegate.setStateToAbort(now);
+  }
 
-	@Override
-	public Facility getCurrentFacility() {
-		return this.basicAgentDelegate.getCurrentFacility();
-	}
+  @Override
+  public final void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
+    basicAgentDelegate.notifyArrivalOnLinkByNonNetworkMode(linkId);
+  }
 
-	@Override
-	public Facility getDestinationFacility() {
-		return this.basicAgentDelegate.getDestinationFacility();
-	}
+  @Override
+  public final void endActivityAndComputeNextState(double now) {
+    basicAgentDelegate.endActivityAndComputeNextState(now);
+  }
 
-	@Override
-	public Plan getModifiablePlan() {
-		return this.basicAgentDelegate.getModifiablePlan();
-	}
+  @Override
+  public final Id<Vehicle> getPlannedVehicleId() {
+    return basicAgentDelegate.getPlannedVehicleId();
+  }
 
-	@Override
-	public void resetCaches() {
-		this.basicAgentDelegate.resetCaches();
-		this.driverAgentDelegate.resetCaches();
-	}
+  @Override
+  public final String getMode() {
+    return basicAgentDelegate.getMode();
+  }
 
-	@Override
-	public int getCurrentLinkIndex() {
-		return this.basicAgentDelegate.getCurrentLinkIndex();
-	}
+  @Override
+  public String toString() {
+    return basicAgentDelegate.toString();
+  }
 
+  @Override
+  public final OptionalTime getExpectedTravelTime() {
+    return basicAgentDelegate.getExpectedTravelTime();
+  }
+
+  @Override
+  public final Double getExpectedTravelDistance() {
+    return basicAgentDelegate.getExpectedTravelDistance();
+  }
+
+  @Override
+  public final PlanElement getCurrentPlanElement() {
+    return basicAgentDelegate.getCurrentPlanElement();
+  }
+
+  @Override
+  public final PlanElement getNextPlanElement() {
+    return basicAgentDelegate.getNextPlanElement();
+  }
+
+  @Override
+  public final Plan getCurrentPlan() {
+    return basicAgentDelegate.getCurrentPlan();
+  }
+
+  @Override
+  public final Id<Person> getId() {
+    return basicAgentDelegate.getId();
+  }
+
+  @Override
+  public final Person getPerson() {
+    return basicAgentDelegate.getPerson();
+  }
+
+  @Override
+  public final MobsimVehicle getVehicle() {
+    return basicAgentDelegate.getVehicle();
+  }
+
+  @Override
+  public final void setVehicle(MobsimVehicle vehicle) {
+    basicAgentDelegate.setVehicle(vehicle);
+  }
+
+  @Override
+  public final Id<Link> getCurrentLinkId() {
+    return basicAgentDelegate.getCurrentLinkId();
+  }
+
+  @Override
+  public final Id<Link> getDestinationLinkId() {
+    return basicAgentDelegate.getDestinationLinkId();
+  }
+
+  @Override
+  public final double getActivityEndTime() {
+    return basicAgentDelegate.getActivityEndTime();
+  }
+
+  @Override
+  public final State getState() {
+    return basicAgentDelegate.getState();
+  }
+
+  @Override
+  public final void notifyMoveOverNode(Id<Link> newLinkId) {
+    driverAgentDelegate.notifyMoveOverNode(newLinkId);
+  }
+
+  @Override
+  public final Id<Link> chooseNextLinkId() {
+    return driverAgentDelegate.chooseNextLinkId();
+  }
+
+  @Override
+  public final boolean isWantingToArriveOnCurrentLink() {
+    return driverAgentDelegate.isWantingToArriveOnCurrentLink();
+  }
+
+  @Override
+  public final boolean getExitAtStop(TransitStopFacility stop) {
+    return transitAgentDelegate.getExitAtStop(stop);
+  }
+
+  @Override
+  public final boolean getEnterTransitRoute(
+      TransitLine line,
+      TransitRoute transitRoute,
+      List<TransitRouteStop> stopsToCome,
+      TransitVehicle transitVehicle) {
+    return transitAgentDelegate.getEnterTransitRoute(
+        line, transitRoute, stopsToCome, transitVehicle);
+  }
+
+  @Override
+  public final double getWeight() {
+    return transitAgentDelegate.getWeight();
+  }
+
+  @Override
+  public final Id<TransitStopFacility> getDesiredAccessStopId() {
+    return transitAgentDelegate.getDesiredAccessStopId();
+  }
+
+  @Override
+  public final Id<TransitStopFacility> getDesiredDestinationStopId() {
+    return transitAgentDelegate.getDesiredDestinationStopId();
+  }
+
+  @Override
+  public final PlanElement getPreviousPlanElement() {
+    return this.basicAgentDelegate.getPreviousPlanElement();
+  }
+
+  @Override
+  public Facility getCurrentFacility() {
+    return this.basicAgentDelegate.getCurrentFacility();
+  }
+
+  @Override
+  public Facility getDestinationFacility() {
+    return this.basicAgentDelegate.getDestinationFacility();
+  }
+
+  @Override
+  public Plan getModifiablePlan() {
+    return this.basicAgentDelegate.getModifiablePlan();
+  }
+
+  @Override
+  public void resetCaches() {
+    this.basicAgentDelegate.resetCaches();
+    this.driverAgentDelegate.resetCaches();
+  }
+
+  @Override
+  public int getCurrentLinkIndex() {
+    return this.basicAgentDelegate.getCurrentLinkIndex();
+  }
 }

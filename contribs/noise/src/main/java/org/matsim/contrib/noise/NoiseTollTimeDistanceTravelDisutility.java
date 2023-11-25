@@ -25,43 +25,49 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.vehicles.Vehicle;
 
 /**
-* @author ikaddoura
-*/
+ * @author ikaddoura
+ */
 class NoiseTollTimeDistanceTravelDisutility implements TravelDisutility {
 
-	private final TravelDisutility travelDisutilityDelegate;
-	private final TravelDisutility tollDisutilityDelegate;
-	private final double marginalUtilityOfMoney;
-	private final boolean usingRandomization;
+  private final TravelDisutility travelDisutilityDelegate;
+  private final TravelDisutility tollDisutilityDelegate;
+  private final double marginalUtilityOfMoney;
+  private final boolean usingRandomization;
 
-	NoiseTollTimeDistanceTravelDisutility( TravelDisutility travelDisutilityDelegate, TravelDisutility tollDisutilityDelegate, double marginalUtilityOfMoney,
-					       boolean usingRandomization ) {
+  NoiseTollTimeDistanceTravelDisutility(
+      TravelDisutility travelDisutilityDelegate,
+      TravelDisutility tollDisutilityDelegate,
+      double marginalUtilityOfMoney,
+      boolean usingRandomization) {
 
-		this.travelDisutilityDelegate = travelDisutilityDelegate;
-		this.tollDisutilityDelegate = tollDisutilityDelegate;
-		this.marginalUtilityOfMoney = marginalUtilityOfMoney;
-		this.usingRandomization = usingRandomization;
-	}
+    this.travelDisutilityDelegate = travelDisutilityDelegate;
+    this.tollDisutilityDelegate = tollDisutilityDelegate;
+    this.marginalUtilityOfMoney = marginalUtilityOfMoney;
+    this.usingRandomization = usingRandomization;
+  }
 
-	@Override
-	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
+  @Override
+  public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
 
-		double randomizedTimeDistanceDisutilityForLink = this.travelDisutilityDelegate.getLinkTravelDisutility(link, time, person, vehicle );
+    double randomizedTimeDistanceDisutilityForLink =
+        this.travelDisutilityDelegate.getLinkTravelDisutility(link, time, person, vehicle);
 
-		double logNormalRnd = 1. ;
-		if ( usingRandomization) {
-			logNormalRnd = (double) person.getCustomAttributes().get("logNormalRnd") ;
-		}
+    double logNormalRnd = 1.;
+    if (usingRandomization) {
+      logNormalRnd = (double) person.getCustomAttributes().get("logNormalRnd");
+    }
 
-		double linkExpectedTollDisutility = this.marginalUtilityOfMoney * tollDisutilityDelegate.getLinkTravelDisutility(link, time, person, vehicle );
-		double randomizedTollDisutility = linkExpectedTollDisutility * logNormalRnd;
+    double linkExpectedTollDisutility =
+        this.marginalUtilityOfMoney
+            * tollDisutilityDelegate.getLinkTravelDisutility(link, time, person, vehicle);
+    double randomizedTollDisutility = linkExpectedTollDisutility * logNormalRnd;
 
-		return randomizedTimeDistanceDisutilityForLink + randomizedTollDisutility;
-	}
+    return randomizedTimeDistanceDisutilityForLink + randomizedTollDisutility;
+  }
 
-	@Override
-	public double getLinkMinimumTravelDisutility(Link link) {
-		return travelDisutilityDelegate.getLinkMinimumTravelDisutility( link ) + tollDisutilityDelegate.getLinkMinimumTravelDisutility( link );
-	}
+  @Override
+  public double getLinkMinimumTravelDisutility(Link link) {
+    return travelDisutilityDelegate.getLinkMinimumTravelDisutility(link)
+        + tollDisutilityDelegate.getLinkMinimumTravelDisutility(link);
+  }
 }
-

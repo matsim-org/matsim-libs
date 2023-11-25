@@ -23,7 +23,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,77 +40,81 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
- *
  * Tests the functionality of adding subsidies to the operator's score.
  *
-* @author ikaddoura
-*/
-
+ * @author ikaddoura
+ */
 public class SubsidyTestIT implements TabularFileHandler {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private final ArrayList<String[]> pStatsResults = new ArrayList<>();
+  private final ArrayList<String[]> pStatsResults = new ArrayList<>();
 
-	@Test
-	public final void testSubsidyPControler() {
+  @Test
+  public final void testSubsidyPControler() {
 
-		Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config.xml", new PConfigGroup() ) ;
+    Config config =
+        ConfigUtils.loadConfig(utils.getClassInputDirectory() + "config.xml", new PConfigGroup());
 
-		PConfigGroup pConfig = (PConfigGroup) config.getModules().get(PConfigGroup.GROUP_NAME);
-		pConfig.setSubsidyApproach("perPassenger");
-		String gridScenarioDirectory ="../../example-scenario/input/";
-		config.network().setInputFile(gridScenarioDirectory  + "network.xml");
-		config.transit().setVehiclesFile(gridScenarioDirectory + "transitVehicles.xml");
-		config.transit().setTransitScheduleFile(gridScenarioDirectory + "transitSchedule_10min.xml");
-		config.plans().setInputFile(gridScenarioDirectory + "population_1000_per_hour_each_from_6_to_10.xml.gz");
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		config.controller().setWriteEventsInterval(0);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
+    PConfigGroup pConfig = (PConfigGroup) config.getModules().get(PConfigGroup.GROUP_NAME);
+    pConfig.setSubsidyApproach("perPassenger");
+    String gridScenarioDirectory = "../../example-scenario/input/";
+    config.network().setInputFile(gridScenarioDirectory + "network.xml");
+    config.transit().setVehiclesFile(gridScenarioDirectory + "transitVehicles.xml");
+    config.transit().setTransitScheduleFile(gridScenarioDirectory + "transitSchedule_10min.xml");
+    config
+        .plans()
+        .setInputFile(gridScenarioDirectory + "population_1000_per_hour_each_from_6_to_10.xml.gz");
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
+    config.controller().setWriteEventsInterval(0);
+    Scenario scenario = ScenarioUtils.loadScenario(config);
+    Controler controler = new Controler(scenario);
 
-		controler.getConfig().controller().setCreateGraphs(true);
+    controler.getConfig().controller().setCreateGraphs(true);
 
-		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+    controler
+        .getConfig()
+        .controller()
+        .setOverwriteFileSetting(
+            OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
-		controler.addOverridingModule(new PModule()) ;
-		controler.run();
+    controler.addOverridingModule(new PModule());
+    controler.run();
 
-		// Check standard output files
+    // Check standard output files
 
-		List<String> filesToCheckFor = new LinkedList<>();
-		filesToCheckFor.add(utils.getOutputDirectory() + "0.actsFromParatransitUsers.txt");
-		filesToCheckFor.add(utils.getOutputDirectory() + "pOperatorLogger.txt");
-		filesToCheckFor.add(utils.getOutputDirectory() + "pStats.txt");
-		filesToCheckFor.add(utils.getOutputDirectory() + "scorestats.csv");
-		filesToCheckFor.add(utils.getOutputDirectory() + "stopwatch.csv");
-		filesToCheckFor.add(utils.getOutputDirectory() + "traveldistancestats.csv");
-		filesToCheckFor.add(utils.getOutputDirectory() + "pStat_light.gexf.gz");
-		filesToCheckFor.add(utils.getOutputDirectory() + "pStat.gexf.gz");
+    List<String> filesToCheckFor = new LinkedList<>();
+    filesToCheckFor.add(utils.getOutputDirectory() + "0.actsFromParatransitUsers.txt");
+    filesToCheckFor.add(utils.getOutputDirectory() + "pOperatorLogger.txt");
+    filesToCheckFor.add(utils.getOutputDirectory() + "pStats.txt");
+    filesToCheckFor.add(utils.getOutputDirectory() + "scorestats.csv");
+    filesToCheckFor.add(utils.getOutputDirectory() + "stopwatch.csv");
+    filesToCheckFor.add(utils.getOutputDirectory() + "traveldistancestats.csv");
+    filesToCheckFor.add(utils.getOutputDirectory() + "pStat_light.gexf.gz");
+    filesToCheckFor.add(utils.getOutputDirectory() + "pStat.gexf.gz");
 
-		for (String filename : filesToCheckFor) {
-			File f = new File(filename);
-			Assert.assertEquals(filename + " does not exist", true, f.exists() && !f.isDirectory());
-		}
+    for (String filename : filesToCheckFor) {
+      File f = new File(filename);
+      Assert.assertEquals(filename + " does not exist", true, f.exists() && !f.isDirectory());
+    }
 
-		// Check pStats
-		String filenameOfpStats = utils.getOutputDirectory() + "pStats.txt";
-		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
-		tabFileParserConfig.setFileName(filenameOfpStats);
-		tabFileParserConfig.setDelimiterTags(new String[] {"\t"});
+    // Check pStats
+    String filenameOfpStats = utils.getOutputDirectory() + "pStats.txt";
+    TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
+    tabFileParserConfig.setFileName(filenameOfpStats);
+    tabFileParserConfig.setDelimiterTags(new String[] {"\t"});
 
-		new TabularFileParser().parse(tabFileParserConfig, this);
+    new TabularFileParser().parse(tabFileParserConfig, this);
 
-		// Check final iteration
-		String actual = this.pStatsResults.get(2)[9];
-		// flaky (non-deterministic) test... allow multiple results
-		Assert.assertEquals("Number of budget (final iteration)", 174413625.6, Double.parseDouble(actual), 1);
-	}
+    // Check final iteration
+    String actual = this.pStatsResults.get(2)[9];
+    // flaky (non-deterministic) test... allow multiple results
+    Assert.assertEquals(
+        "Number of budget (final iteration)", 174413625.6, Double.parseDouble(actual), 1);
+  }
 
-	@Override
-	public void startRow(String[] row) {
-		this.pStatsResults.add(row);
-	}
-
+  @Override
+  public void startRow(String[] row) {
+    this.pStatsResults.add(row);
+  }
 }
-

@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
@@ -30,59 +29,71 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 public class MaximumUtilityTest {
-	@Test
-	public void testMaximumUtility() throws NoFeasibleChoiceException {
-		TripFilter tripFilter = new CompositeTripFilter(Collections.emptySet());
-		ModeAvailability modeAvailability = new DefaultModeAvailability(Arrays.asList("car", "pt", "walk"));
-		TripConstraintFactory constraintFactory = new CompositeTripConstraintFactory();
-		FallbackBehaviour fallbackBehaviour = FallbackBehaviour.EXCEPTION;
-		ConstantTripEstimator estimator = new ConstantTripEstimator();
-		UtilitySelectorFactory selectorFactory = new MaximumSelector.Factory();
+  @Test
+  public void testMaximumUtility() throws NoFeasibleChoiceException {
+    TripFilter tripFilter = new CompositeTripFilter(Collections.emptySet());
+    ModeAvailability modeAvailability =
+        new DefaultModeAvailability(Arrays.asList("car", "pt", "walk"));
+    TripConstraintFactory constraintFactory = new CompositeTripConstraintFactory();
+    FallbackBehaviour fallbackBehaviour = FallbackBehaviour.EXCEPTION;
+    ConstantTripEstimator estimator = new ConstantTripEstimator();
+    UtilitySelectorFactory selectorFactory = new MaximumSelector.Factory();
 
-		Activity originActivity = PopulationUtils.createActivityFromCoord("generic", new Coord(0.0, 0.0));
-		originActivity.setEndTime(0.0);
+    Activity originActivity =
+        PopulationUtils.createActivityFromCoord("generic", new Coord(0.0, 0.0));
+    originActivity.setEndTime(0.0);
 
-		Activity destinationActivity = PopulationUtils.createActivityFromCoord("generic", new Coord(0.0, 0.0));
-		originActivity.setEndTime(0.0);
+    Activity destinationActivity =
+        PopulationUtils.createActivityFromCoord("generic", new Coord(0.0, 0.0));
+    originActivity.setEndTime(0.0);
 
-		List<DiscreteModeChoiceTrip> trips = Collections
-				.singletonList(new DiscreteModeChoiceTrip(originActivity, destinationActivity, null, null, 0, 0, 0, new AttributesImpl()));
+    List<DiscreteModeChoiceTrip> trips =
+        Collections.singletonList(
+            new DiscreteModeChoiceTrip(
+                originActivity, destinationActivity, null, null, 0, 0, 0, new AttributesImpl()));
 
-		TripBasedModel model = new TripBasedModel(estimator, tripFilter, modeAvailability, constraintFactory,
-				selectorFactory, fallbackBehaviour,
-				TimeInterpretation.create(ActivityDurationInterpretation.tryEndTimeThenDuration,
-						TripDurationHandling.shiftActivityEndTimes));
+    TripBasedModel model =
+        new TripBasedModel(
+            estimator,
+            tripFilter,
+            modeAvailability,
+            constraintFactory,
+            selectorFactory,
+            fallbackBehaviour,
+            TimeInterpretation.create(
+                ActivityDurationInterpretation.tryEndTimeThenDuration,
+                TripDurationHandling.shiftActivityEndTimes));
 
-		List<TripCandidate> result;
+    List<TripCandidate> result;
 
-		// Test 1
-		estimator.setAlternative("car", -1.0);
-		estimator.setAlternative("pt", -1.5);
-		estimator.setAlternative("walk", -2.0);
+    // Test 1
+    estimator.setAlternative("car", -1.0);
+    estimator.setAlternative("pt", -1.5);
+    estimator.setAlternative("walk", -2.0);
 
-		result = model.chooseModes(null, trips, new Random(0));
-		assertEquals(1, result.size());
-		assertEquals("car", result.get(0).getMode());
-		assertEquals(-1.0, result.get(0).getUtility(), 1e-3);
+    result = model.chooseModes(null, trips, new Random(0));
+    assertEquals(1, result.size());
+    assertEquals("car", result.get(0).getMode());
+    assertEquals(-1.0, result.get(0).getUtility(), 1e-3);
 
-		// Test 2
-		estimator.setAlternative("car", -1.0);
-		estimator.setAlternative("pt", 2.5);
-		estimator.setAlternative("walk", -2.0);
+    // Test 2
+    estimator.setAlternative("car", -1.0);
+    estimator.setAlternative("pt", 2.5);
+    estimator.setAlternative("walk", -2.0);
 
-		result = model.chooseModes(null, trips, new Random(0));
-		assertEquals(1, result.size());
-		assertEquals("pt", result.get(0).getMode());
-		assertEquals(2.5, result.get(0).getUtility(), 1e-3);
+    result = model.chooseModes(null, trips, new Random(0));
+    assertEquals(1, result.size());
+    assertEquals("pt", result.get(0).getMode());
+    assertEquals(2.5, result.get(0).getUtility(), 1e-3);
 
-		// Test 3
-		estimator.setAlternative("car", -1.0);
-		estimator.setAlternative("pt", -1.5);
-		estimator.setAlternative("walk", -0.9);
+    // Test 3
+    estimator.setAlternative("car", -1.0);
+    estimator.setAlternative("pt", -1.5);
+    estimator.setAlternative("walk", -0.9);
 
-		result = model.chooseModes(null, trips, new Random(0));
-		assertEquals(1, result.size());
-		assertEquals("walk", result.get(0).getMode());
-		assertEquals(-0.9, result.get(0).getUtility(), 1e-3);
-	}
+    result = model.chooseModes(null, trips, new Random(0));
+    assertEquals(1, result.size());
+    assertEquals("walk", result.get(0).getMode());
+    assertEquals(-0.9, result.get(0).getUtility(), 1e-3);
+  }
 }

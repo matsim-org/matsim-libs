@@ -22,14 +22,13 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 /**
  * @author nagel
- *
  */
 public final class TravelTimeUtils {
-	
-	private TravelTimeUtils(){} ; // do not instantiate
-	
-	public static TravelTime createFreeSpeedTravelTime() {
-		return new FreeSpeedTravelTime() ;
-	}
 
+  private TravelTimeUtils() {}
+  ; // do not instantiate
+
+  public static TravelTime createFreeSpeedTravelTime() {
+    return new FreeSpeedTravelTime();
+  }
 }

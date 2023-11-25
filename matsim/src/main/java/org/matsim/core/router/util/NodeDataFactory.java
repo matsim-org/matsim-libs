@@ -22,5 +22,5 @@ package org.matsim.core.router.util;
 
 public interface NodeDataFactory {
 
-	public NodeData createNodeData();
+  public NodeData createNodeData();
 }

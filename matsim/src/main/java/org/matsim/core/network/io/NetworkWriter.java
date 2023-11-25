@@ -20,6 +20,11 @@
 
 package org.matsim.core.network.io;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UncheckedIOException;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -32,126 +37,112 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UncheckedIOException;
-import java.util.HashMap;
-import java.util.Map;
-
 public final class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 
-	private static final Logger log = LogManager.getLogger(NetworkWriter.class);
+  private static final Logger log = LogManager.getLogger(NetworkWriter.class);
 
-	private final Network network;
-	private final CoordinateTransformation transformation;
-	private final Map<Class<?>,AttributeConverter<?>> converters = new HashMap<>();
+  private final Network network;
+  private final CoordinateTransformation transformation;
+  private final Map<Class<?>, AttributeConverter<?>> converters = new HashMap<>();
 
-	public NetworkWriter(final Network network) {
-		this( new IdentityTransformation() , network );
-	}
+  public NetworkWriter(final Network network) {
+    this(new IdentityTransformation(), network);
+  }
 
-	public NetworkWriter(
-			final CoordinateTransformation transformation,
-			final Network network) {
-		this.transformation = transformation;
-		this.network = network;
-	}
+  public NetworkWriter(final CoordinateTransformation transformation, final Network network) {
+    this.transformation = transformation;
+    this.network = network;
+  }
 
-	public void putAttributeConverters(final Map<Class<?>, AttributeConverter<?>> converters) {
-		this.converters.putAll( converters );
-	}
+  public void putAttributeConverters(final Map<Class<?>, AttributeConverter<?>> converters) {
+    this.converters.putAll(converters);
+  }
 
-	public void putAttributeConverter(Class<?> clazz , AttributeConverter<?> converter) {
-		this.converters.put(  clazz , converter );
-	}
+  public void putAttributeConverter(Class<?> clazz, AttributeConverter<?> converter) {
+    this.converters.put(clazz, converter);
+  }
 
-	@Override
-	public void write(final String filename) {
-		log.info("Writing network to file: " + filename  + "...");
-		// always write out in newest version, currently v2
-		writeFileV2(filename);
-		log.info("done.");
-	}
+  @Override
+  public void write(final String filename) {
+    log.info("Writing network to file: " + filename + "...");
+    // always write out in newest version, currently v2
+    writeFileV2(filename);
+    log.info("done.");
+  }
 
-	public void writeFileV1(final String filename) {
-		String dtd = "http://www.matsim.org/files/dtd/network_v1.dtd";
-		NetworkWriterHandler handler = new NetworkWriterHandlerImplV1(transformation);
-		writeFile( dtd , handler , filename );
-	}
+  public void writeFileV1(final String filename) {
+    String dtd = "http://www.matsim.org/files/dtd/network_v1.dtd";
+    NetworkWriterHandler handler = new NetworkWriterHandlerImplV1(transformation);
+    writeFile(dtd, handler, filename);
+  }
 
-	public void writeStreamV1(final OutputStream stream) {
-		String dtd = "http://www.matsim.org/files/dtd/network_v1.dtd";
-		NetworkWriterHandler handler = new NetworkWriterHandlerImplV1(transformation);
-		writeStream(dtd, handler, stream);
-	}
+  public void writeStreamV1(final OutputStream stream) {
+    String dtd = "http://www.matsim.org/files/dtd/network_v1.dtd";
+    NetworkWriterHandler handler = new NetworkWriterHandlerImplV1(transformation);
+    writeStream(dtd, handler, stream);
+  }
 
-	public void writeFileV2(final String filename) {
-		String dtd = "http://www.matsim.org/files/dtd/network_v2.dtd";
-		NetworkWriterHandlerImplV2 handler = new NetworkWriterHandlerImplV2(transformation);
+  public void writeFileV2(final String filename) {
+    String dtd = "http://www.matsim.org/files/dtd/network_v2.dtd";
+    NetworkWriterHandlerImplV2 handler = new NetworkWriterHandlerImplV2(transformation);
 
-		handler.putAttributeConverters( converters );
+    handler.putAttributeConverters(converters);
 
-		writeFile(dtd, handler, filename);
-	}
+    writeFile(dtd, handler, filename);
+  }
 
-	public void writeStreamV2(final OutputStream stream) {
-		String dtd = "http://www.matsim.org/files/dtd/network_v2.dtd";
-		NetworkWriterHandlerImplV2 handler = new NetworkWriterHandlerImplV2(transformation);
+  public void writeStreamV2(final OutputStream stream) {
+    String dtd = "http://www.matsim.org/files/dtd/network_v2.dtd";
+    NetworkWriterHandlerImplV2 handler = new NetworkWriterHandlerImplV2(transformation);
 
-		handler.putAttributeConverters( converters );
+    handler.putAttributeConverters(converters);
 
-		writeStream( dtd , handler , stream );
-	}
+    writeStream(dtd, handler, stream);
+  }
 
-	private void writeFile(
-			final String dtd,
-			final NetworkWriterHandler handler,
-			final String filename) {
+  private void writeFile(
+      final String dtd, final NetworkWriterHandler handler, final String filename) {
 
-		try {
-			openFile(filename);
-			writeContent(dtd, handler);
-		}
-		catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
+    try {
+      openFile(filename);
+      writeContent(dtd, handler);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
 
-	private void writeStream(
-			final String dtd,
-			final NetworkWriterHandler handler,
-			final OutputStream stream) {
+  private void writeStream(
+      final String dtd, final NetworkWriterHandler handler, final OutputStream stream) {
 
-		try {
-			openOutputStream(stream);
-			writeContent(dtd, handler);
-		}
-		catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
+    try {
+      openOutputStream(stream);
+      writeContent(dtd, handler);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
 
-	private void writeContent(String dtd, NetworkWriterHandler handler) throws IOException {
-		writeXmlHead();
-		writeDoctype("network", dtd);
+  private void writeContent(String dtd, NetworkWriterHandler handler) throws IOException {
+    writeXmlHead();
+    writeDoctype("network", dtd);
 
-		handler.startNetwork(network, this.writer);
-		handler.writeSeparator(this.writer);
-		handler.startNodes(network, this.writer);
-		for (Node n : NetworkUtils.getSortedNodes(network)) {
-			handler.startNode(n, this.writer);
-			handler.endNode(this.writer);
-		}
-		handler.endNodes(this.writer);
-		handler.writeSeparator(this.writer);
-		handler.startLinks(network, this.writer);
-		for (Link l : NetworkUtils.getSortedLinks(network)) {
-			handler.startLink(l, this.writer);
-			handler.endLink(this.writer);
-		}
-		handler.endLinks(this.writer);
-		handler.writeSeparator(this.writer);
-		handler.endNetwork(this.writer);
-		this.writer.close();
-	}
+    handler.startNetwork(network, this.writer);
+    handler.writeSeparator(this.writer);
+    handler.startNodes(network, this.writer);
+    for (Node n : NetworkUtils.getSortedNodes(network)) {
+      handler.startNode(n, this.writer);
+      handler.endNode(this.writer);
+    }
+    handler.endNodes(this.writer);
+    handler.writeSeparator(this.writer);
+    handler.startLinks(network, this.writer);
+    for (Link l : NetworkUtils.getSortedLinks(network)) {
+      handler.startLink(l, this.writer);
+      handler.endLink(this.writer);
+    }
+    handler.endLinks(this.writer);
+    handler.writeSeparator(this.writer);
+    handler.endNetwork(this.writer);
+    this.writer.close();
+  }
 }

@@ -21,35 +21,33 @@ package org.matsim.contrib.socnetsim.usage.analysis;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 /**
  * @author thibautd
  */
 public class JointPlanSizeStats extends AbstractPlanAnalyzerPerGroup {
-	private final JointPlans jointPlans;
+  private final JointPlans jointPlans;
 
-	public JointPlanSizeStats(
-			final int graphWriteInterval,
-			final OutputDirectoryHierarchy controlerIO,
-			final Scenario scenario,
-			final GroupIdentifier groupIdentifier) {
-		super(graphWriteInterval, controlerIO, scenario, groupIdentifier);
-		this.jointPlans = (JointPlans) scenario.getScenarioElement( JointPlans.ELEMENT_NAME );
-	}
+  public JointPlanSizeStats(
+      final int graphWriteInterval,
+      final OutputDirectoryHierarchy controlerIO,
+      final Scenario scenario,
+      final GroupIdentifier groupIdentifier) {
+    super(graphWriteInterval, controlerIO, scenario, groupIdentifier);
+    this.jointPlans = (JointPlans) scenario.getScenarioElement(JointPlans.ELEMENT_NAME);
+  }
 
-	@Override
-	protected double calcStat(final Plan plan) {
-		final JointPlan jp = jointPlans.getJointPlan( plan );
-		return jp == null ? 1 : jp.getIndividualPlans().size();
-	}
+  @Override
+  protected double calcStat(final Plan plan) {
+    final JointPlan jp = jointPlans.getJointPlan(plan);
+    return jp == null ? 1 : jp.getIndividualPlans().size();
+  }
 
-	@Override
-	protected String getStatName() {
-		return "Joint Plan Size";
-	}
+  @Override
+  protected String getStatName() {
+    return "Joint Plan Size";
+  }
 }
-

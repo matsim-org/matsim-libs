@@ -20,30 +20,28 @@
 
 package org.matsim.contrib.dvrp.fleet;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.function.Function;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  * @author michalm
  */
 public class Fleets {
-	public static Fleet createDefaultFleet(FleetSpecification fleetSpecification,
-			Function<Id<Link>, Link> linkProvider) {
-		return createCustomFleet(fleetSpecification,
-				s -> new DvrpVehicleImpl(s, linkProvider.apply(s.getStartLinkId())));
-	}
+  public static Fleet createDefaultFleet(
+      FleetSpecification fleetSpecification, Function<Id<Link>, Link> linkProvider) {
+    return createCustomFleet(
+        fleetSpecification, s -> new DvrpVehicleImpl(s, linkProvider.apply(s.getStartLinkId())));
+  }
 
-	public static Fleet createCustomFleet(FleetSpecification fleetSpecification,
-			Function<DvrpVehicleSpecification, DvrpVehicle> vehicleCreator) {
-		ImmutableMap<Id<DvrpVehicle>, DvrpVehicle> vehicles = fleetSpecification.getVehicleSpecifications()
-				.values()
-				.stream()
-				.map(vehicleCreator)
-				.collect(ImmutableMap.toImmutableMap(DvrpVehicle::getId, v -> v));
-		return () -> vehicles;
-	}
+  public static Fleet createCustomFleet(
+      FleetSpecification fleetSpecification,
+      Function<DvrpVehicleSpecification, DvrpVehicle> vehicleCreator) {
+    ImmutableMap<Id<DvrpVehicle>, DvrpVehicle> vehicles =
+        fleetSpecification.getVehicleSpecifications().values().stream()
+            .map(vehicleCreator)
+            .collect(ImmutableMap.toImmutableMap(DvrpVehicle::getId, v -> v));
+    return () -> vehicles;
+  }
 }

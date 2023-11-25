@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -48,113 +47,117 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
 /**
- * Collects data to create Route-Time-Diagrams based on the actual simulation.
- * A Route-Time-Diagram shows the position along one transit route of one or
- * more vehicles over the lapse of time.
+ * Collects data to create Route-Time-Diagrams based on the actual simulation. A Route-Time-Diagram
+ * shows the position along one transit route of one or more vehicles over the lapse of time.
  *
  * @author mrieser
  */
-public class RouteTimeDiagram implements VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
+public class RouteTimeDiagram
+    implements VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
 
-	/**
-	 * Map containing for each vehicle a list of positions, stored as StopFacility Ids and the time.
-	 */
-	private final Map<Id, List<Tuple<Id, Double>>> positions = new HashMap<Id, List<Tuple<Id, Double>>>();
+  /**
+   * Map containing for each vehicle a list of positions, stored as StopFacility Ids and the time.
+   */
+  private final Map<Id, List<Tuple<Id, Double>>> positions =
+      new HashMap<Id, List<Tuple<Id, Double>>>();
 
-	public void handleEvent(final VehicleArrivesAtFacilityEvent event) {
-		List<Tuple<Id, Double>> list = this.positions.get(event.getVehicleId());
-		if (list == null) {
-			list = new ArrayList<Tuple<Id, Double>>();
-			this.positions.put(event.getVehicleId(), list);
-		}
-		list.add(new Tuple<Id, Double>(event.getFacilityId(), Double.valueOf(event.getTime())));
-	}
+  public void handleEvent(final VehicleArrivesAtFacilityEvent event) {
+    List<Tuple<Id, Double>> list = this.positions.get(event.getVehicleId());
+    if (list == null) {
+      list = new ArrayList<Tuple<Id, Double>>();
+      this.positions.put(event.getVehicleId(), list);
+    }
+    list.add(new Tuple<Id, Double>(event.getFacilityId(), Double.valueOf(event.getTime())));
+  }
 
-	public void handleEvent(final VehicleDepartsAtFacilityEvent event) {
-		List<Tuple<Id, Double>> list = this.positions.get(event.getVehicleId());
-		if (list == null) {
-			list = new ArrayList<Tuple<Id, Double>>();
-			this.positions.put(event.getVehicleId(), list);
-		}
-		list.add(new Tuple<Id, Double>(event.getFacilityId(), Double.valueOf(event.getTime())));
-	}
+  public void handleEvent(final VehicleDepartsAtFacilityEvent event) {
+    List<Tuple<Id, Double>> list = this.positions.get(event.getVehicleId());
+    if (list == null) {
+      list = new ArrayList<Tuple<Id, Double>>();
+      this.positions.put(event.getVehicleId(), list);
+    }
+    list.add(new Tuple<Id, Double>(event.getFacilityId(), Double.valueOf(event.getTime())));
+  }
 
-	public void reset(final int iteration) {
-		this.positions.clear();
-	}
+  public void reset(final int iteration) {
+    this.positions.clear();
+  }
 
-	public void writeData() {
-		for (List<Tuple<Id, Double>> list : this.positions.values()) {
-			for (Tuple<Id, Double> info : list) {
-				System.out.println(info.getFirst().toString() + "\t" + info.getSecond().toString());
-			}
-			System.out.println();
-		}
-	}
+  public void writeData() {
+    for (List<Tuple<Id, Double>> list : this.positions.values()) {
+      for (Tuple<Id, Double> info : list) {
+        System.out.println(info.getFirst().toString() + "\t" + info.getSecond().toString());
+      }
+      System.out.println();
+    }
+  }
 
-	public void createGraph(final String filename, final TransitRoute route) {
+  public void createGraph(final String filename, final TransitRoute route) {
 
-		HashMap<Id, Integer> stopIndex = new HashMap<Id, Integer>();
-		int idx = 0;
-		for (TransitRouteStop stop : route.getStops()) {
-			stopIndex.put(stop.getStopFacility().getId(), idx);
-			idx++;
-		}
+    HashMap<Id, Integer> stopIndex = new HashMap<Id, Integer>();
+    int idx = 0;
+    for (TransitRouteStop stop : route.getStops()) {
+      stopIndex.put(stop.getStopFacility().getId(), idx);
+      idx++;
+    }
 
-		HashSet<Id> vehicles = new HashSet<Id>();
-		for (Departure dep : route.getDepartures().values()) {
-			vehicles.add(dep.getVehicleId());
-		}
+    HashSet<Id> vehicles = new HashSet<Id>();
+    for (Departure dep : route.getDepartures().values()) {
+      vehicles.add(dep.getVehicleId());
+    }
 
-		XYSeriesCollection dataset = new XYSeriesCollection();
-		int numSeries = 0;
-		double earliestTime = Double.POSITIVE_INFINITY;
-		double latestTime = Double.NEGATIVE_INFINITY;
+    XYSeriesCollection dataset = new XYSeriesCollection();
+    int numSeries = 0;
+    double earliestTime = Double.POSITIVE_INFINITY;
+    double latestTime = Double.NEGATIVE_INFINITY;
 
-		for (Map.Entry<Id, List<Tuple<Id, Double>>> entry : this.positions.entrySet()) {
-			if (vehicles.contains(entry.getKey())) {
-				XYSeries series = new XYSeries("t", false, true);
-				for (Tuple<Id, Double> pos : entry.getValue()) {
-					Integer stopIdx = stopIndex.get(pos.getFirst());
-					if (stopIdx != null) {
-						double time = pos.getSecond().doubleValue();
-						series.add(stopIdx.intValue(), time);
-						if (time < earliestTime) {
-							earliestTime = time;
-						}
-						if (time > latestTime) {
-							latestTime = time;
-						}
-					}
-				}
-				dataset.addSeries(series);
-				numSeries++;
+    for (Map.Entry<Id, List<Tuple<Id, Double>>> entry : this.positions.entrySet()) {
+      if (vehicles.contains(entry.getKey())) {
+        XYSeries series = new XYSeries("t", false, true);
+        for (Tuple<Id, Double> pos : entry.getValue()) {
+          Integer stopIdx = stopIndex.get(pos.getFirst());
+          if (stopIdx != null) {
+            double time = pos.getSecond().doubleValue();
+            series.add(stopIdx.intValue(), time);
+            if (time < earliestTime) {
+              earliestTime = time;
+            }
+            if (time > latestTime) {
+              latestTime = time;
+            }
+          }
+        }
+        dataset.addSeries(series);
+        numSeries++;
+      }
+    }
 
-			}
-		}
+    JFreeChart c =
+        ChartFactory.createXYLineChart(
+            "Route-Time Diagram, Route = " + route.getId(),
+            "stops",
+            "time",
+            dataset,
+            PlotOrientation.VERTICAL,
+            false, // legend?
+            false, // tooltips?
+            false // URLs?
+            );
+    c.setBackgroundPaint(new Color(1.0f, 1.0f, 1.0f, 1.0f));
 
-		JFreeChart c = ChartFactory.createXYLineChart("Route-Time Diagram, Route = " + route.getId(), "stops", "time",
-				dataset, PlotOrientation.VERTICAL,
-				false, // legend?
-				false, // tooltips?
-				false // URLs?
-				);
-		c.setBackgroundPaint(new Color(1.0f, 1.0f, 1.0f, 1.0f));
+    XYPlot p = (XYPlot) c.getPlot();
 
-		XYPlot p  = (XYPlot) c.getPlot();
+    p.getRangeAxis().setInverted(true);
+    p.getRangeAxis().setRange(earliestTime, latestTime);
+    XYItemRenderer renderer = p.getRenderer();
+    for (int i = 0; i < numSeries; i++) {
+      renderer.setSeriesPaint(i, Color.black);
+    }
 
-		p.getRangeAxis().setInverted(true);
-		p.getRangeAxis().setRange(earliestTime, latestTime);
-		XYItemRenderer renderer = p.getRenderer();
-		for (int i = 0; i < numSeries; i++) {
-			renderer.setSeriesPaint(i, Color.black);
-		}
-
-		try {
-			ChartUtils.saveChartAsPNG(new File(filename), c, 1024, 768, null, true, 9);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
+    try {
+      ChartUtils.saveChartAsPNG(new File(filename), c, 1024, 768, null, true, 9);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 }

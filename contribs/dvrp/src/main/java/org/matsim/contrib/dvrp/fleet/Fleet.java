@@ -20,17 +20,18 @@
 
 package org.matsim.contrib.dvrp.fleet;
 
+import com.google.common.collect.ImmutableMap;
 import org.matsim.api.core.v01.Id;
 
-import com.google.common.collect.ImmutableMap;
-
 /**
- * Contains all DvrpVehicles generated for a given iteration. Its lifespan is limited to a single QSim simulation.
- * <p>
- * Fleet (ond the contained DvrpVehicles) are created from FleetSpecification (and the contained DvrpVehicleSpecifications)
+ * Contains all DvrpVehicles generated for a given iteration. Its lifespan is limited to a single
+ * QSim simulation.
+ *
+ * <p>Fleet (ond the contained DvrpVehicles) are created from FleetSpecification (and the contained
+ * DvrpVehicleSpecifications)
  *
  * @author michalm
  */
 public interface Fleet {
-	ImmutableMap<Id<DvrpVehicle>, DvrpVehicle> getVehicles();
+  ImmutableMap<Id<DvrpVehicle>, DvrpVehicle> getVehicles();
 }

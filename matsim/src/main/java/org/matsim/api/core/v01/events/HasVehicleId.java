@@ -17,21 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
+/** */
 package org.matsim.api.core.v01.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
 /**
  * @author nagel
- *
  */
-public interface HasVehicleId{
-	String ATTRIBUTE_VEHICLE = "vehicle";
+public interface HasVehicleId {
+  String ATTRIBUTE_VEHICLE = "vehicle";
 
-	Id<Vehicle> getVehicleId() ;
+  Id<Vehicle> getVehicleId();
 }

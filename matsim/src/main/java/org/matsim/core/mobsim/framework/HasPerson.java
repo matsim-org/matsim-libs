@@ -24,14 +24,11 @@ import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author nagel
- *
  */
 public interface HasPerson {
-	
-	/**
-	 * @return the underlying person (data class)
-	 */
-	public Person getPerson();
-	
 
+  /**
+   * @return the underlying person (data class)
+   */
+  public Person getPerson();
 }

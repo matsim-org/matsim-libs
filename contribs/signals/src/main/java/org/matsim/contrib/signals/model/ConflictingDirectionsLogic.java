@@ -19,15 +19,11 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.model;
 
-
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
 
 /**
  * Marker interface.
- * 
- * @author tthunig
  *
+ * @author tthunig
  */
-public interface ConflictingDirectionsLogic extends SignalGroupStateChangedEventHandler {
-
-}
+public interface ConflictingDirectionsLogic extends SignalGroupStateChangedEventHandler {}

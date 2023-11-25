@@ -26,5 +26,5 @@ import org.matsim.api.core.v01.network.Link;
  * @author Michal Maciejewski (michalm)
  */
 public interface StayTask extends Task {
-	Link getLink();
+  Link getLink();
 }

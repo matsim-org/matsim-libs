@@ -20,37 +20,37 @@
 package playground.vsp.analysis.modules.bvgAna.anaLevel1.vehId2DelayAtStop;
 
 import java.util.LinkedList;
-
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 
 /**
- * Simple data container to store the <code>VehicleDepartsAtFacilityEvent</code> following a <code>TransitDriverStartsEvent</code>.
- * 
- * @author aneumann
+ * Simple data container to store the <code>VehicleDepartsAtFacilityEvent</code> following a <code>
+ * TransitDriverStartsEvent</code>.
  *
+ * @author aneumann
  */
 public class VehId2DelayAtStopData {
-	
-	private final TransitDriverStartsEvent transitDriverStartsEvent;
-	private LinkedList<VehicleDepartsAtFacilityEvent> vehicleDepartsAtFacilityEventList = new LinkedList<VehicleDepartsAtFacilityEvent>();
-	
-	public VehId2DelayAtStopData(TransitDriverStartsEvent transitDriverStartsEvent){
-		this.transitDriverStartsEvent = transitDriverStartsEvent;
-	}
 
-	protected void addVehicleDepartsAtFacilityEvent(VehicleDepartsAtFacilityEvent event) {
-		this.vehicleDepartsAtFacilityEventList.add(event);
-	}
-	
-	@Override
-	public String toString() {
-		StringBuffer strB = new StringBuffer();
-		strB.append(this.transitDriverStartsEvent);
-		for (VehicleDepartsAtFacilityEvent event : this.vehicleDepartsAtFacilityEventList) {
-			strB.append(" - ");
-			strB.append(event);
-		}		
-		return strB.toString();
-	}
+  private final TransitDriverStartsEvent transitDriverStartsEvent;
+  private LinkedList<VehicleDepartsAtFacilityEvent> vehicleDepartsAtFacilityEventList =
+      new LinkedList<VehicleDepartsAtFacilityEvent>();
+
+  public VehId2DelayAtStopData(TransitDriverStartsEvent transitDriverStartsEvent) {
+    this.transitDriverStartsEvent = transitDriverStartsEvent;
+  }
+
+  protected void addVehicleDepartsAtFacilityEvent(VehicleDepartsAtFacilityEvent event) {
+    this.vehicleDepartsAtFacilityEventList.add(event);
+  }
+
+  @Override
+  public String toString() {
+    StringBuffer strB = new StringBuffer();
+    strB.append(this.transitDriverStartsEvent);
+    for (VehicleDepartsAtFacilityEvent event : this.vehicleDepartsAtFacilityEventList) {
+      strB.append(" - ");
+      strB.append(event);
+    }
+    return strB.toString();
+  }
 }

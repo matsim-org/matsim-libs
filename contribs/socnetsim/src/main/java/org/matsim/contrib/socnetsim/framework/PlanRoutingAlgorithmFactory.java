@@ -23,17 +23,14 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripRouter;
 
 /**
- * If this proves to be useful, we could think of putting this in org.matsim.core.router.*
- * and use it to replace the createRoutingAlgorithm() method of Controler.
- * <br>
- * I am not sure what is better: pass a trip router as a parameter to the create method,
- * or pass a TripRouterFactory at the constructor, and make the factory a
- * "PlanAlgorithmFactory" without parameters, which could also be used in
- * AbstractMultithreadedModule.
+ * If this proves to be useful, we could think of putting this in org.matsim.core.router.* and use
+ * it to replace the createRoutingAlgorithm() method of Controler. <br>
+ * I am not sure what is better: pass a trip router as a parameter to the create method, or pass a
+ * TripRouterFactory at the constructor, and make the factory a "PlanAlgorithmFactory" without
+ * parameters, which could also be used in AbstractMultithreadedModule.
  *
  * @author thibautd
  */
 public interface PlanRoutingAlgorithmFactory {
-	public PlanAlgorithm createPlanRoutingAlgorithm(TripRouter tripRouter);
+  public PlanAlgorithm createPlanRoutingAlgorithm(TripRouter tripRouter);
 }
-

@@ -25,18 +25,17 @@ package org.matsim.core.mobsim.jdeqsim;
  * @author rashid_waraich
  */
 public abstract class EventMessage extends Message {
-	public Vehicle vehicle;
-	public Scheduler scheduler;
+  public Vehicle vehicle;
+  public Scheduler scheduler;
 
-	public EventMessage(Scheduler scheduler, Vehicle vehicle) {
-		super();
-		this.vehicle = vehicle;
-		this.scheduler = scheduler;
-	}
+  public EventMessage(Scheduler scheduler, Vehicle vehicle) {
+    super();
+    this.vehicle = vehicle;
+    this.scheduler = scheduler;
+  }
 
-	public void resetMessage(Scheduler scheduler, Vehicle vehicle) {
-		this.scheduler = scheduler;
-		this.vehicle = vehicle;
-	}
-
+  public void resetMessage(Scheduler scheduler, Vehicle vehicle) {
+    this.scheduler = scheduler;
+    this.vehicle = vehicle;
+  }
 }

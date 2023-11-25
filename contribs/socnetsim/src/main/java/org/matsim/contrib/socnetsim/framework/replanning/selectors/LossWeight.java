@@ -21,37 +21,31 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
 
 /**
  * @author thibautd
  */
 public class LossWeight implements WeightCalculator {
-	// XXX beware if make configurable: mustn't be random!
-	private final WeightCalculator baseWeight = new ScoreWeight();
+  // XXX beware if make configurable: mustn't be random!
+  private final WeightCalculator baseWeight = new ScoreWeight();
 
-	@Override
-	public double getWeight(
-			final Plan indivPlan,
-			final ReplanningGroup replanningGroup) {
-		final double planScore = baseWeight.getWeight( indivPlan , replanningGroup );
-		final double bestScore = getBestScore( indivPlan.getPerson() , replanningGroup );
+  @Override
+  public double getWeight(final Plan indivPlan, final ReplanningGroup replanningGroup) {
+    final double planScore = baseWeight.getWeight(indivPlan, replanningGroup);
+    final double bestScore = getBestScore(indivPlan.getPerson(), replanningGroup);
 
-		return planScore - bestScore;
-	}
+    return planScore - bestScore;
+  }
 
-	private double getBestScore(
-			final Person person,
-			final ReplanningGroup group) {
-		double best = Double.NEGATIVE_INFINITY;
+  private double getBestScore(final Person person, final ReplanningGroup group) {
+    double best = Double.NEGATIVE_INFINITY;
 
-		for ( final Plan p : person.getPlans() ) {
-			final double score = baseWeight.getWeight( p , group );
-			if ( score > best ) best = score;
-		}
+    for (final Plan p : person.getPlans()) {
+      final double score = baseWeight.getWeight(p, group);
+      if (score > best) best = score;
+    }
 
-		return best;
-	}
+    return best;
+  }
 }
-

@@ -29,15 +29,14 @@ import org.matsim.api.core.v01.events.Event;
  */
 public final class LastEventOfSimStep extends Event {
 
-	public static final String EVENT_TYPE = "simstepend";
-	
-	public LastEventOfSimStep(final double time) {
-		super(time);
-	}
+  public static final String EVENT_TYPE = "simstepend";
 
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
+  public LastEventOfSimStep(final double time) {
+    super(time);
+  }
 
+  @Override
+  public String getEventType() {
+    return EVENT_TYPE;
+  }
 }

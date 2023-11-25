@@ -20,6 +20,7 @@
 
 package org.matsim.withinday.replanning.replanners;
 
+import jakarta.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
@@ -28,29 +29,34 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
-import jakarta.inject.Provider;
-
 public class InitialReplannerFactory extends WithinDayInitialReplannerFactory {
 
-	private final Scenario scenario;
-	private final Provider<TripRouter> tripRouterFactory;
-	private final TimeInterpretation timeInterpretation;
+  private final Scenario scenario;
+  private final Provider<TripRouter> tripRouterFactory;
+  private final TimeInterpretation timeInterpretation;
 
-	public InitialReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
-								   Provider<TripRouter> tripRouterFactory, TimeInterpretation timeInterpretation) {
-		super(withinDayEngine);
-		this.scenario = scenario;
-		this.tripRouterFactory = tripRouterFactory;
-		this.timeInterpretation = timeInterpretation;
-	}
+  public InitialReplannerFactory(
+      Scenario scenario,
+      WithinDayEngine withinDayEngine,
+      Provider<TripRouter> tripRouterFactory,
+      TimeInterpretation timeInterpretation) {
+    super(withinDayEngine);
+    this.scenario = scenario;
+    this.tripRouterFactory = tripRouterFactory;
+    this.timeInterpretation = timeInterpretation;
+  }
 
-	@Override
-	public WithinDayInitialReplanner createReplanner() {
-		WithinDayInitialReplanner replanner = new InitialReplanner(super.getId(), scenario,
-				this.getWithinDayEngine().getActivityRescheduler(),
-				new PlanRouter(this.tripRouterFactory.get(),
-						this.scenario.getActivityFacilities(), timeInterpretation));
-		return replanner;
-	}
-
+  @Override
+  public WithinDayInitialReplanner createReplanner() {
+    WithinDayInitialReplanner replanner =
+        new InitialReplanner(
+            super.getId(),
+            scenario,
+            this.getWithinDayEngine().getActivityRescheduler(),
+            new PlanRouter(
+                this.tripRouterFactory.get(),
+                this.scenario.getActivityFacilities(),
+                timeInterpretation));
+    return replanner;
+  }
 }

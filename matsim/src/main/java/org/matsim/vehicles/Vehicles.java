@@ -20,32 +20,29 @@
 package org.matsim.vehicles;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
-import org.matsim.utils.objectattributes.FailingObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-
 
 /**
  * Root class of the vehicles container.
+ *
  * @author dgrether
  * @author jwjoubert
  */
 public interface Vehicles extends MatsimToplevelContainer {
 
-	public Map<Id<VehicleType>, VehicleType> getVehicleTypes();
+  public Map<Id<VehicleType>, VehicleType> getVehicleTypes();
 
-	public Map<Id<Vehicle>, Vehicle> getVehicles();
+  public Map<Id<Vehicle>, Vehicle> getVehicles();
 
-	@Override
-	public VehiclesFactory getFactory();
+  @Override
+  public VehiclesFactory getFactory();
 
-	public void addVehicle(final Vehicle v);
+  public void addVehicle(final Vehicle v);
 
-	public void removeVehicle(final Id<Vehicle> vehicleId);
+  public void removeVehicle(final Id<Vehicle> vehicleId);
 
-	public void addVehicleType(final VehicleType type);
+  public void addVehicleType(final VehicleType type);
 
-	public void removeVehicleType(final Id<VehicleType> vehicleTypeId);
+  public void removeVehicleType(final Id<VehicleType> vehicleTypeId);
 }

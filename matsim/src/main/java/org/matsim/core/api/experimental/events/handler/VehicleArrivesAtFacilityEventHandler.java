@@ -28,6 +28,5 @@ import org.matsim.core.events.handler.EventHandler;
  */
 public interface VehicleArrivesAtFacilityEventHandler extends EventHandler {
 
-	public void handleEvent(VehicleArrivesAtFacilityEvent event);
-	
+  public void handleEvent(VehicleArrivesAtFacilityEvent event);
 }

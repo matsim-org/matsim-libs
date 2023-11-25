@@ -23,10 +23,10 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.TripStructureUtils;
@@ -34,58 +34,56 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
-
 /**
  * @author thibautd
  */
 public class CountNSelectedJointTripsPerAgent {
-	public static void main(final String[] args) {
-		final String popFile = args[ 0 ];
-		final String outFile = args[ 1 ];
+  public static void main(final String[] args) {
+    final String popFile = args[0];
+    final String outFile = args[1];
 
-		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new PopulationReader( sc ).readFile( popFile );
+    final Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    new PopulationReader(sc).readFile(popFile);
 
-		final BufferedWriter writer = IOUtils.getBufferedWriter( outFile );
+    final BufferedWriter writer = IOUtils.getBufferedWriter(outFile);
 
-		try {
-			writer.write( "id\tnPassenger\tnDriver\tnJoint" );
+    try {
+      writer.write("id\tnPassenger\tnDriver\tnJoint");
 
-			for (Person p : sc.getPopulation().getPersons().values()) {
-				final List<Trip> trips =
-					TripStructureUtils.getTrips(p.getSelectedPlan());
+      for (Person p : sc.getPopulation().getPersons().values()) {
+        final List<Trip> trips = TripStructureUtils.getTrips(p.getSelectedPlan());
 
-				int countPassenger = 0;
-				int countDriver = 0;
-				for (Trip trip : trips) {
-					final boolean isPassenger = containsMode( trip , JointActingTypes.PASSENGER );
-					final boolean isDriver = containsMode( trip , JointActingTypes.DRIVER );
-					assert !(isPassenger && isDriver);
-					if (isPassenger) countPassenger++;
-					if (isDriver) countDriver++;
-				}
+        int countPassenger = 0;
+        int countDriver = 0;
+        for (Trip trip : trips) {
+          final boolean isPassenger = containsMode(trip, JointActingTypes.PASSENGER);
+          final boolean isDriver = containsMode(trip, JointActingTypes.DRIVER);
+          assert !(isPassenger && isDriver);
+          if (isPassenger) countPassenger++;
+          if (isDriver) countDriver++;
+        }
 
-				writer.newLine();
-				writer.write( p.getId()+"\t"+
-						countPassenger+"\t"+
-						countDriver+"\t"+
-						(countPassenger + countDriver) );
-			}
+        writer.newLine();
+        writer.write(
+            p.getId()
+                + "\t"
+                + countPassenger
+                + "\t"
+                + countDriver
+                + "\t"
+                + (countPassenger + countDriver));
+      }
 
-			writer.close();
-		} catch (IOException e) {
-			throw new UncheckedIOException( e );
-		}
-	}
+      writer.close();
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
 
-	private static boolean containsMode(
-			final Trip trip,
-			final String mode) {
-		for (Leg leg : trip.getLegsOnly()) {
-			if (leg.getMode().equals( mode )) return true;
-		}
-		return false;
-	}
+  private static boolean containsMode(final Trip trip, final String mode) {
+    for (Leg leg : trip.getLegsOnly()) {
+      if (leg.getMode().equals(mode)) return true;
+    }
+    return false;
+  }
 }
-

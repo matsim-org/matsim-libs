@@ -36,35 +36,35 @@ import org.matsim.core.population.PopulationUtils;
  */
 public class KeepSelectedTest extends AbstractPlanSelectorTest {
 
-	@Override
-	protected KeepSelected<Plan, Person> getPlanSelector() {
-		return new KeepSelected<Plan, Person>();
-	}
+  @Override
+  protected KeepSelected<Plan, Person> getPlanSelector() {
+    return new KeepSelected<Plan, Person>();
+  }
 
-	/**
-	 * Test that really the already selected plan is returned.
-	 *
-	 * @author mrieser
-	 */
-	@Test public void testSelected() {
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-		Plan plan1 = PersonUtils.createAndAddPlan(person, false);
-		Plan plan2 = PersonUtils.createAndAddPlan(person, true);
-		plan2.setScore(10.0);
-		Plan plan3 = PersonUtils.createAndAddPlan(person, false);
-		plan3.setScore(-50.0);
-		KeepSelected selector = new KeepSelected();
+  /**
+   * Test that really the already selected plan is returned.
+   *
+   * @author mrieser
+   */
+  @Test
+  public void testSelected() {
+    Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+    Plan plan1 = PersonUtils.createAndAddPlan(person, false);
+    Plan plan2 = PersonUtils.createAndAddPlan(person, true);
+    plan2.setScore(10.0);
+    Plan plan3 = PersonUtils.createAndAddPlan(person, false);
+    plan3.setScore(-50.0);
+    KeepSelected selector = new KeepSelected();
 
-		// test default selected plan
-		assertEquals(plan2, selector.selectPlan(person));
+    // test default selected plan
+    assertEquals(plan2, selector.selectPlan(person));
 
-		// test selected plan with negative score
-		person.setSelectedPlan(plan3);
-		assertEquals(plan3, selector.selectPlan(person));
+    // test selected plan with negative score
+    person.setSelectedPlan(plan3);
+    assertEquals(plan3, selector.selectPlan(person));
 
-		// test selected plan with undefined score
-		person.setSelectedPlan(plan1);
-		assertEquals(plan1, selector.selectPlan(person));
-	}
-
+    // test selected plan with undefined score
+    person.setSelectedPlan(plan1);
+    assertEquals(plan1, selector.selectPlan(person));
+  }
 }

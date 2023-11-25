@@ -19,33 +19,33 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
+import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.optimizer.Request;
 
-import java.util.List;
-
 public interface PassengerRequest extends Request {
-	/**
-	 * @return beginning of the time window (inclusive) - earliest time when the passenger can be picked up
-	 */
-	double getEarliestStartTime();
+  /**
+   * @return beginning of the time window (inclusive) - earliest time when the passenger can be
+   *     picked up
+   */
+  double getEarliestStartTime();
 
-	/**
-	 * @return end of the time window (exclusive) - time by which the passenger should be picked up
-	 */
-	default double getLatestStartTime() {
-		return Double.MAX_VALUE;
-	}
+  /**
+   * @return end of the time window (exclusive) - time by which the passenger should be picked up
+   */
+  default double getLatestStartTime() {
+    return Double.MAX_VALUE;
+  }
 
-	Link getFromLink();
+  Link getFromLink();
 
-	Link getToLink();
+  Link getToLink();
 
-	List<Id<Person>> getPassengerIds();
+  List<Id<Person>> getPassengerIds();
 
-	String getMode();
+  String getMode();
 
-	int getPassengerCount();
+  int getPassengerCount();
 }

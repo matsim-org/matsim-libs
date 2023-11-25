@@ -20,7 +20,6 @@
 package org.matsim.run;
 
 import java.io.File;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -33,20 +32,20 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class CreateFullConfigTest {
 
-	private final static Logger log = LogManager.getLogger(CreateFullConfigTest.class);
+  private static final Logger log = LogManager.getLogger(CreateFullConfigTest.class);
 
-	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
+  @Rule public MatsimTestUtils helper = new MatsimTestUtils();
 
-	@Test
-	public void testMain() {
-		String[] args = new String[1];
-		args[0] = helper.getOutputDirectory() + "newConfig.xml";
+  @Test
+  public void testMain() {
+    String[] args = new String[1];
+    args[0] = helper.getOutputDirectory() + "newConfig.xml";
 
-		File configFile = new File(args[0]);
-		Assert.assertFalse(configFile.exists());
+    File configFile = new File(args[0]);
+    Assert.assertFalse(configFile.exists());
 
-		CreateFullConfig.main(args);
+    CreateFullConfig.main(args);
 
-		Assert.assertTrue(configFile.exists());
-	}
+    Assert.assertTrue(configFile.exists());
+  }
 }

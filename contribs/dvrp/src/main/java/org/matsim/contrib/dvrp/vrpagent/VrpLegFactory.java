@@ -29,25 +29,28 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author michalm
  */
 public interface VrpLegFactory {
-	/**
-	 * @param vehicle for which the leg is created
-	 * @return fully initialised VrpLeg (e.g. with online tracking, etc.)
-	 */
-	VrpLeg create(DvrpVehicle vehicle);
+  /**
+   * @param vehicle for which the leg is created
+   * @return fully initialised VrpLeg (e.g. with online tracking, etc.)
+   */
+  VrpLeg create(DvrpVehicle vehicle);
 
-	static VrpLeg createWithOfflineTracker(String mode, DvrpVehicle vehicle, MobsimTimer timer) {
-		DriveTask driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
-		VrpLeg leg = new VrpLeg(mode, driveTask.getPath());
-		TaskTrackers.initOfflineTaskTracking(driveTask, timer);
-		return leg;
-	}
+  static VrpLeg createWithOfflineTracker(String mode, DvrpVehicle vehicle, MobsimTimer timer) {
+    DriveTask driveTask = (DriveTask) vehicle.getSchedule().getCurrentTask();
+    VrpLeg leg = new VrpLeg(mode, driveTask.getPath());
+    TaskTrackers.initOfflineTaskTracking(driveTask, timer);
+    return leg;
+  }
 
-	static VrpLeg createWithOnlineTracker(String mode, DvrpVehicle vehicle, OnlineTrackerListener onlineTrackerListener,
-			MobsimTimer timer) {
-		DriveTask driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
-		VrpLeg leg = new VrpLeg(mode, driveTask.getPath());
-		TaskTrackers.initOnlineDriveTaskTracking(vehicle, leg,
-				new OnlineDriveTaskTrackerImpl(vehicle, leg, onlineTrackerListener, timer));
-		return leg;
-	}
+  static VrpLeg createWithOnlineTracker(
+      String mode,
+      DvrpVehicle vehicle,
+      OnlineTrackerListener onlineTrackerListener,
+      MobsimTimer timer) {
+    DriveTask driveTask = (DriveTask) vehicle.getSchedule().getCurrentTask();
+    VrpLeg leg = new VrpLeg(mode, driveTask.getPath());
+    TaskTrackers.initOnlineDriveTaskTracking(
+        vehicle, leg, new OnlineDriveTaskTrackerImpl(vehicle, leg, onlineTrackerListener, timer));
+    return leg;
+  }
 }

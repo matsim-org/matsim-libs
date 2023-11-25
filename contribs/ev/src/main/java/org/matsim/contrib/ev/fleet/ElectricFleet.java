@@ -20,18 +20,19 @@
 
 package org.matsim.contrib.ev.fleet;
 
+import com.google.common.collect.ImmutableMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.common.collect.ImmutableMap;
-
 /**
- * Contains all ElectricVehicles generated for a given iteration. Its lifespan is limited to a single QSim simulation.
- * <p>
- * Fleet (ond the contained ElectricVehicles) are created from ElectricFleetSpecification (and the contained ElectricVehicleSpecifications)
+ * Contains all ElectricVehicles generated for a given iteration. Its lifespan is limited to a
+ * single QSim simulation.
+ *
+ * <p>Fleet (ond the contained ElectricVehicles) are created from ElectricFleetSpecification (and
+ * the contained ElectricVehicleSpecifications)
  *
  * @author michalm
  */
 public interface ElectricFleet {
-	ImmutableMap<Id<Vehicle>, ElectricVehicle> getElectricVehicles();
+  ImmutableMap<Id<Vehicle>, ElectricVehicle> getElectricVehicles();
 }

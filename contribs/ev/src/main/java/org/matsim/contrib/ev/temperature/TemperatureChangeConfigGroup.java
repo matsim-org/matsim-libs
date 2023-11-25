@@ -18,29 +18,30 @@
  * *********************************************************************** */
 
 package org.matsim.contrib.ev.temperature;
+
 /*
  * created by jbischoff, 15.08.2018
  */
 
-import org.matsim.core.config.ReflectiveConfigGroup;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 public final class TemperatureChangeConfigGroup extends ReflectiveConfigGroup {
-	public static final String GROUP_NAME = "temperature";
+  public static final String GROUP_NAME = "temperature";
 
-	@Parameter
-	@Comment("Filename containing temperature changes. Expects CSV file with time;linkId;newTemperature")
-	@NotNull
-	public String temperatureChangeFile;
+  @Parameter
+  @Comment(
+      "Filename containing temperature changes. Expects CSV file with time;linkId;newTemperature")
+  @NotNull
+  public String temperatureChangeFile;
 
-	@Parameter
-	@Comment("Delimiter. Default `;`")
-	@NotBlank
-	public String delimiter = ";";
+  @Parameter
+  @Comment("Delimiter. Default `;`")
+  @NotBlank
+  public String delimiter = ";";
 
-	public TemperatureChangeConfigGroup() {
-		super(GROUP_NAME);
-	}
+  public TemperatureChangeConfigGroup() {
+    super(GROUP_NAME);
+  }
 }

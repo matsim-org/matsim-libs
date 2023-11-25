@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * ScenarioByConfigInjectionTest.java
@@ -19,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.scenario;
+package org.matsim.core.scenario;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,202 +45,198 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
  * @author thibautd
  */
 public class ScenarioByConfigInjectionTest {
-	private static final Logger log = LogManager.getLogger( ScenarioByConfigInjectionTest.class );
-	@Rule
-	public final MatsimTestUtils utils = new MatsimTestUtils();
+  private static final Logger log = LogManager.getLogger(ScenarioByConfigInjectionTest.class);
+  @Rule public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testAttributeConvertersAreInjected_deprecated() {
-		log.info( "create test scenario" );
-		final Config config = createTestScenario();
+  @Test
+  public void testAttributeConvertersAreInjected_deprecated() {
+    log.info("create test scenario");
+    final Config config = createTestScenario();
 
-		config.plans().setInsistingOnUsingDeprecatedPersonAttributeFile( true );
-		// yy this enables reading the old attributes file.  The true test, however, would have to test (all) the attribute converters for Attributable.
-		// kai, jun'19
+    config.plans().setInsistingOnUsingDeprecatedPersonAttributeFile(true);
+    // yy this enables reading the old attributes file.  The true test, however, would have to test
+    // (all) the attribute converters for Attributable.
+    // kai, jun'19
 
-		log.info( "create injector" );
-		com.google.inject.Injector injector =
-				Injector.createInjector(
-						config,
-						new ScenarioByConfigModule(),
-						new AbstractModule() {
-							@Override
-							public void install() {
-								addAttributeConverterBinding( StupidClass.class ).to( StupidClassConverter.class );
-							}
-						});
+    log.info("create injector");
+    com.google.inject.Injector injector =
+        Injector.createInjector(
+            config,
+            new ScenarioByConfigModule(),
+            new AbstractModule() {
+              @Override
+              public void install() {
+                addAttributeConverterBinding(StupidClass.class).to(StupidClassConverter.class);
+              }
+            });
 
-		log.info( "Load test scenario via injection" );
-		final Scenario scenario = injector.getInstance( Scenario.class );
+    log.info("Load test scenario via injection");
+    final Scenario scenario = injector.getInstance(Scenario.class);
 
-		log.info( "get object attribute" );
-		Population population = scenario.getPopulation();
-		Person person = population.getPersons().get( Id.createPersonId( "1" ) ) ;
-		Gbl.assertNotNull( person );
-		Object stupid = person.getAttributes().getAttribute( "stupidAttribute" );
+    log.info("get object attribute");
+    Population population = scenario.getPopulation();
+    Person person = population.getPersons().get(Id.createPersonId("1"));
+    Gbl.assertNotNull(person);
+    Object stupid = person.getAttributes().getAttribute("stupidAttribute");
 
-		// TODO test for ALL attribute containers...
-		Assert.assertEquals(
-				"Unexpected type of read in attribute",
-				StupidClass.class,
-				stupid.getClass() );
+    // TODO test for ALL attribute containers...
+    Assert.assertEquals(
+        "Unexpected type of read in attribute", StupidClass.class, stupid.getClass());
 
-		log.info( "get person attribute" );
-		stupid = scenario.getPopulation()
-				.getPersons()
-				.get( Id.createPersonId( 1 ) )
-				.getAttributes()
-				.getAttribute( "otherAttribute" );
+    log.info("get person attribute");
+    stupid =
+        scenario
+            .getPopulation()
+            .getPersons()
+            .get(Id.createPersonId(1))
+            .getAttributes()
+            .getAttribute("otherAttribute");
 
-		Assert.assertEquals(
-				"Unexpected type of read in attribute",
-				StupidClass.class,
-				stupid.getClass() );
+    Assert.assertEquals(
+        "Unexpected type of read in attribute", StupidClass.class, stupid.getClass());
 
-		log.info( "get activity attribute" );
-		stupid = scenario.getPopulation()
-				.getPersons()
-				.get( Id.createPersonId( 1 ) )
-				.getSelectedPlan()
-				.getPlanElements()
-				.get( 0 )
-				.getAttributes()
-				.getAttribute( "actAttribute" );
+    log.info("get activity attribute");
+    stupid =
+        scenario
+            .getPopulation()
+            .getPersons()
+            .get(Id.createPersonId(1))
+            .getSelectedPlan()
+            .getPlanElements()
+            .get(0)
+            .getAttributes()
+            .getAttribute("actAttribute");
 
-		Assert.assertEquals(
-				"Unexpected type of read in attribute",
-				StupidClass.class,
-				stupid.getClass() );
+    Assert.assertEquals(
+        "Unexpected type of read in attribute", StupidClass.class, stupid.getClass());
 
-		log.info( "get leg attribute" );
-		stupid = scenario.getPopulation()
-				.getPersons()
-				.get( Id.createPersonId( 1 ) )
-				.getSelectedPlan()
-				.getPlanElements()
-				.get( 1 )
-				.getAttributes()
-				.getAttribute( "legAttribute" );
+    log.info("get leg attribute");
+    stupid =
+        scenario
+            .getPopulation()
+            .getPersons()
+            .get(Id.createPersonId(1))
+            .getSelectedPlan()
+            .getPlanElements()
+            .get(1)
+            .getAttributes()
+            .getAttribute("legAttribute");
 
-		Assert.assertEquals(
-				"Unexpected type of read in attribute",
-				StupidClass.class,
-				stupid.getClass() );
+    Assert.assertEquals(
+        "Unexpected type of read in attribute", StupidClass.class, stupid.getClass());
 
-		log.info( "get network attribute" );
-		stupid = scenario.getNetwork()
-				.getAttributes()
-				.getAttribute( "networkAttribute" );
+    log.info("get network attribute");
+    stupid = scenario.getNetwork().getAttributes().getAttribute("networkAttribute");
 
-		Assert.assertEquals(
-				"Unexpected type of read in attribute",
-				StupidClass.class,
-				stupid.getClass() );
+    Assert.assertEquals(
+        "Unexpected type of read in attribute", StupidClass.class, stupid.getClass());
 
-		log.info( "get Link attribute" );
-		stupid = scenario.getNetwork()
-				.getLinks()
-				.get( Id.createLinkId( 1 ) )
-				.getAttributes()
-				.getAttribute( "linkAttribute" );
+    log.info("get Link attribute");
+    stupid =
+        scenario
+            .getNetwork()
+            .getLinks()
+            .get(Id.createLinkId(1))
+            .getAttributes()
+            .getAttribute("linkAttribute");
 
-		Assert.assertEquals(
-				"Unexpected type of read in attribute",
-				StupidClass.class,
-				stupid.getClass() );
+    Assert.assertEquals(
+        "Unexpected type of read in attribute", StupidClass.class, stupid.getClass());
 
-		log.info( "get Node attribute" );
-		stupid = scenario.getNetwork()
-				.getNodes()
-				.get( Id.createNodeId( 1 ) )
-				.getAttributes()
-				.getAttribute( "nodeAttribute" );
+    log.info("get Node attribute");
+    stupid =
+        scenario
+            .getNetwork()
+            .getNodes()
+            .get(Id.createNodeId(1))
+            .getAttributes()
+            .getAttribute("nodeAttribute");
 
-		Assert.assertEquals(
-				"Unexpected type of read in attribute",
-				StupidClass.class,
-				stupid.getClass() );
-	}
+    Assert.assertEquals(
+        "Unexpected type of read in attribute", StupidClass.class, stupid.getClass());
+  }
 
-	private Config createTestScenario() {
-		final String directory = utils.getOutputDirectory();
-		final Config config = ConfigUtils.createConfig();
+  private Config createTestScenario() {
+    final String directory = utils.getOutputDirectory();
+    final Config config = ConfigUtils.createConfig();
 
-		final String plansFile = directory+"/plans.xml";
-		final String attributeFile = directory+"/att.xml";
-		final String netFile = directory+"/net.xml";
+    final String plansFile = directory + "/plans.xml";
+    final String attributeFile = directory + "/att.xml";
+    final String netFile = directory + "/net.xml";
 
-		config.plans().setInputFile( plansFile );
-		config.plans().setInputPersonAttributeFile( attributeFile );
-		config.network().setInputFile( netFile );
+    config.plans().setInputFile(plansFile);
+    config.plans().setInputPersonAttributeFile(attributeFile);
+    config.network().setInputFile(netFile);
 
-		final Scenario sc = ScenarioUtils.createScenario( config );
-		final Person person = sc.getPopulation().getFactory().createPerson(Id.createPersonId( 1 ));
-		sc.getPopulation().addPerson( person );
-//		sc.getPopulation().getPersonAttributes().putAttribute( "1" , "stupidAttribute" , new StupidClass() );
-		PopulationUtils.putPersonAttribute( person, "stupidAttribute", new StupidClass() );
+    final Scenario sc = ScenarioUtils.createScenario(config);
+    final Person person = sc.getPopulation().getFactory().createPerson(Id.createPersonId(1));
+    sc.getPopulation().addPerson(person);
+    //		sc.getPopulation().getPersonAttributes().putAttribute( "1" , "stupidAttribute" , new
+    // StupidClass() );
+    PopulationUtils.putPersonAttribute(person, "stupidAttribute", new StupidClass());
 
-		person.getAttributes().putAttribute( "otherAttribute" , new StupidClass() );
+    person.getAttributes().putAttribute("otherAttribute", new StupidClass());
 
-		final Plan plan = sc.getPopulation().getFactory().createPlan();
-		person.addPlan( plan );
+    final Plan plan = sc.getPopulation().getFactory().createPlan();
+    person.addPlan(plan);
 
-		final Activity activity = sc.getPopulation().getFactory().createActivityFromCoord( "type" , new Coord( 0 , 0 ) );
-		plan.addActivity( activity );
+    final Activity activity =
+        sc.getPopulation().getFactory().createActivityFromCoord("type", new Coord(0, 0));
+    plan.addActivity(activity);
 
-		activity.getAttributes().putAttribute( "actAttribute" , new StupidClass() );
+    activity.getAttributes().putAttribute("actAttribute", new StupidClass());
 
-		final Leg leg = sc.getPopulation().getFactory().createLeg( "mode" );
-		plan.addLeg( leg );
+    final Leg leg = sc.getPopulation().getFactory().createLeg("mode");
+    plan.addLeg(leg);
 
-		leg.getAttributes().putAttribute( "legAttribute" , new StupidClass() );
+    leg.getAttributes().putAttribute("legAttribute", new StupidClass());
 
-		plan.addActivity( sc.getPopulation().getFactory().createActivityFromCoord( "type" , new Coord( 0 , 0 )) );
+    plan.addActivity(
+        sc.getPopulation().getFactory().createActivityFromCoord("type", new Coord(0, 0)));
 
-		final PopulationWriter popWriter = new PopulationWriter( sc.getPopulation() , sc.getNetwork() );
-		popWriter.putAttributeConverter( StupidClass.class , new StupidClassConverter() );
-		popWriter.writeV6( plansFile );
-		final ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter(new ObjectAttributes());
-		writer.putAttributeConverter( StupidClass.class , new StupidClassConverter() );
-		writer.writeFile( attributeFile );
+    final PopulationWriter popWriter = new PopulationWriter(sc.getPopulation(), sc.getNetwork());
+    popWriter.putAttributeConverter(StupidClass.class, new StupidClassConverter());
+    popWriter.writeV6(plansFile);
+    final ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter(new ObjectAttributes());
+    writer.putAttributeConverter(StupidClass.class, new StupidClassConverter());
+    writer.writeFile(attributeFile);
 
-		final Network network = sc.getNetwork();
-		final NetworkFactory factory = network.getFactory();
+    final Network network = sc.getNetwork();
+    final NetworkFactory factory = network.getFactory();
 
-		network.getAttributes().putAttribute( "networkAttribute" , new StupidClass() );
+    network.getAttributes().putAttribute("networkAttribute", new StupidClass());
 
-		final Node node1 = factory.createNode( Id.createNodeId( 1 ) , new Coord( 0 , 0 ) );
-		final Node node2 = factory.createNode( Id.createNodeId( 2 ) , new Coord( 1 , 1) );
+    final Node node1 = factory.createNode(Id.createNodeId(1), new Coord(0, 0));
+    final Node node2 = factory.createNode(Id.createNodeId(2), new Coord(1, 1));
 
-		node1.getAttributes().putAttribute( "nodeAttribute" , new StupidClass() );
-		node2.getAttributes().putAttribute( "nodeAttribute" , new StupidClass() );
+    node1.getAttributes().putAttribute("nodeAttribute", new StupidClass());
+    node2.getAttributes().putAttribute("nodeAttribute", new StupidClass());
 
-		network.addNode( node1 );
-		network.addNode( node2 );
+    network.addNode(node1);
+    network.addNode(node2);
 
-		final Link link = factory.createLink( Id.createLinkId( 1 ) ,
-											node1, node2 );
-		link.getAttributes().putAttribute( "linkAttribute" , new StupidClass() );
-		network.addLink( link );
+    final Link link = factory.createLink(Id.createLinkId(1), node1, node2);
+    link.getAttributes().putAttribute("linkAttribute", new StupidClass());
+    network.addLink(link);
 
-		final NetworkWriter networkWriter = new NetworkWriter(sc.getNetwork());
-		networkWriter.putAttributeConverter( StupidClass.class , new StupidClassConverter() );
-		networkWriter.write( netFile );
+    final NetworkWriter networkWriter = new NetworkWriter(sc.getNetwork());
+    networkWriter.putAttributeConverter(StupidClass.class, new StupidClassConverter());
+    networkWriter.write(netFile);
 
-		return config;
-	}
+    return config;
+  }
 
-	private static class StupidClass {}
+  private static class StupidClass {}
 
-	private static class StupidClassConverter implements AttributeConverter<StupidClass> {
-		@Override
-		public StupidClass convert(String value) {
-			return new StupidClass();
-		}
+  private static class StupidClassConverter implements AttributeConverter<StupidClass> {
+    @Override
+    public StupidClass convert(String value) {
+      return new StupidClass();
+    }
 
-		@Override
-		public String convertToString(Object o) {
-			return "just some stupid instance";
-		}
-	}
+    @Override
+    public String convertToString(Object o) {
+      return "just some stupid instance";
+    }
+  }
 }

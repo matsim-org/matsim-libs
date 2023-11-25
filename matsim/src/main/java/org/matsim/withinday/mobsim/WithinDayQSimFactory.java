@@ -20,8 +20,8 @@
 
 package org.matsim.withinday.mobsim;
 
+import com.google.inject.Provider;
 import jakarta.inject.Inject;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -32,38 +32,41 @@ import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
 
-import com.google.inject.Provider;
-
 public class WithinDayQSimFactory implements Provider<Mobsim> {
 
-	private static final Logger log = LogManager.getLogger(WithinDayQSimFactory.class);
+  private static final Logger log = LogManager.getLogger(WithinDayQSimFactory.class);
 
-	private final Scenario scenario;
-	private final EventsManager eventsManager;
-	private final WithinDayEngine withinDayEngine;
-	private final FixedOrderSimulationListener fixedOrderSimulationListener;
-	private final WithinDayTravelTime withinDayTravelTime;
+  private final Scenario scenario;
+  private final EventsManager eventsManager;
+  private final WithinDayEngine withinDayEngine;
+  private final FixedOrderSimulationListener fixedOrderSimulationListener;
+  private final WithinDayTravelTime withinDayTravelTime;
 
-	@Inject
-	WithinDayQSimFactory(Scenario scenario, EventsManager eventsManager, WithinDayEngine withinDayEngine,
-			FixedOrderSimulationListener fixedOrderSimulationListener, WithinDayTravelTime WithinDayTravelTime) {
-		this.scenario = scenario;
-		this.eventsManager = eventsManager;
-		this.withinDayEngine = withinDayEngine;
-		this.fixedOrderSimulationListener = fixedOrderSimulationListener;
-		this.withinDayTravelTime = WithinDayTravelTime;
-	}
+  @Inject
+  WithinDayQSimFactory(
+      Scenario scenario,
+      EventsManager eventsManager,
+      WithinDayEngine withinDayEngine,
+      FixedOrderSimulationListener fixedOrderSimulationListener,
+      WithinDayTravelTime WithinDayTravelTime) {
+    this.scenario = scenario;
+    this.eventsManager = eventsManager;
+    this.withinDayEngine = withinDayEngine;
+    this.fixedOrderSimulationListener = fixedOrderSimulationListener;
+    this.withinDayTravelTime = WithinDayTravelTime;
+  }
 
-	@Override
-	public Mobsim get() {
-		Config config = scenario.getConfig();
+  @Override
+  public Mobsim get() {
+    Config config = scenario.getConfig();
 
-		log.info("Adding WithinDayEngine to Mobsim.");
-		return new QSimBuilder(config) //
-							 .useDefaults() //
-							 .addQSimModule(
-						new WithinDayQSimModule(withinDayEngine, fixedOrderSimulationListener, withinDayTravelTime)) //
-							 .configureQSimComponents(WithinDayQSimModule::configureComponents ) //
-							 .build(scenario, eventsManager);
-	}
+    log.info("Adding WithinDayEngine to Mobsim.");
+    return new QSimBuilder(config) //
+        .useDefaults() //
+        .addQSimModule(
+            new WithinDayQSimModule(
+                withinDayEngine, fixedOrderSimulationListener, withinDayTravelTime)) //
+        .configureQSimComponents(WithinDayQSimModule::configureComponents) //
+        .build(scenario, eventsManager);
+  }
 }

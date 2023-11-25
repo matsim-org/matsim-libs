@@ -19,52 +19,45 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.gbl.MatsimRandom;
-
 import com.google.inject.Inject;
-
-import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.socnetsim.framework.replanning.NonInnovativeStrategyFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.LogitWeight;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.WeightedWeight;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.highestweightselection.HighestWeightSelector;
+import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
+import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * @author thibautd
  */
 public class GroupWeightedSelectExpBetaFactory extends NonInnovativeStrategyFactory {
 
-	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
-	private final Scenario sc;
+  private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+  private final Scenario sc;
 
-	@Inject
-	public GroupWeightedSelectExpBetaFactory(
-			final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory,
-			final Scenario sc ) {
-		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
-		this.sc = sc;
-	}
+  @Inject
+  public GroupWeightedSelectExpBetaFactory(
+      final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory,
+      final Scenario sc) {
+    this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+    this.sc = sc;
+  }
 
-	@Override
-	public GroupLevelPlanSelector createSelector() {
-		final GroupReplanningConfigGroup configGroup = (GroupReplanningConfigGroup)
-				sc.getConfig().getModule(
-						GroupReplanningConfigGroup.GROUP_NAME );
+  @Override
+  public GroupLevelPlanSelector createSelector() {
+    final GroupReplanningConfigGroup configGroup =
+        (GroupReplanningConfigGroup)
+            sc.getConfig().getModule(GroupReplanningConfigGroup.GROUP_NAME);
 
-		return
-				 new HighestWeightSelector(
-					 incompatiblePlansIdentifierFactory ,
-					 new WeightedWeight(
-						 new LogitWeight(
-							MatsimRandom.getLocalInstance(),
-							sc.getConfig().scoring().getBrainExpBeta()),
-						 configGroup.getWeightAttributeName(),
-						 sc.getPopulation() ) );
-
-	}
-
+    return new HighestWeightSelector(
+        incompatiblePlansIdentifierFactory,
+        new WeightedWeight(
+            new LogitWeight(
+                MatsimRandom.getLocalInstance(), sc.getConfig().scoring().getBrainExpBeta()),
+            configGroup.getWeightAttributeName(),
+            sc.getPopulation()));
+  }
 }
-

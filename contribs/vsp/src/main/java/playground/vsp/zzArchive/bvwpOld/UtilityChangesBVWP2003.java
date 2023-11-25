@@ -18,44 +18,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
+/** */
 package playground.vsp.zzArchive.bvwpOld;
 
 import playground.vsp.zzArchive.bvwpOld.Values.Attribute;
 
-
-
 /**
  * @author Ihab
- *
  */
 @Deprecated
- class UtilityChangesBVWP2003 extends UtilityChanges {
-	
-		
-		@Override
-		UtlChangesData utlChangePerEntry(Attribute attribute,
-				double deltaAmount, double quantityNullfall, double quantityPlanfall, double margUtl) {
+class UtilityChangesBVWP2003 extends UtilityChanges {
 
-		UtlChangesData utlChanges = new UtlChangesData() ;
-		
-		if ( deltaAmount > 0 ) {
-			// wir sind aufnehmend; es zaehlt der Planfall:
-			utlChanges.utl = quantityPlanfall * margUtl ;
-		} else {
-			utlChanges.utl = -quantityNullfall * margUtl ;
-		}
+  @Override
+  UtlChangesData utlChangePerEntry(
+      Attribute attribute,
+      double deltaAmount,
+      double quantityNullfall,
+      double quantityPlanfall,
+      double margUtl) {
 
-		return utlChanges;
-	}
+    UtlChangesData utlChanges = new UtlChangesData();
 
-	@Override
-	double computeImplicitUtility(Attributes econValues,
-			Attributes quantitiesNullfall,
-			Attributes quantitiesPlanfall) {
-		return 0;
-	}
+    if (deltaAmount > 0) {
+      // wir sind aufnehmend; es zaehlt der Planfall:
+      utlChanges.utl = quantityPlanfall * margUtl;
+    } else {
+      utlChanges.utl = -quantityNullfall * margUtl;
+    }
 
+    return utlChanges;
+  }
+
+  @Override
+  double computeImplicitUtility(
+      Attributes econValues, Attributes quantitiesNullfall, Attributes quantitiesPlanfall) {
+    return 0;
+  }
 }

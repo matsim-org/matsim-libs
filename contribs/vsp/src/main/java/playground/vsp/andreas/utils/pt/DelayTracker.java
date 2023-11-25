@@ -21,7 +21,6 @@ package playground.vsp.andreas.utils.pt;
 
 import java.util.HashMap;
 import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -34,62 +33,66 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  */
 public class DelayTracker {
 
-	private final TransitSchedule schedule;
-	private final HashMap<Id, InternalData> vehicleTracker = new HashMap<Id, InternalData>();
-	
-	public DelayTracker(final TransitSchedule schedule) {
-		this.schedule = schedule;
-	}
-	
-	public void addVehicleAssignment(final Id vehicleId, final Id transitLineId, final Id transitRouteId, final Id departureId) {
-		TransitLine line = this.schedule.getTransitLines().get(transitLineId);
-		TransitRoute route = line.getRoutes().get(transitRouteId);
-		Departure dep = route.getDepartures().get(departureId);
-		
-		this.vehicleTracker.put(vehicleId, new InternalData(dep.getDepartureTime(), route.getStops()));
-	}
-	
-	public double vehicleArrivesAtStop(final Id vehicleId, final double arrivalTime, final Id stopFacilityId) {
-		InternalData d = this.vehicleTracker.get(vehicleId);
-		TransitRouteStop stop = d.stops.get(d.idx);
-		if (!stop.getStopFacility().getId().equals(stopFacilityId)) {
-			for (int idx = d.idx + 1; idx < d.stops.size(); idx++) {
-				stop = d.stops.get(idx);
-				if (stop.getStopFacility().getId().equals(stopFacilityId)) {
-					// we found the stop, looks like we skipped some stations, or at least were not informed about the departure
-					d.idx = idx;
-					break;
-				}
-			}
-		}
-		
-		if (stop.getStopFacility().getId().equals(stopFacilityId)) {
-			double scheduledTime = d.departureTime + stop.getArrivalOffset().or(stop::getDepartureOffset).seconds();
-			return arrivalTime - scheduledTime;
-		}
-		return Double.NaN;
-	}
+  private final TransitSchedule schedule;
+  private final HashMap<Id, InternalData> vehicleTracker = new HashMap<Id, InternalData>();
 
-	public double vehicleDepartsAtStop(final Id vehicleId, final double departureTime, final Id stopFacilityId) {
-		InternalData d = this.vehicleTracker.get(vehicleId);
-		TransitRouteStop stop = d.stops.get(d.idx);
-		d.idx++;
-		if (stop.getStopFacility().getId().equals(stopFacilityId)) {
-			double scheduledTime = d.departureTime + stop.getDepartureOffset().seconds();
-			return departureTime - scheduledTime;
-		}
-		return Double.NaN;
-	}
+  public DelayTracker(final TransitSchedule schedule) {
+    this.schedule = schedule;
+  }
 
-	private static class InternalData {
-		final double departureTime;
-		final List<TransitRouteStop> stops;
-		int idx = 0;
-		
-		public InternalData(final double departureTime, final List<TransitRouteStop> stops) {
-			this.departureTime = departureTime;
-			this.stops = stops;
-		}
-	}
-	
+  public void addVehicleAssignment(
+      final Id vehicleId, final Id transitLineId, final Id transitRouteId, final Id departureId) {
+    TransitLine line = this.schedule.getTransitLines().get(transitLineId);
+    TransitRoute route = line.getRoutes().get(transitRouteId);
+    Departure dep = route.getDepartures().get(departureId);
+
+    this.vehicleTracker.put(vehicleId, new InternalData(dep.getDepartureTime(), route.getStops()));
+  }
+
+  public double vehicleArrivesAtStop(
+      final Id vehicleId, final double arrivalTime, final Id stopFacilityId) {
+    InternalData d = this.vehicleTracker.get(vehicleId);
+    TransitRouteStop stop = d.stops.get(d.idx);
+    if (!stop.getStopFacility().getId().equals(stopFacilityId)) {
+      for (int idx = d.idx + 1; idx < d.stops.size(); idx++) {
+        stop = d.stops.get(idx);
+        if (stop.getStopFacility().getId().equals(stopFacilityId)) {
+          // we found the stop, looks like we skipped some stations, or at least were not informed
+          // about the departure
+          d.idx = idx;
+          break;
+        }
+      }
+    }
+
+    if (stop.getStopFacility().getId().equals(stopFacilityId)) {
+      double scheduledTime =
+          d.departureTime + stop.getArrivalOffset().or(stop::getDepartureOffset).seconds();
+      return arrivalTime - scheduledTime;
+    }
+    return Double.NaN;
+  }
+
+  public double vehicleDepartsAtStop(
+      final Id vehicleId, final double departureTime, final Id stopFacilityId) {
+    InternalData d = this.vehicleTracker.get(vehicleId);
+    TransitRouteStop stop = d.stops.get(d.idx);
+    d.idx++;
+    if (stop.getStopFacility().getId().equals(stopFacilityId)) {
+      double scheduledTime = d.departureTime + stop.getDepartureOffset().seconds();
+      return departureTime - scheduledTime;
+    }
+    return Double.NaN;
+  }
+
+  private static class InternalData {
+    final double departureTime;
+    final List<TransitRouteStop> stops;
+    int idx = 0;
+
+    public InternalData(final double departureTime, final List<TransitRouteStop> stops) {
+      this.departureTime = departureTime;
+      this.stops = stops;
+    }
+  }
 }

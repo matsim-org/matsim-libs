@@ -19,50 +19,54 @@
 package org.matsim.contrib.signals.data.signalcontrol.v20;
 
 import java.util.SortedMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
+
 /**
- * 
  * @author dgrether
- *
  */
 public interface SignalPlanData {
 
-	public Id<SignalPlan> getId();
+  public Id<SignalPlan> getId();
 
-	public void addSignalGroupSettings(SignalGroupSettingsData signalGroupSettings);
+  public void addSignalGroupSettings(SignalGroupSettingsData signalGroupSettings);
 
-	public SortedMap<Id<SignalGroup>, SignalGroupSettingsData> getSignalGroupSettingsDataByGroupId();
+  public SortedMap<Id<SignalGroup>, SignalGroupSettingsData> getSignalGroupSettingsDataByGroupId();
 
-	/**
-	 * @return 0.0 if not set
-	 */
-	public double getStartTime();
-	/**
-	 * Set the time of day the  plan should be activated. Set start and end to 0.0 if the plan should be active all day.
-	 */
-	public void setStartTime(Double seconds);
-	/**
-	 * @return 0.0 if not set
-	 */
-	public double getEndTime();
-	/**
-	 * Set the time of day the  plan should be activated. Set start and end to 0.0 if the plan should be active all day.
-	 */
-	public void setEndTime(Double seconds);
-	/**
-	 * @return null if not set
-	 */
-	public Integer getCycleTime();
+  /**
+   * @return 0.0 if not set
+   */
+  public double getStartTime();
 
-	public void setCycleTime(Integer cycleTime);
-	/**
-	 * @return 0 if not set
-	 */
-	public int getOffset();
+  /**
+   * Set the time of day the plan should be activated. Set start and end to 0.0 if the plan should
+   * be active all day.
+   */
+  public void setStartTime(Double seconds);
 
-	public void setOffset(int seconds);
-	
+  /**
+   * @return 0.0 if not set
+   */
+  public double getEndTime();
+
+  /**
+   * Set the time of day the plan should be activated. Set start and end to 0.0 if the plan should
+   * be active all day.
+   */
+  public void setEndTime(Double seconds);
+
+  /**
+   * @return null if not set
+   */
+  public Integer getCycleTime();
+
+  public void setCycleTime(Integer cycleTime);
+
+  /**
+   * @return 0 if not set
+   */
+  public int getOffset();
+
+  public void setOffset(int seconds);
 }

@@ -22,8 +22,6 @@ package playground.vsp.andreas.bvgAna.level1;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
-
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,66 +31,75 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 
 /**
- * Evaluates the headway between two vehicles following each other. If they are considered to bunch a <code>StopId2LineId2PulkData</code> entry is stored at the corresponding stop and line.
- * 
- * @author aneumann
+ * Evaluates the headway between two vehicles following each other. If they are considered to bunch
+ * a <code>StopId2LineId2PulkData</code> entry is stored at the corresponding stop and line.
  *
+ * @author aneumann
  */
-public class StopId2LineId2Pulk implements TransitDriverStartsEventHandler, VehicleDepartsAtFacilityEventHandler{
-	
-	private final Logger log = LogManager.getLogger(StopId2LineId2Pulk.class);
-//	private final Level logLevel = Level.DEBUG;
-	
-	private TreeMap<Id, Id> vehId2LineMap = new TreeMap<Id, Id>();
-	private TreeMap<Id, TreeMap<Id, VehicleDepartsAtFacilityEvent>> stopId2LineId2VehDepEvent = new TreeMap<Id, TreeMap<Id,VehicleDepartsAtFacilityEvent>>();
-	private TreeMap<Id, TreeMap<Id, List<StopId2LineId2PulkData>>> stopId2LineId2PulkDataList = new TreeMap<Id, TreeMap<Id, List<StopId2LineId2PulkData>>>();
-	
-	public StopId2LineId2Pulk(){
-//		this.log.setLevel(this.logLevel);
-	}
+public class StopId2LineId2Pulk
+    implements TransitDriverStartsEventHandler, VehicleDepartsAtFacilityEventHandler {
 
-	/**
-	 * @return Returns a map containing all occurred bunching event in form of a <code>StopId2LineId2PulkData</code> entry for each stop sorted by line
-	 */
-	public TreeMap<Id, TreeMap<Id, List<StopId2LineId2PulkData>>> getStopId2LineId2PulkDataList(){
-		return this.stopId2LineId2PulkDataList;
-	}
-	
-	@Override
-	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		if(this.stopId2LineId2VehDepEvent.get(event.getFacilityId()) == null){
-			this.stopId2LineId2VehDepEvent.put(event.getFacilityId(), new TreeMap<Id, VehicleDepartsAtFacilityEvent>());
-		}
-		
-		Id lineId = this.vehId2LineMap.get(event.getVehicleId());		
-		VehicleDepartsAtFacilityEvent oldEvent = this.stopId2LineId2VehDepEvent.get(event.getFacilityId()).get(lineId);
+  private final Logger log = LogManager.getLogger(StopId2LineId2Pulk.class);
+  //	private final Level logLevel = Level.DEBUG;
 
-		if(oldEvent != null){
-			StopId2LineId2PulkData pulkData = new StopId2LineId2PulkData(lineId, oldEvent, event);
+  private TreeMap<Id, Id> vehId2LineMap = new TreeMap<Id, Id>();
+  private TreeMap<Id, TreeMap<Id, VehicleDepartsAtFacilityEvent>> stopId2LineId2VehDepEvent =
+      new TreeMap<Id, TreeMap<Id, VehicleDepartsAtFacilityEvent>>();
+  private TreeMap<Id, TreeMap<Id, List<StopId2LineId2PulkData>>> stopId2LineId2PulkDataList =
+      new TreeMap<Id, TreeMap<Id, List<StopId2LineId2PulkData>>>();
 
-			if(pulkData.isPulk()){
-				if(this.stopId2LineId2PulkDataList.get(event.getFacilityId()) == null){
-					this.stopId2LineId2PulkDataList.put(event.getFacilityId(), new TreeMap<Id, List<StopId2LineId2PulkData>>());
-				}
+  public StopId2LineId2Pulk() {
+    //		this.log.setLevel(this.logLevel);
+  }
 
-				if(this.stopId2LineId2PulkDataList.get(event.getFacilityId()).get(lineId) == null){
-					this.stopId2LineId2PulkDataList.get(event.getFacilityId()).put(lineId, new ArrayList<StopId2LineId2PulkData>());
-				}
+  /**
+   * @return Returns a map containing all occurred bunching event in form of a <code>
+   *     StopId2LineId2PulkData</code> entry for each stop sorted by line
+   */
+  public TreeMap<Id, TreeMap<Id, List<StopId2LineId2PulkData>>> getStopId2LineId2PulkDataList() {
+    return this.stopId2LineId2PulkDataList;
+  }
 
-				this.stopId2LineId2PulkDataList.get(event.getFacilityId()).get(lineId).add(pulkData);
-			}
-		}
+  @Override
+  public void handleEvent(VehicleDepartsAtFacilityEvent event) {
+    if (this.stopId2LineId2VehDepEvent.get(event.getFacilityId()) == null) {
+      this.stopId2LineId2VehDepEvent.put(
+          event.getFacilityId(), new TreeMap<Id, VehicleDepartsAtFacilityEvent>());
+    }
 
-		this.stopId2LineId2VehDepEvent.get(event.getFacilityId()).put(lineId, event);
-	}
-	
-	@Override
-	public void handleEvent(TransitDriverStartsEvent event) {
-		this.vehId2LineMap.put(event.getVehicleId(), event.getTransitLineId());		
-	}	
-	
-	@Override
-	public void reset(int iteration) {
-		this.log.debug("reset method in iteration " + iteration + " not implemented, yet");
-	}
+    Id lineId = this.vehId2LineMap.get(event.getVehicleId());
+    VehicleDepartsAtFacilityEvent oldEvent =
+        this.stopId2LineId2VehDepEvent.get(event.getFacilityId()).get(lineId);
+
+    if (oldEvent != null) {
+      StopId2LineId2PulkData pulkData = new StopId2LineId2PulkData(lineId, oldEvent, event);
+
+      if (pulkData.isPulk()) {
+        if (this.stopId2LineId2PulkDataList.get(event.getFacilityId()) == null) {
+          this.stopId2LineId2PulkDataList.put(
+              event.getFacilityId(), new TreeMap<Id, List<StopId2LineId2PulkData>>());
+        }
+
+        if (this.stopId2LineId2PulkDataList.get(event.getFacilityId()).get(lineId) == null) {
+          this.stopId2LineId2PulkDataList
+              .get(event.getFacilityId())
+              .put(lineId, new ArrayList<StopId2LineId2PulkData>());
+        }
+
+        this.stopId2LineId2PulkDataList.get(event.getFacilityId()).get(lineId).add(pulkData);
+      }
+    }
+
+    this.stopId2LineId2VehDepEvent.get(event.getFacilityId()).put(lineId, event);
+  }
+
+  @Override
+  public void handleEvent(TransitDriverStartsEvent event) {
+    this.vehId2LineMap.put(event.getVehicleId(), event.getTransitLineId());
+  }
+
+  @Override
+  public void reset(int iteration) {
+    this.log.debug("reset method in iteration " + iteration + " not implemented, yet");
+  }
 }

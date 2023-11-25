@@ -21,32 +21,33 @@ package org.matsim.contrib.signals.model;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 
-
 /**
  * Default AmberLogic that switches to green or red without any amber signal in between.
- * 
- * @author dgrether
  *
+ * @author dgrether
  */
 final class EmptyAmberLogicImpl implements AmberLogic {
 
-	@Override
-	public Set<SignalGroupStateChangeRequest> processDropping(double now, Id<SignalSystem> systemId, Id<SignalGroup> signalGroupId) {
-		Set<SignalGroupStateChangeRequest> ret = new HashSet<SignalGroupStateChangeRequest>();
-		SignalGroupStateChangeRequest redRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.RED, now);
-		ret.add(redRequest);
-		return ret;
-	}
+  @Override
+  public Set<SignalGroupStateChangeRequest> processDropping(
+      double now, Id<SignalSystem> systemId, Id<SignalGroup> signalGroupId) {
+    Set<SignalGroupStateChangeRequest> ret = new HashSet<SignalGroupStateChangeRequest>();
+    SignalGroupStateChangeRequest redRequest =
+        new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.RED, now);
+    ret.add(redRequest);
+    return ret;
+  }
 
-	@Override
-	public Set<SignalGroupStateChangeRequest> processOnsets(double now, Id<SignalSystem> systemId, Id<SignalGroup> signalGroupId) {
-		Set<SignalGroupStateChangeRequest> ret = new HashSet<SignalGroupStateChangeRequest>();
-		SignalGroupStateChangeRequest redRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.GREEN, now);
-		ret.add(redRequest);
-		return ret;
-	}
+  @Override
+  public Set<SignalGroupStateChangeRequest> processOnsets(
+      double now, Id<SignalSystem> systemId, Id<SignalGroup> signalGroupId) {
+    Set<SignalGroupStateChangeRequest> ret = new HashSet<SignalGroupStateChangeRequest>();
+    SignalGroupStateChangeRequest redRequest =
+        new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.GREEN, now);
+    ret.add(redRequest);
+    return ret;
+  }
 }

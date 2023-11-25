@@ -11,31 +11,30 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class SpatialGridTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private double cellSize = 10.;
+  private double cellSize = 10.;
 
+  @Test
+  public void testSpatialGrid() {
 
-	@Test public void testSpatialGrid() {
+    // get network
+    Network network = CreateTestNetwork.createTestNetwork();
 
-		// get network
-		Network network = CreateTestNetwork.createTestNetwork();
+    // get boundaries of network, i.e. x and y coordinates
+    BoundingBox nbb = BoundingBox.createBoundingBox(network);
 
-		// get boundaries of network, i.e. x and y coordinates
-		BoundingBox nbb = BoundingBox.createBoundingBox(network);
+    // create spatial grid
+    SpatialGrid testGrid = new SpatialGrid(nbb.getBoundingBox(), cellSize);
 
-		// create spatial grid
-		SpatialGrid testGrid = new SpatialGrid(nbb.getBoundingBox(), cellSize);
+    // get number of rows
+    int rows = testGrid.getNumRows();
+    double numOfExpectedRows = ((nbb.getYMax() - nbb.getYMin()) / cellSize) + 1;
+    Assert.assertTrue(rows == numOfExpectedRows);
 
-		// get number of rows
-		int rows = testGrid.getNumRows();
-		double numOfExpectedRows = ((nbb.getYMax() - nbb.getYMin()) / cellSize) + 1;
-		Assert.assertTrue(rows == numOfExpectedRows);
-
-		// get number of columns
-		int cols = testGrid.getNumCols(0);
-		double numOfExpectedCols = ((nbb.getXMax() - nbb.getXMin()) / cellSize) + 1;
-		Assert.assertTrue(cols == numOfExpectedCols);
-	}
+    // get number of columns
+    int cols = testGrid.getNumCols(0);
+    double numOfExpectedCols = ((nbb.getXMax() - nbb.getXMin()) / cellSize) + 1;
+    Assert.assertTrue(cols == numOfExpectedCols);
+  }
 }

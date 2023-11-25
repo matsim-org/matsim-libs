@@ -25,13 +25,11 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 
 public interface AgentFactory extends MatsimFactory {
 
-	/**
-     * Seems that in current implementations, this does not only create the agent,
-     * but also inserts it into the simulation. This is against our current design
-     * principles ("no side effects", "no object registration behind the scenes"), 
-     * but this is really old design :-(.  It also means that this is not 
-     * a plain factory.  kai, nov'11
-	 */
-	public MobsimAgent createMobsimAgentFromPerson(final Person p);
-
+  /**
+   * Seems that in current implementations, this does not only create the agent, but also inserts it
+   * into the simulation. This is against our current design principles ("no side effects", "no
+   * object registration behind the scenes"), but this is really old design :-(. It also means that
+   * this is not a plain factory. kai, nov'11
+   */
+  public MobsimAgent createMobsimAgentFromPerson(final Person p);
 }

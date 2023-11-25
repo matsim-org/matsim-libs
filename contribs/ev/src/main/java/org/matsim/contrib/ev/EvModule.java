@@ -25,20 +25,24 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 public class EvModule extends AbstractModule {
-	public static final String EV_COMPONENT = "EV_COMPONENT";
+  public static final String EV_COMPONENT = "EV_COMPONENT";
 
-	public EvModule(){}
+  public EvModule() {}
 
-	@Override
-	public void install() {
-		install( new EvBaseModule() );
+  @Override
+  public void install() {
+    install(new EvBaseModule());
 
-		// this is not for DynVehicles.  Does that mean that we cannot combine charging for normal vehicles with charging for eTaxis?  Can't say ...  kai, dec'22
-		installQSimModule(new AbstractQSimModule() {
-			@Override protected void configureQSim() {
-				addMobsimScopeEventHandlerBinding().to( VehicleChargingHandler.class ).in( Singleton.class );
-			}
-		});
-
-	}
+    // this is not for DynVehicles.  Does that mean that we cannot combine charging for normal
+    // vehicles with charging for eTaxis?  Can't say ...  kai, dec'22
+    installQSimModule(
+        new AbstractQSimModule() {
+          @Override
+          protected void configureQSim() {
+            addMobsimScopeEventHandlerBinding()
+                .to(VehicleChargingHandler.class)
+                .in(Singleton.class);
+          }
+        });
+  }
 }

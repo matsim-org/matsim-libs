@@ -21,12 +21,14 @@ package org.matsim.contrib.signals.integration.invertednetworks;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.controller.fixedTime.DefaultPlanbasedSignalSystemController;
+import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataImpl;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataFactory;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
-import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsDataFactory;
@@ -41,57 +43,65 @@ import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.integration.invertednetworks.InvertedNetworkRoutingTestFixture;
-import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.controller.fixedTime.DefaultPlanbasedSignalSystemController;
 
 /**
  * @author dgrether
- *
  */
 public class InvertedNetworkRoutingSignalsFixture extends InvertedNetworkRoutingTestFixture {
 
-	public InvertedNetworkRoutingSignalsFixture(boolean doCreateModes,
-			boolean doCreateLanes, boolean doCreateSignals) {
-		super(doCreateModes, doCreateLanes, doCreateSignals);
-		if (doCreateSignals){
-		    scenario.getConfig().qsim().setUsingFastCapacityUpdate(false);
-			ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
-			createSignals();
-		}
-	}
-	
-	private void createSignals() {
-		SignalsData signalsData = new SignalsDataImpl(ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class));
-		this.scenario.addScenarioElement(SignalsData.ELEMENT_NAME, signalsData);
-		SignalSystemsData ssd = signalsData.getSignalSystemsData();
-		SignalSystemsDataFactory f = ssd.getFactory();
-		SignalSystemData system = f.createSignalSystemData(Id.create(2, SignalSystem.class));
-		ssd.addSignalSystemData(system);
-		SignalData signal = f.createSignalData(Id.create(1, Signal.class));
-		signal.setLinkId(Id.create(12, Link.class));
-		signal.addTurningMoveRestriction(Id.create(25, Link.class));
-		system.addSignalData(signal);
-		SignalGroupsData sgd = signalsData.getSignalGroupsData();
-		SignalGroupsDataFactory fsg = sgd.getFactory();
-		SignalGroupData sg = fsg.createSignalGroupData(Id.create(2, SignalSystem.class), Id.create(2, SignalGroup.class));
-		sg.addSignalId(Id.create(1, Signal.class));
-		sgd.addSignalGroupData(sg);
-		SignalControlData scd = signalsData.getSignalControlData();
-		SignalControlDataFactory fsc = scd.getFactory();
-		SignalSystemControllerData controller = fsc.createSignalSystemControllerData(Id.create(2, SignalSystem.class));
-		controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-		scd.addSignalSystemControllerData(controller);
-		SignalPlanData plan = fsc.createSignalPlanData(Id.create(1, SignalPlan.class));
-		plan.setStartTime(0.0);
-		plan.setEndTime(23 * 3600.0);
-		plan.setCycleTime(100);
-		plan.setOffset(0);
-		controller.addSignalPlanData(plan);
-		SignalGroupSettingsData group = fsc.createSignalGroupSettingsData(Id.create(2, SignalGroup.class));
-		group.setOnset(0);
-		group.setDropping(100);
-		plan.addSignalGroupSettings(group);
-	}
+  public InvertedNetworkRoutingSignalsFixture(
+      boolean doCreateModes, boolean doCreateLanes, boolean doCreateSignals) {
+    super(doCreateModes, doCreateLanes, doCreateSignals);
+    if (doCreateSignals) {
+      scenario.getConfig().qsim().setUsingFastCapacityUpdate(false);
+      ConfigUtils.addOrGetModule(
+              scenario.getConfig(),
+              SignalSystemsConfigGroup.GROUP_NAME,
+              SignalSystemsConfigGroup.class)
+          .setUseSignalSystems(true);
+      createSignals();
+    }
+  }
 
-
+  private void createSignals() {
+    SignalsData signalsData =
+        new SignalsDataImpl(
+            ConfigUtils.addOrGetModule(
+                scenario.getConfig(),
+                SignalSystemsConfigGroup.GROUP_NAME,
+                SignalSystemsConfigGroup.class));
+    this.scenario.addScenarioElement(SignalsData.ELEMENT_NAME, signalsData);
+    SignalSystemsData ssd = signalsData.getSignalSystemsData();
+    SignalSystemsDataFactory f = ssd.getFactory();
+    SignalSystemData system = f.createSignalSystemData(Id.create(2, SignalSystem.class));
+    ssd.addSignalSystemData(system);
+    SignalData signal = f.createSignalData(Id.create(1, Signal.class));
+    signal.setLinkId(Id.create(12, Link.class));
+    signal.addTurningMoveRestriction(Id.create(25, Link.class));
+    system.addSignalData(signal);
+    SignalGroupsData sgd = signalsData.getSignalGroupsData();
+    SignalGroupsDataFactory fsg = sgd.getFactory();
+    SignalGroupData sg =
+        fsg.createSignalGroupData(
+            Id.create(2, SignalSystem.class), Id.create(2, SignalGroup.class));
+    sg.addSignalId(Id.create(1, Signal.class));
+    sgd.addSignalGroupData(sg);
+    SignalControlData scd = signalsData.getSignalControlData();
+    SignalControlDataFactory fsc = scd.getFactory();
+    SignalSystemControllerData controller =
+        fsc.createSignalSystemControllerData(Id.create(2, SignalSystem.class));
+    controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
+    scd.addSignalSystemControllerData(controller);
+    SignalPlanData plan = fsc.createSignalPlanData(Id.create(1, SignalPlan.class));
+    plan.setStartTime(0.0);
+    plan.setEndTime(23 * 3600.0);
+    plan.setCycleTime(100);
+    plan.setOffset(0);
+    controller.addSignalPlanData(plan);
+    SignalGroupSettingsData group =
+        fsc.createSignalGroupSettingsData(Id.create(2, SignalGroup.class));
+    group.setOnset(0);
+    group.setDropping(100);
+    plan.addSignalGroupSettings(group);
+  }
 }

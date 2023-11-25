@@ -25,12 +25,10 @@ import org.matsim.households.Income.IncomePeriod;
 
 /**
  * @author dgrether
- *
  */
 public interface HouseholdsFactory extends MatsimFactory {
 
-	public Household createHousehold(Id<Household> householdId);
-	
-	public Income createIncome(double income, IncomePeriod period);
+  public Household createHousehold(Id<Household> householdId);
 
+  public Income createIncome(double income, IncomePeriod period);
 }

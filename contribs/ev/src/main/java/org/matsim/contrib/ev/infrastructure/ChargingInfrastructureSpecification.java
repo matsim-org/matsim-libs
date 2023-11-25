@@ -21,24 +21,24 @@
 package org.matsim.contrib.ev.infrastructure;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 
 /**
  * A container of {@link ChargerSpecification}. Its lifespan covers all iterations.
- * <p>
- * It can be modified between iterations by add/replace/removeChargerSpecification().
- * <p>
- * The contained DvrpChargerSpecifications are (meant to be) immutable, so to modify them, use replaceVehicleSpecification()
+ *
+ * <p>It can be modified between iterations by add/replace/removeChargerSpecification().
+ *
+ * <p>The contained DvrpChargerSpecifications are (meant to be) immutable, so to modify them, use
+ * replaceVehicleSpecification()
  *
  * @author Michal Maciejewski (michalm)
  */
 public interface ChargingInfrastructureSpecification {
-	Map<Id<Charger>, ChargerSpecification> getChargerSpecifications();
+  Map<Id<Charger>, ChargerSpecification> getChargerSpecifications();
 
-	void addChargerSpecification(ChargerSpecification specification);
+  void addChargerSpecification(ChargerSpecification specification);
 
-	void replaceChargerSpecification(ChargerSpecification specification);
+  void replaceChargerSpecification(ChargerSpecification specification);
 
-	void removeChargerSpecification(Id<Charger> chargerId);
+  void removeChargerSpecification(Id<Charger> chargerId);
 }

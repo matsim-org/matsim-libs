@@ -36,66 +36,68 @@ import org.matsim.testcases.fakes.FakeLink;
  */
 public class TransitStopFacilityTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  /**
+   * In case we once should have more than one implementation of {@link TransitStopFacility}, simply
+   * inherit from this test and overwrite this method to return your own implementation.
+   *
+   * @param id
+   * @param coord
+   * @return a new instance of a TransitStopFacility with the given attributes
+   */
+  protected TransitStopFacility createTransitStopFacility(
+      final Id<TransitStopFacility> id, final Coord coord, final boolean isBlockingLane) {
+    return new TransitStopFacilityImpl(id, coord, isBlockingLane);
+  }
 
-	/**
-	 * In case we once should have more than one implementation of
-	 * {@link TransitStopFacility}, simply inherit from this test and overwrite
-	 * this method to return your own implementation.
-	 *
-	 * @param id
-	 * @param coord
-	 * @return a new instance of a TransitStopFacility with the given attributes
-	 */
-	protected TransitStopFacility createTransitStopFacility(final Id<TransitStopFacility> id, final Coord coord, final boolean isBlockingLane) {
-		return new TransitStopFacilityImpl(id, coord, isBlockingLane);
-	}
+  @Test
+  public void testInitialization() {
+    Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
+    Coord coord = new Coord((double) 30, (double) 5);
+    TransitStopFacility stop = createTransitStopFacility(id, coord, false);
+    assertEquals(id.toString(), stop.getId().toString());
+    assertEquals(coord.getX(), stop.getCoord().getX(), MatsimTestUtils.EPSILON);
+    assertEquals(coord.getY(), stop.getCoord().getY(), MatsimTestUtils.EPSILON);
+    assertFalse(stop.getIsBlockingLane());
+  }
 
-	@Test public void testInitialization() {
-		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
-		Coord coord = new Coord((double) 30, (double) 5);
-		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
-		assertEquals(id.toString(), stop.getId().toString());
-		assertEquals(coord.getX(), stop.getCoord().getX(), MatsimTestUtils.EPSILON);
-		assertEquals(coord.getY(), stop.getCoord().getY(), MatsimTestUtils.EPSILON);
-		assertFalse(stop.getIsBlockingLane());
-	}
+  @Test
+  public void testBlockingStop() {
+    Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
+    Coord coord = new Coord((double) 30, (double) 5);
+    TransitStopFacility stop = createTransitStopFacility(id, coord, false);
+    assertFalse(stop.getIsBlockingLane());
+    stop = createTransitStopFacility(id, coord, true);
+    assertTrue(stop.getIsBlockingLane());
+  }
 
-	@Test public void testBlockingStop() {
-		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
-		Coord coord = new Coord((double) 30, (double) 5);
-		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
-		assertFalse(stop.getIsBlockingLane());
-		stop = createTransitStopFacility(id, coord, true);
-		assertTrue(stop.getIsBlockingLane());
-	}
+  @Test
+  public void testLink() {
+    Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
+    Coord coord = new Coord((double) 30, (double) 5);
+    TransitStopFacility stop = createTransitStopFacility(id, coord, false);
+    assertNull(stop.getLinkId());
+    Link link = new FakeLink(Id.create(99, Link.class), null, null);
+    stop.setLinkId(link.getId());
+    assertEquals(link.getId(), stop.getLinkId());
+    stop.setLinkId(null);
+    assertNull(stop.getLinkId());
+  }
 
-	@Test public void testLink() {
-		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
-		Coord coord = new Coord((double) 30, (double) 5);
-		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
-		assertNull(stop.getLinkId());
-		Link link = new FakeLink(Id.create(99, Link.class), null, null);
-		stop.setLinkId(link.getId());
-		assertEquals(link.getId(), stop.getLinkId());
-		stop.setLinkId(null);
-		assertNull(stop.getLinkId());
-	}
-
-	@Test public void testName() {
-		Id<TransitStopFacility> id = Id.create(9791, TransitStopFacility.class);
-		Coord coord = new Coord((double) 10, (double) 5);
-		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
-		assertNull(stop.getName());
-		String name = "just some name.";
-		stop.setName(name);
-		assertEquals(name, stop.getName());
-		name += " updated.";
-		stop.setName(name);
-		assertEquals(name, stop.getName());
-		stop.setName(null);
-		assertNull(stop.getName());
-	}
+  @Test
+  public void testName() {
+    Id<TransitStopFacility> id = Id.create(9791, TransitStopFacility.class);
+    Coord coord = new Coord((double) 10, (double) 5);
+    TransitStopFacility stop = createTransitStopFacility(id, coord, false);
+    assertNull(stop.getName());
+    String name = "just some name.";
+    stop.setName(name);
+    assertEquals(name, stop.getName());
+    name += " updated.";
+    stop.setName(name);
+    assertEquals(name, stop.getName());
+    stop.setName(null);
+    assertNull(stop.getName());
+  }
 }

@@ -18,5 +18,8 @@
 package org.matsim.contrib.freightreceiver;
 
 public enum ReceiverReplanningType {
-    serviceTime, timeWindow, orderFrequency, afterHoursTimeWindow
+  serviceTime,
+  timeWindow,
+  orderFrequency,
+  afterHoursTimeWindow
 }

@@ -20,13 +20,11 @@
 package org.matsim.contrib.socnetsim.framework.replanning;
 
 import java.util.Collection;
-
 import org.matsim.core.replanning.ReplanningContext;
 
 /**
  * @author thibautd
  */
 public interface GenericStrategyModule<T> {
-	public void handlePlans( ReplanningContext replanningContext , Collection<T> toHandle );
+  public void handlePlans(ReplanningContext replanningContext, Collection<T> toHandle);
 }
-

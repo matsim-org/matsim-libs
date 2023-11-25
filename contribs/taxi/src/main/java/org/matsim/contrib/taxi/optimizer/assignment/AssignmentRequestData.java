@@ -19,41 +19,40 @@
 
 package org.matsim.contrib.taxi.optimizer.assignment;
 
-import org.matsim.contrib.drt.passenger.DrtRequest;
-
 import com.google.common.collect.ImmutableList;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 
 class AssignmentRequestData extends AssignmentDestinationData<DrtRequest> {
 
-	static AssignmentRequestData create(double currentTime, double planningHorizon,
-			Iterable<DrtRequest> unplannedRequests) {
-		double maxEarliestStart = currentTime + planningHorizon;
-		ImmutableList.Builder<DestEntry<DrtRequest>> builder = ImmutableList.builder();
+  static AssignmentRequestData create(
+      double currentTime, double planningHorizon, Iterable<DrtRequest> unplannedRequests) {
+    double maxEarliestStart = currentTime + planningHorizon;
+    ImmutableList.Builder<DestEntry<DrtRequest>> builder = ImmutableList.builder();
 
-		int idx = 0;
-		int urgentReqCount = 0;
-		for (DrtRequest r : unplannedRequests) {
-			double earliestStart = r.getEarliestStartTime();
-			if (earliestStart > maxEarliestStart) {// beyond the planning horizon
-				continue;
-			}
-			if (earliestStart <= currentTime) {
-				urgentReqCount++;
-			}
-			builder.add(new DestEntry<>(idx++, r, r.getFromLink(), earliestStart));
-		}
+    int idx = 0;
+    int urgentReqCount = 0;
+    for (DrtRequest r : unplannedRequests) {
+      double earliestStart = r.getEarliestStartTime();
+      if (earliestStart > maxEarliestStart) { // beyond the planning horizon
+        continue;
+      }
+      if (earliestStart <= currentTime) {
+        urgentReqCount++;
+      }
+      builder.add(new DestEntry<>(idx++, r, r.getFromLink(), earliestStart));
+    }
 
-		return new AssignmentRequestData(builder.build(), urgentReqCount);
-	}
+    return new AssignmentRequestData(builder.build(), urgentReqCount);
+  }
 
-	private final int urgentReqCount;
+  private final int urgentReqCount;
 
-	private AssignmentRequestData(ImmutableList<DestEntry<DrtRequest>> entries, int urgentReqCount) {
-		super(entries);
-		this.urgentReqCount = urgentReqCount;
-	}
+  private AssignmentRequestData(ImmutableList<DestEntry<DrtRequest>> entries, int urgentReqCount) {
+    super(entries);
+    this.urgentReqCount = urgentReqCount;
+  }
 
-	int getUrgentReqCount() {
-		return urgentReqCount;
-	}
+  int getUrgentReqCount() {
+    return urgentReqCount;
+  }
 }

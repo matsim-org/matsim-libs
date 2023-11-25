@@ -1,7 +1,7 @@
 package org.matsim.contrib.carsharing.relocation.utils;
 
+import com.google.inject.Inject;
 import java.util.ArrayList;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.carsharing.manager.demand.DemandHandler;
 import org.matsim.contrib.carsharing.manager.demand.RentalInfo;
@@ -14,49 +14,51 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
-
 public class FFVehiclesRentalsWriterListener implements IterationEndsListener {
-	int frequency = 0;
+  int frequency = 0;
 
-	@Inject private CarsharingSupplyInterface carsharingSupply;
+  @Inject private CarsharingSupplyInterface carsharingSupply;
 
-	@Inject private DemandHandler demandHandler;
+  @Inject private DemandHandler demandHandler;
 
-	@Inject private OutputDirectoryHierarchy outputDirectoryHierarchy;
+  @Inject private OutputDirectoryHierarchy outputDirectoryHierarchy;
 
-	public FFVehiclesRentalsWriterListener(int frequency) {
-		this.frequency = frequency;
-	}
+  public FFVehiclesRentalsWriterListener(int frequency) {
+    this.frequency = frequency;
+  }
 
-	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		if (event.getIteration() % this.frequency == 0) {
-			FFVehiclesRentalsWriter writer = new FFVehiclesRentalsWriter();
-			String filename = this.outputDirectoryHierarchy.getIterationFilename(event.getIteration(), "ff-vehicle-rentals.xml");
+  @Override
+  public void notifyIterationEnds(IterationEndsEvent event) {
+    if (event.getIteration() % this.frequency == 0) {
+      FFVehiclesRentalsWriter writer = new FFVehiclesRentalsWriter();
+      String filename =
+          this.outputDirectoryHierarchy.getIterationFilename(
+              event.getIteration(), "ff-vehicle-rentals.xml");
 
-			for (String companyId : this.carsharingSupply.getCompanyNames()) {
-				CompanyContainer companyContainer = this.carsharingSupply.getCompany(companyId);
-				FreeFloatingVehiclesContainer freeFloatingContainer = (FreeFloatingVehiclesContainer) companyContainer.getVehicleContainer("freefloating");
+      for (String companyId : this.carsharingSupply.getCompanyNames()) {
+        CompanyContainer companyContainer = this.carsharingSupply.getCompany(companyId);
+        FreeFloatingVehiclesContainer freeFloatingContainer =
+            (FreeFloatingVehiclesContainer) companyContainer.getVehicleContainer("freefloating");
 
-				writer.addCompanyId(companyId);
+        writer.addCompanyId(companyId);
 
-				for (CSVehicle vehicle : freeFloatingContainer.getFfvehicleIdMap().values()) {
-					Id<Vehicle> vehicleId = Id.create(vehicle.getVehicleId(), Vehicle.class);
-					ArrayList<RentalInfo> rentals = new ArrayList<RentalInfo>();
+        for (CSVehicle vehicle : freeFloatingContainer.getFfvehicleIdMap().values()) {
+          Id<Vehicle> vehicleId = Id.create(vehicle.getVehicleId(), Vehicle.class);
+          ArrayList<RentalInfo> rentals = new ArrayList<RentalInfo>();
 
-					if (this.demandHandler.getVehicleRentalsMap().containsKey(vehicleId)) {
+          if (this.demandHandler.getVehicleRentalsMap().containsKey(vehicleId)) {
 
-						for (RentalInfo info : this.demandHandler.getVehicleRentalsMap().get(vehicleId).getRentals()) {
-							rentals.add(info);
-						}
-					}
+            for (RentalInfo info :
+                this.demandHandler.getVehicleRentalsMap().get(vehicleId).getRentals()) {
+              rentals.add(info);
+            }
+          }
 
-					writer.addVehicleRentals(companyId, vehicleId, rentals);
-				}
-			}
+          writer.addVehicleRentals(companyId, vehicleId, rentals);
+        }
+      }
 
-			writer.writeFile(filename);
-		}
-	}
+      writer.writeFile(filename);
+    }
+  }
 }

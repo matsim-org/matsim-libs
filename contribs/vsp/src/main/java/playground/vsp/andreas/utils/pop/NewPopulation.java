@@ -30,20 +30,19 @@ import org.matsim.core.population.io.StreamingPopulationWriter;
  * Helper class, for handling plansfiles *
  *
  * @author aneumann, Yu
- *
  */
 public abstract class NewPopulation extends AbstractPersonAlgorithm {
-	private static final Logger log = LogManager.getLogger(NewPopulation.class);
-	protected StreamingPopulationWriter popWriter;
-	protected Network net;
+  private static final Logger log = LogManager.getLogger(NewPopulation.class);
+  protected StreamingPopulationWriter popWriter;
+  protected Network net;
 
-	public NewPopulation(final Network network, final Population population, final String filename) {
-		this.popWriter = new StreamingPopulationWriter();
-		this.popWriter.writeStartPlans(filename);
-	}
+  public NewPopulation(final Network network, final Population population, final String filename) {
+    this.popWriter = new StreamingPopulationWriter();
+    this.popWriter.writeStartPlans(filename);
+  }
 
-	public void writeEndPlans() {
-		log.info("Dumping plans to file");
-		this.popWriter.writeEndPlans();
-	}
+  public void writeEndPlans() {
+    log.info("Dumping plans to file");
+    this.popWriter.writeEndPlans();
+  }
 }

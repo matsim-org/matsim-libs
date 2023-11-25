@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * ZZEverythingInPackageIsPackageOrFinal.java
@@ -19,15 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
- /**
- * 
- */
+/** */
 package org.matsim.core.network.io;
 
 /**
  * @author nagel
- *
  */
-public class ZZEverythingInPackageIsPackageOrFinal {
-
-}
+public class ZZEverythingInPackageIsPackageOrFinal {}

@@ -23,92 +23,89 @@ package org.matsim.core.utils.collections;
 import java.io.Serializable;
 
 /**
- * A Tuple stores two values (a "pair") and respects their order.
- * This generic class implements a commonly used data structure which is not present in
- * the current collection framework. Although it could be simulated with a List containing
- * two Objects, this implementation offers type safety and maximizes convenience for programmers.
+ * A Tuple stores two values (a "pair") and respects their order. This generic class implements a
+ * commonly used data structure which is not present in the current collection framework. Although
+ * it could be simulated with a List containing two Objects, this implementation offers type safety
+ * and maximizes convenience for programmers.
  *
  * @author dgrether
- *
  * @param <A>
  * @param <B>
  */
 public final class Tuple<A, B> implements Serializable {
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	public static <A, B> Tuple<A, B> of(final A first, final B second) {
-		return new Tuple<>(first, second);
-	}
+  public static <A, B> Tuple<A, B> of(final A first, final B second) {
+    return new Tuple<>(first, second);
+  }
 
-	/**
-	 * First entry of the tuple
-	 */
-	private final A first;
-	/**
-	 * Second entry of the tuple
-	 */
-	private final B second;
-	/**
-	 * Creates a new tuple with the two entries.
-	 * @param first
-	 * @param second
-	 */
-	public Tuple(final A first, final B second) {
-		this.first = first;
-		this.second = second;
-	}
+  /** First entry of the tuple */
+  private final A first;
 
-	public A getFirst() {
-		return this.first;
-	}
+  /** Second entry of the tuple */
+  private final B second;
 
-	public B getSecond() {
-		return this.second;
-	}
+  /**
+   * Creates a new tuple with the two entries.
+   *
+   * @param first
+   * @param second
+   */
+  public Tuple(final A first, final B second) {
+    this.first = first;
+    this.second = second;
+  }
 
-	/**
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public boolean equals(final Object other) {
-		if (!(other instanceof Tuple)) return false;
-		Tuple o = (Tuple) other;
-		if (this.first != null && this.second != null && o.first != null && o.second != null) {
-			return (this.first.equals(o.first) && this.second.equals(o.second));
-		}
-		boolean firstEquals = (this.first == null) && (o.first == null);
-		boolean secondEquals = (this.second == null) && (o.second == null);
-		if (!firstEquals && this.first != null && o.first != null) {
-			firstEquals = this.first.equals(o.first);
-		}
-		if (!secondEquals && this.second != null && o.second != null) {
-			secondEquals = this.second.equals(o.second);
-		}
-		return firstEquals && secondEquals;
-	}
+  public A getFirst() {
+    return this.first;
+  }
 
-	/**
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		return (this.first == null ? 0 : this.first.hashCode()) +
-				(this.second == null ? 0 : this.second.hashCode());
-	}
+  public B getSecond() {
+    return this.second;
+  }
 
-	/**
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		StringBuilder buffer = new StringBuilder(50);
-		buffer.append("[Tuple: [First: " );
-		buffer.append(this.first.toString());
-		buffer.append("], [Second: ");
-		buffer.append(this.second.toString());
-		buffer.append("]]");
-		return buffer.toString();
-	}
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @SuppressWarnings("unchecked")
+  @Override
+  public boolean equals(final Object other) {
+    if (!(other instanceof Tuple)) return false;
+    Tuple o = (Tuple) other;
+    if (this.first != null && this.second != null && o.first != null && o.second != null) {
+      return (this.first.equals(o.first) && this.second.equals(o.second));
+    }
+    boolean firstEquals = (this.first == null) && (o.first == null);
+    boolean secondEquals = (this.second == null) && (o.second == null);
+    if (!firstEquals && this.first != null && o.first != null) {
+      firstEquals = this.first.equals(o.first);
+    }
+    if (!secondEquals && this.second != null && o.second != null) {
+      secondEquals = this.second.equals(o.second);
+    }
+    return firstEquals && secondEquals;
+  }
 
+  /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    return (this.first == null ? 0 : this.first.hashCode())
+        + (this.second == null ? 0 : this.second.hashCode());
+  }
+
+  /**
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    StringBuilder buffer = new StringBuilder(50);
+    buffer.append("[Tuple: [First: ");
+    buffer.append(this.first.toString());
+    buffer.append("], [Second: ");
+    buffer.append(this.second.toString());
+    buffer.append("]]");
+    return buffer.toString();
+  }
 }

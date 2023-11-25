@@ -21,23 +21,21 @@
 package org.matsim.core.router.util;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.router.util.RoutingNetworkNode;
 
 /**
- * A network that is used by FastDijkstra, FastAStarEuclidean and FastAStarLandmarks.
- * Instead of storing the node data in a map, the data is attached directly to the nodes
- * which is faster but also consumes more memory.
+ * A network that is used by FastDijkstra, FastAStarEuclidean and FastAStarLandmarks. Instead of
+ * storing the node data in a map, the data is attached directly to the nodes which is faster but
+ * also consumes more memory.
  *
  * @author cdobler
  */
 public interface RoutingNetwork extends Network {
 
-	public void initialize();
+  public void initialize();
 
-	@Override
-	public Map<Id<Node>, RoutingNetworkNode> getNodes();
+  @Override
+  public Map<Id<Node>, RoutingNetworkNode> getNodes();
 }

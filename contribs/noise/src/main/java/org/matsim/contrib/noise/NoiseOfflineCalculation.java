@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.noise;
 
+import java.io.File;
+import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -33,124 +35,134 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
-import java.io.File;
-import java.io.IOException;
-
 /**
- * (1) Computes noise emissions, immissions, person activities and damages based on a standard events file.
- * (2) Optionally throws noise immission damage events for the causing agent and the affected agent.
+ * (1) Computes noise emissions, immissions, person activities and damages based on a standard
+ * events file. (2) Optionally throws noise immission damage events for the causing agent and the
+ * affected agent.
  *
  * @author ikaddoura
- *
  */
-public final class NoiseOfflineCalculation{
-	private static final Logger log = LogManager.getLogger( NoiseOfflineCalculation.class );
+public final class NoiseOfflineCalculation {
+  private static final Logger log = LogManager.getLogger(NoiseOfflineCalculation.class);
 
-	private String outputDirectory;
-	private Scenario scenario;
+  private String outputDirectory;
+  private Scenario scenario;
 
-	private NoiseContext noiseContext = null;
-	private NoiseTimeTracker timeTracker = null;
+  private NoiseContext noiseContext = null;
+  private NoiseTimeTracker timeTracker = null;
 
-	public NoiseOfflineCalculation( Scenario scenario, String analysisOutputDirectory ) {
-		this.scenario = scenario;
-		this.outputDirectory = analysisOutputDirectory;
+  public NoiseOfflineCalculation(Scenario scenario, String analysisOutputDirectory) {
+    this.scenario = scenario;
+    this.outputDirectory = analysisOutputDirectory;
 
-		if (!outputDirectory.endsWith("/")) {
-			outputDirectory = outputDirectory + "/";
-		}
+    if (!outputDirectory.endsWith("/")) {
+      outputDirectory = outputDirectory + "/";
+    }
 
-		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(scenario.getConfig(), NoiseConfigGroup.class) ;
-		if (noiseParameters.isInternalizeNoiseDamages()) {
-			log.warn("If you intend to internalize noise damages, please run the online noise computation."
-					+ " This is an offline noise calculation which can only be used for analysis purposes.");
-			noiseParameters.setInternalizeNoiseDamages(false);
-		}
-	}
+    NoiseConfigGroup noiseParameters =
+        ConfigUtils.addOrGetModule(scenario.getConfig(), NoiseConfigGroup.class);
+    if (noiseParameters.isInternalizeNoiseDamages()) {
+      log.warn(
+          "If you intend to internalize noise damages, please run the online noise computation."
+              + " This is an offline noise calculation which can only be used for analysis purposes.");
+      noiseParameters.setInternalizeNoiseDamages(false);
+    }
+  }
 
-	public void run() {
+  public void run() {
 
-		String outputFilePath = outputDirectory + "noise-analysis/";
-		File file = new File(outputFilePath);
-		file.mkdirs();
+    String outputFilePath = outputDirectory + "noise-analysis/";
+    File file = new File(outputFilePath);
+    file.mkdirs();
 
-		OutputDirectoryLogging.catchLogEntries();
-		try {
-			OutputDirectoryLogging.initLoggingWithOutputDirectory(outputFilePath);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+    OutputDirectoryLogging.catchLogEntries();
+    try {
+      OutputDirectoryLogging.initLoggingWithOutputDirectory(outputFilePath);
+    } catch (IOException e1) {
+      e1.printStackTrace();
+    }
 
-		com.google.inject.Injector injector = Injector.createInjector( scenario.getConfig() , new AbstractModule(){
-				  @Override public void install(){
-					  install( new ScenarioByInstanceModule( scenario ) );
-					  install( new NoiseModule() ) ;
-					  install( new EventsManagerModule() ) ;
-				  }
-			  }) ;
+    com.google.inject.Injector injector =
+        Injector.createInjector(
+            scenario.getConfig(),
+            new AbstractModule() {
+              @Override
+              public void install() {
+                install(new ScenarioByInstanceModule(scenario));
+                install(new NoiseModule());
+                install(new EventsManagerModule());
+              }
+            });
 
-		noiseContext = injector.getInstance( NoiseContext.class ) ;
-		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
+    noiseContext = injector.getInstance(NoiseContext.class);
+    NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
 
-		EventsManager events = injector.getInstance( EventsManager.class ) ;
+    EventsManager events = injector.getInstance(EventsManager.class);
 
-		timeTracker = injector.getInstance( NoiseTimeTracker.class ) ;
-		timeTracker.setOutputFilePath(outputFilePath);
+    timeTracker = injector.getInstance(NoiseTimeTracker.class);
+    timeTracker.setOutputFilePath(outputFilePath);
 
-		//LinkSpeedCalculation is already injected with the NoiseModule! nk jul '20
-//		if (noiseContext.getNoiseParams().isUseActualSpeedLevel()) {
-//			LinkSpeedCalculation linkSpeedCalculator = new LinkSpeedCalculation();
-//			linkSpeedCalculator.setNoiseContext(noiseContext);
-//			events.addHandler(linkSpeedCalculator);
-//		}
+    // LinkSpeedCalculation is already injected with the NoiseModule! nk jul '20
+    //		if (noiseContext.getNoiseParams().isUseActualSpeedLevel()) {
+    //			LinkSpeedCalculation linkSpeedCalculator = new LinkSpeedCalculation();
+    //			linkSpeedCalculator.setNoiseContext(noiseContext);
+    //			events.addHandler(linkSpeedCalculator);
+    //		}
 
-		final NoiseConfigGroup noiseParams = noiseContext.getNoiseParams();
-		noiseParams.checkConsistency(noiseContext.getScenario().getConfig());
+    final NoiseConfigGroup noiseParams = noiseContext.getNoiseParams();
+    noiseParams.checkConsistency(noiseContext.getScenario().getConfig());
 
-		EventWriterXML eventWriter = null;
-		if (noiseContext.getNoiseParams().isThrowNoiseEventsAffected() || noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
-			String eventsFile;
-			if (this.scenario.getConfig().controller().getRunId() == null || this.scenario.getConfig().controller().getRunId().equals("")) {
-				eventsFile = outputFilePath + "noise.output_events.offline.xml.gz";
-			} else {
-				eventsFile = outputFilePath + this.scenario.getConfig().controller().getRunId() + ".noise.output_events.offline.xml.gz";
-			}
-			eventWriter = new EventWriterXML(eventsFile);
-			events.addHandler(eventWriter);
-		}
+    EventWriterXML eventWriter = null;
+    if (noiseContext.getNoiseParams().isThrowNoiseEventsAffected()
+        || noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
+      String eventsFile;
+      if (this.scenario.getConfig().controller().getRunId() == null
+          || this.scenario.getConfig().controller().getRunId().equals("")) {
+        eventsFile = outputFilePath + "noise.output_events.offline.xml.gz";
+      } else {
+        eventsFile =
+            outputFilePath
+                + this.scenario.getConfig().controller().getRunId()
+                + ".noise.output_events.offline.xml.gz";
+      }
+      eventWriter = new EventWriterXML(eventsFile);
+      events.addHandler(eventWriter);
+    }
 
+    log.info("Reading events file...");
+    MatsimEventsReader reader = new MatsimEventsReader(events);
+    String eventsFile;
+    if (this.scenario.getConfig().controller().getRunId() == null
+        || this.scenario.getConfig().controller().getRunId().equals("")) {
+      eventsFile =
+          this.scenario.getConfig().controller().getOutputDirectory() + "output_events.xml.gz";
+    } else {
+      eventsFile =
+          this.scenario.getConfig().controller().getOutputDirectory()
+              + this.scenario.getConfig().controller().getRunId()
+              + ".output_events.xml.gz";
+    }
+    reader.readFile(eventsFile);
+    log.info("Reading events file... Done.");
 
-		log.info("Reading events file...");
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		String eventsFile;
-		if (this.scenario.getConfig().controller().getRunId() == null || this.scenario.getConfig().controller().getRunId().equals("")) {
-			eventsFile = this.scenario.getConfig().controller().getOutputDirectory() + "output_events.xml.gz";
-		} else {
-			eventsFile = this.scenario.getConfig().controller().getOutputDirectory() + this.scenario.getConfig().controller().getRunId() + ".output_events.xml.gz";
-		}
-		reader.readFile(eventsFile);
-		log.info("Reading events file... Done.");
+    timeTracker.computeFinalTimeIntervals();
 
-		timeTracker.computeFinalTimeIntervals();
+    if (noiseContext.getNoiseParams().isThrowNoiseEventsAffected()
+        || noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
+      eventWriter.closeFile();
+    }
+    log.info("Noise calculation completed.");
+  }
 
-		if (noiseContext.getNoiseParams().isThrowNoiseEventsAffected() || noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
-			eventWriter.closeFile();
-		}
-		log.info("Noise calculation completed.");
+  NoiseTimeTracker getTimeTracker() {
+    return timeTracker;
+  }
 
-	}
+  NoiseContext getNoiseContext() {
+    return noiseContext;
+  }
 
-	NoiseTimeTracker getTimeTracker() {
-		return timeTracker;
-	}
-
-	NoiseContext getNoiseContext() {
-		return noiseContext;
-	}
-
-	public final TravelDisutility getTollDisutility() {
-		return new NoiseTollCalculator( noiseContext );
-	}
-
+  public final TravelDisutility getTollDisutility() {
+    return new NoiseTollCalculator(noiseContext);
+  }
 }
-

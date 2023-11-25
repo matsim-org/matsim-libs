@@ -23,10 +23,10 @@ import org.matsim.contrib.dvrp.path.DivertedVrpPath;
 import org.matsim.contrib.dynagent.DriverDynLeg;
 
 public interface DivertibleLeg extends DriverDynLeg {
-	/**
-	 * @return true - yes, false - it is too late, the diversion is possible only at the next link
-	 */
-	boolean canChangeNextLink();
+  /**
+   * @return true - yes, false - it is too late, the diversion is possible only at the next link
+   */
+  boolean canChangeNextLink();
 
-	void pathDiverted(DivertedVrpPath divertedPath);
+  void pathDiverted(DivertedVrpPath divertedPath);
 }

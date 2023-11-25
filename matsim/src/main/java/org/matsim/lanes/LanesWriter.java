@@ -19,15 +19,13 @@
  * *********************************************************************** */
 package org.matsim.lanes;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Map;
-
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Map;
 import javax.xml.crypto.MarshalException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -40,123 +38,123 @@ import org.matsim.jaxb.lanedefinitions20.*;
 import org.matsim.utils.objectattributes.ObjectAttributesConverter;
 
 /**
- * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd
- * file format.
- * @author dgrether
+ * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd file format.
  *
+ * @author dgrether
  */
 public final class LanesWriter extends MatsimJaxbXmlWriter implements MatsimSomeWriter {
 
-	private static final Logger log = LogManager.getLogger(LanesWriter.class);
+  private static final Logger log = LogManager.getLogger(LanesWriter.class);
 
-	private Lanes laneDefinitions;
+  private Lanes laneDefinitions;
 
-	private final ObjectAttributesConverter attributesConverter = new ObjectAttributesConverter();
+  private final ObjectAttributesConverter attributesConverter = new ObjectAttributesConverter();
 
-	/**
-	 * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd
-	 * file format.
-	 * @param lanedefs
-	 *
-	 */
-	public LanesWriter(Lanes lanedefs) {
-//		log.info("Using LaneDefinitionWriter20...");
-		this.laneDefinitions = lanedefs;
-	}
+  /**
+   * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd file format.
+   *
+   * @param lanedefs
+   */
+  public LanesWriter(Lanes lanedefs) {
+    //		log.info("Using LaneDefinitionWriter20...");
+    this.laneDefinitions = lanedefs;
+  }
 
-	/**
-	 * @see org.matsim.core.utils.io.MatsimJaxbXmlWriter#write(java.lang.String)
-	 */
-	@Override
-	public void write(String filename) {
-		log.info( Gbl.aboutToWrite( "lanes", filename ) ) ;
-  	JAXBContext jc;
-		try {
-			XMLLaneDefinitions xmlLaneDefinitions = convertDataToXml();
-			jc = JAXBContext.newInstance(org.matsim.jaxb.lanedefinitions20.ObjectFactory.class);
-			Marshaller m = jc.createMarshaller();
-			super.setMarshallerProperties(LanesReader.SCHEMALOCATIONV20, m);
-			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
-			m.marshal(xmlLaneDefinitions, bufout);
-			bufout.close();
-		} catch (JAXBException | IOException | MarshalException e) {
-			throw new RuntimeException(e);
-		}
-	}
+  /**
+   * @see org.matsim.core.utils.io.MatsimJaxbXmlWriter#write(java.lang.String)
+   */
+  @Override
+  public void write(String filename) {
+    log.info(Gbl.aboutToWrite("lanes", filename));
+    JAXBContext jc;
+    try {
+      XMLLaneDefinitions xmlLaneDefinitions = convertDataToXml();
+      jc = JAXBContext.newInstance(org.matsim.jaxb.lanedefinitions20.ObjectFactory.class);
+      Marshaller m = jc.createMarshaller();
+      super.setMarshallerProperties(LanesReader.SCHEMALOCATIONV20, m);
+      BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
+      m.marshal(xmlLaneDefinitions, bufout);
+      bufout.close();
+    } catch (JAXBException | IOException | MarshalException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-	private XMLLaneDefinitions convertDataToXml() throws MarshalException {
-		ObjectFactory fac = new ObjectFactory();
-		XMLLaneDefinitions xmllaneDefs = fac.createXMLLaneDefinitions();
+  private XMLLaneDefinitions convertDataToXml() throws MarshalException {
+    ObjectFactory fac = new ObjectFactory();
+    XMLLaneDefinitions xmllaneDefs = fac.createXMLLaneDefinitions();
 
-		for (LanesToLinkAssignment ltla : this.laneDefinitions.getLanesToLinkAssignments().values()) {
-			XMLLanesToLinkAssignmentType xmlltla = fac.createXMLLanesToLinkAssignmentType();
-			xmlltla.setLinkIdRef(ltla.getLinkId().toString());
+    for (LanesToLinkAssignment ltla : this.laneDefinitions.getLanesToLinkAssignments().values()) {
+      XMLLanesToLinkAssignmentType xmlltla = fac.createXMLLanesToLinkAssignmentType();
+      xmlltla.setLinkIdRef(ltla.getLinkId().toString());
 
-			for (Lane bl : ltla.getLanes().values()) {
-				XMLLaneType xmllane = fac.createXMLLaneType();
-				xmllane.setId(bl.getId().toString());
+      for (Lane bl : ltla.getLanes().values()) {
+        XMLLaneType xmllane = fac.createXMLLaneType();
+        xmllane.setId(bl.getId().toString());
 
-				if ((bl.getToLinkIds() == null && bl.getToLaneIds() != null) || 
-						(bl.getToLinkIds() != null && bl.getToLaneIds() == null)){
-					xmllane.setLeadsTo(fac.createXMLLaneTypeXMLLeadsTo());
-				}
-				else {
-					throw new MarshalException("Either at least one toLinkId or (exclusive) one toLaneId must" +
-							"be set for Lane Id " + bl.getId() + " on link Id " + ltla.getLinkId() + "! Cannot write according to XML grammar.");
-				}
-				
-				if (bl.getToLinkIds() != null){
-					for (Id<Link> id : bl.getToLinkIds()) {
-						XMLIdRefType xmlToLink = fac.createXMLIdRefType();
-						xmlToLink.setRefId(id.toString());
-						xmllane.getLeadsTo().getToLink().add(xmlToLink);
-					}
-				}
-				else if (bl.getToLaneIds() != null){
-					for (Id<Lane> id : bl.getToLaneIds()) {
-						XMLIdRefType xmlToLink = fac.createXMLIdRefType();
-						xmlToLink.setRefId(id.toString());
-						xmllane.getLeadsTo().getToLane().add(xmlToLink);
-					}
-				}
-				
-				XMLLaneType.XMLCapacity capacity = new XMLLaneType.XMLCapacity();
-				capacity.setVehiclesPerHour(bl.getCapacityVehiclesPerHour());
-				xmllane.setCapacity(capacity);
+        if ((bl.getToLinkIds() == null && bl.getToLaneIds() != null)
+            || (bl.getToLinkIds() != null && bl.getToLaneIds() == null)) {
+          xmllane.setLeadsTo(fac.createXMLLaneTypeXMLLeadsTo());
+        } else {
+          throw new MarshalException(
+              "Either at least one toLinkId or (exclusive) one toLaneId must"
+                  + "be set for Lane Id "
+                  + bl.getId()
+                  + " on link Id "
+                  + ltla.getLinkId()
+                  + "! Cannot write according to XML grammar.");
+        }
 
-				XMLLaneType.XMLRepresentedLanes lanes = new XMLLaneType.XMLRepresentedLanes();
-				lanes.setNumber(bl.getNumberOfRepresentedLanes());
-				xmllane.setRepresentedLanes(lanes);
+        if (bl.getToLinkIds() != null) {
+          for (Id<Link> id : bl.getToLinkIds()) {
+            XMLIdRefType xmlToLink = fac.createXMLIdRefType();
+            xmlToLink.setRefId(id.toString());
+            xmllane.getLeadsTo().getToLink().add(xmlToLink);
+          }
+        } else if (bl.getToLaneIds() != null) {
+          for (Id<Lane> id : bl.getToLaneIds()) {
+            XMLIdRefType xmlToLink = fac.createXMLIdRefType();
+            xmlToLink.setRefId(id.toString());
+            xmllane.getLeadsTo().getToLane().add(xmlToLink);
+          }
+        }
 
-				XMLLaneType.XMLStartsAt startsAt = new XMLLaneType.XMLStartsAt();
-				startsAt.setMeterFromLinkEnd(bl.getStartsAtMeterFromLinkEnd());
-				xmllane.setStartsAt(startsAt);
+        XMLLaneType.XMLCapacity capacity = new XMLLaneType.XMLCapacity();
+        capacity.setVehiclesPerHour(bl.getCapacityVehiclesPerHour());
+        xmllane.setCapacity(capacity);
 
-				xmllane.setAlignment(bl.getAlignment());
+        XMLLaneType.XMLRepresentedLanes lanes = new XMLLaneType.XMLRepresentedLanes();
+        lanes.setNumber(bl.getNumberOfRepresentedLanes());
+        xmllane.setRepresentedLanes(lanes);
 
-				if (bl.getAttributes() != null) {
-					xmllane.setAttributes(fac.createXMLLaneTypeXMLAttributes());
+        XMLLaneType.XMLStartsAt startsAt = new XMLLaneType.XMLStartsAt();
+        startsAt.setMeterFromLinkEnd(bl.getStartsAtMeterFromLinkEnd());
+        xmllane.setStartsAt(startsAt);
 
-					// write attributes
-					for (Map.Entry<String, Object> objAttribute : bl.getAttributes().getAsMap().entrySet()) {
-						Class<?> clazz = objAttribute.getValue().getClass();
-						String converted = attributesConverter.convertToString(objAttribute.getValue());
-						if (converted != null) {
-							XMLAttributeType att = fac.createXMLAttributeType();
-							att.setName(objAttribute.getKey());
-							att.setValue(converted);
-							att.setClazz(clazz.getCanonicalName());
-							xmllane.getAttributes().getAttributeList().add(att);
-						}
-					}
-				}
+        xmllane.setAlignment(bl.getAlignment());
 
-				xmlltla.getLane().add(xmllane);
-			}
-			xmllaneDefs.getLanesToLinkAssignment().add(xmlltla);
-		} //end writing lanesToLinkAssignments
+        if (bl.getAttributes() != null) {
+          xmllane.setAttributes(fac.createXMLLaneTypeXMLAttributes());
 
-		return xmllaneDefs;
-	}
+          // write attributes
+          for (Map.Entry<String, Object> objAttribute : bl.getAttributes().getAsMap().entrySet()) {
+            Class<?> clazz = objAttribute.getValue().getClass();
+            String converted = attributesConverter.convertToString(objAttribute.getValue());
+            if (converted != null) {
+              XMLAttributeType att = fac.createXMLAttributeType();
+              att.setName(objAttribute.getKey());
+              att.setValue(converted);
+              att.setClazz(clazz.getCanonicalName());
+              xmllane.getAttributes().getAttributeList().add(att);
+            }
+          }
+        }
 
+        xmlltla.getLane().add(xmllane);
+      }
+      xmllaneDefs.getLanesToLinkAssignment().add(xmlltla);
+    } // end writing lanesToLinkAssignments
+
+    return xmllaneDefs;
+  }
 }

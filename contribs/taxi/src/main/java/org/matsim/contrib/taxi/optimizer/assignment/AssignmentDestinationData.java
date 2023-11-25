@@ -19,40 +19,39 @@
 
 package org.matsim.contrib.taxi.optimizer.assignment;
 
+import com.google.common.collect.ImmutableList;
 import org.matsim.api.core.v01.network.Link;
 
-import com.google.common.collect.ImmutableList;
-
 public class AssignmentDestinationData<D> {
-	public static class DestEntry<D> {
-		public final int idx;
-		public final D destination;
-		public final Link link;
-		public final double time;
+  public static class DestEntry<D> {
+    public final int idx;
+    public final D destination;
+    public final Link link;
+    public final double time;
 
-		public DestEntry(int idx, D destination, Link link, double time) {
-			this.idx = idx;
-			this.destination = destination;
-			this.link = link;
-			this.time = time;
-		}
-	}
+    public DestEntry(int idx, D destination, Link link, double time) {
+      this.idx = idx;
+      this.destination = destination;
+      this.link = link;
+      this.time = time;
+    }
+  }
 
-	private final ImmutableList<DestEntry<D>> entries;
+  private final ImmutableList<DestEntry<D>> entries;
 
-	public AssignmentDestinationData(ImmutableList<DestEntry<D>> entries) {
-		this.entries = entries;
-	}
+  public AssignmentDestinationData(ImmutableList<DestEntry<D>> entries) {
+    this.entries = entries;
+  }
 
-	public int getSize() {
-		return entries.size();
-	}
+  public int getSize() {
+    return entries.size();
+  }
 
-	public DestEntry<D> getEntry(int idx) {
-		return entries.get(idx);
-	}
+  public DestEntry<D> getEntry(int idx) {
+    return entries.get(idx);
+  }
 
-	public ImmutableList<DestEntry<D>> getEntries() {
-		return entries;
-	}
+  public ImmutableList<DestEntry<D>> getEntries() {
+    return entries;
+  }
 }

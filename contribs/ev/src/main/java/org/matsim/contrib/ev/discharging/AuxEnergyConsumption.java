@@ -24,9 +24,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 public interface AuxEnergyConsumption {
-	interface Factory {
-		AuxEnergyConsumption create(ElectricVehicle electricVehicle);
-	}
+  interface Factory {
+    AuxEnergyConsumption create(ElectricVehicle electricVehicle);
+  }
 
-	double calcEnergyConsumption(double beginTime, double duration, Id<Link> linkId);
+  double calcEnergyConsumption(double beginTime, double duration, Id<Link> linkId);
 }

@@ -26,20 +26,19 @@ import org.matsim.facilities.filters.Filter;
 
 public interface PlanFilter extends PlanAlgorithm, Filter {
 
-	/**
-	 * Judges whether the plan will be selected or not.
-	 *
-	 * @param plan
-	 * @return true if the plan meets the criterion of the filter.
-	 */
-	boolean judge(Plan plan);
+  /**
+   * Judges whether the plan will be selected or not.
+   *
+   * @param plan
+   * @return true if the plan meets the criterion of the filter.
+   */
+  boolean judge(Plan plan);
 
-	/**
-	 * Sends the person to the next algorithm
-	 *
-	 * @param plan
-	 */
-	@Override
-	void run(Plan plan);
-
+  /**
+   * Sends the person to the next algorithm
+   *
+   * @param plan
+   */
+  @Override
+  void run(Plan plan);
 }

@@ -36,17 +36,23 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class PersonDepartureEventTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-
-	@Test public void testWriteReadXml() {
-		final PersonDepartureEvent event = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml",
-				new PersonDepartureEvent(25669.05, Id.create("921", Person.class), Id.create("390", Link.class), TransportMode.bike, "bikeRoutingMode"));
-		assertEquals(25669.05, event.getTime(), MatsimTestUtils.EPSILON);
-		assertEquals("921", event.getPersonId().toString());
-		assertEquals("390", event.getLinkId().toString());
-		assertEquals("bike", event.getLegMode());
-		assertEquals("bikeRoutingMode", event.getRoutingMode());
-	}
+  @Test
+  public void testWriteReadXml() {
+    final PersonDepartureEvent event =
+        XmlEventsTester.testWriteReadXml(
+            utils.getOutputDirectory() + "events.xml",
+            new PersonDepartureEvent(
+                25669.05,
+                Id.create("921", Person.class),
+                Id.create("390", Link.class),
+                TransportMode.bike,
+                "bikeRoutingMode"));
+    assertEquals(25669.05, event.getTime(), MatsimTestUtils.EPSILON);
+    assertEquals("921", event.getPersonId().toString());
+    assertEquals("390", event.getLinkId().toString());
+    assertEquals("bike", event.getLegMode());
+    assertEquals("bikeRoutingMode", event.getRoutingMode());
+  }
 }

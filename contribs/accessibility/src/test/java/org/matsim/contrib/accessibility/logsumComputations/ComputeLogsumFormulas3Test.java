@@ -17,9 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
+/** */
 package org.matsim.contrib.accessibility.logsumComputations;
 
 import org.junit.Assert;
@@ -29,90 +27,80 @@ import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author thomas
- *
  */
 public class ComputeLogsumFormulas3Test {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	/**
-	 * underlying network
-	 * 						  cjk1
-	 * 	  origin_h			 /
-	 * 	   \				/
-	 * 		i--------------j--cjk2
-	 * 					    \
-	 * 						 \
-	 *						  cjk3
-	 */
-	@SuppressWarnings("static-method")
+  /** underlying network cjk1 origin_h / \ / i--------------j--cjk2 \ \ cjk3 */
+  @SuppressWarnings("static-method")
+  @Test
+  public void testLogsumFormulas() {
+    double betaWalkTT = -10. / 3600.0; // [util/sec]
+    double betaWalkTD = -10.; // [util/meter]
 
-	@Test public void testLogsumFormulas(){
-		double betaWalkTT = -10. / 3600.0;	// [util/sec]
-		double betaWalkTD = -10.;			// [util/meter]
+    double betaCarTT = -12 / 3600.0; // [util/sec]
+    double betaCarTD = -12; // [util/meter]
+    double betaCarTMC = -1; // [util/money]
 
-		double betaCarTT  = -12 / 3600.0;	// [util/sec]
-		double betaCarTD  = -12;			// [util/meter]
-		double betaCarTMC = -1;				// [util/money]
+    // travel time costs (h)
+    double cijTT = 1.5 / 60.; // time to reach j from i
+    double chiTT = 1.2 / 60.; // time to reach network from origin
+    //		double cjk1TT= 1.5 / 60.;		// time to reach cjk1 from j
+    //		double cjk2TT= 1.2 / 60.;		// time to reach cjk2 from j
+    //		double cjk3TT= 1.4 / 60.;		// time to reach cjk3 from j
 
-		// travel time costs (h)
-		double cijTT = 1.5 / 60.; 		// time to reach j from i
-		double chiTT = 1.2 / 60.;		// time to reach network from origin
-//		double cjk1TT= 1.5 / 60.;		// time to reach cjk1 from j
-//		double cjk2TT= 1.2 / 60.;		// time to reach cjk2 from j
-//		double cjk3TT= 1.4 / 60.;		// time to reach cjk3 from j
+    // travel distance (m)
+    double cijTD = 500.; // distance to reach j from i
+    double chiTD = 20.; // distance to reach network from origin
+    //		double cjk1TD= 80.;		// distance to reach cjk1 from j
+    //		double cjk2TD= 30.;		// distance to reach cjk2 from j
+    //		double cjk3TD= 50.;		// distance to reach cjk3 from j
 
-		// travel distance (m)
-		double cijTD = 500.;	// distance to reach j from i
-		double chiTD = 20.;		// distance to reach network from origin
-//		double cjk1TD= 80.;		// distance to reach cjk1 from j
-//		double cjk2TD= 30.;		// distance to reach cjk2 from j
-//		double cjk3TD= 50.;		// distance to reach cjk3 from j
+    // travel monetary cost / toll (money)
+    double cijTMC = 10; // toll to get from i to j
 
-		// travel monetary cost / toll (money)
-		double cijTMC= 10;		// toll to get from i to j
+    ///////
+    // opportunities
+    ///////
+    //		double sumExpVjk = Math.exp( (cjk1TT * betaWalkTT) + (cjk1TD * betaWalkTD) );
+    //		sumExpVjk 		+= Math.exp( (cjk2TT * betaWalkTT) + (cjk2TD * betaWalkTD) );
+    //		sumExpVjk 		+= Math.exp( (cjk3TT * betaWalkTT) + (cjk3TD * betaWalkTD) );
 
-		///////
-		// opportunities
-		///////
-//		double sumExpVjk = Math.exp( (cjk1TT * betaWalkTT) + (cjk1TD * betaWalkTD) );
-//		sumExpVjk 		+= Math.exp( (cjk2TT * betaWalkTT) + (cjk2TD * betaWalkTD) );
-//		sumExpVjk 		+= Math.exp( (cjk3TT * betaWalkTT) + (cjk3TD * betaWalkTD) );
+    ///////
+    // OLD
+    ///////
+    double VhjOldTT = (cijTT * betaCarTT) + (chiTT * betaWalkTT);
+    double VhjOldTD = (cijTD * betaCarTD) + (chiTD * betaWalkTD);
+    double VhjOldTMC = cijTMC * betaCarTMC + 0;
 
-		///////
-		// OLD
-		///////
-		double VhjOldTT = (cijTT * betaCarTT) + (chiTT * betaWalkTT);
-		double VhjOldTD = (cijTD * betaCarTD) + (chiTD * betaWalkTD);
-		double VhjOldTMC= cijTMC * betaCarTMC + 0;
+    double VhjOld = VhjOldTT + VhjOldTD + VhjOldTMC;
+    //		double expOldVhj = Math.exp( VhjOld );
+    //		double expOldVhk = expOldVhj * sumExpVjk;
 
-		double VhjOld = VhjOldTT + VhjOldTD + VhjOldTMC;
-//		double expOldVhj = Math.exp( VhjOld );
-//		double expOldVhk = expOldVhj * sumExpVjk;
+    ///////
+    // NEW
+    ///////
+    double VijCar = (cijTT * betaCarTT) + (cijTD * betaCarTD) + (cijTMC * betaCarTMC);
+    double VhiWalk = (chiTT * betaWalkTT) + (chiTD * betaWalkTD);
+    double VhjNew = VijCar + VhiWalk;
+    //		double expNewVhj= Math.exp( VhjNew );
+    //		double expNewVhk= expNewVhj * sumExpVjk;
 
-		///////
-		// NEW
-		///////
-		double VijCar = (cijTT * betaCarTT) + (cijTD * betaCarTD) + (cijTMC * betaCarTMC);
-		double VhiWalk= (chiTT * betaWalkTT) + (chiTD * betaWalkTD);
-		double VhjNew = VijCar + VhiWalk;
-//		double expNewVhj= Math.exp( VhjNew );
-//		double expNewVhk= expNewVhj * sumExpVjk;
+    Assert.assertTrue(
+        VhjOld == VhjNew); // old accessibility computation == new accessibility computation
 
-		Assert.assertTrue(VhjOld == VhjNew);	// old accessibility computation == new accessibility computation
+    ///////
+    // NEW
+    ///////
 
-		///////
-		// NEW
-		///////
+    double dummyVijCar = -0.9123;
+    double dummyVhiWalk = -0.023;
 
-		double dummyVijCar = -0.9123;
-		double dummyVhiWalk= -0.023;
+    double dummyExp1 = Math.exp(dummyVijCar + dummyVhiWalk);
+    double dummyExp2 = Math.exp(dummyVijCar) * Math.exp(dummyVhiWalk);
 
-		double dummyExp1 = Math.exp( dummyVijCar + dummyVhiWalk );
-		double dummyExp2 = Math.exp( dummyVijCar ) * Math.exp( dummyVhiWalk );
-
-		Assert.assertEquals(dummyExp1,dummyExp2,1.e-10);	// exp(VijCar + VijWalk) == exp(VijCar) * exp(VijWalk)
-	}
-
+    Assert.assertEquals(
+        dummyExp1, dummyExp2, 1.e-10); // exp(VijCar + VijWalk) == exp(VijCar) * exp(VijWalk)
+  }
 }

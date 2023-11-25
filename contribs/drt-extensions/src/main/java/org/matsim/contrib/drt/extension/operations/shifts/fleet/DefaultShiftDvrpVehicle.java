@@ -3,7 +3,6 @@ package org.matsim.contrib.drt.extension.operations.shifts.fleet;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Queue;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
@@ -16,57 +15,57 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
  */
 public class DefaultShiftDvrpVehicle implements ShiftDvrpVehicle {
 
-	private final DvrpVehicle vehicle;
+  private final DvrpVehicle vehicle;
 
-	private final Queue<DrtShift> shifts;
+  private final Queue<DrtShift> shifts;
 
-	public DefaultShiftDvrpVehicle(DvrpVehicle vehicle) {
-		this.vehicle = vehicle;
-		this.shifts = new PriorityQueue<>(Comparator.comparingDouble(DrtShift::getStartTime));
-	}
+  public DefaultShiftDvrpVehicle(DvrpVehicle vehicle) {
+    this.vehicle = vehicle;
+    this.shifts = new PriorityQueue<>(Comparator.comparingDouble(DrtShift::getStartTime));
+  }
 
-	@Override
-	public Id<DvrpVehicle> getId() {
-		return vehicle.getId();
-	}
+  @Override
+  public Id<DvrpVehicle> getId() {
+    return vehicle.getId();
+  }
 
-	@Override
-	public Link getStartLink() {
-		return vehicle.getStartLink();
-	}
+  @Override
+  public Link getStartLink() {
+    return vehicle.getStartLink();
+  }
 
-	@Override
-	public int getCapacity() {
-		return vehicle.getCapacity();
-	}
+  @Override
+  public int getCapacity() {
+    return vehicle.getCapacity();
+  }
 
-	@Override
-	public double getServiceBeginTime() {
-		return vehicle.getServiceBeginTime();
-	}
+  @Override
+  public double getServiceBeginTime() {
+    return vehicle.getServiceBeginTime();
+  }
 
-	@Override
-	public double getServiceEndTime() {
-		return vehicle.getServiceEndTime();
-	}
+  @Override
+  public double getServiceEndTime() {
+    return vehicle.getServiceEndTime();
+  }
 
-	@Override
-	public Schedule getSchedule() {
-		return vehicle.getSchedule();
-	}
+  @Override
+  public Schedule getSchedule() {
+    return vehicle.getSchedule();
+  }
 
-	@Override
-	public DvrpVehicleSpecification getSpecification() {
-		return vehicle.getSpecification();
-	}
+  @Override
+  public DvrpVehicleSpecification getSpecification() {
+    return vehicle.getSpecification();
+  }
 
-	@Override
-	public Queue<DrtShift> getShifts() {
-		return shifts;
-	}
+  @Override
+  public Queue<DrtShift> getShifts() {
+    return shifts;
+  }
 
-	@Override
-	public void addShift(DrtShift shift) {
-		shifts.add(shift);
-	}
+  @Override
+  public void addShift(DrtShift shift) {
+    shifts.add(shift);
+  }
 }

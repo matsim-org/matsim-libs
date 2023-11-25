@@ -19,38 +19,32 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.strategies;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.gbl.MatsimRandom;
-
 import com.google.inject.Inject;
-
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.socnetsim.framework.replanning.NonInnovativeStrategyFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.LogitWeight;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector.ConflictSolver;
+import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * @author thibautd
  */
-public class CoalitionExpBetaFactory extends NonInnovativeStrategyFactory  {
-	private final ConflictSolver conflictSolver;
+public class CoalitionExpBetaFactory extends NonInnovativeStrategyFactory {
+  private final ConflictSolver conflictSolver;
 
-	@Inject
-	private Scenario sc = null;
+  @Inject private Scenario sc = null;
 
-	public CoalitionExpBetaFactory(
-			final ConflictSolver conflictSolver) {
-		this.conflictSolver = conflictSolver;
-	}
+  public CoalitionExpBetaFactory(final ConflictSolver conflictSolver) {
+    this.conflictSolver = conflictSolver;
+  }
 
-	@Override
-	public GroupLevelPlanSelector createSelector() {
-		return new CoalitionSelector(
-				new LogitWeight(
-					MatsimRandom.getLocalInstance(),
-					sc.getConfig().scoring().getBrainExpBeta()),
-				conflictSolver);
-	}
+  @Override
+  public GroupLevelPlanSelector createSelector() {
+    return new CoalitionSelector(
+        new LogitWeight(
+            MatsimRandom.getLocalInstance(), sc.getConfig().scoring().getBrainExpBeta()),
+        conflictSolver);
+  }
 }
-

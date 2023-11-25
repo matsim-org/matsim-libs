@@ -22,17 +22,13 @@ package playground.vsp.cadyts.multiModeCadyts;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-/**
- * Created by amit on 24.02.18.
- */
-
+/** Created by amit on 24.02.18. */
 public class ModalCountsUtils {
 
-    private static final String ID_SEPERATOR = "_&_";
+  private static final String ID_SEPERATOR = "_&_";
 
-    public static Id<ModalCountsLinkIdentifier> getModalCountLinkId(String mode, Id<Link> linkId
-    ){
-        return Id.create( mode.concat(ID_SEPERATOR).concat( String.valueOf(linkId) ), ModalCountsLinkIdentifier.class);
-    }
-
+  public static Id<ModalCountsLinkIdentifier> getModalCountLinkId(String mode, Id<Link> linkId) {
+    return Id.create(
+        mode.concat(ID_SEPERATOR).concat(String.valueOf(linkId)), ModalCountsLinkIdentifier.class);
+  }
 }

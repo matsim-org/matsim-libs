@@ -21,20 +21,19 @@ package org.matsim.core.mobsim.framework.events;
 
 import org.matsim.core.mobsim.framework.Mobsim;
 
-
 /**
  * @author dgrether
  */
 public class MobsimBeforeSimStepEvent<T extends Mobsim> extends AbstractMobsimEvent<T> {
 
-	private final double time;
+  private final double time;
 
-	public MobsimBeforeSimStepEvent(T queuesim, double time) {
-		super(queuesim);
-		this.time = time;
-	}
+  public MobsimBeforeSimStepEvent(T queuesim, double time) {
+    super(queuesim);
+    this.time = time;
+  }
 
-	public double getSimulationTime() {
-		return this.time;
-	}
+  public double getSimulationTime() {
+    return this.time;
+  }
 }

@@ -27,241 +27,211 @@ import java.nio.charset.Charset;
  * Configuration for a <code>TabularFileParser</code>.
  *
  * @author gunnar
- *
  */
 public class TabularFileParserConfig {
 
-    // -------------------- CLASS VARIABLES --------------------
+  // -------------------- CLASS VARIABLES --------------------
 
-    private static final String ANYTHING = ".*";
+  private static final String ANYTHING = ".*";
 
-    private static final String ANY_SPACE = "\\s*";
+  private static final String ANY_SPACE = "\\s*";
 
-    // -------------------- INSTANCE VARIABLES --------------------
+  // -------------------- INSTANCE VARIABLES --------------------
 
-    private String file = null;
+  private String file = null;
 
-    private URL url = null;
+  private URL url = null;
 
-    private String startRegex = null;
+  private String startRegex = null;
 
-    private String endRegex = null;
+  private String endRegex = null;
 
-    private String commentRegex = null;
+  private String commentRegex = null;
 
-    private String delimiterRegex = null;
-    
-    private Charset charset = Charset.forName("UTF8");
+  private String delimiterRegex = null;
 
-    // -------------------- CONSTRUCTION --------------------
+  private Charset charset = Charset.forName("UTF8");
 
-    /**
-     * Empty default constructor.
-     */
-    public TabularFileParserConfig() {
-    }
+  // -------------------- CONSTRUCTION --------------------
 
-    // -------------------- SETTERS --------------------
+  /** Empty default constructor. */
+  public TabularFileParserConfig() {}
 
-    /**
-     * Sets the file to be parsed.
-     *
-     * @param file
-     *            the file to be parsed
-     */
-    public void setFileName(String file) {
-        this.file = file;
-    }
+  // -------------------- SETTERS --------------------
 
-    /**
-     * Sets the url to be parsed.
-     *
-     * @param url
-     *            the url to be parsed
-     */
-    public void setUrl(URL url) {
-        this.url = url;
-    }
-    
-    /**
-     * Sets the charset for the file. Defaults to UTF-8
-     * 
-     * @param charset the charset used to reade the file
-     */
-    public void setCharset(Charset charset) {
-    	this.charset = charset;
-    }
+  /**
+   * Sets the file to be parsed.
+   *
+   * @param file the file to be parsed
+   */
+  public void setFileName(String file) {
+    this.file = file;
+  }
 
-    // ---------- DIRECT SETTING OF REGULAR EXPRESSIONS ----------
+  /**
+   * Sets the url to be parsed.
+   *
+   * @param url the url to be parsed
+   */
+  public void setUrl(URL url) {
+    this.url = url;
+  }
 
-    /**
-     * Sets the regular expression that identifies the the first line of the
-     * file section to be parsed.
-     *
-     * @param regex
-     *            the regular expression that identifies the the first line of
-     *            the file section to be parsed
-     */
-    public void setStartRegex(String regex) {
-        this.startRegex = regex;
-    }
+  /**
+   * Sets the charset for the file. Defaults to UTF-8
+   *
+   * @param charset the charset used to reade the file
+   */
+  public void setCharset(Charset charset) {
+    this.charset = charset;
+  }
 
-    /**
-     * Sets the regular expression that identifies the first line <em>after</em>
-     * the file section to be parsed.
-     *
-     * @param regex
-     *            the regular expression that identifies the first line
-     *            <em>after</em> the file section to be parsed
-     */
-    public void setEndRegex(String regex) {
-        this.endRegex = regex;
-    }
+  // ---------- DIRECT SETTING OF REGULAR EXPRESSIONS ----------
 
-    /**
-     * Sets the regular expression that identifies lines to be ignored during
-     * parsing.
-     *
-     * @param regex
-     *            the regular expression that identifies lines to be ignored
-     *            during parsing
-     */
-    public void setCommentRegex(String regex) {
-        this.commentRegex = regex;
-    }
+  /**
+   * Sets the regular expression that identifies the the first line of the file section to be
+   * parsed.
+   *
+   * @param regex the regular expression that identifies the the first line of the file section to
+   *     be parsed
+   */
+  public void setStartRegex(String regex) {
+    this.startRegex = regex;
+  }
 
-    /**
-     * Sets the regular expression that identifies splitting locations in a
-     * parsed line.
-     *
-     * @param regex
-     *            the regular expression that identifies splitting locations in
-     *            a parsed line
-     */
-    public void setDelimiterRegex(String regex) {
-        this.delimiterRegex = regex;
-    }
+  /**
+   * Sets the regular expression that identifies the first line <em>after</em> the file section to
+   * be parsed.
+   *
+   * @param regex the regular expression that identifies the first line <em>after</em> the file
+   *     section to be parsed
+   */
+  public void setEndRegex(String regex) {
+    this.endRegex = regex;
+  }
 
-    // ---------- CREATION OF REGULAR EXPRESSIONS FROM TAGS ----------
+  /**
+   * Sets the regular expression that identifies lines to be ignored during parsing.
+   *
+   * @param regex the regular expression that identifies lines to be ignored during parsing
+   */
+  public void setCommentRegex(String regex) {
+    this.commentRegex = regex;
+  }
 
-    /**
-     * Parsing starts with the first occurrence of <code>tag</code> at the
-     * beginning of a line.
-     *
-     * @param tag
-     *            the first line to be parsed begins with this
-     *            <code>String</code>
-     */
-    public void setStartTag(String tag) {
-        if (tag != null)
-            startRegex = quote(tag) + ANYTHING;
-    }
+  /**
+   * Sets the regular expression that identifies splitting locations in a parsed line.
+   *
+   * @param regex the regular expression that identifies splitting locations in a parsed line
+   */
+  public void setDelimiterRegex(String regex) {
+    this.delimiterRegex = regex;
+  }
 
-    /**
-     * Parsing ends with the first occurence of <code>tag</code> at the
-     * beginning of a line.
-     *
-     * @param tag
-     *            the line before which parsing stops begins with this
-     *            <code>String</code>
-     */
-    public void setEndTag(String tag) {
-        if (tag != null)
-            endRegex = quote(tag) + ANYTHING;
-    }
+  // ---------- CREATION OF REGULAR EXPRESSIONS FROM TAGS ----------
 
-    /**
-     * All lines that begin with an element in the <code>tags</code> array are
-     * ignored
-     *
-     * @param tags
-     *            an array of line beginnings that are to be ignored
-     */
-    public void setCommentTags(String[] tags) {
-        commentRegex = alternativeExpr(tags) + ANYTHING;
-    }
+  /**
+   * Parsing starts with the first occurrence of <code>tag</code> at the beginning of a line.
+   *
+   * @param tag the first line to be parsed begins with this <code>String</code>
+   */
+  public void setStartTag(String tag) {
+    if (tag != null) startRegex = quote(tag) + ANYTHING;
+  }
 
-    /**
-     * A line is split into seperate rows wherever the parser encounters an
-     * element of the <code>tags</code> array, which is be preceeded and
-     * succeeded by zero or more whitespaces.
-     *
-     * @param tags
-     *            an array of <code>String</code>s denoting column delimiters
-     */
-    public void setDelimiterTags(String[] tags) {
-        if (tags == null || tags.length == 0)
-            delimiterRegex = null;
-        else
-            delimiterRegex = ANY_SPACE + alternativeExpr(tags) + ANY_SPACE;
-    }
+  /**
+   * Parsing ends with the first occurence of <code>tag</code> at the beginning of a line.
+   *
+   * @param tag the line before which parsing stops begins with this <code>String</code>
+   */
+  public void setEndTag(String tag) {
+    if (tag != null) endRegex = quote(tag) + ANYTHING;
+  }
 
-    // ---------- GENERATION OF REGULAR EXPRESSIONS ----------
+  /**
+   * All lines that begin with an element in the <code>tags</code> array are ignored
+   *
+   * @param tags an array of line beginnings that are to be ignored
+   */
+  public void setCommentTags(String[] tags) {
+    commentRegex = alternativeExpr(tags) + ANYTHING;
+  }
 
-    private String alternativeExpr(String[] alternatives) {
-        StringBuilder result = new StringBuilder();
+  /**
+   * A line is split into seperate rows wherever the parser encounters an element of the <code>tags
+   * </code> array, which is be preceeded and succeeded by zero or more whitespaces.
+   *
+   * @param tags an array of <code>String</code>s denoting column delimiters
+   */
+  public void setDelimiterTags(String[] tags) {
+    if (tags == null || tags.length == 0) delimiterRegex = null;
+    else delimiterRegex = ANY_SPACE + alternativeExpr(tags) + ANY_SPACE;
+  }
 
-        if (alternatives != null)
-            for (int i = 0; i < alternatives.length; i++) {
-                result.append(quote(alternatives[i]));
-                if (i < alternatives.length - 1)
-                    result.append('|');
-            }
-        return result.toString();
-    }
+  // ---------- GENERATION OF REGULAR EXPRESSIONS ----------
 
-    private String quote(String expr) {
-        return "\\Q" + expr + "\\E";
-    }
+  private String alternativeExpr(String[] alternatives) {
+    StringBuilder result = new StringBuilder();
 
-    // -------------------- DATA ACCESS --------------------
+    if (alternatives != null)
+      for (int i = 0; i < alternatives.length; i++) {
+        result.append(quote(alternatives[i]));
+        if (i < alternatives.length - 1) result.append('|');
+      }
+    return result.toString();
+  }
 
-    public String getFile() {
-        return file;
-    }
+  private String quote(String expr) {
+    return "\\Q" + expr + "\\E";
+  }
 
-    public URL getUrl() {
-        return this.url;
-    }
+  // -------------------- DATA ACCESS --------------------
 
-    public String getStartRegex() {
-        return startRegex;
-    }
+  public String getFile() {
+    return file;
+  }
 
-    public String getEndRegex() {
-        return endRegex;
-    }
+  public URL getUrl() {
+    return this.url;
+  }
 
-    public String getCommentRegex() {
-        return commentRegex;
-    }
+  public String getStartRegex() {
+    return startRegex;
+  }
 
-    public String getDelimiterRegex() {
-        return delimiterRegex;
-    }
-    
-    public Charset getCharset() {
-    	return this.charset;
-    }
+  public String getEndRegex() {
+    return endRegex;
+  }
 
-    // MISC
+  public String getCommentRegex() {
+    return commentRegex;
+  }
 
-    @Override
-		public String toString() {
-        StringBuilder result = new StringBuilder(100);
+  public String getDelimiterRegex() {
+    return delimiterRegex;
+  }
 
-        result.append("TabularFileParserConfig:\n\tfile=");
-        result.append(file);
-        result.append("\n\tstartRegex=");
-        result.append(startRegex);
-        result.append("\n\tendRegex=");
-        result.append(endRegex);
-        result.append("\n\tcommentRegex=");
-        result.append(commentRegex);
-        result.append("\n\tdelimiterRegex=");
-        result.append(delimiterRegex);
+  public Charset getCharset() {
+    return this.charset;
+  }
 
-        return result.toString();
-    }
+  // MISC
 
+  @Override
+  public String toString() {
+    StringBuilder result = new StringBuilder(100);
+
+    result.append("TabularFileParserConfig:\n\tfile=");
+    result.append(file);
+    result.append("\n\tstartRegex=");
+    result.append(startRegex);
+    result.append("\n\tendRegex=");
+    result.append(endRegex);
+    result.append("\n\tcommentRegex=");
+    result.append(commentRegex);
+    result.append("\n\tdelimiterRegex=");
+    result.append(delimiterRegex);
+
+    return result.toString();
+  }
 }

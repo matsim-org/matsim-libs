@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * VehicleHandlerTest.java
@@ -21,8 +20,8 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import com.google.inject.Provides;
 import java.util.Arrays;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -53,200 +52,199 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import com.google.inject.Provides;
-
 public class VehicleHandlerTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testVehicleHandler() {
-		// This is a test where there is a link with a certain parking capacity. As soon
-		// as
-		// it is reached the link is blocking, until a vehicle is leaving the link
-		// again. In
-		// this case there are three agents which do a longer stop on the capacitated
-		// link,
-		// but they all have the same route and plan. This means that if the capacity is
-		// above 3, all agents will perform their plans without any distraction. If the
-		// capacity is set to 2, the third agent needs to wait until the first of the
-		// previous ones is leaving, and so on ...
+  @Test
+  public void testVehicleHandler() {
+    // This is a test where there is a link with a certain parking capacity. As soon
+    // as
+    // it is reached the link is blocking, until a vehicle is leaving the link
+    // again. In
+    // this case there are three agents which do a longer stop on the capacitated
+    // link,
+    // but they all have the same route and plan. This means that if the capacity is
+    // above 3, all agents will perform their plans without any distraction. If the
+    // capacity is set to 2, the third agent needs to wait until the first of the
+    // previous ones is leaving, and so on ...
 
-		Result result;
+    Result result;
 
-		result = runTestScenario(4);
-		Assert.assertEquals(20203.0, result.latestArrivalTime, 1e-3);
-		Assert.assertEquals(3, result.initialCount);
+    result = runTestScenario(4);
+    Assert.assertEquals(20203.0, result.latestArrivalTime, 1e-3);
+    Assert.assertEquals(3, result.initialCount);
 
-		result = runTestScenario(3);
-		Assert.assertEquals(20203.0, result.latestArrivalTime, 1e-3);
-		Assert.assertEquals(3, result.initialCount);
+    result = runTestScenario(3);
+    Assert.assertEquals(20203.0, result.latestArrivalTime, 1e-3);
+    Assert.assertEquals(3, result.initialCount);
 
-		result = runTestScenario(2);
-		Assert.assertEquals(23003.0, result.latestArrivalTime, 1e-3);
-		Assert.assertEquals(3, result.initialCount);
+    result = runTestScenario(2);
+    Assert.assertEquals(23003.0, result.latestArrivalTime, 1e-3);
+    Assert.assertEquals(3, result.initialCount);
 
-		result = runTestScenario(1);
-		Assert.assertEquals(33003.0, result.latestArrivalTime, 1e-3);
-		Assert.assertEquals(3, result.initialCount);
-	}
+    result = runTestScenario(1);
+    Assert.assertEquals(33003.0, result.latestArrivalTime, 1e-3);
+    Assert.assertEquals(3, result.initialCount);
+  }
 
-	public Result runTestScenario(long capacity) {
-		Scenario scenario = createScenario();
-		Controler controler = new Controler(scenario);
+  public Result runTestScenario(long capacity) {
+    Scenario scenario = createScenario();
+    Controler controler = new Controler(scenario);
 
-		LatestArrivalHandler arrivalHandler = new LatestArrivalHandler();
-		BlockingVehicleHandler vehicleHandler = new BlockingVehicleHandler(capacity);
+    LatestArrivalHandler arrivalHandler = new LatestArrivalHandler();
+    BlockingVehicleHandler vehicleHandler = new BlockingVehicleHandler(capacity);
 
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addEventHandlerBinding().toInstance(arrivalHandler);
-			}
-		});
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            addEventHandlerBinding().toInstance(arrivalHandler);
+          }
+        });
 
-		controler.addOverridingQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-			}
+    controler.addOverridingQSimModule(
+        new AbstractQSimModule() {
+          @Override
+          protected void configureQSim() {}
 
-			@Provides
-			QNetworkFactory provideQNetworkFactory(EventsManager eventsManager, Scenario scenario) {
-				ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(eventsManager, scenario);
-				factory.setVehicleHandler(vehicleHandler);
-				return factory;
-			}
-		});
+          @Provides
+          QNetworkFactory provideQNetworkFactory(EventsManager eventsManager, Scenario scenario) {
+            ConfigurableQNetworkFactory factory =
+                new ConfigurableQNetworkFactory(eventsManager, scenario);
+            factory.setVehicleHandler(vehicleHandler);
+            return factory;
+          }
+        });
 
-		controler.run();
+    controler.run();
 
-		Result result = new Result();
-		result.latestArrivalTime = arrivalHandler.latestArrivalTime;
-		result.initialCount = vehicleHandler.initialCount;
-		return result;
-	}
+    Result result = new Result();
+    result.latestArrivalTime = arrivalHandler.latestArrivalTime;
+    result.initialCount = vehicleHandler.initialCount;
+    return result;
+  }
 
-	private class Result {
-		double latestArrivalTime;
-		long initialCount;
-	}
+  private class Result {
+    double latestArrivalTime;
+    long initialCount;
+  }
 
-	private class BlockingVehicleHandler implements VehicleHandler {
-		private final long capacity;
+  private class BlockingVehicleHandler implements VehicleHandler {
+    private final long capacity;
 
-		long initialCount = 0;
-		long count = 0;
+    long initialCount = 0;
+    long count = 0;
 
-		public BlockingVehicleHandler(long capacity) {
-			this.capacity = capacity;
-		}
+    public BlockingVehicleHandler(long capacity) {
+      this.capacity = capacity;
+    }
 
-		@Override
-		public void handleVehicleDeparture(QVehicle vehicle, Link link) {
-			if (link.getId().equals(Id.createLinkId("CD"))) {
-				count--;
-			}
-		}
+    @Override
+    public void handleVehicleDeparture(QVehicle vehicle, Link link) {
+      if (link.getId().equals(Id.createLinkId("CD"))) {
+        count--;
+      }
+    }
 
-		@Override
-		public boolean handleVehicleArrival(QVehicle vehicle, Link link) {
-			if (link.getId().equals(Id.createLinkId("CD"))) {
-				if (count >= capacity) {
-					return false;
-				}
+    @Override
+    public boolean handleVehicleArrival(QVehicle vehicle, Link link) {
+      if (link.getId().equals(Id.createLinkId("CD"))) {
+        if (count >= capacity) {
+          return false;
+        }
 
-				count++;
-			}
+        count++;
+      }
 
-			return true;
-		}
+      return true;
+    }
 
-		@Override
-		public void handleInitialVehicleArrival(QVehicle vehicle, Link link) {
-			if (link.getId().equals(Id.createLinkId("AB"))) {
-				initialCount++;
-			} else {
-				throw new IllegalStateException("Only AB should have initial vehicles.");
-			}
-		}
-	}
+    @Override
+    public void handleInitialVehicleArrival(QVehicle vehicle, Link link) {
+      if (link.getId().equals(Id.createLinkId("AB"))) {
+        initialCount++;
+      } else {
+        throw new IllegalStateException("Only AB should have initial vehicles.");
+      }
+    }
+  }
 
-	private class LatestArrivalHandler implements PersonArrivalEventHandler {
-		Double latestArrivalTime = null;
+  private class LatestArrivalHandler implements PersonArrivalEventHandler {
+    Double latestArrivalTime = null;
 
-		@Override
-		public void handleEvent(PersonArrivalEvent event) {
-			if (event.getLinkId().equals(Id.createLinkId("DE"))) {
-				latestArrivalTime = event.getTime();
-			}
-		}
-	}
+    @Override
+    public void handleEvent(PersonArrivalEvent event) {
+      if (event.getLinkId().equals(Id.createLinkId("DE"))) {
+        latestArrivalTime = event.getTime();
+      }
+    }
+  }
 
-	private Scenario createScenario() {
-		Config config = ConfigUtils.createConfig();
-		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setLastIteration(0);
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
+  private Scenario createScenario() {
+    Config config = ConfigUtils.createConfig();
+    config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+    config.controller().setLastIteration(0);
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
 
-		ActivityParams genericParams = new ActivityParams("generic");
-		genericParams.setTypicalDuration(1.0);
+    ActivityParams genericParams = new ActivityParams("generic");
+    genericParams.setTypicalDuration(1.0);
 
-		config.scoring().addActivityParams(genericParams);
+    config.scoring().addActivityParams(genericParams);
 
-		Scenario scenario = ScenarioUtils.createScenario(config);
+    Scenario scenario = ScenarioUtils.createScenario(config);
 
-		Network network = scenario.getNetwork();
-		NetworkFactory networkFactory = network.getFactory();
+    Network network = scenario.getNetwork();
+    NetworkFactory networkFactory = network.getFactory();
 
-		Node nodeA = networkFactory.createNode(Id.createNodeId("A"), new Coord(0.0, 0.0));
-		Node nodeB = networkFactory.createNode(Id.createNodeId("B"), new Coord(1000.0, 2000.0));
-		Node nodeC = networkFactory.createNode(Id.createNodeId("C"), new Coord(1000.0, 3000.0));
-		Node nodeD = networkFactory.createNode(Id.createNodeId("D"), new Coord(1000.0, 4000.0));
-		Node nodeE = networkFactory.createNode(Id.createNodeId("E"), new Coord(1000.0, 5000.0));
+    Node nodeA = networkFactory.createNode(Id.createNodeId("A"), new Coord(0.0, 0.0));
+    Node nodeB = networkFactory.createNode(Id.createNodeId("B"), new Coord(1000.0, 2000.0));
+    Node nodeC = networkFactory.createNode(Id.createNodeId("C"), new Coord(1000.0, 3000.0));
+    Node nodeD = networkFactory.createNode(Id.createNodeId("D"), new Coord(1000.0, 4000.0));
+    Node nodeE = networkFactory.createNode(Id.createNodeId("E"), new Coord(1000.0, 5000.0));
 
-		Link linkAB = networkFactory.createLink(Id.createLinkId("AB"), nodeA, nodeB);
-		Link linkBC = networkFactory.createLink(Id.createLinkId("BC"), nodeB, nodeC);
-		Link linkCD = networkFactory.createLink(Id.createLinkId("CD"), nodeC, nodeD);
-		Link linkDE = networkFactory.createLink(Id.createLinkId("DE"), nodeD, nodeE);
+    Link linkAB = networkFactory.createLink(Id.createLinkId("AB"), nodeA, nodeB);
+    Link linkBC = networkFactory.createLink(Id.createLinkId("BC"), nodeB, nodeC);
+    Link linkCD = networkFactory.createLink(Id.createLinkId("CD"), nodeC, nodeD);
+    Link linkDE = networkFactory.createLink(Id.createLinkId("DE"), nodeD, nodeE);
 
-		Arrays.asList(nodeA, nodeB, nodeC, nodeD, nodeE).forEach(network::addNode);
-		Arrays.asList(linkAB, linkBC, linkCD, linkDE).forEach(network::addLink);
+    Arrays.asList(nodeA, nodeB, nodeC, nodeD, nodeE).forEach(network::addNode);
+    Arrays.asList(linkAB, linkBC, linkCD, linkDE).forEach(network::addLink);
 
-		Population population = scenario.getPopulation();
-		PopulationFactory populationFactory = population.getFactory();
+    Population population = scenario.getPopulation();
+    PopulationFactory populationFactory = population.getFactory();
 
-		Person person1 = populationFactory.createPerson(Id.createPersonId("person1"));
-		Person person2 = populationFactory.createPerson(Id.createPersonId("person2"));
-		Person person3 = populationFactory.createPerson(Id.createPersonId("person3"));
+    Person person1 = populationFactory.createPerson(Id.createPersonId("person1"));
+    Person person2 = populationFactory.createPerson(Id.createPersonId("person2"));
+    Person person3 = populationFactory.createPerson(Id.createPersonId("person3"));
 
-		for (Person person : Arrays.asList(person1, person2, person3)) {
-			population.addPerson(person);
+    for (Person person : Arrays.asList(person1, person2, person3)) {
+      population.addPerson(person);
 
-			Plan plan = populationFactory.createPlan();
-			person.addPlan(plan);
+      Plan plan = populationFactory.createPlan();
+      person.addPlan(plan);
 
-			Activity activity;
-			Leg leg;
+      Activity activity;
+      Leg leg;
 
-			activity = populationFactory.createActivityFromLinkId("generic", linkAB.getId());
-			activity.setEndTime(0.0);
-			plan.addActivity(activity);
+      activity = populationFactory.createActivityFromLinkId("generic", linkAB.getId());
+      activity.setEndTime(0.0);
+      plan.addActivity(activity);
 
-			leg = populationFactory.createLeg("car");
-			plan.addLeg(leg);
+      leg = populationFactory.createLeg("car");
+      plan.addLeg(leg);
 
-			activity = populationFactory.createActivityFromLinkId("generic", linkCD.getId());
-			activity.setMaximumDuration(10000.0);
-			plan.addActivity(activity);
+      activity = populationFactory.createActivityFromLinkId("generic", linkCD.getId());
+      activity.setMaximumDuration(10000.0);
+      plan.addActivity(activity);
 
-			leg = populationFactory.createLeg("car");
-			plan.addLeg(leg);
+      leg = populationFactory.createLeg("car");
+      plan.addLeg(leg);
 
-			activity = populationFactory.createActivityFromLinkId("generic", linkDE.getId());
-			plan.addActivity(activity);
-		}
+      activity = populationFactory.createActivityFromLinkId("generic", linkDE.getId());
+      plan.addActivity(activity);
+    }
 
-		return scenario;
-	}
+    return scenario;
+  }
 }

@@ -21,95 +21,86 @@ package org.matsim.contrib.signals.controller.sylvia;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.contrib.signals.model.DatabasedSignalPlan;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 
-
 /**
  * @author dgrether
- *
  */
 public final class SylviaSignalPlan implements SignalPlan {
 
-	private DatabasedSignalPlan delegate;
-	private List<SylviaExtensionPoint> extensionPoints = new ArrayList<SylviaExtensionPoint>();
-	private int maxExtensionTime = 0;
-	private int fixedTimeCycle = 0;
+  private DatabasedSignalPlan delegate;
+  private List<SylviaExtensionPoint> extensionPoints = new ArrayList<SylviaExtensionPoint>();
+  private int maxExtensionTime = 0;
+  private int fixedTimeCycle = 0;
 
-	
-	public SylviaSignalPlan(DatabasedSignalPlan delegate){
-		this.delegate = delegate;
-	}
-	
-	@Override
-	public List<Id<SignalGroup>> getDroppings(double timeSeconds) {
-		return delegate.getDroppings(timeSeconds);
-	}
+  public SylviaSignalPlan(DatabasedSignalPlan delegate) {
+    this.delegate = delegate;
+  }
 
-	@Override
-	public List<Id<SignalGroup>> getOnsets(double timeSeconds) {
-		return delegate.getOnsets(timeSeconds);
-	}
+  @Override
+  public List<Id<SignalGroup>> getDroppings(double timeSeconds) {
+    return delegate.getDroppings(timeSeconds);
+  }
 
-	@Override
-	public double getEndTime() {
-		return delegate.getEndTime();
-	}
+  @Override
+  public List<Id<SignalGroup>> getOnsets(double timeSeconds) {
+    return delegate.getOnsets(timeSeconds);
+  }
 
-	@Override
-	public double getStartTime() {
-		return delegate.getStartTime();
-	}
+  @Override
+  public double getEndTime() {
+    return delegate.getEndTime();
+  }
 
-	@Override
-	public Id<SignalPlan> getId() {
-		return delegate.getId();
-	}
+  @Override
+  public double getStartTime() {
+    return delegate.getStartTime();
+  }
 
-	@Override
-	public Integer getOffset() {
-		return delegate.getOffset();
-	}
+  @Override
+  public Id<SignalPlan> getId() {
+    return delegate.getId();
+  }
 
-	@Override
-	public Integer getCycleTime() {
-		return delegate.getCycleTime();
-	}
-	
-	public void addExtensionPoint(SylviaExtensionPoint extensionPoint){
-		this.extensionPoints.add(extensionPoint);
-	}
+  @Override
+  public Integer getOffset() {
+    return delegate.getOffset();
+  }
 
-	public List<SylviaExtensionPoint> getExtensionPoints() {
-		return extensionPoints;
-	}
+  @Override
+  public Integer getCycleTime() {
+    return delegate.getCycleTime();
+  }
 
-	
-	public int getMaxExtensionTime() {
-		return maxExtensionTime;
-	}
+  public void addExtensionPoint(SylviaExtensionPoint extensionPoint) {
+    this.extensionPoints.add(extensionPoint);
+  }
 
-	
-	public void setMaxExtensionTime(int maxExtensionTime) {
-		this.maxExtensionTime = maxExtensionTime;
-	}
+  public List<SylviaExtensionPoint> getExtensionPoints() {
+    return extensionPoints;
+  }
 
-	
-	public int getFixedTimeCycle() {
-		return fixedTimeCycle;
-	}
+  public int getMaxExtensionTime() {
+    return maxExtensionTime;
+  }
 
-	
-	public void setFixedTimeCycle(int fixedTimeCycle) {
-		this.fixedTimeCycle = fixedTimeCycle;
-	}
-	
-	public SignalPlanData getPlanData(){
-		return this.delegate.getPlanData();
-	}
-	
+  public void setMaxExtensionTime(int maxExtensionTime) {
+    this.maxExtensionTime = maxExtensionTime;
+  }
+
+  public int getFixedTimeCycle() {
+    return fixedTimeCycle;
+  }
+
+  public void setFixedTimeCycle(int fixedTimeCycle) {
+    this.fixedTimeCycle = fixedTimeCycle;
+  }
+
+  public SignalPlanData getPlanData() {
+    return this.delegate.getPlanData();
+  }
 }

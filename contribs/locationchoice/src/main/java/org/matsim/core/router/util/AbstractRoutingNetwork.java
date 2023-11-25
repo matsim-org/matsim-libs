@@ -22,7 +22,6 @@ package org.matsim.core.router.util;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -31,88 +30,92 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public abstract class AbstractRoutingNetwork implements RoutingNetwork {
-	
-	/*package*/ final Map<Id<Node>, RoutingNetworkNode> nodes = new LinkedHashMap<>();	// needs to be a LinkedHashMap since the order is relevant for the router-preprocessing!
-	/*package*/ final Network network;
 
-	public AbstractRoutingNetwork(Network network) {
-		this.network = network;
-	}
-	
-	@Override
-	public void initialize() {
-		// Some classes might override this method and do some additional stuff...
-	}
-	
-	@Override
-	public NetworkFactory getFactory() {
-		return network.getFactory();
-	}
+  /*package*/ final Map<Id<Node>, RoutingNetworkNode> nodes =
+      new LinkedHashMap<>(); // needs to be a LinkedHashMap since the order is relevant for the
+  // router-preprocessing!
+  /*package*/ final Network network;
 
-	@Override
-	public Map<Id<Node>, RoutingNetworkNode> getNodes() {
-		return nodes;
-	}
+  public AbstractRoutingNetwork(Network network) {
+    this.network = network;
+  }
 
-	public void addNode(RoutingNetworkNode nn) {
-		this.nodes.put(nn.getId(), nn);
-	}
-	
-	@Override
-	public RoutingNetworkNode removeNode(Id<Node> nodeId) {
-		return nodes.remove(nodeId);
-	}
+  @Override
+  public void initialize() {
+    // Some classes might override this method and do some additional stuff...
+  }
 
-	@Override
-	public void addLink(Link ll) {
-		throw new RuntimeException("Not supported operation!");
-	}
+  @Override
+  public NetworkFactory getFactory() {
+    return network.getFactory();
+  }
 
-	@Override
-	public void addNode(Node nn) {
-		throw new RuntimeException("Not supported operation!");
-	}
+  @Override
+  public Map<Id<Node>, RoutingNetworkNode> getNodes() {
+    return nodes;
+  }
 
-	@Override
-	public double getCapacityPeriod() {
-		throw new RuntimeException("Not supported operation!");
-	}
+  public void addNode(RoutingNetworkNode nn) {
+    this.nodes.put(nn.getId(), nn);
+  }
 
-	@Override
-	public double getEffectiveLaneWidth() {
-		throw new RuntimeException("Not supported operation!");
-	}
+  @Override
+  public RoutingNetworkNode removeNode(Id<Node> nodeId) {
+    return nodes.remove(nodeId);
+  }
 
-	@Override
-	public Map<Id<Link>, ? extends Link> getLinks() {
-		throw new RuntimeException("Not supported operation!");
-	}
+  @Override
+  public void addLink(Link ll) {
+    throw new RuntimeException("Not supported operation!");
+  }
 
-	@Override
-	public Link removeLink(Id<Link> linkId) {
-		throw new RuntimeException("Not supported operation!");
-	}
-	@Override
-	public void setCapacityPeriod(double capPeriod) {
-		throw new RuntimeException("not implemented") ;
-	}
+  @Override
+  public void addNode(Node nn) {
+    throw new RuntimeException("Not supported operation!");
+  }
 
-	@Override
-	public void setEffectiveCellSize(double effectiveCellSize) {
-		throw new RuntimeException("not implemented") ;
-	}
+  @Override
+  public double getCapacityPeriod() {
+    throw new RuntimeException("Not supported operation!");
+  }
 
-	@Override
-	public void setEffectiveLaneWidth(double effectiveLaneWidth) {
-		throw new RuntimeException("not implemented") ;
-	}
-	@Override
-	public double getEffectiveCellSize() {
-		throw new RuntimeException("not implemented") ;
-	}
+  @Override
+  public double getEffectiveLaneWidth() {
+    throw new RuntimeException("Not supported operation!");
+  }
 
-	@Override
-	public Attributes getAttributes() {
-		return this.network.getAttributes();
-	}
+  @Override
+  public Map<Id<Link>, ? extends Link> getLinks() {
+    throw new RuntimeException("Not supported operation!");
+  }
+
+  @Override
+  public Link removeLink(Id<Link> linkId) {
+    throw new RuntimeException("Not supported operation!");
+  }
+
+  @Override
+  public void setCapacityPeriod(double capPeriod) {
+    throw new RuntimeException("not implemented");
+  }
+
+  @Override
+  public void setEffectiveCellSize(double effectiveCellSize) {
+    throw new RuntimeException("not implemented");
+  }
+
+  @Override
+  public void setEffectiveLaneWidth(double effectiveLaneWidth) {
+    throw new RuntimeException("not implemented");
+  }
+
+  @Override
+  public double getEffectiveCellSize() {
+    throw new RuntimeException("not implemented");
+  }
+
+  @Override
+  public Attributes getAttributes() {
+    return this.network.getAttributes();
+  }
 }

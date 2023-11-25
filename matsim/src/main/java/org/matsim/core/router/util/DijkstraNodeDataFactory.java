@@ -22,8 +22,8 @@ package org.matsim.core.router.util;
 
 public class DijkstraNodeDataFactory implements NodeDataFactory {
 
-	@Override
-	public NodeData createNodeData() {
-		return new DijkstraNodeData();
-	}
+  @Override
+  public NodeData createNodeData() {
+    return new DijkstraNodeData();
+  }
 }

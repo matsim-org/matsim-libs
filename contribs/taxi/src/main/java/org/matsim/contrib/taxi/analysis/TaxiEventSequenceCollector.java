@@ -25,9 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
 import javax.annotation.Nullable;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
@@ -45,93 +43,95 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEventHandler;
  * @author Michal Maciejewski (michalm)
  */
 public class TaxiEventSequenceCollector
-		implements PassengerRequestScheduledEventHandler, PassengerRequestSubmittedEventHandler,
-		PassengerPickedUpEventHandler, PassengerDroppedOffEventHandler {
+    implements PassengerRequestScheduledEventHandler,
+        PassengerRequestSubmittedEventHandler,
+        PassengerPickedUpEventHandler,
+        PassengerDroppedOffEventHandler {
 
-	public static class RequestEventSequence {
-		private final PassengerRequestSubmittedEvent submitted;
-		//nullable events may be null if QSim ends before the request is actually handled
-		@Nullable
-		private PassengerRequestScheduledEvent scheduled;
-		@Nullable
-		private PassengerPickedUpEvent pickedUp;
-		@Nullable
-		private PassengerDroppedOffEvent droppedOff;
+  public static class RequestEventSequence {
+    private final PassengerRequestSubmittedEvent submitted;
+    // nullable events may be null if QSim ends before the request is actually handled
+    @Nullable private PassengerRequestScheduledEvent scheduled;
+    @Nullable private PassengerPickedUpEvent pickedUp;
+    @Nullable private PassengerDroppedOffEvent droppedOff;
 
-		public RequestEventSequence(PassengerRequestSubmittedEvent submitted) {
-			this(submitted, null, null, null);
-		}
+    public RequestEventSequence(PassengerRequestSubmittedEvent submitted) {
+      this(submitted, null, null, null);
+    }
 
-		public RequestEventSequence(PassengerRequestSubmittedEvent submitted, PassengerRequestScheduledEvent scheduled,
-				PassengerPickedUpEvent pickedUp, PassengerDroppedOffEvent droppedOff) {
-			this.submitted = Objects.requireNonNull(submitted);
-			this.scheduled = scheduled;
-			this.pickedUp = pickedUp;
-			this.droppedOff = droppedOff;
-		}
+    public RequestEventSequence(
+        PassengerRequestSubmittedEvent submitted,
+        PassengerRequestScheduledEvent scheduled,
+        PassengerPickedUpEvent pickedUp,
+        PassengerDroppedOffEvent droppedOff) {
+      this.submitted = Objects.requireNonNull(submitted);
+      this.scheduled = scheduled;
+      this.pickedUp = pickedUp;
+      this.droppedOff = droppedOff;
+    }
 
-		public PassengerRequestSubmittedEvent getSubmitted() {
-			return submitted;
-		}
+    public PassengerRequestSubmittedEvent getSubmitted() {
+      return submitted;
+    }
 
-		public Optional<PassengerRequestScheduledEvent> getScheduled() {
-			return Optional.ofNullable(scheduled);
-		}
+    public Optional<PassengerRequestScheduledEvent> getScheduled() {
+      return Optional.ofNullable(scheduled);
+    }
 
-		public Optional<PassengerPickedUpEvent> getPickedUp() {
-			return Optional.ofNullable(pickedUp);
-		}
+    public Optional<PassengerPickedUpEvent> getPickedUp() {
+      return Optional.ofNullable(pickedUp);
+    }
 
-		public Optional<PassengerDroppedOffEvent> getDroppedOff() {
-			return Optional.ofNullable(droppedOff);
-		}
+    public Optional<PassengerDroppedOffEvent> getDroppedOff() {
+      return Optional.ofNullable(droppedOff);
+    }
 
-		public boolean isCompleted() {
-			return droppedOff != null;
-		}
-	}
+    public boolean isCompleted() {
+      return droppedOff != null;
+    }
+  }
 
-	private final String mode;
-	private final Map<Id<Request>, RequestEventSequence> requestSequences = new HashMap<>();
+  private final String mode;
+  private final Map<Id<Request>, RequestEventSequence> requestSequences = new HashMap<>();
 
-	public TaxiEventSequenceCollector(String mode) {
-		this.mode = mode;
-	}
+  public TaxiEventSequenceCollector(String mode) {
+    this.mode = mode;
+  }
 
-	public Map<Id<Request>, RequestEventSequence> getRequestSequences() {
-		return Collections.unmodifiableMap(requestSequences);
-	}
+  public Map<Id<Request>, RequestEventSequence> getRequestSequences() {
+    return Collections.unmodifiableMap(requestSequences);
+  }
 
-	@Override
-	public void handleEvent(PassengerRequestSubmittedEvent event) {
-		if (event.getMode().equals(mode)) {
-			requestSequences.put(event.getRequestId(), new RequestEventSequence(event));
-		}
-	}
+  @Override
+  public void handleEvent(PassengerRequestSubmittedEvent event) {
+    if (event.getMode().equals(mode)) {
+      requestSequences.put(event.getRequestId(), new RequestEventSequence(event));
+    }
+  }
 
-	@Override
-	public void handleEvent(PassengerRequestScheduledEvent event) {
-		if (event.getMode().equals(mode)) {
-			requestSequences.get(event.getRequestId()).scheduled = event;
-		}
-	}
+  @Override
+  public void handleEvent(PassengerRequestScheduledEvent event) {
+    if (event.getMode().equals(mode)) {
+      requestSequences.get(event.getRequestId()).scheduled = event;
+    }
+  }
 
-	@Override
-	public void handleEvent(PassengerPickedUpEvent event) {
-		if (event.getMode().equals(mode)) {
-			requestSequences.get(event.getRequestId()).pickedUp = event;
-		}
-	}
+  @Override
+  public void handleEvent(PassengerPickedUpEvent event) {
+    if (event.getMode().equals(mode)) {
+      requestSequences.get(event.getRequestId()).pickedUp = event;
+    }
+  }
 
-	@Override
-	public void handleEvent(PassengerDroppedOffEvent event) {
-		if (event.getMode().equals(mode)) {
-			requestSequences.get(event.getRequestId()).droppedOff = event;
-		}
-	}
+  @Override
+  public void handleEvent(PassengerDroppedOffEvent event) {
+    if (event.getMode().equals(mode)) {
+      requestSequences.get(event.getRequestId()).droppedOff = event;
+    }
+  }
 
-	@Override
-	public void reset(int iteration) {
-		requestSequences.clear();
-	}
+  @Override
+  public void reset(int iteration) {
+    requestSequences.clear();
+  }
 }

@@ -19,23 +19,21 @@
 
 package org.matsim.core.replanning.strategies;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-
 public class SelectPathSizeLogit implements Provider<PlanStrategy> {
 
-    @Inject private ScoringConfigGroup config;
-    @Inject private Network network;
+  @Inject private ScoringConfigGroup config;
+  @Inject private Network network;
 
-    @Override
-	public PlanStrategy get() {
-        return new PlanStrategyImpl(new PathSizeLogitSelector(config, network));
-	}
-
+  @Override
+  public PlanStrategy get() {
+    return new PlanStrategyImpl(new PathSizeLogitSelector(config, network));
+  }
 }

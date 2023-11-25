@@ -21,7 +21,6 @@
 package org.matsim.core.router.util;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -31,79 +30,78 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public abstract class AbstractRoutingNetworkNode implements RoutingNetworkNode {
 
-	private final Node node;
-	private final RoutingNetworkLink[] outLinks;
-	
-	private DeadEndData deadEndData;
-	
-	/*
-	 * We could get the number of out-links from the node. However,
-	 * if some of those links should not be part of the routing network
-	 * this would fail.
-	 */
-	/*package*/ AbstractRoutingNetworkNode(Node node, int numOutLinks) {
-		this.node = node;
-		this.outLinks = new RoutingNetworkLink[numOutLinks];
-	}
-	
-	@Override
-	public Node getNode() {
-		return node;
-	}
+  private final Node node;
+  private final RoutingNetworkLink[] outLinks;
 
-	@Override
-	public void setOutLinksArray(RoutingNetworkLink[] outLinks) {
-        System.arraycopy(outLinks, 0, this.outLinks, 0, outLinks.length);
-	}
-	
-	@Override
-	public RoutingNetworkLink[] getOutLinksArray() {
-		return this.outLinks;
-	}
+  private DeadEndData deadEndData;
 
-	@Override
-	public void setDeadEndData(DeadEndData deadEndData) {
-		this.deadEndData = deadEndData;
-	}
-	
-	@Override
-	public DeadEndData getDeadEndData() {
-		return this.deadEndData;
-	}
+  /*
+   * We could get the number of out-links from the node. However,
+   * if some of those links should not be part of the routing network
+   * this would fail.
+   */
+  /*package*/ AbstractRoutingNetworkNode(Node node, int numOutLinks) {
+    this.node = node;
+    this.outLinks = new RoutingNetworkLink[numOutLinks];
+  }
 
-	@Override
-	public Id<Node> getId() {
-		return node.getId();
-	}
+  @Override
+  public Node getNode() {
+    return node;
+  }
 
-	@Override
-	public Coord getCoord() {
-		return node.getCoord();
-	}
+  @Override
+  public void setOutLinksArray(RoutingNetworkLink[] outLinks) {
+    System.arraycopy(outLinks, 0, this.outLinks, 0, outLinks.length);
+  }
 
-	@Override
-	public boolean addInLink(Link link) {
-		throw new RuntimeException("Not supported operation!");
-	}
+  @Override
+  public RoutingNetworkLink[] getOutLinksArray() {
+    return this.outLinks;
+  }
 
-	@Override
-	public boolean addOutLink(Link link) {
-		throw new RuntimeException("Not supported operation!");
-	}
+  @Override
+  public void setDeadEndData(DeadEndData deadEndData) {
+    this.deadEndData = deadEndData;
+  }
 
-	@Override
-	public Map<Id<Link>, ? extends Link> getInLinks() {
-		throw new RuntimeException("Not supported operation!");
-	}
+  @Override
+  public DeadEndData getDeadEndData() {
+    return this.deadEndData;
+  }
 
+  @Override
+  public Id<Node> getId() {
+    return node.getId();
+  }
 
-	@Override
-	public Map<Id<Link>, ? extends Link> getOutLinks() {
-		throw new RuntimeException("Not supported operation!");
-	}
+  @Override
+  public Coord getCoord() {
+    return node.getCoord();
+  }
 
-	@Override
-	public Attributes getAttributes() {
-		return node.getAttributes();
-	}
+  @Override
+  public boolean addInLink(Link link) {
+    throw new RuntimeException("Not supported operation!");
+  }
+
+  @Override
+  public boolean addOutLink(Link link) {
+    throw new RuntimeException("Not supported operation!");
+  }
+
+  @Override
+  public Map<Id<Link>, ? extends Link> getInLinks() {
+    throw new RuntimeException("Not supported operation!");
+  }
+
+  @Override
+  public Map<Id<Link>, ? extends Link> getOutLinks() {
+    throw new RuntimeException("Not supported operation!");
+  }
+
+  @Override
+  public Attributes getAttributes() {
+    return node.getAttributes();
+  }
 }

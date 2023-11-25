@@ -7,31 +7,38 @@ import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PC2Parking;
 
 public interface ParkingScore {
 
-	double calcWalkScore(Coord destCoord, PC2Parking parking, Id<Person> personId, double parkingDurationInSeconds);
+  double calcWalkScore(
+      Coord destCoord, PC2Parking parking, Id<Person> personId, double parkingDurationInSeconds);
 
-	double calcCostScore(double arrivalTime, double parkingDurationInSeconds, PC2Parking parking, Id<Person> personId);
+  double calcCostScore(
+      double arrivalTime, double parkingDurationInSeconds, PC2Parking parking, Id<Person> personId);
 
-	double calcScore(Coord destCoord, double arrivalTime, double parkingDurationInSeconds, PC2Parking parking,
-			Id<Person> personId, int legIndex, boolean setCostToZero);
+  double calcScore(
+      Coord destCoord,
+      double arrivalTime,
+      double parkingDurationInSeconds,
+      PC2Parking parking,
+      Id<Person> personId,
+      int legIndex,
+      boolean setCostToZero);
 
-	double getScore(Id<Person> id);
+  double getScore(Id<Person> id);
 
-	void addScore(Id<Person> id, double incValue);
+  void addScore(Id<Person> id, double incValue);
 
-	void prepareForNewIteration();
+  void prepareForNewIteration();
 
-	double getParkingScoreScalingFactor();
+  double getParkingScoreScalingFactor();
 
-	void setParkingScoreScalingFactor(double parkingScoreScalingFactor);
+  void setParkingScoreScalingFactor(double parkingScoreScalingFactor);
 
-	double getRandomErrorTermScalingFactor();
+  double getRandomErrorTermScalingFactor();
 
-	void setRandomErrorTermScalingFactor(double randomErrorTermScalingFactor);
+  void setRandomErrorTermScalingFactor(double randomErrorTermScalingFactor);
 
-	AbstractParkingBetas getParkingBetas();
+  AbstractParkingBetas getParkingBetas();
 
-	void setParkingBetas(AbstractParkingBetas parkingBetas);
+  void setParkingBetas(AbstractParkingBetas parkingBetas);
 
-	void setRandomErrorTermManger(RandomErrorTermManager randomErrorTermManager);
-
+  void setRandomErrorTermManger(RandomErrorTermManager randomErrorTermManager);
 }

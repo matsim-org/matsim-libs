@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.minibus.hook;
 
+import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -28,8 +29,6 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.pt.router.TransitActsRemover;
 
-import java.util.Set;
-
 /**
  * ReRoutes every person from a given set of person ids
  *
@@ -37,28 +36,28 @@ import java.util.Set;
  */
 final class PersonReRouteStuck extends AbstractPersonReRouteStuck {
 
+  private static final Logger log = LogManager.getLogger(PersonReRouteStuck.class);
 
-	private static final Logger log = LogManager.getLogger(PersonReRouteStuck.class);
-	
-	private final TransitActsRemover transitActsRemover;
+  private final TransitActsRemover transitActsRemover;
 
-	public PersonReRouteStuck(final PlanAlgorithm router, final MutableScenario scenario, Set<Id<Person>> agentsStuck) {
-		super(router, scenario, agentsStuck);
-		this.transitActsRemover = new TransitActsRemover(); 
-	}
-	
-	@Override
-	public void run(final Person person) {
-		Plan selectedPlan = person.getSelectedPlan();
-		if (selectedPlan == null) {
-			// the only way no plan can be selected should be when the person has no plans at all
-			log.warn("Person " + person.getId() + " has no plans!");
-			return;
-		}
-		
-		if(this.agentsStuck.contains(person.getId())){
-			this.transitActsRemover.run(selectedPlan);
-			this.router.run(selectedPlan);
-		}
-	}
+  public PersonReRouteStuck(
+      final PlanAlgorithm router, final MutableScenario scenario, Set<Id<Person>> agentsStuck) {
+    super(router, scenario, agentsStuck);
+    this.transitActsRemover = new TransitActsRemover();
+  }
+
+  @Override
+  public void run(final Person person) {
+    Plan selectedPlan = person.getSelectedPlan();
+    if (selectedPlan == null) {
+      // the only way no plan can be selected should be when the person has no plans at all
+      log.warn("Person " + person.getId() + " has no plans!");
+      return;
+    }
+
+    if (this.agentsStuck.contains(person.getId())) {
+      this.transitActsRemover.run(selectedPlan);
+      this.router.run(selectedPlan);
+    }
+  }
 }

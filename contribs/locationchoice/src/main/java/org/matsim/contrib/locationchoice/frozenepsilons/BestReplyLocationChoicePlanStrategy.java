@@ -19,6 +19,9 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import java.util.Map;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
@@ -39,65 +42,76 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-import java.util.Map;
-
 class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 
-	private PlanStrategyImpl delegate;
-	@Inject private Config config ;
-	@Inject private Scenario scenario;
-	@Inject private Provider<TripRouter> tripRouterProvider;
-	@Inject private ScoringFunctionFactory scoringFunctionFactory;
-	@Inject private Map<String, TravelTime> travelTimes;
-	@Inject private Map<String, TravelDisutilityFactory> travelDisutilities;
-	@Inject private TimeInterpretation timeInterpretation;
+  private PlanStrategyImpl delegate;
+  @Inject private Config config;
+  @Inject private Scenario scenario;
+  @Inject private Provider<TripRouter> tripRouterProvider;
+  @Inject private ScoringFunctionFactory scoringFunctionFactory;
+  @Inject private Map<String, TravelTime> travelTimes;
+  @Inject private Map<String, TravelDisutilityFactory> travelDisutilities;
+  @Inject private TimeInterpretation timeInterpretation;
 
-	@Override
-	public void run(HasPlansAndId<Plan, Person> person) {
-		delegate.run(person);
-	}
+  @Override
+  public void run(HasPlansAndId<Plan, Person> person) {
+    delegate.run(person);
+  }
 
-	@Override
-	public void init(ReplanningContext replanningContext) {
-		/*
-		 * Somehow this is ugly. Should be initialized in the constructor. But I do not know, how to initialize the lc scenario elements
-		 * such that they are already available at the time of constructing this object. ah feb'13
-		 */
-		FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule( config, FrozenTastesConfigGroup.class ) ;
+  @Override
+  public void init(ReplanningContext replanningContext) {
+    /*
+     * Somehow this is ugly. Should be initialized in the constructor. But I do not know, how to initialize the lc scenario elements
+     * such that they are already available at the time of constructing this object. ah feb'13
+     */
+    FrozenTastesConfigGroup dccg =
+        ConfigUtils.addOrGetModule(config, FrozenTastesConfigGroup.class);
 
-		DestinationChoiceContext lcContext = (DestinationChoiceContext) scenario.getScenarioElement(DestinationChoiceContext.ELEMENT_NAME);
+    DestinationChoiceContext lcContext =
+        (DestinationChoiceContext)
+            scenario.getScenarioElement(DestinationChoiceContext.ELEMENT_NAME);
 
-		// only necessary if vou overwritten one of the following classes BestReplyLocationChoicePlanAlgorithm or BestReplyLocationChoiceStrategymodule
-		MaxDCScoreWrapper maxDcScoreWrapper = (MaxDCScoreWrapper)scenario.getScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME);
+    // only necessary if vou overwritten one of the following classes
+    // BestReplyLocationChoicePlanAlgorithm or BestReplyLocationChoiceStrategymodule
+    MaxDCScoreWrapper maxDcScoreWrapper =
+        (MaxDCScoreWrapper) scenario.getScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME);
 
-		if ( !FrozenTastesConfigGroup.Algotype.bestResponse.equals(dccg.getAlgorithm() )) {
-			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
-		}
+    if (!FrozenTastesConfigGroup.Algotype.bestResponse.equals(dccg.getAlgorithm())) {
+      throw new RuntimeException(
+          "wrong class for selected location choice algorithm type; aborting ...");
+    }
 
-		switch( dccg.getPlanSelector() ){
-			case "BestScore":
-				delegate = new PlanStrategyImpl( new BestPlanSelector<>() );
-				break;
-			case "ChangeExpBeta":
-				delegate = new PlanStrategyImpl( new ExpBetaPlanChanger( config.scoring().getBrainExpBeta() ) );
-				break;
-			case "SelectRandom":
-				delegate = new PlanStrategyImpl( new RandomPlanSelector() );
-				break;
-			default:
-				delegate = new PlanStrategyImpl( new ExpBetaPlanSelector( config.scoring() ) );
-				break;
-		}
-		delegate.addStrategyModule(new BestReplyLocationChoiceStrategymodule(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled(), scoringFunctionFactory, travelTimes, travelDisutilities, timeInterpretation) );
-		delegate.addStrategyModule(new ReRoute(lcContext.getScenario(), tripRouterProvider, timeInterpretation));
+    switch (dccg.getPlanSelector()) {
+      case "BestScore":
+        delegate = new PlanStrategyImpl(new BestPlanSelector<>());
+        break;
+      case "ChangeExpBeta":
+        delegate = new PlanStrategyImpl(new ExpBetaPlanChanger(config.scoring().getBrainExpBeta()));
+        break;
+      case "SelectRandom":
+        delegate = new PlanStrategyImpl(new RandomPlanSelector());
+        break;
+      default:
+        delegate = new PlanStrategyImpl(new ExpBetaPlanSelector(config.scoring()));
+        break;
+    }
+    delegate.addStrategyModule(
+        new BestReplyLocationChoiceStrategymodule(
+            tripRouterProvider,
+            lcContext,
+            maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled(),
+            scoringFunctionFactory,
+            travelTimes,
+            travelDisutilities,
+            timeInterpretation));
+    delegate.addStrategyModule(
+        new ReRoute(lcContext.getScenario(), tripRouterProvider, timeInterpretation));
 
-		delegate.init(replanningContext);
-	}
+    delegate.init(replanningContext);
+  }
 
-	@Override
-	public void finish() {
-		delegate.finish();
-	}
+  @Override
+  public void finish() {
+    delegate.finish();
+  }
 }

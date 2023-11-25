@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Person;
@@ -36,46 +35,54 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
 /**
- * Collects {@link StageContainer} and creates {@link PersonMoneyEvent} for
- * each (commuter) agent.
- * 
+ * Collects {@link StageContainer} and creates {@link PersonMoneyEvent} for each (commuter) agent.
+ *
  * @author aneumann
  */
-final class StageContainer2AgentMoneyEvent implements StageContainerHandler, AfterMobsimListener{
+final class StageContainer2AgentMoneyEvent implements StageContainerHandler, AfterMobsimListener {
 
-	private final EventsManager eventsManager;
-	private final double mobsimShutdownTime;
-	private HashMap<Id<Person>, List<StageContainer>> agentId2stageContainerListMap = new HashMap<>();
-	private final TicketMachineI ticketMachine;
+  private final EventsManager eventsManager;
+  private final double mobsimShutdownTime;
+  private HashMap<Id<Person>, List<StageContainer>> agentId2stageContainerListMap = new HashMap<>();
+  private final TicketMachineI ticketMachine;
 
-	public StageContainer2AgentMoneyEvent(MatsimServices controler, TicketMachineI ticketMachine) {
-		controler.addControlerListener(this);
-		this.eventsManager = controler.getEvents();
-		this.mobsimShutdownTime = controler.getConfig().qsim().getEndTime().seconds();
-		this.ticketMachine = ticketMachine;
-	}
+  public StageContainer2AgentMoneyEvent(MatsimServices controler, TicketMachineI ticketMachine) {
+    controler.addControlerListener(this);
+    this.eventsManager = controler.getEvents();
+    this.mobsimShutdownTime = controler.getConfig().qsim().getEndTime().seconds();
+    this.ticketMachine = ticketMachine;
+  }
 
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		// TODO[AN] This can be used to hook in a Farebox
-		for (Entry<Id<Person>, List<StageContainer>> agentId2stageContainersEntry : this.agentId2stageContainerListMap.entrySet()) {
-			double totalFareOfAgent = 0.0;
-			for (StageContainer stageContainer : agentId2stageContainersEntry.getValue()) {
-				totalFareOfAgent += this.ticketMachine.getFare(stageContainer);
-			}
-			this.eventsManager.processEvent(new PersonMoneyEvent(this.mobsimShutdownTime, agentId2stageContainersEntry.getKey(), -totalFareOfAgent, "minibus", null, null));
-		}
-	}
+  @Override
+  public void notifyAfterMobsim(AfterMobsimEvent event) {
+    // TODO[AN] This can be used to hook in a Farebox
+    for (Entry<Id<Person>, List<StageContainer>> agentId2stageContainersEntry :
+        this.agentId2stageContainerListMap.entrySet()) {
+      double totalFareOfAgent = 0.0;
+      for (StageContainer stageContainer : agentId2stageContainersEntry.getValue()) {
+        totalFareOfAgent += this.ticketMachine.getFare(stageContainer);
+      }
+      this.eventsManager.processEvent(
+          new PersonMoneyEvent(
+              this.mobsimShutdownTime,
+              agentId2stageContainersEntry.getKey(),
+              -totalFareOfAgent,
+              "minibus",
+              null,
+              null));
+    }
+  }
 
-	@Override
-	public void handleFareContainer(StageContainer stageContainer) {
-		this.agentId2stageContainerListMap.computeIfAbsent(stageContainer.getAgentId(), k -> new LinkedList<>());
-		
-		this.agentId2stageContainerListMap.get(stageContainer.getAgentId()).add(stageContainer);
-	}
+  @Override
+  public void handleFareContainer(StageContainer stageContainer) {
+    this.agentId2stageContainerListMap.computeIfAbsent(
+        stageContainer.getAgentId(), k -> new LinkedList<>());
 
-	@Override
-	public void reset() {
-		this.agentId2stageContainerListMap = new HashMap<>();
-	}
+    this.agentId2stageContainerListMap.get(stageContainer.getAgentId()).add(stageContainer);
+  }
+
+  @Override
+  public void reset() {
+    this.agentId2stageContainerListMap = new HashMap<>();
+  }
 }

@@ -18,8 +18,8 @@
 
 package org.matsim.contrib.drt.extension.edrt.optimizer;
 
+import com.google.inject.Provider;
 import java.util.List;
-
 import org.matsim.contrib.drt.extension.edrt.schedule.EDrtChargingTask;
 import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
@@ -33,77 +33,76 @@ import org.matsim.contrib.evrp.ETask;
 import org.matsim.contrib.evrp.EvDvrpVehicle;
 import org.matsim.contrib.evrp.tracker.ETaskTracker;
 
-import com.google.inject.Provider;
-
 /**
  * @author michalm
  */
 public class EDrtVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
-	public static class EVehicleEntry extends VehicleEntry {
-		public final double socBeforeFinalStay;
+  public static class EVehicleEntry extends VehicleEntry {
+    public final double socBeforeFinalStay;
 
-		public EVehicleEntry(VehicleEntry entry, double socBeforeFinalStay) {
-			super(entry);
-			this.socBeforeFinalStay = socBeforeFinalStay;
-		}
-	}
+    public EVehicleEntry(VehicleEntry entry, double socBeforeFinalStay) {
+      super(entry);
+      this.socBeforeFinalStay = socBeforeFinalStay;
+    }
+  }
 
-	private final double minimumRelativeSoc;
-	private final VehicleDataEntryFactoryImpl entryFactory;
+  private final double minimumRelativeSoc;
+  private final VehicleDataEntryFactoryImpl entryFactory;
 
-	public EDrtVehicleDataEntryFactory(double minimumRelativeSoc) {
-		this.minimumRelativeSoc = minimumRelativeSoc;
-		entryFactory = new VehicleDataEntryFactoryImpl();
-	}
+  public EDrtVehicleDataEntryFactory(double minimumRelativeSoc) {
+    this.minimumRelativeSoc = minimumRelativeSoc;
+    entryFactory = new VehicleDataEntryFactoryImpl();
+  }
 
-	@Override
-	public VehicleEntry create(DvrpVehicle vehicle, double currentTime) {
-		Schedule schedule = vehicle.getSchedule();
-		int taskCount = schedule.getTaskCount();
-		if (taskCount > 1) {
-			Task oneBeforeLast = schedule.getTasks().get(taskCount - 2);
-			if (oneBeforeLast.getStatus() != TaskStatus.PERFORMED && oneBeforeLast.getTaskType()
-					.equals(EDrtChargingTask.TYPE)) {
-				return null;
-			}
-		}
+  @Override
+  public VehicleEntry create(DvrpVehicle vehicle, double currentTime) {
+    Schedule schedule = vehicle.getSchedule();
+    int taskCount = schedule.getTaskCount();
+    if (taskCount > 1) {
+      Task oneBeforeLast = schedule.getTasks().get(taskCount - 2);
+      if (oneBeforeLast.getStatus() != TaskStatus.PERFORMED
+          && oneBeforeLast.getTaskType().equals(EDrtChargingTask.TYPE)) {
+        return null;
+      }
+    }
 
-		Battery battery = ((EvDvrpVehicle)vehicle).getElectricVehicle().getBattery();
-		int nextTaskIdx;
-		double chargeBeforeNextTask;
-		if (schedule.getStatus() == ScheduleStatus.PLANNED) {
-			nextTaskIdx = 0;
-			chargeBeforeNextTask = battery.getCharge();
-		} else { // STARTED
-			Task currentTask = schedule.getCurrentTask();
-			ETaskTracker eTracker = (ETaskTracker)currentTask.getTaskTracker();
-			chargeBeforeNextTask = eTracker.predictChargeAtEnd();
-			nextTaskIdx = currentTask.getTaskIdx() + 1;
-		}
+    Battery battery = ((EvDvrpVehicle) vehicle).getElectricVehicle().getBattery();
+    int nextTaskIdx;
+    double chargeBeforeNextTask;
+    if (schedule.getStatus() == ScheduleStatus.PLANNED) {
+      nextTaskIdx = 0;
+      chargeBeforeNextTask = battery.getCharge();
+    } else { // STARTED
+      Task currentTask = schedule.getCurrentTask();
+      ETaskTracker eTracker = (ETaskTracker) currentTask.getTaskTracker();
+      chargeBeforeNextTask = eTracker.predictChargeAtEnd();
+      nextTaskIdx = currentTask.getTaskIdx() + 1;
+    }
 
-		List<? extends Task> tasks = schedule.getTasks();
-		for (int i = nextTaskIdx; i < tasks.size() - 1; i++) {
-			chargeBeforeNextTask -= ((ETask)tasks.get(i)).getTotalEnergy();
-		}
+    List<? extends Task> tasks = schedule.getTasks();
+    for (int i = nextTaskIdx; i < tasks.size() - 1; i++) {
+      chargeBeforeNextTask -= ((ETask) tasks.get(i)).getTotalEnergy();
+    }
 
-		if (chargeBeforeNextTask < minimumRelativeSoc * battery.getCapacity()) {
-			return null;// skip undercharged vehicles
-		}
+    if (chargeBeforeNextTask < minimumRelativeSoc * battery.getCapacity()) {
+      return null; // skip undercharged vehicles
+    }
 
-		VehicleEntry entry = entryFactory.create(vehicle, currentTime);
-		return entry == null ? null : new EVehicleEntry(entry, chargeBeforeNextTask);
-	}
+    VehicleEntry entry = entryFactory.create(vehicle, currentTime);
+    return entry == null ? null : new EVehicleEntry(entry, chargeBeforeNextTask);
+  }
 
-	public static class EDrtVehicleDataEntryFactoryProvider implements Provider<VehicleEntry.EntryFactory> {
-		private final double minimumRelativeSoc;
+  public static class EDrtVehicleDataEntryFactoryProvider
+      implements Provider<VehicleEntry.EntryFactory> {
+    private final double minimumRelativeSoc;
 
-		public EDrtVehicleDataEntryFactoryProvider(double minimumRelativeSoc) {
-			this.minimumRelativeSoc = minimumRelativeSoc;
-		}
+    public EDrtVehicleDataEntryFactoryProvider(double minimumRelativeSoc) {
+      this.minimumRelativeSoc = minimumRelativeSoc;
+    }
 
-		@Override
-		public EDrtVehicleDataEntryFactory get() {
-			return new EDrtVehicleDataEntryFactory(minimumRelativeSoc);
-		}
-	}
+    @Override
+    public EDrtVehicleDataEntryFactory get() {
+      return new EDrtVehicleDataEntryFactory(minimumRelativeSoc);
+    }
+  }
 }

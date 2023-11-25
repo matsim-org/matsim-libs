@@ -30,12 +30,12 @@ import java.util.Set;
  * @author michalm (Michal Maciejewski)
  */
 public class DefaultPassengerRequestValidator implements PassengerRequestValidator {
-	public static final String EQUAL_FROM_LINK_AND_TO_LINK_CAUSE = "eqal_fromLink_and_toLink";
+  public static final String EQUAL_FROM_LINK_AND_TO_LINK_CAUSE = "eqal_fromLink_and_toLink";
 
-	@Override
-	public Set<String> validateRequest(PassengerRequest request) {
-		return request.getFromLink() == request.getToLink() ?
-				Collections.singleton(EQUAL_FROM_LINK_AND_TO_LINK_CAUSE) :
-				Collections.emptySet();
-	}
+  @Override
+  public Set<String> validateRequest(PassengerRequest request) {
+    return request.getFromLink() == request.getToLink()
+        ? Collections.singleton(EQUAL_FROM_LINK_AND_TO_LINK_CAUSE)
+        : Collections.emptySet();
+  }
 }

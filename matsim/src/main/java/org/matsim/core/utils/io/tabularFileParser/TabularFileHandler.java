@@ -21,22 +21,17 @@
 package org.matsim.core.utils.io.tabularFileParser;
 
 /**
- * An implementation of this interface is expected by the
- * <code>TabularFileParser</code> for row-by-row handling of parsed files.
+ * An implementation of this interface is expected by the <code>TabularFileParser</code> for
+ * row-by-row handling of parsed files.
  *
  * @author gunnar
- *
  */
 public interface TabularFileHandler {
 
-    /**
-     * Is called by the <code>TabularFileParser</code> whenever a row has been
-     * parsed
-     *
-     * @param row
-     *            a <code>String[]</code> representation of the parsed row's
-     *            columns
-     */
-    public void startRow(String[] row);
-
+  /**
+   * Is called by the <code>TabularFileParser</code> whenever a row has been parsed
+   *
+   * @param row a <code>String[]</code> representation of the parsed row's columns
+   */
+  public void startRow(String[] row);
 }

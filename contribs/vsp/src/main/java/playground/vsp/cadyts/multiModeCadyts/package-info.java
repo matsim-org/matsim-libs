@@ -19,9 +19,9 @@
 
 /**
  * Cadyts infrastructure for multi (main) modes(s) calibration based on link traffic counts.
- * 
- * See {@link ModalCadytsTest}
+ *
+ * <p>See {@link ModalCadytsTest}
+ *
  * @author amit
  */
-
 package playground.vsp.cadyts.multiModeCadyts;

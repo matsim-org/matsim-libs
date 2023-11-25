@@ -31,13 +31,12 @@ import org.matsim.pt.router.TransitActsRemover;
 @Deprecated // use TripsToLegsModule
 public class TransitActsRemoverStrategy extends AbstractMultithreadedModule {
 
-	public TransitActsRemoverStrategy(Config config) {
-		super(config.global());
-	}
+  public TransitActsRemoverStrategy(Config config) {
+    super(config.global());
+  }
 
-	@Override
-	public PlanAlgorithm getPlanAlgoInstance() {
-		return new TransitActsRemover();
-	}
-
+  @Override
+  public PlanAlgorithm getPlanAlgoInstance() {
+    return new TransitActsRemover();
+  }
 }

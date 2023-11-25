@@ -21,29 +21,26 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
 import java.util.Collections;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
-
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
 
 /**
  * The default factory: no incomaptibility relationships
+ *
  * @author thibautd
  */
 public class EmptyIncompatiblePlansIdentifierFactory implements IncompatiblePlansIdentifierFactory {
 
-	@Override
-	public IncompatiblePlansIdentifier createIdentifier(
-			final JointPlans jointPlans,
-			final ReplanningGroup group) {
-		return new IncompatiblePlansIdentifier() {
-			@Override
-			public Set<Id> identifyIncompatibilityGroups(final Plan plan) {
-				return Collections.<Id>emptySet();
-			}
-		};
-	}
+  @Override
+  public IncompatiblePlansIdentifier createIdentifier(
+      final JointPlans jointPlans, final ReplanningGroup group) {
+    return new IncompatiblePlansIdentifier() {
+      @Override
+      public Set<Id> identifyIncompatibilityGroups(final Plan plan) {
+        return Collections.<Id>emptySet();
+      }
+    };
+  }
 }
-

@@ -21,7 +21,6 @@ package org.matsim.lanes;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.utils.objectattributes.attributable.Attributes;
@@ -32,103 +31,100 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
  */
 final class LaneImpl implements Lane {
 
-	private Id<Lane> id;
-	/**
-	 * the default according to the xml schema, never change the value if schema is not changed
-	 */
-	private double numberOfRepresentedLanes = 1;
-	/**
-	 * the default according to the xml schema, never change the value if schema is not changed
-	 */
-	private double startsAtMeterFromLinkEnd = 45.0;
-	private List<Id<Link>> toLinkIds;
-	private List<Id<Lane>> toLaneIds;
-	private int alignment = 0;
-	/**
-	 * the default according to the xml schema, never change the value if schema is not changed
-	 */
-	private double capacity = 3600.0;
+  private Id<Lane> id;
 
-	private final Attributes attributes = new AttributesImpl();
+  /** the default according to the xml schema, never change the value if schema is not changed */
+  private double numberOfRepresentedLanes = 1;
 
-	public LaneImpl(Id<Lane> id) {
-		this.id = id;
-	}
+  /** the default according to the xml schema, never change the value if schema is not changed */
+  private double startsAtMeterFromLinkEnd = 45.0;
 
-	@Override
-	public void setNumberOfRepresentedLanes(double number) {
-		this.numberOfRepresentedLanes = number;
-	}
+  private List<Id<Link>> toLinkIds;
+  private List<Id<Lane>> toLaneIds;
+  private int alignment = 0;
 
-	@Override
-	public void setStartsAtMeterFromLinkEnd(double meter) {
-		this.startsAtMeterFromLinkEnd = meter;
-	}
+  /** the default according to the xml schema, never change the value if schema is not changed */
+  private double capacity = 3600.0;
 
-	@Override
-	public Id<Lane> getId() {
-		return id;
-	}
+  private final Attributes attributes = new AttributesImpl();
 
-	@Override
-	public double getNumberOfRepresentedLanes() {
-		return numberOfRepresentedLanes;
-	}
+  public LaneImpl(Id<Lane> id) {
+    this.id = id;
+  }
 
-	@Override
-	public double getStartsAtMeterFromLinkEnd() {
-		return startsAtMeterFromLinkEnd;
-	}
+  @Override
+  public void setNumberOfRepresentedLanes(double number) {
+    this.numberOfRepresentedLanes = number;
+  }
 
-	@Override
-	public void addToLinkId(Id<Link> id) {
-		if (this.toLinkIds == null) {
-			this.toLinkIds = new ArrayList<>();
-		}
-		this.toLinkIds.add(id);
-	}
+  @Override
+  public void setStartsAtMeterFromLinkEnd(double meter) {
+    this.startsAtMeterFromLinkEnd = meter;
+  }
 
-	@Override
-	public List<Id<Link>> getToLinkIds() {
-		return this.toLinkIds;
-	}
+  @Override
+  public Id<Lane> getId() {
+    return id;
+  }
 
-	@Override
-	public void addToLaneId(Id<Lane> id) {
-		if (this.toLaneIds == null) {
-			this.toLaneIds = new ArrayList<>();
-		}
-		this.toLaneIds.add(id);
-	}
+  @Override
+  public double getNumberOfRepresentedLanes() {
+    return numberOfRepresentedLanes;
+  }
 
-	@Override
-	public List<Id<Lane>> getToLaneIds() {
-		return this.toLaneIds;
-	}
+  @Override
+  public double getStartsAtMeterFromLinkEnd() {
+    return startsAtMeterFromLinkEnd;
+  }
 
-	@Override
-	public int getAlignment() {
-		return alignment;
-	}
+  @Override
+  public void addToLinkId(Id<Link> id) {
+    if (this.toLinkIds == null) {
+      this.toLinkIds = new ArrayList<>();
+    }
+    this.toLinkIds.add(id);
+  }
 
-	@Override
-	public void setAlignment(int alignment) {
-		this.alignment = alignment;
-	}
+  @Override
+  public List<Id<Link>> getToLinkIds() {
+    return this.toLinkIds;
+  }
 
-	@Override
-	public double getCapacityVehiclesPerHour() {
-		return this.capacity;
-	}
+  @Override
+  public void addToLaneId(Id<Lane> id) {
+    if (this.toLaneIds == null) {
+      this.toLaneIds = new ArrayList<>();
+    }
+    this.toLaneIds.add(id);
+  }
 
-	@Override
-	public void setCapacityVehiclesPerHour(double capacity) {
-		this.capacity = capacity;
-	}
+  @Override
+  public List<Id<Lane>> getToLaneIds() {
+    return this.toLaneIds;
+  }
 
-	@Override
-	public Attributes getAttributes() {
-		return attributes;
-	}
+  @Override
+  public int getAlignment() {
+    return alignment;
+  }
 
+  @Override
+  public void setAlignment(int alignment) {
+    this.alignment = alignment;
+  }
+
+  @Override
+  public double getCapacityVehiclesPerHour() {
+    return this.capacity;
+  }
+
+  @Override
+  public void setCapacityVehiclesPerHour(double capacity) {
+    this.capacity = capacity;
+  }
+
+  @Override
+  public Attributes getAttributes() {
+    return attributes;
+  }
 }

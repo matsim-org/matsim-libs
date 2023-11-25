@@ -20,14 +20,13 @@
 package org.matsim.utils.eventsfilecomparison;
 
 /*package*/ class Counter {
-	int count = 0;
+  int count = 0;
 
-	/*package*/	void increment() {
-		this.count++;
-	}
+  /*package*/ void increment() {
+    this.count++;
+  }
 
-	public int getCount() {
-		return this.count;
-	}
-
+  public int getCount() {
+    return this.count;
+  }
 }

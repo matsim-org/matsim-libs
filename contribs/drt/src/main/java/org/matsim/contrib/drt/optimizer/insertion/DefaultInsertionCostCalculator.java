@@ -28,39 +28,44 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
  * @author michalm
  */
 public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
-	private final CostCalculationStrategy costCalculationStrategy;
+  private final CostCalculationStrategy costCalculationStrategy;
 
-	public DefaultInsertionCostCalculator(CostCalculationStrategy costCalculationStrategy) {
-		this.costCalculationStrategy = costCalculationStrategy;
-	}
+  public DefaultInsertionCostCalculator(CostCalculationStrategy costCalculationStrategy) {
+    this.costCalculationStrategy = costCalculationStrategy;
+  }
 
-	/**
-	 * As the main goal is to minimise bus operation time, this method calculates how much longer the bus will operate
-	 * after insertion. By returning INFEASIBLE_SOLUTION_COST, the insertion is considered infeasible
-	 * <p>
-	 * The insertion is invalid if some maxTravel/Wait constraints for the already scheduled requests are not fulfilled.
-	 * This is denoted by returning INFEASIBLE_SOLUTION_COST.
-	 * <p>
-	 *
-	 * @param drtRequest the request
-	 * @param insertion  the insertion to be considered here
-	 * @return cost of insertion (INFEASIBLE_SOLUTION_COST represents an infeasible insertion)
-	 */
-	@Override
-	public double calculate(DrtRequest drtRequest, Insertion insertion, DetourTimeInfo detourTimeInfo) {
-		var vEntry = insertion.vehicleEntry;
+  /**
+   * As the main goal is to minimise bus operation time, this method calculates how much longer the
+   * bus will operate after insertion. By returning INFEASIBLE_SOLUTION_COST, the insertion is
+   * considered infeasible
+   *
+   * <p>The insertion is invalid if some maxTravel/Wait constraints for the already scheduled
+   * requests are not fulfilled. This is denoted by returning INFEASIBLE_SOLUTION_COST.
+   *
+   * <p>
+   *
+   * @param drtRequest the request
+   * @param insertion the insertion to be considered here
+   * @return cost of insertion (INFEASIBLE_SOLUTION_COST represents an infeasible insertion)
+   */
+  @Override
+  public double calculate(
+      DrtRequest drtRequest, Insertion insertion, DetourTimeInfo detourTimeInfo) {
+    var vEntry = insertion.vehicleEntry;
 
-		// in case of prebooking, we may have intermediate stay times after pickup
-		// insertion that may reduce the effective pickup delay that remains that the
-		// dropoff insertion point
-		double effectiveDropoffTimeLoss = InsertionDetourTimeCalculator.calculateRemainingPickupTimeLossAtDropoff(
-				insertion, detourTimeInfo.pickupDetourInfo) + detourTimeInfo.dropoffDetourInfo.dropoffTimeLoss;
-		
-		if (vEntry.getSlackTime(insertion.pickup.index) < detourTimeInfo.pickupDetourInfo.pickupTimeLoss
-				|| vEntry.getSlackTime(insertion.dropoff.index) < effectiveDropoffTimeLoss) {
-			return INFEASIBLE_SOLUTION_COST;
-		}
+    // in case of prebooking, we may have intermediate stay times after pickup
+    // insertion that may reduce the effective pickup delay that remains that the
+    // dropoff insertion point
+    double effectiveDropoffTimeLoss =
+        InsertionDetourTimeCalculator.calculateRemainingPickupTimeLossAtDropoff(
+                insertion, detourTimeInfo.pickupDetourInfo)
+            + detourTimeInfo.dropoffDetourInfo.dropoffTimeLoss;
 
-		return costCalculationStrategy.calcCost(drtRequest, insertion, detourTimeInfo);
-	}
+    if (vEntry.getSlackTime(insertion.pickup.index) < detourTimeInfo.pickupDetourInfo.pickupTimeLoss
+        || vEntry.getSlackTime(insertion.dropoff.index) < effectiveDropoffTimeLoss) {
+      return INFEASIBLE_SOLUTION_COST;
+    }
+
+    return costCalculationStrategy.calcCost(drtRequest, insertion, detourTimeInfo);
+  }
 }

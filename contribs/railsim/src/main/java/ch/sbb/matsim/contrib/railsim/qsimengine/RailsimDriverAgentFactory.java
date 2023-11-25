@@ -21,6 +21,10 @@ package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import com.google.inject.Inject;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -35,37 +39,37 @@ import org.matsim.pt.Umlauf;
 import org.matsim.pt.transitSchedule.api.TransitStopArea;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-/**
- * Factory to create specific drivers for the rail engine.
- */
+/** Factory to create specific drivers for the rail engine. */
 public class RailsimDriverAgentFactory implements TransitDriverAgentFactory {
 
-	private final Set<String> modes;
-	private final Map<Id<TransitStopArea>, List<TransitStopFacility>> stopAreas;
+  private final Set<String> modes;
+  private final Map<Id<TransitStopArea>, List<TransitStopFacility>> stopAreas;
 
-	@Inject
-	public RailsimDriverAgentFactory(Config config, Scenario scenario) {
-		this.modes = ConfigUtils.addOrGetModule(config, RailsimConfigGroup.class).getNetworkModes();
+  @Inject
+  public RailsimDriverAgentFactory(Config config, Scenario scenario) {
+    this.modes = ConfigUtils.addOrGetModule(config, RailsimConfigGroup.class).getNetworkModes();
 
-		this.stopAreas = scenario.getTransitSchedule().getFacilities().values().stream()
-			.filter(t -> t.getStopAreaId() != null)
-			.collect(Collectors.groupingBy(TransitStopFacility::getStopAreaId, Collectors.toList()));
-	}
+    this.stopAreas =
+        scenario.getTransitSchedule().getFacilities().values().stream()
+            .filter(t -> t.getStopAreaId() != null)
+            .collect(
+                Collectors.groupingBy(TransitStopFacility::getStopAreaId, Collectors.toList()));
+  }
 
-	@Override
-	public AbstractTransitDriverAgent createTransitDriver(Umlauf umlauf, InternalInterface internalInterface, TransitStopAgentTracker transitStopAgentTracker) {
+  @Override
+  public AbstractTransitDriverAgent createTransitDriver(
+      Umlauf umlauf,
+      InternalInterface internalInterface,
+      TransitStopAgentTracker transitStopAgentTracker) {
 
-		String mode = umlauf.getUmlaufStuecke().get(0).getRoute().getTransportMode();
+    String mode = umlauf.getUmlaufStuecke().get(0).getRoute().getTransportMode();
 
-		if (this.modes.contains(mode)) {
-			return new RailsimTransitDriverAgent(stopAreas, umlauf, mode, transitStopAgentTracker, internalInterface);
-		}
+    if (this.modes.contains(mode)) {
+      return new RailsimTransitDriverAgent(
+          stopAreas, umlauf, mode, transitStopAgentTracker, internalInterface);
+    }
 
-		return new TransitDriverAgentImpl(umlauf, TransportMode.car, transitStopAgentTracker, internalInterface);
-	}
+    return new TransitDriverAgentImpl(
+        umlauf, TransportMode.car, transitStopAgentTracker, internalInterface);
+  }
 }

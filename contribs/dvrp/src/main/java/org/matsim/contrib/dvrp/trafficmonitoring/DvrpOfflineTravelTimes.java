@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.net.URL;
 import java.util.Collection;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
@@ -41,100 +40,111 @@ import org.matsim.core.utils.io.IOUtils;
  * @author Michal Maciejewski (michalm)
  */
 public class DvrpOfflineTravelTimes {
-	private static final String DELIMITER = ";";
+  private static final String DELIMITER = ";";
 
-	public static void saveLinkTravelTimes(TimeDiscretizer timeDiscretizer, double[][] linkTravelTimes,
-			String filename) {
-		try (Writer writer = IOUtils.getBufferedWriter(filename)) {
-			saveLinkTravelTimes(timeDiscretizer, linkTravelTimes, writer);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+  public static void saveLinkTravelTimes(
+      TimeDiscretizer timeDiscretizer, double[][] linkTravelTimes, String filename) {
+    try (Writer writer = IOUtils.getBufferedWriter(filename)) {
+      saveLinkTravelTimes(timeDiscretizer, linkTravelTimes, writer);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-	public static void saveLinkTravelTimes(TimeDiscretizer timeDiscretizer, double[][] linkTravelTimes, Writer writer)
-			throws IOException {
-		int intervalCount = timeDiscretizer.getIntervalCount();
-		//header row
-		writer.append("linkId" + DELIMITER);
-		for (int i = 0; i < intervalCount; i++) {
-			double time = i * timeDiscretizer.getTimeInterval();
-			writer.append(time + DELIMITER);
-		}
-		writer.append('\n');
+  public static void saveLinkTravelTimes(
+      TimeDiscretizer timeDiscretizer, double[][] linkTravelTimes, Writer writer)
+      throws IOException {
+    int intervalCount = timeDiscretizer.getIntervalCount();
+    // header row
+    writer.append("linkId" + DELIMITER);
+    for (int i = 0; i < intervalCount; i++) {
+      double time = i * timeDiscretizer.getTimeInterval();
+      writer.append(time + DELIMITER);
+    }
+    writer.append('\n');
 
-		//regular rows
-		for (int idx = 0; idx < linkTravelTimes.length; idx++) {
-			double[] ttRow = linkTravelTimes[idx];
+    // regular rows
+    for (int idx = 0; idx < linkTravelTimes.length; idx++) {
+      double[] ttRow = linkTravelTimes[idx];
 
-			// rows in linkTTs that are null are skipped
-			if (ttRow != null) {
-				checkArgument(ttRow.length == intervalCount);
+      // rows in linkTTs that are null are skipped
+      if (ttRow != null) {
+        checkArgument(ttRow.length == intervalCount);
 
-				writer.append(Id.get(idx, Link.class) + DELIMITER);
-				for (int t = 0; t < intervalCount; t++) {
-					// rounding up to full seconds, otherwise the output files are sometimes huge (even when gzipped)
-					// consider having a switch for enabling/disabling rounding
-					int tt = (int)Math.ceil(ttRow[t]);//rounding up to avoid zeros; also QSim rounds up
-					writer.append(tt + DELIMITER);
-				}
-				writer.append('\n');
-			}
-		}
-	}
+        writer.append(Id.get(idx, Link.class) + DELIMITER);
+        for (int t = 0; t < intervalCount; t++) {
+          // rounding up to full seconds, otherwise the output files are sometimes huge (even when
+          // gzipped)
+          // consider having a switch for enabling/disabling rounding
+          int tt = (int) Math.ceil(ttRow[t]); // rounding up to avoid zeros; also QSim rounds up
+          writer.append(tt + DELIMITER);
+        }
+        writer.append('\n');
+      }
+    }
+  }
 
-	public static double[][] convertToLinkTravelTimeMatrix(TravelTime travelTime, Collection<? extends Link> links,
-			TimeDiscretizer timeDiscretizer) {
-		var linkTTs = new double[Id.getNumberOfIds(Link.class)][];
-		for (Link link : links) {
-			double[] tt = linkTTs[link.getId().index()] = new double[timeDiscretizer.getIntervalCount()];
-			timeDiscretizer.forEach((bin, time) -> tt[bin] = travelTime.getLinkTravelTime(link, time, null, null));
-		}
-		return linkTTs;
-	}
+  public static double[][] convertToLinkTravelTimeMatrix(
+      TravelTime travelTime, Collection<? extends Link> links, TimeDiscretizer timeDiscretizer) {
+    var linkTTs = new double[Id.getNumberOfIds(Link.class)][];
+    for (Link link : links) {
+      double[] tt = linkTTs[link.getId().index()] = new double[timeDiscretizer.getIntervalCount()];
+      timeDiscretizer.forEach(
+          (bin, time) -> tt[bin] = travelTime.getLinkTravelTime(link, time, null, null));
+    }
+    return linkTTs;
+  }
 
-	public static TravelTime asTravelTime(TimeDiscretizer timeDiscretizer, double[][] linkTravelTimes) {
-		return (link, time, person, vehicle) -> {
-			var linkTT = checkNotNull(linkTravelTimes[link.getId().index()],
-					"Link (%s) does not belong to network. No travel time data.", link.getId());
-			return linkTT[timeDiscretizer.getIdx(time)];
-		};
-	}
+  public static TravelTime asTravelTime(
+      TimeDiscretizer timeDiscretizer, double[][] linkTravelTimes) {
+    return (link, time, person, vehicle) -> {
+      var linkTT =
+          checkNotNull(
+              linkTravelTimes[link.getId().index()],
+              "Link (%s) does not belong to network. No travel time data.",
+              link.getId());
+      return linkTT[timeDiscretizer.getIdx(time)];
+    };
+  }
 
-	public static double[][] loadLinkTravelTimes(TimeDiscretizer timeDiscretizer, URL url) {
-		try (BufferedReader reader = IOUtils.getBufferedReader(url)) {
-			return loadLinkTravelTimes(timeDiscretizer, reader);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+  public static double[][] loadLinkTravelTimes(TimeDiscretizer timeDiscretizer, URL url) {
+    try (BufferedReader reader = IOUtils.getBufferedReader(url)) {
+      return loadLinkTravelTimes(timeDiscretizer, reader);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-	public static double[][] loadLinkTravelTimes(TimeDiscretizer timeDiscretizer, BufferedReader reader)
-			throws IOException {
-		//start with IdMap and then convert to array (to avoid index out of bounds)
-		IdMap<Link, double[]> linkTravelTimes = new IdMap<>(Link.class);
+  public static double[][] loadLinkTravelTimes(
+      TimeDiscretizer timeDiscretizer, BufferedReader reader) throws IOException {
+    // start with IdMap and then convert to array (to avoid index out of bounds)
+    IdMap<Link, double[]> linkTravelTimes = new IdMap<>(Link.class);
 
-		//header row
-		String[] headerLine = reader.readLine().split(";");
-		verify(timeDiscretizer.getIntervalCount() == headerLine.length - 1);
-		verify(headerLine[0].equals("linkId"));
-		timeDiscretizer.forEach((bin, time) -> verify(Double.parseDouble(headerLine[bin + 1]) == time));
+    // header row
+    String[] headerLine = reader.readLine().split(";");
+    verify(timeDiscretizer.getIntervalCount() == headerLine.length - 1);
+    verify(headerLine[0].equals("linkId"));
+    timeDiscretizer.forEach((bin, time) -> verify(Double.parseDouble(headerLine[bin + 1]) == time));
 
-		//regular rows
-		reader.lines().map(line -> line.split(DELIMITER)).forEach(cells -> {
-			verify(timeDiscretizer.getIntervalCount() == cells.length - 1);
+    // regular rows
+    reader
+        .lines()
+        .map(line -> line.split(DELIMITER))
+        .forEach(
+            cells -> {
+              verify(timeDiscretizer.getIntervalCount() == cells.length - 1);
 
-			double[] row = new double[timeDiscretizer.getIntervalCount()];
-			for (int i = 0; i < row.length; i++) {
-				row[i] = Double.parseDouble(cells[i + 1]);
-			}
-			linkTravelTimes.put(Id.createLinkId(cells[0]), row);
-		});
+              double[] row = new double[timeDiscretizer.getIntervalCount()];
+              for (int i = 0; i < row.length; i++) {
+                row[i] = Double.parseDouble(cells[i + 1]);
+              }
+              linkTravelTimes.put(Id.createLinkId(cells[0]), row);
+            });
 
-		// rows in linkTTs for which we do not have TT data, will remain null
-		double[][] linkTravelTimeArray = new double[Id.getNumberOfIds(Link.class)][];
-		linkTravelTimes.forEach((linkId, row) -> linkTravelTimeArray[linkId.index()] = row);
+    // rows in linkTTs for which we do not have TT data, will remain null
+    double[][] linkTravelTimeArray = new double[Id.getNumberOfIds(Link.class)][];
+    linkTravelTimes.forEach((linkId, row) -> linkTravelTimeArray[linkId.index()] = row);
 
-		return linkTravelTimeArray;
-	}
+    return linkTravelTimeArray;
+  }
 }

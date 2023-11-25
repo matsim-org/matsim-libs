@@ -29,11 +29,11 @@ import org.matsim.core.controler.AbstractModule;
  */
 public class SBBTransitModule extends AbstractModule {
 
-    @Override
-    public void install() {
-        installQSimModule(new SBBTransitEngineQSimModule());
-        // make sure the config is registered before the simulation starts
-        // https://github.com/SchweizerischeBundesbahnen/matsim-sbb-extensions/issues/3
-        ConfigUtils.addOrGetModule(getConfig(), SBBTransitConfigGroup.class);
-    }
+  @Override
+  public void install() {
+    installQSimModule(new SBBTransitEngineQSimModule());
+    // make sure the config is registered before the simulation starts
+    // https://github.com/SchweizerischeBundesbahnen/matsim-sbb-extensions/issues/3
+    ConfigUtils.addOrGetModule(getConfig(), SBBTransitConfigGroup.class);
+  }
 }

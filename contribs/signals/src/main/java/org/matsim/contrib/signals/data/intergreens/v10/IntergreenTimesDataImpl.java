@@ -21,40 +21,38 @@ package org.matsim.contrib.signals.data.intergreens.v10;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.SignalSystem;
 
-
 /**
  * @author dgrether
- *
  */
 public final class IntergreenTimesDataImpl implements IntergreenTimesData {
 
-	private IntergreenTimesDataFactory factory = new IntergreenTimesDataFactoryImpl();
+  private IntergreenTimesDataFactory factory = new IntergreenTimesDataFactoryImpl();
 
-	private Map<Id<SignalSystem>, IntergreensForSignalSystemData> intergreensForSystemByIdMap = new HashMap<>();
-	
-	@Override
-	public IntergreensForSignalSystemData addIntergreensForSignalSystem(
-			IntergreensForSignalSystemData intergreens) {
-		return this.intergreensForSystemByIdMap.put(intergreens.getSignalSystemId(), intergreens);
-	}
+  private Map<Id<SignalSystem>, IntergreensForSignalSystemData> intergreensForSystemByIdMap =
+      new HashMap<>();
 
-	@Override
-	public Map<Id<SignalSystem>, IntergreensForSignalSystemData> getIntergreensForSignalSystemDataMap() {
-		return this.intergreensForSystemByIdMap;
-	}
+  @Override
+  public IntergreensForSignalSystemData addIntergreensForSignalSystem(
+      IntergreensForSignalSystemData intergreens) {
+    return this.intergreensForSystemByIdMap.put(intergreens.getSignalSystemId(), intergreens);
+  }
 
-	@Override
-	public IntergreenTimesDataFactory getFactory() {
-		return this.factory;
-	}
+  @Override
+  public Map<Id<SignalSystem>, IntergreensForSignalSystemData>
+      getIntergreensForSignalSystemDataMap() {
+    return this.intergreensForSystemByIdMap;
+  }
 
-	@Override
-	public void setFactory(IntergreenTimesDataFactory factory) {
-		this.factory = factory;
-	}
+  @Override
+  public IntergreenTimesDataFactory getFactory() {
+    return this.factory;
+  }
 
+  @Override
+  public void setFactory(IntergreenTimesDataFactory factory) {
+    this.factory = factory;
+  }
 }

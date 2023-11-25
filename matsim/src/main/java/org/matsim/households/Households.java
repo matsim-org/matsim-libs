@@ -20,23 +20,19 @@
 package org.matsim.households;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-
 /**
  * @author dgrether
- *
  */
 public interface Households extends MatsimToplevelContainer {
 
-	public Map<Id<Household>, Household> getHouseholds();
-	
-	@Override
-	public HouseholdsFactory getFactory();
-	
-	public ObjectAttributes getHouseholdAttributes();
-	
+  public Map<Id<Household>, Household> getHouseholds();
+
+  @Override
+  public HouseholdsFactory getFactory();
+
+  public ObjectAttributes getHouseholdAttributes();
 }

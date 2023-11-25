@@ -20,6 +20,7 @@
 
 package playground.vsp.airPollution.exposure;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -34,71 +35,75 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
-import com.google.inject.Inject;
-
 /**
  * @author benjamin
- *
  */
-public class InternalizeEmissionResponsibilityControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
-	private static final Logger logger = LogManager.getLogger(InternalizeEmissionResponsibilityControlerListener.class);
+public class InternalizeEmissionResponsibilityControlerListener
+    implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
+  private static final Logger logger =
+      LogManager.getLogger(InternalizeEmissionResponsibilityControlerListener.class);
 
-	private final Double timeBinSize;
+  private final Double timeBinSize;
 
-	private final GridTools gridTools;
-	private final EmissionModule emissionModule;
-	private final EmissionResponsibilityCostModule emissionCostModule;
-	private final ResponsibilityGridTools responsibilityGridTools;
+  private final GridTools gridTools;
+  private final EmissionModule emissionModule;
+  private final EmissionResponsibilityCostModule emissionCostModule;
+  private final ResponsibilityGridTools responsibilityGridTools;
 
-	@Inject
-	private MatsimServices controler;
+  @Inject private MatsimServices controler;
 
-	private EmissionResponsibilityInternalizationHandler emissionInternalizationHandler;
-	private IntervalHandler intervalHandler;
+  private EmissionResponsibilityInternalizationHandler emissionInternalizationHandler;
+  private IntervalHandler intervalHandler;
 
-	@Inject
-	private InternalizeEmissionResponsibilityControlerListener(EmissionModule emissionModule, EmissionResponsibilityCostModule emissionCostModule, ResponsibilityGridTools rgt, GridTools gridTools) {
-		this.timeBinSize = rgt.getTimeBinSize();
-		this.emissionModule = emissionModule;
-		this.emissionCostModule = emissionCostModule;
-		this.responsibilityGridTools = rgt;
-		this.gridTools = gridTools;
-	}
+  @Inject
+  private InternalizeEmissionResponsibilityControlerListener(
+      EmissionModule emissionModule,
+      EmissionResponsibilityCostModule emissionCostModule,
+      ResponsibilityGridTools rgt,
+      GridTools gridTools) {
+    this.timeBinSize = rgt.getTimeBinSize();
+    this.emissionModule = emissionModule;
+    this.emissionCostModule = emissionCostModule;
+    this.responsibilityGridTools = rgt;
+    this.gridTools = gridTools;
+  }
 
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		EventsManager eventsManager = emissionModule.getEmissionEventsManager();
+  @Override
+  public void notifyStartup(StartupEvent event) {
+    EventsManager eventsManager = emissionModule.getEmissionEventsManager();
 
-		double simulationEndtime = controler.getConfig().qsim().getEndTime().seconds();
-		intervalHandler = new IntervalHandler(timeBinSize, simulationEndtime, gridTools);
-		eventsManager.addHandler(intervalHandler);
-	}
+    double simulationEndtime = controler.getConfig().qsim().getEndTime().seconds();
+    intervalHandler = new IntervalHandler(timeBinSize, simulationEndtime, gridTools);
+    eventsManager.addHandler(intervalHandler);
+  }
 
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		int iteration = event.getIteration();
+  @Override
+  public void notifyIterationStarts(IterationStartsEvent event) {
+    int iteration = event.getIteration();
 
-		logger.info("creating new emission internalization handler...");
-		emissionInternalizationHandler = new EmissionResponsibilityInternalizationHandler(controler, emissionCostModule);
-		logger.info("adding emission internalization module to emission events stream...");
-		emissionModule.getEmissionEventsManager().addHandler(emissionInternalizationHandler);
-	}
+    logger.info("creating new emission internalization handler...");
+    emissionInternalizationHandler =
+        new EmissionResponsibilityInternalizationHandler(controler, emissionCostModule);
+    logger.info("adding emission internalization module to emission events stream...");
+    emissionModule.getEmissionEventsManager().addHandler(emissionInternalizationHandler);
+  }
 
-	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		int iteration = event.getIteration();
+  @Override
+  public void notifyIterationEnds(IterationEndsEvent event) {
+    int iteration = event.getIteration();
 
-		logger.info("removing emission internalization module from emission events stream...");
-		emissionModule.getEmissionEventsManager().removeHandler(emissionInternalizationHandler);
+    logger.info("removing emission internalization module from emission events stream...");
+    emissionModule.getEmissionEventsManager().removeHandler(emissionInternalizationHandler);
 
-		logger.info("calculating relative duration factors from this/last iteration...");
-		// calc relative duration factors/density from last iteration
-		responsibilityGridTools.resetAndcaluculateRelativeDurationFactors(intervalHandler.getDuration());
-		logger.info("done calculating relative duration factors");
-	}
+    logger.info("calculating relative duration factors from this/last iteration...");
+    // calc relative duration factors/density from last iteration
+    responsibilityGridTools.resetAndcaluculateRelativeDurationFactors(
+        intervalHandler.getDuration());
+    logger.info("done calculating relative duration factors");
+  }
 
-	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-		emissionModule.writeEmissionInformation();
-	}
+  @Override
+  public void notifyShutdown(ShutdownEvent event) {
+    emissionModule.writeEmissionInformation();
+  }
 }

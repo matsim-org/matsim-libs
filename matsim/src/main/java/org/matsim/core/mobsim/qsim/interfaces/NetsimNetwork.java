@@ -20,7 +20,6 @@
 package org.matsim.core.mobsim.qsim.interfaces;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -30,27 +29,23 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
 
 /**
  * @author nagel
- *
  */
 public interface NetsimNetwork extends VisNetwork, MatsimNetworkObject {
-	// yyyy "extends VisNetwork" possibly a temporary fix
+  // yyyy "extends VisNetwork" possibly a temporary fix
 
-	@Override
-	Network getNetwork();
+  @Override
+  Network getNetwork();
 
-	Map<Id<Link>, ? extends NetsimLink> getNetsimLinks();
-	// yyyy this should arguable be getQLinks() or getMobsimLinks().  Esthetically less pleasing, but imho easier to use.  kai, may'10
+  Map<Id<Link>, ? extends NetsimLink> getNetsimLinks();
 
-	Map<Id<Node>, ? extends NetsimNode> getNetsimNodes() ;
+  // yyyy this should arguable be getQLinks() or getMobsimLinks().  Esthetically less pleasing, but
+  // imho easier to use.  kai, may'10
 
-	/**
-	 * Convenience method for getLinks().get( id ).  May be renamed
-	 */
-	public NetsimLink getNetsimLink(final Id<Link> id) ;
+  Map<Id<Node>, ? extends NetsimNode> getNetsimNodes();
 
-	/**
-	 * Convenience method for getNodes().get( id ).  May be renamed
-	 */
-	public NetsimNode getNetsimNode(final Id<Node> id) ;
+  /** Convenience method for getLinks().get( id ). May be renamed */
+  public NetsimLink getNetsimLink(final Id<Link> id);
 
+  /** Convenience method for getNodes().get( id ). May be renamed */
+  public NetsimNode getNetsimNode(final Id<Node> id);
 }

@@ -24,7 +24,6 @@ import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -34,37 +33,42 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
  * @author michalm
  */
 public class BestInsertionFinder {
-	public static class InsertionWithCost {
-		public final InsertionWithDetourData insertionWithDetourData;
-		public final double cost;
+  public static class InsertionWithCost {
+    public final InsertionWithDetourData insertionWithDetourData;
+    public final double cost;
 
-		public InsertionWithCost(InsertionWithDetourData insertionWithDetourData, double cost) {
-			this.insertionWithDetourData = insertionWithDetourData;
-			this.cost = cost;
-		}
-	}
+    public InsertionWithCost(InsertionWithDetourData insertionWithDetourData, double cost) {
+      this.insertionWithDetourData = insertionWithDetourData;
+      this.cost = cost;
+    }
+  }
 
-	public static final Comparator<Insertion> INSERTION_COMPARATOR = //
-			Comparator.<Insertion, Id<DvrpVehicle>>comparing(insertion -> insertion.vehicleEntry.vehicle.getId())
-					.thenComparingInt(insertion -> insertion.pickup.index)
-					.thenComparingInt(insertion -> insertion.dropoff.index);
+  public static final Comparator<Insertion> INSERTION_COMPARATOR = //
+      Comparator.<Insertion, Id<DvrpVehicle>>comparing(
+              insertion -> insertion.vehicleEntry.vehicle.getId())
+          .thenComparingInt(insertion -> insertion.pickup.index)
+          .thenComparingInt(insertion -> insertion.dropoff.index);
 
-	public static final Comparator<InsertionWithCost> INSERTION_WITH_COST_COMPARATOR = //
-			Comparator.<InsertionWithCost>comparingDouble(insertionWithCost -> insertionWithCost.cost)
-					.thenComparing(insertion -> insertion.insertionWithDetourData.insertion, INSERTION_COMPARATOR);
+  public static final Comparator<InsertionWithCost> INSERTION_WITH_COST_COMPARATOR = //
+      Comparator.<InsertionWithCost>comparingDouble(insertionWithCost -> insertionWithCost.cost)
+          .thenComparing(
+              insertion -> insertion.insertionWithDetourData.insertion, INSERTION_COMPARATOR);
 
-	private final InsertionCostCalculator costCalculator;
+  private final InsertionCostCalculator costCalculator;
 
-	public BestInsertionFinder(InsertionCostCalculator costCalculator) {
-		this.costCalculator = costCalculator;
-	}
+  public BestInsertionFinder(InsertionCostCalculator costCalculator) {
+    this.costCalculator = costCalculator;
+  }
 
-	public Optional<InsertionWithDetourData> findBestInsertion(DrtRequest drtRequest,
-			Stream<InsertionWithDetourData> insertions) {
-		return insertions.map(
-						i -> new InsertionWithCost(i, costCalculator.calculate(drtRequest, i.insertion, i.detourTimeInfo)))
-				.filter(iWithCost -> iWithCost.cost < INFEASIBLE_SOLUTION_COST)
-				.min(INSERTION_WITH_COST_COMPARATOR)
-				.map(iWithCost -> iWithCost.insertionWithDetourData);
-	}
+  public Optional<InsertionWithDetourData> findBestInsertion(
+      DrtRequest drtRequest, Stream<InsertionWithDetourData> insertions) {
+    return insertions
+        .map(
+            i ->
+                new InsertionWithCost(
+                    i, costCalculator.calculate(drtRequest, i.insertion, i.detourTimeInfo)))
+        .filter(iWithCost -> iWithCost.cost < INFEASIBLE_SOLUTION_COST)
+        .min(INSERTION_WITH_COST_COMPARATOR)
+        .map(iWithCost -> iWithCost.insertionWithDetourData);
+  }
 }

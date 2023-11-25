@@ -25,37 +25,37 @@ import org.matsim.core.scoring.SumScoringFunction.MoneyScoring;
 
 class ReceiverScoringFunctionFactoryMoneyOnly implements ReceiverScoringFunctionFactory {
 
-	ReceiverScoringFunctionFactoryMoneyOnly() {
-	}
+  ReceiverScoringFunctionFactoryMoneyOnly() {}
 
-	@Override
-	public ScoringFunction createScoringFunction(Receiver receiver) {
-		SumScoringFunction sumScoringFunction = new SumScoringFunction();
-		sumScoringFunction.addScoringFunction(new CarrierToReceiverCostAllocation());
-		return sumScoringFunction;
-	}
+  @Override
+  public ScoringFunction createScoringFunction(Receiver receiver) {
+    SumScoringFunction sumScoringFunction = new SumScoringFunction();
+    sumScoringFunction.addScoringFunction(new CarrierToReceiverCostAllocation());
+    return sumScoringFunction;
+  }
 
-	static class CarrierToReceiverCostAllocation implements MoneyScoring {
+  static class CarrierToReceiverCostAllocation implements MoneyScoring {
 
-		private double moneyBalance = 0.0;
+    private double moneyBalance = 0.0;
 
-		@Override
-		public void finish() {
-		}
+    @Override
+    public void finish() {}
 
-		@Override
-		public double getScore() {
-			return this.moneyBalance;
-		}
+    @Override
+    public double getScore() {
+      return this.moneyBalance;
+    }
 
-		@Override
-		public void addMoney(double amount) {
-			if (amount < 0) {
-				LogManager.getLogger(ReceiverScoringFunctionFactoryMoneyOnly.class).warn("What?! The receiver is getting paid for a delivery?! Make sure this is what you want.");
-			}
-//			LogManager.getLogger(ReceiverScoringFunctionFactoryMoneyOnly.class).error("Where is this used?!");
-			this.moneyBalance += amount;
-		}
-	}
-
+    @Override
+    public void addMoney(double amount) {
+      if (amount < 0) {
+        LogManager.getLogger(ReceiverScoringFunctionFactoryMoneyOnly.class)
+            .warn(
+                "What?! The receiver is getting paid for a delivery?! Make sure this is what you want.");
+      }
+      //			LogManager.getLogger(ReceiverScoringFunctionFactoryMoneyOnly.class).error("Where is this
+      // used?!");
+      this.moneyBalance += amount;
+    }
+  }
 }

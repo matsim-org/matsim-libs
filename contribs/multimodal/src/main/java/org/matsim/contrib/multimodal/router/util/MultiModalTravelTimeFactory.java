@@ -20,6 +20,12 @@
 
 package org.matsim.contrib.multimodal.router.util;
 
+import jakarta.inject.Provider;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,88 +38,95 @@ import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-import jakarta.inject.Provider;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 public class MultiModalTravelTimeFactory implements MatsimFactory {
 
-	private static final Logger log = LogManager.getLogger(MultiModalTravelTimeFactory.class);
+  private static final Logger log = LogManager.getLogger(MultiModalTravelTimeFactory.class);
 
-	private final Map<String, Provider<TravelTime>> factories;
-	private final Map<String, Provider<TravelTime>> additionalFactories;
-	private final Map<Id<Link>, Double> linkSlopes;
+  private final Map<String, Provider<TravelTime>> factories;
+  private final Map<String, Provider<TravelTime>> additionalFactories;
+  private final Map<Id<Link>, Double> linkSlopes;
 
-	public MultiModalTravelTimeFactory(Config config) {
-		this(config, null, null);
-	}
+  public MultiModalTravelTimeFactory(Config config) {
+    this(config, null, null);
+  }
 
-	public MultiModalTravelTimeFactory(Config config, Map<Id<Link>, Double> linkSlopes) {
-		this(config, linkSlopes, null);
-	}
+  public MultiModalTravelTimeFactory(Config config, Map<Id<Link>, Double> linkSlopes) {
+    this(config, linkSlopes, null);
+  }
 
-	public MultiModalTravelTimeFactory(Config config, Map<Id<Link>, Double> linkSlopes, Map<String, Provider<TravelTime>> additionalFactories) {
-		this.linkSlopes = linkSlopes;
-		this.factories = new LinkedHashMap<>();
-		this.additionalFactories = additionalFactories;
+  public MultiModalTravelTimeFactory(
+      Config config,
+      Map<Id<Link>, Double> linkSlopes,
+      Map<String, Provider<TravelTime>> additionalFactories) {
+    this.linkSlopes = linkSlopes;
+    this.factories = new LinkedHashMap<>();
+    this.additionalFactories = additionalFactories;
 
-		if (this.linkSlopes == null) {
-			log.warn("No slope information for the links available - travel time will only take agents age and gender into account!");
-		}
+    if (this.linkSlopes == null) {
+      log.warn(
+          "No slope information for the links available - travel time will only take agents age and gender into account!");
+    }
 
-		this.initMultiModalTravelTimeFactories(config);
-	}
+    this.initMultiModalTravelTimeFactories(config);
+  }
 
-	public Map<String, TravelTime> createTravelTimes() {
-		Map<String, TravelTime> travelTimes = new HashMap<>();
+  public Map<String, TravelTime> createTravelTimes() {
+    Map<String, TravelTime> travelTimes = new HashMap<>();
 
-		for (Entry<String, Provider<TravelTime>> entry : factories.entrySet()) {
-			travelTimes.put(entry.getKey(), entry.getValue().get());
-		}
+    for (Entry<String, Provider<TravelTime>> entry : factories.entrySet()) {
+      travelTimes.put(entry.getKey(), entry.getValue().get());
+    }
 
-		return travelTimes;
-	}
+    return travelTimes;
+  }
 
-	private void initMultiModalTravelTimeFactories(Config config) {
+  private void initMultiModalTravelTimeFactories(Config config) {
 
-		RoutingConfigGroup routingConfigGroup = config.routing();
-        MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) config.getModule(MultiModalConfigGroup.GROUP_NAME);
-        Set<String> simulatedModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
+    RoutingConfigGroup routingConfigGroup = config.routing();
+    MultiModalConfigGroup multiModalConfigGroup =
+        (MultiModalConfigGroup) config.getModule(MultiModalConfigGroup.GROUP_NAME);
+    Set<String> simulatedModes =
+        CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
 
-		for (String mode : simulatedModes) {
-			if (mode.equals(TransportMode.walk)) {
-				Provider<TravelTime> factory = new WalkTravelTimeFactory(routingConfigGroup, linkSlopes);
-				this.factories.put(mode, factory);
-			} else if (mode.equals(TransportMode.transit_walk)) {
-				Provider<TravelTime> factory = new TransitWalkTravelTimeFactory(routingConfigGroup, linkSlopes);
-				this.factories.put(mode, factory);
-			} else if (mode.equals(TransportMode.bike)) {
-				Provider<TravelTime> factory = new BikeTravelTimeFactory(routingConfigGroup, linkSlopes);
-				this.factories.put(mode, factory);
-			} else {
-				Provider<TravelTime> factory = getTravelTimeFactory(mode);
+    for (String mode : simulatedModes) {
+      if (mode.equals(TransportMode.walk)) {
+        Provider<TravelTime> factory = new WalkTravelTimeFactory(routingConfigGroup, linkSlopes);
+        this.factories.put(mode, factory);
+      } else if (mode.equals(TransportMode.transit_walk)) {
+        Provider<TravelTime> factory =
+            new TransitWalkTravelTimeFactory(routingConfigGroup, linkSlopes);
+        this.factories.put(mode, factory);
+      } else if (mode.equals(TransportMode.bike)) {
+        Provider<TravelTime> factory = new BikeTravelTimeFactory(routingConfigGroup, linkSlopes);
+        this.factories.put(mode, factory);
+      } else {
+        Provider<TravelTime> factory = getTravelTimeFactory(mode);
 
-				if (factory == null) {
-					log.warn("Mode " + mode + " is not supported! " +
-							"Use a constructor where you provide the travel time objects. " +
-							"Using a UnknownTravelTime calculator based on constant speed." +
-							"Agent specific attributes are not taken into account!");
-					factory = new UnknownTravelTimeFactory(mode, routingConfigGroup);
-					this.factories.put(mode, factory);
-				} else {
-					log.info("Found additional travel time factory from type " + factory.getClass().toString() +
-							" for mode " + mode + ".");
-					this.factories.put(mode, factory);
-				}
-			}
-		}
-	}
+        if (factory == null) {
+          log.warn(
+              "Mode "
+                  + mode
+                  + " is not supported! "
+                  + "Use a constructor where you provide the travel time objects. "
+                  + "Using a UnknownTravelTime calculator based on constant speed."
+                  + "Agent specific attributes are not taken into account!");
+          factory = new UnknownTravelTimeFactory(mode, routingConfigGroup);
+          this.factories.put(mode, factory);
+        } else {
+          log.info(
+              "Found additional travel time factory from type "
+                  + factory.getClass().toString()
+                  + " for mode "
+                  + mode
+                  + ".");
+          this.factories.put(mode, factory);
+        }
+      }
+    }
+  }
 
-	private Provider<TravelTime> getTravelTimeFactory(String mode) {
-		if (additionalFactories != null) return this.additionalFactories.get(mode);
-		else return null;
-	}
+  private Provider<TravelTime> getTravelTimeFactory(String mode) {
+    if (additionalFactories != null) return this.additionalFactories.get(mode);
+    else return null;
+  }
 }

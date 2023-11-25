@@ -17,9 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
+/** */
 package org.matsim.contrib.noise;
 
 import org.matsim.api.core.v01.Coord;
@@ -27,30 +25,27 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 
 /**
- * 
  * Contains the relevant information for a single receiver point.
- * 
- * @author ikaddoura
  *
+ * @author ikaddoura
  */
-public class ReceiverPoint implements Identifiable<ReceiverPoint>{
-	
-	// initialization
-	private final Id<ReceiverPoint> id;
-	private Coord coord;
-	
-	public ReceiverPoint(Id<ReceiverPoint> id, Coord coord) {
-		this.id = id;
-		this.coord = coord;
-	}
-	
-	@Override
-	public Id<ReceiverPoint> getId() {
-		return this.id;
-	}
+public class ReceiverPoint implements Identifiable<ReceiverPoint> {
 
-	public Coord getCoord() {
-		return coord;
-	}
-	
+  // initialization
+  private final Id<ReceiverPoint> id;
+  private Coord coord;
+
+  public ReceiverPoint(Id<ReceiverPoint> id, Coord coord) {
+    this.id = id;
+    this.coord = coord;
+  }
+
+  @Override
+  public Id<ReceiverPoint> getId() {
+    return this.id;
+  }
+
+  public Coord getCoord() {
+    return coord;
+  }
 }

@@ -24,5 +24,5 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.core.events.handler.EventHandler;
 
 public interface LinkEnterEventHandler extends EventHandler {
-	public void handleEvent (LinkEnterEvent event);
+  public void handleEvent(LinkEnterEvent event);
 }

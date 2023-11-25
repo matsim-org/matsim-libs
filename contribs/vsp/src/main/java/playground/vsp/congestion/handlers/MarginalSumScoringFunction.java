@@ -29,114 +29,118 @@ import org.matsim.core.scoring.functions.ScoringParameters;
 
 /**
  * @author ikaddoura
- *
  */
 public class MarginalSumScoringFunction {
-//	private final static Logger log = LogManager.getLogger(MarginalSumScoringFunction.class);
+  //	private final static Logger log = LogManager.getLogger(MarginalSumScoringFunction.class);
 
-	CharyparNagelActivityScoring activityScoringA;
-	CharyparNagelActivityScoring activityScoringB;
+  CharyparNagelActivityScoring activityScoringA;
+  CharyparNagelActivityScoring activityScoringB;
 
-	public MarginalSumScoringFunction(ScoringParameters params) {
+  public MarginalSumScoringFunction(ScoringParameters params) {
 
-		ScoringConfigGroup.ActivityParams taxiActParams = new ScoringConfigGroup.ActivityParams("TaxiPickup");
-		taxiActParams.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
-		taxiActParams.setScoringThisActivityAtAll(false);
-		taxiActParams.setTypicalDuration(1.0);
+    ScoringConfigGroup.ActivityParams taxiActParams =
+        new ScoringConfigGroup.ActivityParams("TaxiPickup");
+    taxiActParams.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
+    taxiActParams.setScoringThisActivityAtAll(false);
+    taxiActParams.setTypicalDuration(1.0);
 
-		ActivityUtilityParameters actUtilityParams = new ActivityUtilityParameters.Builder(taxiActParams).build();
-		params.utilParams.put("TaxiPickup", actUtilityParams);
+    ActivityUtilityParameters actUtilityParams =
+        new ActivityUtilityParameters.Builder(taxiActParams).build();
+    params.utilParams.put("TaxiPickup", actUtilityParams);
 
-		activityScoringA = new CharyparNagelActivityScoring(params);
-		activityScoringB = new CharyparNagelActivityScoring(params);
-	}
+    activityScoringA = new CharyparNagelActivityScoring(params);
+    activityScoringB = new CharyparNagelActivityScoring(params);
+  }
 
-	public final double getNormalActivityDelayDisutility(Activity activity, double delay) {
+  public final double getNormalActivityDelayDisutility(Activity activity, double delay) {
 
-		SumScoringFunction sumScoringA = new SumScoringFunction() ;
-		sumScoringA.addScoringFunction(activityScoringA);
+    SumScoringFunction sumScoringA = new SumScoringFunction();
+    sumScoringA.addScoringFunction(activityScoringA);
 
-		SumScoringFunction sumScoringB = new SumScoringFunction() ;
-		sumScoringB.addScoringFunction(activityScoringB);
+    SumScoringFunction sumScoringB = new SumScoringFunction();
+    sumScoringB.addScoringFunction(activityScoringB);
 
-		if (activity.getStartTime().isDefined() && activity.getEndTime().isDefined()) {
-        	// activity is not the first and not the last activity
-        } else {
-        	throw new RuntimeException("Missing start or end time! The provided activity is probably the first or last activity. Aborting...");
-        }
+    if (activity.getStartTime().isDefined() && activity.getEndTime().isDefined()) {
+      // activity is not the first and not the last activity
+    } else {
+      throw new RuntimeException(
+          "Missing start or end time! The provided activity is probably the first or last activity. Aborting...");
+    }
 
-		double scoreA0 = sumScoringA.getScore();
-		double scoreB0 = sumScoringB.getScore();
+    double scoreA0 = sumScoringA.getScore();
+    double scoreB0 = sumScoringB.getScore();
 
-		Activity activityWithoutDelay = PopulationUtils.createActivity(activity);
-		activityWithoutDelay.setStartTime(activity.getStartTime().seconds() - delay);
+    Activity activityWithoutDelay = PopulationUtils.createActivity(activity);
+    activityWithoutDelay.setStartTime(activity.getStartTime().seconds() - delay);
 
-//		log.info("activity: " + activity.toString());
-//		log.info("activityWithoutDelay: " + activityWithoutDelay.toString());
+    //		log.info("activity: " + activity.toString());
+    //		log.info("activityWithoutDelay: " + activityWithoutDelay.toString());
 
-		sumScoringA.handleActivity(activity);
-		sumScoringB.handleActivity(activityWithoutDelay);
+    sumScoringA.handleActivity(activity);
+    sumScoringB.handleActivity(activityWithoutDelay);
 
-		sumScoringA.finish();
-		sumScoringB.finish();
+    sumScoringA.finish();
+    sumScoringB.finish();
 
-		double scoreA1 = sumScoringA.getScore();
-		double scoreB1 = sumScoringB.getScore();
+    double scoreA1 = sumScoringA.getScore();
+    double scoreB1 = sumScoringB.getScore();
 
-		double scoreWithDelay = scoreA1 - scoreA0;
-		double scoreWithoutDelay = scoreB1 - scoreB0;
+    double scoreWithDelay = scoreA1 - scoreA0;
+    double scoreWithoutDelay = scoreB1 - scoreB0;
 
-		double activityDelayDisutility = scoreWithoutDelay - scoreWithDelay;
-		return activityDelayDisutility;
-	}
+    double activityDelayDisutility = scoreWithoutDelay - scoreWithDelay;
+    return activityDelayDisutility;
+  }
 
-	public final double getOvernightActivityDelayDisutility(Activity activityMorning, Activity activityEvening, double delay) {
+  public final double getOvernightActivityDelayDisutility(
+      Activity activityMorning, Activity activityEvening, double delay) {
 
-		SumScoringFunction delegateA = new SumScoringFunction() ;
-		delegateA.addScoringFunction(activityScoringA);
+    SumScoringFunction delegateA = new SumScoringFunction();
+    delegateA.addScoringFunction(activityScoringA);
 
-		SumScoringFunction delegateB = new SumScoringFunction() ;
-		delegateB.addScoringFunction(activityScoringB);
+    SumScoringFunction delegateB = new SumScoringFunction();
+    delegateB.addScoringFunction(activityScoringB);
 
-		if (activityMorning.getStartTime().isUndefined() && activityMorning.getEndTime().isDefined()) {
-        	// 'morningActivity' is the first activity
-        } else {
-        	throw new RuntimeException("activityMorning is not the first activity. Or why does it have a start time? Aborting...");
-        }
+    if (activityMorning.getStartTime().isUndefined() && activityMorning.getEndTime().isDefined()) {
+      // 'morningActivity' is the first activity
+    } else {
+      throw new RuntimeException(
+          "activityMorning is not the first activity. Or why does it have a start time? Aborting...");
+    }
 
-		if (activityEvening.getStartTime().isDefined() && activityEvening.getEndTime().isUndefined()) {
-        	// 'eveningActivity' is the last activity
-        } else {
-        	throw new RuntimeException("activityEvening is not the last activity. Or why does it have an end time? Aborting...");
-        }
+    if (activityEvening.getStartTime().isDefined() && activityEvening.getEndTime().isUndefined()) {
+      // 'eveningActivity' is the last activity
+    } else {
+      throw new RuntimeException(
+          "activityEvening is not the last activity. Or why does it have an end time? Aborting...");
+    }
 
-		double scoreA0 = delegateA.getScore();
-		double scoreB0 = delegateB.getScore();
+    double scoreA0 = delegateA.getScore();
+    double scoreB0 = delegateB.getScore();
 
-		delegateA.handleActivity(activityMorning);
-		delegateB.handleActivity(activityMorning);
+    delegateA.handleActivity(activityMorning);
+    delegateB.handleActivity(activityMorning);
 
-		Activity activityEveningWithoutDelay = PopulationUtils.createActivity(activityEvening);
-		activityEveningWithoutDelay.setStartTime(activityEvening.getStartTime().seconds() - delay);
+    Activity activityEveningWithoutDelay = PopulationUtils.createActivity(activityEvening);
+    activityEveningWithoutDelay.setStartTime(activityEvening.getStartTime().seconds() - delay);
 
-//		log.info("activityMorning: " + activityMorning.toString());
-//		log.info("activityEvening: " + activityEvening.toString());
-//		log.info("activityEveningWithoutDelay: " + activityEveningWithoutDelay.toString());
+    //		log.info("activityMorning: " + activityMorning.toString());
+    //		log.info("activityEvening: " + activityEvening.toString());
+    //		log.info("activityEveningWithoutDelay: " + activityEveningWithoutDelay.toString());
 
-		delegateA.handleActivity(activityEvening);
-		delegateB.handleActivity(activityEveningWithoutDelay);
+    delegateA.handleActivity(activityEvening);
+    delegateB.handleActivity(activityEveningWithoutDelay);
 
-		delegateA.finish();
-		delegateB.finish();
+    delegateA.finish();
+    delegateB.finish();
 
-		double scoreA1 = delegateA.getScore();
-		double scoreB1 = delegateB.getScore();
+    double scoreA1 = delegateA.getScore();
+    double scoreB1 = delegateB.getScore();
 
-		double scoreWithDelay = scoreA1 - scoreA0;
-		double scoreWithoutDelay = scoreB1 - scoreB0;
+    double scoreWithDelay = scoreA1 - scoreA0;
+    double scoreWithoutDelay = scoreB1 - scoreB0;
 
-		double activityDelayDisutility = scoreWithoutDelay - scoreWithDelay;
-		return activityDelayDisutility;
-	}
-
+    double activityDelayDisutility = scoreWithoutDelay - scoreWithDelay;
+    return activityDelayDisutility;
+  }
 }

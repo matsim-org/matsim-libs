@@ -20,79 +20,79 @@
 
 package org.matsim.contrib.dvrp.fleet;
 
+import com.google.common.base.MoreObjects;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule;
-
-import com.google.common.base.MoreObjects;
 
 /**
  * @author michalm
  */
 public class DvrpVehicleImpl implements DvrpVehicle {
-	private final DvrpVehicleSpecification specification;
-	private final Link startLink;
-	private final Schedule schedule;
+  private final DvrpVehicleSpecification specification;
+  private final Link startLink;
+  private final Schedule schedule;
 
-	public DvrpVehicleImpl(DvrpVehicleSpecification specification, Link startLink) {
-		if (startLink == null) {
-			throw new RuntimeException("Start link "
-					+ specification.getStartLinkId()
-					+ " of vehicle "
-					+ specification.getId()
-					+ " is null."
-					+ " Please make sure the link is part of the mode-filtered (and cleaned?) network! Aborting...");
-		}
-		if (!startLink.getId().equals(specification.getStartLinkId())) {
-			throw new IllegalArgumentException("startLink.id != specification.startLinkId");
-		}
-		this.specification = specification;
-		this.startLink = startLink;
-		schedule = Schedule.create(specification);
-	}
+  public DvrpVehicleImpl(DvrpVehicleSpecification specification, Link startLink) {
+    if (startLink == null) {
+      throw new RuntimeException(
+          "Start link "
+              + specification.getStartLinkId()
+              + " of vehicle "
+              + specification.getId()
+              + " is null."
+              + " Please make sure the link is part of the mode-filtered (and cleaned?) network! Aborting...");
+    }
+    if (!startLink.getId().equals(specification.getStartLinkId())) {
+      throw new IllegalArgumentException("startLink.id != specification.startLinkId");
+    }
+    this.specification = specification;
+    this.startLink = startLink;
+    schedule = Schedule.create(specification);
+  }
 
-	@Override
-	public Id<DvrpVehicle> getId() {
-		return specification.getId();
-	}
+  @Override
+  public Id<DvrpVehicle> getId() {
+    return specification.getId();
+  }
 
-	@Override
-	public Link getStartLink() {
-		return startLink;
-	}
+  @Override
+  public Link getStartLink() {
+    return startLink;
+  }
 
-	@Override
-	public int getCapacity() {
-		return specification.getCapacity();
-	}
+  @Override
+  public int getCapacity() {
+    return specification.getCapacity();
+  }
 
-	@Override
-	public double getServiceBeginTime() {
-		return specification.getServiceBeginTime();
-	}
+  @Override
+  public double getServiceBeginTime() {
+    return specification.getServiceBeginTime();
+  }
 
-	@Override
-	public double getServiceEndTime() {
-		return specification.getServiceEndTime();
-	}
+  @Override
+  public double getServiceEndTime() {
+    return specification.getServiceEndTime();
+  }
 
-	@Override
-	public Schedule getSchedule() {
-		return schedule;
-	}
+  @Override
+  public Schedule getSchedule() {
+    return schedule;
+  }
 
-	public DvrpVehicleSpecification getSpecification() {
-		return specification;
-	}
+  public DvrpVehicleSpecification getSpecification() {
+    return specification;
+  }
 
-	@Override
-	public String toString() {
-		return MoreObjects.toStringHelper(this)
-				.add("id", getId())
-				.add("startLinkId", getStartLink().getId())
-				.add("capacity", getCapacity())
-				.add("serviceBeginTime", getServiceBeginTime())
-				.add("serviceEndTime", getServiceEndTime())
-				.toString();
-	}
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("id", getId())
+        .add("startLinkId", getStartLink().getId())
+        .add("capacity", getCapacity())
+        .add("serviceBeginTime", getServiceBeginTime())
+        .add("serviceEndTime", getServiceEndTime())
+        .toString();
+  }
 }

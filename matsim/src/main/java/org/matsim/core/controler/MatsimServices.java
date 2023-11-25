@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * MatsimServices.java
@@ -19,9 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.controler;
+package org.matsim.core.controler;
 
-
+import com.google.inject.Provider;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.ScoreStats;
@@ -38,42 +37,39 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
-import com.google.inject.Provider;
-
 public interface MatsimServices extends IterationCounter {
 
-	IterationStopWatch getStopwatch();
+  IterationStopWatch getStopwatch();
 
-	TravelTime getLinkTravelTimes();
+  TravelTime getLinkTravelTimes();
 
-	Provider<TripRouter> getTripRouterProvider();
+  Provider<TripRouter> getTripRouterProvider();
 
-	TravelDisutility createTravelDisutilityCalculator();
+  TravelDisutility createTravelDisutilityCalculator();
 
-	LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory();
+  LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory();
 
-	ScoringFunctionFactory getScoringFunctionFactory();
+  ScoringFunctionFactory getScoringFunctionFactory();
 
-	Config getConfig();
+  Config getConfig();
 
-	Scenario getScenario();
+  Scenario getScenario();
 
-	EventsManager getEvents();
+  EventsManager getEvents();
 
-	com.google.inject.Injector getInjector();
+  com.google.inject.Injector getInjector();
 
-	CalcLinkStats getLinkStats();
+  CalcLinkStats getLinkStats();
 
-	VolumesAnalyzer getVolumes();
+  VolumesAnalyzer getVolumes();
 
-	ScoreStats getScoreStats();
+  ScoreStats getScoreStats();
 
-	TravelDisutilityFactory getTravelDisutilityFactory();
+  TravelDisutilityFactory getTravelDisutilityFactory();
 
-	StrategyManager getStrategyManager();
+  StrategyManager getStrategyManager();
 
-	OutputDirectoryHierarchy getControlerIO();
+  OutputDirectoryHierarchy getControlerIO();
 
-	void addControlerListener(ControlerListener controlerListener);
-	
+  void addControlerListener(ControlerListener controlerListener);
 }

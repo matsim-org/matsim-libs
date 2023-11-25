@@ -27,26 +27,23 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.vehicles.Vehicle;
 
-/**
- * Converter for railsim events.
- */
+/** Converter for railsim events. */
 public class RailsimLinkStateChangeEventMapper implements MatsimEventsReader.CustomEventMapper {
-	@Override
-	public RailsimLinkStateChangeEvent apply(GenericEvent event) {
-		var attributes = event.getAttributes();
-		return new RailsimLinkStateChangeEvent(
-			event.getTime(),
-			asId(attributes.get(RailsimLinkStateChangeEvent.ATTRIBUTE_LINK), Link.class),
-			asId(attributes.get(RailsimLinkStateChangeEvent.ATTRIBUTE_VEHICLE), Vehicle.class),
-			TrackState.valueOf(attributes.get(RailsimLinkStateChangeEvent.ATTRIBUTE_STATE)),
-			Integer.parseInt(attributes.get(RailsimLinkStateChangeEvent.ATTRIBUTE_TRACK))
-		);
-	}
+  @Override
+  public RailsimLinkStateChangeEvent apply(GenericEvent event) {
+    var attributes = event.getAttributes();
+    return new RailsimLinkStateChangeEvent(
+        event.getTime(),
+        asId(attributes.get(RailsimLinkStateChangeEvent.ATTRIBUTE_LINK), Link.class),
+        asId(attributes.get(RailsimLinkStateChangeEvent.ATTRIBUTE_VEHICLE), Vehicle.class),
+        TrackState.valueOf(attributes.get(RailsimLinkStateChangeEvent.ATTRIBUTE_STATE)),
+        Integer.parseInt(attributes.get(RailsimLinkStateChangeEvent.ATTRIBUTE_TRACK)));
+  }
 
-	private static <T> Id<T> asId(String value, Class<T> idClass) {
-		if (value == null) {
-			return null;
-		}
-		return Id.create(value, idClass);
-	}
+  private static <T> Id<T> asId(String value, Class<T> idClass) {
+    if (value == null) {
+      return null;
+    }
+    return Id.create(value, idClass);
+  }
 }

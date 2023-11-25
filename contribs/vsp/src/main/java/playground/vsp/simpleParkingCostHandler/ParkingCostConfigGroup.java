@@ -19,123 +19,120 @@
 
 package playground.vsp.simpleParkingCostHandler;
 
+import java.util.HashSet;
+import java.util.Set;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
- *
  * @author ikaddoura
  */
-
 public class ParkingCostConfigGroup extends ReflectiveConfigGroup {
-	public static final String GROUP_NAME = "parkingCost" ;
+  public static final String GROUP_NAME = "parkingCost";
 
-	public ParkingCostConfigGroup() {
-		super(GROUP_NAME);
-	}
+  public ParkingCostConfigGroup() {
+    super(GROUP_NAME);
+  }
 
-	private String mode = "car";
-	private String dailyParkingCostLinkAttributeName = "dailyPCost";
-	private String firstHourParkingCostLinkAttributeName = "oneHourPCost";
-	private String extraHourParkingCostLinkAttributeName = "extraHourPCost";
-	private String maxDailyParkingCostLinkAttributeName = "maxDailyPCost";
-	private String maxParkingDurationAttributeName = "maxPDuration";
-	private String parkingPenaltyAttributeName = "penalty";
-	private String residentialParkingFeePerDay = "residentialPFee";
-	private String activityPrefixForDailyParkingCosts = "home";
-	private final Set<String> activityPrefixToBeExcludedFromParkingCost = new HashSet<>();
+  private String mode = "car";
+  private String dailyParkingCostLinkAttributeName = "dailyPCost";
+  private String firstHourParkingCostLinkAttributeName = "oneHourPCost";
+  private String extraHourParkingCostLinkAttributeName = "extraHourPCost";
+  private String maxDailyParkingCostLinkAttributeName = "maxDailyPCost";
+  private String maxParkingDurationAttributeName = "maxPDuration";
+  private String parkingPenaltyAttributeName = "penalty";
+  private String residentialParkingFeePerDay = "residentialPFee";
+  private String activityPrefixForDailyParkingCosts = "home";
+  private final Set<String> activityPrefixToBeExcludedFromParkingCost = new HashSet<>();
 
-	public String getMode() {
-		return mode;
-	}
+  public String getMode() {
+    return mode;
+  }
 
-	public void setMode(String mode) {
-		this.mode = mode;
-	}
+  public void setMode(String mode) {
+    this.mode = mode;
+  }
 
-	public String getDailyParkingCostLinkAttributeName() {
-		return dailyParkingCostLinkAttributeName;
-	}
+  public String getDailyParkingCostLinkAttributeName() {
+    return dailyParkingCostLinkAttributeName;
+  }
 
-	public void setDailyParkingCostLinkAttributeName(String dailyParkingCostLinkAttributeName) {
-		this.dailyParkingCostLinkAttributeName = dailyParkingCostLinkAttributeName;
-	}
+  public void setDailyParkingCostLinkAttributeName(String dailyParkingCostLinkAttributeName) {
+    this.dailyParkingCostLinkAttributeName = dailyParkingCostLinkAttributeName;
+  }
 
-	public String getFirstHourParkingCostLinkAttributeName() {
-		return firstHourParkingCostLinkAttributeName;
-	}
+  public String getFirstHourParkingCostLinkAttributeName() {
+    return firstHourParkingCostLinkAttributeName;
+  }
 
-	public void setFirstHourParkingCostLinkAttributeName(String firstHourParkingCostLinkAttributeName) {
-		this.firstHourParkingCostLinkAttributeName = firstHourParkingCostLinkAttributeName;
-	}
+  public void setFirstHourParkingCostLinkAttributeName(
+      String firstHourParkingCostLinkAttributeName) {
+    this.firstHourParkingCostLinkAttributeName = firstHourParkingCostLinkAttributeName;
+  }
 
-	public String getExtraHourParkingCostLinkAttributeName() {
-		return extraHourParkingCostLinkAttributeName;
-	}
+  public String getExtraHourParkingCostLinkAttributeName() {
+    return extraHourParkingCostLinkAttributeName;
+  }
 
-	public void setExtraHourParkingCostLinkAttributeName(String extraHourParkingCostLinkAttributeName) {
-		this.extraHourParkingCostLinkAttributeName = extraHourParkingCostLinkAttributeName;
-	}
+  public void setExtraHourParkingCostLinkAttributeName(
+      String extraHourParkingCostLinkAttributeName) {
+    this.extraHourParkingCostLinkAttributeName = extraHourParkingCostLinkAttributeName;
+  }
 
-	public String getMaxDailyParkingCostLinkAttributeName() {
-		return maxDailyParkingCostLinkAttributeName;
-	}
+  public String getMaxDailyParkingCostLinkAttributeName() {
+    return maxDailyParkingCostLinkAttributeName;
+  }
 
-	public void setMaxDailyParkingCostLinkAttributeName(String maxDailyParkingCostLinkAttributeName) {
-		this.maxDailyParkingCostLinkAttributeName = maxDailyParkingCostLinkAttributeName;
-	}
+  public void setMaxDailyParkingCostLinkAttributeName(String maxDailyParkingCostLinkAttributeName) {
+    this.maxDailyParkingCostLinkAttributeName = maxDailyParkingCostLinkAttributeName;
+  }
 
-	public String getActivityPrefixesToBeExcludedFromParkingCostAsString() {
-		return CollectionUtils.setToString(this.activityPrefixToBeExcludedFromParkingCost);
-	}
+  public String getActivityPrefixesToBeExcludedFromParkingCostAsString() {
+    return CollectionUtils.setToString(this.activityPrefixToBeExcludedFromParkingCost);
+  }
 
-	public Set<String> getActivityPrefixesToBeExcludedFromParkingCost() {
-		return this.activityPrefixToBeExcludedFromParkingCost;
-	}
+  public Set<String> getActivityPrefixesToBeExcludedFromParkingCost() {
+    return this.activityPrefixToBeExcludedFromParkingCost;
+  }
 
-	public void setActivityPrefixToBeExcludedFromParkingCost(String prefixes) {
-		setActivityPrefixToBeExcludedFromParkingCost(CollectionUtils.stringToSet(prefixes));
-	}
+  public void setActivityPrefixToBeExcludedFromParkingCost(String prefixes) {
+    setActivityPrefixToBeExcludedFromParkingCost(CollectionUtils.stringToSet(prefixes));
+  }
 
-	public void setActivityPrefixToBeExcludedFromParkingCost(Set<String> prefixes) {
-		this.activityPrefixToBeExcludedFromParkingCost.clear();
-		this.activityPrefixToBeExcludedFromParkingCost.addAll(prefixes);
-	}
+  public void setActivityPrefixToBeExcludedFromParkingCost(Set<String> prefixes) {
+    this.activityPrefixToBeExcludedFromParkingCost.clear();
+    this.activityPrefixToBeExcludedFromParkingCost.addAll(prefixes);
+  }
 
-    public String getMaxParkingDurationAttributeName() {
-		return maxParkingDurationAttributeName;
-    }
+  public String getMaxParkingDurationAttributeName() {
+    return maxParkingDurationAttributeName;
+  }
 
-	public void setMaxParkingDurationAttributeName(String maxParkingDurationAttributeName) {
-		this.maxParkingDurationAttributeName = maxParkingDurationAttributeName;
-	}
+  public void setMaxParkingDurationAttributeName(String maxParkingDurationAttributeName) {
+    this.maxParkingDurationAttributeName = maxParkingDurationAttributeName;
+  }
 
-	public String getParkingPenaltyAttributeName() {
-		return parkingPenaltyAttributeName;
-	}
+  public String getParkingPenaltyAttributeName() {
+    return parkingPenaltyAttributeName;
+  }
 
-	public void setParkingPenaltyAttributeName(String parkingPenaltyAttributeName) {
-		this.parkingPenaltyAttributeName = parkingPenaltyAttributeName;
-	}
+  public void setParkingPenaltyAttributeName(String parkingPenaltyAttributeName) {
+    this.parkingPenaltyAttributeName = parkingPenaltyAttributeName;
+  }
 
-	public String getResidentialParkingFeeAttributeName() {
-		return residentialParkingFeePerDay;
-	}
+  public String getResidentialParkingFeeAttributeName() {
+    return residentialParkingFeePerDay;
+  }
 
-	public void setResidentialParkingFeeAttributeName(String residentialParkingFeePerDay) {
-		this.residentialParkingFeePerDay = residentialParkingFeePerDay;
-	}
+  public void setResidentialParkingFeeAttributeName(String residentialParkingFeePerDay) {
+    this.residentialParkingFeePerDay = residentialParkingFeePerDay;
+  }
 
-	public String getActivityPrefixForDailyParkingCosts() {
-		return activityPrefixForDailyParkingCosts;
-	}
+  public String getActivityPrefixForDailyParkingCosts() {
+    return activityPrefixForDailyParkingCosts;
+  }
 
-	public void setActivityPrefixForDailyParkingCosts(String activityPrefixForDailyParkingCosts) {
-		this.activityPrefixForDailyParkingCosts = activityPrefixForDailyParkingCosts;
-	}
-
+  public void setActivityPrefixForDailyParkingCosts(String activityPrefixForDailyParkingCosts) {
+    this.activityPrefixForDailyParkingCosts = activityPrefixForDailyParkingCosts;
+  }
 }
-

@@ -29,15 +29,16 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class CountsErrorGraphTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  @Test
+  public void testCreateChart() {
+    CountsFixture fixture = new CountsFixture();
+    fixture.setUp();
 
-	@Test public void testCreateChart() {
-		CountsFixture fixture = new CountsFixture();
-		fixture.setUp();
-
-		BoxPlotErrorGraph eg = new BoxPlotErrorGraph(fixture.ceateCountSimCompList(), 1, "testCreateChart", "testCreateChart");
-		assertNotNull("No graph is created", eg.createChart(0));
-	}
+    BoxPlotErrorGraph eg =
+        new BoxPlotErrorGraph(
+            fixture.ceateCountSimCompList(), 1, "testCreateChart", "testCreateChart");
+    assertNotNull("No graph is created", eg.createChart(0));
+  }
 }

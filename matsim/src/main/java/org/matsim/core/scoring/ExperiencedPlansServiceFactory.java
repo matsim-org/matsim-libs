@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * ExperiencedPlansServiceImpl.java
@@ -25,11 +24,11 @@ import org.matsim.api.core.v01.Scenario;
 
 public class ExperiencedPlansServiceFactory {
 
-    /*
-     This should only be needed in Postprocessing. The way to access Experienced Plans during a simulation is via dependency injection.
-     */
-    public static ExperiencedPlansService create(Scenario scenario, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs) {
-        return new ExperiencedPlansServiceImpl(eventsToActivities, eventsToLegs, scenario);
-
-    }
+  /*
+  This should only be needed in Postprocessing. The way to access Experienced Plans during a simulation is via dependency injection.
+  */
+  public static ExperiencedPlansService create(
+      Scenario scenario, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs) {
+    return new ExperiencedPlansServiceImpl(eventsToActivities, eventsToLegs, scenario);
+  }
 }

@@ -20,7 +20,6 @@
 package org.matsim.contrib.dynagent.examples.random;
 
 import java.net.URL;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dynagent.run.DynActivityEngine;
 import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
@@ -37,40 +36,42 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 public class RunRandomDynAgentExample {
-	public static void run(URL context, String networkFile, boolean otfvis) {
-		OTFVisConfigGroup otfvisConfig = new OTFVisConfigGroup();
-		otfvisConfig.setColoringScheme(ColoringScheme.byId);
-		otfvisConfig.setDrawNonMovingItems(true);
+  public static void run(URL context, String networkFile, boolean otfvis) {
+    OTFVisConfigGroup otfvisConfig = new OTFVisConfigGroup();
+    otfvisConfig.setColoringScheme(ColoringScheme.byId);
+    otfvisConfig.setDrawNonMovingItems(true);
 
-		Config config = ConfigUtils.createConfig(otfvisConfig);
-		config.setContext(context);
-		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
-		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
-		config.network().setInputFile(networkFile);
-		config.controller().setOutputDirectory("./test/output/random_dyn_agent/");
-		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setLastIteration(0);
-		config.addConfigConsistencyChecker(new DynQSimConfigConsistencyChecker());
+    Config config = ConfigUtils.createConfig(otfvisConfig);
+    config.setContext(context);
+    config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
+    config.qsim().setSnapshotStyle(SnapshotStyle.queue);
+    config.network().setInputFile(networkFile);
+    config.controller().setOutputDirectory("./test/output/random_dyn_agent/");
+    config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+    config.controller().setLastIteration(0);
+    config.addConfigConsistencyChecker(new DynQSimConfigConsistencyChecker());
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+    Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		Controler controler = new Controler(scenario);
-		controler.addOverridingQSimModule(new AbstractQSimModule() {
-			@Override
-			public void configureQSim() {
-				addQSimComponentBinding(DynActivityEngine.COMPONENT_NAME).to(DynActivityEngine.class);
-				addQSimComponentBinding("DynAgentSource").to(RandomDynAgentSource.class);
-			}
-		});
-		controler.configureQSimComponents(components -> {
-			components.addNamedComponent(DynActivityEngine.COMPONENT_NAME);
-			components.addNamedComponent("DynAgentSource");
-		});
+    Controler controler = new Controler(scenario);
+    controler.addOverridingQSimModule(
+        new AbstractQSimModule() {
+          @Override
+          public void configureQSim() {
+            addQSimComponentBinding(DynActivityEngine.COMPONENT_NAME).to(DynActivityEngine.class);
+            addQSimComponentBinding("DynAgentSource").to(RandomDynAgentSource.class);
+          }
+        });
+    controler.configureQSimComponents(
+        components -> {
+          components.addNamedComponent(DynActivityEngine.COMPONENT_NAME);
+          components.addNamedComponent("DynAgentSource");
+        });
 
-		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule());
-		}
+    if (otfvis) {
+      controler.addOverridingModule(new OTFVisLiveModule());
+    }
 
-		controler.run();
-	}
+    controler.run();
+  }
 }

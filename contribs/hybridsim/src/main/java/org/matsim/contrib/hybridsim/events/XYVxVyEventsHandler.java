@@ -23,6 +23,5 @@ import org.matsim.core.events.handler.EventHandler;
 
 public interface XYVxVyEventsHandler extends EventHandler {
 
-	void handleEvent(XYVxVyEventImpl event);
-
+  void handleEvent(XYVxVyEventImpl event);
 }

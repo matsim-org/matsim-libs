@@ -22,20 +22,14 @@ package org.matsim.vis.otfvis.opengl.drawer;
 
 import org.matsim.vis.otfvis.caching.SceneGraph;
 
-
 /**
- * OTFGLDrawableImpl is a basic implementation of the OTFOGLDrawable interface with an
- * additional simple invalidation mechanism.
+ * OTFGLDrawableImpl is a basic implementation of the OTFOGLDrawable interface with an additional
+ * simple invalidation mechanism.
  *
  * @author dstrippgen
- *
- * <p>
- * there was an "isValid" but it was not used.  kai, jan'10/feb'11
- * </p>
- *
+ *     <p>there was an "isValid" but it was not used. kai, jan'10/feb'11
  */
 public abstract class OTFGLAbstractDrawableReceiver extends OTFGLAbstractDrawable {
 
-	public abstract void addToSceneGraph(SceneGraph graph);
-
+  public abstract void addToSceneGraph(SceneGraph graph);
 }

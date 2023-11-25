@@ -20,10 +20,7 @@ package org.matsim.core.api.internal;
 
 /**
  * marker interface, for objects without id
- * 
- * @author nagel
  *
+ * @author nagel
  */
-public interface MatsimFacilitiesObject {
-
-}
+public interface MatsimFacilitiesObject {}

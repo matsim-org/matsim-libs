@@ -21,20 +21,19 @@ package org.matsim.contrib.socnetsim.sharedvehicles;
 
 import java.util.Collections;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
 /**
  * One vehicle per agent
+ *
  * @author thibautd
  */
 public class UnrestrictedVehicleRessources implements VehicleRessources {
 
-	@Override
-	public Set<Id<Vehicle>> identifyVehiclesUsableForAgent(final Id<Person> person) {
-		return Collections.singleton( Id.create( person , Vehicle.class ) );
-	}
+  @Override
+  public Set<Id<Vehicle>> identifyVehiclesUsableForAgent(final Id<Person> person) {
+    return Collections.singleton(Id.create(person, Vehicle.class));
+  }
 }
-

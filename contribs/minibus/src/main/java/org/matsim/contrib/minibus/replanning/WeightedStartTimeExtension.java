@@ -19,64 +19,65 @@
 
 package org.matsim.contrib.minibus.replanning;
 
+import java.util.ArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.minibus.hook.Operator;
 import org.matsim.contrib.minibus.hook.PPlan;
 import org.matsim.contrib.minibus.hook.TimeProvider;
 
-import java.util.ArrayList;
-
 /**
- * 
- * Changes the start time of operation by drawing randomly a new time slot from midnight to startTime.
- * The draw is weighted by the number of activities in those time slots (see {@link TimeProvider}).
- * 
- * @author aneumann
+ * Changes the start time of operation by drawing randomly a new time slot from midnight to
+ * startTime. The draw is weighted by the number of activities in those time slots (see {@link
+ * TimeProvider}).
  *
+ * @author aneumann
  */
 public final class WeightedStartTimeExtension extends AbstractPStrategyModule {
-	
-	private final static Logger log = LogManager.getLogger(WeightedStartTimeExtension.class);
-	public static final String STRATEGY_NAME = "WeightedStartTimeExtension";
 
-	private TimeProvider timeProvider = null;
-	
-	public WeightedStartTimeExtension(ArrayList<String> parameter) {
-		super();
-		if(parameter.size() != 0){
-			log.error("No parameters needed for this module.");
-		}
-	}
-	
-	public void setTimeProvider(TimeProvider timeProvider){
-		this.timeProvider = timeProvider;
-	}
+  private static final Logger log = LogManager.getLogger(WeightedStartTimeExtension.class);
+  public static final String STRATEGY_NAME = "WeightedStartTimeExtension";
 
-	@Override
-	public PPlan run(Operator operator) {
-		// change startTime
-		PPlan newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName(), operator.getBestPlan().getId());
-		newPlan.setNVehicles(1);
-		newPlan.setStopsToBeServed(operator.getBestPlan().getStopsToBeServed());
-		
-		// get a valid new start time
-		double newStartTime = this.timeProvider.getRandomTimeInInterval(0.0, operator.getBestPlan().getStartTime());
-		newPlan.setStartTime(newStartTime);
-		newPlan.setEndTime(operator.getBestPlan().getEndTime());
-		
-		if(newPlan.getEndTime() <= newPlan.getStartTime()){
-			// Could not find a valid new plan
-			return null;
-		}
-		
-		newPlan.setLine(operator.getRouteProvider().createTransitLineFromOperatorPlan(operator.getId(), newPlan));
-		
-		return newPlan;
-	}
-	
-	@Override
-	public String getStrategyName() {
-		return WeightedStartTimeExtension.STRATEGY_NAME;
-	}
+  private TimeProvider timeProvider = null;
+
+  public WeightedStartTimeExtension(ArrayList<String> parameter) {
+    super();
+    if (parameter.size() != 0) {
+      log.error("No parameters needed for this module.");
+    }
+  }
+
+  public void setTimeProvider(TimeProvider timeProvider) {
+    this.timeProvider = timeProvider;
+  }
+
+  @Override
+  public PPlan run(Operator operator) {
+    // change startTime
+    PPlan newPlan =
+        new PPlan(operator.getNewPlanId(), this.getStrategyName(), operator.getBestPlan().getId());
+    newPlan.setNVehicles(1);
+    newPlan.setStopsToBeServed(operator.getBestPlan().getStopsToBeServed());
+
+    // get a valid new start time
+    double newStartTime =
+        this.timeProvider.getRandomTimeInInterval(0.0, operator.getBestPlan().getStartTime());
+    newPlan.setStartTime(newStartTime);
+    newPlan.setEndTime(operator.getBestPlan().getEndTime());
+
+    if (newPlan.getEndTime() <= newPlan.getStartTime()) {
+      // Could not find a valid new plan
+      return null;
+    }
+
+    newPlan.setLine(
+        operator.getRouteProvider().createTransitLineFromOperatorPlan(operator.getId(), newPlan));
+
+    return newPlan;
+  }
+
+  @Override
+  public String getStrategyName() {
+    return WeightedStartTimeExtension.STRATEGY_NAME;
+  }
 }

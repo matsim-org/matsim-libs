@@ -23,7 +23,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,105 +44,115 @@ import org.matsim.testcases.MatsimTestUtils;
  *
  * @author aneumann
  */
-public class PControlerTestIT implements TabularFileHandler{
+public class PControlerTestIT implements TabularFileHandler {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private final ArrayList<String[]> pStatsResults = new ArrayList<>();
+  private final ArrayList<String[]> pStatsResults = new ArrayList<>();
 
+  @Test
+  public final void testPControler() {
 
-	@Test
-	public final void testPControler() {
+    final String scenarioName = "corr_s1_0";
+    final int numberOfIterations = 10;
 
-		final String scenarioName = "corr_s1_0";
-		final int numberOfIterations = 10;
+    final String inputPath = utils.getClassInputDirectory();
+    final String outputPath = utils.getOutputDirectory() + scenarioName + "/";
 
-		final String inputPath = utils.getClassInputDirectory();
-		final String outputPath = utils.getOutputDirectory() + scenarioName + "/";
+    final String configFile = inputPath + "config_" + scenarioName + ".xml";
 
-		final String configFile = inputPath + "config_" + scenarioName + ".xml";
+    // ---
 
-		// ---
+    Config config = ConfigUtils.loadConfig(configFile, new PConfigGroup());
 
-		Config config = ConfigUtils.loadConfig(configFile, new PConfigGroup());
+    config.controller().setLastIteration(numberOfIterations);
+    config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+    config.controller().setCreateGraphs(false);
+    config.controller().setOutputDirectory(outputPath);
 
-		config.controller().setLastIteration(numberOfIterations);
-		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setCreateGraphs(false);
-		config.controller().setOutputDirectory(outputPath);
+    // ---
 
-		// ---
+    Scenario scenario = ScenarioUtils.createScenario(config);
+    ScenarioUtils.loadScenario(scenario);
 
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		ScenarioUtils.loadScenario(scenario);
+    // ---
 
-		// ---
+    Controler controler = new Controler(scenario);
 
-		Controler controler = new Controler(scenario);
+    // manipulate config
+    controler.addOverridingModule(new PModule());
 
-		// manipulate config
-		controler.addOverridingModule(new PModule()) ;
+    //		services.setScoringFunctionFactory(new
+    // BvgScoringFunctionFactory(services.getConfig().planCalcScore(), new
+    // BvgScoringFunctionConfigGroup(services.getConfig()), services.getNetwork()));
+    // looks like the above was removed in head but I had a merge conflict.  kai, sep'14
 
-		//		services.setScoringFunctionFactory(new BvgScoringFunctionFactory(services.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroup(services.getConfig()), services.getNetwork()));
-		// looks like the above was removed in head but I had a merge conflict.  kai, sep'14
+    controler.run();
 
-		controler.run();
+    // Check standard output files
+    List<String> filesToCheckFor = new LinkedList<>();
+    filesToCheckFor.add(outputPath + scenarioName + ".0.actsFromParatransitUsers.txt");
+    filesToCheckFor.add(outputPath + scenarioName + ".pOperatorLogger.txt");
+    filesToCheckFor.add(outputPath + scenarioName + ".pStats.txt");
+    filesToCheckFor.add(outputPath + scenarioName + ".scorestats.csv");
+    filesToCheckFor.add(outputPath + scenarioName + ".stopwatch.csv");
+    filesToCheckFor.add(outputPath + scenarioName + ".traveldistancestats.csv");
+    filesToCheckFor.add(outputPath + scenarioName + ".pStat_light.gexf.gz");
+    filesToCheckFor.add(outputPath + scenarioName + ".pStat.gexf.gz");
 
-		// Check standard output files
-		List<String> filesToCheckFor = new LinkedList<>();
-		filesToCheckFor.add(outputPath + scenarioName + ".0.actsFromParatransitUsers.txt");
-		filesToCheckFor.add(outputPath + scenarioName + ".pOperatorLogger.txt");
-		filesToCheckFor.add(outputPath + scenarioName + ".pStats.txt");
-		filesToCheckFor.add(outputPath + scenarioName + ".scorestats.csv");
-		filesToCheckFor.add(outputPath + scenarioName + ".stopwatch.csv");
-		filesToCheckFor.add(outputPath + scenarioName + ".traveldistancestats.csv");
-		filesToCheckFor.add(outputPath + scenarioName + ".pStat_light.gexf.gz");
-		filesToCheckFor.add(outputPath + scenarioName + ".pStat.gexf.gz");
+    for (String filename : filesToCheckFor) {
+      File f = new File(filename);
+      Assert.assertEquals(filename + " does not exist", true, f.exists() && !f.isDirectory());
+    }
 
-		for (String filename : filesToCheckFor) {
-			File f = new File(filename);
-			Assert.assertEquals(filename + " does not exist", true, f.exists() && !f.isDirectory());
-		}
+    // Check pStats
+    String filenameOfpStats = outputPath + scenarioName + ".pStats.txt";
+    TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
+    tabFileParserConfig.setFileName(filenameOfpStats);
+    tabFileParserConfig.setDelimiterTags(new String[] {"\t"});
 
+    new TabularFileParser().parse(tabFileParserConfig, this);
 
-		// Check pStats
-		String filenameOfpStats = outputPath + scenarioName + ".pStats.txt";
-		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
-		tabFileParserConfig.setFileName(filenameOfpStats);
-		tabFileParserConfig.setDelimiterTags(new String[] {"\t"});
+    Assert.assertEquals(
+        "There a less than the expected number of "
+            + (numberOfIterations + 2)
+            + " lines in "
+            + filenameOfpStats,
+        12,
+        this.pStatsResults.size());
 
-		new TabularFileParser().parse(tabFileParserConfig, this);
+    // Check first iteration
+    Assert.assertEquals("Number of coops (first iteration)", "1", this.pStatsResults.get(1)[1]);
+    Assert.assertEquals("Number of routes (first iteration)", "1", this.pStatsResults.get(1)[3]);
+    Assert.assertEquals("Number of pax (first iteration)", "3092", this.pStatsResults.get(1)[5]);
+    Assert.assertEquals("Number of veh (first iteration)", "3", this.pStatsResults.get(1)[7]);
+    Assert.assertEquals(
+        "Number of budget (first iteration)", "-149.4493333333", this.pStatsResults.get(1)[9]);
 
-		Assert.assertEquals("There a less than the expected number of " + (numberOfIterations + 2) + " lines in " + filenameOfpStats, 12, this.pStatsResults.size());
+    Assert.assertEquals("Number of +coops (first iteration)", "0", this.pStatsResults.get(1)[2]);
+    Assert.assertEquals("Number of +routes (first iteration)", "0", this.pStatsResults.get(1)[4]);
+    Assert.assertEquals("Number of +pax (first iteration)", "0", this.pStatsResults.get(1)[6]);
+    Assert.assertEquals("Number of +veh (first iteration)", "0", this.pStatsResults.get(1)[8]);
+    Assert.assertEquals(
+        "Number of +budget (first iteration)", "NaN", this.pStatsResults.get(1)[10]);
 
-		// Check first iteration
-		Assert.assertEquals("Number of coops (first iteration)", "1", this.pStatsResults.get(1)[1]);
-		Assert.assertEquals("Number of routes (first iteration)", "1", this.pStatsResults.get(1)[3]);
-		Assert.assertEquals("Number of pax (first iteration)", "3092", this.pStatsResults.get(1)[5]);
-		Assert.assertEquals("Number of veh (first iteration)", "3", this.pStatsResults.get(1)[7]);
-		Assert.assertEquals("Number of budget (first iteration)", "-149.4493333333", this.pStatsResults.get(1)[9]);
+    Assert.assertEquals("Number of coops (last iteration)", "3", this.pStatsResults.get(11)[1]);
+    Assert.assertEquals("Number of routes (last iteration)", "3", this.pStatsResults.get(11)[3]);
+    Assert.assertEquals("Number of pax (last iteration)", "6728", this.pStatsResults.get(11)[5]);
+    Assert.assertEquals("Number of veh (last iteration)", "10", this.pStatsResults.get(11)[7]);
+    Assert.assertEquals(
+        "Number of budget (last iteration)", "68.7117037037", this.pStatsResults.get(11)[9]);
 
-		Assert.assertEquals("Number of +coops (first iteration)", "0", this.pStatsResults.get(1)[2]);
-		Assert.assertEquals("Number of +routes (first iteration)", "0", this.pStatsResults.get(1)[4]);
-		Assert.assertEquals("Number of +pax (first iteration)", "0", this.pStatsResults.get(1)[6]);
-		Assert.assertEquals("Number of +veh (first iteration)", "0", this.pStatsResults.get(1)[8]);
-		Assert.assertEquals("Number of +budget (first iteration)", "NaN", this.pStatsResults.get(1)[10]);
+    Assert.assertEquals("Number of +coops (last iteration)", "2", this.pStatsResults.get(11)[2]);
+    Assert.assertEquals("Number of +routes (last iteration)", "2", this.pStatsResults.get(11)[4]);
+    Assert.assertEquals("Number of +pax (last iteration)", "6508", this.pStatsResults.get(11)[6]);
+    Assert.assertEquals("Number of +veh (last iteration)", "7", this.pStatsResults.get(11)[8]);
+    Assert.assertEquals(
+        "Number of +budget (last iteration)", "113.2005555555", this.pStatsResults.get(11)[10]);
+  }
 
-		Assert.assertEquals("Number of coops (last iteration)", "3", this.pStatsResults.get(11)[1]);
-		Assert.assertEquals("Number of routes (last iteration)", "3", this.pStatsResults.get(11)[3]);
-		Assert.assertEquals("Number of pax (last iteration)", "6728", this.pStatsResults.get(11)[5]);
-		Assert.assertEquals("Number of veh (last iteration)", "10", this.pStatsResults.get(11)[7]);
-		Assert.assertEquals("Number of budget (last iteration)", "68.7117037037", this.pStatsResults.get(11)[9]);
-
-		Assert.assertEquals("Number of +coops (last iteration)", "2", this.pStatsResults.get(11)[2]);
-		Assert.assertEquals("Number of +routes (last iteration)", "2", this.pStatsResults.get(11)[4]);
-		Assert.assertEquals("Number of +pax (last iteration)", "6508", this.pStatsResults.get(11)[6]);
-		Assert.assertEquals("Number of +veh (last iteration)", "7", this.pStatsResults.get(11)[8]);
-		Assert.assertEquals("Number of +budget (last iteration)", "113.2005555555", this.pStatsResults.get(11)[10]);
-	}
-
-	@Override
-	public void startRow(String[] row) {
-		this.pStatsResults.add(row);
-	}
+  @Override
+  public void startRow(String[] row) {
+    this.pStatsResults.add(row);
+  }
 }

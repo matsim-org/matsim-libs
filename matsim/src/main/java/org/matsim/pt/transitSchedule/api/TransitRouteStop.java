@@ -23,52 +23,51 @@ package org.matsim.pt.transitSchedule.api;
 import org.matsim.core.utils.misc.OptionalTime;
 
 /**
- * Describes the stop within a route of a transit line. Specifies also at
- * what time a headway is expected at the stop as offset from the route start.
+ * Describes the stop within a route of a transit line. Specifies also at what time a headway is
+ * expected at the stop as offset from the route start.
  *
  * @author mrieser
  */
 public interface TransitRouteStop {
 
-	public abstract TransitStopFacility getStopFacility();
+  public abstract TransitStopFacility getStopFacility();
 
-	public abstract void setStopFacility(final TransitStopFacility stopFacility);
+  public abstract void setStopFacility(final TransitStopFacility stopFacility);
 
-	public abstract OptionalTime getDepartureOffset();
+  public abstract OptionalTime getDepartureOffset();
 
-	public abstract OptionalTime getArrivalOffset();
+  public abstract OptionalTime getArrivalOffset();
 
-	/**
-	 * Specifies if a driver should wait until the specified departure time
-	 * has come before departing, especially if the driver is too early at
-	 * the stop. Requires that a departure offset is set for this stop.
-	 *
-	 * @param awaitDepartureTime <code>true</code> if the driver should wait if too early
-	 * @see #getDepartureOffset()
-	 */
-	public abstract void setAwaitDepartureTime(final boolean awaitDepartureTime);
+  /**
+   * Specifies if a driver should wait until the specified departure time has come before departing,
+   * especially if the driver is too early at the stop. Requires that a departure offset is set for
+   * this stop.
+   *
+   * @param awaitDepartureTime <code>true</code> if the driver should wait if too early
+   * @see #getDepartureOffset()
+   */
+  public abstract void setAwaitDepartureTime(final boolean awaitDepartureTime);
 
-	/**
-	 * Returns whether a driver should wait until the specified departure
-	 * time has come before departing, especially if the driver is too
-	 * early at the stop. Can only be interpreted if a departure offset
-	 * is set for this stop.
-	 *
-	 * @return <code>true</code> if drivers should wait until the departure
-	 * time has passed before departing, <code>false</code> otherwise.
-	 * @see #getDepartureOffset()
-	 */
-	public abstract boolean isAwaitDepartureTime();
+  /**
+   * Returns whether a driver should wait until the specified departure time has come before
+   * departing, especially if the driver is too early at the stop. Can only be interpreted if a
+   * departure offset is set for this stop.
+   *
+   * @return <code>true</code> if drivers should wait until the departure time has passed before
+   *     departing, <code>false</code> otherwise.
+   * @see #getDepartureOffset()
+   */
+  public abstract boolean isAwaitDepartureTime();
 
-	interface Builder<B extends Builder<B>> {
-		Builder<B> stop(TransitStopFacility val);
+  interface Builder<B extends Builder<B>> {
+    Builder<B> stop(TransitStopFacility val);
 
-		Builder<B> departureOffset(double val);
+    Builder<B> departureOffset(double val);
 
-		Builder<B> arrivalOffset(double val);
+    Builder<B> arrivalOffset(double val);
 
-		Builder<B> awaitDepartureTime(boolean val);
+    Builder<B> awaitDepartureTime(boolean val);
 
-		TransitRouteStop build();
-	}
+    TransitRouteStop build();
+  }
 }

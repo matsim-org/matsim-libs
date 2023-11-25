@@ -21,248 +21,266 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author Sebastian Hörl (sebhoerl) / IRT SystemX
  */
 public class AbandonAndCancelTest {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
-	
-	@Test
-	public void noAbandonTest() {
-		/*
-		 * One person requests to depart at 2000 and also is there at 2000. Another
-		 * person asks also to depart at 2000, but only arrives at 4000, i.e. the person
-		 * has 1000s delay. The vehicle should wait accordingly.
-		 */
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.addVehicle("vehicle", 1, 1) //
-				.addRequest("personOk", 0, 0, 5, 5, 2000.0, 0.0, 2000.0) //
-				.addRequest("personLate", 0, 0, 5, 5, 4000.0, 0.0, 2000.0) //
-				.configure(600.0, 1.3, 600.0, 60.0) //
-				.endTime(10.0 * 3600.0);
+  @Test
+  public void noAbandonTest() {
+    /*
+     * One person requests to depart at 2000 and also is there at 2000. Another
+     * person asks also to depart at 2000, but only arrives at 4000, i.e. the person
+     * has 1000s delay. The vehicle should wait accordingly.
+     */
 
-		Controler controller = environment.build();
-		PrebookingTest.installPrebooking(controller);
-		controller.run();
+    PrebookingTestEnvironment environment =
+        new PrebookingTestEnvironment(utils) //
+            .addVehicle("vehicle", 1, 1) //
+            .addRequest("personOk", 0, 0, 5, 5, 2000.0, 0.0, 2000.0) //
+            .addRequest("personLate", 0, 0, 5, 5, 4000.0, 0.0, 2000.0) //
+            .configure(600.0, 1.3, 600.0, 60.0) //
+            .endTime(10.0 * 3600.0);
 
-		{
-			RequestInfo requestInfo = environment.getRequestInfo().get("personOk");
-			assertEquals(0.0, requestInfo.submissionTime, 1e-3);
-			assertEquals(2061.0, requestInfo.pickupTime, 1e-3);
-			assertEquals(4271.0, requestInfo.dropoffTime, 1e-3);
-		}
+    Controler controller = environment.build();
+    PrebookingTest.installPrebooking(controller);
+    controller.run();
 
-		{
-			RequestInfo requestInfo = environment.getRequestInfo().get("personLate");
-			assertEquals(0.0, requestInfo.submissionTime, 1e-3);
-			assertEquals(4060.0, requestInfo.pickupTime, 1e-3);
-			assertEquals(4271.0, requestInfo.dropoffTime, 1e-3);
-		}
-	}
+    {
+      RequestInfo requestInfo = environment.getRequestInfo().get("personOk");
+      assertEquals(0.0, requestInfo.submissionTime, 1e-3);
+      assertEquals(2061.0, requestInfo.pickupTime, 1e-3);
+      assertEquals(4271.0, requestInfo.dropoffTime, 1e-3);
+    }
 
-	@Test
-	public void abandonTest() {
-		/*
-		 * One person requests to depart at 2000 and also is there at 2000. Another
-		 * person asks also to depart at 2000, but only arrives at 4000, i.e. the person
-		 * has 1000s delay.
-		 * 
-		 * We configure that the vehicle should leave without the passenger if it waits
-		 * longer than 500s. The late request will be rejected!
-		 */
+    {
+      RequestInfo requestInfo = environment.getRequestInfo().get("personLate");
+      assertEquals(0.0, requestInfo.submissionTime, 1e-3);
+      assertEquals(4060.0, requestInfo.pickupTime, 1e-3);
+      assertEquals(4271.0, requestInfo.dropoffTime, 1e-3);
+    }
+  }
 
-		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.addVehicle("vehicle", 1, 1) //
-				.addRequest("personOk", 0, 0, 5, 5, 2000.0, 0.0, 2000.0) //
-				.addRequest("personLate", 0, 0, 5, 5, 4000.0, 0.0, 2000.0) //
-				.configure(600.0, 1.3, 600.0, 60.0) //
-				.endTime(10.0 * 3600.0);
+  @Test
+  public void abandonTest() {
+    /*
+     * One person requests to depart at 2000 and also is there at 2000. Another
+     * person asks also to depart at 2000, but only arrives at 4000, i.e. the person
+     * has 1000s delay.
+     *
+     * We configure that the vehicle should leave without the passenger if it waits
+     * longer than 500s. The late request will be rejected!
+     */
 
-		Controler controller = environment.build();
-		PrebookingParams parameters = PrebookingTest.installPrebooking(controller);
-		parameters.maximumPassengerDelay = 500.0;
-		controller.run();
+    PrebookingTestEnvironment environment =
+        new PrebookingTestEnvironment(utils) //
+            .addVehicle("vehicle", 1, 1) //
+            .addRequest("personOk", 0, 0, 5, 5, 2000.0, 0.0, 2000.0) //
+            .addRequest("personLate", 0, 0, 5, 5, 4000.0, 0.0, 2000.0) //
+            .configure(600.0, 1.3, 600.0, 60.0) //
+            .endTime(10.0 * 3600.0);
 
-		{
-			RequestInfo requestInfo = environment.getRequestInfo().get("personOk");
-			assertEquals(0.0, requestInfo.submissionTime, 1e-3);
-			assertEquals(2061.0, requestInfo.pickupTime, 1e-3);
-			assertEquals(2713.0, requestInfo.dropoffTime, 1e-3);
-		}
+    Controler controller = environment.build();
+    PrebookingParams parameters = PrebookingTest.installPrebooking(controller);
+    parameters.maximumPassengerDelay = 500.0;
+    controller.run();
 
-		{
-			RequestInfo requestInfo = environment.getRequestInfo().get("personLate");
-			assertEquals(0.0, requestInfo.submissionTimes.get(0), 1e-3);
-			// agent tries a non-prebooked request upon arrival
-			assertEquals(4000.0, requestInfo.submissionTimes.get(1), 1e-3);
-			assertTrue(requestInfo.rejected);
-		}
-	}
+    {
+      RequestInfo requestInfo = environment.getRequestInfo().get("personOk");
+      assertEquals(0.0, requestInfo.submissionTime, 1e-3);
+      assertEquals(2061.0, requestInfo.pickupTime, 1e-3);
+      assertEquals(2713.0, requestInfo.dropoffTime, 1e-3);
+    }
 
-	@Test
-	public void abandonThenImmediateTest() {
-		/*
-		 * One person requests to depart at 2000 and also is there at 2000. Another
-		 * person asks also to depart at 2000, but only arrives at 4000, i.e. the person
-		 * has 1000s delay.
-		 * 
-		 * We configure that the vehicle should leave without the passenger if it waits
-		 * longer than 500s. The person will, however, send a new request when arriving
-		 * at the departure point and get an immediate vehicle.
-		 */
+    {
+      RequestInfo requestInfo = environment.getRequestInfo().get("personLate");
+      assertEquals(0.0, requestInfo.submissionTimes.get(0), 1e-3);
+      // agent tries a non-prebooked request upon arrival
+      assertEquals(4000.0, requestInfo.submissionTimes.get(1), 1e-3);
+      assertTrue(requestInfo.rejected);
+    }
+  }
 
-		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.addVehicle("vehicle", 1, 1) //
-				.addVehicle("vehicle2", 1, 1) //
-				.addRequest("personOk", 0, 0, 5, 5, 2000.0, 0.0, 2000.0) //
-				.addRequest("personLate", 0, 0, 5, 5, 4000.0, 0.0, 2000.0) //
-				.configure(600.0, 1.3, 600.0, 60.0) //
-				.endTime(10.0 * 3600.0);
+  @Test
+  public void abandonThenImmediateTest() {
+    /*
+     * One person requests to depart at 2000 and also is there at 2000. Another
+     * person asks also to depart at 2000, but only arrives at 4000, i.e. the person
+     * has 1000s delay.
+     *
+     * We configure that the vehicle should leave without the passenger if it waits
+     * longer than 500s. The person will, however, send a new request when arriving
+     * at the departure point and get an immediate vehicle.
+     */
 
-		Controler controller = environment.build();
-		PrebookingParams parameters = PrebookingTest.installPrebooking(controller);
-		parameters.maximumPassengerDelay = 500.0;
-		controller.run();
+    PrebookingTestEnvironment environment =
+        new PrebookingTestEnvironment(utils) //
+            .addVehicle("vehicle", 1, 1) //
+            .addVehicle("vehicle2", 1, 1) //
+            .addRequest("personOk", 0, 0, 5, 5, 2000.0, 0.0, 2000.0) //
+            .addRequest("personLate", 0, 0, 5, 5, 4000.0, 0.0, 2000.0) //
+            .configure(600.0, 1.3, 600.0, 60.0) //
+            .endTime(10.0 * 3600.0);
 
-		{
-			RequestInfo requestInfo = environment.getRequestInfo().get("personOk");
-			assertEquals(0.0, requestInfo.submissionTime, 1e-3);
-			assertEquals(2061.0, requestInfo.pickupTime, 1e-3);
-			assertEquals(2713.0, requestInfo.dropoffTime, 1e-3);
-		}
+    Controler controller = environment.build();
+    PrebookingParams parameters = PrebookingTest.installPrebooking(controller);
+    parameters.maximumPassengerDelay = 500.0;
+    controller.run();
 
-		{
-			RequestInfo requestInfo = environment.getRequestInfo().get("personLate");
-			assertEquals(0.0, requestInfo.submissionTimes.get(0), 1e-3);
-			// agent tries a non-prebooked request upon arrival
-			assertEquals(4000.0, requestInfo.submissionTimes.get(1), 1e-3);
-			assertEquals(4146.0, requestInfo.pickupTime, 1e-3);
-			assertEquals(4357.0, requestInfo.dropoffTime, 1e-3);
-			assertTrue(requestInfo.rejected);
-		}
-	}
+    {
+      RequestInfo requestInfo = environment.getRequestInfo().get("personOk");
+      assertEquals(0.0, requestInfo.submissionTime, 1e-3);
+      assertEquals(2061.0, requestInfo.pickupTime, 1e-3);
+      assertEquals(2713.0, requestInfo.dropoffTime, 1e-3);
+    }
 
-	@Test
-	public void cancelEarlyTest() {
-		/*
-		 * One person requests to depart at 2000 and also is there at 2000. Another
-		 * person asks also to depart at 2000, but only arrives at 4000, i.e. the person
-		 * has 1000s delay.
-		 * 
-		 * In this test we manually cancel the second request at 500.0 (so before
-		 * departure of any agent).
-		 */
+    {
+      RequestInfo requestInfo = environment.getRequestInfo().get("personLate");
+      assertEquals(0.0, requestInfo.submissionTimes.get(0), 1e-3);
+      // agent tries a non-prebooked request upon arrival
+      assertEquals(4000.0, requestInfo.submissionTimes.get(1), 1e-3);
+      assertEquals(4146.0, requestInfo.pickupTime, 1e-3);
+      assertEquals(4357.0, requestInfo.dropoffTime, 1e-3);
+      assertTrue(requestInfo.rejected);
+    }
+  }
 
-		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.addVehicle("vehicle", 1, 1) //
-				.addRequest("personOk", 0, 0, 5, 5, 2000.0, 0.0, 2000.0) //
-				.addRequest("personLate", 0, 0, 5, 5, 4000.0, 0.0, 2000.0) //
-				.configure(600.0, 1.3, 600.0, 60.0) //
-				.endTime(10.0 * 3600.0);
+  @Test
+  public void cancelEarlyTest() {
+    /*
+     * One person requests to depart at 2000 and also is there at 2000. Another
+     * person asks also to depart at 2000, but only arrives at 4000, i.e. the person
+     * has 1000s delay.
+     *
+     * In this test we manually cancel the second request at 500.0 (so before
+     * departure of any agent).
+     */
 
-		Controler controller = environment.build();
-		PrebookingTest.installPrebooking(controller);
+    PrebookingTestEnvironment environment =
+        new PrebookingTestEnvironment(utils) //
+            .addVehicle("vehicle", 1, 1) //
+            .addRequest("personOk", 0, 0, 5, 5, 2000.0, 0.0, 2000.0) //
+            .addRequest("personLate", 0, 0, 5, 5, 4000.0, 0.0, 2000.0) //
+            .configure(600.0, 1.3, 600.0, 60.0) //
+            .endTime(10.0 * 3600.0);
 
-		controller.addOverridingQSimModule(new AbstractDvrpModeQSimModule("drt") {
-			@Override
-			protected void configureQSim() {
-				addModalQSimComponentBinding().toProvider(modalProvider(getter -> {
-					PrebookingManager prebookingManager = getter.getModal(PrebookingManager.class);
-					QSim qsim = getter.get(QSim.class);
+    Controler controller = environment.build();
+    PrebookingTest.installPrebooking(controller);
 
-					return new MobsimBeforeSimStepListener() {
-						@Override
-						public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
-							if (e.getSimulationTime() == 500.0) {
-								PlanAgent planAgent = (PlanAgent) qsim.getAgents()
-										.get(Id.createPersonId("personLate"));
-								
-								Leg leg = TripStructureUtils.getLegs(planAgent.getCurrentPlan()).get(1);
-								
-								prebookingManager.cancel(leg);
-							}
-						}
-					};
-				}));
-			}
-		});
+    controller.addOverridingQSimModule(
+        new AbstractDvrpModeQSimModule("drt") {
+          @Override
+          protected void configureQSim() {
+            addModalQSimComponentBinding()
+                .toProvider(
+                    modalProvider(
+                        getter -> {
+                          PrebookingManager prebookingManager =
+                              getter.getModal(PrebookingManager.class);
+                          QSim qsim = getter.get(QSim.class);
 
-		controller.run();
+                          return new MobsimBeforeSimStepListener() {
+                            @Override
+                            public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
+                              if (e.getSimulationTime() == 500.0) {
+                                PlanAgent planAgent =
+                                    (PlanAgent)
+                                        qsim.getAgents().get(Id.createPersonId("personLate"));
 
-		{
-			RequestInfo requestInfo = environment.getRequestInfo().get("personOk");
-			assertEquals(0.0, requestInfo.submissionTime, 1e-3);
-			assertEquals(2061.0, requestInfo.pickupTime, 1e-3);
-			assertEquals(2272.0, requestInfo.dropoffTime, 1e-3);
-		}
+                                Leg leg =
+                                    TripStructureUtils.getLegs(planAgent.getCurrentPlan()).get(1);
 
-		{
-			RequestInfo requestInfo = environment.getRequestInfo().get("personLate");
-			assertEquals(0.0, requestInfo.submissionTimes.get(0), 1e-3);
-			// agent tries a non-prebooked request upon arrival
-			assertEquals(4000.0, requestInfo.submissionTimes.get(1), 1e-3);
-			assertTrue(requestInfo.rejected);
-		}
-	}
-	
-	@Test
-	public void cancelLateTest() {
-		/*
-		 * One person requests to depart at 2000 and also is there at 2000. Another
-		 * person asks also to depart at 2000, but only arrives at 4000, i.e. the person
-		 * has 1000s delay.
-		 * 
-		 * In this test we manually cancel the second request at 3000.0 (so after
-		 * departure of the first agent).
-		 */
+                                prebookingManager.cancel(leg);
+                              }
+                            }
+                          };
+                        }));
+          }
+        });
 
-		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.addVehicle("vehicle", 1, 1) //
-				.addRequest("personOk", 0, 0, 5, 5, 2000.0, 0.0, 2000.0) //
-				.addRequest("personLate", 0, 0, 5, 5, 4000.0, 0.0, 2000.0) //
-				.configure(600.0, 1.3, 600.0, 60.0) //
-				.endTime(10.0 * 3600.0);
+    controller.run();
 
-		Controler controller = environment.build();
-		PrebookingTest.installPrebooking(controller);
+    {
+      RequestInfo requestInfo = environment.getRequestInfo().get("personOk");
+      assertEquals(0.0, requestInfo.submissionTime, 1e-3);
+      assertEquals(2061.0, requestInfo.pickupTime, 1e-3);
+      assertEquals(2272.0, requestInfo.dropoffTime, 1e-3);
+    }
 
-		controller.addOverridingQSimModule(new AbstractDvrpModeQSimModule("drt") {
-			@Override
-			protected void configureQSim() {
-				addModalQSimComponentBinding().toProvider(modalProvider(getter -> {
-					PrebookingManager prebookingManager = getter.getModal(PrebookingManager.class);
-					QSim qsim = getter.get(QSim.class);
+    {
+      RequestInfo requestInfo = environment.getRequestInfo().get("personLate");
+      assertEquals(0.0, requestInfo.submissionTimes.get(0), 1e-3);
+      // agent tries a non-prebooked request upon arrival
+      assertEquals(4000.0, requestInfo.submissionTimes.get(1), 1e-3);
+      assertTrue(requestInfo.rejected);
+    }
+  }
 
-					return new MobsimBeforeSimStepListener() {
-						@Override
-						public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
-							if (e.getSimulationTime() == 3000.0) {
-								PlanAgent planAgent = (PlanAgent) qsim.getAgents()
-										.get(Id.createPersonId("personLate"));
-								
-								Leg leg = TripStructureUtils.getLegs(planAgent.getCurrentPlan()).get(1);
-								
-								prebookingManager.cancel(leg);
-							}
-						}
-					};
-				}));
-			}
-		});
+  @Test
+  public void cancelLateTest() {
+    /*
+     * One person requests to depart at 2000 and also is there at 2000. Another
+     * person asks also to depart at 2000, but only arrives at 4000, i.e. the person
+     * has 1000s delay.
+     *
+     * In this test we manually cancel the second request at 3000.0 (so after
+     * departure of the first agent).
+     */
 
-		controller.run();
+    PrebookingTestEnvironment environment =
+        new PrebookingTestEnvironment(utils) //
+            .addVehicle("vehicle", 1, 1) //
+            .addRequest("personOk", 0, 0, 5, 5, 2000.0, 0.0, 2000.0) //
+            .addRequest("personLate", 0, 0, 5, 5, 4000.0, 0.0, 2000.0) //
+            .configure(600.0, 1.3, 600.0, 60.0) //
+            .endTime(10.0 * 3600.0);
 
-		{
-			RequestInfo requestInfo = environment.getRequestInfo().get("personOk");
-			assertEquals(0.0, requestInfo.submissionTime, 1e-3);
-			assertEquals(2061.0, requestInfo.pickupTime, 1e-3);
-			assertEquals(3212.0, requestInfo.dropoffTime, 1e-3); // still waited quite a bit
-		}
+    Controler controller = environment.build();
+    PrebookingTest.installPrebooking(controller);
 
-		{
-			RequestInfo requestInfo = environment.getRequestInfo().get("personLate");
-			assertEquals(0.0, requestInfo.submissionTimes.get(0), 1e-3);
-			// agent tries a non-prebooked request upon arrival
-			assertEquals(4000.0, requestInfo.submissionTimes.get(1), 1e-3);
-			assertTrue(requestInfo.rejected);
-		}
-	}
+    controller.addOverridingQSimModule(
+        new AbstractDvrpModeQSimModule("drt") {
+          @Override
+          protected void configureQSim() {
+            addModalQSimComponentBinding()
+                .toProvider(
+                    modalProvider(
+                        getter -> {
+                          PrebookingManager prebookingManager =
+                              getter.getModal(PrebookingManager.class);
+                          QSim qsim = getter.get(QSim.class);
+
+                          return new MobsimBeforeSimStepListener() {
+                            @Override
+                            public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
+                              if (e.getSimulationTime() == 3000.0) {
+                                PlanAgent planAgent =
+                                    (PlanAgent)
+                                        qsim.getAgents().get(Id.createPersonId("personLate"));
+
+                                Leg leg =
+                                    TripStructureUtils.getLegs(planAgent.getCurrentPlan()).get(1);
+
+                                prebookingManager.cancel(leg);
+                              }
+                            }
+                          };
+                        }));
+          }
+        });
+
+    controller.run();
+
+    {
+      RequestInfo requestInfo = environment.getRequestInfo().get("personOk");
+      assertEquals(0.0, requestInfo.submissionTime, 1e-3);
+      assertEquals(2061.0, requestInfo.pickupTime, 1e-3);
+      assertEquals(3212.0, requestInfo.dropoffTime, 1e-3); // still waited quite a bit
+    }
+
+    {
+      RequestInfo requestInfo = environment.getRequestInfo().get("personLate");
+      assertEquals(0.0, requestInfo.submissionTimes.get(0), 1e-3);
+      // agent tries a non-prebooked request upon arrival
+      assertEquals(4000.0, requestInfo.submissionTimes.get(1), 1e-3);
+      assertTrue(requestInfo.rejected);
+    }
+  }
 }

@@ -17,9 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
+/** */
 package org.matsim.contrib.accessibility;
 
 import org.matsim.api.core.v01.TransportMode;
@@ -31,34 +29,37 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * A simple cost calculator which only respects time to calculate generalized costs
- * This is based on org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility
+ * A simple cost calculator which only respects time to calculate generalized costs This is based on
+ * org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility
  *
  * @author mrieser, thomas
  */
-class TravelTimeBasedTravelDisutility implements TravelDisutility{
+class TravelTimeBasedTravelDisutility implements TravelDisutility {
 
-	protected final TravelTime timeCalculator;
-	private final double marginalCostOfTime;
+  protected final TravelTime timeCalculator;
+  private final double marginalCostOfTime;
 
-	public TravelTimeBasedTravelDisutility(final TravelTime timeCalculator, ScoringConfigGroup cnScoringGroup) {
-		this.timeCalculator = timeCalculator;
-		/* Usually, the travel-utility should be negative (it's a disutility)
-		 * but the cost should be positive. Thus negate the utility.
-		 */
-		this.marginalCostOfTime = (-cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
-	}
+  public TravelTimeBasedTravelDisutility(
+      final TravelTime timeCalculator, ScoringConfigGroup cnScoringGroup) {
+    this.timeCalculator = timeCalculator;
+    /* Usually, the travel-utility should be negative (it's a disutility)
+     * but the cost should be positive. Thus negate the utility.
+     */
+    this.marginalCostOfTime =
+        (-cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0)
+            + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
+  }
 
-	@Override
-	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
+  @Override
+  public double getLinkTravelDisutility(
+      final Link link, final double time, final Person person, final Vehicle vehicle) {
+    double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 
-		return this.marginalCostOfTime * travelTime;
-	}
+    return this.marginalCostOfTime * travelTime;
+  }
 
-	@Override
-	public double getLinkMinimumTravelDisutility(final Link link) {
-		return (link.getLength() / link.getFreespeed()) * this.marginalCostOfTime;
-	}
-
+  @Override
+  public double getLinkMinimumTravelDisutility(final Link link) {
+    return (link.getLength() / link.getFreespeed()) * this.marginalCostOfTime;
+  }
 }

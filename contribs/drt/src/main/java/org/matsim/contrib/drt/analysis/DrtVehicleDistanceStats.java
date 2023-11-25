@@ -17,15 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
+/** */
 package org.matsim.contrib.drt.analysis;
 
+import com.google.common.base.Preconditions;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -44,122 +42,133 @@ import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.common.base.Preconditions;
-
 /**
  * @author jbischoff
  * @author Michal Maciejewski
  */
 public class DrtVehicleDistanceStats
-		implements PassengerPickedUpEventHandler, LinkEnterEventHandler, PassengerDroppedOffEventHandler,
-		TeleportationArrivalEventHandler {
+    implements PassengerPickedUpEventHandler,
+        LinkEnterEventHandler,
+        PassengerDroppedOffEventHandler,
+        TeleportationArrivalEventHandler {
 
-	static class VehicleState {
-		final Map<Id<Person>, MutableDouble> distanceByPersonId = new HashMap<>();
-		double totalDistance = 0;
-		double totalOccupiedDistance = 0;
-		double totalPassengerTraveledDistance = 0; //in (passenger x meters)
-		final double[] totalDistanceByOccupancy;
-		final double serviceDuration;
+  static class VehicleState {
+    final Map<Id<Person>, MutableDouble> distanceByPersonId = new HashMap<>();
+    double totalDistance = 0;
+    double totalOccupiedDistance = 0;
+    double totalPassengerTraveledDistance = 0; // in (passenger x meters)
+    final double[] totalDistanceByOccupancy;
+    final double serviceDuration;
 
-		private VehicleState(int maxCapacity, double serviceTime) {
-			this.totalDistanceByOccupancy = new double[maxCapacity + 1];
-			this.serviceDuration = serviceTime;
-		}
+    private VehicleState(int maxCapacity, double serviceTime) {
+      this.totalDistanceByOccupancy = new double[maxCapacity + 1];
+      this.serviceDuration = serviceTime;
+    }
 
-		private void linkEntered(Link link) {
-			double linkLength = link.getLength();
-			distanceByPersonId.values().forEach(distance -> distance.add(linkLength));
-			totalDistance += linkLength;
-			int occupancy = distanceByPersonId.size();
-			if (occupancy > 0) {
-				totalOccupiedDistance += linkLength;
-				totalPassengerTraveledDistance += linkLength * occupancy;
-			}
-			totalDistanceByOccupancy[occupancy] += linkLength;
-		}
-	}
+    private void linkEntered(Link link) {
+      double linkLength = link.getLength();
+      distanceByPersonId.values().forEach(distance -> distance.add(linkLength));
+      totalDistance += linkLength;
+      int occupancy = distanceByPersonId.size();
+      if (occupancy > 0) {
+        totalOccupiedDistance += linkLength;
+        totalPassengerTraveledDistance += linkLength * occupancy;
+      }
+      totalDistanceByOccupancy[occupancy] += linkLength;
+    }
+  }
 
-	private final Map<Id<Vehicle>, VehicleState> vehicleStates = new HashMap<>();
-	private final Map<Id<Request>, Double> travelDistances = new HashMap<>();
+  private final Map<Id<Vehicle>, VehicleState> vehicleStates = new HashMap<>();
+  private final Map<Id<Request>, Double> travelDistances = new HashMap<>();
 
-	private final String mode;
-	private final Network network;
-	private final FleetSpecification fleetSpecification;
+  private final String mode;
+  private final Network network;
+  private final FleetSpecification fleetSpecification;
 
-	public DrtVehicleDistanceStats(Network network, DrtConfigGroup drtCfg, FleetSpecification fleetSpecification) {
-		this.mode = drtCfg.getMode();
-		this.network = network;
-		this.fleetSpecification = fleetSpecification;
-		initializeVehicles();
-	}
+  public DrtVehicleDistanceStats(
+      Network network, DrtConfigGroup drtCfg, FleetSpecification fleetSpecification) {
+    this.mode = drtCfg.getMode();
+    this.network = network;
+    this.fleetSpecification = fleetSpecification;
+    initializeVehicles();
+  }
 
-	@Override
-	public void reset(int iteration) {
-		vehicleStates.clear();
-		initializeVehicles();
-	}
+  @Override
+  public void reset(int iteration) {
+    vehicleStates.clear();
+    initializeVehicles();
+  }
 
-	private void initializeVehicles() {
-		int maxCapacity = DrtAnalysisControlerListener.findMaxVehicleCapacity(fleetSpecification);
-		fleetSpecification.getVehicleSpecifications()
-				.values()
-				.stream()
-				.forEach(spec -> vehicleStates.put(Id.createVehicleId(spec.getId()),
-					new VehicleState(maxCapacity, spec.getServiceEndTime() - spec.getServiceBeginTime())));
-	}
+  private void initializeVehicles() {
+    int maxCapacity = DrtAnalysisControlerListener.findMaxVehicleCapacity(fleetSpecification);
+    fleetSpecification.getVehicleSpecifications().values().stream()
+        .forEach(
+            spec ->
+                vehicleStates.put(
+                    Id.createVehicleId(spec.getId()),
+                    new VehicleState(
+                        maxCapacity, spec.getServiceEndTime() - spec.getServiceBeginTime())));
+  }
 
-	@Override
-	public void handleEvent(PassengerPickedUpEvent event) {
-		if (event.getMode().equals(mode)) {
-			if (event.getVehicleId() != null) {
-				vehicleStates.get(Id.createVehicleId(event.getVehicleId())).distanceByPersonId.put(event.getPersonId(),
-						new MutableDouble());
-			}
-		}
-	}
+  @Override
+  public void handleEvent(PassengerPickedUpEvent event) {
+    if (event.getMode().equals(mode)) {
+      if (event.getVehicleId() != null) {
+        vehicleStates
+            .get(Id.createVehicleId(event.getVehicleId()))
+            .distanceByPersonId
+            .put(event.getPersonId(), new MutableDouble());
+      }
+    }
+  }
 
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		VehicleState vehicleState = vehicleStates.get(event.getVehicleId());
-		if (vehicleState != null) {
-			vehicleState.linkEntered(network.getLinks().get(event.getLinkId()));
-		}
-	}
+  @Override
+  public void handleEvent(LinkEnterEvent event) {
+    VehicleState vehicleState = vehicleStates.get(event.getVehicleId());
+    if (vehicleState != null) {
+      vehicleState.linkEntered(network.getLinks().get(event.getLinkId()));
+    }
+  }
 
-	private final Map<Id<Person>, Id<Request>> soonArrivingTeleportedRequests = new HashMap<>();
+  private final Map<Id<Person>, Id<Request>> soonArrivingTeleportedRequests = new HashMap<>();
 
-	@Override
-	public void handleEvent(PassengerDroppedOffEvent event) {
-		if (event.getMode().equals(mode)) {
-			if (event.getVehicleId() != null) {
-				double distance = vehicleStates.get(Id.createVehicleId(event.getVehicleId())).distanceByPersonId.remove(
-						event.getPersonId()).doubleValue();
-				travelDistances.put(event.getRequestId(), distance);
-			} else {
-				Preconditions.checkArgument(
-						soonArrivingTeleportedRequests.put(event.getPersonId(), event.getRequestId()) == null,
-						"Duplicate entry for arriving passenger: (%s)", event.getPersonId());
-			}
-		}
-	}
+  @Override
+  public void handleEvent(PassengerDroppedOffEvent event) {
+    if (event.getMode().equals(mode)) {
+      if (event.getVehicleId() != null) {
+        double distance =
+            vehicleStates
+                .get(Id.createVehicleId(event.getVehicleId()))
+                .distanceByPersonId
+                .remove(event.getPersonId())
+                .doubleValue();
+        travelDistances.put(event.getRequestId(), distance);
+      } else {
+        Preconditions.checkArgument(
+            soonArrivingTeleportedRequests.put(event.getPersonId(), event.getRequestId()) == null,
+            "Duplicate entry for arriving passenger: (%s)",
+            event.getPersonId());
+      }
+    }
+  }
 
-	@Override
-	public void handleEvent(TeleportationArrivalEvent event) {
-		if (event.getMode().equals(mode)) {
-			Id<Request> requestId = Objects.requireNonNull(soonArrivingTeleportedRequests.remove(event.getPersonId()));
-			travelDistances.put(requestId, event.getDistance());
-		}
-	}
+  @Override
+  public void handleEvent(TeleportationArrivalEvent event) {
+    if (event.getMode().equals(mode)) {
+      Id<Request> requestId =
+          Objects.requireNonNull(soonArrivingTeleportedRequests.remove(event.getPersonId()));
+      travelDistances.put(requestId, event.getDistance());
+    }
+  }
 
-	/**
-	 * @return the vehicleDistances
-	 */
-	Map<Id<Vehicle>, VehicleState> getVehicleStates() {
-		return vehicleStates;
-	}
+  /**
+   * @return the vehicleDistances
+   */
+  Map<Id<Vehicle>, VehicleState> getVehicleStates() {
+    return vehicleStates;
+  }
 
-	Map<Id<Request>, Double> getTravelDistances() {
-		return travelDistances;
-	}
+  Map<Id<Request>, Double> getTravelDistances() {
+    return travelDistances;
+  }
 }

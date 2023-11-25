@@ -28,15 +28,16 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
  * @author Michal Maciejewski (michalm)
  */
 public interface RequestInsertionScheduler {
-	class PickupDropoffTaskPair {
-		public final DrtStopTask pickupTask;
-		public final DrtStopTask dropoffTask;
+  class PickupDropoffTaskPair {
+    public final DrtStopTask pickupTask;
+    public final DrtStopTask dropoffTask;
 
-		public PickupDropoffTaskPair(DrtStopTask pickupTask, DrtStopTask dropoffTask) {
-			this.pickupTask = pickupTask;
-			this.dropoffTask = dropoffTask;
-		}
-	}
+    public PickupDropoffTaskPair(DrtStopTask pickupTask, DrtStopTask dropoffTask) {
+      this.pickupTask = pickupTask;
+      this.dropoffTask = dropoffTask;
+    }
+  }
 
-	PickupDropoffTaskPair scheduleRequest(AcceptedDrtRequest request, InsertionWithDetourData insertion);
+  PickupDropoffTaskPair scheduleRequest(
+      AcceptedDrtRequest request, InsertionWithDetourData insertion);
 }

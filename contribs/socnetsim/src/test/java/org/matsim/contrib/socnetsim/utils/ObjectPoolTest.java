@@ -19,45 +19,36 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.utils;
 
-import org.junit.Test;
-
 import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 /**
  * @author thibautd
  */
 public class ObjectPoolTest {
-	@Test
-	public void testInstanceIsPooled() throws Exception {
-		final ObjectPool<String> pool = new ObjectPool<String>();
+  @Test
+  public void testInstanceIsPooled() throws Exception {
+    final ObjectPool<String> pool = new ObjectPool<String>();
 
-		final String instance1 = new String( "jojo" );
-		final String instance2 = new String( "jojo" );
-		final String instance3 = new String( "jojo" );
+    final String instance1 = new String("jojo");
+    final String instance2 = new String("jojo");
+    final String instance3 = new String("jojo");
 
-		assertTrue("the two variables should be different objects", instance1 != instance2);
-		
-		assertSame(
-				"first instance not returned when pooled",
-				instance1,
-				pool.getPooledInstance( instance1 ));
+    assertTrue("the two variables should be different objects", instance1 != instance2);
 
-		assertNotSame(
-				"second instance returned instead of first",
-				instance2,
-				pool.getPooledInstance( instance2 ));
+    assertSame(
+        "first instance not returned when pooled", instance1, pool.getPooledInstance(instance1));
 
-		assertSame(
-				"first instance not returned while pooled",
-				instance1,
-				pool.getPooledInstance( instance2 ));
+    assertNotSame(
+        "second instance returned instead of first", instance2, pool.getPooledInstance(instance2));
 
-		assertSame(
-				"first instance not returned while pooled",
-				instance1,
-				pool.getPooledInstance( instance3 ));
-	}
+    assertSame(
+        "first instance not returned while pooled", instance1, pool.getPooledInstance(instance2));
 
-	// TODO test forgetting
+    assertSame(
+        "first instance not returned while pooled", instance1, pool.getPooledInstance(instance3));
+  }
+
+  // TODO test forgetting
 }
-

@@ -24,7 +24,6 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
 import java.util.Map;
 import java.util.stream.Stream;
-
 import org.matsim.contrib.dvrp.util.DvrpEventsReaders;
 import org.matsim.contrib.etaxi.ETaxiChargingTask;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
@@ -39,17 +38,23 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.MatsimEventsReader.CustomEventMapper;
 
 public final class TaxiEventsReaders {
-	public static final Map<String, TaxiTaskType> TASK_TYPE_MAP = //
-			Stream.of(TaxiEmptyDriveTask.TYPE, TaxiPickupTask.TYPE, TaxiOccupiedDriveTask.TYPE, TaxiDropoffTask.TYPE,
-							TaxiStayTask.TYPE, ETaxiScheduler.DRIVE_TO_CHARGER, ETaxiChargingTask.TYPE)//
-					.collect(toImmutableMap(TaxiTaskType::name, type -> type));
+  public static final Map<String, TaxiTaskType> TASK_TYPE_MAP = //
+      Stream.of(
+              TaxiEmptyDriveTask.TYPE,
+              TaxiPickupTask.TYPE,
+              TaxiOccupiedDriveTask.TYPE,
+              TaxiDropoffTask.TYPE,
+              TaxiStayTask.TYPE,
+              ETaxiScheduler.DRIVE_TO_CHARGER,
+              ETaxiChargingTask.TYPE) //
+          .collect(toImmutableMap(TaxiTaskType::name, type -> type));
 
-	public static final Map<String, CustomEventMapper> CUSTOM_EVENT_MAPPERS = DvrpEventsReaders.createCustomEventMappers(
-			TASK_TYPE_MAP::get);
+  public static final Map<String, CustomEventMapper> CUSTOM_EVENT_MAPPERS =
+      DvrpEventsReaders.createCustomEventMappers(TASK_TYPE_MAP::get);
 
-	public static MatsimEventsReader createEventsReader(EventsManager eventsManager) {
-		MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
-		CUSTOM_EVENT_MAPPERS.forEach(reader::addCustomEventMapper);
-		return reader;
-	}
+  public static MatsimEventsReader createEventsReader(EventsManager eventsManager) {
+    MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
+    CUSTOM_EVENT_MAPPERS.forEach(reader::addCustomEventMapper);
+    return reader;
+  }
 }

@@ -20,7 +20,6 @@
 package org.matsim.contrib.zone;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -28,21 +27,21 @@ import org.matsim.contrib.zone.util.NetworkWithZonesUtils;
 import org.matsim.contrib.zone.util.ZoneFinder;
 
 public class ZonalSystemImpl implements ZonalSystem {
-	private final Map<Id<Zone>, Zone> zones;
-	private final Map<Id<Node>, Zone> nodeToZoneMap;
+  private final Map<Id<Zone>, Zone> zones;
+  private final Map<Id<Node>, Zone> nodeToZoneMap;
 
-	public ZonalSystemImpl(Map<Id<Zone>, Zone> zones, ZoneFinder zoneFinder, Network network) {
-		this.zones = zones;
-		nodeToZoneMap = NetworkWithZonesUtils.createNodeToZoneMap(network, zoneFinder);
-	}
+  public ZonalSystemImpl(Map<Id<Zone>, Zone> zones, ZoneFinder zoneFinder, Network network) {
+    this.zones = zones;
+    nodeToZoneMap = NetworkWithZonesUtils.createNodeToZoneMap(network, zoneFinder);
+  }
 
-	@Override
-	public Map<Id<Zone>, Zone> getZones() {
-		return zones;
-	}
+  @Override
+  public Map<Id<Zone>, Zone> getZones() {
+    return zones;
+  }
 
-	@Override
-	public Zone getZone(Node node) {
-		return nodeToZoneMap.get(node.getId());
-	}
+  @Override
+  public Zone getZone(Node node) {
+    return nodeToZoneMap.get(node.getId());
+  }
 }

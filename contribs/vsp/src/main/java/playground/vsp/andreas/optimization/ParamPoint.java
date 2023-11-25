@@ -20,83 +20,80 @@
 
 package playground.vsp.andreas.optimization;
 
-import org.matsim.core.gbl.Gbl;
-
 /**
- * An implementation of a multidimensional point. The dimension can be freely 
- * chosen when instantiating an object, but cannot be altered afterwards.
- * Division is not supplied, use multiply with factor `1 / divisor' instead ;-)
+ * An implementation of a multidimensional point. The dimension can be freely chosen when
+ * instantiating an object, but cannot be altered afterwards. Division is not supplied, use multiply
+ * with factor `1 / divisor' instead ;-)
  */
 public class ParamPoint {
-	final private int dimension;
-	final private double[] values;
-	
-	public ParamPoint(int dimension) {
-		this.dimension = dimension;
-		this.values = new double[dimension];
-	}
-	
-	public int getDimension() {
-		return this.dimension;
-	}
-	
-	public void setValue(int idx, double value) {
-		this.values[idx] = value;
-	}
+  private final int dimension;
+  private final double[] values;
 
-	public double getValue(int idx) {
-		return this.values[idx];
-	}
+  public ParamPoint(int dimension) {
+    this.dimension = dimension;
+    this.values = new double[dimension];
+  }
 
-	public static ParamPoint add(ParamPoint p1, ParamPoint p2) {
-		int dimension = p1.getDimension();
-		if (p2.getDimension() != dimension) {
-			throw new RuntimeException("p1 and p2 have different dimensions.");
-		}
-		ParamPoint result = new ParamPoint(dimension);
-		for (int i = 0; i < dimension; i++) {
-			double value = p1.getValue(i) + p2.getValue(i);
-			result.setValue(i, value);
-		}
-		return result;
-	}
-	
-	public static ParamPoint subtract(ParamPoint p1, ParamPoint p2) {
-		int dimension = p1.getDimension();
-		if (p2.getDimension() != dimension) {
-			throw new RuntimeException("p1 and p2 have different dimensions.");
-		}
-		ParamPoint result = new ParamPoint(dimension);
-		for (int i = 0; i < dimension; i++) {
-			double value = p1.getValue(i) - p2.getValue(i);
-			result.setValue(i, value);
-		}
-		return result;
-	}
-	
-	public static ParamPoint multiply(ParamPoint p1, double factor) {
-		int dimension = p1.getDimension();
-		ParamPoint result = new ParamPoint(dimension);
-		for (int i = 0; i < dimension; i++) {
-			double value = p1.getValue(i) * factor;
-			result.setValue(i, value);
-		}
-		return result;
-	}
-	
-	@Override
-	public String toString() {
-		StringBuilder result = new StringBuilder();
-		result.append("[dimension=");
-		result.append(dimension);
-		result.append("][values={");
-		result.append(values[0]);
-		for (int i = 1; i < dimension; i++) {
-			result.append(",");
-			result.append(values[i]);
-		}
-		result.append("}]");
-		return result.toString();
-	}
+  public int getDimension() {
+    return this.dimension;
+  }
 
+  public void setValue(int idx, double value) {
+    this.values[idx] = value;
+  }
+
+  public double getValue(int idx) {
+    return this.values[idx];
+  }
+
+  public static ParamPoint add(ParamPoint p1, ParamPoint p2) {
+    int dimension = p1.getDimension();
+    if (p2.getDimension() != dimension) {
+      throw new RuntimeException("p1 and p2 have different dimensions.");
+    }
+    ParamPoint result = new ParamPoint(dimension);
+    for (int i = 0; i < dimension; i++) {
+      double value = p1.getValue(i) + p2.getValue(i);
+      result.setValue(i, value);
+    }
+    return result;
+  }
+
+  public static ParamPoint subtract(ParamPoint p1, ParamPoint p2) {
+    int dimension = p1.getDimension();
+    if (p2.getDimension() != dimension) {
+      throw new RuntimeException("p1 and p2 have different dimensions.");
+    }
+    ParamPoint result = new ParamPoint(dimension);
+    for (int i = 0; i < dimension; i++) {
+      double value = p1.getValue(i) - p2.getValue(i);
+      result.setValue(i, value);
+    }
+    return result;
+  }
+
+  public static ParamPoint multiply(ParamPoint p1, double factor) {
+    int dimension = p1.getDimension();
+    ParamPoint result = new ParamPoint(dimension);
+    for (int i = 0; i < dimension; i++) {
+      double value = p1.getValue(i) * factor;
+      result.setValue(i, value);
+    }
+    return result;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder result = new StringBuilder();
+    result.append("[dimension=");
+    result.append(dimension);
+    result.append("][values={");
+    result.append(values[0]);
+    for (int i = 1; i < dimension; i++) {
+      result.append(",");
+      result.append(values[i]);
+    }
+    result.append("}]");
+    return result.toString();
+  }
 }

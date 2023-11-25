@@ -3,5 +3,5 @@ package org.matsim.contrib.ev.charging;
 import org.matsim.core.events.handler.EventHandler;
 
 public interface ChargingStartEventHandler extends EventHandler {
-    void handleEvent(ChargingStartEvent event);
+  void handleEvent(ChargingStartEvent event);
 }

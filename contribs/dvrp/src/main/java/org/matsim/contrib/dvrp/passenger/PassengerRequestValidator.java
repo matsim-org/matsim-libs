@@ -23,25 +23,26 @@ package org.matsim.contrib.dvrp.passenger;
 import java.util.Set;
 
 /**
- * Validates (for the optimizer), whether a PassengerRequest should be served or not (e.g. for limitations in business
- * area or distance or time)
+ * Validates (for the optimizer), whether a PassengerRequest should be served or not (e.g. for
+ * limitations in business area or distance or time)
  *
  * @author jbischoff
  * @author michalm (Michal Maciejewski)
  */
 public interface PassengerRequestValidator {
-	/**
-	 * Checks if the request can be served given some spatiotemporal (limited time and area of operations) or other
-	 * constraints.
-	 * <p>
-	 * Preferred format for causes: underscores instead of spaces.
-	 * <p>
-	 * Thread safety: This method can be called concurrently from multiple QSim worker threads.
-	 * Prefer stateless implementation, otherwise provide other ways to achieve thread-safety.
-	 *
-	 * @param request to be validated
-	 * @return set containing causes of constraint violations. An empty set means the request fulfills all
-	 * constraints and may be considered by the optimizer (although this does not guarantee it will get scheduled)
-	 */
-	Set<String> validateRequest(PassengerRequest request);
+  /**
+   * Checks if the request can be served given some spatiotemporal (limited time and area of
+   * operations) or other constraints.
+   *
+   * <p>Preferred format for causes: underscores instead of spaces.
+   *
+   * <p>Thread safety: This method can be called concurrently from multiple QSim worker threads.
+   * Prefer stateless implementation, otherwise provide other ways to achieve thread-safety.
+   *
+   * @param request to be validated
+   * @return set containing causes of constraint violations. An empty set means the request fulfills
+   *     all constraints and may be considered by the optimizer (although this does not guarantee it
+   *     will get scheduled)
+   */
+  Set<String> validateRequest(PassengerRequest request);
 }

@@ -18,8 +18,8 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -49,198 +49,230 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import java.util.*;
-
 /**
- * Tests that two persons can leave a link at the same time if flow capacity permits
- * In other words, test if qsim can handle capacity more than 3600 PCU/Hr.
- * If the flow capacity is 3601 PCU/Hr it will allow the two vehicles.
+ * Tests that two persons can leave a link at the same time if flow capacity permits In other words,
+ * test if qsim can handle capacity more than 3600 PCU/Hr. If the flow capacity is 3601 PCU/Hr it
+ * will allow the two vehicles.
  *
  * @author amit
  */
 public class FlowCapacityVariationTest {
-	
-	@Test
-	public void twoCarsLeavingTimes () {
-		vehiclesLeavingSameTime(TransportMode.car,3601);
-	}
 
-	@Test 
-	public void twoMotorbikesTravelTime(){
-		/* linkCapacity higher than 1PCU/sec*/
-		vehiclesLeavingSameTime("motorbike",3601);
-		
-		/*link capacuty higher than 1motorbike/sec = 0.25PCU/sec */
-		vehiclesLeavingSameTime("motorbike",1800);
-	}
-	
-	@Test 
-	public void twoBikesTravelTime(){
-		/* linkCapacity higher than 1PCU/sec */
-		vehiclesLeavingSameTime(TransportMode.bike,3601);
-				
-		/* link capacuty higher than 1motorbike/sec = 0.25PCU/sec */
-		vehiclesLeavingSameTime(TransportMode.bike,1800);
-	}
-	
-	private void vehiclesLeavingSameTime(String travelMode, double linkCapacity){
-		PseudoInputs net = new PseudoInputs(travelMode);
-		net.createNetwork(linkCapacity);
-		net.createPopulation();
+  @Test
+  public void twoCarsLeavingTimes() {
+    vehiclesLeavingSameTime(TransportMode.car, 3601);
+  }
 
-		Map<Id<Vehicle>, Map<Id<Link>, double[]>> vehicleLinkTravelTimes = new HashMap<>();
+  @Test
+  public void twoMotorbikesTravelTime() {
+    /* linkCapacity higher than 1PCU/sec*/
+    vehiclesLeavingSameTime("motorbike", 3601);
 
-		EventsManager manager = EventsUtils.createEventsManager();
-		manager.addHandler(new VehicleLinkTravelTimeEventHandler(vehicleLinkTravelTimes));
+    /*link capacuty higher than 1motorbike/sec = 0.25PCU/sec */
+    vehiclesLeavingSameTime("motorbike", 1800);
+  }
 
-		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario).run();
-		new QSimBuilder(net.scenario.getConfig()) //
-			.useDefaults() //
-			.build(net.scenario, manager) //
-			.run();
+  @Test
+  public void twoBikesTravelTime() {
+    /* linkCapacity higher than 1PCU/sec */
+    vehiclesLeavingSameTime(TransportMode.bike, 3601);
 
-		Map<Id<Link>, double[]> times1 = vehicleLinkTravelTimes.get(Id.create("1", Vehicle.class));
-		Map<Id<Link>, double[]> times2 = vehicleLinkTravelTimes.get(Id.create("2", Vehicle.class));
+    /* link capacuty higher than 1motorbike/sec = 0.25PCU/sec */
+    vehiclesLeavingSameTime(TransportMode.bike, 1800);
+  }
 
-		int linkEnterTime1 = (int)times1.get(Id.create("2", Link.class))[0]; 
-		int linkEnterTime2 = (int)times2.get(Id.create("2", Link.class))[0];
+  private void vehiclesLeavingSameTime(String travelMode, double linkCapacity) {
+    PseudoInputs net = new PseudoInputs(travelMode);
+    net.createNetwork(linkCapacity);
+    net.createPopulation();
 
-		int linkLeaveTime1 = (int)times1.get(Id.create("2", Link.class))[1]; 
-		int linkLeaveTime2 = (int)times2.get(Id.create("2", Link.class))[1];
+    Map<Id<Vehicle>, Map<Id<Link>, double[]>> vehicleLinkTravelTimes = new HashMap<>();
 
-		Assert.assertEquals(travelMode+ " entered at different time", 0, linkEnterTime1-linkEnterTime2);
-		Assert.assertEquals(travelMode +" entered at same time but not leaving the link at the same time.", 0, linkLeaveTime1-linkLeaveTime2);
-	}
-	
-	private static final class PseudoInputs{
+    EventsManager manager = EventsUtils.createEventsManager();
+    manager.addHandler(new VehicleLinkTravelTimeEventHandler(vehicleLinkTravelTimes));
 
-		final Config config;
-		final Scenario scenario ;
-		Network network;
-		final Population population;
-		Link link1;
-		Link link2;
-		Link link3;
-		private String travelMode;
+    PrepareForSimUtils.createDefaultPrepareForSim(net.scenario).run();
+    new QSimBuilder(net.scenario.getConfig()) //
+        .useDefaults() //
+        .build(net.scenario, manager) //
+        .run();
 
-		public PseudoInputs(String travelMode){
+    Map<Id<Link>, double[]> times1 = vehicleLinkTravelTimes.get(Id.create("1", Vehicle.class));
+    Map<Id<Link>, double[]> times2 = vehicleLinkTravelTimes.get(Id.create("2", Vehicle.class));
 
-			this.travelMode = travelMode;
-			
-			scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			config = scenario.getConfig();
-			config.qsim().setMainModes(Arrays.asList(travelMode));
-			config.qsim().setUsingFastCapacityUpdate(true);
+    int linkEnterTime1 = (int) times1.get(Id.create("2", Link.class))[0];
+    int linkEnterTime2 = (int) times2.get(Id.create("2", Link.class))[0];
 
-			population = scenario.getPopulation();
-		}
+    int linkLeaveTime1 = (int) times1.get(Id.create("2", Link.class))[1];
+    int linkLeaveTime2 = (int) times2.get(Id.create("2", Link.class))[1];
 
-		private void createNetwork(double linkCapacity){
+    Assert.assertEquals(
+        travelMode + " entered at different time", 0, linkEnterTime1 - linkEnterTime2);
+    Assert.assertEquals(
+        travelMode + " entered at same time but not leaving the link at the same time.",
+        0,
+        linkLeaveTime1 - linkLeaveTime2);
+  }
 
-			network = scenario.getNetwork();
+  private static final class PseudoInputs {
 
-			double x = -100.0;
-			Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(x, 0.0));
-			Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord(0.0, 0.0));
-			Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord(0.0, 1000.0));
-			Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord(0.0, 1100.0));
-			final Node fromNode = node1;
-			final Node toNode = node2;
+    final Config config;
+    final Scenario scenario;
+    Network network;
+    final Population population;
+    Link link1;
+    Link link2;
+    Link link3;
+    private String travelMode;
 
-			link1 = NetworkUtils.createAndAddLink(network, Id.create("1", Link.class), fromNode, toNode, 1000, 25, 7200, 1, null, "22");
-			final Node fromNode1 = node2;
-			final Node toNode1 = node3;
-			final double capacity = linkCapacity;
-			link2 = NetworkUtils.createAndAddLink(network, Id.create("2", Link.class), fromNode1, toNode1, 1000, 25, capacity, 1, null, "22");
-			final Node fromNode2 = node3;
-			final Node toNode2 = node4;
-			link3 = NetworkUtils.createAndAddLink(network, Id.create("3", Link.class), fromNode2, toNode2, 1000, 25, 7200, 1, null, "22");
+    public PseudoInputs(String travelMode) {
 
-		}
-		
-		private void createPopulation(){
+      this.travelMode = travelMode;
 
-			// Vehicles info			
-//			scenario.getConfig().qsim().setUseDefaultVehicles(false);
-			scenario.getConfig().qsim().setVehiclesSource( VehiclesSource.fromVehiclesData ) ;
+      scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+      config = scenario.getConfig();
+      config.qsim().setMainModes(Arrays.asList(travelMode));
+      config.qsim().setUsingFastCapacityUpdate(true);
 
-			VehicleType vt = VehicleUtils.getFactory().createVehicleType(Id.create(travelMode, VehicleType.class));
-			vt.setMaximumVelocity(travelMode == "bike" ? 5.0 : 20.0 );
-			vt.setPcuEquivalents(travelMode == "car" ? 1.0 : 0.25);
-			scenario.getVehicles().addVehicleType(vt);
+      population = scenario.getPopulation();
+    }
 
-			for(int i=1;i<3;i++){
-				Id<Person> id = Id.createPersonId(i);
-				Person p = population.getFactory().createPerson(id);
-				Plan plan = population.getFactory().createPlan();
-				p.addPlan(plan);
-				Activity a1 = population.getFactory().createActivityFromLinkId("h", link1.getId());
+    private void createNetwork(double linkCapacity) {
 
-				a1.setEndTime(0 * 3600);
-				Leg leg = population.getFactory().createLeg(travelMode);
-				plan.addActivity(a1);
-				plan.addLeg(leg);
-				LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
-				NetworkRoute route;
-				List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-				route = (NetworkRoute) factory.createRoute(link1.getId(), link3.getId());
-				linkIds.add(link2.getId());
-				route.setLinkIds(link1.getId(), linkIds, link3.getId());
-				leg.setRoute(route);
+      network = scenario.getNetwork();
 
-				Activity a2 = population.getFactory().createActivityFromLinkId("w", link3.getId());
-				plan.addActivity(a2);
-				population.addPerson(p);
+      double x = -100.0;
+      Node node1 =
+          NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(x, 0.0));
+      Node node2 =
+          NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord(0.0, 0.0));
+      Node node3 =
+          NetworkUtils.createAndAddNode(
+              network, Id.create("3", Node.class), new Coord(0.0, 1000.0));
+      Node node4 =
+          NetworkUtils.createAndAddNode(
+              network, Id.create("4", Node.class), new Coord(0.0, 1100.0));
+      final Node fromNode = node1;
+      final Node toNode = node2;
 
-				Id<Vehicle> vehId = Id.create(i, Vehicle.class);
-				VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(travelMode, vehId));
-				Vehicle veh = VehicleUtils.getFactory().createVehicle(vehId, vt);
-				scenario.getVehicles().addVehicle(veh);
-			}
-		}
+      link1 =
+          NetworkUtils.createAndAddLink(
+              network, Id.create("1", Link.class), fromNode, toNode, 1000, 25, 7200, 1, null, "22");
+      final Node fromNode1 = node2;
+      final Node toNode1 = node3;
+      final double capacity = linkCapacity;
+      link2 =
+          NetworkUtils.createAndAddLink(
+              network,
+              Id.create("2", Link.class),
+              fromNode1,
+              toNode1,
+              1000,
+              25,
+              capacity,
+              1,
+              null,
+              "22");
+      final Node fromNode2 = node3;
+      final Node toNode2 = node4;
+      link3 =
+          NetworkUtils.createAndAddLink(
+              network,
+              Id.create("3", Link.class),
+              fromNode2,
+              toNode2,
+              1000,
+              25,
+              7200,
+              1,
+              null,
+              "22");
+    }
 
-	}
+    private void createPopulation() {
 
-	private static class VehicleLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
+      // Vehicles info
+      //			scenario.getConfig().qsim().setUseDefaultVehicles(false);
+      scenario.getConfig().qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
-		private final Map<Id<Vehicle>, Map<Id<Link>, double[]>> vehicleLinkEnterLeaveTimes;
+      VehicleType vt =
+          VehicleUtils.getFactory().createVehicleType(Id.create(travelMode, VehicleType.class));
+      vt.setMaximumVelocity(travelMode == "bike" ? 5.0 : 20.0);
+      vt.setPcuEquivalents(travelMode == "car" ? 1.0 : 0.25);
+      scenario.getVehicles().addVehicleType(vt);
 
-		public VehicleLinkTravelTimeEventHandler(Map<Id<Vehicle>, Map<Id<Link>, double[]>> agentLinkEnterLeaveTimes) {
-			this.vehicleLinkEnterLeaveTimes = agentLinkEnterLeaveTimes;
-		}
+      for (int i = 1; i < 3; i++) {
+        Id<Person> id = Id.createPersonId(i);
+        Person p = population.getFactory().createPerson(id);
+        Plan plan = population.getFactory().createPlan();
+        p.addPlan(plan);
+        Activity a1 = population.getFactory().createActivityFromLinkId("h", link1.getId());
 
-		@Override
-		public void handleEvent(LinkEnterEvent event) {
-			LogManager.getLogger(VehicleLinkTravelTimeEventHandler.class).info(event.toString());
-			Map<Id<Link>, double[]> times = this.vehicleLinkEnterLeaveTimes.get(event.getVehicleId());
-			if (times == null) {
-				times = new HashMap<>();
-				double [] linkEnterLeaveTime = {Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY};
-				times.put(event.getLinkId(), linkEnterLeaveTime);
-				this.vehicleLinkEnterLeaveTimes.put(event.getVehicleId(), times);
-			}
-			double linkLeaveTime;
-			if(times.get(event.getLinkId())!=null){
-				linkLeaveTime = times.get(event.getLinkId())[1];
-			} else linkLeaveTime = Double.POSITIVE_INFINITY;
+        a1.setEndTime(0 * 3600);
+        Leg leg = population.getFactory().createLeg(travelMode);
+        plan.addActivity(a1);
+        plan.addLeg(leg);
+        LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
+        NetworkRoute route;
+        List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+        route = (NetworkRoute) factory.createRoute(link1.getId(), link3.getId());
+        linkIds.add(link2.getId());
+        route.setLinkIds(link1.getId(), linkIds, link3.getId());
+        leg.setRoute(route);
 
-			double [] linkEnterTime = {event.getTime(),linkLeaveTime};
-			times.put(event.getLinkId(), linkEnterTime);
-		}
+        Activity a2 = population.getFactory().createActivityFromLinkId("w", link3.getId());
+        plan.addActivity(a2);
+        population.addPerson(p);
 
-		@Override
-		public void handleEvent(LinkLeaveEvent event) {
-			LogManager.getLogger(VehicleLinkTravelTimeEventHandler.class).info(event.toString());
-			Map<Id<Link>, double[]> times = this.vehicleLinkEnterLeaveTimes.get(event.getVehicleId());
-			if (times != null) {
-				double linkEnterTime = times.get(event.getLinkId())[0];
-				double [] linkEnterLeaveTime = {linkEnterTime,event.getTime()};
-				times.put(event.getLinkId(), linkEnterLeaveTime);
-			}
-		}
+        Id<Vehicle> vehId = Id.create(i, Vehicle.class);
+        VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(travelMode, vehId));
+        Vehicle veh = VehicleUtils.getFactory().createVehicle(vehId, vt);
+        scenario.getVehicles().addVehicle(veh);
+      }
+    }
+  }
 
-		@Override
-		public void reset(int iteration) {
-		}
-	}
+  private static class VehicleLinkTravelTimeEventHandler
+      implements LinkEnterEventHandler, LinkLeaveEventHandler {
+
+    private final Map<Id<Vehicle>, Map<Id<Link>, double[]>> vehicleLinkEnterLeaveTimes;
+
+    public VehicleLinkTravelTimeEventHandler(
+        Map<Id<Vehicle>, Map<Id<Link>, double[]>> agentLinkEnterLeaveTimes) {
+      this.vehicleLinkEnterLeaveTimes = agentLinkEnterLeaveTimes;
+    }
+
+    @Override
+    public void handleEvent(LinkEnterEvent event) {
+      LogManager.getLogger(VehicleLinkTravelTimeEventHandler.class).info(event.toString());
+      Map<Id<Link>, double[]> times = this.vehicleLinkEnterLeaveTimes.get(event.getVehicleId());
+      if (times == null) {
+        times = new HashMap<>();
+        double[] linkEnterLeaveTime = {Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY};
+        times.put(event.getLinkId(), linkEnterLeaveTime);
+        this.vehicleLinkEnterLeaveTimes.put(event.getVehicleId(), times);
+      }
+      double linkLeaveTime;
+      if (times.get(event.getLinkId()) != null) {
+        linkLeaveTime = times.get(event.getLinkId())[1];
+      } else linkLeaveTime = Double.POSITIVE_INFINITY;
+
+      double[] linkEnterTime = {event.getTime(), linkLeaveTime};
+      times.put(event.getLinkId(), linkEnterTime);
+    }
+
+    @Override
+    public void handleEvent(LinkLeaveEvent event) {
+      LogManager.getLogger(VehicleLinkTravelTimeEventHandler.class).info(event.toString());
+      Map<Id<Link>, double[]> times = this.vehicleLinkEnterLeaveTimes.get(event.getVehicleId());
+      if (times != null) {
+        double linkEnterTime = times.get(event.getLinkId())[0];
+        double[] linkEnterLeaveTime = {linkEnterTime, event.getTime()};
+        times.put(event.getLinkId(), linkEnterLeaveTime);
+      }
+    }
+
+    @Override
+    public void reset(int iteration) {}
+  }
 }

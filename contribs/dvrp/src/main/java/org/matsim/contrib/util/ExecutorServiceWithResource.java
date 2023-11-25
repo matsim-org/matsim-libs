@@ -18,6 +18,7 @@
 
 package org.matsim.contrib.util;
 
+import com.google.common.util.concurrent.Futures;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -28,62 +29,62 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.google.common.util.concurrent.Futures;
-
 /**
  * @author michalm
  */
 public class ExecutorServiceWithResource<R> {
-	public interface CallableWithResource<V, R> {
-		V call(R resource) throws Exception;
-	}
+  public interface CallableWithResource<V, R> {
+    V call(R resource) throws Exception;
+  }
 
-	public interface RunnableWithResource<R> {
-		void run(R resource);
-	}
+  public interface RunnableWithResource<R> {
+    void run(R resource);
+  }
 
-	private final BlockingQueue<R> resourceQueue = new LinkedBlockingQueue<>();
-	private final ExecutorService executorService;
+  private final BlockingQueue<R> resourceQueue = new LinkedBlockingQueue<>();
+  private final ExecutorService executorService;
 
-	public ExecutorServiceWithResource(Collection<R> resources) {
-		resourceQueue.addAll(resources);
-		executorService = Executors.newFixedThreadPool(resourceQueue.size());
-	}
+  public ExecutorServiceWithResource(Collection<R> resources) {
+    resourceQueue.addAll(resources);
+    executorService = Executors.newFixedThreadPool(resourceQueue.size());
+  }
 
-	public <V> Future<V> submitCallable(CallableWithResource<V, R> task) {
-		return executorService.submit(() -> {
-			R resource = resourceQueue.remove();
-			V value = task.call(resource);
-			resourceQueue.add(resource);
-			return value;
-		});
-	}
+  public <V> Future<V> submitCallable(CallableWithResource<V, R> task) {
+    return executorService.submit(
+        () -> {
+          R resource = resourceQueue.remove();
+          V value = task.call(resource);
+          resourceQueue.add(resource);
+          return value;
+        });
+  }
 
-	public <V> List<Future<V>> submitCallables(Stream<CallableWithResource<V, R>> tasks) {
-		return tasks.map(this::submitCallable).collect(Collectors.toList());
-	}
+  public <V> List<Future<V>> submitCallables(Stream<CallableWithResource<V, R>> tasks) {
+    return tasks.map(this::submitCallable).collect(Collectors.toList());
+  }
 
-	public <V> List<V> submitCallablesAndGetResults(Stream<CallableWithResource<V, R>> tasks) {
-		return submitCallables(tasks).stream().map(Futures::getUnchecked).collect(Collectors.toList());
-	}
+  public <V> List<V> submitCallablesAndGetResults(Stream<CallableWithResource<V, R>> tasks) {
+    return submitCallables(tasks).stream().map(Futures::getUnchecked).collect(Collectors.toList());
+  }
 
-	public Future<?> submitRunnable(RunnableWithResource<R> task) {
-		return executorService.submit(() -> {
-			R resource = resourceQueue.remove();
-			task.run(resource);
-			resourceQueue.add(resource);
-		});
-	}
+  public Future<?> submitRunnable(RunnableWithResource<R> task) {
+    return executorService.submit(
+        () -> {
+          R resource = resourceQueue.remove();
+          task.run(resource);
+          resourceQueue.add(resource);
+        });
+  }
 
-	public List<Future<?>> submitRunnables(Stream<RunnableWithResource<R>> tasks) {
-		return tasks.map(this::submitRunnable).collect(Collectors.toList());
-	}
+  public List<Future<?>> submitRunnables(Stream<RunnableWithResource<R>> tasks) {
+    return tasks.map(this::submitRunnable).collect(Collectors.toList());
+  }
 
-	public void submitRunnablesAndWait(Stream<RunnableWithResource<R>> tasks) {
-		submitRunnables(tasks).forEach(Futures::getUnchecked);
-	}
+  public void submitRunnablesAndWait(Stream<RunnableWithResource<R>> tasks) {
+    submitRunnables(tasks).forEach(Futures::getUnchecked);
+  }
 
-	public void shutdown() {
-		executorService.shutdown();
-	}
+  public void shutdown() {
+    executorService.shutdown();
+  }
 }

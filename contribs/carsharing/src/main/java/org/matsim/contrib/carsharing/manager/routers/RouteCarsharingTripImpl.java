@@ -1,10 +1,11 @@
 package org.matsim.contrib.carsharing.manager.routers;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -24,109 +25,144 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
 /**
  * @author balac
  */
 public class RouteCarsharingTripImpl implements RouteCarsharingTrip {
 
-	@Inject
-	private Scenario scenario;
-	@Inject
-	private LeastCostPathCalculatorFactory pathCalculatorFactory;
+  @Inject private Scenario scenario;
+  @Inject private LeastCostPathCalculatorFactory pathCalculatorFactory;
 
-	@Inject
-	@Named("ff")
-	private TravelTime travelTimes;
-	@Inject
-	private Map<String, TravelDisutilityFactory> travelDisutilityFactories;
+  @Inject
+  @Named("ff")
+  private TravelTime travelTimes;
 
-	@Inject
-	@Named("carnetwork")
-	private Network networkFF;
+  @Inject private Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 
-	private final ArrayList<String> carsharingLegs = new ArrayList<>(Arrays.asList("oneway", "twoway", "freefloating"));
+  @Inject
+  @Named("carnetwork")
+  private Network networkFF;
 
-	private final String[] carsharingVehicleLegs = { "oneway_vehicle", "twoway_vehicle", "freefloating_vehicle" };
-	private final String[] accessCSLegs = { "access_walk_ow", "access_walk_tw", "access_walk_ff" };
+  private final ArrayList<String> carsharingLegs =
+      new ArrayList<>(Arrays.asList("oneway", "twoway", "freefloating"));
 
-	private final String[] egressCSLegs = { "egress_walk_ow", "egress_walk_tw", "egress_walk_ff" };
+  private final String[] carsharingVehicleLegs = {
+    "oneway_vehicle", "twoway_vehicle", "freefloating_vehicle"
+  };
+  private final String[] accessCSLegs = {"access_walk_ow", "access_walk_tw", "access_walk_ff"};
 
-	@Override
-	public List<PlanElement> routeCarsharingTrip(Plan plan, Leg legToBeRouted, double time, CSVehicle vehicle,
-			Link vehicleLinkLocation, Link parkingLocation, boolean keepTheCarForLaterUse, boolean hasVehicle) {
-		PopulationFactory pf = scenario.getPopulation().getFactory();
+  private final String[] egressCSLegs = {"egress_walk_ow", "egress_walk_tw", "egress_walk_ff"};
 
-		TravelDisutility travelDisutility = travelDisutilityFactories.get(TransportMode.car)
-				.createTravelDisutility(travelTimes);
-		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(networkFF, travelDisutility,
-				travelTimes);
+  @Override
+  public List<PlanElement> routeCarsharingTrip(
+      Plan plan,
+      Leg legToBeRouted,
+      double time,
+      CSVehicle vehicle,
+      Link vehicleLinkLocation,
+      Link parkingLocation,
+      boolean keepTheCarForLaterUse,
+      boolean hasVehicle) {
+    PopulationFactory pf = scenario.getPopulation().getFactory();
 
-		String mainMode = legToBeRouted.getMode();
-		int index = carsharingLegs.indexOf(mainMode);
-		final List<PlanElement> trip = new ArrayList<PlanElement>();
+    TravelDisutility travelDisutility =
+        travelDisutilityFactories.get(TransportMode.car).createTravelDisutility(travelTimes);
+    LeastCostPathCalculator pathCalculator =
+        pathCalculatorFactory.createPathCalculator(networkFF, travelDisutility, travelTimes);
 
-		Person person = plan.getPerson();
-		CarsharingRoute route = (CarsharingRoute) legToBeRouted.getRoute();
-		final Link currentLink = networkFF.getLinks().get(route.getStartLinkId());
-		final Link destinationLink = networkFF.getLinks().get(route.getEndLinkId());
+    String mainMode = legToBeRouted.getMode();
+    int index = carsharingLegs.indexOf(mainMode);
+    final List<PlanElement> trip = new ArrayList<PlanElement>();
 
-		if (hasVehicle) {
-			// === car leg
+    Person person = plan.getPerson();
+    CarsharingRoute route = (CarsharingRoute) legToBeRouted.getRoute();
+    final Link currentLink = networkFF.getLinks().get(route.getStartLinkId());
+    final Link destinationLink = networkFF.getLinks().get(route.getEndLinkId());
 
-			trip.add(RouterUtils.createCarLeg(pf, pathCalculator, person,
-					this.networkFF.getLinks().get(currentLink.getId()),
-					this.networkFF.getLinks().get(parkingLocation.getId()), carsharingVehicleLegs[index],
-					vehicle.getVehicleId(), time));
+    if (hasVehicle) {
+      // === car leg
 
-			if (!keepTheCarForLaterUse) {
+      trip.add(
+          RouterUtils.createCarLeg(
+              pf,
+              pathCalculator,
+              person,
+              this.networkFF.getLinks().get(currentLink.getId()),
+              this.networkFF.getLinks().get(parkingLocation.getId()),
+              carsharingVehicleLegs[index],
+              vehicle.getVehicleId(),
+              time));
 
-				Activity activityE = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null,
-						parkingLocation.getId(), mainMode);
-//				activityE.setMaximumDuration(0); // obsolete since this is hard-coded in InteractionActivity
+      if (!keepTheCarForLaterUse) {
 
-				trip.add(activityE);
+        Activity activityE =
+            PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(
+                null, parkingLocation.getId(), mainMode);
+        //				activityE.setMaximumDuration(0); // obsolete since this is hard-coded in
+        // InteractionActivity
 
-				trip.add(RouterUtils.createWalkLeg(pf, parkingLocation, destinationLink, egressCSLegs[index], time));
-			}
+        trip.add(activityE);
 
-		} else {
+        trip.add(
+            RouterUtils.createWalkLeg(
+                pf, parkingLocation, destinationLink, egressCSLegs[index], time));
+      }
 
-			String ffVehId = vehicle.getVehicleId();
-			trip.add(RouterUtils.createWalkLeg(scenario.getPopulation().getFactory(), currentLink, vehicleLinkLocation,
-					accessCSLegs[index], time));
+    } else {
 
-			Activity activityS = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null,
-					vehicleLinkLocation.getId(), mainMode);
-//			activityS.setMaximumDuration(0); // obsolete since this is hard-coded in InteractionActivity
+      String ffVehId = vehicle.getVehicleId();
+      trip.add(
+          RouterUtils.createWalkLeg(
+              scenario.getPopulation().getFactory(),
+              currentLink,
+              vehicleLinkLocation,
+              accessCSLegs[index],
+              time));
 
-			trip.add(activityS);
-			// === car leg: ===
+      Activity activityS =
+          PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(
+              null, vehicleLinkLocation.getId(), mainMode);
+      //			activityS.setMaximumDuration(0); // obsolete since this is hard-coded in
+      // InteractionActivity
 
-			if (!keepTheCarForLaterUse) {
-				trip.add(RouterUtils.createCarLeg(pf, pathCalculator, person,
-						this.networkFF.getLinks().get(vehicleLinkLocation.getId()),
-						this.networkFF.getLinks().get(parkingLocation.getId()), carsharingVehicleLegs[index], ffVehId,
-						time));
-				Activity activityE = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null,
-						parkingLocation.getId(), mainMode);
-//				activityE.setMaximumDuration(0); // obsolete since this is hard-coded in InteractionActivity
+      trip.add(activityS);
+      // === car leg: ===
 
-				trip.add(activityE);
+      if (!keepTheCarForLaterUse) {
+        trip.add(
+            RouterUtils.createCarLeg(
+                pf,
+                pathCalculator,
+                person,
+                this.networkFF.getLinks().get(vehicleLinkLocation.getId()),
+                this.networkFF.getLinks().get(parkingLocation.getId()),
+                carsharingVehicleLegs[index],
+                ffVehId,
+                time));
+        Activity activityE =
+            PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(
+                null, parkingLocation.getId(), mainMode);
+        //				activityE.setMaximumDuration(0); // obsolete since this is hard-coded in
+        // InteractionActivity
 
-				trip.add(RouterUtils.createWalkLeg(pf, parkingLocation, destinationLink, egressCSLegs[index], time));
-			} else {
-				trip.add(RouterUtils.createCarLeg(pf, pathCalculator, person,
-						this.networkFF.getLinks().get(vehicleLinkLocation.getId()),
-						this.networkFF.getLinks().get(destinationLink.getId()), carsharingVehicleLegs[index], ffVehId,
-						time));
+        trip.add(activityE);
 
-			}
-
-		}
-		return trip;
-	}
-
+        trip.add(
+            RouterUtils.createWalkLeg(
+                pf, parkingLocation, destinationLink, egressCSLegs[index], time));
+      } else {
+        trip.add(
+            RouterUtils.createCarLeg(
+                pf,
+                pathCalculator,
+                person,
+                this.networkFF.getLinks().get(vehicleLinkLocation.getId()),
+                this.networkFF.getLinks().get(destinationLink.getId()),
+                carsharingVehicleLegs[index],
+                ffVehId,
+                time));
+      }
+    }
+    return trip;
+  }
 }

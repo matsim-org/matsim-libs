@@ -20,26 +20,25 @@
 package org.matsim.contrib.ev.charging;
 
 import java.util.Collection;
-
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 
 public interface ChargingLogic {
-	interface Factory {
-		ChargingLogic create(ChargerSpecification charger);
-	}
+  interface Factory {
+    ChargingLogic create(ChargerSpecification charger);
+  }
 
-	void addVehicle(ElectricVehicle ev, double now);
+  void addVehicle(ElectricVehicle ev, double now);
 
-	void addVehicle(ElectricVehicle ev, ChargingListener chargingListener, double now);
+  void addVehicle(ElectricVehicle ev, ChargingListener chargingListener, double now);
 
-	void removeVehicle(ElectricVehicle ev, double now);
+  void removeVehicle(ElectricVehicle ev, double now);
 
-	void chargeVehicles(double chargePeriod, double now);
+  void chargeVehicles(double chargePeriod, double now);
 
-	Collection<ElectricVehicle> getPluggedVehicles();
+  Collection<ElectricVehicle> getPluggedVehicles();
 
-	Collection<ElectricVehicle> getQueuedVehicles();
+  Collection<ElectricVehicle> getQueuedVehicles();
 
-	ChargingStrategy getChargingStrategy();
+  ChargingStrategy getChargingStrategy();
 }

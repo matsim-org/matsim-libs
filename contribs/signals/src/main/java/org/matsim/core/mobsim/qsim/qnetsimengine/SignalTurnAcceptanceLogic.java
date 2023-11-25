@@ -24,29 +24,35 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
 
 /**
- * This class extends the DefaultTurnAcceptanceLogic by also checking for signal states: 
- * It only accepts a turn, if the corresponding signal shows green. If not, it returns AcceptTurn.WAIT.
- * 
+ * This class extends the DefaultTurnAcceptanceLogic by also checking for signal states: It only
+ * accepts a turn, if the corresponding signal shows green. If not, it returns AcceptTurn.WAIT.
+ *
  * @author tthunig
  */
 final class SignalTurnAcceptanceLogic implements TurnAcceptanceLogic {
 
-	private final TurnAcceptanceLogic delegate = new DefaultTurnAcceptanceLogic();
-	
-	@Override
-	public AcceptTurn isAcceptingTurn(Link currentLink, QLaneI currentLane, Id<Link> nextLinkId, QVehicle veh, QNetwork qNetwork, double now) {
-		AcceptTurn defaultTurn = delegate.isAcceptingTurn(currentLink, currentLane, nextLinkId, veh, qNetwork, now);
-		if ( defaultTurn.equals(AcceptTurn.ABORT) ) {
-			return defaultTurn;
-		}
-		// else: check whether there are signals at the lane/link and whether they show green/red
-		if ( (currentLane instanceof SignalizeableItem) && 
-				(! ((SignalizeableItem)currentLane).hasGreenForToLink(nextLinkId)) ) {
-			/* because turn acceptance is checked before stuck time, an infinite red time
-			 * does not lead to stuck event of waiting vehicles. dg, mar'14 */
-			return AcceptTurn.WAIT;
-		}
-		return AcceptTurn.GO;
-	}
+  private final TurnAcceptanceLogic delegate = new DefaultTurnAcceptanceLogic();
 
+  @Override
+  public AcceptTurn isAcceptingTurn(
+      Link currentLink,
+      QLaneI currentLane,
+      Id<Link> nextLinkId,
+      QVehicle veh,
+      QNetwork qNetwork,
+      double now) {
+    AcceptTurn defaultTurn =
+        delegate.isAcceptingTurn(currentLink, currentLane, nextLinkId, veh, qNetwork, now);
+    if (defaultTurn.equals(AcceptTurn.ABORT)) {
+      return defaultTurn;
+    }
+    // else: check whether there are signals at the lane/link and whether they show green/red
+    if ((currentLane instanceof SignalizeableItem)
+        && (!((SignalizeableItem) currentLane).hasGreenForToLink(nextLinkId))) {
+      /* because turn acceptance is checked before stuck time, an infinite red time
+       * does not lead to stuck event of waiting vehicles. dg, mar'14 */
+      return AcceptTurn.WAIT;
+    }
+    return AcceptTurn.GO;
+  }
 }

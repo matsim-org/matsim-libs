@@ -26,19 +26,19 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
 public class ReplanningTask {
 
-	protected MobsimAgent agentToReplan;
-	protected Id<WithinDayReplanner> withinDayReplannerId;
-	
-	public ReplanningTask(MobsimAgent agentToReplan, Id<WithinDayReplanner> withinDayReplannerId) {
-		this.agentToReplan = agentToReplan;
-		this.withinDayReplannerId = withinDayReplannerId;
-	}
-	
-	public MobsimAgent getAgentToReplan() {
-		return this.agentToReplan;
-	}
-	
-	public Id<WithinDayReplanner> getWithinDayReplannerId() {
-		return this.withinDayReplannerId;
-	}
+  protected MobsimAgent agentToReplan;
+  protected Id<WithinDayReplanner> withinDayReplannerId;
+
+  public ReplanningTask(MobsimAgent agentToReplan, Id<WithinDayReplanner> withinDayReplannerId) {
+    this.agentToReplan = agentToReplan;
+    this.withinDayReplannerId = withinDayReplannerId;
+  }
+
+  public MobsimAgent getAgentToReplan() {
+    return this.agentToReplan;
+  }
+
+  public Id<WithinDayReplanner> getWithinDayReplannerId() {
+    return this.withinDayReplannerId;
+  }
 }

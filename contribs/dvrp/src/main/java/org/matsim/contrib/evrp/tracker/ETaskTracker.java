@@ -26,5 +26,5 @@ import org.matsim.contrib.dvrp.tracker.TaskTracker;
  * @author michalm
  */
 public interface ETaskTracker extends TaskTracker {
-	double predictChargeAtEnd();
+  double predictChargeAtEnd();
 }

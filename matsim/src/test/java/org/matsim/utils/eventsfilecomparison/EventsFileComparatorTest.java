@@ -32,47 +32,72 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class EventsFileComparatorTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  @Test
+  public void testRetCode0() {
+    String f1 = utils.getClassInputDirectory() + "/events0.xml.gz";
+    String f2 = utils.getClassInputDirectory() + "/events5.xml.gz";
+    assertEquals(
+        "return val = " + FILES_ARE_EQUAL, FILES_ARE_EQUAL, EventsFileComparator.compare(f1, f2));
 
-	@Test public void testRetCode0() {
-		String f1 = utils.getClassInputDirectory() + "/events0.xml.gz";
-		String f2 = utils.getClassInputDirectory() + "/events5.xml.gz";
-		assertEquals("return val = "  + FILES_ARE_EQUAL, FILES_ARE_EQUAL, EventsFileComparator.compare(f1, f2));
+    assertEquals(
+        "return val = " + FILES_ARE_EQUAL, FILES_ARE_EQUAL, EventsFileComparator.compare(f2, f1));
+  }
 
-		assertEquals("return val = "  + FILES_ARE_EQUAL, FILES_ARE_EQUAL, EventsFileComparator.compare(f2, f1));
-	}
+  @Test
+  public void testRetCodeM1() {
+    String f1 = utils.getClassInputDirectory() + "/events0.xml.gz";
+    String f2 = utils.getClassInputDirectory() + "/events1.xml.gz";
+    assertEquals(
+        "return val " + DIFFERENT_NUMBER_OF_TIMESTEPS,
+        DIFFERENT_NUMBER_OF_TIMESTEPS,
+        EventsFileComparator.compare(f1, f2));
 
-	@Test public void testRetCodeM1() {
-		String f1 = utils.getClassInputDirectory() + "/events0.xml.gz";
-		String f2 = utils.getClassInputDirectory() + "/events1.xml.gz";
-		assertEquals("return val " +DIFFERENT_NUMBER_OF_TIMESTEPS, DIFFERENT_NUMBER_OF_TIMESTEPS, EventsFileComparator.compare(f1, f2));
+    assertEquals(
+        "return val " + DIFFERENT_NUMBER_OF_TIMESTEPS,
+        DIFFERENT_NUMBER_OF_TIMESTEPS,
+        EventsFileComparator.compare(f2, f1));
+  }
 
-		assertEquals("return val " +DIFFERENT_NUMBER_OF_TIMESTEPS, DIFFERENT_NUMBER_OF_TIMESTEPS, EventsFileComparator.compare(f2, f1));
-	}
+  @Test
+  public void testRetCodeM2() {
+    String f1 = utils.getClassInputDirectory() + "/events0.xml.gz";
+    String f2 = utils.getClassInputDirectory() + "/events2.xml.gz";
+    assertEquals(
+        "return val = " + DIFFERENT_TIMESTEPS,
+        DIFFERENT_TIMESTEPS,
+        EventsFileComparator.compare(f1, f2));
 
-	@Test public void testRetCodeM2() {
-		String f1 = utils.getClassInputDirectory() + "/events0.xml.gz";
-		String f2 = utils.getClassInputDirectory() + "/events2.xml.gz";
-		assertEquals("return val = " + DIFFERENT_TIMESTEPS, DIFFERENT_TIMESTEPS, EventsFileComparator.compare(f1, f2));
+    assertEquals(
+        "return val = " + DIFFERENT_TIMESTEPS,
+        DIFFERENT_TIMESTEPS,
+        EventsFileComparator.compare(f2, f1));
+  }
 
-		assertEquals("return val = " + DIFFERENT_TIMESTEPS, DIFFERENT_TIMESTEPS, EventsFileComparator.compare(f2, f1));
-	}
+  @Test
+  public void testRetCodeM3() {
+    String f1 = utils.getClassInputDirectory() + "/events0.xml.gz";
+    String f2 = utils.getClassInputDirectory() + "/events3.xml.gz";
+    assertEquals(
+        "return val = " + MISSING_EVENT, MISSING_EVENT, EventsFileComparator.compare(f1, f2));
 
-	@Test public void testRetCodeM3() {
-		String f1 = utils.getClassInputDirectory() + "/events0.xml.gz";
-		String f2 = utils.getClassInputDirectory() + "/events3.xml.gz";
-		assertEquals("return val = " + MISSING_EVENT, MISSING_EVENT, EventsFileComparator.compare(f1, f2));
+    assertEquals(
+        "return val = " + MISSING_EVENT, MISSING_EVENT, EventsFileComparator.compare(f2, f1));
+  }
 
-		assertEquals("return val = " + MISSING_EVENT, MISSING_EVENT, EventsFileComparator.compare(f2, f1));
-	}
+  @Test
+  public void testRetCodeM4() {
+    String f1 = utils.getClassInputDirectory() + "/events0.xml.gz";
+    String f2 = utils.getClassInputDirectory() + "/events4.xml.gz";
+    assertEquals(
+        "return val = " + WRONG_EVENT_COUNT,
+        WRONG_EVENT_COUNT,
+        EventsFileComparator.compare(f1, f2));
 
-	@Test public void testRetCodeM4() {
-		String f1 = utils.getClassInputDirectory() + "/events0.xml.gz";
-		String f2 = utils.getClassInputDirectory() + "/events4.xml.gz";
-		assertEquals("return val = " + WRONG_EVENT_COUNT, WRONG_EVENT_COUNT, EventsFileComparator.compare(f1, f2));
-
-		assertEquals("return val = " + WRONG_EVENT_COUNT, WRONG_EVENT_COUNT, EventsFileComparator.compare(f2, f1));
-	}
+    assertEquals(
+        "return val = " + WRONG_EVENT_COUNT,
+        WRONG_EVENT_COUNT,
+        EventsFileComparator.compare(f2, f1));
+  }
 }

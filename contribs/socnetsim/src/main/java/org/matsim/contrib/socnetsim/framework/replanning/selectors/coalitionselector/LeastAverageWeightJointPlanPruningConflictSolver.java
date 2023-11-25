@@ -21,7 +21,6 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionsel
 
 import java.util.Collection;
 import java.util.Map;
-
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector.ConflictSolver;
 
@@ -30,36 +29,37 @@ import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionsele
  */
 public class LeastAverageWeightJointPlanPruningConflictSolver implements ConflictSolver {
 
-	@Override
-	public void attemptToSolveConflicts(
-			final CoalitionSelector.RecordsOfJointPlan recordsPerJointPlan) {
-		double minAvg = Double.POSITIVE_INFINITY;
-		Map.Entry<JointPlan , Collection<PlanRecord>> toMark = null;
+  @Override
+  public void attemptToSolveConflicts(
+      final CoalitionSelector.RecordsOfJointPlan recordsPerJointPlan) {
+    double minAvg = Double.POSITIVE_INFINITY;
+    Map.Entry<JointPlan, Collection<PlanRecord>> toMark = null;
 
-		for ( final Map.Entry<JointPlan , Collection<PlanRecord>> entry : recordsPerJointPlan.entrySet() ) {
-			final Collection<PlanRecord> records = entry.getValue();
+    for (final Map.Entry<JointPlan, Collection<PlanRecord>> entry :
+        recordsPerJointPlan.entrySet()) {
+      final Collection<PlanRecord> records = entry.getValue();
 
-			double avg = 0;
-			boolean isPointed = false;
-			for ( final PlanRecord r : records ) {
-				if ( !r.isFeasible() ) throw new RuntimeException( "should not get unfeasible plans!" );
-				isPointed = isPointed || r.getAgent().getPointedPlan() == r.getPlan();
-				avg += r.getWeight();
-			}
-			avg /= records.size();
+      double avg = 0;
+      boolean isPointed = false;
+      for (final PlanRecord r : records) {
+        if (!r.isFeasible()) throw new RuntimeException("should not get unfeasible plans!");
+        isPointed = isPointed || r.getAgent().getPointedPlan() == r.getPlan();
+        avg += r.getWeight();
+      }
+      avg /= records.size();
 
-			if ( avg < minAvg ) {
-				minAvg = avg;
-				toMark = entry;
-			}
-		}
+      if (avg < minAvg) {
+        minAvg = avg;
+        toMark = entry;
+      }
+    }
 
-		if ( toMark == null ) {
-			throw new RuntimeException( "could not find pointed joint plan of minimum average weight in "+recordsPerJointPlan );
-		}
+    if (toMark == null) {
+      throw new RuntimeException(
+          "could not find pointed joint plan of minimum average weight in " + recordsPerJointPlan);
+    }
 
-		for ( final PlanRecord r : toMark.getValue() ) r.setInfeasible();
-		recordsPerJointPlan.remove( toMark.getKey() );
-	}
+    for (final PlanRecord r : toMark.getValue()) r.setInfeasible();
+    recordsPerJointPlan.remove(toMark.getKey());
+  }
 }
-

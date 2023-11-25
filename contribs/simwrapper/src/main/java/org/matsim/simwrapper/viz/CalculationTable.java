@@ -2,18 +2,14 @@ package org.matsim.simwrapper.viz;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * Creates a Calculation Table for simwrapper.
- */
+/** Creates a Calculation Table for simwrapper. */
 public class CalculationTable extends Viz {
 
-	/**
-	 * Path to the config file.
-	 */
-	@JsonProperty(required = true)
-	public String configFile;
+  /** Path to the config file. */
+  @JsonProperty(required = true)
+  public String configFile;
 
-	public CalculationTable() {
-		super("table");
-	}
+  public CalculationTable() {
+    super("table");
+  }
 }

@@ -21,7 +21,6 @@ package playground.vsp.analysis.modules.ptAccessibility.stops;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
@@ -35,70 +34,67 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author droeder
- *
  */
 public class PtStopMap {
 
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(PtStopMap.class);
-	
-	public static final String FILESUFFIX = "AccessMap";
-	
-	private GeometryFactory f;
+  @SuppressWarnings("unused")
+  private static final Logger log = LogManager.getLogger(PtStopMap.class);
 
-	private HashMap<String, Map<String, Polygon>> map;
+  public static final String FILESUFFIX = "AccessMap";
 
-	private Map<String, Circle> cluster;
+  private GeometryFactory f;
 
-	private String mode;
+  private HashMap<String, Map<String, Polygon>> map;
 
-	public PtStopMap(String mode, Map<String, Circle> cluster ) {
-		this.f = new GeometryFactory();
-		this.mode = mode;
-		
-		this.map = new HashMap<String, Map<String, Polygon>>();
-		for(String s: cluster.keySet()){
-			this.map.put(s, new HashMap<String, Polygon>());
-		}
-		this.cluster = cluster;
-	}
-	
-	public void addStop(TransitStopFacility stop){
-		Polygon g;
-		
-		for(Entry<String, Map<String, Polygon>> e: this.map.entrySet()){
-			g = this.cluster.get(e.getKey()).createPolygon(this.f, stop.getCoord());
-			e.getValue().put(stop.getId().toString(), g);
-		}
-	}
+  private Map<String, Circle> cluster;
 
-	/**
-	 * @param outputFolder
-	 */
-	public Map<String, MultiPolygon> getCluster() {
-		Polygon[] p;
-		MultiPolygon mp ;
-		Map<String, MultiPolygon> cluster = new HashMap<String, MultiPolygon>();
-		
-		for(Entry<String, Map<String, Polygon>> e: this.map.entrySet()){
-			p = e.getValue().values().toArray(new Polygon[e.getValue().size()]);
-			mp = this.f.createMultiPolygon(p);
-			cluster.put(e.getKey(), mp);
-		}
-		return cluster;
-	}
-	
-	public String getMode(){
-		return this.mode;
-	}
-	
-	public boolean contains(Coordinate c, String cluster){
-		Point p = MGC.coordinate2Point(c);
-		for(Geometry g: this.map.get(cluster).values()){
-			if(g.contains(p)) return true;
-		}
-		return false;
-	}
-	
+  private String mode;
+
+  public PtStopMap(String mode, Map<String, Circle> cluster) {
+    this.f = new GeometryFactory();
+    this.mode = mode;
+
+    this.map = new HashMap<String, Map<String, Polygon>>();
+    for (String s : cluster.keySet()) {
+      this.map.put(s, new HashMap<String, Polygon>());
+    }
+    this.cluster = cluster;
+  }
+
+  public void addStop(TransitStopFacility stop) {
+    Polygon g;
+
+    for (Entry<String, Map<String, Polygon>> e : this.map.entrySet()) {
+      g = this.cluster.get(e.getKey()).createPolygon(this.f, stop.getCoord());
+      e.getValue().put(stop.getId().toString(), g);
+    }
+  }
+
+  /**
+   * @param outputFolder
+   */
+  public Map<String, MultiPolygon> getCluster() {
+    Polygon[] p;
+    MultiPolygon mp;
+    Map<String, MultiPolygon> cluster = new HashMap<String, MultiPolygon>();
+
+    for (Entry<String, Map<String, Polygon>> e : this.map.entrySet()) {
+      p = e.getValue().values().toArray(new Polygon[e.getValue().size()]);
+      mp = this.f.createMultiPolygon(p);
+      cluster.put(e.getKey(), mp);
+    }
+    return cluster;
+  }
+
+  public String getMode() {
+    return this.mode;
+  }
+
+  public boolean contains(Coordinate c, String cluster) {
+    Point p = MGC.coordinate2Point(c);
+    for (Geometry g : this.map.get(cluster).values()) {
+      if (g.contains(p)) return true;
+    }
+    return false;
+  }
 }
-

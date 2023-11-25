@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * MatsimXmlEventsParser.java
@@ -25,9 +24,9 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 
 abstract class MatsimXmlEventsParser extends MatsimXmlParser {
 
-	public MatsimXmlEventsParser() {
-		super(ValidationType.NO_VALIDATION);
-	}
+  public MatsimXmlEventsParser() {
+    super(ValidationType.NO_VALIDATION);
+  }
 
-	public abstract void addCustomEventMapper(String key, MatsimEventsReader.CustomEventMapper value );
+  public abstract void addCustomEventMapper(String key, MatsimEventsReader.CustomEventMapper value);
 }

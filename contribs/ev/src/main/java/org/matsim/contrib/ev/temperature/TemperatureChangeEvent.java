@@ -17,53 +17,52 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.ev.temperature;/*
- * created by jbischoff, 15.08.2018
- */
+package org.matsim.contrib.ev.temperature; /*
+                                            * created by jbischoff, 15.08.2018
+                                            */
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 
 public class TemperatureChangeEvent extends Event {
-    public static final String EVENT_TYPE = "temperature_changed";
-    public static final String ATTRIBUTE_LINK = "link";
-    public static final String ATTRIBUTE_TEMP = "newTemperature";
+  public static final String EVENT_TYPE = "temperature_changed";
+  public static final String ATTRIBUTE_LINK = "link";
+  public static final String ATTRIBUTE_TEMP = "newTemperature";
 
-    private final Id<Link> linkId;
-    private final double newTemperatureC;
+  private final Id<Link> linkId;
+  private final double newTemperatureC;
 
-    /**
-     * @param time               eventTime
-     * @param linkId             linkId of measurement point
-     * @param newTemperatureDegC temperature measured
-     */
-    public TemperatureChangeEvent(double time, Id<Link> linkId, double newTemperatureDegC) {
-        super(time);
-        this.newTemperatureC = newTemperatureDegC;
-        this.linkId = linkId;
-    }
+  /**
+   * @param time eventTime
+   * @param linkId linkId of measurement point
+   * @param newTemperatureDegC temperature measured
+   */
+  public TemperatureChangeEvent(double time, Id<Link> linkId, double newTemperatureDegC) {
+    super(time);
+    this.newTemperatureC = newTemperatureDegC;
+    this.linkId = linkId;
+  }
 
-    @Override
-    public String getEventType() {
-        return EVENT_TYPE;
-    }
+  @Override
+  public String getEventType() {
+    return EVENT_TYPE;
+  }
 
-    @Override
-    public Map<String, String> getAttributes() {
-        Map<String, String> attr = super.getAttributes();
-        attr.put(ATTRIBUTE_TEMP, String.valueOf(this.newTemperatureC));
-        attr.put(ATTRIBUTE_LINK, this.linkId.toString());
-        return attr;
-    }
+  @Override
+  public Map<String, String> getAttributes() {
+    Map<String, String> attr = super.getAttributes();
+    attr.put(ATTRIBUTE_TEMP, String.valueOf(this.newTemperatureC));
+    attr.put(ATTRIBUTE_LINK, this.linkId.toString());
+    return attr;
+  }
 
-    public double getNewTemperatureC() {
-        return newTemperatureC;
-    }
+  public double getNewTemperatureC() {
+    return newTemperatureC;
+  }
 
-    public Id<Link> getLinkId() {
-        return linkId;
-    }
+  public Id<Link> getLinkId() {
+    return linkId;
+  }
 }

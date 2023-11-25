@@ -23,14 +23,13 @@ package org.matsim.core.config;
  * @author thibautd
  */
 class ConfigV2XmlNames {
-	private ConfigV2XmlNames() {}
+  private ConfigV2XmlNames() {}
 
-	public static String CONFIG = "config";
-	public static String PARAMETER = "param";
-	public static String PARAMETER_SET = "parameterset";
-	public static String TYPE = "type";
-	public static String MODULE = "module";
-	public static String NAME = "name";
-	public static String VALUE = "value";
+  public static String CONFIG = "config";
+  public static String PARAMETER = "param";
+  public static String PARAMETER_SET = "parameterset";
+  public static String TYPE = "type";
+  public static String MODULE = "module";
+  public static String NAME = "name";
+  public static String VALUE = "value";
 }
-

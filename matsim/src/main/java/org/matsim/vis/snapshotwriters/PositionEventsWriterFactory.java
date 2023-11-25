@@ -6,18 +6,15 @@ import org.matsim.core.api.experimental.events.EventsManager;
 
 class PositionEventsWriterFactory implements Provider<SnapshotWriter> {
 
-        private final EventsManager eventsManager;
+  private final EventsManager eventsManager;
 
-        @Inject
-        PositionEventsWriterFactory( EventsManager eventsManager ) {
-                this.eventsManager = eventsManager;
-        }
+  @Inject
+  PositionEventsWriterFactory(EventsManager eventsManager) {
+    this.eventsManager = eventsManager;
+  }
 
-        @Override
-        public SnapshotWriter get() {
-                return new PositionEventsWriter(eventsManager);
-        }
-
-
-
+  @Override
+  public SnapshotWriter get() {
+    return new PositionEventsWriter(eventsManager);
+  }
 }

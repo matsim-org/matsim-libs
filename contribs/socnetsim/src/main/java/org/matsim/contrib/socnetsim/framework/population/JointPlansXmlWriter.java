@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -42,70 +41,61 @@ import org.matsim.core.utils.misc.Counter;
  * @author thibautd
  */
 public class JointPlansXmlWriter extends MatsimXmlWriter {
-	private final Set<JointPlan> jointPlansSet = new HashSet<JointPlan>();
+  private final Set<JointPlan> jointPlansSet = new HashSet<JointPlan>();
 
-	public static void write(
-			final Population population,
-			final JointPlans jointPlans,
-			final String file ) {
-		new JointPlansXmlWriter( population , jointPlans ).write( file );
-	}
+  public static void write(
+      final Population population, final JointPlans jointPlans, final String file) {
+    new JointPlansXmlWriter(population, jointPlans).write(file);
+  }
 
-	private JointPlansXmlWriter(
-			final Population population,
-			final JointPlans jointPlans) {
-		for (Person person : population.getPersons().values()) {
-			for (Plan plan : person.getPlans()) {
-				final JointPlan jp = jointPlans.getJointPlan( plan );
-				if (jp != null) jointPlansSet.add( jp );
-			}
-		}
-	}
+  private JointPlansXmlWriter(final Population population, final JointPlans jointPlans) {
+    for (Person person : population.getPersons().values()) {
+      for (Plan plan : person.getPlans()) {
+        final JointPlan jp = jointPlans.getJointPlan(plan);
+        if (jp != null) jointPlansSet.add(jp);
+      }
+    }
+  }
 
-	private void write(final String file) {
-		final Counter counter = new Counter( "[JointPlansXmlWriter] dumped jointPlan # " );
-		openFile( file );
-		writeXmlHead();
-		writeDoctype( ROOT_TAG , "jointplans_v1.dtd" );
-		writeStartTag(
-				ROOT_TAG,
-				Collections.<Tuple<String, String>>emptyList() );
-		for (JointPlan jp : jointPlansSet) {
-			counter.incCounter();
-			writeJointPlan( jp );
-		}
-		counter.printCounter();
-		writeEndTag( ROOT_TAG );
-		close();
-	}
+  private void write(final String file) {
+    final Counter counter = new Counter("[JointPlansXmlWriter] dumped jointPlan # ");
+    openFile(file);
+    writeXmlHead();
+    writeDoctype(ROOT_TAG, "jointplans_v1.dtd");
+    writeStartTag(ROOT_TAG, Collections.<Tuple<String, String>>emptyList());
+    for (JointPlan jp : jointPlansSet) {
+      counter.incCounter();
+      writeJointPlan(jp);
+    }
+    counter.printCounter();
+    writeEndTag(ROOT_TAG);
+    close();
+  }
 
-	private void writeJointPlan(final JointPlan jp) {
-		startJointPlan();
-		for (Plan plan : jp.getIndividualPlans().values()) {
-			writeIndividualPlan( plan );
-		}
-		endJointPlan();
-	}
+  private void writeJointPlan(final JointPlan jp) {
+    startJointPlan();
+    for (Plan plan : jp.getIndividualPlans().values()) {
+      writeIndividualPlan(plan);
+    }
+    endJointPlan();
+  }
 
-	private void startJointPlan() {
-		writeStartTag(
-				JOINT_PLAN_TAG,
-				Collections.<Tuple<String, String>>emptyList() );
-	}
+  private void startJointPlan() {
+    writeStartTag(JOINT_PLAN_TAG, Collections.<Tuple<String, String>>emptyList());
+  }
 
-	private void writeIndividualPlan(final Plan plan) {
-		final List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
+  private void writeIndividualPlan(final Plan plan) {
+    final List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
 
-		atts.add( createTuple( PERSON_ATT , plan.getPerson().getId().toString() ) );
-		final int index = plan.getPerson().getPlans().indexOf( plan );
-		assert index >= 0;
-		atts.add( createTuple( PLAN_NR_ATT , index+"" ) );
+    atts.add(createTuple(PERSON_ATT, plan.getPerson().getId().toString()));
+    final int index = plan.getPerson().getPlans().indexOf(plan);
+    assert index >= 0;
+    atts.add(createTuple(PLAN_NR_ATT, index + ""));
 
-		writeStartTag( PLAN_TAG , atts , true );
-	}
+    writeStartTag(PLAN_TAG, atts, true);
+  }
 
-	private void endJointPlan() {
-		writeEndTag( JOINT_PLAN_TAG );
-	}
+  private void endJointPlan() {
+    writeEndTag(JOINT_PLAN_TAG);
+  }
 }
-

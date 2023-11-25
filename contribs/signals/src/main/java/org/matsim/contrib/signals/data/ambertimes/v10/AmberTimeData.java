@@ -20,47 +20,40 @@
 package org.matsim.contrib.signals.data.ambertimes.v10;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
 
-
 /**
  * @author dgrether
- *
  */
 public interface AmberTimeData {
-	
-	public Id<SignalSystem> getSignalSystemId();
-	
-	public Integer getDefaultRedAmber();
-	
-	public Integer getDefaultAmber();
-	
-	
-	public Integer getRedAmberOfSignal(Id<Signal> signalId);
-	
-	public Integer getAmberOfSignal(Id<Signal> signalId);
-	
-	public void setAmberTimeOfSignal(Id<Signal> signalId, Integer seconds);
-	
-	public void setRedAmberTimeOfSignal(Id<Signal> signalId, Integer seconds);
-	
 
-	public void setDefaultRedAmber(Integer seconds);
-	
-	public void setDefaultAmber(Integer seconds);
+  public Id<SignalSystem> getSignalSystemId();
 
-	
-	/**
-	 * @return A map with signal ids as keys and amber times for that signal in seconds as values
-	 */
-	public Map<Id<Signal>, Integer> getSignalAmberMap();
-	/**
-	 * @return A map with signal ids as keys and red-amber times for that signal in seconds as values
-	 */
-	public Map<Id<Signal>, Integer> getSignalRedAmberMap();
-	
+  public Integer getDefaultRedAmber();
 
+  public Integer getDefaultAmber();
+
+  public Integer getRedAmberOfSignal(Id<Signal> signalId);
+
+  public Integer getAmberOfSignal(Id<Signal> signalId);
+
+  public void setAmberTimeOfSignal(Id<Signal> signalId, Integer seconds);
+
+  public void setRedAmberTimeOfSignal(Id<Signal> signalId, Integer seconds);
+
+  public void setDefaultRedAmber(Integer seconds);
+
+  public void setDefaultAmber(Integer seconds);
+
+  /**
+   * @return A map with signal ids as keys and amber times for that signal in seconds as values
+   */
+  public Map<Id<Signal>, Integer> getSignalAmberMap();
+
+  /**
+   * @return A map with signal ids as keys and red-amber times for that signal in seconds as values
+   */
+  public Map<Id<Signal>, Integer> getSignalRedAmberMap();
 }

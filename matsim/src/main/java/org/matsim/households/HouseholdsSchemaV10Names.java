@@ -24,18 +24,17 @@ package org.matsim.households;
  */
 public interface HouseholdsSchemaV10Names {
 
-	public final static String HOUSEHOLDS = "households";
-	public final static String HOUSEHOLD = "household";
-	public final static String ID = "id";
-	public final static String MEMBERS = "members";
-	public final static String PERSONID = "personId";
-	public final static String REFID = "refId";
-	public final static String INCOME = "income";
-	public final static String CURRENCY = "currency";
-	public final static String PERIOD = "period";
-	public final static String VEHICLEDEFINITIONID = "vehicleDefinitionId";
-	public final static String VEHICLES = "vehicles";
-	public final static String ATTRIBUTES = "attributes";
-	public final static String ATTRIBUTE = "attribute";
-
+  public static final String HOUSEHOLDS = "households";
+  public static final String HOUSEHOLD = "household";
+  public static final String ID = "id";
+  public static final String MEMBERS = "members";
+  public static final String PERSONID = "personId";
+  public static final String REFID = "refId";
+  public static final String INCOME = "income";
+  public static final String CURRENCY = "currency";
+  public static final String PERIOD = "period";
+  public static final String VEHICLEDEFINITIONID = "vehicleDefinitionId";
+  public static final String VEHICLES = "vehicles";
+  public static final String ATTRIBUTES = "attributes";
+  public static final String ATTRIBUTE = "attribute";
 }

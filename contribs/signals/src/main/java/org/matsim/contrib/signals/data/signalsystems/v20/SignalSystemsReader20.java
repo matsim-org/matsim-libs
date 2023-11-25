@@ -19,16 +19,14 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data.signalsystems.v20;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UncheckedIOException;
-
-import javax.xml.XMLConstants;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+import javax.xml.XMLConstants;
 import javax.xml.validation.SchemaFactory;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.data.AbstractSignalsReader;
@@ -44,55 +42,56 @@ import org.matsim.lanes.Lane;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-
 /**
  * @author dgrether
- *
  */
 public final class SignalSystemsReader20 extends AbstractSignalsReader {
 
-	private SignalSystemsData signalSystemsData;
+  private SignalSystemsData signalSystemsData;
 
-	public SignalSystemsReader20(SignalSystemsData signalSystemData) {
-		this.signalSystemsData = signalSystemData;
-	}
+  public SignalSystemsReader20(SignalSystemsData signalSystemData) {
+    this.signalSystemsData = signalSystemData;
+  }
 
-	public void read( InputSource stream ) {
-//		XMLSignalSystems xmlssdefs = getXmlSignalSystems(stream);
-		XMLSignalSystems xmlssdefs = getXmlSignalSystems(stream.getByteStream());
+  public void read(InputSource stream) {
+    //		XMLSignalSystems xmlssdefs = getXmlSignalSystems(stream);
+    XMLSignalSystems xmlssdefs = getXmlSignalSystems(stream.getByteStream());
 
-		//convert from Jaxb types to MATSim-API conform types
-		SignalSystemsDataFactory builder = this.signalSystemsData.getFactory();
-		for (XMLSignalSystemType xmlss : xmlssdefs.getSignalSystem()){
-			SignalSystemData ssdata = builder.createSignalSystemData(Id.create(xmlss.getId(), SignalSystem.class));
-			this.signalSystemsData.addSignalSystemData(ssdata);
-			for (XMLSignalType xmlsignal : xmlss.getSignals().getSignal()){
-				SignalData signal = builder.createSignalData(Id.create(xmlsignal.getId(), Signal.class));
-				signal.setLinkId(Id.create(xmlsignal.getLinkIdRef(), Link.class));
-				ssdata.addSignalData(signal);
-				if (xmlsignal.getLane() != null){
-					for (XMLLane xmllane : xmlsignal.getLane()){
-						signal.addLaneId(Id.create(xmllane.getRefId(), Lane.class));
-					}
-				}
-				if (xmlsignal.getTurningMoveRestrictions() != null){
-					XMLTurningMoveRestrictions tmr = xmlsignal.getTurningMoveRestrictions();
-					for (XMLIdRefType xmlid : tmr.getToLink()){
-						signal.addTurningMoveRestriction(Id.create(xmlid.getRefId(), Link.class));
-					}
-				}
-			}
-		}
-	}
+    // convert from Jaxb types to MATSim-API conform types
+    SignalSystemsDataFactory builder = this.signalSystemsData.getFactory();
+    for (XMLSignalSystemType xmlss : xmlssdefs.getSignalSystem()) {
+      SignalSystemData ssdata =
+          builder.createSignalSystemData(Id.create(xmlss.getId(), SignalSystem.class));
+      this.signalSystemsData.addSignalSystemData(ssdata);
+      for (XMLSignalType xmlsignal : xmlss.getSignals().getSignal()) {
+        SignalData signal = builder.createSignalData(Id.create(xmlsignal.getId(), Signal.class));
+        signal.setLinkId(Id.create(xmlsignal.getLinkIdRef(), Link.class));
+        ssdata.addSignalData(signal);
+        if (xmlsignal.getLane() != null) {
+          for (XMLLane xmllane : xmlsignal.getLane()) {
+            signal.addLaneId(Id.create(xmllane.getRefId(), Lane.class));
+          }
+        }
+        if (xmlsignal.getTurningMoveRestrictions() != null) {
+          XMLTurningMoveRestrictions tmr = xmlsignal.getTurningMoveRestrictions();
+          for (XMLIdRefType xmlid : tmr.getToLink()) {
+            signal.addTurningMoveRestriction(Id.create(xmlid.getRefId(), Link.class));
+          }
+        }
+      }
+    }
+  }
 
-	private XMLSignalSystems getXmlSignalSystems(InputStream stream) {
-		try {
-			JAXBContext jc = JAXBContext.newInstance(org.matsim.jaxb.signalsystems20.ObjectFactory.class);
-			Unmarshaller u = jc.createUnmarshaller();
-			u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/signalSystems_v2.0.xsd")));
-			return (XMLSignalSystems) u.unmarshal(stream);
-		} catch (JAXBException | SAXException e) {
-			throw new UncheckedIOException(new IOException(e));
-		}
-	}
+  private XMLSignalSystems getXmlSignalSystems(InputStream stream) {
+    try {
+      JAXBContext jc = JAXBContext.newInstance(org.matsim.jaxb.signalsystems20.ObjectFactory.class);
+      Unmarshaller u = jc.createUnmarshaller();
+      u.setSchema(
+          SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+              .newSchema(getClass().getResource("/dtd/signalSystems_v2.0.xsd")));
+      return (XMLSignalSystems) u.unmarshal(stream);
+    } catch (JAXBException | SAXException e) {
+      throw new UncheckedIOException(new IOException(e));
+    }
+  }
 }

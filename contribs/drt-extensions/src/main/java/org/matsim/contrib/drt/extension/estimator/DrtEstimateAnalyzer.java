@@ -1,5 +1,12 @@
 package org.matsim.contrib.drt.extension.estimator;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -19,114 +26,135 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.misc.OptionalTime;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
+/** Analyzes and outputs drt estimates errors metrics based on daily requests. */
+public final class DrtEstimateAnalyzer
+    implements StartupListener, ShutdownListener, AfterMobsimListener {
 
-/**
- * Analyzes and outputs drt estimates errors metrics based on daily requests.
- */
-public final class DrtEstimateAnalyzer implements StartupListener, ShutdownListener, AfterMobsimListener {
+  private static final Logger log = LogManager.getLogger(DrtEstimateAnalyzer.class);
 
-	private static final Logger log = LogManager.getLogger(DrtEstimateAnalyzer.class);
+  // Might be useful but not needed currently
+  // private final DefaultMainLegRouter.RouteCreator creator;
+  private final DrtEstimator estimator;
+  private final DrtEventSequenceCollector collector;
+  private final DrtEstimatorConfigGroup config;
 
-	// Might be useful but not needed currently
-	//private final DefaultMainLegRouter.RouteCreator creator;
-	private final DrtEstimator estimator;
-	private final DrtEventSequenceCollector collector;
-	private final DrtEstimatorConfigGroup config;
+  private CSVPrinter csv;
 
-	private CSVPrinter csv;
+  public DrtEstimateAnalyzer(
+      DrtEstimator estimator, DrtEventSequenceCollector collector, DrtEstimatorConfigGroup config) {
+    this.estimator = estimator;
+    this.collector = collector;
+    this.config = config;
+  }
 
-	public DrtEstimateAnalyzer(DrtEstimator estimator, DrtEventSequenceCollector collector, DrtEstimatorConfigGroup config) {
-		this.estimator = estimator;
-		this.collector = collector;
-		this.config = config;
-	}
+  @Override
+  public void notifyStartup(StartupEvent event) {
 
-	@Override
-	public void notifyStartup(StartupEvent event) {
+    String filename =
+        event
+            .getServices()
+            .getControlerIO()
+            .getOutputFilename("drt_estimates_" + config.getMode() + ".csv");
 
-		String filename = event.getServices().getControlerIO().getOutputFilename("drt_estimates_" + config.getMode() + ".csv");
+    try {
+      csv =
+          new CSVPrinter(
+              Files.newBufferedWriter(Path.of(filename), StandardCharsets.UTF_8),
+              CSVFormat.DEFAULT);
+      csv.printRecord(
+          "iteration",
+          "wait_time_mae",
+          "wait_time_err_q5",
+          "wait_time_err_q50",
+          "wait_time_err_q95",
+          "travel_time_mae",
+          "travel_time_err_q5",
+          "travel_time_err_q50",
+          "travel_time_err_q95",
+          "fare_mae",
+          "fare_err_q5",
+          "fare_err_q50",
+          "fare_err_q95");
 
-		try {
-			csv = new CSVPrinter(Files.newBufferedWriter(Path.of(filename), StandardCharsets.UTF_8), CSVFormat.DEFAULT);
-			csv.printRecord("iteration",
-					"wait_time_mae", "wait_time_err_q5", "wait_time_err_q50", "wait_time_err_q95",
-					"travel_time_mae", "travel_time_err_q5", "travel_time_err_q50", "travel_time_err_q95",
-					"fare_mae", "fare_err_q5", "fare_err_q50", "fare_err_q95"
-			);
+    } catch (IOException e) {
+      throw new UncheckedIOException("Could not open output file for estimates.", e);
+    }
+  }
 
-		} catch (IOException e) {
-			throw new UncheckedIOException("Could not open output file for estimates.", e);
-		}
-	}
+  @Override
+  public void notifyShutdown(ShutdownEvent event) {
+    try {
+      csv.close();
+    } catch (IOException e) {
+      log.warn("Could not close drt estimate file", e);
+    }
+  }
 
-	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-		try {
-			csv.close();
-		} catch (IOException e) {
-			log.warn("Could not close drt estimate file", e);
-		}
-	}
+  /** Needs to run before any estimators updates. */
+  @Override
+  public void notifyAfterMobsim(AfterMobsimEvent event) {
 
-	/**
-	 * Needs to run before any estimators updates.
-	 */
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
+    try {
+      csv.printRecord(calcMetrics(event.getIteration()));
+      csv.flush();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-		try {
-			csv.printRecord(calcMetrics(event.getIteration()));
-			csv.flush();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+  /** Return row of metrics for the csv file. */
+  private Iterable<Number> calcMetrics(int iteration) {
 
-	/**
-	 * Return row of metrics for the csv file.
-	 */
-	private Iterable<Number> calcMetrics(int iteration) {
+    DescriptiveStatistics waitTime = new DescriptiveStatistics();
+    DescriptiveStatistics travelTime = new DescriptiveStatistics();
+    DescriptiveStatistics fare = new DescriptiveStatistics();
 
-		DescriptiveStatistics waitTime = new DescriptiveStatistics();
-		DescriptiveStatistics travelTime = new DescriptiveStatistics();
-		DescriptiveStatistics fare = new DescriptiveStatistics();
+    for (DrtEventSequenceCollector.EventSequence seq :
+        collector.getPerformedRequestSequences().values()) {
+      Map<Id<Person>, DrtEventSequenceCollector.EventSequence.PersonEvents> personEvents =
+          seq.getPersonEvents();
+      for (Map.Entry<Id<Person>, DrtEventSequenceCollector.EventSequence.PersonEvents> entry :
+          personEvents.entrySet()) {
+        if (entry.getValue().getPickedUp().isPresent()
+            && entry.getValue().getDroppedOff().isPresent()) {
 
-		for (DrtEventSequenceCollector.EventSequence seq : collector.getPerformedRequestSequences().values()) {
-			Map<Id<Person>, DrtEventSequenceCollector.EventSequence.PersonEvents> personEvents = seq.getPersonEvents();
-			for (Map.Entry<Id<Person>, DrtEventSequenceCollector.EventSequence.PersonEvents> entry : personEvents.entrySet()) {
-				if (entry.getValue().getPickedUp().isPresent() && entry.getValue().getDroppedOff().isPresent()) {
+          // many attributes are not filled, when using the constructor
+          DrtRoute route =
+              new DrtRoute(seq.getSubmitted().getFromLinkId(), seq.getSubmitted().getToLinkId());
+          route.setDirectRideTime(seq.getSubmitted().getUnsharedRideTime());
+          route.setDistance(seq.getSubmitted().getUnsharedRideDistance());
 
-					// many attributes are not filled, when using the constructor
-					DrtRoute route = new DrtRoute(seq.getSubmitted().getFromLinkId(), seq.getSubmitted().getToLinkId());
-					route.setDirectRideTime(seq.getSubmitted().getUnsharedRideTime());
-					route.setDistance(seq.getSubmitted().getUnsharedRideDistance());
+          double valWaitTime =
+              entry.getValue().getPickedUp().get().getTime() - seq.getSubmitted().getTime();
+          double valTravelTime =
+              entry.getValue().getDroppedOff().get().getTime()
+                  - entry.getValue().getPickedUp().get().getTime();
+          double valFare =
+              seq.getDrtFares().stream().mapToDouble(PersonMoneyEvent::getAmount).sum();
 
-					double valWaitTime = entry.getValue().getPickedUp().get().getTime() - seq.getSubmitted().getTime();
-					double valTravelTime = entry.getValue().getDroppedOff().get().getTime() - entry.getValue().getPickedUp().get().getTime();
-					double valFare = seq.getDrtFares().stream().mapToDouble(PersonMoneyEvent::getAmount).sum();
+          DrtEstimator.Estimate estimate =
+              estimator.estimate(route, OptionalTime.defined(seq.getSubmitted().getTime()));
 
-					DrtEstimator.Estimate estimate = estimator.estimate(route, OptionalTime.defined(seq.getSubmitted().getTime()));
+          waitTime.addValue(Math.abs(estimate.waitingTime() - valWaitTime));
+          travelTime.addValue(Math.abs(estimate.travelTime() - valTravelTime));
+          fare.addValue(Math.abs(estimate.fare() - valFare));
+        }
+      }
+    }
 
-					waitTime.addValue(Math.abs(estimate.waitingTime() - valWaitTime));
-					travelTime.addValue(Math.abs(estimate.travelTime() - valTravelTime));
-					fare.addValue(Math.abs(estimate.fare() - valFare));
-				}
-			}
-		}
-
-		return List.of(
-				iteration,
-				waitTime.getMean(), waitTime.getPercentile(5), waitTime.getPercentile(50), waitTime.getPercentile(95),
-				travelTime.getMean(), travelTime.getPercentile(5), travelTime.getPercentile(50), travelTime.getPercentile(95),
-				fare.getMean(), fare.getPercentile(5), fare.getPercentile(50), fare.getPercentile(95)
-		);
-	}
-
+    return List.of(
+        iteration,
+        waitTime.getMean(),
+        waitTime.getPercentile(5),
+        waitTime.getPercentile(50),
+        waitTime.getPercentile(95),
+        travelTime.getMean(),
+        travelTime.getPercentile(5),
+        travelTime.getPercentile(50),
+        travelTime.getPercentile(95),
+        fare.getMean(),
+        fare.getPercentile(5),
+        fare.getPercentile(50),
+        fare.getPercentile(95));
+  }
 }

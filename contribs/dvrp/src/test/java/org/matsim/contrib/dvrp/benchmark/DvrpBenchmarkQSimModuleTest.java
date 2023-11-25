@@ -35,17 +35,17 @@ import org.matsim.vehicles.Vehicle;
  * @author Michal Maciejewski (michalm)
  */
 public class DvrpBenchmarkQSimModuleTest {
-	@Test
-	public void calcLinkSpeed() {
-		var link = NetworkUtils.createLink(Id.createLinkId("id"), null, null, null, 150, 15, 10, 1);
-		var vehicle = mock(Vehicle.class);
+  @Test
+  public void calcLinkSpeed() {
+    var link = NetworkUtils.createLink(Id.createLinkId("id"), null, null, null, 150, 15, 10, 1);
+    var vehicle = mock(Vehicle.class);
 
-		var travelTime = mock(TravelTime.class);
+    var travelTime = mock(TravelTime.class);
 
-		when(travelTime.getLinkTravelTime(eq(link), eq(0.), isNull(), eq(vehicle))).thenReturn(10.);
-		assertThat(DvrpBenchmarkQSimModule.calcLinkSpeed(travelTime, vehicle, link, 0)).isEqualTo(15);
+    when(travelTime.getLinkTravelTime(eq(link), eq(0.), isNull(), eq(vehicle))).thenReturn(10.);
+    assertThat(DvrpBenchmarkQSimModule.calcLinkSpeed(travelTime, vehicle, link, 0)).isEqualTo(15);
 
-		when(travelTime.getLinkTravelTime(eq(link), eq(100.), isNull(), eq(vehicle))).thenReturn(15.);
-		assertThat(DvrpBenchmarkQSimModule.calcLinkSpeed(travelTime, vehicle, link, 100)).isEqualTo(10);
-	}
+    when(travelTime.getLinkTravelTime(eq(link), eq(100.), isNull(), eq(vehicle))).thenReturn(15.);
+    assertThat(DvrpBenchmarkQSimModule.calcLinkSpeed(travelTime, vehicle, link, 100)).isEqualTo(10);
+  }
 }

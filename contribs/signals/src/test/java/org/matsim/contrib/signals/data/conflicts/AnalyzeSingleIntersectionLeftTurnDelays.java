@@ -20,9 +20,9 @@
  */
 package org.matsim.contrib.signals.data.conflicts;
 
+import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
@@ -36,68 +36,69 @@ import org.matsim.lanes.Lane;
 import org.matsim.lanes.Lanes;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
-
 /**
  * @author tthunig
  */
-class AnalyzeSingleIntersectionLeftTurnDelays implements LaneEnterEventHandler, LaneLeaveEventHandler, PersonStuckEventHandler {
+class AnalyzeSingleIntersectionLeftTurnDelays
+    implements LaneEnterEventHandler, LaneLeaveEventHandler, PersonStuckEventHandler {
 
-	@Inject
-	private Network network;
-	@Inject
-	private Lanes lanes;
-	
-	private Map<Id<Vehicle>, Double> enterTimePerVehicle = new HashMap<>();
-	private double leftTurnDelay;
-	private int stuckCount;
-	
-	@Override
-	public void reset(int iteration) {
-		stuckCount = 0;
-		leftTurnDelay = 0.0;
-		enterTimePerVehicle.clear();
-	}
-	
-	@Override
-	public void handleEvent(LaneLeaveEvent event) {
-		if (event.getLaneId().equals(Id.create("2_3.l", Lane.class)) || 
-				event.getLaneId().equals(Id.create("4_3.l", Lane.class))) {
-			double enterTime = enterTimePerVehicle.remove(event.getVehicleId());
-			Lane lane = lanes.getLanesToLinkAssignments().get(event.getLinkId()).getLanes().get(event.getLaneId());
-			Link link = network.getLinks().get(event.getLinkId());
-			double freespeedTT = lane.getStartsAtMeterFromLinkEnd()/link.getFreespeed();
-			// this is the earliest time where matsim sets the agent to the next link
-			double matsimFreespeedTT = Math.floor(freespeedTT + 1);
-			leftTurnDelay += event.getTime() - enterTime - matsimFreespeedTT;
-		}
-	}
+  @Inject private Network network;
+  @Inject private Lanes lanes;
 
-	/**
-	 * This method gives you the total delay of left turning vehicles at the single intersection scenario. 
-	 * It includes all delay, also the time that vehicles have to wait in front of a red light.
-	 * note: delay of stucked vehicles is not considered. To check for plausibility, you can call getStuckCount(). 
-	 */
-	public double getLeftTurnDelay() {
-		return leftTurnDelay;
-	}
-	
-	public int getStuckCount() {
-		return stuckCount;
-	}
+  private Map<Id<Vehicle>, Double> enterTimePerVehicle = new HashMap<>();
+  private double leftTurnDelay;
+  private int stuckCount;
 
-	@Override
-	public void handleEvent(LaneEnterEvent event) {
-		if (event.getLaneId().equals(Id.create("2_3.l", Lane.class)) || 
-				event.getLaneId().equals(Id.create("4_3.l", Lane.class))) {
-			enterTimePerVehicle.put(event.getVehicleId(), event.getTime());
-		}
-	}
+  @Override
+  public void reset(int iteration) {
+    stuckCount = 0;
+    leftTurnDelay = 0.0;
+    enterTimePerVehicle.clear();
+  }
 
-	@Override
-	public void handleEvent(PersonStuckEvent event) {
-		stuckCount++;
-	}
-	
+  @Override
+  public void handleEvent(LaneLeaveEvent event) {
+    if (event.getLaneId().equals(Id.create("2_3.l", Lane.class))
+        || event.getLaneId().equals(Id.create("4_3.l", Lane.class))) {
+      double enterTime = enterTimePerVehicle.remove(event.getVehicleId());
+      Lane lane =
+          lanes
+              .getLanesToLinkAssignments()
+              .get(event.getLinkId())
+              .getLanes()
+              .get(event.getLaneId());
+      Link link = network.getLinks().get(event.getLinkId());
+      double freespeedTT = lane.getStartsAtMeterFromLinkEnd() / link.getFreespeed();
+      // this is the earliest time where matsim sets the agent to the next link
+      double matsimFreespeedTT = Math.floor(freespeedTT + 1);
+      leftTurnDelay += event.getTime() - enterTime - matsimFreespeedTT;
+    }
+  }
 
+  /**
+   * This method gives you the total delay of left turning vehicles at the single intersection
+   * scenario. It includes all delay, also the time that vehicles have to wait in front of a red
+   * light. note: delay of stucked vehicles is not considered. To check for plausibility, you can
+   * call getStuckCount().
+   */
+  public double getLeftTurnDelay() {
+    return leftTurnDelay;
+  }
+
+  public int getStuckCount() {
+    return stuckCount;
+  }
+
+  @Override
+  public void handleEvent(LaneEnterEvent event) {
+    if (event.getLaneId().equals(Id.create("2_3.l", Lane.class))
+        || event.getLaneId().equals(Id.create("4_3.l", Lane.class))) {
+      enterTimePerVehicle.put(event.getVehicleId(), event.getTime());
+    }
+  }
+
+  @Override
+  public void handleEvent(PersonStuckEvent event) {
+    stuckCount++;
+  }
 }

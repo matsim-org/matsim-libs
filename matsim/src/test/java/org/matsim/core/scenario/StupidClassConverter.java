@@ -16,19 +16,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-
 package org.matsim.core.scenario;
 
 import org.matsim.utils.objectattributes.AttributeConverter;
 
 class StupidClassConverter implements AttributeConverter<StupidClass> {
-    @Override
-    public StupidClass convert(String value) {
-        return new StupidClass();
-    }
+  @Override
+  public StupidClass convert(String value) {
+    return new StupidClass();
+  }
 
-    @Override
-    public String convertToString(Object o) {
-        return "just some stupid instance";
-    }
+  @Override
+  public String convertToString(Object o) {
+    return "just some stupid instance";
+  }
 }

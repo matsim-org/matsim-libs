@@ -19,129 +19,128 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.grouping;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.socnetsim.framework.cliques.config.CliquesConfigGroup;
 import org.matsim.core.config.Config;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
-
-import org.matsim.contrib.socnetsim.framework.cliques.config.CliquesConfigGroup;
-
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
 
 /**
  * @author thibautd
  */
 @Singleton
 public class FixedGroupsIdentifier implements GroupIdentifier {
-	private static final Logger log =
-		LogManager.getLogger(FixedGroupsIdentifier.class);
+  private static final Logger log = LogManager.getLogger(FixedGroupsIdentifier.class);
 
-	private final Collection<? extends Collection<Id<Person>>> groupsInfo;
+  private final Collection<? extends Collection<Id<Person>>> groupsInfo;
 
-	public static class FixedGroupsProvider implements Provider<FixedGroupsIdentifier> {
-		private final Scenario scenario;
+  public static class FixedGroupsProvider implements Provider<FixedGroupsIdentifier> {
+    private final Scenario scenario;
 
-		@Inject
-		public FixedGroupsProvider( final Scenario sc ) {
-			this.scenario = sc;
-		}
+    @Inject
+    public FixedGroupsProvider(final Scenario sc) {
+      this.scenario = sc;
+    }
 
-		@Override
-		public FixedGroupsIdentifier get() {
-			final Config config = scenario.getConfig();
-			final CliquesConfigGroup cliquesConf = (CliquesConfigGroup)
-						config.getModule( CliquesConfigGroup.GROUP_NAME );
+    @Override
+    public FixedGroupsIdentifier get() {
+      final Config config = scenario.getConfig();
+      final CliquesConfigGroup cliquesConf =
+          (CliquesConfigGroup) config.getModule(CliquesConfigGroup.GROUP_NAME);
 
-			return config.households().getInputFile()!=null ?
-					new FixedGroupsIdentifier(
-							scenario.getHouseholds() ) :
-					FixedGroupsIdentifierFileParser.readCliquesFile(
-							cliquesConf.getInputFile() );
-		}
-	}
+      return config.households().getInputFile() != null
+          ? new FixedGroupsIdentifier(scenario.getHouseholds())
+          : FixedGroupsIdentifierFileParser.readCliquesFile(cliquesConf.getInputFile());
+    }
+  }
 
-	public FixedGroupsIdentifier(final Collection<? extends Collection<Id<Person>>> groups) {
-		this.groupsInfo = groups;
-	}
+  public FixedGroupsIdentifier(final Collection<? extends Collection<Id<Person>>> groups) {
+    this.groupsInfo = groups;
+  }
 
-	/**
-	 * for convenience: takes the grouping information in the household
-	 * container.
-	 * <br>
-	 * After initialization, any change in the household container will
-	 * <b><u>NOT</u></b> be reflected here!!!
-	 */
-	public FixedGroupsIdentifier(final Households households) {
-		this( extractGroups( households ) );
-	}
+  /**
+   * for convenience: takes the grouping information in the household container. <br>
+   * After initialization, any change in the household container will <b><u>NOT</u></b> be reflected
+   * here!!!
+   */
+  public FixedGroupsIdentifier(final Households households) {
+    this(extractGroups(households));
+  }
 
-	private static Collection<? extends Collection<Id<Person>>> extractGroups(
-			final Households households) {
-		final List<List<Id<Person>>> groups = new ArrayList<>();
+  private static Collection<? extends Collection<Id<Person>>> extractGroups(
+      final Households households) {
+    final List<List<Id<Person>>> groups = new ArrayList<>();
 
-		for ( Household hh : households.getHouseholds().values() ) {
-			groups.add( hh.getMemberIds() );
-		}
+    for (Household hh : households.getHouseholds().values()) {
+      groups.add(hh.getMemberIds());
+    }
 
-		return groups;
-	}
+    return groups;
+  }
 
-	public Collection<? extends Collection<Id<Person>>> getGroupInfo() {
-		return groupsInfo;
-	}
+  public Collection<? extends Collection<Id<Person>>> getGroupInfo() {
+    return groupsInfo;
+  }
 
-	@Override
-	public Collection<ReplanningGroup> identifyGroups(final Population population) {
-		final List<ReplanningGroup> groups = new ArrayList<ReplanningGroup>();
-		final Map<Id, Person> persons = new LinkedHashMap<Id, Person>( population.getPersons() );
+  @Override
+  public Collection<ReplanningGroup> identifyGroups(final Population population) {
+    final List<ReplanningGroup> groups = new ArrayList<ReplanningGroup>();
+    final Map<Id, Person> persons = new LinkedHashMap<Id, Person>(population.getPersons());
 
-		int countGroups = 0;
-		int countPersonsExplicit = 0;
-		for (Collection<Id<Person>> groupIds : groupsInfo) {
-			final ReplanningGroup g = new ReplanningGroup();
-			countGroups++;
+    int countGroups = 0;
+    int countPersonsExplicit = 0;
+    for (Collection<Id<Person>> groupIds : groupsInfo) {
+      final ReplanningGroup g = new ReplanningGroup();
+      countGroups++;
 
-			for (Id<Person> id : groupIds) {
-				countPersonsExplicit++;
-				final Person p = persons.remove( id );
-				if ( p == null ) {
-					if ( population.getPersons().containsKey( id ) ) {
-						throw new RuntimeException( "person with id "+id+" was found pertaining to several groups" );
-					}
-					throw new RuntimeException( "no person with id "+id+" in population "+population+" of size "+population.getPersons().size() );
-				}
-				g.addPerson( p );
-			}
+      for (Id<Person> id : groupIds) {
+        countPersonsExplicit++;
+        final Person p = persons.remove(id);
+        if (p == null) {
+          if (population.getPersons().containsKey(id)) {
+            throw new RuntimeException(
+                "person with id " + id + " was found pertaining to several groups");
+          }
+          throw new RuntimeException(
+              "no person with id "
+                  + id
+                  + " in population "
+                  + population
+                  + " of size "
+                  + population.getPersons().size());
+        }
+        g.addPerson(p);
+      }
 
-			groups.add( g );
-		}
-		log.info( countPersonsExplicit+" were allocated to "+countGroups+" groups." );
+      groups.add(g);
+    }
+    log.info(countPersonsExplicit + " were allocated to " + countGroups + " groups.");
 
-		// persons not allocated to any group are "grouped" alone
-		int countPersonsImplicit = 0;
-		for (Person p : persons.values()) {
-			final ReplanningGroup g = new ReplanningGroup();
-			g.addPerson( p );
-			groups.add( g );
-			countPersonsImplicit++;
-		}
-		log.info( countPersonsImplicit+" were not explicitly allocated to any group, and were put in one-person groups" );
+    // persons not allocated to any group are "grouped" alone
+    int countPersonsImplicit = 0;
+    for (Person p : persons.values()) {
+      final ReplanningGroup g = new ReplanningGroup();
+      g.addPerson(p);
+      groups.add(g);
+      countPersonsImplicit++;
+    }
+    log.info(
+        countPersonsImplicit
+            + " were not explicitly allocated to any group, and were put in one-person groups");
 
-		return groups;
-	}
+    return groups;
+  }
 }
-

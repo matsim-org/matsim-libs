@@ -22,7 +22,6 @@ package org.matsim.contrib.locationchoice.timegeography;
 
 import java.util.Random;
 import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -37,51 +36,56 @@ import org.matsim.facilities.ActivityFacilityImpl;
 /**
  * @author anhorni
  */
-class RandomLocationMutator extends AbstractLocationMutator{
+class RandomLocationMutator extends AbstractLocationMutator {
 
-	public RandomLocationMutator(final Scenario scenario, Random random) {
-		super(scenario, random);
-	}
+  public RandomLocationMutator(final Scenario scenario, Random random) {
+    super(scenario, random);
+  }
 
-	public RandomLocationMutator(final Scenario scenario, TreeMap<String, ? extends QuadTree<ActivityFacility>> quad_trees,
-			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
-		super(scenario, quad_trees, facilities_of_type, random);
-	}
+  public RandomLocationMutator(
+      final Scenario scenario,
+      TreeMap<String, ? extends QuadTree<ActivityFacility>> quad_trees,
+      TreeMap<String, ActivityFacilityImpl[]> facilities_of_type,
+      Random random) {
+    super(scenario, quad_trees, facilities_of_type, random);
+  }
 
+  /*
+   * For all secondary activities of the plan chose randomly a new facility which provides
+   * the possibility to perform the same activity.
+   * plan == selected plan
+   */
+  @Override
+  public void run(final Plan plan) {
+    this.handlePlanForPreDefinedFlexibleTypes(plan);
+    PopulationUtils.resetRoutes(plan);
+  }
 
-	/*
-	 * For all secondary activities of the plan chose randomly a new facility which provides
-	 * the possibility to perform the same activity.
-	 * plan == selected plan
-	 */
-	@Override
-	public void run(final Plan plan) {
-		this.handlePlanForPreDefinedFlexibleTypes(plan);
-		PopulationUtils.resetRoutes(plan );
-	}
+  private void handlePlanForPreDefinedFlexibleTypes(final Plan plan) {
+    for (PlanElement pe : plan.getPlanElements()) {
+      if (pe instanceof Activity) {
+        final Activity act = (Activity) pe;
 
+        // if home is accidentally not defined as primary
+        if (super.getDefineFlexibleActivities().getFlexibleTypes().contains(act.getType())) {
+          int length = this.getFacilitiesOfType().get(act.getType()).length;
+          // only one facility: do not need to do location choice
+          if (length > 1) {
+            this.setNewLocationForAct((Activity) act, length);
+          }
+        }
+      }
+    }
+  }
 
-	private void handlePlanForPreDefinedFlexibleTypes(final Plan plan) {
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				final Activity act = (Activity) pe;
-	
-				// if home is accidentally not defined as primary
-				if ( super.getDefineFlexibleActivities().getFlexibleTypes().contains(act.getType() )) {
-					int length = this.getFacilitiesOfType().get(act.getType() ).length;
-					// only one facility: do not need to do location choice
-					if (length > 1) {
-						this.setNewLocationForAct((Activity) act, length);
-					}
-				}
-			}
-		}
-	}
-
-	private void setNewLocationForAct(Activity act, int length) {
-		ActivityFacilityImpl facility = this.getFacilitiesOfType().get(act.getType() )[super.getRandom().nextInt(length )];
-		act.setFacilityId(facility.getId());
-		act.setLinkId(NetworkUtils.getNearestLink(((Network) this.getScenario().getNetwork()), facility.getCoord() ).getId() );
-		act.setCoord(facility.getCoord());
-	}
+  private void setNewLocationForAct(Activity act, int length) {
+    ActivityFacilityImpl facility =
+        this.getFacilitiesOfType().get(act.getType())[super.getRandom().nextInt(length)];
+    act.setFacilityId(facility.getId());
+    act.setLinkId(
+        NetworkUtils.getNearestLink(
+                ((Network) this.getScenario().getNetwork()), facility.getCoord())
+            .getId());
+    act.setCoord(facility.getCoord());
+  }
 }

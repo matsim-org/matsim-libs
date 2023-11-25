@@ -31,19 +31,29 @@ import org.matsim.core.controler.AbstractModule;
 
 public class ParkingManagerModule extends AbstractModule {
 
-    @Override
-    public void install() {
-		Config config = getConfig();
+  @Override
+  public void install() {
+    Config config = getConfig();
 
-		ParkingSearchConfigGroup psConfigGroup = (ParkingSearchConfigGroup) config.getModules().get(ParkingSearchConfigGroup.GROUP_NAME);
+    ParkingSearchConfigGroup psConfigGroup =
+        (ParkingSearchConfigGroup) config.getModules().get(ParkingSearchConfigGroup.GROUP_NAME);
 
-		if (psConfigGroup.getParkingSearchManagerType().equals(ParkingSearchConfigGroup.ParkingSearchManagerType.FacilityBasedParkingManager)){
-			bind(ParkingSearchManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();
-		} else if (psConfigGroup.getParkingSearchManagerType().equals(ParkingSearchConfigGroup.ParkingSearchManagerType.ZoneParkingManager)) {
-			bind(ParkingSearchManager.class).to(ZoneParkingManager.class).asEagerSingleton();
-		} else if (psConfigGroup.getParkingSearchManagerType().equals(ParkingSearchConfigGroup.ParkingSearchManagerType.LinkLengthBasedParkingManagerWithRandomInitialUtilisation)) {
-			bind(ParkingSearchManager.class).to(LinkLengthBasedParkingManagerWithRandomInitialUtilisation.class).asEagerSingleton();
-		}
+    if (psConfigGroup
+        .getParkingSearchManagerType()
+        .equals(ParkingSearchConfigGroup.ParkingSearchManagerType.FacilityBasedParkingManager)) {
+      bind(ParkingSearchManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();
+    } else if (psConfigGroup
+        .getParkingSearchManagerType()
+        .equals(ParkingSearchConfigGroup.ParkingSearchManagerType.ZoneParkingManager)) {
+      bind(ParkingSearchManager.class).to(ZoneParkingManager.class).asEagerSingleton();
+    } else if (psConfigGroup
+        .getParkingSearchManagerType()
+        .equals(
+            ParkingSearchConfigGroup.ParkingSearchManagerType
+                .LinkLengthBasedParkingManagerWithRandomInitialUtilisation)) {
+      bind(ParkingSearchManager.class)
+          .to(LinkLengthBasedParkingManagerWithRandomInitialUtilisation.class)
+          .asEagerSingleton();
     }
-
+  }
 }

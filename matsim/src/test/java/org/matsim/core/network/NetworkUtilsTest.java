@@ -18,6 +18,10 @@
  * *********************************************************************** */
 package org.matsim.core.network;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.List;
+import java.util.TreeMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -35,271 +39,263 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.util.List;
-import java.util.TreeMap;
-
-import static org.junit.Assert.assertEquals;
-
 /**
  * @author nagel
- *
  */
 public class NetworkUtilsTest {
-	private static final Logger log = LogManager.getLogger( NetworkUtilsTest.class ) ;
-	
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils() ;
+  private static final Logger log = LogManager.getLogger(NetworkUtilsTest.class);
 
-	/**
-	 * Test method for {@link org.matsim.core.network.NetworkUtils#isMultimodal(org.matsim.api.core.v01.network.Network)}.
-	 */
-	@Test
-	public final void testIsMultimodal() {
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-		Config config = utils.createConfigWithInputResourcePathAsContext();
-		config.network().setInputFile("network.xml" );
-		
-		Scenario scenario = ScenarioUtils.loadScenario(config) ;
-		
-		Network network = scenario.getNetwork() ;
-		
-		Assert.assertTrue( NetworkUtils.isMultimodal( network ) );
-		
-	}
+  /**
+   * Test method for {@link
+   * org.matsim.core.network.NetworkUtils#isMultimodal(org.matsim.api.core.v01.network.Network)}.
+   */
+  @Test
+  public final void testIsMultimodal() {
 
+    Config config = utils.createConfigWithInputResourcePathAsContext();
+    config.network().setInputFile("network.xml");
 
-	@SuppressWarnings("static-method")
-	@Test
-	public final void getOutLinksSortedByAngleTest() {
-		final Network network = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
-		// (we need the network to properly connect the links)
-		
-		NetworkFactory nf = network.getFactory() ;
-		
-		// a number of potentially outgoing links:
-		
-		Node nd0 = nf.createNode(Id.createNodeId("0"), new Coord(0.,0.) ) ;
-		Node ndN = nf.createNode(Id.createNodeId("N"), new Coord(0.,100.) ) ;
-		Node ndNE = nf.createNode(Id.createNodeId("NE"), new Coord(100.,100.) ) ;
-		Node ndE = nf.createNode(Id.createNodeId("E"), new Coord(100.,0.) ) ;
-		Node ndSE = nf.createNode(Id.createNodeId("SE"), new Coord(100.,-100.) ) ;
-		Node ndS = nf.createNode(Id.createNodeId("S"), new Coord(0.,-100.) ) ;
-		Node ndSW = nf.createNode(Id.createNodeId("SW"), new Coord(-100.,-100.) ) ;
-		Node ndW = nf.createNode(Id.createNodeId("W"), new Coord(-100.,0.) ) ;
-		Node ndNW = nf.createNode(Id.createNodeId("NW"), new Coord(-100.,+100.) ) ;
-		
-		network.addNode( nd0 );
-		network.addNode( ndN );
-		network.addNode( ndNE );
-		network.addNode( ndE );
-		network.addNode( ndSE );
-		network.addNode( ndS );
-		network.addNode( ndSW );
-		network.addNode( ndW );
-		network.addNode( ndNW );
-		
-		Link liN = nf.createLink( Id.createLinkId("N"), nd0, ndN ) ;
-		Link liNE = nf.createLink( Id.createLinkId("NE"), nd0, ndNE ) ;
-		Link liE = nf.createLink( Id.createLinkId("E"), nd0, ndE ) ;
-		Link liSE = nf.createLink( Id.createLinkId("SE"), nd0, ndSE ) ;
-		Link liS = nf.createLink( Id.createLinkId("S"), nd0, ndS ) ;
-		Link liSW = nf.createLink( Id.createLinkId("SW"), nd0, ndSW ) ;
-		Link liW = nf.createLink( Id.createLinkId("W"), nd0, ndW ) ;
-		Link liNW = nf.createLink( Id.createLinkId("NW"), nd0, ndNW ) ;
-		
-		network.addLink( liN );
-		network.addLink( liNE );
-		network.addLink( liE );
-		network.addLink( liSE );
-		network.addLink( liS );
-		network.addLink( liSW );
-		network.addLink( liW );
-		network.addLink( liNW );
-		
-		log.info("===");
-		// a link coming north to south:
-		{
-			Link inLink = nf.createLink( Id.createLinkId("fromNorth"), ndN, nd0 ) ;
-			TreeMap<Double, Link> result = NetworkUtils.getOutLinksSortedClockwiseByAngle(inLink) ;
-			for ( Link outLink : result.values() ) {
-				log.info( outLink );
-			}
-			
-			Link[] actuals = result.values().toArray( new Link[result.size()] ) ;
-			Link[] expecteds = {liNE,liE,liSE,liS,liSW,liW,liNW} ;
-			Assert.assertArrayEquals(expecteds, actuals);
-			
-		}
-		log.info("===");
-		// a link coming south to north:
-		{
-			Link inLink = nf.createLink( Id.createLinkId("fromSouth"), ndS, nd0 ) ;
-			TreeMap<Double, Link> result = NetworkUtils.getOutLinksSortedClockwiseByAngle(inLink) ;
-			for ( Link outLink : result.values() ) {
-				log.info( outLink );
-			}
-			Link[] actuals = result.values().toArray( new Link[result.size()] ) ;
-			Link[] expecteds = {liSW,liW,liNW,liN,liNE,liE,liSE} ;
-			Assert.assertArrayEquals(expecteds, actuals);
-		}
-		log.info("===");
-	}
+    Scenario scenario = ScenarioUtils.loadScenario(config);
 
-	@Test
-	public void testfindNearestPointOnLink(){
-		Network network = NetworkUtils.createNetwork();
-        Coord n1 = new Coord(1, 1);
-		Coord n2 = new Coord(100,100);
-		Coord plainX = new Coord(1,100);
-		Coord plainY = new Coord(100,1);
-		Node node1 = NetworkUtils.createNode(Id.createNodeId(1),n1);
-		Node node2 = NetworkUtils.createNode(Id.createNodeId(2),n2);
-		Node plainXNode = NetworkUtils.createNode(Id.createNodeId(3),plainX);
-		Node plainYNode = NetworkUtils.createNode(Id.createNodeId(4),plainY);
+    Network network = scenario.getNetwork();
 
-		Link link = NetworkUtils.createLink(Id.createLinkId("1-2"),node1,node2,network,150,1,20,1);
-		Link plainXLink = NetworkUtils.createLink(Id.createLinkId("plainX"),node1,plainXNode,network,150,1,20,1);
-		Link plainYLink = NetworkUtils.createLink(Id.createLinkId("plainY"),node1,plainYNode,network,150,1,20,1);
-		Link loop = NetworkUtils.createLink(Id.createLinkId("1-1"),node1,node1,network,150,1,20,1);
+    Assert.assertTrue(NetworkUtils.isMultimodal(network));
+  }
 
-		//fromNode
-		Coord tp1 = new Coord(1,1);
-		assertEquals(n1,NetworkUtils.findNearestPointOnLink(tp1,link));
+  @SuppressWarnings("static-method")
+  @Test
+  public final void getOutLinksSortedByAngleTest() {
+    final Network network = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
+    // (we need the network to properly connect the links)
 
-		//toNode
-		Coord tp2 = new Coord(100,100);
-		assertEquals(n2,NetworkUtils.findNearestPointOnLink(tp2,link));
+    NetworkFactory nf = network.getFactory();
 
-		//on the link
-		Coord tp3 = new Coord(50,50);
-		assertEquals(tp3,NetworkUtils.findNearestPointOnLink(tp3,link));
+    // a number of potentially outgoing links:
 
-		//along the link vector, but before link
-		Coord tp4 = new Coord(-50,-50);
-		assertEquals(n1,NetworkUtils.findNearestPointOnLink(tp4,link));
+    Node nd0 = nf.createNode(Id.createNodeId("0"), new Coord(0., 0.));
+    Node ndN = nf.createNode(Id.createNodeId("N"), new Coord(0., 100.));
+    Node ndNE = nf.createNode(Id.createNodeId("NE"), new Coord(100., 100.));
+    Node ndE = nf.createNode(Id.createNodeId("E"), new Coord(100., 0.));
+    Node ndSE = nf.createNode(Id.createNodeId("SE"), new Coord(100., -100.));
+    Node ndS = nf.createNode(Id.createNodeId("S"), new Coord(0., -100.));
+    Node ndSW = nf.createNode(Id.createNodeId("SW"), new Coord(-100., -100.));
+    Node ndW = nf.createNode(Id.createNodeId("W"), new Coord(-100., 0.));
+    Node ndNW = nf.createNode(Id.createNodeId("NW"), new Coord(-100., +100.));
 
-		//along the link vector, but after link ends
-		Coord tp5 = new Coord(150,150);
-		assertEquals(n2,NetworkUtils.findNearestPointOnLink(tp5,link));
+    network.addNode(nd0);
+    network.addNode(ndN);
+    network.addNode(ndNE);
+    network.addNode(ndE);
+    network.addNode(ndSE);
+    network.addNode(ndS);
+    network.addNode(ndSW);
+    network.addNode(ndW);
+    network.addNode(ndNW);
 
-		//off the link, but before link start
-		Coord tp6 = new Coord(1,0);
-		assertEquals(new Coord(1,1),NetworkUtils.findNearestPointOnLink(tp6,link));
+    Link liN = nf.createLink(Id.createLinkId("N"), nd0, ndN);
+    Link liNE = nf.createLink(Id.createLinkId("NE"), nd0, ndNE);
+    Link liE = nf.createLink(Id.createLinkId("E"), nd0, ndE);
+    Link liSE = nf.createLink(Id.createLinkId("SE"), nd0, ndSE);
+    Link liS = nf.createLink(Id.createLinkId("S"), nd0, ndS);
+    Link liSW = nf.createLink(Id.createLinkId("SW"), nd0, ndSW);
+    Link liW = nf.createLink(Id.createLinkId("W"), nd0, ndW);
+    Link liNW = nf.createLink(Id.createLinkId("NW"), nd0, ndNW);
 
-		//off the link, parallel to it
-		Coord tp7 = new Coord(2,1);
-		assertEquals(new Coord(1.5,1.5),NetworkUtils.findNearestPointOnLink(tp7,link));
+    network.addLink(liN);
+    network.addLink(liNE);
+    network.addLink(liE);
+    network.addLink(liSE);
+    network.addLink(liS);
+    network.addLink(liSW);
+    network.addLink(liW);
+    network.addLink(liNW);
 
-		//off the link, parallel to it
-		Coord tp8 = new Coord(30,45);
-		assertEquals(new Coord(37.5,37.5),NetworkUtils.findNearestPointOnLink(tp8,link));
+    log.info("===");
+    // a link coming north to south:
+    {
+      Link inLink = nf.createLink(Id.createLinkId("fromNorth"), ndN, nd0);
+      TreeMap<Double, Link> result = NetworkUtils.getOutLinksSortedClockwiseByAngle(inLink);
+      for (Link outLink : result.values()) {
+        log.info(outLink);
+      }
 
-		//loop link
-		assertEquals(n1,NetworkUtils.findNearestPointOnLink(tp8,loop));
+      Link[] actuals = result.values().toArray(new Link[result.size()]);
+      Link[] expecteds = {liNE, liE, liSE, liS, liSW, liW, liNW};
+      Assert.assertArrayEquals(expecteds, actuals);
+    }
+    log.info("===");
+    // a link coming south to north:
+    {
+      Link inLink = nf.createLink(Id.createLinkId("fromSouth"), ndS, nd0);
+      TreeMap<Double, Link> result = NetworkUtils.getOutLinksSortedClockwiseByAngle(inLink);
+      for (Link outLink : result.values()) {
+        log.info(outLink);
+      }
+      Link[] actuals = result.values().toArray(new Link[result.size()]);
+      Link[] expecteds = {liSW, liW, liNW, liN, liNE, liE, liSE};
+      Assert.assertArrayEquals(expecteds, actuals);
+    }
+    log.info("===");
+  }
 
-		//link is plain in x & y
-		assertEquals(new Coord(1,45),NetworkUtils.findNearestPointOnLink(tp8,plainXLink));
-		assertEquals(new Coord(30,1),NetworkUtils.findNearestPointOnLink(tp8,plainYLink));
+  @Test
+  public void testfindNearestPointOnLink() {
+    Network network = NetworkUtils.createNetwork();
+    Coord n1 = new Coord(1, 1);
+    Coord n2 = new Coord(100, 100);
+    Coord plainX = new Coord(1, 100);
+    Coord plainY = new Coord(100, 1);
+    Node node1 = NetworkUtils.createNode(Id.createNodeId(1), n1);
+    Node node2 = NetworkUtils.createNode(Id.createNodeId(2), n2);
+    Node plainXNode = NetworkUtils.createNode(Id.createNodeId(3), plainX);
+    Node plainYNode = NetworkUtils.createNode(Id.createNodeId(4), plainY);
 
-	}
+    Link link =
+        NetworkUtils.createLink(Id.createLinkId("1-2"), node1, node2, network, 150, 1, 20, 1);
+    Link plainXLink =
+        NetworkUtils.createLink(
+            Id.createLinkId("plainX"), node1, plainXNode, network, 150, 1, 20, 1);
+    Link plainYLink =
+        NetworkUtils.createLink(
+            Id.createLinkId("plainY"), node1, plainYNode, network, 150, 1, 20, 1);
+    Link loop =
+        NetworkUtils.createLink(Id.createLinkId("1-1"), node1, node1, network, 150, 1, 20, 1);
 
-	@Test
-	public void getOriginalGeometry() {
+    // fromNode
+    Coord tp1 = new Coord(1, 1);
+    assertEquals(n1, NetworkUtils.findNearestPointOnLink(tp1, link));
 
-        var network = NetworkUtils.createNetwork();
-        var fromNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0, 0));
-		var toNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("to"), new Coord(100, 100));
-		var link = network.getFactory().createLink(Id.createLinkId("link"), fromNode, toNode);
-		network.addLink(link);
+    // toNode
+    Coord tp2 = new Coord(100, 100);
+    assertEquals(n2, NetworkUtils.findNearestPointOnLink(tp2, link));
 
-		var intermediateNode1 = network.getFactory().createNode(Id.createNodeId("intermediate_1"), new Coord(20, 20));
-		var intermediateNode2 = network.getFactory().createNode(Id.createNodeId("intermediate_2"), new Coord(70, 70));
+    // on the link
+    Coord tp3 = new Coord(50, 50);
+    assertEquals(tp3, NetworkUtils.findNearestPointOnLink(tp3, link));
 
-		var intermediateString1 = intermediateNode1.getId().toString() + "," + intermediateNode1.getCoord().getX() + "," + intermediateNode1.getCoord().getY();
-		var intermediateString2 = intermediateNode2.getId().toString() + "," + intermediateNode2.getCoord().getX() + "," + intermediateNode2.getCoord().getY();
-		var geometryString = intermediateString1 + " " + intermediateString2;
-		link.getAttributes().putAttribute(NetworkUtils.ORIG_GEOM, geometryString);
+    // along the link vector, but before link
+    Coord tp4 = new Coord(-50, -50);
+    assertEquals(n1, NetworkUtils.findNearestPointOnLink(tp4, link));
 
-		var expectedNodeList = List.of(fromNode, intermediateNode1, intermediateNode2, toNode);
-		var actualNodeList = NetworkUtils.getOriginalGeometry(link);
+    // along the link vector, but after link ends
+    Coord tp5 = new Coord(150, 150);
+    assertEquals(n2, NetworkUtils.findNearestPointOnLink(tp5, link));
 
-		assertEquals(expectedNodeList.size(), actualNodeList.size());
+    // off the link, but before link start
+    Coord tp6 = new Coord(1, 0);
+    assertEquals(new Coord(1, 1), NetworkUtils.findNearestPointOnLink(tp6, link));
 
-		for (var i = 0; i < expectedNodeList.size(); i++) {
-			var expectedNode = expectedNodeList.get(i);
-			var actualNode = actualNodeList.get(i);
+    // off the link, parallel to it
+    Coord tp7 = new Coord(2, 1);
+    assertEquals(new Coord(1.5, 1.5), NetworkUtils.findNearestPointOnLink(tp7, link));
 
-			assertEquals(expectedNode.getId(), actualNode.getId());
-			assertEquals(expectedNode.getCoord(), actualNode.getCoord());
-		}
-	}
+    // off the link, parallel to it
+    Coord tp8 = new Coord(30, 45);
+    assertEquals(new Coord(37.5, 37.5), NetworkUtils.findNearestPointOnLink(tp8, link));
 
-	@Test
-	public void getOriginalGeometry_noGeometryStored() {
+    // loop link
+    assertEquals(n1, NetworkUtils.findNearestPointOnLink(tp8, loop));
 
-        var network = NetworkUtils.createNetwork();
-        var fromNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0, 0));
-		var toNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("to"), new Coord(100, 100));
-		var link = network.getFactory().createLink(Id.createLinkId("link"), fromNode, toNode);
-		network.addLink(link);
+    // link is plain in x & y
+    assertEquals(new Coord(1, 45), NetworkUtils.findNearestPointOnLink(tp8, plainXLink));
+    assertEquals(new Coord(30, 1), NetworkUtils.findNearestPointOnLink(tp8, plainYLink));
+  }
 
-		var expectedNodeList = List.of(fromNode, toNode);
+  @Test
+  public void getOriginalGeometry() {
 
-		var actualNodeList = NetworkUtils.getOriginalGeometry(link);
+    var network = NetworkUtils.createNetwork();
+    var fromNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0, 0));
+    var toNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("to"), new Coord(100, 100));
+    var link = network.getFactory().createLink(Id.createLinkId("link"), fromNode, toNode);
+    network.addLink(link);
 
-		assertEquals(expectedNodeList.size(), actualNodeList.size());
+    var intermediateNode1 =
+        network.getFactory().createNode(Id.createNodeId("intermediate_1"), new Coord(20, 20));
+    var intermediateNode2 =
+        network.getFactory().createNode(Id.createNodeId("intermediate_2"), new Coord(70, 70));
 
-		for (var i = 0; i < expectedNodeList.size(); i++) {
-			var expectedNode = expectedNodeList.get(i);
-			var actualNode = actualNodeList.get(i);
+    var intermediateString1 =
+        intermediateNode1.getId().toString()
+            + ","
+            + intermediateNode1.getCoord().getX()
+            + ","
+            + intermediateNode1.getCoord().getY();
+    var intermediateString2 =
+        intermediateNode2.getId().toString()
+            + ","
+            + intermediateNode2.getCoord().getX()
+            + ","
+            + intermediateNode2.getCoord().getY();
+    var geometryString = intermediateString1 + " " + intermediateString2;
+    link.getAttributes().putAttribute(NetworkUtils.ORIG_GEOM, geometryString);
 
-			assertEquals(expectedNode.getId(), actualNode.getId());
-			assertEquals(expectedNode.getCoord(), actualNode.getCoord());
-		}
-	}
+    var expectedNodeList = List.of(fromNode, intermediateNode1, intermediateNode2, toNode);
+    var actualNodeList = NetworkUtils.getOriginalGeometry(link);
 
-	/**
-	 * Have this test here since I first had a bug where empty origgeom attributes would cause exceptions because String.split
-	 * splits an empty string ("") into string[""]...
-	 */
-	@Test
-	public void getOriginalGeometry_emptyGeometryStored() {
+    assertEquals(expectedNodeList.size(), actualNodeList.size());
 
-        var network = NetworkUtils.createNetwork();
-        var fromNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0, 0));
-		var toNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("to"), new Coord(100, 100));
-		var link = network.getFactory().createLink(Id.createLinkId("link"), fromNode, toNode);
-		link.getAttributes().putAttribute(NetworkUtils.ORIG_GEOM, "");
-		network.addLink(link);
+    for (var i = 0; i < expectedNodeList.size(); i++) {
+      var expectedNode = expectedNodeList.get(i);
+      var actualNode = actualNodeList.get(i);
 
-		var expectedNodeList = List.of(fromNode, toNode);
+      assertEquals(expectedNode.getId(), actualNode.getId());
+      assertEquals(expectedNode.getCoord(), actualNode.getCoord());
+    }
+  }
 
-		var actualNodeList = NetworkUtils.getOriginalGeometry(link);
+  @Test
+  public void getOriginalGeometry_noGeometryStored() {
 
-		assertEquals(expectedNodeList.size(), actualNodeList.size());
+    var network = NetworkUtils.createNetwork();
+    var fromNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0, 0));
+    var toNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("to"), new Coord(100, 100));
+    var link = network.getFactory().createLink(Id.createLinkId("link"), fromNode, toNode);
+    network.addLink(link);
 
-		for (var i = 0; i < expectedNodeList.size(); i++) {
-			var expectedNode = expectedNodeList.get(i);
-			var actualNode = actualNodeList.get(i);
+    var expectedNodeList = List.of(fromNode, toNode);
 
-			assertEquals(expectedNode.getId(), actualNode.getId());
-			assertEquals(expectedNode.getCoord(), actualNode.getCoord());
-		}
+    var actualNodeList = NetworkUtils.getOriginalGeometry(link);
 
-	}
+    assertEquals(expectedNodeList.size(), actualNodeList.size());
+
+    for (var i = 0; i < expectedNodeList.size(); i++) {
+      var expectedNode = expectedNodeList.get(i);
+      var actualNode = actualNodeList.get(i);
+
+      assertEquals(expectedNode.getId(), actualNode.getId());
+      assertEquals(expectedNode.getCoord(), actualNode.getCoord());
+    }
+  }
+
+  /**
+   * Have this test here since I first had a bug where empty origgeom attributes would cause
+   * exceptions because String.split splits an empty string ("") into string[""]...
+   */
+  @Test
+  public void getOriginalGeometry_emptyGeometryStored() {
+
+    var network = NetworkUtils.createNetwork();
+    var fromNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0, 0));
+    var toNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("to"), new Coord(100, 100));
+    var link = network.getFactory().createLink(Id.createLinkId("link"), fromNode, toNode);
+    link.getAttributes().putAttribute(NetworkUtils.ORIG_GEOM, "");
+    network.addLink(link);
+
+    var expectedNodeList = List.of(fromNode, toNode);
+
+    var actualNodeList = NetworkUtils.getOriginalGeometry(link);
+
+    assertEquals(expectedNodeList.size(), actualNodeList.size());
+
+    for (var i = 0; i < expectedNodeList.size(); i++) {
+      var expectedNode = expectedNodeList.get(i);
+      var actualNode = actualNodeList.get(i);
+
+      assertEquals(expectedNode.getId(), actualNode.getId());
+      assertEquals(expectedNode.getCoord(), actualNode.getCoord());
+    }
+  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

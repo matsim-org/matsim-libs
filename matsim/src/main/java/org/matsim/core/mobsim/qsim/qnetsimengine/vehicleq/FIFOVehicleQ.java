@@ -21,41 +21,39 @@ package org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq;
 import java.util.AbstractQueue;
 import java.util.Iterator;
 import java.util.LinkedList;
-
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
-public final class FIFOVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle>  {
-	
-	private final LinkedList<QVehicle> vehicleQueue = new LinkedList<>();
+public final class FIFOVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle> {
 
-	@Override
-	public boolean offer(QVehicle e) {
-		return vehicleQueue.offer(e);
-	}
+  private final LinkedList<QVehicle> vehicleQueue = new LinkedList<>();
 
-	@Override
-	public QVehicle peek() {
-		return vehicleQueue.peek();
-	}
+  @Override
+  public boolean offer(QVehicle e) {
+    return vehicleQueue.offer(e);
+  }
 
-	@Override
-	public QVehicle poll() {
-		return vehicleQueue.poll();
-	}
+  @Override
+  public QVehicle peek() {
+    return vehicleQueue.peek();
+  }
 
-	@Override
-	public Iterator<QVehicle> iterator() {
-		return vehicleQueue.iterator();
-	}
+  @Override
+  public QVehicle poll() {
+    return vehicleQueue.poll();
+  }
 
-	@Override
-	public int size() {
-		return vehicleQueue.size();
-	}
+  @Override
+  public Iterator<QVehicle> iterator() {
+    return vehicleQueue.iterator();
+  }
 
-	@Override
-	public void addFirst(QVehicle e) {
-		vehicleQueue.addFirst(e);
-	}
+  @Override
+  public int size() {
+    return vehicleQueue.size();
+  }
 
+  @Override
+  public void addFirst(QVehicle e) {
+    vehicleQueue.addFirst(e);
+  }
 }

@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * QSimComponent.java
@@ -19,8 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim.components;
+package org.matsim.core.mobsim.qsim.components;
 
-public interface QSimComponent {
-
-}
+public interface QSimComponent {}

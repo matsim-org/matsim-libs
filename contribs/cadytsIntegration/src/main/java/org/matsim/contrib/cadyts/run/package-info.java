@@ -17,10 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 /**
- * Contains "scripts-in-java" to run cadyts with matsim.  The scripts should be considered prototypes rather than
- * runnable examples for the time being (dec'2014).
- * 
- * @author nagel
+ * Contains "scripts-in-java" to run cadyts with matsim. The scripts should be considered prototypes
+ * rather than runnable examples for the time being (dec'2014).
  *
+ * @author nagel
  */
 package org.matsim.contrib.cadyts.run;

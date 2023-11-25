@@ -28,15 +28,15 @@ import org.matsim.contrib.evrp.ETask;
  * @author michalm
  */
 public class EDrtDriveTask extends DrtDriveTask implements ETask {
-	private final double consumedEnergy;
+  private final double consumedEnergy;
 
-	public EDrtDriveTask(VrpPathWithTravelData path, DrtTaskType taskType, double consumedEnergy) {
-		super(path, taskType);
-		this.consumedEnergy = consumedEnergy;
-	}
+  public EDrtDriveTask(VrpPathWithTravelData path, DrtTaskType taskType, double consumedEnergy) {
+    super(path, taskType);
+    this.consumedEnergy = consumedEnergy;
+  }
 
-	@Override
-	public double getTotalEnergy() {
-		return consumedEnergy;
-	}
+  @Override
+  public double getTotalEnergy() {
+    return consumedEnergy;
+  }
 }

@@ -26,6 +26,5 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
  * @author thibautd
  */
 public interface QVehicleProvider {
-	public QVehicle getVehicle( Id vehicleId );
+  public QVehicle getVehicle(Id vehicleId);
 }
-

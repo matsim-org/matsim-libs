@@ -22,36 +22,33 @@ package org.matsim.counts.algorithms.graphs;
 
 import java.util.List;
 import java.util.Vector;
-
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.algorithms.graphs.helper.MyURL;
 
 public class CountsErrorGraphCreator extends CountsGraphsCreator {
 
+  public CountsErrorGraphCreator(final String sectionTitle) {
+    super(sectionTitle);
+  }
 
-	public CountsErrorGraphCreator(final String sectionTitle) {
-		super(sectionTitle);
-	}
+  @Override
+  public List<CountsGraph> createGraphs(final List<CountSimComparison> ccl, final int iteration) {
 
-
-	@Override
-	public List<CountsGraph> createGraphs(final List<CountSimComparison> ccl, final int iteration) {	
-
-		List<CountsGraph> graphList=new Vector<CountsGraph>();
-		{
-			String fileName="errors";
-			BoxPlotErrorGraph ep=new BoxPlotErrorGraph(ccl, iteration, fileName, fileName);
-			ep.createChart(0);
-			graphList.add(ep);
-			this.section.addURL(new MyURL(fileName+".html", "errors"));
-		}
-		{
-			String fileName="biasErrors";
-			BiasErrorGraph ep=new BiasErrorGraph(ccl, iteration, fileName, fileName);
-			ep.createChart(0);
-			graphList.add(ep);
-			this.section.addURL(new MyURL(fileName+".html", "biasErrors"));
-		}
-		return graphList;
-	}
+    List<CountsGraph> graphList = new Vector<CountsGraph>();
+    {
+      String fileName = "errors";
+      BoxPlotErrorGraph ep = new BoxPlotErrorGraph(ccl, iteration, fileName, fileName);
+      ep.createChart(0);
+      graphList.add(ep);
+      this.section.addURL(new MyURL(fileName + ".html", "errors"));
+    }
+    {
+      String fileName = "biasErrors";
+      BiasErrorGraph ep = new BiasErrorGraph(ccl, iteration, fileName, fileName);
+      ep.createChart(0);
+      graphList.add(ep);
+      this.section.addURL(new MyURL(fileName + ".html", "biasErrors"));
+    }
+    return graphList;
+  }
 }

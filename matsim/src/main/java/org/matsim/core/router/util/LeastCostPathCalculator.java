@@ -21,7 +21,6 @@
 package org.matsim.core.router.util;
 
 import java.util.List;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
@@ -29,27 +28,32 @@ import org.matsim.vehicles.Vehicle;
 
 public interface LeastCostPathCalculator {
 
-	Path calcLeastCostPath(Node fromNode, Node toNode, double starttime, final Person person, final Vehicle vehicle);
+  Path calcLeastCostPath(
+      Node fromNode, Node toNode, double starttime, final Person person, final Vehicle vehicle);
 
-	class Path {
-		public List<Node> nodes;
-		public final List<Link> links;
-		public final double travelTime;
-		public final double travelCost;
+  class Path {
+    public List<Node> nodes;
+    public final List<Link> links;
+    public final double travelTime;
+    public final double travelCost;
 
-		public Path(final List<Node> nodes, final List<Link> links, final double travelTime, final double travelCost) {
-			this.nodes = nodes;
-			this.links = links;
-			this.travelTime = travelTime;
-			this.travelCost = travelCost;
-		}
+    public Path(
+        final List<Node> nodes,
+        final List<Link> links,
+        final double travelTime,
+        final double travelCost) {
+      this.nodes = nodes;
+      this.links = links;
+      this.travelTime = travelTime;
+      this.travelCost = travelCost;
+    }
 
-		public Node getFromNode() {
-			return nodes.get(0);
-		}
+    public Node getFromNode() {
+      return nodes.get(0);
+    }
 
-		public Node getToNode() {
-			return nodes.get(nodes.size() - 1);
-		}
-	}
+    public Node getToNode() {
+      return nodes.get(nodes.size() - 1);
+    }
+  }
 }

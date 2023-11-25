@@ -29,11 +29,11 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
  *
  * @author Christoph Dobler
  */
-public class ParallelDuringActivityReplanner extends ParallelReplanner<WithinDayDuringActivityReplannerFactory> {
-	
-	public ParallelDuringActivityReplanner(int numOfThreads, EventsManager eventsManager) {
-		super(numOfThreads, eventsManager);
-		this.init("ParallelDuringActivityReplanner");
-	}
-	
+public class ParallelDuringActivityReplanner
+    extends ParallelReplanner<WithinDayDuringActivityReplannerFactory> {
+
+  public ParallelDuringActivityReplanner(int numOfThreads, EventsManager eventsManager) {
+    super(numOfThreads, eventsManager);
+    this.init("ParallelDuringActivityReplanner");
+  }
 }

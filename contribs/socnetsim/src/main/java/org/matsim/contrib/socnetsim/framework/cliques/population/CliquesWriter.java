@@ -26,7 +26,6 @@ import static org.matsim.contrib.socnetsim.framework.cliques.population.CliquesS
 import static org.matsim.contrib.socnetsim.framework.cliques.population.CliquesSchemaNames.MEMBER_ID;
 
 import java.util.Collections;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.utils.collections.Tuple;
@@ -37,40 +36,25 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
  */
 public class CliquesWriter extends MatsimXmlWriter {
 
-	public void openAndStartFile(final String fileName) {
-		openFile( fileName );
-		writeXmlHead();
-		writeStartTag(
-				CLIQUES,
-				Collections.<Tuple<String,String>> emptyList() );
-	}
+  public void openAndStartFile(final String fileName) {
+    openFile(fileName);
+    writeXmlHead();
+    writeStartTag(CLIQUES, Collections.<Tuple<String, String>>emptyList());
+  }
 
-	public void writeClique(
-			final Id id,
-			final Iterable<? extends Identifiable> members) {
-		writeStartTag(
-				CLIQUE,
-				Collections.singletonList(
-					createTuple(
-						CLIQUE_ID,
-						id.toString() ) ) );
+  public void writeClique(final Id id, final Iterable<? extends Identifiable> members) {
+    writeStartTag(CLIQUE, Collections.singletonList(createTuple(CLIQUE_ID, id.toString())));
 
-		for ( Identifiable m : members ) {
-			writeStartTag(
-					MEMBER,
-					Collections.singletonList(
-						createTuple(
-							MEMBER_ID,
-							m.getId().toString() ) ),
-					true);
-		}
+    for (Identifiable m : members) {
+      writeStartTag(
+          MEMBER, Collections.singletonList(createTuple(MEMBER_ID, m.getId().toString())), true);
+    }
 
-		writeEndTag( CLIQUE );
-	}
+    writeEndTag(CLIQUE);
+  }
 
-	public void finishAndCloseFile() {
-		writeEndTag( CLIQUES );
-		close();
-	}
+  public void finishAndCloseFile() {
+    writeEndTag(CLIQUES);
+    close();
+  }
 }
-

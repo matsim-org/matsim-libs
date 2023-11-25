@@ -32,27 +32,38 @@ import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.qsim.QSimModule;
 
 public class DefaultMobsimModule extends AbstractModule {
-    @Override
-    public void install() {
-        if (getConfig().controller().getMobsim().equals(ControllerConfigGroup.MobsimType.qsim.toString())) {
-            install(new QSimModule());
-//            bind(  RelativePositionOfEntryExitOnLink.class ).toInstance( () -> 1. );
-        } else if (getConfig().controller().getMobsim().equals(ControllerConfigGroup.MobsimType.JDEQSim.toString())) {
-            bindMobsim().to(JDEQSimulation.class);
-            //            bind(  RelativePositionOfEntryExitOnLink.class ).toInstance( () -> 0. );
-        } else if (getConfig().controller().getMobsim().equals(ControllerConfigGroup.MobsimType.hermes.toString())) {
-            bindMobsim().toProvider(HermesProvider.class);
-        } else if (getConfig().getModule(ExternalMobimConfigGroup.GROUP_NAME) != null
-                && ((ExternalMobimConfigGroup)getConfig().getModule(
-                ExternalMobimConfigGroup.GROUP_NAME)).getExternalExe() != null) {
-            bindMobsim().to(ExternalMobsim.class);
-            // since we do not know what the external mobsim does here, we leave it open, which should force the user to fill this with meaning.  ???  kai,
-            // nov'19
-        }
-
-        install(new MobsimScopeEventHandlingModule());
+  @Override
+  public void install() {
+    if (getConfig()
+        .controller()
+        .getMobsim()
+        .equals(ControllerConfigGroup.MobsimType.qsim.toString())) {
+      install(new QSimModule());
+      //            bind(  RelativePositionOfEntryExitOnLink.class ).toInstance( () -> 1. );
+    } else if (getConfig()
+        .controller()
+        .getMobsim()
+        .equals(ControllerConfigGroup.MobsimType.JDEQSim.toString())) {
+      bindMobsim().to(JDEQSimulation.class);
+      //            bind(  RelativePositionOfEntryExitOnLink.class ).toInstance( () -> 0. );
+    } else if (getConfig()
+        .controller()
+        .getMobsim()
+        .equals(ControllerConfigGroup.MobsimType.hermes.toString())) {
+      bindMobsim().toProvider(HermesProvider.class);
+    } else if (getConfig().getModule(ExternalMobimConfigGroup.GROUP_NAME) != null
+        && ((ExternalMobimConfigGroup) getConfig().getModule(ExternalMobimConfigGroup.GROUP_NAME))
+                .getExternalExe()
+            != null) {
+      bindMobsim().to(ExternalMobsim.class);
+      // since we do not know what the external mobsim does here, we leave it open, which should
+      // force the user to fill this with meaning.  ???  kai,
+      // nov'19
     }
-//    public interface RelativePositionOfEntryExitOnLink{
-//        double get() ;
-//    }
+
+    install(new MobsimScopeEventHandlingModule());
+  }
+  //    public interface RelativePositionOfEntryExitOnLink{
+  //        double get() ;
+  //    }
 }

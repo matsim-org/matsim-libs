@@ -21,36 +21,33 @@ package playground.vsp.andreas.utils.pop;
 
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.analysis.filters.population.AbstractPersonFilter;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 
 /**
- * 
  * @author aneumann
- *
  */
 public class PersonIdFilter extends AbstractPersonFilter {
 
-	private Set<String> personIds;
+  private Set<String> personIds;
 
-	public PersonIdFilter(Set<Id> personIds, PersonAlgorithm nextAlgorithm) {
-		super();
-		this.nextAlgorithm = nextAlgorithm;
-		this.personIds = new TreeSet<String>();
-		for (Id id : personIds) {
-			this.personIds.add(id.toString());
-		}
-	}
+  public PersonIdFilter(Set<Id> personIds, PersonAlgorithm nextAlgorithm) {
+    super();
+    this.nextAlgorithm = nextAlgorithm;
+    this.personIds = new TreeSet<String>();
+    for (Id id : personIds) {
+      this.personIds.add(id.toString());
+    }
+  }
 
-	@Override
-	public boolean judge(Person person) {
-		if (this.personIds.contains(person.getId().toString())) {
-			return true;
-		}
+  @Override
+  public boolean judge(Person person) {
+    if (this.personIds.contains(person.getId().toString())) {
+      return true;
+    }
 
-		return false;
-	}
+    return false;
+  }
 }

@@ -25,13 +25,13 @@ import org.matsim.utils.objectattributes.AttributeConverter;
  * @author mrieser / Senozon AG
  */
 public class FloatConverter implements AttributeConverter<Float> {
-	@Override
-	public Float convert(String value) {
-		return Float.valueOf(value);
-	}
+  @Override
+  public Float convert(String value) {
+    return Float.valueOf(value);
+  }
 
-	@Override
-	public String convertToString(Object o) {
-		return o.toString();
-	}
+  @Override
+  public String convertToString(Object o) {
+    return o.toString();
+  }
 }

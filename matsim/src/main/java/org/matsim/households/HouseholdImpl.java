@@ -20,7 +20,6 @@
 package org.matsim.households;
 
 import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.utils.objectattributes.attributable.Attributes;
@@ -32,53 +31,52 @@ import org.matsim.vehicles.Vehicle;
  */
 public class HouseholdImpl implements Household {
 
-	private Id<Household> id;
-	private List<Id<Person>> memberIds = null;
-	private List<Id<Vehicle>> vehicleDefinitionIds = null;
-	private Income income;
-	
-	private final Attributes attributes = new AttributesImpl();
-	
-	public HouseholdImpl(Id<Household> id) {
-		this.id = id;
-	}
+  private Id<Household> id;
+  private List<Id<Person>> memberIds = null;
+  private List<Id<Vehicle>> vehicleDefinitionIds = null;
+  private Income income;
 
-	@Override
-	public Id<Household> getId() {
-		return this.id;
-	}
+  private final Attributes attributes = new AttributesImpl();
 
-	@Override
-	public Income getIncome() {
-		return this.income;
-	}
+  public HouseholdImpl(Id<Household> id) {
+    this.id = id;
+  }
 
-	@Override
-	public List<Id<Person>> getMemberIds() {
-		return this.memberIds;
-	}
+  @Override
+  public Id<Household> getId() {
+    return this.id;
+  }
 
-	@Override
-	public List<Id<Vehicle>> getVehicleIds() {
-		return this.vehicleDefinitionIds;
-	}
-	
-	public void setMemberIds(List<Id<Person>> memberIds) {
-		this.memberIds = memberIds;
-	}
+  @Override
+  public Income getIncome() {
+    return this.income;
+  }
 
-	@Override
-	public void setIncome(Income income) {
-		this.income = income;
-	}
+  @Override
+  public List<Id<Person>> getMemberIds() {
+    return this.memberIds;
+  }
 
-	public void setVehicleIds(List<Id<Vehicle>> vehicleIds) {
-		this.vehicleDefinitionIds = vehicleIds;
-	}
+  @Override
+  public List<Id<Vehicle>> getVehicleIds() {
+    return this.vehicleDefinitionIds;
+  }
 
-	@Override
-	public Attributes getAttributes() {
-		return attributes;
-	}
-	
+  public void setMemberIds(List<Id<Person>> memberIds) {
+    this.memberIds = memberIds;
+  }
+
+  @Override
+  public void setIncome(Income income) {
+    this.income = income;
+  }
+
+  public void setVehicleIds(List<Id<Vehicle>> vehicleIds) {
+    this.vehicleDefinitionIds = vehicleIds;
+  }
+
+  @Override
+  public Attributes getAttributes() {
+    return attributes;
+  }
 }

@@ -1,9 +1,9 @@
 package org.matsim.core.router;
 
-public class RouterUtils{
-	private RouterUtils(){} // do not instantiate
+public class RouterUtils {
+  private RouterUtils() {} // do not instantiate
 
-	public static MultimodalLinkChooser getMultimodalLinkChooserDefault() {
-		return new MultimodalLinkChooserDefaultImpl();
-	}
+  public static MultimodalLinkChooser getMultimodalLinkChooserDefault() {
+    return new MultimodalLinkChooserDefaultImpl();
+  }
 }

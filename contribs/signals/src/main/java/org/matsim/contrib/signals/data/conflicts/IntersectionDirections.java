@@ -21,7 +21,6 @@
 package org.matsim.contrib.signals.data.conflicts;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -31,15 +30,14 @@ import org.matsim.contrib.signals.model.SignalSystem;
  * @author tthunig
  */
 public interface IntersectionDirections {
-	
-	public Id<SignalSystem> getSignalSystemId();
-	
-	public Id<Node> getNodeId();
-	
-	public void addDirection(Direction direction);
-	
-	public Direction getDirection(Id<Link> fromLink, Id<Link> toLink);
-	
-	public Map<Id<Direction>, Direction> getDirections();
-	
+
+  public Id<SignalSystem> getSignalSystemId();
+
+  public Id<Node> getNodeId();
+
+  public void addDirection(Direction direction);
+
+  public Direction getDirection(Id<Link> fromLink, Id<Link> toLink);
+
+  public Map<Id<Direction>, Direction> getDirections();
 }

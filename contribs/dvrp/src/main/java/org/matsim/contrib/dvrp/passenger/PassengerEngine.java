@@ -23,5 +23,5 @@ import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-public interface PassengerEngine extends MobsimEngine, DepartureHandler, PassengerHandler, MobsimScopeEventHandler {
-}
+public interface PassengerEngine
+    extends MobsimEngine, DepartureHandler, PassengerHandler, MobsimScopeEventHandler {}

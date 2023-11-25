@@ -19,36 +19,34 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.strategies;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.gbl.MatsimRandom;
-
 import com.google.inject.Inject;
-
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.socnetsim.framework.replanning.NonInnovativeStrategyFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.LogitSumSelector;
+import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * @author thibautd
  */
 public class GroupSelectExpBetaFactory extends NonInnovativeStrategyFactory {
 
-	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
-	private final Scenario sc;
+  private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+  private final Scenario sc;
 
-	@Inject
-	public GroupSelectExpBetaFactory( IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory , Scenario sc ) {
-		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
-		this.sc = sc;
-	}
+  @Inject
+  public GroupSelectExpBetaFactory(
+      IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory, Scenario sc) {
+    this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+    this.sc = sc;
+  }
 
-	@Override
-	public GroupLevelPlanSelector createSelector() {
-		return new LogitSumSelector(
-			MatsimRandom.getLocalInstance(),
-			incompatiblePlansIdentifierFactory,
-			sc.getConfig().scoring().getBrainExpBeta());
-	}
+  @Override
+  public GroupLevelPlanSelector createSelector() {
+    return new LogitSumSelector(
+        MatsimRandom.getLocalInstance(),
+        incompatiblePlansIdentifierFactory,
+        sc.getConfig().scoring().getBrainExpBeta());
+  }
 }
-

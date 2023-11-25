@@ -36,108 +36,110 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class NetworkFactoryTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  /*package*/ static class CarRouteMock extends AbstractRoute implements Cloneable {
+    CarRouteMock(final Id<Link> startLinkId, final Id<Link> endLinkId) {
+      super(startLinkId, endLinkId);
+    }
 
-	/*package*/ static class CarRouteMock extends AbstractRoute implements Cloneable {
-		CarRouteMock(final Id<Link> startLinkId, final Id<Link> endLinkId) {
-			super(startLinkId, endLinkId);
-		}
-		@Override
-		public CarRouteMock clone() {
-			return (CarRouteMock) super.clone();
-		}
-		@Override
-		public String getRouteDescription() {
-			return null;
-		}
-		@Override
-		public void setRouteDescription(String routeDescription) {
-		}
-		@Override
-		public String getRouteType() {
-			return null;
-		}
-	}
+    @Override
+    public CarRouteMock clone() {
+      return (CarRouteMock) super.clone();
+    }
 
-	/*package*/ static class PtRouteMock extends AbstractRoute implements Cloneable {
-		PtRouteMock(final Id<Link> startLinkId, final Id<Link> endLinkId) {
-			super(startLinkId, endLinkId);
-		}
-		@Override
-		public PtRouteMock clone() {
-			return (PtRouteMock) super.clone();
-		}
-		@Override
-		public String getRouteDescription() {
-			return null;
-		}
-		@Override
-		public void setRouteDescription(String routeDescription) {
-		}
-		@Override
-		public String getRouteType() {
-			return null;
-		}
-	}
+    @Override
+    public String getRouteDescription() {
+      return null;
+    }
 
-	/*package*/ static class CarRouteMockFactory implements RouteFactory {
-		@Override
-		public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
-			return new CarRouteMock(startLinkId, endLinkId);
-		}
+    @Override
+    public void setRouteDescription(String routeDescription) {}
 
-		@Override
-		public String getCreatedRouteType() {
-			return "carMock";
-		}
+    @Override
+    public String getRouteType() {
+      return null;
+    }
+  }
 
-	}
+  /*package*/ static class PtRouteMock extends AbstractRoute implements Cloneable {
+    PtRouteMock(final Id<Link> startLinkId, final Id<Link> endLinkId) {
+      super(startLinkId, endLinkId);
+    }
 
-	/*package*/ static class PtRouteMockFactory implements RouteFactory {
-		@Override
-		public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
-			return new PtRouteMock(startLinkId, endLinkId);
-		}
+    @Override
+    public PtRouteMock clone() {
+      return (PtRouteMock) super.clone();
+    }
 
-		@Override
-		public String getCreatedRouteType() {
-			return "ptMock";
-		}
+    @Override
+    public String getRouteDescription() {
+      return null;
+    }
 
-	}
+    @Override
+    public void setRouteDescription(String routeDescription) {}
 
-	@Test public void testSetRouteFactory() {
-		PopulationFactory factory = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
+    @Override
+    public String getRouteType() {
+      return null;
+    }
+  }
 
-		// test default
-		Route carRoute = factory.getRouteFactories().createRoute(NetworkRoute.class, null, null);
-		Assert.assertTrue(carRoute instanceof NetworkRoute);
+  /*package*/ static class CarRouteMockFactory implements RouteFactory {
+    @Override
+    public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
+      return new CarRouteMock(startLinkId, endLinkId);
+    }
 
-		Route route = factory.getRouteFactories().createRoute(Route.class, null, null);
-		Assert.assertTrue(route instanceof GenericRouteImpl);
+    @Override
+    public String getCreatedRouteType() {
+      return "carMock";
+    }
+  }
 
-		// overwrite car-mode
-		factory.getRouteFactories().setRouteFactory(CarRouteMock.class, new CarRouteMockFactory());
-		// add pt-mode
-		factory.getRouteFactories().setRouteFactory(PtRouteMock.class, new PtRouteMockFactory());
+  /*package*/ static class PtRouteMockFactory implements RouteFactory {
+    @Override
+    public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
+      return new PtRouteMock(startLinkId, endLinkId);
+    }
 
-		// test car-mode
-		carRoute = factory.getRouteFactories().createRoute(CarRouteMock.class, null, null);
-		Assert.assertTrue(carRoute instanceof CarRouteMock);
+    @Override
+    public String getCreatedRouteType() {
+      return "ptMock";
+    }
+  }
 
-		// add pt-mode
-		Route ptRoute = factory.getRouteFactories().createRoute(PtRouteMock.class, null, null);
-		Assert.assertTrue(ptRoute instanceof PtRouteMock);
+  @Test
+  public void testSetRouteFactory() {
+    PopulationFactory factory =
+        ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
 
-		// remove pt-mode
-		factory.getRouteFactories().setRouteFactory(PtRouteMock.class, null);
+    // test default
+    Route carRoute = factory.getRouteFactories().createRoute(NetworkRoute.class, null, null);
+    Assert.assertTrue(carRoute instanceof NetworkRoute);
 
-		// test pt again
-		route = factory.getRouteFactories().createRoute(PtRouteMock.class, null, null);
-		Assert.assertTrue(route instanceof GenericRouteImpl);
-	}
+    Route route = factory.getRouteFactories().createRoute(Route.class, null, null);
+    Assert.assertTrue(route instanceof GenericRouteImpl);
 
+    // overwrite car-mode
+    factory.getRouteFactories().setRouteFactory(CarRouteMock.class, new CarRouteMockFactory());
+    // add pt-mode
+    factory.getRouteFactories().setRouteFactory(PtRouteMock.class, new PtRouteMockFactory());
 
+    // test car-mode
+    carRoute = factory.getRouteFactories().createRoute(CarRouteMock.class, null, null);
+    Assert.assertTrue(carRoute instanceof CarRouteMock);
+
+    // add pt-mode
+    Route ptRoute = factory.getRouteFactories().createRoute(PtRouteMock.class, null, null);
+    Assert.assertTrue(ptRoute instanceof PtRouteMock);
+
+    // remove pt-mode
+    factory.getRouteFactories().setRouteFactory(PtRouteMock.class, null);
+
+    // test pt again
+    route = factory.getRouteFactories().createRoute(PtRouteMock.class, null, null);
+    Assert.assertTrue(route instanceof GenericRouteImpl);
+  }
 }

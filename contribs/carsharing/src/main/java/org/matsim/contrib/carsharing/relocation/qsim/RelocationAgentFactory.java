@@ -7,17 +7,19 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 
 public class RelocationAgentFactory {
-	private Scenario scenario;
-	private Network network;
-	public RelocationAgentFactory(Scenario scenario, Network network) {
-		this.scenario = scenario;
-		this.network = network;
-	}
+  private Scenario scenario;
+  private Network network;
 
-	public RelocationAgent createRelocationAgent(Id<Person> id, String companyId, Id<Link> relocationAgentBaseLinkId) {
-		RelocationAgent agent = new RelocationAgent(id, companyId, relocationAgentBaseLinkId, this.scenario, this.network);
+  public RelocationAgentFactory(Scenario scenario, Network network) {
+    this.scenario = scenario;
+    this.network = network;
+  }
 
-		return agent;
-	}
+  public RelocationAgent createRelocationAgent(
+      Id<Person> id, String companyId, Id<Link> relocationAgentBaseLinkId) {
+    RelocationAgent agent =
+        new RelocationAgent(id, companyId, relocationAgentBaseLinkId, this.scenario, this.network);
 
+    return agent;
+  }
 }

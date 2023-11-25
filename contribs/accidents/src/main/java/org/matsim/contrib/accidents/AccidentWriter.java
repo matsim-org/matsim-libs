@@ -27,137 +27,181 @@ import java.text.NumberFormat;
 import java.time.LocalTime;
 import java.util.Locale;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.events.IterationEndsEvent;
 
 /**
-* @author ikaddoura
-*/
-
+ * @author ikaddoura
+ */
 class AccidentWriter {
-	private static String convertSecondToHHMMSSString(int nSecondTime) {
-	    return LocalTime.MIN.plusSeconds(nSecondTime).toString();
-	}
+  private static String convertSecondToHHMMSSString(int nSecondTime) {
+    return LocalTime.MIN.plusSeconds(nSecondTime).toString();
+  }
 
-	public void write(Scenario scenario, IterationEndsEvent event, Map<Id<Link>, AccidentLinkInfo> linkId2info, AnalysisEventHandler analzyer) {
-		AccidentsConfigGroup accidentsCfg = (AccidentsConfigGroup) scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
+  public void write(
+      Scenario scenario,
+      IterationEndsEvent event,
+      Map<Id<Link>, AccidentLinkInfo> linkId2info,
+      AnalysisEventHandler analzyer) {
+    AccidentsConfigGroup accidentsCfg =
+        (AccidentsConfigGroup)
+            scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
 
-		double timeBinSize = scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize();
+    double timeBinSize = scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize();
 
-		//File with Linkinfo for Tests
-		File linkInfoFile = new File(scenario.getConfig().controller().getOutputDirectory() + "ITERS/it." + event.getIteration() + "/" + scenario.getConfig().controller().getRunId() + "." + event.getIteration() + ".linkInfo.csv");
-		BufferedWriter linkInformation = null;
-		try {
-			linkInformation = new BufferedWriter (new FileWriter(linkInfoFile));
-			linkInformation.write("Link_ID ;");
-			for (double endTime = timeBinSize ; endTime <= scenario.getConfig().travelTimeCalculator().getMaxTime(); endTime = endTime + timeBinSize ) {
-				linkInformation.write(convertSecondToHHMMSSString((int)(endTime-timeBinSize)));
-				linkInformation.write(" - ");
-				linkInformation.write(convertSecondToHHMMSSString((int)(endTime)));
-				linkInformation.write("_demand ");
-				linkInformation.write(";");
-				}
-			linkInformation.write("demandPerDay ;");
-			linkInformation.newLine();
+    // File with Linkinfo for Tests
+    File linkInfoFile =
+        new File(
+            scenario.getConfig().controller().getOutputDirectory()
+                + "ITERS/it."
+                + event.getIteration()
+                + "/"
+                + scenario.getConfig().controller().getRunId()
+                + "."
+                + event.getIteration()
+                + ".linkInfo.csv");
+    BufferedWriter linkInformation = null;
+    try {
+      linkInformation = new BufferedWriter(new FileWriter(linkInfoFile));
+      linkInformation.write("Link_ID ;");
+      for (double endTime = timeBinSize;
+          endTime <= scenario.getConfig().travelTimeCalculator().getMaxTime();
+          endTime = endTime + timeBinSize) {
+        linkInformation.write(convertSecondToHHMMSSString((int) (endTime - timeBinSize)));
+        linkInformation.write(" - ");
+        linkInformation.write(convertSecondToHHMMSSString((int) (endTime)));
+        linkInformation.write("_demand ");
+        linkInformation.write(";");
+      }
+      linkInformation.write("demandPerDay ;");
+      linkInformation.newLine();
 
-			for (AccidentLinkInfo info : linkId2info.values()) {
-				double demandPerDay = 0.0;
-				linkInformation.write(info.getLinkId().toString());
-				linkInformation.write(";");
-				for (double endTime = timeBinSize ; endTime <= scenario.getConfig().travelTimeCalculator().getMaxTime(); endTime = endTime + timeBinSize ) {
-					double time = (endTime - timeBinSize/2.);
-					int timeBinNr = (int) (time / timeBinSize);
-					AccidentsConfigGroup accidentSettings = (AccidentsConfigGroup) scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
-					double demand = accidentSettings.getScaleFactor() * analzyer.getDemand(info.getLinkId(), timeBinNr);
-					demandPerDay += demand;
+      for (AccidentLinkInfo info : linkId2info.values()) {
+        double demandPerDay = 0.0;
+        linkInformation.write(info.getLinkId().toString());
+        linkInformation.write(";");
+        for (double endTime = timeBinSize;
+            endTime <= scenario.getConfig().travelTimeCalculator().getMaxTime();
+            endTime = endTime + timeBinSize) {
+          double time = (endTime - timeBinSize / 2.);
+          int timeBinNr = (int) (time / timeBinSize);
+          AccidentsConfigGroup accidentSettings =
+              (AccidentsConfigGroup)
+                  scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
+          double demand =
+              accidentSettings.getScaleFactor() * analzyer.getDemand(info.getLinkId(), timeBinNr);
+          demandPerDay += demand;
 
-					linkInformation.write(Double.toString(demand));
-					linkInformation.write(";");
-				}
-				linkInformation.write(Double.toString(demandPerDay));
-				linkInformation.newLine();
-			}
-			linkInformation.close();
-		} catch (IOException e3) {
-			e3.printStackTrace();
-		}
+          linkInformation.write(Double.toString(demand));
+          linkInformation.write(";");
+        }
+        linkInformation.write(Double.toString(demandPerDay));
+        linkInformation.newLine();
+      }
+      linkInformation.close();
+    } catch (IOException e3) {
+      e3.printStackTrace();
+    }
 
-		File accidentCostsBVWPFile = new File(scenario.getConfig().controller().getOutputDirectory() + "ITERS/it." + event.getIteration() + "/" + scenario.getConfig().controller().getRunId() + "." + event.getIteration() + ".accidentCosts_BVWP.csv");
-		BufferedWriter accidentCostsBVWP = null;
-		try {
-			accidentCostsBVWP = new BufferedWriter (new FileWriter(accidentCostsBVWPFile));
-			//HEADER
-			accidentCostsBVWP.write("Link ID ;");
-			for (double endTime = timeBinSize ; endTime <= scenario.getConfig().travelTimeCalculator().getMaxTime(); endTime = endTime + timeBinSize ) {
-				accidentCostsBVWP.write(convertSecondToHHMMSSString((int)(endTime-timeBinSize)));
-				accidentCostsBVWP.write(" - ");
-				accidentCostsBVWP.write(convertSecondToHHMMSSString((int)(endTime)));
-				accidentCostsBVWP.write("_Costs [EUR] ;");
-			}
-			accidentCostsBVWP.write("Costs per Day [EUR] ;");
-			accidentCostsBVWP.write("Costs per Year [EUR] ;");
-			accidentCostsBVWP.newLine();
+    File accidentCostsBVWPFile =
+        new File(
+            scenario.getConfig().controller().getOutputDirectory()
+                + "ITERS/it."
+                + event.getIteration()
+                + "/"
+                + scenario.getConfig().controller().getRunId()
+                + "."
+                + event.getIteration()
+                + ".accidentCosts_BVWP.csv");
+    BufferedWriter accidentCostsBVWP = null;
+    try {
+      accidentCostsBVWP = new BufferedWriter(new FileWriter(accidentCostsBVWPFile));
+      // HEADER
+      accidentCostsBVWP.write("Link ID ;");
+      for (double endTime = timeBinSize;
+          endTime <= scenario.getConfig().travelTimeCalculator().getMaxTime();
+          endTime = endTime + timeBinSize) {
+        accidentCostsBVWP.write(convertSecondToHHMMSSString((int) (endTime - timeBinSize)));
+        accidentCostsBVWP.write(" - ");
+        accidentCostsBVWP.write(convertSecondToHHMMSSString((int) (endTime)));
+        accidentCostsBVWP.write("_Costs [EUR] ;");
+      }
+      accidentCostsBVWP.write("Costs per Day [EUR] ;");
+      accidentCostsBVWP.write("Costs per Year [EUR] ;");
+      accidentCostsBVWP.newLine();
 
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+    } catch (IOException e1) {
+      e1.printStackTrace();
+    }
 
-		NumberFormat nf = NumberFormat.getInstance(Locale.US);
-		nf.setMaximumFractionDigits(2);
-		nf.setGroupingUsed(false);
+    NumberFormat nf = NumberFormat.getInstance(Locale.US);
+    nf.setMaximumFractionDigits(2);
+    nf.setGroupingUsed(false);
 
-		for (AccidentLinkInfo info : linkId2info.values()) {
-			double accidentCostsPerDay_BVWP = 0.0;
-			double accidentCostsPerYear_BVWP = 0.0;
+    for (AccidentLinkInfo info : linkId2info.values()) {
+      double accidentCostsPerDay_BVWP = 0.0;
+      double accidentCostsPerYear_BVWP = 0.0;
 
-			String linkComputationMethod = (String) scenario.getNetwork().getLinks().get(info.getLinkId()).getAttributes().getAttribute(accidentsCfg.getAccidentsComputationMethodAttributeName());
+      String linkComputationMethod =
+          (String)
+              scenario
+                  .getNetwork()
+                  .getLinks()
+                  .get(info.getLinkId())
+                  .getAttributes()
+                  .getAttribute(accidentsCfg.getAccidentsComputationMethodAttributeName());
 
-			try {
-				if (linkComputationMethod.equals( AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() )){
-					accidentCostsBVWP.write(info.getLinkId().toString());
-					accidentCostsBVWP.write(";");
-				}
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+      try {
+        if (linkComputationMethod.equals(
+            AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString())) {
+          accidentCostsBVWP.write(info.getLinkId().toString());
+          accidentCostsBVWP.write(";");
+        }
+      } catch (IOException e1) {
+        e1.printStackTrace();
+      }
 
-			for (double endTime = timeBinSize ; endTime <= scenario.getConfig().travelTimeCalculator().getMaxTime(); endTime = endTime + timeBinSize ) {
+      for (double endTime = timeBinSize;
+          endTime <= scenario.getConfig().travelTimeCalculator().getMaxTime();
+          endTime = endTime + timeBinSize) {
 
-				double time = (endTime - timeBinSize/2.);
-				int timeBinNr = (int) (time / timeBinSize);
+        double time = (endTime - timeBinSize / 2.);
+        int timeBinNr = (int) (time / timeBinSize);
 
-				if (linkComputationMethod.toString().equals( AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() )){
-					accidentCostsPerDay_BVWP += info.getTimeSpecificInfo().get(timeBinNr).getAccidentCosts();
-					try {
-						accidentCostsBVWP.write(nf.format(info.getTimeSpecificInfo().get(timeBinNr).getAccidentCosts()));
-						accidentCostsBVWP.write(";");
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-			accidentCostsPerYear_BVWP = accidentCostsPerDay_BVWP * 365;
-			try {
-				if (linkComputationMethod.toString().equals( AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() )){
-					accidentCostsBVWP.write(nf.format(accidentCostsPerDay_BVWP));
-					accidentCostsBVWP.write(";");
-					accidentCostsBVWP.write(nf.format(accidentCostsPerYear_BVWP));
-					accidentCostsBVWP.write(";");
-					accidentCostsBVWP.newLine();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		try {
-			accidentCostsBVWP.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
+        if (linkComputationMethod
+            .toString()
+            .equals(AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString())) {
+          accidentCostsPerDay_BVWP += info.getTimeSpecificInfo().get(timeBinNr).getAccidentCosts();
+          try {
+            accidentCostsBVWP.write(
+                nf.format(info.getTimeSpecificInfo().get(timeBinNr).getAccidentCosts()));
+            accidentCostsBVWP.write(";");
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        }
+      }
+      accidentCostsPerYear_BVWP = accidentCostsPerDay_BVWP * 365;
+      try {
+        if (linkComputationMethod
+            .toString()
+            .equals(AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString())) {
+          accidentCostsBVWP.write(nf.format(accidentCostsPerDay_BVWP));
+          accidentCostsBVWP.write(";");
+          accidentCostsBVWP.write(nf.format(accidentCostsPerYear_BVWP));
+          accidentCostsBVWP.write(";");
+          accidentCostsBVWP.newLine();
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    try {
+      accidentCostsBVWP.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 }
-

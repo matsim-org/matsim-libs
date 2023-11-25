@@ -36,69 +36,82 @@ import org.matsim.vehicles.Vehicle;
  */
 public final class StageContainer {
 
-    private PersonEntersVehicleEvent personEnterVehE;
-    private TransitDriverStartsEvent transitDriverStartsE;
-    private VehicleArrivesAtFacilityEvent vehArrivesAtFacilityEEntered;
-    private PersonLeavesVehicleEvent personLeavesVehE;
-    private VehicleArrivesAtFacilityEvent vehArrivesAtFacilityELeft;
-    private double meterTravelled = 0.0;
+  private PersonEntersVehicleEvent personEnterVehE;
+  private TransitDriverStartsEvent transitDriverStartsE;
+  private VehicleArrivesAtFacilityEvent vehArrivesAtFacilityEEntered;
+  private PersonLeavesVehicleEvent personLeavesVehE;
+  private VehicleArrivesAtFacilityEvent vehArrivesAtFacilityELeft;
+  private double meterTravelled = 0.0;
 
-    public void handlePersonEnters(PersonEntersVehicleEvent personEnterVehE1, VehicleArrivesAtFacilityEvent vehArrivesAtFacilityE, TransitDriverStartsEvent transitDriverStartsE1) {
-        this.personEnterVehE = personEnterVehE1;
-        this.vehArrivesAtFacilityEEntered = vehArrivesAtFacilityE;
-        this.transitDriverStartsE = transitDriverStartsE1;
-    }
+  public void handlePersonEnters(
+      PersonEntersVehicleEvent personEnterVehE1,
+      VehicleArrivesAtFacilityEvent vehArrivesAtFacilityE,
+      TransitDriverStartsEvent transitDriverStartsE1) {
+    this.personEnterVehE = personEnterVehE1;
+    this.vehArrivesAtFacilityEEntered = vehArrivesAtFacilityE;
+    this.transitDriverStartsE = transitDriverStartsE1;
+  }
 
-    public void handlePersonLeaves(PersonLeavesVehicleEvent personLeavesVehE1, VehicleArrivesAtFacilityEvent vehArrivesAtFacilityE) {
-        this.personLeavesVehE = personLeavesVehE1;
-        this.vehArrivesAtFacilityELeft = vehArrivesAtFacilityE;
-    }
+  public void handlePersonLeaves(
+      PersonLeavesVehicleEvent personLeavesVehE1,
+      VehicleArrivesAtFacilityEvent vehArrivesAtFacilityE) {
+    this.personLeavesVehE = personLeavesVehE1;
+    this.vehArrivesAtFacilityELeft = vehArrivesAtFacilityE;
+  }
 
-    public void addDistanceTravelled(double meterTravelled1) {
-        this.meterTravelled += meterTravelled1;
-    }
+  public void addDistanceTravelled(double meterTravelled1) {
+    this.meterTravelled += meterTravelled1;
+  }
 
-    public Id<TransitStopFacility> getStopEntered() {
-        return this.vehArrivesAtFacilityEEntered.getFacilityId();
-    }
+  public Id<TransitStopFacility> getStopEntered() {
+    return this.vehArrivesAtFacilityEEntered.getFacilityId();
+  }
 
-    public Id<TransitStopFacility> getStopLeft() {
-        return this.vehArrivesAtFacilityELeft.getFacilityId();
-    }
+  public Id<TransitStopFacility> getStopLeft() {
+    return this.vehArrivesAtFacilityELeft.getFacilityId();
+  }
 
-    public double getTimeEntered() {
-        return this.personEnterVehE.getTime();
-    }
+  public double getTimeEntered() {
+    return this.personEnterVehE.getTime();
+  }
 
-    public double getTimeLeft() {
-        return this.personLeavesVehE.getTime();
-    }
+  public double getTimeLeft() {
+    return this.personLeavesVehE.getTime();
+  }
 
-    public Id<TransitRoute> getRouteId() {
-        return this.transitDriverStartsE.getTransitRouteId();
-    }
+  public Id<TransitRoute> getRouteId() {
+    return this.transitDriverStartsE.getTransitRouteId();
+  }
 
-    public double getDistanceTravelledInMeter() {
-        return this.meterTravelled;
-    }
+  public double getDistanceTravelledInMeter() {
+    return this.meterTravelled;
+  }
 
-    public Id<Vehicle> getVehicleId() {
-        return this.transitDriverStartsE.getVehicleId();
-    }
+  public Id<Vehicle> getVehicleId() {
+    return this.transitDriverStartsE.getVehicleId();
+  }
 
-    public Id<Person> getAgentId() {
-        return this.personLeavesVehE.getPersonId();
-    }
+  public Id<Person> getAgentId() {
+    return this.personLeavesVehE.getPersonId();
+  }
 
-    @Override
-    public String toString() {
-        return "StartStop " + getStopEntered() +
-                "; EndStop " + getStopLeft() +
-                "; TimeEntered " + getTimeEntered() +
-                "; getTimeLeft " + getTimeLeft() +
-                "; RouteId " + getRouteId() +
-                "; distanceMeter " + getDistanceTravelledInMeter() +
-                "; vehId " + getVehicleId() +
-                "; agentId " + getAgentId();
-    }
+  @Override
+  public String toString() {
+    return "StartStop "
+        + getStopEntered()
+        + "; EndStop "
+        + getStopLeft()
+        + "; TimeEntered "
+        + getTimeEntered()
+        + "; getTimeLeft "
+        + getTimeLeft()
+        + "; RouteId "
+        + getRouteId()
+        + "; distanceMeter "
+        + getDistanceTravelledInMeter()
+        + "; vehId "
+        + getVehicleId()
+        + "; agentId "
+        + getAgentId();
+  }
 }

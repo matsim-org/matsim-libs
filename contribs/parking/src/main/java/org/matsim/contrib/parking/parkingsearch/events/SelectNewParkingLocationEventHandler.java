@@ -24,8 +24,7 @@ import org.matsim.core.events.handler.EventHandler;
 /**
  * @author Ricardo Ewert
  */
-
 public interface SelectNewParkingLocationEventHandler extends EventHandler {
 
-	void handleEvent(SelectNewParkingLocationEvent event);
+  void handleEvent(SelectNewParkingLocationEvent event);
 }

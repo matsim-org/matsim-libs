@@ -1,6 +1,5 @@
 package org.matsim.simwrapper;
 
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -10,14 +9,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.matsim.application.CommandRunner;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.simwrapper.viz.Viz;
-import tech.tablesaw.plotly.components.Component;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,201 +18,184 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.application.CommandRunner;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.simwrapper.viz.Viz;
+import tech.tablesaw.plotly.components.Component;
 
-/**
- * Class to define and generate SimWrapper dashboards.
- */
+/** Class to define and generate SimWrapper dashboards. */
 @SuppressWarnings("unused")
 public final class SimWrapper {
 
-	private static final Logger log = LogManager.getLogger(SimWrapper.class);
+  private static final Logger log = LogManager.getLogger(SimWrapper.class);
 
-	private final Data data;
+  private final Data data;
 
-	private final Config config = new Config();
+  private final Config config = new Config();
 
-	private final org.matsim.core.config.Config matsimConfig;
-	private final SimWrapperConfigGroup configGroup;
+  private final org.matsim.core.config.Config matsimConfig;
+  private final SimWrapperConfigGroup configGroup;
 
-	private final List<Dashboard> dashboards = new ArrayList<>();
+  private final List<Dashboard> dashboards = new ArrayList<>();
 
-	/**
-	 * Use {@link #create(SimWrapperConfigGroup)}.
-	 */
-	private SimWrapper(org.matsim.core.config.Config config) {
-		this.matsimConfig = config;
-		this.configGroup = ConfigUtils.addOrGetModule(matsimConfig, SimWrapperConfigGroup.class);
-		this.data = new Data(configGroup);
-	}
+  /** Use {@link #create(SimWrapperConfigGroup)}. */
+  private SimWrapper(org.matsim.core.config.Config config) {
+    this.matsimConfig = config;
+    this.configGroup = ConfigUtils.addOrGetModule(matsimConfig, SimWrapperConfigGroup.class);
+    this.data = new Data(configGroup);
+  }
 
-	/**
-	 * Create a new {@link SimWrapper} instance with default config.
-	 */
-	public static SimWrapper create() {
-		return new SimWrapper(ConfigUtils.createConfig());
-	}
+  /** Create a new {@link SimWrapper} instance with default config. */
+  public static SimWrapper create() {
+    return new SimWrapper(ConfigUtils.createConfig());
+  }
 
-	/**
-	 * * Create a new {@link SimWrapper} instance with given config.
-	 */
-	public static SimWrapper create(org.matsim.core.config.Config config) {
-		return new SimWrapper(config);
-	}
+  /** * Create a new {@link SimWrapper} instance with given config. */
+  public static SimWrapper create(org.matsim.core.config.Config config) {
+    return new SimWrapper(config);
+  }
 
-	/**
-	 * Return the {@link Data} instance for managing.
-	 */
-	public Data getData() {
-		return data;
-	}
+  /** Return the {@link Data} instance for managing. */
+  public Data getData() {
+    return data;
+  }
 
-	/**
-	 * Get the internal simwrapper config, which will be exported as yaml file.
-	 */
-	public Config getConfig() {
-		return config;
-	}
+  /** Get the internal simwrapper config, which will be exported as yaml file. */
+  public Config getConfig() {
+    return config;
+  }
 
-	/**
-	 * Return associated config group.
-	 */
-	public SimWrapperConfigGroup getConfigGroup() {
-		return configGroup;
-	}
+  /** Return associated config group. */
+  public SimWrapperConfigGroup getConfigGroup() {
+    return configGroup;
+  }
 
-	/**
-	 * Adds a dashboard definition to SimWrapper.
-	 * This only stores the specification, the actual code is executed during {@link #generate(Path)}.
-	 */
-	public SimWrapper addDashboard(Dashboard d) {
-		dashboards.add(d);
-		return this;
-	}
+  /**
+   * Adds a dashboard definition to SimWrapper. This only stores the specification, the actual code
+   * is executed during {@link #generate(Path)}.
+   */
+  public SimWrapper addDashboard(Dashboard d) {
+    dashboards.add(d);
+    return this;
+  }
 
-	/**
-	 * Check if dashboard of same type is present already.
-	 */
-	boolean hasDashboard(Class<? extends Dashboard> d, String context) {
-		return dashboards.stream().anyMatch(o -> d.isAssignableFrom(o.getClass()) && Objects.equals(o.context(), context));
-	}
+  /** Check if dashboard of same type is present already. */
+  boolean hasDashboard(Class<? extends Dashboard> d, String context) {
+    return dashboards.stream()
+        .anyMatch(o -> d.isAssignableFrom(o.getClass()) && Objects.equals(o.context(), context));
+  }
 
-	/**
-	 * Generate the dashboards specification and writes .yaml files to {@code dir}.
-	 */
-	public void generate(Path dir) throws IOException {
+  /** Generate the dashboards specification and writes .yaml files to {@code dir}. */
+  public void generate(Path dir) throws IOException {
 
-		ObjectMapper mapper = new ObjectMapper(new YAMLFactory()
-			.disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
-			.enable(YAMLGenerator.Feature.MINIMIZE_QUOTES))
-			.setSerializationInclusion(JsonInclude.Include.NON_NULL)
-			.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
-			.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-			.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+    ObjectMapper mapper =
+        new ObjectMapper(
+                new YAMLFactory()
+                    .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
+                    .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES))
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
-		mapper.registerModule(new JavaTimeModule());
-		mapper.addMixIn(Component.class, ComponentMixin.class);
+    mapper.registerModule(new JavaTimeModule());
+    mapper.addMixIn(Component.class, ComponentMixin.class);
 
-		ObjectWriter writer = mapper.writerFor(YAML.class);
+    ObjectWriter writer = mapper.writerFor(YAML.class);
 
-		Files.createDirectories(dir);
+    Files.createDirectories(dir);
 
-		data.setPath(dir.resolve("analysis"));
+    data.setPath(dir.resolve("analysis"));
 
-		// Initialize default context and path
-		data.setCurrentContext("");
+    // Initialize default context and path
+    data.setCurrentContext("");
 
-		// TODO: copy config, css, and other auxiliary files
-		// from resources
+    // TODO: copy config, css, and other auxiliary files
+    // from resources
 
-		dashboards.sort(Comparator.comparingDouble(Dashboard::priority).reversed());
+    dashboards.sort(Comparator.comparingDouble(Dashboard::priority).reversed());
 
-		int i = 0;
-		for (Dashboard d : dashboards) {
+    int i = 0;
+    for (Dashboard d : dashboards) {
 
-			YAML yaml = new YAML();
-			Layout layout = new Layout(d.context());
+      YAML yaml = new YAML();
+      Layout layout = new Layout(d.context());
 
-			d.configure(yaml.header, layout);
-			yaml.layout = layout.create(data);
+      d.configure(yaml.header, layout);
+      yaml.layout = layout.create(data);
 
-			Path out = dir.resolve("dashboard-" + i + ".yaml");
-			writer.writeValue(out.toFile(), yaml);
+      Path out = dir.resolve("dashboard-" + i + ".yaml");
+      writer.writeValue(out.toFile(), yaml);
 
-			i++;
-		}
+      i++;
+    }
 
-		ObjectWriter configWriter = mapper.writerFor(Config.class);
+    ObjectWriter configWriter = mapper.writerFor(Config.class);
 
-		Path out = dir.resolve("simwrapper-config.yaml");
-		configWriter.writeValue(out.toFile(), config);
+    Path out = dir.resolve("simwrapper-config.yaml");
+    configWriter.writeValue(out.toFile(), config);
 
-		// TODO: think about json schema for the datatypes
-	}
+    // TODO: think about json schema for the datatypes
+  }
 
-	/**
-	 * Run data pipeline to create the necessary data for the dashboards.
-	 */
-	public void run(Path dir) {
+  /** Run data pipeline to create the necessary data for the dashboards. */
+  public void run(Path dir) {
 
-		for (Map.Entry<Path, URL> e : data.getResources().entrySet()) {
-			try {
-				Files.createDirectories(e.getKey().getParent());
-				try (InputStream is = e.getValue().openStream()) {
-					Files.copy(is, e.getKey());
-				}
+    for (Map.Entry<Path, URL> e : data.getResources().entrySet()) {
+      try {
+        Files.createDirectories(e.getKey().getParent());
+        try (InputStream is = e.getValue().openStream()) {
+          Files.copy(is, e.getKey());
+        }
 
-			} catch (IOException ex) {
-				log.error("Could not copy resources", ex);
-			}
-		}
+      } catch (IOException ex) {
+        log.error("Could not copy resources", ex);
+      }
+    }
 
-		for (CommandRunner runner : data.getRunners().values()) {
+    for (CommandRunner runner : data.getRunners().values()) {
 
-			SimWrapperConfigGroup.ContextParams ctx = configGroup.get(runner.getName());
+      SimWrapperConfigGroup.ContextParams ctx = configGroup.get(runner.getName());
 
-			runner.setSampleSize(ctx.sampleSize);
+      runner.setSampleSize(ctx.sampleSize);
 
-			if (ctx.shp != null) {
+      if (ctx.shp != null) {
 
-				try {
-					URI path = ConfigGroup.getInputFileURL(matsimConfig.getContext(), ctx.shp).toURI();
+        try {
+          URI path = ConfigGroup.getInputFileURL(matsimConfig.getContext(), ctx.shp).toURI();
 
-					if (path.getScheme().equals("file"))
-						runner.setShp(new File(path).getAbsoluteFile().toString());
-					else
-						runner.setShp(path.toString());
+          if (path.getScheme().equals("file"))
+            runner.setShp(new File(path).getAbsoluteFile().toString());
+          else runner.setShp(path.toString());
 
-				} catch (URISyntaxException e) {
-					log.warn("Could not set shp file", e);
-				}
-			}
+        } catch (URISyntaxException e) {
+          log.warn("Could not set shp file", e);
+        }
+      }
 
-			runner.run(dir);
-		}
-	}
+      runner.run(dir);
+    }
+  }
 
-	/**
-	 * This class stores the data as required in the yaml files.
-	 */
-	private static final class YAML {
+  /** This class stores the data as required in the yaml files. */
+  private static final class YAML {
 
-		private final Header header = new Header();
-		private Map<String, List<Viz>> layout;
+    private final Header header = new Header();
+    private Map<String, List<Viz>> layout;
+  }
 
-	}
+  /** Class representing the simwrapper config. */
+  public static final class Config {
 
-	/**
-	 * Class representing the simwrapper config.
-	 */
-	public static final class Config {
+    public boolean hideLeftBar = false;
+    public boolean fullWidth = true;
 
-		public boolean hideLeftBar = false;
-		public boolean fullWidth = true;
-
-		public String header;
-		public String footer_en;
-		public String footer_de;
-		public String css;
-
-	}
+    public String header;
+    public String footer_en;
+    public String footer_de;
+    public String css;
+  }
 }

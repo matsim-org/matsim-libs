@@ -21,38 +21,38 @@
 package org.matsim.contrib.common.histogram;
 
 public abstract class AbstractHistogram<T> implements Histogram<T> {
-	protected final long[] counts;
-	protected long totalCount = 0;
+  protected final long[] counts;
+  protected long totalCount = 0;
 
-	public AbstractHistogram(int binCount) {
-		counts = new long[binCount];
-	}
+  public AbstractHistogram(int binCount) {
+    counts = new long[binCount];
+  }
 
-	public void increment(int idx) {
-		counts[idx]++;
-		totalCount++;
-	}
+  public void increment(int idx) {
+    counts[idx]++;
+    totalCount++;
+  }
 
-	@Override
-	public int getBinCount() {
-		return counts.length;
-	}
+  @Override
+  public int getBinCount() {
+    return counts.length;
+  }
 
-	@Override
-	public long getCount(int idx) {
-		return counts[idx];
-	}
+  @Override
+  public long getCount(int idx) {
+    return counts[idx];
+  }
 
-	@Override
-	public long getTotalCount() {
-		return totalCount;
-	}
+  @Override
+  public long getTotalCount() {
+    return totalCount;
+  }
 
-	public void addValues(double[] values) {
-		for (double v : values) {
-			addValue(v);
-		}
-	}
+  public void addValues(double[] values) {
+    for (double v : values) {
+      addValue(v);
+    }
+  }
 
-	abstract public void addValue(double value);
+  public abstract void addValue(double value);
 }

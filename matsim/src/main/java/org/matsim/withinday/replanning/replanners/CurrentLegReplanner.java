@@ -51,45 +51,49 @@ import org.matsim.withinday.utils.EditRoutes;
  */
 public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 
-	private final LeastCostPathCalculator pathCalculator;
-	private final PopulationFactory populationFactory;
-	
-	/*package*/ CurrentLegReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface,
-			LeastCostPathCalculator pathCalculator) {
-		super(id, scenario, internalInterface);
-		this.pathCalculator = pathCalculator;
-		this.populationFactory = scenario.getPopulation().getFactory() ;
-	}
+  private final LeastCostPathCalculator pathCalculator;
+  private final PopulationFactory populationFactory;
 
-	/*
-	 * Replan Route every time the End of a Link is reached.
-	 *
-	 * Idea:
-	 * - create a new Activity at the current Location
-	 * - create a new Route from the current Location to the Destination
-	 * - merge already passed parts of the current Route with the new created Route
-	 */
-	@Override
-	public boolean doReplanning(MobsimAgent withinDayAgent) {
+  /*package*/ CurrentLegReplanner(
+      Id<WithinDayReplanner> id,
+      Scenario scenario,
+      ActivityEndRescheduler internalInterface,
+      LeastCostPathCalculator pathCalculator) {
+    super(id, scenario, internalInterface);
+    this.pathCalculator = pathCalculator;
+    this.populationFactory = scenario.getPopulation().getFactory();
+  }
 
-		Plan executedPlan = WithinDayAgentUtils.getModifiablePlan(withinDayAgent);
+  /*
+   * Replan Route every time the End of a Link is reached.
+   *
+   * Idea:
+   * - create a new Activity at the current Location
+   * - create a new Route from the current Location to the Destination
+   * - merge already passed parts of the current Route with the new created Route
+   */
+  @Override
+  public boolean doReplanning(MobsimAgent withinDayAgent) {
 
-		// If we don't have an executed plan
-		if (executedPlan == null) return false;
+    Plan executedPlan = WithinDayAgentUtils.getModifiablePlan(withinDayAgent);
 
-		PlanElement currentPlanElement = WithinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
-		if (!(currentPlanElement instanceof Leg)) return false;
-		Leg currentLeg = (Leg) currentPlanElement;
-		int currentLinkIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
+    // If we don't have an executed plan
+    if (executedPlan == null) return false;
 
-		EditRoutes editRoutes = new EditRoutes( scenario.getNetwork(), pathCalculator, populationFactory ) ;
+    PlanElement currentPlanElement = WithinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
+    if (!(currentPlanElement instanceof Leg)) return false;
+    Leg currentLeg = (Leg) currentPlanElement;
+    int currentLinkIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 
-		editRoutes.replanCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, this.time.seconds() ) ;
-		
-		// Finally reset the cached Values of the PersonAgent - they may have changed!
-		WithinDayAgentUtils.resetCaches(withinDayAgent);
+    EditRoutes editRoutes =
+        new EditRoutes(scenario.getNetwork(), pathCalculator, populationFactory);
 
-		return true;
-	}
+    editRoutes.replanCurrentLegRoute(
+        currentLeg, executedPlan.getPerson(), currentLinkIndex, this.time.seconds());
 
+    // Finally reset the cached Values of the PersonAgent - they may have changed!
+    WithinDayAgentUtils.resetCaches(withinDayAgent);
+
+    return true;
+  }
 }

@@ -19,15 +19,11 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.model;
 
-
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
 
 /**
  * Marker interface.
- * 
- * @author dgrether
  *
+ * @author dgrether
  */
-public interface IntergreensLogic extends SignalGroupStateChangedEventHandler {
-
-}
+public interface IntergreensLogic extends SignalGroupStateChangedEventHandler {}

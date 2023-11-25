@@ -21,7 +21,6 @@
 package org.matsim.utils.gis.matsim2esri.network;
 
 import java.util.Collection;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,111 +35,115 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-public class Network2ESRIShapeTest   {
+public class Network2ESRIShapeTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test public void testPolygonCapacityShape() {
-		String netFileName = "test/scenarios/equil/network.xml";
-		String outputFileP = utils.getOutputDirectory() + "./network.shp";
+  @Test
+  public void testPolygonCapacityShape() {
+    String netFileName = "test/scenarios/equil/network.xml";
+    String outputFileP = utils.getOutputDirectory() + "./network.shp";
 
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
+    Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
-		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
+    final Network network = scenario.getNetwork();
+    new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 
-		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "DHDN_GK4");
-		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
-		builder.setWidthCoefficient(0.001);
-		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
-		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
-		builder.setCoordinateReferenceSystem(crs);
-		new Links2ESRIShape(network,outputFileP, builder).write();
+    FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "DHDN_GK4");
+    CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
+    builder.setWidthCoefficient(0.001);
+    builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
+    builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
+    builder.setCoordinateReferenceSystem(crs);
+    new Links2ESRIShape(network, outputFileP, builder).write();
 
-		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileP);
-		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
-	}
+    Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileP);
+    Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
+  }
 
-	@Test public void testPolygonLanesShape() {
-		String netFileName = "test/scenarios/equil/network.xml";
-		String outputFileP = utils.getOutputDirectory() + "./network.shp";
+  @Test
+  public void testPolygonLanesShape() {
+    String netFileName = "test/scenarios/equil/network.xml";
+    String outputFileP = utils.getOutputDirectory() + "./network.shp";
 
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
+    Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
-		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
+    final Network network = scenario.getNetwork();
+    new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 
-		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "DHDN_GK4");
-		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
-		builder.setWidthCoefficient(1);
-		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
-		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
-		builder.setCoordinateReferenceSystem(crs);
-		new Links2ESRIShape(network,outputFileP, builder).write();
+    FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "DHDN_GK4");
+    CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
+    builder.setWidthCoefficient(1);
+    builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
+    builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
+    builder.setCoordinateReferenceSystem(crs);
+    new Links2ESRIShape(network, outputFileP, builder).write();
 
-		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileP);
-		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
-	}
+    Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileP);
+    Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
+  }
 
-	@Test public void testPolygonFreespeedShape() {
-		String netFileName = "test/scenarios/equil/network.xml";
-		String outputFileP = utils.getOutputDirectory() + "./network.shp";
+  @Test
+  public void testPolygonFreespeedShape() {
+    String netFileName = "test/scenarios/equil/network.xml";
+    String outputFileP = utils.getOutputDirectory() + "./network.shp";
 
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
+    Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
-		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
+    final Network network = scenario.getNetwork();
+    new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 
-		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "DHDN_GK4");
-		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
-		builder.setWidthCoefficient(1);
-		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
-		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
-		builder.setCoordinateReferenceSystem(crs);
-		new Links2ESRIShape(network,outputFileP, builder).write();
+    FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "DHDN_GK4");
+    CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
+    builder.setWidthCoefficient(1);
+    builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
+    builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
+    builder.setCoordinateReferenceSystem(crs);
+    new Links2ESRIShape(network, outputFileP, builder).write();
 
-		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileP);
-		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
-	}
+    Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileP);
+    Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
+  }
 
-	@Test public void testLineStringShape() {
-		String netFileName = "test/scenarios/equil/network.xml";
-		String outputFileShp = utils.getOutputDirectory() + "./network.shp";
+  @Test
+  public void testLineStringShape() {
+    String netFileName = "test/scenarios/equil/network.xml";
+    String outputFileShp = utils.getOutputDirectory() + "./network.shp";
 
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
+    Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
-		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
+    final Network network = scenario.getNetwork();
+    new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 
-		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "DHDN_GK4");
-		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
-		builder.setWidthCoefficient(1);
-		builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
-		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
-		builder.setCoordinateReferenceSystem(crs);
-		new Links2ESRIShape(network,outputFileShp, builder).write();
+    FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "DHDN_GK4");
+    CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
+    builder.setWidthCoefficient(1);
+    builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
+    builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
+    builder.setCoordinateReferenceSystem(crs);
+    new Links2ESRIShape(network, outputFileShp, builder).write();
 
-		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileShp);
-		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
-	}
+    Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileShp);
+    Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
+  }
 
-	@Test public void testNodesShape() {
-		String netFileName = "test/scenarios/equil/network.xml";
-		String outputFileShp = utils.getOutputDirectory() + "./network.shp";
+  @Test
+  public void testNodesShape() {
+    String netFileName = "test/scenarios/equil/network.xml";
+    String outputFileShp = utils.getOutputDirectory() + "./network.shp";
 
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
+    final Network network = scenario.getNetwork();
+    new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 
-		new Nodes2ESRIShape(network,outputFileShp, "DHDN_GK4").write();
+    new Nodes2ESRIShape(network, outputFileShp, "DHDN_GK4").write();
 
-		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileShp);
-		Assert.assertEquals(network.getNodes().size(), writtenFeatures.size());
-	}
+    Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileShp);
+    Assert.assertEquals(network.getNodes().size(), writtenFeatures.size());
+  }
 }

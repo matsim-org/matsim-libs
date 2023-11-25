@@ -19,93 +19,98 @@
 
 package org.matsim.core.controler.corelisteners;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.io.File;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 /**
  * @author mrieser
  */
 public class PlansDumpingIT {
 
-	@Rule public MatsimTestUtils util = new MatsimTestUtils();
+  @Rule public MatsimTestUtils util = new MatsimTestUtils();
 
-	@Test
-	public void testPlansDump_Interval() {
-		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controller().setLastIteration(10);
-		config.controller().setWritePlansInterval(3);
-		Controler c = new Controler(config);
-		c.getConfig().controller().setWriteEventsInterval(0);
-        c.getConfig().controller().setCreateGraphs(false);
+  @Test
+  public void testPlansDump_Interval() {
+    Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
+    config.controller().setLastIteration(10);
+    config.controller().setWritePlansInterval(3);
+    Controler c = new Controler(config);
+    c.getConfig().controller().setWriteEventsInterval(0);
+    c.getConfig().controller().setCreateGraphs(false);
 
-        c.run();
+    c.run();
 
-		assertTrue(new File(c.getControlerIO().getIterationFilename(0, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(1, "plans.xml.gz")).exists()); // it.1 is always written
-		assertFalse(new File(c.getControlerIO().getIterationFilename(2, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(3, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(4, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(5, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(6, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(7, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(8, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(9, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(10, "plans.xml.gz")).exists());
-	}
+    assertTrue(new File(c.getControlerIO().getIterationFilename(0, "plans.xml.gz")).exists());
+    assertTrue(
+        new File(c.getControlerIO().getIterationFilename(1, "plans.xml.gz"))
+            .exists()); // it.1 is always written
+    assertFalse(new File(c.getControlerIO().getIterationFilename(2, "plans.xml.gz")).exists());
+    assertTrue(new File(c.getControlerIO().getIterationFilename(3, "plans.xml.gz")).exists());
+    assertFalse(new File(c.getControlerIO().getIterationFilename(4, "plans.xml.gz")).exists());
+    assertFalse(new File(c.getControlerIO().getIterationFilename(5, "plans.xml.gz")).exists());
+    assertTrue(new File(c.getControlerIO().getIterationFilename(6, "plans.xml.gz")).exists());
+    assertFalse(new File(c.getControlerIO().getIterationFilename(7, "plans.xml.gz")).exists());
+    assertFalse(new File(c.getControlerIO().getIterationFilename(8, "plans.xml.gz")).exists());
+    assertTrue(new File(c.getControlerIO().getIterationFilename(9, "plans.xml.gz")).exists());
+    assertFalse(new File(c.getControlerIO().getIterationFilename(10, "plans.xml.gz")).exists());
+  }
 
-	@Test
-	public void testPlansDump_Never() {
-		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controller().setLastIteration(10);
-		config.controller().setWritePlansInterval(0);
-		Controler c = new Controler(config);
-		c.getConfig().controller().setWriteEventsInterval(0);
-        c.getConfig().controller().setCreateGraphs(false);
+  @Test
+  public void testPlansDump_Never() {
+    Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
+    config.controller().setLastIteration(10);
+    config.controller().setWritePlansInterval(0);
+    Controler c = new Controler(config);
+    c.getConfig().controller().setWriteEventsInterval(0);
+    c.getConfig().controller().setCreateGraphs(false);
 
-        c.run();
+    c.run();
 
-		assertFalse(new File(c.getControlerIO().getIterationFilename(0, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(1, "plans.xml.gz")).exists()); // it.1 is deactivated when interval = 0
-		assertFalse(new File(c.getControlerIO().getIterationFilename(2, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(3, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(4, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(5, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(6, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(7, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(8, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(9, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(10, "plans.xml.gz")).exists());
-	}
+    assertFalse(new File(c.getControlerIO().getIterationFilename(0, "plans.xml.gz")).exists());
+    assertFalse(
+        new File(c.getControlerIO().getIterationFilename(1, "plans.xml.gz"))
+            .exists()); // it.1 is deactivated when interval = 0
+    assertFalse(new File(c.getControlerIO().getIterationFilename(2, "plans.xml.gz")).exists());
+    assertFalse(new File(c.getControlerIO().getIterationFilename(3, "plans.xml.gz")).exists());
+    assertFalse(new File(c.getControlerIO().getIterationFilename(4, "plans.xml.gz")).exists());
+    assertFalse(new File(c.getControlerIO().getIterationFilename(5, "plans.xml.gz")).exists());
+    assertFalse(new File(c.getControlerIO().getIterationFilename(6, "plans.xml.gz")).exists());
+    assertFalse(new File(c.getControlerIO().getIterationFilename(7, "plans.xml.gz")).exists());
+    assertFalse(new File(c.getControlerIO().getIterationFilename(8, "plans.xml.gz")).exists());
+    assertFalse(new File(c.getControlerIO().getIterationFilename(9, "plans.xml.gz")).exists());
+    assertFalse(new File(c.getControlerIO().getIterationFilename(10, "plans.xml.gz")).exists());
+  }
 
-	@Test
-	public void testPlansDump_Always() {
-		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controller().setLastIteration(10);
-		config.controller().setWritePlansInterval(1);
-		Controler c = new Controler(config);
-		c.getConfig().controller().setWriteEventsInterval(0);
-        c.getConfig().controller().setCreateGraphs(false);
+  @Test
+  public void testPlansDump_Always() {
+    Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
+    config.controller().setLastIteration(10);
+    config.controller().setWritePlansInterval(1);
+    Controler c = new Controler(config);
+    c.getConfig().controller().setWriteEventsInterval(0);
+    c.getConfig().controller().setCreateGraphs(false);
 
-        c.run();
+    c.run();
 
-		assertTrue(new File(c.getControlerIO().getIterationFilename(0, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(1, "plans.xml.gz")).exists()); // it.1 is always written
-		assertTrue(new File(c.getControlerIO().getIterationFilename(2, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(3, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(4, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(5, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(6, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(7, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(8, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(9, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(10, "plans.xml.gz")).exists());
-	}
+    assertTrue(new File(c.getControlerIO().getIterationFilename(0, "plans.xml.gz")).exists());
+    assertTrue(
+        new File(c.getControlerIO().getIterationFilename(1, "plans.xml.gz"))
+            .exists()); // it.1 is always written
+    assertTrue(new File(c.getControlerIO().getIterationFilename(2, "plans.xml.gz")).exists());
+    assertTrue(new File(c.getControlerIO().getIterationFilename(3, "plans.xml.gz")).exists());
+    assertTrue(new File(c.getControlerIO().getIterationFilename(4, "plans.xml.gz")).exists());
+    assertTrue(new File(c.getControlerIO().getIterationFilename(5, "plans.xml.gz")).exists());
+    assertTrue(new File(c.getControlerIO().getIterationFilename(6, "plans.xml.gz")).exists());
+    assertTrue(new File(c.getControlerIO().getIterationFilename(7, "plans.xml.gz")).exists());
+    assertTrue(new File(c.getControlerIO().getIterationFilename(8, "plans.xml.gz")).exists());
+    assertTrue(new File(c.getControlerIO().getIterationFilename(9, "plans.xml.gz")).exists());
+    assertTrue(new File(c.getControlerIO().getIterationFilename(10, "plans.xml.gz")).exists());
+  }
 }

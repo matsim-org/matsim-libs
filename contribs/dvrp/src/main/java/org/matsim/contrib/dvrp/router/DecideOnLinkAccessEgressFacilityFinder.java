@@ -21,7 +21,6 @@
 package org.matsim.contrib.dvrp.router;
 
 import java.util.Optional;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.network.Network;
@@ -35,17 +34,19 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author Michal Maciejewski (michalm)
  */
 public class DecideOnLinkAccessEgressFacilityFinder implements AccessEgressFacilityFinder {
-	private final Network network;
+  private final Network network;
 
-	public DecideOnLinkAccessEgressFacilityFinder(Network network) {
-		this.network = network;
-	}
+  public DecideOnLinkAccessEgressFacilityFinder(Network network) {
+    this.network = network;
+  }
 
-	@Override
-	public Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility, Attributes tripAttributes) {
-		LinkWrapperFacility accessFacility = new LinkWrapperFacility(
-				FacilitiesUtils.decideOnLink(fromFacility, network));
-		LinkWrapperFacility egressFacility = new LinkWrapperFacility(FacilitiesUtils.decideOnLink(toFacility, network));
-		return Optional.of(ImmutablePair.of(accessFacility, egressFacility));
-	}
+  @Override
+  public Optional<Pair<Facility, Facility>> findFacilities(
+      Facility fromFacility, Facility toFacility, Attributes tripAttributes) {
+    LinkWrapperFacility accessFacility =
+        new LinkWrapperFacility(FacilitiesUtils.decideOnLink(fromFacility, network));
+    LinkWrapperFacility egressFacility =
+        new LinkWrapperFacility(FacilitiesUtils.decideOnLink(toFacility, network));
+    return Optional.of(ImmutablePair.of(accessFacility, egressFacility));
+  }
 }

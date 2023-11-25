@@ -22,7 +22,6 @@ package org.matsim.run;
 
 import java.util.Arrays;
 import java.util.Iterator;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -48,130 +47,144 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeInterpretationModule;
 
 /**
- * Assigns for each leg of each plan of each person an initial (freespeed) route.
- * All given activities must have a link assigned already (use XY2Links).
+ * Assigns for each leg of each plan of each person an initial (freespeed) route. All given
+ * activities must have a link assigned already (use XY2Links).
  *
  * @author balmermi
  * @author mrieser
  */
 public class InitRoutes {
 
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // member variables
+  //////////////////////////////////////////////////////////////////////
 
-	private Config config;
-	private String configfile = null;
-	private String plansfile = null;
+  private Config config;
+  private String configfile = null;
+  private String plansfile = null;
 
-	//////////////////////////////////////////////////////////////////////
-	// parse methods
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // parse methods
+  //////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Parses all arguments and sets the corresponding members.
-	 *
-	 * @param args
-	 */
-	private void parseArguments(final String[] args) {
-		if (args.length == 0) {
-			System.out.println("Too few arguments.");
-			printUsage();
-			System.exit(1);
-		}
-		Iterator<String> argIter = new ArgumentParser(args).iterator();
-		String arg = argIter.next();
-		if (arg.equals("-h") || arg.equals("--help")) {
-			printUsage();
-			System.exit(0);
-		} else {
-			this.configfile = arg;
-			this.plansfile = argIter.next();
-			if (argIter.hasNext()) {
-				System.out.println("Too many arguments.");
-				printUsage();
-				System.exit(1);
-			}
-		}
-	}
+  /**
+   * Parses all arguments and sets the corresponding members.
+   *
+   * @param args
+   */
+  private void parseArguments(final String[] args) {
+    if (args.length == 0) {
+      System.out.println("Too few arguments.");
+      printUsage();
+      System.exit(1);
+    }
+    Iterator<String> argIter = new ArgumentParser(args).iterator();
+    String arg = argIter.next();
+    if (arg.equals("-h") || arg.equals("--help")) {
+      printUsage();
+      System.exit(0);
+    } else {
+      this.configfile = arg;
+      this.plansfile = argIter.next();
+      if (argIter.hasNext()) {
+        System.out.println("Too many arguments.");
+        printUsage();
+        System.exit(1);
+      }
+    }
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// print methods
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // print methods
+  //////////////////////////////////////////////////////////////////////
 
-	private void printUsage() {
-		System.out.println();
-		System.out.println("InitRoutes");
-		System.out.println("Reads a plans-file and assignes each leg in each plan of each person");
-		System.out.println("a an initial route (freespeed) based on the given netowrk. The modified plans/");
-		System.out.println("persons are then written out to file again.");
-		System.out.println();
-		System.out.println("usage: InitRoutes [OPTIONS] configfile");
-		System.out.println("       The following parameters must be given in the config-file:");
-		System.out.println("       - network.inputNetworkFile");
-		System.out.println("       - plans.inputPlansFile");
-		System.out.println("       - plans.outputPlansFile");
-		System.out.println();
-		System.out.println("Options:");
-		System.out.println("-h, --help:     Displays this message.");
-		System.out.println();
-		System.out.println("----------------");
-		System.out.println("2008, matsim.org");
-		System.out.println();
-	}
+  private void printUsage() {
+    System.out.println();
+    System.out.println("InitRoutes");
+    System.out.println("Reads a plans-file and assignes each leg in each plan of each person");
+    System.out.println(
+        "a an initial route (freespeed) based on the given netowrk. The modified plans/");
+    System.out.println("persons are then written out to file again.");
+    System.out.println();
+    System.out.println("usage: InitRoutes [OPTIONS] configfile");
+    System.out.println("       The following parameters must be given in the config-file:");
+    System.out.println("       - network.inputNetworkFile");
+    System.out.println("       - plans.inputPlansFile");
+    System.out.println("       - plans.outputPlansFile");
+    System.out.println();
+    System.out.println("Options:");
+    System.out.println("-h, --help:     Displays this message.");
+    System.out.println();
+    System.out.println("----------------");
+    System.out.println("2008, matsim.org");
+    System.out.println();
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// run method
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // run method
+  //////////////////////////////////////////////////////////////////////
 
-	public void run(final String[] args) {
-		parseArguments(args);
-		this.config = ConfigUtils.loadConfig(this.configfile);
-		MatsimRandom.reset(config.global().getRandomSeed());
-		final MutableScenario scenario = ScenarioUtils.createMutableScenario(config);
-//		final Population plans = PopulationUtils.createStreamingPopulation( config.plans(), null );
-		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
+  public void run(final String[] args) {
+    parseArguments(args);
+    this.config = ConfigUtils.loadConfig(this.configfile);
+    MatsimRandom.reset(config.global().getRandomSeed());
+    final MutableScenario scenario = ScenarioUtils.createMutableScenario(config);
+    //		final Population plans = PopulationUtils.createStreamingPopulation( config.plans(), null );
+    StreamingPopulationReader reader = new StreamingPopulationReader(scenario);
 
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
+    new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 
-		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter();
-		Gbl.assertNotNull(this.plansfile);
-		plansWriter.startStreaming(this.plansfile);
-		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.scoring());
-		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
-			@Override
-			public void install() {
-			install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {
-				@Override
-				public void install() {
-				install(new ScenarioByInstanceModule(scenario));
-				install(new TimeInterpretationModule());
-				addTravelTimeBinding("car").toInstance(timeCostCalc);
-				addTravelDisutilityFactoryBinding("car").toInstance(new TravelDisutilityFactory() {
-					@Override
-					public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
-						return timeCostCalc;
-					}
-				});
-				}
-			}));
-			}
-		});
-		reader.addAlgorithm(new PlanRouter(injector.getInstance(TripRouter.class), null, injector.getInstance(TimeInterpretation.class)));
-		reader.addAlgorithm(plansWriter);
-		reader.readFile(this.config.plans().getInputFile());
-		PopulationUtils.printPlansCount(reader) ;
-		plansWriter.closeStreaming();
+    final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter();
+    Gbl.assertNotNull(this.plansfile);
+    plansWriter.startStreaming(this.plansfile);
+    final FreespeedTravelTimeAndDisutility timeCostCalc =
+        new FreespeedTravelTimeAndDisutility(config.scoring());
+    com.google.inject.Injector injector =
+        Injector.createInjector(
+            scenario.getConfig(),
+            new AbstractModule() {
+              @Override
+              public void install() {
+                install(
+                    AbstractModule.override(
+                        Arrays.asList(new TripRouterModule()),
+                        new AbstractModule() {
+                          @Override
+                          public void install() {
+                            install(new ScenarioByInstanceModule(scenario));
+                            install(new TimeInterpretationModule());
+                            addTravelTimeBinding("car").toInstance(timeCostCalc);
+                            addTravelDisutilityFactoryBinding("car")
+                                .toInstance(
+                                    new TravelDisutilityFactory() {
+                                      @Override
+                                      public TravelDisutility createTravelDisutility(
+                                          TravelTime timeCalculator) {
+                                        return timeCostCalc;
+                                      }
+                                    });
+                          }
+                        }));
+              }
+            });
+    reader.addAlgorithm(
+        new PlanRouter(
+            injector.getInstance(TripRouter.class),
+            null,
+            injector.getInstance(TimeInterpretation.class)));
+    reader.addAlgorithm(plansWriter);
+    reader.readFile(this.config.plans().getInputFile());
+    PopulationUtils.printPlansCount(reader);
+    plansWriter.closeStreaming();
 
-		System.out.println("done.");
-	}
+    System.out.println("done.");
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// main method
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // main method
+  //////////////////////////////////////////////////////////////////////
 
-	public static void main(final String[] args) {
-		new InitRoutes().run(args);
-	}
-
+  public static void main(final String[] args) {
+    new InitRoutes().run(args);
+  }
 }

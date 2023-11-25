@@ -22,16 +22,13 @@ package org.matsim.contrib.signals.data.ambertimes.v10;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.SignalSystem;
 
-
 /**
  * @author dgrether
- *
  */
 final class AmberTimesDataFactoryImpl implements AmberTimesDataFactory {
 
-	@Override
-	public AmberTimeData createAmberTimeData(Id<SignalSystem> signalSystemId) {
-		return new AmberTimeDataImpl(signalSystemId);
-	}
-
+  @Override
+  public AmberTimeData createAmberTimeData(Id<SignalSystem> signalSystemId) {
+    return new AmberTimeDataImpl(signalSystemId);
+  }
 }

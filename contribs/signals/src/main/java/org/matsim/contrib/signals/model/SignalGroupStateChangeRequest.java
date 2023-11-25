@@ -24,14 +24,12 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 
 /**
  * @author dgrether
- *
  */
 public interface SignalGroupStateChangeRequest extends Comparable<SignalGroupStateChangeRequest> {
-	
-	public SignalGroupState getRequestedState();
 
-	public double getTimeOfDay();
-	
-	public Id<SignalGroup> getSignalGroupId();
-	
+  public SignalGroupState getRequestedState();
+
+  public double getTimeOfDay();
+
+  public Id<SignalGroup> getSignalGroupId();
 }

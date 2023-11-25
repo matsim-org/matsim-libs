@@ -19,12 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import org.matsim.contrib.socnetsim.framework.cliques.config.JointTripInsertorConfigGroup;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
@@ -32,112 +29,110 @@ import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.framework.replanning.GroupPlanStrategy;
-import org.matsim.contrib.socnetsim.usage.replanning.GroupPlanStrategyFactoryUtils;
 import org.matsim.contrib.socnetsim.framework.replanning.JointPlanBasedGroupStrategyModule;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.AbstractMultithreadedGenericStrategyModule;
-import org.matsim.contrib.socnetsim.jointtrips.replanning.modules.JointTripInsertorAlgorithm;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
 import org.matsim.contrib.socnetsim.jointactivities.replanning.modules.prismiclocationchoice.PrismicLocationChoiceModule;
+import org.matsim.contrib.socnetsim.jointtrips.replanning.modules.JointTripInsertorAlgorithm;
 import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import org.matsim.contrib.socnetsim.usage.replanning.GroupPlanStrategyFactoryUtils;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 /**
  * @author thibautd
  */
-public class JointPrismLocationChoiceWithJointTripInsertionStrategyFactory extends AbstractConfigurableSelectionStrategy {
+public class JointPrismLocationChoiceWithJointTripInsertionStrategyFactory
+    extends AbstractConfigurableSelectionStrategy {
 
-	private final Scenario sc;
-	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
-	private final Provider<TripRouter> tripRouterFactory;
-	private final PlanLinkIdentifier planLinkIdentifier;
-	private jakarta.inject.Provider<TripRouter> tripRouterProvider;
-	private final MainModeIdentifier mainModeIdentifier;
-	private final TimeInterpretation timeInterpretation;
+  private final Scenario sc;
+  private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
+  private final Provider<TripRouter> tripRouterFactory;
+  private final PlanLinkIdentifier planLinkIdentifier;
+  private jakarta.inject.Provider<TripRouter> tripRouterProvider;
+  private final MainModeIdentifier mainModeIdentifier;
+  private final TimeInterpretation timeInterpretation;
 
-	@Inject
-	public JointPrismLocationChoiceWithJointTripInsertionStrategyFactory(Scenario sc, PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
-																		 Provider<TripRouter> tripRouterFactory, @Strong PlanLinkIdentifier planLinkIdentifier,
-																		 jakarta.inject.Provider<TripRouter> tripRouterProvider, MainModeIdentifier mainModeIdentifier,
-																		 TimeInterpretation timeInterpretation) {
-		this.sc = sc;
-		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
-		this.tripRouterFactory = tripRouterFactory;
-		this.planLinkIdentifier = planLinkIdentifier;
-		this.tripRouterProvider = tripRouterProvider;
-		this.mainModeIdentifier = mainModeIdentifier;
-		this.timeInterpretation = timeInterpretation;
-	}
+  @Inject
+  public JointPrismLocationChoiceWithJointTripInsertionStrategyFactory(
+      Scenario sc,
+      PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
+      Provider<TripRouter> tripRouterFactory,
+      @Strong PlanLinkIdentifier planLinkIdentifier,
+      jakarta.inject.Provider<TripRouter> tripRouterProvider,
+      MainModeIdentifier mainModeIdentifier,
+      TimeInterpretation timeInterpretation) {
+    this.sc = sc;
+    this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
+    this.tripRouterFactory = tripRouterFactory;
+    this.planLinkIdentifier = planLinkIdentifier;
+    this.tripRouterProvider = tripRouterProvider;
+    this.mainModeIdentifier = mainModeIdentifier;
+    this.timeInterpretation = timeInterpretation;
+  }
 
+  @Override
+  public GroupPlanStrategy get() {
+    final GroupPlanStrategy strategy = instantiateStrategy(sc.getConfig());
 
-	@Override
-	public GroupPlanStrategy get() {
-		final GroupPlanStrategy strategy = instantiateStrategy( sc.getConfig() );
+    strategy.addStrategyModule(new PrismicLocationChoiceModule(sc, tripRouterProvider));
 
-		strategy.addStrategyModule(
-				new PrismicLocationChoiceModule(
-					sc, tripRouterProvider) );
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createJointTripAwareTourModeUnifierModule(
+            sc.getConfig(), mainModeIdentifier));
 
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createJointTripAwareTourModeUnifierModule(
-						sc.getConfig(),
-						mainModeIdentifier) );
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
+            sc.getConfig(),
+            ((JointPlans) sc.getScenarioElement(JointPlans.ELEMENT_NAME)).getFactory(),
+            planLinkIdentifier));
 
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
-					sc.getConfig(),
-					((JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME  )).getFactory(),
-					planLinkIdentifier ) );
+    strategy.addStrategyModule(
+        new JointPlanBasedGroupStrategyModule(
+            new AbstractMultithreadedGenericStrategyModule<JointPlan>(sc.getConfig().global()) {
+              @Override
+              public GenericPlanAlgorithm<JointPlan> createAlgorithm(
+                  ReplanningContext replanningContext) {
+                return new JointTripInsertorAlgorithm(
+                    MatsimRandom.getLocalInstance(),
+                    (SocialNetwork) sc.getScenarioElement(SocialNetwork.ELEMENT_NAME),
+                    (JointTripInsertorConfigGroup)
+                        sc.getConfig().getModule(JointTripInsertorConfigGroup.GROUP_NAME),
+                    mainModeIdentifier);
+              }
 
-		strategy.addStrategyModule(
-			new JointPlanBasedGroupStrategyModule(
-					new AbstractMultithreadedGenericStrategyModule<JointPlan>( sc.getConfig().global() ) {
-						@Override
-						public GenericPlanAlgorithm<JointPlan> createAlgorithm(ReplanningContext replanningContext) {
-							return new JointTripInsertorAlgorithm(
-								MatsimRandom.getLocalInstance(),
-								(SocialNetwork) sc.getScenarioElement(  SocialNetwork.ELEMENT_NAME ),
-								(JointTripInsertorConfigGroup) sc.getConfig().getModule( JointTripInsertorConfigGroup.GROUP_NAME ),
-								mainModeIdentifier);
-						}
+              @Override
+              protected String getName() {
+                return "JointTripMutator";
+              }
+            }));
 
-						@Override
-						protected String getName() {
-							return "JointTripMutator";
-						}
-					}));
+    // TODO: add an option to enable or disable this part?
+    final VehicleRessources vehicles =
+        (VehicleRessources) sc.getScenarioElement(VehicleRessources.ELEMENT_NAME);
+    if (vehicles != null) {
+      strategy.addStrategyModule(
+          GroupPlanStrategyFactoryUtils.createVehicleAllocationModule(sc.getConfig(), vehicles));
+    }
 
-		// TODO: add an option to enable or disable this part?
-		final VehicleRessources vehicles =
-				(VehicleRessources) sc.getScenarioElement(
-					VehicleRessources.ELEMENT_NAME );
-		if ( vehicles != null ) {
-			strategy.addStrategyModule(
-					GroupPlanStrategyFactoryUtils.createVehicleAllocationModule(
-						sc.getConfig(),
-						vehicles ) );
-		}
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createReRouteModule(
+            sc.getConfig(), planRoutingAlgorithmFactory, tripRouterFactory));
 
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createReRouteModule(
-					sc.getConfig(),
-					planRoutingAlgorithmFactory,
-					tripRouterFactory ) );
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createSynchronizerModule(
+            sc.getConfig(), tripRouterFactory, timeInterpretation));
 
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createSynchronizerModule(
-					sc.getConfig(),
-					tripRouterFactory, timeInterpretation) );
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
+            sc.getConfig(),
+            ((JointPlans) sc.getScenarioElement(JointPlans.ELEMENT_NAME)).getFactory(),
+            planLinkIdentifier));
 
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
-					sc.getConfig(),
-					((JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME  )).getFactory(),
-					planLinkIdentifier ) );
-
-		return strategy;
-	}
+    return strategy;
+  }
 }
-

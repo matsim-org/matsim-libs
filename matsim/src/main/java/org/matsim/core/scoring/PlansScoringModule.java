@@ -24,13 +24,13 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 
 public final class PlansScoringModule extends AbstractModule {
-	@Override
-	public void install() {
-		bind(EventsToActivities.class).asEagerSingleton();
-		bind(EventsToLegs.class).asEagerSingleton();
-		bind(EventsToLegsAndActivities.class).asEagerSingleton();
-		bind(ScoringFunctionsForPopulation.class).asEagerSingleton();
-		bind(PlansScoring.class).to(PlansScoringImpl.class);
-		bind(ExperiencedPlansService.class).to(ExperiencedPlansServiceImpl.class).asEagerSingleton();
-	}
+  @Override
+  public void install() {
+    bind(EventsToActivities.class).asEagerSingleton();
+    bind(EventsToLegs.class).asEagerSingleton();
+    bind(EventsToLegsAndActivities.class).asEagerSingleton();
+    bind(ScoringFunctionsForPopulation.class).asEagerSingleton();
+    bind(PlansScoring.class).to(PlansScoringImpl.class);
+    bind(ExperiencedPlansService.class).to(ExperiencedPlansServiceImpl.class).asEagerSingleton();
+  }
 }

@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.drt.routing;
 
+import java.util.Map;
+import java.util.Objects;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
@@ -29,57 +31,64 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
-import java.util.Map;
-import java.util.Objects;
-
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class DrtStopFacilityImpl implements DrtStopFacility {
-	public static <F extends Identifiable<?> & Facility & Attributable> DrtStopFacility createFromFacility(F facility) {
-		Objects.requireNonNull(facility.getLinkId(), "Link ID at Facility " + facility.getId() + " must not be null.");
-		return new DrtStopFacilityImpl(Id.create(facility.getId(), DrtStopFacility.class), facility.getLinkId(),
-				facility.getCoord(), facility.getAttributes());
-	}
+  public static <F extends Identifiable<?> & Facility & Attributable>
+      DrtStopFacility createFromFacility(F facility) {
+    Objects.requireNonNull(
+        facility.getLinkId(), "Link ID at Facility " + facility.getId() + " must not be null.");
+    return new DrtStopFacilityImpl(
+        Id.create(facility.getId(), DrtStopFacility.class),
+        facility.getLinkId(),
+        facility.getCoord(),
+        facility.getAttributes());
+  }
 
-	public static DrtStopFacility createFromLink(Link link) {
-		return new DrtStopFacilityImpl(Id.create(link.getId(), DrtStopFacility.class), link.getId(), link.getToNode().getCoord(), new AttributesImpl());
-	}
+  public static DrtStopFacility createFromLink(Link link) {
+    return new DrtStopFacilityImpl(
+        Id.create(link.getId(), DrtStopFacility.class),
+        link.getId(),
+        link.getToNode().getCoord(),
+        new AttributesImpl());
+  }
 
-	private final Id<DrtStopFacility> id;
-	private final Id<Link> linkId;
-	private final Coord coord;
-	private final Attributes attributes;
+  private final Id<DrtStopFacility> id;
+  private final Id<Link> linkId;
+  private final Coord coord;
+  private final Attributes attributes;
 
-	public DrtStopFacilityImpl(Id<DrtStopFacility> id, Id<Link> linkId, Coord coord, Attributes attributes) {
-		this.id = id;
-		this.linkId = linkId;
-		this.coord = coord;
-		this.attributes = attributes;
-	}
+  public DrtStopFacilityImpl(
+      Id<DrtStopFacility> id, Id<Link> linkId, Coord coord, Attributes attributes) {
+    this.id = id;
+    this.linkId = linkId;
+    this.coord = coord;
+    this.attributes = attributes;
+  }
 
-	@Override
-	public Id<DrtStopFacility> getId() {
-		return id;
-	}
+  @Override
+  public Id<DrtStopFacility> getId() {
+    return id;
+  }
 
-	@Override
-	public Id<Link> getLinkId() {
-		return linkId;
-	}
+  @Override
+  public Id<Link> getLinkId() {
+    return linkId;
+  }
 
-	@Override
-	public Coord getCoord() {
-		return coord;
-	}
+  @Override
+  public Coord getCoord() {
+    return coord;
+  }
 
-	@Override
-	public Map<String, Object> getCustomAttributes() {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public Map<String, Object> getCustomAttributes() {
+    throw new UnsupportedOperationException();
+  }
 
-	@Override
-	public Attributes getAttributes() {
-		return attributes;
-	}
+  @Override
+  public Attributes getAttributes() {
+    return attributes;
+  }
 }

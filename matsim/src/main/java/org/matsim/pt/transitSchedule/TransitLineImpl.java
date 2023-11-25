@@ -23,72 +23,78 @@ package org.matsim.pt.transitSchedule;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
-
 /**
- * Description of a single transit line. Can have multiple routes (e.g. from A to B and from B to A).
+ * Description of a single transit line. Can have multiple routes (e.g. from A to B and from B to
+ * A).
  *
  * @author mrieser
  */
 public class TransitLineImpl implements TransitLine {
 
-	private final Id<TransitLine> lineId;
-	private String name = null;
-	private final Map<Id<TransitRoute>, TransitRoute> transitRoutes = new LinkedHashMap<>(5);
-	private final Attributes attributes = new AttributesImpl();
+  private final Id<TransitLine> lineId;
+  private String name = null;
+  private final Map<Id<TransitRoute>, TransitRoute> transitRoutes = new LinkedHashMap<>(5);
+  private final Attributes attributes = new AttributesImpl();
 
-	protected TransitLineImpl(final Id<TransitLine> id) {
-		this.lineId = id;
-	}
+  protected TransitLineImpl(final Id<TransitLine> id) {
+    this.lineId = id;
+  }
 
-	@Override
-	public Id<TransitLine> getId() {
-		return this.lineId;
-	}
-	
-	@Override
-	public String getName() {
-		return this.name;
-	}
-	
-	@Override
-	public void setName(String name) {
-		this.name = name;
-	}
+  @Override
+  public Id<TransitLine> getId() {
+    return this.lineId;
+  }
 
-	@Override
-	public void addRoute(final TransitRoute transitRoute) {
-		final Id<TransitRoute> id = transitRoute.getId();
-		if (this.transitRoutes.containsKey(id)) {
-			throw new IllegalArgumentException("There is already a transit route with id " + id.toString() + " with line " + this.lineId);
-		}
-		this.transitRoutes.put(id, transitRoute);
-	}
+  @Override
+  public String getName() {
+    return this.name;
+  }
 
-	@Override
-	public Map<Id<TransitRoute>, TransitRoute> getRoutes() {
-		return Collections.unmodifiableMap(this.transitRoutes);
-	}
+  @Override
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	@Override
-	public boolean removeRoute(final TransitRoute route) {
-		return null != this.transitRoutes.remove(route.getId());
-	}
+  @Override
+  public void addRoute(final TransitRoute transitRoute) {
+    final Id<TransitRoute> id = transitRoute.getId();
+    if (this.transitRoutes.containsKey(id)) {
+      throw new IllegalArgumentException(
+          "There is already a transit route with id "
+              + id.toString()
+              + " with line "
+              + this.lineId);
+    }
+    this.transitRoutes.put(id, transitRoute);
+  }
 
-	@Override
-	public Attributes getAttributes() {
-		return this.attributes;
-	}
+  @Override
+  public Map<Id<TransitRoute>, TransitRoute> getRoutes() {
+    return Collections.unmodifiableMap(this.transitRoutes);
+  }
 
-	@Override
-	public String toString() {
-		return "[TransitLineImpl: line=" + this.lineId.toString() + ", #routes=" + this.transitRoutes.size() + "]";
-	}
-	
+  @Override
+  public boolean removeRoute(final TransitRoute route) {
+    return null != this.transitRoutes.remove(route.getId());
+  }
+
+  @Override
+  public Attributes getAttributes() {
+    return this.attributes;
+  }
+
+  @Override
+  public String toString() {
+    return "[TransitLineImpl: line="
+        + this.lineId.toString()
+        + ", #routes="
+        + this.transitRoutes.size()
+        + "]";
+  }
 }

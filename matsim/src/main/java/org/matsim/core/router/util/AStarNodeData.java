@@ -21,37 +21,34 @@
 package org.matsim.core.router.util;
 
 /**
- * Holds AStarEuclidean specific information used during routing
- * associated with each node in the network.
+ * Holds AStarEuclidean specific information used during routing associated with each node in the
+ * network.
  */
 public class AStarNodeData extends DijkstraNodeData {
 
-	private double expectedRemainingCost;
+  private double expectedRemainingCost;
 
-	/**
-	 * @return The expected total travel cost from the start
-	 * node to the target node of the route when the associated node
-	 * is on that route.
-	 */
-	public double getExpectedCost() {
-		return this.expectedRemainingCost + getCost();
-	}
+  /**
+   * @return The expected total travel cost from the start node to the target node of the route when
+   *     the associated node is on that route.
+   */
+  public double getExpectedCost() {
+    return this.expectedRemainingCost + getCost();
+  }
 
-	/**
-	 * Sets the expected travel cost from the associated
-	 * node to the target node of the route.
-	 *
-	 * @param expectedCost the expected cost
-	 */
-	public void setExpectedRemainingCost(final double expectedCost) {
-		this.expectedRemainingCost = expectedCost;
-	}
+  /**
+   * Sets the expected travel cost from the associated node to the target node of the route.
+   *
+   * @param expectedCost the expected cost
+   */
+  public void setExpectedRemainingCost(final double expectedCost) {
+    this.expectedRemainingCost = expectedCost;
+  }
 
-	/**
-	 * @return The expected travel cost from the associated
-	 * node to the target node of the route.
-	 */
-	public double getExpectedRemainingCost() {
-		return this.expectedRemainingCost;
-	}
+  /**
+   * @return The expected travel cost from the associated node to the target node of the route.
+   */
+  public double getExpectedRemainingCost() {
+    return this.expectedRemainingCost;
+  }
 }

@@ -25,6 +25,6 @@ import org.matsim.core.router.util.RoutingNetwork;
 
 public interface FastRouterDelegateFactory {
 
-	public FastRouterDelegate createFastRouterDelegate(Dijkstra dijkstra,
-																										 NodeDataFactory nodeDataFactory, RoutingNetwork routingNetwork);
+  public FastRouterDelegate createFastRouterDelegate(
+      Dijkstra dijkstra, NodeDataFactory nodeDataFactory, RoutingNetwork routingNetwork);
 }

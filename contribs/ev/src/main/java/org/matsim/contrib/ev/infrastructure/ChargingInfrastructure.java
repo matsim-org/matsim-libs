@@ -20,13 +20,12 @@
 
 package org.matsim.contrib.ev.infrastructure;
 
-import org.matsim.api.core.v01.Id;
-
 import com.google.common.collect.ImmutableMap;
+import org.matsim.api.core.v01.Id;
 
 /**
  * @author michalm
  */
 public interface ChargingInfrastructure {
-	ImmutableMap<Id<Charger>, Charger> getChargers();
+  ImmutableMap<Id<Charger>, Charger> getChargers();
 }

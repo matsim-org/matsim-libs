@@ -29,14 +29,13 @@ import org.matsim.api.core.v01.population.Route;
  */
 public final class LinkNetworkRouteFactory implements RouteFactory {
 
-	@Override
-	public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
-		return RouteUtils.createLinkNetworkRouteImpl(startLinkId, endLinkId);
-	}
+  @Override
+  public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
+    return RouteUtils.createLinkNetworkRouteImpl(startLinkId, endLinkId);
+  }
 
-	@Override
-	public String getCreatedRouteType() {
-		return LinkNetworkRouteImpl.ROUTE_TYPE;
-	}
-	
+  @Override
+  public String getCreatedRouteType() {
+    return LinkNetworkRouteImpl.ROUTE_TYPE;
+  }
 }

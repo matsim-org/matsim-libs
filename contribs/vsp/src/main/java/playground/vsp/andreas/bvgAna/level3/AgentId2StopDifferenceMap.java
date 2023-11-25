@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -40,7 +38,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.utils.collections.Tuple;
-
 import playground.vsp.andreas.bvgAna.level0.AgentId2PlannedDepartureTimeMap;
 import playground.vsp.andreas.bvgAna.level0.AgentId2PlannedDepartureTimeMapData;
 import playground.vsp.andreas.bvgAna.level1.AgentId2DepartureDelayAtStopMap;
@@ -49,7 +46,8 @@ import playground.vsp.andreas.bvgAna.level1.StopId2RouteId2DelayAtStopMap;
 import playground.vsp.andreas.bvgAna.level2.VehiclePlannedRealizedMissedDepartures;
 
 /**
- * Calculates the difference between realized time and planned time spent waiting at a stop for a given set of agent ids.<br>
+ * Calculates the difference between realized time and planned time spent waiting at a stop for a
+ * given set of agent ids.<br>
  * Returns negative values for agents being faster than planned.<br>
  * Returns positive values for agents being slower than planned.<br>
  * <br>
@@ -57,147 +55,175 @@ import playground.vsp.andreas.bvgAna.level2.VehiclePlannedRealizedMissedDepartur
  * Planned time: vehicle departs as scheduled minus "pt interaction" activity ends
  *
  * @author aneumann
- *
  */
-public class AgentId2StopDifferenceMap implements TransitDriverStartsEventHandler, VehicleDepartsAtFacilityEventHandler, PersonDepartureEventHandler, PersonEntersVehicleEventHandler {
+public class AgentId2StopDifferenceMap
+    implements TransitDriverStartsEventHandler,
+        VehicleDepartsAtFacilityEventHandler,
+        PersonDepartureEventHandler,
+        PersonEntersVehicleEventHandler {
 
-	private final Logger log = LogManager.getLogger(AgentId2StopDifferenceMap.class);
-//	private final Level logLevel = Level.OFF;
+  private final Logger log = LogManager.getLogger(AgentId2StopDifferenceMap.class);
+  //	private final Level logLevel = Level.OFF;
 
-	private Population pop;
-	private Set<Id<Person>> agentIds;
-	private Map<Id, List<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>> plannedDepartureTimeMap;
-	private StopId2RouteId2DelayAtStopMap vehDelayHandler;
-	private VehiclePlannedRealizedMissedDepartures vehDelayAnalyzer;
-	private AgentId2DepartureDelayAtStopMap agentDelayHandler;
-	private Map<Id,List<Tuple<Id,Double>>> agentId2StopDifferenceMap = null;
-	private Map<Id,List<Tuple<Id,Integer>>> agentIds2MissedVehMap = null;
+  private Population pop;
+  private Set<Id<Person>> agentIds;
+  private Map<Id, List<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>> plannedDepartureTimeMap;
+  private StopId2RouteId2DelayAtStopMap vehDelayHandler;
+  private VehiclePlannedRealizedMissedDepartures vehDelayAnalyzer;
+  private AgentId2DepartureDelayAtStopMap agentDelayHandler;
+  private Map<Id, List<Tuple<Id, Double>>> agentId2StopDifferenceMap = null;
+  private Map<Id, List<Tuple<Id, Integer>>> agentIds2MissedVehMap = null;
 
-	public AgentId2StopDifferenceMap(Population pop, Set<Id<Person>> agentIds){
-//		this.log.setLevel(this.logLevel);
-		this.pop = pop;
-		this.agentIds = agentIds;
+  public AgentId2StopDifferenceMap(Population pop, Set<Id<Person>> agentIds) {
+    //		this.log.setLevel(this.logLevel);
+    this.pop = pop;
+    this.agentIds = agentIds;
 
-		this.vehDelayHandler = new StopId2RouteId2DelayAtStopMap();
-		this.vehDelayAnalyzer = new VehiclePlannedRealizedMissedDepartures(this.vehDelayHandler);
-		this.agentDelayHandler = new AgentId2DepartureDelayAtStopMap(this.agentIds);
+    this.vehDelayHandler = new StopId2RouteId2DelayAtStopMap();
+    this.vehDelayAnalyzer = new VehiclePlannedRealizedMissedDepartures(this.vehDelayHandler);
+    this.agentDelayHandler = new AgentId2DepartureDelayAtStopMap(this.agentIds);
 
-		this.log.info("Reading planned departure time...");
-		this.plannedDepartureTimeMap = AgentId2PlannedDepartureTimeMap.getAgentId2PlannedPTDepartureTimeMap(this.pop, this.agentIds);
-	}
+    this.log.info("Reading planned departure time...");
+    this.plannedDepartureTimeMap =
+        AgentId2PlannedDepartureTimeMap.getAgentId2PlannedPTDepartureTimeMap(
+            this.pop, this.agentIds);
+  }
 
-	private void compare(){
-		this.agentId2StopDifferenceMap = new TreeMap<Id,List<Tuple<Id,Double>>>();
-		this.agentIds2MissedVehMap = new TreeMap<Id, List<Tuple<Id,Integer>>>();
+  private void compare() {
+    this.agentId2StopDifferenceMap = new TreeMap<Id, List<Tuple<Id, Double>>>();
+    this.agentIds2MissedVehMap = new TreeMap<Id, List<Tuple<Id, Integer>>>();
 
-		for (Id agentId : this.agentIds) {
+    for (Id agentId : this.agentIds) {
 
-			if(this.agentId2StopDifferenceMap.get(agentId) == null){
-				this.agentId2StopDifferenceMap.put(agentId, new ArrayList<Tuple<Id,Double>>());
-			}
+      if (this.agentId2StopDifferenceMap.get(agentId) == null) {
+        this.agentId2StopDifferenceMap.put(agentId, new ArrayList<Tuple<Id, Double>>());
+      }
 
-			if(this.agentIds2MissedVehMap.get(agentId) == null){
-				this.agentIds2MissedVehMap.put(agentId, new ArrayList<Tuple<Id,Integer>>());
-			}
+      if (this.agentIds2MissedVehMap.get(agentId) == null) {
+        this.agentIds2MissedVehMap.put(agentId, new ArrayList<Tuple<Id, Integer>>());
+      }
 
-			List<Tuple<Id,Double>> agentsDiffs = this.agentId2StopDifferenceMap.get(agentId);
-			List<Tuple<Id, Integer>> agentsMissedVehicles = this.agentIds2MissedVehMap.get(agentId);
-			List<Tuple<Id, AgentId2PlannedDepartureTimeMapData>> plannedDepartures = this.plannedDepartureTimeMap.get(agentId);
+      List<Tuple<Id, Double>> agentsDiffs = this.agentId2StopDifferenceMap.get(agentId);
+      List<Tuple<Id, Integer>> agentsMissedVehicles = this.agentIds2MissedVehMap.get(agentId);
+      List<Tuple<Id, AgentId2PlannedDepartureTimeMapData>> plannedDepartures =
+          this.plannedDepartureTimeMap.get(agentId);
 
-			for (int i = 0; i < plannedDepartures.size(); i++) {
+      for (int i = 0; i < plannedDepartures.size(); i++) {
 
-				Id stopId = plannedDepartures.get(i).getFirst();
-				AgentId2PlannedDepartureTimeMapData depContainer = plannedDepartures.get(i).getSecond();
-				double plannedDepartureTime = depContainer.getPlannedDepartureTime();
+        Id stopId = plannedDepartures.get(i).getFirst();
+        AgentId2PlannedDepartureTimeMapData depContainer = plannedDepartures.get(i).getSecond();
+        double plannedDepartureTime = depContainer.getPlannedDepartureTime();
 
-				if (depContainer.getStopId() == null) {
-					continue; // likely, no route could be calculated, thus this information is missing
-				}
+        if (depContainer.getStopId() == null) {
+          continue; // likely, no route could be calculated, thus this information is missing
+        }
 
-				// get next possible departure as scheduled
-				double nextPlannedVehDeparture = this.vehDelayAnalyzer.getNextPlannedDepartureTime(stopId, plannedDepartureTime, depContainer.getLineId(), depContainer.getRouteId());
+        // get next possible departure as scheduled
+        double nextPlannedVehDeparture =
+            this.vehDelayAnalyzer.getNextPlannedDepartureTime(
+                stopId, plannedDepartureTime, depContainer.getLineId(), depContainer.getRouteId());
 
-				// calculate resulting time spent waiting
-				double plannedTimeWaiting = nextPlannedVehDeparture - plannedDepartureTime;
+        // calculate resulting time spent waiting
+        double plannedTimeWaiting = nextPlannedVehDeparture - plannedDepartureTime;
 
-				// get realized values
-				AgentId2DepartureDelayAtStopMapData agentData = this.agentDelayHandler.getStopId2DelayAtStopMap().get(agentId);
-				if (agentData == null){
-					continue;
-				}
-				if(agentData.getAgentDepartsPTInteraction().size() == 0 || this.agentDelayHandler.getStopId2DelayAtStopMap().get(agentId).getAgentEntersVehicle().size() == 0){
-					break;
-				}
-				if (agentData.getAgentDepartsPTInteraction().size() <= i || agentData.getAgentEntersVehicle().size() <= i) {
-					break; // agent could realize less legs than planned
-				}
-				double realizedDepartureTime = agentData.getAgentDepartsPTInteraction().get(i).doubleValue();
-				double realizedVehEntersTime = agentData.getAgentEntersVehicle().get(i).doubleValue();
+        // get realized values
+        AgentId2DepartureDelayAtStopMapData agentData =
+            this.agentDelayHandler.getStopId2DelayAtStopMap().get(agentId);
+        if (agentData == null) {
+          continue;
+        }
+        if (agentData.getAgentDepartsPTInteraction().size() == 0
+            || this.agentDelayHandler
+                    .getStopId2DelayAtStopMap()
+                    .get(agentId)
+                    .getAgentEntersVehicle()
+                    .size()
+                == 0) {
+          break;
+        }
+        if (agentData.getAgentDepartsPTInteraction().size() <= i
+            || agentData.getAgentEntersVehicle().size() <= i) {
+          break; // agent could realize less legs than planned
+        }
+        double realizedDepartureTime =
+            agentData.getAgentDepartsPTInteraction().get(i).doubleValue();
+        double realizedVehEntersTime = agentData.getAgentEntersVehicle().get(i).doubleValue();
 
-				// calculate resulting time spent waiting
-				this.log.debug("Realized time waiting at the stop is counted by calculating \"agent enters vehicle\" minus \"agent departs pt interaction\"." +
-						"Maybe this should be done by taking the corresponding VehicleDepartsAtFacilityEvent instead of the PersonEntersVehicleEvent.");
-				double realizedTimeWaiting = realizedVehEntersTime - realizedDepartureTime;
+        // calculate resulting time spent waiting
+        this.log.debug(
+            "Realized time waiting at the stop is counted by calculating \"agent enters vehicle\" minus \"agent departs pt interaction\"."
+                + "Maybe this should be done by taking the corresponding VehicleDepartsAtFacilityEvent instead of the PersonEntersVehicleEvent.");
+        double realizedTimeWaiting = realizedVehEntersTime - realizedDepartureTime;
 
-				// calculate difference, so that agents faster than planned get negative values and slower agents positive values
-				double difference = realizedTimeWaiting - plannedTimeWaiting;
+        // calculate difference, so that agents faster than planned get negative values and slower
+        // agents positive values
+        double difference = realizedTimeWaiting - plannedTimeWaiting;
 
-				// put the resulting difference in the map
-				agentsDiffs.add(new Tuple<Id, Double>(stopId, new Double(difference)));
+        // put the resulting difference in the map
+        agentsDiffs.add(new Tuple<Id, Double>(stopId, new Double(difference)));
 
-				//--------------
-				// Calculate missed vehicle
-				agentsMissedVehicles.add(new Tuple<Id, Integer>(stopId, new Integer(this.vehDelayAnalyzer.getNumberOfMissedVehicles(stopId, plannedDepartureTime, realizedDepartureTime, depContainer.getLineId(), depContainer.getRouteId()))));
-			}
-		}
-	}
+        // --------------
+        // Calculate missed vehicle
+        agentsMissedVehicles.add(
+            new Tuple<Id, Integer>(
+                stopId,
+                new Integer(
+                    this.vehDelayAnalyzer.getNumberOfMissedVehicles(
+                        stopId,
+                        plannedDepartureTime,
+                        realizedDepartureTime,
+                        depContainer.getLineId(),
+                        depContainer.getRouteId()))));
+      }
+    }
+  }
 
-	/**
-	 * Returns resulting difference between planned and realized time spent waiting at each stop
-	 *
-	 * @return A map containing a list of the resulting difference for each agent
-	 */
-	public Map<Id,List<Tuple<Id, Double>>> getAgentId2StopDifferenceMap(){
-		if(this.agentId2StopDifferenceMap == null){
-			compare();
-		}
-		return this.agentId2StopDifferenceMap;
-	}
+  /**
+   * Returns resulting difference between planned and realized time spent waiting at each stop
+   *
+   * @return A map containing a list of the resulting difference for each agent
+   */
+  public Map<Id, List<Tuple<Id, Double>>> getAgentId2StopDifferenceMap() {
+    if (this.agentId2StopDifferenceMap == null) {
+      compare();
+    }
+    return this.agentId2StopDifferenceMap;
+  }
 
-	/**
-	 * Returns the number of vehicles the agent missed or took earlier than scheduled for each stop
-	 *
-	 * @return A map containing a list of the resulting number of stops for each agent
-	 */
-	public Map<Id, List<Tuple<Id, Integer>>> getNumberOfMissedVehiclesMap(){
-		if(this.agentIds2MissedVehMap == null){
-			compare();
-		}
-		return this.agentIds2MissedVehMap;
-	}
+  /**
+   * Returns the number of vehicles the agent missed or took earlier than scheduled for each stop
+   *
+   * @return A map containing a list of the resulting number of stops for each agent
+   */
+  public Map<Id, List<Tuple<Id, Integer>>> getNumberOfMissedVehiclesMap() {
+    if (this.agentIds2MissedVehMap == null) {
+      compare();
+    }
+    return this.agentIds2MissedVehMap;
+  }
 
-	@Override
-	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		this.vehDelayHandler.handleEvent(event);
-	}
+  @Override
+  public void handleEvent(VehicleDepartsAtFacilityEvent event) {
+    this.vehDelayHandler.handleEvent(event);
+  }
 
-	@Override
-	public void handleEvent(TransitDriverStartsEvent event) {
-		this.vehDelayHandler.handleEvent(event);
-	}
+  @Override
+  public void handleEvent(TransitDriverStartsEvent event) {
+    this.vehDelayHandler.handleEvent(event);
+  }
 
-	@Override
-	public void reset(int iteration) {
-		this.log.debug("reset method in iteration " + iteration + " not implemented, yet");
-	}
+  @Override
+  public void reset(int iteration) {
+    this.log.debug("reset method in iteration " + iteration + " not implemented, yet");
+  }
 
-	@Override
-	public void handleEvent(PersonDepartureEvent event) {
-		this.agentDelayHandler.handleEvent(event);
-	}
+  @Override
+  public void handleEvent(PersonDepartureEvent event) {
+    this.agentDelayHandler.handleEvent(event);
+  }
 
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		this.agentDelayHandler.handleEvent(event);
-	}
+  @Override
+  public void handleEvent(PersonEntersVehicleEvent event) {
+    this.agentDelayHandler.handleEvent(event);
+  }
 }

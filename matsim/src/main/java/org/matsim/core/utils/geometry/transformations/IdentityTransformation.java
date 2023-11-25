@@ -24,16 +24,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 /**
- * A very simple coordinate transformation which always returns the same coordinate
- * as it was given.
+ * A very simple coordinate transformation which always returns the same coordinate as it was given.
  *
  * @author mrieser
  */
 public class IdentityTransformation implements CoordinateTransformation {
 
-	@Override
-	public Coord transform(Coord coord) {
-		return coord;
-	}
-
+  @Override
+  public Coord transform(Coord coord) {
+    return coord;
+  }
 }

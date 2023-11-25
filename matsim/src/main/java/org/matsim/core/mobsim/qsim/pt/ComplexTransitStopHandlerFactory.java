@@ -23,9 +23,8 @@ import org.matsim.vehicles.Vehicle;
 
 public class ComplexTransitStopHandlerFactory implements TransitStopHandlerFactory {
 
-	@Override
-	public TransitStopHandler createTransitStopHandler(Vehicle vehicle) {
-		return new ComplexTransitStopHandler(vehicle);
-	}
-
+  @Override
+  public TransitStopHandler createTransitStopHandler(Vehicle vehicle) {
+    return new ComplexTransitStopHandler(vehicle);
+  }
 }

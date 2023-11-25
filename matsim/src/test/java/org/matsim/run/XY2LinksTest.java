@@ -23,7 +23,6 @@ package org.matsim.run;
 import static org.junit.Assert.*;
 
 import java.io.File;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -47,62 +46,63 @@ import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Simple test case to ensure that {@link org.matsim.run.XY2Links} functions properly, e.g. really
- * writes out modified plans. It does <em>not</em> test that {@link org.matsim.core.population.algorithms.XY2Links}
- * works correctly, e.g. that it assigns the right links.
+ * writes out modified plans. It does <em>not</em> test that {@link
+ * org.matsim.core.population.algorithms.XY2Links} works correctly, e.g. that it assigns the right
+ * links.
  *
  * @author mrieser
  */
 public class XY2LinksTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  @Test
+  public void testMain() throws Exception {
+    Config config = utils.loadConfig((String) null);
+    final String NETWORK_FILE = "test/scenarios/equil/network.xml";
+    final String PLANS_FILE_TESTINPUT = utils.getOutputDirectory() + "plans.in.xml";
+    final String PLANS_FILE_TESTOUTPUT = utils.getOutputDirectory() + "plans.out.xml";
+    final String CONFIG_FILE = utils.getOutputDirectory() + "config.xml";
 
-	@Test public void testMain() throws Exception {
-		Config config = utils.loadConfig((String)null);
-		final String NETWORK_FILE = "test/scenarios/equil/network.xml";
-		final String PLANS_FILE_TESTINPUT = utils.getOutputDirectory() + "plans.in.xml";
-		final String PLANS_FILE_TESTOUTPUT = utils.getOutputDirectory() + "plans.out.xml";
-		final String CONFIG_FILE = utils.getOutputDirectory() + "config.xml";
+    // prepare data like world and network
+    MutableScenario scenario =
+        (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    Network network = scenario.getNetwork();
+    new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILE);
 
-		// prepare data like world and network
-		MutableScenario scenario =  (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILE);
+    // create one person with missing link in act
+    Population population =
+        ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
+    Person person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
+    population.addPerson(person);
+    Plan plan = PersonUtils.createAndAddPlan(person, true);
+    Activity a1 = PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord(50, 25));
+    a1.setEndTime(3600);
 
-		// create one person with missing link in act
-		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
-		Person person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
-		population.addPerson(person);
-		Plan plan = PersonUtils.createAndAddPlan(person, true);
-		Activity a1 = PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord(50, 25));
-		a1.setEndTime(3600);
+    // write person to file
+    new PopulationWriter(population, network).write(PLANS_FILE_TESTINPUT);
 
-		// write person to file
-		new PopulationWriter(population, network).write(PLANS_FILE_TESTINPUT);
+    // prepare config for test
+    config.network().setInputFile(NETWORK_FILE);
+    config.plans().setInputFile(PLANS_FILE_TESTINPUT);
+    new ConfigWriter(config).write(CONFIG_FILE);
 
-		// prepare config for test
-		config.network().setInputFile(NETWORK_FILE);
-		config.plans().setInputFile(PLANS_FILE_TESTINPUT);
-		new ConfigWriter(config).write(CONFIG_FILE);
+    // some pre-tests
+    assertFalse("Output-File should not yet exist.", new File(PLANS_FILE_TESTOUTPUT).exists());
 
-		// some pre-tests
-		assertFalse("Output-File should not yet exist.", new File(PLANS_FILE_TESTOUTPUT).exists());
+    // now run the tested class
+    XY2Links.main(new String[] {CONFIG_FILE, PLANS_FILE_TESTOUTPUT});
 
-		// now run the tested class
-		XY2Links.main(new String[] {CONFIG_FILE, PLANS_FILE_TESTOUTPUT});
-
-		// now perform some tests
-		assertTrue("no output generated.", new File(PLANS_FILE_TESTOUTPUT).exists());
-		Population population2 = scenario.getPopulation();
-		new PopulationReader(scenario).readFile(PLANS_FILE_TESTOUTPUT);
-		assertEquals("wrong number of persons.", 1, population2.getPersons().size());
-		Person person2 = population2.getPersons().get(Id.create("1", Person.class));
-		assertNotNull("person 1 missing", person2);
-		assertEquals("wrong number of plans in person 1", 1, person2.getPlans().size());
-		Plan plan2 = person2.getPlans().get(0);
-		Activity act2 = (Activity) plan2.getPlanElements().get(0);
-		assertNotNull("no link assigned.", act2.getLinkId());
-	}
-
+    // now perform some tests
+    assertTrue("no output generated.", new File(PLANS_FILE_TESTOUTPUT).exists());
+    Population population2 = scenario.getPopulation();
+    new PopulationReader(scenario).readFile(PLANS_FILE_TESTOUTPUT);
+    assertEquals("wrong number of persons.", 1, population2.getPersons().size());
+    Person person2 = population2.getPersons().get(Id.create("1", Person.class));
+    assertNotNull("person 1 missing", person2);
+    assertEquals("wrong number of plans in person 1", 1, person2.getPlans().size());
+    Plan plan2 = person2.getPlans().get(0);
+    Activity act2 = (Activity) plan2.getPlanElements().get(0);
+    assertNotNull("no link assigned.", act2.getLinkId());
+  }
 }

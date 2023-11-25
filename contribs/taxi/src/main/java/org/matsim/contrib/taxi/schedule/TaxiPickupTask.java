@@ -21,27 +21,29 @@ package org.matsim.contrib.taxi.schedule;
 
 import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.PICKUP;
 
+import com.google.common.base.MoreObjects;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 
-import com.google.common.base.MoreObjects;
-
 public class TaxiPickupTask extends DefaultStayTask {
-	public static final TaxiTaskType TYPE = new TaxiTaskType(PICKUP);
+  public static final TaxiTaskType TYPE = new TaxiTaskType(PICKUP);
 
-	private final DrtRequest request;
+  private final DrtRequest request;
 
-	public TaxiPickupTask(double beginTime, double endTime, DrtRequest request) {
-		super(TYPE, beginTime, endTime, request.getFromLink());
-		this.request = request;
-	}
+  public TaxiPickupTask(double beginTime, double endTime, DrtRequest request) {
+    super(TYPE, beginTime, endTime, request.getFromLink());
+    this.request = request;
+  }
 
-	public DrtRequest getRequest() {
-		return request;
-	}
+  public DrtRequest getRequest() {
+    return request;
+  }
 
-	@Override
-	public String toString() {
-		return MoreObjects.toStringHelper(this).add("request", request).add("super", super.toString()).toString();
-	}
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("request", request)
+        .add("super", super.toString())
+        .toString();
+  }
 }

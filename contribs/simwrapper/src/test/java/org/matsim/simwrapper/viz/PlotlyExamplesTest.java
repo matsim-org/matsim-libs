@@ -1,6 +1,11 @@
 package org.matsim.simwrapper.viz;
 
+import static org.matsim.simwrapper.viz.PlotlyTest.createWriter;
+import static tech.tablesaw.plotly.traces.HistogramTrace.HistFunc.COUNT;
+
 import com.fasterxml.jackson.databind.ObjectWriter;
+import java.io.File;
+import java.io.IOException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,100 +21,98 @@ import tech.tablesaw.plotly.traces.HistogramTrace;
 import tech.tablesaw.plotly.traces.PieTrace;
 import tech.tablesaw.plotly.traces.Scatter3DTrace;
 
-import java.io.File;
-import java.io.IOException;
-
-import static org.matsim.simwrapper.viz.PlotlyTest.createWriter;
-import static tech.tablesaw.plotly.traces.HistogramTrace.HistFunc.COUNT;
-
 /**
- * Examples taken from <a href="https://github.com/jtablesaw/tablesaw/tree/master/jsplot/src/test/java/tech/tablesaw/examples">here</a>
+ * Examples taken from <a
+ * href="https://github.com/jtablesaw/tablesaw/tree/master/jsplot/src/test/java/tech/tablesaw/examples">here</a>
  */
 public class PlotlyExamplesTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private ObjectWriter writer;
+  private ObjectWriter writer;
 
-	@Before
-	public void setUp() throws Exception {
-		writer = createWriter();
-	}
+  @Before
+  public void setUp() throws Exception {
+    writer = createWriter();
+  }
 
-	@Test
-	public void pie() throws IOException {
+  @Test
+  public void pie() throws IOException {
 
-		String[] modes = {"car", "bike", "pt", "ride", "walk"};
-		double[] shares = {0.2, 0.15, 0.25, 0.1, 0.3};
+    String[] modes = {"car", "bike", "pt", "ride", "walk"};
+    double[] shares = {0.2, 0.15, 0.25, 0.1, 0.3};
 
-		Figure figure = new Figure(PieTrace.builder(modes, shares).build());
+    Figure figure = new Figure(PieTrace.builder(modes, shares).build());
 
-		Plotly plot = new Plotly(figure);
+    Plotly plot = new Plotly(figure);
 
-		writer.writeValue(new File(utils.getOutputDirectory(), "plotly-pie.yaml"), plot);
-	}
+    writer.writeValue(new File(utils.getOutputDirectory(), "plotly-pie.yaml"), plot);
+  }
 
+  @Test
+  public void timeSeries() throws IOException {
+    Table bush = Table.read().csv(new File(utils.getClassInputDirectory(), "bush.csv"));
 
-	@Test
-	public void timeSeries() throws IOException {
-		Table bush = Table.read().csv(new File(utils.getClassInputDirectory(), "bush.csv"));
+    Figure figure =
+        TimeSeriesPlot.create("George W. Bush approval ratings", bush, "date", "approval", "who");
 
-		Figure figure = TimeSeriesPlot.create("George W. Bush approval ratings", bush, "date", "approval", "who");
+    Plotly plot = new Plotly(figure);
 
-		Plotly plot = new Plotly(figure);
+    writer.writeValue(new File(utils.getOutputDirectory(), "plotly-timeseries.yaml"), plot);
+  }
 
-		writer.writeValue(new File(utils.getOutputDirectory(), "plotly-timeseries.yaml"), plot);
-	}
+  @Test
+  public void hist() throws IOException {
 
-	@Test
-	public void hist() throws IOException {
+    Table test =
+        Table.create(
+            StringColumn.create("type")
+                .append("apples")
+                .append("apples")
+                .append("apples")
+                .append("oranges")
+                .append("bananas"),
+            IntColumn.create("num").append(5).append(10).append(3).append(10).append(5));
 
-		Table test = Table.create(
-				StringColumn.create("type").append("apples").append("apples").append("apples").append("oranges").append("bananas"),
-				IntColumn.create("num").append(5).append(10).append(3).append(10).append(5));
+    Layout layout1 = Layout.builder().title("Histogram COUNT Test (team batting averages)").build();
+    HistogramTrace trace =
+        HistogramTrace.builder(test.stringColumn("type"), test.intColumn("num"))
+            .histFunc(COUNT)
+            .build();
 
-		Layout layout1 = Layout.builder().title("Histogram COUNT Test (team batting averages)").build();
-		HistogramTrace trace = HistogramTrace.
-				builder(test.stringColumn("type"), test.intColumn("num"))
-				.histFunc(COUNT)
-				.build();
+    Plotly plot = new Plotly(layout1, trace);
 
-		Plotly plot = new Plotly(layout1, trace);
+    writer.writeValue(new File(utils.getOutputDirectory(), "plotly-hist.yaml"), plot);
+  }
 
-		writer.writeValue(new File(utils.getOutputDirectory(), "plotly-hist.yaml"), plot);
-	}
+  @Test
+  public void heatmap() throws IOException {
 
-	@Test
-	public void heatmap() throws IOException {
+    Table table = Table.read().csv(new File(utils.getClassInputDirectory(), "bush.csv"));
 
-		Table table = Table.read().csv(new File(utils.getClassInputDirectory(), "bush.csv"));
+    StringColumn yearsMonth = table.dateColumn("date").yearMonth();
+    String name = "Year and month";
+    yearsMonth.setName(name);
+    table.addColumns(yearsMonth);
 
-		StringColumn yearsMonth = table.dateColumn("date").yearMonth();
-		String name = "Year and month";
-		yearsMonth.setName(name);
-		table.addColumns(yearsMonth);
+    Figure heatmap = Heatmap.create("Polls conducted by year and month", table, name, "who");
 
-		Figure heatmap = Heatmap.create("Polls conducted by year and month", table, name, "who");
+    Plotly plot = new Plotly(heatmap);
 
-		Plotly plot = new Plotly(heatmap);
+    writer.writeValue(new File(utils.getOutputDirectory(), "plotly-heatmap.yaml"), plot);
+  }
 
-		writer.writeValue(new File(utils.getOutputDirectory(), "plotly-heatmap.yaml"), plot);
+  @Test
+  public void scatter() throws IOException {
 
-	}
+    final double[] x = {1, 2, 3, 4, 5, 6};
+    final double[] y = {0, 1, 6, 14, 25, 39};
+    final double[] z = {-23, 11, -2, -7, 0.324, -11};
+    final String[] labels = {"apple", "bike", "car", "dog", "elephant", "fox"};
 
-	@Test
-	public void scatter() throws IOException {
+    Scatter3DTrace trace = Scatter3DTrace.builder(x, y, z).text(labels).build();
 
-		final double[] x = {1, 2, 3, 4, 5, 6};
-		final double[] y = {0, 1, 6, 14, 25, 39};
-		final double[] z = {-23, 11, -2, -7, 0.324, -11};
-		final String[] labels = {"apple", "bike", "car", "dog", "elephant", "fox"};
-
-		Scatter3DTrace trace = Scatter3DTrace.builder(x, y, z).text(labels).build();
-
-		Plotly plot = new Plotly(null, trace);
-		writer.writeValue(new File(utils.getOutputDirectory(), "plotly-scatter3d.yaml"), plot);
-
-	}
+    Plotly plot = new Plotly(null, trace);
+    writer.writeValue(new File(utils.getOutputDirectory(), "plotly-scatter3d.yaml"), plot);
+  }
 }

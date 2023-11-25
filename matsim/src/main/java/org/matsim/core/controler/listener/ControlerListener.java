@@ -21,27 +21,28 @@
 package org.matsim.core.controler.listener;
 
 import java.util.EventListener;
-
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.controler.Controler;
 
 /**
- * ControlerListeners are notified at specific points in the {@link Controler} loop.  See sub-interfaces for more information
- * and specific usages.
- * <p>
- * Example(s):<ul>
- * <li> {@link tutorial.programming.example07ControlerListener.RunControlerListenerExample}
+ * ControlerListeners are notified at specific points in the {@link Controler} loop. See
+ * sub-interfaces for more information and specific usages.
+ *
+ * <p>Example(s):
+ *
+ * <ul>
+ *   <li>{@link tutorial.programming.example07ControlerListener.RunControlerListenerExample}
  * </ul>
  *
  * @author dgrether
  */
 public interface ControlerListener extends EventListener, MatsimExtensionPoint {
 
-	/**
-	 * Return the priority of this listener. Listeners with higher priority are executed first. The default priority is 0.
-	 */
-	default double priority() {
-		return 0;
-	}
-
+  /**
+   * Return the priority of this listener. Listeners with higher priority are executed first. The
+   * default priority is 0.
+   */
+  default double priority() {
+    return 0;
+  }
 }

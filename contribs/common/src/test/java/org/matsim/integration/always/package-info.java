@@ -17,9 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 /**
- * Integration tests that should _always_ run (but which are too slow for the main repository tests).
- * 
- * @author nagel
+ * Integration tests that should _always_ run (but which are too slow for the main repository
+ * tests).
  *
+ * @author nagel
  */
 package org.matsim.integration.always;

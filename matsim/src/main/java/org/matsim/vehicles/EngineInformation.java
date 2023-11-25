@@ -27,32 +27,43 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
  * @author dgrether
  */
 public final class EngineInformation implements Attributable {
-	// yyyy maybe these subtypes should be immutable?
+  // yyyy maybe these subtypes should be immutable?
 
-	private Attributes attributes = new AttributesImpl() ;
+  private Attributes attributes = new AttributesImpl();
 
-	/* package-private */ EngineInformation() { }
-	@Deprecated
-	public FuelType getFuelType() {
-		return VehicleUtils.getFuelType( this ) ;
-	}
-	@Deprecated
-	public double getFuelConsumption() {
-		return VehicleUtils.getFuelConsumption(this);
-	}
-	@Deprecated
-	public EngineInformation setFuelType( FuelType fueltype ) {
-		VehicleUtils.setFuelType(this, fueltype);
-		return this ;
-	}
-	@Deprecated
-	public EngineInformation setFuelConsumption( double literPerMeter ) {
-		VehicleUtils.setFuelConsumption(this, literPerMeter);
-		return this ;
-	}
-	public Attributes getAttributes(){
-		return attributes ;
-	}
-	@Deprecated
-	public enum FuelType {diesel, gasoline, electricity, biodiesel}
+  /* package-private */ EngineInformation() {}
+
+  @Deprecated
+  public FuelType getFuelType() {
+    return VehicleUtils.getFuelType(this);
+  }
+
+  @Deprecated
+  public double getFuelConsumption() {
+    return VehicleUtils.getFuelConsumption(this);
+  }
+
+  @Deprecated
+  public EngineInformation setFuelType(FuelType fueltype) {
+    VehicleUtils.setFuelType(this, fueltype);
+    return this;
+  }
+
+  @Deprecated
+  public EngineInformation setFuelConsumption(double literPerMeter) {
+    VehicleUtils.setFuelConsumption(this, literPerMeter);
+    return this;
+  }
+
+  public Attributes getAttributes() {
+    return attributes;
+  }
+
+  @Deprecated
+  public enum FuelType {
+    diesel,
+    gasoline,
+    electricity,
+    biodiesel
+  }
 }

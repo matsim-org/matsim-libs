@@ -19,17 +19,18 @@
  * *********************************************************************** */
 
 /**
- * This package contains some classes that can be plugged into a MATSim
- * Controler. They produce additional outputs that one might use to analyse
- * the outcomes of a MATSim run.
- *  <ul>
- *  	<li>ActivitiesAnalyzer: analyzes the number of agents performing activities over the simulation period.
- *  		Results are produced for each iteration and for all types of performed activites.</li>
- *  	<li>TravelTimesWriter: analyzes the average link travel times and writes them to files (absolute and
- *  		relative values; txt and shp files).</li>
- *  	<li>TripsAnalyzer: analyzes the average leg travel times and the number of trips per mode and iteration.</li>
- *  </ul>
- * 
+ * This package contains some classes that can be plugged into a MATSim Controler. They produce
+ * additional outputs that one might use to analyse the outcomes of a MATSim run.
+ *
+ * <ul>
+ *   <li>ActivitiesAnalyzer: analyzes the number of agents performing activities over the simulation
+ *       period. Results are produced for each iteration and for all types of performed activites.
+ *   <li>TravelTimesWriter: analyzes the average link travel times and writes them to files
+ *       (absolute and relative values; txt and shp files).
+ *   <li>TripsAnalyzer: analyzes the average leg travel times and the number of trips per mode and
+ *       iteration.
+ * </ul>
+ *
  * @author cdobler
  */
 package org.matsim.contrib.analysis.christoph;

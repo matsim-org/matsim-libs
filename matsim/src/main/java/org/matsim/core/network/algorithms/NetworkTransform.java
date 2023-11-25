@@ -28,20 +28,20 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 public final class NetworkTransform implements NetworkRunnable {
 
-	private final CoordinateTransformation transformer;
+  private final CoordinateTransformation transformer;
 
-	public NetworkTransform(final CoordinateTransformation transformer) {
-		super();
-		this.transformer = transformer;
-	}
+  public NetworkTransform(final CoordinateTransformation transformer) {
+    super();
+    this.transformer = transformer;
+  }
 
-	@Override
-	public void run(final Network network) {
-		for (Node n : network.getNodes().values()) {
-			Coord coord = n.getCoord();
-			Coord new_coord = transformer.transform(coord);
-//			coord.setXY(new_coord.getX(), new_coord.getY());
-			n.setCoord(new_coord);
-		}
-	}
+  @Override
+  public void run(final Network network) {
+    for (Node n : network.getNodes().values()) {
+      Coord coord = n.getCoord();
+      Coord new_coord = transformer.transform(coord);
+      //			coord.setXY(new_coord.getX(), new_coord.getY());
+      n.setCoord(new_coord);
+    }
+  }
 }

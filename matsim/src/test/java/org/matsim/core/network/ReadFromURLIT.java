@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package org.matsim.core.network;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.matsim.api.core.v01.network.Network;
@@ -25,23 +27,21 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 /**
  * @author nagel
  * @author michaz
- *
  */
 public class ReadFromURLIT {
 
-	@Test
-	public void testReadingFromURLWorks() throws MalformedURLException {
-		Network network = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getNetwork() ;
-		MatsimNetworkReader reader = new MatsimNetworkReader(network) ;
-//		reader.parse(new URL("https://raw.githubusercontent.com/matsim-org/matsim/master/matsim/examples/equil/network.xml"));
-		reader.parse( new URL("https://raw.githubusercontent.com/matsim-org/matsim/master/examples/scenarios/equil/network.xml") ) ;
-		Assertions.assertThat(network.getLinks().size()).isEqualTo(23);
-	}
-
+  @Test
+  public void testReadingFromURLWorks() throws MalformedURLException {
+    Network network = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
+    MatsimNetworkReader reader = new MatsimNetworkReader(network);
+    //		reader.parse(new
+    // URL("https://raw.githubusercontent.com/matsim-org/matsim/master/matsim/examples/equil/network.xml"));
+    reader.parse(
+        new URL(
+            "https://raw.githubusercontent.com/matsim-org/matsim/master/examples/scenarios/equil/network.xml"));
+    Assertions.assertThat(network.getLinks().size()).isEqualTo(23);
+  }
 }

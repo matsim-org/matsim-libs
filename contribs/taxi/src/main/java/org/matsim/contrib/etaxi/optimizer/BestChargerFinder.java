@@ -20,7 +20,6 @@
 package org.matsim.contrib.etaxi.optimizer;
 
 import java.util.stream.Stream;
-
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
@@ -30,13 +29,13 @@ import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
  * @author michalm
  */
 public class BestChargerFinder {
-	private final BestDispatchFinder dispatchFinder;
+  private final BestDispatchFinder dispatchFinder;
 
-	public BestChargerFinder(BestDispatchFinder dispatchFinder) {
-		this.dispatchFinder = dispatchFinder;
-	}
+  public BestChargerFinder(BestDispatchFinder dispatchFinder) {
+    this.dispatchFinder = dispatchFinder;
+  }
 
-	public Dispatch<Charger> findBestChargerForVehicle(DvrpVehicle veh, Stream<Charger> chargers) {
-		return dispatchFinder.findBestDestination(veh, chargers, Charger::getLink);
-	}
+  public Dispatch<Charger> findBestChargerForVehicle(DvrpVehicle veh, Stream<Charger> chargers) {
+    return dispatchFinder.findBestDestination(veh, chargers, Charger::getLink);
+  }
 }

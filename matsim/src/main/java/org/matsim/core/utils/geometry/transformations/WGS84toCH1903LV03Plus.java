@@ -26,45 +26,44 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 /**
  * Transforms coordinates from WGS84 to the new Swiss-Grid coordinate system.
- * 
+ *
  * @author boescpa
  * @author mrieser
- * 
  * @see <a href="http://de.wikipedia.org/wiki/WGS84">de.wikipedia.org/wiki/WGS84</a>
- * @see <a href="http://www.swisstopo.ch/pub/down/basics/geo/system/ch1903_wgs84_de.pdf">Swisstopo Umrechnungen (PDF)</a>
+ * @see <a href="http://www.swisstopo.ch/pub/down/basics/geo/system/ch1903_wgs84_de.pdf">Swisstopo
+ *     Umrechnungen (PDF)</a>
  */
 public class WGS84toCH1903LV03Plus implements CoordinateTransformation {
 
-	@Override
-	public Coord transform(Coord coord) {
+  @Override
+  public Coord transform(Coord coord) {
 
-		double lonNorm = (coord.getX() * 3600 - 26782.5) / 10000;
-		double latNorm = (coord.getY() * 3600 - 169028.66) / 10000;
-		
-		double CH1903X = 
-			1200147.07 +
-			308807.95 * latNorm +
-			3745.25 * Math.pow(lonNorm, 2) +
-			76.63 * Math.pow(latNorm, 2) -
-			194.56 * Math.pow(lonNorm, 2) * latNorm +
-			119.79 * Math.pow(latNorm, 3);
-		
-		double CH1903Y = 
-			2600072.37 +
-			211455.93 * lonNorm -
-			10938.51 * lonNorm * latNorm -
-			0.36 * lonNorm * Math.pow(latNorm, 2) -
-			44.54 * Math.pow(lonNorm, 3);
-		
-		/* Important Note: in the Swiss Grid, y describes easting and x describes 
-		 * northing, contrary to the usual naming conventions!		 */
-		double elevation;
-		try{
-			elevation = coord.getZ();
-			return new Coord((double) Math.round(CH1903Y), (double) Math.round(CH1903X), elevation);
-		} catch (Exception e){
-			return new Coord((double) Math.round(CH1903Y), (double) Math.round(CH1903X));
-		}
-	}
+    double lonNorm = (coord.getX() * 3600 - 26782.5) / 10000;
+    double latNorm = (coord.getY() * 3600 - 169028.66) / 10000;
 
+    double CH1903X =
+        1200147.07
+            + 308807.95 * latNorm
+            + 3745.25 * Math.pow(lonNorm, 2)
+            + 76.63 * Math.pow(latNorm, 2)
+            - 194.56 * Math.pow(lonNorm, 2) * latNorm
+            + 119.79 * Math.pow(latNorm, 3);
+
+    double CH1903Y =
+        2600072.37
+            + 211455.93 * lonNorm
+            - 10938.51 * lonNorm * latNorm
+            - 0.36 * lonNorm * Math.pow(latNorm, 2)
+            - 44.54 * Math.pow(lonNorm, 3);
+
+    /* Important Note: in the Swiss Grid, y describes easting and x describes
+     * northing, contrary to the usual naming conventions!		 */
+    double elevation;
+    try {
+      elevation = coord.getZ();
+      return new Coord((double) Math.round(CH1903Y), (double) Math.round(CH1903X), elevation);
+    } catch (Exception e) {
+      return new Coord((double) Math.round(CH1903Y), (double) Math.round(CH1903X));
+    }
+  }
 }

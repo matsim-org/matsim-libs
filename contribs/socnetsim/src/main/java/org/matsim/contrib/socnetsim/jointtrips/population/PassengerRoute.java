@@ -27,113 +27,119 @@ import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * A route for passenger trips.
+ *
  * @author thibautd
  */
 public class PassengerRoute implements Route {
-	private double distance = Double.NaN;
-	private OptionalTime travelTime = OptionalTime.undefined();
-	private Id<Link> startLink = null;
-	private Id<Link> endLink = null;
-	private Id<Person> driver = null;
+  private double distance = Double.NaN;
+  private OptionalTime travelTime = OptionalTime.undefined();
+  private Id<Link> startLink = null;
+  private Id<Link> endLink = null;
+  private Id<Person> driver = null;
 
-	private PassengerRoute() {}
+  private PassengerRoute() {}
 
-	public PassengerRoute(
-			final Id<Link> startLink,
-			final Id<Link> endLink) {
-		this.startLink = startLink;
-		this.endLink = endLink;
-	}
+  public PassengerRoute(final Id<Link> startLink, final Id<Link> endLink) {
+    this.startLink = startLink;
+    this.endLink = endLink;
+  }
 
-	public Id<Person> getDriverId() {
-		return driver;
-	}
+  public Id<Person> getDriverId() {
+    return driver;
+  }
 
-	public void setDriverId(final Id<Person> d) {
-		driver = d;
-	}
+  public void setDriverId(final Id<Person> d) {
+    driver = d;
+  }
 
-	@Override
-	public double getDistance() {
-		return distance;
-	}
+  @Override
+  public double getDistance() {
+    return distance;
+  }
 
-	@Override
-	public void setDistance(final double distance) {
-		this.distance = distance;
-	}
+  @Override
+  public void setDistance(final double distance) {
+    this.distance = distance;
+  }
 
-	@Override
-	public OptionalTime getTravelTime() {
-		return travelTime;
-	}
+  @Override
+  public OptionalTime getTravelTime() {
+    return travelTime;
+  }
 
-	@Override
-	public void setTravelTime(final double travelTime) {
-		this.travelTime = OptionalTime.defined(travelTime);
-	}
+  @Override
+  public void setTravelTime(final double travelTime) {
+    this.travelTime = OptionalTime.defined(travelTime);
+  }
 
-	@Override
-	public void setTravelTimeUndefined() {
-		this.travelTime = OptionalTime.undefined();
-	}
+  @Override
+  public void setTravelTimeUndefined() {
+    this.travelTime = OptionalTime.undefined();
+  }
 
-	@Override
-	public Id<Link> getStartLinkId() {
-		return startLink;
-	}
+  @Override
+  public Id<Link> getStartLinkId() {
+    return startLink;
+  }
 
-	@Override
-	public Id<Link> getEndLinkId() {
-		return endLink;
-	}
+  @Override
+  public Id<Link> getEndLinkId() {
+    return endLink;
+  }
 
-	@Override
-	public void setStartLinkId(final Id<Link> linkId) {
-		startLink = linkId;
-	}
+  @Override
+  public void setStartLinkId(final Id<Link> linkId) {
+    startLink = linkId;
+  }
 
-	@Override
-	public void setEndLinkId(final Id<Link> linkId) {
-		endLink = linkId;
-	}
+  @Override
+  public void setEndLinkId(final Id<Link> linkId) {
+    endLink = linkId;
+  }
 
-	@Override
-	public void setRouteDescription(
-			final String routeDescription
-			) {
-		driver = Id.create(routeDescription.trim(), Person.class);
-	}
+  @Override
+  public void setRouteDescription(final String routeDescription) {
+    driver = Id.create(routeDescription.trim(), Person.class);
+  }
 
-	@Override
-	public String getRouteDescription() {
-		return driver != null ? driver.toString() : "";
-	}
+  @Override
+  public String getRouteDescription() {
+    return driver != null ? driver.toString() : "";
+  }
 
-	@Override
-	public String getRouteType() {
-		return "passenger";
-	}
+  @Override
+  public String getRouteType() {
+    return "passenger";
+  }
 
-	@Override
-	public PassengerRoute clone() {
-		PassengerRoute c = new PassengerRoute();
-		c.distance = distance;
-		c.travelTime= travelTime;
-		c.startLink = startLink;
-		c.endLink = endLink;
-		c.driver = driver;
-		return c;
-	}
+  @Override
+  public PassengerRoute clone() {
+    PassengerRoute c = new PassengerRoute();
+    c.distance = distance;
+    c.travelTime = travelTime;
+    c.startLink = startLink;
+    c.endLink = endLink;
+    c.driver = driver;
+    return c;
+  }
 
-	@Override
-	public String toString() {
-		return "[PassengerRoute: "+
-			"distance="+distance+"; "+
-			"travelTime="+travelTime+"; "+
-			"startLink="+startLink+"; "+
-			"endLink="+endLink+"; "+
-			"driver="+driver+"]";
-	}
+  @Override
+  public String toString() {
+    return "[PassengerRoute: "
+        + "distance="
+        + distance
+        + "; "
+        + "travelTime="
+        + travelTime
+        + "; "
+        + "startLink="
+        + startLink
+        + "; "
+        + "endLink="
+        + endLink
+        + "; "
+        + "driver="
+        + driver
+        + "]";
+  }
 }
-

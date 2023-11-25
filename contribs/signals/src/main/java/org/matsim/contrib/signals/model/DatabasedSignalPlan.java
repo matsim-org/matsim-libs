@@ -23,114 +23,109 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
 
-
 /**
  * @author dgrether
- *
  */
 public final class DatabasedSignalPlan implements SignalPlan {
-//	private static final Logger log = LogManager.getLogger(DatabasedSignalPlan.class);
-	
-	private SignalPlanData data;
-	private int cycle;
-	
-	private Map<Integer, List<Id<SignalGroup>>> secondInPlanOnsetsMap = new HashMap<>();
+  //	private static final Logger log = LogManager.getLogger(DatabasedSignalPlan.class);
 
-	private Map<Integer, List<Id<SignalGroup>>> secondInPlanDroppingsMap = new HashMap<>();
-	
-	public DatabasedSignalPlan(SignalPlanData planData) {
-		this.data = planData;
-		this.init();
-	}
-	
-	private void init(){
-		if (this.data.getCycleTime() != null){
-			this.cycle = data.getCycleTime();
-		}
-		else {
-			throw new IllegalStateException("This implementation of SignalPlan works only with a cycle time");
-		}
-	
-		int offset = this.data.getOffset();
-		for (SignalGroupSettingsData sgdata : this.data.getSignalGroupSettingsDataByGroupId().values()){
-//			log.error("  SignalGroup " +  sgdata.getSignalGroupId());
-			//do nothing if onset == dropping or all time green is set
-			if (! ( (sgdata.getOnset() == sgdata.getDropping()) || 
-					(sgdata.getOnset() % this.cycle == 0 && sgdata.getDropping() % this.cycle == 0))){
-				int onset = sgdata.getOnset();
-				onset = getPositiveModuloByCycleTime(offset+onset);
-				//onsets
-				List<Id<SignalGroup>> onsetsSgIds = this.secondInPlanOnsetsMap.get(onset);
-				if (onsetsSgIds == null){
-					onsetsSgIds = new ArrayList<>();
-					this.secondInPlanOnsetsMap.put(onset, onsetsSgIds);
-				}
-				onsetsSgIds.add(sgdata.getSignalGroupId());
-				//dropping
-				int dropping = sgdata.getDropping();
-				dropping = getPositiveModuloByCycleTime(offset+dropping);
-				List<Id<SignalGroup>> droppingSgIds = this.secondInPlanDroppingsMap.get(dropping);
-				if (droppingSgIds == null){
-					droppingSgIds = new ArrayList<>();
-					this.secondInPlanDroppingsMap.put(dropping, droppingSgIds);
-				}
-				droppingSgIds.add(sgdata.getSignalGroupId());
-			}
-		}
-	}
+  private SignalPlanData data;
+  private int cycle;
 
-	private int getPositiveModuloByCycleTime(int dividend) {
-		int modulo = dividend % this.cycle;
-		if (modulo < 0) modulo += this.cycle;
-		return modulo;
-	}
-	
+  private Map<Integer, List<Id<SignalGroup>>> secondInPlanOnsetsMap = new HashMap<>();
 
-	@Override
-	public List<Id<SignalGroup>> getDroppings(double timeSeconds) {
-		Integer currentSecondInPlan = ((int) (timeSeconds % this.cycle));
-		return this.secondInPlanDroppingsMap.get(currentSecondInPlan);
-	}
+  private Map<Integer, List<Id<SignalGroup>>> secondInPlanDroppingsMap = new HashMap<>();
 
-	@Override
-	public List<Id<SignalGroup>> getOnsets(double timeSeconds) {
-		Integer currentSecondInPlan = ((int) (timeSeconds  % this.cycle));
-		return this.secondInPlanOnsetsMap.get(currentSecondInPlan);
-	}
+  public DatabasedSignalPlan(SignalPlanData planData) {
+    this.data = planData;
+    this.init();
+  }
 
-	
-	@Override
-	public double getEndTime() {
-		return this.data.getEndTime();
-	}
+  private void init() {
+    if (this.data.getCycleTime() != null) {
+      this.cycle = data.getCycleTime();
+    } else {
+      throw new IllegalStateException(
+          "This implementation of SignalPlan works only with a cycle time");
+    }
 
-	@Override
-	public double getStartTime() {
-		return this.data.getStartTime();
-	}
+    int offset = this.data.getOffset();
+    for (SignalGroupSettingsData sgdata :
+        this.data.getSignalGroupSettingsDataByGroupId().values()) {
+      //			log.error("  SignalGroup " +  sgdata.getSignalGroupId());
+      // do nothing if onset == dropping or all time green is set
+      if (!((sgdata.getOnset() == sgdata.getDropping())
+          || (sgdata.getOnset() % this.cycle == 0 && sgdata.getDropping() % this.cycle == 0))) {
+        int onset = sgdata.getOnset();
+        onset = getPositiveModuloByCycleTime(offset + onset);
+        // onsets
+        List<Id<SignalGroup>> onsetsSgIds = this.secondInPlanOnsetsMap.get(onset);
+        if (onsetsSgIds == null) {
+          onsetsSgIds = new ArrayList<>();
+          this.secondInPlanOnsetsMap.put(onset, onsetsSgIds);
+        }
+        onsetsSgIds.add(sgdata.getSignalGroupId());
+        // dropping
+        int dropping = sgdata.getDropping();
+        dropping = getPositiveModuloByCycleTime(offset + dropping);
+        List<Id<SignalGroup>> droppingSgIds = this.secondInPlanDroppingsMap.get(dropping);
+        if (droppingSgIds == null) {
+          droppingSgIds = new ArrayList<>();
+          this.secondInPlanDroppingsMap.put(dropping, droppingSgIds);
+        }
+        droppingSgIds.add(sgdata.getSignalGroupId());
+      }
+    }
+  }
 
-	@Override
-	public Id<SignalPlan> getId() {
-		return this.data.getId();
-	}
+  private int getPositiveModuloByCycleTime(int dividend) {
+    int modulo = dividend % this.cycle;
+    if (modulo < 0) modulo += this.cycle;
+    return modulo;
+  }
 
-	@Override
-	public Integer getOffset() {
-		return this.data.getOffset();
-	}
+  @Override
+  public List<Id<SignalGroup>> getDroppings(double timeSeconds) {
+    Integer currentSecondInPlan = ((int) (timeSeconds % this.cycle));
+    return this.secondInPlanDroppingsMap.get(currentSecondInPlan);
+  }
 
-	@Override
-	public Integer getCycleTime() {
-		return this.data.getCycleTime();
-	}
+  @Override
+  public List<Id<SignalGroup>> getOnsets(double timeSeconds) {
+    Integer currentSecondInPlan = ((int) (timeSeconds % this.cycle));
+    return this.secondInPlanOnsetsMap.get(currentSecondInPlan);
+  }
 
-	public SignalPlanData getPlanData(){
-		return this.data;
-	}
-	
+  @Override
+  public double getEndTime() {
+    return this.data.getEndTime();
+  }
+
+  @Override
+  public double getStartTime() {
+    return this.data.getStartTime();
+  }
+
+  @Override
+  public Id<SignalPlan> getId() {
+    return this.data.getId();
+  }
+
+  @Override
+  public Integer getOffset() {
+    return this.data.getOffset();
+  }
+
+  @Override
+  public Integer getCycleTime() {
+    return this.data.getCycleTime();
+  }
+
+  public SignalPlanData getPlanData() {
+    return this.data;
+  }
 }

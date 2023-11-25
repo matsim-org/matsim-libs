@@ -17,9 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
+/** */
 package org.matsim.contrib.noise;
 
 import org.junit.Assert;
@@ -35,63 +33,97 @@ import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author ikaddoura
- *
  */
-
 public class NoiseConfigGroupIT {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	@Test
-	public final void test0(){
+  @Test
+  public final void test0() {
 
-		String configFile = testUtils.getPackageInputDirectory() + "NoiseConfigGroupTest/config0.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
-		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
+    String configFile = testUtils.getPackageInputDirectory() + "NoiseConfigGroupTest/config0.xml";
+    Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
+    config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
+    NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 
-		// test the config parameters
-		Assert.assertEquals("wrong config parameter", 12345., noiseParameters.getReceiverPointGap(), MatsimTestUtils.EPSILON);
+    // test the config parameters
+    Assert.assertEquals(
+        "wrong config parameter",
+        12345.,
+        noiseParameters.getReceiverPointGap(),
+        MatsimTestUtils.EPSILON);
 
-		String actForRecPtGrid = noiseParameters.getConsideredActivitiesForReceiverPointGridArray()[0] + "," + noiseParameters.getConsideredActivitiesForReceiverPointGridArray()[1] + "," + noiseParameters.getConsideredActivitiesForReceiverPointGridArray()[2];
-		Assert.assertEquals("wrong config parameter", "home,sleep,eat", actForRecPtGrid);
+    String actForRecPtGrid =
+        noiseParameters.getConsideredActivitiesForReceiverPointGridArray()[0]
+            + ","
+            + noiseParameters.getConsideredActivitiesForReceiverPointGridArray()[1]
+            + ","
+            + noiseParameters.getConsideredActivitiesForReceiverPointGridArray()[2];
+    Assert.assertEquals("wrong config parameter", "home,sleep,eat", actForRecPtGrid);
 
-		String actForSpatFct = noiseParameters.getConsideredActivitiesForDamageCalculationArray()[0] + "," + noiseParameters.getConsideredActivitiesForDamageCalculationArray()[1] + "," + noiseParameters.getConsideredActivitiesForDamageCalculationArray()[2];
-		Assert.assertEquals("wrong config parameter", "work,leisure,other", actForSpatFct);
+    String actForSpatFct =
+        noiseParameters.getConsideredActivitiesForDamageCalculationArray()[0]
+            + ","
+            + noiseParameters.getConsideredActivitiesForDamageCalculationArray()[1]
+            + ","
+            + noiseParameters.getConsideredActivitiesForDamageCalculationArray()[2];
+    Assert.assertEquals("wrong config parameter", "work,leisure,other", actForSpatFct);
 
-		Assert.assertEquals("wrong config parameter", 12345789., noiseParameters.getRelevantRadius(), MatsimTestUtils.EPSILON);
-		Assert.assertFalse("wrong config parameter", noiseParameters.isComputeNoiseDamages());
+    Assert.assertEquals(
+        "wrong config parameter",
+        12345789.,
+        noiseParameters.getRelevantRadius(),
+        MatsimTestUtils.EPSILON);
+    Assert.assertFalse("wrong config parameter", noiseParameters.isComputeNoiseDamages());
 
-		String hgvIdPrefixes = noiseParameters.getHgvIdPrefixesArray()[0] + "," + noiseParameters.getHgvIdPrefixesArray()[1] + "," + noiseParameters.getHgvIdPrefixesArray()[2] + "," + noiseParameters.getHgvIdPrefixesArray()[3];
-		Assert.assertEquals("wrong config parameter", "lkw,LKW,HGV,hgv", hgvIdPrefixes);
+    String hgvIdPrefixes =
+        noiseParameters.getHgvIdPrefixesArray()[0]
+            + ","
+            + noiseParameters.getHgvIdPrefixesArray()[1]
+            + ","
+            + noiseParameters.getHgvIdPrefixesArray()[2]
+            + ","
+            + noiseParameters.getHgvIdPrefixesArray()[3];
+    Assert.assertEquals("wrong config parameter", "lkw,LKW,HGV,hgv", hgvIdPrefixes);
 
-		String tunnelLinkIds = noiseParameters.getTunnelLinkIDsSet().toArray()[0] + "," + noiseParameters.getTunnelLinkIDsSet().toArray()[1];
-		Assert.assertEquals("wrong config parameter", "link1,link2", tunnelLinkIds);
-	}
+    String tunnelLinkIds =
+        noiseParameters.getTunnelLinkIDsSet().toArray()[0]
+            + ","
+            + noiseParameters.getTunnelLinkIDsSet().toArray()[1];
+    Assert.assertEquals("wrong config parameter", "link1,link2", tunnelLinkIds);
+  }
 
-	@Test
-	public final void test1(){
+  @Test
+  public final void test1() {
 
-		String configFile = testUtils.getPackageInputDirectory() + "NoiseConfigGroupTest/config1.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
-		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
+    String configFile = testUtils.getPackageInputDirectory() + "NoiseConfigGroupTest/config1.xml";
+    Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
+    config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
+    NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 
-		// see if the custom config group is written into the output config file
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+    // see if the custom config group is written into the output config file
+    Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new NoiseModule());
-		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		controler.run();
+    Controler controler = new Controler(scenario);
+    controler.addOverridingModule(new NoiseModule());
+    controler
+        .getConfig()
+        .controller()
+        .setOverwriteFileSetting(
+            OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+    controler.run();
 
-		Config outputConfig = ConfigUtils.loadConfig(controler.getConfig().controller().getOutputDirectory() + "/output_config.xml", new NoiseConfigGroup());
-		NoiseConfigGroup outputNoiseParameters = (NoiseConfigGroup) outputConfig.getModule("noise");
+    Config outputConfig =
+        ConfigUtils.loadConfig(
+            controler.getConfig().controller().getOutputDirectory() + "/output_config.xml",
+            new NoiseConfigGroup());
+    NoiseConfigGroup outputNoiseParameters = (NoiseConfigGroup) outputConfig.getModule("noise");
 
-		Assert.assertEquals("input and output config parameters are not the same", noiseParameters.toString(), outputNoiseParameters.toString());
-	}
-
+    Assert.assertEquals(
+        "input and output config parameters are not the same",
+        noiseParameters.toString(),
+        outputNoiseParameters.toString());
+  }
 }

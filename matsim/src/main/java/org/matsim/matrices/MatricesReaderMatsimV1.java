@@ -21,7 +21,6 @@
 package org.matsim.matrices;
 
 import java.util.Stack;
-
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -33,51 +32,52 @@ import org.xml.sax.Attributes;
  */
 public class MatricesReaderMatsimV1<T> extends MatsimXmlParser {
 
-	private final static String MATRICES = "matrices";
-	private final static String MATRIX = "matrix";
-	private final static String ENTRY = "entry";
+  private static final String MATRICES = "matrices";
+  private static final String MATRIX = "matrix";
+  private static final String ENTRY = "entry";
 
-	private Matrices matrices;
-	private Matrix currMatrix = null;
+  private Matrices matrices;
+  private Matrix currMatrix = null;
 
-	public MatricesReaderMatsimV1(final Matrices matrices) {
-		super(ValidationType.DTD_ONLY);
-		this.matrices = matrices;
-	}
+  public MatricesReaderMatsimV1(final Matrices matrices) {
+    super(ValidationType.DTD_ONLY);
+    this.matrices = matrices;
+  }
 
-	@Override
-	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
-		if (MATRICES.equals(name)) {
-			startMatrices(atts);
-		} else if (MATRIX.equals(name)) {
-			startMatrix(atts);
-		} else if (ENTRY.equals(name)) {
-			startEntry(atts);
-		} else {
-			throw new RuntimeException(this + "[tag=" + name + " not known or not supported]");
-		}
-	}
+  @Override
+  public void startTag(final String name, final Attributes atts, final Stack<String> context) {
+    if (MATRICES.equals(name)) {
+      startMatrices(atts);
+    } else if (MATRIX.equals(name)) {
+      startMatrix(atts);
+    } else if (ENTRY.equals(name)) {
+      startEntry(atts);
+    } else {
+      throw new RuntimeException(this + "[tag=" + name + " not known or not supported]");
+    }
+  }
 
-	@Override
-	public void endTag(final String name, final String content, final Stack<String> context) {
-		if (MATRICES.equals(name)) {
-			this.matrices = null;
-		} else if (MATRIX.equals(name)) {
-			this.currMatrix = null;
-		}
-	}
+  @Override
+  public void endTag(final String name, final String content, final Stack<String> context) {
+    if (MATRICES.equals(name)) {
+      this.matrices = null;
+    } else if (MATRIX.equals(name)) {
+      this.currMatrix = null;
+    }
+  }
 
-	private void startMatrices(final Attributes atts) {
-		this.matrices.setName(atts.getValue("name"));
-	}
+  private void startMatrices(final Attributes atts) {
+    this.matrices.setName(atts.getValue("name"));
+  }
 
-	private void startMatrix(final Attributes atts) {
-		this.currMatrix = this.matrices.createMatrix(atts.getValue("id"),
-				atts.getValue("desc"));
-	}
+  private void startMatrix(final Attributes atts) {
+    this.currMatrix = this.matrices.createMatrix(atts.getValue("id"), atts.getValue("desc"));
+  }
 
-	private void startEntry(final Attributes  atts) {
-		this.currMatrix.createAndAddEntry(atts.getValue("from_id"), atts.getValue("to_id"), Double.parseDouble(atts.getValue("value")));
-	}
-
+  private void startEntry(final Attributes atts) {
+    this.currMatrix.createAndAddEntry(
+        atts.getValue("from_id"),
+        atts.getValue("to_id"),
+        Double.parseDouble(atts.getValue("value")));
+  }
 }

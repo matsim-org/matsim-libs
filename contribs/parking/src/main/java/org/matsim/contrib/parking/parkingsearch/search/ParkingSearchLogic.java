@@ -24,18 +24,19 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * @author  jbischoff
- *
+ * @author jbischoff
  */
 public interface ParkingSearchLogic {
-	/**
-	 * currentLinkId link last visited
-	 * @param vehicleId vehicleId
-	 */
-	Id<Link> getNextLink(Id<Link> currentLinkId, Id<Vehicle> vehicleId, String mode);
-	
-	/**
-	 * fixed route search strategies (i.e. find the next carsharing parking lot) might require a reset once search is completed
-	 */
-	void reset();
+  /**
+   * currentLinkId link last visited
+   *
+   * @param vehicleId vehicleId
+   */
+  Id<Link> getNextLink(Id<Link> currentLinkId, Id<Vehicle> vehicleId, String mode);
+
+  /**
+   * fixed route search strategies (i.e. find the next carsharing parking lot) might require a reset
+   * once search is completed
+   */
+  void reset();
 }

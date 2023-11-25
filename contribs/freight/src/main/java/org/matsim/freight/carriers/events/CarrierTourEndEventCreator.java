@@ -32,12 +32,26 @@ import org.matsim.vehicles.Vehicle;
 
 /*package-private*/ final class CarrierTourEndEventCreator implements CarrierEventCreator {
 
-	@Override
-	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter, Id<Vehicle> vehicleId) {
-		if(event instanceof ActivityStartEvent startEvent && CarrierConstants.END.equals(startEvent.getActType()) ) {
-				return new CarrierTourEndEvent(startEvent.getTime(), carrier.getId(), scheduledTour.getTour().getEndLinkId(), // TODO: If we have the tourId, we do not need to store the link here, kmt sep 22
-						vehicleId, scheduledTour.getTour().getId());
-		}
-		return null;
-	}
+  @Override
+  public Event createEvent(
+      Event event,
+      Carrier carrier,
+      Activity activity,
+      ScheduledTour scheduledTour,
+      int activityCounter,
+      Id<Vehicle> vehicleId) {
+    if (event instanceof ActivityStartEvent startEvent
+        && CarrierConstants.END.equals(startEvent.getActType())) {
+      return new CarrierTourEndEvent(
+          startEvent.getTime(),
+          carrier.getId(),
+          scheduledTour
+              .getTour()
+              .getEndLinkId(), // TODO: If we have the tourId, we do not need to store the link
+          // here, kmt sep 22
+          vehicleId,
+          scheduledTour.getTour().getId());
+    }
+    return null;
+  }
 }

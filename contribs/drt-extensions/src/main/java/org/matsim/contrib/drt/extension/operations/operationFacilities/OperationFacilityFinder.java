@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.Coord;
  */
 public interface OperationFacilityFinder {
 
-    OperationFacility findFacilityOfType(Coord coord, OperationFacilityType type);
+  OperationFacility findFacilityOfType(Coord coord, OperationFacilityType type);
 
-    OperationFacility findFacility(Coord coord);
+  OperationFacility findFacility(Coord coord);
 }

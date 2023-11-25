@@ -33,26 +33,26 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.utils.timing.TimeInterpretationModule;
 
 public class DvrpBenchmarkControlerModule extends AbstractModule {
-	@Override
-	public void install() {
-		install(new EventsManagerModule());
-		install(new DefaultMobsimModule());
-		// install(new TravelTimeCalculatorModule());
-		install(new TravelDisutilityModule());
-		install(new CharyparNagelScoringFunctionModule());
-		install(new StandaloneExperiencedPlansModule());
-		install(new TripRouterModule());
-		install(new StrategyManagerModule());
-		// install(new LinkStatsModule());
-		// install(new VolumesAnalyzerModule());
-		// install(new LegHistogramModule());
-		// install(new LegTimesModule());
-		// install(new TravelDistanceStatsModule());
-		// install(new ScoreStatsModule());
-		// install(new CountsModule());
-		// install(new PtCountsModule());
-		// install(new VspPlansCleanerModule());
-		// install(new SnapshotWritersModule());
-		install(new TimeInterpretationModule());
-	}
+  @Override
+  public void install() {
+    install(new EventsManagerModule());
+    install(new DefaultMobsimModule());
+    // install(new TravelTimeCalculatorModule());
+    install(new TravelDisutilityModule());
+    install(new CharyparNagelScoringFunctionModule());
+    install(new StandaloneExperiencedPlansModule());
+    install(new TripRouterModule());
+    install(new StrategyManagerModule());
+    // install(new LinkStatsModule());
+    // install(new VolumesAnalyzerModule());
+    // install(new LegHistogramModule());
+    // install(new LegTimesModule());
+    // install(new TravelDistanceStatsModule());
+    // install(new ScoreStatsModule());
+    // install(new CountsModule());
+    // install(new PtCountsModule());
+    // install(new VspPlansCleanerModule());
+    // install(new SnapshotWritersModule());
+    install(new TimeInterpretationModule());
+  }
 }

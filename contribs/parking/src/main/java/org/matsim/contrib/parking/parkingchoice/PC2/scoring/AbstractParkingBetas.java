@@ -23,11 +23,10 @@ import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author jbischoff
- *
  */
 public abstract class AbstractParkingBetas {
 
-	abstract public double getParkingWalkBeta(Person person, double activityDurationInSeconds);
-	abstract public double getParkingCostBeta(Person person); 
+  public abstract double getParkingWalkBeta(Person person, double activityDurationInSeconds);
 
+  public abstract double getParkingCostBeta(Person person);
 }

@@ -19,11 +19,19 @@
 
 package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
+import com.google.inject.Inject;
 import jakarta.inject.Provider;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
+import org.matsim.contrib.socnetsim.framework.population.JointPlans;
+import org.matsim.contrib.socnetsim.framework.replanning.GroupPlanStrategy;
+import org.matsim.contrib.socnetsim.framework.replanning.IndividualBasedGroupStrategyModule;
+import org.matsim.contrib.socnetsim.framework.replanning.modules.BlackListedTimeAllocationMutator;
+import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
+import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
+import org.matsim.contrib.socnetsim.usage.replanning.GroupPlanStrategyFactoryUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
@@ -31,87 +39,74 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import com.google.inject.Inject;
-
-import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
-import org.matsim.contrib.socnetsim.framework.replanning.modules.BlackListedTimeAllocationMutator;
-import org.matsim.contrib.socnetsim.framework.population.JointPlans;
-import org.matsim.contrib.socnetsim.framework.replanning.GroupPlanStrategy;
-import org.matsim.contrib.socnetsim.usage.replanning.GroupPlanStrategyFactoryUtils;
-import org.matsim.contrib.socnetsim.framework.replanning.IndividualBasedGroupStrategyModule;
-import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
-import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
-
 public class GroupTimeAllocationMutatorFactory extends AbstractConfigurableSelectionStrategy {
-	private static final Logger log =
-		LogManager.getLogger(GroupTimeAllocationMutatorFactory.class);
+  private static final Logger log = LogManager.getLogger(GroupTimeAllocationMutatorFactory.class);
 
-	private final Scenario sc;
-	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
-	private final Provider<TripRouter> tripRouterFactory;
-	private final PlanLinkIdentifier planLinkIdentifier;
-	private final TimeInterpretation timeInterpretation;
+  private final Scenario sc;
+  private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
+  private final Provider<TripRouter> tripRouterFactory;
+  private final PlanLinkIdentifier planLinkIdentifier;
+  private final TimeInterpretation timeInterpretation;
 
-	// TODO make configurable again
-	private final double maxTemp = 1;
+  // TODO make configurable again
+  private final double maxTemp = 1;
 
-	@Inject
-	public GroupTimeAllocationMutatorFactory( final Scenario sc , final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , final Provider<TripRouter> tripRouterFactory ,
-			@Strong final PlanLinkIdentifier planLinkIdentifier, TimeInterpretation timeInterpretation ) {
-		this.sc = sc;
-		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
-		this.tripRouterFactory = tripRouterFactory;
-		this.planLinkIdentifier = planLinkIdentifier;
-		this.timeInterpretation = timeInterpretation;
-	}
+  @Inject
+  public GroupTimeAllocationMutatorFactory(
+      final Scenario sc,
+      final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
+      final Provider<TripRouter> tripRouterFactory,
+      @Strong final PlanLinkIdentifier planLinkIdentifier,
+      TimeInterpretation timeInterpretation) {
+    this.sc = sc;
+    this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
+    this.tripRouterFactory = tripRouterFactory;
+    this.planLinkIdentifier = planLinkIdentifier;
+    this.timeInterpretation = timeInterpretation;
+  }
 
+  @Override
+  public GroupPlanStrategy get() {
+    final Config config = sc.getConfig();
+    final GroupPlanStrategy strategy = instantiateStrategy(config);
+    final PlanRoutingAlgorithmFactory planRouterFactory = planRoutingAlgorithmFactory;
 
-	@Override
-	public GroupPlanStrategy get() {
-		final Config config = sc.getConfig();
-		final GroupPlanStrategy strategy = instantiateStrategy( config );
-		final PlanRoutingAlgorithmFactory planRouterFactory = planRoutingAlgorithmFactory;
+    strategy.addStrategyModule(
+        new IndividualBasedGroupStrategyModule(
+            new AbstractMultithreadedModule(config.global().getNumberOfThreads()) {
+              @Override
+              public PlanAlgorithm getPlanAlgoInstance() {
 
-		strategy.addStrategyModule(
-				new IndividualBasedGroupStrategyModule(
-					new AbstractMultithreadedModule( config.global().getNumberOfThreads() ) {
-						@Override
-						public PlanAlgorithm getPlanAlgoInstance() {
+                final int iteration = getReplanningContext().getIteration();
+                final int firstIteration = config.controller().getFirstIteration();
+                final double nIters = config.controller().getLastIteration() - firstIteration;
+                final double minTemp = 1;
+                final double startMin = (2 / 3.) * nIters;
+                final double progress = (iteration - firstIteration) / startMin;
+                final double temp = minTemp + Math.max(1 - progress, 0) * (maxTemp - minTemp);
+                log.debug("temperature in iteration " + iteration + ": " + temp);
+                final BlackListedTimeAllocationMutator algo =
+                    new BlackListedTimeAllocationMutator(
+                        config.timeAllocationMutator().getMutationRange() * temp,
+                        MatsimRandom.getLocalInstance());
+                return algo;
+              }
+            }));
 
-							final int iteration = getReplanningContext().getIteration();
-							final int firstIteration = config.controller().getFirstIteration();
-							final double nIters = config.controller().getLastIteration() - firstIteration;
-							final double minTemp = 1;
-							final double startMin = (2 / 3.) * nIters;
-							final double progress = (iteration - firstIteration) / startMin;
-							final double temp = minTemp + Math.max(1 - progress , 0) * (maxTemp - minTemp);
-							log.debug( "temperature in iteration "+iteration+": "+temp );
-							final BlackListedTimeAllocationMutator algo =
-									new BlackListedTimeAllocationMutator(
-										config.timeAllocationMutator().getMutationRange() * temp,
-										MatsimRandom.getLocalInstance() );
-							return algo;
-						}
-					}));
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createReRouteModule(
+            config, planRouterFactory, tripRouterFactory));
 
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createReRouteModule(
-						config,
-						planRouterFactory,
-						tripRouterFactory) );
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createSynchronizerModule(
+            config, tripRouterFactory, timeInterpretation));
 
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createSynchronizerModule(
-					config,
-					tripRouterFactory, timeInterpretation) );
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
+            config,
+            ((JointPlans) sc.getScenarioElement(JointPlans.ELEMENT_NAME)).getFactory(),
+            planLinkIdentifier));
 
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
-					config,
-					((JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME  )).getFactory(),
-					planLinkIdentifier ) );
-
-		return strategy;
-	}
+    return strategy;
+  }
 }
-

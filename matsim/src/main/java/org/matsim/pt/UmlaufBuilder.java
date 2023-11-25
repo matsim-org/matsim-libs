@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * UmlaufBuilder.java
@@ -19,12 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.pt;
+package org.matsim.pt;
 
 import java.util.Collection;
 
 public interface UmlaufBuilder {
 
-	public abstract Collection<Umlauf> build();
-
+  public abstract Collection<Umlauf> build();
 }

@@ -23,13 +23,12 @@ package org.matsim.core.events.algorithms;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
- * A very basic interface for event writers, just to make sure that event
- * files can be closed correctly.
+ * A very basic interface for event writers, just to make sure that event files can be closed
+ * correctly.
  *
  * @author mrieser
  */
 public interface EventWriter extends EventHandler {
 
-	public void closeFile();
-
+  public void closeFile();
 }

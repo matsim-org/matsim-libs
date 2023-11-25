@@ -20,61 +20,58 @@
 package org.matsim.contrib.socnetsim.jointtrips.router;
 
 import com.google.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.RoutingModule;
 
-import jakarta.inject.Named;
-import jakarta.inject.Provider;
-
 /**
  * @author thibautd
  */
 public class JointTripRouterModule extends AbstractModule {
 
-	@Override
-	public void install() {
-		addRoutingModuleBinding(JointActingTypes.DRIVER).toProvider(DriverRoutingModuleProvider.class);
-		addRoutingModuleBinding(JointActingTypes.PASSENGER).toProvider(PassengerRoutingModuleProvider.class);
-	}
+  @Override
+  public void install() {
+    addRoutingModuleBinding(JointActingTypes.DRIVER).toProvider(DriverRoutingModuleProvider.class);
+    addRoutingModuleBinding(JointActingTypes.PASSENGER)
+        .toProvider(PassengerRoutingModuleProvider.class);
+  }
 
-	private static class DriverRoutingModuleProvider implements Provider<RoutingModule> {
+  private static class DriverRoutingModuleProvider implements Provider<RoutingModule> {
 
-		private final Scenario scenario;
-		private final RoutingModule carRouter;
+    private final Scenario scenario;
+    private final RoutingModule carRouter;
 
-		@Inject
-		DriverRoutingModuleProvider(Scenario scenario, @Named(TransportMode.car) RoutingModule carRouter) {
-			this.scenario = scenario;
-			this.carRouter = carRouter;
-		}
+    @Inject
+    DriverRoutingModuleProvider(
+        Scenario scenario, @Named(TransportMode.car) RoutingModule carRouter) {
+      this.scenario = scenario;
+      this.carRouter = carRouter;
+    }
 
-		@Override
-		public RoutingModule get() {
-			return new DriverRoutingModule(
-					JointActingTypes.DRIVER,
-					scenario.getPopulation().getFactory(),
-					carRouter);
-		}
-	}
+    @Override
+    public RoutingModule get() {
+      return new DriverRoutingModule(
+          JointActingTypes.DRIVER, scenario.getPopulation().getFactory(), carRouter);
+    }
+  }
 
-	private static class PassengerRoutingModuleProvider implements Provider<RoutingModule> {
+  private static class PassengerRoutingModuleProvider implements Provider<RoutingModule> {
 
-		private final Scenario scenario;
+    private final Scenario scenario;
 
-		@Inject
-		PassengerRoutingModuleProvider(Scenario scenario) {
-			this.scenario = scenario;
-		}
+    @Inject
+    PassengerRoutingModuleProvider(Scenario scenario) {
+      this.scenario = scenario;
+    }
 
-		@Override
-		public RoutingModule get() {
-			return new PassengerRoutingModule(
-					JointActingTypes.PASSENGER,
-					scenario.getPopulation().getFactory());
-		}
-	}
+    @Override
+    public RoutingModule get() {
+      return new PassengerRoutingModule(
+          JointActingTypes.PASSENGER, scenario.getPopulation().getFactory());
+    }
+  }
 }
-

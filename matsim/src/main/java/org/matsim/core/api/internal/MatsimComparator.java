@@ -20,12 +20,11 @@
 
 package org.matsim.core.api.internal;
 
-/**An interface that marks all implementations of Comparator.  Personally I would probably say
- * "extends Comparator" but I can't say if people would like that.  (Would not be a marker
- * interface any longer.)
- * 
+/**
+ * An interface that marks all implementations of Comparator. Personally I would probably say
+ * "extends Comparator" but I can't say if people would like that. (Would not be a marker interface
+ * any longer.)
+ *
  * @author nagel
  */
-public interface MatsimComparator {
-
-}
+public interface MatsimComparator {}

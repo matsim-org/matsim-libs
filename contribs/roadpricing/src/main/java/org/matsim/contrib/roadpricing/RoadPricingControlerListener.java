@@ -21,7 +21,6 @@
 package org.matsim.contrib.roadpricing;
 
 import jakarta.inject.Inject;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
@@ -37,59 +36,64 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.TravelDisutility;
 
 /**
- * Integrates the RoadPricing functionality into the MATSim Controler.  Does the
- * following:
- * <p></p>
- * <strike>Initialization:
+ * Integrates the RoadPricing functionality into the MATSim Controler. Does the following:
+ *
+ * <p><strike>Initialization:
+ *
  * <ul>
- * 		<li> Adds the {@link RoadPricingTollCalculator} events listener (to calculate the
- * 			 toll per agent).
- * 		<li> Adds the toll to the {@link TravelDisutility} for the router (by
- * 			 wrapping the pre-existing {@link TravelDisutility} object).
- * </ul></strike>
- * After mobsim:
- * <ul>
- * 		<li> Send toll as money events to agents.
+ *   <li>Adds the {@link RoadPricingTollCalculator} events listener (to calculate the toll per
+ *       agent).
+ *   <li>Adds the toll to the {@link TravelDisutility} for the router (by wrapping the pre-existing
+ *       {@link TravelDisutility} object).
  * </ul>
+ *
+ * </strike> After mobsim:
+ *
+ * <ul>
+ *   <li>Send toll as money events to agents.
+ * </ul>
+ *
  * Will also generate and output some statistics ...
  *
  * @author mrieser
  */
-class RoadPricingControlerListener implements StartupListener, IterationEndsListener, ShutdownListener {
+class RoadPricingControlerListener
+    implements StartupListener, IterationEndsListener, ShutdownListener {
 
-	final static private Logger log = LogManager.getLogger(RoadPricingControlerListener.class);
+  private static final Logger log = LogManager.getLogger(RoadPricingControlerListener.class);
 
-	private final RoadPricingScheme scheme;
-	private final RoadPricingTollCalculator calcPaidToll;
-	private final CalcAverageTolledTripLength cattl;
-	private final OutputDirectoryHierarchy controlerIO;
+  private final RoadPricingScheme scheme;
+  private final RoadPricingTollCalculator calcPaidToll;
+  private final CalcAverageTolledTripLength cattl;
+  private final OutputDirectoryHierarchy controlerIO;
 
-	@Inject
-	RoadPricingControlerListener( RoadPricingScheme scheme, Network network,
-				      EventsManager events, OutputDirectoryHierarchy controlerIO ) {
-		this.scheme = scheme;
-		this.calcPaidToll = new RoadPricingTollCalculator( network, scheme, events );
-		this.cattl = new CalcAverageTolledTripLength( network, scheme, events );
-		this.controlerIO = controlerIO;
-		Gbl.printBuildInfo("RoadPricing", "/org.matsim.contrib/roadpricing/revision.txt");
-	}
+  @Inject
+  RoadPricingControlerListener(
+      RoadPricingScheme scheme,
+      Network network,
+      EventsManager events,
+      OutputDirectoryHierarchy controlerIO) {
+    this.scheme = scheme;
+    this.calcPaidToll = new RoadPricingTollCalculator(network, scheme, events);
+    this.cattl = new CalcAverageTolledTripLength(network, scheme, events);
+    this.controlerIO = controlerIO;
+    Gbl.printBuildInfo("RoadPricing", "/org.matsim.contrib/roadpricing/revision.txt");
+  }
 
-	@Override
-	public void notifyStartup(final StartupEvent event) {}
+  @Override
+  public void notifyStartup(final StartupEvent event) {}
 
+  @Override
+  public void notifyIterationEnds(final IterationEndsEvent event) {
+    log.info(
+        "The sum of all paid tolls : " + this.calcPaidToll.getAllAgentsToll() + " monetary units.");
+    log.info("The number of people who paid toll : " + this.calcPaidToll.getDraweesNr());
+    log.info("The average paid trip length : " + this.cattl.getAverageTripLength() + " m.");
+  }
 
-
-	@Override
-	public void notifyIterationEnds(final IterationEndsEvent event) {
-		log.info("The sum of all paid tolls : " + this.calcPaidToll.getAllAgentsToll() + " monetary units.");
-		log.info("The number of people who paid toll : " + this.calcPaidToll.getDraweesNr());
-		log.info("The average paid trip length : " + this.cattl.getAverageTripLength() + " m.");
-	}
-
-	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-		String filename = this.controlerIO.getOutputFilename("output_toll.xml.gz") ;
-		new RoadPricingWriterXMLv1(this.scheme).writeFile(filename);
-	}
-
+  @Override
+  public void notifyShutdown(ShutdownEvent event) {
+    String filename = this.controlerIO.getOutputFilename("output_toll.xml.gz");
+    new RoadPricingWriterXMLv1(this.scheme).writeFile(filename);
+  }
 }

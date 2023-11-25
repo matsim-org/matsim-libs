@@ -20,7 +20,6 @@
 package org.matsim.contrib.etaxi.optimizer.rules;
 
 import java.util.stream.Stream;
-
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
@@ -42,58 +41,75 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 
-	// TODO MIN_SOC should depend on the weather and time of day
-	private final RuleBasedETaxiOptimizerParams params;
-	private final ChargingInfrastructure chargingInfrastructure;
-	private final BestChargerFinder eDispatchFinder;
-	private final ETaxiScheduler eScheduler;
-	private final IdleTaxiZonalRegistry idleTaxiRegistry;
+  // TODO MIN_SOC should depend on the weather and time of day
+  private final RuleBasedETaxiOptimizerParams params;
+  private final ChargingInfrastructure chargingInfrastructure;
+  private final BestChargerFinder eDispatchFinder;
+  private final ETaxiScheduler eScheduler;
+  private final IdleTaxiZonalRegistry idleTaxiRegistry;
 
-	public RuleBasedETaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			ETaxiScheduler eScheduler, ScheduleTimingUpdater scheduleTimingUpdater,
-			ChargingInfrastructure chargingInfrastructure, ZonalRegisters zonalRegisters,
-			BestDispatchFinder dispatchFinder, UnplannedRequestInserter requestInserter) {
-		super(eventsManager, taxiCfg, fleet, eScheduler, scheduleTimingUpdater, zonalRegisters, requestInserter);
-		this.params = (RuleBasedETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams();
-		this.chargingInfrastructure = chargingInfrastructure;
-		this.eScheduler = eScheduler;
-		this.idleTaxiRegistry = zonalRegisters.idleTaxiRegistry;
-		eDispatchFinder = new BestChargerFinder(dispatchFinder);
-	}
+  public RuleBasedETaxiOptimizer(
+      EventsManager eventsManager,
+      TaxiConfigGroup taxiCfg,
+      Fleet fleet,
+      ETaxiScheduler eScheduler,
+      ScheduleTimingUpdater scheduleTimingUpdater,
+      ChargingInfrastructure chargingInfrastructure,
+      ZonalRegisters zonalRegisters,
+      BestDispatchFinder dispatchFinder,
+      UnplannedRequestInserter requestInserter) {
+    super(
+        eventsManager,
+        taxiCfg,
+        fleet,
+        eScheduler,
+        scheduleTimingUpdater,
+        zonalRegisters,
+        requestInserter);
+    this.params = (RuleBasedETaxiOptimizerParams) taxiCfg.getTaxiOptimizerParams();
+    this.chargingInfrastructure = chargingInfrastructure;
+    this.eScheduler = eScheduler;
+    this.idleTaxiRegistry = zonalRegisters.idleTaxiRegistry;
+    eDispatchFinder = new BestChargerFinder(dispatchFinder);
+  }
 
-	@Override
-	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
-		if (isNewDecisionEpoch(e, params.socCheckTimeStep)) {
-			@SuppressWarnings("unchecked")
-			Stream<EvDvrpVehicle> eTaxis = (Stream<EvDvrpVehicle>)(Stream<? extends DvrpVehicle>)idleTaxiRegistry.vehicles();
-			chargeIdleUnderchargedVehicles(eTaxis.filter(this::isUndercharged));
-		}
+  @Override
+  public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
+    if (isNewDecisionEpoch(e, params.socCheckTimeStep)) {
+      @SuppressWarnings("unchecked")
+      Stream<EvDvrpVehicle> eTaxis =
+          (Stream<EvDvrpVehicle>) (Stream<? extends DvrpVehicle>) idleTaxiRegistry.vehicles();
+      chargeIdleUnderchargedVehicles(eTaxis.filter(this::isUndercharged));
+    }
 
-		super.notifyMobsimBeforeSimStep(e);
-	}
+    super.notifyMobsimBeforeSimStep(e);
+  }
 
-	private void chargeIdleUnderchargedVehicles(Stream<EvDvrpVehicle> vehicles) {
-		vehicles.forEach(v -> {
-			Dispatch<Charger> eDispatch = eDispatchFinder.findBestChargerForVehicle(v,
-					chargingInfrastructure.getChargers().values().stream());
-			eScheduler.scheduleCharging(v, v.getElectricVehicle(), eDispatch.destination, eDispatch.path);
-		});
-	}
+  private void chargeIdleUnderchargedVehicles(Stream<EvDvrpVehicle> vehicles) {
+    vehicles.forEach(
+        v -> {
+          Dispatch<Charger> eDispatch =
+              eDispatchFinder.findBestChargerForVehicle(
+                  v, chargingInfrastructure.getChargers().values().stream());
+          eScheduler.scheduleCharging(
+              v, v.getElectricVehicle(), eDispatch.destination, eDispatch.path);
+        });
+  }
 
-	@Override
-	public void nextTask(DvrpVehicle vehicle) {
-		super.nextTask(vehicle);
+  @Override
+  public void nextTask(DvrpVehicle vehicle) {
+    super.nextTask(vehicle);
 
-		if (eScheduler.getScheduleInquiry().isIdle(vehicle)) {
-			EvDvrpVehicle eTaxi = (EvDvrpVehicle)vehicle;
-			if (isUndercharged(eTaxi)) {
-				chargeIdleUnderchargedVehicles(Stream.of(eTaxi));
-			}
-		}
-	}
+    if (eScheduler.getScheduleInquiry().isIdle(vehicle)) {
+      EvDvrpVehicle eTaxi = (EvDvrpVehicle) vehicle;
+      if (isUndercharged(eTaxi)) {
+        chargeIdleUnderchargedVehicles(Stream.of(eTaxi));
+      }
+    }
+  }
 
-	private boolean isUndercharged(EvDvrpVehicle v) {
-		Battery b = v.getElectricVehicle().getBattery();
-		return b.getCharge() < params.minSoc * b.getCapacity();
-	}
+  private boolean isUndercharged(EvDvrpVehicle v) {
+    Battery b = v.getElectricVehicle().getBattery();
+    return b.getCharge() < params.minSoc * b.getCapacity();
+  }
 }

@@ -11,16 +11,16 @@ package org.matsim.contrib.simulatedannealing.acceptor;
 import org.matsim.contrib.simulatedannealing.SimulatedAnnealing;
 
 /**
- *
  * The acceptor decides whether the current solution becomes the new accepted solution, normally
- * based on the cost or energy differences between current and accepted solution and current temperature.
+ * based on the cost or energy differences between current and accepted solution and current
+ * temperature.
  *
  * @author nkuehnel / MOIA
  */
 public interface Acceptor<T> {
 
-	boolean accept(SimulatedAnnealing.Solution<T> currentSolution,
-				   SimulatedAnnealing.Solution<T> acceptedSolution,
-				   double temperature
-	);
+  boolean accept(
+      SimulatedAnnealing.Solution<T> currentSolution,
+      SimulatedAnnealing.Solution<T> acceptedSolution,
+      double temperature);
 }

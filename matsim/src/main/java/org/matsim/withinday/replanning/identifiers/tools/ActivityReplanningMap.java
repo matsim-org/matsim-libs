@@ -20,15 +20,13 @@
 
 package org.matsim.withinday.replanning.identifiers.tools;
 
+import jakarta.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import jakarta.inject.Inject;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -52,243 +50,245 @@ import org.matsim.withinday.events.handler.ReplanningEventHandler;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 
 /**
- * This class tracks agents and their activity end times. It can be used to identify
- * those agents which are going to end their activities in the current time step.
- * Doing so allows one to e.g. extend their activities. Moreover, it can return a set
- * containing all agents currently performing activites.
+ * This class tracks agents and their activity end times. It can be used to identify those agents
+ * which are going to end their activities in the current time step. Doing so allows one to e.g.
+ * extend their activities. Moreover, it can return a set containing all agents currently performing
+ * activites.
  */
-public class ActivityReplanningMap implements PersonStuckEventHandler,
-		ActivityStartEventHandler, ActivityEndEventHandler, ReplanningEventHandler,
-		MobsimInitializedListener, MobsimAfterSimStepListener {
+public class ActivityReplanningMap
+    implements PersonStuckEventHandler,
+        ActivityStartEventHandler,
+        ActivityEndEventHandler,
+        ReplanningEventHandler,
+        MobsimInitializedListener,
+        MobsimAfterSimStepListener {
 
-	private static final Logger log = LogManager.getLogger(ActivityReplanningMap.class);
+  private static final Logger log = LogManager.getLogger(ActivityReplanningMap.class);
 
-	private final MobsimDataProvider mobsimDataProvider;
+  private final MobsimDataProvider mobsimDataProvider;
 
-	/*
-	 * Agents that have started an activity in the current time step. We store the
-	 * MobsimAgents and their Ids (which are contained in the activity start
-	 * event). By doing so, the lookup Id -> MobsimAgent is performed by the
-	 * EventHandler which is parallelized.
-	 * However, this will result in few unnecessary lookups for agents who end their
-	 * activity in the same time step as they start it.
-	 */
-	private final Map<Id<Person>, MobsimAgent> startingAgents;	// PersonId
+  /*
+   * Agents that have started an activity in the current time step. We store the
+   * MobsimAgents and their Ids (which are contained in the activity start
+   * event). By doing so, the lookup Id -> MobsimAgent is performed by the
+   * EventHandler which is parallelized.
+   * However, this will result in few unnecessary lookups for agents who end their
+   * activity in the same time step as they start it.
+   */
+  private final Map<Id<Person>, MobsimAgent> startingAgents; // PersonId
 
-	/*
-	 * Contains activity end times of agents that are currently performing an activity.
-	 * This is required in case an agent changes its activity end time. To be able to
-	 * remove the agent from the activityPerformingAgents we need to know its original
-	 * activity end time.
-	 */
-	private final Map<Id<Person>, Double> activityEndTimes;	// scheduled activity end times
+  /*
+   * Contains activity end times of agents that are currently performing an activity.
+   * This is required in case an agent changes its activity end time. To be able to
+   * remove the agent from the activityPerformingAgents we need to know its original
+   * activity end time.
+   */
+  private final Map<Id<Person>, Double> activityEndTimes; // scheduled activity end times
 
-	/*
-	 * Contains a map for each time bin (a bin equals a time step in the mobility simulation).
-	 * The set contains all agents ending their activity in that time bin.
-	 */
-	private final Map<Integer, Map<Id<Person>, MobsimAgent>> activityPerformingAgents;
+  /*
+   * Contains a map for each time bin (a bin equals a time step in the mobility simulation).
+   * The set contains all agents ending their activity in that time bin.
+   */
+  private final Map<Integer, Map<Id<Person>, MobsimAgent>> activityPerformingAgents;
 
-	// package protected to be accessible for test case
-	/*package*/ double simStartTime;
-	/*package*/ double timeStepSize;
+  // package protected to be accessible for test case
+  /*package*/ double simStartTime;
+  /*package*/ double timeStepSize;
 
-	@Inject
-	public ActivityReplanningMap(MobsimDataProvider mobsimDataProvider, EventsManager eventsManager) {
-		eventsManager.addHandler(this);
-		log.info("Note that the ActivityReplanningMap has to be registered as an EventHandler and a SimulationListener!");
+  @Inject
+  public ActivityReplanningMap(MobsimDataProvider mobsimDataProvider, EventsManager eventsManager) {
+    eventsManager.addHandler(this);
+    log.info(
+        "Note that the ActivityReplanningMap has to be registered as an EventHandler and a SimulationListener!");
 
-		this.mobsimDataProvider = mobsimDataProvider;
+    this.mobsimDataProvider = mobsimDataProvider;
 
-		this.startingAgents = new HashMap<>();
-		this.activityEndTimes = new HashMap<>();
+    this.startingAgents = new HashMap<>();
+    this.activityEndTimes = new HashMap<>();
 
-		this.activityPerformingAgents = new ConcurrentHashMap<>();
-	}
+    this.activityPerformingAgents = new ConcurrentHashMap<>();
+  }
 
-	/*
-	 * When the simulation starts the agents are all performing an activity. We collect
-	 * them and check their activity end time.
-	 */
-	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+  /*
+   * When the simulation starts the agents are all performing an activity. We collect
+   * them and check their activity end time.
+   */
+  @Override
+  public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 
-		MobsimTimer mobsimTimer = ((QSim) e.getQueueSimulation()).getSimTimer();
-		this.simStartTime = mobsimTimer.getSimStartTime();
-		this.timeStepSize = mobsimTimer.getSimTimestepSize();
+    MobsimTimer mobsimTimer = ((QSim) e.getQueueSimulation()).getSimTimer();
+    this.simStartTime = mobsimTimer.getSimStartTime();
+    this.timeStepSize = mobsimTimer.getSimTimestepSize();
 
-		this.activityPerformingAgents.clear();
+    this.activityPerformingAgents.clear();
 
-		for (MobsimAgent mobsimAgent : this.mobsimDataProvider.getAgents().values()) {
+    for (MobsimAgent mobsimAgent : this.mobsimDataProvider.getAgents().values()) {
 
-			// get the agent's activity end time and mark it as currently performing an Activity
-			double activityEndTime = mobsimAgent.getActivityEndTime();
+      // get the agent's activity end time and mark it as currently performing an Activity
+      double activityEndTime = mobsimAgent.getActivityEndTime();
 
-			// add the agent to the collections
-			this.activityEndTimes.put(mobsimAgent.getId(), activityEndTime);
+      // add the agent to the collections
+      this.activityEndTimes.put(mobsimAgent.getId(), activityEndTime);
 
-			int bin = this.getTimeBin(activityEndTime);
-			Map<Id<Person>, MobsimAgent> map = getMapForTimeBin(bin);
-			map.put(mobsimAgent.getId(), mobsimAgent);
-		}
+      int bin = this.getTimeBin(activityEndTime);
+      Map<Id<Person>, MobsimAgent> map = getMapForTimeBin(bin);
+      map.put(mobsimAgent.getId(), mobsimAgent);
+    }
+  }
 
-	}
+  /*
+   * The Activity Start Events are thrown before the Activity Start has been handled
+   * by the Simulation. As a result the Departure Time is not set at that time.
+   * We have to wait until the SimStep has been fully simulated and retrieve
+   * the activity departure times then.
+   */
+  @Override
+  public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 
-	/*
-	 * The Activity Start Events are thrown before the Activity Start has been handled
-	 * by the Simulation. As a result the Departure Time is not set at that time.
-	 * We have to wait until the SimStep has been fully simulated and retrieve
-	 * the activity departure times then.
-	 */
-	@Override
-	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
+    double now = e.getSimulationTime();
+    for (MobsimAgent mobsimAgent : startingAgents.values()) {
 
-		double now = e.getSimulationTime();
-		for (MobsimAgent mobsimAgent : startingAgents.values()) {
+      double departureTime = mobsimAgent.getActivityEndTime();
 
-			double departureTime = mobsimAgent.getActivityEndTime();
+      /*
+       * If it is the last scheduled Activity the departureTime is -infinity.
+       * Otherwise we select the agent for a replanning.
+       */
+      if (departureTime >= now) {
+        this.activityEndTimes.put(mobsimAgent.getId(), departureTime);
+        int bin = this.getTimeBin(mobsimAgent.getActivityEndTime());
+        Map<Id<Person>, MobsimAgent> map = getMapForTimeBin(bin);
+        map.put(mobsimAgent.getId(), mobsimAgent);
+      } else {
+        log.warn("Departure time is in the past - ignoring activity!");
+      }
+    }
+    this.startingAgents.clear();
 
-			/*
-			 * If it is the last scheduled Activity the departureTime is -infinity.
-			 * Otherwise we select the agent for a replanning.
-			 */
-			if (departureTime >= now) {
-				this.activityEndTimes.put(mobsimAgent.getId(), departureTime);
-				int bin = this.getTimeBin(mobsimAgent.getActivityEndTime());
-				Map<Id<Person>, MobsimAgent> map = getMapForTimeBin(bin);
-				map.put(mobsimAgent.getId(), mobsimAgent);
-			} else {
-				log.warn("Departure time is in the past - ignoring activity!");
-			}
-		}
-		this.startingAgents.clear();
+    /*
+     * Remove current time bin from activityPerformingAgents map. They have been handled
+     * in the current time step.
+     */
+    this.activityPerformingAgents.remove(this.getTimeBin(now));
+  }
 
-		/*
-		 * Remove current time bin from activityPerformingAgents map. They have been handled
-		 * in the current time step.
-		 */
-		this.activityPerformingAgents.remove(this.getTimeBin(now));
-	}
+  /*
+   * We collect departures in time bins. Each bin contains all departures of one
+   * time step of the mobility simulation.
+   *
+   * Method is package protected to be accessible for test case.
+   */
+  /*package*/ int getTimeBin(double time) {
 
-	/*
-	 * We collect departures in time bins. Each bin contains all departures of one
-	 * time step of the mobility simulation.
-	 *
-	 * Method is package protected to be accessible for test case.
-	 */
-	/*package*/ int getTimeBin(double time) {
+    double timeAfterSimStart = time - simStartTime;
 
-		double timeAfterSimStart = time - simStartTime;
+    /*
+     * Agents who end their first activity before the simulation has started
+     * will depart in the first time step.
+     */
+    if (timeAfterSimStart <= 0.0) return 0;
 
-		/*
-		 * Agents who end their first activity before the simulation has started
-		 * will depart in the first time step.
-		 */
-		if (timeAfterSimStart <= 0.0) return 0;
+    /*
+     * Calculate the bin for the given time. Increase it by one if the result
+     * of the modulo operation is > 0. If it is 0, it is the last time value
+     * which is part of the previous bin.
+     */
+    int bin = (int) (timeAfterSimStart / timeStepSize);
+    if (timeAfterSimStart % timeStepSize != 0.0) bin++;
 
-		/*
-		 * Calculate the bin for the given time. Increase it by one if the result
-		 * of the modulo operation is > 0. If it is 0, it is the last time value
-		 * which is part of the previous bin.
-		 */
-		int bin = (int) (timeAfterSimStart / timeStepSize);
-		if (timeAfterSimStart % timeStepSize != 0.0) bin++;
+    return bin;
+  }
 
-		return bin;
-	}
+  private Map<Id<Person>, MobsimAgent> getMapForTimeBin(int bin) {
+    Map<Id<Person>, MobsimAgent> map = this.activityPerformingAgents.get(bin);
+    if (map == null) {
+      map = new HashMap<>();
+      this.activityPerformingAgents.put(bin, map);
+    }
+    return map;
+  }
 
-	private Map<Id<Person>, MobsimAgent> getMapForTimeBin(int bin) {
-		Map<Id<Person>, MobsimAgent> map = this.activityPerformingAgents.get(bin);
-		if (map == null) {
-			map = new HashMap<>();
-			this.activityPerformingAgents.put(bin, map);
-		}
-		return map;
-	}
+  /*
+   * Collect the agents that are starting an Activity in the current time step.
+   * Do the agent lookup here since this can be executed parallel to the mobsim.
+   */
+  @Override
+  public void handleEvent(ActivityStartEvent event) {
+    Id<Person> agentId = event.getPersonId();
+    this.startingAgents.put(agentId, this.mobsimDataProvider.getAgent(agentId));
+  }
 
-	/*
-	 * Collect the agents that are starting an Activity in the current time step.
-	 * Do the agent lookup here since this can be executed parallel to the mobsim.
-	 */
-	@Override
-	public void handleEvent(ActivityStartEvent event) {
-		Id<Person> agentId = event.getPersonId();
-		this.startingAgents.put(agentId, this.mobsimDataProvider.getAgent(agentId));
-	}
+  /*
+   * Nothing to do here?
+   * Agents should be removed from the map if their replanning time has come.
+   */
+  @Override
+  public void handleEvent(ActivityEndEvent event) {
+    Id<Person> agentId = event.getPersonId();
+    this.startingAgents.remove(agentId);
 
-	/*
-	 * Nothing to do here?
-	 * Agents should be removed from the map if their replanning time has come.
-	 */
-	@Override
-	public void handleEvent(ActivityEndEvent event) {
-		Id<Person> agentId = event.getPersonId();
-		this.startingAgents.remove(agentId);
+    Double activityEndTime = this.activityEndTimes.remove(agentId);
+    if (activityEndTime != null) {
+      Map<Id<Person>, MobsimAgent> map;
+      // remove
+      map = this.getMapForTimeBin(this.getTimeBin(activityEndTime));
+      map.remove(agentId);
+    }
+  }
 
-		Double activityEndTime = this.activityEndTimes.remove(agentId);
-		if (activityEndTime != null) {
-			Map<Id<Person>, MobsimAgent> map;
-			// remove
-			map = this.getMapForTimeBin(this.getTimeBin(activityEndTime));
-			map.remove(agentId);
-		}
-	}
+  /*
+   * Nothing to do here?
+   * Agents should not be removed from the simulation if they are performing an activity.
+   */
+  @Override
+  public void handleEvent(PersonStuckEvent event) {}
 
-	/*
-	 * Nothing to do here?
-	 * Agents should not be removed from the simulation if they are performing an activity.
-	 */
-	@Override
-	public void handleEvent(PersonStuckEvent event) {
-	}
+  @Override
+  public void handleEvent(ReplanningEvent event) {
 
-	@Override
-	public void handleEvent(ReplanningEvent event) {
+    // check whether the agent is performing an activity
+    Double activityEndTime = this.activityEndTimes.get(event.getPersonId());
+    if (activityEndTime != null) {
 
-		// check whether the agent is performing an activity
-		Double activityEndTime = this.activityEndTimes.get(event.getPersonId());
-		if (activityEndTime != null) {
+      // check whether the agent has changed its planned departure time
+      MobsimAgent agent = this.mobsimDataProvider.getAgent(event.getPersonId());
+      if (activityEndTime != agent.getActivityEndTime()) {
+        // Update the agent's activity end time.
+        this.activityEndTimes.put(agent.getId(), agent.getActivityEndTime());
 
-			// check whether the agent has changed its planned departure time
-			MobsimAgent agent = this.mobsimDataProvider.getAgent(event.getPersonId());
-			if (activityEndTime != agent.getActivityEndTime()) {
-				// Update the agent's activity end time.
-				this.activityEndTimes.put(agent.getId(), agent.getActivityEndTime());
+        // Update the activity performing agents map. To do so, remove old entry and add new one.
+        Map<Id<Person>, MobsimAgent> map;
+        // remove
+        map = this.getMapForTimeBin(this.getTimeBin(activityEndTime));
+        map.remove(agent.getId());
 
-				// Update the activity performing agents map. To do so, remove old entry and add new one.
-				Map<Id<Person>, MobsimAgent> map;
-				// remove
-				map = this.getMapForTimeBin(this.getTimeBin(activityEndTime));
-				map.remove(agent.getId());
+        // add
+        map = this.getMapForTimeBin(this.getTimeBin(agent.getActivityEndTime()));
+        map.put(agent.getId(), agent);
+      }
+    }
+  }
 
-				// add
-				map = this.getMapForTimeBin(this.getTimeBin(agent.getActivityEndTime()));
-				map.put(agent.getId(), agent);
-			}
-		}
-	}
+  /** Returns a set containing the Ids of all agents that are currently performing an activity. */
+  public Set<Id<Person>> getActivityPerformingAgents() {
+    return Collections.unmodifiableSet(this.activityEndTimes.keySet());
+  }
 
-	/**
-	 * Returns a set containing the Ids of all agents that are currently performing an activity.
-	 */
-	public Set<Id<Person>> getActivityPerformingAgents() {
-		return Collections.unmodifiableSet(this.activityEndTimes.keySet());
-	}
+  /**
+   * Returns a Collection containing all agents that are going to end their activity in the time
+   * step belongs to the given time. Typically, this is the current simulation time. For times in
+   * the past an empty set is returned. Since in data structure in the background the MobsimAgents
+   * are available, we return them instead of only their Ids as the getActivityPerformingAgents()
+   * method does.
+   */
+  public Collection<MobsimAgent> getActivityEndingAgents(double time) {
+    return Collections.unmodifiableCollection(
+        this.getMapForTimeBin(this.getTimeBin(time)).values());
+  }
 
-	/**
-	 * Returns a Collection containing all agents that are going to end their activity in the
-	 * time step belongs to the given time. Typically, this is the current simulation time.
-	 * For times in the past an empty set is returned.
-	 * Since in data structure in the background the MobsimAgents are available, we return them
-	 * instead of only their Ids as the getActivityPerformingAgents() method does.
-	 */
-	public Collection<MobsimAgent> getActivityEndingAgents(double time) {
-		return Collections.unmodifiableCollection(this.getMapForTimeBin(this.getTimeBin(time)).values());
-	}
-
-	@Override
-	public void reset(int iteration) {
-		this.startingAgents.clear();
-		this.activityEndTimes.clear();
-	}
+  @Override
+  public void reset(int iteration) {
+    this.startingAgents.clear();
+    this.activityEndTimes.clear();
+  }
 }

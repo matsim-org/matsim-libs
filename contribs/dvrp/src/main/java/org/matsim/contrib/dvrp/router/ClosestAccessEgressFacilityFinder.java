@@ -20,8 +20,8 @@
 
 package org.matsim.contrib.dvrp.router;
 
+import com.google.common.base.Verify;
 import java.util.Optional;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Coord;
@@ -32,49 +32,49 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-import com.google.common.base.Verify;
-
 /**
  * @author michalm
  */
 public class ClosestAccessEgressFacilityFinder implements AccessEgressFacilityFinder {
-	private final Network network;
-	private final QuadTree<? extends Facility> facilityQuadTree;
-	private final double maxDistance;
+  private final Network network;
+  private final QuadTree<? extends Facility> facilityQuadTree;
+  private final double maxDistance;
 
-	public ClosestAccessEgressFacilityFinder(double maxDistance, Network network,
-			QuadTree<? extends Facility> facilityQuadTree) {
-		this.network = network;
-		this.facilityQuadTree = facilityQuadTree;
-		this.maxDistance = maxDistance;
-	}
+  public ClosestAccessEgressFacilityFinder(
+      double maxDistance, Network network, QuadTree<? extends Facility> facilityQuadTree) {
+    this.network = network;
+    this.facilityQuadTree = facilityQuadTree;
+    this.maxDistance = maxDistance;
+  }
 
-	@Override
-	public Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility, Attributes tripAttributes) {
-		Facility accessFacility = findClosestStop(fromFacility);
-		if (accessFacility == null) {
-			return Optional.empty();
-		}
+  @Override
+  public Optional<Pair<Facility, Facility>> findFacilities(
+      Facility fromFacility, Facility toFacility, Attributes tripAttributes) {
+    Facility accessFacility = findClosestStop(fromFacility);
+    if (accessFacility == null) {
+      return Optional.empty();
+    }
 
-		Facility egressFacility = findClosestStop(toFacility);
-		return egressFacility == null ?
-				Optional.empty() :
-				Optional.of(new ImmutablePair<>(accessFacility, egressFacility));
-	}
+    Facility egressFacility = findClosestStop(toFacility);
+    return egressFacility == null
+        ? Optional.empty()
+        : Optional.of(new ImmutablePair<>(accessFacility, egressFacility));
+  }
 
-	private Facility findClosestStop(Facility facility) {
-		Coord coord = getFacilityCoord(facility, network);
-		Facility closestStop = facilityQuadTree.getClosest(coord.getX(), coord.getY());
-		double closestStopDistance = CoordUtils.calcEuclideanDistance(coord, closestStop.getCoord());
-		return closestStopDistance > maxDistance ? null : closestStop;
-	}
+  private Facility findClosestStop(Facility facility) {
+    Coord coord = getFacilityCoord(facility, network);
+    Facility closestStop = facilityQuadTree.getClosest(coord.getX(), coord.getY());
+    double closestStopDistance = CoordUtils.calcEuclideanDistance(coord, closestStop.getCoord());
+    return closestStopDistance > maxDistance ? null : closestStop;
+  }
 
-	static Coord getFacilityCoord(Facility facility, Network network) {
-		Coord coord = facility.getCoord();
-		if (coord == null) {
-			coord = network.getLinks().get(facility.getLinkId()).getCoord();
-			Verify.verify(coord != null, "From facility has neither coordinates nor link Id. Should not happen.");
-		}
-		return coord;
-	}
+  static Coord getFacilityCoord(Facility facility, Network network) {
+    Coord coord = facility.getCoord();
+    if (coord == null) {
+      coord = network.getLinks().get(facility.getLinkId()).getCoord();
+      Verify.verify(
+          coord != null, "From facility has neither coordinates nor link Id. Should not happen.");
+    }
+    return coord;
+  }
 }

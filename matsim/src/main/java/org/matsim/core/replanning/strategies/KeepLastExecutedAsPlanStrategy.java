@@ -20,7 +20,6 @@ package org.matsim.core.replanning.strategies;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
-
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -33,16 +32,17 @@ import org.matsim.withinday.controller.ExecutedPlansServiceImpl;
 
 /**
  * @author nagel
- *
  */
 public class KeepLastExecutedAsPlanStrategy implements Provider<PlanStrategy> {
-	@Inject Config config ;
-	@Inject ControlerListenerManager cm ;
-	@Inject ExecutedPlansServiceImpl executedPlans ;
+  @Inject Config config;
+  @Inject ControlerListenerManager cm;
+  @Inject ExecutedPlansServiceImpl executedPlans;
 
-	@Override public PlanStrategy get() {
-		Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan,Person>()) ;
-		builder.addStrategyModule(new org.matsim.core.replanning.modules.KeepLastExecuted(config, executedPlans) ) ;
-		return builder.build() ;
-	}
+  @Override
+  public PlanStrategy get() {
+    Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>());
+    builder.addStrategyModule(
+        new org.matsim.core.replanning.modules.KeepLastExecuted(config, executedPlans));
+    return builder.build();
+  }
 }

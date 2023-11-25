@@ -22,10 +22,9 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 
 /**
  * @author nagel
- *
  */
 public interface ActivityEndRescheduler {
-	@Deprecated // use same method from QSim directly and try to get rid of the handle to internal interface. kai, mar'15
-	public void rescheduleActivityEnd(MobsimAgent agent);
-
+  @Deprecated // use same method from QSim directly and try to get rid of the handle to internal
+  // interface. kai, mar'15
+  public void rescheduleActivityEnd(MobsimAgent agent);
 }

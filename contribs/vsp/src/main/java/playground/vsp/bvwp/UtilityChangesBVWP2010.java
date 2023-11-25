@@ -18,53 +18,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
+/** */
 package playground.vsp.bvwp;
 
 import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
 
-
-
-
 /**
  * @author Ihab
- *
  */
 class UtilityChangesBVWP2010 extends UtilityChanges {
 
+  @Override
+  UtlChangesData utlChangePerEntry(
+      Attribute attribute,
+      double deltaAmount,
+      double quantityNullfall,
+      double quantityPlanfall,
+      double margUtl) {
 
-	@Override
-	UtlChangesData utlChangePerEntry(Attribute attribute,
-			double deltaAmount, double quantityNullfall, double quantityPlanfall, double margUtl) {
+    UtlChangesData utlChanges = new UtlChangesData();
 
-		UtlChangesData utlChanges = new UtlChangesData() ;
+    if (attribute.equals(Attribute.Reisezeit_h)) {
+      if (deltaAmount > 0) {
+        // wir sind aufnehmend; es gilt die RoH
+        utlChanges.utl = (quantityPlanfall - quantityNullfall) * margUtl / 2.;
+      } else {
+        utlChanges.utl = 0.;
+      }
+    } else {
+      if (deltaAmount > 0) {
+        // wir sind aufnehmend; es zaehlt der Planfall:
+        utlChanges.utl = quantityPlanfall * margUtl;
+      } else {
+        utlChanges.utl = -quantityNullfall * margUtl;
+      }
+    }
 
-		if ( attribute.equals(Attribute.Reisezeit_h) ) {
-			if ( deltaAmount > 0 ) {
-				// wir sind aufnehmend; es gilt die RoH
-				utlChanges.utl = (quantityPlanfall-quantityNullfall) * margUtl / 2. ;
-			} else {
-				utlChanges.utl = 0. ;
-			}
-		} else {
-			if ( deltaAmount > 0 ) {
-				// wir sind aufnehmend; es zaehlt der Planfall:
-				utlChanges.utl = quantityPlanfall * margUtl ;
-			} else {
-				utlChanges.utl = -quantityNullfall * margUtl ;
-			}
-		}
+    return utlChanges;
+  }
 
-		return utlChanges;
-	}
-
-	@Override
-	double computeImplicitUtilityPerItem(Attributes econValues,
-			Attributes quantitiesNullfall,
-			Attributes quantitiesPlanfall) {
-		return 0 ;
-	}
-
+  @Override
+  double computeImplicitUtilityPerItem(
+      Attributes econValues, Attributes quantitiesNullfall, Attributes quantitiesPlanfall) {
+    return 0;
+  }
 }

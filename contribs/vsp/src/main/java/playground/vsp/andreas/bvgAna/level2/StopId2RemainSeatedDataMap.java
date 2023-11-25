@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,62 +32,71 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
-
 import playground.vsp.andreas.bvgAna.level1.VehId2OccupancyHandler;
 
 /**
- * Calculates the number of agents which remain in the vehicles and do not leave the vehicle at the stop.
+ * Calculates the number of agents which remain in the vehicles and do not leave the vehicle at the
+ * stop.
  *
  * @author aneumann
- *
  */
-public class StopId2RemainSeatedDataMap implements VehicleArrivesAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
+public class StopId2RemainSeatedDataMap
+    implements VehicleArrivesAtFacilityEventHandler,
+        PersonEntersVehicleEventHandler,
+        PersonLeavesVehicleEventHandler {
 
-	private final Logger log = LogManager.getLogger(StopId2RemainSeatedDataMap.class);
-//	private final Level logLevel = Level.DEBUG;
+  private final Logger log = LogManager.getLogger(StopId2RemainSeatedDataMap.class);
+  //	private final Level logLevel = Level.DEBUG;
 
-	private VehId2OccupancyHandler vehId2OccupancyHandler;
-	private TreeMap<Id, StopId2RemainSeatedDataMapData> vehId2PersonsLeavingMap = new TreeMap<Id, StopId2RemainSeatedDataMapData>();
-	private TreeMap<Id, List<StopId2RemainSeatedDataMapData>> stopId2RemainSeatedDataMap = new TreeMap<Id, List<StopId2RemainSeatedDataMapData>>();
+  private VehId2OccupancyHandler vehId2OccupancyHandler;
+  private TreeMap<Id, StopId2RemainSeatedDataMapData> vehId2PersonsLeavingMap =
+      new TreeMap<Id, StopId2RemainSeatedDataMapData>();
+  private TreeMap<Id, List<StopId2RemainSeatedDataMapData>> stopId2RemainSeatedDataMap =
+      new TreeMap<Id, List<StopId2RemainSeatedDataMapData>>();
 
-	public StopId2RemainSeatedDataMap(){
-//		this.log.setLevel(this.logLevel);
-		this.vehId2OccupancyHandler = new VehId2OccupancyHandler();
-	}
+  public StopId2RemainSeatedDataMap() {
+    //		this.log.setLevel(this.logLevel);
+    this.vehId2OccupancyHandler = new VehId2OccupancyHandler();
+  }
 
-	/**
-	 * @return A map containing a list of <code>StopId2RemainSeatedDataMapData</code> for each stop
-	 */
-	public Map<Id, List<StopId2RemainSeatedDataMapData>> getStopId2RemainSeatedDataMap(){
-		return this.stopId2RemainSeatedDataMap;
-	}
+  /**
+   * @return A map containing a list of <code>StopId2RemainSeatedDataMapData</code> for each stop
+   */
+  public Map<Id, List<StopId2RemainSeatedDataMapData>> getStopId2RemainSeatedDataMap() {
+    return this.stopId2RemainSeatedDataMap;
+  }
 
-	@Override
-	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		this.vehId2PersonsLeavingMap.put(event.getVehicleId(),
-				new StopId2RemainSeatedDataMapData(event,
-						this.vehId2OccupancyHandler.getVehicleLoad(event.getVehicleId(), event.getTime())));
+  @Override
+  public void handleEvent(VehicleArrivesAtFacilityEvent event) {
+    this.vehId2PersonsLeavingMap.put(
+        event.getVehicleId(),
+        new StopId2RemainSeatedDataMapData(
+            event,
+            this.vehId2OccupancyHandler.getVehicleLoad(event.getVehicleId(), event.getTime())));
 
-		if(this.stopId2RemainSeatedDataMap.get(event.getFacilityId()) == null){
-			this.stopId2RemainSeatedDataMap.put(event.getFacilityId(), new ArrayList<StopId2RemainSeatedDataMapData>());
-		}
-		this.stopId2RemainSeatedDataMap.get(event.getFacilityId()).add(this.vehId2PersonsLeavingMap.get(event.getVehicleId()));
-	}
+    if (this.stopId2RemainSeatedDataMap.get(event.getFacilityId()) == null) {
+      this.stopId2RemainSeatedDataMap.put(
+          event.getFacilityId(), new ArrayList<StopId2RemainSeatedDataMapData>());
+    }
+    this.stopId2RemainSeatedDataMap
+        .get(event.getFacilityId())
+        .add(this.vehId2PersonsLeavingMap.get(event.getVehicleId()));
+  }
 
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		this.vehId2OccupancyHandler.handleEvent(event);
-		this.vehId2PersonsLeavingMap.get(event.getVehicleId()).addAgentEntering();
-	}
+  @Override
+  public void handleEvent(PersonEntersVehicleEvent event) {
+    this.vehId2OccupancyHandler.handleEvent(event);
+    this.vehId2PersonsLeavingMap.get(event.getVehicleId()).addAgentEntering();
+  }
 
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		this.vehId2OccupancyHandler.handleEvent(event);
-		this.vehId2PersonsLeavingMap.get(event.getVehicleId()).addAgentLeaving();
-	}
+  @Override
+  public void handleEvent(PersonLeavesVehicleEvent event) {
+    this.vehId2OccupancyHandler.handleEvent(event);
+    this.vehId2PersonsLeavingMap.get(event.getVehicleId()).addAgentLeaving();
+  }
 
-	@Override
-	public void reset(int iteration) {
-		this.vehId2OccupancyHandler.reset(iteration);
-	}
+  @Override
+  public void reset(int iteration) {
+    this.vehId2OccupancyHandler.reset(iteration);
+  }
 }

@@ -22,141 +22,144 @@ package org.matsim.utils.gis.matsim2esri.network;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
- * Design thoughts:<ul>
- * <li> I would argue that basing this on reflection is software design overkill.  In my understanding, reflection is useful to decouple
- * pieces of software, i.e. be able to insert a class (a constructor) into compiled code (e.g. a jar file) if I do not have access to the source
- * code of the jar file.  This is, however, not the situation here.  kai, mar'14
- * <li> Practically, the current design is in my way.  I need additional information inside the width calculator, because I do not want to
- * calculate width based on a network property, but on something else (speed differences).  So now I will have to abuse "capacity"
- * for the quantity of interest. kai, mar'14
- * </ul
+ * Design thoughts:
+ *
+ * <ul>
+ *   <li>I would argue that basing this on reflection is software design overkill. In my
+ *       understanding, reflection is useful to decouple pieces of software, i.e. be able to insert
+ *       a class (a constructor) into compiled code (e.g. a jar file) if I do not have access to the
+ *       source code of the jar file. This is, however, not the situation here. kai, mar'14
+ *   <li>Practically, the current design is in my way. I need additional information inside the
+ *       width calculator, because I do not want to calculate width based on a network property, but
+ *       on something else (speed differences). So now I will have to abuse "capacity" for the
+ *       quantity of interest. kai, mar'14 </ul
  */
 public class FeatureGeneratorBuilderImpl implements FeatureGeneratorBuilder {
 
+  private final Network network;
+  private CoordinateReferenceSystem crs;
 
-	private final Network network;
-	private CoordinateReferenceSystem crs;
+  private Constructor<? extends FeatureGenerator> featureGeneratorPrototypeContructor;
+  private static final Class[] FEATURE_GENERATOR_PROTOTYPECONSTRUCTOR = {
+    WidthCalculator.class, CoordinateReferenceSystem.class
+  };
 
-	private Constructor<? extends FeatureGenerator> featureGeneratorPrototypeContructor;
-	private static final Class[] FEATURE_GENERATOR_PROTOTYPECONSTRUCTOR =  { WidthCalculator.class, CoordinateReferenceSystem.class};
+  private Constructor<? extends WidthCalculator> widthCalculatorPrototypeContructor;
 
-	private Constructor<? extends WidthCalculator> widthCalculatorPrototypeContructor;
+  private double widthCoefficient = 1;
+  private static final Class[] WIDTH_CALCULATOR_PROTOTYPECONSTRUCTOR = {
+    Network.class, Double.class
+  };
 
-	private double widthCoefficient = 1;
-	private static final Class[] WIDTH_CALCULATOR_PROTOTYPECONSTRUCTOR =  { Network.class, Double.class};
+  public FeatureGeneratorBuilderImpl(final Network network, final String coordinateSystem) {
+    this.network = network;
+    this.crs = MGC.getCRS(coordinateSystem);
+    try {
+      this.featureGeneratorPrototypeContructor =
+          PolygonFeatureGenerator.class.getConstructor(FEATURE_GENERATOR_PROTOTYPECONSTRUCTOR);
+    } catch (SecurityException e) {
+      e.printStackTrace();
+    } catch (NoSuchMethodException e) {
+      e.printStackTrace();
+    }
 
+    try {
+      this.widthCalculatorPrototypeContructor =
+          LanesBasedWidthCalculator.class.getConstructor(WIDTH_CALCULATOR_PROTOTYPECONSTRUCTOR);
+    } catch (SecurityException e) {
+      e.printStackTrace();
+    } catch (NoSuchMethodException e) {
+      e.printStackTrace();
+    }
+  }
 
-	public FeatureGeneratorBuilderImpl(final Network network, final String coordinateSystem) {
-		this.network = network;
-		this.crs = MGC.getCRS(coordinateSystem);
-		try {
-			this.featureGeneratorPrototypeContructor = PolygonFeatureGenerator.class.getConstructor(FEATURE_GENERATOR_PROTOTYPECONSTRUCTOR);
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
+  @Override
+  public FeatureGenerator createFeatureGenerator() {
 
-		try {
-			this.widthCalculatorPrototypeContructor = LanesBasedWidthCalculator.class.getConstructor(WIDTH_CALCULATOR_PROTOTYPECONSTRUCTOR);
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
-	}
+    WidthCalculator widthCalc = createWidthCalculator();
+    FeatureGenerator ret;
+    Exception ex;
+    try {
+      ret = this.featureGeneratorPrototypeContructor.newInstance(widthCalc, this.crs);
+      return ret;
+    } catch (IllegalArgumentException e) {
+      ex = e;
+    } catch (InstantiationException e) {
+      ex = e;
+    } catch (IllegalAccessException e) {
+      ex = e;
+    } catch (InvocationTargetException e) {
+      ex = e;
+    }
+    throw new RuntimeException(
+        "Could not instantiate feature generator from prototype! "
+            + this.featureGeneratorPrototypeContructor.getDeclaringClass().getCanonicalName(),
+        ex);
+  }
 
-	@Override
-	public FeatureGenerator createFeatureGenerator() {
+  private WidthCalculator createWidthCalculator() {
+    WidthCalculator ret;
+    Exception ex;
+    try {
+      ret =
+          this.widthCalculatorPrototypeContructor.newInstance(this.network, this.widthCoefficient);
+      return ret;
+    } catch (IllegalArgumentException e) {
+      ex = e;
+    } catch (InstantiationException e) {
+      ex = e;
+    } catch (IllegalAccessException e) {
+      ex = e;
+    } catch (InvocationTargetException e) {
+      ex = e;
+    }
+    throw new RuntimeException("Could not instantiate width calculator from prototype!", ex);
+  }
 
-		WidthCalculator widthCalc = createWidthCalculator();
-		FeatureGenerator ret;
-		Exception ex;
-		try {
-			ret = this.featureGeneratorPrototypeContructor.newInstance(widthCalc, this.crs);
-			return ret;
-		} catch (IllegalArgumentException e) {
-			ex = e;
-		} catch (InstantiationException e) {
-			ex = e;
-		} catch (IllegalAccessException e) {
-			ex = e;
-		} catch (InvocationTargetException e) {
-			ex = e;
-		}
-		throw new RuntimeException(
-				"Could not instantiate feature generator from prototype! " + this.featureGeneratorPrototypeContructor.getDeclaringClass().getCanonicalName(),
-				ex);
-	}
+  public void setWidthCoefficient(final double coef) {
+    this.widthCoefficient = coef;
+  }
 
-	private WidthCalculator createWidthCalculator() {
-		WidthCalculator ret;
-		Exception ex;
-		try {
-			ret = this.widthCalculatorPrototypeContructor.newInstance(this.network, this.widthCoefficient);
-			return ret;
-		} catch (IllegalArgumentException e) {
-			ex = e;
-		} catch (InstantiationException e) {
-			ex = e;
-		} catch (IllegalAccessException e) {
-			ex = e;
-		} catch (InvocationTargetException e) {
-			ex = e;
-		}
-		throw new RuntimeException(
-				"Could not instantiate width calculator from prototype!",
-				ex);
+  public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs) {
+    this.crs = crs;
+  }
 
-	}
+  public void setWidthCalculatorPrototype(final Class<? extends WidthCalculator> prototype) {
 
+    try {
+      Constructor<? extends WidthCalculator> c =
+          prototype.getConstructor(WIDTH_CALCULATOR_PROTOTYPECONSTRUCTOR);
+      if (null != c) {
+        this.widthCalculatorPrototypeContructor = c;
+      } else {
+        throw new IllegalArgumentException("Wrong prototype constructor!");
+      }
+    } catch (SecurityException e) {
+      e.printStackTrace();
+    } catch (NoSuchMethodException e) {
+      e.printStackTrace();
+    }
+  }
 
-	public void setWidthCoefficient(final double coef) {
-		this.widthCoefficient  = coef;
-	}
+  public void setFeatureGeneratorPrototype(final Class<? extends FeatureGenerator> prototype) {
 
-	public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs) {
-		this.crs = crs;
-	}
-
-	public void setWidthCalculatorPrototype(final Class<? extends WidthCalculator> prototype) {
-
-		try {
-			Constructor<? extends WidthCalculator> c = prototype.getConstructor(WIDTH_CALCULATOR_PROTOTYPECONSTRUCTOR);
-			if (null != c) {
-				this.widthCalculatorPrototypeContructor = c;
-			}
-			else {
-				throw new IllegalArgumentException("Wrong prototype constructor!");
-			}
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void setFeatureGeneratorPrototype(final Class<? extends FeatureGenerator> prototype) {
-
-		try {
-			Constructor<? extends FeatureGenerator> c = prototype.getConstructor(FEATURE_GENERATOR_PROTOTYPECONSTRUCTOR);
-			if (null != c) {
-				this.featureGeneratorPrototypeContructor = c;
-			}
-			else {
-				throw new IllegalArgumentException("Wrong prototype constructor!");
-			}
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
-	}
-
+    try {
+      Constructor<? extends FeatureGenerator> c =
+          prototype.getConstructor(FEATURE_GENERATOR_PROTOTYPECONSTRUCTOR);
+      if (null != c) {
+        this.featureGeneratorPrototypeContructor = c;
+      } else {
+        throw new IllegalArgumentException("Wrong prototype constructor!");
+      }
+    } catch (SecurityException e) {
+      e.printStackTrace();
+    } catch (NoSuchMethodException e) {
+      e.printStackTrace();
+    }
+  }
 }

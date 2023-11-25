@@ -22,6 +22,8 @@
 
 package org.matsim.core.router.old;
 
+import java.util.Arrays;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,101 +52,136 @@ import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class PlanRouterTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public void passesVehicleFromOldPlan() {
-        final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
-        config.plans().setInputFile("plans1.xml");
-        final Scenario scenario = ScenarioUtils.loadScenario(config);
-        com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
-            @Override
-            public void install() {
+  @Test
+  public void passesVehicleFromOldPlan() {
+    final Config config =
+        ConfigUtils.loadConfig(
+            IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+    config.plans().setInputFile("plans1.xml");
+    final Scenario scenario = ScenarioUtils.loadScenario(config);
+    com.google.inject.Injector injector =
+        Injector.createInjector(
+            scenario.getConfig(),
+            new AbstractModule() {
+              @Override
+              public void install() {
                 install(new TripRouterModule());
                 install(new ScenarioByInstanceModule(scenario));
                 install(new TimeInterpretationModule());
-                addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility(config.scoring()));
-                addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
-            }
-        });
-        TripRouter tripRouter = injector.getInstance(TripRouter.class);
-        PlanRouter testee = new PlanRouter(tripRouter, TimeInterpretation.create(config));
-        Plan plan = scenario.getPopulation().getPersons().get(Id.createPersonId(1)).getSelectedPlan();
-        Id<Vehicle> vehicleId = Id.create(1, Vehicle.class);
-        ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).setVehicleId(vehicleId);
-        testee.run(plan);
-
-        if ( config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-      	  Assert.assertEquals("Vehicle Id transferred to new Plan", vehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).getVehicleId());
-        } else {
-      	  Assert.assertEquals("Vehicle Id transferred to new Plan", vehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(1).getRoute()).getVehicleId());
-      	  // yy I changed get(0) to get(1) since in the input file there is no intervening walk leg, but in the output there is. kai, feb'16
-        }
-    }
-
-    @Test
-    public void keepsVehicleIfTripRouterUsesOneAlready() {
-        final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
-        config.plans().setInputFile("plans1.xml");
-        final Scenario scenario = ScenarioUtils.loadScenario(config);
-        final DijkstraFactory leastCostAlgoFactory = new DijkstraFactory();
-        final OnlyTimeDependentTravelDisutilityFactory disutilityFactory = new OnlyTimeDependentTravelDisutilityFactory();
-        final FreeSpeedTravelTime travelTime = new FreeSpeedTravelTime();
-
-        Plan plan = scenario.getPopulation().getPersons().get(Id.createPersonId(1)).getSelectedPlan();
-        Id<Vehicle> oldVehicleId = Id.create(1, Vehicle.class);
-        ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).setVehicleId(oldVehicleId);
-
-        // A trip router which provides vehicle ids by itself.
-        final Id<Vehicle> newVehicleId = Id.create(2, Vehicle.class);
-        final RoutingModule routingModule = new RoutingModule() {
-              @Override
-              public List<? extends PlanElement> calcRoute(RoutingRequest request) {
-            		final Facility fromFacility = request.getFromFacility();
-            		final Facility toFacility = request.getToFacility();
-            		final double departureTime = request.getDepartureTime();
-            		final Person person = request.getPerson();
-
-                  List<? extends PlanElement> trip = DefaultRoutingModules.createPureNetworkRouter("car", scenario.getPopulation().getFactory(),
-                  		scenario.getNetwork(),
-                  		leastCostAlgoFactory.createPathCalculator(scenario.getNetwork(), disutilityFactory.createTravelDisutility(travelTime), travelTime)
-                  		).calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, departureTime, person));
-                  ((NetworkRoute) TripStructureUtils.getLegs(trip).get(0).getRoute()).setVehicleId(newVehicleId);
-                  return trip;
+                addTravelTimeBinding("car")
+                    .toInstance(new FreespeedTravelTimeAndDisutility(config.scoring()));
+                addTravelDisutilityFactoryBinding("car")
+                    .toInstance(new OnlyTimeDependentTravelDisutilityFactory());
               }
+            });
+    TripRouter tripRouter = injector.getInstance(TripRouter.class);
+    PlanRouter testee = new PlanRouter(tripRouter, TimeInterpretation.create(config));
+    Plan plan = scenario.getPopulation().getPersons().get(Id.createPersonId(1)).getSelectedPlan();
+    Id<Vehicle> vehicleId = Id.create(1, Vehicle.class);
+    ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).setVehicleId(vehicleId);
+    testee.run(plan);
 
-          };
-        com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
-            @Override
-            public void install() {
-                install(new ScenarioByInstanceModule(scenario));
-                install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {
-                    @Override
-                    public void install() {
-                        addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility(config.scoring()));
-                        addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
-                        addRoutingModuleBinding("car").toInstance( routingModule );
-                    }
-                }));
-            }
-        });
-        TripRouter tripRouter = injector.getInstance(TripRouter.class);
-
-        PlanRouter testee = new PlanRouter(tripRouter, TimeInterpretation.create(config));
-        testee.run(plan);
-        if ( config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-              Assert.assertEquals("Vehicle Id from TripRouter used", newVehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).getVehicleId());
-        } else {
-              Assert.assertEquals("Vehicle Id from TripRouter used", newVehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(1).getRoute()).getVehicleId());
-              // yy I changed get(0) to get(1) since in the input file there is no intervening walk leg, but in the output there is. kai, feb'16
-        }
-
+    if (config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none)) {
+      Assert.assertEquals(
+          "Vehicle Id transferred to new Plan",
+          vehicleId,
+          ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).getVehicleId());
+    } else {
+      Assert.assertEquals(
+          "Vehicle Id transferred to new Plan",
+          vehicleId,
+          ((NetworkRoute) TripStructureUtils.getLegs(plan).get(1).getRoute()).getVehicleId());
+      // yy I changed get(0) to get(1) since in the input file there is no intervening walk leg, but
+      // in the output there is. kai, feb'16
     }
+  }
 
+  @Test
+  public void keepsVehicleIfTripRouterUsesOneAlready() {
+    final Config config =
+        ConfigUtils.loadConfig(
+            IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+    config.plans().setInputFile("plans1.xml");
+    final Scenario scenario = ScenarioUtils.loadScenario(config);
+    final DijkstraFactory leastCostAlgoFactory = new DijkstraFactory();
+    final OnlyTimeDependentTravelDisutilityFactory disutilityFactory =
+        new OnlyTimeDependentTravelDisutilityFactory();
+    final FreeSpeedTravelTime travelTime = new FreeSpeedTravelTime();
+
+    Plan plan = scenario.getPopulation().getPersons().get(Id.createPersonId(1)).getSelectedPlan();
+    Id<Vehicle> oldVehicleId = Id.create(1, Vehicle.class);
+    ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).setVehicleId(oldVehicleId);
+
+    // A trip router which provides vehicle ids by itself.
+    final Id<Vehicle> newVehicleId = Id.create(2, Vehicle.class);
+    final RoutingModule routingModule =
+        new RoutingModule() {
+          @Override
+          public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+            final Facility fromFacility = request.getFromFacility();
+            final Facility toFacility = request.getToFacility();
+            final double departureTime = request.getDepartureTime();
+            final Person person = request.getPerson();
+
+            List<? extends PlanElement> trip =
+                DefaultRoutingModules.createPureNetworkRouter(
+                        "car",
+                        scenario.getPopulation().getFactory(),
+                        scenario.getNetwork(),
+                        leastCostAlgoFactory.createPathCalculator(
+                            scenario.getNetwork(),
+                            disutilityFactory.createTravelDisutility(travelTime),
+                            travelTime))
+                    .calcRoute(
+                        DefaultRoutingRequest.withoutAttributes(
+                            fromFacility, toFacility, departureTime, person));
+            ((NetworkRoute) TripStructureUtils.getLegs(trip).get(0).getRoute())
+                .setVehicleId(newVehicleId);
+            return trip;
+          }
+        };
+    com.google.inject.Injector injector =
+        Injector.createInjector(
+            scenario.getConfig(),
+            new AbstractModule() {
+              @Override
+              public void install() {
+                install(new ScenarioByInstanceModule(scenario));
+                install(
+                    AbstractModule.override(
+                        Arrays.asList(new TripRouterModule()),
+                        new AbstractModule() {
+                          @Override
+                          public void install() {
+                            addTravelTimeBinding("car")
+                                .toInstance(new FreespeedTravelTimeAndDisutility(config.scoring()));
+                            addTravelDisutilityFactoryBinding("car")
+                                .toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+                            addRoutingModuleBinding("car").toInstance(routingModule);
+                          }
+                        }));
+              }
+            });
+    TripRouter tripRouter = injector.getInstance(TripRouter.class);
+
+    PlanRouter testee = new PlanRouter(tripRouter, TimeInterpretation.create(config));
+    testee.run(plan);
+    if (config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none)) {
+      Assert.assertEquals(
+          "Vehicle Id from TripRouter used",
+          newVehicleId,
+          ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).getVehicleId());
+    } else {
+      Assert.assertEquals(
+          "Vehicle Id from TripRouter used",
+          newVehicleId,
+          ((NetworkRoute) TripStructureUtils.getLegs(plan).get(1).getRoute()).getVehicleId());
+      // yy I changed get(0) to get(1) since in the input file there is no intervening walk leg, but
+      // in the output there is. kai, feb'16
+    }
+  }
 }

@@ -34,25 +34,26 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author Michal Maciejewski (michalm)
  */
 public class TaxiControlerCreator {
-	/**
-	 * Creates a controller in one step.
-	 *
-	 * @param config
-	 * @param otfvis
-	 * @return
-	 */
-	public static Controler createControler(Config config, boolean otfvis) {
-		Scenario scenario = createScenarioWithDrtRouteFactory(config);
-		ScenarioUtils.loadScenario(scenario);
+  /**
+   * Creates a controller in one step.
+   *
+   * @param config
+   * @param otfvis
+   * @return
+   */
+  public static Controler createControler(Config config, boolean otfvis) {
+    Scenario scenario = createScenarioWithDrtRouteFactory(config);
+    ScenarioUtils.loadScenario(scenario);
 
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new MultiModeTaxiModule());
-		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(MultiModeTaxiConfigGroup.get(config)));
+    Controler controler = new Controler(scenario);
+    controler.addOverridingModule(new DvrpModule());
+    controler.addOverridingModule(new MultiModeTaxiModule());
+    controler.configureQSimComponents(
+        DvrpQSimComponents.activateAllModes(MultiModeTaxiConfigGroup.get(config)));
 
-		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule());
-		}
-		return controler;
-	}
+    if (otfvis) {
+      controler.addOverridingModule(new OTFVisLiveModule());
+    }
+    return controler;
+  }
 }

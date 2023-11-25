@@ -23,76 +23,74 @@ package org.matsim.matrices;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 public class MatricesWriter extends MatsimXmlWriter implements MatsimWriter {
 
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // member variables
+  //////////////////////////////////////////////////////////////////////
 
-	private MatricesWriterHandler handler = null;
-	private final Matrices matrices;
-	private String dtd;
+  private MatricesWriterHandler handler = null;
+  private final Matrices matrices;
+  private String dtd;
 
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // constructors
+  //////////////////////////////////////////////////////////////////////
 
-	public MatricesWriter(final Matrices matrices) {
-		super();
-		this.matrices = matrices;
-		// always write out in newest version, currently v1
-		this.dtd = "http://matsim.org/files/dtd/matrices_v1.dtd";
-		this.handler = new MatricesWriterHandlerImplV1();
-	}
+  public MatricesWriter(final Matrices matrices) {
+    super();
+    this.matrices = matrices;
+    // always write out in newest version, currently v1
+    this.dtd = "http://matsim.org/files/dtd/matrices_v1.dtd";
+    this.handler = new MatricesWriterHandlerImplV1();
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// write methods
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // write methods
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public final void write(final String filename) {
-		try {
-			openFile(filename);
-			writeXmlHead();
-			writeDoctype("matrices", this.dtd);
-			this.handler.startMatrices(this.matrices, this.writer);
-			this.handler.writeSeparator(this.writer);
-			Iterator<Matrix> m_it = this.matrices.getMatrices().values().iterator();
-			while (m_it.hasNext()) {
-				Matrix m = m_it.next();
-				this.handler.startMatrix(m, this.writer);
-				Iterator<ArrayList<Entry>> eal_it = m.getFromLocations().values().iterator();
-				while (eal_it.hasNext()) {
-					ArrayList<Entry> eal = eal_it.next();
-					Iterator<Entry> e_it = eal.iterator();
-					while (e_it.hasNext()) {
-						Entry e = e_it.next();
-						this.handler.startEntry(e, this.writer);
-						this.handler.endEntry(this.writer);
-					}
-				}
-				this.handler.endMatrix(this.writer);
-				this.handler.writeSeparator(this.writer);
-				this.writer.flush();
-			}
-			this.handler.endMatrices(this.writer);
-			close();
-		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+  @Override
+  public final void write(final String filename) {
+    try {
+      openFile(filename);
+      writeXmlHead();
+      writeDoctype("matrices", this.dtd);
+      this.handler.startMatrices(this.matrices, this.writer);
+      this.handler.writeSeparator(this.writer);
+      Iterator<Matrix> m_it = this.matrices.getMatrices().values().iterator();
+      while (m_it.hasNext()) {
+        Matrix m = m_it.next();
+        this.handler.startMatrix(m, this.writer);
+        Iterator<ArrayList<Entry>> eal_it = m.getFromLocations().values().iterator();
+        while (eal_it.hasNext()) {
+          ArrayList<Entry> eal = eal_it.next();
+          Iterator<Entry> e_it = eal.iterator();
+          while (e_it.hasNext()) {
+            Entry e = e_it.next();
+            this.handler.startEntry(e, this.writer);
+            this.handler.endEntry(this.writer);
+          }
+        }
+        this.handler.endMatrix(this.writer);
+        this.handler.writeSeparator(this.writer);
+        this.writer.flush();
+      }
+      this.handler.endMatrices(this.writer);
+      close();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// print methods
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // print methods
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public final String toString() {
-		return super.toString();
-	}
+  @Override
+  public final String toString() {
+    return super.toString();
+  }
 }

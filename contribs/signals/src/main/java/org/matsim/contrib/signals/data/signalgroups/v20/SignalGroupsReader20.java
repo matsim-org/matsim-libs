@@ -19,17 +19,15 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data.signalgroups.v20;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
-
 import javax.xml.XMLConstants;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
@@ -49,57 +47,63 @@ import org.xml.sax.SAXException;
  */
 public final class SignalGroupsReader20 implements MatsimReader {
 
-	private SignalGroupsData signalGroupsData;
-	private SignalGroupsDataFactory factory;
+  private SignalGroupsData signalGroupsData;
+  private SignalGroupsDataFactory factory;
 
-	public SignalGroupsReader20(SignalGroupsData signalGroupsData) {
-		this.signalGroupsData = signalGroupsData;
-		this.factory = signalGroupsData.getFactory();
-	}
+  public SignalGroupsReader20(SignalGroupsData signalGroupsData) {
+    this.signalGroupsData = signalGroupsData;
+    this.factory = signalGroupsData.getFactory();
+  }
 
-	@Override
-	public void readURL( URL url ) {
-		throw new RuntimeException( "not implemented; please try to use AbstractSignalsReader when doing that" ) ;
-	}
+  @Override
+  public void readURL(URL url) {
+    throw new RuntimeException(
+        "not implemented; please try to use AbstractSignalsReader when doing that");
+  }
 
-	@Override
-	public void readFile(String filename) {
-		XMLSignalGroups xmlsgdefs = readXmlSignalGroups(filename);
-		fillStuff(xmlsgdefs);
-	}
+  @Override
+  public void readFile(String filename) {
+    XMLSignalGroups xmlsgdefs = readXmlSignalGroups(filename);
+    fillStuff(xmlsgdefs);
+  }
 
-	public void readStream(InputStream stream) {
-		XMLSignalGroups xmlsgdefs = readXmlSignalGroups( new InputSource( stream ) ) ;
-		fillStuff(xmlsgdefs);
-	}
+  public void readStream(InputStream stream) {
+    XMLSignalGroups xmlsgdefs = readXmlSignalGroups(new InputSource(stream));
+    fillStuff(xmlsgdefs);
+  }
 
-	private void fillStuff(XMLSignalGroups xmlsgdefs) {
-		for (XMLSignalSystemSignalGroupType xsssgt : xmlsgdefs.getSignalSystem()) {
-			// SigSys
-			for (XMLSignalGroupType xsgt : xsssgt.getSignalGroup()) {
-				SignalGroupData sgd = factory.createSignalGroupData(Id.create(xsssgt.getRefId(), SignalSystem.class), Id.create(xsgt.getId(), SignalGroup.class));
+  private void fillStuff(XMLSignalGroups xmlsgdefs) {
+    for (XMLSignalSystemSignalGroupType xsssgt : xmlsgdefs.getSignalSystem()) {
+      // SigSys
+      for (XMLSignalGroupType xsgt : xsssgt.getSignalGroup()) {
+        SignalGroupData sgd =
+            factory.createSignalGroupData(
+                Id.create(xsssgt.getRefId(), SignalSystem.class),
+                Id.create(xsgt.getId(), SignalGroup.class));
 
-				for (XMLIdRefType id : xsgt.getSignal()) {
-					sgd.addSignalId(Id.create(id.getRefId(), Signal.class));
-				}
-				signalGroupsData.addSignalGroupData(sgd);
-			}
-		}
-	}
+        for (XMLIdRefType id : xsgt.getSignal()) {
+          sgd.addSignalId(Id.create(id.getRefId(), Signal.class));
+        }
+        signalGroupsData.addSignalGroupData(sgd);
+      }
+    }
+  }
 
-	private XMLSignalGroups readXmlSignalGroups(String filename) {
-		return readXmlSignalGroups( new InputSource( IOUtils.getInputStream(IOUtils.resolveFileOrResource(filename)) ) ) ;
-	}
+  private XMLSignalGroups readXmlSignalGroups(String filename) {
+    return readXmlSignalGroups(
+        new InputSource(IOUtils.getInputStream(IOUtils.resolveFileOrResource(filename))));
+  }
 
-	private XMLSignalGroups readXmlSignalGroups( InputSource stream ) {
-		try {
-			JAXBContext jc = JAXBContext.newInstance(org.matsim.jaxb.signalgroups20.ObjectFactory.class);
-			Unmarshaller u = jc.createUnmarshaller();
-			u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/signalGroups_v2.0.xsd")));
-			return (XMLSignalGroups) u.unmarshal(stream);
-		} catch (SAXException | JAXBException e) {
-			throw new UncheckedIOException(new IOException(e));
-		}
-	}
-
+  private XMLSignalGroups readXmlSignalGroups(InputSource stream) {
+    try {
+      JAXBContext jc = JAXBContext.newInstance(org.matsim.jaxb.signalgroups20.ObjectFactory.class);
+      Unmarshaller u = jc.createUnmarshaller();
+      u.setSchema(
+          SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+              .newSchema(getClass().getResource("/dtd/signalGroups_v2.0.xsd")));
+      return (XMLSignalGroups) u.unmarshal(stream);
+    } catch (SAXException | JAXBException e) {
+      throw new UncheckedIOException(new IOException(e));
+    }
+  }
 }

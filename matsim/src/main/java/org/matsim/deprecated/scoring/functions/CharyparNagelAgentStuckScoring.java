@@ -25,50 +25,49 @@ import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.AgentStuckScorin
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
 
 /**
- * This is a re-implementation of the original CharyparNagel function, based on a
- * modular approach.
+ * This is a re-implementation of the original CharyparNagel function, based on a modular approach.
+ *
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant should be used.  kai, aug'18
+@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant
+// should be used.  kai, aug'18
 public class CharyparNagelAgentStuckScoring implements AgentStuckScoring, BasicScoring {
 
-	protected double score;
+  protected double score;
 
-	private static final double INITIAL_SCORE = 0.0;
+  private static final double INITIAL_SCORE = 0.0;
 
-	/** The parameters used for scoring */
-	protected final ScoringParameters params;
-	
-	@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant should be used.  kai, aug'18
-	public CharyparNagelAgentStuckScoring(final ScoringParameters params) {
-		this.params = params;
-		this.reset();
-	}
+  /** The parameters used for scoring */
+  protected final ScoringParameters params;
 
-	@Override
-	public void reset() {
-		this.score = INITIAL_SCORE;
-	}
+  @Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant
+  // should be used.  kai, aug'18
+  public CharyparNagelAgentStuckScoring(final ScoringParameters params) {
+    this.params = params;
+    this.reset();
+  }
 
-	@Override
-	public void agentStuck(final double time) {
+  @Override
+  public void reset() {
+    this.score = INITIAL_SCORE;
+  }
 
-		this.score += getStuckPenalty();
-	}
+  @Override
+  public void agentStuck(final double time) {
 
-	@Override
-	public void finish() {
+    this.score += getStuckPenalty();
+  }
 
-	}
+  @Override
+  public void finish() {}
 
-	@Override
-	public double getScore() {
-		return this.score;
-	}
+  @Override
+  public double getScore() {
+    return this.score;
+  }
 
-	private double getStuckPenalty() {
-		return this.params.abortedPlanScore;
-	}
-
+  private double getStuckPenalty() {
+    return this.params.abortedPlanScore;
+  }
 }

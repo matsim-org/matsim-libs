@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -40,116 +39,109 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.scenario.ScenarioUtils;
-
 import org.matsim.contrib.socnetsim.framework.cliques.config.JointTripInsertorConfigGroup;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkImpl;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author thibautd
  */
 public class JointTripInsertionWithSocialNetworkTest {
-	private static final Logger log =
-		LogManager.getLogger(JointTripInsertionWithSocialNetworkTest.class);
+  private static final Logger log =
+      LogManager.getLogger(JointTripInsertionWithSocialNetworkTest.class);
 
-	@Test
-	public void testJointTripsGeneratedOnlyAlongSocialTies() {
-		final Random random = new Random( 123 );
+  @Test
+  public void testJointTripsGeneratedOnlyAlongSocialTies() {
+    final Random random = new Random(123);
 
-		for ( int i=0; i < 10; i++ ) {
-			final Scenario scenario = generateScenario();
+    for (int i = 0; i < 10; i++) {
+      final Scenario scenario = generateScenario();
 
-			final SocialNetwork sn =
-					(SocialNetwork) scenario.getScenarioElement(
-							SocialNetwork.ELEMENT_NAME );
-			final JointTripInsertorAlgorithm algo =
-				new JointTripInsertorAlgorithm(
-						random,
-						sn,
-						new JointTripInsertorConfigGroup(),
-//						new TripRouter() );
-//						new TripRouter.Builder( scenario.getConfig() ).build() ) ;
-//						  new MainModeIdentifierImpl() // yyyyyy ????
-							  TripStructureUtils.getRoutingModeIdentifier() // yyyyyy ??????
-						) ;
+      final SocialNetwork sn =
+          (SocialNetwork) scenario.getScenarioElement(SocialNetwork.ELEMENT_NAME);
+      final JointTripInsertorAlgorithm algo =
+          new JointTripInsertorAlgorithm(
+              random,
+              sn,
+              new JointTripInsertorConfigGroup(),
+              //						new TripRouter() );
+              //						new TripRouter.Builder( scenario.getConfig() ).build() ) ;
+              //						  new MainModeIdentifierImpl() // yyyyyy ????
+              TripStructureUtils.getRoutingModeIdentifier() // yyyyyy ??????
+              );
 
-			final JointPlan jp = groupAllPlansInJointPlan( scenario.getPopulation() );
+      final JointPlan jp = groupAllPlansInJointPlan(scenario.getPopulation());
 
+      final Set<Id<Person>> agentsToIgnore = new HashSet<>();
+      while (true) {
+        final ActedUponInformation actedUpon = algo.run(jp, agentsToIgnore);
 
-			final Set<Id<Person>> agentsToIgnore = new HashSet< >();
-			while ( true ) {
-				final ActedUponInformation actedUpon =
-							algo.run( jp , agentsToIgnore );
+        if (actedUpon == null) break;
+        agentsToIgnore.add(actedUpon.getDriverId());
+        agentsToIgnore.add(actedUpon.getPassengerId());
 
-				if (actedUpon == null) break;
-				agentsToIgnore.add( actedUpon.getDriverId() );
-				agentsToIgnore.add( actedUpon.getPassengerId() );
+        Assert.assertTrue(
+            "passenger not alter of driver!",
+            sn.getAlters(actedUpon.getDriverId()).contains(actedUpon.getPassengerId()));
+      }
 
-				Assert.assertTrue(
-						"passenger not alter of driver!",
-						sn.getAlters( actedUpon.getDriverId() ).contains( actedUpon.getPassengerId() ) );
-			}
+      log.info("there were " + agentsToIgnore.size() + " agents handled");
+    }
+  }
 
-			log.info( "there were "+agentsToIgnore.size()+" agents handled" );
-		}
-	}
+  private JointPlan groupAllPlansInJointPlan(final Population population) {
+    final Map<Id<Person>, Plan> plans = new HashMap<>();
 
-	private JointPlan groupAllPlansInJointPlan(final Population population) {
-		final Map<Id<Person>, Plan> plans = new HashMap< >();
+    for (Person person : population.getPersons().values()) {
+      plans.put(person.getId(), person.getSelectedPlan());
+    }
 
-		for ( Person person : population.getPersons().values() ) {
-			plans.put(
-					person.getId(),
-					person.getSelectedPlan() );
-		}
+    return new JointPlanFactory().createJointPlan(plans);
+  }
 
-		return new JointPlanFactory().createJointPlan( plans );
-	}
+  private Scenario generateScenario() {
+    final Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-	private Scenario generateScenario() {
-		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+    final Population population = sc.getPopulation();
+    final PopulationFactory factory = population.getFactory();
 
-		final Population population = sc.getPopulation();
-		final PopulationFactory factory = population.getFactory();
+    final Coord coordHome = new Coord((double) 0, (double) 0);
+    final Id linkHome = Id.create("link", Link.class);
+    final int nAgents = 100;
+    for (int i = 0; i < nAgents; i++) {
+      final Person person = factory.createPerson(Id.create(i, Person.class));
+      final Plan plan = factory.createPlan();
 
-		final Coord coordHome = new Coord((double) 0, (double) 0);
-		final Id linkHome = Id.create( "link" , Link.class );
-		final int nAgents = 100;
-		for ( int i = 0; i < nAgents; i++ ) {
-			final Person person = factory.createPerson( Id.create( i , Person.class ) );
-			final Plan plan = factory.createPlan();
+      final Activity firstAct = (Activity) factory.createActivityFromCoord("h", coordHome);
+      firstAct.setEndTime(10);
+      firstAct.setLinkId(linkHome);
+      plan.addActivity(firstAct);
 
-			final Activity firstAct = (Activity) factory.createActivityFromCoord( "h" , coordHome );
-			firstAct.setEndTime( 10 );
-			firstAct.setLinkId( linkHome );
-			plan.addActivity( firstAct );
+      final Leg leg = factory.createLeg(i % 2 == 0 ? TransportMode.car : TransportMode.pt);
+      TripStructureUtils.setRoutingMode(leg, leg.getMode());
+      plan.addLeg(leg);
 
-			final Leg leg = factory.createLeg( i % 2 == 0 ? TransportMode.car : TransportMode.pt );
-			TripStructureUtils.setRoutingMode( leg, leg.getMode() );
-			plan.addLeg( leg );
+      final Activity secondAct = (Activity) factory.createActivityFromCoord("h", coordHome);
+      secondAct.setLinkId(linkHome);
+      plan.addActivity(secondAct);
 
-			final Activity secondAct = (Activity) factory.createActivityFromCoord( "h" , coordHome );
-			secondAct.setLinkId( linkHome );
-			plan.addActivity( secondAct );
+      person.addPlan(plan);
+      population.addPerson(person);
+    }
 
-			person.addPlan( plan );
-			population.addPerson( person );
-		}
+    final SocialNetwork sn = new SocialNetworkImpl(true);
+    sc.addScenarioElement(SocialNetwork.ELEMENT_NAME, sn);
 
-		final SocialNetwork sn = new SocialNetworkImpl( true );
-		sc.addScenarioElement( SocialNetwork.ELEMENT_NAME , sn );
+    for (int i = 0; i < nAgents; i++) sn.addEgo(Id.create(i, Person.class));
+    for (int i = 0; i < nAgents - 1; i++) {
+      sn.addBidirectionalTie(Id.create(i, Person.class), Id.create(i + 1, Person.class));
+    }
 
-		for ( int i=0; i < nAgents; i++ ) sn.addEgo( Id.create( i , Person.class ) );
-		for ( int i=0; i < nAgents - 1; i++ ) {
-			sn.addBidirectionalTie( Id.create( i , Person.class ) , Id.create( i + 1 , Person.class ) );
-		}
-
-		return sc;
-	}
+    return sc;
+  }
 }
-

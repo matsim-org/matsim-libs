@@ -19,28 +19,27 @@
  * *********************************************************************** */
 package ch.sbb.matsim.routing.pt.raptor;
 
+import jakarta.inject.Inject;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 
-import jakarta.inject.Inject;
-
 /**
- * A default implementation of {@link RaptorParametersForPerson} returning the
- * same parameters for every person.
+ * A default implementation of {@link RaptorParametersForPerson} returning the same parameters for
+ * every person.
  *
  * @author mrieser / SBB
  */
 public class DefaultRaptorParametersForPerson implements RaptorParametersForPerson {
 
-    private final RaptorParameters defaultParameters;
+  private final RaptorParameters defaultParameters;
 
-    @Inject
-    public DefaultRaptorParametersForPerson(Config config) {
-        this.defaultParameters = RaptorUtils.createParameters(config);
-    }
+  @Inject
+  public DefaultRaptorParametersForPerson(Config config) {
+    this.defaultParameters = RaptorUtils.createParameters(config);
+  }
 
-    @Override
-    public RaptorParameters getRaptorParameters(Person person) {
-        return this.defaultParameters;
-    }
+  @Override
+  public RaptorParameters getRaptorParameters(Person person) {
+    return this.defaultParameters;
+  }
 }

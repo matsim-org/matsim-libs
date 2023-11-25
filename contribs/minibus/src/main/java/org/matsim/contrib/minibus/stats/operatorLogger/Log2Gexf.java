@@ -19,40 +19,37 @@
 
 package org.matsim.contrib.minibus.stats.operatorLogger;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * 
  * Converts a pLogger file into gexf format
- * 
- * @author aneumann
  *
+ * @author aneumann
  */
 final class Log2Gexf {
 
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(Log2Gexf.class);
-	
-	private static void convertLog2Gexf(String inputFile, String outputFile) {
-		ArrayList<LogElement> logElements = LogReader.readFile(inputFile);
-		List<PlanElement> planElements = LogElement2PlanElement.logElement2PlanElement(logElements);
-		planElements = PlanElementLinkParent.linkParentPlansToGivenPlanElements(planElements);
-		PlanElement2Gexf.planElement2Gexf(planElements, outputFile);
-	}
-	
-	public static void main(String[] args) {
-		for (String inputFile : args) {
-			String outputFile;
-			
-			outputFile = inputFile.replace(".txt", ".gexf.gz");
-			Log2Gexf.convertLog2Gexf(inputFile, outputFile);
-			
-			outputFile = inputFile.replace(".txt", ".tex");
-			Log2Tex.convertLog2Tex(inputFile, outputFile);
-		}
-	}
+  @SuppressWarnings("unused")
+  private static final Logger log = LogManager.getLogger(Log2Gexf.class);
+
+  private static void convertLog2Gexf(String inputFile, String outputFile) {
+    ArrayList<LogElement> logElements = LogReader.readFile(inputFile);
+    List<PlanElement> planElements = LogElement2PlanElement.logElement2PlanElement(logElements);
+    planElements = PlanElementLinkParent.linkParentPlansToGivenPlanElements(planElements);
+    PlanElement2Gexf.planElement2Gexf(planElements, outputFile);
+  }
+
+  public static void main(String[] args) {
+    for (String inputFile : args) {
+      String outputFile;
+
+      outputFile = inputFile.replace(".txt", ".gexf.gz");
+      Log2Gexf.convertLog2Gexf(inputFile, outputFile);
+
+      outputFile = inputFile.replace(".txt", ".tex");
+      Log2Tex.convertLog2Tex(inputFile, outputFile);
+    }
+  }
 }

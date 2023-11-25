@@ -21,7 +21,6 @@
 package org.matsim.contrib.dvrp.passenger;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -33,91 +32,99 @@ import org.matsim.facilities.Facility;
  * @author Michal Maciejewski (michalm)
  */
 class DvrpTripInfo implements TripInfoWithRequiredBooking {
-	private final String mode;
-	private final Link pickupLink;
-	private final Link dropoffLink;
-	private final double departureTime;
-	private final double timeStamp;
-	private final Request originalRequest;
-	private final Provider provider;
+  private final String mode;
+  private final Link pickupLink;
+  private final Link dropoffLink;
+  private final double departureTime;
+  private final double timeStamp;
+  private final Request originalRequest;
+  private final Provider provider;
 
-	DvrpTripInfo( String mode, Link pickupLink, Link dropoffLink, double departureTime, double timeStamp,
-		      Request originalRequest, Provider provider ) {
-		this.mode = mode;
-		this.pickupLink = pickupLink;
-		this.dropoffLink = dropoffLink;
-		this.departureTime = departureTime;
-		this.timeStamp = timeStamp;
-		this.originalRequest = originalRequest ;
-		this.provider = provider;
-	}
+  DvrpTripInfo(
+      String mode,
+      Link pickupLink,
+      Link dropoffLink,
+      double departureTime,
+      double timeStamp,
+      Request originalRequest,
+      Provider provider) {
+    this.mode = mode;
+    this.pickupLink = pickupLink;
+    this.dropoffLink = dropoffLink;
+    this.departureTime = departureTime;
+    this.timeStamp = timeStamp;
+    this.originalRequest = originalRequest;
+    this.provider = provider;
+  }
 
-	@Override
-	public Facility getPickupLocation() {
-		return createAdHocFacility(pickupLink);
-	}
+  @Override
+  public Facility getPickupLocation() {
+    return createAdHocFacility(pickupLink);
+  }
 
-	@Override
-	public double getExpectedBoardingTime() {
-		return departureTime;
-	}
+  @Override
+  public double getExpectedBoardingTime() {
+    return departureTime;
+  }
 
-	@Override
-	public Facility getDropoffLocation() {
-		return createAdHocFacility(dropoffLink);
-	}
+  @Override
+  public Facility getDropoffLocation() {
+    return createAdHocFacility(dropoffLink);
+  }
 
-	@Override
-	public double getExpectedTravelTime() {
-		throw new RuntimeException("not implemented");
-	}
+  @Override
+  public double getExpectedTravelTime() {
+    throw new RuntimeException("not implemented");
+  }
 
-	@Override
-	public double getMonetaryPrice() {
-		throw new RuntimeException("not implemented");
-	}
+  @Override
+  public double getMonetaryPrice() {
+    throw new RuntimeException("not implemented");
+  }
 
-	@Override
-	public Map<String, String> getAdditionalAttributes() {
-		return null;
-	}
+  @Override
+  public Map<String, String> getAdditionalAttributes() {
+    return null;
+  }
 
-	@Override
-	public String getMode() {
-		return mode;
-	}
+  @Override
+  public String getMode() {
+    return mode;
+  }
 
-	@Override
-	public double getLatestDecisionTime() {
-		// we currently allow only one time step to make the decision:
-		return timeStamp + 1;
-	}
+  @Override
+  public double getLatestDecisionTime() {
+    // we currently allow only one time step to make the decision:
+    return timeStamp + 1;
+  }
 
-	private static Facility createAdHocFacility(Link link) {
-		return new Facility() {
-			@Override
-			public Map<String, Object> getCustomAttributes() {
-				throw new RuntimeException("not implemented");
-			}
+  private static Facility createAdHocFacility(Link link) {
+    return new Facility() {
+      @Override
+      public Map<String, Object> getCustomAttributes() {
+        throw new RuntimeException("not implemented");
+      }
 
-			@Override
-			public Coord getCoord() {
-//				throw new RuntimeException("not implemented");
-				return null ;
-			}
+      @Override
+      public Coord getCoord() {
+        //				throw new RuntimeException("not implemented");
+        return null;
+      }
 
-			@Override
-			public Id<Link> getLinkId() {
-				return link.getId();
-			}
-		};
-	}
+      @Override
+      public Id<Link> getLinkId() {
+        return link.getId();
+      }
+    };
+  }
 
-	@Override
-	public Request getOriginalRequest(){
-		return originalRequest;
-	}
-	@Override public void bookTrip( MobsimPassengerAgent agent ) {
-		this.provider.bookTrip( agent, this );
-	}
+  @Override
+  public Request getOriginalRequest() {
+    return originalRequest;
+  }
+
+  @Override
+  public void bookTrip(MobsimPassengerAgent agent) {
+    this.provider.bookTrip(agent, this);
+  }
 }

@@ -15,47 +15,56 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.vehicles.Vehicle;
 
 public class RouterUtils {
-	
-	public static Leg createCarLeg(PopulationFactory pf, LeastCostPathCalculator pathCalculator,
-			Person person, Link startLink, Link destinationLink, String mode, 
-			String vehicleId, double now) {
-		
-		
-		RouteFactories routeFactory = ((PopulationFactory)pf).getRouteFactories() ;
-		
-		Vehicle vehicle = null ;
-		Path path = pathCalculator.calcLeastCostPath(startLink.getToNode(), destinationLink.getFromNode(), 
-				now, person, vehicle ) ;
-		
-		NetworkRoute carRoute = routeFactory.createRoute(NetworkRoute.class, startLink.getId(), destinationLink.getId() );
-		carRoute.setLinkIds(startLink.getId(), NetworkUtils.getLinkIds( path.links), destinationLink.getId());
-		carRoute.setTravelTime( path.travelTime );		
-		
-		carRoute.setVehicleId( Id.create( (vehicleId), Vehicle.class) ) ;
 
-		Leg carLeg = pf.createLeg(mode);
-		carLeg.setTravelTime( path.travelTime );
-		carLeg.setRoute(carRoute);
-		
-		return carLeg;
-	}
+  public static Leg createCarLeg(
+      PopulationFactory pf,
+      LeastCostPathCalculator pathCalculator,
+      Person person,
+      Link startLink,
+      Link destinationLink,
+      String mode,
+      String vehicleId,
+      double now) {
 
-	public static Leg createWalkLeg(PopulationFactory pf, Link startLink, 
-			Link destinationLink, String mode, double now) {
-		
-		RouteFactories routeFactory = ((PopulationFactory)pf).getRouteFactories() ;
-		
-		Route routeWalk = routeFactory.createRoute( Route.class, startLink.getId(), destinationLink.getId() ) ; 
-		
-		double egressDist = CoordUtils.calcEuclideanDistance(startLink.getCoord(), destinationLink.getCoord()) * 1.05;
-		egressDist = egressDist > 0 ? egressDist : 1; 
-		routeWalk.setTravelTime( (egressDist / 1.38));
-		routeWalk.setDistance(egressDist);	
+    RouteFactories routeFactory = ((PopulationFactory) pf).getRouteFactories();
 
-		final Leg walkLeg = pf.createLeg( mode );
-		walkLeg.setRoute(routeWalk);
+    Vehicle vehicle = null;
+    Path path =
+        pathCalculator.calcLeastCostPath(
+            startLink.getToNode(), destinationLink.getFromNode(), now, person, vehicle);
 
-		return walkLeg;		
-	}
-	
+    NetworkRoute carRoute =
+        routeFactory.createRoute(NetworkRoute.class, startLink.getId(), destinationLink.getId());
+    carRoute.setLinkIds(
+        startLink.getId(), NetworkUtils.getLinkIds(path.links), destinationLink.getId());
+    carRoute.setTravelTime(path.travelTime);
+
+    carRoute.setVehicleId(Id.create((vehicleId), Vehicle.class));
+
+    Leg carLeg = pf.createLeg(mode);
+    carLeg.setTravelTime(path.travelTime);
+    carLeg.setRoute(carRoute);
+
+    return carLeg;
+  }
+
+  public static Leg createWalkLeg(
+      PopulationFactory pf, Link startLink, Link destinationLink, String mode, double now) {
+
+    RouteFactories routeFactory = ((PopulationFactory) pf).getRouteFactories();
+
+    Route routeWalk =
+        routeFactory.createRoute(Route.class, startLink.getId(), destinationLink.getId());
+
+    double egressDist =
+        CoordUtils.calcEuclideanDistance(startLink.getCoord(), destinationLink.getCoord()) * 1.05;
+    egressDist = egressDist > 0 ? egressDist : 1;
+    routeWalk.setTravelTime((egressDist / 1.38));
+    routeWalk.setDistance(egressDist);
+
+    final Leg walkLeg = pf.createLeg(mode);
+    walkLeg.setRoute(routeWalk);
+
+    return walkLeg;
+  }
 }

@@ -19,39 +19,38 @@
  * *********************************************************************** */
 package org.matsim.core.replanning.modules;
 
+import jakarta.inject.Provider;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 
-import jakarta.inject.Provider;
-
 /**
- * Removes trips and replaces them by legs.
- * The aim is to simplify the plan before passing it to plan algorithms
- * unable to handle multi-planElement trips.
- * The plan must be re-routed before execution!
+ * Removes trips and replaces them by legs. The aim is to simplify the plan before passing it to
+ * plan algorithms unable to handle multi-planElement trips. The plan must be re-routed before
+ * execution!
+ *
  * @author thibautd
  */
 public class TripsToLegsModule extends AbstractMultithreadedModule {
 
-	/**
-	 * @param tripRouterProvider
-	 * @param globalConfigGroup
-	 */
-	@Deprecated // tripRouterProvider element no longer necessary
-	public TripsToLegsModule(Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup) {
-		super(globalConfigGroup);
-	}
+  /**
+   * @param tripRouterProvider
+   * @param globalConfigGroup
+   */
+  @Deprecated // tripRouterProvider element no longer necessary
+  public TripsToLegsModule(
+      Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup) {
+    super(globalConfigGroup);
+  }
 
-	public TripsToLegsModule(GlobalConfigGroup globalConfigGroup) {
-		super(globalConfigGroup);
-	}
+  public TripsToLegsModule(GlobalConfigGroup globalConfigGroup) {
+    super(globalConfigGroup);
+  }
 
-	@Override
-	public PlanAlgorithm getPlanAlgoInstance() {
-		return new TripsToLegsAlgorithm( TripStructureUtils.getRoutingModeIdentifier() );
-	}
+  @Override
+  public PlanAlgorithm getPlanAlgoInstance() {
+    return new TripsToLegsAlgorithm(TripStructureUtils.getRoutingModeIdentifier());
+  }
 }
-

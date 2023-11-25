@@ -20,26 +20,23 @@
 
 package org.matsim.contrib.drt.optimizer.insertion.extensive;
 
-import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
-
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class ExtensiveInsertionSearchParams extends DrtInsertionSearchParams {
-	public static final String SET_NAME = "ExtensiveInsertionSearch";
+  public static final String SET_NAME = "ExtensiveInsertionSearch";
 
-	@Parameter
-	@PositiveOrZero
-	public int nearestInsertionsAtEndLimit = 10;
+  @Parameter @PositiveOrZero public int nearestInsertionsAtEndLimit = 10;
 
-	@Parameter
-	@DecimalMin("1.0")
-	public double admissibleBeelineSpeedFactor = 1.0;
+  @Parameter
+  @DecimalMin("1.0")
+  public double admissibleBeelineSpeedFactor = 1.0;
 
-	public ExtensiveInsertionSearchParams() {
-		super(SET_NAME);
-	}
+  public ExtensiveInsertionSearchParams() {
+    super(SET_NAME);
+  }
 }

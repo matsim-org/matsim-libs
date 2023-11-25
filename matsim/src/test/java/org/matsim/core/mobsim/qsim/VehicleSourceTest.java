@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim;
 
+import java.util.*;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,9 +38,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -53,270 +54,295 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
-import java.util.*;
-
 /**
  * A test to check the functionality of the VehicleSource.
  *
  * @author amit
  */
-
 @RunWith(Parameterized.class)
 public class VehicleSourceTest {
 
-	private final VehiclesSource vehiclesSource;
-	private final boolean usingPersonIdForMissingVehicleId;
+  private final VehiclesSource vehiclesSource;
+  private final boolean usingPersonIdForMissingVehicleId;
 
-	/**
-	 * testing if there is a meaningful error message if vehicles are _not_ added to person
-	 */
-	private final boolean providingVehiclesInPerson ;
+  /** testing if there is a meaningful error message if vehicles are _not_ added to person */
+  private final boolean providingVehiclesInPerson;
 
-	public VehicleSourceTest( VehiclesSource vehiclesSource, boolean usingPersonIdForMissingVehicleId, boolean providingVehiclesInPerson ) {
-		this.vehiclesSource = vehiclesSource;
-		this.usingPersonIdForMissingVehicleId = usingPersonIdForMissingVehicleId;
-		this.providingVehiclesInPerson = providingVehiclesInPerson;
-	}
+  public VehicleSourceTest(
+      VehiclesSource vehiclesSource,
+      boolean usingPersonIdForMissingVehicleId,
+      boolean providingVehiclesInPerson) {
+    this.vehiclesSource = vehiclesSource;
+    this.usingPersonIdForMissingVehicleId = usingPersonIdForMissingVehicleId;
+    this.providingVehiclesInPerson = providingVehiclesInPerson;
+  }
 
-	@Parameters(name = "{index}: vehicleSource == {0}; isUsingPersonIdForMissingVehicleId == {1}")
-	public static Collection<Object[]> parameterObjects () {
+  @Parameters(name = "{index}: vehicleSource == {0}; isUsingPersonIdForMissingVehicleId == {1}")
+  public static Collection<Object[]> parameterObjects() {
 
-		// create the combinations manually, since 'fromVehiclesData' in combination with 'isUsingPersonIdForMissingVehicleId' doesn't make sense
-		return Arrays.asList(
-				new Object[]{VehiclesSource.defaultVehicle, true, true},
-//				new Object[]{VehiclesSource.defaultVehicle, true, false}, // not meaningful for defaultVehicle
+    // create the combinations manually, since 'fromVehiclesData' in combination with
+    // 'isUsingPersonIdForMissingVehicleId' doesn't make sense
+    return Arrays.asList(
+        new Object[] {VehiclesSource.defaultVehicle, true, true},
+        //				new Object[]{VehiclesSource.defaultVehicle, true, false}, // not meaningful for
+        // defaultVehicle
 
-				new Object[]{VehiclesSource.defaultVehicle, false, true},
-//				new Object[]{VehiclesSource.defaultVehicle, false, false}, // not meaningful for defaultVehicle
+        new Object[] {VehiclesSource.defaultVehicle, false, true},
+        //				new Object[]{VehiclesSource.defaultVehicle, false, false}, // not meaningful for
+        // defaultVehicle
 
-				new Object[]{VehiclesSource.modeVehicleTypesFromVehiclesData, true, true},
-				new Object[]{VehiclesSource.modeVehicleTypesFromVehiclesData, true, false},
+        new Object[] {VehiclesSource.modeVehicleTypesFromVehiclesData, true, true},
+        new Object[] {VehiclesSource.modeVehicleTypesFromVehiclesData, true, false},
+        new Object[] {VehiclesSource.modeVehicleTypesFromVehiclesData, false, true},
+        new Object[] {VehiclesSource.modeVehicleTypesFromVehiclesData, false, false},
+        new Object[] {VehiclesSource.fromVehiclesData, false, true},
+        new Object[] {VehiclesSource.fromVehiclesData, false, false});
+  }
 
-				new Object[]{VehiclesSource.modeVehicleTypesFromVehiclesData, false, true },
-				new Object[]{VehiclesSource.modeVehicleTypesFromVehiclesData, false, false },
+  @Rule public MatsimTestUtils helper = new MatsimTestUtils();
+  private Scenario scenario;
+  private final String[] transportModes = new String[] {"bike", "car"};
+  private Link link1;
+  private Link link2;
+  private Link link3;
 
-				new Object[]{VehiclesSource.fromVehiclesData, false, true },
-				new Object[]{VehiclesSource.fromVehiclesData, false, false }
-		);
-	}
+  @Test
+  public void main() {
+    scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
-	private Scenario scenario ;
-	private final String[] transportModes = new String[]{"bike", "car"};
-	private Link link1;
-	private Link link2;
-	private Link link3;
+    createNetwork();
+    createPlans();
 
-	@Test
-	public void main() {
-		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    Config config = scenario.getConfig();
+    config.qsim().setFlowCapFactor(1.0);
+    config.qsim().setStorageCapFactor(1.0);
+    config.qsim().setMainModes(Arrays.asList(transportModes));
+    // config.plansCalcRoute().setNetworkModes(Arrays.asList(transportModes));
+    config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 
-		createNetwork();
-		createPlans();
+    config.qsim().setVehiclesSource(this.vehiclesSource);
+    config.qsim().setUsePersonIdForMissingVehicleId(this.usingPersonIdForMissingVehicleId);
 
-		Config config = scenario.getConfig();
-		config.qsim().setFlowCapFactor(1.0);
-		config.qsim().setStorageCapFactor(1.0);
-		config.qsim().setMainModes(Arrays.asList(transportModes));
-		//config.plansCalcRoute().setNetworkModes(Arrays.asList(transportModes));
-		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
+    config.controller().setOutputDirectory(helper.getOutputDirectory());
+    config.controller().setLastIteration(0);
+    config.controller().setWriteEventsInterval(1);
+    config.controller().setCreateGraphs(false);
+    config.controller().setDumpDataAtEnd(false);
 
-		config.qsim().setVehiclesSource(this.vehiclesSource );
-		config.qsim().setUsePersonIdForMissingVehicleId(this.usingPersonIdForMissingVehicleId );
+    config.scoring().addActivityParams(new ActivityParams("h").setTypicalDuration(1. * 3600.));
+    config.scoring().addActivityParams(new ActivityParams("w").setTypicalDuration(1. * 3600.));
 
-		config.controller().setOutputDirectory(helper.getOutputDirectory());
-		config.controller().setLastIteration(0);
-		config.controller().setWriteEventsInterval(1);
-		config.controller().setCreateGraphs(false);
-		config.controller().setDumpDataAtEnd(false);
+    final Controler cont = new Controler(scenario);
+    cont.getConfig()
+        .controller()
+        .setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		config.scoring().addActivityParams( new ActivityParams("h").setTypicalDuration(1. * 3600. ) );
-		config.scoring().addActivityParams( new ActivityParams("w").setTypicalDuration(1. * 3600. ) );
+    Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleLinkTravelTimes = new HashMap<>();
+    final VehicleLinkTravelTimeEventHandler handler =
+        new VehicleLinkTravelTimeEventHandler(vehicleLinkTravelTimes);
 
-		final Controler cont = new Controler(scenario);
-		cont.getConfig().controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+    cont.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            this.addEventHandlerBinding().toInstance(handler);
+          }
+        });
 
-		Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleLinkTravelTimes = new HashMap<>();
-		final VehicleLinkTravelTimeEventHandler handler = new VehicleLinkTravelTimeEventHandler(vehicleLinkTravelTimes);
+    boolean expectedException = false;
+    try {
+      cont.run();
+    } catch (Exception ee) {
+      if (providingVehiclesInPerson) {
+        throw ee;
+      } else {
+        // (expected exception)
+        System.err.println();
+        System.err.println("The following is an expected exception:");
+        System.err.println();
+        System.err.println(ee.getMessage());
+        System.err.println();
+        System.err.println("(The above was an expected exception.)");
+        System.err.println();
+        expectedException = true;
+      }
+    }
+    if (providingVehiclesInPerson) {
+      Assert.assertFalse(expectedException);
+    } else {
+      Assert.assertTrue(expectedException);
+      return;
+    }
 
-		cont.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				this.addEventHandlerBinding().toInstance(handler);
-			}
-		});
+    // usually all vehicles will have an id of the form personId_mode. If person id for missing
+    // vehicle id is used
+    // the vehicle for mode car will have an id equal to the driver's id. All other modes will
+    // receive the normal ids
+    Id<Vehicle> carId;
+    if (usingPersonIdForMissingVehicleId) {
+      carId = Id.createVehicleId("1");
+    } else {
+      carId = Id.createVehicleId("1_car");
+    }
 
-		boolean expectedException = false ;
-		try{
-			cont.run();
-		} catch ( Exception ee ) {
-			if ( providingVehiclesInPerson ){
-				throw ee;
-			} else {
-				// (expected exception)
-				System.err.println();
-				System.err.println("The following is an expected exception:");
-				System.err.println();
-				System.err.println(ee.getMessage());
-				System.err.println();
-				System.err.println("(The above was an expected exception.)");
-				System.err.println();
-				expectedException = true;
-			}
-		}
-		if ( providingVehiclesInPerson ) {
-			Assert.assertFalse( expectedException );
-		} else {
-			Assert.assertTrue( expectedException );
-			return ;
-		}
+    Map<Id<Link>, Double> travelTime1 =
+        vehicleLinkTravelTimes.get(Id.create("0_bike", Vehicle.class));
+    Map<Id<Link>, Double> travelTime2 = vehicleLinkTravelTimes.get(carId);
 
+    int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue();
+    int carTravelTime = travelTime2.get(Id.create("2", Link.class)).intValue();
 
-		// usually all vehicles will have an id of the form personId_mode. If person id for missing vehicle id is used
-		// the vehicle for mode car will have an id equal to the driver's id. All other modes will receive the normal ids
-		Id<Vehicle> carId;
-		if ( usingPersonIdForMissingVehicleId ) {
-			carId = Id.createVehicleId("1");
-		} else {
-			carId = Id.createVehicleId("1_car");
-		}
+    switch (this.vehiclesSource) {
+      case defaultVehicle: // both bike and car are default vehicles (i.e. identical)
+        Assert.assertEquals(
+            "Both car, bike are default vehicles (i.e. identical), thus should have same travel time.",
+            0,
+            bikeTravelTime - carTravelTime,
+            MatsimTestUtils.EPSILON);
+        break;
+      case modeVehicleTypesFromVehiclesData:
+      case fromVehiclesData:
+        Assert.assertEquals(
+            "Passing is not executed.",
+            150,
+            bikeTravelTime - carTravelTime,
+            MatsimTestUtils.EPSILON);
+        break;
+      default:
+        throw new RuntimeException("not implemented yet.");
+    }
+  }
 
-		Map<Id<Link>, Double> travelTime1 = vehicleLinkTravelTimes.get(Id.create("0_bike", Vehicle.class));
-		Map<Id<Link>, Double> travelTime2 = vehicleLinkTravelTimes.get(carId);
+  private void createNetwork() {
+    Network network = scenario.getNetwork();
 
-		int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue();
-		int carTravelTime = travelTime2.get(Id.create("2", Link.class)).intValue();
+    Node node1 =
+        NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(-100.0, 0.0));
+    Node node2 =
+        NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord(0.0, 0.0));
+    Node node3 =
+        NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord(0.0, 1000.0));
+    Node node4 =
+        NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord(0.0, 1100.0));
 
-		switch (this.vehiclesSource ) {
-			case defaultVehicle: // both bike and car are default vehicles (i.e. identical)
-				Assert.assertEquals("Both car, bike are default vehicles (i.e. identical), thus should have same travel time.",
-						0, bikeTravelTime - carTravelTime, MatsimTestUtils.EPSILON);
-				break;
-			case modeVehicleTypesFromVehiclesData:
-			case fromVehiclesData:
-				Assert.assertEquals("Passing is not executed.", 150, bikeTravelTime - carTravelTime, MatsimTestUtils.EPSILON);
-				break;
-			default:
-				throw new RuntimeException("not implemented yet.");
-		}
+    link1 =
+        NetworkUtils.createAndAddLink(
+            network, Id.create("1", Link.class), node1, node2, 100, 25, 600, 1, null, "22");
+    link2 =
+        NetworkUtils.createAndAddLink(
+            network, Id.create("2", Link.class), node2, node3, 1000, 25, 600, 1, null, "22");
+    link3 =
+        NetworkUtils.createAndAddLink(
+            network, Id.create("3", Link.class), node3, node4, 100, 25, 600, 1, null, "22");
+  }
 
-	}
+  private void createPlans() {
 
-	private void createNetwork(){
-		Network network = scenario.getNetwork();
+    Population population = scenario.getPopulation();
+    VehiclesFactory vehiclesFactory = scenario.getVehicles().getFactory();
 
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord( -100.0, 0.0) );
-		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord(0.0, 0.0));
-		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord(0.0, 1000.0));
-		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord(0.0, 1100.0));
+    VehicleType bike =
+        vehiclesFactory.createVehicleType(Id.create(transportModes[0], VehicleType.class));
+    bike.setMaximumVelocity(5);
+    bike.setPcuEquivalents(0.25);
 
-		link1 = NetworkUtils.createAndAddLink(network, Id.create("1", Link.class), node1, node2, 100, 25, 600, 1, null, "22");
-		link2 = NetworkUtils.createAndAddLink(network, Id.create("2", Link.class), node2, node3, 1000, 25, 600, 1, null, "22");
-		link3 = NetworkUtils.createAndAddLink(network, Id.create("3", Link.class), node3, node4, 100, 25, 600, 1, null, "22");
-	}
+    VehicleType car =
+        vehiclesFactory.createVehicleType(Id.create(transportModes[1], VehicleType.class));
+    car.setMaximumVelocity(20);
+    car.setPcuEquivalents(1.0);
 
-	private void createPlans(){
+    VehicleType[] vehTypes = {bike, car};
 
-		Population population = scenario.getPopulation();
-		VehiclesFactory vehiclesFactory = scenario.getVehicles().getFactory();
+    for (int i = 0; i < 2; i++) {
+      Id<Person> id = Id.create(i, Person.class);
+      Person p = population.getFactory().createPerson(id);
+      Plan plan = population.getFactory().createPlan();
+      p.addPlan(plan);
+      {
+        Activity a1 = population.getFactory().createActivityFromLinkId("h", link1.getId());
+        a1.setEndTime(8 * 3600 + i * 5);
+        plan.addActivity(a1);
+      }
+      {
+        Leg leg = population.getFactory().createLeg(transportModes[i]);
+        plan.addLeg(leg);
+        LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
+        NetworkRoute route = (NetworkRoute) factory.createRoute(link1.getId(), link3.getId());
+        route.setLinkIds(link1.getId(), Collections.singletonList(link2.getId()), link3.getId());
+        leg.setRoute(route);
+      }
+      {
+        Activity a2 = population.getFactory().createActivityFromLinkId("w", link3.getId());
+        plan.addActivity(a2);
+        population.addPerson(p);
+      }
 
-		VehicleType bike = vehiclesFactory.createVehicleType(Id.create(transportModes[0], VehicleType.class));
-		bike.setMaximumVelocity(5);
-		bike.setPcuEquivalents(0.25);
+      if (!providingVehiclesInPerson) {
+        // i.e. testing what happens if the vehicles are not added into the person
+        return;
+      }
 
-		VehicleType car = vehiclesFactory.createVehicleType(Id.create(transportModes[1], VehicleType.class));
-		car.setMaximumVelocity(20);
-		car.setPcuEquivalents(1.0);
+      // adding vehicle type and vehicle to scenario as needed:
+      switch (this.vehiclesSource) {
+        case defaultVehicle:
+          // don't add anything
+          break;
+        case modeVehicleTypesFromVehiclesData:
+          // only vehicle type is necessary
+          if (!scenario.getVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
+            scenario.getVehicles().addVehicleType(vehTypes[i]);
+          }
+          break;
+        case fromVehiclesData:
+          // vehicle type as well as vehicle info is necessary
+          if (!scenario.getVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
+            scenario.getVehicles().addVehicleType(vehTypes[i]);
+          }
 
-		VehicleType [] vehTypes = {bike, car};
+          Id<Vehicle> vId = VehicleUtils.createVehicleId(p, transportModes[i]);
+          Vehicle v = vehiclesFactory.createVehicle(vId, vehTypes[i]);
+          scenario.getVehicles().addVehicle(v);
+          VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(transportModes[i], vId));
 
-		for(int i=0;i<2;i++){
-			Id<Person> id = Id.create(i, Person.class);
-			Person p = population.getFactory().createPerson(id);
-			Plan plan = population.getFactory().createPlan();
-			p.addPlan(plan);
-			{
-				Activity a1 = population.getFactory().createActivityFromLinkId( "h", link1.getId() );
-				a1.setEndTime( 8 * 3600 + i * 5 );
-				plan.addActivity( a1 );
-			}
-			{
-				Leg leg = population.getFactory().createLeg( transportModes[i] );
-				plan.addLeg( leg );
-				LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
-				NetworkRoute route = (NetworkRoute) factory.createRoute( link1.getId(), link3.getId() );
-				route.setLinkIds( link1.getId(), Collections.singletonList( link2.getId() ), link3.getId() );
-				leg.setRoute( route );
-			}
-			{
-				Activity a2 = population.getFactory().createActivityFromLinkId( "w", link3.getId() );
-				plan.addActivity( a2 );
-				population.addPerson( p );
-			}
+          break;
+        default:
+          throw new RuntimeException("not implemented yet.");
+      }
+    }
+  }
 
-			if ( !providingVehiclesInPerson ) {
-				// i.e. testing what happens if the vehicles are not added into the person
-				return ;
-			}
+  private static class VehicleLinkTravelTimeEventHandler
+      implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
-			//adding vehicle type and vehicle to scenario as needed:
-			switch (this.vehiclesSource ) {
-				case defaultVehicle:
-					//don't add anything
-					break;
-				case modeVehicleTypesFromVehiclesData:
-					// only vehicle type is necessary
-					if (!scenario.getVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
-						scenario.getVehicles().addVehicleType(vehTypes[i]);
-					}
-					break;
-				case fromVehiclesData:
-					// vehicle type as well as vehicle info is necessary
-					if (!scenario.getVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
-						scenario.getVehicles().addVehicleType(vehTypes[i]);
-					}
+    private final Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleTravelTimes;
 
-					Id<Vehicle> vId = VehicleUtils.createVehicleId(p, transportModes[i]);
-					Vehicle v = vehiclesFactory.createVehicle(vId, vehTypes[i]);
-					scenario.getVehicles().addVehicle(v);
-					VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(transportModes[i], vId));
+    VehicleLinkTravelTimeEventHandler(Map<Id<Vehicle>, Map<Id<Link>, Double>> agentTravelTimes) {
+      this.vehicleTravelTimes = agentTravelTimes;
+    }
 
-					break;
-				default:
-					throw new RuntimeException("not implemented yet.");
-			}
-		}
-	}
+    @Override
+    public void handleEvent(LinkEnterEvent event) {
+      Map<Id<Link>, Double> travelTimes =
+          this.vehicleTravelTimes.computeIfAbsent(
+              event.getVehicleId(), vehicleId -> new HashMap<>());
+      travelTimes.put(event.getLinkId(), event.getTime());
+    }
 
-	private static class VehicleLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
+    @Override
+    public void handleEvent(LinkLeaveEvent event) {
+      Map<Id<Link>, Double> travelTimes = this.vehicleTravelTimes.get(event.getVehicleId());
+      if (travelTimes != null) {
+        Double d = travelTimes.get(event.getLinkId());
+        if (d != null) {
+          double time = event.getTime() - d;
+          travelTimes.put(event.getLinkId(), time);
+        }
+      }
+    }
 
-		private final Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleTravelTimes;
-
-		VehicleLinkTravelTimeEventHandler( Map<Id<Vehicle>, Map<Id<Link>, Double>> agentTravelTimes ) {
-			this.vehicleTravelTimes = agentTravelTimes;
-		}
-
-		@Override
-		public void handleEvent(LinkEnterEvent event) {
-			Map<Id<Link>, Double> travelTimes = this.vehicleTravelTimes.computeIfAbsent( event.getVehicleId(), vehicleId -> new HashMap<>() );
-			travelTimes.put(event.getLinkId(), event.getTime() );
-		}
-
-		@Override
-		public void handleEvent(LinkLeaveEvent event) {
-			Map<Id<Link>, Double> travelTimes = this.vehicleTravelTimes.get( event.getVehicleId() );
-			if (travelTimes != null) {
-				Double d = travelTimes.get(event.getLinkId());
-				if (d != null) {
-					double time = event.getTime() - d;
-					travelTimes.put(event.getLinkId(), time );
-				}
-			}
-		}
-
-		@Override
-		public void reset(int iteration) {
-			vehicleTravelTimes.clear();
-		}
-	}
+    @Override
+    public void reset(int iteration) {
+      vehicleTravelTimes.clear();
+    }
+  }
 }

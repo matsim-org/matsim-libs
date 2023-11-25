@@ -20,37 +20,53 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  */
 public class ShiftEDrtActionCreator implements DynActionCreator {
 
-    private final ShiftDrtActionCreator delegate;
-    private final MobsimTimer timer;
-    private final PassengerHandler passengerHandler;
+  private final ShiftDrtActionCreator delegate;
+  private final MobsimTimer timer;
+  private final PassengerHandler passengerHandler;
 
-    public ShiftEDrtActionCreator(ShiftDrtActionCreator delegate, MobsimTimer timer, PassengerHandler passengerHandler) {
-    	this.delegate = delegate;
-    	this.timer = timer;
-        this.passengerHandler = passengerHandler;
+  public ShiftEDrtActionCreator(
+      ShiftDrtActionCreator delegate, MobsimTimer timer, PassengerHandler passengerHandler) {
+    this.delegate = delegate;
+    this.timer = timer;
+    this.passengerHandler = passengerHandler;
+  }
+
+  @Override
+  public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
+
+    Task task = vehicle.getSchedule().getCurrentTask();
+    if (task instanceof EDrtShiftBreakTaskImpl
+        && ((EDrtShiftBreakTaskImpl) task).getChargingTask() != null) {
+      task.initTaskTracker(new OfflineETaskTracker((EvDvrpVehicle) vehicle, timer));
+      EDrtShiftBreakTaskImpl t = (EDrtShiftBreakTaskImpl) task;
+      return new ChargingBreakActivity(
+          ((EDrtShiftBreakTaskImpl) task).getChargingTask(),
+          passengerHandler,
+          dynAgent,
+          t,
+          t.getDropoffRequests(),
+          t.getPickupRequests());
+    } else if (task instanceof EDrtShiftChangeoverTaskImpl
+        && ((EDrtShiftChangeoverTaskImpl) task).getChargingTask() != null) {
+      task.initTaskTracker(new OfflineETaskTracker((EvDvrpVehicle) vehicle, timer));
+      DrtStopTask t = (DrtStopTask) task;
+      return new ChargingChangeoverActivity(
+          ((EDrtShiftChangeoverTaskImpl) task).getChargingTask(),
+          passengerHandler,
+          dynAgent,
+          t,
+          t.getDropoffRequests(),
+          t.getPickupRequests());
+    } else if (task instanceof EDrtWaitForShiftStayTask
+        && ((EDrtWaitForShiftStayTask) task).getChargingTask() != null) {
+      task.initTaskTracker(new OfflineETaskTracker((EvDvrpVehicle) vehicle, timer));
+      return new ChargingWaitForShiftActivity(((EDrtWaitForShiftStayTask) task).getChargingTask());
     }
 
-    @Override
-    public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
-
-        Task task = vehicle.getSchedule().getCurrentTask();
-        if (task instanceof EDrtShiftBreakTaskImpl && ((EDrtShiftBreakTaskImpl) task).getChargingTask() != null) {
-            task.initTaskTracker(new OfflineETaskTracker((EvDvrpVehicle) vehicle, timer));
-			EDrtShiftBreakTaskImpl t = (EDrtShiftBreakTaskImpl)task;
-            return new ChargingBreakActivity(((EDrtShiftBreakTaskImpl) task).getChargingTask(), passengerHandler, dynAgent, t, t.getDropoffRequests(), t.getPickupRequests());
-        } else if (task instanceof EDrtShiftChangeoverTaskImpl && ((EDrtShiftChangeoverTaskImpl) task).getChargingTask() != null) {
-            task.initTaskTracker(new OfflineETaskTracker((EvDvrpVehicle) vehicle, timer));
-            DrtStopTask t = (DrtStopTask) task;
-            return new ChargingChangeoverActivity(((EDrtShiftChangeoverTaskImpl) task).getChargingTask(), passengerHandler, dynAgent, t, t.getDropoffRequests(), t.getPickupRequests());
-        } else if (task instanceof EDrtWaitForShiftStayTask && ((EDrtWaitForShiftStayTask) task).getChargingTask() != null) {
-            task.initTaskTracker(new OfflineETaskTracker((EvDvrpVehicle) vehicle, timer));
-            return new ChargingWaitForShiftActivity(((EDrtWaitForShiftStayTask) task).getChargingTask());
-        }
-
-        DynAction dynAction = delegate.createAction(dynAgent, vehicle, now);
-        if (task.getTaskTracker() == null) {
-            task.initTaskTracker(new OfflineETaskTracker((EvDvrpVehicle) vehicle, timer));
-        }
-        return dynAction;
+    DynAction dynAction = delegate.createAction(dynAgent, vehicle, now);
+    if (task.getTaskTracker() == null) {
+      task.initTaskTracker(new OfflineETaskTracker((EvDvrpVehicle) vehicle, timer));
     }
+    return dynAction;
+  }
 }

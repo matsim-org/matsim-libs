@@ -27,21 +27,19 @@ import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author nagel
- *
  */
 public class RunParkingChoiceExampleIT {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	/**
-	 * Test method for {@link org.matsim.contrib.parking.parkingchoice.run.RunParkingChoiceExample#run(org.matsim.core.config.Config)}.
-	 */
-	@Test
-	public final void testRun() {
-		Config config = ConfigUtils.loadConfig("./src/main/resources/parkingchoice/config.xml");
-		config.controller().setOutputDirectory( utils.getOutputDirectory() );
-		config.controller().setLastIteration(0);
-		RunParkingChoiceExample.run(config);
-
-	}
-
+  /**
+   * Test method for {@link
+   * org.matsim.contrib.parking.parkingchoice.run.RunParkingChoiceExample#run(org.matsim.core.config.Config)}.
+   */
+  @Test
+  public final void testRun() {
+    Config config = ConfigUtils.loadConfig("./src/main/resources/parkingchoice/config.xml");
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
+    config.controller().setLastIteration(0);
+    RunParkingChoiceExample.run(config);
+  }
 }

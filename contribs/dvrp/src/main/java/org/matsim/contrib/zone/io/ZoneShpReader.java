@@ -22,7 +22,6 @@ package org.matsim.contrib.zone.io;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
-
 import org.locationtech.jts.geom.MultiPolygon;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.zone.Zone;
@@ -30,26 +29,26 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
 public class ZoneShpReader {
-	private final Map<Id<Zone>, Zone> zones;
+  private final Map<Id<Zone>, Zone> zones;
 
-	public ZoneShpReader(Map<Id<Zone>, Zone> zones) {
-		this.zones = zones;
-	}
+  public ZoneShpReader(Map<Id<Zone>, Zone> zones) {
+    this.zones = zones;
+  }
 
-	public void readZones(URL url) {
-		readZones(url, ZoneShpWriter.ID_HEADER);
-	}
+  public void readZones(URL url) {
+    readZones(url, ZoneShpWriter.ID_HEADER);
+  }
 
-	public void readZones(URL url, String idHeader) {
-		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(url);
-		if (features.size() != zones.size()) {
-			throw new RuntimeException("Features#: " + features.size() + "; zones#: " + zones.size());
-		}
+  public void readZones(URL url, String idHeader) {
+    Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(url);
+    if (features.size() != zones.size()) {
+      throw new RuntimeException("Features#: " + features.size() + "; zones#: " + zones.size());
+    }
 
-		for (SimpleFeature ft : features) {
-			String id = ft.getAttribute(idHeader).toString();
-			Zone z = zones.get(Id.create(id, Zone.class));
-			z.setMultiPolygon((MultiPolygon)ft.getDefaultGeometry());
-		}
-	}
+    for (SimpleFeature ft : features) {
+      String id = ft.getAttribute(idHeader).toString();
+      Zone z = zones.get(Id.create(id, Zone.class));
+      z.setMultiPolygon((MultiPolygon) ft.getDefaultGeometry());
+    }
+  }
 }

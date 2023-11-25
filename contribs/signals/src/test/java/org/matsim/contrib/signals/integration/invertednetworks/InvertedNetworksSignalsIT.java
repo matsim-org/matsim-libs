@@ -40,61 +40,79 @@ import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author dgrether
- *
  */
 public class InvertedNetworksSignalsIT {
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	@Test
-	public final void testSignalsInvertedNetworkRouting() {
-		InvertedNetworkRoutingSignalsFixture f = new InvertedNetworkRoutingSignalsFixture(false, false, true);
-		f.scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
-		Controler c = new Controler(f.scenario);
-//		c.addOverridingModule(new SignalsModule());
-		Signals.configure(c);
-		c.getConfig().controller().setDumpDataAtEnd(false);
-		c.getConfig().controller().setCreateGraphs(false);
-        final InvertedNetworkRoutingTestEventHandler testHandler = new InvertedNetworkRoutingTestEventHandler();
-		c.addControlerListener(new StartupListener(){
-			@Override
-			public void notifyStartup(StartupEvent event) {
-				event.getServices().getEvents().addHandler(testHandler);
-			}
-		});
-		c.run();
-		Assert.assertTrue("No traffic on link", testHandler.hadTrafficOnLink25);
-	}
+  @Test
+  public final void testSignalsInvertedNetworkRouting() {
+    InvertedNetworkRoutingSignalsFixture f =
+        new InvertedNetworkRoutingSignalsFixture(false, false, true);
+    f.scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
+    Controler c = new Controler(f.scenario);
+    //		c.addOverridingModule(new SignalsModule());
+    Signals.configure(c);
+    c.getConfig().controller().setDumpDataAtEnd(false);
+    c.getConfig().controller().setCreateGraphs(false);
+    final InvertedNetworkRoutingTestEventHandler testHandler =
+        new InvertedNetworkRoutingTestEventHandler();
+    c.addControlerListener(
+        new StartupListener() {
+          @Override
+          public void notifyStartup(StartupEvent event) {
+            event.getServices().getEvents().addHandler(testHandler);
+          }
+        });
+    c.run();
+    Assert.assertTrue("No traffic on link", testHandler.hadTrafficOnLink25);
+  }
 
-	@Test
-	public final void testSignalsInvertedNetworkRoutingIterations() {
-		InvertedNetworkRoutingSignalsFixture f = new InvertedNetworkRoutingSignalsFixture(false, false, true);
-		f.scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
-		f.scenario.getConfig().controller().setLastIteration(1);
-		SignalsData signalsData = (SignalsData) f.scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-		SignalPlanData signalPlan = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(Id.create(2, SignalSystem.class)).getSignalPlanData().get(Id.create(1, SignalPlan.class));
-		signalPlan.setCycleTime(500);
-		signalPlan.getSignalGroupSettingsDataByGroupId().get(Id.create(2, SignalGroup.class)).setOnset(0);
-		signalPlan.getSignalGroupSettingsDataByGroupId().get(Id.create(2, SignalGroup.class)).setDropping(5);
-		SignalData sd = signalsData.getSignalSystemsData().getSignalSystemData().get(Id.create(2, SignalSystem.class)).getSignalData().get(Id.create(1, Signal.class));
-		sd.addTurningMoveRestriction(Id.create(23, Link.class));
-		Controler c = new Controler(f.scenario);
-//		c.addOverridingModule(new SignalsModule());
-		Signals.configure( c );
-		c.getConfig().controller().setDumpDataAtEnd(false);
-		c.getConfig().controller().setCreateGraphs(false);
-        final InvertedNetworkRoutingTestEventHandler testHandler = new InvertedNetworkRoutingTestEventHandler();
-		c.addControlerListener(new StartupListener(){
-			@Override
-			public void notifyStartup(StartupEvent event) {
-				event.getServices().getEvents().addHandler(testHandler);
-			}
-		});
-		c.run();
-		Assert.assertTrue("No traffic on link", testHandler.hadTrafficOnLink25);
-	}
-
-
-
-
+  @Test
+  public final void testSignalsInvertedNetworkRoutingIterations() {
+    InvertedNetworkRoutingSignalsFixture f =
+        new InvertedNetworkRoutingSignalsFixture(false, false, true);
+    f.scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
+    f.scenario.getConfig().controller().setLastIteration(1);
+    SignalsData signalsData = (SignalsData) f.scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+    SignalPlanData signalPlan =
+        signalsData
+            .getSignalControlData()
+            .getSignalSystemControllerDataBySystemId()
+            .get(Id.create(2, SignalSystem.class))
+            .getSignalPlanData()
+            .get(Id.create(1, SignalPlan.class));
+    signalPlan.setCycleTime(500);
+    signalPlan
+        .getSignalGroupSettingsDataByGroupId()
+        .get(Id.create(2, SignalGroup.class))
+        .setOnset(0);
+    signalPlan
+        .getSignalGroupSettingsDataByGroupId()
+        .get(Id.create(2, SignalGroup.class))
+        .setDropping(5);
+    SignalData sd =
+        signalsData
+            .getSignalSystemsData()
+            .getSignalSystemData()
+            .get(Id.create(2, SignalSystem.class))
+            .getSignalData()
+            .get(Id.create(1, Signal.class));
+    sd.addTurningMoveRestriction(Id.create(23, Link.class));
+    Controler c = new Controler(f.scenario);
+    //		c.addOverridingModule(new SignalsModule());
+    Signals.configure(c);
+    c.getConfig().controller().setDumpDataAtEnd(false);
+    c.getConfig().controller().setCreateGraphs(false);
+    final InvertedNetworkRoutingTestEventHandler testHandler =
+        new InvertedNetworkRoutingTestEventHandler();
+    c.addControlerListener(
+        new StartupListener() {
+          @Override
+          public void notifyStartup(StartupEvent event) {
+            event.getServices().getEvents().addHandler(testHandler);
+          }
+        });
+    c.run();
+    Assert.assertTrue("No traffic on link", testHandler.hadTrafficOnLink25);
+  }
 }

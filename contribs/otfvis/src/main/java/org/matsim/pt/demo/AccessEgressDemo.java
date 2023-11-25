@@ -21,7 +21,6 @@
 package org.matsim.pt.demo;
 
 import java.util.ArrayList;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -68,169 +67,199 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class AccessEgressDemo {
 
-	private static final int nOfLinks = 15;
-	private static final int nOfBuses = 20;
-	private static final int nOfAgentsPerStop = 100;
-	private static final int agentInterval = 60;
-	private static final int delayedBus = 9;
-	private static final int heading = 5*60;
-	private static final int delay = 60;
-	private static final double departureTime = 7.0*3600;
-	private static final boolean stopsBlockLane = true;
+  private static final int nOfLinks = 15;
+  private static final int nOfBuses = 20;
+  private static final int nOfAgentsPerStop = 100;
+  private static final int agentInterval = 60;
+  private static final int delayedBus = 9;
+  private static final int heading = 5 * 60;
+  private static final int delay = 60;
+  private static final double departureTime = 7.0 * 3600;
+  private static final boolean stopsBlockLane = true;
 
-	private final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+  private final MutableScenario scenario =
+      (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-	private void prepareConfig() {
-		Config config = this.scenario.getConfig();
-		config.transit().setUseTransit(true);
-		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
-		config.qsim().setEndTime(24.0*3600);
-	}
+  private void prepareConfig() {
+    Config config = this.scenario.getConfig();
+    config.transit().setUseTransit(true);
+    config.qsim().setSnapshotStyle(SnapshotStyle.queue);
+    config.qsim().setEndTime(24.0 * 3600);
+  }
 
-	private void createNetwork() {
-		Network network = this.scenario.getNetwork();
-		Node[] nodes = new Node[nOfLinks + 1];
-		for (int i = 0; i <= nOfLinks; i++) {
-			nodes[i] = network.getFactory().createNode(Id.create(i, Node.class), new Coord(i * 500, 0));
-			network.addNode(nodes[i]);
-		}
-		for (int i = 0; i < nOfLinks; i++) {
-			Link l = network.getFactory().createLink(Id.create(i, Link.class), nodes[i], nodes[i+1]);
-			l.setLength(500.0);
-			l.setFreespeed(10.0);
-			l.setCapacity(1000.0);
-			l.setNumberOfLanes(1);
-			network.addLink(l);
-		}
-	}
+  private void createNetwork() {
+    Network network = this.scenario.getNetwork();
+    Node[] nodes = new Node[nOfLinks + 1];
+    for (int i = 0; i <= nOfLinks; i++) {
+      nodes[i] = network.getFactory().createNode(Id.create(i, Node.class), new Coord(i * 500, 0));
+      network.addNode(nodes[i]);
+    }
+    for (int i = 0; i < nOfLinks; i++) {
+      Link l = network.getFactory().createLink(Id.create(i, Link.class), nodes[i], nodes[i + 1]);
+      l.setLength(500.0);
+      l.setFreespeed(10.0);
+      l.setCapacity(1000.0);
+      l.setNumberOfLanes(1);
+      network.addLink(l);
+    }
+  }
 
-	private void createTransitSchedule() {
-		TransitSchedule schedule = this.scenario.getTransitSchedule();
-		TransitScheduleFactory builder = schedule.getFactory();
-		TransitStopFacility[] stops = new TransitStopFacility[nOfLinks];
-		ArrayList<TransitRouteStop> stopList = new ArrayList<>(nOfLinks);
-		for (int i = 0; i < nOfLinks; i++) {
-			stops[i] = builder.createTransitStopFacility(Id.create(i, TransitStopFacility.class), new Coord((i + 1) * 500, 0), stopsBlockLane);
-			stops[i].setLinkId(Id.create(i, Link.class));
-			schedule.addStopFacility(stops[i]);
-			TransitRouteStop stop = builder.createTransitRouteStop(stops[i], i * 50, i * 50 + 10);
-			stopList.add(stop);
-		}
-		Link startLink = this.scenario.getNetwork().getLinks().get(Id.create(0, Link.class));
-		Link endLink = this.scenario.getNetwork().getLinks().get(Id.create(nOfLinks - 1, Link.class));
-		NetworkRoute networkRoute = this.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, startLink.getId(), endLink.getId());
-		ArrayList<Id<Link>> linkList = new ArrayList<>(nOfLinks - 2);
-		for (int i = 1; i < nOfLinks -1; i++) {
-			linkList.add(Id.create(i, Link.class));
-		}
-		networkRoute.setLinkIds(startLink.getId(), linkList, endLink.getId());
-		TransitRoute tRoute = builder.createTransitRoute(Id.create(1, TransitRoute.class), networkRoute, stopList, "bus");
+  private void createTransitSchedule() {
+    TransitSchedule schedule = this.scenario.getTransitSchedule();
+    TransitScheduleFactory builder = schedule.getFactory();
+    TransitStopFacility[] stops = new TransitStopFacility[nOfLinks];
+    ArrayList<TransitRouteStop> stopList = new ArrayList<>(nOfLinks);
+    for (int i = 0; i < nOfLinks; i++) {
+      stops[i] =
+          builder.createTransitStopFacility(
+              Id.create(i, TransitStopFacility.class), new Coord((i + 1) * 500, 0), stopsBlockLane);
+      stops[i].setLinkId(Id.create(i, Link.class));
+      schedule.addStopFacility(stops[i]);
+      TransitRouteStop stop = builder.createTransitRouteStop(stops[i], i * 50, i * 50 + 10);
+      stopList.add(stop);
+    }
+    Link startLink = this.scenario.getNetwork().getLinks().get(Id.create(0, Link.class));
+    Link endLink = this.scenario.getNetwork().getLinks().get(Id.create(nOfLinks - 1, Link.class));
+    NetworkRoute networkRoute =
+        this.scenario
+            .getPopulation()
+            .getFactory()
+            .getRouteFactories()
+            .createRoute(NetworkRoute.class, startLink.getId(), endLink.getId());
+    ArrayList<Id<Link>> linkList = new ArrayList<>(nOfLinks - 2);
+    for (int i = 1; i < nOfLinks - 1; i++) {
+      linkList.add(Id.create(i, Link.class));
+    }
+    networkRoute.setLinkIds(startLink.getId(), linkList, endLink.getId());
+    TransitRoute tRoute =
+        builder.createTransitRoute(Id.create(1, TransitRoute.class), networkRoute, stopList, "bus");
 
-		TransitLine tLine = builder.createTransitLine(Id.create(1, TransitLine.class));
-		tLine.addRoute(tRoute);
-		schedule.addTransitLine(tLine);
+    TransitLine tLine = builder.createTransitLine(Id.create(1, TransitLine.class));
+    tLine.addRoute(tRoute);
+    schedule.addTransitLine(tLine);
 
-		for (int i = 0; i < nOfBuses; i++	) {
-			Departure dep = builder.createDeparture(Id.create(i, Departure.class), departureTime + i*heading + (i == delayedBus ? delay : 0));
-			dep.setVehicleId(Id.create(i, Vehicle.class));
-			tRoute.addDeparture(dep);
-		}
-	}
+    for (int i = 0; i < nOfBuses; i++) {
+      Departure dep =
+          builder.createDeparture(
+              Id.create(i, Departure.class),
+              departureTime + i * heading + (i == delayedBus ? delay : 0));
+      dep.setVehicleId(Id.create(i, Vehicle.class));
+      tRoute.addDeparture(dep);
+    }
+  }
 
-	private void createVehicles() {
-		Vehicles vehicles = this.scenario.getTransitVehicles();
-		VehiclesFactory vb = vehicles.getFactory();
-		VehicleType vehicleType = vb.createVehicleType(Id.create("transitVehicleType", VehicleType.class));
-		vehicles.addVehicleType(vehicleType);
-		
-//		VehicleCapacity capacity = vb.createVehicleCapacity();
-		vehicleType.getCapacity().setSeats(101);
-		vehicleType.getCapacity().setStandingRoom(0);
-//		vehicleType.setCapacity(capacity);
-		for (int i = 0; i < nOfBuses; i++) {
-			vehicles.addVehicle( vb.createVehicle(Id.create(i, Vehicle.class), vehicleType));
-		}
-	}
+  private void createVehicles() {
+    Vehicles vehicles = this.scenario.getTransitVehicles();
+    VehiclesFactory vb = vehicles.getFactory();
+    VehicleType vehicleType =
+        vb.createVehicleType(Id.create("transitVehicleType", VehicleType.class));
+    vehicles.addVehicleType(vehicleType);
 
-	private void createPopulation() {
-		TransitSchedule schedule = this.scenario.getTransitSchedule();
-		Population population = this.scenario.getPopulation();
-		PopulationFactory pb = population.getFactory();
-		TransitStopFacility[] stops = schedule.getFacilities().values().toArray(new TransitStopFacility[schedule.getFacilities().size()]);
-		TransitLine tLine = schedule.getTransitLines().get(Id.create(1, TransitLine.class));
-		TransitRoute tRoute = tLine.getRoutes().get(Id.create(1, TransitRoute.class));
+    //		VehicleCapacity capacity = vb.createVehicleCapacity();
+    vehicleType.getCapacity().setSeats(101);
+    vehicleType.getCapacity().setStandingRoom(0);
+    //		vehicleType.setCapacity(capacity);
+    for (int i = 0; i < nOfBuses; i++) {
+      vehicles.addVehicle(vb.createVehicle(Id.create(i, Vehicle.class), vehicleType));
+    }
+  }
 
-		TransitStopFacility lastStop = schedule.getFacilities().get(Id.create(stops.length - 1, TransitStopFacility.class));
-		for (int i = 0; i < stops.length; i++) {
-			TransitStopFacility stop = stops[i];
-			if (stop == lastStop) {
-				continue;
-			}
-			for (int j = 0; j < nOfAgentsPerStop; j++) {
-				Person person = pb.createPerson(Id.create(Integer.toString(i * nOfAgentsPerStop + j), Person.class));
-				Plan plan = pb.createPlan();
-				Activity act1 = pb.createActivityFromLinkId("home", stop.getLinkId());
-				act1.setEndTime(departureTime + j * agentInterval);
-				Leg leg = pb.createLeg(TransportMode.pt);
-				leg.setRoute(new DefaultTransitPassengerRoute(stop, tLine, tRoute, lastStop));
-				Activity act2 = pb.createActivityFromLinkId("work", Id.create(nOfLinks - 1, Link.class));
+  private void createPopulation() {
+    TransitSchedule schedule = this.scenario.getTransitSchedule();
+    Population population = this.scenario.getPopulation();
+    PopulationFactory pb = population.getFactory();
+    TransitStopFacility[] stops =
+        schedule
+            .getFacilities()
+            .values()
+            .toArray(new TransitStopFacility[schedule.getFacilities().size()]);
+    TransitLine tLine = schedule.getTransitLines().get(Id.create(1, TransitLine.class));
+    TransitRoute tRoute = tLine.getRoutes().get(Id.create(1, TransitRoute.class));
 
-				population.addPerson(person);
-				person.addPlan(plan);
-				person.setSelectedPlan(plan);
-				plan.addActivity(act1);
-				plan.addLeg(leg);
-				plan.addActivity(act2);
-			}
-		}
-	}
+    TransitStopFacility lastStop =
+        schedule.getFacilities().get(Id.create(stops.length - 1, TransitStopFacility.class));
+    for (int i = 0; i < stops.length; i++) {
+      TransitStopFacility stop = stops[i];
+      if (stop == lastStop) {
+        continue;
+      }
+      for (int j = 0; j < nOfAgentsPerStop; j++) {
+        Person person =
+            pb.createPerson(Id.create(Integer.toString(i * nOfAgentsPerStop + j), Person.class));
+        Plan plan = pb.createPlan();
+        Activity act1 = pb.createActivityFromLinkId("home", stop.getLinkId());
+        act1.setEndTime(departureTime + j * agentInterval);
+        Leg leg = pb.createLeg(TransportMode.pt);
+        leg.setRoute(new DefaultTransitPassengerRoute(stop, tLine, tRoute, lastStop));
+        Activity act2 = pb.createActivityFromLinkId("work", Id.create(nOfLinks - 1, Link.class));
 
-	private void runSim() {
-		EventsManager events = EventsUtils.createEventsManager();
+        population.addPerson(person);
+        person.addPlan(plan);
+        person.setSelectedPlan(plan);
+        plan.addActivity(act1);
+        plan.addLeg(leg);
+        plan.addActivity(act2);
+      }
+    }
+  }
 
-		TransitRoute route = this.scenario.getTransitSchedule().getTransitLines().get(Id.create(1, TransitLine.class)).getRoutes().get(Id.create(1, TransitRoute.class));
-		VehicleTracker vehTracker = new VehicleTracker();
-		events.addHandler(vehTracker);
-		TransitRouteAccessEgressAnalysis analysis = new TransitRouteAccessEgressAnalysis(route, vehTracker);
-		events.addHandler(analysis);
-		RouteTimeDiagram diagram = new RouteTimeDiagram();
-		events.addHandler(diagram);
+  private void runSim() {
+    EventsManager events = EventsUtils.createEventsManager();
 
-		final QSim sim = new QSimBuilder(scenario.getConfig()) //
-				.useDefaults() //
-				.addOverridingModule( new AbstractModule() {
-					@Override
-					public void install() {
-						bind(TransitStopHandlerFactory.class).to(SimpleTransitStopHandlerFactory.class)
-								.asEagerSingleton();
-					}
-				} ) //
-				.build(scenario, events);
-		
-		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.scenario.getConfig(), this.scenario, events, sim);
-		OTFClientLive.run(this.scenario.getConfig(), server);
-		sim.run();
+    TransitRoute route =
+        this.scenario
+            .getTransitSchedule()
+            .getTransitLines()
+            .get(Id.create(1, TransitLine.class))
+            .getRoutes()
+            .get(Id.create(1, TransitRoute.class));
+    VehicleTracker vehTracker = new VehicleTracker();
+    events.addHandler(vehTracker);
+    TransitRouteAccessEgressAnalysis analysis =
+        new TransitRouteAccessEgressAnalysis(route, vehTracker);
+    events.addHandler(analysis);
+    RouteTimeDiagram diagram = new RouteTimeDiagram();
+    events.addHandler(diagram);
 
-		System.out.println("TransitRouteAccessEgressAnalysis:");
-		analysis.printStats();
-		System.out.println("Route-Time-Diagram:");
-		diagram.writeData();
-		String filename = "output/routeTimeDiagram.png";
-		System.out.println("writing route-time diagram to: " + filename);
-		diagram.createGraph(filename, route);
-	}
+    final QSim sim =
+        new QSimBuilder(scenario.getConfig()) //
+            .useDefaults() //
+            .addOverridingModule(
+                new AbstractModule() {
+                  @Override
+                  public void install() {
+                    bind(TransitStopHandlerFactory.class)
+                        .to(SimpleTransitStopHandlerFactory.class)
+                        .asEagerSingleton();
+                  }
+                }) //
+            .build(scenario, events);
 
-	public void run() {
-		prepareConfig();
-		createNetwork();
-		createTransitSchedule();
-		createVehicles();
-		createPopulation();
-		runSim();
-	}
+    OnTheFlyServer server =
+        OTFVis.startServerAndRegisterWithQSim(
+            this.scenario.getConfig(), this.scenario, events, sim);
+    OTFClientLive.run(this.scenario.getConfig(), server);
+    sim.run();
 
-	public static void main(final String[] args) {
-		new AccessEgressDemo().run();
-	}
+    System.out.println("TransitRouteAccessEgressAnalysis:");
+    analysis.printStats();
+    System.out.println("Route-Time-Diagram:");
+    diagram.writeData();
+    String filename = "output/routeTimeDiagram.png";
+    System.out.println("writing route-time diagram to: " + filename);
+    diagram.createGraph(filename, route);
+  }
 
+  public void run() {
+    prepareConfig();
+    createNetwork();
+    createTransitSchedule();
+    createVehicles();
+    createPopulation();
+    runSim();
+  }
+
+  public static void main(final String[] args) {
+    new AccessEgressDemo().run();
+  }
 }

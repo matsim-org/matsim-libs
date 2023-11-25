@@ -1,6 +1,6 @@
 /*
  * Copyright 2018 Gunnar Flötteröd
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,15 +23,13 @@ import org.matsim.api.core.v01.population.Leg;
 
 /**
  * Use this to effectively turn off transit emulation.
- * 
- * @author Gunnar Flötteröd
  *
+ * @author Gunnar Flötteröd
  */
 public class NoTransitEmulator implements TransitEmulator {
 
-	@Override
-	public Trip findTrip(Leg leg, double earliestDepartureTime_s) {
-		return null;
-	}
-
+  @Override
+  public Trip findTrip(Leg leg, double earliestDepartureTime_s) {
+    return null;
+  }
 }

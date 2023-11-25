@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * PrepareForSim.java
@@ -19,8 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.controler;
+package org.matsim.core.controler;
 
-
-public interface PrepareForSim extends Runnable {
-}
+public interface PrepareForSim extends Runnable {}

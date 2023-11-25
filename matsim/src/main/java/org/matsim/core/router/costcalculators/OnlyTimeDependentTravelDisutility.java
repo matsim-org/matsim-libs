@@ -27,34 +27,34 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 /**
- *  A Travel Cost Calculator that uses the travel times as travel disutility.
- *  
+ * A Travel Cost Calculator that uses the travel times as travel disutility.
+ *
  * @author cdobler
  */
 public class OnlyTimeDependentTravelDisutility implements TravelDisutility {
 
-	private static final Logger log = LogManager.getLogger(OnlyTimeDependentTravelDisutility.class);
-	
-	protected final TravelTime travelTime;
+  private static final Logger log = LogManager.getLogger(OnlyTimeDependentTravelDisutility.class);
 
-	public OnlyTimeDependentTravelDisutility(final TravelTime travelTime) {
-		if (travelTime == null) {
-			log.warn("TimeCalculator is null so FreeSpeedTravelTimes will be calculated!");
-			this.travelTime = new FreeSpeedTravelTime();
-		} else this.travelTime = travelTime;
-	}
+  protected final TravelTime travelTime;
 
-	@Override
-	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {		
-		return this.travelTime.getLinkTravelTime(link, time, person, vehicle);
-	}
+  public OnlyTimeDependentTravelDisutility(final TravelTime travelTime) {
+    if (travelTime == null) {
+      log.warn("TimeCalculator is null so FreeSpeedTravelTimes will be calculated!");
+      this.travelTime = new FreeSpeedTravelTime();
+    } else this.travelTime = travelTime;
+  }
 
-	@Override
-	public double getLinkMinimumTravelDisutility(final Link link) {
-		return link.getLength() / link.getFreespeed();
-	}
+  @Override
+  public double getLinkTravelDisutility(
+      final Link link, final double time, final Person person, final Vehicle vehicle) {
+    return this.travelTime.getLinkTravelTime(link, time, person, vehicle);
+  }
+
+  @Override
+  public double getLinkMinimumTravelDisutility(final Link link) {
+    return link.getLength() / link.getFreespeed();
+  }
 }

@@ -19,24 +19,20 @@
 package playground.vsp.congestion.handlers;
 
 import org.matsim.core.events.handler.EventHandler;
-
 import playground.vsp.congestion.events.CongestionEvent;
 
 /**
- * A common congestion pricing handler to handle different implementations of congestion pricing schemes.
- * Available options are -
+ * A common congestion pricing handler to handle different implementations of congestion pricing
+ * schemes. Available options are -
  *
- * <list>
- * <li> implv3
- * <li> implv4
- * <li> implv6
- * </list>
- * 
+ * <p><list>
+ * <li>implv3
+ * <li>implv4
+ * <li>implv6 </list>
+ *
  * @author ihab
  */
-
 public interface CongestionEventHandler extends EventHandler {
-	
-	public void handleEvent (CongestionEvent event);
-	
+
+  public void handleEvent(CongestionEvent event);
 }

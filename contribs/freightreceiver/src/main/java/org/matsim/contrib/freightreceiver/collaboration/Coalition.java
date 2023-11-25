@@ -1,33 +1,30 @@
 package org.matsim.contrib.freightreceiver.collaboration;
 
-import org.matsim.freight.carriers.Carrier;
-import org.matsim.contrib.freightreceiver.Receiver;
-import org.matsim.utils.objectattributes.attributable.Attributable;
-
 import java.util.Collection;
+import org.matsim.contrib.freightreceiver.Receiver;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * This is an interface to create and manage carrier-receiver coalitions.
  *
  * @author wlbean
  */
-
 public interface Coalition extends Attributable {
 
-	void addReceiverCoalitionMember(Receiver receiver);
+  void addReceiverCoalitionMember(Receiver receiver);
 
-	void addCarrierCoalitionMember(Carrier carrier);
+  void addCarrierCoalitionMember(Carrier carrier);
 
-	void removeReceiverCoalitionMember(Receiver receiver);
+  void removeReceiverCoalitionMember(Receiver receiver);
 
-	void removeCarrierCoalitionMember(Carrier carrier);
+  void removeCarrierCoalitionMember(Carrier carrier);
 
-	Collection<Carrier> getCarrierCoalitionMembers();
+  Collection<Carrier> getCarrierCoalitionMembers();
 
-	Collection<Receiver> getReceiverCoalitionMembers();
+  Collection<Receiver> getReceiverCoalitionMembers();
 
-	void setCoalitionCost(double cost);
+  void setCoalitionCost(double cost);
 
-	double getCoalitionCost();
-
+  double getCoalitionCost();
 }

@@ -8,31 +8,29 @@ import org.matsim.facilities.ActivityFacility;
 
 /**
  * Some utilities for location handling.
- * 
+ *
  * @author sebhoerl
  */
 public final class LocationUtils {
-	private LocationUtils() {
+  private LocationUtils() {}
 
-	}
+  /**
+   * Returns the facility id of an activity, or the link if no facility is set. If none is given, an
+   * exception is raised.
+   */
+  public static Id<? extends BasicLocation> getLocationId(Activity activity) {
+    Id<ActivityFacility> facilityId = activity.getFacilityId();
 
-	/**
-	 * Returns the facility id of an activity, or the link if no facility is set. If
-	 * none is given, an exception is raised.
-	 */
-	public static Id<? extends BasicLocation> getLocationId(Activity activity) {
-		Id<ActivityFacility> facilityId = activity.getFacilityId();
+    if (facilityId != null) {
+      return facilityId;
+    }
 
-		if (facilityId != null) {
-			return facilityId;
-		}
+    Id<Link> linkId = activity.getLinkId();
 
-		Id<Link> linkId = activity.getLinkId();
+    if (linkId != null) {
+      return linkId;
+    }
 
-		if (linkId != null) {
-			return linkId;
-		}
-
-		throw new IllegalStateException();
-	}
+    throw new IllegalStateException();
+  }
 }

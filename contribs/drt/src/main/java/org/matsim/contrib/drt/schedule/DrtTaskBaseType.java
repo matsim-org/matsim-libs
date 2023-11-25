@@ -26,20 +26,22 @@ import org.matsim.contrib.dvrp.schedule.Task;
  * @author Michal Maciejewski (michalm)
  */
 public enum DrtTaskBaseType {
-	STAY, // idle
-	STOP, // stopped to drop off and pick up passengers
-	DRIVE; // driving with/without passengers
+  STAY, // idle
+  STOP, // stopped to drop off and pick up passengers
+  DRIVE; // driving with/without passengers
 
-	public static DrtTaskBaseType getBaseTypeOrElseThrow(Task task) {
-		return ((DrtTaskType)task.getTaskType()).baseType()
-				.orElseThrow(() -> new IllegalArgumentException("Task: " + task + "does not have a base type"));
-	}
+  public static DrtTaskBaseType getBaseTypeOrElseThrow(Task task) {
+    return ((DrtTaskType) task.getTaskType())
+        .baseType()
+        .orElseThrow(
+            () -> new IllegalArgumentException("Task: " + task + "does not have a base type"));
+  }
 
-	public boolean isBaseTypeOf(Task task) {
-		return isBaseTypeOf(task.getTaskType());
-	}
+  public boolean isBaseTypeOf(Task task) {
+    return isBaseTypeOf(task.getTaskType());
+  }
 
-	public boolean isBaseTypeOf(Task.TaskType taskType) {
-		return ((DrtTaskType)taskType).baseType().orElse(null) == this;
-	}
+  public boolean isBaseTypeOf(Task.TaskType taskType) {
+    return ((DrtTaskType) taskType).baseType().orElse(null) == this;
+  }
 }

@@ -22,7 +22,6 @@ package org.matsim.core.mobsim.framework;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
 /**
- * 
  * Must be implemented by simulations using {@link MobsimListener}s
  *
  * @author dgrether
@@ -30,5 +29,4 @@ import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 public interface ObservableMobsim extends Mobsim {
 
   public void addQueueSimulationListeners(final MobsimListener listener);
-
 }

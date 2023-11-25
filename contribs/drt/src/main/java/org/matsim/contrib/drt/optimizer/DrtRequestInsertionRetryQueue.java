@@ -24,60 +24,62 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class DrtRequestInsertionRetryQueue {
-	private final DrtRequestInsertionRetryParams params;
+  private final DrtRequestInsertionRetryParams params;
 
-	public DrtRequestInsertionRetryQueue(DrtRequestInsertionRetryParams params) {
-		this.params = params;
-	}
+  public DrtRequestInsertionRetryQueue(DrtRequestInsertionRetryParams params) {
+    this.params = params;
+  }
 
-	//priority queue not needed - retry interval is equal for all requests
-	private final Deque<RequestRetryEntry> requestQueue = new LinkedList<>();
+  // priority queue not needed - retry interval is equal for all requests
+  private final Deque<RequestRetryEntry> requestQueue = new LinkedList<>();
 
-	public boolean tryAddFailedRequest(DrtRequest request, double now) {
-		if (request.getSubmissionTime() + params.maxRequestAge < now + params.retryInterval) {
-			return false;//request is too old, not eligible for retry
-		}
-		requestQueue.addLast(new RequestRetryEntry(request, now));
-		return true;
-	}
+  public boolean tryAddFailedRequest(DrtRequest request, double now) {
+    if (request.getSubmissionTime() + params.maxRequestAge < now + params.retryInterval) {
+      return false; // request is too old, not eligible for retry
+    }
+    requestQueue.addLast(new RequestRetryEntry(request, now));
+    return true;
+  }
 
-	public boolean hasRequestsToRetryNow(double now) {
-		double maxLastAttemptTimeForRetry = now - params.retryInterval;
-		return !requestQueue.isEmpty() && requestQueue.getFirst().lastAttemptTime <= maxLastAttemptTimeForRetry;
-	}
+  public boolean hasRequestsToRetryNow(double now) {
+    double maxLastAttemptTimeForRetry = now - params.retryInterval;
+    return !requestQueue.isEmpty()
+        && requestQueue.getFirst().lastAttemptTime <= maxLastAttemptTimeForRetry;
+  }
 
-	public List<DrtRequest> getRequestsToRetryNow(double now) {
-		List<DrtRequest> requests = new ArrayList<>();
-		while (hasRequestsToRetryNow(now)) {
-			var entry = requestQueue.removeFirst();
-			//no guarantee that this method is called every second, so we need to calculate time delta, instead of
-			//directly using the retry interval
-			double timeDelta = now - entry.lastAttemptTime;
-			var oldRequest = entry.request;
-			//XXX alternatively make both latest start/arrival times modifiable
-			var newRequest = DrtRequest.newBuilder(oldRequest)
-					.latestStartTime(oldRequest.getLatestStartTime() + timeDelta)
-					.latestArrivalTime(oldRequest.getLatestArrivalTime() + timeDelta)
-					.build();
-			requests.add(newRequest);
-		}
-		return requests;
-	}
+  public List<DrtRequest> getRequestsToRetryNow(double now) {
+    List<DrtRequest> requests = new ArrayList<>();
+    while (hasRequestsToRetryNow(now)) {
+      var entry = requestQueue.removeFirst();
+      // no guarantee that this method is called every second, so we need to calculate time delta,
+      // instead of
+      // directly using the retry interval
+      double timeDelta = now - entry.lastAttemptTime;
+      var oldRequest = entry.request;
+      // XXX alternatively make both latest start/arrival times modifiable
+      var newRequest =
+          DrtRequest.newBuilder(oldRequest)
+              .latestStartTime(oldRequest.getLatestStartTime() + timeDelta)
+              .latestArrivalTime(oldRequest.getLatestArrivalTime() + timeDelta)
+              .build();
+      requests.add(newRequest);
+    }
+    return requests;
+  }
 
-	private static class RequestRetryEntry {
-		private final DrtRequest request;
-		private final double lastAttemptTime;
+  private static class RequestRetryEntry {
+    private final DrtRequest request;
+    private final double lastAttemptTime;
 
-		private RequestRetryEntry(DrtRequest request, double lastAttemptTime) {
-			this.request = request;
-			this.lastAttemptTime = lastAttemptTime;
-		}
-	}
+    private RequestRetryEntry(DrtRequest request, double lastAttemptTime) {
+      this.request = request;
+      this.lastAttemptTime = lastAttemptTime;
+    }
+  }
 }

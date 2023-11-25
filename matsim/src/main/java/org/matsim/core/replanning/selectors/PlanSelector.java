@@ -23,10 +23,8 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
 
 /**
  * @author nagel
- *
  */
 public interface PlanSelector<T extends BasicPlan, I> {
-	
-	T selectPlan( HasPlansAndId<T, I> member ) ; 
 
+  T selectPlan(HasPlansAndId<T, I> member);
 }

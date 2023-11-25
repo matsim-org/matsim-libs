@@ -7,5 +7,5 @@ import org.matsim.contrib.dvrp.schedule.Task;
  * @author nkuehnel / MOIA
  */
 public interface OperationalStop extends Task {
-    OperationFacility getFacility();
+  OperationFacility getFacility();
 }

@@ -28,20 +28,16 @@ import org.matsim.contrib.socnetsim.framework.replanning.selectors.GroupLevelPla
  */
 public abstract class AbstractDumbRemoverFactory implements Provider<ExtraPlanRemover> {
 
-	private final int maxPlansPerAgent;
+  private final int maxPlansPerAgent;
 
-	public AbstractDumbRemoverFactory(
-			final int maxPlansPerAgent) {
-		this.maxPlansPerAgent = maxPlansPerAgent;
-	}
+  public AbstractDumbRemoverFactory(final int maxPlansPerAgent) {
+    this.maxPlansPerAgent = maxPlansPerAgent;
+  }
 
-	@Override
-	public ExtraPlanRemover get() {
-		return new DumbExtraPlanRemover(
-				createSelector( ),
-				maxPlansPerAgent );
-	}
+  @Override
+  public ExtraPlanRemover get() {
+    return new DumbExtraPlanRemover(createSelector(), maxPlansPerAgent);
+  }
 
-	protected abstract GroupLevelPlanSelector createSelector();
+  protected abstract GroupLevelPlanSelector createSelector();
 }
-

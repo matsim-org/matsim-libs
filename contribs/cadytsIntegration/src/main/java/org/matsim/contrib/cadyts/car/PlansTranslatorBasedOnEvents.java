@@ -20,23 +20,22 @@
 
 package org.matsim.contrib.cadyts.car;
 
+import cadyts.demand.PlanBuilder;
+import jakarta.inject.Inject;
 import java.util.HashSet;
 import java.util.Set;
-
-import jakarta.inject.Inject;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
@@ -44,135 +43,147 @@ import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
-import cadyts.demand.PlanBuilder;
+public final class PlansTranslatorBasedOnEvents
+    implements PlansTranslator<Link>,
+        LinkLeaveEventHandler,
+        VehicleEntersTrafficEventHandler,
+        VehicleLeavesTrafficEventHandler {
+  // could be/remain public as long as constructor is package-private. kai, feb'20
+  // used from outside, e.g. vsp-playgrounds
 
-public final class PlansTranslatorBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler,
-VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
-	// could be/remain public as long as constructor is package-private. kai, feb'20
-	// used from outside, e.g. vsp-playgrounds
+  private static final Logger log = LogManager.getLogger(PlansTranslatorBasedOnEvents.class);
 
-	private static final Logger log = LogManager.getLogger(PlansTranslatorBasedOnEvents.class);
+  private final Scenario scenario;
 
-	private final Scenario scenario;
+  private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
-	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+  private int iteration = -1;
 
-	private int iteration = -1;
+  // this is _only_ there for output:
+  Set<Plan> plansEverSeen = new HashSet<>();
 
-	// this is _only_ there for output:
-	Set<Plan> plansEverSeen = new HashSet<>();
+  private static final String STR_PLANSTEPFACTORY = "planStepFactory";
+  private static final String STR_ITERATION = "iteration";
 
-	private static final String STR_PLANSTEPFACTORY = "planStepFactory";
-	private static final String STR_ITERATION = "iteration";
+  private final Set<Id<Link>> calibratedLinks = new HashSet<>();
 
-	private final Set<Id<Link>> calibratedLinks = new HashSet<>() ;
+  @Inject
+  PlansTranslatorBasedOnEvents(final Scenario scenario) {
+    this.scenario = scenario;
+    Set<String> abc =
+        ConfigUtils.addOrGetModule(
+                scenario.getConfig(), CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class)
+            .getCalibratedLinks();
+    for (String str : abc) {
+      this.calibratedLinks.add(Id.createLinkId(str));
+    }
+  }
 
-	@Inject
-	PlansTranslatorBasedOnEvents(final Scenario scenario) {
-		this.scenario = scenario;
-		Set<String> abc = ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class).getCalibratedLinks();
-		for ( String str : abc ) {
-			this.calibratedLinks.add( Id.createLinkId(str) ) ;
-		}
-	}
+  private long plansFound = 0;
+  private long plansNotFound = 0;
 
-	private long plansFound = 0;
-	private long plansNotFound = 0;
+  @Override
+  public final cadyts.demand.Plan<Link> getCadytsPlan(final Plan plan) {
+    @SuppressWarnings("unchecked")
+    PlanBuilder<Link> planStepFactory =
+        (PlanBuilder<Link>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
+    if (planStepFactory == null) {
+      this.plansNotFound++;
+      return null;
+    }
+    this.plansFound++;
+    final cadyts.demand.Plan<Link> planSteps = planStepFactory.getResult();
+    return planSteps;
+  }
 
-	@Override
-	public final cadyts.demand.Plan<Link> getCadytsPlan(final Plan plan) {
-		@SuppressWarnings("unchecked")
-		PlanBuilder<Link> planStepFactory = (PlanBuilder<Link>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
-		if (planStepFactory == null) {
-			this.plansNotFound++;
-			return null;
-		}
-		this.plansFound++;
-		final cadyts.demand.Plan<Link> planSteps = planStepFactory.getResult();
-		return planSteps;
-	}
+  @Override
+  public void reset(final int iteration) {
+    this.iteration = iteration;
 
-	@Override
-	public void reset(final int iteration) {
-		this.iteration = iteration;
+    log.warn(
+        "found "
+            + this.plansFound
+            + " out of "
+            + (this.plansFound + this.plansNotFound)
+            + " ("
+            + (100. * this.plansFound / (this.plansFound + this.plansNotFound))
+            + "%)");
+    log.warn(
+        "(above values may both be at zero for a couple of iterations if multiple plans per agent all have no score)");
 
-		log.warn("found " + this.plansFound + " out of " + (this.plansFound + this.plansNotFound) + " ("
-				+ (100. * this.plansFound / (this.plansFound + this.plansNotFound)) + "%)");
-		log.warn("(above values may both be at zero for a couple of iterations if multiple plans per agent all have no score)");
+    delegate.reset(iteration);
+  }
 
-		delegate.reset(iteration);
-	}
+  @Override
+  public void handleEvent(VehicleEntersTrafficEvent event) {
+    if (event.getNetworkMode().equals(TransportMode.car)) delegate.handleEvent(event);
+  }
 
-	@Override
-	public void handleEvent(VehicleEntersTrafficEvent event) {
-		if (event.getNetworkMode().equals(TransportMode.car))
-			delegate.handleEvent(event);
-	}
+  @Override
+  public void handleEvent(VehicleLeavesTrafficEvent event) {
+    delegate.handleEvent(event);
+  }
 
-	@Override
-	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		delegate.handleEvent(event);
-	}
+  @Override
+  public void handleEvent(LinkLeaveEvent event) {
 
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
+    Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
 
-		Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
+    // if it is not a car, ignore the event
+    if (driverId == null) return;
 
-		// if it is not a car, ignore the event
-		if (driverId == null)
-			return;
+    // if only a subset of links is calibrated but the link is not contained, ignore the event
+    if (!calibratedLinks.contains(event.getLinkId())) return;
 
-		// if only a subset of links is calibrated but the link is not contained, ignore the event
-		if (!calibratedLinks.contains(event.getLinkId()))
-			return;
+    // get the "Person" behind the id:
+    Person person = this.scenario.getPopulation().getPersons().get(driverId);
 
-		// get the "Person" behind the id:
-		Person person = this.scenario.getPopulation().getPersons().get(driverId);
+    // return if the driver is not in the standard population:
+    if (person == null) {
+      return;
+    }
+    // (I think that this will be ok: they will be counted, as they will be in reality.  But we
+    // cannot influence them in the normal way because they are not part of normal replanning.
+    // Cadyts
+    // should still work, since it operates on all the others. kai, based on
+    // https://matsim.atlassian.net/browse/MATSIM-648, nov'18
 
-		// return if the driver is not in the standard population:
-		if ( person==null ) {
-			return ;
-		}
-		// (I think that this will be ok: they will be counted, as they will be in reality.  But we cannot influence them in the normal way because they are not part of normal replanning.  Cadyts
-		// should still work, since it operates on all the others. kai, based on https://matsim.atlassian.net/browse/MATSIM-648, nov'18
+    // get the selected plan:
+    Plan selectedPlan = person.getSelectedPlan();
 
-		// get the selected plan:
-		Plan selectedPlan = person.getSelectedPlan();
+    // get the planStepFactory for the plan (or create one):
+    PlanBuilder<Link> tmpPlanStepFactory = getPlanStepFactoryForPlan(selectedPlan);
 
-		// get the planStepFactory for the plan (or create one):
-		PlanBuilder<Link> tmpPlanStepFactory = getPlanStepFactoryForPlan(selectedPlan);
+    if (tmpPlanStepFactory != null) {
 
-		if (tmpPlanStepFactory != null) {
+      Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
 
-			Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
+      // add the "turn" to the planStepfactory
+      tmpPlanStepFactory.addTurn(link, (int) event.getTime());
+    }
+  }
 
-			// add the "turn" to the planStepfactory
-			tmpPlanStepFactory.addTurn(link, (int) event.getTime());
-		}
-	}
+  // ###################################################################################
+  // only private functions below here (low level functionality)
 
-	// ###################################################################################
-	// only private functions below here (low level functionality)
+  private PlanBuilder<Link> getPlanStepFactoryForPlan(final Plan selectedPlan) {
+    PlanBuilder<Link> planStepFactory = null;
 
-	private PlanBuilder<Link> getPlanStepFactoryForPlan(final Plan selectedPlan) {
-		PlanBuilder<Link> planStepFactory = null;
+    planStepFactory =
+        (PlanBuilder<Link>) selectedPlan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
+    Integer factoryIteration = (Integer) selectedPlan.getCustomAttributes().get(STR_ITERATION);
+    if (planStepFactory == null || factoryIteration == null || factoryIteration != this.iteration) {
+      // attach the iteration number to the plan:
+      selectedPlan.getCustomAttributes().put(STR_ITERATION, this.iteration);
 
-		planStepFactory = (PlanBuilder<Link>) selectedPlan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
-		Integer factoryIteration = (Integer) selectedPlan.getCustomAttributes().get(STR_ITERATION);
-		if (planStepFactory == null || factoryIteration == null || factoryIteration != this.iteration) {
-			// attach the iteration number to the plan:
-			selectedPlan.getCustomAttributes().put(STR_ITERATION, this.iteration);
+      // construct a new PlanBulder and attach it to the plan:
+      planStepFactory = new PlanBuilder<Link>();
+      selectedPlan.getCustomAttributes().put(STR_PLANSTEPFACTORY, planStepFactory);
 
-			// construct a new PlanBulder and attach it to the plan:
-			planStepFactory = new PlanBuilder<Link>();
-			selectedPlan.getCustomAttributes().put(STR_PLANSTEPFACTORY, planStepFactory);
+      // memorize the plan as being seen:
+      this.plansEverSeen.add(selectedPlan);
+    }
 
-			// memorize the plan as being seen:
-			this.plansEverSeen.add(selectedPlan);
-		}
-
-		return planStepFactory;
-	}
-
+    return planStepFactory;
+  }
 }

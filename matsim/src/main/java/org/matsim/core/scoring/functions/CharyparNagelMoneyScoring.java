@@ -23,37 +23,35 @@ package org.matsim.core.scoring.functions;
 import org.matsim.core.scoring.SumScoringFunction;
 
 /**
- * This is a re-implementation of the original CharyparNagel function, based on a
- * modular approach.
+ * This is a re-implementation of the original CharyparNagel function, based on a modular approach.
+ *
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
 public final class CharyparNagelMoneyScoring implements SumScoringFunction.MoneyScoring {
 
-	private double score;
+  private double score;
 
-	private final double marginalUtilityOfMoney;
+  private final double marginalUtilityOfMoney;
 
-	public CharyparNagelMoneyScoring(final ScoringParameters params) {
-		this.marginalUtilityOfMoney = params.marginalUtilityOfMoney;
-	}
+  public CharyparNagelMoneyScoring(final ScoringParameters params) {
+    this.marginalUtilityOfMoney = params.marginalUtilityOfMoney;
+  }
 
-	public CharyparNagelMoneyScoring(final double marginalUtilityOfMoney) {
-		this.marginalUtilityOfMoney = marginalUtilityOfMoney;
-	}
+  public CharyparNagelMoneyScoring(final double marginalUtilityOfMoney) {
+    this.marginalUtilityOfMoney = marginalUtilityOfMoney;
+  }
 
-	@Override
-	public void addMoney(final double amount) {
-		this.score += amount * this.marginalUtilityOfMoney ; // linear mapping of money to score
-	}
+  @Override
+  public void addMoney(final double amount) {
+    this.score += amount * this.marginalUtilityOfMoney; // linear mapping of money to score
+  }
 
-	@Override
-	public void finish() {
-	}
+  @Override
+  public void finish() {}
 
-	@Override
-	public double getScore() {
-		return this.score;
-	}
-
+  @Override
+  public double getScore() {
+    return this.score;
+  }
 }

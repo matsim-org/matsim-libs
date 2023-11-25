@@ -18,13 +18,10 @@
 
 package org.matsim.core.events;
 
-import java.lang.InterruptedException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
@@ -35,78 +32,74 @@ import org.matsim.core.gbl.Gbl;
  * @author rashid_waraich
  */
 /*package*/ class ProcessEventThread implements Runnable {
-	private final List<Event> preInputBuffer;
-	private final BlockingQueue<Event> eventQueue;
-	private final EventsManager events;
-	private final int preInputBufferMaxLength;
+  private final List<Event> preInputBuffer;
+  private final BlockingQueue<Event> eventQueue;
+  private final EventsManager events;
+  private final int preInputBufferMaxLength;
 
-	public ProcessEventThread(
-			final EventsManager events,
-			final int preInputBufferMaxLength) {
-		this.events = events;
-		this.preInputBufferMaxLength = preInputBufferMaxLength;
-		eventQueue = new LinkedBlockingQueue<Event>();
-		preInputBuffer = new ArrayList<Event>( preInputBufferMaxLength + 1);
-	}
+  public ProcessEventThread(final EventsManager events, final int preInputBufferMaxLength) {
+    this.events = events;
+    this.preInputBufferMaxLength = preInputBufferMaxLength;
+    eventQueue = new LinkedBlockingQueue<Event>();
+    preInputBuffer = new ArrayList<Event>(preInputBufferMaxLength + 1);
+  }
 
-	public synchronized void processEvent(final Event event) {
-		// first approach (quick on office computer, but not on satawal)
-		// eventQueue.add(event);
+  public synchronized void processEvent(final Event event) {
+    // first approach (quick on office computer, but not on satawal)
+    // eventQueue.add(event);
 
-		// second approach, lesser locking => faster on Satawal
-		preInputBuffer.add(event);
-		if (preInputBuffer.size() > preInputBufferMaxLength) {
-			emptyPreBuffer();
-		}
-	}
+    // second approach, lesser locking => faster on Satawal
+    preInputBuffer.add(event);
+    if (preInputBuffer.size() > preInputBufferMaxLength) {
+      emptyPreBuffer();
+    }
+  }
 
-	private void emptyPreBuffer() {
-		eventQueue.addAll( preInputBuffer );
-		preInputBuffer.clear();
-	}
+  private void emptyPreBuffer() {
+    eventQueue.addAll(preInputBuffer);
+    preInputBuffer.clear();
+  }
 
-	@Override
-	public void run() {
-		try {
-			// process events, until LastEventOfIteration arrives
-			while (true) {
-				// take waits for an element to exist before returning:
-				//  - thread sleeps until there is an event to process
-				//  - we do not have to bother checking if the element exists
-				Event nextEvent = eventQueue.take();
-				if (nextEvent instanceof LastEventOfIteration) {
-					Gbl.printCurrentThreadCpuTime();
-					
-					// if there are more events generated after end of simulation 
-					// (generated in events handler), process them before stopping events handling.
-					// in order to do this, LastEventOfIteration is moved to the back of the queue.
-					if (eventQueue.size()>0){
-						processEvent(nextEvent);
-						emptyPreBuffer();
-						nextEvent = eventQueue.take();
-					} else {
-						return;
-					}
-				}
-				getEvents().processEvent(nextEvent);
-			}
-		}
-		catch ( InterruptedException e ) {
-			throw new RuntimeException( e );
-		}
-	}
+  @Override
+  public void run() {
+    try {
+      // process events, until LastEventOfIteration arrives
+      while (true) {
+        // take waits for an element to exist before returning:
+        //  - thread sleeps until there is an event to process
+        //  - we do not have to bother checking if the element exists
+        Event nextEvent = eventQueue.take();
+        if (nextEvent instanceof LastEventOfIteration) {
+          Gbl.printCurrentThreadCpuTime();
 
-	// schedule LastEventOfIteration and flush buffered events
-	// the LastEventOfIteration lets the event handler threads know,
-	// that there is no more work, as soon as they have processed this,
-	// they are allowed to go to sleep
-	public synchronized void close() {
-		processEvent(new LastEventOfIteration(0.0));
-		emptyPreBuffer();
-	} 
+          // if there are more events generated after end of simulation
+          // (generated in events handler), process them before stopping events handling.
+          // in order to do this, LastEventOfIteration is moved to the back of the queue.
+          if (eventQueue.size() > 0) {
+            processEvent(nextEvent);
+            emptyPreBuffer();
+            nextEvent = eventQueue.take();
+          } else {
+            return;
+          }
+        }
+        getEvents().processEvent(nextEvent);
+      }
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-	public EventsManager getEvents() {
-		return events;
-	}
+  // schedule LastEventOfIteration and flush buffered events
+  // the LastEventOfIteration lets the event handler threads know,
+  // that there is no more work, as soon as they have processed this,
+  // they are allowed to go to sleep
+  public synchronized void close() {
+    processEvent(new LastEventOfIteration(0.0));
+    emptyPreBuffer();
+  }
 
+  public EventsManager getEvents() {
+    return events;
+  }
 }

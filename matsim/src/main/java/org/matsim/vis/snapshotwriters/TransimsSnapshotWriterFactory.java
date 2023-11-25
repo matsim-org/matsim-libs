@@ -21,28 +21,25 @@
 package org.matsim.vis.snapshotwriters;
 
 import com.google.inject.Inject;
-import org.matsim.core.controler.ControlerI;
+import jakarta.inject.Provider;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.ReplanningContext;
 
-import jakarta.inject.Named;
-import jakarta.inject.Provider;
-
 class TransimsSnapshotWriterFactory implements Provider<SnapshotWriter> {
 
-	private OutputDirectoryHierarchy controlerIO;
-	private final int iteration;
+  private OutputDirectoryHierarchy controlerIO;
+  private final int iteration;
 
-	@Inject
-	TransimsSnapshotWriterFactory(OutputDirectoryHierarchy controlerIO, ReplanningContext replanningContext) {
-		this.iteration = replanningContext.getIteration();
-		this.controlerIO = controlerIO;
-	}
+  @Inject
+  TransimsSnapshotWriterFactory(
+      OutputDirectoryHierarchy controlerIO, ReplanningContext replanningContext) {
+    this.iteration = replanningContext.getIteration();
+    this.controlerIO = controlerIO;
+  }
 
-	@Override
-	public SnapshotWriter get() {
-		String fileName = controlerIO.getIterationFilename(iteration, "T.veh.gz");
-		return new TransimsSnapshotWriter(fileName);
-	}
-
+  @Override
+  public SnapshotWriter get() {
+    String fileName = controlerIO.getIterationFilename(iteration, "T.veh.gz");
+    return new TransimsSnapshotWriter(fileName);
+  }
 }

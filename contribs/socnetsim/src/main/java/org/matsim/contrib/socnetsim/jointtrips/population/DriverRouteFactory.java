@@ -23,17 +23,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.RouteFactory;
 
-
 public class DriverRouteFactory implements RouteFactory {
-	@Override
-	public Route createRoute(
-		final Id s,
-		final Id e) {
-		return new DriverRoute( s , e );
-	}
-	
-	@Override
-	public String getCreatedRouteType() {
-		return "driver";
-	}
+  @Override
+  public Route createRoute(final Id s, final Id e) {
+    return new DriverRoute(s, e);
+  }
+
+  @Override
+  public String getCreatedRouteType() {
+    return "driver";
+  }
 }

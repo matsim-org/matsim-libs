@@ -17,9 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
+/** */
 package org.matsim.contrib.noise.examples;
 
 import org.matsim.api.core.v01.Scenario;
@@ -35,34 +33,49 @@ import org.matsim.core.scenario.ScenarioUtils;
 /**
  * An example how to use the noise module during a MATSim run (= online noise computation).
  *
- * The {@link NoiseConfigGroup} specifies parameters that are relevant for the noise computation and if noise damages are internalized.
- * For the internalization of noise damages, there is an average and a marginal cost pricing approach, see {@link NoiseConfigGroup.NoiseAllocationApproach}.
+ * <p>The {@link NoiseConfigGroup} specifies parameters that are relevant for the noise computation
+ * and if noise damages are internalized. For the internalization of noise damages, there is an
+ * average and a marginal cost pricing approach, see {@link
+ * NoiseConfigGroup.NoiseAllocationApproach}.
  *
- * For an example of how to compute noise levels, damages etc. for a final iteration (= offline noise computation), see {@link NoiseOfflineCalculationExample}.
+ * <p>For an example of how to compute noise levels, damages etc. for a final iteration (= offline
+ * noise computation), see {@link NoiseOfflineCalculationExample}.
  *
  * @author ikaddoura
- *
  */
 public class NoiseOnlineControlerExample {
 
-	private static final String configFile = "./contribs/noise/test/input/org/matsim/contrib/noise/config.xml";
+  private static final String configFile =
+      "./contribs/noise/test/input/org/matsim/contrib/noise/config.xml";
 
-	public static void main(String[] args) {
+  public static void main(String[] args) {
 
-		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+    Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
+    Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new NoiseModule());
+    Controler controler = new Controler(scenario);
+    controler.addOverridingModule(new NoiseModule());
 
-		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		controler.run();
+    controler
+        .getConfig()
+        .controller()
+        .setOverwriteFileSetting(
+            OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+    controler.run();
 
-		// optionally process the output data
-		String workingDirectory = controler.getConfig().controller().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controller().getLastIteration() + "/immissions/";
-		String receiverPointsFile = controler.getConfig().controller().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
-		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class ) ;
-		ProcessNoiseImmissions processNoiseImmissions = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile, noiseParameters.getReceiverPointGap());
-		processNoiseImmissions.run();
-	}
+    // optionally process the output data
+    String workingDirectory =
+        controler.getConfig().controller().getOutputDirectory()
+            + "/ITERS/it."
+            + controler.getConfig().controller().getLastIteration()
+            + "/immissions/";
+    String receiverPointsFile =
+        controler.getConfig().controller().getOutputDirectory()
+            + "/receiverPoints/receiverPoints.csv";
+    NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
+    ProcessNoiseImmissions processNoiseImmissions =
+        new ProcessNoiseImmissions(
+            workingDirectory, receiverPointsFile, noiseParameters.getReceiverPointGap());
+    processNoiseImmissions.run();
+  }
 }

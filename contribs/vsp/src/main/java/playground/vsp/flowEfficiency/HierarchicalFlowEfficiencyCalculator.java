@@ -20,39 +20,49 @@
 
 package playground.vsp.flowEfficiency;
 
+import java.util.LinkedList;
+import javax.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.FlowEfficiencyCalculator;
 import org.matsim.lanes.Lane;
 
-import javax.annotation.Nullable;
-import java.util.LinkedList;
-
 /**
- * a {@link FlowEfficiencyCalculator} that holds several implementations of {@link FlowEfficiencyCalculator} in hierarchical order, called {@link SituationalFlowEfficiencyImpact}.
- * Each of these impacts the resulting flow efficiency (by multiplication). Depending on the situation, a  {@link SituationalFlowEfficiencyImpact} can prevent any following
- * impacts in the hierarchical order.
+ * a {@link FlowEfficiencyCalculator} that holds several implementations of {@link
+ * FlowEfficiencyCalculator} in hierarchical order, called {@link SituationalFlowEfficiencyImpact}.
+ * Each of these impacts the resulting flow efficiency (by multiplication). Depending on the
+ * situation, a {@link SituationalFlowEfficiencyImpact} can prevent any following impacts in the
+ * hierarchical order.
  *
  * @author tschlenther
  */
 public final class HierarchicalFlowEfficiencyCalculator implements FlowEfficiencyCalculator {
 
-	private final LinkedList<SituationalFlowEfficiencyImpact> situationalImpacts;
+  private final LinkedList<SituationalFlowEfficiencyImpact> situationalImpacts;
 
-	public HierarchicalFlowEfficiencyCalculator(LinkedList<SituationalFlowEfficiencyImpact> situationalImpacts) {
-		this.situationalImpacts = situationalImpacts;
-	}
+  public HierarchicalFlowEfficiencyCalculator(
+      LinkedList<SituationalFlowEfficiencyImpact> situationalImpacts) {
+    this.situationalImpacts = situationalImpacts;
+  }
 
-	@Override
-	public double calculateFlowEfficiency(QVehicle qVehicle, @Nullable QVehicle previousQVehicle, @Nullable Double timeGapToPreviousVeh, Link link, Id<Lane> laneId) {
-		double flowEfficiencyFactor = qVehicle.getVehicle().getType().getFlowEfficiencyFactor();
+  @Override
+  public double calculateFlowEfficiency(
+      QVehicle qVehicle,
+      @Nullable QVehicle previousQVehicle,
+      @Nullable Double timeGapToPreviousVeh,
+      Link link,
+      Id<Lane> laneId) {
+    double flowEfficiencyFactor = qVehicle.getVehicle().getType().getFlowEfficiencyFactor();
 
-		for (SituationalFlowEfficiencyImpact situationalImpact : this.situationalImpacts) {
-			flowEfficiencyFactor *= situationalImpact.calculateFlowEfficiency(qVehicle, previousQVehicle, timeGapToPreviousVeh, link, laneId);
-			if(situationalImpact.isFinalImpact(qVehicle, previousQVehicle, timeGapToPreviousVeh, link, laneId)) break;
-		}
+    for (SituationalFlowEfficiencyImpact situationalImpact : this.situationalImpacts) {
+      flowEfficiencyFactor *=
+          situationalImpact.calculateFlowEfficiency(
+              qVehicle, previousQVehicle, timeGapToPreviousVeh, link, laneId);
+      if (situationalImpact.isFinalImpact(
+          qVehicle, previousQVehicle, timeGapToPreviousVeh, link, laneId)) break;
+    }
 
-		return flowEfficiencyFactor;
-	}
+    return flowEfficiencyFactor;
+  }
 }

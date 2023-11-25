@@ -20,6 +20,9 @@
 
 package org.matsim.contrib.multimodal.simengine;
 
+import java.io.Serializable;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -27,9 +30,9 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -38,212 +41,273 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
-import java.io.Serializable;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 class MultiModalQLinkExtension {
 
-	private final Link link;
-	private final MultiModalQNodeExtension toNode;
-	private MultiModalSimEngine simEngine;
-	private NetworkElementActivator activator = null;
-	
-	/*
-	 * Is set to "true" if the MultiModalQLinkExtension has active Agents.
-	 */
-    private final AtomicBoolean isActive = new AtomicBoolean(false);
+  private final Link link;
+  private final MultiModalQNodeExtension toNode;
+  private MultiModalSimEngine simEngine;
+  private NetworkElementActivator activator = null;
 
-	private final Queue<Tuple<Double, MobsimAgent>> agents = new PriorityQueue<>(30, new TravelTimeComparator());
-	private final Queue<MobsimAgent> waitingAfterActivityAgents = new LinkedList<>();
-	private final Queue<MobsimAgent> waitingToLeaveAgents = new LinkedList<>();
+  /*
+   * Is set to "true" if the MultiModalQLinkExtension has active Agents.
+   */
+  private final AtomicBoolean isActive = new AtomicBoolean(false);
 
-	/*package*/ MultiModalQLinkExtension(Link link, MultiModalSimEngine simEngine, MultiModalQNodeExtension multiModalQNodeExtension) {
-		this.link = link;
-		this.simEngine = simEngine;
-		this.toNode = multiModalQNodeExtension;
-	}
+  private final Queue<Tuple<Double, MobsimAgent>> agents =
+      new PriorityQueue<>(30, new TravelTimeComparator());
+  private final Queue<MobsimAgent> waitingAfterActivityAgents = new LinkedList<>();
+  private final Queue<MobsimAgent> waitingToLeaveAgents = new LinkedList<>();
 
-	/*package*/ void setNetworkElementActivator(NetworkElementActivator activator) {
-		this.activator = activator;
-	}
+  /*package*/ MultiModalQLinkExtension(
+      Link link, MultiModalSimEngine simEngine, MultiModalQNodeExtension multiModalQNodeExtension) {
+    this.link = link;
+    this.simEngine = simEngine;
+    this.toNode = multiModalQNodeExtension;
+  }
 
-	/*package*/ boolean hasWaitingToLeaveAgents() {
-		return this.waitingToLeaveAgents.size() > 0;
-	}
-	
-	/*package*/ Link getLink() {
-		return this.link;
-	}
+  /*package*/ void setNetworkElementActivator(NetworkElementActivator activator) {
+    this.activator = activator;
+  }
 
-	public void addAgentFromIntersection(MobsimAgent mobsimAgent, double now) {
-		this.activateLink();
+  /*package*/ boolean hasWaitingToLeaveAgents() {
+    return this.waitingToLeaveAgents.size() > 0;
+  }
 
-		this.addAgent(mobsimAgent, now);
+  /*package*/ Link getLink() {
+    return this.link;
+  }
 
-		this.simEngine.getEventsManager().processEvent(new LinkEnterEvent(now, Id.create(mobsimAgent.getId(), Vehicle.class), link.getId()));
-	}
+  public void addAgentFromIntersection(MobsimAgent mobsimAgent, double now) {
+    this.activateLink();
 
-	private void addAgent(MobsimAgent mobsimAgent, double now) {
+    this.addAgent(mobsimAgent, now);
 
-		Map<String, TravelTime> multiModalTravelTime = this.simEngine.getMultiModalTravelTimes();
-		Person person = null;
-		if (mobsimAgent instanceof HasPerson) {
-			person = ((HasPerson) mobsimAgent).getPerson(); 
-		}
-		double travelTime = multiModalTravelTime.get(mobsimAgent.getMode()).getLinkTravelTime(link, now, person, null);
-		double departureTime = now + travelTime;
+    this.simEngine
+        .getEventsManager()
+        .processEvent(
+            new LinkEnterEvent(now, Id.create(mobsimAgent.getId(), Vehicle.class), link.getId()));
+  }
 
-		departureTime = Math.round(departureTime);
+  private void addAgent(MobsimAgent mobsimAgent, double now) {
 
-		this.agents.add(new Tuple<>(departureTime, mobsimAgent));
-	}
+    Map<String, TravelTime> multiModalTravelTime = this.simEngine.getMultiModalTravelTimes();
+    Person person = null;
+    if (mobsimAgent instanceof HasPerson) {
+      person = ((HasPerson) mobsimAgent).getPerson();
+    }
+    double travelTime =
+        multiModalTravelTime.get(mobsimAgent.getMode()).getLinkTravelTime(link, now, person, null);
+    double departureTime = now + travelTime;
 
-	public void addDepartingAgent(MobsimAgent mobsimAgent, double now) {
-		this.waitingAfterActivityAgents.add(mobsimAgent);
-		this.activateLink();
+    departureTime = Math.round(departureTime);
 
-		this.simEngine.getEventsManager().processEvent(
-				new PersonEntersVehicleEvent(now, mobsimAgent.getId(), Id.create(mobsimAgent.getId(), Vehicle.class)));
-	
-		this.simEngine.getEventsManager().processEvent(
-				new VehicleEntersTrafficEvent(now, mobsimAgent.getId(), link.getId(), Id.create(mobsimAgent.getId(), Vehicle.class), mobsimAgent.getMode(), 1.0));
-	}
+    this.agents.add(new Tuple<>(departureTime, mobsimAgent));
+  }
 
-	boolean moveLink(double now) {
-		
-		boolean keepLinkActive = moveAgents(now);
-		this.isActive.set(keepLinkActive);
+  public void addDepartingAgent(MobsimAgent mobsimAgent, double now) {
+    this.waitingAfterActivityAgents.add(mobsimAgent);
+    this.activateLink();
 
-		moveWaitingAfterActivityAgents();
+    this.simEngine
+        .getEventsManager()
+        .processEvent(
+            new PersonEntersVehicleEvent(
+                now, mobsimAgent.getId(), Id.create(mobsimAgent.getId(), Vehicle.class)));
 
-		// If agents are ready to leave the link, ensure that the to Node is active and handles them.
-		if (this.hasWaitingToLeaveAgents()) toNode.activateNode();
-		
-		return keepLinkActive;
-	}
+    this.simEngine
+        .getEventsManager()
+        .processEvent(
+            new VehicleEntersTrafficEvent(
+                now,
+                mobsimAgent.getId(),
+                link.getId(),
+                Id.create(mobsimAgent.getId(), Vehicle.class),
+                mobsimAgent.getMode(),
+                1.0));
+  }
 
-	private void activateLink() {
-		/*
-		 * If isActive is false, then it is set to true ant the
-		 * link is activated. Using an AtomicBoolean is thread-safe.
-		 * Otherwise, it could be activated multiple times concurrently.
-		 */
-		if (this.isActive.compareAndSet(false, true)) {			
-			this.activator.activateLink(this);
-		}
-	}
+  boolean moveLink(double now) {
 
-	/*
-	 * Returns true, if the Link has to be still active.
-	 */
-	private boolean moveAgents(double now) {
-		Tuple<Double, MobsimAgent> tuple;
+    boolean keepLinkActive = moveAgents(now);
+    this.isActive.set(keepLinkActive);
 
-		while ((tuple = agents.peek()) != null) {
-			/*
-			 * If the MobsimAgent cannot depart now:
-			 * At least still one Agent is still walking/cycling/... on the Link, therefore
-			 * it cannot be deactivated. We return true (Link has to be kept active).
-			 */
-			if (tuple.getFirst() > now) {
-				return true;
-			}
+    moveWaitingAfterActivityAgents();
 
-			/*
-			 *  Agent starts next Activity at the same link or leaves the Link.
-			 *  Therefore remove him from the Queue.
-			 */
-			agents.poll();
+    // If agents are ready to leave the link, ensure that the to Node is active and handles them.
+    if (this.hasWaitingToLeaveAgents()) toNode.activateNode();
 
-			// Check if MobsimAgent has reached destination:
-			MobsimDriverAgent driver = (MobsimDriverAgent) tuple.getSecond();
+    return keepLinkActive;
+  }
 
-//			if ((link.getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
-			if ((link.getId().equals(driver.getDestinationLinkId())) && (driver.isWantingToArriveOnCurrentLink())) {
-				// Christoph, the "isArrivingOnCurrentLink" method is new.  You may decide that this is enough, and getDestinationLinkId
-				// does not need to be queried.  kai, nov'14
-				
-				this.simEngine.getMobsim().getEventsManager().processEvent(
-						new VehicleLeavesTrafficEvent(now, driver.getId(), link.getId(), Id.create(driver.getId(), Vehicle.class), driver.getMode(), 1.0));
-				
-				this.simEngine.getMobsim().getEventsManager().processEvent(
-						new PersonLeavesVehicleEvent(now, driver.getId(), Id.create(driver.getId(), Vehicle.class)));				
-				
-				driver.endLegAndComputeNextState(now);
-				this.simEngine.internalInterface.arrangeNextAgentState(driver);
-			}
-			/*
-			 * The PersonAgent can leave, therefore we move him to the waitingToLeave Queue.
-			 */
-			else {
-				this.waitingToLeaveAgents.add(driver);
-			}
-		}
-		
-		return agents.size() > 0;
-	}
+  private void activateLink() {
+    /*
+     * If isActive is false, then it is set to true ant the
+     * link is activated. Using an AtomicBoolean is thread-safe.
+     * Otherwise, it could be activated multiple times concurrently.
+     */
+    if (this.isActive.compareAndSet(false, true)) {
+      this.activator.activateLink(this);
+    }
+  }
 
-	/*
-	 * Add all Agents that have ended an Activity to the waitingToLeaveLink Queue.
-	 * If waiting Agents exist, the toNode of this Link is activated.
-	 */
-	private void moveWaitingAfterActivityAgents() {
-		waitingToLeaveAgents.addAll(waitingAfterActivityAgents);
-		waitingAfterActivityAgents.clear();
-	}
+  /*
+   * Returns true, if the Link has to be still active.
+   */
+  private boolean moveAgents(double now) {
+    Tuple<Double, MobsimAgent> tuple;
 
-	public MobsimAgent getNextWaitingAgent(double now) {
-		MobsimAgent personAgent = waitingToLeaveAgents.poll();
-		if (personAgent != null) {
-			this.simEngine.getEventsManager().processEvent(new LinkLeaveEvent(now, Id.create(personAgent.getId(), Vehicle.class), link.getId()));
-		}
-		return personAgent;
-	}
+    while ((tuple = agents.peek()) != null) {
+      /*
+       * If the MobsimAgent cannot depart now:
+       * At least still one Agent is still walking/cycling/... on the Link, therefore
+       * it cannot be deactivated. We return true (Link has to be kept active).
+       */
+      if (tuple.getFirst() > now) {
+        return true;
+      }
 
-	public void clearVehicles() {
-		double now = this.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+      /*
+       *  Agent starts next Activity at the same link or leaves the Link.
+       *  Therefore remove him from the Queue.
+       */
+      agents.poll();
 
-		for (Tuple<Double, MobsimAgent> tuple : agents) {
-			MobsimAgent mobsimAgent = tuple.getSecond();
-			this.simEngine.getMobsim().getEventsManager().processEvent(
-					new VehicleAbortsEvent(now, Id.create(mobsimAgent.getId(), Vehicle.class), link.getId()));
-			this.simEngine.getMobsim().getEventsManager().processEvent(
-					new PersonStuckEvent(now, mobsimAgent.getId(), link.getId(), mobsimAgent.getMode()));
-			this.simEngine.getMobsim().getAgentCounter().incLost();
-			this.simEngine.getMobsim().getAgentCounter().decLiving();
-		}
-		
-		for (MobsimAgent mobsimAgent : this.waitingAfterActivityAgents) {
-			this.simEngine.getMobsim().getEventsManager().processEvent(
-					new VehicleAbortsEvent(now, Id.create(mobsimAgent.getId(), Vehicle.class), link.getId()));
-			this.simEngine.getMobsim().getEventsManager().processEvent(
-					new PersonStuckEvent(now, mobsimAgent.getId(), link.getId(), mobsimAgent.getMode()));
-			this.simEngine.getMobsim().getAgentCounter().incLost();
-			this.simEngine.getMobsim().getAgentCounter().decLiving();
-		}
-		
-		for (MobsimAgent mobsimAgent : this.waitingToLeaveAgents) {
-			this.simEngine.getMobsim().getEventsManager().processEvent(
-					new VehicleAbortsEvent(now, Id.create(mobsimAgent.getId(), Vehicle.class), link.getId()));
-			this.simEngine.getMobsim().getEventsManager().processEvent(
-					new PersonStuckEvent(now, mobsimAgent.getId(), link.getId(), mobsimAgent.getMode()));
-			this.simEngine.getMobsim().getAgentCounter().incLost();
-			this.simEngine.getMobsim().getAgentCounter().decLiving();
-		}
-		
-		this.agents.clear();
-	}
+      // Check if MobsimAgent has reached destination:
+      MobsimDriverAgent driver = (MobsimDriverAgent) tuple.getSecond();
 
-	private static class TravelTimeComparator implements Comparator<Tuple<Double, MobsimAgent>>, Serializable {
-		private static final long serialVersionUID = 1L;
-		@Override
-		public int compare(final Tuple<Double, MobsimAgent> o1, final Tuple<Double, MobsimAgent> o2) {
-			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
-			if (ret == 0) {
-				ret = o2.getSecond().getId().compareTo(o1.getSecond().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
-			}
-			return ret;
-		}
-	}
+      //			if ((link.getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() ==
+      // null)) {
+      if ((link.getId().equals(driver.getDestinationLinkId()))
+          && (driver.isWantingToArriveOnCurrentLink())) {
+        // Christoph, the "isArrivingOnCurrentLink" method is new.  You may decide that this is
+        // enough, and getDestinationLinkId
+        // does not need to be queried.  kai, nov'14
+
+        this.simEngine
+            .getMobsim()
+            .getEventsManager()
+            .processEvent(
+                new VehicleLeavesTrafficEvent(
+                    now,
+                    driver.getId(),
+                    link.getId(),
+                    Id.create(driver.getId(), Vehicle.class),
+                    driver.getMode(),
+                    1.0));
+
+        this.simEngine
+            .getMobsim()
+            .getEventsManager()
+            .processEvent(
+                new PersonLeavesVehicleEvent(
+                    now, driver.getId(), Id.create(driver.getId(), Vehicle.class)));
+
+        driver.endLegAndComputeNextState(now);
+        this.simEngine.internalInterface.arrangeNextAgentState(driver);
+      }
+      /*
+       * The PersonAgent can leave, therefore we move him to the waitingToLeave Queue.
+       */
+      else {
+        this.waitingToLeaveAgents.add(driver);
+      }
+    }
+
+    return agents.size() > 0;
+  }
+
+  /*
+   * Add all Agents that have ended an Activity to the waitingToLeaveLink Queue.
+   * If waiting Agents exist, the toNode of this Link is activated.
+   */
+  private void moveWaitingAfterActivityAgents() {
+    waitingToLeaveAgents.addAll(waitingAfterActivityAgents);
+    waitingAfterActivityAgents.clear();
+  }
+
+  public MobsimAgent getNextWaitingAgent(double now) {
+    MobsimAgent personAgent = waitingToLeaveAgents.poll();
+    if (personAgent != null) {
+      this.simEngine
+          .getEventsManager()
+          .processEvent(
+              new LinkLeaveEvent(now, Id.create(personAgent.getId(), Vehicle.class), link.getId()));
+    }
+    return personAgent;
+  }
+
+  public void clearVehicles() {
+    double now = this.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+
+    for (Tuple<Double, MobsimAgent> tuple : agents) {
+      MobsimAgent mobsimAgent = tuple.getSecond();
+      this.simEngine
+          .getMobsim()
+          .getEventsManager()
+          .processEvent(
+              new VehicleAbortsEvent(
+                  now, Id.create(mobsimAgent.getId(), Vehicle.class), link.getId()));
+      this.simEngine
+          .getMobsim()
+          .getEventsManager()
+          .processEvent(
+              new PersonStuckEvent(now, mobsimAgent.getId(), link.getId(), mobsimAgent.getMode()));
+      this.simEngine.getMobsim().getAgentCounter().incLost();
+      this.simEngine.getMobsim().getAgentCounter().decLiving();
+    }
+
+    for (MobsimAgent mobsimAgent : this.waitingAfterActivityAgents) {
+      this.simEngine
+          .getMobsim()
+          .getEventsManager()
+          .processEvent(
+              new VehicleAbortsEvent(
+                  now, Id.create(mobsimAgent.getId(), Vehicle.class), link.getId()));
+      this.simEngine
+          .getMobsim()
+          .getEventsManager()
+          .processEvent(
+              new PersonStuckEvent(now, mobsimAgent.getId(), link.getId(), mobsimAgent.getMode()));
+      this.simEngine.getMobsim().getAgentCounter().incLost();
+      this.simEngine.getMobsim().getAgentCounter().decLiving();
+    }
+
+    for (MobsimAgent mobsimAgent : this.waitingToLeaveAgents) {
+      this.simEngine
+          .getMobsim()
+          .getEventsManager()
+          .processEvent(
+              new VehicleAbortsEvent(
+                  now, Id.create(mobsimAgent.getId(), Vehicle.class), link.getId()));
+      this.simEngine
+          .getMobsim()
+          .getEventsManager()
+          .processEvent(
+              new PersonStuckEvent(now, mobsimAgent.getId(), link.getId(), mobsimAgent.getMode()));
+      this.simEngine.getMobsim().getAgentCounter().incLost();
+      this.simEngine.getMobsim().getAgentCounter().decLiving();
+    }
+
+    this.agents.clear();
+  }
+
+  private static class TravelTimeComparator
+      implements Comparator<Tuple<Double, MobsimAgent>>, Serializable {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public int compare(final Tuple<Double, MobsimAgent> o1, final Tuple<Double, MobsimAgent> o2) {
+      int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
+      if (ret == 0) {
+        ret =
+            o2.getSecond()
+                .getId()
+                .compareTo(
+                    o1.getSecond()
+                        .getId()); // if they're equal, compare the Ids: the one with the larger Id
+        // should be first
+      }
+      return ret;
+    }
+  }
 }

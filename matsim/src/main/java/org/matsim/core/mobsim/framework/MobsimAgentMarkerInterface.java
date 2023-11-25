@@ -22,8 +22,5 @@ package org.matsim.core.mobsim.framework;
 
 /**
  * @author nagel
- *
  */
-public interface MobsimAgentMarkerInterface {
-
-}
+public interface MobsimAgentMarkerInterface {}

@@ -19,12 +19,13 @@
 
 package org.matsim.contrib.signals.data.ambertimes.v10;
 
-import javax.xml.XMLConstants;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import javax.xml.XMLConstants;
 import javax.xml.validation.SchemaFactory;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.AbstractSignalsReader;
 import org.matsim.contrib.signals.model.Signal;
@@ -35,79 +36,75 @@ import org.matsim.jaxb.amberTimes10.XMLAmberTimes.XMLSignalSystem.XMLSignal;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-
 /**
  * @author jbischoff
  * @author dgrether
  */
 public final class AmberTimesReader10 extends AbstractSignalsReader {
 
-	private AmberTimesData amberTimesData;
+  private AmberTimesData amberTimesData;
 
-	public AmberTimesReader10(AmberTimesData amberTimesData) {
-		this.amberTimesData = amberTimesData;
-	}
+  public AmberTimesReader10(AmberTimesData amberTimesData) {
+    this.amberTimesData = amberTimesData;
+  }
 
+  public void read(InputSource stream) {
+    // create jaxb infrastructure
+    JAXBContext jc;
+    XMLAmberTimes xmlatdefs;
+    try {
+      jc = JAXBContext.newInstance(org.matsim.jaxb.amberTimes10.ObjectFactory.class);
+      Unmarshaller u = jc.createUnmarshaller();
+      // validate XML file
+      u.setSchema(
+          SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+              .newSchema(getClass().getResource("/dtd/amberTimes_v1.0.xsd")));
+      xmlatdefs = (XMLAmberTimes) u.unmarshal(stream);
+    } catch (JAXBException | SAXException e) {
+      throw new UncheckedIOException(new IOException(e));
+    }
 
-	public void read( InputSource stream ) {
-		// create jaxb infrastructure
-		JAXBContext jc;
-		XMLAmberTimes xmlatdefs;
-		try {
-			jc = JAXBContext.newInstance(org.matsim.jaxb.amberTimes10.ObjectFactory.class);
-			Unmarshaller u = jc.createUnmarshaller();
-			// validate XML file
-			u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/amberTimes_v1.0.xsd")));
-			xmlatdefs = (XMLAmberTimes) u.unmarshal(stream);
-		} catch (JAXBException | SAXException e) {
-			throw new UncheckedIOException(new IOException(e));
-		}
+    // convert from Jaxb types to MATSim-API conform types
 
-		// convert from Jaxb types to MATSim-API conform types
+    // Global Defaults
+    if (xmlatdefs.getGlobalDefaults() != null) {
+      if (xmlatdefs.getGlobalDefaults().getAmber() != null) {
+        amberTimesData.setDefaultAmber(
+            xmlatdefs.getGlobalDefaults().getAmber().getSeconds().intValue());
+      }
+      if (xmlatdefs.getGlobalDefaults().getAmberTimeGreen() != null) {
+        amberTimesData.setDefaultAmberTimeGreen(
+            xmlatdefs.getGlobalDefaults().getAmberTimeGreen().getProportion().doubleValue());
+      }
+      if (xmlatdefs.getGlobalDefaults().getRedAmber() != null) {
+        amberTimesData.setDefaultRedAmber(
+            xmlatdefs.getGlobalDefaults().getRedAmber().getSeconds().intValue());
+      }
+    }
 
-		// Global Defaults
-		if (xmlatdefs.getGlobalDefaults() != null){
-			if (xmlatdefs.getGlobalDefaults().getAmber() != null){
-				amberTimesData
-				.setDefaultAmber(xmlatdefs.getGlobalDefaults().getAmber().getSeconds().intValue());
-			}
-			if (xmlatdefs.getGlobalDefaults().getAmberTimeGreen() != null){
-				amberTimesData.setDefaultAmberTimeGreen(xmlatdefs.getGlobalDefaults().getAmberTimeGreen()
-						.getProportion().doubleValue());
-			}
-			if (xmlatdefs.getGlobalDefaults().getRedAmber() != null){
-				amberTimesData.setDefaultRedAmber(xmlatdefs.getGlobalDefaults().getRedAmber().getSeconds()
-						.intValue());
-			}
-		}
+    for (XMLSignalSystem xmlss : xmlatdefs.getSignalSystem()) {
+      Id<SignalSystem> ssid = Id.create(xmlss.getRefId(), SignalSystem.class);
+      AmberTimeData atdata = new AmberTimeDataImpl(ssid);
 
-		for (XMLSignalSystem xmlss : xmlatdefs.getSignalSystem()) {
-			Id<SignalSystem> ssid = Id.create(xmlss.getRefId(), SignalSystem.class);
-			AmberTimeData atdata = new AmberTimeDataImpl(ssid);
+      // Signalsystem Defaults
+      if (xmlss.getSystemDefaults() != null) {
+        if (xmlss.getSystemDefaults().getAmber() != null) {
+          atdata.setDefaultAmber(xmlss.getSystemDefaults().getAmber().getSeconds().intValue());
+        }
+        if (xmlss.getSystemDefaults().getRedAmber() != null) {
+          atdata.setDefaultRedAmber(
+              xmlss.getSystemDefaults().getRedAmber().getSeconds().intValue());
+        }
+      }
 
-			// Signalsystem Defaults
-			if (xmlss.getSystemDefaults() != null){
-				if (xmlss.getSystemDefaults().getAmber() != null){
-					atdata.setDefaultAmber(xmlss.getSystemDefaults().getAmber().getSeconds().intValue());
-				}
-				if (xmlss.getSystemDefaults().getRedAmber() != null){
-					atdata.setDefaultRedAmber(xmlss.getSystemDefaults().getRedAmber().getSeconds().intValue());
-				}
-			}
+      for (XMLSignal xmls : xmlss.getSignal()) {
 
-			for (XMLSignal xmls : xmlss.getSignal()) {
+        Id<Signal> sid = Id.create(xmls.getRefId(), Signal.class);
+        atdata.setAmberTimeOfSignal(sid, xmls.getAmber().getSeconds().intValue());
+        atdata.setRedAmberTimeOfSignal(sid, xmls.getRedAmber().getSeconds().intValue());
+      }
 
-				Id<Signal> sid = Id.create(xmls.getRefId(), Signal.class);
-				atdata.setAmberTimeOfSignal(sid, xmls.getAmber().getSeconds().intValue());
-				atdata.setRedAmberTimeOfSignal(sid, xmls.getRedAmber().getSeconds().intValue());
-
-			}
-
-			amberTimesData.addAmberTimeData(atdata);
-		}
-
-	}
-
+      amberTimesData.addAmberTimeData(atdata);
+    }
+  }
 }

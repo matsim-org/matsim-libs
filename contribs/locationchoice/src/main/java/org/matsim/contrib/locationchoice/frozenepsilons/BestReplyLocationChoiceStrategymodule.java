@@ -19,8 +19,8 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
+import jakarta.inject.Provider;
 import java.util.*;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -50,112 +50,145 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-import jakarta.inject.Provider;
-
 /**
- * Idea of this should be as follows: all persons and all facilities have k values.  frozen epsilon will be generated on the fly from those two values.  together with frozen
- * epsilon, the location choice is indeed best reply.
+ * Idea of this should be as follows: all persons and all facilities have k values. frozen epsilon
+ * will be generated on the fly from those two values. together with frozen epsilon, the location
+ * choice is indeed best reply.
  */
 final class BestReplyLocationChoiceStrategymodule extends AbstractMultithreadedModule {
 
-	private static final Logger log = LogManager.getLogger( BestReplyLocationChoiceStrategymodule.class );
-	private final Provider<TripRouter> tripRouterProvider;
+  private static final Logger log =
+      LogManager.getLogger(BestReplyLocationChoiceStrategymodule.class);
+  private final Provider<TripRouter> tripRouterProvider;
 
-	private ObjectAttributes personsMaxEpsUnscaled;
-	private DestinationSampler sampler;
-	private TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType = new TreeMap<>();
-//	private TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<>();
-	private final Scenario scenario;
-	private DestinationChoiceContext lcContext;
-	private HashSet<String> flexibleTypes;
-	private final LeastCostPathCalculatorFactory forwardMultiNodeDijsktaFactory;
-	private final LeastCostPathCalculatorFactory backwardMultiNodeDijsktaFactory;
-	private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks;
-	private final TimeInterpretation timeInterpretation;
+  private ObjectAttributes personsMaxEpsUnscaled;
+  private DestinationSampler sampler;
+  private TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType = new TreeMap<>();
+  //	private TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<>();
+  private final Scenario scenario;
+  private DestinationChoiceContext lcContext;
+  private HashSet<String> flexibleTypes;
+  private final LeastCostPathCalculatorFactory forwardMultiNodeDijsktaFactory;
+  private final LeastCostPathCalculatorFactory backwardMultiNodeDijsktaFactory;
+  private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks;
+  private final TimeInterpretation timeInterpretation;
 
-	public static double useScaleEpsilonFromConfig = -99.0;
-	private ScoringFunctionFactory scoringFunctionFactory;
-	private Map<String, TravelTime> travelTimes;
-	private Map<String, TravelDisutilityFactory> travelDisutilities;
+  public static double useScaleEpsilonFromConfig = -99.0;
+  private ScoringFunctionFactory scoringFunctionFactory;
+  private Map<String, TravelTime> travelTimes;
+  private Map<String, TravelDisutilityFactory> travelDisutilities;
 
-	public BestReplyLocationChoiceStrategymodule( Provider<TripRouter> tripRouterProvider, DestinationChoiceContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled,
-								    ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities,
-								    TimeInterpretation timeInterpretation) {
-		super(lcContext.getScenario().getConfig().global());
-		this.tripRouterProvider = tripRouterProvider;
-		this.scoringFunctionFactory = scoringFunctionFactory;
-		this.travelTimes = travelTimes;
-		this.travelDisutilities = travelDisutilities;
-		this.timeInterpretation = timeInterpretation;
+  public BestReplyLocationChoiceStrategymodule(
+      Provider<TripRouter> tripRouterProvider,
+      DestinationChoiceContext lcContext,
+      ObjectAttributes personsMaxDCScoreUnscaled,
+      ScoringFunctionFactory scoringFunctionFactory,
+      Map<String, TravelTime> travelTimes,
+      Map<String, TravelDisutilityFactory> travelDisutilities,
+      TimeInterpretation timeInterpretation) {
+    super(lcContext.getScenario().getConfig().global());
+    this.tripRouterProvider = tripRouterProvider;
+    this.scoringFunctionFactory = scoringFunctionFactory;
+    this.travelTimes = travelTimes;
+    this.travelDisutilities = travelDisutilities;
+    this.timeInterpretation = timeInterpretation;
 
-		FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule( lcContext.getScenario().getConfig(), FrozenTastesConfigGroup.class );
-		if (!FrozenTastesConfigGroup.Algotype.bestResponse.equals( dccg.getAlgorithm() )) {
-			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
-		}
-		this.lcContext = lcContext;
-		this.scenario = lcContext.getScenario();
-		this.personsMaxEpsUnscaled = personsMaxDCScoreUnscaled;
-		this.forwardMultiNodeDijsktaFactory = new FastMultiNodeDijkstraFactory(true);
-		this.backwardMultiNodeDijsktaFactory = new BackwardFastMultiNodeDijkstraFactory(true);
+    FrozenTastesConfigGroup dccg =
+        ConfigUtils.addOrGetModule(
+            lcContext.getScenario().getConfig(), FrozenTastesConfigGroup.class);
+    if (!FrozenTastesConfigGroup.Algotype.bestResponse.equals(dccg.getAlgorithm())) {
+      throw new RuntimeException(
+          "wrong class for selected location choice algorithm type; aborting ...");
+    }
+    this.lcContext = lcContext;
+    this.scenario = lcContext.getScenario();
+    this.personsMaxEpsUnscaled = personsMaxDCScoreUnscaled;
+    this.forwardMultiNodeDijsktaFactory = new FastMultiNodeDijkstraFactory(true);
+    this.backwardMultiNodeDijsktaFactory = new BackwardFastMultiNodeDijkstraFactory(true);
 
-		// create cache which is used in ChoiceSet
-		// instead of just the nearest link we probably should check whether the facility is attached to a link? cdobler, oct'14
-		this.nearestLinks = new HashMap<>();
-		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
-			if (facility.getLinkId() != null)
-				this.nearestLinks.put(facility.getId(), facility.getLinkId());
-			else
-				this.nearestLinks.put(facility.getId(), Objects.requireNonNull( NetworkUtils.getNearestLink( scenario.getNetwork(), facility.getCoord() ) ).getId() );
-		}
+    // create cache which is used in ChoiceSet
+    // instead of just the nearest link we probably should check whether the facility is attached to
+    // a link? cdobler, oct'14
+    this.nearestLinks = new HashMap<>();
+    for (ActivityFacility facility :
+        this.scenario.getActivityFacilities().getFacilities().values()) {
+      if (facility.getLinkId() != null)
+        this.nearestLinks.put(facility.getId(), facility.getLinkId());
+      else
+        this.nearestLinks.put(
+            facility.getId(),
+            Objects.requireNonNull(
+                    NetworkUtils.getNearestLink(scenario.getNetwork(), facility.getCoord()))
+                .getId());
+    }
 
-		this.flexibleTypes = this.lcContext.getFlexibleTypes();
-		this.initTrees();
-		this.sampler = new DestinationSampler(
-			  this.lcContext.getPersonsKValuesArray(),
-			  this.lcContext.getFacilitiesKValuesArray(),
-			  dccg );
-	}
+    this.flexibleTypes = this.lcContext.getFlexibleTypes();
+    this.initTrees();
+    this.sampler =
+        new DestinationSampler(
+            this.lcContext.getPersonsKValuesArray(),
+            this.lcContext.getFacilitiesKValuesArray(),
+            dccg);
+  }
 
-	/**
-	 * Initialize the quadtrees of all available activity types
-	 */
-	private void initTrees() {
-		log.info("Doing location choice for activities: " + this.flexibleTypes.toString());
+  /** Initialize the quadtrees of all available activity types */
+  private void initTrees() {
+    log.info("Doing location choice for activities: " + this.flexibleTypes.toString());
 
-		for (String flexibleType : this.flexibleTypes) {
-			Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> tuple = this.lcContext.getQuadTreeAndFacilities(flexibleType);
-			this.quadTreesOfType.put(flexibleType, tuple.getFirst());
-//			this.facilitiesOfType.put(flexibleType, tuple.getSecond());
-		}
-	}
+    for (String flexibleType : this.flexibleTypes) {
+      Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> tuple =
+          this.lcContext.getQuadTreeAndFacilities(flexibleType);
+      this.quadTreesOfType.put(flexibleType, tuple.getFirst());
+      //			this.facilitiesOfType.put(flexibleType, tuple.getSecond());
+    }
+  }
 
-	@Override
-	protected final void beforeFinishReplanningHook() {
-		Gbl.printMemoryUsage();
-	}
+  @Override
+  protected final void beforeFinishReplanningHook() {
+    Gbl.printMemoryUsage();
+  }
 
-	@Override
-	public final PlanAlgorithm getPlanAlgoInstance() {
+  @Override
+  public final PlanAlgorithm getPlanAlgoInstance() {
 
-		ReplanningContext replanningContext = this.getReplanningContext();
+    ReplanningContext replanningContext = this.getReplanningContext();
 
-		MultiNodeDijkstra forwardMultiNodeDijkstra = (MultiNodeDijkstra) this.forwardMultiNodeDijsktaFactory.createPathCalculator(
-			  this.scenario.getNetwork(),
-			  travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car)),
-			  travelTimes.get(TransportMode.car));
+    MultiNodeDijkstra forwardMultiNodeDijkstra =
+        (MultiNodeDijkstra)
+            this.forwardMultiNodeDijsktaFactory.createPathCalculator(
+                this.scenario.getNetwork(),
+                travelDisutilities
+                    .get(TransportMode.car)
+                    .createTravelDisutility(travelTimes.get(TransportMode.car)),
+                travelTimes.get(TransportMode.car));
 
-		BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra = (BackwardFastMultiNodeDijkstra) this.backwardMultiNodeDijsktaFactory.createPathCalculator(
-			  this.scenario.getNetwork(),
-			  travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car)),
-			  travelTimes.get(TransportMode.car));
+    BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra =
+        (BackwardFastMultiNodeDijkstra)
+            this.backwardMultiNodeDijsktaFactory.createPathCalculator(
+                this.scenario.getNetwork(),
+                travelDisutilities
+                    .get(TransportMode.car)
+                    .createTravelDisutility(travelTimes.get(TransportMode.car)),
+                travelTimes.get(TransportMode.car));
 
-		// this one corresponds to the "frozen epsilon" paper(s)
-		// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
+    // this one corresponds to the "frozen epsilon" paper(s)
+    // the random number generators are re-seeded anyway in the dc module. So we do not need a
+    // MatsimRandom instance here
 
-		TripRouter tripRouter = tripRouterProvider.get();
-		int iteration = replanningContext.getIteration();
+    TripRouter tripRouter = tripRouterProvider.get();
+    int iteration = replanningContext.getIteration();
 
-		return new BestReplyLocationChoicePlanAlgorithm(this.quadTreesOfType, this.personsMaxEpsUnscaled,
-			  this.lcContext, this.sampler, tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, scoringFunctionFactory, iteration, this.nearestLinks, timeInterpretation);
-	}
+    return new BestReplyLocationChoicePlanAlgorithm(
+        this.quadTreesOfType,
+        this.personsMaxEpsUnscaled,
+        this.lcContext,
+        this.sampler,
+        tripRouter,
+        forwardMultiNodeDijkstra,
+        backwardMultiNodeDijkstra,
+        scoringFunctionFactory,
+        iteration,
+        this.nearestLinks,
+        timeInterpretation);
+  }
 }

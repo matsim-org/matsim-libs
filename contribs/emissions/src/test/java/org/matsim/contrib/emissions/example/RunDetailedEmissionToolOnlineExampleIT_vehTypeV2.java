@@ -28,37 +28,39 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import static org.junit.Assert.fail;
-
 /**
  * @author nagel
- *
  */
 public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV2 {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	/**
-	 * Test method for {@link RunDetailedEmissionToolOnlineExample#main(String[])}.
-	 */
+  /** Test method for {@link RunDetailedEmissionToolOnlineExample#main(String[])}. */
 
-//	@Test(expected=RuntimeException.class) // Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
-	@Ignore //Ignore this test, because the thrown exception during events handling does not always leads to an abort of the Simulation ->> Maybe a problem in @link{ParallelEventsManagerImpl.class}?
-	@Test
-	public final void testDetailed_vehTypeV2() {
-		boolean gotAnException = false ;
-		try {
-			RunDetailedEmissionToolOnlineExample onlineExample = new RunDetailedEmissionToolOnlineExample();
-			Config config = onlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"} ) ;
-			config.controller().setOutputDirectory( utils.getOutputDirectory() );
-			config.controller().setLastIteration( 1 );
-			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-			emissionsConfig.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
-			Scenario scenario = onlineExample.prepareScenario( config ) ;
-			onlineExample.run( scenario ) ;
-		} catch (Exception ee ) {
-			gotAnException = true ;
-		}
-		Assert.assertTrue( gotAnException );
-	}
-
+  //	@Test(expected=RuntimeException.class) // Expecting RuntimeException, because requested values
+  // are only in average file. Without fallback it has to fail!
+  @Ignore // Ignore this test, because the thrown exception during events handling does not always
+  // leads to an abort of the Simulation ->> Maybe a problem in
+  // @link{ParallelEventsManagerImpl.class}?
+  @Test
+  public final void testDetailed_vehTypeV2() {
+    boolean gotAnException = false;
+    try {
+      RunDetailedEmissionToolOnlineExample onlineExample =
+          new RunDetailedEmissionToolOnlineExample();
+      Config config =
+          onlineExample.prepareConfig(
+              new String[] {"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"});
+      config.controller().setOutputDirectory(utils.getOutputDirectory());
+      config.controller().setLastIteration(1);
+      EmissionsConfigGroup emissionsConfig =
+          ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
+      emissionsConfig.setDetailedVsAverageLookupBehavior(
+          EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
+      Scenario scenario = onlineExample.prepareScenario(config);
+      onlineExample.run(scenario);
+    } catch (Exception ee) {
+      gotAnException = true;
+    }
+    Assert.assertTrue(gotAnException);
+  }
 }

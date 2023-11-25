@@ -1,5 +1,7 @@
 package org.matsim.contrib.drt.extension.operations.shifts.run;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
@@ -68,130 +70,199 @@ import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Singleton;
-
 /**
  * @author nkuehnel, fzwick / MOIA
  */
 public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
-	private final DrtConfigGroup drtCfg;
-	private final DrtOperationsParams drtOperationsParams;
+  private final DrtConfigGroup drtCfg;
+  private final DrtOperationsParams drtOperationsParams;
 
-	public ShiftDrtModeOptimizerQSimModule(DrtConfigGroup drtCfg) {
-		super(drtCfg.getMode());
-		this.drtCfg = drtCfg;
-		this.drtOperationsParams = ((DrtWithOperationsConfigGroup) drtCfg).getDrtOperationsParams();
-	}
+  public ShiftDrtModeOptimizerQSimModule(DrtConfigGroup drtCfg) {
+    super(drtCfg.getMode());
+    this.drtCfg = drtCfg;
+    this.drtOperationsParams = ((DrtWithOperationsConfigGroup) drtCfg).getDrtOperationsParams();
+  }
 
-	@Override
-	protected void configureQSim() {
+  @Override
+  protected void configureQSim() {
 
-		ShiftsParams shiftsParams = drtOperationsParams.getShiftsParams().orElseThrow();
-		bindModal(DrtShifts.class).toProvider(new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
-			@Override
-			public DrtShifts get() {
-				DrtShiftsSpecification shiftsSpecification = getModalInstance(DrtShiftsSpecification.class);
-				ImmutableMap<Id<DrtShift>, DrtShiftImpl> shifts = shiftsSpecification.getShiftSpecifications().values()
-						.stream()
-						.map(spec -> {
-							DefaultShiftBreakImpl shiftBreak = null;
-							DrtShiftBreakSpecification breakSpec = spec.getBreak().orElse(null);
-							if(breakSpec != null) {
-								shiftBreak = new DefaultShiftBreakImpl(
-										breakSpec.getEarliestBreakStartTime(),
-										breakSpec.getLatestBreakEndTime(),
-										breakSpec.getDuration());
-							}
-							return new DrtShiftImpl(spec.getId(), spec.getStartTime(), spec.getEndTime(), spec.getOperationFacilityId().orElse(null), shiftBreak);
-						})
-						.collect(ImmutableMap.toImmutableMap(DrtShift::getId, s -> s));
-				return () -> shifts;
-			}
-		}).asEagerSingleton();
+    ShiftsParams shiftsParams = drtOperationsParams.getShiftsParams().orElseThrow();
+    bindModal(DrtShifts.class)
+        .toProvider(
+            new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
+              @Override
+              public DrtShifts get() {
+                DrtShiftsSpecification shiftsSpecification =
+                    getModalInstance(DrtShiftsSpecification.class);
+                ImmutableMap<Id<DrtShift>, DrtShiftImpl> shifts =
+                    shiftsSpecification.getShiftSpecifications().values().stream()
+                        .map(
+                            spec -> {
+                              DefaultShiftBreakImpl shiftBreak = null;
+                              DrtShiftBreakSpecification breakSpec = spec.getBreak().orElse(null);
+                              if (breakSpec != null) {
+                                shiftBreak =
+                                    new DefaultShiftBreakImpl(
+                                        breakSpec.getEarliestBreakStartTime(),
+                                        breakSpec.getLatestBreakEndTime(),
+                                        breakSpec.getDuration());
+                              }
+                              return new DrtShiftImpl(
+                                  spec.getId(),
+                                  spec.getStartTime(),
+                                  spec.getEndTime(),
+                                  spec.getOperationFacilityId().orElse(null),
+                                  shiftBreak);
+                            })
+                        .collect(ImmutableMap.toImmutableMap(DrtShift::getId, s -> s));
+                return () -> shifts;
+              }
+            })
+        .asEagerSingleton();
 
-		addModalComponent(DrtOptimizer.class, modalProvider(
-				getter -> { 
-					return new ShiftDrtOptimizer(
-						new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
-							getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
-							getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
-							getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class),
-							getter.getModal(DrtRequestInsertionRetryQueue.class)
-						),
-						getter.getModal(DrtShiftDispatcher.class),
-						getter.getModal(ScheduleTimingUpdater.class));
-				}));
+    addModalComponent(
+        DrtOptimizer.class,
+        modalProvider(
+            getter -> {
+              return new ShiftDrtOptimizer(
+                  new DefaultDrtOptimizer(
+                      drtCfg,
+                      getter.getModal(Fleet.class),
+                      getter.get(MobsimTimer.class),
+                      getter.getModal(DepotFinder.class),
+                      getter.getModal(RebalancingStrategy.class),
+                      getter.getModal(DrtScheduleInquiry.class),
+                      getter.getModal(ScheduleTimingUpdater.class),
+                      getter.getModal(EmptyVehicleRelocator.class),
+                      getter.getModal(UnplannedRequestInserter.class),
+                      getter.getModal(DrtRequestInsertionRetryQueue.class)),
+                  getter.getModal(DrtShiftDispatcher.class),
+                  getter.getModal(ScheduleTimingUpdater.class));
+            }));
 
-			bindModal(DrtShiftDispatcher.class).toProvider(modalProvider(
-				getter -> new DrtShiftDispatcherImpl(getter.getModal(DrtShifts.class), getter.getModal(Fleet.class),
-						getter.get(MobsimTimer.class), getter.getModal(OperationFacilities.class), getter.getModal(OperationFacilityFinder.class),
-						getter.getModal(ShiftTaskScheduler.class), getter.getModal(Network.class), getter.get(EventsManager.class),
-						shiftsParams, new DefaultShiftStartLogic(), new DefaultAssignShiftToVehicleLogic(shiftsParams)))
-		).asEagerSingleton();
+    bindModal(DrtShiftDispatcher.class)
+        .toProvider(
+            modalProvider(
+                getter ->
+                    new DrtShiftDispatcherImpl(
+                        getter.getModal(DrtShifts.class),
+                        getter.getModal(Fleet.class),
+                        getter.get(MobsimTimer.class),
+                        getter.getModal(OperationFacilities.class),
+                        getter.getModal(OperationFacilityFinder.class),
+                        getter.getModal(ShiftTaskScheduler.class),
+                        getter.getModal(Network.class),
+                        getter.get(EventsManager.class),
+                        shiftsParams,
+                        new DefaultShiftStartLogic(),
+                        new DefaultAssignShiftToVehicleLogic(shiftsParams))))
+        .asEagerSingleton();
 
-		bindModal(InsertionCostCalculator.class).toProvider(modalProvider(
-				getter -> new ShiftInsertionCostCalculator(getter.get(MobsimTimer.class),
-						new DefaultInsertionCostCalculator(getter.getModal(CostCalculationStrategy.class)))));
+    bindModal(InsertionCostCalculator.class)
+        .toProvider(
+            modalProvider(
+                getter ->
+                    new ShiftInsertionCostCalculator(
+                        getter.get(MobsimTimer.class),
+                        new DefaultInsertionCostCalculator(
+                            getter.getModal(CostCalculationStrategy.class)))));
 
-		bindModal(VehicleEntry.EntryFactory.class).toInstance(new ShiftVehicleDataEntryFactory(new VehicleDataEntryFactoryImpl()));
+    bindModal(VehicleEntry.EntryFactory.class)
+        .toInstance(new ShiftVehicleDataEntryFactory(new VehicleDataEntryFactoryImpl()));
 
-		final ShiftDrtTaskFactoryImpl taskFactory = new ShiftDrtTaskFactoryImpl(new DrtTaskFactoryImpl());
-		bindModal(DrtTaskFactory.class).toInstance(taskFactory);
-		bindModal(ShiftDrtTaskFactory.class).toInstance(taskFactory);
+    final ShiftDrtTaskFactoryImpl taskFactory =
+        new ShiftDrtTaskFactoryImpl(new DrtTaskFactoryImpl());
+    bindModal(DrtTaskFactory.class).toInstance(taskFactory);
+    bindModal(ShiftDrtTaskFactory.class).toInstance(taskFactory);
 
-		bindModal(ShiftTaskScheduler.class).toProvider(modalProvider(
-				getter -> new ShiftTaskSchedulerImpl(getter.getModal(Network.class),
-						getter.getModal(TravelTime.class),
-						getter.getModal(TravelDisutilityFactory.class).createTravelDisutility(getter.getModal(TravelTime.class)),
-						getter.get(MobsimTimer.class), taskFactory, shiftsParams,
-						getter.getModal(OperationFacilities.class), getter.getModal(Fleet.class)))
-		).asEagerSingleton();
+    bindModal(ShiftTaskScheduler.class)
+        .toProvider(
+            modalProvider(
+                getter ->
+                    new ShiftTaskSchedulerImpl(
+                        getter.getModal(Network.class),
+                        getter.getModal(TravelTime.class),
+                        getter
+                            .getModal(TravelDisutilityFactory.class)
+                            .createTravelDisutility(getter.getModal(TravelTime.class)),
+                        getter.get(MobsimTimer.class),
+                        taskFactory,
+                        shiftsParams,
+                        getter.getModal(OperationFacilities.class),
+                        getter.getModal(Fleet.class))))
+        .asEagerSingleton();
 
-		bindModal(DrtScheduleInquiry.class).to(ShiftDrtScheduleInquiry.class).asEagerSingleton();
-		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
-				getter -> new ShiftRequestInsertionScheduler(
-						getter.get(MobsimTimer.class), getter.getModal(TravelTime.class),
-						getter.getModal(ScheduleTimingUpdater.class), getter.getModal(ShiftDrtTaskFactory.class),
-						getter.getModal(StopTimeCalculator.class)))
-		).asEagerSingleton();
+    bindModal(DrtScheduleInquiry.class).to(ShiftDrtScheduleInquiry.class).asEagerSingleton();
+    bindModal(RequestInsertionScheduler.class)
+        .toProvider(
+            modalProvider(
+                getter ->
+                    new ShiftRequestInsertionScheduler(
+                        getter.get(MobsimTimer.class),
+                        getter.getModal(TravelTime.class),
+                        getter.getModal(ScheduleTimingUpdater.class),
+                        getter.getModal(ShiftDrtTaskFactory.class),
+                        getter.getModal(StopTimeCalculator.class))))
+        .asEagerSingleton();
 
-		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
-				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
-						new ShiftDrtStayTaskEndTimeCalculator(shiftsParams,
-								new DrtStayTaskEndTimeCalculator(getter.getModal(StopTimeCalculator.class)))))
-		).asEagerSingleton();
-		
-		// see DrtModeOptimizerQSimModule
-		bindModal(VrpLegFactory.class).toProvider(modalProvider(getter -> {
-			DvrpConfigGroup dvrpCfg = getter.get(DvrpConfigGroup.class);
-			MobsimTimer timer = getter.get(MobsimTimer.class);
+    bindModal(ScheduleTimingUpdater.class)
+        .toProvider(
+            modalProvider(
+                getter ->
+                    new ScheduleTimingUpdater(
+                        getter.get(MobsimTimer.class),
+                        new ShiftDrtStayTaskEndTimeCalculator(
+                            shiftsParams,
+                            new DrtStayTaskEndTimeCalculator(
+                                getter.getModal(StopTimeCalculator.class))))))
+        .asEagerSingleton();
 
-			return v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.mobsimMode, v, OnlineTrackerListener.NO_LISTENER,
-					timer);
-		})).in(Singleton.class);
+    // see DrtModeOptimizerQSimModule
+    bindModal(VrpLegFactory.class)
+        .toProvider(
+            modalProvider(
+                getter -> {
+                  DvrpConfigGroup dvrpCfg = getter.get(DvrpConfigGroup.class);
+                  MobsimTimer timer = getter.get(MobsimTimer.class);
 
-		bindModal(ShiftDrtActionCreator.class).toProvider(modalProvider((getter) -> {
-			VrpAgentLogic.DynActionCreator delegate = drtCfg.getPrebookingParams().isPresent()
-					? getter.getModal(PrebookingActionCreator.class)
-					: getter.getModal(DrtActionCreator.class);
-			
-			// adds shift tasks
-			return new ShiftDrtActionCreator(getter.getModal(PassengerHandler.class), delegate);
-		})).asEagerSingleton();
-		
-		bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(ShiftDrtActionCreator.class));
+                  return v ->
+                      VrpLegFactory.createWithOnlineTracker(
+                          dvrpCfg.mobsimMode, v, OnlineTrackerListener.NO_LISTENER, timer);
+                }))
+        .in(Singleton.class);
 
-		bindModal(Fleet.class).toProvider(new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
-			@Override
-			public Fleet get() {
-				FleetSpecification fleetSpecification = getModalInstance(FleetSpecification.class);
-				Network network = getModalInstance(Network.class);
-				return Fleets.createCustomFleet(fleetSpecification,
-						s -> new DefaultShiftDvrpVehicle(new DvrpVehicleImpl(s, network.getLinks().get(s.getStartLinkId()))));
+    bindModal(ShiftDrtActionCreator.class)
+        .toProvider(
+            modalProvider(
+                (getter) -> {
+                  VrpAgentLogic.DynActionCreator delegate =
+                      drtCfg.getPrebookingParams().isPresent()
+                          ? getter.getModal(PrebookingActionCreator.class)
+                          : getter.getModal(DrtActionCreator.class);
 
-			}
-		}).asEagerSingleton();
-	}
+                  // adds shift tasks
+                  return new ShiftDrtActionCreator(
+                      getter.getModal(PassengerHandler.class), delegate);
+                }))
+        .asEagerSingleton();
+
+    bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(ShiftDrtActionCreator.class));
+
+    bindModal(Fleet.class)
+        .toProvider(
+            new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
+              @Override
+              public Fleet get() {
+                FleetSpecification fleetSpecification = getModalInstance(FleetSpecification.class);
+                Network network = getModalInstance(Network.class);
+                return Fleets.createCustomFleet(
+                    fleetSpecification,
+                    s ->
+                        new DefaultShiftDvrpVehicle(
+                            new DvrpVehicleImpl(s, network.getLinks().get(s.getStartLinkId()))));
+              }
+            })
+        .asEagerSingleton();
+  }
 }

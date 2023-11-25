@@ -22,7 +22,6 @@ package org.matsim.analysis;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -53,135 +52,236 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
 
-
 public class CalcLegTimesTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  public static final String BASE_FILE_NAME = "legdurations.txt";
+  public final Id<Person> DEFAULT_PERSON_ID = Id.create(123, Person.class);
+  public final Id<Link> DEFAULT_LINK_ID = Id.create(456, Link.class);
 
-	public static final String BASE_FILE_NAME = "legdurations.txt";
-	public final Id<Person> DEFAULT_PERSON_ID = Id.create(123, Person.class);
-	public final Id<Link> DEFAULT_LINK_ID = Id.create(456, Link.class);
+  private Population population = null;
+  private Network network = null;
 
-	private Population population = null;
-	private Network network = null;
+  @Before
+  public void setUp() {
+    utils.loadConfig((String) null);
 
-	@Before public void setUp() {
-		utils.loadConfig((String)null);
+    MutableScenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    this.population = s.getPopulation();
+    Person person = PopulationUtils.getFactory().createPerson(DEFAULT_PERSON_ID);
+    this.population.addPerson(person);
+    Plan plan = PersonUtils.createAndAddPlan(person, true);
+    PopulationUtils.createAndAddActivityFromCoord(plan, "act1", new Coord(100.0, 100.0));
+    PopulationUtils.createAndAddLeg(plan, "undefined");
+    PopulationUtils.createAndAddActivityFromCoord(plan, "act2", new Coord(200.0, 200.0));
+    PopulationUtils.createAndAddLeg(plan, "undefined");
+    PopulationUtils.createAndAddActivityFromCoord(plan, "act3", new Coord(200.0, 200.0));
+    PopulationUtils.createAndAddLeg(plan, "undefined");
+    PopulationUtils.createAndAddActivityFromCoord(plan, "act4", new Coord(200.0, 200.0));
+    PopulationUtils.createAndAddLeg(plan, "undefined");
+    PopulationUtils.createAndAddActivityFromCoord(plan, "act5", new Coord(200.0, 200.0));
+    this.network = s.getNetwork();
+    Node fromNode =
+        this.network
+            .getFactory()
+            .createNode(Id.create("123456", Node.class), new Coord(100.0, 100.0));
+    this.network.addNode(fromNode);
+    Node toNode =
+        this.network
+            .getFactory()
+            .createNode(Id.create("789012", Node.class), new Coord(200.0, 200.0));
+    this.network.addNode(toNode);
+    Link link = this.network.getFactory().createLink(DEFAULT_LINK_ID, fromNode, toNode);
+    link.setLength(Math.sqrt(20000.0));
+    link.setFreespeed(13.333);
+    link.setCapacity(2000);
+    link.setNumberOfLanes(1);
+    this.network.addLink(link);
+  }
 
-		MutableScenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		this.population = s.getPopulation();
-		Person person = PopulationUtils.getFactory().createPerson(DEFAULT_PERSON_ID);
-		this.population.addPerson(person);
-		Plan plan = PersonUtils.createAndAddPlan(person, true);
-		PopulationUtils.createAndAddActivityFromCoord(plan, "act1", new Coord(100.0, 100.0));
-		PopulationUtils.createAndAddLeg( plan, "undefined" );
-		PopulationUtils.createAndAddActivityFromCoord(plan, "act2", new Coord(200.0, 200.0));
-		PopulationUtils.createAndAddLeg( plan, "undefined" );
-		PopulationUtils.createAndAddActivityFromCoord(plan, "act3", new Coord(200.0, 200.0));
-		PopulationUtils.createAndAddLeg( plan, "undefined" );
-		PopulationUtils.createAndAddActivityFromCoord(plan, "act4", new Coord(200.0, 200.0));
-		PopulationUtils.createAndAddLeg( plan, "undefined" );
-		PopulationUtils.createAndAddActivityFromCoord(plan, "act5", new Coord(200.0, 200.0));
-		this.network = s.getNetwork();
-		Node fromNode = this.network.getFactory().createNode(Id.create("123456", Node.class), new Coord(100.0, 100.0));
-		this.network.addNode(fromNode);
-		Node toNode = this.network.getFactory().createNode(Id.create("789012", Node.class), new Coord(200.0, 200.0));
-		this.network.addNode(toNode);
-		Link link = this.network.getFactory().createLink(DEFAULT_LINK_ID, fromNode, toNode);
-		link.setLength(Math.sqrt(20000.0));
-		link.setFreespeed(13.333);
-		link.setCapacity(2000);
-		link.setNumberOfLanes(1);
-		this.network.addLink(link);
-	}
+  @After
+  public void tearDown() {
+    this.population = null;
+    this.network = null;
+  }
 
-	@After public void tearDown() {
-		this.population = null;
-		this.network = null;
-	}
+  @Test
+  public void testNoEvents() throws IOException {
 
-	@Test public void testNoEvents() throws IOException {
+    CalcLegTimes testee = new CalcLegTimes();
 
-		CalcLegTimes testee = new CalcLegTimes();
+    EventsManager events = EventsUtils.createEventsManager();
+    events.addHandler(testee);
 
-		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(testee);
+    // add events to handle here
 
-		// add events to handle here
+    this.runTest(testee);
+  }
 
-		this.runTest(testee);
-	}
+  @Test
+  public void testAveraging() throws IOException {
 
-	@Test public void testAveraging() throws IOException {
+    CalcLegTimes testee = new CalcLegTimes();
 
-		CalcLegTimes testee = new CalcLegTimes();
+    EventsManager events = EventsUtils.createEventsManager();
+    events.addHandler(testee);
 
-		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(testee);
+    Leg leg = PopulationUtils.createLeg(TransportMode.car);
+    leg.setDepartureTime(Time.parseTime("07:10:00"));
+    leg.setTravelTime(Time.parseTime("07:30:00") - leg.getDepartureTime().seconds());
+    testee.handleEvent(
+        new ActivityEndEvent(
+            leg.getDepartureTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            null,
+            "act1",
+            null));
+    testee.handleEvent(
+        new PersonDepartureEvent(
+            leg.getDepartureTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            leg.getMode(),
+            leg.getMode()));
+    testee.handleEvent(
+        new PersonArrivalEvent(
+            leg.getDepartureTime().seconds() + leg.getTravelTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            leg.getMode()));
+    testee.handleEvent(
+        new ActivityStartEvent(
+            leg.getDepartureTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            null,
+            "act2",
+            null));
 
+    leg = PopulationUtils.createLeg(TransportMode.car);
+    leg.setDepartureTime(Time.parseTime("07:00:00"));
+    leg.setTravelTime(Time.parseTime("07:10:00") - leg.getDepartureTime().seconds());
+    testee.handleEvent(
+        new ActivityEndEvent(
+            leg.getDepartureTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            null,
+            "act2",
+            null));
+    testee.handleEvent(
+        new PersonDepartureEvent(
+            leg.getDepartureTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            leg.getMode(),
+            leg.getMode()));
+    testee.handleEvent(
+        new PersonArrivalEvent(
+            leg.getDepartureTime().seconds() + leg.getTravelTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            leg.getMode()));
+    testee.handleEvent(
+        new ActivityStartEvent(
+            leg.getDepartureTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            null,
+            "act3",
+            null));
 
-		Leg leg = PopulationUtils.createLeg(TransportMode.car);
-		leg.setDepartureTime(Time.parseTime("07:10:00"));
-		leg.setTravelTime( Time.parseTime("07:30:00") - leg.getDepartureTime().seconds());
-		testee.handleEvent(new ActivityEndEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act1", null));
-		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode(), leg.getMode()));
-		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
-				.seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		testee.handleEvent(new ActivityStartEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act2", null));
+    leg = PopulationUtils.createLeg(TransportMode.car);
+    leg.setDepartureTime(Time.parseTime("31:12:00"));
+    leg.setTravelTime(Time.parseTime("31:22:00") - leg.getDepartureTime().seconds());
+    testee.handleEvent(
+        new ActivityEndEvent(
+            leg.getDepartureTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            null,
+            "act3",
+            null));
+    testee.handleEvent(
+        new PersonDepartureEvent(
+            leg.getDepartureTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            leg.getMode(),
+            leg.getMode()));
+    testee.handleEvent(
+        new PersonArrivalEvent(
+            leg.getDepartureTime().seconds() + leg.getTravelTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            leg.getMode()));
+    testee.handleEvent(
+        new ActivityStartEvent(
+            leg.getDepartureTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            null,
+            "act4",
+            null));
 
-		leg = PopulationUtils.createLeg(TransportMode.car);
-		leg.setDepartureTime(Time.parseTime("07:00:00"));
-		leg.setTravelTime( Time.parseTime("07:10:00") - leg.getDepartureTime().seconds());
-		testee.handleEvent(new ActivityEndEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act2", null));
-		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode(), leg.getMode()));
-		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
-				.seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		testee.handleEvent(new ActivityStartEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act3", null));
+    leg = PopulationUtils.createLeg(TransportMode.car);
+    leg.setDepartureTime(Time.parseTime("30:12:00"));
+    leg.setTravelTime(Time.parseTime("30:12:01") - leg.getDepartureTime().seconds());
+    testee.handleEvent(
+        new ActivityEndEvent(
+            leg.getDepartureTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            null,
+            "act4",
+            null));
+    testee.handleEvent(
+        new PersonDepartureEvent(
+            leg.getDepartureTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            leg.getMode(),
+            leg.getMode()));
+    testee.handleEvent(
+        new PersonArrivalEvent(
+            leg.getDepartureTime().seconds() + leg.getTravelTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            leg.getMode()));
+    testee.handleEvent(
+        new ActivityStartEvent(
+            leg.getDepartureTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            null,
+            "act5",
+            null));
 
-		leg = PopulationUtils.createLeg(TransportMode.car);
-		leg.setDepartureTime(Time.parseTime("31:12:00"));
-		leg.setTravelTime( Time.parseTime("31:22:00") - leg.getDepartureTime().seconds());
-		testee.handleEvent(new ActivityEndEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act3", null));
-		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode(), leg.getMode()));
-		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
-				.seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		testee.handleEvent(new ActivityStartEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act4", null));
+    this.runTest(testee);
+  }
 
-		leg = PopulationUtils.createLeg(TransportMode.car);
-		leg.setDepartureTime(Time.parseTime("30:12:00"));
-		leg.setTravelTime( Time.parseTime("30:12:01") - leg.getDepartureTime().seconds());
-		testee.handleEvent(new ActivityEndEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act4", null));
-		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode(), leg.getMode()));
-		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
-				.seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		testee.handleEvent(new ActivityStartEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act5", null));
+  private void runTest(CalcLegTimes calcLegTimes) throws IOException {
 
-		this.runTest(testee);
-	}
+    calcLegTimes.writeStats(utils.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME);
 
-	private void runTest( CalcLegTimes calcLegTimes ) throws IOException {
+    Assert.assertEquals(
+        readResult(utils.getInputDirectory() + CalcLegTimesTest.BASE_FILE_NAME),
+        readResult(utils.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME));
+  }
 
-		calcLegTimes.writeStats(utils.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME);
+  private static String readResult(String filePath) throws IOException {
+    BufferedReader br = IOUtils.getBufferedReader(filePath);
+    StringBuilder sb = new StringBuilder();
+    String line = br.readLine();
 
-		Assert.assertEquals(readResult(utils.getInputDirectory() + CalcLegTimesTest.BASE_FILE_NAME),
-				readResult(utils.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME));
+    while (line != null) {
+      sb.append(line);
+      sb.append("\n");
+      line = br.readLine();
+    }
 
-	}
-
-	private static String readResult(String filePath) throws IOException {
-		BufferedReader br = IOUtils.getBufferedReader(filePath);
-		StringBuilder sb = new StringBuilder();
-		String line = br.readLine();
-
-		while (line != null) {
-			sb.append(line);
-			sb.append("\n");
-			line = br.readLine();
-		}
-
-		return sb.toString();
-	}
-
+    return sb.toString();
+  }
 }

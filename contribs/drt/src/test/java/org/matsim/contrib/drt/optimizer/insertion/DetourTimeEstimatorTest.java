@@ -36,26 +36,30 @@ import org.matsim.testcases.fakes.FakeNode;
  */
 public class DetourTimeEstimatorTest {
 
-	@Test
-	public void freeSpeedZonalTimeEstimator_fromLinkToLinkSame() {
-		var link = new FakeLink(null);
-		var estimator = DetourTimeEstimator.createMatrixBasedEstimator(1, null, null);
-		Assertions.assertThat(estimator.estimateTime(link, link, 345)).isZero();
-	}
+  @Test
+  public void freeSpeedZonalTimeEstimator_fromLinkToLinkSame() {
+    var link = new FakeLink(null);
+    var estimator = DetourTimeEstimator.createMatrixBasedEstimator(1, null, null);
+    Assertions.assertThat(estimator.estimateTime(link, link, 345)).isZero();
+  }
 
-	@Test
-	public void freeSpeedZonalTimeEstimator_fromLinkToLinkDifferent() {
-		var linkA = new FakeLink(null, null, new FakeNode(null));
-		var linkB = new FakeLink(null, new FakeNode(null), null);
+  @Test
+  public void freeSpeedZonalTimeEstimator_fromLinkToLinkDifferent() {
+    var linkA = new FakeLink(null, null, new FakeNode(null));
+    var linkB = new FakeLink(null, new FakeNode(null), null);
 
-		TravelTimeMatrix ttMatrix = mock(TravelTimeMatrix.class);
-		when(ttMatrix.getTravelTime(eq(linkA.getToNode()), eq(linkB.getFromNode()), eq(345. + 2.))).thenReturn(1234);
+    TravelTimeMatrix ttMatrix = mock(TravelTimeMatrix.class);
+    when(ttMatrix.getTravelTime(eq(linkA.getToNode()), eq(linkB.getFromNode()), eq(345. + 2.)))
+        .thenReturn(1234);
 
-		var estimator = DetourTimeEstimator.createMatrixBasedEstimator(1.5, ttMatrix, new QSimFreeSpeedTravelTime(1));
-		double expectedTT = 2 //first link TT
-				+ 1234 // TT between nodes
-				+ linkB.getLength() / linkB.getFreespeed();// last link TT
-		double adjustedTT = expectedTT / 1.5;// using speed factor
-		Assertions.assertThat(estimator.estimateTime(linkA, linkB, 345)).isEqualTo(adjustedTT);
-	}
+    var estimator =
+        DetourTimeEstimator.createMatrixBasedEstimator(
+            1.5, ttMatrix, new QSimFreeSpeedTravelTime(1));
+    double expectedTT =
+        2 // first link TT
+            + 1234 // TT between nodes
+            + linkB.getLength() / linkB.getFreespeed(); // last link TT
+    double adjustedTT = expectedTT / 1.5; // using speed factor
+    Assertions.assertThat(estimator.estimateTime(linkA, linkB, 345)).isEqualTo(adjustedTT);
+  }
 }

@@ -20,19 +20,18 @@
 package org.matsim.core.mobsim.framework.listeners;
 
 import java.util.EventListener;
-
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 
 /**
  * A marker interface that all QueueSimulationListeners must extend.
- * <p></p>
- * Example(s):<ul>
- * <li> {@link tutorial.programming.example22MobsimListener.RunMobsimListenerExample}
+ *
+ * <p>Example(s):
+ *
+ * <ul>
+ *   <li>{@link tutorial.programming.example22MobsimListener.RunMobsimListenerExample}
  * </ul>
  *
  * @author dgrether
  */
-public interface MobsimListener extends EventListener, MatsimExtensionPoint, QSimComponent {
-
-}
+public interface MobsimListener extends EventListener, MatsimExtensionPoint, QSimComponent {}

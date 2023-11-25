@@ -28,7 +28,7 @@ import org.matsim.freight.carriers.Carrier;
  * @author Kai Martins-Turner (kturner)
  */
 public interface HasCarrierId {
-	String ATTRIBUTE_CARRIER_ID = "carrierId";
+  String ATTRIBUTE_CARRIER_ID = "carrierId";
 
-	Id<Carrier> getCarrierId();
+  Id<Carrier> getCarrierId();
 }

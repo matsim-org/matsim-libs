@@ -22,44 +22,41 @@ package org.matsim.contrib.signals.data.signalcontrol.v20;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.SignalGroup;
 
-
 /**
  * @author dgrether
- *
  */
 public final class SignalGroupSettingsDataImpl implements SignalGroupSettingsData {
 
-	private int dropping;
-	private int onset;
-	private Id<SignalGroup> signalGroupId;
+  private int dropping;
+  private int onset;
+  private Id<SignalGroup> signalGroupId;
 
-	public SignalGroupSettingsDataImpl(Id<SignalGroup> signalGroupId){
-		this.signalGroupId = signalGroupId;
-	}
-	
-	@Override
-	public int getDropping() {
-		return this.dropping;
-	}
+  public SignalGroupSettingsDataImpl(Id<SignalGroup> signalGroupId) {
+    this.signalGroupId = signalGroupId;
+  }
 
-	@Override
-	public int getOnset() {
-		return this.onset;
-	}
+  @Override
+  public int getDropping() {
+    return this.dropping;
+  }
 
-	@Override
-	public Id<SignalGroup> getSignalGroupId() {
-		return this.signalGroupId;
-	}
+  @Override
+  public int getOnset() {
+    return this.onset;
+  }
 
-	@Override
-	public void setDropping(int second) {
-		this.dropping = second;
-	}
+  @Override
+  public Id<SignalGroup> getSignalGroupId() {
+    return this.signalGroupId;
+  }
 
-	@Override
-	public void setOnset(int second) {
-		this.onset= second;
-	}
+  @Override
+  public void setDropping(int second) {
+    this.dropping = second;
+  }
 
+  @Override
+  public void setOnset(int second) {
+    this.onset = second;
+  }
 }

@@ -23,7 +23,9 @@ import org.matsim.api.core.v01.population.Person;
 
 public interface ParkingCostModel {
 
-	public double calcParkingCost(double arrivalTimeInSeconds,
-			double durationInSeconds, Id<Person> personId, Id parkingFacilityId);
-
+  public double calcParkingCost(
+      double arrivalTimeInSeconds,
+      double durationInSeconds,
+      Id<Person> personId,
+      Id parkingFacilityId);
 }

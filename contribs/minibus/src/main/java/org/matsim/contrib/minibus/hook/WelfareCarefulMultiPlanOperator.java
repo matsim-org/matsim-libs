@@ -1,4 +1,4 @@
-///* *********************************************************************** *
+/// * *********************************************************************** *
 // * project: org.matsim.*
 // *                                                                         *
 // * *********************************************************************** *
@@ -17,43 +17,45 @@
 // *                                                                         *
 // * *********************************************************************** */
 //
-///**
-// * 
+/// **
+// *
 // */
-//package org.matsim.contrib.minibus.operator;
+// package org.matsim.contrib.minibus.operator;
 //
-//import java.util.List;
-//import java.util.Map;
+// import java.util.List;
+// import java.util.Map;
 //
-//import org.matsim.api.core.v01.Id;
-//import org.matsim.contrib.minibus.PConfigGroup;
-//import org.matsim.contrib.minibus.PConstants.OperatorState;
-//import org.matsim.contrib.minibus.replanning.PStrategy;
-//import org.matsim.contrib.minibus.replanning.PStrategyManager;
-//import org.matsim.contrib.minibus.routeProvider.PRouteProvider;
-//import org.matsim.contrib.minibus.scoring.PScoreContainer;
-//import org.matsim.pt.transitSchedule.api.TransitLine;
-//import org.matsim.pt.transitSchedule.api.TransitRoute;
-//import org.matsim.vehicles.Vehicle;
+// import org.matsim.api.core.v01.Id;
+// import org.matsim.contrib.minibus.PConfigGroup;
+// import org.matsim.contrib.minibus.PConstants.OperatorState;
+// import org.matsim.contrib.minibus.replanning.PStrategy;
+// import org.matsim.contrib.minibus.replanning.PStrategyManager;
+// import org.matsim.contrib.minibus.routeProvider.PRouteProvider;
+// import org.matsim.contrib.minibus.scoring.PScoreContainer;
+// import org.matsim.pt.transitSchedule.api.TransitLine;
+// import org.matsim.pt.transitSchedule.api.TransitRoute;
+// import org.matsim.vehicles.Vehicle;
 //
-///**
+/// **
 // * @author ikaddoura, dhosse
 // *
 // */
-//public final class WelfareCarefulMultiPlanOperator implements Operator {
+// public final class WelfareCarefulMultiPlanOperator implements Operator {
 //
 //	public static final String OPERATOR_NAME = "WelfareCarefulMultiPlanOperator";
 //
 //	private CarefulMultiPlanOperator delegate;
 //	private PerPassengerSubsidy welfareAnalyzer;
-//	
-//	WelfareCarefulMultiPlanOperator(Id<Operator> id, PConfigGroup pConfig, PFranchise franchise, PerPassengerSubsidy welfareAnalyzer) {
+//
+//	WelfareCarefulMultiPlanOperator(Id<Operator> id, PConfigGroup pConfig, PFranchise franchise,
+// PerPassengerSubsidy welfareAnalyzer) {
 //		delegate = new CarefulMultiPlanOperator(id, pConfig, franchise);
 //		this.welfareAnalyzer = welfareAnalyzer;
 //	}
 //
 //	@Override
-//	public boolean init(PRouteProvider pRouteProvider, PStrategy initialStrategy, int iteration, double initialBudget) {
+//	public boolean init(PRouteProvider pRouteProvider, PStrategy initialStrategy, int iteration,
+// double initialBudget) {
 //		return delegate.init(pRouteProvider, initialStrategy, iteration, initialBudget);
 //	}
 //
@@ -74,10 +76,10 @@
 //
 //	@Override
 //	public void score(Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap) {
-//				
+//
 //		delegate.setScoreLastIteration(delegate.getScore());
 //		delegate.setScore(0);
-//		
+//
 //		// score all plans
 //		for (PPlan plan : delegate.getAllPlans()) {
 //			AbstractOperator.scorePlan(driverId2ScoreMap, plan);
@@ -87,7 +89,7 @@
 //			double newPlanScore = welfareCorrection + plan.getScore();
 //			System.out.println("newPlanScore: " + newPlanScore);
 //			plan.setScore(newPlanScore);
-//			
+//
 //			delegate.setScore(delegate.getScore() + plan.getScore());
 //			for (TransitRoute route : plan.getLine().getRoutes().values()) {
 //				StringBuffer sB = new StringBuffer();
@@ -97,13 +99,14 @@
 //				route.setDescription(sB.toString());
 //			}
 //		}
-//		
+//
 //		delegate.processScore();
-//		
+//
 //	}
 //
 //	private double getWelfareCorrection(PPlan plan) {
-//		Id<PPlan> pplanId = Id.create(plan.getLine().getId().toString() + "-" + plan.getId().toString(), PPlan.class);
+//		Id<PPlan> pplanId = Id.create(plan.getLine().getId().toString() + "-" + plan.getId().toString(),
+// PPlan.class);
 //		return welfareAnalyzer.getWelfareCorrection(pplanId);
 //	}
 //
@@ -171,5 +174,5 @@
 //	public String toString() {
 //		return delegate.toString();
 //	}
-//	
-//}
+//
+// }

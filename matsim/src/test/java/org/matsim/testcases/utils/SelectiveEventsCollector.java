@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
@@ -38,38 +37,38 @@ import org.matsim.core.events.handler.BasicEventHandler;
  */
 public class SelectiveEventsCollector implements BasicEventHandler {
 
-	private final static Logger log = LogManager.getLogger(SelectiveEventsCollector.class);
+  private static final Logger log = LogManager.getLogger(SelectiveEventsCollector.class);
 
-	private final List<Event> events = new ArrayList<Event>(50);
-	private final Set<Class<?>> classes = new HashSet<Class<?>>();
+  private final List<Event> events = new ArrayList<Event>(50);
+  private final Set<Class<?>> classes = new HashSet<Class<?>>();
 
-	public SelectiveEventsCollector(final Class<?>... classes) {
-        Collections.addAll(this.classes, classes);
-	}
+  public SelectiveEventsCollector(final Class<?>... classes) {
+    Collections.addAll(this.classes, classes);
+  }
 
-	@Override
-	public void handleEvent(final Event event) {
-		Class<?> eC = event.getClass();
-		for (Class<?> klass : this.classes) {
-			if (klass.isAssignableFrom(eC)) {
-				this.events.add(event);
-				return;
-			}
-		}
-	}
+  @Override
+  public void handleEvent(final Event event) {
+    Class<?> eC = event.getClass();
+    for (Class<?> klass : this.classes) {
+      if (klass.isAssignableFrom(eC)) {
+        this.events.add(event);
+        return;
+      }
+    }
+  }
 
-	@Override
-	public void reset(final int iteration) {
-		this.events.clear();
-	}
+  @Override
+  public void reset(final int iteration) {
+    this.events.clear();
+  }
 
-	public List<Event> getEvents() {
-		return this.events;
-	}
+  public List<Event> getEvents() {
+    return this.events;
+  }
 
-	public void printEvents() {
-		for (Event e : this.events) {
-			log.info(e.toString());
-		}
-	}
+  public void printEvents() {
+    for (Event e : this.events) {
+      log.info(e.toString());
+    }
+  }
 }

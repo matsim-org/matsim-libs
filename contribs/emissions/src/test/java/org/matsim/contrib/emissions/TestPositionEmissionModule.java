@@ -1,5 +1,12 @@
 package org.matsim.contrib.emissions;
 
+import static org.junit.Assert.assertEquals;
+
+import jakarta.inject.Singleton;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,9 +27,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -42,226 +49,256 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.snapshotwriters.PositionEvent;
 
-import jakarta.inject.Singleton;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-
 public class TestPositionEmissionModule {
 
-    private static final String configFile = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv2" ), "config_detailed.xml" ).toString();
-    // (I changed the above from veh v1 to veh v2 since veh v1 is deprecated, especially for emissions.  kai, apr'21)
+  private static final String configFile =
+      IOUtils.extendUrl(
+              ExamplesUtils.getTestScenarioURL("emissions-sampleScenario/testv2_Vehv2"),
+              "config_detailed.xml")
+          .toString();
+  // (I changed the above from veh v1 to veh v2 since veh v1 is deprecated, especially for
+  // emissions.  kai, apr'21)
 
-    @Rule
-    public MatsimTestUtils testUtils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-    @Test
-    @Ignore
-    public void simpleTest() {
+  @Test
+  @Ignore
+  public void simpleTest() {
 
-        var emissionConfig = new EmissionsConfigGroup();
-        emissionConfig.setHbefaVehicleDescriptionSource(EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
-        emissionConfig.setDetailedVsAverageLookupBehavior(
-                EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable); //This is the previous behaviour
-        var config = ConfigUtils.loadConfig(configFile, emissionConfig);
-        config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        config.qsim().setSnapshotPeriod(1);
-        config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
-        config.controller().setWriteSnapshotsInterval(1);
-        config.controller().setSnapshotFormat(Set.of(ControllerConfigGroup.SnapshotFormat.positionevents));
+    var emissionConfig = new EmissionsConfigGroup();
+    emissionConfig.setHbefaVehicleDescriptionSource(
+        EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
+    emissionConfig.setDetailedVsAverageLookupBehavior(
+        EmissionsConfigGroup.DetailedVsAverageLookupBehavior
+            .tryDetailedThenTechnologyAverageThenAverageTable); // This is the previous behaviour
+    var config = ConfigUtils.loadConfig(configFile, emissionConfig);
+    config
+        .controller()
+        .setOverwriteFileSetting(
+            OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+    config.qsim().setSnapshotPeriod(1);
+    config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
+    config.controller().setWriteSnapshotsInterval(1);
+    config
+        .controller()
+        .setSnapshotFormat(Set.of(ControllerConfigGroup.SnapshotFormat.positionevents));
 
-        var scenario = ScenarioUtils.loadScenario(config);
+    var scenario = ScenarioUtils.loadScenario(config);
 
-        var controler = new Controler(scenario);
+    var controler = new Controler(scenario);
 
-        controler.addOverridingModule(new PositionEmissionsModule());
-        controler.run();
-    }
+    controler.addOverridingModule(new PositionEmissionsModule());
+    controler.run();
+  }
 
-    @Test
-    public void compareToOtherModule_singleVehicleSingleLink() {
+  @Test
+  public void compareToOtherModule_singleVehicleSingleLink() {
 
-        var emissionConfig = new EmissionsConfigGroup();
-        emissionConfig.setHbefaVehicleDescriptionSource(EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
-        emissionConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
+    var emissionConfig = new EmissionsConfigGroup();
+    emissionConfig.setHbefaVehicleDescriptionSource(
+        EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
+    emissionConfig.setDetailedVsAverageLookupBehavior(
+        EmissionsConfigGroup.DetailedVsAverageLookupBehavior
+            .tryDetailedThenTechnologyAverageThenAverageTable);
 
-        var config = ConfigUtils.loadConfig(configFile, emissionConfig);
-        config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        config.controller().setOutputDirectory(testUtils.getOutputDirectory());
+    var config = ConfigUtils.loadConfig(configFile, emissionConfig);
+    config
+        .controller()
+        .setOverwriteFileSetting(
+            OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+    config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 
-        emissionConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.csv");
-        emissionConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.csv" );
-        emissionConfig.setHbefaTableConsistencyCheckingLevel( EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.consistent );
+    emissionConfig.setAverageColdEmissionFactorsFile(
+        "../sample_41_EFA_ColdStart_vehcat_2020average.csv");
+    emissionConfig.setAverageWarmEmissionFactorsFile("../sample_41_EFA_HOT_vehcat_2020average.csv");
+    emissionConfig.setHbefaTableConsistencyCheckingLevel(
+        EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.consistent);
 
-        final ScoringConfigGroup.ActivityParams homeParams = new ScoringConfigGroup.ActivityParams("home")
-                .setTypicalDuration(20);
-        config.scoring().addActivityParams(homeParams);
-        final ScoringConfigGroup.ActivityParams workParams = new ScoringConfigGroup.ActivityParams("work")
-                .setTypicalDuration(20);
-        config.scoring().addActivityParams(workParams);
+    final ScoringConfigGroup.ActivityParams homeParams =
+        new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(20);
+    config.scoring().addActivityParams(homeParams);
+    final ScoringConfigGroup.ActivityParams workParams =
+        new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(20);
+    config.scoring().addActivityParams(workParams);
 
-        var strategy = new ReplanningConfigGroup.StrategySettings();
-        strategy.setStrategyName("ChangeExpBeta");
-        strategy.setWeight(1.0);
+    var strategy = new ReplanningConfigGroup.StrategySettings();
+    strategy.setStrategyName("ChangeExpBeta");
+    strategy.setWeight(1.0);
 
-        config.replanning().addParameterSet(strategy);
+    config.replanning().addParameterSet(strategy);
 
-        // activate snapshots
-        config.qsim().setSnapshotPeriod(1);
-        config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
-        config.controller().setWriteSnapshotsInterval(1);
-        config.controller().setSnapshotFormat(Set.of(ControllerConfigGroup.SnapshotFormat.positionevents));
-        config.controller().setFirstIteration(0);
-        config.controller().setLastIteration(0);
+    // activate snapshots
+    config.qsim().setSnapshotPeriod(1);
+    config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
+    config.controller().setWriteSnapshotsInterval(1);
+    config
+        .controller()
+        .setSnapshotFormat(Set.of(ControllerConfigGroup.SnapshotFormat.positionevents));
+    config.controller().setFirstIteration(0);
+    config.controller().setLastIteration(0);
 
-        config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
+    config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
 
-        // create a scenario:
-        final MutableScenario scenario = ScenarioUtils.createMutableScenario(config);
-        scenario.setNetwork(createSingleLinkNetwork());
+    // create a scenario:
+    final MutableScenario scenario = ScenarioUtils.createMutableScenario(config);
+    scenario.setNetwork(createSingleLinkNetwork());
 
-        var vehicleType = createVehicleType();
-        scenario.getVehicles().addVehicleType(vehicleType);
-        Vehicle vehicle = VehicleUtils.createVehicle(Id.createVehicleId("1"), vehicleType);
-        scenario.getVehicles().addVehicle(vehicle);
-        var person = createPerson(scenario.getPopulation().getFactory());
-        scenario.getPopulation().addPerson(person);
-        VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(vehicle.getType().getNetworkMode(), vehicle.getId()));
+    var vehicleType = createVehicleType();
+    scenario.getVehicles().addVehicleType(vehicleType);
+    Vehicle vehicle = VehicleUtils.createVehicle(Id.createVehicleId("1"), vehicleType);
+    scenario.getVehicles().addVehicle(vehicle);
+    var person = createPerson(scenario.getPopulation().getFactory());
+    scenario.getPopulation().addPerson(person);
+    VehicleUtils.insertVehicleIdsIntoAttributes(
+        person, Map.of(vehicle.getType().getNetworkMode(), vehicle.getId()));
 
-        var controler = new Controler(scenario);
+    var controler = new Controler(scenario);
 
-        controler.addOverridingModule(new PositionEmissionsModule());
-        // exclude last link since both emission calculations work slightly different for the last link of a trip.
-        var combinedHandler = new FilterLinkHandler(Set.of(Id.createLinkId("start-link"), Id.createLinkId("link")));
+    controler.addOverridingModule(new PositionEmissionsModule());
+    // exclude last link since both emission calculations work slightly different for the last link
+    // of a trip.
+    var combinedHandler =
+        new FilterLinkHandler(Set.of(Id.createLinkId("start-link"), Id.createLinkId("link")));
 
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                addEventHandlerBinding().toInstance(combinedHandler);
-                addEventHandlerBinding().toInstance((BasicEventHandler) event -> {
-                    if (!event.getEventType().equals(PositionEvent.EVENT_TYPE) && !event.getEventType().equals(PositionEmissionsModule.PositionEmissionEvent.EVENT_TYPE)) {
-                        System.out.println(event.getEventType());
-                    }
-                });
-                bind(EventsManager.class).to(EventsManagerImpl.class).in(Singleton.class);
-            }
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            addEventHandlerBinding().toInstance(combinedHandler);
+            addEventHandlerBinding()
+                .toInstance(
+                    (BasicEventHandler)
+                        event -> {
+                          if (!event.getEventType().equals(PositionEvent.EVENT_TYPE)
+                              && !event
+                                  .getEventType()
+                                  .equals(
+                                      PositionEmissionsModule.PositionEmissionEvent.EVENT_TYPE)) {
+                            System.out.println(event.getEventType());
+                          }
+                        });
+            bind(EventsManager.class).to(EventsManagerImpl.class).in(Singleton.class);
+          }
         });
 
-        controler.run();
+    controler.run();
 
-        // check that the overall amount of emissions is equal for the main link
-        for (var entry : combinedHandler.getClassicEmissions().entrySet()) {
-            assertEquals(entry.getValue(), combinedHandler.getPositionEmissions().get(entry.getKey()), 0.1);
-        }
+    // check that the overall amount of emissions is equal for the main link
+    for (var entry : combinedHandler.getClassicEmissions().entrySet()) {
+      assertEquals(
+          entry.getValue(), combinedHandler.getPositionEmissions().get(entry.getKey()), 0.1);
+    }
+  }
+
+  private static class FilterLinkHandler implements BasicEventHandler {
+
+    private final Set<Id<Link>> filterLinks;
+    private final Map<Pollutant, Double> classicEmissions = new HashMap<>();
+    private final Map<Pollutant, Double> positionEmissions = new HashMap<>();
+
+    private FilterLinkHandler(Set<Id<Link>> filterLinks) {
+      this.filterLinks = filterLinks;
     }
 
-    private static class FilterLinkHandler implements BasicEventHandler {
-
-        private final Set<Id<Link>> filterLinks;
-        private final Map<Pollutant, Double> classicEmissions = new HashMap<>();
-        private final Map<Pollutant, Double> positionEmissions = new HashMap<>();
-
-        private FilterLinkHandler(Set<Id<Link>> filterLinks) {
-            this.filterLinks = filterLinks;
-        }
-
-        Map<Pollutant, Double> getClassicEmissions() {
-            return classicEmissions;
-        }
-
-        Map<Pollutant, Double> getPositionEmissions() {
-            return positionEmissions;
-        }
-
-        void sumAll(Map<Pollutant, Double> to, Map<Pollutant, Double> from) {
-
-            for (Map.Entry<Pollutant, Double> pollutantDoubleEntry : from.entrySet()) {
-                to.merge(pollutantDoubleEntry.getKey(), pollutantDoubleEntry.getValue(), Double::sum);
-            }
-        }
-
-        @Override
-        public void handleEvent(Event event) {
-            switch (event.getEventType()) {
-                case WarmEmissionEvent.EVENT_TYPE:
-                case ColdEmissionEvent.EVENT_TYPE:
-                    var emissionEvent = (EmissionEvent) event;
-                    if (filterLinks.contains(emissionEvent.getLinkId())) {
-                        sumAll(classicEmissions, emissionEvent.getEmissions());
-                    }
-                    break;
-                case PositionEmissionsModule.PositionEmissionEvent.EVENT_TYPE:
-                    var positionEvent = (PositionEmissionsModule.PositionEmissionEvent) event;
-                    if (positionEvent.getLinkId().equals(Id.createLinkId("link")) && positionEvent.getEmissionType().equals("combined"))
-                        sumAll(positionEmissions, positionEvent.getEmissions());
-                    break;
-
-            }
-        }
+    Map<Pollutant, Double> getClassicEmissions() {
+      return classicEmissions;
     }
 
-    private VehicleType createVehicleType() {
-        VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("dieselCarFullSpecified", VehicleType.class));
-        EngineInformation engineInformation = vehicleType.getEngineInformation();
-        VehicleUtils.setHbefaVehicleCategory(engineInformation, "PASSENGER_CAR");
-        VehicleUtils.setHbefaTechnology(engineInformation, "diesel");
-        VehicleUtils.setHbefaEmissionsConcept(engineInformation, "PC-D-Euro-3");
-        VehicleUtils.setHbefaSizeClass(engineInformation, ">1,4L");
-        vehicleType.setMaximumVelocity(10);
-
-        return vehicleType;
+    Map<Pollutant, Double> getPositionEmissions() {
+      return positionEmissions;
     }
 
-    /**
-     * Creates network with three links, to make sure the main link is traversed completely
-     */
-    private Network createSingleLinkNetwork() {
+    void sumAll(Map<Pollutant, Double> to, Map<Pollutant, Double> from) {
 
-        var network = NetworkUtils.createNetwork(new NetworkConfigGroup());
-        addLink(network, "start-link",
-                network.getFactory().createNode(Id.createNodeId("1"), new Coord(-100, 0)),
-                network.getFactory().createNode(Id.createNodeId("2"), new Coord(0, 0)));
-        addLink(network, "link",
-                network.getFactory().createNode(Id.createNodeId("2"), new Coord(0, 0)),
-                network.getFactory().createNode(Id.createNodeId("3"), new Coord(10000, 0)));
-        addLink(network, "end-link",
-                network.getFactory().createNode(Id.createNodeId("3"), new Coord(1000, 0)),
-                network.getFactory().createNode(Id.createNodeId("4"), new Coord(10100, 0)));
-        return network;
+      for (Map.Entry<Pollutant, Double> pollutantDoubleEntry : from.entrySet()) {
+        to.merge(pollutantDoubleEntry.getKey(), pollutantDoubleEntry.getValue(), Double::sum);
+      }
     }
 
-    private void addLink(Network network, String id, Node from, Node to) {
-
-        if (!network.getNodes().containsKey(from.getId()))
-            network.addNode(from);
-        if (!network.getNodes().containsKey(to.getId()))
-            network.addNode(to);
-
-        var link = network.getFactory().createLink(Id.createLinkId(id), from, to);
-        EmissionUtils.setHbefaRoadType(link, "URB/Local/50");
-        link.setFreespeed(10);
-        network.addLink(link);
+    @Override
+    public void handleEvent(Event event) {
+      switch (event.getEventType()) {
+        case WarmEmissionEvent.EVENT_TYPE:
+        case ColdEmissionEvent.EVENT_TYPE:
+          var emissionEvent = (EmissionEvent) event;
+          if (filterLinks.contains(emissionEvent.getLinkId())) {
+            sumAll(classicEmissions, emissionEvent.getEmissions());
+          }
+          break;
+        case PositionEmissionsModule.PositionEmissionEvent.EVENT_TYPE:
+          var positionEvent = (PositionEmissionsModule.PositionEmissionEvent) event;
+          if (positionEvent.getLinkId().equals(Id.createLinkId("link"))
+              && positionEvent.getEmissionType().equals("combined"))
+            sumAll(positionEmissions, positionEvent.getEmissions());
+          break;
+      }
     }
+  }
 
-    private Person createPerson(PopulationFactory factory) {
+  private VehicleType createVehicleType() {
+    VehicleType vehicleType =
+        VehicleUtils.createVehicleType(Id.create("dieselCarFullSpecified", VehicleType.class));
+    EngineInformation engineInformation = vehicleType.getEngineInformation();
+    VehicleUtils.setHbefaVehicleCategory(engineInformation, "PASSENGER_CAR");
+    VehicleUtils.setHbefaTechnology(engineInformation, "diesel");
+    VehicleUtils.setHbefaEmissionsConcept(engineInformation, "PC-D-Euro-3");
+    VehicleUtils.setHbefaSizeClass(engineInformation, ">1,4L");
+    vehicleType.setMaximumVelocity(10);
 
-        var plan = factory.createPlan();
-        var home = PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(-100, 0));
-        home.setEndTime(1);
+    return vehicleType;
+  }
 
-        var leg = PopulationUtils.createLeg(TransportMode.car);
-        leg.setRoute(RouteUtils.createNetworkRoute(List.of(Id.createLinkId("start"), Id.createLinkId("link"), Id.createLinkId("end"))));
-        plan.addLeg(leg);
+  /** Creates network with three links, to make sure the main link is traversed completely */
+  private Network createSingleLinkNetwork() {
 
-        var work = PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord(10100, 0));
-        work.setEndTime(3600);
+    var network = NetworkUtils.createNetwork(new NetworkConfigGroup());
+    addLink(
+        network,
+        "start-link",
+        network.getFactory().createNode(Id.createNodeId("1"), new Coord(-100, 0)),
+        network.getFactory().createNode(Id.createNodeId("2"), new Coord(0, 0)));
+    addLink(
+        network,
+        "link",
+        network.getFactory().createNode(Id.createNodeId("2"), new Coord(0, 0)),
+        network.getFactory().createNode(Id.createNodeId("3"), new Coord(10000, 0)));
+    addLink(
+        network,
+        "end-link",
+        network.getFactory().createNode(Id.createNodeId("3"), new Coord(1000, 0)),
+        network.getFactory().createNode(Id.createNodeId("4"), new Coord(10100, 0)));
+    return network;
+  }
 
-        var person = factory.createPerson(Id.createPersonId("person"));
-        person.addPlan(plan);
-        person.setSelectedPlan(plan);
-        return person;
-    }
+  private void addLink(Network network, String id, Node from, Node to) {
+
+    if (!network.getNodes().containsKey(from.getId())) network.addNode(from);
+    if (!network.getNodes().containsKey(to.getId())) network.addNode(to);
+
+    var link = network.getFactory().createLink(Id.createLinkId(id), from, to);
+    EmissionUtils.setHbefaRoadType(link, "URB/Local/50");
+    link.setFreespeed(10);
+    network.addLink(link);
+  }
+
+  private Person createPerson(PopulationFactory factory) {
+
+    var plan = factory.createPlan();
+    var home = PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(-100, 0));
+    home.setEndTime(1);
+
+    var leg = PopulationUtils.createLeg(TransportMode.car);
+    leg.setRoute(
+        RouteUtils.createNetworkRoute(
+            List.of(Id.createLinkId("start"), Id.createLinkId("link"), Id.createLinkId("end"))));
+    plan.addLeg(leg);
+
+    var work = PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord(10100, 0));
+    work.setEndTime(3600);
+
+    var person = factory.createPerson(Id.createPersonId("person"));
+    person.addPlan(plan);
+    person.setSelectedPlan(plan);
+    return person;
+  }
 }

@@ -27,91 +27,92 @@ import java.util.Map;
 
 /*package*/ class ConfigWriterHandlerImplV1 extends ConfigWriterHandler {
 
-	private String newline = "\n";
+  private String newline = "\n";
 
-	@Override
-	public String setNewline(final String newline) {
-		String former = this.newline;
-		this.newline = newline;
-		return former;
-	}
+  @Override
+  public String setNewline(final String newline) {
+    String former = this.newline;
+    this.newline = newline;
+    return former;
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// <config ... > ... </config>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <config ... > ... </config>
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	 void startConfig(final Config config, final BufferedWriter out) throws UncheckedIOException {
-		try {
-			out.write("<config>");
-			out.write(this.newline);
-			out.write(this.newline);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
+  @Override
+  void startConfig(final Config config, final BufferedWriter out) throws UncheckedIOException {
+    try {
+      out.write("<config>");
+      out.write(this.newline);
+      out.write(this.newline);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
 
-	@Override
-	 void endConfig(final BufferedWriter out) throws UncheckedIOException {
-		try {
-			out.write("</config>");
-			out.write(this.newline);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
+  @Override
+  void endConfig(final BufferedWriter out) throws UncheckedIOException {
+    try {
+      out.write("</config>");
+      out.write(this.newline);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
 
-//////////////////////////////////////////////////////////////////////
-// <module ... > ... </module>
-//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <module ... > ... </module>
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	 void writeModule(final ConfigGroup module, final BufferedWriter out) throws UncheckedIOException {
-		Map<String, String> params = module.getParams();
-		Map<String, String> comments = module.getComments();
+  @Override
+  void writeModule(final ConfigGroup module, final BufferedWriter out) throws UncheckedIOException {
+    Map<String, String> params = module.getParams();
+    Map<String, String> comments = module.getComments();
 
-		try {
-			out.write("\t<module");
-			out.write(" name=\"" + module.getName() + "\" >");
-			out.write(this.newline);
+    try {
+      out.write("\t<module");
+      out.write(" name=\"" + module.getName() + "\" >");
+      out.write(this.newline);
 
-			boolean lastHadComment = false;
+      boolean lastHadComment = false;
 
-			for (Map.Entry<String, String> entry : params.entrySet()) {
-				if (comments.get(entry.getKey()) != null) {
-					out.write(this.newline);
-					out.write( "\t\t<!-- " + comments.get(entry.getKey()) + " -->");
-					out.write(this.newline);
-					lastHadComment = true;
-				} else {
-					if (lastHadComment) {
-						out.write(this.newline);
-					}
-					lastHadComment = false;
-				}
-				out.write("\t\t<param name=\"" + entry.getKey() + "\" value=\"" + entry.getValue() + "\" />");
-				out.write(this.newline);
-			}
-			out.write("\t</module>");
-			out.write(this.newline);
-			out.write(this.newline);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
+      for (Map.Entry<String, String> entry : params.entrySet()) {
+        if (comments.get(entry.getKey()) != null) {
+          out.write(this.newline);
+          out.write("\t\t<!-- " + comments.get(entry.getKey()) + " -->");
+          out.write(this.newline);
+          lastHadComment = true;
+        } else {
+          if (lastHadComment) {
+            out.write(this.newline);
+          }
+          lastHadComment = false;
+        }
+        out.write(
+            "\t\t<param name=\"" + entry.getKey() + "\" value=\"" + entry.getValue() + "\" />");
+        out.write(this.newline);
+      }
+      out.write("\t</module>");
+      out.write(this.newline);
+      out.write(this.newline);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// <!-- ============ ... ========== -->
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <!-- ============ ... ========== -->
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	 void writeSeparator(final BufferedWriter out) throws UncheckedIOException {
-		try {
-			out.write("<!-- ====================================================================== -->");
-			out.write(this.newline);
-			out.write(this.newline);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
+  @Override
+  void writeSeparator(final BufferedWriter out) throws UncheckedIOException {
+    try {
+      out.write("<!-- ====================================================================== -->");
+      out.write(this.newline);
+      out.write(this.newline);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
 }

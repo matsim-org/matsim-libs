@@ -26,7 +26,6 @@ import org.matsim.core.events.handler.EventHandler;
  * @author mrieser / senozon
  */
 public interface AgentWaitingForPtEventHandler extends EventHandler {
-	
-	public void handleEvent(final AgentWaitingForPtEvent event);
 
+  public void handleEvent(final AgentWaitingForPtEvent event);
 }

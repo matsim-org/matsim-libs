@@ -25,28 +25,27 @@ import org.matsim.api.core.v01.population.Person;
 
 /*package*/ class DepartureEvent {
 
-	private final Id<Person> agentId;
+  private final Id<Person> agentId;
 
-	protected DepartureEvent(final Id<Person> agentId) {
-		this.agentId = agentId;
-	}
+  protected DepartureEvent(final Id<Person> agentId) {
+    this.agentId = agentId;
+  }
 
-	@Override
-	public boolean equals(final Object arg0) {
-		if (!(arg0 instanceof DepartureEvent)) return false;
+  @Override
+  public boolean equals(final Object arg0) {
+    if (!(arg0 instanceof DepartureEvent)) return false;
 
-		DepartureEvent event = (DepartureEvent)arg0;
-		return (this.agentId.equals(event.agentId));
-	}
+    DepartureEvent event = (DepartureEvent) arg0;
+    return (this.agentId.equals(event.agentId));
+  }
 
-	@Override
-	public String toString() {
-		return "[[agentId = " + this.agentId + "]";
-	}
+  @Override
+  public String toString() {
+    return "[[agentId = " + this.agentId + "]";
+  }
 
-	@Override
-	public int hashCode() {
-		return this.agentId.hashCode();
-	}
-
+  @Override
+  public int hashCode() {
+    return this.agentId.hashCode();
+  }
 }

@@ -17,11 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 /**
- * A place to keep around some material which should not be used any more but which still contains elements that should
- * be salvaged.  (Optimally, we would always have enough time to clean everything up right away.)
- * 
- * 
- * @author nagel
+ * A place to keep around some material which should not be used any more but which still contains
+ * elements that should be salvaged. (Optimally, we would always have enough time to clean
+ * everything up right away.)
  *
+ * @author nagel
  */
 package playground.vsp.zzArchive;

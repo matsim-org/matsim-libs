@@ -20,37 +20,35 @@
 package org.matsim.contrib.socnetsim.jointtrips;
 
 import java.util.List;
-
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.core.router.MainModeIdentifier;
 
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
-
 public class JointMainModeIdentifier implements MainModeIdentifier {
-	private final MainModeIdentifier d;
-	
-	public JointMainModeIdentifier( final MainModeIdentifier delegate ) {
-		this.d = delegate;
-	}
+  private final MainModeIdentifier d;
 
-	@Override
-	public String identifyMainMode(
-			final List<? extends PlanElement> tripElements) {
-		for (PlanElement pe : tripElements) {
-			if ( !(pe instanceof Leg) ) continue;
-			final String mode = ((Leg) pe).getMode();
+  public JointMainModeIdentifier(final MainModeIdentifier delegate) {
+    this.d = delegate;
+  }
 
-			if (mode.equals( JointActingTypes.DRIVER ) ||
-					mode.equals( JointActingTypes.PASSENGER ) ) {
-				return mode;
-			}
-		}
-		
-		// If there is a joint leg, return the whole trip as joint.   The above implementation seems incomplete in the sense
-		// that it only looks at the _first_ occurence of a joint leg, i.e. someone who starts as a passenger always needs to be
-		// a passenger, etc.
+  @Override
+  public String identifyMainMode(final List<? extends PlanElement> tripElements) {
+    for (PlanElement pe : tripElements) {
+      if (!(pe instanceof Leg)) continue;
+      final String mode = ((Leg) pe).getMode();
 
-		return d.identifyMainMode( tripElements );
-	}
+      if (mode.equals(JointActingTypes.DRIVER) || mode.equals(JointActingTypes.PASSENGER)) {
+        return mode;
+      }
+    }
+
+    // If there is a joint leg, return the whole trip as joint.   The above implementation seems
+    // incomplete in the sense
+    // that it only looks at the _first_ occurence of a joint leg, i.e. someone who starts as a
+    // passenger always needs to be
+    // a passenger, etc.
+
+    return d.identifyMainMode(tripElements);
+  }
 }

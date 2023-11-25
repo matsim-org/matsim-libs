@@ -27,22 +27,26 @@ import org.matsim.core.router.util.TravelTime;
  * @author Michal Maciejewski (michalm)
  */
 public class DvrpModeLimitedMaxSpeedTravelTimeModule extends AbstractDvrpModeModule {
-	private final double timeStepSize;
-	private final double maxSpeed;
+  private final double timeStepSize;
+  private final double maxSpeed;
 
-	public DvrpModeLimitedMaxSpeedTravelTimeModule(String mode, double timeStepSize, double maxSpeed) {
-		super(mode);
-		this.timeStepSize = timeStepSize;
-		this.maxSpeed = maxSpeed;
-	}
+  public DvrpModeLimitedMaxSpeedTravelTimeModule(
+      String mode, double timeStepSize, double maxSpeed) {
+    super(mode);
+    this.timeStepSize = timeStepSize;
+    this.maxSpeed = maxSpeed;
+  }
 
-	@Override
-	public void install() {
-		var qSimFreeSpeedTravelTimeWithMaxSpeedLimit = new QSimFreeSpeedTravelTimeWithMaxSpeedLimit(timeStepSize,
-				maxSpeed);
-		bindModal(TravelTime.class).toProvider(modalProvider(
-				getter -> TravelTimeUtils.maxOfTravelTimes(qSimFreeSpeedTravelTimeWithMaxSpeedLimit,
-						getter.getNamed(TravelTime.class, DvrpTravelTimeModule.DVRP_ESTIMATED))));
-	}
+  @Override
+  public void install() {
+    var qSimFreeSpeedTravelTimeWithMaxSpeedLimit =
+        new QSimFreeSpeedTravelTimeWithMaxSpeedLimit(timeStepSize, maxSpeed);
+    bindModal(TravelTime.class)
+        .toProvider(
+            modalProvider(
+                getter ->
+                    TravelTimeUtils.maxOfTravelTimes(
+                        qSimFreeSpeedTravelTimeWithMaxSpeedLimit,
+                        getter.getNamed(TravelTime.class, DvrpTravelTimeModule.DVRP_ESTIMATED))));
+  }
 }
-

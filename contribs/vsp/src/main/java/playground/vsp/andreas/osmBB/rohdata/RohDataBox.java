@@ -20,55 +20,69 @@
 package playground.vsp.andreas.osmBB.rohdata;
 
 public class RohDataBox {
-	
-	private final String date;
-	private final String time;
-	
-	private final boolean valid; 
-	
-	private int dtvKfz;
-	private int dtvLkw;
-	private int dtvPkw;
-	private int vKfz;
-	private int vLkw;
-	private int vPkw;
-	
-	public RohDataBox(String date, String time, boolean valid) {
-		this.date = date;
-		this.time = time;
-		this.valid = valid;
-	}
-	
-	protected boolean isValid(){
-		return this.valid;
-	}	
 
-	public void setDtvKfz(int dtvKfz) {
-		this.dtvKfz = dtvKfz;
-	}
+  private final String date;
+  private final String time;
 
-	public void setDtvLkw(int dtvLkw) {
-		this.dtvLkw = dtvLkw;
-	}
+  private final boolean valid;
 
-	public void setDtvPkw(int dtvPkw) {
-		this.dtvPkw = dtvPkw;
-	}
+  private int dtvKfz;
+  private int dtvLkw;
+  private int dtvPkw;
+  private int vKfz;
+  private int vLkw;
+  private int vPkw;
 
-	public void setvKfz(int vKfz) {
-		this.vKfz = vKfz;
-	}
+  public RohDataBox(String date, String time, boolean valid) {
+    this.date = date;
+    this.time = time;
+    this.valid = valid;
+  }
 
-	public void setvLkw(int vLkw) {
-		this.vLkw = vLkw;
-	}
+  protected boolean isValid() {
+    return this.valid;
+  }
 
-	public void setvPkw(int vPkw) {
-		this.vPkw = vPkw;
-	}
-	
-	@Override
-	public String toString() {
-		return this.date + " " + this.time + ", DTV Kfz " + this.dtvKfz + ", DTV Lkw " + this.dtvLkw + ", DTV Pkw " + this.dtvPkw + ", v Kfz " + this.vKfz + ", v Lkw " + this.vLkw + ", v Pkw " + this.vPkw;
-	}
+  public void setDtvKfz(int dtvKfz) {
+    this.dtvKfz = dtvKfz;
+  }
+
+  public void setDtvLkw(int dtvLkw) {
+    this.dtvLkw = dtvLkw;
+  }
+
+  public void setDtvPkw(int dtvPkw) {
+    this.dtvPkw = dtvPkw;
+  }
+
+  public void setvKfz(int vKfz) {
+    this.vKfz = vKfz;
+  }
+
+  public void setvLkw(int vLkw) {
+    this.vLkw = vLkw;
+  }
+
+  public void setvPkw(int vPkw) {
+    this.vPkw = vPkw;
+  }
+
+  @Override
+  public String toString() {
+    return this.date
+        + " "
+        + this.time
+        + ", DTV Kfz "
+        + this.dtvKfz
+        + ", DTV Lkw "
+        + this.dtvLkw
+        + ", DTV Pkw "
+        + this.dtvPkw
+        + ", v Kfz "
+        + this.vKfz
+        + ", v Lkw "
+        + this.vLkw
+        + ", v Pkw "
+        + this.vPkw;
+  }
 }

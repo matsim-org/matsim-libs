@@ -22,21 +22,18 @@ package org.matsim.core.utils.geometry;
 
 import org.matsim.api.core.v01.Coord;
 
-
 /**
- * A simple interface to convert coordinates from one coordinate system to
- * another one.
+ * A simple interface to convert coordinates from one coordinate system to another one.
  *
  * @author mrieser
  */
 public interface CoordinateTransformation {
 
-	/**
-	 * Transforms the given coordinate from one coordinate system to the other.
-	 *
-	 * @param coord The coordinate to transform.
-	 * @return The transformed coordinate.
-	 */
-	public Coord transform(Coord coord);
-
+  /**
+   * Transforms the given coordinate from one coordinate system to the other.
+   *
+   * @param coord The coordinate to transform.
+   * @return The transformed coordinate.
+   */
+  public Coord transform(Coord coord);
 }

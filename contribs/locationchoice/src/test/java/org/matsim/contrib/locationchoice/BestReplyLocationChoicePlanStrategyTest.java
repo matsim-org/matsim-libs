@@ -22,51 +22,44 @@ package org.matsim.contrib.locationchoice;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.*;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.testcases.MatsimTestUtils;
-
-import jakarta.inject.Provider;
 
 public class BestReplyLocationChoicePlanStrategyTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testOne() {
+  @Test
+  public void testOne() {
 
-//		Config config = ConfigUtils.loadConfig(this.utils.getPackageInputDirectory() + "config.xml");
-//		Scenario scenario = ScenarioUtils.loadScenario(config);
-//
-//		// joint context (based on scenario):
-//		final DestinationChoiceBestResponseContext lcContext = new DestinationChoiceBestResponseContext(scenario) ;
-//		lcContext.init();
-//
-//		// CONTROL(L)ER - only used to pass the config to ReadOrComputeMaxDCScore
-//		Controler controler = new Controler(scenario);
-//
-//		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
-//  		computer.readOrCreateMaxDCScore(controler, lcContext.kValsAreRead());
-//  		final ObjectAttributes personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
-//
-//		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
-//		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
-//		controler.getTestScenarioURL().addScenarioElement(DestinationChoiceBestResponseContext.ELEMENT_NAME, lcContext);
-//		controler.getTestScenarioURL().addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME, dcScore);
-//
-//		BestReplyLocationChoicePlanStrategy planStrategy = new BestReplyLocationChoicePlanStrategy(scenario);
-//
-//		planStrategy.init(new ReplanningContextImpl(scenario));
-//
-//		for (Person person : scenario.getPopulation().getPersons().values()) planStrategy.run(person);
-	}
-
+    //		Config config = ConfigUtils.loadConfig(this.utils.getPackageInputDirectory() +
+    // "config.xml");
+    //		Scenario scenario = ScenarioUtils.loadScenario(config);
+    //
+    //		// joint context (based on scenario):
+    //		final DestinationChoiceBestResponseContext lcContext = new
+    // DestinationChoiceBestResponseContext(scenario) ;
+    //		lcContext.init();
+    //
+    //		// CONTROL(L)ER - only used to pass the config to ReadOrComputeMaxDCScore
+    //		Controler controler = new Controler(scenario);
+    //
+    //		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
+    //  		computer.readOrCreateMaxDCScore(controler, lcContext.kValsAreRead());
+    //  		final ObjectAttributes personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
+    //
+    //		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
+    //		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
+    //
+    //	controler.getTestScenarioURL().addScenarioElement(DestinationChoiceBestResponseContext.ELEMENT_NAME, lcContext);
+    //		controler.getTestScenarioURL().addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME, dcScore);
+    //
+    //		BestReplyLocationChoicePlanStrategy planStrategy = new
+    // BestReplyLocationChoicePlanStrategy(scenario);
+    //
+    //		planStrategy.init(new ReplanningContextImpl(scenario));
+    //
+    //		for (Person person : scenario.getPopulation().getPersons().values())
+    // planStrategy.run(person);
+  }
 }

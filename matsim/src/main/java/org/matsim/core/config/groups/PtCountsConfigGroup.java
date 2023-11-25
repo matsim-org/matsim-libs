@@ -21,7 +21,6 @@
 package org.matsim.core.config.groups;
 
 import java.util.Map;
-
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
@@ -29,138 +28,139 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  */
 public final class PtCountsConfigGroup extends ReflectiveConfigGroup {
 
-	public static final String GROUP_NAME = "ptCounts";
+  public static final String GROUP_NAME = "ptCounts";
 
-	private static final String OUTPUTFORMAT = "outputformat";
-	private static final String DISTANCEFILTER = "distanceFilter";
-	private static final String DISTANCEFILTERCENTERNODE = "distanceFilterCenterNode";
-	private static final String OCCUPANCY_COUNTS_INPUT_FILENAME = "inputOccupancyCountsFile";
-	private static final String BOARD_COUNTS_INPUT_FILENAME = "inputBoardCountsFile";
-	private static final String ALIGHT_COUNTS_INPUT_FILENAME = "inputAlightCountsFile";
-	private static final String COUNTSSCALEFACTOR = "countsScaleFactor";
-	private static final String PT_COUNTS_INTERVAL = "ptCountsInterval" ;
+  private static final String OUTPUTFORMAT = "outputformat";
+  private static final String DISTANCEFILTER = "distanceFilter";
+  private static final String DISTANCEFILTERCENTERNODE = "distanceFilterCenterNode";
+  private static final String OCCUPANCY_COUNTS_INPUT_FILENAME = "inputOccupancyCountsFile";
+  private static final String BOARD_COUNTS_INPUT_FILENAME = "inputBoardCountsFile";
+  private static final String ALIGHT_COUNTS_INPUT_FILENAME = "inputAlightCountsFile";
+  private static final String COUNTSSCALEFACTOR = "countsScaleFactor";
+  private static final String PT_COUNTS_INTERVAL = "ptCountsInterval";
 
-	private String outputFormat;
+  private String outputFormat;
 
-	/**
-	 * the distance filter in m
-	 */
-	private Double distanceFilter;
+  /** the distance filter in m */
+  private Double distanceFilter;
 
-	/**
-	 * the id of the node used as center for the distance filter
-	 */
-	private String distanceFilterCenterNode;
+  /** the id of the node used as center for the distance filter */
+  private String distanceFilterCenterNode;
 
-	/**
-	 * the path to the file with the counts
-	 */
-	private String occupancyCountsFileName = null;
-	private String boardCountsFileName = null;
-	private String alightCountsFileName = null;
-	/**
-	 * the scaling for the counts
-	 */
-	private double countsScaleFactor = 1.0;
-	private int ptCountsInterval = 10 ;
+  /** the path to the file with the counts */
+  private String occupancyCountsFileName = null;
 
-	public PtCountsConfigGroup() {
-		super(GROUP_NAME);
-	}
+  private String boardCountsFileName = null;
+  private String alightCountsFileName = null;
 
-	@Override
-	public Map<String, String> getComments() {
-		Map<String, String> comments = super.getComments();
-		comments.put(OUTPUTFORMAT, CountsConfigGroup.COUNTS_OUTPUTFORMAT_COMMENT ) ;
-		comments.put(DISTANCEFILTER,  CountsConfigGroup.COUNTS_DISTANCEFILTER_COMMENT ) ;
-		comments.put(DISTANCEFILTERCENTERNODE, CountsConfigGroup.COUNTS_DISTANCEFILTERCENTERNODE_COMMENT ) ;
-		comments.put(OCCUPANCY_COUNTS_INPUT_FILENAME, "input file containing the occupancy counts for pt" ) ;
-		comments.put(ALIGHT_COUNTS_INPUT_FILENAME, "input file containing the alighting (getting off) counts for pt" ) ;
-		comments.put(BOARD_COUNTS_INPUT_FILENAME, "input file containing the boarding (getting on) counts for pt" ) ;
-		comments.put(COUNTSSCALEFACTOR, CountsConfigGroup.COUNTSSCALEFACTOR_COMMENT ) ;
-		comments.put(PT_COUNTS_INTERVAL, "every how many iterations (starting with 0) counts comparisons are generated" );
-		return comments;
-	}
+  /** the scaling for the counts */
+  private double countsScaleFactor = 1.0;
 
-	@StringGetter( OUTPUTFORMAT )
-	public String getOutputFormat() {
-		return outputFormat;
-	}
+  private int ptCountsInterval = 10;
 
-	@StringSetter( OUTPUTFORMAT )
-	public void setOutputFormat(String outputFormat) {
-		this.outputFormat = outputFormat;
-	}
+  public PtCountsConfigGroup() {
+    super(GROUP_NAME);
+  }
 
-	@StringGetter( DISTANCEFILTER )
-	public Double getDistanceFilter() {
-		return distanceFilter;
-	}
+  @Override
+  public Map<String, String> getComments() {
+    Map<String, String> comments = super.getComments();
+    comments.put(OUTPUTFORMAT, CountsConfigGroup.COUNTS_OUTPUTFORMAT_COMMENT);
+    comments.put(DISTANCEFILTER, CountsConfigGroup.COUNTS_DISTANCEFILTER_COMMENT);
+    comments.put(
+        DISTANCEFILTERCENTERNODE, CountsConfigGroup.COUNTS_DISTANCEFILTERCENTERNODE_COMMENT);
+    comments.put(
+        OCCUPANCY_COUNTS_INPUT_FILENAME, "input file containing the occupancy counts for pt");
+    comments.put(
+        ALIGHT_COUNTS_INPUT_FILENAME,
+        "input file containing the alighting (getting off) counts for pt");
+    comments.put(
+        BOARD_COUNTS_INPUT_FILENAME,
+        "input file containing the boarding (getting on) counts for pt");
+    comments.put(COUNTSSCALEFACTOR, CountsConfigGroup.COUNTSSCALEFACTOR_COMMENT);
+    comments.put(
+        PT_COUNTS_INTERVAL,
+        "every how many iterations (starting with 0) counts comparisons are generated");
+    return comments;
+  }
 
-	@StringSetter( DISTANCEFILTER )
-	public void setDistanceFilter(Double distanceFilter) {
-		this.distanceFilter = distanceFilter;
-	}
+  @StringGetter(OUTPUTFORMAT)
+  public String getOutputFormat() {
+    return outputFormat;
+  }
 
-	@StringGetter( DISTANCEFILTERCENTERNODE )
-	public String getDistanceFilterCenterNode() {
-		return distanceFilterCenterNode;
-	}
+  @StringSetter(OUTPUTFORMAT)
+  public void setOutputFormat(String outputFormat) {
+    this.outputFormat = outputFormat;
+  }
 
-	@StringSetter( DISTANCEFILTERCENTERNODE )
-	public void setDistanceFilterCenterNode(String distanceFilterCenterNode) {
-		this.distanceFilterCenterNode = distanceFilterCenterNode;
-	}
+  @StringGetter(DISTANCEFILTER)
+  public Double getDistanceFilter() {
+    return distanceFilter;
+  }
 
-	@StringGetter( OCCUPANCY_COUNTS_INPUT_FILENAME )
-	public String getOccupancyCountsFileName() {
-		return occupancyCountsFileName;
-	}
+  @StringSetter(DISTANCEFILTER)
+  public void setDistanceFilter(Double distanceFilter) {
+    this.distanceFilter = distanceFilter;
+  }
 
-	@StringSetter( OCCUPANCY_COUNTS_INPUT_FILENAME )
-	public void setOccupancyCountsFileName(String occupancyCountsFileName) {
-		this.occupancyCountsFileName = occupancyCountsFileName;
-	}
+  @StringGetter(DISTANCEFILTERCENTERNODE)
+  public String getDistanceFilterCenterNode() {
+    return distanceFilterCenterNode;
+  }
 
-	@StringGetter( BOARD_COUNTS_INPUT_FILENAME )
-	public String getBoardCountsFileName() {
-		return boardCountsFileName;
-	}
+  @StringSetter(DISTANCEFILTERCENTERNODE)
+  public void setDistanceFilterCenterNode(String distanceFilterCenterNode) {
+    this.distanceFilterCenterNode = distanceFilterCenterNode;
+  }
 
-	@StringSetter( BOARD_COUNTS_INPUT_FILENAME )
-	public void setBoardCountsFileName(String boardCountsFileName) {
-		this.boardCountsFileName = boardCountsFileName;
-	}
+  @StringGetter(OCCUPANCY_COUNTS_INPUT_FILENAME)
+  public String getOccupancyCountsFileName() {
+    return occupancyCountsFileName;
+  }
 
-	@StringGetter( ALIGHT_COUNTS_INPUT_FILENAME )
-	public String getAlightCountsFileName() {
-		return alightCountsFileName;
-	}
+  @StringSetter(OCCUPANCY_COUNTS_INPUT_FILENAME)
+  public void setOccupancyCountsFileName(String occupancyCountsFileName) {
+    this.occupancyCountsFileName = occupancyCountsFileName;
+  }
 
-	@StringSetter( ALIGHT_COUNTS_INPUT_FILENAME )
-	public void setAlightCountsFileName(String alightCountsFileName) {
-		this.alightCountsFileName = alightCountsFileName;
-	}
+  @StringGetter(BOARD_COUNTS_INPUT_FILENAME)
+  public String getBoardCountsFileName() {
+    return boardCountsFileName;
+  }
 
-	@StringGetter( COUNTSSCALEFACTOR )
-	public double getCountsScaleFactor() {
-		return countsScaleFactor;
-	}
+  @StringSetter(BOARD_COUNTS_INPUT_FILENAME)
+  public void setBoardCountsFileName(String boardCountsFileName) {
+    this.boardCountsFileName = boardCountsFileName;
+  }
 
-	@StringSetter( COUNTSSCALEFACTOR )
-	public void setCountsScaleFactor(double countsScaleFactor) {
-		this.countsScaleFactor = countsScaleFactor;
-	}
+  @StringGetter(ALIGHT_COUNTS_INPUT_FILENAME)
+  public String getAlightCountsFileName() {
+    return alightCountsFileName;
+  }
 
-	@StringGetter( PT_COUNTS_INTERVAL )
-	public int getPtCountsInterval() {
-		return ptCountsInterval;
-	}
+  @StringSetter(ALIGHT_COUNTS_INPUT_FILENAME)
+  public void setAlightCountsFileName(String alightCountsFileName) {
+    this.alightCountsFileName = alightCountsFileName;
+  }
 
-	@StringSetter( PT_COUNTS_INTERVAL )
-	public void setPtCountsInterval(int ptCountsInterval) {
-		this.ptCountsInterval = ptCountsInterval;
-	}
+  @StringGetter(COUNTSSCALEFACTOR)
+  public double getCountsScaleFactor() {
+    return countsScaleFactor;
+  }
 
+  @StringSetter(COUNTSSCALEFACTOR)
+  public void setCountsScaleFactor(double countsScaleFactor) {
+    this.countsScaleFactor = countsScaleFactor;
+  }
 
+  @StringGetter(PT_COUNTS_INTERVAL)
+  public int getPtCountsInterval() {
+    return ptCountsInterval;
+  }
+
+  @StringSetter(PT_COUNTS_INTERVAL)
+  public void setPtCountsInterval(int ptCountsInterval) {
+    this.ptCountsInterval = ptCountsInterval;
+  }
 }

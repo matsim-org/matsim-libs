@@ -30,96 +30,96 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  */
 class LCLeg implements Leg, LCPlanElement {
 
-	private final LCPlan plan;
-	private final int arrayIndex;
-	private final int planElementIndex;
-	
-	public LCLeg(final LCPlan plan, final int arrayIndex, final int planElementIndex) {
-		this.plan = plan;
-		this.arrayIndex = arrayIndex;
-		this.planElementIndex = planElementIndex;
-	}
-	
-	@Override
-	public final String getMode() {
-		return this.plan.modes[this.arrayIndex];
-	}
+  private final LCPlan plan;
+  private final int arrayIndex;
+  private final int planElementIndex;
 
-	@Override
-	public final void setMode(String mode) {
-		this.plan.modes[this.arrayIndex] = mode;
-	}
+  public LCLeg(final LCPlan plan, final int arrayIndex, final int planElementIndex) {
+    this.plan = plan;
+    this.arrayIndex = arrayIndex;
+    this.planElementIndex = planElementIndex;
+  }
 
-	@Override
-	public final String getRoutingMode() {
-		return this.plan.routingModes[this.arrayIndex];
-	}
+  @Override
+  public final String getMode() {
+    return this.plan.modes[this.arrayIndex];
+  }
 
-	@Override
-	public final void setRoutingMode(String routingMode) {
-		this.plan.routingModes[this.arrayIndex] = routingMode;
-	}
+  @Override
+  public final void setMode(String mode) {
+    this.plan.modes[this.arrayIndex] = mode;
+  }
 
-	@Override
-	public final Route getRoute() {
-		return this.plan.routes[this.arrayIndex];
-	}
+  @Override
+  public final String getRoutingMode() {
+    return this.plan.routingModes[this.arrayIndex];
+  }
 
-	@Override
-	public final void setRoute(Route route) {
-		this.plan.routes[this.arrayIndex] = route;
-	}
+  @Override
+  public final void setRoutingMode(String routingMode) {
+    this.plan.routingModes[this.arrayIndex] = routingMode;
+  }
 
-	@Override
-	public final OptionalTime getDepartureTime() {
-		return this.plan.depTimes[this.arrayIndex];
-	}
+  @Override
+  public final Route getRoute() {
+    return this.plan.routes[this.arrayIndex];
+  }
 
-	@Override
-	public final void setDepartureTime(double seconds) {
-		this.plan.depTimes[this.arrayIndex] = OptionalTime.defined(seconds);
-	}
+  @Override
+  public final void setRoute(Route route) {
+    this.plan.routes[this.arrayIndex] = route;
+  }
 
-	@Override
-	public void setDepartureTimeUndefined() {
-		this.plan.depTimes[this.arrayIndex] = OptionalTime.undefined();
-	}
+  @Override
+  public final OptionalTime getDepartureTime() {
+    return this.plan.depTimes[this.arrayIndex];
+  }
 
-	@Override
-	public final OptionalTime getTravelTime() {
-		return this.plan.travTimes[this.arrayIndex];
-	}
+  @Override
+  public final void setDepartureTime(double seconds) {
+    this.plan.depTimes[this.arrayIndex] = OptionalTime.defined(seconds);
+  }
 
-	@Override
-	public final void setTravelTime(double seconds) {
-		this.plan.travTimes[this.arrayIndex] = OptionalTime.defined(seconds);
-	}
+  @Override
+  public void setDepartureTimeUndefined() {
+    this.plan.depTimes[this.arrayIndex] = OptionalTime.undefined();
+  }
 
-	@Override
-	public void setTravelTimeUndefined() {
-		this.plan.travTimes[this.arrayIndex] = OptionalTime.undefined();
-	}
+  @Override
+  public final OptionalTime getTravelTime() {
+    return this.plan.travTimes[this.arrayIndex];
+  }
 
-	public final OptionalTime getArrivalTime() {
-		return this.plan.arrTimes[this.arrayIndex];
-	}
-	
-	public final void setArrivalTime(final double arrTime) {
-		this.plan.arrTimes[this.arrayIndex] = OptionalTime.defined(arrTime);
-	}
+  @Override
+  public final void setTravelTime(double seconds) {
+    this.plan.travTimes[this.arrayIndex] = OptionalTime.defined(seconds);
+  }
 
-	@Override
-	public int getArrayIndex() {
-		return this.arrayIndex;
-	}
-	
-	@Override
-	public final int getPlanElementIndex() {
-		return this.planElementIndex;
-	}
+  @Override
+  public void setTravelTimeUndefined() {
+    this.plan.travTimes[this.arrayIndex] = OptionalTime.undefined();
+  }
 
-	@Override
-	public Attributes getAttributes() {
-		throw new UnsupportedOperationException();
-	}
+  public final OptionalTime getArrivalTime() {
+    return this.plan.arrTimes[this.arrayIndex];
+  }
+
+  public final void setArrivalTime(final double arrTime) {
+    this.plan.arrTimes[this.arrayIndex] = OptionalTime.defined(arrTime);
+  }
+
+  @Override
+  public int getArrayIndex() {
+    return this.arrayIndex;
+  }
+
+  @Override
+  public final int getPlanElementIndex() {
+    return this.planElementIndex;
+  }
+
+  @Override
+  public Attributes getAttributes() {
+    throw new UnsupportedOperationException();
+  }
 }

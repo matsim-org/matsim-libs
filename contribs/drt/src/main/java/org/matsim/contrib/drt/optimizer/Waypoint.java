@@ -20,12 +20,11 @@
 
 package org.matsim.contrib.drt.optimizer;
 
+import com.google.common.base.MoreObjects;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.DoubleStream;
-
 import javax.annotation.Nullable;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -33,246 +32,258 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.utils.misc.OptionalTime;
 
-import com.google.common.base.MoreObjects;
-
 /**
  * @author Michal Maciejewski (michalm)
  */
 public interface Waypoint {
-	Link getLink();
+  Link getLink();
 
-	double getArrivalTime();
+  double getArrivalTime();
 
-	double getDepartureTime();
+  double getDepartureTime();
 
-	int getOutgoingOccupancy();
+  int getOutgoingOccupancy();
 
-	class Start implements Waypoint {
-		public final Optional<Task> task;// empty if schedule status is PLANNED
-		public final Link link;
-		public final double time;
-		public final int occupancy;
+  class Start implements Waypoint {
+    public final Optional<Task> task; // empty if schedule status is PLANNED
+    public final Link link;
+    public final double time;
+    public final int occupancy;
 
-		public Start(@Nullable Task task, Link link, double time, int occupancy) {
-			this.task = Optional.ofNullable(task);
-			this.link = link;
-			this.time = time;
-			this.occupancy = occupancy;
-		}
+    public Start(@Nullable Task task, Link link, double time, int occupancy) {
+      this.task = Optional.ofNullable(task);
+      this.link = link;
+      this.time = time;
+      this.occupancy = occupancy;
+    }
 
-		@Override
-		public Link getLink() {
-			return link;
-		}
+    @Override
+    public Link getLink() {
+      return link;
+    }
 
-		@Override
-		public double getArrivalTime() {
-			throw new UnsupportedOperationException("No arrival time for start waypoint");
-		}
+    @Override
+    public double getArrivalTime() {
+      throw new UnsupportedOperationException("No arrival time for start waypoint");
+    }
 
-		@Override
-		public double getDepartureTime() {
-			return time;
-		}
+    @Override
+    public double getDepartureTime() {
+      return time;
+    }
 
-		@Override
-		public int getOutgoingOccupancy() {
-			return occupancy;
-		}
+    @Override
+    public int getOutgoingOccupancy() {
+      return occupancy;
+    }
 
-		@Override
-		public String toString() {
-			return MoreObjects.toStringHelper(this)
-					.add("task", task)
-					.add("link", link)
-					.add("time", time)
-					.add("occupancy", occupancy)
-					.toString();
-		}
-	}
+    @Override
+    public String toString() {
+      return MoreObjects.toStringHelper(this)
+          .add("task", task)
+          .add("link", link)
+          .add("time", time)
+          .add("occupancy", occupancy)
+          .toString();
+    }
+  }
 
-	class End implements Waypoint {
-		public static final End OPEN_END = new End();
+  class End implements Waypoint {
+    public static final End OPEN_END = new End();
 
-		public final Optional<Link> link;//null if open-end route
-		public final OptionalTime arrivalTime;//undefined if open-end route
+    public final Optional<Link> link; // null if open-end route
+    public final OptionalTime arrivalTime; // undefined if open-end route
 
-		private End() {
-			link = Optional.empty();
-			arrivalTime = OptionalTime.undefined();
-		}
+    private End() {
+      link = Optional.empty();
+      arrivalTime = OptionalTime.undefined();
+    }
 
-		public End(Link link, double arrivalTime) {
-			this.link = Optional.of(link);
-			this.arrivalTime = OptionalTime.defined(arrivalTime);
-		}
+    public End(Link link, double arrivalTime) {
+      this.link = Optional.of(link);
+      this.arrivalTime = OptionalTime.defined(arrivalTime);
+    }
 
-		public boolean isOpenEnd() {
-			return link.isEmpty();
-		}
+    public boolean isOpenEnd() {
+      return link.isEmpty();
+    }
 
-		@Override
-		public Link getLink() {
-			return link.orElseThrow(() -> new NoSuchElementException("Open-end route -- no end link provided"));
-		}
+    @Override
+    public Link getLink() {
+      return link.orElseThrow(
+          () -> new NoSuchElementException("Open-end route -- no end link provided"));
+    }
 
-		@Override
-		public double getArrivalTime() {
-			return arrivalTime.seconds();
-		}
+    @Override
+    public double getArrivalTime() {
+      return arrivalTime.seconds();
+    }
 
-		@Override
-		public double getDepartureTime() {
-			throw new UnsupportedOperationException("No departure time for end waypoint");
-		}
+    @Override
+    public double getDepartureTime() {
+      throw new UnsupportedOperationException("No departure time for end waypoint");
+    }
 
-		@Override
-		public int getOutgoingOccupancy() {
-			throw new UnsupportedOperationException("End is the terminal waypoint");
-		}
+    @Override
+    public int getOutgoingOccupancy() {
+      throw new UnsupportedOperationException("End is the terminal waypoint");
+    }
 
-		@Override
-		public String toString() {
-			return MoreObjects.toStringHelper(this).add("link", link).add("arrivalTime", arrivalTime).toString();
-		}
-	}
+    @Override
+    public String toString() {
+      return MoreObjects.toStringHelper(this)
+          .add("link", link)
+          .add("arrivalTime", arrivalTime)
+          .toString();
+    }
+  }
 
-	class Stop implements Waypoint {
-		public final DrtStopTask task;
-		public final double latestArrivalTime;// relating to max passenger drive time (for dropoff requests)
-		public final double latestDepartureTime;// relating to passenger max wait time (for pickup requests)
-		public final int outgoingOccupancy;
+  class Stop implements Waypoint {
+    public final DrtStopTask task;
+    public final double
+        latestArrivalTime; // relating to max passenger drive time (for dropoff requests)
+    public final double
+        latestDepartureTime; // relating to passenger max wait time (for pickup requests)
+    public final int outgoingOccupancy;
 
-		public Stop(DrtStopTask task, int outgoingOccupancy) {
-			this.task = task;
-			this.outgoingOccupancy = outgoingOccupancy;
+    public Stop(DrtStopTask task, int outgoingOccupancy) {
+      this.task = task;
+      this.outgoingOccupancy = outgoingOccupancy;
 
-			// essentially the min of the latest possible arrival times at this stop
-			latestArrivalTime = calcLatestArrivalTime();
+      // essentially the min of the latest possible arrival times at this stop
+      latestArrivalTime = calcLatestArrivalTime();
 
-			// essentially the min of the latest possible pickup times at this stop
-			latestDepartureTime = calcLatestDepartureTime();
-		}
+      // essentially the min of the latest possible pickup times at this stop
+      latestDepartureTime = calcLatestDepartureTime();
+    }
 
-		public Stop(DrtStopTask task, double latestArrivalTime, double latestDepartureTime, int outgoingOccupancy) {
-			this.task = task;
-			this.latestArrivalTime = latestArrivalTime;
-			this.latestDepartureTime = latestDepartureTime;
-			this.outgoingOccupancy = outgoingOccupancy;
-		}
+    public Stop(
+        DrtStopTask task,
+        double latestArrivalTime,
+        double latestDepartureTime,
+        int outgoingOccupancy) {
+      this.task = task;
+      this.latestArrivalTime = latestArrivalTime;
+      this.latestDepartureTime = latestDepartureTime;
+      this.outgoingOccupancy = outgoingOccupancy;
+    }
 
-		@Override
-		public Link getLink() {
-			return task.getLink();
-		}
+    @Override
+    public Link getLink() {
+      return task.getLink();
+    }
 
-		@Override
-		public double getArrivalTime() {
-			return task.getBeginTime();
-		}
+    @Override
+    public double getArrivalTime() {
+      return task.getBeginTime();
+    }
 
-		@Override
-		public double getDepartureTime() {
-			return task.getEndTime();
-		}
+    @Override
+    public double getDepartureTime() {
+      return task.getEndTime();
+    }
 
-		@Override
-		public int getOutgoingOccupancy() {
-			return outgoingOccupancy;
-		}
+    @Override
+    public int getOutgoingOccupancy() {
+      return outgoingOccupancy;
+    }
 
-		public int getOccupancyChange() {
-			return task.getPickupRequests().size() - task.getDropoffRequests().size();
-		}
+    public int getOccupancyChange() {
+      return task.getPickupRequests().size() - task.getDropoffRequests().size();
+    }
 
-		private double calcLatestArrivalTime() {
-			return getMaxTimeConstraint(
-					task.getDropoffRequests().values().stream().mapToDouble(AcceptedDrtRequest::getLatestArrivalTime),
-					task.getBeginTime());
-		}
+    private double calcLatestArrivalTime() {
+      return getMaxTimeConstraint(
+          task.getDropoffRequests().values().stream()
+              .mapToDouble(AcceptedDrtRequest::getLatestArrivalTime),
+          task.getBeginTime());
+    }
 
-		private double calcLatestDepartureTime() {
-			return getMaxTimeConstraint(
-					task.getPickupRequests().values().stream().mapToDouble(AcceptedDrtRequest::getLatestStartTime),
-					task.getEndTime());
-		}
+    private double calcLatestDepartureTime() {
+      return getMaxTimeConstraint(
+          task.getPickupRequests().values().stream()
+              .mapToDouble(AcceptedDrtRequest::getLatestStartTime),
+          task.getEndTime());
+    }
 
-		private double getMaxTimeConstraint(DoubleStream latestAllowedTimes, double scheduledTime) {
-			//XXX if task is already delayed beyond one or more of latestTimes, use scheduledTime as maxTime constraint
-			//thus we can still add a new request to the already scheduled stops (as no further delays are incurred)
-			//but we cannot add a new stop before the delayed task
-			return Math.max(latestAllowedTimes.min().orElse(Double.MAX_VALUE), scheduledTime);
-		}
+    private double getMaxTimeConstraint(DoubleStream latestAllowedTimes, double scheduledTime) {
+      // XXX if task is already delayed beyond one or more of latestTimes, use scheduledTime as
+      // maxTime constraint
+      // thus we can still add a new request to the already scheduled stops (as no further delays
+      // are incurred)
+      // but we cannot add a new stop before the delayed task
+      return Math.max(latestAllowedTimes.min().orElse(Double.MAX_VALUE), scheduledTime);
+    }
 
-		@Override
-		public String toString() {
-			return "VehicleData.Stop for: " + task.toString();
-		}
-	}
+    @Override
+    public String toString() {
+      return "VehicleData.Stop for: " + task.toString();
+    }
+  }
 
-	class Pickup implements Waypoint {
-		public final DrtRequest request;
+  class Pickup implements Waypoint {
+    public final DrtRequest request;
 
-		public Pickup(DrtRequest request) {
-			this.request = request;
-		}
+    public Pickup(DrtRequest request) {
+      this.request = request;
+    }
 
-		@Override
-		public Link getLink() {
-			return request.getFromLink();
-		}
+    @Override
+    public Link getLink() {
+      return request.getFromLink();
+    }
 
-		@Override
-		public double getArrivalTime() {
-			throw new UnsupportedOperationException();
-		}
+    @Override
+    public double getArrivalTime() {
+      throw new UnsupportedOperationException();
+    }
 
-		@Override
-		public double getDepartureTime() {
-			throw new UnsupportedOperationException();
-		}
+    @Override
+    public double getDepartureTime() {
+      throw new UnsupportedOperationException();
+    }
 
-		@Override
-		public int getOutgoingOccupancy() {
-			throw new UnsupportedOperationException();
-		}
+    @Override
+    public int getOutgoingOccupancy() {
+      throw new UnsupportedOperationException();
+    }
 
-		@Override
-		public String toString() {
-			return MoreObjects.toStringHelper(this).add("request", request).toString();
-		}
-	}
+    @Override
+    public String toString() {
+      return MoreObjects.toStringHelper(this).add("request", request).toString();
+    }
+  }
 
-	class Dropoff implements Waypoint {
-		public final DrtRequest request;
+  class Dropoff implements Waypoint {
+    public final DrtRequest request;
 
-		public Dropoff(DrtRequest request) {
-			this.request = request;
-		}
+    public Dropoff(DrtRequest request) {
+      this.request = request;
+    }
 
-		@Override
-		public Link getLink() {
-			return request.getToLink();
-		}
+    @Override
+    public Link getLink() {
+      return request.getToLink();
+    }
 
-		@Override
-		public double getArrivalTime() {
-			throw new UnsupportedOperationException();
-		}
+    @Override
+    public double getArrivalTime() {
+      throw new UnsupportedOperationException();
+    }
 
-		@Override
-		public double getDepartureTime() {
-			throw new UnsupportedOperationException();
-		}
+    @Override
+    public double getDepartureTime() {
+      throw new UnsupportedOperationException();
+    }
 
-		@Override
-		public int getOutgoingOccupancy() {
-			throw new UnsupportedOperationException();
-		}
+    @Override
+    public int getOutgoingOccupancy() {
+      throw new UnsupportedOperationException();
+    }
 
-		@Override
-		public String toString() {
-			return MoreObjects.toStringHelper(this).add("request", request).toString();
-		}
-	}
+    @Override
+    public String toString() {
+      return MoreObjects.toStringHelper(this).add("request", request).toString();
+    }
+  }
 }

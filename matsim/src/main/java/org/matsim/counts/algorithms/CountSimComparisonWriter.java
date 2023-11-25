@@ -21,27 +21,25 @@
 package org.matsim.counts.algorithms;
 
 import java.util.List;
-
 import org.matsim.counts.CountSimComparison;
 
 abstract class CountSimComparisonWriter {
 
-	protected int iterationNumber;
-	
-	protected CountSimComparisonTimeFilter countComparisonFilter;
+  protected int iterationNumber;
 
-	public CountSimComparisonWriter(final List<CountSimComparison> countSimCompList) {
-		super();
-		this.countComparisonFilter = new CountSimComparisonTimeFilter(countSimCompList);
-	}
+  protected CountSimComparisonTimeFilter countComparisonFilter;
 
-	public abstract void writeFile(final String filename);
+  public CountSimComparisonWriter(final List<CountSimComparison> countSimCompList) {
+    super();
+    this.countComparisonFilter = new CountSimComparisonTimeFilter(countSimCompList);
+  }
 
-	/**
-	 * @param iterationNumber the iterationNumber to set
-	 */
-	public void setIterationNumber(final int iterationNumber) {
-		this.iterationNumber = iterationNumber;
-	}
+  public abstract void writeFile(final String filename);
 
+  /**
+   * @param iterationNumber the iterationNumber to set
+   */
+  public void setIterationNumber(final int iterationNumber) {
+    this.iterationNumber = iterationNumber;
+  }
 }

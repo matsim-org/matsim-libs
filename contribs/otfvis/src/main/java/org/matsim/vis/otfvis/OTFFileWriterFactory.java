@@ -20,33 +20,34 @@
 
 package org.matsim.vis.otfvis;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.ControlerI;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-
 public class OTFFileWriterFactory implements Provider<SnapshotWriter> {
 
-	private Scenario scenario;
-	private OutputDirectoryHierarchy controlerIO;
-	private final ReplanningContext iterationContext;
+  private Scenario scenario;
+  private OutputDirectoryHierarchy controlerIO;
+  private final ReplanningContext iterationContext;
 
-	@Inject
-	OTFFileWriterFactory(Scenario scenario, ReplanningContext replanningContext, OutputDirectoryHierarchy controlerIO) {
-		this.scenario = scenario;
-		this.iterationContext = replanningContext;
-		this.controlerIO = controlerIO;
-	}
+  @Inject
+  OTFFileWriterFactory(
+      Scenario scenario,
+      ReplanningContext replanningContext,
+      OutputDirectoryHierarchy controlerIO) {
+    this.scenario = scenario;
+    this.iterationContext = replanningContext;
+    this.controlerIO = controlerIO;
+  }
 
-	@Override
-	public SnapshotWriter get() {
-		String fileName = controlerIO.getIterationFilename(iterationContext.getIteration(), "otfvis.mvi");
-		OTFFileWriter writer = new OTFFileWriter(scenario, fileName);
-		return writer;
-	}
-
+  @Override
+  public SnapshotWriter get() {
+    String fileName =
+        controlerIO.getIterationFilename(iterationContext.getIteration(), "otfvis.mvi");
+    OTFFileWriter writer = new OTFFileWriter(scenario, fileName);
+    return writer;
+  }
 }

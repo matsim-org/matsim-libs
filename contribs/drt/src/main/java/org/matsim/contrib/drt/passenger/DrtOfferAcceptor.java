@@ -26,14 +26,16 @@ import java.util.Optional;
  * @author Michal Maciejewski (michalm)
  */
 public interface DrtOfferAcceptor {
-	DrtOfferAcceptor DEFAULT_ACCEPTOR = (request, departureTime, arrivalTime) -> Optional.of(
-			AcceptedDrtRequest.createFromOriginalRequest(request));
+  DrtOfferAcceptor DEFAULT_ACCEPTOR =
+      (request, departureTime, arrivalTime) ->
+          Optional.of(AcceptedDrtRequest.createFromOriginalRequest(request));
 
-	/**
-	 * @param request       drt request
-	 * @param departureTime offered departure time for the new request
-	 * @param arrivalTime   offered arrival time for the new request
-	 * @return accepted request (if accepted) or empty
-	 */
-	Optional<AcceptedDrtRequest> acceptDrtOffer(DrtRequest request, double departureTime, double arrivalTime);
+  /**
+   * @param request drt request
+   * @param departureTime offered departure time for the new request
+   * @param arrivalTime offered arrival time for the new request
+   * @return accepted request (if accepted) or empty
+   */
+  Optional<AcceptedDrtRequest> acceptDrtOffer(
+      DrtRequest request, double departureTime, double arrivalTime);
 }

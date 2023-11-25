@@ -28,7 +28,7 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
  * @author michalm
  */
 public interface InsertionCostCalculator {
-	double INFEASIBLE_SOLUTION_COST = Double.POSITIVE_INFINITY;
+  double INFEASIBLE_SOLUTION_COST = Double.POSITIVE_INFINITY;
 
-	double calculate(DrtRequest drtRequest, Insertion insertion, DetourTimeInfo detourTimeInfo);
+  double calculate(DrtRequest drtRequest, Insertion insertion, DetourTimeInfo detourTimeInfo);
 }

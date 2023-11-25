@@ -29,56 +29,59 @@ import org.matsim.core.gbl.Gbl;
  * @author rashid_waraich
  */
 public class Scheduler {
-	
-	private static final Logger log = LogManager.getLogger(Scheduler.class);
-	private double simTime = 0;
-	protected final MessageQueue queue;
-	private double simulationStartTime = System.currentTimeMillis();
-	private final double simulationEndTime;
-	private double hourlyLogTime = 3600;
 
-	public Scheduler(MessageQueue queue) {
-		this(queue, Double.MAX_VALUE);
-	}
+  private static final Logger log = LogManager.getLogger(Scheduler.class);
+  private double simTime = 0;
+  protected final MessageQueue queue;
+  private double simulationStartTime = System.currentTimeMillis();
+  private final double simulationEndTime;
+  private double hourlyLogTime = 3600;
 
-	public Scheduler(MessageQueue messageQueue, double simulationEndTime) {
-		this.queue = messageQueue;
-		this.simulationEndTime = simulationEndTime;
-	}
+  public Scheduler(MessageQueue queue) {
+    this(queue, Double.MAX_VALUE);
+  }
 
-	public void schedule(Message m) {
-		queue.putMessage(m);
-	}
+  public Scheduler(MessageQueue messageQueue, double simulationEndTime) {
+    this.queue = messageQueue;
+    this.simulationEndTime = simulationEndTime;
+  }
 
-	public void unschedule(Message m) {
-		queue.removeMessage(m);
-	}
+  public void schedule(Message m) {
+    queue.putMessage(m);
+  }
 
-	public void startSimulation() {
-		Message m;
-		while (!queue.isEmpty() && simTime < simulationEndTime) {
-			m = queue.getNextMessage();
-			if (m != null) {
-				simTime = m.getMessageArrivalTime();
-				m.processEvent();
-				m.handleMessage();
-			}
-			printLog();
-		}
-	}
+  public void unschedule(Message m) {
+    queue.removeMessage(m);
+  }
 
-	public double getSimTime() {
-		return simTime;
-	}
+  public void startSimulation() {
+    Message m;
+    while (!queue.isEmpty() && simTime < simulationEndTime) {
+      m = queue.getNextMessage();
+      if (m != null) {
+        simTime = m.getMessageArrivalTime();
+        m.processEvent();
+        m.handleMessage();
+      }
+      printLog();
+    }
+  }
 
-	private void printLog() {
+  public double getSimTime() {
+    return simTime;
+  }
 
-		// print output each hour
-		if (simTime / hourlyLogTime > 1) {
-			hourlyLogTime = simTime + 3600;
-			log.info("Simulation at " + simTime / 3600 + "[h]; s/r:" + simTime / (System.currentTimeMillis() - simulationStartTime) * 1000);
-			Gbl.printMemoryUsage();
-		}
-	}
+  private void printLog() {
 
+    // print output each hour
+    if (simTime / hourlyLogTime > 1) {
+      hourlyLogTime = simTime + 3600;
+      log.info(
+          "Simulation at "
+              + simTime / 3600
+              + "[h]; s/r:"
+              + simTime / (System.currentTimeMillis() - simulationStartTime) * 1000);
+      Gbl.printMemoryUsage();
+    }
+  }
 }

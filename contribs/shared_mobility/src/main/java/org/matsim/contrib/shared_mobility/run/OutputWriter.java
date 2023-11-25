@@ -9,20 +9,22 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 
 class OutputWriter implements ShutdownListener {
-	private final Id<SharingService> serviceId;
-	private final SharingServiceSpecification specification;
-	private final OutputDirectoryHierarchy outputHierarchy;
+  private final Id<SharingService> serviceId;
+  private final SharingServiceSpecification specification;
+  private final OutputDirectoryHierarchy outputHierarchy;
 
-	public OutputWriter(Id<SharingService> serviceId, SharingServiceSpecification specification,
-			OutputDirectoryHierarchy outputHierarchy) {
-		this.serviceId = serviceId;
-		this.specification = specification;
-		this.outputHierarchy = outputHierarchy;
-	}
+  public OutputWriter(
+      Id<SharingService> serviceId,
+      SharingServiceSpecification specification,
+      OutputDirectoryHierarchy outputHierarchy) {
+    this.serviceId = serviceId;
+    this.specification = specification;
+    this.outputHierarchy = outputHierarchy;
+  }
 
-	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-		String path = outputHierarchy.getOutputFilename("output_sharing_" + serviceId + ".xml");
-		new SharingServiceWriter(specification).write(path);
-	}
+  @Override
+  public void notifyShutdown(ShutdownEvent event) {
+    String path = outputHierarchy.getOutputFilename("output_sharing_" + serviceId + ".xml");
+    new SharingServiceWriter(specification).write(path);
+  }
 }

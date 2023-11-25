@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * JDEQSimPluginTest.java
@@ -19,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim.jdeqsimengine;
+package org.matsim.core.mobsim.qsim.jdeqsimengine;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,41 +32,41 @@ import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-/**
- * Created by michaelzilske on 19/03/14.
- */
+/** Created by michaelzilske on 19/03/14. */
 public class JDEQSimPluginTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private QSim prepareQSim(Scenario scenario, EventsManager eventsManager) {
-        return new QSimBuilder(scenario.getConfig()) //
-        	.addQSimModule(new JDEQSimModule()) //
-        	.configureQSimComponents( components -> {
-        		components.addNamedComponent(JDEQSimModule.COMPONENT_NAME);
-        	} ) //
-        	.build(scenario, eventsManager);
-	}
+  private QSim prepareQSim(Scenario scenario, EventsManager eventsManager) {
+    return new QSimBuilder(scenario.getConfig()) //
+        .addQSimModule(new JDEQSimModule()) //
+        .configureQSimComponents(
+            components -> {
+              components.addNamedComponent(JDEQSimModule.COMPONENT_NAME);
+            }) //
+        .build(scenario, eventsManager);
+  }
 
-    @Test public void testRunsAtAll() {
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
-        eventsManager.initProcessing();
-        PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+  @Test
+  public void testRunsAtAll() {
+    Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
+    eventsManager.initProcessing();
+    PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 
-        QSim qsim = prepareQSim(scenario, eventsManager);
-        qsim.run();
-    }
+    QSim qsim = prepareQSim(scenario, eventsManager);
+    qsim.run();
+  }
 
-    @Test public void testRunsEquil() {
-		Scenario scenario = ScenarioUtils.loadScenario(utils.loadConfig("test/scenarios/equil/config.xml"));
-        EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
-        eventsManager.initProcessing();
-        PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+  @Test
+  public void testRunsEquil() {
+    Scenario scenario =
+        ScenarioUtils.loadScenario(utils.loadConfig("test/scenarios/equil/config.xml"));
+    EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
+    eventsManager.initProcessing();
+    PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 
-        QSim qsim = prepareQSim(scenario, eventsManager);
-        qsim.run();
-    }
-
+    QSim qsim = prepareQSim(scenario, eventsManager);
+    qsim.run();
+  }
 }

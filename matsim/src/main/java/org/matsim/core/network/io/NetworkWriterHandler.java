@@ -20,54 +20,53 @@
 
 package org.matsim.core.network.io;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-
 interface NetworkWriterHandler {
 
-	//////////////////////////////////////////////////////////////////////
-	// <network ... > ... </network>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <network ... > ... </network>
+  //////////////////////////////////////////////////////////////////////
 
-	public void startNetwork(final Network network, final BufferedWriter out) throws IOException;
+  public void startNetwork(final Network network, final BufferedWriter out) throws IOException;
 
-	public void endNetwork(final BufferedWriter out) throws IOException;
+  public void endNetwork(final BufferedWriter out) throws IOException;
 
-	//////////////////////////////////////////////////////////////////////
-	// <nodes ... > ... </nodes>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <nodes ... > ... </nodes>
+  //////////////////////////////////////////////////////////////////////
 
-	public void startNodes(final Network network, final BufferedWriter out) throws IOException;
+  public void startNodes(final Network network, final BufferedWriter out) throws IOException;
 
-	public void endNodes(final BufferedWriter out) throws IOException;
+  public void endNodes(final BufferedWriter out) throws IOException;
 
-	//////////////////////////////////////////////////////////////////////
-	// <links ... > ... </links>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <links ... > ... </links>
+  //////////////////////////////////////////////////////////////////////
 
-	public void startLinks(final Network network, final BufferedWriter out) throws IOException;
+  public void startLinks(final Network network, final BufferedWriter out) throws IOException;
 
-	public void endLinks(final BufferedWriter out) throws IOException;
+  public void endLinks(final BufferedWriter out) throws IOException;
 
-	//////////////////////////////////////////////////////////////////////
-	// <node ... > ... </node>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <node ... > ... </node>
+  //////////////////////////////////////////////////////////////////////
 
-	public void startNode(final Node node, final BufferedWriter out) throws IOException;
+  public void startNode(final Node node, final BufferedWriter out) throws IOException;
 
-	public void endNode(final BufferedWriter out) throws IOException;
+  public void endNode(final BufferedWriter out) throws IOException;
 
-	//////////////////////////////////////////////////////////////////////
-	// <link ... > ... </link>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <link ... > ... </link>
+  //////////////////////////////////////////////////////////////////////
 
-	public void startLink(final Link link, final BufferedWriter out) throws IOException;
+  public void startLink(final Link link, final BufferedWriter out) throws IOException;
 
-	public void endLink(final BufferedWriter out) throws IOException;
-	
-	public void writeSeparator(final BufferedWriter out) throws IOException;
+  public void endLink(final BufferedWriter out) throws IOException;
+
+  public void writeSeparator(final BufferedWriter out) throws IOException;
 }

@@ -25,22 +25,20 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 
 public class SelectedPlanFilter extends AbstractPersonFilter {
 
-	private final PlanAlgorithm nextAlgo;
+  private final PlanAlgorithm nextAlgo;
 
-	public SelectedPlanFilter(final PlanAlgorithm nextAlgo) {
-		this.nextAlgo = nextAlgo;
-	}
+  public SelectedPlanFilter(final PlanAlgorithm nextAlgo) {
+    this.nextAlgo = nextAlgo;
+  }
 
-	@Override
-	public boolean judge(final Person person) {
-		return true;
-	}
+  @Override
+  public boolean judge(final Person person) {
+    return true;
+  }
 
-	@Override
-	public void run(final Person person) {
-		count();
-		this.nextAlgo.run(person.getSelectedPlan());
-	}
-
-
+  @Override
+  public void run(final Person person) {
+    count();
+    this.nextAlgo.run(person.getSelectedPlan());
+  }
 }

@@ -22,7 +22,6 @@ package org.matsim.counts.algorithms.graphs;
 
 import java.awt.Font;
 import java.util.List;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
@@ -40,77 +39,86 @@ import org.matsim.counts.CountSimComparison;
 
 public final class BiasErrorGraph extends CountsGraph {
 
-	private ComparisonErrorStatsCalculator errorStats;
-	
-	public BiasErrorGraph(final List<CountSimComparison> ccl, final int iteration, final String filename,
-			final String chartTitle) {
-		super(ccl, iteration, filename, chartTitle);
-	}
+  private ComparisonErrorStatsCalculator errorStats;
 
-	@Override
-	public JFreeChart createChart(final int nbr) {
-		DefaultCategoryDataset dataset0 = new DefaultCategoryDataset();
-		DefaultCategoryDataset dataset1 = new DefaultCategoryDataset();
+  public BiasErrorGraph(
+      final List<CountSimComparison> ccl,
+      final int iteration,
+      final String filename,
+      final String chartTitle) {
+    super(ccl, iteration, filename, chartTitle);
+  }
 
-		this.errorStats = new ComparisonErrorStatsCalculator(this.ccl_);
+  @Override
+  public JFreeChart createChart(final int nbr) {
+    DefaultCategoryDataset dataset0 = new DefaultCategoryDataset();
+    DefaultCategoryDataset dataset1 = new DefaultCategoryDataset();
 
-		double[] meanRelError = this.errorStats.getMeanRelError();
-//		double[] meanAbsError = this.errorStats.getMeanAbsError();
-		double[] meanBias = this.errorStats.getMeanBias();
+    this.errorStats = new ComparisonErrorStatsCalculator(this.ccl_);
 
-		for (int h = 0; h < 24; h++) {
-			meanRelError[h] *= 100;
-			dataset0.addValue(meanRelError[h], "Mean rel error", Integer.toString(h + 1));
-//			dataset1.addValue(meanAbsError[h], "Mean abs error", Integer.toString(h + 1));
-			dataset1.addValue(meanBias[h], "Mean bias", Integer.toString(h + 1));
-		}
+    double[] meanRelError = this.errorStats.getMeanRelError();
+    //		double[] meanAbsError = this.errorStats.getMeanAbsError();
+    double[] meanBias = this.errorStats.getMeanBias();
 
-		this.chart_ = ChartFactory.createLineChart("", "Hour", "Mean rel error [%]", dataset0, PlotOrientation.VERTICAL,
-				true, // legend?
-				true, // tooltips?
-				false // URLs?
-				);
-		CategoryPlot plot = this.chart_.getCategoryPlot();
-		plot.setDomainAxisLocation(AxisLocation.BOTTOM_OR_RIGHT);
-		plot.setDataset(1, dataset1);
-		plot.mapDatasetToRangeAxis(1, 1);
+    for (int h = 0; h < 24; h++) {
+      meanRelError[h] *= 100;
+      dataset0.addValue(meanRelError[h], "Mean rel error", Integer.toString(h + 1));
+      //			dataset1.addValue(meanAbsError[h], "Mean abs error", Integer.toString(h + 1));
+      dataset1.addValue(meanBias[h], "Mean bias", Integer.toString(h + 1));
+    }
 
-		final LineAndShapeRenderer renderer = new LineAndShapeRenderer();
-		renderer.setSeriesToolTipGenerator(0, new StandardCategoryToolTipGenerator());
-		plot.setRenderer(0, renderer);
+    this.chart_ =
+        ChartFactory.createLineChart(
+            "",
+            "Hour",
+            "Mean rel error [%]",
+            dataset0,
+            PlotOrientation.VERTICAL,
+            true, // legend?
+            true, // tooltips?
+            false // URLs?
+            );
+    CategoryPlot plot = this.chart_.getCategoryPlot();
+    plot.setDomainAxisLocation(AxisLocation.BOTTOM_OR_RIGHT);
+    plot.setDataset(1, dataset1);
+    plot.mapDatasetToRangeAxis(1, 1);
 
-		final CategoryAxis axis1 = new CategoryAxis("Hour");
-		axis1.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 7));
-		plot.setDomainAxis(axis1);
+    final LineAndShapeRenderer renderer = new LineAndShapeRenderer();
+    renderer.setSeriesToolTipGenerator(0, new StandardCategoryToolTipGenerator());
+    plot.setRenderer(0, renderer);
 
-//		final ValueAxis axis2 = new NumberAxis("Mean abs {bias, error} [veh/h]");
-		final ValueAxis axis2 = new NumberAxis("Mean bias [veh/h]");
-		plot.setRangeAxis(1, axis2);
+    final CategoryAxis axis1 = new CategoryAxis("Hour");
+    axis1.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 7));
+    plot.setDomainAxis(axis1);
 
-		final ValueAxis axis3 = plot.getRangeAxis(0);
-		axis3.setRange(0.0, 100.0);
+    //		final ValueAxis axis2 = new NumberAxis("Mean abs {bias, error} [veh/h]");
+    final ValueAxis axis2 = new NumberAxis("Mean bias [veh/h]");
+    plot.setRangeAxis(1, axis2);
 
-		final LineAndShapeRenderer renderer2 = new LineAndShapeRenderer();
-		renderer2.setSeriesToolTipGenerator(0, new StandardCategoryToolTipGenerator());
-		renderer2.setSeriesToolTipGenerator(1, new StandardCategoryToolTipGenerator());
-//		renderer2.setSeriesPaint(0, Color.black);
-		plot.setRenderer(1, renderer2);
-		plot.setDatasetRenderingOrder(DatasetRenderingOrder.REVERSE);
+    final ValueAxis axis3 = plot.getRangeAxis(0);
+    axis3.setRange(0.0, 100.0);
 
-		return this.chart_;
-	}
-	
-	public double[] getMeanRelError() {
-		if (this.errorStats == null) {
-			throw new RuntimeException("Object not initialized correctly. Call createChart(..) first!");
-		}
-		return this.errorStats.getMeanRelError();
-	}
+    final LineAndShapeRenderer renderer2 = new LineAndShapeRenderer();
+    renderer2.setSeriesToolTipGenerator(0, new StandardCategoryToolTipGenerator());
+    renderer2.setSeriesToolTipGenerator(1, new StandardCategoryToolTipGenerator());
+    //		renderer2.setSeriesPaint(0, Color.black);
+    plot.setRenderer(1, renderer2);
+    plot.setDatasetRenderingOrder(DatasetRenderingOrder.REVERSE);
 
-	public double[] getMeanBias() {
-		if (this.errorStats == null) {
-			throw new RuntimeException("Object not initialized correctly. Call createChart(..) first!");
-		}
-		return this.errorStats.getMeanBias();
-	}
+    return this.chart_;
+  }
+
+  public double[] getMeanRelError() {
+    if (this.errorStats == null) {
+      throw new RuntimeException("Object not initialized correctly. Call createChart(..) first!");
+    }
+    return this.errorStats.getMeanRelError();
+  }
+
+  public double[] getMeanBias() {
+    if (this.errorStats == null) {
+      throw new RuntimeException("Object not initialized correctly. Call createChart(..) first!");
+    }
+    return this.errorStats.getMeanBias();
+  }
 }

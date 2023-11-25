@@ -25,108 +25,97 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
-
-import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifier;
+import org.matsim.core.utils.collections.MapUtils;
 
 /**
  * @author thibautd
  */
 final class IncompatiblePlanRecords {
-	private final Set<Id> allIncompatibilityGroupIds;
+  private final Set<Id> allIncompatibilityGroupIds;
 
-	private final Map<Id, Collection<PlanRecord>> plansPerGroup = new HashMap<Id, Collection<PlanRecord>>();
+  private final Map<Id, Collection<PlanRecord>> plansPerGroup =
+      new HashMap<Id, Collection<PlanRecord>>();
 
-	public IncompatiblePlanRecords(
-			final IncompatiblePlansIdentifier identifier,
-			final Map<Id, PersonRecord> personRecords) {
-		final HashSet<Id> ids = new HashSet<Id>();
-		this.allIncompatibilityGroupIds = Collections.unmodifiableSet( ids );
-		for ( PersonRecord person : personRecords.values() ) {
-			for ( PlanRecord plan : person.plans ) {
-				for ( Id group : identifyGroups( identifier , plan ) ) {
-					MapUtils.getCollection( group , plansPerGroup ).add( plan );
-					ids.add( group );
-				}
-				plan.setIncompatibilityGroups( identifyGroups( identifier , plan ) );
-			}
-		}
-	}
+  public IncompatiblePlanRecords(
+      final IncompatiblePlansIdentifier identifier, final Map<Id, PersonRecord> personRecords) {
+    final HashSet<Id> ids = new HashSet<Id>();
+    this.allIncompatibilityGroupIds = Collections.unmodifiableSet(ids);
+    for (PersonRecord person : personRecords.values()) {
+      for (PlanRecord plan : person.plans) {
+        for (Id group : identifyGroups(identifier, plan)) {
+          MapUtils.getCollection(group, plansPerGroup).add(plan);
+          ids.add(group);
+        }
+        plan.setIncompatibilityGroups(identifyGroups(identifier, plan));
+      }
+    }
+  }
 
-	private static Set<Id> identifyGroups(
-			final IncompatiblePlansIdentifier identifier,
-			final PlanRecord plan) {
-		return plan.jointPlan == null ?
-			identifier.identifyIncompatibilityGroups( plan.plan ) :
-			identifier.identifyIncompatibilityGroups( plan.jointPlan );
-	}
+  private static Set<Id> identifyGroups(
+      final IncompatiblePlansIdentifier identifier, final PlanRecord plan) {
+    return plan.jointPlan == null
+        ? identifier.identifyIncompatibilityGroups(plan.plan)
+        : identifier.identifyIncompatibilityGroups(plan.jointPlan);
+  }
 
-	public Set<Id> getAllIncompatibilityGroupIds() {
-		return allIncompatibilityGroupIds;
-	}
+  public Set<Id> getAllIncompatibilityGroupIds() {
+    return allIncompatibilityGroupIds;
+  }
 
-	public Collection<PlanRecord> getIncompatiblePlans( final PlanRecord record ) {
-		if ( record.getIncompatiblePlans() == null ) {
-			record.setIncompatiblePlans(
-					calcIncompatiblePlans(
-						plansPerGroup,
-						record));
-		}
+  public Collection<PlanRecord> getIncompatiblePlans(final PlanRecord record) {
+    if (record.getIncompatiblePlans() == null) {
+      record.setIncompatiblePlans(calcIncompatiblePlans(plansPerGroup, record));
+    }
 
-		return record.getIncompatiblePlans();
-	}
+    return record.getIncompatiblePlans();
+  }
 
-	private static Collection<PlanRecord> calcIncompatiblePlans(
-			final Map<Id, Collection<PlanRecord>> plansPerGroup,
-			final PlanRecord record) {
-		final Collection<PlanRecord> incompatible = new HashSet<PlanRecord>();
+  private static Collection<PlanRecord> calcIncompatiblePlans(
+      final Map<Id, Collection<PlanRecord>> plansPerGroup, final PlanRecord record) {
+    final Collection<PlanRecord> incompatible = new HashSet<PlanRecord>();
 
-		addLinkedPlansOfOtherPlansOfPerson( incompatible , record );
-		addLinkedPlansOfPartners( incompatible , record );
-		addIncompatiblePlans( incompatible , plansPerGroup , record );
+    addLinkedPlansOfOtherPlansOfPerson(incompatible, record);
+    addLinkedPlansOfPartners(incompatible, record);
+    addIncompatiblePlans(incompatible, plansPerGroup, record);
 
-		return incompatible;
-	}
+    return incompatible;
+  }
 
-	private static void addIncompatiblePlans(
-			final Collection<PlanRecord> incompatible,
-			final Map<Id, Collection<PlanRecord>> plansPerGroup,
-			final PlanRecord record) {
-		for ( Id group : record.getIncompatibilityGroups()  ) {
-			incompatible.addAll( plansPerGroup.get( group ) );
-		}
-	}
+  private static void addIncompatiblePlans(
+      final Collection<PlanRecord> incompatible,
+      final Map<Id, Collection<PlanRecord>> plansPerGroup,
+      final PlanRecord record) {
+    for (Id group : record.getIncompatibilityGroups()) {
+      incompatible.addAll(plansPerGroup.get(group));
+    }
+  }
 
-	private static void addLinkedPlansOfOtherPlansOfPerson(
-			final Collection<PlanRecord> incompatible,
-			final PlanRecord record ) {
-		for ( PlanRecord otherRecord : record.person.plans ) {
-			if ( record.equals( otherRecord ) ) continue;
-			incompatible.addAll( otherRecord.linkedPlans );
-		}
-	}
+  private static void addLinkedPlansOfOtherPlansOfPerson(
+      final Collection<PlanRecord> incompatible, final PlanRecord record) {
+    for (PlanRecord otherRecord : record.person.plans) {
+      if (record.equals(otherRecord)) continue;
+      incompatible.addAll(otherRecord.linkedPlans);
+    }
+  }
 
-	private static void addLinkedPlansOfPartners(
-			final Collection<PlanRecord> incompatible,
-			final PlanRecord record ) {
-		for ( PlanRecord linkedPlan : record.linkedPlans ) {
-			final PersonRecord cotrav = linkedPlan.person;
-			addLinkedPlansOfPerson( incompatible , cotrav );
-		}
-	}
+  private static void addLinkedPlansOfPartners(
+      final Collection<PlanRecord> incompatible, final PlanRecord record) {
+    for (PlanRecord linkedPlan : record.linkedPlans) {
+      final PersonRecord cotrav = linkedPlan.person;
+      addLinkedPlansOfPerson(incompatible, cotrav);
+    }
+  }
 
-	private static void addLinkedPlansOfPerson(
-			final Collection<PlanRecord> incompatible,
-			final PersonRecord person ) {
-		for ( PlanRecord otherRecord : person.plans ) {
-			incompatible.addAll( otherRecord.linkedPlans );
-		}
-	}
+  private static void addLinkedPlansOfPerson(
+      final Collection<PlanRecord> incompatible, final PersonRecord person) {
+    for (PlanRecord otherRecord : person.plans) {
+      incompatible.addAll(otherRecord.linkedPlans);
+    }
+  }
 
-	public Set<Id> getIncompatibilityGroups(final PlanRecord pr) {
-		return pr.getIncompatibilityGroups();
-	}
+  public Set<Id> getIncompatibilityGroups(final PlanRecord pr) {
+    return pr.getIncompatibilityGroups();
+  }
 }
-

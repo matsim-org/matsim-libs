@@ -22,13 +22,10 @@ package org.matsim.core.api.experimental.events.handler;
 import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
 import org.matsim.core.events.handler.EventHandler;
 
-
 /**
  * @author dgrether
- *
  */
 public interface BoardingDeniedEventHandler extends EventHandler {
 
-	public void handleEvent(BoardingDeniedEvent e);
-	
+  public void handleEvent(BoardingDeniedEvent e);
 }

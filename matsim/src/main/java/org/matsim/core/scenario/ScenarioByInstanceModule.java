@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * ScenarioByInstanceModule.java
@@ -19,9 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.scenario;
+package org.matsim.core.scenario;
 
 import com.google.inject.Provides;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -34,79 +35,77 @@ import org.matsim.pt.transitSchedule.api.Transit;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-
 public final class ScenarioByInstanceModule extends AbstractModule {
 
-	private final Scenario scenario;
+  private final Scenario scenario;
 
-	public ScenarioByInstanceModule(Scenario scenario) {
-		this.scenario = scenario;
-	}
+  public ScenarioByInstanceModule(Scenario scenario) {
+    this.scenario = scenario;
+  }
 
-	@Override
-	public void install() {
-		// if no network provided, assume it comes from somewhere else, and this module just provides
-		// the scenario "elements"
-		if ( scenario != null ) bind(Scenario.class).toInstance(scenario);
-		if (getConfig().transit().isUseTransit()) {
-			bind(TransitSchedule.class).toProvider(TransitScheduleProvider.class);
-			bind(Vehicles.class).annotatedWith(Transit.class).toProvider(TransitVehiclesProvider.class);
-		}
-	}
+  @Override
+  public void install() {
+    // if no network provided, assume it comes from somewhere else, and this module just provides
+    // the scenario "elements"
+    if (scenario != null) bind(Scenario.class).toInstance(scenario);
+    if (getConfig().transit().isUseTransit()) {
+      bind(TransitSchedule.class).toProvider(TransitScheduleProvider.class);
+      bind(Vehicles.class).annotatedWith(Transit.class).toProvider(TransitVehiclesProvider.class);
+    }
+  }
 
-	@Provides Network provideNetwork(Scenario scenario) {
-		return scenario.getNetwork();
-	}
+  @Provides
+  Network provideNetwork(Scenario scenario) {
+    return scenario.getNetwork();
+  }
 
-	@Provides Population providePopulation(Scenario scenario) {
-		return scenario.getPopulation();
-	}
+  @Provides
+  Population providePopulation(Scenario scenario) {
+    return scenario.getPopulation();
+  }
 
-	@Provides PopulationFactory providePopulationFactory(Population population) {
-		return population.getFactory();
-	}
+  @Provides
+  PopulationFactory providePopulationFactory(Population population) {
+    return population.getFactory();
+  }
 
-	@Provides ActivityFacilities provideActivityFacilities(Scenario scenario) {
-		return scenario.getActivityFacilities();
-	}
+  @Provides
+  ActivityFacilities provideActivityFacilities(Scenario scenario) {
+    return scenario.getActivityFacilities();
+  }
 
-	@Provides
-	Households provideHouseholds(Scenario scenario) {
-		return scenario.getHouseholds();
-	}
+  @Provides
+  Households provideHouseholds(Scenario scenario) {
+    return scenario.getHouseholds();
+  }
 
-	@Provides
-	Vehicles provideVehicles(Scenario scenario) {
-		return scenario.getVehicles();
-	}
+  @Provides
+  Vehicles provideVehicles(Scenario scenario) {
+    return scenario.getVehicles();
+  }
 
-	@Provides
-	Lanes provideLanes(Scenario scenario) {
-		return scenario.getLanes();
-	}
+  @Provides
+  Lanes provideLanes(Scenario scenario) {
+    return scenario.getLanes();
+  }
 
-	private static class TransitScheduleProvider implements Provider<TransitSchedule> {
+  private static class TransitScheduleProvider implements Provider<TransitSchedule> {
 
-		@Inject
-		Scenario scenario;
+    @Inject Scenario scenario;
 
-		@Override
-		public TransitSchedule get() {
-			return scenario.getTransitSchedule();
-		}
+    @Override
+    public TransitSchedule get() {
+      return scenario.getTransitSchedule();
+    }
+  }
 
-	}
+  private static class TransitVehiclesProvider implements Provider<Vehicles> {
 
-	private static class TransitVehiclesProvider implements Provider<Vehicles> {
+    @Inject Scenario scenario;
 
-		@Inject
-		Scenario scenario;
-
-		@Override
-		public Vehicles get() {
-			return scenario.getTransitVehicles();
-		}
-	}
+    @Override
+    public Vehicles get() {
+      return scenario.getTransitVehicles();
+    }
+  }
 }

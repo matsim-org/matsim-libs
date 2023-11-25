@@ -19,16 +19,14 @@
  * *********************************************************************** */
 package org.matsim.lanes;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-
-import javax.xml.XMLConstants;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import javax.xml.XMLConstants;
 import javax.xml.validation.SchemaFactory;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -49,117 +47,121 @@ import org.xml.sax.SAXException;
  * @author dgrether
  */
 public final class LanesReader implements MatsimReader {
-	
-	private static final Logger log = LogManager.getLogger(LanesReader.class);
-	
-	@Deprecated
-	public static final String SCHEMALOCATIONV11 = "http://www.matsim.org/files/dtd/laneDefinitions_v1.1.xsd";
 
-	public static final String SCHEMALOCATIONV20 = "http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd";
-	
-	private Lanes lanes;
-	private LanesFactory factory;
+  private static final Logger log = LogManager.getLogger(LanesReader.class);
 
-	private final ObjectAttributesConverter attributesConverter = new ObjectAttributesConverter();
+  @Deprecated
+  public static final String SCHEMALOCATIONV11 =
+      "http://www.matsim.org/files/dtd/laneDefinitions_v1.1.xsd";
 
-	public LanesReader(Scenario scenario) {
-		this.lanes = scenario.getLanes();
-		this.factory = lanes.getFactory();
-	}
+  public static final String SCHEMALOCATIONV20 =
+      "http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd";
 
-	@Override
-	public void readFile(final String filename) {
-		try {
-			log.info("reading file " + filename);
-			InputStream inputStream = IOUtils.getInputStream(IOUtils.resolveFileOrResource(filename));
-			parse(inputStream);
-		} catch (JAXBException | SAXException e) {
-			throw new RuntimeException(e);
-		}
-	}
+  private Lanes lanes;
+  private LanesFactory factory;
 
-	@Override
-	public void readURL( final URL url ) {
-		try {
-			log.info("reading file " + url.toString());
-			InputStream inputStream = IOUtils.getInputStream(url);
-			parse(inputStream);
-		} catch (JAXBException | SAXException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	private void parse(InputStream stream) throws JAXBException, SAXException {
-		ObjectFactory fac = new ObjectFactory();
-		JAXBContext jc = JAXBContext.newInstance(org.matsim.jaxb.lanedefinitions20.ObjectFactory.class);
-		Unmarshaller u = jc.createUnmarshaller();
-		u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/laneDefinitions_v2.0.xsd")));
+  private final ObjectAttributesConverter attributesConverter = new ObjectAttributesConverter();
 
-		XMLLaneDefinitions xmlLaneDefinitions;
-		try {
-			xmlLaneDefinitions = (XMLLaneDefinitions) u.unmarshal(stream);
-		}
-		finally {
-			try {
-				if (stream != null) { stream.close();	}
-			} catch (IOException e) {
-				log.warn("Could not close stream.", e);
-			}
-		}
+  public LanesReader(Scenario scenario) {
+    this.lanes = scenario.getLanes();
+    this.factory = lanes.getFactory();
+  }
 
-		//convert the parsed xml-instances to basic instances
-		for (XMLLanesToLinkAssignmentType lldef : xmlLaneDefinitions
-				.getLanesToLinkAssignment()) {
-			LanesToLinkAssignment l2lAssignment = factory.createLanesToLinkAssignment(Id.create(lldef
-					.getLinkIdRef(), Link.class));
-			for (XMLLaneType laneType : lldef.getLane()) {
-				Lane lane = factory.createLane(Id.create(laneType.getId(), Lane.class));
+  @Override
+  public void readFile(final String filename) {
+    try {
+      log.info("reading file " + filename);
+      InputStream inputStream = IOUtils.getInputStream(IOUtils.resolveFileOrResource(filename));
+      parse(inputStream);
+    } catch (JAXBException | SAXException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-				if (!laneType.getLeadsTo().getToLane().isEmpty()) {
-					for (XMLIdRefType toLaneId : laneType.getLeadsTo().getToLane()){
-						lane.addToLaneId(Id.create(toLaneId.getRefId(), Lane.class));
-					}
-				}
-				else if (!laneType.getLeadsTo().getToLink().isEmpty()){
-					for (XMLIdRefType toLinkId : laneType.getLeadsTo().getToLink()){
-						lane.addToLinkId(Id.create(toLinkId.getRefId(), Link.class));
-					}
-				}
+  @Override
+  public void readURL(final URL url) {
+    try {
+      log.info("reading file " + url.toString());
+      InputStream inputStream = IOUtils.getInputStream(url);
+      parse(inputStream);
+    } catch (JAXBException | SAXException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-				if (laneType.getCapacity() == null){
-					log.warn("Capacity not set in lane definition, using default...");
-					laneType.setCapacity(fac.createXMLLaneTypeXMLCapacity());
-				}
-				lane.setCapacityVehiclesPerHour(laneType.getCapacity().getVehiclesPerHour());
+  private void parse(InputStream stream) throws JAXBException, SAXException {
+    ObjectFactory fac = new ObjectFactory();
+    JAXBContext jc = JAXBContext.newInstance(org.matsim.jaxb.lanedefinitions20.ObjectFactory.class);
+    Unmarshaller u = jc.createUnmarshaller();
+    u.setSchema(
+        SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+            .newSchema(getClass().getResource("/dtd/laneDefinitions_v2.0.xsd")));
 
-				if (laneType.getRepresentedLanes() == null) {
-					laneType.setRepresentedLanes(fac
-							.createXMLLaneTypeXMLRepresentedLanes());
-				}
-				lane.setNumberOfRepresentedLanes(laneType.getRepresentedLanes()
-						.getNumber());
+    XMLLaneDefinitions xmlLaneDefinitions;
+    try {
+      xmlLaneDefinitions = (XMLLaneDefinitions) u.unmarshal(stream);
+    } finally {
+      try {
+        if (stream != null) {
+          stream.close();
+        }
+      } catch (IOException e) {
+        log.warn("Could not close stream.", e);
+      }
+    }
 
-				if (laneType.getStartsAt() == null) {
-					laneType.setStartsAt(fac.createXMLLaneTypeXMLStartsAt());
-				}
-				lane.setStartsAtMeterFromLinkEnd(laneType.getStartsAt().getMeterFromLinkEnd());
+    // convert the parsed xml-instances to basic instances
+    for (XMLLanesToLinkAssignmentType lldef : xmlLaneDefinitions.getLanesToLinkAssignment()) {
+      LanesToLinkAssignment l2lAssignment =
+          factory.createLanesToLinkAssignment(Id.create(lldef.getLinkIdRef(), Link.class));
+      for (XMLLaneType laneType : lldef.getLane()) {
+        Lane lane = factory.createLane(Id.create(laneType.getId(), Lane.class));
 
-				lane.setAlignment(laneType.getAlignment());
+        if (!laneType.getLeadsTo().getToLane().isEmpty()) {
+          for (XMLIdRefType toLaneId : laneType.getLeadsTo().getToLane()) {
+            lane.addToLaneId(Id.create(toLaneId.getRefId(), Lane.class));
+          }
+        } else if (!laneType.getLeadsTo().getToLink().isEmpty()) {
+          for (XMLIdRefType toLinkId : laneType.getLeadsTo().getToLink()) {
+            lane.addToLinkId(Id.create(toLinkId.getRefId(), Link.class));
+          }
+        }
 
-				if (laneType.getAttributes()!=null && !laneType.getAttributes().getAttributeList().isEmpty()) {
-					for (XMLAttributeType att : laneType.getAttributes().getAttributeList()){
-						Object attribute = attributesConverter.convert(att.getClazz(), att.getValue());
-						// Note: when I refactored this, the behavior was that if a converter was not found,
-						// the attribute was read as String. This is inconsistent with the way attributes are read normally,
-						// and I cannot see a use for it, so I just ignored the attribute, as is done in other readers.
-						// td, apr 18
-						if (attribute != null) lane.getAttributes().putAttribute(att.getName(), attribute);
-					}
-				}
+        if (laneType.getCapacity() == null) {
+          log.warn("Capacity not set in lane definition, using default...");
+          laneType.setCapacity(fac.createXMLLaneTypeXMLCapacity());
+        }
+        lane.setCapacityVehiclesPerHour(laneType.getCapacity().getVehiclesPerHour());
 
-				l2lAssignment.addLane(lane);
-			}
-			this.lanes.addLanesToLinkAssignment(l2lAssignment);
-		}
-	}
+        if (laneType.getRepresentedLanes() == null) {
+          laneType.setRepresentedLanes(fac.createXMLLaneTypeXMLRepresentedLanes());
+        }
+        lane.setNumberOfRepresentedLanes(laneType.getRepresentedLanes().getNumber());
+
+        if (laneType.getStartsAt() == null) {
+          laneType.setStartsAt(fac.createXMLLaneTypeXMLStartsAt());
+        }
+        lane.setStartsAtMeterFromLinkEnd(laneType.getStartsAt().getMeterFromLinkEnd());
+
+        lane.setAlignment(laneType.getAlignment());
+
+        if (laneType.getAttributes() != null
+            && !laneType.getAttributes().getAttributeList().isEmpty()) {
+          for (XMLAttributeType att : laneType.getAttributes().getAttributeList()) {
+            Object attribute = attributesConverter.convert(att.getClazz(), att.getValue());
+            // Note: when I refactored this, the behavior was that if a converter was not found,
+            // the attribute was read as String. This is inconsistent with the way attributes are
+            // read normally,
+            // and I cannot see a use for it, so I just ignored the attribute, as is done in other
+            // readers.
+            // td, apr 18
+            if (attribute != null) lane.getAttributes().putAttribute(att.getName(), attribute);
+          }
+        }
+
+        l2lAssignment.addLane(lane);
+      }
+      this.lanes.addLanesToLinkAssignment(l2lAssignment);
+    }
+  }
 }

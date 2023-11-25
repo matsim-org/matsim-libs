@@ -33,29 +33,30 @@ import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraphCreator;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * Tests if some graphs are created.
- * As types of graphs can be plugged in or removed no testing for the existence of particular graphs is done.
+ * Tests if some graphs are created. As types of graphs can be plugged in or removed no testing for
+ * the existence of particular graphs is done.
  */
 public class CountsHtmlAndGraphsWriterTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  @Test
+  public void testGraphCreation() {
+    CountsFixture fixture = new CountsFixture();
+    fixture.setUp();
 
-	@Test public void testGraphCreation() {
-		CountsFixture fixture = new CountsFixture();
-		fixture.setUp();
+    CountsComparisonAlgorithm cca = fixture.getCCA();
+    cca.run();
 
-		CountsComparisonAlgorithm cca = fixture.getCCA();
-		cca.run();
+    CountsHtmlAndGraphsWriter cgw =
+        new CountsHtmlAndGraphsWriter(utils.getOutputDirectory(), cca.getComparison(), 1);
+    cgw.addGraphsCreator(new CountsSimRealPerHourGraphCreator("sim vs. real volumes per hour"));
+    cgw.addGraphsCreator(new CountsErrorGraphCreator("Error Plots"));
+    cgw.addGraphsCreator(new CountsLoadCurveGraphCreator("Load curve graph"));
+    cgw.addGraphsCreator(
+        new CountsSimReal24GraphCreator("average working day sim and count volumes"));
+    cgw.createHtmlAndGraphs();
 
-		CountsHtmlAndGraphsWriter cgw = new CountsHtmlAndGraphsWriter(utils.getOutputDirectory(), cca.getComparison(),1);
-		cgw.addGraphsCreator(new CountsSimRealPerHourGraphCreator("sim vs. real volumes per hour"));
-		cgw.addGraphsCreator(new CountsErrorGraphCreator("Error Plots"));
-		cgw.addGraphsCreator(new CountsLoadCurveGraphCreator("Load curve graph"));
-		cgw.addGraphsCreator(new CountsSimReal24GraphCreator("average working day sim and count volumes"));
-		cgw.createHtmlAndGraphs();
-
-		assertTrue(cgw.getOutput().getGraphs().size()>0);
-	}
+    assertTrue(cgw.getOutput().getGraphs().size() > 0);
+  }
 }

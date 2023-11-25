@@ -21,23 +21,21 @@
 package org.matsim.withinday.replanning.identifiers.filter;
 
 import java.util.Set;
-
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
 
 public class TransportModeFilterFactory implements AgentFilterFactory {
 
-	private final Set<String> modes;
-	private final MobsimDataProvider mobsimDataProvider;
-	
-	public TransportModeFilterFactory(Set<String> modes, MobsimDataProvider mobsimDataProvider) {
-		this.modes = modes;
-		this.mobsimDataProvider = mobsimDataProvider;
-	}
-	
-	@Override
-	public TransportModeFilter createAgentFilter() {
-		return new TransportModeFilter(this.mobsimDataProvider.getAgents(), this.modes);
-	}
+  private final Set<String> modes;
+  private final MobsimDataProvider mobsimDataProvider;
 
+  public TransportModeFilterFactory(Set<String> modes, MobsimDataProvider mobsimDataProvider) {
+    this.modes = modes;
+    this.mobsimDataProvider = mobsimDataProvider;
+  }
+
+  @Override
+  public TransportModeFilter createAgentFilter() {
+    return new TransportModeFilter(this.mobsimDataProvider.getAgents(), this.modes);
+  }
 }

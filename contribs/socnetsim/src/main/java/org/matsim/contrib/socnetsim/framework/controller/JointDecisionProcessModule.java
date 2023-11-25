@@ -19,6 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.controller;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import java.util.Collection;
+import java.util.Collections;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import org.matsim.contrib.socnetsim.framework.controller.listeners.DumpJointDataAtEnd;
@@ -44,87 +48,88 @@ import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-
-import java.util.Collection;
-import java.util.Collections;
-
 /**
- * Defines the basic elements for the matsim process with joint plans.
- * Should be enough to run without crash, but not very useful as such.
+ * Defines the basic elements for the matsim process with joint plans. Should be enough to run
+ * without crash, but not very useful as such.
  *
- * A useful module would first add this module, and then an "overriding"
- * module defining more useful elements.
+ * <p>A useful module would first add this module, and then an "overriding" module defining more
+ * useful elements.
  *
  * @author thibautd
  */
 public class JointDecisionProcessModule extends AbstractModule {
 
-	@Override
-	public void install() {
-		// process as such
-		bind(PlansReplanning.class).to( GroupReplanningListenner.class );
-		bind(PlansScoring.class).to( InternalizingPlansScoring.class );
-		addControlerListenerBinding().to( InternalizingPlansScoring.class );
-		addControlerListenerBinding().to( DumpJointDataAtEnd.class );
+  @Override
+  public void install() {
+    // process as such
+    bind(PlansReplanning.class).to(GroupReplanningListenner.class);
+    bind(PlansScoring.class).to(InternalizingPlansScoring.class);
+    addControlerListenerBinding().to(InternalizingPlansScoring.class);
+    addControlerListenerBinding().to(DumpJointDataAtEnd.class);
 
-		bind( InternalizationSettings.class ).to( ConfigBasedInternalizationSettings.class );
+    bind(InternalizationSettings.class).to(ConfigBasedInternalizationSettings.class);
 
-		addControlerListenerBinding().to(JointPlansDumping.class);
+    addControlerListenerBinding().to(JointPlansDumping.class);
 
-		addEventHandlerBinding().to(CourtesyEventsGenerator.class);
+    addEventHandlerBinding().to(CourtesyEventsGenerator.class);
 
-		// consistency
-		addControlerListenerBinding().to(JointPlanCompositionMinimalityChecker.class);
-		addControlerListenerBinding().to(JointPlanSelectionConsistencyChecker.class);
+    // consistency
+    addControlerListenerBinding().to(JointPlanCompositionMinimalityChecker.class);
+    addControlerListenerBinding().to(JointPlanSelectionConsistencyChecker.class);
 
-		// default elements
-		bind(GroupIdentifier.class).toInstance(
-				// by default, no groups (results in individual replanning)
-				new GroupIdentifier() {
-					@Override
-					public Collection<ReplanningGroup> identifyGroups(
-							final Population population) {
-						return Collections.<ReplanningGroup>emptyList();
-					}
-				});
-		
-		bind(PlanRoutingAlgorithmFactory.class).toProvider(new Provider<PlanRoutingAlgorithmFactory>() {
-			@Inject TimeInterpretation timeInterpretation;
-			
-			@Override
-			public PlanRoutingAlgorithmFactory get() {
-				return new PlanRoutingAlgorithmFactory() {
-					@Override
-					public PlanAlgorithm createPlanRoutingAlgorithm(
-							final TripRouter tripRouter) {
-						return new PlanRouter(tripRouter, timeInterpretation);
-					}
-				};
-			}
-		});
+    // default elements
+    bind(GroupIdentifier.class)
+        .toInstance(
+            // by default, no groups (results in individual replanning)
+            new GroupIdentifier() {
+              @Override
+              public Collection<ReplanningGroup> identifyGroups(final Population population) {
+                return Collections.<ReplanningGroup>emptyList();
+              }
+            });
 
-		bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Strong.class ).toInstance(new CompositePlanLinkIdentifier());
-		bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Weak.class ).toInstance(new CompositePlanLinkIdentifier());
-		bind( IncompatiblePlansIdentifierFactory.class ).toInstance( new EmptyIncompatiblePlansIdentifierFactory() );
+    bind(PlanRoutingAlgorithmFactory.class)
+        .toProvider(
+            new Provider<PlanRoutingAlgorithmFactory>() {
+              @Inject TimeInterpretation timeInterpretation;
 
-		//addControlerListenerBinding().to( TripModeShares.class );
-		//final CompositeStageActivityTypes actTypesForAnalysis = new CompositeStageActivityTypes();
-		//actTypesForAnalysis.addActivityTypes(
-		//		controller.getRegistry().getTripRouterFactory().get().getStageActivityTypes() );
-		//actTypesForAnalysis.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
-		//controller.addControlerListener(
-		//		new TripModeShares(
-		//			graphWriteInterval,
-		//			controller.getControlerIO(),
-		//			controller.getRegistry().getScenario(),
-		//			new JointMainModeIdentifier( new MainModeIdentifierImpl() ),
-		//			actTypesForAnalysis));
+              @Override
+              public PlanRoutingAlgorithmFactory get() {
+                return new PlanRoutingAlgorithmFactory() {
+                  @Override
+                  public PlanAlgorithm createPlanRoutingAlgorithm(final TripRouter tripRouter) {
+                    return new PlanRouter(tripRouter, timeInterpretation);
+                  }
+                };
+              }
+            });
 
-		// For convenience
-		bind( JointPlans.class ).toProvider( new ScenarioElementProvider<JointPlans>( JointPlans.ELEMENT_NAME ) );
-		bind( SocialNetwork.class ).toProvider( new ScenarioElementProvider<SocialNetwork>( SocialNetwork.ELEMENT_NAME ) );
-	}
+    bind(PlanLinkIdentifier.class)
+        .annotatedWith(PlanLinkIdentifier.Strong.class)
+        .toInstance(new CompositePlanLinkIdentifier());
+    bind(PlanLinkIdentifier.class)
+        .annotatedWith(PlanLinkIdentifier.Weak.class)
+        .toInstance(new CompositePlanLinkIdentifier());
+    bind(IncompatiblePlansIdentifierFactory.class)
+        .toInstance(new EmptyIncompatiblePlansIdentifierFactory());
+
+    // addControlerListenerBinding().to( TripModeShares.class );
+    // final CompositeStageActivityTypes actTypesForAnalysis = new CompositeStageActivityTypes();
+    // actTypesForAnalysis.addActivityTypes(
+    //		controller.getRegistry().getTripRouterFactory().get().getStageActivityTypes() );
+    // actTypesForAnalysis.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
+    // controller.addControlerListener(
+    //		new TripModeShares(
+    //			graphWriteInterval,
+    //			controller.getControlerIO(),
+    //			controller.getRegistry().getScenario(),
+    //			new JointMainModeIdentifier( new MainModeIdentifierImpl() ),
+    //			actTypesForAnalysis));
+
+    // For convenience
+    bind(JointPlans.class)
+        .toProvider(new ScenarioElementProvider<JointPlans>(JointPlans.ELEMENT_NAME));
+    bind(SocialNetwork.class)
+        .toProvider(new ScenarioElementProvider<SocialNetwork>(SocialNetwork.ELEMENT_NAME));
+  }
 }
-

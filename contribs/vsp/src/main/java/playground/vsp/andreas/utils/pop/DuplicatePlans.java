@@ -22,7 +22,6 @@ package playground.vsp.andreas.utils.pop;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
@@ -37,52 +36,50 @@ import org.matsim.core.scenario.ScenarioUtils;
  * Create numberOfcopies additional persons for a given plan.
  *
  * @author aneumann
- *
  */
 public class DuplicatePlans extends NewPopulation {
 
-	private final int numberOfCopies;
+  private final int numberOfCopies;
 
-	public DuplicatePlans(Network network, Population plans, String filename, int numberOfCopies) {
-		super(network, plans, filename);
-		this.numberOfCopies = numberOfCopies;
-	}
+  public DuplicatePlans(Network network, Population plans, String filename, int numberOfCopies) {
+    super(network, plans, filename);
+    this.numberOfCopies = numberOfCopies;
+  }
 
-	@Override
-	public void run(Person person) {
-		// Keep old person untouched
-		this.popWriter.writePerson(person);
-		Id<Person> personId = person.getId();
+  @Override
+  public void run(Person person) {
+    // Keep old person untouched
+    this.popWriter.writePerson(person);
+    Id<Person> personId = person.getId();
 
-		for (int i = 1; i < this.numberOfCopies + 1; i++) {
+    for (int i = 1; i < this.numberOfCopies + 1; i++) {
 
-            PopulationUtils.changePersonId( ((Person) person), Id.create(personId.toString() + "X" + i, Person.class) ) ;
-            this.popWriter.writePerson(person);
+      PopulationUtils.changePersonId(
+          ((Person) person), Id.create(personId.toString() + "X" + i, Person.class));
+      this.popWriter.writePerson(person);
+    }
+  }
 
-		}
+  public static void main(final String[] args) {
+    Gbl.startMeasurement();
 
-	}
+    MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-	public static void main(final String[] args) {
-		Gbl.startMeasurement();
+    String networkFile = "./bb_cl.xml.gz";
+    String inPlansFile = "./plan_korridor.xml.gz";
+    String outPlansFile = "./plan_korridor_50x.xml.gz";
 
-		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    Network net = sc.getNetwork();
+    new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
-		String networkFile = "./bb_cl.xml.gz";
-		String inPlansFile = "./plan_korridor.xml.gz";
-		String outPlansFile = "./plan_korridor_50x.xml.gz";
+    Population inPop = sc.getPopulation();
+    MatsimReader popReader = new PopulationReader(sc);
+    popReader.readFile(inPlansFile);
 
-		Network net = sc.getNetwork();
-		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
+    DuplicatePlans dp = new DuplicatePlans(net, inPop, outPlansFile, 49);
+    dp.run(inPop);
+    dp.writeEndPlans();
 
-		Population inPop = sc.getPopulation();
-		MatsimReader popReader = new PopulationReader(sc);
-		popReader.readFile(inPlansFile);
-
-		DuplicatePlans dp = new DuplicatePlans(net, inPop, outPlansFile, 49);
-		dp.run(inPop);
-		dp.writeEndPlans();
-
-		Gbl.printElapsedTime();
-	}
+    Gbl.printElapsedTime();
+  }
 }

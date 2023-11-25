@@ -20,7 +20,6 @@ package playground.vsp.congestion;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,201 +49,277 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 
 /**
  * Accounting for flow delays even if leaving agents list is empty.
- * 
+ *
  * @author amit
  */
-
 public class CombinedFlowAndStorageDelayTest {
-	
-	private final boolean usingOTFVis = false;
-	
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	/**
-	 * Basically agent first delay due to flow cap and then when agent can leave the link, it is delayed due to storage cap
-	 * on the next link in the route. Since, it is waiting for storage delay, causing agent(s) for flow delay is not captured by leaving agents list.
-	 * Thus, such agents are caught by comparing the free speed link time of each agent. If time headway is less than minimum time headway of the link,
-	 * agents are stored to charge later if required.
-	 */
-	@Test
-	public final void implV4Test(){
-		/*
-		 * In the test, two routes (1-2-3-4 and 5-3-4) are assigned to agents. First two agents (1,2) start on first route and next two (3,4) on 
-		 * other route. After agent 1 leave the link 2 (marginal flow delay =100), agent 2 is delayed. Mean while, before agent 2 can move to next link,
-		 * link 3 is blocked by agent 3 (departed on link 5). Thus, agent 2 on link 2 is delayed. Causing agents should be 1 (flow cap), 4 (storage cap).
-		 */
-		List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays("v4");
-		
-		for(CongestionEvent e : congestionEvents){
-			if(e.getAffectedAgentId().equals(Id.createPersonId("2")) && e.getCausingAgentId().equals(Id.createPersonId("1"))){
-				Assert.assertEquals("Delay caused by agent 2 is not correct.", 100, e.getDelay(), MatsimTestUtils.EPSILON);
-				// this is not captured by only leaving agents list.
-			} 
-		}
-		
-		Assert.assertEquals("Number of congestion events are not correct.", 4, congestionEvents.size(), MatsimTestUtils.EPSILON);
-	}
+  private final boolean usingOTFVis = false;
 
-//	@Test
-	public final void implV6Test(){
-		/*
-		 * In the test, two routes (1-2-3-4 and 5-3-4) are assigned to agents. First two agents (1,2) start on first route and next two (3,4) on 
-		 * other route. After agent 1 leave the link 2 (marginal flow delay =100), agent 2 is delayed. Mean while, before agent 2 can move to next link,
-		 * link 3 is blocked by agent 3 (departed on link 5). Thus, agent 2 on link 2 is delayed. Causing agents should be 1 (flow cap), 4 (storage cap).
-		 */
-		List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays("v6");
-		
-		for(CongestionEvent e : congestionEvents){
-			if(e.getAffectedAgentId().equals(Id.createPersonId("2")) && e.getLinkId().equals(Id.createLinkId("2"))){
-				Assert.assertEquals("Wrong causing agent", Id.createPersonId("1"), e.getCausingAgentId());
-				// this is not captured by only leaving agents list.
-			} 
-		}
-		Assert.assertEquals("Number of congestion events are not correct.", 3, congestionEvents.size(), MatsimTestUtils.EPSILON);
-	}
-	
-	private List<CongestionEvent> getAffectedPersonId2Delays(String congestionPricingImpl){
+  @Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-		createPseudoInputs pseudoInputs = new createPseudoInputs();
-		pseudoInputs.createNetwork();
-		pseudoInputs.createPopulation();
-		Scenario sc = pseudoInputs.scenario;
+  /**
+   * Basically agent first delay due to flow cap and then when agent can leave the link, it is
+   * delayed due to storage cap on the next link in the route. Since, it is waiting for storage
+   * delay, causing agent(s) for flow delay is not captured by leaving agents list. Thus, such
+   * agents are caught by comparing the free speed link time of each agent. If time headway is less
+   * than minimum time headway of the link, agents are stored to charge later if required.
+   */
+  @Test
+  public final void implV4Test() {
+    /*
+     * In the test, two routes (1-2-3-4 and 5-3-4) are assigned to agents. First two agents (1,2) start on first route and next two (3,4) on
+     * other route. After agent 1 leave the link 2 (marginal flow delay =100), agent 2 is delayed. Mean while, before agent 2 can move to next link,
+     * link 3 is blocked by agent 3 (departed on link 5). Thus, agent 2 on link 2 is delayed. Causing agents should be 1 (flow cap), 4 (storage cap).
+     */
+    List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays("v4");
 
-		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
-		car.setMaximumVelocity(20);
-		car.setPcuEquivalents(1.0);
-		sc.getVehicles().addVehicleType(car);
+    for (CongestionEvent e : congestionEvents) {
+      if (e.getAffectedAgentId().equals(Id.createPersonId("2"))
+          && e.getCausingAgentId().equals(Id.createPersonId("1"))) {
+        Assert.assertEquals(
+            "Delay caused by agent 2 is not correct.", 100, e.getDelay(), MatsimTestUtils.EPSILON);
+        // this is not captured by only leaving agents list.
+      }
+    }
 
-		sc.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+    Assert.assertEquals(
+        "Number of congestion events are not correct.",
+        4,
+        congestionEvents.size(),
+        MatsimTestUtils.EPSILON);
+  }
 
-		EventsManager events = EventsUtils.createEventsManager();
+  //	@Test
+  public final void implV6Test() {
+    /*
+     * In the test, two routes (1-2-3-4 and 5-3-4) are assigned to agents. First two agents (1,2) start on first route and next two (3,4) on
+     * other route. After agent 1 leave the link 2 (marginal flow delay =100), agent 2 is delayed. Mean while, before agent 2 can move to next link,
+     * link 3 is blocked by agent 3 (departed on link 5). Thus, agent 2 on link 2 is delayed. Causing agents should be 1 (flow cap), 4 (storage cap).
+     */
+    List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays("v6");
 
-		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
+    for (CongestionEvent e : congestionEvents) {
+      if (e.getAffectedAgentId().equals(Id.createPersonId("2"))
+          && e.getLinkId().equals(Id.createLinkId("2"))) {
+        Assert.assertEquals("Wrong causing agent", Id.createPersonId("1"), e.getCausingAgentId());
+        // this is not captured by only leaving agents list.
+      }
+    }
+    Assert.assertEquals(
+        "Number of congestion events are not correct.",
+        3,
+        congestionEvents.size(),
+        MatsimTestUtils.EPSILON);
+  }
 
-		events.addHandler( new CongestionEventHandler() {
+  private List<CongestionEvent> getAffectedPersonId2Delays(String congestionPricingImpl) {
 
-			@Override
-			public void reset(int iteration) {				
-			}
+    createPseudoInputs pseudoInputs = new createPseudoInputs();
+    pseudoInputs.createNetwork();
+    pseudoInputs.createPopulation();
+    Scenario sc = pseudoInputs.scenario;
 
-			@Override
-			public void handleEvent(CongestionEvent event) {
-				congestionEvents.add(event);
-			}
+    VehicleType car =
+        VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
+    car.setMaximumVelocity(20);
+    car.setPcuEquivalents(1.0);
+    sc.getVehicles().addVehicleType(car);
 
-		});
-		if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new CongestionHandlerImplV4(events, sc));
-//		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new CongestionHandlerImplV6(events, sc));
+    sc.getConfig()
+        .qsim()
+        .setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
-		new QSimBuilder(sc.getConfig()).useDefaults().build(sc, events).run();
+    EventsManager events = EventsUtils.createEventsManager();
 
-		return congestionEvents;
-	}
+    final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 
-	private class createPseudoInputs {
-		Scenario scenario;
-		Config config;
-		Network network;
-		Population population;
-		Link link1;
-		Link link2;
-		Link link3;
-		Link link4;
-		Link link5;
+    events.addHandler(
+        new CongestionEventHandler() {
 
-		public createPseudoInputs(){
-			config=ConfigUtils.createConfig();
-			this.scenario = ScenarioUtils.loadScenario(config);
-			network =  (Network) this.scenario.getNetwork();
-			population = this.scenario.getPopulation();
-		}
+          @Override
+          public void reset(int iteration) {}
 
-		private void createNetwork(){
+          @Override
+          public void handleEvent(CongestionEvent event) {
+            congestionEvents.add(event);
+          }
+        });
+    if (congestionPricingImpl.equalsIgnoreCase("v4"))
+      events.addHandler(new CongestionHandlerImplV4(events, sc));
+    //		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new
+    // CongestionHandlerImplV6(events, sc));
 
-			Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("1"), new Coord((double) 0, (double) 0)) ;
-			Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId("2"), new Coord((double) 0, (double) 100));
-			Node node3 = NetworkUtils.createAndAddNode(network, Id.createNodeId("3"), new Coord((double) 500, (double) 150));
-			Node node4 = NetworkUtils.createAndAddNode(network, Id.createNodeId("4"), new Coord((double) 1000, (double) 100));
-			Node node5 = NetworkUtils.createAndAddNode(network, Id.createNodeId("5"), new Coord((double) 1000, (double) 0));
-			final Node fromNode = node1;
-			final Node toNode = node2;
+    PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
+    new QSimBuilder(sc.getConfig()).useDefaults().build(sc, events).run();
 
-			link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("1")), fromNode, toNode, 100.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
-			final Node fromNode1 = node2;
-			final Node toNode1 = node3;
-			link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("2")), fromNode1, toNode1, 100.0, 20.0, (double) 36, (double) 1, null, (String) "7");
-			final Node fromNode2 = node3;
-			final Node toNode2 = node4;
-			link3 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("3")), fromNode2, toNode2, 1.0, 20.0, (double) 360, (double) 1, null, (String) "7");
-			final Node fromNode3 = node4;
-			final Node toNode3 = node5;
-			link4 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("4")), fromNode3, toNode3, 100.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
-			final Node fromNode4 = node1;
-			final Node toNode4 = node3;
-			
-			link5 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("5")), fromNode4, toNode4, 100.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
-		}
+    return congestionEvents;
+  }
 
-		private void createPopulation(){
+  private class createPseudoInputs {
+    Scenario scenario;
+    Config config;
+    Network network;
+    Population population;
+    Link link1;
+    Link link2;
+    Link link3;
+    Link link4;
+    Link link5;
 
-			for(int i=1;i<3;i++){
+    public createPseudoInputs() {
+      config = ConfigUtils.createConfig();
+      this.scenario = ScenarioUtils.loadScenario(config);
+      network = (Network) this.scenario.getNetwork();
+      population = this.scenario.getPopulation();
+    }
 
-				Id<Person> id = Id.createPersonId(i);
-				Person p = population.getFactory().createPerson(id);
-				Plan plan = population.getFactory().createPlan();
-				p.addPlan(plan);
+    private void createNetwork() {
 
-				Activity a1 = population.getFactory().createActivityFromLinkId("h", link1.getId());
-				a1.setEndTime(0+i);
-				Leg leg = population.getFactory().createLeg(TransportMode.car);
-				plan.addActivity(a1);
-				plan.addLeg(leg);
-				LinkNetworkRouteFactory factory1 = new LinkNetworkRouteFactory();
-				NetworkRoute route1;
-				List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-				route1= (NetworkRoute) factory1.createRoute(link1.getId(), link4.getId());
-				linkIds.add(link2.getId());
-				linkIds.add(link3.getId());
-				route1.setLinkIds(link1.getId(), linkIds, link4.getId());
-				leg.setRoute(route1);
-				Activity a2 = population.getFactory().createActivityFromLinkId("w", link4.getId());
-				plan.addActivity(a2);
-				population.addPerson(p);
-			}
+      Node node1 =
+          NetworkUtils.createAndAddNode(
+              network, Id.createNodeId("1"), new Coord((double) 0, (double) 0));
+      Node node2 =
+          NetworkUtils.createAndAddNode(
+              network, Id.createNodeId("2"), new Coord((double) 0, (double) 100));
+      Node node3 =
+          NetworkUtils.createAndAddNode(
+              network, Id.createNodeId("3"), new Coord((double) 500, (double) 150));
+      Node node4 =
+          NetworkUtils.createAndAddNode(
+              network, Id.createNodeId("4"), new Coord((double) 1000, (double) 100));
+      Node node5 =
+          NetworkUtils.createAndAddNode(
+              network, Id.createNodeId("5"), new Coord((double) 1000, (double) 0));
+      final Node fromNode = node1;
+      final Node toNode = node2;
 
-			for(int i=3;i<5;i++) {
-				Id<Person> id = Id.createPersonId(i);
-				Person p = population.getFactory().createPerson(id);
-				Plan plan = population.getFactory().createPlan();
-				p.addPlan(plan);
+      link1 =
+          NetworkUtils.createAndAddLink(
+              network,
+              Id.createLinkId(String.valueOf("1")),
+              fromNode,
+              toNode,
+              100.0,
+              20.0,
+              (double) 3600,
+              (double) 1,
+              null,
+              (String) "7");
+      final Node fromNode1 = node2;
+      final Node toNode1 = node3;
+      link2 =
+          NetworkUtils.createAndAddLink(
+              network,
+              Id.createLinkId(String.valueOf("2")),
+              fromNode1,
+              toNode1,
+              100.0,
+              20.0,
+              (double) 36,
+              (double) 1,
+              null,
+              (String) "7");
+      final Node fromNode2 = node3;
+      final Node toNode2 = node4;
+      link3 =
+          NetworkUtils.createAndAddLink(
+              network,
+              Id.createLinkId(String.valueOf("3")),
+              fromNode2,
+              toNode2,
+              1.0,
+              20.0,
+              (double) 360,
+              (double) 1,
+              null,
+              (String) "7");
+      final Node fromNode3 = node4;
+      final Node toNode3 = node5;
+      link4 =
+          NetworkUtils.createAndAddLink(
+              network,
+              Id.createLinkId(String.valueOf("4")),
+              fromNode3,
+              toNode3,
+              100.0,
+              20.0,
+              (double) 3600,
+              (double) 1,
+              null,
+              (String) "7");
+      final Node fromNode4 = node1;
+      final Node toNode4 = node3;
 
-				Activity a1 = population.getFactory().createActivityFromLinkId("h", link5.getId());
-				a1.setEndTime(100+i);
-				Leg leg = population.getFactory().createLeg(TransportMode.car);
-				plan.addActivity(a1);
-				plan.addLeg(leg);
-				LinkNetworkRouteFactory factory1 = new LinkNetworkRouteFactory();
-				NetworkRoute route1;
-				List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-				route1= (NetworkRoute) factory1.createRoute(link5.getId(), link4.getId());
-				linkIds.add(link3.getId());
-				route1.setLinkIds(link5.getId(), linkIds, link4.getId());
-				leg.setRoute(route1);
-				Activity a2 = population.getFactory().createActivityFromLinkId("w", link4.getId());
-				plan.addActivity(a2);
-				population.addPerson(p);
-			}
-		}
+      link5 =
+          NetworkUtils.createAndAddLink(
+              network,
+              Id.createLinkId(String.valueOf("5")),
+              fromNode4,
+              toNode4,
+              100.0,
+              20.0,
+              (double) 3600,
+              (double) 1,
+              null,
+              (String) "7");
+    }
 
-	}
+    private void createPopulation() {
+
+      for (int i = 1; i < 3; i++) {
+
+        Id<Person> id = Id.createPersonId(i);
+        Person p = population.getFactory().createPerson(id);
+        Plan plan = population.getFactory().createPlan();
+        p.addPlan(plan);
+
+        Activity a1 = population.getFactory().createActivityFromLinkId("h", link1.getId());
+        a1.setEndTime(0 + i);
+        Leg leg = population.getFactory().createLeg(TransportMode.car);
+        plan.addActivity(a1);
+        plan.addLeg(leg);
+        LinkNetworkRouteFactory factory1 = new LinkNetworkRouteFactory();
+        NetworkRoute route1;
+        List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+        route1 = (NetworkRoute) factory1.createRoute(link1.getId(), link4.getId());
+        linkIds.add(link2.getId());
+        linkIds.add(link3.getId());
+        route1.setLinkIds(link1.getId(), linkIds, link4.getId());
+        leg.setRoute(route1);
+        Activity a2 = population.getFactory().createActivityFromLinkId("w", link4.getId());
+        plan.addActivity(a2);
+        population.addPerson(p);
+      }
+
+      for (int i = 3; i < 5; i++) {
+        Id<Person> id = Id.createPersonId(i);
+        Person p = population.getFactory().createPerson(id);
+        Plan plan = population.getFactory().createPlan();
+        p.addPlan(plan);
+
+        Activity a1 = population.getFactory().createActivityFromLinkId("h", link5.getId());
+        a1.setEndTime(100 + i);
+        Leg leg = population.getFactory().createLeg(TransportMode.car);
+        plan.addActivity(a1);
+        plan.addLeg(leg);
+        LinkNetworkRouteFactory factory1 = new LinkNetworkRouteFactory();
+        NetworkRoute route1;
+        List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+        route1 = (NetworkRoute) factory1.createRoute(link5.getId(), link4.getId());
+        linkIds.add(link3.getId());
+        route1.setLinkIds(link5.getId(), linkIds, link4.getId());
+        leg.setRoute(route1);
+        Activity a2 = population.getFactory().createActivityFromLinkId("w", link4.getId());
+        plan.addActivity(a2);
+        population.addPerson(p);
+      }
+    }
+  }
 }
-

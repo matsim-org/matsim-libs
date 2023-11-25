@@ -1,5 +1,3 @@
 package playground.vsp.pipeline;
 
-public interface PersonSinkSource extends PersonSink, PersonSource {
-
-}
+public interface PersonSinkSource extends PersonSink, PersonSource {}

@@ -24,23 +24,19 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
-
-
 public class BvwpTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  @Test
+  public void testOne() {
 
-	@Test public void testOne() {
+    Values economicValues = EconomicValues.createEconomicValuesForTest1();
 
-		Values economicValues = EconomicValues.createEconomicValuesForTest1();
+    ScenarioForEvalData nullfall = ScenarioForTest1.createNullfallForTest();
 
-		ScenarioForEvalData nullfall = ScenarioForTest1.createNullfallForTest();
+    ScenarioForEvalData planfall = ScenarioForTest1.createPlanfallForTest(nullfall);
 
-		ScenarioForEvalData planfall = ScenarioForTest1.createPlanfallForTest(nullfall);
-
-		new UtilityChangesRuleOfHalf().computeAndPrintResults(economicValues, nullfall, planfall) ;
-
-	}
+    new UtilityChangesRuleOfHalf().computeAndPrintResults(economicValues, nullfall, planfall);
+  }
 }

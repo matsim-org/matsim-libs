@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,91 +39,87 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 
 public class StreamingPopulationAttributeConversionTest {
 
-	@Rule
-	public final MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testDefaults() {
-		final String path = utils.getOutputDirectory() + "/plans.xml";
+  @Test
+  public void testDefaults() {
+    final String path = utils.getOutputDirectory() + "/plans.xml";
 
-		testWriteAndRereadStreaming((w, persons) -> {
-			w.startStreaming(path);
-			persons.forEach(w::writePerson);
-			w.closeStreaming();
-		}, r -> r.readFile(path));
-	}
+    testWriteAndRereadStreaming(
+        (w, persons) -> {
+          w.startStreaming(path);
+          persons.forEach(w::writePerson);
+          w.closeStreaming();
+        },
+        r -> r.readFile(path));
+  }
 
-	public void testWriteAndRereadStreaming(
-			final BiConsumer<StreamingPopulationWriter, Collection<? extends Person>> writeMethod,
-			final Consumer<StreamingPopulationReader> readMethod) {
-		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		final Population population = scenario.getPopulation();
-		final PopulationFactory populationFactory = population.getFactory();
+  public void testWriteAndRereadStreaming(
+      final BiConsumer<StreamingPopulationWriter, Collection<? extends Person>> writeMethod,
+      final Consumer<StreamingPopulationReader> readMethod) {
+    final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    final Population population = scenario.getPopulation();
+    final PopulationFactory populationFactory = population.getFactory();
 
-		final Id<Person> personId0 = Id.createPersonId("Gaston0");
-		final CustomClass attribute = new CustomClass("homme à tout faire");
-		// create 10 test persons so we can actually test parallelism better
-		for (int i = 0; i < 10; i++) {
-			final Id<Person> personId = Id.createPersonId("Gaston" + i);
-			final Person person = populationFactory.createPerson(personId);
-			person.getAttributes().putAttribute("job", attribute);
-			population.addPerson(person);
-		}
+    final Id<Person> personId0 = Id.createPersonId("Gaston0");
+    final CustomClass attribute = new CustomClass("homme à tout faire");
+    // create 10 test persons so we can actually test parallelism better
+    for (int i = 0; i < 10; i++) {
+      final Id<Person> personId = Id.createPersonId("Gaston" + i);
+      final Person person = populationFactory.createPerson(personId);
+      person.getAttributes().putAttribute("job", attribute);
+      population.addPerson(person);
+    }
 
-		final StreamingPopulationWriter writer = new StreamingPopulationWriter();
-		writer.putAttributeConverter(CustomClass.class, new CustomClassConverter());
-		writeMethod.accept(writer, population.getPersons().values());
+    final StreamingPopulationWriter writer = new StreamingPopulationWriter();
+    writer.putAttributeConverter(CustomClass.class, new CustomClassConverter());
+    writeMethod.accept(writer, population.getPersons().values());
 
-		final Scenario readScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		final Scenario streamingReadScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		final StreamingPopulationReader reader = new StreamingPopulationReader(streamingReadScenario);
-		reader.addAlgorithm(readScenario.getPopulation()::addPerson);
-		reader.putAttributeConverter(CustomClass.class, new CustomClassConverter());
-		readMethod.accept(reader);
+    final Scenario readScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    final Scenario streamingReadScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    final StreamingPopulationReader reader = new StreamingPopulationReader(streamingReadScenario);
+    reader.addAlgorithm(readScenario.getPopulation()::addPerson);
+    reader.putAttributeConverter(CustomClass.class, new CustomClassConverter());
+    readMethod.accept(reader);
 
-		final Person readPerson = readScenario.getPopulation().getPersons().get(personId0);
-		final Object readAttribute = readPerson.getAttributes().getAttribute("job");
+    final Person readPerson = readScenario.getPopulation().getPersons().get(personId0);
+    final Object readAttribute = readPerson.getAttributes().getAttribute("job");
 
-		Assert.assertEquals(
-				"unexpected read attribute",
-				attribute,
-				readAttribute);
-	}
+    Assert.assertEquals("unexpected read attribute", attribute, readAttribute);
+  }
 
-	private static class CustomClass {
+  private static class CustomClass {
 
-		private final String value;
+    private final String value;
 
-		private CustomClass(String value) {
-			this.value = value;
-		}
+    private CustomClass(String value) {
+      this.value = value;
+    }
 
-		@Override
-		public boolean equals(Object o) {
-			if (this == o)
-				return true;
-			if (o == null || getClass() != o.getClass())
-				return false;
-			CustomClass that = (CustomClass) o;
-			return Objects.equals(value, that.value);
-		}
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      CustomClass that = (CustomClass) o;
+      return Objects.equals(value, that.value);
+    }
 
-		@Override
-		public int hashCode() {
-			return Objects.hash(value);
-		}
-	}
+    @Override
+    public int hashCode() {
+      return Objects.hash(value);
+    }
+  }
 
-	private static class CustomClassConverter implements AttributeConverter<CustomClass> {
+  private static class CustomClassConverter implements AttributeConverter<CustomClass> {
 
-		@Override
-		public CustomClass convert(String value) {
-			return new CustomClass(value);
-		}
+    @Override
+    public CustomClass convert(String value) {
+      return new CustomClass(value);
+    }
 
-		@Override
-		public String convertToString(Object o) {
-			return ((CustomClass) o).value;
-		}
-	}
+    @Override
+    public String convertToString(Object o) {
+      return ((CustomClass) o).value;
+    }
+  }
 }

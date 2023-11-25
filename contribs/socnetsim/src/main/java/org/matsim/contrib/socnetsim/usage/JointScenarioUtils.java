@@ -44,83 +44,81 @@ import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- *
  * @author thibautd
  */
 public class JointScenarioUtils {
-	private JointScenarioUtils() {}
+  private JointScenarioUtils() {}
 
-	/**
-	 * binds to createScenario(createConfig(configFile));
-	 *
-	 * @param configFile the path to the configFile
-	 * @return a ready to use scenario
-	 */
-	public static Scenario loadScenario(final String configFile) {
-		return loadScenario(loadConfig(configFile));
-	}
+  /**
+   * binds to createScenario(createConfig(configFile));
+   *
+   * @param configFile the path to the configFile
+   * @return a ready to use scenario
+   */
+  public static Scenario loadScenario(final String configFile) {
+    return loadScenario(loadConfig(configFile));
+  }
 
-	public static Scenario createScenario(final Config config) {
-		final Scenario sc = ScenarioUtils.createScenario( config );
-		final RouteFactories rFactory = ((PopulationFactory) sc.getPopulation().getFactory()).getRouteFactories();
-		rFactory.setRouteFactory(
-				DriverRoute.class,//JointActingTypes.DRIVER,
-				new DriverRouteFactory());
-		rFactory.setRouteFactory(
-				PassengerRoute.class,//JointActingTypes.PASSENGER,
-				new PassengerRouteFactory());
-		return sc;
-	}
+  public static Scenario createScenario(final Config config) {
+    final Scenario sc = ScenarioUtils.createScenario(config);
+    final RouteFactories rFactory =
+        ((PopulationFactory) sc.getPopulation().getFactory()).getRouteFactories();
+    rFactory.setRouteFactory(
+        DriverRoute.class, // JointActingTypes.DRIVER,
+        new DriverRouteFactory());
+    rFactory.setRouteFactory(
+        PassengerRoute.class, // JointActingTypes.PASSENGER,
+        new PassengerRouteFactory());
+    return sc;
+  }
 
-	/**
-	 * @param config a loaded config
-	 * @return a ready to use scenario
-	 */
-	public static Scenario loadScenario(final Config config) {
-		final Scenario scenario = createScenario( config );
-		ScenarioUtils.loadScenario( scenario );
-		enrichScenario( scenario );
-		return scenario;
-	}
+  /**
+   * @param config a loaded config
+   * @return a ready to use scenario
+   */
+  public static Scenario loadScenario(final Config config) {
+    final Scenario scenario = createScenario(config);
+    ScenarioUtils.loadScenario(scenario);
+    enrichScenario(scenario);
+    return scenario;
+  }
 
-	public static void enrichScenario(final Scenario scenario) {
-		final Config config = scenario.getConfig();
-		final JointPlansConfigGroup jpConfig = (JointPlansConfigGroup)
-			config.getModule( JointPlansConfigGroup.GROUP_NAME );
-		if ( jpConfig.getFileName() != null) {
-			new JointPlansXmlReader( scenario ).readFile( jpConfig.getFileName() );
-		}
-		else {
-			scenario.addScenarioElement(JointPlans.ELEMENT_NAME, new JointPlans());
-		}
-	}
+  public static void enrichScenario(final Scenario scenario) {
+    final Config config = scenario.getConfig();
+    final JointPlansConfigGroup jpConfig =
+        (JointPlansConfigGroup) config.getModule(JointPlansConfigGroup.GROUP_NAME);
+    if (jpConfig.getFileName() != null) {
+      new JointPlansXmlReader(scenario).readFile(jpConfig.getFileName());
+    } else {
+      scenario.addScenarioElement(JointPlans.ELEMENT_NAME, new JointPlans());
+    }
+  }
 
-	public static Config createConfig() {
-		final Config config = ConfigUtils.createConfig();
+  public static Config createConfig() {
+    final Config config = ConfigUtils.createConfig();
 
-		addConfigGroups( config );
+    addConfigGroups(config);
 
-		return config;
-	}
+    return config;
+  }
 
-	public static void addConfigGroups(final Config config) {
-		config.addModule( new CliquesConfigGroup());
-		config.addModule( new JointTripsMutatorConfigGroup());
-		config.addModule( new JointTimeModeChooserConfigGroup());
-		config.addModule( new JointTripInsertorConfigGroup());
-		config.addModule( new JointPlansConfigGroup());
-		config.addModule( new GroupReplanningConfigGroup() );
-		config.addModule( new SocialNetworkConfigGroup() );
-		config.addModule( new RandomJointLocationChoiceConfigGroup() );
-		config.addModule( new PlanLinkConfigGroup() );
-		config.addModule( new PrismicLocationChoiceConfigGroup() );
-		config.addModule( new InternalizationConfigGroup() );
-	}
+  public static void addConfigGroups(final Config config) {
+    config.addModule(new CliquesConfigGroup());
+    config.addModule(new JointTripsMutatorConfigGroup());
+    config.addModule(new JointTimeModeChooserConfigGroup());
+    config.addModule(new JointTripInsertorConfigGroup());
+    config.addModule(new JointPlansConfigGroup());
+    config.addModule(new GroupReplanningConfigGroup());
+    config.addModule(new SocialNetworkConfigGroup());
+    config.addModule(new RandomJointLocationChoiceConfigGroup());
+    config.addModule(new PlanLinkConfigGroup());
+    config.addModule(new PrismicLocationChoiceConfigGroup());
+    config.addModule(new InternalizationConfigGroup());
+  }
 
-	public static Config loadConfig(final String configFile) {
-		final Config config = createConfig();
-		new ConfigReader( config ).readFile( configFile );
-		return config;
-	}
+  public static Config loadConfig(final String configFile) {
+    final Config config = createConfig();
+    new ConfigReader(config).readFile(configFile);
+    return config;
+  }
 }
-

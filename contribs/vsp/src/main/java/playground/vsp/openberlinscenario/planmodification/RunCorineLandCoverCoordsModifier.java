@@ -21,31 +21,41 @@ package playground.vsp.openberlinscenario.planmodification;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import playground.vsp.corineLandcover.CORINELandCoverCoordsModifier;
 
 public class RunCorineLandCoverCoordsModifier {
-	
-	public static void main(String[] args) {
-	    String inputPlansFile = "../../shared-svn/studies/countries/de/open_berlin_scenario/be_5/population/500/plans_500-10-1_10pct.xml.gz";
-	    String outputPlansFile = "../../shared-svn/studies/countries/de/open_berlin_scenario/be_5/population/500/plans_500-10-1_10pct_clc.xml.gz";
-	    
-		String corineLandCoverFile = "../../shared-svn/studies/countries/de/open_berlin_scenario/input/shapefiles/corine_landcover/corine_lancover_berlin-brandenburg_GK4.shp";
 
-	    String zonalShapeFile = "../../shared-svn/studies/countries/de/open_berlin_scenario/input/shapefiles/2016/gemeinden_Planungsraum.shp";
-	    String zoneIdTag = "NR";
-	
-	    boolean simplifyGeom = false;
-	    boolean combiningGeoms = false;
-	    boolean sameHomeActivity = true;
-	    String homeActivityPrefix = "home";
-	
-	    Map<String, String> shapeFileToFeatureKey = new HashMap<>();
-	    shapeFileToFeatureKey.put(zonalShapeFile, zoneIdTag);
-	
-	    CORINELandCoverCoordsModifier plansFilterForCORINELandCover = new CORINELandCoverCoordsModifier(inputPlansFile, shapeFileToFeatureKey,
-	            corineLandCoverFile, simplifyGeom, combiningGeoms, sameHomeActivity, homeActivityPrefix);
-	    plansFilterForCORINELandCover.process();
-	    plansFilterForCORINELandCover.writePlans(outputPlansFile);
-    }
+  public static void main(String[] args) {
+    String inputPlansFile =
+        "../../shared-svn/studies/countries/de/open_berlin_scenario/be_5/population/500/plans_500-10-1_10pct.xml.gz";
+    String outputPlansFile =
+        "../../shared-svn/studies/countries/de/open_berlin_scenario/be_5/population/500/plans_500-10-1_10pct_clc.xml.gz";
+
+    String corineLandCoverFile =
+        "../../shared-svn/studies/countries/de/open_berlin_scenario/input/shapefiles/corine_landcover/corine_lancover_berlin-brandenburg_GK4.shp";
+
+    String zonalShapeFile =
+        "../../shared-svn/studies/countries/de/open_berlin_scenario/input/shapefiles/2016/gemeinden_Planungsraum.shp";
+    String zoneIdTag = "NR";
+
+    boolean simplifyGeom = false;
+    boolean combiningGeoms = false;
+    boolean sameHomeActivity = true;
+    String homeActivityPrefix = "home";
+
+    Map<String, String> shapeFileToFeatureKey = new HashMap<>();
+    shapeFileToFeatureKey.put(zonalShapeFile, zoneIdTag);
+
+    CORINELandCoverCoordsModifier plansFilterForCORINELandCover =
+        new CORINELandCoverCoordsModifier(
+            inputPlansFile,
+            shapeFileToFeatureKey,
+            corineLandCoverFile,
+            simplifyGeom,
+            combiningGeoms,
+            sameHomeActivity,
+            homeActivityPrefix);
+    plansFilterForCORINELandCover.process();
+    plansFilterForCORINELandCover.writePlans(outputPlansFile);
+  }
 }

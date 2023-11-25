@@ -22,7 +22,6 @@ package playground.vsp.andreas.fcd;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,78 +32,73 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-
 public class ReadFcdEvents implements TabularFileHandler {
 
-	static interface FcdEventSink {
-		void process(FcdEvent fcdEvent);
-	}
+  static interface FcdEventSink {
+    void process(FcdEvent fcdEvent);
+  }
 
-	class ListAdder implements FcdEventSink {
+  class ListAdder implements FcdEventSink {
 
-		@Override
-		public void process(FcdEvent fcdEvent) {
-			fcdEventList.add(fcdEvent);
-		}
-
-	}
-
-	private static final Logger log = LogManager.getLogger(ReadFcdEvents.class);
-
-	private TabularFileParserConfig tabFileParserConfig;
-	private LinkedList<FcdEvent> fcdEventList = new LinkedList<FcdEvent>();
-	private FcdEventSink sink = new ListAdder();
-
-	public ReadFcdEvents(String filename) {
-		tabFileParserConfig = new TabularFileParserConfig();
-		tabFileParserConfig.setFileName(filename);
-		tabFileParserConfig.setDelimiterTags(new String[] {"\t"}); // \t
-	}
-
-	public static LinkedList<FcdEvent> readFcdEvents(String filename) throws IOException {
-
-		ReadFcdEvents reader = new ReadFcdEvents(filename);
-
-		//		this.tabFileParserConfig.setDelimiterTags(new String[] {"D"});
-		reader.parse();
-
-		return reader.fcdEventList;		
-	}	
-
-	public void parse() {
-        new TabularFileParser().parse(tabFileParserConfig, this);
+    @Override
+    public void process(FcdEvent fcdEvent) {
+      fcdEventList.add(fcdEvent);
     }
-	
-	@Override
-	public void startRow(String[] row) {
-		if(row[0].contains("#")){
-			StringBuffer tempBuffer = new StringBuffer();
-			for (String string : row) {
-				tempBuffer.append(string);
-				tempBuffer.append(", ");
-			}
-			log.info("Ignoring: " + tempBuffer);
-		} else {
-			try {
-				double time = Time.parseTime(row[0].split(" ")[1]);
-				Id<Link> linkId = Id.create(row[1], Link.class);
-				double aveSpeed = Double.parseDouble(row[2]);
-				double cover = Double.parseDouble(row[3]);
-				Id<Vehicle> vehId = Id.create(row[4], Vehicle.class);
-				int minuteOfWeek = Integer.parseInt(row[5]);
+  }
 
-				FcdEvent fcdEvent = new FcdEvent(time, linkId, aveSpeed, cover, vehId, minuteOfWeek);
-				sink.process(fcdEvent);
-			} catch (NumberFormatException e) {
-				System.out.println("Ignoring line : " + Arrays.asList(row));
-			}
-		}
+  private static final Logger log = LogManager.getLogger(ReadFcdEvents.class);
 
-	}
+  private TabularFileParserConfig tabFileParserConfig;
+  private LinkedList<FcdEvent> fcdEventList = new LinkedList<FcdEvent>();
+  private FcdEventSink sink = new ListAdder();
 
-	public void setSink(FcdEventSink sink) {
-		this.sink = sink;
-	}
+  public ReadFcdEvents(String filename) {
+    tabFileParserConfig = new TabularFileParserConfig();
+    tabFileParserConfig.setFileName(filename);
+    tabFileParserConfig.setDelimiterTags(new String[] {"\t"}); // \t
+  }
 
+  public static LinkedList<FcdEvent> readFcdEvents(String filename) throws IOException {
 
+    ReadFcdEvents reader = new ReadFcdEvents(filename);
+
+    //		this.tabFileParserConfig.setDelimiterTags(new String[] {"D"});
+    reader.parse();
+
+    return reader.fcdEventList;
+  }
+
+  public void parse() {
+    new TabularFileParser().parse(tabFileParserConfig, this);
+  }
+
+  @Override
+  public void startRow(String[] row) {
+    if (row[0].contains("#")) {
+      StringBuffer tempBuffer = new StringBuffer();
+      for (String string : row) {
+        tempBuffer.append(string);
+        tempBuffer.append(", ");
+      }
+      log.info("Ignoring: " + tempBuffer);
+    } else {
+      try {
+        double time = Time.parseTime(row[0].split(" ")[1]);
+        Id<Link> linkId = Id.create(row[1], Link.class);
+        double aveSpeed = Double.parseDouble(row[2]);
+        double cover = Double.parseDouble(row[3]);
+        Id<Vehicle> vehId = Id.create(row[4], Vehicle.class);
+        int minuteOfWeek = Integer.parseInt(row[5]);
+
+        FcdEvent fcdEvent = new FcdEvent(time, linkId, aveSpeed, cover, vehId, minuteOfWeek);
+        sink.process(fcdEvent);
+      } catch (NumberFormatException e) {
+        System.out.println("Ignoring line : " + Arrays.asList(row));
+      }
+    }
+  }
+
+  public void setSink(FcdEventSink sink) {
+    this.sink = sink;
+  }
 }

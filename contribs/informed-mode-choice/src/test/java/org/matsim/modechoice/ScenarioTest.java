@@ -11,32 +11,28 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class ScenarioTest {
 
-	protected InformedModeChoiceConfigGroup group;
-	protected Controler controler;
-	protected Injector injector;
+  protected InformedModeChoiceConfigGroup group;
+  protected Controler controler;
+  protected Injector injector;
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Before
-	public void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
 
-		Config config = TestScenario.loadConfig(utils);
+    Config config = TestScenario.loadConfig(utils);
 
-		group = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
+    group = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 
-		prepareConfig(config);
+    prepareConfig(config);
 
-		controler = MATSimApplication.prepare(TestScenario.class, config, getArgs());
-		injector = controler.getInjector();
+    controler = MATSimApplication.prepare(TestScenario.class, config, getArgs());
+    injector = controler.getInjector();
+  }
 
-	}
+  protected void prepareConfig(Config config) {}
 
-	protected void prepareConfig(Config config) {
-	}
-
-	protected String[] getArgs() {
-		return new String[0];
-	}
-
+  protected String[] getArgs() {
+    return new String[0];
+  }
 }

@@ -29,46 +29,40 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class HouseholdImplTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  /** Test that households with the same {@link Id} are not accepted. */
+  @Test
+  public void testAddHousehold_DuplicateId() {
+    HouseholdsImpl hhs = new HouseholdsImpl();
+    Household hh1 = new HouseholdImpl(Id.create("1", Household.class));
+    Household hh2 = new HouseholdImpl(Id.create("1", Household.class));
 
-	/**
-	 * Test that households with the same {@link Id} are not accepted.
-	 */
-	@Test public void testAddHousehold_DuplicateId(){
-		HouseholdsImpl hhs = new HouseholdsImpl();
-		Household hh1 = new HouseholdImpl(Id.create("1", Household.class));
-		Household hh2 = new HouseholdImpl(Id.create("1", Household.class));
+    assertEquals("Shouldn't have a household.", 0, hhs.getHouseholds().size());
+    hhs.addHousehold(hh1);
+    assertEquals("Didn't add the household.", 1, hhs.getHouseholds().size());
+    assertEquals("Should have added the household.", hh1, hhs.getHouseholds().get(hh1.getId()));
+    try {
+      hhs.addHousehold(hh2);
+      fail("Should not have accepted household with similar Id.");
+    } catch (IllegalArgumentException e) {
+    }
+  }
 
-		assertEquals("Shouldn't have a household.", 0, hhs.getHouseholds().size());
-		hhs.addHousehold(hh1);
-		assertEquals("Didn't add the household.", 1, hhs.getHouseholds().size());
-		assertEquals("Should have added the household.", hh1, hhs.getHouseholds().get(hh1.getId()));
-		try{
-			hhs.addHousehold(hh2);
-			fail("Should not have accepted household with similar Id.");
-		} catch (IllegalArgumentException e){
-		}
-	}
+  /** Test that households are accumulated if streaming is off. */
+  @Test
+  public void testAddHousehold_NoStreaming() {
+    HouseholdsImpl hhs = new HouseholdsImpl();
+    Household hh1 = new HouseholdImpl(Id.create("1", Household.class));
+    Household hh2 = new HouseholdImpl(Id.create("2", Household.class));
 
-
-	/**
-	 * Test that households are accumulated if streaming is off.
-	 */
-	@Test public void testAddHousehold_NoStreaming(){
-		HouseholdsImpl hhs = new HouseholdsImpl();
-		Household hh1 = new HouseholdImpl(Id.create("1", Household.class));
-		Household hh2 = new HouseholdImpl(Id.create("2", Household.class));
-
-		hhs.addHousehold(hh1);
-		assertEquals("Should have the first household added.", 1, hhs.getHouseholds().size());
-		assertTrue("First household not present.", hhs.getHouseholds().containsValue(hh1));
-		hhs.addHousehold(hh2);
-		assertEquals("Should have the first AND second household added.", 2, hhs.getHouseholds().size());
-		assertTrue("First household not present.", hhs.getHouseholds().containsValue(hh1));
-		assertTrue("Second household not present.", hhs.getHouseholds().containsValue(hh2));
-	}
-
+    hhs.addHousehold(hh1);
+    assertEquals("Should have the first household added.", 1, hhs.getHouseholds().size());
+    assertTrue("First household not present.", hhs.getHouseholds().containsValue(hh1));
+    hhs.addHousehold(hh2);
+    assertEquals(
+        "Should have the first AND second household added.", 2, hhs.getHouseholds().size());
+    assertTrue("First household not present.", hhs.getHouseholds().containsValue(hh1));
+    assertTrue("Second household not present.", hhs.getHouseholds().containsValue(hh2));
+  }
 }
-

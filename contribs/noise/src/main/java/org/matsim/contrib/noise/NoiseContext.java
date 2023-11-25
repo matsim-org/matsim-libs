@@ -1,49 +1,48 @@
 package org.matsim.contrib.noise;
 
+import java.util.Map;
+import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.Map;
-import java.util.Set;
-
 public interface NoiseContext {
-    // for routing purposes
-    void storeTimeInterval();
+  // for routing purposes
+  void storeTimeInterval();
 
-    Scenario getScenario();
+  Scenario getScenario();
 
-    Map<Id<ReceiverPoint>, NoiseReceiverPoint> getReceiverPoints();
+  Map<Id<ReceiverPoint>, NoiseReceiverPoint> getReceiverPoints();
 
-    NoiseConfigGroup getNoiseParams();
+  NoiseConfigGroup getNoiseParams();
 
-    double getCurrentTimeBinEndTime();
+  double getCurrentTimeBinEndTime();
 
-    void setCurrentTimeBinEndTime(double currentTimeBinEndTime);
+  void setCurrentTimeBinEndTime(double currentTimeBinEndTime);
 
-    Map<Id<Link>, NoiseLink> getNoiseLinks();
+  Map<Id<Link>, NoiseLink> getNoiseLinks();
 
-    Map<Double, Map<Id<Link>, NoiseLink>> getTimeInterval2linkId2noiseLinks();
+  Map<Double, Map<Id<Link>, NoiseLink>> getTimeInterval2linkId2noiseLinks();
 
-    void setEventTime(double time);
+  void setEventTime(double time);
 
-    double getEventTime();
+  double getEventTime();
 
-    Grid getGrid();
+  Grid getGrid();
 
-    Set<Id<Vehicle>> getBusVehicleIDs();
+  Set<Id<Vehicle>> getBusVehicleIDs();
 
-    Map<Id<Link>, Map<Id<Vehicle>, Double>> getLinkId2vehicleId2lastEnterTime();
+  Map<Id<Link>, Map<Id<Vehicle>, Double>> getLinkId2vehicleId2lastEnterTime();
 
-    Set<Id<Vehicle>> getNotConsideredTransitVehicleIDs();
+  Set<Id<Vehicle>> getNotConsideredTransitVehicleIDs();
 
-    Map<Id<Vehicle>, Id<Person>> getVehicleId2PersonId();
+  Map<Id<Vehicle>, Id<Person>> getVehicleId2PersonId();
 
-    Set<Id<Vehicle>> getIgnoredNetworkModeVehicleIDs();
+  Set<Id<Vehicle>> getIgnoredNetworkModeVehicleIDs();
 
-    void reset();
+  void reset();
 
-    Set<Id<Link>> getPotentialLinks(NoiseReceiverPoint nrp);
+  Set<Id<Link>> getPotentialLinks(NoiseReceiverPoint nrp);
 }

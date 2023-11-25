@@ -1,7 +1,7 @@
 package org.matsim.core.controler;
 
+import com.google.inject.Singleton;
 import java.io.File;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,192 +23,202 @@ import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import com.google.inject.Singleton;
-
-/**
- * This test makes sure that events are written based on the
- * TerminationCriterion.
- */
+/** This test makes sure that events are written based on the TerminationCriterion. */
 public class TerminationTest {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testSimulationEndsOnInterval() {
-		prepareExperiment(2, 4, ControllerConfigGroup.CleanIterations.keep).run();
+  @Test
+  public void testSimulationEndsOnInterval() {
+    prepareExperiment(2, 4, ControllerConfigGroup.CleanIterations.keep).run();
 
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.4/4.events.xml.gz").exists());
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
+    Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.4/4.events.xml.gz").exists());
+    Assert.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
 
-		long iterationOutput = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/ITERS/it.4/4.events.xml.gz");
-		long mainOutput = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/output_events.xml.gz");
-		Assert.assertEquals(iterationOutput, mainOutput);
-	}
+    long iterationOutput =
+        CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/ITERS/it.4/4.events.xml.gz");
+    long mainOutput =
+        CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/output_events.xml.gz");
+    Assert.assertEquals(iterationOutput, mainOutput);
+  }
 
-	@Test
-	public void testOnlyRunIterationZero() {
-		prepareExperiment(2, 0, ControllerConfigGroup.CleanIterations.keep).run();
+  @Test
+  public void testOnlyRunIterationZero() {
+    prepareExperiment(2, 0, ControllerConfigGroup.CleanIterations.keep).run();
 
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.0/0.events.xml.gz").exists());
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
+    Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.0/0.events.xml.gz").exists());
+    Assert.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
 
-		long iterationOutput = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/ITERS/it.0/0.events.xml.gz");
-		long mainOutput = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/output_events.xml.gz");
-		Assert.assertEquals(iterationOutput, mainOutput);
-	}
+    long iterationOutput =
+        CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/ITERS/it.0/0.events.xml.gz");
+    long mainOutput =
+        CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/output_events.xml.gz");
+    Assert.assertEquals(iterationOutput, mainOutput);
+  }
 
-	@Test
-	public void testSimulationEndsOffInterval() {
-		// This is the case when the TerminationCriterion decides that the simulation is
-		// done, but it does not fall at the same time as the output interval.
+  @Test
+  public void testSimulationEndsOffInterval() {
+    // This is the case when the TerminationCriterion decides that the simulation is
+    // done, but it does not fall at the same time as the output interval.
 
-		prepareExperiment(2, 3, ControllerConfigGroup.CleanIterations.keep).run();
+    prepareExperiment(2, 3, ControllerConfigGroup.CleanIterations.keep).run();
 
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.2/2.events.xml.gz").exists());
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.3/3.events.xml.gz").exists());
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
+    Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.2/2.events.xml.gz").exists());
+    Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.3/3.events.xml.gz").exists());
+    Assert.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
 
-		long iterationOutput = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/ITERS/it.3/3.events.xml.gz");
-		long mainOutput = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/output_events.xml.gz");
-		Assert.assertEquals(iterationOutput, mainOutput);
-	}
+    long iterationOutput =
+        CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/ITERS/it.3/3.events.xml.gz");
+    long mainOutput =
+        CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/output_events.xml.gz");
+    Assert.assertEquals(iterationOutput, mainOutput);
+  }
 
-	@Test
-	public void testSimulationEndDeleteIters() {
-		prepareExperiment(2, 3, ControllerConfigGroup.CleanIterations.delete).run();
-		Assert.assertFalse(new File(utils.getOutputDirectory(), "/ITERS").exists());
-	}
+  @Test
+  public void testSimulationEndDeleteIters() {
+    prepareExperiment(2, 3, ControllerConfigGroup.CleanIterations.delete).run();
+    Assert.assertFalse(new File(utils.getOutputDirectory(), "/ITERS").exists());
+  }
 
-	private Controler prepareExperiment(int interval, int criterion, ControllerConfigGroup.CleanIterations iters) {
-		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		config.controller().setCleanItersAtEnd(iters);
+  private Controler prepareExperiment(
+      int interval, int criterion, ControllerConfigGroup.CleanIterations iters) {
+    Config config =
+        utils.loadConfig(
+            IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
+    config.controller().setCleanItersAtEnd(iters);
 
-		config.controller().setWriteEventsInterval(interval);
-		config.controller().setLastIteration(criterion);
+    config.controller().setWriteEventsInterval(interval);
+    config.controller().setLastIteration(criterion);
 
-		return new Controler(config);
-	}
+    return new Controler(config);
+  }
 
-	@Test
-	public void testMultipleLastIterations() {
-		/**
-		 * This test covers the case where the termination criterion decides that the
-		 * coming iteration may be the last, but then, after analysis and after the data
-		 * is written, decides that more iterations need to be run.
-		 */
+  @Test
+  public void testMultipleLastIterations() {
+    /**
+     * This test covers the case where the termination criterion decides that the coming iteration
+     * may be the last, but then, after analysis and after the data is written, decides that more
+     * iterations need to be run.
+     */
+    Controler controller = prepareExperiment(2, 1000, ControllerConfigGroup.CleanIterations.keep);
 
-		Controler controller = prepareExperiment(2, 1000, ControllerConfigGroup.CleanIterations.keep);
+    controller.setTerminationCriterion(
+        new TerminationCriterion() {
+          @Override
+          public boolean mayTerminateAfterIteration(int iteration) {
+            return iteration >= 2; // After it 2 we decide that we need to write events
+          }
 
-		controller.setTerminationCriterion(new TerminationCriterion() {
-			@Override
-			public boolean mayTerminateAfterIteration(int iteration) {
-				return iteration >= 2; // After it 2 we decide that we need to write events
-			}
+          @Override
+          public boolean doTerminate(int iteration) {
+            return iteration >= 4; // But only iteration 4 is actually the last one
+          }
+        });
 
-			@Override
-			public boolean doTerminate(int iteration) {
-				return iteration >= 4; // But only iteration 4 is actually the last one
-			}
-		});
+    controller.run();
 
-		controller.run();
+    Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.2/2.events.xml.gz").exists());
+    Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.3/3.events.xml.gz").exists());
+    Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.4/4.events.xml.gz").exists());
+    Assert.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
 
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.2/2.events.xml.gz").exists());
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.3/3.events.xml.gz").exists());
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.4/4.events.xml.gz").exists());
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
+    long iterationOutput =
+        CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/ITERS/it.4/4.events.xml.gz");
+    long mainOutput =
+        CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/output_events.xml.gz");
+    Assert.assertEquals(iterationOutput, mainOutput);
+  }
 
-		long iterationOutput = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/ITERS/it.4/4.events.xml.gz");
-		long mainOutput = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/output_events.xml.gz");
-		Assert.assertEquals(iterationOutput, mainOutput);
-	}
+  @Test
+  public void testCustomConverenceCriterion() {
+    /**
+     * In this test, we set all legs to walk and let agents change them to car. We stop the
+     * simulation once there are more car legs than walk legs.
+     */
+    Config config =
+        utils.loadConfig(
+            IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
+    config.controller().setCleanItersAtEnd(ControllerConfigGroup.CleanIterations.keep);
 
-	@Test
-	public void testCustomConverenceCriterion() {
-		/**
-		 * In this test, we set all legs to walk and let agents change them to car. We
-		 * stop the simulation once there are more car legs than walk legs.
-		 */
+    { // Set up mode choice
+      config.changeMode().setModes(new String[] {"car", "walk"});
 
-		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		config.controller().setCleanItersAtEnd(ControllerConfigGroup.CleanIterations.keep);
+      StrategySettings modeStrategy = new StrategySettings();
+      modeStrategy.setStrategyName(DefaultStrategy.ChangeTripMode);
+      modeStrategy.setWeight(0.1);
+      config.replanning().addStrategySettings(modeStrategy);
+    }
 
-		{ // Set up mode choice
-			config.changeMode().setModes(new String[] { "car", "walk" });
+    Scenario scenario = ScenarioUtils.loadScenario(config);
 
-			StrategySettings modeStrategy = new StrategySettings();
-			modeStrategy.setStrategyName(DefaultStrategy.ChangeTripMode);
-			modeStrategy.setWeight(0.1);
-			config.replanning().addStrategySettings(modeStrategy);
-		}
+    { // Change initial mode to walk
+      for (Person person : scenario.getPopulation().getPersons().values()) {
+        for (Leg leg : TripStructureUtils.getLegs(person.getSelectedPlan())) {
+          leg.setMode("walk");
+          leg.setRoute(null);
+        }
+      }
+    }
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+    Controler controler = new Controler(scenario);
 
-		{ // Change initial mode to walk
-			for (Person person : scenario.getPopulation().getPersons().values()) {
-				for (Leg leg : TripStructureUtils.getLegs(person.getSelectedPlan())) {
-					leg.setMode("walk");
-					leg.setRoute(null);
-				}
-			}
-		}
+    { // Set convergence criterion
+      controler.addOverridingModule(
+          new AbstractModule() {
+            @Override
+            public void install() {
+              addControlerListenerBinding().to(CustomConvergenceCriterion.class);
+              bind(TerminationCriterion.class).to(CustomConvergenceCriterion.class);
+              addEventHandlerBinding().to(CustomConvergenceCriterion.class);
+            }
+          });
+    }
 
-		Controler controler = new Controler(scenario);
+    controler.run();
 
-		{ // Set convergence criterion
-			controler.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					addControlerListenerBinding().to(CustomConvergenceCriterion.class);
-					bind(TerminationCriterion.class).to(CustomConvergenceCriterion.class);
-					addEventHandlerBinding().to(CustomConvergenceCriterion.class);
-				}
-			});
-		}
+    Assert.assertEquals(12, (int) controler.getIterationNumber());
 
-		controler.run();
+    Assert.assertTrue(
+        new File(utils.getOutputDirectory(), "/ITERS/it.12/12.events.xml.gz").exists());
+    Assert.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
 
-		Assert.assertEquals(12, (int) controler.getIterationNumber());
+    long iterationOutput =
+        CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/ITERS/it.12/12.events.xml.gz");
+    long mainOutput =
+        CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/output_events.xml.gz");
+    Assert.assertEquals(iterationOutput, mainOutput);
+  }
 
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/ITERS/it.12/12.events.xml.gz").exists());
-		Assert.assertTrue(new File(utils.getOutputDirectory(), "/output_events.xml.gz").exists());
+  @Singleton
+  private static class CustomConvergenceCriterion
+      implements TerminationCriterion, PersonDepartureEventHandler, IterationStartsListener {
+    private int countCar = 0;
+    private int countWalk = 0;
 
-		long iterationOutput = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/ITERS/it.12/12.events.xml.gz");
-		long mainOutput = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/output_events.xml.gz");
-		Assert.assertEquals(iterationOutput, mainOutput);
-	}
+    @Override
+    public void notifyIterationStarts(IterationStartsEvent event) {
+      countCar = 0;
+      countWalk = 0;
+    }
 
-	@Singleton
-	static private class CustomConvergenceCriterion
-			implements TerminationCriterion, PersonDepartureEventHandler, IterationStartsListener {
-		private int countCar = 0;
-		private int countWalk = 0;
+    @Override
+    public void handleEvent(PersonDepartureEvent event) {
+      if (event.getLegMode().equals("car")) {
+        countCar++;
+      } else {
+        countWalk++;
+      }
+    }
 
-		@Override
-		public void notifyIterationStarts(IterationStartsEvent event) {
-			countCar = 0;
-			countWalk = 0;
-		}
+    @Override
+    public boolean mayTerminateAfterIteration(int iteration) {
+      return countCar > countWalk; // Check before the iteration!
+    }
 
-		@Override
-		public void handleEvent(PersonDepartureEvent event) {
-			if (event.getLegMode().equals("car")) {
-				countCar++;
-			} else {
-				countWalk++;
-			}
-		}
-
-		@Override
-		public boolean mayTerminateAfterIteration(int iteration) {
-			return countCar > countWalk; // Check before the iteration!
-		}
-
-		@Override
-		public boolean doTerminate(int iteration) {
-			return countCar > countWalk; // Verify after the iteration!
-		}
-	}
+    @Override
+    public boolean doTerminate(int iteration) {
+      return countCar > countWalk; // Verify after the iteration!
+    }
+  }
 }

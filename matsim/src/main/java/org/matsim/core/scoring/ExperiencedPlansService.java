@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * ExperiencedPlansService.java
@@ -19,8 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.scoring;
-
+package org.matsim.core.scoring;
 
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Person;
@@ -28,10 +26,9 @@ import org.matsim.api.core.v01.population.Plan;
 
 public interface ExperiencedPlansService {
 
-	void writeExperiencedPlans(String filename);
+  void writeExperiencedPlans(String filename);
 
-	IdMap<Person, Plan> getExperiencedPlans();
+  IdMap<Person, Plan> getExperiencedPlans();
 
-	void finishIteration();
-
+  void finishIteration();
 }

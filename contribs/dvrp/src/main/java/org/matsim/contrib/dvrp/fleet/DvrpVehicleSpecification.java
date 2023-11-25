@@ -21,7 +21,6 @@
 package org.matsim.contrib.dvrp.fleet;
 
 import java.util.Optional;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
@@ -29,36 +28,37 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * DvrpVehicleSpecification is assumed to be immutable.
- * <p>
- * Its lifespan can span over all iterations, but can be also changed before each iteration.
- * <p>
- * Changing a vehicle specification (e.g. setting a different startLinkId) should be done only "between" iterations
- * by passing a new instance to FleetSpecification.
+ *
+ * <p>Its lifespan can span over all iterations, but can be also changed before each iteration.
+ *
+ * <p>Changing a vehicle specification (e.g. setting a different startLinkId) should be done only
+ * "between" iterations by passing a new instance to FleetSpecification.
  *
  * @author Michal Maciejewski (michalm)
  */
 public interface DvrpVehicleSpecification extends Identifiable<DvrpVehicle> {
-	//provided only if the vehicle specification is created from a corresponding standard matsim vehicle
-	//(see FleetModule)
-	Optional<Vehicle> getMatsimVehicle();
+  // provided only if the vehicle specification is created from a corresponding standard matsim
+  // vehicle
+  // (see FleetModule)
+  Optional<Vehicle> getMatsimVehicle();
 
-	/**
-	 * @return id of the link where the vehicle stays at the beginning of simulation
-	 */
-	Id<Link> getStartLinkId();
+  /**
+   * @return id of the link where the vehicle stays at the beginning of simulation
+   */
+  Id<Link> getStartLinkId();
 
-	/**
-	 * @return vehicle capacity
-	 */
-	int getCapacity();
+  /**
+   * @return vehicle capacity
+   */
+  int getCapacity();
 
-	/**
-	 * @return vehicle operations start time
-	 */
-	double getServiceBeginTime();
+  /**
+   * @return vehicle operations start time
+   */
+  double getServiceBeginTime();
 
-	/**
-	 * @return vehicle operations end time
-	 */
-	double getServiceEndTime();
+  /**
+   * @return vehicle operations end time
+   */
+  double getServiceEndTime();
 }

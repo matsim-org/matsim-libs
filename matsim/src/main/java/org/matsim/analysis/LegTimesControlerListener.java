@@ -20,6 +20,7 @@
 
 package org.matsim.analysis;
 
+import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -27,33 +28,35 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.utils.misc.Time;
 
-import jakarta.inject.Inject;
-
 class LegTimesControlerListener implements AfterMobsimListener {
 
-	private static final  Logger log = LogManager.getLogger(LegTimesControlerListener.class);
+  private static final Logger log = LogManager.getLogger(LegTimesControlerListener.class);
 
-	private final CalcLegTimes legTimes;
+  private final CalcLegTimes legTimes;
 
-	private final OutputDirectoryHierarchy controlerIO;
+  private final OutputDirectoryHierarchy controlerIO;
 
-	@Inject
-    LegTimesControlerListener(CalcLegTimes legTimes, OutputDirectoryHierarchy controlerIO) {
-		this.legTimes = legTimes;
-		this.controlerIO = controlerIO;
-	}
+  @Inject
+  LegTimesControlerListener(CalcLegTimes legTimes, OutputDirectoryHierarchy controlerIO) {
+    this.legTimes = legTimes;
+    this.controlerIO = controlerIO;
+  }
 
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
+  @Override
+  public void notifyAfterMobsim(AfterMobsimEvent event) {
 
-		legTimes.writeStats(controlerIO.getIterationFilename(event.getIteration(), "legdurations.txt"));
-		// - print averages in log
-		log.info("[" + event.getIteration() + "] average trip (probably: leg) duration is: " + (int) legTimes.getAverageLegDuration()
-				+ " seconds = " + Time.writeTime(legTimes.getAverageLegDuration(), Time.TIMEFORMAT_HHMMSS));
-		// trips are from "true" activity to "true" activity.  legs may also go
-		// from/to ptInteraction activity.  This, in my opinion "legs" is the correct (matsim) term
-		// kai, jul'11
+    legTimes.writeStats(controlerIO.getIterationFilename(event.getIteration(), "legdurations.txt"));
+    // - print averages in log
+    log.info(
+        "["
+            + event.getIteration()
+            + "] average trip (probably: leg) duration is: "
+            + (int) legTimes.getAverageLegDuration()
+            + " seconds = "
+            + Time.writeTime(legTimes.getAverageLegDuration(), Time.TIMEFORMAT_HHMMSS));
+    // trips are from "true" activity to "true" activity.  legs may also go
+    // from/to ptInteraction activity.  This, in my opinion "legs" is the correct (matsim) term
+    // kai, jul'11
 
-	}
-
+  }
 }

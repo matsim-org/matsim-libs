@@ -10,14 +10,13 @@ import org.matsim.core.population.routes.RouteFactory;
  */
 public class MediumCompressedNetworkRouteFactory implements RouteFactory {
 
-	@Override
-	public NetworkRoute createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
-		return new MediumCompressedNetworkRoute(startLinkId, endLinkId);
-	}
+  @Override
+  public NetworkRoute createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
+    return new MediumCompressedNetworkRoute(startLinkId, endLinkId);
+  }
 
-	@Override
-	public String getCreatedRouteType() {
-		return "links";
-	}
-
+  @Override
+  public String getCreatedRouteType() {
+    return "links";
+  }
 }

@@ -20,17 +20,15 @@
 package org.matsim.facilities;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 public interface ActivityFacility extends Facility, Identifiable<ActivityFacility>, Attributable {
 
-	public Map<String, ActivityOption> getActivityOptions();
+  public Map<String, ActivityOption> getActivityOptions();
 
-	void addActivityOption(ActivityOption option);
+  void addActivityOption(ActivityOption option);
 
-	void setCoord(Coord coord);
-
+  void setCoord(Coord coord);
 }

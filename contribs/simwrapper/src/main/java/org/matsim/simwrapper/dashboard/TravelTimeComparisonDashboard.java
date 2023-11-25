@@ -9,127 +9,154 @@ import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.components.Line;
 import tech.tablesaw.plotly.traces.ScatterTrace;
 
-/**
- * Compares travel time from simulation with reference data.
- */
+/** Compares travel time from simulation with reference data. */
 public class TravelTimeComparisonDashboard implements Dashboard {
 
-	private final String refData;
+  private final String refData;
 
-	/**
-	 * Constructor, which needs the path to the reference files produces by {@link org.matsim.application.analysis.traffic.traveltime.SampleValidationRoutes}.
-	 */
-	public TravelTimeComparisonDashboard(String refData) {
-		this.refData = refData;
-	}
+  /**
+   * Constructor, which needs the path to the reference files produces by {@link
+   * org.matsim.application.analysis.traffic.traveltime.SampleValidationRoutes}.
+   */
+  public TravelTimeComparisonDashboard(String refData) {
+    this.refData = refData;
+  }
 
-	@Override
-	public double priority() {
-		return -1;
-	}
+  @Override
+  public double priority() {
+    return -1;
+  }
 
-	@Override
-	public void configure(Header header, Layout layout) {
+  @Override
+  public void configure(Header header, Layout layout) {
 
-		header.title = "Travel time";
-		header.description = "Comparison of simulated travel times vs. results from routing services.";
+    header.title = "Travel time";
+    header.description = "Comparison of simulated travel times vs. results from routing services.";
 
-		layout.row("first")
-			.el(Plotly.class, (viz, data) -> {
+    layout
+        .row("first")
+        .el(
+            Plotly.class,
+            (viz, data) -> {
+              viz.title = "Travel time comparison";
+              viz.description = "by hour";
+              viz.fixedRatio = true;
+              viz.height = 8d;
 
-				viz.title = "Travel time comparison";
-				viz.description = "by hour";
-				viz.fixedRatio = true;
-				viz.height = 8d;
+              viz.interactive = Plotly.Interactive.slider;
+              viz.layout =
+                  tech.tablesaw.plotly.components.Layout.builder()
+                      .xAxis(Axis.builder().title("Observed historical mean speed [km/h]").build())
+                      .yAxis(Axis.builder().title("Simulated mean speed [km/h]").build())
+                      .build();
 
-				viz.interactive = Plotly.Interactive.slider;
-				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-					.xAxis(Axis.builder().title("Observed historical mean speed [km/h]").build())
-					.yAxis(Axis.builder().title("Simulated mean speed [km/h]").build())
-					.build();
+              Plotly.DataSet ds =
+                  viz.addDataset(
+                      data.compute(
+                          TravelTimeComparison.class,
+                          "travel_time_comparison_by_route.csv",
+                          "--input-ref",
+                          refData));
 
-				Plotly.DataSet ds = viz.addDataset(data.compute(TravelTimeComparison.class, "travel_time_comparison_by_route.csv", "--input-ref", refData));
+              viz.addTrace(
+                  ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).build(),
+                  ds.mapping().x("mean").y("simulated").text("from_node").name("hour"));
+            })
+        .el(
+            Plotly.class,
+            ((viz, data) -> {
+              viz.title = "Avg. Speed";
+              viz.description = "by hour";
 
-				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).build(), ds.mapping()
-					.x("mean")
-					.y("simulated")
-					.text("from_node")
-					.name("hour")
-				);
+              Plotly.DataSet ds =
+                  viz.addDataset(
+                      data.compute(
+                          TravelTimeComparison.class,
+                          "travel_time_comparison_by_hour.csv",
+                          "--input-ref",
+                          refData));
 
-			}).el(Plotly.class, ((viz, data) -> {
+              viz.layout =
+                  tech.tablesaw.plotly.components.Layout.builder()
+                      .xAxis(Axis.builder().title("Hour").build())
+                      .yAxis(Axis.builder().title("Speed [km/h]").build())
+                      .build();
 
-				viz.title = "Avg. Speed";
-				viz.description = "by hour";
+              viz.addTrace(
+                  ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+                      .name("Mean")
+                      .mode(ScatterTrace.Mode.LINE)
+                      .line(Line.builder().dash(Line.Dash.LONG_DASH_DOT).build())
+                      .build(),
+                  ds.mapping().x("hour").y("mean"));
 
-				Plotly.DataSet ds = viz.addDataset(data.compute(TravelTimeComparison.class, "travel_time_comparison_by_hour.csv", "--input-ref", refData));
+              viz.addTrace(
+                  ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+                      .name("Min")
+                      .mode(ScatterTrace.Mode.LINE)
+                      .line(Line.builder().dash(Line.Dash.DASH).build())
+                      .build(),
+                  ds.mapping().x("hour").y("min"));
 
-				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-					.xAxis(Axis.builder().title("Hour").build())
-					.yAxis(Axis.builder().title("Speed [km/h]").build())
-					.build();
+              viz.addTrace(
+                  ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+                      .name("Max")
+                      .mode(ScatterTrace.Mode.LINE)
+                      .line(Line.builder().dash(Line.Dash.DASH).build())
+                      .build(),
+                  ds.mapping().x("hour").y("max"));
 
-				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
-					.name("Mean")
-					.mode(ScatterTrace.Mode.LINE)
-					.line(Line.builder().dash(Line.Dash.LONG_DASH_DOT).build()).build(), ds.mapping()
-					.x("hour").y("mean")
-				);
+              viz.addTrace(
+                  ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+                      .name("Simulated")
+                      .mode(ScatterTrace.Mode.LINE)
+                      .line(Line.builder().dash(Line.Dash.SOLID).build())
+                      .build(),
+                  ds.mapping().x("hour").y("simulated"));
+            }))
+        .el(
+            Plotly.class,
+            ((viz, data) -> {
+              viz.title = "Error and bias";
+              viz.description = "by hour";
 
-				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
-					.name("Min")
-					.mode(ScatterTrace.Mode.LINE)
-					.line(Line.builder().dash(Line.Dash.DASH).build()).build(), ds.mapping()
-					.x("hour").y("min")
-				);
+              Plotly.DataSet ds =
+                  viz.addDataset(
+                      data.compute(
+                          TravelTimeComparison.class,
+                          "travel_time_comparison_by_hour.csv",
+                          "--input-ref",
+                          refData));
 
-				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
-					.name("Max")
-					.mode(ScatterTrace.Mode.LINE)
-					.line(Line.builder().dash(Line.Dash.DASH).build()).build(), ds.mapping()
-					.x("hour").y("max")
-				);
+              viz.layout =
+                  tech.tablesaw.plotly.components.Layout.builder()
+                      .xAxis(Axis.builder().title("Hour").build())
+                      .yAxis(Axis.builder().title("Speed [km/h]").build())
+                      .build();
 
-				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
-					.name("Simulated")
-					.mode(ScatterTrace.Mode.LINE)
-					.line(Line.builder().dash(Line.Dash.SOLID).build()).build(), ds.mapping()
-					.x("hour").y("simulated")
-				);
+              viz.addTrace(
+                  ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+                      .name("Mean abs. error")
+                      .mode(ScatterTrace.Mode.LINE)
+                      .line(Line.builder().dash(Line.Dash.SOLID).build())
+                      .build(),
+                  ds.mapping().x("hour").y("abs_error"));
 
-			})).el(Plotly.class, ((viz, data) -> {
+              viz.addTrace(
+                  ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+                      .name("Ref. std.")
+                      .mode(ScatterTrace.Mode.LINE)
+                      .line(Line.builder().dash(Line.Dash.LONG_DASH_DOT).build())
+                      .build(),
+                  ds.mapping().x("hour").y("std"));
 
-				viz.title = "Error and bias";
-				viz.description = "by hour";
-
-				Plotly.DataSet ds = viz.addDataset(data.compute(TravelTimeComparison.class, "travel_time_comparison_by_hour.csv", "--input-ref", refData));
-
-				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-					.xAxis(Axis.builder().title("Hour").build())
-					.yAxis(Axis.builder().title("Speed [km/h]").build())
-					.build();
-
-				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
-					.name("Mean abs. error")
-					.mode(ScatterTrace.Mode.LINE)
-					.line(Line.builder().dash(Line.Dash.SOLID).build()).build(), ds.mapping()
-					.x("hour").y("abs_error")
-				);
-
-				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
-					.name("Ref. std.")
-					.mode(ScatterTrace.Mode.LINE)
-					.line(Line.builder().dash(Line.Dash.LONG_DASH_DOT).build()).build(), ds.mapping()
-					.x("hour").y("std")
-				);
-
-				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
-					.name("Bias")
-					.mode(ScatterTrace.Mode.LINE)
-					.line(Line.builder().dash(Line.Dash.SOLID).build()).build(), ds.mapping()
-					.x("hour").y("bias")
-				);
-
-			}));
-	}
+              viz.addTrace(
+                  ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+                      .name("Bias")
+                      .mode(ScatterTrace.Mode.LINE)
+                      .line(Line.builder().dash(Line.Dash.SOLID).build())
+                      .build(),
+                  ds.mapping().x("hour").y("bias"));
+            }));
+  }
 }

@@ -20,7 +20,6 @@
 package org.matsim.contrib.drt.run.examples;
 
 import java.net.URL;
-
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -32,11 +31,15 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * @author michalm
  */
 public class RunOneSharedTaxiExample {
-	public static void run(URL configUrl, boolean otfvis, int lastIteration) {
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
-				new OTFVisConfigGroup());
-		config.controller().setLastIteration(lastIteration);
-		config.controller().setWriteEventsInterval(lastIteration);
-		DrtControlerCreator.createControler(config, otfvis).run();
-	}
+  public static void run(URL configUrl, boolean otfvis, int lastIteration) {
+    Config config =
+        ConfigUtils.loadConfig(
+            configUrl,
+            new MultiModeDrtConfigGroup(),
+            new DvrpConfigGroup(),
+            new OTFVisConfigGroup());
+    config.controller().setLastIteration(lastIteration);
+    config.controller().setWriteEventsInterval(lastIteration);
+    DrtControlerCreator.createControler(config, otfvis).run();
+  }
 }

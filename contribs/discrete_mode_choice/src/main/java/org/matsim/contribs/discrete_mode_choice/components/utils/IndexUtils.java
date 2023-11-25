@@ -4,18 +4,17 @@ import java.util.Collection;
 import java.util.List;
 
 public class IndexUtils {
-	private IndexUtils() {
-	}
+  private IndexUtils() {}
 
-	static public int getTripIndex(List<String> previousModes) {
-		return previousModes.size();
-	}
+  public static int getTripIndex(List<String> previousModes) {
+    return previousModes.size();
+  }
 
-	static public int getTourIndex(List<List<String>> previousModes) {
-		return previousModes.size();
-	}
+  public static int getTourIndex(List<List<String>> previousModes) {
+    return previousModes.size();
+  }
 
-	static public int getFirstTripIndex(List<List<String>> previousModes) {
-		return previousModes.stream().mapToInt(Collection::size).sum();
-	}
+  public static int getFirstTripIndex(List<List<String>> previousModes) {
+    return previousModes.stream().mapToInt(Collection::size).sum();
+  }
 }

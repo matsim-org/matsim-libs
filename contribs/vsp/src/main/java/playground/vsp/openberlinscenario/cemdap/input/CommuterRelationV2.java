@@ -20,62 +20,69 @@ package playground.vsp.openberlinscenario.cemdap.input;
 
 /**
  * Storage object for commuter relations.
- * 
+ *
  * @author dziemke
  */
 public class CommuterRelationV2 {
 
-	private String origin;
-	private String destination;
-	private Integer tripsAll;
-	private Integer tripsMale;
-	private Integer tripsFemale;
+  private String origin;
+  private String destination;
+  private Integer tripsAll;
+  private Integer tripsMale;
+  private Integer tripsFemale;
 
-		
-	public CommuterRelationV2(String origin, String destination, Integer tripsAll, Integer tripsMale, Integer tripsFemale) {
-		this.origin = origin;
-		this.destination = destination;
-		this.tripsAll = tripsAll;
-		this.tripsMale = tripsMale;
-		this.tripsFemale = tripsFemale;
-	}
+  public CommuterRelationV2(
+      String origin, String destination, Integer tripsAll, Integer tripsMale, Integer tripsFemale) {
+    this.origin = origin;
+    this.destination = destination;
+    this.tripsAll = tripsAll;
+    this.tripsMale = tripsMale;
+    this.tripsFemale = tripsFemale;
+  }
 
-	public String getFrom() {
-		return this.origin;
-	}
+  public String getFrom() {
+    return this.origin;
+  }
 
-	public String getTo() {
-		return this.destination;
-	}
-	
-	public Integer getTrips() {
-		return this.tripsAll;
-	}
+  public String getTo() {
+    return this.destination;
+  }
 
-	public Integer getTripsMale() {
-		return this.tripsMale;
-	}
-	
-	public void setTripsMale(int tripsMale) {
-		this.tripsMale = tripsMale;
-	}
+  public Integer getTrips() {
+    return this.tripsAll;
+  }
 
-	public Integer getTripsFemale() {
-		return this.tripsFemale;
-	}
-	
-	public void setTripsFemale(int tripsFemale) {
-		this.tripsFemale = tripsFemale;
-	}
+  public Integer getTripsMale() {
+    return this.tripsMale;
+  }
 
-    @Override
-    public String toString() {
-        return "CommuterRelationV2{" +
-                "origin='" + origin + '\'' +
-                ", destination='" + destination + '\'' +
-                ", tripsAll=" + tripsAll +
-                ", tripsMale=" + tripsMale +
-                ", tripsFemale=" + tripsFemale +
-                '}';
-    }
+  public void setTripsMale(int tripsMale) {
+    this.tripsMale = tripsMale;
+  }
+
+  public Integer getTripsFemale() {
+    return this.tripsFemale;
+  }
+
+  public void setTripsFemale(int tripsFemale) {
+    this.tripsFemale = tripsFemale;
+  }
+
+  @Override
+  public String toString() {
+    return "CommuterRelationV2{"
+        + "origin='"
+        + origin
+        + '\''
+        + ", destination='"
+        + destination
+        + '\''
+        + ", tripsAll="
+        + tripsAll
+        + ", tripsMale="
+        + tripsMale
+        + ", tripsFemale="
+        + tripsFemale
+        + '}';
+  }
 }

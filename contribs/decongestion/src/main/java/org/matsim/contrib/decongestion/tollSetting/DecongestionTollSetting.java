@@ -21,12 +21,10 @@ package org.matsim.contrib.decongestion.tollSetting;
 
 /**
  * Computes the initial tolls per link and time bin and updates the tolls.
- * 
+ *
  * @author ikaddoura
  */
-
 public interface DecongestionTollSetting {
-	
-	public void updateTolls();
-}
 
+  public void updateTolls();
+}

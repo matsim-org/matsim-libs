@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
-
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
@@ -29,24 +28,19 @@ import org.matsim.contrib.socnetsim.framework.replanning.selectors.highestweight
  * @author thibautd
  */
 public class HighestScoreSumSelector implements GroupLevelPlanSelector {
-	private final GroupLevelPlanSelector delegate;
-	
-	public HighestScoreSumSelector(
-			final IncompatiblePlansIdentifierFactory fact) {
-		delegate = new HighestWeightSelector( fact , new ScoreWeight() );
-	}
+  private final GroupLevelPlanSelector delegate;
 
-	// for tests
-	HighestScoreSumSelector(
-			final IncompatiblePlansIdentifierFactory fact,
-			final boolean blocking) {
-		delegate = new HighestWeightSelector( blocking , fact , new ScoreWeight() );
-	}
+  public HighestScoreSumSelector(final IncompatiblePlansIdentifierFactory fact) {
+    delegate = new HighestWeightSelector(fact, new ScoreWeight());
+  }
 
-	@Override
-	public GroupPlans selectPlans(
-			final JointPlans jointPlans,
-			final ReplanningGroup group) {
-		return delegate.selectPlans( jointPlans, group );
-	}
+  // for tests
+  HighestScoreSumSelector(final IncompatiblePlansIdentifierFactory fact, final boolean blocking) {
+    delegate = new HighestWeightSelector(blocking, fact, new ScoreWeight());
+  }
+
+  @Override
+  public GroupPlans selectPlans(final JointPlans jointPlans, final ReplanningGroup group) {
+    return delegate.selectPlans(jointPlans, group);
+  }
 }

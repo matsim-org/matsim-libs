@@ -19,26 +19,22 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data.signalsystems.v20;
 
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 
-import java.util.Map;
-
-
 /**
  * @author dgrether
- *
  */
 public interface SignalSystemsData extends MatsimToplevelContainer {
 
-	@Override
-	public SignalSystemsDataFactory getFactory();
-	
-	public void setFactory(SignalSystemsDataFactory  factory);
-	
-	public Map<Id<SignalSystem>, SignalSystemData> getSignalSystemData();
+  @Override
+  public SignalSystemsDataFactory getFactory();
 
-	public void addSignalSystemData(SignalSystemData signalSystemData);
+  public void setFactory(SignalSystemsDataFactory factory);
 
+  public Map<Id<SignalSystem>, SignalSystemData> getSignalSystemData();
+
+  public void addSignalSystemData(SignalSystemData signalSystemData);
 }

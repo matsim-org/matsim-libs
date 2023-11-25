@@ -19,6 +19,7 @@
 
 package playground.vsp.parkAndRide.replanning;
 
+import jakarta.inject.Provider;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -32,46 +33,48 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.pt.replanning.TransitActsRemoverStrategy;
 
-import jakarta.inject.Provider;
-
 /**
- * A way of plugging park-and-ride strategy modules together. Via config file: <param name="Module_#" value="playground.vsp.parkAndRide.replanning.PRStrategyRemove" />
+ * A way of plugging park-and-ride strategy modules together. Via config file: <param
+ * name="Module_#" value="playground.vsp.parkAndRide.replanning.PRStrategyRemove" />
  *
  * @author ikaddoura
- *
  */
 public class PRStrategyRemove implements PlanStrategy {
 
-	PlanStrategyImpl planStrategyDelegate = null ;
+  PlanStrategyImpl planStrategyDelegate = null;
 
-	public PRStrategyRemove(MatsimServices controler, Provider<TripRouter> tripRouterProvider) {
+  public PRStrategyRemove(MatsimServices controler, Provider<TripRouter> tripRouterProvider) {
 
-		RandomPlanSelector planSelector = new RandomPlanSelector();
-		planStrategyDelegate = new PlanStrategyImpl( planSelector );
+    RandomPlanSelector planSelector = new RandomPlanSelector();
+    planStrategyDelegate = new PlanStrategyImpl(planSelector);
 
-		TransitActsRemoverStrategy transitActsRemoveModule = new TransitActsRemoverStrategy(controler.getConfig());
-		planStrategyDelegate.addStrategyModule(transitActsRemoveModule) ;
+    TransitActsRemoverStrategy transitActsRemoveModule =
+        new TransitActsRemoverStrategy(controler.getConfig());
+    planStrategyDelegate.addStrategyModule(transitActsRemoveModule);
 
-		PRRemoveStrategyMod prRemoveMod = new PRRemoveStrategyMod(controler.getScenario());
-		planStrategyDelegate.addStrategyModule(prRemoveMod);
+    PRRemoveStrategyMod prRemoveMod = new PRRemoveStrategyMod(controler.getScenario());
+    planStrategyDelegate.addStrategyModule(prRemoveMod);
 
-		ReRoute reRouteModule = new ReRoute( controler.getScenario(), tripRouterProvider, TimeInterpretation.create(controler.getConfig())) ;
-		planStrategyDelegate.addStrategyModule(reRouteModule) ;
+    ReRoute reRouteModule =
+        new ReRoute(
+            controler.getScenario(),
+            tripRouterProvider,
+            TimeInterpretation.create(controler.getConfig()));
+    planStrategyDelegate.addStrategyModule(reRouteModule);
+  }
 
-	}
+  @Override
+  public void finish() {
+    planStrategyDelegate.finish();
+  }
 
-	@Override
-	public void finish() {
-		planStrategyDelegate.finish();
-	}
+  @Override
+  public void init(ReplanningContext replanningContext) {
+    planStrategyDelegate.init(replanningContext);
+  }
 
-	@Override
-	public void init(ReplanningContext replanningContext) {
-		planStrategyDelegate.init(replanningContext);
-	}
-
-	@Override
-	public void run(HasPlansAndId<Plan, Person> person) {
-		planStrategyDelegate.run(person);
-	}
+  @Override
+  public void run(HasPlansAndId<Plan, Person> person) {
+    planStrategyDelegate.run(person);
+  }
 }

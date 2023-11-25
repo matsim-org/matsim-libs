@@ -20,7 +20,6 @@
 package org.matsim.contrib.taxi.run.examples;
 
 import java.net.URL;
-
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiControlerCreator;
@@ -29,11 +28,15 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunTaxiExample {
-	public static void run(URL configUrl, boolean otfvis, int lastIteration) {
-		// load config
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
-				new OTFVisConfigGroup());
-		config.controller().setLastIteration(lastIteration);
-		TaxiControlerCreator.createControler(config, otfvis).run();
-	}
+  public static void run(URL configUrl, boolean otfvis, int lastIteration) {
+    // load config
+    Config config =
+        ConfigUtils.loadConfig(
+            configUrl,
+            new MultiModeTaxiConfigGroup(),
+            new DvrpConfigGroup(),
+            new OTFVisConfigGroup());
+    config.controller().setLastIteration(lastIteration);
+    TaxiControlerCreator.createControler(config, otfvis).run();
+  }
 }

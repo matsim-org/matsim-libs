@@ -28,10 +28,8 @@ import org.matsim.freight.carriers.events.CarrierShipmentDeliveryStartEvent;
  * Interface to listen to shipmentDeliveredEvents.
  *
  * @author sschroeder
- *
  */
 public interface CarrierShipmentDeliveryStartEventHandler extends EventHandler {
 
-	void handleEvent(CarrierShipmentDeliveryStartEvent event);
-
+  void handleEvent(CarrierShipmentDeliveryStartEvent event);
 }

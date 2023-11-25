@@ -19,13 +19,13 @@
 
 package playground.vsp.analysis.modules.modalAnalyses.modalTripTime;
 
+import jakarta.inject.Inject;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import jakarta.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -38,92 +38,92 @@ import org.matsim.core.utils.charts.XYLineChart;
 /**
  * @author amit
  */
+public class ModalTravelTimeControlerListener implements StartupListener, IterationEndsListener {
 
-public class ModalTravelTimeControlerListener implements StartupListener, IterationEndsListener{
+  private int firstIteration = 0;
+  private final SortedMap<String, double[]> mode2AvgTripTimes = new TreeMap<>();
 
-	private int firstIteration = 0;
-	private final SortedMap<String, double []> mode2AvgTripTimes = new TreeMap<>();
+  // following is required to fix if at some intermediate iteration, one of the mode type vanishes,
+  // the arrayCopy wont work
+  private final Set<String> modeHistory = new HashSet<>();
 
-	// following is required to fix if at some intermediate iteration, one of the mode type vanishes, the arrayCopy wont work
-	private final Set<String> modeHistory = new HashSet<>();
+  @Inject private ModalTripTravelTimeHandler travelTimeHandler;
 
-	@Inject
-	private ModalTripTravelTimeHandler travelTimeHandler;
+  @Inject private EventsManager events;
 
-	@Inject
-	private EventsManager events;
+  @Override
+  public void notifyStartup(StartupEvent event) {
+    this.firstIteration = event.getServices().getConfig().controller().getFirstIteration();
+    this.events.addHandler(this.travelTimeHandler);
+  }
 
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		this.firstIteration = event.getServices().getConfig().controller().getFirstIteration();
-		this.events.addHandler(this.travelTimeHandler);
-	}
+  @Override
+  public void notifyIterationEnds(IterationEndsEvent event) {
 
-	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
+    String outputDir = event.getServices().getConfig().controller().getOutputDirectory();
 
-		String outputDir = event.getServices().getConfig().controller().getOutputDirectory();
+    SortedMap<String, Double> mode2AvgTripTime = modalAvgTime();
+    modeHistory.addAll(mode2AvgTripTime.keySet());
+    modeHistory.stream()
+        .filter(e -> !mode2AvgTripTime.containsKey(e))
+        .forEach(e -> mode2AvgTripTime.put(e, 0.));
 
-		SortedMap<String, Double > mode2AvgTripTime = modalAvgTime();
-		modeHistory.addAll(mode2AvgTripTime.keySet());
-		modeHistory.stream().filter(e -> ! mode2AvgTripTime.containsKey(e)).forEach(e -> mode2AvgTripTime.put(e, 0.));
+    int itNrIndex = event.getIteration() - this.firstIteration;
 
+    for (String mode : mode2AvgTripTime.keySet()) {
+      if (!mode2AvgTripTimes.containsKey(mode)) {
+        double[] avgTimes = new double[itNrIndex + 1];
+        avgTimes[itNrIndex] = mode2AvgTripTime.get(mode);
+        mode2AvgTripTimes.put(mode, avgTimes);
+      } else {
+        double[] avgTimesSoFar = mode2AvgTripTimes.get(mode);
+        double[] avgTimesNew = new double[avgTimesSoFar.length + 1];
+        System.arraycopy(avgTimesSoFar, 0, avgTimesNew, 0, avgTimesSoFar.length);
+        avgTimesNew[itNrIndex] = mode2AvgTripTime.get(mode);
+        mode2AvgTripTimes.put(mode, avgTimesNew);
+      }
+    }
 
-		int itNrIndex = event.getIteration() - this.firstIteration;
+    if (itNrIndex == 0) return;
 
-		for(String mode : mode2AvgTripTime.keySet()) {
-			if ( ! mode2AvgTripTimes.containsKey(mode)){
-				double [] avgTimes = new double [itNrIndex+1];
-				avgTimes[itNrIndex] = mode2AvgTripTime.get(mode);
-				mode2AvgTripTimes.put(mode, avgTimes);
-			} else {
-				double [] avgTimesSoFar = mode2AvgTripTimes.get(mode);
-				double [] avgTimesNew = new double [avgTimesSoFar.length+1];
-				System.arraycopy(avgTimesSoFar, 0, avgTimesNew, 0, avgTimesSoFar.length);
-				avgTimesNew[itNrIndex] = mode2AvgTripTime.get(mode);
-				mode2AvgTripTimes.put(mode, avgTimesNew);
-			}
-		}
+    // plot data here...
+    XYLineChart chart = new XYLineChart("Modal Travel Time", "iteration", "travel time [sec]");
 
-		if(itNrIndex == 0) return;
+    // x-series
+    double[] iterations = new double[itNrIndex + 1];
+    for (int i = 0; i <= itNrIndex; i++) {
+      iterations[i] = i + this.firstIteration;
+    }
 
-		//plot data here...
-		XYLineChart chart = new XYLineChart("Modal Travel Time", "iteration", "travel time [sec]");
+    // y series
+    for (String mode : this.mode2AvgTripTimes.keySet()) {
+      double[] values = new double[itNrIndex + 1]; // array of only available data
+      System.arraycopy(this.mode2AvgTripTimes.get(mode), 0, values, 0, itNrIndex + 1);
+      chart.addSeries(mode, iterations, values);
+    }
 
-		// x-series
-		double[] iterations = new double[itNrIndex + 1];
-		for (int i = 0; i <= itNrIndex; i++) {
-			iterations[i] = i + this.firstIteration;
-		}
+    // others--
+    chart.addMatsimLogo();
+    chart.saveAsPng(outputDir + "/modalTravelTime.png", 800, 600);
+  }
 
-		//y series
-		for(String mode : this.mode2AvgTripTimes.keySet()){
-			double [] values = new double [itNrIndex+1]; // array of only available data
-			System.arraycopy(this.mode2AvgTripTimes.get(mode), 0, values, 0, itNrIndex + 1);
-			chart.addSeries(mode, iterations, values);
-		}
+  private SortedMap<String, Double> modalAvgTime() {
+    SortedMap<String, Double> mode2AvgTripTime = new TreeMap<>();
+    SortedMap<String, Map<Id<Person>, List<Double>>> times =
+        travelTimeHandler.getLegMode2PesonId2TripTimes();
+    for (String mode : times.keySet()) {
+      double tripTimes = 0;
+      int count = 0;
+      for (Id<Person> id : times.get(mode).keySet()) {
+        tripTimes += doubleSum(times.get(mode).get(id));
+        count += times.get(mode).get(id).size();
+      }
+      mode2AvgTripTime.put(mode, tripTimes / count);
+    }
+    return mode2AvgTripTime;
+  }
 
-		// others--
-		chart.addMatsimLogo();
-		chart.saveAsPng(outputDir+"/modalTravelTime.png", 800, 600);
-	}
-
-	private SortedMap<String, Double > modalAvgTime() {
-		SortedMap<String, Double > mode2AvgTripTime = new TreeMap<>();
-		SortedMap<String, Map<Id<Person>, List<Double>>> times = travelTimeHandler.getLegMode2PesonId2TripTimes();
-		for(String mode :times.keySet()){
-			double tripTimes =0;
-				int count = 0;
-				for(Id<Person> id : times.get(mode).keySet()){
-					tripTimes += doubleSum(times.get(mode).get(id));
-					count += times.get(mode).get(id).size();
-				}
-			mode2AvgTripTime.put(mode, tripTimes/count);
-		}
-		return mode2AvgTripTime;
-	}
-
-	private double doubleSum(List<Double> doubleList) {
-		return doubleList.parallelStream().reduce(0.0, Double::sum);
-	}
+  private double doubleSum(List<Double> doubleList) {
+    return doubleList.parallelStream().reduce(0.0, Double::sum);
+  }
 }

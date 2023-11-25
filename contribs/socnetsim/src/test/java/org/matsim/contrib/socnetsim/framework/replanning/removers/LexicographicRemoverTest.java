@@ -22,7 +22,6 @@ package org.matsim.contrib.socnetsim.framework.replanning.removers;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -40,168 +39,128 @@ import org.matsim.core.population.PopulationUtils;
  */
 public class LexicographicRemoverTest {
 
-	@Test
-	public void testOnlyIndividualPlans() {
-		final Map<Id<Person>, Plan> toRemove = new LinkedHashMap< >();
-		final ReplanningGroup group = new ReplanningGroup();
-		final JointPlans jointPlans = new JointPlans();
+  @Test
+  public void testOnlyIndividualPlans() {
+    final Map<Id<Person>, Plan> toRemove = new LinkedHashMap<>();
+    final ReplanningGroup group = new ReplanningGroup();
+    final JointPlans jointPlans = new JointPlans();
 
-		for ( int i=0; i < 4; i++ ) {
-			final Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
-			group.addPerson( person );
+    for (int i = 0; i < 4; i++) {
+      final Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
+      group.addPerson(person);
 
-			for ( double score = 0; score < 3; score++ ) {
-				final Plan plan = jointPlans.getFactory().createIndividualPlan(  person );
-				plan.setScore( score );
-				person.addPlan( plan );
-				if ( score == 0 ) toRemove.put( person.getId() , plan );
-			}
-		}
-		
-		test( new Fixture(
-					2, 2,
-					jointPlans,
-					group,
-					toRemove ) );
+      for (double score = 0; score < 3; score++) {
+        final Plan plan = jointPlans.getFactory().createIndividualPlan(person);
+        plan.setScore(score);
+        person.addPlan(plan);
+        if (score == 0) toRemove.put(person.getId(), plan);
+      }
+    }
 
-	}
+    test(new Fixture(2, 2, jointPlans, group, toRemove));
+  }
 
-	@Test
-	public void testOnlyOneComposition() {
-		final ReplanningGroup group = new ReplanningGroup();
+  @Test
+  public void testOnlyOneComposition() {
+    final ReplanningGroup group = new ReplanningGroup();
 
-		for ( int i=0; i < 4; i++ ) {
-			group.addPerson(PopulationUtils.getFactory().createPerson(Id.create(i, Person.class)));
-		}
-		
-		final JointPlans jointPlans = new JointPlans();
+    for (int i = 0; i < 4; i++) {
+      group.addPerson(PopulationUtils.getFactory().createPerson(Id.create(i, Person.class)));
+    }
 
-		final JointPlan toRemove =
-				createJointPlan(
-					jointPlans.getFactory(),
-					group.getPersons(),
-					1, 1, 2, 3 );
-		jointPlans.addJointPlan( toRemove );
-		jointPlans.addJointPlan(
-				createJointPlan(
-					jointPlans.getFactory(),
-					group.getPersons(),
-					2, 2, 1, 2 ) );
-		jointPlans.addJointPlan(
-				createJointPlan(
-					jointPlans.getFactory(),
-					group.getPersons(),
-					3, 3, 3, 1 ) );
+    final JointPlans jointPlans = new JointPlans();
 
-		test( new Fixture(
-					2, 2,
-					jointPlans,
-					group,
-					toRemove.getIndividualPlans() ) );
-	}
+    final JointPlan toRemove =
+        createJointPlan(jointPlans.getFactory(), group.getPersons(), 1, 1, 2, 3);
+    jointPlans.addJointPlan(toRemove);
+    jointPlans.addJointPlan(
+        createJointPlan(jointPlans.getFactory(), group.getPersons(), 2, 2, 1, 2));
+    jointPlans.addJointPlan(
+        createJointPlan(jointPlans.getFactory(), group.getPersons(), 3, 3, 3, 1));
 
-	@Test
-	public void testOneCompositionAndOneExcedentaryPlan() {
-		final ReplanningGroup group = new ReplanningGroup();
+    test(new Fixture(2, 2, jointPlans, group, toRemove.getIndividualPlans()));
+  }
 
-		for ( int i=0; i < 4; i++ ) {
-			group.addPerson(PopulationUtils.getFactory().createPerson(Id.create(i, Person.class)));
-		}
-		
-		final JointPlans jointPlans = new JointPlans();
+  @Test
+  public void testOneCompositionAndOneExcedentaryPlan() {
+    final ReplanningGroup group = new ReplanningGroup();
 
-		final JointPlan toRemove =
-				createJointPlan(
-					jointPlans.getFactory(),
-					group.getPersons(),
-					1, 1, 2, 3 );
-		jointPlans.addJointPlan( toRemove );
-		jointPlans.addJointPlan(
-				createJointPlan(
-					jointPlans.getFactory(),
-					group.getPersons(),
-					2, 2, 1, 2 ) );
-		jointPlans.addJointPlan(
-				createJointPlan(
-					jointPlans.getFactory(),
-					group.getPersons(),
-					3, 3, 3, 1 ) );
+    for (int i = 0; i < 4; i++) {
+      group.addPerson(PopulationUtils.getFactory().createPerson(Id.create(i, Person.class)));
+    }
 
-		final Person p = group.getPersons().get( 0 );
-		final Plan indivPlan = jointPlans.getFactory().createIndividualPlan( p );
-		indivPlan.setScore( 0d );
-		p.addPlan( indivPlan );
+    final JointPlans jointPlans = new JointPlans();
 
-		test( new Fixture(
-					3, 3,
-					jointPlans,
-					group,
-					toRemove.getIndividualPlans() ) );
+    final JointPlan toRemove =
+        createJointPlan(jointPlans.getFactory(), group.getPersons(), 1, 1, 2, 3);
+    jointPlans.addJointPlan(toRemove);
+    jointPlans.addJointPlan(
+        createJointPlan(jointPlans.getFactory(), group.getPersons(), 2, 2, 1, 2));
+    jointPlans.addJointPlan(
+        createJointPlan(jointPlans.getFactory(), group.getPersons(), 3, 3, 3, 1));
 
-	}
+    final Person p = group.getPersons().get(0);
+    final Plan indivPlan = jointPlans.getFactory().createIndividualPlan(p);
+    indivPlan.setScore(0d);
+    p.addPlan(indivPlan);
 
-	private static JointPlan createJointPlan(
-			final JointPlanFactory factory,
-			final List<Person> persons,
-			final double... scores) {
-		final Map<Id<Person>, Plan> plans = new LinkedHashMap< >();
+    test(new Fixture(3, 3, jointPlans, group, toRemove.getIndividualPlans()));
+  }
 
-		if ( scores.length != persons.size() ) throw new IllegalArgumentException();
+  private static JointPlan createJointPlan(
+      final JointPlanFactory factory, final List<Person> persons, final double... scores) {
+    final Map<Id<Person>, Plan> plans = new LinkedHashMap<>();
 
-		for ( int i=0; i < scores.length; i++ ) {
-			final Person person = persons.get( i );
+    if (scores.length != persons.size()) throw new IllegalArgumentException();
 
-			final Plan plan = factory.createIndividualPlan( person );
-			person.addPlan( plan );
-			plan.setScore( scores[ i ] );
+    for (int i = 0; i < scores.length; i++) {
+      final Person person = persons.get(i);
 
-			plans.put( person.getId() , plan );
-		}
+      final Plan plan = factory.createIndividualPlan(person);
+      person.addPlan(plan);
+      plan.setScore(scores[i]);
 
-		return factory.createJointPlan( plans );
-	}
+      plans.put(person.getId(), plan);
+    }
 
-	private static void test(final Fixture f) {
-		final ExtraPlanRemover remover =
-			new LexicographicForCompositionExtraPlanRemover(
-					f.maxPerComposition,
-					f.maxPerAgent );
+    return factory.createJointPlan(plans);
+  }
 
-		remover.removePlansInGroup(
-				f.jointPlans,
-				f.group );
+  private static void test(final Fixture f) {
+    final ExtraPlanRemover remover =
+        new LexicographicForCompositionExtraPlanRemover(f.maxPerComposition, f.maxPerAgent);
 
-		for ( Person p : f.group.getPersons() ) {
-			final Plan expectedRemoved = f.expectedRemovedPlans.get( p.getId() );
-			Assert.assertFalse(
-					expectedRemoved+" not removed for person "+p,
-					p.getPlans().contains( expectedRemoved ) );
+    remover.removePlansInGroup(f.jointPlans, f.group);
 
-			Assert.assertNull(
-					"MEMORY LEAK: There is still a joint plan associated to removed plan "+expectedRemoved,
-					f.jointPlans.getJointPlan( expectedRemoved ) );
-		}
-	}
+    for (Person p : f.group.getPersons()) {
+      final Plan expectedRemoved = f.expectedRemovedPlans.get(p.getId());
+      Assert.assertFalse(
+          expectedRemoved + " not removed for person " + p, p.getPlans().contains(expectedRemoved));
 
-	private static class Fixture {
-		public final int maxPerComposition;
-		public final int maxPerAgent;
-		public final JointPlans jointPlans;
-		public final ReplanningGroup group;
-		public final Map<Id<Person>, Plan> expectedRemovedPlans;
+      Assert.assertNull(
+          "MEMORY LEAK: There is still a joint plan associated to removed plan " + expectedRemoved,
+          f.jointPlans.getJointPlan(expectedRemoved));
+    }
+  }
 
-		public Fixture(
-				final int maxPerComposition,
-				final int maxPerAgent,
-				final JointPlans jointPlans,
-				final ReplanningGroup group,
-				final Map<Id<Person>, Plan> expectedRemovedPlans) {
-			this.maxPerComposition = maxPerComposition;
-			this.maxPerAgent = maxPerAgent;
-			this.jointPlans = jointPlans;
-			this.group = group;
-			this.expectedRemovedPlans = expectedRemovedPlans;
-		}
-	}
+  private static class Fixture {
+    public final int maxPerComposition;
+    public final int maxPerAgent;
+    public final JointPlans jointPlans;
+    public final ReplanningGroup group;
+    public final Map<Id<Person>, Plan> expectedRemovedPlans;
+
+    public Fixture(
+        final int maxPerComposition,
+        final int maxPerAgent,
+        final JointPlans jointPlans,
+        final ReplanningGroup group,
+        final Map<Id<Person>, Plan> expectedRemovedPlans) {
+      this.maxPerComposition = maxPerComposition;
+      this.maxPerAgent = maxPerAgent;
+      this.jointPlans = jointPlans;
+      this.group = group;
+      this.expectedRemovedPlans = expectedRemovedPlans;
+    }
+  }
 }
-

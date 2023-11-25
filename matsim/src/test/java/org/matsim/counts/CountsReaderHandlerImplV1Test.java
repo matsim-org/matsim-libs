@@ -30,40 +30,48 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class CountsReaderHandlerImplV1Test {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  @Test
+  public void testSECounts() {
+    AttributeFactory attributeFactory = new AttributeFactory();
+    final Counts counts = new Counts();
+    CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
+    reader.startTag("counts", attributeFactory.createCountsAttributes(), null);
 
-	@Test public void testSECounts() {
-		AttributeFactory attributeFactory = new AttributeFactory();
-		final Counts counts = new Counts();
-		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
-		reader.startTag("counts", attributeFactory.createCountsAttributes(), null);
+    assertEquals("Counts attribute setting failed", "testName", counts.getName());
+    assertEquals("Counts attribute setting failed", "testDesc", counts.getDescription());
+    assertEquals("Counts attribute setting failed", 2000, counts.getYear());
+  }
 
-		assertEquals("Counts attribute setting failed", "testName", counts.getName());
-		assertEquals("Counts attribute setting failed", "testDesc", counts.getDescription());
-		assertEquals("Counts attribute setting failed", 2000, counts.getYear());
-	}
+  @Test
+  public void testSECount() {
+    AttributeFactory attributeFactory = new AttributeFactory();
+    final Counts counts = new Counts();
+    CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
 
-	@Test public void testSECount() {
-		AttributeFactory attributeFactory = new AttributeFactory();
-		final Counts counts = new Counts();
-		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
+    reader.startTag("counts", attributeFactory.createCountsAttributes(), null);
+    reader.startTag("count", attributeFactory.createCountAttributes(), null);
 
-		reader.startTag("counts", attributeFactory.createCountsAttributes(), null);
-		reader.startTag("count", attributeFactory.createCountAttributes(), null);
+    assertEquals(
+        "Count attribute setting failed",
+        "testNr",
+        counts.getCount(Id.create(1, Link.class)).getCsLabel());
+  }
 
-		assertEquals("Count attribute setting failed", "testNr", counts.getCount(Id.create(1, Link.class)).getCsLabel());
-	}
+  @Test
+  public void testSEVolume() {
+    AttributeFactory attributeFactory = new AttributeFactory();
+    final Counts counts = new Counts();
+    CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
+    reader.startTag("counts", attributeFactory.createCountsAttributes(), null);
+    reader.startTag("count", attributeFactory.createCountAttributes(), null);
+    reader.startTag("volume", attributeFactory.createVolumeAttributes(), null);
 
-	@Test public void testSEVolume() {
-		AttributeFactory attributeFactory = new AttributeFactory();
-		final Counts counts = new Counts();
-		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
-		reader.startTag("counts", attributeFactory.createCountsAttributes(), null);
-		reader.startTag("count", attributeFactory.createCountAttributes(), null);
-		reader.startTag("volume", attributeFactory.createVolumeAttributes(), null);
-
-		assertEquals("Volume attribute setting failed", 100.0, counts.getCount(Id.create(1, Link.class)).getVolume(1).getValue(), MatsimTestUtils.EPSILON);
-	}
+    assertEquals(
+        "Volume attribute setting failed",
+        100.0,
+        counts.getCount(Id.create(1, Link.class)).getVolume(1).getValue(),
+        MatsimTestUtils.EPSILON);
+  }
 }

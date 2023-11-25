@@ -23,19 +23,19 @@ package org.matsim.contrib.accessibility.osm;
  * @author dziemke
  */
 public final class AccessibilityOsmUtils {
-	// used from vsp-playgrounds
+  // used from vsp-playgrounds
 
-	private AccessibilityOsmUtils(){} // do not instantiate
-	
-	public static String simplifyString(String name) {
-		if(name != null) {
-			if (name.contains("&")) {							
-				name = name.replaceAll("&", "u");
-			}
-			if (name.contains("\"")) {							
-				name = name.replaceAll("\"", "");
-			}
-		}
-		return name;
-	}
+  private AccessibilityOsmUtils() {} // do not instantiate
+
+  public static String simplifyString(String name) {
+    if (name != null) {
+      if (name.contains("&")) {
+        name = name.replaceAll("&", "u");
+      }
+      if (name.contains("\"")) {
+        name = name.replaceAll("\"", "");
+      }
+    }
+    return name;
+  }
 }

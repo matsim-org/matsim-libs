@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * NewControlerTest.java
@@ -19,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.controler;
+package org.matsim.core.controler;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,31 +34,35 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class NewControlerTest {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	@Test
-	public void testInjectionBeforeControler() {
-		Config config = testUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+  @Test
+  public void testInjectionBeforeControler() {
+    Config config =
+        testUtils.loadConfig(
+            IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 
-		// a scenario is created and none of the files are loaded;
-		// facility file is provided in config and facilitySource is 'fromFile', the facilitySource must be changed. Amit Jan'18
-		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.none);
+    // a scenario is created and none of the files are loaded;
+    // facility file is provided in config and facilitySource is 'fromFile', the facilitySource must
+    // be changed. Amit Jan'18
+    config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.none);
 
-		config.controller().setLastIteration(1);
-		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
-		final Scenario scenario = ScenarioUtils.createScenario(config);
-		com.google.inject.Injector injector = Injector.createInjector(config, new AbstractModule() {
-			@Override
-			public void install() {
-				install(new NewControlerModule());
-				install(new ControlerDefaultCoreListenersModule());
-				install(new ControlerDefaultsModule());
-				install(new ScenarioByInstanceModule(scenario));
-			}
-		});
-		ControlerI controler = injector.getInstance(ControlerI.class);
-		controler.run();
-	}
-
+    config.controller().setLastIteration(1);
+    config.controller().setOutputDirectory(testUtils.getOutputDirectory());
+    final Scenario scenario = ScenarioUtils.createScenario(config);
+    com.google.inject.Injector injector =
+        Injector.createInjector(
+            config,
+            new AbstractModule() {
+              @Override
+              public void install() {
+                install(new NewControlerModule());
+                install(new ControlerDefaultCoreListenersModule());
+                install(new ControlerDefaultsModule());
+                install(new ScenarioByInstanceModule(scenario));
+              }
+            });
+    ControlerI controler = injector.getInstance(ControlerI.class);
+    controler.run();
+  }
 }

@@ -25,22 +25,21 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  * @author thibautd
  */
 public class JointPlansConfigGroup extends ReflectiveConfigGroup {
-	public final static String GROUP_NAME = "jointPlans";
+  public static final String GROUP_NAME = "jointPlans";
 
-	public JointPlansConfigGroup() {
-		super( GROUP_NAME );
-	}
+  public JointPlansConfigGroup() {
+    super(GROUP_NAME);
+  }
 
-	private String fileName = null;
+  private String fileName = null;
 
-	@StringSetter( "fileName" )
-	public void setFileName( final String fileName ) {
-		this.fileName = fileName;
-	}
+  @StringSetter("fileName")
+  public void setFileName(final String fileName) {
+    this.fileName = fileName;
+  }
 
-	@StringGetter( "fileName" )
-	public String getFileName() {
-		return fileName;
-	}
+  @StringGetter("fileName")
+  public String getFileName() {
+    return fileName;
+  }
 }
-

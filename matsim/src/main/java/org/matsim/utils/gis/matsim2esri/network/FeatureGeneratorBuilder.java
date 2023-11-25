@@ -21,6 +21,5 @@ package org.matsim.utils.gis.matsim2esri.network;
 
 public interface FeatureGeneratorBuilder {
 
-	public FeatureGenerator createFeatureGenerator();
-
+  public FeatureGenerator createFeatureGenerator();
 }

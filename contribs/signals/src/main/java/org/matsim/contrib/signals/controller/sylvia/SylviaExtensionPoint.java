@@ -23,55 +23,52 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 
-
 /**
- * Has no idea about the sensors as it should be a datastructure
- * but might have an idea about the links of the signal groups
- * @author dgrether
+ * Has no idea about the sensors as it should be a datastructure but might have an idea about the
+ * links of the signal groups
  *
+ * @author dgrether
  */
 final class SylviaExtensionPoint {
 
-	private Map<Id<SignalGroup>, Integer> maxGreenTimes = new HashMap<>();
-	private int secondInPlan;
-	private Set<Id<SignalGroup>> signalGroupIds = new HashSet<>();
-	private Set<Signal> signals = new HashSet<>();
+  private Map<Id<SignalGroup>, Integer> maxGreenTimes = new HashMap<>();
+  private int secondInPlan;
+  private Set<Id<SignalGroup>> signalGroupIds = new HashSet<>();
+  private Set<Signal> signals = new HashSet<>();
 
-	public SylviaExtensionPoint(int secondInPlan){
-		this.secondInPlan = secondInPlan;
-	}
-	
-	public int getSecondInPlan(){
-		return this.secondInPlan;
-	}
-	
-	public Set<Id<SignalGroup>> getSignalGroupIds() {
-		return this.signalGroupIds ;
-	}
-	
-	public void addSignalGroupId(Id<SignalGroup> signalGroupId){
-		this.signalGroupIds.add(signalGroupId);
-	}
+  public SylviaExtensionPoint(int secondInPlan) {
+    this.secondInPlan = secondInPlan;
+  }
 
-	public int getMaxGreenTime(Id<SignalGroup> signalGroupId) {
-		return this.maxGreenTimes.get(signalGroupId);
-	}
-	
-	public void setMaxGreenTime(Id<SignalGroup> signalGroupId, int maxGreenTime){
-		this.maxGreenTimes.put(signalGroupId, maxGreenTime);
-	}
+  public int getSecondInPlan() {
+    return this.secondInPlan;
+  }
 
-	public void addSignals(Set<Signal> signals) {
-		this.signals.addAll(signals);
-	}
-	
-	public Set<Signal> getSignals(){
-		return this.signals;
-	}
+  public Set<Id<SignalGroup>> getSignalGroupIds() {
+    return this.signalGroupIds;
+  }
 
+  public void addSignalGroupId(Id<SignalGroup> signalGroupId) {
+    this.signalGroupIds.add(signalGroupId);
+  }
+
+  public int getMaxGreenTime(Id<SignalGroup> signalGroupId) {
+    return this.maxGreenTimes.get(signalGroupId);
+  }
+
+  public void setMaxGreenTime(Id<SignalGroup> signalGroupId, int maxGreenTime) {
+    this.maxGreenTimes.put(signalGroupId, maxGreenTime);
+  }
+
+  public void addSignals(Set<Signal> signals) {
+    this.signals.addAll(signals);
+  }
+
+  public Set<Signal> getSignals() {
+    return this.signals;
+  }
 }

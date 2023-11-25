@@ -31,42 +31,46 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * This class contains a simple example how to visualize a scenario with lanes and signalized intersections.
+ * This class contains a simple example how to visualize a scenario with lanes and signalized
+ * intersections.
  *
  * @author dgrether
  */
 public class VisualizeSignalScenarioWithLanes {
 
-	private static final String INPUT_DIR = "./examples/tutorial/example90TrafficLights/useSignalInput/withLanes/";
+  private static final String INPUT_DIR =
+      "./examples/tutorial/example90TrafficLights/useSignalInput/withLanes/";
 
-	public static void run(boolean startOtfvis) {
-		// --- load the configuration file
-		Config config = ConfigUtils.loadConfig(INPUT_DIR + "config.xml");
-		config.controller().setLastIteration(0);
-		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+  public static void run(boolean startOtfvis) {
+    // --- load the configuration file
+    Config config = ConfigUtils.loadConfig(INPUT_DIR + "config.xml");
+    config.controller().setLastIteration(0);
+    config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 
-		// --- create the scenario
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		// load the information about signals data (i.e. fill the SignalsData object) and add it to the scenario as scenario element
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
+    // --- create the scenario
+    Scenario scenario = ScenarioUtils.loadScenario(config);
+    // load the information about signals data (i.e. fill the SignalsData object) and add it to the
+    // scenario as scenario element
+    scenario.addScenarioElement(
+        SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 
-		// --- create the controler
-		Controler c = new Controler(scenario);
-		// add the signals module to the simulation such that SignalsData is not only
-		// contained in the scenario but also used in the simulation
-//		c.addOverridingModule(new SignalsModule());
-		Signals.configure( c ) ;
+    // --- create the controler
+    Controler c = new Controler(scenario);
+    // add the signals module to the simulation such that SignalsData is not only
+    // contained in the scenario but also used in the simulation
+    //		c.addOverridingModule(new SignalsModule());
+    Signals.configure(c);
 
-		if (startOtfvis) {
-			// add the module that start the otfvis visualization with signals
-			c.addOverridingModule(new OTFVisWithSignalsLiveModule());
-		}
+    if (startOtfvis) {
+      // add the module that start the otfvis visualization with signals
+      c.addOverridingModule(new OTFVisWithSignalsLiveModule());
+    }
 
-		// --- run the simulation
-		c.run();
-	}
+    // --- run the simulation
+    c.run();
+  }
 
-	public static void main(String[] args) {
-		run(true);
-	}
+  public static void main(String[] args) {
+    run(true);
+  }
 }

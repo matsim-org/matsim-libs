@@ -20,6 +20,7 @@
 
 package org.matsim.withinday.replanning.replanners;
 
+import jakarta.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
@@ -27,29 +28,32 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
-import jakarta.inject.Provider;
-
 public class NextLegReplannerFactory extends WithinDayDuringActivityReplannerFactory {
 
-	private final Scenario scenario;
-	private final Provider<TripRouter> tripRouterFactory;
-	private final TimeInterpretation timeInterpretation;
+  private final Scenario scenario;
+  private final Provider<TripRouter> tripRouterFactory;
+  private final TimeInterpretation timeInterpretation;
 
-	public NextLegReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
-																 Provider<TripRouter> tripRouterFactory,
-																 TimeInterpretation timeInterpretation) {
-		super(withinDayEngine);
-		this.scenario = scenario;
-		this.tripRouterFactory = tripRouterFactory;
-		this.timeInterpretation = timeInterpretation;
-	}
+  public NextLegReplannerFactory(
+      Scenario scenario,
+      WithinDayEngine withinDayEngine,
+      Provider<TripRouter> tripRouterFactory,
+      TimeInterpretation timeInterpretation) {
+    super(withinDayEngine);
+    this.scenario = scenario;
+    this.tripRouterFactory = tripRouterFactory;
+    this.timeInterpretation = timeInterpretation;
+  }
 
-	@Override
-	public WithinDayDuringActivityReplanner createReplanner() {
-		WithinDayDuringActivityReplanner replanner = new NextLegReplanner(super.getId(), this.scenario,
-				this.getWithinDayEngine().getActivityRescheduler(),
-				this.tripRouterFactory.get(), timeInterpretation);
-		return replanner;
-	}
-
+  @Override
+  public WithinDayDuringActivityReplanner createReplanner() {
+    WithinDayDuringActivityReplanner replanner =
+        new NextLegReplanner(
+            super.getId(),
+            this.scenario,
+            this.getWithinDayEngine().getActivityRescheduler(),
+            this.tripRouterFactory.get(),
+            timeInterpretation);
+    return replanner;
+  }
 }

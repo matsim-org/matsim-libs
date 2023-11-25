@@ -25,15 +25,14 @@ import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory
 
 public class ActivityStartingFilterFactory implements AgentFilterFactory {
 
-	private final MobsimDataProvider mobsimDataProvider;
-	
-	public ActivityStartingFilterFactory(MobsimDataProvider mobsimDataProvider) {
-		this.mobsimDataProvider = mobsimDataProvider;
-	}
-	
-	@Override
-	public ActivityStartingFilter createAgentFilter() {
-		return new ActivityStartingFilter(mobsimDataProvider.getAgents());
-	}
+  private final MobsimDataProvider mobsimDataProvider;
 
+  public ActivityStartingFilterFactory(MobsimDataProvider mobsimDataProvider) {
+    this.mobsimDataProvider = mobsimDataProvider;
+  }
+
+  @Override
+  public ActivityStartingFilter createAgentFilter() {
+    return new ActivityStartingFilter(mobsimDataProvider.getAgents());
+  }
 }

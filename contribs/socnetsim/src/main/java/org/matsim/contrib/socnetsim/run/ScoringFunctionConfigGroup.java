@@ -19,208 +19,206 @@
 
 package org.matsim.contrib.socnetsim.run;
 
-import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.contrib.socnetsim.framework.scoring.BeingTogetherScoring;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.matsim.contrib.socnetsim.framework.scoring.BeingTogetherScoring;
+import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.utils.collections.CollectionUtils;
 
 public class ScoringFunctionConfigGroup extends ReflectiveConfigGroup {
-	public static final String GROUP_NAME = "scoringFunction";
-	private boolean useKtiScoring = false;
-	private double marginalUtilityOfBeingTogether_h = 0;
-	private double marginalUtilityOfBeingDriver_h = -3;
-	private double marginalUtilityOfBeingPassenger_h = -3;
-	private double constantDriver = 0;
-	private double constantPassenger = 0;
-	private String activityTypeForContactInDesires = "leisure";
-	private boolean useLocationChoiceEpsilons = false;
+  public static final String GROUP_NAME = "scoringFunction";
+  private boolean useKtiScoring = false;
+  private double marginalUtilityOfBeingTogether_h = 0;
+  private double marginalUtilityOfBeingDriver_h = -3;
+  private double marginalUtilityOfBeingPassenger_h = -3;
+  private double constantDriver = 0;
+  private double constantPassenger = 0;
+  private String activityTypeForContactInDesires = "leisure";
+  private boolean useLocationChoiceEpsilons = false;
 
-	public static enum TogetherScoringForm {
-		linear,
-		logarithmic;
-	}
-	private TogetherScoringForm togetherScoringForm = TogetherScoringForm.linear;
-	
-	static enum TogetherScoringType {
-		allModesAndActs,
-		actsRestricted;
-	}
-	private TogetherScoringType togetherScoringType = TogetherScoringType.allModesAndActs;
-	private Set<String> joinableActivityTypes = new HashSet<String>( Arrays.asList( "leisure" , "l" ) );
+  public static enum TogetherScoringForm {
+    linear,
+    logarithmic;
+  }
 
-	public ScoringFunctionConfigGroup() {
-		super( GROUP_NAME );
-	}
+  private TogetherScoringForm togetherScoringForm = TogetherScoringForm.linear;
 
-	@StringSetter( "useKtiScoring" )
-	public void setUseKtiScoring(final boolean v) {
-		this.useKtiScoring = v;
-	}
+  static enum TogetherScoringType {
+    allModesAndActs,
+    actsRestricted;
+  }
 
-	@StringGetter( "useKtiScoring" )
-	public boolean isUseKtiScoring() {
-		return useKtiScoring;
-	}
+  private TogetherScoringType togetherScoringType = TogetherScoringType.allModesAndActs;
+  private Set<String> joinableActivityTypes = new HashSet<String>(Arrays.asList("leisure", "l"));
 
-	@StringGetter( "marginalUtilityOfBeingTogether_h" )
-	public double getMarginalUtilityOfBeingTogether_h() {
-		return this.marginalUtilityOfBeingTogether_h;
-	}
+  public ScoringFunctionConfigGroup() {
+    super(GROUP_NAME);
+  }
 
-	public double getMarginalUtilityOfBeingTogether_s() {
-		return this.marginalUtilityOfBeingTogether_h / 3600;
-	}
+  @StringSetter("useKtiScoring")
+  public void setUseKtiScoring(final boolean v) {
+    this.useKtiScoring = v;
+  }
 
-	@StringSetter( "marginalUtilityOfBeingTogether_h" )
-	public void setMarginalUtilityOfBeingTogether_h(
-			final double marginalUtilityOfBeingTogether_h) {
-		this.marginalUtilityOfBeingTogether_h = marginalUtilityOfBeingTogether_h;
-	}
+  @StringGetter("useKtiScoring")
+  public boolean isUseKtiScoring() {
+    return useKtiScoring;
+  }
 
-	@StringGetter( "togetherScoringType" )
-	public TogetherScoringType getTogetherScoringType() {
-		return this.togetherScoringType;
-	}
+  @StringGetter("marginalUtilityOfBeingTogether_h")
+  public double getMarginalUtilityOfBeingTogether_h() {
+    return this.marginalUtilityOfBeingTogether_h;
+  }
 
-	@StringSetter( "togetherScoringType" )
-	public void setTogetherScoringType(final TogetherScoringType togetherScoringType) {
-		this.togetherScoringType = togetherScoringType;
-	}
+  public double getMarginalUtilityOfBeingTogether_s() {
+    return this.marginalUtilityOfBeingTogether_h / 3600;
+  }
 
-	@StringGetter( "marginalUtilityOfBeingDriver_h" )
-	public double getMarginalUtilityOfBeingDriver_h() {
-		return this.marginalUtilityOfBeingDriver_h;
-	}
+  @StringSetter("marginalUtilityOfBeingTogether_h")
+  public void setMarginalUtilityOfBeingTogether_h(final double marginalUtilityOfBeingTogether_h) {
+    this.marginalUtilityOfBeingTogether_h = marginalUtilityOfBeingTogether_h;
+  }
 
-	public double getMarginalUtilityOfBeingDriver_s() {
-		return this.marginalUtilityOfBeingDriver_h / 3600d;
-	}
+  @StringGetter("togetherScoringType")
+  public TogetherScoringType getTogetherScoringType() {
+    return this.togetherScoringType;
+  }
 
-	@StringSetter( "marginalUtilityOfBeingDriver_h" )
-	public void setMarginalUtilityOfBeingDriver_h(
-			final double marginalUtilityOfBeingDriver_h) {
-		this.marginalUtilityOfBeingDriver_h = marginalUtilityOfBeingDriver_h;
-	}
+  @StringSetter("togetherScoringType")
+  public void setTogetherScoringType(final TogetherScoringType togetherScoringType) {
+    this.togetherScoringType = togetherScoringType;
+  }
 
-	@StringGetter( "marginalUtilityOfBeingPassenger_h" )
-	public double getMarginalUtilityOfBeingPassenger_h() {
-		return this.marginalUtilityOfBeingPassenger_h;
-	}
+  @StringGetter("marginalUtilityOfBeingDriver_h")
+  public double getMarginalUtilityOfBeingDriver_h() {
+    return this.marginalUtilityOfBeingDriver_h;
+  }
 
-	public double getMarginalUtilityOfBeingPassenger_s() {
-		return this.marginalUtilityOfBeingPassenger_h / 3600d;
-	}
+  public double getMarginalUtilityOfBeingDriver_s() {
+    return this.marginalUtilityOfBeingDriver_h / 3600d;
+  }
 
-	@StringSetter( "marginalUtilityOfBeingPassenger_h" )
-	public void setMarginalUtilityOfBeingPassenger_h(
-			final double marginalUtilityOfBeingPassenger_h) {
-		this.marginalUtilityOfBeingPassenger_h = marginalUtilityOfBeingPassenger_h;
-	}
+  @StringSetter("marginalUtilityOfBeingDriver_h")
+  public void setMarginalUtilityOfBeingDriver_h(final double marginalUtilityOfBeingDriver_h) {
+    this.marginalUtilityOfBeingDriver_h = marginalUtilityOfBeingDriver_h;
+  }
 
-	@StringGetter( "useLocationChoiceEpsilons" )
-	public boolean isUseLocationChoiceEpsilons() {
-		return this.useLocationChoiceEpsilons;
-	}
+  @StringGetter("marginalUtilityOfBeingPassenger_h")
+  public double getMarginalUtilityOfBeingPassenger_h() {
+    return this.marginalUtilityOfBeingPassenger_h;
+  }
 
-	@StringSetter( "useLocationChoiceEpsilons" )
-	public void setUseLocationChoiceEpsilons(final boolean useLocationChoiceEpsilons) {
-		this.useLocationChoiceEpsilons = useLocationChoiceEpsilons;
-	}
+  public double getMarginalUtilityOfBeingPassenger_s() {
+    return this.marginalUtilityOfBeingPassenger_h / 3600d;
+  }
 
-	@StringGetter( "togetherScoringForm" )
-	public TogetherScoringForm getTogetherScoringForm() {
-		return this.togetherScoringForm;
-	}
+  @StringSetter("marginalUtilityOfBeingPassenger_h")
+  public void setMarginalUtilityOfBeingPassenger_h(final double marginalUtilityOfBeingPassenger_h) {
+    this.marginalUtilityOfBeingPassenger_h = marginalUtilityOfBeingPassenger_h;
+  }
 
-	@StringSetter( "togetherScoringForm" )
-	public void setTogetherScoringForm(final TogetherScoringForm togetherScoringForm) {
-		this.togetherScoringForm = togetherScoringForm;
-	}
+  @StringGetter("useLocationChoiceEpsilons")
+  public boolean isUseLocationChoiceEpsilons() {
+    return this.useLocationChoiceEpsilons;
+  }
 
-	// I do not like so much this kind of "intelligent" method in Modules...
-	public BeingTogetherScoring.Filter getActTypeFilterForJointScoring() {
-		switch ( togetherScoringType ) {
-			case allModesAndActs:
-				return new BeingTogetherScoring.AcceptAllFilter();
-			case actsRestricted:
-				return new BeingTogetherScoring.AcceptAllInListFilter( getJoinableActivityTypes() );
-			default:
-				throw new IllegalStateException( "gné?! "+togetherScoringType );
-		}
-	}
+  @StringSetter("useLocationChoiceEpsilons")
+  public void setUseLocationChoiceEpsilons(final boolean useLocationChoiceEpsilons) {
+    this.useLocationChoiceEpsilons = useLocationChoiceEpsilons;
+  }
 
-	public BeingTogetherScoring.Filter getModeFilterForJointScoring() {
-		switch ( togetherScoringType ) {
-			case allModesAndActs:
-				return new BeingTogetherScoring.AcceptAllFilter();
-			case actsRestricted:
-				return new BeingTogetherScoring.RejectAllFilter();
-			default:
-				throw new IllegalStateException( "gné?! "+togetherScoringType );
-		}
-	}
+  @StringGetter("togetherScoringForm")
+  public TogetherScoringForm getTogetherScoringForm() {
+    return this.togetherScoringForm;
+  }
 
-	@StringGetter( "joinableActivityTypes" )
-	private String getJoinableActivityTypesString() {
-		return CollectionUtils.setToString( getJoinableActivityTypes() );
-	}
-	
-	public Set<String> getJoinableActivityTypes() {
-		return joinableActivityTypes;
-	}
+  @StringSetter("togetherScoringForm")
+  public void setTogetherScoringForm(final TogetherScoringForm togetherScoringForm) {
+    this.togetherScoringForm = togetherScoringForm;
+  }
 
-	@StringSetter( "joinableActivityTypes" )
-	private void setJoinableActivityTypes(final String v) {
-		setJoinableActivityTypes( CollectionUtils.stringToSet( v ) );
-	}
-	
-	public void setJoinableActivityTypes(final Set<String> joinableActivityTypes) {
-		this.joinableActivityTypes = joinableActivityTypes;
-	}
+  // I do not like so much this kind of "intelligent" method in Modules...
+  public BeingTogetherScoring.Filter getActTypeFilterForJointScoring() {
+    switch (togetherScoringType) {
+      case allModesAndActs:
+        return new BeingTogetherScoring.AcceptAllFilter();
+      case actsRestricted:
+        return new BeingTogetherScoring.AcceptAllInListFilter(getJoinableActivityTypes());
+      default:
+        throw new IllegalStateException("gné?! " + togetherScoringType);
+    }
+  }
 
-	@StringGetter( "constantDriver" )
-	public double getConstantDriver() {
-		return this.constantDriver;
-	}
+  public BeingTogetherScoring.Filter getModeFilterForJointScoring() {
+    switch (togetherScoringType) {
+      case allModesAndActs:
+        return new BeingTogetherScoring.AcceptAllFilter();
+      case actsRestricted:
+        return new BeingTogetherScoring.RejectAllFilter();
+      default:
+        throw new IllegalStateException("gné?! " + togetherScoringType);
+    }
+  }
 
-	@StringSetter( "constantDriver" )
-	public void setConstantDriver(final double constantDriver) {
-		this.constantDriver = constantDriver;
-	}
+  @StringGetter("joinableActivityTypes")
+  private String getJoinableActivityTypesString() {
+    return CollectionUtils.setToString(getJoinableActivityTypes());
+  }
 
-	@StringGetter( "constantPassenger" )
-	public double getConstantPassenger() {
-		return this.constantPassenger;
-	}
+  public Set<String> getJoinableActivityTypes() {
+    return joinableActivityTypes;
+  }
 
-	@StringSetter( "constantPassenger" )
-	public void setConstantPassenger(final double constantPassenger) {
-		this.constantPassenger = constantPassenger;
-	}
+  @StringSetter("joinableActivityTypes")
+  private void setJoinableActivityTypes(final String v) {
+    setJoinableActivityTypes(CollectionUtils.stringToSet(v));
+  }
 
-	@StringGetter( "activityTypeForContactInDesires" )
-	public String getActivityTypeForContactInDesires() {
-		return activityTypeForContactInDesires;
-	}
+  public void setJoinableActivityTypes(final Set<String> joinableActivityTypes) {
+    this.joinableActivityTypes = joinableActivityTypes;
+  }
 
-	@StringSetter( "activityTypeForContactInDesires" )
-	public void setActivityTypeForContactInDesires(
-			final String activityTypeForContactInDesires) {
-		this.activityTypeForContactInDesires = activityTypeForContactInDesires;
-	}
+  @StringGetter("constantDriver")
+  public double getConstantDriver() {
+    return this.constantDriver;
+  }
 
-	@Override
-	public Map<String, String> getComments() {
-		final Map<String, String> map = super.getComments();
-		
-		map.put( "activityTypeForContactInDesires" ,
-				"the type of the activity from which typical duration will be taken for the log form.\n"+
-				"This can be a real or a \"dummy\" activity type." );
-		
-		return map;
-	}
+  @StringSetter("constantDriver")
+  public void setConstantDriver(final double constantDriver) {
+    this.constantDriver = constantDriver;
+  }
+
+  @StringGetter("constantPassenger")
+  public double getConstantPassenger() {
+    return this.constantPassenger;
+  }
+
+  @StringSetter("constantPassenger")
+  public void setConstantPassenger(final double constantPassenger) {
+    this.constantPassenger = constantPassenger;
+  }
+
+  @StringGetter("activityTypeForContactInDesires")
+  public String getActivityTypeForContactInDesires() {
+    return activityTypeForContactInDesires;
+  }
+
+  @StringSetter("activityTypeForContactInDesires")
+  public void setActivityTypeForContactInDesires(final String activityTypeForContactInDesires) {
+    this.activityTypeForContactInDesires = activityTypeForContactInDesires;
+  }
+
+  @Override
+  public Map<String, String> getComments() {
+    final Map<String, String> map = super.getComments();
+
+    map.put(
+        "activityTypeForContactInDesires",
+        "the type of the activity from which typical duration will be taken for the log form.\n"
+            + "This can be a real or a \"dummy\" activity type.");
+
+    return map;
+  }
 }

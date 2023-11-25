@@ -22,7 +22,6 @@ package org.matsim.contrib.evrp;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
-
 import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
@@ -32,54 +31,60 @@ import org.matsim.contrib.ev.infrastructure.Charger;
  * @author michalm
  */
 public class ChargingTaskImpl extends DefaultStayTask implements ChargingTask {
-	private final ChargingWithAssignmentLogic chargingLogic;
-	private final ElectricVehicle ev;
-	private Double chargingStartedTime;
-	private final double totalEnergy;
+  private final ChargingWithAssignmentLogic chargingLogic;
+  private final ElectricVehicle ev;
+  private Double chargingStartedTime;
+  private final double totalEnergy;
 
-	public ChargingTaskImpl(TaskType taskType, double beginTime, double endTime, Charger charger, ElectricVehicle ev,
-			double totalEnergy) {
-		super(taskType, beginTime, endTime, charger.getLink());
-		Preconditions.checkArgument(totalEnergy < 0, "Total energy consumption is not negative: %s", totalEnergy);
+  public ChargingTaskImpl(
+      TaskType taskType,
+      double beginTime,
+      double endTime,
+      Charger charger,
+      ElectricVehicle ev,
+      double totalEnergy) {
+    super(taskType, beginTime, endTime, charger.getLink());
+    Preconditions.checkArgument(
+        totalEnergy < 0, "Total energy consumption is not negative: %s", totalEnergy);
 
-		this.chargingLogic = (ChargingWithAssignmentLogic)charger.getLogic();
-		this.ev = ev;
-		this.totalEnergy = totalEnergy;
-	}
+    this.chargingLogic = (ChargingWithAssignmentLogic) charger.getLogic();
+    this.ev = ev;
+    this.totalEnergy = totalEnergy;
+  }
 
-	@Override
-	public double getTotalEnergy() {
-		return totalEnergy;
-	}
+  @Override
+  public double getTotalEnergy() {
+    return totalEnergy;
+  }
 
-	@Override
-	public ChargingWithAssignmentLogic getChargingLogic() {
-		return chargingLogic;
-	}
+  @Override
+  public ChargingWithAssignmentLogic getChargingLogic() {
+    return chargingLogic;
+  }
 
-	@Override
-	public ElectricVehicle getElectricVehicle() {
-		return ev;
-	}
+  @Override
+  public ElectricVehicle getElectricVehicle() {
+    return ev;
+  }
 
-	@Override
-	public void setChargingStartedTime(double chargingStartedTime) {
-		this.chargingStartedTime = chargingStartedTime;
-	}
+  @Override
+  public void setChargingStartedTime(double chargingStartedTime) {
+    this.chargingStartedTime = chargingStartedTime;
+  }
 
-	@Override
-	public double getChargingStartedTime() {
-		return chargingStartedTime;
-	}
+  @Override
+  public double getChargingStartedTime() {
+    return chargingStartedTime;
+  }
 
-	@Override
-	public String toString() {
-		return MoreObjects.toStringHelper(this)
-				.add("chargingLogic", chargingLogic)
-				.add("ev", ev)
-				.add("chargingStartedTime", chargingStartedTime)
-				.add("totalEnergy", totalEnergy)
-				.add("super", super.toString())
-				.toString();
-	}
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("chargingLogic", chargingLogic)
+        .add("ev", ev)
+        .add("chargingStartedTime", chargingStartedTime)
+        .add("totalEnergy", totalEnergy)
+        .add("super", super.toString())
+        .toString();
+  }
 }

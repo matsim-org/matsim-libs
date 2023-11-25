@@ -22,12 +22,9 @@ package org.matsim.contrib.decongestion.handler;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
-* @author ikaddoura
-*/
+ * @author ikaddoura
+ */
+public interface IntervalBasedTolling extends EventHandler {
 
-public interface IntervalBasedTolling extends EventHandler{
-
-	public double getTotalTollPayments();
-
+  public double getTotalTollPayments();
 }
-

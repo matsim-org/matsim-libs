@@ -27,71 +27,66 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * This implements the product types used among all {@link Receivers}.
- * <p>
- * TODO (JWJ, WLB, April 2018: think about how we can/should convert (seemlessly)
- * between volume and weight. Consider the IATA Dimensional Weight Factor. Think
- * about expressing a factor "percentage of cube(meter)-ton". A cubic meter of
- * toilet paper will have a factor of 1.0, and at the same time a brick-size
- * weighing a ton will also have a factor of 1.0. This is necessary as jsprit
- * can only work with ONE unit throughout its optimisation, i.e. and associate
- * it with vehicle capacity.
+ *
+ * <p>TODO (JWJ, WLB, April 2018: think about how we can/should convert (seemlessly) between volume
+ * and weight. Consider the IATA Dimensional Weight Factor. Think about expressing a factor
+ * "percentage of cube(meter)-ton". A cubic meter of toilet paper will have a factor of 1.0, and at
+ * the same time a brick-size weighing a ton will also have a factor of 1.0. This is necessary as
+ * jsprit can only work with ONE unit throughout its optimisation, i.e. and associate it with
+ * vehicle capacity.
  *
  * @author wlbean
  */
 public class ProductType implements Identifiable<ProductType>, Attributable {
 
-	private final Attributes attributes = new AttributesImpl();
+  private final Attributes attributes = new AttributesImpl();
 
-	/**
-	 * Set default values.
-	 */
-	private String descr = "";
-	private double reqCapacity = 1;
-	private final Id<ProductType> typeId;
-	private final Id<Link> originLinkId;
+  /** Set default values. */
+  private String descr = "";
 
-	/**
-	 * The constructor should not be visible from outside the package. Use
-	 * {@link ReceiverUtils#createAndGetProductType(Receivers, Id, Id)} to
-	 * instantiate.
-	 *
-	 * @param typeId the type {@link Id};
-	 * @param originLinkId the {@link Id<Link>} from which this product type
-	 *                     is used. Since each product type represents a unique
-	 *                     stock keeping unit (SKU), it is assumed the same
-	 *                     product sourced from two different locations should
-	 *                     be discernible.
-	 */
-	ProductType(final Id<ProductType> typeId, Id<Link> originLinkId){
-		this.typeId = typeId;
-		this.originLinkId = originLinkId;
-	}
+  private double reqCapacity = 1;
+  private final Id<ProductType> typeId;
+  private final Id<Link> originLinkId;
 
-	public void setDescription(String description){
-		this.descr = description;
-	}
+  /**
+   * The constructor should not be visible from outside the package. Use {@link
+   * ReceiverUtils#createAndGetProductType(Receivers, Id, Id)} to instantiate.
+   *
+   * @param typeId the type {@link Id};
+   * @param originLinkId the {@link Id<Link>} from which this product type is used. Since each
+   *     product type represents a unique stock keeping unit (SKU), it is assumed the same product
+   *     sourced from two different locations should be discernible.
+   */
+  ProductType(final Id<ProductType> typeId, Id<Link> originLinkId) {
+    this.typeId = typeId;
+    this.originLinkId = originLinkId;
+  }
 
-	public void setRequiredCapacity(double reqCapacity){
-		this.reqCapacity = reqCapacity;
-	}
+  public void setDescription(String description) {
+    this.descr = description;
+  }
 
-	public String getDescription(){
-		return descr;
-	}
+  public void setRequiredCapacity(double reqCapacity) {
+    this.reqCapacity = reqCapacity;
+  }
 
-	public double getRequiredCapacity(){
-		return reqCapacity;
-	}
+  public String getDescription() {
+    return descr;
+  }
 
-	public Id<ProductType> getId(){
-		return typeId;
-	}
+  public double getRequiredCapacity() {
+    return reqCapacity;
+  }
 
-	public Attributes getAttributes() {
-		return this.attributes;
-	}
+  public Id<ProductType> getId() {
+    return typeId;
+  }
 
-	public Id<Link> getOriginLinkId(){
-		return this.originLinkId;
-	}
+  public Attributes getAttributes() {
+    return this.attributes;
+  }
+
+  public Id<Link> getOriginLinkId() {
+    return this.originLinkId;
+  }
 }

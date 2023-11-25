@@ -24,5 +24,5 @@ import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.core.events.handler.EventHandler;
 
 public interface GenericEventHandler extends EventHandler {
-	public void handleEvent (GenericEvent event);
+  public void handleEvent(GenericEvent event);
 }

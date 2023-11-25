@@ -30,36 +30,35 @@ import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.TransitActsRemover;
 
+public class RemoveTransitActsFromPop {
 
-public class RemoveTransitActsFromPop{
+  private static final Logger log = LogManager.getLogger(RemoveTransitActsFromPop.class);
 
-	private final static Logger log = LogManager.getLogger(RemoveTransitActsFromPop.class);
+  /**
+   * @param args
+   */
+  public static void main(String[] args) {
+    String networkFile = args[0];
+    String popFile = args[1];
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		String networkFile = args[0];
-		String popFile = args[1];
+    RemoveTransitActsFromPop.removeActs(networkFile, popFile);
+  }
 
-		RemoveTransitActsFromPop.removeActs(networkFile, popFile);
-	}
+  private static void removeActs(String networkFile, String popFile) {
+    String popOutFile = popFile + "_removedTransitActs.xml.gz";
+    TransitActsRemover remover = new TransitActsRemover();
 
-	private static void removeActs(String networkFile, String popFile) {
-		String popOutFile = popFile + "_removedTransitActs.xml.gz";
-		TransitActsRemover remover = new TransitActsRemover();
-		
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
-		new PopulationReader(sc).readFile(popFile);
-		
-		for (Person person : sc.getPopulation().getPersons().values()) {
-			for (Plan plan : person.getPlans()) {
-				remover.run(plan);
-			}
-		}
+    Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
+    new PopulationReader(sc).readFile(popFile);
 
-		PopulationWriter popWriter = new PopulationWriter(sc.getPopulation(), sc.getNetwork());
-		popWriter.write(popOutFile);
-	}
+    for (Person person : sc.getPopulation().getPersons().values()) {
+      for (Plan plan : person.getPlans()) {
+        remover.run(plan);
+      }
+    }
+
+    PopulationWriter popWriter = new PopulationWriter(sc.getPopulation(), sc.getNetwork());
+    popWriter.write(popOutFile);
+  }
 }

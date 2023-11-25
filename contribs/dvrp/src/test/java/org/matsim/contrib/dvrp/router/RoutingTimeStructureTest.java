@@ -26,7 +26,6 @@ import static org.mockito.Mockito.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -48,133 +47,151 @@ import org.mockito.Mockito;
  * @author Sebastian Hörl (sebhoerl)
  */
 public class RoutingTimeStructureTest {
-	@Test
-	public void testTimingWithSimpleAccess() {
-		TimeInterpretation timeInterpretation = TimeInterpretation.create(ConfigUtils.createConfig());
+  @Test
+  public void testTimingWithSimpleAccess() {
+    TimeInterpretation timeInterpretation = TimeInterpretation.create(ConfigUtils.createConfig());
 
-		Facility fromFacility = mock(Facility.class);
-		Facility toFacility = mock(Facility.class);
-		Facility accessFacility = mock(Facility.class);
-		Facility egressFacility = mock(Facility.class);
+    Facility fromFacility = mock(Facility.class);
+    Facility toFacility = mock(Facility.class);
+    Facility accessFacility = mock(Facility.class);
+    Facility egressFacility = mock(Facility.class);
 
-		when(accessFacility.getLinkId()).thenReturn(Id.createLinkId("access"));
-		when(egressFacility.getLinkId()).thenReturn(Id.createLinkId("egress"));
+    when(accessFacility.getLinkId()).thenReturn(Id.createLinkId("access"));
+    when(egressFacility.getLinkId()).thenReturn(Id.createLinkId("egress"));
 
-		AccessEgressFacilityFinder stopFinder = mock(AccessEgressFacilityFinder.class);
-		when(stopFinder.findFacilities(eq(fromFacility), eq(toFacility), any())).thenReturn(
-				Optional.of(Pair.of(accessFacility, egressFacility)));
+    AccessEgressFacilityFinder stopFinder = mock(AccessEgressFacilityFinder.class);
+    when(stopFinder.findFacilities(eq(fromFacility), eq(toFacility), any()))
+        .thenReturn(Optional.of(Pair.of(accessFacility, egressFacility)));
 
-		RoutingModule accessRouter = mock(RoutingModule.class);
-		when(accessRouter.calcRoute(Mockito.any())).thenAnswer(iv -> {
-			Leg leg = PopulationUtils.createLeg("walk");
-			leg.setDepartureTime(((RoutingRequest)iv.getArgument(0)).getDepartureTime());
-			leg.setTravelTime(120.0);
-			return Arrays.asList(leg);
-		});
+    RoutingModule accessRouter = mock(RoutingModule.class);
+    when(accessRouter.calcRoute(Mockito.any()))
+        .thenAnswer(
+            iv -> {
+              Leg leg = PopulationUtils.createLeg("walk");
+              leg.setDepartureTime(((RoutingRequest) iv.getArgument(0)).getDepartureTime());
+              leg.setTravelTime(120.0);
+              return Arrays.asList(leg);
+            });
 
-		RoutingModule mainRouter = mock(RoutingModule.class);
-		when(mainRouter.calcRoute(Mockito.any())).thenAnswer(iv -> {
-			Leg leg = PopulationUtils.createLeg("drt");
-			leg.setDepartureTime(((RoutingRequest)iv.getArgument(0)).getDepartureTime());
-			leg.setTravelTime(800.0);
-			return Arrays.asList(leg);
-		});
+    RoutingModule mainRouter = mock(RoutingModule.class);
+    when(mainRouter.calcRoute(Mockito.any()))
+        .thenAnswer(
+            iv -> {
+              Leg leg = PopulationUtils.createLeg("drt");
+              leg.setDepartureTime(((RoutingRequest) iv.getArgument(0)).getDepartureTime());
+              leg.setTravelTime(800.0);
+              return Arrays.asList(leg);
+            });
 
-		RoutingModule egressRouter = mock(RoutingModule.class);
-		when(egressRouter.calcRoute(Mockito.any())).thenAnswer(iv -> {
-			Leg leg = PopulationUtils.createLeg("walk");
-			leg.setDepartureTime(((RoutingRequest)iv.getArgument(0)).getDepartureTime());
-			leg.setTravelTime(45.0);
-			return Arrays.asList(leg);
-		});
+    RoutingModule egressRouter = mock(RoutingModule.class);
+    when(egressRouter.calcRoute(Mockito.any()))
+        .thenAnswer(
+            iv -> {
+              Leg leg = PopulationUtils.createLeg("walk");
+              leg.setDepartureTime(((RoutingRequest) iv.getArgument(0)).getDepartureTime());
+              leg.setTravelTime(45.0);
+              return Arrays.asList(leg);
+            });
 
-		DvrpRoutingModule routingModule = new DvrpRoutingModule(mainRouter, accessRouter, egressRouter, stopFinder,
-				"drt", timeInterpretation);
-		List<? extends PlanElement> result = routingModule.calcRoute(
-				DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, 500.0, null));
+    DvrpRoutingModule routingModule =
+        new DvrpRoutingModule(
+            mainRouter, accessRouter, egressRouter, stopFinder, "drt", timeInterpretation);
+    List<? extends PlanElement> result =
+        routingModule.calcRoute(
+            DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, 500.0, null));
 
-		assertThat(result.get(0)).isInstanceOf(Leg.class);
-		assertThat(result.get(1)).isInstanceOf(Activity.class);
-		assertThat(result.get(2)).isInstanceOf(Leg.class);
-		assertThat(result.get(3)).isInstanceOf(Activity.class);
-		assertThat(result.get(4)).isInstanceOf(Leg.class);
+    assertThat(result.get(0)).isInstanceOf(Leg.class);
+    assertThat(result.get(1)).isInstanceOf(Activity.class);
+    assertThat(result.get(2)).isInstanceOf(Leg.class);
+    assertThat(result.get(3)).isInstanceOf(Activity.class);
+    assertThat(result.get(4)).isInstanceOf(Leg.class);
 
-		assertThat(((Leg)result.get(0)).getDepartureTime().seconds()).isEqualTo(500.0);
-		assertThat(((Activity)result.get(1)).getMaximumDuration().seconds()).isEqualTo(0.0);
-		assertThat(((Activity)result.get(1)).getEndTime().isUndefined()).isTrue();
-		assertThat(((Leg)result.get(2)).getDepartureTime().seconds()).isEqualTo(500.0 + 120.0);
-		assertThat(((Activity)result.get(3)).getMaximumDuration().seconds()).isEqualTo(0.0);
-		assertThat(((Activity)result.get(3)).getEndTime().isUndefined()).isTrue();
-		assertThat(((Leg)result.get(4)).getDepartureTime().seconds()).isEqualTo(500.0 + 120.0 + 800.0);
-	}
+    assertThat(((Leg) result.get(0)).getDepartureTime().seconds()).isEqualTo(500.0);
+    assertThat(((Activity) result.get(1)).getMaximumDuration().seconds()).isEqualTo(0.0);
+    assertThat(((Activity) result.get(1)).getEndTime().isUndefined()).isTrue();
+    assertThat(((Leg) result.get(2)).getDepartureTime().seconds()).isEqualTo(500.0 + 120.0);
+    assertThat(((Activity) result.get(3)).getMaximumDuration().seconds()).isEqualTo(0.0);
+    assertThat(((Activity) result.get(3)).getEndTime().isUndefined()).isTrue();
+    assertThat(((Leg) result.get(4)).getDepartureTime().seconds()).isEqualTo(500.0 + 120.0 + 800.0);
+  }
 
-	@Test
-	public void testTimingWithComplexAccess() {
-		TimeInterpretation timeInterpretation = TimeInterpretation.create(ConfigUtils.createConfig());
+  @Test
+  public void testTimingWithComplexAccess() {
+    TimeInterpretation timeInterpretation = TimeInterpretation.create(ConfigUtils.createConfig());
 
-		Facility fromFacility = mock(Facility.class);
-		Facility toFacility = mock(Facility.class);
-		Facility accessFacility = mock(Facility.class);
-		Facility egressFacility = mock(Facility.class);
+    Facility fromFacility = mock(Facility.class);
+    Facility toFacility = mock(Facility.class);
+    Facility accessFacility = mock(Facility.class);
+    Facility egressFacility = mock(Facility.class);
 
-		when(accessFacility.getLinkId()).thenReturn(Id.createLinkId("access"));
-		when(egressFacility.getLinkId()).thenReturn(Id.createLinkId("egress"));
+    when(accessFacility.getLinkId()).thenReturn(Id.createLinkId("access"));
+    when(egressFacility.getLinkId()).thenReturn(Id.createLinkId("egress"));
 
-		AccessEgressFacilityFinder stopFinder = mock(AccessEgressFacilityFinder.class);
-		when(stopFinder.findFacilities(eq(fromFacility), eq(toFacility), any())).thenReturn(
-				Optional.of(Pair.of(accessFacility, egressFacility)));
+    AccessEgressFacilityFinder stopFinder = mock(AccessEgressFacilityFinder.class);
+    when(stopFinder.findFacilities(eq(fromFacility), eq(toFacility), any()))
+        .thenReturn(Optional.of(Pair.of(accessFacility, egressFacility)));
 
-		RoutingModule accessRouter = mock(RoutingModule.class);
-		when(accessRouter.calcRoute(Mockito.any())).thenAnswer(iv -> {
-			Leg leg1 = PopulationUtils.createLeg("walk");
-			leg1.setDepartureTime(((RoutingRequest)iv.getArgument(0)).getDepartureTime());
-			leg1.setTravelTime(120.0);
+    RoutingModule accessRouter = mock(RoutingModule.class);
+    when(accessRouter.calcRoute(Mockito.any()))
+        .thenAnswer(
+            iv -> {
+              Leg leg1 = PopulationUtils.createLeg("walk");
+              leg1.setDepartureTime(((RoutingRequest) iv.getArgument(0)).getDepartureTime());
+              leg1.setTravelTime(120.0);
 
-			Activity activity = PopulationUtils.createActivityFromCoord("walk interaction", new Coord(0.0, 0.0));
-			activity.setMaximumDuration(0.0);
-			activity.setEndTimeUndefined();
+              Activity activity =
+                  PopulationUtils.createActivityFromCoord("walk interaction", new Coord(0.0, 0.0));
+              activity.setMaximumDuration(0.0);
+              activity.setEndTimeUndefined();
 
-			Leg leg2 = PopulationUtils.createLeg("walk");
-			leg2.setTravelTime(400.0);
+              Leg leg2 = PopulationUtils.createLeg("walk");
+              leg2.setTravelTime(400.0);
 
-			return Arrays.asList(leg1, activity, leg2);
-		});
+              return Arrays.asList(leg1, activity, leg2);
+            });
 
-		RoutingModule mainRouter = mock(RoutingModule.class);
-		when(mainRouter.calcRoute(Mockito.any())).thenAnswer(iv -> {
-			Leg leg = PopulationUtils.createLeg("drt");
-			leg.setDepartureTime(((RoutingRequest)iv.getArgument(0)).getDepartureTime());
-			leg.setTravelTime(800.0);
-			return Arrays.asList(leg);
-		});
+    RoutingModule mainRouter = mock(RoutingModule.class);
+    when(mainRouter.calcRoute(Mockito.any()))
+        .thenAnswer(
+            iv -> {
+              Leg leg = PopulationUtils.createLeg("drt");
+              leg.setDepartureTime(((RoutingRequest) iv.getArgument(0)).getDepartureTime());
+              leg.setTravelTime(800.0);
+              return Arrays.asList(leg);
+            });
 
-		RoutingModule egressRouter = mock(RoutingModule.class);
-		when(egressRouter.calcRoute(Mockito.any())).thenAnswer(iv -> {
-			Leg leg = PopulationUtils.createLeg("walk");
-			leg.setDepartureTime(((RoutingRequest)iv.getArgument(0)).getDepartureTime());
-			leg.setTravelTime(45.0);
-			return Arrays.asList(leg);
-		});
+    RoutingModule egressRouter = mock(RoutingModule.class);
+    when(egressRouter.calcRoute(Mockito.any()))
+        .thenAnswer(
+            iv -> {
+              Leg leg = PopulationUtils.createLeg("walk");
+              leg.setDepartureTime(((RoutingRequest) iv.getArgument(0)).getDepartureTime());
+              leg.setTravelTime(45.0);
+              return Arrays.asList(leg);
+            });
 
-		DvrpRoutingModule routingModule = new DvrpRoutingModule(mainRouter, accessRouter, egressRouter, stopFinder,
-				"drt", timeInterpretation);
-		List<? extends PlanElement> result = routingModule.calcRoute(
-				DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, 500.0, null));
+    DvrpRoutingModule routingModule =
+        new DvrpRoutingModule(
+            mainRouter, accessRouter, egressRouter, stopFinder, "drt", timeInterpretation);
+    List<? extends PlanElement> result =
+        routingModule.calcRoute(
+            DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, 500.0, null));
 
-		assertThat(result.get(0)).isInstanceOf(Leg.class);
-		assertThat(result.get(1)).isInstanceOf(Activity.class);
-		assertThat(result.get(2)).isInstanceOf(Leg.class);
-		assertThat(result.get(3)).isInstanceOf(Activity.class);
-		assertThat(result.get(4)).isInstanceOf(Leg.class);
-		assertThat(result.get(5)).isInstanceOf(Activity.class);
-		assertThat(result.get(6)).isInstanceOf(Leg.class);
+    assertThat(result.get(0)).isInstanceOf(Leg.class);
+    assertThat(result.get(1)).isInstanceOf(Activity.class);
+    assertThat(result.get(2)).isInstanceOf(Leg.class);
+    assertThat(result.get(3)).isInstanceOf(Activity.class);
+    assertThat(result.get(4)).isInstanceOf(Leg.class);
+    assertThat(result.get(5)).isInstanceOf(Activity.class);
+    assertThat(result.get(6)).isInstanceOf(Leg.class);
 
-		assertThat(((Leg)result.get(0)).getDepartureTime().seconds()).isEqualTo(500.0);
-		assertThat(((Activity)result.get(3)).getMaximumDuration().seconds()).isEqualTo(0.0);
-		assertThat(((Activity)result.get(3)).getEndTime().isUndefined()).isTrue();
-		assertThat(((Leg)result.get(4)).getDepartureTime().seconds()).isEqualTo(500.0 + 120.0 + 400.0);
-		assertThat(((Activity)result.get(5)).getMaximumDuration().seconds()).isEqualTo(0.0);
-		assertThat(((Activity)result.get(5)).getEndTime().isUndefined()).isTrue();
-		assertThat(((Leg)result.get(6)).getDepartureTime().seconds()).isEqualTo(500.0 + 120.0 + 400.0 + 800.0);
-	}
+    assertThat(((Leg) result.get(0)).getDepartureTime().seconds()).isEqualTo(500.0);
+    assertThat(((Activity) result.get(3)).getMaximumDuration().seconds()).isEqualTo(0.0);
+    assertThat(((Activity) result.get(3)).getEndTime().isUndefined()).isTrue();
+    assertThat(((Leg) result.get(4)).getDepartureTime().seconds()).isEqualTo(500.0 + 120.0 + 400.0);
+    assertThat(((Activity) result.get(5)).getMaximumDuration().seconds()).isEqualTo(0.0);
+    assertThat(((Activity) result.get(5)).getEndTime().isUndefined()).isTrue();
+    assertThat(((Leg) result.get(6)).getDepartureTime().seconds())
+        .isEqualTo(500.0 + 120.0 + 400.0 + 800.0);
+  }
 }

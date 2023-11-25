@@ -19,16 +19,15 @@
 
 package org.matsim.vis.otfvis.opengl.queries;
 
+import com.jogamp.common.nio.Buffers;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.util.awt.TextRenderer;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.nio.FloatBuffer;
 import java.util.*;
 import java.util.List;
-
-import com.jogamp.opengl.GL;
-import com.jogamp.opengl.GL2;
-
-import com.jogamp.opengl.util.awt.TextRenderer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -50,162 +49,154 @@ import org.matsim.vis.otfvis.opengl.gl.GLUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 
-import com.jogamp.common.nio.Buffers;
-
-/**
- * QueryAgentPTBus draws certain public transport related informations.
- */
+/** QueryAgentPTBus draws certain public transport related informations. */
 public class QueryAgentPTBus extends AbstractQuery {
 
-	public static class Result implements OTFQueryResult {
+  public static class Result implements OTFQueryResult {
 
-		private final List<String> allIds;
-		private float[] vertex = null;
-		private transient FloatBuffer vert;
-		private boolean calcOffset = true;
+    private final List<String> allIds;
+    private float[] vertex = null;
+    private transient FloatBuffer vert;
+    private boolean calcOffset = true;
 
-		public Result(final List<String> allIds) {
-			this.allIds = allIds;
-		}
+    public Result(final List<String> allIds) {
+      this.allIds = allIds;
+    }
 
-		@Override
-		public void draw(OTFOGLDrawer drawer) {
-			TextRenderer textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 32), true, false);
+    @Override
+    public void draw(OTFOGLDrawer drawer) {
+      TextRenderer textRenderer =
+          new TextRenderer(new Font("SansSerif", Font.PLAIN, 32), true, false);
 
-			if(this.vertex == null) return;
+      if (this.vertex == null) return;
 
-			OGLAgentPointLayer layer = drawer.getCurrentSceneGraph().getAgentPointLayer();
+      OGLAgentPointLayer layer = drawer.getCurrentSceneGraph().getAgentPointLayer();
 
-			if(this.calcOffset) {
-				float east = (float)drawer.getQuad().offsetEast;
-				float north = (float)drawer.getQuad().offsetNorth;
+      if (this.calcOffset) {
+        float east = (float) drawer.getQuad().offsetEast;
+        float north = (float) drawer.getQuad().offsetNorth;
 
-				this.calcOffset = false;
-				for(int i = 0; i < this.vertex.length; i+=2) {
-					this.vertex[i] -=east;
-					this.vertex[i+1] -= north;
-				}
-				this.vert = Buffers.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
+        this.calcOffset = false;
+        for (int i = 0; i < this.vertex.length; i += 2) {
+          this.vertex[i] -= east;
+          this.vertex[i + 1] -= north;
+        }
+        this.vert = Buffers.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
+      }
 
-			}
+      GL2 gl = OTFGLAbstractDrawable.getGl().getGL2();
+      gl.glEnable(GL.GL_BLEND);
+      gl.glColor4d(0.6, 0.0, 0.2, .2);
 
-			GL2 gl = OTFGLAbstractDrawable.getGl().getGL2();
-			gl.glEnable(GL.GL_BLEND);
-			gl.glColor4d(0.6, 0.0,0.2,.2);
+      gl.glEnable(GL.GL_LINE_SMOOTH);
+      gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
+      gl.glLineWidth(1.f * OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
+      gl.glVertexPointer(2, GL.GL_FLOAT, 0, this.vert);
+      gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, this.vertex.length / 2);
+      gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
+      gl.glDisable(GL2.GL_LINE_SMOOTH);
 
-			gl.glEnable(GL.GL_LINE_SMOOTH);
-			gl.glEnableClientState (GL2.GL_VERTEX_ARRAY);
-			gl.glLineWidth(1.f*OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
-			gl.glVertexPointer (2, GL.GL_FLOAT, 0, this.vert);
-			gl.glDrawArrays (GL2.GL_LINE_STRIP, 0, this.vertex.length/2);
-			gl.glDisableClientState (GL2.GL_VERTEX_ARRAY);
-			gl.glDisable(GL2.GL_LINE_SMOOTH);
+      for (String id : allIds) {
+        Point2D.Double pos = layer.getAgentCoords(id.toCharArray());
+        if (pos == null) continue;
 
-			for(String id : allIds) {
-				Point2D.Double pos = layer.getAgentCoords(id.toCharArray());
-				if (pos == null) continue;
+        // System.out.println("POS: " + pos.x + ", " + pos.y);
+        gl.glColor4f(0.2f, 0.4f, 0.4f, 0.5f); // Blue
+        gl.glLineWidth(2);
+        gl.glBegin(GL.GL_LINE_STRIP);
+        gl.glVertex3d((float) pos.x + 50, (float) pos.y + 50, 0);
+        gl.glVertex3d((float) pos.x + 250, (float) pos.y + 250, 0);
+        gl.glEnd();
+        GLUtils.drawCircle(gl, (float) pos.x, (float) pos.y, 100.f);
+        InfoText text = new InfoText("Bus " + id, (float) pos.x + 250, (float) pos.y + 250);
+        text.draw(
+            textRenderer,
+            OTFClientControl.getInstance().getMainOTFDrawer().getCanvas(),
+            drawer.getViewBoundsAsQuadTreeRect());
+      }
+      gl.glDisable(GL.GL_BLEND);
+    }
 
-				//System.out.println("POS: " + pos.x + ", " + pos.y);
-				gl.glColor4f(0.2f, 0.4f, 0.4f, 0.5f);//Blue
-				gl.glLineWidth(2);
-				gl.glBegin(GL.GL_LINE_STRIP);
-				gl.glVertex3d((float)pos.x + 50, (float)pos.y + 50,0);
-				gl.glVertex3d((float)pos.x +250, (float)pos.y +250,0);
-				gl.glEnd();
-				GLUtils.drawCircle(gl, (float)pos.x, (float)pos.y, 100.f);
-				InfoText text = new InfoText("Bus " + id, (float)pos.x+ 250, (float)pos.y+ 250);
-				text.draw(textRenderer, OTFClientControl.getInstance().getMainOTFDrawer().getCanvas(), drawer.getViewBoundsAsQuadTreeRect());
+    @Override
+    public void remove() {}
 
-			}
-			gl.glDisable(GL.GL_BLEND);
+    @Override
+    public boolean isAlive() {
+      return false;
+    }
+  }
 
-		}
+  private String agentId;
+  private Result result;
+  private final List<String> allIds = new LinkedList<>();
 
-		@Override
-		public void remove() {
+  private Network net = null;
 
-		}
+  @Override
+  public void setId(String id) {
+    this.agentId = id;
+  }
 
-		@Override
-		public boolean isAlive() {
-			return false;
-		}
+  private float[] buildRoute(Plan plan) {
+    List<Id<Link>> drivenLinks = new LinkedList<>();
 
-	}
+    List<PlanElement> actslegs = plan.getPlanElements();
+    for (PlanElement pe : actslegs) {
+      if (pe instanceof Activity) {
+        // handle act
+        Activity act = (Activity) pe;
+        drivenLinks.add(act.getLinkId());
+      } else if (pe instanceof Leg) {
+        // handle leg
+        Leg leg = (Leg) pe;
+        // if (!leg.getMode().equals("car")) continue;
+        for (Id<Link> linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
+          drivenLinks.add(linkId);
+        }
+      }
+    }
 
-	private String agentId;
-	private Result result;
-	private final List<String> allIds = new LinkedList<>();
+    if (drivenLinks.size() == 0) return null;
 
-	private Network net = null;
+    // convert this to drawable info
+    float[] vertex = new float[drivenLinks.size() * 2];
+    int pos = 0;
+    for (Id<Link> linkId : drivenLinks) {
+      Link link = this.net.getLinks().get(linkId);
+      Node node = link.getFromNode();
+      vertex[pos++] = (float) node.getCoord().getX();
+      vertex[pos++] = (float) node.getCoord().getY();
+    }
+    return vertex;
+  }
 
+  @Override
+  public void installQuery(SimulationViewForQueries simulationView) {
+    this.net = simulationView.getNetwork();
+    this.result = new Result(this.allIds);
+    String prefix = agentId + "-";
+    Collection<Id<Person>> agentIds = simulationView.getMobsimAgents().keySet();
+    for (Id<Person> id : agentIds) {
+      if (id.toString().startsWith(prefix, 0)) {
+        allIds.add(id.toString());
+      }
+    }
+    if (allIds.size() == 0) {
+      return;
+    }
+    MobsimAgent firstAgent =
+        simulationView.getMobsimAgents().get(Id.create(allIds.get(0), Person.class));
+    Plan plan = simulationView.getPlan(firstAgent);
+    this.result.vertex = buildRoute(plan);
+  }
 
-	@Override
-	public void setId(String id) {
-		this.agentId = id;
-	}
+  @Override
+  public Type getType() {
+    return OTFQuery.Type.AGENT;
+  }
 
-	private float[] buildRoute(Plan plan) {
-		List<Id<Link>> drivenLinks = new LinkedList<>();
-
-		List<PlanElement> actslegs = plan.getPlanElements();
-		for (PlanElement pe : actslegs) {
-			if (pe instanceof Activity) {
-				// handle act
-				Activity act = (Activity)pe;
-				drivenLinks.add(act.getLinkId());
-			} else if (pe instanceof Leg) {
-				// handle leg
-				Leg leg = (Leg) pe;
-				//if (!leg.getMode().equals("car")) continue;
-				for (Id<Link> linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
-					drivenLinks.add(linkId);
-				}
-			}
-		}
-
-		if(drivenLinks.size() == 0) return null;
-
-		// convert this to drawable info
-		float[] vertex = new float[drivenLinks.size()*2];
-		int pos = 0;
-		for(Id<Link> linkId : drivenLinks) {
-			Link link = this.net.getLinks().get(linkId);
-			Node node = link.getFromNode();
-			vertex[pos++] = (float)node.getCoord().getX();
-			vertex[pos++] = (float)node.getCoord().getY();
-		}
-		return vertex;
-	}
-
-	@Override
-	public void installQuery(SimulationViewForQueries simulationView) {
-		this.net = simulationView.getNetwork();
-		this.result = new Result(this.allIds);
-		String prefix = agentId + "-";
-		Collection<Id<Person>> agentIds = simulationView.getMobsimAgents().keySet();
-		for(Id<Person> id : agentIds) {
-			if(id.toString().startsWith(prefix, 0)) {
-			    allIds.add(id.toString());
-			}
-		}
-		if (allIds.size()==0) {
-			return;
-		}
-		MobsimAgent firstAgent = simulationView.getMobsimAgents().get(Id.create(allIds.get(0), Person.class));
-		Plan plan = simulationView.getPlan(firstAgent);
-		this.result.vertex = buildRoute(plan);
-	}
-
-
-	@Override
-	public Type getType() {
-		return OTFQuery.Type.AGENT;
-	}
-
-	@Override
-	public OTFQueryResult query() {
-		return result;
-	}
-
+  @Override
+  public OTFQueryResult query() {
+    return result;
+  }
 }

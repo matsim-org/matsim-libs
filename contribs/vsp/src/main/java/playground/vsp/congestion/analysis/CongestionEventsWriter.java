@@ -20,7 +20,6 @@
 package playground.vsp.congestion.analysis;
 
 import java.io.File;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -31,70 +30,78 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.MarginalCongestionPricingHandler;
 
 /**
- * (1) Computes marginal congestion events based on a standard events file.
- * (2) Computes agent money events based on these marginal congestion events.
+ * (1) Computes marginal congestion events based on a standard events file. (2) Computes agent money
+ * events based on these marginal congestion events.
  *
  * @author ikaddoura
- *
  */
 public class CongestionEventsWriter {
-	private static final Logger log = LogManager.getLogger(CongestionEventsWriter.class);
+  private static final Logger log = LogManager.getLogger(CongestionEventsWriter.class);
 
-	static String runDirectory;
+  static String runDirectory;
 
-	public static void main(String[] args) {
+  public static void main(String[] args) {
 
-		if (args.length > 0) {
+    if (args.length > 0) {
 
-			runDirectory = args[0];
-			log.info("runDirectory: " + runDirectory);
+      runDirectory = args[0];
+      log.info("runDirectory: " + runDirectory);
 
-		} else {
-			runDirectory = "../../runs-svn/berlin_internalizationCar2/output/baseCase_2/";
-		}
+    } else {
+      runDirectory = "../../runs-svn/berlin_internalizationCar2/output/baseCase_2/";
+    }
 
-		CongestionEventsWriter congestionEventsWriter = new CongestionEventsWriter();
-		congestionEventsWriter.run();
-	}
+    CongestionEventsWriter congestionEventsWriter = new CongestionEventsWriter();
+    congestionEventsWriter.run();
+  }
 
-	private void run() {
+  private void run() {
 
-		log.info("Loading scenario...");
-		Config config = ConfigUtils.loadConfig(runDirectory + "output_config.xml.gz");
-		config.network().setInputFile(runDirectory + "output_network.xml.gz");
-		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
-		log.info("Loading scenario... Done.");
+    log.info("Loading scenario...");
+    Config config = ConfigUtils.loadConfig(runDirectory + "output_config.xml.gz");
+    config.network().setInputFile(runDirectory + "output_network.xml.gz");
+    config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
+    MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
+    log.info("Loading scenario... Done.");
 
-		String outputDirectory = runDirectory + "analysis_it." + config.controller().getLastIteration() + "/";
-		File file = new File(outputDirectory);
-		file.mkdirs();
+    String outputDirectory =
+        runDirectory + "analysis_it." + config.controller().getLastIteration() + "/";
+    File file = new File(outputDirectory);
+    file.mkdirs();
 
-		EventsManager events = EventsUtils.createEventsManager();
+    EventsManager events = EventsUtils.createEventsManager();
 
-		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controller().getLastIteration() + ".events_ExternalCongestionCost_Offline.xml.gz");
-		CongestionHandlerImplV3 congestionHandler = new CongestionHandlerImplV3(events, scenario);
-		MarginalCongestionPricingHandler marginalCostTollHandler = new MarginalCongestionPricingHandler(events, scenario);
+    EventWriterXML eventWriter =
+        new EventWriterXML(
+            outputDirectory
+                + config.controller().getLastIteration()
+                + ".events_ExternalCongestionCost_Offline.xml.gz");
+    CongestionHandlerImplV3 congestionHandler = new CongestionHandlerImplV3(events, scenario);
+    MarginalCongestionPricingHandler marginalCostTollHandler =
+        new MarginalCongestionPricingHandler(events, scenario);
 
-		events.addHandler(eventWriter);
-		events.addHandler(congestionHandler);
-		events.addHandler(marginalCostTollHandler);
+    events.addHandler(eventWriter);
+    events.addHandler(congestionHandler);
+    events.addHandler(marginalCostTollHandler);
 
-		log.info("Reading events file...");
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(runDirectory + "ITERS/it." + config.controller().getLastIteration() + "/" + config.controller().getLastIteration() + ".events.xml.gz");
-		log.info("Reading events file... Done.");
+    log.info("Reading events file...");
+    MatsimEventsReader reader = new MatsimEventsReader(events);
+    reader.readFile(
+        runDirectory
+            + "ITERS/it."
+            + config.controller().getLastIteration()
+            + "/"
+            + config.controller().getLastIteration()
+            + ".events.xml.gz");
+    log.info("Reading events file... Done.");
 
-		eventWriter.closeFile();
+    eventWriter.closeFile();
 
-		congestionHandler.writeCongestionStats(outputDirectory + config.controller().getLastIteration() + ".congestionStats_Offline.csv");
-	}
-
+    congestionHandler.writeCongestionStats(
+        outputDirectory + config.controller().getLastIteration() + ".congestionStats_Offline.csv");
+  }
 }
-
-

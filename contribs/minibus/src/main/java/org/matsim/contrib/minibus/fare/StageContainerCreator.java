@@ -19,6 +19,9 @@
 
 package org.matsim.contrib.minibus.fare;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -38,117 +41,128 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
 /**
- * 
- * Collects all information needed to calculate create a {@link StageContainer}
- * and pushes them to all registered {@link StageContainerHandler}.
- * 
- * @author aneumann
+ * Collects all information needed to calculate create a {@link StageContainer} and pushes them to
+ * all registered {@link StageContainerHandler}.
  *
+ * @author aneumann
  */
-public final class StageContainerCreator implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener{
-	
-	private final static Logger log = LogManager.getLogger(StageContainerCreator.class);
-	
-	private Network network;
-	private final String pIdentifier;
-	
-	private final List<StageContainerHandler> stageContainerHandlerList = new LinkedList<>();
-	private HashMap<Id<Vehicle>, TransitDriverStartsEvent> vehId2TransitDriverStartsE = new HashMap<>();
-	private HashMap<Id<Vehicle>, VehicleArrivesAtFacilityEvent> vehId2VehArrivesAtFacilityE = new HashMap<>();
-	private HashMap<Id<Vehicle>, LinkedList<StageContainer>> vehId2StageContainerListMap = new HashMap<>();
-	private HashMap<Id<Person>, StageContainer> personId2StageContainer = new HashMap<>();
+public final class StageContainerCreator
+    implements TransitDriverStartsEventHandler,
+        VehicleArrivesAtFacilityEventHandler,
+        LinkEnterEventHandler,
+        PersonEntersVehicleEventHandler,
+        PersonLeavesVehicleEventHandler,
+        AfterMobsimListener {
 
-	public StageContainerCreator(String pIdentifier){
-		this.pIdentifier = pIdentifier;
-		log.info("enabled");
-	}
-	
-	public void init(Network network){
-		this.network = network;
-	}
-	
-	public void addStageContainerHandler(StageContainerHandler stageContainerHandler){
-		this.stageContainerHandlerList.add(stageContainerHandler);
-	}
-	
-	@Override
-	public void reset(int iteration) {
-		this.vehId2TransitDriverStartsE = new HashMap<>();
-		this.vehId2VehArrivesAtFacilityE = new HashMap<>();
-		this.vehId2StageContainerListMap = new HashMap<>();
-		this.personId2StageContainer = new HashMap<>();
-		
-		for (StageContainerHandler stageContainerHandler : this.stageContainerHandlerList) {
-			stageContainerHandler.reset();
-		}
-	}
-	
-	@Override
-	public void handleEvent(TransitDriverStartsEvent event) {
-		this.vehId2TransitDriverStartsE.put(event.getVehicleId(), event);
-		this.vehId2StageContainerListMap.computeIfAbsent(event.getVehicleId(), k -> new LinkedList<>());
-	}
+  private static final Logger log = LogManager.getLogger(StageContainerCreator.class);
 
-	@Override
-	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		this.vehId2VehArrivesAtFacilityE.put(event.getVehicleId(), event);
-	}
+  private Network network;
+  private final String pIdentifier;
 
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		if (this.vehId2TransitDriverStartsE.containsKey(event.getVehicleId())) {
-			// It's a transit driver
-			double linkLength = this.network.getLinks().get(event.getLinkId()).getLength();
-			for (StageContainer stageContainer : this.vehId2StageContainerListMap.get(event.getVehicleId())) {
-				stageContainer.addDistanceTravelled(linkLength);
-			}
-		}
-	}
+  private final List<StageContainerHandler> stageContainerHandlerList = new LinkedList<>();
+  private HashMap<Id<Vehicle>, TransitDriverStartsEvent> vehId2TransitDriverStartsE =
+      new HashMap<>();
+  private HashMap<Id<Vehicle>, VehicleArrivesAtFacilityEvent> vehId2VehArrivesAtFacilityE =
+      new HashMap<>();
+  private HashMap<Id<Vehicle>, LinkedList<StageContainer>> vehId2StageContainerListMap =
+      new HashMap<>();
+  private HashMap<Id<Person>, StageContainer> personId2StageContainer = new HashMap<>();
 
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		if(event.getVehicleId().toString().startsWith(this.pIdentifier)){
-			// it's a paratransit vehicle
-			if(!event.getPersonId().toString().contains(this.pIdentifier)){
-				// it's not the driver
-				StageContainer stageContainer = new StageContainer();
-				stageContainer.handlePersonEnters(event, this.vehId2VehArrivesAtFacilityE.get(event.getVehicleId()), this.vehId2TransitDriverStartsE.get(event.getVehicleId()));
-				this.vehId2StageContainerListMap.get(event.getVehicleId()).add(stageContainer);
-				this.personId2StageContainer.put(event.getPersonId(), stageContainer);
-			}
-		}
-	}
+  public StageContainerCreator(String pIdentifier) {
+    this.pIdentifier = pIdentifier;
+    log.info("enabled");
+  }
 
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if(event.getVehicleId().toString().startsWith(this.pIdentifier)){
-			// it's a paratransit vehicle
-			if(!event.getPersonId().toString().contains(this.pIdentifier)){
-				// it's not the driver
-				StageContainer stageContainer = this.personId2StageContainer.remove(event.getPersonId());
-				this.vehId2StageContainerListMap.get(event.getVehicleId()).remove(stageContainer);
-				stageContainer.handlePersonLeaves(event, this.vehId2VehArrivesAtFacilityE.get(event.getVehicleId()));
-				
-				// call all StageContainerHandler
-				for (StageContainerHandler stageContainerHandler : this.stageContainerHandlerList) {
-					stageContainerHandler.handleFareContainer(stageContainer);
-				}
-				
-				// Note the stageContainer is dropped at this point.
-			}
-		}
-	}
+  public void init(Network network) {
+    this.network = network;
+  }
 
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		// ok, mobsim is done - finish incomplete entries
-		if (this.personId2StageContainer.size() > 0) {
-			log.warn("There are " + this.personId2StageContainer.size() + " passengers with incomplete trips. Cannot finish them. Will not forward those entries");
-		}
-	}
+  public void addStageContainerHandler(StageContainerHandler stageContainerHandler) {
+    this.stageContainerHandlerList.add(stageContainerHandler);
+  }
+
+  @Override
+  public void reset(int iteration) {
+    this.vehId2TransitDriverStartsE = new HashMap<>();
+    this.vehId2VehArrivesAtFacilityE = new HashMap<>();
+    this.vehId2StageContainerListMap = new HashMap<>();
+    this.personId2StageContainer = new HashMap<>();
+
+    for (StageContainerHandler stageContainerHandler : this.stageContainerHandlerList) {
+      stageContainerHandler.reset();
+    }
+  }
+
+  @Override
+  public void handleEvent(TransitDriverStartsEvent event) {
+    this.vehId2TransitDriverStartsE.put(event.getVehicleId(), event);
+    this.vehId2StageContainerListMap.computeIfAbsent(event.getVehicleId(), k -> new LinkedList<>());
+  }
+
+  @Override
+  public void handleEvent(VehicleArrivesAtFacilityEvent event) {
+    this.vehId2VehArrivesAtFacilityE.put(event.getVehicleId(), event);
+  }
+
+  @Override
+  public void handleEvent(LinkEnterEvent event) {
+    if (this.vehId2TransitDriverStartsE.containsKey(event.getVehicleId())) {
+      // It's a transit driver
+      double linkLength = this.network.getLinks().get(event.getLinkId()).getLength();
+      for (StageContainer stageContainer :
+          this.vehId2StageContainerListMap.get(event.getVehicleId())) {
+        stageContainer.addDistanceTravelled(linkLength);
+      }
+    }
+  }
+
+  @Override
+  public void handleEvent(PersonEntersVehicleEvent event) {
+    if (event.getVehicleId().toString().startsWith(this.pIdentifier)) {
+      // it's a paratransit vehicle
+      if (!event.getPersonId().toString().contains(this.pIdentifier)) {
+        // it's not the driver
+        StageContainer stageContainer = new StageContainer();
+        stageContainer.handlePersonEnters(
+            event,
+            this.vehId2VehArrivesAtFacilityE.get(event.getVehicleId()),
+            this.vehId2TransitDriverStartsE.get(event.getVehicleId()));
+        this.vehId2StageContainerListMap.get(event.getVehicleId()).add(stageContainer);
+        this.personId2StageContainer.put(event.getPersonId(), stageContainer);
+      }
+    }
+  }
+
+  @Override
+  public void handleEvent(PersonLeavesVehicleEvent event) {
+    if (event.getVehicleId().toString().startsWith(this.pIdentifier)) {
+      // it's a paratransit vehicle
+      if (!event.getPersonId().toString().contains(this.pIdentifier)) {
+        // it's not the driver
+        StageContainer stageContainer = this.personId2StageContainer.remove(event.getPersonId());
+        this.vehId2StageContainerListMap.get(event.getVehicleId()).remove(stageContainer);
+        stageContainer.handlePersonLeaves(
+            event, this.vehId2VehArrivesAtFacilityE.get(event.getVehicleId()));
+
+        // call all StageContainerHandler
+        for (StageContainerHandler stageContainerHandler : this.stageContainerHandlerList) {
+          stageContainerHandler.handleFareContainer(stageContainer);
+        }
+
+        // Note the stageContainer is dropped at this point.
+      }
+    }
+  }
+
+  @Override
+  public void notifyAfterMobsim(AfterMobsimEvent event) {
+    // ok, mobsim is done - finish incomplete entries
+    if (this.personId2StageContainer.size() > 0) {
+      log.warn(
+          "There are "
+              + this.personId2StageContainer.size()
+              + " passengers with incomplete trips. Cannot finish them. Will not forward those entries");
+    }
+  }
 }

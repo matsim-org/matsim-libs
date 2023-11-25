@@ -21,7 +21,6 @@ package org.matsim.utils.gis.matsim2esri.network;
 
 import java.util.ArrayList;
 import java.util.Collection;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -40,87 +39,86 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
- * Simple class to convert the nodess of MATSim network files to ESRI shape files. The nodes could be written points
- * For a basic example please have a look at the <code>main</code> method.
- * Can also be called as Nodes2ESRIShape inputNetwork.xml output.shp .
+ * Simple class to convert the nodess of MATSim network files to ESRI shape files. The nodes could
+ * be written points For a basic example please have a look at the <code>main</code> method. Can
+ * also be called as Nodes2ESRIShape inputNetwork.xml output.shp .
  *
- * <p> <strong>Keywords:</strong> converter, network, nodes, esri, shp, matsim </p>
+ * <p><strong>Keywords:</strong> converter, network, nodes, esri, shp, matsim
  *
  * @author laemmel
  */
 public class Nodes2ESRIShape {
 
-	private final static Logger log = LogManager.getLogger(Nodes2ESRIShape.class);
+  private static final Logger log = LogManager.getLogger(Nodes2ESRIShape.class);
 
-	private final Network network;
-	private final String filename;
-	private SimpleFeatureBuilder builder;
+  private final Network network;
+  private final String filename;
+  private SimpleFeatureBuilder builder;
 
-	
-	public Nodes2ESRIShape(final Network network, final String filename, final String coordinateSystem) {
-		this(network, filename, MGC.getCRS(coordinateSystem));
-	}
-	
-	public Nodes2ESRIShape(Network network, String filename, CoordinateReferenceSystem crs) {
-		this.network = network;
-		this.filename = filename;
-		initFeatureType(crs);
-	}
+  public Nodes2ESRIShape(
+      final Network network, final String filename, final String coordinateSystem) {
+    this(network, filename, MGC.getCRS(coordinateSystem));
+  }
 
-	public void write() {
-		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		for (Node node : NetworkUtils.getSortedNodes(this.network)) {
-			features.add(getFeature(node));
-		}
-		ShapeFileWriter.writeGeometries(features, this.filename);
+  public Nodes2ESRIShape(Network network, String filename, CoordinateReferenceSystem crs) {
+    this.network = network;
+    this.filename = filename;
+    initFeatureType(crs);
+  }
 
-	}
+  public void write() {
+    Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+    for (Node node : NetworkUtils.getSortedNodes(this.network)) {
+      features.add(getFeature(node));
+    }
+    ShapeFileWriter.writeGeometries(features, this.filename);
+  }
 
-	private SimpleFeature getFeature(Node node) {
-		Point p = MGC.coord2Point(node.getCoord());
-		try {
-			return this.builder.buildFeature(null, new Object[]{p,node.getId().toString()});
-		} catch (IllegalArgumentException e) {
-			throw new RuntimeException(e);
-		}
-	}
+  private SimpleFeature getFeature(Node node) {
+    Point p = MGC.coord2Point(node.getCoord());
+    try {
+      return this.builder.buildFeature(null, new Object[] {p, node.getId().toString()});
+    } catch (IllegalArgumentException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-	private void initFeatureType(final CoordinateReferenceSystem crs) {
-		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
-		typeBuilder.setName("node");
-		typeBuilder.setCRS(crs);
-		typeBuilder.add("location", Point.class);
-		typeBuilder.add("ID", String.class);
+  private void initFeatureType(final CoordinateReferenceSystem crs) {
+    SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
+    typeBuilder.setName("node");
+    typeBuilder.setCRS(crs);
+    typeBuilder.add("location", Point.class);
+    typeBuilder.add("ID", String.class);
 
-		this.builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
-	}
+    this.builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
+  }
 
-	public static void main(String [] args) {
-		String netfile = null ;
-		String outputFile = null ;
+  public static void main(String[] args) {
+    String netfile = null;
+    String outputFile = null;
 
-		if ( args.length == 0 ) {
-			netfile = "./examples/equil/network.xml";
-//		String netfile = "./test/scenarios/berlin/network.xml.gz";
+    if (args.length == 0) {
+      netfile = "./examples/equil/network.xml";
+      //		String netfile = "./test/scenarios/berlin/network.xml.gz";
 
-			outputFile = "./plans/networkNodes.shp";
-		} else if ( args.length == 2 ) {
-			netfile = args[0] ;
-			outputFile = args[1] ;
-		} else {
-			log.error("Arguments cannot be interpreted.  Aborting ...") ;
-			System.exit(-1) ;
-		}
+      outputFile = "./plans/networkNodes.shp";
+    } else if (args.length == 2) {
+      netfile = args[0];
+      outputFile = args[1];
+    } else {
+      log.error("Arguments cannot be interpreted.  Aborting ...");
+      System.exit(-1);
+    }
 
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
+    MutableScenario scenario =
+        (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    //		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
-		log.info("loading network from " + netfile);
-		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netfile);
-		log.info("done.");
+    log.info("loading network from " + netfile);
+    final Network network = scenario.getNetwork();
+    new MatsimNetworkReader(scenario.getNetwork()).readFile(netfile);
+    log.info("done.");
 
-		new Nodes2ESRIShape(network,outputFile, "DHDN_GK4").write();
-	}
-
+    new Nodes2ESRIShape(network, outputFile, "DHDN_GK4").write();
+  }
 }

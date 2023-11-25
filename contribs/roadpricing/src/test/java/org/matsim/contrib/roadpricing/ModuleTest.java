@@ -32,53 +32,50 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class ModuleTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test(expected = RuntimeException.class)
-    public void testControlerWithoutRoadPricingDoesntWork() {
-        Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
-        Controler controler = new Controler(config);
-        controler.run();
-        // config has a roadpricing config group, but controler does not know about
-        // road pricing.
-    }
+  @Test(expected = RuntimeException.class)
+  public void testControlerWithoutRoadPricingDoesntWork() {
+    Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
+    Controler controler = new Controler(config);
+    controler.run();
+    // config has a roadpricing config group, but controler does not know about
+    // road pricing.
+  }
 
-    @Test
-    public void testControlerWithRoadPricingWorks() {
-        Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
-        Controler controler = new Controler(config);
-//        controler.setModules(new RoadPricingModuleDefaults());
-        controler.addOverridingModule(new RoadPricingModule());
-        controler.run();
-    }
+  @Test
+  public void testControlerWithRoadPricingWorks() {
+    Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
+    Controler controler = new Controler(config);
+    //        controler.setModules(new RoadPricingModuleDefaults());
+    controler.addOverridingModule(new RoadPricingModule());
+    controler.run();
+  }
 
-    @Test
-    public void testControlerWithRoadPricingByScenarioWorks() {
-        Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
-        Scenario scenario = ScenarioUtils.loadScenario(config);
-        Controler controler = new Controler(scenario);
-	    controler.addOverridingModule( new RoadPricingModule() );
-//        controler.setModules(new RoadPricingModuleDefaults());
-        controler.run();
-    }
+  @Test
+  public void testControlerWithRoadPricingByScenarioWorks() {
+    Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
+    Scenario scenario = ScenarioUtils.loadScenario(config);
+    Controler controler = new Controler(scenario);
+    controler.addOverridingModule(new RoadPricingModule());
+    //        controler.setModules(new RoadPricingModuleDefaults());
+    controler.run();
+  }
 
+  @Test
+  public void testControlerWithRoadPricingByScenarioWorksTwice() {
+    Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
+    config.controller().setOutputDirectory(utils.getOutputDirectory() + "/1");
+    Scenario scenario = ScenarioUtils.loadScenario(config);
 
-    @Test
-    public void testControlerWithRoadPricingByScenarioWorksTwice() {
-        Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
-        config.controller().setOutputDirectory(utils.getOutputDirectory()+"/1");
-        Scenario scenario = ScenarioUtils.loadScenario(config);
-
-        Controler controler1 = new Controler(scenario);
-//        controler1.setModules(new RoadPricingModuleDefaults());
-	    controler1.addOverridingModule( new RoadPricingModule() );
-        controler1.run();
-        config.controller().setOutputDirectory(utils.getOutputDirectory()+"/2");
-        Controler controler2 = new Controler(scenario);
-	    controler2.addOverridingModule( new RoadPricingModule() );
-//        controler2.setModules(new RoadPricingModuleDefaults());
-        controler2.run();
-    }
-
+    Controler controler1 = new Controler(scenario);
+    //        controler1.setModules(new RoadPricingModuleDefaults());
+    controler1.addOverridingModule(new RoadPricingModule());
+    controler1.run();
+    config.controller().setOutputDirectory(utils.getOutputDirectory() + "/2");
+    Controler controler2 = new Controler(scenario);
+    controler2.addOverridingModule(new RoadPricingModule());
+    //        controler2.setModules(new RoadPricingModuleDefaults());
+    controler2.run();
+  }
 }

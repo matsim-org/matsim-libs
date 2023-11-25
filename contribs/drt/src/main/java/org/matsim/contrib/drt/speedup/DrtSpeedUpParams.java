@@ -20,72 +20,63 @@
 
 package org.matsim.contrib.drt.speedup;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ReflectiveConfigGroup;
-
 import com.google.common.base.Preconditions;
-
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author ikaddoura
  */
 public class DrtSpeedUpParams extends ReflectiveConfigGroup {
-	public static final String SET_NAME = "drtSpeedUp";
+  public static final String SET_NAME = "drtSpeedUp";
 
-	public DrtSpeedUpParams() {
-		super(SET_NAME);
-	}
+  public DrtSpeedUpParams() {
+    super(SET_NAME);
+  }
 
-	@Parameter
-	@DecimalMin("0.0")
-	@DecimalMax("1.0")
-	public double fractionOfIterationsSwitchOff = 0.99;
+  @Parameter
+  @DecimalMin("0.0")
+  @DecimalMax("1.0")
+  public double fractionOfIterationsSwitchOff = 0.99;
 
-	@Parameter
-	@DecimalMin("0.0")
-	@DecimalMax("1.0")
-	public double fractionOfIterationsSwitchOn = 0.;
+  @Parameter
+  @DecimalMin("0.0")
+  @DecimalMax("1.0")
+  public double fractionOfIterationsSwitchOn = 0.;
 
-	@Parameter
-	@Positive
-	public int intervalDetailedIteration = 10;
+  @Parameter @Positive public int intervalDetailedIteration = 10;
 
-	@Parameter
-	@PositiveOrZero
-	public double initialWaitingTime = 900.;
+  @Parameter @PositiveOrZero public double initialWaitingTime = 900.;
 
-	@Parameter
-	@Positive
-	public double initialInVehicleBeelineSpeed = 4.16667;
+  @Parameter @Positive public double initialInVehicleBeelineSpeed = 4.16667;
 
-	@Parameter
-	@PositiveOrZero
-	public int firstSimulatedDrtIterationToReplaceInitialDrtPerformanceParams = 0;
+  @Parameter @PositiveOrZero
+  public int firstSimulatedDrtIterationToReplaceInitialDrtPerformanceParams = 0;
 
-	public enum WaitingTimeUpdateDuringSpeedUp {
-		Disabled, LinearRegression
-	}
+  public enum WaitingTimeUpdateDuringSpeedUp {
+    Disabled,
+    LinearRegression
+  }
 
-	@Parameter
-	@NotNull
-	public WaitingTimeUpdateDuringSpeedUp waitingTimeUpdateDuringSpeedUp = WaitingTimeUpdateDuringSpeedUp.Disabled;
+  @Parameter @NotNull
+  public WaitingTimeUpdateDuringSpeedUp waitingTimeUpdateDuringSpeedUp =
+      WaitingTimeUpdateDuringSpeedUp.Disabled;
 
-	@Parameter
-	@Positive
-	public int movingAverageSize = 1;
+  @Parameter @Positive public int movingAverageSize = 1;
 
-	@Override
-	protected void checkConsistency(Config config) {
-		super.checkConsistency(config);
+  @Override
+  protected void checkConsistency(Config config) {
+    super.checkConsistency(config);
 
-		Preconditions.checkArgument(fractionOfIterationsSwitchOn <= fractionOfIterationsSwitchOff,
-				"fractionOfIterationsSwitchOn (%s) must be less than or equal to fractionOfIterationsSwitchOff (%s)",
-				fractionOfIterationsSwitchOn, fractionOfIterationsSwitchOff);
-	}
+    Preconditions.checkArgument(
+        fractionOfIterationsSwitchOn <= fractionOfIterationsSwitchOff,
+        "fractionOfIterationsSwitchOn (%s) must be less than or equal to fractionOfIterationsSwitchOff (%s)",
+        fractionOfIterationsSwitchOn,
+        fractionOfIterationsSwitchOff);
+  }
 }
-

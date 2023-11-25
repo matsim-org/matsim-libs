@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.minibus.hook;
 
+import java.util.Set;
+import java.util.TreeSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -26,37 +28,34 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Person;
 
-import java.util.Set;
-import java.util.TreeSet;
-
 /**
  * Collects all {@link PersonStuckEvent} and returns a set of the ids of the agents
  *
  * @author aneumann
  */
-class AgentsStuckHandlerImpl implements PersonStuckEventHandler{
+class AgentsStuckHandlerImpl implements PersonStuckEventHandler {
 
-	private static final Logger log = LogManager.getLogger(AgentsStuckHandlerImpl.class);
+  private static final Logger log = LogManager.getLogger(AgentsStuckHandlerImpl.class);
 
-	private Set<Id<Person>> agentsStuck;
+  private Set<Id<Person>> agentsStuck;
 
-	public AgentsStuckHandlerImpl() {
-		this.agentsStuck = new TreeSet<>();
-		log.info("initialized");
-	}
+  public AgentsStuckHandlerImpl() {
+    this.agentsStuck = new TreeSet<>();
+    log.info("initialized");
+  }
 
-	@Override
-	public void reset(int iteration) {
-		this.agentsStuck = new TreeSet<>();
-	}
+  @Override
+  public void reset(int iteration) {
+    this.agentsStuck = new TreeSet<>();
+  }
 
-	@Override
-	public void handleEvent(PersonStuckEvent event) {
-		this.agentsStuck.add(event.getPersonId());		
-	}
+  @Override
+  public void handleEvent(PersonStuckEvent event) {
+    this.agentsStuck.add(event.getPersonId());
+  }
 
-	public Set<Id<Person>> getAgentsStuck() {
-		log.info("Returning " + this.agentsStuck.size() + " agent ids");
-		return this.agentsStuck;
-	}
+  public Set<Id<Person>> getAgentsStuck() {
+    log.info("Returning " + this.agentsStuck.size() + " agent ids");
+    return this.agentsStuck;
+  }
 }

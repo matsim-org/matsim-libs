@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,68 +33,67 @@ import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author ikaddoura, benjamin
- *
  */
 public class MoneyEventHandler implements PersonMoneyEventHandler {
-	private static final Logger log = LogManager.getLogger(MoneyEventHandler.class);
+  private static final Logger log = LogManager.getLogger(MoneyEventHandler.class);
 
-	private SortedMap<Id<Person>, Double> id2amount = new TreeMap<Id<Person>, Double>();
-	private Set<Id<Person>> stuckingAgents = null;
+  private SortedMap<Id<Person>, Double> id2amount = new TreeMap<Id<Person>, Double>();
+  private Set<Id<Person>> stuckingAgents = null;
 
-	public MoneyEventHandler(Set<Id<Person>> stuckingAgents) {
-		this.stuckingAgents = stuckingAgents;
-		log.info("Providing the person Ids of stucking agents. These agents will be excluded from this analysis.");
-	}
-	
-	public MoneyEventHandler() {
-		log.info("Considering all persons even though they may stuck in the base case or policy case.");
-	}
-	
-	private boolean isStucking(Id<Person> personId) {
-		if (this.stuckingAgents == null) {
-			return false;
-		} else if (this.stuckingAgents.contains(personId)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	@Override
-	public void handleEvent(PersonMoneyEvent event) {
+  public MoneyEventHandler(Set<Id<Person>> stuckingAgents) {
+    this.stuckingAgents = stuckingAgents;
+    log.info(
+        "Providing the person Ids of stucking agents. These agents will be excluded from this analysis.");
+  }
 
-		if (isStucking(event.getPersonId())) {
-			// ignore this person
-			
-		} else {
-			Id<Person> id = event.getPersonId();
-			Double amountByEvent = event.getAmount();
-			Double amountSoFar = id2amount.get(id);
-			
-			if(amountSoFar == null){
-				id2amount.put(id, amountByEvent);
-			}
-			else{
-				amountSoFar += amountByEvent;
-				id2amount.put(id, amountSoFar);
-			}
-		}	
-	}
+  public MoneyEventHandler() {
+    log.info("Considering all persons even though they may stuck in the base case or policy case.");
+  }
 
-	public Map<Id<Person>, Double> getPersonId2amount() {
-		return Collections.unmodifiableMap(id2amount);
-	}
-	
-	public Double getSumOfMonetaryAmounts(){
-		double sum = 0.;
-		for (Double amount : this.id2amount.values()){
-			sum = sum + amount;
-		}
-		return sum;
-	}
-	
-	@Override
-	public void reset(int iteration) {
-		this.id2amount.clear();
-	}
+  private boolean isStucking(Id<Person> personId) {
+    if (this.stuckingAgents == null) {
+      return false;
+    } else if (this.stuckingAgents.contains(personId)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public void handleEvent(PersonMoneyEvent event) {
+
+    if (isStucking(event.getPersonId())) {
+      // ignore this person
+
+    } else {
+      Id<Person> id = event.getPersonId();
+      Double amountByEvent = event.getAmount();
+      Double amountSoFar = id2amount.get(id);
+
+      if (amountSoFar == null) {
+        id2amount.put(id, amountByEvent);
+      } else {
+        amountSoFar += amountByEvent;
+        id2amount.put(id, amountSoFar);
+      }
+    }
+  }
+
+  public Map<Id<Person>, Double> getPersonId2amount() {
+    return Collections.unmodifiableMap(id2amount);
+  }
+
+  public Double getSumOfMonetaryAmounts() {
+    double sum = 0.;
+    for (Double amount : this.id2amount.values()) {
+      sum = sum + amount;
+    }
+    return sum;
+  }
+
+  @Override
+  public void reset(int iteration) {
+    this.id2amount.clear();
+  }
 }

@@ -20,27 +20,25 @@
 package org.matsim.core.mobsim.qsim.pt;
 
 import java.util.Collection;
-
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 class UmlaufCache {
-	public static final String ELEMENT_NAME = "umlaufCache";
+  public static final String ELEMENT_NAME = "umlaufCache";
 
-	private final TransitSchedule transitSchedule;
-	private final Collection<Umlauf> umlaeufe;
+  private final TransitSchedule transitSchedule;
+  private final Collection<Umlauf> umlaeufe;
 
-	public UmlaufCache(TransitSchedule transitSchedule, Collection<Umlauf> umlaeufe) {
-		this.transitSchedule = transitSchedule;
-		this.umlaeufe = umlaeufe;
-	}
+  public UmlaufCache(TransitSchedule transitSchedule, Collection<Umlauf> umlaeufe) {
+    this.transitSchedule = transitSchedule;
+    this.umlaeufe = umlaeufe;
+  }
 
-	public TransitSchedule getTransitSchedule() {
-		return this.transitSchedule;
-	}
+  public TransitSchedule getTransitSchedule() {
+    return this.transitSchedule;
+  }
 
-	public Collection<Umlauf> getUmlaeufe() {
-		return this.umlaeufe;
-	}
-
+  public Collection<Umlauf> getUmlaeufe() {
+    return this.umlaeufe;
+  }
 }

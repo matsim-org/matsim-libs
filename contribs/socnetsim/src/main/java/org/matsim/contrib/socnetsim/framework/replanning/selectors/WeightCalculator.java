@@ -20,22 +20,17 @@
 package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
 import org.matsim.api.core.v01.population.Plan;
-
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
 
 public interface WeightCalculator {
-	/**
-	 * Defines the weight of a plan, used for selection.
-	 * The method is called once for each plan: it is not required that
-	 * the method returns the same result if called twice with the same
-	 * arguments (ie it can return a random number).
-	 *
-	 * @param indivPlan the plan to weight
-	 * @param replanningGroup the group for which plans are being selected.
-	 * Selectors using "niching" measures may need this. No modifications should
-	 * be done to the group.
-	 */
-	public double getWeight(
-			final Plan indivPlan,
-			final ReplanningGroup replanningGroup);
+  /**
+   * Defines the weight of a plan, used for selection. The method is called once for each plan: it
+   * is not required that the method returns the same result if called twice with the same arguments
+   * (ie it can return a random number).
+   *
+   * @param indivPlan the plan to weight
+   * @param replanningGroup the group for which plans are being selected. Selectors using "niching"
+   *     measures may need this. No modifications should be done to the group.
+   */
+  public double getWeight(final Plan indivPlan, final ReplanningGroup replanningGroup);
 }

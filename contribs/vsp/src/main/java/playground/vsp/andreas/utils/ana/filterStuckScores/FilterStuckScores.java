@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -38,154 +37,156 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.vsp.andreas.utils.stats.RecursiveStatsContainer;
 
+public class FilterStuckScores implements PersonStuckEventHandler {
 
-public class FilterStuckScores implements PersonStuckEventHandler{
+  private static final Logger log = LogManager.getLogger(FilterStuckScores.class);
 
-	private final static Logger log = LogManager.getLogger(FilterStuckScores.class);
+  private Set<String> stuckAgentIds = new TreeSet<String>();
+  private Set<String> tempIds;
 
-	private Set<String> stuckAgentIds = new TreeSet<String>();
-	private Set<String> tempIds;
+  /**
+   * @param args
+   */
+  public static void main(String[] args) {
+    String networkFile = args[0];
+    String eventsFilenamesList = args[1];
+    String plansFilenamesList = args[2];
+    String outputFolder = args[3];
 
+    FilterStuckScores.filterStuckScores(
+        networkFile, eventsFilenamesList, plansFilenamesList, outputFolder);
+  }
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		String networkFile = args[0];
-		String eventsFilenamesList = args[1];
-		String plansFilenamesList = args[2];
-		String outputFolder = args[3];
+  private static void filterStuckScores(
+      String networkFile,
+      String eventsFilenamesList,
+      String plansFilenamesList,
+      String outputFolder) {
+    FilterStuckScores fsc = new FilterStuckScores();
+    fsc.parseEventsForStuckAgentIds(eventsFilenamesList, outputFolder + "/");
+    fsc.parsePopulationsForStuckAgentsScore(networkFile, plansFilenamesList, outputFolder + "/");
+  }
 
-		FilterStuckScores.filterStuckScores(networkFile, eventsFilenamesList, plansFilenamesList, outputFolder);
+  private void parsePopulationsForStuckAgentsScore(
+      String networkFile, String plansFilenamesList, String outputFolder) {
+    List<String> plansFiles = ReadFilenames.readFilenames(plansFilenamesList);
 
-	}
+    BufferedWriter results = IOUtils.getBufferedWriter(outputFolder + "_scores_total.txt");
 
-	private static void filterStuckScores(String networkFile, String eventsFilenamesList, String plansFilenamesList, String outputFolder) {
-		FilterStuckScores fsc = new FilterStuckScores();
-		fsc.parseEventsForStuckAgentIds(eventsFilenamesList, outputFolder + "/");
-		fsc.parsePopulationsForStuckAgentsScore(networkFile, plansFilenamesList, outputFolder + "/");
-	}
+    try {
+      results.write(
+          "# N stuck; avg. stuck; SD stuck; N not stuck; avg. not stuck; SD not stuck; filename");
 
+      for (String planFile : plansFiles) {
+        String filenameOnly = planFile.substring(planFile.lastIndexOf("/") + 1);
 
-	private void parsePopulationsForStuckAgentsScore(String networkFile, String plansFilenamesList, String outputFolder) {
-		List<String> plansFiles = ReadFilenames.readFilenames(plansFilenamesList);
+        BufferedWriter writerStuck =
+            IOUtils.getBufferedWriter(outputFolder + filenameOnly + "_scores_stuck.txt");
+        BufferedWriter writerNotStuck =
+            IOUtils.getBufferedWriter(outputFolder + filenameOnly + "_scores_notStuck.txt");
 
-		BufferedWriter results = IOUtils.getBufferedWriter(outputFolder + "_scores_total.txt");
+        // header
+        writerStuck.write("# Agent Id; Score - Stucks read from " + planFile);
+        writerNotStuck.write("# Agent Id; Score - NotStuck read from " + planFile);
 
-		try {
-			results.write("# N stuck; avg. stuck; SD stuck; N not stuck; avg. not stuck; SD not stuck; filename");
+        RecursiveStatsContainer statsStuck = new RecursiveStatsContainer();
+        RecursiveStatsContainer statsNotStuck = new RecursiveStatsContainer();
 
-			for (String planFile : plansFiles) {
-				String filenameOnly = planFile.substring(planFile.lastIndexOf("/") + 1);
+        Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
+        new PopulationReader(sc).readFile(planFile);
 
-				BufferedWriter writerStuck = IOUtils.getBufferedWriter(outputFolder + filenameOnly + "_scores_stuck.txt");
-				BufferedWriter writerNotStuck = IOUtils.getBufferedWriter(outputFolder + filenameOnly + "_scores_notStuck.txt");
+        for (Person person : sc.getPopulation().getPersons().values()) {
+          double score = person.getSelectedPlan().getScore().doubleValue();
+          if (this.stuckAgentIds.contains(person.getId().toString())) {
+            // person is stuck in at least one run
+            statsStuck.handleNewEntry(score);
+            writerStuck.newLine();
+            writerStuck.write(person.getId() + "; " + score);
+          } else {
+            // person never stucks
+            statsNotStuck.handleNewEntry(score);
+            writerNotStuck.newLine();
+            writerNotStuck.write(person.getId() + "; " + score);
+          }
+        }
 
-				//header
-				writerStuck.write("# Agent Id; Score - Stucks read from " + planFile);
-				writerNotStuck.write("# Agent Id; Score - NotStuck read from " + planFile);
+        writerStuck.flush();
+        writerNotStuck.flush();
 
-				RecursiveStatsContainer statsStuck = new RecursiveStatsContainer();
-				RecursiveStatsContainer statsNotStuck = new RecursiveStatsContainer();
+        writerStuck.close();
+        writerNotStuck.close();
 
-				Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-				new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
-				new PopulationReader(sc).readFile(planFile);
+        // write results to file
+        results.newLine();
+        results.write("" + statsStuck.getNumberOfEntries());
+        results.write("; " + statsStuck.getMean());
+        results.write("; " + statsStuck.getStdDev());
+        results.write("; " + statsNotStuck.getNumberOfEntries());
+        results.write("; " + statsNotStuck.getMean());
+        results.write("; " + statsNotStuck.getStdDev());
+        results.write("; " + filenameOnly);
+      }
 
-				for (Person person : sc.getPopulation().getPersons().values()) {
-					double score = person.getSelectedPlan().getScore().doubleValue();
-					if (this.stuckAgentIds.contains(person.getId().toString())) {
-						// person is stuck in at least one run
-						statsStuck.handleNewEntry(score);
-						writerStuck.newLine();
-						writerStuck.write(person.getId() + "; " + score);
-					} else {
-						// person never stucks
-						statsNotStuck.handleNewEntry(score);
-						writerNotStuck.newLine();
-						writerNotStuck.write(person.getId() + "; " + score);
-					}
-				}
+      results.flush();
+      results.close();
 
-				writerStuck.flush();
-				writerNotStuck.flush();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 
-				writerStuck.close();
-				writerNotStuck.close();
-				
-				// write results to file
-				results.newLine();
-				results.write("" + statsStuck.getNumberOfEntries());
-				results.write("; " + statsStuck.getMean());
-				results.write("; " + statsStuck.getStdDev());
-				results.write("; " + statsNotStuck.getNumberOfEntries());
-				results.write("; " + statsNotStuck.getMean());
-				results.write("; " + statsNotStuck.getStdDev());
-				results.write("; " + filenameOnly);
-			}
-			
-			results.flush();
-			results.close();
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-	}
+  private void parseEventsForStuckAgentIds(String eventsFilenamesList, String outputFolder) {
+    List<String> eventsFiles = ReadFilenames.readFilenames(eventsFilenamesList);
 
-	private void parseEventsForStuckAgentIds(String eventsFilenamesList, String outputFolder) {
-		List<String> eventsFiles = ReadFilenames.readFilenames(eventsFilenamesList);
-		
-		for (String eventFile : eventsFiles) {
-			EventsManager manager = EventsUtils.createEventsManager();
-			manager.addHandler(this);
-			this.reset(0);
-			new MatsimEventsReader(manager).readFile(eventFile);
-			
-			String filenameOnly = eventFile.substring(eventFile.lastIndexOf("/") + 1);
-			String filename = outputFolder + filenameOnly + "_stuckIds.txt";
-			
-			this.writeIdsToFile(filename, eventFile);
+    for (String eventFile : eventsFiles) {
+      EventsManager manager = EventsUtils.createEventsManager();
+      manager.addHandler(this);
+      this.reset(0);
+      new MatsimEventsReader(manager).readFile(eventFile);
 
-			// store them away
-			this.stuckAgentIds.addAll(this.tempIds);
-		}
+      String filenameOnly = eventFile.substring(eventFile.lastIndexOf("/") + 1);
+      String filename = outputFolder + filenameOnly + "_stuckIds.txt";
 
-		String filename = outputFolder + "_stuckIds_total.txt";
-		this.tempIds = this.stuckAgentIds;
-		this.writeIdsToFile(filename, "total");
-	}
+      this.writeIdsToFile(filename, eventFile);
 
-	@Override
-	public void reset(int iteration) {
-		this.tempIds = new TreeSet<String>();
-	}
+      // store them away
+      this.stuckAgentIds.addAll(this.tempIds);
+    }
 
-	@Override
-	public void handleEvent(PersonStuckEvent event) {
-		this.tempIds.add(event.getPersonId().toString());
-	}
-	
-	private void writeIdsToFile(String filename, String eventFile){
-		BufferedWriter writer = IOUtils.getBufferedWriter(filename);
-		
-		try {
-			//header
-			writer.write("# Read " + this.tempIds.size() + " Ids from " + eventFile);
+    String filename = outputFolder + "_stuckIds_total.txt";
+    this.tempIds = this.stuckAgentIds;
+    this.writeIdsToFile(filename, "total");
+  }
 
-			//content
-			for(String id: this.tempIds){
-				writer.newLine();
-				writer.write(id);
-			}
-			writer.flush();
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+  @Override
+  public void reset(int iteration) {
+    this.tempIds = new TreeSet<String>();
+  }
 
+  @Override
+  public void handleEvent(PersonStuckEvent event) {
+    this.tempIds.add(event.getPersonId().toString());
+  }
+
+  private void writeIdsToFile(String filename, String eventFile) {
+    BufferedWriter writer = IOUtils.getBufferedWriter(filename);
+
+    try {
+      // header
+      writer.write("# Read " + this.tempIds.size() + " Ids from " + eventFile);
+
+      // content
+      for (String id : this.tempIds) {
+        writer.newLine();
+        writer.write(id);
+      }
+      writer.flush();
+      writer.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 }

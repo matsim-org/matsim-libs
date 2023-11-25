@@ -32,40 +32,54 @@ import org.matsim.core.router.util.TravelTime;
  * @author Michal Maciejewski (michalm)
  */
 public class FreeSpeedTravelTimeMatrix implements TravelTimeMatrix {
-	public static FreeSpeedTravelTimeMatrix createFreeSpeedMatrix(Network dvrpNetwork, DvrpTravelTimeMatrixParams params, int numberOfThreads,
-		double qSimTimeStepSize) {
-		return new FreeSpeedTravelTimeMatrix(dvrpNetwork, params, numberOfThreads, new QSimFreeSpeedTravelTime(qSimTimeStepSize));
-	}
+  public static FreeSpeedTravelTimeMatrix createFreeSpeedMatrix(
+      Network dvrpNetwork,
+      DvrpTravelTimeMatrixParams params,
+      int numberOfThreads,
+      double qSimTimeStepSize) {
+    return new FreeSpeedTravelTimeMatrix(
+        dvrpNetwork, params, numberOfThreads, new QSimFreeSpeedTravelTime(qSimTimeStepSize));
+  }
 
-	private final SquareGridSystem gridSystem;
-	private final Matrix freeSpeedTravelTimeMatrix;
-	private final SparseMatrix freeSpeedTravelTimeSparseMatrix;
+  private final SquareGridSystem gridSystem;
+  private final Matrix freeSpeedTravelTimeMatrix;
+  private final SparseMatrix freeSpeedTravelTimeSparseMatrix;
 
-	public FreeSpeedTravelTimeMatrix(Network dvrpNetwork, DvrpTravelTimeMatrixParams params, int numberOfThreads, TravelTime travelTime) {
-		gridSystem = new SquareGridSystem(dvrpNetwork.getNodes().values(), params.cellSize);
-		var centralNodes = ZonalSystems.computeMostCentralNodes(dvrpNetwork.getNodes().values(), gridSystem);
-		var travelDisutility = new TimeAsTravelDisutility(travelTime);
-		var routingParams = new TravelTimeMatrices.RoutingParams(dvrpNetwork, travelTime, travelDisutility, numberOfThreads);
-		freeSpeedTravelTimeMatrix = TravelTimeMatrices.calculateTravelTimeMatrix(routingParams, centralNodes, 0);
-		freeSpeedTravelTimeSparseMatrix = TravelTimeMatrices.calculateTravelTimeSparseMatrix(routingParams, params.maxNeighborDistance,
-			params.maxNeighborTravelTime, 0).orElse(null);
-	}
+  public FreeSpeedTravelTimeMatrix(
+      Network dvrpNetwork,
+      DvrpTravelTimeMatrixParams params,
+      int numberOfThreads,
+      TravelTime travelTime) {
+    gridSystem = new SquareGridSystem(dvrpNetwork.getNodes().values(), params.cellSize);
+    var centralNodes =
+        ZonalSystems.computeMostCentralNodes(dvrpNetwork.getNodes().values(), gridSystem);
+    var travelDisutility = new TimeAsTravelDisutility(travelTime);
+    var routingParams =
+        new TravelTimeMatrices.RoutingParams(
+            dvrpNetwork, travelTime, travelDisutility, numberOfThreads);
+    freeSpeedTravelTimeMatrix =
+        TravelTimeMatrices.calculateTravelTimeMatrix(routingParams, centralNodes, 0);
+    freeSpeedTravelTimeSparseMatrix =
+        TravelTimeMatrices.calculateTravelTimeSparseMatrix(
+                routingParams, params.maxNeighborDistance, params.maxNeighborTravelTime, 0)
+            .orElse(null);
+  }
 
-	@Override
-	public int getTravelTime(Node fromNode, Node toNode, double departureTime) {
-		if (fromNode == toNode) {
-			return 0;
-		}
-		if (freeSpeedTravelTimeSparseMatrix != null) {
-			int time = freeSpeedTravelTimeSparseMatrix.get(fromNode, toNode);
-			if (time >= 0) {// value is present
-				return time;
-			}
-		}
-		return freeSpeedTravelTimeMatrix.get(gridSystem.getZone(fromNode), gridSystem.getZone(toNode));
-	}
+  @Override
+  public int getTravelTime(Node fromNode, Node toNode, double departureTime) {
+    if (fromNode == toNode) {
+      return 0;
+    }
+    if (freeSpeedTravelTimeSparseMatrix != null) {
+      int time = freeSpeedTravelTimeSparseMatrix.get(fromNode, toNode);
+      if (time >= 0) { // value is present
+        return time;
+      }
+    }
+    return freeSpeedTravelTimeMatrix.get(gridSystem.getZone(fromNode), gridSystem.getZone(toNode));
+  }
 
-	public int getZonalTravelTime(Node fromNode, Node toNode, double departureTime) {
-		return freeSpeedTravelTimeMatrix.get(gridSystem.getZone(fromNode), gridSystem.getZone(toNode));
-	}
+  public int getZonalTravelTime(Node fromNode, Node toNode, double departureTime) {
+    return freeSpeedTravelTimeMatrix.get(gridSystem.getZone(fromNode), gridSystem.getZone(toNode));
+  }
 }

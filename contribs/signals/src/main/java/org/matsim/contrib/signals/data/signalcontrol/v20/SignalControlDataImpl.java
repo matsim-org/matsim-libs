@@ -21,39 +21,37 @@ package org.matsim.contrib.signals.data.signalcontrol.v20;
 
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.model.SignalSystem;
 
-
 /**
  * @author dgrether
- *
  */
 public final class SignalControlDataImpl implements SignalControlData {
 
-	private SignalControlDataFactory factory = new SignalControlDataFactoryImpl();
-	private Map<Id<SignalSystem>, SignalSystemControllerData> signalControllerDataBySystemId = new TreeMap<>();
+  private SignalControlDataFactory factory = new SignalControlDataFactoryImpl();
+  private Map<Id<SignalSystem>, SignalSystemControllerData> signalControllerDataBySystemId =
+      new TreeMap<>();
 
-	@Override
-	public void addSignalSystemControllerData(SignalSystemControllerData controllerData) {
-		this.signalControllerDataBySystemId.put(controllerData.getSignalSystemId(), controllerData);
-	}
+  @Override
+  public void addSignalSystemControllerData(SignalSystemControllerData controllerData) {
+    this.signalControllerDataBySystemId.put(controllerData.getSignalSystemId(), controllerData);
+  }
 
-	@Override
-	public SignalControlDataFactory getFactory() {
-		return this.factory ;
-	}
+  @Override
+  public SignalControlDataFactory getFactory() {
+    return this.factory;
+  }
 
-	@Override
-	public Map<Id<SignalSystem>, SignalSystemControllerData> getSignalSystemControllerDataBySystemId() {
-		return this.signalControllerDataBySystemId;
-	}
+  @Override
+  public Map<Id<SignalSystem>, SignalSystemControllerData>
+      getSignalSystemControllerDataBySystemId() {
+    return this.signalControllerDataBySystemId;
+  }
 
-	@Override
-	public void setFactory(SignalControlDataFactory factory) {
-		this.factory = factory;		
-	}
-
+  @Override
+  public void setFactory(SignalControlDataFactory factory) {
+    this.factory = factory;
+  }
 }

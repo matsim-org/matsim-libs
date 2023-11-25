@@ -28,6 +28,5 @@ import org.matsim.withinday.events.ReplanningEvent;
  */
 public interface ReplanningEventHandler extends EventHandler {
 
-	public void handleEvent(ReplanningEvent event);
-
+  public void handleEvent(ReplanningEvent event);
 }

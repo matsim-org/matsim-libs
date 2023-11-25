@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * EventsUtils.java
@@ -28,51 +27,52 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 public final class EventsUtils {
 
-	/**
-	 * Create a events manager instance that guarantees causality of processed events across all handlers.
-	 */
-    public static EventsManager createEventsManager() {
-		return new EventsManagerImpl();
+  /**
+   * Create a events manager instance that guarantees causality of processed events across all
+   * handlers.
+   */
+  public static EventsManager createEventsManager() {
+    return new EventsManagerImpl();
+  }
+
+  /**
+   * Creates a parallel events manager, with no guarantees for the order of processed events between
+   * multiple handlers.
+   */
+  public static EventsManager createParallelEventsManager() {
+    return new ParallelEventsManager(false);
+  }
+
+  public static EventsManager createEventsManager(Config config) {
+    final EventsManager events =
+        Injector.createInjector(config, new EventsManagerModule()).getInstance(EventsManager.class);
+    //		events.initProcessing();
+    return events;
+  }
+
+  /**
+   * The SimStepParallelEventsManagerImpl can handle events from multiple threads. The
+   * (Parallel)EventsMangerImpl cannot, therefore it has to be wrapped into a
+   * SynchronizedEventsManagerImpl.
+   */
+  public static EventsManager getParallelFeedableInstance(EventsManager events) {
+    if (events instanceof SimStepParallelEventsManagerImpl) {
+      return events;
+    } else if (events instanceof ParallelEventsManager) {
+      return events;
+    } else if (events instanceof SynchronizedEventsManagerImpl) {
+      return events;
+    } else {
+      return new SynchronizedEventsManagerImpl(events);
     }
+  }
 
-	/**
-	 * Creates a parallel events manager, with no guarantees for the order of processed events between multiple handlers.
-	 */
-	public static EventsManager createParallelEventsManager() {
-		return new ParallelEventsManager(false);
-	}
+  public static void readEvents(EventsManager events, String filename) {
+    new MatsimEventsReader(events).readFile(filename);
+  }
 
-	public static EventsManager createEventsManager(Config config) {
-		final EventsManager events = Injector.createInjector( config, new EventsManagerModule() ).getInstance( EventsManager.class );
-//		events.initProcessing();
-		return events;
-	}
-
-	/**
-	 * The SimStepParallelEventsManagerImpl can handle events from multiple threads.
-	 * The (Parallel)EventsMangerImpl cannot, therefore it has to be wrapped into a
-	 * SynchronizedEventsManagerImpl.
-	 */
-	public static EventsManager getParallelFeedableInstance(EventsManager events) {
-		if (events instanceof SimStepParallelEventsManagerImpl) {
-			return events;
-		} else if (events instanceof ParallelEventsManager) {
-			return events;
-		}
-		else if (events instanceof SynchronizedEventsManagerImpl) {
-			return events;
-		} else {
-			return new SynchronizedEventsManagerImpl(events);
-		}
-	}
-
-	public static void readEvents( EventsManager events, String filename ) {
-		new MatsimEventsReader(events).readFile(filename) ;
-	}
-
-	public static EventsFileComparator.Result compareEventsFiles( String filename1, String filename2 ) {
-		EventsFileComparator.Result result = EventsFileComparator.compare( filename1, filename2 );
-		return result ;
-	}
-
+  public static EventsFileComparator.Result compareEventsFiles(String filename1, String filename2) {
+    EventsFileComparator.Result result = EventsFileComparator.compare(filename1, filename2);
+    return result;
+  }
 }

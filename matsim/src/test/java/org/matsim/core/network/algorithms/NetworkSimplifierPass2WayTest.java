@@ -21,6 +21,7 @@ package org.matsim.core.network.algorithms;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,111 +36,198 @@ import org.matsim.core.utils.geometry.CoordUtils;
 /**
  * Created by amit on 31.10.17.
  *
- * See https://matsim.atlassian.net/browse/MATSIM-755.
+ * <p>See https://matsim.atlassian.net/browse/MATSIM-755.
  */
-
 public class NetworkSimplifierPass2WayTest {
 
-    @Test
-    public void testSimplifying(){
-        List<Network> networks = buildNetworks();
+  @Test
+  public void testSimplifying() {
+    List<Network> networks = buildNetworks();
 
-        int counter = 0;
-        for (Network network : networks) {
-            System.out.println("Running simplifier on network "+counter);
-            assertEquals("Wrong number of links", 10, network.getLinks().size());
+    int counter = 0;
+    for (Network network : networks) {
+      System.out.println("Running simplifier on network " + counter);
+      assertEquals("Wrong number of links", 10, network.getLinks().size());
 
-            NetworkSimplifier networkSimplifier = new NetworkSimplifier();
-            networkSimplifier.setMergeLinkStats(false);
-            networkSimplifier.run(network);
+      NetworkSimplifier networkSimplifier = new NetworkSimplifier();
+      networkSimplifier.setMergeLinkStats(false);
+      networkSimplifier.run(network);
 
-            network.getLinks().values().stream().forEach(l ->System.out.println(l.toString()));
+      network.getLinks().values().stream().forEach(l -> System.out.println(l.toString()));
 
-            assertEquals("Wrong number of links", 4, network.getLinks().size());
-            assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("AB-BC-CD-DE-EF")));
+      assertEquals("Wrong number of links", 4, network.getLinks().size());
+      assertNotNull(
+          "Expected link not found.", network.getLinks().get(Id.createLinkId("AB-BC-CD-DE-EF")));
 
-            assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("CB")));
-            assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("BA")));
+      assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("CB")));
+      assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("BA")));
 
-            assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("FE-ED-DC")));
-
-        }
-
-//        if (randomSequenceOfLinksToNetwork) {
-//            assertEquals("Wrong number of links", 4, network.getLinks().size());
-//            assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("AB-BC-CD-DE-EF")));
-//
-//            assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("CB")));
-//            assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("BA")));
-//
-//            //following is fixed.
-//            assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("FE-ED")));
-//            assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("AB-BC-CD-DC"))); // this is undesired link.
-//        } else {
-//            assertEquals("Wrong number of links", 4, network.getLinks().size());
-//            assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("AB-BC-CD-DE-EF")));
-//
-//            assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("CB")));
-//            assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("BA")));
-//
-//            assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("FE-ED-DC")));
-//        }
+      assertNotNull(
+          "Expected link not found.", network.getLinks().get(Id.createLinkId("FE-ED-DC")));
     }
 
-    /**
-     * Builds a test network like the following diagram.
-     *
-     * A<===>B<===>C<===>D<===>E<===>F
-     *
-     * Each link has one lane, 10 m, A to F is one direction and F to A is other.
-     * The capacity of each link is same except CB.
-     *
-     * @return
-     */
-    private List<Network> buildNetworks(){
+    //        if (randomSequenceOfLinksToNetwork) {
+    //            assertEquals("Wrong number of links", 4, network.getLinks().size());
+    //            assertNotNull("Expected link not found.",
+    // network.getLinks().get(Id.createLinkId("AB-BC-CD-DE-EF")));
+    //
+    //            assertNotNull("Expected link not found.",
+    // network.getLinks().get(Id.createLinkId("CB")));
+    //            assertNotNull("Expected link not found.",
+    // network.getLinks().get(Id.createLinkId("BA")));
+    //
+    //            //following is fixed.
+    //            assertNotNull("Expected link not found.",
+    // network.getLinks().get(Id.createLinkId("FE-ED")));
+    //            assertNotNull("Expected link not found.",
+    // network.getLinks().get(Id.createLinkId("AB-BC-CD-DC"))); // this is undesired link.
+    //        } else {
+    //            assertEquals("Wrong number of links", 4, network.getLinks().size());
+    //            assertNotNull("Expected link not found.",
+    // network.getLinks().get(Id.createLinkId("AB-BC-CD-DE-EF")));
+    //
+    //            assertNotNull("Expected link not found.",
+    // network.getLinks().get(Id.createLinkId("CB")));
+    //            assertNotNull("Expected link not found.",
+    // network.getLinks().get(Id.createLinkId("BA")));
+    //
+    //            assertNotNull("Expected link not found.",
+    // network.getLinks().get(Id.createLinkId("FE-ED-DC")));
+    //        }
+  }
 
-        Node a = NetworkUtils.createNode(Id.createNodeId("a"),CoordUtils.createCoord(0.0,  0.0));
-        Node b = NetworkUtils.createNode(Id.createNodeId("b"), CoordUtils.createCoord(10.0,  0.0));
-        Node c = NetworkUtils.createNode(Id.createNodeId("c"), CoordUtils.createCoord(20.0,  0.0));
-        Node d = NetworkUtils.createNode(Id.createNodeId("d"), CoordUtils.createCoord(30.0,  0.0));
-        Node e = NetworkUtils.createNode(Id.createNodeId("e"), CoordUtils.createCoord(40.0,  0.0));
-        Node f = NetworkUtils.createNode(Id.createNodeId("f"), CoordUtils.createCoord(50.0,  0.0));
+  /**
+   * Builds a test network like the following diagram.
+   *
+   * <p>A<===>B<===>C<===>D<===>E<===>F
+   *
+   * <p>Each link has one lane, 10 m, A to F is one direction and F to A is other. The capacity of
+   * each link is same except CB.
+   *
+   * @return
+   */
+  private List<Network> buildNetworks() {
 
-        List<Network> networks = new ArrayList<>();
-        {
-            List<Node> nodes = Arrays.asList(a, b, c, d, e, f);
+    Node a = NetworkUtils.createNode(Id.createNodeId("a"), CoordUtils.createCoord(0.0, 0.0));
+    Node b = NetworkUtils.createNode(Id.createNodeId("b"), CoordUtils.createCoord(10.0, 0.0));
+    Node c = NetworkUtils.createNode(Id.createNodeId("c"), CoordUtils.createCoord(20.0, 0.0));
+    Node d = NetworkUtils.createNode(Id.createNodeId("d"), CoordUtils.createCoord(30.0, 0.0));
+    Node e = NetworkUtils.createNode(Id.createNodeId("e"), CoordUtils.createCoord(40.0, 0.0));
+    Node f = NetworkUtils.createNode(Id.createNodeId("f"), CoordUtils.createCoord(50.0, 0.0));
 
-            for (int i = 0; i< nodes.size(); i++){
-                System.out.println("Nodes ordering index "+ i);
-                networks.add(reshuffleNodesAndReturnNetwork(new ArrayList<>(nodes)));
-            }
-        }
+    List<Network> networks = new ArrayList<>();
+    {
+      List<Node> nodes = Arrays.asList(a, b, c, d, e, f);
 
-        for (Network network : networks) {
-            NetworkUtils.createAndAddLink(network, Id.createLinkId("AB"), network.getNodes().get(Id.createNodeId("a")), network.getNodes().get(Id.createNodeId("b")), 10.0, 60.0/3.6, 1000.0, 1);
-            NetworkUtils.createAndAddLink(network, Id.createLinkId("BC"), network.getNodes().get(Id.createNodeId("b")), network.getNodes().get(Id.createNodeId("c")), 10.0, 60.0/3.6, 1000.0, 1);
-            NetworkUtils.createAndAddLink(network, Id.createLinkId("CD"), network.getNodes().get(Id.createNodeId("c")), network.getNodes().get(Id.createNodeId("d")), 10.0, 60.0/3.6, 1000.0, 1);
-            NetworkUtils.createAndAddLink(network, Id.createLinkId("DE"), network.getNodes().get(Id.createNodeId("d")), network.getNodes().get(Id.createNodeId("e")), 10.0, 60.0/3.6, 1000.0, 1);
-            NetworkUtils.createAndAddLink(network, Id.createLinkId("EF"), network.getNodes().get(Id.createNodeId("e")), network.getNodes().get(Id.createNodeId("f")), 10.0, 60.0/3.6, 1000.0, 1);
-
-            NetworkUtils.createAndAddLink(network, Id.createLinkId("BA"), network.getNodes().get(Id.createNodeId("b")), network.getNodes().get(Id.createNodeId("a")), 10.0, 60.0/3.6, 1000.0, 1);
-            NetworkUtils.createAndAddLink(network, Id.createLinkId("CB"), network.getNodes().get(Id.createNodeId("c")), network.getNodes().get(Id.createNodeId("b")), 10.0, 60.0/3.6, 2000.0, 1);
-            NetworkUtils.createAndAddLink(network, Id.createLinkId("DC"), network.getNodes().get(Id.createNodeId("d")), network.getNodes().get(Id.createNodeId("c")), 10.0, 60.0/3.6, 1000.0, 1);
-            NetworkUtils.createAndAddLink(network, Id.createLinkId("ED"), network.getNodes().get(Id.createNodeId("e")), network.getNodes().get(Id.createNodeId("d")), 10.0, 60.0/3.6, 1000.0, 1);
-            NetworkUtils.createAndAddLink(network, Id.createLinkId("FE"), network.getNodes().get(Id.createNodeId("f")), network.getNodes().get(Id.createNodeId("e")), 10.0, 60.0/3.6, 1000.0, 1);
-        }
-        return networks;
+      for (int i = 0; i < nodes.size(); i++) {
+        System.out.println("Nodes ordering index " + i);
+        networks.add(reshuffleNodesAndReturnNetwork(new ArrayList<>(nodes)));
+      }
     }
 
-    private Network reshuffleNodesAndReturnNetwork(List<Node> nodes) {
-        Network network = NetworkUtils.createNetwork();
-        Collections.shuffle(nodes);
-        for (Node n : nodes) {
-            System.out.println("Adding node "+ n.getId());
-            network.addNode(NetworkUtils.createNode(n.getId(), n.getCoord()));
-        }
-        return network;
+    for (Network network : networks) {
+      NetworkUtils.createAndAddLink(
+          network,
+          Id.createLinkId("AB"),
+          network.getNodes().get(Id.createNodeId("a")),
+          network.getNodes().get(Id.createNodeId("b")),
+          10.0,
+          60.0 / 3.6,
+          1000.0,
+          1);
+      NetworkUtils.createAndAddLink(
+          network,
+          Id.createLinkId("BC"),
+          network.getNodes().get(Id.createNodeId("b")),
+          network.getNodes().get(Id.createNodeId("c")),
+          10.0,
+          60.0 / 3.6,
+          1000.0,
+          1);
+      NetworkUtils.createAndAddLink(
+          network,
+          Id.createLinkId("CD"),
+          network.getNodes().get(Id.createNodeId("c")),
+          network.getNodes().get(Id.createNodeId("d")),
+          10.0,
+          60.0 / 3.6,
+          1000.0,
+          1);
+      NetworkUtils.createAndAddLink(
+          network,
+          Id.createLinkId("DE"),
+          network.getNodes().get(Id.createNodeId("d")),
+          network.getNodes().get(Id.createNodeId("e")),
+          10.0,
+          60.0 / 3.6,
+          1000.0,
+          1);
+      NetworkUtils.createAndAddLink(
+          network,
+          Id.createLinkId("EF"),
+          network.getNodes().get(Id.createNodeId("e")),
+          network.getNodes().get(Id.createNodeId("f")),
+          10.0,
+          60.0 / 3.6,
+          1000.0,
+          1);
+
+      NetworkUtils.createAndAddLink(
+          network,
+          Id.createLinkId("BA"),
+          network.getNodes().get(Id.createNodeId("b")),
+          network.getNodes().get(Id.createNodeId("a")),
+          10.0,
+          60.0 / 3.6,
+          1000.0,
+          1);
+      NetworkUtils.createAndAddLink(
+          network,
+          Id.createLinkId("CB"),
+          network.getNodes().get(Id.createNodeId("c")),
+          network.getNodes().get(Id.createNodeId("b")),
+          10.0,
+          60.0 / 3.6,
+          2000.0,
+          1);
+      NetworkUtils.createAndAddLink(
+          network,
+          Id.createLinkId("DC"),
+          network.getNodes().get(Id.createNodeId("d")),
+          network.getNodes().get(Id.createNodeId("c")),
+          10.0,
+          60.0 / 3.6,
+          1000.0,
+          1);
+      NetworkUtils.createAndAddLink(
+          network,
+          Id.createLinkId("ED"),
+          network.getNodes().get(Id.createNodeId("e")),
+          network.getNodes().get(Id.createNodeId("d")),
+          10.0,
+          60.0 / 3.6,
+          1000.0,
+          1);
+      NetworkUtils.createAndAddLink(
+          network,
+          Id.createLinkId("FE"),
+          network.getNodes().get(Id.createNodeId("f")),
+          network.getNodes().get(Id.createNodeId("e")),
+          10.0,
+          60.0 / 3.6,
+          1000.0,
+          1);
     }
+    return networks;
+  }
 
-
+  private Network reshuffleNodesAndReturnNetwork(List<Node> nodes) {
+    Network network = NetworkUtils.createNetwork();
+    Collections.shuffle(nodes);
+    for (Node n : nodes) {
+      System.out.println("Adding node " + n.getId());
+      network.addNode(NetworkUtils.createNode(n.getId(), n.getCoord()));
+    }
+    return network;
+  }
 }

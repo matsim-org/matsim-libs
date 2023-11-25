@@ -13,5 +13,5 @@ package org.matsim.contrib.drt.extension.operations.shifts.dispatcher;
  */
 public interface ShiftStartLogic {
 
-	boolean shiftStarts(DrtShiftDispatcher.ShiftEntry shiftEntry);
+  boolean shiftStarts(DrtShiftDispatcher.ShiftEntry shiftEntry);
 }

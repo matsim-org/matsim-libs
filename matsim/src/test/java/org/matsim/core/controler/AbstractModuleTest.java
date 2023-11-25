@@ -3,6 +3,7 @@ package org.matsim.core.controler;
 import com.google.inject.*;
 import com.google.inject.Module;
 import com.google.inject.name.Named;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
@@ -17,85 +18,94 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.util.Map;
+public class AbstractModuleTest {
+  private static final Logger log = LogManager.getLogger(AbstractModuleTest.class);
 
-public class AbstractModuleTest{
-	private static final Logger log = LogManager.getLogger( AbstractModuleTest.class );
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+  @Test
+  public void test1() {
 
-	@Test
-	public void test1() {
+    Config config = ConfigUtils.createConfig();
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
 
-		Config config = ConfigUtils.createConfig() ;
-		config.controller().setOutputDirectory( utils.getOutputDirectory() );
+    Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+    Module module =
+        new AbstractModule() {
+          @Override
+          public void install() {
+            install(new ControlerDefaultsModule());
+            install(new ControlerDefaultCoreListenersModule());
+            install(new NewControlerModule());
+            install(new ScenarioByInstanceModule(scenario));
 
-		Module module = new AbstractModule(){
-			@Override public void install(){
-				install(  new ControlerDefaultsModule() );
-				install(  new ControlerDefaultCoreListenersModule() );
-				install(  new NewControlerModule() );
-				install(  new ScenarioByInstanceModule( scenario ) );
+            this.addTravelTimeBinding(TransportMode.ride)
+                .toProvider(
+                    new Provider<TravelTime>() {
+                      @Inject
+                      @Named(TransportMode.car)
+                      TravelTime carTTime;
 
-				this.addTravelTimeBinding( TransportMode.ride ).toProvider( new Provider<TravelTime>(){
-					@Inject @Named( TransportMode.car ) TravelTime carTTime ;
-					@Override public TravelTime get(){
-						return carTTime ;
-					}
-				} );
+                      @Override
+                      public TravelTime get() {
+                        return carTTime;
+                      }
+                    });
 
-				bind( Abc.class ) ;
-				bind( Def.class ) ;
+            bind(Abc.class);
+            bind(Def.class);
+          }
+        };
 
-			}
-		};
+    com.google.inject.Injector injector = Injector.createInjector(config, module);
 
-		com.google.inject.Injector injector = Injector.createInjector( config, module );
+    Abc abc = injector.getInstance(Abc.class);
+    abc.run();
 
-		Abc abc = injector.getInstance( Abc.class ) ;
-		abc.run() ;
+    Def def = injector.getInstance(Def.class);
+    def.run();
+  }
 
-		Def def = injector.getInstance( Def.class ) ;
-		def.run() ;
+  private static class Abc {
+    @Inject Map<String, TravelTime> map;
 
-	}
+    @Inject
+    @Named(TransportMode.car)
+    TravelTime carTTime;
 
-	private static class Abc {
-		@Inject Map<String,TravelTime> map ;
-		@Inject @Named(TransportMode.car ) TravelTime carTTime ;
-//		@Inject @Named(TransportMode.bike ) TravelTime bikeTTime ;
+    //		@Inject @Named(TransportMode.bike ) TravelTime bikeTTime ;
 
-		void run () {
-			for( Map.Entry<String, TravelTime> entry : map.entrySet() ){
-				log.info( "mode=" + entry.getKey() + "; ttime=" + entry.getValue() );
-			}
-			log.info( "" );
-			log.info( "carTTime=" + carTTime );
-			log.info( "" );
-//			log.info( "bikeTTime=" + bikeTTime );
-//			log.info( "" );
-		}
+    void run() {
+      for (Map.Entry<String, TravelTime> entry : map.entrySet()) {
+        log.info("mode=" + entry.getKey() + "; ttime=" + entry.getValue());
+      }
+      log.info("");
+      log.info("carTTime=" + carTTime);
+      log.info("");
+      //			log.info( "bikeTTime=" + bikeTTime );
+      //			log.info( "" );
+    }
+  }
 
-	}
+  private static class Def {
+    @Inject Map<String, TravelTime> map;
 
-	private static class Def {
-		@Inject Map<String,TravelTime> map ;
-		@Inject @Named(TransportMode.car ) TravelTime carTTime ;
-//		@Inject @Named(TransportMode.bike ) TravelTime bikeTTime ;
+    @Inject
+    @Named(TransportMode.car)
+    TravelTime carTTime;
 
-		void run () {
-			for( Map.Entry<String, TravelTime> entry : map.entrySet() ){
-				log.info( "mode=" + entry.getKey() + "; ttime=" + entry.getValue() );
-			}
-			log.info( "" );
-			log.info( "carTTime=" + carTTime );
-			log.info( "" );
-//			log.info( "bikeTTime=" + bikeTTime );
-//			log.info( "" );
-		}
+    //		@Inject @Named(TransportMode.bike ) TravelTime bikeTTime ;
 
-	}
-
+    void run() {
+      for (Map.Entry<String, TravelTime> entry : map.entrySet()) {
+        log.info("mode=" + entry.getKey() + "; ttime=" + entry.getValue());
+      }
+      log.info("");
+      log.info("carTTime=" + carTTime);
+      log.info("");
+      //			log.info( "bikeTTime=" + bikeTTime );
+      //			log.info( "" );
+    }
+  }
 }

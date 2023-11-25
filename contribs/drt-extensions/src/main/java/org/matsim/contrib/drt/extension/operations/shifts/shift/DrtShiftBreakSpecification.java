@@ -5,10 +5,9 @@ package org.matsim.contrib.drt.extension.operations.shifts.shift;
  */
 public interface DrtShiftBreakSpecification {
 
-	double getEarliestBreakStartTime();
+  double getEarliestBreakStartTime();
 
-	double getLatestBreakEndTime();
+  double getLatestBreakEndTime();
 
-	double getDuration();
-
+  double getDuration();
 }

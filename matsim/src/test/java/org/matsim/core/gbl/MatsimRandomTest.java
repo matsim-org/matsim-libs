@@ -24,7 +24,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Random;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
@@ -34,99 +33,103 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class MatsimRandomTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  /** Test that MatsimRandom returns different values. */
+  @Test
+  public void testRandomness() {
+    final double value1 = MatsimRandom.getRandom().nextDouble();
+    final double value2 = MatsimRandom.getRandom().nextDouble();
+    final double value3 = MatsimRandom.getRandom().nextDouble();
+    assertTrue(Math.abs(value1 - value2) > MatsimTestUtils.EPSILON);
+    assertTrue(Math.abs(value1 - value3) > MatsimTestUtils.EPSILON);
+    assertTrue(Math.abs(value2 - value3) > MatsimTestUtils.EPSILON);
+  }
 
-	/**
-	 * Test that MatsimRandom returns different values.
-	 */
-	@Test public void testRandomness() {
-		final double value1 = MatsimRandom.getRandom().nextDouble();
-		final double value2 = MatsimRandom.getRandom().nextDouble();
-		final double value3 = MatsimRandom.getRandom().nextDouble();
-		assertTrue(Math.abs(value1 - value2) > MatsimTestUtils.EPSILON);
-		assertTrue(Math.abs(value1 - value3) > MatsimTestUtils.EPSILON);
-		assertTrue(Math.abs(value2 - value3) > MatsimTestUtils.EPSILON);
-	}
+  /** Tests that resetting the RandomObject creates the same random numbers again. */
+  @Test
+  public void testReset() {
+    MatsimRandom.reset();
+    int value1 = MatsimRandom.getRandom().nextInt();
+    MatsimRandom.reset();
+    int value2 = MatsimRandom.getRandom().nextInt();
+    assertEquals(value1, value2);
+  }
 
-	/**
-	 * Tests that resetting the RandomObject creates the same random numbers again.
-	 */
-	@Test public void testReset() {
-		MatsimRandom.reset();
-		int value1 = MatsimRandom.getRandom().nextInt();
-		MatsimRandom.reset();
-		int value2 = MatsimRandom.getRandom().nextInt();
-		assertEquals(value1, value2);
-	}
+  /**
+   * Tests that the same number of random numbers is generated if a custom seed is used, and that
+   * these numbers are different with different seeds.
+   */
+  @Test
+  public void testSeedReset() {
+    final long seed1 = 123L;
+    final long seed2 = 234L;
 
-	/**
-	 * Tests that the same number of random numbers is generated if a custom seed
-	 * is used, and that these numbers are different with different seeds.
-	 */
-	@Test public void testSeedReset() {
-		final long seed1 = 123L;
-		final long seed2 = 234L;
+    MatsimRandom.reset(seed1);
+    double value1 = MatsimRandom.getRandom().nextDouble();
+    MatsimRandom.reset(seed1);
+    double value2 = MatsimRandom.getRandom().nextDouble();
+    assertEquals(value1, value2, MatsimTestUtils.EPSILON);
 
-		MatsimRandom.reset(seed1);
-		double value1 = MatsimRandom.getRandom().nextDouble();
-		MatsimRandom.reset(seed1);
-		double value2 = MatsimRandom.getRandom().nextDouble();
-		assertEquals(value1, value2, MatsimTestUtils.EPSILON);
+    MatsimRandom.reset(seed2);
+    double value3 = MatsimRandom.getRandom().nextInt();
+    assertTrue(Math.abs(value1 - value3) > MatsimTestUtils.EPSILON);
+  }
 
-		MatsimRandom.reset(seed2);
-		double value3 = MatsimRandom.getRandom().nextInt();
-		assertTrue(Math.abs(value1 - value3) > MatsimTestUtils.EPSILON);
-	}
+  /**
+   * Tests that local instances can be recreated (=are deterministic) if the same random seed is
+   * used to generate them.
+   */
+  @Test
+  public void testLocalInstances_deterministic() {
+    MatsimRandom.reset();
+    Random local1a = MatsimRandom.getLocalInstance();
+    Random local1b = MatsimRandom.getLocalInstance();
 
-	/**
-	 * Tests that local instances can be recreated (=are deterministic) if the
-	 * same random seed is used to generate them.
-	 */
-	@Test public void testLocalInstances_deterministic() {
-		MatsimRandom.reset();
-		Random local1a = MatsimRandom.getLocalInstance();
-		Random local1b = MatsimRandom.getLocalInstance();
+    MatsimRandom.reset();
+    Random local2a = MatsimRandom.getLocalInstance();
+    Random local2b = MatsimRandom.getLocalInstance();
 
-		MatsimRandom.reset();
-		Random local2a = MatsimRandom.getLocalInstance();
-		Random local2b = MatsimRandom.getLocalInstance();
+    assertEqualRandomNumberGenerators(local1a, local2a);
+    assertEqualRandomNumberGenerators(local1b, local2b);
+  }
 
-		assertEqualRandomNumberGenerators(local1a, local2a);
-		assertEqualRandomNumberGenerators(local1b, local2b);
-	}
+  /**
+   * Tests that multiple local instance return different random numbers, and that they are more or
+   * less evenly distributed.
+   */
+  @Test
+  public void testLocalInstances_distribution() {
+    MatsimRandom.reset(123L);
+    Random local1a = MatsimRandom.getLocalInstance();
+    double value1 = local1a.nextDouble();
 
-	/**
-	 * Tests that multiple local instance return different random numbers,
-	 * and that they are more or less evenly distributed.
-	 */
-	@Test public void testLocalInstances_distribution() {
-		MatsimRandom.reset(123L);
-		Random local1a = MatsimRandom.getLocalInstance();
-		double value1 = local1a.nextDouble();
+    MatsimRandom.reset(234L);
+    Random local2a = MatsimRandom.getLocalInstance();
+    double value2a = local2a.nextDouble();
 
-		MatsimRandom.reset(234L);
-		Random local2a = MatsimRandom.getLocalInstance();
-		double value2a = local2a.nextDouble();
+    Random local2b = MatsimRandom.getLocalInstance();
+    double value2b = local2b.nextDouble();
 
-		Random local2b = MatsimRandom.getLocalInstance();
-		double value2b = local2b.nextDouble();
+    assertTrue(Math.abs(value1 - value2a) > MatsimTestUtils.EPSILON);
+    assertTrue(Math.abs(value2a - value2b) > MatsimTestUtils.EPSILON);
+    assertTrue(Math.abs(value1 - value2b) > MatsimTestUtils.EPSILON);
+  }
 
-		assertTrue(Math.abs(value1 - value2a) > MatsimTestUtils.EPSILON);
-		assertTrue(Math.abs(value2a - value2b) > MatsimTestUtils.EPSILON);
-		assertTrue(Math.abs(value1 - value2b) > MatsimTestUtils.EPSILON);
-	}
-
-	/** Test that two (Pseudo)Random Number Generators are equil by
-	 * drawing a series of random numbers and comparing those.
-	 *
-	 * @param rng1 first random number generator
-	 * @param rng2 second random number generator
-	 */
-	private void assertEqualRandomNumberGenerators(final Random rng1, final Random rng2) {
-		for (int i = 0; i < 10; i++) {
-			assertEquals("different element at position " + i, rng1.nextDouble(), rng2.nextDouble(), MatsimTestUtils.EPSILON);
-		}
-	}
+  /**
+   * Test that two (Pseudo)Random Number Generators are equil by drawing a series of random numbers
+   * and comparing those.
+   *
+   * @param rng1 first random number generator
+   * @param rng2 second random number generator
+   */
+  private void assertEqualRandomNumberGenerators(final Random rng1, final Random rng2) {
+    for (int i = 0; i < 10; i++) {
+      assertEquals(
+          "different element at position " + i,
+          rng1.nextDouble(),
+          rng2.nextDouble(),
+          MatsimTestUtils.EPSILON);
+    }
+  }
 }

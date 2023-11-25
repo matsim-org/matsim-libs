@@ -25,38 +25,38 @@ import org.matsim.run.gui.Gui;
  */
 public class AccessibilityGUI {
 
-	public static void main(String[] args) {
-		Gui.show("MATSim Accessibility GUI", RunAccessibilityExample.class);
-	}
+  public static void main(String[] args) {
+    Gui.show("MATSim Accessibility GUI", RunAccessibilityExample.class);
+  }
 
-	/* To start this class upon double-clicking the jar-file, add the following lines to the pom.xml
-	 * and configure the mainClass correctly:
-	 * 
-	 * 
- 		<build>
-			<plugins>
-		  	<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-jar-plugin</artifactId>
-					<configuration>
-						<archive>
-							<manifest>
-								<mainClass>contrib.accessibility.run.AccessibilityGUI</mainClass>
-							</manifest>
-						</archive>
-					</configuration>
-				</plugin>
-			</plugins>
-		</build>
-	 * 
-	 * and then, to create the clickable jar-file:
-	 * 
-	 * - make sure the dependencies (including MATSim-core) is maven-installed, 
-	 *   e.g. do "mvn install -DskipTests=true" for all required dependencies
-	 * - change to the directory of this project, e.g. cd /path/to/playground/accessibility/
-	 * - mvn clean
-	 * - mvn -Prelease
-	 * 
-	 * This will result in a zip file in the target-directory which includes the clickable jar-file.
-	 */
+  /* To start this class upon double-clicking the jar-file, add the following lines to the pom.xml
+  * and configure the mainClass correctly:
+  *
+  *
+  	<build>
+  	<plugins>
+    	<plugin>
+  			<groupId>org.apache.maven.plugins</groupId>
+  			<artifactId>maven-jar-plugin</artifactId>
+  			<configuration>
+  				<archive>
+  					<manifest>
+  						<mainClass>contrib.accessibility.run.AccessibilityGUI</mainClass>
+  					</manifest>
+  				</archive>
+  			</configuration>
+  		</plugin>
+  	</plugins>
+  </build>
+  *
+  * and then, to create the clickable jar-file:
+  *
+  * - make sure the dependencies (including MATSim-core) is maven-installed,
+  *   e.g. do "mvn install -DskipTests=true" for all required dependencies
+  * - change to the directory of this project, e.g. cd /path/to/playground/accessibility/
+  * - mvn clean
+  * - mvn -Prelease
+  *
+  * This will result in a zip file in the target-directory which includes the clickable jar-file.
+  */
 }

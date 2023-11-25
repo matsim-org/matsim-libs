@@ -25,10 +25,11 @@ import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * A simple builder class to create SAX-{@link Attributes} for manually testing
- * SAX Parsers, like all parsers inheriting from {@link MatsimXmlParser}.
+ * A simple builder class to create SAX-{@link Attributes} for manually testing SAX Parsers, like
+ * all parsers inheriting from {@link MatsimXmlParser}.
  *
  * <h3>Advised Usage:</h3>
+ *
  * <pre>
  * MyParser parser = new MyParser();
  * Attributes atts = new AttributesBuilder().add("key1", "value1").add("k2", "v2").get();
@@ -40,19 +41,19 @@ import org.xml.sax.helpers.AttributesImpl;
  * @author mrieser
  */
 public class AttributesBuilder {
-	private final static Attributes emptyAtts = new AttributesImpl();
-	private final AttributesImpl atts = new AttributesImpl();
+  private static final Attributes emptyAtts = new AttributesImpl();
+  private final AttributesImpl atts = new AttributesImpl();
 
-	public AttributesBuilder add(final String key, final String value) {
-		this.atts.addAttribute(null, null, key, null, value);
-		return this;
-	}
+  public AttributesBuilder add(final String key, final String value) {
+    this.atts.addAttribute(null, null, key, null, value);
+    return this;
+  }
 
-	public Attributes get() {
-		return this.atts;
-	}
+  public Attributes get() {
+    return this.atts;
+  }
 
-	public static Attributes getEmpty() {
-		return emptyAtts;
-	}
+  public static Attributes getEmpty() {
+    return emptyAtts;
+  }
 }

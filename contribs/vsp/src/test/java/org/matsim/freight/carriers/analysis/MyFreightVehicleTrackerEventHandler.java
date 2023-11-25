@@ -28,61 +28,65 @@ import org.matsim.freight.carriers.Carriers;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
-  class MyFreightVehicleTrackerEventHandler implements ActivityStartEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
-	 private final Vehicles vehicles;
-	 private final Network network;
-	 private final Carriers carriers;
+class MyFreightVehicleTrackerEventHandler
+    implements ActivityStartEventHandler,
+        LinkEnterEventHandler,
+        LinkLeaveEventHandler,
+        PersonEntersVehicleEventHandler,
+        PersonLeavesVehicleEventHandler {
+  private final Vehicles vehicles;
+  private final Network network;
+  private final Carriers carriers;
 
+  private FreightAnalysisVehicleTracking vehicleTracking = new FreightAnalysisVehicleTracking();
 
+  MyFreightVehicleTrackerEventHandler(Vehicles vehicles, Network network, Carriers carriers) {
+    this.network = network;
+    this.carriers = carriers;
+    this.vehicles = vehicles;
+    this.init();
+  }
 
-	 private FreightAnalysisVehicleTracking vehicleTracking = new FreightAnalysisVehicleTracking();
+  private void init() {
+    for (Vehicle vehicle : vehicles.getVehicles().values()) {
+      String vehicleIdString = vehicle.getId().toString();
+      if (vehicle.getId().toString().contains("freight")) {
+        vehicleTracking.addTracker(vehicle);
+      }
+    }
+  }
 
-	 MyFreightVehicleTrackerEventHandler(Vehicles vehicles, Network network, Carriers carriers) {
-		 this.network = network;
-		 this.carriers = carriers;
-		 this.vehicles = vehicles;
-		 this.init();
-	 }
+  @Override
+  public void handleEvent(ActivityStartEvent activityStartEvent) {
+    if (activityStartEvent.getActType().equals("end")) {
+      vehicleTracking.endVehicleUsage(activityStartEvent.getPersonId());
+    }
+  }
 
-	 private void init() {
-		 for (Vehicle vehicle : vehicles.getVehicles().values()) {
-			 String vehicleIdString = vehicle.getId().toString();
-			 if (vehicle.getId().toString().contains("freight")) {
-				 vehicleTracking.addTracker(vehicle);
-			 }
-		 }
-	 }
+  // link events are used to calculate vehicle travel time and distance
+  @Override
+  public void handleEvent(LinkEnterEvent linkEnterEvent) {
+    vehicleTracking.trackLinkEnterEvent(linkEnterEvent);
+  }
 
-	 @Override
-	 public void handleEvent(ActivityStartEvent activityStartEvent) {
-		 if (activityStartEvent.getActType().equals("end")) {
-			 vehicleTracking.endVehicleUsage(activityStartEvent.getPersonId());
-		 }
-	 }
+  @Override
+  public void handleEvent(LinkLeaveEvent linkLeaveEvent) {
+    vehicleTracking.trackLinkLeaveEvent(
+        linkLeaveEvent, network.getLinks().get(linkLeaveEvent.getLinkId()).getLength());
+  }
 
-	 // link events are used to calculate vehicle travel time and distance
-	 @Override
-	 public void handleEvent(LinkEnterEvent linkEnterEvent) {
-	 	vehicleTracking.trackLinkEnterEvent(linkEnterEvent);
-	 }
+  // Person<>Vehicle relations and vehicle usage times are tracked
+  @Override
+  public void handleEvent(PersonEntersVehicleEvent event) {
+    vehicleTracking.addDriver2Vehicle(event.getPersonId(), event.getVehicleId(), event.getTime());
+  }
 
-	 @Override
-	 public void handleEvent(LinkLeaveEvent linkLeaveEvent) {
-		 vehicleTracking.trackLinkLeaveEvent(linkLeaveEvent, network.getLinks().get(linkLeaveEvent.getLinkId()).getLength());
-	 }
+  @Override
+  public void handleEvent(PersonLeavesVehicleEvent event) {
+    vehicleTracking.registerVehicleLeave(event);
+  }
 
-	 // Person<>Vehicle relations and vehicle usage times are tracked
-	 @Override
-	 public void handleEvent(PersonEntersVehicleEvent event) {
-		 vehicleTracking.addDriver2Vehicle(event.getPersonId(), event.getVehicleId(), event.getTime());
-	 }
-
-	 @Override
-	 public void handleEvent(PersonLeavesVehicleEvent event) {
-	 	vehicleTracking.registerVehicleLeave(event);
-	 }
-
-	 public FreightAnalysisVehicleTracking getVehicleTracking() {
-	 	return vehicleTracking;
-	 }
- }
+  public FreightAnalysisVehicleTracking getVehicleTracking() {
+    return vehicleTracking;
+  }
+}

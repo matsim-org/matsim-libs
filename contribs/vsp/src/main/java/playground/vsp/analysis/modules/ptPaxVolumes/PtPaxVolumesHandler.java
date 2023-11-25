@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -40,183 +39,186 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 
-/** 
+/**
  * Counts the number of passenger of public transport vehicles per link and time slice
- * 
- * @author droeder
  *
+ * @author droeder
  */
-public class PtPaxVolumesHandler implements LinkEnterEventHandler, 
-									PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
-									TransitDriverStartsEventHandler{
-	
-	private static final Logger log = LogManager.getLogger(PtPaxVolumesHandler.class);
-	
-	private HashMap<Id, Counts> linkId2LineCounts;
+public class PtPaxVolumesHandler
+    implements LinkEnterEventHandler,
+        PersonEntersVehicleEventHandler,
+        PersonLeavesVehicleEventHandler,
+        TransitDriverStartsEventHandler {
 
-	private List<Id> drivers;
+  private static final Logger log = LogManager.getLogger(PtPaxVolumesHandler.class);
 
-	private Map<Id, CountVehicle> transitVehicles;
+  private HashMap<Id, Counts> linkId2LineCounts;
 
-	private Integer maxSlice = 24;;
+  private List<Id> drivers;
 
-	private Double interval;
+  private Map<Id, CountVehicle> transitVehicles;
 
-	public PtPaxVolumesHandler(Double interval) {
-		this.linkId2LineCounts = new HashMap<Id, Counts>();
-		this.drivers = new ArrayList<Id>();
-		this.transitVehicles = new HashMap<Id, PtPaxVolumesHandler.CountVehicle>();
-		this.interval = interval;
-	}
-	
+  private Integer maxSlice = 24;
+  ;
 
-	public double getPaxCountForLinkId(Id linkId){
-		// check if we have a count for the link
-		Counts<Link> counts = this.linkId2LineCounts.get(linkId);
-		if(counts == null) return 0;
-		int count = 0;
-		// sum up all count-values
-		for(Count<Link> c: counts.getCounts().values()){
-			for(Volume v: c.getVolumes().values()){
-				count += v.getValue();
-			}
-		}
-		return count;
-	}
-	
-	public double getPaxCountForLinkId(Id linkId, int interval){
-		// check if we have a count for the link
-		Counts<Link> counts = this.linkId2LineCounts.get(linkId);
-		if(counts == null) return 0;
-		int count = 0;
-		// sum up all count-values
-		for(Count c: counts.getCounts().values()){
-			if(c.getVolumes().containsKey(interval)){
-				count += c.getVolume(interval).getValue();
-			}
-		}
-		return count;
-	}
-	
-	public double getPaxCountForLinkId(Id linkId, Id lineId){
-		// check if we have a count for the link
-		Counts counts = this.linkId2LineCounts.get(linkId);
-		if(counts == null) return 0;
-		// check if ther is a count for the line
-		Count<Link> c = counts.getCount(lineId);
-		if(c == null) return 0;
-		// sum up all volumes
-		int count = 0;
-		for(Volume v: c.getVolumes().values()){
-			count += v.getValue();
-		}
-		return count;
-	}
-	
-	public double getPaxCountForLinkId(Id linkId, Id lineId, int interval){
-		// check if we have a count for the link
-		Counts counts = this.linkId2LineCounts.get(linkId);
-		if(counts == null) return 0;
-		// check if there is a count for the line
-		Count c = counts.getCount(lineId);
-		if(c == null) return 0;
-		// check if there is a volume
-		Volume v = c.getVolume(interval);
-		if(v == null) return 0;
-		return (int) v.getValue();
-	}
+  private Double interval;
 
-	@Override
-	public void reset(int iteration) {
-		//do nothing
-	}
-	
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		if(this.transitVehicles.keySet().contains(event.getVehicleId())){
-			//get the count Vehicle
-			CountVehicle v = this.transitVehicles.get(event.getVehicleId());
-			// check if we already have a count for this link
-			Counts counts = this.linkId2LineCounts.get(event.getLinkId());
-			Count c;
-			if(counts == null){
-				counts = new Counts();
-			}
-			c = counts.createAndAddCount(v.getLineId(), v.getLineId().toString());
-			if(c == null){
-				c = counts.getCount(v.getLineId());
-			}
-			this.increase(c, v, event.getTime());
-			this.linkId2LineCounts.put(event.getLinkId(), counts);
-		}
-	}
-	
-	private void increase(Count c, CountVehicle cv, Double time){
-		Integer slice = (int) (time / this.interval) + 1;
-		if(slice > this.maxSlice){
-			this.maxSlice = slice;
-		}
-		Volume v;
-		if(c.getVolumes().containsKey(slice)){
-			v = c.getVolume(slice);
-		}else{
-			v = c.createVolume(slice, 0);
-		}
-		v.setValue(v.getValue() + cv.getCnt());
-	}
+  public PtPaxVolumesHandler(Double interval) {
+    this.linkId2LineCounts = new HashMap<Id, Counts>();
+    this.drivers = new ArrayList<Id>();
+    this.transitVehicles = new HashMap<Id, PtPaxVolumesHandler.CountVehicle>();
+    this.interval = interval;
+  }
 
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		// add a passenger to the vehicle counts data, but ignore every non pt-vehicle vehicle and every driver
-		if(this.transitVehicles.keySet().contains(event.getVehicleId())){
-			if(!this.drivers.contains(event.getPersonId())){
-				this.transitVehicles.get(event.getVehicleId()).board();
-			}
-		}		
-	}
+  public double getPaxCountForLinkId(Id linkId) {
+    // check if we have a count for the link
+    Counts<Link> counts = this.linkId2LineCounts.get(linkId);
+    if (counts == null) return 0;
+    int count = 0;
+    // sum up all count-values
+    for (Count<Link> c : counts.getCounts().values()) {
+      for (Volume v : c.getVolumes().values()) {
+        count += v.getValue();
+      }
+    }
+    return count;
+  }
 
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		// subtract a passenger to the vehicle counts data, but ignore every non pt-vehicle vehicle and every driver
-		if(this.transitVehicles.keySet().contains(event.getVehicleId())){
-			if(!this.drivers.contains(event.getPersonId())){
-				this.transitVehicles.get(event.getVehicleId()).alight();
-			}
-		}		
-	}
-	
-	@Override
-	public void handleEvent(TransitDriverStartsEvent event) {
-		this.drivers.add(event.getDriverId());
-		this.transitVehicles.put(event.getVehicleId(), new CountVehicle(event.getTransitLineId()));
-	}
-	
-	public int getMaxInterval(){
-		return this.maxSlice;
-	}
-	
-	private class CountVehicle{
-		private int cnt = 0;
-		private Id lineId;
-		
-		public CountVehicle(Id lineId){
-			this.lineId = lineId;
-		}
-		
-		public Id getLineId(){
-			return this.lineId;
-		}
-		
-		public void board(){
-			this.cnt++;
-		}
-		
-		public void alight(){
-			this.cnt--;
-		}
-		
-		public int getCnt(){
-			return this.cnt;
-		}
-	}
+  public double getPaxCountForLinkId(Id linkId, int interval) {
+    // check if we have a count for the link
+    Counts<Link> counts = this.linkId2LineCounts.get(linkId);
+    if (counts == null) return 0;
+    int count = 0;
+    // sum up all count-values
+    for (Count c : counts.getCounts().values()) {
+      if (c.getVolumes().containsKey(interval)) {
+        count += c.getVolume(interval).getValue();
+      }
+    }
+    return count;
+  }
+
+  public double getPaxCountForLinkId(Id linkId, Id lineId) {
+    // check if we have a count for the link
+    Counts counts = this.linkId2LineCounts.get(linkId);
+    if (counts == null) return 0;
+    // check if ther is a count for the line
+    Count<Link> c = counts.getCount(lineId);
+    if (c == null) return 0;
+    // sum up all volumes
+    int count = 0;
+    for (Volume v : c.getVolumes().values()) {
+      count += v.getValue();
+    }
+    return count;
+  }
+
+  public double getPaxCountForLinkId(Id linkId, Id lineId, int interval) {
+    // check if we have a count for the link
+    Counts counts = this.linkId2LineCounts.get(linkId);
+    if (counts == null) return 0;
+    // check if there is a count for the line
+    Count c = counts.getCount(lineId);
+    if (c == null) return 0;
+    // check if there is a volume
+    Volume v = c.getVolume(interval);
+    if (v == null) return 0;
+    return (int) v.getValue();
+  }
+
+  @Override
+  public void reset(int iteration) {
+    // do nothing
+  }
+
+  @Override
+  public void handleEvent(LinkEnterEvent event) {
+    if (this.transitVehicles.keySet().contains(event.getVehicleId())) {
+      // get the count Vehicle
+      CountVehicle v = this.transitVehicles.get(event.getVehicleId());
+      // check if we already have a count for this link
+      Counts counts = this.linkId2LineCounts.get(event.getLinkId());
+      Count c;
+      if (counts == null) {
+        counts = new Counts();
+      }
+      c = counts.createAndAddCount(v.getLineId(), v.getLineId().toString());
+      if (c == null) {
+        c = counts.getCount(v.getLineId());
+      }
+      this.increase(c, v, event.getTime());
+      this.linkId2LineCounts.put(event.getLinkId(), counts);
+    }
+  }
+
+  private void increase(Count c, CountVehicle cv, Double time) {
+    Integer slice = (int) (time / this.interval) + 1;
+    if (slice > this.maxSlice) {
+      this.maxSlice = slice;
+    }
+    Volume v;
+    if (c.getVolumes().containsKey(slice)) {
+      v = c.getVolume(slice);
+    } else {
+      v = c.createVolume(slice, 0);
+    }
+    v.setValue(v.getValue() + cv.getCnt());
+  }
+
+  @Override
+  public void handleEvent(PersonEntersVehicleEvent event) {
+    // add a passenger to the vehicle counts data, but ignore every non pt-vehicle vehicle and every
+    // driver
+    if (this.transitVehicles.keySet().contains(event.getVehicleId())) {
+      if (!this.drivers.contains(event.getPersonId())) {
+        this.transitVehicles.get(event.getVehicleId()).board();
+      }
+    }
+  }
+
+  @Override
+  public void handleEvent(PersonLeavesVehicleEvent event) {
+    // subtract a passenger to the vehicle counts data, but ignore every non pt-vehicle vehicle and
+    // every driver
+    if (this.transitVehicles.keySet().contains(event.getVehicleId())) {
+      if (!this.drivers.contains(event.getPersonId())) {
+        this.transitVehicles.get(event.getVehicleId()).alight();
+      }
+    }
+  }
+
+  @Override
+  public void handleEvent(TransitDriverStartsEvent event) {
+    this.drivers.add(event.getDriverId());
+    this.transitVehicles.put(event.getVehicleId(), new CountVehicle(event.getTransitLineId()));
+  }
+
+  public int getMaxInterval() {
+    return this.maxSlice;
+  }
+
+  private class CountVehicle {
+    private int cnt = 0;
+    private Id lineId;
+
+    public CountVehicle(Id lineId) {
+      this.lineId = lineId;
+    }
+
+    public Id getLineId() {
+      return this.lineId;
+    }
+
+    public void board() {
+      this.cnt++;
+    }
+
+    public void alight() {
+      this.cnt--;
+    }
+
+    public int getCnt() {
+      return this.cnt;
+    }
+  }
 }

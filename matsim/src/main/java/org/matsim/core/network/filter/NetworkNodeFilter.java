@@ -22,13 +22,11 @@ package org.matsim.core.network.filter;
 import org.matsim.api.core.v01.network.Node;
 
 /**
- * Implement this interface to filter the nodes of a network
- * using the NetworkFilterManager.
- * 
+ * Implement this interface to filter the nodes of a network using the NetworkFilterManager.
+ *
  * @author dgrether
  */
 public interface NetworkNodeFilter {
 
-	public boolean judgeNode(Node n);
-
+  public boolean judgeNode(Node n);
 }

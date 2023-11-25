@@ -23,10 +23,5 @@ package org.matsim.core.mobsim.framework;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Person;
 
-/**
- * (e.g. as passenger in private car.)
- *
- */
-public interface PassengerAgent extends NetworkAgent, VehicleUsingAgent, Identifiable<Person> {
-
-}
+/** (e.g. as passenger in private car.) */
+public interface PassengerAgent extends NetworkAgent, VehicleUsingAgent, Identifiable<Person> {}

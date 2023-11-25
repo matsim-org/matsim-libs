@@ -19,41 +19,43 @@
 
 package org.matsim.contrib.dvrp.schedule;
 
+import com.google.common.base.MoreObjects;
 import org.matsim.contrib.dvrp.path.DivertedVrpPath;
 import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-
-import com.google.common.base.MoreObjects;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class DefaultDriveTask extends AbstractTask implements DriveTask {
-	private VrpPath path;
+  private VrpPath path;
 
-	public DefaultDriveTask(TaskType taskType, VrpPathWithTravelData path) {
-		super(taskType, path.getDepartureTime(), path.getArrivalTime());
-		this.path = path;
-	}
+  public DefaultDriveTask(TaskType taskType, VrpPathWithTravelData path) {
+    super(taskType, path.getDepartureTime(), path.getArrivalTime());
+    this.path = path;
+  }
 
-	@Override
-	public final VrpPath getPath() {
-		return path;
-	}
+  @Override
+  public final VrpPath getPath() {
+    return path;
+  }
 
-	@Override
-	public final void pathDiverted(DivertedVrpPath divertedPath, double newEndTime) {
-		// can only divert an ongoing task
-		if (getStatus() != TaskStatus.STARTED) {
-			throw new IllegalStateException();
-		}
+  @Override
+  public final void pathDiverted(DivertedVrpPath divertedPath, double newEndTime) {
+    // can only divert an ongoing task
+    if (getStatus() != TaskStatus.STARTED) {
+      throw new IllegalStateException();
+    }
 
-		path = divertedPath;
-		setEndTime(newEndTime);
-	}
+    path = divertedPath;
+    setEndTime(newEndTime);
+  }
 
-	@Override
-	public String toString() {
-		return MoreObjects.toStringHelper(this).add("super", super.toString()).add("path", path).toString();
-	}
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("super", super.toString())
+        .add("path", path)
+        .toString();
+  }
 }

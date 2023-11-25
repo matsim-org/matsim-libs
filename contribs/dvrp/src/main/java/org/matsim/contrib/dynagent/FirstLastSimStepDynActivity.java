@@ -22,52 +22,50 @@ package org.matsim.contrib.dynagent;
 
 /**
  * To simplify typical use cases, where all simulation happens only in the first and/or last step.
- * Additionally, it ensures that both methods are executed, which may not happen for typical zero-duration DynActivity
+ * Additionally, it ensures that both methods are executed, which may not happen for typical
+ * zero-duration DynActivity
  *
  * @author Michal Maciejewski (michalm)
  */
 public abstract class FirstLastSimStepDynActivity implements DynActivity {
-	private final String activityType;
-	private boolean beforeFirstStep = true;
-	private boolean afterLastStep = false;
+  private final String activityType;
+  private boolean beforeFirstStep = true;
+  private boolean afterLastStep = false;
 
-	public FirstLastSimStepDynActivity(String activityType) {
-		this.activityType = activityType;
-	}
+  public FirstLastSimStepDynActivity(String activityType) {
+    this.activityType = activityType;
+  }
 
-	@Override
-	public final String getActivityType() {
-		return activityType;
-	}
+  @Override
+  public final String getActivityType() {
+    return activityType;
+  }
 
-	@Override
-	public final double getEndTime() {
-		return afterLastStep ? END_ACTIVITY_NOW : END_ACTIVITY_LATER;
-	}
+  @Override
+  public final double getEndTime() {
+    return afterLastStep ? END_ACTIVITY_NOW : END_ACTIVITY_LATER;
+  }
 
-	@Override
-	public final void doSimStep(double now) {
-		if (beforeFirstStep) {
-			beforeFirstStep(now);
-			beforeFirstStep = false;
-		}
+  @Override
+  public final void doSimStep(double now) {
+    if (beforeFirstStep) {
+      beforeFirstStep(now);
+      beforeFirstStep = false;
+    }
 
-		simStep(now);
+    simStep(now);
 
-		if (isLastStep(now)) {
-			afterLastStep(now);
-			afterLastStep = true;
-		}
-	}
+    if (isLastStep(now)) {
+      afterLastStep(now);
+      afterLastStep = true;
+    }
+  }
 
-	protected abstract boolean isLastStep(double now);
+  protected abstract boolean isLastStep(double now);
 
-	protected void beforeFirstStep(double now) {
-	}
+  protected void beforeFirstStep(double now) {}
 
-	protected void afterLastStep(double now) {
-	}
+  protected void afterLastStep(double now) {}
 
-	protected void simStep(double now) {
-	}
+  protected void simStep(double now) {}
 }

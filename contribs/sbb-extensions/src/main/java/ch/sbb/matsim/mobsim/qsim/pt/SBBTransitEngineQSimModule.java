@@ -27,22 +27,23 @@ import org.matsim.core.mobsim.qsim.pt.TransitEngineModule;
 /**
  * @author Sebastian Hörl / ETHZ
  */
-public class SBBTransitEngineQSimModule extends AbstractQSimModule implements QSimComponentsConfigurator {
+public class SBBTransitEngineQSimModule extends AbstractQSimModule
+    implements QSimComponentsConfigurator {
 
-    public static final String COMPONENT_NAME = "SBBTransit";
+  public static final String COMPONENT_NAME = "SBBTransit";
 
-    @Override
-    public void configure(QSimComponentsConfig components) {
-        if (components.hasNamedComponent(TransitEngineModule.TRANSIT_ENGINE_NAME)) {
-            components.removeNamedComponent(TransitEngineModule.TRANSIT_ENGINE_NAME);
-        }
-
-        components.addNamedComponent(COMPONENT_NAME);
+  @Override
+  public void configure(QSimComponentsConfig components) {
+    if (components.hasNamedComponent(TransitEngineModule.TRANSIT_ENGINE_NAME)) {
+      components.removeNamedComponent(TransitEngineModule.TRANSIT_ENGINE_NAME);
     }
 
-    @Override
-    protected void configureQSim() {
-        bind(SBBTransitQSimEngine.class).asEagerSingleton();
-        addQSimComponentBinding(COMPONENT_NAME).to(SBBTransitQSimEngine.class);
-    }
+    components.addNamedComponent(COMPONENT_NAME);
+  }
+
+  @Override
+  protected void configureQSim() {
+    bind(SBBTransitQSimEngine.class).asEagerSingleton();
+    addQSimComponentBinding(COMPONENT_NAME).to(SBBTransitQSimEngine.class);
+  }
 }

@@ -27,19 +27,21 @@ import org.matsim.core.controler.AbstractModule;
 
 public class TransitRouterModule extends AbstractModule {
 
-    @Override
-    public void install() {
-        if (getConfig().transit().isUseTransit()) {
-            switch (getConfig().transit().getRoutingAlgorithmType()) {
-                case DijkstraBased:
-                    throw new RuntimeException("'DijkstraBased' is no longer supported as a transit routing algorithm. Use 'SwissRailRaptor' instead.");
-                case SwissRailRaptor:
-                    install(new SwissRailRaptorModule());
-                    break;
-                default:
-                    throw new RuntimeException("Unsupported transit routing algorithm type: " + getConfig().transit().getRoutingAlgorithmType().name());
-            }
-        }
+  @Override
+  public void install() {
+    if (getConfig().transit().isUseTransit()) {
+      switch (getConfig().transit().getRoutingAlgorithmType()) {
+        case DijkstraBased:
+          throw new RuntimeException(
+              "'DijkstraBased' is no longer supported as a transit routing algorithm. Use 'SwissRailRaptor' instead.");
+        case SwissRailRaptor:
+          install(new SwissRailRaptorModule());
+          break;
+        default:
+          throw new RuntimeException(
+              "Unsupported transit routing algorithm type: "
+                  + getConfig().transit().getRoutingAlgorithmType().name());
+      }
     }
-
+  }
 }

@@ -24,5 +24,5 @@ import org.matsim.api.core.v01.population.Person;
  * @author thibautd
  */
 public interface ScoringParametersForPerson {
-	ScoringParameters getScoringParameters(Person person);
+  ScoringParameters getScoringParameters(Person person);
 }

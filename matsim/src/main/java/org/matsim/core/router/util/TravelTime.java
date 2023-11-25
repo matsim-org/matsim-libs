@@ -26,24 +26,24 @@ import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * A simple interface to retrieve the travel time on links.
- * <br>
- * For an example of how to replace this, see {@link tutorial.programming.example20customTravelTime.RunCustomTravelTimeExample }.
+ * A simple interface to retrieve the travel time on links. <br>
+ * For an example of how to replace this, see {@link
+ * tutorial.programming.example20customTravelTime.RunCustomTravelTimeExample }.
  *
  * @author mrieser
  */
 public interface TravelTime extends MatsimExtensionPoint {
 
-	/**
-	 * Returns the travel time for the specified link at the specified time.
-	 *
-	 * @param link The link for which the travel time is calculated.
-	 * @param time The departure time (in seconds since 00:00) at the beginning
-	 * 		of the link for which the travel time is calculated.
-	 * @param person TODO
-	 * @param vehicle TODO
-	 * @return The time (in seconds) needed to travel over the link
-	 * 		<code>link</code>, departing at time <code>time</code>.
-	 */
-	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle);
+  /**
+   * Returns the travel time for the specified link at the specified time.
+   *
+   * @param link The link for which the travel time is calculated.
+   * @param time The departure time (in seconds since 00:00) at the beginning of the link for which
+   *     the travel time is calculated.
+   * @param person TODO
+   * @param vehicle TODO
+   * @return The time (in seconds) needed to travel over the link <code>link</code>, departing at
+   *     time <code>time</code>.
+   */
+  public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle);
 }

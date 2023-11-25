@@ -36,68 +36,69 @@ import org.matsim.freight.carriers.ScheduledTour;
  * Strategy module to reRoute a carrierPlan.
  *
  * @author sschroeder
- *
  */
-public class CarrierReRouteVehicles implements GenericPlanStrategyModule<CarrierPlan>{
+public class CarrierReRouteVehicles implements GenericPlanStrategyModule<CarrierPlan> {
 
-	@SuppressWarnings("unused")
-	private static final Logger logger = LogManager.getLogger( CarrierReRouteVehicles.class );
+  @SuppressWarnings("unused")
+  private static final Logger logger = LogManager.getLogger(CarrierReRouteVehicles.class);
 
-	public static final class Factory {
-		private final LeastCostPathCalculator router;
-		private final Network network;
-		private final TravelTime travelTime;
-		private double probability = 1.;
-		public Factory( LeastCostPathCalculator router, Network network, TravelTime travelTime ){
-			this.router = router;
-			this.network = network;
-			this.travelTime = travelTime;
-		}
-		public CarrierReRouteVehicles build() {
-			return new CarrierReRouteVehicles( router, network, travelTime, probability );
-		}
-		public Factory setProbability( double probability ){
-			this.probability = probability;
-			return this;
-		}
-	}
+  public static final class Factory {
+    private final LeastCostPathCalculator router;
+    private final Network network;
+    private final TravelTime travelTime;
+    private double probability = 1.;
 
-	private final LeastCostPathCalculator router;
-	private final Network network;
-	private final TravelTime travelTime;
-	private final double probability ;
-	private CarrierReRouteVehicles( LeastCostPathCalculator router, Network network, TravelTime travelTime, double probability ) {
-		super();
-		this.router = router;
-		this.network = network;
-		this.travelTime = travelTime;
-		this.probability = probability;
-	}
+    public Factory(LeastCostPathCalculator router, Network network, TravelTime travelTime) {
+      this.router = router;
+      this.network = network;
+      this.travelTime = travelTime;
+    }
 
-	/**
-	 * Routes the carrierPlan in time and space.
-	 *
-	 * @param carrierPlan
-	 * @throws IllegalStateException if carrierPlan is null.
-	 * @see CarrierTimeAndSpaceTourRouter
-	 */
-	@Override
-	public void handlePlan(CarrierPlan carrierPlan) {
-		if(carrierPlan == null) throw new IllegalStateException("carrierPlan is null and cannot be handled.");
-		for(ScheduledTour tour : carrierPlan.getScheduledTours()){
-			if(MatsimRandom.getRandom().nextDouble() < probability){
-				new CarrierTimeAndSpaceTourRouter(router, network, travelTime).route(tour );
-			}
-		}
-	}
+    public CarrierReRouteVehicles build() {
+      return new CarrierReRouteVehicles(router, network, travelTime, probability);
+    }
 
-	@Override
-	public void prepareReplanning(ReplanningContext replanningContext) {
-	}
+    public Factory setProbability(double probability) {
+      this.probability = probability;
+      return this;
+    }
+  }
 
-	@Override
-	public void finishReplanning() {
-	}
+  private final LeastCostPathCalculator router;
+  private final Network network;
+  private final TravelTime travelTime;
+  private final double probability;
 
+  private CarrierReRouteVehicles(
+      LeastCostPathCalculator router, Network network, TravelTime travelTime, double probability) {
+    super();
+    this.router = router;
+    this.network = network;
+    this.travelTime = travelTime;
+    this.probability = probability;
+  }
 
+  /**
+   * Routes the carrierPlan in time and space.
+   *
+   * @param carrierPlan
+   * @throws IllegalStateException if carrierPlan is null.
+   * @see CarrierTimeAndSpaceTourRouter
+   */
+  @Override
+  public void handlePlan(CarrierPlan carrierPlan) {
+    if (carrierPlan == null)
+      throw new IllegalStateException("carrierPlan is null and cannot be handled.");
+    for (ScheduledTour tour : carrierPlan.getScheduledTours()) {
+      if (MatsimRandom.getRandom().nextDouble() < probability) {
+        new CarrierTimeAndSpaceTourRouter(router, network, travelTime).route(tour);
+      }
+    }
+  }
+
+  @Override
+  public void prepareReplanning(ReplanningContext replanningContext) {}
+
+  @Override
+  public void finishReplanning() {}
 }

@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.utils.io;
 
+import java.util.LinkedList;
+import java.util.List;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
@@ -26,35 +28,31 @@ import org.apache.logging.log4j.core.config.Property;
 import org.apache.logging.log4j.core.filter.ThresholdFilter;
 import org.matsim.core.controler.Controler;
 
-import java.util.LinkedList;
-import java.util.List;
-
-
 /**
  * Collects log4j LoggingEvent instances and stores them in a List.
- * @author dgrether
  *
+ * @author dgrether
  */
 public class CollectLogMessagesAppender extends AbstractAppender {
 
-	private List<LogEvent> logEvents = new LinkedList<>();
+  private List<LogEvent> logEvents = new LinkedList<>();
 
-	public CollectLogMessagesAppender() {
-		super("collector",
-				ThresholdFilter.createFilter(Level.ALL, null, null),
-				Controler.DEFAULTLOG4JLAYOUT,
-				false,
-				new Property[0]);
-		this.logEvents = logEvents;
-	}
+  public CollectLogMessagesAppender() {
+    super(
+        "collector",
+        ThresholdFilter.createFilter(Level.ALL, null, null),
+        Controler.DEFAULTLOG4JLAYOUT,
+        false,
+        new Property[0]);
+    this.logEvents = logEvents;
+  }
 
-	@Override
-	public void append(LogEvent e) {
-		this.logEvents.add(e);
-	}
+  @Override
+  public void append(LogEvent e) {
+    this.logEvents.add(e);
+  }
 
-	public List<LogEvent> getLogEvents() {
-		return this.logEvents;
-	}
-
+  public List<LogEvent> getLogEvents() {
+    return this.logEvents;
+  }
 }

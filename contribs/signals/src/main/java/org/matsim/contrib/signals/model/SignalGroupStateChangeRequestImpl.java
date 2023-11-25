@@ -24,70 +24,69 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 
 /**
  * @author dgrether
- *
  */
 final class SignalGroupStateChangeRequestImpl implements SignalGroupStateChangeRequest {
-	
-	private SignalGroupState newState;
-	private double timeSec;
-	private Id<SignalGroup> signalGroupId;
-	
-	private String hashCode = null;
-	
-	SignalGroupStateChangeRequestImpl(Id<SignalGroup> groupId, SignalGroupState newState, double timeSeconds){
-		this.signalGroupId = groupId;
-		this.newState = newState;
-		this.timeSec = timeSeconds;
-	}
-	
-	@Override
-	public SignalGroupState getRequestedState() {
-		return this.newState;
-	}
 
-	@Override
-	public double getTimeOfDay() {
-		return this.timeSec;
-	}
+  private SignalGroupState newState;
+  private double timeSec;
+  private Id<SignalGroup> signalGroupId;
 
-	@Override
-	public Id<SignalGroup> getSignalGroupId() {
-		return signalGroupId;
-	}
+  private String hashCode = null;
 
-	@Override
-	public int compareTo(SignalGroupStateChangeRequest other) {
-		int doubleCompare = Double.compare(this.getTimeOfDay(), other.getTimeOfDay());
-		//sorting by time only is not unique within one timestep -> sort by id
-		if (doubleCompare == 0){
-			int idCompare = this.getSignalGroupId().compareTo(other.getSignalGroupId());
-			if (idCompare == 0){
-				return this.newState.compareTo(other.getRequestedState());
-			}
-			return idCompare;
-		}
-		return doubleCompare;
-	}
-	
-	@Override
-	public int hashCode(){
-		if (this.hashCode == null){
-			StringBuilder hCode = new StringBuilder();
-			hCode.append(newState.toString());
-			hCode.append(Double.toString(timeSec));
-			hCode.append(signalGroupId.toString());
-			this.hashCode = hCode.toString();
-		}
-		return this.hashCode.hashCode();
-	}
-	
-	@Override
-	public boolean equals(final Object other){
-		if (!(other instanceof SignalGroupStateChangeRequestImpl)){
-			return false;
-		}
-		else {
-			return (this.compareTo((SignalGroupStateChangeRequestImpl)other) == 0);
-		}
-	}
+  SignalGroupStateChangeRequestImpl(
+      Id<SignalGroup> groupId, SignalGroupState newState, double timeSeconds) {
+    this.signalGroupId = groupId;
+    this.newState = newState;
+    this.timeSec = timeSeconds;
+  }
+
+  @Override
+  public SignalGroupState getRequestedState() {
+    return this.newState;
+  }
+
+  @Override
+  public double getTimeOfDay() {
+    return this.timeSec;
+  }
+
+  @Override
+  public Id<SignalGroup> getSignalGroupId() {
+    return signalGroupId;
+  }
+
+  @Override
+  public int compareTo(SignalGroupStateChangeRequest other) {
+    int doubleCompare = Double.compare(this.getTimeOfDay(), other.getTimeOfDay());
+    // sorting by time only is not unique within one timestep -> sort by id
+    if (doubleCompare == 0) {
+      int idCompare = this.getSignalGroupId().compareTo(other.getSignalGroupId());
+      if (idCompare == 0) {
+        return this.newState.compareTo(other.getRequestedState());
+      }
+      return idCompare;
+    }
+    return doubleCompare;
+  }
+
+  @Override
+  public int hashCode() {
+    if (this.hashCode == null) {
+      StringBuilder hCode = new StringBuilder();
+      hCode.append(newState.toString());
+      hCode.append(Double.toString(timeSec));
+      hCode.append(signalGroupId.toString());
+      this.hashCode = hCode.toString();
+    }
+    return this.hashCode.hashCode();
+  }
+
+  @Override
+  public boolean equals(final Object other) {
+    if (!(other instanceof SignalGroupStateChangeRequestImpl)) {
+      return false;
+    } else {
+      return (this.compareTo((SignalGroupStateChangeRequestImpl) other) == 0);
+    }
+  }
 }

@@ -26,5 +26,5 @@ import org.matsim.api.core.v01.network.Node;
  * @author Michal Maciejewski (michalm)
  */
 public interface TravelTimeMatrix {
-	int getTravelTime(Node fromNode, Node toNode, double departureTime);
+  int getTravelTime(Node fromNode, Node toNode, double departureTime);
 }

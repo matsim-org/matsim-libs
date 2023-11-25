@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * package-info.java
@@ -19,24 +18,24 @@
  *                                                                         *
  * *********************************************************************** */
 
- /**
- * This package provides the comparison of simulation values to counting stations.  
- * 
- * Also see http://matsim.org/docs/userguide/usingCounts .
- * 
+/**
+ * This package provides the comparison of simulation values to counting stations.
+ *
+ * <p>Also see http://matsim.org/docs/userguide/usingCounts .
+ *
  * <h2>Package Maintainer(s):</h2>
+ *
  * <ul>
- *   <li>Andreas Horni</li>
+ *   <li>Andreas Horni
  * </ul>
- * 
+ *
  * <h2>Parameters:<a name="counts_parameters"></a></h2>
+ *
  * <ul>
- * 	<li><strong><font color="blue">...</font></strong> <br>
- * 		Type and range: ... <br>
- * 		Default: ... <br>
- * 		Description: ...
- * 	</li>
+ *   <li><strong><font color="blue">...</font></strong> <br>
+ *       Type and range: ... <br>
+ *       Default: ... <br>
+ *       Description: ...
  * </ul>
- * 
  */
 package org.matsim.counts;

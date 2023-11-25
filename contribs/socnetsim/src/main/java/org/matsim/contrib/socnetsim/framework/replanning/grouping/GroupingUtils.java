@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.grouping;
 
+import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -29,171 +30,160 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkUtils;
 import org.matsim.contrib.socnetsim.utils.CollectionUtils;
 
-import java.util.*;
-
 /**
  * @author thibautd
  */
 public class GroupingUtils {
-	private  GroupingUtils() {}
+  private GroupingUtils() {}
 
-	public interface GroupingParameters {
-		double getTieActivationProbability();
-		double getJointPlanBreakingProbability();
-		double getMaxGroupSize();
-	}
+  public interface GroupingParameters {
+    double getTieActivationProbability();
 
-	public static Collection<Collection<Plan>> randomlyGroup(
-			final GroupingParameters params,
-			final Random random,
-			final GroupPlans groupPlans,
-			final SocialNetwork socialNetwork) {
-		final Map<Id<Person>, Plan> planPerPerson = new LinkedHashMap<>();
-		for ( Plan p : groupPlans.getAllIndividualPlans() ) {
-			planPerPerson.put( p.getPerson().getId() , p );
-		}
+    double getJointPlanBreakingProbability();
 
-		final Map<Id, Set<Id>> jpTies = getJointPlanLinks( groupPlans );
-		final Map<Id<Person>, Set<Id<Person>>> subnet =
-			SocialNetworkUtils.getSubnetwork(
-					socialNetwork,
-					planPerPerson.keySet() );
+    double getMaxGroupSize();
+  }
 
-		assert planPerPerson.keySet().containsAll( jpTies.keySet() ) : planPerPerson+" "+jpTies;
-		assert planPerPerson.keySet().equals( subnet.keySet() ) : planPerPerson +" != "+ subnet;
+  public static Collection<Collection<Plan>> randomlyGroup(
+      final GroupingParameters params,
+      final Random random,
+      final GroupPlans groupPlans,
+      final SocialNetwork socialNetwork) {
+    final Map<Id<Person>, Plan> planPerPerson = new LinkedHashMap<>();
+    for (Plan p : groupPlans.getAllIndividualPlans()) {
+      planPerPerson.put(p.getPerson().getId(), p);
+    }
 
-		final Collection<Collection<Plan>> groups = new ArrayList<Collection<Plan>>();
-		while ( !subnet.isEmpty() ) {
-			final Set<Id> group =
-					getRandomGroup(
-							params,
-							random,
-							subnet,
-							jpTies );
+    final Map<Id, Set<Id>> jpTies = getJointPlanLinks(groupPlans);
+    final Map<Id<Person>, Set<Id<Person>>> subnet =
+        SocialNetworkUtils.getSubnetwork(socialNetwork, planPerPerson.keySet());
 
-			assert planPerPerson.keySet().containsAll( group ) : planPerPerson +" - "+group+" - "+groups;
+    assert planPerPerson.keySet().containsAll(jpTies.keySet()) : planPerPerson + " " + jpTies;
+    assert planPerPerson.keySet().equals(subnet.keySet()) : planPerPerson + " != " + subnet;
 
-			final Collection<Plan> plans = new ArrayList<Plan>();
-			for ( Id id : group ) {
-				plans.add( planPerPerson.remove( id ) );
-			}
+    final Collection<Collection<Plan>> groups = new ArrayList<Collection<Plan>>();
+    while (!subnet.isEmpty()) {
+      final Set<Id> group = getRandomGroup(params, random, subnet, jpTies);
 
-			assert !CollectionUtils.intersects( planPerPerson.keySet() , group ) : planPerPerson+" intersect "+group;
-			assert planPerPerson.keySet().containsAll( jpTies.keySet() ) : planPerPerson+" "+jpTies;
-			assert planPerPerson.keySet().equals( subnet.keySet() ) : planPerPerson+"  "+subnet;
+      assert planPerPerson.keySet().containsAll(group)
+          : planPerPerson + " - " + group + " - " + groups;
 
-			groups.add( plans );
-		}
+      final Collection<Plan> plans = new ArrayList<Plan>();
+      for (Id id : group) {
+        plans.add(planPerPerson.remove(id));
+      }
 
-		return groups;
-	}
+      assert !CollectionUtils.intersects(planPerPerson.keySet(), group)
+          : planPerPerson + " intersect " + group;
+      assert planPerPerson.keySet().containsAll(jpTies.keySet()) : planPerPerson + " " + jpTies;
+      assert planPerPerson.keySet().equals(subnet.keySet()) : planPerPerson + "  " + subnet;
 
-	public static Map<Id, Set<Id>> getJointPlanLinks(final GroupPlans groupPlans) {
-		final Map<Id, Set<Id>> links = new LinkedHashMap<Id, Set<Id>>();
+      groups.add(plans);
+    }
 
-		for ( JointPlan jp : groupPlans.getJointPlans() ) {
-			for ( Id id : jp.getIndividualPlans().keySet() ) {
-				final Set<Id> alters = new LinkedHashSet<Id>( jp.getIndividualPlans().keySet() );
-				alters.remove( id );
-				links.put( id , alters );
-			}
-		}
+    return groups;
+  }
 
-		return links;
-	}
+  public static Map<Id, Set<Id>> getJointPlanLinks(final GroupPlans groupPlans) {
+    final Map<Id, Set<Id>> links = new LinkedHashMap<Id, Set<Id>>();
 
-	public static Collection<ReplanningGroup> randomlyGroupPersons(
-			final GroupingParameters params,
-			final Random random,
-			final Population population,
-			final JointPlans jointPlans,
-			final SocialNetwork socialNetwork) {
+    for (JointPlan jp : groupPlans.getJointPlans()) {
+      for (Id id : jp.getIndividualPlans().keySet()) {
+        final Set<Id> alters = new LinkedHashSet<Id>(jp.getIndividualPlans().keySet());
+        alters.remove(id);
+        links.put(id, alters);
+      }
+    }
 
-		final Map<Id, Set<Id>> jpTies = getJointPlanNetwork( population , jointPlans );
-		final Map<Id<Person>, Set<Id<Person>>> netmap = new LinkedHashMap<>( socialNetwork.getMapRepresentation() );
+    return links;
+  }
 
-		final Collection<ReplanningGroup> groups = new ArrayList<ReplanningGroup>();
-		while ( !netmap.isEmpty() ) {
-			final Set<Id> ids =
-					getRandomGroup(
-							params,
-							random,
-							netmap,
-							jpTies );
+  public static Collection<ReplanningGroup> randomlyGroupPersons(
+      final GroupingParameters params,
+      final Random random,
+      final Population population,
+      final JointPlans jointPlans,
+      final SocialNetwork socialNetwork) {
 
-			final ReplanningGroup group = new ReplanningGroup();
-			groups.add( group );
-			for ( Id id : ids ) group.addPerson( population.getPersons().get( id ) );
-		}
+    final Map<Id, Set<Id>> jpTies = getJointPlanNetwork(population, jointPlans);
+    final Map<Id<Person>, Set<Id<Person>>> netmap =
+        new LinkedHashMap<>(socialNetwork.getMapRepresentation());
 
-		return groups;
-	}
+    final Collection<ReplanningGroup> groups = new ArrayList<ReplanningGroup>();
+    while (!netmap.isEmpty()) {
+      final Set<Id> ids = getRandomGroup(params, random, netmap, jpTies);
 
-	public static Map<Id, Set<Id>> getJointPlanNetwork(
-			final Population population,
-			final JointPlans jointPlans ) {
-		final Map<Id, Set<Id>> links = new LinkedHashMap<Id, Set<Id>>();
+      final ReplanningGroup group = new ReplanningGroup();
+      groups.add(group);
+      for (Id id : ids) group.addPerson(population.getPersons().get(id));
+    }
 
-		for ( Person person : population.getPersons().values() ) {
-			final Set<Id> alters = new LinkedHashSet<Id>();
-			links.put( person.getId() , alters );
+    return groups;
+  }
 
-			for ( Plan plan : person.getPlans() ) {
-				final JointPlan jp = jointPlans.getJointPlan( plan );
-				if ( jp == null ) continue;
-				alters.addAll( jp.getIndividualPlans().keySet() );
-			}
+  public static Map<Id, Set<Id>> getJointPlanNetwork(
+      final Population population, final JointPlans jointPlans) {
+    final Map<Id, Set<Id>> links = new LinkedHashMap<Id, Set<Id>>();
 
-			alters.remove( person.getId() );
-		}
+    for (Person person : population.getPersons().values()) {
+      final Set<Id> alters = new LinkedHashSet<Id>();
+      links.put(person.getId(), alters);
 
-		return links;
-	}
+      for (Plan plan : person.getPlans()) {
+        final JointPlan jp = jointPlans.getJointPlan(plan);
+        if (jp == null) continue;
+        alters.addAll(jp.getIndividualPlans().keySet());
+      }
 
-	private static Set<Id> getRandomGroup(
-			final GroupingParameters params,
-			final Random random,
-			final Map<Id<Person>, Set<Id<Person>>> netmap,
-			final Map<Id, Set<Id>> jpTies) {
-		assert netmap.keySet().containsAll( jpTies.keySet() ) : netmap+" != "+jpTies;
-		final Set<Id> group = new LinkedHashSet<Id>();
+      alters.remove(person.getId());
+    }
 
-		final Queue<Id> egoStack = Collections.asLifoQueue( new ArrayDeque<Id>( netmap.size() ) );
-		egoStack.add( CollectionUtils.getElement( 0 , netmap.keySet() ) );
+    return links;
+  }
 
-		while ( !egoStack.isEmpty() /*&& group.size() < params.getMaxGroupSize()*/ ) {
-			final Id ego = egoStack.remove();
-			final Set<Id<Person>> alters = netmap.remove( ego );
-			final Set<Id> jpAlters = jpTies.remove( ego );
+  private static Set<Id> getRandomGroup(
+      final GroupingParameters params,
+      final Random random,
+      final Map<Id<Person>, Set<Id<Person>>> netmap,
+      final Map<Id, Set<Id>> jpTies) {
+    assert netmap.keySet().containsAll(jpTies.keySet()) : netmap + " != " + jpTies;
+    final Set<Id> group = new LinkedHashSet<Id>();
 
-			if ( alters == null ) continue;
-			group.add( ego );
+    final Queue<Id> egoStack = Collections.asLifoQueue(new ArrayDeque<Id>(netmap.size()));
+    egoStack.add(CollectionUtils.getElement(0, netmap.keySet()));
 
-			if ( jpAlters != null && random.nextDouble() >= params.getJointPlanBreakingProbability() ) {
-				// keep jp
-				for ( Id alter : jpAlters ) {
-					alters.remove( alter );
-					egoStack.add(alter);
-					// already add, so that joint plan not broken by early abort
-					// group.add( alter );
-				}
-			}
+    while (!egoStack.isEmpty() /*&& group.size() < params.getMaxGroupSize()*/) {
+      final Id ego = egoStack.remove();
+      final Set<Id<Person>> alters = netmap.remove(ego);
+      final Set<Id> jpAlters = jpTies.remove(ego);
 
-			for ( Id alter : alters ) {
-				if ( random.nextDouble() < params.getTieActivationProbability() ) {
-					egoStack.add( alter );
-				}
-			}
-		}
+      if (alters == null) continue;
+      group.add(ego);
 
-		for ( Id<Person> p : group )  {
-			netmap.remove( p );
-			jpTies.remove( p );
-		}
+      if (jpAlters != null && random.nextDouble() >= params.getJointPlanBreakingProbability()) {
+        // keep jp
+        for (Id alter : jpAlters) {
+          alters.remove(alter);
+          egoStack.add(alter);
+          // already add, so that joint plan not broken by early abort
+          // group.add( alter );
+        }
+      }
 
-		assert netmap.keySet().containsAll( jpTies.keySet() ) : netmap+" != "+jpTies;
+      for (Id alter : alters) {
+        if (random.nextDouble() < params.getTieActivationProbability()) {
+          egoStack.add(alter);
+        }
+      }
+    }
 
-		return group;
-	}
+    for (Id<Person> p : group) {
+      netmap.remove(p);
+      jpTies.remove(p);
+    }
+
+    assert netmap.keySet().containsAll(jpTies.keySet()) : netmap + " != " + jpTies;
+
+    return group;
+  }
 }
-

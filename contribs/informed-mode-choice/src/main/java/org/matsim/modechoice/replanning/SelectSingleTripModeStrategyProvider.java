@@ -1,5 +1,7 @@
 package org.matsim.modechoice.replanning;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -12,46 +14,40 @@ import org.matsim.modechoice.InformedModeChoiceConfigGroup;
 import org.matsim.modechoice.pruning.CandidatePruner;
 import org.matsim.modechoice.search.SingleTripChoicesGenerator;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-
-/**
- * Provider for {@link SelectFromGeneratorStrategy}.
- */
+/** Provider for {@link SelectFromGeneratorStrategy}. */
 public class SelectSingleTripModeStrategyProvider implements Provider<PlanStrategy> {
 
-	@Inject
-	private Provider<TripRouter> tripRouterProvider;
-	@Inject
-	private GlobalConfigGroup globalConfigGroup;
+  @Inject private Provider<TripRouter> tripRouterProvider;
+  @Inject private GlobalConfigGroup globalConfigGroup;
 
-	@Inject
-	private ActivityFacilities facilities;
-	@Inject
-	private TimeInterpretation timeInterpretation;
+  @Inject private ActivityFacilities facilities;
+  @Inject private TimeInterpretation timeInterpretation;
 
-	@Inject
-	private Provider<SingleTripChoicesGenerator> generator;
+  @Inject private Provider<SingleTripChoicesGenerator> generator;
 
-	@Inject
-	private InformedModeChoiceConfigGroup config;
+  @Inject private InformedModeChoiceConfigGroup config;
 
-	@Inject
-	private Provider<PlanSelector> selector;
+  @Inject private Provider<PlanSelector> selector;
 
-	@Inject
-	private Provider<CandidatePruner> pruner;
+  @Inject private Provider<CandidatePruner> pruner;
 
-	@Override
-	public PlanStrategy get() {
+  @Override
+  public PlanStrategy get() {
 
-		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
+    PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
 
-		builder.addStrategyModule(new SelectSingleTripModeStrategy(globalConfigGroup,  config.getModes(), generator, selector, pruner, config.isRequireDifferentModes()));
+    builder.addStrategyModule(
+        new SelectSingleTripModeStrategy(
+            globalConfigGroup,
+            config.getModes(),
+            generator,
+            selector,
+            pruner,
+            config.isRequireDifferentModes()));
 
-		builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
+    builder.addStrategyModule(
+        new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
 
-		return builder.build();
-	}
-
+    return builder.build();
+  }
 }

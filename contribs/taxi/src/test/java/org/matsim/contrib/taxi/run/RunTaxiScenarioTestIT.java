@@ -20,7 +20,6 @@
 package org.matsim.contrib.taxi.run;
 
 import java.net.URL;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -32,27 +31,31 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunTaxiScenarioTestIT {
-	@Rule
-	public final MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testRunMielecLowDemandLowSupply() {
-		runMielec("plans_taxi_1.0.xml.gz", "taxis-25.xml");
-	}
+  @Test
+  public void testRunMielecLowDemandLowSupply() {
+    runMielec("plans_taxi_1.0.xml.gz", "taxis-25.xml");
+  }
 
-	@Test
-	public void testRunMielecHighDemandLowSupply() {
-		runMielec("plans_taxi_4.0.xml.gz", "taxis-25.xml");
-	}
+  @Test
+  public void testRunMielecHighDemandLowSupply() {
+    runMielec("plans_taxi_4.0.xml.gz", "taxis-25.xml");
+  }
 
-	private void runMielec(String plansFile, String taxisFile) {
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_config.xml");
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
-				new OTFVisConfigGroup());
-		config.plans().setInputFile(plansFile);
-		TaxiConfigGroup.getSingleModeTaxiConfig(config).taxisFile = taxisFile;
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		config.controller().setDumpDataAtEnd(false);
-		TaxiControlerCreator.createControler(config, false).run();
-	}
+  private void runMielec(String plansFile, String taxisFile) {
+    URL configUrl =
+        IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_config.xml");
+    Config config =
+        ConfigUtils.loadConfig(
+            configUrl,
+            new MultiModeTaxiConfigGroup(),
+            new DvrpConfigGroup(),
+            new OTFVisConfigGroup());
+    config.plans().setInputFile(plansFile);
+    TaxiConfigGroup.getSingleModeTaxiConfig(config).taxisFile = taxisFile;
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
+    config.controller().setDumpDataAtEnd(false);
+    TaxiControlerCreator.createControler(config, false).run();
+  }
 }

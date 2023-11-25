@@ -21,41 +21,35 @@ package org.matsim.contrib.decongestion.data;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 /**
- * 
  * @author ikaddoura
  */
-
 public class LinkInfo {
-	
-	private final Link link;
-	
-	private final Map<Integer, Double> time2toll = new HashMap<>();
-	private Map<Integer, Double> time2avgDelay = new HashMap<>();
-	
-	public LinkInfo(Link link) {
-		this.link = link;
-	}
 
-	public Link getLink() {
-		return link;
-	}
+  private final Link link;
 
-	public Map<Integer, Double> getTime2toll() {
-		return time2toll;
-	}
+  private final Map<Integer, Double> time2toll = new HashMap<>();
+  private Map<Integer, Double> time2avgDelay = new HashMap<>();
 
-	public Map<Integer, Double> getTime2avgDelay() {
-		return time2avgDelay;
-	}
+  public LinkInfo(Link link) {
+    this.link = link;
+  }
 
-	public void setTime2avgDelay(Map<Integer, Double> time2avgDelay) {
-		this.time2avgDelay = time2avgDelay;
-	}
+  public Link getLink() {
+    return link;
+  }
 
+  public Map<Integer, Double> getTime2toll() {
+    return time2toll;
+  }
+
+  public Map<Integer, Double> getTime2avgDelay() {
+    return time2avgDelay;
+  }
+
+  public void setTime2avgDelay(Map<Integer, Double> time2avgDelay) {
+    this.time2avgDelay = time2avgDelay;
+  }
 }
-

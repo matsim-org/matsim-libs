@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * TravelDistanceStatsModule.java
@@ -19,22 +18,26 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.analysis;
-
+package org.matsim.analysis;
 
 import org.matsim.core.controler.AbstractModule;
 
 public class IterationTravelStatsModule extends AbstractModule {
 
-	@Override
-	public void install() {
-		bind(TravelDistanceStats.class).asEagerSingleton();
-		bind(PKMbyModeCalculator.class).asEagerSingleton();
-		bind(PHbyModeCalculator.class).asEagerSingleton();
-		bind(TripsAndLegsCSVWriter.CustomTripsWriterExtension.class).to(TripsAndLegsCSVWriter.NoTripWriterExtension.class).asEagerSingleton();
-		bind(TripsAndLegsCSVWriter.CustomLegsWriterExtension.class).to(TripsAndLegsCSVWriter.NoLegsWriterExtension.class).asEagerSingleton();
-		bind(TripsAndLegsCSVWriter.CustomTimeWriter.class).to(TripsAndLegsCSVWriter.DefaultTimeWriter.class).asEagerSingleton();
-		addControlerListenerBinding().to(IterationTravelStatsControlerListener.class);
-	}
-
+  @Override
+  public void install() {
+    bind(TravelDistanceStats.class).asEagerSingleton();
+    bind(PKMbyModeCalculator.class).asEagerSingleton();
+    bind(PHbyModeCalculator.class).asEagerSingleton();
+    bind(TripsAndLegsCSVWriter.CustomTripsWriterExtension.class)
+        .to(TripsAndLegsCSVWriter.NoTripWriterExtension.class)
+        .asEagerSingleton();
+    bind(TripsAndLegsCSVWriter.CustomLegsWriterExtension.class)
+        .to(TripsAndLegsCSVWriter.NoLegsWriterExtension.class)
+        .asEagerSingleton();
+    bind(TripsAndLegsCSVWriter.CustomTimeWriter.class)
+        .to(TripsAndLegsCSVWriter.DefaultTimeWriter.class)
+        .asEagerSingleton();
+    addControlerListenerBinding().to(IterationTravelStatsControlerListener.class);
+  }
 }

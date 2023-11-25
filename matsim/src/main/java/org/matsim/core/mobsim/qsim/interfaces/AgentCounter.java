@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * AgentCounter.java
@@ -19,18 +18,17 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim.interfaces;
+package org.matsim.core.mobsim.qsim.interfaces;
 
 public interface AgentCounter {
 
-	int getLiving();
+  int getLiving();
 
-	boolean isLiving();
+  boolean isLiving();
 
-	int getLost();
+  int getLost();
 
-	void incLost();
+  void incLost();
 
-	void decLiving();
-
+  void decLiving();
 }

@@ -21,49 +21,49 @@
 package org.matsim.pt.transitSchedule.api;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.utils.objectattributes.FailingObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
- * Stores a complete transit schedules with multiple lines, multiple routes per line, all the time data
- * and the infrastructure in form of stop facilities.
- * 
+ * Stores a complete transit schedules with multiple lines, multiple routes per line, all the time
+ * data and the infrastructure in form of stop facilities.
+ *
  * @author mrieser
  */
 public interface TransitSchedule extends MatsimToplevelContainer, Attributable {
 
-	void addTransitLine(final TransitLine line);
-	
-	/**
-	 * @param line the transit line to be removed
-	 * @return <code>true</code> if the transit line was successfully removed from the transit schedule.
-	 */
-	boolean removeTransitLine(final TransitLine line);
+  void addTransitLine(final TransitLine line);
 
-	void addStopFacility(final TransitStopFacility stop);
+  /**
+   * @param line the transit line to be removed
+   * @return <code>true</code> if the transit line was successfully removed from the transit
+   *     schedule.
+   */
+  boolean removeTransitLine(final TransitLine line);
 
-	Map<Id<TransitLine>, TransitLine> getTransitLines();
+  void addStopFacility(final TransitStopFacility stop);
 
-	Map<Id<TransitStopFacility>, TransitStopFacility> getFacilities();
-	
-	/**
-	 * @param stop the stop facility to be removed
-	 * @return <code>true</code> if the transit stop facility was successfully removed from the transit schedule.
-	 */
-	boolean removeStopFacility(final TransitStopFacility stop);
-	
-	@Override
-	TransitScheduleFactory getFactory();
+  Map<Id<TransitLine>, TransitLine> getTransitLines();
 
-	@Deprecated
-	FailingObjectAttributes getTransitLinesAttributes();
+  Map<Id<TransitStopFacility>, TransitStopFacility> getFacilities();
 
-	@Deprecated
-	FailingObjectAttributes getTransitStopsAttributes();
+  /**
+   * @param stop the stop facility to be removed
+   * @return <code>true</code> if the transit stop facility was successfully removed from the
+   *     transit schedule.
+   */
+  boolean removeStopFacility(final TransitStopFacility stop);
 
-	MinimalTransferTimes getMinimalTransferTimes();
+  @Override
+  TransitScheduleFactory getFactory();
+
+  @Deprecated
+  FailingObjectAttributes getTransitLinesAttributes();
+
+  @Deprecated
+  FailingObjectAttributes getTransitStopsAttributes();
+
+  MinimalTransferTimes getMinimalTransferTimes();
 }

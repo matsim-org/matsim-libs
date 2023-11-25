@@ -21,42 +21,44 @@ package org.matsim.run;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 
-
 /**
  * This is currently only a substitute to the full Controler.
  *
- * This class is deprecated. Use {@link org.matsim.core.controler.Controler} instead
+ * <p>This class is deprecated. Use {@link org.matsim.core.controler.Controler} instead
  *
  * @author mrieser
  */
 public class RunMatsim {
 
-	private final org.matsim.core.controler.Controler controler;
+  private final org.matsim.core.controler.Controler controler;
 
-	public RunMatsim(final String[] args) {
-		this.controler = new org.matsim.core.controler.Controler(args);
-	}
+  public RunMatsim(final String[] args) {
+    this.controler = new org.matsim.core.controler.Controler(args);
+  }
 
-	public RunMatsim(final String configFilename) {
-		this.controler = new org.matsim.core.controler.Controler(configFilename);
-	}
+  public RunMatsim(final String configFilename) {
+    this.controler = new org.matsim.core.controler.Controler(configFilename);
+  }
 
-	public void setOverwriteFiles(final boolean overwriteFiles) {
-		this.controler.getConfig().controller().setOverwriteFileSetting(
-				overwriteFiles ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-	}
+  public void setOverwriteFiles(final boolean overwriteFiles) {
+    this.controler
+        .getConfig()
+        .controller()
+        .setOverwriteFileSetting(
+            overwriteFiles
+                ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles
+                : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
+  }
 
-	public Scenario getScenario() {
-		return this.controler.getScenario() ;
-	}
+  public Scenario getScenario() {
+    return this.controler.getScenario();
+  }
 
-	public void run() {
-		this.controler.run();
-	}
+  public void run() {
+    this.controler.run();
+  }
 
-	public  static void main(String[] args) {
-		new RunMatsim(args).run();
-	}
+  public static void main(String[] args) {
+    new RunMatsim(args).run();
+  }
 }

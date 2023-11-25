@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * BasicPlan.java
@@ -19,12 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.api.core.v01.population;
+package org.matsim.api.core.v01.population;
 
 public interface BasicPlan {
 
-	public abstract void setScore(Double score);
+  public abstract void setScore(Double score);
 
-	public abstract Double getScore();
-	
+  public abstract Double getScore();
 }

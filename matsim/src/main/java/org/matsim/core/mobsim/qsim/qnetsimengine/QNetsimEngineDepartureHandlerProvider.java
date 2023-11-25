@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * QNetsimEngineDepartureHandlerProvider.java
@@ -19,19 +18,19 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim.qnetsimengine;
+package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 
 class QNetsimEngineDepartureHandlerProvider implements Provider<VehicularDepartureHandler> {
-	// yyyyyy should return an interface.  Otherwise one must inherit from the implementation, which we don't like! kai, may'18
+  // yyyyyy should return an interface.  Otherwise one must inherit from the implementation, which
+  // we don't like! kai, may'18
 
-	@Inject
-	QNetsimEngineI qNetsimEngine;
+  @Inject QNetsimEngineI qNetsimEngine;
 
-	@Override
-	public VehicularDepartureHandler get() {
-		return qNetsimEngine.getDepartureHandler();
-	}
+  @Override
+  public VehicularDepartureHandler get() {
+    return qNetsimEngine.getDepartureHandler();
+  }
 }

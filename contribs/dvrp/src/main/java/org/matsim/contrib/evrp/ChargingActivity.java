@@ -25,65 +25,70 @@ import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 public class ChargingActivity implements DynActivity {
-	/**
-	 * String constant should have different value from {@link org.matsim.contrib.ev.charging.VehicleChargingHandler#CHARGING_INTERACTION}.
-	 */
-	public static final String ACTIVITY_TYPE = "Charging";
+  /**
+   * String constant should have different value from {@link
+   * org.matsim.contrib.ev.charging.VehicleChargingHandler#CHARGING_INTERACTION}.
+   */
+  public static final String ACTIVITY_TYPE = "Charging";
 
-	private final ChargingTask chargingTask;
-	private double endTime = END_ACTIVITY_LATER;
+  private final ChargingTask chargingTask;
+  private double endTime = END_ACTIVITY_LATER;
 
-	private enum State {
-		init, added, queued, plugged, unplugged
-	}
+  private enum State {
+    init,
+    added,
+    queued,
+    plugged,
+    unplugged
+  }
 
-	private State state = State.init;
+  private State state = State.init;
 
-	public ChargingActivity(ChargingTask chargingTask) {
-		this.chargingTask = chargingTask;
-	}
+  public ChargingActivity(ChargingTask chargingTask) {
+    this.chargingTask = chargingTask;
+  }
 
-	@Override
-	public String getActivityType() {
-		return ACTIVITY_TYPE;
-	}
+  @Override
+  public String getActivityType() {
+    return ACTIVITY_TYPE;
+  }
 
-	@Override
-	public void doSimStep(double now) {
-		switch (state) {
-			case init -> initialize(now);
-			case added, queued, plugged -> {
-				if (endTime <= now) {
-					endTime = now + 1;
-				}
-			}
-		}
-	}
+  @Override
+  public void doSimStep(double now) {
+    switch (state) {
+      case init -> initialize(now);
+      case added, queued, plugged -> {
+        if (endTime <= now) {
+          endTime = now + 1;
+        }
+      }
+    }
+  }
 
-	private void initialize(double now) {
-		ChargingWithAssignmentLogic logic = chargingTask.getChargingLogic();
-		ElectricVehicle ev = chargingTask.getElectricVehicle();
-		logic.unassignVehicle(ev);
-		logic.addVehicle(ev, new DvrpChargingListener(this), now);
-		state = State.added;
-	}
+  private void initialize(double now) {
+    ChargingWithAssignmentLogic logic = chargingTask.getChargingLogic();
+    ElectricVehicle ev = chargingTask.getElectricVehicle();
+    logic.unassignVehicle(ev);
+    logic.addVehicle(ev, new DvrpChargingListener(this), now);
+    state = State.added;
+  }
 
-	@Override
-	public double getEndTime() {
-		return endTime;
-	}
+  @Override
+  public double getEndTime() {
+    return endTime;
+  }
 
-	public void vehicleQueued(double now) {
-		state = State.queued;
-	}
+  public void vehicleQueued(double now) {
+    state = State.queued;
+  }
 
-	public void chargingStarted(double now) {
-		state = State.plugged;
-		chargingTask.setChargingStartedTime(now);
-	}
+  public void chargingStarted(double now) {
+    state = State.plugged;
+    chargingTask.setChargingStartedTime(now);
+  }
 
-	public void chargingEnded(double now) {
-		endTime = now;
-		state = State.unplugged;
-	}
+  public void chargingEnded(double now) {
+    endTime = now;
+    state = State.unplugged;
+  }
 }

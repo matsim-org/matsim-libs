@@ -19,7 +19,6 @@
 package org.matsim.contrib.ev.charging;
 
 import java.util.stream.Stream;
-
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 
@@ -29,29 +28,35 @@ import org.matsim.contrib.ev.infrastructure.Charger;
  * @author michalm
  */
 public class ChargingEstimations {
-	// TODO overestimates for short queues!!! (which is often the case for more advanced dispatch strategies)
-	public static double estimateMaxWaitTimeForNextVehicle(Charger charger) {
-		if (charger.getLogic().getPluggedVehicles().size() < charger.getPlugCount()) {
-			return 0;
-		}
-		return ChargingEstimations.estimateTotalTimeToCharge(charger.getLogic()) / charger.getPlugCount();
-	}
+  // TODO overestimates for short queues!!! (which is often the case for more advanced dispatch
+  // strategies)
+  public static double estimateMaxWaitTimeForNextVehicle(Charger charger) {
+    if (charger.getLogic().getPluggedVehicles().size() < charger.getPlugCount()) {
+      return 0;
+    }
+    return ChargingEstimations.estimateTotalTimeToCharge(charger.getLogic())
+        / charger.getPlugCount();
+  }
 
-	public static double estimateTotalTimeToCharge(ChargingLogic logic) {
-		return estimateTotalTimeToCharge(logic.getChargingStrategy(),
-				Stream.concat(logic.getPluggedVehicles().stream(), logic.getQueuedVehicles().stream()));
-	}
+  public static double estimateTotalTimeToCharge(ChargingLogic logic) {
+    return estimateTotalTimeToCharge(
+        logic.getChargingStrategy(),
+        Stream.concat(logic.getPluggedVehicles().stream(), logic.getQueuedVehicles().stream()));
+  }
 
-	public static double estimateTotalEnergyToCharge(ChargingLogic logic) {
-		return estimateTotalEnergyToCharge(logic.getChargingStrategy(),
-				Stream.concat(logic.getPluggedVehicles().stream(), logic.getQueuedVehicles().stream()));
-	}
+  public static double estimateTotalEnergyToCharge(ChargingLogic logic) {
+    return estimateTotalEnergyToCharge(
+        logic.getChargingStrategy(),
+        Stream.concat(logic.getPluggedVehicles().stream(), logic.getQueuedVehicles().stream()));
+  }
 
-	public static double estimateTotalTimeToCharge(ChargingStrategy strategy, Stream<ElectricVehicle> vehicles) {
-		return vehicles.mapToDouble(strategy::calcRemainingTimeToCharge).sum();
-	}
+  public static double estimateTotalTimeToCharge(
+      ChargingStrategy strategy, Stream<ElectricVehicle> vehicles) {
+    return vehicles.mapToDouble(strategy::calcRemainingTimeToCharge).sum();
+  }
 
-	public static double estimateTotalEnergyToCharge(ChargingStrategy strategy, Stream<ElectricVehicle> vehicles) {
-		return vehicles.mapToDouble(strategy::calcRemainingEnergyToCharge).sum();
-	}
+  public static double estimateTotalEnergyToCharge(
+      ChargingStrategy strategy, Stream<ElectricVehicle> vehicles) {
+    return vehicles.mapToDouble(strategy::calcRemainingEnergyToCharge).sum();
+  }
 }

@@ -25,5 +25,4 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 /**
  * @author michalm
  */
-public interface DrtOptimizer extends VrpOptimizer, MobsimBeforeSimStepListener {
-}
+public interface DrtOptimizer extends VrpOptimizer, MobsimBeforeSimStepListener {}

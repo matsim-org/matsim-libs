@@ -19,28 +19,26 @@
 
 package org.matsim.contrib.accidents;
 
+import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 /**
-* @author ikaddoura
-*/
-
+ * @author ikaddoura
+ */
 public final class AccidentsContext {
-	// class is public so it can be bound from outside package
+  // class is public so it can be bound from outside package
 
-	@Inject AccidentsContext(){}
-	// injected constructor is package-private so that nobody can instantiate this class directly
-	
-	private Map<Id<Link>, AccidentLinkInfo> linkId2info = new HashMap<>();
+  @Inject
+  AccidentsContext() {}
 
-	Map<Id<Link>, AccidentLinkInfo> getLinkId2info() {
-		return linkId2info;
-	}
+  // injected constructor is package-private so that nobody can instantiate this class directly
 
+  private Map<Id<Link>, AccidentLinkInfo> linkId2info = new HashMap<>();
+
+  Map<Id<Link>, AccidentLinkInfo> getLinkId2info() {
+    return linkId2info;
+  }
 }
-

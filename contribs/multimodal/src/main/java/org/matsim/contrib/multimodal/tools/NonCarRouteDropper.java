@@ -20,6 +20,9 @@
 
 package org.matsim.contrib.multimodal.tools;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Leg;
@@ -31,46 +34,41 @@ import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-/**
- * Drops all non car routes which are specified in the multiModalConfigGroup
- * ("simulatedModes").
- */
+/** Drops all non car routes which are specified in the multiModalConfigGroup ("simulatedModes"). */
 class NonCarRouteDropper extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
-	private static final Logger log = LogManager.getLogger(NonCarRouteDropper.class);
+  private static final Logger log = LogManager.getLogger(NonCarRouteDropper.class);
 
-	private final Set<String> modesToDrop = new HashSet<>();
+  private final Set<String> modesToDrop = new HashSet<>();
 
-	public NonCarRouteDropper(MultiModalConfigGroup multiModalConfigGroup) {
+  public NonCarRouteDropper(MultiModalConfigGroup multiModalConfigGroup) {
 
-		if (!multiModalConfigGroup.isDropNonCarRoutes()) {
-			log.warn("Dropping of non car routes is not enabled in the config group - routes will not be dropped!");
-			return;
-		}
+    if (!multiModalConfigGroup.isDropNonCarRoutes()) {
+      log.warn(
+          "Dropping of non car routes is not enabled in the config group - routes will not be dropped!");
+      return;
+    }
 
-        Collections.addAll(this.modesToDrop, CollectionUtils.stringToArray(multiModalConfigGroup.getSimulatedModes()));
-	}
+    Collections.addAll(
+        this.modesToDrop, CollectionUtils.stringToArray(multiModalConfigGroup.getSimulatedModes()));
+  }
 
-	@Override
-	public void run(Plan plan) {
-		for (PlanElement planElement : plan.getPlanElements()) {
-			if (planElement instanceof Leg) {
-				Leg leg = (Leg) planElement;
-				if (modesToDrop.contains(leg.getMode())) {
-					leg.setRoute(null);
-				}
-			}
-		}
-	}
+  @Override
+  public void run(Plan plan) {
+    for (PlanElement planElement : plan.getPlanElements()) {
+      if (planElement instanceof Leg) {
+        Leg leg = (Leg) planElement;
+        if (modesToDrop.contains(leg.getMode())) {
+          leg.setRoute(null);
+        }
+      }
+    }
+  }
 
-	@Override
-	public void run(Person person) {
-		for (Plan plan : person.getPlans()) {
-			run(plan);
-		}
-	}
+  @Override
+  public void run(Person person) {
+    for (Plan plan : person.getPlans()) {
+      run(plan);
+    }
+  }
 }

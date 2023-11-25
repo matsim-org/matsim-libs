@@ -20,52 +20,51 @@
 
 package org.matsim.contrib.common.csv;
 
+import com.opencsv.CSVWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
 
-import com.opencsv.CSVWriter;
-
 public class CompactCSVWriter extends CSVWriter {
-	public static final String[] EMPTY_LINE = {};
-	public static final String EMPTY_CELL = null;
+  public static final String[] EMPTY_LINE = {};
+  public static final String EMPTY_CELL = null;
 
-	public CompactCSVWriter(Writer writer) {
-		this(writer, '\t');
-	}
+  public CompactCSVWriter(Writer writer) {
+    this(writer, '\t');
+  }
 
-	public CompactCSVWriter(Writer writer, char separator) {
-		super(writer, separator, CSVWriter.NO_QUOTE_CHARACTER, '"', "\n");
-	}
+  public CompactCSVWriter(Writer writer, char separator) {
+    super(writer, separator, CSVWriter.NO_QUOTE_CHARACTER, '"', "\n");
+  }
 
-	@Override
-	public void writeNext(String... nextLine) {
-		super.writeNext(nextLine);
-	}
+  @Override
+  public void writeNext(String... nextLine) {
+    super.writeNext(nextLine);
+  }
 
-	public void writeNextEmpty() {
-		writeNext(EMPTY_LINE);
-	}
+  public void writeNextEmpty() {
+    writeNext(EMPTY_LINE);
+  }
 
-	public void writeNext(CSVLineBuilder lineBuilder) {
-		writeNext(lineBuilder.build());
-	}
+  public void writeNext(CSVLineBuilder lineBuilder) {
+    writeNext(lineBuilder.build());
+  }
 
-	@Override
-	public void flush() {
-		try {
-			super.flush();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
+  @Override
+  public void flush() {
+    try {
+      super.flush();
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
 
-	@Override
-	public void close() {
-		try {
-			super.close();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
+  @Override
+  public void close() {
+    try {
+      super.close();
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
 }

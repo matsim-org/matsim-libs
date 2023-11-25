@@ -24,22 +24,19 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 
 /**
  * @author nagel
- *
  */
-public interface CongestionHandler extends
-LinkEnterEventHandler,
-LinkLeaveEventHandler,
-TransitDriverStartsEventHandler,
-PersonDepartureEventHandler, 
-PersonStuckEventHandler,
-VehicleEntersTrafficEventHandler,
-PersonArrivalEventHandler,
-CongestionInternalization,
-VehicleLeavesTrafficEventHandler {
-
-}
+public interface CongestionHandler
+    extends LinkEnterEventHandler,
+        LinkLeaveEventHandler,
+        TransitDriverStartsEventHandler,
+        PersonDepartureEventHandler,
+        PersonStuckEventHandler,
+        VehicleEntersTrafficEventHandler,
+        PersonArrivalEventHandler,
+        CongestionInternalization,
+        VehicleLeavesTrafficEventHandler {}

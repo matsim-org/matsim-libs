@@ -19,7 +19,6 @@
 package org.matsim.contrib.parking.parkingchoice.PC2.scoring;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -33,118 +32,133 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 public final class ParkingScoreManager implements ParkingScore {
 
-	private Double beelineDistanceFactor = 1.3 ;
+  private Double beelineDistanceFactor = 1.3;
 
-	private AbstractParkingBetas parkingBetas;
-	private double parkingScoreScalingFactor;
-	private double randomErrorTermScalingFactor;
-	private DoubleValueHashMap<Id<Person>> scores;
-	private final Scenario scenario;
-	private final WalkTravelTime walkTravelTime;
-	private RandomErrorTermManager randomErrorTermManager;
+  private AbstractParkingBetas parkingBetas;
+  private double parkingScoreScalingFactor;
+  private double randomErrorTermScalingFactor;
+  private DoubleValueHashMap<Id<Person>> scores;
+  private final Scenario scenario;
+  private final WalkTravelTime walkTravelTime;
+  private RandomErrorTermManager randomErrorTermManager;
 
-	public ParkingScoreManager(WalkTravelTime walkTravelTime, Scenario scenario) {
-		this.walkTravelTime = walkTravelTime;
-		this.scenario = scenario;
-	}
+  public ParkingScoreManager(WalkTravelTime walkTravelTime, Scenario scenario) {
+    this.walkTravelTime = walkTravelTime;
+    this.scenario = scenario;
+  }
 
-	@Override
-	public double calcWalkScore(Coord destCoord, PC2Parking parking, Id<Person> personId, double parkingDurationInSeconds) {
-		Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons();
-		Person person = persons.get(personId);
+  @Override
+  public double calcWalkScore(
+      Coord destCoord, PC2Parking parking, Id<Person> personId, double parkingDurationInSeconds) {
+    Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons();
+    Person person = persons.get(personId);
 
-		double parkingWalkBeta = getParkingBetas().getParkingWalkBeta(person, parkingDurationInSeconds);
+    double parkingWalkBeta = getParkingBetas().getParkingWalkBeta(person, parkingDurationInSeconds);
 
-		Link link = NetworkUtils.getNearestLink((scenario.getNetwork()), destCoord);
+    Link link = NetworkUtils.getNearestLink((scenario.getNetwork()), destCoord);
 
-		double linkLength = link.getLength();
+    double linkLength = link.getLength();
 
-		double walkDistance = CoordUtils.calcEuclideanDistance(destCoord, parking.getCoordinate())
-				* scenario.getConfig().routing().getBeelineDistanceFactors().get("walk")* beelineDistanceFactor;
+    double walkDistance =
+        CoordUtils.calcEuclideanDistance(destCoord, parking.getCoordinate())
+            * scenario.getConfig().routing().getBeelineDistanceFactors().get("walk")
+            * beelineDistanceFactor;
 
-		double walkSpeed = linkLength / this.walkTravelTime.getLinkTravelTime(link, 0, person, null);
+    double walkSpeed = linkLength / this.walkTravelTime.getLinkTravelTime(link, 0, person, null);
 
-		double walkDurationInSeconds = walkDistance / walkSpeed;
+    double walkDurationInSeconds = walkDistance / walkSpeed;
 
-		double walkingTimeTotalInMinutes = walkDurationInSeconds / 60;
+    double walkingTimeTotalInMinutes = walkDurationInSeconds / 60;
 
-		return (parkingWalkBeta * walkingTimeTotalInMinutes) * parkingScoreScalingFactor;
-	}
+    return (parkingWalkBeta * walkingTimeTotalInMinutes) * parkingScoreScalingFactor;
+  }
 
-	@Override
-	public double calcCostScore(double arrivalTime, double parkingDurationInSeconds, PC2Parking parking, Id<Person> personId) {
-		Person person = scenario.getPopulation().getPersons().get(personId);
-		double parkingCostBeta = getParkingBetas().getParkingCostBeta(person);
-		double parkingCost = parking.getCost(personId, arrivalTime, parkingDurationInSeconds);
-		return (parkingCostBeta * parkingCost) * parkingScoreScalingFactor;
-	}
+  @Override
+  public double calcCostScore(
+      double arrivalTime,
+      double parkingDurationInSeconds,
+      PC2Parking parking,
+      Id<Person> personId) {
+    Person person = scenario.getPopulation().getPersons().get(personId);
+    double parkingCostBeta = getParkingBetas().getParkingCostBeta(person);
+    double parkingCost = parking.getCost(personId, arrivalTime, parkingDurationInSeconds);
+    return (parkingCostBeta * parkingCost) * parkingScoreScalingFactor;
+  }
 
+  @Override
+  public double calcScore(
+      Coord destCoord,
+      double arrivalTime,
+      double parkingDurationInSeconds,
+      PC2Parking parking,
+      Id<Person> personId,
+      int legIndex,
+      boolean setCostToZero) {
+    double walkScore = calcWalkScore(destCoord, parking, personId, parkingDurationInSeconds);
+    double costScore = calcCostScore(arrivalTime, parkingDurationInSeconds, parking, personId);
 
-	@Override
-	public double calcScore(Coord destCoord, double arrivalTime, double parkingDurationInSeconds, PC2Parking parking, Id<Person> personId, int legIndex, boolean setCostToZero) {
-		double walkScore = calcWalkScore(destCoord, parking, personId, parkingDurationInSeconds);
-		double costScore = calcCostScore(arrivalTime, parkingDurationInSeconds, parking, personId);
+    if (setCostToZero) {
+      costScore = 0;
+    }
 
-		if (setCostToZero){
-			costScore=0;
-		}
+    double randomError = 0;
 
-		double randomError=0;
+    if (randomErrorTermManager != null) {
+      randomError =
+          randomErrorTermManager.getEpsilonAlternative(parking.getId(), personId, legIndex)
+              * randomErrorTermScalingFactor
+              * parkingScoreScalingFactor;
+    }
+    return costScore + walkScore + randomError;
+  }
 
-		if (randomErrorTermManager!=null){
-			randomError= randomErrorTermManager.getEpsilonAlternative(parking.getId(),personId,legIndex)*randomErrorTermScalingFactor*parkingScoreScalingFactor;
-		}
-		return costScore + walkScore + randomError;
-	}
+  @Override
+  public double getScore(Id<Person> id) {
+    return scores.get(id);
+  }
 
-	@Override
-	public double getScore(Id<Person> id) {
-		return scores.get(id);
-	}
+  @Override
+  public synchronized void addScore(Id<Person> id, double incValue) {
+    scores.incrementBy(id, incValue);
+  }
 
-	@Override
-	public synchronized void addScore(Id<Person> id, double incValue) {
-		scores.incrementBy(id, incValue);
-	}
+  @Override
+  public synchronized void prepareForNewIteration() {
+    scores = new DoubleValueHashMap<>();
+  }
 
-	@Override
-	public synchronized void prepareForNewIteration() {
-		scores = new DoubleValueHashMap<>();
-	}
+  @Override
+  public double getParkingScoreScalingFactor() {
+    return parkingScoreScalingFactor;
+  }
 
-	@Override
-	public double getParkingScoreScalingFactor() {
-		return parkingScoreScalingFactor;
-	}
+  @Override
+  public void setParkingScoreScalingFactor(double parkingScoreScalingFactor) {
+    this.parkingScoreScalingFactor = parkingScoreScalingFactor;
+  }
 
-	@Override
-	public void setParkingScoreScalingFactor(double parkingScoreScalingFactor) {
-		this.parkingScoreScalingFactor = parkingScoreScalingFactor;
-	}
+  @Override
+  public double getRandomErrorTermScalingFactor() {
+    return randomErrorTermScalingFactor;
+  }
 
-	@Override
-	public double getRandomErrorTermScalingFactor() {
-		return randomErrorTermScalingFactor;
-	}
+  @Override
+  public void setRandomErrorTermScalingFactor(double randomErrorTermScalingFactor) {
+    this.randomErrorTermScalingFactor = randomErrorTermScalingFactor;
+  }
 
-	@Override
-	public void setRandomErrorTermScalingFactor(double randomErrorTermScalingFactor) {
-		this.randomErrorTermScalingFactor = randomErrorTermScalingFactor;
-	}
+  @Override
+  public AbstractParkingBetas getParkingBetas() {
+    return parkingBetas;
+  }
 
-	@Override
-	public AbstractParkingBetas getParkingBetas() {
-		return parkingBetas;
-	}
+  @Override
+  public void setParkingBetas(AbstractParkingBetas parkingBetas) {
+    this.parkingBetas = parkingBetas;
+  }
 
-	@Override
-	public void setParkingBetas(AbstractParkingBetas parkingBetas) {
-		this.parkingBetas = parkingBetas;
-	}
-
-	@Override
-	public void setRandomErrorTermManger(RandomErrorTermManager randomErrorTermManager) {
-		this.randomErrorTermManager = randomErrorTermManager;
-	}
-
+  @Override
+  public void setRandomErrorTermManger(RandomErrorTermManager randomErrorTermManager) {
+    this.randomErrorTermManager = randomErrorTermManager;
+  }
 }

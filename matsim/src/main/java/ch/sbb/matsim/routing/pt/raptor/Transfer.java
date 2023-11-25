@@ -29,45 +29,45 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  * @author mrieser / Simunto
  */
 public class Transfer {
-	RTransfer rTransfer = null;
-	RRouteStop fromStop = null;
-	RRouteStop toStop = null;
+  RTransfer rTransfer = null;
+  RRouteStop fromStop = null;
+  RRouteStop toStop = null;
 
-	void reset(RTransfer transfer, RRouteStop rFromStop, RRouteStop rToStop) {
-		this.rTransfer = transfer;
-		this.fromStop = rFromStop;
-		this.toStop = rToStop;
-	}
+  void reset(RTransfer transfer, RRouteStop rFromStop, RRouteStop rToStop) {
+    this.rTransfer = transfer;
+    this.fromStop = rFromStop;
+    this.toStop = rToStop;
+  }
 
-	public TransitStopFacility getFromStop() {
-		return this.fromStop.routeStop.getStopFacility();
-	}
+  public TransitStopFacility getFromStop() {
+    return this.fromStop.routeStop.getStopFacility();
+  }
 
-	public TransitStopFacility getToStop() {
-		return this.toStop.routeStop.getStopFacility();
-	}
+  public TransitStopFacility getToStop() {
+    return this.toStop.routeStop.getStopFacility();
+  }
 
-	public double getTransferTime() {
-		return this.rTransfer.transferTime;
-	}
+  public double getTransferTime() {
+    return this.rTransfer.transferTime;
+  }
 
-	public double getTransferDistance() {
-		return this.rTransfer.transferDistance;
-	}
+  public double getTransferDistance() {
+    return this.rTransfer.transferDistance;
+  }
 
-	public TransitLine getFromTransitLine() {
-		return this.fromStop.line;
-	}
+  public TransitLine getFromTransitLine() {
+    return this.fromStop.line;
+  }
 
-	public TransitRoute getFromTransitRoute() {
-		return this.fromStop.route;
-	}
+  public TransitRoute getFromTransitRoute() {
+    return this.fromStop.route;
+  }
 
-	public TransitLine getToTransitLine() {
-		return this.toStop.line;
-	}
+  public TransitLine getToTransitLine() {
+    return this.toStop.line;
+  }
 
-	public TransitRoute getToTransitRoute() {
-		return this.toStop.route;
-	}
+  public TransitRoute getToTransitRoute() {
+    return this.toStop.route;
+  }
 }

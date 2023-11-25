@@ -19,8 +19,8 @@
 package org.matsim.contrib.parking.parkingsearch;
 
 public enum ParkingSearchStrategy {
-	Random,
-	Benenson,
-	DistanceMemory,
-	NearestParkingSpot
+  Random,
+  Benenson,
+  DistanceMemory,
+  NearestParkingSpot
 }

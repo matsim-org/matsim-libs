@@ -20,5 +20,5 @@
 package playground.vsp.bvwp;
 
 public class UtlChangesData {
-	double utl ;
+  double utl;
 }

@@ -33,9 +33,9 @@ import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FixedSpeedCharging;
 import org.matsim.contrib.ev.discharging.IdleDischargingHandler;
+import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.contrib.evrp.EvDvrpFleetQSimModule;
 import org.matsim.contrib.evrp.OperatingVehicleProvider;
-import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -49,60 +49,72 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunETaxiScenario {
-	private static final double CHARGING_SPEED_FACTOR = 1.5; // > 1 in this example
-	private static final double MAX_SOC = 0.8; // charge up to 80% SOC
-	private static final double TEMPERATURE = 20; // oC
+  private static final double CHARGING_SPEED_FACTOR = 1.5; // > 1 in this example
+  private static final double MAX_SOC = 0.8; // charge up to 80% SOC
+  private static final double TEMPERATURE = 20; // oC
 
-	public static void run(String [] args, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(args,
-				new MultiModeTaxiConfigGroup(ETaxiConfigGroups::createWithCustomETaxiOptimizerParams),
-				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup());
+  public static void run(String[] args, boolean otfvis) {
+    Config config =
+        ConfigUtils.loadConfig(
+            args,
+            new MultiModeTaxiConfigGroup(ETaxiConfigGroups::createWithCustomETaxiOptimizerParams),
+            new DvrpConfigGroup(),
+            new OTFVisConfigGroup(),
+            new EvConfigGroup());
 
-		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		createControler(config, otfvis).run();
-	}
+    config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+    createControler(config, otfvis).run();
+  }
 
-	public static Controler createControler(Config config, boolean otfvis) {
-		MultiModeTaxiConfigGroup multiModeTaxiConfig = MultiModeTaxiConfigGroup.get(config);
+  public static Controler createControler(Config config, boolean otfvis) {
+    MultiModeTaxiConfigGroup multiModeTaxiConfig = MultiModeTaxiConfigGroup.get(config);
 
-		Scenario scenario = createScenarioWithDrtRouteFactory(config);
-		ScenarioUtils.loadScenario(scenario);
+    Scenario scenario = createScenarioWithDrtRouteFactory(config);
+    ScenarioUtils.loadScenario(scenario);
 
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new MultiModeETaxiModule());
-		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new EvModule());
+    Controler controler = new Controler(scenario);
+    controler.addOverridingModule(new MultiModeETaxiModule());
+    controler.addOverridingModule(new DvrpModule());
+    controler.addOverridingModule(new EvModule());
 
-		for (TaxiConfigGroup taxiCfg : multiModeTaxiConfig.getModalElements()) {
-			controler.addOverridingQSimModule(new EvDvrpFleetQSimModule(taxiCfg.getMode()));
-		}
+    for (TaxiConfigGroup taxiCfg : multiModeTaxiConfig.getModalElements()) {
+      controler.addOverridingQSimModule(new EvDvrpFleetQSimModule(taxiCfg.getMode()));
+    }
 
-		controler.addOverridingQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				this.bind(IdleDischargingHandler.VehicleProvider.class).to(OperatingVehicleProvider.class);
-			}
-		});
+    controler.addOverridingQSimModule(
+        new AbstractQSimModule() {
+          @Override
+          protected void configureQSim() {
+            this.bind(IdleDischargingHandler.VehicleProvider.class)
+                .to(OperatingVehicleProvider.class);
+          }
+        });
 
-//		controler.configureQSimComponents(DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT),
-//				multiModeTaxiConfig.modes().collect(toList())));
-		controler.configureQSimComponents( DvrpQSimComponents.activateModes( multiModeTaxiConfig.modes().toArray(String[]::new ) ) );
+    //
+    //	controler.configureQSimComponents(DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT),
+    //				multiModeTaxiConfig.modes().collect(toList())));
+    controler.configureQSimComponents(
+        DvrpQSimComponents.activateModes(multiModeTaxiConfig.modes().toArray(String[]::new)));
 
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-						charger -> new ChargeUpToMaxSocStrategy(charger, MAX_SOC)));
-				//TODO switch to VariableSpeedCharging for Nissan
-				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, CHARGING_SPEED_FACTOR));
-				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
-			}
-		});
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            bind(ChargingLogic.Factory.class)
+                .toProvider(
+                    new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
+                        charger -> new ChargeUpToMaxSocStrategy(charger, MAX_SOC)));
+            // TODO switch to VariableSpeedCharging for Nissan
+            bind(ChargingPower.Factory.class)
+                .toInstance(ev -> new FixedSpeedCharging(ev, CHARGING_SPEED_FACTOR));
+            bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
+          }
+        });
 
-		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule());
-		}
+    if (otfvis) {
+      controler.addOverridingModule(new OTFVisLiveModule());
+    }
 
-		return controler;
-	}
+    return controler;
+  }
 }

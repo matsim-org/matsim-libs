@@ -25,9 +25,8 @@ import org.matsim.core.router.util.TravelTime;
 
 public class OnlyTimeDependentTravelDisutilityFactory implements TravelDisutilityFactory {
 
-	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
-		return new OnlyTimeDependentTravelDisutility(timeCalculator);
-	}
-
+  @Override
+  public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
+    return new OnlyTimeDependentTravelDisutility(timeCalculator);
+  }
 }

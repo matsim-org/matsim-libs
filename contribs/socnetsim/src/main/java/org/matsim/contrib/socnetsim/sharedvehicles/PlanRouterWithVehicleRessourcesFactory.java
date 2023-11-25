@@ -19,26 +19,22 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.sharedvehicles;
 
+import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripRouter;
-import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 
 /**
  * @author thibautd
  */
 public class PlanRouterWithVehicleRessourcesFactory implements PlanRoutingAlgorithmFactory {
-	private final PlanRoutingAlgorithmFactory delegate;
+  private final PlanRoutingAlgorithmFactory delegate;
 
-	public PlanRouterWithVehicleRessourcesFactory(
-			final PlanRoutingAlgorithmFactory delegate) {
-		this.delegate = delegate;
-	}
+  public PlanRouterWithVehicleRessourcesFactory(final PlanRoutingAlgorithmFactory delegate) {
+    this.delegate = delegate;
+  }
 
-	@Override
-	public PlanAlgorithm createPlanRoutingAlgorithm(final TripRouter tripRouter) {
-		return new PlanRouterWithVehicleRessources(
-				delegate.createPlanRoutingAlgorithm(
-					tripRouter ));
-	}
+  @Override
+  public PlanAlgorithm createPlanRoutingAlgorithm(final TripRouter tripRouter) {
+    return new PlanRouterWithVehicleRessources(delegate.createPlanRoutingAlgorithm(tripRouter));
+  }
 }
-

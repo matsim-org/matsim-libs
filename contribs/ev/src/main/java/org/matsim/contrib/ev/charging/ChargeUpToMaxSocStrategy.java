@@ -28,25 +28,26 @@ import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
  * @author Michal Maciejewski (michalm)
  */
 public class ChargeUpToMaxSocStrategy implements ChargingStrategy {
-	private final ChargerSpecification charger;
-	private final double maxSoc;
+  private final ChargerSpecification charger;
+  private final double maxSoc;
 
-	public ChargeUpToMaxSocStrategy(ChargerSpecification charger, double maxSoc) {
-		if (maxSoc < 0 || maxSoc > 1) {
-			throw new IllegalArgumentException();
-		}
-		this.charger = charger;
-		this.maxSoc = maxSoc;
-	}
+  public ChargeUpToMaxSocStrategy(ChargerSpecification charger, double maxSoc) {
+    if (maxSoc < 0 || maxSoc > 1) {
+      throw new IllegalArgumentException();
+    }
+    this.charger = charger;
+    this.maxSoc = maxSoc;
+  }
 
-	@Override
-	public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
-		Battery battery = ev.getBattery();
-		return maxSoc * battery.getCapacity() - battery.getCharge();
-	}
+  @Override
+  public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
+    Battery battery = ev.getBattery();
+    return maxSoc * battery.getCapacity() - battery.getCharge();
+  }
 
-	@Override
-	public double calcRemainingTimeToCharge(ElectricVehicle ev) {
-		return ((BatteryCharging)ev.getChargingPower()).calcChargingTime(charger, calcRemainingEnergyToCharge(ev));
-	}
+  @Override
+  public double calcRemainingTimeToCharge(ElectricVehicle ev) {
+    return ((BatteryCharging) ev.getChargingPower())
+        .calcChargingTime(charger, calcRemainingEnergyToCharge(ev));
+  }
 }

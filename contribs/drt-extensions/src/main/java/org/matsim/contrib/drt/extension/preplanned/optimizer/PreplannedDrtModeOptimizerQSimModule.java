@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.drt.extension.preplanned.optimizer;
 
+import com.google.common.base.Preconditions;
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -30,7 +32,6 @@ import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
@@ -42,46 +43,66 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.common.base.Preconditions;
-import com.google.inject.Singleton;
-
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class PreplannedDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
-	private final DrtConfigGroup drtCfg;
+  private final DrtConfigGroup drtCfg;
 
-	public PreplannedDrtModeOptimizerQSimModule(DrtConfigGroup drtCfg) {
-		super(drtCfg.getMode());
-		this.drtCfg = drtCfg;
-	}
+  public PreplannedDrtModeOptimizerQSimModule(DrtConfigGroup drtCfg) {
+    super(drtCfg.getMode());
+    this.drtCfg = drtCfg;
+  }
 
-	@Override
-	protected void configureQSim() {
-		addModalComponent(DrtOptimizer.class, modalProvider(getter -> new PreplannedDrtOptimizer(drtCfg,
-				getter.getModal(PreplannedDrtOptimizer.PreplannedSchedules.class), getter.getModal(Network.class),
-				getter.getModal(TravelTime.class), getter.getModal(TravelDisutilityFactory.class)
-				.createTravelDisutility(getter.getModal(TravelTime.class)), getter.get(MobsimTimer.class),
-				getter.getModal(DrtTaskFactory.class), getter.get(EventsManager.class), getter.getModal(Fleet.class),
-				getter.getModal(ScheduleTimingUpdater.class))));
+  @Override
+  protected void configureQSim() {
+    addModalComponent(
+        DrtOptimizer.class,
+        modalProvider(
+            getter ->
+                new PreplannedDrtOptimizer(
+                    drtCfg,
+                    getter.getModal(PreplannedDrtOptimizer.PreplannedSchedules.class),
+                    getter.getModal(Network.class),
+                    getter.getModal(TravelTime.class),
+                    getter
+                        .getModal(TravelDisutilityFactory.class)
+                        .createTravelDisutility(getter.getModal(TravelTime.class)),
+                    getter.get(MobsimTimer.class),
+                    getter.getModal(DrtTaskFactory.class),
+                    getter.get(EventsManager.class),
+                    getter.getModal(Fleet.class),
+                    getter.getModal(ScheduleTimingUpdater.class))));
 
-		bindModal(DrtTaskFactory.class).toInstance(new DrtTaskFactoryImpl());
-		
-		bindModal(VrpLegFactory.class).toProvider(modalProvider(getter -> {
-			DvrpConfigGroup dvrpCfg = getter.get(DvrpConfigGroup.class);
-			MobsimTimer timer = getter.get(MobsimTimer.class);
+    bindModal(DrtTaskFactory.class).toInstance(new DrtTaskFactoryImpl());
 
-			return v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.mobsimMode, v, OnlineTrackerListener.NO_LISTENER,
-					timer);
-		})).in(Singleton.class);
+    bindModal(VrpLegFactory.class)
+        .toProvider(
+            modalProvider(
+                getter -> {
+                  DvrpConfigGroup dvrpCfg = getter.get(DvrpConfigGroup.class);
+                  MobsimTimer timer = getter.get(MobsimTimer.class);
 
-		Preconditions.checkState(drtCfg.getPrebookingParams().isEmpty(), "cannot use preplanned schedules with prebooking");
-		bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(DrtActionCreator.class));
+                  return v ->
+                      VrpLegFactory.createWithOnlineTracker(
+                          dvrpCfg.mobsimMode, v, OnlineTrackerListener.NO_LISTENER, timer);
+                }))
+        .in(Singleton.class);
 
-		bindModal(VrpOptimizer.class).to(modalKey(DrtOptimizer.class));
+    Preconditions.checkState(
+        drtCfg.getPrebookingParams().isEmpty(), "cannot use preplanned schedules with prebooking");
+    bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(DrtActionCreator.class));
 
-		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
-				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
-						new DrtStayTaskEndTimeCalculator(getter.getModal(StopTimeCalculator.class))))).asEagerSingleton();
-	}
+    bindModal(VrpOptimizer.class).to(modalKey(DrtOptimizer.class));
+
+    bindModal(ScheduleTimingUpdater.class)
+        .toProvider(
+            modalProvider(
+                getter ->
+                    new ScheduleTimingUpdater(
+                        getter.get(MobsimTimer.class),
+                        new DrtStayTaskEndTimeCalculator(
+                            getter.getModal(StopTimeCalculator.class)))))
+        .asEagerSingleton();
+  }
 }

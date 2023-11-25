@@ -23,38 +23,37 @@ import org.matsim.api.core.v01.Id;
 
 /**
  * @author droeder
- *
  */
 public class DistAnalysisPtDriver {
-	
-	private Id id;
-	private DistAnalysisVehicle vehicle = null;
-	private double distance = 0;
 
-	/**
-	 * @param driverId
-	 * @param id 
-	 */
-	public DistAnalysisPtDriver(Id driverId) {
-		this.id  = driverId;
-	}
+  private Id id;
+  private DistAnalysisVehicle vehicle = null;
+  private double distance = 0;
 
-	/**
-	 * @param v
-	 */
-	public void registerVehicle(DistAnalysisVehicle v) {
-		this.vehicle = v;
-	}
+  /**
+   * @param driverId
+   * @param id
+   */
+  public DistAnalysisPtDriver(Id driverId) {
+    this.id = driverId;
+  }
 
-	/**
-	 * @param length
-	 */
-	public void processLinkEnterEvent(double length) {
-		this.vehicle.processLinkEnterEvent(length);		
-		this.distance += length;
-	}
-	
-	public Id getId(){
-		return this.id;
-	}
+  /**
+   * @param v
+   */
+  public void registerVehicle(DistAnalysisVehicle v) {
+    this.vehicle = v;
+  }
+
+  /**
+   * @param length
+   */
+  public void processLinkEnterEvent(double length) {
+    this.vehicle.processLinkEnterEvent(length);
+    this.distance += length;
+  }
+
+  public Id getId() {
+    return this.id;
+  }
 }

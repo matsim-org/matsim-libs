@@ -17,11 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.commercialTrafficApplications.jointDemand;/*
- * created by jbischoff, 19.06.2019
- */
+package org.matsim.contrib.commercialTrafficApplications.jointDemand; /*
+                                                                       * created by jbischoff, 19.06.2019
+                                                                       */
 
 import com.google.inject.Inject;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -33,70 +37,67 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.freight.carriers.CarrierConstants;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.freight.carriers.CarrierConstants;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+class TourLengthAnalyzer
+    implements ActivityEndEventHandler,
+        LinkEnterEventHandler,
+        PersonEntersVehicleEventHandler,
+        PersonLeavesVehicleEventHandler {
 
-class TourLengthAnalyzer implements ActivityEndEventHandler, LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
+  private final Map<Id<Vehicle>, Set<Id<Person>>> currentFreightVehicleForDelivery =
+      new HashMap<>();
+  private final Map<Id<Person>, Double> deliveryAgentDistances = new HashMap<>();
 
-    private final Map<Id<Vehicle>, Set<Id<Person>>> currentFreightVehicleForDelivery = new HashMap<>();
-    private final Map<Id<Person>, Double> deliveryAgentDistances = new HashMap<>();
+  private final Network network;
 
+  @Inject
+  private TourLengthAnalyzer(Network network, EventsManager eventsManager) {
+    this.network = network;
+    eventsManager.addHandler(this);
+  }
 
-    private final Network network;
-
-    @Inject
-    private TourLengthAnalyzer(Network network, EventsManager eventsManager) {
-        this.network = network;
-        eventsManager.addHandler(this);
+  @Override
+  public void handleEvent(ActivityEndEvent event) {
+    if (event.getActType().equals(CarrierConstants.START)) {
+      deliveryAgentDistances.put(event.getPersonId(), 0.0);
     }
+  }
 
-
-    @Override
-    public void handleEvent(ActivityEndEvent event) {
-        if (event.getActType().equals(CarrierConstants.START)) {
-            deliveryAgentDistances.put(event.getPersonId(), 0.0);
-        }
+  @Override
+  public void handleEvent(LinkEnterEvent event) {
+    if (currentFreightVehicleForDelivery.containsKey(event.getVehicleId())) {
+      for (Id<Person> p : currentFreightVehicleForDelivery.get(event.getVehicleId())) {
+        double currentDistance = deliveryAgentDistances.get(p);
+        currentDistance += network.getLinks().get(event.getLinkId()).getLength();
+        deliveryAgentDistances.put(p, currentDistance);
+      }
     }
+  }
 
-    @Override
-    public void handleEvent(LinkEnterEvent event) {
-        if (currentFreightVehicleForDelivery.containsKey(event.getVehicleId())) {
-            for (Id<Person> p : currentFreightVehicleForDelivery.get(event.getVehicleId())) {
-                double currentDistance = deliveryAgentDistances.get(p);
-                currentDistance += network.getLinks().get(event.getLinkId()).getLength();
-                deliveryAgentDistances.put(p, currentDistance);
-            }
-        }
-
+  @Override
+  public void handleEvent(PersonEntersVehicleEvent event) {
+    if (deliveryAgentDistances.containsKey(event.getPersonId())) {
+      currentFreightVehicleForDelivery.putIfAbsent(event.getVehicleId(), new HashSet<>());
+      currentFreightVehicleForDelivery.get(event.getVehicleId()).add(event.getPersonId());
     }
+  }
 
-    @Override
-    public void handleEvent(PersonEntersVehicleEvent event) {
-        if (deliveryAgentDistances.containsKey(event.getPersonId())) {
-            currentFreightVehicleForDelivery.putIfAbsent(event.getVehicleId(), new HashSet<>());
-            currentFreightVehicleForDelivery.get(event.getVehicleId()).add(event.getPersonId());
-        }
+  @Override
+  public void handleEvent(PersonLeavesVehicleEvent event) {
+    if (currentFreightVehicleForDelivery.containsKey(event.getVehicleId())) {
+      currentFreightVehicleForDelivery.get(event.getVehicleId()).remove(event.getPersonId());
     }
+  }
 
-    @Override
-    public void handleEvent(PersonLeavesVehicleEvent event) {
-        if (currentFreightVehicleForDelivery.containsKey(event.getVehicleId())) {
-            currentFreightVehicleForDelivery.get(event.getVehicleId()).remove(event.getPersonId());
-        }
-    }
+  @Override
+  public void reset(int iteration) {
+    currentFreightVehicleForDelivery.clear();
+  }
 
-    @Override
-    public void reset(int iteration) {
-        currentFreightVehicleForDelivery.clear();
-    }
-
-    Map<Id<Person>, Double> getDeliveryAgentDistances() {
-        return deliveryAgentDistances;
-    }
+  Map<Id<Person>, Double> getDeliveryAgentDistances() {
+    return deliveryAgentDistances;
+  }
 }

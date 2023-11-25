@@ -17,7 +17,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-
 package org.matsim.contrib.drt.extension.companions;
 
 import org.matsim.api.core.v01.Scenario;
@@ -33,24 +32,22 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author Steffen Axer
- *
  */
 public final class DrtCompanionControlerCreator {
 
+  public static Controler createControler(Config config) {
+    MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
+    DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
 
-	public static Controler createControler(Config config) {
-		MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
-		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
+    Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
+    ScenarioUtils.loadScenario(scenario);
 
-		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
-		ScenarioUtils.loadScenario(scenario);
+    Controler controler = new Controler(scenario);
+    controler.addOverridingModule(new DvrpModule());
+    controler.addOverridingModule(new MultiModeDrtModule());
+    controler.addOverridingModule(new MultiModeDrtCompanionModule());
+    controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
 
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new MultiModeDrtModule());
-		controler.addOverridingModule(new MultiModeDrtCompanionModule());
-		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
-
-		return controler;
-	}
+    return controler;
+  }
 }

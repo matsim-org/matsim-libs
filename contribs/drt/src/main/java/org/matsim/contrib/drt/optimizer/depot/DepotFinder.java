@@ -26,5 +26,5 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
  * @author michalm
  */
 public interface DepotFinder {
-	Link findDepot(DvrpVehicle vehicle);
+  Link findDepot(DvrpVehicle vehicle);
 }

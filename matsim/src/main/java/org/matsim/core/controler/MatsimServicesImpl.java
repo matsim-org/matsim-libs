@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * MatsimServicesImpl.java
@@ -19,13 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.controler;
-
+package org.matsim.core.controler;
 
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
+import jakarta.inject.Inject;
+import java.util.Map;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.ScoreStats;
@@ -44,100 +44,104 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
-import jakarta.inject.Inject;
-import java.util.Map;
-
 class MatsimServicesImpl implements MatsimServices {
 
-	@Override
-	public IterationStopWatch getStopwatch() {
-		return injector.getInstance(IterationStopWatch.class);
-	}
+  @Override
+  public IterationStopWatch getStopwatch() {
+    return injector.getInstance(IterationStopWatch.class);
+  }
 
-	@Override
-	public final TravelTime getLinkTravelTimes() {
-		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelTime>>() {})).get(TransportMode.car);
-	}
+  @Override
+  public final TravelTime getLinkTravelTimes() {
+    return this.injector
+        .getInstance(com.google.inject.Injector.class)
+        .getInstance(Key.get(new TypeLiteral<Map<String, TravelTime>>() {}))
+        .get(TransportMode.car);
+  }
 
-	@Override
-	public final Provider<TripRouter> getTripRouterProvider() {
-		return this.injector.getProvider(TripRouter.class);
-	}
+  @Override
+  public final Provider<TripRouter> getTripRouterProvider() {
+    return this.injector.getProvider(TripRouter.class);
+  }
 
-	@Override
-	public final TravelDisutility createTravelDisutilityCalculator() {
-		return getTravelDisutilityFactory().createTravelDisutility(this.injector.getInstance(TravelTime.class));
-	}
+  @Override
+  public final TravelDisutility createTravelDisutilityCalculator() {
+    return getTravelDisutilityFactory()
+        .createTravelDisutility(this.injector.getInstance(TravelTime.class));
+  }
 
-	@Override
-	public final LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
-		return this.injector.getInstance(LeastCostPathCalculatorFactory.class);
-	}
+  @Override
+  public final LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
+    return this.injector.getInstance(LeastCostPathCalculatorFactory.class);
+  }
 
-	@Override
-	public final ScoringFunctionFactory getScoringFunctionFactory() {
-		return this.injector.getInstance(ScoringFunctionFactory.class);
-	}
+  @Override
+  public final ScoringFunctionFactory getScoringFunctionFactory() {
+    return this.injector.getInstance(ScoringFunctionFactory.class);
+  }
 
-	@Override
-	public Config getConfig() {
-		return this.injector.getInstance(Config.class);
-	}
+  @Override
+  public Config getConfig() {
+    return this.injector.getInstance(Config.class);
+  }
 
-	@Override
-	public Scenario getScenario() {
-		return this.injector.getInstance(Scenario.class);
-	}
+  @Override
+  public Scenario getScenario() {
+    return this.injector.getInstance(Scenario.class);
+  }
 
-	@Override
-	public EventsManager getEvents() {
-		return this.injector.getInstance(EventsManager.class);
-	}
+  @Override
+  public EventsManager getEvents() {
+    return this.injector.getInstance(EventsManager.class);
+  }
 
-	@Inject Injector injector;
-	@Override
-	public Injector getInjector() {
-		return injector;
-	}
+  @Inject Injector injector;
 
-	@Override
-	public final CalcLinkStats getLinkStats() {
-		return this.injector.getInstance(CalcLinkStats.class);
-	}
+  @Override
+  public Injector getInjector() {
+    return injector;
+  }
 
-	@Override
-	public final VolumesAnalyzer getVolumes() {
-		return this.injector.getInstance(VolumesAnalyzer.class);
-	}
+  @Override
+  public final CalcLinkStats getLinkStats() {
+    return this.injector.getInstance(CalcLinkStats.class);
+  }
 
-	@Override
-	public final ScoreStats getScoreStats() {
-		return this.injector.getInstance(ScoreStats.class);
-	}
+  @Override
+  public final VolumesAnalyzer getVolumes() {
+    return this.injector.getInstance(VolumesAnalyzer.class);
+  }
 
-	@Override
-	public final TravelDisutilityFactory getTravelDisutilityFactory() {
-		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelDisutilityFactory>>(){}))
-				.get(TransportMode.car);
-	}
+  @Override
+  public final ScoreStats getScoreStats() {
+    return this.injector.getInstance(ScoreStats.class);
+  }
 
-	@Override
-	public final StrategyManager getStrategyManager() {
-		return this.injector.getInstance(StrategyManager.class);
-	}
+  @Override
+  public final TravelDisutilityFactory getTravelDisutilityFactory() {
+    return this.injector
+        .getInstance(com.google.inject.Injector.class)
+        .getInstance(Key.get(new TypeLiteral<Map<String, TravelDisutilityFactory>>() {}))
+        .get(TransportMode.car);
+  }
 
-	@Override
-	public OutputDirectoryHierarchy getControlerIO() {
-		return injector.getInstance(OutputDirectoryHierarchy.class);
-	}
+  @Override
+  public final StrategyManager getStrategyManager() {
+    return this.injector.getInstance(StrategyManager.class);
+  }
 
-	@Override
-	public void addControlerListener(ControlerListener controlerListener) {
-		((NewControler) injector.getInstance(ControlerI.class)).addControlerListener(controlerListener);
-	}
+  @Override
+  public OutputDirectoryHierarchy getControlerIO() {
+    return injector.getInstance(OutputDirectoryHierarchy.class);
+  }
 
-	@Override
-	public Integer getIterationNumber() {
-		return injector.getInstance(ReplanningContext.class).getIteration();
-	}
+  @Override
+  public void addControlerListener(ControlerListener controlerListener) {
+    ((NewControler) injector.getInstance(ControlerI.class)).addControlerListener(controlerListener);
+  }
+
+  @Override
+  public Integer getIterationNumber() {
+    return injector.getInstance(ReplanningContext.class).getIteration();
+  }
 }

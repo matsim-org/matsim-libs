@@ -21,7 +21,6 @@ package playground.vsp.andreas.utils.ana;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -31,46 +30,48 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
  * Tags all routes of lines starting with a given identifier.
- * 
- * @author aneumann
  *
+ * @author aneumann
  */
 public class TagLinesInTransitSchedule {
-	
-	private final static Logger log = LogManager.getLogger(TagLinesInTransitSchedule.class);
-	
-	public static TransitSchedule tagLinesInTransitSchedule(TransitSchedule transitSchedule, String identifier){
-		int routesTagged = 0;
-		int linesTagged = 0;
 
-		for (Entry<Id<TransitLine>, TransitLine> transitLineEntry : transitSchedule.getTransitLines().entrySet()) {
-			if (transitLineEntry.getKey().toString().startsWith(identifier)) {
-				linesTagged++;
-				for (TransitRoute transitRoute : transitLineEntry.getValue().getRoutes().values()) {
-					transitRoute.setTransportMode(identifier);
-					routesTagged++;
-				}
-			}
-		}
-		
-		log.info("Tagged " + linesTagged + " lines and " + routesTagged + " routes.");
-		return transitSchedule;
-	}
-	
-	public static void tagLinesInTransitSchedule(TransitSchedule transitSchedule, HashMap<Id<TransitLine>, String> lineId2ptModeMap) {
-		int routesTagged = 0;
-		int linesTagged = 0;
-		
-		for (Entry<Id<TransitLine>, String> lineId2ptModeEntry : lineId2ptModeMap.entrySet()) {
-			TransitLine transitLine = transitSchedule.getTransitLines().get(lineId2ptModeEntry.getKey());
-			linesTagged++;
-			
-			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				transitRoute.setTransportMode(lineId2ptModeEntry.getValue());
-				routesTagged++;
-			}
-		}
+  private static final Logger log = LogManager.getLogger(TagLinesInTransitSchedule.class);
 
-		log.info("Tagged " + linesTagged + " lines and " + routesTagged + " routes.");
-	}
+  public static TransitSchedule tagLinesInTransitSchedule(
+      TransitSchedule transitSchedule, String identifier) {
+    int routesTagged = 0;
+    int linesTagged = 0;
+
+    for (Entry<Id<TransitLine>, TransitLine> transitLineEntry :
+        transitSchedule.getTransitLines().entrySet()) {
+      if (transitLineEntry.getKey().toString().startsWith(identifier)) {
+        linesTagged++;
+        for (TransitRoute transitRoute : transitLineEntry.getValue().getRoutes().values()) {
+          transitRoute.setTransportMode(identifier);
+          routesTagged++;
+        }
+      }
+    }
+
+    log.info("Tagged " + linesTagged + " lines and " + routesTagged + " routes.");
+    return transitSchedule;
+  }
+
+  public static void tagLinesInTransitSchedule(
+      TransitSchedule transitSchedule, HashMap<Id<TransitLine>, String> lineId2ptModeMap) {
+    int routesTagged = 0;
+    int linesTagged = 0;
+
+    for (Entry<Id<TransitLine>, String> lineId2ptModeEntry : lineId2ptModeMap.entrySet()) {
+      TransitLine transitLine = transitSchedule.getTransitLines().get(lineId2ptModeEntry.getKey());
+      linesTagged++;
+
+      for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
+        transitRoute.setTransportMode(lineId2ptModeEntry.getValue());
+        routesTagged++;
+      }
+    }
+
+    log.info("Tagged " + linesTagged + " lines and " + routesTagged + " routes.");
+  }
 }

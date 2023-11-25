@@ -19,7 +19,6 @@
 package org.matsim.contrib.minibus.hook;
 
 import java.util.Set;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -29,20 +28,17 @@ import org.matsim.core.scenario.MutableScenario;
 
 /**
  * @author droeder
- *
  */
 class PersonReRouteStuckFactoryImpl implements PersonReRouteStuckFactory {
 
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(PersonReRouteStuckFactoryImpl.class);
+  @SuppressWarnings("unused")
+  private static final Logger log = LogManager.getLogger(PersonReRouteStuckFactoryImpl.class);
 
-	public PersonReRouteStuckFactoryImpl() {
-		
-	}
+  public PersonReRouteStuckFactoryImpl() {}
 
-	@Override
-	public AbstractPersonReRouteStuck getReRouteStuck(final PlanAlgorithm router, final MutableScenario scenario, Set<Id<Person>> agentsStuck) {
-		return new PersonReRouteStuck(router, scenario, agentsStuck);
-	}
+  @Override
+  public AbstractPersonReRouteStuck getReRouteStuck(
+      final PlanAlgorithm router, final MutableScenario scenario, Set<Id<Person>> agentsStuck) {
+    return new PersonReRouteStuck(router, scenario, agentsStuck);
+  }
 }
-

@@ -20,7 +20,6 @@
 package org.matsim.households;
 
 import java.util.ArrayList;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.households.Income.IncomePeriod;
@@ -31,16 +30,16 @@ import org.matsim.vehicles.Vehicle;
  */
 public class HouseholdsFactoryImpl implements HouseholdsFactory {
 
-	@Override
-	public HouseholdImpl createHousehold(Id<Household> householdId) {
-		HouseholdImpl hh = new HouseholdImpl(householdId);
-		hh.setMemberIds(new ArrayList<Id<Person>>());
-		hh.setVehicleIds(new ArrayList<Id<Vehicle>>());
-		return hh;
-	}
-	
-	@Override
-	public Income createIncome(double income, IncomePeriod period) {
-		return new IncomeImpl(income, period);
-	}
+  @Override
+  public HouseholdImpl createHousehold(Id<Household> householdId) {
+    HouseholdImpl hh = new HouseholdImpl(householdId);
+    hh.setMemberIds(new ArrayList<Id<Person>>());
+    hh.setVehicleIds(new ArrayList<Id<Vehicle>>());
+    return hh;
+  }
+
+  @Override
+  public Income createIncome(double income, IncomePeriod period) {
+    return new IncomeImpl(income, period);
+  }
 }

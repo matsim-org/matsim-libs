@@ -25,22 +25,21 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 
-
 /**
- * SignalControllerListener implementation for the MATSim default implementation for traffic light control, 
- * i.e. a fixed-time traffic signal control that can be specified completely by xml input data.
- * @author dgrether
+ * SignalControllerListener implementation for the MATSim default implementation for traffic light
+ * control, i.e. a fixed-time traffic signal control that can be specified completely by xml input
+ * data.
  *
+ * @author dgrether
  */
 final class DefaultSignalControlerListener implements SignalControlerListener, ShutdownListener {
-	
-	@Override
-	public final void notifyShutdown(ShutdownEvent event) {
-		writeData(event.getServices().getScenario(), event.getServices().getControlerIO());
-	}
-	
-	private static void writeData(Scenario sc, OutputDirectoryHierarchy controlerIO){
-		new SignalsScenarioWriter(controlerIO).writeSignalsData(sc);
-	}
 
+  @Override
+  public final void notifyShutdown(ShutdownEvent event) {
+    writeData(event.getServices().getScenario(), event.getServices().getControlerIO());
+  }
+
+  private static void writeData(Scenario sc, OutputDirectoryHierarchy controlerIO) {
+    new SignalsScenarioWriter(controlerIO).writeSignalsData(sc);
+  }
 }

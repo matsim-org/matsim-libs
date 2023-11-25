@@ -26,32 +26,33 @@ import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
  * @author michalm
  */
 public class FixedSpeedCharging implements BatteryCharging {
-	private final double maxPower;
-	private final ElectricVehicle electricVehicle;
+  private final double maxPower;
+  private final ElectricVehicle electricVehicle;
 
-	/**
-	 * @param electricVehicle
-	 * @param relativeSpeed   in C, where 1 C = full recharge in 1 hour
-	 */
-	public FixedSpeedCharging(ElectricVehicle electricVehicle, double relativeSpeed) {
-		this.electricVehicle = electricVehicle;
-		double c = this.electricVehicle.getBattery().getCapacity() / 3600.;
-		maxPower = relativeSpeed * c;
-	}
+  /**
+   * @param electricVehicle
+   * @param relativeSpeed in C, where 1 C = full recharge in 1 hour
+   */
+  public FixedSpeedCharging(ElectricVehicle electricVehicle, double relativeSpeed) {
+    this.electricVehicle = electricVehicle;
+    double c = this.electricVehicle.getBattery().getCapacity() / 3600.;
+    maxPower = relativeSpeed * c;
+  }
 
-	@Override
-	public double calcChargingPower(ChargerSpecification charger) {
-		return Math.min(maxPower, charger.getPlugPower());
-	}
+  @Override
+  public double calcChargingPower(ChargerSpecification charger) {
+    return Math.min(maxPower, charger.getPlugPower());
+  }
 
-	@Override
-	public double calcEnergyCharged(ChargerSpecification charger, double chargePeriod) {
-		final Battery battery = electricVehicle.getBattery();
-		return Math.min(calcChargingPower(charger) * chargePeriod, battery.getCapacity() - battery.getCharge());
-	}
+  @Override
+  public double calcEnergyCharged(ChargerSpecification charger, double chargePeriod) {
+    final Battery battery = electricVehicle.getBattery();
+    return Math.min(
+        calcChargingPower(charger) * chargePeriod, battery.getCapacity() - battery.getCharge());
+  }
 
-	@Override
-	public double calcChargingTime(ChargerSpecification charger, double energy) {
-		return energy / calcChargingPower(charger);
-	}
+  @Override
+  public double calcChargingTime(ChargerSpecification charger, double energy) {
+    return energy / calcChargingPower(charger);
+  }
 }

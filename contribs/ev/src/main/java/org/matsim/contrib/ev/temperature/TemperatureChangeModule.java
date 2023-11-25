@@ -17,33 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.ev.temperature;/*
- * created by jbischoff, 15.08.2018
- */
+package org.matsim.contrib.ev.temperature; /*
+                                            * created by jbischoff, 15.08.2018
+                                            */
 
 import com.google.inject.Singleton;
 import org.matsim.core.controler.AbstractModule;
 
 public class TemperatureChangeModule extends AbstractModule {
-    @Override
-    public void install() {
+  @Override
+  public void install() {
 
-	    addMobsimListenerBinding().to(TemperatureManager.class).in( Singleton.class );
+    addMobsimListenerBinding().to(TemperatureManager.class).in(Singleton.class);
 
-	    bind(TemperatureServiceImpl.class).in( Singleton.class );
-	    bind(TemperatureService.class).to(TemperatureServiceImpl.class);
-	    addEventHandlerBinding().to(TemperatureServiceImpl.class);
+    bind(TemperatureServiceImpl.class).in(Singleton.class);
+    bind(TemperatureService.class).to(TemperatureServiceImpl.class);
+    addEventHandlerBinding().to(TemperatureServiceImpl.class);
 
-	    // yyyy Shouldn't we think about just having a like
+    // yyyy Shouldn't we think about just having a like
 
-//	    bind(TemperatureService.class).to(TemperatureServiceImpl.class)(.in( Singleton.class ));
+    //	    bind(TemperatureService.class).to(TemperatureServiceImpl.class)(.in( Singleton.class ));
 
-	    // and then make sure that the implementation registers itself?  But how to actually achieve that?  kai, oct'23
+    // and then make sure that the implementation registers itself?  But how to actually achieve
+    // that?  kai, oct'23
 
-	    // I think that the answer to that last question is to bind the interface rather than the implementation, and have that further "upstairs" in the ev module:
-	    // addEventHandlerBinding().to( TemperatureService.class );
-	    // for this, evidently, the interface needs to implement the right things (which it currently does not).
+    // I think that the answer to that last question is to bind the interface rather than the
+    // implementation, and have that further "upstairs" in the ev module:
+    // addEventHandlerBinding().to( TemperatureService.class );
+    // for this, evidently, the interface needs to implement the right things (which it currently
+    // does not).
 
-
-	}
+  }
 }

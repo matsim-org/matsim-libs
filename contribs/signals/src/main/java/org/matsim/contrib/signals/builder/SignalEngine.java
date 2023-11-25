@@ -22,12 +22,7 @@ package org.matsim.contrib.signals.builder;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 
-
 /**
  * @author dgrether
- *
- */ 
-interface SignalEngine extends MobsimInitializedListener, MobsimBeforeSimStepListener{
-
-	
-}
+ */
+interface SignalEngine extends MobsimInitializedListener, MobsimBeforeSimStepListener {}

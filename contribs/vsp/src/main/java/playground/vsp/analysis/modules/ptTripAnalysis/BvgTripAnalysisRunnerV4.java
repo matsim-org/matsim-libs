@@ -19,54 +19,53 @@
  * *********************************************************************** */
 package playground.vsp.analysis.modules.ptTripAnalysis;
 
-
 /**
  * @author aneumann, droeder
- *
  */
 public class BvgTripAnalysisRunnerV4 {
-//			extends AbstractAnalyisModule{
-//	
-//	private final static Logger log = LogManager.getLogger(BvgTripAnalysisRunnerV4.class);
-//
-//	private ScenarioImpl scenario;
-//	private TTtripAnalysisV4 ana;
-//	
-//	public BvgTripAnalysisRunnerV4(String ptDriverPrefix){
-//		super(BvgTripAnalysisRunnerV4.class.getSimpleName(), ptDriverPrefix);
-//		log.info("enabled");
-//	}
-//	
-//	public void init(ScenarioImpl scenario, Set<Feature> shapeFile) {
-//		this.scenario = scenario;
-//		this.ana = new TTtripAnalysisV4(scenario.getConfig().transit().getTransitModes(), scenario.getConfig().plansCalcRoute().getNetworkModes());
-//
-//		Geometry g =  (Geometry) shapeFile.iterator().next().getAttribute(0);
-//		Map<String, Geometry> zones =  new HashMap<String, Geometry>();
-//		zones.put("Berlin", g);
-//		this.ana.addZones(zones);
-//	}
-//
-//	@Override
-//	public List<EventHandler> getEventHandler() {
-//		List<EventHandler> handler = new LinkedList<EventHandler>();
-//		handler.add(this.ana.getEventHandler());
-//		return handler;
-//	}
-//
-//	@Override
-//	public void preProcessData() {
-//		this.ana.preProcessData(this.scenario.getPopulation());
-//	}
-//
-//	@Override
-//	public void postProcessData() {
-//		// nothing to do here
-//	}
-//
-//	@Override
-//	public void writeResults(String outputFolder) {
-//		this.ana.writeResults(outputFolder);
-//	}
+  //			extends AbstractAnalyisModule{
+  //
+  //	private final static Logger log = LogManager.getLogger(BvgTripAnalysisRunnerV4.class);
+  //
+  //	private ScenarioImpl scenario;
+  //	private TTtripAnalysisV4 ana;
+  //
+  //	public BvgTripAnalysisRunnerV4(String ptDriverPrefix){
+  //		super(BvgTripAnalysisRunnerV4.class.getSimpleName(), ptDriverPrefix);
+  //		log.info("enabled");
+  //	}
+  //
+  //	public void init(ScenarioImpl scenario, Set<Feature> shapeFile) {
+  //		this.scenario = scenario;
+  //		this.ana = new TTtripAnalysisV4(scenario.getConfig().transit().getTransitModes(),
+  // scenario.getConfig().plansCalcRoute().getNetworkModes());
+  //
+  //		Geometry g =  (Geometry) shapeFile.iterator().next().getAttribute(0);
+  //		Map<String, Geometry> zones =  new HashMap<String, Geometry>();
+  //		zones.put("Berlin", g);
+  //		this.ana.addZones(zones);
+  //	}
+  //
+  //	@Override
+  //	public List<EventHandler> getEventHandler() {
+  //		List<EventHandler> handler = new LinkedList<EventHandler>();
+  //		handler.add(this.ana.getEventHandler());
+  //		return handler;
+  //	}
+  //
+  //	@Override
+  //	public void preProcessData() {
+  //		this.ana.preProcessData(this.scenario.getPopulation());
+  //	}
+  //
+  //	@Override
+  //	public void postProcessData() {
+  //		// nothing to do here
+  //	}
+  //
+  //	@Override
+  //	public void writeResults(String outputFolder) {
+  //		this.ana.writeResults(outputFolder);
+  //	}
 
 }

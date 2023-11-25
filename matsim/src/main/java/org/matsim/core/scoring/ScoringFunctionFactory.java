@@ -25,23 +25,23 @@ import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.api.internal.MatsimFactory;
 
 /**
- * The <code>ScoringFunctionFactory</code> creates new scoring functions.
- * <br>
- * Examples:<ul>
- * <li> {@link tutorial.programming.example16customscoring.RunCustomScoringExample}
+ * The <code>ScoringFunctionFactory</code> creates new scoring functions. <br>
+ * Examples:
+ *
+ * <ul>
+ *   <li>{@link tutorial.programming.example16customscoring.RunCustomScoringExample}
  * </ul>
  *
  * @author mrieser
  */
 public interface ScoringFunctionFactory extends MatsimFactory, MatsimExtensionPoint {
 
-	/**
-	 * Creates a new scoring function for the given plan.
-	 *
-	 * @param person A reference plan when calculating the score. This plan may be
-	 * used by the scoring function to look additional information. (But see comment above.  kai, mar'12)
-	 * @return A scoring function.
-	 */
-	public ScoringFunction createNewScoringFunction(final Person person);
-
+  /**
+   * Creates a new scoring function for the given plan.
+   *
+   * @param person A reference plan when calculating the score. This plan may be used by the scoring
+   *     function to look additional information. (But see comment above. kai, mar'12)
+   * @return A scoring function.
+   */
+  public ScoringFunction createNewScoringFunction(final Person person);
 }

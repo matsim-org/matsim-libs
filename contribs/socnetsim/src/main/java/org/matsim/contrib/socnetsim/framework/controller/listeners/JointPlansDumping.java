@@ -19,73 +19,65 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.controller.listeners;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.socnetsim.framework.population.JointPlans;
+import org.matsim.contrib.socnetsim.framework.population.JointPlansXmlWriter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-
-import org.matsim.contrib.socnetsim.framework.population.JointPlans;
-import org.matsim.contrib.socnetsim.framework.population.JointPlansXmlWriter;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 /**
  * @author thibautd
  */
 @Singleton
 public class JointPlansDumping implements BeforeMobsimListener {
-	private static final Logger log =
-		LogManager.getLogger(JointPlansDumping.class);
+  private static final Logger log = LogManager.getLogger(JointPlansDumping.class);
 
-	private final Scenario sc;
-	private final JointPlans jointPlans;
-	private final int writePlansInterval;
-	private final int firstIteration ;
-	private final OutputDirectoryHierarchy controlerIO;
+  private final Scenario sc;
+  private final JointPlans jointPlans;
+  private final int writePlansInterval;
+  private final int firstIteration;
+  private final OutputDirectoryHierarchy controlerIO;
 
-	@Inject
-	public JointPlansDumping(
-			final Scenario sc,
-			final OutputDirectoryHierarchy controlerIO ) {
-		this.sc = sc ;
-		this.jointPlans = (JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME );
-		this.firstIteration = sc.getConfig().controller().getFirstIteration();
-		this.writePlansInterval = sc.getConfig().controller().getWritePlansInterval() ;
-		this.controlerIO = controlerIO ;
-	}
+  @Inject
+  public JointPlansDumping(final Scenario sc, final OutputDirectoryHierarchy controlerIO) {
+    this.sc = sc;
+    this.jointPlans = (JointPlans) sc.getScenarioElement(JointPlans.ELEMENT_NAME);
+    this.firstIteration = sc.getConfig().controller().getFirstIteration();
+    this.writePlansInterval = sc.getConfig().controller().getWritePlansInterval();
+    this.controlerIO = controlerIO;
+  }
 
-	public JointPlansDumping(
-			final Scenario sc,
-			final JointPlans jointPlans,
-			final int firstIteration,
-			final int writePlansInterval,
-			final OutputDirectoryHierarchy controlerIO ) {
-		this.sc = sc ;
-		this.jointPlans = jointPlans;
-		this.firstIteration = firstIteration ;
-		this.writePlansInterval = writePlansInterval ;
-		this.controlerIO = controlerIO ;
-	}
+  public JointPlansDumping(
+      final Scenario sc,
+      final JointPlans jointPlans,
+      final int firstIteration,
+      final int writePlansInterval,
+      final OutputDirectoryHierarchy controlerIO) {
+    this.sc = sc;
+    this.jointPlans = jointPlans;
+    this.firstIteration = firstIteration;
+    this.writePlansInterval = writePlansInterval;
+    this.controlerIO = controlerIO;
+  }
 
-	@Override
-	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
-		if ( !dump( event.getIteration() ) ) return;
-		log.info("dumping joint plans...");
-		JointPlansXmlWriter.write(
-				sc.getPopulation(),
-				jointPlans,
-				controlerIO.getIterationFilename(
-					event.getIteration(),
-					"jointPlans.xml.gz" ));
-		log.info("finished joint plans dump.");
-	}
+  @Override
+  public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
+    if (!dump(event.getIteration())) return;
+    log.info("dumping joint plans...");
+    JointPlansXmlWriter.write(
+        sc.getPopulation(),
+        jointPlans,
+        controlerIO.getIterationFilename(event.getIteration(), "jointPlans.xml.gz"));
+    log.info("finished joint plans dump.");
+  }
 
-	protected boolean dump( final int iteration ) {
-		return writePlansInterval > 0 &&
-				( (iteration % writePlansInterval== 0)
-				|| (iteration == (firstIteration + 1) ) );
-	}
+  protected boolean dump(final int iteration) {
+    return writePlansInterval > 0
+        && ((iteration % writePlansInterval == 0) || (iteration == (firstIteration + 1)));
+  }
 }

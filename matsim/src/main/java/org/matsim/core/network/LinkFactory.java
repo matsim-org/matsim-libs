@@ -28,13 +28,20 @@ import org.matsim.core.api.internal.MatsimFactory;
 
 /**
  * The link factory is used e.g. when link data is written from files.
- * 
- * @author (of documentation) nagel
  *
+ * @author (of documentation) nagel
  */
 public interface LinkFactory extends MatsimFactory {
 
-	public Link createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed, double capacity, double nOfLanes);
-	// yyyyyy reduce length of signature !!!!
+  public Link createLink(
+      Id<Link> id,
+      Node from,
+      Node to,
+      Network network,
+      double length,
+      double freespeed,
+      double capacity,
+      double nOfLanes);
+  // yyyyyy reduce length of signature !!!!
 
 }

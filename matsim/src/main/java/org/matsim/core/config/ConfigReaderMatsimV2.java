@@ -27,18 +27,10 @@ import static org.matsim.core.config.ConfigV2XmlNames.TYPE;
 import static org.matsim.core.config.ConfigV2XmlNames.VALUE;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Stack;
-import java.util.stream.Collectors;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.checkerframework.checker.units.qual.C;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -47,88 +39,75 @@ import org.xml.sax.Attributes;
  * @author mrieser (alias-functionality)
  */
 class ConfigReaderMatsimV2 extends MatsimXmlParser {
-	private final static Logger LOG = LogManager.getLogger(ConfigReaderMatsimV2.class);
+  private static final Logger LOG = LogManager.getLogger(ConfigReaderMatsimV2.class);
 
-	private final Config config;
+  private final Config config;
 
-	private final ConfigAliases aliases;
-	private final Deque<ConfigGroup> moduleStack = new ArrayDeque<>();
-	private final Deque<String> pathStack = new ArrayDeque<>();
+  private final ConfigAliases aliases;
+  private final Deque<ConfigGroup> moduleStack = new ArrayDeque<>();
+  private final Deque<String> pathStack = new ArrayDeque<>();
 
-	ConfigReaderMatsimV2(final Config config) {
-		super(ValidationType.DTD_ONLY);
-		this.config = config;
-		this.aliases = new ConfigAliases();
-	}
+  ConfigReaderMatsimV2(final Config config) {
+    super(ValidationType.DTD_ONLY);
+    this.config = config;
+    this.aliases = new ConfigAliases();
+  }
 
-	ConfigReaderMatsimV2(final Config config, final ConfigAliases aliases) {
-		super(ValidationType.DTD_ONLY);
-		this.config = config;
-		this.aliases = aliases;
-	}
+  ConfigReaderMatsimV2(final Config config, final ConfigAliases aliases) {
+    super(ValidationType.DTD_ONLY);
+    this.config = config;
+    this.aliases = aliases;
+  }
 
-	public ConfigAliases getConfigAliases() {
-		return this.aliases;
-	}
+  public ConfigAliases getConfigAliases() {
+    return this.aliases;
+  }
 
-	@Override
-	public void startTag(
-			final String name,
-			final Attributes atts,
-			final Stack<String> context) {
+  @Override
+  public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 
-		if ( name.equals( MODULE ) ) {
-			startModule(atts);
-		}
-		else if ( name.equals( PARAMETER_SET ) ) {
-			startParameterSet(atts);
-		}
-		else if ( name.equals( PARAMETER ) ) {
-			startParameter(atts);
-		}
-		else if ( !name.equals( "config" ) ) {
-			// this is the job of the dtd validation,
-			// but better too much safety than too little...
-			throw new IllegalArgumentException( "unknown tag "+name );
-		}
-	}
+    if (name.equals(MODULE)) {
+      startModule(atts);
+    } else if (name.equals(PARAMETER_SET)) {
+      startParameterSet(atts);
+    } else if (name.equals(PARAMETER)) {
+      startParameter(atts);
+    } else if (!name.equals("config")) {
+      // this is the job of the dtd validation,
+      // but better too much safety than too little...
+      throw new IllegalArgumentException("unknown tag " + name);
+    }
+  }
 
-	private void startParameter(final Attributes atts) {
-		String name = this.aliases.resolveAlias(atts.getValue(NAME), this.pathStack);
-		this.moduleStack.getFirst().addParam(
-				name,
-				atts.getValue( VALUE ) );
-	}
+  private void startParameter(final Attributes atts) {
+    String name = this.aliases.resolveAlias(atts.getValue(NAME), this.pathStack);
+    this.moduleStack.getFirst().addParam(name, atts.getValue(VALUE));
+  }
 
-	private void startParameterSet(final Attributes atts) {
-		String type = this.aliases.resolveAlias(atts.getValue(TYPE), this.pathStack);
-		final ConfigGroup m = this.moduleStack.getFirst().createParameterSet( type );
-		this.moduleStack.addFirst(m);
-		this.pathStack.addFirst(m.getName());
-	}
+  private void startParameterSet(final Attributes atts) {
+    String type = this.aliases.resolveAlias(atts.getValue(TYPE), this.pathStack);
+    final ConfigGroup m = this.moduleStack.getFirst().createParameterSet(type);
+    this.moduleStack.addFirst(m);
+    this.pathStack.addFirst(m.getName());
+  }
 
-	private void startModule(final Attributes atts) {
-		String name = this.aliases.resolveAlias(atts.getValue(NAME), this.pathStack);
-		ConfigGroup m = this.config.getModule(name);
-		if (m == null) {
-			m = this.config.createModule(name);
-		}
-		this.moduleStack.addFirst(m);
-		this.pathStack.addFirst(m.getName());
-	}
+  private void startModule(final Attributes atts) {
+    String name = this.aliases.resolveAlias(atts.getValue(NAME), this.pathStack);
+    ConfigGroup m = this.config.getModule(name);
+    if (m == null) {
+      m = this.config.createModule(name);
+    }
+    this.moduleStack.addFirst(m);
+    this.pathStack.addFirst(m.getName());
+  }
 
-	@Override
-	public void endTag(
-			final String name,
-			final String content,
-			final Stack<String> context) {
-		if ( name.equals( MODULE ) || name.equals( PARAMETER_SET ) ) {
-			final ConfigGroup head = this.moduleStack.removeFirst();
-			this.pathStack.removeFirst();
+  @Override
+  public void endTag(final String name, final String content, final Stack<String> context) {
+    if (name.equals(MODULE) || name.equals(PARAMETER_SET)) {
+      final ConfigGroup head = this.moduleStack.removeFirst();
+      this.pathStack.removeFirst();
 
-			if ( !this.moduleStack.isEmpty() ) this.moduleStack.getFirst().addParameterSet( head );
-		}
-	}
-
+      if (!this.moduleStack.isEmpty()) this.moduleStack.getFirst().addParameterSet(head);
+    }
+  }
 }
-

@@ -22,7 +22,6 @@ package org.matsim.core.router.speedy;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.TravelDisutility;
@@ -32,18 +31,21 @@ import org.matsim.core.router.util.TravelTime;
  * @author Michal Maciejewski (michalm)
  */
 public class SpeedyMultiSourceALTFactory {
-	private final Map<Network, SpeedyGraph> graphs = new ConcurrentHashMap<>();
-	private final Map<Pair<SpeedyGraph, TravelDisutility>, SpeedyALTData> landmarksData = new ConcurrentHashMap<>();
+  private final Map<Network, SpeedyGraph> graphs = new ConcurrentHashMap<>();
+  private final Map<Pair<SpeedyGraph, TravelDisutility>, SpeedyALTData> landmarksData =
+      new ConcurrentHashMap<>();
 
-	public SpeedyMultiSourceALT createPathCalculator(Network network, TravelDisutility travelCosts,
-			TravelTime travelTimes) {
-		SpeedyGraph graph = this.graphs.computeIfAbsent(network, SpeedyGraph::new);
+  public SpeedyMultiSourceALT createPathCalculator(
+      Network network, TravelDisutility travelCosts, TravelTime travelTimes) {
+    SpeedyGraph graph = this.graphs.computeIfAbsent(network, SpeedyGraph::new);
 
-		var graphTravelCostsPair = Pair.of(graph, travelCosts);
-		int landmarksCount = Math.min(16, graph.nodeCount);
-		SpeedyALTData landmarks = this.landmarksData.computeIfAbsent(graphTravelCostsPair,
-				p -> new SpeedyALTData(p.getLeft(), landmarksCount, p.getRight()));
+    var graphTravelCostsPair = Pair.of(graph, travelCosts);
+    int landmarksCount = Math.min(16, graph.nodeCount);
+    SpeedyALTData landmarks =
+        this.landmarksData.computeIfAbsent(
+            graphTravelCostsPair,
+            p -> new SpeedyALTData(p.getLeft(), landmarksCount, p.getRight()));
 
-		return new SpeedyMultiSourceALT(landmarks, travelTimes, travelCosts);
-	}
+    return new SpeedyMultiSourceALT(landmarks, travelTimes, travelCosts);
+  }
 }

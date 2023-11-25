@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -40,149 +39,170 @@ import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
 
 public class TreesBuilder {
-	// this functionality would better be directly provided by the facilities container (similar to how network does it)
+  // this functionality would better be directly provided by the facilities container (similar to
+  // how network does it)
 
-	private Network network = null;
-	private static final Logger log = LogManager.getLogger(TreesBuilder.class);
-	private Set<String> flexibleTypes = new HashSet<String>();
-	private final DestinationChoiceConfigGroupI config;
-	
-	protected TreeMap<String, QuadTree<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTree<ActivityFacility>>();
-	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
-	
-	public TreesBuilder(Set<String> flexibleTypes, Network network, DestinationChoiceConfigGroupI config) {
-		this.flexibleTypes = flexibleTypes;
-		this.network = network;
-		this.config = config;
-	}
+  private Network network = null;
+  private static final Logger log = LogManager.getLogger(TreesBuilder.class);
+  private Set<String> flexibleTypes = new HashSet<String>();
+  private final DestinationChoiceConfigGroupI config;
 
-	public TreesBuilder(Network network, DestinationChoiceConfigGroupI config) {
-		this.network = network;
-		this.config = config;
-		this.initFlexibleTypes();
-	}
+  protected TreeMap<String, QuadTree<ActivityFacility>> quadTreesOfType =
+      new TreeMap<String, QuadTree<ActivityFacility>>();
+  protected TreeMap<String, ActivityFacilityImpl[]> facilitiesOfType =
+      new TreeMap<String, ActivityFacilityImpl[]>();
 
-	private void initFlexibleTypes() {
-		String types = config.getFlexibleTypes();
+  public TreesBuilder(
+      Set<String> flexibleTypes, Network network, DestinationChoiceConfigGroupI config) {
+    this.flexibleTypes = flexibleTypes;
+    this.network = network;
+    this.config = config;
+  }
 
-		if (!types.equals("null")) {
-			log.info("Doing location choice for activity types: " + types);
-			String[] entries = types.split(",", -1);
-			for (int i = 0; i < entries.length; i++) {
-				if (!entries[i].trim().equals("null")) {
-					this.flexibleTypes.add( entries[i].trim() );
-				}
-			}
-		}
-	}
+  public TreesBuilder(Network network, DestinationChoiceConfigGroupI config) {
+    this.network = network;
+    this.config = config;
+    this.initFlexibleTypes();
+  }
 
-	public void createTrees(ActivityFacilities facilities) {
-		TreeMap<String, TreeMap<Id<ActivityFacility>, ActivityFacility>> treesForTypes = this.createTreesForTypes(facilities);
-		this.createQuadTreesAndArrays(treesForTypes);
-	}
+  private void initFlexibleTypes() {
+    String types = config.getFlexibleTypes();
 
-	private TreeMap<String, TreeMap<Id<ActivityFacility>, ActivityFacility>> createTreesForTypes(ActivityFacilities facilities) {
+    if (!types.equals("null")) {
+      log.info("Doing location choice for activity types: " + types);
+      String[] entries = types.split(",", -1);
+      for (int i = 0; i < entries.length; i++) {
+        if (!entries[i].trim().equals("null")) {
+          this.flexibleTypes.add(entries[i].trim());
+        }
+      }
+    }
+  }
 
-		boolean regionalScenario = false;
-		double radius = 0.0;
-		Node centerNode = null;
+  public void createTrees(ActivityFacilities facilities) {
+    TreeMap<String, TreeMap<Id<ActivityFacility>, ActivityFacility>> treesForTypes =
+        this.createTreesForTypes(facilities);
+    this.createQuadTreesAndArrays(treesForTypes);
+  }
 
-		if (this.config.getCenterNode() != null && this.config.getRadius() != null) {
-			regionalScenario = true;
-			centerNode = this.network.getNodes().get(Id.create(config.getCenterNode(), Node.class));
-			radius = config.getRadius();
-			log.info("Building trees regional scenario");
-		}
-		else {
-			log.info("Building trees complete scenario");
-		}
+  private TreeMap<String, TreeMap<Id<ActivityFacility>, ActivityFacility>> createTreesForTypes(
+      ActivityFacilities facilities) {
 
-		TreeMap<String, TreeMap<Id<ActivityFacility>, ActivityFacility>> trees = new TreeMap<>();
-		// get all types of activities
-		for (ActivityFacility f : facilities.getFacilities().values()) {
-			Map<String, ? extends ActivityOption> facilityActOpts = f.getActivityOptions();
+    boolean regionalScenario = false;
+    double radius = 0.0;
+    Node centerNode = null;
 
-			// do not add facility if it is not in region of interest ------------------------
-			if (regionalScenario && (CoordUtils.calcEuclideanDistance(f.getCoord(), centerNode.getCoord()) > radius)) {
-				continue;
-			}
-			// -------------------------------------------------------------------------------
+    if (this.config.getCenterNode() != null && this.config.getRadius() != null) {
+      regionalScenario = true;
+      centerNode = this.network.getNodes().get(Id.create(config.getCenterNode(), Node.class));
+      radius = config.getRadius();
+      log.info("Building trees regional scenario");
+    } else {
+      log.info("Building trees complete scenario");
+    }
 
-			Iterator<? extends ActivityOption> actOpt_it = facilityActOpts.values().iterator();
-			while (actOpt_it.hasNext()) {
-				ActivityOption actOpt = actOpt_it.next();
+    TreeMap<String, TreeMap<Id<ActivityFacility>, ActivityFacility>> trees = new TreeMap<>();
+    // get all types of activities
+    for (ActivityFacility f : facilities.getFacilities().values()) {
+      Map<String, ? extends ActivityOption> facilityActOpts = f.getActivityOptions();
 
-				// if flexibleTypes is empty we add all types to trees as potentially all types can be relocated
-				// otherwise we add all types given by flexibleTypes
-				if (this.flexibleTypes.size() == 0 ||  this.flexibleTypes.contains( actOpt.getType() )) {
-					if (!trees.containsKey( actOpt.getType() )) {
-						trees.put( actOpt.getType(), new TreeMap<Id<ActivityFacility>, ActivityFacility>() );
-					}
-					trees.get( actOpt.getType() ).put(f.getId(), f );
-				}
-			}
-		}
-		return trees;
-	}
+      // do not add facility if it is not in region of interest ------------------------
+      if (regionalScenario
+          && (CoordUtils.calcEuclideanDistance(f.getCoord(), centerNode.getCoord()) > radius)) {
+        continue;
+      }
+      // -------------------------------------------------------------------------------
 
-	private void createQuadTreesAndArrays(TreeMap<String, TreeMap<Id<ActivityFacility>, ActivityFacility>> trees) {
-		Iterator<TreeMap<Id<ActivityFacility>, ActivityFacility>> tree_it = trees.values().iterator();
-		Iterator<String> type_it = trees.keySet().iterator();
+      Iterator<? extends ActivityOption> actOpt_it = facilityActOpts.values().iterator();
+      while (actOpt_it.hasNext()) {
+        ActivityOption actOpt = actOpt_it.next();
 
-		while (tree_it.hasNext()) {
-			TreeMap<Id<ActivityFacility>, ActivityFacility> tree_of_type = tree_it.next();
-			String type = type_it.next();
+        // if flexibleTypes is empty we add all types to trees as potentially all types can be
+        // relocated
+        // otherwise we add all types given by flexibleTypes
+        if (this.flexibleTypes.size() == 0 || this.flexibleTypes.contains(actOpt.getType())) {
+          if (!trees.containsKey(actOpt.getType())) {
+            trees.put(actOpt.getType(), new TreeMap<Id<ActivityFacility>, ActivityFacility>());
+          }
+          trees.get(actOpt.getType()).put(f.getId(), f);
+        }
+      }
+    }
+    return trees;
+  }
 
-			// do not construct tree for home and tta act
-//			if (type.startsWith("h") || type.startsWith("tta")) continue;	// startsWith("h") also removed oder activity types such as "hotel". cdobler, nov'14
-			if (type.equals("h") || type.equals("home") || type.startsWith("tta")) continue;
+  private void createQuadTreesAndArrays(
+      TreeMap<String, TreeMap<Id<ActivityFacility>, ActivityFacility>> trees) {
+    Iterator<TreeMap<Id<ActivityFacility>, ActivityFacility>> tree_it = trees.values().iterator();
+    Iterator<String> type_it = trees.keySet().iterator();
 
-			this.quadTreesOfType.put( type, this.buildFacQuadTree( type, tree_of_type ) );
-			this.facilitiesOfType.put( type, tree_of_type.values().toArray(new ActivityFacilityImpl[tree_of_type.size()] ) );
-		}
-	}
+    while (tree_it.hasNext()) {
+      TreeMap<Id<ActivityFacility>, ActivityFacility> tree_of_type = tree_it.next();
+      String type = type_it.next();
 
-	private QuadTree<ActivityFacility> buildFacQuadTree(String type, TreeMap<Id<ActivityFacility>,ActivityFacility> facilities_of_type) {
-		Gbl.startMeasurement();
-		log.info(" building " + type + " facility quad tree");
-		double minx = Double.POSITIVE_INFINITY;
-		double miny = Double.POSITIVE_INFINITY;
-		double maxx = Double.NEGATIVE_INFINITY;
-		double maxy = Double.NEGATIVE_INFINITY;
+      // do not construct tree for home and tta act
+      //			if (type.startsWith("h") || type.startsWith("tta")) continue;	// startsWith("h") also
+      // removed oder activity types such as "hotel". cdobler, nov'14
+      if (type.equals("h") || type.equals("home") || type.startsWith("tta")) continue;
 
-		for (final ActivityFacility f : facilities_of_type.values()) {
-			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
-			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
-			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
-			if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
-		}
-		minx -= 1.0;
-		miny -= 1.0;
-		maxx += 1.0;
-		maxy += 1.0;
-		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-		for (final ActivityFacility f : facilities_of_type.values()) {
-			quadtree.put(f.getCoord().getX(),f.getCoord().getY(),f);
-		}
-		log.info("    done");
-		Gbl.printRoundTime();
-		Gbl.printMemoryUsage();
-		return quadtree;
-	}
+      this.quadTreesOfType.put(type, this.buildFacQuadTree(type, tree_of_type));
+      this.facilitiesOfType.put(
+          type, tree_of_type.values().toArray(new ActivityFacilityImpl[tree_of_type.size()]));
+    }
+  }
 
-	public TreeMap<String, QuadTree<ActivityFacility>> getQuadTreesOfType() {
-		return quadTreesOfType;
-	}
-	public TreeMap<String, ActivityFacilityImpl[]> getFacilitiesOfType() {
-		return facilitiesOfType;
-	}
+  private QuadTree<ActivityFacility> buildFacQuadTree(
+      String type, TreeMap<Id<ActivityFacility>, ActivityFacility> facilities_of_type) {
+    Gbl.startMeasurement();
+    log.info(" building " + type + " facility quad tree");
+    double minx = Double.POSITIVE_INFINITY;
+    double miny = Double.POSITIVE_INFINITY;
+    double maxx = Double.NEGATIVE_INFINITY;
+    double maxy = Double.NEGATIVE_INFINITY;
 
-//	public ActTypeConverter getActTypeConverter() {
-//		return converter;
-//	}
-//
-//	public void setActTypeConverter(ActTypeConverter converter) {
-//		this.converter = converter;
-//	}
+    for (final ActivityFacility f : facilities_of_type.values()) {
+      if (f.getCoord().getX() < minx) {
+        minx = f.getCoord().getX();
+      }
+      if (f.getCoord().getY() < miny) {
+        miny = f.getCoord().getY();
+      }
+      if (f.getCoord().getX() > maxx) {
+        maxx = f.getCoord().getX();
+      }
+      if (f.getCoord().getY() > maxy) {
+        maxy = f.getCoord().getY();
+      }
+    }
+    minx -= 1.0;
+    miny -= 1.0;
+    maxx += 1.0;
+    maxy += 1.0;
+    System.out.println(
+        "        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
+    QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+    for (final ActivityFacility f : facilities_of_type.values()) {
+      quadtree.put(f.getCoord().getX(), f.getCoord().getY(), f);
+    }
+    log.info("    done");
+    Gbl.printRoundTime();
+    Gbl.printMemoryUsage();
+    return quadtree;
+  }
+
+  public TreeMap<String, QuadTree<ActivityFacility>> getQuadTreesOfType() {
+    return quadTreesOfType;
+  }
+
+  public TreeMap<String, ActivityFacilityImpl[]> getFacilitiesOfType() {
+    return facilitiesOfType;
+  }
+
+  //	public ActTypeConverter getActTypeConverter() {
+  //		return converter;
+  //	}
+  //
+  //	public void setActTypeConverter(ActTypeConverter converter) {
+  //		this.converter = converter;
+  //	}
 }

@@ -17,18 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
+/** */
 package org.matsim.contrib.noise;
 
 import org.matsim.core.events.handler.EventHandler;
 
 /**
  * @author lkroeger
- *
  */
-
-public interface NoiseEventCausedHandler extends EventHandler{
-	public void handleEvent (NoiseEventCaused event);
+public interface NoiseEventCausedHandler extends EventHandler {
+  public void handleEvent(NoiseEventCaused event);
 }

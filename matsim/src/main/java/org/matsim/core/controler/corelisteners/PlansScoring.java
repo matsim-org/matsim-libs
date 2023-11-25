@@ -23,8 +23,8 @@ package org.matsim.core.controler.corelisteners;
 import org.matsim.core.controler.listener.ControlerListener;
 
 /**
- * Marker interface, allowing to replace the element providing
- * this functionality in the Controler by Injection.
+ * Marker interface, allowing to replace the element providing this functionality in the Controler
+ * by Injection.
  *
  * @author thibautd
  */

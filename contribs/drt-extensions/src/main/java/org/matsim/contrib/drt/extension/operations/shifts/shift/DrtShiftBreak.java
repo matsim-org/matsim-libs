@@ -5,17 +5,17 @@ package org.matsim.contrib.drt.extension.operations.shifts.shift;
  */
 public interface DrtShiftBreak {
 
-    double getEarliestBreakStartTime();
+  double getEarliestBreakStartTime();
 
-    double getLatestBreakEndTime();
+  double getLatestBreakEndTime();
 
-    double getDuration();
+  double getDuration();
 
-    void schedule(double latestArrivalTime);
+  void schedule(double latestArrivalTime);
 
-    boolean isScheduled();
+  boolean isScheduled();
 
-    double getScheduledLatestArrival();
+  double getScheduledLatestArrival();
 
-    void reset();
+  void reset();
 }

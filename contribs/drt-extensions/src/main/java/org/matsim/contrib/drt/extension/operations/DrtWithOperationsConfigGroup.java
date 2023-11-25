@@ -16,16 +16,17 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
  */
 public class DrtWithOperationsConfigGroup extends DrtConfigGroup {
 
-	@NotNull
-	private DrtOperationsParams drtOperationsParams;
+  @NotNull private DrtOperationsParams drtOperationsParams;
 
-	public DrtWithOperationsConfigGroup() {
-		addDefinition(DrtOperationsParams.SET_NAME, DrtOperationsParams::new,
-				() -> drtOperationsParams,
-				params -> drtOperationsParams = (DrtOperationsParams)params);
-	}
+  public DrtWithOperationsConfigGroup() {
+    addDefinition(
+        DrtOperationsParams.SET_NAME,
+        DrtOperationsParams::new,
+        () -> drtOperationsParams,
+        params -> drtOperationsParams = (DrtOperationsParams) params);
+  }
 
-	public DrtOperationsParams getDrtOperationsParams() {
-		return drtOperationsParams;
-	}
+  public DrtOperationsParams getDrtOperationsParams() {
+    return drtOperationsParams;
+  }
 }

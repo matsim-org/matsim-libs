@@ -21,7 +21,6 @@ package org.matsim.contrib.signals.data.signalsystems.v20;
 
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -31,30 +30,29 @@ import org.matsim.contrib.signals.model.SignalSystem;
  */
 final class SignalSystemDataImpl implements SignalSystemData {
 
-	private Id<SignalSystem> id;
-	
-	private Map<Id<Signal>, SignalData> signalDataMap = null;
+  private Id<SignalSystem> id;
 
-	SignalSystemDataImpl(Id<SignalSystem> id) {
-		this.id = id;
-	}
+  private Map<Id<Signal>, SignalData> signalDataMap = null;
 
-	@Override
-	public void addSignalData(SignalData signalData) {
-		if (this.signalDataMap == null) {
-			this.signalDataMap = new TreeMap<>();
-		}
-		this.signalDataMap.put(signalData.getId(), signalData);
-	}
+  SignalSystemDataImpl(Id<SignalSystem> id) {
+    this.id = id;
+  }
 
-	@Override
-	public Map<Id<Signal>, SignalData> getSignalData() {
-		return this.signalDataMap;
-	}
+  @Override
+  public void addSignalData(SignalData signalData) {
+    if (this.signalDataMap == null) {
+      this.signalDataMap = new TreeMap<>();
+    }
+    this.signalDataMap.put(signalData.getId(), signalData);
+  }
 
-	@Override
-	public Id<SignalSystem> getId() {
-		return this.id;
-	}
+  @Override
+  public Map<Id<Signal>, SignalData> getSignalData() {
+    return this.signalDataMap;
+  }
 
+  @Override
+  public Id<SignalSystem> getId() {
+    return this.id;
+  }
 }

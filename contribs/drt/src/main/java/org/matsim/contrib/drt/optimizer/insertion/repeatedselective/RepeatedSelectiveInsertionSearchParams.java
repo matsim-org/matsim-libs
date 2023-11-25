@@ -17,7 +17,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-
 package org.matsim.contrib.drt.optimizer.insertion.repeatedselective;
 
 import jakarta.validation.constraints.Positive;
@@ -27,13 +26,11 @@ import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
  * @author steffenaxer
  */
 public class RepeatedSelectiveInsertionSearchParams extends DrtInsertionSearchParams {
-	public static final String SET_NAME = "RepeatedSelectiveInsertionSearch";
+  public static final String SET_NAME = "RepeatedSelectiveInsertionSearch";
 
-	@Parameter
-	@Positive
-	public int retryInsertion = 5;
+  @Parameter @Positive public int retryInsertion = 5;
 
-	public RepeatedSelectiveInsertionSearchParams() {
-		super(SET_NAME);
-	}
+  public RepeatedSelectiveInsertionSearchParams() {
+    super(SET_NAME);
+  }
 }

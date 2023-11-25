@@ -1,10 +1,15 @@
 package org.matsim.application.prepare.network;
 
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -21,150 +26,156 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import picocli.CommandLine;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
-
-
-@CommandLine.Command(name = "network-geojson", description = "Create geojson representation of a network.")
+@CommandLine.Command(
+    name = "network-geojson",
+    description = "Create geojson representation of a network.")
 @CommandSpec(requireNetwork = true, produces = "network.geojson")
 public class CreateGeoJsonNetwork implements MATSimAppCommand {
 
-	@CommandLine.Mixin
-	private InputOptions input = InputOptions.ofCommand(CreateGeoJsonNetwork.class);
-	@CommandLine.Mixin
-	private OutputOptions output = OutputOptions.ofCommand(CreateGeoJsonNetwork.class);
-	@CommandLine.Mixin
-	private ShpOptions shp;
-	@CommandLine.Mixin
-	private CrsOptions crs = new CrsOptions(null, "EPSG:4326");
+  @CommandLine.Mixin
+  private InputOptions input = InputOptions.ofCommand(CreateGeoJsonNetwork.class);
 
-	@CommandLine.Option(names = "--match-id", description = "Pattern to filter links by id")
-	private String matchId;
+  @CommandLine.Mixin
+  private OutputOptions output = OutputOptions.ofCommand(CreateGeoJsonNetwork.class);
 
-	@CommandLine.Option(names = "--mode-filter", split = ",", defaultValue = "car,freight,drt",
-		description = "Only keep links if they have one of the specified modes. Specify 'none' to disable.")
-	private Set<String> modes;
+  @CommandLine.Mixin private ShpOptions shp;
+  @CommandLine.Mixin private CrsOptions crs = new CrsOptions(null, "EPSG:4326");
 
-	@CommandLine.Option(names = "--precision", description = "Number of decimals places", defaultValue = "6")
-	private int precision;
+  @CommandLine.Option(names = "--match-id", description = "Pattern to filter links by id")
+  private String matchId;
 
-	@CommandLine.Option(names = "--with-properties", description = "Put network attributes as properties into the geojson.")
-	private boolean withProperties;
+  @CommandLine.Option(
+      names = "--mode-filter",
+      split = ",",
+      defaultValue = "car,freight,drt",
+      description =
+          "Only keep links if they have one of the specified modes. Specify 'none' to disable.")
+  private Set<String> modes;
 
-	public static void main(String[] args) {
-		new CreateGeoJsonNetwork().execute(args);
-	}
+  @CommandLine.Option(
+      names = "--precision",
+      description = "Number of decimals places",
+      defaultValue = "6")
+  private int precision;
 
-	@Override
-	public Integer call() throws Exception {
+  @CommandLine.Option(
+      names = "--with-properties",
+      description = "Put network attributes as properties into the geojson.")
+  private boolean withProperties;
 
-		Network network = input.getNetwork();
+  public static void main(String[] args) {
+    new CreateGeoJsonNetwork().execute(args);
+  }
 
-		String networkCrs = ProjectionUtils.getCRS(input.getNetwork());
-		if (crs.getInputCRS() != null)
-			networkCrs = crs.getInputCRS();
+  @Override
+  public Integer call() throws Exception {
 
-		if (networkCrs == null) {
-			throw new IllegalArgumentException("Network coordinate system is neither in the xml nor given as option.");
-		}
+    Network network = input.getNetwork();
 
-		ObjectMapper mapper = new ObjectMapper();
+    String networkCrs = ProjectionUtils.getCRS(input.getNetwork());
+    if (crs.getInputCRS() != null) networkCrs = crs.getInputCRS();
 
-		ObjectNode json = mapper.createObjectNode();
+    if (networkCrs == null) {
+      throw new IllegalArgumentException(
+          "Network coordinate system is neither in the xml nor given as option.");
+    }
 
-		json.put("type", "FeatureCollection");
+    ObjectMapper mapper = new ObjectMapper();
 
-		// Default CRS assumed to be 4326
-		if (!networkCrs.equalsIgnoreCase("epsg:4326")) {
-			ObjectNode crs = json.putObject("crs");
-			putCrs(crs, networkCrs);
-		}
+    ObjectNode json = mapper.createObjectNode();
 
-		Predicate<Link> filter = link -> true;
+    json.put("type", "FeatureCollection");
 
-		if (shp.isDefined()) {
-			Geometry geom = shp.getGeometry();
-			CoordinateTransformation ct = shp.createTransformation(networkCrs);
+    // Default CRS assumed to be 4326
+    if (!networkCrs.equalsIgnoreCase("epsg:4326")) {
+      ObjectNode crs = json.putObject("crs");
+      putCrs(crs, networkCrs);
+    }
 
-			filter = link -> geom.contains(MGC.coord2Point(ct.transform(link.getFromNode().getCoord()))) ||
-				geom.contains(MGC.coord2Point(ct.transform(link.getToNode().getCoord())));
-		}
+    Predicate<Link> filter = link -> true;
 
-		if (matchId != null) {
-			Pattern p = Pattern.compile(matchId);
-			filter = filter.and(link -> p.matcher(link.getId().toString()).matches());
-		}
+    if (shp.isDefined()) {
+      Geometry geom = shp.getGeometry();
+      CoordinateTransformation ct = shp.createTransformation(networkCrs);
 
-		// At least one of the specified modes needs to be contained
-		if (!modes.isEmpty() && !modes.equals(Set.of("none"))) {
-			filter = filter.and(link -> modes.stream().anyMatch(m -> link.getAllowedModes().contains(m)));
-		}
+      filter =
+          link ->
+              geom.contains(MGC.coord2Point(ct.transform(link.getFromNode().getCoord())))
+                  || geom.contains(MGC.coord2Point(ct.transform(link.getToNode().getCoord())));
+    }
 
-		convert(json, network, TransformationFactory.getCoordinateTransformation(networkCrs, this.crs.getTargetCRS()), filter);
+    if (matchId != null) {
+      Pattern p = Pattern.compile(matchId);
+      filter = filter.and(link -> p.matcher(link.getId().toString()).matches());
+    }
 
-		mapper.writerFor(JsonNode.class).writeValue(output.getPath().toFile(), json);
+    // At least one of the specified modes needs to be contained
+    if (!modes.isEmpty() && !modes.equals(Set.of("none"))) {
+      filter = filter.and(link -> modes.stream().anyMatch(m -> link.getAllowedModes().contains(m)));
+    }
 
-		return 0;
-	}
+    convert(
+        json,
+        network,
+        TransformationFactory.getCoordinateTransformation(networkCrs, this.crs.getTargetCRS()),
+        filter);
 
-	private void putCrs(ObjectNode crs, String networkCrs) {
-		crs.put("type", "name");
-		ObjectNode prop = crs.putObject("properties");
-		prop.put("name", networkCrs);
-	}
+    mapper.writerFor(JsonNode.class).writeValue(output.getPath().toFile(), json);
 
-	private void convert(ObjectNode json, Network network, CoordinateTransformation ct, Predicate<Link> filter) {
+    return 0;
+  }
 
-		ArrayNode ft = json.putArray("features");
+  private void putCrs(ObjectNode crs, String networkCrs) {
+    crs.put("type", "name");
+    ObjectNode prop = crs.putObject("properties");
+    prop.put("name", networkCrs);
+  }
 
-		for (Link link : network.getLinks().values()) {
+  private void convert(
+      ObjectNode json, Network network, CoordinateTransformation ct, Predicate<Link> filter) {
 
-			if (!filter.test(link))
-				continue;
+    ArrayNode ft = json.putArray("features");
 
-			ObjectNode obj = ft.addObject();
+    for (Link link : network.getLinks().values()) {
 
-			obj.put("id", link.getId().toString());
-			obj.put("type", "Feature");
+      if (!filter.test(link)) continue;
 
-			ObjectNode geom = obj.putObject("geometry");
+      ObjectNode obj = ft.addObject();
 
-			geom.put("type", "LineString");
-			ArrayNode coords = geom.putArray("coordinates");
+      obj.put("id", link.getId().toString());
+      obj.put("type", "Feature");
 
-			Coord from = ct.transform(link.getFromNode().getCoord());
-			Coord to = ct.transform(link.getToNode().getCoord());
+      ObjectNode geom = obj.putObject("geometry");
 
-			ArrayNode f = coords.addArray();
-			f.add(round(from.getX()));
-			f.add(round(from.getY()));
+      geom.put("type", "LineString");
+      ArrayNode coords = geom.putArray("coordinates");
 
-			ArrayNode t = coords.addArray();
-			t.add(round(to.getX()));
-			t.add(round(to.getY()));
+      Coord from = ct.transform(link.getFromNode().getCoord());
+      Coord to = ct.transform(link.getToNode().getCoord());
 
-			if (withProperties) {
-				ObjectNode prop = obj.putObject("properties");
+      ArrayNode f = coords.addArray();
+      f.add(round(from.getX()));
+      f.add(round(from.getY()));
 
-				for (Map.Entry<String, Object> e : link.getAttributes().getAsMap().entrySet()) {
-					Object value = e.getValue();
-					if (value instanceof String || value instanceof Number || value instanceof Boolean)
-						prop.putPOJO(e.getKey(), value);
-				}
-			}
-		}
-	}
+      ArrayNode t = coords.addArray();
+      t.add(round(to.getX()));
+      t.add(round(to.getY()));
 
-	/**
-	 * Round to desired precision.
-	 */
-	private double round(double x) {
-		BigDecimal d = BigDecimal.valueOf(x).setScale(precision, RoundingMode.HALF_UP);
-		return d.doubleValue();
-	}
+      if (withProperties) {
+        ObjectNode prop = obj.putObject("properties");
 
+        for (Map.Entry<String, Object> e : link.getAttributes().getAsMap().entrySet()) {
+          Object value = e.getValue();
+          if (value instanceof String || value instanceof Number || value instanceof Boolean)
+            prop.putPOJO(e.getKey(), value);
+        }
+      }
+    }
+  }
+
+  /** Round to desired precision. */
+  private double round(double x) {
+    BigDecimal d = BigDecimal.valueOf(x).setScale(precision, RoundingMode.HALF_UP);
+    return d.doubleValue();
+  }
 }

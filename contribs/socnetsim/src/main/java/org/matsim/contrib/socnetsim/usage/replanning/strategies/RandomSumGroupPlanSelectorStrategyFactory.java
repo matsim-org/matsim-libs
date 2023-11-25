@@ -19,45 +19,40 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
-import java.util.Random;
-
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.gbl.MatsimRandom;
-
 import com.google.inject.Inject;
-
+import java.util.Random;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.socnetsim.framework.replanning.NonInnovativeStrategyFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.WeightCalculator;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.highestweightselection.HighestWeightSelector;
+import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * @author thibautd
  */
 public class RandomSumGroupPlanSelectorStrategyFactory extends NonInnovativeStrategyFactory {
 
-	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+  private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
 
-	@Inject
-	public RandomSumGroupPlanSelectorStrategyFactory( IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory ) {
-		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
-	}
+  @Inject
+  public RandomSumGroupPlanSelectorStrategyFactory(
+      IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory) {
+    this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+  }
 
-	@Override
-	public GroupLevelPlanSelector createSelector() {
-		final Random random = MatsimRandom.getLocalInstance();
-		return new HighestWeightSelector(
-				incompatiblePlansIdentifierFactory,
-				new WeightCalculator() {
-					@Override
-					public double getWeight(
-							final Plan indivPlan,
-							final ReplanningGroup group) {
-						return random.nextDouble();
-					}
-				});
-	}
+  @Override
+  public GroupLevelPlanSelector createSelector() {
+    final Random random = MatsimRandom.getLocalInstance();
+    return new HighestWeightSelector(
+        incompatiblePlansIdentifierFactory,
+        new WeightCalculator() {
+          @Override
+          public double getWeight(final Plan indivPlan, final ReplanningGroup group) {
+            return random.nextDouble();
+          }
+        });
+  }
 }
-

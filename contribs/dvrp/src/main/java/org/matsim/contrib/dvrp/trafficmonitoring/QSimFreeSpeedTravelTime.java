@@ -19,7 +19,6 @@
 package org.matsim.contrib.dvrp.trafficmonitoring;
 
 import jakarta.inject.Inject;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -27,27 +26,30 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * Precise version of FreeSpeedTravelTime that takes into account the way QSim moves vehicles along links and over
- * nodes. Useful for simulations with congestion-free (i.e. via super high flow/storage capacity factors) QSim.
+ * Precise version of FreeSpeedTravelTime that takes into account the way QSim moves vehicles along
+ * links and over nodes. Useful for simulations with congestion-free (i.e. via super high
+ * flow/storage capacity factors) QSim.
  *
  * @author michalm
  */
 public class QSimFreeSpeedTravelTime implements TravelTime {
-	private final double timeStepSize;
+  private final double timeStepSize;
 
-	@Inject
-	public QSimFreeSpeedTravelTime(QSimConfigGroup qsimCfg) {
-		this(qsimCfg.getTimeStepSize());
-	}
+  @Inject
+  public QSimFreeSpeedTravelTime(QSimConfigGroup qsimCfg) {
+    this(qsimCfg.getTimeStepSize());
+  }
 
-	public QSimFreeSpeedTravelTime(double timeStepSize) {
-		this.timeStepSize = timeStepSize;
-	}
+  public QSimFreeSpeedTravelTime(double timeStepSize) {
+    this.timeStepSize = timeStepSize;
+  }
 
-	@Override
-	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		double freeSpeedTT = link.getLength() / link.getFreespeed(time); // equiv. to FreeSpeedTravelTime
-		double linkTravelTime = timeStepSize * Math.floor(freeSpeedTT / timeStepSize); // used in QSim for TT at link
-		return linkTravelTime + timeStepSize;// adds 1 extra time step for moving over nodes
-	}
+  @Override
+  public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+    double freeSpeedTT =
+        link.getLength() / link.getFreespeed(time); // equiv. to FreeSpeedTravelTime
+    double linkTravelTime =
+        timeStepSize * Math.floor(freeSpeedTT / timeStepSize); // used in QSim for TT at link
+    return linkTravelTime + timeStepSize; // adds 1 extra time step for moving over nodes
+  }
 }

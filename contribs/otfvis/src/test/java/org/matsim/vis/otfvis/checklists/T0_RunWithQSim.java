@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * 
+ *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -27,8 +27,7 @@ import org.matsim.contrib.otfvis.OTFVis;
  */
 public class T0_RunWithQSim {
 
-	public static void main(String[] args) {
-		OTFVis.playConfig("contribs/otfvis/test/scenarios/equil/config-qsim.xml");
-	}
-
+  public static void main(String[] args) {
+    OTFVis.playConfig("contribs/otfvis/test/scenarios/equil/config-qsim.xml");
+  }
 }

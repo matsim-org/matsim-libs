@@ -30,41 +30,46 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author nagel
- *
  */
 public class RunConfigurableQNetworkFactoryExample {
 
-	public static void main(String[] args) {
+  public static void main(String[] args) {
 
-		Config config = ConfigUtils.createConfig(args[0]) ;
-		
-		run(config);
-		
-	}
+    Config config = ConfigUtils.createConfig(args[0]);
 
-	static void run(Config config) {
-		final Scenario scenario = ScenarioUtils.createScenario( config ) ;
-		
-		Controler controler = new Controler( scenario ) ;
-		
-		final EventsManager events = controler.getEvents() ;
-		
-		controler.addOverridingQSimModule( new AbstractQSimModule(){
-			@Override public void configureQSim() {
-				final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
-				factory.setLinkSpeedCalculator( new LinkSpeedCalculator(){
-					@Override public double getMaximumVelocity( QVehicle vehicle, Link link, double time ){
-						return 1.; // replace by something meaningful
-					}
-				} );
-				factory.setTurnAcceptanceLogic(new DefaultTurnAcceptanceLogic()); // You would obviously set something else than the default
-				bind(QNetworkFactory.class).toInstance(factory);
-				// NOTE: Other than when using a provider, this uses the same factory instance over all iterations, re-configuring
-				// it in every iteration via the initializeFactory(...) method. kai, mar'16
-			}
-		});
-		
-		controler.run();
-	}
+    run(config);
+  }
 
+  static void run(Config config) {
+    final Scenario scenario = ScenarioUtils.createScenario(config);
+
+    Controler controler = new Controler(scenario);
+
+    final EventsManager events = controler.getEvents();
+
+    controler.addOverridingQSimModule(
+        new AbstractQSimModule() {
+          @Override
+          public void configureQSim() {
+            final ConfigurableQNetworkFactory factory =
+                new ConfigurableQNetworkFactory(events, scenario);
+            factory.setLinkSpeedCalculator(
+                new LinkSpeedCalculator() {
+                  @Override
+                  public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {
+                    return 1.; // replace by something meaningful
+                  }
+                });
+            factory.setTurnAcceptanceLogic(
+                new DefaultTurnAcceptanceLogic()); // You would obviously set something else than
+            // the default
+            bind(QNetworkFactory.class).toInstance(factory);
+            // NOTE: Other than when using a provider, this uses the same factory instance over all
+            // iterations, re-configuring
+            // it in every iteration via the initializeFactory(...) method. kai, mar'16
+          }
+        });
+
+    controler.run();
+  }
 }

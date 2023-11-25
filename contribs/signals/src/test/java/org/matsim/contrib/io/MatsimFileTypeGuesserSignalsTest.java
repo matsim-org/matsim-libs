@@ -24,41 +24,45 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
-
 import org.junit.Test;
 import org.matsim.contrib.signals.data.MatsimSignalSystemsReader;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 
 /**
  * @author dgrether
- *
  */
 public class MatsimFileTypeGuesserSignalsTest {
-	
-	@Test
-	public void testSignalSystemsV20XML() throws IOException {
-		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/contrib/signals/data/signalsystems/v20/testSignalSystems_v2.0.xml");
-		assertEquals(MatsimFileTypeGuesser.FileType.SignalSystems, g.getGuessedFileType());
-		assertNull(g.getPublicId());
-		assertNotNull(g.getSystemId());
-		assertEquals(MatsimSignalSystemsReader.SIGNALSYSTEMS20, g.getSystemId());
-	}
-	
-	@Test
-	public void testSignalGroupsV20XML() throws IOException {
-		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/contrib/signals/data/signalgroups/v20/testSignalGroups_v2.0.xml");
-		assertEquals(MatsimFileTypeGuesser.FileType.SignalGroups, g.getGuessedFileType());
-		assertNull(g.getPublicId());
-		assertNotNull(g.getSystemId());
-		assertEquals(MatsimSignalSystemsReader.SIGNALGROUPS20, g.getSystemId());
-	}
 
-	@Test
-	public void testSignalControlV20XML() throws IOException {
-		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/contrib/signals/data/signalcontrol/v20/testSignalControl_v2.0.xml");
-		assertEquals(MatsimFileTypeGuesser.FileType.SignalControl, g.getGuessedFileType());
-		assertNull(g.getPublicId());
-		assertNotNull(g.getSystemId());
-		assertEquals(MatsimSignalSystemsReader.SIGNALCONTROL20, g.getSystemId());
-	}
+  @Test
+  public void testSignalSystemsV20XML() throws IOException {
+    MatsimFileTypeGuesser g =
+        new MatsimFileTypeGuesser(
+            "test/input/org/matsim/contrib/signals/data/signalsystems/v20/testSignalSystems_v2.0.xml");
+    assertEquals(MatsimFileTypeGuesser.FileType.SignalSystems, g.getGuessedFileType());
+    assertNull(g.getPublicId());
+    assertNotNull(g.getSystemId());
+    assertEquals(MatsimSignalSystemsReader.SIGNALSYSTEMS20, g.getSystemId());
+  }
+
+  @Test
+  public void testSignalGroupsV20XML() throws IOException {
+    MatsimFileTypeGuesser g =
+        new MatsimFileTypeGuesser(
+            "test/input/org/matsim/contrib/signals/data/signalgroups/v20/testSignalGroups_v2.0.xml");
+    assertEquals(MatsimFileTypeGuesser.FileType.SignalGroups, g.getGuessedFileType());
+    assertNull(g.getPublicId());
+    assertNotNull(g.getSystemId());
+    assertEquals(MatsimSignalSystemsReader.SIGNALGROUPS20, g.getSystemId());
+  }
+
+  @Test
+  public void testSignalControlV20XML() throws IOException {
+    MatsimFileTypeGuesser g =
+        new MatsimFileTypeGuesser(
+            "test/input/org/matsim/contrib/signals/data/signalcontrol/v20/testSignalControl_v2.0.xml");
+    assertEquals(MatsimFileTypeGuesser.FileType.SignalControl, g.getGuessedFileType());
+    assertNull(g.getPublicId());
+    assertNotNull(g.getSystemId());
+    assertEquals(MatsimSignalSystemsReader.SIGNALCONTROL20, g.getSystemId());
+  }
 }

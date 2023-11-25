@@ -37,18 +37,24 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ActEndEventTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-
-	@Test public void testWriteReadXml() {
-		final ActivityEndEvent event = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml",
-				new ActivityEndEvent(7893.14, Id.create("143", Person.class), Id.create("293", Link.class), Id.create("f811", ActivityFacility.class),
-						"home", new Coord( 234., 5.67 )));
-		assertEquals(7893.14, event.getTime(), MatsimTestUtils.EPSILON);
-		assertEquals("143", event.getPersonId().toString());
-		assertEquals("293", event.getLinkId().toString());
-		assertEquals("f811", event.getFacilityId().toString());
-		assertEquals("home", event.getActType());
-	}
+  @Test
+  public void testWriteReadXml() {
+    final ActivityEndEvent event =
+        XmlEventsTester.testWriteReadXml(
+            utils.getOutputDirectory() + "events.xml",
+            new ActivityEndEvent(
+                7893.14,
+                Id.create("143", Person.class),
+                Id.create("293", Link.class),
+                Id.create("f811", ActivityFacility.class),
+                "home",
+                new Coord(234., 5.67)));
+    assertEquals(7893.14, event.getTime(), MatsimTestUtils.EPSILON);
+    assertEquals("143", event.getPersonId().toString());
+    assertEquals("293", event.getLinkId().toString());
+    assertEquals("f811", event.getFacilityId().toString());
+    assertEquals("home", event.getActType());
+  }
 }

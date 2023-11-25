@@ -29,35 +29,36 @@ import org.matsim.vehicles.Vehicle;
 
 class TravelTimeCostCalculator implements TravelDisutility {
 
-	private static final Logger log = LogManager.getLogger(TravelTimeCostCalculator.class);
-	
-	protected final TravelTime timeCalculator;
-	
-	/**
-	 * constructor
-	 * 
-	 * @param timeCalculator
-	 * @param cnScoringGroup
-	 */
-	public TravelTimeCostCalculator(final TravelTime timeCalculator){
-		this.timeCalculator = timeCalculator;
-	}
-	
-	@Override
-	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		if(link != null){
-			double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
-			return travelTime; 	// travel time in seconds
-		}
-		log.warn("Link is null. Returned 0 as car time.");
-		return 0.;
-	}
-	
-	@Override
-	public double getLinkMinimumTravelDisutility(final Link link) {
-		if(link != null) 		// travel time in seconds
-			return (link.getLength() / link.getFreespeed());
-		log.warn("Link is null. Returned 0 as walk time.");
-		return 0.;
-	}
+  private static final Logger log = LogManager.getLogger(TravelTimeCostCalculator.class);
+
+  protected final TravelTime timeCalculator;
+
+  /**
+   * constructor
+   *
+   * @param timeCalculator
+   * @param cnScoringGroup
+   */
+  public TravelTimeCostCalculator(final TravelTime timeCalculator) {
+    this.timeCalculator = timeCalculator;
+  }
+
+  @Override
+  public double getLinkTravelDisutility(
+      final Link link, final double time, final Person person, final Vehicle vehicle) {
+    if (link != null) {
+      double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
+      return travelTime; // travel time in seconds
+    }
+    log.warn("Link is null. Returned 0 as car time.");
+    return 0.;
+  }
+
+  @Override
+  public double getLinkMinimumTravelDisutility(final Link link) {
+    if (link != null) // travel time in seconds
+    return (link.getLength() / link.getFreespeed());
+    log.warn("Link is null. Returned 0 as walk time.");
+    return 0.;
+  }
 }

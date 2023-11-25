@@ -33,30 +33,29 @@ import org.matsim.core.controler.listener.ShutdownListener;
  */
 @Singleton
 public class DumpJointDataAtEnd implements ShutdownListener {
-	private final Scenario scenario;
-	private final JointPlans jointPlans;
-	private final OutputDirectoryHierarchy controlerIO;
+  private final Scenario scenario;
+  private final JointPlans jointPlans;
+  private final OutputDirectoryHierarchy controlerIO;
 
-	@Inject
-	public DumpJointDataAtEnd(
-			final Scenario scenarioData,
-			final JointPlans jointPlans,
-			final OutputDirectoryHierarchy controlerIO) {
-		this.scenario = scenarioData;
-		this.jointPlans = jointPlans;
-		this.controlerIO = controlerIO;
-	}
+  @Inject
+  public DumpJointDataAtEnd(
+      final Scenario scenarioData,
+      final JointPlans jointPlans,
+      final OutputDirectoryHierarchy controlerIO) {
+    this.scenario = scenarioData;
+    this.jointPlans = jointPlans;
+    this.controlerIO = controlerIO;
+  }
 
-	@Override
-	public void notifyShutdown(final ShutdownEvent event) {
-		dumpJointPlans();
-	}
+  @Override
+  public void notifyShutdown(final ShutdownEvent event) {
+    dumpJointPlans();
+  }
 
-	private void dumpJointPlans() {
-		JointPlansXmlWriter.write(
-				scenario.getPopulation(),
-				jointPlans,
-				controlerIO.getOutputFilename( "output_jointPlans.xml.gz" ) );
-	}
+  private void dumpJointPlans() {
+    JointPlansXmlWriter.write(
+        scenario.getPopulation(),
+        jointPlans,
+        controlerIO.getOutputFilename("output_jointPlans.xml.gz"));
+  }
 }
-

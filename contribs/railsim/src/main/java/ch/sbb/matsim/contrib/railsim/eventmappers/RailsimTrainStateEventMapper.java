@@ -26,31 +26,28 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.vehicles.Vehicle;
 
-/**
- * Convert for {@link RailsimTrainStateEvent}.
- */
+/** Convert for {@link RailsimTrainStateEvent}. */
 public class RailsimTrainStateEventMapper implements MatsimEventsReader.CustomEventMapper {
-	@Override
-	public RailsimTrainStateEvent apply(GenericEvent event) {
-		var attributes = event.getAttributes();
-		return new RailsimTrainStateEvent(
-			event.getTime(),
-			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_EXACT_TIME)),
-			asId(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_VEHICLE), Vehicle.class),
-			asId(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_HEAD_LINK), Link.class),
-			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_HEAD_POSITION)),
-			asId(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_TAIL_LINK), Link.class),
-			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_TAIL_POSITION)),
-			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_SPEED)),
-			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_ACCELERATION)),
-			Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_TARGET_SPEED))
-		);
-	}
+  @Override
+  public RailsimTrainStateEvent apply(GenericEvent event) {
+    var attributes = event.getAttributes();
+    return new RailsimTrainStateEvent(
+        event.getTime(),
+        Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_EXACT_TIME)),
+        asId(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_VEHICLE), Vehicle.class),
+        asId(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_HEAD_LINK), Link.class),
+        Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_HEAD_POSITION)),
+        asId(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_TAIL_LINK), Link.class),
+        Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_TAIL_POSITION)),
+        Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_SPEED)),
+        Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_ACCELERATION)),
+        Double.parseDouble(attributes.get(RailsimTrainStateEvent.ATTRIBUTE_TARGET_SPEED)));
+  }
 
-	private static <T> Id<T> asId(String value, Class<T> idClass) {
-		if (value == null) {
-			return null;
-		}
-		return Id.create(value, idClass);
-	}
+  private static <T> Id<T> asId(String value, Class<T> idClass) {
+    if (value == null) {
+      return null;
+    }
+    return Id.create(value, idClass);
+  }
 }

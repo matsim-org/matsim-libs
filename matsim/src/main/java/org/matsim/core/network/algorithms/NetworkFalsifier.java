@@ -29,34 +29,36 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
- * Falsifies a network, so it can more legally be redistributed, by moving the nodes by a random amount
- * north or south and east or west from their original point, but at most <code>distance</code> away.
- * Additionally, the link length will be set to the euclidean distance between the from- and to-node.
+ * Falsifies a network, so it can more legally be redistributed, by moving the nodes by a random
+ * amount north or south and east or west from their original point, but at most <code>distance
+ * </code> away. Additionally, the link length will be set to the euclidean distance between the
+ * from- and to-node.
  *
  * @author mrieser
  */
 public final class NetworkFalsifier implements NetworkRunnable {
 
-	private final double distance;
+  private final double distance;
 
-	public NetworkFalsifier(double distance) {
-		this.distance = distance;
-	}
+  public NetworkFalsifier(double distance) {
+    this.distance = distance;
+  }
 
-	@Override
-	public void run(Network network) {
-		double maxDistance = this.distance * 2.0;
-		for (Node node : network.getNodes().values()) {
-			Coord coord = node.getCoord();
-			node.setCoord( new Coord(coord.getX() + (MatsimRandom.getRandom().nextDouble() - 0.5) *  maxDistance,
-					coord.getY() + (MatsimRandom.getRandom().nextDouble() - 0.5) * maxDistance) ) ;
-		}
+  @Override
+  public void run(Network network) {
+    double maxDistance = this.distance * 2.0;
+    for (Node node : network.getNodes().values()) {
+      Coord coord = node.getCoord();
+      node.setCoord(
+          new Coord(
+              coord.getX() + (MatsimRandom.getRandom().nextDouble() - 0.5) * maxDistance,
+              coord.getY() + (MatsimRandom.getRandom().nextDouble() - 0.5) * maxDistance));
+    }
 
-		for (Link link : network.getLinks().values()) {
-			Coord fromCoord = link.getFromNode().getCoord();
-			Coord toCoord = link.getToNode().getCoord();
-			link.setLength(CoordUtils.calcEuclideanDistance(fromCoord, toCoord));
-		}
-	}
-
+    for (Link link : network.getLinks().values()) {
+      Coord fromCoord = link.getFromNode().getCoord();
+      Coord toCoord = link.getToNode().getCoord();
+      link.setLength(CoordUtils.calcEuclideanDistance(fromCoord, toCoord));
+    }
+  }
 }

@@ -25,31 +25,28 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 
 /**
- * The parking scoring function adds a term to the original scoring function
- * (creates wrapper around original scoring function factory).
+ * The parking scoring function adds a term to the original scoring function (creates wrapper around
+ * original scoring function factory).
  *
- * rashid_waraich
- *
+ * <p>rashid_waraich
  */
-
 public class ParkingScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private ScoringFunctionFactory orginalScoringFunctionFactory;
-	private ParkingScore parkingScoreManager;
+  private ScoringFunctionFactory orginalScoringFunctionFactory;
+  private ParkingScore parkingScoreManager;
 
-	public ParkingScoringFunctionFactory(
-			ScoringFunctionFactory orginalScoringFunction, ParkingScore parkingScoreManager) {
-		this.orginalScoringFunctionFactory = orginalScoringFunction;
-		this.parkingScoreManager = parkingScoreManager;
-	}
+  public ParkingScoringFunctionFactory(
+      ScoringFunctionFactory orginalScoringFunction, ParkingScore parkingScoreManager) {
+    this.orginalScoringFunctionFactory = orginalScoringFunction;
+    this.parkingScoreManager = parkingScoreManager;
+  }
 
-	@Override
-	public ScoringFunction createNewScoringFunction(Person person) {
-		SumScoringFunction scoringFunctionSum = (SumScoringFunction) orginalScoringFunctionFactory
-				.createNewScoringFunction(person);
-		scoringFunctionSum.addScoringFunction(new ParkingScoringFunction(person
-				.getSelectedPlan(),parkingScoreManager));
-		return scoringFunctionSum;
-	}
-
+  @Override
+  public ScoringFunction createNewScoringFunction(Person person) {
+    SumScoringFunction scoringFunctionSum =
+        (SumScoringFunction) orginalScoringFunctionFactory.createNewScoringFunction(person);
+    scoringFunctionSum.addScoringFunction(
+        new ParkingScoringFunction(person.getSelectedPlan(), parkingScoreManager));
+    return scoringFunctionSum;
+  }
 }

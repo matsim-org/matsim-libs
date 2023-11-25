@@ -21,7 +21,6 @@
 package org.matsim.pt.fakes;
 
 import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -34,82 +33,82 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-
 /**
- * A very simple implementation of the interface {@link PTPassengerAgent} for
- * use in tests. Enters every available line and exits at the specified stop.
+ * A very simple implementation of the interface {@link PTPassengerAgent} for use in tests. Enters
+ * every available line and exits at the specified stop.
  *
  * @author mrieser
  */
 public class FakePassengerAgent implements PTPassengerAgent {
 
-	private final TransitStopFacility exitStop;
+  private final TransitStopFacility exitStop;
 
-	/**
-	 * @param exitStop can be <code>null</code>
-	 */
-	public FakePassengerAgent(final TransitStopFacility exitStop) {
-		this.exitStop = exitStop;
-	}
+  /**
+   * @param exitStop can be <code>null</code>
+   */
+  public FakePassengerAgent(final TransitStopFacility exitStop) {
+    this.exitStop = exitStop;
+  }
 
-	@Override
-	public Id<Person> getId() {
-		return null;
-	}
+  @Override
+  public Id<Person> getId() {
+    return null;
+  }
 
-	@Override
-	public boolean getExitAtStop(final TransitStopFacility stop) {
-		return stop == this.exitStop;
-	}
+  @Override
+  public boolean getExitAtStop(final TransitStopFacility stop) {
+    return stop == this.exitStop;
+  }
 
-	@Override
-	public boolean getEnterTransitRoute(TransitLine line,
-			TransitRoute transitRoute, List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
-		return true;
-	}
+  @Override
+  public boolean getEnterTransitRoute(
+      TransitLine line,
+      TransitRoute transitRoute,
+      List<TransitRouteStop> stopsToCome,
+      TransitVehicle transitVehicle) {
+    return true;
+  }
 
-	@Override
-	public double getWeight() {
-		return 1.0;
-	}
+  @Override
+  public double getWeight() {
+    return 1.0;
+  }
 
-	@Override
-	public Id<TransitStopFacility> getDesiredAccessStopId() {
-		return null;
-	}
-	
-	@Override
-	public Id<TransitStopFacility> getDesiredDestinationStopId() {
-		return null;
-	}
+  @Override
+  public Id<TransitStopFacility> getDesiredAccessStopId() {
+    return null;
+  }
 
-	@Override
-	public void setVehicle(MobsimVehicle veh) {
-	}
+  @Override
+  public Id<TransitStopFacility> getDesiredDestinationStopId() {
+    return null;
+  }
 
-	@Override
-	public MobsimVehicle getVehicle() {
-		return null;
-	}
+  @Override
+  public void setVehicle(MobsimVehicle veh) {}
 
-	@Override
-	public Id<Vehicle> getPlannedVehicleId() {
-		return null;
-	}
+  @Override
+  public MobsimVehicle getVehicle() {
+    return null;
+  }
 
-	@Override
-	public Id<Link> getCurrentLinkId() {
-		return null;
-	}
+  @Override
+  public Id<Vehicle> getPlannedVehicleId() {
+    return null;
+  }
 
-	@Override
-	public Id<Link> getDestinationLinkId() {
-		return null;
-	}
+  @Override
+  public Id<Link> getCurrentLinkId() {
+    return null;
+  }
 
-	@Override
-	public String getMode() {
-		throw new RuntimeException("not implemented") ;
-	}
+  @Override
+  public Id<Link> getDestinationLinkId() {
+    return null;
+  }
 
+  @Override
+  public String getMode() {
+    throw new RuntimeException("not implemented");
+  }
 }

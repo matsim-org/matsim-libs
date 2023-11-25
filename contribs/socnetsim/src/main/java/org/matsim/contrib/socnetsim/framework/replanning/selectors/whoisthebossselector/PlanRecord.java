@@ -21,41 +21,41 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors.whoistheboss
 
 import java.util.Collection;
 import java.util.HashSet;
-
 import org.matsim.api.core.v01.population.Plan;
-
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 
 final class PlanRecord {
-	PersonRecord person;
-	final Plan plan;
-	/**
-	 * The joint plan to which pertains the individual plan,
-	 * if any.
-	 */
-	final JointPlan jointPlan;
-	/**
-	 * the plan records corresponding to the other plans in the joint plan
-	 */
-	final Collection<PlanRecord> linkedPlans = new HashSet<PlanRecord>();
-	final double individualPlanWeight;
-	// true if all partners are still unallocated
-	boolean isStillFeasible = true;
+  PersonRecord person;
+  final Plan plan;
 
-	public PlanRecord(
-			final Plan plan,
-			final JointPlan jointPlan,
-			final double weight) {
-		this.plan = plan;
-		this.jointPlan = jointPlan;
-		this.individualPlanWeight = weight;
-	}
+  /** The joint plan to which pertains the individual plan, if any. */
+  final JointPlan jointPlan;
 
-	@Override
-	public String toString() {
-		return "{PlanRecord: "+plan.getPerson().getId()+":"+plan.getScore()+
-			" linkedWith:"+(jointPlan == null ? "[]" : jointPlan.getIndividualPlans().keySet())+
-			" weight="+individualPlanWeight+
-			" isFeasible="+isStillFeasible+"}";
-	}
+  /** the plan records corresponding to the other plans in the joint plan */
+  final Collection<PlanRecord> linkedPlans = new HashSet<PlanRecord>();
+
+  final double individualPlanWeight;
+  // true if all partners are still unallocated
+  boolean isStillFeasible = true;
+
+  public PlanRecord(final Plan plan, final JointPlan jointPlan, final double weight) {
+    this.plan = plan;
+    this.jointPlan = jointPlan;
+    this.individualPlanWeight = weight;
+  }
+
+  @Override
+  public String toString() {
+    return "{PlanRecord: "
+        + plan.getPerson().getId()
+        + ":"
+        + plan.getScore()
+        + " linkedWith:"
+        + (jointPlan == null ? "[]" : jointPlan.getIndividualPlans().keySet())
+        + " weight="
+        + individualPlanWeight
+        + " isFeasible="
+        + isStillFeasible
+        + "}";
+  }
 }

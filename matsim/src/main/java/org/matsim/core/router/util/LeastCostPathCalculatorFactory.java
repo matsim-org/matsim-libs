@@ -25,17 +25,16 @@ import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.api.internal.MatsimFactory;
 
 /**
- * Example(s):<ul>
- * <li> {@link tutorial.programming.example21tutorialTUBclass.leastCostPath.RunLeastCostPathCalculatorExample}
- * </ul>
+ * Example(s):
  *
+ * <ul>
+ *   <li>{@link
+ *       tutorial.programming.example21tutorialTUBclass.leastCostPath.RunLeastCostPathCalculatorExample}
+ * </ul>
  */
 public interface LeastCostPathCalculatorFactory extends MatsimFactory, MatsimExtensionPoint {
-	
-	/**
-	 * Creational method, since Network may not be exactly the scenario's network
-	 */
-	
-	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes);
 
+  /** Creational method, since Network may not be exactly the scenario's network */
+  public LeastCostPathCalculator createPathCalculator(
+      final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes);
 }

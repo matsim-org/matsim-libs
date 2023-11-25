@@ -17,9 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
+/** */
 package playground.vsp.congestion.routing;
 
 import org.matsim.api.core.v01.network.Link;
@@ -29,41 +27,41 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
-
 import playground.vsp.congestion.handlers.TollHandler;
 
 /**
  * @author ikaddoura
- *
  */
 public class TollDisutilityCalculatorFactory implements TravelDisutilityFactory {
 
-	private TollHandler tollHandler;
-	private final ScoringConfigGroup cnScoringGroup;
+  private TollHandler tollHandler;
+  private final ScoringConfigGroup cnScoringGroup;
 
-	@Deprecated
-	public TollDisutilityCalculatorFactory(TollHandler tollHandler, ScoringConfigGroup cnScoringGroup) {
-		this.tollHandler = tollHandler;
-		this.cnScoringGroup = cnScoringGroup;
-	}
+  @Deprecated
+  public TollDisutilityCalculatorFactory(
+      TollHandler tollHandler, ScoringConfigGroup cnScoringGroup) {
+    this.tollHandler = tollHandler;
+    this.cnScoringGroup = cnScoringGroup;
+  }
 
-	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
-		final TollTravelDisutilityCalculator ttdc = new TollTravelDisutilityCalculator(timeCalculator, cnScoringGroup, tollHandler);
+  @Override
+  public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
+    final TollTravelDisutilityCalculator ttdc =
+        new TollTravelDisutilityCalculator(timeCalculator, cnScoringGroup, tollHandler);
 
-		return new TravelDisutility(){
+    return new TravelDisutility() {
 
-			@Override
-			public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-				double linkTravelDisutility = ttdc.getLinkTravelDisutility(link, time, person, vehicle);
-				return linkTravelDisutility;
-			}
+      @Override
+      public double getLinkTravelDisutility(
+          final Link link, final double time, final Person person, final Vehicle vehicle) {
+        double linkTravelDisutility = ttdc.getLinkTravelDisutility(link, time, person, vehicle);
+        return linkTravelDisutility;
+      }
 
-			@Override
-			public double getLinkMinimumTravelDisutility(Link link) {
-				return ttdc.getLinkMinimumTravelDisutility(link);
-			}
-		};
-	}
-
+      @Override
+      public double getLinkMinimumTravelDisutility(Link link) {
+        return ttdc.getLinkMinimumTravelDisutility(link);
+      }
+    };
+  }
 }

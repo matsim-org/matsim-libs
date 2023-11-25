@@ -1,6 +1,6 @@
 /*
  * Copyright 2018 Gunnar Flötteröd
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,8 +19,8 @@
  */
 package org.matsim.contrib.pseudosimulation.mobsim.transitperformance;
 
+import com.google.inject.Inject;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
@@ -29,39 +29,41 @@ import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import com.google.inject.Inject;
-
 /**
- * An attempt to carve out the TransitPerformance based transit emulation.
- * Largely cut & paste from PSim. Not tested with an actual model.
+ * An attempt to carve out the TransitPerformance based transit emulation. Largely cut & paste from
+ * PSim. Not tested with an actual model.
  *
  * @author Gunnar Flötteröd
- *
  */
 public class TransitPerformanceFromPSimSpecificImplementation implements TransitEmulator {
 
-	private TransitPerformance transitPerformance;
+  private TransitPerformance transitPerformance;
 
-	private Map<Id<TransitLine>, TransitLine> transitLines;
+  private Map<Id<TransitLine>, TransitLine> transitLines;
 
-	@Inject
-	public TransitPerformanceFromPSimSpecificImplementation(TransitPerformance transitPerformance,
-			TransitSchedule transitSchedule) {
-		this.transitPerformance = transitPerformance;
-		this.transitLines = transitSchedule.getTransitLines();
-	}
+  @Inject
+  public TransitPerformanceFromPSimSpecificImplementation(
+      TransitPerformance transitPerformance, TransitSchedule transitSchedule) {
+    this.transitPerformance = transitPerformance;
+    this.transitLines = transitSchedule.getTransitLines();
+  }
 
-	@Override
-	public Trip findTrip(Leg prevLeg, double earliestDepartureTime_s) {
+  @Override
+  public Trip findTrip(Leg prevLeg, double earliestDepartureTime_s) {
 
-		TransitPassengerRoute route = (TransitPassengerRoute) prevLeg.getRoute();
-		Id accessStopId = route.getAccessStopId();
-		Id egressStopId = route.getEgressStopId();
+    TransitPassengerRoute route = (TransitPassengerRoute) prevLeg.getRoute();
+    Id accessStopId = route.getAccessStopId();
+    Id egressStopId = route.getEgressStopId();
 
-		Tuple<Double, Double> routeTravelTime = transitPerformance.getRouteTravelTime(route.getLineId(),
-				route.getRouteId(), accessStopId, egressStopId, earliestDepartureTime_s);
-		final double accessTime_s = earliestDepartureTime_s + routeTravelTime.getFirst();
-		final double egressTime_s = accessTime_s + routeTravelTime.getSecond();
-		return new Trip(null, accessTime_s, egressTime_s);
-	}
+    Tuple<Double, Double> routeTravelTime =
+        transitPerformance.getRouteTravelTime(
+            route.getLineId(),
+            route.getRouteId(),
+            accessStopId,
+            egressStopId,
+            earliestDepartureTime_s);
+    final double accessTime_s = earliestDepartureTime_s + routeTravelTime.getFirst();
+    final double egressTime_s = accessTime_s + routeTravelTime.getSecond();
+    return new Trip(null, accessTime_s, egressTime_s);
+  }
 }

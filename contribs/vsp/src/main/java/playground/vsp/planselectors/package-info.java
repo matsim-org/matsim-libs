@@ -18,6 +18,5 @@
  * *********************************************************************** */
 /**
  * @author nagel
- *
  */
 package playground.vsp.planselectors;

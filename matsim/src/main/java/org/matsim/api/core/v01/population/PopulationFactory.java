@@ -31,38 +31,44 @@ import org.matsim.facilities.ActivityFacility;
  */
 public interface PopulationFactory extends MatsimFactory {
 
-	Person createPerson(Id<Person> id);
+  Person createPerson(Id<Person> id);
 
-	Plan createPlan();
+  Plan createPlan();
 
-	/**
-	 * Creates an Activity from a coordinate. Such activities are assigned to a link on running the Controler.
-	 * @param actType - the type of the activity, which needs to correspond to some string in the config file
-	 * @param coord - the coordinates of the activity
-	 * @return the activity
-	 * <p></p>
-	 * It might in fact make sense to add a creational method that takes coord <i>and</i> link id.  kai, aug'10
-	 */
-	Activity createActivityFromCoord(String actType, Coord coord);
-	
-	Activity createInteractionActivityFromCoord(String actType, Coord coord);
+  /**
+   * Creates an Activity from a coordinate. Such activities are assigned to a link on running the
+   * Controler.
+   *
+   * @param actType - the type of the activity, which needs to correspond to some string in the
+   *     config file
+   * @param coord - the coordinates of the activity
+   * @return the activity
+   *     <p>It might in fact make sense to add a creational method that takes coord <i>and</i> link
+   *     id. kai, aug'10
+   */
+  Activity createActivityFromCoord(String actType, Coord coord);
 
-	/**
-	 * Creates an Activity from a link id. No coordinate will be associated directly with this activity. This does
-	 * <i> not </i> add the activity into the plan.
-	 * @param actType - the type of the activity, which needs to correspond to some string in the config file
-	 * @return the activity
-	 */
-	Activity createActivityFromLinkId(String actType, Id<Link> linkId);
-	
-	Activity createInteractionActivityFromLinkId(String actType, Id<Link> linkId);
+  Activity createInteractionActivityFromCoord(String actType, Coord coord);
 
-	Activity createActivityFromActivityFacilityId( String actType, Id<ActivityFacility> activityFacilityId ) ;
-	
-	Activity createInteractionActivityFromActivityFacilityId( String actType, Id<ActivityFacility> activityFacilityId ) ;
+  /**
+   * Creates an Activity from a link id. No coordinate will be associated directly with this
+   * activity. This does <i> not </i> add the activity into the plan.
+   *
+   * @param actType - the type of the activity, which needs to correspond to some string in the
+   *     config file
+   * @return the activity
+   */
+  Activity createActivityFromLinkId(String actType, Id<Link> linkId);
 
-	Leg createLeg(String legMode);
+  Activity createInteractionActivityFromLinkId(String actType, Id<Link> linkId);
 
-	RouteFactories getRouteFactories();
+  Activity createActivityFromActivityFacilityId(
+      String actType, Id<ActivityFacility> activityFacilityId);
 
+  Activity createInteractionActivityFromActivityFacilityId(
+      String actType, Id<ActivityFacility> activityFacilityId);
+
+  Leg createLeg(String legMode);
+
+  RouteFactories getRouteFactories();
 }

@@ -27,13 +27,13 @@ import org.matsim.core.population.algorithms.ChooseRandomLegMode;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 
 /**
- * Changes the transportation mode of all legs in a plan to a randomly chosen
- * different mode (but the same mode for all legs in that plan) given a list
- * of possible modes.
+ * Changes the transportation mode of all legs in a plan to a randomly chosen different mode (but
+ * the same mode for all legs in that plan) given a list of possible modes.
  *
- * By default, the module chooses between "car" and "pt". If other modes should
- * be used, it can be done so in the configuration. Also, this module is able to (optionally)
- * respect car-availability:
+ * <p>By default, the module chooses between "car" and "pt". If other modes should be used, it can
+ * be done so in the configuration. Also, this module is able to (optionally) respect
+ * car-availability:
+ *
  * <pre>
  * &lt;module name="changeLegMode">
  *   &lt!-- provide a comma-separated list of leg modes -->
@@ -43,39 +43,48 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
  * </pre>
  *
  * @see ChooseRandomLegMode
- *
  * @author mrieser
  */
 public class ChangeLegMode extends AbstractMultithreadedModule {
 
-	// (I made the above static final variables public so they can be used in scripts-in-java. kai, jun'15)
+  // (I made the above static final variables public so they can be used in scripts-in-java. kai,
+  // jun'15)
 
-	private String[] availableModes;
-	private boolean ignoreCarAvailability;
-	private boolean allowSwitchFromListedModesOnly;
+  private String[] availableModes;
+  private boolean ignoreCarAvailability;
+  private boolean allowSwitchFromListedModesOnly;
 
+  public ChangeLegMode(
+      final GlobalConfigGroup globalConfigGroup, ChangeModeConfigGroup changeLegModeConfigGroup) {
+    super(globalConfigGroup.getNumberOfThreads());
+    this.availableModes = changeLegModeConfigGroup.getModes();
+    this.ignoreCarAvailability = changeLegModeConfigGroup.getIgnoreCarAvailability();
+    if (changeLegModeConfigGroup
+        .getBehavior()
+        .equals(ChangeModeConfigGroup.Behavior.fromSpecifiedModesToSpecifiedModes)) {
+      this.allowSwitchFromListedModesOnly = true;
+    } else this.allowSwitchFromListedModesOnly = false;
+  }
 
-	public ChangeLegMode(final GlobalConfigGroup globalConfigGroup, ChangeModeConfigGroup changeLegModeConfigGroup) {
-		super(globalConfigGroup.getNumberOfThreads());
-		this.availableModes = changeLegModeConfigGroup.getModes();
-		this.ignoreCarAvailability = changeLegModeConfigGroup.getIgnoreCarAvailability();
-		if (changeLegModeConfigGroup.getBehavior().equals(ChangeModeConfigGroup.Behavior.fromSpecifiedModesToSpecifiedModes)) {
-			this.allowSwitchFromListedModesOnly = true;
-		} else this.allowSwitchFromListedModesOnly=false;
-	}
-	
-	public ChangeLegMode(final int nOfThreads, final String[] modes, final boolean ignoreCarAvailabilty, boolean allowSwitchFromListedModesOnly) {
-		super(nOfThreads);
-		this.availableModes = modes.clone();
-		this.ignoreCarAvailability = ignoreCarAvailabilty;
-		this.allowSwitchFromListedModesOnly = allowSwitchFromListedModesOnly;
-	}
+  public ChangeLegMode(
+      final int nOfThreads,
+      final String[] modes,
+      final boolean ignoreCarAvailabilty,
+      boolean allowSwitchFromListedModesOnly) {
+    super(nOfThreads);
+    this.availableModes = modes.clone();
+    this.ignoreCarAvailability = ignoreCarAvailabilty;
+    this.allowSwitchFromListedModesOnly = allowSwitchFromListedModesOnly;
+  }
 
-	@Override
-	public PlanAlgorithm getPlanAlgoInstance() {
-		ChooseRandomLegMode algo = new ChooseRandomLegMode(this.availableModes, MatsimRandom.getLocalInstance(), this.allowSwitchFromListedModesOnly);
-		algo.setIgnoreCarAvailability(this.ignoreCarAvailability);
-		return algo;
-	}
-
+  @Override
+  public PlanAlgorithm getPlanAlgoInstance() {
+    ChooseRandomLegMode algo =
+        new ChooseRandomLegMode(
+            this.availableModes,
+            MatsimRandom.getLocalInstance(),
+            this.allowSwitchFromListedModesOnly);
+    algo.setIgnoreCarAvailability(this.ignoreCarAvailability);
+    return algo;
+  }
 }

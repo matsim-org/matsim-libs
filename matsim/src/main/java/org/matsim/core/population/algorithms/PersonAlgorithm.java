@@ -23,5 +23,5 @@ package org.matsim.core.population.algorithms;
 import org.matsim.api.core.v01.population.Person;
 
 public interface PersonAlgorithm {
-	public void run(Person person);
+  public void run(Person person);
 }

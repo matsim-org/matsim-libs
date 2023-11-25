@@ -23,37 +23,39 @@ import org.matsim.contrib.ev.fleet.Battery;
  */
 public class EDrtAssignShiftToVehicleLogic implements AssignShiftToVehicleLogic {
 
-	private final AssignShiftToVehicleLogic delegate;
-	private final ShiftsParams drtShiftParams;
+  private final AssignShiftToVehicleLogic delegate;
+  private final ShiftsParams drtShiftParams;
 
-	public EDrtAssignShiftToVehicleLogic(AssignShiftToVehicleLogic delegate, ShiftsParams drtShiftParams) {
-		this.delegate = delegate;
-		this.drtShiftParams = drtShiftParams;
-	}
+  public EDrtAssignShiftToVehicleLogic(
+      AssignShiftToVehicleLogic delegate, ShiftsParams drtShiftParams) {
+    this.delegate = delegate;
+    this.drtShiftParams = drtShiftParams;
+  }
 
-	@Override
-	public boolean canAssignVehicleToShift(ShiftDvrpVehicle vehicle, DrtShift shift) {
+  @Override
+  public boolean canAssignVehicleToShift(ShiftDvrpVehicle vehicle, DrtShift shift) {
 
-		// no, if charging
-		if(vehicle.getSchedule().getStatus() == Schedule.ScheduleStatus.STARTED) {
-			final Task currentTask = vehicle.getSchedule().getCurrentTask();
-			if (currentTask instanceof EDrtWaitForShiftStayTask) {
-				if (((EDrtWaitForShiftStayTask) currentTask).getChargingTask() != null) {
-					if (currentTask.getEndTime() > shift.getStartTime()) {
-						return false;
-					}
-				}
-			}
-		}
+    // no, if charging
+    if (vehicle.getSchedule().getStatus() == Schedule.ScheduleStatus.STARTED) {
+      final Task currentTask = vehicle.getSchedule().getCurrentTask();
+      if (currentTask instanceof EDrtWaitForShiftStayTask) {
+        if (((EDrtWaitForShiftStayTask) currentTask).getChargingTask() != null) {
+          if (currentTask.getEndTime() > shift.getStartTime()) {
+            return false;
+          }
+        }
+      }
+    }
 
-		// no, if below battery threshold
-		if (vehicle instanceof EvShiftDvrpVehicle) {
-			final Battery battery = ((EvShiftDvrpVehicle) vehicle).getElectricVehicle().getBattery();
-			if (battery.getCharge() / battery.getCapacity() < drtShiftParams.shiftAssignmentBatteryThreshold) {
-				return false;
-			}
-		}
+    // no, if below battery threshold
+    if (vehicle instanceof EvShiftDvrpVehicle) {
+      final Battery battery = ((EvShiftDvrpVehicle) vehicle).getElectricVehicle().getBattery();
+      if (battery.getCharge() / battery.getCapacity()
+          < drtShiftParams.shiftAssignmentBatteryThreshold) {
+        return false;
+      }
+    }
 
-		return delegate.canAssignVehicleToShift(vehicle, shift);
-	}
+    return delegate.canAssignVehicleToShift(vehicle, shift);
+  }
 }

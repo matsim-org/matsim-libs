@@ -23,6 +23,5 @@ package org.matsim.contrib.socnetsim.framework.replanning;
  * @author thibautd
  */
 public interface GenericPlanAlgorithm<T> {
-	public void run( T plan );
+  public void run(T plan);
 }
-

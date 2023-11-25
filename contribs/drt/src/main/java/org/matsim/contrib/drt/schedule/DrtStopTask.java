@@ -21,29 +21,29 @@
 package org.matsim.contrib.drt.schedule;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 
 /**
- * A task representing stopping at a bus stop with at least one or more passengers being picked up or dropped off.
- * <p>
- * Note that we can have both dropoff requests and pickup requests for the same stop.  kai, nov'18
+ * A task representing stopping at a bus stop with at least one or more passengers being picked up
+ * or dropped off.
+ *
+ * <p>Note that we can have both dropoff requests and pickup requests for the same stop. kai, nov'18
  *
  * @author Michal Maciejewski (michalm)
  */
 public interface DrtStopTask extends StayTask {
-	Map<Id<Request>, AcceptedDrtRequest> getDropoffRequests();
+  Map<Id<Request>, AcceptedDrtRequest> getDropoffRequests();
 
-	Map<Id<Request>, AcceptedDrtRequest> getPickupRequests();
+  Map<Id<Request>, AcceptedDrtRequest> getPickupRequests();
 
-	void addDropoffRequest(AcceptedDrtRequest request);
+  void addDropoffRequest(AcceptedDrtRequest request);
 
-	void addPickupRequest(AcceptedDrtRequest request);
-	
-	void removePickupRequest(Id<Request> requestId);
-	
-	void removeDropoffRequest(Id<Request> requestId);
+  void addPickupRequest(AcceptedDrtRequest request);
+
+  void removePickupRequest(Id<Request> requestId);
+
+  void removeDropoffRequest(Id<Request> requestId);
 }

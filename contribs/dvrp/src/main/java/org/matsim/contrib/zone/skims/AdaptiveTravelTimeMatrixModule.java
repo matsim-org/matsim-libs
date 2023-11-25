@@ -30,26 +30,29 @@ import org.matsim.core.config.groups.QSimConfigGroup;
  * @author steffenaxer
  */
 public class AdaptiveTravelTimeMatrixModule extends AbstractDvrpModeModule {
-    private final double ALTERNATIVE_ENDTIME = 30*3600;
-    private final static double SMOOTHING_ALPHA = 0.75; // High weight to new values
+  private final double ALTERNATIVE_ENDTIME = 30 * 3600;
+  private static final double SMOOTHING_ALPHA = 0.75; // High weight to new values
 
-    @Inject
-    private QSimConfigGroup qsimConfig;
+  @Inject private QSimConfigGroup qsimConfig;
 
-    @Inject
-    private DvrpConfigGroup dvrpConfigGroup;
+  @Inject private DvrpConfigGroup dvrpConfigGroup;
 
-    public AdaptiveTravelTimeMatrixModule(String mode) {
-        super(mode);
-    }
+  public AdaptiveTravelTimeMatrixModule(String mode) {
+    super(mode);
+  }
 
-    @Override
-    public void install() {
-        bindModal(AdaptiveTravelTimeMatrix.class).toProvider(modalProvider(
-                getter -> new AdaptiveTravelTimeMatrixImpl(qsimConfig.getEndTime().orElse(ALTERNATIVE_ENDTIME),
+  @Override
+  public void install() {
+    bindModal(AdaptiveTravelTimeMatrix.class)
+        .toProvider(
+            modalProvider(
+                getter ->
+                    new AdaptiveTravelTimeMatrixImpl(
+                        qsimConfig.getEndTime().orElse(ALTERNATIVE_ENDTIME),
                         getter.getModal(Network.class),
                         dvrpConfigGroup.getTravelTimeMatrixParams(),
-                        getter.getModal(TravelTimeMatrix.class),SMOOTHING_ALPHA)))
-                .in(Singleton.class);
-    }
+                        getter.getModal(TravelTimeMatrix.class),
+                        SMOOTHING_ALPHA)))
+        .in(Singleton.class);
+  }
 }

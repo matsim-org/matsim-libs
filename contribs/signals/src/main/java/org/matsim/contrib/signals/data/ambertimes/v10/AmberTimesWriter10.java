@@ -18,20 +18,19 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data.ambertimes.v10;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Map;
-
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.signals.model.Signal;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.jaxb.amberTimes10.ObjectFactory;
@@ -43,111 +42,103 @@ import org.matsim.jaxb.amberTimes10.XMLAmberTimesType.XMLAmber;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimesType.XMLRedAmber;
 import org.matsim.jaxb.amberTimes10.XMLGlobalDefaultsType;
 import org.matsim.jaxb.amberTimes10.XMLGlobalDefaultsType.XMLAmberTimeGreen;
-import org.matsim.contrib.signals.model.Signal;
-
 
 /**
  * @author jbischoff
  * @author dgrether
  */
 public final class AmberTimesWriter10 extends MatsimJaxbXmlWriter {
-	
-		private static final Logger log = LogManager.getLogger(AmberTimesWriter10.class);
-		
-		private AmberTimesData amberTimesData;
-	
-		public static final String AMBERTIMES10 = "http://www.matsim.org/files/dtd/amberTimes_v1.0.xsd";
-		
-		public AmberTimesWriter10(AmberTimesData amberTimesData){
-			this.amberTimesData = amberTimesData;
-		}
-		
-		private XMLAmberTimes convertDataToXml() {
-			ObjectFactory fac = new ObjectFactory();
-			XMLAmberTimes xmlContainer = fac.createXMLAmberTimes();
-			
-			//global defaults
-			XMLGlobalDefaultsType gdt = fac.createXMLGlobalDefaultsType();
-			if (this.amberTimesData.getDefaultAmber() != null){
-				XMLAmber gda = fac.createXMLAmberTimesTypeXMLAmber();
-				gda.setSeconds(BigInteger.valueOf(this.amberTimesData.getDefaultAmber()));
-				gdt.setAmber(gda);
-			}
-			if (this.amberTimesData.getDefaultRedAmber() != null){
-				XMLRedAmber gdra = fac.createXMLAmberTimesTypeXMLRedAmber();
-				gdra.setSeconds(BigInteger.valueOf(this.amberTimesData.getDefaultRedAmber()));
-				gdt.setRedAmber(gdra);
-			}
-			if (this.amberTimesData.getDefaultAmberTimeGreen() != null){
-				XMLAmberTimeGreen gdatg = fac.createXMLGlobalDefaultsTypeXMLAmberTimeGreen();
-				gdatg.setProportion(BigDecimal.valueOf(this.amberTimesData.getDefaultAmberTimeGreen()));
-				gdt.setAmberTimeGreen(gdatg);
-			}
-			xmlContainer.setGlobalDefaults(gdt);
-			
-			for (AmberTimeData atdata : this.amberTimesData.getAmberTimeDataBySystemId().values()){
-							
-				XMLSignalSystem xmlss = fac.createXMLAmberTimesXMLSignalSystem();
-				xmlss.setRefId(atdata.getSignalSystemId().toString());
-							
-				//Signal System Defaults
-				XMLAmberTimesType ssd = fac.createXMLAmberTimesType();	
-				if (atdata.getDefaultAmber() != null){
-					XMLAmber ssda = fac.createXMLAmberTimesTypeXMLAmber();
-					ssda.setSeconds(BigInteger.valueOf(atdata.getDefaultAmber()));
-					ssd.setAmber(ssda);
-				}
-				if (atdata.getDefaultRedAmber() != null){
-					XMLRedAmber ssdra = fac.createXMLAmberTimesTypeXMLRedAmber();
-					ssdra.setSeconds(BigInteger.valueOf(atdata.getDefaultRedAmber()));
-					ssd.setRedAmber(ssdra);
-				}
-				xmlss.setSystemDefaults(ssd);
-				
-				for (Map.Entry<Id<Signal> ,Integer> amt : atdata.getSignalAmberMap().entrySet()){
-					XMLAmber lca = fac.createXMLAmberTimesTypeXMLAmber();
-					XMLRedAmber lcra = fac.createXMLAmberTimesTypeXMLRedAmber();
-					XMLSignal xmls = fac.createXMLAmberTimesXMLSignalSystemXMLSignal();
-					xmls.setRefId(amt.getKey().toString());
-					lca.setSeconds(BigInteger.valueOf(amt.getValue()));
-					lcra.setSeconds(BigInteger.valueOf(atdata.getRedAmberOfSignal(amt.getKey())));
-					xmls.setAmber(lca);
-					xmls.setRedAmber(lcra);
-					xmlss.getSignal().add(xmls);
-					
-				}		
-				xmlContainer.getSignalSystem().add(xmlss);
-			}
-			return xmlContainer;
-		}
 
-		public void write(String filename, XMLAmberTimes xmlAmberTimes) {
-			log.info("writing file: " + filename);
-	  	JAXBContext jc;
-			try {
-				jc = JAXBContext.newInstance(org.matsim.jaxb.amberTimes10.ObjectFactory.class);
-				Marshaller m = jc.createMarshaller();
-				super.setMarshallerProperties(AmberTimesWriter10.AMBERTIMES10, m);
-				BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
-				m.marshal(xmlAmberTimes, bufout);
-				bufout.close();
-			} catch (JAXBException e) {
-				e.printStackTrace();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
-		}
+  private static final Logger log = LogManager.getLogger(AmberTimesWriter10.class);
 
-		
-		@Override
-		public void write(final String filename) {
-			XMLAmberTimes xmlAmberTimes = convertDataToXml();
-			this.write(filename, xmlAmberTimes);
-		}
+  private AmberTimesData amberTimesData;
 
-		
-	}
+  public static final String AMBERTIMES10 = "http://www.matsim.org/files/dtd/amberTimes_v1.0.xsd";
 
+  public AmberTimesWriter10(AmberTimesData amberTimesData) {
+    this.amberTimesData = amberTimesData;
+  }
+
+  private XMLAmberTimes convertDataToXml() {
+    ObjectFactory fac = new ObjectFactory();
+    XMLAmberTimes xmlContainer = fac.createXMLAmberTimes();
+
+    // global defaults
+    XMLGlobalDefaultsType gdt = fac.createXMLGlobalDefaultsType();
+    if (this.amberTimesData.getDefaultAmber() != null) {
+      XMLAmber gda = fac.createXMLAmberTimesTypeXMLAmber();
+      gda.setSeconds(BigInteger.valueOf(this.amberTimesData.getDefaultAmber()));
+      gdt.setAmber(gda);
+    }
+    if (this.amberTimesData.getDefaultRedAmber() != null) {
+      XMLRedAmber gdra = fac.createXMLAmberTimesTypeXMLRedAmber();
+      gdra.setSeconds(BigInteger.valueOf(this.amberTimesData.getDefaultRedAmber()));
+      gdt.setRedAmber(gdra);
+    }
+    if (this.amberTimesData.getDefaultAmberTimeGreen() != null) {
+      XMLAmberTimeGreen gdatg = fac.createXMLGlobalDefaultsTypeXMLAmberTimeGreen();
+      gdatg.setProportion(BigDecimal.valueOf(this.amberTimesData.getDefaultAmberTimeGreen()));
+      gdt.setAmberTimeGreen(gdatg);
+    }
+    xmlContainer.setGlobalDefaults(gdt);
+
+    for (AmberTimeData atdata : this.amberTimesData.getAmberTimeDataBySystemId().values()) {
+
+      XMLSignalSystem xmlss = fac.createXMLAmberTimesXMLSignalSystem();
+      xmlss.setRefId(atdata.getSignalSystemId().toString());
+
+      // Signal System Defaults
+      XMLAmberTimesType ssd = fac.createXMLAmberTimesType();
+      if (atdata.getDefaultAmber() != null) {
+        XMLAmber ssda = fac.createXMLAmberTimesTypeXMLAmber();
+        ssda.setSeconds(BigInteger.valueOf(atdata.getDefaultAmber()));
+        ssd.setAmber(ssda);
+      }
+      if (atdata.getDefaultRedAmber() != null) {
+        XMLRedAmber ssdra = fac.createXMLAmberTimesTypeXMLRedAmber();
+        ssdra.setSeconds(BigInteger.valueOf(atdata.getDefaultRedAmber()));
+        ssd.setRedAmber(ssdra);
+      }
+      xmlss.setSystemDefaults(ssd);
+
+      for (Map.Entry<Id<Signal>, Integer> amt : atdata.getSignalAmberMap().entrySet()) {
+        XMLAmber lca = fac.createXMLAmberTimesTypeXMLAmber();
+        XMLRedAmber lcra = fac.createXMLAmberTimesTypeXMLRedAmber();
+        XMLSignal xmls = fac.createXMLAmberTimesXMLSignalSystemXMLSignal();
+        xmls.setRefId(amt.getKey().toString());
+        lca.setSeconds(BigInteger.valueOf(amt.getValue()));
+        lcra.setSeconds(BigInteger.valueOf(atdata.getRedAmberOfSignal(amt.getKey())));
+        xmls.setAmber(lca);
+        xmls.setRedAmber(lcra);
+        xmlss.getSignal().add(xmls);
+      }
+      xmlContainer.getSignalSystem().add(xmlss);
+    }
+    return xmlContainer;
+  }
+
+  public void write(String filename, XMLAmberTimes xmlAmberTimes) {
+    log.info("writing file: " + filename);
+    JAXBContext jc;
+    try {
+      jc = JAXBContext.newInstance(org.matsim.jaxb.amberTimes10.ObjectFactory.class);
+      Marshaller m = jc.createMarshaller();
+      super.setMarshallerProperties(AmberTimesWriter10.AMBERTIMES10, m);
+      BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
+      m.marshal(xmlAmberTimes, bufout);
+      bufout.close();
+    } catch (JAXBException e) {
+      e.printStackTrace();
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public void write(final String filename) {
+    XMLAmberTimes xmlAmberTimes = convertDataToXml();
+    this.write(filename, xmlAmberTimes);
+  }
+}

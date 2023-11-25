@@ -20,38 +20,33 @@
 package org.matsim.households;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Person;
 
-
 /**
  * Tiny helper to get the household associated with a person's id.
- * @author dgrether
  *
+ * @author dgrether
  */
 public class PersonHouseholdMapping {
 
-	private final Map<Id<Person>, Household> phMap = new IdMap<>(Person.class);
-	
-	public PersonHouseholdMapping(Households hhs) {
-		this.reinitialize(hhs);
-	}
+  private final Map<Id<Person>, Household> phMap = new IdMap<>(Person.class);
 
-	public void reinitialize(Households hhs) {
-		this.phMap.clear();
-		for (Household h : hhs.getHouseholds().values()){
-			for (Id<Person> member : h.getMemberIds()){
-				this.phMap.put(member, h);
-			}
-		}
-		
-	}
-	
-	public Household getHousehold(Id<Person> personId) {
-		return this.phMap.get(personId);
-	}
-	
-	
+  public PersonHouseholdMapping(Households hhs) {
+    this.reinitialize(hhs);
+  }
+
+  public void reinitialize(Households hhs) {
+    this.phMap.clear();
+    for (Household h : hhs.getHouseholds().values()) {
+      for (Id<Person> member : h.getMemberIds()) {
+        this.phMap.put(member, h);
+      }
+    }
+  }
+
+  public Household getHousehold(Id<Person> personId) {
+    return this.phMap.get(personId);
+  }
 }

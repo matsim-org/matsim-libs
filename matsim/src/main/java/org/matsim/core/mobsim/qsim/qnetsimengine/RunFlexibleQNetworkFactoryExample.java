@@ -19,7 +19,6 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import jakarta.inject.Inject;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -38,70 +37,80 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 /**
  * @author nagel
- *
  */
 public class RunFlexibleQNetworkFactoryExample {
 
-	static final class MyQNetworkFactory implements QNetworkFactory {
-		@Inject private EventsManager events ;
-		@Inject private Scenario scenario ; // yyyyyy I would like to get rid of this. kai, mar'16
-		@Inject private Network network ;
-		@Inject private QSimConfigGroup qsimConfig ;
+  static final class MyQNetworkFactory implements QNetworkFactory {
+    @Inject private EventsManager events;
+    @Inject private Scenario scenario; // yyyyyy I would like to get rid of this. kai, mar'16
+    @Inject private Network network;
+    @Inject private QSimConfigGroup qsimConfig;
 
-		private NetsimEngineContext context;
-		private NetsimInternalInterface netsimEngine;
+    private NetsimEngineContext context;
+    private NetsimInternalInterface netsimEngine;
 
-		@Override
-		public final void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
-			double effectiveCellSize = ((Network)network).getEffectiveCellSize() ;
+    @Override
+    public final void initializeFactory(
+        AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1) {
+      double effectiveCellSize = ((Network) network).getEffectiveCellSize();
 
-			SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-			linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );
-			if (! Double.isNaN(network.getEffectiveLaneWidth())){
-				linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
-			}
-			AbstractAgentSnapshotInfoBuilder snapshotBuilder = QNetsimEngineWithThreadpool.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
+      SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+      linkWidthCalculator.setLinkWidthForVis(qsimConfig.getLinkWidthForVis());
+      if (!Double.isNaN(network.getEffectiveLaneWidth())) {
+        linkWidthCalculator.setLaneWidth(network.getEffectiveLaneWidth());
+      }
+      AbstractAgentSnapshotInfoBuilder snapshotBuilder =
+          QNetsimEngineWithThreadpool.createAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
 
-			this.context = new NetsimEngineContext(events, effectiveCellSize, agentCounter, snapshotBuilder, qsimConfig, mobsimTimer, linkWidthCalculator ) ;
+      this.context =
+          new NetsimEngineContext(
+              events,
+              effectiveCellSize,
+              agentCounter,
+              snapshotBuilder,
+              qsimConfig,
+              mobsimTimer,
+              linkWidthCalculator);
 
-			this.netsimEngine = netsimEngine1 ;
-		}
-		@Override
-		public final QNodeI createNetsimNode( Node node ) {
-			QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context, qsimConfig ) ;
-			return builder.build( node ) ;
+      this.netsimEngine = netsimEngine1;
+    }
 
-		}
-		@Override
-		public final QLinkI createNetsimLink( Link link, QNodeI queueNode ) {
+    @Override
+    public final QNodeI createNetsimNode(Node node) {
+      QNodeImpl.Builder builder = new QNodeImpl.Builder(netsimEngine, context, qsimConfig);
+      return builder.build(node);
+    }
 
-			QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
-			{
-				QueueWithBuffer.Builder laneBuilder = new QueueWithBuffer.Builder( context );
-				linkBuilder.setLaneFactory( laneBuilder );
-			}
-			return linkBuilder.build(link, queueNode) ;
-		}
-	}
+    @Override
+    public final QLinkI createNetsimLink(Link link, QNodeI queueNode) {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Config config = ConfigUtils.createConfig() ;
+      QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine);
+      {
+        QueueWithBuffer.Builder laneBuilder = new QueueWithBuffer.Builder(context);
+        linkBuilder.setLaneFactory(laneBuilder);
+      }
+      return linkBuilder.build(link, queueNode);
+    }
+  }
 
-		Scenario scenario = ScenarioUtils.createScenario( config ) ;
+  /**
+   * @param args
+   */
+  public static void main(String[] args) {
+    Config config = ConfigUtils.createConfig();
 
-		Controler controler = new Controler( scenario ) ;
+    Scenario scenario = ScenarioUtils.createScenario(config);
 
-		controler.addOverridingModule( new AbstractModule(){
-			@Override public void install() {
-				bind( QNetworkFactory.class ).to( MyQNetworkFactory.class ) ;
-			}
-		});
+    Controler controler = new Controler(scenario);
 
-		controler.run();
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            bind(QNetworkFactory.class).to(MyQNetworkFactory.class);
+          }
+        });
 
-	}
-
+    controler.run();
+  }
 }

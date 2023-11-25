@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * PopulationModule.java
@@ -19,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim;
+package org.matsim.core.mobsim.qsim;
 
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -34,27 +33,28 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.pt.config.TransitConfigGroup;
 
 public class PopulationModule extends AbstractQSimModule {
-	public final static String COMPONENT_NAME = "PopulationAgentSource";
+  public static final String COMPONENT_NAME = "PopulationAgentSource";
 
-	@Override
-	protected void configureQSim() {
-		bind(PopulationAgentSource.class).asEagerSingleton();
-		addQSimComponentBinding( COMPONENT_NAME ).to( PopulationAgentSource.class );
-	}
+  @Override
+  protected void configureQSim() {
+    bind(PopulationAgentSource.class).asEagerSingleton();
+    addQSimComponentBinding(COMPONENT_NAME).to(PopulationAgentSource.class);
+  }
 
-	@Provides
-	@Singleton
-	AgentFactory provideAgentFactory(TransitConfigGroup config, Netsim simulation, TimeInterpretation timeInterpretation) {
-		if (config.isUseTransit()) {
-			return new TransitAgentFactory(simulation, timeInterpretation);
-		} else {
-			return new DefaultAgentFactory(simulation, timeInterpretation);
-		}
-	}
-	
-	@Provides
-	@Singleton
-	QVehicleFactory provideQVehicleFactory( ) {
-		return QVehicleImpl::new;
-	}
+  @Provides
+  @Singleton
+  AgentFactory provideAgentFactory(
+      TransitConfigGroup config, Netsim simulation, TimeInterpretation timeInterpretation) {
+    if (config.isUseTransit()) {
+      return new TransitAgentFactory(simulation, timeInterpretation);
+    } else {
+      return new DefaultAgentFactory(simulation, timeInterpretation);
+    }
+  }
+
+  @Provides
+  @Singleton
+  QVehicleFactory provideQVehicleFactory() {
+    return QVehicleImpl::new;
+  }
 }

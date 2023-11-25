@@ -34,136 +34,102 @@ import java.util.TreeSet;
  * @author thibautd
  */
 public class CollectionUtils {
-	public static <T> List<T> getRandomDistinctElements(
-			final Random random,
-			final List<T> list,
-			final int nElements ) {
-		if ( list.size() < nElements ) throw new IllegalArgumentException( "cannot sample "+nElements+" elements from "+list.size() );
+  public static <T> List<T> getRandomDistinctElements(
+      final Random random, final List<T> list, final int nElements) {
+    if (list.size() < nElements)
+      throw new IllegalArgumentException(
+          "cannot sample " + nElements + " elements from " + list.size());
 
-		// TODO: avoid creating "bowl" collection
-		final List<T> bowl = new ArrayList<T>( list );
-		final List<T> sample = new ArrayList<T>( nElements );
+    // TODO: avoid creating "bowl" collection
+    final List<T> bowl = new ArrayList<T>(list);
+    final List<T> sample = new ArrayList<T>(nElements);
 
-		for ( int i=0; i < nElements; i++ ) {
-			sample.add(
-					bowl.remove(
-						random.nextInt(
-							bowl.size() ) ) );
-		}
+    for (int i = 0; i < nElements; i++) {
+      sample.add(bowl.remove(random.nextInt(bowl.size())));
+    }
 
-		return sample;
-	}
+    return sample;
+  }
 
-	public static boolean intersects(
-			final Collection<?> c1,
-			final Collection<?> c2) {
-		for ( Object o : c1 ) {
-			if ( c2.contains( o ) ) return true;
-		}
-		return false;
-	}
+  public static boolean intersects(final Collection<?> c1, final Collection<?> c2) {
+    for (Object o : c1) {
+      if (c2.contains(o)) return true;
+    }
+    return false;
+  }
 
-	public static <T> Set<T> intersect(
-			final Collection<? extends T> c1,
-			final Collection<? extends T> c2) {
-		final Set<T> set = new HashSet<T>();
-		for ( T t : c1 ) {
-			if ( c2.contains( t ) ) set.add( t );
-		}
-		return set;
-	}
+  public static <T> Set<T> intersect(
+      final Collection<? extends T> c1, final Collection<? extends T> c2) {
+    final Set<T> set = new HashSet<T>();
+    for (T t : c1) {
+      if (c2.contains(t)) set.add(t);
+    }
+    return set;
+  }
 
-	public static <T extends Comparable<T>> SortedSet<T> intersectSorted(
-			final Collection<? extends T> c1,
-			final Collection<? extends T> c2) {
-		final SortedSet<T> set = new TreeSet<T>();
-		for ( T t : c1 ) {
-			if ( c2.contains( t ) ) set.add( t );
-		}
-		return set;
-	}
+  public static <T extends Comparable<T>> SortedSet<T> intersectSorted(
+      final Collection<? extends T> c1, final Collection<? extends T> c2) {
+    final SortedSet<T> set = new TreeSet<T>();
+    for (T t : c1) {
+      if (c2.contains(t)) set.add(t);
+    }
+    return set;
+  }
 
-	/**
-	 * makes sense only if iteration order deterministic!
-	 */
-	public static <K,V> Map.Entry<K,V> getRandomElement(
-			final Random random,
-			final Map<K,V> map) {
-		return getRandomElement( false , random , map );
-	}
+  /** makes sense only if iteration order deterministic! */
+  public static <K, V> Map.Entry<K, V> getRandomElement(final Random random, final Map<K, V> map) {
+    return getRandomElement(false, random, map);
+  }
 
-	/**
-	 * makes sense only if iteration order deterministic!
-	 */
-	public static <K,V> Map.Entry<K,V> removeRandomElement(
-			final Random random,
-			final Map<K,V> map) {
-		return getRandomElement( true , random , map );
-	}
+  /** makes sense only if iteration order deterministic! */
+  public static <K, V> Map.Entry<K, V> removeRandomElement(
+      final Random random, final Map<K, V> map) {
+    return getRandomElement(true, random, map);
+  }
 
+  /** makes sense only if iteration order deterministic! */
+  private static <K, V> Map.Entry<K, V> getRandomElement(
+      final boolean remove, final Random random, final Map<K, V> map) {
+    if (map.isEmpty()) throw new IllegalArgumentException("map is empty!");
+    final int index = random.nextInt(map.size());
 
-	/**
-	 * makes sense only if iteration order deterministic!
-	 */
-	private static <K,V> Map.Entry<K,V> getRandomElement(
-			final boolean remove,
-			final Random random,
-			final Map<K,V> map) {
-		if ( map.isEmpty() ) throw new IllegalArgumentException( "map is empty!" );
-		final int index = random.nextInt( map.size() );
+    final Iterator<Map.Entry<K, V>> it = map.entrySet().iterator();
+    int i = 0;
 
-		final Iterator<Map.Entry<K,V>> it = map.entrySet().iterator();
-		int i=0;
+    while (i++ < index) it.next();
 
-		while ( i++ < index ) it.next();
+    final Map.Entry<K, V> elem = it.next();
+    if (remove) it.remove();
+    return elem;
+  }
 
-		final Map.Entry<K,V> elem = it.next();
-		if ( remove ) it.remove();
-		return elem;
-	}
+  /** makes sense only if iteration order deterministic! */
+  public static <T> T removeElement(final int index, final Collection<T> coll) {
+    return getElement(true, index, coll);
+  }
 
-	/**
-	 * makes sense only if iteration order deterministic!
-	 */
-	public static <T> T removeElement(
-			final int index,
-			final Collection<T> coll) {
-		return getElement( true , index , coll );
-	}
+  /** makes sense only if iteration order deterministic! */
+  public static <T> T getElement(final int index, final Collection<T> coll) {
+    return getElement(false, index, coll);
+  }
 
-	/**
-	 * makes sense only if iteration order deterministic!
-	 */
-	public static <T> T getElement(
-			final int index,
-			final Collection<T> coll) {
-		return getElement( false , index , coll );
-	}
+  /** makes sense only if iteration order deterministic! */
+  private static <T> T getElement(final boolean remove, final int index, final Collection<T> coll) {
+    if (index >= coll.size()) throw new IndexOutOfBoundsException(index + " >= " + coll.size());
 
-	/**
-	 * makes sense only if iteration order deterministic!
-	 */
-	private static <T> T getElement(
-			final boolean remove,
-			final int index,
-			final Collection<T> coll) {
-		if ( index >= coll.size() ) throw new IndexOutOfBoundsException( index+" >= "+coll.size() );
+    final Iterator<T> it = coll.iterator();
+    int i = 0;
 
-		final Iterator<T> it = coll.iterator();
-		int i=0;
+    while (i++ < index) it.next();
 
-		while ( i++ < index ) it.next();
+    final T elem = it.next();
+    if (remove) it.remove();
+    return elem;
+  }
 
-		final T elem = it.next();
-		if ( remove ) it.remove();
-		return elem;
-	}
-
-	public static List<String> toString(
-			final List<? extends Object> list) {
-		final List<String> strings = new ArrayList<String>( list.size() );
-		for ( Object o : list ) strings.add( o.toString() );
-		return strings;
-	}
+  public static List<String> toString(final List<? extends Object> list) {
+    final List<String> strings = new ArrayList<String>(list.size());
+    for (Object o : list) strings.add(o.toString());
+    return strings;
+  }
 }
-

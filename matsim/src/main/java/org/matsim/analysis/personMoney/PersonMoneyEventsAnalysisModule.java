@@ -29,11 +29,11 @@ import org.matsim.core.controler.AbstractModule;
  * @author vsp-gleich
  */
 public class PersonMoneyEventsAnalysisModule extends AbstractModule {
-    @Override
-    public void install() {
-        bind(PersonMoneyEventsAggregator.class).in(Singleton.class);
-        bind(PersonMoneyEventsCollector.class).in(Singleton.class);
-        bind(PersonMoneyEventsAnalysisControlerListener.class).in(Singleton.class);
-        addControlerListenerBinding().to(PersonMoneyEventsAnalysisControlerListener.class);
-    }
+  @Override
+  public void install() {
+    bind(PersonMoneyEventsAggregator.class).in(Singleton.class);
+    bind(PersonMoneyEventsCollector.class).in(Singleton.class);
+    bind(PersonMoneyEventsAnalysisControlerListener.class).in(Singleton.class);
+    addControlerListenerBinding().to(PersonMoneyEventsAnalysisControlerListener.class);
+  }
 }

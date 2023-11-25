@@ -25,26 +25,20 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 
-/**
- * sets up a Matsim Scenario using example matrix based pt routing data
- */
+/** sets up a Matsim Scenario using example matrix based pt routing data */
 /**
  * @author jbischoff
- *
  */
+public class RunMatrixBasedPTRouterExample {
 
-public class RunMatrixBasedPTRouterExample
-{
+  public static void main(String[] args) {
+    // load config - check the config file for required PT Matrix input file data
+    String path = "src/main/resources/example/";
+    Config config =
+        ConfigUtils.loadConfig(path + "example_config.xml", new MatrixBasedPtRouterConfigGroup());
 
-    public static void main(String[] args)
-    {
-        //load config - check the config file for required PT Matrix input file data
-        String path = "src/main/resources/example/";
-        Config config = ConfigUtils.loadConfig(path+"example_config.xml", new MatrixBasedPtRouterConfigGroup());
-
-        Controler controler = new Controler(config);
-        controler.addOverridingModule(new MatrixBasedPtModule());
-        controler.run();
-    }
-
+    Controler controler = new Controler(config);
+    controler.addOverridingModule(new MatrixBasedPtModule());
+    controler.run();
+  }
 }

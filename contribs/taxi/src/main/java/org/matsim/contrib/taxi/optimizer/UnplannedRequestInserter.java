@@ -19,12 +19,11 @@
 package org.matsim.contrib.taxi.optimizer;
 
 import java.util.Collection;
-
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
  * @author michalm
  */
 public interface UnplannedRequestInserter {
-	void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests);
+  void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests);
 }

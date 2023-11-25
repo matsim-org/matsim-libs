@@ -6,8 +6,13 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.lanes.Lane;
 
 public class DefaultFlowEfficiencyCalculator implements FlowEfficiencyCalculator {
-	@Override
-    public double calculateFlowEfficiency(QVehicle qVehicle, QVehicle previousQVehicle, Double timeGapToPreviousVeh, Link link, Id<Lane> laneId) {
-        return qVehicle.getVehicle().getType().getFlowEfficiencyFactor();
-	}
+  @Override
+  public double calculateFlowEfficiency(
+      QVehicle qVehicle,
+      QVehicle previousQVehicle,
+      Double timeGapToPreviousVeh,
+      Link link,
+      Id<Lane> laneId) {
+    return qVehicle.getVehicle().getType().getFlowEfficiencyFactor();
+  }
 }

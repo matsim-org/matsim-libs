@@ -25,23 +25,22 @@ import org.matsim.facilities.algorithms.FacilityAlgorithm;
 
 /**
  * @author meisterk
- *
  */
 public interface FacilityFilter extends FacilityAlgorithm, Filter {
 
-	/**
-	 * Judges whether the facility will be selected or not.
-	 *
-	 * @param facility
-	 * @return true if the facility meets the criterion of the filter.
-	 */
-	boolean judge(ActivityFacility facility);
+  /**
+   * Judges whether the facility will be selected or not.
+   *
+   * @param facility
+   * @return true if the facility meets the criterion of the filter.
+   */
+  boolean judge(ActivityFacility facility);
 
-	/**
-	 * Sends the facility to the next algorithm
-	 *
-	 * @param facility
-	 */
-	@Override
-	void run(ActivityFacility facility);
+  /**
+   * Sends the facility to the next algorithm
+   *
+   * @param facility
+   */
+  @Override
+  void run(ActivityFacility facility);
 }

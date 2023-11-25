@@ -26,5 +26,5 @@ import java.util.List;
  */
 @FunctionalInterface
 public interface RaptorRouteSelector {
-    RaptorRoute selectOne(List<RaptorRoute> routes, double desiredDepartureTime);
+  RaptorRoute selectOne(List<RaptorRoute> routes, double desiredDepartureTime);
 }

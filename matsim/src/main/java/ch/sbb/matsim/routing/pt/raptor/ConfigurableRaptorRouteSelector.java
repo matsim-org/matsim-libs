@@ -19,17 +19,16 @@
  * *********************************************************************** */
 package ch.sbb.matsim.routing.pt.raptor;
 
-import org.matsim.core.gbl.MatsimRandom;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import org.matsim.core.gbl.MatsimRandom;
 
 /**
- * Implementation of {@link RaptorRouteSelector} that selects a route from a given
- * choice set based on configurable parameters. Each route will be scored,
- * and the route with the best (lowest) score will be taken. The score is
- * calculated as:
+ * Implementation of {@link RaptorRouteSelector} that selects a route from a given choice set based
+ * on configurable parameters. Each route will be scored, and the route with the best (lowest) score
+ * will be taken. The score is calculated as:
+ *
  * <pre>
  *     score = betaDepartureTime * abs(desiredDepartureTime - effectiveDepartureTime)
  *             + betaTravelTime * totalTravelTime
@@ -42,53 +41,54 @@ import java.util.Random;
  */
 public class ConfigurableRaptorRouteSelector implements RaptorRouteSelector {
 
-    private double betaDepartureTime = 1;
-    private double betaTravelTime = 1;
-    private double betaTransfer = 300; // 1 transfer corresponds to 5 minutes
+  private double betaDepartureTime = 1;
+  private double betaTravelTime = 1;
+  private double betaTransfer = 300; // 1 transfer corresponds to 5 minutes
 
-    private final Random random = MatsimRandom.getLocalInstance();
+  private final Random random = MatsimRandom.getLocalInstance();
 
-    public void setBetaDepartureTime(double betaDepartureTime) {
-        this.betaDepartureTime = betaDepartureTime;
+  public void setBetaDepartureTime(double betaDepartureTime) {
+    this.betaDepartureTime = betaDepartureTime;
+  }
+
+  public void setBetaTravelTime(double betaTravelTime) {
+    this.betaTravelTime = betaTravelTime;
+  }
+
+  public void setBetaTransfer(double betaTransfer) {
+    this.betaTransfer = betaTransfer;
+  }
+
+  @Override
+  public RaptorRoute selectOne(List<RaptorRoute> routes, double desiredDepartureTime) {
+    if (routes == null || routes.isEmpty()) {
+      return null;
     }
-
-    public void setBetaTravelTime(double betaTravelTime) {
-        this.betaTravelTime = betaTravelTime;
-    }
-
-    public void setBetaTransfer(double betaTransfer) {
-        this.betaTransfer = betaTransfer;
-    }
-
-    @Override
-    public RaptorRoute selectOne(List<RaptorRoute> routes, double desiredDepartureTime) {
-        if (routes == null || routes.isEmpty()) {
-            return null;
+    RaptorRoute bestRoute = null;
+    List<RaptorRoute> bestRoutes = null;
+    double bestScore = 0;
+    for (RaptorRoute route : routes) {
+      double score =
+          betaDepartureTime * Math.abs(desiredDepartureTime - route.getDepartureTime())
+              + betaTravelTime * route.getTravelTime()
+              + betaTransfer * route.getNumberOfTransfers();
+      if (bestRoute == null || score < bestScore) {
+        bestRoute = route;
+        bestRoutes = null;
+        bestScore = score;
+      } else if (score == bestScore) {
+        if (bestRoutes == null) {
+          bestRoutes = new ArrayList<>();
+          bestRoutes.add(bestRoute);
         }
-        RaptorRoute bestRoute = null;
-        List<RaptorRoute> bestRoutes = null;
-        double bestScore = 0;
-        for (RaptorRoute route : routes) {
-            double score = betaDepartureTime * Math.abs(desiredDepartureTime - route.getDepartureTime())
-                           + betaTravelTime * route.getTravelTime()
-                           + betaTransfer * route.getNumberOfTransfers();
-            if (bestRoute == null || score < bestScore) {
-                bestRoute = route;
-                bestRoutes = null;
-                bestScore = score;
-            } else if (score == bestScore) {
-                if (bestRoutes == null) {
-                    bestRoutes = new ArrayList<>();
-                    bestRoutes.add(bestRoute);
-                }
-                bestRoutes.add(route);
-            }
-        }
-        if (bestRoutes != null) {
-            // chose a random one
-            int index = this.random.nextInt(bestRoutes.size());
-            bestRoute = bestRoutes.get(index);
-        }
-        return bestRoute;
+        bestRoutes.add(route);
+      }
     }
+    if (bestRoutes != null) {
+      // chose a random one
+      int index = this.random.nextInt(bestRoutes.size());
+      bestRoute = bestRoutes.get(index);
+    }
+    return bestRoute;
+  }
 }

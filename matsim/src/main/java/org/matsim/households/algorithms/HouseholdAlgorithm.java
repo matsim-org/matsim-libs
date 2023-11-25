@@ -23,6 +23,5 @@ package org.matsim.households.algorithms;
 import org.matsim.households.Household;
 
 public interface HouseholdAlgorithm {
-	public void run(Household household);
+  public void run(Household household);
 }
-

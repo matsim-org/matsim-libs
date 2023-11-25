@@ -21,31 +21,28 @@ package org.matsim.contrib.signals.otfvis;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
 
-
 /**
  * @author dgrether
- *
  */
-final class SignalGroupStateChangeTracker implements SignalGroupStateChangedEventHandler{
+final class SignalGroupStateChangeTracker implements SignalGroupStateChangedEventHandler {
 
-	private List<SignalGroupStateChangedEvent> signalGroupEvents = new ArrayList<SignalGroupStateChangedEvent>();
-	
-	@Override
-	public void handleEvent(SignalGroupStateChangedEvent event) {
-		this.signalGroupEvents.add(event);
-	}
+  private List<SignalGroupStateChangedEvent> signalGroupEvents =
+      new ArrayList<SignalGroupStateChangedEvent>();
 
-	@Override
-	public void reset(int iteration) {
-		this.signalGroupEvents.clear();
-	}
+  @Override
+  public void handleEvent(SignalGroupStateChangedEvent event) {
+    this.signalGroupEvents.add(event);
+  }
 
-	public List<SignalGroupStateChangedEvent> getSignalGroupEvents() {
-		return signalGroupEvents;
-	}
+  @Override
+  public void reset(int iteration) {
+    this.signalGroupEvents.clear();
+  }
 
+  public List<SignalGroupStateChangedEvent> getSignalGroupEvents() {
+    return signalGroupEvents;
+  }
 }

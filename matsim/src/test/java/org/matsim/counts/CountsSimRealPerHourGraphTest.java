@@ -29,15 +29,15 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class CountsSimRealPerHourGraphTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  @Test
+  public void testCreateChart() {
+    CountsFixture fixture = new CountsFixture();
+    fixture.setUp();
 
-	@Test public void testCreateChart() {
-		CountsFixture fixture = new CountsFixture();
-		fixture.setUp();
-
-		CountsSimRealPerHourGraph eg = new CountsSimRealPerHourGraph(fixture.ceateCountSimCompList(), 1, "testCreateChart");
-		assertNotNull("No graph is created", eg.createChart(0));
-	}
+    CountsSimRealPerHourGraph eg =
+        new CountsSimRealPerHourGraph(fixture.ceateCountSimCompList(), 1, "testCreateChart");
+    assertNotNull("No graph is created", eg.createChart(0));
+  }
 }

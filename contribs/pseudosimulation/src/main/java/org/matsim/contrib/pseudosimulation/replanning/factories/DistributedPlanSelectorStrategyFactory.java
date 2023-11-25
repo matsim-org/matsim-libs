@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.pseudosimulation.replanning.factories;
 
+import jakarta.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
 import org.matsim.contrib.pseudosimulation.replanning.selectors.DistributedPlanSelector;
@@ -26,37 +27,40 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 
-import jakarta.inject.Provider;
-
 /**
- * @author fouriep Creates plan selector for distributed Simulation. Limits the expected value of being selected for PSim execution
- *         in a cycle to the value specified in the config for the selector, thus updating plan scores to the latest travel time information
- *         but preventing excessive repeated execution of plans during the cycle.
- *         .
+ * @author fouriep Creates plan selector for distributed Simulation. Limits the expected value of
+ *     being selected for PSim execution in a cycle to the value specified in the config for the
+ *     selector, thus updating plan scores to the latest travel time information but preventing
+ *     excessive repeated execution of plans during the cycle. .
  */
 public class DistributedPlanSelectorStrategyFactory implements Provider<PlanStrategy> {
 
-    private final String strategyName;
-    private final MatsimServices controler;
-    boolean quickReplanning;
-    int selectionInflationFactor;
-    private PlanCatcher slave;
-    private Scenario scenario;
+  private final String strategyName;
+  private final MatsimServices controler;
+  boolean quickReplanning;
+  int selectionInflationFactor;
+  private PlanCatcher slave;
+  private Scenario scenario;
 
-    public DistributedPlanSelectorStrategyFactory(PlanCatcher slave, boolean quickReplanning, int selectionInflationFactor, MatsimServices controler, String strategyName) {
-        this.slave = slave;
-        this.quickReplanning = quickReplanning;
-        this.selectionInflationFactor = selectionInflationFactor;
-        this.controler = controler;
-        this.strategyName = strategyName;
-    }
+  public DistributedPlanSelectorStrategyFactory(
+      PlanCatcher slave,
+      boolean quickReplanning,
+      int selectionInflationFactor,
+      MatsimServices controler,
+      String strategyName) {
+    this.slave = slave;
+    this.quickReplanning = quickReplanning;
+    this.selectionInflationFactor = selectionInflationFactor;
+    this.controler = controler;
+    this.strategyName = strategyName;
+  }
 
-    @Override
-    public PlanStrategy get() {
-        PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(
-                new DistributedPlanSelector( controler, strategyName, slave, quickReplanning,  selectionInflationFactor)
-        );
-        return builder.build();
-    }
-
+  @Override
+  public PlanStrategy get() {
+    PlanStrategyImpl.Builder builder =
+        new PlanStrategyImpl.Builder(
+            new DistributedPlanSelector(
+                controler, strategyName, slave, quickReplanning, selectionInflationFactor));
+    return builder.build();
+  }
 }

@@ -22,13 +22,12 @@ package org.matsim.core.mobsim.framework.listeners;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 
 /**
- * Implement this listener interface if you want to be notified when the QueueSimulation's
- * setup process is completed.
+ * Implement this listener interface if you want to be notified when the QueueSimulation's setup
+ * process is completed.
  *
  * @author dgrether
  */
 public interface MobsimInitializedListener extends MobsimListener {
 
-	public void notifyMobsimInitialized(final MobsimInitializedEvent e);
-
+  public void notifyMobsimInitialized(final MobsimInitializedEvent e);
 }

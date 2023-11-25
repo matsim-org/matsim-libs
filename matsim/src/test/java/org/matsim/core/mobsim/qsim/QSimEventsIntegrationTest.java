@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * QSimEventsIntegrationTest.java
@@ -36,56 +35,70 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class QSimEventsIntegrationTest {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Rule
-	public Timeout globalTimeout = new Timeout(10000);
+  @Rule public Timeout globalTimeout = new Timeout(10000);
 
-	@Test
-	public void netsimEngineHandlesExceptionCorrectly() {
-		Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+  @Test
+  public void netsimEngineHandlesExceptionCorrectly() {
+    Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+    Scenario scenario = ScenarioUtils.loadScenario(config);
+    PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 
-		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler((LinkLeaveEventHandler)event -> {
-			throw new RuntimeException("Haha, I hope the QSim exits cleanly.");
-		});
+    EventsManager events = EventsUtils.createEventsManager();
+    events.addHandler(
+        (LinkLeaveEventHandler)
+            event -> {
+              throw new RuntimeException("Haha, I hope the QSim exits cleanly.");
+            });
 
-		// That's fine. Only timeout is bad, which would mean qsim would hang on an Exception in an EventHandler.
-		Assertions.assertThatThrownBy(new QSimBuilder(config).useDefaults().build(scenario, events)::run)
-				.hasRootCauseMessage("Haha, I hope the QSim exits cleanly.");
-	}
+    // That's fine. Only timeout is bad, which would mean qsim would hang on an Exception in an
+    // EventHandler.
+    Assertions.assertThatThrownBy(
+            new QSimBuilder(config).useDefaults().build(scenario, events)::run)
+        .hasRootCauseMessage("Haha, I hope the QSim exits cleanly.");
+  }
 
-	@Test
-	public void controlerHandlesExceptionCorrectly_syncOnSimSteps() {
-		Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.eventsManager().setNumberOfThreads(1);
-		config.eventsManager().setSynchronizeOnSimSteps(true);
+  @Test
+  public void controlerHandlesExceptionCorrectly_syncOnSimSteps() {
+    Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+    config.eventsManager().setNumberOfThreads(1);
+    config.eventsManager().setSynchronizeOnSimSteps(true);
 
-		Controler controler = new Controler(config);
-		controler.getEvents().addHandler((LinkLeaveEventHandler)event -> {
-			throw new RuntimeException("Haha, I hope the QSim exits cleanly.");
-		});
+    Controler controler = new Controler(config);
+    controler
+        .getEvents()
+        .addHandler(
+            (LinkLeaveEventHandler)
+                event -> {
+                  throw new RuntimeException("Haha, I hope the QSim exits cleanly.");
+                });
 
-		// That's fine. Only timeout is bad, which would mean qsim would hang on an Exception in an EventHandler.
-		Assertions.assertThatThrownBy(controler::run).hasRootCauseMessage("Haha, I hope the QSim exits cleanly.");
-	}
+    // That's fine. Only timeout is bad, which would mean qsim would hang on an Exception in an
+    // EventHandler.
+    Assertions.assertThatThrownBy(controler::run)
+        .hasRootCauseMessage("Haha, I hope the QSim exits cleanly.");
+  }
 
-	@Test
-	public void controlerHandlesExceptionCorrectly_noSyncOnSimSteps() {
-		Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.eventsManager().setNumberOfThreads(1);
-		config.eventsManager().setSynchronizeOnSimSteps(false);
+  @Test
+  public void controlerHandlesExceptionCorrectly_noSyncOnSimSteps() {
+    Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+    config.eventsManager().setNumberOfThreads(1);
+    config.eventsManager().setSynchronizeOnSimSteps(false);
 
-		Controler controler = new Controler(config);
-		controler.getEvents().addHandler((LinkLeaveEventHandler)event -> {
-			throw new RuntimeException("Haha, I hope the QSim exits cleanly.");
-		});
+    Controler controler = new Controler(config);
+    controler
+        .getEvents()
+        .addHandler(
+            (LinkLeaveEventHandler)
+                event -> {
+                  throw new RuntimeException("Haha, I hope the QSim exits cleanly.");
+                });
 
-		// That's fine. Only timeout is bad, which would mean qsim would hang on an Exception in an EventHandler.
-		Assertions.assertThatThrownBy(controler::run).hasRootCauseMessage("Haha, I hope the QSim exits cleanly.");
-	}
+    // That's fine. Only timeout is bad, which would mean qsim would hang on an Exception in an
+    // EventHandler.
+    Assertions.assertThatThrownBy(controler::run)
+        .hasRootCauseMessage("Haha, I hope the QSim exits cleanly.");
+  }
 }

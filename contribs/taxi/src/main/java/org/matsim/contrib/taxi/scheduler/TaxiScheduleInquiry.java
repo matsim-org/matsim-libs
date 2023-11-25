@@ -37,112 +37,110 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author michalm
  */
 public class TaxiScheduleInquiry implements ScheduleInquiry {
-	private final TaxiConfigGroup taxiCfg;
-	private final MobsimTimer timer;
+  private final TaxiConfigGroup taxiCfg;
+  private final MobsimTimer timer;
 
-	public TaxiScheduleInquiry(TaxiConfigGroup taxiCfg, MobsimTimer timer) {
-		this.taxiCfg = taxiCfg;
-		this.timer = timer;
-	}
+  public TaxiScheduleInquiry(TaxiConfigGroup taxiCfg, MobsimTimer timer) {
+    this.taxiCfg = taxiCfg;
+    this.timer = timer;
+  }
 
-	@Override
-	public boolean isIdle(DvrpVehicle vehicle) {
-		Schedule schedule = vehicle.getSchedule();
-		if (timer.getTimeOfDay() >= vehicle.getServiceEndTime()
-				|| schedule.getStatus() != Schedule.ScheduleStatus.STARTED) {
-			return false;
-		}
+  @Override
+  public boolean isIdle(DvrpVehicle vehicle) {
+    Schedule schedule = vehicle.getSchedule();
+    if (timer.getTimeOfDay() >= vehicle.getServiceEndTime()
+        || schedule.getStatus() != Schedule.ScheduleStatus.STARTED) {
+      return false;
+    }
 
-		Task currentTask = schedule.getCurrentTask();
-		return currentTask.getTaskIdx() == schedule.getTaskCount() - 1 // last task
-				&& STAY.isBaseTypeOf(currentTask);
-	}
+    Task currentTask = schedule.getCurrentTask();
+    return currentTask.getTaskIdx() == schedule.getTaskCount() - 1 // last task
+        && STAY.isBaseTypeOf(currentTask);
+  }
 
-	/**
-	 * If the returned LinkTimePair is not null, then time is not smaller than the current time
-	 */
-	public LinkTimePair getImmediateDiversionOrEarliestIdleness(DvrpVehicle veh) {
-		if (taxiCfg.vehicleDiversion) {
-			LinkTimePair diversion = getImmediateDiversion(veh);
-			if (diversion != null) {
-				return diversion;
-			}
-		}
+  /** If the returned LinkTimePair is not null, then time is not smaller than the current time */
+  public LinkTimePair getImmediateDiversionOrEarliestIdleness(DvrpVehicle veh) {
+    if (taxiCfg.vehicleDiversion) {
+      LinkTimePair diversion = getImmediateDiversion(veh);
+      if (diversion != null) {
+        return diversion;
+      }
+    }
 
-		return getEarliestIdleness(veh);
-	}
+    return getEarliestIdleness(veh);
+  }
 
-	/**
-	 * If the returned LinkTimePair is not null, then time is not smaller than the current time
-	 */
-	public LinkTimePair getEarliestIdleness(DvrpVehicle veh) {
-		if (timer.getTimeOfDay() >= veh.getServiceEndTime()) {// time window exceeded
-			return null;
-		}
+  /** If the returned LinkTimePair is not null, then time is not smaller than the current time */
+  public LinkTimePair getEarliestIdleness(DvrpVehicle veh) {
+    if (timer.getTimeOfDay() >= veh.getServiceEndTime()) { // time window exceeded
+      return null;
+    }
 
-		Schedule schedule = veh.getSchedule();
+    Schedule schedule = veh.getSchedule();
 
-		switch (schedule.getStatus()) {
-			case PLANNED, STARTED:
-				Task lastTask = Schedules.getLastTask(schedule);
+    switch (schedule.getStatus()) {
+      case PLANNED, STARTED:
+        Task lastTask = Schedules.getLastTask(schedule);
 
-				switch (getBaseTypeOrElseThrow(lastTask)) {
-					case STAY:
-						Link link = ((StayTask)lastTask).getLink();
-						double time = Math.max(lastTask.getBeginTime(), timer.getTimeOfDay());// TODO very optimistic!!!
-						return createValidLinkTimePair(link, time, veh);
+        switch (getBaseTypeOrElseThrow(lastTask)) {
+          case STAY:
+            Link link = ((StayTask) lastTask).getLink();
+            double time =
+                Math.max(lastTask.getBeginTime(), timer.getTimeOfDay()); // TODO very optimistic!!!
+            return createValidLinkTimePair(link, time, veh);
 
-					case PICKUP:
-						if (!taxiCfg.destinationKnown) {
-							return null;
-						}
-						// otherwise: IllegalStateException -- the schedule should end with STAY (or PICKUP if
-						// unfinished)
+          case PICKUP:
+            if (!taxiCfg.destinationKnown) {
+              return null;
+            }
+            // otherwise: IllegalStateException -- the schedule should end with STAY (or PICKUP if
+            // unfinished)
 
-					default:
-						throw new IllegalStateException("Type of the last task is wrong: " + lastTask.getTaskType());
-				}
+          default:
+            throw new IllegalStateException(
+                "Type of the last task is wrong: " + lastTask.getTaskType());
+        }
 
-			case COMPLETED:
-				return null;
+      case COMPLETED:
+        return null;
 
-			case UNPLANNED:// there is always at least one STAY task in a schedule
-			default:
-				throw new IllegalStateException();
-		}
-	}
+      case UNPLANNED: // there is always at least one STAY task in a schedule
+      default:
+        throw new IllegalStateException();
+    }
+  }
 
-	/**
-	 * If the returned LinkTimePair is not null, then time is not smaller than the current time
-	 */
-	public LinkTimePair getImmediateDiversion(DvrpVehicle veh) {
-		if (!taxiCfg.vehicleDiversion) {
-			throw new RuntimeException("Diversion must be on");
-		}
+  /** If the returned LinkTimePair is not null, then time is not smaller than the current time */
+  public LinkTimePair getImmediateDiversion(DvrpVehicle veh) {
+    if (!taxiCfg.vehicleDiversion) {
+      throw new RuntimeException("Diversion must be on");
+    }
 
-		Schedule schedule = veh.getSchedule();
-		// timer.getTimeOfDay() >= veh.getServiceEndTime() is ALLOWED because we need to stop/divert delayed vehicles
-		// so do not return null
-		if (schedule.getStatus() != Schedule.ScheduleStatus.STARTED) {
-			return null;
-		}
+    Schedule schedule = veh.getSchedule();
+    // timer.getTimeOfDay() >= veh.getServiceEndTime() is ALLOWED because we need to stop/divert
+    // delayed vehicles
+    // so do not return null
+    if (schedule.getStatus() != Schedule.ScheduleStatus.STARTED) {
+      return null;
+    }
 
-		Task currentTask = schedule.getCurrentTask();
-		// no prebooking ==> we can divert vehicle whose current task is an empty drive at the end of the schedule
-		if (currentTask.getTaskIdx() != schedule.getTaskCount() - 1 // not last task
-				|| !EMPTY_DRIVE.isBaseTypeOf(currentTask)) {
-			return null;
-		}
+    Task currentTask = schedule.getCurrentTask();
+    // no prebooking ==> we can divert vehicle whose current task is an empty drive at the end of
+    // the schedule
+    if (currentTask.getTaskIdx() != schedule.getTaskCount() - 1 // not last task
+        || !EMPTY_DRIVE.isBaseTypeOf(currentTask)) {
+      return null;
+    }
 
-		OnlineDriveTaskTracker tracker = (OnlineDriveTaskTracker)currentTask.getTaskTracker();
-		return filterValidLinkTimePair(tracker.getDiversionPoint(), veh);
-	}
+    OnlineDriveTaskTracker tracker = (OnlineDriveTaskTracker) currentTask.getTaskTracker();
+    return filterValidLinkTimePair(tracker.getDiversionPoint(), veh);
+  }
 
-	private static LinkTimePair filterValidLinkTimePair(LinkTimePair pair, DvrpVehicle veh) {
-		return pair.time >= veh.getServiceEndTime() ? null : pair;
-	}
+  private static LinkTimePair filterValidLinkTimePair(LinkTimePair pair, DvrpVehicle veh) {
+    return pair.time >= veh.getServiceEndTime() ? null : pair;
+  }
 
-	private static LinkTimePair createValidLinkTimePair(Link link, double time, DvrpVehicle veh) {
-		return time >= veh.getServiceEndTime() ? null : new LinkTimePair(link, time);
-	}
+  private static LinkTimePair createValidLinkTimePair(Link link, double time, DvrpVehicle veh) {
+    return time >= veh.getServiceEndTime() ? null : new LinkTimePair(link, time);
+  }
 }

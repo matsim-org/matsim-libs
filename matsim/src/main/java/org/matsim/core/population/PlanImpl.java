@@ -23,12 +23,10 @@ package org.matsim.core.population;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -39,184 +37,191 @@ import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
-/* deliberately package */  final class PlanImpl implements Plan {
+/* deliberately package */ final class PlanImpl implements Plan {
 
-	private Id<Plan> id=  null;
-	
-	private ArrayList<PlanElement> actsLegs = new ArrayList<>();
+  private Id<Plan> id = null;
 
-	private Double score = null;
-	private Person person = null;
+  private ArrayList<PlanElement> actsLegs = new ArrayList<>();
 
-	private String type = null;
+  private Double score = null;
+  private Person person = null;
 
-	@SuppressWarnings("unused")
-	private final static Logger log = LogManager.getLogger(Plan.class);
+  private String type = null;
 
-	private Customizable customizableDelegate;
-	
-	private final Attributes attributes = new AttributesImpl();
-	
-	@Override
-	public final Attributes getAttributes() {
-		return this.attributes;
-	}
+  @SuppressWarnings("unused")
+  private static final Logger log = LogManager.getLogger(Plan.class);
 
-	/* package */ PlanImpl() {}
+  private Customizable customizableDelegate;
 
-//	@Override
-//	public final Activity createAndAddActivity(final String type1) {
-//		Activity a = new ActivityImpl(type1);
-//		// (PlanImpl knows the corresponding Activity implementation, so it does not have to go through the factory.  kai, jun'16)
-//
-//		this.addActivity(a) ;
-//		return a;
-//	}
+  private final Attributes attributes = new AttributesImpl();
 
-	
+  @Override
+  public final Attributes getAttributes() {
+    return this.attributes;
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// create methods
-	//////////////////////////////////////////////////////////////////////
+  /* package */ PlanImpl() {}
 
-//	@Override
-//	public Leg createAndAddLeg(final String mode) {
-//		verifyCreateLeg();
-//		Leg leg = new LegImpl( mode ) ;
-//		getPlanElements().add(leg);
-//		return leg;
-//	}
+  //	@Override
+  //	public final Activity createAndAddActivity(final String type1) {
+  //		Activity a = new ActivityImpl(type1);
+  //		// (PlanImpl knows the corresponding Activity implementation, so it does not have to go
+  // through the factory.  kai, jun'16)
+  //
+  //		this.addActivity(a) ;
+  //		return a;
+  //	}
 
-//	private static void verifyCreateLeg(Plan plan) throws IllegalStateException {
-//		if (plan.getPlanElements().size() == 0) {
-//			throw new IllegalStateException("The order of 'acts'/'legs' is wrong in some way while trying to create a 'leg'.");
-//		}
-//	}
+  //////////////////////////////////////////////////////////////////////
+  // create methods
+  //////////////////////////////////////////////////////////////////////
 
-	//////////////////////////////////////////////////////////////////////
-	// remove methods
-	//////////////////////////////////////////////////////////////////////
+  //	@Override
+  //	public Leg createAndAddLeg(final String mode) {
+  //		verifyCreateLeg();
+  //		Leg leg = new LegImpl( mode ) ;
+  //		getPlanElements().add(leg);
+  //		return leg;
+  //	}
 
-	@Override
-	public final Person getPerson() {
-		return this.person;
-	}
+  //	private static void verifyCreateLeg(Plan plan) throws IllegalStateException {
+  //		if (plan.getPlanElements().size() == 0) {
+  //			throw new IllegalStateException("The order of 'acts'/'legs' is wrong in some way while trying
+  // to create a 'leg'.");
+  //		}
+  //	}
 
-	@Override
-	public void setPerson(final Person person) {
-		this.person = person;
-	}
+  //////////////////////////////////////////////////////////////////////
+  // remove methods
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public final Double getScore() {
-		return this.score;
-	}
+  @Override
+  public final Person getPerson() {
+    return this.person;
+  }
 
-	@Override
-	public void setScore(final Double score) {
-		this.score = score;
-	}
+  @Override
+  public void setPerson(final Person person) {
+    this.person = person;
+  }
 
-    @Override
-	public String getType() {
-		return this.type;
-	}
+  @Override
+  public final Double getScore() {
+    return this.score;
+  }
 
-    @Override
-	public void setType(final String type) {
-		this.type = type;
-	}
-    
-	@Override
-	public Id<Plan> getId() {
-		if(this.id!=null)
-			return this.id;
-		else {
-			if(this.getAttributes().getAttribute(PlanInheritanceModule.PLAN_ID)!=null)
-				return Id.create(this.getAttributes().getAttribute(PlanInheritanceModule.PLAN_ID).toString(),Plan.class);
-			else return null;
-		}
-			
-	}
+  @Override
+  public void setScore(final Double score) {
+    this.score = score;
+  }
 
-	@Override
-	public void setPlanId(Id<Plan> planId) {
-		this.getAttributes().putAttribute(PlanInheritanceModule.PLAN_ID, planId.toString());
-		this.id = planId;
-	}
-	
-	@Override
-	public int getIterationCreated() {
-		return (int) this.getAttributes().getAttribute(PlanInheritanceModule.ITERATION_CREATED);
-	}
+  @Override
+  public String getType() {
+    return this.type;
+  }
 
-	@Override
-	public void setIterationCreated(int iteration) {
-		this.getAttributes().putAttribute(PlanInheritanceModule.ITERATION_CREATED, iteration);
-	}
+  @Override
+  public void setType(final String type) {
+    this.type = type;
+  }
 
-	@Override
-	public String getPlanMutator() {
-		return (String) this.getAttributes().getAttribute(PlanInheritanceModule.PLAN_MUTATOR);
-	}
+  @Override
+  public Id<Plan> getId() {
+    if (this.id != null) return this.id;
+    else {
+      if (this.getAttributes().getAttribute(PlanInheritanceModule.PLAN_ID) != null)
+        return Id.create(
+            this.getAttributes().getAttribute(PlanInheritanceModule.PLAN_ID).toString(),
+            Plan.class);
+      else return null;
+    }
+  }
 
-	@Override
-	public void setPlanMutator(String planMutator) {
-		this.getAttributes().putAttribute(PlanInheritanceModule.PLAN_MUTATOR, planMutator);
-	}
+  @Override
+  public void setPlanId(Id<Plan> planId) {
+    this.getAttributes().putAttribute(PlanInheritanceModule.PLAN_ID, planId.toString());
+    this.id = planId;
+  }
 
-	@Override
-	public final List<PlanElement> getPlanElements() {
-		return this.actsLegs;
-	}
+  @Override
+  public int getIterationCreated() {
+    return (int) this.getAttributes().getAttribute(PlanInheritanceModule.ITERATION_CREATED);
+  }
 
-	@Override
-	public final void addLeg(final Leg leg) {
-		this.actsLegs.add(leg);
-	}
+  @Override
+  public void setIterationCreated(int iteration) {
+    this.getAttributes().putAttribute(PlanInheritanceModule.ITERATION_CREATED, iteration);
+  }
 
-	@Override
-	public final void addActivity(final Activity act) {
-		this.actsLegs.add(act);
-	}
+  @Override
+  public String getPlanMutator() {
+    return (String) this.getAttributes().getAttribute(PlanInheritanceModule.PLAN_MUTATOR);
+  }
 
-	@Override
-	public final String toString() {
+  @Override
+  public void setPlanMutator(String planMutator) {
+    this.getAttributes().putAttribute(PlanInheritanceModule.PLAN_MUTATOR, planMutator);
+  }
 
-		String scoreString = "undefined";
-		if (this.getScore() != null) {
-			scoreString = this.getScore().toString();
-		}
-		String personIdString = "undefined" ;
-		if ( this.getPerson() != null ) {
-			personIdString = this.getPerson().getId().toString() ;
-		}
+  @Override
+  public final List<PlanElement> getPlanElements() {
+    return this.actsLegs;
+  }
 
-		return "[score=" + scoreString + "]" +
-//				"[selected=" + PersonUtils.isSelected(this) + "]" +
-				"[nof_acts_legs=" + getPlanElements().size() + "]" +
-				"[type=" + this.type + "]" +
-				"[personId=" + personIdString + "]" ;
-	}
+  @Override
+  public final void addLeg(final Leg leg) {
+    this.actsLegs.add(leg);
+  }
 
-	@Override
-	public final Map<String, Object> getCustomAttributes() {
-		if (this.customizableDelegate == null) {
-			this.customizableDelegate = CustomizableUtils.createCustomizable();
-		}
-		return this.customizableDelegate.getCustomAttributes();
-	}
+  @Override
+  public final void addActivity(final Activity act) {
+    this.actsLegs.add(act);
+  }
 
+  @Override
+  public final String toString() {
 
+    String scoreString = "undefined";
+    if (this.getScore() != null) {
+      scoreString = this.getScore().toString();
+    }
+    String personIdString = "undefined";
+    if (this.getPerson() != null) {
+      personIdString = this.getPerson().getId().toString();
+    }
 
-//	public final void setLocked() {
-//		for ( PlanElement pe : this.actsLegs ) {
-//			if ( pe instanceof ActivityImpl ) {
-//				((ActivityImpl) pe).setLocked(); 
-//			} else if ( pe instanceof LegImpl ) {
-//				((LegImpl) pe).setLocked() ;
-//			}
-//		}
-//	}
+    return "[score="
+        + scoreString
+        + "]"
+        +
+        //				"[selected=" + PersonUtils.isSelected(this) + "]" +
+        "[nof_acts_legs="
+        + getPlanElements().size()
+        + "]"
+        + "[type="
+        + this.type
+        + "]"
+        + "[personId="
+        + personIdString
+        + "]";
+  }
+
+  @Override
+  public final Map<String, Object> getCustomAttributes() {
+    if (this.customizableDelegate == null) {
+      this.customizableDelegate = CustomizableUtils.createCustomizable();
+    }
+    return this.customizableDelegate.getCustomAttributes();
+  }
+
+  //	public final void setLocked() {
+  //		for ( PlanElement pe : this.actsLegs ) {
+  //			if ( pe instanceof ActivityImpl ) {
+  //				((ActivityImpl) pe).setLocked();
+  //			} else if ( pe instanceof LegImpl ) {
+  //				((LegImpl) pe).setLocked() ;
+  //			}
+  //		}
+  //	}
 
 }

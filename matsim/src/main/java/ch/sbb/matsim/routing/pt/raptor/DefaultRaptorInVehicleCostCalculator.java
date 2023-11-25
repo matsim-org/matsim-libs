@@ -27,9 +27,14 @@ import org.matsim.vehicles.Vehicle;
  */
 public class DefaultRaptorInVehicleCostCalculator implements RaptorInVehicleCostCalculator {
 
-	@Override
-	public double getInVehicleCost(double inVehicleTime, double marginalUtility_utl_s, Person person, Vehicle vehicle, RaptorParameters parameters, RouteSegmentIterator iterator) {
-		return inVehicleTime * -marginalUtility_utl_s;
-	}
-
+  @Override
+  public double getInVehicleCost(
+      double inVehicleTime,
+      double marginalUtility_utl_s,
+      Person person,
+      Vehicle vehicle,
+      RaptorParameters parameters,
+      RouteSegmentIterator iterator) {
+    return inVehicleTime * -marginalUtility_utl_s;
+  }
 }

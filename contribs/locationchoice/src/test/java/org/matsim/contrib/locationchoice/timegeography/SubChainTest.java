@@ -8,12 +8,11 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class SubChainTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-
-	@Test public void testConstructorandGetSlActs() {
-		SubChain subchain = new SubChain();
-		assertNotNull(subchain.getSlActs());
-	}
+  @Test
+  public void testConstructorandGetSlActs() {
+    SubChain subchain = new SubChain();
+    assertNotNull(subchain.getSlActs());
+  }
 }

@@ -17,48 +17,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
+/** */
 package org.matsim.contrib.matrixbasedptrouter;
 
+import jakarta.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.router.*;
-
-import jakarta.inject.Provider;
 
 /**
  * @author thomas
- *
  */
 public final class MatrixBasedPtRouterFactoryImpl implements Provider<TripRouter> {
 
-	private static final Logger log = LogManager.getLogger(MatrixBasedPtRouterFactoryImpl.class);
+  private static final Logger log = LogManager.getLogger(MatrixBasedPtRouterFactoryImpl.class);
 
-	private Provider<TripRouter> delegate;
+  private Provider<TripRouter> delegate;
 
-	private final PtMatrix ptMatrix; // immutable, shared between instances
+  private final PtMatrix ptMatrix; // immutable, shared between instances
 
-	private Scenario scenario;
+  private Scenario scenario;
 
-	public MatrixBasedPtRouterFactoryImpl(final Scenario scenario, final PtMatrix ptMatrix) {
-		this.ptMatrix = ptMatrix;
-		this.delegate = TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(scenario);
-		this.scenario = scenario;
-	}
+  public MatrixBasedPtRouterFactoryImpl(final Scenario scenario, final PtMatrix ptMatrix) {
+    this.ptMatrix = ptMatrix;
+    this.delegate =
+        TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(scenario);
+    this.scenario = scenario;
+  }
 
-	@Override
-	public TripRouter get() {
-		if ( scenario.getConfig().transit().isUseTransit() ) {
-			log.warn("you try to use PseudoPtRoutingModule and physical transit simulation at the same time. This probably will not work!");
-		}
-		TripRouter tripRouter = this.delegate.get();
-//		tripRouter.setRoutingModule(TransportMode.pt, new MatrixBasedPtRoutingModule(scenario, ptMatrix));
-//		return tripRouter;
-		throw new RuntimeException("routing module should just be added to trip router; don't need this delegating indirection. kai, jun'18") ;
-	}
-
+  @Override
+  public TripRouter get() {
+    if (scenario.getConfig().transit().isUseTransit()) {
+      log.warn(
+          "you try to use PseudoPtRoutingModule and physical transit simulation at the same time. This probably will not work!");
+    }
+    TripRouter tripRouter = this.delegate.get();
+    //		tripRouter.setRoutingModule(TransportMode.pt, new MatrixBasedPtRoutingModule(scenario,
+    // ptMatrix));
+    //		return tripRouter;
+    throw new RuntimeException(
+        "routing module should just be added to trip router; don't need this delegating indirection. kai, jun'18");
+  }
 }

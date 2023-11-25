@@ -23,13 +23,12 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 
 /**
  * @author nagel
- *
  */
 public final class TravelDisutilityUtils {
-	private TravelDisutilityUtils(){} // do not instantiate
+  private TravelDisutilityUtils() {} // do not instantiate
 
-	public static TravelDisutility createFreespeedTravelTimeAndDisutility(ScoringConfigGroup cnScoringGroup) {
-		return new FreespeedTravelTimeAndDisutility(cnScoringGroup) ;
-	}
-
+  public static TravelDisutility createFreespeedTravelTimeAndDisutility(
+      ScoringConfigGroup cnScoringGroup) {
+    return new FreespeedTravelTimeAndDisutility(cnScoringGroup);
+  }
 }

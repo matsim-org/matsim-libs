@@ -22,68 +22,66 @@ package org.matsim.contrib.locationchoice.timegeography;
 
 import java.util.List;
 import java.util.Vector;
-
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 
- class ManageSubchains {
+class ManageSubchains {
 
-	private List<SubChain> subChains = new Vector<SubChain>();
-	private int subChainIndex = -1;
-	boolean chainStarted = false;
-	boolean secondaryActFound = false;
+  private List<SubChain> subChains = new Vector<SubChain>();
+  private int subChainIndex = -1;
+  boolean chainStarted = false;
+  boolean secondaryActFound = false;
 
-	private double ttBudget = 0.0;
-	private double totalTravelDistance = 0.0;
+  private double ttBudget = 0.0;
+  private double totalTravelDistance = 0.0;
 
-	public void secondaryActivityFound(Activity act, Leg leg) {
-		/*
-		 * No plan starts with secondary activity!
-		 */
-		this.subChains.get(subChainIndex).defineMode(leg.getMode());
-		this.subChains.get(subChainIndex).addAct(act);
-		this.secondaryActFound = true;
-		this.ttBudget += leg.getTravelTime().seconds();
-		this.totalTravelDistance += leg.getRoute().getDistance();
-	}
+  public void secondaryActivityFound(Activity act, Leg leg) {
+    /*
+     * No plan starts with secondary activity!
+     */
+    this.subChains.get(subChainIndex).defineMode(leg.getMode());
+    this.subChains.get(subChainIndex).addAct(act);
+    this.secondaryActFound = true;
+    this.ttBudget += leg.getTravelTime().seconds();
+    this.totalTravelDistance += leg.getRoute().getDistance();
+  }
 
-	public void primaryActivityFound(Activity act, Leg leg) {
-		/*
-		 * close chain
-		 */
-		if (chainStarted) {
-			if (secondaryActFound) {
-				this.subChains.get(subChainIndex).setTotalTravelDistance(this.totalTravelDistance);
-				this.subChains.get(subChainIndex).setTtBudget(this.ttBudget);
-				this.subChains.get(subChainIndex).setEndCoord(act.getCoord());
-				this.subChains.get(subChainIndex).setLastPrimAct(act);
-			}
-			else {
-				this.subChains.remove(subChainIndex);
-				this.subChainIndex--;
-			}
-		}
+  public void primaryActivityFound(Activity act, Leg leg) {
+    /*
+     * close chain
+     */
+    if (chainStarted) {
+      if (secondaryActFound) {
+        this.subChains.get(subChainIndex).setTotalTravelDistance(this.totalTravelDistance);
+        this.subChains.get(subChainIndex).setTtBudget(this.ttBudget);
+        this.subChains.get(subChainIndex).setEndCoord(act.getCoord());
+        this.subChains.get(subChainIndex).setLastPrimAct(act);
+      } else {
+        this.subChains.remove(subChainIndex);
+        this.subChainIndex--;
+      }
+    }
 
-		// it is not the second home act
-		if (!(leg == null)) {
-			//open chain
-			this.subChains.add(new SubChain());
-			this.subChainIndex++;
-			this.subChains.get(subChainIndex).setFirstPrimAct(act);
-			this.subChains.get(subChainIndex).setStartCoord(act.getCoord());
-			this.chainStarted = true;
-			this.secondaryActFound = false;
-			this.ttBudget = leg.getTravelTime().seconds();
-			this.totalTravelDistance = leg.getRoute().getDistance();
-			this.subChains.get(subChainIndex).defineMode(leg.getMode());
-		}
-	}
+    // it is not the second home act
+    if (!(leg == null)) {
+      // open chain
+      this.subChains.add(new SubChain());
+      this.subChainIndex++;
+      this.subChains.get(subChainIndex).setFirstPrimAct(act);
+      this.subChains.get(subChainIndex).setStartCoord(act.getCoord());
+      this.chainStarted = true;
+      this.secondaryActFound = false;
+      this.ttBudget = leg.getTravelTime().seconds();
+      this.totalTravelDistance = leg.getRoute().getDistance();
+      this.subChains.get(subChainIndex).defineMode(leg.getMode());
+    }
+  }
 
-	public List<SubChain> getSubChains() {
-		return subChains;
-	}
+  public List<SubChain> getSubChains() {
+    return subChains;
+  }
 
-	public void setSubChains(List<SubChain> subChains) {
-		this.subChains = subChains;
-	}
+  public void setSubChains(List<SubChain> subChains) {
+    this.subChains = subChains;
+  }
 }

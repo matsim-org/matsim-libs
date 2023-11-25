@@ -21,81 +21,82 @@
 
 package org.matsim.freight.carriers;
 
+import java.util.List;
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.utils.objectattributes.attributable.Attributable;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * A carrier.
  *
  * @author sschroeder
- *
  */
-public interface Carrier extends HasPlansAndId<CarrierPlan, Carrier>, Attributable{
+public interface Carrier extends HasPlansAndId<CarrierPlan, Carrier>, Attributable {
 
-	int PLAN_MEMORY = 5;
+  int PLAN_MEMORY = 5;
 
-	/**
-	 * Gets the carrierId.
-	 *
-	 * @return id
-	 */
-	@Override Id<Carrier> getId();
+  /**
+   * Gets the carrierId.
+   *
+   * @return id
+   */
+  @Override
+  Id<Carrier> getId();
 
-	/**
-	 * Gets a collection of carrierPlans.
-	 *
-	 * @return collection of {@link CarrierPlan}
-	 */
-	@Override List<CarrierPlan> getPlans();
+  /**
+   * Gets a collection of carrierPlans.
+   *
+   * @return collection of {@link CarrierPlan}
+   */
+  @Override
+  List<CarrierPlan> getPlans();
 
-	/**
-	 * Gets a collection of carrierShipments
-	 *
-	 * @return collection of {@link CarrierShipment}
-	 */
-	Map<Id<CarrierShipment>, CarrierShipment> getShipments();
+  /**
+   * Gets a collection of carrierShipments
+   *
+   * @return collection of {@link CarrierShipment}
+   */
+  Map<Id<CarrierShipment>, CarrierShipment> getShipments();
 
-	/**
-	 * Gets a collection of carrierServices
-	 *
-	 * @return collection of {@link CarrierService}
-	 */
-	Map<Id<CarrierService>, CarrierService> getServices();
+  /**
+   * Gets a collection of carrierServices
+   *
+   * @return collection of {@link CarrierService}
+   */
+  Map<Id<CarrierService>, CarrierService> getServices();
 
-	/**
-	 * Gets the selected plan.
-	 *
-	 * @return {@link CarrierPlan}
-	 */
-	@Override CarrierPlan getSelectedPlan();
+  /**
+   * Gets the selected plan.
+   *
+   * @return {@link CarrierPlan}
+   */
+  @Override
+  CarrierPlan getSelectedPlan();
 
-	/**
-	 * Sets a {@link CarrierPlan} as selected.
-	 *
-	 * <p>If selectedPlan in not in plan-collection, it adds it.
-	 *
-	 * @param selectedPlan to be set
-	 */
-	@Override void setSelectedPlan(CarrierPlan selectedPlan);
+  /**
+   * Sets a {@link CarrierPlan} as selected.
+   *
+   * <p>If selectedPlan in not in plan-collection, it adds it.
+   *
+   * @param selectedPlan to be set
+   */
+  @Override
+  void setSelectedPlan(CarrierPlan selectedPlan);
 
-	/**
-	 * Sets carrierCapabilities.
-	 *
-	 * @param carrierCapabilities to be set
-	 */
-	void setCarrierCapabilities(CarrierCapabilities carrierCapabilities);
+  /**
+   * Sets carrierCapabilities.
+   *
+   * @param carrierCapabilities to be set
+   */
+  void setCarrierCapabilities(CarrierCapabilities carrierCapabilities);
 
-	/**
-	 * Gets the carrierCapabilities.
-	 *
-	 * @return {@link CarrierCapabilities}
-	 */
-	CarrierCapabilities getCarrierCapabilities();
+  /**
+   * Gets the carrierCapabilities.
+   *
+   * @return {@link CarrierCapabilities}
+   */
+  CarrierCapabilities getCarrierCapabilities();
 
-
-	void clearPlans();
+  void clearPlans();
 }

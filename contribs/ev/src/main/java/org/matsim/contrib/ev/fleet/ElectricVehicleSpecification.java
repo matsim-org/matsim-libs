@@ -28,15 +28,15 @@ import org.matsim.vehicles.Vehicle;
  * @author Michal Maciejewski (michalm)
  */
 public interface ElectricVehicleSpecification extends Identifiable<Vehicle> {
-	Vehicle getMatsimVehicle();
+  Vehicle getMatsimVehicle();
 
-	ImmutableList<String> getChargerTypes();
+  ImmutableList<String> getChargerTypes();
 
-	double getInitialSoc(); //in [0, 1]
+  double getInitialSoc(); // in [0, 1]
 
-	default double getInitialCharge() {
-		return getInitialSoc() * getBatteryCapacity();
-	}
+  default double getInitialCharge() {
+    return getInitialSoc() * getBatteryCapacity();
+  }
 
-	double getBatteryCapacity();//[J]
+  double getBatteryCapacity(); // [J]
 }

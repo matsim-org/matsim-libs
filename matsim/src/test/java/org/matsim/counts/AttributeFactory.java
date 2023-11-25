@@ -26,55 +26,53 @@ import org.xml.sax.helpers.AttributesImpl;
 
 public class AttributeFactory {
 
-	public AttributeFactory() {
-	}
+  public AttributeFactory() {}
 
-	public AttributesImpl createCountsAttributes() {
-		AttributesImpl meta=new AttributesImpl();
+  public AttributesImpl createCountsAttributes() {
+    AttributesImpl meta = new AttributesImpl();
 
-		//String uri, String localName, String qName, String type, String value
-		meta.addAttribute("", "", "name", "xsd:string", "testName");
-		meta.addAttribute("", "", "desc", "xsd:string", "testDesc");
-		meta.addAttribute("", "", "year", "xsd:gYear", "2000");
-		meta.addAttribute("", "", "layer", "xsd:string", "testLayer");
+    // String uri, String localName, String qName, String type, String value
+    meta.addAttribute("", "", "name", "xsd:string", "testName");
+    meta.addAttribute("", "", "desc", "xsd:string", "testDesc");
+    meta.addAttribute("", "", "year", "xsd:gYear", "2000");
+    meta.addAttribute("", "", "layer", "xsd:string", "testLayer");
 
-		return meta;
-	}
+    return meta;
+  }
 
-	public AttributesImpl createCountAttributes() {
-		AttributesImpl meta=new AttributesImpl();
+  public AttributesImpl createCountAttributes() {
+    AttributesImpl meta = new AttributesImpl();
 
-		//String uri, String localName, String qName, String type, String value
-		meta.addAttribute("", "", "loc_id", "xsd:nonNegativeInteger", "1");
-		meta.addAttribute("", "", "cs_id", "xsd:string", "testNr");
+    // String uri, String localName, String qName, String type, String value
+    meta.addAttribute("", "", "loc_id", "xsd:nonNegativeInteger", "1");
+    meta.addAttribute("", "", "cs_id", "xsd:string", "testNr");
 
-		return meta;
-	}
+    return meta;
+  }
 
-	public AttributesImpl createCountAttributesWithCoords() {
-		AttributesImpl meta=createCountAttributes();
+  public AttributesImpl createCountAttributesWithCoords() {
+    AttributesImpl meta = createCountAttributes();
 
-		//String uri, String localName, String qName, String type, String value
-		meta.addAttribute("", "", "x", "xsd:double", "123.456");
-		meta.addAttribute("", "", "y", "xsd:double", "987.654");
+    // String uri, String localName, String qName, String type, String value
+    meta.addAttribute("", "", "x", "xsd:double", "123.456");
+    meta.addAttribute("", "", "y", "xsd:double", "987.654");
 
-		return meta;
-	}
+    return meta;
+  }
 
-	public AttributesImpl createVolumeAttributes() {
-		AttributesImpl meta=new AttributesImpl();
+  public AttributesImpl createVolumeAttributes() {
+    AttributesImpl meta = new AttributesImpl();
 
-		//String uri, String localName, String qName, String type, String value
-		meta.addAttribute("", "", "h", "xsd:nonNegativeInteger", "1");
-		meta.addAttribute("", "", "val", "xsd:string", "100.0");
+    // String uri, String localName, String qName, String type, String value
+    meta.addAttribute("", "", "h", "xsd:nonNegativeInteger", "1");
+    meta.addAttribute("", "", "val", "xsd:string", "100.0");
 
-		return meta;
-	}
+    return meta;
+  }
 
-	public CalcLinkStats createLinkStats(Network network) {
-		CalcLinkStats linkStats = new CalcLinkStats(network);
-		linkStats.readFile("./test/input/org/matsim/counts/linkstats.att");
-		return linkStats;
-	}
-
+  public CalcLinkStats createLinkStats(Network network) {
+    CalcLinkStats linkStats = new CalcLinkStats(network);
+    linkStats.readFile("./test/input/org/matsim/counts/linkstats.att");
+    return linkStats;
+  }
 }

@@ -28,12 +28,12 @@ import org.matsim.core.router.util.PreProcessEuclidean;
 
 public class AStarEuclideanTest extends AbstractLeastCostPathCalculatorTest {
 
-	@Override
-	protected LeastCostPathCalculator getLeastCostPathCalculator(Network network) {
-		FreespeedTravelTimeAndDisutility travelTimeCostCalculator = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
-		PreProcessEuclidean preProcessData = new PreProcessEuclidean(travelTimeCostCalculator);
-		preProcessData.run(network);
-		return new AStarEuclidean(network, preProcessData, travelTimeCostCalculator);
-	}
-
+  @Override
+  protected LeastCostPathCalculator getLeastCostPathCalculator(Network network) {
+    FreespeedTravelTimeAndDisutility travelTimeCostCalculator =
+        new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
+    PreProcessEuclidean preProcessData = new PreProcessEuclidean(travelTimeCostCalculator);
+    preProcessData.run(network);
+    return new AStarEuclidean(network, preProcessData, travelTimeCostCalculator);
+  }
 }

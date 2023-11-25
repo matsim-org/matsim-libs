@@ -24,27 +24,27 @@ import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.zone.io.ZoneShpReader;
 import org.matsim.contrib.zone.io.ZoneXmlReader;
 
 public class Zones {
-	public static Map<Id<Zone>, Zone> readZones(String zonesXmlFile, String zonesShpFile) {
-		try {
-			return readZones(new File(zonesXmlFile).toURI().toURL(), new File(zonesShpFile).toURI().toURL());
-		} catch (MalformedURLException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
+  public static Map<Id<Zone>, Zone> readZones(String zonesXmlFile, String zonesShpFile) {
+    try {
+      return readZones(
+          new File(zonesXmlFile).toURI().toURL(), new File(zonesShpFile).toURI().toURL());
+    } catch (MalformedURLException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
 
-	public static Map<Id<Zone>, Zone> readZones(URL zonesXmlUrl, URL zonesShpUrl) {
-		ZoneXmlReader xmlReader = new ZoneXmlReader();
-		xmlReader.readURL(zonesXmlUrl);
-		Map<Id<Zone>, Zone> zones = xmlReader.getZones();
+  public static Map<Id<Zone>, Zone> readZones(URL zonesXmlUrl, URL zonesShpUrl) {
+    ZoneXmlReader xmlReader = new ZoneXmlReader();
+    xmlReader.readURL(zonesXmlUrl);
+    Map<Id<Zone>, Zone> zones = xmlReader.getZones();
 
-		ZoneShpReader shpReader = new ZoneShpReader(zones);
-		shpReader.readZones(zonesShpUrl);
-		return zones;
-	}
+    ZoneShpReader shpReader = new ZoneShpReader(zones);
+    shpReader.readZones(zonesShpUrl);
+    return zones;
+  }
 }

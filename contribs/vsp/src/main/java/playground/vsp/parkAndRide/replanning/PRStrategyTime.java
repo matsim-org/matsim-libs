@@ -19,6 +19,7 @@
 
 package playground.vsp.parkAndRide.replanning;
 
+import jakarta.inject.Provider;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -31,43 +32,44 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import jakarta.inject.Provider;
-
 /**
- * A way of plugging park-and-ride strategy modules together. Via config file: <param name="Module_#" value="playground.vsp.parkAndRide.replanning.PRStrategyTime" />
+ * A way of plugging park-and-ride strategy modules together. Via config file: <param
+ * name="Module_#" value="playground.vsp.parkAndRide.replanning.PRStrategyTime" />
  *
  * @author ikaddoura
- *
  */
 public class PRStrategyTime implements PlanStrategy {
 
-	PlanStrategyImpl planStrategyDelegate = null ;
+  PlanStrategyImpl planStrategyDelegate = null;
 
-	public PRStrategyTime(MatsimServices controler, Provider<TripRouter> tripRouterProvider) {
+  public PRStrategyTime(MatsimServices controler, Provider<TripRouter> tripRouterProvider) {
 
-		RandomPlanSelector planSelector = new RandomPlanSelector();
-		planStrategyDelegate = new PlanStrategyImpl( planSelector );
+    RandomPlanSelector planSelector = new RandomPlanSelector();
+    planStrategyDelegate = new PlanStrategyImpl(planSelector);
 
-		PRTimeAllocationMutator prTimeModule = new PRTimeAllocationMutator(controler.getConfig());
-		planStrategyDelegate.addStrategyModule(prTimeModule);
+    PRTimeAllocationMutator prTimeModule = new PRTimeAllocationMutator(controler.getConfig());
+    planStrategyDelegate.addStrategyModule(prTimeModule);
 
-		ReRoute reRouteModule = new ReRoute( controler.getScenario(), tripRouterProvider, TimeInterpretation.create(controler.getConfig())) ;
-		planStrategyDelegate.addStrategyModule(reRouteModule) ;
+    ReRoute reRouteModule =
+        new ReRoute(
+            controler.getScenario(),
+            tripRouterProvider,
+            TimeInterpretation.create(controler.getConfig()));
+    planStrategyDelegate.addStrategyModule(reRouteModule);
+  }
 
-	}
+  @Override
+  public void finish() {
+    planStrategyDelegate.finish();
+  }
 
-	@Override
-	public void finish() {
-		planStrategyDelegate.finish();
-	}
+  @Override
+  public void init(ReplanningContext replanningContext) {
+    planStrategyDelegate.init(replanningContext);
+  }
 
-	@Override
-	public void init(ReplanningContext replanningContext) {
-		planStrategyDelegate.init(replanningContext);
-	}
-
-	@Override
-	public void run(HasPlansAndId<Plan, Person> person) {
-		planStrategyDelegate.run(person);
-	}
+  @Override
+  public void run(HasPlansAndId<Plan, Person> person) {
+    planStrategyDelegate.run(person);
+  }
 }

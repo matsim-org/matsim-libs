@@ -26,22 +26,29 @@ import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
- * Creates the transit stops valid for paratransit. Currently, only a replacement for a configurable version.
- * 
- * @author aneumann
+ * Creates the transit stops valid for paratransit. Currently, only a replacement for a configurable
+ * version.
  *
+ * @author aneumann
  */
 public final class PStopsFactory {
 
-	public static TransitSchedule createPStops(Network network, PConfigGroup pConfig, TransitSchedule transitSchedule, NetworkConfigGroup networkConfigGroup){
-		// return CreateStopsForAllCarLinks.createStopsForAllCarLinks(network, pConfig, transitSchedule);
-		if (pConfig.getStopLocationSelector().equals(StopLocationSelector.allCarLinks)) {
-			return CreatePStops.createPStops(network, pConfig, transitSchedule);
-		} else if (pConfig.getStopLocationSelector().equals(StopLocationSelector.junctionApproachesAndBetweenJunctions)) {
-			return CreatePStopsOnJunctionApproachesAndBetweenJunctions.createPStops(network, pConfig, transitSchedule, networkConfigGroup);
-		} else {
-			throw new RuntimeException("unknown StopLocationSelector");
-		}
-	}
-	
+  public static TransitSchedule createPStops(
+      Network network,
+      PConfigGroup pConfig,
+      TransitSchedule transitSchedule,
+      NetworkConfigGroup networkConfigGroup) {
+    // return CreateStopsForAllCarLinks.createStopsForAllCarLinks(network, pConfig,
+    // transitSchedule);
+    if (pConfig.getStopLocationSelector().equals(StopLocationSelector.allCarLinks)) {
+      return CreatePStops.createPStops(network, pConfig, transitSchedule);
+    } else if (pConfig
+        .getStopLocationSelector()
+        .equals(StopLocationSelector.junctionApproachesAndBetweenJunctions)) {
+      return CreatePStopsOnJunctionApproachesAndBetweenJunctions.createPStops(
+          network, pConfig, transitSchedule, networkConfigGroup);
+    } else {
+      throw new RuntimeException("unknown StopLocationSelector");
+    }
+  }
 }

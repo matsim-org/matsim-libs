@@ -1,6 +1,11 @@
 package playground.vsp.flowEfficiency;
 
 import com.google.inject.Provides;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -41,262 +46,350 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import java.net.URL;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-
 /**
- * This class tests {@link HierarchicalFlowEfficiencyCalculator} with the application of {@link BunchingFlowEfficencyImpact} and {@code AVFlowEfficencyImpact}.
+ * This class tests {@link HierarchicalFlowEfficiencyCalculator} with the application of {@link
+ * BunchingFlowEfficencyImpact} and {@code AVFlowEfficencyImpact}.
  *
- * On 3 different routes, agents travel in different mode sequences:
+ * <p>On 3 different routes, agents travel in different mode sequences:
  *
- * 1) all car
- * 2) all drt
- * 3) car - drt - car - drt - ....
+ * <p>1) all car 2) all drt 3) car - drt - car - drt - ....
  *
- * It is tested that for corresponding configuration, drt vehicles consume less flow capacity and move faster through the network
- * TODO test more details
+ * <p>It is tested that for corresponding configuration, drt vehicles consume less flow capacity and
+ * move faster through the network TODO test more details
  */
 public class HierarchicalFLowEfficiencyCalculatorTest {
 
+  public @Rule MatsimTestUtils utils = new MatsimTestUtils();
+  private FlowEfficiencyHandler handler;
 
-	public @Rule
-	MatsimTestUtils utils = new MatsimTestUtils();
-	private FlowEfficiencyHandler handler;
+  @Test
+  public void testThatDrtAVMoveFaster() {
 
-	@Test
-	public void testThatDrtAVMoveFaster(){
+    Assert.assertTrue(
+        handler.lastArrivalsPerLink.get(Id.createLinkId(258))
+            > handler.lastArrivalsPerLink.get(Id.createLinkId(259)));
+    Assert.assertTrue(
+        handler.lastArrivalsPerLink.get(Id.createLinkId(258))
+            > handler.lastArrivalsPerLink.get(Id.createLinkId(260)));
+    Assert.assertTrue(
+        handler.lastArrivalsPerLink.get(Id.createLinkId(260))
+            > handler.lastArrivalsPerLink.get(Id.createLinkId(259)));
 
-		Assert.assertTrue(handler.lastArrivalsPerLink.get(Id.createLinkId(258)) > handler.lastArrivalsPerLink.get(Id.createLinkId(259)));
-		Assert.assertTrue(handler.lastArrivalsPerLink.get(Id.createLinkId(258)) > handler.lastArrivalsPerLink.get(Id.createLinkId(260)));
-		Assert.assertTrue(handler.lastArrivalsPerLink.get(Id.createLinkId(260)) > handler.lastArrivalsPerLink.get(Id.createLinkId(259)));
+    Assert.assertEquals(
+        7238,
+        handler.lastArrivalsPerLink.get(Id.createLinkId(258)),
+        MatsimTestUtils.EPSILON); // car drivers
+    Assert.assertEquals(
+        1845,
+        handler.lastArrivalsPerLink.get(Id.createLinkId(259)),
+        MatsimTestUtils.EPSILON); // drt drivers
+    Assert.assertEquals(
+        5440,
+        handler.lastArrivalsPerLink.get(Id.createLinkId(260)),
+        MatsimTestUtils.EPSILON); // mixed (car - drt -car - drt - ....)
 
-		Assert.assertEquals(7238, handler.lastArrivalsPerLink.get(Id.createLinkId(258)), MatsimTestUtils.EPSILON); //car drivers
-		Assert.assertEquals(1845, handler.lastArrivalsPerLink.get(Id.createLinkId(259)), MatsimTestUtils.EPSILON); //drt drivers
-		Assert.assertEquals(5440, handler.lastArrivalsPerLink.get(Id.createLinkId(260)), MatsimTestUtils.EPSILON); //mixed (car - drt -car - drt - ....)
+    Assert.assertEquals(
+        1800, handler.nrOfArrivalsPerLink.get(Id.createLinkId(258)), MatsimTestUtils.EPSILON);
+    Assert.assertEquals(
+        1800, handler.nrOfArrivalsPerLink.get(Id.createLinkId(259)), MatsimTestUtils.EPSILON);
+    Assert.assertEquals(
+        1800, handler.nrOfArrivalsPerLink.get(Id.createLinkId(260)), MatsimTestUtils.EPSILON);
+  }
 
-		Assert.assertEquals(1800, handler.nrOfArrivalsPerLink.get(Id.createLinkId(258)), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1800, handler.nrOfArrivalsPerLink.get(Id.createLinkId(259)), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1800, handler.nrOfArrivalsPerLink.get(Id.createLinkId(260)), MatsimTestUtils.EPSILON);
+  @Before
+  public void simulate() {
+    URL configUrl =
+        IOUtils.extendUrl(
+            ExamplesUtils.getTestScenarioURL("dvrp-grid"), "eight_shared_taxi_config.xml");
 
-	}
+    Config config =
+        ConfigUtils.loadConfig(
+            configUrl,
+            new DvrpConfigGroup(),
+            new MultiModeDrtConfigGroup(),
+            new OTFVisConfigGroup());
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
+    config.qsim().setEndTime(4 * 3600);
 
-	@Before
-	public void simulate(){
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
-				"eight_shared_taxi_config.xml");
+    MultiModeDrtConfigGroup multiModeDrtConfigGroup =
+        ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
+    DrtConfigGroup drtCfg = multiModeDrtConfigGroup.getModalElements().iterator().next();
+    drtCfg.stopDuration = 1;
 
-		Config config = ConfigUtils.loadConfig(configUrl, new DvrpConfigGroup(), new MultiModeDrtConfigGroup(), new OTFVisConfigGroup());
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		config.qsim().setEndTime(4*3600);
+    Scenario scenario = ScenarioUtils.loadScenario(config);
+    scenario
+        .getPopulation()
+        .getFactory()
+        .getRouteFactories()
+        .setRouteFactory(DrtRoute.class, new DrtRouteFactory());
 
-		MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
-		DrtConfigGroup drtCfg = multiModeDrtConfigGroup.getModalElements().iterator().next();
-		drtCfg.stopDuration = 1;
+    adjustNetwork(scenario);
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		scenario.getPopulation()
-				.getFactory()
-				.getRouteFactories()
-				.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
+    scenario.getPopulation().getPersons().clear();
+    addPersons(scenario, 1800, Id.createLinkId(226), Id.createLinkId(258), TransportMode.car, 0);
+    addPersons(scenario, 1800, Id.createLinkId(227), Id.createLinkId(259), TransportMode.drt, 0);
+    addPersonsMixedMode(scenario, 1800, Id.createLinkId(228), Id.createLinkId(260), 0);
 
-		adjustNetwork(scenario);
+    VehiclesFactory fac = scenario.getVehicles().getFactory();
+    VehicleType dvrpVehType =
+        fac.createVehicleType(Id.create(TransportMode.drt + "-fancyType", VehicleType.class));
 
-		scenario.getPopulation().getPersons().clear();
-		addPersons(scenario, 1800, Id.createLinkId(226), Id.createLinkId(258), TransportMode.car, 0 );
-		addPersons(scenario, 1800, Id.createLinkId(227), Id.createLinkId(259), TransportMode.drt, 0 );
-		addPersonsMixedMode(scenario, 1800, Id.createLinkId(228), Id.createLinkId(260), 0 );
+    dvrpVehType.setLength(7.5);
+    dvrpVehType.setFlowEfficiencyFactor(1d);
+    dvrpVehType.setMaximumVelocity(999);
+    scenario.getVehicles().addVehicleType(dvrpVehType);
 
-		VehiclesFactory fac = scenario.getVehicles().getFactory();
-		VehicleType dvrpVehType = fac.createVehicleType(Id.create(TransportMode.drt + "-fancyType", VehicleType.class));
+    Controler controler = new Controler(scenario);
+    controler.addOverridingModule(new DvrpModule());
+    controler.addOverridingModule(new MultiModeDrtModule());
+    controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfigGroup));
 
-		dvrpVehType.setLength(7.5);
-		dvrpVehType.setFlowEfficiencyFactor(1d);
-		dvrpVehType.setMaximumVelocity(999);
-		scenario.getVehicles().addVehicleType(dvrpVehType);
+    controler.addOverridingQSimModule(
+        new AbstractQSimModule() {
+          @Override
+          protected void configureQSim() {}
 
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new MultiModeDrtModule());
-		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfigGroup));
+          @Provides
+          QNetworkFactory provideQNetworkFactory(EventsManager eventsManager, Scenario scenario) {
+            ConfigurableQNetworkFactory factory =
+                new ConfigurableQNetworkFactory(eventsManager, scenario);
 
-		controler.addOverridingQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-			}
+            LinkedList<SituationalFlowEfficiencyImpact> situationalImpacts = new LinkedList<>();
+            // the order of impacts matters!
+            situationalImpacts.add(new AVFlowEfficiencyImpact(Set.of(dvrpVehType)));
+            situationalImpacts.add(new BunchingFlowEfficencyImpact(Set.of(dvrpVehType), 2d, 1.1d));
+            factory.setFlowEfficiencyCalculator(
+                new HierarchicalFlowEfficiencyCalculator(situationalImpacts));
+            return factory;
+          }
+        });
 
-			@Provides
-			QNetworkFactory provideQNetworkFactory(EventsManager eventsManager, Scenario scenario) {
-				ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(eventsManager, scenario);
+    controler.addOverridingModule(
+        new AbstractDvrpModeModule(drtCfg.getMode()) {
+          @Override
+          public void install() {
+            FleetSpecificationImpl fleet = new FleetSpecificationImpl();
+            for (int i = 0; i < 1800 * 1.5; i++) {
+              fleet.addVehicleSpecification(
+                  ImmutableDvrpVehicleSpecification.newBuilder()
+                      .capacity(1)
+                      .serviceBeginTime(0)
+                      .serviceEndTime(24 * 3600)
+                      .startLinkId(Id.createLinkId((i % 3 == 0) ? 228 : 227))
+                      .id(Id.create("drt_" + i, DvrpVehicle.class))
+                      .build());
+            }
+            bindModal(FleetSpecification.class).toInstance(fleet);
+            bindModal(VehicleType.class).toInstance(dvrpVehType);
+          }
+        });
 
-				LinkedList<SituationalFlowEfficiencyImpact> situationalImpacts = new LinkedList<>();
-				//the order of impacts matters!
-				situationalImpacts.add(new AVFlowEfficiencyImpact(Set.of(dvrpVehType)));
-				situationalImpacts.add(new BunchingFlowEfficencyImpact(Set.of(dvrpVehType), 2d, 1.1d));
-				factory.setFlowEfficiencyCalculator(new HierarchicalFlowEfficiencyCalculator(situationalImpacts));
-				return factory;
-			}
-		});
+    handler = new FlowEfficiencyHandler();
 
-		controler.addOverridingModule(new AbstractDvrpModeModule(drtCfg.getMode()) {
-			@Override
-			public void install() {
-				FleetSpecificationImpl fleet = new FleetSpecificationImpl();
-				for (int i = 0; i < 1800 * 1.5; i++) {
-					fleet.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder()
-							.capacity(1)
-							.serviceBeginTime(0)
-							.serviceEndTime(24*3600)
-							.startLinkId(Id.createLinkId( (i % 3 == 0) ? 228 : 227))
-							.id(Id.create("drt_" + i , DvrpVehicle.class))
-							.build());
-				}
-				bindModal(FleetSpecification.class).toInstance(fleet);
-				bindModal(VehicleType.class).toInstance(dvrpVehType);
-			}
-		});
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            addEventHandlerBinding().toInstance(handler);
+          }
+        });
 
-		handler = new FlowEfficiencyHandler();
+    controler.run();
+  }
 
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addEventHandlerBinding().toInstance(handler);
-			}
-		});
+  private void adjustNetwork(Scenario scenario) {
+    scenario.getNetwork().getLinks().values().forEach(link -> link.setLength(300));
+    HashMap<String, String> turns;
 
-		controler.run();
-	}
+    { // car mode route: 226 -> 237 -> 258
+      scenario.getNetwork().getLinks().get(Id.createLinkId(226)).setCapacity(1800);
+      turns = new HashMap<>();
+      turns.put(
+          "237", String.valueOf(LinkTurnDirectionAttributesFromGraphHopper.TurnDirection.STRAIGHT));
+      scenario
+          .getNetwork()
+          .getLinks()
+          .get(Id.createLinkId(226))
+          .getAttributes()
+          .putAttribute("turns", turns);
 
-	private void adjustNetwork(Scenario scenario) {
-		scenario.getNetwork().getLinks().values().forEach(link -> link.setLength(300));
-		HashMap<String, String> turns;
+      scenario.getNetwork().getLinks().get(Id.createLinkId(237)).setCapacity(900);
+      turns = new HashMap<>();
+      turns.put(
+          "258", String.valueOf(LinkTurnDirectionAttributesFromGraphHopper.TurnDirection.STRAIGHT));
+      scenario
+          .getNetwork()
+          .getLinks()
+          .get(Id.createLinkId(237))
+          .getAttributes()
+          .putAttribute("turns", turns);
+    }
 
-		{ //car mode route: 226 -> 237 -> 258
-			scenario.getNetwork().getLinks().get(Id.createLinkId(226)).setCapacity(1800);
-			turns = new HashMap<>();
-			turns.put("237", String.valueOf(LinkTurnDirectionAttributesFromGraphHopper.TurnDirection.STRAIGHT));
-			scenario.getNetwork().getLinks().get(Id.createLinkId(226)).getAttributes().putAttribute("turns", turns);
+    { // drt mode route: 227 -> 238 -> 259
+      scenario.getNetwork().getLinks().get(Id.createLinkId(227)).setCapacity(1800);
+      turns = new HashMap<>();
+      turns.put(
+          "238", String.valueOf(LinkTurnDirectionAttributesFromGraphHopper.TurnDirection.STRAIGHT));
+      scenario
+          .getNetwork()
+          .getLinks()
+          .get(Id.createLinkId(227))
+          .getAttributes()
+          .putAttribute("turns", turns);
 
-			scenario.getNetwork().getLinks().get(Id.createLinkId(237)).setCapacity(900);
-			turns = new HashMap<>();
-			turns.put("258", String.valueOf(LinkTurnDirectionAttributesFromGraphHopper.TurnDirection.STRAIGHT));
-			scenario.getNetwork().getLinks().get(Id.createLinkId(237)).getAttributes().putAttribute("turns", turns);
-		}
+      scenario.getNetwork().getLinks().get(Id.createLinkId(238)).setCapacity(900);
+      turns = new HashMap<>();
+      turns.put(
+          "259", String.valueOf(LinkTurnDirectionAttributesFromGraphHopper.TurnDirection.STRAIGHT));
+      scenario
+          .getNetwork()
+          .getLinks()
+          .get(Id.createLinkId(238))
+          .getAttributes()
+          .putAttribute("turns", turns);
 
-		{ //drt mode route: 227 -> 238 -> 259
-			scenario.getNetwork().getLinks().get(Id.createLinkId(227)).setCapacity(1800);
-			turns = new HashMap<>();
-			turns.put("238", String.valueOf(LinkTurnDirectionAttributesFromGraphHopper.TurnDirection.STRAIGHT));
-			scenario.getNetwork().getLinks().get(Id.createLinkId(227)).getAttributes().putAttribute("turns", turns);
+      turns = new HashMap<>();
+      turns.put(
+          "459", String.valueOf(LinkTurnDirectionAttributesFromGraphHopper.TurnDirection.UTURN));
+      scenario
+          .getNetwork()
+          .getLinks()
+          .get(Id.createLinkId(259))
+          .getAttributes()
+          .putAttribute("turns", turns);
 
-			scenario.getNetwork().getLinks().get(Id.createLinkId(238)).setCapacity(900);
-			turns = new HashMap<>();
-			turns.put("259", String.valueOf(LinkTurnDirectionAttributesFromGraphHopper.TurnDirection.STRAIGHT));
-			scenario.getNetwork().getLinks().get(Id.createLinkId(238)).getAttributes().putAttribute("turns", turns);
+      turns = new HashMap<>();
+      turns.put(
+          "438", String.valueOf(LinkTurnDirectionAttributesFromGraphHopper.TurnDirection.STRAIGHT));
+      scenario
+          .getNetwork()
+          .getLinks()
+          .get(Id.createLinkId(459))
+          .getAttributes()
+          .putAttribute("turns", turns);
 
-			turns = new HashMap<>();
-			turns.put("459", String.valueOf(LinkTurnDirectionAttributesFromGraphHopper.TurnDirection.UTURN));
-			scenario.getNetwork().getLinks().get(Id.createLinkId(259)).getAttributes().putAttribute("turns", turns);
+      turns = new HashMap<>();
+      turns.put(
+          "427", String.valueOf(LinkTurnDirectionAttributesFromGraphHopper.TurnDirection.STRAIGHT));
+      scenario
+          .getNetwork()
+          .getLinks()
+          .get(Id.createLinkId(438))
+          .getAttributes()
+          .putAttribute("turns", turns);
 
-			turns = new HashMap<>();
-			turns.put("438", String.valueOf(LinkTurnDirectionAttributesFromGraphHopper.TurnDirection.STRAIGHT));
-			scenario.getNetwork().getLinks().get(Id.createLinkId(459)).getAttributes().putAttribute("turns", turns);
+      turns = new HashMap<>();
+      turns.put(
+          "227", String.valueOf(LinkTurnDirectionAttributesFromGraphHopper.TurnDirection.UTURN));
+      scenario
+          .getNetwork()
+          .getLinks()
+          .get(Id.createLinkId(427))
+          .getAttributes()
+          .putAttribute("turns", turns);
+    }
 
-			turns = new HashMap<>();
-			turns.put("427", String.valueOf(LinkTurnDirectionAttributesFromGraphHopper.TurnDirection.STRAIGHT));
-			scenario.getNetwork().getLinks().get(Id.createLinkId(438)).getAttributes().putAttribute("turns", turns);
+    { // mixed mode route: 228 -> 239 -> 260
+      scenario.getNetwork().getLinks().get(Id.createLinkId(228)).setCapacity(1800);
+      turns = new HashMap<>();
+      turns.put(
+          "239", String.valueOf(LinkTurnDirectionAttributesFromGraphHopper.TurnDirection.STRAIGHT));
+      scenario
+          .getNetwork()
+          .getLinks()
+          .get(Id.createLinkId(228))
+          .getAttributes()
+          .putAttribute("turns", turns);
 
-			turns = new HashMap<>();
-			turns.put("227", String.valueOf(LinkTurnDirectionAttributesFromGraphHopper.TurnDirection.UTURN));
-			scenario.getNetwork().getLinks().get(Id.createLinkId(427)).getAttributes().putAttribute("turns", turns);
-		}
+      scenario.getNetwork().getLinks().get(Id.createLinkId(239)).setCapacity(900);
+      turns = new HashMap<>();
+      turns.put(
+          "260", String.valueOf(LinkTurnDirectionAttributesFromGraphHopper.TurnDirection.STRAIGHT));
+      scenario
+          .getNetwork()
+          .getLinks()
+          .get(Id.createLinkId(239))
+          .getAttributes()
+          .putAttribute("turns", turns);
+    }
+  }
 
-		{ //mixed mode route: 228 -> 239 -> 260
-			scenario.getNetwork().getLinks().get(Id.createLinkId(228)).setCapacity(1800);
-			turns = new HashMap<>();
-			turns.put("239", String.valueOf(LinkTurnDirectionAttributesFromGraphHopper.TurnDirection.STRAIGHT));
-			scenario.getNetwork().getLinks().get(Id.createLinkId(228)).getAttributes().putAttribute("turns", turns);
+  private void addPersons(
+      Scenario scenario,
+      int howMany,
+      Id<Link> from,
+      Id<Link> to,
+      String legMode,
+      double startTime) {
 
-			scenario.getNetwork().getLinks().get(Id.createLinkId(239)).setCapacity(900);
-			turns = new HashMap<>();
-			turns.put("260", String.valueOf(LinkTurnDirectionAttributesFromGraphHopper.TurnDirection.STRAIGHT));
-			scenario.getNetwork().getLinks().get(Id.createLinkId(239)).getAttributes().putAttribute("turns", turns);
-		}
+    PopulationFactory factory = scenario.getPopulation().getFactory();
 
-	}
+    for (int i = 0; i < howMany; i++) {
+      Person person = factory.createPerson(Id.createPersonId("straight_" + legMode + "_" + i));
 
-	private void addPersons(Scenario scenario, int howMany, Id<Link> from, Id<Link> to, String legMode, double startTime){
+      Plan plan = factory.createPlan();
 
-		PopulationFactory factory = scenario.getPopulation().getFactory();
+      Activity origin = factory.createActivityFromLinkId("dummy", from);
+      origin.setEndTime(startTime);
+      plan.addActivity(origin);
+      plan.addLeg(factory.createLeg(legMode));
 
-		for (int i = 0; i < howMany; i++) {
-			Person person = factory.createPerson(Id.createPersonId("straight_" + legMode + "_" + i));
+      Activity destination = factory.createActivityFromLinkId("dummy", to);
+      plan.addActivity(destination);
 
-			Plan plan = factory.createPlan();
+      person.addPlan(plan);
+      person.setSelectedPlan(plan);
 
-			Activity origin = factory.createActivityFromLinkId("dummy", from);
-			origin.setEndTime(startTime);
-			plan.addActivity(origin);
-			plan.addLeg(factory.createLeg(legMode));
+      scenario.getPopulation().addPerson(person);
+    }
+  }
 
-			Activity destination = factory.createActivityFromLinkId("dummy", to);
-			plan.addActivity(destination);
+  private void addPersonsMixedMode(
+      Scenario scenario, int howMany, Id<Link> from, Id<Link> to, double startTime) {
 
-			person.addPlan(plan);
-			person.setSelectedPlan(plan);
+    PopulationFactory factory = scenario.getPopulation().getFactory();
 
-			scenario.getPopulation().addPerson(person);
-		}
-	}
+    for (int i = 0; i < howMany; i++) {
+      String legMode = (i % 2 == 0) ? TransportMode.car : TransportMode.drt;
+      Person person = factory.createPerson(Id.createPersonId("mixed_" + legMode + "_" + i));
 
-	private void addPersonsMixedMode(Scenario scenario, int howMany, Id<Link> from, Id<Link> to, double startTime){
+      Plan plan = factory.createPlan();
 
-		PopulationFactory factory = scenario.getPopulation().getFactory();
+      Activity origin = factory.createActivityFromLinkId("dummy", from);
+      origin.setEndTime(startTime + i);
+      plan.addActivity(origin);
+      plan.addLeg(factory.createLeg(legMode));
 
-		for (int i = 0; i < howMany; i++) {
-			String legMode = (i % 2 == 0) ? TransportMode.car : TransportMode.drt;
-			Person person = factory.createPerson(Id.createPersonId("mixed_" + legMode + "_" + i));
+      Activity destination = factory.createActivityFromLinkId("dummy", to);
+      plan.addActivity(destination);
 
-			Plan plan = factory.createPlan();
+      person.addPlan(plan);
+      person.setSelectedPlan(plan);
 
-			Activity origin = factory.createActivityFromLinkId("dummy", from);
-			origin.setEndTime(startTime + i);
-			plan.addActivity(origin);
-			plan.addLeg(factory.createLeg(legMode));
+      scenario.getPopulation().addPerson(person);
+    }
+  }
 
-			Activity destination = factory.createActivityFromLinkId("dummy", to);
-			plan.addActivity(destination);
+  private class FlowEfficiencyHandler implements PersonArrivalEventHandler {
 
-			person.addPlan(plan);
-			person.setSelectedPlan(plan);
+    Map<Id<Link>, Integer> nrOfArrivalsPerLink = new HashMap<>();
+    Map<Id<Link>, Double> lastArrivalsPerLink = new HashMap<>();
 
-			scenario.getPopulation().addPerson(person);
-		}
-	}
+    @Override
+    public void handleEvent(PersonArrivalEvent event) {
+      if ((event.getLegMode().equals(TransportMode.car)
+              || event.getLegMode().equals(TransportMode.drt))
+          && (event.getPersonId().toString().contains("straight_")
+              || event.getPersonId().toString().contains("mixed_"))) {
+        this.nrOfArrivalsPerLink.compute(event.getLinkId(), (k, v) -> (v == null) ? 1 : v + 1);
+        this.lastArrivalsPerLink.put(event.getLinkId(), event.getTime());
+      }
+    }
 
-	private class FlowEfficiencyHandler implements PersonArrivalEventHandler {
-
-		Map<Id<Link>, Integer> nrOfArrivalsPerLink = new HashMap<>();
-		Map<Id<Link>, Double> lastArrivalsPerLink = new HashMap<>();
-
-		@Override
-		public void handleEvent(PersonArrivalEvent event) {
-			if ( (event.getLegMode().equals(TransportMode.car) || event.getLegMode().equals(TransportMode.drt) ) &&
-					(event.getPersonId().toString().contains("straight_") || event.getPersonId().toString().contains("mixed_"))) {
-				this.nrOfArrivalsPerLink.compute(event.getLinkId(), (k,v) -> (v==null) ? 1 : v+1);
-				this.lastArrivalsPerLink.put(event.getLinkId(), event.getTime());
-			}
-		}
-
-		@Override
-		public void reset(int iteration) {
-			this.lastArrivalsPerLink.clear();
-			this.nrOfArrivalsPerLink.clear();
-		}
-
-	}
-
+    @Override
+    public void reset(int iteration) {
+      this.lastArrivalsPerLink.clear();
+      this.nrOfArrivalsPerLink.clear();
+    }
+  }
 }

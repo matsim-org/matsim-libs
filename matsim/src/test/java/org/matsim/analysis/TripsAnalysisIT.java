@@ -19,6 +19,11 @@
 
 package org.matsim.analysis;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -34,47 +39,46 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class TripsAnalysisIT {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	@Test
-	public void testMainMode() {
-		final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+  @Test
+  public void testMainMode() {
+    final Config config =
+        ConfigUtils.loadConfig(
+            IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+    Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		config.controller().setLastIteration(0);
-		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
+    config.controller().setLastIteration(0);
+    config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 
-		Controler controller = new Controler(scenario);
-		controller.run();
+    Controler controller = new Controler(scenario);
+    controller.run();
 
-		String tripsCsvFilename = controller.getControlerIO().getOutputFilename(Controler.DefaultFiles.tripscsv);
-		try (Reader reader = IOUtils.getBufferedReader(tripsCsvFilename)) {
-			CSVParser parser = new CSVParser(reader, CSVFormat.newFormat(config.global().getDefaultDelimiter().charAt(0)));
-			List<CSVRecord> records = parser.getRecords();
-			CSVRecord header = records.get(0);
-			Map<String, Integer> headerMap = new HashMap<>();
-			for (int i = 0; i < header.size(); i++) {
-				headerMap.put(header.get(i), i);
-			}
-			int mainModeIndex = headerMap.get("main_mode");
-			for (int row = 1, n = Math.min(30, records.size()); row < n; row++) {
-				CSVRecord record = records.get(row);
-				String mainMode = record.get(mainModeIndex);
-				if (mainMode == null || mainMode.isBlank()) {
-					Assertions.fail("Row " + row + " has no main_mode set.\nheader = " + header + "\nrow = " + row);
-				}
-			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    String tripsCsvFilename =
+        controller.getControlerIO().getOutputFilename(Controler.DefaultFiles.tripscsv);
+    try (Reader reader = IOUtils.getBufferedReader(tripsCsvFilename)) {
+      CSVParser parser =
+          new CSVParser(
+              reader, CSVFormat.newFormat(config.global().getDefaultDelimiter().charAt(0)));
+      List<CSVRecord> records = parser.getRecords();
+      CSVRecord header = records.get(0);
+      Map<String, Integer> headerMap = new HashMap<>();
+      for (int i = 0; i < header.size(); i++) {
+        headerMap.put(header.get(i), i);
+      }
+      int mainModeIndex = headerMap.get("main_mode");
+      for (int row = 1, n = Math.min(30, records.size()); row < n; row++) {
+        CSVRecord record = records.get(row);
+        String mainMode = record.get(mainModeIndex);
+        if (mainMode == null || mainMode.isBlank()) {
+          Assertions.fail(
+              "Row " + row + " has no main_mode set.\nheader = " + header + "\nrow = " + row);
+        }
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }

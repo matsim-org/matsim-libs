@@ -18,11 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.scoring;
+package org.matsim.core.scoring;
 
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import jakarta.inject.Inject;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -36,81 +36,84 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.population.PopulationUtils;
 
 /**
+ * Converts a stream of Events into a stream of Activities. Passes Activities to a single
+ * ActivityHandler which must be registered with this class. Mainly intended for scoring, but can be
+ * used for any kind of Activity related statistics. Essentially, it allows you to read Activities
+ * from the simulation like you would read Activities from Plans, except that the Plan does not even
+ * need to exist.
  *
- * Converts a stream of Events into a stream of Activities. Passes Activities to a single ActivityHandler which must be registered with this class.
- * Mainly intended for scoring, but can be used for any kind of Activity related statistics. Essentially, it allows you to read
- * Activities from the simulation like you would read Activities from Plans, except that the Plan does not even need to exist.
- * <p></p>
- * Note that the instances of Activity passed to the LegHandler will never be identical to those in the Scenario! Even
- * in a "no-op" simulation which only reproduces the Plan, new instances will be created. So if you attach your own data
- * to the Activities in the Scenario, that's your own lookout.
+ * <p>Note that the instances of Activity passed to the LegHandler will never be identical to those
+ * in the Scenario! Even in a "no-op" simulation which only reproduces the Plan, new instances will
+ * be created. So if you attach your own data to the Activities in the Scenario, that's your own
+ * lookout.
  *
  * @author michaz
- *
  */
-public final class EventsToActivities implements ActivityStartEventHandler, ActivityEndEventHandler {
+public final class EventsToActivities
+    implements ActivityStartEventHandler, ActivityEndEventHandler {
 
-	public interface ActivityHandler {
-	    void handleActivity(PersonExperiencedActivity activity);
-	}
+  public interface ActivityHandler {
+    void handleActivity(PersonExperiencedActivity activity);
+  }
 
-    private final IdMap<Person, Activity> activities = new IdMap<>(Person.class);
-    private final List<ActivityHandler> activityHandlers = new ArrayList<>();
+  private final IdMap<Person, Activity> activities = new IdMap<>(Person.class);
+  private final List<ActivityHandler> activityHandlers = new ArrayList<>();
 
-    public EventsToActivities() {
+  public EventsToActivities() {}
 
-    }
-
-    @Inject
-    EventsToActivities(ControlerListenerManager controlerListenerManager) {
-        controlerListenerManager.addControlerListener(new AfterMobsimListener() {
-            @Override
-            public void notifyAfterMobsim(AfterMobsimEvent event) {
-                finish();
-            }
+  @Inject
+  EventsToActivities(ControlerListenerManager controlerListenerManager) {
+    controlerListenerManager.addControlerListener(
+        new AfterMobsimListener() {
+          @Override
+          public void notifyAfterMobsim(AfterMobsimEvent event) {
+            finish();
+          }
         });
+  }
+
+  @Override
+  public void handleEvent(ActivityEndEvent event) {
+    Activity activity = this.activities.remove(event.getPersonId());
+    if (activity == null) {
+      Activity firstActivity =
+          PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
+      firstActivity.setFacilityId(event.getFacilityId());
+      firstActivity.setCoord(event.getCoord());
+      activity = firstActivity;
     }
-
-    @Override
-    public void handleEvent(ActivityEndEvent event) {
-        Activity activity = this.activities.remove(event.getPersonId());
-        if (activity == null) {
-            Activity firstActivity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
-            firstActivity.setFacilityId(event.getFacilityId());
-            firstActivity.setCoord(event.getCoord());
-            activity = firstActivity;
-        }
-        activity.setEndTime(event.getTime());
-        for (ActivityHandler activityHandler : this.activityHandlers) {
-            activityHandler.handleActivity(new PersonExperiencedActivity(event.getPersonId(), activity));
-        }
+    activity.setEndTime(event.getTime());
+    for (ActivityHandler activityHandler : this.activityHandlers) {
+      activityHandler.handleActivity(new PersonExperiencedActivity(event.getPersonId(), activity));
     }
+  }
 
-    @Override
-    public void handleEvent(ActivityStartEvent event) {
-        Activity activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
-        activity.setFacilityId(event.getFacilityId());
-        activity.setStartTime(event.getTime());
-        activity.setCoord( event.getCoord() );
+  @Override
+  public void handleEvent(ActivityStartEvent event) {
+    Activity activity =
+        PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
+    activity.setFacilityId(event.getFacilityId());
+    activity.setStartTime(event.getTime());
+    activity.setCoord(event.getCoord());
 
-        this.activities.put(event.getPersonId(), activity);
-    }
+    this.activities.put(event.getPersonId(), activity);
+  }
 
-    @Override
-    public void reset(int iteration) {
-        this.activities.clear();
-    }
+  @Override
+  public void reset(int iteration) {
+    this.activities.clear();
+  }
 
-    public void addActivityHandler(ActivityHandler activityHandler) {
-        this.activityHandlers.add(activityHandler);
-    }
+  public void addActivityHandler(ActivityHandler activityHandler) {
+    this.activityHandlers.add(activityHandler);
+  }
 
-    public void finish() {
-        this.activities.forEach((id, activity) -> {
-            for (ActivityHandler activityHandler : this.activityHandlers) {
-                activityHandler.handleActivity(new PersonExperiencedActivity(id, activity));
-            }
+  public void finish() {
+    this.activities.forEach(
+        (id, activity) -> {
+          for (ActivityHandler activityHandler : this.activityHandlers) {
+            activityHandler.handleActivity(new PersonExperiencedActivity(id, activity));
+          }
         });
-    }
-
+  }
 }

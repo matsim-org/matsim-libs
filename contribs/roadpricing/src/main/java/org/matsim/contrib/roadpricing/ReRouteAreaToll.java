@@ -22,6 +22,8 @@
 
 package org.matsim.contrib.roadpricing;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.PlanStrategy;
@@ -31,34 +33,39 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+class ReRouteAreaToll implements Provider<PlanStrategy> {
 
- class ReRouteAreaToll implements Provider<PlanStrategy> {
+  private final Config config;
+  private RoadPricingScheme roadPricingScheme;
+  private Provider<TripRouter> tripRouterFactory;
+  private final TimeInterpretation timeInterpretation;
 
-	private final Config config;
-	private RoadPricingScheme roadPricingScheme;
-	private Provider<TripRouter> tripRouterFactory;
-	private final TimeInterpretation timeInterpretation;
-//	private final Provider<PlansCalcRouteWithTollOrNot> factory;
+  //	private final Provider<PlansCalcRouteWithTollOrNot> factory;
 
-	@Inject ReRouteAreaToll( Config config, RoadPricingScheme roadPricingScheme, Provider<TripRouter> tripRouterFactory, TimeInterpretation timeInterpretation ) {
-		this.config = config;
-//		this.factory = factory;
-		this.roadPricingScheme = roadPricingScheme;
-		this.tripRouterFactory = tripRouterFactory;
-		this.timeInterpretation = timeInterpretation;
-	}
+  @Inject
+  ReRouteAreaToll(
+      Config config,
+      RoadPricingScheme roadPricingScheme,
+      Provider<TripRouter> tripRouterFactory,
+      TimeInterpretation timeInterpretation) {
+    this.config = config;
+    //		this.factory = factory;
+    this.roadPricingScheme = roadPricingScheme;
+    this.tripRouterFactory = tripRouterFactory;
+    this.timeInterpretation = timeInterpretation;
+  }
 
-	@Override
-	public PlanStrategy get() {
-		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
-		builder.addStrategyModule(new AbstractMultithreadedModule(config.global()) {
-			@Override
-			public PlanAlgorithm getPlanAlgoInstance() {
-				return new PlansCalcRouteWithTollOrNot( roadPricingScheme, tripRouterFactory, timeInterpretation ) ;
-			}
-		});
-		return builder.build();
-	}
+  @Override
+  public PlanStrategy get() {
+    PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
+    builder.addStrategyModule(
+        new AbstractMultithreadedModule(config.global()) {
+          @Override
+          public PlanAlgorithm getPlanAlgoInstance() {
+            return new PlansCalcRouteWithTollOrNot(
+                roadPricingScheme, tripRouterFactory, timeInterpretation);
+          }
+        });
+    return builder.build();
+  }
 }

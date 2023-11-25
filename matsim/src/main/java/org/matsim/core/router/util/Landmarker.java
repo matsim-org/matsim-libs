@@ -25,5 +25,5 @@ import org.matsim.api.core.v01.network.Node;
  * @author thibautd
  */
 public interface Landmarker {
-	Node[] identifyLandmarks( int nLandmarks, Network network );
+  Node[] identifyLandmarks(int nLandmarks, Network network);
 }

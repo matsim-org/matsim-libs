@@ -20,6 +20,9 @@
 
 package org.matsim.contrib.emissions;
 
+import static org.matsim.contrib.emissions.Pollutant.PM;
+
+import java.util.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,10 +38,6 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
-import java.util.*;
-
-import static org.matsim.contrib.emissions.Pollutant.PM;
-
 /**
  * @author julia
  */
@@ -47,12 +46,11 @@ import static org.matsim.contrib.emissions.Pollutant.PM;
  * Case 5 - data in detailed table, stop go speed zero
  */
 
-
 /*
  * test for playground.vsp.emissions.WarmEmissionAnalysisModule
  *
- * WarmEmissionAnalysisModule (weam) 
- * public methods and corresponding tests: 
+ * WarmEmissionAnalysisModule (weam)
+ * public methods and corresponding tests:
  * weamParameter - testWarmEmissionAnalysisParameter
  * throw warm EmissionEvent - testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent*, testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions
  * check vehicle info and calculate warm emissions -testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent*, testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions
@@ -64,7 +62,7 @@ import static org.matsim.contrib.emissions.Pollutant.PM;
  * get top go km couter - testCounters*()
  * get warm emission event counter - testCounters*()
  *
- * private methods and corresponding tests: 
+ * private methods and corresponding tests:
  * rescale warm emissions - rescaleWarmEmissionsTest()
  * calculate warm emissions - implicitly tested
  * convert string 2 tuple - implicitly tested
@@ -74,137 +72,157 @@ import static org.matsim.contrib.emissions.Pollutant.PM;
  **/
 
 @RunWith(Parameterized.class)
-public class TestWarmEmissionAnalysisModuleCase5{
-	// This used to be one large test class, which had separate table entries for each test, but put them all into the same table.  The result was
-	// difficult if not impossible to debug, and the resulting detailed table was inconsistent in the sense that it did not contain all combinations of
-	// entries. -- I have now pulled this apart into 6 different test classes, this one here plus "Case1" to "Case5".  Things look ok, but given that the
-	// single class before was so large that I could not fully comprehend it, there may now be errors in the ripped-apart classes.  Hopefully, over time,
-	// this will help to sort things out.  kai, feb'20
+public class TestWarmEmissionAnalysisModuleCase5 {
+  // This used to be one large test class, which had separate table entries for each test, but put
+  // them all into the same table.  The result was
+  // difficult if not impossible to debug, and the resulting detailed table was inconsistent in the
+  // sense that it did not contain all combinations of
+  // entries. -- I have now pulled this apart into 6 different test classes, this one here plus
+  // "Case1" to "Case5".  Things look ok, but given that the
+  // single class before was so large that I could not fully comprehend it, there may now be errors
+  // in the ripped-apart classes.  Hopefully, over time,
+  // this will help to sort things out.  kai, feb'20
 
-	private final HandlerToTestEmissionAnalysisModules emissionEventManager = new HandlerToTestEmissionAnalysisModules();
+  private final HandlerToTestEmissionAnalysisModules emissionEventManager =
+      new HandlerToTestEmissionAnalysisModules();
 
-	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ));
-	private final EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod;
-	private static final String PASSENGER_CAR = "PASSENGER_CAR";
+  private static final Set<Pollutant> pollutants = new HashSet<>(Arrays.asList(Pollutant.values()));
+  private final EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod;
+  private static final String PASSENGER_CAR = "PASSENGER_CAR";
 
-	private static final Double DETAILED_ZERO_FACTOR_FF =  .0011;
+  private static final Double DETAILED_ZERO_FACTOR_FF = .0011;
 
-	// vehicle information for regular test cases
+  // vehicle information for regular test cases
 
-	// case 5 - data in detailed table, stop go speed zero
-	private final String zeroRoadCategory = "URB_case6";
-	private final String zeroTechnology = "zero technology";
-	private final String zeroConcept = "zero concept";
-	private final String zeroSizeClass = "zero size class";
-	private final Double zeroFreeVelocity = 20.; //km/h
-	private final Double zeroSgVelocity = 0.; //km/h
+  // case 5 - data in detailed table, stop go speed zero
+  private final String zeroRoadCategory = "URB_case6";
+  private final String zeroTechnology = "zero technology";
+  private final String zeroConcept = "zero concept";
+  private final String zeroSizeClass = "zero size class";
+  private final Double zeroFreeVelocity = 20.; // km/h
+  private final Double zeroSgVelocity = 0.; // km/h
 
+  @Parameterized.Parameters(name = "{index}: ComputationMethod={0}")
+  public static Collection<Object[]> createCombinations() {
+    List<Object[]> list = new ArrayList<>();
+    list.add(new Object[] {EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction});
+    list.add(new Object[] {EmissionsConfigGroup.EmissionsComputationMethod.AverageSpeed});
+    return list;
+  }
 
+  public TestWarmEmissionAnalysisModuleCase5(
+      EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod) {
+    this.emissionsComputationMethod = emissionsComputationMethod;
+  }
 
-	@Parameterized.Parameters( name = "{index}: ComputationMethod={0}")
-	public static Collection<Object[]> createCombinations() {
-		List <Object[]> list = new ArrayList<>();
-		list.add( new Object [] {EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction} ) ;
-		list.add( new Object [] {EmissionsConfigGroup.EmissionsComputationMethod.AverageSpeed} ) ;
-		return list;
-	}
+  /*
+   * this test method creates a vehicle and a mock link  (both zero properties)
+   * the free flow factor is used to calculate and test the PM warm Emissions and HandlerToTestEmissionAnalysisModules Sum
+   * detailed values are used
+   */
+  @Test
+  public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent5() {
+    // -- set up tables, event handler, parameters, module
+    WarmEmissionAnalysisModule emissionsModule = setUp();
 
-	public TestWarmEmissionAnalysisModuleCase5( EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod ) {
-		this.emissionsComputationMethod = emissionsComputationMethod;
-	}
+    // case 6 - data in detailed table, stop go speed zero
+    // use free flow factor to calculate emissions
+    Id<Vehicle> zeroVehicleId = Id.create("vehicle zero", Vehicle.class);
+    double zeroLinklength = 3000.;
+    Link zerolink =
+        TestWarmEmissionAnalysisModule.createMockLink(
+            "link zero", zeroLinklength, zeroFreeVelocity / 3.6);
+    Id<Link> lpgLinkId = zerolink.getId();
+    EmissionUtils.setHbefaRoadType(zerolink, zeroRoadCategory);
 
-	/*
-	 * this test method creates a vehicle and a mock link  (both zero properties)
-	 * the free flow factor is used to calculate and test the PM warm Emissions and HandlerToTestEmissionAnalysisModules Sum
-	 * detailed values are used
-	 */
-	@Test
-	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent5(){
-		//-- set up tables, event handler, parameters, module
-		WarmEmissionAnalysisModule emissionsModule = setUp();
+    Id<VehicleType> zeroVehicleTypeId =
+        Id.create(
+            PASSENGER_CAR + ";" + zeroTechnology + ";" + zeroSizeClass + ";" + zeroConcept,
+            VehicleType.class);
+    VehiclesFactory vehFac = VehicleUtils.getFactory();
+    Vehicle zeroVehicle =
+        vehFac.createVehicle(zeroVehicleId, vehFac.createVehicleType(zeroVehicleTypeId));
 
-		// case 6 - data in detailed table, stop go speed zero
-		// use free flow factor to calculate emissions
-		Id<Vehicle> zeroVehicleId = Id.create("vehicle zero", Vehicle.class);
-		double zeroLinklength = 3000.;
-		Link zerolink = TestWarmEmissionAnalysisModule.createMockLink("link zero", zeroLinklength, zeroFreeVelocity / 3.6 );
-		Id<Link> lpgLinkId = zerolink.getId();
-		EmissionUtils.setHbefaRoadType(zerolink, zeroRoadCategory);
+    Map<Pollutant, Double> warmEmissions =
+        emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(
+            zeroVehicle, zerolink, 2 * zeroLinklength / (zeroFreeVelocity + zeroSgVelocity) * 3.6);
+    Assert.assertEquals(
+        DETAILED_ZERO_FACTOR_FF * zeroLinklength / 1000.,
+        warmEmissions.get(PM),
+        MatsimTestUtils.EPSILON);
 
-		Id<VehicleType> zeroVehicleTypeId = Id.create(
-				PASSENGER_CAR + ";"+ zeroTechnology + ";" + zeroSizeClass + ";" + zeroConcept, VehicleType.class );
-		VehiclesFactory vehFac = VehicleUtils.getFactory();
-		Vehicle zeroVehicle = vehFac.createVehicle(zeroVehicleId, vehFac.createVehicleType(zeroVehicleTypeId));
+    emissionsModule.throwWarmEmissionEvent(22., lpgLinkId, zeroVehicleId, warmEmissions);
+    Assert.assertEquals(
+        pollutants.size() * DETAILED_ZERO_FACTOR_FF * zeroLinklength / 1000.,
+        emissionEventManager.getSum(),
+        MatsimTestUtils.EPSILON);
+    warmEmissions.clear();
+  }
 
-		Map<Pollutant, Double> warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(zeroVehicle, zerolink, 2 * zeroLinklength / (zeroFreeVelocity + zeroSgVelocity) * 3.6);
-		Assert.assertEquals( DETAILED_ZERO_FACTOR_FF *zeroLinklength/1000., warmEmissions.get(PM ), MatsimTestUtils.EPSILON );
+  private WarmEmissionAnalysisModule setUp() {
 
-		emissionsModule.throwWarmEmissionEvent(22., lpgLinkId, zeroVehicleId, warmEmissions);
-		Assert.assertEquals( pollutants.size() * DETAILED_ZERO_FACTOR_FF *zeroLinklength/1000., emissionEventManager.getSum(), MatsimTestUtils.EPSILON );
-		warmEmissions.clear();
+    Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
+    Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable =
+        new HashMap<>();
 
-	}
+    TestWarmEmissionAnalysisModule.fillAverageTable(avgHbefaWarmTable);
+    fillDetailedTable(detailedHbefaWarmTable);
+    Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds =
+        EmissionUtils.createHBEFASpeedsTable(avgHbefaWarmTable);
+    TestWarmEmissionAnalysisModule.addDetailedRecordsToTestSpeedsTable(
+        hbefaRoadTrafficSpeeds, detailedHbefaWarmTable);
 
+    EventsManager emissionEventManager = this.emissionEventManager;
+    EmissionsConfigGroup ecg = new EmissionsConfigGroup();
+    ecg.setHbefaVehicleDescriptionSource(
+        EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId);
+    ecg.setEmissionsComputationMethod(this.emissionsComputationMethod);
+    ecg.setDetailedVsAverageLookupBehavior(
+        DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
+    return new WarmEmissionAnalysisModule(
+        avgHbefaWarmTable,
+        detailedHbefaWarmTable,
+        hbefaRoadTrafficSpeeds,
+        pollutants,
+        emissionEventManager,
+        ecg);
+  }
 
-	private WarmEmissionAnalysisModule setUp() {
+  private void fillDetailedTable(
+      Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable) {
 
-		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
-		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
+    // entries for zero case
+    {
+      HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
+      vehAtt.setHbefaEmConcept(zeroConcept);
+      vehAtt.setHbefaSizeClass(zeroSizeClass);
+      vehAtt.setHbefaTechnology(zeroTechnology);
 
-		TestWarmEmissionAnalysisModule.fillAverageTable( avgHbefaWarmTable );
-		fillDetailedTable( detailedHbefaWarmTable );
-		Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(
-				avgHbefaWarmTable );
-		TestWarmEmissionAnalysisModule.addDetailedRecordsToTestSpeedsTable( hbefaRoadTrafficSpeeds, detailedHbefaWarmTable );
+      HbefaWarmEmissionFactor detWarmFactor =
+          new HbefaWarmEmissionFactor(DETAILED_ZERO_FACTOR_FF, zeroFreeVelocity);
 
-		EventsManager emissionEventManager = this.emissionEventManager;
-		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		ecg.setEmissionsComputationMethod( this.emissionsComputationMethod );
-		ecg.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
+      for (Pollutant wp : pollutants) {
+        HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
+        detWarmKey.setComponent(wp);
+        detWarmKey.setRoadCategory(zeroRoadCategory);
+        detWarmKey.setTrafficSituation(HbefaTrafficSituation.FREEFLOW);
+        detWarmKey.setVehicleAttributes(vehAtt);
+        detWarmKey.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+        detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
+      }
 
-		return new WarmEmissionAnalysisModule( avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, emissionEventManager, ecg );
+      detWarmFactor = new HbefaWarmEmissionFactor(.00011, zeroSgVelocity);
 
-	}
-
-	private void fillDetailedTable( Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable) {
-
-		//entries for zero case
-		{
-			HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
-			vehAtt.setHbefaEmConcept(zeroConcept);
-			vehAtt.setHbefaSizeClass(zeroSizeClass);
-			vehAtt.setHbefaTechnology(zeroTechnology);
-
-			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor(DETAILED_ZERO_FACTOR_FF, zeroFreeVelocity);
-
-			for (Pollutant wp : pollutants) {
-				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
-				detWarmKey.setComponent(wp);
-				detWarmKey.setRoadCategory(zeroRoadCategory);
-				detWarmKey.setTrafficSituation(HbefaTrafficSituation.FREEFLOW);
-				detWarmKey.setVehicleAttributes(vehAtt);
-				detWarmKey.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-				detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
-			}
-
-			detWarmFactor = new HbefaWarmEmissionFactor(.00011, zeroSgVelocity);
-
-
-			for (Pollutant wp : pollutants) {
-				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
-				detWarmKey.setComponent(wp);
-				detWarmKey.setRoadCategory(zeroRoadCategory);
-				detWarmKey.setTrafficSituation(HbefaTrafficSituation.STOPANDGO);
-				detWarmKey.setVehicleAttributes(vehAtt);
-				detWarmKey.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-				detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
-			}
-		}
-	}
+      for (Pollutant wp : pollutants) {
+        HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
+        detWarmKey.setComponent(wp);
+        detWarmKey.setRoadCategory(zeroRoadCategory);
+        detWarmKey.setTrafficSituation(HbefaTrafficSituation.STOPANDGO);
+        detWarmKey.setVehicleAttributes(vehAtt);
+        detWarmKey.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+        detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
+      }
+    }
+  }
 }
-	
-
-	
-

@@ -20,7 +20,6 @@
 package org.matsim.facilities;
 
 import java.util.SortedSet;
-
 import org.matsim.core.api.internal.MatsimFacilitiesObject;
 
 /**
@@ -29,14 +28,13 @@ import org.matsim.core.api.internal.MatsimFacilitiesObject;
  */
 public interface ActivityOption extends MatsimFacilitiesObject {
 
-	public double getCapacity();
+  public double getCapacity();
 
-	public void setCapacity(double cap);
+  public void setCapacity(double cap);
 
-	public void addOpeningTime(OpeningTime openingTime);
+  public void addOpeningTime(OpeningTime openingTime);
 
-	public SortedSet<OpeningTime> getOpeningTimes();
+  public SortedSet<OpeningTime> getOpeningTimes();
 
-	public String getType();
-
+  public String getType();
 }

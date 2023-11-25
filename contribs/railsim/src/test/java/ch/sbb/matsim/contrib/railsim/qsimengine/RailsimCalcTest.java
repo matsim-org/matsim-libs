@@ -19,132 +19,108 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.assertj.core.data.Offset;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class RailsimCalcTest {
 
-	@Test
-	public void testCalcAndSolveTraveledDist() {
+  @Test
+  public void testCalcAndSolveTraveledDist() {
 
-		assertThat(RailsimCalc.calcTraveledDist(5, 2, 0))
-			.isEqualTo(10);
+    assertThat(RailsimCalc.calcTraveledDist(5, 2, 0)).isEqualTo(10);
 
-		assertThat(RailsimCalc.solveTraveledDist(5, 15, 0))
-			.isEqualTo(3);
+    assertThat(RailsimCalc.solveTraveledDist(5, 15, 0)).isEqualTo(3);
 
-		double d = RailsimCalc.calcTraveledDist(5, 3, 1);
+    double d = RailsimCalc.calcTraveledDist(5, 3, 1);
 
-		assertThat(d)
-			.isEqualTo(19.5);
+    assertThat(d).isEqualTo(19.5);
 
-		assertThat(RailsimCalc.solveTraveledDist(5, 19.5, 1))
-			.isEqualTo(3);
+    assertThat(RailsimCalc.solveTraveledDist(5, 19.5, 1)).isEqualTo(3);
+  }
 
+  @Test
+  public void testCalcAndSolveTraveledDistNegative() {
 
-	}
+    double d = RailsimCalc.calcTraveledDist(5, 5, -1);
 
-	@Test
-	public void testCalcAndSolveTraveledDistNegative() {
+    assertThat(d).isEqualTo(12.5);
 
-		double d = RailsimCalc.calcTraveledDist(5, 5, -1);
+    assertThat(RailsimCalc.calcTraveledDist(5, 10, -1)).isEqualTo(0);
 
-		assertThat(d).isEqualTo(12.5);
+    double t = RailsimCalc.solveTraveledDist(5, 12.5, -1);
 
-		assertThat(RailsimCalc.calcTraveledDist(5, 10, -1))
-			.isEqualTo(0);
+    assertThat(t).isEqualTo(5);
+  }
 
-		double t = RailsimCalc.solveTraveledDist(5, 12.5, -1);
+  @Test
+  public void testMaxSpeed() {
 
-		assertThat(t)
-			.isEqualTo(5);
+    double dist = 1000;
 
-	}
+    double current = 5;
+    double f = 0;
 
-	@Test
-	public void testMaxSpeed() {
+    RailsimCalc.SpeedTarget res = RailsimCalc.calcTargetSpeed(dist, 0.5, 0.5, 5, 30, 0);
 
-		double dist = 1000;
+    double timeDecel = (res.targetSpeed() - f) / 0.5;
+    double distDecel = RailsimCalc.calcTraveledDist(res.targetSpeed(), timeDecel, -0.5);
 
-		double current = 5;
-		double f = 0;
+    double timeAccel = (res.targetSpeed() - current) / 0.5;
+    double distAccel = RailsimCalc.calcTraveledDist(5, timeAccel, 0.5);
 
-		RailsimCalc.SpeedTarget res = RailsimCalc.calcTargetSpeed(dist, 0.5, 0.5,
-			5, 30, 0);
+    assertThat(distDecel + distAccel).isCloseTo(dist, Offset.offset(0.001));
+  }
 
-		double timeDecel = (res.targetSpeed() - f) / 0.5;
-		double distDecel = RailsimCalc.calcTraveledDist(res.targetSpeed(), timeDecel, -0.5);
+  @Test
+  public void testCalcTargetDecel() {
 
-		double timeAccel = (res.targetSpeed() - current) / 0.5;
-		double distAccel = RailsimCalc.calcTraveledDist(5, timeAccel, 0.5);
+    double d = RailsimCalc.calcTargetDecel(1000, 0, 10);
 
-		assertThat(distDecel + distAccel)
-			.isCloseTo(dist, Offset.offset(0.001));
+    assertThat(RailsimCalc.calcTraveledDist(10, -10 / d, d)).isCloseTo(1000, Offset.offset(0.001));
 
-	}
+    d = RailsimCalc.calcTargetDecel(1000, 5, 10);
 
-	@Test
-	public void testCalcTargetDecel() {
+    assertThat(RailsimCalc.calcTraveledDist(10, -5 / d, d)).isCloseTo(1000, Offset.offset(0.001));
+  }
 
-		double d = RailsimCalc.calcTargetDecel(1000, 0, 10);
+  @Test
+  public void testCalcTargetSpeed() {
 
-		assertThat(RailsimCalc.calcTraveledDist(10, -10 / d, d))
-			.isCloseTo(1000, Offset.offset(0.001));
+    RailsimCalc.SpeedTarget target = RailsimCalc.calcTargetSpeed(100, 0.5, 0.5, 0, 23, 0);
 
-		d = RailsimCalc.calcTargetDecel(1000, 5, 10);
+    double t = RailsimCalc.solveTraveledDist(0, 50, 0.5);
 
-		assertThat(RailsimCalc.calcTraveledDist(10, -5 / d, d))
-			.isCloseTo(1000, Offset.offset(0.001));
+    // Train can not reach target speed and accelerates until 50m
+    assertThat(target.decelDist()).isCloseTo(50, Offset.offset(0.0001));
 
-	}
+    assertThat(RailsimCalc.calcTraveledDist(target.targetSpeed(), t, -0.5))
+        .isCloseTo(50, Offset.offset(0.0001));
 
-	@Test
-	public void testCalcTargetSpeed() {
+    target = RailsimCalc.calcTargetSpeed(200, 0.5, 0.5, 13, 13, 0);
 
-		RailsimCalc.SpeedTarget target = RailsimCalc.calcTargetSpeed(100, 0.5, 0.5, 0, 23, 0);
+    assertThat(target.targetSpeed()).isCloseTo(13, Offset.offset(0.0001));
 
+    // assume travelling at max speed for 31m
+    assertThat(target.decelDist()).isCloseTo(31, Offset.offset(0.0001));
 
-		double t = RailsimCalc.solveTraveledDist(0, 50, 0.5);
+    t = RailsimCalc.solveTraveledDist(13, 200 - 31, -0.5);
 
-		// Train can not reach target speed and accelerates until 50m
-		assertThat(target.decelDist())
-			.isCloseTo(50, Offset.offset(0.0001));
+    // speed is 0 after decelerating rest of the distance
+    assertThat(13 + t * -0.5).isCloseTo(0, Offset.offset(0.001));
+  }
 
-		assertThat(RailsimCalc.calcTraveledDist(target.targetSpeed(), t, -0.5))
-			.isCloseTo(50, Offset.offset(0.0001));
+  @Test
+  public void testCalcTargetSpeedForStop() {
 
+    double v = RailsimCalc.calcTargetSpeedForStop(1000, 0.5, 0.5, 0);
 
-		target = RailsimCalc.calcTargetSpeed(200, 0.5, 0.5, 13, 13, 0);
+    double accelTime = v / 0.5;
 
-		assertThat(target.targetSpeed())
-			.isCloseTo(13, Offset.offset(0.0001));
+    double d1 = RailsimCalc.calcTraveledDist(0, accelTime, 0.5);
+    double d2 = RailsimCalc.calcTraveledDist(v, accelTime, -0.5);
 
-		// assume travelling at max speed for 31m
-		assertThat(target.decelDist())
-			.isCloseTo(31, Offset.offset(0.0001));
-
-		t = RailsimCalc.solveTraveledDist(13, 200 - 31, -0.5);
-
-		// speed is 0 after decelerating rest of the distance
-		assertThat(13 + t * -0.5)
-			.isCloseTo(0, Offset.offset(0.001));
-
-	}
-
-	@Test
-	public void testCalcTargetSpeedForStop() {
-
-		double v = RailsimCalc.calcTargetSpeedForStop(1000, 0.5, 0.5, 0);
-
-		double accelTime = v / 0.5;
-
-		double d1 = RailsimCalc.calcTraveledDist(0, accelTime, 0.5);
-		double d2 = RailsimCalc.calcTraveledDist(v, accelTime, -0.5);
-
-		assertThat(d1 + d2)
-			.isCloseTo(1000, Offset.offset(0.0001));
-
-	}
+    assertThat(d1 + d2).isCloseTo(1000, Offset.offset(0.0001));
+  }
 }

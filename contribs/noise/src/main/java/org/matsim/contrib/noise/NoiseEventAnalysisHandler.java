@@ -17,72 +17,65 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
+/** */
 package org.matsim.contrib.noise;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
 /**
  * Analyzes an event file with noise events.
- * 
- * @author ikaddoura
  *
+ * @author ikaddoura
  */
-public class NoiseEventAnalysisHandler implements NoiseEventCausedHandler, NoiseEventAffectedHandler {
+public class NoiseEventAnalysisHandler
+    implements NoiseEventCausedHandler, NoiseEventAffectedHandler {
 
-	private SortedMap<Id<Person>, Double> id2causedNoiseCost = new TreeMap<Id<Person>, Double>();
-	private SortedMap<Id<Person>, Double> id2affectedNoiseCost = new TreeMap<Id<Person>, Double>();
+  private SortedMap<Id<Person>, Double> id2causedNoiseCost = new TreeMap<Id<Person>, Double>();
+  private SortedMap<Id<Person>, Double> id2affectedNoiseCost = new TreeMap<Id<Person>, Double>();
 
-	@Override
-	public void reset(int iteration) {
-		id2causedNoiseCost.clear();
-		id2affectedNoiseCost.clear();
-	}
+  @Override
+  public void reset(int iteration) {
+    id2causedNoiseCost.clear();
+    id2affectedNoiseCost.clear();
+  }
 
-	@Override
-	public void handleEvent(NoiseEventCaused event) {
+  @Override
+  public void handleEvent(NoiseEventCaused event) {
 
-		Id<Person> id = event.getCausingAgentId();
-		Double amountByEvent = event.getAmount();
-		Double amountSoFar = id2causedNoiseCost.get(id);
-		
-		if (amountSoFar == null) {
-			id2causedNoiseCost.put(id, amountByEvent);
-		}
-		else {
-			amountSoFar += amountByEvent;
-			id2causedNoiseCost.put(id, amountSoFar);
-		}	
-		
-	}
+    Id<Person> id = event.getCausingAgentId();
+    Double amountByEvent = event.getAmount();
+    Double amountSoFar = id2causedNoiseCost.get(id);
 
-	@Override
-	public void handleEvent(NoiseEventAffected event) {
-		Id<Person> id = event.getAffectedAgentId();
-		Double amountByEvent = event.getAmount();
-		Double amountSoFar = id2affectedNoiseCost.get(id);
-		
-		if (amountSoFar == null) {
-			id2affectedNoiseCost.put(id, amountByEvent);
-		}
-		else {
-			amountSoFar += amountByEvent;
-			id2affectedNoiseCost.put(id, amountSoFar);
-		}
-	}
+    if (amountSoFar == null) {
+      id2causedNoiseCost.put(id, amountByEvent);
+    } else {
+      amountSoFar += amountByEvent;
+      id2causedNoiseCost.put(id, amountSoFar);
+    }
+  }
 
-	public SortedMap<Id<Person>, Double> getPersonId2causedNoiseCost() {
-		return id2causedNoiseCost;
-	}
+  @Override
+  public void handleEvent(NoiseEventAffected event) {
+    Id<Person> id = event.getAffectedAgentId();
+    Double amountByEvent = event.getAmount();
+    Double amountSoFar = id2affectedNoiseCost.get(id);
 
-	public SortedMap<Id<Person>, Double> getPersonId2affectedNoiseCost() {
-		return id2affectedNoiseCost;
-	}
+    if (amountSoFar == null) {
+      id2affectedNoiseCost.put(id, amountByEvent);
+    } else {
+      amountSoFar += amountByEvent;
+      id2affectedNoiseCost.put(id, amountSoFar);
+    }
+  }
 
+  public SortedMap<Id<Person>, Double> getPersonId2causedNoiseCost() {
+    return id2causedNoiseCost;
+  }
+
+  public SortedMap<Id<Person>, Double> getPersonId2affectedNoiseCost() {
+    return id2affectedNoiseCost;
+  }
 }

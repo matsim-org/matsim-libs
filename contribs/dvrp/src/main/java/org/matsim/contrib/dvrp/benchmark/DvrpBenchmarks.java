@@ -20,25 +20,24 @@
 
 package org.matsim.contrib.dvrp.benchmark;
 
+import com.google.common.collect.ImmutableSet;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 
-import com.google.common.collect.ImmutableSet;
-
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class DvrpBenchmarks {
-	public static void adjustConfig(Config config) {
-		DvrpConfigGroup.get(config).networkModes = ImmutableSet.of();// to switch off network filtering
-		config.addConfigConsistencyChecker(new DvrpBenchmarkConfigConsistencyChecker());
-	}
+  public static void adjustConfig(Config config) {
+    DvrpConfigGroup.get(config).networkModes = ImmutableSet.of(); // to switch off network filtering
+    config.addConfigConsistencyChecker(new DvrpBenchmarkConfigConsistencyChecker());
+  }
 
-	public static void initController(Controler controler) {
-		controler.setModules(new DvrpBenchmarkControlerModule());
-		controler.addOverridingModule(new DvrpModule(new DvrpBenchmarkTravelTimeModule()));
-		controler.addOverridingQSimModule(new DvrpBenchmarkQSimModule());
-	}
+  public static void initController(Controler controler) {
+    controler.setModules(new DvrpBenchmarkControlerModule());
+    controler.addOverridingModule(new DvrpModule(new DvrpBenchmarkTravelTimeModule()));
+    controler.addOverridingQSimModule(new DvrpBenchmarkQSimModule());
+  }
 }

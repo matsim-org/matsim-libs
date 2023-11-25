@@ -22,7 +22,6 @@ package playground.vsp.analysis.modules.emissionsAnalyzer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.Pollutant;
@@ -31,40 +30,39 @@ import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 
 /**
  * @author benjamin
- *
  */
 public class EmissionsPerPersonColdEventHandler implements ColdEmissionEventHandler {
 
-	Map<Id<Person>, Map<Pollutant, Double>> coldEmissionsTotal = new HashMap<>();
+  Map<Id<Person>, Map<Pollutant, Double>> coldEmissionsTotal = new HashMap<>();
 
-	@Override
-	public void handleEvent(ColdEmissionEvent event) {
-		// TODO person id statt vehicleid??? woher?
-		Id<Person> personId = Id.create(event.getVehicleId(), Person.class);
-		Map<Pollutant, Double> coldEmissionsOfEvent = event.getColdEmissions();
+  @Override
+  public void handleEvent(ColdEmissionEvent event) {
+    // TODO person id statt vehicleid??? woher?
+    Id<Person> personId = Id.create(event.getVehicleId(), Person.class);
+    Map<Pollutant, Double> coldEmissionsOfEvent = event.getColdEmissions();
 
-		if(coldEmissionsTotal.get(personId) != null){
-			Map<Pollutant, Double> coldEmissionsSoFar = coldEmissionsTotal.get(personId );
-			for( Entry<Pollutant, Double> entry : coldEmissionsOfEvent.entrySet()){
-				Pollutant pollutant = entry.getKey();
-				Double eventValue = entry.getValue();
+    if (coldEmissionsTotal.get(personId) != null) {
+      Map<Pollutant, Double> coldEmissionsSoFar = coldEmissionsTotal.get(personId);
+      for (Entry<Pollutant, Double> entry : coldEmissionsOfEvent.entrySet()) {
+        Pollutant pollutant = entry.getKey();
+        Double eventValue = entry.getValue();
 
-				Double previousValue = coldEmissionsSoFar.get(pollutant);
-				Double newValue = previousValue + eventValue;
-				coldEmissionsSoFar.put(pollutant, newValue);
-			}
-			coldEmissionsTotal.put(personId, coldEmissionsSoFar);
-		} else {
-			coldEmissionsTotal.put(personId, coldEmissionsOfEvent);
-		}
-	}
+        Double previousValue = coldEmissionsSoFar.get(pollutant);
+        Double newValue = previousValue + eventValue;
+        coldEmissionsSoFar.put(pollutant, newValue);
+      }
+      coldEmissionsTotal.put(personId, coldEmissionsSoFar);
+    } else {
+      coldEmissionsTotal.put(personId, coldEmissionsOfEvent);
+    }
+  }
 
-	public Map<Id<Person>, Map<Pollutant, Double>> getColdEmissionsPerPerson() {
-		return coldEmissionsTotal;
-	}
+  public Map<Id<Person>, Map<Pollutant, Double>> getColdEmissionsPerPerson() {
+    return coldEmissionsTotal;
+  }
 
-	@Override
-	public void reset(int iteration) {
-		coldEmissionsTotal.clear();
-	}
+  @Override
+  public void reset(int iteration) {
+    coldEmissionsTotal.clear();
+  }
 }

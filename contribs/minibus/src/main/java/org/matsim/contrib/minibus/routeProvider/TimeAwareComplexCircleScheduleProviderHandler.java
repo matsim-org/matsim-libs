@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.minibus.routeProvider;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -29,99 +31,101 @@ import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityE
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-
 /**
  * @author aneumann
  */
-final class TimeAwareComplexCircleScheduleProviderHandler implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler{
+final class TimeAwareComplexCircleScheduleProviderHandler
+    implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler {
 
-	@SuppressWarnings("unused")
-	private final static Logger log = LogManager.getLogger(TimeAwareComplexCircleScheduleProviderHandler.class);
-	
-	private final String pIdentifier;
-	private LinkedHashMap<Id<Vehicle>, TransitDriverStartsEvent> vehId2StartsEvent = new LinkedHashMap<>();
-	private LinkedHashMap<Id<Vehicle>, ArrayList<Double>> vehId2Offset = new LinkedHashMap<>();
-	private LinkedHashMap<Id<TransitRoute>, ArrayList<TinyStatsContainer>> routeId2StatsContrainerMap = new LinkedHashMap<>();
+  @SuppressWarnings("unused")
+  private static final Logger log =
+      LogManager.getLogger(TimeAwareComplexCircleScheduleProviderHandler.class);
 
-	
-	public TimeAwareComplexCircleScheduleProviderHandler(String pIdentifier) {
-		this.pIdentifier = pIdentifier;
-	}
+  private final String pIdentifier;
+  private LinkedHashMap<Id<Vehicle>, TransitDriverStartsEvent> vehId2StartsEvent =
+      new LinkedHashMap<>();
+  private LinkedHashMap<Id<Vehicle>, ArrayList<Double>> vehId2Offset = new LinkedHashMap<>();
+  private LinkedHashMap<Id<TransitRoute>, ArrayList<TinyStatsContainer>>
+      routeId2StatsContrainerMap = new LinkedHashMap<>();
 
-	@Override
-	public void reset(int iteration) {
-		this.vehId2StartsEvent = new LinkedHashMap<>();
-		this.vehId2Offset = new LinkedHashMap<>();
-		this.routeId2StatsContrainerMap = new LinkedHashMap<>();
-	}
+  public TimeAwareComplexCircleScheduleProviderHandler(String pIdentifier) {
+    this.pIdentifier = pIdentifier;
+  }
 
-	@Override
-	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		if(event.getVehicleId().toString().contains(this.pIdentifier)){
-			if (this.vehId2Offset.get(event.getVehicleId()) == null) {
-				this.vehId2Offset.put(event.getVehicleId(), new ArrayList<Double>());				
-			}
-			this.vehId2Offset.get(event.getVehicleId()).add(event.getTime());
-		}
-		
-	}
+  @Override
+  public void reset(int iteration) {
+    this.vehId2StartsEvent = new LinkedHashMap<>();
+    this.vehId2Offset = new LinkedHashMap<>();
+    this.routeId2StatsContrainerMap = new LinkedHashMap<>();
+  }
 
-	@Override
-	public void handleEvent(TransitDriverStartsEvent event) {
-		if(event.getVehicleId().toString().contains(this.pIdentifier)){
-			// first complete old entry
-			addEntry2Stats(this.vehId2StartsEvent.get(event.getVehicleId()), this.vehId2Offset.get(event.getVehicleId()));
-			// add new event
-			this.vehId2StartsEvent.put(event.getVehicleId(), event);
-			this.vehId2Offset.put(event.getVehicleId(), new ArrayList<Double>());
-			
-		}
-		
-	}
-	
-	private void addEntry2Stats(TransitDriverStartsEvent event, ArrayList<Double> offsetList){
-		if (event == null || offsetList == null) {
-			return;
-		}
-		
-		if (this.routeId2StatsContrainerMap.get(event.getTransitRouteId()) == null) {
-			// first entry - create new one
-			ArrayList<TinyStatsContainer> statsList = new ArrayList<>();
-			for (Double offset : offsetList) {
-				TinyStatsContainer statsContainer = new TinyStatsContainer();
-				statsContainer.handleEntry(offset - event.getTime());
-				statsList.add(statsContainer);
-			}
-			this.routeId2StatsContrainerMap.put(event.getTransitRouteId(), statsList);
-		} else {
-			// update existing one
-			for (int i = 0; i < offsetList.size(); i++) {
-				this.routeId2StatsContrainerMap.get(event.getTransitRouteId()).get(i).handleEntry(offsetList.get(i) - event.getTime());
-			}
-		}
-	}
-	
-	private class TinyStatsContainer{
-		private int numberOfEntries = 0;
-		private double sumOfEntries = 0.0;
-		
-		void handleEntry(double entry){
-			this.sumOfEntries += entry;
-			this.numberOfEntries++;
-		}
-		
-		double getMean(){
-			return this.sumOfEntries / this.numberOfEntries;
-		}
-	}
+  @Override
+  public void handleEvent(VehicleArrivesAtFacilityEvent event) {
+    if (event.getVehicleId().toString().contains(this.pIdentifier)) {
+      if (this.vehId2Offset.get(event.getVehicleId()) == null) {
+        this.vehId2Offset.put(event.getVehicleId(), new ArrayList<Double>());
+      }
+      this.vehId2Offset.get(event.getVehicleId()).add(event.getTime());
+    }
+  }
 
-	public double getOffsetForRouteAndStopNumber(Id<TransitRoute> routeID, int stopIndex) {
-		if (this.routeId2StatsContrainerMap.get(routeID) == null) {
-			return -Double.MAX_VALUE;
-		}
-		
-		return this.routeId2StatsContrainerMap.get(routeID).get(stopIndex).getMean();
-	}
+  @Override
+  public void handleEvent(TransitDriverStartsEvent event) {
+    if (event.getVehicleId().toString().contains(this.pIdentifier)) {
+      // first complete old entry
+      addEntry2Stats(
+          this.vehId2StartsEvent.get(event.getVehicleId()),
+          this.vehId2Offset.get(event.getVehicleId()));
+      // add new event
+      this.vehId2StartsEvent.put(event.getVehicleId(), event);
+      this.vehId2Offset.put(event.getVehicleId(), new ArrayList<Double>());
+    }
+  }
+
+  private void addEntry2Stats(TransitDriverStartsEvent event, ArrayList<Double> offsetList) {
+    if (event == null || offsetList == null) {
+      return;
+    }
+
+    if (this.routeId2StatsContrainerMap.get(event.getTransitRouteId()) == null) {
+      // first entry - create new one
+      ArrayList<TinyStatsContainer> statsList = new ArrayList<>();
+      for (Double offset : offsetList) {
+        TinyStatsContainer statsContainer = new TinyStatsContainer();
+        statsContainer.handleEntry(offset - event.getTime());
+        statsList.add(statsContainer);
+      }
+      this.routeId2StatsContrainerMap.put(event.getTransitRouteId(), statsList);
+    } else {
+      // update existing one
+      for (int i = 0; i < offsetList.size(); i++) {
+        this.routeId2StatsContrainerMap
+            .get(event.getTransitRouteId())
+            .get(i)
+            .handleEntry(offsetList.get(i) - event.getTime());
+      }
+    }
+  }
+
+  private class TinyStatsContainer {
+    private int numberOfEntries = 0;
+    private double sumOfEntries = 0.0;
+
+    void handleEntry(double entry) {
+      this.sumOfEntries += entry;
+      this.numberOfEntries++;
+    }
+
+    double getMean() {
+      return this.sumOfEntries / this.numberOfEntries;
+    }
+  }
+
+  public double getOffsetForRouteAndStopNumber(Id<TransitRoute> routeID, int stopIndex) {
+    if (this.routeId2StatsContrainerMap.get(routeID) == null) {
+      return -Double.MAX_VALUE;
+    }
+
+    return this.routeId2StatsContrainerMap.get(routeID).get(stopIndex).getMean();
+  }
 }

@@ -18,14 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
+/** */
 package org.matsim.contrib.decongestion;
 
-
 import java.io.IOException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -43,82 +39,84 @@ import org.matsim.core.scenario.ScenarioUtils;
  * Starts an interval-based decongestion pricing simulation run.
  *
  * @author ikaddoura
- *
  */
 public class DecongestionRunExample {
 
-	private static final Logger log = LogManager.getLogger(DecongestionRunExample.class);
+  private static final Logger log = LogManager.getLogger(DecongestionRunExample.class);
 
-	private static String configFile;
+  private static String configFile;
 
-	public static void main(String[] args) throws IOException {
+  public static void main(String[] args) throws IOException {
 
-		if (args.length > 0) {
-			log.info("Starting simulation run with the following arguments:");
+    if (args.length > 0) {
+      log.info("Starting simulation run with the following arguments:");
 
-			configFile = args[0];
-			log.info("config file: "+ configFile);
+      configFile = args[0];
+      log.info("config file: " + configFile);
 
-		} else {
-			configFile = "path/to/config.xml";
-		}
+    } else {
+      configFile = "path/to/config.xml";
+    }
 
-		DecongestionRunExample main = new DecongestionRunExample();
-		main.run();
+    DecongestionRunExample main = new DecongestionRunExample();
+    main.run();
+  }
 
-	}
+  private void run() {
 
-	private void run() {
+    final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+    decongestionSettings.setToleratedAverageDelaySec(30.);
+    decongestionSettings.setFractionOfIterationsToEndPriceAdjustment(1.0);
+    decongestionSettings.setFractionOfIterationsToStartPriceAdjustment(0.0);
+    decongestionSettings.setUpdatePriceInterval(1);
+    decongestionSettings.setMsa(false);
+    decongestionSettings.setTollBlendFactor(1.0);
 
-		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setToleratedAverageDelaySec(30.);
-		decongestionSettings.setFractionOfIterationsToEndPriceAdjustment(1.0);
-		decongestionSettings.setFractionOfIterationsToStartPriceAdjustment(0.0);
-		decongestionSettings.setUpdatePriceInterval(1);
-		decongestionSettings.setMsa(false);
-		decongestionSettings.setTollBlendFactor(1.0);
+    //		decongestionSettings.setDecongestionApproach(DecongestionApproach.P_MC);
 
-//		decongestionSettings.setDecongestionApproach(DecongestionApproach.P_MC);
+    decongestionSettings.setDecongestionApproach(DecongestionApproach.PID);
+    decongestionSettings.setKd(0.005);
+    decongestionSettings.setKi(0.005);
+    decongestionSettings.setKp(0.005);
+    decongestionSettings.setIntegralApproach(IntegralApproach.UnusedHeadway);
+    decongestionSettings.setIntegralApproachUnusedHeadwayFactor(10.0);
+    decongestionSettings.setIntegralApproachAverageAlpha(0.0);
 
-		decongestionSettings.setDecongestionApproach(DecongestionApproach.PID);
-		decongestionSettings.setKd(0.005);
-		decongestionSettings.setKi(0.005);
-		decongestionSettings.setKp(0.005);
-		decongestionSettings.setIntegralApproach(IntegralApproach.UnusedHeadway);
-		decongestionSettings.setIntegralApproachUnusedHeadwayFactor(10.0);
-		decongestionSettings.setIntegralApproachAverageAlpha(0.0);
+    //		decongestionSettings.setDecongestionApproach(DecongestionApproach.BangBang);
+    //		decongestionSettings.setTOLL_ADJUSTMENT(1.0);
+    //		decongestionSettings.setINITIAL_TOLL(1.0);
 
-//		decongestionSettings.setDecongestionApproach(DecongestionApproach.BangBang);
-//		decongestionSettings.setTOLL_ADJUSTMENT(1.0);
-//		decongestionSettings.setINITIAL_TOLL(1.0);
+    Config config = ConfigUtils.loadConfig(configFile);
+    config.addModule(decongestionSettings);
 
-		Config config = ConfigUtils.loadConfig(configFile);
-		config.addModule(decongestionSettings);
+    final Scenario scenario = ScenarioUtils.loadScenario(config);
+    Controler controler = new Controler(scenario);
 
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
+    // #############################################################
 
-		// #############################################################
+    // congestion toll computation
 
-		// congestion toll computation
+    controler.addOverridingModule(new DecongestionModule(scenario));
 
-		controler.addOverridingModule(new DecongestionModule(scenario));
+    // toll-adjusted routing
 
-		// toll-adjusted routing
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory =
+                new TollTimeDistanceTravelDisutilityFactory();
+            this.bindCarTravelDisutilityFactory().toInstance(travelDisutilityFactory);
+          }
+        });
 
-		controler.addOverridingModule(new AbstractModule(){
-			@Override
-			public void install() {
-				final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
-                                this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
-			}
-		});
+    // #############################################################
 
-		// #############################################################
-
-		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
-        controler.run();
-
-	}
+    controler
+        .getConfig()
+        .controller()
+        .setOverwriteFileSetting(
+            OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
+    controler.run();
+  }
 }
-

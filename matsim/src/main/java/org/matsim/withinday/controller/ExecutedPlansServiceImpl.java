@@ -20,6 +20,9 @@
 
 package org.matsim.withinday.controller;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -44,107 +47,111 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-import java.util.Map;
-
 /**
- * Take the plans that the agents have after within-day replanning, and write them to file.
- * <br>
+ * Take the plans that the agents have after within-day replanning, and write them to file. <br>
  * Not the same as the {@link ExperiencedPlansService}, since that is based on the events.
  *
  * @author (of documentation) nagel
-  */
+ */
 @Singleton
 public class ExecutedPlansServiceImpl implements AfterMobsimListener, ExecutedPlansService {
-	// I renamed this from ExperiencedPlansWriter into ExecutedPlansWriter since we also have an ExperiencedPlansService that
-	// reconstructs experienced plans from events. kai, jun'16
+  // I renamed this from ExperiencedPlansWriter into ExecutedPlansWriter since we also have an
+  // ExperiencedPlansService that
+  // reconstructs experienced plans from events. kai, jun'16
 
-	private static final Logger log = LogManager.getLogger( ExecutedPlansServiceImpl.class );
+  private static final Logger log = LogManager.getLogger(ExecutedPlansServiceImpl.class);
 
-	public static final String EXECUTEDPLANSFILE = "executedPlans.xml.gz";
+  public static final String EXECUTEDPLANSFILE = "executedPlans.xml.gz";
 
-	private Population experiencedPopulation ;
+  private Population experiencedPopulation;
 
-	private Scenario scenario;
+  private Scenario scenario;
 
-	private MobsimDataProvider mobsimDataProvider;
+  private MobsimDataProvider mobsimDataProvider;
 
-	private OutputDirectoryHierarchy controlerIO;
+  private OutputDirectoryHierarchy controlerIO;
 
-	@Inject
-	ExecutedPlansServiceImpl( Scenario scenario, MobsimDataProvider mobsimDataProvider, OutputDirectoryHierarchy controlerIO ) {
-		this.scenario = scenario;
-		this.mobsimDataProvider = mobsimDataProvider;
-		this.controlerIO = controlerIO;
-	}
+  @Inject
+  ExecutedPlansServiceImpl(
+      Scenario scenario,
+      MobsimDataProvider mobsimDataProvider,
+      OutputDirectoryHierarchy controlerIO) {
+    this.scenario = scenario;
+    this.mobsimDataProvider = mobsimDataProvider;
+    this.controlerIO = controlerIO;
+  }
 
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		Gbl.assertNotNull(scenario);
-		final Config config = scenario.getConfig();
-		Scenario experiencedScenario = ScenarioUtils.createScenario(config);
-		experiencedPopulation = experiencedScenario.getPopulation();
+  @Override
+  public void notifyAfterMobsim(AfterMobsimEvent event) {
+    Gbl.assertNotNull(scenario);
+    final Config config = scenario.getConfig();
+    Scenario experiencedScenario = ScenarioUtils.createScenario(config);
+    experiencedPopulation = experiencedScenario.getPopulation();
 
-		for (Person person : scenario.getPopulation().getPersons().values()) {
+    for (Person person : scenario.getPopulation().getPersons().values()) {
 
-			MobsimAgent agent = this.mobsimDataProvider.getAgent(person.getId());
+      MobsimAgent agent = this.mobsimDataProvider.getAgent(person.getId());
 
-			if (agent == null || !(agent instanceof PersonDriverAgentImpl)) experiencedPopulation.addPerson(person);
-			else {
-				Person experiencedPerson = experiencedPopulation.getFactory().createPerson(person.getId());
+      if (agent == null || !(agent instanceof PersonDriverAgentImpl))
+        experiencedPopulation.addPerson(person);
+      else {
+        Person experiencedPerson = experiencedPopulation.getFactory().createPerson(person.getId());
 
-				// add experienced plan
-				final Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
-				experiencedPerson.addPlan(plan);
-				experiencedPerson.setSelectedPlan(plan);
+        // add experienced plan
+        final Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
+        experiencedPerson.addPlan(plan);
+        experiencedPerson.setSelectedPlan(plan);
 
-				// copy attributes
-				PersonUtils.setAge(experiencedPerson, PersonUtils.getAge(person));
-				PersonUtils.setCarAvail(experiencedPerson, PersonUtils.getCarAvail(person));
-				PersonUtils.setEmployed(experiencedPerson, PersonUtils.isEmployed(person));
-				PersonUtils.setLicence(experiencedPerson, PersonUtils.getLicense(person));
-				PersonUtils.setSex(experiencedPerson, PersonUtils.getSex(person));
+        // copy attributes
+        PersonUtils.setAge(experiencedPerson, PersonUtils.getAge(person));
+        PersonUtils.setCarAvail(experiencedPerson, PersonUtils.getCarAvail(person));
+        PersonUtils.setEmployed(experiencedPerson, PersonUtils.isEmployed(person));
+        PersonUtils.setLicence(experiencedPerson, PersonUtils.getLicense(person));
+        PersonUtils.setSex(experiencedPerson, PersonUtils.getSex(person));
 
-				experiencedPopulation.addPerson(experiencedPerson);
-			}
-		}
+        experiencedPopulation.addPerson(experiencedPerson);
+      }
+    }
 
-		// write this in every iteration in order to be consistent with previous design.  I think this should be changed.  kai, jun'16
-		// as a quick fix, writing this as often as the base plans file.  kai, jun'23
-		if ( event.getIteration() % scenario.getConfig().controller().getWritePlansInterval() == 0 ){
-			String outputFile = controlerIO.getIterationFilename( event.getIteration(), EXECUTEDPLANSFILE );
-			writeExecutedPlans( outputFile );
-		}
-	}
+    // write this in every iteration in order to be consistent with previous design.  I think this
+    // should be changed.  kai, jun'16
+    // as a quick fix, writing this as often as the base plans file.  kai, jun'23
+    if (event.getIteration() % scenario.getConfig().controller().getWritePlansInterval() == 0) {
+      String outputFile = controlerIO.getIterationFilename(event.getIteration(), EXECUTEDPLANSFILE);
+      writeExecutedPlans(outputFile);
+    }
+  }
 
-	@Override
-	public void writeExecutedPlans(String outputFile) {
-		final Config config = scenario.getConfig();
-		final String inputCRS = config.plans().getInputCRS();
-		final String internalCRS = config.global().getCoordinateSystem();
+  @Override
+  public void writeExecutedPlans(String outputFile) {
+    final Config config = scenario.getConfig();
+    final String inputCRS = config.plans().getInputCRS();
+    final String internalCRS = config.global().getCoordinateSystem();
 
-		if ( inputCRS == null ) {
-			new PopulationWriter(experiencedPopulation, scenario.getNetwork()).write(outputFile);
-		}
-		else {
-			log.info( "re-projecting \"experienced\" population from "+internalCRS+" to "+inputCRS+" for export" );
+    if (inputCRS == null) {
+      new PopulationWriter(experiencedPopulation, scenario.getNetwork()).write(outputFile);
+    } else {
+      log.info(
+          "re-projecting \"experienced\" population from "
+              + internalCRS
+              + " to "
+              + inputCRS
+              + " for export");
 
-			final CoordinateTransformation transformation =
-					TransformationFactory.getCoordinateTransformation(
-							internalCRS,
-							inputCRS );
+      final CoordinateTransformation transformation =
+          TransformationFactory.getCoordinateTransformation(internalCRS, inputCRS);
 
-			new PopulationWriter(transformation, experiencedPopulation, scenario.getNetwork()).write(outputFile);
-		}
-	}
+      new PopulationWriter(transformation, experiencedPopulation, scenario.getNetwork())
+          .write(outputFile);
+    }
+  }
 
-	@Override
-	public Map<Id<Person>, Plan> getExecutedPlans() {
-		IdMap<Person, Plan> map = new IdMap<>(Person.class) ;
-		for ( Person pp : this.experiencedPopulation.getPersons().values() ) {
-			map.put( pp.getId(), pp.getSelectedPlan() ) ;
-		}
-		return map ;
-	}
+  @Override
+  public Map<Id<Person>, Plan> getExecutedPlans() {
+    IdMap<Person, Plan> map = new IdMap<>(Person.class);
+    for (Person pp : this.experiencedPopulation.getPersons().values()) {
+      map.put(pp.getId(), pp.getSelectedPlan());
+    }
+    return map;
+  }
 }

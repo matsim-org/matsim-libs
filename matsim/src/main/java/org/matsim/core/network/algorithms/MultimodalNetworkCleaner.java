@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -48,229 +47,250 @@ import org.matsim.api.core.v01.network.Node;
  */
 public final class MultimodalNetworkCleaner {
 
-	private final static Logger log = LogManager.getLogger(MultimodalNetworkCleaner.class);
+  private static final Logger log = LogManager.getLogger(MultimodalNetworkCleaner.class);
 
-	private final Network network;
-	
-	private final Set<Id<Link>> removedLinks = new HashSet<>();
-	private final Set<Id<Link>> modifiedLinks = new HashSet<>();
+  private final Network network;
 
-	public MultimodalNetworkCleaner(final Network network) {
-		this.network = network;
-	}
+  private final Set<Id<Link>> removedLinks = new HashSet<>();
+  private final Set<Id<Link>> modifiedLinks = new HashSet<>();
 
-	/**
-	 * Removes nodes from the network that have no incoming or outgoing links attached to them.
-	 */
-	public void removeNodesWithoutLinks() {
-		List<Node> toBeRemoved = new ArrayList<>();
-		for (Node node : this.network.getNodes().values()) {
-			if ((node.getInLinks().size() == 0) && (node.getOutLinks().size() == 0)) {
-				toBeRemoved.add(node);
-			}
-		}
-		for (Node node : toBeRemoved) {
-			this.network.removeNode(node.getId());
-		}
-	}
+  public MultimodalNetworkCleaner(final Network network) {
+    this.network = network;
+  }
 
-	/**
-	 * Modifies the network such that the subnetwork containing only links that have at least
-	 * one of the specified transport modes in their set of allowed transport modes is strongly
-	 * connected (=every link/node can be reached by every other link/node). If multiple modes
-	 * are given, the algorithm does <em>not</em> guarantee that the resulting network is strongly
-	 * connected for each of the modes individually! Nodes having links connected to them before
-	 * cleaning, but none after cleaning, are removed from the network.
-	 *
-	 * @param modes
-	 */
-	public void run(final Set<String> modes) {
-		run(modes, new HashSet<String>());
-	}
+  /** Removes nodes from the network that have no incoming or outgoing links attached to them. */
+  public void removeNodesWithoutLinks() {
+    List<Node> toBeRemoved = new ArrayList<>();
+    for (Node node : this.network.getNodes().values()) {
+      if ((node.getInLinks().size() == 0) && (node.getOutLinks().size() == 0)) {
+        toBeRemoved.add(node);
+      }
+    }
+    for (Node node : toBeRemoved) {
+      this.network.removeNode(node.getId());
+    }
+  }
 
-	/**
-	 * Modifies the network such that the subnetwork containing only links that have at least
-	 * one of the specified transport modes (<code>cleaningModes</code> as well as
-	 * <code>connectivityModes</code>) in their set of allowed transport modes is strongly
-	 * connected (=every link/node can be reached by every other link/node). In contrast to
-	 * {@link #run(Set)}, this method will only remove <code>cleaningModes</code> from links,
-	 * but not <code>connectivityModes</code>. Thus, the resulting  network may still contain
-	 * nodes that are sources or sinks for modes of <code>connectivityModes</code>, but not
-	 * for modes of <code>cleaningModes</code> and <code>connectivityModes</code> combined. If
-	 * multiple modes are given as <code>cleaningModes</code>, the algorithm does <em>not</em>
-	 * guarantee that the resulting network is strongly connected for each of the modes
-	 * individually! The subnetwork consisting of links having only modes from
-	 * <code>cleaningModes</code> may not be strongly connected, only in combination with links
-	 * having modes from <code>connectivityModes</code>, a strongly connected subnetwork emerges.
-	 * Nodes having links connected to them before cleaning, but none after cleaning, are removed
-	 * from the network.
-	 *
-	 * @param cleaningModes
-	 * @param connectivityModes
-	 */
-	public void run(final Set<String> cleaningModes, final Set<String> connectivityModes) {
-		final Set<String> combinedModes = new HashSet<>(cleaningModes);
-		combinedModes.addAll(connectivityModes);
-		final Map<Id<Link>, Link> visitedLinks = new TreeMap<>();
-		Map<Id<Link>, Link> biggestCluster = new TreeMap<>();
+  /**
+   * Modifies the network such that the subnetwork containing only links that have at least one of
+   * the specified transport modes in their set of allowed transport modes is strongly connected
+   * (=every link/node can be reached by every other link/node). If multiple modes are given, the
+   * algorithm does <em>not</em> guarantee that the resulting network is strongly connected for each
+   * of the modes individually! Nodes having links connected to them before cleaning, but none after
+   * cleaning, are removed from the network.
+   *
+   * @param modes
+   */
+  public void run(final Set<String> modes) {
+    run(modes, new HashSet<String>());
+  }
 
-		log.info("running " + this.getClass().getName() + " algorithm for modes " + Arrays.toString(cleaningModes.toArray())
-				+ " with connectivity modes " + Arrays.toString(connectivityModes.toArray()) + "...");
+  /**
+   * Modifies the network such that the subnetwork containing only links that have at least one of
+   * the specified transport modes (<code>cleaningModes</code> as well as <code>connectivityModes
+   * </code>) in their set of allowed transport modes is strongly connected (=every link/node can be
+   * reached by every other link/node). In contrast to {@link #run(Set)}, this method will only
+   * remove <code>cleaningModes</code> from links, but not <code>connectivityModes</code>. Thus, the
+   * resulting network may still contain nodes that are sources or sinks for modes of <code>
+   * connectivityModes</code>, but not for modes of <code>cleaningModes</code> and <code>
+   * connectivityModes</code> combined. If multiple modes are given as <code>cleaningModes</code>,
+   * the algorithm does <em>not</em> guarantee that the resulting network is strongly connected for
+   * each of the modes individually! The subnetwork consisting of links having only modes from
+   * <code>cleaningModes</code> may not be strongly connected, only in combination with links having
+   * modes from <code>connectivityModes</code>, a strongly connected subnetwork emerges. Nodes
+   * having links connected to them before cleaning, but none after cleaning, are removed from the
+   * network.
+   *
+   * @param cleaningModes
+   * @param connectivityModes
+   */
+  public void run(final Set<String> cleaningModes, final Set<String> connectivityModes) {
+    final Set<String> combinedModes = new HashSet<>(cleaningModes);
+    combinedModes.addAll(connectivityModes);
+    final Map<Id<Link>, Link> visitedLinks = new TreeMap<>();
+    Map<Id<Link>, Link> biggestCluster = new TreeMap<>();
 
-		// search the biggest cluster of nodes in the network
-		log.info("  checking " + this.network.getNodes().size() + " nodes and " +
-				this.network.getLinks().size() + " links for dead-ends...");
-		boolean stillSearching = true;
-		Iterator<? extends Link> iter = this.network.getLinks().values().iterator();
-		while (iter.hasNext() && stillSearching) {
-			Link startLink = iter.next();
-			if ((!visitedLinks.containsKey(startLink.getId())) && (intersectingSets(combinedModes, startLink.getAllowedModes()))) {
-				Map<Id<Link>, Link> cluster = this.findCluster(startLink, combinedModes);
-				visitedLinks.putAll(cluster);
-				if (cluster.size() > biggestCluster.size()) {
-					biggestCluster = cluster;
-					if (biggestCluster.size() >= (this.network.getLinks().size() - visitedLinks.size())) {
-						// stop searching here, because we cannot find a bigger cluster in the lasting nodes
-						stillSearching = false;
-					}
-				}
-			}
-		}
-		log.info("    The biggest cluster consists of " + biggestCluster.size() + " links.");
-		log.info("  done.");
+    log.info(
+        "running "
+            + this.getClass().getName()
+            + " algorithm for modes "
+            + Arrays.toString(cleaningModes.toArray())
+            + " with connectivity modes "
+            + Arrays.toString(connectivityModes.toArray())
+            + "...");
 
-		/* Remove the modes from all links not being part of the cluster. If a link has no allowed mode
-		 * anymore after this, remove the link from the network.
-		 */
-		List<Link> allLinks = new ArrayList<>(this.network.getLinks().values());
-		for (Link link : allLinks) {
-			if (!biggestCluster.containsKey(link.getId())) {
-				Set<String> reducedModes = new HashSet<>(link.getAllowedModes());
-				reducedModes.removeAll(cleaningModes);
-				link.setAllowedModes(reducedModes);
-				if (reducedModes.isEmpty()) {
-					this.network.removeLink(link.getId());
-					if ((link.getFromNode().getInLinks().size() + link.getFromNode().getOutLinks().size()) == 0) {
-						this.network.removeNode(link.getFromNode().getId());
-					}
-					if ((link.getToNode().getInLinks().size() + link.getToNode().getOutLinks().size()) == 0) {
-						this.network.removeNode(link.getToNode().getId());
-					}
-					this.removedLinks.add(link.getId());
-				}
-				if(!removedLinks.contains(link.getId())) modifiedLinks.add(link.getId());
-			}
-		}
-		log.info("  resulting network contains " + this.network.getNodes().size() + " nodes and " +
-				this.network.getLinks().size() + " links.");
-		log.info("done.");
-	}
+    // search the biggest cluster of nodes in the network
+    log.info(
+        "  checking "
+            + this.network.getNodes().size()
+            + " nodes and "
+            + this.network.getLinks().size()
+            + " links for dead-ends...");
+    boolean stillSearching = true;
+    Iterator<? extends Link> iter = this.network.getLinks().values().iterator();
+    while (iter.hasNext() && stillSearching) {
+      Link startLink = iter.next();
+      if ((!visitedLinks.containsKey(startLink.getId()))
+          && (intersectingSets(combinedModes, startLink.getAllowedModes()))) {
+        Map<Id<Link>, Link> cluster = this.findCluster(startLink, combinedModes);
+        visitedLinks.putAll(cluster);
+        if (cluster.size() > biggestCluster.size()) {
+          biggestCluster = cluster;
+          if (biggestCluster.size() >= (this.network.getLinks().size() - visitedLinks.size())) {
+            // stop searching here, because we cannot find a bigger cluster in the lasting nodes
+            stillSearching = false;
+          }
+        }
+      }
+    }
+    log.info("    The biggest cluster consists of " + biggestCluster.size() + " links.");
+    log.info("  done.");
 
-	/**
-	 * Finds the cluster of links <pre>startLink</pre> is part of. The cluster
-	 * contains all links which can be reached starting at <code>startLink</code>
-	 * and from where it is also possible to return again to <code>startLink</code>.
-	 *
-	 * @param startLink the link to start building the cluster
-	 * @param modes the set of modes that are allowed to
-	 * @return cluster of links <pre>startLink</pre> is part of
-	 */
-	private Map<Id<Link>, Link> findCluster(final Link startLink, final Set<String> modes) {
+    /* Remove the modes from all links not being part of the cluster. If a link has no allowed mode
+     * anymore after this, remove the link from the network.
+     */
+    List<Link> allLinks = new ArrayList<>(this.network.getLinks().values());
+    for (Link link : allLinks) {
+      if (!biggestCluster.containsKey(link.getId())) {
+        Set<String> reducedModes = new HashSet<>(link.getAllowedModes());
+        reducedModes.removeAll(cleaningModes);
+        link.setAllowedModes(reducedModes);
+        if (reducedModes.isEmpty()) {
+          this.network.removeLink(link.getId());
+          if ((link.getFromNode().getInLinks().size() + link.getFromNode().getOutLinks().size())
+              == 0) {
+            this.network.removeNode(link.getFromNode().getId());
+          }
+          if ((link.getToNode().getInLinks().size() + link.getToNode().getOutLinks().size()) == 0) {
+            this.network.removeNode(link.getToNode().getId());
+          }
+          this.removedLinks.add(link.getId());
+        }
+        if (!removedLinks.contains(link.getId())) modifiedLinks.add(link.getId());
+      }
+    }
+    log.info(
+        "  resulting network contains "
+            + this.network.getNodes().size()
+            + " nodes and "
+            + this.network.getLinks().size()
+            + " links.");
+    log.info("done.");
+  }
 
-		final Map<Id<Link>, DoubleFlagRole> linkRoles = new HashMap<>(this.network.getLinks().size());
+  /**
+   * Finds the cluster of links
+   *
+   * <pre>startLink</pre>
+   *
+   * is part of. The cluster contains all links which can be reached starting at <code>startLink
+   * </code> and from where it is also possible to return again to <code>startLink</code>.
+   *
+   * @param startLink the link to start building the cluster
+   * @param modes the set of modes that are allowed to
+   * @return cluster of links
+   *     <pre>startLink</pre>
+   *     is part of
+   */
+  private Map<Id<Link>, Link> findCluster(final Link startLink, final Set<String> modes) {
 
-		ArrayList<Node> pendingForward = new ArrayList<>();
-		ArrayList<Node> pendingBackward = new ArrayList<>();
+    final Map<Id<Link>, DoubleFlagRole> linkRoles = new HashMap<>(this.network.getLinks().size());
 
-		TreeMap<Id<Link>, Link> clusterLinks = new TreeMap<>();
+    ArrayList<Node> pendingForward = new ArrayList<>();
+    ArrayList<Node> pendingBackward = new ArrayList<>();
 
-		pendingForward.add(startLink.getToNode());
-		pendingBackward.add(startLink.getFromNode());
+    TreeMap<Id<Link>, Link> clusterLinks = new TreeMap<>();
 
-		// step through the network in forward mode
-		while (pendingForward.size() > 0) {
-			int idx = pendingForward.size() - 1;
-			Node currNode = pendingForward.remove(idx); // get the last element to prevent object shifting in the array
-			for (Link link : currNode.getOutLinks().values()) {
-				if (intersectingSets(modes, link.getAllowedModes())) {
-					DoubleFlagRole r = getDoubleFlag(link, linkRoles);
-					if (!r.forwardFlag) {
-						r.forwardFlag = true;
-						pendingForward.add(link.getToNode());
-					}
-				}
-			}
-		}
+    pendingForward.add(startLink.getToNode());
+    pendingBackward.add(startLink.getFromNode());
 
-		// now step through the network in backward mode
-		while (pendingBackward.size() > 0) {
-			int idx = pendingBackward.size()-1;
-			Node currNode = pendingBackward.remove(idx); // get the last element to prevent object shifting in the array
-			for (Link link : currNode.getInLinks().values()) {
-				if (intersectingSets(modes, link.getAllowedModes())) {
-					DoubleFlagRole r = getDoubleFlag(link, linkRoles);
-					if (!r.backwardFlag) {
-						r.backwardFlag = true;
-						pendingBackward.add(link.getFromNode());
-						if (r.forwardFlag) {
-							// the node can be reached forward and backward, add it to the cluster
-							clusterLinks.put(link.getId(), link);
-						}
-					}
-				}
-			}
-		}
+    // step through the network in forward mode
+    while (pendingForward.size() > 0) {
+      int idx = pendingForward.size() - 1;
+      Node currNode =
+          pendingForward.remove(
+              idx); // get the last element to prevent object shifting in the array
+      for (Link link : currNode.getOutLinks().values()) {
+        if (intersectingSets(modes, link.getAllowedModes())) {
+          DoubleFlagRole r = getDoubleFlag(link, linkRoles);
+          if (!r.forwardFlag) {
+            r.forwardFlag = true;
+            pendingForward.add(link.getToNode());
+          }
+        }
+      }
+    }
 
-		return clusterLinks;
-	}
+    // now step through the network in backward mode
+    while (pendingBackward.size() > 0) {
+      int idx = pendingBackward.size() - 1;
+      Node currNode =
+          pendingBackward.remove(
+              idx); // get the last element to prevent object shifting in the array
+      for (Link link : currNode.getInLinks().values()) {
+        if (intersectingSets(modes, link.getAllowedModes())) {
+          DoubleFlagRole r = getDoubleFlag(link, linkRoles);
+          if (!r.backwardFlag) {
+            r.backwardFlag = true;
+            pendingBackward.add(link.getFromNode());
+            if (r.forwardFlag) {
+              // the node can be reached forward and backward, add it to the cluster
+              clusterLinks.put(link.getId(), link);
+            }
+          }
+        }
+      }
+    }
 
-	/**
-	 * @return the removedLinks
-	 */
-	public final Set<Id<Link>> getRemovedLinkIds() {
-		return removedLinks;
-	}
+    return clusterLinks;
+  }
 
-	/**
-	 * @return the modifiedLinks
-	 */
-	public final Set<Id<Link>> getModifiedLinkIds() {
-		return modifiedLinks;
-	}
+  /**
+   * @return the removedLinks
+   */
+  public final Set<Id<Link>> getRemovedLinkIds() {
+    return removedLinks;
+  }
 
-	/**
-	 * An optimized method to find out if two sets have common elements.
-	 * The basic approach would be to copy one set, and then use
-	 * {@link Set#retainAll(java.util.Collection)} and see if the
-	 * resulting set is not empty. But that way creates additional objects,
-	 * which this method tries to avoid.
-	 *
-	 * @param <T> the type of objects in the two sets
-	 * @param setA the first set
-	 * @param setB the second set
-	 * @return <code>true</code> if the intersection of two sets is not empty
-	 */
-	private <T> boolean intersectingSets(final Set<T> setA, final Set<T> setB) {
-		for (T t : setA) {
-			if (setB.contains(t)) {
-				return true;
-			}
-		}
-		return false;
-	}
+  /**
+   * @return the modifiedLinks
+   */
+  public final Set<Id<Link>> getModifiedLinkIds() {
+    return modifiedLinks;
+  }
 
-	private static DoubleFlagRole getDoubleFlag(final Link l, final Map<Id<Link>, DoubleFlagRole> linkRoles) {
-		DoubleFlagRole r = linkRoles.get(l.getId());
-		if (null == r) {
-			r = new DoubleFlagRole();
-			linkRoles.put(l.getId(), r);
-		}
-		return r;
-	}
+  /**
+   * An optimized method to find out if two sets have common elements. The basic approach would be
+   * to copy one set, and then use {@link Set#retainAll(java.util.Collection)} and see if the
+   * resulting set is not empty. But that way creates additional objects, which this method tries to
+   * avoid.
+   *
+   * @param <T> the type of objects in the two sets
+   * @param setA the first set
+   * @param setB the second set
+   * @return <code>true</code> if the intersection of two sets is not empty
+   */
+  private <T> boolean intersectingSets(final Set<T> setA, final Set<T> setB) {
+    for (T t : setA) {
+      if (setB.contains(t)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-	static class DoubleFlagRole {
-		boolean forwardFlag = false;
-		boolean backwardFlag = false;
-	}
+  private static DoubleFlagRole getDoubleFlag(
+      final Link l, final Map<Id<Link>, DoubleFlagRole> linkRoles) {
+    DoubleFlagRole r = linkRoles.get(l.getId());
+    if (null == r) {
+      r = new DoubleFlagRole();
+      linkRoles.put(l.getId(), r);
+    }
+    return r;
+  }
 
+  static class DoubleFlagRole {
+    boolean forwardFlag = false;
+    boolean backwardFlag = false;
+  }
 }

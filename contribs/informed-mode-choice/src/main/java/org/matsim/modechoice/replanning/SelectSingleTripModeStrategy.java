@@ -3,6 +3,9 @@ package org.matsim.modechoice.replanning;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntListIterator;
+import jakarta.inject.Provider;
+import java.util.*;
+import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
@@ -15,10 +18,6 @@ import org.matsim.modechoice.PlanModel;
 import org.matsim.modechoice.pruning.CandidatePruner;
 import org.matsim.modechoice.search.SingleTripChoicesGenerator;
 
-import javax.annotation.Nullable;
-import jakarta.inject.Provider;
-import java.util.*;
-
 /**
  * Selects the mode for a single leg, based on estimation.
  *
@@ -26,155 +25,169 @@ import java.util.*;
  */
 public class SelectSingleTripModeStrategy extends AbstractMultithreadedModule {
 
-	private static final Logger log = LogManager.getLogger(SelectSingleTripModeStrategy.class);
+  private static final Logger log = LogManager.getLogger(SelectSingleTripModeStrategy.class);
 
-	private final Provider<SingleTripChoicesGenerator> generator;
-	private final Provider<PlanSelector> selector;
+  private final Provider<SingleTripChoicesGenerator> generator;
+  private final Provider<PlanSelector> selector;
 
-	private final List<String> modes;
-	private final Provider<CandidatePruner> pruner;
+  private final List<String> modes;
+  private final Provider<CandidatePruner> pruner;
 
-	private final boolean requireDifferentModes;
+  private final boolean requireDifferentModes;
 
-	public SelectSingleTripModeStrategy(GlobalConfigGroup globalConfigGroup,
-	                                    List<String> modes,
-	                                    Provider<SingleTripChoicesGenerator> generator,
-	                                    Provider<PlanSelector> selector,
-	                                    Provider<CandidatePruner> pruner, boolean requireDifferentModes) {
-		super(globalConfigGroup);
-		this.generator = generator;
-		this.selector = selector;
-		this.modes = modes;
-		this.pruner = pruner;
-		this.requireDifferentModes = requireDifferentModes;
-	}
+  public SelectSingleTripModeStrategy(
+      GlobalConfigGroup globalConfigGroup,
+      List<String> modes,
+      Provider<SingleTripChoicesGenerator> generator,
+      Provider<PlanSelector> selector,
+      Provider<CandidatePruner> pruner,
+      boolean requireDifferentModes) {
+    super(globalConfigGroup);
+    this.generator = generator;
+    this.selector = selector;
+    this.modes = modes;
+    this.pruner = pruner;
+    this.requireDifferentModes = requireDifferentModes;
+  }
 
-	@Override
-	public PlanAlgorithm getPlanAlgoInstance() {
-		return new Algorithm(generator.get(), selector.get(), pruner.get(), modes, requireDifferentModes);
-	}
+  @Override
+  public PlanAlgorithm getPlanAlgoInstance() {
+    return new Algorithm(
+        generator.get(), selector.get(), pruner.get(), modes, requireDifferentModes);
+  }
 
+  public static Algorithm newAlgorithm(
+      SingleTripChoicesGenerator generator,
+      PlanSelector selector,
+      CandidatePruner pruner,
+      Collection<String> modes,
+      boolean requireDifferentModes) {
+    return new Algorithm(generator, selector, pruner, modes, requireDifferentModes);
+  }
 
-	public static Algorithm newAlgorithm(SingleTripChoicesGenerator generator, PlanSelector selector, CandidatePruner pruner, Collection<String> modes, boolean requireDifferentModes) {
-		return new Algorithm(generator, selector, pruner, modes, requireDifferentModes);
-	}
+  public static final class Algorithm implements PlanAlgorithm {
 
-	public static final class Algorithm implements PlanAlgorithm {
+    private final SingleTripChoicesGenerator generator;
+    private final PlanSelector selector;
+    private final CandidatePruner pruner;
+    private final Set<String> modes;
+    private final Random rnd;
+    private final boolean requireDifferentModes;
 
-		private final SingleTripChoicesGenerator generator;
-		private final PlanSelector selector;
-		private final CandidatePruner pruner;
-		private final Set<String> modes;
-		private final Random rnd;
-		private final boolean requireDifferentModes;
+    public Algorithm(
+        SingleTripChoicesGenerator generator,
+        PlanSelector selector,
+        CandidatePruner pruner,
+        Collection<String> modes,
+        boolean requireDifferentModes) {
+      this.generator = generator;
+      this.selector = selector;
+      this.pruner = pruner;
+      this.modes = new HashSet<>(modes);
+      this.requireDifferentModes = requireDifferentModes;
+      this.rnd = MatsimRandom.getLocalInstance();
+    }
 
-		public Algorithm(SingleTripChoicesGenerator generator, PlanSelector selector, CandidatePruner pruner, Collection<String> modes, boolean requireDifferentModes) {
-			this.generator = generator;
-			this.selector = selector;
-			this.pruner = pruner;
-			this.modes = new HashSet<>(modes);
-			this.requireDifferentModes = requireDifferentModes;
-			this.rnd = MatsimRandom.getLocalInstance();
-		}
+    @Override
+    public void run(Plan plan) {
+      PlanModel model = PlanModel.newInstance(plan);
 
-		@Override
-		public void run(Plan plan) {
-			PlanModel model = PlanModel.newInstance(plan);
+      PlanCandidate c = chooseCandidate(model, null);
 
-			PlanCandidate c = chooseCandidate(model, null);
+      if (c != null) c.applyTo(plan);
+    }
 
-			if (c != null)
-				c.applyTo(plan);
-		}
+    /**
+     * Choose one candidate with one single trip changed.
+     *
+     * @param avoidList combinations to avoid, can be null
+     * @return true if a candidate was selected
+     */
+    @Nullable
+    public PlanCandidate chooseCandidate(
+        PlanModel model, @Nullable Collection<String[]> avoidList) {
 
+      // empty plan
+      if (model.trips() == 0) return null;
 
-		/**
-		 * Choose one candidate with one single trip changed.
-		 *
-		 * @param avoidList combinations to avoid, can be null
-		 * @return true if a candidate was selected
-		 */
-		@Nullable
-		public PlanCandidate chooseCandidate(PlanModel model, @Nullable Collection<String[]> avoidList) {
+      boolean[] mask = new boolean[model.trips()];
 
-			// empty plan
-			if (model.trips() == 0)
-				return null;
+      IntList options = new IntArrayList();
 
-			boolean[] mask = new boolean[model.trips()];
+      // only select trips that are allowed to change
+      for (int i = 0; i < model.trips(); i++) {
+        if (modes.contains(model.getTripMode(i))) {
+          options.add(i);
+        }
+      }
 
-			IntList options = new IntArrayList();
+      if (avoidList != null) {
+        String[] current = model.getCurrentModes();
 
-			// only select trips that are allowed to change
-			for (int i = 0; i < model.trips(); i++) {
-				if (modes.contains(model.getTripMode(i))) {
-					options.add(i);
-				}
-			}
+        IntListIterator it = options.iterator();
 
-			if (avoidList != null) {
-				String[] current = model.getCurrentModes();
+        outer:
+        while (it.hasNext()) {
+          int idx = it.nextInt();
 
-				IntListIterator it = options.iterator();
+          for (String m : modes) {
+            current[idx] = m;
+            if (!avoidList.contains(current)) {
+              continue outer;
+            }
+          }
 
-				outer:
-				while (it.hasNext()) {
-					int idx = it.nextInt();
+          // if at least one option is found, idx is not removed
+          it.remove();
+        }
+      }
 
-					for (String m : modes) {
-						current[idx] = m;
-						if (!avoidList.contains(current)) {
-							continue outer;
-						}
-					}
+      if (options.isEmpty()) return null;
 
-					// if at least one option is found, idx is not removed
-					it.remove();
-				}
-			}
+      int idx = options.getInt(rnd.nextInt(options.size()));
 
-			if (options.isEmpty())
-				return null;
+      // Set one trip to be modifiable
+      mask[idx] = true;
 
-			int idx = options.getInt(rnd.nextInt(options.size()));
+      Collection<PlanCandidate> candidates = generator.generate(model, modes, mask);
 
-			// Set one trip to be modifiable
-			mask[idx] = true;
+      // Remove based on threshold
+      if (pruner != null) {
 
-			Collection<PlanCandidate> candidates = generator.generate(model, modes, mask);
+        OptionalDouble max = candidates.stream().mapToDouble(PlanCandidate::getUtility).max();
+        double t = pruner.tripThreshold(model, idx);
 
-			// Remove based on threshold
-			if (pruner != null) {
+        if (max.isPresent() && t >= 0) {
+          double threshold = max.getAsDouble() - t;
+          candidates.removeIf(c -> c.getUtility() < threshold);
+        }
+      }
 
-				OptionalDouble max = candidates.stream().mapToDouble(PlanCandidate::getUtility).max();
-				double t = pruner.tripThreshold(model, idx);
+      // Remove options that are the same as the current mode
+      if (requireDifferentModes)
+        candidates.removeIf(c -> Objects.equals(c.getMode(idx), model.getTripMode(idx)));
 
-				if (max.isPresent() && t >= 0) {
-					double threshold = max.getAsDouble() - t;
-					candidates.removeIf(c -> c.getUtility() < threshold);
-				}
-			}
+      // Remove avoided combinations
+      if (avoidList != null) {
+        String[] current = model.getCurrentModes();
 
-			// Remove options that are the same as the current mode
-			if (requireDifferentModes)
-				candidates.removeIf(c -> Objects.equals(c.getMode(idx), model.getTripMode(idx)));
+        candidates.removeIf(
+            c -> {
+              current[idx] = c.getMode(idx);
+              return avoidList.contains(current);
+            });
+      }
 
-			// Remove avoided combinations
-			if (avoidList != null) {
-				String[] current = model.getCurrentModes();
+      PlanCandidate selected = selector.select(candidates);
 
-				candidates.removeIf(c -> {
-					current[idx] = c.getMode(idx);
-					return avoidList.contains(current);
-				});
-			}
+      log.debug(
+          "Candidates for person {} at trip {}: {} | selected {}",
+          model.getPerson(),
+          idx,
+          candidates,
+          selected);
 
-			PlanCandidate selected = selector.select(candidates);
-
-			log.debug("Candidates for person {} at trip {}: {} | selected {}", model.getPerson(), idx, candidates, selected);
-
-			return selected;
-		}
-	}
-
+      return selected;
+    }
+  }
 }

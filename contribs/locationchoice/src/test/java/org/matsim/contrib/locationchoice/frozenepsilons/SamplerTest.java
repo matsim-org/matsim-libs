@@ -22,6 +22,8 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,31 +36,38 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
-import static org.junit.Assert.assertTrue;
-
 public class SamplerTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-    private DestinationChoiceContext context;
-    private Scenario scenario;
+  private DestinationChoiceContext context;
+  private Scenario scenario;
 
-    @Before
-    public void setUp() throws Exception {
-        Config config = ConfigUtils.loadConfig("test/scenarios/chessboard/config.xml", new FrozenTastesConfigGroup() );
-        ConfigUtils.loadConfig(config, utils.getPackageInputDirectory() + "/config.xml");
-        scenario = ScenarioUtils.loadScenario(config);
-        this.context = new DestinationChoiceContext(this.scenario);
-        this.context.init();
-    }
+  @Before
+  public void setUp() throws Exception {
+    Config config =
+        ConfigUtils.loadConfig(
+            "test/scenarios/chessboard/config.xml", new FrozenTastesConfigGroup());
+    ConfigUtils.loadConfig(config, utils.getPackageInputDirectory() + "/config.xml");
+    scenario = ScenarioUtils.loadScenario(config);
+    this.context = new DestinationChoiceContext(this.scenario);
+    this.context.init();
+  }
 
-    @Test
-    public void testSampler() {
-        DestinationSampler sampler = new DestinationSampler(
-                context.getPersonsKValuesArray(), context.getFacilitiesKValuesArray(), ConfigUtils.addOrGetModule( scenario.getConfig(), FrozenTastesConfigGroup.class ) ) ;
-        assertTrue(sampler.sample(context.getFacilityIndex(Id.create(1, ActivityFacility.class)), context.getPersonIndex(Id.create(1, Person.class))));
-        assertTrue(!sampler.sample(context.getFacilityIndex(Id.create(1, ActivityFacility.class)), context.getPersonIndex(Id.create(2, Person.class))));
-    }
-
+  @Test
+  public void testSampler() {
+    DestinationSampler sampler =
+        new DestinationSampler(
+            context.getPersonsKValuesArray(),
+            context.getFacilitiesKValuesArray(),
+            ConfigUtils.addOrGetModule(scenario.getConfig(), FrozenTastesConfigGroup.class));
+    assertTrue(
+        sampler.sample(
+            context.getFacilityIndex(Id.create(1, ActivityFacility.class)),
+            context.getPersonIndex(Id.create(1, Person.class))));
+    assertTrue(
+        !sampler.sample(
+            context.getFacilityIndex(Id.create(1, ActivityFacility.class)),
+            context.getPersonIndex(Id.create(2, Person.class))));
+  }
 }

@@ -27,6 +27,5 @@ import org.matsim.core.scoring.ScoringFunction;
  */
 public interface ReceiverScoringFunctionFactory {
 
-	ScoringFunction createScoringFunction(Receiver receiver);
-
+  ScoringFunction createScoringFunction(Receiver receiver);
 }

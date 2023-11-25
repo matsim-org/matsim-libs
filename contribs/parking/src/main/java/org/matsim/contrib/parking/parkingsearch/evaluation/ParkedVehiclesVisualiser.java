@@ -17,11 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
+/** */
 package org.matsim.contrib.parking.parkingsearch.evaluation;
 
+import com.google.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -50,112 +48,135 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
-
 /**
- * @author  jbischoff
- *
+ * @author jbischoff
  */
-/**
- *
- */
-public class ParkedVehiclesVisualiser implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler {
+/** */
+public class ParkedVehiclesVisualiser
+    implements PersonEntersVehicleEventHandler,
+        PersonLeavesVehicleEventHandler,
+        VehicleLeavesTrafficEventHandler,
+        VehicleEntersTrafficEventHandler {
 
-		Network network;
-	
-	/**
-	 * 
-	 */
-	@Inject
-	public ParkedVehiclesVisualiser(Network network) {
-		this.network = network;
-	}
-	
-	Map<Id<Vehicle>,Tuple<Id<Link>,MutableDouble>> vehicleParkingPosition = new HashMap<>();
-	Map<Id<Vehicle>,Tuple<Double,Double>> midnightParkers = new HashMap<>();
-	Map<Id<Vehicle>,Id<Link>> lastLink = new HashMap<>();
-	Random r = MatsimRandom.getLocalInstance();
-	List<String> parkings = new ArrayList<>();
-	/* (non-Javadoc)
-	 * @see org.matsim.core.events.handler.EventHandler#reset(int)
-	 */
-	@Override
-	public void reset(int iteration) {
-		
-	}
+  Network network;
 
-	
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		vehicleParkingPosition.put(event.getVehicleId(), new Tuple<Id<Link>,MutableDouble>(lastLink.get(event.getVehicleId()),new MutableDouble(event.getTime())));
-	}
+  /** */
+  @Inject
+  public ParkedVehiclesVisualiser(Network network) {
+    this.network = network;
+  }
 
+  Map<Id<Vehicle>, Tuple<Id<Link>, MutableDouble>> vehicleParkingPosition = new HashMap<>();
+  Map<Id<Vehicle>, Tuple<Double, Double>> midnightParkers = new HashMap<>();
+  Map<Id<Vehicle>, Id<Link>> lastLink = new HashMap<>();
+  Random r = MatsimRandom.getLocalInstance();
+  List<String> parkings = new ArrayList<>();
 
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		Tuple<Id<Link>,MutableDouble> lastLoc = vehicleParkingPosition.remove(event.getVehicleId());
-		if (lastLoc!=null){
-			Id<Link> linkId = lastLoc.getFirst();
-			double parkTime = lastLoc.getSecond().doubleValue();
-			double unparkTime = event.getTime();
-			Link l = network.getLinks().get(linkId);
-			Coord coord = ParkingUtils.getRandomPointAlongLink(r, l);
-			parkings.add(event.getVehicleId()+";"+parkTime+";"+unparkTime+";"+coord.getX()+";"+coord.getY());
-		} else {
-			midnightParkers.put(event.getVehicleId(), new Tuple<Double,Double>(0.0,event.getTime()));
-		}
-	}
+  /* (non-Javadoc)
+   * @see org.matsim.core.events.handler.EventHandler#reset(int)
+   */
+  @Override
+  public void reset(int iteration) {}
 
+  @Override
+  public void handleEvent(PersonLeavesVehicleEvent event) {
+    vehicleParkingPosition.put(
+        event.getVehicleId(),
+        new Tuple<Id<Link>, MutableDouble>(
+            lastLink.get(event.getVehicleId()), new MutableDouble(event.getTime())));
+  }
 
-	@Override
-	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		this.lastLink.put(event.getVehicleId(), event.getLinkId());
-		
-		
-	}
+  @Override
+  public void handleEvent(PersonEntersVehicleEvent event) {
+    Tuple<Id<Link>, MutableDouble> lastLoc = vehicleParkingPosition.remove(event.getVehicleId());
+    if (lastLoc != null) {
+      Id<Link> linkId = lastLoc.getFirst();
+      double parkTime = lastLoc.getSecond().doubleValue();
+      double unparkTime = event.getTime();
+      Link l = network.getLinks().get(linkId);
+      Coord coord = ParkingUtils.getRandomPointAlongLink(r, l);
+      parkings.add(
+          event.getVehicleId()
+              + ";"
+              + parkTime
+              + ";"
+              + unparkTime
+              + ";"
+              + coord.getX()
+              + ";"
+              + coord.getY());
+    } else {
+      midnightParkers.put(event.getVehicleId(), new Tuple<Double, Double>(0.0, event.getTime()));
+    }
+  }
 
+  @Override
+  public void handleEvent(VehicleLeavesTrafficEvent event) {
+    this.lastLink.put(event.getVehicleId(), event.getLinkId());
+  }
 
-	/* (non-Javadoc)
-	 * @see org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler#handleEvent(org.matsim.api.core.v01.events.VehicleEntersTrafficEvent)
-	 */
-	@Override
-	public void handleEvent(VehicleEntersTrafficEvent event) {
-		if (this.midnightParkers.containsKey(event.getVehicleId())){
-			Link l = network.getLinks().get(event.getLinkId());
-			Coord coord = ParkingUtils.getRandomPointAlongLink(r, l);
-			Tuple<Double, Double> time = midnightParkers.remove(event.getVehicleId());
-			parkings.add(event.getVehicleId()+";"+time.getFirst()+";"+time.getSecond()+";"+event.getLinkId()+";"+coord.getX()+";"+coord.getY());
-		}
-	}
-	
-	public void finishDay(){
-		for (Entry<Id<Vehicle>, Tuple<Id<Link>, MutableDouble>> e :vehicleParkingPosition.entrySet()){
-			Tuple<Id<Link>,MutableDouble> lastLoc = e.getValue();
-			Id<Vehicle> vehicleId = e.getKey(); 
-			Id<Link> linkId = lastLoc.getFirst();
-			double parkTime = lastLoc.getSecond().doubleValue();
-			double unparkTime = 30*3600;
-			Link l = network.getLinks().get(linkId);
-			Coord coord = ParkingUtils.getRandomPointAlongLink(r, l);
-			parkings.add(vehicleId+";"+parkTime+";"+unparkTime+";"+linkId+";"+coord.getX()+";"+coord.getY());
-		}
-	}
-	
-	public void plotCarPositions(String filename){
-		String head = "Vehicle;parkTime;unparkTime;LinkId;X;Y";
-		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
-		try {
-			bw.write(head);
-			for (String s : this.parkings){
-				bw.newLine();
-				bw.write(s);
-			}
-			bw.flush();
-			bw.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+  /* (non-Javadoc)
+   * @see org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler#handleEvent(org.matsim.api.core.v01.events.VehicleEntersTrafficEvent)
+   */
+  @Override
+  public void handleEvent(VehicleEntersTrafficEvent event) {
+    if (this.midnightParkers.containsKey(event.getVehicleId())) {
+      Link l = network.getLinks().get(event.getLinkId());
+      Coord coord = ParkingUtils.getRandomPointAlongLink(r, l);
+      Tuple<Double, Double> time = midnightParkers.remove(event.getVehicleId());
+      parkings.add(
+          event.getVehicleId()
+              + ";"
+              + time.getFirst()
+              + ";"
+              + time.getSecond()
+              + ";"
+              + event.getLinkId()
+              + ";"
+              + coord.getX()
+              + ";"
+              + coord.getY());
+    }
+  }
 
+  public void finishDay() {
+    for (Entry<Id<Vehicle>, Tuple<Id<Link>, MutableDouble>> e : vehicleParkingPosition.entrySet()) {
+      Tuple<Id<Link>, MutableDouble> lastLoc = e.getValue();
+      Id<Vehicle> vehicleId = e.getKey();
+      Id<Link> linkId = lastLoc.getFirst();
+      double parkTime = lastLoc.getSecond().doubleValue();
+      double unparkTime = 30 * 3600;
+      Link l = network.getLinks().get(linkId);
+      Coord coord = ParkingUtils.getRandomPointAlongLink(r, l);
+      parkings.add(
+          vehicleId
+              + ";"
+              + parkTime
+              + ";"
+              + unparkTime
+              + ";"
+              + linkId
+              + ";"
+              + coord.getX()
+              + ";"
+              + coord.getY());
+    }
+  }
+
+  public void plotCarPositions(String filename) {
+    String head = "Vehicle;parkTime;unparkTime;LinkId;X;Y";
+    BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+    try {
+      bw.write(head);
+      for (String s : this.parkings) {
+        bw.newLine();
+        bw.write(s);
+      }
+      bw.flush();
+      bw.close();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
 }

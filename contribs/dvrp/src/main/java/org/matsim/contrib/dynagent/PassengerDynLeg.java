@@ -19,5 +19,4 @@
 
 package org.matsim.contrib.dynagent;
 
-public interface PassengerDynLeg extends DynLeg {
-}
+public interface PassengerDynLeg extends DynLeg {}

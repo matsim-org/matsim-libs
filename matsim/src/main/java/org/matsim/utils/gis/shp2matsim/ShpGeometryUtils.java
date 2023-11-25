@@ -22,7 +22,6 @@ package org.matsim.utils.gis.shp2matsim;
 import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
@@ -32,28 +31,27 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 public class ShpGeometryUtils {
-	public static List<Geometry> loadGeometries(URL url) {
-		return ShapeFileReader.getAllFeatures(url)
-				.stream()
-				.map(sf -> (Geometry)sf.getDefaultGeometry())
-				.collect(Collectors.toList());
-	}
+  public static List<Geometry> loadGeometries(URL url) {
+    return ShapeFileReader.getAllFeatures(url).stream()
+        .map(sf -> (Geometry) sf.getDefaultGeometry())
+        .collect(Collectors.toList());
+  }
 
-	public static List<PreparedGeometry> loadPreparedGeometries(URL url) {
-		PreparedGeometryFactory factory = new PreparedGeometryFactory();
-		return ShapeFileReader.getAllFeatures(url)
-				.stream()
-				.map(sf -> factory.create((Geometry)sf.getDefaultGeometry()))
-				.collect(Collectors.toList());
-	}
+  public static List<PreparedGeometry> loadPreparedGeometries(URL url) {
+    PreparedGeometryFactory factory = new PreparedGeometryFactory();
+    return ShapeFileReader.getAllFeatures(url).stream()
+        .map(sf -> factory.create((Geometry) sf.getDefaultGeometry()))
+        .collect(Collectors.toList());
+  }
 
-	public static boolean isCoordInGeometries(Coord coord, List<Geometry> geometries) {
-		Point point = MGC.coord2Point(coord);
-		return geometries.stream().anyMatch(g -> g.contains(point));
-	}
+  public static boolean isCoordInGeometries(Coord coord, List<Geometry> geometries) {
+    Point point = MGC.coord2Point(coord);
+    return geometries.stream().anyMatch(g -> g.contains(point));
+  }
 
-	public static boolean isCoordInPreparedGeometries(Coord coord, List<PreparedGeometry> geometries) {
-		Point point = MGC.coord2Point(coord);
-		return geometries.stream().anyMatch(g -> g.contains(point));
-	}
+  public static boolean isCoordInPreparedGeometries(
+      Coord coord, List<PreparedGeometry> geometries) {
+    Point point = MGC.coord2Point(coord);
+    return geometries.stream().anyMatch(g -> g.contains(point));
+  }
 }

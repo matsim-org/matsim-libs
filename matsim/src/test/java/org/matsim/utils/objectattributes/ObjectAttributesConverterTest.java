@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * ObjectAttributesConverterTest.java
@@ -19,101 +18,102 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.utils.objectattributes;
+package org.matsim.utils.objectattributes;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.time.Month;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author thibautd
  */
 public class ObjectAttributesConverterTest {
 
-	@Test
-	public void testEnumToString() {
-		final ObjectAttributesConverter converter = new ObjectAttributesConverter();
-		// cannot use an enum type defined here, because test classes are not on classpath for classes outside of test...
-		// And is thus unavailable to the ObjectAttributesConverter
-		// So use something from the standard library, as there is no way this goes away
-		String converted = converter.convertToString(Month.JANUARY);
-		Assert.assertEquals("unexpected string converted from enum value", "JANUARY", converted);
-	}
+  @Test
+  public void testEnumToString() {
+    final ObjectAttributesConverter converter = new ObjectAttributesConverter();
+    // cannot use an enum type defined here, because test classes are not on classpath for classes
+    // outside of test...
+    // And is thus unavailable to the ObjectAttributesConverter
+    // So use something from the standard library, as there is no way this goes away
+    String converted = converter.convertToString(Month.JANUARY);
+    Assert.assertEquals("unexpected string converted from enum value", "JANUARY", converted);
+  }
 
-	@Test
-	public void testStringToEnum() {
-		final ObjectAttributesConverter converter = new ObjectAttributesConverter();
-		Object converted = converter.convert(Month.class.getCanonicalName(), "JANUARY");
-		Assert.assertEquals("unexpected enum converted from String value", Month.JANUARY, converted);
-	}
+  @Test
+  public void testStringToEnum() {
+    final ObjectAttributesConverter converter = new ObjectAttributesConverter();
+    Object converted = converter.convert(Month.class.getCanonicalName(), "JANUARY");
+    Assert.assertEquals("unexpected enum converted from String value", Month.JANUARY, converted);
+  }
 
-	@Test
-	public void testHashMap() {
+  @Test
+  public void testHashMap() {
 
-		var expectedString = "{\"a\":\"value-a\",\"b\":\"value-b\"}";
-		final var converter = new ObjectAttributesConverter();
+    var expectedString = "{\"a\":\"value-a\",\"b\":\"value-b\"}";
+    final var converter = new ObjectAttributesConverter();
 
-		Map<String, String> parsed = (Map<String, String>) converter.convert("java.util.Map", expectedString);
-		var serialized = converter.convertToString(parsed);
+    Map<String, String> parsed =
+        (Map<String, String>) converter.convert("java.util.Map", expectedString);
+    var serialized = converter.convertToString(parsed);
 
-		assertEquals(expectedString, serialized);
-	}
+    assertEquals(expectedString, serialized);
+  }
 
-	@Test
-	public void testEmptyHashMap() {
+  @Test
+  public void testEmptyHashMap() {
 
-		var expectedString = "{}";
-		final var converter = new ObjectAttributesConverter();
+    var expectedString = "{}";
+    final var converter = new ObjectAttributesConverter();
 
-		Map<String, String> parsed = new HashMap<>();
-		var serialized = converter.convertToString(parsed);
+    Map<String, String> parsed = new HashMap<>();
+    var serialized = converter.convertToString(parsed);
 
-		assertEquals(expectedString, serialized);
-	}
+    assertEquals(expectedString, serialized);
+  }
 
-	@Test
-	public void testCollection() {
+  @Test
+  public void testCollection() {
 
-		var expectedString = "[\"a\",\"b\"]";
-		final var converter = new ObjectAttributesConverter();
+    var expectedString = "[\"a\",\"b\"]";
+    final var converter = new ObjectAttributesConverter();
 
-		Collection<String> parsed = (Collection<String>) converter.convert("java.util.Collection", expectedString);
-		var serialized = converter.convertToString(parsed);
+    Collection<String> parsed =
+        (Collection<String>) converter.convert("java.util.Collection", expectedString);
+    var serialized = converter.convertToString(parsed);
 
-		assertEquals(expectedString, serialized);
-	}
+    assertEquals(expectedString, serialized);
+  }
 
-	@Test
-	public void testEmptyCollection() {
+  @Test
+  public void testEmptyCollection() {
 
-		var expectedString = "[]";
-		final var converter = new ObjectAttributesConverter();
+    var expectedString = "[]";
+    final var converter = new ObjectAttributesConverter();
 
-		Collection<String> parsed = Arrays.asList();
-		var serialized = converter.convertToString(parsed);
+    Collection<String> parsed = Arrays.asList();
+    var serialized = converter.convertToString(parsed);
 
-		assertEquals(expectedString, serialized);
-	}
+    assertEquals(expectedString, serialized);
+  }
 
-	@Test
-	public void testUnsupported() {
+  @Test
+  public void testUnsupported() {
 
-		final var converter = new ObjectAttributesConverter();
-		var serialized = converter.convertToString(new UnsupportedType());
-		var parsed = converter.convert(UnsupportedType.class.getName(), "some-value");
+    final var converter = new ObjectAttributesConverter();
+    var serialized = converter.convertToString(new UnsupportedType());
+    var parsed = converter.convert(UnsupportedType.class.getName(), "some-value");
 
-		assertNull(serialized);
-		assertNull(parsed);
-	}
+    assertNull(serialized);
+    assertNull(parsed);
+  }
 
-	private static class UnsupportedType {
-	}
+  private static class UnsupportedType {}
 }

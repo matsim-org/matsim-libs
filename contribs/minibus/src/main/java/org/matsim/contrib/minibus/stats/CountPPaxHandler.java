@@ -19,6 +19,9 @@
 
 package org.matsim.contrib.minibus.stats;
 
+import java.util.HashMap;
+import java.util.Set;
+import java.util.TreeSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -31,112 +34,116 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeSet;
-
 /**
  * Counts the number of passenger of paratransit vehicles per link
- * 
- * @author aneumann
  *
+ * @author aneumann
  */
-final class CountPPaxHandler implements LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
-	
-	private static final Logger log = LogManager.getLogger(CountPPaxHandler.class);
-	
-	private final String pIdentifier;
-	private HashMap<Id<Link>, HashMap<String, Integer>> linkId2LineId2CountsMap;
-	private HashMap<Id<Vehicle>, Integer> vehId2CountsMap;
-	// TODO [AN] Check if this can be replaced by Set<Id<TransitLine/Operator>> lineIds
-	private Set<String> lineIds;
+final class CountPPaxHandler
+    implements LinkEnterEventHandler,
+        PersonEntersVehicleEventHandler,
+        PersonLeavesVehicleEventHandler {
 
-	public CountPPaxHandler(String pIdentifier) {
-		this.pIdentifier = pIdentifier;
-		this.linkId2LineId2CountsMap = new HashMap<>();
-		this.vehId2CountsMap =  new HashMap<>();
-		this.lineIds = new TreeSet<>();
-	}
-	
-	public Set<String> getLineIds(){
-		return this.lineIds;
-	}
+  private static final Logger log = LogManager.getLogger(CountPPaxHandler.class);
 
-	public int getPaxCountForLinkId(Id<Link> linkId){
-		int count = 0;
-		if (this.linkId2LineId2CountsMap.get(linkId) != null) {
-			for (Integer countEntryForLine : this.linkId2LineId2CountsMap.get(linkId).values()) {
-				count += countEntryForLine;
-			}
-		}
-		return count;
-	}
-	
-	public int getPaxCountForLinkId(Id<Link> linkId, String lineId){
-		if (this.linkId2LineId2CountsMap.get(linkId) != null) {
-			if (this.linkId2LineId2CountsMap.get(linkId).get(lineId) != null) {
-				return this.linkId2LineId2CountsMap.get(linkId).get(lineId);
-			}
-		}
-		return 0;
-	}
+  private final String pIdentifier;
+  private HashMap<Id<Link>, HashMap<String, Integer>> linkId2LineId2CountsMap;
+  private HashMap<Id<Vehicle>, Integer> vehId2CountsMap;
+  // TODO [AN] Check if this can be replaced by Set<Id<TransitLine/Operator>> lineIds
+  private Set<String> lineIds;
 
-	@Override
-	public void reset(int iteration) {
-		this.linkId2LineId2CountsMap = new HashMap<>();
-		for (Integer count : this.vehId2CountsMap.values()) {
-			if(count != 0){
-				log.warn("Should not have a count different zero " + count);
-			}
-		}
-		this.vehId2CountsMap = new HashMap<>();
-		this.lineIds = new TreeSet<>();
-	}
+  public CountPPaxHandler(String pIdentifier) {
+    this.pIdentifier = pIdentifier;
+    this.linkId2LineId2CountsMap = new HashMap<>();
+    this.vehId2CountsMap = new HashMap<>();
+    this.lineIds = new TreeSet<>();
+  }
 
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		// add the number of passengers of the vehicle to the total amount of that link. ignore every non paratransit vehicle
-		if(event.getVehicleId().toString().contains(this.pIdentifier)){
-			if(this.linkId2LineId2CountsMap.get(event.getLinkId()) == null){
-				this.linkId2LineId2CountsMap.put(event.getLinkId(), new HashMap<String, Integer>());
-			}
-			
-			String lineId = event.getVehicleId().toString().split("-")[0];
-			this.lineIds.add(lineId);
-			
-			if (this.linkId2LineId2CountsMap.get(event.getLinkId()).get(lineId) == null) {
-				this.linkId2LineId2CountsMap.get(event.getLinkId()).put(lineId, 0); // initialize with one, implying that the link actually was served
-			}
-			
-			if(this.vehId2CountsMap.get(event.getVehicleId()) != null){
-				int oldValue = this.linkId2LineId2CountsMap.get(event.getLinkId()).get(lineId);
-				int additionalValue = this.vehId2CountsMap.get(event.getVehicleId());
-				this.linkId2LineId2CountsMap.get(event.getLinkId()).put(lineId, oldValue + additionalValue);
-			}
-		}		
-	}
+  public Set<String> getLineIds() {
+    return this.lineIds;
+  }
 
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		// add a passenger to the vehicle counts data, but ignore every non paratransit vehicle and every driver
-		if(event.getVehicleId().toString().contains(this.pIdentifier)){
-			if(!event.getPersonId().toString().contains(this.pIdentifier)){
-				if(this.vehId2CountsMap.get(event.getVehicleId()) == null){
-					this.vehId2CountsMap.put(event.getVehicleId(), 0);
-				}
-				int oldValue = this.vehId2CountsMap.get(event.getVehicleId());
-				this.vehId2CountsMap.put(event.getVehicleId(), oldValue + 1);
-			}
-		}		
-	}
+  public int getPaxCountForLinkId(Id<Link> linkId) {
+    int count = 0;
+    if (this.linkId2LineId2CountsMap.get(linkId) != null) {
+      for (Integer countEntryForLine : this.linkId2LineId2CountsMap.get(linkId).values()) {
+        count += countEntryForLine;
+      }
+    }
+    return count;
+  }
 
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		// subtract a passenger to the vehicle counts data, but ignore every non paratransit vehicle and every driver
-		if(event.getVehicleId().toString().contains(this.pIdentifier)){
-			if(!event.getPersonId().toString().contains(this.pIdentifier)){
-				this.vehId2CountsMap.put(event.getVehicleId(), this.vehId2CountsMap.get(event.getVehicleId()) - 1);
-			}
-		}		
-	}
+  public int getPaxCountForLinkId(Id<Link> linkId, String lineId) {
+    if (this.linkId2LineId2CountsMap.get(linkId) != null) {
+      if (this.linkId2LineId2CountsMap.get(linkId).get(lineId) != null) {
+        return this.linkId2LineId2CountsMap.get(linkId).get(lineId);
+      }
+    }
+    return 0;
+  }
+
+  @Override
+  public void reset(int iteration) {
+    this.linkId2LineId2CountsMap = new HashMap<>();
+    for (Integer count : this.vehId2CountsMap.values()) {
+      if (count != 0) {
+        log.warn("Should not have a count different zero " + count);
+      }
+    }
+    this.vehId2CountsMap = new HashMap<>();
+    this.lineIds = new TreeSet<>();
+  }
+
+  @Override
+  public void handleEvent(LinkEnterEvent event) {
+    // add the number of passengers of the vehicle to the total amount of that link. ignore every
+    // non paratransit vehicle
+    if (event.getVehicleId().toString().contains(this.pIdentifier)) {
+      if (this.linkId2LineId2CountsMap.get(event.getLinkId()) == null) {
+        this.linkId2LineId2CountsMap.put(event.getLinkId(), new HashMap<String, Integer>());
+      }
+
+      String lineId = event.getVehicleId().toString().split("-")[0];
+      this.lineIds.add(lineId);
+
+      if (this.linkId2LineId2CountsMap.get(event.getLinkId()).get(lineId) == null) {
+        this.linkId2LineId2CountsMap
+            .get(event.getLinkId())
+            .put(lineId, 0); // initialize with one, implying that the link actually was served
+      }
+
+      if (this.vehId2CountsMap.get(event.getVehicleId()) != null) {
+        int oldValue = this.linkId2LineId2CountsMap.get(event.getLinkId()).get(lineId);
+        int additionalValue = this.vehId2CountsMap.get(event.getVehicleId());
+        this.linkId2LineId2CountsMap.get(event.getLinkId()).put(lineId, oldValue + additionalValue);
+      }
+    }
+  }
+
+  @Override
+  public void handleEvent(PersonEntersVehicleEvent event) {
+    // add a passenger to the vehicle counts data, but ignore every non paratransit vehicle and
+    // every driver
+    if (event.getVehicleId().toString().contains(this.pIdentifier)) {
+      if (!event.getPersonId().toString().contains(this.pIdentifier)) {
+        if (this.vehId2CountsMap.get(event.getVehicleId()) == null) {
+          this.vehId2CountsMap.put(event.getVehicleId(), 0);
+        }
+        int oldValue = this.vehId2CountsMap.get(event.getVehicleId());
+        this.vehId2CountsMap.put(event.getVehicleId(), oldValue + 1);
+      }
+    }
+  }
+
+  @Override
+  public void handleEvent(PersonLeavesVehicleEvent event) {
+    // subtract a passenger to the vehicle counts data, but ignore every non paratransit vehicle and
+    // every driver
+    if (event.getVehicleId().toString().contains(this.pIdentifier)) {
+      if (!event.getPersonId().toString().contains(this.pIdentifier)) {
+        this.vehId2CountsMap.put(
+            event.getVehicleId(), this.vehId2CountsMap.get(event.getVehicleId()) - 1);
+      }
+    }
+  }
 }

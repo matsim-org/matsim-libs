@@ -31,33 +31,36 @@ import org.matsim.core.scenario.ScenarioUtils;
 @Deprecated // (I think)
 class RunLocationChoiceBestResponse {
 
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig(args[0], new FrozenTastesConfigGroup() );
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		run(scenario);
-	}
+  public static void main(String[] args) {
+    Config config = ConfigUtils.loadConfig(args[0], new FrozenTastesConfigGroup());
+    final Scenario scenario = ScenarioUtils.loadScenario(config);
+    run(scenario);
+  }
 
-	public static void run(Scenario scenario) {
+  public static void run(Scenario scenario) {
 
+    DestinationChoiceContext dcContext = new DestinationChoiceContext(scenario);
+    scenario.addScenarioElement(DestinationChoiceContext.ELEMENT_NAME, dcContext);
 
-		DestinationChoiceContext dcContext = new DestinationChoiceContext(scenario);
-		scenario.addScenarioElement(DestinationChoiceContext.ELEMENT_NAME , dcContext);
+    DCScoringFunctionFactory dcScoringFunctionFactory =
+        new DCScoringFunctionFactory(scenario, dcContext);
+    FrozenTastesConfigGroup dccg =
+        ConfigUtils.addOrGetModule(
+            dcContext.getScenario().getConfig(), FrozenTastesConfigGroup.class);
+    if (dccg.getPrefsFile() == null
+        && !scenario.getConfig().facilities().getInputFile().equals("null")) {
+      dcScoringFunctionFactory.setUsingConfigParamsForScoring(false);
+    } else {
+      dcScoringFunctionFactory.setUsingConfigParamsForScoring(true);
+    }
 
-		DCScoringFunctionFactory dcScoringFunctionFactory = new DCScoringFunctionFactory(scenario, dcContext);
-		FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule( dcContext.getScenario().getConfig(), FrozenTastesConfigGroup.class );
-		if (dccg.getPrefsFile() == null && !scenario.getConfig().facilities().getInputFile().equals("null")) {
-			dcScoringFunctionFactory.setUsingConfigParamsForScoring(false);
-		} else {
-			dcScoringFunctionFactory.setUsingConfigParamsForScoring(true);
-		}
-
-		Controler controler = new Controler(scenario);
-		controler.addControlerListener(new DestinationChoiceInitializer(dcContext) );
-		if (dccg.getRestraintFcnExp() > 0.0 && dccg.getRestraintFcnFactor() > 0.0) {
-			controler.addControlerListener(new FacilitiesLoadCalculator(dcContext.getFacilityPenalties()));
-		}
-		controler.setScoringFunctionFactory(dcScoringFunctionFactory);
-		controler.run();
-	}
-
+    Controler controler = new Controler(scenario);
+    controler.addControlerListener(new DestinationChoiceInitializer(dcContext));
+    if (dccg.getRestraintFcnExp() > 0.0 && dccg.getRestraintFcnFactor() > 0.0) {
+      controler.addControlerListener(
+          new FacilitiesLoadCalculator(dcContext.getFacilityPenalties()));
+    }
+    controler.setScoringFunctionFactory(dcScoringFunctionFactory);
+    controler.run();
+  }
 }

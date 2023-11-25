@@ -18,15 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
+/** */
 package playground.vsp.parkAndRide.example;
 
-
+import com.google.inject.Provider;
 import java.io.IOException;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -37,9 +34,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
-
-import com.google.inject.Provider;
-
 import playground.vsp.parkAndRide.PRAdaptiveCapacityControl;
 import playground.vsp.parkAndRide.PRConfigGroup;
 import playground.vsp.parkAndRide.PRConstants;
@@ -49,64 +43,72 @@ import playground.vsp.parkAndRide.scoring.PRScoringFunctionFactory;
 
 /**
  * @author ikaddoura
- *
  */
 public class PRRunner {
 
-	static String configFile;
+  static String configFile;
 
-	public static void main(String[] args) throws IOException {
+  public static void main(String[] args) throws IOException {
 
-		configFile = "/path-to/config.xml";
+    configFile = "/path-to/config.xml";
 
-		PRRunner main = new PRRunner();
-		main.run();
-	}
+    PRRunner main = new PRRunner();
+    main.run();
+  }
 
-	private void run() {
+  private void run() {
 
-		Config config = new Config();
-		config.addModule(new PRConfigGroup());
-		ConfigUtils.loadConfig(config, configFile);
+    Config config = new Config();
+    config.addModule(new PRConfigGroup());
+    ConfigUtils.loadConfig(config, configFile);
 
-		final Controler controler = new Controler(config);
-		controler.getConfig().controller().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+    final Controler controler = new Controler(config);
+    controler
+        .getConfig()
+        .controller()
+        .setOverwriteFileSetting(
+            true
+                ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles
+                : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
 
-		PRConfigGroup prSettings = (PRConfigGroup) controler.getConfig().getModule(PRConfigGroup.GROUP_NAME);
+    PRConfigGroup prSettings =
+        (PRConfigGroup) controler.getConfig().getModule(PRConfigGroup.GROUP_NAME);
 
-		ActivityParams prActivityParams = new ActivityParams(PRConstants.PARKANDRIDE_ACTIVITY_TYPE);
-		prActivityParams.setTypicalDuration(prSettings.getTypicalDuration());
-		controler.getConfig().scoring().addActivityParams(prActivityParams);
+    ActivityParams prActivityParams = new ActivityParams(PRConstants.PARKANDRIDE_ACTIVITY_TYPE);
+    prActivityParams.setTypicalDuration(prSettings.getTypicalDuration());
+    controler.getConfig().scoring().addActivityParams(prActivityParams);
 
-        controler.setScoringFunctionFactory(new PRScoringFunctionFactory(controler.getScenario(), prSettings.getIntermodalTransferPenalty()));
+    controler.setScoringFunctionFactory(
+        new PRScoringFunctionFactory(
+            controler.getScenario(), prSettings.getIntermodalTransferPenalty()));
 
-		PRFileReader prReader = new PRFileReader(prSettings.getInputFile());
-		Map<Id<PRFacility>, PRFacility> id2prFacility = prReader.getId2prFacility();
-		final PRAdaptiveCapacityControl adaptiveControl = new PRAdaptiveCapacityControl(id2prFacility);
+    PRFileReader prReader = new PRFileReader(prSettings.getInputFile());
+    Map<Id<PRFacility>, PRFacility> id2prFacility = prReader.getId2prFacility();
+    final PRAdaptiveCapacityControl adaptiveControl = new PRAdaptiveCapacityControl(id2prFacility);
 
-		PRControlerListener prControlerListener = new PRControlerListener(controler, adaptiveControl);
-		controler.addControlerListener(prControlerListener);
+    PRControlerListener prControlerListener = new PRControlerListener(controler, adaptiveControl);
+    controler.addControlerListener(prControlerListener);
 
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindMobsim().toProvider(new Provider<Mobsim>() {
-					@Override
-					public Mobsim get() {
-						final QSim mobsim = new QSimBuilder(controler.getConfig()).useDefaults().build(controler.getScenario(), controler.getEvents());
-						mobsim.addMobsimEngine(adaptiveControl);
-						return mobsim;
-					}
-				});
-			}
-		});
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            bindMobsim()
+                .toProvider(
+                    new Provider<Mobsim>() {
+                      @Override
+                      public Mobsim get() {
+                        final QSim mobsim =
+                            new QSimBuilder(controler.getConfig())
+                                .useDefaults()
+                                .build(controler.getScenario(), controler.getEvents());
+                        mobsim.addMobsimEngine(adaptiveControl);
+                        return mobsim;
+                      }
+                    });
+          }
+        });
 
-		controler.run();
-
-	}
-
+    controler.run();
+  }
 }
-

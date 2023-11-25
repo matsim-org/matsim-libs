@@ -27,8 +27,5 @@ import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGrou
  * @author thibautd
  */
 public interface GroupLevelPlanSelector {
-	public GroupPlans selectPlans(
-			JointPlans jointPlans,
-			ReplanningGroup group);
+  public GroupPlans selectPlans(JointPlans jointPlans, ReplanningGroup group);
 }
-

@@ -19,6 +19,8 @@
 
 package org.matsim.core.config.consistency;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
 import org.apache.logging.log4j.Level;
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,202 +31,210 @@ import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.pt.PtConstants;
 import org.matsim.testcases.utils.LogCounter;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 /**
  * @author mrieser
  */
 public class ConfigConsistencyCheckerImplTest {
 
-	@Test
-	public void testCheckPlanCalcScore_DefaultsOk() {
-		Config config = new Config();
-		config.addCoreModules();
+  @Test
+  public void testCheckPlanCalcScore_DefaultsOk() {
+    Config config = new Config();
+    config.addCoreModules();
 
-		LogCounter logger = new LogCounter(Level.WARN);
-		try {
-			logger.activate();
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
-			Assert.assertEquals(0, logger.getWarnCount());
-		} finally {
-			// make sure counter is deactivated at the end
-			logger.deactivate();
-		}
-	}
+    LogCounter logger = new LogCounter(Level.WARN);
+    try {
+      logger.activate();
+      ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
+      Assert.assertEquals(0, logger.getWarnCount());
+    } finally {
+      // make sure counter is deactivated at the end
+      logger.deactivate();
+    }
+  }
 
-	@Test
-	public void testCheckPlanCalcScore_Traveling() {
-		Config config = new Config();
-		config.addCoreModules();
+  @Test
+  public void testCheckPlanCalcScore_Traveling() {
+    Config config = new Config();
+    config.addCoreModules();
 
-		config.scoring().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(3.0);
+    config.scoring().getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(3.0);
 
-		LogCounter logger = new LogCounter(Level.WARN);
-		try {
-			logger.activate();
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
-			Assert.assertEquals(1, logger.getWarnCount());
-		} finally {
-			// make sure counter is deactivated at the end
-			logger.deactivate();
-		}
-	}
+    LogCounter logger = new LogCounter(Level.WARN);
+    try {
+      logger.activate();
+      ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
+      Assert.assertEquals(1, logger.getWarnCount());
+    } finally {
+      // make sure counter is deactivated at the end
+      logger.deactivate();
+    }
+  }
 
-	@Test
-	public void testCheckPlanCalcScore_TravelingPt() {
-		Config config = new Config();
-		config.addCoreModules();
+  @Test
+  public void testCheckPlanCalcScore_TravelingPt() {
+    Config config = new Config();
+    config.addCoreModules();
 
-		config.scoring().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(3.0);
+    config.scoring().getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(3.0);
 
-		LogCounter logger = new LogCounter(Level.WARN);
-		try {
-			logger.activate();
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
-			Assert.assertEquals(1, logger.getWarnCount());
-		} finally {
-			// make sure counter is deactivated at the end
-			logger.deactivate();
-		}
-	}
+    LogCounter logger = new LogCounter(Level.WARN);
+    try {
+      logger.activate();
+      ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
+      Assert.assertEquals(1, logger.getWarnCount());
+    } finally {
+      // make sure counter is deactivated at the end
+      logger.deactivate();
+    }
+  }
 
-	@Test
-	public void testCheckPlanCalcScore_TravelingBike() {
-		Config config = new Config();
-		config.addCoreModules();
+  @Test
+  public void testCheckPlanCalcScore_TravelingBike() {
+    Config config = new Config();
+    config.addCoreModules();
 
-		config.scoring().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(3.0);
+    config.scoring().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(3.0);
 
-		LogCounter logger = new LogCounter(Level.WARN);
-		try {
-			logger.activate();
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
-			Assert.assertEquals(1, logger.getWarnCount());
-		} finally {
-			// make sure counter is deactivated at the end
-			logger.deactivate();
-		}
-	}
+    LogCounter logger = new LogCounter(Level.WARN);
+    try {
+      logger.activate();
+      ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
+      Assert.assertEquals(1, logger.getWarnCount());
+    } finally {
+      // make sure counter is deactivated at the end
+      logger.deactivate();
+    }
+  }
 
-	@Test
-	public void testCheckPlanCalcScore_TravelingWalk() {
-		Config config = new Config();
-		config.addCoreModules();
+  @Test
+  public void testCheckPlanCalcScore_TravelingWalk() {
+    Config config = new Config();
+    config.addCoreModules();
 
-		config.scoring().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(3.0);
+    config.scoring().getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(3.0);
 
-		LogCounter logger = new LogCounter(Level.WARN);
-		try {
-			logger.activate();
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
-			Assert.assertEquals(1, logger.getWarnCount());
-		} finally {
-			// make sure counter is deactivated at the end
-			logger.deactivate();
-		}
-	}
+    LogCounter logger = new LogCounter(Level.WARN);
+    try {
+      logger.activate();
+      ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
+      Assert.assertEquals(1, logger.getWarnCount());
+    } finally {
+      // make sure counter is deactivated at the end
+      logger.deactivate();
+    }
+  }
 
-	@Test
-	public void testCheckPlanCalcScore_PtInteractionActivity() {
-		Config config = new Config();
-		config.addCoreModules();
+  @Test
+  public void testCheckPlanCalcScore_PtInteractionActivity() {
+    Config config = new Config();
+    config.addCoreModules();
 
-		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
-		transitActivityParams.setClosingTime(1.) ;
-		config.scoring().addActivityParams(transitActivityParams);
+    ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
+    transitActivityParams.setClosingTime(1.);
+    config.scoring().addActivityParams(transitActivityParams);
 
-		try {
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
-			Assert.assertEquals(0,1) ; // should never get here
-		} catch ( Exception ee ){
+    try {
+      ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
+      Assert.assertEquals(0, 1); // should never get here
+    } catch (Exception ee) {
 
-			System.out.println("expected exception") ;
-		}
+      System.out.println("expected exception");
+    }
 
-		config.vspExperimental().setAbleToOverwritePtInteractionParams(true) ;
+    config.vspExperimental().setAbleToOverwritePtInteractionParams(true);
 
-		try {
-			ConfigConsistencyCheckerImpl.checkPlanCalcScore(config );
-		} catch ( Exception ee ){
-			Assert.assertEquals(0,1) ; // should never get here
-		}
+    try {
+      ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
+    } catch (Exception ee) {
+      Assert.assertEquals(0, 1); // should never get here
+    }
+  }
 
-	}
+  @Test
+  public void checkConsistencyBetweenRouterAndTravelTimeCalculatorTest() {
+    {
+      Config config = ConfigUtils.createConfig();
 
+      // first for separateModes=false:
+      config.travelTimeCalculator().setSeparateModes(false);
+      {
+        boolean problem =
+            ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator(
+                config);
+        Assert.assertFalse(problem);
+      }
+      {
+        Set<String> modes = new LinkedHashSet<>(config.routing().getNetworkModes());
+        modes.add(TransportMode.bike);
+        config.routing().setNetworkModes(modes);
 
-	@Test
-	public void checkConsistencyBetweenRouterAndTravelTimeCalculatorTest(){
-		{
-			Config config = ConfigUtils.createConfig();
+        boolean problem =
+            ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator(
+                config);
+        Assert.assertFalse(problem);
+      }
+      {
+        Set<String> modes = new LinkedHashSet<>(config.travelTimeCalculator().getAnalyzedModes());
+        modes.add(TransportMode.bike);
+        config.travelTimeCalculator().setAnalyzedModes(modes);
 
-			// first for separateModes=false:
-			config.travelTimeCalculator().setSeparateModes( false );
-			{
-				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
-				Assert.assertFalse( problem );
-			}
-			{
-				Set<String> modes = new LinkedHashSet<>( config.routing().getNetworkModes() );
-				modes.add( TransportMode.bike );
-				config.routing().setNetworkModes( modes );
+        boolean problem =
+            ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator(
+                config);
+        Assert.assertFalse(problem);
+      }
+      {
+        Set<String> modes = new LinkedHashSet<>(config.travelTimeCalculator().getAnalyzedModes());
+        modes.add("abc");
+        config.travelTimeCalculator().setAnalyzedModes(modes);
 
-				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
-				Assert.assertFalse( problem );
-			}
-			{
-				Set<String> modes = new LinkedHashSet<>( config.travelTimeCalculator().getAnalyzedModes() );
-				modes.add( TransportMode.bike );
-				config.travelTimeCalculator().setAnalyzedModes( modes );
+        boolean problem =
+            ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator(
+                config);
+        Assert.assertFalse(problem);
+      }
+    }
+    {
+      // then for separateModes=true
 
-				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
-				Assert.assertFalse( problem );
-			}
-			{
-				Set<String> modes = new LinkedHashSet<>( config.travelTimeCalculator().getAnalyzedModes() );
-				modes.add( "abc" );
-				config.travelTimeCalculator().setAnalyzedModes( modes );
+      Config config = ConfigUtils.createConfig();
 
-				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
-				Assert.assertFalse( problem );
-			}
-		}
-		{
-			// then for separateModes=true
+      config.travelTimeCalculator().setSeparateModes(true);
 
-			Config config = ConfigUtils.createConfig() ;
+      ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator(config);
 
-			config.travelTimeCalculator().setSeparateModes( true );
+      {
+        Set<String> modes = new LinkedHashSet<>(config.routing().getNetworkModes());
+        modes.add(TransportMode.bike);
+        config.routing().setNetworkModes(modes);
 
-			ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
+        boolean problem =
+            ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator(
+                config);
+        // see comments inside that static function. kai, jul'19
 
-			{
-				Set<String> modes = new LinkedHashSet<>( config.routing().getNetworkModes() );
-				modes.add( TransportMode.bike );
-				config.routing().setNetworkModes( modes );
+        //				Assert.assertTrue( problem ); // !!
+      }
+      {
+        Set<String> modes = new LinkedHashSet<>(config.travelTimeCalculator().getAnalyzedModes());
+        modes.add(TransportMode.bike);
+        config.travelTimeCalculator().setAnalyzedModes(modes);
 
-				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
-				// see comments inside that static function. kai, jul'19
+        boolean problem =
+            ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator(
+                config);
+        Assert.assertFalse(problem);
+      }
+      {
+        Set<String> modes = new LinkedHashSet<>(config.travelTimeCalculator().getAnalyzedModes());
+        modes.add("abc");
+        config.travelTimeCalculator().setAnalyzedModes(modes);
 
-//				Assert.assertTrue( problem ); // !!
-			}
-			{
-				Set<String> modes = new LinkedHashSet<>( config.travelTimeCalculator().getAnalyzedModes() );
-				modes.add( TransportMode.bike );
-				config.travelTimeCalculator().setAnalyzedModes( modes );
-
-				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
-				Assert.assertFalse( problem );
-			}
-			{
-				Set<String> modes = new LinkedHashSet<>( config.travelTimeCalculator().getAnalyzedModes() );
-				modes.add( "abc" );
-				config.travelTimeCalculator().setAnalyzedModes( modes );
-
-				boolean problem = ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
-				Assert.assertFalse( problem );
-			}
-		}
-
-	}
+        boolean problem =
+            ConfigConsistencyCheckerImpl.checkConsistencyBetweenRouterAndTravelTimeCalculator(
+                config);
+        Assert.assertFalse(problem);
+      }
+    }
+  }
 }

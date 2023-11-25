@@ -26,9 +26,9 @@ import com.google.inject.Singleton;
 import org.matsim.core.controler.AbstractModule;
 
 public class LegTimesModule extends AbstractModule {
-    @Override
-    public void install() {
-        bind(CalcLegTimes.class).in(Singleton.class);
-        addControlerListenerBinding().to(LegTimesControlerListener.class);
-    }
+  @Override
+  public void install() {
+    bind(CalcLegTimes.class).in(Singleton.class);
+    addControlerListenerBinding().to(LegTimesControlerListener.class);
+  }
 }

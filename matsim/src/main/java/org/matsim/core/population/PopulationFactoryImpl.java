@@ -20,7 +20,6 @@
 package org.matsim.core.population;
 
 import jakarta.inject.Inject;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -39,84 +38,84 @@ import org.matsim.facilities.ActivityFacility;
  */
 /* deliberately package */ class PopulationFactoryImpl implements PopulationFactory {
 
-	private final RouteFactories routeFactory;
+  private final RouteFactories routeFactory;
 
-    @Inject
-	PopulationFactoryImpl(RouteFactories routeFactory) {
-        this.routeFactory = routeFactory;
-    }
+  @Inject
+  PopulationFactoryImpl(RouteFactories routeFactory) {
+    this.routeFactory = routeFactory;
+  }
 
-    @Override
-	public Person createPerson(final Id<Person> id) {
-        return new PersonImpl(id) ;
-	}
+  @Override
+  public Person createPerson(final Id<Person> id) {
+    return new PersonImpl(id);
+  }
 
-	@Override
-	public Plan createPlan(){
-		return new PlanImpl() ;
-	}
+  @Override
+  public Plan createPlan() {
+    return new PlanImpl();
+  }
 
-	@Override
-	public Activity createActivityFromCoord(final String actType, final Coord coord) {
-        Activity act = new ActivityImpl(actType) ;
-        act.setCoord(coord);
-        return act ;
-	}
+  @Override
+  public Activity createActivityFromCoord(final String actType, final Coord coord) {
+    Activity act = new ActivityImpl(actType);
+    act.setCoord(coord);
+    return act;
+  }
 
-	@Override
-	public Activity createInteractionActivityFromCoord(final String actType, final Coord coord) {
-        Activity act = new InteractionActivity(actType) ;
-        act.setCoord(coord);
-        return act ;
-	}
+  @Override
+  public Activity createInteractionActivityFromCoord(final String actType, final Coord coord) {
+    Activity act = new InteractionActivity(actType);
+    act.setCoord(coord);
+    return act;
+  }
 
-	@Override
-	public Activity createActivityFromLinkId(final String actType, final Id<Link> linkId) {
-	        Activity act = new ActivityImpl(actType) ;
-	        act.setLinkId(linkId);
-	        return act ;
-	}
+  @Override
+  public Activity createActivityFromLinkId(final String actType, final Id<Link> linkId) {
+    Activity act = new ActivityImpl(actType);
+    act.setLinkId(linkId);
+    return act;
+  }
 
-	@Override
-	public Activity createInteractionActivityFromLinkId(final String actType, final Id<Link> linkId) {
-	        Activity act = new InteractionActivity(actType) ;
-	        act.setLinkId(linkId);
-	        return act ;
-	}
+  @Override
+  public Activity createInteractionActivityFromLinkId(final String actType, final Id<Link> linkId) {
+    Activity act = new InteractionActivity(actType);
+    act.setLinkId(linkId);
+    return act;
+  }
 
-	@Override
-	public Activity createActivityFromActivityFacilityId( String actType, Id<ActivityFacility> activityFacilityId ){
-		Activity act = new ActivityImpl( actType ) ;
-		act.setFacilityId( activityFacilityId );
-		return act ;
-	}
+  @Override
+  public Activity createActivityFromActivityFacilityId(
+      String actType, Id<ActivityFacility> activityFacilityId) {
+    Activity act = new ActivityImpl(actType);
+    act.setFacilityId(activityFacilityId);
+    return act;
+  }
 
-	@Override
-	public Activity createInteractionActivityFromActivityFacilityId( String actType, Id<ActivityFacility> activityFacilityId ){
-		Activity act = new InteractionActivity( actType ) ;
-		act.setFacilityId( activityFacilityId );
-		return act ;
-	}
+  @Override
+  public Activity createInteractionActivityFromActivityFacilityId(
+      String actType, Id<ActivityFacility> activityFacilityId) {
+    Activity act = new InteractionActivity(actType);
+    act.setFacilityId(activityFacilityId);
+    return act;
+  }
 
-	@Override
-	public Leg createLeg(final String legMode) {
-		return new LegImpl(legMode) ;
-	}
+  @Override
+  public Leg createLeg(final String legMode) {
+    return new LegImpl(legMode);
+  }
 
+  /**
+   * Registers a {@link RouteFactory} for the specified route type. If <code>factory</code> is
+   * <code>null</code>, the existing entry for this <code>routeType</code> will be deleted. If
+   * <code>routeType</code> is <code>null</code>, then the default factory is set that is used if no
+   * specific RouteFactory for a routeType is set.
+   */
+  public void setRouteFactory(final Class<? extends Route> routeType, final RouteFactory factory) {
+    this.routeFactory.setRouteFactory(routeType, factory);
+  }
 
-	/**
-	 * Registers a {@link RouteFactory} for the specified route type. If <code>factory</code> is <code>null</code>,
-	 * the existing entry for this <code>routeType</code> will be deleted. If <code>routeType</code> is <code>null</code>,
-	 * then the default factory is set that is used if no specific RouteFactory for a routeType is set.
-	 *
-	 */
-	public void setRouteFactory(final Class<? extends Route> routeType, final RouteFactory factory) {
-		this.routeFactory.setRouteFactory(routeType, factory);
-	}
-
-	@Override
-	public RouteFactories getRouteFactories() {
-		return this.routeFactory;
-	}
-
+  @Override
+  public RouteFactories getRouteFactories() {
+    return this.routeFactory;
+  }
 }

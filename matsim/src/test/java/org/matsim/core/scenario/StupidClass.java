@@ -16,7 +16,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-
 package org.matsim.core.scenario;
 
 class StupidClass {}

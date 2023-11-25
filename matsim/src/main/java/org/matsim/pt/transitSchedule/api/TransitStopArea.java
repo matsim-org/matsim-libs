@@ -20,9 +20,9 @@
 package org.matsim.pt.transitSchedule.api;
 
 /**
- * This interface is currently only used to provided a typed Id: <code>Id&lt;TransitStopArea&gt;</code>
+ * This interface is currently only used to provided a typed Id: <code>Id&lt;TransitStopArea&gt;
+ * </code>
  *
  * @author mrieser / SBB
- **/
-public interface TransitStopArea {
-}
+ */
+public interface TransitStopArea {}

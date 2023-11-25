@@ -22,16 +22,16 @@ package org.matsim.contrib.dvrp.util;
 import org.matsim.api.core.v01.network.Link;
 
 public class LinkTimePair {
-	public final Link link;
-	public final double time;
+  public final Link link;
+  public final double time;
 
-	public LinkTimePair(Link link, double time) {
-		this.link = link;
-		this.time = time;
-	}
+  public LinkTimePair(Link link, double time) {
+    this.link = link;
+    this.time = time;
+  }
 
-	@Override
-	public String toString() {
-		return "[link=" + link + "][time=" + time + "]";
-	}
+  @Override
+  public String toString() {
+    return "[link=" + link + "][time=" + time + "]";
+  }
 }

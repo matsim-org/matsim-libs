@@ -20,130 +20,133 @@
 package ch.sbb.matsim.routing.pt.raptor;
 
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
-
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Static configuration of SwissRailRaptor used to initialize it.
- * These values are only used initially to build the necessary dataset for SwissRailRaptor
- * (see {@link SwissRailRaptorData}. Once initialized, changes to values in this class
- * will have no effect.
+ * Static configuration of SwissRailRaptor used to initialize it. These values are only used
+ * initially to build the necessary dataset for SwissRailRaptor (see {@link SwissRailRaptorData}.
+ * Once initialized, changes to values in this class will have no effect.
  *
  * @author mrieser / SBB
  */
 public class RaptorStaticConfig {
 
-    public enum RaptorOptimization {
-        /**
-         * Use this option if you plan to calculate simple from-to routes
-         * (see {@link SwissRailRaptor#calcRoute(org.matsim.facilities.Facility, org.matsim.facilities.Facility, double, org.matsim.api.core.v01.population.Person)}).
-         */
-        OneToOneRouting,
-        /**
-         * Use this option if you plan to calculate one-to-all least-cost-path-trees
-         * (see {@link SwissRailRaptor#calcTree(org.matsim.pt.transitSchedule.api.TransitStopFacility, double, RaptorParameters)}).
-         */
-        OneToAllRouting }
-
-
-	/**
-     * The distance in meters that agents can walk to get from one stop to
-     * another stop of a nearby transit line.
+  public enum RaptorOptimization {
+    /**
+     * Use this option if you plan to calculate simple from-to routes (see {@link
+     * SwissRailRaptor#calcRoute(org.matsim.facilities.Facility, org.matsim.facilities.Facility,
+     * double, org.matsim.api.core.v01.population.Person)}).
      */
-    private double beelineWalkConnectionDistance = 200.0;
-    private double beelineWalkSpeed; // meter / second
-    private double beelineWalkDistanceFactor = 1.0;
+    OneToOneRouting,
+    /**
+     * Use this option if you plan to calculate one-to-all least-cost-path-trees (see {@link
+     * SwissRailRaptor#calcTree(org.matsim.pt.transitSchedule.api.TransitStopFacility, double,
+     * RaptorParameters)}).
+     */
+    OneToAllRouting
+  }
 
-    private double minimalTransferTime = 60;
-    private double transferWalkMargin = 5;
+  /**
+   * The distance in meters that agents can walk to get from one stop to another stop of a nearby
+   * transit line.
+   */
+  private double beelineWalkConnectionDistance = 200.0;
 
-    private boolean useModeMappingForPassengers = false;
-    private final Map<String, String> passengerModeMappings = new HashMap<>();
+  private double beelineWalkSpeed; // meter / second
+  private double beelineWalkDistanceFactor = 1.0;
 
-    private boolean useCapacityConstraints = false;
+  private double minimalTransferTime = 60;
+  private double transferWalkMargin = 5;
 
-    private RaptorOptimization optimization = RaptorOptimization.OneToOneRouting;
+  private boolean useModeMappingForPassengers = false;
+  private final Map<String, String> passengerModeMappings = new HashMap<>();
 
-	private SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling intermodalLegOnlyHandling = SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling.forbid;
+  private boolean useCapacityConstraints = false;
 
-    public double getBeelineWalkConnectionDistance() {
-        return this.beelineWalkConnectionDistance;
-    }
+  private RaptorOptimization optimization = RaptorOptimization.OneToOneRouting;
 
-    public void setBeelineWalkConnectionDistance(double beelineWalkConnectionDistance) {
-        this.beelineWalkConnectionDistance = beelineWalkConnectionDistance;
-    }
+  private SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling intermodalLegOnlyHandling =
+      SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling.forbid;
 
-    public double getBeelineWalkSpeed() {
-        return this.beelineWalkSpeed;
-    }
+  public double getBeelineWalkConnectionDistance() {
+    return this.beelineWalkConnectionDistance;
+  }
 
-    public void setBeelineWalkSpeed(double beelineWalkSpeed) {
-        this.beelineWalkSpeed = beelineWalkSpeed;
-    }
+  public void setBeelineWalkConnectionDistance(double beelineWalkConnectionDistance) {
+    this.beelineWalkConnectionDistance = beelineWalkConnectionDistance;
+  }
 
-    public double getBeelineWalkDistanceFactor() {
-        return this.beelineWalkDistanceFactor;
-    }
+  public double getBeelineWalkSpeed() {
+    return this.beelineWalkSpeed;
+  }
 
-    public void setBeelineWalkDistanceFactor(double beelineWalkDistanceFactor) {
-        this.beelineWalkDistanceFactor = beelineWalkDistanceFactor;
-    }
+  public void setBeelineWalkSpeed(double beelineWalkSpeed) {
+    this.beelineWalkSpeed = beelineWalkSpeed;
+  }
 
-    public double getTransferWalkMargin() {
-        return transferWalkMargin;
-    }
+  public double getBeelineWalkDistanceFactor() {
+    return this.beelineWalkDistanceFactor;
+  }
 
-    public void setTransferWalkMargin(double transferWalkMargin) {
-        this.transferWalkMargin = transferWalkMargin;
-    }
+  public void setBeelineWalkDistanceFactor(double beelineWalkDistanceFactor) {
+    this.beelineWalkDistanceFactor = beelineWalkDistanceFactor;
+  }
 
-    public double getMinimalTransferTime() {
-        return this.minimalTransferTime;
-    }
+  public double getTransferWalkMargin() {
+    return transferWalkMargin;
+  }
 
-    public void setMinimalTransferTime(double minimalTransferTime) {
-        this.minimalTransferTime = minimalTransferTime;
-    }
+  public void setTransferWalkMargin(double transferWalkMargin) {
+    this.transferWalkMargin = transferWalkMargin;
+  }
 
-    public boolean isUseModeMappingForPassengers() {
-        return this.useModeMappingForPassengers;
-    }
+  public double getMinimalTransferTime() {
+    return this.minimalTransferTime;
+  }
 
-    public void setUseModeMappingForPassengers(boolean useModeMappingForPassengers) {
-        this.useModeMappingForPassengers = useModeMappingForPassengers;
-    }
+  public void setMinimalTransferTime(double minimalTransferTime) {
+    this.minimalTransferTime = minimalTransferTime;
+  }
 
-    public boolean isUseCapacityConstraints() {
-        return this.useCapacityConstraints;
-    }
+  public boolean isUseModeMappingForPassengers() {
+    return this.useModeMappingForPassengers;
+  }
 
-    public void setUseCapacityConstraints(boolean useCapacityConstraints) {
-        this.useCapacityConstraints = useCapacityConstraints;
-    }
+  public void setUseModeMappingForPassengers(boolean useModeMappingForPassengers) {
+    this.useModeMappingForPassengers = useModeMappingForPassengers;
+  }
 
-    public void addModeMappingForPassengers(String routeMode, String passengerMode) {
-        this.passengerModeMappings.put(routeMode, passengerMode);
-    }
+  public boolean isUseCapacityConstraints() {
+    return this.useCapacityConstraints;
+  }
 
-    public String getPassengerMode(String routeMode) {
-        return this.passengerModeMappings.get(routeMode);
-    }
+  public void setUseCapacityConstraints(boolean useCapacityConstraints) {
+    this.useCapacityConstraints = useCapacityConstraints;
+  }
 
-    public RaptorOptimization getOptimization() {
-        return this.optimization;
-    }
+  public void addModeMappingForPassengers(String routeMode, String passengerMode) {
+    this.passengerModeMappings.put(routeMode, passengerMode);
+  }
 
-    public void setOptimization(RaptorOptimization optimization) {
-        this.optimization = optimization;
-    }
+  public String getPassengerMode(String routeMode) {
+    return this.passengerModeMappings.get(routeMode);
+  }
 
-	public SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling getIntermodalLegOnlyHandling() {
-		return intermodalLegOnlyHandling;
-	}
+  public RaptorOptimization getOptimization() {
+    return this.optimization;
+  }
 
-	public void setIntermodalLegOnlyHandling(SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling intermodalLegOnlyHandling) {
-		this.intermodalLegOnlyHandling = intermodalLegOnlyHandling;
-	}
+  public void setOptimization(RaptorOptimization optimization) {
+    this.optimization = optimization;
+  }
+
+  public SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling getIntermodalLegOnlyHandling() {
+    return intermodalLegOnlyHandling;
+  }
+
+  public void setIntermodalLegOnlyHandling(
+      SwissRailRaptorConfigGroup.IntermodalLegOnlyHandling intermodalLegOnlyHandling) {
+    this.intermodalLegOnlyHandling = intermodalLegOnlyHandling;
+  }
 }

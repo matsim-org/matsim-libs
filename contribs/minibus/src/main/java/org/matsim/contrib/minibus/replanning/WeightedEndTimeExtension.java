@@ -19,64 +19,64 @@
 
 package org.matsim.contrib.minibus.replanning;
 
+import java.util.ArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.minibus.hook.Operator;
 import org.matsim.contrib.minibus.hook.PPlan;
 import org.matsim.contrib.minibus.hook.TimeProvider;
 
-import java.util.ArrayList;
-
 /**
- * 
  * Changes the end time of operation by drawing randomly a new time slot from endTime to midnight.
  * The draw is weighted by the number of activities in those time slots (see {@link TimeProvider}).
- * 
- * @author aneumann
  *
+ * @author aneumann
  */
 public final class WeightedEndTimeExtension extends AbstractPStrategyModule {
-	
-	private final static Logger log = LogManager.getLogger(WeightedEndTimeExtension.class);
-	public static final String STRATEGY_NAME = "WeightedEndTimeExtension";
-	
-	private TimeProvider timeProvider = null;
-	
-	public WeightedEndTimeExtension(ArrayList<String> parameter) {
-		super();
-		if(parameter.size() != 0){
-			log.error("No parameters needed for this module.");
-		}
-	}
-	
-	public void setTimeProvider(TimeProvider timeProvider){
-		this.timeProvider = timeProvider;
-	}
-	
-	@Override
-	public PPlan run(Operator operator) {
-		// change endTime
-		PPlan newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName(), operator.getBestPlan().getId());
-		newPlan.setNVehicles(1);
-		newPlan.setStopsToBeServed(operator.getBestPlan().getStopsToBeServed());
-		newPlan.setStartTime(operator.getBestPlan().getStartTime());
-		
-		// get a valid new end time
-		double newEndTime = this.timeProvider.getRandomTimeInInterval(operator.getBestPlan().getEndTime(), 24 * 3600.0);
-		newPlan.setEndTime(newEndTime);
-		
-		if(newPlan.getEndTime() <= newPlan.getStartTime()){
-			// Could not find a valid new plan
-			return null;
-		}
-		
-		newPlan.setLine(operator.getRouteProvider().createTransitLineFromOperatorPlan(operator.getId(), newPlan));
-		
-		return newPlan;
-	}
 
-	@Override
-	public String getStrategyName() {
-		return WeightedEndTimeExtension.STRATEGY_NAME;
-	}
+  private static final Logger log = LogManager.getLogger(WeightedEndTimeExtension.class);
+  public static final String STRATEGY_NAME = "WeightedEndTimeExtension";
+
+  private TimeProvider timeProvider = null;
+
+  public WeightedEndTimeExtension(ArrayList<String> parameter) {
+    super();
+    if (parameter.size() != 0) {
+      log.error("No parameters needed for this module.");
+    }
+  }
+
+  public void setTimeProvider(TimeProvider timeProvider) {
+    this.timeProvider = timeProvider;
+  }
+
+  @Override
+  public PPlan run(Operator operator) {
+    // change endTime
+    PPlan newPlan =
+        new PPlan(operator.getNewPlanId(), this.getStrategyName(), operator.getBestPlan().getId());
+    newPlan.setNVehicles(1);
+    newPlan.setStopsToBeServed(operator.getBestPlan().getStopsToBeServed());
+    newPlan.setStartTime(operator.getBestPlan().getStartTime());
+
+    // get a valid new end time
+    double newEndTime =
+        this.timeProvider.getRandomTimeInInterval(operator.getBestPlan().getEndTime(), 24 * 3600.0);
+    newPlan.setEndTime(newEndTime);
+
+    if (newPlan.getEndTime() <= newPlan.getStartTime()) {
+      // Could not find a valid new plan
+      return null;
+    }
+
+    newPlan.setLine(
+        operator.getRouteProvider().createTransitLineFromOperatorPlan(operator.getId(), newPlan));
+
+    return newPlan;
+  }
+
+  @Override
+  public String getStrategyName() {
+    return WeightedEndTimeExtension.STRATEGY_NAME;
+  }
 }

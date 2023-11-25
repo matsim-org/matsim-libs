@@ -21,35 +21,32 @@ package org.matsim.lanes;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-
 
 /**
  * @author dgrether
  */
- final class LanesImpl implements Lanes {
+final class LanesImpl implements Lanes {
 
-	private SortedMap<Id<Link>, LanesToLinkAssignment> lanesToLinkAssignments =  new TreeMap<>();
+  private SortedMap<Id<Link>, LanesToLinkAssignment> lanesToLinkAssignments = new TreeMap<>();
 
-	private LanesFactory builder = new LanesFactoryImpl();
+  private LanesFactory builder = new LanesFactoryImpl();
 
-	LanesImpl(){}
+  LanesImpl() {}
 
-	@Override
-	public SortedMap<Id<Link>, LanesToLinkAssignment> getLanesToLinkAssignments() {
-		return this.lanesToLinkAssignments;
-	}
+  @Override
+  public SortedMap<Id<Link>, LanesToLinkAssignment> getLanesToLinkAssignments() {
+    return this.lanesToLinkAssignments;
+  }
 
-	@Override
-	public void addLanesToLinkAssignment(LanesToLinkAssignment assignment) {
-		this.lanesToLinkAssignments.put(assignment.getLinkId(), assignment);
-	}
+  @Override
+  public void addLanesToLinkAssignment(LanesToLinkAssignment assignment) {
+    this.lanesToLinkAssignments.put(assignment.getLinkId(), assignment);
+  }
 
-	@Override
-	public LanesFactory getFactory(){
-		return this.builder;
-	}
-
+  @Override
+  public LanesFactory getFactory() {
+    return this.builder;
+  }
 }

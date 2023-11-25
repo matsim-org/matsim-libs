@@ -21,11 +21,10 @@
 
 package org.matsim.freight.carriers.events.eventhandler;
 
-
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
 
-public interface CarrierServiceEndEventHandler extends EventHandler{
+public interface CarrierServiceEndEventHandler extends EventHandler {
 
-		void handleEvent( CarrierServiceEndEvent event );
+  void handleEvent(CarrierServiceEndEvent event);
 }

@@ -36,33 +36,38 @@ import org.matsim.contrib.dynagent.IdleDynActivity;
  * @author michalm
  */
 public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
-	public static final String DRT_STAY_NAME = "DrtStay";
-	public final static String DRT_STOP_NAME = "DrtBusStop";
-	private final PassengerHandler passengerHandler;
-	private final VrpLegFactory legFactory;
+  public static final String DRT_STAY_NAME = "DrtStay";
+  public static final String DRT_STOP_NAME = "DrtBusStop";
+  private final PassengerHandler passengerHandler;
+  private final VrpLegFactory legFactory;
 
-	public DrtActionCreator(PassengerHandler passengerHandler, VrpLegFactory legFactory) {
-		this.passengerHandler = passengerHandler;
-		this.legFactory = legFactory;
-	}
+  public DrtActionCreator(PassengerHandler passengerHandler, VrpLegFactory legFactory) {
+    this.passengerHandler = passengerHandler;
+    this.legFactory = legFactory;
+  }
 
-	@Override
-	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
-		Task task = vehicle.getSchedule().getCurrentTask();
-		switch (getBaseTypeOrElseThrow(task)) {
-			case DRIVE:
-				return legFactory.create(vehicle);
+  @Override
+  public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
+    Task task = vehicle.getSchedule().getCurrentTask();
+    switch (getBaseTypeOrElseThrow(task)) {
+      case DRIVE:
+        return legFactory.create(vehicle);
 
-			case STOP:
-				DrtStopTask t = (DrtStopTask)task;
-				return new DrtStopActivity(passengerHandler, dynAgent, t::getEndTime, t.getDropoffRequests(), t.getPickupRequests(),
-						DRT_STOP_NAME);
+      case STOP:
+        DrtStopTask t = (DrtStopTask) task;
+        return new DrtStopActivity(
+            passengerHandler,
+            dynAgent,
+            t::getEndTime,
+            t.getDropoffRequests(),
+            t.getPickupRequests(),
+            DRT_STOP_NAME);
 
-			case STAY:
-				return new IdleDynActivity(DRT_STAY_NAME, task::getEndTime);
+      case STAY:
+        return new IdleDynActivity(DRT_STAY_NAME, task::getEndTime);
 
-			default:
-				throw new IllegalStateException();
-		}
-	}
+      default:
+        throw new IllegalStateException();
+    }
+  }
 }

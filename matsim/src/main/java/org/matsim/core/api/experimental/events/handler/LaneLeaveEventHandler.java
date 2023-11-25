@@ -22,13 +22,10 @@ package org.matsim.core.api.experimental.events.handler;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.events.handler.EventHandler;
 
-
-
 /**
  * @author dgrether
- *
  */
 public interface LaneLeaveEventHandler extends EventHandler {
 
-	public void handleEvent (LaneLeaveEvent event);
+  public void handleEvent(LaneLeaveEvent event);
 }

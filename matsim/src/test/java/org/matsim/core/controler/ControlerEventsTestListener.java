@@ -22,7 +22,6 @@ package org.matsim.core.controler;
 
 import java.util.List;
 import java.util.Vector;
-
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -32,78 +31,72 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
+public class ControlerEventsTestListener
+    implements IterationStartsListener, IterationEndsListener, StartupListener, ShutdownListener {
 
-public class ControlerEventsTestListener implements
-		IterationStartsListener, IterationEndsListener, StartupListener, ShutdownListener {
-
-
-	private StartupEvent startupEvent;
-	private ShutdownEvent shutdownEvent;
-  private final List<IterationStartsEvent> startIterationEvents = new Vector<IterationStartsEvent>();
+  private StartupEvent startupEvent;
+  private ShutdownEvent shutdownEvent;
+  private final List<IterationStartsEvent> startIterationEvents =
+      new Vector<IterationStartsEvent>();
   private final List<IterationEndsEvent> endIterationEvents = new Vector<IterationEndsEvent>();
-	private int number;
+  private int number;
 
-	private ControlerEventsTest testClass;
+  private ControlerEventsTest testClass;
 
-	public ControlerEventsTestListener(int i, ControlerEventsTest test) {
-		this.number = i;
-		this.testClass = test;
-	}
+  public ControlerEventsTestListener(int i, ControlerEventsTest test) {
+    this.number = i;
+    this.testClass = test;
+  }
 
-	public void notifyStartup(final StartupEvent controlerStartupEvent) {
-		this.startupEvent = controlerStartupEvent;
-		this.testClass.addCalledStartupListenerNumber(this.number);
-	}
+  public void notifyStartup(final StartupEvent controlerStartupEvent) {
+    this.startupEvent = controlerStartupEvent;
+    this.testClass.addCalledStartupListenerNumber(this.number);
+  }
 
-	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
-		this.shutdownEvent = controlerShudownEvent;
-	}
+  public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
+    this.shutdownEvent = controlerShudownEvent;
+  }
 
+  public void notifyIterationEnds(final IterationEndsEvent event) {
+    this.endIterationEvents.add(event);
+  }
 
-	public void notifyIterationEnds(final IterationEndsEvent event) {
-		this.endIterationEvents.add(event);
-	}
+  public void notifyIterationStarts(final IterationStartsEvent event) {
+    this.startIterationEvents.add(event);
+  }
 
-	public void notifyIterationStarts(final IterationStartsEvent event) {
-		this.startIterationEvents.add(event);
-	}
+  /**
+   * @return the startupEvent
+   */
+  public StartupEvent getStartupEvent() {
+    return this.startupEvent;
+  }
 
-	/**
-	 * @return the startupEvent
-	 */
-	public StartupEvent getStartupEvent() {
-		return this.startupEvent;
-	}
+  /**
+   * @return the shutdownEvent
+   */
+  public ShutdownEvent getShutdownEvent() {
+    return this.shutdownEvent;
+  }
 
-	/**
-	 * @return the shutdownEvent
-	 */
-	public ShutdownEvent getShutdownEvent() {
-		return this.shutdownEvent;
-	}
+  /**
+   * @return the finishIterationEvents
+   */
+  public List<IterationEndsEvent> getIterationEndsEvents() {
+    return this.endIterationEvents;
+  }
 
+  /**
+   * @return the setupIterationEvents
+   */
+  public List<IterationStartsEvent> getIterationStartsEvents() {
+    return this.startIterationEvents;
+  }
 
-	/**
-	 * @return the finishIterationEvents
-	 */
-	public List<IterationEndsEvent> getIterationEndsEvents() {
-		return this.endIterationEvents;
-	}
-
-
-	/**
-	 * @return the setupIterationEvents
-	 */
-	public List<IterationStartsEvent> getIterationStartsEvents() {
-		return this.startIterationEvents;
-	}
-
-	public void reset() {
-		this.startIterationEvents.clear();
-		this.endIterationEvents.clear();
-		this.shutdownEvent = null;
-		this.startupEvent = null;
-	}
-
-
+  public void reset() {
+    this.startIterationEvents.clear();
+    this.endIterationEvents.clear();
+    this.shutdownEvent = null;
+    this.startupEvent = null;
+  }
 }

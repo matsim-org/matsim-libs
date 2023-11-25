@@ -20,145 +20,134 @@
 package org.matsim.contrib.socnetsim.framework.cliques.config;
 
 import java.util.TreeMap;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.ConfigGroup;
 
 /**
  * A config group for the joint trips mutator.
+ *
  * @author thibautd
  */
 public class JointTripsMutatorConfigGroup extends ConfigGroup {
-	private static final Logger log =
-		LogManager.getLogger(JointTripsMutatorConfigGroup.class);
+  private static final Logger log = LogManager.getLogger(JointTripsMutatorConfigGroup.class);
 
-	public static enum SelectorName {
-		EXP_BETA, BEST_SCORE, RANDOM, SELECTED;
-	}
+  public static enum SelectorName {
+    EXP_BETA,
+    BEST_SCORE,
+    RANDOM,
+    SELECTED;
+  }
 
-	public static final String GROUP_NAME = "JointTripsMutator";
+  public static final String GROUP_NAME = "JointTripsMutator";
 
-	public static final String START_PROB = "startMutationProbability";
-	public static final String END_PROB = "endMutationProbability";
-	public static final String SELECTOR = "planSelector";
+  public static final String START_PROB = "startMutationProbability";
+  public static final String END_PROB = "endMutationProbability";
+  public static final String SELECTOR = "planSelector";
 
-	private double startProb = 0.6d;
-	private double endProb = 0.1d;
-	private SelectorName selector = SelectorName.EXP_BETA;
+  private double startProb = 0.6d;
+  private double endProb = 0.1d;
+  private SelectorName selector = SelectorName.EXP_BETA;
 
-	// /////////////////////////////////////////////////////////////////////////
-	// constructor
-	// /////////////////////////////////////////////////////////////////////////
-	public JointTripsMutatorConfigGroup() {
-		super( GROUP_NAME );
-	}
+  // /////////////////////////////////////////////////////////////////////////
+  // constructor
+  // /////////////////////////////////////////////////////////////////////////
+  public JointTripsMutatorConfigGroup() {
+    super(GROUP_NAME);
+  }
 
-	// /////////////////////////////////////////////////////////////////////////
-	// base class methods
-	// /////////////////////////////////////////////////////////////////////////
-	@Override
-	public void addParam(
-			final String param_name,
-			final String value) {
-		// emulate previous behavior of reader (ignore null values at reading). td Apr'15
-		if ( "null".equalsIgnoreCase( value ) ) return;
-	
-		if (param_name.equals( START_PROB )) {
-			setStartMutationProbability( value );
-		}
-		else if (param_name.equals( END_PROB )) {
-			setEndMutationProbability( value );
-		}
-		else if (param_name.equals( SELECTOR )) {
-			setSelector( value );
-		}
-		else {
-			log.warn( "unknown parameter "+param_name );
-		}
-	}
+  // /////////////////////////////////////////////////////////////////////////
+  // base class methods
+  // /////////////////////////////////////////////////////////////////////////
+  @Override
+  public void addParam(final String param_name, final String value) {
+    // emulate previous behavior of reader (ignore null values at reading). td Apr'15
+    if ("null".equalsIgnoreCase(value)) return;
 
-	@Override
-	public String getValue(
-			final String param_name) {
-		if (param_name.equals( START_PROB )) {
-			return ""+getStartMutationProbability();
-		}
-		else if (param_name.equals( END_PROB )) {
-			return ""+getEndMutationProbability();
-		}
-		else if (param_name.equals( SELECTOR )) {
-			return ""+getSelector();
-		}
-		return null;
-	}
+    if (param_name.equals(START_PROB)) {
+      setStartMutationProbability(value);
+    } else if (param_name.equals(END_PROB)) {
+      setEndMutationProbability(value);
+    } else if (param_name.equals(SELECTOR)) {
+      setSelector(value);
+    } else {
+      log.warn("unknown parameter " + param_name);
+    }
+  }
 
-	@Override
-	public TreeMap<String,String> getParams() {
-		TreeMap<String, String> map = new TreeMap<String, String>();
+  @Override
+  public String getValue(final String param_name) {
+    if (param_name.equals(START_PROB)) {
+      return "" + getStartMutationProbability();
+    } else if (param_name.equals(END_PROB)) {
+      return "" + getEndMutationProbability();
+    } else if (param_name.equals(SELECTOR)) {
+      return "" + getSelector();
+    }
+    return null;
+  }
 
-		addParameterToMap( map , START_PROB );
-		addParameterToMap( map , END_PROB );
-		addParameterToMap( map , SELECTOR );
-		return map;
-	}
+  @Override
+  public TreeMap<String, String> getParams() {
+    TreeMap<String, String> map = new TreeMap<String, String>();
 
-	// /////////////////////////////////////////////////////////////////////////
-	// getters/setters
-	// /////////////////////////////////////////////////////////////////////////
-	private void setStartMutationProbability(final String value) {
-		try {
-			double p = Double.parseDouble( value );
+    addParameterToMap(map, START_PROB);
+    addParameterToMap(map, END_PROB);
+    addParameterToMap(map, SELECTOR);
+    return map;
+  }
 
-			if (p >= 0 && p <= 1) {
-				startProb = p;
-			}
-			else {
-				log.warn( "invalid probability "+p+": keeping start mutation probability to "+startProb );
-			}
-		}
-		catch (NumberFormatException e) {
-			log.warn( "invalid number "+value+": keeping start mutation probability to "+startProb );
-		}
-	}
+  // /////////////////////////////////////////////////////////////////////////
+  // getters/setters
+  // /////////////////////////////////////////////////////////////////////////
+  private void setStartMutationProbability(final String value) {
+    try {
+      double p = Double.parseDouble(value);
 
-	private void setEndMutationProbability(final String value) {
-		try {
-			double p = Double.parseDouble( value );
+      if (p >= 0 && p <= 1) {
+        startProb = p;
+      } else {
+        log.warn(
+            "invalid probability " + p + ": keeping start mutation probability to " + startProb);
+      }
+    } catch (NumberFormatException e) {
+      log.warn("invalid number " + value + ": keeping start mutation probability to " + startProb);
+    }
+  }
 
-			if (p >= 0 && p <= 1) {
-				endProb = p;
-			}
-			else {
-				log.warn( "invalid probability "+p+": keeping end mutation probability to "+endProb );
-			}
-		}
-		catch (NumberFormatException e) {
-			log.warn( "invalid number "+value+": keeping end mutation probability to "+endProb );
-		}
-	}
+  private void setEndMutationProbability(final String value) {
+    try {
+      double p = Double.parseDouble(value);
 
-	public double getStartMutationProbability() {
-		return startProb;
-	}
+      if (p >= 0 && p <= 1) {
+        endProb = p;
+      } else {
+        log.warn("invalid probability " + p + ": keeping end mutation probability to " + endProb);
+      }
+    } catch (NumberFormatException e) {
+      log.warn("invalid number " + value + ": keeping end mutation probability to " + endProb);
+    }
+  }
 
-	public double getEndMutationProbability() {
-		return endProb;
-	}
+  public double getStartMutationProbability() {
+    return startProb;
+  }
 
-	private void setSelector(final String value) {
-		try {
-			SelectorName name = SelectorName.valueOf( value.toUpperCase().trim() );
-			this.selector = name;
-		}
-		catch (IllegalArgumentException e) {
-			log.warn( "invalid selector name: "+value.toUpperCase().trim() );
-			log.warn( "keeping current value "+selector );
-		}
-	}
+  public double getEndMutationProbability() {
+    return endProb;
+  }
 
-	public SelectorName getSelector() {
-		return selector;
-	}
+  private void setSelector(final String value) {
+    try {
+      SelectorName name = SelectorName.valueOf(value.toUpperCase().trim());
+      this.selector = name;
+    } catch (IllegalArgumentException e) {
+      log.warn("invalid selector name: " + value.toUpperCase().trim());
+      log.warn("keeping current value " + selector);
+    }
+  }
+
+  public SelectorName getSelector() {
+    return selector;
+  }
 }
-

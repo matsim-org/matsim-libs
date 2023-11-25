@@ -22,110 +22,106 @@ package org.matsim.contrib.locationchoice.timegeography;
 
 import java.util.List;
 import java.util.Vector;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 
 class SubChain {
 
-	private Activity firstPrimAct = null;
-	private Activity lastPrimAct = null;
+  private Activity firstPrimAct = null;
+  private Activity lastPrimAct = null;
 
-	private List<Activity> secondaryActs = null;
-	private double ttBudget = 0.0;
-	private double totalTravelDistance = 0.0;
+  private List<Activity> secondaryActs = null;
+  private double ttBudget = 0.0;
+  private double totalTravelDistance = 0.0;
 
-	private Coord startCoord = null;
-	private Coord endCoord = null;
+  private Coord startCoord = null;
+  private Coord endCoord = null;
 
-	//car, walk, mixed
-	private String mode = null;
+  // car, walk, mixed
+  private String mode = null;
 
-	public void defineMode(final String mode) {
-		if (this.mode == null) {
-			this.mode = mode;
-			return;
-		}
-		if (this.mode.equals("mixed")) {
-			return;
-		}
-		if (!this.mode.equals(mode)) {
-			this.mode = "mixed";
-		}
-	}
+  public void defineMode(final String mode) {
+    if (this.mode == null) {
+      this.mode = mode;
+      return;
+    }
+    if (this.mode.equals("mixed")) {
+      return;
+    }
+    if (!this.mode.equals(mode)) {
+      this.mode = "mixed";
+    }
+  }
 
-	public SubChain() {
-		secondaryActs = new Vector<Activity>();
-	}
+  public SubChain() {
+    secondaryActs = new Vector<Activity>();
+  }
 
-	public void addAct(Activity act) {
-		this.secondaryActs.add(act);
-	}
+  public void addAct(Activity act) {
+    this.secondaryActs.add(act);
+  }
 
+  public double getTtBudget() {
+    return ttBudget;
+  }
 
-	public double getTtBudget() {
-		return ttBudget;
-	}
+  public void setTtBudget(double ttBudget) {
+    this.ttBudget = ttBudget;
+  }
 
+  public Coord getStartCoord() {
+    return startCoord;
+  }
 
-	public void setTtBudget(double ttBudget) {
-		this.ttBudget = ttBudget;
-	}
+  public void setStartCoord(Coord startCoord) {
+    this.startCoord = startCoord;
+  }
 
-	public Coord getStartCoord() {
-		return startCoord;
-	}
+  public Coord getEndCoord() {
+    return endCoord;
+  }
 
-	public void setStartCoord(Coord startCoord) {
-		this.startCoord = startCoord;
-	}
+  public void setEndCoord(Coord endCoord) {
+    this.endCoord = endCoord;
+  }
 
-	public Coord getEndCoord() {
-		return endCoord;
-	}
+  public List<Activity> getSlActs() {
+    return secondaryActs;
+  }
 
-	public void setEndCoord(Coord endCoord) {
-		this.endCoord = endCoord;
-	}
+  public void setSlActs(List<Activity> slActs) {
+    this.secondaryActs = slActs;
+  }
 
-	public List<Activity> getSlActs() {
-		return secondaryActs;
-	}
+  public Activity getFirstPrimAct() {
+    return firstPrimAct;
+  }
 
-	public void setSlActs(List<Activity> slActs) {
-		this.secondaryActs = slActs;
-	}
+  public void setFirstPrimAct(Activity firstPrimAct) {
+    this.firstPrimAct = firstPrimAct;
+  }
 
-	public Activity getFirstPrimAct() {
-		return firstPrimAct;
-	}
+  public Activity getLastPrimAct() {
+    return lastPrimAct;
+  }
 
-	public void setFirstPrimAct(Activity firstPrimAct) {
-		this.firstPrimAct = firstPrimAct;
-	}
+  public void setLastPrimAct(Activity lastPrimAct) {
+    this.lastPrimAct = lastPrimAct;
+  }
 
-	public Activity getLastPrimAct() {
-		return lastPrimAct;
-	}
+  public double getTotalTravelDistance() {
+    return totalTravelDistance;
+  }
 
-	public void setLastPrimAct(Activity lastPrimAct) {
-		this.lastPrimAct = lastPrimAct;
-	}
+  public void setTotalTravelDistance(double totalTravelDistance) {
+    this.totalTravelDistance = totalTravelDistance;
+  }
 
-	public double getTotalTravelDistance() {
-		return totalTravelDistance;
-	}
+  public String getMode() {
+    return mode;
+  }
 
-	public void setTotalTravelDistance(double totalTravelDistance) {
-		this.totalTravelDistance = totalTravelDistance;
-	}
-
-	public String getMode() {
-		return mode;
-	}
-
-	public void setMode(String mode) {
-		this.mode = mode;
-	}
-
+  public void setMode(String mode) {
+    this.mode = mode;
+  }
 }

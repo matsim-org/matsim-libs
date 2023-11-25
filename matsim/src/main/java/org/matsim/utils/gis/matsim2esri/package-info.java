@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * package-info.java
@@ -19,13 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
- /**
- * This package provides classes and methods to write out MATSim data
- * as ESRI Shape Files (e.g. network, plans, ...)
- * 
+/**
+ * This package provides classes and methods to write out MATSim data as ESRI Shape Files (e.g.
+ * network, plans, ...)
+ *
  * <h2>Package Maintainer(s):</h2>
+ *
  * <ul>
- *   <li>Gregor Laemmel</li>
+ *   <li>Gregor Laemmel
  * </ul>
  */
 package org.matsim.utils.gis.matsim2esri;

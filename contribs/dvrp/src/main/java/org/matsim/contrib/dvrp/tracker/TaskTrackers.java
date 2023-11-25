@@ -29,35 +29,36 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
  * General assumptions:
+ *
  * <ul>
- * <li>An offline tracker knows/uses only the corresponding task and the schedule (i.e. plan)</li>
- * <li>An online tracker knows/uses also the corresponding {@link DynAction} (i.e. execution)</li>
+ *   <li>An offline tracker knows/uses only the corresponding task and the schedule (i.e. plan)
+ *   <li>An online tracker knows/uses also the corresponding {@link DynAction} (i.e. execution)
  * </ul>
  *
  * @author michalm
  */
 public class TaskTrackers {
-	public static void initOnlineDriveTaskTracking(DvrpVehicle vehicle, VrpLeg vrpDynLeg,
-			OnlineDriveTaskTracker onlineTracker) {
-		DriveTask driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
-		driveTask.initTaskTracker(onlineTracker);
-		vrpDynLeg.initOnlineTracking(onlineTracker);
-	}
+  public static void initOnlineDriveTaskTracking(
+      DvrpVehicle vehicle, VrpLeg vrpDynLeg, OnlineDriveTaskTracker onlineTracker) {
+    DriveTask driveTask = (DriveTask) vehicle.getSchedule().getCurrentTask();
+    driveTask.initTaskTracker(onlineTracker);
+    vrpDynLeg.initOnlineTracking(onlineTracker);
+  }
 
-	public static void initOfflineTaskTracking(final Task task, final MobsimTimer timer) {
-		task.initTaskTracker(() -> TaskTrackers.predictEndTimeOffline(task, timer.getTimeOfDay()));
-	}
+  public static void initOfflineTaskTracking(final Task task, final MobsimTimer timer) {
+    task.initTaskTracker(() -> TaskTrackers.predictEndTimeOffline(task, timer.getTimeOfDay()));
+  }
 
-	public static double predictEndTime(Task task, double currentTime) {
-		if (task.getStatus() != TaskStatus.STARTED) {
-			throw new IllegalStateException();
-		}
+  public static double predictEndTime(Task task, double currentTime) {
+    if (task.getStatus() != TaskStatus.STARTED) {
+      throw new IllegalStateException();
+    }
 
-		TaskTracker tracker = task.getTaskTracker();
-		return tracker != null ? tracker.predictEndTime() : predictEndTimeOffline(task, currentTime);
-	}
+    TaskTracker tracker = task.getTaskTracker();
+    return tracker != null ? tracker.predictEndTime() : predictEndTimeOffline(task, currentTime);
+  }
 
-	private static double predictEndTimeOffline(Task task, double currentTime) {
-		return Math.max(task.getEndTime(), currentTime);
-	}
+  private static double predictEndTimeOffline(Task task, double currentTime) {
+    return Math.max(task.getEndTime(), currentTime);
+  }
 }

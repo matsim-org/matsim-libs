@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.vsp.airPollution.flatEmissions;
 
-import java.util.Set;
 import jakarta.inject.Inject;
+import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -36,48 +36,47 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
-
 /**
  * @author benjamin
- *
  */
-public class InternalizeEmissionsControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
-	private static final Logger logger = LogManager.getLogger(InternalizeEmissionsControlerListener.class);
+public class InternalizeEmissionsControlerListener
+    implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
+  private static final Logger logger =
+      LogManager.getLogger(InternalizeEmissionsControlerListener.class);
 
-	@Inject private MatsimServices controler;
+  @Inject private MatsimServices controler;
 
-	private EmissionInternalizationHandler emissionInternalizationHandler;
+  private EmissionInternalizationHandler emissionInternalizationHandler;
 
-	@Inject private EmissionModule emissionModule;
-	@Inject private EmissionCostModule emissionCostModule;
+  @Inject private EmissionModule emissionModule;
+  @Inject private EmissionCostModule emissionCostModule;
 
-	private Set<Id<Link>> hotspotLinks;
+  private Set<Id<Link>> hotspotLinks;
 
-	@Override
-	public void notifyStartup(StartupEvent event) {
-	}
+  @Override
+  public void notifyStartup(StartupEvent event) {}
 
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		logger.info("creating new emission internalization handler...");
-		emissionInternalizationHandler = new EmissionInternalizationHandler(controler, emissionCostModule, hotspotLinks );
-		logger.info("adding emission internalization module to emission events stream...");
-		emissionModule.getEmissionEventsManager().addHandler(emissionInternalizationHandler);
-	}
+  @Override
+  public void notifyIterationStarts(IterationStartsEvent event) {
+    logger.info("creating new emission internalization handler...");
+    emissionInternalizationHandler =
+        new EmissionInternalizationHandler(controler, emissionCostModule, hotspotLinks);
+    logger.info("adding emission internalization module to emission events stream...");
+    emissionModule.getEmissionEventsManager().addHandler(emissionInternalizationHandler);
+  }
 
-	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		logger.info("removing emission internalization module from emission events stream...");
-		emissionModule.getEmissionEventsManager().removeHandler(emissionInternalizationHandler);
-	}
+  @Override
+  public void notifyIterationEnds(IterationEndsEvent event) {
+    logger.info("removing emission internalization module from emission events stream...");
+    emissionModule.getEmissionEventsManager().removeHandler(emissionInternalizationHandler);
+  }
 
-	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-		emissionModule.writeEmissionInformation();
-	}
+  @Override
+  public void notifyShutdown(ShutdownEvent event) {
+    emissionModule.writeEmissionInformation();
+  }
 
-	public void setHotspotLinks(Set<Id<Link>> hotspotLinks) {
-		this.hotspotLinks = hotspotLinks;
-	}
-
+  public void setHotspotLinks(Set<Id<Link>> hotspotLinks) {
+    this.hotspotLinks = hotspotLinks;
+  }
 }

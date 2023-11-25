@@ -35,42 +35,41 @@ import org.matsim.contrib.socnetsim.usage.PlanLinkConfigGroup;
  * @author thibautd
  */
 public class StrongLinkIdentifierProvider implements Provider<PlanLinkIdentifier> {
-	private static final Logger log = LogManager.getLogger( StrongLinkIdentifierProvider.class );
-	private final PlanLinkConfigGroup configGroup;
-	private final SocialNetwork socialNetwork;
+  private static final Logger log = LogManager.getLogger(StrongLinkIdentifierProvider.class);
+  private final PlanLinkConfigGroup configGroup;
+  private final SocialNetwork socialNetwork;
 
-	@Inject
-	public StrongLinkIdentifierProvider(
-			final PlanLinkConfigGroup configGroup,
-			final SocialNetwork socialNetwork ) {
-		this.configGroup = configGroup;
-		this.socialNetwork = socialNetwork;
-	}
+  @Inject
+  public StrongLinkIdentifierProvider(
+      final PlanLinkConfigGroup configGroup, final SocialNetwork socialNetwork) {
+    this.configGroup = configGroup;
+    this.socialNetwork = socialNetwork;
+  }
 
-	@Override
-	public PlanLinkIdentifier get() {
-		final CompositePlanLinkIdentifier id = new CompositePlanLinkIdentifier();
+  @Override
+  public PlanLinkIdentifier get() {
+    final CompositePlanLinkIdentifier id = new CompositePlanLinkIdentifier();
 
-		id.addAndComponent( new SocialNetworkPlanLinkIdentifier( socialNetwork ) );
+    id.addAndComponent(new SocialNetworkPlanLinkIdentifier(socialNetwork));
 
-		if ( configGroup.getLinkJointTrips().isWeak() ) {
-			id.addOrComponent( new JointTripsPlanLinkIdentifier() );
-		}
+    if (configGroup.getLinkJointTrips().isWeak()) {
+      id.addOrComponent(new JointTripsPlanLinkIdentifier());
+    }
 
-		if ( configGroup.getLinkVehicles().isWeak() ) {
-			id.addOrComponent( new VehicularPlanBasedIdentifier() );
-		}
+    if (configGroup.getLinkVehicles().isWeak()) {
+      id.addOrComponent(new VehicularPlanBasedIdentifier());
+    }
 
-		if ( configGroup.getLinkJoinableActivities().isWeak() ) {
-			for ( String activityType : configGroup.getJoinableTypes() ) {
-				id.addOrComponent( new JoinableActivitiesPlanLinkIdentifier( activityType ) );
-			}
-		}
+    if (configGroup.getLinkJoinableActivities().isWeak()) {
+      for (String activityType : configGroup.getJoinableTypes()) {
+        id.addOrComponent(new JoinableActivitiesPlanLinkIdentifier(activityType));
+      }
+    }
 
-		if ( log.isTraceEnabled() ) {
-			log.trace( "Created STRONG plan link identifier: "+id );
-		}
+    if (log.isTraceEnabled()) {
+      log.trace("Created STRONG plan link identifier: " + id);
+    }
 
-		return id;
-	}
+    return id;
+  }
 }

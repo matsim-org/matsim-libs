@@ -24,8 +24,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
-
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureIterator;
@@ -43,163 +41,193 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-public class WorkHomeShapeCounter extends AbstractPersonAlgorithm{
-	
-	private static final Logger log = LogManager.getLogger(WorkHomeShapeCounter.class);
+public class WorkHomeShapeCounter extends AbstractPersonAlgorithm {
 
-	private final Coord minXY;
-	private final Coord maxXY;
-	private String actTypeOne;
-	private String actTypeTwo;
-	
-	private boolean initDone = false;
-	private String shapeFile;
-	private SimpleFeatureSource featureSource;
-	private HashMap<Polygon, Integer> polygonCountMap = new HashMap<Polygon, Integer>();
-	private HashMap<Polygon, String> polyNameMap = new HashMap<Polygon, String>();
-	
-	@Override
-	public void run(Person person) {
-		
-		if(!this.initDone){
-			init();
-		}
-		
-		int nofPlans = person.getPlans().size();
-	
-		for (int planId = 0; planId < nofPlans; planId++) {
-			Plan plan = person.getPlans().get(planId);
-			
-			// search selected plan
-			if (PersonUtils.isSelected(plan)) {
-				
-				// do something				
-				for (PlanElement pEOne : plan.getPlanElements()) {
-					if(pEOne instanceof Activity){
-						
-						// check - actTypeOne in search area? 
-						Activity actOne = (Activity) pEOne;						
-						if(actOne.getType().equalsIgnoreCase(this.actTypeOne)){
-							// it is of type actTypeOne -> check coords
-							
-							if(actIsSituatedInGivenSearchArea(actOne)){
-								// act one ok, check type two;
-								
-								for (PlanElement pETwo : plan.getPlanElements()) {
-									if(pETwo instanceof Activity){
-										
-										Activity actTwo = (Activity) pETwo;										
-										if(actTwo.getType().equalsIgnoreCase(this.actTypeTwo)){
-											
-											// act two ok - search corresponding shape											
-											searchCorrespondingShape(actTwo);
-											break;
-										}
-										
-									}									
-								}								
-								break;
-							}							
-							
-						}						
-						
-					}
-				}
-				
-			}
-		}		
-	}
+  private static final Logger log = LogManager.getLogger(WorkHomeShapeCounter.class);
 
-	public WorkHomeShapeCounter(Coord minXY, Coord maxXY, String actTypeOne, String actTypeTwo, String shapeFile){
-		super();
-		this.minXY = minXY;
-		this.maxXY = maxXY;
-		this.actTypeOne = actTypeOne;
-		this.actTypeTwo = actTypeTwo;
-		this.shapeFile = shapeFile;
-		log.info("Added...");
-	}
+  private final Coord minXY;
+  private final Coord maxXY;
+  private String actTypeOne;
+  private String actTypeTwo;
 
-	@Override
-	public String toString() {
-		StringBuffer strB = new StringBuffer();
-		strB.append("Results with " + this.actTypeOne + " at " + this.minXY + ", " + this.maxXY + " and " + this.actTypeTwo + " at...\n");
-		strB.append("Shape, Number of agents\n");
-		for (Polygon poly : this.polygonCountMap.keySet()) {
-			strB.append(this.polyNameMap.get(poly) + ", " + this.polygonCountMap.get(poly) + "\n");
-		}
-		return strB.toString();
-	}
-	
-	public void toFile(String filename){
-		
-		int numberOfActs = 0;
-		for (Polygon poly : this.polygonCountMap.keySet()) {
-			numberOfActs += this.polygonCountMap.get(poly).intValue();
-		}
-		
-		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filename)));
-			writer.write("#Results with " + this.actTypeOne + " act in minXY " + this.minXY + " maxXY " + this.maxXY + " and " + this.actTypeTwo + " act located in"); writer.newLine();
-			writer.write("#Includes all acts moved from TXL and SXF to BBI. " + numberOfActs + " agents in total"); writer.newLine();
-			writer.write("Shape, Number of agents, Share"); writer.newLine();
-			for (Polygon poly : this.polygonCountMap.keySet()) {
-				writer.write(this.polyNameMap.get(poly) + ", " + this.polygonCountMap.get(poly) + ", " + (this.polygonCountMap.get(poly).doubleValue() / numberOfActs)); writer.newLine();
-			}
-			writer.flush();
-			writer.close();
-			log.info("Results written to " + filename);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+  private boolean initDone = false;
+  private String shapeFile;
+  private SimpleFeatureSource featureSource;
+  private HashMap<Polygon, Integer> polygonCountMap = new HashMap<Polygon, Integer>();
+  private HashMap<Polygon, String> polyNameMap = new HashMap<Polygon, String>();
 
-	/**
-	 * Put all polygon in an iterable list
-	 */
-	private void init() {
-		
-		try {
-			this.featureSource = ShapeFileReader.readDataFile(this.shapeFile);			
-	
-			SimpleFeatureIterator fIt = this.featureSource.getFeatures().features();
-			while (fIt.hasNext()) {
-				SimpleFeature ft = fIt.next();
-				for (int i = 0; i < ((Geometry) ft.getDefaultGeometry()).getNumGeometries(); i++) {
-					Geometry geometry = ((Geometry) ft.getDefaultGeometry()).getGeometryN(i);
-					if(geometry instanceof Polygon){
-						Polygon poly = (Polygon) geometry;
-						this.polygonCountMap.put(poly, new Integer(0));
-						this.polyNameMap.put(poly, (String) ft.getAttribute("Bezirk"));
-					}
-				}
-			}			
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		this.initDone = true;
-	}
+  @Override
+  public void run(Person person) {
 
-	private boolean actIsSituatedInGivenSearchArea(Activity act) {
-		if(this.minXY.getX() > act.getCoord().getX()){ return false;}
-		if(this.minXY.getY() > act.getCoord().getY()){ return false;}
-		if(this.maxXY.getX() < act.getCoord().getX()){ return false;}
-		if(this.maxXY.getY() < act.getCoord().getY()){ return false;}
-		
-		return true;		
-	}
+    if (!this.initDone) {
+      init();
+    }
 
-	private void searchCorrespondingShape(Activity actTwo) {
-		for (Polygon poly : this.polygonCountMap.keySet()) {
-			if(poly.contains(MGC.coord2Point(actTwo.getCoord()))){
-				this.polygonCountMap.put(poly, new Integer(this.polygonCountMap.get(poly).intValue() + 1));
-				break;
-			}
-		}
-	}
+    int nofPlans = person.getPlans().size();
 
+    for (int planId = 0; planId < nofPlans; planId++) {
+      Plan plan = person.getPlans().get(planId);
+
+      // search selected plan
+      if (PersonUtils.isSelected(plan)) {
+
+        // do something
+        for (PlanElement pEOne : plan.getPlanElements()) {
+          if (pEOne instanceof Activity) {
+
+            // check - actTypeOne in search area?
+            Activity actOne = (Activity) pEOne;
+            if (actOne.getType().equalsIgnoreCase(this.actTypeOne)) {
+              // it is of type actTypeOne -> check coords
+
+              if (actIsSituatedInGivenSearchArea(actOne)) {
+                // act one ok, check type two;
+
+                for (PlanElement pETwo : plan.getPlanElements()) {
+                  if (pETwo instanceof Activity) {
+
+                    Activity actTwo = (Activity) pETwo;
+                    if (actTwo.getType().equalsIgnoreCase(this.actTypeTwo)) {
+
+                      // act two ok - search corresponding shape
+                      searchCorrespondingShape(actTwo);
+                      break;
+                    }
+                  }
+                }
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  public WorkHomeShapeCounter(
+      Coord minXY, Coord maxXY, String actTypeOne, String actTypeTwo, String shapeFile) {
+    super();
+    this.minXY = minXY;
+    this.maxXY = maxXY;
+    this.actTypeOne = actTypeOne;
+    this.actTypeTwo = actTypeTwo;
+    this.shapeFile = shapeFile;
+    log.info("Added...");
+  }
+
+  @Override
+  public String toString() {
+    StringBuffer strB = new StringBuffer();
+    strB.append(
+        "Results with "
+            + this.actTypeOne
+            + " at "
+            + this.minXY
+            + ", "
+            + this.maxXY
+            + " and "
+            + this.actTypeTwo
+            + " at...\n");
+    strB.append("Shape, Number of agents\n");
+    for (Polygon poly : this.polygonCountMap.keySet()) {
+      strB.append(this.polyNameMap.get(poly) + ", " + this.polygonCountMap.get(poly) + "\n");
+    }
+    return strB.toString();
+  }
+
+  public void toFile(String filename) {
+
+    int numberOfActs = 0;
+    for (Polygon poly : this.polygonCountMap.keySet()) {
+      numberOfActs += this.polygonCountMap.get(poly).intValue();
+    }
+
+    try {
+      BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filename)));
+      writer.write(
+          "#Results with "
+              + this.actTypeOne
+              + " act in minXY "
+              + this.minXY
+              + " maxXY "
+              + this.maxXY
+              + " and "
+              + this.actTypeTwo
+              + " act located in");
+      writer.newLine();
+      writer.write(
+          "#Includes all acts moved from TXL and SXF to BBI. " + numberOfActs + " agents in total");
+      writer.newLine();
+      writer.write("Shape, Number of agents, Share");
+      writer.newLine();
+      for (Polygon poly : this.polygonCountMap.keySet()) {
+        writer.write(
+            this.polyNameMap.get(poly)
+                + ", "
+                + this.polygonCountMap.get(poly)
+                + ", "
+                + (this.polygonCountMap.get(poly).doubleValue() / numberOfActs));
+        writer.newLine();
+      }
+      writer.flush();
+      writer.close();
+      log.info("Results written to " + filename);
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
+  /** Put all polygon in an iterable list */
+  private void init() {
+
+    try {
+      this.featureSource = ShapeFileReader.readDataFile(this.shapeFile);
+
+      SimpleFeatureIterator fIt = this.featureSource.getFeatures().features();
+      while (fIt.hasNext()) {
+        SimpleFeature ft = fIt.next();
+        for (int i = 0; i < ((Geometry) ft.getDefaultGeometry()).getNumGeometries(); i++) {
+          Geometry geometry = ((Geometry) ft.getDefaultGeometry()).getGeometryN(i);
+          if (geometry instanceof Polygon) {
+            Polygon poly = (Polygon) geometry;
+            this.polygonCountMap.put(poly, new Integer(0));
+            this.polyNameMap.put(poly, (String) ft.getAttribute("Bezirk"));
+          }
+        }
+      }
+
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
+    this.initDone = true;
+  }
+
+  private boolean actIsSituatedInGivenSearchArea(Activity act) {
+    if (this.minXY.getX() > act.getCoord().getX()) {
+      return false;
+    }
+    if (this.minXY.getY() > act.getCoord().getY()) {
+      return false;
+    }
+    if (this.maxXY.getX() < act.getCoord().getX()) {
+      return false;
+    }
+    if (this.maxXY.getY() < act.getCoord().getY()) {
+      return false;
+    }
+
+    return true;
+  }
+
+  private void searchCorrespondingShape(Activity actTwo) {
+    for (Polygon poly : this.polygonCountMap.keySet()) {
+      if (poly.contains(MGC.coord2Point(actTwo.getCoord()))) {
+        this.polygonCountMap.put(poly, new Integer(this.polygonCountMap.get(poly).intValue() + 1));
+        break;
+      }
+    }
+  }
 }

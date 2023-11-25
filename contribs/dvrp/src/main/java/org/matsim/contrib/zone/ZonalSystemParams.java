@@ -20,31 +20,31 @@
 
 package org.matsim.contrib.zone;
 
-import org.matsim.core.config.ReflectiveConfigGroup;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 public final class ZonalSystemParams extends ReflectiveConfigGroup {
-	public static final String SET_NAME = "ZonalSystemParams";
+  public static final String SET_NAME = "ZonalSystemParams";
 
-	@Parameter
-	@Comment("An XML file specifying the zonal system")
-	@NotBlank
-	public String zonesXmlFile;
+  @Parameter
+  @Comment("An XML file specifying the zonal system")
+  @NotBlank
+  public String zonesXmlFile;
 
-	@Parameter
-	@Comment("A shape file specifying the geometries of zones")
-	@NotBlank
-	public String zonesShpFile;
+  @Parameter
+  @Comment("A shape file specifying the geometries of zones")
+  @NotBlank
+  public String zonesShpFile;
 
-	@Parameter
-	@Comment("Expands the envelope by a given distance in all directions."
-			+ " Used in ZoneFinderImpl.findZone(). The default value is 0")
-	@PositiveOrZero
-	public double expansionDistance = 0;
+  @Parameter
+  @Comment(
+      "Expands the envelope by a given distance in all directions."
+          + " Used in ZoneFinderImpl.findZone(). The default value is 0")
+  @PositiveOrZero
+  public double expansionDistance = 0;
 
-	public ZonalSystemParams() {
-		super(SET_NAME);
-	}
+  public ZonalSystemParams() {
+    super(SET_NAME);
+  }
 }

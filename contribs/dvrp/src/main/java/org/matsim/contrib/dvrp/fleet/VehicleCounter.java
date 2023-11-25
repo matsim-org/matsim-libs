@@ -31,49 +31,51 @@ import java.util.Queue;
  * @author michalm
  */
 public class VehicleCounter {
-	private final Collection<? extends DvrpVehicle> vehicles;
-	private final Queue<DvrpVehicle> waitingVehicles;
-	private final Queue<DvrpVehicle> activeVehicles;
+  private final Collection<? extends DvrpVehicle> vehicles;
+  private final Queue<DvrpVehicle> waitingVehicles;
+  private final Queue<DvrpVehicle> activeVehicles;
 
-	public VehicleCounter(Collection<? extends DvrpVehicle> vehicles) {
-		this.vehicles = vehicles;
+  public VehicleCounter(Collection<? extends DvrpVehicle> vehicles) {
+    this.vehicles = vehicles;
 
-		int queueCapacity = vehicles.size();
-		this.waitingVehicles = new PriorityQueue<>(queueCapacity,
-				Comparator.comparingDouble(DvrpVehicle::getServiceBeginTime));
-		this.activeVehicles = new PriorityQueue<>(queueCapacity,
-				Comparator.comparingDouble(DvrpVehicle::getServiceEndTime));
-	}
+    int queueCapacity = vehicles.size();
+    this.waitingVehicles =
+        new PriorityQueue<>(
+            queueCapacity, Comparator.comparingDouble(DvrpVehicle::getServiceBeginTime));
+    this.activeVehicles =
+        new PriorityQueue<>(
+            queueCapacity, Comparator.comparingDouble(DvrpVehicle::getServiceEndTime));
+  }
 
-	public List<Integer> countVehiclesOverTime(double timeStep) {
-		List<Integer> vehicleCounts = new ArrayList<>();
-		double currentTime = 0;
-		waitingVehicles.addAll(vehicles);
+  public List<Integer> countVehiclesOverTime(double timeStep) {
+    List<Integer> vehicleCounts = new ArrayList<>();
+    double currentTime = 0;
+    waitingVehicles.addAll(vehicles);
 
-		while (!waitingVehicles.isEmpty() || !activeVehicles.isEmpty()) {
-			// move waiting->active
-			while (!waitingVehicles.isEmpty()) {
-				if (waitingVehicles.peek().getServiceBeginTime() > currentTime) {
-					break;
-				}
+    while (!waitingVehicles.isEmpty() || !activeVehicles.isEmpty()) {
+      // move waiting->active
+      while (!waitingVehicles.isEmpty()) {
+        if (waitingVehicles.peek().getServiceBeginTime() > currentTime) {
+          break;
+        }
 
-				DvrpVehicle newActiveVehicle = waitingVehicles.poll();
-				activeVehicles.add(newActiveVehicle);
-			}
+        DvrpVehicle newActiveVehicle = waitingVehicles.poll();
+        activeVehicles.add(newActiveVehicle);
+      }
 
-			// remove from active
-			while (!activeVehicles.isEmpty()) {
-				if (activeVehicles.peek().getServiceEndTime() > currentTime) {
-					break;
-				}
+      // remove from active
+      while (!activeVehicles.isEmpty()) {
+        if (activeVehicles.peek().getServiceEndTime() > currentTime) {
+          break;
+        }
 
-				activeVehicles.poll();
-			}
+        activeVehicles.poll();
+      }
 
-			vehicleCounts.add(activeVehicles.size());
-			currentTime += timeStep;
-		}
+      vehicleCounts.add(activeVehicles.size());
+      currentTime += timeStep;
+    }
 
-		return vehicleCounts;
-	}
+    return vehicleCounts;
+  }
 }

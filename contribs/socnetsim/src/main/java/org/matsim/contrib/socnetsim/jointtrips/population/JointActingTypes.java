@@ -26,14 +26,14 @@ import java.util.Set;
 
 /**
  * Defines different naming constants related to joint actings.
+ *
  * @author thibautd
  */
 public interface JointActingTypes {
-	public static final String INTERACTION = "joint";
-	public static final Set<String> JOINT_STAGE_ACTS = new HashSet<>(Arrays.asList( INTERACTION ));
+  public static final String INTERACTION = "joint";
+  public static final Set<String> JOINT_STAGE_ACTS = new HashSet<>(Arrays.asList(INTERACTION));
 
-	public static final String PASSENGER = "car_passenger";
-	public static final String DRIVER = "car_driver";
-	public static final List<String> JOINT_MODES = Arrays.asList( PASSENGER , DRIVER );
+  public static final String PASSENGER = "car_passenger";
+  public static final String DRIVER = "car_driver";
+  public static final List<String> JOINT_MODES = Arrays.asList(PASSENGER, DRIVER);
 }
-

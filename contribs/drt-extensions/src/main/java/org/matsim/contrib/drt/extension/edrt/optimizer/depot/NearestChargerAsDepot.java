@@ -18,6 +18,8 @@
 
 package org.matsim.contrib.drt.extension.edrt.optimizer.depot;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.Depots;
@@ -25,27 +27,24 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.inject.Inject;
-
 /**
  * @author michalm
  */
 public class NearestChargerAsDepot implements DepotFinder {
-	private final ImmutableSet<Link> chargerLinks;
+  private final ImmutableSet<Link> chargerLinks;
 
-	@Inject
-	public NearestChargerAsDepot(ChargingInfrastructure chargingInfrastructure) {
-		chargerLinks = chargingInfrastructure.getChargers()
-				.values()
-				.stream()
-				.map(Charger::getLink)
-				.collect(ImmutableSet.toImmutableSet());
-	}
+  @Inject
+  public NearestChargerAsDepot(ChargingInfrastructure chargingInfrastructure) {
+    chargerLinks =
+        chargingInfrastructure.getChargers().values().stream()
+            .map(Charger::getLink)
+            .collect(ImmutableSet.toImmutableSet());
+  }
 
-	// TODO a simple straight-line search (for the time being)... MultiNodeDijkstra should be the ultimate solution
-	@Override
-	public Link findDepot(DvrpVehicle vehicle) {
-		return Depots.findStraightLineNearestDepot(vehicle, chargerLinks);
-	}
+  // TODO a simple straight-line search (for the time being)... MultiNodeDijkstra should be the
+  // ultimate solution
+  @Override
+  public Link findDepot(DvrpVehicle vehicle) {
+    return Depots.findStraightLineNearestDepot(vehicle, chargerLinks);
+  }
 }

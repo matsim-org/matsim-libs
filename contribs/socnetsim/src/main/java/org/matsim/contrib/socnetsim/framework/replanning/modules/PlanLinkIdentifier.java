@@ -19,26 +19,23 @@
 
 package org.matsim.contrib.socnetsim.framework.replanning.modules;
 
+import com.google.inject.BindingAnnotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
 import org.matsim.api.core.v01.population.Plan;
 
-import com.google.inject.BindingAnnotation;
-
 public interface PlanLinkIdentifier {
-	@Retention( RetentionPolicy.RUNTIME )
-	@BindingAnnotation
-	@Target( { ElementType.FIELD, ElementType.LOCAL_VARIABLE, ElementType.PARAMETER } )
-	@interface Strong {}
+  @Retention(RetentionPolicy.RUNTIME)
+  @BindingAnnotation
+  @Target({ElementType.FIELD, ElementType.LOCAL_VARIABLE, ElementType.PARAMETER})
+  @interface Strong {}
 
-	@Retention( RetentionPolicy.RUNTIME )
-	@BindingAnnotation
-	@Target( { ElementType.FIELD, ElementType.LOCAL_VARIABLE, ElementType.PARAMETER } )
-	@interface Weak {}
+  @Retention(RetentionPolicy.RUNTIME)
+  @BindingAnnotation
+  @Target({ElementType.FIELD, ElementType.LOCAL_VARIABLE, ElementType.PARAMETER})
+  @interface Weak {}
 
-
-	boolean areLinked( Plan p1, Plan p2 );
+  boolean areLinked(Plan p1, Plan p2);
 }

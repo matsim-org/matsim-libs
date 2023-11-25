@@ -16,6 +16,5 @@ import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
  */
 public interface AssignShiftToVehicleLogic {
 
-	boolean canAssignVehicleToShift(ShiftDvrpVehicle vehicle, DrtShift shift);
-
+  boolean canAssignVehicleToShift(ShiftDvrpVehicle vehicle, DrtShift shift);
 }

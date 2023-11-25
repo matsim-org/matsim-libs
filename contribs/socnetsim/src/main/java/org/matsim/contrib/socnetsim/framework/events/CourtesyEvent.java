@@ -20,70 +20,69 @@
 package org.matsim.contrib.socnetsim.framework.events;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.events.HasPersonId;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author thibautd
  */
 public class CourtesyEvent extends Event implements HasPersonId {
 
-	public enum Type {
-		sayHelloEvent, sayGoodbyeEvent;
-	}
+  public enum Type {
+    sayHelloEvent,
+    sayGoodbyeEvent;
+  }
 
-	private final Type type;
-	private final String actType;
-	private final Id<Person> ego;
-	private final Id<Person> alter;
+  private final Type type;
+  private final String actType;
+  private final Id<Person> ego;
+  private final Id<Person> alter;
 
-	public CourtesyEvent(
-			final double time,
-			final String actType,
-			final Id<Person> ego,
-			final Id<Person> alter,
-			final Type type ) {
-		super( time );
-		this.actType = actType;
-		this.ego = ego;
-		this.alter = alter;
-		this.type = type;
-	}
+  public CourtesyEvent(
+      final double time,
+      final String actType,
+      final Id<Person> ego,
+      final Id<Person> alter,
+      final Type type) {
+    super(time);
+    this.actType = actType;
+    this.ego = ego;
+    this.alter = alter;
+    this.type = type;
+  }
 
-	@Override
-	public String getEventType() {
-		return type.toString();
-	}
+  @Override
+  public String getEventType() {
+    return type.toString();
+  }
 
-	@Override
-	public Id<Person> getPersonId() {
-		return ego;
-	}
-	
-	public Id<Person> getAlterId() {
-		return alter;
-	}
+  @Override
+  public Id<Person> getPersonId() {
+    return ego;
+  }
 
-	public Type getType() {
-		return type;
-	}
+  public Id<Person> getAlterId() {
+    return alter;
+  }
 
-	public String getActType() {
-		return actType;
-	}
+  public Type getType() {
+    return type;
+  }
 
-	@Override
-	public Map<String, String> getAttributes() {
-		final Map<String, String> map = super.getAttributes();
+  public String getActType() {
+    return actType;
+  }
 
-		map.put( "actType" , actType );
-		map.put( "egoId" , ego.toString() );
-		map.put( "alterId" , alter.toString() );
+  @Override
+  public Map<String, String> getAttributes() {
+    final Map<String, String> map = super.getAttributes();
 
-		return map;
-	}
+    map.put("actType", actType);
+    map.put("egoId", ego.toString());
+    map.put("alterId", alter.toString());
+
+    return map;
+  }
 }
-

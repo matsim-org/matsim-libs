@@ -28,29 +28,33 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 /**
- * An extended QSimFreeSpeedTravelTime that allows for adjusting the free-flow speed to the max vehicle speed.
+ * An extended QSimFreeSpeedTravelTime that allows for adjusting the free-flow speed to the max
+ * vehicle speed.
  *
  * @author michalm
  */
 public class QSimFreeSpeedTravelTimeWithMaxSpeedLimit implements TravelTime {
-	private final double timeStepSize;
-	//FIXME use vehicle max speed (currently impossible, because the vehicle passed to path search is often null)
-	private final double maxSpeed;
+  private final double timeStepSize;
+  // FIXME use vehicle max speed (currently impossible, because the vehicle passed to path search is
+  // often null)
+  private final double maxSpeed;
 
-	public QSimFreeSpeedTravelTimeWithMaxSpeedLimit(QSimConfigGroup qsimCfg, VehicleType vehicleType) {
-		this(qsimCfg.getTimeStepSize(), vehicleType.getMaximumVelocity());
-	}
+  public QSimFreeSpeedTravelTimeWithMaxSpeedLimit(
+      QSimConfigGroup qsimCfg, VehicleType vehicleType) {
+    this(qsimCfg.getTimeStepSize(), vehicleType.getMaximumVelocity());
+  }
 
-	public QSimFreeSpeedTravelTimeWithMaxSpeedLimit(double timeStepSize, double maxSpeed) {
-		this.timeStepSize = timeStepSize;
-		this.maxSpeed = maxSpeed;
-	}
+  public QSimFreeSpeedTravelTimeWithMaxSpeedLimit(double timeStepSize, double maxSpeed) {
+    this.timeStepSize = timeStepSize;
+    this.maxSpeed = maxSpeed;
+  }
 
-	@Override
-	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		double freeSpeed = Math.min(link.getFreespeed(time), maxSpeed);
-		double freeSpeedTT = link.getLength() / freeSpeed;
-		double linkTravelTime = timeStepSize * Math.floor(freeSpeedTT / timeStepSize); // used in QSim for TT at link
-		return linkTravelTime + 1;// adds 1 extra second for moving over nodes
-	}
+  @Override
+  public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+    double freeSpeed = Math.min(link.getFreespeed(time), maxSpeed);
+    double freeSpeedTT = link.getLength() / freeSpeed;
+    double linkTravelTime =
+        timeStepSize * Math.floor(freeSpeedTT / timeStepSize); // used in QSim for TT at link
+    return linkTravelTime + 1; // adds 1 extra second for moving over nodes
+  }
 }

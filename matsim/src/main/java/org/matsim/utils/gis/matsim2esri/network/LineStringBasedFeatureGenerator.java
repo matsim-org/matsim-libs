@@ -31,65 +31,65 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-public class LineStringBasedFeatureGenerator implements FeatureGenerator{
+public class LineStringBasedFeatureGenerator implements FeatureGenerator {
 
-	private final WidthCalculator widthCalculator;
-	private SimpleFeatureBuilder builder;
-	private final CoordinateReferenceSystem crs;
-	private final GeometryFactory geofac;
+  private final WidthCalculator widthCalculator;
+  private SimpleFeatureBuilder builder;
+  private final CoordinateReferenceSystem crs;
+  private final GeometryFactory geofac;
 
+  public LineStringBasedFeatureGenerator(
+      final WidthCalculator widthCalculator, final CoordinateReferenceSystem crs) {
+    this.widthCalculator = widthCalculator;
+    this.crs = crs;
+    this.geofac = new GeometryFactory();
+    initFeatureType();
+  }
 
-	public LineStringBasedFeatureGenerator(final WidthCalculator widthCalculator, final CoordinateReferenceSystem crs) {
-		this.widthCalculator = widthCalculator;
-		this.crs = crs;
-		this.geofac = new GeometryFactory();
-		initFeatureType();
-	}
+  private void initFeatureType() {
+    SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
+    typeBuilder.setName("link");
+    typeBuilder.setCRS(this.crs);
+    typeBuilder.add("the_geom", LineString.class);
+    typeBuilder.add("ID", String.class);
+    typeBuilder.add("fromID", String.class);
+    typeBuilder.add("toID", String.class);
+    typeBuilder.add("length", Double.class);
+    typeBuilder.add("freespeed", Double.class);
+    typeBuilder.add("capacity", Double.class);
+    typeBuilder.add("lanes", Double.class);
+    typeBuilder.add("visWidth", Double.class);
+    typeBuilder.add("type", String.class);
 
+    this.builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
+  }
 
-	private void initFeatureType() {
-		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
-		typeBuilder.setName("link");
-		typeBuilder.setCRS(this.crs);
-		typeBuilder.add("the_geom", LineString.class);
-		typeBuilder.add("ID", String.class);
-		typeBuilder.add("fromID", String.class);
-		typeBuilder.add("toID", String.class);
-		typeBuilder.add("length", Double.class);
-		typeBuilder.add("freespeed", Double.class);
-		typeBuilder.add("capacity", Double.class);
-		typeBuilder.add("lanes", Double.class);
-		typeBuilder.add("visWidth", Double.class);
-		typeBuilder.add("type", String.class);
+  @Override
+  public SimpleFeature getFeature(final Link link) {
+    double width = this.widthCalculator.getWidth(link);
+    LineString ls =
+        this.geofac.createLineString(
+            new Coordinate[] {
+              MGC.coord2Coordinate(link.getFromNode().getCoord()),
+              MGC.coord2Coordinate(link.getToNode().getCoord())
+            });
 
-		this.builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
-	}
+    Object[] attribs = new Object[10];
+    attribs[0] = ls;
+    attribs[1] = link.getId().toString();
+    attribs[2] = link.getFromNode().getId().toString();
+    attribs[3] = link.getToNode().getId().toString();
+    attribs[4] = link.getLength();
+    attribs[5] = link.getFreespeed();
+    attribs[6] = link.getCapacity();
+    attribs[7] = link.getNumberOfLanes();
+    attribs[8] = width;
+    attribs[9] = NetworkUtils.getType(link);
 
-
-	@Override
-	public SimpleFeature getFeature(final Link link) {
-		double width = this.widthCalculator.getWidth(link);
-		LineString ls = this.geofac.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()),
-				MGC.coord2Coordinate(link.getToNode().getCoord())});
-
-		Object [] attribs = new Object[10];
-		attribs[0] = ls;
-		attribs[1] = link.getId().toString();
-		attribs[2] = link.getFromNode().getId().toString();
-		attribs[3] = link.getToNode().getId().toString();
-		attribs[4] = link.getLength();
-		attribs[5] = link.getFreespeed();
-		attribs[6] = link.getCapacity();
-		attribs[7] = link.getNumberOfLanes();
-		attribs[8] = width;
-		attribs[9] = NetworkUtils.getType(link);
-
-		try {
-			return this.builder.buildFeature(null, attribs);
-		} catch (IllegalArgumentException e) {
-			throw new RuntimeException(e);
-		}
-
-	}
-
+    try {
+      return this.builder.buildFeature(null, attribs);
+    } catch (IllegalArgumentException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }

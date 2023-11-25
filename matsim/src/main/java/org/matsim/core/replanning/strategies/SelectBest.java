@@ -19,18 +19,16 @@
 
 package org.matsim.core.replanning.strategies;
 
+import jakarta.inject.Provider;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 
-import jakarta.inject.Provider;
-
 public class SelectBest implements Provider<PlanStrategy> {
 
-	@Override
-	public PlanStrategy get() {
-		PlanStrategy strategy = new PlanStrategyImpl(new BestPlanSelector());
-		return strategy;
-	}
-
+  @Override
+  public PlanStrategy get() {
+    PlanStrategy strategy = new PlanStrategyImpl(new BestPlanSelector());
+    return strategy;
+  }
 }

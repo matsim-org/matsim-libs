@@ -26,6 +26,5 @@ import java.util.List;
 
 public interface POperators {
 
-    public List<Operator> getOperators();
-
+  public List<Operator> getOperators();
 }

@@ -29,7 +29,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Optional;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
@@ -40,104 +39,113 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
  * @author Michal Maciejewski (michalm)
  */
 public class BestInsertionFinderTest {
-	//min cost is used
-	// if min costs equal, use the Id/idx comparator
+  // min cost is used
+  // if min costs equal, use the Id/idx comparator
 
-	private final DrtRequest request = mock(DrtRequest.class);
-	private final InsertionCostCalculator insertionCostCalculator = mock(InsertionCostCalculator.class);
-	private final BestInsertionFinder bestInsertionFinder = new BestInsertionFinder(insertionCostCalculator);
+  private final DrtRequest request = mock(DrtRequest.class);
+  private final InsertionCostCalculator insertionCostCalculator =
+      mock(InsertionCostCalculator.class);
+  private final BestInsertionFinder bestInsertionFinder =
+      new BestInsertionFinder(insertionCostCalculator);
 
-	@Test
-	public void noInsertions_empty() {
-		assertThat(findBestInsertion()).isEmpty();
-	}
+  @Test
+  public void noInsertions_empty() {
+    assertThat(findBestInsertion()).isEmpty();
+  }
 
-	@Test
-	public void noFeasibleInsertions_empty() {
-		when(insertionCostCalculator.calculate(eq(request), any(), any())).thenReturn(INFEASIBLE_SOLUTION_COST);
+  @Test
+  public void noFeasibleInsertions_empty() {
+    when(insertionCostCalculator.calculate(eq(request), any(), any()))
+        .thenReturn(INFEASIBLE_SOLUTION_COST);
 
-		assertThat(findBestInsertion(insertion("v1", 0, 0), insertion("v1", 0, 1))).isEmpty();
-	}
+    assertThat(findBestInsertion(insertion("v1", 0, 0), insertion("v1", 0, 1))).isEmpty();
+  }
 
-	@Test
-	public void oneFeasibleInsertion_oneInfeasibleInsertion_chooseFeasible() {
-		var feasibleInsertion = insertion("v1", 0, 0);
-		whenInsertionThenCost(feasibleInsertion, 12345);
+  @Test
+  public void oneFeasibleInsertion_oneInfeasibleInsertion_chooseFeasible() {
+    var feasibleInsertion = insertion("v1", 0, 0);
+    whenInsertionThenCost(feasibleInsertion, 12345);
 
-		var infeasibleInsertion = insertion("v1", 0, 1);
-		whenInsertionThenCost(infeasibleInsertion, INFEASIBLE_SOLUTION_COST);
+    var infeasibleInsertion = insertion("v1", 0, 1);
+    whenInsertionThenCost(infeasibleInsertion, INFEASIBLE_SOLUTION_COST);
 
-		assertThat(findBestInsertion(feasibleInsertion, infeasibleInsertion)).hasValue(feasibleInsertion);
-		assertThat(findBestInsertion(infeasibleInsertion, feasibleInsertion)).hasValue(feasibleInsertion);
-	}
+    assertThat(findBestInsertion(feasibleInsertion, infeasibleInsertion))
+        .hasValue(feasibleInsertion);
+    assertThat(findBestInsertion(infeasibleInsertion, feasibleInsertion))
+        .hasValue(feasibleInsertion);
+  }
 
-	@Test
-	public void twoFeasibleInsertions_chooseBetter() {
-		var insertion1 = insertion("v1", 0, 0);
-		whenInsertionThenCost(insertion1, 123);
+  @Test
+  public void twoFeasibleInsertions_chooseBetter() {
+    var insertion1 = insertion("v1", 0, 0);
+    whenInsertionThenCost(insertion1, 123);
 
-		var insertion2 = insertion("v1", 0, 1);
-		whenInsertionThenCost(insertion2, 9999);
+    var insertion2 = insertion("v1", 0, 1);
+    whenInsertionThenCost(insertion2, 9999);
 
-		assertThat(findBestInsertion(insertion1, insertion2)).hasValue(insertion1);
-		assertThat(findBestInsertion(insertion2, insertion1)).hasValue(insertion1);
-	}
+    assertThat(findBestInsertion(insertion1, insertion2)).hasValue(insertion1);
+    assertThat(findBestInsertion(insertion2, insertion1)).hasValue(insertion1);
+  }
 
-	@Test
-	public void twoEqualInsertions_chooseLowerVehicleId() {
-		var insertion1 = insertion("v1", 0, 0);
-		whenInsertionThenCost(insertion1, 123);
+  @Test
+  public void twoEqualInsertions_chooseLowerVehicleId() {
+    var insertion1 = insertion("v1", 0, 0);
+    whenInsertionThenCost(insertion1, 123);
 
-		var insertion2 = insertion("v2", 0, 0);
-		whenInsertionThenCost(insertion2, 123);
+    var insertion2 = insertion("v2", 0, 0);
+    whenInsertionThenCost(insertion2, 123);
 
-		assertThat(findBestInsertion(insertion1, insertion2)).hasValue(insertion1);
-		assertThat(findBestInsertion(insertion2, insertion1)).hasValue(insertion1);
-	}
+    assertThat(findBestInsertion(insertion1, insertion2)).hasValue(insertion1);
+    assertThat(findBestInsertion(insertion2, insertion1)).hasValue(insertion1);
+  }
 
-	@Test
-	public void twoEqualInsertions_sameVehicle_chooseLowerPickupIdx() {
-		var insertion1 = insertion("v1", 0, 1);
-		whenInsertionThenCost(insertion1, 123);
+  @Test
+  public void twoEqualInsertions_sameVehicle_chooseLowerPickupIdx() {
+    var insertion1 = insertion("v1", 0, 1);
+    whenInsertionThenCost(insertion1, 123);
 
-		var insertion2 = insertion("v1", 1, 1);
-		whenInsertionThenCost(insertion2, 123);
+    var insertion2 = insertion("v1", 1, 1);
+    whenInsertionThenCost(insertion2, 123);
 
-		assertThat(findBestInsertion(insertion1, insertion2)).hasValue(insertion1);
-		assertThat(findBestInsertion(insertion2, insertion1)).hasValue(insertion1);
-	}
+    assertThat(findBestInsertion(insertion1, insertion2)).hasValue(insertion1);
+    assertThat(findBestInsertion(insertion2, insertion1)).hasValue(insertion1);
+  }
 
-	@Test
-	public void twoEqualInsertions_sameVehicle_samePickupIdx_chooseLowerDropoffIdx() {
-		var insertion1 = insertion("v1", 0, 0);
-		whenInsertionThenCost(insertion1, 123);
+  @Test
+  public void twoEqualInsertions_sameVehicle_samePickupIdx_chooseLowerDropoffIdx() {
+    var insertion1 = insertion("v1", 0, 0);
+    whenInsertionThenCost(insertion1, 123);
 
-		var insertion2 = insertion("v1", 0, 1);
-		whenInsertionThenCost(insertion2, 123);
+    var insertion2 = insertion("v1", 0, 1);
+    whenInsertionThenCost(insertion2, 123);
 
-		assertThat(findBestInsertion(insertion1, insertion2)).hasValue(insertion1);
-		assertThat(findBestInsertion(insertion2, insertion1)).hasValue(insertion1);
-	}
+    assertThat(findBestInsertion(insertion1, insertion2)).hasValue(insertion1);
+    assertThat(findBestInsertion(insertion2, insertion1)).hasValue(insertion1);
+  }
 
-	@SafeVarargs
-	private Optional<InsertionWithDetourData> findBestInsertion(InsertionWithDetourData... insertions) {
-		return bestInsertionFinder.findBestInsertion(request, Arrays.stream(insertions));
-	}
+  @SafeVarargs
+  private Optional<InsertionWithDetourData> findBestInsertion(
+      InsertionWithDetourData... insertions) {
+    return bestInsertionFinder.findBestInsertion(request, Arrays.stream(insertions));
+  }
 
-	private void whenInsertionThenCost(InsertionWithDetourData insertion, double cost) {
-		when(insertionCostCalculator.calculate(eq(request), eq(insertion.insertion),
-				eq(insertion.detourTimeInfo))).thenReturn(cost);
-	}
+  private void whenInsertionThenCost(InsertionWithDetourData insertion, double cost) {
+    when(insertionCostCalculator.calculate(
+            eq(request), eq(insertion.insertion), eq(insertion.detourTimeInfo)))
+        .thenReturn(cost);
+  }
 
-	private InsertionWithDetourData insertion(String vehicleId, int pickupIdx, int dropoffIdx) {
-		var vehicle = mock(DvrpVehicle.class);
-		when(vehicle.getId()).thenReturn(Id.create(vehicleId, DvrpVehicle.class));
-		var vehicleEntry = new VehicleEntry(vehicle, null, null, null, null, 0);
+  private InsertionWithDetourData insertion(String vehicleId, int pickupIdx, int dropoffIdx) {
+    var vehicle = mock(DvrpVehicle.class);
+    when(vehicle.getId()).thenReturn(Id.create(vehicleId, DvrpVehicle.class));
+    var vehicleEntry = new VehicleEntry(vehicle, null, null, null, null, 0);
 
-		var pickupInsertion = new InsertionGenerator.InsertionPoint(pickupIdx, null, null, null);
-		var dropoffInsertion = new InsertionGenerator.InsertionPoint(dropoffIdx, null, null, null);
+    var pickupInsertion = new InsertionGenerator.InsertionPoint(pickupIdx, null, null, null);
+    var dropoffInsertion = new InsertionGenerator.InsertionPoint(dropoffIdx, null, null, null);
 
-		return new InsertionWithDetourData(
-				new InsertionGenerator.Insertion(vehicleEntry, pickupInsertion, dropoffInsertion), null, null);
-	}
+    return new InsertionWithDetourData(
+        new InsertionGenerator.Insertion(vehicleEntry, pickupInsertion, dropoffInsertion),
+        null,
+        null);
+  }
 }

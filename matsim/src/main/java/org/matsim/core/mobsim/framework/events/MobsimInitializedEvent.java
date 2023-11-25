@@ -24,11 +24,9 @@ import org.matsim.core.mobsim.framework.Mobsim;
 /**
  * @author dgrether
  */
-public class MobsimInitializedEvent<T extends Mobsim> extends
-		AbstractMobsimEvent<T> {
+public class MobsimInitializedEvent<T extends Mobsim> extends AbstractMobsimEvent<T> {
 
-	public MobsimInitializedEvent(T queuesim) {
-		super(queuesim);
-	}
-
+  public MobsimInitializedEvent(T queuesim) {
+    super(queuesim);
+  }
 }

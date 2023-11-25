@@ -17,9 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
+/** */
 package org.matsim.contrib.parking.parkingsearch;
 
 import org.matsim.api.core.v01.Scenario;
@@ -35,61 +33,57 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * @author jbischoff An example how to use parking search in MATSim.
- *         Technically, all you need as extra input is a facilities file
- *         containing "car interaction" locations.
- *
- *
+ * @author jbischoff An example how to use parking search in MATSim. Technically, all you need as
+ *     extra input is a facilities file containing "car interaction" locations.
  */
-
 public class RunParkingSearchExample {
 
-	public static void main(String[] args) {
+  public static void main(String[] args) {
 
-		Config config = ConfigUtils.loadConfig("parkingsearch/config.xml", new ParkingSearchConfigGroup());
-		//all further input files are set in the config.
+    Config config =
+        ConfigUtils.loadConfig("parkingsearch/config.xml", new ParkingSearchConfigGroup());
+    // all further input files are set in the config.
 
-		//get the parking search config group to set some parameters, like agent's search strategy or average parking slot length
-		ParkingSearchConfigGroup configGroup = (ParkingSearchConfigGroup) config.getModules().get(ParkingSearchConfigGroup.GROUP_NAME);
-		configGroup.setParkingSearchStrategy(ParkingSearchStrategy.Benenson);
+    // get the parking search config group to set some parameters, like agent's search strategy or
+    // average parking slot length
+    ParkingSearchConfigGroup configGroup =
+        (ParkingSearchConfigGroup) config.getModules().get(ParkingSearchConfigGroup.GROUP_NAME);
+    configGroup.setParkingSearchStrategy(ParkingSearchStrategy.Benenson);
 
-        // set to false, if you don't require visualisation, then the example will run for 10 iterations, with OTFVis, only one iteration is performed.
-        boolean otfvis = false;
-		if (otfvis) {
-			config.controller().setLastIteration(0);
-		} else {
-			config.controller().setLastIteration(10);
-		}
-		new RunParkingSearchExample().run(config,otfvis);
+    // set to false, if you don't require visualisation, then the example will run for 10
+    // iterations, with OTFVis, only one iteration is performed.
+    boolean otfvis = false;
+    if (otfvis) {
+      config.controller().setLastIteration(0);
+    } else {
+      config.controller().setLastIteration(10);
+    }
+    new RunParkingSearchExample().run(config, otfvis);
+  }
 
-	}
+  /**
+   * @param config a standard MATSim config
+   * @param otfvis turns otfvis visualisation on or off
+   */
+  public void run(Config config, boolean otfvis) {
+    final Scenario scenario = ScenarioUtils.loadScenario(config);
+    Controler controler = new Controler(scenario);
+    config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
 
-	/**
-	 * @param config
-	 * 			a standard MATSim config
-	 * @param otfvis
-	 *            turns otfvis visualisation on or off
-	 */
-	public void run(Config config, boolean otfvis) {
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
-		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
+    controler.addOverridingModule(
+        new AbstractModule() {
 
-
-		controler.addOverridingModule(new AbstractModule() {
-
-			@Override
-			public void install() {
-				ParkingSlotVisualiser visualiser = new ParkingSlotVisualiser(scenario);
-				addEventHandlerBinding().toInstance(visualiser);
-				addControlerListenerBinding().toInstance(visualiser);
-			}
-		});
-		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule());
-		}
-		SetupParking.installParkingModules(controler);
-		controler.run();
-	}
-
+          @Override
+          public void install() {
+            ParkingSlotVisualiser visualiser = new ParkingSlotVisualiser(scenario);
+            addEventHandlerBinding().toInstance(visualiser);
+            addControlerListenerBinding().toInstance(visualiser);
+          }
+        });
+    if (otfvis) {
+      controler.addOverridingModule(new OTFVisLiveModule());
+    }
+    SetupParking.installParkingModules(controler);
+    controler.run();
+  }
 }

@@ -22,21 +22,18 @@ package org.matsim.contrib.accessibility.gis;
 import java.awt.Color;
 
 /**
- * A Colorizable is used to define the color with which an object (e.g., a
- * vertex or an edge) is displayed.
- * 
+ * A Colorizable is used to define the color with which an object (e.g., a vertex or an edge) is
+ * displayed.
+ *
  * @author jillenberger
- * 
  */
 interface Colorizable {
 
-	/**
-	 * Returns the color used to display <tt>object</tt>.
-	 * 
-	 * @param object
-	 *            an object (e.g., a vertex or an edge).
-	 * @return the color used to display <tt>object</tt>.
-	 */
-	public Color getColor(Object object);
-
+  /**
+   * Returns the color used to display <tt>object</tt>.
+   *
+   * @param object an object (e.g., a vertex or an edge).
+   * @return the color used to display <tt>object</tt>.
+   */
+  public Color getColor(Object object);
 }

@@ -21,7 +21,6 @@
 package playground.vsp.parkAndRide.replanning;
 
 import java.util.Random;
-
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -29,133 +28,134 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.pt.PtConstants;
-
 import playground.vsp.parkAndRide.PRConstants;
 
-
 /**
- * Copy/Paste of TransitPlanMutateTimeAllocation, but with special handling
- * for park-and-ride and pt interaction activities: they are
- * just ignored and not changed at all.
+ * Copy/Paste of TransitPlanMutateTimeAllocation, but with special handling for park-and-ride and pt
+ * interaction activities: they are just ignored and not changed at all.
  *
  * @author ikaddoura
  */
 public class PRPlanMutateTimeAllocation implements PlanAlgorithm {
 
-	private final Double mutationRange;
-	private final Random random;
-	private boolean useActivityDurations;
+  private final Double mutationRange;
+  private final Random random;
+  private boolean useActivityDurations;
 
-	public PRPlanMutateTimeAllocation(final Double mutationRange, final Random random) {
-		this.mutationRange = mutationRange;
-		this.random = random;
-	}
+  public PRPlanMutateTimeAllocation(final Double mutationRange, final Random random) {
+    this.mutationRange = mutationRange;
+    this.random = random;
+  }
 
-	@Override
-	public void run(final Plan plan) {
-		
-			mutatePlan(plan);
-	}
+  @Override
+  public void run(final Plan plan) {
 
-	private void mutatePlan(final Plan plan) {
+    mutatePlan(plan);
+  }
 
-		double now = 0;
-		boolean isFirst = true;
-		Activity lastAct = (Activity) plan.getPlanElements().listIterator(plan.getPlanElements().size()).previous();
+  private void mutatePlan(final Plan plan) {
 
-		// apply mutation to all activities except the last home activity
-		for (PlanElement pe : plan.getPlanElements()) {
+    double now = 0;
+    boolean isFirst = true;
+    Activity lastAct =
+        (Activity) plan.getPlanElements().listIterator(plan.getPlanElements().size()).previous();
 
-			if (pe instanceof Activity) {
-				Activity act = (Activity)pe;
+    // apply mutation to all activities except the last home activity
+    for (PlanElement pe : plan.getPlanElements()) {
 
-				// handle first activity
-				if (isFirst) {
-					isFirst = false;
-					// set start to midnight
-					act.setStartTime(now);
-					// mutate the end time of the first activity
-					act.setEndTime(mutateTime(act.getEndTime()));
-					// calculate resulting duration
-					act.setMaximumDuration(act.getEndTime().seconds() - act.getStartTime().seconds());
-					// move now pointer
-					now += act.getEndTime().seconds();
+      if (pe instanceof Activity) {
+        Activity act = (Activity) pe;
 
-				// handle middle activities
-				} else if (act != lastAct) {
+        // handle first activity
+        if (isFirst) {
+          isFirst = false;
+          // set start to midnight
+          act.setStartTime(now);
+          // mutate the end time of the first activity
+          act.setEndTime(mutateTime(act.getEndTime()));
+          // calculate resulting duration
+          act.setMaximumDuration(act.getEndTime().seconds() - act.getStartTime().seconds());
+          // move now pointer
+          now += act.getEndTime().seconds();
 
-					// assume that there will be no delay between arrival time and activity start time
-					act.setStartTime(now);
-					if (act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE) || act.getType().equals(PRConstants.PARKANDRIDE_ACTIVITY_TYPE)) {
-					} else {
-						if (this.useActivityDurations) {
-							if (act.getMaximumDuration().isDefined()) {
-								// mutate the durations of all 'middle' activities
-								act.setMaximumDuration(mutateTime(act.getMaximumDuration()));
-								now += act.getMaximumDuration().seconds();
-								// set end time accordingly
-								act.setEndTime(now);
-							} else {
-								double newEndTime = mutateTime(act.getEndTime());
-								if (newEndTime < now) {
-									newEndTime = now;
-								}
-								act.setEndTime(newEndTime);
-								now = newEndTime;
-							}
-						}
-						else {
-							if (act.getEndTime().isUndefined()) {
-								throw new IllegalStateException("Can not mutate activity end time because it is not set for Person: " + plan.getPerson().getId());
-							}
-							double newEndTime = mutateTime(act.getEndTime());
-							if (newEndTime < now) {
-								newEndTime = now;
-							}
-							act.setEndTime(newEndTime);
-							now = newEndTime;
-						}
-					}
-				// handle last activity
-				} else {
+          // handle middle activities
+        } else if (act != lastAct) {
 
-					// assume that there will be no delay between arrival time and activity start time
-					act.setStartTime(now);
-					// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
-					act.setMaximumDurationUndefined();
-					act.setEndTimeUndefined();
+          // assume that there will be no delay between arrival time and activity start time
+          act.setStartTime(now);
+          if (act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)
+              || act.getType().equals(PRConstants.PARKANDRIDE_ACTIVITY_TYPE)) {
+          } else {
+            if (this.useActivityDurations) {
+              if (act.getMaximumDuration().isDefined()) {
+                // mutate the durations of all 'middle' activities
+                act.setMaximumDuration(mutateTime(act.getMaximumDuration()));
+                now += act.getMaximumDuration().seconds();
+                // set end time accordingly
+                act.setEndTime(now);
+              } else {
+                double newEndTime = mutateTime(act.getEndTime());
+                if (newEndTime < now) {
+                  newEndTime = now;
+                }
+                act.setEndTime(newEndTime);
+                now = newEndTime;
+              }
+            } else {
+              if (act.getEndTime().isUndefined()) {
+                throw new IllegalStateException(
+                    "Can not mutate activity end time because it is not set for Person: "
+                        + plan.getPerson().getId());
+              }
+              double newEndTime = mutateTime(act.getEndTime());
+              if (newEndTime < now) {
+                newEndTime = now;
+              }
+              act.setEndTime(newEndTime);
+              now = newEndTime;
+            }
+          }
+          // handle last activity
+        } else {
 
-				}
+          // assume that there will be no delay between arrival time and activity start time
+          act.setStartTime(now);
+          // invalidate duration and end time because the plan will be interpreted 24 hour
+          // wrap-around
+          act.setMaximumDurationUndefined();
+          act.setEndTimeUndefined();
+        }
 
-			} else {
-				Leg leg = (Leg) pe;
+      } else {
+        Leg leg = (Leg) pe;
 
-				// assume that there will be no delay between end time of previous activity and departure time
-				leg.setDepartureTime(now);
-				// let duration untouched. if defined add it to now
-				if (leg.getTravelTime().isDefined()) {
-					now += leg.getTravelTime().seconds();
-				}
-				final double arrTime = now;
-				// set planned arrival time accordingly
-				leg.setTravelTime( arrTime - leg.getDepartureTime().seconds());
-			}
-		}
-	}
+        // assume that there will be no delay between end time of previous activity and departure
+        // time
+        leg.setDepartureTime(now);
+        // let duration untouched. if defined add it to now
+        if (leg.getTravelTime().isDefined()) {
+          now += leg.getTravelTime().seconds();
+        }
+        final double arrTime = now;
+        // set planned arrival time accordingly
+        leg.setTravelTime(arrTime - leg.getDepartureTime().seconds());
+      }
+    }
+  }
 
-	private double mutateTime(final OptionalTime time) {
-		if (time.isDefined()) {
-			double t = time.seconds() + (int)((this.random.nextDouble() * 2.0 - 1.0) * this.mutationRange);
-			if (t < 0) t = 0;
-			if (t > 24*3600) t = 24*3600;
-			return t;
-		} else {
-			return this.random.nextInt(24*3600);
-		}
-	}
+  private double mutateTime(final OptionalTime time) {
+    if (time.isDefined()) {
+      double t =
+          time.seconds() + (int) ((this.random.nextDouble() * 2.0 - 1.0) * this.mutationRange);
+      if (t < 0) t = 0;
+      if (t > 24 * 3600) t = 24 * 3600;
+      return t;
+    } else {
+      return this.random.nextInt(24 * 3600);
+    }
+  }
 
-	public void setUseActivityDurations(final boolean useActivityDurations) {
-		this.useActivityDurations = useActivityDurations;
-	}
-
+  public void setUseActivityDurations(final boolean useActivityDurations) {
+    this.useActivityDurations = useActivityDurations;
+  }
 }

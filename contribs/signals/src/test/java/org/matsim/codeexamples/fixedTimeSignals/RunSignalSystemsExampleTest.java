@@ -28,36 +28,36 @@ import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author nagel
- *
  */
 public class RunSignalSystemsExampleTest {
 
-	@Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	@Test
-	public final void testExampleWithHoles() {
-		boolean usingOTFVis = false ;
-		try {
-			RunSignalSystemsExampleWithHoles.run(usingOTFVis);
-		} catch (Exception ee ) {
-			ee.printStackTrace();
-			Assert.fail("something went wrong: " + ee.getMessage()) ;
-		}
-	}
+  @Test
+  public final void testExampleWithHoles() {
+    boolean usingOTFVis = false;
+    try {
+      RunSignalSystemsExampleWithHoles.run(usingOTFVis);
+    } catch (Exception ee) {
+      ee.printStackTrace();
+      Assert.fail("something went wrong: " + ee.getMessage());
+    }
+  }
 
-	@Test
-	public final void testMinimalExample() {
-		try {
-			Config config = ConfigUtils.loadConfig("./examples/tutorial/example90TrafficLights/useSignalInput/withLanes/config.xml");
-			config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-			config.controller().setLastIteration(0);
-			config.controller().setOutputDirectory(testUtils.getOutputDirectory());
+  @Test
+  public final void testMinimalExample() {
+    try {
+      Config config =
+          ConfigUtils.loadConfig(
+              "./examples/tutorial/example90TrafficLights/useSignalInput/withLanes/config.xml");
+      config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+      config.controller().setLastIteration(0);
+      config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 
-			RunSignalSystemsExample.run(config, false);
-		} catch (Exception ee ) {
-			ee.printStackTrace();
-			Assert.fail("something went wrong: " + ee.getMessage()) ;
-		}
-	}
-
+      RunSignalSystemsExample.run(config, false);
+    } catch (Exception ee) {
+      ee.printStackTrace();
+      Assert.fail("something went wrong: " + ee.getMessage());
+    }
+  }
 }

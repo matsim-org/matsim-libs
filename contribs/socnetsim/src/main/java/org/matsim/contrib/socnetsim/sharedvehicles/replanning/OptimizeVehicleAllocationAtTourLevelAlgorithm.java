@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -37,7 +36,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
 import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
@@ -47,300 +45,286 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * Optimizes vehicle allocation at the tour level, by minimizing the estimated
- * waiting times.
- * It assumes all persons in the group start and end their plans at the same location ("home"),
- * and get the vehicles at the "home" location (ie household-like).
- * If those assumptions are not verified, the algorithm falls back to random allocation.
+ * Optimizes vehicle allocation at the tour level, by minimizing the estimated waiting times. It
+ * assumes all persons in the group start and end their plans at the same location ("home"), and get
+ * the vehicles at the "home" location (ie household-like). If those assumptions are not verified,
+ * the algorithm falls back to random allocation. <br>
+ * It also assumes departure times are determined by activity end times and routes (or legs) contain
+ * good estimation of the travel time.
  *
- * <br>
- * It also assumes departure times are determined by activity end times and routes
- * (or legs) contain good estimation of the travel time.
  * @author thibautd
  */
-public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPlanAlgorithm<GroupPlans> {
-	private final GenericPlanAlgorithm<GroupPlans> randomAllocator;
-	private final Set<String> stageActs;
-	private final Collection<String> vehicularModes;
-	private final boolean allowNullRoutes;
-	private final VehicleRessources vehicleRessources;
-	private final TimeInterpretation timeInterpretation;
+public class OptimizeVehicleAllocationAtTourLevelAlgorithm
+    implements GenericPlanAlgorithm<GroupPlans> {
+  private final GenericPlanAlgorithm<GroupPlans> randomAllocator;
+  private final Set<String> stageActs;
+  private final Collection<String> vehicularModes;
+  private final boolean allowNullRoutes;
+  private final VehicleRessources vehicleRessources;
+  private final TimeInterpretation timeInterpretation;
 
-	public OptimizeVehicleAllocationAtTourLevelAlgorithm(
-			final Set<String> stageActivitiesForSubtourDetection,
-			final Random random,
-			final VehicleRessources vehicleRessources,
-			final Collection<String> modes,
-			final boolean allowNullRoutes,
-			final TimeInterpretation timeInterpretation) {
-		this.randomAllocator = new AllocateVehicleToPlansInGroupPlanAlgorithm(
-			random,
-			vehicleRessources,
-			modes,
-			allowNullRoutes,
-			false);
-		this.vehicularModes = modes;
-		this.allowNullRoutes = allowNullRoutes;
-		this.stageActs = stageActivitiesForSubtourDetection;
-		this.vehicleRessources = vehicleRessources;
-		this.timeInterpretation = timeInterpretation;
-	}
+  public OptimizeVehicleAllocationAtTourLevelAlgorithm(
+      final Set<String> stageActivitiesForSubtourDetection,
+      final Random random,
+      final VehicleRessources vehicleRessources,
+      final Collection<String> modes,
+      final boolean allowNullRoutes,
+      final TimeInterpretation timeInterpretation) {
+    this.randomAllocator =
+        new AllocateVehicleToPlansInGroupPlanAlgorithm(
+            random, vehicleRessources, modes, allowNullRoutes, false);
+    this.vehicularModes = modes;
+    this.allowNullRoutes = allowNullRoutes;
+    this.stageActs = stageActivitiesForSubtourDetection;
+    this.vehicleRessources = vehicleRessources;
+    this.timeInterpretation = timeInterpretation;
+  }
 
-	@Override
-	public void run(final GroupPlans plan) {
-		final List<SubtourRecord> vehicularTours = getVehicularToursSortedByStartTime( plan );
-		if ( vehicularTours == null ) {
-			randomAllocator.run( plan );
-			return;
-		}
+  @Override
+  public void run(final GroupPlans plan) {
+    final List<SubtourRecord> vehicularTours = getVehicularToursSortedByStartTime(plan);
+    if (vehicularTours == null) {
+      randomAllocator.run(plan);
+      return;
+    }
 
-		allocateVehicles( vehicularTours );
+    allocateVehicles(vehicularTours);
 
-		processAllocation( vehicularTours );
-	}
+    processAllocation(vehicularTours);
+  }
 
-	private void processAllocation(final List<SubtourRecord> vehicularTours) {
-		for ( final SubtourRecord r : vehicularTours ) {
-			for ( final Trip t : r.subtour.getTrips() ) {
-				for ( final Leg leg : t.getLegsOnly() ) {
-					if ( !vehicularModes.contains( leg.getMode() ) ) continue;
+  private void processAllocation(final List<SubtourRecord> vehicularTours) {
+    for (final SubtourRecord r : vehicularTours) {
+      for (final Trip t : r.subtour.getTrips()) {
+        for (final Leg leg : t.getLegsOnly()) {
+          if (!vehicularModes.contains(leg.getMode())) continue;
 
-					if ( allowNullRoutes && leg.getRoute() == null ) {
-						// this is not so nice...
-						leg.setRoute( new VehicleOnlyNetworkRoute() );
-					}
+          if (allowNullRoutes && leg.getRoute() == null) {
+            // this is not so nice...
+            leg.setRoute(new VehicleOnlyNetworkRoute());
+          }
 
-					if ( !( leg.getRoute() instanceof NetworkRoute ) ) {
-						throw new RuntimeException( "route for mode "+leg.getMode()+" has non-network route "+leg.getRoute() );
-					}
+          if (!(leg.getRoute() instanceof NetworkRoute)) {
+            throw new RuntimeException(
+                "route for mode " + leg.getMode() + " has non-network route " + leg.getRoute());
+          }
 
-					((NetworkRoute) leg.getRoute()).setVehicleId( r.allocatedVehicle );
-				}
-			}
-		}
-	}
+          ((NetworkRoute) leg.getRoute()).setVehicleId(r.allocatedVehicle);
+        }
+      }
+    }
+  }
 
-	private void allocateVehicles(
-			final List<SubtourRecord> toursToAllocate) {
-		// greedy algo. Should be ok, but didn't formally prove it
-		if ( toursToAllocate.isEmpty() ) return;
-		final List<SubtourRecord> remainingSubtours = new ArrayList<SubtourRecord>( toursToAllocate );
-		final SubtourRecord currentSubtour = remainingSubtours.remove( 0 );
+  private void allocateVehicles(final List<SubtourRecord> toursToAllocate) {
+    // greedy algo. Should be ok, but didn't formally prove it
+    if (toursToAllocate.isEmpty()) return;
+    final List<SubtourRecord> remainingSubtours = new ArrayList<SubtourRecord>(toursToAllocate);
+    final SubtourRecord currentSubtour = remainingSubtours.remove(0);
 
-		final VehicleRecord firstAvailableVehicle =
-			Collections.min(
-				currentSubtour.possibleVehicles,
-				new Comparator<VehicleRecord>() {
-					@Override
-					public int compare(
-							final VehicleRecord o1,
-							final VehicleRecord o2) {
-						final int timeComp = Double.compare(
-							o1.availableFrom,
-							o2.availableFrom );
-						return timeComp != 0 ? timeComp :
-							o1.nAllocs - o2.nAllocs;
-					}
-				});
+    final VehicleRecord firstAvailableVehicle =
+        Collections.min(
+            currentSubtour.possibleVehicles,
+            new Comparator<VehicleRecord>() {
+              @Override
+              public int compare(final VehicleRecord o1, final VehicleRecord o2) {
+                final int timeComp = Double.compare(o1.availableFrom, o2.availableFrom);
+                return timeComp != 0 ? timeComp : o1.nAllocs - o2.nAllocs;
+              }
+            });
 
-		if ( firstAvailableVehicle.availableFrom < currentSubtour.endTime ) {
-			firstAvailableVehicle.availableFrom = currentSubtour.endTime;
-		}
-		firstAvailableVehicle.nAllocs++;
-		currentSubtour.allocatedVehicle = firstAvailableVehicle.id;
+    if (firstAvailableVehicle.availableFrom < currentSubtour.endTime) {
+      firstAvailableVehicle.availableFrom = currentSubtour.endTime;
+    }
+    firstAvailableVehicle.nAllocs++;
+    currentSubtour.allocatedVehicle = firstAvailableVehicle.id;
 
-		allocateVehicles( remainingSubtours );
-	}
+    allocateVehicles(remainingSubtours);
+  }
 
-	/*for tests*/ double calcOverlap(final GroupPlans gps) {
-		final List<SubtourRecord> tours = getVehicularToursSortedByStartTime( gps );
+  /*for tests*/ double calcOverlap(final GroupPlans gps) {
+    final List<SubtourRecord> tours = getVehicularToursSortedByStartTime(gps);
 
-		double overlap = 0;
-		for ( final SubtourRecord tour : tours ) {
-			Id veh = null;
-			for ( final Trip t : tour.subtour.getTrips() ) {
-				veh = getVehicle( t );
-				if ( veh != null ) break;
-			}
-			
-			for ( final VehicleRecord vr : tour.possibleVehicles ) {
-				if ( vr.id.equals( veh ) ) {
-					overlap += Math.max( 0 , vr.availableFrom - tour.startTime );
-					if ( vr.availableFrom < tour.endTime ) {
-						vr.availableFrom = tour.endTime;
-					}
-					break;
-				}
-			}
-		}
+    double overlap = 0;
+    for (final SubtourRecord tour : tours) {
+      Id veh = null;
+      for (final Trip t : tour.subtour.getTrips()) {
+        veh = getVehicle(t);
+        if (veh != null) break;
+      }
 
-		return overlap;
-	}
+      for (final VehicleRecord vr : tour.possibleVehicles) {
+        if (vr.id.equals(veh)) {
+          overlap += Math.max(0, vr.availableFrom - tour.startTime);
+          if (vr.availableFrom < tour.endTime) {
+            vr.availableFrom = tour.endTime;
+          }
+          break;
+        }
+      }
+    }
 
-	// /////////////////////////////////////////////////////////////////////////
-	// subtour-related methods
-	// /////////////////////////////////////////////////////////////////////////
-	private List<SubtourRecord> getVehicularToursSortedByStartTime(final GroupPlans plans) {
-		final List<SubtourRecord> vehicularTours = new ArrayList<SubtourRecord>();
-		final VehicleRecordFactory factory = new VehicleRecordFactory();
+    return overlap;
+  }
 
-		for ( final Plan p : plans.getAllIndividualPlans() ) {
-			final Collection<Subtour> subtours =
-				TripStructureUtils.getSubtours(
-						p,
-						stageActs::contains
-                );
-			for ( final Subtour s : subtours ) {
-				if ( s.getParent() != null ) continue; // is not a root tour
-				boolean isFirstTrip = true;
-				for ( final Trip t : s.getTrips() ) {
-					// TODO: check that the sequence of vehicular movements come back to origin
-					if ( isFirstTrip && isVehicular( t ) ) {
-						vehicularTours.add(
-								new SubtourRecord(
-									s,
-									factory.getRecords(
-										vehicleRessources.identifyVehiclesUsableForAgent(
-											p.getPerson().getId() )), timeInterpretation) );
-						break;
-					}
-					if ( !isFirstTrip && isVehicular( t ) ) {
-						// invalid structure
-						return null;
-					}
-					isFirstTrip = false;
-				}
-			}
-		}
+  // /////////////////////////////////////////////////////////////////////////
+  // subtour-related methods
+  // /////////////////////////////////////////////////////////////////////////
+  private List<SubtourRecord> getVehicularToursSortedByStartTime(final GroupPlans plans) {
+    final List<SubtourRecord> vehicularTours = new ArrayList<SubtourRecord>();
+    final VehicleRecordFactory factory = new VehicleRecordFactory();
 
-		// check validity
-		Id homeLoc = null;
-		for ( final SubtourRecord record : vehicularTours ) {
-			final Subtour s = record.subtour;
-			assert s.getParent() == null;
-			final Id anchor = s.getTrips().get( 0 ).getOriginActivity().getFacilityId()!=null ?
-				s.getTrips().get( 0 ).getOriginActivity().getFacilityId() :
-				s.getTrips().get( 0 ).getOriginActivity().getLinkId();
+    for (final Plan p : plans.getAllIndividualPlans()) {
+      final Collection<Subtour> subtours = TripStructureUtils.getSubtours(p, stageActs::contains);
+      for (final Subtour s : subtours) {
+        if (s.getParent() != null) continue; // is not a root tour
+        boolean isFirstTrip = true;
+        for (final Trip t : s.getTrips()) {
+          // TODO: check that the sequence of vehicular movements come back to origin
+          if (isFirstTrip && isVehicular(t)) {
+            vehicularTours.add(
+                new SubtourRecord(
+                    s,
+                    factory.getRecords(
+                        vehicleRessources.identifyVehiclesUsableForAgent(p.getPerson().getId())),
+                    timeInterpretation));
+            break;
+          }
+          if (!isFirstTrip && isVehicular(t)) {
+            // invalid structure
+            return null;
+          }
+          isFirstTrip = false;
+        }
+      }
+    }
 
-			if ( anchor == null ) throw new NullPointerException( "null anchor location" );
-			if ( homeLoc == null ) {
-				homeLoc = anchor;
-			}
-			else if ( !homeLoc.equals( anchor ) ) {
-				// invalid
-				return null;
-			}
-		}
+    // check validity
+    Id homeLoc = null;
+    for (final SubtourRecord record : vehicularTours) {
+      final Subtour s = record.subtour;
+      assert s.getParent() == null;
+      final Id anchor =
+          s.getTrips().get(0).getOriginActivity().getFacilityId() != null
+              ? s.getTrips().get(0).getOriginActivity().getFacilityId()
+              : s.getTrips().get(0).getOriginActivity().getLinkId();
 
-		Collections.sort(
-				vehicularTours,
-				new Comparator<SubtourRecord>() {
-					@Override
-					public int compare(
-							final SubtourRecord o1,
-							final SubtourRecord o2) {
-						return Double.compare( o1.startTime , o2.startTime );
-					}
-				});
+      if (anchor == null) throw new NullPointerException("null anchor location");
+      if (homeLoc == null) {
+        homeLoc = anchor;
+      } else if (!homeLoc.equals(anchor)) {
+        // invalid
+        return null;
+      }
+    }
 
+    Collections.sort(
+        vehicularTours,
+        new Comparator<SubtourRecord>() {
+          @Override
+          public int compare(final SubtourRecord o1, final SubtourRecord o2) {
+            return Double.compare(o1.startTime, o2.startTime);
+          }
+        });
 
-		return vehicularTours;
-	}
+    return vehicularTours;
+  }
 
-	private boolean isVehicular(final Trip t) {
-		// note: checking that getVehicle returns null doen't work
-		// when allowing for null routes. Hence the duplication of the logic...
-		final List<Leg> legs = t.getLegsOnly();
-		if ( legs.isEmpty() ) return false;
+  private boolean isVehicular(final Trip t) {
+    // note: checking that getVehicle returns null doen't work
+    // when allowing for null routes. Hence the duplication of the logic...
+    final List<Leg> legs = t.getLegsOnly();
+    if (legs.isEmpty()) return false;
 
-		// XXX what to do if several legs???
-		final Leg l = legs.get( 0 );
-		if ( !vehicularModes.contains( l.getMode() ) ) return false;
-		if ( !allowNullRoutes && l.getRoute() == null ) return false;
-		if ( l.getRoute() != null && !(l.getRoute() instanceof NetworkRoute) ) return false; 
-		return true;
-	}
+    // XXX what to do if several legs???
+    final Leg l = legs.get(0);
+    if (!vehicularModes.contains(l.getMode())) return false;
+    if (!allowNullRoutes && l.getRoute() == null) return false;
+    if (l.getRoute() != null && !(l.getRoute() instanceof NetworkRoute)) return false;
+    return true;
+  }
 
-	private Id getVehicle( final Trip t ) {
-		final List<Leg> legs = t.getLegsOnly();
-		if ( legs.isEmpty() ) return null;
+  private Id getVehicle(final Trip t) {
+    final List<Leg> legs = t.getLegsOnly();
+    if (legs.isEmpty()) return null;
 
-		// XXX what to do if several legs???
-		final Leg l = legs.get( 0 );
-		if ( !vehicularModes.contains( l.getMode() ) ) return null;
-		if ( !allowNullRoutes && l.getRoute() == null ) return null;
-		if ( l.getRoute() != null && !(l.getRoute() instanceof NetworkRoute) ) return null; 
-		return ((NetworkRoute) l.getRoute()).getVehicleId();
-	}
+    // XXX what to do if several legs???
+    final Leg l = legs.get(0);
+    if (!vehicularModes.contains(l.getMode())) return null;
+    if (!allowNullRoutes && l.getRoute() == null) return null;
+    if (l.getRoute() != null && !(l.getRoute() instanceof NetworkRoute)) return null;
+    return ((NetworkRoute) l.getRoute()).getVehicleId();
+  }
 
-	// /////////////////////////////////////////////////////////////////////////
-	// classes
-	// /////////////////////////////////////////////////////////////////////////
-	private static class SubtourRecord {
-		public final double startTime, endTime;
-		public final List<VehicleRecord> possibleVehicles;
-		public final Subtour subtour;
-		public Id allocatedVehicle = null;
+  // /////////////////////////////////////////////////////////////////////////
+  // classes
+  // /////////////////////////////////////////////////////////////////////////
+  private static class SubtourRecord {
+    public final double startTime, endTime;
+    public final List<VehicleRecord> possibleVehicles;
+    public final Subtour subtour;
+    public Id allocatedVehicle = null;
 
-		public SubtourRecord(
-				final Subtour subtour,
-				final List<VehicleRecord> possibleVehicles, TimeInterpretation timeInterpretation) {
-			this.possibleVehicles = possibleVehicles; 
-			this.subtour = subtour;
-			
-			final Trip firstTrip = subtour.getTrips().get( 0 );
-			this.startTime = firstTrip.getOriginActivity().getEndTime().seconds();
+    public SubtourRecord(
+        final Subtour subtour,
+        final List<VehicleRecord> possibleVehicles,
+        TimeInterpretation timeInterpretation) {
+      this.possibleVehicles = possibleVehicles;
+      this.subtour = subtour;
 
-			final Trip lastTrip = subtour.getTrips().get( subtour.getTrips().size() - 1 );
-			this.endTime = calcArrivalTime( lastTrip, timeInterpretation );
-		}
-	}
+      final Trip firstTrip = subtour.getTrips().get(0);
+      this.startTime = firstTrip.getOriginActivity().getEndTime().seconds();
 
-	private static class VehicleRecord {
-		public final Id id;
-		public int nAllocs = 0;
-		public double availableFrom = Double.NEGATIVE_INFINITY;
+      final Trip lastTrip = subtour.getTrips().get(subtour.getTrips().size() - 1);
+      this.endTime = calcArrivalTime(lastTrip, timeInterpretation);
+    }
+  }
 
-		public VehicleRecord(final Id id) {
-			this.id = id;
-		}
-	}
+  private static class VehicleRecord {
+    public final Id id;
+    public int nAllocs = 0;
+    public double availableFrom = Double.NEGATIVE_INFINITY;
 
-	private static class VehicleRecordFactory {
-		private final Map<Id<Vehicle>, VehicleRecord> records = new HashMap<>();
+    public VehicleRecord(final Id id) {
+      this.id = id;
+    }
+  }
 
-		public List<VehicleRecord> getRecords(final Collection<Id<Vehicle>> ids) {
-			final List<VehicleRecord> list = new ArrayList<VehicleRecord>();
+  private static class VehicleRecordFactory {
+    private final Map<Id<Vehicle>, VehicleRecord> records = new HashMap<>();
 
-			for ( final Id<Vehicle> id : ids ) {
-				VehicleRecord r = records.get( id );
+    public List<VehicleRecord> getRecords(final Collection<Id<Vehicle>> ids) {
+      final List<VehicleRecord> list = new ArrayList<VehicleRecord>();
 
-				if ( r == null ) {
-					r = new VehicleRecord( id );
-					records.put( id , r );
-				}
+      for (final Id<Vehicle> id : ids) {
+        VehicleRecord r = records.get(id);
 
-				list.add( r );
-			}
+        if (r == null) {
+          r = new VehicleRecord(id);
+          records.put(id, r);
+        }
 
-			return list;
-		}
-	}
+        list.add(r);
+      }
 
-	private static double calcArrivalTime(final Trip trip, TimeInterpretation timeInterpretation) {
-		double now = trip.getOriginActivity().getEndTime().seconds();
-		for ( final PlanElement pe : trip.getTripElements() ) {
-			if ( pe instanceof Activity ) {
-				final OptionalTime end = ((Activity)pe).getEndTime();
-				now = end.isDefined() ? end.seconds() : now + ((Activity)pe).getMaximumDuration().seconds();
-			}
-			else if ( pe instanceof Leg ) {
-				Leg leg = (Leg)pe;
-				final OptionalTime tt = timeInterpretation.decideOnLegTravelTime(leg);
-				now += tt.orElse(0);// no info: just assume instantaneous (i.e. 0). This will give poor results!
-			}
-		}
-		return now;
-	}
+      return list;
+    }
+  }
+
+  private static double calcArrivalTime(final Trip trip, TimeInterpretation timeInterpretation) {
+    double now = trip.getOriginActivity().getEndTime().seconds();
+    for (final PlanElement pe : trip.getTripElements()) {
+      if (pe instanceof Activity) {
+        final OptionalTime end = ((Activity) pe).getEndTime();
+        now =
+            end.isDefined() ? end.seconds() : now + ((Activity) pe).getMaximumDuration().seconds();
+      } else if (pe instanceof Leg) {
+        Leg leg = (Leg) pe;
+        final OptionalTime tt = timeInterpretation.decideOnLegTravelTime(leg);
+        now +=
+            tt.orElse(
+                0); // no info: just assume instantaneous (i.e. 0). This will give poor results!
+      }
+    }
+    return now;
+  }
 }
-

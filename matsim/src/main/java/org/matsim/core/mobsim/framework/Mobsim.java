@@ -22,16 +22,16 @@ package org.matsim.core.mobsim.framework;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 
 /**
- * Example(s):<ul>
- * <li> {@link  tutorial.programming.ownMobsimAgentUsingRouter.RunOwnMobsimAgentUsingRouterExample}
- * <li> {@link tutorial.programming.ownMobsimAgentWithPerception.RunOwnMobsimAgentWithPerceptionExample}
- *</ul>
+ * Example(s):
+ *
+ * <ul>
+ *   <li>{@link tutorial.programming.ownMobsimAgentUsingRouter.RunOwnMobsimAgentUsingRouterExample}
+ *   <li>{@link
+ *       tutorial.programming.ownMobsimAgentWithPerception.RunOwnMobsimAgentWithPerceptionExample}
+ * </ul>
  */
 public interface Mobsim extends MatsimExtensionPoint {
 
-  /**
-   * Start the mobility simulation
-   */
+  /** Start the mobility simulation */
   public void run();
-
 }

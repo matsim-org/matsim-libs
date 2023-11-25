@@ -22,23 +22,22 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors.highestweigh
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
 final class KnownBranches {
-	private final boolean prune;
-	private final List<Branch> branches = new ArrayList<Branch>();
+  private final boolean prune;
+  private final List<Branch> branches = new ArrayList<Branch>();
 
-	public KnownBranches(final boolean prune) {
-		this.prune = prune;
-	}
+  public KnownBranches(final boolean prune) {
+    this.prune = prune;
+  }
 
-	public void tagAsExplored(final Set<Id<Person>> cotravs, final Set<Id> incomp) {
-		if (prune) branches.add( new Branch( cotravs , incomp ) );
-	}
+  public void tagAsExplored(final Set<Id<Person>> cotravs, final Set<Id> incomp) {
+    if (prune) branches.add(new Branch(cotravs, incomp));
+  }
 
-	public boolean isExplored(final Set<Id<Person>> cotravs, final Set<Id> incomp) {
-		return prune && branches.contains( new Branch( cotravs , incomp ) );
-	}
+  public boolean isExplored(final Set<Id<Person>> cotravs, final Set<Id> incomp) {
+    return prune && branches.contains(new Branch(cotravs, incomp));
+  }
 }

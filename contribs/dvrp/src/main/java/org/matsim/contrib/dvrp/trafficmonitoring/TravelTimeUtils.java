@@ -34,21 +34,25 @@ import org.matsim.vehicles.Vehicle;
  * @author michalm
  */
 public class TravelTimeUtils {
-	public static TravelTime maxOfTravelTimes(TravelTime travelTime1, TravelTime travelTime2) {
-		return (Link link, double time, Person person, Vehicle vehicle) -> Math.max(
-				travelTime1.getLinkTravelTime(link, time, person, vehicle),
-				travelTime2.getLinkTravelTime(link, time, person, vehicle));
-	}
+  public static TravelTime maxOfTravelTimes(TravelTime travelTime1, TravelTime travelTime2) {
+    return (Link link, double time, Person person, Vehicle vehicle) ->
+        Math.max(
+            travelTime1.getLinkTravelTime(link, time, person, vehicle),
+            travelTime2.getLinkTravelTime(link, time, person, vehicle));
+  }
 
-	public static TravelTime createTravelTimesFromEvents(Network network, Config config, String eventsFile) {
-		TravelTimeCalculator ttCalculator = TravelTimeCalculator.create(network, config.travelTimeCalculator());
-		initTravelTimeCalculatorFromEvents(ttCalculator, eventsFile);
-		return ttCalculator.getLinkTravelTimes();
-	}
+  public static TravelTime createTravelTimesFromEvents(
+      Network network, Config config, String eventsFile) {
+    TravelTimeCalculator ttCalculator =
+        TravelTimeCalculator.create(network, config.travelTimeCalculator());
+    initTravelTimeCalculatorFromEvents(ttCalculator, eventsFile);
+    return ttCalculator.getLinkTravelTimes();
+  }
 
-	public static void initTravelTimeCalculatorFromEvents(TravelTimeCalculator ttCalculator, String eventsFile) {
-		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(ttCalculator);
-		new MatsimEventsReader(events).readFile(eventsFile);
-	}
+  public static void initTravelTimeCalculatorFromEvents(
+      TravelTimeCalculator ttCalculator, String eventsFile) {
+    EventsManager events = EventsUtils.createEventsManager();
+    events.addHandler(ttCalculator);
+    new MatsimEventsReader(events).readFile(eventsFile);
+  }
 }

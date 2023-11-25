@@ -1,5 +1,6 @@
 package org.matsim.simwrapper;
 
+import java.net.URL;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
@@ -9,26 +10,22 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.net.URL;
-
 public class SimWrapperModuleTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void runScenario() {
+  @Test
+  public void runScenario() {
 
-		URL equil = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml");
+    URL equil = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml");
 
-		Config config = ConfigUtils.loadConfig(equil);
+    Config config = ConfigUtils.loadConfig(equil);
 
-		config.controller().setLastIteration(5);
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
+    config.controller().setLastIteration(5);
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
 
-		Controler controler = new Controler(config);
-		controler.addOverridingModule(new SimWrapperModule());
-		controler.run();
-
-	}
+    Controler controler = new Controler(config);
+    controler.addOverridingModule(new SimWrapperModule());
+    controler.run();
+  }
 }

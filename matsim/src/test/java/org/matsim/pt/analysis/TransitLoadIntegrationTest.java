@@ -41,36 +41,41 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class TransitLoadIntegrationTest {
 
-	@Rule public MatsimTestUtils util = new MatsimTestUtils();
+  @Rule public MatsimTestUtils util = new MatsimTestUtils();
 
-	@Test
-	public void testIntegration() {
-		final Config cfg = this.util.loadConfig("test/scenarios/pt-tutorial/0.config.xml");
-		cfg.controller().setLastIteration(0);
-		cfg.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
-		final Scenario s = ScenarioUtils.loadScenario(cfg);
-		final Controler c = new Controler(s);
-		final TransitLoad transitload = new TransitLoad();
+  @Test
+  public void testIntegration() {
+    final Config cfg = this.util.loadConfig("test/scenarios/pt-tutorial/0.config.xml");
+    cfg.controller().setLastIteration(0);
+    cfg.plans()
+        .setHandlingOfPlansWithoutRoutingMode(
+            HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
+    final Scenario s = ScenarioUtils.loadScenario(cfg);
+    final Controler c = new Controler(s);
+    final TransitLoad transitload = new TransitLoad();
 
-		c.addControlerListener(new StartupListener() {
-			@Override
-			public void notifyStartup(StartupEvent event) {
-				c.getEvents().addHandler(transitload);
-			}
-		});
+    c.addControlerListener(
+        new StartupListener() {
+          @Override
+          public void notifyStartup(StartupEvent event) {
+            c.getEvents().addHandler(transitload);
+          }
+        });
 
-		cfg.controller().setWritePlansInterval(0);
-        c.getConfig().controller().setCreateGraphs(false);
-        c.getConfig().controller().setWriteEventsInterval(0);
-		c.getConfig().controller().setDumpDataAtEnd(false);
-		c.run();
+    cfg.controller().setWritePlansInterval(0);
+    c.getConfig().controller().setCreateGraphs(false);
+    c.getConfig().controller().setWriteEventsInterval(0);
+    c.getConfig().controller().setDumpDataAtEnd(false);
+    c.run();
 
-		TransitLine line = s.getTransitSchedule().getTransitLines().get(Id.create("Blue Line", TransitLine.class));
-		TransitRoute route = line.getRoutes().get(Id.create("1to3", TransitRoute.class));
-		TransitStopFacility stopFacility = s.getTransitSchedule().getFacilities().get(Id.create("2a", TransitStopFacility.class));
-		Departure departure = route.getDepartures().get(Id.create("07", Departure.class));
-		int load = transitload.getLoadAtDeparture(line, route, stopFacility, departure);
+    TransitLine line =
+        s.getTransitSchedule().getTransitLines().get(Id.create("Blue Line", TransitLine.class));
+    TransitRoute route = line.getRoutes().get(Id.create("1to3", TransitRoute.class));
+    TransitStopFacility stopFacility =
+        s.getTransitSchedule().getFacilities().get(Id.create("2a", TransitStopFacility.class));
+    Departure departure = route.getDepartures().get(Id.create("07", Departure.class));
+    int load = transitload.getLoadAtDeparture(line, route, stopFacility, departure);
 
-		Assert.assertEquals("wrong number of passengers.", 4, load);
-	}
+    Assert.assertEquals("wrong number of passengers.", 4, load);
+  }
 }

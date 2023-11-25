@@ -21,43 +21,41 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.concurrent.Callable;
-
 import org.matsim.core.gbl.Gbl;
 
 /**
- * Split up the old {@code QNetsimEngineRunner} which was implementing
- * 2 different approaches.
- * 
+ * Split up the old {@code QNetsimEngineRunner} which was implementing 2 different approaches.
+ *
  * @author droeder @ Senozon Deutschland GmbH
  */
-final class QNetsimEngineRunnerForThreadpool extends AbstractQNetsimEngineRunner implements Callable<Boolean>{
-	
-	private volatile boolean simulationRunning = true;
-	private boolean movingNodes;
+final class QNetsimEngineRunnerForThreadpool extends AbstractQNetsimEngineRunner
+    implements Callable<Boolean> {
 
-	QNetsimEngineRunnerForThreadpool() {
-	}
+  private volatile boolean simulationRunning = true;
+  private boolean movingNodes;
 
-	@Override
-	public Boolean call() {
-		if (!this.simulationRunning) {
-			Gbl.printCurrentThreadCpuTime();
-			return false;
-		}
+  QNetsimEngineRunnerForThreadpool() {}
 
-		if (this.movingNodes) {
-			moveNodes();
-		} else {
-			moveLinks();
-		}
-		return true ;
-	}
+  @Override
+  public Boolean call() {
+    if (!this.simulationRunning) {
+      Gbl.printCurrentThreadCpuTime();
+      return false;
+    }
 
-	public final void afterSim() {
-		this.simulationRunning  = false;
-	}
+    if (this.movingNodes) {
+      moveNodes();
+    } else {
+      moveLinks();
+    }
+    return true;
+  }
 
-	public final void setMovingNodes(boolean movingNodes) {
-		this.movingNodes = movingNodes;
-	}
+  public final void afterSim() {
+    this.simulationRunning = false;
+  }
+
+  public final void setMovingNodes(boolean movingNodes) {
+    this.movingNodes = movingNodes;
+  }
 }

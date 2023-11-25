@@ -19,42 +19,40 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
-
-//import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
+// import org.apache.logging.log4j.LogManager;
 
 class ScoringPenalty {
 
-	private double startTime = 0;
-	private double endTime = 0;
-	private FacilityPenalty facilityPenalty = null;
-	private double score = 0.0;
+  private double startTime = 0;
+  private double endTime = 0;
+  private FacilityPenalty facilityPenalty = null;
+  private double score = 0.0;
 
-	//private static final Logger log = LogManager.getLogger(Penalty.class);
+  // private static final Logger log = LogManager.getLogger(Penalty.class);
 
-	public ScoringPenalty(double startTime, double endTime, FacilityPenalty facilityPenalty, double score) {
-		this.startTime = startTime;
-		this.endTime = endTime;
-		this.facilityPenalty = facilityPenalty;
-		this.score = score;
-	}
+  public ScoringPenalty(
+      double startTime, double endTime, FacilityPenalty facilityPenalty, double score) {
+    this.startTime = startTime;
+    this.endTime = endTime;
+    this.facilityPenalty = facilityPenalty;
+    this.score = score;
+  }
 
+  public double getScore() {
+    return score;
+  }
 
-	public double getScore() {
-		return score;
-	}
-	public void setScore(double score) {
-		this.score = score;
-	}
+  public void setScore(double score) {
+    this.score = score;
+  }
 
-	public double getPenalty() {
-		
-		double penaltyFactor = 0.0;
-		if (this.facilityPenalty != null) {
-			this.facilityPenalty.finish(); // is this still needed? we have a call in EventsToFacilityLoad
-			penaltyFactor = this.facilityPenalty.getCapacityPenaltyFactor(startTime, endTime);
-		}
-		return this.score * penaltyFactor;
-	}
+  public double getPenalty() {
+
+    double penaltyFactor = 0.0;
+    if (this.facilityPenalty != null) {
+      this.facilityPenalty.finish(); // is this still needed? we have a call in EventsToFacilityLoad
+      penaltyFactor = this.facilityPenalty.getCapacityPenaltyFactor(startTime, endTime);
+    }
+    return this.score * penaltyFactor;
+  }
 }

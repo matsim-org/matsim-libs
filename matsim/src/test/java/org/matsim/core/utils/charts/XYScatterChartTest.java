@@ -26,9 +26,7 @@ import static org.junit.Assert.assertTrue;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
@@ -40,25 +38,24 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class XYScatterChartTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  /**
+   * Test that a file was really generated, and that the image, when loaded, has the specified size.
+   *
+   * @throws IOException possible exception when reading the image for validation
+   */
+  @Test
+  public void testXYScatterChartDemo() throws IOException {
+    String imageFilename = utils.getOutputDirectory() + "xyscatterchart.png";
+    Demo demo = new Demo();
+    demo.createXYScatterChart(imageFilename);
 
-	/**
-	 * Test that a file was really generated, and that the image, when loaded, has the specified size.
-	 * @throws IOException possible exception when reading the image for validation
-	 */
-	@Test public void testXYScatterChartDemo() throws IOException {
-		String imageFilename = utils.getOutputDirectory() + "xyscatterchart.png";
-		Demo demo = new Demo();
-		demo.createXYScatterChart(imageFilename);
+    File imagefile = new File(imageFilename);
+    assertTrue(imagefile.exists());
 
-		File imagefile = new File(imageFilename);
-		assertTrue(imagefile.exists());
-
-		BufferedImage image = ImageIO.read(imagefile);
-		assertEquals(800, image.getWidth(null));
-		assertEquals(600, image.getHeight(null));
-	}
-
+    BufferedImage image = ImageIO.read(imagefile);
+    assertEquals(800, image.getWidth(null));
+    assertEquals(600, image.getHeight(null));
+  }
 }

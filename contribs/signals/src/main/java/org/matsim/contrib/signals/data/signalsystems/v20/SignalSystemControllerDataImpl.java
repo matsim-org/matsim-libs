@@ -21,53 +21,49 @@ package org.matsim.contrib.signals.data.signalsystems.v20;
 
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 
-
 /**
  * @author dgrether
- *
  */
 public final class SignalSystemControllerDataImpl implements SignalSystemControllerData {
 
-	private String controllerIdentifier;
-	private Id<SignalSystem> signalSystemId;
-	private Map<Id<SignalPlan>, SignalPlanData> signalPlanData;
+  private String controllerIdentifier;
+  private Id<SignalSystem> signalSystemId;
+  private Map<Id<SignalPlan>, SignalPlanData> signalPlanData;
 
-	public SignalSystemControllerDataImpl(Id<SignalSystem> signalSystemId) {
-		this.signalSystemId = signalSystemId;
-	}
+  public SignalSystemControllerDataImpl(Id<SignalSystem> signalSystemId) {
+    this.signalSystemId = signalSystemId;
+  }
 
-	@Override
-	public void addSignalPlanData(SignalPlanData plan) {
-		if (this.signalPlanData == null){
-			this.signalPlanData = new TreeMap<>();
-		}
-		this.signalPlanData.put(plan.getId(), plan);
-	}
+  @Override
+  public void addSignalPlanData(SignalPlanData plan) {
+    if (this.signalPlanData == null) {
+      this.signalPlanData = new TreeMap<>();
+    }
+    this.signalPlanData.put(plan.getId(), plan);
+  }
 
-	@Override
-	public String getControllerIdentifier() {
-		return this.controllerIdentifier;
-	}
+  @Override
+  public String getControllerIdentifier() {
+    return this.controllerIdentifier;
+  }
 
-	@Override
-	public Id<SignalSystem> getSignalSystemId() {
-		return this.signalSystemId;
-	}
+  @Override
+  public Id<SignalSystem> getSignalSystemId() {
+    return this.signalSystemId;
+  }
 
-	@Override
-	public Map<Id<SignalPlan>, SignalPlanData> getSignalPlanData() {
-		return this.signalPlanData;
-	}
+  @Override
+  public Map<Id<SignalPlan>, SignalPlanData> getSignalPlanData() {
+    return this.signalPlanData;
+  }
 
-	@Override
-	public void setControllerIdentifier(String identifier) {
-		this.controllerIdentifier = identifier;
-	}
-
+  @Override
+  public void setControllerIdentifier(String identifier) {
+    this.controllerIdentifier = identifier;
+  }
 }

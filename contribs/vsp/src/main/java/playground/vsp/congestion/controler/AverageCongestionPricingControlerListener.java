@@ -18,10 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
-
+/** */
 package playground.vsp.congestion.controler;
 
 import org.apache.logging.log4j.LogManager;
@@ -35,58 +32,71 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.MutableScenario;
-
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.TollHandler;
 
 /**
  * @author Ihab
- *
  */
+public class AverageCongestionPricingControlerListener
+    implements StartupListener, AfterMobsimListener {
+  private static final Logger log =
+      LogManager.getLogger(AverageCongestionPricingControlerListener.class);
 
-public class AverageCongestionPricingControlerListener implements StartupListener, AfterMobsimListener {
-	private static final Logger log = LogManager.getLogger(AverageCongestionPricingControlerListener.class);
+  private final MutableScenario scenario;
+  private TollHandler tollHandler;
+  private CongestionHandlerImplV3 congestionHandler;
 
-	private final MutableScenario scenario;
-	private TollHandler tollHandler;
-	private CongestionHandlerImplV3 congestionHandler;
+  public AverageCongestionPricingControlerListener(
+      MutableScenario scenario, TollHandler tollHandler) {
+    this.scenario = scenario;
+    this.tollHandler = tollHandler;
+  }
 
-	public AverageCongestionPricingControlerListener(MutableScenario scenario, TollHandler tollHandler){
-		this.scenario = scenario;
-		this.tollHandler = tollHandler;
-	}
+  @Override
+  public void notifyStartup(StartupEvent event) {
 
-	@Override
-	public void notifyStartup(StartupEvent event) {
+    EventsManager eventsManager = event.getServices().getEvents();
+    congestionHandler = new CongestionHandlerImplV3(eventsManager, scenario);
 
-		EventsManager eventsManager = event.getServices().getEvents();
-		congestionHandler = new CongestionHandlerImplV3(eventsManager, scenario);
+    event.getServices().getEvents().addHandler(congestionHandler);
+    event.getServices().getEvents().addHandler(tollHandler);
+  }
 
-		event.getServices().getEvents().addHandler(congestionHandler);
-		event.getServices().getEvents().addHandler(tollHandler);
+  @Override
+  public void notifyAfterMobsim(AfterMobsimEvent event) {
 
-	}
+    log.info("Set average tolls for each link Id and time bin.");
+    tollHandler.setLinkId2timeBin2avgToll();
 
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
+    // write out toll statistics every iteration
+    tollHandler.writeTollStats(
+        this.scenario.getConfig().controller().getOutputDirectory()
+            + "/ITERS/it."
+            + event.getIteration()
+            + "/tollStats.csv");
 
-		log.info("Set average tolls for each link Id and time bin.");
-		tollHandler.setLinkId2timeBin2avgToll();
+    // write out congestion statistics every iteration
+    congestionHandler.writeCongestionStats(
+        this.scenario.getConfig().controller().getOutputDirectory()
+            + "/ITERS/it."
+            + event.getIteration()
+            + "/congestionStats.csv");
 
-		// write out toll statistics every iteration
-		tollHandler.writeTollStats(this.scenario.getConfig().controller().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");
+    log.info(
+        "Throwing agent money events based on calculated average marginal cost for each link and time bin.");
+    EventsManager events = event.getServices().getEvents();
 
-		// write out congestion statistics every iteration
-		congestionHandler.writeCongestionStats(this.scenario.getConfig().controller().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
-
-		log.info("Throwing agent money events based on calculated average marginal cost for each link and time bin.");
-		EventsManager events = event.getServices().getEvents();
-
-		for (LinkEnterEvent enterEvent : this.tollHandler.getLinkEnterEvents()) {
-			double amount = tollHandler.getAvgToll(enterEvent.getLinkId(), enterEvent.getTime());
-			PersonMoneyEvent moneyEvent = new PersonMoneyEvent(enterEvent.getTime(), Id.createPersonId(enterEvent.getVehicleId()), amount, "congestionPricing", null);
-			events.processEvent(moneyEvent);
-		}
-	}
-
+    for (LinkEnterEvent enterEvent : this.tollHandler.getLinkEnterEvents()) {
+      double amount = tollHandler.getAvgToll(enterEvent.getLinkId(), enterEvent.getTime());
+      PersonMoneyEvent moneyEvent =
+          new PersonMoneyEvent(
+              enterEvent.getTime(),
+              Id.createPersonId(enterEvent.getVehicleId()),
+              amount,
+              "congestionPricing",
+              null);
+      events.processEvent(moneyEvent);
+    }
+  }
 }

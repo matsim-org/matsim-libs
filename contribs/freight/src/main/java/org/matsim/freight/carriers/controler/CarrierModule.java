@@ -24,6 +24,7 @@ package org.matsim.freight.carriers.controler;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import java.util.List;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
@@ -38,114 +39,146 @@ import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.freight.carriers.*;
 
-import java.util.List;
-
 public final class CarrierModule extends AbstractModule {
 
+  @Override
+  public void install() {
+    FreightCarriersConfigGroup freightConfig =
+        ConfigUtils.addOrGetModule(getConfig(), FreightCarriersConfigGroup.class);
 
-	@Override public void install() {
-		FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule( getConfig(), FreightCarriersConfigGroup.class ) ;
+    bind(Carriers.class)
+        .toProvider(new CarrierProvider())
+        .asEagerSingleton(); // needs to be eager since it is still scenario construction. kai,
+    // oct'19
+    // this is probably ok
 
-		bind(Carriers.class).toProvider( new CarrierProvider() ).asEagerSingleton(); // needs to be eager since it is still scenario construction. kai, oct'19
-		// this is probably ok
+    bind(CarrierControlerListener.class).in(Singleton.class);
+    addControlerListenerBinding().to(CarrierControlerListener.class);
 
-		bind(CarrierControlerListener.class).in( Singleton.class );
-		addControlerListenerBinding().to(CarrierControlerListener.class);
+    bind(CarrierAgentTracker.class).in(Singleton.class);
+    addEventHandlerBinding().to(CarrierAgentTracker.class);
 
-		bind(CarrierAgentTracker.class).in( Singleton.class );
-		addEventHandlerBinding().to( CarrierAgentTracker.class );
+    {
+      // this switches on certain qsim components:
+      QSimComponentsConfigGroup qsimComponents =
+          ConfigUtils.addOrGetModule(getConfig(), QSimComponentsConfigGroup.class);
+      List<String> components = qsimComponents.getActiveComponents();
+      components.add(FreightAgentSource.COMPONENT_NAME);
+      switch (freightConfig.getTimeWindowHandling()) {
+        case ignore:
+          break;
+        case enforceBeginnings:
+          components.add(WithinDayActivityReScheduling.COMPONENT_NAME);
+          break;
+        default:
+          throw new IllegalStateException(
+              "Unexpected value: " + freightConfig.getTimeWindowHandling());
+      }
+      qsimComponents.setActiveComponents(components);
 
-		{
-			// this switches on certain qsim components:
-			QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule( getConfig(), QSimComponentsConfigGroup.class );
-			List<String> components = qsimComponents.getActiveComponents();
-			components.add( FreightAgentSource.COMPONENT_NAME );
-			switch( freightConfig.getTimeWindowHandling() ){
-				case ignore:
-					break;
-				case enforceBeginnings:
-					components.add( WithinDayActivityReScheduling.COMPONENT_NAME );
-					break;
-				default:
-					throw new IllegalStateException( "Unexpected value: " + freightConfig.getTimeWindowHandling() );
-			}
-			qsimComponents.setActiveComponents( components );
+      // this installs qsim components, which are switched on (or not) via the above syntax:
+      this.installQSimModule(
+          new AbstractQSimModule() {
+            @Override
+            protected void configureQSim() {
+              this.bind(FreightAgentSource.class).in(Singleton.class);
+              this.addQSimComponentBinding(FreightAgentSource.COMPONENT_NAME)
+                  .to(FreightAgentSource.class);
+              switch (freightConfig.getTimeWindowHandling()) {
+                case ignore:
+                  break;
+                case enforceBeginnings:
+                  this.addQSimComponentBinding(WithinDayActivityReScheduling.COMPONENT_NAME)
+                      .to(WithinDayActivityReScheduling.class);
+                  break;
+                default:
+                  throw new IllegalStateException(
+                      "Unexpected value: " + freightConfig.getTimeWindowHandling());
+              }
+            }
+          });
+    }
 
-			// this installs qsim components, which are switched on (or not) via the above syntax:
-			this.installQSimModule( new AbstractQSimModule(){
-				@Override protected void configureQSim(){
-					this.bind( FreightAgentSource.class ).in( Singleton.class );
-					this.addQSimComponentBinding( FreightAgentSource.COMPONENT_NAME ).to( FreightAgentSource.class );
-					switch( freightConfig.getTimeWindowHandling() ){
-						case ignore:
-							break;
-						case enforceBeginnings:
-							this.addQSimComponentBinding( WithinDayActivityReScheduling.COMPONENT_NAME ).to( WithinDayActivityReScheduling.class );
-							break;
-						default:
-							throw new IllegalStateException( "Unexpected value: " + freightConfig.getTimeWindowHandling() );
-					}
-				}
-			} );
-		}
+    bind(CarrierScoringFunctionFactory.class).to(CarrierScoringFunctionFactoryDummyImpl.class);
 
-		bind( CarrierScoringFunctionFactory.class ).to( CarrierScoringFunctionFactoryDummyImpl.class ) ;
+    // yyyy in the long run, needs to be done differently (establish strategy manager as fixed
+    // infrastructure; have user code register strategies there).
+    // kai/kai, jan'21
+    // See javadoc of CarrierStrategyManager for some explanation of design decisions.  kai, jul'22
+    bind(CarrierStrategyManager.class).toProvider(() -> null);
+    // (the null binding means that a zeroth iteration will run. kai, jul'22)
 
-		// yyyy in the long run, needs to be done differently (establish strategy manager as fixed infrastructure; have user code register strategies there).
-		// kai/kai, jan'21
-		// See javadoc of CarrierStrategyManager for some explanation of design decisions.  kai, jul'22
-		bind( CarrierStrategyManager.class ).toProvider( () -> null );
-		// (the null binding means that a zeroth iteration will run. kai, jul'22)
+    this.addControlerListenerBinding()
+        .toInstance(
+            (ShutdownListener)
+                event ->
+                    writeAdditionalRunOutput(
+                        event.getServices().getControlerIO(),
+                        event.getServices().getConfig(),
+                        CarriersUtils.getCarriers(event.getServices().getScenario())));
+  }
 
-		this.addControlerListenerBinding().toInstance((ShutdownListener) event -> writeAdditionalRunOutput( event.getServices().getControlerIO(), event.getServices().getConfig(), CarriersUtils.getCarriers( event.getServices().getScenario() ) ));
+  // We export CarrierAgentTracker, which is kept by the ControlerListener, which happens to
+  // re-create it every iteration.
+  // The freight QSim needs it (see below [[where?]]).
+  // yyyy this feels rather scary.  kai, oct'19
+  // Since we are exporting it anyway, we could as well also inject it.  kai, sep'20
+  // Is this maybe already resolved now?  kai, jul'22
+  //	@Provides CarrierAgentTracker provideCarrierAgentTracker(CarrierControlerListener
+  // carrierControlerListener) {
+  //		return carrierControlerListener.getCarrierAgentTracker();
+  //	}
 
-	}
+  private static class CarrierScoringFunctionFactoryDummyImpl
+      implements CarrierScoringFunctionFactory {
+    @Override
+    public ScoringFunction createScoringFunction(Carrier carrier) {
+      return new ScoringFunction() {
+        @Override
+        public void handleActivity(Activity activity) {}
 
-	// We export CarrierAgentTracker, which is kept by the ControlerListener, which happens to re-create it every iteration.
-	// The freight QSim needs it (see below [[where?]]).
-	// yyyy this feels rather scary.  kai, oct'19
-	// Since we are exporting it anyway, we could as well also inject it.  kai, sep'20
-	// Is this maybe already resolved now?  kai, jul'22
-//	@Provides CarrierAgentTracker provideCarrierAgentTracker(CarrierControlerListener carrierControlerListener) {
-//		return carrierControlerListener.getCarrierAgentTracker();
-//	}
+        @Override
+        public void handleLeg(Leg leg) {}
 
-	private static class CarrierScoringFunctionFactoryDummyImpl implements CarrierScoringFunctionFactory {
-		@Override public ScoringFunction createScoringFunction( Carrier carrier ){
-			return new ScoringFunction(){
-				@Override public void handleActivity( Activity activity ){
-				}
-				@Override public void handleLeg( Leg leg ){
-				}
-				@Override public void agentStuck( double time ){
-				}
-				@Override public void addMoney( double amount ){
-				}
-				@Override public void addScore( double amount ){
-				}
-				@Override public void finish(){
-				}
-				@Override public double getScore(){
-					return Double.NEGATIVE_INFINITY;
-				}
-				@Override public void handleEvent( Event event ){
-				}
-			};
-		}
-	}
+        @Override
+        public void agentStuck(double time) {}
 
-	private static void writeAdditionalRunOutput( OutputDirectoryHierarchy controllerIO, Config config, Carriers carriers ) {
-		// ### some final output: ###
-		String compression = config.controller().getCompressionType().fileEnding;
-		new CarrierPlanWriter(carriers).write( controllerIO.getOutputFilename("output_carriers.xml" + compression));
-		new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write(controllerIO.getOutputFilename("output_carriersVehicleTypes.xml" + compression));
-	}
+        @Override
+        public void addMoney(double amount) {}
 
+        @Override
+        public void addScore(double amount) {}
 
-	private static class CarrierProvider implements Provider<Carriers> {
-		@Inject Scenario scenario;
-		@Override public Carriers get() {
-			return CarriersUtils.getCarriers(scenario);
-		}
-	}
+        @Override
+        public void finish() {}
+
+        @Override
+        public double getScore() {
+          return Double.NEGATIVE_INFINITY;
+        }
+
+        @Override
+        public void handleEvent(Event event) {}
+      };
+    }
+  }
+
+  private static void writeAdditionalRunOutput(
+      OutputDirectoryHierarchy controllerIO, Config config, Carriers carriers) {
+    // ### some final output: ###
+    String compression = config.controller().getCompressionType().fileEnding;
+    new CarrierPlanWriter(carriers)
+        .write(controllerIO.getOutputFilename("output_carriers.xml" + compression));
+    new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers))
+        .write(controllerIO.getOutputFilename("output_carriersVehicleTypes.xml" + compression));
+  }
+
+  private static class CarrierProvider implements Provider<Carriers> {
+    @Inject Scenario scenario;
+
+    @Override
+    public Carriers get() {
+      return CarriersUtils.getCarriers(scenario);
+    }
+  }
 }

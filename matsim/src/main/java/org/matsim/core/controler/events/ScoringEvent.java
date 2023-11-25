@@ -28,7 +28,7 @@ import org.matsim.core.controler.MatsimServices;
  * @author mrieser
  */
 public final class ScoringEvent extends AbstractIterationEvent {
-	public ScoringEvent(MatsimServices services, int iteration, boolean isLastIteration) {
-		super(services, iteration, isLastIteration);
-	}
+  public ScoringEvent(MatsimServices services, int iteration, boolean isLastIteration) {
+    super(services, iteration, isLastIteration);
+  }
 }

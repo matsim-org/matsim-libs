@@ -21,70 +21,66 @@ package org.matsim.contrib.signals.data.signalsystems.v20;
 
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.lanes.Lane;
 
-
 /**
  * @author dgrether
- *
  */
 final class SignalDataImpl implements SignalData {
 
-	private Id<Signal> id;
-	
-	private Id<Link> linkId;
-	
-	private Set<Id<Lane>> laneIds = null;
-	
-	private Set<Id<Link>> turningMoveRestrictions = null;
+  private Id<Signal> id;
 
-	SignalDataImpl(Id<Signal> id) {
-		this.id = id;
-	}
+  private Id<Link> linkId;
 
-	@Override
-	public void addLaneId(Id<Lane> laneId) {
-		if (this.laneIds == null){
-			this.laneIds = new TreeSet<>();
-		}
-		this.laneIds.add(laneId);
-	}
+  private Set<Id<Lane>> laneIds = null;
 
-	@Override
-	public void addTurningMoveRestriction(Id<Link> linkId) {
-		if (this.turningMoveRestrictions == null){
-			this.turningMoveRestrictions = new TreeSet<>();
-		}
-		this.turningMoveRestrictions.add(linkId);
-	}
+  private Set<Id<Link>> turningMoveRestrictions = null;
 
-	@Override
-	public Set<Id<Lane>> getLaneIds() {
-		return this.laneIds;
-	}
+  SignalDataImpl(Id<Signal> id) {
+    this.id = id;
+  }
 
-	@Override
-	public Id<Link> getLinkId() {
-		return this.linkId;
-	}
+  @Override
+  public void addLaneId(Id<Lane> laneId) {
+    if (this.laneIds == null) {
+      this.laneIds = new TreeSet<>();
+    }
+    this.laneIds.add(laneId);
+  }
 
-	@Override
-	public Set<Id<Link>> getTurningMoveRestrictions() {
-		return this.turningMoveRestrictions;
-	}
+  @Override
+  public void addTurningMoveRestriction(Id<Link> linkId) {
+    if (this.turningMoveRestrictions == null) {
+      this.turningMoveRestrictions = new TreeSet<>();
+    }
+    this.turningMoveRestrictions.add(linkId);
+  }
 
-	@Override
-	public void setLinkId(Id<Link> id) {
-		this.linkId = id;
-	}
+  @Override
+  public Set<Id<Lane>> getLaneIds() {
+    return this.laneIds;
+  }
 
-	@Override
-	public Id<Signal> getId() {
-		return this.id;
-	}
+  @Override
+  public Id<Link> getLinkId() {
+    return this.linkId;
+  }
 
+  @Override
+  public Set<Id<Link>> getTurningMoveRestrictions() {
+    return this.turningMoveRestrictions;
+  }
+
+  @Override
+  public void setLinkId(Id<Link> id) {
+    this.linkId = id;
+  }
+
+  @Override
+  public Id<Signal> getId() {
+    return this.id;
+  }
 }

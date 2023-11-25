@@ -19,11 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.gbl.MatsimRandom;
-
 import com.google.inject.Inject;
-
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.NonInnovativeStrategyFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
@@ -31,31 +28,31 @@ import org.matsim.contrib.socnetsim.framework.replanning.selectors.IncompatibleP
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.LogitWeight;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.LowestScoreOfJointPlanWeight;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.highestweightselection.HighestWeightSelector;
+import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * @author thibautd
  */
 public class GroupMinSelectExpBetaFactory extends NonInnovativeStrategyFactory {
 
-	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
-	private final Scenario sc;
+  private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+  private final Scenario sc;
 
-	@Inject
-	public GroupMinSelectExpBetaFactory( IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory , Scenario sc ) {
-		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
-		this.sc = sc;
-	}
+  @Inject
+  public GroupMinSelectExpBetaFactory(
+      IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory, Scenario sc) {
+    this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+    this.sc = sc;
+  }
 
-	@Override
-	public GroupLevelPlanSelector createSelector() {
-		return new HighestWeightSelector(
-			 incompatiblePlansIdentifierFactory ,
-			 new LogitWeight(
-				new LowestScoreOfJointPlanWeight(
-					((JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME  )) ),
-				MatsimRandom.getLocalInstance(),
-				sc.getConfig().scoring().getBrainExpBeta()) );
-
-	}
+  @Override
+  public GroupLevelPlanSelector createSelector() {
+    return new HighestWeightSelector(
+        incompatiblePlansIdentifierFactory,
+        new LogitWeight(
+            new LowestScoreOfJointPlanWeight(
+                ((JointPlans) sc.getScenarioElement(JointPlans.ELEMENT_NAME))),
+            MatsimRandom.getLocalInstance(),
+            sc.getConfig().scoring().getBrainExpBeta()));
+  }
 }
-

@@ -26,23 +26,21 @@ import org.matsim.contrib.cadyts.general.LookUpItemFromId;
 
 /**
  * @author nagel
- *
  */
-class LinkLookUp implements LookUpItemFromId<Link>{
-	
-	private Network network;
+class LinkLookUp implements LookUpItemFromId<Link> {
 
-	LinkLookUp( Scenario sc ) {
-		this.network = sc.getNetwork();
-	}
-	
-	LinkLookUp( Network net ) {
-		this.network = net ;
-	}
-	
-	@Override
-	public Link getItem( Id<Link> id ) {
-		return this.network.getLinks().get( id ) ;
-	}
+  private Network network;
 
+  LinkLookUp(Scenario sc) {
+    this.network = sc.getNetwork();
+  }
+
+  LinkLookUp(Network net) {
+    this.network = net;
+  }
+
+  @Override
+  public Link getItem(Id<Link> id) {
+    return this.network.getLinks().get(id);
+  }
 }

@@ -37,63 +37,63 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 
 /**
- * <p>
  * Starts a simulation with a social network, joint trips and joint activities.
- * </p>
  *
- * <p>For details of the approach, please refer to <a href="https://doi.org/10.3929/ethz-b-000165685">this dissertation</a>.</p>
+ * <p>For details of the approach, please refer to <a
+ * href="https://doi.org/10.3929/ethz-b-000165685">this dissertation</a>.
  *
  * @author thibautd
  */
 public class RunExampleSocialSimulation {
-	public static void main(final String[] args) {
-		final String configFile = "examples/siouxfalls-socialnetwork/config.xml";
+  public static void main(final String[] args) {
+    final String configFile = "examples/siouxfalls-socialnetwork/config.xml";
 
-		final Scenario scenario = RunUtils.createScenario( configFile );
-		final Config config = scenario.getConfig();
+    final Scenario scenario = RunUtils.createScenario(configFile);
+    final Config config = scenario.getConfig();
 
-		final SocialNetworkConfigGroup snConf = (SocialNetworkConfigGroup)
-				config.getModule( SocialNetworkConfigGroup.GROUP_NAME );
+    final SocialNetworkConfigGroup snConf =
+        (SocialNetworkConfigGroup) config.getModule(SocialNetworkConfigGroup.GROUP_NAME);
 
-		new SocialNetworkReader( scenario ).readFile( snConf.getInputFile() );
+    new SocialNetworkReader(scenario).readFile(snConf.getInputFile());
 
-		final SocialNetwork sn = (SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME );
-		for ( Id p : scenario.getPopulation().getPersons().keySet() ) {
-			if ( !sn.getEgos().contains( p ) ) sn.addEgo( p );
-		}
+    final SocialNetwork sn =
+        (SocialNetwork) scenario.getScenarioElement(SocialNetwork.ELEMENT_NAME);
+    for (Id p : scenario.getPopulation().getPersons().keySet()) {
+      if (!sn.getEgos().contains(p)) sn.addEgo(p);
+    }
 
-		final Controler controler = new Controler( scenario );
-		// The first step is to set the modifications to the co-evolutionary algorithm
-		controler.addOverridingModule( new JointDecisionProcessModule() );
+    final Controler controler = new Controler(scenario);
+    // The first step is to set the modifications to the co-evolutionary algorithm
+    controler.addOverridingModule(new JointDecisionProcessModule());
 
-		// Then, one can add the "features", as overriding modules, in case they erase
-		// defaults from the JointDecisionProcessModule
-		// One needs however to add the various features one wants to use in one module to be safe:
-		// this way, if two features conflict, a crash will occur at injection.
-		controler.addOverridingModule(
-				new AbstractModule() {
-					@Override
-					public void install() {
-						// this module enable configuration of joint plan creation from the config file
-						install( new ConfigConfiguredPlanLinkIdentifierModule());
-						// Some default analysis: not necessary, but cannot hurt
-						install( new SocnetsimDefaultAnalysisModule() );
-						// Makes the scoring function aware of co-presence at secondary activity
-						// locations
-						install( new JointActivitiesScoringModule() );
-						// Makes the default strategies provided by the framework available
-						install( new DefaultGroupStrategyRegistryModule() );
-						// Activates joint trip simulation (drivers and passengers waiting each other in the QSim
-						install( new JointTripsModule() );
-						// Enables storing the Social Network.
-						// In the future, the loading routines above should also be enabled automatically
-						// by this module.
-						install( new SocialNetworkModule() );
-					}
-				} );
+    // Then, one can add the "features", as overriding modules, in case they erase
+    // defaults from the JointDecisionProcessModule
+    // One needs however to add the various features one wants to use in one module to be safe:
+    // this way, if two features conflict, a crash will occur at injection.
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            // this module enable configuration of joint plan creation from the config file
+            install(new ConfigConfiguredPlanLinkIdentifierModule());
+            // Some default analysis: not necessary, but cannot hurt
+            install(new SocnetsimDefaultAnalysisModule());
+            // Makes the scoring function aware of co-presence at secondary activity
+            // locations
+            install(new JointActivitiesScoringModule());
+            // Makes the default strategies provided by the framework available
+            install(new DefaultGroupStrategyRegistryModule());
+            // Activates joint trip simulation (drivers and passengers waiting each other in the
+            // QSim
+            install(new JointTripsModule());
+            // Enables storing the Social Network.
+            // In the future, the loading routines above should also be enabled automatically
+            // by this module.
+            install(new SocialNetworkModule());
+          }
+        });
 
-		// We are set!
-		controler.run();
-	}
+    // We are set!
+    controler.run();
+  }
 }
-

@@ -40,49 +40,61 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author Kai Nagel
  */
 public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
-	private final DrtConfigGroup drtCfg;
-	private final TravelTime travelTime;
-	private final LeastCostPathCalculator router;
+  private final DrtConfigGroup drtCfg;
+  private final TravelTime travelTime;
+  private final LeastCostPathCalculator router;
 
-	public DrtRouteCreator(DrtConfigGroup drtCfg, Network modalNetwork,
-			LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, TravelTime travelTime,
-			TravelDisutilityFactory travelDisutilityFactory) {
-		this.drtCfg = drtCfg;
-		this.travelTime = travelTime;
-		router = leastCostPathCalculatorFactory.createPathCalculator(modalNetwork,
-				travelDisutilityFactory.createTravelDisutility(travelTime), travelTime);
-	}
+  public DrtRouteCreator(
+      DrtConfigGroup drtCfg,
+      Network modalNetwork,
+      LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
+      TravelTime travelTime,
+      TravelDisutilityFactory travelDisutilityFactory) {
+    this.drtCfg = drtCfg;
+    this.travelTime = travelTime;
+    router =
+        leastCostPathCalculatorFactory.createPathCalculator(
+            modalNetwork, travelDisutilityFactory.createTravelDisutility(travelTime), travelTime);
+  }
 
-	/**
-	 * Calculates the maximum travel time defined as: drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta()
-	 *
-	 * @param drtCfg
-	 * @param unsharedRideTime ride time of the direct (shortest-time) route
-	 * @return maximum travel time
-	 */
-	static double getMaxTravelTime(DrtConfigGroup drtCfg, double unsharedRideTime) {
-		return Math.min(unsharedRideTime + drtCfg.maxAbsoluteDetour,
-				drtCfg.maxTravelTimeAlpha * unsharedRideTime + drtCfg.maxTravelTimeBeta);
-	}
+  /**
+   * Calculates the maximum travel time defined as: drtCfg.getMaxTravelTimeAlpha() *
+   * unsharedRideTime + drtCfg.getMaxTravelTimeBeta()
+   *
+   * @param drtCfg
+   * @param unsharedRideTime ride time of the direct (shortest-time) route
+   * @return maximum travel time
+   */
+  static double getMaxTravelTime(DrtConfigGroup drtCfg, double unsharedRideTime) {
+    return Math.min(
+        unsharedRideTime + drtCfg.maxAbsoluteDetour,
+        drtCfg.maxTravelTimeAlpha * unsharedRideTime + drtCfg.maxTravelTimeBeta);
+  }
 
-	public Route createRoute(double departureTime, Link accessActLink, Link egressActLink, Person person,
-			Attributes tripAttributes, RouteFactories routeFactories) {
-		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(accessActLink, egressActLink, departureTime,
-				router, travelTime);
-		double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
-		double maxTravelTime = getMaxTravelTime(drtCfg, unsharedRideTime);
-		double unsharedDistance = VrpPaths.calcDistance(unsharedPath);//includes last link
+  public Route createRoute(
+      double departureTime,
+      Link accessActLink,
+      Link egressActLink,
+      Person person,
+      Attributes tripAttributes,
+      RouteFactories routeFactories) {
+    VrpPathWithTravelData unsharedPath =
+        VrpPaths.calcAndCreatePath(accessActLink, egressActLink, departureTime, router, travelTime);
+    double unsharedRideTime = unsharedPath.getTravelTime(); // includes first & last link
+    double maxTravelTime = getMaxTravelTime(drtCfg, unsharedRideTime);
+    double unsharedDistance = VrpPaths.calcDistance(unsharedPath); // includes last link
 
-		DrtRoute route = routeFactories.createRoute(DrtRoute.class, accessActLink.getId(), egressActLink.getId());
-		route.setDistance(unsharedDistance);
-		route.setTravelTime(maxTravelTime);
-		route.setDirectRideTime(unsharedRideTime);
-		route.setMaxWaitTime(drtCfg.maxWaitTime);
+    DrtRoute route =
+        routeFactories.createRoute(DrtRoute.class, accessActLink.getId(), egressActLink.getId());
+    route.setDistance(unsharedDistance);
+    route.setTravelTime(maxTravelTime);
+    route.setDirectRideTime(unsharedRideTime);
+    route.setMaxWaitTime(drtCfg.maxWaitTime);
 
-		if (this.drtCfg.storeUnsharedPath) {
-			route.setUnsharedPath(unsharedPath);
-		}
+    if (this.drtCfg.storeUnsharedPath) {
+      route.setUnsharedPath(unsharedPath);
+    }
 
-		return route;
-	}
+    return route;
+  }
 }

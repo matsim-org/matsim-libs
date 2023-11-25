@@ -29,11 +29,11 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
  *
  * @author Christoph Dobler
  */
-public class ParallelDuringLegReplanner extends ParallelReplanner<WithinDayDuringLegReplannerFactory> {
+public class ParallelDuringLegReplanner
+    extends ParallelReplanner<WithinDayDuringLegReplannerFactory> {
 
-	public ParallelDuringLegReplanner(int numOfThreads, EventsManager eventsManager) {
-		super(numOfThreads, eventsManager);
-		this.init("ParallelDuringLegReplanner");
-	}
-	
+  public ParallelDuringLegReplanner(int numOfThreads, EventsManager eventsManager) {
+    super(numOfThreads, eventsManager);
+    this.init("ParallelDuringLegReplanner");
+  }
 }

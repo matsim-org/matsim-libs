@@ -30,24 +30,25 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
  * @author michalm
  */
 public class VrpPathEnergyConsumptions {
-	public static double calcTotalEnergy(ElectricVehicle ev, VrpPath path, double beginTime) {
-		return calcRemainingTotalEnergy(ev, path, 0, beginTime);
-	}
+  public static double calcTotalEnergy(ElectricVehicle ev, VrpPath path, double beginTime) {
+    return calcRemainingTotalEnergy(ev, path, 0, beginTime);
+  }
 
-	public static double calcRemainingTotalEnergy(ElectricVehicle ev, VrpPath path, int currentLinkIdx,
-			double currentLinkEnterTime) {
-		DriveEnergyConsumption consumption = ev.getDriveEnergyConsumption();
-		AuxEnergyConsumption auxConsumption = ev.getAuxEnergyConsumption();
+  public static double calcRemainingTotalEnergy(
+      ElectricVehicle ev, VrpPath path, int currentLinkIdx, double currentLinkEnterTime) {
+    DriveEnergyConsumption consumption = ev.getDriveEnergyConsumption();
+    AuxEnergyConsumption auxConsumption = ev.getAuxEnergyConsumption();
 
-		double energy = 0;
-		double linkEnterTime = currentLinkEnterTime + (currentLinkIdx == 0 ? 1 : 0);// skip first link
-		for (int i = Math.max(currentLinkIdx, 1); i < path.getLinkCount(); i++) {// skip first link
-			Link link = path.getLink(i);
-			double linkTravelTime = path.getLinkTravelTime(i);
-			energy += consumption.calcEnergyConsumption(link, linkTravelTime, linkEnterTime)
-					+ auxConsumption.calcEnergyConsumption(linkEnterTime, linkTravelTime, link.getId());
-			linkEnterTime += linkTravelTime;
-		}
-		return energy;
-	}
+    double energy = 0;
+    double linkEnterTime = currentLinkEnterTime + (currentLinkIdx == 0 ? 1 : 0); // skip first link
+    for (int i = Math.max(currentLinkIdx, 1); i < path.getLinkCount(); i++) { // skip first link
+      Link link = path.getLink(i);
+      double linkTravelTime = path.getLinkTravelTime(i);
+      energy +=
+          consumption.calcEnergyConsumption(link, linkTravelTime, linkEnterTime)
+              + auxConsumption.calcEnergyConsumption(linkEnterTime, linkTravelTime, link.getId());
+      linkEnterTime += linkTravelTime;
+    }
+    return energy;
+  }
 }

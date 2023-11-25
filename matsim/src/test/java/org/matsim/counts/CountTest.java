@@ -23,7 +23,6 @@ package org.matsim.counts;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -32,32 +31,33 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class CountTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  @Test
+  public void testCreateVolume() {
+    Count count = new Count(Id.create(0, Link.class), "1");
+    Volume volume = count.createVolume(1, 100.0);
+    assertTrue(
+        "Creation and initialization of volume failed", volume.getHourOfDayStartingWithOne() == 1);
+    assertTrue("Creation and initialization of volume failed", volume.getValue() == 100.0);
+  }
 
-	@Test public void testCreateVolume() {
-		Count count = new Count(Id.create(0, Link.class), "1");
-		Volume volume = count.createVolume(1, 100.0);
-		assertTrue("Creation and initialization of volume failed", volume.getHourOfDayStartingWithOne()==1);
-		assertTrue("Creation and initialization of volume failed", volume.getValue()==100.0);
-	}
+  @Test
+  public void testGetVolume() {
+    Count count = new Count(Id.create(0, Link.class), "1");
+    count.createVolume(1, 100.0);
+    assertTrue("Getting volume failed", count.getVolume(1).getValue() == 100.0);
+  }
 
-	@Test public void testGetVolume() {
-		Count count = new Count(Id.create(0, Link.class), "1");
-		count.createVolume(1, 100.0);
-		assertTrue("Getting volume failed", count.getVolume(1).getValue() == 100.0);
-	}
+  @Test
+  public void testGetVolumes() {
+    Count count = new Count(Id.create(0, Link.class), "1");
+    count.createVolume(1, 100.0);
 
-	@Test public void testGetVolumes() {
-		Count count = new Count(Id.create(0, Link.class), "1");
-		count.createVolume(1, 100.0);
-
-		Iterator<Volume> vol_it = count.getVolumes().values().iterator();
-		while (vol_it.hasNext()) {
-			Volume v = vol_it.next();
-			assertTrue("Getting volumes failed", v.getValue() == 100.0);
-		}
-
-	}
+    Iterator<Volume> vol_it = count.getVolumes().values().iterator();
+    while (vol_it.hasNext()) {
+      Volume v = vol_it.next();
+      assertTrue("Getting volumes failed", v.getValue() == 100.0);
+    }
+  }
 }

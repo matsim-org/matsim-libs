@@ -21,7 +21,6 @@
 package org.matsim.pt.transitSchedule;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
@@ -38,93 +37,94 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
  * @author mrieser
  */
 public class TransitStopFacilityImpl implements TransitStopFacility {
-	
-	private final Id<TransitStopFacility> id;
-	private Id<TransitStopArea> stopAreaId;
-	private Coord coord;
-	private Id<Link> linkId = null;
-	private final boolean isBlockingLane;
-	private String name = null;
-	private Customizable customizableDelegate;
-	private final Attributes attributes = new AttributesImpl();
 
-	protected TransitStopFacilityImpl(final Id<TransitStopFacility> id, final Coord coord, final boolean isBlockingLane) {
-		this.id = id;
-		this.coord = coord;
-		this.isBlockingLane = isBlockingLane;
-	}
+  private final Id<TransitStopFacility> id;
+  private Id<TransitStopArea> stopAreaId;
+  private Coord coord;
+  private Id<Link> linkId = null;
+  private final boolean isBlockingLane;
+  private String name = null;
+  private Customizable customizableDelegate;
+  private final Attributes attributes = new AttributesImpl();
 
-	@Override
-	public void setLinkId(final Id<Link> linkId) {
-		this.linkId = linkId;
-	}
+  protected TransitStopFacilityImpl(
+      final Id<TransitStopFacility> id, final Coord coord, final boolean isBlockingLane) {
+    this.id = id;
+    this.coord = coord;
+    this.isBlockingLane = isBlockingLane;
+  }
 
-	@Override
-	public Id<Link> getLinkId() {
-		return this.linkId;
-	}
+  @Override
+  public void setLinkId(final Id<Link> linkId) {
+    this.linkId = linkId;
+  }
 
-	@Override
-	public Coord getCoord() {
-		return this.coord;
-	}
-	
-	@Override
-	public void setCoord(Coord coord) {
-		this.coord = coord;
-	}
+  @Override
+  public Id<Link> getLinkId() {
+    return this.linkId;
+  }
 
-	@Override
-	public Id<TransitStopFacility> getId() {
-		return this.id;
-	}
+  @Override
+  public Coord getCoord() {
+    return this.coord;
+  }
 
-	@Override
-	public boolean getIsBlockingLane() {
-		return this.isBlockingLane;
-	}
+  @Override
+  public void setCoord(Coord coord) {
+    this.coord = coord;
+  }
 
-	@Override
-	public void setName(final String name) {
-		this.name = name;
-	}
+  @Override
+  public Id<TransitStopFacility> getId() {
+    return this.id;
+  }
 
-	@Override
-	public String getName() {
-		return this.name;
-	}
+  @Override
+  public boolean getIsBlockingLane() {
+    return this.isBlockingLane;
+  }
 
-	@Override
-	public String toString() {
-		StringBuilder strb = new StringBuilder(  ) ;
-		strb.append( "[ facility id=" ).append( id ) ;
-		strb.append ( " | coord=").append( coord ) ;
-		strb.append( " | linkId=" ).append( linkId ) ;
+  @Override
+  public void setName(final String name) {
+    this.name = name;
+  }
 
-		strb.append(" ] ") ;
-		return strb.toString() ;
-	}
+  @Override
+  public String getName() {
+    return this.name;
+  }
 
-	@Override
-	public Id<TransitStopArea> getStopAreaId() {
-		return this.stopAreaId;
-	}
+  @Override
+  public String toString() {
+    StringBuilder strb = new StringBuilder();
+    strb.append("[ facility id=").append(id);
+    strb.append(" | coord=").append(coord);
+    strb.append(" | linkId=").append(linkId);
 
-	@Override
-	public void setStopAreaId(Id<TransitStopArea> stopAreaId) {
-		this.stopAreaId = stopAreaId;
-	}
-	
-	@Override
-	public Map<String, Object> getCustomAttributes() {
-		if (this.customizableDelegate == null) {
-			this.customizableDelegate = CustomizableUtils.createCustomizable();
-		}
-		return this.customizableDelegate.getCustomAttributes();
-	}
+    strb.append(" ] ");
+    return strb.toString();
+  }
 
-	@Override
-	public Attributes getAttributes() {
-		return this.attributes;
-	}
+  @Override
+  public Id<TransitStopArea> getStopAreaId() {
+    return this.stopAreaId;
+  }
+
+  @Override
+  public void setStopAreaId(Id<TransitStopArea> stopAreaId) {
+    this.stopAreaId = stopAreaId;
+  }
+
+  @Override
+  public Map<String, Object> getCustomAttributes() {
+    if (this.customizableDelegate == null) {
+      this.customizableDelegate = CustomizableUtils.createCustomizable();
+    }
+    return this.customizableDelegate.getCustomAttributes();
+  }
+
+  @Override
+  public Attributes getAttributes() {
+    return this.attributes;
+  }
 }

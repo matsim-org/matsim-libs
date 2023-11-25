@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
-
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.algorithms.FacilityAlgorithm;
 
@@ -32,34 +31,32 @@ import org.matsim.facilities.algorithms.FacilityAlgorithm;
  * Keeps all facilities if they contain one OR more of the specified activities.
  *
  * @author meisterk
- *
  */
 public class FacilitiesActTypeFilter extends AbstractFacilityFilter {
 
-	private final Set<String> actTypePatterns = new TreeSet<String>();
+  private final Set<String> actTypePatterns = new TreeSet<String>();
 
-	public FacilitiesActTypeFilter(final FacilityAlgorithm nextAlgorithm) {
-		super();
-		this.nextAlgorithm = nextAlgorithm;
-	}
+  public FacilitiesActTypeFilter(final FacilityAlgorithm nextAlgorithm) {
+    super();
+    this.nextAlgorithm = nextAlgorithm;
+  }
 
-	public void addActTypePattern(final String actTypePattern) {
-		this.actTypePatterns.add(actTypePattern);
-	}
+  public void addActTypePattern(final String actTypePattern) {
+    this.actTypePatterns.add(actTypePattern);
+  }
 
-	@Override
-	public boolean judge(final ActivityFacility facility) {
+  @Override
+  public boolean judge(final ActivityFacility facility) {
 
-		Iterator<String> activityIterator = facility.getActivityOptions().keySet().iterator();
-		while (activityIterator.hasNext()) {
-			String activity = activityIterator.next();
-			for (String actTypePattern : this.actTypePatterns) {
-				if (Pattern.matches(actTypePattern, activity)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
+    Iterator<String> activityIterator = facility.getActivityOptions().keySet().iterator();
+    while (activityIterator.hasNext()) {
+      String activity = activityIterator.next();
+      for (String actTypePattern : this.actTypePatterns) {
+        if (Pattern.matches(actTypePattern, activity)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 }

@@ -33,16 +33,21 @@ import org.matsim.vehicles.Vehicle;
 
 public class VehicleDepartsAtFacilityEventImplTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-
-	@Test public void testWriteReadXml() {
-		VehicleDepartsAtFacilityEvent event = new VehicleDepartsAtFacilityEvent(Time.parseTime("10:55:00"), Id.create(5, Vehicle.class), Id.create(11, TransitStopFacility.class), -1.2);
-		VehicleDepartsAtFacilityEvent event2 = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", event);
-		assertEquals(Time.parseTime("10:55:00"), event2.getTime(), MatsimTestUtils.EPSILON);
-		assertEquals(Id.create(5, Vehicle.class), event2.getVehicleId());
-		assertEquals(Id.create(11, TransitStopFacility.class), event2.getFacilityId());
-		assertEquals(Double.valueOf(-1.2), Double.valueOf(event2.getDelay()));
-	}
+  @Test
+  public void testWriteReadXml() {
+    VehicleDepartsAtFacilityEvent event =
+        new VehicleDepartsAtFacilityEvent(
+            Time.parseTime("10:55:00"),
+            Id.create(5, Vehicle.class),
+            Id.create(11, TransitStopFacility.class),
+            -1.2);
+    VehicleDepartsAtFacilityEvent event2 =
+        XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", event);
+    assertEquals(Time.parseTime("10:55:00"), event2.getTime(), MatsimTestUtils.EPSILON);
+    assertEquals(Id.create(5, Vehicle.class), event2.getVehicleId());
+    assertEquals(Id.create(11, TransitStopFacility.class), event2.getFacilityId());
+    assertEquals(Double.valueOf(-1.2), Double.valueOf(event2.getDelay()));
+  }
 }

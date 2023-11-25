@@ -26,25 +26,26 @@ import java.util.Set;
 
 public abstract class AgentSelectorFactory {
 
-	private final Set<AgentFilterFactory> agentFilterFactories = new LinkedHashSet<AgentFilterFactory>();
-	
-	public abstract AgentSelector createIdentifier();
-	
-	protected final void addAgentFiltersToIdentifier(AgentSelector identifier) {
-		for (AgentFilterFactory agentFilterFactory : agentFilterFactories) {
-			identifier.addAgentFilter(agentFilterFactory.createAgentFilter());
-		}
-	}
-	
-	public final void addAgentFilterFactory(AgentFilterFactory agentFilterFactory) {
-		this.agentFilterFactories.add(agentFilterFactory);
-	}
-	
-	public final boolean removeAgentFilterFactory(AgentFilterFactory agentFilterFactory) {
-		return this.agentFilterFactories.remove(agentFilterFactory);
-	}
+  private final Set<AgentFilterFactory> agentFilterFactories =
+      new LinkedHashSet<AgentFilterFactory>();
 
-	public final Set<AgentFilterFactory> getAgentFilterFactories() {
-		return Collections.unmodifiableSet(agentFilterFactories);
-	}
+  public abstract AgentSelector createIdentifier();
+
+  protected final void addAgentFiltersToIdentifier(AgentSelector identifier) {
+    for (AgentFilterFactory agentFilterFactory : agentFilterFactories) {
+      identifier.addAgentFilter(agentFilterFactory.createAgentFilter());
+    }
+  }
+
+  public final void addAgentFilterFactory(AgentFilterFactory agentFilterFactory) {
+    this.agentFilterFactories.add(agentFilterFactory);
+  }
+
+  public final boolean removeAgentFilterFactory(AgentFilterFactory agentFilterFactory) {
+    return this.agentFilterFactories.remove(agentFilterFactory);
+  }
+
+  public final Set<AgentFilterFactory> getAgentFilterFactories() {
+    return Collections.unmodifiableSet(agentFilterFactories);
+  }
 }

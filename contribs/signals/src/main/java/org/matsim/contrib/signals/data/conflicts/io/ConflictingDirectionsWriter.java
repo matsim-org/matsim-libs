@@ -22,7 +22,6 @@ package org.matsim.contrib.signals.data.conflicts.io;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.signals.data.conflicts.ConflictData;
@@ -34,35 +33,33 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
  */
 public final class ConflictingDirectionsWriter extends MatsimXmlWriter implements MatsimWriter {
 
-	private static final Logger LOG = LogManager.getLogger(ConflictingDirectionsWriter.class);
+  private static final Logger LOG = LogManager.getLogger(ConflictingDirectionsWriter.class);
 
-	private ConflictData conflictData;
-	private ConflictingDirectionsWriterHandlerImpl handler;
+  private ConflictData conflictData;
+  private ConflictingDirectionsWriterHandlerImpl handler;
 
+  public ConflictingDirectionsWriter(ConflictData conflictData) {
+    this.conflictData = conflictData;
+    this.handler = new ConflictingDirectionsWriterHandlerImpl();
+  }
 
-	public ConflictingDirectionsWriter(ConflictData conflictData) {
-		this.conflictData = conflictData;
-		this.handler = new ConflictingDirectionsWriterHandlerImpl();
-	}
+  @Override
+  public void write(String filename) {
+    LOG.info("Writing conflicting direction data to file: " + filename + "...");
 
-	@Override
-	public void write(String filename) {
-		LOG.info("Writing conflicting direction data to file: " + filename + "...");
+    try {
+      this.openFile(filename);
+      this.handler.writeHeaderAndStartElement(this.writer);
+      this.handler.startConflictData(this.writer);
+      this.handler.writeIntersections(this.conflictData, this.writer);
+      this.handler.endConflictData(this.writer);
+      LOG.info("Conflict data written to: " + filename);
+    } catch (IOException e) {
+      throw new UncheckedIOException(new IOException(e));
+    } finally {
+      this.close();
+    }
 
-		try {
-			this.openFile(filename);
-			this.handler.writeHeaderAndStartElement(this.writer);
-			this.handler.startConflictData(this.writer);
-			this.handler.writeIntersections(this.conflictData, this.writer);
-			this.handler.endConflictData(this.writer);
-			LOG.info("Conflict data written to: " + filename);
-		} catch (IOException e) {
-			throw new UncheckedIOException(new IOException(e));
-		} finally {
-			this.close();
-		}
-
-		LOG.info("done.");
-	}
-
+    LOG.info("done.");
+  }
 }

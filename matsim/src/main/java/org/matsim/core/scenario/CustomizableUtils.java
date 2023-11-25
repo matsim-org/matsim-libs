@@ -22,13 +22,11 @@ import org.matsim.api.core.v01.Customizable;
 
 /**
  * @author nagel
- *
  */
 public class CustomizableUtils {
-	private CustomizableUtils(){} // do not instantiate
+  private CustomizableUtils() {} // do not instantiate
 
-	public static Customizable createCustomizable() {
-		return new CustomizableImpl();
-	}
-
+  public static Customizable createCustomizable() {
+    return new CustomizableImpl();
+  }
 }

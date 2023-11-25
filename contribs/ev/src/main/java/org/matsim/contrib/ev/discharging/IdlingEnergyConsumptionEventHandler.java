@@ -26,5 +26,5 @@ import org.matsim.core.events.handler.EventHandler;
  * @author Michal Maciejewski (michalm)
  */
 public interface IdlingEnergyConsumptionEventHandler extends EventHandler {
-	void handleEvent(IdlingEnergyConsumptionEvent event);
+  void handleEvent(IdlingEnergyConsumptionEvent event);
 }

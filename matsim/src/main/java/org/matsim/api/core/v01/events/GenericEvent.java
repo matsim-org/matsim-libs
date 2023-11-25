@@ -24,28 +24,25 @@ import java.util.Map;
 
 /**
  * @author nagel
- *
  */
 public class GenericEvent extends Event {
-	
-	private final String type;
-	private final Map<String, String> attributes;
-	
-	public GenericEvent( String type, double time ) {
-		super(time);
-		this.type = type;
-		this.attributes = super.getAttributes();
-	}
+
+  private final String type;
+  private final Map<String, String> attributes;
+
+  public GenericEvent(String type, double time) {
+    super(time);
+    this.type = type;
+    this.attributes = super.getAttributes();
+  }
 
   @Override
   public String getEventType() {
-      return this.type;
+    return this.type;
   }
-	
-	@Override
-	public Map<String, String> getAttributes() {
-		return this.attributes;
-	}
 
-
+  @Override
+  public Map<String, String> getAttributes() {
+    return this.attributes;
+  }
 }

@@ -30,45 +30,49 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
-import org.matsim.core.scoring.functions.ScoringParameters;
 
 /**
- * Park-and-ride specific scoring function accumulator which extends the CharyparNagelActivityScoring
+ * Park-and-ride specific scoring function accumulator which extends the
+ * CharyparNagelActivityScoring
  *
  * @author ikaddoura
- *
  */
 public class PRScoringFunctionFactory implements ScoringFunctionFactory {
-	
-	private static final Logger log = LogManager.getLogger(PRScoringFunctionFactory.class);
-	private final ScoringParametersForPerson charyparNagelConfigParameters;
-	private final double interModalTransferPenalty;
-	private final Network network;
 
-	public PRScoringFunctionFactory(final Scenario scenario, double intermodalTransferPenalty) {
-		log.info("Extending the ordinary activity scoring function by a park-and-ride specific activity scoring function.");
-		this.charyparNagelConfigParameters = new SubpopulationScoringParameters( scenario );
-		this.interModalTransferPenalty = intermodalTransferPenalty;
-		log.info("The intermodal transfer penalty for each park-and-ride activity is set to " + this.interModalTransferPenalty);
-		this.network = scenario.getNetwork();
-	}
+  private static final Logger log = LogManager.getLogger(PRScoringFunctionFactory.class);
+  private final ScoringParametersForPerson charyparNagelConfigParameters;
+  private final double interModalTransferPenalty;
+  private final Network network;
 
-	@Override
-	public ScoringFunction createNewScoringFunction(Person person) {
-		SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
+  public PRScoringFunctionFactory(final Scenario scenario, double intermodalTransferPenalty) {
+    log.info(
+        "Extending the ordinary activity scoring function by a park-and-ride specific activity scoring function.");
+    this.charyparNagelConfigParameters = new SubpopulationScoringParameters(scenario);
+    this.interModalTransferPenalty = intermodalTransferPenalty;
+    log.info(
+        "The intermodal transfer penalty for each park-and-ride activity is set to "
+            + this.interModalTransferPenalty);
+    this.network = scenario.getNetwork();
+  }
 
-		final ScoringParameters parameters = charyparNagelConfigParameters.getScoringParameters( person );
-		
-		// Park-and-ride specific activity scoring extension
-		scoringFunctionAccumulator.addScoringFunction(new PRActivityScoringFunction( parameters , this.interModalTransferPenalty));
-		
-		// standard scoring functions
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring( parameters , this.network));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring( parameters ));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring( parameters ));
-		return scoringFunctionAccumulator;
-	}
+  @Override
+  public ScoringFunction createNewScoringFunction(Person person) {
+    SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 
+    final ScoringParameters parameters = charyparNagelConfigParameters.getScoringParameters(person);
+
+    // Park-and-ride specific activity scoring extension
+    scoringFunctionAccumulator.addScoringFunction(
+        new PRActivityScoringFunction(parameters, this.interModalTransferPenalty));
+
+    // standard scoring functions
+    scoringFunctionAccumulator.addScoringFunction(
+        new CharyparNagelLegScoring(parameters, this.network));
+    scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(parameters));
+    scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(parameters));
+    return scoringFunctionAccumulator;
+  }
 }

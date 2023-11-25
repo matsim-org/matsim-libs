@@ -25,43 +25,40 @@ import org.matsim.api.core.v01.Coord;
 
 /**
  * @author droeder
- *
  */
 public class ActivityLocation {
 
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(ActivityLocation.class);
-	private String type;
-	private Coordinate coord;
+  @SuppressWarnings("unused")
+  private static final Logger log = LogManager.getLogger(ActivityLocation.class);
 
-	public ActivityLocation(Coord coord, String type) {
-		this.coord = new Coordinate(coord.getX(), coord.getY(), 0.);
-		this.type = type;
-	}
-	
-	@Override
-	public boolean equals(Object o){
-		if(! (o instanceof ActivityLocation)) return false;
-		ActivityLocation delegate = (ActivityLocation) o;
-		if(delegate.getCoord().equals(this.getCoord()) && delegate.getType().equals(this.getType())) return true;
-		return false;
-		
-	}
+  private String type;
+  private Coordinate coord;
 
-	/**
-	 * @return
-	 */
-	public String getType() {
-		return this.type;
-	}
+  public ActivityLocation(Coord coord, String type) {
+    this.coord = new Coordinate(coord.getX(), coord.getY(), 0.);
+    this.type = type;
+  }
 
-	/**
-	 * @return
-	 */
-	public Coordinate getCoord() {
-		return this.coord;
-	}
-	
-	
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof ActivityLocation)) return false;
+    ActivityLocation delegate = (ActivityLocation) o;
+    if (delegate.getCoord().equals(this.getCoord()) && delegate.getType().equals(this.getType()))
+      return true;
+    return false;
+  }
+
+  /**
+   * @return
+   */
+  public String getType() {
+    return this.type;
+  }
+
+  /**
+   * @return
+   */
+  public Coordinate getCoord() {
+    return this.coord;
+  }
 }
-

@@ -25,7 +25,6 @@ import static org.junit.Assert.assertFalse;
 
 import java.io.Serializable;
 import java.nio.ByteBuffer;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
@@ -35,52 +34,51 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ByteBufferUtilsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  /**
+   * Tests {@link ByteBufferUtils#putString(java.nio.ByteBuffer, String)} and {@link
+   * ByteBufferUtils#getString(java.nio.ByteBuffer)}.
+   */
+  @Test
+  public void testPutGetString() {
+    final ByteBuffer buffer = ByteBuffer.allocate(100);
+    buffer.putInt(5);
+    ByteBufferUtils.putString(buffer, "foo bar");
+    buffer.putChar('?');
+    ByteBufferUtils.putString(buffer, "Hello World");
+    buffer.putChar('!');
 
-	/**
-	 * Tests {@link ByteBufferUtils#putString(java.nio.ByteBuffer, String)} and
-	 * {@link ByteBufferUtils#getString(java.nio.ByteBuffer)}.
-	 */
-	@Test public void testPutGetString() {
-		final ByteBuffer buffer = ByteBuffer.allocate(100);
-		buffer.putInt(5);
-		ByteBufferUtils.putString(buffer, "foo bar");
-		buffer.putChar('?');
-		ByteBufferUtils.putString(buffer, "Hello World");
-		buffer.putChar('!');
+    buffer.flip();
 
-		buffer.flip();
+    assertEquals(5, buffer.getInt());
+    assertEquals("foo bar", ByteBufferUtils.getString(buffer));
+    assertEquals('?', buffer.getChar());
+    assertEquals("Hello World", ByteBufferUtils.getString(buffer));
+    assertEquals('!', buffer.getChar());
+    assertFalse(buffer.hasRemaining());
+  }
 
-		assertEquals(5, buffer.getInt());
-		assertEquals("foo bar", ByteBufferUtils.getString(buffer));
-		assertEquals('?', buffer.getChar());
-		assertEquals("Hello World", ByteBufferUtils.getString(buffer));
-		assertEquals('!', buffer.getChar());
-		assertFalse(buffer.hasRemaining());
-	}
+  /**
+   * Tests {@link ByteBufferUtils#putObject(java.nio.ByteBuffer, Serializable)} and {@link
+   * ByteBufferUtils#getObject(java.nio.ByteBuffer)}.
+   */
+  @Test
+  public void testPutGetObject() {
+    final ByteBuffer buffer = ByteBuffer.allocate(100);
+    buffer.putInt(5);
+    ByteBufferUtils.putObject(buffer, "foo bar");
+    buffer.putChar('?');
+    ByteBufferUtils.putObject(buffer, "Hello World");
+    buffer.putChar('!');
 
-	/**
-	 * Tests {@link ByteBufferUtils#putObject(java.nio.ByteBuffer, Serializable)} and
-	 * {@link ByteBufferUtils#getObject(java.nio.ByteBuffer)}.
-	 */
-	@Test public void testPutGetObject() {
-		final ByteBuffer buffer = ByteBuffer.allocate(100);
-		buffer.putInt(5);
-		ByteBufferUtils.putObject(buffer, "foo bar");
-		buffer.putChar('?');
-		ByteBufferUtils.putObject(buffer, "Hello World");
-		buffer.putChar('!');
+    buffer.flip();
 
-		buffer.flip();
-
-		assertEquals(5, buffer.getInt());
-		assertEquals("foo bar", ByteBufferUtils.getObject(buffer));
-		assertEquals('?', buffer.getChar());
-		assertEquals("Hello World", ByteBufferUtils.getObject(buffer));
-		assertEquals('!', buffer.getChar());
-		assertFalse(buffer.hasRemaining());
-	}
-
+    assertEquals(5, buffer.getInt());
+    assertEquals("foo bar", ByteBufferUtils.getObject(buffer));
+    assertEquals('?', buffer.getChar());
+    assertEquals("Hello World", ByteBufferUtils.getObject(buffer));
+    assertEquals('!', buffer.getChar());
+    assertFalse(buffer.hasRemaining());
+  }
 }

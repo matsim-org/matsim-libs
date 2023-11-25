@@ -18,10 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-
+/** */
 package playground.vsp.congestion.controler;
 
 import org.apache.logging.log4j.LogManager;
@@ -33,26 +30,25 @@ import org.matsim.core.events.handler.EventHandler;
 
 /**
  * @author ihab
- *
  */
-
 public class CongestionAnalysisControlerListener implements StartupListener {
-	private final Logger log = LogManager.getLogger(CongestionAnalysisControlerListener.class);
+  private final Logger log = LogManager.getLogger(CongestionAnalysisControlerListener.class);
 
-	private EventHandler congestionHandler;
-	
-	/**
-	 * @param handler must be one of the implementation for congestion pricing 
-	 */
-	public CongestionAnalysisControlerListener(EventHandler congestionHandler){
-		this.congestionHandler = congestionHandler;
-		log.info("Congestion effects are only computed for analysis purposes. They are not internalized!");
-	}
-	
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		
-		EventsManager eventsManager = event.getServices().getEvents();
-		eventsManager.addHandler(this.congestionHandler);
-	}
+  private EventHandler congestionHandler;
+
+  /**
+   * @param handler must be one of the implementation for congestion pricing
+   */
+  public CongestionAnalysisControlerListener(EventHandler congestionHandler) {
+    this.congestionHandler = congestionHandler;
+    log.info(
+        "Congestion effects are only computed for analysis purposes. They are not internalized!");
+  }
+
+  @Override
+  public void notifyStartup(StartupEvent event) {
+
+    EventsManager eventsManager = event.getServices().getEvents();
+    eventsManager.addHandler(this.congestionHandler);
+  }
 }

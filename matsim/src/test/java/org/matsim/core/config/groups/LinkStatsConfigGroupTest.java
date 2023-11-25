@@ -27,48 +27,47 @@ import org.junit.Test;
  */
 public class LinkStatsConfigGroupTest {
 
-	@Test
-	public void testWriteLinkStatsInterval() {
-		LinkStatsConfigGroup cg = new LinkStatsConfigGroup();
-		// test initial value
-		Assert.assertEquals(50, cg.getWriteLinkStatsInterval());
-		Assert.assertEquals("50", cg.getValue("writeLinkStatsInterval"));
-		// test setting with setMobsim
-		cg.setWriteLinkStatsInterval(4);
-		Assert.assertEquals(4, cg.getWriteLinkStatsInterval());
-		Assert.assertEquals("4", cg.getValue("writeLinkStatsInterval"));
-		// test setting with addParam
-		cg.addParam("writeLinkStatsInterval", "2");
-		Assert.assertEquals(2, cg.getWriteLinkStatsInterval());
-		Assert.assertEquals("2", cg.getValue("writeLinkStatsInterval"));
-	}
+  @Test
+  public void testWriteLinkStatsInterval() {
+    LinkStatsConfigGroup cg = new LinkStatsConfigGroup();
+    // test initial value
+    Assert.assertEquals(50, cg.getWriteLinkStatsInterval());
+    Assert.assertEquals("50", cg.getValue("writeLinkStatsInterval"));
+    // test setting with setMobsim
+    cg.setWriteLinkStatsInterval(4);
+    Assert.assertEquals(4, cg.getWriteLinkStatsInterval());
+    Assert.assertEquals("4", cg.getValue("writeLinkStatsInterval"));
+    // test setting with addParam
+    cg.addParam("writeLinkStatsInterval", "2");
+    Assert.assertEquals(2, cg.getWriteLinkStatsInterval());
+    Assert.assertEquals("2", cg.getValue("writeLinkStatsInterval"));
+  }
 
-	@Test
-	public void testGetParams_writeLinkStatsInterval() {
-		LinkStatsConfigGroup cg = new LinkStatsConfigGroup();
-		Assert.assertNotNull(cg.getParams().get("writeLinkStatsInterval"));
-	}
-	
-	@Test
-	public void testWriteAverageOverIterations() {
-		LinkStatsConfigGroup cg = new LinkStatsConfigGroup();
-		// test initial value
-		Assert.assertEquals(5, cg.getAverageLinkStatsOverIterations());
-		Assert.assertEquals("5", cg.getValue("averageLinkStatsOverIterations"));
-		// test setting with setMobsim
-		cg.setAverageLinkStatsOverIterations(4);
-		Assert.assertEquals(4, cg.getAverageLinkStatsOverIterations());
-		Assert.assertEquals("4", cg.getValue("averageLinkStatsOverIterations"));
-		// test setting with addParam
-		cg.addParam("averageLinkStatsOverIterations", "2");
-		Assert.assertEquals(2, cg.getAverageLinkStatsOverIterations());
-		Assert.assertEquals("2", cg.getValue("averageLinkStatsOverIterations"));
-	}
-	
-	@Test
-	public void testGetParams_averageLinkStatsOverIterations() {
-		LinkStatsConfigGroup cg = new LinkStatsConfigGroup();
-		Assert.assertNotNull(cg.getParams().get("averageLinkStatsOverIterations"));
-	}
-	
+  @Test
+  public void testGetParams_writeLinkStatsInterval() {
+    LinkStatsConfigGroup cg = new LinkStatsConfigGroup();
+    Assert.assertNotNull(cg.getParams().get("writeLinkStatsInterval"));
+  }
+
+  @Test
+  public void testWriteAverageOverIterations() {
+    LinkStatsConfigGroup cg = new LinkStatsConfigGroup();
+    // test initial value
+    Assert.assertEquals(5, cg.getAverageLinkStatsOverIterations());
+    Assert.assertEquals("5", cg.getValue("averageLinkStatsOverIterations"));
+    // test setting with setMobsim
+    cg.setAverageLinkStatsOverIterations(4);
+    Assert.assertEquals(4, cg.getAverageLinkStatsOverIterations());
+    Assert.assertEquals("4", cg.getValue("averageLinkStatsOverIterations"));
+    // test setting with addParam
+    cg.addParam("averageLinkStatsOverIterations", "2");
+    Assert.assertEquals(2, cg.getAverageLinkStatsOverIterations());
+    Assert.assertEquals("2", cg.getValue("averageLinkStatsOverIterations"));
+  }
+
+  @Test
+  public void testGetParams_averageLinkStatsOverIterations() {
+    LinkStatsConfigGroup cg = new LinkStatsConfigGroup();
+    Assert.assertNotNull(cg.getParams().get("averageLinkStatsOverIterations"));
+  }
 }

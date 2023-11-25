@@ -1,5 +1,7 @@
 package org.matsim.contrib.drt.extension.estimator;
 
+import java.util.Map;
+import java.util.SplittableRandom;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.stat.regression.RegressionResults;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
@@ -18,160 +20,200 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.misc.OptionalTime;
 
-import java.util.Map;
-import java.util.SplittableRandom;
-
 /**
- * Estimates drt trips based only daily averages. No spatial or temporal differentiation is taken into account for the estimate.
- * This estimator is suited for small scenarios with few vehicles and trips and consequently few data points.
+ * Estimates drt trips based only daily averages. No spatial or temporal differentiation is taken
+ * into account for the estimate. This estimator is suited for small scenarios with few vehicles and
+ * trips and consequently few data points.
  */
 public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 
-	private static final Logger log = LogManager.getLogger(BasicDrtEstimator.class);
+  private static final Logger log = LogManager.getLogger(BasicDrtEstimator.class);
 
-	private final DrtEventSequenceCollector collector;
-	private final DrtEstimatorConfigGroup config;
-	private final DrtConfigGroup drtConfig;
+  private final DrtEventSequenceCollector collector;
+  private final DrtEstimatorConfigGroup config;
+  private final DrtConfigGroup drtConfig;
 
-	private final SplittableRandom rnd = new SplittableRandom();
-	/**
-	 * Currently valid estimates.
-	 */
-	private GlobalEstimate currentEst;
-	private RegressionResults fare;
+  private final SplittableRandom rnd = new SplittableRandom();
 
-	public BasicDrtEstimator(DrtEventSequenceCollector collector, DrtEstimatorConfigGroup config,
-							 DrtConfigGroup drtConfig) {
-		//zones = injector.getModal(DrtZonalSystem.class);
-		this.collector = collector;
-		this.config = config;
-		this.drtConfig = drtConfig;
-	}
+  /** Currently valid estimates. */
+  private GlobalEstimate currentEst;
 
-	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
+  private RegressionResults fare;
 
-		// Speed-up iteration need to be ignored for the estimates
-		if (drtConfig.getDrtSpeedUpParams().isPresent() &&
-			DrtSpeedUp.isTeleportDrtUsers(drtConfig.getDrtSpeedUpParams().get(),
-				event.getServices().getConfig().controller(), event.getIteration())) {
-			return;
-		}
+  public BasicDrtEstimator(
+      DrtEventSequenceCollector collector,
+      DrtEstimatorConfigGroup config,
+      DrtConfigGroup drtConfig) {
+    // zones = injector.getModal(DrtZonalSystem.class);
+    this.collector = collector;
+    this.config = config;
+    this.drtConfig = drtConfig;
+  }
 
-		GlobalEstimate est = new GlobalEstimate();
+  @Override
+  public void notifyIterationEnds(IterationEndsEvent event) {
 
-		int n = 0;
+    // Speed-up iteration need to be ignored for the estimates
+    if (drtConfig.getDrtSpeedUpParams().isPresent()
+        && DrtSpeedUp.isTeleportDrtUsers(
+            drtConfig.getDrtSpeedUpParams().get(),
+            event.getServices().getConfig().controller(),
+            event.getIteration())) {
+      return;
+    }
 
-		int nRejections = collector.getRejectedRequestSequences().size();
-		int nSubmitted = collector.getRequestSubmissions().size();
+    GlobalEstimate est = new GlobalEstimate();
 
-		for (DrtEventSequenceCollector.EventSequence seq : collector.getPerformedRequestSequences().values()) {
+    int n = 0;
 
-			Map<Id<Person>, DrtEventSequenceCollector.EventSequence.PersonEvents> personEvents = seq.getPersonEvents();
-			for (Map.Entry<Id<Person>, DrtEventSequenceCollector.EventSequence.PersonEvents> entry : personEvents.entrySet()) {
-				if (entry.getValue().getPickedUp().isPresent() && entry.getValue().getDroppedOff().isPresent()) {
-					double waitTime = entry.getValue().getPickedUp().get().getTime() - seq.getSubmitted().getTime();
-					est.waitTime.addValue(waitTime);
+    int nRejections = collector.getRejectedRequestSequences().size();
+    int nSubmitted = collector.getRequestSubmissions().size();
 
-					double unsharedTime = seq.getSubmitted().getUnsharedRideTime();
-					double travelTime = entry.getValue().getDroppedOff().get().getTime() - entry.getValue().getPickedUp().get().getTime();
+    for (DrtEventSequenceCollector.EventSequence seq :
+        collector.getPerformedRequestSequences().values()) {
 
-					est.detour.addValue(travelTime / unsharedTime);
+      Map<Id<Person>, DrtEventSequenceCollector.EventSequence.PersonEvents> personEvents =
+          seq.getPersonEvents();
+      for (Map.Entry<Id<Person>, DrtEventSequenceCollector.EventSequence.PersonEvents> entry :
+          personEvents.entrySet()) {
+        if (entry.getValue().getPickedUp().isPresent()
+            && entry.getValue().getDroppedOff().isPresent()) {
+          double waitTime =
+              entry.getValue().getPickedUp().get().getTime() - seq.getSubmitted().getTime();
+          est.waitTime.addValue(waitTime);
 
-					double fare = seq.getDrtFares().stream().mapToDouble(PersonMoneyEvent::getAmount).sum();
-					est.fare.addData(seq.getSubmitted().getUnsharedRideDistance(), fare);
-					n++;
-				}
-			}
-		}
+          double unsharedTime = seq.getSubmitted().getUnsharedRideTime();
+          double travelTime =
+              entry.getValue().getDroppedOff().get().getTime()
+                  - entry.getValue().getPickedUp().get().getTime();
 
-		// At least some data points are required
-		if (n <= 3)
-			return;
+          est.detour.addValue(travelTime / unsharedTime);
 
-		fare = est.fare.regress();
+          double fare = seq.getDrtFares().stream().mapToDouble(PersonMoneyEvent::getAmount).sum();
+          est.fare.addData(seq.getSubmitted().getUnsharedRideDistance(), fare);
+          n++;
+        }
+      }
+    }
 
-		double rejectionRate = (double) nRejections / nSubmitted;
+    // At least some data points are required
+    if (n <= 3) return;
 
-		if (currentEst == null) {
-			est.meanWait = est.waitTime.getMean();
-			est.stdWait = est.waitTime.getStandardDeviation();
-			est.meanDetour = est.detour.getMean();
-			est.stdDetour = est.detour.getStandardDeviation();
-			est.rejectionRate = rejectionRate;
-		} else {
-			est.meanWait = config.decayFactor * est.waitTime.getMean() + (1 - config.decayFactor) * currentEst.waitTime.getMean();
-			est.stdWait = config.decayFactor * est.waitTime.getStandardDeviation() + (1 - config.decayFactor) * currentEst.waitTime.getStandardDeviation();
-			est.meanDetour = config.decayFactor * est.detour.getMean() + (1 - config.decayFactor) * currentEst.detour.getMean();
-			est.stdDetour = config.decayFactor * est.detour.getStandardDeviation() + (1 - config.decayFactor) * currentEst.detour.getStandardDeviation();
-			est.rejectionRate = config.decayFactor * rejectionRate + (1 - config.decayFactor) * currentEst.rejectionRate;
-		}
+    fare = est.fare.regress();
 
-		log.info("Calculated {}", est);
-		currentEst = est;
-	}
+    double rejectionRate = (double) nRejections / nSubmitted;
 
-	@Override
-	public Estimate estimate(DrtRoute route, OptionalTime departureTime) {
+    if (currentEst == null) {
+      est.meanWait = est.waitTime.getMean();
+      est.stdWait = est.waitTime.getStandardDeviation();
+      est.meanDetour = est.detour.getMean();
+      est.stdDetour = est.detour.getStandardDeviation();
+      est.rejectionRate = rejectionRate;
+    } else {
+      est.meanWait =
+          config.decayFactor * est.waitTime.getMean()
+              + (1 - config.decayFactor) * currentEst.waitTime.getMean();
+      est.stdWait =
+          config.decayFactor * est.waitTime.getStandardDeviation()
+              + (1 - config.decayFactor) * currentEst.waitTime.getStandardDeviation();
+      est.meanDetour =
+          config.decayFactor * est.detour.getMean()
+              + (1 - config.decayFactor) * currentEst.detour.getMean();
+      est.stdDetour =
+          config.decayFactor * est.detour.getStandardDeviation()
+              + (1 - config.decayFactor) * currentEst.detour.getStandardDeviation();
+      est.rejectionRate =
+          config.decayFactor * rejectionRate + (1 - config.decayFactor) * currentEst.rejectionRate;
+    }
 
-		if (currentEst == null) {
-			// If not estimates are present, use travel time alpha as detour
-			// beta is not used, because estimates are supposed to be minimums and not worst cases
-			double travelTime = Math.min(route.getDirectRideTime() + drtConfig.maxAbsoluteDetour,
-				route.getDirectRideTime() * drtConfig.maxTravelTimeAlpha);
+    log.info("Calculated {}", est);
+    currentEst = est;
+  }
 
-			double fare = 0;
-			if (drtConfig.getDrtFareParams().isPresent()) {
-				DrtFareParams fareParams = drtConfig.getDrtFareParams().get();
-				fare = fareParams.distanceFare_m * route.getDistance()
-					+ fareParams.timeFare_h * route.getDirectRideTime() / 3600.0
-					+ fareParams.baseFare;
+  @Override
+  public Estimate estimate(DrtRoute route, OptionalTime departureTime) {
 
-				fare = Math.max(fare, fareParams.minFarePerTrip);
-			}
+    if (currentEst == null) {
+      // If not estimates are present, use travel time alpha as detour
+      // beta is not used, because estimates are supposed to be minimums and not worst cases
+      double travelTime =
+          Math.min(
+              route.getDirectRideTime() + drtConfig.maxAbsoluteDetour,
+              route.getDirectRideTime() * drtConfig.maxTravelTimeAlpha);
 
-			// for distance, also use the max travel time alpha
-			return new Estimate(route.getDistance() * drtConfig.maxTravelTimeAlpha, travelTime, drtConfig.maxWaitTime, fare, 0);
-		}
+      double fare = 0;
+      if (drtConfig.getDrtFareParams().isPresent()) {
+        DrtFareParams fareParams = drtConfig.getDrtFareParams().get();
+        fare =
+            fareParams.distanceFare_m * route.getDistance()
+                + fareParams.timeFare_h * route.getDirectRideTime() / 3600.0
+                + fareParams.baseFare;
 
-		double fare = 0;
-		if (this.fare != null)
-			fare = this.fare.getParameterEstimate(0) + this.fare.getParameterEstimate(1) * route.getDistance();
+        fare = Math.max(fare, fareParams.minFarePerTrip);
+      }
 
-		if (drtConfig.getDrtFareParams().isPresent()) {
-			fare = Math.max(fare, drtConfig.getDrtFareParams().get().minFarePerTrip);
-		}
+      // for distance, also use the max travel time alpha
+      return new Estimate(
+          route.getDistance() * drtConfig.maxTravelTimeAlpha,
+          travelTime,
+          drtConfig.maxWaitTime,
+          fare,
+          0);
+    }
 
-		double detour = Math.max(1, rnd.nextGaussian(currentEst.meanDetour, config.randomization * currentEst.stdDetour));
-		double waitTime = Math.max(0, rnd.nextGaussian(currentEst.meanWait, config.randomization * currentEst.stdWait));
+    double fare = 0;
+    if (this.fare != null)
+      fare =
+          this.fare.getParameterEstimate(0)
+              + this.fare.getParameterEstimate(1) * route.getDistance();
 
-		return new Estimate(route.getDistance() * detour, route.getDirectRideTime() * detour, waitTime, fare, currentEst.rejectionRate);
-	}
+    if (drtConfig.getDrtFareParams().isPresent()) {
+      fare = Math.max(fare, drtConfig.getDrtFareParams().get().minFarePerTrip);
+    }
 
-	/**
-	 * Helper class to hold statistics.
-	 */
-	private static final class GlobalEstimate {
+    double detour =
+        Math.max(
+            1,
+            rnd.nextGaussian(currentEst.meanDetour, config.randomization * currentEst.stdDetour));
+    double waitTime =
+        Math.max(
+            0, rnd.nextGaussian(currentEst.meanWait, config.randomization * currentEst.stdWait));
 
-		private final SummaryStatistics waitTime = new SummaryStatistics();
-		private final SummaryStatistics detour = new SummaryStatistics();
-		private final SimpleRegression fare = new SimpleRegression(true);
+    return new Estimate(
+        route.getDistance() * detour,
+        route.getDirectRideTime() * detour,
+        waitTime,
+        fare,
+        currentEst.rejectionRate);
+  }
 
-		private double meanWait;
-		private double stdWait;
-		private double meanDetour;
-		private double stdDetour;
-		private double rejectionRate;
+  /** Helper class to hold statistics. */
+  private static final class GlobalEstimate {
 
-		@Override
-		public String toString() {
-			return "GlobalEstimate{" +
-				"meanWait=" + meanWait +
-				", stdWait=" + stdWait +
-				", meanDetour=" + meanDetour +
-				", stdDetour=" + stdDetour +
-				", rejectionRate=" + rejectionRate +
-				'}';
-		}
-	}
+    private final SummaryStatistics waitTime = new SummaryStatistics();
+    private final SummaryStatistics detour = new SummaryStatistics();
+    private final SimpleRegression fare = new SimpleRegression(true);
+
+    private double meanWait;
+    private double stdWait;
+    private double meanDetour;
+    private double stdDetour;
+    private double rejectionRate;
+
+    @Override
+    public String toString() {
+      return "GlobalEstimate{"
+          + "meanWait="
+          + meanWait
+          + ", stdWait="
+          + stdWait
+          + ", meanDetour="
+          + meanDetour
+          + ", stdDetour="
+          + stdDetour
+          + ", rejectionRate="
+          + rejectionRate
+          + '}';
+    }
+  }
 }

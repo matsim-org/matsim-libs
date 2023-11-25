@@ -21,13 +21,14 @@ package org.matsim.contrib.drt.optimizer.rebalancing;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
- * Custom rebalancing strategy parameters. User is responsible for installing rebalancing module and parameters.
+ * Custom rebalancing strategy parameters. User is responsible for installing rebalancing module and
+ * parameters.
  */
 public final class CustomRebalancingStrategyParams extends ReflectiveConfigGroup
-		implements RebalancingParams.RebalancingStrategyParams {
-	public static final String SET_NAME = "CustomRebalancingStrategy";
+    implements RebalancingParams.RebalancingStrategyParams {
+  public static final String SET_NAME = "CustomRebalancingStrategy";
 
-	public CustomRebalancingStrategyParams() {
-		super(SET_NAME);
-	}
+  public CustomRebalancingStrategyParams() {
+    super(SET_NAME);
+  }
 }

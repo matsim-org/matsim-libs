@@ -27,11 +27,17 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.FlowEfficiencyC
 import org.matsim.lanes.Lane;
 
 /**
- * calculate the situational impact on the flow efficiency of {@code qVehicle}. The result is multiplied with other impacts and
- * the base vlow efficiency value of the vehicle type. See {@link HierarchicalFlowEfficiencyCalculator}.
+ * calculate the situational impact on the flow efficiency of {@code qVehicle}. The result is
+ * multiplied with other impacts and the base vlow efficiency value of the vehicle type. See {@link
+ * HierarchicalFlowEfficiencyCalculator}.
  *
  * @author tschlenther
-**/
+ */
 public interface SituationalFlowEfficiencyImpact extends FlowEfficiencyCalculator {
-	boolean isFinalImpact(QVehicle qVehicle, QVehicle previousQVehicle, Double previousTimeDiff, Link link, Id<Lane> laneId);
+  boolean isFinalImpact(
+      QVehicle qVehicle,
+      QVehicle previousQVehicle,
+      Double previousTimeDiff,
+      Link link,
+      Id<Lane> laneId);
 }

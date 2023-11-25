@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * MatsimServicesImplTest.java
@@ -19,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.controler;
+package org.matsim.core.controler;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -33,36 +32,35 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class MatsimServicesImplTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Ignore
-    @Test
-    public void testIterationInServicesEqualsIterationInEvent() {
+  @Ignore
+  @Test
+  public void testIterationInServicesEqualsIterationInEvent() {
 
-    	Config config = ConfigUtils.createConfig();
-		config.controller().setLastIteration(1);
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
+    Config config = ConfigUtils.createConfig();
+    config.controller().setLastIteration(1);
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
 
-		Controler controler = new Controler( config );
+    Controler controler = new Controler(config);
 
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                addControlerListenerBinding().toInstance(new IterationStartsListener() {
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            addControlerListenerBinding()
+                .toInstance(
+                    new IterationStartsListener() {
 
-					@Override
-					public void notifyIterationStarts(IterationStartsEvent event) {
-						Assert.assertSame(event.getIteration(), event.getServices().getIterationNumber());
-
-					}
-
-                });
-            }
+                      @Override
+                      public void notifyIterationStarts(IterationStartsEvent event) {
+                        Assert.assertSame(
+                            event.getIteration(), event.getServices().getIterationNumber());
+                      }
+                    });
+          }
         });
 
-		controler.run();
-
-    }
-
+    controler.run();
+  }
 }

@@ -23,24 +23,28 @@ import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 
 /**
+ *
+ *
  * <ul>
- * 		<li></li>
- * 		<li></li>
+ *   <li>
+ *   <li>
  * </ul>
+ *
  * @author dgrether
  */
 public interface SignalController {
-	
-	/**
-	 * Is called every timestep to notify that the controller may update the state of the signal groups
-	 * @param timeSeconds
-	 */
-	public void updateState(double timeSeconds);
 
-	public void addPlan(SignalPlan plan);
+  /**
+   * Is called every timestep to notify that the controller may update the state of the signal
+   * groups
+   *
+   * @param timeSeconds
+   */
+  public void updateState(double timeSeconds);
 
-	public void simulationInitialized(double simStartTimeSeconds);
-	
-	public void setSignalSystem(SignalSystem signalSystem);
-	
+  public void addPlan(SignalPlan plan);
+
+  public void simulationInitialized(double simStartTimeSeconds);
+
+  public void setSignalSystem(SignalSystem signalSystem);
 }

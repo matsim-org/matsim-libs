@@ -19,91 +19,99 @@
 
 package org.matsim.contrib.socnetsim.framework.controller;
 
+import com.google.inject.Inject;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.socnetsim.framework.population.JointPlan;
+import org.matsim.contrib.socnetsim.framework.population.JointPlans;
+import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
+import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
-import org.matsim.contrib.socnetsim.framework.population.JointPlan;
-import org.matsim.contrib.socnetsim.framework.population.JointPlans;
-import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
-import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
+public final class JointPlanCompositionMinimalityChecker
+    implements IterationEndsListener, IterationStartsListener {
+  private static final Logger log =
+      LogManager.getLogger(JointPlanCompositionMinimalityChecker.class);
 
-import com.google.inject.Inject;
+  // Fail only on start of next iteration, to let all consistency checkers print their error, if
+  // any.
+  private boolean gotError = false;
+  private final PlanLinkIdentifier linkIdentifier;
+  private final Population population;
+  private final JointPlans jointPlansStruct;
 
-public final class JointPlanCompositionMinimalityChecker implements IterationEndsListener, IterationStartsListener {
-	private static final Logger log = LogManager.getLogger( JointPlanCompositionMinimalityChecker.class );
+  @Inject
+  public JointPlanCompositionMinimalityChecker(
+      final @Strong PlanLinkIdentifier linkIdentifier, final Scenario sc) {
+    this.linkIdentifier = linkIdentifier;
+    this.population = sc.getPopulation();
+    this.jointPlansStruct = (JointPlans) sc.getScenarioElement(JointPlans.ELEMENT_NAME);
+  }
 
-	// Fail only on start of next iteration, to let all consistency checkers print their error, if any.
-	private boolean gotError = false;
-	private final PlanLinkIdentifier linkIdentifier;
-	private final Population population;
-	private final JointPlans jointPlansStruct;
+  @Override
+  public void notifyIterationEnds(final IterationEndsEvent event) {
+    log.info("Checking minimality of joint plan composition");
+    final PlanLinkIdentifier links = linkIdentifier;
+    final Set<JointPlan> jointPlans = new HashSet<JointPlan>();
 
-	@Inject
-	public JointPlanCompositionMinimalityChecker(
-			final @Strong PlanLinkIdentifier linkIdentifier,
-			final Scenario sc ) {
-		this.linkIdentifier = linkIdentifier;
-		this.population = sc.getPopulation();
-		this.jointPlansStruct = (JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME );
-	}
+    for (Person person : population.getPersons().values()) {
+      final Plan plan = person.getSelectedPlan();
+      final JointPlan jp = jointPlansStruct.getJointPlan(plan);
 
-	@Override
-	public void notifyIterationEnds(final IterationEndsEvent event) {
-		log.info( "Checking minimality of joint plan composition" );
-		final PlanLinkIdentifier links = linkIdentifier;
-		final Set<JointPlan> jointPlans = new HashSet<JointPlan>();
+      if (jp != null) {
+        jointPlans.add(jp);
+      }
+    }
 
-		for ( Person person : population.getPersons().values() ) {
-			final Plan plan = person.getSelectedPlan();
-			final JointPlan jp = jointPlansStruct.getJointPlan( plan );
+    for (JointPlan jp : jointPlans) {
+      for (Plan p : jp.getIndividualPlans().values()) {
+        if (!hasLinkedPlan(links, p, jp.getIndividualPlans().values())) {
+          log.error("plan " + p + " is in " + jp + " but is not linked with any plan");
+          gotError = true;
+        }
+      }
+    }
+  }
 
-			if ( jp != null ) {
-				jointPlans.add( jp );
-			}
-		}
+  private boolean hasLinkedPlan(
+      final PlanLinkIdentifier links, final Plan p, final Collection<Plan> plans) {
+    for (Plan p2 : plans) {
+      if (p == p2) continue;
+      final boolean l = links.areLinked(p, p2);
+      if (l != links.areLinked(p2, p)) {
+        log.error("inconsistent plan link identifier revealed by " + p + " and " + p2);
+        log.error(
+            p.getPerson().getId()
+                + " is "
+                + (l ? "" : "NOT")
+                + " linked with "
+                + p2.getPerson().getId());
+        log.error(
+            p2.getPerson().getId()
+                + " is "
+                + (l ? "NOT" : "")
+                + " linked with "
+                + p.getPerson().getId());
+        gotError = true;
+      }
+      if (l) return true;
+    }
+    return false;
+  }
 
-		for ( JointPlan jp : jointPlans ) {
-			for ( Plan p : jp.getIndividualPlans().values() ) {
-				if ( !hasLinkedPlan( links , p , jp.getIndividualPlans().values() ) ) {
-					log.error( "plan "+p+" is in "+jp+" but is not linked with any plan" );
-					gotError = true ;
-				}
-			}
-		}
-	}
-
-	private boolean hasLinkedPlan(
-			final PlanLinkIdentifier links,
-			final Plan p,
-			final Collection<Plan> plans) {
-		for ( Plan p2 : plans ) {
-			if ( p == p2 ) continue;
-			final boolean l = links.areLinked( p , p2 );
-			if ( l != links.areLinked( p2 , p ) ) {
-				log.error( "inconsistent plan link identifier revealed by "+p+" and "+p2 );
-				log.error( p.getPerson().getId()+" is "+(l ? "" : "NOT")+" linked with "+p2.getPerson().getId() );
-				log.error( p2.getPerson().getId()+" is "+(l ? "NOT" : "")+" linked with "+p.getPerson().getId() );
-				gotError = true;
-			}
-			if ( l ) return true;
-		}
-		return false;
-	}
-
-	@Override
-	public void notifyIterationStarts( IterationStartsEvent event ) {
-		if ( gotError ) throw new RuntimeException( "inconsistency detected. Look at error messages for details" );
-	}
+  @Override
+  public void notifyIterationStarts(IterationStartsEvent event) {
+    if (gotError)
+      throw new RuntimeException("inconsistency detected. Look at error messages for details");
+  }
 }

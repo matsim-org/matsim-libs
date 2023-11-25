@@ -20,7 +20,6 @@ package org.matsim.core.mobsim.framework;
 
 import java.util.concurrent.Phaser;
 import java.util.concurrent.Semaphore;
-
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -29,104 +28,111 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
 /**
- * Extracted the play/pause functionality from otfvis to make it available for other purposes (specifically, RMITs
- * CombineSim approach).
+ * Extracted the play/pause functionality from otfvis to make it available for other purposes
+ * (specifically, RMITs CombineSim approach).
  *
  * @author nagel
  */
 public class PlayPauseSimulationControl implements PlayPauseSimulationControlI {
 
-	public enum Status {
-		PAUSE, PLAY
-	}
+  public enum Status {
+    PAUSE,
+    PLAY
+  }
 
-	private volatile Status status = Status.PLAY;
+  private volatile Status status = Status.PLAY;
 
-	private final Semaphore access = new Semaphore(1, true);
+  private final Semaphore access = new Semaphore(1, true);
 
-	private volatile double localTime = -1;
+  private volatile double localTime = -1;
 
-	private final Phaser stepDone = new Phaser(1);
-	// I think the way this works (e.g. for bdi-abm-integration; presumably for otfvis) is as follows:
-	// (1) Here, a phaser is constructed, with one participant that now needs to arrive.  Also, "pause" is called from code
-	// immediately after creation.
+  private final Phaser stepDone = new Phaser(1);
 
-	public PlayPauseSimulationControl(ObservableMobsim qSim) {
-		PlayPauseMobsimListener playPauseMobsimListener = new PlayPauseMobsimListener();
-		qSim.addQueueSimulationListeners(playPauseMobsimListener);
-	}
+  // I think the way this works (e.g. for bdi-abm-integration; presumably for otfvis) is as follows:
+  // (1) Here, a phaser is constructed, with one participant that now needs to arrive.  Also,
+  // "pause" is called from code
+  // immediately after creation.
 
-	private class PlayPauseMobsimListener
-			implements MobsimBeforeSimStepListener, MobsimAfterSimStepListener, MobsimBeforeCleanupListener {
-		@Override
-		public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent event) {
-			try {
-				access.acquire();
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			}
-		}
+  public PlayPauseSimulationControl(ObservableMobsim qSim) {
+    PlayPauseMobsimListener playPauseMobsimListener = new PlayPauseMobsimListener();
+    qSim.addQueueSimulationListeners(playPauseMobsimListener);
+  }
 
-		@Override
-		public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent event) {
-			access.release();
-			localTime = (int)event.getSimulationTime();
-			// yy I am not so sure about the "int".  kai, nov'17
-			stepDone.arriveAndAwaitAdvance();
-			// This is arrival by one party.  If "pause" has been pressed before, we have a second party, and thus do not
-			// advance.
-		}
+  private class PlayPauseMobsimListener
+      implements MobsimBeforeSimStepListener,
+          MobsimAfterSimStepListener,
+          MobsimBeforeCleanupListener {
+    @Override
+    public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent event) {
+      try {
+        access.acquire();
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+    }
 
-		@Override
-		public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
-			localTime = Double.MAX_VALUE;
-			stepDone.arriveAndDeregister();
-		}
-	}
+    @Override
+    public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent event) {
+      access.release();
+      localTime = (int) event.getSimulationTime();
+      // yy I am not so sure about the "int".  kai, nov'17
+      stepDone.arriveAndAwaitAdvance();
+      // This is arrival by one party.  If "pause" has been pressed before, we have a second party,
+      // and thus do not
+      // advance.
+    }
 
-	@Override
-	public final void doStep(int time) {
-		if (status == Status.PLAY) {
-			// this may happen when clicking single/multi-step forward buttons while playing in the async mode,
-			// so that combination should be disabled in GUI, michalm
-			throw new IllegalStateException();
-		}
-		while (localTime < time) {
-			stepDone.arriveAndAwaitAdvance();
-			// as long as localTime < time, this acts as the second party, and thus the simulation progresses
-			// otherwise, the doStep method will return.
-		}
-	}
+    @Override
+    public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
+      localTime = Double.MAX_VALUE;
+      stepDone.arriveAndDeregister();
+    }
+  }
 
-	@Override
-	public final void pause() {
-		if (status != Status.PAUSE) {
-			stepDone.register();
-			// so when "pause" was hit, there is now a second party registered to the the phaser
-			status = Status.PAUSE;
-		}
-	}
+  @Override
+  public final void doStep(int time) {
+    if (status == Status.PLAY) {
+      // this may happen when clicking single/multi-step forward buttons while playing in the async
+      // mode,
+      // so that combination should be disabled in GUI, michalm
+      throw new IllegalStateException();
+    }
+    while (localTime < time) {
+      stepDone.arriveAndAwaitAdvance();
+      // as long as localTime < time, this acts as the second party, and thus the simulation
+      // progresses
+      // otherwise, the doStep method will return.
+    }
+  }
 
-	@Override
-	public final void play() {
-		if (status != Status.PLAY) {
-			stepDone.arriveAndDeregister();
-			// the second party is de-registered, and thus it will now just play
+  @Override
+  public final void pause() {
+    if (status != Status.PAUSE) {
+      stepDone.register();
+      // so when "pause" was hit, there is now a second party registered to the the phaser
+      status = Status.PAUSE;
+    }
+  }
 
-			status = Status.PLAY;
-		}
-	}
+  @Override
+  public final void play() {
+    if (status != Status.PLAY) {
+      stepDone.arriveAndDeregister();
+      // the second party is de-registered, and thus it will now just play
 
-	public final Semaphore getAccess() {
-		return access;
-	}
+      status = Status.PLAY;
+    }
+  }
 
-	public final boolean isFinished() {
-		return (localTime == Double.MAX_VALUE);
-	}
+  public final Semaphore getAccess() {
+    return access;
+  }
 
-	public final double getLocalTime() {
-		return localTime;
-	}
+  public final boolean isFinished() {
+    return (localTime == Double.MAX_VALUE);
+  }
 
+  public final double getLocalTime() {
+    return localTime;
+  }
 }

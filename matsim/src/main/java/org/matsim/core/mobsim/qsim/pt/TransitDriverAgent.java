@@ -30,7 +30,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public interface TransitDriverAgent extends MobsimDriverAgent {
 
-	public TransitStopFacility getNextTransitStop();
-	
-	public double handleTransitStop(final TransitStopFacility stop, final double now);
+  public TransitStopFacility getNextTransitStop();
+
+  public double handleTransitStop(final TransitStopFacility stop, final double now);
 }

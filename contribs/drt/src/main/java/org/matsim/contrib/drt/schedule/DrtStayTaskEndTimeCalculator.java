@@ -21,45 +21,48 @@ package org.matsim.contrib.drt.schedule;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
 import static org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater.REMOVE_STAY_TASK;
 
-import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 
-public class DrtStayTaskEndTimeCalculator implements ScheduleTimingUpdater.StayTaskEndTimeCalculator {
+public class DrtStayTaskEndTimeCalculator
+    implements ScheduleTimingUpdater.StayTaskEndTimeCalculator {
 
-	private final StopTimeCalculator stopTimeCalculator;
+  private final StopTimeCalculator stopTimeCalculator;
 
-	public DrtStayTaskEndTimeCalculator(StopTimeCalculator stopTimeCalculator) {
-		this.stopTimeCalculator = stopTimeCalculator;
-	}
+  public DrtStayTaskEndTimeCalculator(StopTimeCalculator stopTimeCalculator) {
+    this.stopTimeCalculator = stopTimeCalculator;
+  }
 
-	@Override
-	public double calcNewEndTime(DvrpVehicle vehicle, StayTask task, double newBeginTime) {
-		switch (getBaseTypeOrElseThrow(task)) {
-			case STAY: {
-				if (Schedules.getLastTask(vehicle.getSchedule()).equals(task)) {// last task
-					// even if endTime=beginTime, do not remove this task!!! A DRT schedule should end with WAIT
-					return Math.max(newBeginTime, vehicle.getServiceEndTime());
-				} else {
-					// if this is not the last task then some other task (e.g. DRIVE or PICKUP)
-					// must have been added at time submissionTime <= t
-					double oldEndTime = task.getEndTime();
-					if (oldEndTime <= newBeginTime) {// may happen if the previous task is delayed
-						return REMOVE_STAY_TASK;// remove the task
-					} else {
-						return oldEndTime;
-					}
-				}
-			}
-			case STOP: {
-				return stopTimeCalculator.shiftEndTime(vehicle, (DrtStopTask) task, newBeginTime);
-			}
+  @Override
+  public double calcNewEndTime(DvrpVehicle vehicle, StayTask task, double newBeginTime) {
+    switch (getBaseTypeOrElseThrow(task)) {
+      case STAY:
+        {
+          if (Schedules.getLastTask(vehicle.getSchedule()).equals(task)) { // last task
+            // even if endTime=beginTime, do not remove this task!!! A DRT schedule should end with
+            // WAIT
+            return Math.max(newBeginTime, vehicle.getServiceEndTime());
+          } else {
+            // if this is not the last task then some other task (e.g. DRIVE or PICKUP)
+            // must have been added at time submissionTime <= t
+            double oldEndTime = task.getEndTime();
+            if (oldEndTime <= newBeginTime) { // may happen if the previous task is delayed
+              return REMOVE_STAY_TASK; // remove the task
+            } else {
+              return oldEndTime;
+            }
+          }
+        }
+      case STOP:
+        {
+          return stopTimeCalculator.shiftEndTime(vehicle, (DrtStopTask) task, newBeginTime);
+        }
 
-			default:
-				throw new IllegalStateException();
-		}
-	}
+      default:
+        throw new IllegalStateException();
+    }
+  }
 }

@@ -27,6 +27,5 @@ import org.matsim.api.core.v01.network.Network;
  */
 public interface NetworkRunnable {
 
-	public void run(final Network network);
-
+  public void run(final Network network);
 }

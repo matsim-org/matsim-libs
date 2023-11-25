@@ -27,29 +27,29 @@ import org.matsim.api.core.v01.network.Network;
 
 public class LanesBasedWidthCalculator implements WidthCalculator {
 
-	private static final Logger log = LogManager.getLogger(LanesBasedWidthCalculator.class);
+  private static final Logger log = LogManager.getLogger(LanesBasedWidthCalculator.class);
 
-	private final double effectiveLaneWidth;
-	private final double widthCoefficient;
+  private final double effectiveLaneWidth;
+  private final double widthCoefficient;
 
-	/**
-	 * This constructor is used by reflection. It's signature mustn't be changed or it won't work anymore. :-(
-	 */
-	public LanesBasedWidthCalculator(final Network network, final Double coef) {
-		double w = network.getEffectiveLaneWidth();
-		if (Double.isNaN(w)) {
-			log.warn("Effective lane width in network is set to Double.NaN. Set a real value in your network.xml to make this tool work with this value. Using 3.75 as effective lane width...");
-			this.effectiveLaneWidth = 3.75;
-		}
-		else {
-			this.effectiveLaneWidth = w;
-		}
-		this.widthCoefficient = coef;
-	}
+  /**
+   * This constructor is used by reflection. It's signature mustn't be changed or it won't work
+   * anymore. :-(
+   */
+  public LanesBasedWidthCalculator(final Network network, final Double coef) {
+    double w = network.getEffectiveLaneWidth();
+    if (Double.isNaN(w)) {
+      log.warn(
+          "Effective lane width in network is set to Double.NaN. Set a real value in your network.xml to make this tool work with this value. Using 3.75 as effective lane width...");
+      this.effectiveLaneWidth = 3.75;
+    } else {
+      this.effectiveLaneWidth = w;
+    }
+    this.widthCoefficient = coef;
+  }
 
-	@Override
-	public double getWidth(final Link link) {
-		return link.getNumberOfLanes() * this.effectiveLaneWidth * this.widthCoefficient;
-	}
-
+  @Override
+  public double getWidth(final Link link) {
+    return link.getNumberOfLanes() * this.effectiveLaneWidth * this.widthCoefficient;
+  }
 }

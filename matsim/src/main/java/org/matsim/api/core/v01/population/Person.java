@@ -25,6 +25,4 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
 /**
  * @author dgrether
  */
-public interface Person extends Customizable, Attributable, HasPlansAndId<Plan, Person> {
-
-}
+public interface Person extends Customizable, Attributable, HasPlansAndId<Plan, Person> {}

@@ -25,45 +25,45 @@ import org.matsim.contrib.zone.ZonalSystemParams;
 import org.matsim.core.config.ConfigGroup;
 
 public final class ZonalTaxiOptimizerParams extends AbstractTaxiOptimizerParams {
-	public static final String SET_NAME = "ZonalTaxiOptimizer";
+  public static final String SET_NAME = "ZonalTaxiOptimizer";
 
-	private RuleBasedTaxiOptimizerParams ruleBasedTaxiOptimizerParams;
-	private ZonalSystemParams zonalSystemParams;
+  private RuleBasedTaxiOptimizerParams ruleBasedTaxiOptimizerParams;
+  private ZonalSystemParams zonalSystemParams;
 
-	public ZonalTaxiOptimizerParams() {
-		super(SET_NAME, false, false);
-	}
+  public ZonalTaxiOptimizerParams() {
+    super(SET_NAME, false, false);
+  }
 
-	@Override
-	public ConfigGroup createParameterSet(String type) {
-		return switch (type) {
-			case RuleBasedTaxiOptimizerParams.SET_NAME -> new RuleBasedTaxiOptimizerParams();
-			case ZonalSystemParams.SET_NAME -> new ZonalSystemParams();
-			default -> super.createParameterSet(type);
-		};
-	}
+  @Override
+  public ConfigGroup createParameterSet(String type) {
+    return switch (type) {
+      case RuleBasedTaxiOptimizerParams.SET_NAME -> new RuleBasedTaxiOptimizerParams();
+      case ZonalSystemParams.SET_NAME -> new ZonalSystemParams();
+      default -> super.createParameterSet(type);
+    };
+  }
 
-	@Override
-	public void addParameterSet(ConfigGroup set) {
-		switch (set.getName()) {
-			case RuleBasedTaxiOptimizerParams.SET_NAME ->
-					ruleBasedTaxiOptimizerParams = (RuleBasedTaxiOptimizerParams)set;
-			case ZonalSystemParams.SET_NAME -> zonalSystemParams = (ZonalSystemParams)set;
-		}
+  @Override
+  public void addParameterSet(ConfigGroup set) {
+    switch (set.getName()) {
+      case RuleBasedTaxiOptimizerParams.SET_NAME -> ruleBasedTaxiOptimizerParams =
+          (RuleBasedTaxiOptimizerParams) set;
+      case ZonalSystemParams.SET_NAME -> zonalSystemParams = (ZonalSystemParams) set;
+    }
 
-		super.addParameterSet(set);
-	}
+    super.addParameterSet(set);
+  }
 
-	public ZonalSystemParams getZonalSystemParams() {
-		return zonalSystemParams;
-	}
+  public ZonalSystemParams getZonalSystemParams() {
+    return zonalSystemParams;
+  }
 
-	public RuleBasedTaxiOptimizerParams getRuleBasedTaxiOptimizerParams() {
-		return ruleBasedTaxiOptimizerParams;
-	}
+  public RuleBasedTaxiOptimizerParams getRuleBasedTaxiOptimizerParams() {
+    return ruleBasedTaxiOptimizerParams;
+  }
 
-	@Override
-	public int getReoptimizationTimeStep() {
-		return ruleBasedTaxiOptimizerParams.getReoptimizationTimeStep();
-	}
+  @Override
+  public int getReoptimizationTimeStep() {
+    return ruleBasedTaxiOptimizerParams.getReoptimizationTimeStep();
+  }
 }

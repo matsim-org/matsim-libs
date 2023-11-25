@@ -24,62 +24,64 @@ package org.matsim.contrib.emissions;
  */
 class HbefaWarmEmissionFactorKey extends HbefaEmissionFactorKey {
 
-	private String roadCategory;
-	private HbefaTrafficSituation trafficSituation;
+  private String roadCategory;
+  private HbefaTrafficSituation trafficSituation;
 
-	/*package-private*/ HbefaWarmEmissionFactorKey() {
-	}
+  /*package-private*/ HbefaWarmEmissionFactorKey() {}
 
-	public HbefaWarmEmissionFactorKey(HbefaWarmEmissionFactorKey key) {
-		super(key);
-		this.roadCategory = key.roadCategory;
-		this.trafficSituation = key.trafficSituation;
-	}
+  public HbefaWarmEmissionFactorKey(HbefaWarmEmissionFactorKey key) {
+    super(key);
+    this.roadCategory = key.roadCategory;
+    this.trafficSituation = key.trafficSituation;
+  }
 
-	String getRoadCategory() {
-		return this.roadCategory;
-	}
+  String getRoadCategory() {
+    return this.roadCategory;
+  }
 
-	/*package-private*/ void setRoadCategory(String roadCategory) {
-		this.roadCategory = roadCategory;
-	}
+  /*package-private*/ void setRoadCategory(String roadCategory) {
+    this.roadCategory = roadCategory;
+  }
 
-	/*package-private*/ HbefaTrafficSituation getTrafficSituation() {
-		return this.trafficSituation;
-	}
+  /*package-private*/ HbefaTrafficSituation getTrafficSituation() {
+    return this.trafficSituation;
+  }
 
-	/*package-private*/ void setTrafficSituation(HbefaTrafficSituation trafficSituation) {
-		this.trafficSituation = trafficSituation;
-	}
+  /*package-private*/ void setTrafficSituation(HbefaTrafficSituation trafficSituation) {
+    this.trafficSituation = trafficSituation;
+  }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		if (!super.equals(o)) return false;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
 
-		var that = (HbefaWarmEmissionFactorKey) o;
+    var that = (HbefaWarmEmissionFactorKey) o;
 
-		if (trafficSituation != that.trafficSituation) return false;
-		return roadCategory.equals(that.roadCategory);
-	}
+    if (trafficSituation != that.trafficSituation) return false;
+    return roadCategory.equals(that.roadCategory);
+  }
 
-	@Override
-	public int hashCode() {
-		int result = super.hashCode();
-		result = 31 * result + trafficSituation.hashCode();
-		result = 31 * result + roadCategory.hashCode();
-		return result;
-	}
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + trafficSituation.hashCode();
+    result = 31 * result + roadCategory.hashCode();
+    return result;
+  }
 
-	// needed for "hashCode" method
-	@Override
-	public String toString(){
-		return
-				getVehicleCategory() + "; "
-						+ getComponent() + "; "
-						+ roadCategory + "; "
-						+ trafficSituation + "; "
-						+ getVehicleAttributes();
-	}
+  // needed for "hashCode" method
+  @Override
+  public String toString() {
+    return getVehicleCategory()
+        + "; "
+        + getComponent()
+        + "; "
+        + roadCategory
+        + "; "
+        + trafficSituation
+        + "; "
+        + getVehicleAttributes();
+  }
 }

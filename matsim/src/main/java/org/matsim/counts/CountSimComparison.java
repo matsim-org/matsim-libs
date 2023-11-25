@@ -21,59 +21,60 @@
 package org.matsim.counts;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 
 /**
- * Classes implementing this interface can be used to access the data
- * needed to compare traffic counts and simulation traffic at a specific
- * link for a one hour time step.
- * 
+ * Classes implementing this interface can be used to access the data needed to compare traffic
+ * counts and simulation traffic at a specific link for a one hour time step.
+ *
  * @author dgrether
  */
 public interface CountSimComparison<T> {
 
-	/**
-	 * @return The Id of the link
-	 */
-	public Id<T> getId();
+  /**
+   * @return The Id of the link
+   */
+  public Id<T> getId();
 
-	/**
-	 * 
-	 * @return The Id of the count station
-	 */
-	public String getCsId();
-	
-	/**
-	 * The time at which the data was measured.
-	 * @return A value in 1..24, 1 means 0 - 1 am, 2 means 1 - 2 am and so on
-	 */
-	public int getHour();
+  /**
+   * @return The Id of the count station
+   */
+  public String getCsId();
 
-	/**
-	 * @return The real traffic amount
-	 */
-	public double getCountValue();
+  /**
+   * The time at which the data was measured.
+   *
+   * @return A value in 1..24, 1 means 0 - 1 am, 2 means 1 - 2 am and so on
+   */
+  public int getHour();
 
-	/**
-	 * @return The traffic amount of the simulation
-	 */
-	public double getSimulationValue();
+  /**
+   * @return The real traffic amount
+   */
+  public double getCountValue();
 
-	/**
-	 * Calculates the relative error.
-	 * @return the relative error
-	 */
-	public double calculateRelativeError();
+  /**
+   * @return The traffic amount of the simulation
+   */
+  public double getSimulationValue();
 
-	/**
-	 * Calculates the normalized relative error.
-	 * @return the normalized relative error
-	 */
-	public double calculateNormalizedRelativeError();
-	
-	/**
-	 * Calculates the GEH value
-	 * @return the GEH value
-	 */
-	public double calculateGEHValue();	
+  /**
+   * Calculates the relative error.
+   *
+   * @return the relative error
+   */
+  public double calculateRelativeError();
+
+  /**
+   * Calculates the normalized relative error.
+   *
+   * @return the normalized relative error
+   */
+  public double calculateNormalizedRelativeError();
+
+  /**
+   * Calculates the GEH value
+   *
+   * @return the GEH value
+   */
+  public double calculateGEHValue();
 }

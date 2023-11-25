@@ -22,87 +22,81 @@ package org.matsim.contrib.socnetsim.jointtrips.router;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
+import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
-import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 
 /**
- * Based on the {@link PlanRouter}, but transmits passenger information
- * in the new plan elements.
+ * Based on the {@link PlanRouter}, but transmits passenger information in the new plan elements.
  *
- * Note that this implies that using the trip router alone will loose
- * this information!
+ * <p>Note that this implies that using the trip router alone will loose this information!
  *
  * @author thibautd
  */
 public class JointPlanRouter implements PlanAlgorithm {
-	private final PlanRouter delegate;
-	
-	public JointPlanRouter(
-			final TripRouter routingHandler,
-			final ActivityFacilities facilities,
-			final TimeInterpretation timeInterpretation) {
-		delegate = new PlanRouter( routingHandler , facilities, timeInterpretation );
-	}
+  private final PlanRouter delegate;
 
-	@Override
-	public void run( final Plan plan ) {
-		JointRouteIterator oldPlan = new JointRouteIterator( plan.getPlanElements() );
-		delegate.run( plan );
-		// "transmit" joint info before returning
-		JointRouteIterator newPlan = new JointRouteIterator( plan.getPlanElements() ) ;
+  public JointPlanRouter(
+      final TripRouter routingHandler,
+      final ActivityFacilities facilities,
+      final TimeInterpretation timeInterpretation) {
+    delegate = new PlanRouter(routingHandler, facilities, timeInterpretation);
+  }
 
-		Route oldRoute = oldPlan.nextJointRoute();
-		Route newRoute = newPlan.nextJointRoute();
+  @Override
+  public void run(final Plan plan) {
+    JointRouteIterator oldPlan = new JointRouteIterator(plan.getPlanElements());
+    delegate.run(plan);
+    // "transmit" joint info before returning
+    JointRouteIterator newPlan = new JointRouteIterator(plan.getPlanElements());
 
-		while (oldRoute != null) {
-			if (oldRoute instanceof DriverRoute) {
-				((DriverRoute) newRoute).setPassengerIds(
-					((DriverRoute) oldRoute).getPassengersIds() );
-			}
-			else {
-				((PassengerRoute) newRoute).setDriverId(
-					((PassengerRoute) oldRoute).getDriverId() );
-			}
+    Route oldRoute = oldPlan.nextJointRoute();
+    Route newRoute = newPlan.nextJointRoute();
 
-			oldRoute = oldPlan.nextJointRoute();
-			newRoute = newPlan.nextJointRoute();
-		}
+    while (oldRoute != null) {
+      if (oldRoute instanceof DriverRoute) {
+        ((DriverRoute) newRoute).setPassengerIds(((DriverRoute) oldRoute).getPassengersIds());
+      } else {
+        ((PassengerRoute) newRoute).setDriverId(((PassengerRoute) oldRoute).getDriverId());
+      }
 
-		assert oldRoute == null;
-		assert newRoute == null;
-	}
+      oldRoute = oldPlan.nextJointRoute();
+      newRoute = newPlan.nextJointRoute();
+    }
 
-//	public TripRouter getTripRouter() {
-//		return delegate.getTripRouter();
-//	}
+    assert oldRoute == null;
+    assert newRoute == null;
+  }
 
-	private static class JointRouteIterator {
-		private final Iterator<PlanElement> pes;
+  //	public TripRouter getTripRouter() {
+  //		return delegate.getTripRouter();
+  //	}
 
-		public JointRouteIterator( final List<PlanElement> pes ) {
-			this.pes = new ArrayList<PlanElement>( pes ).iterator();
-		}
+  private static class JointRouteIterator {
+    private final Iterator<PlanElement> pes;
 
-		public Route nextJointRoute() {
-			while (pes.hasNext()) {
-				PlanElement pe = pes.next();
-				if (pe instanceof Leg &&
-						(((Leg) pe).getRoute() instanceof DriverRoute ||
-						 ((Leg) pe).getRoute() instanceof PassengerRoute)) {
-					return ((Leg) pe).getRoute();
-				}
-			}
-			return null;
-		}
-	}
+    public JointRouteIterator(final List<PlanElement> pes) {
+      this.pes = new ArrayList<PlanElement>(pes).iterator();
+    }
+
+    public Route nextJointRoute() {
+      while (pes.hasNext()) {
+        PlanElement pe = pes.next();
+        if (pe instanceof Leg
+            && (((Leg) pe).getRoute() instanceof DriverRoute
+                || ((Leg) pe).getRoute() instanceof PassengerRoute)) {
+          return ((Leg) pe).getRoute();
+        }
+      }
+      return null;
+    }
+  }
 }

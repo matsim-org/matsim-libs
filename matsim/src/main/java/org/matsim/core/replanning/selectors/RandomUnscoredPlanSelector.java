@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.core.gbl.MatsimRandom;
 
-
 /**
  * Select randomly one of the existing plans of the person.
  *
@@ -32,33 +31,34 @@ import org.matsim.core.gbl.MatsimRandom;
  */
 public class RandomUnscoredPlanSelector<T extends BasicPlan, I> implements PlanSelector<T, I> {
 
-	/**
-	 * Choose a random plan from the person and return it.
-	 * @return The newly selected plan for this person; <code>null</code> if the person has no plans.
-	 */
-	@Override
-	public T selectPlan(final HasPlansAndId<T, I> person) {
-		// following code copied from PersonImpl and then made runnable
-		
-		int cntUnscored = 0;
-		for (T plan : person.getPlans()) {
-			if (plan.getScore() == null) {
-				cntUnscored++;
-			}
-		}
-		if (cntUnscored > 0) {
-			// select one of the unscored plans
-			int idxUnscored = MatsimRandom.getRandom().nextInt(cntUnscored);
-			cntUnscored = 0;
-			for (T plan : person.getPlans()) {
-				if (plan.getScore() == null) {
-					if (cntUnscored == idxUnscored) {
-						return plan;
-					}
-					cntUnscored++;
-				}
-			}
-		}
-		return null;
-	}
+  /**
+   * Choose a random plan from the person and return it.
+   *
+   * @return The newly selected plan for this person; <code>null</code> if the person has no plans.
+   */
+  @Override
+  public T selectPlan(final HasPlansAndId<T, I> person) {
+    // following code copied from PersonImpl and then made runnable
+
+    int cntUnscored = 0;
+    for (T plan : person.getPlans()) {
+      if (plan.getScore() == null) {
+        cntUnscored++;
+      }
+    }
+    if (cntUnscored > 0) {
+      // select one of the unscored plans
+      int idxUnscored = MatsimRandom.getRandom().nextInt(cntUnscored);
+      cntUnscored = 0;
+      for (T plan : person.getPlans()) {
+        if (plan.getScore() == null) {
+          if (cntUnscored == idxUnscored) {
+            return plan;
+          }
+          cntUnscored++;
+        }
+      }
+    }
+    return null;
+  }
 }

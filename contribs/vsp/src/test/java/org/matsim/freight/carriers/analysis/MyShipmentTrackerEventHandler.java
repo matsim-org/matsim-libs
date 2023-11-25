@@ -33,59 +33,61 @@ import org.matsim.freight.carriers.events.eventhandler.CarrierShipmentDeliveryEn
 import org.matsim.freight.carriers.events.eventhandler.CarrierShipmentPickupEndEventHandler;
 import org.matsim.vehicles.Vehicles;
 
-public class MyShipmentTrackerEventHandler implements ActivityStartEventHandler, CarrierShipmentPickupEndEventHandler, CarrierShipmentDeliveryEndEventHandler {
+public class MyShipmentTrackerEventHandler
+    implements ActivityStartEventHandler,
+        CarrierShipmentPickupEndEventHandler,
+        CarrierShipmentDeliveryEndEventHandler {
 
-    private final Vehicles vehicles;
-    private final Network network;
-    private final Carriers carriers;
+  private final Vehicles vehicles;
+  private final Network network;
+  private final Carriers carriers;
 
-    private FreightAnalysisShipmentTracking shipmentTracking = new FreightAnalysisShipmentTracking();
+  private FreightAnalysisShipmentTracking shipmentTracking = new FreightAnalysisShipmentTracking();
 
-    MyShipmentTrackerEventHandler(Vehicles vehicles, Network network, Carriers carriers) {
-        this.network = network;
-        this.carriers = carriers;
-        this.vehicles = vehicles;
-        this.init();
+  MyShipmentTrackerEventHandler(Vehicles vehicles, Network network, Carriers carriers) {
+    this.network = network;
+    this.carriers = carriers;
+    this.vehicles = vehicles;
+    this.init();
+  }
+
+  private void init() {
+    for (Carrier carrier : carriers.getCarriers().values()) {
+      // for all shipments and services of the carriers, tracking is started here.
+      for (CarrierShipment shipment : carrier.getShipments().values()) {
+        shipmentTracking.addTracker(shipment);
+      }
+    }
+  }
+
+  @Override
+  public void handleEvent(CarrierShipmentDeliveryEndEvent event) {
+    shipmentTracking.trackDeliveryEvent(event);
+  }
+
+  @Override
+  public void handleEvent(CarrierShipmentPickupEndEvent event) {
+    shipmentTracking.trackPickedUpEvent(event);
+  }
+
+  @Override
+  public void reset(int iteration) {
+    CarrierShipmentPickupEndEventHandler.super.reset(iteration);
+  }
+
+  @Override
+  public void handleEvent(ActivityStartEvent activityStartEvent) {
+
+    if (activityStartEvent.getActType().equals("delivery")) {
+      shipmentTracking.trackDeliveryActivity(activityStartEvent);
     }
 
-    private void init(){
-        for (Carrier carrier : carriers.getCarriers().values()) {
-            // for all shipments and services of the carriers, tracking is started here.
-            for (CarrierShipment shipment : carrier.getShipments().values()) {
-                shipmentTracking.addTracker(shipment);
-            }
-        }
+    if (activityStartEvent.getActType().equals("pickup")) {
+      shipmentTracking.trackPickupActivity(activityStartEvent);
     }
+  }
 
-    @Override
-    public void handleEvent(CarrierShipmentDeliveryEndEvent event) {
-        shipmentTracking.trackDeliveryEvent(event);
-    }
-
-    @Override
-    public void handleEvent(CarrierShipmentPickupEndEvent event) {
-        shipmentTracking.trackPickedUpEvent(event);
-    }
-
-    @Override
-    public void reset(int iteration) {
-        CarrierShipmentPickupEndEventHandler.super.reset(iteration);
-    }
-
-    @Override
-    public void handleEvent(ActivityStartEvent activityStartEvent) {
-
-        if (activityStartEvent.getActType().equals("delivery")) {
-            shipmentTracking.trackDeliveryActivity(activityStartEvent);
-        }
-
-        if (activityStartEvent.getActType().equals("pickup")){
-            shipmentTracking.trackPickupActivity(activityStartEvent);
-        }
-
-    }
-
-    public FreightAnalysisShipmentTracking getShipmentTracker(){
-        return shipmentTracking;
-    }
+  public FreightAnalysisShipmentTracking getShipmentTracker() {
+    return shipmentTracking;
+  }
 }

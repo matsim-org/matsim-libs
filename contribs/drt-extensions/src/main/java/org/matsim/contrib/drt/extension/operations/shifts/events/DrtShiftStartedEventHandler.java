@@ -6,5 +6,5 @@ import org.matsim.core.events.handler.EventHandler;
  * @author nkuehnel / MOIA
  */
 public interface DrtShiftStartedEventHandler extends EventHandler {
-    public void handleEvent (DrtShiftStartedEvent event);
+  public void handleEvent(DrtShiftStartedEvent event);
 }

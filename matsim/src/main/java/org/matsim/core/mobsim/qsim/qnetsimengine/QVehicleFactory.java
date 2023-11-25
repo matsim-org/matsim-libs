@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * QVehicleFactory.java
@@ -19,12 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim.qnetsimengine;
+package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.matsim.vehicles.Vehicle;
 
 public interface QVehicleFactory {
-	
-	QVehicle createQVehicle( Vehicle vehicle ) ;
-	
+
+  QVehicle createQVehicle(Vehicle vehicle);
 }

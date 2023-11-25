@@ -25,24 +25,23 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-
 /**
  * @author aneumann
  */
 class PTransitAgentFactory implements AgentFactory {
 
-	private final Netsim simulation;
-	private final TimeInterpretation timeInterpretation;
-	
-    public PTransitAgentFactory(final Netsim simulation, TimeInterpretation timeInterpretation) {
-		this.simulation = simulation;
-		this.timeInterpretation = timeInterpretation;
-    }
+  private final Netsim simulation;
+  private final TimeInterpretation timeInterpretation;
 
-	@Override
-	public MobsimDriverPassengerAgent createMobsimAgentFromPerson(final Person p) {
-		MobsimDriverPassengerAgent agent = PTransitAgent.createTransitAgent(p, this.simulation, this.timeInterpretation);
-		return agent;
-	}
+  public PTransitAgentFactory(final Netsim simulation, TimeInterpretation timeInterpretation) {
+    this.simulation = simulation;
+    this.timeInterpretation = timeInterpretation;
+  }
 
+  @Override
+  public MobsimDriverPassengerAgent createMobsimAgentFromPerson(final Person p) {
+    MobsimDriverPassengerAgent agent =
+        PTransitAgent.createTransitAgent(p, this.simulation, this.timeInterpretation);
+    return agent;
+  }
 }

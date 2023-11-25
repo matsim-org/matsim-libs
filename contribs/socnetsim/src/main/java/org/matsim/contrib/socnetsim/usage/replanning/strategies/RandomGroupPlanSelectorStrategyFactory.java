@@ -19,32 +19,29 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
-import org.matsim.core.gbl.MatsimRandom;
-
 import com.google.inject.Inject;
-
 import org.matsim.contrib.socnetsim.framework.replanning.NonInnovativeStrategyFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.highestweightselection.RandomGroupLevelSelector;
+import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * @author thibautd
  */
 public class RandomGroupPlanSelectorStrategyFactory extends NonInnovativeStrategyFactory {
 
-	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+  private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
 
-	@Inject
-	public RandomGroupPlanSelectorStrategyFactory( IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory ) {
-		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
-	}
+  @Inject
+  public RandomGroupPlanSelectorStrategyFactory(
+      IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory) {
+    this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+  }
 
-	@Override
-	public GroupLevelPlanSelector createSelector() {
-		return new RandomGroupLevelSelector(
-			MatsimRandom.getLocalInstance(),
-			incompatiblePlansIdentifierFactory );
-	}
+  @Override
+  public GroupLevelPlanSelector createSelector() {
+    return new RandomGroupLevelSelector(
+        MatsimRandom.getLocalInstance(), incompatiblePlansIdentifierFactory);
+  }
 }
-

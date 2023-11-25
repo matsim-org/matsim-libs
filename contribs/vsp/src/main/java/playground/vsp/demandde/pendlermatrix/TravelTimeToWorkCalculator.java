@@ -13,45 +13,64 @@ import org.matsim.facilities.ActivityFacility;
 
 public class TravelTimeToWorkCalculator implements TripFlowSink {
 
-	private Network network;
+  private Network network;
 
-	private LeastCostPathCalculator dijkstra;
+  private LeastCostPathCalculator dijkstra;
 
-	private TripFlowSink sink;
+  private TripFlowSink sink;
 
-	public TravelTimeToWorkCalculator(Network network) {
-		this.network = network;
-		FreespeedTravelTimeAndDisutility fttc = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
-		dijkstra = new DijkstraFactory().createPathCalculator(network, fttc, fttc);
-	}
+  public TravelTimeToWorkCalculator(Network network) {
+    this.network = network;
+    FreespeedTravelTimeAndDisutility fttc =
+        new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
+    dijkstra = new DijkstraFactory().createPathCalculator(network, fttc, fttc);
+  }
 
-	@Override
-	public void process(ActivityFacility quelle, ActivityFacility ziel, int quantity, String mode, String destinationActivityType, double departureTimeOffset) {
-		Node quellNode = NetworkUtils.getNearestNode(((Network) network),quelle.getCoord());
-		Node zielNode = NetworkUtils.getNearestNode(((Network) network),ziel.getCoord());
-		Path path = dijkstra.calcLeastCostPath(quellNode, zielNode, 0.0, null, null);
-		double travelTimeToWork = calculateFreespeedTravelTimeToNode(this.network, path, zielNode);
-//		if(quelle.id == 9375 && ziel.id == 9162){
-			System.out.println("from zone " + quelle.getId() + " to zone " + ziel.getId() + ", it takes " + travelTimeToWork + " seconds to travel.");
-			sink.process(quelle, ziel, quantity, mode, destinationActivityType, departureTimeOffset - travelTimeToWork );
-//		}
-	}
+  @Override
+  public void process(
+      ActivityFacility quelle,
+      ActivityFacility ziel,
+      int quantity,
+      String mode,
+      String destinationActivityType,
+      double departureTimeOffset) {
+    Node quellNode = NetworkUtils.getNearestNode(((Network) network), quelle.getCoord());
+    Node zielNode = NetworkUtils.getNearestNode(((Network) network), ziel.getCoord());
+    Path path = dijkstra.calcLeastCostPath(quellNode, zielNode, 0.0, null, null);
+    double travelTimeToWork = calculateFreespeedTravelTimeToNode(this.network, path, zielNode);
+    //		if(quelle.id == 9375 && ziel.id == 9162){
+    System.out.println(
+        "from zone "
+            + quelle.getId()
+            + " to zone "
+            + ziel.getId()
+            + ", it takes "
+            + travelTimeToWork
+            + " seconds to travel.");
+    sink.process(
+        quelle,
+        ziel,
+        quantity,
+        mode,
+        destinationActivityType,
+        departureTimeOffset - travelTimeToWork);
+    //		}
+  }
 
-	public void setSink(TripFlowSink sink) {
-		this.sink = sink;
-	}
+  public void setSink(TripFlowSink sink) {
+    this.sink = sink;
+  }
 
-	@Override
-	public void complete() {
-		sink.complete();
-	}
+  @Override
+  public void complete() {
+    sink.complete();
+  }
 
-	private static double calculateFreespeedTravelTimeToNode(Network network, Path path, Node node) {
-		double travelTime = 0.0;
-		for (Link l : path.links) {
-			travelTime += l.getLength() / l.getFreespeed();
-		}
-		return travelTime;
-	}
-
+  private static double calculateFreespeedTravelTimeToNode(Network network, Path path, Node node) {
+    double travelTime = 0.0;
+    for (Link l : path.links) {
+      travelTime += l.getLength() / l.getFreespeed();
+    }
+    return travelTime;
+  }
 }

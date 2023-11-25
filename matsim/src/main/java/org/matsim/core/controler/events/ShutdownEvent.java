@@ -29,26 +29,25 @@ import org.matsim.core.controler.MatsimServices;
  */
 public final class ShutdownEvent extends ControlerEvent {
 
-	/**
-	 * Flag to indicate if the controler was shutdown unexpected
-	 */
-	private final boolean unexpected;
-	private final int iteration;
-	
-	public ShutdownEvent(final MatsimServices controler, final boolean unexpected, int iteration) {
-		super(controler);
-		this.unexpected = unexpected;
-		this.iteration = iteration;
-	}
+  /** Flag to indicate if the controler was shutdown unexpected */
+  private final boolean unexpected;
 
-	/**
-	 * @return true if the  controler was shutdown unexpected, false if a normal shutdown occured
-	 */
-	public boolean isUnexpected() {
-		return this.unexpected;
-	}
-	
-	public int getIteration() {
-		return iteration;
-	}
+  private final int iteration;
+
+  public ShutdownEvent(final MatsimServices controler, final boolean unexpected, int iteration) {
+    super(controler);
+    this.unexpected = unexpected;
+    this.iteration = iteration;
+  }
+
+  /**
+   * @return true if the controler was shutdown unexpected, false if a normal shutdown occured
+   */
+  public boolean isUnexpected() {
+    return this.unexpected;
+  }
+
+  public int getIteration() {
+    return iteration;
+  }
 }

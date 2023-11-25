@@ -21,4 +21,7 @@ package playground.vsp.openberlinscenario;
 /**
  * @author dziemke
  */
-public enum Gender {male, female}
+public enum Gender {
+  male,
+  female
+}

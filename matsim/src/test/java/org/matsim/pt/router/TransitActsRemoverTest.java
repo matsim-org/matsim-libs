@@ -34,91 +34,103 @@ import org.matsim.pt.PtConstants;
 
 public class TransitActsRemoverTest {
 
+  @Test
+  public void testNormalTransitPlan() {
+    Plan plan = PopulationUtils.createPlan();
+    Coord dummyCoord = new Coord((double) 0, (double) 0);
+    plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
 
-	@Test public void testNormalTransitPlan() {
-		Plan plan = PopulationUtils.createPlan();
-		Coord dummyCoord = new Coord((double) 0, (double) 0);
-		plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
+    plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
+    plan.addActivity(
+        PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
+    plan.addLeg(PopulationUtils.createLeg(TransportMode.pt));
+    plan.addActivity(
+        PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
+    plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
 
-		plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
-		plan.addActivity(PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
-		plan.addLeg(PopulationUtils.createLeg(TransportMode.pt));
-		plan.addActivity(PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
-		plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
+    plan.addActivity(PopulationUtils.createActivityFromCoord("w", dummyCoord));
 
-		plan.addActivity(PopulationUtils.createActivityFromCoord("w", dummyCoord));
+    plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
+    plan.addActivity(
+        PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
+    plan.addLeg(PopulationUtils.createLeg(TransportMode.pt));
+    plan.addActivity(
+        PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
+    // direct connection without walking
+    plan.addLeg(PopulationUtils.createLeg(TransportMode.pt));
+    plan.addActivity(
+        PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
+    plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
 
-		plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
-		plan.addActivity(PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
-		plan.addLeg(PopulationUtils.createLeg(TransportMode.pt));
-		plan.addActivity(PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
-		// direct connection without walking
-		plan.addLeg(PopulationUtils.createLeg(TransportMode.pt));
-		plan.addActivity(PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
-		plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
+    plan.addActivity(PopulationUtils.createActivityFromCoord("s", dummyCoord));
 
-		plan.addActivity(PopulationUtils.createActivityFromCoord("s", dummyCoord));
+    plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
+    plan.addActivity(
+        PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
+    plan.addLeg(PopulationUtils.createLeg(TransportMode.pt));
+    plan.addActivity(
+        PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
+    plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk)); // connection with walking
+    plan.addActivity(
+        PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
+    plan.addLeg(PopulationUtils.createLeg(TransportMode.pt));
+    plan.addActivity(
+        PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
+    plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
 
-		plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
-		plan.addActivity(PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
-		plan.addLeg(PopulationUtils.createLeg(TransportMode.pt));
-		plan.addActivity(PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
-		plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk)); // connection with walking
-		plan.addActivity(PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
-		plan.addLeg(PopulationUtils.createLeg(TransportMode.pt));
-		plan.addActivity(PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, dummyCoord));
-		plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
+    plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
+    new TransitActsRemover().run(plan);
 
-		plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
-		new TransitActsRemover().run(plan);
+    assertEquals(7, plan.getPlanElements().size());
+    assertEquals("h", ((Activity) plan.getPlanElements().get(0)).getType());
+    assertEquals(TransportMode.pt, ((Leg) plan.getPlanElements().get(1)).getMode());
+    assertEquals("w", ((Activity) plan.getPlanElements().get(2)).getType());
+    assertEquals(TransportMode.pt, ((Leg) plan.getPlanElements().get(3)).getMode());
+    assertEquals("s", ((Activity) plan.getPlanElements().get(4)).getType());
+    assertEquals(TransportMode.pt, ((Leg) plan.getPlanElements().get(5)).getMode());
+    assertNull(((Leg) plan.getPlanElements().get(5)).getRoute());
+    assertEquals("h", ((Activity) plan.getPlanElements().get(6)).getType());
+  }
 
-		assertEquals(7, plan.getPlanElements().size());
-		assertEquals("h", ((Activity) plan.getPlanElements().get(0)).getType());
-		assertEquals(TransportMode.pt, ((Leg) plan.getPlanElements().get(1)).getMode());
-		assertEquals("w", ((Activity) plan.getPlanElements().get(2)).getType());
-		assertEquals(TransportMode.pt, ((Leg) plan.getPlanElements().get(3)).getMode());
-		assertEquals("s", ((Activity) plan.getPlanElements().get(4)).getType());
-		assertEquals(TransportMode.pt, ((Leg) plan.getPlanElements().get(5)).getMode());
-		assertNull(((Leg) plan.getPlanElements().get(5)).getRoute());
-		assertEquals("h", ((Activity) plan.getPlanElements().get(6)).getType());
-	}
+  @Test
+  public void testEmptyPlan() {
+    Plan plan = PopulationUtils.createPlan();
+    new TransitActsRemover().run(plan);
+    assertEquals(0, plan.getPlanElements().size());
+    // this mostly checks that there is no exception
+  }
 
-	@Test public void testEmptyPlan() {
-		Plan plan = PopulationUtils.createPlan();
-		new TransitActsRemover().run(plan);
-		assertEquals(0, plan.getPlanElements().size());
-		// this mostly checks that there is no exception
-	}
+  @Test
+  public void testPlanWithoutLegs() {
+    Plan plan = PopulationUtils.createPlan();
+    Coord dummyCoord = new Coord((double) 0, (double) 0);
+    plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
+    new TransitActsRemover().run(plan);
+    assertEquals(1, plan.getPlanElements().size());
+    // this mostly checks that there is no exception
+  }
 
-	@Test public void testPlanWithoutLegs() {
-		Plan plan = PopulationUtils.createPlan();
-		Coord dummyCoord = new Coord((double) 0, (double) 0);
-		plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
-		new TransitActsRemover().run(plan);
-		assertEquals(1, plan.getPlanElements().size());
-		// this mostly checks that there is no exception
-	}
+  @Test
+  public void testWalkOnlyPlan() {
+    Plan plan = PopulationUtils.createPlan();
+    Coord dummyCoord = new Coord((double) 0, (double) 0);
+    plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
+    plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
+    plan.addActivity(PopulationUtils.createActivityFromCoord("w", dummyCoord));
+    new TransitActsRemover().run(plan);
+    assertEquals(3, plan.getPlanElements().size());
+    assertEquals(TransportMode.pt, ((Leg) plan.getPlanElements().get(1)).getMode());
+  }
 
-	@Test public void testWalkOnlyPlan() {
-		Plan plan = PopulationUtils.createPlan();
-		Coord dummyCoord = new Coord((double) 0, (double) 0);
-		plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
-		plan.addLeg(PopulationUtils.createLeg(TransportMode.transit_walk));
-		plan.addActivity(PopulationUtils.createActivityFromCoord("w", dummyCoord));
-		new TransitActsRemover().run(plan);
-		assertEquals(3, plan.getPlanElements().size());
-		assertEquals(TransportMode.pt, ((Leg) plan.getPlanElements().get(1)).getMode());
-	}
-
-	@Test public void testNoTransitActPlan() {
-		Plan plan = PopulationUtils.createPlan();
-		Coord dummyCoord = new Coord((double) 0, (double) 0);
-		plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
-		plan.addLeg(PopulationUtils.createLeg(TransportMode.car));
-		plan.addActivity(PopulationUtils.createActivityFromCoord("w", dummyCoord));
-		new TransitActsRemover().run(plan);
-		assertEquals(3, plan.getPlanElements().size());
-		assertEquals(TransportMode.car, ((Leg) plan.getPlanElements().get(1)).getMode());
-	}
-
+  @Test
+  public void testNoTransitActPlan() {
+    Plan plan = PopulationUtils.createPlan();
+    Coord dummyCoord = new Coord((double) 0, (double) 0);
+    plan.addActivity(PopulationUtils.createActivityFromCoord("h", dummyCoord));
+    plan.addLeg(PopulationUtils.createLeg(TransportMode.car));
+    plan.addActivity(PopulationUtils.createActivityFromCoord("w", dummyCoord));
+    new TransitActsRemover().run(plan);
+    assertEquals(3, plan.getPlanElements().size());
+    assertEquals(TransportMode.car, ((Leg) plan.getPlanElements().get(1)).getMode());
+  }
 }

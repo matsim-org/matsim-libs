@@ -20,7 +20,6 @@ package org.matsim.core.replanning.selectors;
 
 import java.util.List;
 import java.util.Map;
-
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -28,42 +27,39 @@ import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * Standardizing plans selection when weights are given.
- * 
- * @author nagel
  *
+ * @author nagel
  */
 public abstract class AbstractPlanSelector implements PlanSelector<Plan, Person> {
 
-	@Override
-	public final Plan selectPlan(HasPlansAndId<Plan, Person> person) {
-		// First check if there are any unscored plans
-		Plan selectedPlan = new RandomUnscoredPlanSelector<Plan, Person>().selectPlan(person);
-		if (selectedPlan != null) return selectedPlan;
-		// Okay, no unscored plans...
+  @Override
+  public final Plan selectPlan(HasPlansAndId<Plan, Person> person) {
+    // First check if there are any unscored plans
+    Plan selectedPlan = new RandomUnscoredPlanSelector<Plan, Person>().selectPlan(person);
+    if (selectedPlan != null) return selectedPlan;
+    // Okay, no unscored plans...
 
-		// Build the weights of all plans
+    // Build the weights of all plans
 
-		// - now calculate the weights
-		Map<Plan,Double> wc = calcWeights(person.getPlans() );
-		double sumWeights = 0. ;
-		for ( Double score : wc.values() ) {
-			sumWeights += score ;
-		}
+    // - now calculate the weights
+    Map<Plan, Double> wc = calcWeights(person.getPlans());
+    double sumWeights = 0.;
+    for (Double score : wc.values()) {
+      sumWeights += score;
+    }
 
-		// choose a random number over interval [0,sumWeights[
-		double selnum = sumWeights*MatsimRandom.getRandom().nextDouble();
-		for (Plan plan : person.getPlans()) {
-			selnum -= wc.get(plan);
-			if (selnum <= 0.0) {
-				return plan;
-			}
-		}
+    // choose a random number over interval [0,sumWeights[
+    double selnum = sumWeights * MatsimRandom.getRandom().nextDouble();
+    for (Plan plan : person.getPlans()) {
+      selnum -= wc.get(plan);
+      if (selnum <= 0.0) {
+        return plan;
+      }
+    }
 
-		// this case should never happen, except a person has no plans at all.
-		return null;
+    // this case should never happen, except a person has no plans at all.
+    return null;
+  }
 
-	}
-	
-	abstract protected Map<Plan,Double> calcWeights( List<? extends Plan> plans ) ;
-	
+  protected abstract Map<Plan, Double> calcWeights(List<? extends Plan> plans);
 }

@@ -27,20 +27,21 @@ import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 public class ActivityPerformingIdentifierFactory extends DuringActivityIdentifierFactory {
 
-	private ActivityReplanningMap activityReplanningMap;
-	private MobsimDataProvider mobsimDataProvider;
-	
-	public ActivityPerformingIdentifierFactory(ActivityReplanningMap activityReplanningMap, MobsimDataProvider mobsimDataProvider) {
-		this.activityReplanningMap = activityReplanningMap;
-		this.mobsimDataProvider = mobsimDataProvider;
-	}
-	
-	@Override
-	public DuringActivityAgentSelector createIdentifier() {
-		DuringActivityAgentSelector identifier = new ActivityPerformingIdentifier(this.activityReplanningMap, this.mobsimDataProvider);
-		this.addAgentFiltersToIdentifier(identifier);
-		identifier.setAgentSelectorFactory(this);
-		return identifier;
-	}
+  private ActivityReplanningMap activityReplanningMap;
+  private MobsimDataProvider mobsimDataProvider;
 
+  public ActivityPerformingIdentifierFactory(
+      ActivityReplanningMap activityReplanningMap, MobsimDataProvider mobsimDataProvider) {
+    this.activityReplanningMap = activityReplanningMap;
+    this.mobsimDataProvider = mobsimDataProvider;
+  }
+
+  @Override
+  public DuringActivityAgentSelector createIdentifier() {
+    DuringActivityAgentSelector identifier =
+        new ActivityPerformingIdentifier(this.activityReplanningMap, this.mobsimDataProvider);
+    this.addAgentFiltersToIdentifier(identifier);
+    identifier.setAgentSelectorFactory(this);
+    return identifier;
+  }
 }

@@ -19,99 +19,80 @@
 package org.matsim.contrib.freightreceiver;
 
 /**
- * Returns a new instance of a receiver product with associated information,
- * such as location, order policy parameters (min and max levels) and possibly
- * demand rate (to be included later).
- * <p><p>
- * The default values are: min level = 1000 units, max level = 5000 units.
+ * Returns a new instance of a receiver product with associated information, such as location, order
+ * policy parameters (min and max levels) and possibly demand rate (to be included later).
+ *
+ * <p>
+ *
+ * <p>The default values are: min level = 1000 units, max level = 5000 units.
  *
  * @author wlbean, jwjoubert
  */
 public class ReceiverProduct {
 
-	private final ReorderPolicy policy;
-	private final double stockOnHand;
-	private final ProductType productType;
+  private final ReorderPolicy policy;
+  private final double stockOnHand;
+  private final ProductType productType;
 
+  private ReceiverProduct(Builder builder) {
+    this.productType = builder.productType;
+    this.policy = builder.policy;
+    this.stockOnHand = builder.onHand;
+  }
 
-	private ReceiverProduct(Builder builder){
-		this.productType = builder.productType;
-		this.policy = builder.policy;
-		this.stockOnHand = builder.onHand;
-	}
+  /** Returns receiver product type. */
+  public ProductType getProductType() {
+    return productType;
+  }
 
+  public ReorderPolicy getReorderPolicy() {
+    return this.policy;
+  }
 
-	/**
-	 * Returns receiver product type.
-	 */
-	public ProductType getProductType(){
-		return productType;
-	}
+  public double getStockOnHand() {
+    return stockOnHand;
+  }
 
+  /**
+   * A builder that is used to build the product instance for the receiver.
+   *
+   * <p>FIXME There are multiple ways to create/set things. And, reading from the XML file means
+   * that you must read the ReceiverProduct first, BEFORE you get to the ReorderPolicy.
+   */
+  public static class Builder {
 
-	public ReorderPolicy getReorderPolicy() {
-		return this.policy;
-	}
+    /** This returns a builder with locationId. */
+    public static Builder newInstance() {
+      return new Builder();
+    }
 
-	public double getStockOnHand() {
-		return stockOnHand;
-	}
+    private ReorderPolicy policy = ReceiverUtils.createSSReorderPolicy(1000, 5000);
+    private double onHand = 0.0;
+    private ProductType productType;
 
+    /** Set relevant receiver product types. */
+    public Builder setProductType(ProductType productType) {
+      this.productType = productType;
+      return this;
+    }
 
-	/**
-	 * A builder that is used to build the product instance for the receiver.
-	 * <p>
-	 * FIXME There are multiple ways to create/set things. And, reading from the
-	 * XML file means that you must read the ReceiverProduct first, BEFORE you
-	 * get to the ReorderPolicy.
-	 */
+    /** Set relevant product type id. */
+    public Builder setReorderingPolicy(ReorderPolicy policy) {
+      this.policy = policy;
+      return this;
+    }
 
-	public static class Builder {
+    /**
+     * Set the current (opening) inventory for the product at the receiver. Defaults to 0 units on
+     * hand.
+     */
+    public Builder setStockOnHand(double stockOnHand) {
+      this.onHand = stockOnHand;
+      return this;
+    }
 
-		/**
-		 * This returns a builder with locationId.
-		 */
-		public static Builder newInstance(){
-			return new Builder();
-		}
-
-		private ReorderPolicy policy = ReceiverUtils.createSSReorderPolicy(1000, 5000);
-		private double onHand = 0.0;
-		private ProductType productType;
-
-
-		/**
-		 * Set relevant receiver product types.
-		 */
-		public Builder setProductType(ProductType productType){
-			this.productType = productType;
-			return this;
-		}
-
-		/**
-		 * Set relevant product type id.
-		 */
-		public Builder setReorderingPolicy(ReorderPolicy policy) {
-			this.policy = policy;
-			return this;
-		}
-
-
-		/**
-		 * Set the current (opening) inventory for the product at the receiver. Defaults to 0 units on hand.
-		 */
-		public Builder setStockOnHand(double stockOnHand) {
-			this.onHand = stockOnHand;
-			return this;
-		}
-
-
-		public ReceiverProduct build(){
-			return new ReceiverProduct(this);
-		}
-
-
-	}
-
-
+    public ReceiverProduct build() {
+      return new ReceiverProduct(this);
+    }
+  }
 }

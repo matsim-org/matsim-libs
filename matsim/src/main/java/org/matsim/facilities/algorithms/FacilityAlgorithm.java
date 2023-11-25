@@ -23,5 +23,5 @@ package org.matsim.facilities.algorithms;
 import org.matsim.facilities.ActivityFacility;
 
 public interface FacilityAlgorithm {
-	public void run(ActivityFacility facility);
+  public void run(ActivityFacility facility);
 }

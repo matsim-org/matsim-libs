@@ -21,25 +21,22 @@ package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import org.matsim.core.config.Config;
+import java.util.Map;
 import org.matsim.contrib.socnetsim.framework.replanning.GroupPlanStrategy;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
-
-import java.util.Map;
+import org.matsim.core.config.Config;
 
 /**
  * @author thibautd
  */
 public abstract class AbstractConfigurableSelectionStrategy implements Provider<GroupPlanStrategy> {
-	@Inject
-	private Map<String, Provider<GroupLevelPlanSelector>> factoryRegistry;
+  @Inject private Map<String, Provider<GroupLevelPlanSelector>> factoryRegistry;
 
-	protected GroupPlanStrategy instantiateStrategy( final Config config ) {
-		final GroupReplanningConfigGroup conf = (GroupReplanningConfigGroup)
-			config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
+  protected GroupPlanStrategy instantiateStrategy(final Config config) {
+    final GroupReplanningConfigGroup conf =
+        (GroupReplanningConfigGroup) config.getModule(GroupReplanningConfigGroup.GROUP_NAME);
 
-		return new GroupPlanStrategy( factoryRegistry.get( conf.getSelectorForModification() ).get() );
-	}
+    return new GroupPlanStrategy(factoryRegistry.get(conf.getSelectorForModification()).get());
+  }
 }
-

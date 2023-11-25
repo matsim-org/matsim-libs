@@ -23,23 +23,20 @@ package org.matsim.freight.carriers;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.freight.carriers.CarrierVehicleTypeReader;
-import org.matsim.freight.carriers.CarrierVehicleTypeWriter;
-import org.matsim.freight.carriers.CarrierVehicleTypes;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class CarrierVehicleTypeWriterTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils() ;
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testTypeWriter(){
-		CarrierVehicleTypes types = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader(types).readFile(utils.getClassInputDirectory()+ "vehicleTypes.xml");
-		final String outputVehTypeFile = utils.getOutputDirectory()+ "vehicleTypesWritten.xml";
-		new CarrierVehicleTypeWriter(types).write(outputVehTypeFile);
-		types.getVehicleTypes().clear();
-		new CarrierVehicleTypeReader(types).readFile(outputVehTypeFile);
-	}
+  @Test
+  public void testTypeWriter() {
+    CarrierVehicleTypes types = new CarrierVehicleTypes();
+    new CarrierVehicleTypeReader(types)
+        .readFile(utils.getClassInputDirectory() + "vehicleTypes.xml");
+    final String outputVehTypeFile = utils.getOutputDirectory() + "vehicleTypesWritten.xml";
+    new CarrierVehicleTypeWriter(types).write(outputVehTypeFile);
+    types.getVehicleTypes().clear();
+    new CarrierVehicleTypeReader(types).readFile(outputVehTypeFile);
+  }
 }

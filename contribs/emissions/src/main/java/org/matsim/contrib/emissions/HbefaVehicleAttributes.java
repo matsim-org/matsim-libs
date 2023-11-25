@@ -21,91 +21,93 @@ package org.matsim.contrib.emissions;
 
 /**
  * @author benjamin
- *
  */
 final class HbefaVehicleAttributes {
-	// yy I can see what this is good for.  I am at this point not totally sure if it makes a lot of sense to use this outside the emissions contrib.  kai, jan'19
+  // yy I can see what this is good for.  I am at this point not totally sure if it makes a lot of
+  // sense to use this outside the emissions contrib.  kai, jan'19
 
-	private String hbefaTechnology = "average";
-	private String hbefaSizeClass = "average";
-	private String hbefaEmConcept = "average";
-	
-	public HbefaVehicleAttributes(){
-	}
-	
-	private static final String TECHNOLOGY_CMT="Normally something like |diesel| or |petrol|." ;
-	/**
-	 * @return {@value #TECHNOLOGY_CMT}
-	 */
-	String getHbefaTechnology(){
-		return this.hbefaTechnology;
-	}
-	/**
-	 * @param hbefaTechnology - {@value #TECHNOLOGY_CMT}
-	 */
-	public void setHbefaTechnology(String hbefaTechnology) {
-		this.hbefaTechnology = hbefaTechnology;		
-	}
-	
-	
-	private static final String SIZE_CLASS_CMT="Normally something like |<1,4L| or |>=2L|." ;
-	/**
-	 * @return {@value #SIZE_CLASS_CMT}
-	 */
-	public String getHbefaSizeClass(){
-		return this.hbefaSizeClass;
-	}
-	/**
-	 * @param hbefaSizeClass - {@value #SIZE_CLASS_CMT}
-	 */
-	public void setHbefaSizeClass(String hbefaSizeClass) {
-		this.hbefaSizeClass = hbefaSizeClass;
-	}
+  private String hbefaTechnology = "average";
+  private String hbefaSizeClass = "average";
+  private String hbefaEmConcept = "average";
 
-	private static final String EM_CONCEPT_CMT="Normally something like PC-P/D-Euro-X." ;
-	/**
-	 * @return {@value #EM_CONCEPT_CMT}
-	 */
-	public String getHbefaEmConcept() {
-		return this.hbefaEmConcept;
-	}
+  public HbefaVehicleAttributes() {}
 
-	/**
-	 * @param hbefaEmConcept - {@value #EM_CONCEPT_CMT}
-	 */
-	public void setHbefaEmConcept(String hbefaEmConcept) {
-		this.hbefaEmConcept = hbefaEmConcept;
-	}
+  private static final String TECHNOLOGY_CMT = "Normally something like |diesel| or |petrol|.";
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+  /**
+   * @return {@value #TECHNOLOGY_CMT}
+   */
+  String getHbefaTechnology() {
+    return this.hbefaTechnology;
+  }
 
-		HbefaVehicleAttributes that = (HbefaVehicleAttributes) o;
+  /**
+   * @param hbefaTechnology - {@value #TECHNOLOGY_CMT}
+   */
+  public void setHbefaTechnology(String hbefaTechnology) {
+    this.hbefaTechnology = hbefaTechnology;
+  }
 
-		if (!hbefaTechnology.equals(that.hbefaTechnology)) return false;
-		if (!hbefaSizeClass.equals(that.hbefaSizeClass)) return false;
-		return hbefaEmConcept.equals(that.hbefaEmConcept);
-	}
+  private static final String SIZE_CLASS_CMT = "Normally something like |<1,4L| or |>=2L|.";
 
-	@Override
-	public int hashCode() {
-		int result = hbefaTechnology.hashCode();
-		result = 31 * result + hbefaSizeClass.hashCode();
-		result = 31 * result + hbefaEmConcept.hashCode();
-		return result;
-	}
+  /**
+   * @return {@value #SIZE_CLASS_CMT}
+   */
+  public String getHbefaSizeClass() {
+    return this.hbefaSizeClass;
+  }
 
-	@Override
-	public String toString() {
-		return
-				hbefaTechnology + "; "
-						+ hbefaSizeClass + "; "
-						+ hbefaEmConcept;
-	}
+  /**
+   * @param hbefaSizeClass - {@value #SIZE_CLASS_CMT}
+   */
+  public void setHbefaSizeClass(String hbefaSizeClass) {
+    this.hbefaSizeClass = hbefaSizeClass;
+  }
 
-	public boolean isDetailed() {
-		return !hbefaTechnology.equals("average") && !hbefaSizeClass.equals("average") && !hbefaEmConcept.equals("average");
-	}
+  private static final String EM_CONCEPT_CMT = "Normally something like PC-P/D-Euro-X.";
+
+  /**
+   * @return {@value #EM_CONCEPT_CMT}
+   */
+  public String getHbefaEmConcept() {
+    return this.hbefaEmConcept;
+  }
+
+  /**
+   * @param hbefaEmConcept - {@value #EM_CONCEPT_CMT}
+   */
+  public void setHbefaEmConcept(String hbefaEmConcept) {
+    this.hbefaEmConcept = hbefaEmConcept;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    HbefaVehicleAttributes that = (HbefaVehicleAttributes) o;
+
+    if (!hbefaTechnology.equals(that.hbefaTechnology)) return false;
+    if (!hbefaSizeClass.equals(that.hbefaSizeClass)) return false;
+    return hbefaEmConcept.equals(that.hbefaEmConcept);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = hbefaTechnology.hashCode();
+    result = 31 * result + hbefaSizeClass.hashCode();
+    result = 31 * result + hbefaEmConcept.hashCode();
+    return result;
+  }
+
+  @Override
+  public String toString() {
+    return hbefaTechnology + "; " + hbefaSizeClass + "; " + hbefaEmConcept;
+  }
+
+  public boolean isDetailed() {
+    return !hbefaTechnology.equals("average")
+        && !hbefaSizeClass.equals("average")
+        && !hbefaEmConcept.equals("average");
+  }
 }

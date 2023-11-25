@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * TeleportationModule.java
@@ -19,14 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim;
+package org.matsim.core.mobsim.qsim;
 
 public class TeleportationModule extends AbstractQSimModule {
-	public final static String COMPONENT_NAME = "TeleportationEngine";
+  public static final String COMPONENT_NAME = "TeleportationEngine";
 
-	@Override
-	protected void configureQSim() {
-		bind(DefaultTeleportationEngine.class).asEagerSingleton();
-		addQSimComponentBinding( COMPONENT_NAME ).to( DefaultTeleportationEngine.class );
-	}
+  @Override
+  protected void configureQSim() {
+    bind(DefaultTeleportationEngine.class).asEagerSingleton();
+    addQSimComponentBinding(COMPONENT_NAME).to(DefaultTeleportationEngine.class);
+  }
 }

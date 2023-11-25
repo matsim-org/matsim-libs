@@ -25,13 +25,13 @@ import org.matsim.utils.objectattributes.AttributeConverter;
  * @author mrieser
  */
 public class BooleanConverter implements AttributeConverter<Boolean> {
-	@Override
-	public Boolean convert(String value) {
-		return Boolean.valueOf(value);
-	}
+  @Override
+  public Boolean convert(String value) {
+    return Boolean.valueOf(value);
+  }
 
-	@Override
-	public String convertToString(Object b) {
-		return b.toString();
-	}
+  @Override
+  public String convertToString(Object b) {
+    return b.toString();
+  }
 }

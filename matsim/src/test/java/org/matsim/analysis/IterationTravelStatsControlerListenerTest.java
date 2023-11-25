@@ -1,6 +1,4 @@
-/**
- *
- */
+/** */
 package org.matsim.analysis;
 
 import java.io.BufferedReader;
@@ -9,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.zip.GZIPInputStream;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,164 +34,182 @@ import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author Aravind
- *
  */
 public class IterationTravelStatsControlerListenerTest {
 
-	final IdMap<Person, Plan> map = new IdMap<>(Person.class);
-	Config config = ConfigUtils.createConfig();
+  final IdMap<Person, Plan> map = new IdMap<>(Person.class);
+  Config config = ConfigUtils.createConfig();
 
-	private int person;
-	private int executed_score;
-	private int first_act_x;
-	private int first_act_y;
-	private int first_act_type;
+  private int person;
+  private int executed_score;
+  private int first_act_x;
+  private int first_act_y;
+  private int first_act_type;
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testIterationTravelStatsControlerListener() {
+  @Test
+  public void testIterationTravelStatsControlerListener() {
 
-		Plans plans = new Plans();
+    Plans plans = new Plans();
 
-		/****************************
-		 * Plan 1 - creating plan 1
-		 ************************************/
+    /****************************
+     * Plan 1 - creating plan 1
+     ************************************/
 
-		Plan plan1 = plans.createPlanOne();
+    Plan plan1 = plans.createPlanOne();
 
-		/********************************
-		 * Plan 2 - creating plan 2
-		 ********************************/
-		Plan plan2 = plans.createPlanTwo();
+    /********************************
+     * Plan 2 - creating plan 2
+     ********************************/
+    Plan plan2 = plans.createPlanTwo();
 
-		/*****************************
-		 * Plan 3 - creating plan 3
-		 ************************************/
-		Plan plan3 = plans.createPlanThree();
+    /*****************************
+     * Plan 3 - creating plan 3
+     ************************************/
+    Plan plan3 = plans.createPlanThree();
 
-		/************************
-		 * Plan 4-----creating plan 4
-		 **************************************/
-		Plan plan4 = plans.createPlanFour();
+    /************************
+     * Plan 4-----creating plan 4
+     **************************************/
+    Plan plan4 = plans.createPlanFour();
 
-		Scenario scenario = ScenarioUtils.createScenario(config);
+    Scenario scenario = ScenarioUtils.createScenario(config);
 
-		Person person1 = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));;
-		person1.addPlan(plan1);
-		Person person2 = PopulationUtils.getFactory().createPerson(Id.create("2", Person.class));;
-		person2.addPlan(plan2);
-		Person person3 = PopulationUtils.getFactory().createPerson(Id.create("3", Person.class));;
-		person3.addPlan(plan3);
-		Person person4 = PopulationUtils.getFactory().createPerson(Id.create("4", Person.class));;
-		person4.addPlan(plan4);
+    Person person1 = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
+    ;
+    person1.addPlan(plan1);
+    Person person2 = PopulationUtils.getFactory().createPerson(Id.create("2", Person.class));
+    ;
+    person2.addPlan(plan2);
+    Person person3 = PopulationUtils.getFactory().createPerson(Id.create("3", Person.class));
+    ;
+    person3.addPlan(plan3);
+    Person person4 = PopulationUtils.getFactory().createPerson(Id.create("4", Person.class));
+    ;
+    person4.addPlan(plan4);
 
-		scenario.getPopulation().addPerson(person1);
-		scenario.getPopulation().addPerson(person2);
-		scenario.getPopulation().addPerson(person3);
-		scenario.getPopulation().addPerson(person4);
+    scenario.getPopulation().addPerson(person1);
+    scenario.getPopulation().addPerson(person2);
+    scenario.getPopulation().addPerson(person3);
+    scenario.getPopulation().addPerson(person4);
 
-		performTest(scenario, utils.getOutputDirectory() + "/IterationTravelStatsControlerListener");
-	}
+    performTest(scenario, utils.getOutputDirectory() + "/IterationTravelStatsControlerListener");
+  }
 
-	private void performTest(Scenario scenario, String outputDirectory) {
+  private void performTest(Scenario scenario, String outputDirectory) {
 
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		ShutdownEvent shutdownEvent = new ShutdownEvent(null, false, 0);
-		com.google.inject.Injector injector = Injector.createInjector(config, new AbstractModule() {
-			@Override
-			public void install() {
-				install(new IterationTravelStatsModule());
-				install(new ScenarioByInstanceModule(scenario));
-				install(new StandaloneExperiencedPlansModule());
-				// an AnalysisMainModeIdentifier must be bound to avoid injection creation errors. TripRouterModule should do this. Check thereby that TripRouterModule still does that by installing TripRouterModule instead of binding AnalysisMainModeIdentifier directly
-				install(new TripRouterModule());
-				install(new TimeInterpretationModule());
-				bind(OutputDirectoryHierarchy.class).asEagerSingleton();
-				//bind(ExperiencedPlansService.class).to(ExperiencedPlansServiceImpl.class);
-				bind(IterationTravelStatsControlerListener.class).asEagerSingleton();
-				bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
-			}
-		});
-		IterationTravelStatsControlerListener ltcl = injector.getInstance(IterationTravelStatsControlerListener.class);
-		ltcl.notifyShutdown(shutdownEvent);
-		readAndValidateValues(scenario);
-	}
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
+    ShutdownEvent shutdownEvent = new ShutdownEvent(null, false, 0);
+    com.google.inject.Injector injector =
+        Injector.createInjector(
+            config,
+            new AbstractModule() {
+              @Override
+              public void install() {
+                install(new IterationTravelStatsModule());
+                install(new ScenarioByInstanceModule(scenario));
+                install(new StandaloneExperiencedPlansModule());
+                // an AnalysisMainModeIdentifier must be bound to avoid injection creation errors.
+                // TripRouterModule should do this. Check thereby that TripRouterModule still does
+                // that by installing TripRouterModule instead of binding AnalysisMainModeIdentifier
+                // directly
+                install(new TripRouterModule());
+                install(new TimeInterpretationModule());
+                bind(OutputDirectoryHierarchy.class).asEagerSingleton();
+                // bind(ExperiencedPlansService.class).to(ExperiencedPlansServiceImpl.class);
+                bind(IterationTravelStatsControlerListener.class).asEagerSingleton();
+                bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
+              }
+            });
+    IterationTravelStatsControlerListener ltcl =
+        injector.getInstance(IterationTravelStatsControlerListener.class);
+    ltcl.notifyShutdown(shutdownEvent);
+    readAndValidateValues(scenario);
+  }
 
-	private Activity identifyFirstActivity(Person person) {
-		return (Activity) person.getSelectedPlan().getPlanElements().get(0);
-	}
+  private Activity identifyFirstActivity(Person person) {
+    return (Activity) person.getSelectedPlan().getPlanElements().get(0);
+  }
 
-	private void readAndValidateValues(Scenario scenario) {
+  private void readAndValidateValues(Scenario scenario) {
 
-		String file = utils.getOutputDirectory() + "/output_persons.csv.gz";
-		BufferedReader br;
-		String line;
-		try {
-			GZIPInputStream input = new GZIPInputStream(new FileInputStream(file));
-			Reader decoder = new InputStreamReader(input);
-			br = new BufferedReader(decoder);
-			String firstRow = br.readLine();
-			String[] columnNames = firstRow.split(";");
-			decideColumns(columnNames);
-			while ((line = br.readLine()) != null) {
-					String[] column = line.split(";");
-					// checking if column number in greater than 0, because 0th column is always
-					// 'Iteration' and we don't need that --> see decideColumns() method
-					Double x = (first_act_x > 0) ? Double.valueOf(column[first_act_x]) : 0;
-					Double y = (first_act_y > 0) ? Double.valueOf(column[first_act_y]) : 0;
-					Id<Person> personId = Id.create(column[person], Person.class);
+    String file = utils.getOutputDirectory() + "/output_persons.csv.gz";
+    BufferedReader br;
+    String line;
+    try {
+      GZIPInputStream input = new GZIPInputStream(new FileInputStream(file));
+      Reader decoder = new InputStreamReader(input);
+      br = new BufferedReader(decoder);
+      String firstRow = br.readLine();
+      String[] columnNames = firstRow.split(";");
+      decideColumns(columnNames);
+      while ((line = br.readLine()) != null) {
+        String[] column = line.split(";");
+        // checking if column number in greater than 0, because 0th column is always
+        // 'Iteration' and we don't need that --> see decideColumns() method
+        Double x = (first_act_x > 0) ? Double.valueOf(column[first_act_x]) : 0;
+        Double y = (first_act_y > 0) ? Double.valueOf(column[first_act_y]) : 0;
+        Id<Person> personId = Id.create(column[person], Person.class);
 
-					Person personInScenario = scenario.getPopulation().getPersons().get(personId);
-					Activity firstActivity = identifyFirstActivity(personInScenario);
+        Person personInScenario = scenario.getPopulation().getPersons().get(personId);
+        Activity firstActivity = identifyFirstActivity(personInScenario);
 
-					Assert.assertEquals("wrong score", personInScenario.getSelectedPlan().getScore(), Double.valueOf(column[executed_score]), MatsimTestUtils.EPSILON);
-					Assert.assertEquals("x coordinate does not match", firstActivity.getCoord().getX(), x,
-							MatsimTestUtils.EPSILON);
-					Assert.assertEquals("y coordinate does not match", firstActivity.getCoord().getY(), y,
-							MatsimTestUtils.EPSILON);
-					Assert.assertEquals("type of first activity does not match", firstActivity.getType(), column[first_act_type]);
+        Assert.assertEquals(
+            "wrong score",
+            personInScenario.getSelectedPlan().getScore(),
+            Double.valueOf(column[executed_score]),
+            MatsimTestUtils.EPSILON);
+        Assert.assertEquals(
+            "x coordinate does not match",
+            firstActivity.getCoord().getX(),
+            x,
+            MatsimTestUtils.EPSILON);
+        Assert.assertEquals(
+            "y coordinate does not match",
+            firstActivity.getCoord().getY(),
+            y,
+            MatsimTestUtils.EPSILON);
+        Assert.assertEquals(
+            "type of first activity does not match",
+            firstActivity.getType(),
+            column[first_act_type]);
 
-					break;
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        break;
+      }
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
 
+  private void decideColumns(String[] columnNames) {
 
-	}
+    Integer i = 0;
+    while (i < columnNames.length) {
+      String name = columnNames[i];
+      switch (name) {
+        case "person":
+          person = i;
+          break;
 
-	private void decideColumns(String[] columnNames) {
+        case "executed_score":
+          executed_score = i;
+          break;
 
-		Integer i = 0;
-		while (i < columnNames.length) {
-			String name = columnNames[i];
-			switch (name) {
+        case "first_act_x":
+          first_act_x = i;
+          break;
 
-			case "person":
-				person = i;
-				break;
+        case "first_act_y":
+          first_act_y = i;
+          break;
 
-			case "executed_score":
-				executed_score = i;
-				break;
-
-			case "first_act_x":
-				first_act_x = i;
-				break;
-
-			case "first_act_y":
-				first_act_y = i;
-				break;
-
-			case "first_act_type":
-				first_act_type = i;
-				break;
-
-			}
-			i++;
-		}
-	}
+        case "first_act_type":
+          first_act_type = i;
+          break;
+      }
+      i++;
+    }
+  }
 }

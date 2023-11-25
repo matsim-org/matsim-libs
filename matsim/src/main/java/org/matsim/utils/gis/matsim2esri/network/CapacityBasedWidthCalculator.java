@@ -25,14 +25,14 @@ import org.matsim.api.core.v01.network.Network;
 
 public class CapacityBasedWidthCalculator implements WidthCalculator {
 
-	private final double widthCoefficient;
+  private final double widthCoefficient;
 
-	public CapacityBasedWidthCalculator(final Network network, final Double coef) {
-		this.widthCoefficient = coef;
-	}
+  public CapacityBasedWidthCalculator(final Network network, final Double coef) {
+    this.widthCoefficient = coef;
+  }
 
-	@Override
-	public double getWidth(final Link link) {
-		return link.getCapacity() * this.widthCoefficient;
-	}
+  @Override
+  public double getWidth(final Link link) {
+    return link.getCapacity() * this.widthCoefficient;
+  }
 }

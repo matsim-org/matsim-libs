@@ -24,25 +24,25 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.RunConfigurableQNetworkFactoryExample;
 
 /**
- * Calculates the maximum speed a vehicle can travel with on a specific link 
- * at a specific time in a specific vehicle. If the speed should be depending
- * on the person driving it, use vehicle.getDriver(). But remember that not
- * every vehicle must have a Person as a driver.
- * <br/><br/>
- * Tutorial examples:<ul>
- * <li> {@link RunConfigurableQNetworkFactoryExample}
+ * Calculates the maximum speed a vehicle can travel with on a specific link at a specific time in a
+ * specific vehicle. If the speed should be depending on the person driving it, use
+ * vehicle.getDriver(). But remember that not every vehicle must have a Person as a driver. <br>
+ * <br>
+ * Tutorial examples:
+ *
+ * <ul>
+ *   <li>{@link RunConfigurableQNetworkFactoryExample}
  * </ul>
- * 
+ *
  * @author mrieser / Senozon AG
  */
 public interface LinkSpeedCalculator {
 
-	/**
-	 * @param vehicle
-	 * @param link
-	 * @param time
-	 * @return the maximum speed the vehicle can travel on the given link.
-	 */
-	public double getMaximumVelocity(QVehicle vehicle, Link link, double time);
-
+  /**
+   * @param vehicle
+   * @param link
+   * @param time
+   * @return the maximum speed the vehicle can travel on the given link.
+   */
+  public double getMaximumVelocity(QVehicle vehicle, Link link, double time);
 }

@@ -24,9 +24,7 @@ import org.matsim.core.events.handler.EventHandler;
 /**
  * @author jbischoff
  */
-
 public interface StartWaitingForParkingEventHandler extends EventHandler {
 
-	public void handleEvent(StartWaitingForParkingEvent event);
-
+  public void handleEvent(StartWaitingForParkingEvent event);
 }

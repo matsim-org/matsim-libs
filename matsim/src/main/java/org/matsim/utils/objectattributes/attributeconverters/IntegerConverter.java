@@ -25,13 +25,13 @@ import org.matsim.utils.objectattributes.AttributeConverter;
  * @author mrieser
  */
 public class IntegerConverter implements AttributeConverter<Integer> {
-	@Override
-	public Integer convert(String value) {
-		return Integer.valueOf(value);
-	}
+  @Override
+  public Integer convert(String value) {
+    return Integer.valueOf(value);
+  }
 
-@Override
-	public String convertToString(Object o) {
-		return o.toString();
-	}
+  @Override
+  public String convertToString(Object o) {
+    return o.toString();
+  }
 }

@@ -1,38 +1,35 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * 
- * @author droeder@Senozon 
- *
+ * @author droeder@Senozon
  */
 public interface QNetsimEngineI extends MobsimEngine, NetsimEngine {
-	
-	interface NetsimInternalInterface {
-		QNetwork getNetsimNetwork();
-		void arrangeNextAgentState(MobsimAgent pp);
-		void letVehicleArrive(QVehicle veh);
-	}
 
+  interface NetsimInternalInterface {
+    QNetwork getNetsimNetwork();
 
-	void doSimStep(double time);
+    void arrangeNextAgentState(MobsimAgent pp);
 
-	int getNumberOfSimulatedLinks();
+    void letVehicleArrive(QVehicle veh);
+  }
 
-	int getNumberOfSimulatedNodes();
+  void doSimStep(double time);
 
-	VehicularDepartureHandler getDepartureHandler();
+  int getNumberOfSimulatedLinks();
 
-	Map<Id<Vehicle>, QVehicle> getVehicles();
+  int getNumberOfSimulatedNodes();
 
-	void printEngineRunTimes();
-	
-	NetsimInternalInterface getNetsimInternalInterface();
+  VehicularDepartureHandler getDepartureHandler();
 
+  Map<Id<Vehicle>, QVehicle> getVehicles();
+
+  void printEngineRunTimes();
+
+  NetsimInternalInterface getNetsimInternalInterface();
 }

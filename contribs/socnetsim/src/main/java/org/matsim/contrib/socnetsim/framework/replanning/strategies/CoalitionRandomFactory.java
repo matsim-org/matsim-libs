@@ -20,41 +20,35 @@
 package org.matsim.contrib.socnetsim.framework.replanning.strategies;
 
 import java.util.Random;
-
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.gbl.MatsimRandom;
-
 import org.matsim.contrib.socnetsim.framework.replanning.NonInnovativeStrategyFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.WeightCalculator;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector.ConflictSolver;
+import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * @author thibautd
  */
-public class CoalitionRandomFactory  extends NonInnovativeStrategyFactory {
-	private final ConflictSolver conflictSolver;
+public class CoalitionRandomFactory extends NonInnovativeStrategyFactory {
+  private final ConflictSolver conflictSolver;
 
-	public CoalitionRandomFactory(
-			final ConflictSolver conflictSolver) {
-		this.conflictSolver = conflictSolver;
-	}
+  public CoalitionRandomFactory(final ConflictSolver conflictSolver) {
+    this.conflictSolver = conflictSolver;
+  }
 
-	@Override
-	public GroupLevelPlanSelector createSelector() {
-		final Random random = MatsimRandom.getLocalInstance();
-		return new CoalitionSelector(
-				new WeightCalculator() {
-					@Override
-					public double getWeight(
-							final Plan indivPlan,
-							final ReplanningGroup group) {
-						return random.nextDouble();
-					}
-				},
-				conflictSolver);
-	}
+  @Override
+  public GroupLevelPlanSelector createSelector() {
+    final Random random = MatsimRandom.getLocalInstance();
+    return new CoalitionSelector(
+        new WeightCalculator() {
+          @Override
+          public double getWeight(final Plan indivPlan, final ReplanningGroup group) {
+            return random.nextDouble();
+          }
+        },
+        conflictSolver);
+  }
 }
-

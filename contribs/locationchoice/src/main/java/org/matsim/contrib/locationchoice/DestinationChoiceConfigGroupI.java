@@ -1,17 +1,17 @@
 package org.matsim.contrib.locationchoice;
 
-public interface DestinationChoiceConfigGroupI{
-	String getFlexibleTypes();
+public interface DestinationChoiceConfigGroupI {
+  String getFlexibleTypes();
 
-	double getScaleFactor();
+  double getScaleFactor();
 
-	String getCenterNode();
+  String getCenterNode();
 
-	Double getRadius();
+  Double getRadius();
 
-	String getEpsilonScaleFactors();
+  String getEpsilonScaleFactors();
 
-	double getRestraintFcnFactor();
+  double getRestraintFcnFactor();
 
-	double getRestraintFcnExp();
+  double getRestraintFcnExp();
 }

@@ -21,7 +21,6 @@
 package org.matsim.contrib.drt.optimizer;
 
 import java.util.concurrent.ForkJoinPool;
-
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 
@@ -31,18 +30,18 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
  * @author Michal Maciejewski (michalm)
  */
 public class QSimScopeForkJoinPoolHolder implements MobsimBeforeCleanupListener {
-	private final ForkJoinPool forkJoinPool;
+  private final ForkJoinPool forkJoinPool;
 
-	public QSimScopeForkJoinPoolHolder(int numberOfThreads) {
-		forkJoinPool = new ForkJoinPool(numberOfThreads);
-	}
+  public QSimScopeForkJoinPoolHolder(int numberOfThreads) {
+    forkJoinPool = new ForkJoinPool(numberOfThreads);
+  }
 
-	public ForkJoinPool getPool() {
-		return forkJoinPool;
-	}
+  public ForkJoinPool getPool() {
+    return forkJoinPool;
+  }
 
-	@Override
-	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e) {
-		forkJoinPool.shutdown();
-	}
+  @Override
+  public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e) {
+    forkJoinPool.shutdown();
+  }
 }

@@ -22,11 +22,10 @@
 
 package org.matsim.withinday.controller;
 
+import com.google.inject.Provides;
+import jakarta.inject.Named;
 import java.util.HashMap;
 import java.util.Map;
-
-import jakarta.inject.Named;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -41,28 +40,28 @@ import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 import org.matsim.withinday.trafficmonitoring.WithinDayTravelTimeModule;
 
-import com.google.inject.Provides;
-
 public class WithinDayModule extends AbstractModule {
-    @Override
-    public void install() {
-        install(new WithinDayTravelTimeModule());
-        bind(WithinDayEngine.class);
-        bind(Mobsim.class).toProvider(WithinDayQSimFactory.class);
-        bind(FixedOrderSimulationListener.class).asEagerSingleton();
-        bind(WithinDayControlerListener.class).asEagerSingleton();
-        addControlerListenerBinding().to(WithinDayControlerListener.class);
-        bind(MobsimDataProvider.class).asEagerSingleton();
-        bind(ActivityReplanningMap.class).asEagerSingleton();
-        bind(LinkReplanningMap.class).asEagerSingleton();
-        bind(EarliestLinkExitTimeProvider.class).asEagerSingleton();
-    }
+  @Override
+  public void install() {
+    install(new WithinDayTravelTimeModule());
+    bind(WithinDayEngine.class);
+    bind(Mobsim.class).toProvider(WithinDayQSimFactory.class);
+    bind(FixedOrderSimulationListener.class).asEagerSingleton();
+    bind(WithinDayControlerListener.class).asEagerSingleton();
+    addControlerListenerBinding().to(WithinDayControlerListener.class);
+    bind(MobsimDataProvider.class).asEagerSingleton();
+    bind(ActivityReplanningMap.class).asEagerSingleton();
+    bind(LinkReplanningMap.class).asEagerSingleton();
+    bind(EarliestLinkExitTimeProvider.class).asEagerSingleton();
+  }
 
-    @SuppressWarnings("static-method")
-    @Provides @Named("lowerBound") Map<String, TravelTime> provideEarliestLinkExitTravelTimes(Map<String, TravelTime> travelTimes) {
-        Map<String, TravelTime> earliestLinkExitTravelTimes = new HashMap<>();
-        earliestLinkExitTravelTimes.putAll(travelTimes);
-        earliestLinkExitTravelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
-        return earliestLinkExitTravelTimes;
-    }
+  @SuppressWarnings("static-method")
+  @Provides
+  @Named("lowerBound")
+  Map<String, TravelTime> provideEarliestLinkExitTravelTimes(Map<String, TravelTime> travelTimes) {
+    Map<String, TravelTime> earliestLinkExitTravelTimes = new HashMap<>();
+    earliestLinkExitTravelTimes.putAll(travelTimes);
+    earliestLinkExitTravelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
+    return earliestLinkExitTravelTimes;
+  }
 }

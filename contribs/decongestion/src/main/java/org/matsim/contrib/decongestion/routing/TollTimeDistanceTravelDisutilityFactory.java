@@ -19,38 +19,32 @@
  * *********************************************************************** */
 package org.matsim.contrib.decongestion.routing;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.decongestion.data.DecongestionInfo;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.Inject;
-
-import org.matsim.contrib.decongestion.data.DecongestionInfo;
-
-
 /**
  * @author ikaddoura
- *
  */
 public final class TollTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
-	private static final Logger log = LogManager.getLogger(TollTimeDistanceTravelDisutilityFactory.class);
+  private static final Logger log =
+      LogManager.getLogger(TollTimeDistanceTravelDisutilityFactory.class);
 
-	@Inject
-	private Scenario scenario;
-	
-	@Inject
-	private DecongestionInfo info;
-		
-	public TollTimeDistanceTravelDisutilityFactory() {
-		log.info("Using the toll-adjusted travel disutility factory in the decongestion package.");
-	}
+  @Inject private Scenario scenario;
 
-	@Override
-	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
-		return new TollTimeDistanceTravelDisutility(timeCalculator, scenario.getConfig(), info);
-	}
+  @Inject private DecongestionInfo info;
 
+  public TollTimeDistanceTravelDisutilityFactory() {
+    log.info("Using the toll-adjusted travel disutility factory in the decongestion package.");
+  }
+
+  @Override
+  public final TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
+    return new TollTimeDistanceTravelDisutility(timeCalculator, scenario.getConfig(), info);
+  }
 }

@@ -20,7 +20,6 @@
 package org.matsim.contrib.noise.personLinkMoneyEvents;
 
 import java.util.Stack;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -31,66 +30,63 @@ import org.xml.sax.SAXException;
 
 /**
  * @author ikaddoura
- *
  */
-public class PersonLinkMoneyEventsReader extends MatsimXmlParser{
+public class PersonLinkMoneyEventsReader extends MatsimXmlParser {
 
-	private static final String EVENT = "event";
+  private static final String EVENT = "event";
 
-	private final EventsManager eventsManager;
+  private final EventsManager eventsManager;
 
-	public PersonLinkMoneyEventsReader(EventsManager events) {
-		super(ValidationType.NO_VALIDATION);
-		this.eventsManager = events;
-		setValidating(false);
-	}
+  public PersonLinkMoneyEventsReader(EventsManager events) {
+    super(ValidationType.NO_VALIDATION);
+    this.eventsManager = events;
+    setValidating(false);
+  }
 
-	@Override
-	public void startTag(String name, Attributes atts, Stack<String> context) {
-		if (EVENT.equals(name)) {
-			startEvent(atts);
-		}
-	}
+  @Override
+  public void startTag(String name, Attributes atts, Stack<String> context) {
+    if (EVENT.equals(name)) {
+      startEvent(atts);
+    }
+  }
 
-	@Override
-	public void endTag(String name, String content, Stack<String> context) {
-	}
+  @Override
+  public void endTag(String name, String content, Stack<String> context) {}
 
-	@Override
-	public void characters(char[] ch, int start, int length) throws SAXException {
+  @Override
+  public void characters(char[] ch, int start, int length) throws SAXException {}
 
-	}
+  private void startEvent(final Attributes attributes) {
 
-	private void startEvent(final Attributes attributes){
+    String eventType = attributes.getValue("type");
 
-		String eventType = attributes.getValue("type");
+    if (PersonLinkMoneyEvent.EVENT_TYPE.equals(eventType)) {
+      Double time = 0.0;
+      Id<Person> personId = null;
+      Id<Link> linkId = null;
+      Double amount = 0.0;
+      Double relevantTime = 0.0;
+      String description = "";
 
-		if (PersonLinkMoneyEvent.EVENT_TYPE.equals(eventType)){
-			Double time = 0.0;
-			Id<Person> personId = null;
-			Id<Link> linkId = null;
-			Double amount = 0.0;
-			Double relevantTime = 0.0;
-			String description = "";
-
-			for (int i = 0; i < attributes.getLength(); i++){
-				if (attributes.getQName(i).equals("time")){
-					time = Double.parseDouble(attributes.getValue(i));
-				} else if(attributes.getQName(i).equals("type")){
-					eventType = attributes.getValue(i);
-				} else if(attributes.getQName(i).equals(PersonLinkMoneyEvent.ATTRIBUTE_LINK)){
-					linkId = Id.create((attributes.getValue(i)), Link.class);
-				} else if(attributes.getQName(i).equals(PersonLinkMoneyEvent.ATTRIBUTE_PERSON)){
-					personId = Id.create((attributes.getValue(i)), Person.class);
-				} else if(attributes.getQName(i).equals(PersonLinkMoneyEvent.ATTRIBUTE_AMOUNT)){
-					amount = Double.parseDouble(attributes.getValue(i));
-				} else if(attributes.getQName(i).equals(PersonLinkMoneyEvent.ATTRIBUTE_RELEVANT_TIME)){
-					relevantTime = Double.parseDouble(attributes.getValue(i));
-				} else if(attributes.getQName(i).equals(PersonLinkMoneyEvent.ATTRIBUTE_DESCRIPTION)){
-					description = attributes.getValue(i);
-				}
-			}
-			this.eventsManager.processEvent(new PersonLinkMoneyEvent(time, personId, linkId, amount, relevantTime, description));
-		}
-	}
+      for (int i = 0; i < attributes.getLength(); i++) {
+        if (attributes.getQName(i).equals("time")) {
+          time = Double.parseDouble(attributes.getValue(i));
+        } else if (attributes.getQName(i).equals("type")) {
+          eventType = attributes.getValue(i);
+        } else if (attributes.getQName(i).equals(PersonLinkMoneyEvent.ATTRIBUTE_LINK)) {
+          linkId = Id.create((attributes.getValue(i)), Link.class);
+        } else if (attributes.getQName(i).equals(PersonLinkMoneyEvent.ATTRIBUTE_PERSON)) {
+          personId = Id.create((attributes.getValue(i)), Person.class);
+        } else if (attributes.getQName(i).equals(PersonLinkMoneyEvent.ATTRIBUTE_AMOUNT)) {
+          amount = Double.parseDouble(attributes.getValue(i));
+        } else if (attributes.getQName(i).equals(PersonLinkMoneyEvent.ATTRIBUTE_RELEVANT_TIME)) {
+          relevantTime = Double.parseDouble(attributes.getValue(i));
+        } else if (attributes.getQName(i).equals(PersonLinkMoneyEvent.ATTRIBUTE_DESCRIPTION)) {
+          description = attributes.getValue(i);
+        }
+      }
+      this.eventsManager.processEvent(
+          new PersonLinkMoneyEvent(time, personId, linkId, amount, relevantTime, description));
+    }
+  }
 }

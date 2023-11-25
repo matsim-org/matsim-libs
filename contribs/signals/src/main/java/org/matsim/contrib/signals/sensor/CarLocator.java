@@ -25,85 +25,93 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.lanes.Lane;
 
 /**
- * This class provides methods to check, if a vehicle is approximately in a certain distance from a link's end.
- * 
- * Note: Each instance of this class is valid for only one specific distance.
- * 
+ * This class provides methods to check, if a vehicle is approximately in a certain distance from a
+ * link's end.
+ *
+ * <p>Note: Each instance of this class is valid for only one specific distance.
+ *
  * @author droeder
  * @author dgrether
- *
  */
 final class CarLocator {
-	
-	/** time when the vehicle will be at the given distance in front of the links to node */
-	private double earliestTimeInDistance;
-	
-	private static final Logger log = LogManager.getLogger(CarLocator.class);
 
-	public CarLocator(Link link, double enterTime, double distance){
-		double dist = this.checkDistance(link.getLength(), distance);
-		this.calculateEarliestTimeInDistance(enterTime, dist, link);
-	}
+  /** time when the vehicle will be at the given distance in front of the links to node */
+  private double earliestTimeInDistance;
 
-	public CarLocator( Lane lane, Link link, double enterTime, double distance){
-		double dist = this.checkDistance(lane.getStartsAtMeterFromLinkEnd(), distance);
-		this.calculateEarliestTimeInDistance(enterTime, dist, link, lane);
-	}
+  private static final Logger log = LogManager.getLogger(CarLocator.class);
 
-	public void setEarliestTimeInDistance(double time){
-		this.earliestTimeInDistance = time;
-	}
+  public CarLocator(Link link, double enterTime, double distance) {
+    double dist = this.checkDistance(link.getLength(), distance);
+    this.calculateEarliestTimeInDistance(enterTime, dist, link);
+  }
 
-	public double getEarliestTimeInDistance(){
-		return this.earliestTimeInDistance;
-	}
-	
-	/**
-	 * Checks whether the car is in the specific distance (given in the controller) from a links end at the given time.
-	 * 
-	 * @param time
-	 * @return true, if the position of the car on the link at the given time is within the specific distance from its end. false, if it is further afar.
-	 */
-	public boolean isCarinDistance(double time){
-		if ((this.earliestTimeInDistance < time)){
-			return true;
-		}
-		return false;
-	}
+  public CarLocator(Lane lane, Link link, double enterTime, double distance) {
+    double dist = this.checkDistance(lane.getStartsAtMeterFromLinkEnd(), distance);
+    this.calculateEarliestTimeInDistance(enterTime, dist, link, lane);
+  }
 
-	private void calculateEarliestTimeInDistance (double enterTime, double dist, Link link){
-		this.earliestTimeInDistance = enterTime + ((link.getLength() - dist) / link.getFreespeed(enterTime));
-//		log.debug("link " + link.getId() + " enterTime: " + enterTime + " earliest time " + this.earliestTimeInDistance +  " distance " + d);
-	}
+  public void setEarliestTimeInDistance(double time) {
+    this.earliestTimeInDistance = time;
+  }
 
-	private void calculateEarliestTimeInDistance (double enterTime, double dist, Link link, Lane lane){
-		this.earliestTimeInDistance = enterTime + ((lane.getStartsAtMeterFromLinkEnd() - dist) / link.getFreespeed(enterTime));
-//		log.debug("link " + link.getId() + " enterTime: " + enterTime + " earliest time " + this.earliestTimeInDistance +  " distance " + d);
-	}
-	
-	/**
-	 * Checks whether the given distance is within the link length.
-	 * 
-	 * @return the minimum of given distance and link length.
-	 */
-	private double checkDistance(double length, double distance) {
-		if (length < distance){
-			log.warn("distance to measure " + distance + " m was longer than link / lane " + length
-					 + " m . using link/lane length as distance");
-			return length;
-		}
-		return distance;
-//		if (this.link instanceof QLinkLanesImpl){
-//			for (QLane ql : ((QLinkLanesImpl)link).getQueueLanes()){
-//				if(!((ql.equals(((QLinkLanesImpl)link).getOriginalLane()))) && (ql.getLength()>this.d)){
-//					this.d = ql.getLength();
-//					log.info("d was shorter than lane. Set to " + this.d);
-//					break;
-//				}
-//			}
-//		}
-	}
-	
-	
+  public double getEarliestTimeInDistance() {
+    return this.earliestTimeInDistance;
+  }
 
+  /**
+   * Checks whether the car is in the specific distance (given in the controller) from a links end
+   * at the given time.
+   *
+   * @param time
+   * @return true, if the position of the car on the link at the given time is within the specific
+   *     distance from its end. false, if it is further afar.
+   */
+  public boolean isCarinDistance(double time) {
+    if ((this.earliestTimeInDistance < time)) {
+      return true;
+    }
+    return false;
+  }
+
+  private void calculateEarliestTimeInDistance(double enterTime, double dist, Link link) {
+    this.earliestTimeInDistance =
+        enterTime + ((link.getLength() - dist) / link.getFreespeed(enterTime));
+    //		log.debug("link " + link.getId() + " enterTime: " + enterTime + " earliest time " +
+    // this.earliestTimeInDistance +  " distance " + d);
+  }
+
+  private void calculateEarliestTimeInDistance(
+      double enterTime, double dist, Link link, Lane lane) {
+    this.earliestTimeInDistance =
+        enterTime + ((lane.getStartsAtMeterFromLinkEnd() - dist) / link.getFreespeed(enterTime));
+    //		log.debug("link " + link.getId() + " enterTime: " + enterTime + " earliest time " +
+    // this.earliestTimeInDistance +  " distance " + d);
+  }
+
+  /**
+   * Checks whether the given distance is within the link length.
+   *
+   * @return the minimum of given distance and link length.
+   */
+  private double checkDistance(double length, double distance) {
+    if (length < distance) {
+      log.warn(
+          "distance to measure "
+              + distance
+              + " m was longer than link / lane "
+              + length
+              + " m . using link/lane length as distance");
+      return length;
+    }
+    return distance;
+    //		if (this.link instanceof QLinkLanesImpl){
+    //			for (QLane ql : ((QLinkLanesImpl)link).getQueueLanes()){
+    //				if(!((ql.equals(((QLinkLanesImpl)link).getOriginalLane()))) && (ql.getLength()>this.d)){
+    //					this.d = ql.getLength();
+    //					log.info("d was shorter than lane. Set to " + this.d);
+    //					break;
+    //				}
+    //			}
+    //		}
+  }
 }

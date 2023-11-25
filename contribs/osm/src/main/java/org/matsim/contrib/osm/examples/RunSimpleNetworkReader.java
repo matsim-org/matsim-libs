@@ -8,18 +8,19 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 public class RunSimpleNetworkReader {
 
-	private static final String inputFile = "/path/to/your/file.osm.pbf";
-	private static final String outputFile = "/path/to/your/matsim-network.xml.gz";
-	private static final CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
+  private static final String inputFile = "/path/to/your/file.osm.pbf";
+  private static final String outputFile = "/path/to/your/matsim-network.xml.gz";
+  private static final CoordinateTransformation coordinateTransformation =
+      TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
 
-	public static void main(String[] args) {
+  public static void main(String[] args) {
 
-		Network network = new SupersonicOsmNetworkReader.Builder()
-				.setCoordinateTransformation(coordinateTransformation)
-				.build()
-				.read(inputFile);
+    Network network =
+        new SupersonicOsmNetworkReader.Builder()
+            .setCoordinateTransformation(coordinateTransformation)
+            .build()
+            .read(inputFile);
 
-		new NetworkWriter(network).write(outputFile);
-	}
-
+    new NetworkWriter(network).write(outputFile);
+  }
 }

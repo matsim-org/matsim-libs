@@ -21,130 +21,134 @@
 package org.matsim.core.config.groups;
 
 import java.util.Map;
-
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author nagel
- *
  */
 public final class EventsManagerConfigGroup extends ReflectiveConfigGroup {
 
-	public static final String GROUP_NAME = "eventsManager";
+  public static final String GROUP_NAME = "eventsManager";
 
-	private final static String NUMBER_OF_THREADS = "numberOfThreads";
-	private Integer numberOfThreads = null;
-	public final static String NUMBER_OF_THREADS_COMMENT = "Number of threads for parallel events handler. _null_ means the framework decides by itself. 0 is currently not possible.";
+  private static final String NUMBER_OF_THREADS = "numberOfThreads";
+  private Integer numberOfThreads = null;
+  public static final String NUMBER_OF_THREADS_COMMENT =
+      "Number of threads for parallel events handler. _null_ means the framework decides by itself. 0 is currently not possible.";
 
-	private final static String ESTIMATED_NUMBER_OF_EVENTS = "estimatedNumberOfEvents";
-	private Long estimatedNumberOfEvents = null;
+  private static final String ESTIMATED_NUMBER_OF_EVENTS = "estimatedNumberOfEvents";
+  private Long estimatedNumberOfEvents = null;
 
-	private final static String SYNCHRONIZE_ON_SIMSTEPS = "synchronizeOnSimSteps";
-	private Boolean synchronizeOnSimSteps = true;
+  private static final String SYNCHRONIZE_ON_SIMSTEPS = "synchronizeOnSimSteps";
+  private Boolean synchronizeOnSimSteps = true;
 
-	private final static String ONE_THREAD_PER_HANDLER = "oneThreadPerHandler";
-	private Boolean oneThreadPerHandler = false;
+  private static final String ONE_THREAD_PER_HANDLER = "oneThreadPerHandler";
+  private Boolean oneThreadPerHandler = false;
 
-	private final static String EVENTS_QUEUE_SIZE = "eventsQueueSize";
-	private final static String EVENTS_QUEUE_SIZE_COMMENT = "Size of the events Queue. Increase for very large scenarios";
-	private int eventsQueueSize = 65536 * 2 ;
+  private static final String EVENTS_QUEUE_SIZE = "eventsQueueSize";
+  private static final String EVENTS_QUEUE_SIZE_COMMENT =
+      "Size of the events Queue. Increase for very large scenarios";
+  private int eventsQueueSize = 65536 * 2;
 
+  private boolean locked = false;
 
+  public EventsManagerConfigGroup() {
+    super(GROUP_NAME);
+  }
 
-	private boolean locked = false;
+  @Override
+  public Map<String, String> getComments() {
+    Map<String, String> comments = super.getComments();
+    comments.put(NUMBER_OF_THREADS, NUMBER_OF_THREADS_COMMENT);
+    comments.put(
+        ESTIMATED_NUMBER_OF_EVENTS,
+        "Estimated number of events during mobsim run. An optional optimization hint for the framework.");
+    comments.put(
+        SYNCHRONIZE_ON_SIMSTEPS,
+        "If enabled, it is ensured that all events that are created during a time step of the mobility simulation are processed "
+            + "before the next time step is simulated. E.g. neccessary when within-day replanning is used.");
+    comments.put(
+        ONE_THREAD_PER_HANDLER,
+        "If enabled, each event handler is assigned to its own thread. Note that enabling this feature disabled the "
+            + NUMBER_OF_THREADS
+            + " option! "
+            + "This feature is still experimental!");
+    comments.put(EVENTS_QUEUE_SIZE, EVENTS_QUEUE_SIZE_COMMENT);
+    return comments;
+  }
 
-	public EventsManagerConfigGroup() {
-		super(GROUP_NAME);
-	}
+  /** {@value #NUMBER_OF_THREADS_COMMENT} */
+  @StringGetter(NUMBER_OF_THREADS)
+  public Integer getNumberOfThreads() {
+    return numberOfThreads;
+  }
 
-	@Override
-	public Map<String, String> getComments() {
-		Map<String, String> comments = super.getComments();
-		comments.put(NUMBER_OF_THREADS, NUMBER_OF_THREADS_COMMENT);
-		comments.put(ESTIMATED_NUMBER_OF_EVENTS, "Estimated number of events during mobsim run. An optional optimization hint for the framework.");
-		comments.put(SYNCHRONIZE_ON_SIMSTEPS, "If enabled, it is ensured that all events that are created during a time step of the mobility simulation are processed "
-				+ "before the next time step is simulated. E.g. neccessary when within-day replanning is used.");
-		comments.put(ONE_THREAD_PER_HANDLER, "If enabled, each event handler is assigned to its own thread. Note that enabling this feature disabled the " + NUMBER_OF_THREADS + " option! "
-				+ "This feature is still experimental!");
-		comments.put(EVENTS_QUEUE_SIZE,EVENTS_QUEUE_SIZE_COMMENT);
-		return comments;
-	}
+  /**
+   * {@value #NUMBER_OF_THREADS_COMMENT}
+   *
+   * @param numberOfThreads
+   */
+  @StringSetter(NUMBER_OF_THREADS)
+  public void setNumberOfThreads(Integer numberOfThreads) {
+    if (!this.locked) {
+      this.numberOfThreads = numberOfThreads;
+    } else {
+      throw new RuntimeException("it is too late in the control flow to modify this parameter");
+    }
+  }
 
-	/**
-	 * {@value #NUMBER_OF_THREADS_COMMENT}
-	 */
-	@StringGetter( NUMBER_OF_THREADS )
-	public Integer getNumberOfThreads() {
-		return numberOfThreads;
-	}
+  @StringGetter(ESTIMATED_NUMBER_OF_EVENTS)
+  public Long getEstimatedNumberOfEvents() {
+    return estimatedNumberOfEvents;
+  }
 
-	/**
-	 * {@value #NUMBER_OF_THREADS_COMMENT}
-	 *
-	 * @param numberOfThreads
-	 */
-	@StringSetter( NUMBER_OF_THREADS )
-	public void setNumberOfThreads(Integer numberOfThreads) {
-		if ( !this.locked ) {
-			this.numberOfThreads = numberOfThreads;
-		} else {
-			throw new RuntimeException("it is too late in the control flow to modify this parameter");
-		}
-	}
+  @StringSetter(ESTIMATED_NUMBER_OF_EVENTS)
+  public void setEstimatedNumberOfEvents(Long estimatedNumberOfEvents) {
+    if (!this.locked) {
+      this.estimatedNumberOfEvents = estimatedNumberOfEvents;
+    } else {
+      throw new RuntimeException("it is too late in the control flow to modify this parameter");
+    }
+  }
 
-	@StringGetter( ESTIMATED_NUMBER_OF_EVENTS )
-	public Long getEstimatedNumberOfEvents() {
-		return estimatedNumberOfEvents;
-	}
+  @StringSetter(EVENTS_QUEUE_SIZE)
+  public void setEventsQueueSize(int eventsQueueSize) {
+    this.eventsQueueSize = eventsQueueSize;
+  }
 
-	@StringSetter( ESTIMATED_NUMBER_OF_EVENTS )
-	public void setEstimatedNumberOfEvents(Long estimatedNumberOfEvents) {
-		if ( !this.locked ) {
-			this.estimatedNumberOfEvents = estimatedNumberOfEvents;
-		} else {
-			throw new RuntimeException("it is too late in the control flow to modify this parameter");
-		}
-	}
+  @StringGetter(EVENTS_QUEUE_SIZE)
+  public int getEventsQueueSize() {
+    return eventsQueueSize;
+  }
 
-	@StringSetter(EVENTS_QUEUE_SIZE)
-	public void setEventsQueueSize(int eventsQueueSize) {
-		this.eventsQueueSize = eventsQueueSize;
-	}
+  @StringGetter(SYNCHRONIZE_ON_SIMSTEPS)
+  public Boolean getSynchronizeOnSimSteps() {
+    return this.synchronizeOnSimSteps;
+  }
 
-	@StringGetter(EVENTS_QUEUE_SIZE)
-	public int getEventsQueueSize() {
-		return eventsQueueSize;
-	}
+  @StringSetter(SYNCHRONIZE_ON_SIMSTEPS)
+  public void setSynchronizeOnSimSteps(Boolean synchronizeOnSimSteps) {
+    if (!this.locked) {
+      this.synchronizeOnSimSteps = synchronizeOnSimSteps;
+    } else {
+      throw new RuntimeException("it is too late in the control flow to modify this parameter");
+    }
+  }
 
-	@StringGetter( SYNCHRONIZE_ON_SIMSTEPS )
-	public Boolean getSynchronizeOnSimSteps() {
-		return this.synchronizeOnSimSteps;
-	}
+  @StringGetter(ONE_THREAD_PER_HANDLER)
+  public Boolean getOneThreadPerHandler() {
+    return this.oneThreadPerHandler;
+  }
 
-	@StringSetter( SYNCHRONIZE_ON_SIMSTEPS )
-	public void setSynchronizeOnSimSteps(Boolean synchronizeOnSimSteps) {
-		if ( !this.locked ) {
-			this.synchronizeOnSimSteps = synchronizeOnSimSteps;
-		} else {
-			throw new RuntimeException("it is too late in the control flow to modify this parameter");
-		}
-	}
+  @StringSetter(ONE_THREAD_PER_HANDLER)
+  public void setOneThreadPerHandler(Boolean oneThreadPerHandler) {
+    if (!this.locked) {
+      this.oneThreadPerHandler = oneThreadPerHandler;
+    } else {
+      throw new RuntimeException("it is too late in the control flow to modify this parameter");
+    }
+  }
 
-	@StringGetter( ONE_THREAD_PER_HANDLER )
-	public Boolean getOneThreadPerHandler() {
-		return this.oneThreadPerHandler;
-	}
-
-	@StringSetter( ONE_THREAD_PER_HANDLER )
-	public void setOneThreadPerHandler(Boolean oneThreadPerHandler) {
-		if ( !this.locked ) {
-			this.oneThreadPerHandler = oneThreadPerHandler;
-		} else {
-			throw new RuntimeException("it is too late in the control flow to modify this parameter");
-		}
-	}
-
-	public void makeLocked() {
-		this.locked = true;
-	}
+  public void makeLocked() {
+    this.locked = true;
+  }
 }

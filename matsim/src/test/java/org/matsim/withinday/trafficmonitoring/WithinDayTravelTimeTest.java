@@ -55,190 +55,218 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class WithinDayTravelTimeTest {
 
-	@Rule
-	public MatsimTestUtils helper = new MatsimTestUtils();
+  @Rule public MatsimTestUtils helper = new MatsimTestUtils();
 
-	private Link link22;
-	private double originalFreeSpeed22;
+  private Link link22;
+  private double originalFreeSpeed22;
 
-	@Test
-	public void testGetLinkTravelTime_fastCapacityUpdate() {
-		testGetLinkTravelTime(true);
-	}
+  @Test
+  public void testGetLinkTravelTime_fastCapacityUpdate() {
+    testGetLinkTravelTime(true);
+  }
 
-	@Test
-	public void testGetLinkTravelTime_noFastCapacityUpdate() {
-		testGetLinkTravelTime(false);
-	}
+  @Test
+  public void testGetLinkTravelTime_noFastCapacityUpdate() {
+    testGetLinkTravelTime(false);
+  }
 
+  private void testGetLinkTravelTime(boolean isUsingFastCapacityUpdate) {
 
-	private void testGetLinkTravelTime(boolean isUsingFastCapacityUpdate) {
+    Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
+    config
+        .controller()
+        .setOutputDirectory(
+            helper.getOutputDirectory() + "fastCapacityUpdate_" + isUsingFastCapacityUpdate);
 
-        Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
-		config.controller().setOutputDirectory(helper.getOutputDirectory()+"fastCapacityUpdate_"+isUsingFastCapacityUpdate);
+    QSimConfigGroup qSimConfig = config.qsim();
+    qSimConfig.setNumberOfThreads(2);
+    qSimConfig.setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
-		QSimConfigGroup qSimConfig = config.qsim();
-		qSimConfig.setNumberOfThreads(2);
-		qSimConfig.setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
+    config.controller().setLastIteration(0);
 
-		config.controller().setLastIteration(0);
+    config.controller().setCreateGraphs(false);
+    config.controller().setDumpDataAtEnd(false);
+    config.controller().setWriteEventsInterval(0);
+    config.controller().setWritePlansInterval(0);
 
-		config.controller().setCreateGraphs(false);
-		config.controller().setDumpDataAtEnd(false);
-		config.controller().setWriteEventsInterval(0);
-		config.controller().setWritePlansInterval(0);
+    config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+    config
+        .controller()
+        .setRoutingAlgorithmType(ControllerConfigGroup.RoutingAlgorithmType.Dijkstra);
 
-		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
+    config.network().setTimeVariantNetwork(true);
 
-		config.network().setTimeVariantNetwork(true);
+    // ---
 
-		// ---
+    final Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
+    // ---
 
-		// ---
+    // I in particular want to test if change events from before simulation start
+    // are picked up (which they originally were not).  kai, dec'17
+    Network network = scenario.getNetwork();
 
-		// I in particular want to test if change events from before simulation start
-		// are picked up (which they originally were not).  kai, dec'17
-		Network network = scenario.getNetwork() ;
+    link22 = network.getLinks().get(Id.createLinkId(22));
+    originalFreeSpeed22 = link22.getFreespeed();
+    Gbl.assertNotNull(link22);
+    {
+      NetworkChangeEvent event = new NetworkChangeEvent(5. * 3600.);
+      ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 0.);
+      event.setFreespeedChange(freespeedChange);
+      NetworkUtils.addNetworkChangeEvent(network, event);
+      event.addLink(link22);
+    }
+    {
+      NetworkChangeEvent event = new NetworkChangeEvent(6. * 3600.);
+      ChangeValue freespeedChange =
+          new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, originalFreeSpeed22);
+      event.setFreespeedChange(freespeedChange);
+      NetworkUtils.addNetworkChangeEvent(network, event);
+      event.addLink(link22);
+    }
 
-		link22 = network.getLinks().get(Id.createLinkId(22));
-		originalFreeSpeed22 = link22.getFreespeed() ;
-		Gbl.assertNotNull(link22);
-		{
-			NetworkChangeEvent event = new NetworkChangeEvent(5. * 3600.);
-			ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 0.);
-			event.setFreespeedChange(freespeedChange);
-			NetworkUtils.addNetworkChangeEvent(network, event);
-			event.addLink(link22);
-		}
-		{
-			NetworkChangeEvent event = new NetworkChangeEvent(6. * 3600.);
-			ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, originalFreeSpeed22);
-			event.setFreespeedChange(freespeedChange);
-			NetworkUtils.addNetworkChangeEvent(network, event);
-			event.addLink(link22);
-		}
+    final WithinDayTravelTime travelTime = new WithinDayTravelTime(scenario, null);
+    final MobsimListener listener = new MobsimListenerForTests(scenario, travelTime);
+    final FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
+    fosl.addSimulationListener(travelTime);
+    fosl.addSimulationListener(listener);
 
-		final WithinDayTravelTime travelTime = new WithinDayTravelTime(scenario, null);
-		final MobsimListener listener = new MobsimListenerForTests(scenario, travelTime);
-		final FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
-		fosl.addSimulationListener(travelTime);
-		fosl.addSimulationListener(listener);
+    Controler controler = new Controler(scenario);
+    controler.getEvents().addHandler(travelTime);
+    controler.addControlerListener(
+        new StartupListener() {
+          @Override
+          public void notifyStartup(StartupEvent event) {
+            double t1 = 0.0;
+            double t2 = 8.0;
+            double t3 = 18.0;
 
-		Controler controler = new Controler(scenario);
-		controler.getEvents().addHandler(travelTime);
-		controler.addControlerListener(new StartupListener() {
-			@Override
-			public void notifyStartup(StartupEvent event) {
-				double t1 = 0.0;
-				double t2 = 8.0;
-				double t3 = 18.0;
+            Id<Link> id = Id.create("6", Link.class);
+            Link link = scenario.getNetwork().getLinks().get(id);
+            link.setCapacity(500.0); // reduce capacity
 
-				Id<Link> id = Id.create("6", Link.class);
-				Link link = scenario.getNetwork().getLinks().get(id);
-				link.setCapacity(500.0);	// reduce capacity
+            // check free speed travel times - they should not be initialized yet
+            assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t1, null, null), 0);
+            assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t2, null, null), 0);
+            assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t3, null, null), 0);
+          }
+        });
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            addMobsimListenerBinding().toInstance(fosl);
+          }
+        });
 
-				// check free speed travel times - they should not be initialized yet
-				assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t1, null, null), 0);
-				assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t2, null, null), 0);
-				assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t3, null, null), 0);
-			}
-		});
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addMobsimListenerBinding().toInstance(fosl);
-			}
-		});
+    controler.run();
+  }
 
-		controler.run();
-	}
+  /**
+   * Check travel times before and after a time step.
+   *
+   * @author cdobler
+   */
+  private class MobsimListenerForTests
+      implements MobsimInitializedListener,
+          MobsimBeforeSimStepListener,
+          MobsimAfterSimStepListener {
 
-	/**
-	 * Check travel times before and after a time step.
-	 *
-	 * @author cdobler
-	 */
-	private class MobsimListenerForTests implements MobsimInitializedListener, MobsimBeforeSimStepListener,
-		MobsimAfterSimStepListener {
+    private TravelTime travelTime;
+    private final Link link;
+    private boolean isUsingFastCapacityUpdate;
+    private int t1 = 6 * 3600;
+    private int t2 = 6 * 3600 + 5 * 60;
+    private int t3 = 6 * 3600 + 10 * 60;
+    private int t4 = 6 * 3600 + 15 * 60;
+    private int t5 = 6 * 3600 + 20 * 60;
+    private int t6 = 6 * 3600 + 30 * 60;
+    private int t7 = 6 * 3600 + 45 * 60;
+    private int t8 = 7 * 3600;
 
-		private TravelTime travelTime;
-		private final Link link ;
-		private boolean isUsingFastCapacityUpdate;
-		private int t1 = 6*3600;
-		private int t2 = 6*3600 + 5*60;
-		private int t3 = 6*3600 + 10*60;
-		private int t4 = 6*3600 + 15*60;
-		private int t5 = 6*3600 + 20*60;
-		private int t6 = 6*3600 + 30*60;
-		private int t7 = 6*3600 + 45*60;
-		private int t8 = 7*3600;
+    public MobsimListenerForTests(Scenario scenario, TravelTime travelTime) {
+      this.travelTime = travelTime;
+      this.isUsingFastCapacityUpdate = scenario.getConfig().qsim().isUsingFastCapacityUpdate();
+      Id<Link> id = Id.create("6", Link.class);
+      link = scenario.getNetwork().getLinks().get(id);
+    }
 
-		public MobsimListenerForTests(Scenario scenario, TravelTime travelTime) {
-			this.travelTime = travelTime;
-			this.isUsingFastCapacityUpdate = scenario.getConfig().qsim().isUsingFastCapacityUpdate();
-			Id<Link> id = Id.create("6", Link.class);
-			link = scenario.getNetwork().getLinks().get(id);
-		}
+    @Override
+    public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+      // check free speed travel times - they should be initialized now
+      assertEquals(
+          link.getLength() / link.getFreespeed(t1),
+          travelTime.getLinkTravelTime(link, t1, null, null),
+          0);
+      assertEquals(
+          link.getLength() / link.getFreespeed(t2),
+          travelTime.getLinkTravelTime(link, t2, null, null),
+          0);
+      assertEquals(
+          link.getLength() / link.getFreespeed(t3),
+          travelTime.getLinkTravelTime(link, t3, null, null),
+          0);
+      assertEquals(
+          link.getLength() / link.getFreespeed(t4),
+          travelTime.getLinkTravelTime(link, t4, null, null),
+          0);
+      assertEquals(
+          link.getLength() / link.getFreespeed(t5),
+          travelTime.getLinkTravelTime(link, t5, null, null),
+          0);
+      assertEquals(
+          link.getLength() / link.getFreespeed(t6),
+          travelTime.getLinkTravelTime(link, t6, null, null),
+          0);
+      assertEquals(
+          link.getLength() / link.getFreespeed(t7),
+          travelTime.getLinkTravelTime(link, t7, null, null),
+          0);
+      assertEquals(
+          link.getLength() / link.getFreespeed(t8),
+          travelTime.getLinkTravelTime(link, t8, null, null),
+          0);
+    }
 
-		@Override
-		public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-			// check free speed travel times - they should be initialized now
-			assertEquals(link.getLength()/link.getFreespeed(t1),
-					travelTime.getLinkTravelTime(link, t1, null, null), 0);
-			assertEquals(link.getLength()/link.getFreespeed(t2),
-					travelTime.getLinkTravelTime(link, t2, null, null), 0);
-			assertEquals(link.getLength()/link.getFreespeed(t3),
-					travelTime.getLinkTravelTime(link, t3, null, null), 0);
-			assertEquals(link.getLength()/link.getFreespeed(t4),
-					travelTime.getLinkTravelTime(link, t4, null, null), 0);
-			assertEquals(link.getLength()/link.getFreespeed(t5),
-					travelTime.getLinkTravelTime(link, t5, null, null), 0);
-			assertEquals(link.getLength()/link.getFreespeed(t6),
-					travelTime.getLinkTravelTime(link, t6, null, null), 0);
-			assertEquals(link.getLength()/link.getFreespeed(t7),
-					travelTime.getLinkTravelTime(link, t7, null, null), 0);
-			assertEquals(link.getLength()/link.getFreespeed(t8),
-					travelTime.getLinkTravelTime(link, t8, null, null), 0);
-		}
+    @Override
+    public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
+      checkLinkTravelTimes(e.getSimulationTime());
+    }
 
-		@Override
-		public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
-		    checkLinkTravelTimes(e.getSimulationTime());
-		}
+    @Override
+    public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
+      checkLinkTravelTimes(e.getSimulationTime());
+    }
 
-		@Override
-		public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
-            checkLinkTravelTimes(e.getSimulationTime());
-		}
-
-		private void checkLinkTravelTimes(double time) {
-	        if (time == t1) {
-				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t1, null, null), 0);
-			} else if (time == t2) {
-				assertEquals(360.0, travelTime.getLinkTravelTime(link, t2, null, null), 0);
-			} else if (time == t3) {
-				assertEquals(467.6756756756757, travelTime.getLinkTravelTime(link, t3, null, null), 0);
-			} else if (time == t4) {
-				assertEquals(612.6282051282051, travelTime.getLinkTravelTime(link, t4, null, null), 0);
-			} else if (time == t5) {
-				assertEquals(690.62, travelTime.getLinkTravelTime(link, t5, null, null), 0);
-			} else if (time == t6) {
-				assertEquals(690.62, travelTime.getLinkTravelTime(link, t6, null, null), 0);
-			} else if (time == t7) {
-				assertEquals(967.1363636363636, travelTime.getLinkTravelTime(link, t7, null, null), 0);
-			} else if (time == t8) {
-				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t8, null, null), 0);
-			}
-	        if ( time== 6*3600-1 ) {
-				assertEquals(Double.POSITIVE_INFINITY,
-						travelTime.getLinkTravelTime(link22,6*3600-1, null, null ), 0);
-			} else if ( time==6*3600+1 ) {
-				assertEquals(link22.getLength()/originalFreeSpeed22,
-						travelTime.getLinkTravelTime(link22, 6 * 3600 - 1, null, null), 0);
-			}
-	    }
-	}
+    private void checkLinkTravelTimes(double time) {
+      if (time == t1) {
+        assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t1, null, null), 0);
+      } else if (time == t2) {
+        assertEquals(360.0, travelTime.getLinkTravelTime(link, t2, null, null), 0);
+      } else if (time == t3) {
+        assertEquals(467.6756756756757, travelTime.getLinkTravelTime(link, t3, null, null), 0);
+      } else if (time == t4) {
+        assertEquals(612.6282051282051, travelTime.getLinkTravelTime(link, t4, null, null), 0);
+      } else if (time == t5) {
+        assertEquals(690.62, travelTime.getLinkTravelTime(link, t5, null, null), 0);
+      } else if (time == t6) {
+        assertEquals(690.62, travelTime.getLinkTravelTime(link, t6, null, null), 0);
+      } else if (time == t7) {
+        assertEquals(967.1363636363636, travelTime.getLinkTravelTime(link, t7, null, null), 0);
+      } else if (time == t8) {
+        assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t8, null, null), 0);
+      }
+      if (time == 6 * 3600 - 1) {
+        assertEquals(
+            Double.POSITIVE_INFINITY,
+            travelTime.getLinkTravelTime(link22, 6 * 3600 - 1, null, null),
+            0);
+      } else if (time == 6 * 3600 + 1) {
+        assertEquals(
+            link22.getLength() / originalFreeSpeed22,
+            travelTime.getLinkTravelTime(link22, 6 * 3600 - 1, null, null),
+            0);
+      }
+    }
+  }
 }

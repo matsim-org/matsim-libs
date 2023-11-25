@@ -19,35 +19,34 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.router;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
-
-import com.google.inject.Inject;
 
 /**
  * @author thibautd
  */
 public class JointPlanRouterFactory implements PlanRoutingAlgorithmFactory {
-	private final ActivityFacilities facilities;
-	private final TimeInterpretation timeInterpretation;
+  private final ActivityFacilities facilities;
+  private final TimeInterpretation timeInterpretation;
 
-	@Inject
-	public JointPlanRouterFactory(final Scenario sc, final TimeInterpretation timeInterpretation) {
-		this( sc.getActivityFacilities(), timeInterpretation );
-	}
+  @Inject
+  public JointPlanRouterFactory(final Scenario sc, final TimeInterpretation timeInterpretation) {
+    this(sc.getActivityFacilities(), timeInterpretation);
+  }
 
-	public JointPlanRouterFactory(final ActivityFacilities facilities, TimeInterpretation timeInterpretation) {
-		this.facilities = facilities;
-		this.timeInterpretation = timeInterpretation;
-	}
+  public JointPlanRouterFactory(
+      final ActivityFacilities facilities, TimeInterpretation timeInterpretation) {
+    this.facilities = facilities;
+    this.timeInterpretation = timeInterpretation;
+  }
 
-	@Override
-	public PlanAlgorithm createPlanRoutingAlgorithm(final TripRouter tripRouter) {
-		return new JointPlanRouter( tripRouter , facilities, timeInterpretation );
-	}
+  @Override
+  public PlanAlgorithm createPlanRoutingAlgorithm(final TripRouter tripRouter) {
+    return new JointPlanRouter(tripRouter, facilities, timeInterpretation);
+  }
 }
-

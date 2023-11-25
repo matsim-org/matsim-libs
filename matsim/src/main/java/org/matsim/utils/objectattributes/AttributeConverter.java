@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * AttributeConverter.java
@@ -19,18 +18,16 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.utils.objectattributes;
+package org.matsim.utils.objectattributes;
 
 /**
- * Converts an attribute to a String (for being written out) or from a String
- * (after being read in).
+ * Converts an attribute to a String (for being written out) or from a String (after being read in).
  *
  * @author mrieser
  */
 public interface AttributeConverter<T> {
 
-	public T convert(final String value);
+  public T convert(final String value);
 
-	public String convertToString(final Object o);
-
+  public String convertToString(final Object o);
 }

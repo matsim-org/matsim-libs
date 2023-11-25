@@ -19,6 +19,10 @@
 
 package org.matsim.contrib.ev.stats;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.contrib.common.timeprofile.TimeProfileCharts.ChartType;
 import org.matsim.contrib.common.timeprofile.TimeProfileCollector;
 import org.matsim.contrib.common.timeprofile.TimeProfileCollector.ProfileCalculator;
@@ -29,49 +33,55 @@ import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+public final class ChargerOccupancyTimeProfileCollectorProvider
+    implements Provider<MobsimListener> {
+  private final ChargingInfrastructure chargingInfrastructure;
+  private final MatsimServices matsimServices;
 
-public final class ChargerOccupancyTimeProfileCollectorProvider implements Provider<MobsimListener> {
-	private final ChargingInfrastructure chargingInfrastructure;
-	private final MatsimServices matsimServices;
+  @Inject
+  ChargerOccupancyTimeProfileCollectorProvider(
+      ChargingInfrastructure chargingInfrastructure, MatsimServices matsimServices) {
+    this.chargingInfrastructure = chargingInfrastructure;
+    this.matsimServices = matsimServices;
+  }
 
-	@Inject
-	ChargerOccupancyTimeProfileCollectorProvider(ChargingInfrastructure chargingInfrastructure, MatsimServices matsimServices) {
-		this.chargingInfrastructure = chargingInfrastructure;
-		this.matsimServices = matsimServices;
-	}
+  @Override
+  public MobsimListener get() {
+    final String PLUGGED_ID = "plugged";
+    final String QUEUED_ID = "queued";
+    final String ASSIGNED_ID = "assigned";
 
-	@Override
-	public MobsimListener get() {
-		final String PLUGGED_ID = "plugged";
-		final String QUEUED_ID = "queued";
-		final String ASSIGNED_ID = "assigned";
+    var header = ImmutableList.of(PLUGGED_ID, QUEUED_ID, ASSIGNED_ID);
+    ProfileCalculator calc =
+        () -> {
+          int plugged = 0;
+          int queued = 0;
+          int assigned = 0;
+          for (Charger c : chargingInfrastructure.getChargers().values()) {
+            ChargingLogic logic = c.getLogic();
+            plugged += logic.getPluggedVehicles().size();
+            queued += logic.getQueuedVehicles().size();
+            if (logic instanceof ChargingWithAssignmentLogic) {
+              assigned += ((ChargingWithAssignmentLogic) logic).getAssignedVehicles().size();
+            }
+          }
+          return ImmutableMap.of(
+              PLUGGED_ID,
+              (double) plugged,
+              QUEUED_ID,
+              (double) queued,
+              ASSIGNED_ID,
+              (double) assigned);
+        };
 
-		var header = ImmutableList.of(PLUGGED_ID, QUEUED_ID, ASSIGNED_ID);
-		ProfileCalculator calc = () -> {
-			int plugged = 0;
-			int queued = 0;
-			int assigned = 0;
-			for (Charger c : chargingInfrastructure.getChargers().values()) {
-				ChargingLogic logic = c.getLogic();
-				plugged += logic.getPluggedVehicles().size();
-				queued += logic.getQueuedVehicles().size();
-				if (logic instanceof ChargingWithAssignmentLogic) {
-					assigned += ((ChargingWithAssignmentLogic)logic).getAssignedVehicles().size();
-				}
-			}
-			return ImmutableMap.of(PLUGGED_ID, (double)plugged, QUEUED_ID, (double)queued, ASSIGNED_ID, (double)assigned);
-		};
-
-		var collector = new TimeProfileCollector(header, calc, 300, "charger_occupancy_time_profiles", matsimServices);
-		if (matsimServices.getConfig().controller().isCreateGraphs()) {
-			collector.setChartTypes(ChartType.Line, ChartType.StackedArea);
-		} else {
-			collector.setChartTypes();
-		}
-		return collector;
-	}
+    var collector =
+        new TimeProfileCollector(
+            header, calc, 300, "charger_occupancy_time_profiles", matsimServices);
+    if (matsimServices.getConfig().controller().isCreateGraphs()) {
+      collector.setChartTypes(ChartType.Line, ChartType.StackedArea);
+    } else {
+      collector.setChartTypes();
+    }
+    return collector;
+  }
 }

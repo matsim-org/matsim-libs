@@ -22,7 +22,6 @@ package playground.vsp.andreas.osmBB.extended;
 
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.MinimalTransferTimes;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -34,82 +33,88 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * Default implementation of {@link TransitSchedule}, but with modifiable lines and facilities.
- * <p>
- * {@inheritDoc}
+ *
+ * <p>{@inheritDoc}
  *
  * @author aneumann
  */
 public class TransitScheduleImpl implements TransitSchedule {
-	private final Map<Id<TransitLine>, TransitLine> transitLines = new TreeMap<Id<TransitLine>, TransitLine>();
-	private final Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities = new TreeMap<Id<TransitStopFacility>, TransitStopFacility>();
-	private final TransitScheduleFactory factory;
-	private final FailingObjectAttributes transitLinesAttributes = FailingObjectAttributes.createTransitLinesAttributes();
-	private final FailingObjectAttributes transitStopsAttributes = FailingObjectAttributes.createTransitStopsAttributes();
+  private final Map<Id<TransitLine>, TransitLine> transitLines =
+      new TreeMap<Id<TransitLine>, TransitLine>();
+  private final Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities =
+      new TreeMap<Id<TransitStopFacility>, TransitStopFacility>();
+  private final TransitScheduleFactory factory;
+  private final FailingObjectAttributes transitLinesAttributes =
+      FailingObjectAttributes.createTransitLinesAttributes();
+  private final FailingObjectAttributes transitStopsAttributes =
+      FailingObjectAttributes.createTransitStopsAttributes();
 
-	public TransitScheduleImpl(final TransitScheduleFactory builder) {
-		this.factory = builder;
-	}
+  public TransitScheduleImpl(final TransitScheduleFactory builder) {
+    this.factory = builder;
+  }
 
-	@Override
-	public void addTransitLine(final TransitLine line) {
-		final Id id = line.getId();
-		if (this.transitLines.containsKey(id)) {
-			throw new IllegalArgumentException("There is already a transit line with id " + id.toString());
-		}
-		this.transitLines.put(id, line);
-	}
+  @Override
+  public void addTransitLine(final TransitLine line) {
+    final Id id = line.getId();
+    if (this.transitLines.containsKey(id)) {
+      throw new IllegalArgumentException(
+          "There is already a transit line with id " + id.toString());
+    }
+    this.transitLines.put(id, line);
+  }
 
-	@Override
-	public boolean removeTransitLine(TransitLine line) {
-		return this.transitLines.remove(line.getId()) != null;
-	}
+  @Override
+  public boolean removeTransitLine(TransitLine line) {
+    return this.transitLines.remove(line.getId()) != null;
+  }
 
-	@Override
-	public void addStopFacility(final TransitStopFacility stop) {
-		final Id id = stop.getId();
-		if (this.stopFacilities.containsKey(id)) {
-			throw new IllegalArgumentException("There is already a stop facility with id " + id.toString());
-		}
-		this.stopFacilities.put(id, stop);
-	}
+  @Override
+  public void addStopFacility(final TransitStopFacility stop) {
+    final Id id = stop.getId();
+    if (this.stopFacilities.containsKey(id)) {
+      throw new IllegalArgumentException(
+          "There is already a stop facility with id " + id.toString());
+    }
+    this.stopFacilities.put(id, stop);
+  }
 
-	@Override
-	public Map<Id<TransitLine>, TransitLine> getTransitLines() {
-		return this.transitLines;
-	}
+  @Override
+  public Map<Id<TransitLine>, TransitLine> getTransitLines() {
+    return this.transitLines;
+  }
 
-	@Override
-	public Map<Id<TransitStopFacility>, TransitStopFacility> getFacilities() {
-		return this.stopFacilities;
-	}
+  @Override
+  public Map<Id<TransitStopFacility>, TransitStopFacility> getFacilities() {
+    return this.stopFacilities;
+  }
 
-	@Override
-	public boolean removeStopFacility(final TransitStopFacility stop) {
-		return this.stopFacilities.remove(stop.getId()) != null;
-	}
+  @Override
+  public boolean removeStopFacility(final TransitStopFacility stop) {
+    return this.stopFacilities.remove(stop.getId()) != null;
+  }
 
-	@Override
-	public TransitScheduleFactory getFactory() {
-		return this.factory;
-	}
+  @Override
+  public TransitScheduleFactory getFactory() {
+    return this.factory;
+  }
 
-	@Override
-	public FailingObjectAttributes getTransitLinesAttributes() {
-		return this.transitLinesAttributes;
-	}
+  @Override
+  public FailingObjectAttributes getTransitLinesAttributes() {
+    return this.transitLinesAttributes;
+  }
 
-	@Override
-	public FailingObjectAttributes getTransitStopsAttributes() {
-		return this.transitStopsAttributes;
-	}
+  @Override
+  public FailingObjectAttributes getTransitStopsAttributes() {
+    return this.transitStopsAttributes;
+  }
 
-	@Override
-	public MinimalTransferTimes getMinimalTransferTimes() {
-		throw new RuntimeException("not implemented yet.");
-	}
+  @Override
+  public MinimalTransferTimes getMinimalTransferTimes() {
+    throw new RuntimeException("not implemented yet.");
+  }
 
-	@Override
-	public Attributes getAttributes() {
-		throw new RuntimeException("not implemented yet.");
-	}
+  @Override
+  public Attributes getAttributes() {
+    throw new RuntimeException("not implemented yet.");
+  }
 }

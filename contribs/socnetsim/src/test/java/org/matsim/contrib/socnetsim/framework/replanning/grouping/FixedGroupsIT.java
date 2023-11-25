@@ -19,102 +19,100 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.grouping;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import static org.junit.Assert.assertEquals;
+
+import java.io.File;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Random;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.socnetsim.framework.cliques.config.CliquesConfigGroup;
+import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.contrib.socnetsim.framework.cliques.config.CliquesConfigGroup;
-import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
-
-import java.io.File;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Random;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author thibautd
  */
 public class FixedGroupsIT {
-	@Rule
-	public final MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testIterationOrderIsDeterministic() throws Exception {
-		final String configFile = new File( utils.getPackageInputDirectory() ).getParentFile().getParentFile().getParentFile()+"/config.xml";
-		final Config config = JointScenarioUtils.loadConfig( configFile );
+  @Test
+  public void testIterationOrderIsDeterministic() throws Exception {
+    final String configFile =
+        new File(utils.getPackageInputDirectory()).getParentFile().getParentFile().getParentFile()
+            + "/config.xml";
+    final Config config = JointScenarioUtils.loadConfig(configFile);
 
-		Collection<ReplanningGroup> previous = null;
+    Collection<ReplanningGroup> previous = null;
 
-		// avoid spamming the log file
-		for (int i=0; i < 100; i++) {
-			final FixedGroupsIdentifier identifier =
-				FixedGroupsIdentifierFileParser.readCliquesFile(
-						((CliquesConfigGroup) config.getModule(
-							CliquesConfigGroup.GROUP_NAME)).getInputFile());
-			// recreate each time, in case it changes iteration order
-			final Population population = getPopulation( config );
-			Collection<ReplanningGroup> groups = identifier.identifyGroups( population );
+    // avoid spamming the log file
+    for (int i = 0; i < 100; i++) {
+      final FixedGroupsIdentifier identifier =
+          FixedGroupsIdentifierFileParser.readCliquesFile(
+              ((CliquesConfigGroup) config.getModule(CliquesConfigGroup.GROUP_NAME))
+                  .getInputFile());
+      // recreate each time, in case it changes iteration order
+      final Population population = getPopulation(config);
+      Collection<ReplanningGroup> groups = identifier.identifyGroups(population);
 
-			if (previous != null) {
-				assertIterationOrder(
-						previous,
-						groups);
-			}
-			previous = groups;
-		}
-	}
+      if (previous != null) {
+        assertIterationOrder(previous, groups);
+      }
+      previous = groups;
+    }
+  }
 
-	private static void assertIterationOrder(
-			final Collection<ReplanningGroup> expected,
-			final Collection<ReplanningGroup> actual) {
-		assertEquals(
-				"not the same number of groups",
-				expected.size(),
-				actual.size());
+  private static void assertIterationOrder(
+      final Collection<ReplanningGroup> expected, final Collection<ReplanningGroup> actual) {
+    assertEquals("not the same number of groups", expected.size(), actual.size());
 
-		final Iterator<ReplanningGroup> expectedIter = expected.iterator();
-		final Iterator<ReplanningGroup> actualIter = actual.iterator();
+    final Iterator<ReplanningGroup> expectedIter = expected.iterator();
+    final Iterator<ReplanningGroup> actualIter = actual.iterator();
 
-		int c = 0;
-		while (expectedIter.hasNext()) {
-			c++;
-			final ReplanningGroup expectedGroup = expectedIter.next();
-			final ReplanningGroup actualGroup = actualIter.next();
+    int c = 0;
+    while (expectedIter.hasNext()) {
+      c++;
+      final ReplanningGroup expectedGroup = expectedIter.next();
+      final ReplanningGroup actualGroup = actualIter.next();
 
-			final Iterator<Person> actualGroupIterator = actualGroup.getPersons().iterator();
-			for (Person expectedPerson : expectedGroup.getPersons()) {
-				assertEquals(
-						"groups "+expectedGroup+" and "+actualGroup+" in position "+
-						c+" are not equal or do not present the persons in the same order",
-						expectedPerson.getId(),
-						actualGroupIterator.next().getId());
-			}
-		}
-	}
+      final Iterator<Person> actualGroupIterator = actualGroup.getPersons().iterator();
+      for (Person expectedPerson : expectedGroup.getPersons()) {
+        assertEquals(
+            "groups "
+                + expectedGroup
+                + " and "
+                + actualGroup
+                + " in position "
+                + c
+                + " are not equal or do not present the persons in the same order",
+            expectedPerson.getId(),
+            actualGroupIterator.next().getId());
+      }
+    }
+  }
 
-	private static Population getPopulation( final Config config ) {
-		final Scenario scenario = ScenarioUtils.loadScenario( config );
-		// generate persons not allocated to any clique,
-		// making sure that they are not added in the same order as the
-		// ordering of their ids.
-		final Random random = new Random( 1432 );
-		for (int i=0; i < 100; i++) {
-			scenario.getPopulation().addPerson(
-					PopulationUtils.getFactory().createPerson(Id.create(
-					"garbage-" + random.nextInt(999999) + "-" + i, Person.class)));
-		}
-		return scenario.getPopulation();
-	}
+  private static Population getPopulation(final Config config) {
+    final Scenario scenario = ScenarioUtils.loadScenario(config);
+    // generate persons not allocated to any clique,
+    // making sure that they are not added in the same order as the
+    // ordering of their ids.
+    final Random random = new Random(1432);
+    for (int i = 0; i < 100; i++) {
+      scenario
+          .getPopulation()
+          .addPerson(
+              PopulationUtils.getFactory()
+                  .createPerson(
+                      Id.create("garbage-" + random.nextInt(999999) + "-" + i, Person.class)));
+    }
+    return scenario.getPopulation();
+  }
 }
-

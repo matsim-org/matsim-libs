@@ -20,7 +20,6 @@
 package org.matsim.contrib.dynagent;
 
 import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -28,68 +27,68 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.vehicles.Vehicle;
 
 public class StaticDriverDynLeg implements DriverDynLeg {
-	private final NetworkRoute route;
-	private int currentLinkIdx;
-	private final String mode;
+  private final NetworkRoute route;
+  private int currentLinkIdx;
+  private final String mode;
 
-	public StaticDriverDynLeg(String mode, NetworkRoute route) {
-		this.mode = mode;
-		this.route = route;
-		currentLinkIdx = -1;
-	}
+  public StaticDriverDynLeg(String mode, NetworkRoute route) {
+    this.mode = mode;
+    this.route = route;
+    currentLinkIdx = -1;
+  }
 
-	@Override
-	public void movedOverNode(Id<Link> newLinkId) {
-		currentLinkIdx++;
-	}
+  @Override
+  public void movedOverNode(Id<Link> newLinkId) {
+    currentLinkIdx++;
+  }
 
-	@Override
-	public Id<Link> getNextLinkId() {
-		List<Id<Link>> linkIds = route.getLinkIds();
+  @Override
+  public Id<Link> getNextLinkId() {
+    List<Id<Link>> linkIds = route.getLinkIds();
 
-		if (currentLinkIdx == linkIds.size()) {
-			return null;
-		}
+    if (currentLinkIdx == linkIds.size()) {
+      return null;
+    }
 
-		if (currentLinkIdx == linkIds.size() - 1) {
-			return route.getEndLinkId();
-		}
+    if (currentLinkIdx == linkIds.size() - 1) {
+      return route.getEndLinkId();
+    }
 
-		return linkIds.get(currentLinkIdx + 1);
-	}
+    return linkIds.get(currentLinkIdx + 1);
+  }
 
-	@Override
-	public Id<Link> getDestinationLinkId() {
-		return route.getEndLinkId();
-	}
+  @Override
+  public Id<Link> getDestinationLinkId() {
+    return route.getEndLinkId();
+  }
 
-	@Override
-	public String getMode() {
-		return mode;
-	}
+  @Override
+  public String getMode() {
+    return mode;
+  }
 
-	@Override
-	public void arrivedOnLinkByNonNetworkMode(Id<Link> linkId) {
-		if (!getDestinationLinkId().equals(linkId)) {
-			throw new IllegalStateException();
-		}
+  @Override
+  public void arrivedOnLinkByNonNetworkMode(Id<Link> linkId) {
+    if (!getDestinationLinkId().equals(linkId)) {
+      throw new IllegalStateException();
+    }
 
-		currentLinkIdx = route.getLinkIds().size();
-	}
+    currentLinkIdx = route.getLinkIds().size();
+  }
 
-	@Override
-	public Id<Vehicle> getPlannedVehicleId() {
-		return route.getVehicleId();
-	}
+  @Override
+  public Id<Vehicle> getPlannedVehicleId() {
+    return route.getVehicleId();
+  }
 
-	@Override
-	public OptionalTime getExpectedTravelTime() {
-		// TODO add travel time at the destination link??
-		return route.getTravelTime();
-	}
+  @Override
+  public OptionalTime getExpectedTravelTime() {
+    // TODO add travel time at the destination link??
+    return route.getTravelTime();
+  }
 
-	public Double getExpectedTravelDistance() {
-		// TODO add length of the destination link??
-		return route.getDistance();
-	}
+  public Double getExpectedTravelDistance() {
+    // TODO add length of the destination link??
+    return route.getDistance();
+  }
 }

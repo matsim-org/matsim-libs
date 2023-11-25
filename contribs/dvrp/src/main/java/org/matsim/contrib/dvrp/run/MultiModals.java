@@ -20,29 +20,29 @@
 
 package org.matsim.contrib.dvrp.run;
 
+import com.google.common.base.Verify;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Stream;
-
-import com.google.common.base.Verify;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class MultiModals {
-	public static void requireAllModesUnique(MultiModal<?> multiModal) {
-		Verify.verify(isAllModesUnique(multiModal.modes()), "There are non-unique modes in: %s", multiModal);
-	}
+  public static void requireAllModesUnique(MultiModal<?> multiModal) {
+    Verify.verify(
+        isAllModesUnique(multiModal.modes()), "There are non-unique modes in: %s", multiModal);
+  }
 
-	public static void requireAllModesUnique(List<String> modes) {
-		Verify.verify(isAllModesUnique(modes.stream()), "There are non-unique modes in: %s", modes);
-	}
+  public static void requireAllModesUnique(List<String> modes) {
+    Verify.verify(isAllModesUnique(modes.stream()), "There are non-unique modes in: %s", modes);
+  }
 
-	public static boolean isAllModesUnique(Stream<String> modes) {
-		return modes.allMatch(new HashSet<>()::add);
-	}
+  public static boolean isAllModesUnique(Stream<String> modes) {
+    return modes.allMatch(new HashSet<>()::add);
+  }
 
-	public static boolean isAllDvrpModesUnique(Stream<DvrpMode> dvrpModes) {
-		return dvrpModes.allMatch(new HashSet<>()::add);
-	}
+  public static boolean isAllDvrpModesUnique(Stream<DvrpMode> dvrpModes) {
+    return dvrpModes.allMatch(new HashSet<>()::add);
+  }
 }

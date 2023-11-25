@@ -19,43 +19,35 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.sharedvehicles.replanning;
 
-import com.google.inject.Inject;
+import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.TripRouter;
-import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
-
-import jakarta.inject.Provider;
 
 /**
  * @author thibautd
  */
 public class AllocateVehicleToSubtourModule extends AbstractMultithreadedModule {
-	private final String mode;
-	private final VehicleRessources ressources;
+  private final String mode;
+  private final VehicleRessources ressources;
 
-	private final MainModeIdentifier mainModeIdentifier;
+  private final MainModeIdentifier mainModeIdentifier;
 
-	public AllocateVehicleToSubtourModule(
-			final int nThreads,
-			final String mode,
-			final VehicleRessources ressources,
-			final MainModeIdentifier mainModeIdentifier) {
-		super( nThreads );
-		this.mode = mode;
-		this.ressources = ressources;
-		this.mainModeIdentifier = mainModeIdentifier;
-	}
+  public AllocateVehicleToSubtourModule(
+      final int nThreads,
+      final String mode,
+      final VehicleRessources ressources,
+      final MainModeIdentifier mainModeIdentifier) {
+    super(nThreads);
+    this.mode = mode;
+    this.ressources = ressources;
+    this.mainModeIdentifier = mainModeIdentifier;
+  }
 
-	@Override
-	public PlanAlgorithm getPlanAlgoInstance() {
-		return new AllocateVehicleToSubtourAlgorithm(
-				MatsimRandom.getLocalInstance(),
-				mode,
-				ressources,
-				mainModeIdentifier);
-	}
+  @Override
+  public PlanAlgorithm getPlanAlgoInstance() {
+    return new AllocateVehicleToSubtourAlgorithm(
+        MatsimRandom.getLocalInstance(), mode, ressources, mainModeIdentifier);
+  }
 }
-

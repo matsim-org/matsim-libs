@@ -24,21 +24,24 @@ import java.util.Map;
 import java.util.OptionalDouble;
 
 public class ETaxiStats {
-	public enum ETaxiState {
-		QUEUED, PLUGGED
-	}
+  public enum ETaxiState {
+    QUEUED,
+    PLUGGED
+  }
 
-	public final String id;
+  public final String id;
 
-	public final Map<ETaxiState, Double> stateDurations = new HashMap<>();
+  public final Map<ETaxiState, Double> stateDurations = new HashMap<>();
 
-	public ETaxiStats(String id) {
-		this.id = id;
-	}
+  public ETaxiStats(String id) {
+    this.id = id;
+  }
 
-	public OptionalDouble getFleetQueuedTimeRatio() {
-		double queued = stateDurations.getOrDefault(ETaxiState.QUEUED, 0.);
-		double plugged = stateDurations.getOrDefault(ETaxiState.PLUGGED, 0.);
-		return (queued != 0 && plugged != 0) ? OptionalDouble.of(queued / (queued + plugged)) : OptionalDouble.empty();
-	}
+  public OptionalDouble getFleetQueuedTimeRatio() {
+    double queued = stateDurations.getOrDefault(ETaxiState.QUEUED, 0.);
+    double plugged = stateDurations.getOrDefault(ETaxiState.PLUGGED, 0.);
+    return (queued != 0 && plugged != 0)
+        ? OptionalDouble.of(queued / (queued + plugged))
+        : OptionalDouble.empty();
+  }
 }

@@ -25,29 +25,34 @@ import java.util.Set;
 import java.util.TreeMap;
 
 class ScenarioForEvalData {
-		private Map<String,Values> values = new TreeMap<>();
-		ScenarioForEvalData() {
-//			for ( Id id : values.keySet() ) {
-//				Values vals = new Values() ;
-//				values.put( id, vals ) ;
-//			}
-		}
-		ScenarioForEvalData createDeepCopy() {
-			ScenarioForEvalData nnn = new ScenarioForEvalData() ;
-			for ( String id : values.keySet() ) {
-				Values oldValues = this.getByODRelation(id) ;
-				Values newValues = oldValues.createDeepCopy() ;
-				nnn.values.put( id, newValues ) ;
-			}
-			return nnn ;
-		}
-		Values getByODRelation( String id ) {
-			return values.get(id) ;
-		}
-		void setValuesForODRelation( String id , Values tmp ) {
-			values.put( id, tmp ) ;
-		}
-		Set<String> getAllRelations() {
-			return Collections.unmodifiableSet(values.keySet()) ;
-		}
-	}
+  private Map<String, Values> values = new TreeMap<>();
+
+  ScenarioForEvalData() {
+    //			for ( Id id : values.keySet() ) {
+    //				Values vals = new Values() ;
+    //				values.put( id, vals ) ;
+    //			}
+  }
+
+  ScenarioForEvalData createDeepCopy() {
+    ScenarioForEvalData nnn = new ScenarioForEvalData();
+    for (String id : values.keySet()) {
+      Values oldValues = this.getByODRelation(id);
+      Values newValues = oldValues.createDeepCopy();
+      nnn.values.put(id, newValues);
+    }
+    return nnn;
+  }
+
+  Values getByODRelation(String id) {
+    return values.get(id);
+  }
+
+  void setValuesForODRelation(String id, Values tmp) {
+    values.put(id, tmp);
+  }
+
+  Set<String> getAllRelations() {
+    return Collections.unmodifiableSet(values.keySet());
+  }
+}

@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -40,49 +39,53 @@ import org.matsim.contrib.dvrp.vrpagent.TaskStartedEventHandler;
  */
 public class ZonalIdleVehicleCollector implements TaskStartedEventHandler, TaskEndedEventHandler {
 
-	private final DrtZonalSystem zonalSystem;
-	private final String dvrpMode;
+  private final DrtZonalSystem zonalSystem;
+  private final String dvrpMode;
 
-	private final Map<DrtZone, Set<Id<DvrpVehicle>>> vehiclesPerZone = new HashMap<>();
-	private final Map<Id<DvrpVehicle>, DrtZone> zonePerVehicle = new HashMap<>();
+  private final Map<DrtZone, Set<Id<DvrpVehicle>>> vehiclesPerZone = new HashMap<>();
+  private final Map<Id<DvrpVehicle>, DrtZone> zonePerVehicle = new HashMap<>();
 
-	public ZonalIdleVehicleCollector(String dvrpMode, DrtZonalSystem zonalSystem) {
-		this.dvrpMode = dvrpMode;
-		this.zonalSystem = zonalSystem;
-	}
+  public ZonalIdleVehicleCollector(String dvrpMode, DrtZonalSystem zonalSystem) {
+    this.dvrpMode = dvrpMode;
+    this.zonalSystem = zonalSystem;
+  }
 
-	@Override
-	public void handleEvent(TaskStartedEvent event) {
-		handleEvent(event, zone -> {
-			vehiclesPerZone.computeIfAbsent(zone, z -> new HashSet<>()).add(event.getDvrpVehicleId());
-			zonePerVehicle.put(event.getDvrpVehicleId(), zone);
-		});
-	}
+  @Override
+  public void handleEvent(TaskStartedEvent event) {
+    handleEvent(
+        event,
+        zone -> {
+          vehiclesPerZone.computeIfAbsent(zone, z -> new HashSet<>()).add(event.getDvrpVehicleId());
+          zonePerVehicle.put(event.getDvrpVehicleId(), zone);
+        });
+  }
 
-	@Override
-	public void handleEvent(TaskEndedEvent event) {
-		handleEvent(event, zone -> {
-			zonePerVehicle.remove(event.getDvrpVehicleId());
-			vehiclesPerZone.get(zone).remove(event.getDvrpVehicleId());
-		});
-	}
+  @Override
+  public void handleEvent(TaskEndedEvent event) {
+    handleEvent(
+        event,
+        zone -> {
+          zonePerVehicle.remove(event.getDvrpVehicleId());
+          vehiclesPerZone.get(zone).remove(event.getDvrpVehicleId());
+        });
+  }
 
-	private void handleEvent(AbstractTaskEvent event, Consumer<DrtZone> handler) {
-		if (event.getDvrpMode().equals(dvrpMode) && event.getTaskType().equals(DrtStayTask.TYPE)) {
-			DrtZone zone = zonalSystem.getZoneForLinkId(event.getLinkId());
-			if (zone != null) {
-				handler.accept(zone);
-			}
-		}
-	}
+  private void handleEvent(AbstractTaskEvent event, Consumer<DrtZone> handler) {
+    if (event.getDvrpMode().equals(dvrpMode) && event.getTaskType().equals(DrtStayTask.TYPE)) {
+      DrtZone zone = zonalSystem.getZoneForLinkId(event.getLinkId());
+      if (zone != null) {
+        handler.accept(zone);
+      }
+    }
+  }
 
-	public Set<Id<DvrpVehicle>> getIdleVehiclesPerZone(DrtZone zone) {
-		return this.vehiclesPerZone.get(zone);
-	}
+  public Set<Id<DvrpVehicle>> getIdleVehiclesPerZone(DrtZone zone) {
+    return this.vehiclesPerZone.get(zone);
+  }
 
-	@Override
-	public void reset(int iteration) {
-		zonePerVehicle.clear();
-		vehiclesPerZone.clear();
-	}
+  @Override
+  public void reset(int iteration) {
+    zonePerVehicle.clear();
+    vehiclesPerZone.clear();
+  }
 }

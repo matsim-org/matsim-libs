@@ -17,9 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
+/** */
 package org.matsim.contrib.drt.passenger.events;
 
 import org.matsim.core.events.handler.EventHandler;
@@ -28,5 +26,5 @@ import org.matsim.core.events.handler.EventHandler;
  * @author jbischoff
  */
 public interface DrtRequestSubmittedEventHandler extends EventHandler {
-	void handleEvent(final DrtRequestSubmittedEvent event);
+  void handleEvent(final DrtRequestSubmittedEvent event);
 }

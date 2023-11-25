@@ -21,6 +21,9 @@
 
 package org.matsim.freight.carriers.events;
 
+import static org.matsim.freight.carriers.events.CarrierEventAttributes.*;
+
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -28,67 +31,65 @@ import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierShipment;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.Map;
-
-import static org.matsim.freight.carriers.events.CarrierEventAttributes.*;
-
 /**
  * An event, that informs that a Freight {@link CarrierShipment} delivery-activity has started.
  *
  * @author Kai Martins-Turner (kturner)
- *
  */
 public class CarrierShipmentDeliveryStartEvent extends AbstractCarrierEvent {
 
-	public static final String EVENT_TYPE = "Freight shipment delivered starts";
+  public static final String EVENT_TYPE = "Freight shipment delivered starts";
 
-	private final Id<CarrierShipment> shipmentId;
-	private final double deliveryDuration;
-	private final int capacityDemand;
-	public CarrierShipmentDeliveryStartEvent(double time, Id<Carrier> carrierId, CarrierShipment shipment, Id<Vehicle> vehicleId) {
-		super(time, carrierId, shipment.getTo(), vehicleId);
-		this.shipmentId = shipment.getId();
-		this.deliveryDuration = shipment.getDeliveryServiceTime();
-		this.capacityDemand = shipment.getSize();
-	}
+  private final Id<CarrierShipment> shipmentId;
+  private final double deliveryDuration;
+  private final int capacityDemand;
 
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
+  public CarrierShipmentDeliveryStartEvent(
+      double time, Id<Carrier> carrierId, CarrierShipment shipment, Id<Vehicle> vehicleId) {
+    super(time, carrierId, shipment.getTo(), vehicleId);
+    this.shipmentId = shipment.getId();
+    this.deliveryDuration = shipment.getDeliveryServiceTime();
+    this.capacityDemand = shipment.getSize();
+  }
 
-	public Id<CarrierShipment> getShipmentId() {
-		return shipmentId;
-	}
+  @Override
+  public String getEventType() {
+    return EVENT_TYPE;
+  }
 
-	public double getDeliveryDuration() {
-		return deliveryDuration;
-	}
+  public Id<CarrierShipment> getShipmentId() {
+    return shipmentId;
+  }
 
-	public int getCapacityDemand() {
-		return capacityDemand;
-	}
+  public double getDeliveryDuration() {
+    return deliveryDuration;
+  }
 
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_SHIPMENT_ID, this.shipmentId.toString());
-		attr.put(ATTRIBUTE_DROPOFF_DURATION, String.valueOf(this.deliveryDuration));
-		attr.put(ATTRIBUTE_CAPACITYDEMAND, String.valueOf(capacityDemand));
-		return attr;
-	}
+  public int getCapacityDemand() {
+    return capacityDemand;
+  }
 
-	public static CarrierShipmentDeliveryStartEvent convert(GenericEvent event) {
-		var attributes = event.getAttributes();
-		double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));
-		Id<Carrier> carrierId = Id.create(attributes.get(ATTRIBUTE_CARRIER_ID), Carrier.class);
-		Id<CarrierShipment> shipmentId = Id.create(attributes.get(ATTRIBUTE_SHIPMENT_ID), CarrierShipment.class);
-		Id<Link> shipmentTo = Id.createLinkId(attributes.get(ATTRIBUTE_LINK));
-		int size = Integer.parseInt(attributes.get(ATTRIBUTE_CAPACITYDEMAND));
-		CarrierShipment shipment = CarrierShipment.Builder.newInstance(shipmentId, null, shipmentTo, size)
-				.setDeliveryServiceTime(Double.parseDouble(attributes.get(ATTRIBUTE_DROPOFF_DURATION)))
-				.build();
-		Id<Vehicle> vehicleId = Id.createVehicleId(attributes.get(ATTRIBUTE_VEHICLE));
-		return new CarrierShipmentDeliveryStartEvent(time, carrierId, shipment, vehicleId);
-	}
+  public Map<String, String> getAttributes() {
+    Map<String, String> attr = super.getAttributes();
+    attr.put(ATTRIBUTE_SHIPMENT_ID, this.shipmentId.toString());
+    attr.put(ATTRIBUTE_DROPOFF_DURATION, String.valueOf(this.deliveryDuration));
+    attr.put(ATTRIBUTE_CAPACITYDEMAND, String.valueOf(capacityDemand));
+    return attr;
+  }
 
+  public static CarrierShipmentDeliveryStartEvent convert(GenericEvent event) {
+    var attributes = event.getAttributes();
+    double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));
+    Id<Carrier> carrierId = Id.create(attributes.get(ATTRIBUTE_CARRIER_ID), Carrier.class);
+    Id<CarrierShipment> shipmentId =
+        Id.create(attributes.get(ATTRIBUTE_SHIPMENT_ID), CarrierShipment.class);
+    Id<Link> shipmentTo = Id.createLinkId(attributes.get(ATTRIBUTE_LINK));
+    int size = Integer.parseInt(attributes.get(ATTRIBUTE_CAPACITYDEMAND));
+    CarrierShipment shipment =
+        CarrierShipment.Builder.newInstance(shipmentId, null, shipmentTo, size)
+            .setDeliveryServiceTime(Double.parseDouble(attributes.get(ATTRIBUTE_DROPOFF_DURATION)))
+            .build();
+    Id<Vehicle> vehicleId = Id.createVehicleId(attributes.get(ATTRIBUTE_VEHICLE));
+    return new CarrierShipmentDeliveryStartEvent(time, carrierId, shipment, vehicleId);
+  }
 }

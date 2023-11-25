@@ -20,7 +20,6 @@
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import java.net.URL;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule.PassengerEngineType;
@@ -39,26 +38,29 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * @author michalm
  */
 public final class RunOneTaxiExample {
-	public static void run(URL configUrl, String taxisFile, boolean otfvis, int lastIteration) {
-		// load config
-		Config config = ConfigUtils.loadConfig(configUrl, new DvrpConfigGroup(), new OTFVisConfigGroup());
-		config.controller().setLastIteration(lastIteration);
+  public static void run(URL configUrl, String taxisFile, boolean otfvis, int lastIteration) {
+    // load config
+    Config config =
+        ConfigUtils.loadConfig(configUrl, new DvrpConfigGroup(), new OTFVisConfigGroup());
+    config.controller().setLastIteration(lastIteration);
 
-		// load scenario
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+    // load scenario
+    Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		// setup controler
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new OneTaxiModule(ConfigGroup.getInputFileURL(config.getContext(), taxisFile),
-				PassengerEngineType.DEFAULT));
-		controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.taxi));
+    // setup controler
+    Controler controler = new Controler(scenario);
+    controler.addOverridingModule(new DvrpModule());
+    controler.addOverridingModule(
+        new OneTaxiModule(
+            ConfigGroup.getInputFileURL(config.getContext(), taxisFile),
+            PassengerEngineType.DEFAULT));
+    controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.taxi));
 
-		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule()); // OTFVis visualisation
-		}
+    if (otfvis) {
+      controler.addOverridingModule(new OTFVisLiveModule()); // OTFVis visualisation
+    }
 
-		// run simulation
-		controler.run();
-	}
+    // run simulation
+    controler.run();
+  }
 }

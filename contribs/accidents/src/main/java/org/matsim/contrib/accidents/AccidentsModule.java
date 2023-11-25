@@ -19,32 +19,28 @@
 
 package org.matsim.contrib.accidents;
 
+import com.google.inject.Singleton;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 
-import com.google.inject.Singleton;
-
 /**
-* @author ikaddoura
-*/
-
+ * @author ikaddoura
+ */
 public final class AccidentsModule extends AbstractModule {
 
-	@Override
-	public void install() {
-		AccidentsConfigGroup accidentsConfigGroup = ConfigUtils.addOrGetModule( getConfig() , AccidentsConfigGroup.class );
+  @Override
+  public void install() {
+    AccidentsConfigGroup accidentsConfigGroup =
+        ConfigUtils.addOrGetModule(getConfig(), AccidentsConfigGroup.class);
 
-		if ( accidentsConfigGroup.isEnableAccidentsModule()) {
-			
-			this.bind(AccidentsContext.class).in( Singleton.class ) ;
-			
-			this.bind(AnalysisEventHandler.class).in( Singleton.class ) ;
-			this.addEventHandlerBinding().to(AnalysisEventHandler.class) ;
-			
-			this.addControlerListenerBinding().to(AccidentControlerListener.class);
-		}
-				
-	}
+    if (accidentsConfigGroup.isEnableAccidentsModule()) {
 
+      this.bind(AccidentsContext.class).in(Singleton.class);
+
+      this.bind(AnalysisEventHandler.class).in(Singleton.class);
+      this.addEventHandlerBinding().to(AnalysisEventHandler.class);
+
+      this.addControlerListenerBinding().to(AccidentControlerListener.class);
+    }
+  }
 }
-

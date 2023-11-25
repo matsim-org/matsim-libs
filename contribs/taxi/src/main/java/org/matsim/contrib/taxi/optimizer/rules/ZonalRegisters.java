@@ -24,12 +24,13 @@ package org.matsim.contrib.taxi.optimizer.rules;
  * @author Michal Maciejewski (michalm)
  */
 public class ZonalRegisters {
-	public final IdleTaxiZonalRegistry idleTaxiRegistry;
-	public final UnplannedRequestZonalRegistry unplannedRequestRegistry;
+  public final IdleTaxiZonalRegistry idleTaxiRegistry;
+  public final UnplannedRequestZonalRegistry unplannedRequestRegistry;
 
-	public ZonalRegisters(IdleTaxiZonalRegistry idleTaxiRegistry,
-			UnplannedRequestZonalRegistry unplannedRequestRegistry) {
-		this.idleTaxiRegistry = idleTaxiRegistry;
-		this.unplannedRequestRegistry = unplannedRequestRegistry;
-	}
+  public ZonalRegisters(
+      IdleTaxiZonalRegistry idleTaxiRegistry,
+      UnplannedRequestZonalRegistry unplannedRequestRegistry) {
+    this.idleTaxiRegistry = idleTaxiRegistry;
+    this.unplannedRequestRegistry = unplannedRequestRegistry;
+  }
 }

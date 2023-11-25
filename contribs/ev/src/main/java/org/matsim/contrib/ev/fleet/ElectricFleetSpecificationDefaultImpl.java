@@ -23,7 +23,6 @@ package org.matsim.contrib.ev.fleet;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.Vehicle;
 
@@ -31,21 +30,21 @@ import org.matsim.vehicles.Vehicle;
  * @author Michal Maciejewski (michalm)
  */
 final class ElectricFleetSpecificationDefaultImpl implements ElectricFleetSpecification {
-	private final Map<Id<Vehicle>, ElectricVehicleSpecification> specifications = new LinkedHashMap<>();
+  private final Map<Id<Vehicle>, ElectricVehicleSpecification> specifications =
+      new LinkedHashMap<>();
 
-	@Override
-	public Map<Id<Vehicle>, ElectricVehicleSpecification> getVehicleSpecifications() {
-		return Collections.unmodifiableMap(specifications);
-	}
+  @Override
+  public Map<Id<Vehicle>, ElectricVehicleSpecification> getVehicleSpecifications() {
+    return Collections.unmodifiableMap(specifications);
+  }
 
-	@Override
-	public void addVehicleSpecification(ElectricVehicleSpecification specification) {
-		specifications.put(specification.getId(), specification);
-	}
+  @Override
+  public void addVehicleSpecification(ElectricVehicleSpecification specification) {
+    specifications.put(specification.getId(), specification);
+  }
 
-	@Override
-	public void clear() {
-		specifications.clear();
-	}
+  @Override
+  public void clear() {
+    specifications.clear();
+  }
 }
-

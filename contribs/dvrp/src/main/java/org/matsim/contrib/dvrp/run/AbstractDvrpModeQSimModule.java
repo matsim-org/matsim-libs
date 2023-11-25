@@ -26,7 +26,7 @@ import org.matsim.core.modal.AbstractModalQSimModule;
  * @author Michal Maciejewski (michalm)
  */
 public abstract class AbstractDvrpModeQSimModule extends AbstractModalQSimModule<DvrpMode> {
-	protected AbstractDvrpModeQSimModule(String mode) {
-		super(mode, DvrpModes::mode);
-	}
+  protected AbstractDvrpModeQSimModule(String mode) {
+    super(mode, DvrpModes::mode);
+  }
 }

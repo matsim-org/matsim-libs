@@ -24,7 +24,6 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -55,153 +54,118 @@ import org.matsim.facilities.Facility;
  * @author thibautd
  */
 public class JointPlanRouterTest {
-	@Test
-	public void testDriverIdIsKept() throws Exception {
-		final Config config = ConfigUtils.createConfig();
-		final PopulationFactory populationFactory =
-                ScenarioUtils.createScenario(
-				    config).getPopulation().getFactory();
+  @Test
+  public void testDriverIdIsKept() throws Exception {
+    final Config config = ConfigUtils.createConfig();
+    final PopulationFactory populationFactory =
+        ScenarioUtils.createScenario(config).getPopulation().getFactory();
 
-		final JointPlanRouter testee =
-			new JointPlanRouter(
-					createTripRouter(
-						populationFactory, config),
-					null, TimeInterpretation.create(config));
+    final JointPlanRouter testee =
+        new JointPlanRouter(
+            createTripRouter(populationFactory, config), null, TimeInterpretation.create(config));
 
-		final Id<Link> linkId = Id.create( "some_link" , Link.class );
-		final Plan plan = populationFactory.createPlan();
-		final Activity act1 =
-			populationFactory.createActivityFromLinkId(
-					"say hello",
-					linkId);
-		act1.setEndTime( 1035 );
-		plan.addActivity( act1 );
-		final Leg leg = populationFactory.createLeg( JointActingTypes.PASSENGER );
-		TripStructureUtils.setRoutingMode( leg, JointActingTypes.PASSENGER );
-		plan.addLeg( leg );
-		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"say goodbye",
-					linkId));
+    final Id<Link> linkId = Id.create("some_link", Link.class);
+    final Plan plan = populationFactory.createPlan();
+    final Activity act1 = populationFactory.createActivityFromLinkId("say hello", linkId);
+    act1.setEndTime(1035);
+    plan.addActivity(act1);
+    final Leg leg = populationFactory.createLeg(JointActingTypes.PASSENGER);
+    TripStructureUtils.setRoutingMode(leg, JointActingTypes.PASSENGER);
+    plan.addLeg(leg);
+    plan.addActivity(populationFactory.createActivityFromLinkId("say goodbye", linkId));
 
-		final Id<Person> driverId = Id.create( "the_driver" , Person.class );
-		final PassengerRoute route = new PassengerRoute( linkId , linkId );
-		route.setDriverId( driverId );
-		leg.setRoute( route );
+    final Id<Person> driverId = Id.create("the_driver", Person.class);
+    final PassengerRoute route = new PassengerRoute(linkId, linkId);
+    route.setDriverId(driverId);
+    leg.setRoute(route);
 
-		testee.run( plan );
+    testee.run(plan);
 
-		final Leg newLeg = (Leg) plan.getPlanElements().get( 1 );
-		assertNotSame(
-				"leg not replaced",
-				leg,
-				newLeg);
+    final Leg newLeg = (Leg) plan.getPlanElements().get(1);
+    assertNotSame("leg not replaced", leg, newLeg);
 
-		final PassengerRoute newRoute = (PassengerRoute) leg.getRoute();
-		assertNotNull(
-				"new passenger route is null",
+    final PassengerRoute newRoute = (PassengerRoute) leg.getRoute();
+    assertNotNull("new passenger route is null", newRoute);
 
+    assertEquals("driver id not kept correctly", driverId, newRoute.getDriverId());
+  }
 
-				newRoute);
+  @Test
+  public void testPassengerIdIsKept() throws Exception {
+    final Config config = ConfigUtils.createConfig();
+    final PopulationFactory populationFactory =
+        ScenarioUtils.createScenario(config).getPopulation().getFactory();
 
-		assertEquals(
-				"driver id not kept correctly",
-				driverId,
-				newRoute.getDriverId());
-	}
+    final JointPlanRouter testee =
+        new JointPlanRouter(
+            createTripRouter(populationFactory, config), null, TimeInterpretation.create(config));
 
-	@Test
-	public void testPassengerIdIsKept() throws Exception {
-		final Config config = ConfigUtils.createConfig();
-		final PopulationFactory populationFactory =
-                ScenarioUtils.createScenario(
-				    config).getPopulation().getFactory();
+    final Id<Link> linkId = Id.create("some_link", Link.class);
+    final Plan plan = populationFactory.createPlan();
+    final Activity act1 = populationFactory.createActivityFromLinkId("say hello", linkId);
+    act1.setEndTime(1035);
+    plan.addActivity(act1);
+    final Leg leg = populationFactory.createLeg(JointActingTypes.DRIVER);
+    TripStructureUtils.setRoutingMode(leg, JointActingTypes.DRIVER);
+    plan.addLeg(leg);
+    plan.addActivity(populationFactory.createActivityFromLinkId("say goodbye", linkId));
 
-		final JointPlanRouter testee =
-			new JointPlanRouter(
-					createTripRouter(
-						populationFactory, config),
-					null, TimeInterpretation.create(config));
+    final Id<Person> passengerId1 = Id.create("the_passenger_1", Person.class);
+    final Id<Person> passengerId2 = Id.create("the_passenger_2", Person.class);
+    final DriverRoute route = new DriverRoute(linkId, linkId);
+    route.addPassenger(passengerId1);
+    route.addPassenger(passengerId2);
+    leg.setRoute(route);
 
-		final Id<Link> linkId = Id.create( "some_link" , Link.class );
-		final Plan plan = populationFactory.createPlan();
-		final Activity act1 =
-			populationFactory.createActivityFromLinkId(
-					"say hello",
-					linkId);
-		act1.setEndTime( 1035 );
-		plan.addActivity( act1 );
-		final Leg leg = populationFactory.createLeg( JointActingTypes.DRIVER );
-		TripStructureUtils.setRoutingMode( leg, JointActingTypes.DRIVER );
-		plan.addLeg( leg );
-		plan.addActivity(
-				populationFactory.createActivityFromLinkId(
-					"say goodbye",
-					linkId));
+    testee.run(plan);
 
-		final Id<Person> passengerId1 = Id.create( "the_passenger_1" , Person.class );
-		final Id<Person> passengerId2 = Id.create( "the_passenger_2" , Person.class );
-		final DriverRoute route = new DriverRoute( linkId , linkId );
-		route.addPassenger( passengerId1 );
-		route.addPassenger( passengerId2 );
-		leg.setRoute( route );
+    final Leg newLeg = (Leg) plan.getPlanElements().get(1);
+    assertNotSame("leg not replaced", leg, newLeg);
 
-		testee.run( plan );
+    final DriverRoute newRoute = (DriverRoute) leg.getRoute();
+    assertNotNull("new driver route is null", newRoute);
 
-		final Leg newLeg = (Leg) plan.getPlanElements().get( 1 );
-		assertNotSame(
-				"leg not replaced",
-				leg,
-				newLeg);
+    final Collection<Id<Person>> passengers = Arrays.asList(passengerId1, passengerId2);
+    assertEquals(
+        "not the right number of passenger ids in " + newRoute.getPassengersIds(),
+        passengers.size(),
+        newRoute.getPassengersIds().size());
 
-		final DriverRoute newRoute = (DriverRoute) leg.getRoute();
-		assertNotNull(
-				"new driver route is null",
-				newRoute);
+    assertTrue(
+        "not the right ids in " + newRoute.getPassengersIds(),
+        passengers.containsAll(newRoute.getPassengersIds()));
+  }
 
-		final Collection<Id<Person>> passengers = Arrays.asList( passengerId1 , passengerId2 );
-		assertEquals(
-				"not the right number of passenger ids in "+newRoute.getPassengersIds(),
-				passengers.size(),
-				newRoute.getPassengersIds().size());
+  private static TripRouter createTripRouter(
+      final PopulationFactory populationFactory, Config config) {
+    final TripRouter.Builder builder = new TripRouter.Builder(config);
 
-		assertTrue(
-				"not the right ids in "+newRoute.getPassengersIds(),
-				passengers.containsAll(
-					newRoute.getPassengersIds() ));
-	}
+    builder.setRoutingModule(
+        JointActingTypes.DRIVER,
+        new DriverRoutingModule(
+            JointActingTypes.DRIVER,
+            populationFactory,
+            new RoutingModule() {
 
-	private static TripRouter createTripRouter(final PopulationFactory populationFactory, Config config) {
-		final TripRouter.Builder builder = new TripRouter.Builder(config) ;
-		
-		builder.setRoutingModule(
-				JointActingTypes.DRIVER,
-				new DriverRoutingModule(
-					JointActingTypes.DRIVER,
-					populationFactory,
-					new RoutingModule() {
+              @Override
+              public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+                final Facility fromFacility = request.getFromFacility();
+                final Facility toFacility = request.getToFacility();
 
-						@Override
-						public List<? extends PlanElement> calcRoute(RoutingRequest request) {
-							final Facility fromFacility = request.getFromFacility();
-							final Facility toFacility = request.getToFacility();
-							
-							NetworkRoute route = RouteUtils.createNetworkRoute(List.of(fromFacility.getLinkId(), toFacility.getLinkId()), null);
-							route.setTravelTime(10);
-							Leg leg =  PopulationUtils.createLeg(TransportMode.car);
-							leg.setRoute(route);
-							return List.of(leg);
-						}
+                NetworkRoute route =
+                    RouteUtils.createNetworkRoute(
+                        List.of(fromFacility.getLinkId(), toFacility.getLinkId()), null);
+                route.setTravelTime(10);
+                Leg leg = PopulationUtils.createLeg(TransportMode.car);
+                leg.setRoute(route);
+                return List.of(leg);
+              }
+            }));
 
-					}));
-		
-		builder.setRoutingModule(
-				JointActingTypes.PASSENGER,
-				new PassengerRoutingModule(
-					JointActingTypes.PASSENGER,
-					populationFactory));
+    builder.setRoutingModule(
+        JointActingTypes.PASSENGER,
+        new PassengerRoutingModule(JointActingTypes.PASSENGER, populationFactory));
 
-		return builder.build() ;
-	}
+    return builder.build();
+  }
 }
-

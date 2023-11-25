@@ -8,6 +8,5 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
  */
 public interface ShiftBreakTask extends DrtStopTask, OperationalStop {
 
-    DrtShiftBreak getShiftBreak();
-
+  DrtShiftBreak getShiftBreak();
 }

@@ -20,24 +20,20 @@
 package playground.vsp.analysis.modules.ptTripAnalysis.distance;
 
 import java.util.ArrayList;
-
 import org.matsim.api.core.v01.population.PlanElement;
-
 import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTrip;
 import playground.vsp.analysis.modules.ptTripAnalysis.AbstractPlan2TripsFilter;
 
 /**
  * @author droeder
- *
  */
 public class DistPlan2TripsFilter extends AbstractPlan2TripsFilter {
 
-	/* (non-Javadoc)
-	 * @see playground.droeder.Analysis.Trips.AbstractPlan2TripsFilter#generateTrip(java.util.ArrayList)
-	 */
-	@Override
-	protected AbstractAnalysisTrip generateTrip(ArrayList<PlanElement> temp) {
-		return new DistAnalysisTrip(temp);
-	}
-
+  /* (non-Javadoc)
+   * @see playground.droeder.Analysis.Trips.AbstractPlan2TripsFilter#generateTrip(java.util.ArrayList)
+   */
+  @Override
+  protected AbstractAnalysisTrip generateTrip(ArrayList<PlanElement> temp) {
+    return new DistAnalysisTrip(temp);
+  }
 }

@@ -21,77 +21,82 @@ package org.matsim.contrib.minibus.genericUtils;
 
 /**
  * Provides arithmetic mean, standard deviation, and Min/Max.
- * 
- * @author aneumann
  *
+ * @author aneumann
  */
 public final class RecursiveStatsContainer {
 
-	private double numberOfEntries = Double.NaN;
-	private double arithmeticMean;
-	private double min = Double.POSITIVE_INFINITY;
-	private double max = Double.NEGATIVE_INFINITY;
-	private double tempVar;
+  private double numberOfEntries = Double.NaN;
+  private double arithmeticMean;
+  private double min = Double.POSITIVE_INFINITY;
+  private double max = Double.NEGATIVE_INFINITY;
+  private double tempVar;
 
-	public void handleNewEntry(double entry){
-		
-		if (entry < this.min) {
-			this.min = entry;
-		}
-		
-		if (entry > this.max) {
-			this.max = entry;
-		}
-		
-		// new entries n + 1
-		double meanEntry_n_1;
-		double tempVarEntry_n_1;
+  public void handleNewEntry(double entry) {
 
-		if(Double.isNaN(this.numberOfEntries)){
-			// initialize
-			this.numberOfEntries = 0;
-			this.arithmeticMean = 0;
-			this.tempVar = 0;
-		}
+    if (entry < this.min) {
+      this.min = entry;
+    }
 
-		// calculate the exact mean and variance
+    if (entry > this.max) {
+      this.max = entry;
+    }
 
-		// calculate new mean
-		meanEntry_n_1 =  (this.numberOfEntries * this.arithmeticMean + entry) / (this.numberOfEntries + 1);
+    // new entries n + 1
+    double meanEntry_n_1;
+    double tempVarEntry_n_1;
 
-		if (this.numberOfEntries == 0) {
-			tempVarEntry_n_1 = 0;
-		} else {
-			tempVarEntry_n_1 = this.tempVar + (this.numberOfEntries + 1) / (this.numberOfEntries) * (meanEntry_n_1 - entry) * (meanEntry_n_1 - entry);
-		}
+    if (Double.isNaN(this.numberOfEntries)) {
+      // initialize
+      this.numberOfEntries = 0;
+      this.arithmeticMean = 0;
+      this.tempVar = 0;
+    }
 
-		this.numberOfEntries++;
+    // calculate the exact mean and variance
 
-		// store em away
-		this.arithmeticMean = meanEntry_n_1;
-		this.tempVar = tempVarEntry_n_1;
-	}
+    // calculate new mean
+    meanEntry_n_1 =
+        (this.numberOfEntries * this.arithmeticMean + entry) / (this.numberOfEntries + 1);
 
-	public double getStdDev() {
-		if (this.numberOfEntries > 1){
-			return Math.sqrt(1.0/(this.numberOfEntries - 1.0) * this.tempVar);
-		}			
-		return Double.NaN;
-	}
+    if (this.numberOfEntries == 0) {
+      tempVarEntry_n_1 = 0;
+    } else {
+      tempVarEntry_n_1 =
+          this.tempVar
+              + (this.numberOfEntries + 1)
+                  / (this.numberOfEntries)
+                  * (meanEntry_n_1 - entry)
+                  * (meanEntry_n_1 - entry);
+    }
 
-	public double getMean() {
-		return this.arithmeticMean;
-	}
-	
-	public int getNumberOfEntries(){
-		return (int) this.numberOfEntries;
-	}
-	
-	public double getMin(){
-		return this.min;
-	}
-	
-	public double getMax(){
-		return this.max;
-	}
+    this.numberOfEntries++;
+
+    // store em away
+    this.arithmeticMean = meanEntry_n_1;
+    this.tempVar = tempVarEntry_n_1;
+  }
+
+  public double getStdDev() {
+    if (this.numberOfEntries > 1) {
+      return Math.sqrt(1.0 / (this.numberOfEntries - 1.0) * this.tempVar);
+    }
+    return Double.NaN;
+  }
+
+  public double getMean() {
+    return this.arithmeticMean;
+  }
+
+  public int getNumberOfEntries() {
+    return (int) this.numberOfEntries;
+  }
+
+  public double getMin() {
+    return this.min;
+  }
+
+  public double getMax() {
+    return this.max;
+  }
 }

@@ -19,11 +19,11 @@
 package org.matsim.core.mobsim.qsim;
 
 /**
- * need this because a lot of code passes the withinDayEngine around, in order to later get to the activity end scheduling possibility
- * via the InternalInterface
- * 
+ * need this because a lot of code passes the withinDayEngine around, in order to later get to the
+ * activity end scheduling possibility via the InternalInterface
+ *
  * @author nagel
  */
 public interface ActivityEndReschedulerProvider {
-	public ActivityEndRescheduler getActivityRescheduler() ;
+  public ActivityEndRescheduler getActivityRescheduler();
 }

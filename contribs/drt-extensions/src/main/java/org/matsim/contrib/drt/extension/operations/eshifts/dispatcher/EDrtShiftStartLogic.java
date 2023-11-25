@@ -19,22 +19,22 @@ import org.matsim.contrib.dvrp.schedule.Task;
  */
 public class EDrtShiftStartLogic implements ShiftStartLogic {
 
-	private final ShiftStartLogic delegate;
+  private final ShiftStartLogic delegate;
 
-	public EDrtShiftStartLogic(ShiftStartLogic delegate) {
-		this.delegate = delegate;
-	}
+  public EDrtShiftStartLogic(ShiftStartLogic delegate) {
+    this.delegate = delegate;
+  }
 
-	@Override
-	public boolean shiftStarts(DrtShiftDispatcher.ShiftEntry shiftEntry) {
-		Schedule schedule = shiftEntry.vehicle.getSchedule();
-		Task currentTask = schedule.getCurrentTask();
-		if (currentTask instanceof EDrtWaitForShiftStayTask) {
-			//check whether vehicle still needs to complete charging task
-			if(((EDrtWaitForShiftStayTask) currentTask).getChargingTask() == null) {
-				return delegate.shiftStarts(shiftEntry);
-			}
-		}
-		return false;
-	}
+  @Override
+  public boolean shiftStarts(DrtShiftDispatcher.ShiftEntry shiftEntry) {
+    Schedule schedule = shiftEntry.vehicle.getSchedule();
+    Task currentTask = schedule.getCurrentTask();
+    if (currentTask instanceof EDrtWaitForShiftStayTask) {
+      // check whether vehicle still needs to complete charging task
+      if (((EDrtWaitForShiftStayTask) currentTask).getChargingTask() == null) {
+        return delegate.shiftStarts(shiftEntry);
+      }
+    }
+    return false;
+  }
 }

@@ -21,42 +21,39 @@ package org.matsim.contrib.signals.otfvis;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.VisLaneModelBuilder;
 import org.matsim.lanes.VisLinkWLanes;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 
-
 /**
  * @author dgrether
- *
  */
 class OTFLaneReader extends OTFDataReader {
-	
-	OTFLaneSignalDrawer drawer = new OTFLaneSignalDrawer();
 
-	private VisLaneModelBuilder laneModelBuilder = new VisLaneModelBuilder();
-	
-	@Override
-	public void readConstData(ByteBuffer in) throws IOException {
-		int noLinks = in.getInt();
-		for (int i = 0; i < noLinks; i++){
-			//read link data
-			VisLinkWLanes lanesLinkData = (VisLinkWLanes) ByteBufferUtils.getObject(in);
-			this.drawer.addLaneLinkData(lanesLinkData);
-		}
-		this.laneModelBuilder.connect(this.drawer.getLanesLinkData());
-	}
-	
-	@Override
-	public void invalidate(SceneGraph graph) {
-		this.drawer.addToSceneGraph(graph);
-	}
+  OTFLaneSignalDrawer drawer = new OTFLaneSignalDrawer();
 
-	@Override
-	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
-		// nothing to do as lanes are non dynamical data
-	}
+  private VisLaneModelBuilder laneModelBuilder = new VisLaneModelBuilder();
+
+  @Override
+  public void readConstData(ByteBuffer in) throws IOException {
+    int noLinks = in.getInt();
+    for (int i = 0; i < noLinks; i++) {
+      // read link data
+      VisLinkWLanes lanesLinkData = (VisLinkWLanes) ByteBufferUtils.getObject(in);
+      this.drawer.addLaneLinkData(lanesLinkData);
+    }
+    this.laneModelBuilder.connect(this.drawer.getLanesLinkData());
+  }
+
+  @Override
+  public void invalidate(SceneGraph graph) {
+    this.drawer.addToSceneGraph(graph);
+  }
+
+  @Override
+  public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
+    // nothing to do as lanes are non dynamical data
+  }
 }

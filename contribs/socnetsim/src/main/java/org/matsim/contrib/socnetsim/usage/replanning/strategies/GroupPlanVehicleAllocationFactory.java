@@ -19,68 +19,64 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.TripRouter;
-
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.GroupPlanStrategy;
-import org.matsim.contrib.socnetsim.usage.replanning.GroupPlanStrategyFactoryUtils;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
 import org.matsim.contrib.socnetsim.sharedvehicles.SharedVehicleUtils;
 import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
 import org.matsim.contrib.socnetsim.sharedvehicles.replanning.AllocateVehicleToPlansInGroupPlanModule;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import org.matsim.contrib.socnetsim.usage.replanning.GroupPlanStrategyFactoryUtils;
+import org.matsim.core.router.TripRouter;
 
 /**
  * @author thibautd
  */
 public class GroupPlanVehicleAllocationFactory extends AbstractConfigurableSelectionStrategy {
 
-	private final Scenario sc;
-	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
-	private final Provider<TripRouter> tripRouterFactory;
-	private final PlanLinkIdentifier planLinkIdentifier;
+  private final Scenario sc;
+  private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
+  private final Provider<TripRouter> tripRouterFactory;
+  private final PlanLinkIdentifier planLinkIdentifier;
 
-	@Inject
-	public GroupPlanVehicleAllocationFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , Provider<TripRouter> tripRouterFactory ,
-			@Strong PlanLinkIdentifier planLinkIdentifier ) {
-		this.sc = sc;
-		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
-		this.tripRouterFactory = tripRouterFactory;
-		this.planLinkIdentifier = planLinkIdentifier;
-	}
+  @Inject
+  public GroupPlanVehicleAllocationFactory(
+      Scenario sc,
+      PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
+      Provider<TripRouter> tripRouterFactory,
+      @Strong PlanLinkIdentifier planLinkIdentifier) {
+    this.sc = sc;
+    this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
+    this.tripRouterFactory = tripRouterFactory;
+    this.planLinkIdentifier = planLinkIdentifier;
+  }
 
-	@Override
-	public GroupPlanStrategy get() {
-		final GroupPlanStrategy strategy = instantiateStrategy( sc.getConfig() );
+  @Override
+  public GroupPlanStrategy get() {
+    final GroupPlanStrategy strategy = instantiateStrategy(sc.getConfig());
 
-		strategy.addStrategyModule(
-				new AllocateVehicleToPlansInGroupPlanModule(
-					sc.getConfig().global().getNumberOfThreads(),
-					(VehicleRessources) sc.getScenarioElement(
-						VehicleRessources.ELEMENT_NAME ),
-					SharedVehicleUtils.DEFAULT_VEHICULAR_MODES,
-					false,
-					false));
+    strategy.addStrategyModule(
+        new AllocateVehicleToPlansInGroupPlanModule(
+            sc.getConfig().global().getNumberOfThreads(),
+            (VehicleRessources) sc.getScenarioElement(VehicleRessources.ELEMENT_NAME),
+            SharedVehicleUtils.DEFAULT_VEHICULAR_MODES,
+            false,
+            false));
 
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createReRouteModule(
-						sc.getConfig(),
-						planRoutingAlgorithmFactory,
-						tripRouterFactory) );
-		
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
-					sc.getConfig(),
-					((JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME  )).getFactory(),
-					planLinkIdentifier));
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createReRouteModule(
+            sc.getConfig(), planRoutingAlgorithmFactory, tripRouterFactory));
 
-		return strategy;
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
+            sc.getConfig(),
+            ((JointPlans) sc.getScenarioElement(JointPlans.ELEMENT_NAME)).getFactory(),
+            planLinkIdentifier));
 
-	}
+    return strategy;
+  }
 }
-

@@ -23,51 +23,44 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.routes.NetworkRoute;
-
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.core.population.routes.NetworkRoute;
 
 /**
  * @author thibautd
  */
 public final class SharedVehicleUtils {
-	public static final  Collection<String> DEFAULT_VEHICULAR_MODES = Arrays.asList(
-					TransportMode.car,
-					JointActingTypes.DRIVER);
+  public static final Collection<String> DEFAULT_VEHICULAR_MODES =
+      Arrays.asList(TransportMode.car, JointActingTypes.DRIVER);
 
-	private SharedVehicleUtils() {}
+  private SharedVehicleUtils() {}
 
-	public static Set<Id> getVehiclesInJointPlan(
-			final JointPlan jointPlan,
-			final Collection<String> legModes) {
-		final Set<Id> vehs = new HashSet<Id>();
-		for ( Plan p : jointPlan.getIndividualPlans().values() ) {
-			vehs.addAll( getVehiclesInPlan( p , legModes ) );
-		}
-		return vehs;
-	}
+  public static Set<Id> getVehiclesInJointPlan(
+      final JointPlan jointPlan, final Collection<String> legModes) {
+    final Set<Id> vehs = new HashSet<Id>();
+    for (Plan p : jointPlan.getIndividualPlans().values()) {
+      vehs.addAll(getVehiclesInPlan(p, legModes));
+    }
+    return vehs;
+  }
 
-	public static Set<Id> getVehiclesInPlan(
-			final Plan plan,
-			final Collection<String> legModes) {
-		final Set<Id> vehs = new HashSet<Id>();
-		for ( PlanElement pe : plan.getPlanElements() ) {
-			if ( !(pe instanceof Leg) ) continue;
-			final Leg l = (Leg) pe;
-			if ( !legModes.contains( l.getMode() ) ) continue;
-			if ( !(l.getRoute() instanceof NetworkRoute) ) continue;
-			final Id v = ((NetworkRoute) l.getRoute()).getVehicleId();
-			if ( v == null ) continue;
-			vehs.add( v );
-		}
-		return vehs;
-	}
+  public static Set<Id> getVehiclesInPlan(final Plan plan, final Collection<String> legModes) {
+    final Set<Id> vehs = new HashSet<Id>();
+    for (PlanElement pe : plan.getPlanElements()) {
+      if (!(pe instanceof Leg)) continue;
+      final Leg l = (Leg) pe;
+      if (!legModes.contains(l.getMode())) continue;
+      if (!(l.getRoute() instanceof NetworkRoute)) continue;
+      final Id v = ((NetworkRoute) l.getRoute()).getVehicleId();
+      if (v == null) continue;
+      vehs.add(v);
+    }
+    return vehs;
+  }
 }
-

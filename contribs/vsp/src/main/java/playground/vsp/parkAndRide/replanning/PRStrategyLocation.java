@@ -19,8 +19,8 @@
 
 package playground.vsp.parkAndRide.replanning;
 
+import jakarta.inject.Provider;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
@@ -34,55 +34,59 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.pt.replanning.TransitActsRemoverStrategy;
-
 import playground.vsp.parkAndRide.PRConfigGroup;
 import playground.vsp.parkAndRide.PRFacility;
 import playground.vsp.parkAndRide.PRFileReader;
 
-import jakarta.inject.Provider;
-
 /**
- * A way of plugging park-and-ride strategy modules together. Via config file: <param name="Module_#" value="playground.vsp.parkAndRide.replanning.PRStrategyLocation" />
+ * A way of plugging park-and-ride strategy modules together. Via config file: <param
+ * name="Module_#" value="playground.vsp.parkAndRide.replanning.PRStrategyLocation" />
  *
  * @author ikaddoura
- *
  */
 public class PRStrategyLocation implements PlanStrategy {
 
-	PlanStrategyImpl planStrategyDelegate = null ;
+  PlanStrategyImpl planStrategyDelegate = null;
 
-	public PRStrategyLocation(MatsimServices controler, Provider<TripRouter> tripRouterProvider) {
+  public PRStrategyLocation(MatsimServices controler, Provider<TripRouter> tripRouterProvider) {
 
-		PRConfigGroup prSettings = (PRConfigGroup) controler.getConfig().getModule(PRConfigGroup.GROUP_NAME);
-		PRFileReader prReader = new PRFileReader(prSettings.getInputFile());
-		Map<Id<PRFacility>, PRFacility> id2prFacility = prReader.getId2prFacility();
+    PRConfigGroup prSettings =
+        (PRConfigGroup) controler.getConfig().getModule(PRConfigGroup.GROUP_NAME);
+    PRFileReader prReader = new PRFileReader(prSettings.getInputFile());
+    Map<Id<PRFacility>, PRFacility> id2prFacility = prReader.getId2prFacility();
 
-		RandomPlanSelector planSelector = new RandomPlanSelector();
-		planStrategyDelegate = new PlanStrategyImpl( planSelector );
+    RandomPlanSelector planSelector = new RandomPlanSelector();
+    planStrategyDelegate = new PlanStrategyImpl(planSelector);
 
-		TransitActsRemoverStrategy transitActsRemoveModule = new TransitActsRemoverStrategy(controler.getConfig());
-		planStrategyDelegate.addStrategyModule(transitActsRemoveModule) ;
+    TransitActsRemoverStrategy transitActsRemoveModule =
+        new TransitActsRemoverStrategy(controler.getConfig());
+    planStrategyDelegate.addStrategyModule(transitActsRemoveModule);
 
-		PRLocationStrategyMod prLocationMod = new PRLocationStrategyMod(controler, id2prFacility, prSettings.getGravity(), prSettings.getTypicalDuration());
-		planStrategyDelegate.addStrategyModule(prLocationMod);
+    PRLocationStrategyMod prLocationMod =
+        new PRLocationStrategyMod(
+            controler, id2prFacility, prSettings.getGravity(), prSettings.getTypicalDuration());
+    planStrategyDelegate.addStrategyModule(prLocationMod);
 
-		ReRoute reRouteModule = new ReRoute( controler.getScenario(), tripRouterProvider, TimeInterpretation.create(controler.getConfig())) ;
-		planStrategyDelegate.addStrategyModule(reRouteModule) ;
+    ReRoute reRouteModule =
+        new ReRoute(
+            controler.getScenario(),
+            tripRouterProvider,
+            TimeInterpretation.create(controler.getConfig()));
+    planStrategyDelegate.addStrategyModule(reRouteModule);
+  }
 
-	}
+  @Override
+  public void finish() {
+    planStrategyDelegate.finish();
+  }
 
-	@Override
-	public void finish() {
-		planStrategyDelegate.finish();
-	}
+  @Override
+  public void init(ReplanningContext replanningContext) {
+    planStrategyDelegate.init(replanningContext);
+  }
 
-	@Override
-	public void init(ReplanningContext replanningContext) {
-		planStrategyDelegate.init(replanningContext);
-	}
-
-	@Override
-	public void run(HasPlansAndId<Plan, Person> person) {
-		planStrategyDelegate.run(person);
-	}
+  @Override
+  public void run(HasPlansAndId<Plan, Person> person) {
+    planStrategyDelegate.run(person);
+  }
 }

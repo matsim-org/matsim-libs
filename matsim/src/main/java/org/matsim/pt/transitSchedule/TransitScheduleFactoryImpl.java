@@ -21,7 +21,6 @@
 package org.matsim.pt.transitSchedule;
 
 import java.util.List;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -34,48 +33,62 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-
-
 public class TransitScheduleFactoryImpl implements TransitScheduleFactory {
 
-	@Override
-	public TransitLine createTransitLine(final Id<TransitLine> lineId) {
-		return new TransitLineImpl(lineId);
-	}
+  @Override
+  public TransitLine createTransitLine(final Id<TransitLine> lineId) {
+    return new TransitLineImpl(lineId);
+  }
 
-	@Override
-	public TransitRoute createTransitRoute(final Id<TransitRoute> routeId, final NetworkRoute route, final List<TransitRouteStop> stops, final String mode) {
-		return new TransitRouteImpl(routeId, route, stops, mode);
-	}
+  @Override
+  public TransitRoute createTransitRoute(
+      final Id<TransitRoute> routeId,
+      final NetworkRoute route,
+      final List<TransitRouteStop> stops,
+      final String mode) {
+    return new TransitRouteImpl(routeId, route, stops, mode);
+  }
 
-	@Override
-	public TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay) {
-		return new TransitRouteStopImpl.Builder().stop(stop).arrivalOffset(arrivalDelay).departureOffset(departureDelay).build();
-	}
+  @Override
+  public TransitRouteStop createTransitRouteStop(
+      final TransitStopFacility stop, final double arrivalDelay, final double departureDelay) {
+    return new TransitRouteStopImpl.Builder()
+        .stop(stop)
+        .arrivalOffset(arrivalDelay)
+        .departureOffset(departureDelay)
+        .build();
+  }
 
-	@Override
-	public TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final OptionalTime arrivalDelay, final OptionalTime departureDelay) {
-		return new TransitRouteStopImpl.Builder().stop(stop).arrivalOffset(arrivalDelay).departureOffset(departureDelay).build();
-	}
+  @Override
+  public TransitRouteStop createTransitRouteStop(
+      final TransitStopFacility stop,
+      final OptionalTime arrivalDelay,
+      final OptionalTime departureDelay) {
+    return new TransitRouteStopImpl.Builder()
+        .stop(stop)
+        .arrivalOffset(arrivalDelay)
+        .departureOffset(departureDelay)
+        .build();
+  }
 
-	@Override
-	public TransitRouteStopImpl.Builder createTransitRouteStopBuilder(TransitStopFacility stop) {
-		return new TransitRouteStopImpl.Builder().stop(stop);
-	}
+  @Override
+  public TransitRouteStopImpl.Builder createTransitRouteStopBuilder(TransitStopFacility stop) {
+    return new TransitRouteStopImpl.Builder().stop(stop);
+  }
 
-	@Override
-	public TransitSchedule createTransitSchedule() {
-		return new TransitScheduleImpl(this);
-	}
+  @Override
+  public TransitSchedule createTransitSchedule() {
+    return new TransitScheduleImpl(this);
+  }
 
-	@Override
-	public TransitStopFacility createTransitStopFacility(final Id<TransitStopFacility> facilityId, final Coord coordinate, final boolean blocksLane) {
-		return new TransitStopFacilityImpl(facilityId, coordinate, blocksLane);
-	}
+  @Override
+  public TransitStopFacility createTransitStopFacility(
+      final Id<TransitStopFacility> facilityId, final Coord coordinate, final boolean blocksLane) {
+    return new TransitStopFacilityImpl(facilityId, coordinate, blocksLane);
+  }
 
-	@Override
-	public Departure createDeparture(final Id<Departure> departureId, final double time) {
-		return new DepartureImpl(departureId, time);
-	}
-
+  @Override
+  public Departure createDeparture(final Id<Departure> departureId, final double time) {
+    return new DepartureImpl(departureId, time);
+  }
 }

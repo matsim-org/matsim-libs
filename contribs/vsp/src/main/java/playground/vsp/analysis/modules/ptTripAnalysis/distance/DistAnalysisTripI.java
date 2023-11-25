@@ -21,8 +21,5 @@ package playground.vsp.analysis.modules.ptTripAnalysis.distance;
 
 /**
  * @author droeder
- *
  */
-public interface DistAnalysisTripI {
-
-}
+public interface DistAnalysisTripI {}

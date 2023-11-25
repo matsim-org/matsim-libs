@@ -19,24 +19,22 @@
 
 package playground.vsp.andreas.bvgAna.level1;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import playground.vsp.andreas.bvgAna.mrieser.analysis.TransitLoadByTime;
 
 /**
  * Wrapper class, should be replaced by original one or substituted by <code>TransitLoad</code>
- * 
- * @author aneumann
  *
+ * @author aneumann
  */
-public class VehId2OccupancyHandler extends TransitLoadByTime{
-	
-	private final Logger log = LogManager.getLogger(VehId2OccupancyHandler.class);
-//	private final Level logLevel = Level.DEBUG;
-	
-	public VehId2OccupancyHandler(){
-//		this.log.setLevel(this.logLevel);
-	}
+public class VehId2OccupancyHandler extends TransitLoadByTime {
+
+  private final Logger log = LogManager.getLogger(VehId2OccupancyHandler.class);
+
+  //	private final Level logLevel = Level.DEBUG;
+
+  public VehId2OccupancyHandler() {
+    //		this.log.setLevel(this.logLevel);
+  }
 }

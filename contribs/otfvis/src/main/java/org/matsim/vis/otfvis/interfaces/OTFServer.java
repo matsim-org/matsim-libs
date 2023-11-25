@@ -21,43 +21,39 @@
 package org.matsim.vis.otfvis.interfaces;
 
 import java.util.Collection;
-
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 
 /**
- * OTFServerRemote is the one most important interface for the
- * communication between client and server. All methods necessary for data
- * exchange are bundled in this interface.
+ * OTFServerRemote is the one most important interface for the communication between client and
+ * server. All methods necessary for data exchange are bundled in this interface.
  *
  * @author dstrippgen
  */
 public interface OTFServer {
 
-	void requestNewTime(int time);
+  void requestNewTime(int time);
 
-	OTFServerQuadTree getQuad(OTFConnectionManager connect);
+  OTFServerQuadTree getQuad(OTFConnectionManager connect);
 
-	byte[] getQuadConstStateBuffer();
+  byte[] getQuadConstStateBuffer();
 
-	byte[] getQuadDynStateBuffer(QuadTree.Rect bounds);
+  byte[] getQuadDynStateBuffer(QuadTree.Rect bounds);
 
-	int getLocalTime();
+  int getLocalTime();
 
-	/**
-	 * @return If the server is "live" (i.e. has user control) or not.
-	 */
-	boolean isLive();
+  /**
+   * @return If the server is "live" (i.e. has user control) or not.
+   */
+  boolean isLive();
 
-	Collection<Double> getTimeSteps();
+  Collection<Double> getTimeSteps();
 
-	void setShowNonMovingItems(boolean showNonMovingItems);
+  void setShowNonMovingItems(boolean showNonMovingItems);
 
-	boolean isFinished();
+  boolean isFinished();
 
-	OTFVisConfigGroup getOTFVisConfig();
-
+  OTFVisConfigGroup getOTFVisConfig();
 }
-

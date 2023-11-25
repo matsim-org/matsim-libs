@@ -24,46 +24,45 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-
 import org.matsim.core.utils.collections.MapUtils;
 
 /**
  * Class responsible of deleting inplausible plans to reduce the search space
+ *
  * @author thibautd
  */
 final class PersonRecordsPlansPruner {
-	private PersonRecordsPlansPruner() {}
+  private PersonRecordsPlansPruner() {}
 
-	public static void prunePlans(
-			final IncompatiblePlanRecords incompatiblePlans,
-			final Map<Id, PersonRecord> persons) {
-		for ( PersonRecord person : persons.values() ) {
-			pruneAtIndividualLevel( incompatiblePlans , person );
-		}
-	}
+  public static void prunePlans(
+      final IncompatiblePlanRecords incompatiblePlans, final Map<Id, PersonRecord> persons) {
+    for (PersonRecord person : persons.values()) {
+      pruneAtIndividualLevel(incompatiblePlans, person);
+    }
+  }
 
-	private static void pruneAtIndividualLevel(
-			final IncompatiblePlanRecords incompatiblePlans,
-			final PersonRecord person) {
-		final Map<Set<Id<Person>>, Set<Set<Id>>> knownBranches = new HashMap< >();
-		double lastRecordWeight = Double.POSITIVE_INFINITY;
-		final Iterator<PlanRecord> iterator = person.prunedPlans.iterator();
-		while ( iterator.hasNext() ) {
-			final PlanRecord r = iterator.next();
-			assert r.individualPlanWeight <= lastRecordWeight : person.plans;
-			lastRecordWeight = r.individualPlanWeight;
+  private static void pruneAtIndividualLevel(
+      final IncompatiblePlanRecords incompatiblePlans, final PersonRecord person) {
+    final Map<Set<Id<Person>>, Set<Set<Id>>> knownBranches = new HashMap<>();
+    double lastRecordWeight = Double.POSITIVE_INFINITY;
+    final Iterator<PlanRecord> iterator = person.prunedPlans.iterator();
+    while (iterator.hasNext()) {
+      final PlanRecord r = iterator.next();
+      assert r.individualPlanWeight <= lastRecordWeight : person.plans;
+      lastRecordWeight = r.individualPlanWeight;
 
-			final Set<Id<Person>> cotravs = r.jointPlan == null ?
-				Collections.<Id<Person>>emptySet() :
-				r.jointPlan.getIndividualPlans().keySet();
-			// only consider the best plan of each structure for each set of
-			// incompatible plans.
-			if ( !MapUtils.getSet( cotravs , knownBranches ).add( incompatiblePlans.getIncompatibilityGroups( r ) ) ) {
-				iterator.remove();
-			}
-		}
-	}
+      final Set<Id<Person>> cotravs =
+          r.jointPlan == null
+              ? Collections.<Id<Person>>emptySet()
+              : r.jointPlan.getIndividualPlans().keySet();
+      // only consider the best plan of each structure for each set of
+      // incompatible plans.
+      if (!MapUtils.getSet(cotravs, knownBranches)
+          .add(incompatiblePlans.getIncompatibilityGroups(r))) {
+        iterator.remove();
+      }
+    }
+  }
 }

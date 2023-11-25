@@ -17,19 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
+/** */
 package playground.vsp.congestion;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,104 +41,132 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.testcases.MatsimTestUtils;
-
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 
 /**
- *
  * This test looks at the cost structure, i.e. each agent's caused and affected delay.
  *
  * @author ikaddoura
- *
  */
-
 public class MarginalCongestionHandlerV3Test {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	@Test
-	public final void testCongestionExample(){
+  @Test
+  public final void testCongestionExample() {
 
-		String configFile = testUtils.getPackageInputDirectory()+"MarginalCongestionHandlerV3Test/config.xml";
-		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
+    String configFile =
+        testUtils.getPackageInputDirectory() + "MarginalCongestionHandlerV3Test/config.xml";
+    final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 
-		Config config = ConfigUtils.loadConfig( configFile ) ;
-		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
+    Config config = ConfigUtils.loadConfig(configFile);
+    config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 
-		final Controler controler = new Controler(config);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addEventHandlerBinding().toProvider(new Provider<EventHandler>() {
-					@Inject EventsManager eventsManager;
-					@Inject Scenario scenario;
-					@Override public EventHandler get() {
-						return new CongestionHandlerImplV3(eventsManager, scenario);
-					}
-				});
-				addEventHandlerBinding().toInstance(new CongestionEventHandler() {
-					@Override public void reset(int iteration) { }
-					@Override public void handleEvent(CongestionEvent event) {
-						congestionEvents.add(event);
-					}
-				});
-			}
-		});
+    final Controler controler = new Controler(config);
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            addEventHandlerBinding()
+                .toProvider(
+                    new Provider<EventHandler>() {
+                      @Inject EventsManager eventsManager;
+                      @Inject Scenario scenario;
 
-		controler.getConfig().controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
-		controler.run();
+                      @Override
+                      public EventHandler get() {
+                        return new CongestionHandlerImplV3(eventsManager, scenario);
+                      }
+                    });
+            addEventHandlerBinding()
+                .toInstance(
+                    new CongestionEventHandler() {
+                      @Override
+                      public void reset(int iteration) {}
 
-		// process
-		Map<Id<Person>, Double> personId2causedDelay = new HashMap<Id<Person>, Double>();
-		Map<Id<Person>, Double> personId2affectedDelay = new HashMap<Id<Person>, Double>();
-		List<Id<Person>> persons = new ArrayList<Id<Person>>();
-		double totalDelay = 0.;
+                      @Override
+                      public void handleEvent(CongestionEvent event) {
+                        congestionEvents.add(event);
+                      }
+                    });
+          }
+        });
 
-		for (CongestionEvent event : congestionEvents) {
+    controler
+        .getConfig()
+        .controller()
+        .setOverwriteFileSetting(
+            OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+    controler.run();
 
-			if (!persons.contains(event.getCausingAgentId())) {
-				persons.add(event.getCausingAgentId());
-			}
+    // process
+    Map<Id<Person>, Double> personId2causedDelay = new HashMap<Id<Person>, Double>();
+    Map<Id<Person>, Double> personId2affectedDelay = new HashMap<Id<Person>, Double>();
+    List<Id<Person>> persons = new ArrayList<Id<Person>>();
+    double totalDelay = 0.;
 
-			if (!persons.contains(event.getAffectedAgentId())) {
-				persons.add(event.getAffectedAgentId());
-			}
+    for (CongestionEvent event : congestionEvents) {
 
-			totalDelay = totalDelay + event.getDelay();
+      if (!persons.contains(event.getCausingAgentId())) {
+        persons.add(event.getCausingAgentId());
+      }
 
-			if (personId2causedDelay.containsKey(event.getCausingAgentId())){
-				double causedSoFar = personId2causedDelay.get(event.getCausingAgentId());
-				double causedNewValue = causedSoFar + event.getDelay();
-				personId2causedDelay.put(event.getCausingAgentId(), causedNewValue);
-			} else {
-				personId2causedDelay.put(event.getCausingAgentId(), event.getDelay());
-			}
+      if (!persons.contains(event.getAffectedAgentId())) {
+        persons.add(event.getAffectedAgentId());
+      }
 
-			if (personId2affectedDelay.containsKey(event.getAffectedAgentId())){
-				double affectedSoFar = personId2affectedDelay.get(event.getAffectedAgentId());
-				double affectedNewValue = affectedSoFar + event.getDelay();
-				personId2affectedDelay.put(event.getAffectedAgentId(), affectedNewValue);
-			} else {
-				personId2affectedDelay.put(event.getAffectedAgentId(), event.getDelay());
-			}
-		}
+      totalDelay = totalDelay + event.getDelay();
 
-		// print out
-		for (Id<Person> personId : persons) {
-			System.out.println("Person: " + personId + " // total caused delay: " + personId2causedDelay.get(personId) + " // total affected delay: " + personId2affectedDelay.get(personId));
-		}
+      if (personId2causedDelay.containsKey(event.getCausingAgentId())) {
+        double causedSoFar = personId2causedDelay.get(event.getCausingAgentId());
+        double causedNewValue = causedSoFar + event.getDelay();
+        personId2causedDelay.put(event.getCausingAgentId(), causedNewValue);
+      } else {
+        personId2causedDelay.put(event.getCausingAgentId(), event.getDelay());
+      }
 
-		double outflowRate = 3.; // 1200 veh / h --> 1 veh every 3 sec
-		double inflowRate = 1.; // 1 veh every 1 sec
-		int demand = 20;
-		Assert.assertEquals("wrong total delay", (outflowRate - inflowRate) * (demand * demand - demand) / 2, totalDelay, MatsimTestUtils.EPSILON);
+      if (personId2affectedDelay.containsKey(event.getAffectedAgentId())) {
+        double affectedSoFar = personId2affectedDelay.get(event.getAffectedAgentId());
+        double affectedNewValue = affectedSoFar + event.getDelay();
+        personId2affectedDelay.put(event.getAffectedAgentId(), affectedNewValue);
+      } else {
+        personId2affectedDelay.put(event.getAffectedAgentId(), event.getDelay());
+      }
+    }
 
-		// assert
-		Assert.assertEquals("wrong values for testAgent7", 38.0, personId2causedDelay.get(Id.create("testAgent7", Person.class)), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong values for testAgent7", 12.0, personId2affectedDelay.get(Id.create("testAgent7", Person.class)), MatsimTestUtils.EPSILON);
-		// ...
-	 }
+    // print out
+    for (Id<Person> personId : persons) {
+      System.out.println(
+          "Person: "
+              + personId
+              + " // total caused delay: "
+              + personId2causedDelay.get(personId)
+              + " // total affected delay: "
+              + personId2affectedDelay.get(personId));
+    }
+
+    double outflowRate = 3.; // 1200 veh / h --> 1 veh every 3 sec
+    double inflowRate = 1.; // 1 veh every 1 sec
+    int demand = 20;
+    Assert.assertEquals(
+        "wrong total delay",
+        (outflowRate - inflowRate) * (demand * demand - demand) / 2,
+        totalDelay,
+        MatsimTestUtils.EPSILON);
+
+    // assert
+    Assert.assertEquals(
+        "wrong values for testAgent7",
+        38.0,
+        personId2causedDelay.get(Id.create("testAgent7", Person.class)),
+        MatsimTestUtils.EPSILON);
+    Assert.assertEquals(
+        "wrong values for testAgent7",
+        12.0,
+        personId2affectedDelay.get(Id.create("testAgent7", Person.class)),
+        MatsimTestUtils.EPSILON);
+    // ...
+  }
 }

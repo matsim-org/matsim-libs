@@ -27,13 +27,13 @@ import org.junit.Test;
  */
 public class ObjectAttributesTest {
 
-	@Test
-	public void testPutGet() {
-		ObjectAttributes linkAttributes = new ObjectAttributes();
-		Assert.assertNull(linkAttributes.getAttribute("1", "osm:roadtype"));
-		Assert.assertNull(linkAttributes.putAttribute("1", "osm:roadtype", "trunk"));
-		Assert.assertEquals("trunk", linkAttributes.getAttribute("1", "osm:roadtype"));
-		Assert.assertEquals("trunk", linkAttributes.putAttribute("1", "osm:roadtype", "motorway"));
-		Assert.assertEquals("motorway", linkAttributes.getAttribute("1", "osm:roadtype"));
-	}
+  @Test
+  public void testPutGet() {
+    ObjectAttributes linkAttributes = new ObjectAttributes();
+    Assert.assertNull(linkAttributes.getAttribute("1", "osm:roadtype"));
+    Assert.assertNull(linkAttributes.putAttribute("1", "osm:roadtype", "trunk"));
+    Assert.assertEquals("trunk", linkAttributes.getAttribute("1", "osm:roadtype"));
+    Assert.assertEquals("trunk", linkAttributes.putAttribute("1", "osm:roadtype", "motorway"));
+    Assert.assertEquals("motorway", linkAttributes.getAttribute("1", "osm:roadtype"));
+  }
 }

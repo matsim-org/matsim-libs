@@ -22,30 +22,32 @@ package org.matsim.vis.otfvis.interfaces;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 
-
 /**
- * OTFDataReader is the base class for all Reader classes.
- * The Reader classes retrieve the information from the ByteStream and
- * directly transfer the information onto the receiver classes. The Reader classes have therefore
- * to extract the exact number of bytes from the stream that the Writer class has written.
+ * OTFDataReader is the base class for all Reader classes. The Reader classes retrieve the
+ * information from the ByteStream and directly transfer the information onto the receiver classes.
+ * The Reader classes have therefore to extract the exact number of bytes from the stream that the
+ * Writer class has written.
  *
  * @author dstrippgen
  */
-public abstract class  OTFDataReader {
+public abstract class OTFDataReader {
 
-	private OTFDataWriter src;
-	public void setSrc(OTFDataWriter src) {
-		this.src = src;
-	}
-	public OTFDataWriter getSrc() {
-		return this.src;
-	}
-	public abstract void readConstData(ByteBuffer in) throws IOException;
-	public abstract void readDynData(ByteBuffer in, SceneGraph graph) throws IOException;
-	public abstract void invalidate(SceneGraph graph);
+  private OTFDataWriter src;
+
+  public void setSrc(OTFDataWriter src) {
+    this.src = src;
+  }
+
+  public OTFDataWriter getSrc() {
+    return this.src;
+  }
+
+  public abstract void readConstData(ByteBuffer in) throws IOException;
+
+  public abstract void readDynData(ByteBuffer in, SceneGraph graph) throws IOException;
+
+  public abstract void invalidate(SceneGraph graph);
 }
-

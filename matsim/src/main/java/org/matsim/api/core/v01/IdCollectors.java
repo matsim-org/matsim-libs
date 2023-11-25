@@ -20,6 +20,7 @@
 
 package org.matsim.api.core.v01;
 
+import com.google.common.base.Preconditions;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BinaryOperator;
@@ -27,72 +28,79 @@ import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
 
-import com.google.common.base.Preconditions;
-
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class IdCollectors {
-	public static <T, K, V> Collector<T, ?, IdMap<K, V>> toIdMap(Class<K> idClass, Function<? super T, ? extends Id<K>> keyMapper,
-			Function<? super T, ? extends V> valueMapper) {
-		return Collector.of(
-				// supplier
-				() -> new IdMap<>(idClass),
-				// accumulator
-				(map, element) -> {
-					Id<K> k = keyMapper.apply(element);
-					V v = Objects.requireNonNull(valueMapper.apply(element));
-					V u = map.putIfAbsent(k, v);
-					Preconditions.checkState(u == null, "Duplicate key %s (attempted merging values %s and %s)", k, u, v);
-				},
-				// combiner
-				(m1, m2) -> {
-					for (Map.Entry<Id<K>, V> e : m2.entrySet()) {
-						Id<K> k = e.getKey();
-						V v = Objects.requireNonNull(e.getValue());
-						V u = m1.putIfAbsent(k, v);
-						Preconditions.checkState(u == null, "Duplicate key %s (attempted merging values %s and %s)", k, u, v);
-					}
-					return m1;
-				},
-				// characteristics
-				Characteristics.IDENTITY_FINISH);
-	}
+  public static <T, K, V> Collector<T, ?, IdMap<K, V>> toIdMap(
+      Class<K> idClass,
+      Function<? super T, ? extends Id<K>> keyMapper,
+      Function<? super T, ? extends V> valueMapper) {
+    return Collector.of(
+        // supplier
+        () -> new IdMap<>(idClass),
+        // accumulator
+        (map, element) -> {
+          Id<K> k = keyMapper.apply(element);
+          V v = Objects.requireNonNull(valueMapper.apply(element));
+          V u = map.putIfAbsent(k, v);
+          Preconditions.checkState(
+              u == null, "Duplicate key %s (attempted merging values %s and %s)", k, u, v);
+        },
+        // combiner
+        (m1, m2) -> {
+          for (Map.Entry<Id<K>, V> e : m2.entrySet()) {
+            Id<K> k = e.getKey();
+            V v = Objects.requireNonNull(e.getValue());
+            V u = m1.putIfAbsent(k, v);
+            Preconditions.checkState(
+                u == null, "Duplicate key %s (attempted merging values %s and %s)", k, u, v);
+          }
+          return m1;
+        },
+        // characteristics
+        Characteristics.IDENTITY_FINISH);
+  }
 
-	public static <T, K, V> Collector<T, ?, IdMap<K, V>> toIdMap(Class<K> idClass, Function<? super T, ? extends Id<K>> keyMapper,
-			Function<? super T, ? extends V> valueMapper, BinaryOperator<V> mergeFunction) {
-		return Collector.of(
-				// supplier
-				() -> new IdMap<>(idClass),
-				// accumulator
-				(map, element) -> map.merge(keyMapper.apply(element), valueMapper.apply(element), mergeFunction),
-				// combiner
-				(m1, m2) -> {
-					for (Map.Entry<Id<K>, V> e : m2.entrySet())
-						m1.merge(e.getKey(), e.getValue(), mergeFunction);
-					return m1;
-				},
-				// characteristics
-				Characteristics.IDENTITY_FINISH);
-	}
+  public static <T, K, V> Collector<T, ?, IdMap<K, V>> toIdMap(
+      Class<K> idClass,
+      Function<? super T, ? extends Id<K>> keyMapper,
+      Function<? super T, ? extends V> valueMapper,
+      BinaryOperator<V> mergeFunction) {
+    return Collector.of(
+        // supplier
+        () -> new IdMap<>(idClass),
+        // accumulator
+        (map, element) ->
+            map.merge(keyMapper.apply(element), valueMapper.apply(element), mergeFunction),
+        // combiner
+        (m1, m2) -> {
+          for (Map.Entry<Id<K>, V> e : m2.entrySet())
+            m1.merge(e.getKey(), e.getValue(), mergeFunction);
+          return m1;
+        },
+        // characteristics
+        Characteristics.IDENTITY_FINISH);
+  }
 
-	public static <T> Collector<Id<T>, ?, IdSet<T>> toIdSet(Class<T> idClass) {
-		return Collector.of(
-				// supplier
-				() -> new IdSet<>(idClass),
-				// accumulator
-				IdSet::add,
-				// combiner
-				(left, right) -> {
-					if (left.size() < right.size()) {
-						right.addAll(left);
-						return right;
-					} else {
-						left.addAll(right);
-						return left;
-					}
-				},
-				// characteristics
-				Characteristics.UNORDERED, Characteristics.IDENTITY_FINISH);
-	}
+  public static <T> Collector<Id<T>, ?, IdSet<T>> toIdSet(Class<T> idClass) {
+    return Collector.of(
+        // supplier
+        () -> new IdSet<>(idClass),
+        // accumulator
+        IdSet::add,
+        // combiner
+        (left, right) -> {
+          if (left.size() < right.size()) {
+            right.addAll(left);
+            return right;
+          } else {
+            left.addAll(right);
+            return left;
+          }
+        },
+        // characteristics
+        Characteristics.UNORDERED,
+        Characteristics.IDENTITY_FINISH);
+  }
 }

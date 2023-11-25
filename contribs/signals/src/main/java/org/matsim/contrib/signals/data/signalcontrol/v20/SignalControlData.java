@@ -20,26 +20,23 @@
 package org.matsim.contrib.signals.data.signalcontrol.v20;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.model.SignalSystem;
-
+import org.matsim.core.api.internal.MatsimToplevelContainer;
 
 /**
  * @author dgrether
- *
  */
 public interface SignalControlData extends MatsimToplevelContainer {
-	
-	@Override
-	public SignalControlDataFactory getFactory();
-	
-	public void setFactory(SignalControlDataFactory factory);
-	
-	public Map<Id<SignalSystem>, SignalSystemControllerData> getSignalSystemControllerDataBySystemId();
-	
-	public void addSignalSystemControllerData(SignalSystemControllerData controllerData);
-	
+
+  @Override
+  public SignalControlDataFactory getFactory();
+
+  public void setFactory(SignalControlDataFactory factory);
+
+  public Map<Id<SignalSystem>, SignalSystemControllerData>
+      getSignalSystemControllerDataBySystemId();
+
+  public void addSignalSystemControllerData(SignalSystemControllerData controllerData);
 }

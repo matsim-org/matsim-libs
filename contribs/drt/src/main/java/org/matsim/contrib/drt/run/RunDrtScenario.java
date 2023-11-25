@@ -19,26 +19,29 @@
 
 package org.matsim.contrib.drt.run;
 
+import com.google.common.base.Preconditions;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import com.google.common.base.Preconditions;
-
 /**
  * @author michalm
  */
 public class RunDrtScenario {
-	public static void run(String configFile, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configFile, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
-				new OTFVisConfigGroup());
-		DrtControlerCreator.createControler(config, otfvis).run();
-	}
+  public static void run(String configFile, boolean otfvis) {
+    Config config =
+        ConfigUtils.loadConfig(
+            configFile,
+            new MultiModeDrtConfigGroup(),
+            new DvrpConfigGroup(),
+            new OTFVisConfigGroup());
+    DrtControlerCreator.createControler(config, otfvis).run();
+  }
 
-	public static void main(String[] args) {
-		Preconditions.checkArgument(args.length == 1,
-				"RunDrtScenario needs one argument: path to the configuration file");
-		RunDrtScenario.run(args[0], false);
-	}
+  public static void main(String[] args) {
+    Preconditions.checkArgument(
+        args.length == 1, "RunDrtScenario needs one argument: path to the configuration file");
+    RunDrtScenario.run(args[0], false);
+  }
 }

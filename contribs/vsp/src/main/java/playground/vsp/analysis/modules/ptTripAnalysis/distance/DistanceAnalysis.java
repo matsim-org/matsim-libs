@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
@@ -42,135 +41,133 @@ import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTrip;
 import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTripSet;
 import playground.vsp.analysis.modules.ptTripAnalysis.AbstractPlan2TripsFilter;
 import playground.vsp.analysis.modules.ptTripAnalysis.AnalysisTripSetStorage;
 
 /**
- * @author droeder
- * actually this class is compiling, but not running
+ * @author droeder actually this class is compiling, but not running
  */
 @Deprecated
 public class DistanceAnalysis {
-	//TODO [dr]debugging
-	private static final Logger log = LogManager.getLogger(DistanceAnalysis.class);
-	
-	private DistAnalysisHandler eventsHandler;
+  // TODO [dr]debugging
+  private static final Logger log = LogManager.getLogger(DistanceAnalysis.class);
 
-	private String unprocessedAgents;
-	
-	public DistanceAnalysis(){
-		this.eventsHandler = new DistAnalysisHandler();
-	}
-	
-	public void addZones(Map<String, Geometry> zones){
-		this.eventsHandler.addZones(zones);
-	}
-	
+  private DistAnalysisHandler eventsHandler;
 
-	public void run(String plans, String network, String events, String outDir){
-		this.readPlansAndNetwork(plans, network);
-		log.info("streaming plans finished!");
-		this.readEvents(events);
-		log.info("streaming events finished!");
-		this.write2csv(outDir);
-		log.info("output written to " + outDir);
-	}
+  private String unprocessedAgents;
 
-	/**
-	 * @param plans
-	 * @param network
-	 */
-	@SuppressWarnings("unchecked")
-	private void readPlansAndNetwork(String plans, String network) {
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc.getNetwork()).readFile(network);
-		this.eventsHandler.addLinks((Map<Id<Link>, Link>) sc.getNetwork().getLinks());
-		
-//		final Population reader = (Population) sc.getPopulation();
-		StreamingPopulationReader reader = new StreamingPopulationReader( sc ) ;
-		StreamingDeprecated.setIsStreaming(reader, true);
-		AbstractPlan2TripsFilter planFilter = new DistPlan2TripsFilter();
-		final PersonAlgorithm algo = planFilter; 
-		reader.addAlgorithm(algo);
-		
-//		new MatsimPopulationReader(sc).parse(IOUtils.getInputStream(plans));
-		reader.parse(IOUtils.getInputStream(IOUtils.getFileUrl(plans)));
-		
-		for(Entry<Id, LinkedList<AbstractAnalysisTrip>> e:  planFilter.getTrips().entrySet()){
-			this.eventsHandler.addPerson(new DistAnalysisAgent(e.getValue(), e.getKey()));
-		}
-		this.unprocessedAgents = planFilter.getUnprocessedAgents();
-	}
-	
-	/**
-	 * @param events
-	 */
-	private void readEvents(String events) {
-		EventsManager manager = EventsUtils.createEventsManager();
-		manager.addHandler(this.eventsHandler);
+  public DistanceAnalysis() {
+    this.eventsHandler = new DistAnalysisHandler();
+  }
 
-		new EventsReaderXMLv1(manager).parse(IOUtils.getInputStream(IOUtils.getFileUrl(events)));
-	}
+  public void addZones(Map<String, Geometry> zones) {
+    this.eventsHandler.addZones(zones);
+  }
 
-	/**
-	 * @param outDir
-	 */
-	private void write2csv(String out) {
-		BufferedWriter writer;
-		try {
-			// write analysis
-			for(Entry<String, AnalysisTripSetStorage> e : this.eventsHandler.getAnalysisTripSetStorage().entrySet()){
-				for(Entry<String, AbstractAnalysisTripSet> o : e.getValue().getTripSets().entrySet()){
-					writer = IOUtils.getBufferedWriter(out + e.getKey() + "_" + o.getKey() + "_trip_distance_analysis.csv");
-					writer.write(o.getValue().toString());
-					writer.flush();
-					writer.close();
-				}
-			}
-			
-			//write stuckAgents
-			writer = IOUtils.getBufferedWriter(out + "trip_distance_analysis_stuckAgents.csv");
-			for(Id id : this.eventsHandler.getStuckAgents()) {
-				writer.write(id.toString() + "\n");
-			}
-			writer.flush();
-			writer.close();
-			
-			//write routes
-			boolean header = true;
-			writer = IOUtils.getBufferedWriter(out + "trip_distance_analysis_routes.csv");
-			for(DistAnalysisTransitRoute r: this.eventsHandler.getRoutes()){
-				writer.write(r.toString(header));
-				header = false;
-			}
-			writer.flush();
-			writer.close();
-			
-			//write vehicles
-			writer = IOUtils.getBufferedWriter(out + "trip_distance_analysis_vehicles.csv");
-			header = true;
-			for(DistAnalysisVehicle v : this.eventsHandler.getVehicles()){
-				writer.write(v.toString(header));
-				header = false;
-			}
-			writer.flush();
-			writer.close();
-			
-			//write unprocessed Agents
-			writer = IOUtils.getBufferedWriter(out + "trip_distance_analysis_uprocessed_Agents.csv");
-			writer.write(this.unprocessedAgents);
-			writer.flush();
-			writer.close();
-			
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-	}
+  public void run(String plans, String network, String events, String outDir) {
+    this.readPlansAndNetwork(plans, network);
+    log.info("streaming plans finished!");
+    this.readEvents(events);
+    log.info("streaming events finished!");
+    this.write2csv(outDir);
+    log.info("output written to " + outDir);
+  }
 
+  /**
+   * @param plans
+   * @param network
+   */
+  @SuppressWarnings("unchecked")
+  private void readPlansAndNetwork(String plans, String network) {
+    Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    new MatsimNetworkReader(sc.getNetwork()).readFile(network);
+    this.eventsHandler.addLinks((Map<Id<Link>, Link>) sc.getNetwork().getLinks());
+
+    //		final Population reader = (Population) sc.getPopulation();
+    StreamingPopulationReader reader = new StreamingPopulationReader(sc);
+    StreamingDeprecated.setIsStreaming(reader, true);
+    AbstractPlan2TripsFilter planFilter = new DistPlan2TripsFilter();
+    final PersonAlgorithm algo = planFilter;
+    reader.addAlgorithm(algo);
+
+    //		new MatsimPopulationReader(sc).parse(IOUtils.getInputStream(plans));
+    reader.parse(IOUtils.getInputStream(IOUtils.getFileUrl(plans)));
+
+    for (Entry<Id, LinkedList<AbstractAnalysisTrip>> e : planFilter.getTrips().entrySet()) {
+      this.eventsHandler.addPerson(new DistAnalysisAgent(e.getValue(), e.getKey()));
+    }
+    this.unprocessedAgents = planFilter.getUnprocessedAgents();
+  }
+
+  /**
+   * @param events
+   */
+  private void readEvents(String events) {
+    EventsManager manager = EventsUtils.createEventsManager();
+    manager.addHandler(this.eventsHandler);
+
+    new EventsReaderXMLv1(manager).parse(IOUtils.getInputStream(IOUtils.getFileUrl(events)));
+  }
+
+  /**
+   * @param outDir
+   */
+  private void write2csv(String out) {
+    BufferedWriter writer;
+    try {
+      // write analysis
+      for (Entry<String, AnalysisTripSetStorage> e :
+          this.eventsHandler.getAnalysisTripSetStorage().entrySet()) {
+        for (Entry<String, AbstractAnalysisTripSet> o : e.getValue().getTripSets().entrySet()) {
+          writer =
+              IOUtils.getBufferedWriter(
+                  out + e.getKey() + "_" + o.getKey() + "_trip_distance_analysis.csv");
+          writer.write(o.getValue().toString());
+          writer.flush();
+          writer.close();
+        }
+      }
+
+      // write stuckAgents
+      writer = IOUtils.getBufferedWriter(out + "trip_distance_analysis_stuckAgents.csv");
+      for (Id id : this.eventsHandler.getStuckAgents()) {
+        writer.write(id.toString() + "\n");
+      }
+      writer.flush();
+      writer.close();
+
+      // write routes
+      boolean header = true;
+      writer = IOUtils.getBufferedWriter(out + "trip_distance_analysis_routes.csv");
+      for (DistAnalysisTransitRoute r : this.eventsHandler.getRoutes()) {
+        writer.write(r.toString(header));
+        header = false;
+      }
+      writer.flush();
+      writer.close();
+
+      // write vehicles
+      writer = IOUtils.getBufferedWriter(out + "trip_distance_analysis_vehicles.csv");
+      header = true;
+      for (DistAnalysisVehicle v : this.eventsHandler.getVehicles()) {
+        writer.write(v.toString(header));
+        header = false;
+      }
+      writer.flush();
+      writer.close();
+
+      // write unprocessed Agents
+      writer = IOUtils.getBufferedWriter(out + "trip_distance_analysis_uprocessed_Agents.csv");
+      writer.write(this.unprocessedAgents);
+      writer.flush();
+      writer.close();
+
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 }

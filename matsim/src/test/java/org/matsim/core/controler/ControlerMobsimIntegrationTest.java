@@ -39,64 +39,68 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ControlerMobsimIntegrationTest {
 
-	private final static Logger log = LogManager.getLogger(ControlerMobsimIntegrationTest.class);
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+  private static final Logger log = LogManager.getLogger(ControlerMobsimIntegrationTest.class);
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testRunMobsim_customMobsim() {
-		Config cfg = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
-		cfg.controller().setLastIteration(0);
-		cfg.controller().setMobsim("counting");
-		cfg.controller().setWritePlansInterval(0);
-		final Controler c = new Controler(cfg);
-		final CountingMobsimFactory mf = new CountingMobsimFactory();
-		c.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				if (getConfig().controller().getMobsim().equals("counting")) {
-					bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
-						@Override
-						public Mobsim get() {
-							return mf.createMobsim(c.getScenario(), c.getEvents());
-						}
-					});
-				}
-			}
-		});
-		c.getConfig().controller().setCreateGraphs(false);
-		c.getConfig().controller().setDumpDataAtEnd(false);
-		c.getConfig().controller().setWriteEventsInterval(0);
-		c.run();
-		Assert.assertEquals(1, mf.callCount);
-	}
+  @Test
+  public void testRunMobsim_customMobsim() {
+    Config cfg =
+        this.utils.loadConfig(
+            IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+    cfg.controller().setLastIteration(0);
+    cfg.controller().setMobsim("counting");
+    cfg.controller().setWritePlansInterval(0);
+    final Controler c = new Controler(cfg);
+    final CountingMobsimFactory mf = new CountingMobsimFactory();
+    c.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            if (getConfig().controller().getMobsim().equals("counting")) {
+              bind(Mobsim.class)
+                  .toProvider(
+                      new Provider<Mobsim>() {
+                        @Override
+                        public Mobsim get() {
+                          return mf.createMobsim(c.getScenario(), c.getEvents());
+                        }
+                      });
+            }
+          }
+        });
+    c.getConfig().controller().setCreateGraphs(false);
+    c.getConfig().controller().setDumpDataAtEnd(false);
+    c.getConfig().controller().setWriteEventsInterval(0);
+    c.run();
+    Assert.assertEquals(1, mf.callCount);
+  }
 
-	@Test(expected = RuntimeException.class)
-	public void testRunMobsim_missingMobsimFactory() {
-		Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		cfg.controller().setLastIteration(0);
-		cfg.controller().setMobsim("counting");
-		cfg.controller().setWritePlansInterval(0);
-		Controler c = new Controler(cfg);
-        c.getConfig().controller().setCreateGraphs(false);
-		c.getConfig().controller().setDumpDataAtEnd(false);
-		c.getConfig().controller().setWriteEventsInterval(0);
-		c.run();
-	}
+  @Test(expected = RuntimeException.class)
+  public void testRunMobsim_missingMobsimFactory() {
+    Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+    cfg.controller().setLastIteration(0);
+    cfg.controller().setMobsim("counting");
+    cfg.controller().setWritePlansInterval(0);
+    Controler c = new Controler(cfg);
+    c.getConfig().controller().setCreateGraphs(false);
+    c.getConfig().controller().setDumpDataAtEnd(false);
+    c.getConfig().controller().setWriteEventsInterval(0);
+    c.run();
+  }
 
-	private static class CountingMobsimFactory implements MobsimFactory {
+  private static class CountingMobsimFactory implements MobsimFactory {
 
-		/*package*/ int callCount = 0;
+    /*package*/ int callCount = 0;
 
-		@Override
-		public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
-			this.callCount++;
-			return new FakeSimulation();
-		}
-	}
+    @Override
+    public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
+      this.callCount++;
+      return new FakeSimulation();
+    }
+  }
 
-	private static class FakeSimulation implements Mobsim {
-		@Override
-		public void run() {
-		}
-	}
+  private static class FakeSimulation implements Mobsim {
+    @Override
+    public void run() {}
+  }
 }

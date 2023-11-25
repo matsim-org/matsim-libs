@@ -30,13 +30,12 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class CountsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-
-	@Test public void testGetCounts() {
-		final Counts counts = new Counts();
-		counts.createAndAddCount(Id.create(0, Link.class), "1");
-		assertEquals("Getting counts failed", 1, counts.getCounts().size());
-	}
+  @Test
+  public void testGetCounts() {
+    final Counts counts = new Counts();
+    counts.createAndAddCount(Id.create(0, Link.class), "1");
+    assertEquals("Getting counts failed", 1, counts.getCounts().size());
+  }
 }

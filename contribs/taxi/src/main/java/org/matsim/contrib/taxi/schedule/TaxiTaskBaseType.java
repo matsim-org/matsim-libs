@@ -28,19 +28,24 @@ import org.matsim.contrib.dvrp.schedule.Task;
  * @author Michal Maciejewski (michalm)
  */
 public enum TaxiTaskBaseType {
-	// not directly related to any customer (although may be related to serving a customer; e.g. a pickup drive)
-	EMPTY_DRIVE, //
-	// serving a customer (TaxiTaskWithRequest)
-	PICKUP, OCCUPIED_DRIVE, DROPOFF,//
-	// not directly related to any customer
-	STAY;
+  // not directly related to any customer (although may be related to serving a customer; e.g. a
+  // pickup drive)
+  EMPTY_DRIVE, //
+  // serving a customer (TaxiTaskWithRequest)
+  PICKUP,
+  OCCUPIED_DRIVE,
+  DROPOFF, //
+  // not directly related to any customer
+  STAY;
 
-	public static TaxiTaskBaseType getBaseTypeOrElseThrow(Task task) {
-		return ((TaxiTaskType)task.getTaskType()).baseType()
-				.orElseThrow(() -> new IllegalArgumentException("Task: " + task + "does not have a base type"));
-	}
+  public static TaxiTaskBaseType getBaseTypeOrElseThrow(Task task) {
+    return ((TaxiTaskType) task.getTaskType())
+        .baseType()
+        .orElseThrow(
+            () -> new IllegalArgumentException("Task: " + task + "does not have a base type"));
+  }
 
-	public boolean isBaseTypeOf(Task task) {
-		return ((TaxiTaskType)task.getTaskType()).baseType().orElse(null) == this;
-	}
+  public boolean isBaseTypeOf(Task task) {
+    return ((TaxiTaskType) task.getTaskType()).baseType().orElse(null) == this;
+  }
 }

@@ -30,46 +30,45 @@ import org.matsim.contrib.zone.ZonalSystemParams;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ZonalTaxiOptimizerIT {
-	@Rule
-	public final MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testZonal_dse() {
-		RuleBasedTaxiOptimizerParams rbParams = new RuleBasedTaxiOptimizerParams();
-		rbParams.goal = Goal.DEMAND_SUPPLY_EQUIL;
-		rbParams.nearestRequestsLimit = 99999;
-		rbParams.nearestVehiclesLimit = 99999;
-		rbParams.cellSize = 99999.;
+  @Test
+  public void testZonal_dse() {
+    RuleBasedTaxiOptimizerParams rbParams = new RuleBasedTaxiOptimizerParams();
+    rbParams.goal = Goal.DEMAND_SUPPLY_EQUIL;
+    rbParams.nearestRequestsLimit = 99999;
+    rbParams.nearestVehiclesLimit = 99999;
+    rbParams.cellSize = 99999.;
 
-		ZonalSystemParams zsParams = new ZonalSystemParams();
-		zsParams.zonesShpFile = "zones/zones.shp";
-		zsParams.zonesXmlFile = "zones/zones.xml";
-		zsParams.expansionDistance = 3000;
+    ZonalSystemParams zsParams = new ZonalSystemParams();
+    zsParams.zonesShpFile = "zones/zones.shp";
+    zsParams.zonesXmlFile = "zones/zones.xml";
+    zsParams.expansionDistance = 3000;
 
-		ZonalTaxiOptimizerParams params = new ZonalTaxiOptimizerParams();
-		params.addParameterSet(zsParams);
-		params.addParameterSet(rbParams);
+    ZonalTaxiOptimizerParams params = new ZonalTaxiOptimizerParams();
+    params.addParameterSet(zsParams);
+    params.addParameterSet(rbParams);
 
-		runBenchmark(false, params, utils);
-	}
+    runBenchmark(false, params, utils);
+  }
 
-	@Test
-	public void testZonal_minWaitTime() {
-		RuleBasedTaxiOptimizerParams rbParams = new RuleBasedTaxiOptimizerParams();
-		rbParams.goal = Goal.MIN_WAIT_TIME;
-		rbParams.nearestRequestsLimit = 10;
-		rbParams.nearestVehiclesLimit = 10;
-		rbParams.cellSize = 1000.;
+  @Test
+  public void testZonal_minWaitTime() {
+    RuleBasedTaxiOptimizerParams rbParams = new RuleBasedTaxiOptimizerParams();
+    rbParams.goal = Goal.MIN_WAIT_TIME;
+    rbParams.nearestRequestsLimit = 10;
+    rbParams.nearestVehiclesLimit = 10;
+    rbParams.cellSize = 1000.;
 
-		ZonalSystemParams zsParams = new ZonalSystemParams();
-		zsParams.zonesShpFile = "zones/zones.shp";
-		zsParams.zonesXmlFile = "zones/zones.xml";
-		zsParams.expansionDistance = 3000;
+    ZonalSystemParams zsParams = new ZonalSystemParams();
+    zsParams.zonesShpFile = "zones/zones.shp";
+    zsParams.zonesXmlFile = "zones/zones.xml";
+    zsParams.expansionDistance = 3000;
 
-		ZonalTaxiOptimizerParams params = new ZonalTaxiOptimizerParams();
-		params.addParameterSet(rbParams);
-		params.addParameterSet(zsParams);
+    ZonalTaxiOptimizerParams params = new ZonalTaxiOptimizerParams();
+    params.addParameterSet(rbParams);
+    params.addParameterSet(zsParams);
 
-		runBenchmark(false, params, utils);
-	}
+    runBenchmark(false, params, utils);
+  }
 }

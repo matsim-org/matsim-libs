@@ -25,9 +25,10 @@ import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.evrp.ChargingTaskImpl;
 
 public class EDrtChargingTask extends ChargingTaskImpl {
-	public static final DrtTaskType TYPE = new DrtTaskType("CHARGING");
+  public static final DrtTaskType TYPE = new DrtTaskType("CHARGING");
 
-	public EDrtChargingTask(double beginTime, double endTime, Charger charger, ElectricVehicle ev, double totalEnergy) {
-		super(TYPE, beginTime, endTime, charger, ev, totalEnergy);
-	}
+  public EDrtChargingTask(
+      double beginTime, double endTime, Charger charger, ElectricVehicle ev, double totalEnergy) {
+    super(TYPE, beginTime, endTime, charger, ev, totalEnergy);
+  }
 }

@@ -18,9 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
  * @author ikaddoura
- * 
  */
 package playground.vsp.analysis.modules.emissionsWriter;
 
@@ -37,57 +35,56 @@ import org.matsim.core.scenario.MutableScenario;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
- * This module requires a scenario with emission specific informations set in the VspExperimentalConfigGroup.
- * Emission events are written based on a standard events file.
- * 
- * @author ikaddoura, benjamin
+ * This module requires a scenario with emission specific informations set in the
+ * VspExperimentalConfigGroup. Emission events are written based on a standard events file.
  *
+ * @author ikaddoura, benjamin
  */
-public class EmissionEventsWriter extends AbstractAnalysisModule{
-	private final static Logger log = LogManager.getLogger(EmissionEventsWriter.class);
-	private MutableScenario scenario;
-	private EmissionModule emissionModule;
-	private EventWriterXML emissionEventWriter;
-	private String outputPath;
-	private String filename;
-	
-	public EmissionEventsWriter(String outputFolder) {
-		super(EmissionEventsWriter.class.getSimpleName());
-		this.outputPath = outputFolder + this.getName() + "/";
-	}
-	
-	public void init(MutableScenario scenario) {
-		this.scenario = scenario;
-		this.emissionModule = new EmissionModule(scenario, EventsUtils.createEventsManager());
-		this.filename = "emission.events.xml.gz";
-	}
-	
-	@Override
-	public List<EventHandler> getEventHandler() {
-		List<EventHandler> handler = new LinkedList<EventHandler>();
-		
-		new File(this.outputPath).mkdirs();
-		this.emissionEventWriter = new EventWriterXML(this.outputPath + this.filename);
-		this.emissionModule.getEmissionEventsManager().addHandler(this.emissionEventWriter);
-		
-		return handler;
-	}
+public class EmissionEventsWriter extends AbstractAnalysisModule {
+  private static final Logger log = LogManager.getLogger(EmissionEventsWriter.class);
+  private MutableScenario scenario;
+  private EmissionModule emissionModule;
+  private EventWriterXML emissionEventWriter;
+  private String outputPath;
+  private String filename;
 
-	@Override
-	public void preProcessData() {
-		// nothing to do
-	}
+  public EmissionEventsWriter(String outputFolder) {
+    super(EmissionEventsWriter.class.getSimpleName());
+    this.outputPath = outputFolder + this.getName() + "/";
+  }
 
-	@Override
-	public void postProcessData() {
-		// nothing to do
-	}
+  public void init(MutableScenario scenario) {
+    this.scenario = scenario;
+    this.emissionModule = new EmissionModule(scenario, EventsUtils.createEventsManager());
+    this.filename = "emission.events.xml.gz";
+  }
 
-	@Override
-	public void writeResults(String outputFolder) {
-		// outputFolder is required earlier and therefore not used here, move in abstract class to constructor? ik
-		this.emissionEventWriter.closeFile();
-		this.emissionModule.writeEmissionInformation();
-	}
-	
+  @Override
+  public List<EventHandler> getEventHandler() {
+    List<EventHandler> handler = new LinkedList<EventHandler>();
+
+    new File(this.outputPath).mkdirs();
+    this.emissionEventWriter = new EventWriterXML(this.outputPath + this.filename);
+    this.emissionModule.getEmissionEventsManager().addHandler(this.emissionEventWriter);
+
+    return handler;
+  }
+
+  @Override
+  public void preProcessData() {
+    // nothing to do
+  }
+
+  @Override
+  public void postProcessData() {
+    // nothing to do
+  }
+
+  @Override
+  public void writeResults(String outputFolder) {
+    // outputFolder is required earlier and therefore not used here, move in abstract class to
+    // constructor? ik
+    this.emissionEventWriter.closeFile();
+    this.emissionModule.writeEmissionInformation();
+  }
 }

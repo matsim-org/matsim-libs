@@ -20,27 +20,28 @@
 package org.matsim.contrib.socnetsim.usage.replanning.removers;
 
 import com.google.inject.Inject;
-import org.matsim.core.config.Config;
 import org.matsim.contrib.socnetsim.framework.replanning.removers.AbstractDumbRemoverFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.InverseScoreWeight;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector;
 import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
+import org.matsim.core.config.Config;
 
 public class CoalitionMinSelectorFactory extends AbstractDumbRemoverFactory {
-	
-	@Inject
-	public CoalitionMinSelectorFactory( final Config conf ) {
-		super( getMaxPlansPerAgent( conf ) );
-	}
 
-	private static int getMaxPlansPerAgent(Config conf) {
-		final GroupReplanningConfigGroup group = (GroupReplanningConfigGroup) conf.getModule( GroupReplanningConfigGroup.GROUP_NAME );
-		return group.getMaxPlansPerAgent();
-	}
+  @Inject
+  public CoalitionMinSelectorFactory(final Config conf) {
+    super(getMaxPlansPerAgent(conf));
+  }
 
-	@Override
-	public GroupLevelPlanSelector createSelector() {
-		return new CoalitionSelector( new InverseScoreWeight() );
-	}
+  private static int getMaxPlansPerAgent(Config conf) {
+    final GroupReplanningConfigGroup group =
+        (GroupReplanningConfigGroup) conf.getModule(GroupReplanningConfigGroup.GROUP_NAME);
+    return group.getMaxPlansPerAgent();
+  }
+
+  @Override
+  public GroupLevelPlanSelector createSelector() {
+    return new CoalitionSelector(new InverseScoreWeight());
+  }
 }

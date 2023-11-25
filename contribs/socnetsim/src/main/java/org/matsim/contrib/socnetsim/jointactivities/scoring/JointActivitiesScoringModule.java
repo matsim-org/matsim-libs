@@ -21,16 +21,13 @@ package org.matsim.contrib.socnetsim.jointactivities.scoring;
 
 import org.matsim.core.controler.AbstractModule;
 
-
 /**
  * @author thibautd
  */
 public class JointActivitiesScoringModule extends AbstractModule {
 
-	@Override
-	public void install() {
-		addEventHandlerBinding().to( FireMoneyEventsForUtilityOfBeingTogether.class );
-	}
-
+  @Override
+  public void install() {
+    addEventHandlerBinding().to(FireMoneyEventsForUtilityOfBeingTogether.class);
+  }
 }
-

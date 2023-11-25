@@ -20,12 +20,12 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -48,181 +48,195 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
-import jakarta.inject.Inject;
-
 /**
  * @author mrieser
  * @author mzilske
  */
-public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentSource, HasAgentTracker {
+public class TransitQSimEngine
+    implements DepartureHandler, MobsimEngine, AgentSource, HasAgentTracker {
 
+  private Collection<MobsimAgent> ptDrivers;
+  private final UmlaufBuilder umlaufBuilder;
 
-	private Collection<MobsimAgent> ptDrivers;
-	private final UmlaufBuilder umlaufBuilder;
+  public static class TransitAgentTriesToTeleportException extends RuntimeException {
 
-	public static class TransitAgentTriesToTeleportException extends RuntimeException {
+    public TransitAgentTriesToTeleportException(String message) {
+      super(message);
+    }
 
-		public TransitAgentTriesToTeleportException(String message) {
-			super(message);
-		}
+    private static final long serialVersionUID = 1L;
+  }
 
-		private static final long serialVersionUID = 1L;
+  private static final Logger log = LogManager.getLogger(TransitQSimEngine.class);
 
-	}
+  private final QSim qSim;
 
-	private static final Logger log = LogManager.getLogger(TransitQSimEngine.class);
+  private TransitSchedule schedule = null;
 
-	private final QSim qSim;
+  protected final TransitStopAgentTracker agentTracker;
 
-	private TransitSchedule schedule = null;
+  private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
 
-	protected final TransitStopAgentTracker agentTracker;
+  private final TransitDriverAgentFactory transitDriverFactory;
 
-	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
+  private InternalInterface internalInterface = null;
 
-	private final TransitDriverAgentFactory transitDriverFactory;
+  @Override
+  public void setInternalInterface(InternalInterface internalInterface) {
+    this.internalInterface = internalInterface;
+  }
 
-	private InternalInterface internalInterface = null ;
+  TransitQSimEngine(QSim queueSimulation) {
+    this(
+        queueSimulation,
+        new SimpleTransitStopHandlerFactory(),
+        new ReconstructingUmlaufBuilder(queueSimulation.getScenario()),
+        new TransitStopAgentTracker(queueSimulation.getEventsManager()),
+        new DefaultTransitDriverAgentFactory());
+  }
 
-	@Override
-	public void setInternalInterface( InternalInterface internalInterface ) {
-		this.internalInterface = internalInterface ;
-	}
+  @Inject
+  public TransitQSimEngine(
+      QSim queueSimulation,
+      TransitStopHandlerFactory stopHandlerFactory,
+      UmlaufBuilder umlaufBuilder,
+      TransitStopAgentTracker tracker,
+      TransitDriverAgentFactory transitDriverFactory) {
+    this.qSim = queueSimulation;
+    this.schedule = queueSimulation.getScenario().getTransitSchedule();
+    this.umlaufBuilder = umlaufBuilder;
+    this.agentTracker = tracker;
+    this.stopHandlerFactory = stopHandlerFactory;
+    this.transitDriverFactory = transitDriverFactory;
+  }
 
-	TransitQSimEngine(QSim queueSimulation) {
-		this(queueSimulation, new SimpleTransitStopHandlerFactory(),
-			new ReconstructingUmlaufBuilder(queueSimulation.getScenario()),
-			new TransitStopAgentTracker(queueSimulation.getEventsManager()),
-			new DefaultTransitDriverAgentFactory());
-	}
+  // For tests (which create an Engine, and externally create Agents as well).
+  public InternalInterface getInternalInterface() {
+    return this.internalInterface;
+  }
 
-	@Inject
-	public TransitQSimEngine(QSim queueSimulation, TransitStopHandlerFactory stopHandlerFactory,
-							 UmlaufBuilder umlaufBuilder, TransitStopAgentTracker tracker,
-							 TransitDriverAgentFactory transitDriverFactory) {
-		this.qSim = queueSimulation;
-		this.schedule = queueSimulation.getScenario().getTransitSchedule();
-		this.umlaufBuilder = umlaufBuilder;
-		this.agentTracker = tracker;
-		this.stopHandlerFactory = stopHandlerFactory;
-		this.transitDriverFactory = transitDriverFactory;
-	}
+  @Override
+  public void onPrepareSim() {
+    // nothing to do here
+  }
 
-	// For tests (which create an Engine, and externally create Agents as well).
-	public InternalInterface getInternalInterface() {
-		return this.internalInterface;
-	}
+  @Override
+  public void afterSim() {
+    double now = this.qSim.getSimTimer().getTimeOfDay();
+    for (Entry<Id<TransitStopFacility>, List<PTPassengerAgent>> agentsAtStop :
+        this.agentTracker.getAgentsAtStop().entrySet()) {
+      TransitStopFacility stop = this.schedule.getFacilities().get(agentsAtStop.getKey());
+      for (PTPassengerAgent agent : agentsAtStop.getValue()) {
+        this.qSim
+            .getEventsManager()
+            .processEvent(
+                new PersonStuckEvent(
+                    now, agent.getId(), stop.getLinkId(), ((MobsimAgent) agent).getMode()));
+        this.qSim.getAgentCounter().decLiving();
+        this.qSim.getAgentCounter().incLost();
+      }
+    }
+  }
 
-	@Override
-	public void onPrepareSim() {
-		//nothing to do here
-	}
+  private Collection<MobsimAgent> createVehiclesAndDriversWithUmlaeufe() {
+    Scenario scenario = this.qSim.getScenario();
+    Vehicles vehicles = scenario.getTransitVehicles();
+    Collection<MobsimAgent> drivers = new ArrayList<>();
+    UmlaufCache umlaufCache = getOrCreateUmlaufCache(scenario);
 
+    for (Umlauf umlauf : umlaufCache.getUmlaeufe()) {
+      Vehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());
+      if (!umlauf.getUmlaufStuecke().isEmpty()) {
+        MobsimAgent driver = createAndScheduleVehicleAndDriver(umlauf, basicVehicle);
+        drivers.add(driver);
+      }
+    }
+    return drivers;
+  }
 
-	@Override
-	public void afterSim() {
-		double now = this.qSim.getSimTimer().getTimeOfDay();
-		for (Entry<Id<TransitStopFacility>, List<PTPassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
-			TransitStopFacility stop = this.schedule.getFacilities().get(agentsAtStop.getKey());
-			for (PTPassengerAgent agent : agentsAtStop.getValue()) {
-				this.qSim.getEventsManager().processEvent(new PersonStuckEvent( now, agent.getId(), stop.getLinkId(), ((MobsimAgent)agent).getMode()));
-				this.qSim.getAgentCounter().decLiving();
-				this.qSim.getAgentCounter().incLost();
-			}
-		}
-	}
+  private UmlaufCache getOrCreateUmlaufCache(final Scenario scenario) {
+    UmlaufCache umlaufCache;
 
-	private Collection<MobsimAgent> createVehiclesAndDriversWithUmlaeufe() {
-		Scenario scenario = this.qSim.getScenario();
-		Vehicles vehicles = scenario.getTransitVehicles();
-		Collection<MobsimAgent> drivers = new ArrayList<>();
-		UmlaufCache umlaufCache = getOrCreateUmlaufCache( scenario );
+    Collection<Umlauf> umlaeufe = umlaufBuilder.build();
+    umlaufCache = new UmlaufCache(scenario.getTransitSchedule(), umlaeufe);
 
-		for (Umlauf umlauf : umlaufCache.getUmlaeufe()) {
-			Vehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());
-			if (!umlauf.getUmlaufStuecke().isEmpty()) {
-				MobsimAgent driver = createAndScheduleVehicleAndDriver(umlauf, basicVehicle);
-				drivers.add(driver);
-			}
-		}
-		return drivers;
-	}
+    return umlaufCache;
+  }
 
-	private UmlaufCache getOrCreateUmlaufCache(final Scenario scenario) {
-		UmlaufCache umlaufCache;
+  private AbstractTransitDriverAgent createAndScheduleVehicleAndDriver(
+      Umlauf umlauf, Vehicle vehicle) {
+    TransitQVehicle veh = new TransitQVehicle(vehicle);
+    AbstractTransitDriverAgent driver =
+        this.transitDriverFactory.createTransitDriver(umlauf, internalInterface, agentTracker);
+    veh.setDriver(driver);
+    veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getVehicle()));
+    driver.setVehicle(veh);
+    Leg firstLeg = (Leg) driver.getNextPlanElement();
+    Id<Link> startLinkId = firstLeg.getRoute().getStartLinkId();
+    this.qSim.addParkedVehicle(veh, startLinkId);
+    this.qSim.insertAgentIntoMobsim(driver);
+    return driver;
+  }
 
-		Collection<Umlauf> umlaeufe = umlaufBuilder.build();
-		umlaufCache = new UmlaufCache(scenario.getTransitSchedule(), umlaeufe);
+  private void handleAgentPTDeparture(final MobsimAgent planAgent, Id<Link> linkId) {
+    // this puts the agent into the transit stop.
+    Id<TransitStopFacility> accessStopId = ((PTPassengerAgent) planAgent).getDesiredAccessStopId();
+    if (accessStopId == null) {
+      // looks like this agent has a bad transit route, likely no
+      // route could be calculated for it
+      log.error(
+          "pt-agent doesn't know to what transit stop to go. Removing agent from simulation. Agent "
+              + planAgent.getId().toString());
+      this.qSim.getAgentCounter().decLiving();
+      this.qSim.getAgentCounter().incLost();
+      return;
+    }
+    TransitStopFacility stop = this.schedule.getFacilities().get(accessStopId);
+    if (stop.getLinkId() == null || stop.getLinkId().equals(linkId)) {
+      double now = this.qSim.getSimTimer().getTimeOfDay();
+      this.agentTracker.addAgentToStop(now, (PTPassengerAgent) planAgent, stop.getId());
+      this.internalInterface.registerAdditionalAgentOnLink(planAgent);
+    } else {
+      throw new TransitAgentTriesToTeleportException(
+          "Agent "
+              + planAgent.getId()
+              + " tries to enter a transit stop at link "
+              + stop.getLinkId()
+              + " but really is at "
+              + linkId
+              + "!");
+    }
+  }
 
-		return umlaufCache;
-	}
+  @Override
+  public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
+    String requestedMode = agent.getMode();
+    if (qSim.getScenario().getConfig().transit().getTransitModes().contains(requestedMode)) {
+      handleAgentPTDeparture(agent, linkId);
+      return true;
+    }
+    return false;
+  }
 
-	private AbstractTransitDriverAgent createAndScheduleVehicleAndDriver(Umlauf umlauf, Vehicle vehicle) {
-		TransitQVehicle veh = new TransitQVehicle(vehicle);
-		AbstractTransitDriverAgent driver = this.transitDriverFactory.createTransitDriver(umlauf, internalInterface, agentTracker);
-		veh.setDriver(driver);
-		veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getVehicle()));
-		driver.setVehicle(veh);
-		Leg firstLeg = (Leg) driver.getNextPlanElement();
-		Id<Link> startLinkId = firstLeg.getRoute().getStartLinkId();
-		this.qSim.addParkedVehicle(veh, startLinkId);
-		this.qSim.insertAgentIntoMobsim(driver);
-		return driver;
-	}
+  public TransitStopAgentTracker getAgentTracker() {
+    return agentTracker;
+  }
 
-	private void handleAgentPTDeparture(final MobsimAgent planAgent, Id<Link> linkId) {
-		// this puts the agent into the transit stop.
-		Id<TransitStopFacility> accessStopId = ((PTPassengerAgent) planAgent).getDesiredAccessStopId();
-		if (accessStopId == null) {
-			// looks like this agent has a bad transit route, likely no
-			// route could be calculated for it
-			log.error("pt-agent doesn't know to what transit stop to go. Removing agent from simulation. Agent " + planAgent.getId().toString());
-			this.qSim.getAgentCounter().decLiving();
-			this.qSim.getAgentCounter().incLost();
-			return;
-		}
-		TransitStopFacility stop = this.schedule.getFacilities().get(accessStopId);
-		if (stop.getLinkId() == null || stop.getLinkId().equals(linkId)) {
-			double now = this.qSim.getSimTimer().getTimeOfDay();
-			this.agentTracker.addAgentToStop(now, (PTPassengerAgent) planAgent, stop.getId());
-			this.internalInterface.registerAdditionalAgentOnLink(planAgent) ;
-		} else {
-			throw new TransitAgentTriesToTeleportException("Agent "+planAgent.getId() + " tries to enter a transit stop at link "+stop.getLinkId()+" but really is at "+linkId+"!");
-		}
-	}
+  public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
+    this.stopHandlerFactory = stopHandlerFactory;
+  }
 
+  @Override
+  public void doSimStep(double time) {
+    // Nothing to do here.
+  }
 
-	@Override
-	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
-		String requestedMode = agent.getMode();
-		if (qSim.getScenario().getConfig().transit().getTransitModes().contains(requestedMode)) {
-			handleAgentPTDeparture(agent, linkId);
-			return true ;
-		}
-		return false ;
-	}
+  @Override
+  public void insertAgentsIntoMobsim() {
+    ptDrivers = createVehiclesAndDriversWithUmlaeufe();
+  }
 
-	public TransitStopAgentTracker getAgentTracker() {
-		return agentTracker;
-	}
-
-	public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
-		this.stopHandlerFactory = stopHandlerFactory;
-	}
-
-	@Override
-	public void doSimStep(double time) {
-		// Nothing to do here.
-	}
-
-	@Override
-	public void insertAgentsIntoMobsim() {
-		ptDrivers = createVehiclesAndDriversWithUmlaeufe();
-	}
-
-	public Collection<MobsimAgent> getPtDrivers() {
-		return Collections.unmodifiableCollection(ptDrivers);
-	}
-
-
+  public Collection<MobsimAgent> getPtDrivers() {
+    return Collections.unmodifiableCollection(ptDrivers);
+  }
 }

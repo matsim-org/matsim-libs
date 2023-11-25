@@ -21,10 +21,8 @@ package playground.vsp.analysis.modules.userBenefits;
 
 /**
  * @author benjamin
- *
  */
 public enum WelfareMeasure {
-	
-	LOGSUM, SELECTED
-
+  LOGSUM,
+  SELECTED
 }

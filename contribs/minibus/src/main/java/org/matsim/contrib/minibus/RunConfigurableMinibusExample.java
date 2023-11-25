@@ -21,7 +21,6 @@ package org.matsim.contrib.minibus;
 
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,7 +32,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-
 /**
  * Entry point, registers all necessary hooks
  *
@@ -41,47 +39,48 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public final class RunConfigurableMinibusExample {
 
-	private final static Logger log = LogManager.getLogger(RunConfigurableMinibusExample.class);
+  private static final Logger log = LogManager.getLogger(RunConfigurableMinibusExample.class);
 
-	public static void main(final String[] args) {
+  public static void main(final String[] args) {
 
-		if(args.length == 0){
-			log.info("Arg 1: config.xml is missing.");
-			log.info("Check http://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/atlantis/minibus/ for an example.");
-			System.exit(1);
-		}
+    if (args.length == 0) {
+      log.info("Arg 1: config.xml is missing.");
+      log.info(
+          "Check http://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/atlantis/minibus/ for an example.");
+      System.exit(1);
+    }
 
-		Config config = ConfigUtils.loadConfig( args[0], new PConfigGroup() ) ;
-		final PConfigGroup pConfig = ConfigUtils.addOrGetModule(config, PConfigGroup.class) ;
+    Config config = ConfigUtils.loadConfig(args[0], new PConfigGroup());
+    final PConfigGroup pConfig = ConfigUtils.addOrGetModule(config, PConfigGroup.class);
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+    Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		final Set<Id<TransitStopFacility>> subsidizedStops = new TreeSet<>() ;
-		// subsidizedStops.add(...) ; // add subsidized stops
+    final Set<Id<TransitStopFacility>> subsidizedStops = new TreeSet<>();
+    // subsidizedStops.add(...) ; // add subsidized stops
 
-		Controler controler = new Controler(scenario);
-		controler.getConfig().controller().setCreateGraphs(false);
+    Controler controler = new Controler(scenario);
+    controler.getConfig().controller().setCreateGraphs(false);
 
-		if ( true ) {
-			throw new RuntimeException("the following is not possibly any more; just copy PModule and modify it to your needs.  kai, jan'17") ;
-		}
-//		builder.setTicketMachine(new TicketMachineI() {
-//			TicketMachineI delegate = new TicketMachine(pConfig.getEarningsPerBoardingPassenger(), pConfig.getEarningsPerKilometerAndPassenger() / 1000.0 ) ;
-//			@Override public double getFare(StageContainer stageContainer) {
-//				double fare = delegate.getFare(stageContainer) ;
-//				if ( subsidizedStops.contains( stageContainer.getStopEntered() ) ) {
-//					fare+=1. ;
-//					// this would increase the fare for the subsidized stops ...
-//					// ... but I fear that this also means that the passengers have to pay this.  kai, jan'17
-//				}
-//				return fare ;
-//			}
-//		}) ;
+    if (true) {
+      throw new RuntimeException(
+          "the following is not possibly any more; just copy PModule and modify it to your needs.  kai, jan'17");
+    }
+    //		builder.setTicketMachine(new TicketMachineI() {
+    //			TicketMachineI delegate = new TicketMachine(pConfig.getEarningsPerBoardingPassenger(),
+    // pConfig.getEarningsPerKilometerAndPassenger() / 1000.0 ) ;
+    //			@Override public double getFare(StageContainer stageContainer) {
+    //				double fare = delegate.getFare(stageContainer) ;
+    //				if ( subsidizedStops.contains( stageContainer.getStopEntered() ) ) {
+    //					fare+=1. ;
+    //					// this would increase the fare for the subsidized stops ...
+    //					// ... but I fear that this also means that the passengers have to pay this.  kai, jan'17
+    //				}
+    //				return fare ;
+    //			}
+    //		}) ;
 
+    controler.addOverridingModule(new PModule());
 
-		controler.addOverridingModule(new PModule()) ;
-
-
-		controler.run();
-	}
+    controler.run();
+  }
 }

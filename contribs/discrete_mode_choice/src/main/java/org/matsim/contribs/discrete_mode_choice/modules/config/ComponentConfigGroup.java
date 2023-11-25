@@ -4,26 +4,25 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * Base class for component configuration sections.
- * 
- * @author sebhoerl
  *
+ * @author sebhoerl
  */
 public abstract class ComponentConfigGroup extends ReflectiveConfigGroup {
-	private final String componentName;
-	private final String componentType;
+  private final String componentName;
+  private final String componentType;
 
-	public ComponentConfigGroup(String componentType, String componentName) {
-		super(String.format("%s:%s", componentType, componentName));
+  public ComponentConfigGroup(String componentType, String componentName) {
+    super(String.format("%s:%s", componentType, componentName));
 
-		this.componentName = componentName;
-		this.componentType = componentType;
-	}
+    this.componentName = componentName;
+    this.componentType = componentType;
+  }
 
-	public String getComponentName() {
-		return componentName;
-	}
+  public String getComponentName() {
+    return componentName;
+  }
 
-	public String getComponentType() {
-		return componentType;
-	}
+  public String getComponentType() {
+    return componentType;
+  }
 }

@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,125 +45,120 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author thibautd
  */
 public class JointPlanIOTest {
-	@Rule
-	public final MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testDumpAndRead() throws Exception {
-		final JointPlans jointPlans = new JointPlans();
-		final Scenario scenario = createScenario( jointPlans );
-		final Population population = scenario.getPopulation();
+  @Test
+  public void testDumpAndRead() throws Exception {
+    final JointPlans jointPlans = new JointPlans();
+    final Scenario scenario = createScenario(jointPlans);
+    final Population population = scenario.getPopulation();
 
-		final String file = utils.getOutputDirectory()+"/jointPlansDump.xml";
-		JointPlansXmlWriter.write(population, jointPlans, file);
+    final String file = utils.getOutputDirectory() + "/jointPlansDump.xml";
+    JointPlansXmlWriter.write(population, jointPlans, file);
 
-		final Scenario rereadScenario = ScenarioUtils.createScenario( scenario.getConfig() );
-		((MutableScenario) rereadScenario).setPopulation( scenario.getPopulation() );
-		new JointPlansXmlReader( rereadScenario ).readFile( file );
-		final JointPlans reReadJointPlans = (JointPlans)
-				rereadScenario.getScenarioElement( JointPlans.ELEMENT_NAME );
+    final Scenario rereadScenario = ScenarioUtils.createScenario(scenario.getConfig());
+    ((MutableScenario) rereadScenario).setPopulation(scenario.getPopulation());
+    new JointPlansXmlReader(rereadScenario).readFile(file);
+    final JointPlans reReadJointPlans =
+        (JointPlans) rereadScenario.getScenarioElement(JointPlans.ELEMENT_NAME);
 
-		for ( Person person : population.getPersons().values() ) {
-			for ( Plan plan : person.getPlans() ) {
-				final JointPlan dumped = jointPlans.getJointPlan( plan );
-				final JointPlan read = reReadJointPlans.getJointPlan( plan );
+    for (Person person : population.getPersons().values()) {
+      for (Plan plan : person.getPlans()) {
+        final JointPlan dumped = jointPlans.getJointPlan(plan);
+        final JointPlan read = reReadJointPlans.getJointPlan(plan);
 
-				if ( dumped == null ) {
-					Assert.assertNull(
-							"dumped is null but read is not",
-							read );
-					continue;
-				}
+        if (dumped == null) {
+          Assert.assertNull("dumped is null but read is not", read);
+          continue;
+        }
 
-				Assert.assertNotNull(
-						"dumped is not null but read is",
-						read );
+        Assert.assertNotNull("dumped is not null but read is", read);
 
-				Assert.assertEquals(
-						"dumped has not the same size as read",
-						dumped.getIndividualPlans().size(),
-						read.getIndividualPlans().size() );
+        Assert.assertEquals(
+            "dumped has not the same size as read",
+            dumped.getIndividualPlans().size(),
+            read.getIndividualPlans().size());
 
-				Assert.assertTrue(
-						"plans in dumped and read do not match",
-						dumped.getIndividualPlans().values().containsAll(
-								read.getIndividualPlans().values() ) );
-			}
-		}
-	}
+        Assert.assertTrue(
+            "plans in dumped and read do not match",
+            dumped.getIndividualPlans().values().containsAll(read.getIndividualPlans().values()));
+      }
+    }
+  }
 
-	@Test
-	public void testPlansOrderIsStableInCoreIO() throws Exception {
-		final JointPlans jointPlans = new JointPlans();
-		final Scenario scenario = createScenario( jointPlans );
+  @Test
+  public void testPlansOrderIsStableInCoreIO() throws Exception {
+    final JointPlans jointPlans = new JointPlans();
+    final Scenario scenario = createScenario(jointPlans);
 
-		final String file = utils.getOutputDirectory()+"/plans.xml";
-		new PopulationWriter( scenario.getPopulation() , scenario.getNetwork() ).write( file );
+    final String file = utils.getOutputDirectory() + "/plans.xml";
+    new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(file);
 
-		final Scenario scenarioReRead = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new PopulationReader( scenarioReRead ).readFile( file );
+    final Scenario scenarioReRead = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    new PopulationReader(scenarioReRead).readFile(file);
 
-		final Iterator<? extends Person> dumpedPersons = scenario.getPopulation().getPersons().values().iterator();
-		final Iterator<? extends Person> readPersons = scenarioReRead.getPopulation().getPersons().values().iterator();
+    final Iterator<? extends Person> dumpedPersons =
+        scenario.getPopulation().getPersons().values().iterator();
+    final Iterator<? extends Person> readPersons =
+        scenarioReRead.getPopulation().getPersons().values().iterator();
 
-		while ( dumpedPersons.hasNext() ) {
-			final Person dumpedPerson = dumpedPersons.next();
-			final Person readPerson = readPersons.next();
+    while (dumpedPersons.hasNext()) {
+      final Person dumpedPerson = dumpedPersons.next();
+      final Person readPerson = readPersons.next();
 
-			final Iterator<? extends Plan> dumpedPlans = dumpedPerson.getPlans().iterator();
-			final Iterator<? extends Plan> readPlans = readPerson.getPlans().iterator();
-			while( dumpedPlans.hasNext() ) {
-				// score are set different for every plan in the sequence
-				Assert.assertEquals(
-						"order of plans have changed through IO",
-						dumpedPlans.next().getScore(),
-						readPlans.next().getScore(),
-						MatsimTestUtils.EPSILON );
-			}
-		}
-	}
+      final Iterator<? extends Plan> dumpedPlans = dumpedPerson.getPlans().iterator();
+      final Iterator<? extends Plan> readPlans = readPerson.getPlans().iterator();
+      while (dumpedPlans.hasNext()) {
+        // score are set different for every plan in the sequence
+        Assert.assertEquals(
+            "order of plans have changed through IO",
+            dumpedPlans.next().getScore(),
+            readPlans.next().getScore(),
+            MatsimTestUtils.EPSILON);
+      }
+    }
+  }
 
-	private static Scenario createScenario(
-			final JointPlans jointPlans ) {
-		final int nMembers = 2000;
-		final int nPlans = 10;
-		final double pJoin = 0.2;
-		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		final Population population =  scenario.getPopulation();
-		final PopulationFactory factory = population.getFactory();
+  private static Scenario createScenario(final JointPlans jointPlans) {
+    final int nMembers = 2000;
+    final int nPlans = 10;
+    final double pJoin = 0.2;
+    final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    final Population population = scenario.getPopulation();
+    final PopulationFactory factory = population.getFactory();
 
-		final Map<Id<Person>, Queue<Plan>> plansPerPerson = new LinkedHashMap<Id<Person>, Queue<Plan>>();
+    final Map<Id<Person>, Queue<Plan>> plansPerPerson =
+        new LinkedHashMap<Id<Person>, Queue<Plan>>();
 
-		// create plans
-		int idCount = 0;
-		for (int j=0; j < nMembers; j++) {
-			final Id<Person> id = Id.createPersonId( idCount++ );
-			final Person person = factory.createPerson( id );
-			population.addPerson( person );
-			for (int k=0; k < nPlans; k++) {
-				final Plan plan = factory.createPlan();
-				plan.setPerson( person );
-				person.addPlan( plan );
-				plan.setScore( (double) k );
-			}
-			plansPerPerson.put( id , new LinkedList<Plan>( person.getPlans() ) );
-		}
+    // create plans
+    int idCount = 0;
+    for (int j = 0; j < nMembers; j++) {
+      final Id<Person> id = Id.createPersonId(idCount++);
+      final Person person = factory.createPerson(id);
+      population.addPerson(person);
+      for (int k = 0; k < nPlans; k++) {
+        final Plan plan = factory.createPlan();
+        plan.setPerson(person);
+        person.addPlan(plan);
+        plan.setScore((double) k);
+      }
+      plansPerPerson.put(id, new LinkedList<Plan>(person.getPlans()));
+    }
 
-		// join plans randomly
-		final Random random = new Random( 1234 );
-		final int nJointPlans = nMembers;
-		for (int p=0; p < nJointPlans; p++) {
-			final Map<Id<Person>, Plan> jointPlan = new LinkedHashMap< >();
-			for (Queue<Plan> plans : plansPerPerson.values()) {
-				if ( random.nextDouble() > pJoin ) continue;
-				final Plan plan = plans.poll();
-				if (plan != null) jointPlan.put( plan.getPerson().getId() , plan );
-			}
-			if (jointPlan.size() <= 1) continue;
-			jointPlans.addJointPlan( jointPlans.getFactory().createJointPlan( jointPlan ) );
-		}
+    // join plans randomly
+    final Random random = new Random(1234);
+    final int nJointPlans = nMembers;
+    for (int p = 0; p < nJointPlans; p++) {
+      final Map<Id<Person>, Plan> jointPlan = new LinkedHashMap<>();
+      for (Queue<Plan> plans : plansPerPerson.values()) {
+        if (random.nextDouble() > pJoin) continue;
+        final Plan plan = plans.poll();
+        if (plan != null) jointPlan.put(plan.getPerson().getId(), plan);
+      }
+      if (jointPlan.size() <= 1) continue;
+      jointPlans.addJointPlan(jointPlans.getFactory().createJointPlan(jointPlan));
+    }
 
-		return scenario;
-	}
+    return scenario;
+  }
 }
-

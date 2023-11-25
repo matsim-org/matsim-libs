@@ -44,110 +44,103 @@ import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
  * @author thibautd
  */
 public class PermissibleModesCalculatorImplTest {
-	private static class Fixture {
-		public final String name;
-		public final Plan plan;
-		public final boolean carAvail;
+  private static class Fixture {
+    public final String name;
+    public final Plan plan;
+    public final boolean carAvail;
 
-		public Fixture( 
-				final String name,
-				final Plan plan,
-				final boolean carAvail ) {
-			this.name = name;
-			this.plan = plan;
-			this.carAvail = carAvail;
-		}
-	}
-	private final List<Fixture> fixtures = new ArrayList<Fixture>();
+    public Fixture(final String name, final Plan plan, final boolean carAvail) {
+      this.name = name;
+      this.plan = plan;
+      this.carAvail = carAvail;
+    }
+  }
 
-	@After
-	public void clean() {
-		fixtures.clear();
-	}
+  private final List<Fixture> fixtures = new ArrayList<Fixture>();
 
-	@Before
-	public void fixtureWithNothing() {
-		String name = "no information";
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
-		Plan plan = PopulationUtils.createPlan(person);
-		fixtures.add( new Fixture( name , plan , true ) );
-	}
+  @After
+  public void clean() {
+    fixtures.clear();
+  }
 
-	@Before
-	public void fixtureWithNoLicense() {
-		String name = "no License";
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
-		Plan plan = PopulationUtils.createPlan(person);
-		PersonUtils.setLicence(person, "no");
-		fixtures.add( new Fixture( name , plan , false ) );
-	}
+  @Before
+  public void fixtureWithNothing() {
+    String name = "no information";
+    Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
+    Plan plan = PopulationUtils.createPlan(person);
+    fixtures.add(new Fixture(name, plan, true));
+  }
 
-	@Before
-	public void fixtureWithNoCar() {
-		String name = "no car" ;
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
-		Plan plan = PopulationUtils.createPlan(person);
-		PersonUtils.setCarAvail(person, "never");
-		fixtures.add( new Fixture( name , plan , false ) );
-	}
+  @Before
+  public void fixtureWithNoLicense() {
+    String name = "no License";
+    Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
+    Plan plan = PopulationUtils.createPlan(person);
+    PersonUtils.setLicence(person, "no");
+    fixtures.add(new Fixture(name, plan, false));
+  }
 
-	@Before
-	public void fixtureWithCarSometimes() {
-		String name = "car sometimes";
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
-		Plan plan = PopulationUtils.createPlan(person);
-		PersonUtils.setCarAvail(person, "sometimes");
-		fixtures.add( new Fixture( name , plan , true ) );
-	}
+  @Before
+  public void fixtureWithNoCar() {
+    String name = "no car";
+    Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
+    Plan plan = PopulationUtils.createPlan(person);
+    PersonUtils.setCarAvail(person, "never");
+    fixtures.add(new Fixture(name, plan, false));
+  }
 
-	@Test
-	public void testWhenConsideringCarAvailability() throws Exception {
-		final List<String> modesWithCar = Arrays.asList(TransportMode.car, "rail", "plane");
-		final List<String> modesWithoutCar = Arrays.asList("rail", "plane");
-		Config config = ConfigUtils.createConfig();
-		config.subtourModeChoice().setModes(modesWithCar.toArray(new String[0]));
-		config.subtourModeChoice().setConsiderCarAvailability(true);
+  @Before
+  public void fixtureWithCarSometimes() {
+    String name = "car sometimes";
+    Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
+    Plan plan = PopulationUtils.createPlan(person);
+    PersonUtils.setCarAvail(person, "sometimes");
+    fixtures.add(new Fixture(name, plan, true));
+  }
 
-		final PermissibleModesCalculator calculatorWithCarAvailability =
-				new PermissibleModesCalculatorImpl(config);
+  @Test
+  public void testWhenConsideringCarAvailability() throws Exception {
+    final List<String> modesWithCar = Arrays.asList(TransportMode.car, "rail", "plane");
+    final List<String> modesWithoutCar = Arrays.asList("rail", "plane");
+    Config config = ConfigUtils.createConfig();
+    config.subtourModeChoice().setModes(modesWithCar.toArray(new String[0]));
+    config.subtourModeChoice().setConsiderCarAvailability(true);
 
-		for (Fixture f : fixtures) {
-			assertListsAreCompatible(
-					f.name,
-					f.carAvail ? modesWithCar : modesWithoutCar,
-					calculatorWithCarAvailability.getPermissibleModes(f.plan));
-		}
-	}
+    final PermissibleModesCalculator calculatorWithCarAvailability =
+        new PermissibleModesCalculatorImpl(config);
 
-	@Test
-	public void testWhenNotConsideringCarAvailability() throws Exception {
-		final List<String> modesWithCar = Arrays.asList(TransportMode.car, "rail", "plane");
-		Config config = ConfigUtils.createConfig();
-		config.subtourModeChoice().setModes(modesWithCar.toArray(new String[0]));
-		config.subtourModeChoice().setConsiderCarAvailability(false);
-		final PermissibleModesCalculator calculatorWithCarAvailability =
-				new PermissibleModesCalculatorImpl(config);
+    for (Fixture f : fixtures) {
+      assertListsAreCompatible(
+          f.name,
+          f.carAvail ? modesWithCar : modesWithoutCar,
+          calculatorWithCarAvailability.getPermissibleModes(f.plan));
+    }
+  }
 
-		for (Fixture f : fixtures) {
-			assertListsAreCompatible(
-					f.name,
-					modesWithCar,
-					calculatorWithCarAvailability.getPermissibleModes(f.plan));
-		}
-	}
+  @Test
+  public void testWhenNotConsideringCarAvailability() throws Exception {
+    final List<String> modesWithCar = Arrays.asList(TransportMode.car, "rail", "plane");
+    Config config = ConfigUtils.createConfig();
+    config.subtourModeChoice().setModes(modesWithCar.toArray(new String[0]));
+    config.subtourModeChoice().setConsiderCarAvailability(false);
+    final PermissibleModesCalculator calculatorWithCarAvailability =
+        new PermissibleModesCalculatorImpl(config);
 
-	private static void assertListsAreCompatible(
-			final String fixtureName,
-			final List<String> expected,
-			final Collection<String> actual) {
-		assertEquals(
-				expected+" and "+actual+" have incompatible sizes for fixture "+fixtureName,
-				expected.size(),
-				actual.size());
+    for (Fixture f : fixtures) {
+      assertListsAreCompatible(
+          f.name, modesWithCar, calculatorWithCarAvailability.getPermissibleModes(f.plan));
+    }
+  }
 
-		assertTrue(
-				expected+" and "+actual+" are not compatible for fixture "+fixtureName,
-				expected.containsAll( actual ));
-	}
+  private static void assertListsAreCompatible(
+      final String fixtureName, final List<String> expected, final Collection<String> actual) {
+    assertEquals(
+        expected + " and " + actual + " have incompatible sizes for fixture " + fixtureName,
+        expected.size(),
+        actual.size());
+
+    assertTrue(
+        expected + " and " + actual + " are not compatible for fixture " + fixtureName,
+        expected.containsAll(actual));
+  }
 }
-

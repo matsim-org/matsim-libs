@@ -23,11 +23,9 @@ package org.matsim.contrib.socnetsim.framework.cliques.population;
  * @author thibautd
  */
 public interface CliquesSchemaNames {
-	public static String CLIQUES = "cliques";
-	public static String CLIQUE = "clique";
-	public static String CLIQUE_ID = "id";
-	public static String MEMBER = "person";
-	public static String MEMBER_ID = "id";
-
+  public static String CLIQUES = "cliques";
+  public static String CLIQUE = "clique";
+  public static String CLIQUE_ID = "id";
+  public static String MEMBER = "person";
+  public static String MEMBER_ID = "id";
 }
-

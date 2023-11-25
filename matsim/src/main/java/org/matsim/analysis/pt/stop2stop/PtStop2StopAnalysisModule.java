@@ -23,14 +23,13 @@ import com.google.inject.Singleton;
 import org.matsim.core.controler.AbstractModule;
 
 /**
- *
- *  @author vsp-gleich
+ * @author vsp-gleich
  */
 public class PtStop2StopAnalysisModule extends AbstractModule {
 
-    @Override
-    public void install() {
-        bind(PtStop2StopAnalysisControlerListener.class).in(Singleton.class);
-        addControlerListenerBinding().to(PtStop2StopAnalysisControlerListener.class);
-    }
+  @Override
+  public void install() {
+    bind(PtStop2StopAnalysisControlerListener.class).in(Singleton.class);
+    addControlerListenerBinding().to(PtStop2StopAnalysisControlerListener.class);
+  }
 }

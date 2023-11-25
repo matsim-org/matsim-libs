@@ -22,7 +22,6 @@ package org.matsim.contrib.analysis.filters.population;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
@@ -33,30 +32,29 @@ import org.matsim.core.population.routes.NetworkRoute;
 
 public class RouteLinkFilter extends AbstractPlanFilter {
 
-	private final Set<Id<Link>> linkIds;
+  private final Set<Id<Link>> linkIds;
 
-	public RouteLinkFilter(final PlanAlgorithm nextAlgo) {
-		this.nextAlgorithm = nextAlgo;
-		this.linkIds = new HashSet<Id<Link>>();
-	}
+  public RouteLinkFilter(final PlanAlgorithm nextAlgo) {
+    this.nextAlgorithm = nextAlgo;
+    this.linkIds = new HashSet<Id<Link>>();
+  }
 
-	public void addLink(final Id<Link> linkId) {
-		this.linkIds.add(linkId);
-	}
+  public void addLink(final Id<Link> linkId) {
+    this.linkIds.add(linkId);
+  }
 
-	@Override
-	public boolean judge(final Plan plan) {
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg) {
-				Leg leg = (Leg) pe;
-				for (Id<Link> linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
-					if (this.linkIds.contains(linkId)) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
-
+  @Override
+  public boolean judge(final Plan plan) {
+    for (PlanElement pe : plan.getPlanElements()) {
+      if (pe instanceof Leg) {
+        Leg leg = (Leg) pe;
+        for (Id<Link> linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
+          if (this.linkIds.contains(linkId)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
 }

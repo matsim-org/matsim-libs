@@ -20,7 +20,6 @@ package playground.vsp.andreas.utils.pop;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -38,117 +37,146 @@ import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
-
 /**
  * Move all acts from a given area to a given coordinate
  *
  * @author aneumann
- *
  */
 public class MoveAllPersonActsFromAreaToCoord extends NewPopulation {
 
-	Coord minSourceCoord;
-	Coord maxSourceCoord;
-	Coord targetCoord;
-		
-	HashMap<String, Integer> actSourceArea = new HashMap<>();
-		
-	private int planswritten = 0;
-	private int personshandled = 0;
-	private int nAct = 0;
-	
-	public MoveAllPersonActsFromAreaToCoord(Network network, Population plans, String filename,	Coord minSourceCoord, Coord maxSourceCoord, Coord targetCoord) {
-		super(network, plans, filename);
-		this.minSourceCoord = minSourceCoord;
-		this.maxSourceCoord = maxSourceCoord;
-		this.targetCoord = targetCoord;
-	}
+  Coord minSourceCoord;
+  Coord maxSourceCoord;
+  Coord targetCoord;
 
-	@Override
-	public void run(Person person) {
+  HashMap<String, Integer> actSourceArea = new HashMap<>();
 
-		this.personshandled++;
-		
-		Plan plan = person.getSelectedPlan();
-		
-		for (PlanElement plan_element : plan.getPlanElements()) {
-			if (plan_element instanceof Activity){
-				this.nAct++;
-				Activity act = (Activity) plan_element;
-				if(checkIsSourceArea(act)){
-					if(this.actSourceArea.get(act.getType()) == null){
-						this.actSourceArea.put(act.getType(), 1);
-					} else {
-						this.actSourceArea.put(act.getType(), this.actSourceArea.get(act.getType()) + 1);
-					}
-					act.setCoord( new Coord(this.targetCoord.getX(), this.targetCoord.getY()));
-                    PopulationUtils.changePersonId( ((Person) person), Id.create(person.getId().toString() + "_source-target", Person.class) ) ;
-                }
-			}
-		}
-		
-		this.popWriter.writePerson(person);
-		this.planswritten++;
-	}
+  private int planswritten = 0;
+  private int personshandled = 0;
+  private int nAct = 0;
 
-	private boolean checkIsSourceArea(Activity act){
-		boolean isSource = true;
-		
-		if(act.getCoord().getX() < this.minSourceCoord.getX()){isSource = false;}
-		if(act.getCoord().getX() > this.maxSourceCoord.getX()){isSource = false;}
-		
-		if(act.getCoord().getY() < this.minSourceCoord.getY()){isSource = false;}
-		if(act.getCoord().getY() > this.maxSourceCoord.getY()){isSource = false;}
-		
-		return isSource;
-	}
-	
-	public static void filterPersonActs(String networkFile, String inPlansFile, String outPlansFile,
-			Coord minSourceCoord, Coord maxSourceCoord, Coord targetCoord){
-		Gbl.startMeasurement();
+  public MoveAllPersonActsFromAreaToCoord(
+      Network network,
+      Population plans,
+      String filename,
+      Coord minSourceCoord,
+      Coord maxSourceCoord,
+      Coord targetCoord) {
+    super(network, plans, filename);
+    this.minSourceCoord = minSourceCoord;
+    this.maxSourceCoord = maxSourceCoord;
+    this.targetCoord = targetCoord;
+  }
 
-		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+  @Override
+  public void run(Person person) {
 
-		Network net = sc.getNetwork();
-		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
+    this.personshandled++;
 
-		Population inPop = sc.getPopulation();
-		MatsimReader popReader = new PopulationReader(sc);
-		popReader.readFile(inPlansFile);
+    Plan plan = person.getSelectedPlan();
 
-		MoveAllPersonActsFromAreaToCoord dp = new MoveAllPersonActsFromAreaToCoord(net, inPop, outPlansFile, minSourceCoord, maxSourceCoord, targetCoord);
-		dp.run(inPop);
-		System.out.println(dp.personshandled + " persons handled; " + dp.planswritten + " plans written to file");
-		
-		System.out.println("Min: " + dp.minSourceCoord);
-		System.out.println("Max: " + dp.maxSourceCoord);
-		System.out.println("Target: " + dp.targetCoord);
-		
-		System.out.println("Source nActs:");
-		for (Entry<String, Integer> entry : dp.actSourceArea.entrySet()) {
-			System.out.println(entry.getKey() + " " + entry.getValue());
-		}
-		dp.writeEndPlans();
+    for (PlanElement plan_element : plan.getPlanElements()) {
+      if (plan_element instanceof Activity) {
+        this.nAct++;
+        Activity act = (Activity) plan_element;
+        if (checkIsSourceArea(act)) {
+          if (this.actSourceArea.get(act.getType()) == null) {
+            this.actSourceArea.put(act.getType(), 1);
+          } else {
+            this.actSourceArea.put(act.getType(), this.actSourceArea.get(act.getType()) + 1);
+          }
+          act.setCoord(new Coord(this.targetCoord.getX(), this.targetCoord.getY()));
+          PopulationUtils.changePersonId(
+              ((Person) person),
+              Id.create(person.getId().toString() + "_source-target", Person.class));
+        }
+      }
+    }
 
-		Gbl.printElapsedTime();
-	}
+    this.popWriter.writePerson(person);
+    this.planswritten++;
+  }
 
-	public static void main(String[] args) {
-		
-		Gbl.startMeasurement();
-		
-		String outputDir = "e:/_shared-svn/andreas/paratransit/txl/run/output_huge/";
-		String networkFile = "e:/_shared-svn/andreas/paratransit/txl/run/output_huge/network.final.xml.gz";
-		String inPlansFile = "e:/_shared-svn/andreas/paratransit/txl/run/output_huge/scenarioPopulation.xml.gz";
-		String outPlansFile = "scenarioPopulation_movedToTXL.xml.gz";
+  private boolean checkIsSourceArea(Activity act) {
+    boolean isSource = true;
 
+    if (act.getCoord().getX() < this.minSourceCoord.getX()) {
+      isSource = false;
+    }
+    if (act.getCoord().getX() > this.maxSourceCoord.getX()) {
+      isSource = false;
+    }
 
-		Coord targetCoord = new Coord(4587780.0, 5825320.0); // TXL
-		Coord minSourceCoord = new Coord(4586000.000, 5824700.000); // TXL bounding box
-		Coord maxSourceCoord = new Coord(4588900.000, 5825900.000); // TXL bounding box
-				
-		// Move all acts from area to the given coordinates
-		MoveAllPersonActsFromAreaToCoord.filterPersonActs(networkFile, inPlansFile, outputDir + outPlansFile, minSourceCoord, maxSourceCoord, targetCoord);
-		Gbl.printElapsedTime();
-	}
+    if (act.getCoord().getY() < this.minSourceCoord.getY()) {
+      isSource = false;
+    }
+    if (act.getCoord().getY() > this.maxSourceCoord.getY()) {
+      isSource = false;
+    }
+
+    return isSource;
+  }
+
+  public static void filterPersonActs(
+      String networkFile,
+      String inPlansFile,
+      String outPlansFile,
+      Coord minSourceCoord,
+      Coord maxSourceCoord,
+      Coord targetCoord) {
+    Gbl.startMeasurement();
+
+    MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+    Network net = sc.getNetwork();
+    new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
+
+    Population inPop = sc.getPopulation();
+    MatsimReader popReader = new PopulationReader(sc);
+    popReader.readFile(inPlansFile);
+
+    MoveAllPersonActsFromAreaToCoord dp =
+        new MoveAllPersonActsFromAreaToCoord(
+            net, inPop, outPlansFile, minSourceCoord, maxSourceCoord, targetCoord);
+    dp.run(inPop);
+    System.out.println(
+        dp.personshandled + " persons handled; " + dp.planswritten + " plans written to file");
+
+    System.out.println("Min: " + dp.minSourceCoord);
+    System.out.println("Max: " + dp.maxSourceCoord);
+    System.out.println("Target: " + dp.targetCoord);
+
+    System.out.println("Source nActs:");
+    for (Entry<String, Integer> entry : dp.actSourceArea.entrySet()) {
+      System.out.println(entry.getKey() + " " + entry.getValue());
+    }
+    dp.writeEndPlans();
+
+    Gbl.printElapsedTime();
+  }
+
+  public static void main(String[] args) {
+
+    Gbl.startMeasurement();
+
+    String outputDir = "e:/_shared-svn/andreas/paratransit/txl/run/output_huge/";
+    String networkFile =
+        "e:/_shared-svn/andreas/paratransit/txl/run/output_huge/network.final.xml.gz";
+    String inPlansFile =
+        "e:/_shared-svn/andreas/paratransit/txl/run/output_huge/scenarioPopulation.xml.gz";
+    String outPlansFile = "scenarioPopulation_movedToTXL.xml.gz";
+
+    Coord targetCoord = new Coord(4587780.0, 5825320.0); // TXL
+    Coord minSourceCoord = new Coord(4586000.000, 5824700.000); // TXL bounding box
+    Coord maxSourceCoord = new Coord(4588900.000, 5825900.000); // TXL bounding box
+
+    // Move all acts from area to the given coordinates
+    MoveAllPersonActsFromAreaToCoord.filterPersonActs(
+        networkFile,
+        inPlansFile,
+        outputDir + outPlansFile,
+        minSourceCoord,
+        maxSourceCoord,
+        targetCoord);
+    Gbl.printElapsedTime();
+  }
 }

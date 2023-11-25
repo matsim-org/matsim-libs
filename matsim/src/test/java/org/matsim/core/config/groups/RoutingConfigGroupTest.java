@@ -21,7 +21,6 @@ package org.matsim.core.config.groups;
 
 import java.util.Arrays;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -30,287 +29,304 @@ import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.RoutingConfigGroup.TeleportedModeParams;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class RoutingConfigGroupTest {
-	private final static Logger log = LogManager.getLogger(RoutingConfigGroupTest.class);
-	private final static int N_MODE_ROUTING_PARAMS_DEFAULT = 5 ;
+  private static final Logger log = LogManager.getLogger(RoutingConfigGroupTest.class);
+  private static final int N_MODE_ROUTING_PARAMS_DEFAULT = 5;
 
-	@Rule
-	public final MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testAddModeParamsTwice() {
-		String outdir = utils.getOutputDirectory();
-		final String filename = outdir + "config.xml";
-		{
-			Config config = ConfigUtils.createConfig();
-			RoutingConfigGroup group = config.routing();
-			Assert.assertEquals( N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size() );
-			group.clearModeRoutingParams();
-//			group.setTeleportedModeSpeed( TransportMode.bike, 1. );
-//			Assert.assertEquals( 1, group.getModeRoutingParams().size() );
-//			group.setTeleportedModeSpeed( TransportMode.bike, 2. );
-//			Assert.assertEquals( 2, group.getModeRoutingParams().size() );
-//			group.clearModeRoutingParams();
-//			Assert.assertEquals( 0, group.getModeRoutingParams().size() );
+  @Test
+  public void testAddModeParamsTwice() {
+    String outdir = utils.getOutputDirectory();
+    final String filename = outdir + "config.xml";
+    {
+      Config config = ConfigUtils.createConfig();
+      RoutingConfigGroup group = config.routing();
+      Assert.assertEquals(N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size());
+      group.clearModeRoutingParams();
+      //			group.setTeleportedModeSpeed( TransportMode.bike, 1. );
+      //			Assert.assertEquals( 1, group.getModeRoutingParams().size() );
+      //			group.setTeleportedModeSpeed( TransportMode.bike, 2. );
+      //			Assert.assertEquals( 2, group.getModeRoutingParams().size() );
+      //			group.clearModeRoutingParams();
+      //			Assert.assertEquals( 0, group.getModeRoutingParams().size() );
 
-			ConfigUtils.writeConfig( config, filename );
-		}
-		{
-			Config config = ConfigUtils.loadConfig( filename ) ;
-			RoutingConfigGroup group = config.routing();
-			Assert.assertEquals( 0, group.getModeRoutingParams().size() );
-		}
-	}
-	@Test
-	public void testClearParamsWriteRead() {
-		String outdir = utils.getOutputDirectory();
-		final String filename = outdir + "config.xml";
-		{
-			Config config = ConfigUtils.createConfig();
-			RoutingConfigGroup group = config.routing();
-			Assert.assertEquals( N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size() );
-			group.clearModeRoutingParams();
-			group.setTeleportedModeSpeed( TransportMode.bike, 1. );
-			Assert.assertEquals( 1, group.getModeRoutingParams().size() );
-			group.setTeleportedModeSpeed( "abc", 1. );
-			Assert.assertEquals( 2, group.getModeRoutingParams().size() );
-			group.clearModeRoutingParams();
-			Assert.assertEquals( 0, group.getModeRoutingParams().size() );
+      ConfigUtils.writeConfig(config, filename);
+    }
+    {
+      Config config = ConfigUtils.loadConfig(filename);
+      RoutingConfigGroup group = config.routing();
+      Assert.assertEquals(0, group.getModeRoutingParams().size());
+    }
+  }
 
-			ConfigUtils.writeConfig( config, filename );
-		}
-		{
-			Config config = ConfigUtils.loadConfig( filename ) ;
-			RoutingConfigGroup group = config.routing();
-			Assert.assertEquals( 0, group.getModeRoutingParams().size() );
-		}
-	}
-	@Test
-	public void testRemoveParamsWriteRead() {
-		String outdir = utils.getOutputDirectory();
-		final String filename = outdir + "config.xml";
-		{
-			Config config = ConfigUtils.createConfig();
-			RoutingConfigGroup group = config.routing();
-			Assert.assertEquals( N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size() );
-			group.setTeleportedModeSpeed( TransportMode.bike, 1. );
-			Assert.assertEquals( 1, group.getModeRoutingParams().size() );
-			group.setTeleportedModeSpeed( "abc", 1. );
-			Assert.assertEquals( 2, group.getModeRoutingParams().size() );
-			for( String mode : group.getModeRoutingParams().keySet() ){
-				group.removeModeRoutingParams( mode );
-			}
-			Assert.assertEquals( 0, group.getModeRoutingParams().size() );
+  @Test
+  public void testClearParamsWriteRead() {
+    String outdir = utils.getOutputDirectory();
+    final String filename = outdir + "config.xml";
+    {
+      Config config = ConfigUtils.createConfig();
+      RoutingConfigGroup group = config.routing();
+      Assert.assertEquals(N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size());
+      group.clearModeRoutingParams();
+      group.setTeleportedModeSpeed(TransportMode.bike, 1.);
+      Assert.assertEquals(1, group.getModeRoutingParams().size());
+      group.setTeleportedModeSpeed("abc", 1.);
+      Assert.assertEquals(2, group.getModeRoutingParams().size());
+      group.clearModeRoutingParams();
+      Assert.assertEquals(0, group.getModeRoutingParams().size());
 
-			ConfigUtils.writeConfig( config, filename );
-		}
-		{
-			Config config = ConfigUtils.loadConfig( filename ) ;
-			RoutingConfigGroup group = config.routing();
-			Assert.assertEquals( 0, group.getModeRoutingParams().size() );
-		}
-	}
-	@Test
-	public void testClearDefaults() {
-		Config config = ConfigUtils.createConfig(  ) ;
-		RoutingConfigGroup group = config.routing() ;
-		Assert.assertEquals( N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size() );
-		group.setTeleportedModeSpeed( "def", 1. );
-		Assert.assertEquals( 1, group.getModeRoutingParams().size() );
-		group.setTeleportedModeSpeed( "abc", 1. );
-		Assert.assertEquals( 2, group.getModeRoutingParams().size() );
-		group.clearModeRoutingParams( );
-		Assert.assertEquals( 0, group.getModeRoutingParams().size() );
-	}
-	@Test
-	public void test3() {
-		Config config = ConfigUtils.createConfig(  ) ;
-		RoutingConfigGroup group = config.routing() ;
-		group.clearModeRoutingParams();
-		group.setClearingDefaultModeRoutingParams( true ); // should be ok
-	}
-	@Test( expected = RuntimeException.class )
-	public void testInconsistencyBetweenActionAndState() {
-		RoutingConfigGroup group = new RoutingConfigGroup() ;
-		group.clearModeRoutingParams();
-		group.setClearingDefaultModeRoutingParams( false ); // should fail
-	}
+      ConfigUtils.writeConfig(config, filename);
+    }
+    {
+      Config config = ConfigUtils.loadConfig(filename);
+      RoutingConfigGroup group = config.routing();
+      Assert.assertEquals(0, group.getModeRoutingParams().size());
+    }
+  }
 
-	@Test
-	public void testBackwardsCompatibility() {
-		RoutingConfigGroup group = new RoutingConfigGroup();
+  @Test
+  public void testRemoveParamsWriteRead() {
+    String outdir = utils.getOutputDirectory();
+    final String filename = outdir + "config.xml";
+    {
+      Config config = ConfigUtils.createConfig();
+      RoutingConfigGroup group = config.routing();
+      Assert.assertEquals(N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size());
+      group.setTeleportedModeSpeed(TransportMode.bike, 1.);
+      Assert.assertEquals(1, group.getModeRoutingParams().size());
+      group.setTeleportedModeSpeed("abc", 1.);
+      Assert.assertEquals(2, group.getModeRoutingParams().size());
+      for (String mode : group.getModeRoutingParams().keySet()) {
+        group.removeModeRoutingParams(mode);
+      }
+      Assert.assertEquals(0, group.getModeRoutingParams().size());
 
-		// test default
-		Assert.assertEquals("different default than expected.", 3.0 / 3.6, group.getTeleportedModeSpeeds().get(TransportMode.walk), MatsimTestUtils.EPSILON);
-		try {
-			group.addParam("walkSpeedFactor", "1.5");
-		}
-		catch (IllegalArgumentException e) {
-			log.info("catched expected exception: " + e.getMessage());
-			Assert.assertFalse("Exception-Message should not be empty.", e.getMessage().isEmpty());
-		}
-		Assert.assertEquals("value should not have changed.", 3.0 / 3.6, group.getTeleportedModeSpeeds().get(TransportMode.walk), MatsimTestUtils.EPSILON);
-		group.addParam("walkSpeed", "1.5");
-		Assert.assertEquals("value should have changed.", 1.5, group.getTeleportedModeSpeeds().get(TransportMode.walk), MatsimTestUtils.EPSILON);
-	}
+      ConfigUtils.writeConfig(config, filename);
+    }
+    {
+      Config config = ConfigUtils.loadConfig(filename);
+      RoutingConfigGroup group = config.routing();
+      Assert.assertEquals(0, group.getModeRoutingParams().size());
+    }
+  }
 
-	@Test
-	public void testDefaultsAreCleared() {
-		RoutingConfigGroup group = new RoutingConfigGroup();
-//		group.clearModeRoutingParams();
-		group.setTeleportedModeSpeed( "skateboard" , 20 / 3.6 );
-		group.setTeleportedModeSpeed( "longboard" , 20 / 3.6 );
-		Assert.assertEquals(
-				"unexpected number of modes after adding new mode in "+group.getModeRoutingParams(),
-				2,
-				group.getModeRoutingParams().size() );
-	}
+  @Test
+  public void testClearDefaults() {
+    Config config = ConfigUtils.createConfig();
+    RoutingConfigGroup group = config.routing();
+    Assert.assertEquals(N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size());
+    group.setTeleportedModeSpeed("def", 1.);
+    Assert.assertEquals(1, group.getModeRoutingParams().size());
+    group.setTeleportedModeSpeed("abc", 1.);
+    Assert.assertEquals(2, group.getModeRoutingParams().size());
+    group.clearModeRoutingParams();
+    Assert.assertEquals(0, group.getModeRoutingParams().size());
+  }
 
-	@Test
-	public void testIODifferentVersions()
-	{
-		final RoutingConfigGroup initialGroup = createTestConfigGroup();
+  @Test
+  public void test3() {
+    Config config = ConfigUtils.createConfig();
+    RoutingConfigGroup group = config.routing();
+    group.clearModeRoutingParams();
+    group.setClearingDefaultModeRoutingParams(true); // should be ok
+  }
 
-		log.info( "constructing new config ...");
-		final Config configV1 = new Config();
-		log.info("... done constructing new config.");
-		log.info("adding undescored info ...");
-		configV1.addModule(toUnderscoredModule(initialGroup));
-		log.info("... done adding underscored info.") ;
+  @Test(expected = RuntimeException.class)
+  public void testInconsistencyBetweenActionAndState() {
+    RoutingConfigGroup group = new RoutingConfigGroup();
+    group.clearModeRoutingParams();
+    group.setClearingDefaultModeRoutingParams(false); // should fail
+  }
 
-		log.info( "writing to file ...");
-		final String v1path = utils.getOutputDirectory() + "/configv1_out.xml";
-		new ConfigWriter( configV1 ).writeFileV1( v1path );
-		log.info( "... done writing to file.");
+  @Test
+  public void testBackwardsCompatibility() {
+    RoutingConfigGroup group = new RoutingConfigGroup();
 
-		log.info( "creating new config ...");
-		final Config configV1In = ConfigUtils.createConfig();
-		log.info( "... done creating new config.");
-		log.info( "read file into new config ...");
-		new ConfigReader( configV1In ).readFile( v1path );
-		log.info("... done reading file into new config.") ;
+    // test default
+    Assert.assertEquals(
+        "different default than expected.",
+        3.0 / 3.6,
+        group.getTeleportedModeSpeeds().get(TransportMode.walk),
+        MatsimTestUtils.EPSILON);
+    try {
+      group.addParam("walkSpeedFactor", "1.5");
+    } catch (IllegalArgumentException e) {
+      log.info("catched expected exception: " + e.getMessage());
+      Assert.assertFalse("Exception-Message should not be empty.", e.getMessage().isEmpty());
+    }
+    Assert.assertEquals(
+        "value should not have changed.",
+        3.0 / 3.6,
+        group.getTeleportedModeSpeeds().get(TransportMode.walk),
+        MatsimTestUtils.EPSILON);
+    group.addParam("walkSpeed", "1.5");
+    Assert.assertEquals(
+        "value should have changed.",
+        1.5,
+        group.getTeleportedModeSpeeds().get(TransportMode.walk),
+        MatsimTestUtils.EPSILON);
+  }
 
-		log.info( "asserting ...");
-		assertIdentical("re-read v1", initialGroup, configV1In.routing());
-		log.info( "... done asserting.") ;
+  @Test
+  public void testDefaultsAreCleared() {
+    RoutingConfigGroup group = new RoutingConfigGroup();
+    //		group.clearModeRoutingParams();
+    group.setTeleportedModeSpeed("skateboard", 20 / 3.6);
+    group.setTeleportedModeSpeed("longboard", 20 / 3.6);
+    Assert.assertEquals(
+        "unexpected number of modes after adding new mode in " + group.getModeRoutingParams(),
+        2,
+        group.getModeRoutingParams().size());
+  }
 
-		final String v2path = utils.getOutputDirectory() + "/configv2_out.xml";
+  @Test
+  public void testIODifferentVersions() {
+    final RoutingConfigGroup initialGroup = createTestConfigGroup();
 
-		new ConfigWriter( configV1In ).writeFileV2( v2path );
+    log.info("constructing new config ...");
+    final Config configV1 = new Config();
+    log.info("... done constructing new config.");
+    log.info("adding undescored info ...");
+    configV1.addModule(toUnderscoredModule(initialGroup));
+    log.info("... done adding underscored info.");
 
-		final Config configV2 = ConfigUtils.createConfig();
-		new ConfigReader( configV2 ).readFile( v2path );
+    log.info("writing to file ...");
+    final String v1path = utils.getOutputDirectory() + "/configv1_out.xml";
+    new ConfigWriter(configV1).writeFileV1(v1path);
+    log.info("... done writing to file.");
 
-		assertIdentical("re-read v2", initialGroup, configV2.routing());
-	}
+    log.info("creating new config ...");
+    final Config configV1In = ConfigUtils.createConfig();
+    log.info("... done creating new config.");
+    log.info("read file into new config ...");
+    new ConfigReader(configV1In).readFile(v1path);
+    log.info("... done reading file into new config.");
 
-	@Test( expected=RuntimeException.class )
-	public void testConsistencyCheckIfNoTeleportedSpeed() {
-		final Config config = ConfigUtils.createConfig();
+    log.info("asserting ...");
+    assertIdentical("re-read v1", initialGroup, configV1In.routing());
+    log.info("... done asserting.");
 
-		final TeleportedModeParams params = new TeleportedModeParams( "skateboard" );
-		config.routing().addModeRoutingParams( params );
-		// (one needs to set one of the teleported speed settings)
+    final String v2path = utils.getOutputDirectory() + "/configv2_out.xml";
 
-		config.checkConsistency();
-	}
+    new ConfigWriter(configV1In).writeFileV2(v2path);
 
-	@Test( expected=IllegalStateException.class )
-	public void testCannotAddSpeedAfterFactor() {
-		final TeleportedModeParams params = new TeleportedModeParams( "overboard" );
-		params.setTeleportedModeFreespeedFactor( 2.0 );
-		params.setTeleportedModeSpeed( 12.0 );
-	}
+    final Config configV2 = ConfigUtils.createConfig();
+    new ConfigReader(configV2).readFile(v2path);
 
-	@Test( expected=IllegalStateException.class )
-	public void testCannotAddFactorAfterSpeed() {
-		final TeleportedModeParams params = new TeleportedModeParams( "overboard" );
-		params.setTeleportedModeSpeed( 12.0 );
-		params.setTeleportedModeFreespeedFactor( 2.0 );
-	}
+    assertIdentical("re-read v2", initialGroup, configV2.routing());
+  }
 
-	private static void assertIdentical(
-			final String msg,
-			final RoutingConfigGroup initialGroup,
-			final RoutingConfigGroup inputConfigGroup) {
-		Assert.assertEquals(
-				"unexpected beelineDistanceFactor",
-//				initialGroup.getBeelineDistanceFactor(),
-//				inputConfigGroup.getBeelineDistanceFactor(),
-				initialGroup.getBeelineDistanceFactors(),
-				inputConfigGroup.getBeelineDistanceFactors() ) ;
-//				MatsimTestUtils.EPSILON );
-		Assert.assertEquals(
-				"unexpected networkModes",
-				initialGroup.getNetworkModes(),
-				inputConfigGroup.getNetworkModes() );
-		Assert.assertEquals(
-				"unexpected teleportedModeFreespeedFactors",
-				initialGroup.getTeleportedModeFreespeedFactors(),
-				inputConfigGroup.getTeleportedModeFreespeedFactors() );
-		Assert.assertEquals(
-				"unexpected teleportedModeSpeeds",
-				initialGroup.getTeleportedModeSpeeds(),
-				inputConfigGroup.getTeleportedModeSpeeds() );
-	}
+  @Test(expected = RuntimeException.class)
+  public void testConsistencyCheckIfNoTeleportedSpeed() {
+    final Config config = ConfigUtils.createConfig();
 
-	private static ConfigGroup toUnderscoredModule(final RoutingConfigGroup initialGroup) {
-		final ConfigGroup module = new ConfigGroup( initialGroup.getName() );
+    final TeleportedModeParams params = new TeleportedModeParams("skateboard");
+    config.routing().addModeRoutingParams(params);
+    // (one needs to set one of the teleported speed settings)
 
-		for ( Map.Entry<String, String> e : initialGroup.getParams().entrySet() ) {
-			log.info( "add param="+e.getKey() + " with value=" + e.getValue() );
-			module.addParam( e.getKey() , e.getValue() );
-		}
+    config.checkConsistency();
+  }
 
-		for ( TeleportedModeParams settings : initialGroup.getModeRoutingParams().values() ) {
-			final String mode = settings.getMode();
-			module.addParam( "teleportedModeSpeed_"+mode , ""+settings.getTeleportedModeSpeed() );
-			module.addParam( "teleportedModeFreespeedFactor_"+mode , ""+settings.getTeleportedModeFreespeedFactor() );
-		}
+  @Test(expected = IllegalStateException.class)
+  public void testCannotAddSpeedAfterFactor() {
+    final TeleportedModeParams params = new TeleportedModeParams("overboard");
+    params.setTeleportedModeFreespeedFactor(2.0);
+    params.setTeleportedModeSpeed(12.0);
+  }
 
-		Double val = null ;
-		boolean first = true ;
-		for ( TeleportedModeParams settings : initialGroup.getModeRoutingParams().values() ) {
-			if ( first ) {
-				first = false ;
-				val = settings.getBeelineDistanceFactor() ;
-			} else if ( !settings.getBeelineDistanceFactor().equals( val ) ) {
-				throw new RuntimeException( "beeline distance factor varies by mode; this cannot be covered by this test" ) ;
-			}
-		}
-		module.addParam( "beelineDistanceFactor", ""+val );
+  @Test(expected = IllegalStateException.class)
+  public void testCannotAddFactorAfterSpeed() {
+    final TeleportedModeParams params = new TeleportedModeParams("overboard");
+    params.setTeleportedModeSpeed(12.0);
+    params.setTeleportedModeFreespeedFactor(2.0);
+  }
 
-		return module;
-	}
+  private static void assertIdentical(
+      final String msg,
+      final RoutingConfigGroup initialGroup,
+      final RoutingConfigGroup inputConfigGroup) {
+    Assert.assertEquals(
+        "unexpected beelineDistanceFactor",
+        //				initialGroup.getBeelineDistanceFactor(),
+        //				inputConfigGroup.getBeelineDistanceFactor(),
+        initialGroup.getBeelineDistanceFactors(),
+        inputConfigGroup.getBeelineDistanceFactors());
+    //				MatsimTestUtils.EPSILON );
+    Assert.assertEquals(
+        "unexpected networkModes",
+        initialGroup.getNetworkModes(),
+        inputConfigGroup.getNetworkModes());
+    Assert.assertEquals(
+        "unexpected teleportedModeFreespeedFactors",
+        initialGroup.getTeleportedModeFreespeedFactors(),
+        inputConfigGroup.getTeleportedModeFreespeedFactors());
+    Assert.assertEquals(
+        "unexpected teleportedModeSpeeds",
+        initialGroup.getTeleportedModeSpeeds(),
+        inputConfigGroup.getTeleportedModeSpeeds());
+  }
 
-	private static RoutingConfigGroup createTestConfigGroup() {
-		log.info( "creating test config group ... ");
+  private static ConfigGroup toUnderscoredModule(final RoutingConfigGroup initialGroup) {
+    final ConfigGroup module = new ConfigGroup(initialGroup.getName());
 
-		final RoutingConfigGroup group = new RoutingConfigGroup();
+    for (Map.Entry<String, String> e : initialGroup.getParams().entrySet()) {
+      log.info("add param=" + e.getKey() + " with value=" + e.getValue());
+      module.addParam(e.getKey(), e.getValue());
+    }
 
-		group.setNetworkModes( Arrays.asList( "electricity" , "water_supply" ) );
+    for (TeleportedModeParams settings : initialGroup.getModeRoutingParams().values()) {
+      final String mode = settings.getMode();
+      module.addParam("teleportedModeSpeed_" + mode, "" + settings.getTeleportedModeSpeed());
+      module.addParam(
+          "teleportedModeFreespeedFactor_" + mode,
+          "" + settings.getTeleportedModeFreespeedFactor());
+    }
 
-		// two modes with only one speed
-		group.setTeleportedModeFreespeedFactor( "inline skate" , 0.1 );
-//		group.getModeRoutingParams().get("inline skate").setBeelineDistanceFactor( 10000000. );
+    Double val = null;
+    boolean first = true;
+    for (TeleportedModeParams settings : initialGroup.getModeRoutingParams().values()) {
+      if (first) {
+        first = false;
+        val = settings.getBeelineDistanceFactor();
+      } else if (!settings.getBeelineDistanceFactor().equals(val)) {
+        throw new RuntimeException(
+            "beeline distance factor varies by mode; this cannot be covered by this test");
+      }
+    }
+    module.addParam("beelineDistanceFactor", "" + val);
 
-		group.setTeleportedModeSpeed( "ice skates" , 10 );
-//		group.getModeRoutingParams().get("ice skates").setBeelineDistanceFactor( 10000000. );
+    return module;
+  }
 
-		group.setBeelineDistanceFactor( 10000000 );
+  private static RoutingConfigGroup createTestConfigGroup() {
+    log.info("creating test config group ... ");
 
-		// one mode with both speeds
-		// Was made illegal: do not test
-		//group.setTeleportedModeFreespeedFactor( "overboard" , 100 );
-		//group.setTeleportedModeSpeed( "overboard" , 999 );
+    final RoutingConfigGroup group = new RoutingConfigGroup();
 
-		log.info( "... done creating test config group.");
-		return group;
-	}
+    group.setNetworkModes(Arrays.asList("electricity", "water_supply"));
+
+    // two modes with only one speed
+    group.setTeleportedModeFreespeedFactor("inline skate", 0.1);
+    //		group.getModeRoutingParams().get("inline skate").setBeelineDistanceFactor( 10000000. );
+
+    group.setTeleportedModeSpeed("ice skates", 10);
+    //		group.getModeRoutingParams().get("ice skates").setBeelineDistanceFactor( 10000000. );
+
+    group.setBeelineDistanceFactor(10000000);
+
+    // one mode with both speeds
+    // Was made illegal: do not test
+    // group.setTeleportedModeFreespeedFactor( "overboard" , 100 );
+    // group.setTeleportedModeSpeed( "overboard" , 999 );
+
+    log.info("... done creating test config group.");
+    return group;
+  }
 }

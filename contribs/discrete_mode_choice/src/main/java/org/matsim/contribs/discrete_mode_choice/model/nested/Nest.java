@@ -1,7 +1,7 @@
 package org.matsim.contribs.discrete_mode_choice.model.nested;
 
 public interface Nest {
-	String getName();
+  String getName();
 
-	double getScaleParameter();
+  double getScaleParameter();
 }

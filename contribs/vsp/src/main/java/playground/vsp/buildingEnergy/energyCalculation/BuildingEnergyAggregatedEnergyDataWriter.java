@@ -23,55 +23,52 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyAggregatedEnergyConsumptionCalculator.EnergyConsumption;
 
 /**
  * @author droeder
- *
  */
 class BuildingEnergyAggregatedEnergyDataWriter {
 
-	private static final Logger log = LogManager.getLogger(BuildingEnergyAggregatedEnergyDataWriter.class);
+  private static final Logger log =
+      LogManager.getLogger(BuildingEnergyAggregatedEnergyDataWriter.class);
 
-	BuildingEnergyAggregatedEnergyDataWriter() {
-	}
+  BuildingEnergyAggregatedEnergyDataWriter() {}
 
-	/**
-	 * @param outputPath
-	 */
-	void write(String outputPath, Map<String, EnergyConsumption> energyConsumption, List<Integer> timeBins) {
-		String file = outputPath + "buildingEnergyConsumption.csv.gz";
-		log.info("writing building-energy-consumption-data to " + file + ".");
-		BufferedWriter writer = IOUtils.getBufferedWriter(file);
-		try {
-			//write the header
-			writer.write("run;activityType;");
-			for(Integer i: timeBins){
-				writer.write(String.valueOf(i) + ";");
-			}
-			writer.write("\n");
-			// write the content
-			for(Entry<String, EnergyConsumption> run: energyConsumption.entrySet()){
-				for(Entry<String, Map<Integer, Double>> activityType :run.getValue().getActType2Consumption().entrySet()){
-					writer.write(run.getKey() + ";" + activityType.getKey() + ";");
-					for(Integer i: timeBins){
-						writer.write(String.valueOf(activityType.getValue().get(i)) + ";");
-					}
-					writer.write("\n");
-				}
-			}
-			writer.flush();
-			writer.close();
-			log.info("finished (writing building-energy-consumption-data to " + file + ".");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
+  /**
+   * @param outputPath
+   */
+  void write(
+      String outputPath, Map<String, EnergyConsumption> energyConsumption, List<Integer> timeBins) {
+    String file = outputPath + "buildingEnergyConsumption.csv.gz";
+    log.info("writing building-energy-consumption-data to " + file + ".");
+    BufferedWriter writer = IOUtils.getBufferedWriter(file);
+    try {
+      // write the header
+      writer.write("run;activityType;");
+      for (Integer i : timeBins) {
+        writer.write(String.valueOf(i) + ";");
+      }
+      writer.write("\n");
+      // write the content
+      for (Entry<String, EnergyConsumption> run : energyConsumption.entrySet()) {
+        for (Entry<String, Map<Integer, Double>> activityType :
+            run.getValue().getActType2Consumption().entrySet()) {
+          writer.write(run.getKey() + ";" + activityType.getKey() + ";");
+          for (Integer i : timeBins) {
+            writer.write(String.valueOf(activityType.getValue().get(i)) + ";");
+          }
+          writer.write("\n");
+        }
+      }
+      writer.flush();
+      writer.close();
+      log.info("finished (writing building-energy-consumption-data to " + file + ".");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 }
-

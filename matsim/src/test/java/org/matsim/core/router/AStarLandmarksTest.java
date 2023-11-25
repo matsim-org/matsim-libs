@@ -28,12 +28,12 @@ import org.matsim.core.router.util.PreProcessLandmarks;
 
 public class AStarLandmarksTest extends AbstractLeastCostPathCalculatorTest {
 
-	@Override
-	protected LeastCostPathCalculator getLeastCostPathCalculator(Network network) {
-		FreespeedTravelTimeAndDisutility travelTimeCostCalculator = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
-		PreProcessLandmarks preProcessData = new PreProcessLandmarks(travelTimeCostCalculator);
-		preProcessData.run(network);
-		return new AStarLandmarks(network, preProcessData, travelTimeCostCalculator);
-	}
-
+  @Override
+  protected LeastCostPathCalculator getLeastCostPathCalculator(Network network) {
+    FreespeedTravelTimeAndDisutility travelTimeCostCalculator =
+        new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
+    PreProcessLandmarks preProcessData = new PreProcessLandmarks(travelTimeCostCalculator);
+    preProcessData.run(network);
+    return new AStarLandmarks(network, preProcessData, travelTimeCostCalculator);
+  }
 }

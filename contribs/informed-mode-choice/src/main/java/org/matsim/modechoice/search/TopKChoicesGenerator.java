@@ -1,8 +1,13 @@
 package org.matsim.modechoice.search;
 
+import static org.matsim.modechoice.PlanModelService.ConstraintHolder;
+
 import com.google.inject.Inject;
 import it.unimi.dsi.fastutil.doubles.DoubleIterator;
 import it.unimi.dsi.fastutil.objects.*;
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.modechoice.*;
@@ -10,355 +15,366 @@ import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.modechoice.estimators.TripEstimator;
 import org.matsim.modechoice.pruning.CandidatePruner;
 
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.matsim.modechoice.PlanModelService.ConstraintHolder;
-
-/**
- * Generate top n choices for each possible mode option.
- */
+/** Generate top n choices for each possible mode option. */
 @SuppressWarnings("unchecked")
 public class TopKChoicesGenerator extends AbstractCandidateGenerator {
 
-	/**
-	 * Maximum number of iterations. Memory usage will increase the more iterations are done.
-	 */
-	private static final int MAX_ITER = 10_000_000;
+  /** Maximum number of iterations. Memory usage will increase the more iterations are done. */
+  private static final int MAX_ITER = 10_000_000;
+
+  private static final Logger log = LogManager.getLogger(TopKChoicesGenerator.class);
+
+  @Inject
+  TopKChoicesGenerator(InformedModeChoiceConfigGroup config) {
+    super(config);
+  }
+
+  public Collection<PlanCandidate> generate(
+      PlanModel planModel, Set<String> consideredModes, boolean[] mask) {
+
+    CandidatePruner p = pruner.get();
+    double threshold = -1;
+    if (p != null) {
+      threshold = p.planThreshold(planModel);
+    }
+
+    return generate(planModel, consideredModes, mask, config.getTopK(), threshold, Double.NaN);
+  }
+
+  /**
+   * Generate k top choices.
+   *
+   * @param planModel plan
+   * @param topK use at most top k choices (for each combination)
+   * @param diffThreshold allowed difference to the best solution (if positive)
+   * @param absThreshold minimal required estimate score (use NaN or negative infinity if not
+   *     needed)
+   */
+  public Collection<PlanCandidate> generate(
+      PlanModel planModel,
+      @Nullable Set<String> consideredModes,
+      @Nullable boolean[] mask,
+      int topK,
+      double diffThreshold,
+      double absThreshold) {
+
+    EstimatorContext context =
+        new EstimatorContext(
+            planModel.getPerson(), params.getScoringParameters(planModel.getPerson()));
+
+    if (mask != null && mask.length != planModel.trips())
+      throw new IllegalArgumentException("Mask must be same length as trips.");
+
+    prepareModel(planModel, context);
+
+    if (planModel.trips() == 0) return new ArrayList<>();
+
+    // modes that need to be re-estimated with the full plan
+    Set<String> consolidateModes = planModel.filterModes(ModeEstimate::isMin);
+
+    List<ConstraintHolder<?>> constraints = buildConstraints(context, planModel);
+
+    return generateCandidate(
+        context,
+        planModel,
+        mask,
+        topK,
+        diffThreshold,
+        absThreshold,
+        consideredModes,
+        consolidateModes,
+        constraints);
+  }
+
+  protected final void prepareModel(PlanModel planModel, EstimatorContext context) {
+
+    if (!planModel.hasEstimates()) {
+      service.initEstimates(context, planModel);
+    }
+
+    if (!planModel.isFullyRouted()) {
+      router.routeModes(planModel, planModel.filterModes(ModeEstimate::isUsable));
+      service.calculateEstimates(context, planModel);
+    }
+  }
+
+  private Collection<PlanCandidate> generateCandidate(
+      EstimatorContext context,
+      PlanModel planModel,
+      boolean[] mask,
+      int topK,
+      double diffThreshold,
+      double absThreshold,
+      Set<String> consideredModes,
+      Set<String> consolidateModes,
+      List<ConstraintHolder<?>> constraints) {
+
+    ModeChoiceSearch search = new ModeChoiceSearch(planModel.trips(), planModel.modes());
+
+    Object2ObjectMap<PlanCandidate, PlanCandidate> candidates = new Object2ObjectOpenHashMap<>();
+
+    int skipped = 0;
+    List<List<ModeEstimate>> combinations = planModel.combinations();
 
-	private static final Logger log = LogManager.getLogger(TopKChoicesGenerator.class);
+    comb:
+    for (List<ModeEstimate> options : combinations) {
+
+      search.clear();
 
+      m:
+      for (ModeEstimate mode : options) {
 
-	@Inject
-	TopKChoicesGenerator(InformedModeChoiceConfigGroup config) {
-		super(config);
-	}
+        // check if a mode can be use at all
+        if (!mode.isUsable()
+            || (consideredModes != null && !consideredModes.contains(mode.getMode()))) continue m;
 
-	public Collection<PlanCandidate> generate(PlanModel planModel, Set<String> consideredModes, boolean[] mask) {
+        for (ConstraintHolder<?> c : constraints) {
 
-		CandidatePruner p = pruner.get();
-		double threshold = -1;
-		if (p != null) {
-			threshold = p.planThreshold(planModel);
-		}
+          if (!c.testMode(planModel.getCurrentModesMutable(), mode, mask)) continue m;
+        }
 
-		return generate(planModel, consideredModes, mask, config.getTopK(), threshold, Double.NaN);
-	}
+        search.addEstimates(mode.getMode(), mode.getEstimates(), mask);
+      }
 
-	/**
-	 * Generate k top choices.
-	 *
-	 * @param planModel     plan
-	 * @param topK          use at most top k choices (for each combination)
-	 * @param diffThreshold allowed difference to the best solution (if positive)
-	 * @param absThreshold  minimal required estimate score (use NaN or negative infinity if not needed)
-	 */
-	public Collection<PlanCandidate> generate(PlanModel planModel, @Nullable Set<String> consideredModes, @Nullable boolean[] mask,
-	                                          int topK, double diffThreshold, double absThreshold) {
+      if (search.isEmpty()) continue comb;
 
-		EstimatorContext context = new EstimatorContext(planModel.getPerson(), params.getScoringParameters(planModel.getPerson()));
+      // results will be updated here
+      String[] result = planModel.getCurrentModes();
 
-		if (mask != null && mask.length != planModel.trips())
-			throw new IllegalArgumentException("Mask must be same length as trips.");
+      // There could be unknown modes which need to be removed first
+      for (int i = 0; i < result.length; i++) {
+        if (!config.getModes().contains(result[i])) result[i] = null;
 
-		prepareModel(planModel, context);
+        if (mask != null && !mask[i] && result[i] != null) {
 
-		if (planModel.trips() == 0)
-			return new ArrayList<>();
+          // If the predefined mode contain any non-usable mode, this combination is skipped
+          // There should be at least one combination where the mode is usable, if not the input
+          // violates the configuration
+          for (ModeEstimate option : options) {
+            if (option.getMode().equals(result[i]) && !option.isUsable()) {
+              skipped++;
+              continue comb;
+            }
+          }
+        }
+      }
 
-		// modes that need to be re-estimated with the full plan
-		Set<String> consolidateModes = planModel.filterModes(ModeEstimate::isMin);
+      // Estimation of already existing modes that were predetermined
+      // the search will not add them, so they need to be calculated here
+      double preDeterminedEstimate = 0;
+      if (mask != null) {
 
-		List<ConstraintHolder<?>> constraints = buildConstraints(context, planModel);
+        for (int i = 0; i < mask.length; i++) {
 
-		return generateCandidate(context, planModel, mask, topK, diffThreshold, absThreshold, consideredModes, consolidateModes, constraints);
-	}
+          // only select the unmasked modes
+          if (mask[i] || result[i] == null) continue;
 
-	protected final void prepareModel(PlanModel planModel, EstimatorContext context) {
+          for (ModeEstimate option : options) {
+            if (option.getMode().equals(result[i]))
+              preDeterminedEstimate += option.getEstimates()[i];
+          }
+        }
+      }
 
-		if (!planModel.hasEstimates()) {
-			service.initEstimates(context, planModel);
-		}
+      // store which modes have been used for one solution
+      ReferenceSet<String> usedModes = new ReferenceOpenHashSet<>();
 
-		if (!planModel.isFullyRouted()) {
-			router.routeModes(planModel, planModel.filterModes(ModeEstimate::isUsable));
-			service.calculateEstimates(context, planModel);
-		}
-	}
+      int k = 0;
+      int n = 0;
+      DoubleIterator it = search.iter(result);
+      double best = Double.NEGATIVE_INFINITY;
 
+      outer:
+      while (it.hasNext() && k < topK) {
+        double estimate = preDeterminedEstimate + it.nextDouble();
 
-	private Collection<PlanCandidate> generateCandidate(EstimatorContext context, PlanModel planModel, boolean[] mask, int topK, double diffThreshold, double absThreshold,
-	                                                    Set<String> consideredModes, Set<String> consolidateModes, List<ConstraintHolder<?>> constraints) {
+        if (n++ > MAX_ITER) {
+          log.warn("Maximum number of iterations reached for person {}", context.person.getId());
+          break;
+        }
 
-		ModeChoiceSearch search = new ModeChoiceSearch(planModel.trips(), planModel.modes());
+        for (ConstraintHolder<?> c : constraints) {
+          if (!c.test(result)) continue outer;
+        }
 
-		Object2ObjectMap<PlanCandidate, PlanCandidate> candidates = new Object2ObjectOpenHashMap<>();
+        Collections.addAll(usedModes, result);
 
-		int skipped = 0;
-		List<List<ModeEstimate>> combinations = planModel.combinations();
+        estimate +=
+            computePlanEstimate(context, planModel, result, usedModes, consolidateModes, options);
 
-		comb:
-		for (List<ModeEstimate> options : combinations) {
+        usedModes.clear();
 
-			search.clear();
+        if (estimate > best) best = estimate;
 
-			m:
-			for (ModeEstimate mode : options) {
+        if (!Double.isNaN(diffThreshold) && diffThreshold >= 0 && best - estimate > diffThreshold)
+          break;
 
-				// check if a mode can be use at all
-				if (!mode.isUsable() || (consideredModes != null && !consideredModes.contains(mode.getMode())))
-					continue m;
+        // absolute threshold
+        if (!Double.isNaN(absThreshold) && estimate < absThreshold) break;
 
-				for (ConstraintHolder<?> c : constraints) {
+        PlanCandidate c = new PlanCandidate(Arrays.copyOf(result, planModel.trips()), estimate);
 
-					if (!c.testMode(planModel.getCurrentModesMutable(), mode, mask))
-						continue m;
-				}
+        if (candidates.containsKey(c))
+          if (Math.abs(candidates.get(c).getUtility() - c.getUtility()) > 1e-5)
+            throw new IllegalStateException(
+                "Candidates estimates differ: " + candidates.get(c) + " | " + c);
 
-				search.addEstimates(mode.getMode(), mode.getEstimates(), mask);
-			}
+        candidates.put(c, c);
 
-			if (search.isEmpty())
-				continue comb;
+        k++;
+      }
+    }
 
-			// results will be updated here
-			String[] result = planModel.getCurrentModes();
+    if (skipped == combinations.size())
+      throw new IllegalStateException(
+          "Received an input with predetermined modes, which are not usable for this agent: "
+              + planModel.getPerson());
 
-			// There could be unknown modes which need to be removed first
-			for (int i = 0; i < result.length; i++) {
-				if (!config.getModes().contains(result[i]))
-					result[i] = null;
+    List<PlanCandidate> result =
+        candidates.keySet().stream().sorted().limit(topK).collect(Collectors.toList());
 
-				if (mask != null && !mask[i] && result[i] != null) {
+    // threshold need to be rechecked again on the global best
+    if (!Double.isNaN(diffThreshold) && diffThreshold >= 0) {
+      double best = result.get(0).getUtility();
 
-					// If the predefined mode contain any non-usable mode, this combination is skipped
-					// There should be at least one combination where the mode is usable, if not the input violates the configuration
-					for (ModeEstimate option : options) {
-						if (option.getMode().equals(result[i]) && !option.isUsable()) {
-							skipped++;
-							continue comb;
-						}
+      // absolute threshold
+      result.removeIf(c -> c.getUtility() < best - diffThreshold);
+    }
 
-					}
-				}
-			}
+    return result;
+  }
 
-			// Estimation of already existing modes that were predetermined
-			// the search will not add them, so they need to be calculated here
-			double preDeterminedEstimate = 0;
-			if (mask != null) {
+  /** Handles fixed costs and plan estimators. */
+  @SuppressWarnings("StringEquality")
+  private double computePlanEstimate(
+      EstimatorContext context,
+      PlanModel planModel,
+      String[] result,
+      ReferenceSet<String> usedModes,
+      Set<String> consolidateModes,
+      Collection<ModeEstimate> options) {
 
-				for (int i = 0; i < mask.length; i++) {
+    double estimate = 0;
 
-					// only select the unmasked modes
-					if (mask[i] || result[i] == null)
-						continue;
+    // Add the fixed costs estimate if a mode has been used
+    for (ModeEstimate mode : options) {
 
-					for (ModeEstimate option : options) {
-						if (option.getMode().equals(result[i]))
-							preDeterminedEstimate += option.getEstimates()[i];
-					}
-				}
-			}
+      FixedCostsEstimator<Enum<?>> f =
+          (FixedCostsEstimator<Enum<?>>) fixedCosts.get(mode.getMode());
 
-			// store which modes have been used for one solution
-			ReferenceSet<String> usedModes = new ReferenceOpenHashSet<>();
+      // Fixed costs are not required for each mode
+      if (f == null) continue;
 
-			int k = 0;
-			int n = 0;
-			DoubleIterator it = search.iter(result);
-			double best = Double.NEGATIVE_INFINITY;
+      if (usedModes.contains(mode.getMode())) {
+        estimate += f.usageUtility(context, mode.getMode(), mode.getOption());
+      }
 
-			outer:
-			while (it.hasNext() && k < topK) {
-				double estimate = preDeterminedEstimate + it.nextDouble();
+      estimate += f.fixedUtility(context, mode.getMode(), mode.getOption());
+    }
 
-				if (n++ > MAX_ITER) {
-					log.warn("Maximum number of iterations reached for person {}", context.person.getId());
-					break;
-				}
+    for (String consolidateMode : consolidateModes) {
+      // search all options for the mode to consolidate
+      for (ModeEstimate mode : options) {
+        if (mode.getMode() == consolidateMode && usedModes.contains(consolidateMode)) {
 
-				for (ConstraintHolder<?> c : constraints) {
-					if (!c.test(result))
-						continue outer;
-				}
+          TripEstimator<Enum<?>> f = (TripEstimator<Enum<?>>) tripEstimator.get(mode.getMode());
 
+          // subtract all the trip estimates that have been made before
+          for (int i = 0; i < result.length; i++) {
+            if (result[i] == mode.getMode()) estimate -= mode.getTripEstimates()[i];
+          }
 
-				Collections.addAll(usedModes, result);
+          // Add the estimate for the whole plan
+          estimate += f.estimate(context, mode.getMode(), result, planModel, mode.getOption());
+        }
+      }
+    }
 
-				estimate += computePlanEstimate(context, planModel, result, usedModes, consolidateModes, options);
+    return estimate;
+  }
 
-				usedModes.clear();
+  /**
+   * Compute candidates from predefined given modes.
+   *
+   * @param modes list of mode combinations to estimate
+   * @return one candidate for each requested mode combination, A candidate violating a constraint
+   *     will receive a utility of {@link Double#NEGATIVE_INFINITY}.
+   */
+  public List<PlanCandidate> generatePredefined(PlanModel planModel, List<String[]> modes) {
 
-				if (estimate > best)
-					best = estimate;
+    List<PlanCandidate> candidates = new ArrayList<>();
 
-				if (!Double.isNaN(diffThreshold) && diffThreshold >= 0 && best - estimate > diffThreshold)
-					break;
+    EstimatorContext context =
+        new EstimatorContext(
+            planModel.getPerson(), params.getScoringParameters(planModel.getPerson()));
+    prepareModel(planModel, context);
 
-				// absolute threshold
-				if (!Double.isNaN(absThreshold) && estimate < absThreshold)
-					break;
+    Map<String, ModeEstimate> singleOptions = new HashMap<>();
 
-				PlanCandidate c = new PlanCandidate(Arrays.copyOf(result, planModel.trips()), estimate);
+    // reduce to single options that are usable
+    for (Map.Entry<String, List<ModeEstimate>> e : planModel.getEstimates().entrySet()) {
+      for (ModeEstimate o : e.getValue()) {
+        // check if a mode can be use at all
+        if (!o.isUsable() || o.isMin()) continue;
 
-				if (candidates.containsKey(c))
-					if (Math.abs(candidates.get(c).getUtility() - c.getUtility()) > 1e-5)
-						throw new IllegalStateException("Candidates estimates differ: " + candidates.get(c) + " | " + c);
+        singleOptions.put(e.getKey(), o);
+        break;
+      }
+    }
 
-				candidates.put(c, c);
+    List<ConstraintHolder<?>> constraints = buildConstraints(context, planModel);
 
-				k++;
-			}
-		}
+    Set<String> consolidateModes = planModel.filterModes(ModeEstimate::isMin);
+    Set<String> usableModes = planModel.filterModes(ModeEstimate::isUsable);
 
-		if (skipped == combinations.size())
-			throw new IllegalStateException("Received an input with predetermined modes, which are not usable for this agent: " + planModel.getPerson());
+    // Same Logic as the top k estimator
+    for (String[] result : modes) {
 
-		List<PlanCandidate> result = candidates.keySet().stream().sorted().limit(topK).collect(Collectors.toList());
+      if (result.length != planModel.trips())
+        throw new IllegalArgumentException(
+            String.format(
+                "Mode arrays must be same length as trips: %d != %d",
+                result.length, planModel.trips()));
 
-		// threshold need to be rechecked again on the global best
-		if (!Double.isNaN(diffThreshold) && diffThreshold >= 0) {
-			double best = result.get(0).getUtility();
+      double estimate = 0;
 
-			// absolute threshold
-			result.removeIf(c -> c.getUtility() < best - diffThreshold);
-		}
+      // Collect estimates for all entries
+      for (int i = 0; i < result.length; i++) {
 
-		return result;
-	}
+        if (result[i] == null) continue;
 
-	/**
-	 * Handles fixed costs and plan estimators.
-	 */
-	@SuppressWarnings("StringEquality")
-	private double computePlanEstimate(EstimatorContext context, PlanModel planModel, String[] result,
-	                                   ReferenceSet<String> usedModes,
-	                                   Set<String> consolidateModes, Collection<ModeEstimate> options) {
+        result[i] = result[i].intern();
 
-		double estimate = 0;
+        String mode = result[i];
 
-		// Add the fixed costs estimate if a mode has been used
-		for (ModeEstimate mode : options) {
+        ModeEstimate opt = singleOptions.get(mode);
+        if (opt == null) {
 
-			FixedCostsEstimator<Enum<?>> f = (FixedCostsEstimator<Enum<?>>) fixedCosts.get(mode.getMode());
+          // Violates constraints by using a non-allowed mode
+          if (allModes.contains(mode) && !usableModes.contains(mode)) {
+            estimate = Double.NEGATIVE_INFINITY;
+            break;
+          } else continue;
+        }
 
-			// Fixed costs are not required for each mode
-			if (f == null)
-				continue;
+        estimate += opt.getEstimates()[i];
+      }
 
-			if (usedModes.contains(mode.getMode())) {
-				estimate += f.usageUtility(context, mode.getMode(), mode.getOption());
-			}
+      ReferenceSet<String> usedModes = new ReferenceOpenHashSet<>(result);
 
-			estimate += f.fixedUtility(context, mode.getMode(), mode.getOption());
-		}
+      estimate +=
+          computePlanEstimate(
+              context, planModel, result, usedModes, consolidateModes, singleOptions.values());
 
-		for (String consolidateMode : consolidateModes) {
-			// search all options for the mode to consolidate
-			for (ModeEstimate mode : options) {
-				if (mode.getMode() == consolidateMode && usedModes.contains(consolidateMode)) {
+      for (ConstraintHolder<?> c : constraints) {
+        if (!c.test(result)) estimate = Double.NEGATIVE_INFINITY;
+      }
 
-					TripEstimator<Enum<?>> f = (TripEstimator<Enum<?>>) tripEstimator.get(mode.getMode());
+      PlanCandidate c = new PlanCandidate(Arrays.copyOf(result, planModel.trips()), estimate);
 
-					// subtract all the trip estimates that have been made before
-					for (int i = 0; i < result.length; i++) {
-						if (result[i] == mode.getMode())
-							estimate -= mode.getTripEstimates()[i];
-					}
+      candidates.add(c);
+    }
 
-					// Add the estimate for the whole plan
-					estimate += f.estimate(context, mode.getMode(), result, planModel, mode.getOption());
-
-				}
-			}
-		}
-
-		return estimate;
-	}
-
-	/**
-	 * Compute candidates from predefined given modes.
-	 *
-	 * @param modes list of mode combinations to estimate
-	 * @return one candidate for each requested mode combination, A candidate violating a constraint will receive a utility of {@link Double#NEGATIVE_INFINITY}.
-	 *
-	 */
-	public List<PlanCandidate> generatePredefined(PlanModel planModel, List<String[]> modes) {
-
-		List<PlanCandidate> candidates = new ArrayList<>();
-
-		EstimatorContext context = new EstimatorContext(planModel.getPerson(), params.getScoringParameters(planModel.getPerson()));
-		prepareModel(planModel, context);
-
-		Map<String, ModeEstimate> singleOptions = new HashMap<>();
-
-		// reduce to single options that are usable
-		for (Map.Entry<String, List<ModeEstimate>> e : planModel.getEstimates().entrySet()) {
-			for (ModeEstimate o : e.getValue()) {
-				// check if a mode can be use at all
-				if (!o.isUsable() || o.isMin())
-					continue;
-
-				singleOptions.put(e.getKey(), o);
-				break;
-			}
-		}
-
-		List<ConstraintHolder<?>> constraints = buildConstraints(context, planModel);
-
-		Set<String> consolidateModes = planModel.filterModes(ModeEstimate::isMin);
-		Set<String> usableModes = planModel.filterModes(ModeEstimate::isUsable);
-
-		// Same Logic as the top k estimator
-		for (String[] result : modes) {
-
-			if (result.length != planModel.trips())
-				throw new IllegalArgumentException(String.format("Mode arrays must be same length as trips: %d != %d", result.length, planModel.trips()));
-
-			double estimate = 0;
-
-			// Collect estimates for all entries
-			for (int i = 0; i < result.length; i++) {
-
-				if (result[i] == null)
-					continue;
-
-				result[i] = result[i].intern();
-
-				String mode = result[i];
-
-				ModeEstimate opt = singleOptions.get(mode);
-				if (opt == null) {
-
-					// Violates constraints by using a non-allowed mode
-					if (allModes.contains(mode) && !usableModes.contains(mode)) {
-						estimate = Double.NEGATIVE_INFINITY;
-						break;
-					} else
-						continue;
-				}
-
-				estimate += opt.getEstimates()[i];
-
-			}
-
-			ReferenceSet<String> usedModes = new ReferenceOpenHashSet<>(result);
-
-			estimate += computePlanEstimate(context, planModel, result, usedModes, consolidateModes, singleOptions.values());
-
-			for (ConstraintHolder<?> c : constraints) {
-				if (!c.test(result))
-					estimate = Double.NEGATIVE_INFINITY;
-			}
-
-			PlanCandidate c = new PlanCandidate(Arrays.copyOf(result, planModel.trips()), estimate);
-
-			candidates.add(c);
-		}
-
-		return candidates;
-	}
-
+    return candidates;
+  }
 }

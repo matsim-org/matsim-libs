@@ -22,28 +22,26 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author nagel
- *
  */
 public final class VehiclesConfigGroup extends ReflectiveConfigGroup {
 
-	public static final String GROUP_NAME = "vehicles" ;
-	
-	private static final String INPUT_FILE = "vehiclesFile" ;
+  public static final String GROUP_NAME = "vehicles";
 
-	private String inputFile = null ;
+  private static final String INPUT_FILE = "vehiclesFile";
 
-	public VehiclesConfigGroup() {
-		super( GROUP_NAME );
-	}
-	
-	@StringSetter(INPUT_FILE)
-	public final void setVehiclesFile( String str ) {
-		this.inputFile = str ;
-	}
-	@StringGetter(INPUT_FILE)
-	public final String getVehiclesFile() {
-		return this.inputFile ;
-	}
-	
+  private String inputFile = null;
 
+  public VehiclesConfigGroup() {
+    super(GROUP_NAME);
+  }
+
+  @StringSetter(INPUT_FILE)
+  public final void setVehiclesFile(String str) {
+    this.inputFile = str;
+  }
+
+  @StringGetter(INPUT_FILE)
+  public final String getVehiclesFile() {
+    return this.inputFile;
+  }
 }

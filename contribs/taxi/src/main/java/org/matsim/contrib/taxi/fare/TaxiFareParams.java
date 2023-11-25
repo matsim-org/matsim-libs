@@ -20,43 +20,42 @@
 
 package org.matsim.contrib.taxi.fare;
 
+import jakarta.validation.constraints.PositiveOrZero;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-import jakarta.validation.constraints.PositiveOrZero;
-
 /**
- * @author jbischoff
- * Config Group to set taxi or drt fares.
+ * @author jbischoff Config Group to set taxi or drt fares.
  */
 public final class TaxiFareParams extends ReflectiveConfigGroup {
-	public static final String SET_NAME = "taxifare";
+  public static final String SET_NAME = "taxifare";
 
-	@Parameter("basefare")
-	@Comment("Basefare per trip (positive or zero value)")
-	@PositiveOrZero
-	public double basefare;
+  @Parameter("basefare")
+  @Comment("Basefare per trip (positive or zero value)")
+  @PositiveOrZero
+  public double basefare;
 
-	@Parameter
-	@Comment("Minimum fare per trip (paid instead of the sum of base, time and distance fare if that sum would be lower than the minimum fare, positive or zero value).")
-	@PositiveOrZero
-	public double minFarePerTrip = 0.0;
+  @Parameter
+  @Comment(
+      "Minimum fare per trip (paid instead of the sum of base, time and distance fare if that sum would be lower than the minimum fare, positive or zero value).")
+  @PositiveOrZero
+  public double minFarePerTrip = 0.0;
 
-	@Parameter
-	@Comment("Daily subscription fee (positive or zero value)")
-	@PositiveOrZero
-	public double dailySubscriptionFee;
+  @Parameter
+  @Comment("Daily subscription fee (positive or zero value)")
+  @PositiveOrZero
+  public double dailySubscriptionFee;
 
-	@Parameter
-	@Comment("taxi fare per hour (positive or zero value)")
-	@PositiveOrZero
-	public double timeFare_h;
+  @Parameter
+  @Comment("taxi fare per hour (positive or zero value)")
+  @PositiveOrZero
+  public double timeFare_h;
 
-	@Parameter
-	@Comment("taxi fare per meter (positive or zero value)")
-	@PositiveOrZero
-	public double distanceFare_m;
+  @Parameter
+  @Comment("taxi fare per meter (positive or zero value)")
+  @PositiveOrZero
+  public double distanceFare_m;
 
-	public TaxiFareParams() {
-		super(SET_NAME);
-	}
+  public TaxiFareParams() {
+    super(SET_NAME);
+  }
 }

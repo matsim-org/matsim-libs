@@ -23,7 +23,6 @@ package org.matsim.counts;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
@@ -31,37 +30,36 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class CountsComparisonAlgorithmTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  @Test
+  public void testCompare() {
+    CountsFixture fixture = new CountsFixture();
+    fixture.setUp();
 
-	@Test public void testCompare() {
-		CountsFixture fixture = new CountsFixture();
-		fixture.setUp();
+    CountsComparisonAlgorithm cca = fixture.getCCA();
+    cca.run();
 
-		CountsComparisonAlgorithm cca = fixture.getCCA();
-		cca.run();
+    List<CountSimComparison> csc_list = cca.getComparison();
 
-		List<CountSimComparison> csc_list = cca.getComparison();
+    int cnt = 0;
+    for (CountSimComparison csc : csc_list) {
+      assertEquals("Wrong sim value set", 2 * cnt, csc.getSimulationValue(), 0.0);
+      cnt++;
+      cnt = cnt % 24;
+    } // while
+  }
 
-		int cnt=0;
-		for (CountSimComparison csc : csc_list) {
-			assertEquals("Wrong sim value set", 2*cnt, csc.getSimulationValue(), 0.0);
-			cnt++;
-			cnt=cnt%24;
-		}//while
-	}
+  @Test
+  public void testDistanceFilter() {
+    CountsFixture fixture = new CountsFixture();
+    fixture.setUp();
 
-	@Test public void testDistanceFilter() {
-		CountsFixture fixture = new CountsFixture();
-		fixture.setUp();
+    CountsComparisonAlgorithm cca = fixture.getCCA();
+    cca.setDistanceFilter(Double.valueOf(0.5), "1");
+    cca.run();
 
-		CountsComparisonAlgorithm cca = fixture.getCCA();
-		cca.setDistanceFilter(Double.valueOf(0.5), "1");
-		cca.run();
-
-		List<CountSimComparison> csc_list = cca.getComparison();
-		assertEquals("Distance filter not working", 0, csc_list.size());
-	}
-
+    List<CountSimComparison> csc_list = cca.getComparison();
+    assertEquals("Distance filter not working", 0, csc_list.size());
+  }
 }

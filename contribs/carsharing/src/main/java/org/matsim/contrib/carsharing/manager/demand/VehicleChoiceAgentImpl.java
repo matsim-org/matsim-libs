@@ -1,8 +1,9 @@
 package org.matsim.contrib.carsharing.manager.demand;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -24,108 +25,111 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
 public class VehicleChoiceAgentImpl implements VehicleChoiceAgent {
 
-	@Inject
-	private CarsharingSupplyInterface carsharingSupply;
-	@Inject
-	private CostsCalculatorContainer costCalculator;
-	@Inject
-	private Scenario scenario;
-	@Inject
-	private LeastCostPathCalculatorFactory pathCalculatorFactory;
-	@Inject
-	private Map<String, TravelTime> travelTimes;
-	@Inject
-	private Map<String, TravelDisutilityFactory> travelDisutilityFactories;
-	@Inject
-	@Named("carnetwork")
-	private Network network;
-	public static final Logger log = LogManager.getLogger(VehicleChoiceAgentImpl.class);
+  @Inject private CarsharingSupplyInterface carsharingSupply;
+  @Inject private CostsCalculatorContainer costCalculator;
+  @Inject private Scenario scenario;
+  @Inject private LeastCostPathCalculatorFactory pathCalculatorFactory;
+  @Inject private Map<String, TravelTime> travelTimes;
+  @Inject private Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 
-	@Override
-	public CSVehicle chooseVehicle(List<CSVehicle> vehicleOptions, Link startLink, Leg leg, double currentTime,
-			Person person) {
+  @Inject
+  @Named("carnetwork")
+  private Network network;
 
-		double distance = -1.0;
-		CSVehicle chosenVehicle = null;
-		for (CSVehicle vehicle : vehicleOptions) {
+  public static final Logger log = LogManager.getLogger(VehicleChoiceAgentImpl.class);
 
-			Link vehicleLocation = this.carsharingSupply.getAllVehicleLocations().get(vehicle);
+  @Override
+  public CSVehicle chooseVehicle(
+      List<CSVehicle> vehicleOptions, Link startLink, Leg leg, double currentTime, Person person) {
 
-			double distanceCurr = CoordUtils.calcEuclideanDistance(vehicleLocation.getCoord(), startLink.getCoord());
+    double distance = -1.0;
+    CSVehicle chosenVehicle = null;
+    for (CSVehicle vehicle : vehicleOptions) {
 
-			if (distance == -1.0 || distanceCurr < distance)
-				chosenVehicle = vehicle;
-		}
+      Link vehicleLocation = this.carsharingSupply.getAllVehicleLocations().get(vehicle);
 
-		return chosenVehicle;
-	}
+      double distanceCurr =
+          CoordUtils.calcEuclideanDistance(vehicleLocation.getCoord(), startLink.getCoord());
 
-	@Override
-	public CSVehicle chooseVehicleActivityTimeIncluded(List<CSVehicle> vehicleOptions, Link startLink, Leg leg,
-			double currentTime, Person person, double durationOfNextActivity, boolean keepthecar) {
+      if (distance == -1.0 || distanceCurr < distance) chosenVehicle = vehicle;
+    }
 
-		CSVehicle chosenVehicle = null;
-		double maxUtility = Integer.MIN_VALUE;
-		double marginalUtilityOfMoney = ((ScoringConfigGroup) scenario.getConfig().getModule("planCalcScore"))
-				.getMarginalUtilityOfMoney();
-		for (CSVehicle vehicle : vehicleOptions) {
-			Link vehicleLocation = this.carsharingSupply.getCompany(vehicle.getCompanyId())
-					.getVehicleContainer(vehicle.getCsType()).getVehicleLocation(vehicle);
+    return chosenVehicle;
+  }
 
-			try {
-				double walkTravelTime = estimateWalkTravelTime(startLink, vehicleLocation);
+  @Override
+  public CSVehicle chooseVehicleActivityTimeIncluded(
+      List<CSVehicle> vehicleOptions,
+      Link startLink,
+      Leg leg,
+      double currentTime,
+      Person person,
+      double durationOfNextActivity,
+      boolean keepthecar) {
 
-				RentalInfo rentalInfo = new RentalInfo();
-				double time = estimatetravelTime(leg, vehicleLocation, currentTime);
-				rentalInfo.setInVehicleTime(time);
-				rentalInfo.setStartTime(currentTime);
+    CSVehicle chosenVehicle = null;
+    double maxUtility = Integer.MIN_VALUE;
+    double marginalUtilityOfMoney =
+        ((ScoringConfigGroup) scenario.getConfig().getModule("planCalcScore"))
+            .getMarginalUtilityOfMoney();
+    for (CSVehicle vehicle : vehicleOptions) {
+      Link vehicleLocation =
+          this.carsharingSupply
+              .getCompany(vehicle.getCompanyId())
+              .getVehicleContainer(vehicle.getCsType())
+              .getVehicleLocation(vehicle);
 
-				if (keepthecar) {
-					rentalInfo.setEndTime(currentTime + walkTravelTime + time + durationOfNextActivity + time);
-				} else
-					rentalInfo.setEndTime(currentTime + walkTravelTime + time);
+      try {
+        double walkTravelTime = estimateWalkTravelTime(startLink, vehicleLocation);
 
-				double utility = -costCalculator.getCost(vehicle.getCompanyId(), vehicle.getCsType(), rentalInfo)
-						* marginalUtilityOfMoney;
+        RentalInfo rentalInfo = new RentalInfo();
+        double time = estimatetravelTime(leg, vehicleLocation, currentTime);
+        rentalInfo.setInVehicleTime(time);
+        rentalInfo.setStartTime(currentTime);
 
-				if (utility > maxUtility) {
-					maxUtility = utility;
-					chosenVehicle = vehicle;
-				}
-			} catch (NullPointerException e) {
-				log.warn("Encountered nullpointerexception while estimating walk travel time!");
-				continue;
-			}
-		}
+        if (keepthecar) {
+          rentalInfo.setEndTime(
+              currentTime + walkTravelTime + time + durationOfNextActivity + time);
+        } else rentalInfo.setEndTime(currentTime + walkTravelTime + time);
 
-		return chosenVehicle;
-	}
+        double utility =
+            -costCalculator.getCost(vehicle.getCompanyId(), vehicle.getCsType(), rentalInfo)
+                * marginalUtilityOfMoney;
 
-	private double estimatetravelTime(Leg leg, Link vehicleLocation, double now) {
+        if (utility > maxUtility) {
+          maxUtility = utility;
+          chosenVehicle = vehicle;
+        }
+      } catch (NullPointerException e) {
+        log.warn("Encountered nullpointerexception while estimating walk travel time!");
+        continue;
+      }
+    }
 
-		TravelTime travelTime = travelTimes.get(TransportMode.car);
+    return chosenVehicle;
+  }
 
-		TravelDisutility travelDisutility = travelDisutilityFactories.get(TransportMode.car)
-				.createTravelDisutility(travelTime);
-		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(network, travelDisutility,
-				travelTime);
-		Link endLink = network.getLinks().get(leg.getRoute().getEndLinkId());
-		Vehicle vehicle = null;
-		Path path = pathCalculator.calcLeastCostPath(vehicleLocation.getToNode(), endLink.getFromNode(), now, null,
-				vehicle);
+  private double estimatetravelTime(Leg leg, Link vehicleLocation, double now) {
 
-		return path.travelTime;
+    TravelTime travelTime = travelTimes.get(TransportMode.car);
 
-	}
+    TravelDisutility travelDisutility =
+        travelDisutilityFactories.get(TransportMode.car).createTravelDisutility(travelTime);
+    LeastCostPathCalculator pathCalculator =
+        pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
+    Link endLink = network.getLinks().get(leg.getRoute().getEndLinkId());
+    Vehicle vehicle = null;
+    Path path =
+        pathCalculator.calcLeastCostPath(
+            vehicleLocation.getToNode(), endLink.getFromNode(), now, null, vehicle);
 
-	private double estimateWalkTravelTime(Link startLink, Link endLink) {
+    return path.travelTime;
+  }
 
-		return CoordUtils.calcEuclideanDistance(startLink.getCoord(), endLink.getCoord()) * 1.3 / 1.0;
+  private double estimateWalkTravelTime(Link startLink, Link endLink) {
 
-	}
+    return CoordUtils.calcEuclideanDistance(startLink.getCoord(), endLink.getCoord()) * 1.3 / 1.0;
+  }
 }

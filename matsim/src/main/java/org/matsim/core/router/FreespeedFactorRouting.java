@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * FreespeedFactorRouting.java
@@ -19,11 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.router;
+package org.matsim.core.router;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -38,47 +36,56 @@ import org.matsim.vehicles.Vehicle;
 
 class FreespeedFactorRouting implements Provider<RoutingModule> {
 
-	private final RoutingConfigGroup.TeleportedModeParams params;
+  private final RoutingConfigGroup.TeleportedModeParams params;
 
-	public FreespeedFactorRouting( RoutingConfigGroup.TeleportedModeParams params ) {
-		this.params = params;
-	}
+  public FreespeedFactorRouting(RoutingConfigGroup.TeleportedModeParams params) {
+    this.params = params;
+  }
 
-	@Inject
-	private Network network;
+  @Inject private Network network;
 
-	@Inject
-	private PopulationFactory populationFactory;
+  @Inject private PopulationFactory populationFactory;
 
-	@Inject
-	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+  @Inject private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
-	@Override
-	public RoutingModule get() {
+  @Override
+  public RoutingModule get() {
 
-//		FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
-		// I wanted to introduce the freespeed limit.  Decided to locally re-implement rather than making the FreespeedTravelTimeAndDisutility
-		// class longer. kai, nov'16
+    //		FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0,
+    // 0.0, 0.0);
+    // I wanted to introduce the freespeed limit.  Decided to locally re-implement rather than
+    // making the FreespeedTravelTimeAndDisutility
+    // class longer. kai, nov'16
 
-		// yyyy the following might be improved by including additional disutility parameters.  But the original one I found was also
-		// just doing fastest time (see commented out version above).  kai, nov'16
-		final TravelTime travelTime = new TravelTime(){
-			@Override public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-				return link.getLength() / Math.min( link.getFreespeed(time) , params.getTeleportedModeFreespeedLimit() ) ;
-			}
-		} ;
-		TravelDisutility travelDisutility = new TravelDisutility(){
-			@Override public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
-				return travelTime.getLinkTravelTime(link, time, person, vehicle) ;
-			}
-			@Override public double getLinkMinimumTravelDisutility(Link link) {
-				return link.getLength() / Math.min( link.getFreespeed() , params.getTeleportedModeFreespeedLimit() ) ;
-			}
-		} ;
-		Gbl.assertNotNull(leastCostPathCalculatorFactory);
-		LeastCostPathCalculator routeAlgoPtFreeFlow = leastCostPathCalculatorFactory.createPathCalculator(
-						network, travelDisutility, travelTime);
-		return DefaultRoutingModules.createPseudoTransitRouter(params.getMode(), populationFactory,
-				network, routeAlgoPtFreeFlow, params);
-	}
+    // yyyy the following might be improved by including additional disutility parameters.  But the
+    // original one I found was also
+    // just doing fastest time (see commented out version above).  kai, nov'16
+    final TravelTime travelTime =
+        new TravelTime() {
+          @Override
+          public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+            return link.getLength()
+                / Math.min(link.getFreespeed(time), params.getTeleportedModeFreespeedLimit());
+          }
+        };
+    TravelDisutility travelDisutility =
+        new TravelDisutility() {
+          @Override
+          public double getLinkTravelDisutility(
+              Link link, double time, Person person, Vehicle vehicle) {
+            return travelTime.getLinkTravelTime(link, time, person, vehicle);
+          }
+
+          @Override
+          public double getLinkMinimumTravelDisutility(Link link) {
+            return link.getLength()
+                / Math.min(link.getFreespeed(), params.getTeleportedModeFreespeedLimit());
+          }
+        };
+    Gbl.assertNotNull(leastCostPathCalculatorFactory);
+    LeastCostPathCalculator routeAlgoPtFreeFlow =
+        leastCostPathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
+    return DefaultRoutingModules.createPseudoTransitRouter(
+        params.getMode(), populationFactory, network, routeAlgoPtFreeFlow, params);
+  }
 }

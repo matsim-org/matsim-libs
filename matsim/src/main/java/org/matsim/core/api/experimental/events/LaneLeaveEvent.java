@@ -20,60 +20,56 @@
 package org.matsim.core.api.experimental.events;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.lanes.Lane;
 import org.matsim.vehicles.Vehicle;
 
-
 /**
- * 
  * @author dgrether
- *
  */
 public final class LaneLeaveEvent extends Event {
-	
-	public static final String EVENT_TYPE = "left lane";
-	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-	public static final String ATTRIBUTE_LINK = "link";
-	public static final String ATTRIBUTE_LANE = "lane";
 
-	private final Id<Vehicle> vehicleId;
-	private final Id<Link> linkId;
-	private final Id<Lane> laneId;
+  public static final String EVENT_TYPE = "left lane";
+  public static final String ATTRIBUTE_VEHICLE = "vehicle";
+  public static final String ATTRIBUTE_LINK = "link";
+  public static final String ATTRIBUTE_LANE = "lane";
 
-	public LaneLeaveEvent(double time, Id<Vehicle> vehicleId, Id<Link> linkId, Id<Lane> laneId) {
-		super(time);
-		this.laneId = laneId;
-		this.vehicleId = vehicleId;
-		this.linkId = linkId;
-	}
+  private final Id<Vehicle> vehicleId;
+  private final Id<Link> linkId;
+  private final Id<Lane> laneId;
 
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
-	
-	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
-		attr.put(ATTRIBUTE_LANE, this.laneId.toString());
-		return attr;
-	}
+  public LaneLeaveEvent(double time, Id<Vehicle> vehicleId, Id<Link> linkId, Id<Lane> laneId) {
+    super(time);
+    this.laneId = laneId;
+    this.vehicleId = vehicleId;
+    this.linkId = linkId;
+  }
 
-	public Id<Vehicle> getVehicleId() {
-		return vehicleId;
-	}
+  @Override
+  public String getEventType() {
+    return EVENT_TYPE;
+  }
 
-	public Id<Link> getLinkId() {
-		return this.linkId;
-	}
+  @Override
+  public Map<String, String> getAttributes() {
+    Map<String, String> attr = super.getAttributes();
+    attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
+    attr.put(ATTRIBUTE_LINK, this.linkId.toString());
+    attr.put(ATTRIBUTE_LANE, this.laneId.toString());
+    return attr;
+  }
 
-	public Id<Lane> getLaneId() {
-		return this.laneId;
-	}
+  public Id<Vehicle> getVehicleId() {
+    return vehicleId;
+  }
+
+  public Id<Link> getLinkId() {
+    return this.linkId;
+  }
+
+  public Id<Lane> getLaneId() {
+    return this.laneId;
+  }
 }

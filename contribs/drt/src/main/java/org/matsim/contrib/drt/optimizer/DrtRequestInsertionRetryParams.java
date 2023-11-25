@@ -20,29 +20,29 @@
 
 package org.matsim.contrib.drt.optimizer;
 
-import org.matsim.core.config.ReflectiveConfigGroup;
-
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author Steffen Axer
  */
 public class DrtRequestInsertionRetryParams extends ReflectiveConfigGroup {
-	public static final String SET_NAME = "dvrpRequestRetry";
+  public static final String SET_NAME = "dvrpRequestRetry";
 
-	@Parameter
-	@Comment("The time interval at which rejected request are repeated." + " Default value is 120 s.")
-	@Positive
-	public int retryInterval = 120;
+  @Parameter
+  @Comment("The time interval at which rejected request are repeated." + " Default value is 120 s.")
+  @Positive
+  public int retryInterval = 120;
 
-	@Parameter
-	@Comment("The maximum age of a request until it gets finally rejected, if not already scheduled."
-			+ " The default value is 0 s (i.e. no retry).")
-	@PositiveOrZero
-	public double maxRequestAge = 0;// no retry by default
+  @Parameter
+  @Comment(
+      "The maximum age of a request until it gets finally rejected, if not already scheduled."
+          + " The default value is 0 s (i.e. no retry).")
+  @PositiveOrZero
+  public double maxRequestAge = 0; // no retry by default
 
-	public DrtRequestInsertionRetryParams() {
-		super(SET_NAME);
-	}
+  public DrtRequestInsertionRetryParams() {
+    super(SET_NAME);
+  }
 }

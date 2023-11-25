@@ -19,53 +19,58 @@
 
 package org.matsim.contrib.minibus.stats.operatorLogger;
 
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.hook.Operator;
 import org.matsim.contrib.minibus.hook.PPlan;
 
-import java.util.*;
-
 /**
  * Add a pointer from each child to its parent.
- * 
- * @author aneumann
  *
+ * @author aneumann
  */
 public class PlanElementLinkParent {
-	
-	private static final Logger log = LogManager.getLogger(PlanElementLinkParent.class);
-	
-	/**
-	 * Add a pointer from each child to its parent.
-	 */
-	public static List<PlanElement> linkParentPlansToGivenPlanElements(List<PlanElement> planElements){
-		
-		Map<Id<Operator>, HashMap<Id<PPlan>, PlanElement>> operatorId2planId2planElement = new HashMap<Id<Operator>, HashMap<Id<PPlan>, PlanElement>>();
-		
-		// resort
-		for (PlanElement planElement : planElements) {
-			
-			Id<Operator> operatorId = planElement.getOperatorId();
-			if (operatorId2planId2planElement.get(operatorId) == null) {
-				operatorId2planId2planElement.put(operatorId, new HashMap<Id<PPlan>, PlanElement>());
-			}
-			
-			operatorId2planId2planElement.get(operatorId).put(planElement.getPlanId(), planElement);
-		}
-		
-		// link parents
-		for (PlanElement planElement : planElements) {
-			try {
-				HashMap<Id<PPlan>, PlanElement> plans = operatorId2planId2planElement.get(planElement.getOperatorId());
-				PlanElement parent = plans.get(planElement.getParentId());
-				planElement.setParentPlan(parent);
-			} catch (Exception e) {
-				log.error("Could not find parent plan element " + planElement.getParentId() + " for operator " + planElement.getOperatorId() + " plan " + planElement.getPlanId());
-			}
-		}
-		
-		return planElements;
-	}
+
+  private static final Logger log = LogManager.getLogger(PlanElementLinkParent.class);
+
+  /** Add a pointer from each child to its parent. */
+  public static List<PlanElement> linkParentPlansToGivenPlanElements(
+      List<PlanElement> planElements) {
+
+    Map<Id<Operator>, HashMap<Id<PPlan>, PlanElement>> operatorId2planId2planElement =
+        new HashMap<Id<Operator>, HashMap<Id<PPlan>, PlanElement>>();
+
+    // resort
+    for (PlanElement planElement : planElements) {
+
+      Id<Operator> operatorId = planElement.getOperatorId();
+      if (operatorId2planId2planElement.get(operatorId) == null) {
+        operatorId2planId2planElement.put(operatorId, new HashMap<Id<PPlan>, PlanElement>());
+      }
+
+      operatorId2planId2planElement.get(operatorId).put(planElement.getPlanId(), planElement);
+    }
+
+    // link parents
+    for (PlanElement planElement : planElements) {
+      try {
+        HashMap<Id<PPlan>, PlanElement> plans =
+            operatorId2planId2planElement.get(planElement.getOperatorId());
+        PlanElement parent = plans.get(planElement.getParentId());
+        planElement.setParentPlan(parent);
+      } catch (Exception e) {
+        log.error(
+            "Could not find parent plan element "
+                + planElement.getParentId()
+                + " for operator "
+                + planElement.getOperatorId()
+                + " plan "
+                + planElement.getPlanId());
+      }
+    }
+
+    return planElements;
+  }
 }

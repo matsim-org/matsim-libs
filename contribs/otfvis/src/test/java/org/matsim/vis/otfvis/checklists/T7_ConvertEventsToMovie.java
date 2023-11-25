@@ -28,13 +28,13 @@ import org.matsim.vis.otfvis.OTFClientFile;
  */
 public class T7_ConvertEventsToMovie {
 
-	public static void main(String[] args) {
-		String[] files = new String[5];
-		files[1] = "./output/OTFVisTestsQSim/ITERS/it.0/0.events.xml.gz";
-		files[2] = "./output/OTFVisTestsQSim/output_network.xml.gz";
-		files[3] = "./output/OTFVisTestsQSim/OTFVis.mvi";
-		files[4] = "60";
-		OTFVis.convert(files);
-		new OTFClientFile(files[3]).run();
-	}
+  public static void main(String[] args) {
+    String[] files = new String[5];
+    files[1] = "./output/OTFVisTestsQSim/ITERS/it.0/0.events.xml.gz";
+    files[2] = "./output/OTFVisTestsQSim/output_network.xml.gz";
+    files[3] = "./output/OTFVisTestsQSim/OTFVis.mvi";
+    files[4] = "60";
+    OTFVis.convert(files);
+    new OTFClientFile(files[3]).run();
+  }
 }

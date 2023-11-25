@@ -26,7 +26,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.List;
 import java.util.Vector;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -38,31 +37,31 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class OutputDelegateTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  @Test
+  public void testOutputHtml() {
+    CountsFixture fixture = new CountsFixture();
+    fixture.setUp();
 
-	@Test public void testOutputHtml() {
-			CountsFixture fixture = new CountsFixture();
-			fixture.setUp();
+    CountsSimRealPerHourGraph sg = null;
+    List<CountSimComparison> countSimCompList = new Vector<CountSimComparison>();
+    for (int i = 0; i < 24; i++) {
+      countSimCompList.add(
+          new CountSimComparisonImpl(Id.create(i + 1, Link.class), "", 1, 1.0, 1.0));
+    }
+    sg = new CountsSimRealPerHourGraph(countSimCompList, 1, "testOutPutAll");
 
-			CountsSimRealPerHourGraph sg = null;
-			List<CountSimComparison> countSimCompList=new Vector<CountSimComparison>();
-			for (int i=0; i<24; i++) {
-				countSimCompList.add(new CountSimComparisonImpl(Id.create(i+1, Link.class), "", 1, 1.0, 1.0));
-			}
-			sg = new CountsSimRealPerHourGraph(countSimCompList, 1, "testOutPutAll");
+    new File(utils.getOutputDirectory() + "graphs").mkdir();
+    OutputDelegate outputDelegate = new OutputDelegate(utils.getOutputDirectory() + "graphs/");
+    outputDelegate.addSection(new Section("testOutPutAll"));
+    assertNotNull("No graph was created", sg.createChart(0));
+    outputDelegate.addCountsGraph(sg);
+    outputDelegate.outputHtml();
 
-		new File(utils.getOutputDirectory() + "graphs").mkdir();
-		OutputDelegate outputDelegate=new OutputDelegate(utils.getOutputDirectory() + "graphs/");
-			outputDelegate.addSection(new Section("testOutPutAll"));
-			assertNotNull("No graph was created", sg.createChart(0));
-			outputDelegate.addCountsGraph(sg);
-			outputDelegate.outputHtml();
-
-		String filename = utils.getOutputDirectory() + "graphs/png/" + sg.getFilename() +".png";
-			File fPng = new File(filename);
-			assertTrue("The png output file " + filename + " doesn't exist", fPng.exists());
-			assertTrue("The png output file " + filename + " is empty", fPng.length()>0.0);
-		}
+    String filename = utils.getOutputDirectory() + "graphs/png/" + sg.getFilename() + ".png";
+    File fPng = new File(filename);
+    assertTrue("The png output file " + filename + " doesn't exist", fPng.exists());
+    assertTrue("The png output file " + filename + " is empty", fPng.length() > 0.0);
+  }
 }

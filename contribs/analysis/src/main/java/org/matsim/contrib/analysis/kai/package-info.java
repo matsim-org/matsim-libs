@@ -20,6 +20,5 @@
 
 /**
  * @author nagel
- *
  */
 package org.matsim.contrib.analysis.kai;

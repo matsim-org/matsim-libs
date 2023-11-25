@@ -19,15 +19,12 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data.consistency;
 
-
-
-
 /**
  * A marker interface for ConsistencyCheckers.
+ *
  * @author dgrether
  */
 public interface ConsistencyChecker {
 
-	public void checkConsistency();
-	
+  public void checkConsistency();
 }

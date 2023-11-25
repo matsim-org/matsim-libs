@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.builder;
 
+import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -35,40 +35,44 @@ import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.model.SignalSystemImpl;
 
-import com.google.inject.Inject;
-
-
 /**
- * 
  * @author tthunig
  */
 final class SignalModelFactoryImpl implements SignalModelFactory {
-	
-	private static final Logger log = LogManager.getLogger(SignalModelFactoryImpl.class);
-	
-	@Inject private final Map<String, SignalControllerFactory> signalControllerFactoriesDeclaredByModules = new HashMap<>();
-	
-	@Override
-	public SignalSystem createSignalSystem(Id<SignalSystem> id) {
-		return new SignalSystemImpl(id);
-	}
 
-	@Override
-	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
-		if (signalControllerFactoriesDeclaredByModules.containsKey(controllerIdentifier)) {
-			log.info("Creating " + controllerIdentifier);
-			return signalControllerFactoriesDeclaredByModules.get(controllerIdentifier).createSignalSystemController(signalSystem);
-		}
-		throw new RuntimeException("Signal controller " + controllerIdentifier + " not specified. "
-				+ "Add a respective factory to the SignalsModule by calling the method addSignalControllerFactory.");
-	}
+  private static final Logger log = LogManager.getLogger(SignalModelFactoryImpl.class);
 
-	@Override
-	public SignalPlan createSignalPlan(SignalPlanData planData) {
-		DatabasedSignalPlan plan = new DatabasedSignalPlan(planData);
-		if (planData.getId().toString().startsWith(SylviaPreprocessData.SYLVIA_PREFIX)) {
-			return new SylviaSignalPlan(plan);
-		}
-		return plan;
-	}
+  @Inject
+  private final Map<String, SignalControllerFactory> signalControllerFactoriesDeclaredByModules =
+      new HashMap<>();
+
+  @Override
+  public SignalSystem createSignalSystem(Id<SignalSystem> id) {
+    return new SignalSystemImpl(id);
+  }
+
+  @Override
+  public SignalController createSignalSystemController(
+      String controllerIdentifier, SignalSystem signalSystem) {
+    if (signalControllerFactoriesDeclaredByModules.containsKey(controllerIdentifier)) {
+      log.info("Creating " + controllerIdentifier);
+      return signalControllerFactoriesDeclaredByModules
+          .get(controllerIdentifier)
+          .createSignalSystemController(signalSystem);
+    }
+    throw new RuntimeException(
+        "Signal controller "
+            + controllerIdentifier
+            + " not specified. "
+            + "Add a respective factory to the SignalsModule by calling the method addSignalControllerFactory.");
+  }
+
+  @Override
+  public SignalPlan createSignalPlan(SignalPlanData planData) {
+    DatabasedSignalPlan plan = new DatabasedSignalPlan(planData);
+    if (planData.getId().toString().startsWith(SylviaPreprocessData.SYLVIA_PREFIX)) {
+      return new SylviaSignalPlan(plan);
+    }
+    return plan;
+  }
 }

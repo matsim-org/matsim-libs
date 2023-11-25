@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.modules;
 
+import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -27,109 +28,104 @@ import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
 
-import java.util.*;
-
 class JointPlanMergingAlgorithm implements GenericPlanAlgorithm<GroupPlans> {
-	private final double probAcceptance;
-	private final Random random;
-	private final JointPlanFactory factory;
+  private final double probAcceptance;
+  private final Random random;
+  private final JointPlanFactory factory;
 
-	public JointPlanMergingAlgorithm(
-			final JointPlanFactory factory,
-			final double probAcceptance,
-			final Random random) {
-		this.probAcceptance = probAcceptance;
-		this.random = random;
-		this.factory = factory;
-	}
+  public JointPlanMergingAlgorithm(
+      final JointPlanFactory factory, final double probAcceptance, final Random random) {
+    this.probAcceptance = probAcceptance;
+    this.random = random;
+    this.factory = factory;
+  }
 
-	@Override
-	public void run(final GroupPlans plans) {
-		//unregisterJointPlans( plans );
-		mergePlans( plans );
-	}
+  @Override
+  public void run(final GroupPlans plans) {
+    // unregisterJointPlans( plans );
+    mergePlans(plans);
+  }
 
-	private void mergePlans(final GroupPlans plans) {
-		final List<JointPlanBuilder> builders = new ArrayList<JointPlanBuilder>();
+  private void mergePlans(final GroupPlans plans) {
+    final List<JointPlanBuilder> builders = new ArrayList<JointPlanBuilder>();
 
-		for ( JointPlan jp : plans.getJointPlans() ) {
-			Collections.shuffle( builders , random );
-			if ( add( builders , jp ) ) continue;
+    for (JointPlan jp : plans.getJointPlans()) {
+      Collections.shuffle(builders, random);
+      if (add(builders, jp)) continue;
 
-			final JointPlanBuilder builder = new JointPlanBuilder();
-			builder.addJointPlan( jp );
-			builders.add( builder );
-		}
+      final JointPlanBuilder builder = new JointPlanBuilder();
+      builder.addJointPlan(jp);
+      builders.add(builder);
+    }
 
-		for ( Plan p : plans.getIndividualPlans() ) {
-			Collections.shuffle( builders , random );
-			if ( add( builders , p ) ) continue;
+    for (Plan p : plans.getIndividualPlans()) {
+      Collections.shuffle(builders, random);
+      if (add(builders, p)) continue;
 
-			final JointPlanBuilder builder = new JointPlanBuilder();
-			builder.addIndividualPlan( p );
-			builders.add( builder );
-		}
+      final JointPlanBuilder builder = new JointPlanBuilder();
+      builder.addIndividualPlan(p);
+      builders.add(builder);
+    }
 
-		// update
-		plans.clear();
+    // update
+    plans.clear();
 
-		for (JointPlanBuilder builder : builders) {
-			if (builder.isJoint()) {
-				plans.addJointPlan( builder.build() );
-			}
-			else {
-				plans.addIndividualPlan( builder.getIndividualPlan() );
-			}
-		}
-	}
+    for (JointPlanBuilder builder : builders) {
+      if (builder.isJoint()) {
+        plans.addJointPlan(builder.build());
+      } else {
+        plans.addIndividualPlan(builder.getIndividualPlan());
+      }
+    }
+  }
 
-	private boolean add( final List<JointPlanBuilder> builders , final JointPlan jp ) {
-		for (JointPlanBuilder builder : builders) {
-			if (random.nextDouble() > probAcceptance) continue;
+  private boolean add(final List<JointPlanBuilder> builders, final JointPlan jp) {
+    for (JointPlanBuilder builder : builders) {
+      if (random.nextDouble() > probAcceptance) continue;
 
-			builder.addJointPlan( jp );
-			return true;
-		}
-		return false;
-	}
-	
-	private boolean add( final List<JointPlanBuilder> builders , final Plan p ) {
-		for (JointPlanBuilder builder : builders) {
-			if (random.nextDouble() > probAcceptance) continue;
+      builder.addJointPlan(jp);
+      return true;
+    }
+    return false;
+  }
 
-			builder.addIndividualPlan( p );
-			return true;
-		}
-		return false;
-	}
+  private boolean add(final List<JointPlanBuilder> builders, final Plan p) {
+    for (JointPlanBuilder builder : builders) {
+      if (random.nextDouble() > probAcceptance) continue;
 
-	//private void unregisterJointPlans(final GroupPlans plans) {
-	//	for (JointPlan jp : plans.getJointPlans()) {
-	//		JointPlanFactory.getPlanLinks().removeJointPlan( jp );
-	//	}
-	//}
+      builder.addIndividualPlan(p);
+      return true;
+    }
+    return false;
+  }
 
-	private class JointPlanBuilder {
-		private final Map<Id<Person>, Plan> plans = new HashMap<Id<Person>, Plan>();
+  // private void unregisterJointPlans(final GroupPlans plans) {
+  //	for (JointPlan jp : plans.getJointPlans()) {
+  //		JointPlanFactory.getPlanLinks().removeJointPlan( jp );
+  //	}
+  // }
 
-		public void addJointPlan(final JointPlan jp) {
-			plans.putAll( jp.getIndividualPlans() );
-		}
+  private class JointPlanBuilder {
+    private final Map<Id<Person>, Plan> plans = new HashMap<Id<Person>, Plan>();
 
-		public void addIndividualPlan(final Plan plan) {
-			plans.put( plan.getPerson().getId() , plan );
-		}
+    public void addJointPlan(final JointPlan jp) {
+      plans.putAll(jp.getIndividualPlans());
+    }
 
-		public boolean isJoint() {
-			return plans.size() > 1;
-		}
+    public void addIndividualPlan(final Plan plan) {
+      plans.put(plan.getPerson().getId(), plan);
+    }
 
-		public Plan getIndividualPlan() {
-			return plans.values().iterator().next();
-		}
+    public boolean isJoint() {
+      return plans.size() > 1;
+    }
 
-		public JointPlan build() {
-			return factory.createJointPlan( plans );
-		}
-	}
+    public Plan getIndividualPlan() {
+      return plans.values().iterator().next();
+    }
+
+    public JointPlan build() {
+      return factory.createJointPlan(plans);
+    }
+  }
 }

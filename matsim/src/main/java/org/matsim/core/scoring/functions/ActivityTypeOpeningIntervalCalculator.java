@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * ActivityTypeOpeningIntervalCalculator.java
@@ -19,34 +18,37 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.scoring.functions;
+package org.matsim.core.scoring.functions;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.utils.misc.OptionalTime;
 
 public class ActivityTypeOpeningIntervalCalculator implements OpeningIntervalCalculator {
-	private final ScoringParameters params;
+  private final ScoringParameters params;
 
-	public ActivityTypeOpeningIntervalCalculator(ScoringParameters params) {
-		this.params = params;
-	}
+  public ActivityTypeOpeningIntervalCalculator(ScoringParameters params) {
+    this.params = params;
+  }
 
-	@Override
-	public OptionalTime[] getOpeningInterval(final Activity act) {
+  @Override
+  public OptionalTime[] getOpeningInterval(final Activity act) {
 
-		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
-		if (actParams == null) {
-			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters " +
-					"(module name=\"planCalcScore\" in the config file).");
-		}
+    ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
+    if (actParams == null) {
+      throw new IllegalArgumentException(
+          "acttype \""
+              + act.getType()
+              + "\" is not known in utility parameters "
+              + "(module name=\"planCalcScore\" in the config file).");
+    }
 
-		OptionalTime openingTime = actParams.getOpeningTime();
-		OptionalTime closingTime = actParams.getClosingTime();
+    OptionalTime openingTime = actParams.getOpeningTime();
+    OptionalTime closingTime = actParams.getClosingTime();
 
-		// openInterval has two values
-		// openInterval[0] will be the opening time
-		// openInterval[1] will be the closing time
+    //  openInterval has two values
+    // openInterval[0] will be the opening time
+    // openInterval[1] will be the closing time
 
-		return new OptionalTime[]{openingTime, closingTime};
-	}
+    return new OptionalTime[] {openingTime, closingTime};
+  }
 }

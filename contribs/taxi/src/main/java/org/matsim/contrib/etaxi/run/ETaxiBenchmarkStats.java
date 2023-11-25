@@ -15,38 +15,42 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.io.IOUtils;
 
 public class ETaxiBenchmarkStats implements ShutdownListener, AfterMobsimListener {
-	public static final String[] HEADER = { "QueuedTimeRatio_fleetAvg" };
+  public static final String[] HEADER = {"QueuedTimeRatio_fleetAvg"};
 
-	private final OutputDirectoryHierarchy controlerIO;
-	private final ChargingEventSequenceCollector chargingEventSequenceCollector;
-	private final FleetSpecification fleetSpecification;
+  private final OutputDirectoryHierarchy controlerIO;
+  private final ChargingEventSequenceCollector chargingEventSequenceCollector;
+  private final FleetSpecification fleetSpecification;
 
-	private final SummaryStatistics queuedTimeRatio = new SummaryStatistics();
+  private final SummaryStatistics queuedTimeRatio = new SummaryStatistics();
 
-	public ETaxiBenchmarkStats(OutputDirectoryHierarchy controlerIO,
-			ChargingEventSequenceCollector chargingEventSequenceCollector, FleetSpecification fleetSpecification) {
-		this.controlerIO = controlerIO;
-		this.chargingEventSequenceCollector = chargingEventSequenceCollector;
-		this.fleetSpecification = fleetSpecification;
-	}
+  public ETaxiBenchmarkStats(
+      OutputDirectoryHierarchy controlerIO,
+      ChargingEventSequenceCollector chargingEventSequenceCollector,
+      FleetSpecification fleetSpecification) {
+    this.controlerIO = controlerIO;
+    this.chargingEventSequenceCollector = chargingEventSequenceCollector;
+    this.fleetSpecification = fleetSpecification;
+  }
 
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		ETaxiStats singleRunEStats = new ETaxiStatsCalculator(chargingEventSequenceCollector.getCompletedSequences(),
-				fleetSpecification).getDailyEStats();
-		singleRunEStats.getFleetQueuedTimeRatio().ifPresent(queuedTimeRatio::addValue);
-	}
+  @Override
+  public void notifyAfterMobsim(AfterMobsimEvent event) {
+    ETaxiStats singleRunEStats =
+        new ETaxiStatsCalculator(
+                chargingEventSequenceCollector.getCompletedSequences(), fleetSpecification)
+            .getDailyEStats();
+    singleRunEStats.getFleetQueuedTimeRatio().ifPresent(queuedTimeRatio::addValue);
+  }
 
-	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-		writeFile("ebenchmark_stats.txt", HEADER);
-	}
+  @Override
+  public void notifyShutdown(ShutdownEvent event) {
+    writeFile("ebenchmark_stats.txt", HEADER);
+  }
 
-	private void writeFile(String file, String[] header) {
-		try (CompactCSVWriter writer = new CompactCSVWriter(
-				IOUtils.getBufferedWriter(controlerIO.getOutputFilename(file)))) {
-			writer.writeNext(header);
-			writer.writeNext(new CSVLineBuilder().addf("%.3f", queuedTimeRatio.getMean()));
-		}
-	}
+  private void writeFile(String file, String[] header) {
+    try (CompactCSVWriter writer =
+        new CompactCSVWriter(IOUtils.getBufferedWriter(controlerIO.getOutputFilename(file)))) {
+      writer.writeNext(header);
+      writer.writeNext(new CSVLineBuilder().addf("%.3f", queuedTimeRatio.getMean()));
+    }
+  }
 }

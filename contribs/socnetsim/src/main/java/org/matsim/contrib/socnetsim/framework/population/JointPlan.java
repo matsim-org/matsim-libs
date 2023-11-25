@@ -19,39 +19,38 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.population;
 
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.socnetsim.utils.CompactUnmodifiablePlanMap;
 
-import java.util.Map;
-
 /**
  * class for handling synchronized plans.
+ *
  * @author thibautd
  */
 public class JointPlan {
-	private final CompactUnmodifiablePlanMap individualPlans;
+  private final CompactUnmodifiablePlanMap individualPlans;
 
-	JointPlan( final Map<Id<Person>, ? extends Plan> plans ) {
-		this.individualPlans = new CompactUnmodifiablePlanMap( plans.values() );
-	}
+  JointPlan(final Map<Id<Person>, ? extends Plan> plans) {
+    this.individualPlans = new CompactUnmodifiablePlanMap(plans.values());
+  }
 
-	public Plan getIndividualPlan(final Id<Person> id) {
-		return this.individualPlans.get(id);
-	}
+  public Plan getIndividualPlan(final Id<Person> id) {
+    return this.individualPlans.get(id);
+  }
 
-	public Map<Id<Person>,Plan> getIndividualPlans() {
-		return this.individualPlans;
-	}
+  public Map<Id<Person>, Plan> getIndividualPlans() {
+    return this.individualPlans;
+  }
 
-	@Override
-	public String toString() {
-		final StringBuilder builder = new StringBuilder( getClass().getSimpleName()+": plans=" );
-		for ( Plan p : getIndividualPlans().values() ) {
-			builder.append(
-				p.getPerson().getId()+": "+p.getPerson().getPlans().indexOf( p )+"; " );
-		}
-		return builder.toString();
-	}
+  @Override
+  public String toString() {
+    final StringBuilder builder = new StringBuilder(getClass().getSimpleName() + ": plans=");
+    for (Plan p : getIndividualPlans().values()) {
+      builder.append(p.getPerson().getId() + ": " + p.getPerson().getPlans().indexOf(p) + "; ");
+    }
+    return builder.toString();
+  }
 }

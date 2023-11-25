@@ -20,8 +20,6 @@
 package playground.vsp.andreas.bvgAna.level1;
 
 import java.util.LinkedList;
-
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -33,71 +31,85 @@ import org.matsim.core.utils.collections.Tuple;
 
 /**
  * Collects travel time data for one single pt trip consisting of transit walk legs and pt legs
- * 
- * @author aneumann
  *
+ * @author aneumann
  */
 public class AgentId2PtTripTravelTimeMapData {
-	
-	private final Logger log = LogManager.getLogger(AgentId2PtTripTravelTimeMapData.class);
-//	private final Level logLevel = Level.DEBUG;
 
-	private ActivityEndEvent startAct;
-	private ActivityStartEvent endAct;
-	
-	LinkedList<Tuple<String, Double>> type2TravelTimeMap = new LinkedList<Tuple<String,Double>>();
-	
-	public AgentId2PtTripTravelTimeMapData(ActivityEndEvent startAct){
-//		this.log.setLevel(this.logLevel);
-		this.startAct = startAct;
-	}
+  private final Logger log = LogManager.getLogger(AgentId2PtTripTravelTimeMapData.class);
+  //	private final Level logLevel = Level.DEBUG;
 
-	protected void handle(PersonDepartureEvent event) {
-		// preregister
-		this.type2TravelTimeMap.add(new Tuple<String, Double>(event.getLegMode(), new Double(event.getTime())));		
-	}
+  private ActivityEndEvent startAct;
+  private ActivityStartEvent endAct;
 
-	protected void handle(PersonArrivalEvent event) {		
-		if(this.type2TravelTimeMap.getLast().getFirst().equalsIgnoreCase(event.getLegMode())){
-			// calculate leg travel time
-			Tuple<String, Double> lastEntry = this.type2TravelTimeMap.removeLast();
-			this.type2TravelTimeMap.add(new Tuple<String, Double>(event.getLegMode(), new Double(event.getTime() - lastEntry.getSecond().doubleValue())));
-		} else {
-			this.log.warn("Got two different legs to handle. Start act: " + this.startAct + " Last event is: " + event);
-		}
-	}
+  LinkedList<Tuple<String, Double>> type2TravelTimeMap = new LinkedList<Tuple<String, Double>>();
 
-	protected void setStartEvent(ActivityStartEvent event) {
-		this.endAct = event;		
-	}
-	
-	/**
-	 * @return Returns the total trip travel time including transit walks and pt legs
-	 */
-	public double getTotalTripTravelTime(){
-		double travelTime = 0.0;
-		for (Tuple<String, Double> tuple : this.type2TravelTimeMap) {
-			travelTime += tuple.getSecond().doubleValue();
-		}
-		return travelTime;
-	}
-	
-	/**
-	 * @return Returns the number of transfers
-	 */
-	public int getNumberOfTransfers(){
-		int numberOfTransfers = -1;
-		for (Tuple<String, Double> tuple : this.type2TravelTimeMap) {
-			if(tuple.getFirst().equalsIgnoreCase(TransportMode.pt)){
-				numberOfTransfers++;
-			}
-		}
-		return numberOfTransfers;		
-	}
-	
-	@Override
-	public String toString() {
-		return "PT Leg from: " + this.startAct + " to " + this.endAct + " took " + this.getTotalTripTravelTime() + " seconds and " + this.getNumberOfTransfers() + " transfers";
-	}
-	
+  public AgentId2PtTripTravelTimeMapData(ActivityEndEvent startAct) {
+    //		this.log.setLevel(this.logLevel);
+    this.startAct = startAct;
+  }
+
+  protected void handle(PersonDepartureEvent event) {
+    // preregister
+    this.type2TravelTimeMap.add(
+        new Tuple<String, Double>(event.getLegMode(), new Double(event.getTime())));
+  }
+
+  protected void handle(PersonArrivalEvent event) {
+    if (this.type2TravelTimeMap.getLast().getFirst().equalsIgnoreCase(event.getLegMode())) {
+      // calculate leg travel time
+      Tuple<String, Double> lastEntry = this.type2TravelTimeMap.removeLast();
+      this.type2TravelTimeMap.add(
+          new Tuple<String, Double>(
+              event.getLegMode(),
+              new Double(event.getTime() - lastEntry.getSecond().doubleValue())));
+    } else {
+      this.log.warn(
+          "Got two different legs to handle. Start act: "
+              + this.startAct
+              + " Last event is: "
+              + event);
+    }
+  }
+
+  protected void setStartEvent(ActivityStartEvent event) {
+    this.endAct = event;
+  }
+
+  /**
+   * @return Returns the total trip travel time including transit walks and pt legs
+   */
+  public double getTotalTripTravelTime() {
+    double travelTime = 0.0;
+    for (Tuple<String, Double> tuple : this.type2TravelTimeMap) {
+      travelTime += tuple.getSecond().doubleValue();
+    }
+    return travelTime;
+  }
+
+  /**
+   * @return Returns the number of transfers
+   */
+  public int getNumberOfTransfers() {
+    int numberOfTransfers = -1;
+    for (Tuple<String, Double> tuple : this.type2TravelTimeMap) {
+      if (tuple.getFirst().equalsIgnoreCase(TransportMode.pt)) {
+        numberOfTransfers++;
+      }
+    }
+    return numberOfTransfers;
+  }
+
+  @Override
+  public String toString() {
+    return "PT Leg from: "
+        + this.startAct
+        + " to "
+        + this.endAct
+        + " took "
+        + this.getTotalTripTravelTime()
+        + " seconds and "
+        + this.getNumberOfTransfers()
+        + " transfers";
+  }
 }

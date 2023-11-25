@@ -22,74 +22,69 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionsel
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.router.priorityqueue.BinaryMinHeap;
-import org.matsim.core.router.priorityqueue.MinHeap;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.WeightCalculator;
+import org.matsim.core.router.priorityqueue.BinaryMinHeap;
+import org.matsim.core.router.priorityqueue.MinHeap;
 
 public final class PointingAgent {
-	private final Id id;
-	private final PlanRecord[] records;
-	private boolean off = false;
+  private final Id id;
+  private final PlanRecord[] records;
+  private boolean off = false;
 
-	private final MinHeap<PlanRecord> heap;
+  private final MinHeap<PlanRecord> heap;
 
-	public PointingAgent(
-			final Person person,
-			final ReplanningGroup group,
-			final WeightCalculator weight) {
-		this.id = person.getId();
-		this.records = new PlanRecord[ person.getPlans().size() ];
-		this.heap = new BinaryMinHeap<>( records.length );
+  public PointingAgent(
+      final Person person, final ReplanningGroup group, final WeightCalculator weight) {
+    this.id = person.getId();
+    this.records = new PlanRecord[person.getPlans().size()];
+    this.heap = new BinaryMinHeap<>(records.length);
 
-		int i = 0;
-		for ( Plan p : person.getPlans() ) {
-			records[ i ] =
-				new PlanRecord(
-						this,
-						p,
-						weight.getWeight(
-							p,
-							group ),
-						// this is used by the binary heap to be efficient:
-						// it asks the user to set the index of the element in the
-						// internal array by himself.
-						i);
-			final boolean added =
-				this.heap.add(
-					records[ i ],
-					// inverse priority: we want decreasing order
-					-records[ i ].getWeight() );
-			if ( !added ) throw new RuntimeException();
-			i++;
-		}
-	}
+    int i = 0;
+    for (Plan p : person.getPlans()) {
+      records[i] =
+          new PlanRecord(
+              this,
+              p,
+              weight.getWeight(p, group),
+              // this is used by the binary heap to be efficient:
+              // it asks the user to set the index of the element in the
+              // internal array by himself.
+              i);
+      final boolean added =
+          this.heap.add(
+              records[i],
+              // inverse priority: we want decreasing order
+              -records[i].getWeight());
+      if (!added) throw new RuntimeException();
+      i++;
+    }
+  }
 
-	public PlanRecord[] getRecords() {
-		return records;
-	}
+  public PlanRecord[] getRecords() {
+    return records;
+  }
 
-	public Plan getPointedPlan() {
-		return getPointedPlanRecord().getPlan();
-	}
+  public Plan getPointedPlan() {
+    return getPointedPlanRecord().getPlan();
+  }
 
-	public PlanRecord getPointedPlanRecord() {
-		while ( !heap.peek().isFeasible() ) {
-			heap.poll();
-			if ( heap.isEmpty() ) {
-				throw new RuntimeException(
-						"no more feasible plans for agent "+id );
-			}
-		}
+  public PlanRecord getPointedPlanRecord() {
+    while (!heap.peek().isFeasible()) {
+      heap.poll();
+      if (heap.isEmpty()) {
+        throw new RuntimeException("no more feasible plans for agent " + id);
+      }
+    }
 
-		return heap.peek();
-	}
+    return heap.peek();
+  }
 
-	public boolean isOff() {
-		return off;
-	}
+  public boolean isOff() {
+    return off;
+  }
 
-	public void switchOff() {
-		this.off = true;
-	}
+  public void switchOff() {
+    this.off = true;
+  }
 }

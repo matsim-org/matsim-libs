@@ -32,32 +32,33 @@ import org.matsim.core.utils.geometry.CoordUtils;
  * @author Michal Maciejewski (michalm)
  */
 public class DrtTeleportedRouteCalculator implements TeleportedRouteCalculator {
-	private final double averageWaitingTime;
-	private final double averageInVehicleBeelineSpeed;
+  private final double averageWaitingTime;
+  private final double averageInVehicleBeelineSpeed;
 
-	DrtTeleportedRouteCalculator(double averageWaitingTime, double averageInVehicleBeelineSpeed) {
-		this.averageWaitingTime = averageWaitingTime;
-		this.averageInVehicleBeelineSpeed = averageInVehicleBeelineSpeed;
-	}
+  DrtTeleportedRouteCalculator(double averageWaitingTime, double averageInVehicleBeelineSpeed) {
+    this.averageWaitingTime = averageWaitingTime;
+    this.averageInVehicleBeelineSpeed = averageInVehicleBeelineSpeed;
+  }
 
-	// TODO: from discussion from michal and rakow
-	// speedup is currently using very simple and not exchangeable estimators
-	// it could be possible to integrate the drt estimators used by the informed mode-choice
-	// this router should probably not use the beeline distance but the direct travel route
-	// speed-up would still be significant (oct'23)
+  // TODO: from discussion from michal and rakow
+  // speedup is currently using very simple and not exchangeable estimators
+  // it could be possible to integrate the drt estimators used by the informed mode-choice
+  // this router should probably not use the beeline distance but the direct travel route
+  // speed-up would still be significant (oct'23)
 
-	@Override
-	public Route calculateRoute(PassengerRequest request) {
-		Link startLink = request.getFromLink();
-		Link endLink = request.getToLink();
-		final Coord fromActCoord = startLink.getToNode().getCoord();
-		final Coord toActCoord = endLink.getToNode().getCoord();
-		double dist = CoordUtils.calcEuclideanDistance(fromActCoord, toActCoord);
-		Route route = new GenericRouteImpl(startLink.getId(), endLink.getId());
-		//TODO move wait time outside the route (handle it explicitly by the TeleportingPassengerEngine)
-		int travTime = (int)(averageWaitingTime + (dist / averageInVehicleBeelineSpeed));
-		route.setTravelTime(travTime);
-		route.setDistance(dist);
-		return route;
-	}
+  @Override
+  public Route calculateRoute(PassengerRequest request) {
+    Link startLink = request.getFromLink();
+    Link endLink = request.getToLink();
+    final Coord fromActCoord = startLink.getToNode().getCoord();
+    final Coord toActCoord = endLink.getToNode().getCoord();
+    double dist = CoordUtils.calcEuclideanDistance(fromActCoord, toActCoord);
+    Route route = new GenericRouteImpl(startLink.getId(), endLink.getId());
+    // TODO move wait time outside the route (handle it explicitly by the
+    // TeleportingPassengerEngine)
+    int travTime = (int) (averageWaitingTime + (dist / averageInVehicleBeelineSpeed));
+    route.setTravelTime(travTime);
+    route.setDistance(dist);
+    return route;
+  }
 }

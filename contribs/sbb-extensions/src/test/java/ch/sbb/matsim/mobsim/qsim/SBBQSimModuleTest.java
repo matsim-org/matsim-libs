@@ -44,58 +44,61 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class SBBQSimModuleTest {
 
-    @Rule public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Before
-    public void setUp() {
-        System.setProperty("matsim.preferLocalDtds", "true");
-    }
+  @Before
+  public void setUp() {
+    System.setProperty("matsim.preferLocalDtds", "true");
+  }
 
-    // https://github.com/SchweizerischeBundesbahnen/matsim-sbb-extensions/issues/3
-    @Test
-    public void testIntegration() {
-        String xmlConfig = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<!DOCTYPE config SYSTEM \"http://www.matsim.org/files/dtd/config_v2.dtd\">\n" +
-                "<config>\n" +
-                "\t<module name=\"controler\" >\n" +
-                "\t\t<param name=\"createGraphs\" value=\"false\" />\n" +
-                "\t\t<param name=\"dumpDataAtEnd\" value=\"false\" />\n" +
-                "\t\t<param name=\"lastIteration\" value=\"0\" />\n" +
-                "\t</module>\n" +
-                "\t<module name=\"SBBPt\" >\n" +
-                "\t\t<param name=\"deterministicServiceModes\" value=\"train,metro\" />\n" +
-                "\t\t<param name=\"createLinkEventsInterval\" value=\"10\" />\n" +
-                "\t</module>\n" +
-                "</config>";
+  // https://github.com/SchweizerischeBundesbahnen/matsim-sbb-extensions/issues/3
+  @Test
+  public void testIntegration() {
+    String xmlConfig =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+            + "<!DOCTYPE config SYSTEM \"http://www.matsim.org/files/dtd/config_v2.dtd\">\n"
+            + "<config>\n"
+            + "\t<module name=\"controler\" >\n"
+            + "\t\t<param name=\"createGraphs\" value=\"false\" />\n"
+            + "\t\t<param name=\"dumpDataAtEnd\" value=\"false\" />\n"
+            + "\t\t<param name=\"lastIteration\" value=\"0\" />\n"
+            + "\t</module>\n"
+            + "\t<module name=\"SBBPt\" >\n"
+            + "\t\t<param name=\"deterministicServiceModes\" value=\"train,metro\" />\n"
+            + "\t\t<param name=\"createLinkEventsInterval\" value=\"10\" />\n"
+            + "\t</module>\n"
+            + "</config>";
 
-        Config config = ConfigUtils.createConfig();
-        new ConfigReader(config).parse(new ByteArrayInputStream(xmlConfig.getBytes(StandardCharsets.UTF_8)));
-        config.controller().setOutputDirectory(this.utils.getOutputDirectory());
-        Scenario scenario = ScenarioUtils.createScenario(config);
-        Controler controler = new Controler(scenario);
+    Config config = ConfigUtils.createConfig();
+    new ConfigReader(config)
+        .parse(new ByteArrayInputStream(xmlConfig.getBytes(StandardCharsets.UTF_8)));
+    config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+    Scenario scenario = ScenarioUtils.createScenario(config);
+    Controler controler = new Controler(scenario);
 
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                // To use the deterministic pt simulation (Part 1 of 2):
-                install(new SBBTransitModule());
-            }
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            // To use the deterministic pt simulation (Part 1 of 2):
+            install(new SBBTransitModule());
+          }
 
-            // To use the deterministic pt simulation (Part 2 of 2):
-            @Provides
-            QSimComponentsConfig provideQSimComponentsConfig() {
-                QSimComponentsConfig components = new QSimComponentsConfig();
-                new StandardQSimComponentConfigurator(config).configure(components);
-                new SBBTransitEngineQSimModule().configure(components);
-                return components;
-            }
+          // To use the deterministic pt simulation (Part 2 of 2):
+          @Provides
+          QSimComponentsConfig provideQSimComponentsConfig() {
+            QSimComponentsConfig components = new QSimComponentsConfig();
+            new StandardQSimComponentConfigurator(config).configure(components);
+            new SBBTransitEngineQSimModule().configure(components);
+            return components;
+          }
         });
 
-        controler.run();
+    controler.run();
 
-        // this test mostly checks that no exception occurred
+    // this test mostly checks that no exception occurred
 
-        Assert.assertTrue(config.getModules().get(SBBTransitConfigGroup.GROUP_NAME) instanceof SBBTransitConfigGroup);
-    }
-
+    Assert.assertTrue(
+        config.getModules().get(SBBTransitConfigGroup.GROUP_NAME) instanceof SBBTransitConfigGroup);
+  }
 }

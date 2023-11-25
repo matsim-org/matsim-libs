@@ -21,8 +21,5 @@ package playground.vsp.analysis.modules.ptTripAnalysis.traveltime;
 
 /**
  * @author droeder
- *
  */
-public interface TTAnalysisTripI {
-
-}
+public interface TTAnalysisTripI {}

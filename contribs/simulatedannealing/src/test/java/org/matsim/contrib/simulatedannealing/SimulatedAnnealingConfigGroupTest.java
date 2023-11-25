@@ -8,78 +8,78 @@
  */
 package org.matsim.contrib.simulatedannealing;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.matsim.contrib.simulatedannealing.temperature.TemperatureFunction;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.contrib.simulatedannealing.temperature.TemperatureFunction;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Map;
 
 /**
  * @author nkuehnel / MOIA
  */
 public class SimulatedAnnealingConfigGroupTest {
 
-	@Rule
-	public TemporaryFolder tempFolder = new TemporaryFolder();
+  @Rule public TemporaryFolder tempFolder = new TemporaryFolder();
 
-	private static Config createConfig() {
-		Config config = ConfigUtils.createConfig();
+  private static Config createConfig() {
+    Config config = ConfigUtils.createConfig();
 
-		SimulatedAnnealingConfigGroup simAnCfg = new SimulatedAnnealingConfigGroup();
-		simAnCfg.initialTemperature = 42;
-		simAnCfg.alpha = 42;
-		simAnCfg.coolingSchedule = TemperatureFunction.DefaultFunctions.exponentialAdditive;
+    SimulatedAnnealingConfigGroup simAnCfg = new SimulatedAnnealingConfigGroup();
+    simAnCfg.initialTemperature = 42;
+    simAnCfg.alpha = 42;
+    simAnCfg.coolingSchedule = TemperatureFunction.DefaultFunctions.exponentialAdditive;
 
-		config.addModule(simAnCfg);
-		return config;
-	}
+    config.addModule(simAnCfg);
+    return config;
+  }
 
+  private static Path writeConfig(final TemporaryFolder tempFolder) throws IOException {
+    Config config = createConfig();
+    Path configFile = tempFolder.newFile("config.xml").toPath();
+    ConfigUtils.writeConfig(config, configFile.toString());
+    return configFile;
+  }
 
-	private static Path writeConfig(final TemporaryFolder tempFolder) throws IOException {
-		Config config = createConfig();
-		Path configFile = tempFolder.newFile("config.xml").toPath();
-		ConfigUtils.writeConfig(config, configFile.toString());
-		return configFile;
-	}
+  @Test
+  public void loadConfigGroupTest() throws IOException {
 
-	@Test
-	public void loadConfigGroupTest() throws IOException {
+    /* Test that exported values are correct imported again */
+    Path configFile = writeConfig(tempFolder);
+    Config config = ConfigUtils.createConfig();
+    ConfigUtils.loadConfig(config, configFile.toString());
+    SimulatedAnnealingConfigGroup loadedCfg =
+        ConfigUtils.addOrGetModule(config, SimulatedAnnealingConfigGroup.class);
+    Assert.assertEquals(42., loadedCfg.alpha, MatsimTestUtils.EPSILON);
+    Assert.assertEquals(42., loadedCfg.initialTemperature, MatsimTestUtils.EPSILON);
+    Assert.assertEquals(
+        TemperatureFunction.DefaultFunctions.exponentialAdditive, loadedCfg.coolingSchedule);
+  }
 
-		/* Test that exported values are correct imported again */
-		Path configFile = writeConfig(tempFolder);
-		Config config = ConfigUtils.createConfig();
-		ConfigUtils.loadConfig(config, configFile.toString());
-		SimulatedAnnealingConfigGroup loadedCfg = ConfigUtils.addOrGetModule(config, SimulatedAnnealingConfigGroup.class);
-		Assert.assertEquals(42., loadedCfg.alpha, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(42., loadedCfg.initialTemperature, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(TemperatureFunction.DefaultFunctions.exponentialAdditive, loadedCfg.coolingSchedule);
-	}
+  @Test
+  public void perturbationParamsTest() {
+    Config config = createConfig();
+    SimulatedAnnealingConfigGroup saConfig =
+        ConfigUtils.addOrGetModule(config, SimulatedAnnealingConfigGroup.class);
 
+    Assert.assertTrue(saConfig.getPerturbationParams().isEmpty());
 
-	@Test
-	public void perturbationParamsTest() {
-		Config config = createConfig();
-		SimulatedAnnealingConfigGroup saConfig = ConfigUtils.addOrGetModule(config, SimulatedAnnealingConfigGroup.class);
+    saConfig.addPerturbationParams(
+        new SimulatedAnnealingConfigGroup.PerturbationParams("perturb", 1.) {
+          @Override
+          public Map<String, String> getComments() {
+            return super.getComments();
+          }
+        });
 
-		Assert.assertTrue(saConfig.getPerturbationParams().isEmpty());
-
-		saConfig.addPerturbationParams(new SimulatedAnnealingConfigGroup.PerturbationParams("perturb", 1.) {
-			@Override
-			public Map<String, String> getComments() {
-				return super.getComments();
-			}
-		});
-
-		Assert.assertFalse(saConfig.getPerturbationParams().isEmpty());
-		Assert.assertTrue(saConfig.getPerturbationParamsPerType().containsKey("perturb"));
-		Assert.assertEquals(1., saConfig.getPerturbationParamsPerType().get("perturb").weight, MatsimTestUtils.EPSILON);
-
-	}
+    Assert.assertFalse(saConfig.getPerturbationParams().isEmpty());
+    Assert.assertTrue(saConfig.getPerturbationParamsPerType().containsKey("perturb"));
+    Assert.assertEquals(
+        1., saConfig.getPerturbationParamsPerType().get("perturb").weight, MatsimTestUtils.EPSILON);
+  }
 }

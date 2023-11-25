@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * OpeningIntervalCalculator.java
@@ -19,13 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.scoring.functions;
+package org.matsim.core.scoring.functions;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.utils.misc.OptionalTime;
 
 public interface OpeningIntervalCalculator {
 
-	OptionalTime[] getOpeningInterval(final Activity act);
-
+  OptionalTime[] getOpeningInterval(final Activity act);
 }

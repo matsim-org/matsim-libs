@@ -20,45 +20,41 @@
 package org.matsim.contrib.socnetsim.jointtrips.qsim;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.socnetsim.qsim.QVehicleProvider;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import org.matsim.contrib.socnetsim.qsim.QVehicleProvider;
-
 public class PassengerUnboardingAgentFactory implements AgentFactory, MobsimEngine {
-	private final AgentFactory delegate;
-	private final QVehicleProvider vehicleProvider;
-	private InternalInterface internalInterface = null;
+  private final AgentFactory delegate;
+  private final QVehicleProvider vehicleProvider;
+  private InternalInterface internalInterface = null;
 
-	public PassengerUnboardingAgentFactory(
-			final AgentFactory delegate,
-			final QVehicleProvider vehicleProvider) {
-		this.delegate = delegate;
-		this.vehicleProvider = vehicleProvider;
-	}
+  public PassengerUnboardingAgentFactory(
+      final AgentFactory delegate, final QVehicleProvider vehicleProvider) {
+    this.delegate = delegate;
+    this.vehicleProvider = vehicleProvider;
+  }
 
-	@Override
-	public MobsimAgent createMobsimAgentFromPerson(final Person p) {
-		if ( internalInterface == null ) throw new IllegalStateException( "no internal interface" );
-		return new PassengerUnboardingDriverAgent(
-				delegate.createMobsimAgentFromPerson( p ),
-				vehicleProvider,
-				internalInterface);
-	}
+  @Override
+  public MobsimAgent createMobsimAgentFromPerson(final Person p) {
+    if (internalInterface == null) throw new IllegalStateException("no internal interface");
+    return new PassengerUnboardingDriverAgent(
+        delegate.createMobsimAgentFromPerson(p), vehicleProvider, internalInterface);
+  }
 
-	@Override
-	public void doSimStep(double time) {}
+  @Override
+  public void doSimStep(double time) {}
 
-	@Override
-	public void onPrepareSim() {}
+  @Override
+  public void onPrepareSim() {}
 
-	@Override
-	public void afterSim() {}
+  @Override
+  public void afterSim() {}
 
-	@Override
-	public void setInternalInterface(final InternalInterface internalInterface) {
-		this.internalInterface = internalInterface;
-	}
+  @Override
+  public void setInternalInterface(final InternalInterface internalInterface) {
+    this.internalInterface = internalInterface;
+  }
 }

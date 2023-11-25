@@ -20,44 +20,43 @@
 package org.matsim.contrib.ev.charging;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.vehicles.Vehicle;
 
 public class QuitQueueAtChargerEvent extends Event {
-	public static final String EVENT_TYPE = "quit_queue_at_charger";
-	public static final String ATTRIBUTE_CHARGER = "charger";
-	public static final String ATTRIBUTE_VEHICLE = "vehicle";
+  public static final String EVENT_TYPE = "quit_queue_at_charger";
+  public static final String ATTRIBUTE_CHARGER = "charger";
+  public static final String ATTRIBUTE_VEHICLE = "vehicle";
 
-	private final Id<Charger> chargerId;
-	private final Id<Vehicle> vehicleId;
+  private final Id<Charger> chargerId;
+  private final Id<Vehicle> vehicleId;
 
-	public QuitQueueAtChargerEvent(double time, Id<Charger> chargerId, Id<Vehicle> vehicleId) {
-		super(time);
-		this.chargerId = chargerId;
-		this.vehicleId = vehicleId;
-	}
+  public QuitQueueAtChargerEvent(double time, Id<Charger> chargerId, Id<Vehicle> vehicleId) {
+    super(time);
+    this.chargerId = chargerId;
+    this.vehicleId = vehicleId;
+  }
 
-	public Id<Charger> getChargerId() {
-		return chargerId;
-	}
+  public Id<Charger> getChargerId() {
+    return chargerId;
+  }
 
-	public Id<Vehicle> getVehicleId() {
-		return vehicleId;
-	}
+  public Id<Vehicle> getVehicleId() {
+    return vehicleId;
+  }
 
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
+  @Override
+  public String getEventType() {
+    return EVENT_TYPE;
+  }
 
-	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_CHARGER, chargerId.toString());
-		attr.put(ATTRIBUTE_VEHICLE, vehicleId.toString());
-		return attr;
-	}
+  @Override
+  public Map<String, String> getAttributes() {
+    Map<String, String> attr = super.getAttributes();
+    attr.put(ATTRIBUTE_CHARGER, chargerId.toString());
+    attr.put(ATTRIBUTE_VEHICLE, vehicleId.toString());
+    return attr;
+  }
 }

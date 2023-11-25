@@ -42,37 +42,37 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author michalm
  */
 public class EDrtActionCreator implements VrpAgentLogic.DynActionCreator {
-	private final VrpAgentLogic.DynActionCreator delegate;
-	private final MobsimTimer timer;
+  private final VrpAgentLogic.DynActionCreator delegate;
+  private final MobsimTimer timer;
 
-	public EDrtActionCreator(VrpAgentLogic.DynActionCreator delegate, MobsimTimer timer) {
-		this.timer = timer;
-		this.delegate = delegate;
-	}
+  public EDrtActionCreator(VrpAgentLogic.DynActionCreator delegate, MobsimTimer timer) {
+    this.timer = timer;
+    this.delegate = delegate;
+  }
 
-	@Override
-	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
-		Task task = vehicle.getSchedule().getCurrentTask();
-		if (task.getTaskType().equals(EDrtChargingTask.TYPE)) {
-			task.initTaskTracker(new OfflineETaskTracker((EvDvrpVehicle)vehicle, timer));
-			return new ChargingActivity((ChargingTask)task);
-		} else {
-			DynAction dynAction = delegate.createAction(dynAgent, vehicle, now);
-			if (task.getTaskTracker() == null) {
-				task.initTaskTracker(new OfflineETaskTracker((EvDvrpVehicle)vehicle, timer));
-			}
-			return dynAction;
-		}
-	}
+  @Override
+  public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
+    Task task = vehicle.getSchedule().getCurrentTask();
+    if (task.getTaskType().equals(EDrtChargingTask.TYPE)) {
+      task.initTaskTracker(new OfflineETaskTracker((EvDvrpVehicle) vehicle, timer));
+      return new ChargingActivity((ChargingTask) task);
+    } else {
+      DynAction dynAction = delegate.createAction(dynAgent, vehicle, now);
+      if (task.getTaskTracker() == null) {
+        task.initTaskTracker(new OfflineETaskTracker((EvDvrpVehicle) vehicle, timer));
+      }
+      return dynAction;
+    }
+  }
 
-	public static VrpLeg createLeg(String mobsimMode, DvrpVehicle vehicle, MobsimTimer timer) {
-		DriveTask driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
-		VrpLeg leg = new VrpLeg(mobsimMode, driveTask.getPath());
-		OnlineDriveTaskTracker onlineTracker = new OnlineDriveTaskTrackerImpl(vehicle, leg,
-				OnlineTrackerListener.NO_LISTENER, timer);
-		OnlineEDriveTaskTracker onlineETracker = new OnlineEDriveTaskTracker((EvDvrpVehicle)vehicle, timer,
-				onlineTracker);
-		TaskTrackers.initOnlineDriveTaskTracking(vehicle, leg, onlineETracker);
-		return leg;
-	}
+  public static VrpLeg createLeg(String mobsimMode, DvrpVehicle vehicle, MobsimTimer timer) {
+    DriveTask driveTask = (DriveTask) vehicle.getSchedule().getCurrentTask();
+    VrpLeg leg = new VrpLeg(mobsimMode, driveTask.getPath());
+    OnlineDriveTaskTracker onlineTracker =
+        new OnlineDriveTaskTrackerImpl(vehicle, leg, OnlineTrackerListener.NO_LISTENER, timer);
+    OnlineEDriveTaskTracker onlineETracker =
+        new OnlineEDriveTaskTracker((EvDvrpVehicle) vehicle, timer, onlineTracker);
+    TaskTrackers.initOnlineDriveTaskTracking(vehicle, leg, onlineETracker);
+    return leg;
+  }
 }

@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -45,101 +44,110 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
-class SingleActLocationMutator extends AbstractLocationMutator{
+class SingleActLocationMutator extends AbstractLocationMutator {
 
-	protected int unsuccessfullLC = 0;
-	private final ActivitiesHandler defineFlexibleActivities;
+  protected int unsuccessfullLC = 0;
+  private final ActivitiesHandler defineFlexibleActivities;
 
-	public SingleActLocationMutator(final Scenario scenario, TreeMap<String, ? extends QuadTree<ActivityFacility>> quad_trees, 
-			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
-			Random random) {
+  public SingleActLocationMutator(
+      final Scenario scenario,
+      TreeMap<String, ? extends QuadTree<ActivityFacility>> quad_trees,
+      TreeMap<String, ActivityFacilityImpl[]> facilities_of_type,
+      Random random) {
 
-		super(scenario, quad_trees, facilities_of_type, random);
-		this.defineFlexibleActivities = new ActivitiesHandler((DestinationChoiceConfigGroup) scenario.getConfig().getModule("locationchoice"));
-	}
+    super(scenario, quad_trees, facilities_of_type, random);
+    this.defineFlexibleActivities =
+        new ActivitiesHandler(
+            (DestinationChoiceConfigGroup) scenario.getConfig().getModule("locationchoice"));
+  }
 
-	@Override
-	public final void run(final Plan plan){
+  @Override
+  public final void run(final Plan plan) {
 
-		List<Activity> flexibleActivities = this.getFlexibleActivities(plan);
+    List<Activity> flexibleActivities = this.getFlexibleActivities(plan);
 
-		if (flexibleActivities.size() == 0) {
-			this.unsuccessfullLC++;
-			return;
-		}
-		Collections.shuffle(flexibleActivities);
-		Activity actToMove = flexibleActivities.get(0);
-		List<PlanElement> actslegs = plan.getPlanElements();
-		int indexOfActToMove = actslegs.indexOf(actToMove);
+    if (flexibleActivities.size() == 0) {
+      this.unsuccessfullLC++;
+      return;
+    }
+    Collections.shuffle(flexibleActivities);
+    Activity actToMove = flexibleActivities.get(0);
+    List<PlanElement> actslegs = plan.getPlanElements();
+    int indexOfActToMove = actslegs.indexOf(actToMove);
 
-		// starting home and ending home are never flexible
-		final Leg legPre = (Leg)actslegs.get(indexOfActToMove -1);
-		final Leg legPost = (Leg)actslegs.get(indexOfActToMove + 1);
-		final Activity actPre = (Activity)actslegs.get(indexOfActToMove - 2);
-		final Activity actPost = (Activity)actslegs.get(indexOfActToMove + 2);
+    // starting home and ending home are never flexible
+    final Leg legPre = (Leg) actslegs.get(indexOfActToMove - 1);
+    final Leg legPost = (Leg) actslegs.get(indexOfActToMove + 1);
+    final Activity actPre = (Activity) actslegs.get(indexOfActToMove - 2);
+    final Activity actPost = (Activity) actslegs.get(indexOfActToMove + 2);
 
-		double travelDistancePre = 0.0;
-		double travelDistancePost = 0.0;
+    double travelDistancePre = 0.0;
+    double travelDistancePost = 0.0;
 
-		if (legPre.getMode().compareTo(TransportMode.car) == 0) {
-			travelDistancePre = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) legPre.getRoute(), this.getScenario().getNetwork() );
-		}
-		else {
-			travelDistancePre = CoordUtils.calcEuclideanDistance(actPre.getCoord(), actToMove.getCoord());
-		}
-		if (legPost.getMode().compareTo(TransportMode.car) == 0) {
-			travelDistancePost = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) legPost.getRoute(), this.getScenario().getNetwork() );
-		}
-		else {
-			travelDistancePost = CoordUtils.calcEuclideanDistance(actToMove.getCoord(), actPost.getCoord());
-		}
-		double radius =  0.5 * (travelDistancePre + travelDistancePost);
+    if (legPre.getMode().compareTo(TransportMode.car) == 0) {
+      travelDistancePre =
+          RouteUtils.calcDistanceExcludingStartEndLink(
+              (NetworkRoute) legPre.getRoute(), this.getScenario().getNetwork());
+    } else {
+      travelDistancePre = CoordUtils.calcEuclideanDistance(actPre.getCoord(), actToMove.getCoord());
+    }
+    if (legPost.getMode().compareTo(TransportMode.car) == 0) {
+      travelDistancePost =
+          RouteUtils.calcDistanceExcludingStartEndLink(
+              (NetworkRoute) legPost.getRoute(), this.getScenario().getNetwork());
+    } else {
+      travelDistancePost =
+          CoordUtils.calcEuclideanDistance(actToMove.getCoord(), actPost.getCoord());
+    }
+    double radius = 0.5 * (travelDistancePre + travelDistancePost);
 
-		if (Double.isNaN(radius)) {
-			this.unsuccessfullLC++;
-			return;
-		}
+    if (Double.isNaN(radius)) {
+      this.unsuccessfullLC++;
+      return;
+    }
 
-		if (!this.modifyLocation((Activity) actToMove, actPre.getCoord(), actPost.getCoord(), radius)) {
-			this.unsuccessfullLC++;
-			return;
-		}
-		PopulationUtils.resetRoutes(plan );
-	}
+    if (!this.modifyLocation((Activity) actToMove, actPre.getCoord(), actPost.getCoord(), radius)) {
+      this.unsuccessfullLC++;
+      return;
+    }
+    PopulationUtils.resetRoutes(plan);
+  }
 
-	private List<Activity> getFlexibleActivities(final Plan plan) {
-		List<Activity> flexibleActivities;
-		flexibleActivities = this.defineFlexibleActivities.getFlexibleActivities(plan);
-		return flexibleActivities;
-	}
+  private List<Activity> getFlexibleActivities(final Plan plan) {
+    List<Activity> flexibleActivities;
+    flexibleActivities = this.defineFlexibleActivities.getFlexibleActivities(plan);
+    return flexibleActivities;
+  }
 
-	protected final boolean modifyLocation(Activity act, Coord startCoord, Coord endCoord, double radius) {
-		double midPointX = (startCoord.getX() + endCoord.getX()) / 2.0;
-		double midPointY = (startCoord.getY() + endCoord.getY()) / 2.0;
-		ArrayList<ActivityFacility> facilitySet =
-				(ArrayList<ActivityFacility>) this.getQuadTreesOfType().get( act.getType() ).
-						getDisk(midPointX, midPointY, radius);
+  protected final boolean modifyLocation(
+      Activity act, Coord startCoord, Coord endCoord, double radius) {
+    double midPointX = (startCoord.getX() + endCoord.getX()) / 2.0;
+    double midPointY = (startCoord.getY() + endCoord.getY()) / 2.0;
+    ArrayList<ActivityFacility> facilitySet =
+        (ArrayList<ActivityFacility>)
+            this.getQuadTreesOfType().get(act.getType()).getDisk(midPointX, midPointY, radius);
 
-		ActivityFacility facility = null;
-		if (facilitySet.size() > 1) {
-			facility = facilitySet.get( super.getRandom().nextInt(facilitySet.size() ) );
-		}
-		else {
-			return false;
-		}
-		act.setFacilityId(facility.getId());
-   		act.setLinkId(NetworkUtils.getNearestLink(((Network) this.getScenario().getNetwork()), facility.getCoord() ).getId() );
-   		act.setCoord(facility.getCoord());
+    ActivityFacility facility = null;
+    if (facilitySet.size() > 1) {
+      facility = facilitySet.get(super.getRandom().nextInt(facilitySet.size()));
+    } else {
+      return false;
+    }
+    act.setFacilityId(facility.getId());
+    act.setLinkId(
+        NetworkUtils.getNearestLink(
+                ((Network) this.getScenario().getNetwork()), facility.getCoord())
+            .getId());
+    act.setCoord(facility.getCoord());
 
-   		return true;
-	}
+    return true;
+  }
 
-	public final int getNumberOfUnsuccessfull() {
-		return this.unsuccessfullLC;
-	}
+  public final int getNumberOfUnsuccessfull() {
+    return this.unsuccessfullLC;
+  }
 
-	public final void resetUnsuccsessfull() {
-		this.unsuccessfullLC = 0;
-	}
+  public final void resetUnsuccsessfull() {
+    this.unsuccessfullLC = 0;
+  }
 }
-

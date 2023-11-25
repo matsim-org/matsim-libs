@@ -21,34 +21,31 @@ package org.matsim.vis.otfvis;
 
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 
-
 /**
- * This class must not contain server side code. It is responsible 
- * to provide access to the TOP LEVEL control objects of OTFVis, namely
- * the config, the server connection manager, the client data control, e.g. data chaching,
- * the query enging control and the access to the visualization layer.
- * This TOP LEVEL control objects may not exist yet, however it is planned to
- * create them when needed.
- * 
- * @author dgrether
+ * This class must not contain server side code. It is responsible to provide access to the TOP
+ * LEVEL control objects of OTFVis, namely the config, the server connection manager, the client
+ * data control, e.g. data chaching, the query enging control and the access to the visualization
+ * layer. This TOP LEVEL control objects may not exist yet, however it is planned to create them
+ * when needed.
  *
+ * @author dgrether
  */
 public final class OTFClientControl {
-  
+
   private static final OTFClientControl instance = new OTFClientControl();
   private OTFVisConfigGroup config;
   private OTFOGLDrawer mainDrawer;
-  
+
   private OTFClientControl() {}
-  
+
   public static synchronized OTFClientControl getInstance() {
     return instance;
   }
-  
+
   public void setOTFVisConfig(OTFVisConfigGroup conf) {
     this.config = conf;
   }
-  
+
   public OTFVisConfigGroup getOTFVisConfig() {
     return this.config;
   }
@@ -56,9 +53,8 @@ public final class OTFClientControl {
   public void setMainOTFDrawer(OTFOGLDrawer mainDrawer) {
     this.mainDrawer = mainDrawer;
   }
-  
-  public OTFOGLDrawer getMainOTFDrawer(){
+
+  public OTFOGLDrawer getMainOTFDrawer() {
     return this.mainDrawer;
   }
-
 }

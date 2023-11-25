@@ -25,9 +25,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 /**
  * @author cdobler
  */
- interface LCPlanElement extends PlanElement {
+interface LCPlanElement extends PlanElement {
 
-	public int getArrayIndex();
-	
-	public int getPlanElementIndex();
+  public int getArrayIndex();
+
+  public int getPlanElementIndex();
 }

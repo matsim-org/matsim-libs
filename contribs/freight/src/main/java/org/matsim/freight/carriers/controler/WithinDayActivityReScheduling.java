@@ -22,6 +22,9 @@
 package org.matsim.freight.carriers.controler;
 
 import com.google.inject.Inject;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -38,10 +41,6 @@ import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.freight.carriers.Tour.Start;
 import org.matsim.freight.carriers.Tour.TourActivity;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 /*
  * Physically enforces beginnings of time windows for freight activities, i.e. freight agents
  * wait before closed doors until they can deliver / pick up their goods.
@@ -52,52 +51,57 @@ import java.util.Set;
  *
  */
 class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimStepListener {
-	public static final String COMPONENT_NAME=WithinDayActivityReScheduling.class.getSimpleName() ;
+  public static final String COMPONENT_NAME = WithinDayActivityReScheduling.class.getSimpleName();
 
+  @SuppressWarnings("unused")
+  private static final Logger logger = LogManager.getLogger(WithinDayActivityReScheduling.class);
 
-	@SuppressWarnings("unused")
-	private static final  Logger logger = LogManager.getLogger(WithinDayActivityReScheduling.class);
+  private final FreightAgentSource freightAgentSource;
 
-	private final FreightAgentSource freightAgentSource;
+  private final Set<Activity> encounteredActivities = new HashSet<>();
 
-	private final Set<Activity> encounteredActivities = new HashSet<>();
+  private final CarrierAgentTracker carrierAgentTracker;
 
-	private final CarrierAgentTracker carrierAgentTracker;
+  @Inject
+  WithinDayActivityReScheduling(
+      FreightAgentSource freightAgentSource, CarrierAgentTracker carrierAgentTracker) {
+    this.freightAgentSource = freightAgentSource;
+    this.carrierAgentTracker = carrierAgentTracker;
+  }
 
-	@Inject
-	WithinDayActivityReScheduling(FreightAgentSource freightAgentSource, CarrierAgentTracker carrierAgentTracker) {
-		this.freightAgentSource = freightAgentSource;
-		this.carrierAgentTracker = carrierAgentTracker;
-	}
+  @Override
+  public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
+    Collection<MobsimAgent> agentsToReplan = freightAgentSource.getMobSimAgents();
+    for (MobsimAgent pa : agentsToReplan) {
+      doReplanning(pa, e.getSimulationTime(), e.getQueueSimulation());
+    }
+  }
 
-	@Override
-	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
-		Collection<MobsimAgent> agentsToReplan = freightAgentSource.getMobSimAgents();
-		for (MobsimAgent pa : agentsToReplan) {
-			doReplanning(pa, e.getSimulationTime(), e.getQueueSimulation());
-		}
-	}
-
-	private void doReplanning( MobsimAgent mobsimAgent, double time, Mobsim mobsim ) {
-		PlanAgent planAgent = (PlanAgent) mobsimAgent;
-		Id<Person> agentId = planAgent.getCurrentPlan().getPerson().getId();
-		PlanElement currentPlanElement = WithinDayAgentUtils.getCurrentPlanElement(mobsimAgent);
-		if (currentPlanElement instanceof Activity act) {
-			if (encounteredActivities.contains(act)) {
-				return;
-			}
-			CarrierDriverAgent driver = carrierAgentTracker.getDriver(agentId);
-			TourActivity plannedActivity = (TourActivity) driver.getPlannedTourElement(WithinDayAgentUtils.getCurrentPlanElementIndex(mobsimAgent));
-			if (plannedActivity instanceof Start){
-				encounteredActivities.add(act);
-			} else {
-				double newEndTime = Math.max(time, plannedActivity.getTimeWindow().getStart()) + plannedActivity.getDuration();
-				act.setMaximumDurationUndefined();
-				act.setEndTime(newEndTime);
-				WithinDayAgentUtils.resetCaches( mobsimAgent );
-				WithinDayAgentUtils.rescheduleActivityEnd(mobsimAgent,mobsim);
-				encounteredActivities.add(act);
-			}
-		}
-	}
+  private void doReplanning(MobsimAgent mobsimAgent, double time, Mobsim mobsim) {
+    PlanAgent planAgent = (PlanAgent) mobsimAgent;
+    Id<Person> agentId = planAgent.getCurrentPlan().getPerson().getId();
+    PlanElement currentPlanElement = WithinDayAgentUtils.getCurrentPlanElement(mobsimAgent);
+    if (currentPlanElement instanceof Activity act) {
+      if (encounteredActivities.contains(act)) {
+        return;
+      }
+      CarrierDriverAgent driver = carrierAgentTracker.getDriver(agentId);
+      TourActivity plannedActivity =
+          (TourActivity)
+              driver.getPlannedTourElement(
+                  WithinDayAgentUtils.getCurrentPlanElementIndex(mobsimAgent));
+      if (plannedActivity instanceof Start) {
+        encounteredActivities.add(act);
+      } else {
+        double newEndTime =
+            Math.max(time, plannedActivity.getTimeWindow().getStart())
+                + plannedActivity.getDuration();
+        act.setMaximumDurationUndefined();
+        act.setEndTime(newEndTime);
+        WithinDayAgentUtils.resetCaches(mobsimAgent);
+        WithinDayAgentUtils.rescheduleActivityEnd(mobsimAgent, mobsim);
+        encounteredActivities.add(act);
+      }
+    }
+  }
 }

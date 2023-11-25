@@ -27,15 +27,15 @@ import org.matsim.contrib.minibus.hook.PPlan;
  */
 public final class PConstants {
 
-	public static final String statsOutputFolder = "/pStats/";
-	
-	public static final Id<PPlan> founderPlanId = Id.create("none", PPlan.class);
-	
-	public enum OperatorState {
-	    PROSPECTING, INBUSINESS, BANKRUPT
-	}
-	
-	private PConstants() {
-		
-	}
+  public static final String statsOutputFolder = "/pStats/";
+
+  public static final Id<PPlan> founderPlanId = Id.create("none", PPlan.class);
+
+  public enum OperatorState {
+    PROSPECTING,
+    INBUSINESS,
+    BANKRUPT
+  }
+
+  private PConstants() {}
 }

@@ -21,7 +21,6 @@ package org.matsim.contrib.socnetsim.jointtrips.router;
 
 import java.util.Collections;
 import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -29,50 +28,43 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.RoutingRequest;
-import org.matsim.facilities.Facility;
 
 /**
  * @author thibautd
  */
 public class DriverRoutingModule implements RoutingModule {
-	private final RoutingModule carRoutingModule;
-	private final String mode;
-	private final PopulationFactory popFactory;
+  private final RoutingModule carRoutingModule;
+  private final String mode;
+  private final PopulationFactory popFactory;
 
-	public DriverRoutingModule(
-			final String mode,
-			final PopulationFactory popFactory,
-			final RoutingModule carRoutingModule) {
-		this.mode = mode;
-		this.popFactory = popFactory;
-		this.carRoutingModule = carRoutingModule;
-	}
+  public DriverRoutingModule(
+      final String mode, final PopulationFactory popFactory, final RoutingModule carRoutingModule) {
+    this.mode = mode;
+    this.popFactory = popFactory;
+    this.carRoutingModule = carRoutingModule;
+  }
 
-	@Override
-	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
-		final double departureTime = request.getDepartureTime();
-		
-		List<? extends PlanElement> trip =
-			carRoutingModule.calcRoute(request);
+  @Override
+  public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+    final double departureTime = request.getDepartureTime();
 
-		if (trip.size() != 1) {
-			throw new RuntimeException( "unexpected trip size for trip "+trip+" for mode "+mode );
-		}
+    List<? extends PlanElement> trip = carRoutingModule.calcRoute(request);
 
-		Leg carLeg = (Leg) trip.get( 0 );
-		NetworkRoute netRoute = (NetworkRoute) carLeg.getRoute();
+    if (trip.size() != 1) {
+      throw new RuntimeException("unexpected trip size for trip " + trip + " for mode " + mode);
+    }
 
-		Leg leg = popFactory.createLeg( mode );
-		DriverRoute dRoute = new DriverRoute( netRoute , Collections.<Id<Person>>emptyList() );
-		leg.setRoute( dRoute );
-		leg.setDepartureTime( departureTime );
-		leg.setTravelTime(dRoute.getTravelTime().seconds());
+    Leg carLeg = (Leg) trip.get(0);
+    NetworkRoute netRoute = (NetworkRoute) carLeg.getRoute();
 
-		return Collections.singletonList( leg );
-	}
+    Leg leg = popFactory.createLeg(mode);
+    DriverRoute dRoute = new DriverRoute(netRoute, Collections.<Id<Person>>emptyList());
+    leg.setRoute(dRoute);
+    leg.setDepartureTime(departureTime);
+    leg.setTravelTime(dRoute.getTravelTime().seconds());
 
+    return Collections.singletonList(leg);
+  }
 }
-

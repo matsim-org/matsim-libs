@@ -22,7 +22,6 @@ package org.matsim.deprecated.scoring.functions;
 
 import java.util.Iterator;
 import java.util.Set;
-
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -31,73 +30,69 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.OpeningTime;
 
 /**
- * Same as CharyparNagelScoringFunction, but retrieves opening time information
- * from facility object of an activity instead of the config file.
+ * Same as CharyparNagelScoringFunction, but retrieves opening time information from facility object
+ * of an activity instead of the config file.
  *
  * @author meisterk
- *
  */
-@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant should be used.  kai, aug'18
+@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant
+// should be used.  kai, aug'18
 public class CharyparNagelOpenTimesActivityScoring extends CharyparNagelActivityScoring {
 
-	private final ActivityFacilities facilities;
-	
-	@Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant should be used.  kai, aug'18
-	public CharyparNagelOpenTimesActivityScoring(final ScoringParameters params, final ActivityFacilities facilities) {
-		super(params);
-		this.facilities = facilities;
-	}
+  private final ActivityFacilities facilities;
 
-	@Override
-	protected OptionalTime[] getOpeningInterval(Activity act) {
+  @Deprecated // this version should not be used any more.  Instead the SumScoringFunction variant
+  // should be used.  kai, aug'18
+  public CharyparNagelOpenTimesActivityScoring(
+      final ScoringParameters params, final ActivityFacilities facilities) {
+    super(params);
+    this.facilities = facilities;
+  }
 
-		// openInterval has two values
-		// openInterval[0] will be the opening time
-		// openInterval[1] will be the closing time
-		OptionalTime[] openInterval = {OptionalTime.undefined(), OptionalTime.undefined()};
+  @Override
+  protected OptionalTime[] getOpeningInterval(Activity act) {
 
-		boolean foundAct = false;
+    //  openInterval has two values
+    // openInterval[0] will be the opening time
+    // openInterval[1] will be the closing time
+    OptionalTime[] openInterval = {OptionalTime.undefined(), OptionalTime.undefined()};
 
-		ActivityFacility facility = this.facilities.getFacilities().get(act.getFacilityId());
-		Iterator<String> facilityActTypeIterator = facility.getActivityOptions().keySet().iterator();
-		String facilityActType = null;
-		Set<OpeningTime> opentimes = null;
+    boolean foundAct = false;
 
-		while (facilityActTypeIterator.hasNext() && !foundAct) {
+    ActivityFacility facility = this.facilities.getFacilities().get(act.getFacilityId());
+    Iterator<String> facilityActTypeIterator = facility.getActivityOptions().keySet().iterator();
+    String facilityActType = null;
+    Set<OpeningTime> opentimes = null;
 
-			facilityActType = facilityActTypeIterator.next();
-			if (act.getType().equals(facilityActType)) {
-				foundAct = true;
+    while (facilityActTypeIterator.hasNext() && !foundAct) {
 
-				opentimes = facility.getActivityOptions().get(facilityActType).getOpeningTimes();
-				if (opentimes != null && !opentimes.isEmpty()) {
-					// ignoring lunch breaks with the following procedure:
-					// if there is only one open time interval, use it
-					// if there are two or more, use the earliest start time and the latest end time
-					double opening = Double.MAX_VALUE;
-					double closing = Double.MIN_VALUE;
+      facilityActType = facilityActTypeIterator.next();
+      if (act.getType().equals(facilityActType)) {
+        foundAct = true;
 
-					for (OpeningTime opentime : opentimes) {
-						opening = Math.min(opening, opentime.getStartTime());
-						closing = Math.max(closing, opentime.getEndTime());
-					}
+        opentimes = facility.getActivityOptions().get(facilityActType).getOpeningTimes();
+        if (opentimes != null && !opentimes.isEmpty()) {
+          // ignoring lunch breaks with the following procedure:
+          // if there is only one open time interval, use it
+          // if there are two or more, use the earliest start time and the latest end time
+          double opening = Double.MAX_VALUE;
+          double closing = Double.MIN_VALUE;
 
-					openInterval[0] = OptionalTime.defined(opening);
-					openInterval[1] = OptionalTime.defined(closing);
-				}
+          for (OpeningTime opentime : opentimes) {
+            opening = Math.min(opening, opentime.getStartTime());
+            closing = Math.max(closing, opentime.getEndTime());
+          }
 
-			}
+          openInterval[0] = OptionalTime.defined(opening);
+          openInterval[1] = OptionalTime.defined(closing);
+        }
+      }
+    }
 
-		}
+    if (!foundAct) {
+      throw new RuntimeException("No suitable facility activity type found. Aborting...");
+    }
 
-		if (!foundAct) {
-			throw new RuntimeException("No suitable facility activity type found. Aborting...");
-		}
-
-		return openInterval;
-
-	}
-
-
-
+    return openInterval;
+  }
 }

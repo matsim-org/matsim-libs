@@ -21,7 +21,6 @@
 package org.matsim.withinday.mobsim;
 
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentSelector;
@@ -30,25 +29,24 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerFactory;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
 
-public abstract class WithinDayReplanningModule<T extends WithinDayReplannerFactory<? extends AgentSelector>> {
+public abstract class WithinDayReplanningModule<
+    T extends WithinDayReplannerFactory<? extends AgentSelector>> {
 
-	protected ParallelReplanner<T> parallelReplanner;
-	
-	public void doReplanning(double time) {
-		for (T factory : this.parallelReplanner.getWithinDayReplannerFactories()) {
-			Set<? extends AgentSelector> identifiers = factory.getIdentifers(); 
-			Id<WithinDayReplanner> id = factory.getId();
-			
-			for (AgentSelector identifier : identifiers) {
-				for (MobsimAgent withinDayAgent : identifier.getAgentsToReplan(time)) {					
-					ReplanningTask replanningTask = new ReplanningTask(withinDayAgent, id);
-					this.parallelReplanner.addReplanningTask(replanningTask);
-				}
-			}
-		}
-		
-		this.parallelReplanner.run(time);
-	}
-	
+  protected ParallelReplanner<T> parallelReplanner;
 
+  public void doReplanning(double time) {
+    for (T factory : this.parallelReplanner.getWithinDayReplannerFactories()) {
+      Set<? extends AgentSelector> identifiers = factory.getIdentifers();
+      Id<WithinDayReplanner> id = factory.getId();
+
+      for (AgentSelector identifier : identifiers) {
+        for (MobsimAgent withinDayAgent : identifier.getAgentsToReplan(time)) {
+          ReplanningTask replanningTask = new ReplanningTask(withinDayAgent, id);
+          this.parallelReplanner.addReplanningTask(replanningTask);
+        }
+      }
+    }
+
+    this.parallelReplanner.run(time);
+  }
 }

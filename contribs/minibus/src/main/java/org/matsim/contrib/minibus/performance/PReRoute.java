@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.minibus.performance;
 
+import com.google.inject.Inject;
+import jakarta.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
@@ -27,41 +29,34 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-
-import com.google.inject.Inject;
 import org.matsim.core.router.TripRouter;
 
-import jakarta.inject.Provider;
-
 /**
- *
  * Adds a rerouting strategy that will only reroute pt trips.
  *
  * @author aneumann
- *
  */
 public final class PReRoute implements PlanStrategy {
-	private PlanStrategyImpl strategy = null ;
+  private PlanStrategyImpl strategy = null;
 
-	@Inject
-	public PReRoute(Scenario scenario, Provider<TripRouter> tripRouterProvider) {
-		this.strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		this.strategy.addStrategyModule(new PReRouteStrategyModule(tripRouterProvider, scenario)) ;
-	}
+  @Inject
+  public PReRoute(Scenario scenario, Provider<TripRouter> tripRouterProvider) {
+    this.strategy = new PlanStrategyImpl(new RandomPlanSelector());
+    this.strategy.addStrategyModule(new PReRouteStrategyModule(tripRouterProvider, scenario));
+  }
 
-	@Override
-	public void finish() {
-		this.strategy.finish();
-	}
+  @Override
+  public void finish() {
+    this.strategy.finish();
+  }
 
-	@Override
-	public void init(ReplanningContext replanningContext) {
-		this.strategy.init(replanningContext);
-	}
+  @Override
+  public void init(ReplanningContext replanningContext) {
+    this.strategy.init(replanningContext);
+  }
 
-	@Override
-	public void run(HasPlansAndId<Plan, Person> person) {
-		this.strategy.run(person);
-	}
-
+  @Override
+  public void run(HasPlansAndId<Plan, Person> person) {
+    this.strategy.run(person);
+  }
 }

@@ -23,31 +23,29 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 
 /**
- * Default implementation returning information from a map.
- * It doesn't check the consistency of the data it is fed.
+ * Default implementation returning information from a map. It doesn't check the consistency of the
+ * data it is fed.
+ *
  * @author thibautd
  */
 public final class IncompatiblePlansIdentifierImpl<T> extends IncompatiblePlansIdentifier<T> {
-	private final Map<Plan, Set<Id<T>>> incompatiblePlansPerPlans =
-		new HashMap<Plan, Set<Id<T>>>();
+  private final Map<Plan, Set<Id<T>>> incompatiblePlansPerPlans = new HashMap<Plan, Set<Id<T>>>();
 
-	@Override
-	public Set<Id<T>> identifyIncompatibilityGroups(final Plan plan) {
-		final Set<Id<T>> plans = incompatiblePlansPerPlans.get( plan );
-		return plans != null ? plans : Collections.<Id<T>>emptySet();
-	}
+  @Override
+  public Set<Id<T>> identifyIncompatibilityGroups(final Plan plan) {
+    final Set<Id<T>> plans = incompatiblePlansPerPlans.get(plan);
+    return plans != null ? plans : Collections.<Id<T>>emptySet();
+  }
 
-	public void put( final Plan plan , final Set<Id<T>> incompatiblePlans ) {
-		incompatiblePlansPerPlans.put( plan , incompatiblePlans );
-	}
-	
-	public void putAll( final Map<Plan, Set<Id<T>>> incompatiblePlans ) {
-		incompatiblePlansPerPlans.putAll( incompatiblePlans );
-	}
+  public void put(final Plan plan, final Set<Id<T>> incompatiblePlans) {
+    incompatiblePlansPerPlans.put(plan, incompatiblePlans);
+  }
+
+  public void putAll(final Map<Plan, Set<Id<T>>> incompatiblePlans) {
+    incompatiblePlansPerPlans.putAll(incompatiblePlans);
+  }
 }
-

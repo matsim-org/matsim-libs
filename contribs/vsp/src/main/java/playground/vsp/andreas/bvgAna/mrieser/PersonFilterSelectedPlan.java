@@ -26,28 +26,28 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 
 /**
- * Removes all non-selected plans from a person. If a person has no
- * plan selected, the person will be left with zero plans.
+ * Removes all non-selected plans from a person. If a person has no plan selected, the person will
+ * be left with zero plans.
  *
  * @author mrieser
  */
 public class PersonFilterSelectedPlan extends AbstractPersonAlgorithm {
 
-	public PersonFilterSelectedPlan() {
-		super();
-	}
+  public PersonFilterSelectedPlan() {
+    super();
+  }
 
-	@Override
-	public void run(final Person person) {
-		int nofPlans = person.getPlans().size();
+  @Override
+  public void run(final Person person) {
+    int nofPlans = person.getPlans().size();
 
-		for (int planId = 0; planId < nofPlans; planId++) {
-			Plan plan = person.getPlans().get(planId);
-			if (!PersonUtils.isSelected(plan)) {
-				person.getPlans().remove(planId);
-				planId--;
-				nofPlans--;
-			}
-		}
-	}
+    for (int planId = 0; planId < nofPlans; planId++) {
+      Plan plan = person.getPlans().get(planId);
+      if (!PersonUtils.isSelected(plan)) {
+        person.getPlans().remove(planId);
+        planId--;
+        nofPlans--;
+      }
+    }
+  }
 }

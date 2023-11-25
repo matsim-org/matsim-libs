@@ -25,26 +25,23 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 
 /**
  * @author nagel
- *
  */
 public class RunConfigurableQNetworkFactoryExampleTest {
 
-	/**
-	 * Test method for {@link org.matsim.core.mobsim.qsim.qnetsimengine.RunConfigurableQNetworkFactoryExample#main(java.lang.String[])}.
-	 */
-	@SuppressWarnings("static-method")
-	@Test
-	public final void testMain() {
-		try {
-			Config config = ConfigUtils.createConfig() ;
-			config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
-			config.controller().setLastIteration(5);
-			RunConfigurableQNetworkFactoryExample.run(config);
-		} catch ( Exception ee ) {
-			throw new RuntimeException("something went wrong", ee);
-		}
-
-
-	}
-
+  /**
+   * Test method for {@link
+   * org.matsim.core.mobsim.qsim.qnetsimengine.RunConfigurableQNetworkFactoryExample#main(java.lang.String[])}.
+   */
+  @SuppressWarnings("static-method")
+  @Test
+  public final void testMain() {
+    try {
+      Config config = ConfigUtils.createConfig();
+      config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+      config.controller().setLastIteration(5);
+      RunConfigurableQNetworkFactoryExample.run(config);
+    } catch (Exception ee) {
+      throw new RuntimeException("something went wrong", ee);
+    }
+  }
 }

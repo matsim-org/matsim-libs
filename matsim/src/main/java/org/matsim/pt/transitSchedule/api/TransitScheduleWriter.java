@@ -20,6 +20,7 @@
 
 package org.matsim.pt.transitSchedule.api;
 
+import java.io.UncheckedIOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.internal.MatsimSomeWriter;
@@ -29,64 +30,60 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV2;
 
-import java.io.UncheckedIOException;
-
 /**
- * Writes {@link TransitSchedule}s to file in one of the
- * supported file formats.
+ * Writes {@link TransitSchedule}s to file in one of the supported file formats.
  *
  * @author mrieser
  */
 public class TransitScheduleWriter implements MatsimSomeWriter {
-	private static final Logger log = LogManager.getLogger( TransitScheduleWriter.class ) ;
+  private static final Logger log = LogManager.getLogger(TransitScheduleWriter.class);
 
-	private final TransitSchedule schedule;
-	private final CoordinateTransformation transformation;
+  private final TransitSchedule schedule;
+  private final CoordinateTransformation transformation;
 
-	public TransitScheduleWriter(final TransitSchedule schedule) {
-		this( new IdentityTransformation() , schedule );
-	}
+  public TransitScheduleWriter(final TransitSchedule schedule) {
+    this(new IdentityTransformation(), schedule);
+  }
 
-	public TransitScheduleWriter(
-			final CoordinateTransformation transformation,
-			final TransitSchedule schedule) {
-		this.transformation = transformation;
-		this.schedule = schedule;
-	}
+  public TransitScheduleWriter(
+      final CoordinateTransformation transformation, final TransitSchedule schedule) {
+    this.transformation = transformation;
+    this.schedule = schedule;
+  }
 
-	/**
-	 * Writes the transit schedule to the specified file in the most
-	 * current file format (currently V2).
-	 *
-	 * @param filename
-	 * @throws UncheckedIOException
-	 * @see {@link #writeFileV2(String)}
-	 */
-	public void writeFile(final String filename) throws UncheckedIOException {
-		writeFileV2(filename);
-	}
+  /**
+   * Writes the transit schedule to the specified file in the most current file format (currently
+   * V2).
+   *
+   * @param filename
+   * @throws UncheckedIOException
+   * @see {@link #writeFileV2(String)}
+   */
+  public void writeFile(final String filename) throws UncheckedIOException {
+    writeFileV2(filename);
+  }
 
-	/**
-	 * Writes the transit schedule to the specified file in the file
-	 * format specified by <tt>transitSchedule_v1.dtd</tt>
-	 *
-	 * @param filename
-	 * @throws UncheckedIOException
-	 */
-	public void writeFileV1(final String filename) throws UncheckedIOException {
-		log.info( Gbl.aboutToWrite("transit schedule", filename) ) ;
-		new TransitScheduleWriterV1(this.transformation, this.schedule).write(filename);
-	}
+  /**
+   * Writes the transit schedule to the specified file in the file format specified by
+   * <tt>transitSchedule_v1.dtd</tt>
+   *
+   * @param filename
+   * @throws UncheckedIOException
+   */
+  public void writeFileV1(final String filename) throws UncheckedIOException {
+    log.info(Gbl.aboutToWrite("transit schedule", filename));
+    new TransitScheduleWriterV1(this.transformation, this.schedule).write(filename);
+  }
 
-	/**
-	 * Writes the transit schedule to the specified file in the file
-	 * format specified by <tt>transitSchedule_v2.dtd</tt>
-	 *
-	 * @param filename
-	 * @throws UncheckedIOException
-	 */
-	public void writeFileV2(final String filename) throws UncheckedIOException {
-		log.info( Gbl.aboutToWrite( "transit schedule" , filename ) ) ;
-		new TransitScheduleWriterV2(this.transformation, this.schedule).write(filename);
-	}
+  /**
+   * Writes the transit schedule to the specified file in the file format specified by
+   * <tt>transitSchedule_v2.dtd</tt>
+   *
+   * @param filename
+   * @throws UncheckedIOException
+   */
+  public void writeFileV2(final String filename) throws UncheckedIOException {
+    log.info(Gbl.aboutToWrite("transit schedule", filename));
+    new TransitScheduleWriterV2(this.transformation, this.schedule).write(filename);
+  }
 }

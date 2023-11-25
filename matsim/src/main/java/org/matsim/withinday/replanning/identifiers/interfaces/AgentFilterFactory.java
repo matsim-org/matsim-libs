@@ -21,13 +21,10 @@
 package org.matsim.withinday.replanning.identifiers.interfaces;
 
 /**
- * 
  * @author cdobler
  */
 public interface AgentFilterFactory {
 
-	/**
-	 * Create an instance of an AgentFilter.
-	 */
-	public AgentFilter createAgentFilter();
+  /** Create an instance of an AgentFilter. */
+  public AgentFilter createAgentFilter();
 }

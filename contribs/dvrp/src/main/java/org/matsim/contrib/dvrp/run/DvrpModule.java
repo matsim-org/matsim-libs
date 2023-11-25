@@ -19,8 +19,11 @@
 
 package org.matsim.contrib.dvrp.run;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import com.google.inject.name.Names;
 import jakarta.inject.Provider;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLookup;
 import org.matsim.contrib.dvrp.passenger.PassengerModule;
@@ -36,73 +39,73 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-import com.google.inject.name.Names;
-
 /**
- * This module initialises generic (i.e. not taxi or drt-specific) AND global (not mode-specific) dvrp objects.
- * <p>
- * Some of the initialised objects will become modal at some point in the future.
+ * This module initialises generic (i.e. not taxi or drt-specific) AND global (not mode-specific)
+ * dvrp objects.
+ *
+ * <p>Some of the initialised objects will become modal at some point in the future.
  *
  * @author michalm
  */
 public final class DvrpModule extends AbstractModule {
-	@Inject
-	private DvrpConfigGroup dvrpConfigGroup;
+  @Inject private DvrpConfigGroup dvrpConfigGroup;
 
-	private final AbstractModule dvrpTravelTimeEstimationModule;
+  private final AbstractModule dvrpTravelTimeEstimationModule;
 
-	public DvrpModule() {
-		this(new DvrpTravelTimeModule());
-	}
+  public DvrpModule() {
+    this(new DvrpTravelTimeModule());
+  }
 
-	public DvrpModule(AbstractModule dvrpTravelTimeEstimationModule) {
-		this.dvrpTravelTimeEstimationModule = dvrpTravelTimeEstimationModule;
-	}
+  public DvrpModule(AbstractModule dvrpTravelTimeEstimationModule) {
+    this.dvrpTravelTimeEstimationModule = dvrpTravelTimeEstimationModule;
+  }
 
-	@Override
-	public void install() {
-		// Visualisation of schedules for DVRP DynAgents
-		bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);
+  @Override
+  public void install() {
+    // Visualisation of schedules for DVRP DynAgents
+    bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);
 
-		install(dvrpTravelTimeEstimationModule);
+    install(dvrpTravelTimeEstimationModule);
 
-		//lazily initialised because:
-		// 1. we may have only mode-filtered subnetworks
-		// 2. optimisers may not use it
-		bind(TravelTimeMatrix.class).toProvider(new Provider<>() {
-			@Inject
-			@Named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)
-			private Network network;
+    // lazily initialised because:
+    // 1. we may have only mode-filtered subnetworks
+    // 2. optimisers may not use it
+    bind(TravelTimeMatrix.class)
+        .toProvider(
+            new Provider<>() {
+              @Inject
+              @Named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)
+              private Network network;
 
-			@Inject
-			private QSimConfigGroup qSimConfigGroup;
+              @Inject private QSimConfigGroup qSimConfigGroup;
 
-			@Override
-			public TravelTimeMatrix get() {
-				var numberOfThreads = getConfig().global().getNumberOfThreads();
-				var params = dvrpConfigGroup.getTravelTimeMatrixParams();
-				return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, params, numberOfThreads,
-						qSimConfigGroup.getTimeStepSize());
-			}
-		}).in(Singleton.class);
+              @Override
+              public TravelTimeMatrix get() {
+                var numberOfThreads = getConfig().global().getNumberOfThreads();
+                var params = dvrpConfigGroup.getTravelTimeMatrixParams();
+                return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(
+                    network, params, numberOfThreads, qSimConfigGroup.getTimeStepSize());
+              }
+            })
+        .in(Singleton.class);
 
-		bind(Network.class).annotatedWith(Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING))
-				.toProvider(DvrpGlobalRoutingNetworkProvider.class)
-				.asEagerSingleton();
+    bind(Network.class)
+        .annotatedWith(Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING))
+        .toProvider(DvrpGlobalRoutingNetworkProvider.class)
+        .asEagerSingleton();
 
-		installQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				addQSimComponentBinding(DynActivityEngine.COMPONENT_NAME).to(DynActivityEngine.class);
-				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
-				bind(DvrpVehicleLookup.class).toProvider(DvrpVehicleLookup.DvrpVehicleLookupProvider.class)
-						.asEagerSingleton();
-			}
-		});
+    installQSimModule(
+        new AbstractQSimModule() {
+          @Override
+          protected void configureQSim() {
+            addQSimComponentBinding(DynActivityEngine.COMPONENT_NAME).to(DynActivityEngine.class);
+            bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
+            bind(DvrpVehicleLookup.class)
+                .toProvider(DvrpVehicleLookup.DvrpVehicleLookupProvider.class)
+                .asEagerSingleton();
+          }
+        });
 
-		install(new PassengerModule());
-	}
+    install(new PassengerModule());
+  }
 }

@@ -23,11 +23,10 @@ package org.matsim.analysis.linkpaxvolumes;
 import com.google.inject.Singleton;
 import org.matsim.core.controler.AbstractModule;
 
-
 public final class LinkPaxVolumesAnalysisModule extends AbstractModule {
-    @Override
-    public void install() {
-        bind(LinkPaxVolumesControlerListener.class).in(Singleton.class);
-        addControlerListenerBinding().to(LinkPaxVolumesControlerListener.class);
-    }
+  @Override
+  public void install() {
+    bind(LinkPaxVolumesControlerListener.class).in(Singleton.class);
+    addControlerListenerBinding().to(LinkPaxVolumesControlerListener.class);
+  }
 }

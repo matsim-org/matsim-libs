@@ -27,5 +27,4 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public interface DrtStopFacility extends Identifiable<DrtStopFacility>, Facility, Attributable {
-}
+public interface DrtStopFacility extends Identifiable<DrtStopFacility>, Facility, Attributable {}

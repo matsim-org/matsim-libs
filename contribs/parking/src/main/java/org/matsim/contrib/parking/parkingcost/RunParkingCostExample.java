@@ -17,7 +17,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-
 package org.matsim.contrib.parking.parkingcost;
 
 import org.apache.logging.log4j.LogManager;
@@ -33,49 +32,51 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
-/**
- * An example class that shows how parking costs can be added to a scenario.
- */
+/** An example class that shows how parking costs can be added to a scenario. */
 public final class RunParkingCostExample {
-	private RunParkingCostExample() {
-	}
+  private RunParkingCostExample() {}
 
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("parkingcosts/config.xml", new ParkingCostConfigGroup());
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		addParkingCostToLinks(scenario.getNetwork());
-		Controler controller = new Controler(scenario);
-		controller.addOverridingModule(new ParkingCostModule());
+  public static void main(String[] args) {
+    Config config = ConfigUtils.loadConfig("parkingcosts/config.xml", new ParkingCostConfigGroup());
+    Scenario scenario = ScenarioUtils.loadScenario(config);
+    addParkingCostToLinks(scenario.getNetwork());
+    Controler controller = new Controler(scenario);
+    controller.addOverridingModule(new ParkingCostModule());
 
-		ParkingCostTracker parkingCostTracker = new ParkingCostTracker();
-		controller.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addEventHandlerBinding().toInstance(parkingCostTracker);
-			}
-		});
-		controller.run();
+    ParkingCostTracker parkingCostTracker = new ParkingCostTracker();
+    controller.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            addEventHandlerBinding().toInstance(parkingCostTracker);
+          }
+        });
+    controller.run();
 
-		LogManager.getLogger(RunParkingCostExample.class).info("Parking Cost charged in total: " + parkingCostTracker.parkingCostCollected);
+    LogManager.getLogger(RunParkingCostExample.class)
+        .info("Parking Cost charged in total: " + parkingCostTracker.parkingCostCollected);
+  }
 
-	}
+  private static void addParkingCostToLinks(Network network) {
+    network
+        .getLinks()
+        .values()
+        .forEach(
+            link -> {
+              link.getAttributes().putAttribute("pc_car", 2.50);
+            });
+  }
 
-	private static void addParkingCostToLinks(Network network) {
-		network.getLinks().values().forEach(link -> {
-			link.getAttributes().putAttribute("pc_car", 2.50);
-		});
-	}
+  static class ParkingCostTracker implements PersonMoneyEventHandler {
+    double parkingCostCollected = 0.0;
 
-	static class ParkingCostTracker implements PersonMoneyEventHandler {
-		double parkingCostCollected = 0.0;
-
-		@Override
-		public void handleEvent(PersonMoneyEvent event) {
-			if (event.getPurpose() != null) {
-				if (event.getPurpose().endsWith("parking cost")) {
-					parkingCostCollected += event.getAmount();
-				}
-			}
-		}
-	}
+    @Override
+    public void handleEvent(PersonMoneyEvent event) {
+      if (event.getPurpose() != null) {
+        if (event.getPurpose().endsWith("parking cost")) {
+          parkingCostCollected += event.getAmount();
+        }
+      }
+    }
+  }
 }

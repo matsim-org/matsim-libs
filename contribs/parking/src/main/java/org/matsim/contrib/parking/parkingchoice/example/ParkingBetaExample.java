@@ -23,24 +23,18 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.parkingchoice.PC2.scoring.AbstractParkingBetas;
 
 /**
- * @author jbischoff
- *	example class for setting parking betas: we simply return 1 for Beta values. Typically those values should be person- and/or income depending
+ * @author jbischoff example class for setting parking betas: we simply return 1 for Beta values.
+ *     Typically those values should be person- and/or income depending
  */
 public class ParkingBetaExample extends AbstractParkingBetas {
 
-	
-	@Override
-	public double getParkingWalkBeta(Person person,
-			double activityDurationInSeconds) {
-		return 1;
-	}
+  @Override
+  public double getParkingWalkBeta(Person person, double activityDurationInSeconds) {
+    return 1;
+  }
 
-	@Override
-	public double getParkingCostBeta(Person person) {
-		return 1;
-	}
-	
-	
-	
-
+  @Override
+  public double getParkingCostBeta(Person person) {
+    return 1;
+  }
 }

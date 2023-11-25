@@ -24,9 +24,7 @@ import org.matsim.core.events.handler.EventHandler;
 /**
  * @author Ricardo Ewert
  */
-
 public interface RemoveParkingActivityEventHandler extends EventHandler {
 
-	void handleEvent(RemoveParkingActivityEvent event);
-
+  void handleEvent(RemoveParkingActivityEvent event);
 }

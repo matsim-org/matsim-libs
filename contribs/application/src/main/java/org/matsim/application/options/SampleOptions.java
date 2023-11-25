@@ -1,150 +1,135 @@
 package org.matsim.application.options;
 
-import picocli.CommandLine;
-
 import java.util.regex.Pattern;
+import picocli.CommandLine;
 
 /**
  * Sample options that can be used as arg-group:
  *
  * <pre>{@code
- *     @CommandLine.Mixin
- *     private SampleOptions sample = new SampleOptions(1, 10, 25);
- * }
- * </pre>
+ * @CommandLine.Mixin
+ * private SampleOptions sample = new SampleOptions(1, 10, 25);
+ * }</pre>
  */
 public final class SampleOptions {
 
-	private static final Pattern PATTERN = Pattern.compile("\\d+pct");
-	/**
-	 * Available sample sizes
-	 */
-	private final int[] sizes;
-	/**
-	 * Needs to be present or the mixin will not be processed at all.
-	 */
-	@CommandLine.Option(names = "--unused-sample-option", hidden = true)
-	private String unused;
+  private static final Pattern PATTERN = Pattern.compile("\\d+pct");
 
-	/**
-	 * The selected sample size in (0, 1)
-	 */
-	private double sample;
+  /** Available sample sizes */
+  private final int[] sizes;
 
-	/**
-	 * Whether sample size was set explicitly.
-	 */
-	private boolean set;
+  /** Needs to be present or the mixin will not be processed at all. */
+  @CommandLine.Option(names = "--unused-sample-option", hidden = true)
+  private String unused;
 
-	/**
-	 * Create Sample options with the available sample size.
-	 * First sample size is the default option.
-	 *
-	 * @param sizes sizes in percent, e.g 1, 10, 25, etc..
-	 */
-	public SampleOptions(int... sizes) {
-		this.sizes = sizes;
-		this.sample = sizes[0];
-	}
+  /** The selected sample size in (0, 1) */
+  private double sample;
 
-	/**
-	 * Create sample options with arbitrary possible sample size. The sample size option will be indicated as required.
-	 */
-	public SampleOptions() {
-		this.sizes = null;
-		this.sample = 0;
-	}
+  /** Whether sample size was set explicitly. */
+  private boolean set;
 
-	@CommandLine.Spec(CommandLine.Spec.Target.MIXEE)
-	void setSpec(CommandLine.Model.CommandSpec spec) {
+  /**
+   * Create Sample options with the available sample size. First sample size is the default option.
+   *
+   * @param sizes sizes in percent, e.g 1, 10, 25, etc..
+   */
+  public SampleOptions(int... sizes) {
+    this.sizes = sizes;
+    this.sample = sizes[0];
+  }
 
-		// Build simple sample option without predefined sizes
-		if (sizes == null) {
-			CommandLine.Model.OptionSpec.Builder arg = CommandLine.Model.OptionSpec.
-					builder("--sample-size")
-					.type(Double.class)
-					.description("Specify sample size fraction in (0, 1).")
-					.setter(new CommandLine.Model.ISetter() {
-						@Override
-						public <T> T set(T value) {
-							if (value == null)
-								return null;
+  /**
+   * Create sample options with arbitrary possible sample size. The sample size option will be
+   * indicated as required.
+   */
+  public SampleOptions() {
+    this.sizes = null;
+    this.sample = 0;
+  }
 
-							setSize((double) value);
-							return value;
-						}
-					})
-					.required(true);
+  @CommandLine.Spec(CommandLine.Spec.Target.MIXEE)
+  void setSpec(CommandLine.Model.CommandSpec spec) {
 
-			spec.add(arg.build());
+    // Build simple sample option without predefined sizes
+    if (sizes == null) {
+      CommandLine.Model.OptionSpec.Builder arg =
+          CommandLine.Model.OptionSpec.builder("--sample-size")
+              .type(Double.class)
+              .description("Specify sample size fraction in (0, 1).")
+              .setter(
+                  new CommandLine.Model.ISetter() {
+                    @Override
+                    public <T> T set(T value) {
+                      if (value == null) return null;
 
-		} else {
+                      setSize((double) value);
+                      return value;
+                    }
+                  })
+              .required(true);
 
-			CommandLine.Model.ArgGroupSpec.Builder group = CommandLine.Model.ArgGroupSpec.builder()
-					.exclusive(true)
-					.heading("\nSample sizes:\n")
-					.multiplicity("0..1");
+      spec.add(arg.build());
 
-			for (int i = 0; i < sizes.length; i++) {
+    } else {
 
-				int size = sizes[i];
+      CommandLine.Model.ArgGroupSpec.Builder group =
+          CommandLine.Model.ArgGroupSpec.builder()
+              .exclusive(true)
+              .heading("\nSample sizes:\n")
+              .multiplicity("0..1");
 
-				CommandLine.Model.OptionSpec.Builder arg = CommandLine.Model.OptionSpec.
-						builder(String.format("--%dpct", size))
-						.type(Boolean.class)
-						.order(i)
-						.description("Run scenario with " + size + " pct sample size")
-						.setter(new CommandLine.Model.ISetter() {
-							@Override
-							public <T> T set(T value) {
-								setSize(size / 100d);
-								return value;
-							}
-						})
-						.defaultValue(i == 0 ? "true" : "false");
+      for (int i = 0; i < sizes.length; i++) {
 
-				group.addArg(arg.build());
-			}
+        int size = sizes[i];
 
-			spec.addArgGroup(group.build());
-		}
-	}
+        CommandLine.Model.OptionSpec.Builder arg =
+            CommandLine.Model.OptionSpec.builder(String.format("--%dpct", size))
+                .type(Boolean.class)
+                .order(i)
+                .description("Run scenario with " + size + " pct sample size")
+                .setter(
+                    new CommandLine.Model.ISetter() {
+                      @Override
+                      public <T> T set(T value) {
+                        setSize(size / 100d);
+                        return value;
+                      }
+                    })
+                .defaultValue(i == 0 ? "true" : "false");
 
-	/**
-	 * Returns the specified sample size as percent between 1 and 100
-	 */
-	public int getSize() {
-		return (int) (sample * 100);
-	}
+        group.addArg(arg.build());
+      }
 
-	/**
-	 * Return sample size as fraction between 0 and 1.
-	 */
-	public double getSample() {
-		return sample;
-	}
+      spec.addArgGroup(group.build());
+    }
+  }
 
-	private void setSize(double sample) {
-		this.set = true;
-		this.sample = sample;
-	}
+  /** Returns the specified sample size as percent between 1 and 100 */
+  public int getSize() {
+    return (int) (sample * 100);
+  }
 
-	/**
-	 * Check whether the sample size was set explicitly.
-	 */
-	public boolean isSet() {
-		return set;
-	}
+  /** Return sample size as fraction between 0 and 1. */
+  public double getSample() {
+    return sample;
+  }
 
-	/**
-	 * Adjust file name for selected sample size if it was set explicitly.
-	 */
-	public String adjustName(String name) {
-		if (!set) return name;
+  private void setSize(double sample) {
+    this.set = true;
+    this.sample = sample;
+  }
 
-		String postfix = getSize() + "pct";
+  /** Check whether the sample size was set explicitly. */
+  public boolean isSet() {
+    return set;
+  }
 
-		return PATTERN.matcher(name).replaceAll(postfix);
-	}
+  /** Adjust file name for selected sample size if it was set explicitly. */
+  public String adjustName(String name) {
+    if (!set) return name;
 
+    String postfix = getSize() + "pct";
+
+    return PATTERN.matcher(name).replaceAll(postfix);
+  }
 }

@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * VehicleHandlerTest.java
@@ -22,6 +21,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import com.google.inject.Provides;
+import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -46,147 +46,153 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.FlowEfficiencyC
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.Lane;
 
-import java.util.Arrays;
-
 public class FlowEfficiencyCalculatorTest {
-	@Test
-	public void testFlowEfficiencyCalculator() {
-		// In this test we send 1000 vehicles over a link with capacity 500. We then
-		// define a custom FlowEfficiencyCalculator that varies the flow efficiency
-		// globally. We see that with infinite flow efficiency, vehicles move in
-		// freeflow state. For doubled flow efficiency, the longest travel time is
-		// around halfed. For halfed flow efficiency, travel time is around doubled.
+  @Test
+  public void testFlowEfficiencyCalculator() {
+    // In this test we send 1000 vehicles over a link with capacity 500. We then
+    // define a custom FlowEfficiencyCalculator that varies the flow efficiency
+    // globally. We see that with infinite flow efficiency, vehicles move in
+    // freeflow state. For doubled flow efficiency, the longest travel time is
+    // around halfed. For halfed flow efficiency, travel time is around doubled.
 
-		double latestArrivalTime;
+    double latestArrivalTime;
 
-		latestArrivalTime = runTestScenario(Double.POSITIVE_INFINITY);
-		Assert.assertEquals(1003.0, latestArrivalTime, 1e-3);
+    latestArrivalTime = runTestScenario(Double.POSITIVE_INFINITY);
+    Assert.assertEquals(1003.0, latestArrivalTime, 1e-3);
 
-		latestArrivalTime = runTestScenario(1.0);
-		Assert.assertEquals(8195.0, latestArrivalTime, 1e-3);
+    latestArrivalTime = runTestScenario(1.0);
+    Assert.assertEquals(8195.0, latestArrivalTime, 1e-3);
 
-		latestArrivalTime = runTestScenario(2.0);
-		Assert.assertEquals(4599.0, latestArrivalTime, 1e-3);
+    latestArrivalTime = runTestScenario(2.0);
+    Assert.assertEquals(4599.0, latestArrivalTime, 1e-3);
 
-		latestArrivalTime = runTestScenario(0.5);
-		Assert.assertEquals(15388.0, latestArrivalTime, 1e-3);
-	}
+    latestArrivalTime = runTestScenario(0.5);
+    Assert.assertEquals(15388.0, latestArrivalTime, 1e-3);
+  }
 
-	public double runTestScenario(double factor) {
-		Scenario scenario = createScenario();
-		Controler controler = new Controler(scenario);
+  public double runTestScenario(double factor) {
+    Scenario scenario = createScenario();
+    Controler controler = new Controler(scenario);
 
-		LatestArrivalHandler arrivalHandler = new LatestArrivalHandler();
-		CustomFlowEfficiencyCalculator flowEfficiencyCalculator = new CustomFlowEfficiencyCalculator(factor);
+    LatestArrivalHandler arrivalHandler = new LatestArrivalHandler();
+    CustomFlowEfficiencyCalculator flowEfficiencyCalculator =
+        new CustomFlowEfficiencyCalculator(factor);
 
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addEventHandlerBinding().toInstance(arrivalHandler);
-			}
-		});
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            addEventHandlerBinding().toInstance(arrivalHandler);
+          }
+        });
 
-		controler.addOverridingQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-			}
+    controler.addOverridingQSimModule(
+        new AbstractQSimModule() {
+          @Override
+          protected void configureQSim() {}
 
-			@Provides
-			QNetworkFactory provideQNetworkFactory(EventsManager eventsManager, Scenario scenario) {
-				ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(eventsManager, scenario);
-				factory.setFlowEfficiencyCalculator(flowEfficiencyCalculator);
-				return factory;
-			}
-		});
+          @Provides
+          QNetworkFactory provideQNetworkFactory(EventsManager eventsManager, Scenario scenario) {
+            ConfigurableQNetworkFactory factory =
+                new ConfigurableQNetworkFactory(eventsManager, scenario);
+            factory.setFlowEfficiencyCalculator(flowEfficiencyCalculator);
+            return factory;
+          }
+        });
 
-		controler.run();
+    controler.run();
 
-		return arrivalHandler.latestArrivalTime;
-	}
+    return arrivalHandler.latestArrivalTime;
+  }
 
-	private class CustomFlowEfficiencyCalculator implements FlowEfficiencyCalculator {
-		private final double factor;
+  private class CustomFlowEfficiencyCalculator implements FlowEfficiencyCalculator {
+    private final double factor;
 
-		public CustomFlowEfficiencyCalculator(double factor) {
-			this.factor = factor;
-		}
+    public CustomFlowEfficiencyCalculator(double factor) {
+      this.factor = factor;
+    }
 
-		@Override
-        public double calculateFlowEfficiency(QVehicle qVehicle, QVehicle previousVehicle, Double timeGapToPreviousVeh, Link link, Id<Lane> laneId) {
-			return factor;
-		}
-	}
+    @Override
+    public double calculateFlowEfficiency(
+        QVehicle qVehicle,
+        QVehicle previousVehicle,
+        Double timeGapToPreviousVeh,
+        Link link,
+        Id<Lane> laneId) {
+      return factor;
+    }
+  }
 
-	private class LatestArrivalHandler implements PersonArrivalEventHandler {
-		Double latestArrivalTime = null;
+  private class LatestArrivalHandler implements PersonArrivalEventHandler {
+    Double latestArrivalTime = null;
 
-		@Override
-		public void handleEvent(PersonArrivalEvent event) {
-			if (event.getLinkId().equals(Id.createLinkId("CD"))) {
-				latestArrivalTime = event.getTime();
-			}
-		}
-	}
+    @Override
+    public void handleEvent(PersonArrivalEvent event) {
+      if (event.getLinkId().equals(Id.createLinkId("CD"))) {
+        latestArrivalTime = event.getTime();
+      }
+    }
+  }
 
-	private Scenario createScenario() {
-		Config config = ConfigUtils.createConfig();
-		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setLastIteration(0);
+  private Scenario createScenario() {
+    Config config = ConfigUtils.createConfig();
+    config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+    config.controller().setLastIteration(0);
 
-		ActivityParams genericParams = new ActivityParams("generic");
-		genericParams.setTypicalDuration(1.0);
+    ActivityParams genericParams = new ActivityParams("generic");
+    genericParams.setTypicalDuration(1.0);
 
-		config.scoring().addActivityParams(genericParams);
+    config.scoring().addActivityParams(genericParams);
 
-		Scenario scenario = ScenarioUtils.createScenario(config);
+    Scenario scenario = ScenarioUtils.createScenario(config);
 
-		Network network = scenario.getNetwork();
-		NetworkFactory networkFactory = network.getFactory();
+    Network network = scenario.getNetwork();
+    NetworkFactory networkFactory = network.getFactory();
 
-		Node nodeA = networkFactory.createNode(Id.createNodeId("A"), new Coord(0.0, 0.0));
-		Node nodeB = networkFactory.createNode(Id.createNodeId("B"), new Coord(10000.0, 20000.0));
-		Node nodeC = networkFactory.createNode(Id.createNodeId("C"), new Coord(10000.0, 30000.0));
-		Node nodeD = networkFactory.createNode(Id.createNodeId("D"), new Coord(10000.0, 40000.0));
+    Node nodeA = networkFactory.createNode(Id.createNodeId("A"), new Coord(0.0, 0.0));
+    Node nodeB = networkFactory.createNode(Id.createNodeId("B"), new Coord(10000.0, 20000.0));
+    Node nodeC = networkFactory.createNode(Id.createNodeId("C"), new Coord(10000.0, 30000.0));
+    Node nodeD = networkFactory.createNode(Id.createNodeId("D"), new Coord(10000.0, 40000.0));
 
-		Link linkAB = networkFactory.createLink(Id.createLinkId("AB"), nodeA, nodeB);
-		Link linkBC = networkFactory.createLink(Id.createLinkId("BC"), nodeB, nodeC);
-		Link linkCD = networkFactory.createLink(Id.createLinkId("CD"), nodeC, nodeD);
+    Link linkAB = networkFactory.createLink(Id.createLinkId("AB"), nodeA, nodeB);
+    Link linkBC = networkFactory.createLink(Id.createLinkId("BC"), nodeB, nodeC);
+    Link linkCD = networkFactory.createLink(Id.createLinkId("CD"), nodeC, nodeD);
 
-		Arrays.asList(nodeA, nodeB, nodeC, nodeD).forEach(network::addNode);
-		Arrays.asList(linkAB, linkBC, linkCD).forEach(network::addLink);
+    Arrays.asList(nodeA, nodeB, nodeC, nodeD).forEach(network::addNode);
+    Arrays.asList(linkAB, linkBC, linkCD).forEach(network::addLink);
 
-		linkAB.setFreespeed(10000.0);
-		linkBC.setFreespeed(10.0);
-		linkCD.setFreespeed(10000.0);
+    linkAB.setFreespeed(10000.0);
+    linkBC.setFreespeed(10.0);
+    linkCD.setFreespeed(10000.0);
 
-		linkAB.setCapacity(1000.0);
-		linkBC.setCapacity(500.0);
-		linkCD.setCapacity(1000.0);
+    linkAB.setCapacity(1000.0);
+    linkBC.setCapacity(500.0);
+    linkCD.setCapacity(1000.0);
 
-		Population population = scenario.getPopulation();
-		PopulationFactory populationFactory = population.getFactory();
+    Population population = scenario.getPopulation();
+    PopulationFactory populationFactory = population.getFactory();
 
-		for (int i = 0; i < 1000; i++) {
-			Person person = populationFactory.createPerson(Id.createPersonId("person" + i));
-			population.addPerson(person);
+    for (int i = 0; i < 1000; i++) {
+      Person person = populationFactory.createPerson(Id.createPersonId("person" + i));
+      population.addPerson(person);
 
-			Plan plan = populationFactory.createPlan();
-			person.addPlan(plan);
+      Plan plan = populationFactory.createPlan();
+      person.addPlan(plan);
 
-			Activity activity;
-			Leg leg;
+      Activity activity;
+      Leg leg;
 
-			activity = populationFactory.createActivityFromLinkId("generic", linkAB.getId());
-			activity.setEndTime(0.0);
-			plan.addActivity(activity);
+      activity = populationFactory.createActivityFromLinkId("generic", linkAB.getId());
+      activity.setEndTime(0.0);
+      plan.addActivity(activity);
 
-			leg = populationFactory.createLeg("car");
-			plan.addLeg(leg);
+      leg = populationFactory.createLeg("car");
+      plan.addLeg(leg);
 
-			activity = populationFactory.createActivityFromLinkId("generic", linkCD.getId());
-			plan.addActivity(activity);
-		}
+      activity = populationFactory.createActivityFromLinkId("generic", linkCD.getId());
+      plan.addActivity(activity);
+    }
 
-		return scenario;
-	}
+    return scenario;
+  }
 }

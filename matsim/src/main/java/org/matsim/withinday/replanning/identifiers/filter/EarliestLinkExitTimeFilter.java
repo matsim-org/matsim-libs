@@ -21,7 +21,6 @@
 package org.matsim.withinday.replanning.identifiers.filter;
 
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -29,29 +28,30 @@ import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 
 /**
- * Remove all agents from the set that spent more time on a link that
- * their minimal link travel time. Such agents are already in the QLinks'
- * buffer and cannot stop at that link anymore.
- * 
+ * Remove all agents from the set that spent more time on a link that their minimal link travel
+ * time. Such agents are already in the QLinks' buffer and cannot stop at that link anymore.
+ *
  * @author cdobler
  */
 public class EarliestLinkExitTimeFilter implements AgentFilter {
 
-	private final EarliestLinkExitTimeProvider earliestLinkExitTimeProvider;
-	
-	// use the factory
-	/*package*/ EarliestLinkExitTimeFilter(EarliestLinkExitTimeProvider earliestLinkExitTimeProvider) {
-		this.earliestLinkExitTimeProvider = earliestLinkExitTimeProvider;
-	}
-	
-	@Override
-	public void applyAgentFilter(Set<Id<Person>> set, double time) {
-		set.removeIf(id -> !this.applyAgentFilter(id, time));
-	}
-	
-	@Override
-	public boolean applyAgentFilter(Id<Person> id, double time) {
-		OptionalTime earliestLinkExitTime = this.earliestLinkExitTimeProvider.getEarliestLinkExitTime(id);
-		return earliestLinkExitTime.isDefined() && earliestLinkExitTime.seconds() > time;
-	}
+  private final EarliestLinkExitTimeProvider earliestLinkExitTimeProvider;
+
+  // use the factory
+  /*package*/ EarliestLinkExitTimeFilter(
+      EarliestLinkExitTimeProvider earliestLinkExitTimeProvider) {
+    this.earliestLinkExitTimeProvider = earliestLinkExitTimeProvider;
+  }
+
+  @Override
+  public void applyAgentFilter(Set<Id<Person>> set, double time) {
+    set.removeIf(id -> !this.applyAgentFilter(id, time));
+  }
+
+  @Override
+  public boolean applyAgentFilter(Id<Person> id, double time) {
+    OptionalTime earliestLinkExitTime =
+        this.earliestLinkExitTimeProvider.getEarliestLinkExitTime(id);
+    return earliestLinkExitTime.isDefined() && earliestLinkExitTime.seconds() > time;
+  }
 }

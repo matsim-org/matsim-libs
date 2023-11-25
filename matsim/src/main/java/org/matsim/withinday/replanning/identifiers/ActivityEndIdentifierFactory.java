@@ -26,18 +26,17 @@ import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 public class ActivityEndIdentifierFactory extends DuringActivityIdentifierFactory {
 
-	private ActivityReplanningMap activityReplanningMap;
-	
-	public ActivityEndIdentifierFactory(ActivityReplanningMap activityReplanningMap) {
-		this.activityReplanningMap = activityReplanningMap;
-	}
-	
-	@Override
-	public DuringActivityAgentSelector createIdentifier() {
-		DuringActivityAgentSelector identifier = new ActivityEndIdentifier(activityReplanningMap);
-		identifier.setAgentSelectorFactory(this);
-		this.addAgentFiltersToIdentifier(identifier);
-		return identifier;
-	}
+  private ActivityReplanningMap activityReplanningMap;
 
+  public ActivityEndIdentifierFactory(ActivityReplanningMap activityReplanningMap) {
+    this.activityReplanningMap = activityReplanningMap;
+  }
+
+  @Override
+  public DuringActivityAgentSelector createIdentifier() {
+    DuringActivityAgentSelector identifier = new ActivityEndIdentifier(activityReplanningMap);
+    identifier.setAgentSelectorFactory(this);
+    this.addAgentFiltersToIdentifier(identifier);
+    return identifier;
+  }
 }

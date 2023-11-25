@@ -24,11 +24,11 @@ package org.matsim.core.mobsim.qsim;
  * @author Michal Maciejewski (michalm)
  */
 public class PreplanningEngineQSimModule extends AbstractQSimModule {
-	public final static String COMPONENT_NAME = "PreplanningEngine";
+  public static final String COMPONENT_NAME = "PreplanningEngine";
 
-	@Override
-	protected void configureQSim() {
-		bind(PreplanningEngine.class).asEagerSingleton();
-		addQSimComponentBinding(COMPONENT_NAME).to(PreplanningEngine.class);
-	}
+  @Override
+  protected void configureQSim() {
+    bind(PreplanningEngine.class).asEagerSingleton();
+    addQSimComponentBinding(COMPONENT_NAME).to(PreplanningEngine.class);
+  }
 }

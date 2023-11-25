@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.taxi.util;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -26,37 +27,37 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.utils.misc.Time;
 
-import com.google.inject.Inject;
-
 public class TaxiSimulationConsistencyChecker implements MobsimBeforeCleanupListener {
-	private final TaxiEventSequenceCollector taxiEventSequenceCollector;
-	private final TaxiConfigGroup taxiCfg;
+  private final TaxiEventSequenceCollector taxiEventSequenceCollector;
+  private final TaxiConfigGroup taxiCfg;
 
-	@Inject
-	public TaxiSimulationConsistencyChecker(TaxiEventSequenceCollector taxiEventSequenceCollector,
-			TaxiConfigGroup taxiCfg) {
-		this.taxiEventSequenceCollector = taxiEventSequenceCollector;
-		this.taxiCfg = taxiCfg;
-	}
+  @Inject
+  public TaxiSimulationConsistencyChecker(
+      TaxiEventSequenceCollector taxiEventSequenceCollector, TaxiConfigGroup taxiCfg) {
+    this.taxiEventSequenceCollector = taxiEventSequenceCollector;
+    this.taxiCfg = taxiCfg;
+  }
 
-	public void addCheckAllRequestsPerformed() {
-		for (var seq : taxiEventSequenceCollector.getRequestSequences().values()) {
-			if (!seq.isCompleted()) {
-				if (taxiCfg.breakSimulationIfNotAllRequestsServed) {
-					throw new IllegalStateException(
-							"Not all taxi requests served at simulation end time. This exception can be disabled in the taxi config group.");
-				} else {
-					LogManager.getLogger(getClass())
-							.warn("Taxi request not performed. Request time:\t" + Time.writeTime(
-									seq.getSubmitted().getTime()) + "\tPassenger:\t" + seq.getSubmitted()
-									.getPersonIds());
-				}
-			}
-		}
-	}
+  public void addCheckAllRequestsPerformed() {
+    for (var seq : taxiEventSequenceCollector.getRequestSequences().values()) {
+      if (!seq.isCompleted()) {
+        if (taxiCfg.breakSimulationIfNotAllRequestsServed) {
+          throw new IllegalStateException(
+              "Not all taxi requests served at simulation end time. This exception can be disabled in the taxi config group.");
+        } else {
+          LogManager.getLogger(getClass())
+              .warn(
+                  "Taxi request not performed. Request time:\t"
+                      + Time.writeTime(seq.getSubmitted().getTime())
+                      + "\tPassenger:\t"
+                      + seq.getSubmitted().getPersonIds());
+        }
+      }
+    }
+  }
 
-	@Override
-	public void notifyMobsimBeforeCleanup(final MobsimBeforeCleanupEvent e) {
-		addCheckAllRequestsPerformed();
-	}
+  @Override
+  public void notifyMobsimBeforeCleanup(final MobsimBeforeCleanupEvent e) {
+    addCheckAllRequestsPerformed();
+  }
 }

@@ -1,5 +1,8 @@
 package org.matsim.application.prepare.population;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -11,125 +14,127 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.router.TripStructureUtils;
 import picocli.CommandLine;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-
-@CommandLine.Command(name = "check-car-avail", description = "Check and fix violation of car availability.", showDefaultValues = true)
+@CommandLine.Command(
+    name = "check-car-avail",
+    description = "Check and fix violation of car availability.",
+    showDefaultValues = true)
 public class CheckCarAvailability implements MATSimAppCommand, PersonAlgorithm {
 
-	private static final Logger log = LogManager.getLogger(CheckCarAvailability.class);
+  private static final Logger log = LogManager.getLogger(CheckCarAvailability.class);
 
-	@CommandLine.Option(names = "--input", description = "Path to input population", required = true)
-	private Path input;
+  @CommandLine.Option(names = "--input", description = "Path to input population", required = true)
+  private Path input;
 
-	@CommandLine.Option(names = "--output", description = "Path for output population")
-	private Path output;
+  @CommandLine.Option(names = "--output", description = "Path for output population")
+  private Path output;
 
-	@CommandLine.Option(names = "--subpopulation", description = "Subpopulation filter", defaultValue = "person")
-	private String subpopulation;
+  @CommandLine.Option(
+      names = "--subpopulation",
+      description = "Subpopulation filter",
+      defaultValue = "person")
+  private String subpopulation;
 
-	@CommandLine.Option(names = "--mode", description = "Substitute mode in case of violation", defaultValue = TransportMode.ride)
-	private String substMode;
+  @CommandLine.Option(
+      names = "--mode",
+      description = "Substitute mode in case of violation",
+      defaultValue = TransportMode.ride)
+  private String substMode;
 
-	private int violations;
+  private int violations;
 
-	public static void main(String[] args) {
-		new CheckCarAvailability().execute(args);
-	}
+  public static void main(String[] args) {
+    new CheckCarAvailability().execute(args);
+  }
 
-	@Override
-	public Integer call() throws Exception {
+  @Override
+  public Integer call() throws Exception {
 
-		Population population = PopulationUtils.readPopulation(input.toString());
+    Population population = PopulationUtils.readPopulation(input.toString());
 
-		init();
+    init();
 
-		for (Person person : population.getPersons().values()) {
-			run(person);
-		}
+    for (Person person : population.getPersons().values()) {
+      run(person);
+    }
 
-		if (violations > 0) {
-			log.warn("Fixed {} car availability violations.", violations);
-		} else
-			log.info("No violations occurred.");
+    if (violations > 0) {
+      log.warn("Fixed {} car availability violations.", violations);
+    } else log.info("No violations occurred.");
 
-		if (output == null) {
-			log.info("Not writing to output.");
+    if (output == null) {
+      log.info("Not writing to output.");
 
-		} else {
+    } else {
 
-			if (output.getParent() != null) Files.createDirectories(output.getParent());
+      if (output.getParent() != null) Files.createDirectories(output.getParent());
 
-			log.info("Writing to {}", output);
+      log.info("Writing to {}", output);
 
-			PopulationUtils.writePopulation(population, output.toString());
-		}
+      PopulationUtils.writePopulation(population, output.toString());
+    }
 
+    return 0;
+  }
 
-		return 0;
-	}
+  /** Needs to be called before {@link #run(Person)} */
+  public void init() {
+    violations = 0;
+  }
 
-	/**
-	 * Needs to be called before {@link #run(Person)}
-	 */
-	public void init() {
-		violations = 0;
-	}
+  @Override
+  public void run(Person person) {
 
-	@Override
-	public void run(Person person) {
+    String subpop = PopulationUtils.getSubpopulation(person);
+    if (!subpopulation.isEmpty() && !subpop.equals(subpopulation)) return;
 
-		String subpop = PopulationUtils.getSubpopulation(person);
-		if (!subpopulation.isEmpty() && !subpop.equals(subpopulation)) return;
+    if (PersonUtils.canUseCar(person)) return;
 
-		if (PersonUtils.canUseCar(person)) return;
+    boolean correct = true;
+    for (Plan plan : person.getPlans()) {
+      if (!checkPlan(plan)) {
+        correct = false;
+      }
+    }
 
-		boolean correct = true;
-		for (Plan plan : person.getPlans()) {
-			if (!checkPlan(plan)) {
-				correct = false;
-			}
-		}
+    if (!correct) {
+      log.warn("Violation in person {}", person.getId());
+      violations++;
+    }
+  }
 
-		if (!correct) {
-			log.warn("Violation in person {}", person.getId());
-			violations++;
-		}
+  public int getViolations() {
+    return violations;
+  }
 
-	}
+  /** Check plan for violations and also fix them. */
+  private boolean checkPlan(Plan plan) {
 
-	public int getViolations() {
-		return violations;
-	}
+    boolean correct = true;
 
-	/**
-	 * Check plan for violations and also fix them.
-	 */
-	private boolean checkPlan(Plan plan) {
+    for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(plan)) {
+      for (Leg leg : trip.getLegsOnly()) {
 
-		boolean correct = true;
+        if (TransportMode.car.equals(leg.getMode())
+            || TransportMode.car.equals(TripStructureUtils.getRoutingMode(leg))) {
+          correct = false;
 
-		for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(plan)) {
-			for (Leg leg : trip.getLegsOnly()) {
+          // replace this whole trip now
+          List<PlanElement> planElements = plan.getPlanElements();
+          List<PlanElement> fullTrip =
+              planElements.subList(
+                  planElements.indexOf(trip.getOriginActivity()) + 1,
+                  planElements.indexOf(trip.getDestinationActivity()));
+          fullTrip.clear();
 
-				if (TransportMode.car.equals(leg.getMode()) || TransportMode.car.equals(TripStructureUtils.getRoutingMode(leg))) {
-					correct = false;
+          Leg l = PopulationUtils.createLeg(substMode);
+          TripStructureUtils.setRoutingMode(l, substMode);
+          fullTrip.add(l);
 
-					// replace this whole trip now
-					List<PlanElement> planElements = plan.getPlanElements();
-					List<PlanElement> fullTrip = planElements.subList(planElements.indexOf(trip.getOriginActivity()) + 1, planElements.indexOf(trip.getDestinationActivity()));
-					fullTrip.clear();
+          break;
+        }
+      }
+    }
 
-					Leg l = PopulationUtils.createLeg(substMode);
-					TripStructureUtils.setRoutingMode(l, substMode);
-					fullTrip.add(l);
-
-					break;
-				}
-			}
-		}
-
-		return correct;
-	}
+    return correct;
+  }
 }

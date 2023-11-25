@@ -10,17 +10,14 @@ import org.matsim.modechoice.EstimatorContext;
  */
 public interface LegEstimator<T extends Enum<?>> {
 
-	/**
-	 * Calculate an estimate of utility íf this mode would be used.
-	 *
-	 * @param context person traveling
-	 * @param mode    desire mode
-	 * @param leg     leg to estimate
-	 * @param option  used mode availability
-	 * @return Estimated utility
-	 */
-	double estimate(EstimatorContext context, String mode, Leg leg, T option);
-
-
-
+  /**
+   * Calculate an estimate of utility íf this mode would be used.
+   *
+   * @param context person traveling
+   * @param mode desire mode
+   * @param leg leg to estimate
+   * @param option used mode availability
+   * @return Estimated utility
+   */
+  double estimate(EstimatorContext context, String mode, Leg leg, T option);
 }

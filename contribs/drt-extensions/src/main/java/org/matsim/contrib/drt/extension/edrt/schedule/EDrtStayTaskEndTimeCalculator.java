@@ -24,18 +24,18 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 
 public class EDrtStayTaskEndTimeCalculator extends DrtStayTaskEndTimeCalculator {
-	public EDrtStayTaskEndTimeCalculator(StopTimeCalculator stopTimeCalculator) {
-		super(stopTimeCalculator);
-	}
+  public EDrtStayTaskEndTimeCalculator(StopTimeCalculator stopTimeCalculator) {
+    super(stopTimeCalculator);
+  }
 
-	@Override
-	public double calcNewEndTime(DvrpVehicle vehicle, StayTask task, double newBeginTime) {
-		if (task.getTaskType().equals(EDrtChargingTask.TYPE)) {
-			// FIXME underestimated due to the ongoing AUX/drive consumption
-			double duration = task.getEndTime() - task.getBeginTime();
-			return newBeginTime + duration;
-		} else {
-			return super.calcNewEndTime(vehicle, task, newBeginTime);
-		}
-	}
+  @Override
+  public double calcNewEndTime(DvrpVehicle vehicle, StayTask task, double newBeginTime) {
+    if (task.getTaskType().equals(EDrtChargingTask.TYPE)) {
+      // FIXME underestimated due to the ongoing AUX/drive consumption
+      double duration = task.getEndTime() - task.getBeginTime();
+      return newBeginTime + duration;
+    } else {
+      return super.calcNewEndTime(vehicle, task, newBeginTime);
+    }
+  }
 }

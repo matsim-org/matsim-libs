@@ -1,5 +1,7 @@
 package org.matsim.application.prepare.population;
 
+import java.nio.file.Path;
+import java.util.Set;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -12,45 +14,51 @@ import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.facilities.FacilitiesUtils;
 import picocli.CommandLine;
 
-import java.nio.file.Path;
-import java.util.Set;
-
-
-@CommandLine.Command(name = "xy-to-links", description = "Set link for activities based on coordinate", showDefaultValues = true)
+@CommandLine.Command(
+    name = "xy-to-links",
+    description = "Set link for activities based on coordinate",
+    showDefaultValues = true)
 public class XYToLinks implements MATSimAppCommand {
 
-	@CommandLine.Option(names = "--input", description = "Path to input population", required = true)
-	private Path input;
-	@CommandLine.Option(names = "--output", description = "Path to output population", required = true)
-	private Path output;
-	@CommandLine.Option(names = "--network", description = "Path to network", required = true)
-	private Path networkPath;
+  @CommandLine.Option(names = "--input", description = "Path to input population", required = true)
+  private Path input;
 
-	@CommandLine.Option(names = "--car-only", description = "Convert to car-only network", defaultValue = "false")
-	private boolean carOnly;
+  @CommandLine.Option(
+      names = "--output",
+      description = "Path to output population",
+      required = true)
+  private Path output;
 
-	@Override
-	public Integer call() throws Exception {
+  @CommandLine.Option(names = "--network", description = "Path to network", required = true)
+  private Path networkPath;
 
-		Network network = NetworkUtils.readNetwork(networkPath.toString());
+  @CommandLine.Option(
+      names = "--car-only",
+      description = "Convert to car-only network",
+      defaultValue = "false")
+  private boolean carOnly;
 
-		if (carOnly) {
-			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+  @Override
+  public Integer call() throws Exception {
 
-			Network carOnlyNetwork = NetworkUtils.createNetwork();
-			filter.filter(carOnlyNetwork, Set.of(TransportMode.car));
-			network = carOnlyNetwork;
-		}
+    Network network = NetworkUtils.readNetwork(networkPath.toString());
 
-		XY2Links algo = new XY2Links(network, FacilitiesUtils.createActivityFacilities());
+    if (carOnly) {
+      TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
 
-		Population population = PopulationUtils.readPopulation(input.toString());
+      Network carOnlyNetwork = NetworkUtils.createNetwork();
+      filter.filter(carOnlyNetwork, Set.of(TransportMode.car));
+      network = carOnlyNetwork;
+    }
 
-		ParallelPersonAlgorithmUtils.run(population, Runtime.getRuntime().availableProcessors(), algo);
+    XY2Links algo = new XY2Links(network, FacilitiesUtils.createActivityFacilities());
 
-		PopulationUtils.writePopulation(population, output.toString());
+    Population population = PopulationUtils.readPopulation(input.toString());
 
-		return 0;
-	}
+    ParallelPersonAlgorithmUtils.run(population, Runtime.getRuntime().availableProcessors(), algo);
 
+    PopulationUtils.writePopulation(population, output.toString());
+
+    return 0;
+  }
 }

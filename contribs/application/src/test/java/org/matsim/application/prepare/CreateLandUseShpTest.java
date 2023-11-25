@@ -1,37 +1,29 @@
 package org.matsim.application.prepare;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class CreateLandUseShpTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void convert() {
+  @Test
+  public void convert() {
 
-		Path input = Path.of(utils.getClassInputDirectory(), "andorra-latest-free.shp.zip");
+    Path input = Path.of(utils.getClassInputDirectory(), "andorra-latest-free.shp.zip");
 
-		Assume.assumeTrue(Files.exists(input));
+    Assume.assumeTrue(Files.exists(input));
 
-		Path output = Path.of(utils.getOutputDirectory(), "output.shp");
+    Path output = Path.of(utils.getOutputDirectory(), "output.shp");
 
-		new CreateLandUseShp().execute(
-				input.toString(),
-				"--output", output.toString()
-		);
+    new CreateLandUseShp().execute(input.toString(), "--output", output.toString());
 
-		assertThat(output)
-				.exists()
-				.isRegularFile();
-
-	}
+    assertThat(output).exists().isRegularFile();
+  }
 }

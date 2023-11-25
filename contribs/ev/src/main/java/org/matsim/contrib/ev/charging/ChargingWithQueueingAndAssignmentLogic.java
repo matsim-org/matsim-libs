@@ -19,66 +19,67 @@
 
 package org.matsim.contrib.ev.charging;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-
 public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueingLogic
-		implements ChargingWithAssignmentLogic {
-	private final Map<Id<Vehicle>, ElectricVehicle> assignedVehicles = new LinkedHashMap<>();
+    implements ChargingWithAssignmentLogic {
+  private final Map<Id<Vehicle>, ElectricVehicle> assignedVehicles = new LinkedHashMap<>();
 
-	public ChargingWithQueueingAndAssignmentLogic(ChargerSpecification charger, ChargingStrategy chargingStrategy,
-			EventsManager eventsManager) {
-		super(charger, chargingStrategy, eventsManager);
-	}
+  public ChargingWithQueueingAndAssignmentLogic(
+      ChargerSpecification charger,
+      ChargingStrategy chargingStrategy,
+      EventsManager eventsManager) {
+    super(charger, chargingStrategy, eventsManager);
+  }
 
-	@Override
-	public void assignVehicle(ElectricVehicle ev) {
-		if (assignedVehicles.put(ev.getId(), ev) != null) {
-			throw new IllegalArgumentException("Vehicle is already assigned: " + ev.getId());
-		}
-	}
+  @Override
+  public void assignVehicle(ElectricVehicle ev) {
+    if (assignedVehicles.put(ev.getId(), ev) != null) {
+      throw new IllegalArgumentException("Vehicle is already assigned: " + ev.getId());
+    }
+  }
 
-	@Override
-	public void unassignVehicle(ElectricVehicle ev) {
-		if (assignedVehicles.remove(ev.getId()) == null) {
-			throw new IllegalArgumentException("Vehicle was not assigned: " + ev.getId());
-		}
-	}
+  @Override
+  public void unassignVehicle(ElectricVehicle ev) {
+    if (assignedVehicles.remove(ev.getId()) == null) {
+      throw new IllegalArgumentException("Vehicle was not assigned: " + ev.getId());
+    }
+  }
 
-	private final Collection<ElectricVehicle> unmodifiableAssignedVehicles = Collections.unmodifiableCollection(
-			assignedVehicles.values());
+  private final Collection<ElectricVehicle> unmodifiableAssignedVehicles =
+      Collections.unmodifiableCollection(assignedVehicles.values());
 
-	@Override
-	public Collection<ElectricVehicle> getAssignedVehicles() {
-		return unmodifiableAssignedVehicles;
-	}
+  @Override
+  public Collection<ElectricVehicle> getAssignedVehicles() {
+    return unmodifiableAssignedVehicles;
+  }
 
-	public static class FactoryProvider implements Provider<ChargingLogic.Factory> {
-		@Inject
-		private EventsManager eventsManager;
+  public static class FactoryProvider implements Provider<ChargingLogic.Factory> {
+    @Inject private EventsManager eventsManager;
 
-		private final Function<ChargerSpecification, ChargingStrategy> chargingStrategyCreator;
+    private final Function<ChargerSpecification, ChargingStrategy> chargingStrategyCreator;
 
-		public FactoryProvider(Function<ChargerSpecification, ChargingStrategy> chargingStrategyCreator) {
-			this.chargingStrategyCreator = chargingStrategyCreator;
-		}
+    public FactoryProvider(
+        Function<ChargerSpecification, ChargingStrategy> chargingStrategyCreator) {
+      this.chargingStrategyCreator = chargingStrategyCreator;
+    }
 
-		@Override
-		public ChargingLogic.Factory get() {
-			return charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-					chargingStrategyCreator.apply(charger), eventsManager);
-		}
-	}
+    @Override
+    public ChargingLogic.Factory get() {
+      return charger ->
+          new ChargingWithQueueingAndAssignmentLogic(
+              charger, chargingStrategyCreator.apply(charger), eventsManager);
+    }
+  }
 }

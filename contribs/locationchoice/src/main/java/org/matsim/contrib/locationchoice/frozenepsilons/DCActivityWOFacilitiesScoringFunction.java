@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
@@ -27,42 +26,56 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.SumScoringFunction;
 
 class DCActivityWOFacilitiesScoringFunction implements SumScoringFunction.ActivityScoring {
-	static final Logger log = LogManager.getLogger(DCActivityWOFacilitiesScoringFunction.class);
-	private DestinationScoring destinationChoiceScoring;	
-	private double score = 0. ;
-	private final Person person;
-	
-	public DCActivityWOFacilitiesScoringFunction(Person person, DestinationChoiceContext lcContext) {
-		this.destinationChoiceScoring = new DestinationScoring(lcContext);
-		this.person = person ; 
-	}
-	
-	@Override
-	public void finish() {		
-	}
+  static final Logger log = LogManager.getLogger(DCActivityWOFacilitiesScoringFunction.class);
+  private DestinationScoring destinationChoiceScoring;
+  private double score = 0.;
+  private final Person person;
 
-	@Override
-	public double getScore() {
-		return this.score ;
-	}
-	
-	private int activityIndex = 0 ;
+  public DCActivityWOFacilitiesScoringFunction(Person person, DestinationChoiceContext lcContext) {
+    this.destinationChoiceScoring = new DestinationScoring(lcContext);
+    this.person = person;
+  }
 
-	@Override
-	public void handleFirstActivity(Activity act) {
-		activityIndex = 0 ;
-		this.score += destinationChoiceScoring.getDestinationScore(act, BestReplyLocationChoiceStrategymodule.useScaleEpsilonFromConfig, activityIndex, person.getId() );
-	}
+  @Override
+  public void finish() {}
 
-	@Override
-	public void handleActivity(Activity act) {
-		activityIndex++ ;
-		this.score += destinationChoiceScoring.getDestinationScore(act, BestReplyLocationChoiceStrategymodule.useScaleEpsilonFromConfig, activityIndex, person.getId() );
-	}
+  @Override
+  public double getScore() {
+    return this.score;
+  }
 
-	@Override
-	public void handleLastActivity(Activity act) {
-		activityIndex++ ;
-		this.score += destinationChoiceScoring.getDestinationScore(act, BestReplyLocationChoiceStrategymodule.useScaleEpsilonFromConfig, activityIndex, person.getId() );
-	}
+  private int activityIndex = 0;
+
+  @Override
+  public void handleFirstActivity(Activity act) {
+    activityIndex = 0;
+    this.score +=
+        destinationChoiceScoring.getDestinationScore(
+            act,
+            BestReplyLocationChoiceStrategymodule.useScaleEpsilonFromConfig,
+            activityIndex,
+            person.getId());
+  }
+
+  @Override
+  public void handleActivity(Activity act) {
+    activityIndex++;
+    this.score +=
+        destinationChoiceScoring.getDestinationScore(
+            act,
+            BestReplyLocationChoiceStrategymodule.useScaleEpsilonFromConfig,
+            activityIndex,
+            person.getId());
+  }
+
+  @Override
+  public void handleLastActivity(Activity act) {
+    activityIndex++;
+    this.score +=
+        destinationChoiceScoring.getDestinationScore(
+            act,
+            BestReplyLocationChoiceStrategymodule.useScaleEpsilonFromConfig,
+            activityIndex,
+            person.getId());
+  }
 }

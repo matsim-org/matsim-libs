@@ -21,7 +21,6 @@ package org.matsim.contrib.signals.utils;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -30,64 +29,75 @@ import org.matsim.contrib.signals.model.SignalGroup;
 
 /**
  * container for overlapping signal group settings
- * 
- * there are two kinds of phase definitions: unsimplified phases this kind of phase contains all overlapping signals for each signal in the phase i.e. different phases cannot overlap each other
- * simplified phases its phase end is defined by the dropping of the largest setting starting at the phase starting time different phases of this kind cannot overlap each other
- * 
+ *
+ * <p>there are two kinds of phase definitions: unsimplified phases this kind of phase contains all
+ * overlapping signals for each signal in the phase i.e. different phases cannot overlap each other
+ * simplified phases its phase end is defined by the dropping of the largest setting starting at the
+ * phase starting time different phases of this kind cannot overlap each other
+ *
  * @author dgrether
  * @author tthunig
- *
  */
 final class FixedTimeSignalPhase {
 
-	private static final Logger log = LogManager.getLogger(FixedTimeSignalPhase.class);
-	private Integer on = null;
-	private Integer off = null;
-	private Map<Id<SignalGroup>, SignalGroupSettingsData> signalGroupSettingsByGroupId = new HashMap<>();
+  private static final Logger log = LogManager.getLogger(FixedTimeSignalPhase.class);
+  private Integer on = null;
+  private Integer off = null;
+  private Map<Id<SignalGroup>, SignalGroupSettingsData> signalGroupSettingsByGroupId =
+      new HashMap<>();
 
-	// private boolean mixedPhase = false;
+  // private boolean mixedPhase = false;
 
-	public FixedTimeSignalPhase(Integer phaseOn, Integer phaseDrop) {
-		log.debug("created phase from " + phaseOn + " to " + phaseDrop);
-		this.on = phaseOn;
-		this.off = phaseDrop;
-	}
+  public FixedTimeSignalPhase(Integer phaseOn, Integer phaseDrop) {
+    log.debug("created phase from " + phaseOn + " to " + phaseDrop);
+    this.on = phaseOn;
+    this.off = phaseDrop;
+  }
 
-	public FixedTimeSignalPhase(Integer phaseOn, Integer phaseDrop, Map<Id<SignalGroup>, SignalGroupSettingsData> phaseSignals) {
-		this(phaseOn, phaseDrop);
-		this.signalGroupSettingsByGroupId = phaseSignals;
-	}
+  public FixedTimeSignalPhase(
+      Integer phaseOn,
+      Integer phaseDrop,
+      Map<Id<SignalGroup>, SignalGroupSettingsData> phaseSignals) {
+    this(phaseOn, phaseDrop);
+    this.signalGroupSettingsByGroupId = phaseSignals;
+  }
 
-	public void setPhaseStartSecond(Integer on) {
-		this.on = on;
-	}
+  public void setPhaseStartSecond(Integer on) {
+    this.on = on;
+  }
 
-	public void setPhaseEndSecond(Integer off) {
-		this.off = off;
-	}
+  public void setPhaseEndSecond(Integer off) {
+    this.off = off;
+  }
 
-	public Integer getPhaseStartSecond() {
-		return this.on;
-	}
+  public Integer getPhaseStartSecond() {
+    return this.on;
+  }
 
-	public Integer getPhaseEndSecond() {
-		return this.off;
-	}
+  public Integer getPhaseEndSecond() {
+    return this.off;
+  }
 
-	public void setSignalGroupSettingsByGroupId(Map<Id<SignalGroup>, SignalGroupSettingsData> signalGroupSettingsByGroupId) {
-		this.signalGroupSettingsByGroupId = signalGroupSettingsByGroupId;
-	}
+  public void setSignalGroupSettingsByGroupId(
+      Map<Id<SignalGroup>, SignalGroupSettingsData> signalGroupSettingsByGroupId) {
+    this.signalGroupSettingsByGroupId = signalGroupSettingsByGroupId;
+  }
 
-	public void addSignalGroupSettingsData(SignalGroupSettingsData settings) {
-		log.debug("  adding settings to phase: " + settings.getSignalGroupId() + " on: " + settings.getOnset() + " drop " + settings.getDropping());
-		if (settings.getOnset() < this.on || settings.getDropping() > off) {
-			throw new IllegalStateException("SignalGroupSettings longer than phase length!");
-		}
-		this.signalGroupSettingsByGroupId.put(settings.getSignalGroupId(), settings);
-	}
+  public void addSignalGroupSettingsData(SignalGroupSettingsData settings) {
+    log.debug(
+        "  adding settings to phase: "
+            + settings.getSignalGroupId()
+            + " on: "
+            + settings.getOnset()
+            + " drop "
+            + settings.getDropping());
+    if (settings.getOnset() < this.on || settings.getDropping() > off) {
+      throw new IllegalStateException("SignalGroupSettings longer than phase length!");
+    }
+    this.signalGroupSettingsByGroupId.put(settings.getSignalGroupId(), settings);
+  }
 
-	public Map<Id<SignalGroup>, SignalGroupSettingsData> getSignalGroupSettingsByGroupId() {
-		return this.signalGroupSettingsByGroupId;
-	}
-
+  public Map<Id<SignalGroup>, SignalGroupSettingsData> getSignalGroupSettingsByGroupId() {
+    return this.signalGroupSettingsByGroupId;
+  }
 }

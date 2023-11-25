@@ -27,61 +27,71 @@ import org.matsim.core.router.TripStructureUtils;
 
 /**
  * The micro-simulation internal handler for starting a leg.
- * 
+ *
  * @author rashid_waraich
  */
 public class StartingLegMessage extends EventMessage {
 
-	public StartingLegMessage(Scheduler scheduler, Vehicle vehicle) {
-		super(scheduler, vehicle);
-		priority = JDEQSimConfigGroup.PRIORITY_DEPARTUARE_MESSAGE;
-	}
+  public StartingLegMessage(Scheduler scheduler, Vehicle vehicle) {
+    super(scheduler, vehicle);
+    priority = JDEQSimConfigGroup.PRIORITY_DEPARTUARE_MESSAGE;
+  }
 
-	@Override
-	public void handleMessage() {
-		// if current leg is in car mode, then enter request in first road
-		if (vehicle.getCurrentLeg().getMode().equals(TransportMode.car)) {
+  @Override
+  public void handleMessage() {
+    // if current leg is in car mode, then enter request in first road
+    if (vehicle.getCurrentLeg().getMode().equals(TransportMode.car)) {
 
-			// if empty leg, then end leg, else simulate leg
-			if (vehicle.getCurrentLinkRoute().length == 0) {
-				// move to first link in next leg and schedule an end leg
-				// message
-				// duration of leg = 0 (departure and arrival time is the same)
-				scheduleEndLegMessage(getMessageArrivalTime());
+      // if empty leg, then end leg, else simulate leg
+      if (vehicle.getCurrentLinkRoute().length == 0) {
+        // move to first link in next leg and schedule an end leg
+        // message
+        // duration of leg = 0 (departure and arrival time is the same)
+        scheduleEndLegMessage(getMessageArrivalTime());
 
-			} else {
-				// start the new leg
-				Road road = Road.getRoad(vehicle.getCurrentLinkId());
-				road.enterRequest(vehicle, getMessageArrivalTime());
-			}
+      } else {
+        // start the new leg
+        Road road = Road.getRoad(vehicle.getCurrentLinkId());
+        road.enterRequest(vehicle, getMessageArrivalTime());
+      }
 
-		} else {
-			scheduleEndLegMessage(getMessageArrivalTime() + vehicle.getCurrentLeg().getTravelTime().orElse(0));
-		}
-	}
+    } else {
+      scheduleEndLegMessage(
+          getMessageArrivalTime() + vehicle.getCurrentLeg().getTravelTime().orElse(0));
+    }
+  }
 
-	private void scheduleEndLegMessage(double time) {
-		// move to first link in next leg and schedule an end leg message
-		vehicle.moveToFirstLinkInNextLeg();
-		Road road = Road.getRoad(vehicle.getCurrentLinkId());
-		vehicle.scheduleEndLegMessage(time, road);
-	}
+  private void scheduleEndLegMessage(double time) {
+    // move to first link in next leg and schedule an end leg message
+    vehicle.moveToFirstLinkInNextLeg();
+    Road road = Road.getRoad(vehicle.getCurrentLinkId());
+    vehicle.scheduleEndLegMessage(time, road);
+  }
 
-	@Override
-	public void processEvent() {
-		Event event;
+  @Override
+  public void processEvent() {
+    Event event;
 
-		// schedule ActEndEvent
-		event = new ActivityEndEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLinkId(), vehicle
-				.getPreviousActivity().getFacilityId(), vehicle.getPreviousActivity().getType(), vehicle.getPreviousActivity().getCoord());
-		eventsManager.processEvent(event);
+    // schedule ActEndEvent
+    event =
+        new ActivityEndEvent(
+            this.getMessageArrivalTime(),
+            vehicle.getOwnerPerson().getId(),
+            vehicle.getCurrentLinkId(),
+            vehicle.getPreviousActivity().getFacilityId(),
+            vehicle.getPreviousActivity().getType(),
+            vehicle.getPreviousActivity().getCoord());
+    eventsManager.processEvent(event);
 
-		// schedule AgentDepartureEvent
-		event = new PersonDepartureEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLinkId(),
-				vehicle.getCurrentLeg().getMode(), TripStructureUtils.getRoutingMode(vehicle.getCurrentLeg()));
+    // schedule AgentDepartureEvent
+    event =
+        new PersonDepartureEvent(
+            this.getMessageArrivalTime(),
+            vehicle.getOwnerPerson().getId(),
+            vehicle.getCurrentLinkId(),
+            vehicle.getCurrentLeg().getMode(),
+            TripStructureUtils.getRoutingMode(vehicle.getCurrentLeg()));
 
-		eventsManager.processEvent(event);
-
-	}
-
+    eventsManager.processEvent(event);
+  }
 }

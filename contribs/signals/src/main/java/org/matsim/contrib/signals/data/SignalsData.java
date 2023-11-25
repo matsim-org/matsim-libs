@@ -26,33 +26,31 @@ import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 
-
 /**
  * @author dgrether
- *
  */
 public interface SignalsData {
-	/**
-	 * Name under which signals data are added as scenario elements
-	 */
-	public static final String ELEMENT_NAME = "signalsData";
-	
-	public SignalSystemsData getSignalSystemsData();
-	
-	public SignalControlData getSignalControlData();
+  /** Name under which signals data are added as scenario elements */
+  public static final String ELEMENT_NAME = "signalsData";
 
-	public SignalGroupsData getSignalGroupsData();
-	/**
-	 * @return null if feature is not enabled
-	 */
-	public AmberTimesData getAmberTimesData();
-	/**
-	 * @return null if feature is not enabled
-	 */
-	public IntergreenTimesData getIntergreenTimesData();
-	/**
-	 * @return null if feature is not enabled
-	 */
-	public ConflictData getConflictingDirectionsData();
-	
+  public SignalSystemsData getSignalSystemsData();
+
+  public SignalControlData getSignalControlData();
+
+  public SignalGroupsData getSignalGroupsData();
+
+  /**
+   * @return null if feature is not enabled
+   */
+  public AmberTimesData getAmberTimesData();
+
+  /**
+   * @return null if feature is not enabled
+   */
+  public IntergreenTimesData getIntergreenTimesData();
+
+  /**
+   * @return null if feature is not enabled
+   */
+  public ConflictData getConflictingDirectionsData();
 }

@@ -9,15 +9,13 @@
 package org.matsim.contrib.simulatedannealing.cost;
 
 /**
+ * Calculates the cost/energy of the (current) solution. Should implement the cost function that
+ * shall be minimised.
  *
- * Calculates the cost/energy of the (current) solution. Should implement the cost function
- * that shall be minimised.
- *
- * As this is highly problem specific, there is no default implementation.
+ * <p>As this is highly problem specific, there is no default implementation.
  *
  * @author nkuehnel / MOIA
  */
 public interface CostCalculator<T> {
-	double calculateCost(T solution);
-
+  double calculateCost(T solution);
 }

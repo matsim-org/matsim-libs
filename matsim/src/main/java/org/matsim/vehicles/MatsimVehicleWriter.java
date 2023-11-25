@@ -20,38 +20,34 @@
 package org.matsim.vehicles;
 
 import java.io.IOException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 /**
- * This is the new default Writer for the vehicles file.
- * It can easy pointed to the current version of VehicleReader (which is now V2)
+ * This is the new default Writer for the vehicles file. It can easy pointed to the current version
+ * of VehicleReader (which is now V2)
+ *
  * @author kturner
  */
 public final class MatsimVehicleWriter extends MatsimXmlWriter {
 
-	private static final Logger log = LogManager.getLogger(MatsimVehicleWriter.class);
+  private static final Logger log = LogManager.getLogger(MatsimVehicleWriter.class);
 
-	private VehicleWriterV2 delegate;
+  private VehicleWriterV2 delegate;
 
-	public MatsimVehicleWriter(Vehicles vehicles) {
-		delegate = new VehicleWriterV2(vehicles);
-	}
+  public MatsimVehicleWriter(Vehicles vehicles) {
+    delegate = new VehicleWriterV2(vehicles);
+  }
 
-	/**
-	 * Writes the vehicles in the current default format
-	 * (currently vehicleDefinitions_v2.0.dtd).
-	 */
-	public void writeFile(String filename) {
-		log.info( Gbl.aboutToWrite( "vehicles", filename) ) ;
-		try{
-			delegate.writeFile(filename);
-		} catch( IOException e ){
-			e.printStackTrace();
-		}
-	}
-
+  /** Writes the vehicles in the current default format (currently vehicleDefinitions_v2.0.dtd). */
+  public void writeFile(String filename) {
+    log.info(Gbl.aboutToWrite("vehicles", filename));
+    try {
+      delegate.writeFile(filename);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 }

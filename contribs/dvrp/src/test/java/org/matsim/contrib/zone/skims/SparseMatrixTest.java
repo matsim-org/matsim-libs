@@ -23,74 +23,75 @@ package org.matsim.contrib.zone.skims;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.matsim.contrib.zone.skims.SparseMatrix.SparseRow;
 
+import com.google.common.collect.Lists;
 import java.util.List;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.zone.skims.SparseMatrix.NodeAndTime;
 import org.matsim.testcases.fakes.FakeNode;
 
-import com.google.common.collect.Lists;
-
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class SparseMatrixTest {
 
-	private final Node nodeA = new FakeNode(Id.create("A", Node.class));
-	private final Node nodeB = new FakeNode(Id.create("B", Node.class));
-	private final Node nodeC = new FakeNode(Id.create("C", Node.class));
-	private final List<Node> allNodes = List.of(nodeA, nodeB, nodeC);
+  private final Node nodeA = new FakeNode(Id.create("A", Node.class));
+  private final Node nodeB = new FakeNode(Id.create("B", Node.class));
+  private final Node nodeC = new FakeNode(Id.create("C", Node.class));
+  private final List<Node> allNodes = List.of(nodeA, nodeB, nodeC);
 
-	@Test
-	public void emptyMatrix() {
-		var matrix = new SparseMatrix();
-		for (Node from : allNodes) {
-			for (Node to : allNodes) {
-				assertThat(matrix.get(from, to)).isEqualTo(-1);
-			}
-		}
-	}
+  @Test
+  public void emptyMatrix() {
+    var matrix = new SparseMatrix();
+    for (Node from : allNodes) {
+      for (Node to : allNodes) {
+        assertThat(matrix.get(from, to)).isEqualTo(-1);
+      }
+    }
+  }
 
-	@Test
-	public void triangularMatrix() {
-		var matrix = new SparseMatrix();
-		//A -> A, B, C
-		matrix.setRow(nodeA,
-				new SparseRow(List.of(nodeAndTime(nodeA, 0), nodeAndTime(nodeB, 1), nodeAndTime(nodeC, 2))));
-		//B -> B, C
-		matrix.setRow(nodeB, new SparseRow(List.of(nodeAndTime(nodeB, 3), nodeAndTime(nodeC, 4))));
-		//C -> C
-		matrix.setRow(nodeC, new SparseRow(List.of(nodeAndTime(nodeC, 5))));
+  @Test
+  public void triangularMatrix() {
+    var matrix = new SparseMatrix();
+    // A -> A, B, C
+    matrix.setRow(
+        nodeA,
+        new SparseRow(
+            List.of(nodeAndTime(nodeA, 0), nodeAndTime(nodeB, 1), nodeAndTime(nodeC, 2))));
+    // B -> B, C
+    matrix.setRow(nodeB, new SparseRow(List.of(nodeAndTime(nodeB, 3), nodeAndTime(nodeC, 4))));
+    // C -> C
+    matrix.setRow(nodeC, new SparseRow(List.of(nodeAndTime(nodeC, 5))));
 
-		assertThat(matrix.get(nodeA, nodeA)).isEqualTo(0);
-		assertThat(matrix.get(nodeA, nodeB)).isEqualTo(1);
-		assertThat(matrix.get(nodeA, nodeC)).isEqualTo(2);
-		assertThat(matrix.get(nodeB, nodeA)).isEqualTo(-1);
-		assertThat(matrix.get(nodeB, nodeB)).isEqualTo(3);
-		assertThat(matrix.get(nodeB, nodeC)).isEqualTo(4);
-		assertThat(matrix.get(nodeC, nodeA)).isEqualTo(-1);
-		assertThat(matrix.get(nodeC, nodeB)).isEqualTo(-1);
-		assertThat(matrix.get(nodeC, nodeC)).isEqualTo(5);
-	}
+    assertThat(matrix.get(nodeA, nodeA)).isEqualTo(0);
+    assertThat(matrix.get(nodeA, nodeB)).isEqualTo(1);
+    assertThat(matrix.get(nodeA, nodeC)).isEqualTo(2);
+    assertThat(matrix.get(nodeB, nodeA)).isEqualTo(-1);
+    assertThat(matrix.get(nodeB, nodeB)).isEqualTo(3);
+    assertThat(matrix.get(nodeB, nodeC)).isEqualTo(4);
+    assertThat(matrix.get(nodeC, nodeA)).isEqualTo(-1);
+    assertThat(matrix.get(nodeC, nodeB)).isEqualTo(-1);
+    assertThat(matrix.get(nodeC, nodeC)).isEqualTo(5);
+  }
 
-	@Test
-	public void nodeAndTimeOrderNotImportant() {
-		//A -> A, B, C
-		var nodeAndTimes = List.of(nodeAndTime(nodeA, 0), nodeAndTime(nodeB, 1), nodeAndTime(nodeC, 2));
+  @Test
+  public void nodeAndTimeOrderNotImportant() {
+    // A -> A, B, C
+    var nodeAndTimes = List.of(nodeAndTime(nodeA, 0), nodeAndTime(nodeB, 1), nodeAndTime(nodeC, 2));
 
-		for (boolean reversedOrder : List.of(false, true)) {
-			var matrix = new SparseMatrix();
-			matrix.setRow(nodeA, new SparseRow(reversedOrder ? Lists.reverse(nodeAndTimes) : nodeAndTimes));
+    for (boolean reversedOrder : List.of(false, true)) {
+      var matrix = new SparseMatrix();
+      matrix.setRow(
+          nodeA, new SparseRow(reversedOrder ? Lists.reverse(nodeAndTimes) : nodeAndTimes));
 
-			assertThat(matrix.get(nodeA, nodeA)).isEqualTo(0);
-			assertThat(matrix.get(nodeA, nodeB)).isEqualTo(1);
-			assertThat(matrix.get(nodeA, nodeC)).isEqualTo(2);
-		}
-	}
+      assertThat(matrix.get(nodeA, nodeA)).isEqualTo(0);
+      assertThat(matrix.get(nodeA, nodeB)).isEqualTo(1);
+      assertThat(matrix.get(nodeA, nodeC)).isEqualTo(2);
+    }
+  }
 
-	private NodeAndTime nodeAndTime(Node node, double time) {
-		return new NodeAndTime(node.getId().index(), time);
-	}
+  private NodeAndTime nodeAndTime(Node node, double time) {
+    return new NodeAndTime(node.getId().index(), time);
+  }
 }

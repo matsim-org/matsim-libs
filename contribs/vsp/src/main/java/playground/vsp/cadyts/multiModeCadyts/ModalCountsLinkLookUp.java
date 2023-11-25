@@ -20,25 +20,23 @@
 package playground.vsp.cadyts.multiModeCadyts;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.cadyts.general.LookUpItemFromId;
 
 /**
  * @author amit
  */
-
 class ModalCountsLinkLookUp implements LookUpItemFromId<ModalCountsLinkIdentifier> {
-	
-	private final Map<Id<ModalCountsLinkIdentifier>, ModalCountsLinkIdentifier> mappingOfModalLink ;
-	
-	public ModalCountsLinkLookUp(final Map<Id<ModalCountsLinkIdentifier>, ModalCountsLinkIdentifier> modalLinkContainer){
-		this.mappingOfModalLink = modalLinkContainer;
-	}
-	
-	@Override
-	public ModalCountsLinkIdentifier getItem(Id<ModalCountsLinkIdentifier> id ) {
-		return this.mappingOfModalLink.get(id);
 
-	}
+  private final Map<Id<ModalCountsLinkIdentifier>, ModalCountsLinkIdentifier> mappingOfModalLink;
+
+  public ModalCountsLinkLookUp(
+      final Map<Id<ModalCountsLinkIdentifier>, ModalCountsLinkIdentifier> modalLinkContainer) {
+    this.mappingOfModalLink = modalLinkContainer;
+  }
+
+  @Override
+  public ModalCountsLinkIdentifier getItem(Id<ModalCountsLinkIdentifier> id) {
+    return this.mappingOfModalLink.get(id);
+  }
 }

@@ -26,91 +26,109 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.Tour.Leg;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 /**
- * Created by IntelliJ IDEA. User: zilske Date: 10/31/11 Time: 11:46 AM To
- * change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: zilske Date: 10/31/11 Time: 11:46 AM To change this template use
+ * File | Settings | File Templates.
  */
 public class CarrierPlanReaderV1Test {
 
-	@Rule
-	public final MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testCarrierPlanReaderDoesSomething() {
+  @Test
+  public void testCarrierPlanReaderDoesSomething() {
 
-		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( utils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
-		VehicleType defaultVehicleType = VehicleUtils.getFactory().createVehicleType( Id.create("default", VehicleType.class ) );
-		carrierVehicleTypes.getVehicleTypes().put( defaultVehicleType.getId(), defaultVehicleType );
+    CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
+    new CarrierVehicleTypeReader(carrierVehicleTypes)
+        .readFile(utils.getPackageInputDirectory() + "vehicleTypes_v2.xml");
+    VehicleType defaultVehicleType =
+        VehicleUtils.getFactory().createVehicleType(Id.create("default", VehicleType.class));
+    carrierVehicleTypes.getVehicleTypes().put(defaultVehicleType.getId(), defaultVehicleType);
 
-		Carriers carriers = new Carriers();
-		CarrierPlanReaderV1 carrierPlanReaderV1 = new CarrierPlanReaderV1(carriers, carrierVehicleTypes );
-		carrierPlanReaderV1.readFile(utils.getClassInputDirectory() + "carrierPlansEquils.xml");
-		Assert.assertEquals(1, carriers.getCarriers().size());
-	}
+    Carriers carriers = new Carriers();
+    CarrierPlanReaderV1 carrierPlanReaderV1 =
+        new CarrierPlanReaderV1(carriers, carrierVehicleTypes);
+    carrierPlanReaderV1.readFile(utils.getClassInputDirectory() + "carrierPlansEquils.xml");
+    Assert.assertEquals(1, carriers.getCarriers().size());
+  }
 
-	@Test
-	public void testReaderReadsCorrectly() {
+  @Test
+  public void testReaderReadsCorrectly() {
 
-		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( utils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
-		VehicleType defaultVehicleType = VehicleUtils.getFactory().createVehicleType( Id.create("default", VehicleType.class ) );
-		carrierVehicleTypes.getVehicleTypes().put( defaultVehicleType.getId(), defaultVehicleType );
+    CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
+    new CarrierVehicleTypeReader(carrierVehicleTypes)
+        .readFile(utils.getPackageInputDirectory() + "vehicleTypes_v2.xml");
+    VehicleType defaultVehicleType =
+        VehicleUtils.getFactory().createVehicleType(Id.create("default", VehicleType.class));
+    carrierVehicleTypes.getVehicleTypes().put(defaultVehicleType.getId(), defaultVehicleType);
 
-		Carriers carriers = new Carriers();
-		CarrierPlanReaderV1 carrierPlanReaderV1 = new CarrierPlanReaderV1(carriers, carrierVehicleTypes );
-		carrierPlanReaderV1.readFile(utils.getClassInputDirectory() + "carrierPlansEquils.xml");
-		Assert.assertEquals(1, carriers.getCarriers().size());
-		Carrier carrier = carriers.getCarriers().values().iterator().next();
-		Assert.assertEquals(1, carrier.getSelectedPlan().getScheduledTours().size());
-		Leg leg = (Leg) carrier.getSelectedPlan().getScheduledTours()
-				.iterator().next().getTour().getTourElements().get(0);
-		NetworkRoute route = (NetworkRoute) leg.getRoute();
-		Assert.assertEquals(3, route.getLinkIds().size());
-		Assert.assertEquals("23", route.getStartLinkId().toString());
-		Assert.assertEquals("2", route.getLinkIds().get(0).toString());
-		Assert.assertEquals("3", route.getLinkIds().get(1).toString());
-		Assert.assertEquals("4", route.getLinkIds().get(2).toString());
-		Assert.assertEquals("15", route.getEndLinkId().toString());
-	}
+    Carriers carriers = new Carriers();
+    CarrierPlanReaderV1 carrierPlanReaderV1 =
+        new CarrierPlanReaderV1(carriers, carrierVehicleTypes);
+    carrierPlanReaderV1.readFile(utils.getClassInputDirectory() + "carrierPlansEquils.xml");
+    Assert.assertEquals(1, carriers.getCarriers().size());
+    Carrier carrier = carriers.getCarriers().values().iterator().next();
+    Assert.assertEquals(1, carrier.getSelectedPlan().getScheduledTours().size());
+    Leg leg =
+        (Leg)
+            carrier
+                .getSelectedPlan()
+                .getScheduledTours()
+                .iterator()
+                .next()
+                .getTour()
+                .getTourElements()
+                .get(0);
+    NetworkRoute route = (NetworkRoute) leg.getRoute();
+    Assert.assertEquals(3, route.getLinkIds().size());
+    Assert.assertEquals("23", route.getStartLinkId().toString());
+    Assert.assertEquals("2", route.getLinkIds().get(0).toString());
+    Assert.assertEquals("3", route.getLinkIds().get(1).toString());
+    Assert.assertEquals("4", route.getLinkIds().get(2).toString());
+    Assert.assertEquals("15", route.getEndLinkId().toString());
+  }
 
-	@Test
-	public void testReaderReadsScoreAndSelectedPlanCorrectly() {
+  @Test
+  public void testReaderReadsScoreAndSelectedPlanCorrectly() {
 
-		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( utils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
-		VehicleType defaultVehicleType = VehicleUtils.getFactory().createVehicleType( Id.create("default", VehicleType.class ) );
-		carrierVehicleTypes.getVehicleTypes().put( defaultVehicleType.getId(), defaultVehicleType );
+    CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
+    new CarrierVehicleTypeReader(carrierVehicleTypes)
+        .readFile(utils.getPackageInputDirectory() + "vehicleTypes_v2.xml");
+    VehicleType defaultVehicleType =
+        VehicleUtils.getFactory().createVehicleType(Id.create("default", VehicleType.class));
+    carrierVehicleTypes.getVehicleTypes().put(defaultVehicleType.getId(), defaultVehicleType);
 
-		Carriers carriers = new Carriers();
-		CarrierPlanReaderV1 carrierPlanReaderV1 = new CarrierPlanReaderV1(carriers, carrierVehicleTypes );
-		carrierPlanReaderV1.readFile(utils.getClassInputDirectory() + "carrierPlansEquils.xml");
-		Carrier carrier = carriers.getCarriers().values().iterator().next();
-		Assert.assertNotNull(carrier.getSelectedPlan());
-		Assert.assertEquals(-100.0, carrier.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(2,carrier.getPlans().size());
-	}
+    Carriers carriers = new Carriers();
+    CarrierPlanReaderV1 carrierPlanReaderV1 =
+        new CarrierPlanReaderV1(carriers, carrierVehicleTypes);
+    carrierPlanReaderV1.readFile(utils.getClassInputDirectory() + "carrierPlansEquils.xml");
+    Carrier carrier = carriers.getCarriers().values().iterator().next();
+    Assert.assertNotNull(carrier.getSelectedPlan());
+    Assert.assertEquals(-100.0, carrier.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);
+    Assert.assertEquals(2, carrier.getPlans().size());
+  }
 
-	@Test
-	public void testReaderReadsUnScoredAndUnselectedPlanCorrectly() {
+  @Test
+  public void testReaderReadsUnScoredAndUnselectedPlanCorrectly() {
 
-		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( utils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
-		VehicleType defaultVehicleType = VehicleUtils.getFactory().createVehicleType( Id.create("default", VehicleType.class ) );
-		carrierVehicleTypes.getVehicleTypes().put( defaultVehicleType.getId(), defaultVehicleType );
+    CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
+    new CarrierVehicleTypeReader(carrierVehicleTypes)
+        .readFile(utils.getPackageInputDirectory() + "vehicleTypes_v2.xml");
+    VehicleType defaultVehicleType =
+        VehicleUtils.getFactory().createVehicleType(Id.create("default", VehicleType.class));
+    carrierVehicleTypes.getVehicleTypes().put(defaultVehicleType.getId(), defaultVehicleType);
 
-		Carriers carriers = new Carriers();
-		CarrierPlanReaderV1 carrierPlanReaderV1 = new CarrierPlanReaderV1(carriers, carrierVehicleTypes );
-		carrierPlanReaderV1.readFile(utils.getClassInputDirectory() + "carrierPlansEquils_unscored_unselected.xml");
-		Carrier carrier = carriers.getCarriers().values().iterator().next();
-		Assert.assertNull(carrier.getSelectedPlan());
-		Assert.assertEquals(2,carrier.getPlans().size());
-	}
-
+    Carriers carriers = new Carriers();
+    CarrierPlanReaderV1 carrierPlanReaderV1 =
+        new CarrierPlanReaderV1(carriers, carrierVehicleTypes);
+    carrierPlanReaderV1.readFile(
+        utils.getClassInputDirectory() + "carrierPlansEquils_unscored_unselected.xml");
+    Carrier carrier = carriers.getCarriers().values().iterator().next();
+    Assert.assertNull(carrier.getSelectedPlan());
+    Assert.assertEquals(2, carrier.getPlans().size());
+  }
 }

@@ -21,7 +21,6 @@
 package org.matsim.contrib.av.robotaxi.run;
 
 import java.net.URL;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -43,25 +42,33 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * @author Michal Maciejewski (michalm)
  */
 public class RunDrtAndTaxiExample {
-	public static void run(URL configUrl, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new MultiModeTaxiConfigGroup(),
-				new DvrpConfigGroup(), new OTFVisConfigGroup());
-		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
-		ScenarioUtils.loadScenario(scenario);
-		config.controller()
-				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new MultiModeDrtModule());
-		controler.addOverridingModule(new MultiModeTaxiModule());
+  public static void run(URL configUrl, boolean otfvis) {
+    Config config =
+        ConfigUtils.loadConfig(
+            configUrl,
+            new MultiModeDrtConfigGroup(),
+            new MultiModeTaxiConfigGroup(),
+            new DvrpConfigGroup(),
+            new OTFVisConfigGroup());
+    Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
+    ScenarioUtils.loadScenario(scenario);
+    config
+        .controller()
+        .setOverwriteFileSetting(
+            OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+    Controler controler = new Controler(scenario);
+    controler.addOverridingModule(new MultiModeDrtModule());
+    controler.addOverridingModule(new MultiModeTaxiModule());
 
-		controler.addOverridingModule(new DvrpModule());
-		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(MultiModeTaxiConfigGroup.get(config),
-				MultiModeDrtConfigGroup.get(config)));
+    controler.addOverridingModule(new DvrpModule());
+    controler.configureQSimComponents(
+        DvrpQSimComponents.activateAllModes(
+            MultiModeTaxiConfigGroup.get(config), MultiModeDrtConfigGroup.get(config)));
 
-		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule());
-		}
+    if (otfvis) {
+      controler.addOverridingModule(new OTFVisLiveModule());
+    }
 
-		controler.run();
-	}
+    controler.run();
+  }
 }

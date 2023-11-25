@@ -19,25 +19,23 @@
 
 package org.matsim.contrib.minibus.routeProvider;
 
+import java.util.Collection;
+import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.hook.Operator;
 import org.matsim.contrib.minibus.hook.PPlan;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import java.util.Collection;
-import java.util.List;
-
 public interface PRouteProvider {
-	
-	public TransitLine createTransitLineFromOperatorPlan(Id<Operator> operatorId, PPlan plan);
 
-	public TransitStopFacility getRandomTransitStop(int currentIteration);
-	
-	public TransitStopFacility drawRandomStopFromList(List<TransitStopFacility> choiceSet);
-	
-	public Collection<TransitStopFacility> getAllPStops();
+  public TransitLine createTransitLineFromOperatorPlan(Id<Operator> operatorId, PPlan plan);
 
-	public TransitLine createEmptyLineFromOperator(Id<Operator> id);
+  public TransitStopFacility getRandomTransitStop(int currentIteration);
 
+  public TransitStopFacility drawRandomStopFromList(List<TransitStopFacility> choiceSet);
+
+  public Collection<TransitStopFacility> getAllPStops();
+
+  public TransitLine createEmptyLineFromOperator(Id<Operator> id);
 }

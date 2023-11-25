@@ -31,42 +31,36 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class PlanStrategyTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  /**
+   * @author mrieser
+   */
+  @Test
+  public void testGetNumberOfStrategyModules() {
+    final PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
+    assertEquals(0, strategy.getNumberOfStrategyModules());
+    strategy.addStrategyModule(new DummyStrategyModule());
+    assertEquals(1, strategy.getNumberOfStrategyModules());
+    strategy.addStrategyModule(new DummyStrategyModule());
+    assertEquals(2, strategy.getNumberOfStrategyModules());
+  }
 
-	/**
-	 * @author mrieser
-	 */
-	@Test public void testGetNumberOfStrategyModules() {
-		final PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		assertEquals(0, strategy.getNumberOfStrategyModules());
-		strategy.addStrategyModule(new DummyStrategyModule());
-		assertEquals(1, strategy.getNumberOfStrategyModules());
-		strategy.addStrategyModule(new DummyStrategyModule());
-		assertEquals(2, strategy.getNumberOfStrategyModules());
-	}
+  /**
+   * A dummy strategy module for use in tests, without any functionality
+   *
+   * @author mrieser
+   */
+  private static class DummyStrategyModule implements PlanStrategyModule {
 
-	/**
-	 * A dummy strategy module for use in tests, without any functionality
-	 *
-	 * @author mrieser
-	 */
-	private static class DummyStrategyModule implements PlanStrategyModule {
+    /*package*/ DummyStrategyModule() {
+      // empty constructor with default visibility for a private inner class
+    }
 
-		/*package*/ DummyStrategyModule() {
-			// empty constructor with default visibility for a private inner class
-		}
+    public void finishReplanning() {}
 
-		public void finishReplanning() {
-		}
+    public void handlePlan(final Plan plan) {}
 
-		public void handlePlan(final Plan plan) {
-		}
-
-		public void prepareReplanning(ReplanningContext replanningContext) {
-		}
-
-	}
-
+    public void prepareReplanning(ReplanningContext replanningContext) {}
+  }
 }

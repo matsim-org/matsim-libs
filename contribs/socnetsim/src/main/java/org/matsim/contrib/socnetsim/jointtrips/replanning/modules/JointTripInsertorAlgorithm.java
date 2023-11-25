@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -55,383 +54,352 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 
 /**
- * An algorithm which creates joint trips from nothing,
- * by grouping a car trip with a non-chain-based-mode trip.
+ * An algorithm which creates joint trips from nothing, by grouping a car trip with a
+ * non-chain-based-mode trip.
+ *
  * @author thibautd
  */
 public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPlan> {
-	private final List<String> chainBasedModes;
-	private final double betaDetour;
-	private final double scale;
-	private final Random random;
-	private final MainModeIdentifier mainModeIdentifier;
+  private final List<String> chainBasedModes;
+  private final double betaDetour;
+  private final double scale;
+  private final Random random;
+  private final MainModeIdentifier mainModeIdentifier;
 
-	private final SocialNetwork socialNetwork;
+  private final SocialNetwork socialNetwork;
 
-	public JointTripInsertorAlgorithm(
-			final Random random,
-			final SocialNetwork socialNetwork,
-			final JointTripInsertorConfigGroup config,
-			final MainModeIdentifier mainModeIdentifier ) {
-		this.socialNetwork = socialNetwork;
-		chainBasedModes = config.getChainBasedModes();
-		betaDetour = config.getBetaDetour();
-		scale = config.getScale();
-		this.random = random;
-		this.mainModeIdentifier = mainModeIdentifier;
-	}
+  public JointTripInsertorAlgorithm(
+      final Random random,
+      final SocialNetwork socialNetwork,
+      final JointTripInsertorConfigGroup config,
+      final MainModeIdentifier mainModeIdentifier) {
+    this.socialNetwork = socialNetwork;
+    chainBasedModes = config.getChainBasedModes();
+    betaDetour = config.getBetaDetour();
+    scale = config.getScale();
+    this.random = random;
+    this.mainModeIdentifier = mainModeIdentifier;
+  }
 
-	@Override
-	public void run(final JointPlan plan) {
-		run( plan , Collections.<Id<Person>>emptyList() );
-	}
+  @Override
+  public void run(final JointPlan plan) {
+    run(plan, Collections.<Id<Person>>emptyList());
+  }
 
-	public ActedUponInformation run(
-			final JointPlan jointPlan,
-			final Collection<Id<Person>> agentsToIgnore) {
-		final ClassifiedTrips trips = extractClassifiedTrips( jointPlan , agentsToIgnore );
-		final List<Match> matches =
-			extractMatches(
-					jointPlan,
-					trips );
-		if (matches.size() == 0) return null;
+  public ActedUponInformation run(
+      final JointPlan jointPlan, final Collection<Id<Person>> agentsToIgnore) {
+    final ClassifiedTrips trips = extractClassifiedTrips(jointPlan, agentsToIgnore);
+    final List<Match> matches = extractMatches(jointPlan, trips);
+    if (matches.size() == 0) return null;
 
-		final Match match = chooseMatch( matches );
-		insertMatch( jointPlan , match );
-		return match.toInformation();
-	}
+    final Match match = chooseMatch(matches);
+    insertMatch(jointPlan, match);
+    return match.toInformation();
+  }
 
-	private ClassifiedTrips extractClassifiedTrips(
-			final JointPlan jointPlan,
-			final Collection<Id<Person>> agentsToIgnore) {
-		final ClassifiedTrips trips = new ClassifiedTrips();
+  private ClassifiedTrips extractClassifiedTrips(
+      final JointPlan jointPlan, final Collection<Id<Person>> agentsToIgnore) {
+    final ClassifiedTrips trips = new ClassifiedTrips();
 
-		for (Map.Entry<Id<Person>, Plan> entry : jointPlan.getIndividualPlans().entrySet()) {
-			final Id id = entry.getKey();
-			if ( agentsToIgnore.contains( id ) ) continue;
-			final Plan plan = entry.getValue();
+    for (Map.Entry<Id<Person>, Plan> entry : jointPlan.getIndividualPlans().entrySet()) {
+      final Id id = entry.getKey();
+      if (agentsToIgnore.contains(id)) continue;
+      final Plan plan = entry.getValue();
 
-			// identify the joint trips as one single trips.
-			// Otherwise, the process will insert joint trips to access pick-ups
-			// or go from drop offs...
-			final MainModeIdentifier mainModeIdentifier =
-				new JointMainModeIdentifier(
-						this.mainModeIdentifier );
+      // identify the joint trips as one single trips.
+      // Otherwise, the process will insert joint trips to access pick-ups
+      // or go from drop offs...
+      final MainModeIdentifier mainModeIdentifier =
+          new JointMainModeIdentifier(this.mainModeIdentifier);
 
-			for ( TripStructureUtils.Trip trip : TripStructureUtils.getTrips( plan , JointActingTypes.JOINT_STAGE_ACTS::contains ) ) {
-				final String mode = mainModeIdentifier.identifyMainMode( trip.getTripElements() );
+      for (TripStructureUtils.Trip trip :
+          TripStructureUtils.getTrips(plan, JointActingTypes.JOINT_STAGE_ACTS::contains)) {
+        final String mode = mainModeIdentifier.identifyMainMode(trip.getTripElements());
 
-				if ( mode.equals( TransportMode.car ) ) {
-					trips.addCarTrip(
-							new Trip(
-								trip.getOriginActivity(),
-								trip.getDestinationActivity(),
-								calcEndOfActivity( trip.getOriginActivity() , plan ),
-								id) );
-				}
-				else if (
-						!JointActingTypes.JOINT_MODES.contains( mode ) &&
-						!chainBasedModes.contains( mode ) ) {
-					trips.addNonChainBasedTrip(
-							new Trip(
-								trip.getOriginActivity(),
-								trip.getDestinationActivity(),
-								calcEndOfActivity( trip.getOriginActivity() , plan ),
-								id) );
-				}
-			}
-		}
+        if (mode.equals(TransportMode.car)) {
+          trips.addCarTrip(
+              new Trip(
+                  trip.getOriginActivity(),
+                  trip.getDestinationActivity(),
+                  calcEndOfActivity(trip.getOriginActivity(), plan),
+                  id));
+        } else if (!JointActingTypes.JOINT_MODES.contains(mode)
+            && !chainBasedModes.contains(mode)) {
+          trips.addNonChainBasedTrip(
+              new Trip(
+                  trip.getOriginActivity(),
+                  trip.getDestinationActivity(),
+                  calcEndOfActivity(trip.getOriginActivity(), plan),
+                  id));
+        }
+      }
+    }
 
-		return trips;
-	}
+    return trips;
+  }
 
-	private List<Match> extractMatches(
-			final JointPlan jointPlan,
-			final ClassifiedTrips trips) {
-		final List<Match> matches = new ArrayList<Match>();
-		final JointTravelStructure structure = JointTravelUtils.analyseJointTravel(jointPlan);
+  private List<Match> extractMatches(final JointPlan jointPlan, final ClassifiedTrips trips) {
+    final List<Match> matches = new ArrayList<Match>();
+    final JointTravelStructure structure = JointTravelUtils.analyseJointTravel(jointPlan);
 
-		for ( Map.Entry<Id<Person>, List<Trip>> eDriver : trips.carTrips.entrySet() ) {
-			final Id<Person> driverId = eDriver.getKey();
-			for ( Map.Entry<Id<Person>, List<Trip>> ePass : trips.nonChainBasedModeTrips.entrySet() ) {
-				final Id<Person> passengerId = ePass.getKey();
-				if ( acceptAgentMatch( driverId , passengerId ) ) {
-					addMatches( matches , jointPlan , structure , eDriver.getValue() , ePass.getValue() );
-				}
-			}
-		}
+    for (Map.Entry<Id<Person>, List<Trip>> eDriver : trips.carTrips.entrySet()) {
+      final Id<Person> driverId = eDriver.getKey();
+      for (Map.Entry<Id<Person>, List<Trip>> ePass : trips.nonChainBasedModeTrips.entrySet()) {
+        final Id<Person> passengerId = ePass.getKey();
+        if (acceptAgentMatch(driverId, passengerId)) {
+          addMatches(matches, jointPlan, structure, eDriver.getValue(), ePass.getValue());
+        }
+      }
+    }
 
-		return matches;
-	}
+    return matches;
+  }
 
-	private void addMatches(
-			final List<Match> matches,
-			final JointPlan jointPlan,
-			final JointTravelStructure structure,
-			final List<Trip> driverTrips,
-			final List<Trip> passengerTrips) {
-		for ( Trip driverTrip : driverTrips ) {
-			for (Trip passengerTrip : passengerTrips ) {
-				if ( isInCorrectSequence( jointPlan , structure , driverTrip , passengerTrip ) ) {
-					matches.add(
-							new Match(
-								driverTrip,
-								passengerTrip,
-								calcMatchCost(
-									driverTrip,
-									passengerTrip )));
-				}
-			}
-		}
-	}
+  private void addMatches(
+      final List<Match> matches,
+      final JointPlan jointPlan,
+      final JointTravelStructure structure,
+      final List<Trip> driverTrips,
+      final List<Trip> passengerTrips) {
+    for (Trip driverTrip : driverTrips) {
+      for (Trip passengerTrip : passengerTrips) {
+        if (isInCorrectSequence(jointPlan, structure, driverTrip, passengerTrip)) {
+          matches.add(
+              new Match(driverTrip, passengerTrip, calcMatchCost(driverTrip, passengerTrip)));
+        }
+      }
+    }
+  }
 
-	private boolean acceptAgentMatch(
-			final Id driver,
-			final Id passenger ) {
-		if ( driver.equals( passenger ) ) return false;
-		if ( socialNetwork == null ) return true;
+  private boolean acceptAgentMatch(final Id driver, final Id passenger) {
+    if (driver.equals(passenger)) return false;
+    if (socialNetwork == null) return true;
 
-		final boolean passengerAlterOfDriver =
-			socialNetwork.getAlters( driver ).contains( passenger );
+    final boolean passengerAlterOfDriver = socialNetwork.getAlters(driver).contains(passenger);
 
-		if ( socialNetwork.isReflective() ) return passengerAlterOfDriver;
+    if (socialNetwork.isReflective()) return passengerAlterOfDriver;
 
-		return passengerAlterOfDriver || 
-			socialNetwork.getAlters( passenger ).contains( driver );
-	}
+    return passengerAlterOfDriver || socialNetwork.getAlters(passenger).contains(driver);
+  }
 
-	private static boolean isInCorrectSequence(
-			final JointPlan jointPlan,
-			final JointTravelStructure structure,
-			final Trip driverTrip,
-			final Trip passengerTrip) {
-		final List<JointTrip> jointTrips =
-				structure.getJointTripsForCotravelers(
-						driverTrip.agentId,
-						passengerTrip.agentId);
-		final int positionInDriverPlan = getPosition( jointPlan , jointTrips , driverTrip );
-		final int positionInPassengerPlan = getPosition( jointPlan , jointTrips , passengerTrip );
-		return positionInDriverPlan == positionInPassengerPlan;
-	}
+  private static boolean isInCorrectSequence(
+      final JointPlan jointPlan,
+      final JointTravelStructure structure,
+      final Trip driverTrip,
+      final Trip passengerTrip) {
+    final List<JointTrip> jointTrips =
+        structure.getJointTripsForCotravelers(driverTrip.agentId, passengerTrip.agentId);
+    final int positionInDriverPlan = getPosition(jointPlan, jointTrips, driverTrip);
+    final int positionInPassengerPlan = getPosition(jointPlan, jointTrips, passengerTrip);
+    return positionInDriverPlan == positionInPassengerPlan;
+  }
 
-	private static int getPosition(
-			final JointPlan jointPlan,
-			final List<JointTrip> jointTrips,
-			final Trip trip) {
-		final Plan plan = jointPlan.getIndividualPlan( trip.agentId );
+  private static int getPosition(
+      final JointPlan jointPlan, final List<JointTrip> jointTrips, final Trip trip) {
+    final Plan plan = jointPlan.getIndividualPlan(trip.agentId);
 
-		final int indexOfTrip = plan.getPlanElements().indexOf( trip.departure );
+    final int indexOfTrip = plan.getPlanElements().indexOf(trip.departure);
 
-		// count joint trips occuring before the candidate trip
-		int pos = 0;
-		for ( JointTrip jt : jointTrips ) {
-			final int indexOfJointTrip =
-				Math.max(
-						plan.getPlanElements().indexOf( jt.getPassengerLeg() ),
-						plan.getPlanElements().indexOf( jt.getDriverLegs().get( 0 ) ) );
-			assert indexOfJointTrip >= 0;
-			if ( indexOfJointTrip < indexOfTrip ) pos++;
-		}
+    // count joint trips occuring before the candidate trip
+    int pos = 0;
+    for (JointTrip jt : jointTrips) {
+      final int indexOfJointTrip =
+          Math.max(
+              plan.getPlanElements().indexOf(jt.getPassengerLeg()),
+              plan.getPlanElements().indexOf(jt.getDriverLegs().get(0)));
+      assert indexOfJointTrip >= 0;
+      if (indexOfJointTrip < indexOfTrip) pos++;
+    }
 
-		return pos;
-	}
+    return pos;
+  }
 
-	private double calcMatchCost(
-			final Trip driverTrip,
-			final Trip passengerTrip) {
-		final double timeDiff = Math.abs( driverTrip.departureTime - passengerTrip.departureTime );
-		final double detourDist = 
-			CoordUtils.calcEuclideanDistance( driverTrip.departure.getCoord() , passengerTrip.departure.getCoord() ) +
-			CoordUtils.calcEuclideanDistance( driverTrip.arrival.getCoord() , passengerTrip.arrival.getCoord() ) +
-			passengerTrip.length - driverTrip.length;
-			
-		return scale * (timeDiff + betaDetour * detourDist);
-	}
+  private double calcMatchCost(final Trip driverTrip, final Trip passengerTrip) {
+    final double timeDiff = Math.abs(driverTrip.departureTime - passengerTrip.departureTime);
+    final double detourDist =
+        CoordUtils.calcEuclideanDistance(
+                driverTrip.departure.getCoord(), passengerTrip.departure.getCoord())
+            + CoordUtils.calcEuclideanDistance(
+                driverTrip.arrival.getCoord(), passengerTrip.arrival.getCoord())
+            + passengerTrip.length
+            - driverTrip.length;
 
-	private Match chooseMatch(final List<Match> matches) {
-		final double[] thresholds = new double[ matches.size() ];
+    return scale * (timeDiff + betaDetour * detourDist);
+  }
 
-		double sum = 0;
-		int i=0;
-		for (Match match : matches) {
-			sum += Math.exp( -match.cost );
-			thresholds[i] = sum;
-			i++;
-		}
+  private Match chooseMatch(final List<Match> matches) {
+    final double[] thresholds = new double[matches.size()];
 
-		final double choice = random.nextDouble() * sum;
+    double sum = 0;
+    int i = 0;
+    for (Match match : matches) {
+      sum += Math.exp(-match.cost);
+      thresholds[i] = sum;
+      i++;
+    }
 
-		for (i=0; i < thresholds.length; i++) {
-			if (choice <= thresholds[i]) {
-				return matches.get( i );
-			}
-		}
+    final double choice = random.nextDouble() * sum;
 
-		throw new RuntimeException( "choice procedure failed! this should not happen! choice="+choice+" in thresholds="+Arrays.toString(thresholds) );
-	}
+    for (i = 0; i < thresholds.length; i++) {
+      if (choice <= thresholds[i]) {
+        return matches.get(i);
+      }
+    }
 
-	private static void insertMatch(
-			final JointPlan jointPlan,
-			final Match match) {
-		final Plan driverPlan = jointPlan.getIndividualPlans().get( match.tripDriver.agentId );
-		final Plan passengerPlan = jointPlan.getIndividualPlans().get( match.tripPassenger.agentId );
+    throw new RuntimeException(
+        "choice procedure failed! this should not happen! choice="
+            + choice
+            + " in thresholds="
+            + Arrays.toString(thresholds));
+  }
 
-		/* scope of driver-specific variables */ {
-			// insert in driver plan
-			final List<PlanElement> driverTrip = new ArrayList<PlanElement>();
-			driverTrip.add( PopulationUtils.createLeg(TransportMode.car) );
-			/* scope of firstAct */ {
-				final Activity firstAct = PopulationUtils.createActivityFromCoordAndLinkId(JointActingTypes.INTERACTION, match.tripPassenger.departure.getCoord(), match.tripPassenger.departure.getLinkId());
-				firstAct.setMaximumDuration( 0 );
-				driverTrip.add( firstAct );
-			}
-			/* scope of leg */ {
-				final Leg leg =  PopulationUtils.createLeg(JointActingTypes.DRIVER);
-				final DriverRoute dRoute = new DriverRoute(
-						match.tripPassenger.departure.getLinkId(),
-						match.tripPassenger.arrival.getLinkId());
-				dRoute.addPassenger( match.tripPassenger.agentId );
-				leg.setRoute( dRoute );
-				driverTrip.add( leg );
-			}
-			/* scope of secondAct */ {
-				final Activity secondAct = PopulationUtils.createActivityFromCoordAndLinkId(JointActingTypes.INTERACTION, match.tripPassenger.arrival.getCoord(), match.tripPassenger.arrival.getLinkId());
-				secondAct.setMaximumDuration( 0 );
-				driverTrip.add( secondAct );
-			}
-			driverTrip.add( PopulationUtils.createLeg(TransportMode.car) );
+  private static void insertMatch(final JointPlan jointPlan, final Match match) {
+    final Plan driverPlan = jointPlan.getIndividualPlans().get(match.tripDriver.agentId);
+    final Plan passengerPlan = jointPlan.getIndividualPlans().get(match.tripPassenger.agentId);
 
-			TripRouter.insertTrip(
-					driverPlan,
-					match.tripDriver.departure,
-					driverTrip,
-					match.tripDriver.arrival );
-		}
+    /* scope of driver-specific variables */ {
+      // insert in driver plan
+      final List<PlanElement> driverTrip = new ArrayList<PlanElement>();
+      driverTrip.add(PopulationUtils.createLeg(TransportMode.car));
+      /* scope of firstAct */ {
+        final Activity firstAct =
+            PopulationUtils.createActivityFromCoordAndLinkId(
+                JointActingTypes.INTERACTION,
+                match.tripPassenger.departure.getCoord(),
+                match.tripPassenger.departure.getLinkId());
+        firstAct.setMaximumDuration(0);
+        driverTrip.add(firstAct);
+      }
+      /* scope of leg */ {
+        final Leg leg = PopulationUtils.createLeg(JointActingTypes.DRIVER);
+        final DriverRoute dRoute =
+            new DriverRoute(
+                match.tripPassenger.departure.getLinkId(), match.tripPassenger.arrival.getLinkId());
+        dRoute.addPassenger(match.tripPassenger.agentId);
+        leg.setRoute(dRoute);
+        driverTrip.add(leg);
+      }
+      /* scope of secondAct */ {
+        final Activity secondAct =
+            PopulationUtils.createActivityFromCoordAndLinkId(
+                JointActingTypes.INTERACTION,
+                match.tripPassenger.arrival.getCoord(),
+                match.tripPassenger.arrival.getLinkId());
+        secondAct.setMaximumDuration(0);
+        driverTrip.add(secondAct);
+      }
+      driverTrip.add(PopulationUtils.createLeg(TransportMode.car));
 
-		/* scope of passenger-specific variables */ {
-			// insert in passenger plan
-			final Leg pLeg =  PopulationUtils.createLeg(JointActingTypes.PASSENGER);
-			final PassengerRoute pRoute = new PassengerRoute(
-					match.tripPassenger.departure.getLinkId(),
-					match.tripPassenger.arrival.getLinkId());
-			pRoute.setDriverId( match.tripDriver.agentId );
-			pLeg.setRoute( pRoute );
+      TripRouter.insertTrip(
+          driverPlan, match.tripDriver.departure, driverTrip, match.tripDriver.arrival);
+    }
 
+    /* scope of passenger-specific variables */ {
+      // insert in passenger plan
+      final Leg pLeg = PopulationUtils.createLeg(JointActingTypes.PASSENGER);
+      final PassengerRoute pRoute =
+          new PassengerRoute(
+              match.tripPassenger.departure.getLinkId(), match.tripPassenger.arrival.getLinkId());
+      pRoute.setDriverId(match.tripDriver.agentId);
+      pLeg.setRoute(pRoute);
 
-			TripRouter.insertTrip(
-					passengerPlan,
-					match.tripPassenger.departure,
-					Collections.singletonList( pLeg ),
-					match.tripPassenger.arrival );
-		}
-	}
+      TripRouter.insertTrip(
+          passengerPlan,
+          match.tripPassenger.departure,
+          Collections.singletonList(pLeg),
+          match.tripPassenger.arrival);
+    }
+  }
 
-	private static double calcEndOfActivity(
-			final Activity activity,
-			final Plan plan) {
-		if (activity.getEndTime().isDefined())
-			return activity.getEndTime().seconds();
+  private static double calcEndOfActivity(final Activity activity, final Plan plan) {
+    if (activity.getEndTime().isDefined()) return activity.getEndTime().seconds();
 
-		// no sufficient information in the activity...
-		// do it the long way.
-		// XXX This is inefficient! Using a cache for each plan may be an option
-		// (knowing that plan elements are iterated in proper sequence,
-		// no need to re-examine the parts of the plan already known)
-		double now = 0;
+    // no sufficient information in the activity...
+    // do it the long way.
+    // XXX This is inefficient! Using a cache for each plan may be an option
+    // (knowing that plan elements are iterated in proper sequence,
+    // no need to re-examine the parts of the plan already known)
+    double now = 0;
 
-		for (PlanElement pe : plan.getPlanElements()) {
-			now = updateNow( now , pe );
-			if (pe == activity) return now;
-		}
+    for (PlanElement pe : plan.getPlanElements()) {
+      now = updateNow(now, pe);
+      if (pe == activity) return now;
+    }
 
-		throw new RuntimeException( "activity "+activity+" not found in "+plan.getPlanElements() );
-	}
+    throw new RuntimeException("activity " + activity + " not found in " + plan.getPlanElements());
+  }
 
-	private static double updateNow(
-			final double now,
-			final PlanElement pe) {
-		if (pe instanceof Activity) {
-			Activity act = (Activity) pe;
-			OptionalTime startTime = act.getStartTime();
-			OptionalTime dur = act.getMaximumDuration();
-			if (act.getEndTime().isDefined()) {
-				// use fromAct.endTime as time for routing
-				return act.getEndTime().seconds();
-			}
-			else if (startTime.isDefined() && dur.isDefined()) {
-				// use fromAct.startTime + fromAct.duration as time for routing
-				return startTime.seconds() + dur.seconds();
-			}
-			else if (dur.isDefined()) {
-				// use last used time + fromAct.duration as time for routing
-				return now + dur.seconds();
-			}
-			else {
-				throw new RuntimeException("activity has neither end-time nor duration." + act);
-			}
-		}
-		return now + ((Leg) pe).getTravelTime().orElse(0);
+  private static double updateNow(final double now, final PlanElement pe) {
+    if (pe instanceof Activity) {
+      Activity act = (Activity) pe;
+      OptionalTime startTime = act.getStartTime();
+      OptionalTime dur = act.getMaximumDuration();
+      if (act.getEndTime().isDefined()) {
+        // use fromAct.endTime as time for routing
+        return act.getEndTime().seconds();
+      } else if (startTime.isDefined() && dur.isDefined()) {
+        // use fromAct.startTime + fromAct.duration as time for routing
+        return startTime.seconds() + dur.seconds();
+      } else if (dur.isDefined()) {
+        // use last used time + fromAct.duration as time for routing
+        return now + dur.seconds();
+      } else {
+        throw new RuntimeException("activity has neither end-time nor duration." + act);
+      }
+    }
+    return now + ((Leg) pe).getTravelTime().orElse(0);
+  }
 
-	}	
+  // /////////////////////////////////////////////////////////////////////////
+  // helper classes
+  // /////////////////////////////////////////////////////////////////////////
+  private static class ClassifiedTrips {
+    public final Map<Id<Person>, List<Trip>> carTrips = new HashMap<>();
+    public final Map<Id<Person>, List<Trip>> nonChainBasedModeTrips = new HashMap<>();
 
-	// /////////////////////////////////////////////////////////////////////////
-	// helper classes
-	// /////////////////////////////////////////////////////////////////////////
-	private static class ClassifiedTrips {
-		public final Map<Id<Person>, List<Trip>> carTrips = new HashMap< >();
-		public final Map<Id<Person>, List<Trip>> nonChainBasedModeTrips = new HashMap< >();
+    public void addCarTrip(final Trip t) {
+      MapUtils.getList(t.agentId, carTrips).add(t);
+    }
 
-		public void addCarTrip( final Trip t ) {
-			MapUtils.getList( t.agentId , carTrips ).add( t );
-		}
+    public void addNonChainBasedTrip(final Trip t) {
+      MapUtils.getList(t.agentId, nonChainBasedModeTrips).add(t);
+    }
+  }
 
-		public void addNonChainBasedTrip( final Trip t ) {
-			MapUtils.getList( t.agentId , nonChainBasedModeTrips ).add( t );
-		}
-	}
+  private static class Trip {
+    final Activity departure;
+    final Activity arrival;
+    final double departureTime;
+    final double length;
+    final Id<Person> agentId;
 
-	private static class Trip {
-		final Activity departure;
-		final Activity arrival;
-		final double departureTime;
-		final double length;
-		final Id<Person> agentId;
+    public Trip(
+        final Activity departure,
+        final Activity arrival,
+        final double departureTime,
+        final Id<Person> agentId) {
+      this.departure = departure;
+      this.arrival = arrival;
+      this.departureTime = departureTime;
+      this.length = CoordUtils.calcEuclideanDistance(departure.getCoord(), arrival.getCoord());
+      this.agentId = agentId;
+    }
+  }
 
-		public Trip(
-				final Activity departure,
-				final Activity arrival,
-				final double departureTime,
-				final Id<Person> agentId) {
-			this.departure = departure;
-			this.arrival = arrival;
-			this.departureTime = departureTime;
-			this.length = CoordUtils.calcEuclideanDistance( departure.getCoord() , arrival.getCoord() );
-			this.agentId = agentId;
-		}
-	}
+  /** a "record" class with all information relative to a match */
+  private static class Match {
+    final Trip tripDriver;
+    final Trip tripPassenger;
+    final double cost;
 
-	/**
-	 * a "record" class with all information relative to a match
-	 */
-	private static class Match {
-		final Trip tripDriver;
-		final Trip tripPassenger;
-		final double cost;
+    public Match(final Trip tripDriver, final Trip tripPassenger, final double cost) {
+      this.tripDriver = tripDriver;
+      this.tripPassenger = tripPassenger;
+      this.cost = cost;
+    }
 
-		public Match(
-				final Trip tripDriver,
-				final Trip tripPassenger,
-				final double cost) {
-			this.tripDriver = tripDriver;
-			this.tripPassenger = tripPassenger;
-			this.cost = cost;
-		}
-
-		public ActedUponInformation toInformation() {
-			return new ActedUponInformation(
-					tripDriver.agentId,
-					tripPassenger.agentId);
-		}
-	}
+    public ActedUponInformation toInformation() {
+      return new ActedUponInformation(tripDriver.agentId, tripPassenger.agentId);
+    }
+  }
 }
-

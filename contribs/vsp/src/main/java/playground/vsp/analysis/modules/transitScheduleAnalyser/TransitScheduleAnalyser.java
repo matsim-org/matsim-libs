@@ -20,44 +20,41 @@ package playground.vsp.analysis.modules.transitScheduleAnalyser;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * Analyzes a given transit schedule and prints some characteristics to file.
- * 
+ *
  * @author mkillat
  */
 public class TransitScheduleAnalyser extends AbstractAnalysisModule {
-	private TransitSchedule schedule;
-	private Network network;
+  private TransitSchedule schedule;
+  private Network network;
 
-	public TransitScheduleAnalyser(Scenario sc) {
-		super(TransitScheduleAnalyser.class.getSimpleName());
-		this.schedule = sc.getTransitSchedule();
-		this.network = sc.getNetwork();
-	}
+  public TransitScheduleAnalyser(Scenario sc) {
+    super(TransitScheduleAnalyser.class.getSimpleName());
+    this.schedule = sc.getTransitSchedule();
+    this.network = sc.getNetwork();
+  }
 
-	@Override
-	public List<EventHandler> getEventHandler() {
-		return new ArrayList<EventHandler>();
-	}
+  @Override
+  public List<EventHandler> getEventHandler() {
+    return new ArrayList<EventHandler>();
+  }
 
-	@Override
-	public void preProcessData() {	
-	}
+  @Override
+  public void preProcessData() {}
 
-	@Override
-	public void postProcessData() {	
-	}
+  @Override
+  public void postProcessData() {}
 
-	@Override
-	public void writeResults(String outputFolder) {
-		TransitScheduleAnalyserToCSVandTEX.transitScheduleAnalyser(this.schedule, this.network, outputFolder);
-	}
+  @Override
+  public void writeResults(String outputFolder) {
+    TransitScheduleAnalyserToCSVandTEX.transitScheduleAnalyser(
+        this.schedule, this.network, outputFolder);
+  }
 }

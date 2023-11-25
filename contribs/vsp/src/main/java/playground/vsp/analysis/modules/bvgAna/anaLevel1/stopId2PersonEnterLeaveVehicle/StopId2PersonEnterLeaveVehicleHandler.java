@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,90 +32,111 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
-
 import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 
 /**
- * Collects <code>PersonEntersVehicleEvent</code> and <code>PersonLeavesVehicleEventHandler</code> for each stop id.
+ * Collects <code>PersonEntersVehicleEvent</code> and <code>PersonLeavesVehicleEventHandler</code>
+ * for each stop id.
  *
  * @author ikaddoura, aneumann
- *
  */
-public class StopId2PersonEnterLeaveVehicleHandler implements VehicleArrivesAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
+public class StopId2PersonEnterLeaveVehicleHandler
+    implements VehicleArrivesAtFacilityEventHandler,
+        PersonEntersVehicleEventHandler,
+        PersonLeavesVehicleEventHandler {
 
-	private final Logger log = LogManager.getLogger(StopId2PersonEnterLeaveVehicleHandler.class);
-//	private final Level logLevel = Level.WARN;
-	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
-	
-	private Map<Id, Id> vehId2stopIdMap = new TreeMap<Id, Id>();
-	private Map<Id, List<PersonEntersVehicleEvent>> stopId2PersonEnterEventMap = new TreeMap<Id, List<PersonEntersVehicleEvent>>();
-	private Map<Id, List<PersonLeavesVehicleEvent>> stopId2PersonLeaveEventMap = new TreeMap<Id, List<PersonLeavesVehicleEvent>>();
+  private final Logger log = LogManager.getLogger(StopId2PersonEnterLeaveVehicleHandler.class);
+  //	private final Level logLevel = Level.WARN;
+  private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 
-	public StopId2PersonEnterLeaveVehicleHandler(PtDriverIdAnalyzer ptDriverPrefixAnalyzer) {
-//		this.log.setLevel(this.logLevel);
-		this.ptDriverIdAnalyzer = ptDriverPrefixAnalyzer;
-	}
+  private Map<Id, Id> vehId2stopIdMap = new TreeMap<Id, Id>();
+  private Map<Id, List<PersonEntersVehicleEvent>> stopId2PersonEnterEventMap =
+      new TreeMap<Id, List<PersonEntersVehicleEvent>>();
+  private Map<Id, List<PersonLeavesVehicleEvent>> stopId2PersonLeaveEventMap =
+      new TreeMap<Id, List<PersonLeavesVehicleEvent>>();
 
-	/**
-	 * @return A map containing all <code>PersonEntersVehicleEvent</code> sorted by stop id
-	 */
-	public Map<Id, List<PersonEntersVehicleEvent>> getStopId2PersonEnterEventMap() {
-		return this.stopId2PersonEnterEventMap;
-	}
+  public StopId2PersonEnterLeaveVehicleHandler(PtDriverIdAnalyzer ptDriverPrefixAnalyzer) {
+    //		this.log.setLevel(this.logLevel);
+    this.ptDriverIdAnalyzer = ptDriverPrefixAnalyzer;
+  }
 
-	/**
-	 * @return A map containing all <code>PersonLeavesVehicleEvent</code> sorted by stop id
-	 */
-	public Map<Id, List<PersonLeavesVehicleEvent>> getStopId2PersonLeaveEventMap() {
-		return this.stopId2PersonLeaveEventMap;
-	}
+  /**
+   * @return A map containing all <code>PersonEntersVehicleEvent</code> sorted by stop id
+   */
+  public Map<Id, List<PersonEntersVehicleEvent>> getStopId2PersonEnterEventMap() {
+    return this.stopId2PersonEnterEventMap;
+  }
 
-	@Override
-	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		this.vehId2stopIdMap.put(event.getVehicleId(), event.getFacilityId());
-	}
+  /**
+   * @return A map containing all <code>PersonLeavesVehicleEvent</code> sorted by stop id
+   */
+  public Map<Id, List<PersonLeavesVehicleEvent>> getStopId2PersonLeaveEventMap() {
+    return this.stopId2PersonLeaveEventMap;
+  }
 
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (this.ptDriverIdAnalyzer.isPtDriver(event.getPersonId())) {
-			// pt driver
-		} else {
-			if (this.vehId2stopIdMap.containsKey(event.getVehicleId())){
-				// entering a public vehicle
-				if(this.stopId2PersonEnterEventMap.get(this.vehId2stopIdMap.get(event.getVehicleId())) == null){
-					this.stopId2PersonEnterEventMap.put(this.vehId2stopIdMap.get(event.getVehicleId()), new ArrayList<PersonEntersVehicleEvent>());
-				}
-				this.stopId2PersonEnterEventMap.get(this.vehId2stopIdMap.get(event.getVehicleId())).add(event);
-				this.log.debug("Added event to stop " + this.vehId2stopIdMap.get(event.getVehicleId()) + " event " + event);
-				
-			} else {
-				// no public vehicle
-			}
-		}
-	}
+  @Override
+  public void handleEvent(VehicleArrivesAtFacilityEvent event) {
+    this.vehId2stopIdMap.put(event.getVehicleId(), event.getFacilityId());
+  }
 
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if (this.ptDriverIdAnalyzer.isPtDriver(event.getPersonId())) {
-			// pt driver
-		} else {
-			if (this.vehId2stopIdMap.containsKey(event.getVehicleId())){
-				// entering a public vehicle
-				if(this.stopId2PersonLeaveEventMap.get(this.vehId2stopIdMap.get(event.getVehicleId())) == null){
-					this.stopId2PersonLeaveEventMap.put(this.vehId2stopIdMap.get(event.getVehicleId()), new ArrayList<PersonLeavesVehicleEvent>());
-				}
-				this.stopId2PersonLeaveEventMap.get(this.vehId2stopIdMap.get(event.getVehicleId())).add(event);
-				this.log.debug("Added event to stop " + this.vehId2stopIdMap.get(event.getVehicleId()) + " event " + event);
-				
-			} else {
-				// no public vehicle
-			}
-		}
-	}
-	
-	@Override
-	public void reset(int iteration) {
-		this.log.debug("reset method in iteration " + iteration + " not implemented, yet");
-	}
+  @Override
+  public void handleEvent(PersonEntersVehicleEvent event) {
+    if (this.ptDriverIdAnalyzer.isPtDriver(event.getPersonId())) {
+      // pt driver
+    } else {
+      if (this.vehId2stopIdMap.containsKey(event.getVehicleId())) {
+        // entering a public vehicle
+        if (this.stopId2PersonEnterEventMap.get(this.vehId2stopIdMap.get(event.getVehicleId()))
+            == null) {
+          this.stopId2PersonEnterEventMap.put(
+              this.vehId2stopIdMap.get(event.getVehicleId()),
+              new ArrayList<PersonEntersVehicleEvent>());
+        }
+        this.stopId2PersonEnterEventMap
+            .get(this.vehId2stopIdMap.get(event.getVehicleId()))
+            .add(event);
+        this.log.debug(
+            "Added event to stop "
+                + this.vehId2stopIdMap.get(event.getVehicleId())
+                + " event "
+                + event);
 
+      } else {
+        // no public vehicle
+      }
+    }
+  }
+
+  @Override
+  public void handleEvent(PersonLeavesVehicleEvent event) {
+    if (this.ptDriverIdAnalyzer.isPtDriver(event.getPersonId())) {
+      // pt driver
+    } else {
+      if (this.vehId2stopIdMap.containsKey(event.getVehicleId())) {
+        // entering a public vehicle
+        if (this.stopId2PersonLeaveEventMap.get(this.vehId2stopIdMap.get(event.getVehicleId()))
+            == null) {
+          this.stopId2PersonLeaveEventMap.put(
+              this.vehId2stopIdMap.get(event.getVehicleId()),
+              new ArrayList<PersonLeavesVehicleEvent>());
+        }
+        this.stopId2PersonLeaveEventMap
+            .get(this.vehId2stopIdMap.get(event.getVehicleId()))
+            .add(event);
+        this.log.debug(
+            "Added event to stop "
+                + this.vehId2stopIdMap.get(event.getVehicleId())
+                + " event "
+                + event);
+
+      } else {
+        // no public vehicle
+      }
+    }
+  }
+
+  @Override
+  public void reset(int iteration) {
+    this.log.debug("reset method in iteration " + iteration + " not implemented, yet");
+  }
 }

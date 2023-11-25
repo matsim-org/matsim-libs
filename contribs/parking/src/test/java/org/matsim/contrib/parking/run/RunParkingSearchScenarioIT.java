@@ -17,9 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
+/** */
 package org.matsim.contrib.parking.run;
 
 import org.junit.Rule;
@@ -32,23 +30,22 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * @author  jbischoff
- *
+ * @author jbischoff
  */
 public class RunParkingSearchScenarioIT {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testRunParking() {
-		String configFile = "./src/main/resources/parkingsearch/config.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new ParkingSearchConfigGroup());
-		config.controller().setLastIteration(0);
-		config.controller().setOutputDirectory( utils.getOutputDirectory() );
+  @Test
+  public void testRunParking() {
+    String configFile = "./src/main/resources/parkingsearch/config.xml";
+    Config config = ConfigUtils.loadConfig(configFile, new ParkingSearchConfigGroup());
+    config.controller().setLastIteration(0);
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
 
-		ParkingSearchConfigGroup configGroup = (ParkingSearchConfigGroup) config.getModules().get(ParkingSearchConfigGroup.GROUP_NAME);
-		configGroup.setParkingSearchStrategy(ParkingSearchStrategy.Benenson);
+    ParkingSearchConfigGroup configGroup =
+        (ParkingSearchConfigGroup) config.getModules().get(ParkingSearchConfigGroup.GROUP_NAME);
+    configGroup.setParkingSearchStrategy(ParkingSearchStrategy.Benenson);
 
-		new RunParkingSearchExample().run(config,false);
-
-	}
+    new RunParkingSearchExample().run(config, false);
+  }
 }

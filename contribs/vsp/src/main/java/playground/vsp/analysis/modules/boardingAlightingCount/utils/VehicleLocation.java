@@ -24,28 +24,25 @@ import org.matsim.api.core.v01.Id;
 
 /**
  * @author droeder
- *
  */
 public class VehicleLocation {
 
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(VehicleLocation.class);
-	private Id id;
-	private Id locationId;
+  @SuppressWarnings("unused")
+  private static final Logger log = LogManager.getLogger(VehicleLocation.class);
 
-	public VehicleLocation(Id vehId) {
-		this.id = vehId;
-		this.locationId = null;
-	}
-	
-	public void setLocationId(Id id){
-		this.locationId = id;
-	}
-	
-	public Id getLocationId(){
-		return this.locationId;
-	}
-	
-	
+  private Id id;
+  private Id locationId;
+
+  public VehicleLocation(Id vehId) {
+    this.id = vehId;
+    this.locationId = null;
+  }
+
+  public void setLocationId(Id id) {
+    this.locationId = id;
+  }
+
+  public Id getLocationId() {
+    return this.locationId;
+  }
 }
-

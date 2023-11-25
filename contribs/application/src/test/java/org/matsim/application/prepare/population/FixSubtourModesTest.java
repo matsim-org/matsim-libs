@@ -1,5 +1,8 @@
 package org.matsim.application.prepare.population;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Collection;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -9,98 +12,97 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.facilities.ActivityFacility;
 
-import java.util.Collection;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class FixSubtourModesTest {
 
-	private FixSubtourModes algo = (FixSubtourModes) new FixSubtourModes().withArgs("--input=tmp", "--output=tmp");
-	private PopulationFactory fact = PopulationUtils.getFactory();
+  private FixSubtourModes algo =
+      (FixSubtourModes) new FixSubtourModes().withArgs("--input=tmp", "--output=tmp");
+  private PopulationFactory fact = PopulationUtils.getFactory();
 
-	@Test
-	public void unclosed() {
+  @Test
+  public void unclosed() {
 
-		Person person = fact.createPerson(Id.create("1000", Person.class));
-		final Plan plan = fact.createPlan();
+    Person person = fact.createPerson(Id.create("1000", Person.class));
+    final Plan plan = fact.createPlan();
 
-		plan.addActivity(fact.createActivityFromActivityFacilityId("home", Id.create(0, ActivityFacility.class)));
+    plan.addActivity(
+        fact.createActivityFromActivityFacilityId("home", Id.create(0, ActivityFacility.class)));
 
-		plan.addLeg(fact.createLeg("car"));
+    plan.addLeg(fact.createLeg("car"));
 
-		plan.addActivity(fact.createActivityFromActivityFacilityId("work", Id.create(1, ActivityFacility.class)));
+    plan.addActivity(
+        fact.createActivityFromActivityFacilityId("work", Id.create(1, ActivityFacility.class)));
 
-		plan.addLeg(fact.createLeg("pt"));
+    plan.addLeg(fact.createLeg("pt"));
 
-		plan.addActivity(fact.createActivityFromActivityFacilityId("leisure", Id.create(2, ActivityFacility.class)));
+    plan.addActivity(
+        fact.createActivityFromActivityFacilityId("leisure", Id.create(2, ActivityFacility.class)));
 
+    Collection<TripStructureUtils.Subtour> tours = TripStructureUtils.getSubtours(plan);
 
-		Collection<TripStructureUtils.Subtour> tours = TripStructureUtils.getSubtours(plan);
+    assertThat(tours.stream().anyMatch(st -> algo.fixSubtour(person, st))).isTrue();
+  }
 
-		assertThat(tours.stream().anyMatch(st -> algo.fixSubtour(person, st)))
-				.isTrue();
+  @Test
+  public void complex() {
 
-	}
+    Person person = fact.createPerson(Id.create("1000", Person.class));
+    final Plan plan = fact.createPlan();
 
-	@Test
-	public void complex() {
+    plan.addActivity(
+        fact.createActivityFromActivityFacilityId("home", Id.create(0, ActivityFacility.class)));
 
-		Person person = fact.createPerson(Id.create("1000", Person.class));
-		final Plan plan = fact.createPlan();
+    plan.addLeg(fact.createLeg("car"));
+    plan.addActivity(
+        fact.createActivityFromActivityFacilityId("work", Id.create(1, ActivityFacility.class)));
 
-		plan.addActivity(fact.createActivityFromActivityFacilityId("home", Id.create(0, ActivityFacility.class)));
+    plan.addLeg(fact.createLeg("car"));
+    plan.addActivity(
+        fact.createActivityFromActivityFacilityId("home", Id.create(0, ActivityFacility.class)));
 
-		plan.addLeg(fact.createLeg("car"));
-		plan.addActivity(fact.createActivityFromActivityFacilityId("work", Id.create(1, ActivityFacility.class)));
+    plan.addLeg(fact.createLeg("pt"));
+    plan.addActivity(
+        fact.createActivityFromActivityFacilityId("leisure", Id.create(2, ActivityFacility.class)));
 
-		plan.addLeg(fact.createLeg("car"));
-		plan.addActivity(fact.createActivityFromActivityFacilityId("home", Id.create(0, ActivityFacility.class)));
+    plan.addLeg(fact.createLeg("car"));
+    plan.addActivity(
+        fact.createActivityFromActivityFacilityId("shop", Id.create(3, ActivityFacility.class)));
 
-		plan.addLeg(fact.createLeg("pt"));
-		plan.addActivity(fact.createActivityFromActivityFacilityId("leisure", Id.create(2, ActivityFacility.class)));
+    Collection<TripStructureUtils.Subtour> tours = TripStructureUtils.getSubtours(plan);
 
-		plan.addLeg(fact.createLeg("car"));
-		plan.addActivity(fact.createActivityFromActivityFacilityId("shop", Id.create(3, ActivityFacility.class)));
+    assertThat(tours.stream().anyMatch(st -> algo.fixSubtour(person, st))).isTrue();
+  }
 
+  @Test
+  public void correct() {
 
-		Collection<TripStructureUtils.Subtour> tours = TripStructureUtils.getSubtours(plan);
+    Person person = fact.createPerson(Id.create("1000", Person.class));
+    final Plan plan = fact.createPlan();
 
-		assertThat(tours.stream().anyMatch(st -> algo.fixSubtour(person, st)))
-				.isTrue();
+    plan.addActivity(
+        fact.createActivityFromActivityFacilityId("home", Id.create(0, ActivityFacility.class)));
 
-	}
+    plan.addLeg(fact.createLeg("car"));
+    plan.addActivity(
+        fact.createActivityFromActivityFacilityId("work", Id.create(1, ActivityFacility.class)));
 
+    plan.addLeg(fact.createLeg("car"));
+    plan.addActivity(
+        fact.createActivityFromActivityFacilityId("home", Id.create(0, ActivityFacility.class)));
 
-	@Test
-	public void correct() {
+    Collection<TripStructureUtils.Subtour> tours = TripStructureUtils.getSubtours(plan);
 
-		Person person = fact.createPerson(Id.create("1000", Person.class));
-		final Plan plan = fact.createPlan();
+    assertThat(tours.stream().noneMatch(st -> algo.fixSubtour(person, st))).isTrue();
 
-		plan.addActivity(fact.createActivityFromActivityFacilityId("home", Id.create(0, ActivityFacility.class)));
+    plan.addLeg(fact.createLeg("pt"));
+    plan.addActivity(
+        fact.createActivityFromActivityFacilityId("shop", Id.create(2, ActivityFacility.class)));
 
-		plan.addLeg(fact.createLeg("car"));
-		plan.addActivity(fact.createActivityFromActivityFacilityId("work", Id.create(1, ActivityFacility.class)));
+    plan.addLeg(fact.createLeg("ride"));
+    plan.addActivity(
+        fact.createActivityFromActivityFacilityId("home", Id.create(3, ActivityFacility.class)));
 
-		plan.addLeg(fact.createLeg("car"));
-		plan.addActivity(fact.createActivityFromActivityFacilityId("home", Id.create(0, ActivityFacility.class)));
+    tours = TripStructureUtils.getSubtours(plan);
 
-		Collection<TripStructureUtils.Subtour> tours = TripStructureUtils.getSubtours(plan);
-
-		assertThat(tours.stream().noneMatch(st -> algo.fixSubtour(person, st)))
-				.isTrue();
-
-		plan.addLeg(fact.createLeg("pt"));
-		plan.addActivity(fact.createActivityFromActivityFacilityId("shop", Id.create(2, ActivityFacility.class)));
-
-		plan.addLeg(fact.createLeg("ride"));
-		plan.addActivity(fact.createActivityFromActivityFacilityId("home", Id.create(3, ActivityFacility.class)));
-
-		tours = TripStructureUtils.getSubtours(plan);
-
-		assertThat(tours.stream().noneMatch(st -> algo.fixSubtour(person, st)))
-				.isTrue();
-
-	}
-
+    assertThat(tours.stream().noneMatch(st -> algo.fixSubtour(person, st))).isTrue();
+  }
 }

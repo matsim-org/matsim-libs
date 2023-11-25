@@ -25,59 +25,59 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 public final class EvConfigGroup extends ReflectiveConfigGroup {
-	public static final String GROUP_NAME = "ev";
+  public static final String GROUP_NAME = "ev";
 
-	@SuppressWarnings("deprecation")
-	public static EvConfigGroup get(Config config) {
-		return (EvConfigGroup)config.getModule(GROUP_NAME);
-	}
+  @SuppressWarnings("deprecation")
+  public static EvConfigGroup get(Config config) {
+    return (EvConfigGroup) config.getModule(GROUP_NAME);
+  }
 
-	@Parameter
-	@Comment("charging will be simulated every 'chargeTimeStep'-th time step")
-	// no need to simulate with 1-second time step
-	@Positive
-	public int chargeTimeStep = 15; // 15 s ==> 0.417% SOC when charging at 1C (i.e. full recharge in 1 hour)
+  @Parameter
+  @Comment("charging will be simulated every 'chargeTimeStep'-th time step")
+  // no need to simulate with 1-second time step
+  @Positive
+  public int chargeTimeStep =
+      15; // 15 s ==> 0.417% SOC when charging at 1C (i.e. full recharge in 1 hour)
 
-	@Parameter
-	@Comment("AUX discharging will be simulated every 'auxDischargeTimeStep'-th time step")
-	// only used if SeparateAuxDischargingHandler is used, otherwise ignored
-	@Positive
-	public int auxDischargeTimeStep = 60; // 1 min
+  @Parameter
+  @Comment("AUX discharging will be simulated every 'auxDischargeTimeStep'-th time step")
+  // only used if SeparateAuxDischargingHandler is used, otherwise ignored
+  @Positive
+  public int auxDischargeTimeStep = 60; // 1 min
 
-	@Parameter("minChargingTime")
-	@Comment("Minimum activity duration for charging. Used in EvNetwork Routing.")
-	public int minimumChargeTime = 1200;
+  @Parameter("minChargingTime")
+  @Comment("Minimum activity duration for charging. Used in EvNetwork Routing.")
+  public int minimumChargeTime = 1200;
 
-	@Parameter
-	@Comment("Location of the chargers file")
-	@NotNull
-	public String chargersFile = null;
+  @Parameter
+  @Comment("Location of the chargers file")
+  @NotNull
+  public String chargersFile = null;
 
-	/**
-	 * @deprecated -- please avoid booleans in config.  Change to enum.  kai, apr'23
-	 */
-	// output
-	@Parameter
-	@Comment("If true, charge/SoC time profile plots will be created")
-	public boolean timeProfiles = false;
+  /**
+   * @deprecated -- please avoid booleans in config. Change to enum. kai, apr'23
+   */
+  // output
+  @Parameter
+  @Comment("If true, charge/SoC time profile plots will be created")
+  public boolean timeProfiles = false;
 
-	@Parameter
-	@Comment("Number of individual time profiles to be created")
-	@Positive
-	public int numberOfIndividualTimeProfiles = 50;
+  @Parameter
+  @Comment("Number of individual time profiles to be created")
+  @Positive
+  public int numberOfIndividualTimeProfiles = 50;
 
-	/**
-	 * @deprecated -- please avoid booleans in config.  Change to enum.  kai, apr'23
-	 */
-	@Parameter
-	@Comment("determines whether the resulting SoC at the end of the iteration X is set to be the initial SoC"
-			+ "in iteration X+1 for each EV."
-			+ " If set to true, bear in mind that EV might start with 0% battery charge.")
-	public boolean transferFinalSoCToNextIteration = false;
+  /**
+   * @deprecated -- please avoid booleans in config. Change to enum. kai, apr'23
+   */
+  @Parameter
+  @Comment(
+      "determines whether the resulting SoC at the end of the iteration X is set to be the initial SoC"
+          + "in iteration X+1 for each EV."
+          + " If set to true, bear in mind that EV might start with 0% battery charge.")
+  public boolean transferFinalSoCToNextIteration = false;
 
-	public EvConfigGroup() {
-		super(GROUP_NAME);
-	}
+  public EvConfigGroup() {
+    super(GROUP_NAME);
+  }
 }
-
-

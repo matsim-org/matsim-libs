@@ -6,5 +6,5 @@ import org.matsim.facilities.Facility;
 
 public interface MultimodalLinkChooser {
 
-    public Link decideOnLink( final Facility facility, final Network network );
+  public Link decideOnLink(final Facility facility, final Network network);
 }

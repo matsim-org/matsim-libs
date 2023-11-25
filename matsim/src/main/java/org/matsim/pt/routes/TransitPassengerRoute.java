@@ -28,13 +28,13 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public interface TransitPassengerRoute extends Route {
-	Id<TransitStopFacility> getAccessStopId();
+  Id<TransitStopFacility> getAccessStopId();
 
-	Id<TransitStopFacility> getEgressStopId();
+  Id<TransitStopFacility> getEgressStopId();
 
-	Id<TransitLine> getLineId();
+  Id<TransitLine> getLineId();
 
-	Id<TransitRoute> getRouteId();
+  Id<TransitRoute> getRouteId();
 
-	OptionalTime getBoardingTime();
+  OptionalTime getBoardingTime();
 }

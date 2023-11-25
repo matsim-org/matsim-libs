@@ -24,5 +24,5 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.core.events.handler.EventHandler;
 
 public interface PersonMoneyEventHandler extends EventHandler {
-	public void handleEvent (PersonMoneyEvent event);
+  public void handleEvent(PersonMoneyEvent event);
 }

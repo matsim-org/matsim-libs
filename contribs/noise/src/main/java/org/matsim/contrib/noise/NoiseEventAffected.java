@@ -17,81 +17,81 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
+/** */
 package org.matsim.contrib.noise;
 
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 
-import java.util.Map;
-
 /**
  * @author lkroeger, ikaddoura
- *
  */
-
 public final class NoiseEventAffected extends Event {
 
-	public final static String EVENT_TYPE = "noiseEventAffected";
-	
-	public final static String ATTRIBUTE_TIME_BIN = "timeBinEndTime";
-	public final static String ATTRIBUTE_AGENT_ID = "affectedAgentId";
-	public final static String ATTRIBUTE_AMOUNT_DOUBLE = "amount";
-	public final static String ATTRIBUTE_RECEIVERPOINT_ID = "receiverPointId";
-	public final static String ATTRIBUTE_ACTIVTITY_TYPE = "activityType";
-	
-	private final double timeBinEndTime;
-	private final Id<Person> affectedAgentId;
-	private final double amount;
-	private final Id<ReceiverPoint> receiverPointId;
-	private final String actType;
-	
-	public NoiseEventAffected(double time, double timeBinEndTime, Id<Person> affectedAgentId , double amount , Id<ReceiverPoint> receiverPointId , String actType) {
-		super(time);
-		this.timeBinEndTime = timeBinEndTime;
-		this.affectedAgentId = affectedAgentId;
-		this.amount = amount;
-		this.receiverPointId = receiverPointId;
-		this.actType = actType;
-	}
-	
-	public Id<ReceiverPoint> getrReceiverPointId() {
-		return receiverPointId;
-	}
-	
-	public Id<Person> getAffectedAgentId() {
-		return affectedAgentId;
-	}
-	
-	public double getAmount() {
-		return amount;
-	}
-		
-	public String getActType() {
-		return actType;
-	}
-	
-	public double getTimeBinEndTime() {
-		return timeBinEndTime;
-	}
+  public static final String EVENT_TYPE = "noiseEventAffected";
 
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
-	
-	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attrs = super.getAttributes();
-		attrs.put(ATTRIBUTE_TIME_BIN, Double.toString(this.timeBinEndTime));
-		attrs.put(ATTRIBUTE_AGENT_ID, this.affectedAgentId.toString());
-		attrs.put(ATTRIBUTE_AMOUNT_DOUBLE, Double.toString(this.amount));
-		attrs.put(ATTRIBUTE_RECEIVERPOINT_ID , this.receiverPointId.toString());
-		attrs.put(ATTRIBUTE_ACTIVTITY_TYPE , this.actType.toString());
-		return attrs;
-	}
-	
+  public static final String ATTRIBUTE_TIME_BIN = "timeBinEndTime";
+  public static final String ATTRIBUTE_AGENT_ID = "affectedAgentId";
+  public static final String ATTRIBUTE_AMOUNT_DOUBLE = "amount";
+  public static final String ATTRIBUTE_RECEIVERPOINT_ID = "receiverPointId";
+  public static final String ATTRIBUTE_ACTIVTITY_TYPE = "activityType";
+
+  private final double timeBinEndTime;
+  private final Id<Person> affectedAgentId;
+  private final double amount;
+  private final Id<ReceiverPoint> receiverPointId;
+  private final String actType;
+
+  public NoiseEventAffected(
+      double time,
+      double timeBinEndTime,
+      Id<Person> affectedAgentId,
+      double amount,
+      Id<ReceiverPoint> receiverPointId,
+      String actType) {
+    super(time);
+    this.timeBinEndTime = timeBinEndTime;
+    this.affectedAgentId = affectedAgentId;
+    this.amount = amount;
+    this.receiverPointId = receiverPointId;
+    this.actType = actType;
+  }
+
+  public Id<ReceiverPoint> getrReceiverPointId() {
+    return receiverPointId;
+  }
+
+  public Id<Person> getAffectedAgentId() {
+    return affectedAgentId;
+  }
+
+  public double getAmount() {
+    return amount;
+  }
+
+  public String getActType() {
+    return actType;
+  }
+
+  public double getTimeBinEndTime() {
+    return timeBinEndTime;
+  }
+
+  @Override
+  public String getEventType() {
+    return EVENT_TYPE;
+  }
+
+  @Override
+  public Map<String, String> getAttributes() {
+    Map<String, String> attrs = super.getAttributes();
+    attrs.put(ATTRIBUTE_TIME_BIN, Double.toString(this.timeBinEndTime));
+    attrs.put(ATTRIBUTE_AGENT_ID, this.affectedAgentId.toString());
+    attrs.put(ATTRIBUTE_AMOUNT_DOUBLE, Double.toString(this.amount));
+    attrs.put(ATTRIBUTE_RECEIVERPOINT_ID, this.receiverPointId.toString());
+    attrs.put(ATTRIBUTE_ACTIVTITY_TYPE, this.actType.toString());
+    return attrs;
+  }
 }

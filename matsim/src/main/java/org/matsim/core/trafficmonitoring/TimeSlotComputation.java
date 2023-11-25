@@ -20,18 +20,17 @@
 
 package org.matsim.core.trafficmonitoring;
 
-final class TimeSlotComputation{
+final class TimeSlotComputation {
 
-	private final double travelTimeBinSize;
-	private final int numSlots;
+  private final double travelTimeBinSize;
+  private final int numSlots;
 
-	 TimeSlotComputation( final int numSlots, final double travelTimeBinSize ) {
-		this.numSlots = numSlots;
-		this.travelTimeBinSize = travelTimeBinSize;
-	}
+  TimeSlotComputation(final int numSlots, final double travelTimeBinSize) {
+    this.numSlots = numSlots;
+    this.travelTimeBinSize = travelTimeBinSize;
+  }
 
-	 int getTimeSlotIndex(final double time) {
-	    return TimeBinUtils.getTimeBinIndex(time, travelTimeBinSize, numSlots);
-	}
-
- }
+  int getTimeSlotIndex(final double time) {
+    return TimeBinUtils.getTimeBinIndex(time, travelTimeBinSize, numSlots);
+  }
+}

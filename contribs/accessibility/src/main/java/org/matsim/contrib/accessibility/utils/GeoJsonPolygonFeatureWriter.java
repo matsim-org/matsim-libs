@@ -1,197 +1,205 @@
 package org.matsim.contrib.accessibility.utils;
 
+import java.util.*;
 import org.json.simple.JSONValue;
 import org.matsim.api.core.v01.Coord;
 
-import java.util.*;
-
 public class GeoJsonPolygonFeatureWriter {
 
-    private BoundingBox boundingBox;
-    private List<AccessibilityPoi> accessibilityPoiList = new ArrayList<>();
+  private BoundingBox boundingBox;
+  private List<AccessibilityPoi> accessibilityPoiList = new ArrayList<>();
 
-    GeoJsonPolygonFeatureWriter(BoundingBox boundingBox) {
+  GeoJsonPolygonFeatureWriter(BoundingBox boundingBox) {
 
-        this.boundingBox = boundingBox;
+    this.boundingBox = boundingBox;
+  }
+
+  public void setAccessibilityPoiList(List<AccessibilityPoi> accessibilityPoiList) {
+    this.accessibilityPoiList = accessibilityPoiList;
+  }
+
+  public void addPoiData(AccessibilityPoi accessibilityPoi) {
+
+    this.accessibilityPoiList.add(accessibilityPoi);
+  }
+
+  public String asGeoJson() {
+
+    List<Map<String, Object>> featuresList = parseFeatureList();
+
+    Map<String, Object> featureCollectionMap = new LinkedHashMap<>();
+    featureCollectionMap.put("type", "FeatureCollection");
+    featureCollectionMap.put("totalFeatures", featuresList.size());
+    featureCollectionMap.put("features", featuresList);
+    featureCollectionMap.put("crs", parseCRS());
+    featureCollectionMap.put("bbox", boundingBox.getBoundingBox());
+    return JSONValue.toJSONString(featureCollectionMap);
+  }
+
+  private List<Map<String, Object>> parseFeatureList() {
+
+    List<Map<String, Object>> featuresList = new ArrayList<>();
+    for (AccessibilityPoi poi : accessibilityPoiList) {
+
+      List<List<List<Double>>> coordinatesList = new ArrayList<>();
+      coordinatesList.add(poi.getGeometry().getCoordinates());
+
+      Map<String, Object> geometryMap = new LinkedHashMap<>();
+      geometryMap.put("type", "Polygon");
+      geometryMap.put("coordinates", coordinatesList);
+
+      Map<String, Object> propertiesMap = new LinkedHashMap<>();
+      propertiesMap.put("properties", poi.getProperties().getProperties());
+
+      Map<String, Object> featureMap = new LinkedHashMap<>();
+      featureMap.put("type", poi.getTYPE());
+      featureMap.put("id", poi.getId());
+      featureMap.put("geometry", geometryMap);
+      featureMap.put("geometry_name", poi.getGEOMETRY_NAME());
+      featureMap.put("properties", propertiesMap);
+      featuresList.add(featureMap);
+    }
+    return featuresList;
+  }
+
+  private Map<String, Object> parseCRS() {
+
+    Map<String, Object> properties = new LinkedHashMap<>();
+    properties.put("name", "urn:ogc:def:crs:EPSG::4326");
+
+    Map<String, Object> crs = new LinkedHashMap<>();
+    crs.put("type", "name");
+    crs.put("properties", properties);
+
+    return crs;
+  }
+
+  public static class AccessibilityPoi {
+
+    private String TYPE = "Feature";
+    private String id;
+    private Geometry geometry;
+    private final String GEOMETRY_NAME = "the_geom";
+    private Properties properties;
+
+    public AccessibilityPoi(String id, Geometry geometry, Properties properties) {
+      this.id = id;
+      this.geometry = geometry;
+      this.properties = properties;
     }
 
-    public void setAccessibilityPoiList(List<AccessibilityPoi> accessibilityPoiList) {
-        this.accessibilityPoiList = accessibilityPoiList;
+    String getTYPE() {
+      return TYPE;
     }
 
-    public void addPoiData(AccessibilityPoi accessibilityPoi) {
-
-        this.accessibilityPoiList.add(accessibilityPoi);
+    String getId() {
+      return id;
     }
 
-    public String asGeoJson() {
-
-        List<Map<String, Object>> featuresList = parseFeatureList();
-
-        Map<String, Object> featureCollectionMap = new LinkedHashMap<>();
-        featureCollectionMap.put("type", "FeatureCollection");
-        featureCollectionMap.put("totalFeatures", featuresList.size());
-        featureCollectionMap.put("features", featuresList);
-        featureCollectionMap.put("crs", parseCRS());
-        featureCollectionMap.put("bbox", boundingBox.getBoundingBox());
-        return JSONValue.toJSONString(featureCollectionMap);
+    Geometry getGeometry() {
+      return geometry;
     }
 
-    private List<Map<String, Object>> parseFeatureList() {
-
-        List<Map<String, Object>> featuresList = new ArrayList<>();
-        for (AccessibilityPoi poi : accessibilityPoiList) {
-
-            List<List<List<Double>>> coordinatesList = new ArrayList<>();
-            coordinatesList.add(poi.getGeometry().getCoordinates());
-
-            Map<String, Object> geometryMap = new LinkedHashMap<>();
-            geometryMap.put("type", "Polygon");
-            geometryMap.put("coordinates", coordinatesList);
-
-            Map<String, Object> propertiesMap = new LinkedHashMap<>();
-            propertiesMap.put("properties", poi.getProperties().getProperties());
-
-            Map<String, Object> featureMap = new LinkedHashMap<>();
-            featureMap.put("type", poi.getTYPE());
-            featureMap.put("id", poi.getId());
-            featureMap.put("geometry", geometryMap);
-            featureMap.put("geometry_name", poi.getGEOMETRY_NAME());
-            featureMap.put("properties", propertiesMap);
-            featuresList.add(featureMap);
-        }
-        return featuresList;
+    String getGEOMETRY_NAME() {
+      return GEOMETRY_NAME;
     }
 
-    private Map<String, Object> parseCRS() {
+    Properties getProperties() {
+      return properties;
+    }
+  }
 
-        Map<String, Object> properties = new LinkedHashMap<>();
-        properties.put("name", "urn:ogc:def:crs:EPSG::4326");
+  public static class Geometry {
 
-        Map<String, Object> crs = new LinkedHashMap<>();
-        crs.put("type", "name");
-        crs.put("properties", properties);
+    private String type;
+    private List<Coord> coordinates;
 
-        return crs;
+    public Geometry(String type, List<Coord> coordinates) {
+
+      this.type = type;
+      this.coordinates = coordinates;
     }
 
-    static public class AccessibilityPoi {
-
-        private String TYPE = "Feature";
-        private String id;
-        private Geometry geometry;
-        private final String GEOMETRY_NAME = "the_geom";
-        private Properties properties;
-
-        public AccessibilityPoi(String id, Geometry geometry, Properties properties) {
-            this.id = id;
-            this.geometry = geometry;
-            this.properties = properties;
-        }
-
-        String getTYPE() {
-            return TYPE;
-        }
-
-        String getId() {
-            return id;
-        }
-
-        Geometry getGeometry() {
-            return geometry;
-        }
-
-        String getGEOMETRY_NAME() {
-            return GEOMETRY_NAME;
-        }
-
-        Properties getProperties() {
-            return properties;
-        }
+    String getType() {
+      return type;
     }
 
-    static public class Geometry {
+    List<List<Double>> getCoordinates() {
 
-        private String type;
-        private List<Coord> coordinates;
+      List<List<Double>> result = new ArrayList<>();
+      for (Coord coord : coordinates) {
 
-        public Geometry(String type, List<Coord> coordinates) {
+        result.add(Arrays.asList(coord.getX(), coord.getY()));
+      }
+      return result;
+    }
+  }
 
-            this.type = type;
-            this.coordinates = coordinates;
-        }
+  public static class Properties {
 
-        String getType() {
-            return type;
-        }
+    private String id;
+    private int time;
+    private double freespeed;
+    private double car;
+    private double walk;
+    private double bike;
+    private double pt;
+    private double matrixBasedPt;
+    private BoundingBox bbox;
 
-        List<List<Double>> getCoordinates() {
-
-            List<List<Double>> result = new ArrayList<>();
-            for (Coord coord : coordinates) {
-
-                result.add(Arrays.asList(coord.getX(), coord.getY()));
-            }
-            return result;
-        }
+    public Properties(
+        String id,
+        int time,
+        double freespeed,
+        double car,
+        double walk,
+        double bike,
+        double pt,
+        double matrixBasedPt,
+        BoundingBox bbox) {
+      this.id = id;
+      this.time = time;
+      this.freespeed = freespeed;
+      this.car = car;
+      this.walk = walk;
+      this.bike = bike;
+      this.pt = pt;
+      this.matrixBasedPt = matrixBasedPt;
+      this.bbox = bbox;
     }
 
-    static public class Properties {
+    Map<String, Object> getProperties() {
 
-        private String id;
-        private int time;
-        private double freespeed;
-        private double car;
-        private double walk;
-        private double bike;
-        private double pt;
-        private double matrixBasedPt;
-        private BoundingBox bbox;
+      Map<String, Object> result = new LinkedHashMap<>();
+      result.put("id", id);
+      result.put("time", time);
+      result.put("freespeed", freespeed);
+      result.put("car", car);
+      result.put("walk", walk);
+      result.put("bike", bike);
+      result.put("pt", pt);
+      result.put("matrixBasedPt", matrixBasedPt);
+      result.put("bbox", bbox.getBoundingBox());
+      return result;
+    }
+  }
 
-        public Properties(String id, int time, double freespeed, double car, double walk, double bike, double pt, double matrixBasedPt, BoundingBox bbox) {
-            this.id = id;
-            this.time = time;
-            this.freespeed = freespeed;
-            this.car = car;
-            this.walk = walk;
-            this.bike = bike;
-            this.pt = pt;
-            this.matrixBasedPt = matrixBasedPt;
-            this.bbox = bbox;
-        }
+  public static class BoundingBox {
 
-        Map<String, Object> getProperties() {
+    private double minX;
+    private double minY;
+    private double maxX;
+    private double maxY;
 
-            Map<String, Object> result = new LinkedHashMap<>();
-            result.put("id", id);
-            result.put("time", time);
-            result.put("freespeed", freespeed);
-            result.put("car", car);
-            result.put("walk", walk);
-            result.put("bike", bike);
-            result.put("pt", pt);
-            result.put("matrixBasedPt", matrixBasedPt);
-            result.put("bbox", bbox.getBoundingBox());
-            return result;
-        }
+    public BoundingBox(double minX, double minY, double maxX, double maxY) {
+      this.minX = minX;
+      this.minY = minY;
+      this.maxX = maxX;
+      this.maxY = maxY;
     }
 
-    static public class BoundingBox {
-
-        private double minX;
-        private double minY;
-        private double maxX;
-        private double maxY;
-
-        public BoundingBox(double minX, double minY, double maxX, double maxY) {
-            this.minX = minX;
-            this.minY = minY;
-            this.maxX = maxX;
-            this.maxY = maxY;
-        }
-
-        List<Double> getBoundingBox() {
-            return Arrays.asList(minX, minY, maxX, maxY);
-        }
+    List<Double> getBoundingBox() {
+      return Arrays.asList(minX, minY, maxX, maxY);
     }
+  }
 }

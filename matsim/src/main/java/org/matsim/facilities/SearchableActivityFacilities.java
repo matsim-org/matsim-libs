@@ -19,17 +19,14 @@
 package org.matsim.facilities;
 
 import java.util.Collection;
-
 import org.matsim.api.core.v01.Coord;
 
 /**
  * @author nagel
- *
  */
 public interface SearchableActivityFacilities {
 
-	ActivityFacility getNearestFacility(Coord coord);
+  ActivityFacility getNearestFacility(Coord coord);
 
-	Collection<ActivityFacility> getNearestFacilities(Coord coord, double distance);
-
+  Collection<ActivityFacility> getNearestFacilities(Coord coord, double distance);
 }

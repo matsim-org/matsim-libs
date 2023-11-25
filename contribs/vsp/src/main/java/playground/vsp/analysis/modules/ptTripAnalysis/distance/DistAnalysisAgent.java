@@ -20,67 +20,64 @@
 package playground.vsp.analysis.modules.ptTripAnalysis.distance;
 
 import java.util.LinkedList;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
-
 import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTrip;
 
 /**
  * @author droeder
- *
  */
 public class DistAnalysisAgent {
-	
-	private LinkedList<AbstractAnalysisTrip> trips;
-	private Id<Person> id;
-	
-	public DistAnalysisAgent(LinkedList<AbstractAnalysisTrip> linkedList, Id<Person> id){
-		this.trips = linkedList;
-		this.id = id;
-	}
-	
-	/**
-	 * returns true true if the trip is finished
-	 * @param e
-	 * @return
-	 */
-	public boolean processAgentEvent(Event e) {
-		((DistAnalysisTrip) this.trips.getFirst()).processAgentEvent(e);
-		return ((DistAnalysisTrip) this.trips.getFirst()).isFinished();
-	}
 
-	public void processLinkEnterEvent(double length) {
-		((DistAnalysisTrip) this.trips.getFirst()).processLinkEnterEvent(length);
-	}
-	
-	public void passedLinkInPt(double length) {
-		((DistAnalysisTrip) this.trips.getFirst()).passedLinkInPt(length);
-	}
+  private LinkedList<AbstractAnalysisTrip> trips;
+  private Id<Person> id;
 
-	public Id<Person> getId(){
-		return this.id;
-	}
-	
-	@Override
-	public boolean equals(final Object other){
-		if(!(other instanceof DistAnalysisAgent)){
-			return false;
-		}else{
-			if(((DistAnalysisAgent) other).getId().equals(this.id)){
-				return true;
-			}else{
-				return false;
-			}
-		}
-	}
+  public DistAnalysisAgent(LinkedList<AbstractAnalysisTrip> linkedList, Id<Person> id) {
+    this.trips = linkedList;
+    this.id = id;
+  }
 
-	/**
-	 * @return
-	 */
-	public AbstractAnalysisTrip removeFinishedTrip() {
-		return this.trips.removeFirst();
-	}
+  /**
+   * returns true true if the trip is finished
+   *
+   * @param e
+   * @return
+   */
+  public boolean processAgentEvent(Event e) {
+    ((DistAnalysisTrip) this.trips.getFirst()).processAgentEvent(e);
+    return ((DistAnalysisTrip) this.trips.getFirst()).isFinished();
+  }
 
+  public void processLinkEnterEvent(double length) {
+    ((DistAnalysisTrip) this.trips.getFirst()).processLinkEnterEvent(length);
+  }
+
+  public void passedLinkInPt(double length) {
+    ((DistAnalysisTrip) this.trips.getFirst()).passedLinkInPt(length);
+  }
+
+  public Id<Person> getId() {
+    return this.id;
+  }
+
+  @Override
+  public boolean equals(final Object other) {
+    if (!(other instanceof DistAnalysisAgent)) {
+      return false;
+    } else {
+      if (((DistAnalysisAgent) other).getId().equals(this.id)) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
+  /**
+   * @return
+   */
+  public AbstractAnalysisTrip removeFinishedTrip() {
+    return this.trips.removeFirst();
+  }
 }

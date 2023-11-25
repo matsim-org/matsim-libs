@@ -22,6 +22,7 @@
 
 package org.matsim.contrib.roadpricing;
 
+import jakarta.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.ControlerDefaults;
@@ -30,47 +31,54 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import jakarta.inject.Inject;
-
 public final class RoadPricingTravelDisutilityFactory implements TravelDisutilityFactory {
-	private final RoadPricingScheme scheme;
-	private final double marginalUtilityOfMoney ;
-	private final TravelDisutilityFactory previousTravelDisutilityFactory;
-	private double sigma = 3. ;
+  private final RoadPricingScheme scheme;
+  private final double marginalUtilityOfMoney;
+  private final TravelDisutilityFactory previousTravelDisutilityFactory;
+  private double sigma = 3.;
 
-	@Inject
-	RoadPricingTravelDisutilityFactory(Scenario scenario, RoadPricingScheme roadPricingScheme) {
-		this(ControlerDefaults.createDefaultTravelDisutilityFactory(scenario), roadPricingScheme, scenario.getConfig());
-	}
+  @Inject
+  RoadPricingTravelDisutilityFactory(Scenario scenario, RoadPricingScheme roadPricingScheme) {
+    this(
+        ControlerDefaults.createDefaultTravelDisutilityFactory(scenario),
+        roadPricingScheme,
+        scenario.getConfig());
+  }
 
-	public RoadPricingTravelDisutilityFactory(TravelDisutilityFactory previousTravelDisutilityFactory, RoadPricingScheme scheme, double marginalUtilityOfMoney) {
-		this.scheme = scheme ;
-		this.marginalUtilityOfMoney = marginalUtilityOfMoney ;
-		this.previousTravelDisutilityFactory = previousTravelDisutilityFactory ;
-	}
+  public RoadPricingTravelDisutilityFactory(
+      TravelDisutilityFactory previousTravelDisutilityFactory,
+      RoadPricingScheme scheme,
+      double marginalUtilityOfMoney) {
+    this.scheme = scheme;
+    this.marginalUtilityOfMoney = marginalUtilityOfMoney;
+    this.previousTravelDisutilityFactory = previousTravelDisutilityFactory;
+  }
 
-	public RoadPricingTravelDisutilityFactory(TravelDisutilityFactory previousTravelDisutilityFactory, RoadPricingScheme scheme, Config config) {
-		this( previousTravelDisutilityFactory, scheme, config.scoring().getMarginalUtilityOfMoney() ) ;
-	}
+  public RoadPricingTravelDisutilityFactory(
+      TravelDisutilityFactory previousTravelDisutilityFactory,
+      RoadPricingScheme scheme,
+      Config config) {
+    this(previousTravelDisutilityFactory, scheme, config.scoring().getMarginalUtilityOfMoney());
+  }
 
-	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
-		if ( this.sigma != 0. ) {
-			if ( previousTravelDisutilityFactory instanceof RandomizingTimeDistanceTravelDisutilityFactory) {
-                        } else {
-				throw new RuntimeException("cannot use sigma!=null together with provided travel disutility factory");
-			}
-		}
-		return new TravelDisutilityIncludingToll(
-				previousTravelDisutilityFactory.createTravelDisutility(timeCalculator),
-				this.scheme,
-				this.marginalUtilityOfMoney,
-				this.sigma
-		);
-	}
+  @Override
+  public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
+    if (this.sigma != 0.) {
+      if (previousTravelDisutilityFactory
+          instanceof RandomizingTimeDistanceTravelDisutilityFactory) {
+      } else {
+        throw new RuntimeException(
+            "cannot use sigma!=null together with provided travel disutility factory");
+      }
+    }
+    return new TravelDisutilityIncludingToll(
+        previousTravelDisutilityFactory.createTravelDisutility(timeCalculator),
+        this.scheme,
+        this.marginalUtilityOfMoney,
+        this.sigma);
+  }
 
-	public void setSigma( double val ) {
-		this.sigma = val ;
-	}
-
+  public void setSigma(double val) {
+    this.sigma = val;
+  }
 }

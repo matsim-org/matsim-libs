@@ -33,40 +33,53 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class StringUtilsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  /**
+   * Tests the method explode(String, char), which should always return the same as
+   * String.split(String) does.
+   */
+  @Test
+  public void testExplode() {
+    String[] testStrings = {
+      "a:b", "ab:cd", "ab::cd", ":ab:cd", "ab:cd:", ":ab:cd:", "::ab::cd::", "a", "ab", ""
+    };
+    for (String test : testStrings) {
+      String[] resultExplode = StringUtils.explode(test, ':');
+      String[] resultSplit = test.split(":");
+      assertEquals(
+          "Different result lengths with test string \"" + test + "\"",
+          resultSplit.length,
+          resultExplode.length);
+      for (int i = 0; i < resultExplode.length; i++) {
+        assertEquals(
+            "Different result part " + i + " when testing string: \"" + test + "\"",
+            resultSplit[i],
+            resultExplode[i]);
+      }
+    }
+  }
 
-	/**
-	 * Tests the method explode(String, char), which should always return the same as
-	 * String.split(String) does.
-	 */
-	@Test public void testExplode() {
-		String[] testStrings = {"a:b", "ab:cd", "ab::cd", ":ab:cd", "ab:cd:", ":ab:cd:", "::ab::cd::", "a", "ab", ""};
-		for (String test : testStrings) {
-			String[] resultExplode = StringUtils.explode(test, ':');
-			String[] resultSplit = test.split(":");
-			assertEquals("Different result lengths with test string \"" + test + "\"", resultSplit.length, resultExplode.length);
-			for (int i = 0; i < resultExplode.length; i++) {
-				assertEquals("Different result part " + i + " when testing string: \"" + test + "\"", resultSplit[i], resultExplode[i]);
-			}
-		}
-	}
-
-	/**
-	 * Tests the method explode(String, char, int), which should always return the same as
-	 * String.split(String, int) does.
-	 */
-	@Test public void testExplodeLimit() {
-		String[] testStrings = {"a:b", "a:b:c", "a:b:c:d", "a:::b:c", ":::::", "a", ""};
-		for (String test : testStrings) {
-			String[] resultExplode = StringUtils.explode(test, ':', 3);
-			String[] resultSplit = test.split(":", 3);
-			assertEquals("Different result lengths with test string \"" + test + "\"", resultSplit.length, resultExplode.length);
-			for (int i = 0; i < resultExplode.length; i++) {
-				assertEquals("Different result part " + i + " when testing string: \"" + test + "\"", resultSplit[i], resultExplode[i]);
-			}
-		}
-	}
-
+  /**
+   * Tests the method explode(String, char, int), which should always return the same as
+   * String.split(String, int) does.
+   */
+  @Test
+  public void testExplodeLimit() {
+    String[] testStrings = {"a:b", "a:b:c", "a:b:c:d", "a:::b:c", ":::::", "a", ""};
+    for (String test : testStrings) {
+      String[] resultExplode = StringUtils.explode(test, ':', 3);
+      String[] resultSplit = test.split(":", 3);
+      assertEquals(
+          "Different result lengths with test string \"" + test + "\"",
+          resultSplit.length,
+          resultExplode.length);
+      for (int i = 0; i < resultExplode.length; i++) {
+        assertEquals(
+            "Different result part " + i + " when testing string: \"" + test + "\"",
+            resultSplit[i],
+            resultExplode[i]);
+      }
+    }
+  }
 }

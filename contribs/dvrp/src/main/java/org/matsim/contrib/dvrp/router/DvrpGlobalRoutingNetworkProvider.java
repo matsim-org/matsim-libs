@@ -20,7 +20,6 @@ package org.matsim.contrib.dvrp.router;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
@@ -33,41 +32,43 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
  * @author michalm
  */
 public class DvrpGlobalRoutingNetworkProvider implements Provider<Network> {
-	private static final Logger log = LogManager.getLogger(DvrpGlobalRoutingNetworkProvider.class);
+  private static final Logger log = LogManager.getLogger(DvrpGlobalRoutingNetworkProvider.class);
 
-	public static final String DVRP_ROUTING = "dvrp_routing";
+  public static final String DVRP_ROUTING = "dvrp_routing";
 
-	private final Network network;
-	private final DvrpConfigGroup dvrpCfg;
-	private final NetworkConfigGroup networkConfigGroup;
+  private final Network network;
+  private final DvrpConfigGroup dvrpCfg;
+  private final NetworkConfigGroup networkConfigGroup;
 
-	@Inject
-	public DvrpGlobalRoutingNetworkProvider(Network network, DvrpConfigGroup dvrpCfg, NetworkConfigGroup networkConfigGroup) {
-		this.network = network;
-		this.dvrpCfg = dvrpCfg;
-		this.networkConfigGroup = networkConfigGroup;
-	}
+  @Inject
+  public DvrpGlobalRoutingNetworkProvider(
+      Network network, DvrpConfigGroup dvrpCfg, NetworkConfigGroup networkConfigGroup) {
+    this.network = network;
+    this.dvrpCfg = dvrpCfg;
+    this.networkConfigGroup = networkConfigGroup;
+  }
 
-	@Override
-	public Network get() {
-		//input/output network may not be connected
-		logNetworkSize("unfiltered", network);
-		if (dvrpCfg.networkModes.isEmpty()) { // no mode filtering
-			return network;
-		}
+  @Override
+  public Network get() {
+    // input/output network may not be connected
+    logNetworkSize("unfiltered", network);
+    if (dvrpCfg.networkModes.isEmpty()) { // no mode filtering
+      return network;
+    }
 
-		Network filteredNetwork = NetworkUtils.createNetwork(networkConfigGroup);
-		new TransportModeNetworkFilter(network).filter(filteredNetwork, dvrpCfg.networkModes);
-		logNetworkSize("filtered", filteredNetwork);
-		return filteredNetwork;
-	}
+    Network filteredNetwork = NetworkUtils.createNetwork(networkConfigGroup);
+    new TransportModeNetworkFilter(network).filter(filteredNetwork, dvrpCfg.networkModes);
+    logNetworkSize("filtered", filteredNetwork);
+    return filteredNetwork;
+  }
 
-	private void logNetworkSize(String description, Network network) {
-		log.info("DVRP global routing network "
-				+ description
-				+ ": #nodes="
-				+ network.getNodes().size()
-				+ " #links:"
-				+ network.getLinks().size());
-	}
+  private void logNetworkSize(String description, Network network) {
+    log.info(
+        "DVRP global routing network "
+            + description
+            + ": #nodes="
+            + network.getNodes().size()
+            + " #links:"
+            + network.getLinks().size());
+  }
 }

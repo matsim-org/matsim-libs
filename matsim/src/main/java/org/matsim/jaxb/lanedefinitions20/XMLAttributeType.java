@@ -24,14 +24,13 @@ package org.matsim.jaxb.lanedefinitions20;
 import jakarta.xml.bind.annotation.*;
 
 /**
- * This type can be used for all attributes of classes in MATSim that implement the Attributable interface.
- * 
- * <p>
- * Java class for attribute type.
- * 
- * <p>
- * The following schema fragment specifies the expected content contained within this class.
- * 
+ * This type can be used for all attributes of classes in MATSim that implement the Attributable
+ * interface.
+ *
+ * <p>Java class for attribute type.
+ *
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ *
  * <pre>
  *  <xs:complexType name="attributeType">
  * 	<xs:simpleContent>
@@ -42,45 +41,46 @@ import jakarta.xml.bind.annotation.*;
  * 	</xs:simpleContent>
  * </xs:complexType>
  * </pre>
- * 
+ *
  * @author tthunig
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "attributeType", propOrder = {
-	    "name",
-	    "clazz",
-	})
+@XmlType(
+    name = "attributeType",
+    propOrder = {
+      "name", "clazz",
+    })
 public class XMLAttributeType {
 
-	@XmlAttribute(required = true)
-    protected String name;
-	@XmlAttribute(name = "class", required = true)
-    protected String clazz;
-	@XmlValue()
-    protected String value;
+  @XmlAttribute(required = true)
+  protected String name;
 
-	public String getName() {
-		return name;
-	}
+  @XmlAttribute(name = "class", required = true)
+  protected String clazz;
 
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public String getClazz() {
-		return clazz;
-	}
+  @XmlValue() protected String value;
 
-	public void setClazz(String clazz) {
-		this.clazz = clazz;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public String getValue() {
-		return value;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	public void setValue(String value) {
-		this.value = value;
-	}
+  public String getClazz() {
+    return clazz;
+  }
+
+  public void setClazz(String clazz) {
+    this.clazz = clazz;
+  }
+
+  public String getValue() {
+    return value;
+  }
+
+  public void setValue(String value) {
+    this.value = value;
+  }
 }

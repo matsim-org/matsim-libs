@@ -20,7 +20,6 @@
 package org.matsim.contrib.signals.builder;
 
 import java.util.Collections;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -64,190 +63,227 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class TravelTimeOneWayTestIT {
 
-	private static final Logger log = LogManager.getLogger(TravelTimeOneWayTestIT.class);
+  private static final Logger log = LogManager.getLogger(TravelTimeOneWayTestIT.class);
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	@Test
-	public void testSignalOutflow_withLanes() {
-		runAndTestDifferentGreensplitSignals(this.loadAllGreenScenario(true));
-	}
+  @Test
+  public void testSignalOutflow_withLanes() {
+    runAndTestDifferentGreensplitSignals(this.loadAllGreenScenario(true));
+  }
 
-	@Test
-	public void testSignalOutflow_woLanes() {
-		runAndTestDifferentGreensplitSignals(this.loadAllGreenScenario(false));
-	}
+  @Test
+  public void testSignalOutflow_woLanes() {
+    runAndTestDifferentGreensplitSignals(this.loadAllGreenScenario(false));
+  }
 
-	@Test
-	public void testAllGreenSignalVsNoSignal_withLanes() {
-		runAndCompareAllGreenWithNoSignals(this.loadAllGreenScenario(true));
-	}
+  @Test
+  public void testAllGreenSignalVsNoSignal_withLanes() {
+    runAndCompareAllGreenWithNoSignals(this.loadAllGreenScenario(true));
+  }
 
-	@Test
-	public void testAllGreenSignalVsNoSignal_woLanes() {
-		runAndCompareAllGreenWithNoSignals(this.loadAllGreenScenario(false));
-	}
+  @Test
+  public void testAllGreenSignalVsNoSignal_woLanes() {
+    runAndCompareAllGreenWithNoSignals(this.loadAllGreenScenario(false));
+  }
 
-	private Scenario loadAllGreenScenario(boolean useLanes) {
-		Config conf = ConfigUtils.createConfig(testUtils.classInputResourcePath());
-		conf.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		conf.controller().setMobsim("qsim");
-		conf.network().setInputFile("network.xml");
-		conf.plans().setInputFile("plans.xml.gz");
-		conf.qsim().setStuckTime(1000);
-		conf.qsim().setRemoveStuckVehicles(false);
-		conf.qsim().setUsingFastCapacityUpdate(false);
+  private Scenario loadAllGreenScenario(boolean useLanes) {
+    Config conf = ConfigUtils.createConfig(testUtils.classInputResourcePath());
+    conf.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+    conf.controller().setMobsim("qsim");
+    conf.network().setInputFile("network.xml");
+    conf.plans().setInputFile("plans.xml.gz");
+    conf.qsim().setStuckTime(1000);
+    conf.qsim().setRemoveStuckVehicles(false);
+    conf.qsim().setUsingFastCapacityUpdate(false);
 
-		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class );
-		signalsConfig.setUseSignalSystems(true);
-		if (useLanes) {
-			conf.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
-			conf.qsim().setUseLanes(true);
-			signalsConfig.setSignalSystemFile("testSignalSystems_v2.0.xml");
-		} else {
-			signalsConfig.setSignalSystemFile("testSignalSystemsNoLanes_v2.0.xml");
-		}
-		signalsConfig.setSignalGroupsFile("testSignalGroups_v2.0.xml");
-		signalsConfig.setSignalControlFile("testSignalControl_v2.0.xml");
-		signalsConfig.setAmberTimesFile("testAmberTimes_v1.0.xml");
+    SignalSystemsConfigGroup signalsConfig =
+        ConfigUtils.addOrGetModule(
+            conf, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
+    signalsConfig.setUseSignalSystems(true);
+    if (useLanes) {
+      conf.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
+      conf.qsim().setUseLanes(true);
+      signalsConfig.setSignalSystemFile("testSignalSystems_v2.0.xml");
+    } else {
+      signalsConfig.setSignalSystemFile("testSignalSystemsNoLanes_v2.0.xml");
+    }
+    signalsConfig.setSignalGroupsFile("testSignalGroups_v2.0.xml");
+    signalsConfig.setSignalControlFile("testSignalControl_v2.0.xml");
+    signalsConfig.setAmberTimesFile("testAmberTimes_v1.0.xml");
 
-		Scenario scenario = ScenarioUtils.loadScenario(conf);
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(conf).loadSignalsData());
-		return scenario;
-	}
+    Scenario scenario = ScenarioUtils.loadScenario(conf);
+    scenario.addScenarioElement(
+        SignalsData.ELEMENT_NAME, new SignalsDataLoader(conf).loadSignalsData());
+    return scenario;
+  }
 
-	private static void runAndCompareAllGreenWithNoSignals(final Scenario scenario) {
-		// with signals
-		StubLinkEnterEventHandler stubLinkEnterEventHandler = new StubLinkEnterEventHandler();
-		runQsimWithSignals(scenario, stubLinkEnterEventHandler);
-		MeasurementPoint resultsWithSignals = stubLinkEnterEventHandler.beginningOfLink2;
+  private static void runAndCompareAllGreenWithNoSignals(final Scenario scenario) {
+    // with signals
+    StubLinkEnterEventHandler stubLinkEnterEventHandler = new StubLinkEnterEventHandler();
+    runQsimWithSignals(scenario, stubLinkEnterEventHandler);
+    MeasurementPoint resultsWithSignals = stubLinkEnterEventHandler.beginningOfLink2;
 
-		// without signals
-		EventsManager events = EventsUtils.createEventsManager();
-		StubLinkEnterEventHandler eventHandler = new StubLinkEnterEventHandler();
-		events.addHandler(eventHandler);
+    // without signals
+    EventsManager events = EventsUtils.createEventsManager();
+    StubLinkEnterEventHandler eventHandler = new StubLinkEnterEventHandler();
+    events.addHandler(eventHandler);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		new QSimBuilder(scenario.getConfig()) //
-			.useDefaults() //
-			.build(scenario, events)
-			.run();
-		MeasurementPoint resultsWoSignals = eventHandler.beginningOfLink2;
-		if (resultsWoSignals != null) {
-			log.debug("tF = 60s, " + resultsWoSignals.numberOfVehPassedDuringTimeToMeasure + ", " + resultsWoSignals.numberOfVehPassed + ", "
-					+ resultsWoSignals.firstVehPassTime_s + ", " + resultsWoSignals.lastVehPassTime_s);
-		} else {
-			Assert.fail("seems like no LinkEnterEvent was handled, as this.beginningOfLink2 is not set.");
-		}
+    PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+    new QSimBuilder(scenario.getConfig()) //
+        .useDefaults() //
+        .build(scenario, events)
+        .run();
+    MeasurementPoint resultsWoSignals = eventHandler.beginningOfLink2;
+    if (resultsWoSignals != null) {
+      log.debug(
+          "tF = 60s, "
+              + resultsWoSignals.numberOfVehPassedDuringTimeToMeasure
+              + ", "
+              + resultsWoSignals.numberOfVehPassed
+              + ", "
+              + resultsWoSignals.firstVehPassTime_s
+              + ", "
+              + resultsWoSignals.lastVehPassTime_s);
+    } else {
+      Assert.fail("seems like no LinkEnterEvent was handled, as this.beginningOfLink2 is not set.");
+    }
 
-		// compare values
-		Assert.assertEquals(5000.0, resultsWithSignals.numberOfVehPassed, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(resultsWithSignals.firstVehPassTime_s, resultsWoSignals.firstVehPassTime_s, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(resultsWithSignals.numberOfVehPassed, resultsWoSignals.numberOfVehPassed, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(resultsWithSignals.numberOfVehPassedDuringTimeToMeasure, resultsWoSignals.numberOfVehPassedDuringTimeToMeasure, MatsimTestUtils.EPSILON);
-	}
+    // compare values
+    Assert.assertEquals(5000.0, resultsWithSignals.numberOfVehPassed, MatsimTestUtils.EPSILON);
+    Assert.assertEquals(
+        resultsWithSignals.firstVehPassTime_s,
+        resultsWoSignals.firstVehPassTime_s,
+        MatsimTestUtils.EPSILON);
+    Assert.assertEquals(
+        resultsWithSignals.numberOfVehPassed,
+        resultsWoSignals.numberOfVehPassed,
+        MatsimTestUtils.EPSILON);
+    Assert.assertEquals(
+        resultsWithSignals.numberOfVehPassedDuringTimeToMeasure,
+        resultsWoSignals.numberOfVehPassedDuringTimeToMeasure,
+        MatsimTestUtils.EPSILON);
+  }
 
-	private static void runAndTestDifferentGreensplitSignals(final Scenario scenario) {
-		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(Id.create(2, SignalSystem.class));
-		SignalPlanData signalPlan = controllerData.getSignalPlanData().get(Id.create(2, SignalPlan.class));
-		SignalGroupSettingsData signalSetting = signalPlan.getSignalGroupSettingsDataByGroupId().get(Id.create(100, SignalGroup.class));
+  private static void runAndTestDifferentGreensplitSignals(final Scenario scenario) {
+    SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+    SignalSystemControllerData controllerData =
+        signalsData
+            .getSignalControlData()
+            .getSignalSystemControllerDataBySystemId()
+            .get(Id.create(2, SignalSystem.class));
+    SignalPlanData signalPlan =
+        controllerData.getSignalPlanData().get(Id.create(2, SignalPlan.class));
+    SignalGroupSettingsData signalSetting =
+        signalPlan.getSignalGroupSettingsDataByGroupId().get(Id.create(100, SignalGroup.class));
 
-		int circulationTime = signalPlan.getCycleTime();
-		double linkCapacity = scenario.getNetwork().getLinks().get(Id.createLinkId(1)).getCapacity();
+    int circulationTime = signalPlan.getCycleTime();
+    double linkCapacity = scenario.getNetwork().getLinks().get(Id.createLinkId(1)).getCapacity();
 
-		// This tests if a QSim with signals creates the correct outflow for all green splits between 1/6 and 1.
-		for (int dropping = 10; dropping <= circulationTime; dropping++) {
-			signalSetting.setDropping(dropping);
+    // This tests if a QSim with signals creates the correct outflow for all green splits between
+    // 1/6 and 1.
+    for (int dropping = 10; dropping <= circulationTime; dropping++) {
+      signalSetting.setDropping(dropping);
 
-			StubLinkEnterEventHandler stubLinkEnterEventHandler = new StubLinkEnterEventHandler();
-			runQsimWithSignals(scenario, stubLinkEnterEventHandler);
+      StubLinkEnterEventHandler stubLinkEnterEventHandler = new StubLinkEnterEventHandler();
+      runQsimWithSignals(scenario, stubLinkEnterEventHandler);
 
-			log.debug("circulationTime: " + circulationTime);
-			log.debug("dropping  : " + dropping);
+      log.debug("circulationTime: " + circulationTime);
+      log.debug("dropping  : " + dropping);
 
-			Assert.assertEquals((dropping * linkCapacity / circulationTime), stubLinkEnterEventHandler.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure, 1.0);
-			Assert.assertEquals(5000.0, stubLinkEnterEventHandler.beginningOfLink2.numberOfVehPassed, MatsimTestUtils.EPSILON);
-		}
-	}
+      Assert.assertEquals(
+          (dropping * linkCapacity / circulationTime),
+          stubLinkEnterEventHandler.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure,
+          1.0);
+      Assert.assertEquals(
+          5000.0,
+          stubLinkEnterEventHandler.beginningOfLink2.numberOfVehPassed,
+          MatsimTestUtils.EPSILON);
+    }
+  }
 
-	private static void runQsimWithSignals(final Scenario scenario, EventHandler... eventHandlers) {
-		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), AbstractModule.override(Collections.singleton(new AbstractModule() {
-			@Override
-			public void install() {
-				// defaults
-				install(new NewControlerModule());
-				install(new ControlerDefaultCoreListenersModule());
-				install(new ControlerDefaultsModule());
-				install(new ScenarioByInstanceModule(scenario));
-			}
-		}), new SignalsModule()));
+  private static void runQsimWithSignals(final Scenario scenario, EventHandler... eventHandlers) {
+    com.google.inject.Injector injector =
+        Injector.createInjector(
+            scenario.getConfig(),
+            AbstractModule.override(
+                Collections.singleton(
+                    new AbstractModule() {
+                      @Override
+                      public void install() {
+                        // defaults
+                        install(new NewControlerModule());
+                        install(new ControlerDefaultCoreListenersModule());
+                        install(new ControlerDefaultsModule());
+                        install(new ScenarioByInstanceModule(scenario));
+                      }
+                    }),
+                new SignalsModule()));
 
-		EventsManager events = injector.getInstance(EventsManager.class);
-		events.initProcessing();
-		for (EventHandler handler : eventHandlers){
-			events.addHandler(handler);
-		}
+    EventsManager events = injector.getInstance(EventsManager.class);
+    events.initProcessing();
+    for (EventHandler handler : eventHandlers) {
+      events.addHandler(handler);
+    }
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		Mobsim mobsim = injector.getInstance(Mobsim.class);
-		mobsim.run();
-	}
+    PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+    Mobsim mobsim = injector.getInstance(Mobsim.class);
+    mobsim.run();
+  }
 
-	/* package */ static class StubLinkEnterEventHandler implements LinkEnterEventHandler {
+  /* package */ static class StubLinkEnterEventHandler implements LinkEnterEventHandler {
 
-		public MeasurementPoint beginningOfLink2 = null;
+    public MeasurementPoint beginningOfLink2 = null;
 
-		@Override
-		public void handleEvent(LinkEnterEvent event) {
-			// log.info("link enter event id :" + event.linkId);
-			if (event.getLinkId().toString().equalsIgnoreCase("2")) {
-				if (this.beginningOfLink2 == null) {
-					// Make sure measurement starts with second 0 in signalsystemplan
-					double nextSignalCycleStart = event.getTime() + (60 - (event.getTime() % 60));
-					this.beginningOfLink2 = new MeasurementPoint(nextSignalCycleStart);
-				}
+    @Override
+    public void handleEvent(LinkEnterEvent event) {
+      // log.info("link enter event id :" + event.linkId);
+      if (event.getLinkId().toString().equalsIgnoreCase("2")) {
+        if (this.beginningOfLink2 == null) {
+          // Make sure measurement starts with second 0 in signalsystemplan
+          double nextSignalCycleStart = event.getTime() + (60 - (event.getTime() % 60));
+          this.beginningOfLink2 = new MeasurementPoint(nextSignalCycleStart);
+        }
 
-				this.beginningOfLink2.numberOfVehPassed++;
+        this.beginningOfLink2.numberOfVehPassed++;
 
-				if (this.beginningOfLink2.timeToStartMeasurement <= event.getTime()) {
+        if (this.beginningOfLink2.timeToStartMeasurement <= event.getTime()) {
 
-					if (this.beginningOfLink2.firstVehPassTime_s == -1) {
-						this.beginningOfLink2.firstVehPassTime_s = event.getTime();
-					}
+          if (this.beginningOfLink2.firstVehPassTime_s == -1) {
+            this.beginningOfLink2.firstVehPassTime_s = event.getTime();
+          }
 
-					if (event.getTime() < this.beginningOfLink2.timeToStartMeasurement + MeasurementPoint.timeToMeasure_s) {
-						this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure++;
-						this.beginningOfLink2.lastVehPassTime_s = event.getTime();
-					}
-				}
-			}
-		}
+          if (event.getTime()
+              < this.beginningOfLink2.timeToStartMeasurement + MeasurementPoint.timeToMeasure_s) {
+            this.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure++;
+            this.beginningOfLink2.lastVehPassTime_s = event.getTime();
+          }
+        }
+      }
+    }
 
-		@Override
-		public void reset(int iteration) {
-			this.beginningOfLink2 = null;
-		}
-	}
+    @Override
+    public void reset(int iteration) {
+      this.beginningOfLink2 = null;
+    }
+  }
 
-	private static class MeasurementPoint {
+  private static class MeasurementPoint {
 
-		static final int timeToMeasure_s = 3600; // 1 hour
+    static final int timeToMeasure_s = 3600; // 1 hour
 
-		double timeToStartMeasurement;
+    double timeToStartMeasurement;
 
-		double firstVehPassTime_s = -1;
+    double firstVehPassTime_s = -1;
 
-		double lastVehPassTime_s;
+    double lastVehPassTime_s;
 
-		int numberOfVehPassed = 0;
+    int numberOfVehPassed = 0;
 
-		int numberOfVehPassedDuringTimeToMeasure = 0;
+    int numberOfVehPassedDuringTimeToMeasure = 0;
 
-		public MeasurementPoint(double time) {
-			this.timeToStartMeasurement = time;
-		}
-	}
-
+    public MeasurementPoint(double time) {
+      this.timeToStartMeasurement = time;
+    }
+  }
 }

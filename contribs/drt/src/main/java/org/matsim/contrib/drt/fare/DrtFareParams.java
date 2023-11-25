@@ -20,44 +20,43 @@
 
 package org.matsim.contrib.drt.fare;
 
+import jakarta.validation.constraints.PositiveOrZero;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-import jakarta.validation.constraints.PositiveOrZero;
-
 /**
- * @author jbischoff
- * Config Group to set taxi or drt fares.
+ * @author jbischoff Config Group to set taxi or drt fares.
  */
 public final class DrtFareParams extends ReflectiveConfigGroup {
 
-	public static final String SET_NAME = "drtfare";
+  public static final String SET_NAME = "drtfare";
 
-	@Parameter("basefare")
-	@Comment("Basefare per trip (positive or zero value)")
-	@PositiveOrZero
-	public double baseFare;
+  @Parameter("basefare")
+  @Comment("Basefare per trip (positive or zero value)")
+  @PositiveOrZero
+  public double baseFare;
 
-	@Parameter
-	@Comment("Minimum fare per trip (paid instead of the sum of base, time and distance fare if that sum would be lower than the minimum fare, positive or zero value).")
-	@PositiveOrZero
-	public double minFarePerTrip = 0.0;
+  @Parameter
+  @Comment(
+      "Minimum fare per trip (paid instead of the sum of base, time and distance fare if that sum would be lower than the minimum fare, positive or zero value).")
+  @PositiveOrZero
+  public double minFarePerTrip = 0.0;
 
-	@Parameter
-	@Comment("Daily subscription fee (positive or zero value)")
-	@PositiveOrZero
-	public double dailySubscriptionFee;
+  @Parameter
+  @Comment("Daily subscription fee (positive or zero value)")
+  @PositiveOrZero
+  public double dailySubscriptionFee;
 
-	@Parameter
-	@Comment("drt fare per hour (positive or zero value)")
-	@PositiveOrZero
-	public double timeFare_h;
+  @Parameter
+  @Comment("drt fare per hour (positive or zero value)")
+  @PositiveOrZero
+  public double timeFare_h;
 
-	@Parameter
-	@Comment("drt fare per meter (positive or zero value)")
-	@PositiveOrZero
-	public double distanceFare_m;
+  @Parameter
+  @Comment("drt fare per meter (positive or zero value)")
+  @PositiveOrZero
+  public double distanceFare_m;
 
-	public DrtFareParams() {
-		super(SET_NAME);
-	}
+  public DrtFareParams() {
+    super(SET_NAME);
+  }
 }

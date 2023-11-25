@@ -24,32 +24,31 @@ import org.matsim.core.utils.collections.Tuple;
 
 /**
  * @author droeder
- *
  */
-public class Straight{
-	
-	private Coord start;
-	private Coord end;
+public class Straight {
 
-	public Straight(Coord one, Coord two){
-		this.start = one;
-		this.end = two;
-	}
-	
-	public Straight(Tuple<Coord, Coord> t){
-		this.start = t.getFirst();
-		this.end = t.getSecond();
-	}
-	
-	public Coord getStart(){
-		return this.start;
-	}
-	
-	public Coord getEnd(){
-		return this.end;
-	}
-	public String toString(){
-		return start.getX() + "\t" + start.getY() + "\t" + end.getX() + "\t" + end.getY();
-	}
+  private Coord start;
+  private Coord end;
+
+  public Straight(Coord one, Coord two) {
+    this.start = one;
+    this.end = two;
+  }
+
+  public Straight(Tuple<Coord, Coord> t) {
+    this.start = t.getFirst();
+    this.end = t.getSecond();
+  }
+
+  public Coord getStart() {
+    return this.start;
+  }
+
+  public Coord getEnd() {
+    return this.end;
+  }
+
+  public String toString() {
+    return start.getX() + "\t" + start.getY() + "\t" + end.getX() + "\t" + end.getY();
+  }
 }
-

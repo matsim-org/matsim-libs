@@ -27,11 +27,11 @@ import org.matsim.core.controler.events.ShutdownEvent;
  */
 public interface ShutdownListener extends ControlerListener {
 
-	/**
-	 * Notifies all observers of the Controler that the controler is terminated and they should do the same
-	 *
-	 * @param event
-	 */
-	public void notifyShutdown(final ShutdownEvent event);
-
+  /**
+   * Notifies all observers of the Controler that the controler is terminated and they should do the
+   * same
+   *
+   * @param event
+   */
+  public void notifyShutdown(final ShutdownEvent event);
 }

@@ -20,35 +20,30 @@
 package org.matsim.contrib.signals.model;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.contrib.signals.data.SignalsData;
-
+import org.matsim.core.api.experimental.events.EventsManager;
 
 /**
  * @author dgrether
- *
  */
 public interface SignalSystemsManager {
 
-	public SignalsData getSignalsData();
+  public SignalsData getSignalsData();
 
-	public EventsManager getEventsManager();
-	
-	public void addSignalSystem(SignalSystem system);
+  public EventsManager getEventsManager();
 
-	public Map<Id<SignalSystem>, SignalSystem> getSignalSystems();
-	
-	public void requestControlUpdate(double time_sec);
+  public void addSignalSystem(SignalSystem system);
 
-	public void setAmberLogic(AmberLogic amberLogic);
-	
-	public AmberLogic getAmberLogic();
-	
-	public IntergreensLogic getIntergreensLogic();
+  public Map<Id<SignalSystem>, SignalSystem> getSignalSystems();
 
-	public void setIntergreensLogic(IntergreensLogic logic);
-	
+  public void requestControlUpdate(double time_sec);
 
+  public void setAmberLogic(AmberLogic amberLogic);
+
+  public AmberLogic getAmberLogic();
+
+  public IntergreensLogic getIntergreensLogic();
+
+  public void setIntergreensLogic(IntergreensLogic logic);
 }

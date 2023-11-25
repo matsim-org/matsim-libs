@@ -25,6 +25,5 @@ import org.opengis.feature.simple.SimpleFeature;
 
 public interface FeatureGenerator {
 
-	public SimpleFeature getFeature(Link link);
-
+  public SimpleFeature getFeature(Link link);
 }

@@ -24,5 +24,5 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.core.events.handler.EventHandler;
 
 public interface PersonDepartureEventHandler extends EventHandler {
-	public void handleEvent (PersonDepartureEvent event);
+  public void handleEvent(PersonDepartureEvent event);
 }

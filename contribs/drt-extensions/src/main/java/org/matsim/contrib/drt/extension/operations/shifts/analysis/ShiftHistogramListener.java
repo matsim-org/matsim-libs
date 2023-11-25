@@ -14,38 +14,48 @@ import org.matsim.core.controler.listener.IterationStartsListener;
  */
 public class ShiftHistogramListener implements IterationEndsListener, IterationStartsListener {
 
-    static private final Logger log = LogManager.getLogger(ShiftHistogramListener.class);
+  private static final Logger log = LogManager.getLogger(ShiftHistogramListener.class);
 
-	private DrtConfigGroup drtConfigGroup;
-	private MatsimServices matsimServices;
-    private ShiftHistogram shiftHistogram;
+  private DrtConfigGroup drtConfigGroup;
+  private MatsimServices matsimServices;
+  private ShiftHistogram shiftHistogram;
 
-	public ShiftHistogramListener(DrtConfigGroup drtConfigGroup, MatsimServices matsimServices, ShiftHistogram shiftHistogram) {
-		this.drtConfigGroup = drtConfigGroup;
-		this.matsimServices = matsimServices;
-		this.shiftHistogram = shiftHistogram;
-	}
+  public ShiftHistogramListener(
+      DrtConfigGroup drtConfigGroup, MatsimServices matsimServices, ShiftHistogram shiftHistogram) {
+    this.drtConfigGroup = drtConfigGroup;
+    this.matsimServices = matsimServices;
+    this.shiftHistogram = shiftHistogram;
+  }
 
-    @Override
-    public void notifyIterationStarts(final IterationStartsEvent event) {
-        this.shiftHistogram.reset(event.getIteration());
+  @Override
+  public void notifyIterationStarts(final IterationStartsEvent event) {
+    this.shiftHistogram.reset(event.getIteration());
+  }
+
+  @Override
+  public void notifyIterationEnds(final IterationEndsEvent event) {
+    this.shiftHistogram.write(
+        matsimServices
+            .getControlerIO()
+            .getIterationFilename(
+                event.getIteration(), drtConfigGroup.getMode() + "_" + "shiftHistogram.txt"));
+    this.printStats();
+    boolean createGraphs = event.getServices().getConfig().controller().isCreateGraphs();
+    if (createGraphs) {
+      ShiftHistogramChart.writeGraphic(
+          this.shiftHistogram,
+          matsimServices
+              .getControlerIO()
+              .getIterationFilename(
+                  event.getIteration(), drtConfigGroup.getMode() + "_" + "shiftHistogram.png"));
     }
+  }
 
-    @Override
-    public void notifyIterationEnds(final IterationEndsEvent event) {
-        this.shiftHistogram.write(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), drtConfigGroup.getMode() + "_" + "shiftHistogram.txt"));
-        this.printStats();
-		boolean createGraphs = event.getServices().getConfig().controller().isCreateGraphs();
-		if (createGraphs) {
-            ShiftHistogramChart.writeGraphic(this.shiftHistogram, matsimServices.getControlerIO().getIterationFilename(event.getIteration(),drtConfigGroup.getMode() + "_" + "shiftHistogram.png"));
-        }
+  private void printStats() {
+    int nofShifts = 0;
+    for (int nofShiftStarts : this.shiftHistogram.getShiftStarts()) {
+      nofShifts += nofShiftStarts;
     }
-
-    private void printStats() {
-        int nofShifts = 0;
-        for (int nofShiftStarts : this.shiftHistogram.getShiftStarts()) {
-            nofShifts += nofShiftStarts;
-        }
-        log.info("number of shifts:\t"  + nofShifts);
-    }
+    log.info("number of shifts:\t" + nofShifts);
+  }
 }

@@ -20,7 +20,6 @@
 package playground.vsp.analysis.modules.bvgAna.anaLevel1.personId2DelayAtStop;
 
 import java.util.TreeMap;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -29,65 +28,67 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-
 import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 
 /**
- * Collects the <code>AgentDepartureEventHandler</code> and the corresponding <code>PersonEntersVehicleEventHandler</code>.
+ * Collects the <code>AgentDepartureEventHandler</code> and the corresponding <code>
+ * PersonEntersVehicleEventHandler</code>.
  *
  * @author ikaddoura, aneumann
- *
  */
-public class PersonId2DelayAtStopHandler implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler{
-	private final Logger log = LogManager.getLogger(PersonId2DelayAtStopHandler.class);
-	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
-	
-	private TreeMap<Id, PersonId2DelayAtStopData> id2DelayAtStopMap = new TreeMap<Id, PersonId2DelayAtStopData>();
-	
-	public PersonId2DelayAtStopHandler(PtDriverIdAnalyzer ptDriverPrefixAnalyzer){
-		this.ptDriverIdAnalyzer = ptDriverPrefixAnalyzer;
-	}
+public class PersonId2DelayAtStopHandler
+    implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler {
+  private final Logger log = LogManager.getLogger(PersonId2DelayAtStopHandler.class);
+  private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 
-	@Override
-	public void handleEvent(PersonDepartureEvent event) {
+  private TreeMap<Id, PersonId2DelayAtStopData> id2DelayAtStopMap =
+      new TreeMap<Id, PersonId2DelayAtStopData>();
 
-		if(this.ptDriverIdAnalyzer.isPtDriver(event.getPersonId())){
-			// pt driver
-		} else {
+  public PersonId2DelayAtStopHandler(PtDriverIdAnalyzer ptDriverPrefixAnalyzer) {
+    this.ptDriverIdAnalyzer = ptDriverPrefixAnalyzer;
+  }
 
-			if(event.getLegMode() == TransportMode.pt){
+  @Override
+  public void handleEvent(PersonDepartureEvent event) {
 
-				if(this.id2DelayAtStopMap.get(event.getPersonId()) == null){
-//					this.log.debug("Adding new AgentDelayAtStopContainer for agent " + event.getDriverId() + " to map.");
-					this.id2DelayAtStopMap.put(event.getPersonId(), new PersonId2DelayAtStopData(event.getPersonId()));
-				}
+    if (this.ptDriverIdAnalyzer.isPtDriver(event.getPersonId())) {
+      // pt driver
+    } else {
 
-				this.id2DelayAtStopMap.get(event.getPersonId()).addAgentDepartureEvent(event);
-			} else {
-				// no pt
-			}
-		}
-	}
+      if (event.getLegMode() == TransportMode.pt) {
 
-	@Override
-	public void reset(int iteration) {
-		this.log.debug("reset method in iteration " + iteration + " not implemented, yet");
-	}
+        if (this.id2DelayAtStopMap.get(event.getPersonId()) == null) {
+          //					this.log.debug("Adding new AgentDelayAtStopContainer for agent " +
+          // event.getDriverId() + " to map.");
+          this.id2DelayAtStopMap.put(
+              event.getPersonId(), new PersonId2DelayAtStopData(event.getPersonId()));
+        }
 
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (this.id2DelayAtStopMap.containsKey(event.getPersonId())){
-				this.id2DelayAtStopMap.get(event.getPersonId()).addPersonEntersVehicleEvent(event);
-		}
-	}
+        this.id2DelayAtStopMap.get(event.getPersonId()).addAgentDepartureEvent(event);
+      } else {
+        // no pt
+      }
+    }
+  }
 
-	/**
-	 * Returns departure and enter vehicle time information.
-	 *
-	 * @return A map containing a <code>AgentDelayAtStopContainer</code> for each agent id
-	 */
-	public TreeMap<Id, PersonId2DelayAtStopData> getPersonId2DelayAtStopMap() {
-		return this.id2DelayAtStopMap;
-	}
-	
+  @Override
+  public void reset(int iteration) {
+    this.log.debug("reset method in iteration " + iteration + " not implemented, yet");
+  }
+
+  @Override
+  public void handleEvent(PersonEntersVehicleEvent event) {
+    if (this.id2DelayAtStopMap.containsKey(event.getPersonId())) {
+      this.id2DelayAtStopMap.get(event.getPersonId()).addPersonEntersVehicleEvent(event);
+    }
+  }
+
+  /**
+   * Returns departure and enter vehicle time information.
+   *
+   * @return A map containing a <code>AgentDelayAtStopContainer</code> for each agent id
+   */
+  public TreeMap<Id, PersonId2DelayAtStopData> getPersonId2DelayAtStopMap() {
+    return this.id2DelayAtStopMap;
+  }
 }

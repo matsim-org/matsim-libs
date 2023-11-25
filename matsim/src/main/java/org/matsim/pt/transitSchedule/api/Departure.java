@@ -32,16 +32,15 @@ import org.matsim.vehicles.Vehicle;
  */
 public interface Departure extends Identifiable<Departure>, Attributable {
 
-	double getDepartureTime();
+  double getDepartureTime();
 
-	/**
-	 * @param vehicleId the id of the vehicle to be used for this departure, may be <code>null</code>
-	 */
-	void setVehicleId(final Id<Vehicle> vehicleId);
+  /**
+   * @param vehicleId the id of the vehicle to be used for this departure, may be <code>null</code>
+   */
+  void setVehicleId(final Id<Vehicle> vehicleId);
 
-	/**
-	 * @return The id of the vehicle to be used for this departure, may be <code>null</code>
-	 */
-	Id<Vehicle> getVehicleId();
-
+  /**
+   * @return The id of the vehicle to be used for this departure, may be <code>null</code>
+   */
+  Id<Vehicle> getVehicleId();
 }

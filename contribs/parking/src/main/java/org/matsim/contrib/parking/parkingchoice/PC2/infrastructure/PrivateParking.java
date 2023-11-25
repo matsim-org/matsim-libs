@@ -22,28 +22,29 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.facilities.ActivityFacility;
 
-public interface PrivateParking extends PC2Parking{
+public interface PrivateParking extends PC2Parking {
 
-	public boolean isAllowedToUseParking(Id<Person> personId, Id<ActivityFacility> actFacilityId, String actType);
-	
-//	//allow restricting to single person, actType at facility or whole facility.
-//	String restrictionType;
-//	HashSet<Id> facilityIds;
-//	LinkedListValueHashMap<Id> actTypes;
-////Todo three types	
-//	
-//	public boolean isAllowedToUseParking(Id personId, Id actFacilityId, String actType){
-//		if (restrictionType.equalsIgnoreCase("personId")){
-//			
-//		} else if (restrictionType.equalsIgnoreCase("facility")){
-//			return facilityIds.contains(actFacilityId);
-//		}else if (restrictionType.equalsIgnoreCase("actType")){
-//			facilityIds.contains(actFacilityId);
-//		} else {
-//			DebugLib.stopSystemAndReportInconsistency();
-//		}
-//		
-//		return ownerId==agentId;
-//	}
+  public boolean isAllowedToUseParking(
+      Id<Person> personId, Id<ActivityFacility> actFacilityId, String actType);
+
+  //	//allow restricting to single person, actType at facility or whole facility.
+  //	String restrictionType;
+  //	HashSet<Id> facilityIds;
+  //	LinkedListValueHashMap<Id> actTypes;
+  //// Todo three types
+  //
+  //	public boolean isAllowedToUseParking(Id personId, Id actFacilityId, String actType){
+  //		if (restrictionType.equalsIgnoreCase("personId")){
+  //
+  //		} else if (restrictionType.equalsIgnoreCase("facility")){
+  //			return facilityIds.contains(actFacilityId);
+  //		}else if (restrictionType.equalsIgnoreCase("actType")){
+  //			facilityIds.contains(actFacilityId);
+  //		} else {
+  //			DebugLib.stopSystemAndReportInconsistency();
+  //		}
+  //
+  //		return ownerId==agentId;
+  //	}
 
 }

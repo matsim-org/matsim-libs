@@ -26,24 +26,26 @@ package org.matsim.core.mobsim.jdeqsim;
  */
 public abstract class SimUnit {
 
-	protected Scheduler scheduler = null;
+  protected Scheduler scheduler = null;
 
-	public SimUnit(Scheduler scheduler) {
-		this.scheduler = scheduler;
-	}
+  public SimUnit(Scheduler scheduler) {
+    this.scheduler = scheduler;
+  }
 
-	public void sendMessage(Message m, SimUnit targetUnit, double messageArrivalTime) {
+  public void sendMessage(Message m, SimUnit targetUnit, double messageArrivalTime) {
 
-//		m.setSendingUnit(this);
-		// this info is set, but never used.  Commenting it out for the time being, especially since one can generate circumvent this method here.
-		// would (evidently) be easy to re-instantiate since it just needs the "this" pointer.  kai, feb'18
+    //		m.setSendingUnit(this);
+    // this info is set, but never used.  Commenting it out for the time being, especially since one
+    // can generate circumvent this method here.
+    // would (evidently) be easy to re-instantiate since it just needs the "this" pointer.  kai,
+    // feb'18
 
-		m.setReceivingUnit(targetUnit);
-		m.setMessageArrivalTime(messageArrivalTime);
-		scheduler.schedule(m);
-	}
+    m.setReceivingUnit(targetUnit);
+    m.setMessageArrivalTime(messageArrivalTime);
+    scheduler.schedule(m);
+  }
 
-	public Scheduler getScheduler() {
-		return scheduler;
-	}
+  public Scheduler getScheduler() {
+    return scheduler;
+  }
 }

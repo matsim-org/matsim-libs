@@ -25,13 +25,13 @@ import org.matsim.utils.objectattributes.AttributeConverter;
  * @author mrieser
  */
 public class LongConverter implements AttributeConverter<Long> {
-	@Override
-	public Long convert(String value) {
-		return Long.valueOf(value);
-	}
+  @Override
+  public Long convert(String value) {
+    return Long.valueOf(value);
+  }
 
-@Override
-	public String convertToString(Object o) {
-		return o.toString();
-	}
+  @Override
+  public String convertToString(Object o) {
+    return o.toString();
+  }
 }

@@ -19,34 +19,31 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.events;
 
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.Map;
-import java.util.Map.Entry;
-
 
 /**
  * @author benjamin
  */
 public final class ColdEmissionEvent extends EmissionEvent {
-	// leave this public so that external code can generate "standard" emission events. MATSIM-893
+  // leave this public so that external code can generate "standard" emission events. MATSIM-893
 
-	public final static String EVENT_TYPE = "coldEmissionEvent";
+  public static final String EVENT_TYPE = "coldEmissionEvent";
 
-	public ColdEmissionEvent(double time, Id<Link> linkId, Id<Vehicle> vehicleId, Map<Pollutant, Double> coldEmissions) {
-		super(time, linkId, vehicleId, coldEmissions);
-	}
+  public ColdEmissionEvent(
+      double time, Id<Link> linkId, Id<Vehicle> vehicleId, Map<Pollutant, Double> coldEmissions) {
+    super(time, linkId, vehicleId, coldEmissions);
+  }
 
-	public Map<Pollutant, Double> getColdEmissions() {
-		return getEmissions();
-	}
+  public Map<Pollutant, Double> getColdEmissions() {
+    return getEmissions();
+  }
 
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
+  @Override
+  public String getEventType() {
+    return EVENT_TYPE;
+  }
 }

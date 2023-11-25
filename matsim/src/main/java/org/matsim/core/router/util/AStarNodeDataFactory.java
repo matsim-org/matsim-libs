@@ -22,8 +22,8 @@ package org.matsim.core.router.util;
 
 public class AStarNodeDataFactory implements NodeDataFactory {
 
-	@Override
-	public NodeData createNodeData() {
-		return new AStarNodeData();
-	}
+  @Override
+  public NodeData createNodeData() {
+    return new AStarNodeData();
+  }
 }

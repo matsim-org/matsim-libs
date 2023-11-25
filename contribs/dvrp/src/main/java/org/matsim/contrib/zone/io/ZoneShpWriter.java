@@ -20,7 +20,6 @@
 package org.matsim.contrib.zone.io;
 
 import java.util.*;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.zone.Zone;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -29,28 +28,32 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class ZoneShpWriter {
-	public static final String ID_HEADER = "ID";
+  public static final String ID_HEADER = "ID";
 
-	private final Map<Id<Zone>, Zone> zones;
-	private final String coordinateSystem;
+  private final Map<Id<Zone>, Zone> zones;
+  private final String coordinateSystem;
 
-	public ZoneShpWriter(Map<Id<Zone>, Zone> zones, String coordinateSystem) {
-		this.zones = zones;
-		this.coordinateSystem = coordinateSystem;
-	}
+  public ZoneShpWriter(Map<Id<Zone>, Zone> zones, String coordinateSystem) {
+    this.zones = zones;
+    this.coordinateSystem = coordinateSystem;
+  }
 
-	public void write(String shpFile) {
-		CoordinateReferenceSystem crs = MGC.getCRS(coordinateSystem);
+  public void write(String shpFile) {
+    CoordinateReferenceSystem crs = MGC.getCRS(coordinateSystem);
 
-		PolygonFeatureFactory factory = new PolygonFeatureFactory.Builder().addAttribute(ID_HEADER, String.class)
-				.setCrs(crs).setName("zone").create();
+    PolygonFeatureFactory factory =
+        new PolygonFeatureFactory.Builder()
+            .addAttribute(ID_HEADER, String.class)
+            .setCrs(crs)
+            .setName("zone")
+            .create();
 
-		List<SimpleFeature> features = new ArrayList<>();
-		for (Zone z : zones.values()) {
-			String id = z.getId() + "";
-			features.add(factory.createPolygon(z.getMultiPolygon(), new Object[] { id }, id));
-		}
+    List<SimpleFeature> features = new ArrayList<>();
+    for (Zone z : zones.values()) {
+      String id = z.getId() + "";
+      features.add(factory.createPolygon(z.getMultiPolygon(), new Object[] {id}, id));
+    }
 
-		ShapeFileWriter.writeGeometries(features, shpFile);
-	}
+    ShapeFileWriter.writeGeometries(features, shpFile);
+  }
 }

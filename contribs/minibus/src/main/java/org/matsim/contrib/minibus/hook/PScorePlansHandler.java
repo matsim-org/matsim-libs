@@ -21,7 +21,6 @@ package org.matsim.contrib.minibus.hook;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,65 +31,69 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * Scores paratransit vehicles
- * 
- * @author aneumann
  *
+ * @author aneumann
  */
-final class PScorePlansHandler implements StageContainerHandler, OperatorCostContainerHandler{
-	
-	@SuppressWarnings("unused")
-	private final static Logger log = LogManager.getLogger(PScorePlansHandler.class);
-	
-	private final TicketMachineI ticketMachine;
-	private Map<Id<Vehicle>, PScoreContainer> vehicleId2ScoreMap = new ConcurrentHashMap<>();
+final class PScorePlansHandler implements StageContainerHandler, OperatorCostContainerHandler {
 
-	public PScorePlansHandler(TicketMachineI ticketMachine){
-		this.ticketMachine = ticketMachine;
-	}
-	
-	public Map<Id<Vehicle>, PScoreContainer> getDriverId2ScoreMap() {
-		return this.vehicleId2ScoreMap;
-	}
+  @SuppressWarnings("unused")
+  private static final Logger log = LogManager.getLogger(PScorePlansHandler.class);
 
-	@Override
-	public void handleFareContainer(StageContainer fareContainer) {
-		if (this.vehicleId2ScoreMap.get(fareContainer.getVehicleId()) == null) {
-			this.vehicleId2ScoreMap.put(fareContainer.getVehicleId(), new PScoreContainer(fareContainer.getVehicleId(), this.ticketMachine));
-		}
+  private final TicketMachineI ticketMachine;
+  private Map<Id<Vehicle>, PScoreContainer> vehicleId2ScoreMap = new ConcurrentHashMap<>();
 
-		// TODO debugging, got a single null pointer here?! 
-		try {
-			this.vehicleId2ScoreMap.get(fareContainer.getVehicleId()).handleStageContainer(fareContainer);
-		} catch (Exception e) {
-			log.warn("Got a null pointer here...");
-			log.warn(e.getMessage());
-			log.warn("FareContainer " + fareContainer);
-			log.warn("vehicleMap " + this.vehicleId2ScoreMap);
-			e.printStackTrace();
-		}
-	}
+  public PScorePlansHandler(TicketMachineI ticketMachine) {
+    this.ticketMachine = ticketMachine;
+  }
 
-    @Override
-	public void handleOperatorCostContainer(OperatorCostContainer operatorCostContainer) {
-		if (this.vehicleId2ScoreMap.get(operatorCostContainer.getVehicleId()) == null) {
-			this.vehicleId2ScoreMap.put(operatorCostContainer.getVehicleId(), new PScoreContainer(operatorCostContainer.getVehicleId(), this.ticketMachine));
-		}
-		
-		// TODO debugging, got a single null pointer here?! 
-		try {
-			this.vehicleId2ScoreMap.get(operatorCostContainer.getVehicleId()).handleOperatorCostContainer(operatorCostContainer);
-		} catch (Exception e) {
-			log.warn("Got a null pointer here...");
-			log.warn(e.getMessage());
-			log.warn("CostContainer " + operatorCostContainer);
-			log.warn("vehicleMap " + this.vehicleId2ScoreMap);
-			e.printStackTrace();
-		}
-			
-	}
+  public Map<Id<Vehicle>, PScoreContainer> getDriverId2ScoreMap() {
+    return this.vehicleId2ScoreMap;
+  }
 
-	@Override
-	public void reset() {
-		this.vehicleId2ScoreMap = new ConcurrentHashMap<>();
-	}
+  @Override
+  public void handleFareContainer(StageContainer fareContainer) {
+    if (this.vehicleId2ScoreMap.get(fareContainer.getVehicleId()) == null) {
+      this.vehicleId2ScoreMap.put(
+          fareContainer.getVehicleId(),
+          new PScoreContainer(fareContainer.getVehicleId(), this.ticketMachine));
+    }
+
+    // TODO debugging, got a single null pointer here?!
+    try {
+      this.vehicleId2ScoreMap.get(fareContainer.getVehicleId()).handleStageContainer(fareContainer);
+    } catch (Exception e) {
+      log.warn("Got a null pointer here...");
+      log.warn(e.getMessage());
+      log.warn("FareContainer " + fareContainer);
+      log.warn("vehicleMap " + this.vehicleId2ScoreMap);
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public void handleOperatorCostContainer(OperatorCostContainer operatorCostContainer) {
+    if (this.vehicleId2ScoreMap.get(operatorCostContainer.getVehicleId()) == null) {
+      this.vehicleId2ScoreMap.put(
+          operatorCostContainer.getVehicleId(),
+          new PScoreContainer(operatorCostContainer.getVehicleId(), this.ticketMachine));
+    }
+
+    // TODO debugging, got a single null pointer here?!
+    try {
+      this.vehicleId2ScoreMap
+          .get(operatorCostContainer.getVehicleId())
+          .handleOperatorCostContainer(operatorCostContainer);
+    } catch (Exception e) {
+      log.warn("Got a null pointer here...");
+      log.warn(e.getMessage());
+      log.warn("CostContainer " + operatorCostContainer);
+      log.warn("vehicleMap " + this.vehicleId2ScoreMap);
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public void reset() {
+    this.vehicleId2ScoreMap = new ConcurrentHashMap<>();
+  }
 }

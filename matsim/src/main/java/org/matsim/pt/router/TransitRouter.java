@@ -20,7 +20,6 @@
 package org.matsim.pt.router;
 
 import java.util.List;
-
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.RoutingRequest;
 
@@ -29,6 +28,5 @@ import org.matsim.core.router.RoutingRequest;
  */
 public interface TransitRouter {
 
-	List<? extends PlanElement> calcRoute(RoutingRequest request);
-
+  List<? extends PlanElement> calcRoute(RoutingRequest request);
 }

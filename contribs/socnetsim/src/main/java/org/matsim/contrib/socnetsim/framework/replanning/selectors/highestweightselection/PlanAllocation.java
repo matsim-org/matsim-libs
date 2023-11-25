@@ -28,49 +28,48 @@ import java.util.List;
  * @author thibautd
  */
 final class PlanAllocation {
-	private final List<PlanRecord> plans = new ArrayList<PlanRecord>();
-	private final List<PlanRecord> immutable = Collections.unmodifiableList( plans );
-	private double weight = 0;
+  private final List<PlanRecord> plans = new ArrayList<PlanRecord>();
+  private final List<PlanRecord> immutable = Collections.unmodifiableList(plans);
+  private double weight = 0;
 
-	public List<PlanRecord> getPlans() {
-		return immutable;
-	}
+  public List<PlanRecord> getPlans() {
+    return immutable;
+  }
 
-	public double getWeight() {
-		return weight;
-	}
+  public double getWeight() {
+    return weight;
+  }
 
-	public void add(final PlanRecord p) {
-		plans.add( p );
-		weight += p.avgJointPlanWeight;
-	}
+  public void add(final PlanRecord p) {
+    plans.add(p);
+    weight += p.avgJointPlanWeight;
+  }
 
-	public void addAll(final Collection<PlanRecord> ps) {
-		for ( PlanRecord p : ps ) add( p );
-	}
+  public void addAll(final Collection<PlanRecord> ps) {
+    for (PlanRecord p : ps) add(p);
+  }
 
-	public void remove(final PlanRecord p) {
-		plans.remove( p );
-		weight -= p.avgJointPlanWeight;
-	}
+  public void remove(final PlanRecord p) {
+    plans.remove(p);
+    weight -= p.avgJointPlanWeight;
+  }
 
-	public void removeAll(final Collection<PlanRecord> ps) {
-		for ( PlanRecord p : ps ) remove( p );
-	}
+  public void removeAll(final Collection<PlanRecord> ps) {
+    for (PlanRecord p : ps) remove(p);
+  }
 
-	@Override
-	public boolean equals(final Object o) {
-		return o instanceof PlanAllocation && ((PlanAllocation) o).plans.equals( plans );
-	}
+  @Override
+  public boolean equals(final Object o) {
+    return o instanceof PlanAllocation && ((PlanAllocation) o).plans.equals(plans);
+  }
 
-	@Override
-	public int hashCode() {
-		return plans.hashCode();
-	}
+  @Override
+  public int hashCode() {
+    return plans.hashCode();
+  }
 
-	@Override
-	public String toString() {
-		return "{PlanAllocation: plans="+plans+"}";
-	}
+  @Override
+  public String toString() {
+    return "{PlanAllocation: plans=" + plans + "}";
+  }
 }
-

@@ -23,12 +23,11 @@ import org.matsim.core.events.handler.EventHandler;
 
 /**
  * Implement this to get notified when ColdEmissionEvents are thrown
- * 
+ *
  * @author benjamin
  */
-
 public interface ColdEmissionEventHandler extends EventHandler {
-	// leave this public so that external code can generate "standard" emission events. MATSIM-893
+  // leave this public so that external code can generate "standard" emission events. MATSIM-893
 
-	void handleEvent( ColdEmissionEvent event );
+  void handleEvent(ColdEmissionEvent event);
 }

@@ -21,64 +21,51 @@ package playground.vsp.demandde.commuterDemandCottbus;
 
 /**
  * @author jbischoff
- *
  */
 public class CommuterDataElement {
-	private String fromId;
-	private String toId;
-	private String fromName;
-	private String toName;
-	private int commuters;
-	
-	public CommuterDataElement(String from,  String to,  int commuters){
-		this.fromId = from;
-		this.toId = to;
-		this.commuters = commuters;
-		this.fromName = "";
-		this.toName = "";
-	}
-	
-	
+  private String fromId;
+  private String toId;
+  private String fromName;
+  private String toName;
+  private int commuters;
 
-	public String getFromName() {
-		return fromName;
-	}
+  public CommuterDataElement(String from, String to, int commuters) {
+    this.fromId = from;
+    this.toId = to;
+    this.commuters = commuters;
+    this.fromName = "";
+    this.toName = "";
+  }
 
+  public String getFromName() {
+    return fromName;
+  }
 
+  public void setFromName(String fromName) {
+    this.fromName = fromName;
+  }
 
-	public void setFromName(String fromName) {
-		this.fromName = fromName;
-	}
+  public String getToName() {
+    return toName;
+  }
 
+  public void setToName(String toName) {
+    this.toName = toName;
+  }
 
+  public String getFromId() {
+    return fromId;
+  }
 
-	public String getToName() {
-		return toName;
-	}
+  public String getToId() {
+    return toId;
+  }
 
+  public int getCommuters() {
+    return commuters;
+  }
 
-
-	public void setToName(String toName) {
-		this.toName = toName;
-	}
-
-
-
-	public String getFromId() {
-		return fromId;
-	}
-
-	public String getToId() {
-		return toId;
-	}
-
-	public int getCommuters() {
-		return commuters;
-	}
-	
-	public String toString(){
-		return ("F:\t"+fromId+"\tT:\t"+toId+"\tC:\t"+commuters);
-		
-	}
-
+  public String toString() {
+    return ("F:\t" + fromId + "\tT:\t" + toId + "\tC:\t" + commuters);
+  }
 }

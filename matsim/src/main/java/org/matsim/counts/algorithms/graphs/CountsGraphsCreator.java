@@ -21,21 +21,19 @@
 package org.matsim.counts.algorithms.graphs;
 
 import java.util.List;
-
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.algorithms.graphs.helper.Section;
 
-
 public abstract class CountsGraphsCreator {
-	protected Section section;
-	
-	public CountsGraphsCreator(final String sectionTitle) {	
-		this.section=new Section(sectionTitle);
-	}
-	
-	public Section getSection() {
-		return this.section;
-	}
-		
-	public abstract List<CountsGraph> createGraphs(List<CountSimComparison> ccl, int iteration);	
+  protected Section section;
+
+  public CountsGraphsCreator(final String sectionTitle) {
+    this.section = new Section(sectionTitle);
+  }
+
+  public Section getSection() {
+    return this.section;
+  }
+
+  public abstract List<CountsGraph> createGraphs(List<CountSimComparison> ccl, int iteration);
 }

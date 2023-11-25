@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * HasAgentTracker.java
@@ -19,17 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
- /**
- * 
- */
+/** */
 package org.matsim.core.mobsim.qsim;
 
 /**
  * @author gleich
- *
  */
 public interface HasAgentTracker {
 
-	AgentTracker getAgentTracker();
-
+  AgentTracker getAgentTracker();
 }

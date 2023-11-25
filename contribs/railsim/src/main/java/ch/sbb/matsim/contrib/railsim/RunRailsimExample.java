@@ -27,34 +27,33 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
-/**
- * Example script that shows how to use railsim included in this contrib.
- */
+/** Example script that shows how to use railsim included in this contrib. */
 public final class RunRailsimExample {
 
-	private RunRailsimExample() {
-	}
+  private RunRailsimExample() {}
 
-	public static void main(String[] args) {
+  public static void main(String[] args) {
 
-		if (args.length == 0) {
-			System.err.println("Path to config is required as first argument.");
-			System.exit(2);
-		}
+    if (args.length == 0) {
+      System.err.println("Path to config is required as first argument.");
+      System.exit(2);
+    }
 
-		String configFilename = args[0];
-		Config config = ConfigUtils.loadConfig(configFilename);
-		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+    String configFilename = args[0];
+    Config config = ConfigUtils.loadConfig(configFilename);
+    config
+        .controller()
+        .setOverwriteFileSetting(
+            OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
+    Scenario scenario = ScenarioUtils.loadScenario(config);
+    Controler controler = new Controler(scenario);
 
-		controler.addOverridingModule(new RailsimModule());
+    controler.addOverridingModule(new RailsimModule());
 
-		// if you have other extensions that provide QSim components, call their configure-method here
-		controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
+    // if you have other extensions that provide QSim components, call their configure-method here
+    controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
 
-		controler.run();
-	}
-
+    controler.run();
+  }
 }

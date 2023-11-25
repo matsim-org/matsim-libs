@@ -24,60 +24,56 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
-
 /**
- * This class can be used by parallel mobility simulations. 
- * If you are not programming parallel code that generates events better use EventsManagerImpl.
- * 
- * The method processEvent is synchronized in this
- * implementation to avoid thread interference errors.
- * This class is just a delegate that uses all the logic that can be found in another EventsManager instance
- * except the synchronization of processEvent().
- * 
- * @author dgrether
+ * This class can be used by parallel mobility simulations. If you are not programming parallel code
+ * that generates events better use EventsManagerImpl.
  *
+ * <p>The method processEvent is synchronized in this implementation to avoid thread interference
+ * errors. This class is just a delegate that uses all the logic that can be found in another
+ * EventsManager instance except the synchronization of processEvent().
+ *
+ * @author dgrether
  */
 class SynchronizedEventsManagerImpl implements EventsManager {
 
-	private final EventsManager delegate;
+  private final EventsManager delegate;
 
-	public SynchronizedEventsManagerImpl(EventsManager eventsManager){
-		this.delegate = eventsManager;
-	}
+  public SynchronizedEventsManagerImpl(EventsManager eventsManager) {
+    this.delegate = eventsManager;
+  }
 
-	@Override
-	public void addHandler(EventHandler handler) {
-		this.delegate.addHandler(handler);
-	}
+  @Override
+  public void addHandler(EventHandler handler) {
+    this.delegate.addHandler(handler);
+  }
 
-	@Override
-	public synchronized void processEvent(Event event) {
-		this.delegate.processEvent(event);
-	}
-	
-	@Override
-	public void removeHandler(EventHandler handler) {
-		this.delegate.removeHandler(handler);
-	}
+  @Override
+  public synchronized void processEvent(Event event) {
+    this.delegate.processEvent(event);
+  }
 
-	@Override
-	public void resetHandlers(int iteration) {
-		delegate.resetHandlers(iteration);
-	}
+  @Override
+  public void removeHandler(EventHandler handler) {
+    this.delegate.removeHandler(handler);
+  }
 
-	@Override
-	public void initProcessing() {
-		delegate.initProcessing();
-	}
+  @Override
+  public void resetHandlers(int iteration) {
+    delegate.resetHandlers(iteration);
+  }
 
-	@Override
-	public void afterSimStep(double time) {
-		delegate.afterSimStep(time);
-	}
+  @Override
+  public void initProcessing() {
+    delegate.initProcessing();
+  }
 
-	@Override
-	public void finishProcessing() {
-		delegate.finishProcessing();
-	}
+  @Override
+  public void afterSimStep(double time) {
+    delegate.afterSimStep(time);
+  }
 
+  @Override
+  public void finishProcessing() {
+    delegate.finishProcessing();
+  }
 }

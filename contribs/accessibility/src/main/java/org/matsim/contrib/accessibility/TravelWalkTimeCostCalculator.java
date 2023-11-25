@@ -28,44 +28,44 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * this cost calculator is an attempt to substitute travel distances by travel times
- * <p>
- * the average walk speed is 5km/h. this speed is independent of the type of road (motorway, sidewalk ...)
- * therefore, walking time can be considered to be linear. it directly correlates with travel distances
- * tnicolai feb'12
+ *
+ * <p>the average walk speed is 5km/h. this speed is independent of the type of road (motorway,
+ * sidewalk ...) therefore, walking time can be considered to be linear. it directly correlates with
+ * travel distances tnicolai feb'12
  *
  * @author thomas
  */
-class TravelWalkTimeCostCalculator implements TravelDisutility{
+class TravelWalkTimeCostCalculator implements TravelDisutility {
 
-	private static final Logger log = LogManager.getLogger(TravelWalkTimeCostCalculator.class);
+  private static final Logger log = LogManager.getLogger(TravelWalkTimeCostCalculator.class);
 
-	private double meterPerSecWalkSpeed;
+  private double meterPerSecWalkSpeed;
 
-	public TravelWalkTimeCostCalculator(double meterPerSecWalkSpeed) {
-		this.meterPerSecWalkSpeed = meterPerSecWalkSpeed;
-	}
+  public TravelWalkTimeCostCalculator(double meterPerSecWalkSpeed) {
+    this.meterPerSecWalkSpeed = meterPerSecWalkSpeed;
+  }
 
-	/**
-	 * uses network link lengths * walk speed as costs.
-	 * lengths usually are given in meter and walk speed in meter/sec
-	 */
-	@Override
-	public double getLinkTravelDisutility(final Link link, final double time, final Person person,
-			final Vehicle vehicle) {
-		return getLinkTravelDisutilityImpl(link);
-	}
+  /**
+   * uses network link lengths * walk speed as costs. lengths usually are given in meter and walk
+   * speed in meter/sec
+   */
+  @Override
+  public double getLinkTravelDisutility(
+      final Link link, final double time, final Person person, final Vehicle vehicle) {
+    return getLinkTravelDisutilityImpl(link);
+  }
 
-	@Override
-	public double getLinkMinimumTravelDisutility(Link link) {
-		return getLinkTravelDisutilityImpl(link);
-	}
+  @Override
+  public double getLinkMinimumTravelDisutility(Link link) {
+    return getLinkTravelDisutilityImpl(link);
+  }
 
-	private double getLinkTravelDisutilityImpl(Link link) {
-		if (link != null) {
-			double secondWalkTime = link.getLength() / meterPerSecWalkSpeed;
-			return secondWalkTime;
-		}
-		log.warn("Link is null. Returned 0 as walk time.");
-		return 0.;
-	}
+  private double getLinkTravelDisutilityImpl(Link link) {
+    if (link != null) {
+      double secondWalkTime = link.getLength() / meterPerSecWalkSpeed;
+      return secondWalkTime;
+    }
+    log.warn("Link is null. Returned 0 as walk time.");
+    return 0.;
+  }
 }

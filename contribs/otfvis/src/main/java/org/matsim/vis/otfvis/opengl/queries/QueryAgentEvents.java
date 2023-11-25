@@ -20,117 +20,108 @@
 
 package org.matsim.vis.otfvis.opengl.queries;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
 /**
- * 
  * Dumps all events occuring to an agent to the log.
- *  
- * @author michaz
  *
+ * @author michaz
  */
 public class QueryAgentEvents extends AbstractQuery implements BasicEventHandler {
 
-	private static final  Logger logger = LogManager.getLogger(QueryAgentEvents.class);
+  private static final Logger logger = LogManager.getLogger(QueryAgentEvents.class);
 
-	public static class Result implements OTFQueryResult {
+  public static class Result implements OTFQueryResult {
 
-		private String agentId;
-		private List<String> newEventStrings = new ArrayList<>();
-		
-		@Override
-		public void draw(OTFOGLDrawer drawer) {
-			for(String eventString : newEventStrings) {
-				logger.info(agentId + ": " + eventString);
-			}
-			newEventStrings.clear();
-		}
+    private String agentId;
+    private List<String> newEventStrings = new ArrayList<>();
 
-		@Override
-		public boolean isAlive() {
-			return true;
-		}
+    @Override
+    public void draw(OTFOGLDrawer drawer) {
+      for (String eventString : newEventStrings) {
+        logger.info(agentId + ": " + eventString);
+      }
+      newEventStrings.clear();
+    }
 
-		@Override
-		public void remove() {
-			
-		}
-		
-	}
+    @Override
+    public boolean isAlive() {
+      return true;
+    }
 
-	private Id<Person> agentId = null;
+    @Override
+    public void remove() {}
+  }
 
-	private EventsManager eventsManager = null;
-	
-	private BlockingQueue<Event> queue = new LinkedBlockingQueue<>();
-	
-	private Result result = null;
-	
-	@Override
-	public void installQuery(SimulationViewForQueries simulationView) {
-		this.eventsManager = simulationView.getEvents();
-		result = new Result();
-		result.agentId = agentId.toString();
-		eventsManager.addHandler(this);
-		logger.debug("Query initialized.");
-	}
+  private Id<Person> agentId = null;
 
-	@Override
-	public Type getType() {
-		return OTFQuery.Type.AGENT;
-	}
+  private EventsManager eventsManager = null;
 
-	@Override
-	public OTFQueryResult query() {
-		result.newEventStrings.clear();
-		List<Event> newEvents = new ArrayList<>();
-		queue.drainTo(newEvents);
-		for (Event personEvent : newEvents) {
-			result.newEventStrings.add(personEvent.toString());
-		}
-		return result;
-	}
+  private BlockingQueue<Event> queue = new LinkedBlockingQueue<>();
 
-	@Override
-	public void setId(String id) {
-		this.agentId = Id.create(id, Person.class);
-	}
+  private Result result = null;
 
-	@Override
-	public void reset(int iteration) {
-		
-	}
+  @Override
+  public void installQuery(SimulationViewForQueries simulationView) {
+    this.eventsManager = simulationView.getEvents();
+    result = new Result();
+    result.agentId = agentId.toString();
+    eventsManager.addHandler(this);
+    logger.debug("Query initialized.");
+  }
 
-	@Override
-	public void uninstall() {
-		eventsManager.removeHandler(this);
-		logger.debug("Events query deregistered from handler.");
-	}
+  @Override
+  public Type getType() {
+    return OTFQuery.Type.AGENT;
+  }
 
-	@Override
-	public void handleEvent(Event event) {
-		if (event instanceof HasPersonId) {
-			HasPersonId personEvent = (HasPersonId) event;
-			if (personEvent.getPersonId().equals(this.agentId)) {
-				queue.add(event);
-			}
-		}
-	}
+  @Override
+  public OTFQueryResult query() {
+    result.newEventStrings.clear();
+    List<Event> newEvents = new ArrayList<>();
+    queue.drainTo(newEvents);
+    for (Event personEvent : newEvents) {
+      result.newEventStrings.add(personEvent.toString());
+    }
+    return result;
+  }
 
+  @Override
+  public void setId(String id) {
+    this.agentId = Id.create(id, Person.class);
+  }
+
+  @Override
+  public void reset(int iteration) {}
+
+  @Override
+  public void uninstall() {
+    eventsManager.removeHandler(this);
+    logger.debug("Events query deregistered from handler.");
+  }
+
+  @Override
+  public void handleEvent(Event event) {
+    if (event instanceof HasPersonId) {
+      HasPersonId personEvent = (HasPersonId) event;
+      if (personEvent.getPersonId().equals(this.agentId)) {
+        queue.add(event);
+      }
+    }
+  }
 }

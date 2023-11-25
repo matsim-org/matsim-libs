@@ -28,9 +28,9 @@ import org.matsim.contrib.dvrp.schedule.DefaultDriveTask;
  * @author michalm
  */
 public class DrtDriveTask extends DefaultDriveTask {
-	public static final DrtTaskType TYPE = new DrtTaskType(DRIVE);
+  public static final DrtTaskType TYPE = new DrtTaskType(DRIVE);
 
-	public DrtDriveTask(VrpPathWithTravelData path, DrtTaskType taskType) {
-		super(taskType, path);
-	}
+  public DrtDriveTask(VrpPathWithTravelData path, DrtTaskType taskType) {
+    super(taskType, path);
+  }
 }

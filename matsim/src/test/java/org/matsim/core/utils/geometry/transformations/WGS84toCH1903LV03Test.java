@@ -20,7 +20,6 @@
 package org.matsim.core.utils.geometry.transformations;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 
@@ -29,16 +28,15 @@ import org.matsim.api.core.v01.Coord;
  */
 public class WGS84toCH1903LV03Test {
 
-	@Test
-	public void testTransform() {
-		double xx = 8.0 + 43.0/60 + 49.79/3600;
-		double yy = 46.0 + 02.0/60 + 38.87/3600;
-		double epsilon = 1e-2;
+  @Test
+  public void testTransform() {
+    double xx = 8.0 + 43.0 / 60 + 49.79 / 3600;
+    double yy = 46.0 + 02.0 / 60 + 38.87 / 3600;
+    double epsilon = 1e-2;
 
-		WGS84toCH1903LV03 converter = new WGS84toCH1903LV03();
-		Coord n = converter.transform(new Coord(xx, yy));
-		Assert.assertEquals(699999.76, n.getX(), epsilon);
-		Assert.assertEquals(99999.97, n.getY(), epsilon);
-	}
-
+    WGS84toCH1903LV03 converter = new WGS84toCH1903LV03();
+    Coord n = converter.transform(new Coord(xx, yy));
+    Assert.assertEquals(699999.76, n.getX(), epsilon);
+    Assert.assertEquals(99999.97, n.getY(), epsilon);
+  }
 }

@@ -26,9 +26,9 @@ import com.google.inject.Singleton;
 import org.matsim.core.controler.AbstractModule;
 
 public class ModeStatsModule extends AbstractModule {
-    @Override
-    public void install() {
-        bind(ModeStatsControlerListener.class).in(Singleton.class);
-        addControlerListenerBinding().to(ModeStatsControlerListener.class);
-    }
+  @Override
+  public void install() {
+    bind(ModeStatsControlerListener.class).in(Singleton.class);
+    addControlerListenerBinding().to(ModeStatsControlerListener.class);
+  }
 }

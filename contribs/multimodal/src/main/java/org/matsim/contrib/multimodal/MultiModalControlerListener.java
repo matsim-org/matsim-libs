@@ -20,10 +20,8 @@
 
 package org.matsim.contrib.multimodal;
 
-import java.util.Map;
-
 import jakarta.inject.Inject;
-
+import java.util.Map;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.StartupEvent;
@@ -32,24 +30,25 @@ import org.matsim.core.router.util.TravelTime;
 
 public class MultiModalControlerListener implements StartupListener {
 
-	private Config config;
-    private Scenario scenario;
-    private Map<String, TravelTime> multiModalTravelTimes;
+  private Config config;
+  private Scenario scenario;
+  private Map<String, TravelTime> multiModalTravelTimes;
 
-    @Inject
-    MultiModalControlerListener(Config config, Scenario scenario, Map<String, TravelTime> multiModalTravelTimes) {
-        this.config = config;
-        this.scenario = scenario;
-        this.multiModalTravelTimes = multiModalTravelTimes;
+  @Inject
+  MultiModalControlerListener(
+      Config config, Scenario scenario, Map<String, TravelTime> multiModalTravelTimes) {
+    this.config = config;
+    this.scenario = scenario;
+    this.multiModalTravelTimes = multiModalTravelTimes;
+  }
+
+  @Override
+  public void notifyStartup(StartupEvent event) {
+    if (!config.travelTimeCalculator().isFilterModes()) {
+      throw new RuntimeException(
+          "Filtering analyzed modes is NOT enabled in the TravelTimeCalculatorConfigGroup. "
+              + "It must be enabled since otherwise also link travel times of multi-modal legs would be "
+              + "taken into account!");
     }
-
-    @Override
-	public void notifyStartup(StartupEvent event) {
-        if (!config.travelTimeCalculator().isFilterModes()) {
-            throw new RuntimeException("Filtering analyzed modes is NOT enabled in the TravelTimeCalculatorConfigGroup. " +
-                    "It must be enabled since otherwise also link travel times of multi-modal legs would be " +
-                    "taken into account!");
-        }
-	}
-
+  }
 }

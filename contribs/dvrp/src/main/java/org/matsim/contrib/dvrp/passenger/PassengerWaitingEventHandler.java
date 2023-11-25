@@ -25,5 +25,5 @@ import org.matsim.core.events.handler.EventHandler;
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public interface PassengerWaitingEventHandler extends EventHandler {
-	void handleEvent(final PassengerWaitingEvent event);
+  void handleEvent(final PassengerWaitingEvent event);
 }

@@ -20,37 +20,38 @@
 package org.matsim.contrib.socnetsim.usage.replanning.removers;
 
 import com.google.inject.Inject;
-import org.matsim.core.config.Config;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.contrib.socnetsim.framework.replanning.removers.AbstractDumbRemoverFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.InverseScoreWeight;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.whoisthebossselector.WhoIsTheBossSelector;
 import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.MatsimRandom;
 
 public class WhoIsTheBossMinSelectorFactory extends AbstractDumbRemoverFactory {
-	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+  private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
 
-	@Inject
-	public WhoIsTheBossMinSelectorFactory(
-			final Config conf,
-			final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory) {
-		super( getMaxPlansPerAgent( conf ) );
-		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
-	}
+  @Inject
+  public WhoIsTheBossMinSelectorFactory(
+      final Config conf,
+      final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory) {
+    super(getMaxPlansPerAgent(conf));
+    this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+  }
 
-	private static int getMaxPlansPerAgent(final Config conf) {
-		final GroupReplanningConfigGroup group = (GroupReplanningConfigGroup) conf.getModule( GroupReplanningConfigGroup.GROUP_NAME );
-		return group.getMaxPlansPerAgent();
-	}
+  private static int getMaxPlansPerAgent(final Config conf) {
+    final GroupReplanningConfigGroup group =
+        (GroupReplanningConfigGroup) conf.getModule(GroupReplanningConfigGroup.GROUP_NAME);
+    return group.getMaxPlansPerAgent();
+  }
 
-	@Override
-	public GroupLevelPlanSelector createSelector() {
-		return new WhoIsTheBossSelector(
-				true ,
-				MatsimRandom.getLocalInstance(),
-				incompatiblePlansIdentifierFactory,
-				new InverseScoreWeight() );
-	}
+  @Override
+  public GroupLevelPlanSelector createSelector() {
+    return new WhoIsTheBossSelector(
+        true,
+        MatsimRandom.getLocalInstance(),
+        incompatiblePlansIdentifierFactory,
+        new InverseScoreWeight());
+  }
 }

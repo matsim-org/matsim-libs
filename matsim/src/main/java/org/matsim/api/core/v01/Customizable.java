@@ -19,41 +19,36 @@
 package org.matsim.api.core.v01;
 
 import java.util.Map;
-
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 
 /**
- * An interface to customize any class in <tt>org.matsim</tt> for
- * experiments only.
- * 
- * <p>In an experiment---implemented in the <tt>playground</tt>---it can be
- * useful to add additional information, objects or complex structures to
- * MATSim core classes. Therefore, it is allowed to implement this interface
- * for any class given in <tt>org.matsim</tt> and assign additional information
- * from the <tt>playground</tt> only.</p>
- * 
- * <p><b>BUT:</b> is is strictly prohibited to call methods defined in this interface
- * from any point inside the MATSim core (<tt>org.matsim</tt>).</p>
- * 
- * @author balmermi
+ * An interface to customize any class in <tt>org.matsim</tt> for experiments only.
  *
+ * <p>In an experiment---implemented in the <tt>playground</tt>---it can be useful to add additional
+ * information, objects or complex structures to MATSim core classes. Therefore, it is allowed to
+ * implement this interface for any class given in <tt>org.matsim</tt> and assign additional
+ * information from the <tt>playground</tt> only.
+ *
+ * <p><b>BUT:</b> is is strictly prohibited to call methods defined in this interface from any point
+ * inside the MATSim core (<tt>org.matsim</tt>).
+ *
+ * @author balmermi
  * @deprecated use {@link org.matsim.utils.objectattributes.attributable.Attributable instead}
  */
 @Deprecated
 public interface Customizable extends MatsimExtensionPoint {
 
-	//////////////////////////////////////////////////////////////////////
-	// methods
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // methods
+  //////////////////////////////////////////////////////////////////////
 
-	/**
-	 * returns a container for adding arbitrary additional information to
-	 * a MATSim core object.
-	 * 
-	 * <p>IMPORTANT NOTE: This container is meant to use for experiments only.
-	 * Therefore, do NOT call this method from the core (<tt>org.matsim</tt>).</p>
-
-	 * @return map for storing custom attributes
-	 */
-	public Map<String,Object> getCustomAttributes();
+  /**
+   * returns a container for adding arbitrary additional information to a MATSim core object.
+   *
+   * <p>IMPORTANT NOTE: This container is meant to use for experiments only. Therefore, do NOT call
+   * this method from the core (<tt>org.matsim</tt>).
+   *
+   * @return map for storing custom attributes
+   */
+  public Map<String, Object> getCustomAttributes();
 }

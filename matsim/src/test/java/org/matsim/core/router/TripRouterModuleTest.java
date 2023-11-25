@@ -38,22 +38,25 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class TripRouterModuleTest {
 
-    @Rule
-    public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
 
-    @Test
-    public void testRouterCreation() {
-        for (ControllerConfigGroup.RoutingAlgorithmType routingAlgorithmType : ControllerConfigGroup.RoutingAlgorithmType.values()) {
-            Config config = ConfigUtils.createConfig();
-            config.controller().setRoutingAlgorithmType(routingAlgorithmType);
-            Scenario scenario = ScenarioUtils.createScenario(config);
-            LeastCostPathCalculatorFactory defaultLeastCostPathCalculatorFactory = TripRouterFactoryBuilderWithDefaults.createDefaultLeastCostPathCalculatorFactory(scenario);
-            LeastCostPathCalculator pathCalculator = defaultLeastCostPathCalculatorFactory.createPathCalculator(
-                    scenario.getNetwork(),
-                    ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility(new FreeSpeedTravelTime()),
-                    new FreeSpeedTravelTime());
-            Assert.assertNotNull(pathCalculator);
-        }
+  @Test
+  public void testRouterCreation() {
+    for (ControllerConfigGroup.RoutingAlgorithmType routingAlgorithmType :
+        ControllerConfigGroup.RoutingAlgorithmType.values()) {
+      Config config = ConfigUtils.createConfig();
+      config.controller().setRoutingAlgorithmType(routingAlgorithmType);
+      Scenario scenario = ScenarioUtils.createScenario(config);
+      LeastCostPathCalculatorFactory defaultLeastCostPathCalculatorFactory =
+          TripRouterFactoryBuilderWithDefaults.createDefaultLeastCostPathCalculatorFactory(
+              scenario);
+      LeastCostPathCalculator pathCalculator =
+          defaultLeastCostPathCalculatorFactory.createPathCalculator(
+              scenario.getNetwork(),
+              ControlerDefaults.createDefaultTravelDisutilityFactory(scenario)
+                  .createTravelDisutility(new FreeSpeedTravelTime()),
+              new FreeSpeedTravelTime());
+      Assert.assertNotNull(pathCalculator);
     }
-
+  }
 }

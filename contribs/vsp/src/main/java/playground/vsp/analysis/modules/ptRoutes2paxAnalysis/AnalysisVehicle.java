@@ -27,98 +27,103 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 /**
  * @author droeder
- *
  */
 public class AnalysisVehicle {
 
-	private static final Logger log = LogManager.getLogger(AnalysisVehicle.class);
-	private double seatsOccupied;
-	private double capacity;
-	private Id locationId;
-	private Id id;
-	private Id<TransitLine> lineId;
-	private Id<TransitRoute> routeId;
-	private int stopIndex = -1;
+  private static final Logger log = LogManager.getLogger(AnalysisVehicle.class);
+  private double seatsOccupied;
+  private double capacity;
+  private Id locationId;
+  private Id id;
+  private Id<TransitLine> lineId;
+  private Id<TransitRoute> routeId;
+  private int stopIndex = -1;
 
-	public AnalysisVehicle(Id id, Id locationId, double capacity, Id<TransitLine> lineId, Id<TransitRoute> routeId) {
-		this.id = id;
-		this.locationId = locationId;
-		this.capacity = capacity;
-		this.seatsOccupied = 0.;
-		this.lineId = lineId;
-		this.routeId = routeId;
-	}
-	
-	public void personBoards(){
-		this.seatsOccupied++;
-		if(this.seatsOccupied > this.capacity){
-			log.warn("vehicle " + this.id + ", the number of seats occupied (" + this.seatsOccupied + ") is bigger than the capacity (" + this.capacity + ")!");
-		}
-	}
-	
-	public void personAlights(){
-		this.seatsOccupied--;
-		if(this.seatsOccupied < 0){
-			log.warn("vehicle " + this.id + ", less than zero seats are occupied. This should never happen!");
-		}
-	}
-	
-	public Id<Link> getStopIndexId(){
-		return Id.create(this.stopIndex, Link.class);
-	}
+  public AnalysisVehicle(
+      Id id, Id locationId, double capacity, Id<TransitLine> lineId, Id<TransitRoute> routeId) {
+    this.id = id;
+    this.locationId = locationId;
+    this.capacity = capacity;
+    this.seatsOccupied = 0.;
+    this.lineId = lineId;
+    this.routeId = routeId;
+  }
 
-	/**
-	 * @return the locationId
-	 */
-	public final Id getLocationId() {
-		return locationId;
-	}
+  public void personBoards() {
+    this.seatsOccupied++;
+    if (this.seatsOccupied > this.capacity) {
+      log.warn(
+          "vehicle "
+              + this.id
+              + ", the number of seats occupied ("
+              + this.seatsOccupied
+              + ") is bigger than the capacity ("
+              + this.capacity
+              + ")!");
+    }
+  }
 
-	/**
-	 * sets the real location id and increases the index of the current stop...
-	 * @param locationId the locationId to set
-	 */
-	public final void setLocationId(Id locationId) {
-		this.locationId = locationId;
-		this.stopIndex ++;
-	}
+  public void personAlights() {
+    this.seatsOccupied--;
+    if (this.seatsOccupied < 0) {
+      log.warn(
+          "vehicle " + this.id + ", less than zero seats are occupied. This should never happen!");
+    }
+  }
 
-	/**
-	 * @return the seatsOccupied
-	 */
-	public final double getSeatsOccupied() {
-		return seatsOccupied;
-	}
+  public Id<Link> getStopIndexId() {
+    return Id.create(this.stopIndex, Link.class);
+  }
 
-	/**
-	 * @return the capacity
-	 */
-	public final double getCapacity() {
-		return capacity;
-	}
+  /**
+   * @return the locationId
+   */
+  public final Id getLocationId() {
+    return locationId;
+  }
 
-	/**
-	 * @return the id
-	 */
-	public final Id getId() {
-		return id;
-	}
+  /**
+   * sets the real location id and increases the index of the current stop...
+   *
+   * @param locationId the locationId to set
+   */
+  public final void setLocationId(Id locationId) {
+    this.locationId = locationId;
+    this.stopIndex++;
+  }
 
-	/**
-	 * @return the lineId
-	 */
-	public final Id<TransitLine> getLineId() {
-		return lineId;
-	}
+  /**
+   * @return the seatsOccupied
+   */
+  public final double getSeatsOccupied() {
+    return seatsOccupied;
+  }
 
-	/**
-	 * @return the routeId
-	 */
-	public final Id<TransitRoute> getRouteId() {
-		return routeId;
-	}
-	
-	
-	
+  /**
+   * @return the capacity
+   */
+  public final double getCapacity() {
+    return capacity;
+  }
+
+  /**
+   * @return the id
+   */
+  public final Id getId() {
+    return id;
+  }
+
+  /**
+   * @return the lineId
+   */
+  public final Id<TransitLine> getLineId() {
+    return lineId;
+  }
+
+  /**
+   * @return the routeId
+   */
+  public final Id<TransitRoute> getRouteId() {
+    return routeId;
+  }
 }
-

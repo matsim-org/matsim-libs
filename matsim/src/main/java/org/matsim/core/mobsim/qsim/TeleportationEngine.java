@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * TeleportationEngine.java
@@ -19,9 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- /**
- * 
- */
+/** */
 package org.matsim.core.mobsim.qsim;
 
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
@@ -33,5 +30,4 @@ import org.matsim.vis.snapshotwriters.VisData;
  *
  * @author kainagel
  */
-public interface TeleportationEngine extends DepartureHandler, MobsimEngine, VisData {
-}
+public interface TeleportationEngine extends DepartureHandler, MobsimEngine, VisData {}

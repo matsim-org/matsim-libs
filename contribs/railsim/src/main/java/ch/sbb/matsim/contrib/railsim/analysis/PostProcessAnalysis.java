@@ -33,49 +33,49 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-/**
- * Class to generate rail sim csv files from event file.
- */
+/** Class to generate rail sim csv files from event file. */
 public final class PostProcessAnalysis {
 
-	private PostProcessAnalysis() {
-	}
+  private PostProcessAnalysis() {}
 
-	public static void main(String[] args) {
-		String eventsFilename;
-		String networkFilename = null;
-		if (args.length > 0) {
-			eventsFilename = args[0];
-		} else {
-			System.err.println("Please provide events filename.");
-			System.exit(2);
-			return;
-		}
-		if (args.length > 1) {
-			networkFilename = args[1];
-		}
+  public static void main(String[] args) {
+    String eventsFilename;
+    String networkFilename = null;
+    if (args.length > 0) {
+      eventsFilename = args[0];
+    } else {
+      System.err.println("Please provide events filename.");
+      System.exit(2);
+      return;
+    }
+    if (args.length > 1) {
+      networkFilename = args[1];
+    }
 
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		if (networkFilename != null) {
-			new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
-		}
+    Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    if (networkFilename != null) {
+      new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
+    }
 
-		RailLinkStateAnalysis linkStateAnalysis = new RailLinkStateAnalysis();
-		TrainStateAnalysis trainStateAnalysis = new TrainStateAnalysis();
+    RailLinkStateAnalysis linkStateAnalysis = new RailLinkStateAnalysis();
+    TrainStateAnalysis trainStateAnalysis = new TrainStateAnalysis();
 
-		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(linkStateAnalysis);
-		events.addHandler(trainStateAnalysis);
-		events.initProcessing();
+    EventsManager events = EventsUtils.createEventsManager();
+    events.addHandler(linkStateAnalysis);
+    events.addHandler(trainStateAnalysis);
+    events.initProcessing();
 
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.addCustomEventMapper(RailsimLinkStateChangeEvent.EVENT_TYPE, new RailsimLinkStateChangeEventMapper());
-		reader.addCustomEventMapper(RailsimTrainStateEvent.EVENT_TYPE, new RailsimTrainStateEventMapper());
-		reader.readFile(eventsFilename);
+    MatsimEventsReader reader = new MatsimEventsReader(events);
+    reader.addCustomEventMapper(
+        RailsimLinkStateChangeEvent.EVENT_TYPE, new RailsimLinkStateChangeEventMapper());
+    reader.addCustomEventMapper(
+        RailsimTrainStateEvent.EVENT_TYPE, new RailsimTrainStateEventMapper());
+    reader.readFile(eventsFilename);
 
-		events.finishProcessing();
+    events.finishProcessing();
 
-		RailsimCsvWriter.writeLinkStatesCsv(linkStateAnalysis.getEvents(), "railsimLinkStates.csv");
-		RailsimCsvWriter.writeTrainStatesCsv(trainStateAnalysis.getEvents(), scenario.getNetwork(), "railsimTrainStates.csv");
-	}
+    RailsimCsvWriter.writeLinkStatesCsv(linkStateAnalysis.getEvents(), "railsimLinkStates.csv");
+    RailsimCsvWriter.writeTrainStatesCsv(
+        trainStateAnalysis.getEvents(), scenario.getNetwork(), "railsimTrainStates.csv");
+  }
 }

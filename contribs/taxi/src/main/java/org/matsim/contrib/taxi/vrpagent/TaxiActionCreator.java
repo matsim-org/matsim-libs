@@ -42,39 +42,53 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author michalm
  */
 public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
-	public static final String PICKUP_ACTIVITY_TYPE = "TaxiPickup";
-	public static final String DROPOFF_ACTIVITY_TYPE = "TaxiDropoff";
-	public static final String STAY_ACTIVITY_TYPE = "TaxiStay";
+  public static final String PICKUP_ACTIVITY_TYPE = "TaxiPickup";
+  public static final String DROPOFF_ACTIVITY_TYPE = "TaxiDropoff";
+  public static final String STAY_ACTIVITY_TYPE = "TaxiStay";
 
-	private final PassengerHandler passengerHandler;
-	private final VrpLegFactory legFactory;
+  private final PassengerHandler passengerHandler;
+  private final VrpLegFactory legFactory;
 
-	public TaxiActionCreator(PassengerHandler passengerHandler, TaxiConfigGroup taxiCfg, MobsimTimer timer,
-			DvrpConfigGroup dvrpCfg) {
-		this(passengerHandler, taxiCfg.onlineVehicleTracker ?
-				v -> VrpLegFactory.createWithOnlineTracker(dvrpCfg.mobsimMode, v,
-						OnlineTrackerListener.NO_LISTENER, timer) :
-				v -> VrpLegFactory.createWithOfflineTracker(dvrpCfg.mobsimMode, v, timer));
-	}
+  public TaxiActionCreator(
+      PassengerHandler passengerHandler,
+      TaxiConfigGroup taxiCfg,
+      MobsimTimer timer,
+      DvrpConfigGroup dvrpCfg) {
+    this(
+        passengerHandler,
+        taxiCfg.onlineVehicleTracker
+            ? v ->
+                VrpLegFactory.createWithOnlineTracker(
+                    dvrpCfg.mobsimMode, v, OnlineTrackerListener.NO_LISTENER, timer)
+            : v -> VrpLegFactory.createWithOfflineTracker(dvrpCfg.mobsimMode, v, timer));
+  }
 
-	public TaxiActionCreator(PassengerHandler passengerHandler, VrpLegFactory legFactory) {
-		this.passengerHandler = passengerHandler;
-		this.legFactory = legFactory;
-	}
+  public TaxiActionCreator(PassengerHandler passengerHandler, VrpLegFactory legFactory) {
+    this.passengerHandler = passengerHandler;
+    this.legFactory = legFactory;
+  }
 
-	@Override
-	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
-		Task task = vehicle.getSchedule().getCurrentTask();
-		return switch (getBaseTypeOrElseThrow(task)) {
-			case EMPTY_DRIVE, OCCUPIED_DRIVE -> legFactory.create(vehicle);
+  @Override
+  public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
+    Task task = vehicle.getSchedule().getCurrentTask();
+    return switch (getBaseTypeOrElseThrow(task)) {
+      case EMPTY_DRIVE, OCCUPIED_DRIVE -> legFactory.create(vehicle);
 
-			case PICKUP -> new SinglePassengerPickupActivity(passengerHandler, dynAgent, (TaxiPickupTask)task,
-					((TaxiPickupTask)task).getRequest(), PICKUP_ACTIVITY_TYPE);
+      case PICKUP -> new SinglePassengerPickupActivity(
+          passengerHandler,
+          dynAgent,
+          (TaxiPickupTask) task,
+          ((TaxiPickupTask) task).getRequest(),
+          PICKUP_ACTIVITY_TYPE);
 
-			case DROPOFF -> new SinglePassengerDropoffActivity(passengerHandler, dynAgent, (TaxiDropoffTask)task,
-					((TaxiDropoffTask)task).getRequest(), DROPOFF_ACTIVITY_TYPE);
+      case DROPOFF -> new SinglePassengerDropoffActivity(
+          passengerHandler,
+          dynAgent,
+          (TaxiDropoffTask) task,
+          ((TaxiDropoffTask) task).getRequest(),
+          DROPOFF_ACTIVITY_TYPE);
 
-			case STAY -> new IdleDynActivity(STAY_ACTIVITY_TYPE, task::getEndTime);
-		};
-	}
+      case STAY -> new IdleDynActivity(STAY_ACTIVITY_TYPE, task::getEndTime);
+    };
+  }
 }

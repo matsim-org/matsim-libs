@@ -19,28 +19,30 @@
 
 package org.matsim.contrib.dvrp.schedule;
 
-import org.matsim.api.core.v01.network.Link;
-
 import com.google.common.base.MoreObjects;
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class DefaultStayTask extends AbstractTask implements StayTask {
-	private final Link link;
+  private final Link link;
 
-	public DefaultStayTask(TaskType taskType, double beginTime, double endTime, Link link) {
-		super(taskType, beginTime, endTime);
-		this.link = link;
-	}
+  public DefaultStayTask(TaskType taskType, double beginTime, double endTime, Link link) {
+    super(taskType, beginTime, endTime);
+    this.link = link;
+  }
 
-	@Override
-	public final Link getLink() {
-		return link;
-	}
+  @Override
+  public final Link getLink() {
+    return link;
+  }
 
-	@Override
-	public String toString() {
-		return MoreObjects.toStringHelper(this).add("super", super.toString()).add("link", link).toString();
-	}
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("super", super.toString())
+        .add("link", link)
+        .toString();
+  }
 }

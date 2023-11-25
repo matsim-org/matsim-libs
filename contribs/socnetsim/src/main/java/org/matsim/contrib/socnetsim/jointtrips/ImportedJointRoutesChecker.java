@@ -21,7 +21,6 @@ package org.matsim.contrib.socnetsim.jointtrips;
 
 import java.util.Iterator;
 import java.util.List;
-
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -36,69 +35,72 @@ import org.matsim.facilities.FacilitiesUtils;
 
 /**
  * Checks driver routes, in case only passengers were provided in the plan file
+ *
  * @author thibautd
  */
 public class ImportedJointRoutesChecker implements PlanAlgorithm, PersonAlgorithm {
-	private final TripRouter router;
+  private final TripRouter router;
 
-	public ImportedJointRoutesChecker(final TripRouter router) {
-		this.router = router;
-	}
+  public ImportedJointRoutesChecker(final TripRouter router) {
+    this.router = router;
+  }
 
-	@Override
-	public void run(final Person person) {
-		for ( Plan plan : person.getPlans() ) {
-			run( plan );
-		}
-	}
+  @Override
+  public void run(final Person person) {
+    for (Plan plan : person.getPlans()) {
+      run(plan);
+    }
+  }
 
-	@Override
-	public void run(final Plan plan) {
-		Iterator<PlanElement> pes = plan.getPlanElements().iterator();
+  @Override
+  public void run(final Plan plan) {
+    Iterator<PlanElement> pes = plan.getPlanElements().iterator();
 
-		Activity origin = (Activity) pes.next();
-		double now = 0;
-		while (pes.hasNext()) {
-			// FIXME: relies on the assumption of strict alternance leg/act
-			Leg l = (Leg) pes.next();
-			Activity dest = (Activity) pes.next();
+    Activity origin = (Activity) pes.next();
+    double now = 0;
+    while (pes.hasNext()) {
+      // FIXME: relies on the assumption of strict alternance leg/act
+      Leg l = (Leg) pes.next();
+      Activity dest = (Activity) pes.next();
 
-			now = updateTime( now , origin );
-			if (l.getRoute() != null && l.getRoute() instanceof DriverRoute) {
-				List<? extends PlanElement> trip =
-					router.calcRoute(
-							l.getMode(),
-						  FacilitiesUtils.toFacility( origin, null ),
-						  FacilitiesUtils.toFacility( dest, null ),
-							now,
-							plan.getPerson(), origin.getAttributes());
+      now = updateTime(now, origin);
+      if (l.getRoute() != null && l.getRoute() instanceof DriverRoute) {
+        List<? extends PlanElement> trip =
+            router.calcRoute(
+                l.getMode(),
+                FacilitiesUtils.toFacility(origin, null),
+                FacilitiesUtils.toFacility(dest, null),
+                now,
+                plan.getPerson(),
+                origin.getAttributes());
 
-				if (trip.size() != 1) {
-					throw new RuntimeException( "unexpected trip length "+trip.size()+" for "+trip+" for mode "+l.getMode());
-				}
+        if (trip.size() != 1) {
+          throw new RuntimeException(
+              "unexpected trip length "
+                  + trip.size()
+                  + " for "
+                  + trip
+                  + " for mode "
+                  + l.getMode());
+        }
 
-				DriverRoute newRoute = (DriverRoute) ((Leg) trip.get( 0 )).getRoute();
-				newRoute.setPassengerIds( ((DriverRoute) l.getRoute()).getPassengersIds() );
-				l.setRoute( newRoute );
-			}
+        DriverRoute newRoute = (DriverRoute) ((Leg) trip.get(0)).getRoute();
+        newRoute.setPassengerIds(((DriverRoute) l.getRoute()).getPassengersIds());
+        l.setRoute(newRoute);
+      }
 
-			now = updateTime( now , l );
-			origin = dest;
-		}
-	}
+      now = updateTime(now, l);
+      origin = dest;
+    }
+  }
 
-	private static double updateTime(
-			final double currTime,
-			final Activity act) {
-		OptionalTime e = act.getEndTime();
-		OptionalTime d = act.getMaximumDuration();
-		return e.orElseGet(() -> currTime + d.orElse(0));
-	}
+  private static double updateTime(final double currTime, final Activity act) {
+    OptionalTime e = act.getEndTime();
+    OptionalTime d = act.getMaximumDuration();
+    return e.orElseGet(() -> currTime + d.orElse(0));
+  }
 
-	private static double updateTime(
-			final double currTime,
-			final Leg leg) {
-		return currTime + leg.getTravelTime().orElse(0);
-	}
+  private static double updateTime(final double currTime, final Leg leg) {
+    return currTime + leg.getTravelTime().orElse(0);
+  }
 }
-

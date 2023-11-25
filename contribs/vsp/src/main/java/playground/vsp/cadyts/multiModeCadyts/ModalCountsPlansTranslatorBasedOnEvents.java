@@ -20,12 +20,12 @@
 
 package playground.vsp.cadyts.multiModeCadyts;
 
+import cadyts.demand.PlanBuilder;
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import jakarta.inject.Inject;
-import cadyts.demand.PlanBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -41,123 +41,147 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
-class ModalCountsPlansTranslatorBasedOnEvents implements PlansTranslator<ModalCountsLinkIdentifier>, LinkLeaveEventHandler,
-VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+class ModalCountsPlansTranslatorBasedOnEvents
+    implements PlansTranslator<ModalCountsLinkIdentifier>,
+        LinkLeaveEventHandler,
+        VehicleEntersTrafficEventHandler,
+        VehicleLeavesTrafficEventHandler {
 
-	private static final Logger log = LogManager.getLogger(ModalCountsPlansTranslatorBasedOnEvents.class);
+  private static final Logger log =
+      LogManager.getLogger(ModalCountsPlansTranslatorBasedOnEvents.class);
 
-	private final Scenario scenario;
+  private final Scenario scenario;
 
-	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
-	private final Map<Id<Person>,String> personId2Mode = new HashMap<>();
+  private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+  private final Map<Id<Person>, String> personId2Mode = new HashMap<>();
 
-	private int iteration = -1;
+  private int iteration = -1;
 
-	// this is _only_ there for output:
-    private final Set<Plan> plansEverSeen = new HashSet<>();
+  // this is _only_ there for output:
+  private final Set<Plan> plansEverSeen = new HashSet<>();
 
-	private static final String STR_PLANSTEPFACTORY = "planStepFactory";
-	private static final String STR_ITERATION = "iteration";
+  private static final String STR_PLANSTEPFACTORY = "planStepFactory";
+  private static final String STR_ITERATION = "iteration";
 
-	private final Set<Id<ModalCountsLinkIdentifier>> calibratedLinks ;
-	private final Map<Id<ModalCountsLinkIdentifier>,ModalCountsLinkIdentifier> modalLinkContainer;
+  private final Set<Id<ModalCountsLinkIdentifier>> calibratedLinks;
+  private final Map<Id<ModalCountsLinkIdentifier>, ModalCountsLinkIdentifier> modalLinkContainer;
 
-	@Inject
-    ModalCountsPlansTranslatorBasedOnEvents(final Scenario scenario, Map<Id<ModalCountsLinkIdentifier>,ModalCountsLinkIdentifier> modalLinkContainer) {
-		this.scenario = scenario;
-		this.calibratedLinks = modalLinkContainer.keySet();
-		this.modalLinkContainer = modalLinkContainer;
-	}
+  @Inject
+  ModalCountsPlansTranslatorBasedOnEvents(
+      final Scenario scenario,
+      Map<Id<ModalCountsLinkIdentifier>, ModalCountsLinkIdentifier> modalLinkContainer) {
+    this.scenario = scenario;
+    this.calibratedLinks = modalLinkContainer.keySet();
+    this.modalLinkContainer = modalLinkContainer;
+  }
 
-	private long plansFound = 0;
-	private long plansNotFound = 0;
+  private long plansFound = 0;
+  private long plansNotFound = 0;
 
-	@Override
-	public final cadyts.demand.Plan<ModalCountsLinkIdentifier> getCadytsPlan(final Plan plan) {
-		@SuppressWarnings("unchecked")
-		PlanBuilder<ModalCountsLinkIdentifier> planStepFactory = (PlanBuilder<ModalCountsLinkIdentifier>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
-		if (planStepFactory == null) {
-			this.plansNotFound++;
-			return null;
-		}
-		this.plansFound++;
-		return planStepFactory.getResult();
-	}
+  @Override
+  public final cadyts.demand.Plan<ModalCountsLinkIdentifier> getCadytsPlan(final Plan plan) {
+    @SuppressWarnings("unchecked")
+    PlanBuilder<ModalCountsLinkIdentifier> planStepFactory =
+        (PlanBuilder<ModalCountsLinkIdentifier>)
+            plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
+    if (planStepFactory == null) {
+      this.plansNotFound++;
+      return null;
+    }
+    this.plansFound++;
+    return planStepFactory.getResult();
+  }
 
-	@Override
-	public void reset(final int iteration) {
-		this.iteration = iteration;
+  @Override
+  public void reset(final int iteration) {
+    this.iteration = iteration;
 
-		log.warn("found " + this.plansFound + " out of " + (this.plansFound + this.plansNotFound) + " ("
-				+ (100. * this.plansFound / (this.plansFound + this.plansNotFound)) + "%)");
-		log.warn("(above values may both be at zero for a couple of iterations if multiple plans per agent all have no score)");
+    log.warn(
+        "found "
+            + this.plansFound
+            + " out of "
+            + (this.plansFound + this.plansNotFound)
+            + " ("
+            + (100. * this.plansFound / (this.plansFound + this.plansNotFound))
+            + "%)");
+    log.warn(
+        "(above values may both be at zero for a couple of iterations if multiple plans per agent all have no score)");
 
-		delegate.reset(iteration);
-	}
+    delegate.reset(iteration);
+  }
 
-	@Override
-	public void handleEvent(VehicleEntersTrafficEvent event) {
-			delegate.handleEvent(event);
-			this.personId2Mode.put(event.getPersonId(), event.getNetworkMode());
-	}
+  @Override
+  public void handleEvent(VehicleEntersTrafficEvent event) {
+    delegate.handleEvent(event);
+    this.personId2Mode.put(event.getPersonId(), event.getNetworkMode());
+  }
 
-	@Override
-	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		delegate.handleEvent(event);
-		this.personId2Mode.remove(event.getPersonId());
-	}
+  @Override
+  public void handleEvent(VehicleLeavesTrafficEvent event) {
+    delegate.handleEvent(event);
+    this.personId2Mode.remove(event.getPersonId());
+  }
 
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
+  @Override
+  public void handleEvent(LinkLeaveEvent event) {
 
-		Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
-		String mode = this.personId2Mode.get(driverId);
-		// should not happen since all modes are considered now
-		if (driverId == null) throw new RuntimeException("Link leave event "+ event.toString() + ". However, "+event.getVehicleId()+" is not entered traffic.");
+    Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
+    String mode = this.personId2Mode.get(driverId);
+    // should not happen since all modes are considered now
+    if (driverId == null)
+      throw new RuntimeException(
+          "Link leave event "
+              + event.toString()
+              + ". However, "
+              + event.getVehicleId()
+              + " is not entered traffic.");
 
-		// if only a subset of links is calibrated but the link is not contained, ignore the event
+    // if only a subset of links is calibrated but the link is not contained, ignore the event
 
-		Id<ModalCountsLinkIdentifier> mlId = ModalCountsUtils.getModalCountLinkId(mode, event.getLinkId());
-		if (!calibratedLinks.contains(mlId))
-			return;
+    Id<ModalCountsLinkIdentifier> mlId =
+        ModalCountsUtils.getModalCountLinkId(mode, event.getLinkId());
+    if (!calibratedLinks.contains(mlId)) return;
 
-		// get the "Person" behind the id:
-		Person person = this.scenario.getPopulation().getPersons().get(driverId);
+    // get the "Person" behind the id:
+    Person person = this.scenario.getPopulation().getPersons().get(driverId);
 
-		// get the selected plan:
-		Plan selectedPlan = person.getSelectedPlan();
+    // get the selected plan:
+    Plan selectedPlan = person.getSelectedPlan();
 
-		// get the planStepFactory for the plan (or create one):
-		PlanBuilder<ModalCountsLinkIdentifier> tmpPlanStepFactory = getPlanStepFactoryForPlan(selectedPlan);
+    // get the planStepFactory for the plan (or create one):
+    PlanBuilder<ModalCountsLinkIdentifier> tmpPlanStepFactory =
+        getPlanStepFactoryForPlan(selectedPlan);
 
-		if (tmpPlanStepFactory != null) {
+    if (tmpPlanStepFactory != null) {
 
-			// add the "turn" to the planStepfactory
-			tmpPlanStepFactory.addTurn(modalLinkContainer.get(mlId), (int) event.getTime());
-		}
-	}
+      // add the "turn" to the planStepfactory
+      tmpPlanStepFactory.addTurn(modalLinkContainer.get(mlId), (int) event.getTime());
+    }
+  }
 
-	// ###################################################################################
-	// only private functions below here (low level functionality)
+  // ###################################################################################
+  // only private functions below here (low level functionality)
 
-	private PlanBuilder<ModalCountsLinkIdentifier> getPlanStepFactoryForPlan(final Plan selectedPlan) {
-		PlanBuilder<ModalCountsLinkIdentifier> planStepFactory = null;
+  private PlanBuilder<ModalCountsLinkIdentifier> getPlanStepFactoryForPlan(
+      final Plan selectedPlan) {
+    PlanBuilder<ModalCountsLinkIdentifier> planStepFactory = null;
 
-		planStepFactory = (PlanBuilder<ModalCountsLinkIdentifier>) selectedPlan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
-		Integer factoryIteration = (Integer) selectedPlan.getCustomAttributes().get(STR_ITERATION);
-		if (planStepFactory == null || factoryIteration == null || factoryIteration != this.iteration) {
-			// attach the iteration number to the plan:
-			selectedPlan.getCustomAttributes().put(STR_ITERATION, this.iteration);
+    planStepFactory =
+        (PlanBuilder<ModalCountsLinkIdentifier>)
+            selectedPlan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
+    Integer factoryIteration = (Integer) selectedPlan.getCustomAttributes().get(STR_ITERATION);
+    if (planStepFactory == null || factoryIteration == null || factoryIteration != this.iteration) {
+      // attach the iteration number to the plan:
+      selectedPlan.getCustomAttributes().put(STR_ITERATION, this.iteration);
 
-			// construct a new PlanBulder and attach it to the plan:
-			planStepFactory = new PlanBuilder<>();
-			selectedPlan.getCustomAttributes().put(STR_PLANSTEPFACTORY, planStepFactory);
+      // construct a new PlanBulder and attach it to the plan:
+      planStepFactory = new PlanBuilder<>();
+      selectedPlan.getCustomAttributes().put(STR_PLANSTEPFACTORY, planStepFactory);
 
-			// memorize the plan as being seen:
-			this.plansEverSeen.add(selectedPlan);
-		}
+      // memorize the plan as being seen:
+      this.plansEverSeen.add(selectedPlan);
+    }
 
-		return planStepFactory;
-	}
-
+    return planStepFactory;
+  }
 }

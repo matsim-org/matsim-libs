@@ -31,136 +31,146 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.LazyAllocationAttributes;
 
 /**
- * An optimized implementation for interaction activities where start- and endtime is undefined and duration is 0.
- * Since these values are final, we do not need to store them and therefore we can save quite some memory.
+ * An optimized implementation for interaction activities where start- and endtime is undefined and
+ * duration is 0. Since these values are final, we do not need to store them and therefore we can
+ * save quite some memory.
  */
 /*package*/ final class InteractionActivity implements Activity {
 
-	private static final Attributes EMPTY_ATTRIBUTES = new LazyAllocationAttributes(attributes -> {
-		throw new RuntimeException("interaction activities cannot have attributes.");
-	}, () -> null);
-	
-	private String type;
-	private Coord coord = null;
-	private Id<Link> linkId = null;
-	private Id<ActivityFacility> facilityId = null;
+  private static final Attributes EMPTY_ATTRIBUTES =
+      new LazyAllocationAttributes(
+          attributes -> {
+            throw new RuntimeException("interaction activities cannot have attributes.");
+          },
+          () -> null);
 
-	/*package*/ InteractionActivity(final String type) {
-		this.type = type.intern();
-	}
+  private String type;
+  private Coord coord = null;
+  private Id<Link> linkId = null;
+  private Id<ActivityFacility> facilityId = null;
 
-	@Override
-	public OptionalTime getEndTime() {
-		return OptionalTime.undefined();
-	}
+  /*package*/ InteractionActivity(final String type) {
+    this.type = type.intern();
+  }
 
-	@Override
-	public void setEndTime(final double endTime) {
-		throw new UnsupportedOperationException("Setting duration is not supported for InteractionActivity.");
-	}
+  @Override
+  public OptionalTime getEndTime() {
+    return OptionalTime.undefined();
+  }
 
-	@Override
-	public void setEndTimeUndefined() {
-		// It is already undefined, i.e. do nothing.
-	}
+  @Override
+  public void setEndTime(final double endTime) {
+    throw new UnsupportedOperationException(
+        "Setting duration is not supported for InteractionActivity.");
+  }
 
-	@Override
-	public OptionalTime getStartTime() {
-		return OptionalTime.undefined();
-	}
+  @Override
+  public void setEndTimeUndefined() {
+    // It is already undefined, i.e. do nothing.
+  }
 
-	@Override
-	public void setStartTime(final double startTime) {
-		throw new UnsupportedOperationException("Setting start time is not supported for InteractionActivity.");
-	}
+  @Override
+  public OptionalTime getStartTime() {
+    return OptionalTime.undefined();
+  }
 
-	@Override
-	public void setStartTimeUndefined() {
-		// It is already undefined, i.e. do nothing.
-	}
+  @Override
+  public void setStartTime(final double startTime) {
+    throw new UnsupportedOperationException(
+        "Setting start time is not supported for InteractionActivity.");
+  }
 
-	@Override
-	public OptionalTime getMaximumDuration() {
-		return OptionalTime.zeroSeconds();
-	}
+  @Override
+  public void setStartTimeUndefined() {
+    // It is already undefined, i.e. do nothing.
+  }
 
-	@Override
-	public void setMaximumDuration(final double dur) {
-		// For compatibility reasons: allow setting duration to 0 which is the default value anyway.
-		if (dur != 0) throw new UnsupportedOperationException("Setting duration is not supported for InteractionActivity.");
-	}
+  @Override
+  public OptionalTime getMaximumDuration() {
+    return OptionalTime.zeroSeconds();
+  }
 
-	@Override
-	public void setMaximumDurationUndefined() {
-		throw new UnsupportedOperationException("Setting duration to undefined is not supported for InteractionActivity.");
-	}
+  @Override
+  public void setMaximumDuration(final double dur) {
+    // For compatibility reasons: allow setting duration to 0 which is the default value anyway.
+    if (dur != 0)
+      throw new UnsupportedOperationException(
+          "Setting duration is not supported for InteractionActivity.");
+  }
 
-	@Override
-	public String getType() {
-		return this.type;
-	}
+  @Override
+  public void setMaximumDurationUndefined() {
+    throw new UnsupportedOperationException(
+        "Setting duration to undefined is not supported for InteractionActivity.");
+  }
 
-	@Override
-	public void setType(final String type) {
-		this.type = type.intern();
-	}
+  @Override
+  public String getType() {
+    return this.type;
+  }
 
-	@Override
-	public Coord getCoord() {
-		return this.coord;
-	}
+  @Override
+  public void setType(final String type) {
+    this.type = type.intern();
+  }
 
-	@Override
-	public void setCoord(final Coord coord) {
-		this.coord = coord;
-	}
+  @Override
+  public Coord getCoord() {
+    return this.coord;
+  }
 
-	@Override
-	public Id<Link> getLinkId() {
-		return this.linkId;
-	}
+  @Override
+  public void setCoord(final Coord coord) {
+    this.coord = coord;
+  }
 
-	@Override
-	public Id<ActivityFacility> getFacilityId() {
-		return this.facilityId;
-	}
+  @Override
+  public Id<Link> getLinkId() {
+    return this.linkId;
+  }
 
-	@Override
-	public void setFacilityId(final Id<ActivityFacility> facilityId) {
-		this.facilityId = facilityId;
-	}
+  @Override
+  public Id<ActivityFacility> getFacilityId() {
+    return this.facilityId;
+  }
 
-	@Override
-	public void setLinkId(final Id<Link> linkId) {
-		this.linkId = linkId;
-	}
+  @Override
+  public void setFacilityId(final Id<ActivityFacility> facilityId) {
+    this.facilityId = facilityId;
+  }
 
-	@Override
-	public Attributes getAttributes() {
-		return EMPTY_ATTRIBUTES;
-}
+  @Override
+  public void setLinkId(final Id<Link> linkId) {
+    this.linkId = linkId;
+  }
 
-	@Override
-	public String toString() {
-		return "act [type="
-				+ this.getType()
-				+ "]"
-				+ "[coord="
-				+ this.getCoord()
-				+ "]"
-				+ "[linkId="
-				+ this.linkId
-				+ "]"
-				+ "[startTime="
-				+ Time.writeTime(getStartTime())
-				+ "]"
-				+ "[endTime="
-				+ Time.writeTime(getEndTime())
-				+ "]"
-				+ "[duration="
-				+ Time.writeTime(getMaximumDuration())
-				+ "]"
-				+ "[facilityId="
-				+ this.facilityId + "]" ;
-	}
+  @Override
+  public Attributes getAttributes() {
+    return EMPTY_ATTRIBUTES;
+  }
+
+  @Override
+  public String toString() {
+    return "act [type="
+        + this.getType()
+        + "]"
+        + "[coord="
+        + this.getCoord()
+        + "]"
+        + "[linkId="
+        + this.linkId
+        + "]"
+        + "[startTime="
+        + Time.writeTime(getStartTime())
+        + "]"
+        + "[endTime="
+        + Time.writeTime(getEndTime())
+        + "]"
+        + "[duration="
+        + Time.writeTime(getMaximumDuration())
+        + "]"
+        + "[facilityId="
+        + this.facilityId
+        + "]";
+  }
 }

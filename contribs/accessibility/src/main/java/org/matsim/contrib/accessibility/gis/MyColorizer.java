@@ -18,73 +18,68 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
+/** */
 package org.matsim.contrib.accessibility.gis;
 
 import gnu.trove.iterator.TObjectDoubleIterator;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
-
 import java.awt.Color;
 
 /**
  * @author illenberger
  * @author thomas
  */
-final class MyColorizer implements Colorizable{
-	
-	private final TObjectDoubleHashMap values;
-	
-	private double max;
-	
-	private double min;
-	
-	private boolean logscale;
-	
-	public MyColorizer(TObjectDoubleHashMap<?> values) {
-		this.values = values;
-		
-		max = - Double.MAX_VALUE;
-		min = Double.MAX_VALUE;
-		
-		TObjectDoubleIterator<?> it = values.iterator();
-		for(int i = 0; i < values.size(); i++) {
-			it.advance();
-			max = Math.max(max, it.value());
-			min = Math.min(min, it.value());
-		}
-	}
-	
-	public void setLogscale(boolean logscale) {
-		this.logscale = logscale;
-	}
-	
-	public boolean isLogscale() {
-		return logscale;
-	}
-	
-	@SuppressWarnings("unchecked")
-	protected double getValue(Object object) {
-		double r = values.get(object);
+final class MyColorizer implements Colorizable {
 
-		return r;
-	}
-	
-	@Override
-	public Color getColor(Object object) {
-		double val = getValue(object);
-		double color = 0;
-		if (logscale) {
-			double min2 = Math.log(min + 1);
-			double max2 = Math.log(max + 1);
-			color = (Math.log(val + 1) - min2) / (max2 - min2);
-		} else {
-			color = (val - min) / (max - min);
-		}
+  private final TObjectDoubleHashMap values;
 
-		return ColorUtils.getGRBColor(color);
-	}
+  private double max;
 
+  private double min;
+
+  private boolean logscale;
+
+  public MyColorizer(TObjectDoubleHashMap<?> values) {
+    this.values = values;
+
+    max = -Double.MAX_VALUE;
+    min = Double.MAX_VALUE;
+
+    TObjectDoubleIterator<?> it = values.iterator();
+    for (int i = 0; i < values.size(); i++) {
+      it.advance();
+      max = Math.max(max, it.value());
+      min = Math.min(min, it.value());
+    }
+  }
+
+  public void setLogscale(boolean logscale) {
+    this.logscale = logscale;
+  }
+
+  public boolean isLogscale() {
+    return logscale;
+  }
+
+  @SuppressWarnings("unchecked")
+  protected double getValue(Object object) {
+    double r = values.get(object);
+
+    return r;
+  }
+
+  @Override
+  public Color getColor(Object object) {
+    double val = getValue(object);
+    double color = 0;
+    if (logscale) {
+      double min2 = Math.log(min + 1);
+      double max2 = Math.log(max + 1);
+      color = (Math.log(val + 1) - min2) / (max2 - min2);
+    } else {
+      color = (val - min) / (max - min);
+    }
+
+    return ColorUtils.getGRBColor(color);
+  }
 }
-

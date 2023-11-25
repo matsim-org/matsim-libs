@@ -30,43 +30,41 @@ import org.matsim.facilities.FacilitiesWriter;
 
 public abstract class TriangleScenario {
 
-	public static final long CHECKSUM_WORLD_EMPTY = 4202206189L;
+  public static final long CHECKSUM_WORLD_EMPTY = 4202206189L;
 
-	private static final String studyfolder = "test/scenarios/triangle/";
+  private static final String studyfolder = "test/scenarios/triangle/";
 
-	private TriangleScenario() {
-	}
+  private TriangleScenario() {}
 
-	//////////////////////////////////////////////////////////////////////
-	// setup
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // setup
+  //////////////////////////////////////////////////////////////////////
 
-	public static final void setUpScenarioConfig(final Config config) {
-		config.network().setInputFile(studyfolder + "network.xml");
-		config.facilities().setInputFile(studyfolder + "facilities.xml");
-	}
+  public static final void setUpScenarioConfig(final Config config) {
+    config.network().setInputFile(studyfolder + "network.xml");
+    config.facilities().setInputFile(studyfolder + "facilities.xml");
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// write output
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // write output
+  //////////////////////////////////////////////////////////////////////
 
-	public static final void writePlans(Population plans, Network network, String filename) {
-		System.out.println("  writing plans xml file... ");
-		new PopulationWriter(plans, network).write(filename);
-		System.out.println("  done.");
-	}
+  public static final void writePlans(Population plans, Network network, String filename) {
+    System.out.println("  writing plans xml file... ");
+    new PopulationWriter(plans, network).write(filename);
+    System.out.println("  done.");
+  }
 
-	public static final void writeFacilities(ActivityFacilities facilities, String filename) {
-		System.out.println("  writing facilities xml file... ");
-		new FacilitiesWriter(facilities).write(filename);
-		System.out.println("  done.");
-	}
+  public static final void writeFacilities(ActivityFacilities facilities, String filename) {
+    System.out.println("  writing facilities xml file... ");
+    new FacilitiesWriter(facilities).write(filename);
+    System.out.println("  done.");
+  }
 
-	public static final void writeNetwork(Network network, String filename) {
-		System.out.println("  writing network xml file... ");
-		NetworkWriter network_writer = new NetworkWriter(network);
-		network_writer.write(filename);
-		System.out.println("  done.");
-	}
-
+  public static final void writeNetwork(Network network, String filename) {
+    System.out.println("  writing network xml file... ");
+    NetworkWriter network_writer = new NetworkWriter(network);
+    network_writer.write(filename);
+    System.out.println("  done.");
+  }
 }

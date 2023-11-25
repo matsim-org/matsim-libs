@@ -17,11 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
+/** */
 package org.matsim.contrib.noise;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -29,465 +32,514 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.*;
-
 /**
- *
  * Contains all methods for writing noise-specific output.
  *
  * @author ikaddoura
- *
  */
 final class NoiseWriter {
-	private static final Logger log = LogManager.getLogger(NoiseWriter.class);
-
-	public static void writeReceiverPoints(NoiseContext noiseContext, String outputPath, boolean useCompression) {
-
-		// csv file
-		Map<Id<ReceiverPoint>,Double> id2xCoord = new HashMap<>();
-		Map<Id<ReceiverPoint>,Double> id2yCoord = new HashMap<>();
-		int c = 0;
-		for(Id<ReceiverPoint> id : noiseContext.getReceiverPoints().keySet()) {
-			c++;
-			if(c % 10000 == 0) {
-				log.info("Writing out receiver point # "+ c);
-			}
-			id2xCoord.put(id, noiseContext.getReceiverPoints().get(id).getCoord().getX());
-			id2yCoord.put(id, noiseContext.getReceiverPoints().get(id).getCoord().getY());
-		}
-		List<String> headers = new ArrayList<>();
-		headers.add("receiverPointId");
-		headers.add("xCoord");
-		headers.add("yCoord");
-
-		List<Map<Id<ReceiverPoint>,Double>> values = new ArrayList<>();
-		values.add(id2xCoord);
-		values.add(id2yCoord);
-
-		write(outputPath, 3, headers, values, useCompression);
-
-		// shape file
-
-//		PointFeatureFactory factory = new PointFeatureFactory.Builder()
-//		.setCrs(MGC.getCRS(noiseContext.getNoiseParams().getTransformationFactory()))
-//		.setName("receiver point")
-//		.addAttribute("Id", String.class)
-//		.create();
-//		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
-//		
-//		for (ReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
-//					
-//			SimpleFeature feature = factory.createPoint(MGC.coord2Coordinate(rp.getCoord()), new Object[] {rp.getId().toString()}, null);
-//			features.add(feature);
-//		}
-//		
-//		String filePath = outputPath;
-//		File file = new File(filePath);
-//		file.mkdirs();
-//		
-//		log.info("Writing receiver points to shapefile... ");
-//		ShapeFileWriter.writeGeometries(features, filePath + "receiverPoints.shp");
-//		log.info("Writing receiver points to shapefile... Done. ");
-	}
-
-	public static void write (String fileName , int columns , List<String> headers , List<Map<Id<ReceiverPoint>,Double>> values, boolean useCompression) {
-
-		File file = new File(fileName);
-		file.mkdirs();
-
-		String file2 = fileName + "receiverPoints.csv" ;
-		if ( useCompression ) {
-			file2 += ".gz" ;
-		}
-
-		// For all maps, the number of keys should be the same
-		try ( BufferedWriter bw = IOUtils.getBufferedWriter(file2) ) {
-			bw.write(headers.get(0));
-			for(int i = 1 ; i < columns ; i++) {
-				bw.write(";"+headers.get(i));
-			}
-			bw.newLine();
-
-			for(Id<ReceiverPoint> id : values.get(0).keySet()) {
-				bw.write(id.toString());
-				for(int i = 0 ; i < (columns-1) ; i++) {
-					bw.write(";"+values.get(i).get(id));
-				}
-				bw.newLine();
-			}
-
-			bw.close();
-				log.info("Receiver points written to " + fileName);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	static void writeNoiseEmissionStatsPerHour(NoiseContext noiseContext, String outputPath, boolean useCompression,
-											   Set<NoiseVehicleType> vehicleTypes) {
-		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
-
-		String outputPathEmissions = outputPath + "emissions/";
-		File dir = new File(outputPathEmissions);
-		dir.mkdirs();
-
-		String fileName = outputPathEmissions + "emission_" + timeInterval + ".csv";
-		if ( useCompression ) {
-			fileName += ".gz" ;
-		}
-		File file = new File(fileName);
-
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-
-			StringJoiner joiner = new StringJoiner(";");
-			joiner.add("Link Id");
-			for(NoiseVehicleType vehicleType: vehicleTypes) {
-				joiner.add("Demand (" + vehicleType.getId().toString().toUpperCase() + ") "+ Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
-			}
-			for(NoiseVehicleType vehicleType: vehicleTypes) {
-				joiner.add("v" + vehicleType.getId().toString().toUpperCase() + " "+ Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
-			}
-			joiner.add("Noise Emission " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
-
-			bw.write(joiner.toString());
-			bw.newLine();
-
-			for (Id<Link> linkId : noiseContext.getNoiseLinks().keySet()){
-
-				joiner = new StringJoiner(";");
-				joiner.add(linkId.toString());
-				for(NoiseVehicleType vehicleType: vehicleTypes) {
-					int vehicles = 0;
-					if (noiseContext.getNoiseLinks().containsKey(linkId)) {
-						vehicles = noiseContext.getNoiseLinks().get(linkId).getAgentsEntering(vehicleType);
-					}
-					joiner.add(String.valueOf(vehicles * noiseContext.getNoiseParams().getScaleFactor()));
-				}
-				for(NoiseVehicleType vehicleType: vehicleTypes) {
-					double v = noiseContext.getScenario().getNetwork().getLinks().get(linkId).getFreespeed() * 3.6;
-					if (noiseContext.getNoiseLinks().containsKey(linkId)) {
-						double averageTravelTime_sec = 0.;
-						if (noiseContext.getNoiseLinks().get(linkId).getAgentsLeaving(vehicleType) > 0) {
-							averageTravelTime_sec = noiseContext.getNoiseLinks().get(linkId).getTravelTime_sec(vehicleType) / noiseContext.getNoiseLinks().get(linkId).getAgentsLeaving(vehicleType);
-						}
-						if (averageTravelTime_sec > 0.) {
-							v = 3.6 * (noiseContext.getScenario().getNetwork().getLinks().get(linkId).getLength() / averageTravelTime_sec );
-						}
-					}
-					joiner.add(String.valueOf(v));
-				}
-				joiner.add(String.valueOf(noiseContext.getNoiseLinks().get(linkId).getEmission()));
-				bw.write(joiner.toString());
-				bw.newLine();
-			}
+  private static final Logger log = LogManager.getLogger(NoiseWriter.class);
+
+  public static void writeReceiverPoints(
+      NoiseContext noiseContext, String outputPath, boolean useCompression) {
+
+    // csv file
+    Map<Id<ReceiverPoint>, Double> id2xCoord = new HashMap<>();
+    Map<Id<ReceiverPoint>, Double> id2yCoord = new HashMap<>();
+    int c = 0;
+    for (Id<ReceiverPoint> id : noiseContext.getReceiverPoints().keySet()) {
+      c++;
+      if (c % 10000 == 0) {
+        log.info("Writing out receiver point # " + c);
+      }
+      id2xCoord.put(id, noiseContext.getReceiverPoints().get(id).getCoord().getX());
+      id2yCoord.put(id, noiseContext.getReceiverPoints().get(id).getCoord().getY());
+    }
+    List<String> headers = new ArrayList<>();
+    headers.add("receiverPointId");
+    headers.add("xCoord");
+    headers.add("yCoord");
+
+    List<Map<Id<ReceiverPoint>, Double>> values = new ArrayList<>();
+    values.add(id2xCoord);
+    values.add(id2yCoord);
+
+    write(outputPath, 3, headers, values, useCompression);
+
+    // shape file
+
+    //		PointFeatureFactory factory = new PointFeatureFactory.Builder()
+    //		.setCrs(MGC.getCRS(noiseContext.getNoiseParams().getTransformationFactory()))
+    //		.setName("receiver point")
+    //		.addAttribute("Id", String.class)
+    //		.create();
+    //		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+    //
+    //		for (ReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
+    //
+    //			SimpleFeature feature = factory.createPoint(MGC.coord2Coordinate(rp.getCoord()), new
+    // Object[] {rp.getId().toString()}, null);
+    //			features.add(feature);
+    //		}
+    //
+    //		String filePath = outputPath;
+    //		File file = new File(filePath);
+    //		file.mkdirs();
+    //
+    //		log.info("Writing receiver points to shapefile... ");
+    //		ShapeFileWriter.writeGeometries(features, filePath + "receiverPoints.shp");
+    //		log.info("Writing receiver points to shapefile... Done. ");
+  }
+
+  public static void write(
+      String fileName,
+      int columns,
+      List<String> headers,
+      List<Map<Id<ReceiverPoint>, Double>> values,
+      boolean useCompression) {
+
+    File file = new File(fileName);
+    file.mkdirs();
+
+    String file2 = fileName + "receiverPoints.csv";
+    if (useCompression) {
+      file2 += ".gz";
+    }
+
+    // For all maps, the number of keys should be the same
+    try (BufferedWriter bw = IOUtils.getBufferedWriter(file2)) {
+      bw.write(headers.get(0));
+      for (int i = 1; i < columns; i++) {
+        bw.write(";" + headers.get(i));
+      }
+      bw.newLine();
+
+      for (Id<ReceiverPoint> id : values.get(0).keySet()) {
+        bw.write(id.toString());
+        for (int i = 0; i < (columns - 1); i++) {
+          bw.write(";" + values.get(i).get(id));
+        }
+        bw.newLine();
+      }
+
+      bw.close();
+      log.info("Receiver points written to " + fileName);
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  static void writeNoiseEmissionStatsPerHour(
+      NoiseContext noiseContext,
+      String outputPath,
+      boolean useCompression,
+      Set<NoiseVehicleType> vehicleTypes) {
+    double timeInterval = noiseContext.getCurrentTimeBinEndTime();
+
+    String outputPathEmissions = outputPath + "emissions/";
+    File dir = new File(outputPathEmissions);
+    dir.mkdirs();
+
+    String fileName = outputPathEmissions + "emission_" + timeInterval + ".csv";
+    if (useCompression) {
+      fileName += ".gz";
+    }
+    File file = new File(fileName);
+
+    try {
+      BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+
+      StringJoiner joiner = new StringJoiner(";");
+      joiner.add("Link Id");
+      for (NoiseVehicleType vehicleType : vehicleTypes) {
+        joiner.add(
+            "Demand ("
+                + vehicleType.getId().toString().toUpperCase()
+                + ") "
+                + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+      }
+      for (NoiseVehicleType vehicleType : vehicleTypes) {
+        joiner.add(
+            "v"
+                + vehicleType.getId().toString().toUpperCase()
+                + " "
+                + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+      }
+      joiner.add("Noise Emission " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+
+      bw.write(joiner.toString());
+      bw.newLine();
+
+      for (Id<Link> linkId : noiseContext.getNoiseLinks().keySet()) {
+
+        joiner = new StringJoiner(";");
+        joiner.add(linkId.toString());
+        for (NoiseVehicleType vehicleType : vehicleTypes) {
+          int vehicles = 0;
+          if (noiseContext.getNoiseLinks().containsKey(linkId)) {
+            vehicles = noiseContext.getNoiseLinks().get(linkId).getAgentsEntering(vehicleType);
+          }
+          joiner.add(String.valueOf(vehicles * noiseContext.getNoiseParams().getScaleFactor()));
+        }
+        for (NoiseVehicleType vehicleType : vehicleTypes) {
+          double v =
+              noiseContext.getScenario().getNetwork().getLinks().get(linkId).getFreespeed() * 3.6;
+          if (noiseContext.getNoiseLinks().containsKey(linkId)) {
+            double averageTravelTime_sec = 0.;
+            if (noiseContext.getNoiseLinks().get(linkId).getAgentsLeaving(vehicleType) > 0) {
+              averageTravelTime_sec =
+                  noiseContext.getNoiseLinks().get(linkId).getTravelTime_sec(vehicleType)
+                      / noiseContext.getNoiseLinks().get(linkId).getAgentsLeaving(vehicleType);
+            }
+            if (averageTravelTime_sec > 0.) {
+              v =
+                  3.6
+                      * (noiseContext.getScenario().getNetwork().getLinks().get(linkId).getLength()
+                          / averageTravelTime_sec);
+            }
+          }
+          joiner.add(String.valueOf(v));
+        }
+        joiner.add(String.valueOf(noiseContext.getNoiseLinks().get(linkId).getEmission()));
+        bw.write(joiner.toString());
+        bw.newLine();
+      }
+
+      bw.close();
+      log.info("Output written to " + fileName);
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    File file2 = new File(fileName + "t");
+
+    try {
+      BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+      bw.write("\"String\",\"Real\",\"Real\",\"Real\"\"Real\"\"Real\"");
+
+      bw.newLine();
+
+      bw.close();
+      log.info("Output written to " + fileName + "t");
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  static void writeNoiseImmissionStatsPerHour(NoiseContext noiseContext, String outputPath) {
+    double timeInterval = noiseContext.getCurrentTimeBinEndTime();
+
+    String outputPathImmissions = outputPath + "immissions/";
+    File dir = new File(outputPathImmissions);
+    dir.mkdirs();
+
+    String fileName = outputPathImmissions + "immission_" + timeInterval + ".csv";
+
+    File file = new File(fileName);
+
+    try {
+      BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+
+      bw.write(
+          "Receiver Point Id;Immission "
+              + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS)
+              + ";x;y;t");
+      bw.newLine();
+
+      for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
+
+        bw.write(
+            rp.getId()
+                + ";"
+                + rp.getCurrentImmission()
+                + ";"
+                + rp.getCoord().getX()
+                + ";"
+                + rp.getCoord().getY()
+                + ";"
+                + timeInterval);
+        bw.newLine();
+      }
+
+      bw.close();
+      log.info("Output written to " + fileName);
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    File file2 = new File(fileName + "t");
+
+    try {
+      BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+      bw.write("\"String\",\"Real\"");
+
+      bw.newLine();
+
+      bw.close();
+      log.info("Output written to " + fileName + "t");
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  static void writePersonActivityInfoPerHour(NoiseContext noiseContext, String outputPath) {
+    double timeInterval = noiseContext.getCurrentTimeBinEndTime();
+
+    String outputPathActivityInfo = outputPath + "consideredAgentUnits/";
+    File dir = new File(outputPathActivityInfo);
+    dir.mkdirs();
+
+    String fileName = outputPathActivityInfo + "consideredAgentUnits_" + timeInterval + ".csv";
+
+    log.warn("writing consideredAgentUnits for timeInterval=" + timeInterval);
 
-			bw.close();
-			log.info("Output written to " + fileName);
+    File file = new File(fileName);
+
+    try {
+      BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+      bw.write(
+          "Receiver Point Id;Considered Agent Units "
+              + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+      bw.newLine();
 
-		File file2 = new File(fileName + "t");
+      for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
 
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
-			bw.write("\"String\",\"Real\",\"Real\",\"Real\"\"Real\"\"Real\"");
+        bw.write(rp.getId() + ";" + rp.getAffectedAgentUnits());
+        bw.newLine();
+      }
 
-			bw.newLine();
+      bw.close();
+      log.info("Output written to " + fileName);
 
-			bw.close();
-			log.info("Output written to " + fileName + "t");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    File file2 = new File(fileName + "t");
 
-	static void writeNoiseImmissionStatsPerHour(NoiseContext noiseContext, String outputPath) {
-		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
+    try {
+      BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+      bw.write("\"String\",\"Real\"");
 
-		String outputPathImmissions = outputPath + "immissions/";
-		File dir = new File(outputPathImmissions);
-		dir.mkdirs();
+      bw.newLine();
 
-		String fileName = outputPathImmissions + "immission_" + timeInterval + ".csv";
+      bw.close();
+      log.info("Output written to " + fileName + "t");
 
-		File file = new File(fileName);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+  public static void writeDamageInfoPerHour(NoiseContext noiseContext, String outputPath) {
+    double timeInterval = noiseContext.getCurrentTimeBinEndTime();
 
-			bw.write("Receiver Point Id;Immission " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + ";x;y;t");
-			bw.newLine();
+    String outputPathDamages = outputPath + "damages_receiverPoint/";
+    File dir = new File(outputPathDamages);
+    dir.mkdirs();
 
-			for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
+    String fileName = outputPathDamages + "damages_receiverPoint_" + timeInterval + ".csv";
 
-				bw.write(rp.getId() + ";" + rp.getCurrentImmission() + ";" + rp.getCoord().getX() + ";" + rp.getCoord().getY() + ";" + timeInterval );
-				bw.newLine();
-			}
+    File file = new File(fileName);
 
-			bw.close();
-			log.info("Output written to " + fileName);
+    try {
+      BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+      bw.write("Receiver Point Id;Damages " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+      bw.newLine();
 
-		File file2 = new File(fileName + "t");
+      for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
 
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
-			bw.write("\"String\",\"Real\"");
+        bw.write(rp.getId() + ";" + rp.getDamageCosts());
+        bw.newLine();
+      }
 
-			bw.newLine();
+      bw.close();
+      log.info("Output written to " + fileName);
 
-			bw.close();
-			log.info("Output written to " + fileName + "t");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+    File file2 = new File(fileName + "t");
 
-	}
+    try {
+      BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+      bw.write("\"String\",\"Real\"");
 
-	static void writePersonActivityInfoPerHour( NoiseContext noiseContext , String outputPath ) {
-		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
+      bw.newLine();
 
-		String outputPathActivityInfo = outputPath + "consideredAgentUnits/";
-		File dir = new File(outputPathActivityInfo);
-		dir.mkdirs();
+      bw.close();
+      log.info("Output written to " + fileName + "t");
 
-		String fileName = outputPathActivityInfo + "consideredAgentUnits_" + timeInterval + ".csv";
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 
-		log.warn("writing consideredAgentUnits for timeInterval=" + timeInterval ) ;
+  public static void writeLinkDamageInfoPerHour(NoiseContext noiseContext, String outputPath) {
+    double timeInterval = noiseContext.getCurrentTimeBinEndTime();
 
-		File file = new File(fileName);
+    String outputPathDamages = outputPath + "average_damages_link/";
+    File dir = new File(outputPathDamages);
+    dir.mkdirs();
 
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+    String fileName = outputPathDamages + "average_damages_link_" + timeInterval + ".csv";
 
-			bw.write("Receiver Point Id;Considered Agent Units " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
-			bw.newLine();
+    File file = new File(fileName);
 
-			for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
+    try {
+      BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 
-				bw.write(rp.getId() + ";" + rp.getAffectedAgentUnits());
-				bw.newLine();
-			}
+      bw.write("Link Id;Damages " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+      bw.newLine();
 
-			bw.close();
-			log.info("Output written to " + fileName);
+      for (NoiseLink link : noiseContext.getNoiseLinks().values()) {
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        bw.write(link.getId() + ";" + link.getDamageCost());
+        bw.newLine();
+      }
 
-		File file2 = new File(fileName + "t");
+      bw.close();
+      log.info("Output written to " + fileName);
 
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
-			bw.write("\"String\",\"Real\"");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
 
-			bw.newLine();
+    File file2 = new File(fileName + "t");
 
-			bw.close();
-			log.info("Output written to " + fileName + "t");
+    try {
+      BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+      bw.write("\"String\",\"Real\"");
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+      bw.newLine();
 
-	public static void writeDamageInfoPerHour(NoiseContext noiseContext, String outputPath) {
-		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
+      bw.close();
+      log.info("Output written to " + fileName + "t");
 
-		String outputPathDamages = outputPath + "damages_receiverPoint/";
-		File dir = new File(outputPathDamages);
-		dir.mkdirs();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 
-		String fileName = outputPathDamages + "damages_receiverPoint_" + timeInterval + ".csv";
+  static void writeLinkAvgDamagePerVehicleTypeInfoPerHour(
+      NoiseContext noiseContext, String outputPath, NoiseVehicleType vehicleType) {
+    double timeInterval = noiseContext.getCurrentTimeBinEndTime();
 
-		File file = new File(fileName);
+    String outputPathDamages = outputPath + "average_damages_link_" + vehicleType.getId() + "/";
+    File dir = new File(outputPathDamages);
+    dir.mkdirs();
 
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+    String fileName =
+        outputPathDamages
+            + "average_damages_link_"
+            + vehicleType.getId()
+            + "_"
+            + timeInterval
+            + ".csv";
 
-			bw.write("Receiver Point Id;Damages " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
-			bw.newLine();
+    File file = new File(fileName);
 
-			for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
+    try {
+      BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 
-				bw.write(rp.getId() + ";" + rp.getDamageCosts());
-				bw.newLine();
-			}
+      bw.write(
+          "Link Id;Average damages per "
+              + vehicleType.getId()
+              + " "
+              + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+      bw.newLine();
 
-			bw.close();
-			log.info("Output written to " + fileName);
+      for (NoiseLink link : noiseContext.getNoiseLinks().values()) {
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        bw.write(link.getId() + ";" + link.getAverageDamageCostPerVehicle(vehicleType));
+        bw.newLine();
+      }
 
-		File file2 = new File(fileName + "t");
+      bw.close();
+      log.info("Output written to " + fileName);
 
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
-			bw.write("\"String\",\"Real\"");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
 
-			bw.newLine();
+    File file2 = new File(fileName + "t");
 
-			bw.close();
-			log.info("Output written to " + fileName + "t");
+    try {
+      BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+      bw.write("\"String\",\"Real\"");
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+      bw.newLine();
 
-	public static void writeLinkDamageInfoPerHour(NoiseContext noiseContext, String outputPath) {
-		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
+      bw.close();
+      log.info("Output written to " + fileName + "t");
 
-		String outputPathDamages = outputPath + "average_damages_link/";
-		File dir = new File(outputPathDamages);
-		dir.mkdirs();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 
-		String fileName = outputPathDamages + "average_damages_link_" + timeInterval + ".csv";
+  public static void writeLinkMarginalVehicleDamageInfoPerHour(
+      NoiseContext noiseContext, String outputPath, NoiseVehicleType vehicleType) {
+    double timeInterval = noiseContext.getCurrentTimeBinEndTime();
 
-		File file = new File(fileName);
+    String outputPathDamages = outputPath + "marginal_damages_link_" + vehicleType.getId() + "/";
+    File dir = new File(outputPathDamages);
+    dir.mkdirs();
 
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+    String fileName =
+        outputPathDamages
+            + "marginal_damages_link_"
+            + vehicleType.getId()
+            + "_"
+            + timeInterval
+            + ".csv";
 
-			bw.write("Link Id;Damages " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
-			bw.newLine();
+    File file = new File(fileName);
 
-			for (NoiseLink link : noiseContext.getNoiseLinks().values()) {
+    try {
+      BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 
-				bw.write(link.getId() + ";" + link.getDamageCost());
-				bw.newLine();
-			}
+      bw.write(
+          "Link Id;Marginal damages per "
+              + vehicleType.getId()
+              + " "
+              + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+      bw.newLine();
 
-			bw.close();
-			log.info("Output written to " + fileName);
+      for (NoiseLink link : noiseContext.getNoiseLinks().values()) {
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        bw.write(link.getId() + ";" + link.getMarginalDamageCostPerVehicle(vehicleType));
+        bw.newLine();
+      }
 
-		File file2 = new File(fileName + "t");
+      bw.close();
+      log.info("Output written to " + fileName);
 
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
-			bw.write("\"String\",\"Real\"");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
 
-			bw.newLine();
+    File file2 = new File(fileName + "t");
 
-			bw.close();
-			log.info("Output written to " + fileName + "t");
+    try {
+      BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+      bw.write("\"String\",\"Real\"");
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+      bw.newLine();
 
-	static void writeLinkAvgDamagePerVehicleTypeInfoPerHour(NoiseContext noiseContext, String outputPath,
-															NoiseVehicleType vehicleType) {
-		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
+      bw.close();
+      log.info("Output written to " + fileName + "t");
 
-		String outputPathDamages = outputPath + "average_damages_link_"+vehicleType.getId()+"/";
-		File dir = new File(outputPathDamages);
-		dir.mkdirs();
-
-		String fileName = outputPathDamages + "average_damages_link_"+vehicleType.getId()+"_" + timeInterval + ".csv";
-
-		File file = new File(fileName);
-
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-
-			bw.write("Link Id;Average damages per "+vehicleType.getId()+" " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
-			bw.newLine();
-
-			for (NoiseLink link : noiseContext.getNoiseLinks().values()) {
-
-				bw.write(link.getId() + ";" + link.getAverageDamageCostPerVehicle(vehicleType));
-				bw.newLine();
-			}
-
-			bw.close();
-			log.info("Output written to " + fileName);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		File file2 = new File(fileName + "t");
-
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
-			bw.write("\"String\",\"Real\"");
-
-			bw.newLine();
-
-			bw.close();
-			log.info("Output written to " + fileName + "t");
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static void writeLinkMarginalVehicleDamageInfoPerHour(NoiseContext noiseContext, String outputPath,
-																 NoiseVehicleType vehicleType) {
-		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
-
-		String outputPathDamages = outputPath + "marginal_damages_link_"+vehicleType.getId()+"/";
-		File dir = new File(outputPathDamages);
-		dir.mkdirs();
-
-		String fileName = outputPathDamages + "marginal_damages_link_"+vehicleType.getId()+"_" + timeInterval + ".csv";
-
-		File file = new File(fileName);
-
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-
-			bw.write("Link Id;Marginal damages per "+vehicleType.getId()+" " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
-			bw.newLine();
-
-			for (NoiseLink link : noiseContext.getNoiseLinks().values()) {
-
-				bw.write(link.getId() + ";" + link.getMarginalDamageCostPerVehicle(vehicleType));
-				bw.newLine();
-			}
-
-			bw.close();
-			log.info("Output written to " + fileName);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		File file2 = new File(fileName + "t");
-
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
-			bw.write("\"String\",\"Real\"");
-
-			bw.newLine();
-
-			bw.close();
-			log.info("Output written to " + fileName + "t");
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 }

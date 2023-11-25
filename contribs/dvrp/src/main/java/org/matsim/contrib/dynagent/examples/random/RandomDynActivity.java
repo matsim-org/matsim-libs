@@ -23,29 +23,29 @@ import org.matsim.contrib.dynagent.DynActivity;
 import org.matsim.core.gbl.MatsimRandom;
 
 public class RandomDynActivity implements DynActivity {
-	private double endTime;
+  private double endTime;
 
-	public RandomDynActivity(double now) {
-		doRandomChoice(now);// decision made at time beginTime
-	}
+  public RandomDynActivity(double now) {
+    doRandomChoice(now); // decision made at time beginTime
+  }
 
-	@Override
-	public String getActivityType() {
-		return "RandomActivity";
-	}
+  @Override
+  public String getActivityType() {
+    return "RandomActivity";
+  }
 
-	@Override
-	public double getEndTime() {
-		return endTime;
-	}
+  @Override
+  public double getEndTime() {
+    return endTime;
+  }
 
-	@Override
-	public void doSimStep(double now) {
-		doRandomChoice(now);// decisions made at times beginTime+1, ..., endTime
-	}
+  @Override
+  public void doSimStep(double now) {
+    doRandomChoice(now); // decisions made at times beginTime+1, ..., endTime
+  }
 
-	private void doRandomChoice(double now) {
-		// When do I want to stop the current activity?
-		endTime = now + MatsimRandom.getRandom().nextInt(100);// 1% chance that endTime == now
-	}
+  private void doRandomChoice(double now) {
+    // When do I want to stop the current activity?
+    endTime = now + MatsimRandom.getRandom().nextInt(100); // 1% chance that endTime == now
+  }
 }

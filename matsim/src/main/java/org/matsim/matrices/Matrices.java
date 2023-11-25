@@ -24,60 +24,58 @@ import java.util.TreeMap;
 
 public class Matrices {
 
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // member variables
+  //////////////////////////////////////////////////////////////////////
 
-	private String name = null;
-	private final TreeMap<String, Matrix> matrices = new TreeMap<String, Matrix>();
+  private String name = null;
+  private final TreeMap<String, Matrix> matrices = new TreeMap<String, Matrix>();
 
-	//////////////////////////////////////////////////////////////////////
-	// create methods
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // create methods
+  //////////////////////////////////////////////////////////////////////
 
-	public final Matrix createMatrix(final String id, final String desc) {
-		// check id string for uniqueness
-		if (this.matrices.containsKey(id)) {
-			throw new RuntimeException("[id="+id+" already exists.]");
-		}
-		// create the matrix
-		Matrix m = new Matrix(id, desc);
-		this.matrices.put(id,m);
-		return m;
-	}
+  public final Matrix createMatrix(final String id, final String desc) {
+    // check id string for uniqueness
+    if (this.matrices.containsKey(id)) {
+      throw new RuntimeException("[id=" + id + " already exists.]");
+    }
+    // create the matrix
+    Matrix m = new Matrix(id, desc);
+    this.matrices.put(id, m);
+    return m;
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// set methods
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // set methods
+  //////////////////////////////////////////////////////////////////////
 
-	protected final void setName(final String name) {
-		this.name = name;
-	}
+  protected final void setName(final String name) {
+    this.name = name;
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// get methods
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // get methods
+  //////////////////////////////////////////////////////////////////////
 
-	public final String getName() {
-		return this.name;
-	}
+  public final String getName() {
+    return this.name;
+  }
 
-	public final TreeMap<String, Matrix> getMatrices() {
-		return this.matrices;
-	}
+  public final TreeMap<String, Matrix> getMatrices() {
+    return this.matrices;
+  }
 
-	public final Matrix getMatrix(final String id) {
-		return this.matrices.get(id);
-	}
+  public final Matrix getMatrix(final String id) {
+    return this.matrices.get(id);
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// print methods
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // print methods
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public final String toString() {
-		return "[name=" + this.name + "]" +
-				"[nof_matrices=" + this.matrices.size() + "]";
-	}
-
+  @Override
+  public final String toString() {
+    return "[name=" + this.name + "]" + "[nof_matrices=" + this.matrices.size() + "]";
+  }
 }

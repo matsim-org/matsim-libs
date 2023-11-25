@@ -21,7 +21,6 @@ package playground.vsp.andreas.fcd;
 
 import java.io.IOException;
 import java.util.TreeMap;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -30,44 +29,41 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
+public class ReadFcdNetwork implements TabularFileHandler {
 
-public class ReadFcdNetwork implements TabularFileHandler{
+  private static final Logger log = LogManager.getLogger(ReadFcdNetwork.class);
 
-	private static final Logger log = LogManager.getLogger(ReadFcdNetwork.class);
-	
-	private TabularFileParserConfig tabFileParserConfig;
-	private TreeMap<Id, FcdNetworkPoint> networkMap = new TreeMap<Id, FcdNetworkPoint>();
-	
-	public static TreeMap<Id,FcdNetworkPoint> readFcdNetwork(String filename) throws IOException {
-		
-		ReadFcdNetwork reader = new ReadFcdNetwork();
-		
-		reader.tabFileParserConfig = new TabularFileParserConfig();
-		reader.tabFileParserConfig.setFileName(filename);
-		reader.tabFileParserConfig.setDelimiterTags(new String[] {"\t"}); // \t
-//		this.tabFileParserConfig.setDelimiterTags(new String[] {"D"});
-		new TabularFileParser().parse(reader.tabFileParserConfig, reader);
+  private TabularFileParserConfig tabFileParserConfig;
+  private TreeMap<Id, FcdNetworkPoint> networkMap = new TreeMap<Id, FcdNetworkPoint>();
 
-		return reader.networkMap;		
-	}	
-	
-	@Override
-	public void startRow(String[] row) {
-		if(row[0].contains("#")){
-			StringBuffer tempBuffer = new StringBuffer();
-			for (String string : row) {
-				tempBuffer.append(string);
-				tempBuffer.append(", ");
-			}
-			log.info("Ignoring: " + tempBuffer);
-		} else {
-			Id<FcdNetworkPoint> id = Id.create(row[0], FcdNetworkPoint.class);
-			Coord coord = new Coord(Double.parseDouble(row[2]), Double.parseDouble(row[1]));
-			double direction = Double.parseDouble(row[3]);
-			
-			this.networkMap.put(id, new FcdNetworkPoint(id, coord, direction));
-		}
-		
-	}
-	
+  public static TreeMap<Id, FcdNetworkPoint> readFcdNetwork(String filename) throws IOException {
+
+    ReadFcdNetwork reader = new ReadFcdNetwork();
+
+    reader.tabFileParserConfig = new TabularFileParserConfig();
+    reader.tabFileParserConfig.setFileName(filename);
+    reader.tabFileParserConfig.setDelimiterTags(new String[] {"\t"}); // \t
+    //		this.tabFileParserConfig.setDelimiterTags(new String[] {"D"});
+    new TabularFileParser().parse(reader.tabFileParserConfig, reader);
+
+    return reader.networkMap;
+  }
+
+  @Override
+  public void startRow(String[] row) {
+    if (row[0].contains("#")) {
+      StringBuffer tempBuffer = new StringBuffer();
+      for (String string : row) {
+        tempBuffer.append(string);
+        tempBuffer.append(", ");
+      }
+      log.info("Ignoring: " + tempBuffer);
+    } else {
+      Id<FcdNetworkPoint> id = Id.create(row[0], FcdNetworkPoint.class);
+      Coord coord = new Coord(Double.parseDouble(row[2]), Double.parseDouble(row[1]));
+      double direction = Double.parseDouble(row[3]);
+
+      this.networkMap.put(id, new FcdNetworkPoint(id, coord, direction));
+    }
+  }
 }

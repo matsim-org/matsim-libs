@@ -19,18 +19,19 @@
 
 /**
  * All values used in this package use SI base and derived units. In particular:
+ *
  * <ul>
- * <li>distance - meter [m]</li>
- * <li>time - second [s]</li>
- * <li>energy - joule [J]</li>
- * <li>power - watt [W]</li>
- * <li>Temperature - degree Celsius [°C]</li>
+ *   <li>distance - meter [m]
+ *   <li>time - second [s]
+ *   <li>energy - joule [J]
+ *   <li>power - watt [W]
+ *   <li>Temperature - degree Celsius [°C]
  * </ul>
- * <p>
- * In particular, the use of [kWh] and [s] generates confusion and leads to bugs, as 1 kWh = 1,000 J * 3,600 s
- * <p>
- * Consequently, energy consumption is measured in [J/m], rather than [kWh/100km] or [Wh/km], as typically done in
- * transport.
+ *
+ * <p>In particular, the use of [kWh] and [s] generates confusion and leads to bugs, as 1 kWh =
+ * 1,000 J * 3,600 s
+ *
+ * <p>Consequently, energy consumption is measured in [J/m], rather than [kWh/100km] or [Wh/km], as
+ * typically done in transport.
  */
 package org.matsim.contrib.ev;
-

@@ -26,5 +26,5 @@ import org.matsim.core.events.handler.EventHandler;
  * @author Michal Maciejewski (michalm)
  */
 public interface MissingEnergyEventHandler extends EventHandler {
-	void handleEvent(MissingEnergyEvent event);
+  void handleEvent(MissingEnergyEvent event);
 }

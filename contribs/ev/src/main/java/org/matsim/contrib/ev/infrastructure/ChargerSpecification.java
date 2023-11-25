@@ -26,32 +26,32 @@ import org.matsim.api.core.v01.network.Link;
 
 /**
  * ChargerSpecification is assumed to be immutable.
- * <p>
- * Its lifespan can span over all iterations, but can be also changed before each iteration.
- * <p>
- * Changing a charger specification (e.g. setting a different plug count) should be done only "between" iterations
- * by passing a new instance to ChargingInfrastructureSpecification.
+ *
+ * <p>Its lifespan can span over all iterations, but can be also changed before each iteration.
+ *
+ * <p>Changing a charger specification (e.g. setting a different plug count) should be done only
+ * "between" iterations by passing a new instance to ChargingInfrastructureSpecification.
  *
  * @author Michal Maciejewski (michalm)
  */
 public interface ChargerSpecification extends Identifiable<Charger> {
-	String DEFAULT_CHARGER_TYPE = "default";
-	int DEFAULT_PLUG_COUNT = 1;
+  String DEFAULT_CHARGER_TYPE = "default";
+  int DEFAULT_PLUG_COUNT = 1;
 
-	Id<Link> getLinkId();
+  Id<Link> getLinkId();
 
-	/**
-	 * @return charger type
-	 */
-	String getChargerType();
+  /**
+   * @return charger type
+   */
+  String getChargerType();
 
-	/**
-	 * @return max power at a single plug, in [W]
-	 */
-	double getPlugPower();
+  /**
+   * @return max power at a single plug, in [W]
+   */
+  double getPlugPower();
 
-	/**
-	 * @return number of plugs
-	 */
-	int getPlugCount();
+  /**
+   * @return number of plugs
+   */
+  int getPlugCount();
 }

@@ -21,6 +21,7 @@ package org.matsim.contrib.dvrp.examples.onetruck;
 
 import static org.matsim.contrib.dvrp.examples.onetruck.OneTruckOptimizer.OneTruckTaskType;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -31,34 +32,32 @@ import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.dynagent.IdleDynActivity;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
-import com.google.inject.Inject;
-
 /**
  * @author michalm
  */
 final class OneTruckActionCreator implements VrpAgentLogic.DynActionCreator {
-	private final MobsimTimer timer;
+  private final MobsimTimer timer;
 
-	@Inject
-	public OneTruckActionCreator(MobsimTimer timer) {
-		this.timer = timer;
-	}
+  @Inject
+  public OneTruckActionCreator(MobsimTimer timer) {
+    this.timer = timer;
+  }
 
-	@Override
-	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
-		Task task = vehicle.getSchedule().getCurrentTask();
-		switch ((OneTruckTaskType)task.getTaskType()) {
-			case EMPTY_DRIVE:
-			case LOADED_DRIVE:
-				return VrpLegFactory.createWithOfflineTracker(TransportMode.truck, vehicle, timer);
+  @Override
+  public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
+    Task task = vehicle.getSchedule().getCurrentTask();
+    switch ((OneTruckTaskType) task.getTaskType()) {
+      case EMPTY_DRIVE:
+      case LOADED_DRIVE:
+        return VrpLegFactory.createWithOfflineTracker(TransportMode.truck, vehicle, timer);
 
-			case PICKUP:
-			case DELIVERY:
-			case WAIT:
-				return new IdleDynActivity(task.getTaskType() + "", task::getEndTime);
+      case PICKUP:
+      case DELIVERY:
+      case WAIT:
+        return new IdleDynActivity(task.getTaskType() + "", task::getEndTime);
 
-			default:
-				throw new IllegalStateException();
-		}
-	}
+      default:
+        throw new IllegalStateException();
+    }
+  }
 }

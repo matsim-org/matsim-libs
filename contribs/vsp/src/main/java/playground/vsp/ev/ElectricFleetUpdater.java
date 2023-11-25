@@ -20,6 +20,7 @@
 
 package playground.vsp.ev;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -31,31 +32,34 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
-import com.google.inject.Inject;
-
 class ElectricFleetUpdater implements IterationStartsListener {
 
-	@Inject
-	private Population population;
+  @Inject private Population population;
 
-	@Inject
-	private Vehicles vehicles;
+  @Inject private Vehicles vehicles;
 
-	@Inject
-	private ElectricFleetSpecification fleetSpecification;
+  @Inject private ElectricFleetSpecification fleetSpecification;
 
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		fleetSpecification.clear();
+  @Override
+  public void notifyIterationStarts(IterationStartsEvent event) {
+    fleetSpecification.clear();
 
-		//collect EV ids needed this iteration
-		population.getPersons().values().stream().map(HasPlansAndId::getSelectedPlan).forEach(this::registerEVs);
-	}
+    // collect EV ids needed this iteration
+    population.getPersons().values().stream()
+        .map(HasPlansAndId::getSelectedPlan)
+        .forEach(this::registerEVs);
+  }
 
-	private void registerEVs(Plan plan) {
-		var modalVehicles = TripStructureUtils.getLegs(plan).stream()
-				.map(leg -> vehicles.getVehicles().get(VehicleUtils.getVehicleId(plan.getPerson(), leg.getMode())))
-				.toList();
-		ElectricFleetUtils.createAndAddVehicleSpecificationsFromMatsimVehicles(fleetSpecification, modalVehicles );
-	}
+  private void registerEVs(Plan plan) {
+    var modalVehicles =
+        TripStructureUtils.getLegs(plan).stream()
+            .map(
+                leg ->
+                    vehicles
+                        .getVehicles()
+                        .get(VehicleUtils.getVehicleId(plan.getPerson(), leg.getMode())))
+            .toList();
+    ElectricFleetUtils.createAndAddVehicleSpecificationsFromMatsimVehicles(
+        fleetSpecification, modalVehicles);
+  }
 }

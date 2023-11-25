@@ -23,12 +23,13 @@ package org.matsim.withinday.replanning.replanners.interfaces;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityAgentSelector;
 
-public abstract class WithinDayDuringActivityReplannerFactory extends WithinDayReplannerFactory<DuringActivityAgentSelector> {
+public abstract class WithinDayDuringActivityReplannerFactory
+    extends WithinDayReplannerFactory<DuringActivityAgentSelector> {
 
-	public WithinDayDuringActivityReplannerFactory(WithinDayEngine withinDayEngine) {
-		super(withinDayEngine);
-	}
-	
-	@Override
-	public abstract WithinDayDuringActivityReplanner createReplanner();
+  public WithinDayDuringActivityReplannerFactory(WithinDayEngine withinDayEngine) {
+    super(withinDayEngine);
+  }
+
+  @Override
+  public abstract WithinDayDuringActivityReplanner createReplanner();
 }

@@ -20,47 +20,53 @@
 package org.matsim.core.network;
 
 import java.util.TreeMap;
-
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
+public interface TimeVariantAttribute {
+  interface ChangeValueGetter {
+    ChangeValue getChangeValue(NetworkChangeEvent event);
+  }
 
-public interface TimeVariantAttribute
-{
-	interface ChangeValueGetter {
-		ChangeValue getChangeValue(NetworkChangeEvent event);
-	}
+  static ChangeValueGetter FREESPEED_GETTER =
+      new ChangeValueGetter() {
+        @Override
+        public ChangeValue getChangeValue(NetworkChangeEvent event) {
+          return event.getFreespeedChange();
+        }
+      };
 
+  static ChangeValueGetter FLOW_CAPACITY_GETTER =
+      new ChangeValueGetter() {
+        @Override
+        public ChangeValue getChangeValue(NetworkChangeEvent event) {
+          return event.getFlowCapacityChange();
+        }
+      };
 
-	static ChangeValueGetter FREESPEED_GETTER = new ChangeValueGetter() {
-		@Override public ChangeValue getChangeValue(NetworkChangeEvent event) {
-			return event.getFreespeedChange();
-		}
-	};
+  static ChangeValueGetter LANES_GETTER =
+      new ChangeValueGetter() {
+        @Override
+        public ChangeValue getChangeValue(NetworkChangeEvent event) {
+          return event.getLanesChange();
+        }
+      };
 
-	static ChangeValueGetter FLOW_CAPACITY_GETTER = new ChangeValueGetter() {
-		@Override public ChangeValue getChangeValue(NetworkChangeEvent event) {
-			return event.getFlowCapacityChange();
-		}
-	};
+  /**
+   * For base value, use {@link Double#NEGATIVE_INFINITY}. {@link Double#NaN} is not supported
+   *
+   * @param time
+   * @return
+   */
+  double getValue(final double time);
 
-	static ChangeValueGetter LANES_GETTER = new ChangeValueGetter() {
-		@Override public ChangeValue getChangeValue(NetworkChangeEvent event) {
-			return event.getLanesChange();
-		}
-	};
+  boolean isRecalcRequired();
 
-	/**
-	 * For base value, use {@link Double#NEGATIVE_INFINITY}. {@link Double#NaN} is not supported
-	 * @param time
-	 * @return
-	 */
-	double getValue(final double time);
+  void recalc(
+      TreeMap<Double, NetworkChangeEvent> changeEvents,
+      ChangeValueGetter valueGetter,
+      double baseValue);
 
-	boolean isRecalcRequired();
+  void incChangeEvents();
 
-	void recalc(TreeMap<Double, NetworkChangeEvent> changeEvents, ChangeValueGetter valueGetter, double baseValue);
-
-	void incChangeEvents();
-
-	void clearEvents();
+  void clearEvents();
 }

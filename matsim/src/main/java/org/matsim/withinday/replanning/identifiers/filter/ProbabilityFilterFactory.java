@@ -24,14 +24,14 @@ import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory
 
 public class ProbabilityFilterFactory implements AgentFilterFactory {
 
-	private final double replanningProbability;
+  private final double replanningProbability;
 
-	public ProbabilityFilterFactory(double replanningProbability) {
-		this.replanningProbability = replanningProbability;
-	}
-	
-	@Override
-	public ProbabilityFilter createAgentFilter() {
-		return new ProbabilityFilter(replanningProbability);
-	}
+  public ProbabilityFilterFactory(double replanningProbability) {
+    this.replanningProbability = replanningProbability;
+  }
+
+  @Override
+  public ProbabilityFilter createAgentFilter() {
+    return new ProbabilityFilter(replanningProbability);
+  }
 }

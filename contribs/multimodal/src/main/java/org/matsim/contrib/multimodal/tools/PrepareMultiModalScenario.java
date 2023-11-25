@@ -29,35 +29,42 @@ import org.matsim.core.config.ConfigUtils;
 
 public class PrepareMultiModalScenario {
 
-	private static final Logger log = LogManager.getLogger(PrepareMultiModalScenario.class);
-	
-	public static void run(Scenario scenario) {
-		Config config = scenario.getConfig();
-		log.info("setting up multi modal simulation");
-		
-		MultiModalConfigGroup multiModalConfigGroup = ConfigUtils.addOrGetModule(config, MultiModalConfigGroup.GROUP_NAME, MultiModalConfigGroup.class);
-		
-		// set Route Factories
-//		LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
-//        for (String mode : CollectionUtils.stringToArray(multiModalConfigGroup.getSimulatedModes())) {
-//			((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory(mode, factory);
-//		}
-        
-        if (multiModalConfigGroup.isCreateMultiModalNetwork()) {
-			log.info("Creating multi modal network.");
-            new MultiModalNetworkCreator(multiModalConfigGroup).run(scenario.getNetwork());
-		}
+  private static final Logger log = LogManager.getLogger(PrepareMultiModalScenario.class);
 
-        if (multiModalConfigGroup.isEnsureActivityReachability()) {
-			log.info("Relocating activities that cannot be reached by the transport modes of their from- and/or to-legs...");
-			EnsureActivityReachability ensureActivityReachability = new EnsureActivityReachability(scenario);
-			ensureActivityReachability.run(scenario.getPopulation());
-			ensureActivityReachability.printRelocateCount();
-		}
+  public static void run(Scenario scenario) {
+    Config config = scenario.getConfig();
+    log.info("setting up multi modal simulation");
 
-        if (multiModalConfigGroup.isDropNonCarRoutes()) {
-			log.info("Dropping existing routes of modes which are simulated with the multi modal mobsim.");
-            new NonCarRouteDropper(multiModalConfigGroup).run(scenario.getPopulation());
-		}
-	}
+    MultiModalConfigGroup multiModalConfigGroup =
+        ConfigUtils.addOrGetModule(
+            config, MultiModalConfigGroup.GROUP_NAME, MultiModalConfigGroup.class);
+
+    // set Route Factories
+    //		LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
+    //        for (String mode :
+    // CollectionUtils.stringToArray(multiModalConfigGroup.getSimulatedModes())) {
+    //			((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory(mode,
+    // factory);
+    //		}
+
+    if (multiModalConfigGroup.isCreateMultiModalNetwork()) {
+      log.info("Creating multi modal network.");
+      new MultiModalNetworkCreator(multiModalConfigGroup).run(scenario.getNetwork());
+    }
+
+    if (multiModalConfigGroup.isEnsureActivityReachability()) {
+      log.info(
+          "Relocating activities that cannot be reached by the transport modes of their from- and/or to-legs...");
+      EnsureActivityReachability ensureActivityReachability =
+          new EnsureActivityReachability(scenario);
+      ensureActivityReachability.run(scenario.getPopulation());
+      ensureActivityReachability.printRelocateCount();
+    }
+
+    if (multiModalConfigGroup.isDropNonCarRoutes()) {
+      log.info(
+          "Dropping existing routes of modes which are simulated with the multi modal mobsim.");
+      new NonCarRouteDropper(multiModalConfigGroup).run(scenario.getPopulation());
+    }
+  }
 }

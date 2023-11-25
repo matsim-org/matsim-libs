@@ -44,99 +44,109 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 public class OnePercentBerlin10sIT {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  private static final Logger log = LogManager.getLogger(OnePercentBerlin10sIT.class);
 
-	private static final Logger log = LogManager.getLogger(OnePercentBerlin10sIT.class);
+  @Test
+  public void testOnePercent10sQSim() {
+    Config config = utils.loadConfig((String) null);
+    // input files are in the main directory in the resource path!
+    String netFileName = "test/scenarios/berlin/network.xml";
+    String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
 
-	@Test public void testOnePercent10sQSim() {
-		Config config = utils.loadConfig((String)null);
-		// input files are in the main directory in the resource path!
-		String netFileName = "test/scenarios/berlin/network.xml";
-		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
+    String eventsFileName = utils.getOutputDirectory() + "events.xml.gz";
+    String referenceEventsFileName = utils.getInputDirectory() + "events.xml.gz";
 
-		String eventsFileName = utils.getOutputDirectory() + "events.xml.gz";
-		String referenceEventsFileName = utils.getInputDirectory() + "events.xml.gz";
+    MatsimRandom.reset(7411L);
 
-		MatsimRandom.reset(7411L);
+    config.qsim().setTimeStepSize(10.0);
+    config.qsim().setFlowCapFactor(0.01);
+    config.qsim().setStorageCapFactor(0.04);
+    config.qsim().setRemoveStuckVehicles(false);
+    config.qsim().setStuckTime(10.0);
+    config.scoring().setLearningRate(1.0);
 
-		config.qsim().setTimeStepSize(10.0);
-		config.qsim().setFlowCapFactor(0.01);
-		config.qsim().setStorageCapFactor(0.04);
-		config.qsim().setRemoveStuckVehicles(false);
-		config.qsim().setStuckTime(10.0);
-		config.scoring().setLearningRate(1.0);
+    config
+        .plans()
+        .setActivityDurationInterpretation(
+            PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime);
 
-		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime);
+    Scenario scenario = ScenarioUtils.createScenario(config);
 
-		Scenario scenario = ScenarioUtils.createScenario(config);
+    new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
+    new PopulationReader(scenario).readFile(popFileName);
 
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
-		new PopulationReader(scenario).readFile(popFileName);
+    EventsManager events = EventsUtils.createEventsManager();
+    EventWriterXML writer = new EventWriterXML(eventsFileName);
+    events.addHandler(writer);
 
-		EventsManager events = EventsUtils.createEventsManager();
-		EventWriterXML writer = new EventWriterXML(eventsFileName);
-		events.addHandler(writer);
+    PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+    QSim qSim =
+        new QSimBuilder(scenario.getConfig()) //
+            .useDefaults() //
+            .build(scenario, events);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim qSim = new QSimBuilder(scenario.getConfig()) //
-			.useDefaults() //
-			.build(scenario, events);
+    log.info("START testOnePercent10s SIM");
+    qSim.run();
+    log.info("STOP testOnePercent10s SIM");
 
-		log.info("START testOnePercent10s SIM");
-		qSim.run();
-		log.info("STOP testOnePercent10s SIM");
+    writer.closeFile();
 
-		writer.closeFile();
+    System.out.println("reffile: " + referenceEventsFileName);
+    assertEquals(
+        "different event files",
+        EventsFileComparator.Result.FILES_ARE_EQUAL,
+        new EventsFileComparator()
+            .setIgnoringCoordinates(true)
+            .runComparison(referenceEventsFileName, eventsFileName));
+  }
 
-		System.out.println("reffile: " + referenceEventsFileName);
-		assertEquals( "different event files", EventsFileComparator.Result.FILES_ARE_EQUAL,
-				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( referenceEventsFileName, eventsFileName ) );
+  @Test
+  public void testOnePercent10sQSimTryEndTimeThenDuration() {
+    Config config = utils.loadConfig((String) null);
+    String netFileName = "test/scenarios/berlin/network.xml";
+    String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
+    String eventsFileName = utils.getOutputDirectory() + "events.xml.gz";
+    String referenceEventsFileName = utils.getInputDirectory() + "events.xml.gz";
 
-	}
+    MatsimRandom.reset(7411L);
 
-	@Test public void testOnePercent10sQSimTryEndTimeThenDuration() {
-		Config config = utils.loadConfig((String)null);
-		String netFileName = "test/scenarios/berlin/network.xml";
-		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
-		String eventsFileName = utils.getOutputDirectory() + "events.xml.gz";
-		String referenceEventsFileName = utils.getInputDirectory() + "events.xml.gz";
+    config.qsim().setTimeStepSize(10.0);
+    config.qsim().setFlowCapFactor(0.01);
+    config.qsim().setStorageCapFactor(0.04);
+    config.qsim().setRemoveStuckVehicles(false);
+    config.qsim().setStuckTime(10.0);
+    config.scoring().setLearningRate(1.0);
 
-		MatsimRandom.reset(7411L);
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
 
-		config.qsim().setTimeStepSize(10.0);
-		config.qsim().setFlowCapFactor(0.01);
-		config.qsim().setStorageCapFactor(0.04);
-		config.qsim().setRemoveStuckVehicles(false);
-		config.qsim().setStuckTime(10.0);
-		config.scoring().setLearningRate(1.0);
+    Scenario scenario = ScenarioUtils.createScenario(config);
 
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
+    new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
+    new PopulationReader(scenario).readFile(popFileName);
 
-		Scenario scenario = ScenarioUtils.createScenario(config);
+    EventsManager eventsManager = EventsUtils.createEventsManager();
+    EventWriterXML writer = new EventWriterXML(eventsFileName);
+    eventsManager.addHandler(writer);
 
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
-		new PopulationReader(scenario).readFile(popFileName);
+    PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+    QSim qSim =
+        new QSimBuilder(scenario.getConfig()) //
+            .useDefaults() //
+            .build(scenario, eventsManager);
 
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		EventWriterXML writer = new EventWriterXML(eventsFileName);
-		eventsManager.addHandler(writer);
+    log.info("START testOnePercent10s SIM");
+    qSim.run();
+    log.info("STOP testOnePercent10s SIM");
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim qSim = new QSimBuilder(scenario.getConfig()) //
-			.useDefaults() //
-			.build(scenario, eventsManager);
+    writer.closeFile();
 
-		log.info("START testOnePercent10s SIM");
-		qSim.run();
-		log.info("STOP testOnePercent10s SIM");
-
-		writer.closeFile();
-
-		assertEquals( "different event files", EventsFileComparator.Result.FILES_ARE_EQUAL,
-				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( referenceEventsFileName, eventsFileName ) );
-
-	}
-
+    assertEquals(
+        "different event files",
+        EventsFileComparator.Result.FILES_ARE_EQUAL,
+        new EventsFileComparator()
+            .setIgnoringCoordinates(true)
+            .runComparison(referenceEventsFileName, eventsFileName));
+  }
 }

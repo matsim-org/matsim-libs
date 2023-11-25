@@ -25,18 +25,18 @@ import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.TaxiStayTaskEndTimeCalculator;
 
 public class ETaxiStayTaskEndTimeCalculator extends TaxiStayTaskEndTimeCalculator {
-	public ETaxiStayTaskEndTimeCalculator(TaxiConfigGroup taxiConfigGroup) {
-		super(taxiConfigGroup);
-	}
+  public ETaxiStayTaskEndTimeCalculator(TaxiConfigGroup taxiConfigGroup) {
+    super(taxiConfigGroup);
+  }
 
-	@Override
-	public double calcNewEndTime(DvrpVehicle vehicle, StayTask task, double newBeginTime) {
-		if (task.getTaskType().equals(ETaxiChargingTask.TYPE)) {
-			// FIXME underestimated due to the ongoing AUX/drive consumption
-			double duration = task.getEndTime() - task.getBeginTime();
-			return newBeginTime + duration;
-		} else {
-			return super.calcNewEndTime(vehicle, task, newBeginTime);
-		}
-	}
+  @Override
+  public double calcNewEndTime(DvrpVehicle vehicle, StayTask task, double newBeginTime) {
+    if (task.getTaskType().equals(ETaxiChargingTask.TYPE)) {
+      // FIXME underestimated due to the ongoing AUX/drive consumption
+      double duration = task.getEndTime() - task.getBeginTime();
+      return newBeginTime + duration;
+    } else {
+      return super.calcNewEndTime(vehicle, task, newBeginTime);
+    }
+  }
 }

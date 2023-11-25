@@ -19,17 +19,15 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data.signalcontrol.v20;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UncheckedIOException;
-
-import javax.xml.XMLConstants;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+import javax.xml.XMLConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.validation.SchemaFactory;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.AbstractSignalsReader;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
@@ -44,69 +42,73 @@ import org.matsim.jaxb.signalcontrol20.XMLSignalSystemType;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-
 /**
  * @author dgrether
- *
  */
-public final class SignalControlReader20 extends AbstractSignalsReader{
+public final class SignalControlReader20 extends AbstractSignalsReader {
 
-	private SignalControlData signalControlData;
+  private SignalControlData signalControlData;
 
-	public SignalControlReader20(SignalControlData signalControlData){
-		this.signalControlData = signalControlData;
-	}
+  public SignalControlReader20(SignalControlData signalControlData) {
+    this.signalControlData = signalControlData;
+  }
 
-	private XMLSignalControl readSignalControl20Stream(InputStream stream) {
-		try {
-			JAXBContext jc = JAXBContext.newInstance(org.matsim.jaxb.signalcontrol20.ObjectFactory.class);
-			Unmarshaller u = jc.createUnmarshaller();
-			u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/signalControl_v2.0.xsd")));
-			return (XMLSignalControl) u.unmarshal(stream);
-		} catch (JAXBException | SAXException e) {
-			throw new UncheckedIOException(new IOException(e));
-		}
-	}
+  private XMLSignalControl readSignalControl20Stream(InputStream stream) {
+    try {
+      JAXBContext jc = JAXBContext.newInstance(org.matsim.jaxb.signalcontrol20.ObjectFactory.class);
+      Unmarshaller u = jc.createUnmarshaller();
+      u.setSchema(
+          SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+              .newSchema(getClass().getResource("/dtd/signalControl_v2.0.xsd")));
+      return (XMLSignalControl) u.unmarshal(stream);
+    } catch (JAXBException | SAXException e) {
+      throw new UncheckedIOException(new IOException(e));
+    }
+  }
 
-	private double getSeconds(XMLGregorianCalendar daytime) {
-		double sec = daytime.getHour() * 3600.0;
-		sec += daytime.getMinute() * 60.0;
-		sec += daytime.getSecond();
-		return sec;
-	}
+  private double getSeconds(XMLGregorianCalendar daytime) {
+    double sec = daytime.getHour() * 3600.0;
+    sec += daytime.getMinute() * 60.0;
+    sec += daytime.getSecond();
+    return sec;
+  }
 
-	public void read( InputSource inputStream ) {
-//		XMLSignalControl xmlSignalControl = this.readSignalControl20Stream(inputStream);
-		XMLSignalControl xmlSignalControl = this.readSignalControl20Stream(inputStream.getByteStream());
-		SignalControlDataFactory factory = this.signalControlData.getFactory();
-		for (XMLSignalSystemType xmlSystem : xmlSignalControl.getSignalSystem()){
-			SignalSystemControllerData controllerData = factory.createSignalSystemControllerData(Id.create(xmlSystem.getRefId(), SignalSystem.class));
-			this.signalControlData.addSignalSystemControllerData(controllerData);
-			XMLSignalSystemControllerType xmlController = xmlSystem.getSignalSystemController();
-			controllerData.setControllerIdentifier(xmlController.getControllerIdentifier());
-			for (XMLSignalPlanType xmlPlan : xmlController.getSignalPlan()){
-				SignalPlanData plan = factory.createSignalPlanData(Id.create(xmlPlan.getId(), SignalPlan.class));
-				controllerData.addSignalPlanData(plan);
-				if (xmlPlan.getCycleTime() != null){
-					plan.setCycleTime(xmlPlan.getCycleTime().getSec());
-				}
-				if (xmlPlan.getOffset() != null){
-					plan.setOffset(xmlPlan.getOffset().getSec());
-				}
-				if (xmlPlan.getStart() != null){
-					plan.setStartTime(this.getSeconds(xmlPlan.getStart().getDaytime()));
-				}
-				if (xmlPlan.getStop() != null){
-					plan.setEndTime(this.getSeconds(xmlPlan.getStop().getDaytime()));
-				}
-				for (XMLSignalGroupSettingsType xmlSettings: xmlPlan.getSignalGroupSettings()){
-					SignalGroupSettingsData settings = factory.createSignalGroupSettingsData(Id.create(xmlSettings.getRefId(), SignalGroup.class));
-					plan.addSignalGroupSettings(settings);
-					settings.setDropping(xmlSettings.getDropping().getSec());
-					settings.setOnset(xmlSettings.getOnset().getSec());
-				}
-			}
-		}
-	}
-
+  public void read(InputSource inputStream) {
+    //		XMLSignalControl xmlSignalControl = this.readSignalControl20Stream(inputStream);
+    XMLSignalControl xmlSignalControl = this.readSignalControl20Stream(inputStream.getByteStream());
+    SignalControlDataFactory factory = this.signalControlData.getFactory();
+    for (XMLSignalSystemType xmlSystem : xmlSignalControl.getSignalSystem()) {
+      SignalSystemControllerData controllerData =
+          factory.createSignalSystemControllerData(
+              Id.create(xmlSystem.getRefId(), SignalSystem.class));
+      this.signalControlData.addSignalSystemControllerData(controllerData);
+      XMLSignalSystemControllerType xmlController = xmlSystem.getSignalSystemController();
+      controllerData.setControllerIdentifier(xmlController.getControllerIdentifier());
+      for (XMLSignalPlanType xmlPlan : xmlController.getSignalPlan()) {
+        SignalPlanData plan =
+            factory.createSignalPlanData(Id.create(xmlPlan.getId(), SignalPlan.class));
+        controllerData.addSignalPlanData(plan);
+        if (xmlPlan.getCycleTime() != null) {
+          plan.setCycleTime(xmlPlan.getCycleTime().getSec());
+        }
+        if (xmlPlan.getOffset() != null) {
+          plan.setOffset(xmlPlan.getOffset().getSec());
+        }
+        if (xmlPlan.getStart() != null) {
+          plan.setStartTime(this.getSeconds(xmlPlan.getStart().getDaytime()));
+        }
+        if (xmlPlan.getStop() != null) {
+          plan.setEndTime(this.getSeconds(xmlPlan.getStop().getDaytime()));
+        }
+        for (XMLSignalGroupSettingsType xmlSettings : xmlPlan.getSignalGroupSettings()) {
+          SignalGroupSettingsData settings =
+              factory.createSignalGroupSettingsData(
+                  Id.create(xmlSettings.getRefId(), SignalGroup.class));
+          plan.addSignalGroupSettings(settings);
+          settings.setDropping(xmlSettings.getDropping().getSec());
+          settings.setOnset(xmlSettings.getOnset().getSec());
+        }
+      }
+    }
+  }
 }

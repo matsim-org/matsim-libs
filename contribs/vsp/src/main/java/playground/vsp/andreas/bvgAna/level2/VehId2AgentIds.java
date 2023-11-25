@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
-
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,77 +30,80 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
-
 import playground.vsp.andreas.bvgAna.level1.VehId2PersonEnterLeaveVehicleMap;
 
 /**
  * Retrieves the agent ids of a given vehicle id at a given time
- * 
- * @author aneumann
  *
+ * @author aneumann
  */
-public class VehId2AgentIds implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
-	
-	private final Logger log = LogManager.getLogger(VehId2AgentIds.class);
-//	private final Level logLevel = Level.DEBUG;
-	
-	private VehId2PersonEnterLeaveVehicleMap vehId2PersonEnterLeaveVehicleMap;
-	
-	public VehId2AgentIds(){
-//		this.log.setLevel(this.logLevel);
-		this.vehId2PersonEnterLeaveVehicleMap = new VehId2PersonEnterLeaveVehicleMap();
-	}
-	
-	/**
-	 * @return A set containing all agent ids traveling in a given vehicle at a given time
-	 */
-	public Set<Id> getAgentIdsInVehicle(Id vehId, double time){
-		
-		Set<Id> agentIdsInVehicle = new TreeSet<Id>();
-		
-		ArrayList<PersonEntersVehicleEvent> vem = this.vehId2PersonEnterLeaveVehicleMap.getVehId2PersonEnterEventMap().get(vehId);
-		ArrayList<PersonLeavesVehicleEvent> vlm = this.vehId2PersonEnterLeaveVehicleMap.getVehId2PersonLeaveEventMap().get(vehId);		
-		
-		for (Iterator vemIterator = vem.iterator(); vemIterator.hasNext();) {
-			PersonEntersVehicleEvent personEntersVehicleEvent = (PersonEntersVehicleEvent) vemIterator.next();
-			
-			for (Iterator vlmIterator = vlm.iterator(); vlmIterator.hasNext();) {
-				PersonLeavesVehicleEvent personLeavesVehicleEvent = (PersonLeavesVehicleEvent) vlmIterator.next();
-				
-				while(personEntersVehicleEvent.getTime() < personLeavesVehicleEvent.getTime()){
-					if(personEntersVehicleEvent.getTime() <= time){
-						agentIdsInVehicle.add(personEntersVehicleEvent.getPersonId());
-					}
-					if(vemIterator.hasNext()){
-						personEntersVehicleEvent = (PersonEntersVehicleEvent) vemIterator.next();
-					} else {
-						break;
-					}
-				}
-				
-				if(personLeavesVehicleEvent.getTime() <= personEntersVehicleEvent.getTime()){
-					if(personLeavesVehicleEvent.getTime() <= time){
-						agentIdsInVehicle.remove(personLeavesVehicleEvent.getPersonId());
-					}
-				}				
-			}			
-		}
-		
-		return agentIdsInVehicle;
-	}
+public class VehId2AgentIds
+    implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		this.vehId2PersonEnterLeaveVehicleMap.handleEvent(event);
-	}
+  private final Logger log = LogManager.getLogger(VehId2AgentIds.class);
+  //	private final Level logLevel = Level.DEBUG;
 
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		this.vehId2PersonEnterLeaveVehicleMap.handleEvent(event);
-	}
+  private VehId2PersonEnterLeaveVehicleMap vehId2PersonEnterLeaveVehicleMap;
 
-	@Override
-	public void reset(int iteration) {
-		this.log.debug("reset method in iteration " + iteration + " not implemented, yet");
-	}
+  public VehId2AgentIds() {
+    //		this.log.setLevel(this.logLevel);
+    this.vehId2PersonEnterLeaveVehicleMap = new VehId2PersonEnterLeaveVehicleMap();
+  }
+
+  /**
+   * @return A set containing all agent ids traveling in a given vehicle at a given time
+   */
+  public Set<Id> getAgentIdsInVehicle(Id vehId, double time) {
+
+    Set<Id> agentIdsInVehicle = new TreeSet<Id>();
+
+    ArrayList<PersonEntersVehicleEvent> vem =
+        this.vehId2PersonEnterLeaveVehicleMap.getVehId2PersonEnterEventMap().get(vehId);
+    ArrayList<PersonLeavesVehicleEvent> vlm =
+        this.vehId2PersonEnterLeaveVehicleMap.getVehId2PersonLeaveEventMap().get(vehId);
+
+    for (Iterator vemIterator = vem.iterator(); vemIterator.hasNext(); ) {
+      PersonEntersVehicleEvent personEntersVehicleEvent =
+          (PersonEntersVehicleEvent) vemIterator.next();
+
+      for (Iterator vlmIterator = vlm.iterator(); vlmIterator.hasNext(); ) {
+        PersonLeavesVehicleEvent personLeavesVehicleEvent =
+            (PersonLeavesVehicleEvent) vlmIterator.next();
+
+        while (personEntersVehicleEvent.getTime() < personLeavesVehicleEvent.getTime()) {
+          if (personEntersVehicleEvent.getTime() <= time) {
+            agentIdsInVehicle.add(personEntersVehicleEvent.getPersonId());
+          }
+          if (vemIterator.hasNext()) {
+            personEntersVehicleEvent = (PersonEntersVehicleEvent) vemIterator.next();
+          } else {
+            break;
+          }
+        }
+
+        if (personLeavesVehicleEvent.getTime() <= personEntersVehicleEvent.getTime()) {
+          if (personLeavesVehicleEvent.getTime() <= time) {
+            agentIdsInVehicle.remove(personLeavesVehicleEvent.getPersonId());
+          }
+        }
+      }
+    }
+
+    return agentIdsInVehicle;
+  }
+
+  @Override
+  public void handleEvent(PersonEntersVehicleEvent event) {
+    this.vehId2PersonEnterLeaveVehicleMap.handleEvent(event);
+  }
+
+  @Override
+  public void handleEvent(PersonLeavesVehicleEvent event) {
+    this.vehId2PersonEnterLeaveVehicleMap.handleEvent(event);
+  }
+
+  @Override
+  public void reset(int iteration) {
+    this.log.debug("reset method in iteration " + iteration + " not implemented, yet");
+  }
 }

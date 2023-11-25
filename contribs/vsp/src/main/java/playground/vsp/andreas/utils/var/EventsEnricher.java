@@ -19,7 +19,6 @@
 package playground.vsp.andreas.utils.var;
 
 import java.util.HashMap;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,91 +33,84 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
 
 /**
- * 
  * Add missing event attributes, e.g. LinkEnterEvent used to have no vehicleId
- * 
- * @author aneumann
  *
+ * @author aneumann
  */
 public class EventsEnricher implements BasicEventHandler {
-	
-	private static final Logger log = LogManager.getLogger(EventsEnricher.class);
-	
-	private EventWriterXML eventsWriter;
 
-	private HashMap<Id, Id> driver2vehicleIdMap;
-	
-	
-	
-	public EventsEnricher(String outFile) {
-		this.eventsWriter = new EventWriterXML(outFile);
-		this.driver2vehicleIdMap = new HashMap<Id, Id>();
-	}
+  private static final Logger log = LogManager.getLogger(EventsEnricher.class);
 
+  private EventWriterXML eventsWriter;
 
+  private HashMap<Id, Id> driver2vehicleIdMap;
 
-	public static void main(String[] args) {
-		String inFile = args[0];
-		String outFile = args[1];
-		
-		log.info("handling events...");
-		EventsManager manager = EventsUtils.createEventsManager();
+  public EventsEnricher(String outFile) {
+    this.eventsWriter = new EventWriterXML(outFile);
+    this.driver2vehicleIdMap = new HashMap<Id, Id>();
+  }
 
-		EventsEnricher eR = new EventsEnricher(outFile);
-		
-		manager.addHandler(eR);
-		new MatsimEventsReader(manager).readFile(inFile);
-		log.info("event-handling finished...");
-		
-		eR.finish();
-		
-	}
+  public static void main(String[] args) {
+    String inFile = args[0];
+    String outFile = args[1];
 
-	private void finish() {
-		this.eventsWriter.closeFile();
-	}
+    log.info("handling events...");
+    EventsManager manager = EventsUtils.createEventsManager();
 
-	@Override
-	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-	}
+    EventsEnricher eR = new EventsEnricher(outFile);
 
-	public void handleTransitDriverStartsEvent(TransitDriverStartsEvent event) {
-		this.driver2vehicleIdMap.put(event.getDriverId(), event.getVehicleId());
-		this.eventsWriter.handleEvent(event);
-	}
+    manager.addHandler(eR);
+    new MatsimEventsReader(manager).readFile(inFile);
+    log.info("event-handling finished...");
 
-	public void handleLinkLeaveEvent(LinkLeaveEvent event) {
-		Id vehId = this.driver2vehicleIdMap.get(event.getDriverId());
-		if (vehId == null) {
-			// private car
-			vehId = event.getDriverId();
-		}
-		
-		LinkLeaveEvent newEvent = new LinkLeaveEvent(event.getTime(), vehId, event.getLinkId());
-		this.eventsWriter.handleEvent(newEvent);
-	}
+    eR.finish();
+  }
 
-	public void handleLinkEnterEvent(LinkEnterEvent event) {
-		Id vehId = this.driver2vehicleIdMap.get(event.getDriverId());
-		if (vehId == null) {
-			// private car
-			vehId = event.getDriverId();
-		}
-		LinkEnterEvent newEvent = new LinkEnterEvent(event.getTime(), vehId, event.getLinkId());
-		this.eventsWriter.handleEvent(newEvent);
-	}
+  private void finish() {
+    this.eventsWriter.closeFile();
+  }
 
-	@Override
-	public void handleEvent(Event event) {
-		if (event instanceof LinkLeaveEvent) {
-			this.handleLinkLeaveEvent((LinkLeaveEvent) event);
-		} else if (event instanceof LinkEnterEvent) {
-			this.handleLinkEnterEvent((LinkEnterEvent) event);
-		} else if (event instanceof TransitDriverStartsEvent) {
-			this.handleTransitDriverStartsEvent((TransitDriverStartsEvent) event);
-		} else {
-			this.eventsWriter.handleEvent(event);
-		}
-	}
+  @Override
+  public void reset(int iteration) {
+    // TODO Auto-generated method stub
+  }
+
+  public void handleTransitDriverStartsEvent(TransitDriverStartsEvent event) {
+    this.driver2vehicleIdMap.put(event.getDriverId(), event.getVehicleId());
+    this.eventsWriter.handleEvent(event);
+  }
+
+  public void handleLinkLeaveEvent(LinkLeaveEvent event) {
+    Id vehId = this.driver2vehicleIdMap.get(event.getDriverId());
+    if (vehId == null) {
+      // private car
+      vehId = event.getDriverId();
+    }
+
+    LinkLeaveEvent newEvent = new LinkLeaveEvent(event.getTime(), vehId, event.getLinkId());
+    this.eventsWriter.handleEvent(newEvent);
+  }
+
+  public void handleLinkEnterEvent(LinkEnterEvent event) {
+    Id vehId = this.driver2vehicleIdMap.get(event.getDriverId());
+    if (vehId == null) {
+      // private car
+      vehId = event.getDriverId();
+    }
+    LinkEnterEvent newEvent = new LinkEnterEvent(event.getTime(), vehId, event.getLinkId());
+    this.eventsWriter.handleEvent(newEvent);
+  }
+
+  @Override
+  public void handleEvent(Event event) {
+    if (event instanceof LinkLeaveEvent) {
+      this.handleLinkLeaveEvent((LinkLeaveEvent) event);
+    } else if (event instanceof LinkEnterEvent) {
+      this.handleLinkEnterEvent((LinkEnterEvent) event);
+    } else if (event instanceof TransitDriverStartsEvent) {
+      this.handleTransitDriverStartsEvent((TransitDriverStartsEvent) event);
+    } else {
+      this.eventsWriter.handleEvent(event);
+    }
+  }
 }

@@ -17,92 +17,94 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.commercialTrafficApplications.jointDemand;/*
- * created by jbischoff, 03.05.2019
- */
+package org.matsim.contrib.commercialTrafficApplications.jointDemand; /*
+                                                                       * created by jbischoff, 03.05.2019
+                                                                       */
 
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import java.util.Map;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.freight.carriers.CarriersUtils;
-import org.matsim.freight.carriers.Carriers;
-import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCostsFactory;
-import org.matsim.freight.carriers.jsprit.VRPTransportCostsFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.util.TravelTime;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-import java.util.Map;
+import org.matsim.freight.carriers.Carriers;
+import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCostsFactory;
+import org.matsim.freight.carriers.jsprit.VRPTransportCostsFactory;
 
 public class JointDemandModule extends AbstractModule {
 
-    @Override
-    public void install() {
+  @Override
+  public void install() {
 
-        if(MultiModeDrtConfigGroup.get(getConfig()) != null){
-            installDRT();
-        }
+    if (MultiModeDrtConfigGroup.get(getConfig()) != null) {
+      installDRT();
+    }
 
-        JointDemandConfigGroup ctcg = JointDemandConfigGroup.get(getConfig());
+    JointDemandConfigGroup ctcg = JointDemandConfigGroup.get(getConfig());
 
-        bind(CommercialJobScoreCalculator.class).toInstance(new DefaultCommercialServiceScore(ctcg.getMaxJobScore(), ctcg.getMinJobScore(), ctcg.getZeroUtilityDelay()));
-        bind(Carriers.class).toProvider(new CarrierProvider());
+    bind(CommercialJobScoreCalculator.class)
+        .toInstance(
+            new DefaultCommercialServiceScore(
+                ctcg.getMaxJobScore(), ctcg.getMinJobScore(), ctcg.getZeroUtilityDelay()));
+    bind(Carriers.class).toProvider(new CarrierProvider());
 
-        bind(ScoreCommercialJobs.class).in(Singleton.class);
-        bind(TourLengthAnalyzer.class).in(Singleton.class);
-        bind(CommercialJobGenerator.class).to(DefaultCommercialJobGenerator.class).in(Singleton.class);
-        addControlerListenerBinding().to(CommercialJobGenerator.class);
-        addControlerListenerBinding().to(CommercialTrafficAnalysisListener.class);
-        bind(VRPTransportCostsFactory.class).to(NetworkBasedTransportCostsFactory.class).in(Singleton.class);
+    bind(ScoreCommercialJobs.class).in(Singleton.class);
+    bind(TourLengthAnalyzer.class).in(Singleton.class);
+    bind(CommercialJobGenerator.class).to(DefaultCommercialJobGenerator.class).in(Singleton.class);
+    addControlerListenerBinding().to(CommercialJobGenerator.class);
+    addControlerListenerBinding().to(CommercialTrafficAnalysisListener.class);
+    bind(VRPTransportCostsFactory.class)
+        .to(NetworkBasedTransportCostsFactory.class)
+        .in(Singleton.class);
 
-        //bind strategy that enables to choose between operators
-        addPlanStrategyBinding(ChangeCommercialJobOperator.SELECTOR_NAME).toProvider(new Provider<PlanStrategy>() {
-            @Inject
-            Config config;
-            @Inject
-            Carriers carriers;
-            @Override
-            public PlanStrategy get() {
-                final PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
-                builder.addStrategyModule(new ChangeCommercialJobOperator(config.global(), carriers));
+    // bind strategy that enables to choose between operators
+    addPlanStrategyBinding(ChangeCommercialJobOperator.SELECTOR_NAME)
+        .toProvider(
+            new Provider<PlanStrategy>() {
+              @Inject Config config;
+              @Inject Carriers carriers;
+
+              @Override
+              public PlanStrategy get() {
+                final PlanStrategyImpl.Builder builder =
+                    new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
+                builder.addStrategyModule(
+                    new ChangeCommercialJobOperator(config.global(), carriers));
                 return builder.build();
-            }
-        });
+              }
+            });
+  }
+
+  private void installDRT() {
+    install(new MultiModeDrtModule());
+    install(new DvrpModule());
+  }
+
+  private class CarrierProvider implements com.google.inject.Provider<Carriers> {
+    @com.google.inject.Inject Scenario scenario;
+
+    private CarrierProvider() {}
+
+    public Carriers get() {
+      return CarriersUtils.getCarriers(this.scenario);
     }
+  }
 
-    private void installDRT(){
-        install(new MultiModeDrtModule());
-        install(new DvrpModule());
-    }
+  @Provides
+  @Singleton
+  private NetworkBasedTransportCostsFactory provideNetworkBasedTransportCostsFactory(
+      Scenario scenario, Carriers carriers, Map<String, TravelTime> travelTimes, Config config) {
 
-
-    private class CarrierProvider implements com.google.inject.Provider<Carriers> {
-        @com.google.inject.Inject
-        Scenario scenario;
-
-        private CarrierProvider() {
-        }
-
-        public Carriers get() {
-            return CarriersUtils.getCarriers(this.scenario);
-        }
-    }
-
-    @Provides
-    @Singleton
-    private NetworkBasedTransportCostsFactory provideNetworkBasedTransportCostsFactory(Scenario scenario,
-                                                                                       Carriers carriers, Map<String, TravelTime> travelTimes, Config config) {
-
-        return new NetworkBasedTransportCostsFactory(scenario,
-                carriers, travelTimes, config);
-    }
-
+    return new NetworkBasedTransportCostsFactory(scenario, carriers, travelTimes, config);
+  }
 }

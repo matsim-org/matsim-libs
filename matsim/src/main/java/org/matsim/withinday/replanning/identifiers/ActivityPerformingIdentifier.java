@@ -23,7 +23,6 @@ package org.matsim.withinday.replanning.identifiers;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -32,30 +31,30 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityAgen
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 public class ActivityPerformingIdentifier extends DuringActivityAgentSelector {
-	
-	protected ActivityReplanningMap activityReplanningMap;
-	protected MobsimDataProvider mobsimDataProvider;
-	
-	// use the Factory!
-	/*package*/ ActivityPerformingIdentifier(ActivityReplanningMap activityReplanningMap, MobsimDataProvider mobsimDataProvider) {
-		this.activityReplanningMap = activityReplanningMap;
-		this.mobsimDataProvider = mobsimDataProvider;
-	}
-	
-	@Override
-	public Set<MobsimAgent> getAgentsToReplan(double time) {
-		Map<Id<Person>, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();
-		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new ById());
 
-		/*
-		 * Identify those activity performing agents that should be replanned.
-		 * Add them to a set of MobsimAgents.
-		 */
-		for (Id<Person> agentId : this.activityReplanningMap.getActivityPerformingAgents()) {
-			if (this.applyFilters(agentId, time)) agentsToReplan.add(mapping.get(agentId));
-		}
-				
-		return agentsToReplan;
-	}
+  protected ActivityReplanningMap activityReplanningMap;
+  protected MobsimDataProvider mobsimDataProvider;
 
+  // use the Factory!
+  /*package*/ ActivityPerformingIdentifier(
+      ActivityReplanningMap activityReplanningMap, MobsimDataProvider mobsimDataProvider) {
+    this.activityReplanningMap = activityReplanningMap;
+    this.mobsimDataProvider = mobsimDataProvider;
+  }
+
+  @Override
+  public Set<MobsimAgent> getAgentsToReplan(double time) {
+    Map<Id<Person>, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();
+    Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new ById());
+
+    /*
+     * Identify those activity performing agents that should be replanned.
+     * Add them to a set of MobsimAgents.
+     */
+    for (Id<Person> agentId : this.activityReplanningMap.getActivityPerformingAgents()) {
+      if (this.applyFilters(agentId, time)) agentsToReplan.add(mapping.get(agentId));
+    }
+
+    return agentsToReplan;
+  }
 }

@@ -28,69 +28,67 @@ import org.matsim.vehicles.Vehicle;
 
 public class FiFoTravelTime implements TravelTime {
 
-	private final TravelTime travelTime;
+  private final TravelTime travelTime;
 
-	private final int binSize;
+  private final int binSize;
 
-	public FiFoTravelTime(TravelTime travelTime, int binSize) {
-		super();
-		this.travelTime = travelTime;
-		this.binSize = binSize;
-	}
+  public FiFoTravelTime(TravelTime travelTime, int binSize) {
+    super();
+    this.travelTime = travelTime;
+    this.binSize = binSize;
+  }
 
-	public double getLinkTravelTime(Link link, double time, Vehicle vehicle) {
-		double tt = getTravelTime(link, time, vehicle);
-		if(getTimeBin(time) == getTimeBin(time+tt)){
-			return tt;
-		}
-		else{
-			double totalTravelTime = 0.0;
-			double distanceToTravel = link.getLength();
-			double currentTime = time;
-			boolean distanceTraveled = false;
-			while(!distanceTraveled){
-				double nextTimeThreshold = getNextTimeBin(currentTime);
-				if(currentTime < nextTimeThreshold){
-					double speed = calculateCurrentSpeed(link,time, vehicle);
-					double maxReachableDistanceInThisTimeBin = (nextTimeThreshold-currentTime)*speed;
-					if(distanceToTravel > maxReachableDistanceInThisTimeBin){
-						distanceToTravel = distanceToTravel - maxReachableDistanceInThisTimeBin;
-						totalTravelTime += (nextTimeThreshold-currentTime);
-						currentTime = nextTimeThreshold;
-					}
-					else{ //<= maxReachableDistance
-						totalTravelTime += distanceToTravel/speed;
-						distanceTraveled = true;
-					}
-				}
-			}
-			return totalTravelTime;
-		}
-	}
+  public double getLinkTravelTime(Link link, double time, Vehicle vehicle) {
+    double tt = getTravelTime(link, time, vehicle);
+    if (getTimeBin(time) == getTimeBin(time + tt)) {
+      return tt;
+    } else {
+      double totalTravelTime = 0.0;
+      double distanceToTravel = link.getLength();
+      double currentTime = time;
+      boolean distanceTraveled = false;
+      while (!distanceTraveled) {
+        double nextTimeThreshold = getNextTimeBin(currentTime);
+        if (currentTime < nextTimeThreshold) {
+          double speed = calculateCurrentSpeed(link, time, vehicle);
+          double maxReachableDistanceInThisTimeBin = (nextTimeThreshold - currentTime) * speed;
+          if (distanceToTravel > maxReachableDistanceInThisTimeBin) {
+            distanceToTravel = distanceToTravel - maxReachableDistanceInThisTimeBin;
+            totalTravelTime += (nextTimeThreshold - currentTime);
+            currentTime = nextTimeThreshold;
+          } else { // <= maxReachableDistance
+            totalTravelTime += distanceToTravel / speed;
+            distanceTraveled = true;
+          }
+        }
+      }
+      return totalTravelTime;
+    }
+  }
 
-	private double getTravelTime(Link link, double time, Vehicle vehicle) {
-		return travelTime.getLinkTravelTime(link, time, null, vehicle);
-	}
+  private double getTravelTime(Link link, double time, Vehicle vehicle) {
+    return travelTime.getLinkTravelTime(link, time, null, vehicle);
+  }
 
-	private double calculateCurrentSpeed(Link link, double time, Vehicle vehicle) {
-		double speed = link.getLength()/getTravelTime(link, time, vehicle);
-		if(speed > vehicle.getType().getMaximumVelocity()){
-			speed = vehicle.getType().getMaximumVelocity();
-		}
-		return speed;
-	}
+  private double calculateCurrentSpeed(Link link, double time, Vehicle vehicle) {
+    double speed = link.getLength() / getTravelTime(link, time, vehicle);
+    if (speed > vehicle.getType().getMaximumVelocity()) {
+      speed = vehicle.getType().getMaximumVelocity();
+    }
+    return speed;
+  }
 
-	private int getTimeBin(double currentTime){
-		return (int)currentTime/binSize;
-	}
+  private int getTimeBin(double currentTime) {
+    return (int) currentTime / binSize;
+  }
 
-	private double getNextTimeBin(double currentTime) {
-		double lastThreshold = Math.floor(currentTime/binSize) * binSize;
-		return lastThreshold + binSize;
-	}
+  private double getNextTimeBin(double currentTime) {
+    double lastThreshold = Math.floor(currentTime / binSize) * binSize;
+    return lastThreshold + binSize;
+  }
 
-	@Override
-	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		return getLinkTravelTime(link, time, vehicle);
-	}
+  @Override
+  public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+    return getLinkTravelTime(link, time, vehicle);
+  }
 }

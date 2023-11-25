@@ -20,7 +20,6 @@
 package org.matsim.households;
 
 import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Person;
@@ -32,15 +31,14 @@ import org.matsim.vehicles.Vehicle;
  */
 public interface Household extends Identifiable<Household>, Attributable {
 
-	public List<Id<Person>> getMemberIds();
-	
-	/**
-	 * This returns an Income, not a number.  The Income type contains a method `getIncomePeriod()'. 
-	 */
-	public Income getIncome();
-	
-	public List<Id<Vehicle>> getVehicleIds();
+  public List<Id<Person>> getMemberIds();
 
-	public void setIncome(Income income);
+  /**
+   * This returns an Income, not a number. The Income type contains a method `getIncomePeriod()'.
+   */
+  public Income getIncome();
 
+  public List<Id<Vehicle>> getVehicleIds();
+
+  public void setIncome(Income income);
 }

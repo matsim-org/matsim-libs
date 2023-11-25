@@ -25,15 +25,15 @@ import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 
 public class EarliestLinkExitTimeFilterFactory implements AgentFilterFactory {
 
-	private final EarliestLinkExitTimeProvider earliestLinkExitTimeProvider;
-	
-	public EarliestLinkExitTimeFilterFactory(EarliestLinkExitTimeProvider earliestLinkExitTimeProvider) {
-		this.earliestLinkExitTimeProvider = earliestLinkExitTimeProvider;
-	}
-	
-	@Override
-	public EarliestLinkExitTimeFilter createAgentFilter() {
-		return new EarliestLinkExitTimeFilter(earliestLinkExitTimeProvider);
-	}
+  private final EarliestLinkExitTimeProvider earliestLinkExitTimeProvider;
 
+  public EarliestLinkExitTimeFilterFactory(
+      EarliestLinkExitTimeProvider earliestLinkExitTimeProvider) {
+    this.earliestLinkExitTimeProvider = earliestLinkExitTimeProvider;
+  }
+
+  @Override
+  public EarliestLinkExitTimeFilter createAgentFilter() {
+    return new EarliestLinkExitTimeFilter(earliestLinkExitTimeProvider);
+  }
 }

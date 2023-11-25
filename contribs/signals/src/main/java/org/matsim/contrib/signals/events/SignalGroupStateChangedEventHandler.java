@@ -21,12 +21,11 @@ package org.matsim.contrib.signals.events;
 
 import org.matsim.core.events.handler.EventHandler;
 
-
 /**
- * Implement this to get notified when SignalGroupStateChangedEvents are
- * thrown
+ * Implement this to get notified when SignalGroupStateChangedEvents are thrown
+ *
  * @author dgrether
  */
 public interface SignalGroupStateChangedEventHandler extends EventHandler {
-	public void handleEvent (SignalGroupStateChangedEvent event);
+  public void handleEvent(SignalGroupStateChangedEvent event);
 }

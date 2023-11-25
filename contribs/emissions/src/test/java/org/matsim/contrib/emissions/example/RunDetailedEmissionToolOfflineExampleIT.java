@@ -31,161 +31,202 @@ import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author ihab
- *
  */
 public class RunDetailedEmissionToolOfflineExampleIT {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	/*
-	 *
-	 * Abort if values are not found in detailed table
-	 *
-	 * */
+  /*
+   *
+   * Abort if values are not found in detailed table
+   *
+   * */
 
-	// Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
-//	@Test(expected=RuntimeException.class)
-	@Test
-	public final void testDetailed_vehTypeV1() {
-		boolean gotAnException = false ;
-		try {
-			RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
+  // Expecting RuntimeException, because requested values are only in average file. Without fallback
+  // it has to fail!
+  //	@Test(expected=RuntimeException.class)
+  @Test
+  public final void testDetailed_vehTypeV1() {
+    boolean gotAnException = false;
+    try {
+      RunDetailedEmissionToolOfflineExample offlineExample =
+          new RunDetailedEmissionToolOfflineExample();
 
-//			Config config = offlineExample.prepareConfig( "./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml" );
-			var scUrl = ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv1" );
-			var cfUrl = IOUtils.extendUrl( scUrl, "config_detailed.xml" );
-			var config = offlineExample.prepareConfig( new String [] {cfUrl.toString()} );
+      //			Config config = offlineExample.prepareConfig(
+      // "./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml" );
+      var scUrl = ExamplesUtils.getTestScenarioURL("emissions-sampleScenario/testv2_Vehv1");
+      var cfUrl = IOUtils.extendUrl(scUrl, "config_detailed.xml");
+      var config = offlineExample.prepareConfig(new String[] {cfUrl.toString()});
 
-			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-			emissionsConfig.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-			emissionsConfig.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
-			config.controller().setOutputDirectory( utils.getOutputDirectory() );
+      EmissionsConfigGroup emissionsConfig =
+          ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
+      emissionsConfig.setHbefaVehicleDescriptionSource(
+          HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
+      emissionsConfig.setDetailedVsAverageLookupBehavior(
+          DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
+      config.controller().setOutputDirectory(utils.getOutputDirectory());
 
-			offlineExample.run();
-		} catch (Exception ee ) {
-			gotAnException = true ;
-		}
-		Assert.assertTrue( gotAnException );
-	}
+      offlineExample.run();
+    } catch (Exception ee) {
+      gotAnException = true;
+    }
+    Assert.assertTrue(gotAnException);
+  }
 
-	// Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
-//	@Test(expected=RuntimeException.class)
-	@Test
-	public final void testDetailed_vehTypeV2() {
-		boolean gotAnException = false ;
-		try {
-			RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
+  // Expecting RuntimeException, because requested values are only in average file. Without fallback
+  // it has to fail!
+  //	@Test(expected=RuntimeException.class)
+  @Test
+  public final void testDetailed_vehTypeV2() {
+    boolean gotAnException = false;
+    try {
+      RunDetailedEmissionToolOfflineExample offlineExample =
+          new RunDetailedEmissionToolOfflineExample();
 
-//			Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml");
-			var scUrl = ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv2" );
-			var cfUrl = IOUtils.extendUrl( scUrl, "config_detailed.xml" );
-			var config = offlineExample.prepareConfig( new String [] {cfUrl.toString()} );
+      //			Config config =
+      // offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml");
+      var scUrl = ExamplesUtils.getTestScenarioURL("emissions-sampleScenario/testv2_Vehv2");
+      var cfUrl = IOUtils.extendUrl(scUrl, "config_detailed.xml");
+      var config = offlineExample.prepareConfig(new String[] {cfUrl.toString()});
 
-			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-			emissionsConfig.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
-			config.controller().setOutputDirectory(utils.getOutputDirectory());
+      EmissionsConfigGroup emissionsConfig =
+          ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
+      emissionsConfig.setDetailedVsAverageLookupBehavior(
+          DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
+      config.controller().setOutputDirectory(utils.getOutputDirectory());
 
-			offlineExample.run();
-		} catch (Exception ee ) {
-			gotAnException = true ;
-		}
-		Assert.assertTrue( gotAnException );
-	}
+      offlineExample.run();
+    } catch (Exception ee) {
+      gotAnException = true;
+    }
+    Assert.assertTrue(gotAnException);
+  }
 
-	// Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
-//	@Test(expected=RuntimeException.class)
-	@Test
-	public final void testDetailed_vehTypeV2_HBEFA4() {
-		boolean gotAnException = false ;
-		try {
-			RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
-//			Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml");
-			var scUrl = ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv2" );
-			var cfUrl = IOUtils.extendUrl( scUrl, "config_detailed.xml" );
-			var config = offlineExample.prepareConfig( new String [] {cfUrl.toString()} );
+  // Expecting RuntimeException, because requested values are only in average file. Without fallback
+  // it has to fail!
+  //	@Test(expected=RuntimeException.class)
+  @Test
+  public final void testDetailed_vehTypeV2_HBEFA4() {
+    boolean gotAnException = false;
+    try {
+      RunDetailedEmissionToolOfflineExample offlineExample =
+          new RunDetailedEmissionToolOfflineExample();
+      //			Config config =
+      // offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml");
+      var scUrl = ExamplesUtils.getTestScenarioURL("emissions-sampleScenario/testv2_Vehv2");
+      var cfUrl = IOUtils.extendUrl(scUrl, "config_detailed.xml");
+      var config = offlineExample.prepareConfig(new String[] {cfUrl.toString()});
 
-			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-			emissionsConfig.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
-			// --- Change input to hbefa4 sample
-			emissionsConfig.setDetailedColdEmissionFactorsFile("../sample_41_EFA_ColdStart_SubSegm_2020detailed.csv");
-			emissionsConfig.setDetailedWarmEmissionFactorsFile("../sample_41_EFA_HOT_SubSegm_2020detailed.csv");
+      EmissionsConfigGroup emissionsConfig =
+          ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
+      emissionsConfig.setDetailedVsAverageLookupBehavior(
+          DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
+      // --- Change input to hbefa4 sample
+      emissionsConfig.setDetailedColdEmissionFactorsFile(
+          "../sample_41_EFA_ColdStart_SubSegm_2020detailed.csv");
+      emissionsConfig.setDetailedWarmEmissionFactorsFile(
+          "../sample_41_EFA_HOT_SubSegm_2020detailed.csv");
 
-			config.controller().setOutputDirectory(utils.getOutputDirectory());
-			offlineExample.run();
-		} catch (Exception ee ) {
-			gotAnException = true ;
-		}
-		Assert.assertTrue( gotAnException );
-	}
+      config.controller().setOutputDirectory(utils.getOutputDirectory());
+      offlineExample.run();
+    } catch (Exception ee) {
+      gotAnException = true;
+    }
+    Assert.assertTrue(gotAnException);
+  }
 
+  /*
+   *
+   * Fallback to Average
+   * this was the previous behaviour.
+   *
+   * */
 
-	/*
-	 *
-	 * Fallback to Average
-	 * this was the previous behaviour.
-	 *
-	 * */
+  @Test
+  public final void testDetailed_vehTypeV1_FallbackToAverage() {
+    RunDetailedEmissionToolOfflineExample offlineExample =
+        new RunDetailedEmissionToolOfflineExample();
 
-	@Test
-	public final void testDetailed_vehTypeV1_FallbackToAverage() {
-		RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
+    //		Config config =
+    // offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml");
+    var scUrl = ExamplesUtils.getTestScenarioURL("emissions-sampleScenario/testv2_Vehv1");
+    var cfUrl = IOUtils.extendUrl(scUrl, "config_detailed.xml");
+    var config = offlineExample.prepareConfig(new String[] {cfUrl.toString()});
 
-//		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml");
-		var scUrl = ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv1" );
-		var cfUrl = IOUtils.extendUrl( scUrl, "config_detailed.xml" );
-		var config = offlineExample.prepareConfig( new String [] {cfUrl.toString()} );
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
 
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
+    EmissionsConfigGroup emissionsConfig =
+        ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
+    emissionsConfig.setAverageColdEmissionFactorsFile(
+        "../sample_41_EFA_ColdStart_vehcat_2020average.csv");
+    emissionsConfig.setAverageWarmEmissionFactorsFile(
+        "../sample_41_EFA_HOT_vehcat_2020average.csv");
+    emissionsConfig.setHbefaVehicleDescriptionSource(
+        HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
+    emissionsConfig.setDetailedVsAverageLookupBehavior(
+        DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
+    emissionsConfig.setHbefaTableConsistencyCheckingLevel(
+        EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel
+            .consistent); // because we only use a sample hbefa file "allCombinations" is
+    // irrelevant.
 
-		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.csv");
-		emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.csv" );
-		emissionsConfig.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-		emissionsConfig.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
-		emissionsConfig.setHbefaTableConsistencyCheckingLevel( EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.consistent ); // because we only use a sample hbefa file "allCombinations" is irrelevant.
+    offlineExample.run();
+  }
 
-		offlineExample.run();
-	}
+  @Test
+  public final void testDetailed_vehTypeV2_FallbackToAverage() {
+    RunDetailedEmissionToolOfflineExample offlineExample =
+        new RunDetailedEmissionToolOfflineExample();
 
-	@Test
-	public final void testDetailed_vehTypeV2_FallbackToAverage() {
-		RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
+    //		Config config =
+    // offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml");
+    var scUrl = ExamplesUtils.getTestScenarioURL("emissions-sampleScenario/testv2_Vehv2");
+    var cfUrl = IOUtils.extendUrl(scUrl, "config_detailed.xml");
+    var config = offlineExample.prepareConfig(new String[] {cfUrl.toString()});
 
-//		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml");
-		var scUrl = ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv2" );
-		var cfUrl = IOUtils.extendUrl( scUrl, "config_detailed.xml" );
-		var config = offlineExample.prepareConfig( new String [] {cfUrl.toString()} );
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
 
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
+    EmissionsConfigGroup emissionsConfig =
+        ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
+    emissionsConfig.setAverageColdEmissionFactorsFile(
+        "../sample_41_EFA_ColdStart_vehcat_2020average.csv");
+    emissionsConfig.setAverageWarmEmissionFactorsFile(
+        "../sample_41_EFA_HOT_vehcat_2020average.csv");
+    emissionsConfig.setDetailedVsAverageLookupBehavior(
+        DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
+    emissionsConfig.setHbefaTableConsistencyCheckingLevel(
+        EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel
+            .consistent); // because we only use a sample hbefa file "allCombinations" is
+    // irrelevant.
 
-		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.csv");
-		emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.csv" );
-		emissionsConfig.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
-		emissionsConfig.setHbefaTableConsistencyCheckingLevel( EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.consistent ); // because we only use a sample hbefa file "allCombinations" is irrelevant.
+    offlineExample.run();
+  }
 
-		offlineExample.run();
-	}
+  @Test
+  public final void testDetailed_vehTypeV2_HBEFA4_FallbackToAverage() {
+    RunDetailedEmissionToolOfflineExample offlineExample =
+        new RunDetailedEmissionToolOfflineExample();
 
-	@Test
-	public final void testDetailed_vehTypeV2_HBEFA4_FallbackToAverage() {
-		RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
+    //		Config config =
+    // offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml");
+    var scUrl = ExamplesUtils.getTestScenarioURL("emissions-sampleScenario/testv2_Vehv2");
+    var cfUrl = IOUtils.extendUrl(scUrl, "config_detailed.xml");
+    var config = offlineExample.prepareConfig(new String[] {cfUrl.toString()});
 
-//		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml");
-		var scUrl = ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv2" );
-		var cfUrl = IOUtils.extendUrl( scUrl, "config_detailed.xml" );
-		var config = offlineExample.prepareConfig( new String [] {cfUrl.toString()} );
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
 
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
+    EmissionsConfigGroup emissionsConfig =
+        ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
+    emissionsConfig.setDetailedVsAverageLookupBehavior(
+        DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
+    emissionsConfig.setAverageColdEmissionFactorsFile(
+        "../sample_41_EFA_ColdStart_vehcat_2020average.csv");
+    emissionsConfig.setDetailedColdEmissionFactorsFile(
+        "../sample_41_EFA_ColdStart_SubSegm_2020detailed.csv");
+    emissionsConfig.setAverageWarmEmissionFactorsFile(
+        "../sample_41_EFA_HOT_vehcat_2020average.csv");
+    emissionsConfig.setDetailedWarmEmissionFactorsFile(
+        "../sample_41_EFA_HOT_SubSegm_2020detailed.csv");
 
-		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-		emissionsConfig.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
-		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.csv");
-		emissionsConfig.setDetailedColdEmissionFactorsFile("../sample_41_EFA_ColdStart_SubSegm_2020detailed.csv");
-		emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.csv" );
-		emissionsConfig.setDetailedWarmEmissionFactorsFile("../sample_41_EFA_HOT_SubSegm_2020detailed.csv");
-
-		offlineExample.run();
-	}
-
-
+    offlineExample.run();
+  }
 }

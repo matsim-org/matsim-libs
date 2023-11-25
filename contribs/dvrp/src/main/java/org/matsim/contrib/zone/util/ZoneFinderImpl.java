@@ -21,7 +21,6 @@ package org.matsim.contrib.zone.util;
 
 import java.util.List;
 import java.util.Map;
-
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.index.SpatialIndex;
@@ -32,76 +31,75 @@ import org.matsim.contrib.zone.Zone;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 public class ZoneFinderImpl implements ZoneFinder {
-	private final SpatialIndex quadTree = new Quadtree();
-	private final double expansionDistance;
+  private final SpatialIndex quadTree = new Quadtree();
+  private final double expansionDistance;
 
-	public ZoneFinderImpl(Map<Id<Zone>, Zone> zones, double expansionDistance) {
-		this.expansionDistance = expansionDistance;
+  public ZoneFinderImpl(Map<Id<Zone>, Zone> zones, double expansionDistance) {
+    this.expansionDistance = expansionDistance;
 
-		for (Zone z : zones.values()) {
-			quadTree.insert(z.getMultiPolygon().getEnvelopeInternal(), z);
-		}
-	}
+    for (Zone z : zones.values()) {
+      quadTree.insert(z.getMultiPolygon().getEnvelopeInternal(), z);
+    }
+  }
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public Zone findZone(Coord coord) {
-		Point point = MGC.coord2Point(coord);
-		Envelope env = point.getEnvelopeInternal();
+  @Override
+  @SuppressWarnings("unchecked")
+  public Zone findZone(Coord coord) {
+    Point point = MGC.coord2Point(coord);
+    Envelope env = point.getEnvelopeInternal();
 
-		Zone zone = getSmallestZoneContainingPoint(quadTree.query(env), point);
-		if (zone != null) {
-			return zone;
-		}
+    Zone zone = getSmallestZoneContainingPoint(quadTree.query(env), point);
+    if (zone != null) {
+      return zone;
+    }
 
-		if (expansionDistance > 0) {
-			env.expandBy(expansionDistance);
-			zone = getNearestZone(quadTree.query(env), point);
-		}
+    if (expansionDistance > 0) {
+      env.expandBy(expansionDistance);
+      zone = getNearestZone(quadTree.query(env), point);
+    }
 
-		return zone;
-	}
+    return zone;
+  }
 
-	private Zone getSmallestZoneContainingPoint(List<Zone> zones, Point point) {
-		if (zones.size() == 1) {// almost 100% cases
-			return zones.get(0);
-		}
+  private Zone getSmallestZoneContainingPoint(List<Zone> zones, Point point) {
+    if (zones.size() == 1) { // almost 100% cases
+      return zones.get(0);
+    }
 
-		double minArea = Double.MAX_VALUE;
-		Zone smallestZone = null;
+    double minArea = Double.MAX_VALUE;
+    Zone smallestZone = null;
 
-		for (Zone z : zones) {
-			if (z.getMultiPolygon().contains(point)) {
-				double area = z.getMultiPolygon().getArea();
-				if (area < minArea) {
-					minArea = area;
-					smallestZone = z;
-				}
-			}
-		}
+    for (Zone z : zones) {
+      if (z.getMultiPolygon().contains(point)) {
+        double area = z.getMultiPolygon().getArea();
+        if (area < minArea) {
+          minArea = area;
+          smallestZone = z;
+        }
+      }
+    }
 
-		return smallestZone;
-	}
+    return smallestZone;
+  }
 
-	private Zone getNearestZone(List<Zone> zones, Point point) {
-		if (zones.size() == 1) {
-			return zones.get(0);
-		}
+  private Zone getNearestZone(List<Zone> zones, Point point) {
+    if (zones.size() == 1) {
+      return zones.get(0);
+    }
 
-		double minDistance = Double.MAX_VALUE;
-		Zone nearestZone = null;
+    double minDistance = Double.MAX_VALUE;
+    Zone nearestZone = null;
 
-		for (Zone z : zones) {
-			double distance = z.getMultiPolygon().distance(point);
-			if (distance <= expansionDistance) {
-				if (distance < minDistance) {
-					minDistance = distance;
-					nearestZone = z;
-				}
-			}
-		}
+    for (Zone z : zones) {
+      double distance = z.getMultiPolygon().distance(point);
+      if (distance <= expansionDistance) {
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestZone = z;
+        }
+      }
+    }
 
-		return nearestZone;
-	}
-
+    return nearestZone;
+  }
 }

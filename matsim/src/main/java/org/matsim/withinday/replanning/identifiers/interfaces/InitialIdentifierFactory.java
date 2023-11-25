@@ -22,6 +22,6 @@ package org.matsim.withinday.replanning.identifiers.interfaces;
 
 public abstract class InitialIdentifierFactory extends AgentSelectorFactory {
 
-	@Override
-	public abstract InitialIdentifier createIdentifier();
+  @Override
+  public abstract InitialIdentifier createIdentifier();
 }

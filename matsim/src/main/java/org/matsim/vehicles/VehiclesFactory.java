@@ -21,12 +21,10 @@ package org.matsim.vehicles;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.vehicles.EngineInformation.FuelType;
 
 public interface VehiclesFactory extends MatsimFactory {
 
-	VehicleType createVehicleType( Id<VehicleType> type );
+  VehicleType createVehicleType(Id<VehicleType> type);
 
-	Vehicle createVehicle( Id<Vehicle> id, VehicleType type );
-
+  Vehicle createVehicle(Id<Vehicle> id, VehicleType type);
 }

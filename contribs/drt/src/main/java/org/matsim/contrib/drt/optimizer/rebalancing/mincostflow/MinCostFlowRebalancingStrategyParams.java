@@ -18,60 +18,72 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
-import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
-import org.matsim.core.config.ReflectiveConfigGroup;
-
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author michalm
  */
 public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfigGroup
-		implements RebalancingParams.RebalancingStrategyParams {
-	public static final String SET_NAME = "minCostFlowRebalancingStrategy";
+    implements RebalancingParams.RebalancingStrategyParams {
+  public static final String SET_NAME = "minCostFlowRebalancingStrategy";
 
-	@Parameter
-	@Comment("alpha coefficient in linear target calculation."
-			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage.")
-	@PositiveOrZero
-	public double targetAlpha = Double.NaN;
+  @Parameter
+  @Comment(
+      "alpha coefficient in linear target calculation."
+          + " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage.")
+  @PositiveOrZero
+  public double targetAlpha = Double.NaN;
 
-	@Parameter
-	@Comment("beta constant in linear target calculation."
-			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage.")
-	@PositiveOrZero
-	public double targetBeta = Double.NaN;
+  @Parameter
+  @Comment(
+      "beta constant in linear target calculation."
+          + " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage.")
+  @PositiveOrZero
+  public double targetBeta = Double.NaN;
 
-	public enum RebalancingTargetCalculatorType {
-		EstimatedDemand, EqualRebalancableVehicleDistribution, EqualVehicleDensity, EqualVehiclesToPopulationRatio
-	}
+  public enum RebalancingTargetCalculatorType {
+    EstimatedDemand,
+    EqualRebalancableVehicleDistribution,
+    EqualVehicleDensity,
+    EqualVehiclesToPopulationRatio
+  }
 
-	@Parameter
-	@Comment("Defines the calculator used for computing rebalancing targets per each zone"
-			+ " (i.e. number of the desired vehicles)."
-			+ " Can be one of [EstimatedDemand, EqualRebalancableVehicleDistribution,"
-			+ " EqualVehicleDensity, EqualVehiclesToPopulationRatio]."
-			+ " Current default is EstimatedDemand")
-	@NotNull
-	public RebalancingTargetCalculatorType rebalancingTargetCalculatorType = RebalancingTargetCalculatorType.EstimatedDemand;
+  @Parameter
+  @Comment(
+      "Defines the calculator used for computing rebalancing targets per each zone"
+          + " (i.e. number of the desired vehicles)."
+          + " Can be one of [EstimatedDemand, EqualRebalancableVehicleDistribution,"
+          + " EqualVehicleDensity, EqualVehiclesToPopulationRatio]."
+          + " Current default is EstimatedDemand")
+  @NotNull
+  public RebalancingTargetCalculatorType rebalancingTargetCalculatorType =
+      RebalancingTargetCalculatorType.EstimatedDemand;
 
-	public enum ZonalDemandEstimatorType {PreviousIterationDemand, None}
+  public enum ZonalDemandEstimatorType {
+    PreviousIterationDemand,
+    None
+  }
 
-	@Parameter
-	@Comment("Defines the methodology for demand estimation."
-			+ " Can be one of [PreviousIterationDemand, None]. Current default is PreviousIterationDemand")
-	@NotNull
-	public ZonalDemandEstimatorType zonalDemandEstimatorType = ZonalDemandEstimatorType.PreviousIterationDemand;
+  @Parameter
+  @Comment(
+      "Defines the methodology for demand estimation."
+          + " Can be one of [PreviousIterationDemand, None]. Current default is PreviousIterationDemand")
+  @NotNull
+  public ZonalDemandEstimatorType zonalDemandEstimatorType =
+      ZonalDemandEstimatorType.PreviousIterationDemand;
 
-	@Parameter
-	@Comment("Defines the time horizon for predicting the demand."
-			+ " Used when 'zonalDemandEstimatorType' is not set to 'None'."
-			+ " Default value is 1800 s.")
-	@PositiveOrZero
-	public int demandEstimationPeriod = 1800;
+  @Parameter
+  @Comment(
+      "Defines the time horizon for predicting the demand."
+          + " Used when 'zonalDemandEstimatorType' is not set to 'None'."
+          + " Default value is 1800 s.")
+  @PositiveOrZero
+  public int demandEstimationPeriod = 1800;
 
-	public MinCostFlowRebalancingStrategyParams() {
-		super(SET_NAME);
-	}
+  public MinCostFlowRebalancingStrategyParams() {
+    super(SET_NAME);
+  }
 }

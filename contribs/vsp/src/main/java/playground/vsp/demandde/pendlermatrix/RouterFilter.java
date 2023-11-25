@@ -21,7 +21,6 @@ package playground.vsp.demandde.pendlermatrix;
 
 import java.util.Collection;
 import java.util.HashSet;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -43,85 +42,99 @@ import org.matsim.facilities.ActivityOption;
 
 public class RouterFilter implements TripFlowSink {
 
-	private Network network;
+  private Network network;
 
-	private LeastCostPathCalculator dijkstra;
+  private LeastCostPathCalculator dijkstra;
 
-	private TripFlowSink sink;
+  private TripFlowSink sink;
 
-	private Collection<Id> interestingNodeIds = new HashSet<Id>();
+  private Collection<Id> interestingNodeIds = new HashSet<Id>();
 
-	private double travelTimeToLink = 0.0;
+  private double travelTimeToLink = 0.0;
 
-	private Coord entryCoord;
+  private Coord entryCoord;
 
-	private final Scenario sc ;
+  private final Scenario sc;
 
-	public RouterFilter(Network network) {
-		this.network = network;
-		FreespeedTravelTimeAndDisutility fttc = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
-		dijkstra = new DijkstraFactory().createPathCalculator(network, fttc, fttc);
-		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig()) ;
-	}
+  public RouterFilter(Network network) {
+    this.network = network;
+    FreespeedTravelTimeAndDisutility fttc =
+        new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
+    dijkstra = new DijkstraFactory().createPathCalculator(network, fttc, fttc);
+    this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+  }
 
-	@Override
-	public void process(ActivityFacility quelle, ActivityFacility ziel, int quantity, String mode, String destinationActivityType, double departureTimeOffset) {
-		Node quellNode = NetworkUtils.getNearestNode(((Network) network),quelle.getCoord());
-		Node zielNode = NetworkUtils.getNearestNode(((Network) network),ziel.getCoord());
-		Path path = dijkstra.calcLeastCostPath(quellNode, zielNode, 0.0, null, null);
-		ActivityFacilitiesFactory factory = ((MutableScenario)sc).getActivityFacilities().getFactory() ;
-		if (isInteresting(path)) {
-//			Facility newQuelle = new Zone(quelle.getId(), quelle.workplaces, quelle.workingPopulation, entryCoord);
-			ActivityFacility newQuelle = factory.createActivityFacility(quelle.getId(), quelle.getCoord() ) ;
-			for ( ActivityOption option : quelle.getActivityOptions().values() ) {
-				newQuelle.addActivityOption(option) ;
-			}
+  @Override
+  public void process(
+      ActivityFacility quelle,
+      ActivityFacility ziel,
+      int quantity,
+      String mode,
+      String destinationActivityType,
+      double departureTimeOffset) {
+    Node quellNode = NetworkUtils.getNearestNode(((Network) network), quelle.getCoord());
+    Node zielNode = NetworkUtils.getNearestNode(((Network) network), ziel.getCoord());
+    Path path = dijkstra.calcLeastCostPath(quellNode, zielNode, 0.0, null, null);
+    ActivityFacilitiesFactory factory = ((MutableScenario) sc).getActivityFacilities().getFactory();
+    if (isInteresting(path)) {
+      //			Facility newQuelle = new Zone(quelle.getId(), quelle.workplaces,
+      // quelle.workingPopulation, entryCoord);
+      ActivityFacility newQuelle =
+          factory.createActivityFacility(quelle.getId(), quelle.getCoord());
+      for (ActivityOption option : quelle.getActivityOptions().values()) {
+        newQuelle.addActivityOption(option);
+      }
 
-			sink.process(newQuelle, ziel, quantity, mode, destinationActivityType, departureTimeOffset + travelTimeToLink);
-		}
-	}
+      sink.process(
+          newQuelle,
+          ziel,
+          quantity,
+          mode,
+          destinationActivityType,
+          departureTimeOffset + travelTimeToLink);
+    }
+  }
 
-	private boolean isInteresting(Path path) {
-		if (interestingNodeIds.contains(path.getFromNode())) {
-			if (interestingNodeIds.contains(path.getToNode())) {
-				return false;
-			}
-		}
-		for (Node node : path.nodes) {
-			if (interestingNodeIds.contains(node.getId())) {
-				entryCoord = node.getCoord();
-				travelTimeToLink = calculateFreespeedTravelTimeToNode(network, path, node);
-				return true;
-			}
-		}
-		return false;
-	}
+  private boolean isInteresting(Path path) {
+    if (interestingNodeIds.contains(path.getFromNode())) {
+      if (interestingNodeIds.contains(path.getToNode())) {
+        return false;
+      }
+    }
+    for (Node node : path.nodes) {
+      if (interestingNodeIds.contains(node.getId())) {
+        entryCoord = node.getCoord();
+        travelTimeToLink = calculateFreespeedTravelTimeToNode(network, path, node);
+        return true;
+      }
+    }
+    return false;
+  }
 
-	void setSink(TripFlowSink sink) {
-		this.sink = sink;
-	}
+  void setSink(TripFlowSink sink) {
+    this.sink = sink;
+  }
 
-	@Override
-	public void complete() {
-		sink.complete();
-	}
+  @Override
+  public void complete() {
+    sink.complete();
+  }
 
-	Collection<Id> getInterestingNodeIds() {
-		return interestingNodeIds;
-	}
+  Collection<Id> getInterestingNodeIds() {
+    return interestingNodeIds;
+  }
 
-	private static double calculateFreespeedTravelTimeToNode(Network network, Path path, Node node) {
-		double travelTime = 0.0;
-		for (Link l : path.links) {
-			if (l.getFromNode().equals(node)) {
-				return travelTime;
-			}
-			travelTime += l.getLength() / l.getFreespeed();
-			if (l.getToNode().equals(node)) {
-				return travelTime;
-			}
-		}
-		return travelTime;
-	}
-
+  private static double calculateFreespeedTravelTimeToNode(Network network, Path path, Node node) {
+    double travelTime = 0.0;
+    for (Link l : path.links) {
+      if (l.getFromNode().equals(node)) {
+        return travelTime;
+      }
+      travelTime += l.getLength() / l.getFreespeed();
+      if (l.getToNode().equals(node)) {
+        return travelTime;
+      }
+    }
+    return travelTime;
+  }
 }

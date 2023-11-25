@@ -20,12 +20,10 @@
 
 package org.matsim.withinday.controller;
 
-import java.util.Map;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
-
+import java.util.Map;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -68,135 +66,155 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
 /**
- * This class should give an example what is needed to run
- * simulations with WithinDayReplanning.
+ * This class should give an example what is needed to run simulations with WithinDayReplanning.
  *
- * The path to a config file is needed as argument to run the
- * simulation.
+ * <p>The path to a config file is needed as argument to run the simulation.
  *
- * It should be possible to run this class with
- * "src/test/resources/test/scenarios/berlin/config_withinday.xml"
- * as argument.
+ * <p>It should be possible to run this class with
+ * "src/test/resources/test/scenarios/berlin/config_withinday.xml" as argument.
  *
  * @author Christoph Dobler
  */
 @Singleton
 public final class ExampleWithinDayController implements StartupListener {
-	// yyyy I think that for the now existing guice approach this example has too many factories at too many levels. kai, feb'16
+  // yyyy I think that for the now existing guice approach this example has too many factories at
+  // too many levels. kai, feb'16
 
-	/*
-	 * Define the Probability that an Agent uses the
-	 * Replanning Strategy. It is possible to assign
-	 * multiple Strategies to the Agents.
-	 */
-	private double pInitialReplanning = 0.0;
-	private double pDuringActivityReplanning = 1.0;
-	private double pDuringLegReplanning = 0.10;
+  /*
+   * Define the Probability that an Agent uses the
+   * Replanning Strategy. It is possible to assign
+   * multiple Strategies to the Agents.
+   */
+  private double pInitialReplanning = 0.0;
+  private double pDuringActivityReplanning = 1.0;
+  private double pDuringLegReplanning = 0.10;
 
-	private InitialIdentifierFactory initialIdentifierFactory;
-	private DuringActivityIdentifierFactory duringActivityIdentifierFactory;
-	private DuringLegIdentifierFactory duringLegIdentifierFactory;
-	private InitialIdentifier initialIdentifier;
-	private DuringActivityAgentSelector duringActivityIdentifier;
-	private DuringLegAgentSelector duringLegIdentifier;
-	private WithinDayInitialReplannerFactory initialReplannerFactory;
-	private WithinDayDuringActivityReplannerFactory duringActivityReplannerFactory;
-	private WithinDayDuringLegReplannerFactory duringLegReplannerFactory;
-	private ProbabilityFilterFactory initialProbabilityFilterFactory;
-	private ProbabilityFilterFactory duringActivityProbabilityFilterFactory;
-	private ProbabilityFilterFactory duringLegProbabilityFilterFactory;
+  private InitialIdentifierFactory initialIdentifierFactory;
+  private DuringActivityIdentifierFactory duringActivityIdentifierFactory;
+  private DuringLegIdentifierFactory duringLegIdentifierFactory;
+  private InitialIdentifier initialIdentifier;
+  private DuringActivityAgentSelector duringActivityIdentifier;
+  private DuringLegAgentSelector duringLegIdentifier;
+  private WithinDayInitialReplannerFactory initialReplannerFactory;
+  private WithinDayDuringActivityReplannerFactory duringActivityReplannerFactory;
+  private WithinDayDuringLegReplannerFactory duringLegReplannerFactory;
+  private ProbabilityFilterFactory initialProbabilityFilterFactory;
+  private ProbabilityFilterFactory duringActivityProbabilityFilterFactory;
+  private ProbabilityFilterFactory duringLegProbabilityFilterFactory;
 
-	@Inject private Scenario scenario;
-	@Inject private Provider<TripRouter> tripRouterProvider;
-	@Inject private MobsimDataProvider mobsimDataProvider;
-	@Inject private WithinDayEngine withinDayEngine;
-	@Inject private ActivityReplanningMap activityReplanningMap;
-	@Inject private LinkReplanningMap linkReplanningMap;
-	@Inject private LeastCostPathCalculatorFactory pathCalculatorFactory;
-	@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories;
-	@Inject private Map<String,TravelTime> travelTimes;
+  @Inject private Scenario scenario;
+  @Inject private Provider<TripRouter> tripRouterProvider;
+  @Inject private MobsimDataProvider mobsimDataProvider;
+  @Inject private WithinDayEngine withinDayEngine;
+  @Inject private ActivityReplanningMap activityReplanningMap;
+  @Inject private LinkReplanningMap linkReplanningMap;
+  @Inject private LeastCostPathCalculatorFactory pathCalculatorFactory;
+  @Inject private Map<String, TravelDisutilityFactory> travelDisutilityFactories;
+  @Inject private Map<String, TravelTime> travelTimes;
 
+  /*
+   * ===================================================================
+   * main
+   * ===================================================================
+   */
+  public static void main(final String[] args) {
+    if ((args == null) || (args.length == 0)) {
+      System.out.println("No argument given!");
+      //			System.out.println("Usage: Controler config-file [dtd-file]");
+      // the [dtd-file] argument was not honoured when I found this
+      // fca451f279bd4c8e3921846597d657614d5a5832 . kai, may'17
+      System.out.println("Usage: Controler config-file");
+      System.out.println();
+      System.exit(-1);
+    }
 
-	/*
-	 * ===================================================================
-	 * main
-	 * ===================================================================
-	 */
-	public static void main(final String[] args) {
-		if ((args == null) || (args.length == 0)) {
-			System.out.println("No argument given!");
-//			System.out.println("Usage: Controler config-file [dtd-file]");
-			// the [dtd-file] argument was not honoured when I found this fca451f279bd4c8e3921846597d657614d5a5832 . kai, may'17
-			System.out.println("Usage: Controler config-file");
-			System.out.println();
-			System.exit(-1);
-		}
+    Config config = ConfigUtils.loadConfig(args[0], new WithinDayConfigGroup());
+    config
+        .controller()
+        .setRoutingAlgorithmType(ControllerConfigGroup.RoutingAlgorithmType.Dijkstra);
 
-		Config config = ConfigUtils.loadConfig( args[0] , new WithinDayConfigGroup() ) ;
-		config.controller().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
+    Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		Scenario scenario = ScenarioUtils.loadScenario( config) ;
+    final Controler controler = new Controler(scenario);
+    configure(controler);
+    controler.run();
+  }
 
-		final Controler controler = new Controler(scenario);
-		configure(controler);
-		controler.run();
-	}
+  static void configure(Controler controler) {
+    // factored out for testing. kai, jun'16
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            install(new WithinDayModule());
+            addControlerListenerBinding().to(ExampleWithinDayController.class);
 
-	static void configure(Controler controler) {
-		// factored out for testing. kai, jun'16
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				install(new WithinDayModule());
-				addControlerListenerBinding().to(ExampleWithinDayController.class);
+            addTravelDisutilityFactoryBinding(TransportMode.car)
+                .toInstance(new OnlyTimeDependentTravelDisutilityFactory());
 
-				addTravelDisutilityFactoryBinding(TransportMode.car).toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+            // Use a Scoring Function that only scores the travel times:
+            // (yy but why? kai,  jun'16)
+            bindScoringFunctionFactory()
+                .toInstance(new OnlyTravelTimeDependentScoringFunctionFactory());
+          }
+        });
+  }
 
-				// Use a Scoring Function that only scores the travel times:
-				// (yy but why? kai,  jun'16)
-				bindScoringFunctionFactory().toInstance(new OnlyTravelTimeDependentScoringFunctionFactory());
-			}
-		});
-	}
+  @Override
+  public void notifyStartup(StartupEvent event) {
+    this.initReplanners();
+  }
 
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		this.initReplanners(  );
-	}
+  private void initReplanners() {
+    Network network = this.scenario.getNetwork();
 
-	private void initReplanners( ) {
-		Network network = this.scenario.getNetwork() ;
+    TravelTime travelTime = travelTimes.get(TransportMode.car);
 
-		TravelTime travelTime = travelTimes.get( TransportMode.car ) ;
+    TravelDisutilityFactory travelDisutilityFactory =
+        travelDisutilityFactories.get(TransportMode.car);
+    TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
 
-		TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get( TransportMode.car ) ;
-		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime ) ;
+    LeastCostPathCalculator pathCalculator =
+        pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
 
-		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime ) ;
+    this.initialIdentifierFactory = new InitialIdentifierImplFactory(this.mobsimDataProvider);
+    this.initialProbabilityFilterFactory = new ProbabilityFilterFactory(this.pInitialReplanning);
+    this.initialIdentifierFactory.addAgentFilterFactory(this.initialProbabilityFilterFactory);
+    this.initialIdentifier = initialIdentifierFactory.createIdentifier();
+    this.initialReplannerFactory =
+        new InitialReplannerFactory(
+            this.scenario,
+            this.withinDayEngine,
+            this.tripRouterProvider,
+            TimeInterpretation.create(scenario.getConfig()));
+    this.initialReplannerFactory.addIdentifier(this.initialIdentifier);
+    this.withinDayEngine.addIntialReplannerFactory(this.initialReplannerFactory);
 
-		this.initialIdentifierFactory = new InitialIdentifierImplFactory(this.mobsimDataProvider);
-		this.initialProbabilityFilterFactory = new ProbabilityFilterFactory(this.pInitialReplanning);
-		this.initialIdentifierFactory.addAgentFilterFactory(this.initialProbabilityFilterFactory);
-		this.initialIdentifier = initialIdentifierFactory.createIdentifier();
-		this.initialReplannerFactory = new InitialReplannerFactory(this.scenario, this.withinDayEngine, this.tripRouterProvider, TimeInterpretation.create(scenario.getConfig()));
-		this.initialReplannerFactory.addIdentifier(this.initialIdentifier);
-		this.withinDayEngine.addIntialReplannerFactory(this.initialReplannerFactory);
+    this.duringActivityIdentifierFactory =
+        new ActivityEndIdentifierFactory(this.activityReplanningMap);
+    this.duringActivityProbabilityFilterFactory =
+        new ProbabilityFilterFactory(this.pDuringActivityReplanning);
+    this.duringActivityIdentifierFactory.addAgentFilterFactory(
+        this.duringActivityProbabilityFilterFactory);
+    this.duringActivityIdentifier = duringActivityIdentifierFactory.createIdentifier();
+    this.duringActivityReplannerFactory =
+        new NextLegReplannerFactory(
+            this.scenario,
+            this.withinDayEngine,
+            this.tripRouterProvider,
+            TimeInterpretation.create(scenario.getConfig()));
+    this.duringActivityReplannerFactory.addIdentifier(this.duringActivityIdentifier);
+    this.withinDayEngine.addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
 
-		this.duringActivityIdentifierFactory = new ActivityEndIdentifierFactory(this.activityReplanningMap);
-		this.duringActivityProbabilityFilterFactory = new ProbabilityFilterFactory(this.pDuringActivityReplanning);
-		this.duringActivityIdentifierFactory.addAgentFilterFactory(this.duringActivityProbabilityFilterFactory);
-		this.duringActivityIdentifier = duringActivityIdentifierFactory.createIdentifier();
-		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenario, this.withinDayEngine, this.tripRouterProvider, TimeInterpretation.create(scenario.getConfig()));
-		this.duringActivityReplannerFactory.addIdentifier(this.duringActivityIdentifier);
-		this.withinDayEngine.addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
-
-		this.duringLegIdentifierFactory = new LeaveLinkIdentifierFactory(this.linkReplanningMap, this.mobsimDataProvider);
-		this.duringLegProbabilityFilterFactory = new ProbabilityFilterFactory(this.pDuringLegReplanning);
-		this.duringLegIdentifierFactory.addAgentFilterFactory(this.duringLegProbabilityFilterFactory);
-		this.duringLegIdentifier = this.duringLegIdentifierFactory.createIdentifier();
-		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenario, this.withinDayEngine, pathCalculator);
-		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
-		this.withinDayEngine.addDuringLegReplannerFactory(this.duringLegReplannerFactory);
-	}
-
+    this.duringLegIdentifierFactory =
+        new LeaveLinkIdentifierFactory(this.linkReplanningMap, this.mobsimDataProvider);
+    this.duringLegProbabilityFilterFactory =
+        new ProbabilityFilterFactory(this.pDuringLegReplanning);
+    this.duringLegIdentifierFactory.addAgentFilterFactory(this.duringLegProbabilityFilterFactory);
+    this.duringLegIdentifier = this.duringLegIdentifierFactory.createIdentifier();
+    this.duringLegReplannerFactory =
+        new CurrentLegReplannerFactory(this.scenario, this.withinDayEngine, pathCalculator);
+    this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
+    this.withinDayEngine.addDuringLegReplannerFactory(this.duringLegReplannerFactory);
+  }
 }

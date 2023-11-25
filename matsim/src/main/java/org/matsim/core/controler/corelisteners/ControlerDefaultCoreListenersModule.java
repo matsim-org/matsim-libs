@@ -23,22 +23,20 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.scoring.PlansScoringModule;
 
 /**
- * Defines the default core listeners.
- * In 99% of the use cases, this should be left as is.
- * Most of the process can be configured using more elemental elements:
- * StrategyManager, ScoringFunction, EventHandlers.
+ * Defines the default core listeners. In 99% of the use cases, this should be left as is. Most of
+ * the process can be configured using more elemental elements: StrategyManager, ScoringFunction,
+ * EventHandlers.
  *
  * @author thibautd
  */
 public class ControlerDefaultCoreListenersModule extends AbstractModule {
 
-	@Override
-	public void install() {
-		install(new PlansScoringModule());
-		bind( PlansReplanning.class ).to( PlansReplanningImpl.class );
-		bind( PlansDumping.class ).to( PlansDumpingImpl.class );
-		bind( EventsHandling.class ).to( EventsHandlingImpl.class );
-		bind( DumpDataAtEnd.class ).to( DumpDataAtEndImpl.class );
-	}
+  @Override
+  public void install() {
+    install(new PlansScoringModule());
+    bind(PlansReplanning.class).to(PlansReplanningImpl.class);
+    bind(PlansDumping.class).to(PlansDumpingImpl.class);
+    bind(EventsHandling.class).to(EventsHandlingImpl.class);
+    bind(DumpDataAtEnd.class).to(DumpDataAtEndImpl.class);
+  }
 }
-

@@ -1,5 +1,7 @@
 package org.matsim.contrib.drt.prebooking;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -7,9 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import javax.annotation.Nullable;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.IdSet;
@@ -43,415 +43,431 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
-
 /**
- * This class manages prebooked requests. One instance of PrebookingManager
- * exists per mode. The entry point is PrebookingManager::prebook to which you
- * need to pass a person, a leg with the respective DRT mode, the
- * requested/expected earliest departure time, and the time at which the request
- * should be submitted / taken into account in the system.
+ * This class manages prebooked requests. One instance of PrebookingManager exists per mode. The
+ * entry point is PrebookingManager::prebook to which you need to pass a person, a leg with the
+ * respective DRT mode, the requested/expected earliest departure time, and the time at which the
+ * request should be submitted / taken into account in the system.
  *
- * Preplanned requests can be submitted any time before the planned
- * departure/submission times.
+ * <p>Preplanned requests can be submitted any time before the planned departure/submission times.
  *
- * Internally, the prebooking manager will create a request identifier and
- * return the request once the agent actually wants to depart on the planned
- * leg. The link between a leg and a request is managed by inserting a special
- * attribute in the leg instance.
+ * <p>Internally, the prebooking manager will create a request identifier and return the request
+ * once the agent actually wants to depart on the planned leg. The link between a leg and a request
+ * is managed by inserting a special attribute in the leg instance.
  *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
-public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListener, AdvanceRequestProvider,
-		PassengerRequestScheduledEventHandler, PassengerRequestRejectedEventHandler, PersonStuckEventHandler {
-	private final String mode;
-
-	private final Network network;
-	private final EventsManager eventsManager;
-
-	private final VrpOptimizer optimizer;
-	private final RequestUnscheduler unscheduler;
+public class PrebookingManager
+    implements MobsimEngine,
+        MobsimAfterSimStepListener,
+        AdvanceRequestProvider,
+        PassengerRequestScheduledEventHandler,
+        PassengerRequestRejectedEventHandler,
+        PersonStuckEventHandler {
+  private final String mode;
+
+  private final Network network;
+  private final EventsManager eventsManager;
+
+  private final VrpOptimizer optimizer;
+  private final RequestUnscheduler unscheduler;
+
+  private final MobsimTimer mobsimTimer;
+
+  public PrebookingManager(
+      String mode,
+      Network network,
+      PassengerRequestCreator requestCreator,
+      VrpOptimizer optimizer,
+      MobsimTimer mobsimTimer,
+      PassengerRequestValidator requestValidator,
+      EventsManager eventsManager,
+      RequestUnscheduler unscheduler) {
+    this.network = network;
+    this.mode = mode;
+    this.requestCreator = requestCreator;
+    this.optimizer = optimizer;
+    this.requestAttribute = PREBOOKED_REQUEST_PREFIX + ":" + mode;
+    this.requestValidator = requestValidator;
+    this.mobsimTimer = mobsimTimer;
+    this.eventsManager = eventsManager;
+    this.unscheduler = unscheduler;
+  }
+
+  // Functionality for ID management
+
+  private static final String PREBOOKED_REQUEST_PREFIX = "prebookedRequestId";
+  private final AtomicInteger currentRequestIndex = new AtomicInteger(-1);
+  private final String requestAttribute;
+
+  private Id<Request> createRequestId() {
+    return Id.create(mode + "_prebooked_" + currentRequestIndex.incrementAndGet(), Request.class);
+  }
+
+  public boolean isPrebookedRequest(Id<Request> requestId) {
+    return requestId.toString().startsWith(mode + "_prebooked_");
+  }
+
+  public Id<Request> getRequestId(Leg leg) {
+    String rawRequestId = (String) leg.getAttributes().getAttribute(requestAttribute);
+
+    if (rawRequestId == null) {
+      return null;
+    }
+
+    return Id.create(rawRequestId, Request.class);
+  }
+
+  // Event handling: We track events in parallel and process them later in
+  // notifyMobsimAfterSimStep
+
+  private final ConcurrentLinkedQueue<PassengerRequestScheduledEvent> scheduledEvents =
+      new ConcurrentLinkedQueue<>();
+  private final ConcurrentLinkedQueue<Id<Request>> rejectedEventIds = new ConcurrentLinkedQueue<>();
+  private final ConcurrentLinkedQueue<Id<Person>> stuckPersonsIds = new ConcurrentLinkedQueue<>();
+
+  @Override
+  public void handleEvent(PassengerRequestScheduledEvent event) {
+    scheduledEvents.add(event);
+  }
+
+  @Override
+  public void handleEvent(PassengerRequestRejectedEvent event) {
+    rejectedEventIds.add(event.getRequestId());
+  }
+
+  @Override
+  public void handleEvent(PersonStuckEvent event) {
+    stuckPersonsIds.add(event.getPersonId());
+  }
+
+  // Event handling: We don't want to process events in notifyMobsimAfterSimStep,
+  // so we do it at the next time step
+  private record RejectionItem(Id<Request> requestId, List<Id<Person>> personIds, String cause) {}
+
+  private final ConcurrentLinkedQueue<RejectionItem> rejections = new ConcurrentLinkedQueue<>();
+
+  private void processRejection(PassengerRequest request, String cause) {
+    rejections.add(new RejectionItem(request.getId(), request.getPassengerIds(), cause));
+  }
+
+  private void flushRejections(double now) {
+    for (RejectionItem item : rejections) {
+      eventsManager.processEvent(
+          new PassengerRequestRejectedEvent(now, mode, item.requestId, item.personIds, item.cause));
+    }
+
+    rejections.clear();
+  }
 
-	private final MobsimTimer mobsimTimer;
+  // Booking functionality
 
-	public PrebookingManager(String mode, Network network, PassengerRequestCreator requestCreator,
-			VrpOptimizer optimizer, MobsimTimer mobsimTimer, PassengerRequestValidator requestValidator,
-			EventsManager eventsManager, RequestUnscheduler unscheduler) {
-		this.network = network;
-		this.mode = mode;
-		this.requestCreator = requestCreator;
-		this.optimizer = optimizer;
-		this.requestAttribute = PREBOOKED_REQUEST_PREFIX + ":" + mode;
-		this.requestValidator = requestValidator;
-		this.mobsimTimer = mobsimTimer;
-		this.eventsManager = eventsManager;
-		this.unscheduler = unscheduler;
-	}
+  private final PassengerRequestCreator requestCreator;
+  private final PassengerRequestValidator requestValidator;
 
-	// Functionality for ID management
+  // collects new bookings that need to be submitted
+  private final ConcurrentLinkedQueue<PassengerRequest> bookingQueue =
+      new ConcurrentLinkedQueue<>();
 
-	private static final String PREBOOKED_REQUEST_PREFIX = "prebookedRequestId";
-	private final AtomicInteger currentRequestIndex = new AtomicInteger(-1);
-	private final String requestAttribute;
-
-	private Id<Request> createRequestId() {
-		return Id.create(mode + "_prebooked_" + currentRequestIndex.incrementAndGet(), Request.class);
-	}
-
-	public boolean isPrebookedRequest(Id<Request> requestId) {
-		return requestId.toString().startsWith(mode + "_prebooked_");
-	}
-
-	public Id<Request> getRequestId(Leg leg) {
-		String rawRequestId = (String) leg.getAttributes().getAttribute(requestAttribute);
-
-		if (rawRequestId == null) {
-			return null;
-		}
+  public void prebook(MobsimAgent person, Leg leg, double earliestDepartureTime) {
+    Preconditions.checkArgument(
+        leg.getMode().equals(mode), "Invalid mode for this prebooking manager");
+    Preconditions.checkState(
+        !person.getState().equals(State.ABORT), "Cannot prebook aborted agent");
 
-		return Id.create(rawRequestId, Request.class);
-	}
-
-	// Event handling: We track events in parallel and process them later in
-	// notifyMobsimAfterSimStep
+    Id<Request> requestId = createRequestId();
+    double now = mobsimTimer.getTimeOfDay();
 
-	private final ConcurrentLinkedQueue<PassengerRequestScheduledEvent> scheduledEvents = new ConcurrentLinkedQueue<>();
-	private final ConcurrentLinkedQueue<Id<Request>> rejectedEventIds = new ConcurrentLinkedQueue<>();
-	private final ConcurrentLinkedQueue<Id<Person>> stuckPersonsIds = new ConcurrentLinkedQueue<>();
+    eventsManager.processEvent(
+        new PassengerRequestBookedEvent(now, mode, requestId, person.getId()));
 
-	@Override
-	public void handleEvent(PassengerRequestScheduledEvent event) {
-		scheduledEvents.add(event);
-	}
+    PassengerRequest request =
+        requestCreator.createRequest(
+            requestId,
+            List.of(person.getId()),
+            leg.getRoute(),
+            getLink(leg.getRoute().getStartLinkId()),
+            getLink(leg.getRoute().getEndLinkId()),
+            earliestDepartureTime,
+            now);
 
-	@Override
-	public void handleEvent(PassengerRequestRejectedEvent event) {
-		rejectedEventIds.add(event.getRequestId());
-	}
+    Set<String> violations = requestValidator.validateRequest(request);
 
-	@Override
-	public void handleEvent(PersonStuckEvent event) {
-		stuckPersonsIds.add(event.getPersonId());
-	}
+    Plan plan = WithinDayAgentUtils.getModifiablePlan(person);
+    int currentLegIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(person);
+    int prebookingLegIndex = plan.getPlanElements().indexOf(leg);
 
-	// Event handling: We don't want to process events in notifyMobsimAfterSimStep,
-	// so we do it at the next time step
-	private record RejectionItem(Id<Request> requestId, List<Id<Person>> personIds, String cause) {
-	}
+    if (prebookingLegIndex <= currentLegIndex) {
+      violations = new HashSet<>(violations);
+      violations.add("past leg"); // the leg for which the booking was made has already happened
+    }
 
-	private final ConcurrentLinkedQueue<RejectionItem> rejections = new ConcurrentLinkedQueue<>();
+    if (!violations.isEmpty()) {
+      String cause = String.join(", ", violations);
+      processRejection(request, cause);
+    } else {
+      leg.getAttributes().putAttribute(requestAttribute, request.getId().toString());
+      bookingQueue.add(request);
+    }
+  }
 
-	private void processRejection(PassengerRequest request, String cause) {
-		rejections.add(new RejectionItem(request.getId(), request.getPassengerIds(), cause));
-	}
+  private void processBookingQueue(double now) {
+    for (PassengerRequest request : bookingQueue) {
 
-	private void flushRejections(double now) {
-		for (RejectionItem item : rejections) {
-			eventsManager.processEvent(
-					new PassengerRequestRejectedEvent(now, mode, item.requestId, item.personIds, item.cause));
-		}
+      synchronized (optimizer) { // needed?
+        optimizer.requestSubmitted(request);
+      }
 
-		rejections.clear();
-	}
+      requests.put(request.getId(), new RequestItem(request));
+    }
 
-	// Booking functionality
+    bookingQueue.clear();
+  }
+
+  private Link getLink(Id<Link> linkId) {
+    return Preconditions.checkNotNull(
+        network.getLinks().get(linkId),
+        "Link id=%s does not exist in network for mode %s. Agent departs from a link that does not belong to that network?",
+        linkId,
+        mode);
+  }
 
-	private final PassengerRequestCreator requestCreator;
-	private final PassengerRequestValidator requestValidator;
+  // Interface with PassengerEngine
 
-	// collects new bookings that need to be submitted
-	private final ConcurrentLinkedQueue<PassengerRequest> bookingQueue = new ConcurrentLinkedQueue<>();
+  @Override
+  @Nullable
+  public PassengerRequest retrieveRequest(MobsimAgent agent, Leg leg) {
+    Preconditions.checkArgument(
+        leg.getMode().equals(mode), "Invalid mode for this prebooking manager");
 
-	public void prebook(MobsimAgent person, Leg leg, double earliestDepartureTime) {
-		Preconditions.checkArgument(leg.getMode().equals(mode), "Invalid mode for this prebooking manager");
-		Preconditions.checkState(!person.getState().equals(State.ABORT), "Cannot prebook aborted agent");
+    Id<Request> requestId = getRequestId(leg);
 
-		Id<Request> requestId = createRequestId();
-		double now = mobsimTimer.getTimeOfDay();
+    if (requestId == null) {
+      return null;
+    }
 
-		eventsManager.processEvent(new PassengerRequestBookedEvent(now, mode, requestId, person.getId()));
+    RequestItem item = requests.get(requestId);
 
-		PassengerRequest request = requestCreator.createRequest(requestId, List.of(person.getId()), leg.getRoute(),
-				getLink(leg.getRoute().getStartLinkId()), getLink(leg.getRoute().getEndLinkId()), earliestDepartureTime,
-				now);
+    if (item == null) {
+      return null;
+    }
 
-		Set<String> violations = requestValidator.validateRequest(request);
+    return item.request;
+  }
 
-		Plan plan = WithinDayAgentUtils.getModifiablePlan(person);
-		int currentLegIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(person);
-		int prebookingLegIndex = plan.getPlanElements().indexOf(leg);
+  // Housekeeping of requests
 
-		if (prebookingLegIndex <= currentLegIndex) {
-			violations = new HashSet<>(violations);
-			violations.add("past leg"); // the leg for which the booking was made has already happened
-		}
+  private IdMap<Request, RequestItem> requests = new IdMap<>(Request.class);
 
-		if (!violations.isEmpty()) {
-			String cause = String.join(", ", violations);
-			processRejection(request, cause);
-		} else {
-			leg.getAttributes().putAttribute(requestAttribute, request.getId().toString());
-			bookingQueue.add(request);
-		}
-	}
+  private class RequestItem {
+    final PassengerRequest request;
 
-	private void processBookingQueue(double now) {
-		for (PassengerRequest request : bookingQueue) {
+    Id<DvrpVehicle> vehicleId = null;
+    boolean onboard = false;
 
-			synchronized (optimizer) { // needed?
-				optimizer.requestSubmitted(request);
-			}
+    RequestItem(PassengerRequest request) {
+      this.request = request;
+    }
+  }
 
-			requests.put(request.getId(), new RequestItem(request));
-		}
+  void notifyPickup(double now, AcceptedDrtRequest request) {
+    RequestItem item = requests.get(request.getId());
 
-		bookingQueue.clear();
-	}
+    if (item != null) {
+      // may be null, we treat all (also non-prebooked) requests here
+      item.onboard = true;
+    }
+  }
 
-	private Link getLink(Id<Link> linkId) {
-		return Preconditions.checkNotNull(network.getLinks().get(linkId),
-				"Link id=%s does not exist in network for mode %s. Agent departs from a link that does not belong to that network?",
-				linkId, mode);
-	}
+  void notifyDropoff(Id<Request> requestId) {
+    requests.remove(requestId);
+  }
 
-	// Interface with PassengerEngine
+  private IdSet<Request> unscheduleUponVehicleAssignment = new IdSet<>(Request.class);
 
-	@Override
-	@Nullable
-	public PassengerRequest retrieveRequest(MobsimAgent agent, Leg leg) {
-		Preconditions.checkArgument(leg.getMode().equals(mode), "Invalid mode for this prebooking manager");
+  private void processScheduledRequests(double now) {
+    for (PassengerRequestScheduledEvent event : scheduledEvents) {
+      RequestItem item = requests.get(event.getRequestId());
 
-		Id<Request> requestId = getRequestId(leg);
+      if (item != null) {
+        item.vehicleId = event.getVehicleId();
+      }
 
-		if (requestId == null) {
-			return null;
-		}
+      if (unscheduleUponVehicleAssignment.contains(event.getRequestId())) {
+        // this is the case if a request has been rejected / canceled after submission
+        // but before scheduling
+        unscheduler.unscheduleRequest(now, event.getVehicleId(), event.getRequestId());
+        unscheduleUponVehicleAssignment.remove(event.getRequestId());
+      }
+    }
 
-		RequestItem item = requests.get(requestId);
+    scheduledEvents.clear();
+  }
 
-		if (item == null) {
-			return null;
-		}
+  // Functionality for canceling requests
 
-		return item.request;
-	}
+  private static final String CANCEL_REASON = "canceled";
+  private final List<CancelItem> cancelQueue = new LinkedList<>();
 
-	// Housekeeping of requests
+  private void processCanceledRequests(double now) {
+    for (CancelItem cancelItem : cancelQueue) {
+      Id<Request> requestId = cancelItem.requestId;
+      RequestItem item = requests.remove(requestId);
 
-	private IdMap<Request, RequestItem> requests = new IdMap<>(Request.class);
+      if (item != null) { // might be null if abandoned before canceling
+        Verify.verify(!item.onboard, "cannot cancel onboard request");
 
-	private class RequestItem {
-		final PassengerRequest request;
+        // unschedule if requests is scheduled already
+        if (item.vehicleId != null) {
+          unscheduler.unscheduleRequest(now, item.vehicleId, requestId);
+        } else {
+          unscheduleUponVehicleAssignment.add(requestId);
+        }
 
-		Id<DvrpVehicle> vehicleId = null;
-		boolean onboard = false;
+        String reason = CANCEL_REASON;
 
-		RequestItem(PassengerRequest request) {
-			this.request = request;
-		}
-	}
+        if (cancelItem.reason != null) {
+          reason = CANCEL_REASON + ":" + cancelItem.reason;
+        }
 
-	void notifyPickup(double now, AcceptedDrtRequest request) {
-		RequestItem item = requests.get(request.getId());
+        processRejection(item.request, reason);
+      }
+    }
 
-		if (item != null) {
-			// may be null, we treat all (also non-prebooked) requests here
-			item.onboard = true;
-		}
-	}
+    cancelQueue.clear();
+  }
 
-	void notifyDropoff(Id<Request> requestId) {
-		requests.remove(requestId);
-	}
+  public void cancel(Leg leg) {
+    cancel(leg, null);
+  }
 
-	private IdSet<Request> unscheduleUponVehicleAssignment = new IdSet<>(Request.class);
+  public void cancel(Leg leg, String reason) {
+    Id<Request> requestId = getRequestId(leg);
 
-	private void processScheduledRequests(double now) {
-		for (PassengerRequestScheduledEvent event : scheduledEvents) {
-			RequestItem item = requests.get(event.getRequestId());
+    if (requestId != null) {
+      cancel(requestId, reason);
+    }
+  }
 
-			if (item != null) {
-				item.vehicleId = event.getVehicleId();
-			}
+  public void cancel(Id<Request> requestId, String reason) {
+    cancelQueue.add(new CancelItem(requestId, reason));
+  }
 
-			if (unscheduleUponVehicleAssignment.contains(event.getRequestId())) {
-				// this is the case if a request has been rejected / canceled after submission
-				// but before scheduling
-				unscheduler.unscheduleRequest(now, event.getVehicleId(), event.getRequestId());
-				unscheduleUponVehicleAssignment.remove(event.getRequestId());
-			}
-		}
+  public void cancel(Id<Request> requestId) {
+    cancel(requestId, null);
+  }
 
-		scheduledEvents.clear();
-	}
+  private record CancelItem(Id<Request> requestId, String reason) {}
 
-	// Functionality for canceling requests
+  // Functionality for abandoning requests
 
-	private static final String CANCEL_REASON = "canceled";
-	private final List<CancelItem> cancelQueue = new LinkedList<>();
+  private static final String ABANDONED_REASON = "abandoned by vehicle";
+  private final ConcurrentLinkedQueue<Id<Request>> abandonQueue = new ConcurrentLinkedQueue<>();
 
-	private void processCanceledRequests(double now) {
-		for (CancelItem cancelItem : cancelQueue) {
-			Id<Request> requestId = cancelItem.requestId;
-			RequestItem item = requests.remove(requestId);
+  void abandon(Id<Request> requestId) {
+    abandonQueue.add(requestId);
+  }
 
-			if (item != null) { // might be null if abandoned before canceling
-				Verify.verify(!item.onboard, "cannot cancel onboard request");
+  private void processAbandonedRequests(double now) {
+    for (Id<Request> requestId : abandonQueue) {
+      RequestItem item = Objects.requireNonNull(requests.remove(requestId));
+      Verify.verify(!item.onboard, "cannot abandon request that is already onboard");
 
-				// unschedule if requests is scheduled already
-				if (item.vehicleId != null) {
-					unscheduler.unscheduleRequest(now, item.vehicleId, requestId);
-				} else {
-					unscheduleUponVehicleAssignment.add(requestId);
-				}
+      // remove request from scheduled if already scheduled
+      if (item.vehicleId != null) {
+        unscheduler.unscheduleRequest(now, item.vehicleId, item.request.getId());
+      } else {
+        unscheduleUponVehicleAssignment.add(item.request.getId());
+      }
 
-				String reason = CANCEL_REASON;
+      processRejection(item.request, ABANDONED_REASON);
+    }
 
-				if (cancelItem.reason != null) {
-					reason = CANCEL_REASON + ":" + cancelItem.reason;
-				}
+    abandonQueue.clear();
+  }
 
-				processRejection(item.request, reason);
-			}
-		}
+  // Rejections
 
-		cancelQueue.clear();
-	}
+  private void processRejections(double now) {
+    for (Id<Request> requestId : rejectedEventIds) {
+      RequestItem item = requests.remove(requestId);
 
-	public void cancel(Leg leg) {
-		cancel(leg, null);
-	}
+      if (item != null) {
+        // should this fail gracefully?
+        Verify.verify(!item.onboard, "cannot reject onboard request");
 
-	public void cancel(Leg leg, String reason) {
-		Id<Request> requestId = getRequestId(leg);
+        // unschedule if already scheduled
+        if (item.vehicleId != null) {
+          unscheduler.unscheduleRequest(now, item.vehicleId, requestId);
+        } else {
+          unscheduleUponVehicleAssignment.add(requestId);
+        }
+      }
+    }
 
-		if (requestId != null) {
-			cancel(requestId, reason);
-		}
-	}
+    rejectedEventIds.clear();
+  }
 
-	public void cancel(Id<Request> requestId, String reason) {
-		cancelQueue.add(new CancelItem(requestId, reason));
-	}
+  // Stuck
 
-	public void cancel(Id<Request> requestId) {
-		cancel(requestId, null);
-	}
+  private void processStuckAgents(double now) {
+    bookingQueue.removeIf(request -> stuckPersonsIds.containsAll(request.getPassengerIds()));
 
-	private record CancelItem(Id<Request> requestId, String reason) {
-	}
+    for (RequestItem item : requests.values()) {
+      if (stuckPersonsIds.containsAll(item.request.getPassengerIds())) {
+        cancel(item.request.getId());
+      }
+    }
 
-	// Functionality for abandoning requests
+    stuckPersonsIds.clear();
+  }
 
-	private static final String ABANDONED_REASON = "abandoned by vehicle";
-	private final ConcurrentLinkedQueue<Id<Request>> abandonQueue = new ConcurrentLinkedQueue<>();
+  // Engine code
 
-	void abandon(Id<Request> requestId) {
-		abandonQueue.add(requestId);
-	}
+  @Override
+  public void onPrepareSim() {
+    eventsManager.addHandler(this);
+  }
 
-	private void processAbandonedRequests(double now) {
-		for (Id<Request> requestId : abandonQueue) {
-			RequestItem item = Objects.requireNonNull(requests.remove(requestId));
-			Verify.verify(!item.onboard, "cannot abandon request that is already onboard");
+  @Override
+  public void doSimStep(double now) {
+    // avoid method as it runs in parallel with events, only process rejections
+    flushRejections(now);
+  }
 
-			// remove request from scheduled if already scheduled
-			if (item.vehicleId != null) {
-				unscheduler.unscheduleRequest(now, item.vehicleId, item.request.getId());
-			} else {
-				unscheduleUponVehicleAssignment.add(item.request.getId());
-			}
+  @Override
+  public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e) {
+    // here we are back in the main thread and all events
+    // have been processed
 
-			processRejection(item.request, ABANDONED_REASON);
-		}
+    double now = mobsimTimer.getTimeOfDay();
 
-		abandonQueue.clear();
-	}
+    // first process scheduled events (this happened, we cannot change it)
+    processScheduledRequests(now);
 
-	// Rejections
+    // process rejected requests, potential problem if a person has entered the
+    // vehicle in just this simstep, but also a rejection has been sent
+    processRejections(now);
 
-	private void processRejections(double now) {
-		for (Id<Request> requestId : rejectedEventIds) {
-			RequestItem item = requests.remove(requestId);
+    // process stuck agents, they are added to the cancel queue
+    processStuckAgents(now);
 
-			if (item != null) {
-				// should this fail gracefully?
-				Verify.verify(!item.onboard, "cannot reject onboard request");
+    // process abandoned requests (by vehicle), here we are sure that the person
+    // cannot have entered in this iteration
+    processAbandonedRequests(now);
 
-				// unschedule if already scheduled
-				if (item.vehicleId != null) {
-					unscheduler.unscheduleRequest(now, item.vehicleId, requestId);
-				} else {
-					unscheduleUponVehicleAssignment.add(requestId);
-				}
-			}
-		}
+    // process cancel requests, same situation as for rejections
+    processCanceledRequests(now);
 
-		rejectedEventIds.clear();
-	}
+    // submit requests
+    processBookingQueue(now);
+  }
 
-	// Stuck
+  @Override
+  public void afterSim() {
+    eventsManager.removeHandler(this);
+  }
 
-	private void processStuckAgents(double now) {
-		bookingQueue.removeIf(request -> stuckPersonsIds.containsAll(request.getPassengerIds()));
-
-		for (RequestItem item : requests.values()) {
-			if (stuckPersonsIds.containsAll(item.request.getPassengerIds())) {
-				cancel(item.request.getId());
-			}
-		}
-
-		stuckPersonsIds.clear();
-	}
-
-	// Engine code
-
-	@Override
-	public void onPrepareSim() {
-		eventsManager.addHandler(this);
-	}
-
-	@Override
-	public void doSimStep(double now) {
-		// avoid method as it runs in parallel with events, only process rejections
-		flushRejections(now);
-	}
-
-	@Override
-	public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e) {
-		// here we are back in the main thread and all events
-		// have been processed
-
-		double now = mobsimTimer.getTimeOfDay();
-
-		// first process scheduled events (this happened, we cannot change it)
-		processScheduledRequests(now);
-
-		// process rejected requests, potential problem if a person has entered the
-		// vehicle in just this simstep, but also a rejection has been sent
-		processRejections(now);
-
-		// process stuck agents, they are added to the cancel queue
-		processStuckAgents(now);
-
-		// process abandoned requests (by vehicle), here we are sure that the person
-		// cannot have entered in this iteration
-		processAbandonedRequests(now);
-
-		// process cancel requests, same situation as for rejections
-		processCanceledRequests(now);
-
-		// submit requests
-		processBookingQueue(now);
-	}
-
-	@Override
-	public void afterSim() {
-		eventsManager.removeHandler(this);
-	}
-
-	@Override
-	public void setInternalInterface(InternalInterface internalInterface) {
-	}
+  @Override
+  public void setInternalInterface(InternalInterface internalInterface) {}
 }

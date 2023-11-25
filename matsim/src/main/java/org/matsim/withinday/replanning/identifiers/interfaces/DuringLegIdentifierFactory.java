@@ -22,6 +22,6 @@ package org.matsim.withinday.replanning.identifiers.interfaces;
 
 public abstract class DuringLegIdentifierFactory extends AgentSelectorFactory {
 
-	@Override
-	public abstract DuringLegAgentSelector createIdentifier();
+  @Override
+  public abstract DuringLegAgentSelector createIdentifier();
 }

@@ -7,13 +7,12 @@ import org.matsim.api.core.v01.Id;
  * Used for noise shielding calculations.
  *
  * @author nkuehnel
- *
  */
 interface NoiseBarrier {
 
-    PreparedGeometry getGeometry();
+  PreparedGeometry getGeometry();
 
-    double getHeight();
+  double getHeight();
 
-    Id<NoiseBarrier> getId();
+  Id<NoiseBarrier> getId();
 }

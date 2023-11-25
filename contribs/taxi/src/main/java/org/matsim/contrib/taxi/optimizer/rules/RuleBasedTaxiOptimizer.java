@@ -42,55 +42,60 @@ import org.matsim.core.api.experimental.events.EventsManager;
  */
 public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
 
-	private final TaxiScheduler scheduler;
-	private final IdleTaxiZonalRegistry idleTaxiRegistry;
-	private final UnplannedRequestZonalRegistry unplannedRequestRegistry;
+  private final TaxiScheduler scheduler;
+  private final IdleTaxiZonalRegistry idleTaxiRegistry;
+  private final UnplannedRequestZonalRegistry unplannedRequestRegistry;
 
-	public RuleBasedTaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater, ZonalRegisters zonalRegisters,
-			UnplannedRequestInserter requestInserter) {
-		super(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater, requestInserter);
+  public RuleBasedTaxiOptimizer(
+      EventsManager eventsManager,
+      TaxiConfigGroup taxiCfg,
+      Fleet fleet,
+      TaxiScheduler scheduler,
+      ScheduleTimingUpdater scheduleTimingUpdater,
+      ZonalRegisters zonalRegisters,
+      UnplannedRequestInserter requestInserter) {
+    super(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater, requestInserter);
 
-		this.scheduler = scheduler;
-		this.idleTaxiRegistry = zonalRegisters.idleTaxiRegistry;
-		this.unplannedRequestRegistry = zonalRegisters.unplannedRequestRegistry;
+    this.scheduler = scheduler;
+    this.idleTaxiRegistry = zonalRegisters.idleTaxiRegistry;
+    this.unplannedRequestRegistry = zonalRegisters.unplannedRequestRegistry;
 
-		if (taxiCfg.vehicleDiversion) {
-			// hmmmm, change into warning?? or even allow it (e.g. for empty taxi relocaton)??
-			throw new RuntimeException("Diversion is not supported by RuleBasedTaxiOptimizer");
-		}
-	}
+    if (taxiCfg.vehicleDiversion) {
+      // hmmmm, change into warning?? or even allow it (e.g. for empty taxi relocaton)??
+      throw new RuntimeException("Diversion is not supported by RuleBasedTaxiOptimizer");
+    }
+  }
 
-	@Override
-	public void requestSubmitted(Request request) {
-		super.requestSubmitted(request);
-		unplannedRequestRegistry.addRequest((DrtRequest)request);
-	}
+  @Override
+  public void requestSubmitted(Request request) {
+    super.requestSubmitted(request);
+    unplannedRequestRegistry.addRequest((DrtRequest) request);
+  }
 
-	@Override
-	public void nextTask(DvrpVehicle vehicle) {
-		super.nextTask(vehicle);
+  @Override
+  public void nextTask(DvrpVehicle vehicle) {
+    super.nextTask(vehicle);
 
-		Schedule schedule = vehicle.getSchedule();
-		if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
-			TaxiStayTask lastTask = (TaxiStayTask)Schedules.getLastTask(schedule);
-			if (lastTask.getBeginTime() < vehicle.getServiceEndTime()) {
-				idleTaxiRegistry.removeVehicle(vehicle);
-			}
-		} else if (scheduler.getScheduleInquiry().isIdle(vehicle)) {
-			idleTaxiRegistry.addVehicle(vehicle);
-		} else {
-			if (schedule.getCurrentTask().getTaskIdx() != 0) {// not first task
-				Task previousTask = Schedules.getPreviousTask(schedule);
-				if (STAY.isBaseTypeOf(previousTask)) {
-					idleTaxiRegistry.removeVehicle(vehicle);
-				}
-			}
-		}
-	}
+    Schedule schedule = vehicle.getSchedule();
+    if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
+      TaxiStayTask lastTask = (TaxiStayTask) Schedules.getLastTask(schedule);
+      if (lastTask.getBeginTime() < vehicle.getServiceEndTime()) {
+        idleTaxiRegistry.removeVehicle(vehicle);
+      }
+    } else if (scheduler.getScheduleInquiry().isIdle(vehicle)) {
+      idleTaxiRegistry.addVehicle(vehicle);
+    } else {
+      if (schedule.getCurrentTask().getTaskIdx() != 0) { // not first task
+        Task previousTask = Schedules.getPreviousTask(schedule);
+        if (STAY.isBaseTypeOf(previousTask)) {
+          idleTaxiRegistry.removeVehicle(vehicle);
+        }
+      }
+    }
+  }
 
-	@Override
-	protected boolean doReoptimizeAfterNextTask(Task newCurrentTask) {
-		return STAY.isBaseTypeOf(newCurrentTask);
-	}
+  @Override
+  protected boolean doReoptimizeAfterNextTask(Task newCurrentTask) {
+    return STAY.isBaseTypeOf(newCurrentTask);
+  }
 }

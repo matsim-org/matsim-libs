@@ -26,21 +26,21 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 
 public interface Charger extends BasicLocation, Identifiable<Charger> {
-	ChargerSpecification getSpecification();
+  ChargerSpecification getSpecification();
 
-	ChargingLogic getLogic();
+  ChargingLogic getLogic();
 
-	Link getLink();
+  Link getLink();
 
-	String getChargerType();
+  String getChargerType();
 
-	/**
-	 * @return max power of a single plug, in [W]
-	 */
-	double getPlugPower();
+  /**
+   * @return max power of a single plug, in [W]
+   */
+  double getPlugPower();
 
-	/**
-	 * @return number of plugs
-	 */
-	int getPlugCount();
+  /**
+   * @return number of plugs
+   */
+  int getPlugCount();
 }

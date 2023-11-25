@@ -21,7 +21,6 @@
 package org.matsim.contrib.analysis.kai;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -54,126 +53,172 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class KNAnalysisEventsHandlerTest {
 
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+  // yy this test is probably not doing anything with respect to some of the newer statistics, such
+  // as money. kai, mar'14
 
-	// yy this test is probably not doing anything with respect to some of the newer statistics, such as money. kai, mar'14 
+  public static final String BASE_FILE_NAME = "stats_";
+  public final Id<Person> DEFAULT_PERSON_ID = Id.create(123, Person.class);
+  public final Id<Link> DEFAULT_LINK_ID = Id.create(456, Link.class);
 
-	public static final String BASE_FILE_NAME = "stats_";
-	public final Id<Person> DEFAULT_PERSON_ID = Id.create(123, Person.class);
-	public final Id<Link> DEFAULT_LINK_ID = Id.create(456, Link.class);
+  private Scenario scenario = null;
+  private Population population = null;
+  private Network network = null;
 
-	private Scenario scenario = null ;
-	private Population population = null ;
-	private Network network = null ;
+  @Before
+  public void setUp() throws Exception {
 
-    @Before
-	public void setUp() throws Exception {
+    scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    this.population = scenario.getPopulation();
+    Person person = PopulationUtils.getFactory().createPerson(DEFAULT_PERSON_ID);
+    this.population.addPerson(person);
+    Plan plan = PersonUtils.createAndAddPlan(person, true);
+    PopulationUtils.createAndAddActivityFromCoord(plan, "act1", new Coord(100.0, 100.0));
+    PopulationUtils.createAndAddLeg(plan, "undefined");
+    PopulationUtils.createAndAddActivityFromCoord(plan, "act2", new Coord(200.0, 200.0));
+    PopulationUtils.createAndAddLeg(plan, "undefined");
+    PopulationUtils.createAndAddActivityFromCoord(plan, "act3", new Coord(200.0, 200.0));
+    PopulationUtils.createAndAddLeg(plan, "undefined");
+    PopulationUtils.createAndAddActivityFromCoord(plan, "act4", new Coord(200.0, 200.0));
+    PopulationUtils.createAndAddLeg(plan, "undefined");
+    PopulationUtils.createAndAddActivityFromCoord(plan, "act5", new Coord(200.0, 200.0));
+    plan.setScore(12.);
 
-		this.population = scenario.getPopulation();
-		Person person = PopulationUtils.getFactory().createPerson(DEFAULT_PERSON_ID);
-		this.population.addPerson(person);
-		Plan plan = PersonUtils.createAndAddPlan(person, true);
-		PopulationUtils.createAndAddActivityFromCoord(plan, "act1", new Coord(100.0, 100.0));
-		PopulationUtils.createAndAddLeg( plan, "undefined" );
-		PopulationUtils.createAndAddActivityFromCoord(plan, "act2", new Coord(200.0, 200.0));
-		PopulationUtils.createAndAddLeg( plan, "undefined" );
-		PopulationUtils.createAndAddActivityFromCoord(plan, "act3", new Coord(200.0, 200.0));
-		PopulationUtils.createAndAddLeg( plan, "undefined" );
-		PopulationUtils.createAndAddActivityFromCoord(plan, "act4", new Coord(200.0, 200.0));
-		PopulationUtils.createAndAddLeg( plan, "undefined" );
-		PopulationUtils.createAndAddActivityFromCoord(plan, "act5", new Coord(200.0, 200.0));
-		plan.setScore(12.);
+    this.network = scenario.getNetwork();
+    Node fromNode =
+        this.network
+            .getFactory()
+            .createNode(Id.create("123456", Node.class), new Coord(100.0, 100.0));
+    this.network.addNode(fromNode);
+    Node toNode =
+        this.network
+            .getFactory()
+            .createNode(Id.create("789012", Node.class), new Coord(200.0, 200.0));
+    this.network.addNode(toNode);
+    Link link = this.network.getFactory().createLink(DEFAULT_LINK_ID, fromNode, toNode);
+    link.setLength(Math.sqrt(20000.0));
+    link.setFreespeed(13.333);
+    link.setCapacity(2000);
+    link.setNumberOfLanes(1);
+    this.network.addLink(link);
+  }
 
-		this.network = scenario.getNetwork();
-		Node fromNode = this.network.getFactory().createNode(Id.create("123456", Node.class), new Coord(100.0, 100.0));
-		this.network.addNode(fromNode);
-		Node toNode = this.network.getFactory().createNode(Id.create("789012", Node.class), new Coord(200.0, 200.0));
-		this.network.addNode(toNode);
-		Link link = this.network.getFactory().createLink(DEFAULT_LINK_ID, fromNode, toNode);
-		link.setLength(Math.sqrt(20000.0));
-		link.setFreespeed(13.333);
-		link.setCapacity(2000);
-		link.setNumberOfLanes(1);
-		this.network.addLink(link);
-	}
+  @After
+  public void tearDown() throws Exception {
+    this.population = null;
+    this.network = null;
+  }
 
-	@After
-	public void tearDown() throws Exception {
-		this.population = null;
-		this.network = null;
-	}
+  @Test
+  @Ignore
+  public void testNoEvents() {
 
-    @Test
-    @Ignore
-	public void testNoEvents() {
+    KNAnalysisEventsHandler testee = new KNAnalysisEventsHandler(this.scenario);
 
-		KNAnalysisEventsHandler testee = new KNAnalysisEventsHandler(this.scenario);
+    EventsManager events = EventsUtils.createEventsManager();
+    events.addHandler(testee);
 
-		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(testee);
+    // add events to handle here
 
-		// add events to handle here
+    this.runTest(testee);
+  }
 
-		this.runTest(testee);
-	}
+  @Test
+  @Ignore
+  public void testAveraging() {
+    // yy this test is probably not doing anything with respect to some of the newer statistics,
+    // such as money. kai, mar'14
 
-    @Test
-    @Ignore
-	public void testAveraging() {
-		// yy this test is probably not doing anything with respect to some of the newer statistics, such as money. kai, mar'14 
+    KNAnalysisEventsHandler testee = new KNAnalysisEventsHandler(this.scenario);
 
-		KNAnalysisEventsHandler testee = new KNAnalysisEventsHandler(this.scenario);
+    EventsManager events = EventsUtils.createEventsManager();
+    events.addHandler(testee);
 
-		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(testee);
+    Leg leg = PopulationUtils.createLeg(TransportMode.car);
+    leg.setDepartureTime(Time.parseTime("07:10:00"));
+    leg.setTravelTime(Time.parseTime("07:30:00") - leg.getDepartureTime().seconds());
+    testee.handleEvent(
+        new PersonDepartureEvent(
+            leg.getDepartureTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            leg.getMode(),
+            leg.getMode()));
+    testee.handleEvent(
+        new PersonArrivalEvent(
+            leg.getDepartureTime().seconds() + leg.getTravelTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            leg.getMode()));
 
-		Leg leg = PopulationUtils.createLeg(TransportMode.car);
-		leg.setDepartureTime(Time.parseTime("07:10:00"));
-		leg.setTravelTime( Time.parseTime("07:30:00") - leg.getDepartureTime().seconds());
-		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode(), leg.getMode()));
-		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
-				.seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
+    leg = PopulationUtils.createLeg(TransportMode.car);
+    leg.setDepartureTime(Time.parseTime("07:00:00"));
+    leg.setTravelTime(Time.parseTime("07:10:00") - leg.getDepartureTime().seconds());
+    testee.handleEvent(
+        new PersonDepartureEvent(
+            leg.getDepartureTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            leg.getMode(),
+            leg.getMode()));
+    testee.handleEvent(
+        new PersonArrivalEvent(
+            leg.getDepartureTime().seconds() + leg.getTravelTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            leg.getMode()));
 
-		leg = PopulationUtils.createLeg(TransportMode.car);
-		leg.setDepartureTime(Time.parseTime("07:00:00"));
-		leg.setTravelTime( Time.parseTime("07:10:00") - leg.getDepartureTime().seconds());
-		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode(), leg.getMode()));
-		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
-				.seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
+    leg = PopulationUtils.createLeg(TransportMode.car);
+    leg.setDepartureTime(Time.parseTime("31:12:00"));
+    leg.setTravelTime(Time.parseTime("31:22:00") - leg.getDepartureTime().seconds());
+    testee.handleEvent(
+        new PersonDepartureEvent(
+            leg.getDepartureTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            leg.getMode(),
+            leg.getMode()));
+    testee.handleEvent(
+        new PersonArrivalEvent(
+            leg.getDepartureTime().seconds() + leg.getTravelTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            leg.getMode()));
 
-		leg = PopulationUtils.createLeg(TransportMode.car);
-		leg.setDepartureTime(Time.parseTime("31:12:00"));
-		leg.setTravelTime( Time.parseTime("31:22:00") - leg.getDepartureTime().seconds());
-		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode(), leg.getMode()));
-		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
-				.seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
+    leg = PopulationUtils.createLeg(TransportMode.car);
+    leg.setDepartureTime(Time.parseTime("30:12:00"));
+    leg.setTravelTime(Time.parseTime("30:12:01") - leg.getDepartureTime().seconds());
+    testee.handleEvent(
+        new PersonDepartureEvent(
+            leg.getDepartureTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            leg.getMode(),
+            leg.getMode()));
+    testee.handleEvent(
+        new PersonArrivalEvent(
+            leg.getDepartureTime().seconds() + leg.getTravelTime().seconds(),
+            DEFAULT_PERSON_ID,
+            DEFAULT_LINK_ID,
+            leg.getMode()));
 
-		leg = PopulationUtils.createLeg(TransportMode.car);
-		leg.setDepartureTime(Time.parseTime("30:12:00"));
-		leg.setTravelTime( Time.parseTime("30:12:01") - leg.getDepartureTime().seconds());
-		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime().seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode(), leg.getMode()));
-		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
-				.seconds(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
+    this.runTest(testee);
+  }
 
-		this.runTest(testee);
-	}
+  protected void runTest(KNAnalysisEventsHandler calcLegTimes) {
 
-	protected void runTest(KNAnalysisEventsHandler calcLegTimes) {
+    calcLegTimes.writeStats(
+        utils.getOutputDirectory() + KNAnalysisEventsHandlerTest.BASE_FILE_NAME);
 
-		calcLegTimes.writeStats(utils.getOutputDirectory() + KNAnalysisEventsHandlerTest.BASE_FILE_NAME);
-
-		// actual test: compare checksums of the files
-		for ( StatType type : StatType.values() ) {
-			final String str = KNAnalysisEventsHandlerTest.BASE_FILE_NAME + type.toString() + ".txt" ;
-			LogManager.getLogger(this.getClass()).info( "comparing " + str );
-			final long expectedChecksum = CRCChecksum.getCRCFromFile(utils.getInputDirectory() + str);
-			final long actualChecksum = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + str);
-			Assert.assertEquals("Output files differ.", expectedChecksum, actualChecksum);
-		}
-	}
-
+    // actual test: compare checksums of the files
+    for (StatType type : StatType.values()) {
+      final String str = KNAnalysisEventsHandlerTest.BASE_FILE_NAME + type.toString() + ".txt";
+      LogManager.getLogger(this.getClass()).info("comparing " + str);
+      final long expectedChecksum = CRCChecksum.getCRCFromFile(utils.getInputDirectory() + str);
+      final long actualChecksum = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + str);
+      Assert.assertEquals("Output files differ.", expectedChecksum, actualChecksum);
+    }
+  }
 }

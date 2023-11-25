@@ -25,15 +25,16 @@ import org.matsim.core.router.priorityqueue.HasIndex;
 
 public class ArrayRoutingNetworkLink extends AbstractRoutingNetworkLink implements HasIndex {
 
-	final int arrayIndex;
-	
-	public ArrayRoutingNetworkLink(Link link, RoutingNetworkNode fromNode, RoutingNetworkNode toNode, int arrayIndex) {
-		super(link, fromNode, toNode);
-		this.arrayIndex = arrayIndex;
-	}
-	
-	@Override
-	public int getArrayIndex() {
-		return this.arrayIndex;
-	}
+  final int arrayIndex;
+
+  public ArrayRoutingNetworkLink(
+      Link link, RoutingNetworkNode fromNode, RoutingNetworkNode toNode, int arrayIndex) {
+    super(link, fromNode, toNode);
+    this.arrayIndex = arrayIndex;
+  }
+
+  @Override
+  public int getArrayIndex() {
+    return this.arrayIndex;
+  }
 }

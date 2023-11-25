@@ -21,7 +21,6 @@ package org.matsim.integration.events;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -40,33 +39,42 @@ import org.matsim.vehicles.Vehicle;
  */
 public class TransitDriverStartsEventHandlerIntegrationTest {
 
-	@Test
-	public void testProcessEventIntegration() {
-		EventsManager em = EventsUtils.createEventsManager();
-		TransitDriverStartsEvent e1 = new TransitDriverStartsEvent(12345, Id.create("driver", Person.class),
-				Id.create("veh", Vehicle.class), Id.create("line", TransitLine.class), Id.create("route", TransitRoute.class), Id.create("dep", Departure.class));
-		TransitDriverStartsTestEventHandler eh = new TransitDriverStartsTestEventHandler();
-		em.addHandler(eh);
+  @Test
+  public void testProcessEventIntegration() {
+    EventsManager em = EventsUtils.createEventsManager();
+    TransitDriverStartsEvent e1 =
+        new TransitDriverStartsEvent(
+            12345,
+            Id.create("driver", Person.class),
+            Id.create("veh", Vehicle.class),
+            Id.create("line", TransitLine.class),
+            Id.create("route", TransitRoute.class),
+            Id.create("dep", Departure.class));
+    TransitDriverStartsTestEventHandler eh = new TransitDriverStartsTestEventHandler();
+    em.addHandler(eh);
 
-		Assert.assertEquals(0, eh.events.size());
+    Assert.assertEquals(0, eh.events.size());
 
-		em.initProcessing();
-		em.processEvent(e1);
-		em.finishProcessing();
+    em.initProcessing();
+    em.processEvent(e1);
+    em.finishProcessing();
 
-		Assert.assertEquals(1, eh.events.size());
-		Assert.assertEquals(e1, eh.events.get(0));
-	}
+    Assert.assertEquals(1, eh.events.size());
+    Assert.assertEquals(e1, eh.events.get(0));
+  }
 
-	/*package*/ static class TransitDriverStartsTestEventHandler implements TransitDriverStartsEventHandler {
-		/*package*/ List<TransitDriverStartsEvent> events = new ArrayList<TransitDriverStartsEvent>(3);
-		@Override
-		public void reset(int iteration) {
-			this.events.clear();
-		}
-		@Override
-		public void handleEvent(TransitDriverStartsEvent event) {
-			this.events.add(event);
-		}
-	}
+  /*package*/ static class TransitDriverStartsTestEventHandler
+      implements TransitDriverStartsEventHandler {
+    /*package*/ List<TransitDriverStartsEvent> events = new ArrayList<TransitDriverStartsEvent>(3);
+
+    @Override
+    public void reset(int iteration) {
+      this.events.clear();
+    }
+
+    @Override
+    public void handleEvent(TransitDriverStartsEvent event) {
+      this.events.add(event);
+    }
+  }
 }

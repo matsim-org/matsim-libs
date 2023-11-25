@@ -21,7 +21,6 @@
 package org.matsim.contrib.drt.run.examples;
 
 import java.net.URL;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -38,28 +37,34 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * @author michal.mac
  */
 public class RunMultiModeDrtExample {
-	public static void run(URL configUrl, boolean otfvis, int lastIteration) {
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
-				new OTFVisConfigGroup());
-		config.controller().setLastIteration(lastIteration);
+  public static void run(URL configUrl, boolean otfvis, int lastIteration) {
+    Config config =
+        ConfigUtils.loadConfig(
+            configUrl,
+            new MultiModeDrtConfigGroup(),
+            new DvrpConfigGroup(),
+            new OTFVisConfigGroup());
+    config.controller().setLastIteration(lastIteration);
 
-		Controler controler = DrtControlerCreator.createControler(config, otfvis);
+    Controler controler = DrtControlerCreator.createControler(config, otfvis);
 
-		// max allowed speed for AV
-		double maxSpeed = controler.getScenario()
-				.getVehicles()
-				.getVehicleTypes()
-				.get(Id.create("autonomous_vehicle", VehicleType.class))
-				.getMaximumVelocity();
+    // max allowed speed for AV
+    double maxSpeed =
+        controler
+            .getScenario()
+            .getVehicles()
+            .getVehicleTypes()
+            .get(Id.create("autonomous_vehicle", VehicleType.class))
+            .getMaximumVelocity();
 
-		controler.addOverridingModule(
-				new DvrpModeLimitedMaxSpeedTravelTimeModule("drt_autonomous", config.qsim().getTimeStepSize(),
-						maxSpeed));
+    controler.addOverridingModule(
+        new DvrpModeLimitedMaxSpeedTravelTimeModule(
+            "drt_autonomous", config.qsim().getTimeStepSize(), maxSpeed));
 
-		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule());
-		}
+    if (otfvis) {
+      controler.addOverridingModule(new OTFVisLiveModule());
+    }
 
-		controler.run();
-	}
+    controler.run();
+  }
 }

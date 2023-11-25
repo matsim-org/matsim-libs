@@ -27,14 +27,13 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
  * @author Michal Maciejewski (michalm)
  */
 public interface OnlineTrackerListener {
-	OnlineTrackerListener NO_LISTENER = (vehicle, link) -> {
-	};
+  OnlineTrackerListener NO_LISTENER = (vehicle, link) -> {};
 
-	/**
-	 * Notifies that the next link was entered.
-	 *
-	 * @param vehicle
-	 * @param nextLink
-	 */
-	void vehicleEnteredNextLink(DvrpVehicle vehicle, Link nextLink);
+  /**
+   * Notifies that the next link was entered.
+   *
+   * @param vehicle
+   * @param nextLink
+   */
+  void vehicleEnteredNextLink(DvrpVehicle vehicle, Link nextLink);
 }

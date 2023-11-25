@@ -22,10 +22,8 @@ package org.matsim.contrib.noise.personLinkMoneyEvents;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
-* @author ikaddoura
-*/
-
+ * @author ikaddoura
+ */
 public interface PersonLinkMoneyEventHandler extends EventHandler {
-	public void handleEvent(PersonLinkMoneyEvent event);
+  public void handleEvent(PersonLinkMoneyEvent event);
 }
-

@@ -20,7 +20,6 @@ package org.matsim.contrib.dvrp.run;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
-
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
 
@@ -28,10 +27,9 @@ import org.matsim.core.mobsim.qsim.QSim;
  * @author michalm
  */
 public class MobsimTimerProvider implements Provider<MobsimTimer> {
-	@Inject
-	private QSim qsim;
+  @Inject private QSim qsim;
 
-	public MobsimTimer get() {
-		return qsim.getSimTimer();
-	}
+  public MobsimTimer get() {
+    return qsim.getSimTimer();
+  }
 }

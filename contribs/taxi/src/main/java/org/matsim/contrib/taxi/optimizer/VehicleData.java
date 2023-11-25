@@ -22,7 +22,6 @@ package org.matsim.contrib.taxi.optimizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
-
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -33,65 +32,71 @@ import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
  * @author michalm
  */
 public class VehicleData {
-	public static class Entry extends LinkTimePair {
-		public final int idx;
-		public final DvrpVehicle vehicle;
-		public final boolean idle;
+  public static class Entry extends LinkTimePair {
+    public final int idx;
+    public final DvrpVehicle vehicle;
+    public final boolean idle;
 
-		public Entry(int idx, DvrpVehicle vehicle, Link link, double time, boolean idle) {
-			super(link, time);
-			this.idx = idx;
-			this.vehicle = vehicle;
-			this.idle = idle;
-		}
-	}
+    public Entry(int idx, DvrpVehicle vehicle, Link link, double time, boolean idle) {
+      super(link, time);
+      this.idx = idx;
+      this.vehicle = vehicle;
+      this.idle = idle;
+    }
+  }
 
-	// max 48 hours of departure delay (== not a real constraint)
-	private static final double NO_PLANNING_HORIZON = 2 * 24 * 3600;
+  // max 48 hours of departure delay (== not a real constraint)
+  private static final double NO_PLANNING_HORIZON = 2 * 24 * 3600;
 
-	private final List<Entry> entries = new ArrayList<>();
-	private final int idleCount;
+  private final List<Entry> entries = new ArrayList<>();
+  private final int idleCount;
 
-	public VehicleData(double currentTime, TaxiScheduleInquiry scheduleInquiry,
-			Stream<? extends DvrpVehicle> vehicles) {
-		this(currentTime, scheduleInquiry, vehicles, NO_PLANNING_HORIZON);
-	}
+  public VehicleData(
+      double currentTime,
+      TaxiScheduleInquiry scheduleInquiry,
+      Stream<? extends DvrpVehicle> vehicles) {
+    this(currentTime, scheduleInquiry, vehicles, NO_PLANNING_HORIZON);
+  }
 
-	// skipping vehicles with departure.time > curr_time + maxDepartureDelay
-	public VehicleData(double currentTime, TaxiScheduleInquiry scheduleInquiry, Stream<? extends DvrpVehicle> vehicles,
-			double planningHorizon) {
-		double maxDepartureTime = currentTime + planningHorizon;
+  // skipping vehicles with departure.time > curr_time + maxDepartureDelay
+  public VehicleData(
+      double currentTime,
+      TaxiScheduleInquiry scheduleInquiry,
+      Stream<? extends DvrpVehicle> vehicles,
+      double planningHorizon) {
+    double maxDepartureTime = currentTime + planningHorizon;
 
-		MutableInt idx = new MutableInt();
-		MutableInt idleCounter = new MutableInt();
-		vehicles.forEach(v -> {
-			LinkTimePair departure = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(v);
+    MutableInt idx = new MutableInt();
+    MutableInt idleCounter = new MutableInt();
+    vehicles.forEach(
+        v -> {
+          LinkTimePair departure = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(v);
 
-			if (departure != null && departure.time <= maxDepartureTime) {
-				boolean idle = scheduleInquiry.isIdle(v);
-				entries.add(new Entry(idx.getAndIncrement(), v, departure.link, departure.time, idle));
-				if (idle) {
-					idleCounter.increment();
-				}
-			}
-		});
+          if (departure != null && departure.time <= maxDepartureTime) {
+            boolean idle = scheduleInquiry.isIdle(v);
+            entries.add(new Entry(idx.getAndIncrement(), v, departure.link, departure.time, idle));
+            if (idle) {
+              idleCounter.increment();
+            }
+          }
+        });
 
-		idleCount = idleCounter.intValue();
-	}
+    idleCount = idleCounter.intValue();
+  }
 
-	public int getSize() {
-		return entries.size();
-	}
+  public int getSize() {
+    return entries.size();
+  }
 
-	public Entry getEntry(int idx) {
-		return entries.get(idx);
-	}
+  public Entry getEntry(int idx) {
+    return entries.get(idx);
+  }
 
-	public List<Entry> getEntries() {
-		return entries;
-	}
+  public List<Entry> getEntries() {
+    return entries;
+  }
 
-	public int getIdleCount() {
-		return idleCount;
-	}
+  public int getIdleCount() {
+    return idleCount;
+  }
 }

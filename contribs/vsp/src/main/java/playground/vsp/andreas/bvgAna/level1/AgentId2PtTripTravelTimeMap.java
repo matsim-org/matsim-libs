@@ -22,8 +22,6 @@ package playground.vsp.andreas.bvgAna.level1;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.TreeMap;
-
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -40,82 +38,95 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.pt.PtConstants;
 
 /**
- * Calculates the trip travel time and the number of transfers needed for each given agent id and pt trip.
- * A pt trip is considered to start at a non pt interaction activity and to end at the following non pt interaction activity.
- *  
- * @author aneumann
+ * Calculates the trip travel time and the number of transfers needed for each given agent id and pt
+ * trip. A pt trip is considered to start at a non pt interaction activity and to end at the
+ * following non pt interaction activity.
  *
+ * @author aneumann
  */
-public class AgentId2PtTripTravelTimeMap implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler{
-	
-	private final Logger log = LogManager.getLogger(AgentId2PtTripTravelTimeMap.class);
-//	private final Level logLevel = Level.DEBUG;
-	
-	private Set<Id<Person>> agentIds;
-	private TreeMap<Id, ArrayList<AgentId2PtTripTravelTimeMapData>> agentId2PtTripTravelTimeMap = new TreeMap<Id, ArrayList<AgentId2PtTripTravelTimeMapData>>();
-	private TreeMap<Id, AgentId2PtTripTravelTimeMapData> tempList = new TreeMap<Id, AgentId2PtTripTravelTimeMapData>();
-	
-	public AgentId2PtTripTravelTimeMap(Set<Id<Person>> agentIds){
-//		this.log.setLevel(this.logLevel);
-		this.agentIds = agentIds;
-	}
-	
-	/**
-	 * @return Returns a map containing a <code>AgentId2PtTripTravelTimeMapData</code> for each pt trip for each agent id given
-	 */
-	public TreeMap<Id, ArrayList<AgentId2PtTripTravelTimeMapData>> getAgentId2PtTripTravelTimeMap(){
-		return this.agentId2PtTripTravelTimeMap;
-	}
+public class AgentId2PtTripTravelTimeMap
+    implements ActivityStartEventHandler,
+        ActivityEndEventHandler,
+        PersonDepartureEventHandler,
+        PersonArrivalEventHandler {
 
-	@Override
-	public void handleEvent(ActivityStartEvent event) {
-		if(this.agentIds.contains(event.getPersonId()) && !event.getActType().equalsIgnoreCase(PtConstants.TRANSIT_ACTIVITY_TYPE)){
-			// check, if there is a valid entry, if so add it
-			if(this.tempList.get(event.getPersonId()) != null){
-				if(this.agentId2PtTripTravelTimeMap.get(event.getPersonId()) == null){
-					this.agentId2PtTripTravelTimeMap.put(event.getPersonId(), new ArrayList<AgentId2PtTripTravelTimeMapData>());
-				}
-				this.tempList.get(event.getPersonId()).setStartEvent(event);
-				this.agentId2PtTripTravelTimeMap.get(event.getPersonId()).add(this.tempList.remove(event.getPersonId()));
-			}
-		}		
-	}
+  private final Logger log = LogManager.getLogger(AgentId2PtTripTravelTimeMap.class);
+  //	private final Level logLevel = Level.DEBUG;
 
-	@Override
-	public void handleEvent(ActivityEndEvent event) {
-		if(this.agentIds.contains(event.getPersonId()) && !event.getActType().equalsIgnoreCase(PtConstants.TRANSIT_ACTIVITY_TYPE)){
-			// Register a new leg
-			this.tempList.put(event.getPersonId(), new AgentId2PtTripTravelTimeMapData(event));
-		}
-	}
+  private Set<Id<Person>> agentIds;
+  private TreeMap<Id, ArrayList<AgentId2PtTripTravelTimeMapData>> agentId2PtTripTravelTimeMap =
+      new TreeMap<Id, ArrayList<AgentId2PtTripTravelTimeMapData>>();
+  private TreeMap<Id, AgentId2PtTripTravelTimeMapData> tempList =
+      new TreeMap<Id, AgentId2PtTripTravelTimeMapData>();
 
-	@Override
-	public void handleEvent(PersonDepartureEvent event) {
-		if(this.agentIds.contains(event.getPersonId())){
-			if(event.getLegMode().equalsIgnoreCase(TransportMode.transit_walk) || event.getLegMode().equalsIgnoreCase(TransportMode.pt)){
-				this.tempList.get(event.getPersonId()).handle(event);
-			} else {
-				this.log.debug("Leg mode " + event.getLegMode() + " is not of interest");
-				this.tempList.remove(event.getPersonId());
-			}
-		}
-	}
+  public AgentId2PtTripTravelTimeMap(Set<Id<Person>> agentIds) {
+    //		this.log.setLevel(this.logLevel);
+    this.agentIds = agentIds;
+  }
 
-	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-		if(this.agentIds.contains(event.getPersonId())){
-			if(event.getLegMode().equalsIgnoreCase(TransportMode.transit_walk) || event.getLegMode().equalsIgnoreCase(TransportMode.pt)){
-				this.tempList.get(event.getPersonId()).handle(event);
-			} else {
-				this.log.debug("Leg mode " + event.getLegMode() + " is not of interest");
-				this.tempList.remove(event.getPersonId());
-			}
-		}
-	}
+  /**
+   * @return Returns a map containing a <code>AgentId2PtTripTravelTimeMapData</code> for each pt
+   *     trip for each agent id given
+   */
+  public TreeMap<Id, ArrayList<AgentId2PtTripTravelTimeMapData>> getAgentId2PtTripTravelTimeMap() {
+    return this.agentId2PtTripTravelTimeMap;
+  }
 
-	@Override
-	public void reset(int iteration) {
-		this.log.debug("reset method in iteration " + iteration + " not implemented, yet");
-	}	
+  @Override
+  public void handleEvent(ActivityStartEvent event) {
+    if (this.agentIds.contains(event.getPersonId())
+        && !event.getActType().equalsIgnoreCase(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+      // check, if there is a valid entry, if so add it
+      if (this.tempList.get(event.getPersonId()) != null) {
+        if (this.agentId2PtTripTravelTimeMap.get(event.getPersonId()) == null) {
+          this.agentId2PtTripTravelTimeMap.put(
+              event.getPersonId(), new ArrayList<AgentId2PtTripTravelTimeMapData>());
+        }
+        this.tempList.get(event.getPersonId()).setStartEvent(event);
+        this.agentId2PtTripTravelTimeMap
+            .get(event.getPersonId())
+            .add(this.tempList.remove(event.getPersonId()));
+      }
+    }
+  }
 
+  @Override
+  public void handleEvent(ActivityEndEvent event) {
+    if (this.agentIds.contains(event.getPersonId())
+        && !event.getActType().equalsIgnoreCase(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+      // Register a new leg
+      this.tempList.put(event.getPersonId(), new AgentId2PtTripTravelTimeMapData(event));
+    }
+  }
+
+  @Override
+  public void handleEvent(PersonDepartureEvent event) {
+    if (this.agentIds.contains(event.getPersonId())) {
+      if (event.getLegMode().equalsIgnoreCase(TransportMode.transit_walk)
+          || event.getLegMode().equalsIgnoreCase(TransportMode.pt)) {
+        this.tempList.get(event.getPersonId()).handle(event);
+      } else {
+        this.log.debug("Leg mode " + event.getLegMode() + " is not of interest");
+        this.tempList.remove(event.getPersonId());
+      }
+    }
+  }
+
+  @Override
+  public void handleEvent(PersonArrivalEvent event) {
+    if (this.agentIds.contains(event.getPersonId())) {
+      if (event.getLegMode().equalsIgnoreCase(TransportMode.transit_walk)
+          || event.getLegMode().equalsIgnoreCase(TransportMode.pt)) {
+        this.tempList.get(event.getPersonId()).handle(event);
+      } else {
+        this.log.debug("Leg mode " + event.getLegMode() + " is not of interest");
+        this.tempList.remove(event.getPersonId());
+      }
+    }
+  }
+
+  @Override
+  public void reset(int iteration) {
+    this.log.debug("reset method in iteration " + iteration + " not implemented, yet");
+  }
 }

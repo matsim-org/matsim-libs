@@ -21,8 +21,6 @@ package playground.vsp.andreas.bvgAna.level1;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
-
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,58 +30,62 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 
 /**
- * Collects <code>PersonEntersVehicleEvent</code> and <code>PersonLeavesVehicleEventHandler</code> for a each vehicle id.
- * 
- * @author aneumann
+ * Collects <code>PersonEntersVehicleEvent</code> and <code>PersonLeavesVehicleEventHandler</code>
+ * for a each vehicle id.
  *
+ * @author aneumann
  */
-public class VehId2PersonEnterLeaveVehicleMap implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
-	
-	private final Logger log = LogManager.getLogger(VehId2PersonEnterLeaveVehicleMap.class);
-//	private final Level logLevel = Level.DEBUG;
-	
-	private TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> vehId2PersonEnterEventMap = new TreeMap<Id, ArrayList<PersonEntersVehicleEvent>>();
-	private TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> vehId2PersonLeaveEventMap = new TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>>();
-	
-	public VehId2PersonEnterLeaveVehicleMap(){
-//		this.log.setLevel(this.logLevel);
-	}
-	
-	/**
-	 * @return A map containing all <code>PersonEntersVehicleEvent</code> sorted by veh id
-	 */
-	public TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> getVehId2PersonEnterEventMap() {
-		return this.vehId2PersonEnterEventMap;
-	}
+public class VehId2PersonEnterLeaveVehicleMap
+    implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
-	/**
-	 * @return A map containing all <code>PersonLeavesVehicleEvent</code> sorted by veh id
-	 */
-	public TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> getVehId2PersonLeaveEventMap() {
-		return this.vehId2PersonLeaveEventMap;
-	}
+  private final Logger log = LogManager.getLogger(VehId2PersonEnterLeaveVehicleMap.class);
+  //	private final Level logLevel = Level.DEBUG;
 
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		if(this.vehId2PersonEnterEventMap.get(event.getVehicleId()) == null){
-			this.vehId2PersonEnterEventMap.put(event.getVehicleId(), new ArrayList<PersonEntersVehicleEvent>());
-		}
-		this.vehId2PersonEnterEventMap.get(event.getVehicleId()).add(event);
-		this.log.debug("Added event to veh " + event.getVehicleId() + " event " + event);
-	}
+  private TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> vehId2PersonEnterEventMap =
+      new TreeMap<Id, ArrayList<PersonEntersVehicleEvent>>();
+  private TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> vehId2PersonLeaveEventMap =
+      new TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>>();
 
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if(this.vehId2PersonLeaveEventMap.get(event.getVehicleId()) == null){
-			this.vehId2PersonLeaveEventMap.put(event.getVehicleId(), new ArrayList<PersonLeavesVehicleEvent>());
-		}
-		this.vehId2PersonLeaveEventMap.get(event.getVehicleId()).add(event);
-		this.log.debug("Added event to veh " + event.getVehicleId() + " event " + event);
-	}
+  public VehId2PersonEnterLeaveVehicleMap() {
+    //		this.log.setLevel(this.logLevel);
+  }
 
-	@Override
-	public void reset(int iteration) {
-		this.log.debug("reset method in iteration " + iteration + " not implemented, yet");
-	}
+  /**
+   * @return A map containing all <code>PersonEntersVehicleEvent</code> sorted by veh id
+   */
+  public TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> getVehId2PersonEnterEventMap() {
+    return this.vehId2PersonEnterEventMap;
+  }
 
+  /**
+   * @return A map containing all <code>PersonLeavesVehicleEvent</code> sorted by veh id
+   */
+  public TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> getVehId2PersonLeaveEventMap() {
+    return this.vehId2PersonLeaveEventMap;
+  }
+
+  @Override
+  public void handleEvent(PersonEntersVehicleEvent event) {
+    if (this.vehId2PersonEnterEventMap.get(event.getVehicleId()) == null) {
+      this.vehId2PersonEnterEventMap.put(
+          event.getVehicleId(), new ArrayList<PersonEntersVehicleEvent>());
+    }
+    this.vehId2PersonEnterEventMap.get(event.getVehicleId()).add(event);
+    this.log.debug("Added event to veh " + event.getVehicleId() + " event " + event);
+  }
+
+  @Override
+  public void handleEvent(PersonLeavesVehicleEvent event) {
+    if (this.vehId2PersonLeaveEventMap.get(event.getVehicleId()) == null) {
+      this.vehId2PersonLeaveEventMap.put(
+          event.getVehicleId(), new ArrayList<PersonLeavesVehicleEvent>());
+    }
+    this.vehId2PersonLeaveEventMap.get(event.getVehicleId()).add(event);
+    this.log.debug("Added event to veh " + event.getVehicleId() + " event " + event);
+  }
+
+  @Override
+  public void reset(int iteration) {
+    this.log.debug("reset method in iteration " + iteration + " not implemented, yet");
+  }
 }

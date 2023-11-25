@@ -13,10 +13,8 @@ package org.matsim.contrib.simulatedannealing;
  */
 public interface SimulatedAnnealingListener<T> {
 
-	void solutionAccepted(SimulatedAnnealing.Solution<T> oldSolution, SimulatedAnnealing.Solution<T> newSolution);
+  void solutionAccepted(
+      SimulatedAnnealing.Solution<T> oldSolution, SimulatedAnnealing.Solution<T> newSolution);
 
-	void reset(int iteration);
-
-
+  void reset(int iteration);
 }
-

@@ -26,6 +26,5 @@ import org.matsim.freight.carriers.Carrier;
 
 public interface CarrierScoringFunctionFactory {
 
-	ScoringFunction createScoringFunction(Carrier carrier);
-
+  ScoringFunction createScoringFunction(Carrier carrier);
 }

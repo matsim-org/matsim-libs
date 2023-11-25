@@ -21,7 +21,6 @@ package playground.vsp.analysis.modules.transitSchedule2Shp;
 
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -33,156 +32,168 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * Adds some specific transit route data
- * 
- * @author aneumann
  *
+ * @author aneumann
  */
 public class TransitRouteData {
 
-	private String transportMode;
-	private double firstDeparture;
-	private double lastDeparture;
-	private Set<String> vehIds;
-	private TransitStopFacility firstStop;
-	private TransitStopFacility viaStop;
-	private TransitStopFacility lastStop;
-	private double distance;
-	private double freeSpeedTravelTime;
-	private double travelTime;
-	private int numberOfDepartures;
-	private double avgSpeed;
+  private String transportMode;
+  private double firstDeparture;
+  private double lastDeparture;
+  private Set<String> vehIds;
+  private TransitStopFacility firstStop;
+  private TransitStopFacility viaStop;
+  private TransitStopFacility lastStop;
+  private double distance;
+  private double freeSpeedTravelTime;
+  private double travelTime;
+  private int numberOfDepartures;
+  private double avgSpeed;
 
-	public TransitRouteData(Network network, TransitRoute transitRoute) {
+  public TransitRouteData(Network network, TransitRoute transitRoute) {
 
-		this.transportMode = transitRoute.getTransportMode();
+    this.transportMode = transitRoute.getTransportMode();
 
-		this.firstDeparture = Double.MAX_VALUE;
-		this.lastDeparture = -Double.MAX_VALUE;
-		this.vehIds = new TreeSet<String>();
-		this.numberOfDepartures = 0;
-		
-		for (Departure departure : transitRoute.getDepartures().values()) {
-			this.firstDeparture = Math.min(this.firstDeparture,	departure.getDepartureTime());
-			this.lastDeparture = Math.max(this.lastDeparture, departure.getDepartureTime());
-			this.vehIds.add(departure.getVehicleId().toString());
-			this.numberOfDepartures++;
-		}
+    this.firstDeparture = Double.MAX_VALUE;
+    this.lastDeparture = -Double.MAX_VALUE;
+    this.vehIds = new TreeSet<String>();
+    this.numberOfDepartures = 0;
 
-		this.firstStop = transitRoute.getStops().get(0).getStopFacility();
-		this.lastStop = transitRoute.getStops().get(transitRoute.getStops().size() - 1).getStopFacility();
+    for (Departure departure : transitRoute.getDepartures().values()) {
+      this.firstDeparture = Math.min(this.firstDeparture, departure.getDepartureTime());
+      this.lastDeparture = Math.max(this.lastDeparture, departure.getDepartureTime());
+      this.vehIds.add(departure.getVehicleId().toString());
+      this.numberOfDepartures++;
+    }
 
-		if (this.firstStop == this.lastStop) {
-			// get the stop location of stop with the largest distance between first and last stop
-			TransitStopFacility currentViaStop = null;
-			double currentViaDistance = Double.NEGATIVE_INFINITY;
-			for (TransitRouteStop stop : transitRoute.getStops()) {
-				double distanceFirstPotentialVia = CoordUtils.calcEuclideanDistance(this.firstStop.getCoord(), stop.getStopFacility().getCoord());
-				double distanceLastProtenialVia = CoordUtils.calcEuclideanDistance(this.lastStop.getCoord(), stop.getStopFacility().getCoord());
-				double newDistance = Math.sqrt(Math.pow(distanceFirstPotentialVia, 2) + Math.pow(distanceLastProtenialVia, 2));
+    this.firstStop = transitRoute.getStops().get(0).getStopFacility();
+    this.lastStop =
+        transitRoute.getStops().get(transitRoute.getStops().size() - 1).getStopFacility();
 
-				if (newDistance > currentViaDistance) {
-					// this one is farther away - keep it
-					currentViaStop = stop.getStopFacility();
-					currentViaDistance = newDistance;
-				}
-			}
-			this.viaStop = currentViaStop;
-		} else {
-			// get the stop in the middle of the line
-			this.viaStop = transitRoute.getStops().get((int) (transitRoute.getStops().size() / 2)).getStopFacility();
-		}
+    if (this.firstStop == this.lastStop) {
+      // get the stop location of stop with the largest distance between first and last stop
+      TransitStopFacility currentViaStop = null;
+      double currentViaDistance = Double.NEGATIVE_INFINITY;
+      for (TransitRouteStop stop : transitRoute.getStops()) {
+        double distanceFirstPotentialVia =
+            CoordUtils.calcEuclideanDistance(
+                this.firstStop.getCoord(), stop.getStopFacility().getCoord());
+        double distanceLastProtenialVia =
+            CoordUtils.calcEuclideanDistance(
+                this.lastStop.getCoord(), stop.getStopFacility().getCoord());
+        double newDistance =
+            Math.sqrt(
+                Math.pow(distanceFirstPotentialVia, 2) + Math.pow(distanceLastProtenialVia, 2));
 
-		// calculate the length of the route
-		double distance = 0.0;
-		double freeSpeedTravelTime = 0.0;
-		for (Id<Link> linkId : transitRoute.getRoute().getLinkIds()) {
-			Link link = network.getLinks().get(linkId);
-			distance += link.getLength();
-			freeSpeedTravelTime += link.getLength() / link.getFreespeed();
-		}
-		// add last link but not the first link
-		Link link = network.getLinks().get(transitRoute.getRoute().getEndLinkId());
-		distance += link.getLength();
-		freeSpeedTravelTime += link.getLength() / link.getFreespeed();
-		
-		this.distance = distance;
-		this.freeSpeedTravelTime = freeSpeedTravelTime;
+        if (newDistance > currentViaDistance) {
+          // this one is farther away - keep it
+          currentViaStop = stop.getStopFacility();
+          currentViaDistance = newDistance;
+        }
+      }
+      this.viaStop = currentViaStop;
+    } else {
+      // get the stop in the middle of the line
+      this.viaStop =
+          transitRoute.getStops().get((int) (transitRoute.getStops().size() / 2)).getStopFacility();
+    }
 
-		this.travelTime = transitRoute.getStops().get(transitRoute.getStops().size() - 1).getArrivalOffset().seconds();
+    // calculate the length of the route
+    double distance = 0.0;
+    double freeSpeedTravelTime = 0.0;
+    for (Id<Link> linkId : transitRoute.getRoute().getLinkIds()) {
+      Link link = network.getLinks().get(linkId);
+      distance += link.getLength();
+      freeSpeedTravelTime += link.getLength() / link.getFreespeed();
+    }
+    // add last link but not the first link
+    Link link = network.getLinks().get(transitRoute.getRoute().getEndLinkId());
+    distance += link.getLength();
+    freeSpeedTravelTime += link.getLength() / link.getFreespeed();
 
-		this.avgSpeed = this.distance / this.travelTime;
-	}
+    this.distance = distance;
+    this.freeSpeedTravelTime = freeSpeedTravelTime;
 
-	public String getTransportMode() {
-		return this.transportMode;
-	}
+    this.travelTime =
+        transitRoute
+            .getStops()
+            .get(transitRoute.getStops().size() - 1)
+            .getArrivalOffset()
+            .seconds();
 
-	public double getFirstDeparture() {
-		return this.firstDeparture;
-	}
+    this.avgSpeed = this.distance / this.travelTime;
+  }
 
-	public double getLastDeparture() {
-		return this.lastDeparture;
-	}
+  public String getTransportMode() {
+    return this.transportMode;
+  }
 
-	public int getNVehicles() {
-		return this.vehIds.size();
-	}
+  public double getFirstDeparture() {
+    return this.firstDeparture;
+  }
 
-	public String getFirstStopName() {
-		if (this.firstStop.getName() == null) {
-			return this.firstStop.getId().toString();
-		}
-		return this.firstStop.getName();
-	}
+  public double getLastDeparture() {
+    return this.lastDeparture;
+  }
 
-	public String getViaStopName() {
-		if (this.viaStop.getName() == null) {
-			return this.viaStop.getId().toString();
-		}
-		return this.viaStop.getName();
-	}
+  public int getNVehicles() {
+    return this.vehIds.size();
+  }
 
-	public String getLastStopName() {
-		if (this.lastStop.getName() == null) {
-			return this.lastStop.getId().toString();
-		}
-		return this.lastStop.getName();
-	}
+  public String getFirstStopName() {
+    if (this.firstStop.getName() == null) {
+      return this.firstStop.getId().toString();
+    }
+    return this.firstStop.getName();
+  }
 
-	public double getDistance() {
-		return this.distance;
-	}
+  public String getViaStopName() {
+    if (this.viaStop.getName() == null) {
+      return this.viaStop.getId().toString();
+    }
+    return this.viaStop.getName();
+  }
 
-	public double getFreeSpeedTravelTime() {
-		return this.freeSpeedTravelTime;
-	}
+  public String getLastStopName() {
+    if (this.lastStop.getName() == null) {
+      return this.lastStop.getId().toString();
+    }
+    return this.lastStop.getName();
+  }
 
-	public double getTravelTime() {
-		return this.travelTime;
-	}
+  public double getDistance() {
+    return this.distance;
+  }
 
-	public double getHeadway() {
-		if (this.numberOfDepartures == 1) {
-			return Double.NaN;
-		} else {
-			return (this.getLastDeparture() - this.getFirstDeparture()) / (this.numberOfDepartures - 1);
-		}
-	}
-	
-	public int getNDepartures() {
-		return this.numberOfDepartures;
-	}
+  public double getFreeSpeedTravelTime() {
+    return this.freeSpeedTravelTime;
+  }
 
-	public double getAvgSpeed() {
-		return this.avgSpeed;
-	}
-	
-	public double getFreeSpeedFactor() {
-		return this.getFreeSpeedTravelTime() / this.getTravelTime();
-	}
-	
-	public double getOperatingDuration() {
-		return this.getLastDeparture() + this.getTravelTime() - this.getFirstDeparture();
-	}
+  public double getTravelTime() {
+    return this.travelTime;
+  }
+
+  public double getHeadway() {
+    if (this.numberOfDepartures == 1) {
+      return Double.NaN;
+    } else {
+      return (this.getLastDeparture() - this.getFirstDeparture()) / (this.numberOfDepartures - 1);
+    }
+  }
+
+  public int getNDepartures() {
+    return this.numberOfDepartures;
+  }
+
+  public double getAvgSpeed() {
+    return this.avgSpeed;
+  }
+
+  public double getFreeSpeedFactor() {
+    return this.getFreeSpeedTravelTime() / this.getTravelTime();
+  }
+
+  public double getOperatingDuration() {
+    return this.getLastDeparture() + this.getTravelTime() - this.getFirstDeparture();
+  }
 }

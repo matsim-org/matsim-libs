@@ -18,9 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 /**
- * Contains several tests using one virtual person/vehicle and one signal only. 
- * Tests are using QSim or/and Controler.
- * @author dgrether
+ * Contains several tests using one virtual person/vehicle and one signal only. Tests are using QSim
+ * or/and Controler.
  *
+ * @author dgrether
  */
 package org.matsim.contrib.signals.oneagent;

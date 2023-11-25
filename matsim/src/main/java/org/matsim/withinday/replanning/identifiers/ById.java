@@ -22,7 +22,6 @@ package org.matsim.withinday.replanning.identifiers;
 
 import java.io.Serializable;
 import java.util.Comparator;
-
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
@@ -33,11 +32,10 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
  */
 class ById implements Comparator<MobsimAgent>, Serializable, MatsimComparator {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@Override
-	public int compare(MobsimAgent agent1, MobsimAgent agent2) {
-		return agent1.getId().compareTo(agent2.getId());
-	}
-
+  @Override
+  public int compare(MobsimAgent agent1, MobsimAgent agent2) {
+    return agent1.getId().compareTo(agent2.getId());
+  }
 }

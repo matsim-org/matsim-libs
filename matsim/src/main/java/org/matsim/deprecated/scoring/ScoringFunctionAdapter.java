@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * ScoringFunctionAdapter.java
@@ -26,65 +25,59 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.scoring.ScoringFunction;
 
 /**
- * 
- * An adapter from the old ScoringFunction interface to the new one.
- * Do not use for new things. Just implement ScoringFunction.
- * 
- * @author michaz
+ * An adapter from the old ScoringFunction interface to the new one. Do not use for new things. Just
+ * implement ScoringFunction.
  *
+ * @author michaz
  */
-
 @Deprecated
 public abstract class ScoringFunctionAdapter implements ScoringFunction {
 
-    public final void handleActivity(Activity activity) {
-		if (activity.getStartTime().isDefined()) {
-            startActivity(activity.getStartTime().seconds(), activity);
-        }
-        if (activity.getEndTime().isDefined()) {
-			endActivity(activity.getEndTime().seconds(), activity);
-        }
+  public final void handleActivity(Activity activity) {
+    if (activity.getStartTime().isDefined()) {
+      startActivity(activity.getStartTime().seconds(), activity);
     }
-
-    public final void handleLeg(Leg leg) {
-		startLeg(leg.getDepartureTime().seconds(), leg);
-		endLeg(leg.getDepartureTime().seconds() + leg.getTravelTime().seconds());
+    if (activity.getEndTime().isDefined()) {
+      endActivity(activity.getEndTime().seconds(), activity);
     }
+  }
 
-    /**
-     * Tells the scoring function that the agent begins with an activity.
-     *
-     * @param time The time at which the mentioned activity starts.
-     * @param act The activity the agent starts. Can be used to get the activity
-     * type, exact location, facility, opening times and other information.
-     */
-    public abstract void startActivity(final double time, final Activity act);
+  public final void handleLeg(Leg leg) {
+    startLeg(leg.getDepartureTime().seconds(), leg);
+    endLeg(leg.getDepartureTime().seconds() + leg.getTravelTime().seconds());
+  }
 
-    /**
-     * Tells the scoring function that the agent stops with an activity.
-     * The activity is always the same one which started previously,
-     * except if it is the first activity, which never starts.
-     *
-     * @param time The time at which the agent stops performing the current
-     * activity.
-     * @param activity
-     */
-    public abstract void endActivity(final double time, Activity activity);
+  /**
+   * Tells the scoring function that the agent begins with an activity.
+   *
+   * @param time The time at which the mentioned activity starts.
+   * @param act The activity the agent starts. Can be used to get the activity type, exact location,
+   *     facility, opening times and other information.
+   */
+  public abstract void startActivity(final double time, final Activity act);
 
-    /**
-     * Tells the scoring function that the agents starts a new leg.
-     *
-     * @param time The time at which the agent starts the new leg.
-     * @param leg The leg the agent starts. Can be used to get leg mode and other
-     * information about the leg.
-     */
-    public abstract void startLeg(final double time, final Leg leg);
+  /**
+   * Tells the scoring function that the agent stops with an activity. The activity is always the
+   * same one which started previously, except if it is the first activity, which never starts.
+   *
+   * @param time The time at which the agent stops performing the current activity.
+   * @param activity
+   */
+  public abstract void endActivity(final double time, Activity activity);
 
-    /**
-     * Tells the scoring function that the current leg ends.
-     *
-     * @param time The time at which the current leg ends.
-     */
-    public abstract void endLeg(final double time);
+  /**
+   * Tells the scoring function that the agents starts a new leg.
+   *
+   * @param time The time at which the agent starts the new leg.
+   * @param leg The leg the agent starts. Can be used to get leg mode and other information about
+   *     the leg.
+   */
+  public abstract void startLeg(final double time, final Leg leg);
 
+  /**
+   * Tells the scoring function that the current leg ends.
+   *
+   * @param time The time at which the current leg ends.
+   */
+  public abstract void endLeg(final double time);
 }

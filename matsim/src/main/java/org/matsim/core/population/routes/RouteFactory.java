@@ -26,17 +26,16 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.internal.MatsimFactory;
 
 /**
- * Provides a simple factory method to create new Route-objects.
- * Implement this interface to provide one specific implementation
- * of Routes.
+ * Provides a simple factory method to create new Route-objects. Implement this interface to provide
+ * one specific implementation of Routes.
  *
  * @author mrieser
  */
 public interface RouteFactory extends MatsimFactory {
-	public Route createRoute(Id<Link> startLinkId, Id<Link> endLinkId);
-	
-	/**
-	 * @return the type of the {@link Route}s created by this factory.
-	 */
-	public String getCreatedRouteType();
+  public Route createRoute(Id<Link> startLinkId, Id<Link> endLinkId);
+
+  /**
+   * @return the type of the {@link Route}s created by this factory.
+   */
+  public String getCreatedRouteType();
 }

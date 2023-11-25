@@ -31,16 +31,24 @@ import org.matsim.freight.carriers.ScheduledTour;
 import org.matsim.freight.carriers.Tour;
 import org.matsim.vehicles.Vehicle;
 
-/*package-private*/  final class CarrierServiceEndEventCreator implements CarrierEventCreator {
+/*package-private*/ final class CarrierServiceEndEventCreator implements CarrierEventCreator {
 
-	@Override
-	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter, Id<Vehicle> vehicleId) {
-		if(event instanceof ActivityEndEvent endEvent && CarrierConstants.SERVICE.equals(endEvent.getActType())) {
-			Tour.TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
-			if(element instanceof Tour.ServiceActivity serviceActivity) {
-				return new CarrierServiceEndEvent(event.getTime(), carrier.getId(), serviceActivity.getService(), vehicleId);
-			}
-		}
-		return null;
-	}
+  @Override
+  public Event createEvent(
+      Event event,
+      Carrier carrier,
+      Activity activity,
+      ScheduledTour scheduledTour,
+      int activityCounter,
+      Id<Vehicle> vehicleId) {
+    if (event instanceof ActivityEndEvent endEvent
+        && CarrierConstants.SERVICE.equals(endEvent.getActType())) {
+      Tour.TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
+      if (element instanceof Tour.ServiceActivity serviceActivity) {
+        return new CarrierServiceEndEvent(
+            event.getTime(), carrier.getId(), serviceActivity.getService(), vehicleId);
+      }
+    }
+    return null;
+  }
 }

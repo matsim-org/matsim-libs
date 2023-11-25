@@ -22,6 +22,7 @@ package ch.sbb.matsim.contrib.railsim.qsimengine;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
 import com.google.inject.Inject;
+import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
@@ -40,84 +41,84 @@ import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkI;
 import org.matsim.core.population.routes.NetworkRoute;
 
-import java.util.Set;
-
-/**
- * QSim Engine to integrate microscopically simulated train movement.
- */
+/** QSim Engine to integrate microscopically simulated train movement. */
 public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 
-	private final QSim qsim;
-	private final RailsimConfigGroup config;
-	private final RailResourceManager res;
-	private final TrainDisposition disposition;
-	private final Set<String> modes;
-	private final TransitStopAgentTracker agentTracker;
-	private InternalInterface internalInterface;
+  private final QSim qsim;
+  private final RailsimConfigGroup config;
+  private final RailResourceManager res;
+  private final TrainDisposition disposition;
+  private final Set<String> modes;
+  private final TransitStopAgentTracker agentTracker;
+  private InternalInterface internalInterface;
 
-	private RailsimEngine engine;
+  private RailsimEngine engine;
 
-	@Inject
-	public RailsimQSimEngine(QSim qsim, RailResourceManager res, TrainDisposition disposition, TransitStopAgentTracker agentTracker) {
-		this.qsim = qsim;
-		this.config = ConfigUtils.addOrGetModule(qsim.getScenario().getConfig(), RailsimConfigGroup.class);
-		this.res = res;
-		this.disposition = disposition;
-		this.modes = config.getNetworkModes();
-		this.agentTracker = agentTracker;
-	}
+  @Inject
+  public RailsimQSimEngine(
+      QSim qsim,
+      RailResourceManager res,
+      TrainDisposition disposition,
+      TransitStopAgentTracker agentTracker) {
+    this.qsim = qsim;
+    this.config =
+        ConfigUtils.addOrGetModule(qsim.getScenario().getConfig(), RailsimConfigGroup.class);
+    this.res = res;
+    this.disposition = disposition;
+    this.modes = config.getNetworkModes();
+    this.agentTracker = agentTracker;
+  }
 
-	@Override
-	public void setInternalInterface(InternalInterface internalInterface) {
-		this.internalInterface = internalInterface;
-	}
+  @Override
+  public void setInternalInterface(InternalInterface internalInterface) {
+    this.internalInterface = internalInterface;
+  }
 
-	@Override
-	public void onPrepareSim() {
-		engine = new RailsimEngine(qsim.getEventsManager(), config, res, disposition);
-	}
+  @Override
+  public void onPrepareSim() {
+    engine = new RailsimEngine(qsim.getEventsManager(), config, res, disposition);
+  }
 
-	@Override
-	public void afterSim() {
+  @Override
+  public void afterSim() {}
 
-	}
+  @Override
+  public void doSimStep(double time) {
+    engine.doSimStep(time);
+  }
 
-	@Override
-	public void doSimStep(double time) {
-		engine.doSimStep(time);
-	}
+  @Override
+  public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
 
-	@Override
-	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
+    if (!modes.contains(agent.getMode())) return false;
 
-		if (!modes.contains(agent.getMode())) return false;
+    NetsimLink link = qsim.getNetsimNetwork().getNetsimLink(linkId);
 
-		NetsimLink link = qsim.getNetsimNetwork().getNetsimLink(linkId);
+    // Lots of implicit type checking here to get the required information from the agent
+    if (!(agent instanceof MobsimDriverAgent driver)) {
+      throw new IllegalStateException("Departing agent " + agent.getId() + " is not a DriverAgent");
+    }
+    if (!(agent instanceof PlanAgent plan)) {
+      throw new IllegalStateException(
+          "Agent " + agent + " is not of type PlanAgent and therefore incompatible.");
+    }
+    PlanElement el = plan.getCurrentPlanElement();
+    if (!(el instanceof Leg leg)) {
+      throw new IllegalStateException(
+          "Plan element of agent " + agent + " is not a leg with a route.");
+    }
+    Route route = leg.getRoute();
+    if (!(route instanceof NetworkRoute networkRoute)) {
+      throw new IllegalStateException("A network route is required for agent " + agent + ".");
+    }
 
-		// Lots of implicit type checking here to get the required information from the agent
-		if (!(agent instanceof MobsimDriverAgent driver)) {
-			throw new IllegalStateException("Departing agent " + agent.getId() + " is not a DriverAgent");
-		}
-		if (!(agent instanceof PlanAgent plan)) {
-			throw new IllegalStateException("Agent " + agent + " is not of type PlanAgent and therefore incompatible.");
-		}
-		PlanElement el = plan.getCurrentPlanElement();
-		if (!(el instanceof Leg leg)) {
-			throw new IllegalStateException("Plan element of agent " + agent + " is not a leg with a route.");
-		}
-		Route route = leg.getRoute();
-		if (!(route instanceof NetworkRoute networkRoute)) {
-			throw new IllegalStateException("A network route is required for agent " + agent + ".");
-		}
+    // Vehicles were inserted into the qsim as parked
+    // Remove them as soon as we depart
+    if (link instanceof QLinkI qLink) {
+      qLink.unregisterAdditionalAgentOnLink(agent.getId());
+      qLink.removeParkedVehicle(driver.getVehicle().getId());
+    }
 
-		// Vehicles were inserted into the qsim as parked
-		// Remove them as soon as we depart
-		if (link instanceof QLinkI qLink) {
-			qLink.unregisterAdditionalAgentOnLink(agent.getId());
-			qLink.removeParkedVehicle(driver.getVehicle().getId());
-		}
-
-		return engine.handleDeparture(now, driver, linkId, networkRoute);
-	}
-
+    return engine.handleDeparture(now, driver, linkId, networkRoute);
+  }
 }

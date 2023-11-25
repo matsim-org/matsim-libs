@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.builder;
 
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -29,43 +30,40 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 
-import java.util.*;
-
-
 /**
  * Creates TurnInfo objects from traffic signal data.
- * 
- * @author dgrether
  *
+ * @author dgrether
  */
 class SignalsTurnInfoBuilder {
-	
-	private static final Logger log = LogManager.getLogger(SignalsTurnInfoBuilder.class);
 
-	private static int warnCount = 0;
+  private static final Logger log = LogManager.getLogger(SignalsTurnInfoBuilder.class);
 
-	
-	public static Map<Id<Link>, List<TurnInfo>> createSignalsTurnInfos(SignalSystemsData ssd) {
-		Map<Id<Link>, List<TurnInfo>> inLinkIdTurnInfoMap = new HashMap<Id<Link>, List<TurnInfo>>();
-		for (SignalSystemData signalSystem : ssd.getSignalSystemData().values()){
-			for (SignalData signal : signalSystem.getSignalData().values()){
-				if (signal.getTurningMoveRestrictions() != null && ! signal.getTurningMoveRestrictions().isEmpty()){
-					if (warnCount < 1){
-						log.warn("Turning move restrictions for signals are implemented for TransportMode.car only, yet!");
-						warnCount++;
-					}
-					if (!inLinkIdTurnInfoMap.containsKey(signal.getLinkId())){
-						inLinkIdTurnInfoMap.put(signal.getLinkId(), new ArrayList<TurnInfo>());
-					}
-					Set<String> modeCar = new HashSet<String>();
-					modeCar.add(TransportMode.car);
-					for (Id<Link> toLinkId : signal.getTurningMoveRestrictions()){
-						TurnInfo ti = new TurnInfo(signal.getLinkId(), toLinkId, modeCar);
-						inLinkIdTurnInfoMap.get(signal.getLinkId()).add(ti);
-					}
-				}
-			}
-		}
-		return inLinkIdTurnInfoMap;
-	}
+  private static int warnCount = 0;
+
+  public static Map<Id<Link>, List<TurnInfo>> createSignalsTurnInfos(SignalSystemsData ssd) {
+    Map<Id<Link>, List<TurnInfo>> inLinkIdTurnInfoMap = new HashMap<Id<Link>, List<TurnInfo>>();
+    for (SignalSystemData signalSystem : ssd.getSignalSystemData().values()) {
+      for (SignalData signal : signalSystem.getSignalData().values()) {
+        if (signal.getTurningMoveRestrictions() != null
+            && !signal.getTurningMoveRestrictions().isEmpty()) {
+          if (warnCount < 1) {
+            log.warn(
+                "Turning move restrictions for signals are implemented for TransportMode.car only, yet!");
+            warnCount++;
+          }
+          if (!inLinkIdTurnInfoMap.containsKey(signal.getLinkId())) {
+            inLinkIdTurnInfoMap.put(signal.getLinkId(), new ArrayList<TurnInfo>());
+          }
+          Set<String> modeCar = new HashSet<String>();
+          modeCar.add(TransportMode.car);
+          for (Id<Link> toLinkId : signal.getTurningMoveRestrictions()) {
+            TurnInfo ti = new TurnInfo(signal.getLinkId(), toLinkId, modeCar);
+            inLinkIdTurnInfoMap.get(signal.getLinkId()).add(ti);
+          }
+        }
+      }
+    }
+    return inLinkIdTurnInfoMap;
+  }
 }

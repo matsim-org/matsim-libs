@@ -24,88 +24,78 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 
-
-
 /**
- *
- * The LayerDrawingOrderComparator is used to order the layers in ascending order
- * by their getDrawOrder() method
+ * The LayerDrawingOrderComparator is used to order the layers in ascending order by their
+ * getDrawOrder() method
  *
  * @author dstrippgen
- *
  */
 class LayerDrawingOrderComparator implements Comparator<SceneLayer>, Serializable {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@Override
-	public int compare(SceneLayer o1, SceneLayer o2) {
-		return (int)Math.signum(o1.getDrawOrder() - o2.getDrawOrder());
-	}
-
+  @Override
+  public int compare(SceneLayer o1, SceneLayer o2) {
+    return (int) Math.signum(o1.getDrawOrder() - o2.getDrawOrder());
+  }
 }
 
-
 /**
- * The SceneGraph is responsible for holding all information necessary to draw a particular timestep.
- * Once a SceneGraph is constructed, the Reader/Writer and the QuadTree will not be asked for information any longer.
- * Instead the SceneGraph's draw() method will be called.
+ * The SceneGraph is responsible for holding all information necessary to draw a particular
+ * timestep. Once a SceneGraph is constructed, the Reader/Writer and the QuadTree will not be asked
+ * for information any longer. Instead the SceneGraph's draw() method will be called.
  *
  * @author dstrippgen
- *
  */
 public class SceneGraph {
 
-	private Rect rect;
-	
-	private OGLAgentPointLayer agentLayer = new OGLAgentPointLayer();
-	private SimpleSceneLayer miscellaneousLayer = new SimpleSceneLayer();
+  private Rect rect;
 
-	private ArrayList<SceneLayer> drawingLayers;
+  private OGLAgentPointLayer agentLayer = new OGLAgentPointLayer();
+  private SimpleSceneLayer miscellaneousLayer = new SimpleSceneLayer();
 
-	public SceneGraph(Rect rect) {
-		this.rect = rect;
-		this.drawingLayers = new ArrayList<>();
-		this.drawingLayers.add(miscellaneousLayer);
-		this.drawingLayers.add(agentLayer);
-	}
+  private ArrayList<SceneLayer> drawingLayers;
 
-	public Rect getRect() {
-		return this.rect;
-	}
+  public SceneGraph(Rect rect) {
+    this.rect = rect;
+    this.drawingLayers = new ArrayList<>();
+    this.drawingLayers.add(miscellaneousLayer);
+    this.drawingLayers.add(agentLayer);
+  }
 
-	public void setRect(Rect rec) {
-		this.rect = rec;
-	}
+  public Rect getRect() {
+    return this.rect;
+  }
 
-	public void addItem(OTFGLAbstractDrawable item) {
-		miscellaneousLayer.addItem(item);
-	}
+  public void setRect(Rect rec) {
+    this.rect = rec;
+  }
 
-	public void finish() {
-		Collections.sort(drawingLayers, new LayerDrawingOrderComparator());
-	}
-	
-	public OGLAgentPointLayer getAgentPointLayer() {
-		return agentLayer;
-	}
+  public void addItem(OTFGLAbstractDrawable item) {
+    miscellaneousLayer.addItem(item);
+  }
 
-	public void draw() {
-		for (SceneLayer layer : drawingLayers) {
-			layer.draw();
-		}
-	}
+  public void finish() {
+    Collections.sort(drawingLayers, new LayerDrawingOrderComparator());
+  }
 
-	public void glInit() {
-		for (SceneLayer layer : drawingLayers) {
-			layer.glInit();
-		}
-	}
+  public OGLAgentPointLayer getAgentPointLayer() {
+    return agentLayer;
+  }
 
+  public void draw() {
+    for (SceneLayer layer : drawingLayers) {
+      layer.draw();
+    }
+  }
+
+  public void glInit() {
+    for (SceneLayer layer : drawingLayers) {
+      layer.glInit();
+    }
+  }
 }
-

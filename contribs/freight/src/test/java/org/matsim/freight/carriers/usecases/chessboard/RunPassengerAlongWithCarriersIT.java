@@ -29,23 +29,21 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class RunPassengerAlongWithCarriersIT {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils() ;
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public void runChessboard() {
-        try{
-        	RunPassengerAlongWithCarriers abc = new RunPassengerAlongWithCarriers();
-            // ---
-            Config config = abc.prepareConfig();
-            config.controller().setLastIteration( 1 );
-            config.controller().setOutputDirectory( utils.getOutputDirectory() );
-            // ---
-            abc.run();
-        } catch (Exception ee ) {
-            ee.printStackTrace();
-            Assert.fail("something went wrong: " + ee.getMessage());
-        }
+  @Test
+  public void runChessboard() {
+    try {
+      RunPassengerAlongWithCarriers abc = new RunPassengerAlongWithCarriers();
+      // ---
+      Config config = abc.prepareConfig();
+      config.controller().setLastIteration(1);
+      config.controller().setOutputDirectory(utils.getOutputDirectory());
+      // ---
+      abc.run();
+    } catch (Exception ee) {
+      ee.printStackTrace();
+      Assert.fail("something went wrong: " + ee.getMessage());
     }
-
+  }
 }

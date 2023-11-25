@@ -27,16 +27,14 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
  * @author thibautd
  */
 public class NetsimWrappingQVehicleProvider implements QVehicleProvider {
-	private final QNetsimEngineI netsim;
+  private final QNetsimEngineI netsim;
 
-	public NetsimWrappingQVehicleProvider(
-			final QNetsimEngineI netsim) {
-		this.netsim = netsim;
-	}
+  public NetsimWrappingQVehicleProvider(final QNetsimEngineI netsim) {
+    this.netsim = netsim;
+  }
 
-	@Override
-	public QVehicle getVehicle(final Id id) {
-		return netsim.getVehicles().get( id );
-	}
+  @Override
+  public QVehicle getVehicle(final Id id) {
+    return netsim.getVehicles().get(id);
+  }
 }
-

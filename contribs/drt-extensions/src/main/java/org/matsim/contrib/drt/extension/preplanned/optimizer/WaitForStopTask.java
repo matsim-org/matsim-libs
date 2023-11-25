@@ -31,9 +31,9 @@ import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
  */
 public class WaitForStopTask extends DefaultStayTask {
 
-	public static final DrtTaskType TYPE = new DrtTaskType("WAIT_FOR_STOP", STAY);
+  public static final DrtTaskType TYPE = new DrtTaskType("WAIT_FOR_STOP", STAY);
 
-	public WaitForStopTask(double beginTime, double endTime, Link link) {
-		super(TYPE, beginTime, endTime, link);
-	}
+  public WaitForStopTask(double beginTime, double endTime, Link link) {
+    super(TYPE, beginTime, endTime, link);
+  }
 }

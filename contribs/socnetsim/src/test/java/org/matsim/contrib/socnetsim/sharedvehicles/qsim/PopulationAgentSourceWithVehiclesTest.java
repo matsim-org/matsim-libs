@@ -23,7 +23,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -52,155 +51,194 @@ import org.matsim.vehicles.Vehicle;
  * @author thibautd
  */
 public class PopulationAgentSourceWithVehiclesTest {
-	//TODO: test that vehicles added where they should be
+  // TODO: test that vehicles added where they should be
 
-	@Test
-	public void testFailsIfOnlySomeRoutesHaveAVehicle() throws Exception {
-		final Config config = ConfigUtils.createConfig();
-		final Scenario scenario = ScenarioUtils.createScenario( config );
+  @Test
+  public void testFailsIfOnlySomeRoutesHaveAVehicle() throws Exception {
+    final Config config = ConfigUtils.createConfig();
+    final Scenario scenario = ScenarioUtils.createScenario(config);
 
-		final Id<Node> node1 = Id.create( "node1" , Node.class );
-		final Id<Node> node2 = Id.create( "node2" , Node.class );
-		final Id<Link> link = Id.create( "the_link" , Link.class );
+    final Id<Node> node1 = Id.create("node1", Node.class);
+    final Id<Node> node2 = Id.create("node2", Node.class);
+    final Id<Link> link = Id.create("the_link", Link.class);
 
-		scenario.getNetwork().addNode(
-				scenario.getNetwork().getFactory().createNode( node1 , new Coord((double) 0, (double) 0)));
+    scenario
+        .getNetwork()
+        .addNode(
+            scenario
+                .getNetwork()
+                .getFactory()
+                .createNode(node1, new Coord((double) 0, (double) 0)));
 
-		scenario.getNetwork().addNode(
-				scenario.getNetwork().getFactory().createNode( node2 , new Coord((double) 100, (double) 100)));
+    scenario
+        .getNetwork()
+        .addNode(
+            scenario
+                .getNetwork()
+                .getFactory()
+                .createNode(node2, new Coord((double) 100, (double) 100)));
 
-		scenario.getNetwork().addLink(
-				scenario.getNetwork().getFactory().createLink(
-					link,
-					scenario.getNetwork().getNodes().get( node1 ),
-					scenario.getNetwork().getNodes().get( node2 ) ) );
+    scenario
+        .getNetwork()
+        .addLink(
+            scenario
+                .getNetwork()
+                .getFactory()
+                .createLink(
+                    link,
+                    scenario.getNetwork().getNodes().get(node1),
+                    scenario.getNetwork().getNodes().get(node2)));
 
-		final Person withVeh = scenario.getPopulation().getFactory().createPerson( Id.create( "jojo" , Person.class) );
-		scenario.getPopulation().addPerson( withVeh );
-		final Plan planWithVeh = scenario.getPopulation().getFactory().createPlan();
-		planWithVeh.setPerson( withVeh );
-		withVeh.addPlan( planWithVeh );
-		planWithVeh.addActivity( scenario.getPopulation().getFactory().createActivityFromLinkId( "h" , link ) );
-		final Leg legWithVeh = scenario.getPopulation().getFactory().createLeg( TransportMode.car );
-		final NetworkRoute routeWithVeh = RouteUtils.createLinkNetworkRouteImpl(link, Collections.<Id<Link>>emptyList(), link);
-		routeWithVeh.setVehicleId( Id.create( "a_pink_pony" , Vehicle.class) );
-		legWithVeh.setRoute( routeWithVeh );
-		planWithVeh.addLeg( legWithVeh );
+    final Person withVeh =
+        scenario.getPopulation().getFactory().createPerson(Id.create("jojo", Person.class));
+    scenario.getPopulation().addPerson(withVeh);
+    final Plan planWithVeh = scenario.getPopulation().getFactory().createPlan();
+    planWithVeh.setPerson(withVeh);
+    withVeh.addPlan(planWithVeh);
+    planWithVeh.addActivity(
+        scenario.getPopulation().getFactory().createActivityFromLinkId("h", link));
+    final Leg legWithVeh = scenario.getPopulation().getFactory().createLeg(TransportMode.car);
+    final NetworkRoute routeWithVeh =
+        RouteUtils.createLinkNetworkRouteImpl(link, Collections.<Id<Link>>emptyList(), link);
+    routeWithVeh.setVehicleId(Id.create("a_pink_pony", Vehicle.class));
+    legWithVeh.setRoute(routeWithVeh);
+    planWithVeh.addLeg(legWithVeh);
 
-		final Person withoutVeh = scenario.getPopulation().getFactory().createPerson( Id.create( "toto" , Person.class) );
-		scenario.getPopulation().addPerson( withoutVeh );
-		final Plan planWithoutVeh = scenario.getPopulation().getFactory().createPlan();
-		planWithoutVeh.setPerson( withoutVeh );
-		withoutVeh.addPlan( planWithoutVeh );
-		planWithoutVeh.addActivity( scenario.getPopulation().getFactory().createActivityFromLinkId( "h" , link ) );
-		final Leg legWithoutVeh = scenario.getPopulation().getFactory().createLeg( TransportMode.car );
-		final NetworkRoute routeWithoutVeh = RouteUtils.createLinkNetworkRouteImpl(link, Collections.<Id<Link>>emptyList(), link);
-		legWithoutVeh.setRoute( routeWithoutVeh );
-		planWithoutVeh.addLeg( legWithoutVeh );
-		
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		QSim qSim = new QSimBuilder(scenario.getConfig()) //
-				.useDefaults()
-				.build(scenario, eventsManager);
+    final Person withoutVeh =
+        scenario.getPopulation().getFactory().createPerson(Id.create("toto", Person.class));
+    scenario.getPopulation().addPerson(withoutVeh);
+    final Plan planWithoutVeh = scenario.getPopulation().getFactory().createPlan();
+    planWithoutVeh.setPerson(withoutVeh);
+    withoutVeh.addPlan(planWithoutVeh);
+    planWithoutVeh.addActivity(
+        scenario.getPopulation().getFactory().createActivityFromLinkId("h", link));
+    final Leg legWithoutVeh = scenario.getPopulation().getFactory().createLeg(TransportMode.car);
+    final NetworkRoute routeWithoutVeh =
+        RouteUtils.createLinkNetworkRouteImpl(link, Collections.<Id<Link>>emptyList(), link);
+    legWithoutVeh.setRoute(routeWithoutVeh);
+    planWithoutVeh.addLeg(legWithoutVeh);
 
-		final PopulationAgentSourceWithVehicles testee =
-			new PopulationAgentSourceWithVehicles(
-					scenario.getPopulation(),
-					new DefaultAgentFactory( qSim, qSim.getChildInjector().getInstance(TimeInterpretation.class) ),
-					qSim );
+    EventsManager eventsManager = EventsUtils.createEventsManager();
+    QSim qSim =
+        new QSimBuilder(scenario.getConfig()) //
+            .useDefaults()
+            .build(scenario, eventsManager);
 
-		boolean gotException = false;
-		try {
-			testee.insertAgentsIntoMobsim();
-		}
-		catch ( InconsistentVehiculeSpecificationsException e ) {
-			gotException = true;
-		}
+    final PopulationAgentSourceWithVehicles testee =
+        new PopulationAgentSourceWithVehicles(
+            scenario.getPopulation(),
+            new DefaultAgentFactory(
+                qSim, qSim.getChildInjector().getInstance(TimeInterpretation.class)),
+            qSim);
 
-		assertTrue(
-				"did not get an exception with inconsistent setting",
-				gotException);
-	}
+    boolean gotException = false;
+    try {
+      testee.insertAgentsIntoMobsim();
+    } catch (InconsistentVehiculeSpecificationsException e) {
+      gotException = true;
+    }
 
-	@Test
-	public void testNoFailIfAllHaveVehicles() throws Exception {
-		testNoFail( true );
-	}
+    assertTrue("did not get an exception with inconsistent setting", gotException);
+  }
 
-	@Test
-	public void testNoFailIfNoneHaveVehicles() throws Exception {
-		testNoFail( false );
-	}
+  @Test
+  public void testNoFailIfAllHaveVehicles() throws Exception {
+    testNoFail(true);
+  }
 
-	public void testNoFail(final boolean vehicles) throws Exception {
-		final Config config = ConfigUtils.createConfig();
-		final Scenario scenario = ScenarioUtils.createScenario( config );
+  @Test
+  public void testNoFailIfNoneHaveVehicles() throws Exception {
+    testNoFail(false);
+  }
 
-		final Id<Node> node1 = Id.create( "node1" , Node.class );
-		final Id<Node> node2 = Id.create( "node2" , Node.class );
-		final Id<Link> link = Id.create( "the_link" , Link.class );
+  public void testNoFail(final boolean vehicles) throws Exception {
+    final Config config = ConfigUtils.createConfig();
+    final Scenario scenario = ScenarioUtils.createScenario(config);
 
-		scenario.getNetwork().addNode(
-				scenario.getNetwork().getFactory().createNode( node1 , new Coord((double) 0, (double) 0)));
+    final Id<Node> node1 = Id.create("node1", Node.class);
+    final Id<Node> node2 = Id.create("node2", Node.class);
+    final Id<Link> link = Id.create("the_link", Link.class);
 
-		scenario.getNetwork().addNode(
-				scenario.getNetwork().getFactory().createNode( node2 , new Coord((double) 100, (double) 100)));
+    scenario
+        .getNetwork()
+        .addNode(
+            scenario
+                .getNetwork()
+                .getFactory()
+                .createNode(node1, new Coord((double) 0, (double) 0)));
 
-		scenario.getNetwork().addLink(
-				scenario.getNetwork().getFactory().createLink(
-					link,
-					scenario.getNetwork().getNodes().get( node1 ),
-					scenario.getNetwork().getNodes().get( node2 ) ) );
+    scenario
+        .getNetwork()
+        .addNode(
+            scenario
+                .getNetwork()
+                .getFactory()
+                .createNode(node2, new Coord((double) 100, (double) 100)));
 
-		final Person withVeh = scenario.getPopulation().getFactory().createPerson( Id.create( "jojo" , Person.class ) );
-		scenario.getPopulation().addPerson( withVeh );
-		final Plan planWithVeh = scenario.getPopulation().getFactory().createPlan();
-		planWithVeh.setPerson( withVeh );
-		withVeh.addPlan( planWithVeh );
-		planWithVeh.addActivity( scenario.getPopulation().getFactory().createActivityFromLinkId( "h" , link ) );
-		final Leg walkLegWithVeh = scenario.getPopulation().getFactory().createLeg( TransportMode.walk );
-		walkLegWithVeh.setRoute( RouteUtils.createGenericRouteImpl(link, link) );
-		planWithVeh.addLeg( walkLegWithVeh );
-		final Leg legWithVeh = scenario.getPopulation().getFactory().createLeg( TransportMode.car );
-		final NetworkRoute routeWithVeh = RouteUtils.createLinkNetworkRouteImpl(link, Collections.<Id<Link>>emptyList(), link);
-		if (vehicles) routeWithVeh.setVehicleId( Id.create( "a_pink_pony" , Vehicle.class) );
-		legWithVeh.setRoute( routeWithVeh );
-		planWithVeh.addLeg( legWithVeh );
+    scenario
+        .getNetwork()
+        .addLink(
+            scenario
+                .getNetwork()
+                .getFactory()
+                .createLink(
+                    link,
+                    scenario.getNetwork().getNodes().get(node1),
+                    scenario.getNetwork().getNodes().get(node2)));
 
-		final Person withoutVeh = scenario.getPopulation().getFactory().createPerson( Id.create( "toto" , Person.class) );
-		scenario.getPopulation().addPerson( withoutVeh );
-		final Plan planWithoutVeh = scenario.getPopulation().getFactory().createPlan();
-		planWithoutVeh.setPerson( withoutVeh );
-		withoutVeh.addPlan( planWithoutVeh );
-		planWithoutVeh.addActivity( scenario.getPopulation().getFactory().createActivityFromLinkId( "h" , link ) );
-		final Leg legWithoutVeh = scenario.getPopulation().getFactory().createLeg( TransportMode.car );
-		final NetworkRoute routeWithoutVeh = RouteUtils.createLinkNetworkRouteImpl(link, Collections.<Id<Link>>emptyList(), link);
-		if (vehicles) routeWithoutVeh.setVehicleId( Id.create( "a_hummer" , Vehicle.class) );
-		legWithoutVeh.setRoute( routeWithoutVeh );
-		planWithoutVeh.addLeg( legWithoutVeh );
+    final Person withVeh =
+        scenario.getPopulation().getFactory().createPerson(Id.create("jojo", Person.class));
+    scenario.getPopulation().addPerson(withVeh);
+    final Plan planWithVeh = scenario.getPopulation().getFactory().createPlan();
+    planWithVeh.setPerson(withVeh);
+    withVeh.addPlan(planWithVeh);
+    planWithVeh.addActivity(
+        scenario.getPopulation().getFactory().createActivityFromLinkId("h", link));
+    final Leg walkLegWithVeh = scenario.getPopulation().getFactory().createLeg(TransportMode.walk);
+    walkLegWithVeh.setRoute(RouteUtils.createGenericRouteImpl(link, link));
+    planWithVeh.addLeg(walkLegWithVeh);
+    final Leg legWithVeh = scenario.getPopulation().getFactory().createLeg(TransportMode.car);
+    final NetworkRoute routeWithVeh =
+        RouteUtils.createLinkNetworkRouteImpl(link, Collections.<Id<Link>>emptyList(), link);
+    if (vehicles) routeWithVeh.setVehicleId(Id.create("a_pink_pony", Vehicle.class));
+    legWithVeh.setRoute(routeWithVeh);
+    planWithVeh.addLeg(legWithVeh);
 
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		QSim qSim = new QSimBuilder(scenario.getConfig()) //
-				.useDefaults()
-				.build(scenario, eventsManager);
-		
-		final PopulationAgentSourceWithVehicles testee =
-			new PopulationAgentSourceWithVehicles(
-					scenario.getPopulation(),
-					new DefaultAgentFactory( qSim, qSim.getChildInjector().getInstance(TimeInterpretation.class) ),
-					qSim );
+    final Person withoutVeh =
+        scenario.getPopulation().getFactory().createPerson(Id.create("toto", Person.class));
+    scenario.getPopulation().addPerson(withoutVeh);
+    final Plan planWithoutVeh = scenario.getPopulation().getFactory().createPlan();
+    planWithoutVeh.setPerson(withoutVeh);
+    withoutVeh.addPlan(planWithoutVeh);
+    planWithoutVeh.addActivity(
+        scenario.getPopulation().getFactory().createActivityFromLinkId("h", link));
+    final Leg legWithoutVeh = scenario.getPopulation().getFactory().createLeg(TransportMode.car);
+    final NetworkRoute routeWithoutVeh =
+        RouteUtils.createLinkNetworkRouteImpl(link, Collections.<Id<Link>>emptyList(), link);
+    if (vehicles) routeWithoutVeh.setVehicleId(Id.create("a_hummer", Vehicle.class));
+    legWithoutVeh.setRoute(routeWithoutVeh);
+    planWithoutVeh.addLeg(legWithoutVeh);
 
-		boolean gotException = false;
-		try {
-			testee.insertAgentsIntoMobsim();
-		}
-		catch ( InconsistentVehiculeSpecificationsException e ) {
-			gotException = true;
-		}
+    EventsManager eventsManager = EventsUtils.createEventsManager();
+    QSim qSim =
+        new QSimBuilder(scenario.getConfig()) //
+            .useDefaults()
+            .build(scenario, eventsManager);
 
-		assertFalse(
-				"got an exception with consistent setting",
-				gotException);
-	}
+    final PopulationAgentSourceWithVehicles testee =
+        new PopulationAgentSourceWithVehicles(
+            scenario.getPopulation(),
+            new DefaultAgentFactory(
+                qSim, qSim.getChildInjector().getInstance(TimeInterpretation.class)),
+            qSim);
+
+    boolean gotException = false;
+    try {
+      testee.insertAgentsIntoMobsim();
+    } catch (InconsistentVehiculeSpecificationsException e) {
+      gotException = true;
+    }
+
+    assertFalse("got an exception with consistent setting", gotException);
+  }
 }
-

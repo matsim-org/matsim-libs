@@ -37,56 +37,57 @@ import org.matsim.facilities.ActivityFacility;
 
 /**
  * Tests if the expected links are found when using the MultimodalLinkChooserDefaultImpl
- * @author simei94
  *
+ * @author simei94
  */
-
 public class MultimodalLinkChooserTest {
 
-    @Test
-    public void testDecideOnLink() {
+  @Test
+  public void testDecideOnLink() {
 
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-        Network network = scenario.getNetwork();
-        Network netWithoutLinks = NetworkUtils.createNetwork();
-        Link networkLink;
-        Link secondLink;
+    Network network = scenario.getNetwork();
+    Network netWithoutLinks = NetworkUtils.createNetwork();
+    Link networkLink;
+    Link secondLink;
 
-        NetworkFactory nf = network.getFactory();
-        Node n1 = nf.createNode(Id.createNodeId(1), new Coord((double) 0, (double) 0));
-        Node n2 = nf.createNode(Id.createNodeId(2), new Coord((double) 1000, (double) 0));
-        Node n3 = nf.createNode(Id.createNodeId(3), new Coord((double) 1000, (double) 1000));
-        networkLink = nf.createLink(Id.createLinkId("linkWithId"), n1, n2);
-        secondLink = nf.createLink(Id.createLinkId("secondLink"), n2, n3);
+    NetworkFactory nf = network.getFactory();
+    Node n1 = nf.createNode(Id.createNodeId(1), new Coord((double) 0, (double) 0));
+    Node n2 = nf.createNode(Id.createNodeId(2), new Coord((double) 1000, (double) 0));
+    Node n3 = nf.createNode(Id.createNodeId(3), new Coord((double) 1000, (double) 1000));
+    networkLink = nf.createLink(Id.createLinkId("linkWithId"), n1, n2);
+    secondLink = nf.createLink(Id.createLinkId("secondLink"), n2, n3);
 
-        network.addNode(n1);
-        network.addNode(n2);
-        network.addNode(n3);
-        network.addLink(networkLink);
-        network.addLink(secondLink);
+    network.addNode(n1);
+    network.addNode(n2);
+    network.addNode(n3);
+    network.addLink(networkLink);
+    network.addLink(secondLink);
 
-        ActivityFacilitiesFactory fac = new ActivityFacilitiesFactoryImpl();
-        ActivityFacility facilityLinkIdNotNull = fac.createActivityFacility(Id.create("hasLinkId", ActivityFacility.class),
-                new Coord(0,0),
-                networkLink.getId());
-        ActivityFacility facilityLinkIdNull = fac.createActivityFacility(Id.create("noLinkId", ActivityFacility.class),
-                new Coord(0,0));
+    ActivityFacilitiesFactory fac = new ActivityFacilitiesFactoryImpl();
+    ActivityFacility facilityLinkIdNotNull =
+        fac.createActivityFacility(
+            Id.create("hasLinkId", ActivityFacility.class), new Coord(0, 0), networkLink.getId());
+    ActivityFacility facilityLinkIdNull =
+        fac.createActivityFacility(Id.create("noLinkId", ActivityFacility.class), new Coord(0, 0));
 
-        MultimodalLinkChooser linkChooser = new MultimodalLinkChooserDefaultImpl();
+    MultimodalLinkChooser linkChooser = new MultimodalLinkChooserDefaultImpl();
 
-        Link linkFromFacLinkId = linkChooser.decideOnLink(facilityLinkIdNotNull, network);
+    Link linkFromFacLinkId = linkChooser.decideOnLink(facilityLinkIdNotNull, network);
 
-        Assert.assertEquals(networkLink, linkFromFacLinkId);
+    Assert.assertEquals(networkLink, linkFromFacLinkId);
 
-        Link linkFromFacCoord = linkChooser.decideOnLink(facilityLinkIdNull, network);
+    Link linkFromFacCoord = linkChooser.decideOnLink(facilityLinkIdNull, network);
 
-        Assert.assertEquals(networkLink, linkFromFacCoord);
+    Assert.assertEquals(networkLink, linkFromFacCoord);
 
-        //not sure whether the following makes sense as we basically are some functionality of NetworkUtils (which is used in the linkChooser)
-        //testing this with the decideOnLink method would mean causing a RuntimeException -sm 0622
-        Link linkNotInNetwork = NetworkUtils.getNearestLink(netWithoutLinks, facilityLinkIdNull.getCoord());
+    // not sure whether the following makes sense as we basically are some functionality of
+    // NetworkUtils (which is used in the linkChooser)
+    // testing this with the decideOnLink method would mean causing a RuntimeException -sm 0622
+    Link linkNotInNetwork =
+        NetworkUtils.getNearestLink(netWithoutLinks, facilityLinkIdNull.getCoord());
 
-        Assert.assertNull(linkNotInNetwork);
-    }
+    Assert.assertNull(linkNotInNetwork);
+  }
 }

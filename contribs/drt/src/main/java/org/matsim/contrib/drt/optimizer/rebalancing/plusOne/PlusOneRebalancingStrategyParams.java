@@ -18,29 +18,30 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.plusOne;
 
+import jakarta.validation.constraints.NotNull;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.core.config.ReflectiveConfigGroup;
-
-import jakarta.validation.constraints.NotNull;
 
 /**
  * @author michalm
  */
 public final class PlusOneRebalancingStrategyParams extends ReflectiveConfigGroup
-		implements RebalancingParams.RebalancingStrategyParams {
-	public static final String SET_NAME = "PlusOneRebalancingStrategy";
+    implements RebalancingParams.RebalancingStrategyParams {
+  public static final String SET_NAME = "PlusOneRebalancingStrategy";
 
-	// add entry here when additional calculator is implemented
-	public enum ZoneFreeRelocationCalculatorType {
-		FastHeuristic
-	}
+  // add entry here when additional calculator is implemented
+  public enum ZoneFreeRelocationCalculatorType {
+    FastHeuristic
+  }
 
-	@Parameter("relocationCalculatorType")
-	@Comment("Specific the zone free relocation calculator. Default is fast heuristic zone free relocation calculator.")
-	@NotNull
-	public ZoneFreeRelocationCalculatorType zoneFreeRelocationCalculatorType = ZoneFreeRelocationCalculatorType.FastHeuristic;
+  @Parameter("relocationCalculatorType")
+  @Comment(
+      "Specific the zone free relocation calculator. Default is fast heuristic zone free relocation calculator.")
+  @NotNull
+  public ZoneFreeRelocationCalculatorType zoneFreeRelocationCalculatorType =
+      ZoneFreeRelocationCalculatorType.FastHeuristic;
 
-	public PlusOneRebalancingStrategyParams() {
-		super(SET_NAME);
-	}
+  public PlusOneRebalancingStrategyParams() {
+    super(SET_NAME);
+  }
 }

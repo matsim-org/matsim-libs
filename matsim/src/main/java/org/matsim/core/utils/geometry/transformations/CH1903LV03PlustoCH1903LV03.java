@@ -25,28 +25,30 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 /**
- * Transforms coordinates from the new Swiss-Grid-Plus coordinate system to the Swiss-Grid coordinate system.
+ * Transforms coordinates from the new Swiss-Grid-Plus coordinate system to the Swiss-Grid
+ * coordinate system.
  *
  * @author boescpa
- *
- * @see <a href="http://de.wikipedia.org/wiki/Schweizer_Landeskoordinaten">de.wikipedia.org/wiki/Schweizer_Landeskoordinaten</a>
- * @see <a href="http://www.swisstopo.admin.ch/internet/swisstopo/de/home/topics/survey/sys/refsys/switzerland.parsysrelated1.24280.downloadList.87003.DownloadFile.tmp/ch1903wgs84de.pdf">Swisstopo Umrechnungen (PDF)</a>
+ * @see <a
+ *     href="http://de.wikipedia.org/wiki/Schweizer_Landeskoordinaten">de.wikipedia.org/wiki/Schweizer_Landeskoordinaten</a>
+ * @see <a
+ *     href="http://www.swisstopo.admin.ch/internet/swisstopo/de/home/topics/survey/sys/refsys/switzerland.parsysrelated1.24280.downloadList.87003.DownloadFile.tmp/ch1903wgs84de.pdf">Swisstopo
+ *     Umrechnungen (PDF)</a>
  */
 public class CH1903LV03PlustoCH1903LV03 implements CoordinateTransformation {
 
-	@Override
-	public Coord transform(Coord coord) {
-		
-		/* Important Note: in the Swiss Grid, y describes easting and x describes 
-		 * northing, contrary to the usual naming conventions!		 */ 
-		double yNorm = (coord.getX() - 2000000.0);
-		double xNorm = (coord.getY() - 1000000.0);
+  @Override
+  public Coord transform(Coord coord) {
 
-		if (coord.hasZ()) {
-			double elevation = coord.getZ();
-			return new Coord((double) Math.round(yNorm), (double) Math.round(xNorm), elevation);
-		}
-		return new Coord((double) Math.round(yNorm), (double) Math.round(xNorm));
-	}
+    /* Important Note: in the Swiss Grid, y describes easting and x describes
+     * northing, contrary to the usual naming conventions!		 */
+    double yNorm = (coord.getX() - 2000000.0);
+    double xNorm = (coord.getY() - 1000000.0);
 
+    if (coord.hasZ()) {
+      double elevation = coord.getZ();
+      return new Coord((double) Math.round(yNorm), (double) Math.round(xNorm), elevation);
+    }
+    return new Coord((double) Math.round(yNorm), (double) Math.round(xNorm));
+  }
 }

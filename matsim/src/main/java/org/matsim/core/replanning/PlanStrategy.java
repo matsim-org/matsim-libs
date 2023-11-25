@@ -24,19 +24,17 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 
 /**
- * 
  * Examples of how this class can be used can be found are {@link
- * tutorial.programming.example10PluggablePlanStrategyFromFile.RunPluggablePlanStrategyFromFileExample} 
- * and {@link 
- *  tutorial.programming.example11PluggablePlanStrategyInCode.RunPluggablePlanStrategyInCodeExample}.
+ * tutorial.programming.example10PluggablePlanStrategyFromFile.RunPluggablePlanStrategyFromFileExample}
+ * and {@link
+ * tutorial.programming.example11PluggablePlanStrategyInCode.RunPluggablePlanStrategyInCodeExample}.
  * <br>
- *  * Notes:<ul>
- * <li> If an implementation of this interface is "innovative", i.e. modifies plans, then it should first copy that plan, add the new plan to the choice set,
- * and then modify that new copy.  Otherwise, the evolutionary functionality of MATSim will probably be destroyed. kai, jan'15
+ * * Notes:
+ *
+ * <ul>
+ *   <li>If an implementation of this interface is "innovative", i.e. modifies plans, then it should
+ *       first copy that plan, add the new plan to the choice set, and then modify that new copy.
+ *       Otherwise, the evolutionary functionality of MATSim will probably be destroyed. kai, jan'15
  * </ul>
- * 
  */
-public interface PlanStrategy extends GenericPlanStrategy<Plan, Person>, MatsimExtensionPoint {
-
-
-}
+public interface PlanStrategy extends GenericPlanStrategy<Plan, Person>, MatsimExtensionPoint {}

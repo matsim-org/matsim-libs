@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * WithinDayQSimModule.java
@@ -19,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.withinday.mobsim;
+package org.matsim.withinday.mobsim;
 
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
@@ -27,33 +26,36 @@ import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
 
 public class WithinDayQSimModule extends AbstractQSimModule {
-	public final static String COMPONENT_NAME = "WithinDay";
-	public final static String FIXED_ORDER_LISTENER_COMPONENT_NAME = "FixedOrderSimulationListener";
+  public static final String COMPONENT_NAME = "WithinDay";
+  public static final String FIXED_ORDER_LISTENER_COMPONENT_NAME = "FixedOrderSimulationListener";
 
-	private final WithinDayEngine withinDayEngine;
-	private final FixedOrderSimulationListener fixedOrderSimulationListener;
-	private final WithinDayTravelTime withinDayTravelTime;
+  private final WithinDayEngine withinDayEngine;
+  private final FixedOrderSimulationListener fixedOrderSimulationListener;
+  private final WithinDayTravelTime withinDayTravelTime;
 
-	public WithinDayQSimModule(WithinDayEngine withinDayEngine,
-			FixedOrderSimulationListener fixedOrderSimulationListener, WithinDayTravelTime withinDayTravelTime) {
-		this.withinDayEngine = withinDayEngine;
-		this.fixedOrderSimulationListener = fixedOrderSimulationListener;
-		this.withinDayTravelTime = withinDayTravelTime;
-	}
+  public WithinDayQSimModule(
+      WithinDayEngine withinDayEngine,
+      FixedOrderSimulationListener fixedOrderSimulationListener,
+      WithinDayTravelTime withinDayTravelTime) {
+    this.withinDayEngine = withinDayEngine;
+    this.fixedOrderSimulationListener = fixedOrderSimulationListener;
+    this.withinDayTravelTime = withinDayTravelTime;
+  }
 
-	@Override
-	protected void configureQSim() {
-		bind(WithinDayEngine.class).toInstance(withinDayEngine);
-		bind(FixedOrderSimulationListener.class).toInstance(fixedOrderSimulationListener);
-		bind(WithinDayTravelTime.class).toInstance(withinDayTravelTime);
+  @Override
+  protected void configureQSim() {
+    bind(WithinDayEngine.class).toInstance(withinDayEngine);
+    bind(FixedOrderSimulationListener.class).toInstance(fixedOrderSimulationListener);
+    bind(WithinDayTravelTime.class).toInstance(withinDayTravelTime);
 
-		addQSimComponentBinding( FIXED_ORDER_LISTENER_COMPONENT_NAME ).to( FixedOrderSimulationListener.class );
-		addQSimComponentBinding( COMPONENT_NAME ).to( WithinDayTravelTime.class );
-		addQSimComponentBinding( COMPONENT_NAME ).to( WithinDayEngine.class );
-	}
+    addQSimComponentBinding(FIXED_ORDER_LISTENER_COMPONENT_NAME)
+        .to(FixedOrderSimulationListener.class);
+    addQSimComponentBinding(COMPONENT_NAME).to(WithinDayTravelTime.class);
+    addQSimComponentBinding(COMPONENT_NAME).to(WithinDayEngine.class);
+  }
 
-	static public void configureComponents(QSimComponentsConfig components) {
-		components.addNamedComponent(COMPONENT_NAME);
-		components.addNamedComponent(FIXED_ORDER_LISTENER_COMPONENT_NAME);
-	}
+  public static void configureComponents(QSimComponentsConfig components) {
+    components.addNamedComponent(COMPONENT_NAME);
+    components.addNamedComponent(FIXED_ORDER_LISTENER_COMPONENT_NAME);
+  }
 }

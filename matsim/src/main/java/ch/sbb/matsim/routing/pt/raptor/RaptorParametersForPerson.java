@@ -25,5 +25,5 @@ import org.matsim.api.core.v01.population.Person;
  * @author mrieser / SBB
  */
 public interface RaptorParametersForPerson {
-    RaptorParameters getRaptorParameters(Person person);
+  RaptorParameters getRaptorParameters(Person person);
 }

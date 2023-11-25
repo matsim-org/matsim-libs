@@ -22,7 +22,6 @@ package org.matsim.contrib.signals.data.ambertimes.v10;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -33,82 +32,75 @@ import org.matsim.contrib.signals.model.SignalSystem;
  */
 final class AmberTimeDataImpl implements AmberTimeData {
 
-	private Integer defaultRedAmberTime;
-	private Integer defaultAmberTime;
-	private Map<Id<Signal>, Integer> signalAmberMap;
-	private Map<Id<Signal>, Integer> signalRedAmberMap;
-	private Id<SignalSystem> signalSystemId;
+  private Integer defaultRedAmberTime;
+  private Integer defaultAmberTime;
+  private Map<Id<Signal>, Integer> signalAmberMap;
+  private Map<Id<Signal>, Integer> signalRedAmberMap;
+  private Id<SignalSystem> signalSystemId;
 
-	AmberTimeDataImpl(Id<SignalSystem> signalSystemId) {
-		this.signalSystemId = signalSystemId;
-		signalAmberMap = new HashMap<>();
-		signalRedAmberMap = new HashMap<>();
-	}
+  AmberTimeDataImpl(Id<SignalSystem> signalSystemId) {
+    this.signalSystemId = signalSystemId;
+    signalAmberMap = new HashMap<>();
+    signalRedAmberMap = new HashMap<>();
+  }
 
-	@Override
-	public Integer getAmberOfSignal(Id<Signal> signalId) {
-		if (signalAmberMap.containsKey(signalId)) {
-			return signalAmberMap.get(signalId);
-		}
-		else
+  @Override
+  public Integer getAmberOfSignal(Id<Signal> signalId) {
+    if (signalAmberMap.containsKey(signalId)) {
+      return signalAmberMap.get(signalId);
+    } else return defaultAmberTime;
+  }
 
-			return defaultAmberTime;
-	}
+  @Override
+  public Integer getDefaultAmber() {
+    return this.defaultAmberTime;
+  }
 
-	@Override
-	public Integer getDefaultAmber() {
-		return this.defaultAmberTime;
-	}
+  @Override
+  public Integer getDefaultRedAmber() {
+    return this.defaultRedAmberTime;
+  }
 
-	@Override
-	public Integer getDefaultRedAmber() {
-		return this.defaultRedAmberTime;
-	}
+  @Override
+  public Integer getRedAmberOfSignal(Id<Signal> signalId) {
+    if (signalRedAmberMap.containsKey(signalId)) {
+      return signalRedAmberMap.get(signalId);
+    } else return defaultRedAmberTime;
+  }
 
-	@Override
-	public Integer getRedAmberOfSignal(Id<Signal> signalId) {
-		if (signalRedAmberMap.containsKey(signalId)) {
-			return signalRedAmberMap.get(signalId);
-		}
-		else
+  @Override
+  public Map<Id<Signal>, Integer> getSignalAmberMap() {
 
-			return defaultRedAmberTime;
-	}
+    return signalAmberMap;
+  }
 
-	@Override
-	public Map<Id<Signal>, Integer> getSignalAmberMap() {
+  @Override
+  public Map<Id<Signal>, Integer> getSignalRedAmberMap() {
+    return signalRedAmberMap;
+  }
 
-		return signalAmberMap;
-	}
+  @Override
+  public Id<SignalSystem> getSignalSystemId() {
+    return signalSystemId;
+  }
 
-	@Override
-	public Map<Id<Signal>, Integer> getSignalRedAmberMap() {
-		return signalRedAmberMap;
-	}
+  @Override
+  public void setAmberTimeOfSignal(Id<Signal> signalId, Integer seconds) {
+    signalAmberMap.put(signalId, seconds);
+  }
 
-	@Override
-	public Id<SignalSystem> getSignalSystemId() {
-		return signalSystemId;
-	}
+  @Override
+  public void setDefaultAmber(Integer seconds) {
+    this.defaultAmberTime = seconds;
+  }
 
-	@Override
-	public void setAmberTimeOfSignal(Id<Signal> signalId, Integer seconds) {
-		signalAmberMap.put(signalId, seconds);
-	}
+  @Override
+  public void setDefaultRedAmber(Integer seconds) {
+    this.defaultRedAmberTime = seconds;
+  }
 
-	@Override
-	public void setDefaultAmber(Integer seconds) {
-		this.defaultAmberTime = seconds;
-	}
-
-	@Override
-	public void setDefaultRedAmber(Integer seconds) {
-		this.defaultRedAmberTime = seconds;
-	}
-
-	@Override
-	public void setRedAmberTimeOfSignal(Id<Signal> signalId, Integer seconds) {
-		signalRedAmberMap.put(signalId, seconds);
-	}
-
+  @Override
+  public void setRedAmberTimeOfSignal(Id<Signal> signalId, Integer seconds) {
+    signalRedAmberMap.put(signalId, seconds);
+  }
 }

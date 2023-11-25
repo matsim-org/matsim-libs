@@ -23,35 +23,33 @@ package org.matsim.core.population.routes;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-
 public final class GenericRouteImpl extends AbstractRoute {
 
-	/*package*/ final static String ROUTE_TYPE = "generic";
-	
-	private String routeDescription = null;
+  /*package*/ static final String ROUTE_TYPE = "generic";
 
-	public GenericRouteImpl(final Id<Link> startLinkId, final Id<Link> endLinkId) {
-		super(startLinkId, endLinkId);
-	}
+  private String routeDescription = null;
 
-	@Override
-	public GenericRouteImpl clone() {
-		return (GenericRouteImpl) super.clone();
-	}
+  public GenericRouteImpl(final Id<Link> startLinkId, final Id<Link> endLinkId) {
+    super(startLinkId, endLinkId);
+  }
 
-	@Override
-	public String getRouteDescription() {
-		return this.routeDescription;
-	}
+  @Override
+  public GenericRouteImpl clone() {
+    return (GenericRouteImpl) super.clone();
+  }
 
-	@Override
-	public void setRouteDescription(final String routeDescription) {
-		this.routeDescription = routeDescription;
-	}
+  @Override
+  public String getRouteDescription() {
+    return this.routeDescription;
+  }
 
-	@Override
-	public String getRouteType() {
-		return ROUTE_TYPE;
-	}
+  @Override
+  public void setRouteDescription(final String routeDescription) {
+    this.routeDescription = routeDescription;
+  }
 
+  @Override
+  public String getRouteType() {
+    return ROUTE_TYPE;
+  }
 }

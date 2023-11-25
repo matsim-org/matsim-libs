@@ -23,39 +23,36 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 /**
  * @author thibautd
  */
 public class JointTripsStats extends AbstractPlanAnalyzerPerGroup {
 
-	public JointTripsStats(
-			final int graphWriteInterval,
-			final OutputDirectoryHierarchy controlerIO,
-			final Scenario scenario,
-			final GroupIdentifier groupIdentifier) {
-		super(graphWriteInterval, controlerIO, scenario, groupIdentifier);
-	}
+  public JointTripsStats(
+      final int graphWriteInterval,
+      final OutputDirectoryHierarchy controlerIO,
+      final Scenario scenario,
+      final GroupIdentifier groupIdentifier) {
+    super(graphWriteInterval, controlerIO, scenario, groupIdentifier);
+  }
 
-	@Override
-	protected double calcStat(final Plan plan) {
-		int count = 0;
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg &&
-					JointActingTypes.JOINT_MODES.contains( ((Leg) pe).getMode() ) ) {
-				count++;
-			}
-		}
+  @Override
+  protected double calcStat(final Plan plan) {
+    int count = 0;
+    for (PlanElement pe : plan.getPlanElements()) {
+      if (pe instanceof Leg && JointActingTypes.JOINT_MODES.contains(((Leg) pe).getMode())) {
+        count++;
+      }
+    }
 
-		return count;
-	}
+    return count;
+  }
 
-	@Override
-	protected String getStatName() {
-		return "Number of Joint Trips";
-	}
+  @Override
+  protected String getStatName() {
+    return "Number of Joint Trips";
+  }
 }
-

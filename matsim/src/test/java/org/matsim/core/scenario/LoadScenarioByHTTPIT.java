@@ -20,28 +20,29 @@ package org.matsim.core.scenario;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 /**
  * @author michaz
- *
  */
 public class LoadScenarioByHTTPIT {
 
-	@Test
-	public void testLoadingScenarioFromURLWorks() throws MalformedURLException {
-//		Config config = ConfigUtils.loadConfig(new URL("https://raw.githubusercontent.com/matsim-org/matsimExamples/master/tutorial/lesson-3/config.xml"));
-		Config config = ConfigUtils.loadConfig(new URL("https://github.com/matsim-org/matsim/raw/master/examples/scenarios/lesson-3/config.xml"));
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		assertThat(scenario.getNetwork().getLinks()).hasSize(12940);
-		assertThat(scenario.getPopulation().getPersons()).hasSize(8760);
-		assertThat(scenario.getActivityFacilities().getFacilities()).hasSize(10281);
-	}
-
+  @Test
+  public void testLoadingScenarioFromURLWorks() throws MalformedURLException {
+    //		Config config = ConfigUtils.loadConfig(new
+    // URL("https://raw.githubusercontent.com/matsim-org/matsimExamples/master/tutorial/lesson-3/config.xml"));
+    Config config =
+        ConfigUtils.loadConfig(
+            new URL(
+                "https://github.com/matsim-org/matsim/raw/master/examples/scenarios/lesson-3/config.xml"));
+    Scenario scenario = ScenarioUtils.loadScenario(config);
+    assertThat(scenario.getNetwork().getLinks()).hasSize(12940);
+    assertThat(scenario.getPopulation().getPersons()).hasSize(8760);
+    assertThat(scenario.getActivityFacilities().getFacilities()).hasSize(10281);
+  }
 }

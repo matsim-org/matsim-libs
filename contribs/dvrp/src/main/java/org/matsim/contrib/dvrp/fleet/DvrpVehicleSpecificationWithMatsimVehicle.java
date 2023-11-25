@@ -22,7 +22,6 @@ package org.matsim.contrib.dvrp.fleet;
 
 import java.util.Objects;
 import java.util.Optional;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
@@ -33,71 +32,70 @@ import org.matsim.vehicles.Vehicles;
  */
 public class DvrpVehicleSpecificationWithMatsimVehicle implements DvrpVehicleSpecification {
 
-	public static final String DVRP_MODE = "dvrpMode";
-	public static final String START_LINK = "startLink";
-	public static final String SERVICE_BEGIN_TIME = "serviceBeginTime";
-	public static final String SERVICE_END_TIME = "serviceEndTime";
+  public static final String DVRP_MODE = "dvrpMode";
+  public static final String START_LINK = "startLink";
+  public static final String SERVICE_BEGIN_TIME = "serviceBeginTime";
+  public static final String SERVICE_END_TIME = "serviceEndTime";
 
-	public static FleetSpecification createFleetSpecificationFromMatsimVehicles(String mode, Vehicles vehicles) {
-		FleetSpecification fleetSpecification = new FleetSpecificationImpl();
-		vehicles.getVehicles()
-				.values()
-				.stream()
-				.filter(vehicle -> mode.equals(
-						vehicle.getAttributes().getAttribute(DVRP_MODE)))
-				.map(DvrpVehicleSpecificationWithMatsimVehicle::new)
-				.forEach(fleetSpecification::addVehicleSpecification);
-		return fleetSpecification;
-	}
+  public static FleetSpecification createFleetSpecificationFromMatsimVehicles(
+      String mode, Vehicles vehicles) {
+    FleetSpecification fleetSpecification = new FleetSpecificationImpl();
+    vehicles.getVehicles().values().stream()
+        .filter(vehicle -> mode.equals(vehicle.getAttributes().getAttribute(DVRP_MODE)))
+        .map(DvrpVehicleSpecificationWithMatsimVehicle::new)
+        .forEach(fleetSpecification::addVehicleSpecification);
+    return fleetSpecification;
+  }
 
-	private final Id<DvrpVehicle> id;
-	private final Vehicle matsimVehicle;// matsim vehicle is mutable!
-	private final Id<Link> startLinkId;
-	private final int capacity;
+  private final Id<DvrpVehicle> id;
+  private final Vehicle matsimVehicle; // matsim vehicle is mutable!
+  private final Id<Link> startLinkId;
+  private final int capacity;
 
-	// time window
-	private final double serviceBeginTime;
-	private final double serviceEndTime;
+  // time window
+  private final double serviceBeginTime;
+  private final double serviceEndTime;
 
-	public DvrpVehicleSpecificationWithMatsimVehicle(Vehicle matsimVehicle) {
-		id = Objects.requireNonNull(Id.create(matsimVehicle.getId(), DvrpVehicle.class));
-		this.matsimVehicle = matsimVehicle;
+  public DvrpVehicleSpecificationWithMatsimVehicle(Vehicle matsimVehicle) {
+    id = Objects.requireNonNull(Id.create(matsimVehicle.getId(), DvrpVehicle.class));
+    this.matsimVehicle = matsimVehicle;
 
-		this.capacity = matsimVehicle.getType().getCapacity().getSeats();
+    this.capacity = matsimVehicle.getType().getCapacity().getSeats();
 
-		var attributes = matsimVehicle.getAttributes();
-		this.startLinkId = Objects.requireNonNull(Id.createLinkId((String)attributes.getAttribute(START_LINK)));
-		this.serviceBeginTime = (double)attributes.getAttribute(SERVICE_BEGIN_TIME);
-		this.serviceEndTime = (double)attributes.getAttribute(SERVICE_END_TIME);
-	}
+    var attributes = matsimVehicle.getAttributes();
+    this.startLinkId =
+        Objects.requireNonNull(Id.createLinkId((String) attributes.getAttribute(START_LINK)));
+    this.serviceBeginTime = (double) attributes.getAttribute(SERVICE_BEGIN_TIME);
+    this.serviceEndTime = (double) attributes.getAttribute(SERVICE_END_TIME);
+  }
 
-	@Override
-	public Id<DvrpVehicle> getId() {
-		return id;
-	}
+  @Override
+  public Id<DvrpVehicle> getId() {
+    return id;
+  }
 
-	@Override
-	public Optional<Vehicle> getMatsimVehicle() {
-		return Optional.of(matsimVehicle);
-	}
+  @Override
+  public Optional<Vehicle> getMatsimVehicle() {
+    return Optional.of(matsimVehicle);
+  }
 
-	@Override
-	public Id<Link> getStartLinkId() {
-		return startLinkId;
-	}
+  @Override
+  public Id<Link> getStartLinkId() {
+    return startLinkId;
+  }
 
-	@Override
-	public int getCapacity() {
-		return capacity;
-	}
+  @Override
+  public int getCapacity() {
+    return capacity;
+  }
 
-	@Override
-	public double getServiceBeginTime() {
-		return serviceBeginTime;
-	}
+  @Override
+  public double getServiceBeginTime() {
+    return serviceBeginTime;
+  }
 
-	@Override
-	public double getServiceEndTime() {
-		return serviceEndTime;
-	}
+  @Override
+  public double getServiceEndTime() {
+    return serviceEndTime;
+  }
 }

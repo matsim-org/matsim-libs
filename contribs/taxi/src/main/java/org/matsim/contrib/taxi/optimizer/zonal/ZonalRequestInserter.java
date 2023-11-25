@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.stream.Stream;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
@@ -53,90 +52,110 @@ import org.matsim.core.router.util.TravelTime;
  * @author michalm
  */
 public class ZonalRequestInserter implements UnplannedRequestInserter {
-	private static final Comparator<DvrpVehicle> LONGEST_WAITING_FIRST = Comparator.comparingDouble(
-			v -> v.getSchedule().getCurrentTask().getBeginTime());
+  private static final Comparator<DvrpVehicle> LONGEST_WAITING_FIRST =
+      Comparator.comparingDouble(v -> v.getSchedule().getCurrentTask().getBeginTime());
 
-	private final Fleet fleet;
-	private final TaxiScheduler scheduler;
-	private final BestDispatchFinder dispatchFinder;
-	private final RuleBasedRequestInserter requestInserter;
+  private final Fleet fleet;
+  private final TaxiScheduler scheduler;
+  private final BestDispatchFinder dispatchFinder;
+  private final RuleBasedRequestInserter requestInserter;
 
-	private final Map<Id<Zone>, Zone> zones;
-	private IdMap<Zone, PriorityQueue<DvrpVehicle>> zoneToIdleVehicleQueue;
-	private final IdMap<Link, Zone> linkToZone;
+  private final Map<Id<Zone>, Zone> zones;
+  private IdMap<Zone, PriorityQueue<DvrpVehicle>> zoneToIdleVehicleQueue;
+  private final IdMap<Link, Zone> linkToZone;
 
-	public ZonalRequestInserter(Fleet fleet, TaxiScheduler scheduler, MobsimTimer timer, Network network, TravelTime travelTime,
-			TravelDisutility travelDisutility, ZonalTaxiOptimizerParams params, ZonalRegisters zonalRegisters, URL context) {
-		this.fleet = fleet;
-		this.scheduler = scheduler;
-		this.dispatchFinder = new BestDispatchFinder(scheduler.getScheduleInquiry(), network, timer, travelTime, travelDisutility);
-		this.requestInserter = new RuleBasedRequestInserter(scheduler, timer, dispatchFinder, params.getRuleBasedTaxiOptimizerParams(),
-				zonalRegisters);
+  public ZonalRequestInserter(
+      Fleet fleet,
+      TaxiScheduler scheduler,
+      MobsimTimer timer,
+      Network network,
+      TravelTime travelTime,
+      TravelDisutility travelDisutility,
+      ZonalTaxiOptimizerParams params,
+      ZonalRegisters zonalRegisters,
+      URL context) {
+    this.fleet = fleet;
+    this.scheduler = scheduler;
+    this.dispatchFinder =
+        new BestDispatchFinder(
+            scheduler.getScheduleInquiry(), network, timer, travelTime, travelDisutility);
+    this.requestInserter =
+        new RuleBasedRequestInserter(
+            scheduler,
+            timer,
+            dispatchFinder,
+            params.getRuleBasedTaxiOptimizerParams(),
+            zonalRegisters);
 
-		ZonalSystemParams zonalSystemParams = params.getZonalSystemParams();
-		zones = Zones.readZones(ConfigGroup.getInputFileURL(context, zonalSystemParams.zonesXmlFile),
-				ConfigGroup.getInputFileURL(context, zonalSystemParams.zonesShpFile));
-		// TODO No conversion of SRS is done
+    ZonalSystemParams zonalSystemParams = params.getZonalSystemParams();
+    zones =
+        Zones.readZones(
+            ConfigGroup.getInputFileURL(context, zonalSystemParams.zonesXmlFile),
+            ConfigGroup.getInputFileURL(context, zonalSystemParams.zonesShpFile));
+    // TODO No conversion of SRS is done
 
-		this.linkToZone = NetworkWithZonesUtils.createLinkToZoneMap(network, new ZoneFinderImpl(zones, zonalSystemParams.expansionDistance));
+    this.linkToZone =
+        NetworkWithZonesUtils.createLinkToZoneMap(
+            network, new ZoneFinderImpl(zones, zonalSystemParams.expansionDistance));
 
-		// FIXME zonal system used in RuleBasedTaxiOptim (for registers) should be equivalent to
-		// the zones used in ZonalTaxiOptim (for dispatching)
-	}
+    // FIXME zonal system used in RuleBasedTaxiOptim (for registers) should be equivalent to
+    // the zones used in ZonalTaxiOptim (for dispatching)
+  }
 
-	@Override
-	public void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests) {
-		initIdleVehiclesInZones();
-		scheduleUnplannedRequestsWithinZones(unplannedRequests);
+  @Override
+  public void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests) {
+    initIdleVehiclesInZones();
+    scheduleUnplannedRequestsWithinZones(unplannedRequests);
 
-		if (!unplannedRequests.isEmpty()) {
-			requestInserter.scheduleUnplannedRequests(unplannedRequests);
-		}
-	}
+    if (!unplannedRequests.isEmpty()) {
+      requestInserter.scheduleUnplannedRequests(unplannedRequests);
+    }
+  }
 
-	private void initIdleVehiclesInZones() {
-		// TODO use idle vehicle register instead...
+  private void initIdleVehiclesInZones() {
+    // TODO use idle vehicle register instead...
 
-		zoneToIdleVehicleQueue = new IdMap<>(Zone.class);
-		for (Id<Zone> zoneId : zones.keySet()) {
-			zoneToIdleVehicleQueue.put(zoneId, new PriorityQueue<>(10, LONGEST_WAITING_FIRST));
-		}
+    zoneToIdleVehicleQueue = new IdMap<>(Zone.class);
+    for (Id<Zone> zoneId : zones.keySet()) {
+      zoneToIdleVehicleQueue.put(zoneId, new PriorityQueue<>(10, LONGEST_WAITING_FIRST));
+    }
 
-		for (DvrpVehicle veh : fleet.getVehicles().values()) {
-			if (scheduler.getScheduleInquiry().isIdle(veh)) {
-				Link link = ((StayTask)veh.getSchedule().getCurrentTask()).getLink();
-				Zone zone = linkToZone.get(link.getId());
-				if (zone != null) {
-					PriorityQueue<DvrpVehicle> queue = zoneToIdleVehicleQueue.get(zone.getId());
-					queue.add(veh);
-				}
-			}
-		}
-	}
+    for (DvrpVehicle veh : fleet.getVehicles().values()) {
+      if (scheduler.getScheduleInquiry().isIdle(veh)) {
+        Link link = ((StayTask) veh.getSchedule().getCurrentTask()).getLink();
+        Zone zone = linkToZone.get(link.getId());
+        if (zone != null) {
+          PriorityQueue<DvrpVehicle> queue = zoneToIdleVehicleQueue.get(zone.getId());
+          queue.add(veh);
+        }
+      }
+    }
+  }
 
-	private void scheduleUnplannedRequestsWithinZones(Collection<DrtRequest> unplannedRequests) {
-		Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
-		while (reqIter.hasNext()) {
-			DrtRequest req = reqIter.next();
+  private void scheduleUnplannedRequestsWithinZones(Collection<DrtRequest> unplannedRequests) {
+    Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
+    while (reqIter.hasNext()) {
+      DrtRequest req = reqIter.next();
 
-			Zone zone = linkToZone.get(req.getFromLink().getId());
-			if (zone == null) {
-				continue;
-			}
+      Zone zone = linkToZone.get(req.getFromLink().getId());
+      if (zone == null) {
+        continue;
+      }
 
-			PriorityQueue<DvrpVehicle> idleVehsInZone = zoneToIdleVehicleQueue.get(zone.getId());
-			if (idleVehsInZone.isEmpty()) {
-				continue;
-			}
+      PriorityQueue<DvrpVehicle> idleVehsInZone = zoneToIdleVehicleQueue.get(zone.getId());
+      if (idleVehsInZone.isEmpty()) {
+        continue;
+      }
 
-			Stream<DvrpVehicle> filteredVehs = Stream.of(idleVehsInZone.peek());
-			BestDispatchFinder.Dispatch<DrtRequest> best = dispatchFinder.findBestVehicleForRequest(req, filteredVehs);
+      Stream<DvrpVehicle> filteredVehs = Stream.of(idleVehsInZone.peek());
+      BestDispatchFinder.Dispatch<DrtRequest> best =
+          dispatchFinder.findBestVehicleForRequest(req, filteredVehs);
 
-			if (best != null) {
-				scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
-				reqIter.remove();
-				idleVehsInZone.remove(best.vehicle);
-			}
-		}
-	}
+      if (best != null) {
+        scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
+        reqIter.remove();
+        idleVehsInZone.remove(best.vehicle);
+      }
+    }
+  }
 }

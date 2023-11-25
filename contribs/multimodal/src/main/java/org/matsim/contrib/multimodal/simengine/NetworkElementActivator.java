@@ -21,12 +21,12 @@
 package org.matsim.contrib.multimodal.simengine;
 
 public abstract class NetworkElementActivator {
-	
-	protected abstract void activateNode(final MultiModalQNodeExtension node);
-	
-	abstract int getNumberOfSimulatedNodes();
-	
-	protected abstract void activateLink(final MultiModalQLinkExtension link);
 
-	abstract int getNumberOfSimulatedLinks();
+  protected abstract void activateNode(final MultiModalQNodeExtension node);
+
+  abstract int getNumberOfSimulatedNodes();
+
+  protected abstract void activateLink(final MultiModalQLinkExtension link);
+
+  abstract int getNumberOfSimulatedLinks();
 }

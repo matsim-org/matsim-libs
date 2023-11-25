@@ -20,10 +20,8 @@ package org.matsim.core.api.internal;
 
 /**
  * @author nagel
- *
  */
 public interface MatsimWriter extends MatsimSomeWriter {
-	
-	public void write( String filename ) ;
 
+  public void write(String filename);
 }

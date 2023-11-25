@@ -5,79 +5,74 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
-import org.matsim.api.core.v01.population.Plan;
+import java.util.Arrays;
+import java.util.Collection;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.modechoice.EstimatorContext;
 import org.matsim.modechoice.PlanModel;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-
 /**
- * A less restrictive version of mass conservation on subtours.
- * This class ensures that on each subtour only one chain-based mode can be used.
+ * A less restrictive version of mass conservation on subtours. This class ensures that on each
+ * subtour only one chain-based mode can be used.
  */
 public final class RelaxedSubtourConstraint implements TripConstraint<int[]> {
 
-	private final ReferenceSet<String> chainBasedModes;
-	private final double coordDistance;
-	@Inject
-	public RelaxedSubtourConstraint(SubtourModeChoiceConfigGroup config) {
-		chainBasedModes = new ReferenceArraySet<>();
-		chainBasedModes.addAll(Arrays.asList(config.getChainBasedModes()));
-		coordDistance = config.getCoordDistance();
-	}
+  private final ReferenceSet<String> chainBasedModes;
+  private final double coordDistance;
 
-	@Override
-	public int[] getContext(EstimatorContext context, PlanModel model) {
+  @Inject
+  public RelaxedSubtourConstraint(SubtourModeChoiceConfigGroup config) {
+    chainBasedModes = new ReferenceArraySet<>();
+    chainBasedModes.addAll(Arrays.asList(config.getChainBasedModes()));
+    coordDistance = config.getCoordDistance();
+  }
 
-		Collection<TripStructureUtils.Subtour> subtours = TripStructureUtils.getSubtours(model.getPlan(), coordDistance);
+  @Override
+  public int[] getContext(EstimatorContext context, PlanModel model) {
 
-		// ids will contain unique identifier to which subtour a trip belongs.
-		int[] ids = new int[model.trips()];
+    Collection<TripStructureUtils.Subtour> subtours =
+        TripStructureUtils.getSubtours(model.getPlan(), coordDistance);
 
-		for (int i = 0; i < model.trips(); i++) {
+    // ids will contain unique identifier to which subtour a trip belongs.
+    int[] ids = new int[model.trips()];
 
-			int j = 0;
-			for (TripStructureUtils.Subtour st : subtours) {
-				if (st.getTrips().contains(model.getTrip(i)))
-					ids[i] |= (1 << j);
+    for (int i = 0; i < model.trips(); i++) {
 
-				j++;
-			}
-		}
+      int j = 0;
+      for (TripStructureUtils.Subtour st : subtours) {
+        if (st.getTrips().contains(model.getTrip(i))) ids[i] |= (1 << j);
 
-		return ids;
-	}
+        j++;
+      }
+    }
 
-	@SuppressWarnings("StringEquality")
-	@Override
-	public boolean isValid(int[] context, String[] modes) {
+    return ids;
+  }
 
-		// store the used chain based mode
-		Int2ReferenceMap<String> usedMode = new Int2ReferenceArrayMap<>();
+  @SuppressWarnings("StringEquality")
+  @Override
+  public boolean isValid(int[] context, String[] modes) {
 
-		for (int i = 0; i < modes.length; i++) {
+    // store the used chain based mode
+    Int2ReferenceMap<String> usedMode = new Int2ReferenceArrayMap<>();
 
-			String mode = modes[i];
+    for (int i = 0; i < modes.length; i++) {
 
-			if (mode == null)
-				continue;
+      String mode = modes[i];
 
-			String other = usedMode.putIfAbsent(context[i], mode);
+      if (mode == null) continue;
 
-			if (other == null)
-				continue;
+      String other = usedMode.putIfAbsent(context[i], mode);
 
-			// if one of the modes is chain based
-			// the same needs to be used on the whole subtrip
-			if (other != mode && (chainBasedModes.contains(mode) || chainBasedModes.contains(other)))
-				return false;
+      if (other == null) continue;
 
-		}
+      // if one of the modes is chain based
+      // the same needs to be used on the whole subtrip
+      if (other != mode && (chainBasedModes.contains(mode) || chainBasedModes.contains(other)))
+        return false;
+    }
 
-		return true;
-	}
+    return true;
+  }
 }

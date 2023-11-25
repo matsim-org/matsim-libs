@@ -19,12 +19,14 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.interfaces;
 
-
 /**
- * 
  * @author dgrether
- *
  */
 public enum SignalGroupState {
-	REDYELLOW, GREEN, YELLOW, RED, OFF, START_PLAN
+  REDYELLOW,
+  GREEN,
+  YELLOW,
+  RED,
+  OFF,
+  START_PLAN
 }

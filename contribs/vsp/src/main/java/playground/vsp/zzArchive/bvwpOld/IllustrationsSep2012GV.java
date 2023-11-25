@@ -1,49 +1,47 @@
 package playground.vsp.zzArchive.bvwpOld;
 
-
 public class IllustrationsSep2012GV {
 
-	private static Values economicValues;
-	private static ScenarioForEvalData nullfall;
-	private static ScenarioForEvalData planfall;
+  private static Values economicValues;
+  private static ScenarioForEvalData nullfall;
+  private static ScenarioForEvalData planfall;
 
-	public static void main(String[] args) {
+  public static void main(String[] args) {
 
-		// create the economic values
-		economicValues = EconomicValues.createEconomicValuesFictiveExampleGV();
+    // create the economic values
+    economicValues = EconomicValues.createEconomicValuesFictiveExampleGV();
 
-		// create the base case:
-		nullfall = ScenarioFictiveExampleSep2012GV.createNullfall1();
+    // create the base case:
+    nullfall = ScenarioFictiveExampleSep2012GV.createNullfall1();
 
-		// create the policy case:
-		planfall = ScenarioFictiveExampleSep2012GV.createPlanfall1(nullfall);
-		
-		System.out.print(economicValues.toString()) ;
+    // create the policy case:
+    planfall = ScenarioFictiveExampleSep2012GV.createPlanfall1(nullfall);
 
-		runBVWP2003();
-//		runBVWP2010();
-//		runRoH();
-		runBVWP2015();
-	}
+    System.out.print(economicValues.toString());
 
-	private static void runRoH() {
-		UtilityChanges utilityChanges = new UtilityChangesRuleOfHalf();
-		utilityChanges.computeAndPrintResults(economicValues, nullfall, planfall) ;		
-	}
+    runBVWP2003();
+    //		runBVWP2010();
+    //		runRoH();
+    runBVWP2015();
+  }
 
-	private static void runBVWP2003() {
-		UtilityChanges utilityChanges = new UtilityChangesBVWP2003();
-		utilityChanges.computeAndPrintResults(economicValues, nullfall, planfall) ;
-	}
+  private static void runRoH() {
+    UtilityChanges utilityChanges = new UtilityChangesRuleOfHalf();
+    utilityChanges.computeAndPrintResults(economicValues, nullfall, planfall);
+  }
 
-	private static void runBVWP2010() {
-		UtilityChanges utilityChanges = new UtilityChangesBVWP2010();
-		utilityChanges.computeAndPrintResults(economicValues, nullfall, planfall);
-	}
+  private static void runBVWP2003() {
+    UtilityChanges utilityChanges = new UtilityChangesBVWP2003();
+    utilityChanges.computeAndPrintResults(economicValues, nullfall, planfall);
+  }
 
-	private static void runBVWP2015() {
-		UtilityChanges utilityChanges = new UtilityChangesBVWP2015();
-		utilityChanges.computeAndPrintResults(economicValues, nullfall, planfall) ;
-	}
+  private static void runBVWP2010() {
+    UtilityChanges utilityChanges = new UtilityChangesBVWP2010();
+    utilityChanges.computeAndPrintResults(economicValues, nullfall, planfall);
+  }
 
+  private static void runBVWP2015() {
+    UtilityChanges utilityChanges = new UtilityChangesBVWP2015();
+    utilityChanges.computeAndPrintResults(economicValues, nullfall, planfall);
+  }
 }

@@ -1,9 +1,7 @@
 package org.matsim.application.options;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.matsim.application.CommandSpec;
-import org.matsim.application.MATSimAppCommand;
-import picocli.CommandLine;
+import static org.matsim.application.options.InputOptions.argName;
+import static org.matsim.application.options.InputOptions.argNames;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -12,89 +10,84 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.apache.commons.lang3.ArrayUtils;
+import org.matsim.application.CommandSpec;
+import org.matsim.application.MATSimAppCommand;
+import picocli.CommandLine;
 
-import static org.matsim.application.options.InputOptions.argName;
-import static org.matsim.application.options.InputOptions.argNames;
-
-/**
- * Automatically defines output options by reading the {@link CommandSpec} annotation.
- */
+/** Automatically defines output options by reading the {@link CommandSpec} annotation. */
 public final class OutputOptions {
 
-	private final CommandSpec spec;
-	private final Map<String, Path> outputs = new HashMap<>();
-	/**
-	 * Needs to be present or the mixin will not be processed at all.
-	 */
-	@CommandLine.Option(names = "--unused-output-option", hidden = true)
-	private String unused;
+  private final CommandSpec spec;
+  private final Map<String, Path> outputs = new HashMap<>();
 
-	private OutputOptions(CommandSpec spec) {
-		this.spec = spec;
-	}
+  /** Needs to be present or the mixin will not be processed at all. */
+  @CommandLine.Option(names = "--unused-output-option", hidden = true)
+  private String unused;
 
-	/**
-	 * Creates a new instance by evaluating the {@link CommandSpec} annotation.
-	 */
-	public static OutputOptions ofCommand(Class<? extends MATSimAppCommand> command) {
-		CommandSpec spec = command.getAnnotation(CommandSpec.class);
-		if (spec == null)
-			throw new IllegalArgumentException("CommandSpec annotation must be present on " + command);
-		return new OutputOptions(spec);
-	}
+  private OutputOptions(CommandSpec spec) {
+    this.spec = spec;
+  }
 
-	/**
-	 * Get the first configured output path.
-	 */
-	public Path getPath() {
+  /** Creates a new instance by evaluating the {@link CommandSpec} annotation. */
+  public static OutputOptions ofCommand(Class<? extends MATSimAppCommand> command) {
+    CommandSpec spec = command.getAnnotation(CommandSpec.class);
+    if (spec == null)
+      throw new IllegalArgumentException("CommandSpec annotation must be present on " + command);
+    return new OutputOptions(spec);
+  }
 
-		if (spec.produces().length == 0)
-			throw new IllegalArgumentException("There is no output defined for this command");
+  /** Get the first configured output path. */
+  public Path getPath() {
 
-		return getPath(spec.produces()[0]);
-	}
+    if (spec.produces().length == 0)
+      throw new IllegalArgumentException("There is no output defined for this command");
 
-	/**
-	 * Get the output path configured for a specific name.
-	 */
-	public Path getPath(String name) {
+    return getPath(spec.produces()[0]);
+  }
 
-		if (!ArrayUtils.contains(spec.produces(), name))
-			throw new IllegalArgumentException(String.format("The output file '%s' is not defined in the @CommandSpec", name));
+  /** Get the output path configured for a specific name. */
+  public Path getPath(String name) {
 
-		Path output = outputs.containsKey(name) ? outputs.get(name) : Path.of(name);
-		try {
-			Files.createDirectories(output.toAbsolutePath().getParent());
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+    if (!ArrayUtils.contains(spec.produces(), name))
+      throw new IllegalArgumentException(
+          String.format("The output file '%s' is not defined in the @CommandSpec", name));
 
-		return output;
-	}
+    Path output = outputs.containsKey(name) ? outputs.get(name) : Path.of(name);
+    try {
+      Files.createDirectories(output.toAbsolutePath().getParent());
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
 
-	@CommandLine.Spec(CommandLine.Spec.Target.MIXEE)
-	void setSpec(CommandLine.Model.CommandSpec command) {
+    return output;
+  }
 
-		command.mixinStandardHelpOptions(true);
+  @CommandLine.Spec(CommandLine.Spec.Target.MIXEE)
+  void setSpec(CommandLine.Model.CommandSpec command) {
 
-		AtomicBoolean flag = new AtomicBoolean(false);
-		for (String produce : spec.produces()) {
+    command.mixinStandardHelpOptions(true);
 
-			CommandLine.Model.OptionSpec.Builder arg = CommandLine.Model.OptionSpec.
-					builder(argNames(flag, "--output", "--output-" + argName(produce)))
-					.type(Path.class)
-					.setter(new CommandLine.Model.ISetter() {
-						@Override
-						public <T> T set(T value) {
-							outputs.put(produce, (Path) value);
-							return value;
-						}
-					})
-					.defaultValue(produce)
-					.description("Desired output path for " + produce + ".")
-					.required(false);
+    AtomicBoolean flag = new AtomicBoolean(false);
+    for (String produce : spec.produces()) {
 
-			command.add(arg.build());
-		}
-	}
+      CommandLine.Model.OptionSpec.Builder arg =
+          CommandLine.Model.OptionSpec.builder(
+                  argNames(flag, "--output", "--output-" + argName(produce)))
+              .type(Path.class)
+              .setter(
+                  new CommandLine.Model.ISetter() {
+                    @Override
+                    public <T> T set(T value) {
+                      outputs.put(produce, (Path) value);
+                      return value;
+                    }
+                  })
+              .defaultValue(produce)
+              .description("Desired output path for " + produce + ".")
+              .required(false);
+
+      command.add(arg.build());
+    }
+  }
 }

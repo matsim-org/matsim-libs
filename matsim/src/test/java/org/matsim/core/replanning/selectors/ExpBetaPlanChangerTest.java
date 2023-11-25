@@ -27,11 +27,11 @@ package org.matsim.core.replanning.selectors;
  */
 public class ExpBetaPlanChangerTest extends AbstractPlanSelectorTest {
 
-	@Override
-	protected ExpBetaPlanChanger getPlanSelector() {
-		return new ExpBetaPlanChanger(2.0);
-	}
+  @Override
+  protected ExpBetaPlanChanger getPlanSelector() {
+    return new ExpBetaPlanChanger(2.0);
+  }
 
-	// TODO write specific tests for ExpBetaPlanChanger, see ExpBetaPlanSelectorTest for examples
+  // TODO write specific tests for ExpBetaPlanChanger, see ExpBetaPlanSelectorTest for examples
 
 }

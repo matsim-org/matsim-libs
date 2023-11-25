@@ -23,12 +23,13 @@ package org.matsim.withinday.replanning.replanners.interfaces;
 import org.matsim.core.mobsim.qsim.ActivityEndReschedulerProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 
-public abstract class WithinDayDuringLegReplannerFactory extends WithinDayReplannerFactory<DuringLegAgentSelector> {
+public abstract class WithinDayDuringLegReplannerFactory
+    extends WithinDayReplannerFactory<DuringLegAgentSelector> {
 
-	public WithinDayDuringLegReplannerFactory(ActivityEndReschedulerProvider withinDayEngine) {
-		super(withinDayEngine);
-	}
-	
-	@Override
-	public abstract WithinDayDuringLegReplanner createReplanner();
+  public WithinDayDuringLegReplannerFactory(ActivityEndReschedulerProvider withinDayEngine) {
+    super(withinDayEngine);
+  }
+
+  @Override
+  public abstract WithinDayDuringLegReplanner createReplanner();
 }

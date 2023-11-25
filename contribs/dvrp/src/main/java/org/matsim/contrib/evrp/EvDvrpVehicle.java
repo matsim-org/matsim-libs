@@ -33,55 +33,55 @@ import org.matsim.vehicles.Vehicle;
  * @author michalm
  */
 public class EvDvrpVehicle implements DvrpVehicle {
-	static EvDvrpVehicle create(DvrpVehicle vehicle, ElectricFleet evFleet) {
-		return new EvDvrpVehicle(vehicle,
-				evFleet.getElectricVehicles().get(Id.create(vehicle.getId(), Vehicle.class)));
-	}
+  static EvDvrpVehicle create(DvrpVehicle vehicle, ElectricFleet evFleet) {
+    return new EvDvrpVehicle(
+        vehicle, evFleet.getElectricVehicles().get(Id.create(vehicle.getId(), Vehicle.class)));
+  }
 
-	private final DvrpVehicle vehicle;
-	private final ElectricVehicle electricVehicle;
+  private final DvrpVehicle vehicle;
+  private final ElectricVehicle electricVehicle;
 
-	public EvDvrpVehicle(DvrpVehicle vehicle, ElectricVehicle electricVehicle) {
-		this.vehicle = vehicle;
-		this.electricVehicle = electricVehicle;
-	}
+  public EvDvrpVehicle(DvrpVehicle vehicle, ElectricVehicle electricVehicle) {
+    this.vehicle = vehicle;
+    this.electricVehicle = electricVehicle;
+  }
 
-	public ElectricVehicle getElectricVehicle() {
-		return electricVehicle;
-	}
+  public ElectricVehicle getElectricVehicle() {
+    return electricVehicle;
+  }
 
-	@Override
-	public Id<DvrpVehicle> getId() {
-		return vehicle.getId();
-	}
+  @Override
+  public Id<DvrpVehicle> getId() {
+    return vehicle.getId();
+  }
 
-	@Override
-	public Link getStartLink() {
-		return vehicle.getStartLink();
-	}
+  @Override
+  public Link getStartLink() {
+    return vehicle.getStartLink();
+  }
 
-	@Override
-	public int getCapacity() {
-		return vehicle.getCapacity();
-	}
+  @Override
+  public int getCapacity() {
+    return vehicle.getCapacity();
+  }
 
-	@Override
-	public double getServiceBeginTime() {
-		return vehicle.getServiceBeginTime();
-	}
+  @Override
+  public double getServiceBeginTime() {
+    return vehicle.getServiceBeginTime();
+  }
 
-	@Override
-	public double getServiceEndTime() {
-		return vehicle.getServiceEndTime();
-	}
+  @Override
+  public double getServiceEndTime() {
+    return vehicle.getServiceEndTime();
+  }
 
-	@Override
-	public Schedule getSchedule() {
-		return vehicle.getSchedule();
-	}
+  @Override
+  public Schedule getSchedule() {
+    return vehicle.getSchedule();
+  }
 
-	@Override
-	public DvrpVehicleSpecification getSpecification() {
-		return vehicle.getSpecification();
-	}
+  @Override
+  public DvrpVehicleSpecification getSpecification() {
+    return vehicle.getSpecification();
+  }
 }

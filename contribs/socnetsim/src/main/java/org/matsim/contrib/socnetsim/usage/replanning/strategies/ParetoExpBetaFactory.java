@@ -19,42 +19,37 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.gbl.MatsimRandom;
-
 import com.google.inject.Inject;
-
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.socnetsim.framework.replanning.NonInnovativeStrategyFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.LogitWeight;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.ParetoWeight;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.highestweightselection.HighestWeightSelector;
+import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * @author thibautd
  */
 public class ParetoExpBetaFactory extends NonInnovativeStrategyFactory {
 
-	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
-	private final Scenario sc;
+  private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+  private final Scenario sc;
 
-	@Inject
-	public ParetoExpBetaFactory( IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory , Scenario sc ) {
-		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
-		this.sc = sc;
-	}
+  @Inject
+  public ParetoExpBetaFactory(
+      IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory, Scenario sc) {
+    this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+    this.sc = sc;
+  }
 
-
-	@Override
-	public GroupLevelPlanSelector createSelector() {
-		return
-				new HighestWeightSelector(
-						incompatiblePlansIdentifierFactory,
-						new ParetoWeight(
-							new LogitWeight(
-								MatsimRandom.getLocalInstance(),
-								sc.getConfig().scoring().getBrainExpBeta())) );
-	}
+  @Override
+  public GroupLevelPlanSelector createSelector() {
+    return new HighestWeightSelector(
+        incompatiblePlansIdentifierFactory,
+        new ParetoWeight(
+            new LogitWeight(
+                MatsimRandom.getLocalInstance(), sc.getConfig().scoring().getBrainExpBeta())));
+  }
 }
-

@@ -22,7 +22,6 @@ package org.matsim.core.router;
 
 import java.util.Collection;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -38,78 +37,78 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  */
 public class ImaginaryNode implements Node {
 
-	/*package*/ final Collection<? extends InitialNode> initialNodes;
-	/*package*/ final Coord coord;
+  /*package*/ final Collection<? extends InitialNode> initialNodes;
+  /*package*/ final Coord coord;
 
-	 ImaginaryNode(Collection<? extends InitialNode> initialNodes, Coord coord) {
-		this.initialNodes = initialNodes;
-		this.coord = coord;
-	}
+  ImaginaryNode(Collection<? extends InitialNode> initialNodes, Coord coord) {
+    this.initialNodes = initialNodes;
+    this.coord = coord;
+  }
 
-	 ImaginaryNode(Collection<? extends InitialNode> initialNodes) {
-		this.initialNodes = initialNodes;
+  ImaginaryNode(Collection<? extends InitialNode> initialNodes) {
+    this.initialNodes = initialNodes;
 
-		double sumX = 0.0;
-		double sumY = 0.0;
+    double sumX = 0.0;
+    double sumY = 0.0;
 
-		for (InitialNode initialNode : initialNodes) {
-			sumX += initialNode.node.getCoord().getX();
-			sumY += initialNode.node.getCoord().getY();
-		}
+    for (InitialNode initialNode : initialNodes) {
+      sumX += initialNode.node.getCoord().getX();
+      sumY += initialNode.node.getCoord().getY();
+    }
 
-		sumX /= initialNodes.size();
-		sumY /= initialNodes.size();
+    sumX /= initialNodes.size();
+    sumY /= initialNodes.size();
 
-		this.coord = new Coord(sumX, sumY);
-	}
+    this.coord = new Coord(sumX, sumY);
+  }
 
-	@Override
-	public Coord getCoord() {
-		return this.coord;
-	}
+  @Override
+  public Coord getCoord() {
+    return this.coord;
+  }
 
-	@Override
-	public Id<Node> getId() {
-		return null;
-	}
+  @Override
+  public Id<Node> getId() {
+    return null;
+  }
 
-	@Override
-	public boolean addInLink(Link link) {
-		return false;
-	}
+  @Override
+  public boolean addInLink(Link link) {
+    return false;
+  }
 
-	@Override
-	public boolean addOutLink(Link link) {
-		return false;
-	}
+  @Override
+  public boolean addOutLink(Link link) {
+    return false;
+  }
 
-	@Override
-	public Map<Id<Link>, ? extends Link> getInLinks() {
-		return null;
-	}
+  @Override
+  public Map<Id<Link>, ? extends Link> getInLinks() {
+    return null;
+  }
 
-	@Override
-	public Map<Id<Link>, ? extends Link> getOutLinks() {
-		return null;
-	}
+  @Override
+  public Map<Id<Link>, ? extends Link> getOutLinks() {
+    return null;
+  }
 
-	@Override
-	public Link removeInLink(Id<Link> linkId) {
-		throw new RuntimeException("not implemented") ;
-	}
+  @Override
+  public Link removeInLink(Id<Link> linkId) {
+    throw new RuntimeException("not implemented");
+  }
 
-	@Override
-	public Link removeOutLink(Id<Link> outLinkId) {
-		throw new RuntimeException("not implemented") ;
-	}
+  @Override
+  public Link removeOutLink(Id<Link> outLinkId) {
+    throw new RuntimeException("not implemented");
+  }
 
-	@Override
-	public void setCoord(Coord coord) {
-		throw new RuntimeException("not implemented") ;
-	}
+  @Override
+  public void setCoord(Coord coord) {
+    throw new RuntimeException("not implemented");
+  }
 
-	@Override
-	public Attributes getAttributes() {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public Attributes getAttributes() {
+    throw new UnsupportedOperationException();
+  }
 }

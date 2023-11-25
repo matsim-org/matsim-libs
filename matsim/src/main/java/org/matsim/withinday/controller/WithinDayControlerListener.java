@@ -20,6 +20,13 @@
 
 package org.matsim.withinday.controller;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -39,130 +46,130 @@ import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 /**
- * Attempt to realize functionality provided by WithinDayController by
- * a ControlerListener (similar to what is done by the MultiModalControlerListener).
+ * Attempt to realize functionality provided by WithinDayController by a ControlerListener (similar
+ * to what is done by the MultiModalControlerListener).
  *
- * Note: this class has to be registered as Controller Listener!
+ * <p>Note: this class has to be registered as Controller Listener!
  *
  * @author cdobler
  */
 public class WithinDayControlerListener implements StartupListener {
 
-	private static final Logger log = LogManager.getLogger(WithinDayControlerListener.class);
+  private static final Logger log = LogManager.getLogger(WithinDayControlerListener.class);
 
-	private int numReplanningThreads = 0;
-	@Inject private WithinDayTravelTime withinDayTravelTime;
-	@Inject private ActivityReplanningMap activityReplanningMap;
-	@Inject private LinkReplanningMap linkReplanningMap;
-	@Inject private MobsimDataProvider mobsimDataProvider;
-	@Inject private EarliestLinkExitTimeProvider earliestLinkExitTimeProvider;
+  private int numReplanningThreads = 0;
+  @Inject private WithinDayTravelTime withinDayTravelTime;
+  @Inject private ActivityReplanningMap activityReplanningMap;
+  @Inject private LinkReplanningMap linkReplanningMap;
+  @Inject private MobsimDataProvider mobsimDataProvider;
+  @Inject private EarliestLinkExitTimeProvider earliestLinkExitTimeProvider;
 
-	@Inject private EventsManager eventsManager;
-	@Inject private Scenario scenario;
+  @Inject private EventsManager eventsManager;
+  @Inject private Scenario scenario;
 
-	@Inject private WithinDayEngine withinDayEngine;
-	@Inject private FixedOrderSimulationListener fosl;
-	private final Map<String, TravelTime> multiModalTravelTimes = new HashMap<String, TravelTime>();
+  @Inject private WithinDayEngine withinDayEngine;
+  @Inject private FixedOrderSimulationListener fosl;
+  private final Map<String, TravelTime> multiModalTravelTimes = new HashMap<String, TravelTime>();
 
-	public void setNumberOfReplanningThreads(int threads) {
-		throw new RuntimeException(this.getClass().toString() + " configuration has already been locked!");
-	}
+  public void setNumberOfReplanningThreads(int threads) {
+    throw new RuntimeException(
+        this.getClass().toString() + " configuration has already been locked!");
+  }
 
-	public void setTravelDisutilityFactory(TravelDisutilityFactory travelDisutilityFactory) {
-		throw new RuntimeException(this.getClass().toString() + " configuration has already been locked!");
-	}
+  public void setTravelDisutilityFactory(TravelDisutilityFactory travelDisutilityFactory) {
+    throw new RuntimeException(
+        this.getClass().toString() + " configuration has already been locked!");
+  }
 
-	public void setLeastCostPathCalculatorFactory(LeastCostPathCalculatorFactory leastCostPathCalculatorFactory) {
-		throw new RuntimeException(this.getClass().toString() + " configuration has already been locked!");
-	}
+  public void setLeastCostPathCalculatorFactory(
+      LeastCostPathCalculatorFactory leastCostPathCalculatorFactory) {
+    throw new RuntimeException(
+        this.getClass().toString() + " configuration has already been locked!");
+  }
 
-	public void setTransitRouterFactory(Provider<TransitRouter> transitRouterFactory) {
-		throw new RuntimeException(this.getClass().toString() + " configuration has already been locked!");
-	}
+  public void setTransitRouterFactory(Provider<TransitRouter> transitRouterFactory) {
+    throw new RuntimeException(
+        this.getClass().toString() + " configuration has already been locked!");
+  }
 
-	public void setModesAnalyzedByWithinDayTravelTime(Set<String> modes) {
-		throw new RuntimeException(this.getClass().toString() + " configuration has already been locked!");
-	}
+  public void setModesAnalyzedByWithinDayTravelTime(Set<String> modes) {
+    throw new RuntimeException(
+        this.getClass().toString() + " configuration has already been locked!");
+  }
 
-	public Map<String, TravelTime> getMultiModalTravelTimes() {
-		return Collections.unmodifiableMap(this.multiModalTravelTimes);
-	}
+  public Map<String, TravelTime> getMultiModalTravelTimes() {
+    return Collections.unmodifiableMap(this.multiModalTravelTimes);
+  }
 
-	public void addMultiModalTravelTimes(Map<String, TravelTime> multiModalTravelTimes) {
-		for (Entry<String, TravelTime> entry : multiModalTravelTimes.entrySet()) {
-			this.addMultiModalTravelTime(entry.getKey(), entry.getValue());
-		}
-	}
+  public void addMultiModalTravelTimes(Map<String, TravelTime> multiModalTravelTimes) {
+    for (Entry<String, TravelTime> entry : multiModalTravelTimes.entrySet()) {
+      this.addMultiModalTravelTime(entry.getKey(), entry.getValue());
+    }
+  }
 
-	public void addMultiModalTravelTime(String mode, TravelTime travelTime) {
-		throw new RuntimeException(this.getClass().toString() + " configuration has already been locked!");
-	}
+  public void addMultiModalTravelTime(String mode, TravelTime travelTime) {
+    throw new RuntimeException(
+        this.getClass().toString() + " configuration has already been locked!");
+  }
 
-	public WithinDayTravelTime getWithinDayTravelTime() {
-		return this.withinDayTravelTime;
-	}
+  public WithinDayTravelTime getWithinDayTravelTime() {
+    return this.withinDayTravelTime;
+  }
 
-	public EarliestLinkExitTimeProvider getEarliestLinkExitTimeProvider() {
-		return this.earliestLinkExitTimeProvider;
-	}
+  public EarliestLinkExitTimeProvider getEarliestLinkExitTimeProvider() {
+    return this.earliestLinkExitTimeProvider;
+  }
 
-	public void setWithinDayTripRouterFactory(Provider<TripRouter> tripRouterFactory) {
-		throw new RuntimeException(this.getClass().toString() + " configuration has already been locked!");
-	}
+  public void setWithinDayTripRouterFactory(Provider<TripRouter> tripRouterFactory) {
+    throw new RuntimeException(
+        this.getClass().toString() + " configuration has already been locked!");
+  }
 
-	public FixedOrderSimulationListener getFixedOrderSimulationListener() {
-		return this.fosl;
-	}
-	/*
-	 * ===================================================================
-	 */
+  public FixedOrderSimulationListener getFixedOrderSimulationListener() {
+    return this.fosl;
+  }
 
-	/*
-	 * When the Controller Startup Event is created, the EventsManager
-	 * has already been initialized. Therefore we can initialize now
-	 * all Objects, that have to be registered at the EventsManager.
-	 */
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		this.initWithinDayEngine(this.numReplanningThreads);
-		this.createAndInitMobsimDataProvider();
-		this.createAndInitActivityReplanningMap();
-		this.createAndInitLinkReplanningMap();
-	}
+  /*
+   * ===================================================================
+   */
 
-	/*
-	 * ===================================================================
-	 * creation and initialization methods
-	 * ===================================================================
-	 */
+  /*
+   * When the Controller Startup Event is created, the EventsManager
+   * has already been initialized. Therefore we can initialize now
+   * all Objects, that have to be registered at the EventsManager.
+   */
+  @Override
+  public void notifyStartup(StartupEvent event) {
+    this.initWithinDayEngine(this.numReplanningThreads);
+    this.createAndInitMobsimDataProvider();
+    this.createAndInitActivityReplanningMap();
+    this.createAndInitLinkReplanningMap();
+  }
 
-	/*
-	 * TODO: Add a Within-Day Group to the Config. Then this method
-	 * can be called on startup.
-	 */
-	private void initWithinDayEngine(int numOfThreads) {
-		log.info("Initialize WithinDayEngine");
-	}
+  /*
+   * ===================================================================
+   * creation and initialization methods
+   * ===================================================================
+   */
 
-	private void createAndInitMobsimDataProvider() {
-		this.getFixedOrderSimulationListener().addSimulationListener(this.mobsimDataProvider);
-	}
+  /*
+   * TODO: Add a Within-Day Group to the Config. Then this method
+   * can be called on startup.
+   */
+  private void initWithinDayEngine(int numOfThreads) {
+    log.info("Initialize WithinDayEngine");
+  }
 
-	private void createAndInitActivityReplanningMap() {
-		fosl.addSimulationListener(activityReplanningMap);
-	}
+  private void createAndInitMobsimDataProvider() {
+    this.getFixedOrderSimulationListener().addSimulationListener(this.mobsimDataProvider);
+  }
 
-	private void createAndInitLinkReplanningMap() {
-		this.fosl.addSimulationListener(linkReplanningMap);
-	}
+  private void createAndInitActivityReplanningMap() {
+    fosl.addSimulationListener(activityReplanningMap);
+  }
 
+  private void createAndInitLinkReplanningMap() {
+    this.fosl.addSimulationListener(linkReplanningMap);
+  }
 }

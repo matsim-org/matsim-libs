@@ -21,6 +21,8 @@
  */
 package org.matsim.core.events.algorithms;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
@@ -29,40 +31,37 @@ import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
- * Basic event handler that collects the relation between vehicles and drivers.
- * Necessary since link enter and leave events do not contain the driver anymore.
- * 
+ * Basic event handler that collects the relation between vehicles and drivers. Necessary since link
+ * enter and leave events do not contain the driver anymore.
+ *
  * @author tthunig
  */
-public final class Vehicle2DriverEventHandler implements VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+public final class Vehicle2DriverEventHandler
+    implements VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
-	private final Map<Id<Vehicle>, Id<Person>> driverAgents = new ConcurrentHashMap<>();
-	
-	@Override
-	public void reset(int iteration) {
-		driverAgents.clear();
-	}
+  private final Map<Id<Vehicle>, Id<Person>> driverAgents = new ConcurrentHashMap<>();
 
-	@Override
-	public void handleEvent(VehicleEntersTrafficEvent event) {
-		driverAgents.put(event.getVehicleId(), event.getPersonId());
-	}
+  @Override
+  public void reset(int iteration) {
+    driverAgents.clear();
+  }
 
-	@Override
-	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		driverAgents.remove(event.getVehicleId());
-	}
-	
-	/**
-	 * @param vehicleId the unique vehicle identifier.
-	 * @return person id of the driver
-	 */
-	public Id<Person> getDriverOfVehicle(Id<Vehicle> vehicleId){
-		return driverAgents.get(vehicleId);
-	}
+  @Override
+  public void handleEvent(VehicleEntersTrafficEvent event) {
+    driverAgents.put(event.getVehicleId(), event.getPersonId());
+  }
 
+  @Override
+  public void handleEvent(VehicleLeavesTrafficEvent event) {
+    driverAgents.remove(event.getVehicleId());
+  }
+
+  /**
+   * @param vehicleId the unique vehicle identifier.
+   * @return person id of the driver
+   */
+  public Id<Person> getDriverOfVehicle(Id<Vehicle> vehicleId) {
+    return driverAgents.get(vehicleId);
+  }
 }

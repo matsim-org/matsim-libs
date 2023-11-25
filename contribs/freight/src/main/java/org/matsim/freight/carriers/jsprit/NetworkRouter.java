@@ -28,23 +28,25 @@ import org.matsim.freight.carriers.controler.CarrierTimeAndSpaceTourRouter;
  * Router that routes {@link CarrierPlan}.
  *
  * @author stefan schröder
- *
  */
 public class NetworkRouter {
 
-	/**
-	 * Routes the {@link CarrierPlan} with the router defined in {@link NetworkBasedTransportCosts}.
-	 *
-	 * <p>Note that this changes the plan, i.e. it adds routes to the input-plan.
-	 *
-	 * @param {@link CarrierPlan}
-	 * @param {@link NetworkBasedTransportCosts}
-	 */
-	public static void routePlan(CarrierPlan plan, VRPTransportCosts freightTransportCosts){
-		if( plan == null) throw new IllegalStateException("plan is missing.");
-		for( ScheduledTour tour : plan.getScheduledTours()){
-			new CarrierTimeAndSpaceTourRouter( freightTransportCosts.getRouter(), freightTransportCosts.getNetwork(), freightTransportCosts.getTravelTime()).route(tour );
-		}
-	}
-
+  /**
+   * Routes the {@link CarrierPlan} with the router defined in {@link NetworkBasedTransportCosts}.
+   *
+   * <p>Note that this changes the plan, i.e. it adds routes to the input-plan.
+   *
+   * @param {@link CarrierPlan}
+   * @param {@link NetworkBasedTransportCosts}
+   */
+  public static void routePlan(CarrierPlan plan, VRPTransportCosts freightTransportCosts) {
+    if (plan == null) throw new IllegalStateException("plan is missing.");
+    for (ScheduledTour tour : plan.getScheduledTours()) {
+      new CarrierTimeAndSpaceTourRouter(
+              freightTransportCosts.getRouter(),
+              freightTransportCosts.getNetwork(),
+              freightTransportCosts.getTravelTime())
+          .route(tour);
+    }
+  }
 }

@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.ToDoubleFunction;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
@@ -35,51 +34,57 @@ import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.ZonalDemandE
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
- * TODO add some description
- * if no demand => zone is not active => target is 0
- * if demand > 0 => equally distribute all available vehicles
+ * TODO add some description if no demand => zone is not active => target is 0 if demand > 0 =>
+ * equally distribute all available vehicles
  */
-public class EqualRebalancableVehicleDistributionTargetCalculator implements RebalancingTargetCalculator {
-	private static final Logger log = LogManager.getLogger(EqualRebalancableVehicleDistributionTargetCalculator.class);
+public class EqualRebalancableVehicleDistributionTargetCalculator
+    implements RebalancingTargetCalculator {
+  private static final Logger log =
+      LogManager.getLogger(EqualRebalancableVehicleDistributionTargetCalculator.class);
 
-	private final ZonalDemandEstimator demandEstimator;
-	private final DrtZonalSystem zonalSystem;
-	private final double demandEstimationPeriod;
+  private final ZonalDemandEstimator demandEstimator;
+  private final DrtZonalSystem zonalSystem;
+  private final double demandEstimationPeriod;
 
-	public EqualRebalancableVehicleDistributionTargetCalculator(ZonalDemandEstimator demandEstimator,
-			DrtZonalSystem zonalSystem, double demandEstimationPeriod) {
-		this.demandEstimator = demandEstimator;
-		this.zonalSystem = zonalSystem;
-		this.demandEstimationPeriod = demandEstimationPeriod;
-	}
+  public EqualRebalancableVehicleDistributionTargetCalculator(
+      ZonalDemandEstimator demandEstimator,
+      DrtZonalSystem zonalSystem,
+      double demandEstimationPeriod) {
+    this.demandEstimator = demandEstimator;
+    this.zonalSystem = zonalSystem;
+    this.demandEstimationPeriod = demandEstimationPeriod;
+  }
 
-	@Override
-	public ToDoubleFunction<DrtZone> calculate(double time,
-			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
-		int numAvailableVehicles = rebalancableVehiclesPerZone.values().stream().mapToInt(List::size).sum();
+  @Override
+  public ToDoubleFunction<DrtZone> calculate(
+      double time, Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
+    int numAvailableVehicles =
+        rebalancableVehiclesPerZone.values().stream().mapToInt(List::size).sum();
 
-		ToDoubleFunction<DrtZone> currentDemandEstimator = demandEstimator.getExpectedDemand(time,
-				demandEstimationPeriod);
-		Set<DrtZone> activeZones = zonalSystem.getZones()
-				.values()
-				.stream()
-				.filter(zone -> currentDemandEstimator.applyAsDouble(zone) > 0)
-				.collect(toSet());
+    ToDoubleFunction<DrtZone> currentDemandEstimator =
+        demandEstimator.getExpectedDemand(time, demandEstimationPeriod);
+    Set<DrtZone> activeZones =
+        zonalSystem.getZones().values().stream()
+            .filter(zone -> currentDemandEstimator.applyAsDouble(zone) > 0)
+            .collect(toSet());
 
-		// TODO enable different methods for real time target generation by adding
-		// switch and corresponding parameter entry in the parameter file
+    // TODO enable different methods for real time target generation by adding
+    // switch and corresponding parameter entry in the parameter file
 
-		log.debug("Perform Adaptive Real Time Rebalancing now: " + numAvailableVehicles + " vehicles available");
+    log.debug(
+        "Perform Adaptive Real Time Rebalancing now: "
+            + numAvailableVehicles
+            + " vehicles available");
 
-		// First implementation: Simply evenly distribute the rebalancable (i.e. idling
-		// and have enough service time) across the network
-		if (activeZones.isEmpty()) {
-			log.debug(
-					"There is no active zones at this time period. No vehicles will be assigned to rebalance task at this period");
-			return zone -> 0;
-		}
+    // First implementation: Simply evenly distribute the rebalancable (i.e. idling
+    // and have enough service time) across the network
+    if (activeZones.isEmpty()) {
+      log.debug(
+          "There is no active zones at this time period. No vehicles will be assigned to rebalance task at this period");
+      return zone -> 0;
+    }
 
-		double targetValue = (double)numAvailableVehicles / activeZones.size();
-		return zone -> activeZones.contains(zone) ? targetValue : 0;
-	}
+    double targetValue = (double) numAvailableVehicles / activeZones.size();
+    return zone -> activeZones.contains(zone) ? targetValue : 0;
+  }
 }

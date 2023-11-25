@@ -24,11 +24,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
@@ -38,74 +36,67 @@ import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
  * @author thibautd
  */
 public class RecomposeJointPlanAlgorithm implements GenericPlanAlgorithm<GroupPlans> {
-	private final PlanLinkIdentifier linkIdentifier;
-	private final JointPlanFactory factory;
+  private final PlanLinkIdentifier linkIdentifier;
+  private final JointPlanFactory factory;
 
-	public RecomposeJointPlanAlgorithm(
-			final JointPlanFactory jointPlanFactory,
-			final PlanLinkIdentifier linkIdentifier) {
-		this.factory = jointPlanFactory;
-		this.linkIdentifier = linkIdentifier;
-	}
+  public RecomposeJointPlanAlgorithm(
+      final JointPlanFactory jointPlanFactory, final PlanLinkIdentifier linkIdentifier) {
+    this.factory = jointPlanFactory;
+    this.linkIdentifier = linkIdentifier;
+  }
 
-	@Override
-	public void run(final GroupPlans groupPlans) {
-		final Map<Id<Person>, Plan> plansMap = getPlansMap( groupPlans );
+  @Override
+  public void run(final GroupPlans groupPlans) {
+    final Map<Id<Person>, Plan> plansMap = getPlansMap(groupPlans);
 
-		groupPlans.clear();
-		while (plansMap.size() > 0) {
-			final Plan plan = plansMap.remove( plansMap.keySet().iterator().next() );
-			final Map<Id<Person>, Plan> jpMap = new HashMap< >();
-			jpMap.put( plan.getPerson().getId() , plan );
+    groupPlans.clear();
+    while (plansMap.size() > 0) {
+      final Plan plan = plansMap.remove(plansMap.keySet().iterator().next());
+      final Map<Id<Person>, Plan> jpMap = new HashMap<>();
+      jpMap.put(plan.getPerson().getId(), plan);
 
-			findDependentPlans( plan , jpMap , plansMap );
+      findDependentPlans(plan, jpMap, plansMap);
 
-			if ( jpMap.size() > 1 ) {
-				groupPlans.addJointPlan(
-						factory.createJointPlan( jpMap ) );
-			}
-			else {
-				groupPlans.addIndividualPlan( plan );
-			}
-		}
-	}
+      if (jpMap.size() > 1) {
+        groupPlans.addJointPlan(factory.createJointPlan(jpMap));
+      } else {
+        groupPlans.addIndividualPlan(plan);
+      }
+    }
+  }
 
-	private Map<Id<Person>, Plan> getPlansMap(final GroupPlans groupPlans) {
-		final Map<Id<Person>, Plan> map = new HashMap< >();
+  private Map<Id<Person>, Plan> getPlansMap(final GroupPlans groupPlans) {
+    final Map<Id<Person>, Plan> map = new HashMap<>();
 
-		for (Plan p : groupPlans.getIndividualPlans()) {
-			map.put( p.getPerson().getId() , p );
-		}
-		for (JointPlan jp : groupPlans.getJointPlans()) {
-			map.putAll( jp.getIndividualPlans() );
-		}
+    for (Plan p : groupPlans.getIndividualPlans()) {
+      map.put(p.getPerson().getId(), p);
+    }
+    for (JointPlan jp : groupPlans.getJointPlans()) {
+      map.putAll(jp.getIndividualPlans());
+    }
 
-		return map;
-	}
+    return map;
+  }
 
-	// DFS
-	private void findDependentPlans(
-			final Plan plan,
-			final Map<Id<Person>, Plan> dependantPlans,
-			final Map<Id<Person>, Plan> plansToLook) {
-		final List<Plan> dependentPlansList = new ArrayList<Plan>();
+  // DFS
+  private void findDependentPlans(
+      final Plan plan,
+      final Map<Id<Person>, Plan> dependantPlans,
+      final Map<Id<Person>, Plan> plansToLook) {
+    final List<Plan> dependentPlansList = new ArrayList<Plan>();
 
-		final Iterator<Plan> toLookIt = plansToLook.values().iterator();
-		while ( toLookIt.hasNext() ) {
-			final Plan toLook = toLookIt.next();
-			if ( linkIdentifier.areLinked( plan , toLook ) ) {
-				dependentPlansList.add( toLook );
-				toLookIt.remove();
-			}
-		}
+    final Iterator<Plan> toLookIt = plansToLook.values().iterator();
+    while (toLookIt.hasNext()) {
+      final Plan toLook = toLookIt.next();
+      if (linkIdentifier.areLinked(plan, toLook)) {
+        dependentPlansList.add(toLook);
+        toLookIt.remove();
+      }
+    }
 
-		for (Plan depPlan : dependentPlansList) {
-			dependantPlans.put( depPlan.getPerson().getId() , depPlan );
-			findDependentPlans(
-					depPlan,
-					dependantPlans,
-					plansToLook);
-		}
-	}
+    for (Plan depPlan : dependentPlansList) {
+      dependantPlans.put(depPlan.getPerson().getId(), depPlan);
+      findDependentPlans(depPlan, dependantPlans, plansToLook);
+    }
+  }
 }
-

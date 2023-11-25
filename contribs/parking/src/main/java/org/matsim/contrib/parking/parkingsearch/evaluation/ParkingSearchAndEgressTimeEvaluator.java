@@ -17,9 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
+/** */
 package org.matsim.contrib.parking.parkingsearch.evaluation;
 
 import java.io.BufferedWriter;
@@ -32,7 +30,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -53,123 +50,130 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * @author  jbischoff
- *
+ * @author jbischoff
  */
-/**
- *
- */
-public class ParkingSearchAndEgressTimeEvaluator implements PersonArrivalEventHandler, StartParkingSearchEventHandler, PersonEntersVehicleEventHandler{
+/** */
+public class ParkingSearchAndEgressTimeEvaluator
+    implements PersonArrivalEventHandler,
+        StartParkingSearchEventHandler,
+        PersonEntersVehicleEventHandler {
 
-	Map<Id<Person>,Double> searchTime = new HashMap<>();
-	Map<Id<Vehicle>,Id<Person>> drivers = new HashMap<>();
-	private Set<Id<Link>> monitoredLinks;
-	private List<String> coordTimeStamps = new ArrayList<>();
-	private double[] parkingCounts = new double[24];
-	private double[] parkingTime = new double[24];
-	private Network network;
-	Random rnd = MatsimRandom.getLocalInstance();
+  Map<Id<Person>, Double> searchTime = new HashMap<>();
+  Map<Id<Vehicle>, Id<Person>> drivers = new HashMap<>();
+  private Set<Id<Link>> monitoredLinks;
+  private List<String> coordTimeStamps = new ArrayList<>();
+  private double[] parkingCounts = new double[24];
+  private double[] parkingTime = new double[24];
+  private Network network;
+  Random rnd = MatsimRandom.getLocalInstance();
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.events.handler.EventHandler#reset(int)
-	 */
-	@Override
-	public void reset(int iteration) {
-		this.searchTime.clear();;
-		this.drivers.clear();
-	}
+  /* (non-Javadoc)
+   * @see org.matsim.core.events.handler.EventHandler#reset(int)
+   */
+  @Override
+  public void reset(int iteration) {
+    this.searchTime.clear();
+    ;
+    this.drivers.clear();
+  }
 
-	/**
-	 * 
-	 */
-	public ParkingSearchAndEgressTimeEvaluator(Set<Id<Link>> monitoredLinks, Network network) {
-		this.monitoredLinks = monitoredLinks;
-		this.network = network;
-		Locale.setDefault(new Locale("en", "US"));
+  /** */
+  public ParkingSearchAndEgressTimeEvaluator(Set<Id<Link>> monitoredLinks, Network network) {
+    this.monitoredLinks = monitoredLinks;
+    this.network = network;
+    Locale.setDefault(new Locale("en", "US"));
+  }
 
-	}
-	
-	public void writeStats(String filename){
-	BufferedWriter bw = IOUtils.getBufferedWriter(filename);
-	DecimalFormat df = new DecimalFormat("##.##");	
-		try {
-			bw.write("hour;parkingCounts;averageSearchAndEgressWalkTime");
-			for (int i = 0; i<this.parkingCounts.length;i++){
-				bw.newLine();
-				bw.write(i+";"+parkingCounts[i]+";"+df.format(parkingTime[i]/parkingCounts[i]));
-			}
-			bw.flush();
-			bw.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
-		
-	}
-	public void writeCoordTimeStamps(String filename){
-		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
-			try {
-				bw.write("time;coordX;coordY;Xwgs;Ywgs;searchTime");
-				for (String s: this.coordTimeStamps){
-					bw.newLine();
-					bw.write(s);
-				}
-				bw.flush();
-				bw.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}	
-			
-		}
-	
+  public void writeStats(String filename) {
+    BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+    DecimalFormat df = new DecimalFormat("##.##");
+    try {
+      bw.write("hour;parkingCounts;averageSearchAndEgressWalkTime");
+      for (int i = 0; i < this.parkingCounts.length; i++) {
+        bw.newLine();
+        bw.write(i + ";" + parkingCounts[i] + ";" + df.format(parkingTime[i] / parkingCounts[i]));
+      }
+      bw.flush();
+      bw.close();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
 
-	
-	
+  public void writeCoordTimeStamps(String filename) {
+    BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+    try {
+      bw.write("time;coordX;coordY;Xwgs;Ywgs;searchTime");
+      for (String s : this.coordTimeStamps) {
+        bw.newLine();
+        bw.write(s);
+      }
+      bw.flush();
+      bw.close();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
 
+  /* (non-Javadoc)
+   * @see playground.jbischoff.parking.events.StartParkingSearchEventHandler#handleEvent(playground.jbischoff.parking.events.StartParkingSearchEvent)
+   */
+  @Override
+  public void handleEvent(StartParkingSearchEvent event) {
+    if (this.monitoredLinks.contains(event.getLinkId())) {
+      Id<Person> pid = this.drivers.get(event.getVehicleId());
+      if (pid != null) {
+        this.searchTime.put(pid, event.getTime());
+      }
+    }
+  }
 
-	
-	/* (non-Javadoc)
-	 * @see playground.jbischoff.parking.events.StartParkingSearchEventHandler#handleEvent(playground.jbischoff.parking.events.StartParkingSearchEvent)
-	 */
-	@Override
-	public void handleEvent(StartParkingSearchEvent event) {
-		if (this.monitoredLinks.contains(event.getLinkId())){
-		Id<Person> pid = this.drivers.get(event.getVehicleId());
-		if (pid!=null){
-		this.searchTime.put(pid, event.getTime());	
-		}
-	}}
+  /* (non-Javadoc)
+   * @see org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler#handleEvent(org.matsim.api.core.v01.events.PersonEntersVehicleEvent)
+   */
+  @Override
+  public void handleEvent(PersonEntersVehicleEvent event) {
+    // Assumes: Agent = driver, or at least the person that initiates a ride (i.e. a taxi passenger
+    // that lets his taxi search for parking or so...)
+    this.drivers.put(event.getVehicleId(), event.getPersonId());
+  }
 
-	/* (non-Javadoc)
-	 * @see org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler#handleEvent(org.matsim.api.core.v01.events.PersonEntersVehicleEvent)
-	 */
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		//Assumes: Agent = driver, or at least the person that initiates a ride (i.e. a taxi passenger that lets his taxi search for parking or so...)
-		this.drivers.put(event.getVehicleId(), event.getPersonId());
-	}
-
-	/* (non-Javadoc)
-	 * @see org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler#handleEvent(org.matsim.api.core.v01.events.PersonArrivalEvent)
-	 */
-	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-		if (this.searchTime.containsKey(event.getPersonId())){
-			if (event.getLegMode().equals(TransportMode.non_network_walk )){
-			double parkingTime = event.getTime() - searchTime.remove(event.getPersonId());
-			int hour = (int) (event.getTime() / 3600);
-			if (hour<24){
-				this.parkingCounts[hour]++;
-				this.parkingTime[hour]+=parkingTime;
-				CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.GK4, TransformationFactory.WGS84);
-				Coord coord = ParkingUtils.getRandomPointAlongLink(rnd, this.network.getLinks().get(event.getLinkId()));
-				Coord t = ct.transform(coord);
-				String stamp = event.getTime()+";"+coord.getX()+";"+coord.getY()+";"+t.getX()+";"+t.getY()+";"+parkingTime;
-				this.coordTimeStamps.add(stamp);
-			}
-		}
-			}
-	}
-
+  /* (non-Javadoc)
+   * @see org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler#handleEvent(org.matsim.api.core.v01.events.PersonArrivalEvent)
+   */
+  @Override
+  public void handleEvent(PersonArrivalEvent event) {
+    if (this.searchTime.containsKey(event.getPersonId())) {
+      if (event.getLegMode().equals(TransportMode.non_network_walk)) {
+        double parkingTime = event.getTime() - searchTime.remove(event.getPersonId());
+        int hour = (int) (event.getTime() / 3600);
+        if (hour < 24) {
+          this.parkingCounts[hour]++;
+          this.parkingTime[hour] += parkingTime;
+          CoordinateTransformation ct =
+              TransformationFactory.getCoordinateTransformation(
+                  TransformationFactory.GK4, TransformationFactory.WGS84);
+          Coord coord =
+              ParkingUtils.getRandomPointAlongLink(
+                  rnd, this.network.getLinks().get(event.getLinkId()));
+          Coord t = ct.transform(coord);
+          String stamp =
+              event.getTime()
+                  + ";"
+                  + coord.getX()
+                  + ";"
+                  + coord.getY()
+                  + ";"
+                  + t.getX()
+                  + ";"
+                  + t.getY()
+                  + ";"
+                  + parkingTime;
+          this.coordTimeStamps.add(stamp);
+        }
+      }
+    }
+  }
 }

@@ -23,13 +23,14 @@ import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.core.config.Config;
 
 /**
- * @author jbischoff
- * An example to run the demand responsive transport contribution in MATSim. Provides three different examples.
- * All the example files are located in the resource path of the drt contrib jar. If you have trouble locating them, you may also download them directly from github at:
- * <a href="https://github.com/matsim-org/matsim/tree/master/contribs/drt/src/main/resources">https://github.com/matsim-org/matsim/tree/master/contribs/drt/src/main/resources</a>
+ * @author jbischoff An example to run the demand responsive transport contribution in MATSim.
+ *     Provides three different examples. All the example files are located in the resource path of
+ *     the drt contrib jar. If you have trouble locating them, you may also download them directly
+ *     from github at: <a
+ *     href="https://github.com/matsim-org/matsim/tree/master/contribs/drt/src/main/resources">https://github.com/matsim-org/matsim/tree/master/contribs/drt/src/main/resources</a>
  */
 public class RunDrtExample {
-	public static void run(Config config, boolean otfvis) {
-		DrtControlerCreator.createControler(config, otfvis).run();
-	}
+  public static void run(Config config, boolean otfvis) {
+    DrtControlerCreator.createControler(config, otfvis).run();
+  }
 }

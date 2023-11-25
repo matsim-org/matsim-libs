@@ -30,24 +30,30 @@ import org.matsim.core.controler.listener.IterationEndsListener;
  * @author Michal Maciejewski (michalm)
  */
 public class VehicleStartLinkToLastLinkUpdater implements IterationEndsListener {
-	private final FleetSpecification fleetSpecification;
-	private final ExecutedScheduleCollector executedScheduleCollector;
+  private final FleetSpecification fleetSpecification;
+  private final ExecutedScheduleCollector executedScheduleCollector;
 
-	public VehicleStartLinkToLastLinkUpdater(FleetSpecification fleetSpecification,
-			ExecutedScheduleCollector executedScheduleCollector) {
-		this.fleetSpecification = fleetSpecification;
-		this.executedScheduleCollector = executedScheduleCollector;
-	}
+  public VehicleStartLinkToLastLinkUpdater(
+      FleetSpecification fleetSpecification, ExecutedScheduleCollector executedScheduleCollector) {
+    this.fleetSpecification = fleetSpecification;
+    this.executedScheduleCollector = executedScheduleCollector;
+  }
 
-	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		executedScheduleCollector.getExecutedSchedules().forEach(schedule -> {
-			var currentSpecification = fleetSpecification.getVehicleSpecifications().get(schedule.vehicleId);
-			var tasks = schedule.getExecutedTasks();
-			var updatedSpecification = ImmutableDvrpVehicleSpecification.newBuilder(currentSpecification)
-					.startLinkId(tasks.get(tasks.size() - 1).endLinkId) // update start link to last link
-					.build();
-			fleetSpecification.replaceVehicleSpecification(updatedSpecification);
-		});
-	}
+  @Override
+  public void notifyIterationEnds(IterationEndsEvent event) {
+    executedScheduleCollector
+        .getExecutedSchedules()
+        .forEach(
+            schedule -> {
+              var currentSpecification =
+                  fleetSpecification.getVehicleSpecifications().get(schedule.vehicleId);
+              var tasks = schedule.getExecutedTasks();
+              var updatedSpecification =
+                  ImmutableDvrpVehicleSpecification.newBuilder(currentSpecification)
+                      .startLinkId(
+                          tasks.get(tasks.size() - 1).endLinkId) // update start link to last link
+                      .build();
+              fleetSpecification.replaceVehicleSpecification(updatedSpecification);
+            });
+  }
 }

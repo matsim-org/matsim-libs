@@ -37,48 +37,68 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
  * @author michalm (Michal Maciejewski)
  */
 public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
-	private static final Logger log = LogManager.getLogger(DrtModeFeedforwardRebalanceModule.class);
-	private final DrtConfigGroup drtCfg;
+  private static final Logger log = LogManager.getLogger(DrtModeFeedforwardRebalanceModule.class);
+  private final DrtConfigGroup drtCfg;
 
-	public DrtModeFeedforwardRebalanceModule(DrtConfigGroup drtCfg) {
-		super(drtCfg.getMode());
-		this.drtCfg = drtCfg;
-	}
+  public DrtModeFeedforwardRebalanceModule(DrtConfigGroup drtCfg) {
+    super(drtCfg.getMode());
+    this.drtCfg = drtCfg;
+  }
 
-	@Override
-	public void install() {
-		log.info("Feedforward Rebalancing Strategy is now being installed!");
-		RebalancingParams generalParams = drtCfg.getRebalancingParams().orElseThrow();
-		FeedforwardRebalancingStrategyParams strategySpecificParams = (FeedforwardRebalancingStrategyParams) generalParams
-				.getRebalancingStrategyParams();
+  @Override
+  public void install() {
+    log.info("Feedforward Rebalancing Strategy is now being installed!");
+    RebalancingParams generalParams = drtCfg.getRebalancingParams().orElseThrow();
+    FeedforwardRebalancingStrategyParams strategySpecificParams =
+        (FeedforwardRebalancingStrategyParams) generalParams.getRebalancingStrategyParams();
 
-		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
-			@Override
-			protected void configureQSim() {
-				bindModal(RebalancingStrategy.class).toProvider(modalProvider(
-						getter -> new FeedforwardRebalancingStrategy(getter.getModal(DrtZonalSystem.class),
-								getter.getModal(Fleet.class), generalParams, strategySpecificParams,
-								getter.getModal(FeedforwardSignalHandler.class),
-								getter.getModal(DrtZoneTargetLinkSelector.class),
-								getter.getModal(FastHeuristicZonalRelocationCalculator.class))))
-						.asEagerSingleton();
-			}
-		});
+    installQSimModule(
+        new AbstractDvrpModeQSimModule(getMode()) {
+          @Override
+          protected void configureQSim() {
+            bindModal(RebalancingStrategy.class)
+                .toProvider(
+                    modalProvider(
+                        getter ->
+                            new FeedforwardRebalancingStrategy(
+                                getter.getModal(DrtZonalSystem.class),
+                                getter.getModal(Fleet.class),
+                                generalParams,
+                                strategySpecificParams,
+                                getter.getModal(FeedforwardSignalHandler.class),
+                                getter.getModal(DrtZoneTargetLinkSelector.class),
+                                getter.getModal(FastHeuristicZonalRelocationCalculator.class))))
+                .asEagerSingleton();
+          }
+        });
 
-		// Create PreviousIterationDepartureRecoder (this will be created only once)
-		bindModal(FeedforwardSignalHandler.class).toProvider(modalProvider(
-				getter -> new FeedforwardSignalHandler(getter.getModal(DrtZonalSystem.class), strategySpecificParams,
-						getter.getModal(NetDepartureReplenishDemandEstimator.class)))).asEagerSingleton();
+    // Create PreviousIterationDepartureRecoder (this will be created only once)
+    bindModal(FeedforwardSignalHandler.class)
+        .toProvider(
+            modalProvider(
+                getter ->
+                    new FeedforwardSignalHandler(
+                        getter.getModal(DrtZonalSystem.class),
+                        strategySpecificParams,
+                        getter.getModal(NetDepartureReplenishDemandEstimator.class))))
+        .asEagerSingleton();
 
-		bindModal(NetDepartureReplenishDemandEstimator.class).toProvider(modalProvider(
-				getter -> new NetDepartureReplenishDemandEstimator(getter.getModal(DrtZonalSystem.class), drtCfg,
-						strategySpecificParams))).asEagerSingleton();
+    bindModal(NetDepartureReplenishDemandEstimator.class)
+        .toProvider(
+            modalProvider(
+                getter ->
+                    new NetDepartureReplenishDemandEstimator(
+                        getter.getModal(DrtZonalSystem.class), drtCfg, strategySpecificParams)))
+        .asEagerSingleton();
 
-		bindModal(FastHeuristicZonalRelocationCalculator.class).toProvider(modalProvider(
-				getter -> new FastHeuristicZonalRelocationCalculator(
-						getter.getModal(DrtZoneTargetLinkSelector.class))));
+    bindModal(FastHeuristicZonalRelocationCalculator.class)
+        .toProvider(
+            modalProvider(
+                getter ->
+                    new FastHeuristicZonalRelocationCalculator(
+                        getter.getModal(DrtZoneTargetLinkSelector.class))));
 
-		addEventHandlerBinding().to(modalKey(NetDepartureReplenishDemandEstimator.class));
-		addControlerListenerBinding().to(modalKey(FeedforwardSignalHandler.class));
-	}
+    addEventHandlerBinding().to(modalKey(NetDepartureReplenishDemandEstimator.class));
+    addControlerListenerBinding().to(modalKey(FeedforwardSignalHandler.class));
+  }
 }

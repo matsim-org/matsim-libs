@@ -20,16 +20,14 @@
 package org.matsim.core.router;
 
 /**
- * It is used by the {@link TripRouter} to detect trips, and can be used by
- * replanning modules as a "black list" of activities not to touch.
+ * It is used by the {@link TripRouter} to detect trips, and can be used by replanning modules as a
+ * "black list" of activities not to touch.
  *
  * @author gleich
  */
 public final class StageActivityTypeIdentifier {
 
-	public static final boolean isStageActivity(final String activityType) {
-		return activityType.endsWith("interaction");
-	}
-
+  public static final boolean isStageActivity(final String activityType) {
+    return activityType.endsWith("interaction");
+  }
 }
-

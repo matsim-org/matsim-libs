@@ -1,5 +1,6 @@
 package org.matsim.contrib.drt.prebooking;
 
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
@@ -27,84 +28,133 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.Singleton;
-
 public class PrebookingModeQSimModule extends AbstractDvrpModeQSimModule {
-	private final PrebookingParams prebookingParams;
+  private final PrebookingParams prebookingParams;
 
-	public PrebookingModeQSimModule(String mode, PrebookingParams prebookingParams) {
-		super(mode);
-		this.prebookingParams = prebookingParams;
-	}
+  public PrebookingModeQSimModule(String mode, PrebookingParams prebookingParams) {
+    super(mode);
+    this.prebookingParams = prebookingParams;
+  }
 
-	@Override
-	protected void configureQSim() {
-		bindModal(PrebookingActionCreator.class).toProvider(modalProvider(getter -> {
-			PassengerHandler passengerHandler = (PassengerEngine) getter.getModal(PassengerHandler.class);
-			DrtActionCreator delegate = getter.getModal(DrtActionCreator.class);
-			PassengerStopDurationProvider stopDurationProvider = getter.getModal(PassengerStopDurationProvider.class);
-			PrebookingManager prebookingManager = getter.getModal(PrebookingManager.class);
-			AbandonVoter abandonVoter = getter.getModal(AbandonVoter.class);
+  @Override
+  protected void configureQSim() {
+    bindModal(PrebookingActionCreator.class)
+        .toProvider(
+            modalProvider(
+                getter -> {
+                  PassengerHandler passengerHandler =
+                      (PassengerEngine) getter.getModal(PassengerHandler.class);
+                  DrtActionCreator delegate = getter.getModal(DrtActionCreator.class);
+                  PassengerStopDurationProvider stopDurationProvider =
+                      getter.getModal(PassengerStopDurationProvider.class);
+                  PrebookingManager prebookingManager = getter.getModal(PrebookingManager.class);
+                  AbandonVoter abandonVoter = getter.getModal(AbandonVoter.class);
 
-			return new PrebookingActionCreator(passengerHandler, delegate, stopDurationProvider, prebookingManager,
-					abandonVoter);
-		})).in(Singleton.class);
+                  return new PrebookingActionCreator(
+                      passengerHandler,
+                      delegate,
+                      stopDurationProvider,
+                      prebookingManager,
+                      abandonVoter);
+                }))
+        .in(Singleton.class);
 
-		bindModal(PrebookingManager.class).toProvider(modalProvider(getter -> {
-			Network network = getter.getModal(Network.class);
-			PassengerRequestCreator requestCreator = getter.getModal(PassengerRequestCreator.class);
-			VrpOptimizer optimizer = getter.getModal(VrpOptimizer.class);
-			PassengerRequestValidator requestValidator = getter.getModal(PassengerRequestValidator.class);
-			EventsManager eventsManager = getter.get(EventsManager.class);
-			RequestUnscheduler requestUnscheduler = getter.getModal(RequestUnscheduler.class);
-			MobsimTimer mobsimTimer = getter.get(MobsimTimer.class);
+    bindModal(PrebookingManager.class)
+        .toProvider(
+            modalProvider(
+                getter -> {
+                  Network network = getter.getModal(Network.class);
+                  PassengerRequestCreator requestCreator =
+                      getter.getModal(PassengerRequestCreator.class);
+                  VrpOptimizer optimizer = getter.getModal(VrpOptimizer.class);
+                  PassengerRequestValidator requestValidator =
+                      getter.getModal(PassengerRequestValidator.class);
+                  EventsManager eventsManager = getter.get(EventsManager.class);
+                  RequestUnscheduler requestUnscheduler = getter.getModal(RequestUnscheduler.class);
+                  MobsimTimer mobsimTimer = getter.get(MobsimTimer.class);
 
-			return new PrebookingManager(getMode(), network, requestCreator, optimizer, mobsimTimer, requestValidator,
-					eventsManager, requestUnscheduler);
-		})).in(Singleton.class);
-		addModalQSimComponentBinding().to(modalKey(PrebookingManager.class));
+                  return new PrebookingManager(
+                      getMode(),
+                      network,
+                      requestCreator,
+                      optimizer,
+                      mobsimTimer,
+                      requestValidator,
+                      eventsManager,
+                      requestUnscheduler);
+                }))
+        .in(Singleton.class);
+    addModalQSimComponentBinding().to(modalKey(PrebookingManager.class));
 
-		bindModal(PrebookingQueue.class).toProvider(modalProvider(getter -> {
-			return new PrebookingQueue(getter.getModal(PrebookingManager.class));
-		})).in(Singleton.class);
-		addModalQSimComponentBinding().to(modalKey(PrebookingQueue.class));
+    bindModal(PrebookingQueue.class)
+        .toProvider(
+            modalProvider(
+                getter -> {
+                  return new PrebookingQueue(getter.getModal(PrebookingManager.class));
+                }))
+        .in(Singleton.class);
+    addModalQSimComponentBinding().to(modalKey(PrebookingQueue.class));
 
-		bindModal(PopulationIteratorFactory.class).toProvider(modalProvider(getter -> {
-			return new PopulationIteratorFactory(getter.get(Population.class), getter.get(QSim.class));
-		}));
+    bindModal(PopulationIteratorFactory.class)
+        .toProvider(
+            modalProvider(
+                getter -> {
+                  return new PopulationIteratorFactory(
+                      getter.get(Population.class), getter.get(QSim.class));
+                }));
 
-		bindModal(MaximumDelayAbandonVoter.class).toProvider(modalProvider(getter -> {
-			double maximumDelay = prebookingParams.maximumPassengerDelay;
-			return new MaximumDelayAbandonVoter(maximumDelay);
-		})).in(Singleton.class);
-		bindModal(AbandonVoter.class).to(modalKey(MaximumDelayAbandonVoter.class));
+    bindModal(MaximumDelayAbandonVoter.class)
+        .toProvider(
+            modalProvider(
+                getter -> {
+                  double maximumDelay = prebookingParams.maximumPassengerDelay;
+                  return new MaximumDelayAbandonVoter(maximumDelay);
+                }))
+        .in(Singleton.class);
+    bindModal(AbandonVoter.class).to(modalKey(MaximumDelayAbandonVoter.class));
 
-		bindModal(SimpleRequestUnscheduler.class).toProvider(modalProvider(getter -> {
-			DvrpVehicleLookup vehicleLookup = getter.get(DvrpVehicleLookup.class);
-			return new SimpleRequestUnscheduler(vehicleLookup);
-		})).in(Singleton.class);
+    bindModal(SimpleRequestUnscheduler.class)
+        .toProvider(
+            modalProvider(
+                getter -> {
+                  DvrpVehicleLookup vehicleLookup = getter.get(DvrpVehicleLookup.class);
+                  return new SimpleRequestUnscheduler(vehicleLookup);
+                }))
+        .in(Singleton.class);
 
-		bindModal(ComplexRequestUnscheduler.class).toProvider(modalProvider(getter -> {
-			DvrpVehicleLookup vehicleLookup = getter.get(DvrpVehicleLookup.class);
-			VehicleEntry.EntryFactory entryFactory = getter.getModal(VehicleEntry.EntryFactory.class);
-			DrtTaskFactory taskFactory = getter.getModal(DrtTaskFactory.class);
-			LeastCostPathCalculator router = getter.getModal(LeastCostPathCalculator.class);
-			TravelTime travelTime = getter.getModal(TravelTime.class);
-			ScheduleTimingUpdater timingUpdater = getter.getModal(ScheduleTimingUpdater.class);
+    bindModal(ComplexRequestUnscheduler.class)
+        .toProvider(
+            modalProvider(
+                getter -> {
+                  DvrpVehicleLookup vehicleLookup = getter.get(DvrpVehicleLookup.class);
+                  VehicleEntry.EntryFactory entryFactory =
+                      getter.getModal(VehicleEntry.EntryFactory.class);
+                  DrtTaskFactory taskFactory = getter.getModal(DrtTaskFactory.class);
+                  LeastCostPathCalculator router = getter.getModal(LeastCostPathCalculator.class);
+                  TravelTime travelTime = getter.getModal(TravelTime.class);
+                  ScheduleTimingUpdater timingUpdater =
+                      getter.getModal(ScheduleTimingUpdater.class);
 
-			return new ComplexRequestUnscheduler(vehicleLookup, entryFactory, taskFactory, router, travelTime,
-					timingUpdater, prebookingParams.scheduleWaitBeforeDrive);
-		})).in(Singleton.class);
+                  return new ComplexRequestUnscheduler(
+                      vehicleLookup,
+                      entryFactory,
+                      taskFactory,
+                      router,
+                      travelTime,
+                      timingUpdater,
+                      prebookingParams.scheduleWaitBeforeDrive);
+                }))
+        .in(Singleton.class);
 
-		switch (prebookingParams.unschedulingMode) {
-		case StopBased:
-			bindModal(RequestUnscheduler.class).to(modalKey(SimpleRequestUnscheduler.class));
-			break;
-		case Routing:
-			bindModal(RequestUnscheduler.class).to(modalKey(ComplexRequestUnscheduler.class));
-			break;
-		default:
-			throw new IllegalStateException("No binding for selected RequestUnscheduler");
-		}
-	}
+    switch (prebookingParams.unschedulingMode) {
+      case StopBased:
+        bindModal(RequestUnscheduler.class).to(modalKey(SimpleRequestUnscheduler.class));
+        break;
+      case Routing:
+        bindModal(RequestUnscheduler.class).to(modalKey(ComplexRequestUnscheduler.class));
+        break;
+      default:
+        throw new IllegalStateException("No binding for selected RequestUnscheduler");
+    }
+  }
 }

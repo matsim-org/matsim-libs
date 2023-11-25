@@ -18,22 +18,18 @@
  * *********************************************************************** *
  */
 
-/**
- *
- */
+/** */
 package org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator;
 
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.counting;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
-
-import jakarta.validation.constraints.NotNull;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
@@ -45,47 +41,57 @@ import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 
 /**
  * Calculates population size per zone by counting first activites per zone in the selected plans.
- * Returns the share of population of the total population inside the drt service area for the given zone multiplied with the overall fleet size.
- * Should lead lead to rebalancing target values dependent on number of inhabitants (in vehicle units).
+ * Returns the share of population of the total population inside the drt service area for the given
+ * zone multiplied with the overall fleet size. Should lead lead to rebalancing target values
+ * dependent on number of inhabitants (in vehicle units).
  *
  * @author tschlenther
  */
-public final class EqualVehiclesToPopulationRatioTargetCalculator implements RebalancingTargetCalculator {
+public final class EqualVehiclesToPopulationRatioTargetCalculator
+    implements RebalancingTargetCalculator {
 
-	private static final Logger log = LogManager.getLogger(EqualVehiclesToPopulationRatioTargetCalculator.class);
+  private static final Logger log =
+      LogManager.getLogger(EqualVehiclesToPopulationRatioTargetCalculator.class);
 
-	private final int fleetSize;
-	private final Map<DrtZone, Integer> activitiesPerZone;
-	private final int totalNrActivities;
+  private final int fleetSize;
+  private final Map<DrtZone, Integer> activitiesPerZone;
+  private final int totalNrActivities;
 
-	public EqualVehiclesToPopulationRatioTargetCalculator(DrtZonalSystem zonalSystem, Population population,
-			@NotNull FleetSpecification fleetSpecification) {
-		log.debug("nr of zones: " + zonalSystem.getZones().size() + "\t nr of persons = " + population.getPersons()
-				.size());
-		fleetSize = fleetSpecification.getVehicleSpecifications().size();
-		activitiesPerZone = countFirstActsPerZone(zonalSystem, population);
-		totalNrActivities = this.activitiesPerZone.values().stream().mapToInt(Integer::intValue).sum();
-		log.debug("nr of persons that have their first activity inside the service area = " + this.totalNrActivities);
-	}
+  public EqualVehiclesToPopulationRatioTargetCalculator(
+      DrtZonalSystem zonalSystem,
+      Population population,
+      @NotNull FleetSpecification fleetSpecification) {
+    log.debug(
+        "nr of zones: "
+            + zonalSystem.getZones().size()
+            + "\t nr of persons = "
+            + population.getPersons().size());
+    fleetSize = fleetSpecification.getVehicleSpecifications().size();
+    activitiesPerZone = countFirstActsPerZone(zonalSystem, population);
+    totalNrActivities = this.activitiesPerZone.values().stream().mapToInt(Integer::intValue).sum();
+    log.debug(
+        "nr of persons that have their first activity inside the service area = "
+            + this.totalNrActivities);
+  }
 
-	private Map<DrtZone, Integer> countFirstActsPerZone(DrtZonalSystem zonalSystem, Population population) {
-		return population.getPersons()
-				.values()
-				.stream()
-				.map(person -> (Activity)person.getSelectedPlan().getPlanElements().get(0))
-				.map(activity -> zonalSystem.getZoneForLinkId(activity.getLinkId()))
-				.filter(Objects::nonNull)
-				.collect(Collectors.groupingBy(zone -> zone, collectingAndThen(counting(), Long::intValue)));
-	}
+  private Map<DrtZone, Integer> countFirstActsPerZone(
+      DrtZonalSystem zonalSystem, Population population) {
+    return population.getPersons().values().stream()
+        .map(person -> (Activity) person.getSelectedPlan().getPlanElements().get(0))
+        .map(activity -> zonalSystem.getZoneForLinkId(activity.getLinkId()))
+        .filter(Objects::nonNull)
+        .collect(
+            Collectors.groupingBy(zone -> zone, collectingAndThen(counting(), Long::intValue)));
+  }
 
-	@Override
-	public ToDoubleFunction<DrtZone> calculate(double time,
-			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
-		if (totalNrActivities == 0) {
-			return zoneId -> 0;
-		}
+  @Override
+  public ToDoubleFunction<DrtZone> calculate(
+      double time, Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
+    if (totalNrActivities == 0) {
+      return zoneId -> 0;
+    }
 
-		double factor = (double)fleetSize / totalNrActivities;
-		return zoneId -> this.activitiesPerZone.getOrDefault(zoneId, 0).doubleValue() * factor;
-	}
+    double factor = (double) fleetSize / totalNrActivities;
+    return zoneId -> this.activitiesPerZone.getOrDefault(zoneId, 0).doubleValue() * factor;
+  }
 }

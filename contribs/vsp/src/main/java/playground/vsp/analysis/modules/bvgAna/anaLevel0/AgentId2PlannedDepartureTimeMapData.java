@@ -23,38 +23,37 @@ import org.matsim.api.core.v01.Id;
 
 /**
  * Stores a couple of departure related information, when leaving a pt interaction activity
- * 
- * @author aneumann
  *
+ * @author aneumann
  */
 public class AgentId2PlannedDepartureTimeMapData {
-	
-	private final Id stopId;
-	private final double plannedDepartureTime;
-	private final Id lineId;
-	private final Id routeId;
-	
-	public AgentId2PlannedDepartureTimeMapData(Id stopId, double plannedDepartureTime, Id lineId, Id routeId){
-		this.stopId = stopId;
-		this.plannedDepartureTime = plannedDepartureTime;
-		this.lineId = lineId;
-		this.routeId = routeId;
-	}
 
-	public Id getStopId() {
-		return this.stopId;
-	}
+  private final Id stopId;
+  private final double plannedDepartureTime;
+  private final Id lineId;
+  private final Id routeId;
 
-	public double getPlannedDepartureTime() {
-		return this.plannedDepartureTime;
-	}
+  public AgentId2PlannedDepartureTimeMapData(
+      Id stopId, double plannedDepartureTime, Id lineId, Id routeId) {
+    this.stopId = stopId;
+    this.plannedDepartureTime = plannedDepartureTime;
+    this.lineId = lineId;
+    this.routeId = routeId;
+  }
 
-	public Id getLineId() {
-		return this.lineId;
-	}
+  public Id getStopId() {
+    return this.stopId;
+  }
 
-	public Id getRouteId() {
-		return this.routeId;
-	}
+  public double getPlannedDepartureTime() {
+    return this.plannedDepartureTime;
+  }
 
+  public Id getLineId() {
+    return this.lineId;
+  }
+
+  public Id getRouteId() {
+    return this.routeId;
+  }
 }

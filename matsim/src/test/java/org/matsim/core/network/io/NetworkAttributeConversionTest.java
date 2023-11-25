@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * NetworkAttributeConversionTest.java
@@ -19,8 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.network.io;
+package org.matsim.core.network.io;
 
+import java.util.Objects;
+import java.util.function.Consumer;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,85 +32,77 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
-import java.util.Objects;
-import java.util.function.Consumer;
-
 public class NetworkAttributeConversionTest {
-	@Rule
-	public final MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testDefaults() {
-		final String path = utils.getOutputDirectory()+"/network.xml";
+  @Test
+  public void testDefaults() {
+    final String path = utils.getOutputDirectory() + "/network.xml";
 
-		testWriteAndReread(w -> w.write(path), w -> w.readFile(path));
-	}
+    testWriteAndReread(w -> w.write(path), w -> w.readFile(path));
+  }
 
-	@Test
-	public void testV2() {
-		final String path = utils.getOutputDirectory()+"/network.xml";
+  @Test
+  public void testV2() {
+    final String path = utils.getOutputDirectory() + "/network.xml";
 
-		testWriteAndReread(w -> w.writeFileV2(path), w -> w.readFile(path));
-	}
+    testWriteAndReread(w -> w.writeFileV2(path), w -> w.readFile(path));
+  }
 
-	public void testWriteAndReread(
-			final Consumer<NetworkWriter> writeMethod,
-			final Consumer<MatsimNetworkReader> readMethod) {
-		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		final Network network = scenario.getNetwork();
+  public void testWriteAndReread(
+      final Consumer<NetworkWriter> writeMethod, final Consumer<MatsimNetworkReader> readMethod) {
+    final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    final Network network = scenario.getNetwork();
 
-		final CustomClass attribute = new CustomClass("attribute");
-		network.getAttributes().putAttribute("attribute", attribute);
+    final CustomClass attribute = new CustomClass("attribute");
+    network.getAttributes().putAttribute("attribute", attribute);
 
-		final NetworkWriter writer = new NetworkWriter(network);
-		writer.putAttributeConverter(CustomClass.class, new CustomClassConverter());
-		writeMethod.accept(writer);
+    final NetworkWriter writer = new NetworkWriter(network);
+    writer.putAttributeConverter(CustomClass.class, new CustomClassConverter());
+    writeMethod.accept(writer);
 
-		final Scenario readScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		final MatsimNetworkReader reader = new MatsimNetworkReader(readScenario.getNetwork());
-		reader.putAttributeConverter(CustomClass.class, new CustomClassConverter());
-		readMethod.accept(reader);
+    final Scenario readScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    final MatsimNetworkReader reader = new MatsimNetworkReader(readScenario.getNetwork());
+    reader.putAttributeConverter(CustomClass.class, new CustomClassConverter());
+    readMethod.accept(reader);
 
-		final Network readNetwork = readScenario.getNetwork();
-		final Object readAttribute = readNetwork.getAttributes().getAttribute("attribute");
+    final Network readNetwork = readScenario.getNetwork();
+    final Object readAttribute = readNetwork.getAttributes().getAttribute("attribute");
 
-		Assert.assertEquals(
-				"unexpected read attribute",
-				attribute,
-				readAttribute);
-	}
+    Assert.assertEquals("unexpected read attribute", attribute, readAttribute);
+  }
 
-	private static class CustomClass {
-		private final String value;
+  private static class CustomClass {
+    private final String value;
 
-		private CustomClass(String value) {
-			this.value = value;
-		}
+    private CustomClass(String value) {
+      this.value = value;
+    }
 
-		@Override
-		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
-			CustomClass that = (CustomClass) o;
-			return Objects.equals(value, that.value);
-		}
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      CustomClass that = (CustomClass) o;
+      return Objects.equals(value, that.value);
+    }
 
-		@Override
-		public int hashCode() {
-			return Objects.hash(value);
-		}
-	}
+    @Override
+    public int hashCode() {
+      return Objects.hash(value);
+    }
+  }
 
-	private static class CustomClassConverter implements AttributeConverter<CustomClass> {
+  private static class CustomClassConverter implements AttributeConverter<CustomClass> {
 
-		@Override
-		public CustomClass convert(String value) {
-			return new CustomClass(value);
-		}
+    @Override
+    public CustomClass convert(String value) {
+      return new CustomClass(value);
+    }
 
-		@Override
-		public String convertToString(Object o) {
-			return ((CustomClass) o).value;
-		}
-	}
+    @Override
+    public String convertToString(Object o) {
+      return ((CustomClass) o).value;
+    }
+  }
 }

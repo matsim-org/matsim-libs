@@ -19,6 +19,9 @@
 
 package org.matsim.contrib.minibus.stats;
 
+import java.util.HashMap;
+import java.util.Set;
+import java.util.TreeSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -31,63 +34,60 @@ import org.matsim.contrib.minibus.hook.Operator;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeSet;
-
 /**
  * Counts the number of operators per link
- * 
- * @author aneumann
  *
+ * @author aneumann
  */
-final class CountPOperatorHandler implements LinkEnterEventHandler, TransitDriverStartsEventHandler{
-	
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(CountPOperatorHandler.class);
-	
-	private final String pIdentifier;
-	private HashMap<Id<Link>, Set<Id<Operator>>> linkId2OperatorIdsSetMap;
-	private HashMap<Id<Vehicle>, Id<TransitLine>> vehId2lineIdMap;
+final class CountPOperatorHandler
+    implements LinkEnterEventHandler, TransitDriverStartsEventHandler {
 
-	public CountPOperatorHandler(String pIdentifier) {
-		this.pIdentifier = pIdentifier;
-		this.linkId2OperatorIdsSetMap = new HashMap<>();
-		this.vehId2lineIdMap = new HashMap<>();
-	}
+  @SuppressWarnings("unused")
+  private static final Logger log = LogManager.getLogger(CountPOperatorHandler.class);
 
-	public Set<Id<Operator>> getOperatorIdsForLinkId(Id<Link> linkId) {
-		Set<Id<Operator>> operatorIds = this.linkId2OperatorIdsSetMap.get(linkId);
-		if(operatorIds == null){
-			return new TreeSet<>();
-		} else {
-			return operatorIds;
-		}
-	}
+  private final String pIdentifier;
+  private HashMap<Id<Link>, Set<Id<Operator>>> linkId2OperatorIdsSetMap;
+  private HashMap<Id<Vehicle>, Id<TransitLine>> vehId2lineIdMap;
 
-	@Override
-	public void reset(int iteration) {
-		this.linkId2OperatorIdsSetMap = new HashMap<>();
-		this.vehId2lineIdMap = new HashMap<>();
-	}
+  public CountPOperatorHandler(String pIdentifier) {
+    this.pIdentifier = pIdentifier;
+    this.linkId2OperatorIdsSetMap = new HashMap<>();
+    this.vehId2lineIdMap = new HashMap<>();
+  }
 
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		// add the id of the operator to the set of ids of the link
-		if(event.getVehicleId().toString().contains(this.pIdentifier)){
-			if (this.linkId2OperatorIdsSetMap.get(event.getLinkId()) == null) {
-				this.linkId2OperatorIdsSetMap.put(event.getLinkId(), new TreeSet<Id<Operator>>());
-			}
-			
-			Id<Operator> operatorId = Id.create(this.vehId2lineIdMap.get(event.getVehicleId()), Operator.class);
-			this.linkId2OperatorIdsSetMap.get(event.getLinkId()).add(operatorId);
-		}		
-	}
+  public Set<Id<Operator>> getOperatorIdsForLinkId(Id<Link> linkId) {
+    Set<Id<Operator>> operatorIds = this.linkId2OperatorIdsSetMap.get(linkId);
+    if (operatorIds == null) {
+      return new TreeSet<>();
+    } else {
+      return operatorIds;
+    }
+  }
 
-	@Override
-	public void handleEvent(TransitDriverStartsEvent event) {
-		if(event.getVehicleId().toString().contains(this.pIdentifier)){
-			this.vehId2lineIdMap.put(event.getVehicleId(), event.getTransitLineId());
-		}		
-	}
+  @Override
+  public void reset(int iteration) {
+    this.linkId2OperatorIdsSetMap = new HashMap<>();
+    this.vehId2lineIdMap = new HashMap<>();
+  }
+
+  @Override
+  public void handleEvent(LinkEnterEvent event) {
+    // add the id of the operator to the set of ids of the link
+    if (event.getVehicleId().toString().contains(this.pIdentifier)) {
+      if (this.linkId2OperatorIdsSetMap.get(event.getLinkId()) == null) {
+        this.linkId2OperatorIdsSetMap.put(event.getLinkId(), new TreeSet<Id<Operator>>());
+      }
+
+      Id<Operator> operatorId =
+          Id.create(this.vehId2lineIdMap.get(event.getVehicleId()), Operator.class);
+      this.linkId2OperatorIdsSetMap.get(event.getLinkId()).add(operatorId);
+    }
+  }
+
+  @Override
+  public void handleEvent(TransitDriverStartsEvent event) {
+    if (event.getVehicleId().toString().contains(this.pIdentifier)) {
+      this.vehId2lineIdMap.put(event.getVehicleId(), event.getTransitLineId());
+    }
+  }
 }

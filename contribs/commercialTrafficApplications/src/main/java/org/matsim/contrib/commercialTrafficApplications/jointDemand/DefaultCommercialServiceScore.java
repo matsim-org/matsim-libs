@@ -17,25 +17,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.commercialTrafficApplications.jointDemand;/*
- * created by jbischoff, 18.06.2019
- */
+package org.matsim.contrib.commercialTrafficApplications.jointDemand; /*
+                                                                       * created by jbischoff, 18.06.2019
+                                                                       */
 
 class DefaultCommercialServiceScore implements CommercialJobScoreCalculator {
 
-    final double maxPerformedScore;
-    final double minPerformedScore;
-    final double negativeScoreThreshold;
+  final double maxPerformedScore;
+  final double minPerformedScore;
+  final double negativeScoreThreshold;
 
-	DefaultCommercialServiceScore(double maxPerformedScore, double minPerformedScore, double negativeScoreThreshold) {
-        this.maxPerformedScore = maxPerformedScore;
-        this.minPerformedScore = minPerformedScore;
-        this.negativeScoreThreshold = negativeScoreThreshold;
-    }
+  DefaultCommercialServiceScore(
+      double maxPerformedScore, double minPerformedScore, double negativeScoreThreshold) {
+    this.maxPerformedScore = maxPerformedScore;
+    this.minPerformedScore = minPerformedScore;
+    this.negativeScoreThreshold = negativeScoreThreshold;
+  }
 
-    @Override
-    public double calcScore(double timeDifference) {
-        double a = (-maxPerformedScore) / negativeScoreThreshold;
-        return Math.max(minPerformedScore, maxPerformedScore + a * Math.abs(timeDifference));
-    }
+  @Override
+  public double calcScore(double timeDifference) {
+    double a = (-maxPerformedScore) / negativeScoreThreshold;
+    return Math.max(minPerformedScore, maxPerformedScore + a * Math.abs(timeDifference));
+  }
 }

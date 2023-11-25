@@ -24,17 +24,17 @@ package org.matsim.core.scoring.functions;
 
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.scoring.PlansScoringModule;
-import org.matsim.core.scoring.StandaloneExperiencedPlansModule;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-
+import org.matsim.core.scoring.StandaloneExperiencedPlansModule;
 
 /**
- * Needs {@link PlansScoringModule} or {@link StandaloneExperiencedPlansModule} (or something that binds the same interfaces) as pre-requisite.
+ * Needs {@link PlansScoringModule} or {@link StandaloneExperiencedPlansModule} (or something that
+ * binds the same interfaces) as pre-requisite.
  */
 public class CharyparNagelScoringFunctionModule extends AbstractModule {
-    @Override
-    public void install() {
-        bind(ScoringFunctionFactory.class).to(CharyparNagelScoringFunctionFactory.class);
-        bind(ScoringParametersForPerson.class).to(SubpopulationScoringParameters.class);
-    }
+  @Override
+  public void install() {
+    bind(ScoringFunctionFactory.class).to(CharyparNagelScoringFunctionFactory.class);
+    bind(ScoringParametersForPerson.class).to(SubpopulationScoringParameters.class);
+  }
 }

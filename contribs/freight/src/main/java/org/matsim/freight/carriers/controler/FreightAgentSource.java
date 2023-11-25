@@ -22,6 +22,8 @@
 package org.matsim.freight.carriers.controler;
 
 import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -35,69 +37,81 @@ import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
 /**
- * Created by IntelliJ IDEA. User: zilske Date: 10/31/11 Time: 5:59 PM To change
- * this template use File | Settings | File Templates.
- *
+ * Created by IntelliJ IDEA. User: zilske Date: 10/31/11 Time: 5:59 PM To change this template use
+ * File | Settings | File Templates.
  */
- public final class FreightAgentSource implements AgentSource {
-	 // made public so that it can be used from LSP.  Still has a package-private constructor, thus ok.  kai, jul'22
+public final class FreightAgentSource implements AgentSource {
+  // made public so that it can be used from LSP.  Still has a package-private constructor, thus ok.
+  //  kai, jul'22
 
-	public static final String COMPONENT_NAME=FreightAgentSource.class.getSimpleName();
+  public static final String COMPONENT_NAME = FreightAgentSource.class.getSimpleName();
 
-	@SuppressWarnings("unused")
-	private static final  Logger log = LogManager.getLogger(FreightAgentSource.class);
+  @SuppressWarnings("unused")
+  private static final Logger log = LogManager.getLogger(FreightAgentSource.class);
 
-	private final CarrierAgentTracker tracker;
+  private final CarrierAgentTracker tracker;
 
-	private final Collection<MobsimAgent> mobSimAgents;
+  private final Collection<MobsimAgent> mobSimAgents;
 
-	private final AgentFactory agentFactory;
+  private final AgentFactory agentFactory;
 
-	private final QSim qsim;
+  private final QSim qsim;
 
-	@Inject FreightAgentSource(CarrierAgentTracker tracker, AgentFactory agentFactory, QSim qsim) {
-		this.tracker = tracker;
-		this.agentFactory = agentFactory;
-		this.qsim = qsim;
-		mobSimAgents = new ArrayList<>();
-	}
+  @Inject
+  FreightAgentSource(CarrierAgentTracker tracker, AgentFactory agentFactory, QSim qsim) {
+    this.tracker = tracker;
+    this.agentFactory = agentFactory;
+    this.qsim = qsim;
+    mobSimAgents = new ArrayList<>();
+  }
 
-	@Override public void insertAgentsIntoMobsim() {
+  @Override
+  public void insertAgentsIntoMobsim() {
 
-		for (CarrierAgent carrierAgent : tracker.getCarrierAgents()) {
-			for( Plan freightDriverPlan : carrierAgent.createFreightDriverPlans() ){
+    for (CarrierAgent carrierAgent : tracker.getCarrierAgents()) {
+      for (Plan freightDriverPlan : carrierAgent.createFreightDriverPlans()) {
 
-				MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson( freightDriverPlan.getPerson() );
+        MobsimAgent agent =
+            this.agentFactory.createMobsimAgentFromPerson(freightDriverPlan.getPerson());
 
-				Vehicle vehicle;
-				if( CarriersUtils.getVehicle( freightDriverPlan ) == null ){
-					vehicle = VehicleUtils.getFactory().createVehicle( Id.create( agent.getId(), Vehicle.class ), VehicleUtils.getDefaultVehicleType() );
-					log.warn( "vehicle for agent " + freightDriverPlan.getPerson().getId() + " is missing. set default vehicle where maxVelocity is solely defined by link.speed." );
-				} else if( CarriersUtils.getVehicle( freightDriverPlan ).getType() == null ){
-					vehicle = VehicleUtils.getFactory().createVehicle( Id.create( agent.getId(), Vehicle.class ), VehicleUtils.getDefaultVehicleType() );
-					log.warn( "vehicleType for agent " + freightDriverPlan.getPerson().getId() + " is missing. set default vehicleType where maxVelocity is solely defined by link.speed." );
-				} else {
-					vehicle = CarriersUtils.getVehicle( freightDriverPlan );
-				}
+        Vehicle vehicle;
+        if (CarriersUtils.getVehicle(freightDriverPlan) == null) {
+          vehicle =
+              VehicleUtils.getFactory()
+                  .createVehicle(
+                      Id.create(agent.getId(), Vehicle.class),
+                      VehicleUtils.getDefaultVehicleType());
+          log.warn(
+              "vehicle for agent "
+                  + freightDriverPlan.getPerson().getId()
+                  + " is missing. set default vehicle where maxVelocity is solely defined by link.speed.");
+        } else if (CarriersUtils.getVehicle(freightDriverPlan).getType() == null) {
+          vehicle =
+              VehicleUtils.getFactory()
+                  .createVehicle(
+                      Id.create(agent.getId(), Vehicle.class),
+                      VehicleUtils.getDefaultVehicleType());
+          log.warn(
+              "vehicleType for agent "
+                  + freightDriverPlan.getPerson().getId()
+                  + " is missing. set default vehicleType where maxVelocity is solely defined by link.speed.");
+        } else {
+          vehicle = CarriersUtils.getVehicle(freightDriverPlan);
+        }
 
-				log.warn( "inserting vehicleId=" + vehicle.getId() + " into mobsim." );
-				qsim.addParkedVehicle( new QVehicleImpl( vehicle ), agent.getCurrentLinkId() );
-				// yyyyyy should rather use QVehicleFactory.  kai, nov'18
+        log.warn("inserting vehicleId=" + vehicle.getId() + " into mobsim.");
+        qsim.addParkedVehicle(new QVehicleImpl(vehicle), agent.getCurrentLinkId());
+        // yyyyyy should rather use QVehicleFactory.  kai, nov'18
 
-				qsim.insertAgentIntoMobsim( agent );
+        qsim.insertAgentIntoMobsim(agent);
 
-				mobSimAgents.add( agent );
-			}
-		}
-	}
+        mobSimAgents.add(agent);
+      }
+    }
+  }
 
-	public Collection<MobsimAgent> getMobSimAgents() {
-		return mobSimAgents;
-	}
-
-
-
+  public Collection<MobsimAgent> getMobSimAgents() {
+    return mobSimAgents;
+  }
 }

@@ -20,8 +20,10 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
+import com.google.inject.Key;
+import com.google.inject.Singleton;
+import com.google.inject.name.Names;
 import java.net.URL;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
@@ -44,54 +46,55 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.speedy.SpeedyDijkstraFactory;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.Key;
-import com.google.inject.Singleton;
-import com.google.inject.name.Names;
-
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class OneTaxiModule extends AbstractDvrpModeModule {
-	private final URL fleetSpecificationUrl;
-	private final PassengerEngineType passengerEngineType;
+  private final URL fleetSpecificationUrl;
+  private final PassengerEngineType passengerEngineType;
 
-	public OneTaxiModule(URL fleetSpecificationUrl, PassengerEngineType passengerEngineType) {
-		super(TransportMode.taxi);
-		this.fleetSpecificationUrl = fleetSpecificationUrl;
-		this.passengerEngineType = passengerEngineType;
-	}
+  public OneTaxiModule(URL fleetSpecificationUrl, PassengerEngineType passengerEngineType) {
+    super(TransportMode.taxi);
+    this.fleetSpecificationUrl = fleetSpecificationUrl;
+    this.passengerEngineType = passengerEngineType;
+  }
 
-	@Override
-	public void install() {
-		DvrpModes.registerDvrpMode(binder(), getMode());
-		install(new DvrpModeRoutingNetworkModule(getMode(), false));
+  @Override
+  public void install() {
+    DvrpModes.registerDvrpMode(binder(), getMode());
+    install(new DvrpModeRoutingNetworkModule(getMode(), false));
 
-		install(new DvrpModeRoutingModule(getMode(), new SpeedyDijkstraFactory()));
-		bindModal(TravelTime.class).to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
-		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
+    install(new DvrpModeRoutingModule(getMode(), new SpeedyDijkstraFactory()));
+    bindModal(TravelTime.class)
+        .to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
+    bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
-		install(new FleetModule(getMode(), fleetSpecificationUrl));
-		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class);
+    install(new FleetModule(getMode(), fleetSpecificationUrl));
+    bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class);
 
-		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
-			@Override
-			protected void configureQSim() {
-				install(new VrpAgentSourceQSimModule(getMode()));
-				install(new PassengerEngineQSimModule(getMode(), passengerEngineType));
+    installQSimModule(
+        new AbstractDvrpModeQSimModule(getMode()) {
+          @Override
+          protected void configureQSim() {
+            install(new VrpAgentSourceQSimModule(getMode()));
+            install(new PassengerEngineQSimModule(getMode(), passengerEngineType));
 
-				// optimizer that dispatches taxis
-				bindModal(VrpOptimizer.class).to(OneTaxiOptimizer.class).in(Singleton.class);
+            // optimizer that dispatches taxis
+            bindModal(VrpOptimizer.class).to(OneTaxiOptimizer.class).in(Singleton.class);
 
-				// converts departures of the "taxi" mode into taxi requests
-				bindModal(PassengerRequestCreator.class).to(OneTaxiRequest.OneTaxiRequestCreator.class)
-						.in(Singleton.class);
+            // converts departures of the "taxi" mode into taxi requests
+            bindModal(PassengerRequestCreator.class)
+                .to(OneTaxiRequest.OneTaxiRequestCreator.class)
+                .in(Singleton.class);
 
-				// converts scheduled tasks into simulated actions (legs and activities)
-				bindModal(VrpAgentLogic.DynActionCreator.class).to(OneTaxiActionCreator.class).in(Singleton.class);
-				
-				// no advance request
-				bindModal(AdvanceRequestProvider.class).toInstance(AdvanceRequestProvider.NONE);
-			}
-		});
-	}
+            // converts scheduled tasks into simulated actions (legs and activities)
+            bindModal(VrpAgentLogic.DynActionCreator.class)
+                .to(OneTaxiActionCreator.class)
+                .in(Singleton.class);
+
+            // no advance request
+            bindModal(AdvanceRequestProvider.class).toInstance(AdvanceRequestProvider.NONE);
+          }
+        });
+  }
 }

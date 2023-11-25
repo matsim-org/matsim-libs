@@ -20,16 +20,14 @@
 
 package org.matsim.withinday.trafficmonitoring;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -57,159 +55,174 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.misc.OptionalTime;
 
 /**
- * Returns the time when an agent could leave a link if he can travel
- * at free speed. After this time, the agent cannot stop on its current link
- * anymore which influences its possible replanning operations.
+ * Returns the time when an agent could leave a link if he can travel at free speed. After this
+ * time, the agent cannot stop on its current link anymore which influences its possible replanning
+ * operations.
  *
  * @author cdobler
  */
-public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler,
-		PersonDepartureEventHandler, PersonStuckEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+public class EarliestLinkExitTimeProvider
+    implements LinkEnterEventHandler,
+        LinkLeaveEventHandler,
+        PersonArrivalEventHandler,
+        PersonDepartureEventHandler,
+        PersonStuckEventHandler,
+        VehicleEntersTrafficEventHandler,
+        VehicleLeavesTrafficEventHandler {
 
-	private static final Logger log = LogManager.getLogger(EarliestLinkExitTimeProvider.class);
+  private static final Logger log = LogManager.getLogger(EarliestLinkExitTimeProvider.class);
 
-	/*
-	 * We have to create an internal TransportModeProvider and delegate the events to it.
-	 * Otherwise, race conditions could occur since an it could not be guaranteed that an
-	 * external TransportModeProvider has processed all relevant events when this class
-	 * handles an event.
-	 */
-	private final TransportModeProvider transportModeProvider;
+  /*
+   * We have to create an internal TransportModeProvider and delegate the events to it.
+   * Otherwise, race conditions could occur since an it could not be guaranteed that an
+   * external TransportModeProvider has processed all relevant events when this class
+   * handles an event.
+   */
+  private final TransportModeProvider transportModeProvider;
 
-	private final Scenario scenario;
-	private final Map<String, TravelTime> multiModalTravelTimes;
-	private final TravelTime freeSpeedTravelTime;
+  private final Scenario scenario;
+  private final Map<String, TravelTime> multiModalTravelTimes;
+  private final TravelTime freeSpeedTravelTime;
 
-	private final ConcurrentMap<Id<Person>, OptionalTime> earliestLinkExitTimes = new ConcurrentHashMap<>();
-	private final ConcurrentMap<OptionalTime, Set<Id<Person>>> earliestLinkExitTimesPerTimeStep = new ConcurrentHashMap<>();
+  private final ConcurrentMap<Id<Person>, OptionalTime> earliestLinkExitTimes =
+      new ConcurrentHashMap<>();
+  private final ConcurrentMap<OptionalTime, Set<Id<Person>>> earliestLinkExitTimesPerTimeStep =
+      new ConcurrentHashMap<>();
 
-	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+  private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
-	public EarliestLinkExitTimeProvider(Scenario scenario, EventsManager eventsManager) {
-		this(scenario, null, eventsManager);
-		log.info("Note: no map containing TravelTime objects for all simulated modes is given. Therefore use free speed " +
-				"car travel time as minimal link travel time for all modes.");
-	}
+  public EarliestLinkExitTimeProvider(Scenario scenario, EventsManager eventsManager) {
+    this(scenario, null, eventsManager);
+    log.info(
+        "Note: no map containing TravelTime objects for all simulated modes is given. Therefore use free speed "
+            + "car travel time as minimal link travel time for all modes.");
+  }
 
-	@Inject
-	public EarliestLinkExitTimeProvider(Scenario scenario, @Named("lowerBound") Map<String, TravelTime> multiModalTravelTimes, EventsManager eventsManager) {
-		this.scenario = scenario;
-		eventsManager.addHandler(this);
-		this.multiModalTravelTimes = multiModalTravelTimes;
-		this.transportModeProvider = new TransportModeProvider();
-		this.freeSpeedTravelTime = new FreeSpeedTravelTime();
-	}
+  @Inject
+  public EarliestLinkExitTimeProvider(
+      Scenario scenario,
+      @Named("lowerBound") Map<String, TravelTime> multiModalTravelTimes,
+      EventsManager eventsManager) {
+    this.scenario = scenario;
+    eventsManager.addHandler(this);
+    this.multiModalTravelTimes = multiModalTravelTimes;
+    this.transportModeProvider = new TransportModeProvider();
+    this.freeSpeedTravelTime = new FreeSpeedTravelTime();
+  }
 
-	public TransportModeProvider getTransportModeProvider() {
-		return this.transportModeProvider;
-	}
+  public TransportModeProvider getTransportModeProvider() {
+    return this.transportModeProvider;
+  }
 
-	public OptionalTime getEarliestLinkExitTime(Id<Person> agentId) {
-		return this.earliestLinkExitTimes.getOrDefault(agentId, OptionalTime.undefined());
-	}
+  public OptionalTime getEarliestLinkExitTime(Id<Person> agentId) {
+    return this.earliestLinkExitTimes.getOrDefault(agentId, OptionalTime.undefined());
+  }
 
-	public Map<Id<Person>, OptionalTime> getEarliestLinkExitTimes() {
-		return Collections.unmodifiableMap(this.earliestLinkExitTimes);
-	}
+  public Map<Id<Person>, OptionalTime> getEarliestLinkExitTimes() {
+    return Collections.unmodifiableMap(this.earliestLinkExitTimes);
+  }
 
-	public Set<Id<Person>> getEarliestLinkExitTimesPerTimeStep(double time) {
-		Set<Id<Person>> set = this.earliestLinkExitTimesPerTimeStep.get(time);
-		if (set != null) return Collections.unmodifiableSet(set);
-		else return null;
-	}
+  public Set<Id<Person>> getEarliestLinkExitTimesPerTimeStep(double time) {
+    Set<Id<Person>> set = this.earliestLinkExitTimesPerTimeStep.get(time);
+    if (set != null) return Collections.unmodifiableSet(set);
+    else return null;
+  }
 
-	public Map<OptionalTime, Set<Id<Person>>> getEarliestLinkExitTimesPerTimeStep() {
-		return Collections.unmodifiableMap(this.earliestLinkExitTimesPerTimeStep);
-	}
+  public Map<OptionalTime, Set<Id<Person>>> getEarliestLinkExitTimesPerTimeStep() {
+    return Collections.unmodifiableMap(this.earliestLinkExitTimesPerTimeStep);
+  }
 
-	@Override
-	public void reset(int iteration) {
-		this.transportModeProvider.reset(iteration);
+  @Override
+  public void reset(int iteration) {
+    this.transportModeProvider.reset(iteration);
 
-		this.earliestLinkExitTimes.clear();
-		this.earliestLinkExitTimesPerTimeStep.clear();
-	}
+    this.earliestLinkExitTimes.clear();
+    this.earliestLinkExitTimesPerTimeStep.clear();
+  }
 
-	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-		this.transportModeProvider.handleEvent(event);
-		this.removeEarliestLinkExitTimesAtTime(event.getPersonId());
-	}
+  @Override
+  public void handleEvent(PersonArrivalEvent event) {
+    this.transportModeProvider.handleEvent(event);
+    this.removeEarliestLinkExitTimesAtTime(event.getPersonId());
+  }
 
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
-		String transportMode = this.transportModeProvider.getTransportMode(driverId);
-		double now = event.getTime();
-		Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
-		Person person = this.scenario.getPopulation().getPersons().get(driverId);
-		double earliestExitTime;
-		if (this.multiModalTravelTimes != null) {
-			if (transportMode == null) {
-				throw new RuntimeException(
-						"Agent " + driverId.toString() + " is currently not performing a leg. Aborting!");
-			} else {
-				TravelTime travelTime = this.multiModalTravelTimes.get(transportMode);
-				if (travelTime == null) {
-					throw new RuntimeException(
-							"No TravelTime object was found for mode " + transportMode + ". Aborting!");
-				}
+  @Override
+  public void handleEvent(LinkEnterEvent event) {
+    Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
+    String transportMode = this.transportModeProvider.getTransportMode(driverId);
+    double now = event.getTime();
+    Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
+    Person person = this.scenario.getPopulation().getPersons().get(driverId);
+    double earliestExitTime;
+    if (this.multiModalTravelTimes != null) {
+      if (transportMode == null) {
+        throw new RuntimeException(
+            "Agent " + driverId.toString() + " is currently not performing a leg. Aborting!");
+      } else {
+        TravelTime travelTime = this.multiModalTravelTimes.get(transportMode);
+        if (travelTime == null) {
+          throw new RuntimeException(
+              "No TravelTime object was found for mode " + transportMode + ". Aborting!");
+        }
 
-				earliestExitTime = Math.floor(now + travelTime.getLinkTravelTime(link, now, person, null));
-			}
-		} else {
-			earliestExitTime = Math.floor(now + this.freeSpeedTravelTime.getLinkTravelTime(link, now, person, null));
-		}
-		this.handleAddEarliestLinkExitTime(driverId, earliestExitTime);
-	}
+        earliestExitTime = Math.floor(now + travelTime.getLinkTravelTime(link, now, person, null));
+      }
+    } else {
+      earliestExitTime =
+          Math.floor(now + this.freeSpeedTravelTime.getLinkTravelTime(link, now, person, null));
+    }
+    this.handleAddEarliestLinkExitTime(driverId, earliestExitTime);
+  }
 
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		this.removeEarliestLinkExitTimesAtTime(delegate.getDriverOfVehicle(event.getVehicleId()));
-	}
+  @Override
+  public void handleEvent(LinkLeaveEvent event) {
+    this.removeEarliestLinkExitTimesAtTime(delegate.getDriverOfVehicle(event.getVehicleId()));
+  }
 
-	@Override
-	public void handleEvent(PersonDepartureEvent event) {
-		this.transportModeProvider.handleEvent(event);
-		this.handleAddEarliestLinkExitTime(event.getPersonId(), event.getTime());
-	}
+  @Override
+  public void handleEvent(PersonDepartureEvent event) {
+    this.transportModeProvider.handleEvent(event);
+    this.handleAddEarliestLinkExitTime(event.getPersonId(), event.getTime());
+  }
 
-	@Override
-	public void handleEvent(PersonStuckEvent event) {
-		this.transportModeProvider.handleEvent(event);
-		this.removeEarliestLinkExitTimesAtTime(event.getPersonId());
-	}
+  @Override
+  public void handleEvent(PersonStuckEvent event) {
+    this.transportModeProvider.handleEvent(event);
+    this.removeEarliestLinkExitTimesAtTime(event.getPersonId());
+  }
 
-	private void handleAddEarliestLinkExitTime(Id<Person> agentId, double earliestExitTime) {
-		OptionalTime optionalEarliestExitTime = OptionalTime.defined(earliestExitTime);
-		this.earliestLinkExitTimes.put(agentId, optionalEarliestExitTime);
-		//why the value set is not concurrent while the enclosing map is concurrent??
-		Set<Id<Person>> earliestLinkExitTimesAtTime = this.earliestLinkExitTimesPerTimeStep.computeIfAbsent(
-				optionalEarliestExitTime, k -> new HashSet<>());
-		earliestLinkExitTimesAtTime.add(agentId);
-	}
+  private void handleAddEarliestLinkExitTime(Id<Person> agentId, double earliestExitTime) {
+    OptionalTime optionalEarliestExitTime = OptionalTime.defined(earliestExitTime);
+    this.earliestLinkExitTimes.put(agentId, optionalEarliestExitTime);
+    // why the value set is not concurrent while the enclosing map is concurrent??
+    Set<Id<Person>> earliestLinkExitTimesAtTime =
+        this.earliestLinkExitTimesPerTimeStep.computeIfAbsent(
+            optionalEarliestExitTime, k -> new HashSet<>());
+    earliestLinkExitTimesAtTime.add(agentId);
+  }
 
-	private void removeEarliestLinkExitTimesAtTime(Id<Person> agentId) {
-		OptionalTime earliestExitTime = this.earliestLinkExitTimes.remove(agentId);
+  private void removeEarliestLinkExitTimesAtTime(Id<Person> agentId) {
+    OptionalTime earliestExitTime = this.earliestLinkExitTimes.remove(agentId);
 
-		if (earliestExitTime != null) {
-			Set<Id<Person>> earliestLinkExitTimesAtTime = this.earliestLinkExitTimesPerTimeStep.get(earliestExitTime);
-			if (earliestLinkExitTimesAtTime != null) {
-				earliestLinkExitTimesAtTime.remove(agentId);
-				if (earliestLinkExitTimesAtTime.isEmpty()) {
-					this.earliestLinkExitTimesPerTimeStep.remove(earliestExitTime);
-				}
-			}
-		}
-	}
+    if (earliestExitTime != null) {
+      Set<Id<Person>> earliestLinkExitTimesAtTime =
+          this.earliestLinkExitTimesPerTimeStep.get(earliestExitTime);
+      if (earliestLinkExitTimesAtTime != null) {
+        earliestLinkExitTimesAtTime.remove(agentId);
+        if (earliestLinkExitTimesAtTime.isEmpty()) {
+          this.earliestLinkExitTimesPerTimeStep.remove(earliestExitTime);
+        }
+      }
+    }
+  }
 
-	@Override
-	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		delegate.handleEvent(event);
-	}
+  @Override
+  public void handleEvent(VehicleLeavesTrafficEvent event) {
+    delegate.handleEvent(event);
+  }
 
-	@Override
-	public void handleEvent(VehicleEntersTrafficEvent event) {
-		delegate.handleEvent(event);
-	}
+  @Override
+  public void handleEvent(VehicleEntersTrafficEvent event) {
+    delegate.handleEvent(event);
+  }
 }

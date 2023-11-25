@@ -20,6 +20,11 @@
 
 package org.matsim.core.population.io;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -36,176 +41,186 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.HashMap;
-import java.util.Map;
-
 public final class StreamingPopulationWriter implements PersonAlgorithm {
-	private final static Logger log = LogManager.getLogger(StreamingPopulationWriter.class);
+  private static final Logger log = LogManager.getLogger(StreamingPopulationWriter.class);
 
-	private final double write_person_fraction;
+  private final double write_person_fraction;
 
-	private PopulationWriterHandler handler = null;
-	private Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
-	private final Map<Class<?>, AttributeConverter<?>> attributeConverters = new HashMap<>();
+  private PopulationWriterHandler handler = null;
+  private Counter counter =
+      new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
+  private final Map<Class<?>, AttributeConverter<?>> attributeConverters = new HashMap<>();
 
-	private static class DummyMatsimWriter extends AbstractMatsimWriter {
-		BufferedWriter getWriter() {
-			return writer;
-		}
-		void openHere(String filename ) {
-			super.openFile(filename);
-		}
-		void closeHere() {
-			super.close() ;
-		}
-	}
-	private DummyMatsimWriter matsimWriter = new DummyMatsimWriter() ;
+  private static class DummyMatsimWriter extends AbstractMatsimWriter {
+    BufferedWriter getWriter() {
+      return writer;
+    }
 
+    void openHere(String filename) {
+      super.openFile(filename);
+    }
 
-	public StreamingPopulationWriter() {
-		this(1.0);
-	}
+    void closeHere() {
+      super.close();
+    }
+  }
 
-	public StreamingPopulationWriter(
-			final CoordinateTransformation coordinateTransformation) {
-		this(coordinateTransformation , 1.0);
-	}
+  private DummyMatsimWriter matsimWriter = new DummyMatsimWriter();
 
-	/**
-	 *
-	 * @param coordinateTransformation transformation from the internal CRS to the CRS in which the file should be written
-	 * @param fraction of persons to write to the plans file
-	 */
-	public StreamingPopulationWriter(
-			final CoordinateTransformation coordinateTransformation,
-			final double fraction) {
-		this.write_person_fraction = fraction;
-		this.handler = new ParallelPopulationWriterHandlerV6(coordinateTransformation);
-	}
+  public StreamingPopulationWriter() {
+    this(1.0);
+  }
 
-	/**
-	 * @param fraction of persons to write to the plans file
-	 */
-	public StreamingPopulationWriter(
-			final double fraction) {
-		this( new IdentityTransformation() , fraction );
-	}
+  public StreamingPopulationWriter(final CoordinateTransformation coordinateTransformation) {
+    this(coordinateTransformation, 1.0);
+  }
 
-	public <T> void putAttributeConverter(Class<T> clazz, AttributeConverter<T> converter) {
-		this.attributeConverters.put(clazz, converter);
-	}
+  /**
+   * @param coordinateTransformation transformation from the internal CRS to the CRS in which the
+   *     file should be written
+   * @param fraction of persons to write to the plans file
+   */
+  public StreamingPopulationWriter(
+      final CoordinateTransformation coordinateTransformation, final double fraction) {
+    this.write_person_fraction = fraction;
+    this.handler = new ParallelPopulationWriterHandlerV6(coordinateTransformation);
+  }
 
-	public void putAttributeConverters(final Map<Class<?>, AttributeConverter<?>> converters) {
-		this.attributeConverters.putAll(converters);
-	}
+  /**
+   * @param fraction of persons to write to the plans file
+   */
+  public StreamingPopulationWriter(final double fraction) {
+    this(new IdentityTransformation(), fraction);
+  }
 
-	// implementation of PersonAlgorithm
-	// this is primarily to use the PlansWriter with filters and other algorithms.
-	public final void startStreaming(final String filename) {
-//		if ((this.population instanceof Population) && (((Population) this.population).isStreaming())) {
-//		if ( this.population instanceof StreamingPopulationReader.StreamingPopulation ) {
-	// write the file head if it is used with streaming.
-			writeStartPlans(filename);
-//		} else {
-//			log.error("Cannot start streaming. Streaming must be activated in the Population.");
-//		}
-	}
+  public <T> void putAttributeConverter(Class<T> clazz, AttributeConverter<T> converter) {
+    this.attributeConverters.put(clazz, converter);
+  }
 
-	@Override
-	public final void run(final Person person) {
-		writePerson(person);
-	}
+  public void putAttributeConverters(final Map<Class<?>, AttributeConverter<?>> converters) {
+    this.attributeConverters.putAll(converters);
+  }
 
-	public final void closeStreaming() {
-//		if ((this.population instanceof Population) && (((Population) this.population).isStreaming())) {
-//		if ( this.population instanceof StreamingPopulationReader.StreamingPopulation ) {
-			if (matsimWriter.getWriter() != null) {
-				writeEndPlans();
-			} else {
-				log.error("Cannot close streaming. File is not open.");
-			}
-//		} else {
-//			log.error("Cannot close streaming. Streaming must be activated in the Population.");
-//		}
-	}
+  // implementation of PersonAlgorithm
+  // this is primarily to use the PlansWriter with filters and other algorithms.
+  public final void startStreaming(final String filename) {
+    //		if ((this.population instanceof Population) && (((Population)
+    // this.population).isStreaming())) {
+    //		if ( this.population instanceof StreamingPopulationReader.StreamingPopulation ) {
+    // write the file head if it is used with streaming.
+    writeStartPlans(filename);
+    //		} else {
+    //			log.error("Cannot start streaming. Streaming must be activated in the Population.");
+    //		}
+  }
 
-	public final void writeStartPlans(final String filename) {
-		Population fakepop = new Population(){
+  @Override
+  public final void run(final Person person) {
+    writePerson(person);
+  }
 
-			@Override public PopulationFactory getFactory() {
-				throw new RuntimeException("not implemented") ;
-			}
-			@Override public String getName() {
-				return "population written from streaming" ;
-			}
-			@Override public void setName(String name) {
-				throw new RuntimeException("not implemented") ;
-			}
-			@Override public Map<Id<Person>, ? extends Person> getPersons() {
-				throw new RuntimeException("not implemented") ;
-			}
-			@Override public void addPerson(Person p) {
-				throw new RuntimeException("not implemented") ;
-			}
-			@Override public Person removePerson(Id<Person> personId) {
-				throw new RuntimeException("not implemented") ;
-			}
-			@Override
-			public Attributes getAttributes() {
-				//A stream written Population cannot contain Population Attributes, only Person Attributes.
-				return new AttributesImpl();
-			}
+  public final void closeStreaming() {
+    //		if ((this.population instanceof Population) && (((Population)
+    // this.population).isStreaming())) {
+    //		if ( this.population instanceof StreamingPopulationReader.StreamingPopulation ) {
+    if (matsimWriter.getWriter() != null) {
+      writeEndPlans();
+    } else {
+      log.error("Cannot close streaming. File is not open.");
+    }
+    //		} else {
+    //			log.error("Cannot close streaming. Streaming must be activated in the Population.");
+    //		}
+  }
 
-		} ;
-		try {
-			matsimWriter.openHere(filename);
-			this.handler.putAttributeConverters(this.attributeConverters);
-			this.handler.writeHeaderAndStartElement(matsimWriter.getWriter());
-			this.handler.startPlans(fakepop, matsimWriter.getWriter());
-			this.handler.writeSeparator(matsimWriter.getWriter());
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
+  public final void writeStartPlans(final String filename) {
+    Population fakepop =
+        new Population() {
 
-	@SuppressWarnings("static-method")
-	@Deprecated // see comments in method.  kai, dec'16
-	public final void writePersons() {
-		throw new RuntimeException("this execution path does not longer exist.  See comments in code") ;
-		// you can program this yourself by using something like
-//		for (Person p : PopulationUtils.getSortedPersons(population).values()) {
-//			writePerson(p);
-//		}
-		// providing it at the level here would mean to have access to a population that is otherwise totally not needed for streaming.
-		// kai, dec'16
-	}
+          @Override
+          public PopulationFactory getFactory() {
+            throw new RuntimeException("not implemented");
+          }
 
-	public final void writePerson(final Person person) {
-		try {
-			if ((this.write_person_fraction < 1.0) && (MatsimRandom.getRandom().nextDouble() >= this.write_person_fraction)) {
-				return;
-			}
-			this.handler.writePerson(person, matsimWriter.getWriter());
-			counter.incCounter();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
+          @Override
+          public String getName() {
+            return "population written from streaming";
+          }
 
-	public final void writeEndPlans() {
-		try {
-			this.handler.endPlans(matsimWriter.getWriter());
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-		matsimWriter.closeHere();
-	}
+          @Override
+          public void setName(String name) {
+            throw new RuntimeException("not implemented");
+          }
 
-	public final void setWriterHandler(final PopulationWriterHandler handler) {
-		this.handler = handler;
-	}
+          @Override
+          public Map<Id<Person>, ? extends Person> getPersons() {
+            throw new RuntimeException("not implemented");
+          }
 
+          @Override
+          public void addPerson(Person p) {
+            throw new RuntimeException("not implemented");
+          }
+
+          @Override
+          public Person removePerson(Id<Person> personId) {
+            throw new RuntimeException("not implemented");
+          }
+
+          @Override
+          public Attributes getAttributes() {
+            // A stream written Population cannot contain Population Attributes, only Person
+            // Attributes.
+            return new AttributesImpl();
+          }
+        };
+    try {
+      matsimWriter.openHere(filename);
+      this.handler.putAttributeConverters(this.attributeConverters);
+      this.handler.writeHeaderAndStartElement(matsimWriter.getWriter());
+      this.handler.startPlans(fakepop, matsimWriter.getWriter());
+      this.handler.writeSeparator(matsimWriter.getWriter());
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
+
+  @SuppressWarnings("static-method")
+  @Deprecated // see comments in method.  kai, dec'16
+  public final void writePersons() {
+    throw new RuntimeException("this execution path does not longer exist.  See comments in code");
+    // you can program this yourself by using something like
+    //		for (Person p : PopulationUtils.getSortedPersons(population).values()) {
+    //			writePerson(p);
+    //		}
+    // providing it at the level here would mean to have access to a population that is otherwise
+    // totally not needed for streaming.
+    // kai, dec'16
+  }
+
+  public final void writePerson(final Person person) {
+    try {
+      if ((this.write_person_fraction < 1.0)
+          && (MatsimRandom.getRandom().nextDouble() >= this.write_person_fraction)) {
+        return;
+      }
+      this.handler.writePerson(person, matsimWriter.getWriter());
+      counter.incCounter();
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
+
+  public final void writeEndPlans() {
+    try {
+      this.handler.endPlans(matsimWriter.getWriter());
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+    matsimWriter.closeHere();
+  }
+
+  public final void setWriterHandler(final PopulationWriterHandler handler) {
+    this.handler = handler;
+  }
 }

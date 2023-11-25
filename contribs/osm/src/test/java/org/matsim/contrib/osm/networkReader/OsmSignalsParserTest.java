@@ -1,232 +1,241 @@
 package org.matsim.contrib.osm.networkReader;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import de.topobyte.osm4j.core.model.iface.*;
 import de.topobyte.osm4j.core.model.impl.Node;
 import de.topobyte.osm4j.core.model.impl.Relation;
 import de.topobyte.osm4j.core.model.impl.RelationMember;
 import de.topobyte.osm4j.core.model.impl.Tag;
-
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.testcases.MatsimTestUtils;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.testcases.MatsimTestUtils;
 
 public class OsmSignalsParserTest {
 
-	private static final CoordinateTransformation transformation = new IdentityTransformation();
-	private final ExecutorService executor = Executors.newSingleThreadExecutor();
+  private static final CoordinateTransformation transformation = new IdentityTransformation();
+  private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @After
+  public void shutDownExecutor() {
+    executor.shutdown();
+  }
 
+  @Test
+  public void parse_singleLinkWithCrossing() {
 
-	@After
-	public void shutDownExecutor() {
-		executor.shutdown();
-	}
+    Path file = Paths.get(utils.getOutputDirectory()).resolve("tmp.pbf");
+    Utils.OsmData data = Utils.createSingleLink();
+    List<OsmTag> tags = new ArrayList<>();
+    tags.add(new Tag(OsmTags.HIGHWAY, OsmTags.CROSSING));
 
-	@Test
-	public void parse_singleLinkWithCrossing() {
+    // copy the middle node
+    OsmNode crossing =
+        new Node(
+            data.getNodes().get(1).getId(),
+            data.getNodes().get(1).getLatitude(),
+            data.getNodes().get(1).getLongitude(),
+            tags);
 
-		Path file = Paths.get(utils.getOutputDirectory()).resolve("tmp.pbf");
-		Utils.OsmData data = Utils.createSingleLink();
-		List<OsmTag> tags = new ArrayList<>();
-		tags.add(new Tag(OsmTags.HIGHWAY, OsmTags.CROSSING));
+    // replace middle node with crossing
+    data.getNodes().set(1, crossing);
 
-		// copy the middle node
-		OsmNode crossing = new Node(
-				data.getNodes().get(1).getId(),
-				data.getNodes().get(1).getLatitude(),
-				data.getNodes().get(1).getLongitude(),
-				tags
-		);
+    Utils.writeOsmData(data, file);
 
-		// replace middle node with crossing
-		data.getNodes().set(1, crossing);
+    OsmSignalsParser parser = createDefaultParser();
+    parser.parse(file);
 
-		Utils.writeOsmData(data, file);
+    assertEquals(1, parser.getWays().size());
+    assertEquals(4, parser.getNodes().size());
+    assertEquals(1, parser.getSignalizedNodes().size());
+    assertEquals(0, parser.getNodeRestrictions().size());
 
-		OsmSignalsParser parser = createDefaultParser();
-		parser.parse(file);
+    // assert that the right node-id is memorized as crossing
+    assertTrue(parser.getSignalizedNodes().containsKey(crossing.getId()));
+    assertEquals(OsmTags.CROSSING, parser.getSignalizedNodes().get(crossing.getId()));
+  }
 
-		assertEquals(1, parser.getWays().size());
-		assertEquals(4, parser.getNodes().size());
-		assertEquals(1, parser.getSignalizedNodes().size());
-		assertEquals(0, parser.getNodeRestrictions().size());
+  @Test
+  public void parse_singleLinkWithTrafficSignals() {
 
-		// assert that the right node-id is memorized as crossing
-		assertTrue(parser.getSignalizedNodes().containsKey(crossing.getId()));
-		assertEquals(OsmTags.CROSSING, parser.getSignalizedNodes().get(crossing.getId()));
-	}
+    Path file = Paths.get(utils.getOutputDirectory()).resolve("tmp.pbf");
+    Utils.OsmData data = Utils.createSingleLink();
+    List<OsmTag> tags = new ArrayList<>();
+    tags.add(new Tag(OsmTags.HIGHWAY, OsmTags.TRAFFIC_SINGALS));
 
-	@Test
-	public void parse_singleLinkWithTrafficSignals() {
+    // copy the middle node
+    OsmNode crossing =
+        new Node(
+            data.getNodes().get(1).getId(),
+            data.getNodes().get(1).getLatitude(),
+            data.getNodes().get(1).getLongitude(),
+            tags);
 
-		Path file = Paths.get(utils.getOutputDirectory()).resolve("tmp.pbf");
-		Utils.OsmData data = Utils.createSingleLink();
-		List<OsmTag> tags = new ArrayList<>();
-		tags.add(new Tag(OsmTags.HIGHWAY, OsmTags.TRAFFIC_SINGALS));
+    // replace middle node with crossing
+    data.getNodes().set(1, crossing);
 
-		// copy the middle node
-		OsmNode crossing = new Node(
-				data.getNodes().get(1).getId(),
-				data.getNodes().get(1).getLatitude(),
-				data.getNodes().get(1).getLongitude(),
-				tags
-		);
+    Utils.writeOsmData(data, file);
 
-		// replace middle node with crossing
-		data.getNodes().set(1, crossing);
+    OsmSignalsParser parser = createDefaultParser();
+    parser.parse(file);
 
-		Utils.writeOsmData(data, file);
+    assertEquals(1, parser.getWays().size());
+    assertEquals(4, parser.getNodes().size());
+    assertEquals(1, parser.getSignalizedNodes().size());
+    assertEquals(0, parser.getNodeRestrictions().size());
 
-		OsmSignalsParser parser = createDefaultParser();
-		parser.parse(file);
+    // assert that the right node-id is memorized as crossing
+    assertTrue(parser.getSignalizedNodes().containsKey(crossing.getId()));
+    assertEquals(OsmTags.TRAFFIC_SINGALS, parser.getSignalizedNodes().get(crossing.getId()));
+  }
 
-		assertEquals(1, parser.getWays().size());
-		assertEquals(4, parser.getNodes().size());
-		assertEquals(1, parser.getSignalizedNodes().size());
-		assertEquals(0, parser.getNodeRestrictions().size());
+  @Test
+  public void parse_singleLinkWithNonHighwayNode() {
 
-		// assert that the right node-id is memorized as crossing
-		assertTrue(parser.getSignalizedNodes().containsKey(crossing.getId()));
-		assertEquals(OsmTags.TRAFFIC_SINGALS, parser.getSignalizedNodes().get(crossing.getId()));
-	}
+    Path file = Paths.get(utils.getOutputDirectory()).resolve("tmp.pbf");
+    Utils.OsmData data = Utils.createSingleLink();
+    List<OsmTag> tags = new ArrayList<>();
+    tags.add(new Tag(OsmTags.HIGHWAY, "other-than-traffic-ligh-and-crossing"));
 
-	@Test
-	public void parse_singleLinkWithNonHighwayNode() {
+    // copy the middle node
+    OsmNode crossing =
+        new Node(
+            data.getNodes().get(1).getId(),
+            data.getNodes().get(1).getLatitude(),
+            data.getNodes().get(1).getLongitude(),
+            tags);
 
-		Path file = Paths.get(utils.getOutputDirectory()).resolve("tmp.pbf");
-		Utils.OsmData data = Utils.createSingleLink();
-		List<OsmTag> tags = new ArrayList<>();
-		tags.add(new Tag(OsmTags.HIGHWAY, "other-than-traffic-ligh-and-crossing"));
+    // replace middle node with crossing
+    data.getNodes().set(1, crossing);
 
-		// copy the middle node
-		OsmNode crossing = new Node(
-				data.getNodes().get(1).getId(),
-				data.getNodes().get(1).getLatitude(),
-				data.getNodes().get(1).getLongitude(),
-				tags
-		);
+    Utils.writeOsmData(data, file);
 
-		// replace middle node with crossing
-		data.getNodes().set(1, crossing);
+    OsmSignalsParser parser = createDefaultParser();
+    parser.parse(file);
 
-		Utils.writeOsmData(data, file);
+    assertEquals(1, parser.getWays().size());
+    assertEquals(4, parser.getNodes().size());
+    assertEquals(0, parser.getSignalizedNodes().size());
+    assertEquals(0, parser.getNodeRestrictions().size());
+  }
 
-		OsmSignalsParser parser = createDefaultParser();
-		parser.parse(file);
+  @Test
+  public void parse_singleLinkWithNodeNotReferencedByWay() {
 
-		assertEquals(1, parser.getWays().size());
-		assertEquals(4, parser.getNodes().size());
-		assertEquals(0, parser.getSignalizedNodes().size());
-		assertEquals(0, parser.getNodeRestrictions().size());
-	}
+    Path file = Paths.get(utils.getOutputDirectory()).resolve("tmp.pbf");
+    Utils.OsmData data = Utils.createSingleLink();
 
-	@Test
-	public void parse_singleLinkWithNodeNotReferencedByWay() {
+    List<OsmNode> nodes = new ArrayList<>(data.getNodes());
+    nodes.add(new Node(6, 1, 2));
 
-		Path file = Paths.get(utils.getOutputDirectory()).resolve("tmp.pbf");
-		Utils.OsmData data = Utils.createSingleLink();
+    Utils.writeOsmData(nodes, data.getWays(), file);
 
-		List<OsmNode> nodes = new ArrayList<>(data.getNodes());
-		nodes.add(new Node(6, 1, 2));
+    OsmSignalsParser parser = createDefaultParser();
+    parser.parse(file);
 
-		Utils.writeOsmData(nodes, data.getWays(), file);
+    assertEquals(1, parser.getWays().size());
+    assertEquals(4, parser.getNodes().size());
+    assertEquals(0, parser.getSignalizedNodes().size());
+    assertEquals(0, parser.getNodeRestrictions().size());
+  }
 
-		OsmSignalsParser parser = createDefaultParser();
-		parser.parse(file);
+  @Test
+  public void parse_intersectingWaysWithProhibitiveRestriction() {
 
-		assertEquals(1, parser.getWays().size());
-		assertEquals(4, parser.getNodes().size());
-		assertEquals(0, parser.getSignalizedNodes().size());
-		assertEquals(0, parser.getNodeRestrictions().size());
-	}
+    Path file = Paths.get(utils.getOutputDirectory()).resolve("tmp.pbf");
+    Utils.OsmData data = Utils.createTwoIntersectingLinksWithDifferentLevels();
 
-	@Test
-	public void parse_intersectingWaysWithProhibitiveRestriction() {
+    List<OsmRelation> relations = new ArrayList<>();
+    relations.add(
+        createRestriction(
+            1,
+            data.getWays().get(0),
+            data.getWays().get(1),
+            data.getNodes().get(1),
+            "no_right_turn"));
 
-		Path file = Paths.get(utils.getOutputDirectory()).resolve("tmp.pbf");
-		Utils.OsmData data = Utils.createTwoIntersectingLinksWithDifferentLevels();
+    Utils.OsmData withRelation = new Utils.OsmData(data.getNodes(), data.getWays(), relations);
+    Utils.writeOsmData(withRelation, file);
 
-		List<OsmRelation> relations = new ArrayList<>();
-		relations.add(createRestriction(1, data.getWays().get(0), data.getWays().get(1), data.getNodes().get(1), "no_right_turn"));
+    OsmSignalsParser parser = createDefaultParser();
+    parser.parse(file);
 
-		Utils.OsmData withRelation = new Utils.OsmData(data.getNodes(), data.getWays(), relations);
-		Utils.writeOsmData(withRelation, file);
+    assertEquals(2, parser.getWays().size());
+    assertEquals(17, parser.getNodes().size());
+    assertEquals(0, parser.getSignalizedNodes().size());
+    assertEquals(1, parser.getNodeRestrictions().size());
 
-		OsmSignalsParser parser = createDefaultParser();
-		parser.parse(file);
+    ProcessedRelation restriction =
+        parser.getNodeRestrictions().get(data.getNodes().get(1).getId()).iterator().next();
+    assertEquals(data.getWays().get(0).getId(), restriction.getFromWayId());
+    assertEquals(data.getWays().get(1).getId(), restriction.getToWayId());
+    assertEquals(data.getNodes().get(1).getId(), restriction.getNodeId());
+    assertEquals(ProcessedRelation.Type.PROHIBITIVE, restriction.getType());
+  }
 
-		assertEquals(2, parser.getWays().size());
-		assertEquals(17, parser.getNodes().size());
-		assertEquals(0, parser.getSignalizedNodes().size());
-		assertEquals(1, parser.getNodeRestrictions().size());
+  @Test
+  public void parse_intersectingWaysWithImperativeRestriction() {
 
-		ProcessedRelation restriction = parser.getNodeRestrictions().get(data.getNodes().get(1).getId()).iterator().next();
-		assertEquals(data.getWays().get(0).getId(), restriction.getFromWayId());
-		assertEquals(data.getWays().get(1).getId(), restriction.getToWayId());
-		assertEquals(data.getNodes().get(1).getId(), restriction.getNodeId());
-		assertEquals(ProcessedRelation.Type.PROHIBITIVE, restriction.getType());
-	}
+    Path file = Paths.get(utils.getOutputDirectory()).resolve("tmp.pbf");
+    Utils.OsmData data = Utils.createTwoIntersectingLinksWithDifferentLevels();
 
-	@Test
-	public void parse_intersectingWaysWithImperativeRestriction() {
+    List<OsmRelation> relations = new ArrayList<>();
+    relations.add(
+        createRestriction(
+            1,
+            data.getWays().get(0),
+            data.getWays().get(1),
+            data.getNodes().get(1),
+            "only_right_turn"));
 
-		Path file = Paths.get(utils.getOutputDirectory()).resolve("tmp.pbf");
-		Utils.OsmData data = Utils.createTwoIntersectingLinksWithDifferentLevels();
+    Utils.OsmData withRelation = new Utils.OsmData(data.getNodes(), data.getWays(), relations);
+    Utils.writeOsmData(withRelation, file);
 
-		List<OsmRelation> relations = new ArrayList<>();
-		relations.add(createRestriction(1, data.getWays().get(0), data.getWays().get(1), data.getNodes().get(1), "only_right_turn"));
+    OsmSignalsParser parser = createDefaultParser();
+    parser.parse(file);
 
-		Utils.OsmData withRelation = new Utils.OsmData(data.getNodes(), data.getWays(), relations);
-		Utils.writeOsmData(withRelation, file);
+    assertEquals(2, parser.getWays().size());
+    assertEquals(17, parser.getNodes().size());
+    assertEquals(0, parser.getSignalizedNodes().size());
+    assertEquals(1, parser.getNodeRestrictions().size());
 
-		OsmSignalsParser parser = createDefaultParser();
-		parser.parse(file);
+    ProcessedRelation restriction =
+        parser.getNodeRestrictions().get(data.getNodes().get(1).getId()).iterator().next();
+    assertEquals(data.getWays().get(0).getId(), restriction.getFromWayId());
+    assertEquals(data.getWays().get(1).getId(), restriction.getToWayId());
+    assertEquals(data.getNodes().get(1).getId(), restriction.getNodeId());
+    assertEquals(ProcessedRelation.Type.IMPERATIVE, restriction.getType());
+  }
 
-		assertEquals(2, parser.getWays().size());
-		assertEquals(17, parser.getNodes().size());
-		assertEquals(0, parser.getSignalizedNodes().size());
-		assertEquals(1, parser.getNodeRestrictions().size());
+  private OsmSignalsParser createDefaultParser() {
+    return new OsmSignalsParser(
+        transformation, LinkProperties.createLinkProperties(), (coord, id) -> true, executor);
+  }
 
-		ProcessedRelation restriction = parser.getNodeRestrictions().get(data.getNodes().get(1).getId()).iterator().next();
-		assertEquals(data.getWays().get(0).getId(), restriction.getFromWayId());
-		assertEquals(data.getWays().get(1).getId(), restriction.getToWayId());
-		assertEquals(data.getNodes().get(1).getId(), restriction.getNodeId());
-		assertEquals(ProcessedRelation.Type.IMPERATIVE, restriction.getType());
-	}
+  private OsmRelation createRestriction(
+      long id, OsmWay from, OsmWay to, OsmNode via, String restriction) {
 
-	private OsmSignalsParser createDefaultParser() {
-		return new OsmSignalsParser(transformation,
-				LinkProperties.createLinkProperties(), (coord, id) -> true, executor);
-	}
+    List<OsmRelationMember> members = new ArrayList<>();
+    members.add(new RelationMember(from.getId(), EntityType.Way, "from"));
+    members.add(new RelationMember(to.getId(), EntityType.Way, "to"));
+    members.add(new RelationMember(via.getId(), EntityType.Node, "via"));
 
-	private OsmRelation createRestriction(long id, OsmWay from, OsmWay to, OsmNode via, String restriction) {
+    List<OsmTag> tags = new ArrayList<>();
+    tags.add(new Tag(OsmTags.TYPE, OsmTags.RESTRICTION));
+    tags.add(new Tag(OsmTags.RESTRICTION, restriction));
 
-		List<OsmRelationMember> members = new ArrayList<>();
-		members.add(new RelationMember(from.getId(), EntityType.Way, "from"));
-		members.add(new RelationMember(to.getId(), EntityType.Way, "to"));
-		members.add(new RelationMember(via.getId(), EntityType.Node, "via"));
-
-		List<OsmTag> tags = new ArrayList<>();
-		tags.add(new Tag(OsmTags.TYPE, OsmTags.RESTRICTION));
-		tags.add(new Tag(OsmTags.RESTRICTION, restriction));
-
-		return new Relation(id, members, tags);
-	}
+    return new Relation(id, members, tags);
+  }
 }

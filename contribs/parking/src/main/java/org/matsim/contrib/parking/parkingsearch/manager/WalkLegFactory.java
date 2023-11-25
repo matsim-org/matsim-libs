@@ -20,7 +20,6 @@
 package org.matsim.contrib.parking.parkingsearch.manager;
 
 import jakarta.inject.Inject;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -32,33 +31,32 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
- * @author  jbischoff
- *
+ * @author jbischoff
  */
 public class WalkLegFactory {
-	final Network network;
-	final double walkspeed;
-	final double beelinedistancefactor;
+  final Network network;
+  final double walkspeed;
+  final double beelinedistancefactor;
 
-	@Inject
-	public WalkLegFactory(Network network, Config config) {
-		this.network = network;
-		this.beelinedistancefactor = config.routing().getBeelineDistanceFactors().get("walk");
-		this.walkspeed = config.routing().getTeleportedModeSpeeds().get("walk");
+  @Inject
+  public WalkLegFactory(Network network, Config config) {
+    this.network = network;
+    this.beelinedistancefactor = config.routing().getBeelineDistanceFactors().get("walk");
+    this.walkspeed = config.routing().getTeleportedModeSpeeds().get("walk");
+  }
 
-	}
-
-	public Leg createWalkLeg(Id<Link> from, Id<Link> to, double startTime, String walkMode){
-		Leg leg = PopulationUtils.createLeg(walkMode);
-		double walkDistance = CoordUtils.calcEuclideanDistance(network.getLinks().get(from).getCoord(), network.getLinks().get(to).getCoord())*beelinedistancefactor;
-		double walkTime = walkDistance / walkspeed;
-		Route route = RouteUtils.createGenericRouteImpl(from, to);
-		route.setDistance(walkDistance);
-		route.setTravelTime(walkTime);
-		leg.setRoute(route);
-		leg.setDepartureTime(startTime);
-		return leg;
-	}
-
-
+  public Leg createWalkLeg(Id<Link> from, Id<Link> to, double startTime, String walkMode) {
+    Leg leg = PopulationUtils.createLeg(walkMode);
+    double walkDistance =
+        CoordUtils.calcEuclideanDistance(
+                network.getLinks().get(from).getCoord(), network.getLinks().get(to).getCoord())
+            * beelinedistancefactor;
+    double walkTime = walkDistance / walkspeed;
+    Route route = RouteUtils.createGenericRouteImpl(from, to);
+    route.setDistance(walkDistance);
+    route.setTravelTime(walkTime);
+    leg.setRoute(route);
+    leg.setDepartureTime(startTime);
+    return leg;
+  }
 }

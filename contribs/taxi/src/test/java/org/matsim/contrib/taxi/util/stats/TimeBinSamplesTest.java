@@ -33,31 +33,41 @@ import org.mockito.Mockito;
  * @author Michal Maciejewski (michalm)
  */
 public class TimeBinSamplesTest {
-	@Test
-	public void taskSamples_zeroDuration() {
-		var task = task(10, 10);
-		assertThat(taskSamples(task, 100)).isEmpty();
-	}
+  @Test
+  public void taskSamples_zeroDuration() {
+    var task = task(10, 10);
+    assertThat(taskSamples(task, 100)).isEmpty();
+  }
 
-	@Test
-	public void taskSamples_oneSample() {
-		var task = task(110, 190);
-		assertThat(taskSamples(task, 100)).containsExactly(new TimeBinSample<>(1, task));
-	}
+  @Test
+  public void taskSamples_oneSample() {
+    var task = task(110, 190);
+    assertThat(taskSamples(task, 100)).containsExactly(new TimeBinSample<>(1, task));
+  }
 
-	@Test
-	public void taskSamples_threeSamples() {
-		var task = task(110, 390);
-		assertThat(taskSamples(task, 100)).containsExactly(new TimeBinSample<>(1, task), new TimeBinSample<>(2, task), new TimeBinSample<>(3, task));
-	}
+  @Test
+  public void taskSamples_threeSamples() {
+    var task = task(110, 390);
+    assertThat(taskSamples(task, 100))
+        .containsExactly(
+            new TimeBinSample<>(1, task),
+            new TimeBinSample<>(2, task),
+            new TimeBinSample<>(3, task));
+  }
 
-	@Test
-	public void taskSamples_taskEndEqualToTimeBinEnd() {
-		var task = task(110, 300);
-		assertThat(taskSamples(task, 100)).containsExactly(new TimeBinSample<>(1, task), new TimeBinSample<>(2, task));
-	}
+  @Test
+  public void taskSamples_taskEndEqualToTimeBinEnd() {
+    var task = task(110, 300);
+    assertThat(taskSamples(task, 100))
+        .containsExactly(new TimeBinSample<>(1, task), new TimeBinSample<>(2, task));
+  }
 
-	private ExecutedTask task(double beginTime, double endTime) {
-		return new ExecutedTask(Mockito.mock(Task.TaskType.class), beginTime, endTime, Id.createLinkId("a"), Id.createLinkId("b"));
-	}
+  private ExecutedTask task(double beginTime, double endTime) {
+    return new ExecutedTask(
+        Mockito.mock(Task.TaskType.class),
+        beginTime,
+        endTime,
+        Id.createLinkId("a"),
+        Id.createLinkId("b"));
+  }
 }

@@ -24,16 +24,14 @@ import org.matsim.contrib.minibus.hook.PPlan;
 
 public interface PStrategy {
 
-	/**
-	 * 
-	 * @param operator
-	 * @return the plan found or null if there is no better plan 
-	 */
-	public PPlan run(Operator operator);
+  /**
+   * @param operator
+   * @return the plan found or null if there is no better plan
+   */
+  public PPlan run(Operator operator);
 
-	/**
-	 *
-	 * @return The name of the strategy
-	 */
-	public String getStrategyName();
+  /**
+   * @return The name of the strategy
+   */
+  public String getStrategyName();
 }

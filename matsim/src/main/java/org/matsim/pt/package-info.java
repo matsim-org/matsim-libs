@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * package-info.java
@@ -19,10 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
- /**
+/**
+ *
+ *
  * <h2>Package Maintainer(s):</h2>
+ *
  * <ul>
- * 	<li>Marcel Rieser</li>
+ *   <li>Marcel Rieser
  * </ul>
  */
 package org.matsim.pt;

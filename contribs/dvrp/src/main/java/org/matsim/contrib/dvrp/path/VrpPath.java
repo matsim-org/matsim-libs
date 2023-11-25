@@ -23,21 +23,21 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 
 /**
- * Contains relevant information about a dvrp path. But not information about where we are. This information is
- * accessible via {@link OnlineDriveTaskTracker#getCurrentLinkIdx()}
- * 
+ * Contains relevant information about a dvrp path. But not information about where we are. This
+ * information is accessible via {@link OnlineDriveTaskTracker#getCurrentLinkIdx()}
+ *
  * @author (of documentation) nagel
  */
 public interface VrpPath extends Iterable<Link> {
-	int getLinkCount();
+  int getLinkCount();
 
-	Link getLink(int idx);
+  Link getLink(int idx);
 
-	double getLinkTravelTime(int idx);
+  double getLinkTravelTime(int idx);
 
-	void setLinkTravelTime(int idx, double linkTT);
+  void setLinkTravelTime(int idx, double linkTT);
 
-	Link getFromLink();
+  Link getFromLink();
 
-	Link getToLink();
+  Link getToLink();
 }

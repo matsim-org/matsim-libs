@@ -22,30 +22,29 @@
 
 package org.matsim.core.replanning;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 @Singleton
 class ReplanningContextImpl implements ReplanningContext, IterationStartsListener {
 
-    private int iteration;
+  private int iteration;
 
-    @Inject
-    ReplanningContextImpl(ControlerListenerManager controlerListenerManager) {
-        controlerListenerManager.addControlerListener(this);
-    }
+  @Inject
+  ReplanningContextImpl(ControlerListenerManager controlerListenerManager) {
+    controlerListenerManager.addControlerListener(this);
+  }
 
-    @Override
-    public int getIteration() {
-        return iteration;
-    }
+  @Override
+  public int getIteration() {
+    return iteration;
+  }
 
-    @Override
-    public void notifyIterationStarts(IterationStartsEvent event) {
-        this.iteration = event.getIteration();
-    }
+  @Override
+  public void notifyIterationStarts(IterationStartsEvent event) {
+    this.iteration = event.getIteration();
+  }
 }

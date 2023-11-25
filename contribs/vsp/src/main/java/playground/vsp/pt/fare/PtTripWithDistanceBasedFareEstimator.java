@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleDoublePair;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
+import java.util.List;
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -19,206 +21,233 @@ import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import java.util.List;
-import java.util.Map;
-
 public class PtTripWithDistanceBasedFareEstimator extends PtTripEstimator {
 
-	private final PtFareConfigGroup config;
-	private final DistanceBasedPtFareParams ptFare;
-	private final Map<Id<TransitStopFacility>, TransitStopFacility> facilities;
+  private final PtFareConfigGroup config;
+  private final DistanceBasedPtFareParams ptFare;
+  private final Map<Id<TransitStopFacility>, TransitStopFacility> facilities;
 
-	@Inject
-	public PtTripWithDistanceBasedFareEstimator(TransitSchedule transitSchedule, PtFareConfigGroup config, DistanceBasedPtFareParams ptFare, Scenario scenario) {
-		super(transitSchedule);
-		this.config = config;
-		this.ptFare = ptFare;
-		this.facilities = scenario.getTransitSchedule().getFacilities();
-	}
+  @Inject
+  public PtTripWithDistanceBasedFareEstimator(
+      TransitSchedule transitSchedule,
+      PtFareConfigGroup config,
+      DistanceBasedPtFareParams ptFare,
+      Scenario scenario) {
+    super(transitSchedule);
+    this.config = config;
+    this.ptFare = ptFare;
+    this.facilities = scenario.getTransitSchedule().getFacilities();
+  }
 
-	@Override
-	public MinMaxEstimate estimate(EstimatorContext context, String mode, PlanModel plan, List<Leg> trip, ModeAvailability option) {
+  @Override
+  public MinMaxEstimate estimate(
+      EstimatorContext context,
+      String mode,
+      PlanModel plan,
+      List<Leg> trip,
+      ModeAvailability option) {
 
-		DoubleDoublePair p = estimateTrip(context, trip);
+    DoubleDoublePair p = estimateTrip(context, trip);
 
-		double estimate = p.leftDouble();
-		double fareUtility = p.rightDouble();
+    double estimate = p.leftDouble();
+    double fareUtility = p.rightDouble();
 
-		double max;
-		if (providesMinEstimate(context, mode, option)) {
-			double maxFareUtility = -context.scoring.marginalUtilityOfMoney * calcMinimumFare(plan);
+    double max;
+    if (providesMinEstimate(context, mode, option)) {
+      double maxFareUtility = -context.scoring.marginalUtilityOfMoney * calcMinimumFare(plan);
 
-			// It can happen that this bound is not even better
-			// this is the case if there is one trip only
-			// or for instance if there is one short and one very long trip
-			// the upper bound might have no effect in these cases
-			maxFareUtility = Math.max(fareUtility, maxFareUtility);
+      // It can happen that this bound is not even better
+      // this is the case if there is one trip only
+      // or for instance if there is one short and one very long trip
+      // the upper bound might have no effect in these cases
+      maxFareUtility = Math.max(fareUtility, maxFareUtility);
 
-			max = estimate + maxFareUtility;
-		} else
-			max = estimate + fareUtility;
+      max = estimate + maxFareUtility;
+    } else max = estimate + fareUtility;
 
-		// Distance fareUtility is the highest possible price, therefore the minimum utility
-		return MinMaxEstimate.of(estimate + fareUtility, max);
-	}
+    // Distance fareUtility is the highest possible price, therefore the minimum utility
+    return MinMaxEstimate.of(estimate + fareUtility, max);
+  }
 
-	@Override
-	@SuppressWarnings("StringEquality")
-	public double estimate(EstimatorContext context, String mode, String[] modes, PlanModel plan, ModeAvailability option) {
+  @Override
+  @SuppressWarnings("StringEquality")
+  public double estimate(
+      EstimatorContext context,
+      String mode,
+      String[] modes,
+      PlanModel plan,
+      ModeAvailability option) {
 
-		double utility = 0;
-		DoubleList fares = new DoubleArrayList();
+    double utility = 0;
+    DoubleList fares = new DoubleArrayList();
 
-		assert plan.trips() == modes.length : String.format("Plan and mode length differ: %d vs. %d", plan.trips(), mode.length());
+    assert plan.trips() == modes.length
+        : String.format("Plan and mode length differ: %d vs. %d", plan.trips(), mode.length());
 
-		for (int i = 0; i < modes.length; i++) {
+    for (int i = 0; i < modes.length; i++) {
 
-			if (modes[i] == TransportMode.pt) {
+      if (modes[i] == TransportMode.pt) {
 
-				List<Leg> legs = plan.getLegs(mode, i);
+        List<Leg> legs = plan.getLegs(mode, i);
 
-				// Legs can be null if there is a predefined pt trip
-				if (legs == null)
-					continue;
+        // Legs can be null if there is a predefined pt trip
+        if (legs == null) continue;
 
-				//assert legs != null : "Legs must be not null at this point";
+        // assert legs != null : "Legs must be not null at this point";
 
-				DoubleDoublePair p = estimateTrip(context, legs);
+        DoubleDoublePair p = estimateTrip(context, legs);
 
-				utility += p.firstDouble();
-				fares.add(p.rightDouble());
-			}
-		}
+        utility += p.firstDouble();
+        fares.add(p.rightDouble());
+      }
+    }
 
-		// fares are negative, so the minimum is used
-		double maxFare = fares.doubleStream().min().orElse(0);
-		double sumFares = fares.doubleStream().sum();
+    // fares are negative, so the minimum is used
+    double maxFare = fares.doubleStream().min().orElse(0);
+    double sumFares = fares.doubleStream().sum();
 
-		return utility + Math.max(maxFare * config.getUpperBoundFactor(), sumFares);
-	}
+    return utility + Math.max(maxFare * config.getUpperBoundFactor(), sumFares);
+  }
 
-	/**
-	 * Estimate utility and fare for one trip.
-	 *
-	 * @return pair of utility and maximum distance based fare
-	 */
-	private DoubleDoublePair estimateTrip(EstimatorContext context, List<Leg> trip) {
+  /**
+   * Estimate utility and fare for one trip.
+   *
+   * @return pair of utility and maximum distance based fare
+   */
+  private DoubleDoublePair estimateTrip(EstimatorContext context, List<Leg> trip) {
 
-		ModeUtilityParameters params = context.scoring.modeParams.get(TransportMode.pt);
+    ModeUtilityParameters params = context.scoring.modeParams.get(TransportMode.pt);
 
-		double estimate = 0;
-		int numberOfVehicularLegs = 0;
-		double totalWaitingTime = 0.0;
+    double estimate = 0;
+    int numberOfVehicularLegs = 0;
+    double totalWaitingTime = 0.0;
 
-		// first access and last egress
-		TransitStopFacility access = null;
-		TransitStopFacility egress = null;
+    // first access and last egress
+    TransitStopFacility access = null;
+    TransitStopFacility egress = null;
 
-		for (Leg leg : trip) {
+    for (Leg leg : trip) {
 
-			// Only score PT legs, other legs are estimated upstream
-			if (TransportMode.pt.equals(leg.getMode())) {
+      // Only score PT legs, other legs are estimated upstream
+      if (TransportMode.pt.equals(leg.getMode())) {
 
-				TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
+        TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
 
-				if (access == null)
-					access = facilities.get(route.getAccessStopId());
+        if (access == null) access = facilities.get(route.getAccessStopId());
 
-				egress = facilities.get(route.getEgressStopId());
+        egress = facilities.get(route.getEgressStopId());
 
-				totalWaitingTime += estimateWaitingTime(leg.getDepartureTime().seconds(), route);
-				numberOfVehicularLegs++;
+        totalWaitingTime += estimateWaitingTime(leg.getDepartureTime().seconds(), route);
+        numberOfVehicularLegs++;
 
-				// Default leg scoring
-				estimate += scoreLeg(leg, context, params);
-			}
+        // Default leg scoring
+        estimate += scoreLeg(leg, context, params);
+      }
+    }
 
-		}
+    assert access != null && egress != null : "At least one PT trip must be present";
 
-		assert access != null && egress != null : "At least one PT trip must be present";
+    double dist = CoordUtils.calcEuclideanDistance(access.getCoord(), egress.getCoord());
 
-		double dist = CoordUtils.calcEuclideanDistance(access.getCoord(), egress.getCoord());
+    double fareUtility =
+        -context.scoring.marginalUtilityOfMoney
+            * DistanceBasedPtFareHandler.computeFare(
+                dist,
+                ptFare.getLongDistanceTripThreshold(),
+                ptFare.getMinFare(),
+                ptFare.getNormalTripIntercept(),
+                ptFare.getNormalTripSlope(),
+                ptFare.getLongDistanceTripIntercept(),
+                ptFare.getLongDistanceTripSlope());
 
-		double fareUtility = -context.scoring.marginalUtilityOfMoney * DistanceBasedPtFareHandler.computeFare(dist, ptFare.getLongDistanceTripThreshold(), ptFare.getMinFare(),
-				ptFare.getNormalTripIntercept(), ptFare.getNormalTripSlope(), ptFare.getLongDistanceTripIntercept(), ptFare.getLongDistanceTripSlope());
+    estimate += context.scoring.marginalUtilityOfWaitingPt_s * totalWaitingTime;
 
+    if (numberOfVehicularLegs > 0) {
+      estimate += context.scoring.utilityOfLineSwitch * (numberOfVehicularLegs - 1);
+    }
 
-		estimate += context.scoring.marginalUtilityOfWaitingPt_s * totalWaitingTime;
+    return DoubleDoublePair.of(estimate, fareUtility);
+  }
 
-		if (numberOfVehicularLegs > 0) {
-			estimate += context.scoring.utilityOfLineSwitch * (numberOfVehicularLegs - 1);
-		}
+  /** The minimum fare a person would have to pay for an avg. trip */
+  private double calcMinimumFare(PlanModel plan) {
 
-		return DoubleDoublePair.of(estimate, fareUtility);
-	}
+    double minDist = Double.POSITIVE_INFINITY;
+    double secondMinDist = Double.POSITIVE_INFINITY;
 
-	/**
-	 * The minimum fare a person would have to pay for an avg. trip
-	 */
-	private double calcMinimumFare(PlanModel plan) {
+    int n = 0;
+    for (int i = 0; i < plan.trips(); i++) {
 
-		double minDist = Double.POSITIVE_INFINITY;
-		double secondMinDist = Double.POSITIVE_INFINITY;
+      List<Leg> legs = plan.getLegs(TransportMode.pt, i);
 
-		int n = 0;
-		for (int i = 0; i < plan.trips(); i++) {
+      if (legs == null) continue;
 
-			List<Leg> legs = plan.getLegs(TransportMode.pt, i);
+      // first access and last egress
+      TransitStopFacility access = null;
+      TransitStopFacility egress = null;
 
-			if (legs == null)
-				continue;
+      boolean hasPT = false;
 
-			// first access and last egress
-			TransitStopFacility access = null;
-			TransitStopFacility egress = null;
+      // only the distances are important
+      for (Leg leg : legs) {
 
-			boolean hasPT = false;
+        // Only score PT legs, other legs are estimated upstream
+        if (TransportMode.pt.equals(leg.getMode())) {
 
-			// only the distances are important
-			for (Leg leg : legs) {
+          TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
 
-				// Only score PT legs, other legs are estimated upstream
-				if (TransportMode.pt.equals(leg.getMode())) {
+          hasPT = true;
+          if (access == null) access = facilities.get(route.getAccessStopId());
 
-					TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
+          egress = facilities.get(route.getEgressStopId());
+        }
+      }
 
-					hasPT = true;
-					if (access == null)
-						access = facilities.get(route.getAccessStopId());
+      if (hasPT) {
+        double dist = CoordUtils.calcEuclideanDistance(access.getCoord(), egress.getCoord());
 
-					egress = facilities.get(route.getEgressStopId());
-				}
-			}
+        if (dist < minDist) {
+          minDist = dist;
+          secondMinDist = minDist;
+        } else if (dist < secondMinDist) {
+          secondMinDist = dist;
+        }
 
-			if (hasPT) {
-				double dist = CoordUtils.calcEuclideanDistance(access.getCoord(), egress.getCoord());
+        n++;
+      }
+    }
 
-				if (dist < minDist) {
-					minDist = dist;
-					secondMinDist = minDist;
-				} else if (dist < secondMinDist) {
-					secondMinDist = dist;
-				}
+    // a single pt trip could never benefit from the upper bound
+    if (n == 1) {
+      return DistanceBasedPtFareHandler.computeFare(
+          minDist,
+          ptFare.getLongDistanceTripThreshold(),
+          ptFare.getMinFare(),
+          ptFare.getNormalTripIntercept(),
+          ptFare.getNormalTripSlope(),
+          ptFare.getLongDistanceTripIntercept(),
+          ptFare.getLongDistanceTripSlope());
+    }
 
-				n++;
-			}
-		}
+    // the upper bound is the maximum single trip times a factor
+    // therefore the minimum upper bound is the fare for the second-longest trip
+    // the max costs are then assumed to be evenly distributed over all pt trips
+    return 1d
+        / n
+        * config.getUpperBoundFactor()
+        * DistanceBasedPtFareHandler.computeFare(
+            secondMinDist,
+            ptFare.getLongDistanceTripThreshold(),
+            ptFare.getMinFare(),
+            ptFare.getNormalTripIntercept(),
+            ptFare.getNormalTripSlope(),
+            ptFare.getLongDistanceTripIntercept(),
+            ptFare.getLongDistanceTripSlope());
+  }
 
-		// a single pt trip could never benefit from the upper bound
-		if (n == 1) {
-			return DistanceBasedPtFareHandler.computeFare(minDist, ptFare.getLongDistanceTripThreshold(), ptFare.getMinFare(),
-					ptFare.getNormalTripIntercept(), ptFare.getNormalTripSlope(), ptFare.getLongDistanceTripIntercept(), ptFare.getLongDistanceTripSlope());
-		}
-
-		// the upper bound is the maximum single trip times a factor
-		// therefore the minimum upper bound is the fare for the second-longest trip
-		// the max costs are then assumed to be evenly distributed over all pt trips
-		return 1d / n * config.getUpperBoundFactor() * DistanceBasedPtFareHandler.computeFare(secondMinDist, ptFare.getLongDistanceTripThreshold(), ptFare.getMinFare(),
-				ptFare.getNormalTripIntercept(), ptFare.getNormalTripSlope(), ptFare.getLongDistanceTripIntercept(), ptFare.getLongDistanceTripSlope());
-	}
-
-	@Override
-	public boolean providesMinEstimate(EstimatorContext context, String mode, ModeAvailability option) {
-		return config.getApplyUpperBound();
-	}
+  @Override
+  public boolean providesMinEstimate(
+      EstimatorContext context, String mode, ModeAvailability option) {
+    return config.getApplyUpperBound();
+  }
 }

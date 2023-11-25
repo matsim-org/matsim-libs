@@ -9,7 +9,7 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
  */
 public interface ShiftChangeOverTask extends DrtStopTask, OperationalStop {
 
-    Link getLink();
+  Link getLink();
 
-    DrtShift getShift();
+  DrtShift getShift();
 }

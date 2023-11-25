@@ -24,5 +24,4 @@ import org.matsim.core.router.util.TravelTime;
 /**
  * @author michalm
  */
-public interface DvrpTravelTimeEstimator extends TravelTime {
-}
+public interface DvrpTravelTimeEstimator extends TravelTime {}

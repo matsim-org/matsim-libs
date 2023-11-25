@@ -23,92 +23,81 @@ package org.matsim.core.utils.collections;
 import java.util.Iterator;
 
 /**
- * An interface for classes that can be used as priority queue. It offers a
- * decreaseKey(...) method, which can be used by routers to increase the
- * priority of re-visited nodes.
- * 
- * An object's priority is defined by an additional argument of the add method and
- * not determined based on a Comparator as in other implementations. As a result,
- * objects do not have to be wrapped into QueueEntry objects which also include the
- * object's priority.
- * 
+ * An interface for classes that can be used as priority queue. It offers a decreaseKey(...) method,
+ * which can be used by routers to increase the priority of re-visited nodes.
+ *
+ * <p>An object's priority is defined by an additional argument of the add method and not determined
+ * based on a Comparator as in other implementations. As a result, objects do not have to be wrapped
+ * into QueueEntry objects which also include the object's priority.
+ *
  * @author cdobler
  */
 public interface RouterPriorityQueue<E> extends Iterable<E> {
 
-	/**
-	 * Adds the specified element to this priority queue, with the given priority.
-	 * If the element is already present in the queue, it is not added a second
-	 * time.
-	 * @param o
-	 * @param priority
-	 * @return <tt>true</tt> if the element was added to the collection.
-	 */
-	public boolean add(final E o, final double priority);
+  /**
+   * Adds the specified element to this priority queue, with the given priority. If the element is
+   * already present in the queue, it is not added a second time.
+   *
+   * @param o
+   * @param priority
+   * @return <tt>true</tt> if the element was added to the collection.
+   */
+  public boolean add(final E o, final double priority);
 
-	/**
-	 * Retrieves and removes the head of this queue, or <tt>null</tt>
-	 * if this queue is empty.
-	 *
-	 * @return the head of this queue, or <tt>null</tt> if this
-	 *         queue is empty.
-	 */
-	public E poll();
+  /**
+   * Retrieves and removes the head of this queue, or <tt>null</tt> if this queue is empty.
+   *
+   * @return the head of this queue, or <tt>null</tt> if this queue is empty.
+   */
+  public E poll();
 
-	/**
-	 * Removes a single instance of the specified element from this
-	 * queue, if it is present.
-	 *
-	 * @return <tt>true</tt> if the queue contained the specified
-	 *         element.
-	 */
-	public boolean remove(final E o);
-	
-	/**
-	 * Retrieves, but does not remove, the head of this queue, returning 
-	 * <tt>null</tt> if this queue is empty.
-	 *
-	 * @return the head of this queue, or <tt>null</tt> if this
-	 *         queue is empty.
-	 */
-	public E peek();
-	
-	/**
-	 * Returns the number of elements in this priority queue. If the collection
-	 * contains more than <tt>Integer.MAX_VALUE</tt> elements, returns
-	 * <tt>Integer.MAX_VALUE</tt>.
-	 *
-	 * @return the number of elements in this collection.
-	 */
-	public int size();
+  /**
+   * Removes a single instance of the specified element from this queue, if it is present.
+   *
+   * @return <tt>true</tt> if the queue contained the specified element.
+   */
+  public boolean remove(final E o);
 
-	/**
-	 * Checks whether the queue is empty.
-	 *
-	 * @return <tt>true</tt> if the queue is empty.
-	 */
-	public boolean isEmpty();
-	
-	/**
-	 * Returns an iterator over the elements in this queue. The iterator
-	 * does not return the elements in any particular order. Removing
-	 * elements is not supported via the iterator.
-	 *
-	 * @return an iterator over the elements in this queue.
-	 */
-	public Iterator<E> iterator();
+  /**
+   * Retrieves, but does not remove, the head of this queue, returning <tt>null</tt> if this queue
+   * is empty.
+   *
+   * @return the head of this queue, or <tt>null</tt> if this queue is empty.
+   */
+  public E peek();
 
-	/**
-	 * Increases the priority (=decrease the given double value) of the element.
-	 * If the element ins not part of the queue, it is added. If the new priority
-	 * is lower than the existing one, the method returns <tt>false</tt>
-	 *
-	 * @return <tt>true</tt> if the elements priority was decreased.
-	 */
-	public boolean decreaseKey(E value, double priority);
-	
-	/**
-	 * Resets the queue to its initial state.
-	 */
-	public void reset();
+  /**
+   * Returns the number of elements in this priority queue. If the collection contains more than
+   * <tt>Integer.MAX_VALUE</tt> elements, returns <tt>Integer.MAX_VALUE</tt>.
+   *
+   * @return the number of elements in this collection.
+   */
+  public int size();
+
+  /**
+   * Checks whether the queue is empty.
+   *
+   * @return <tt>true</tt> if the queue is empty.
+   */
+  public boolean isEmpty();
+
+  /**
+   * Returns an iterator over the elements in this queue. The iterator does not return the elements
+   * in any particular order. Removing elements is not supported via the iterator.
+   *
+   * @return an iterator over the elements in this queue.
+   */
+  public Iterator<E> iterator();
+
+  /**
+   * Increases the priority (=decrease the given double value) of the element. If the element ins
+   * not part of the queue, it is added. If the new priority is lower than the existing one, the
+   * method returns <tt>false</tt>
+   *
+   * @return <tt>true</tt> if the elements priority was decreased.
+   */
+  public boolean decreaseKey(E value, double priority);
+
+  /** Resets the queue to its initial state. */
+  public void reset();
 }

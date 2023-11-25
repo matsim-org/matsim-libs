@@ -20,7 +20,6 @@
 package org.matsim.contrib.signals.data.consistency;
 
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,56 +33,61 @@ import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.model.SignalGroup;
 
-
 /**
  * @author dgrether
- *
  */
 public final class SignalControlDataConsistencyChecker implements ConsistencyChecker {
-	
-	private static final Logger log = LogManager.getLogger(SignalControlDataConsistencyChecker.class);
-	
-	private SignalsData signalsData;
 
-	public SignalControlDataConsistencyChecker(Scenario scenario) {
-		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+  private static final Logger log = LogManager.getLogger(SignalControlDataConsistencyChecker.class);
 
-	}
+  private SignalsData signalsData;
 
-	/**
-	 * @see ConsistencyChecker#checkConsistency()
-	 */
-	@Override
-	public void checkConsistency() {
-		log.info("Checking consistency of SignalControlData...");
-		this.checkSettingsToGroupMatching();
-		log.info("Checked consistency of SignalControlData.");
-	}
+  public SignalControlDataConsistencyChecker(Scenario scenario) {
+    this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+  }
 
-	private void checkSettingsToGroupMatching() {
-		SignalGroupsData siganlGroupsData = this.signalsData.getSignalGroupsData();
-		SignalControlData control = this.signalsData.getSignalControlData();
-		
-		for (SignalSystemControllerData  controller : control.getSignalSystemControllerDataBySystemId().values()) {
-			Map<Id<SignalGroup>, SignalGroupData> signalGroups = siganlGroupsData.getSignalGroupDataBySystemId(controller.getSignalSystemId());
-			if (null == signalGroups) {
-				log.error("Error: No SignalGroups for SignalSystemController:");
-				log.error("\t\tSignalGroups have no entry for SignalSystem Id: " + controller.getSignalSystemId() + " specified in " + 
-				" the SignalControl");
-			}
+  /**
+   * @see ConsistencyChecker#checkConsistency()
+   */
+  @Override
+  public void checkConsistency() {
+    log.info("Checking consistency of SignalControlData...");
+    this.checkSettingsToGroupMatching();
+    log.info("Checked consistency of SignalControlData.");
+  }
 
-			for (SignalPlanData plan : controller.getSignalPlanData().values()) {
-				for (SignalGroupSettingsData settings : plan.getSignalGroupSettingsDataByGroupId().values()) {
-					if (! signalGroups.containsKey(settings.getSignalGroupId())){
-						log.error("Error: No SignalGroup for SignalGroupSettings:");
-						log.error("\t\t SignalGroupSettings have no entry for SignalGroup Id: " + settings.getSignalGroupId() + 
-								" of SignalSystem Id: " + controller.getSignalSystemId() + " and SignalPlan Id: " + plan.getId());
-					}
-				}
-			}
-			
-		}
-		
-	}
-	
+  private void checkSettingsToGroupMatching() {
+    SignalGroupsData siganlGroupsData = this.signalsData.getSignalGroupsData();
+    SignalControlData control = this.signalsData.getSignalControlData();
+
+    for (SignalSystemControllerData controller :
+        control.getSignalSystemControllerDataBySystemId().values()) {
+      Map<Id<SignalGroup>, SignalGroupData> signalGroups =
+          siganlGroupsData.getSignalGroupDataBySystemId(controller.getSignalSystemId());
+      if (null == signalGroups) {
+        log.error("Error: No SignalGroups for SignalSystemController:");
+        log.error(
+            "\t\tSignalGroups have no entry for SignalSystem Id: "
+                + controller.getSignalSystemId()
+                + " specified in "
+                + " the SignalControl");
+      }
+
+      for (SignalPlanData plan : controller.getSignalPlanData().values()) {
+        for (SignalGroupSettingsData settings :
+            plan.getSignalGroupSettingsDataByGroupId().values()) {
+          if (!signalGroups.containsKey(settings.getSignalGroupId())) {
+            log.error("Error: No SignalGroup for SignalGroupSettings:");
+            log.error(
+                "\t\t SignalGroupSettings have no entry for SignalGroup Id: "
+                    + settings.getSignalGroupId()
+                    + " of SignalSystem Id: "
+                    + controller.getSignalSystemId()
+                    + " and SignalPlan Id: "
+                    + plan.getId());
+          }
+        }
+      }
+    }
+  }
 }

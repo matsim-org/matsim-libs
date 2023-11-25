@@ -24,5 +24,5 @@ import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.core.events.handler.EventHandler;
 
 public interface VehicleLeavesTrafficEventHandler extends EventHandler {
-	public void handleEvent (VehicleLeavesTrafficEvent event);
+  public void handleEvent(VehicleLeavesTrafficEvent event);
 }

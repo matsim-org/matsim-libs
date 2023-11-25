@@ -24,37 +24,36 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
 
 public class CollectionAgentFilter implements AgentFilter {
 
-	private final Set<Id<Person>> includedAgents;
-	
-	// use the factory
-	/*package*/ CollectionAgentFilter(Set<Id<Person>> includedAgents) {
-		this.includedAgents = includedAgents;
-	}
-	
-	@Override
-	public void applyAgentFilter(Set<Id<Person>> set, double time) {
-		Iterator<Id<Person>> iter = set.iterator();
-		
-		while (iter.hasNext()) {
-			Id<Person> id = iter.next();
-			if (!this.applyAgentFilter(id, time)) iter.remove();
-		}
-	}
-	
-	@Override
-	public boolean applyAgentFilter(Id<Person> id, double time) {
-		if (!includedAgents.contains(id)) return false;
-		else return true;
-	}
-	
-	public Collection<Id<Person>> getIncludedAgents() {
-		return Collections.unmodifiableSet(this.includedAgents);
-	}
+  private final Set<Id<Person>> includedAgents;
+
+  // use the factory
+  /*package*/ CollectionAgentFilter(Set<Id<Person>> includedAgents) {
+    this.includedAgents = includedAgents;
+  }
+
+  @Override
+  public void applyAgentFilter(Set<Id<Person>> set, double time) {
+    Iterator<Id<Person>> iter = set.iterator();
+
+    while (iter.hasNext()) {
+      Id<Person> id = iter.next();
+      if (!this.applyAgentFilter(id, time)) iter.remove();
+    }
+  }
+
+  @Override
+  public boolean applyAgentFilter(Id<Person> id, double time) {
+    if (!includedAgents.contains(id)) return false;
+    else return true;
+  }
+
+  public Collection<Id<Person>> getIncludedAgents() {
+    return Collections.unmodifiableSet(this.includedAgents);
+  }
 }

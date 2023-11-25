@@ -8,12 +8,10 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 /**
  * @author nagel
  */
-public class RelocationPlanSelector implements PlanSelector<Plan, Person>
-{
+public class RelocationPlanSelector implements PlanSelector<Plan, Person> {
 
-	@Override
-	public Plan selectPlan(HasPlansAndId<Plan, Person> person) {
-		return person.getSelectedPlan();
-	}
-
+  @Override
+  public Plan selectPlan(HasPlansAndId<Plan, Person> person) {
+    return person.getSelectedPlan();
+  }
 }

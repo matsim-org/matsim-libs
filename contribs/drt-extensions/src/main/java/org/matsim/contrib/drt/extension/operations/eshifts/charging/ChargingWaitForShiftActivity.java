@@ -8,13 +8,12 @@ import org.matsim.contrib.evrp.ChargingTask;
  */
 public class ChargingWaitForShiftActivity extends ChargingActivity {
 
-    public ChargingWaitForShiftActivity(ChargingTask chargingTask) {
-        super(chargingTask);
-    }
+  public ChargingWaitForShiftActivity(ChargingTask chargingTask) {
+    super(chargingTask);
+  }
 
-    @Override
-    public String getActivityType() {
-        return "Charging wait for shift";
-    }
-
+  @Override
+  public String getActivityType() {
+    return "Charging wait for shift";
+  }
 }

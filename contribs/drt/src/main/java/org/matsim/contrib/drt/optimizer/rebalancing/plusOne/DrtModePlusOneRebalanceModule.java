@@ -34,45 +34,54 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
  * @author michalm (Michal Maciejewski)
  */
 public class DrtModePlusOneRebalanceModule extends AbstractDvrpModeModule {
-	private static final Logger log = LogManager.getLogger(DrtModePlusOneRebalanceModule.class);
-	private final DrtConfigGroup drtCfg;
+  private static final Logger log = LogManager.getLogger(DrtModePlusOneRebalanceModule.class);
+  private final DrtConfigGroup drtCfg;
 
-	public DrtModePlusOneRebalanceModule(DrtConfigGroup drtCfg) {
-		super(drtCfg.getMode());
-		this.drtCfg = drtCfg;
-	}
+  public DrtModePlusOneRebalanceModule(DrtConfigGroup drtCfg) {
+    super(drtCfg.getMode());
+    this.drtCfg = drtCfg;
+  }
 
-	@Override
-	public void install() {
-		log.info("Plus one rebalancing strategy is now being installed!");
-		RebalancingParams generalParams = drtCfg.getRebalancingParams().orElseThrow();
-		PlusOneRebalancingStrategyParams specificParams = (PlusOneRebalancingStrategyParams)generalParams.getRebalancingStrategyParams();
+  @Override
+  public void install() {
+    log.info("Plus one rebalancing strategy is now being installed!");
+    RebalancingParams generalParams = drtCfg.getRebalancingParams().orElseThrow();
+    PlusOneRebalancingStrategyParams specificParams =
+        (PlusOneRebalancingStrategyParams) generalParams.getRebalancingStrategyParams();
 
-		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
-			@Override
-			protected void configureQSim() {
-				bindModal(PlusOneRebalancingStrategy.class).toProvider(modalProvider(
-						getter -> new PlusOneRebalancingStrategy(getMode(), getter.getModal(Network.class),
-								getter.getModal(LinkBasedRelocationCalculator.class)))).asEagerSingleton();
+    installQSimModule(
+        new AbstractDvrpModeQSimModule(getMode()) {
+          @Override
+          protected void configureQSim() {
+            bindModal(PlusOneRebalancingStrategy.class)
+                .toProvider(
+                    modalProvider(
+                        getter ->
+                            new PlusOneRebalancingStrategy(
+                                getMode(),
+                                getter.getModal(Network.class),
+                                getter.getModal(LinkBasedRelocationCalculator.class))))
+                .asEagerSingleton();
 
-				// binding zone free relocation calculator
-				switch (specificParams.zoneFreeRelocationCalculatorType) {
-					case FastHeuristic:
-						bindModal(LinkBasedRelocationCalculator.class).toProvider(
-								modalProvider(getter -> new FastHeuristicLinkBasedRelocationCalculator()))
-								.asEagerSingleton();
-						break;
+            // binding zone free relocation calculator
+            switch (specificParams.zoneFreeRelocationCalculatorType) {
+              case FastHeuristic:
+                bindModal(LinkBasedRelocationCalculator.class)
+                    .toProvider(
+                        modalProvider(getter -> new FastHeuristicLinkBasedRelocationCalculator()))
+                    .asEagerSingleton();
+                break;
 
-					default:
-						throw new IllegalArgumentException("Unsupported rebalancingTargetCalculatorType="
-								+ specificParams.zoneFreeRelocationCalculatorType);
-				}
+              default:
+                throw new IllegalArgumentException(
+                    "Unsupported rebalancingTargetCalculatorType="
+                        + specificParams.zoneFreeRelocationCalculatorType);
+            }
 
-				// binding event handler
-				bindModal(RebalancingStrategy.class).to(modalKey(PlusOneRebalancingStrategy.class));
-				addMobsimScopeEventHandlerBinding().to(modalKey(PlusOneRebalancingStrategy.class));
-			}
-		});
-
-	}
+            // binding event handler
+            bindModal(RebalancingStrategy.class).to(modalKey(PlusOneRebalancingStrategy.class));
+            addMobsimScopeEventHandlerBinding().to(modalKey(PlusOneRebalancingStrategy.class));
+          }
+        });
+  }
 }

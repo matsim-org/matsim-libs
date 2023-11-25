@@ -37,70 +37,68 @@ import org.matsim.vehicles.Vehicle;
 
 public class EventsHandlerHierarchyTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  int eventHandled = 0;
+  int resetCalled = 0;
 
-	int eventHandled = 0;
-	int resetCalled = 0;
+  class A implements BasicEventHandler, LinkLeaveEventHandler {
 
-	class A implements BasicEventHandler, LinkLeaveEventHandler {
+    @Override
+    public void handleEvent(final Event event) {
+      System.out.println("Event handled");
+      EventsHandlerHierarchyTest.this.eventHandled++;
+    }
 
-		@Override
-		public void handleEvent(final Event event) {
-			System.out.println("Event handled");
-			EventsHandlerHierarchyTest.this.eventHandled++;
-		}
+    @Override
+    public void handleEvent(LinkLeaveEvent event) {}
 
-		@Override
-		public void handleEvent(LinkLeaveEvent event) {
-		}
+    @Override
+    public void reset(final int iteration) {
+      EventsHandlerHierarchyTest.this.resetCalled++;
+    }
+  }
 
-		@Override
-		public void reset(final int iteration) {
-			EventsHandlerHierarchyTest.this.resetCalled++;
-		}
-	}
+  class B extends A {}
 
-	class B extends A {}
+  @SuppressWarnings("unused")
+  class C extends A implements BasicEventHandler, LinkLeaveEventHandler {}
 
-	@SuppressWarnings("unused")
-	class C extends A implements BasicEventHandler, LinkLeaveEventHandler {}
+  @Test
+  public final void testHandlerHierarchy() {
+    EventsManager events = EventsUtils.createEventsManager();
+    Id<Link> linkId = Id.create("1", Link.class);
+    Id<Vehicle> vehId = Id.create("1", Vehicle.class);
+    EventHandler cc = new B();
+    events.initProcessing();
+    events.processEvent(new LinkLeaveEvent(0., vehId, linkId));
+    events.finishProcessing();
+    assertEquals(this.eventHandled, 0);
+    events.addHandler(cc);
+    events.initProcessing();
+    events.processEvent(new LinkLeaveEvent(0., vehId, linkId));
+    events.finishProcessing();
+    assertEquals(this.eventHandled, 1);
+  }
 
-	@Test public final void testHandlerHierarchy() {
-		EventsManager events = EventsUtils.createEventsManager();
-		Id<Link> linkId = Id.create("1", Link.class);
-		Id<Vehicle> vehId = Id.create("1", Vehicle.class);
-		EventHandler cc = new B();
-		events.initProcessing();
-		events.processEvent(new LinkLeaveEvent(0., vehId, linkId));
-		events.finishProcessing();
-		assertEquals(this.eventHandled, 0);
-		events.addHandler(cc);
-		events.initProcessing();
-		events.processEvent(new LinkLeaveEvent(0., vehId, linkId));
-		events.finishProcessing();
-		assertEquals(this.eventHandled, 1);
-	}
-
-	@Test public final void testHierarchicalReset() {
-		EventsManager events = EventsUtils.createEventsManager();
-		Id<Link> linkId = Id.create("1", Link.class);
-		Id<Vehicle> vehId = Id.create("1", Vehicle.class);
-		//first test if handleEvent is not called twice for A and for C
-		C cc = new C();
-		events.initProcessing();
-		events.processEvent(new LinkLeaveEvent(0., vehId, linkId));
-		events.finishProcessing();
-		assertEquals(this.eventHandled, 0);
-		events.addHandler(cc);
-		events.initProcessing();
-		events.processEvent(new LinkLeaveEvent(0., vehId, linkId));
-		events.finishProcessing();
-		assertEquals(this.eventHandled, 1);
-		//then test the reset
-		events.resetHandlers(0);
-		assertEquals(1, this.resetCalled);
-	}
-
+  @Test
+  public final void testHierarchicalReset() {
+    EventsManager events = EventsUtils.createEventsManager();
+    Id<Link> linkId = Id.create("1", Link.class);
+    Id<Vehicle> vehId = Id.create("1", Vehicle.class);
+    // first test if handleEvent is not called twice for A and for C
+    C cc = new C();
+    events.initProcessing();
+    events.processEvent(new LinkLeaveEvent(0., vehId, linkId));
+    events.finishProcessing();
+    assertEquals(this.eventHandled, 0);
+    events.addHandler(cc);
+    events.initProcessing();
+    events.processEvent(new LinkLeaveEvent(0., vehId, linkId));
+    events.finishProcessing();
+    assertEquals(this.eventHandled, 1);
+    // then test the reset
+    events.resetHandlers(0);
+    assertEquals(1, this.resetCalled);
+  }
 }

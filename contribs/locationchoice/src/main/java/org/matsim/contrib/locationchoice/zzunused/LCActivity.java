@@ -33,119 +33,119 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  */
 class LCActivity implements Activity, LCPlanElement {
 
-	private final LCPlan plan;
-	private final int arrayIndex;
-	private final int planElementIndex;
-	
-	public LCActivity(final LCPlan plan, final int arrayIndex, final int planElementIndex) {
-		this.plan = plan;
-		this.arrayIndex = arrayIndex;
-		this.planElementIndex = planElementIndex;
-	}
-	
-	@Override
-	public final OptionalTime getEndTime() {
-		//consider having an array of OptionalDoubles instead...
-		return this.plan.endTimes[this.arrayIndex];
-	}
+  private final LCPlan plan;
+  private final int arrayIndex;
+  private final int planElementIndex;
 
-	@Override
-	public final void setEndTime(double seconds) {
-		this.plan.endTimes[this.arrayIndex] = OptionalTime.defined(seconds);
-	}
+  public LCActivity(final LCPlan plan, final int arrayIndex, final int planElementIndex) {
+    this.plan = plan;
+    this.arrayIndex = arrayIndex;
+    this.planElementIndex = planElementIndex;
+  }
 
-	@Override
-	public void setEndTimeUndefined() {
-		this.plan.endTimes[this.arrayIndex] = OptionalTime.undefined();
-	}
+  @Override
+  public final OptionalTime getEndTime() {
+    // consider having an array of OptionalDoubles instead...
+    return this.plan.endTimes[this.arrayIndex];
+  }
 
-	@Override
-	public final String getType() {
-		return this.plan.types[this.arrayIndex];
-	}
+  @Override
+  public final void setEndTime(double seconds) {
+    this.plan.endTimes[this.arrayIndex] = OptionalTime.defined(seconds);
+  }
 
-	@Override
-	public final void setType(String type) {
-		this.plan.types[this.arrayIndex] = type;
-	}
+  @Override
+  public void setEndTimeUndefined() {
+    this.plan.endTimes[this.arrayIndex] = OptionalTime.undefined();
+  }
 
-	@Override
-	public final Coord getCoord() {
-		return this.plan.coords[this.arrayIndex];
-	}
+  @Override
+  public final String getType() {
+    return this.plan.types[this.arrayIndex];
+  }
 
-	public final void setCoord(Coord coord) {
-		this.plan.coords[this.arrayIndex] = coord;
-	}
-	
-	@Override
-	public final OptionalTime getStartTime() {
-		return this.plan.startTimes[this.arrayIndex];
-	}
+  @Override
+  public final void setType(String type) {
+    this.plan.types[this.arrayIndex] = type;
+  }
 
-	@Override
-	public final void setStartTime(double seconds) {
-		this.plan.startTimes[this.arrayIndex] = OptionalTime.defined(seconds);
-	}
+  @Override
+  public final Coord getCoord() {
+    return this.plan.coords[this.arrayIndex];
+  }
 
-	@Override
-	public void setStartTimeUndefined() {
-		this.plan.startTimes[this.arrayIndex] = OptionalTime.undefined();
-	}
+  public final void setCoord(Coord coord) {
+    this.plan.coords[this.arrayIndex] = coord;
+  }
 
-	@Override
-	public final OptionalTime getMaximumDuration() {
-		return this.plan.durations[this.arrayIndex];
-	}
+  @Override
+  public final OptionalTime getStartTime() {
+    return this.plan.startTimes[this.arrayIndex];
+  }
 
-	@Override
-	public final void setMaximumDuration(double seconds) {
-		this.plan.durations[this.arrayIndex] = OptionalTime.defined(seconds);
-	}
+  @Override
+  public final void setStartTime(double seconds) {
+    this.plan.startTimes[this.arrayIndex] = OptionalTime.defined(seconds);
+  }
 
-	@Override
-	public void setMaximumDurationUndefined() {
-		this.plan.durations[this.arrayIndex] = OptionalTime.undefined();
-	}
+  @Override
+  public void setStartTimeUndefined() {
+    this.plan.startTimes[this.arrayIndex] = OptionalTime.undefined();
+  }
 
-	@Override
-	public final Id<Link> getLinkId() {
-		return this.plan.linkIds[this.arrayIndex];
-	}
+  @Override
+  public final OptionalTime getMaximumDuration() {
+    return this.plan.durations[this.arrayIndex];
+  }
 
-	public final void setLinkId(Id<Link> linkId) {
-		this.plan.linkIds[this.arrayIndex] = linkId;
-	}
-	
-	@Override
-	public final Id<ActivityFacility> getFacilityId() {
-		return this.plan.facilityIds[this.arrayIndex];
-	}
-	
-	public final void setFacilityId(Id<ActivityFacility> facilityId) {
-		this.plan.facilityIds[this.arrayIndex] = facilityId;
-	}
+  @Override
+  public final void setMaximumDuration(double seconds) {
+    this.plan.durations[this.arrayIndex] = OptionalTime.defined(seconds);
+  }
 
-	public final double getArrivalTime() {
-		return this.plan.arrTimes[this.arrayIndex].seconds();
-	}
+  @Override
+  public void setMaximumDurationUndefined() {
+    this.plan.durations[this.arrayIndex] = OptionalTime.undefined();
+  }
 
-	public final void setArrivalTime(final double arrTime) {
-		this.plan.arrTimes[this.arrayIndex] = OptionalTime.defined(arrTime);
-	}
-	
-	@Override
-	public final int getArrayIndex() {
-		return this.arrayIndex;
-	}
-	
-	@Override
-	public final int getPlanElementIndex() {
-		return this.planElementIndex;
-	}
+  @Override
+  public final Id<Link> getLinkId() {
+    return this.plan.linkIds[this.arrayIndex];
+  }
 
-	@Override
-	public Attributes getAttributes() {
-		throw new UnsupportedOperationException();
-	}
+  public final void setLinkId(Id<Link> linkId) {
+    this.plan.linkIds[this.arrayIndex] = linkId;
+  }
+
+  @Override
+  public final Id<ActivityFacility> getFacilityId() {
+    return this.plan.facilityIds[this.arrayIndex];
+  }
+
+  public final void setFacilityId(Id<ActivityFacility> facilityId) {
+    this.plan.facilityIds[this.arrayIndex] = facilityId;
+  }
+
+  public final double getArrivalTime() {
+    return this.plan.arrTimes[this.arrayIndex].seconds();
+  }
+
+  public final void setArrivalTime(final double arrTime) {
+    this.plan.arrTimes[this.arrayIndex] = OptionalTime.defined(arrTime);
+  }
+
+  @Override
+  public final int getArrayIndex() {
+    return this.arrayIndex;
+  }
+
+  @Override
+  public final int getPlanElementIndex() {
+    return this.planElementIndex;
+  }
+
+  @Override
+  public Attributes getAttributes() {
+    throw new UnsupportedOperationException();
+  }
 }

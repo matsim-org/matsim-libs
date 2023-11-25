@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * QItem.java
@@ -19,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim.qnetsimengine;
+package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.matsim.vis.snapshotwriters.VisVehicle;
 
@@ -27,9 +26,8 @@ import org.matsim.vis.snapshotwriters.VisVehicle;
  * @author nagel
  */
 interface QItem extends VisVehicle {
-	
-	double getEarliestLinkExitTime();
 
-	void setEarliestLinkExitTime( double earliestLinkEndTime );
-	
+  double getEarliestLinkExitTime();
+
+  void setEarliestLinkExitTime(double earliestLinkEndTime);
 }

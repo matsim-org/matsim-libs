@@ -6,23 +6,24 @@ import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
 import picocli.CommandLine;
 
-/**
- * Test command that writes content to file.
- */
-@CommandSpec(requires = {"test.csv", "stats.csv"}, requireNetwork = true, produces = "out.xml")
+/** Test command that writes content to file. */
+@CommandSpec(
+    requires = {"test.csv", "stats.csv"},
+    requireNetwork = true,
+    produces = "out.xml")
 public class TestOtherAnalysis implements MATSimAppCommand {
 
-	@CommandLine.Mixin
-	private final InputOptions input = InputOptions.ofCommand(TestOtherAnalysis.class);
+  @CommandLine.Mixin
+  private final InputOptions input = InputOptions.ofCommand(TestOtherAnalysis.class);
 
-	@CommandLine.Mixin
-	private final OutputOptions output = OutputOptions.ofCommand(TestOtherAnalysis.class);
+  @CommandLine.Mixin
+  private final OutputOptions output = OutputOptions.ofCommand(TestOtherAnalysis.class);
 
-	@CommandLine.Option(names = "--option", description = "Testing option")
-	private int option;
+  @CommandLine.Option(names = "--option", description = "Testing option")
+  private int option;
 
-	@Override
-	public Integer call() throws Exception {
-		return 0;
-	}
+  @Override
+  public Integer call() throws Exception {
+    return 0;
+  }
 }

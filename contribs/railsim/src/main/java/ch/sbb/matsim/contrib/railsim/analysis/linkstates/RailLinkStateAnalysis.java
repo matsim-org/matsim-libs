@@ -21,23 +21,20 @@ package ch.sbb.matsim.contrib.railsim.analysis.linkstates;
 
 import ch.sbb.matsim.contrib.railsim.eventhandlers.RailsimLinkStateChangeEventHandler;
 import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
-
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Handler for {@link RailsimLinkStateChangeEvent}.
- */
+/** Handler for {@link RailsimLinkStateChangeEvent}. */
 public final class RailLinkStateAnalysis implements RailsimLinkStateChangeEventHandler {
 
-	final List<RailsimLinkStateChangeEvent> events = new ArrayList<>(1000);
+  final List<RailsimLinkStateChangeEvent> events = new ArrayList<>(1000);
 
-	@Override
-	public void handleEvent(RailsimLinkStateChangeEvent event) {
-		this.events.add(event);
-	}
+  @Override
+  public void handleEvent(RailsimLinkStateChangeEvent event) {
+    this.events.add(event);
+  }
 
-	public List<RailsimLinkStateChangeEvent> getEvents() {
-		return events;
-	}
+  public List<RailsimLinkStateChangeEvent> getEvents() {
+    return events;
+  }
 }

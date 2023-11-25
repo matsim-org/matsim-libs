@@ -21,108 +21,105 @@ package playground.vsp.analysis.modules.ptTripAnalysis.distance;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 
 /**
  * @author droeder
- *
  */
 public class DistAnalysisVehicle {
-	
-	private Id vehicleId;
-	private List<DistAnalysisAgent> passengers;
-	private DistAnalysisTransitRoute route;
-	private double distance = 0;
-	private double totalPassengers = 0;
 
-	/**
-	 * @param vehicleId
-	 */
-	public DistAnalysisVehicle(Id vehicleId) {
-		this.vehicleId = vehicleId;
-		this.passengers = new ArrayList<DistAnalysisAgent>();
-	}
+  private Id vehicleId;
+  private List<DistAnalysisAgent> passengers;
+  private DistAnalysisTransitRoute route;
+  private double distance = 0;
+  private double totalPassengers = 0;
 
-	
-	public Id getId(){
-		return this.vehicleId;
-	}
-	
-	/**
-	 * register the route at the vehicle and removes the old one, if a new is given
-	 * @param distAnalysisTransitRoute
-	 */
-	public void registerRoute(DistAnalysisTransitRoute route) {
-		this.route = route;
-	}
+  /**
+   * @param vehicleId
+   */
+  public DistAnalysisVehicle(Id vehicleId) {
+    this.vehicleId = vehicleId;
+    this.passengers = new ArrayList<DistAnalysisAgent>();
+  }
 
-	/**
-	 * add the agent to the passengerlist
-	 * @param a
-	 */
-	public void enterVehicle(DistAnalysisAgent a) {
-		this.passengers.add(a);
-		this.totalPassengers++;
-		this.route.countPassenger();
-	}
+  public Id getId() {
+    return this.vehicleId;
+  }
 
-	/**
-	 * remove the agent from passengerlist if it is in
-	 * returns false if the passenger is not in the vehicle
-	 * @param a
-	 */
-	public boolean leaveVehicle(DistAnalysisAgent a) {
-		if(this.passengers.remove(a)){
-			return true;
-		}else{
-			return false;
-		}
-	}
-	
-	public void processLinkEnterEvent(double linkLength){
-		this.distance += linkLength;
-		for(DistAnalysisAgent passenger : this.passengers){
-			passenger.passedLinkInPt(linkLength);
-		}
-		this.route.passedLink(linkLength, this.passengers.size());
-	}
+  /**
+   * register the route at the vehicle and removes the old one, if a new is given
+   *
+   * @param distAnalysisTransitRoute
+   */
+  public void registerRoute(DistAnalysisTransitRoute route) {
+    this.route = route;
+  }
 
+  /**
+   * add the agent to the passengerlist
+   *
+   * @param a
+   */
+  public void enterVehicle(DistAnalysisAgent a) {
+    this.passengers.add(a);
+    this.totalPassengers++;
+    this.route.countPassenger();
+  }
 
-	/**
-	 * @return the vehicleId
-	 */
-	public Id getVehicleId() {
-		return vehicleId;
-	}
+  /**
+   * remove the agent from passengerlist if it is in returns false if the passenger is not in the
+   * vehicle
+   *
+   * @param a
+   */
+  public boolean leaveVehicle(DistAnalysisAgent a) {
+    if (this.passengers.remove(a)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
+  public void processLinkEnterEvent(double linkLength) {
+    this.distance += linkLength;
+    for (DistAnalysisAgent passenger : this.passengers) {
+      passenger.passedLinkInPt(linkLength);
+    }
+    this.route.passedLink(linkLength, this.passengers.size());
+  }
 
-	/**
-	 * @return the distance
-	 */
-	public double getDistance() {
-		return distance;
-	}
+  /**
+   * @return the vehicleId
+   */
+  public Id getVehicleId() {
+    return vehicleId;
+  }
 
+  /**
+   * @return the distance
+   */
+  public double getDistance() {
+    return distance;
+  }
 
-	/**
-	 * @return the totalPassengers
-	 */
-	public double getTotalPassengers() {
-		return totalPassengers;
-	}
-	
-	public String toString(boolean header){
-		StringBuffer b = new StringBuffer();
-		if(header){
-			b.append("vehicleId;PassengerCnt;Dist[m]\n");
-		}
-		b.append(this.vehicleId.toString() + ";" + this.totalPassengers + ";" + this.distance + "\n");
-		return b.toString();
-	}
-	
-	@Override
-	public String toString(){
-		return this.toString(true);
-	}
+  /**
+   * @return the totalPassengers
+   */
+  public double getTotalPassengers() {
+    return totalPassengers;
+  }
+
+  public String toString(boolean header) {
+    StringBuffer b = new StringBuffer();
+    if (header) {
+      b.append("vehicleId;PassengerCnt;Dist[m]\n");
+    }
+    b.append(this.vehicleId.toString() + ";" + this.totalPassengers + ";" + this.distance + "\n");
+    return b.toString();
+  }
+
+  @Override
+  public String toString() {
+    return this.toString(true);
+  }
 }

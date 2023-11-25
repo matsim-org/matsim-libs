@@ -25,21 +25,26 @@ import org.matsim.contrib.parking.parkingchoice.lib.obj.LinkedListValueHashMap;
 
 public class PPRestrictedToFacilitiesAndActivities extends PublicParking implements PrivateParking {
 
+  public PPRestrictedToFacilitiesAndActivities(
+      Id id,
+      int capacity,
+      Coord coord,
+      ParkingCostModel parkingCostModel,
+      String groupName,
+      LinkedListValueHashMap<Id, String> facilitiesActs) {
+    super(id, capacity, coord, parkingCostModel, groupName);
+    this.facilitiesActs = facilitiesActs;
+  }
 
-	public PPRestrictedToFacilitiesAndActivities(Id id, int capacity, Coord coord, ParkingCostModel parkingCostModel,
-			String groupName, LinkedListValueHashMap<Id, String> facilitiesActs) {
-		super(id, capacity, coord, parkingCostModel, groupName);
-		this.facilitiesActs=facilitiesActs;
-	}
+  private LinkedListValueHashMap<Id, String> facilitiesActs;
 
-	private LinkedListValueHashMap<Id, String> facilitiesActs;
+  public void PPRestrictedToIndividuals(LinkedListValueHashMap<Id, String> facilitiesActs) {
+    this.facilitiesActs = facilitiesActs;
+  }
 
-	public void PPRestrictedToIndividuals(LinkedListValueHashMap<Id,String> facilitiesActs){
-		this.facilitiesActs = facilitiesActs;
-	}
-	
-	@Override
-	public boolean isAllowedToUseParking(Id personId, Id actFacilityId, String actType) {
-		return facilitiesActs.getKeySet().contains(actFacilityId) && facilitiesActs.get(actFacilityId).contains(actType);
-	}
+  @Override
+  public boolean isAllowedToUseParking(Id personId, Id actFacilityId, String actType) {
+    return facilitiesActs.getKeySet().contains(actFacilityId)
+        && facilitiesActs.get(actFacilityId).contains(actType);
+  }
 }

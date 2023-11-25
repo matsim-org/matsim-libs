@@ -17,43 +17,43 @@ import org.matsim.core.scenario.ScenarioUtils;
  * Adds a prefix to every person id in the given plans file.
  *
  * @author aneumann
- *
  */
 public class AddPrefixToPersonId extends NewPopulation {
 
-	private String preFix;
-	
-	public AddPrefixToPersonId(Network network, Population plans, String filename, String preFix) {
-		super(network, plans, filename);
-		this.preFix = preFix;
-	}
+  private String preFix;
 
-	@Override
-	public void run(Person person) {
-        PopulationUtils.changePersonId( ((Person) person), Id.create(this.preFix + person.getId().toString(), Person.class) ) ;
-        this.popWriter.writePerson(person);
-	}
+  public AddPrefixToPersonId(Network network, Population plans, String filename, String preFix) {
+    super(network, plans, filename);
+    this.preFix = preFix;
+  }
 
-	public static void main(final String[] args) {
-		Gbl.startMeasurement();
+  @Override
+  public void run(Person person) {
+    PopulationUtils.changePersonId(
+        ((Person) person), Id.create(this.preFix + person.getId().toString(), Person.class));
+    this.popWriter.writePerson(person);
+  }
 
-		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+  public static void main(final String[] args) {
+    Gbl.startMeasurement();
 
-		String networkFile = "./bb_cl.xml.gz";
-		String inPlansFile = "./plan_korridor.xml.gz";
-		String outPlansFile = "./plan_korridor_50x.xml.gz";
+    MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		Network net = sc.getNetwork();
-		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
+    String networkFile = "./bb_cl.xml.gz";
+    String inPlansFile = "./plan_korridor.xml.gz";
+    String outPlansFile = "./plan_korridor_50x.xml.gz";
 
-		Population inPop = sc.getPopulation();
-		MatsimReader popReader = new PopulationReader(sc);
-		popReader.readFile(inPlansFile);
+    Network net = sc.getNetwork();
+    new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
-		AddPrefixToPersonId dp = new AddPrefixToPersonId(net, inPop, outPlansFile, "gv_");
-		dp.run(inPop);
-		dp.writeEndPlans();
+    Population inPop = sc.getPopulation();
+    MatsimReader popReader = new PopulationReader(sc);
+    popReader.readFile(inPlansFile);
 
-		Gbl.printElapsedTime();
-	}
+    AddPrefixToPersonId dp = new AddPrefixToPersonId(net, inPop, outPlansFile, "gv_");
+    dp.run(inPop);
+    dp.writeEndPlans();
+
+    Gbl.printElapsedTime();
+  }
 }

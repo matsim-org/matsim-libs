@@ -18,14 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
+/** */
 package playground.vsp.analysis.modules.ptDriverPrefix;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,35 +31,32 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 
 /**
  * Collects the public vehicle Driver IDs.
- * 
- * @author ikaddoura
  *
+ * @author ikaddoura
  */
 public class PtDriverIdHandler implements TransitDriverStartsEventHandler {
-	private final static Logger log = LogManager.getLogger(PtDriverIdHandler.class);
-	private final static List<Id> ptDriverIDs = new ArrayList<Id>(); //was neither final not static
+  private static final Logger log = LogManager.getLogger(PtDriverIdHandler.class);
+  private static final List<Id> ptDriverIDs = new ArrayList<Id>(); // was neither final not static
 
-	@Override
-	public void reset(int iteration) {
-		this.ptDriverIDs.clear();
-	}
+  @Override
+  public void reset(int iteration) {
+    this.ptDriverIDs.clear();
+  }
 
-	@Override
-	public void handleEvent(TransitDriverStartsEvent event) {
-		Id ptDriverId = event.getDriverId();
-		
-		if (!this.ptDriverIDs.contains(ptDriverId)){
-			this.ptDriverIDs.add(ptDriverId);
-			
-		}
-	}
+  @Override
+  public void handleEvent(TransitDriverStartsEvent event) {
+    Id ptDriverId = event.getDriverId();
 
-	public List<Id> getPtDriverIDs() {
-		
-		if (ptDriverIDs.isEmpty()){
-			log.warn("No pt driver(s) identified. List is empty!");
-		}
-		return ptDriverIDs;
-	}
-	
+    if (!this.ptDriverIDs.contains(ptDriverId)) {
+      this.ptDriverIDs.add(ptDriverId);
+    }
+  }
+
+  public List<Id> getPtDriverIDs() {
+
+    if (ptDriverIDs.isEmpty()) {
+      log.warn("No pt driver(s) identified. List is empty!");
+    }
+    return ptDriverIDs;
+  }
 }

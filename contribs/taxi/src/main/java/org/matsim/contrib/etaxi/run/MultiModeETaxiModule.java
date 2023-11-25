@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.etaxi.run;
 
+import com.google.inject.Inject;
 import org.matsim.contrib.drt.run.DrtModeModule;
 import org.matsim.contrib.drt.run.DrtModeQSimModule;
 import org.matsim.contrib.etaxi.optimizer.ETaxiModeOptimizerQSimModule;
@@ -29,23 +30,20 @@ import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 
-import com.google.inject.Inject;
-
 /**
  * @author michalm
  */
 public final class MultiModeETaxiModule extends AbstractModule {
 
-	@Inject
-	private MultiModeTaxiConfigGroup multiModeTaxiCfg;
+  @Inject private MultiModeTaxiConfigGroup multiModeTaxiCfg;
 
-	@Override
-	public void install() {
-		for (TaxiConfigGroup taxiCfg : multiModeTaxiCfg.getModalElements()) {
-			var drtCfg = MultiModeTaxiModule.convertTaxiToDrtCfg(taxiCfg);
-			install(new DrtModeModule(drtCfg));
-			installQSimModule(new DrtModeQSimModule(drtCfg, new ETaxiModeOptimizerQSimModule(taxiCfg)));
-			install(new TaxiModeAnalysisModule(taxiCfg));
-		}
-	}
+  @Override
+  public void install() {
+    for (TaxiConfigGroup taxiCfg : multiModeTaxiCfg.getModalElements()) {
+      var drtCfg = MultiModeTaxiModule.convertTaxiToDrtCfg(taxiCfg);
+      install(new DrtModeModule(drtCfg));
+      installQSimModule(new DrtModeQSimModule(drtCfg, new ETaxiModeOptimizerQSimModule(taxiCfg)));
+      install(new TaxiModeAnalysisModule(taxiCfg));
+    }
+  }
 }

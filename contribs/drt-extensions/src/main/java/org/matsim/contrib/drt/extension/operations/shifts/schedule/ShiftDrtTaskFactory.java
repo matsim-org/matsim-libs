@@ -12,12 +12,22 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
  */
 public interface ShiftDrtTaskFactory extends DrtTaskFactory {
 
-    ShiftBreakTask createShiftBreakTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link,
-                                        DrtShiftBreak shiftBreak, OperationFacility facility);
+  ShiftBreakTask createShiftBreakTask(
+      DvrpVehicle vehicle,
+      double beginTime,
+      double endTime,
+      Link link,
+      DrtShiftBreak shiftBreak,
+      OperationFacility facility);
 
-    ShiftChangeOverTask createShiftChangeoverTask(DvrpVehicle vehicle, double beginTime, double endTime,
-                                                  Link link, DrtShift shift, OperationFacility facility);
+  ShiftChangeOverTask createShiftChangeoverTask(
+      DvrpVehicle vehicle,
+      double beginTime,
+      double endTime,
+      Link link,
+      DrtShift shift,
+      OperationFacility facility);
 
-    WaitForShiftStayTask createWaitForShiftStayTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link,
-													OperationFacility facility);
+  WaitForShiftStayTask createWaitForShiftStayTask(
+      DvrpVehicle vehicle, double beginTime, double endTime, Link link, OperationFacility facility);
 }

@@ -19,14 +19,12 @@
 
 package org.matsim.contrib.drt.extension.companions;
 
-
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,46 +46,52 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  */
 public class RunDrtWithCompanionExampleIT {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testRunDrtWithCompanions() {
-		Id.resetCaches();
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
-		Config config = ConfigUtils.loadConfig(configUrl, new OTFVisConfigGroup(), new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new), new DvrpConfigGroup());
+  @Test
+  public void testRunDrtWithCompanions() {
+    Id.resetCaches();
+    URL configUrl =
+        IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+    Config config =
+        ConfigUtils.loadConfig(
+            configUrl,
+            new OTFVisConfigGroup(),
+            new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new),
+            new DvrpConfigGroup());
 
-		// Add DrtCompanionParams with some default values into existing Drt configurations
-		MultiModeDrtConfigGroup multiModeDrtConfigGroup = MultiModeDrtConfigGroup.get(config);
-		DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.getModalElements().iterator().next();
-		drtWithExtensionsConfigGroup.addParameterSet(new DrtCompanionParams());
+    // Add DrtCompanionParams with some default values into existing Drt configurations
+    MultiModeDrtConfigGroup multiModeDrtConfigGroup = MultiModeDrtConfigGroup.get(config);
+    DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup =
+        (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.getModalElements().iterator().next();
+    drtWithExtensionsConfigGroup.addParameterSet(new DrtCompanionParams());
 
-		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
+    config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
 
-		Controler controler = DrtCompanionControlerCreator.createControler(config);
-		controler.run();
+    Controler controler = DrtCompanionControlerCreator.createControler(config);
+    controler.run();
 
-		int actualRides = getTotalNumberOfDrtRides();
-		Assertions.assertThat(actualRides).isEqualTo(471);
-	}
+    int actualRides = getTotalNumberOfDrtRides();
+    Assertions.assertThat(actualRides).isEqualTo(471);
+  }
 
-	private int getTotalNumberOfDrtRides() {
-		String filename = utils.getOutputDirectory() + "/drt_customer_stats_drt.csv";
+  private int getTotalNumberOfDrtRides() {
+    String filename = utils.getOutputDirectory() + "/drt_customer_stats_drt.csv";
 
-		final List<String> collect;
-		try {
-			collect = Files.lines(Paths.get(filename)).collect(Collectors.toList());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+    final List<String> collect;
+    try {
+      collect = Files.lines(Paths.get(filename)).collect(Collectors.toList());
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
 
-		int size = collect.size();
-		List<String> keys = List.of(collect.get(0).split(";"));
-		List<String> lastIterationValues = List.of(collect.get(size - 1).split(";"));
+    int size = collect.size();
+    List<String> keys = List.of(collect.get(0).split(";"));
+    List<String> lastIterationValues = List.of(collect.get(size - 1).split(";"));
 
-		int index = keys.indexOf("rides");
-        String value = lastIterationValues.get(index);
-		return Integer.parseInt(value);
-	}
+    int index = keys.indexOf("rides");
+    String value = lastIterationValues.get(index);
+    return Integer.parseInt(value);
+  }
 }

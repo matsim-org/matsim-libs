@@ -28,42 +28,41 @@ import java.util.List;
  * @author thibautd
  */
 final class PlanAllocation {
-	private final List<PlanRecord> plans = new ArrayList<PlanRecord>();
-	private final List<PlanRecord> immutable = Collections.unmodifiableList( plans );
+  private final List<PlanRecord> plans = new ArrayList<PlanRecord>();
+  private final List<PlanRecord> immutable = Collections.unmodifiableList(plans);
 
-	public List<PlanRecord> getPlans() {
-		return immutable;
-	}
+  public List<PlanRecord> getPlans() {
+    return immutable;
+  }
 
-	public void add(final PlanRecord p) {
-		plans.add( p );
-	}
+  public void add(final PlanRecord p) {
+    plans.add(p);
+  }
 
-	public void addAll(final Collection<PlanRecord> ps) {
-		for ( PlanRecord p : ps ) add( p );
-	}
+  public void addAll(final Collection<PlanRecord> ps) {
+    for (PlanRecord p : ps) add(p);
+  }
 
-	public void remove(final PlanRecord p) {
-		plans.remove( p );
-	}
+  public void remove(final PlanRecord p) {
+    plans.remove(p);
+  }
 
-	public void removeAll(final Collection<PlanRecord> ps) {
-		for ( PlanRecord p : ps ) remove( p );
-	}
+  public void removeAll(final Collection<PlanRecord> ps) {
+    for (PlanRecord p : ps) remove(p);
+  }
 
-	@Override
-	public boolean equals(final Object o) {
-		return o instanceof PlanAllocation && ((PlanAllocation) o).plans.equals( plans );
-	}
+  @Override
+  public boolean equals(final Object o) {
+    return o instanceof PlanAllocation && ((PlanAllocation) o).plans.equals(plans);
+  }
 
-	@Override
-	public int hashCode() {
-		return plans.hashCode();
-	}
+  @Override
+  public int hashCode() {
+    return plans.hashCode();
+  }
 
-	@Override
-	public String toString() {
-		return "{PlanAllocation: plans="+plans+"}";
-	}
+  @Override
+  public String toString() {
+    return "{PlanAllocation: plans=" + plans + "}";
+  }
 }
-

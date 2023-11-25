@@ -20,8 +20,6 @@ package org.matsim.core.router;
 
 import java.util.Arrays;
 import java.util.List;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -36,102 +34,115 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.facilities.Facility;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleUtils;
 
 /**
- * This wraps a "computer science" {@link LeastCostPathCalculator}, which routes from a node to another node, into something that
- * routes from a {@link Facility} to another {@link Facility}, as we need in MATSim.
- * 
+ * This wraps a "computer science" {@link LeastCostPathCalculator}, which routes from a node to
+ * another node, into something that routes from a {@link Facility} to another {@link Facility}, as
+ * we need in MATSim.
+ *
  * @author thibautd
  */
 public final class NetworkRoutingModule implements RoutingModule {
-	// I think it makes sense to NOT add the bushwhacking mode directly into here ...
-	// ... since it makes sense be able to to route from facility.getLinkId() to facility.getLinkId(). kai, dec'15
+  // I think it makes sense to NOT add the bushwhacking mode directly into here ...
+  // ... since it makes sense be able to to route from facility.getLinkId() to facility.getLinkId().
+  // kai, dec'15
 
-	private final String mode;
-	private final PopulationFactory populationFactory;
+  private final String mode;
+  private final PopulationFactory populationFactory;
 
-	private final Network network;
-	private final LeastCostPathCalculator routeAlgo;
+  private final Network network;
+  private final LeastCostPathCalculator routeAlgo;
 
+  public NetworkRoutingModule(
+      final String mode,
+      final PopulationFactory populationFactory,
+      final Network network,
+      final LeastCostPathCalculator routeAlgo) {
+    Gbl.assertNotNull(network);
+    //		 Gbl.assertIf( network.getLinks().size()>0 ) ; // otherwise network for mode probably not
+    // defined
+    // makes many tests fail.
+    this.network = network;
+    this.routeAlgo = routeAlgo;
+    this.mode = mode;
+    this.populationFactory = populationFactory;
+  }
 
-	 public NetworkRoutingModule(
-			final String mode,
-			final PopulationFactory populationFactory,
-			final Network network,
-			final LeastCostPathCalculator routeAlgo) {
-		 Gbl.assertNotNull(network);
-//		 Gbl.assertIf( network.getLinks().size()>0 ) ; // otherwise network for mode probably not defined
-		 // makes many tests fail.  
-		 this.network = network;
-		 this.routeAlgo = routeAlgo;
-		 this.mode = mode;
-		 this.populationFactory = populationFactory;
-	}
+  @Override
+  public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+    final Facility fromFacility = request.getFromFacility();
+    final Facility toFacility = request.getToFacility();
+    final double departureTime = request.getDepartureTime();
+    final Person person = request.getPerson();
 
-	@Override
-	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
-		final Facility fromFacility = request.getFromFacility();
-		final Facility toFacility = request.getToFacility();
-		final double departureTime = request.getDepartureTime();
-		final Person person = request.getPerson();
-		
-		Leg newLeg = this.populationFactory.createLeg( this.mode );
+    Leg newLeg = this.populationFactory.createLeg(this.mode);
 
-		Gbl.assertNotNull(fromFacility);
-		Gbl.assertNotNull(toFacility);
+    Gbl.assertNotNull(fromFacility);
+    Gbl.assertNotNull(toFacility);
 
-		Link fromLink = this.network.getLinks().get(fromFacility.getLinkId());
-		if ( fromLink==null ) {
-			Gbl.assertNotNull( fromFacility.getCoord() ) ;
-			fromLink = NetworkUtils.getNearestLink( network, fromFacility.getCoord()) ;
-		}
-		Link toLink = this.network.getLinks().get(toFacility.getLinkId());
-		if ( toLink==null ) {
-			Gbl.assertNotNull( toFacility.getCoord() ) ;
-			toLink = NetworkUtils.getNearestLink(network, toFacility.getCoord());
-		}
-		Gbl.assertNotNull(fromLink);
-		Gbl.assertNotNull(toLink);
-		
-		if (toLink != fromLink) {
-			// (a "true" route)
-			Node startNode = fromLink.getToNode(); // start at the end of the "current" link
-			Node endNode = toLink.getFromNode(); // the target is the start of the link
+    Link fromLink = this.network.getLinks().get(fromFacility.getLinkId());
+    if (fromLink == null) {
+      Gbl.assertNotNull(fromFacility.getCoord());
+      fromLink = NetworkUtils.getNearestLink(network, fromFacility.getCoord());
+    }
+    Link toLink = this.network.getLinks().get(toFacility.getLinkId());
+    if (toLink == null) {
+      Gbl.assertNotNull(toFacility.getCoord());
+      toLink = NetworkUtils.getNearestLink(network, toFacility.getCoord());
+    }
+    Gbl.assertNotNull(fromLink);
+    Gbl.assertNotNull(toLink);
 
-			/* The NetworkInclAccessEgressModule actually looks up the vehicle in the scenario and passes it to the routeAlgo as well as to the resulting route.
-			 * Here, we do not hold the scenario as a field (yet) and can not perform the lookup.
-			 * So i don't add it here (yet), in order not to break anything. But probably should be done in future.
-			 * ts, june '21
-			 */
-			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, departureTime, person, null);
-			if (path == null)
-				throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + " by mode " + this.mode + ".");
-			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
-			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
-			route.setTravelTime(path.travelTime);
-			route.setTravelCost(path.travelCost);
-			route.setDistance(RouteUtils.calcDistance(route, 1.0, 1.0, this.network));
-			newLeg.setRoute(route);
-			newLeg.setTravelTime(path.travelTime);
-		} else {
-			// create an empty route == staying on place if toLink == endLink
-			// note that we still do a route: someone may drive from one location to another on the link. kai, dec'15
-			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
-			route.setTravelTime(0);
-			route.setDistance(0.0);
-			newLeg.setRoute(route);
-			newLeg.setTravelTime(0);
-		}
-		newLeg.setDepartureTime(departureTime);
+    if (toLink != fromLink) {
+      // (a "true" route)
+      Node startNode = fromLink.getToNode(); // start at the end of the "current" link
+      Node endNode = toLink.getFromNode(); // the target is the start of the link
 
-		return Arrays.asList( newLeg );
-	}
+      /* The NetworkInclAccessEgressModule actually looks up the vehicle in the scenario and passes it to the routeAlgo as well as to the resulting route.
+       * Here, we do not hold the scenario as a field (yet) and can not perform the lookup.
+       * So i don't add it here (yet), in order not to break anything. But probably should be done in future.
+       * ts, june '21
+       */
+      Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, departureTime, person, null);
+      if (path == null)
+        throw new RuntimeException(
+            "No route found from node "
+                + startNode.getId()
+                + " to node "
+                + endNode.getId()
+                + " by mode "
+                + this.mode
+                + ".");
+      NetworkRoute route =
+          this.populationFactory
+              .getRouteFactories()
+              .createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
+      route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
+      route.setTravelTime(path.travelTime);
+      route.setTravelCost(path.travelCost);
+      route.setDistance(RouteUtils.calcDistance(route, 1.0, 1.0, this.network));
+      newLeg.setRoute(route);
+      newLeg.setTravelTime(path.travelTime);
+    } else {
+      // create an empty route == staying on place if toLink == endLink
+      // note that we still do a route: someone may drive from one location to another on the link.
+      // kai, dec'15
+      NetworkRoute route =
+          this.populationFactory
+              .getRouteFactories()
+              .createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
+      route.setTravelTime(0);
+      route.setDistance(0.0);
+      newLeg.setRoute(route);
+      newLeg.setTravelTime(0);
+    }
+    newLeg.setDepartureTime(departureTime);
 
-	@Override
-	public String toString() {
-		return "[NetworkRoutingModule: mode="+this.mode+"]";
-	}
+    return Arrays.asList(newLeg);
+  }
 
+  @Override
+  public String toString() {
+    return "[NetworkRoutingModule: mode=" + this.mode + "]";
+  }
 }

@@ -16,13 +16,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
- 
+
 package playground.vsp.andreas.utils.ana.countVehOnLinks;
 
 public class EventsCompareConfig {
-	
-	// LinkStats builder refer to this class evaluating eventsFileOne minus eventsFileTwo
-	public static String eventsFileOne = "thisIsNoFile";
-	public static String eventsFileTwo = "thisIsNoFile";
 
+  // LinkStats builder refer to this class evaluating eventsFileOne minus eventsFileTwo
+  public static String eventsFileOne = "thisIsNoFile";
+  public static String eventsFileTwo = "thisIsNoFile";
 }

@@ -20,52 +20,51 @@
 package org.matsim.contrib.ev.discharging;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
 public final class MissingEnergyEvent extends Event {
-	public static final String EVENT_TYPE = "missing_energy";
-	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-	public static final String ATTRIBUTE_ENERGY = "energy";
-	public static final String ATTRIBUTE_LINK = "link";
+  public static final String EVENT_TYPE = "missing_energy";
+  public static final String ATTRIBUTE_VEHICLE = "vehicle";
+  public static final String ATTRIBUTE_ENERGY = "energy";
+  public static final String ATTRIBUTE_LINK = "link";
 
-	private final Id<Vehicle> vehicleId;
-	private final Id<Link> linkId;
-	private final double energy;
+  private final Id<Vehicle> vehicleId;
+  private final Id<Link> linkId;
+  private final double energy;
 
-	public MissingEnergyEvent(double time, Id<Vehicle> vehicleId, Id<Link> linkId, double energy) {
-		super(time);
-		this.linkId = linkId;
-		this.vehicleId = vehicleId;
-		this.energy = energy;
-	}
+  public MissingEnergyEvent(double time, Id<Vehicle> vehicleId, Id<Link> linkId, double energy) {
+    super(time);
+    this.linkId = linkId;
+    this.vehicleId = vehicleId;
+    this.energy = energy;
+  }
 
-	public Id<Vehicle> getVehicleId() {
-		return vehicleId;
-	}
+  public Id<Vehicle> getVehicleId() {
+    return vehicleId;
+  }
 
-	public Id<Link> getLinkId() {
-		return linkId;
-	}
+  public Id<Link> getLinkId() {
+    return linkId;
+  }
 
-	public double getEnergy() {
-		return energy;
-	}
+  public double getEnergy() {
+    return energy;
+  }
 
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
+  @Override
+  public String getEventType() {
+    return EVENT_TYPE;
+  }
 
-	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_VEHICLE, vehicleId + "");
-		attr.put(ATTRIBUTE_LINK, linkId + "");
-		attr.put(ATTRIBUTE_ENERGY, energy + "");
-		return attr;
-	}
+  @Override
+  public Map<String, String> getAttributes() {
+    Map<String, String> attr = super.getAttributes();
+    attr.put(ATTRIBUTE_VEHICLE, vehicleId + "");
+    attr.put(ATTRIBUTE_LINK, linkId + "");
+    attr.put(ATTRIBUTE_ENERGY, energy + "");
+    return attr;
+  }
 }

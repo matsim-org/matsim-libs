@@ -38,109 +38,123 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 /**
- * Change the coords of a given plan for every person, except the original one.
- * It is assumed that the original persons has a digit only Id.
+ * Change the coords of a given plan for every person, except the original one. It is assumed that
+ * the original persons has a digit only Id.
  *
  * @author aneumann
- *
  */
 public class ShuffleCoords extends NewPopulation {
 
-	private double radius; // meter
-	private String homeActString = null;
-	private CoordinateTransformation coordTransform;
+  private double radius; // meter
+  private String homeActString = null;
+  private CoordinateTransformation coordTransform;
 
-	public ShuffleCoords(Network network, Population plans, String filename, double radius, CoordinateTransformation coordTransform) {
-		super(network, plans, filename);
-		this.radius = radius;
-		this.coordTransform = coordTransform;
-	}
+  public ShuffleCoords(
+      Network network,
+      Population plans,
+      String filename,
+      double radius,
+      CoordinateTransformation coordTransform) {
+    super(network, plans, filename);
+    this.radius = radius;
+    this.coordTransform = coordTransform;
+  }
 
-	/**
-	 * If set, the coords of a home activity will only be changed once, thus all home acts have the same shuffled coords.
-	 *
-	 * @param givenHomeActString The String defining a home act
-	 */
-	public void setChangeHomeActsOnlyOnceTrue(String givenHomeActString) {
-		this.homeActString = givenHomeActString;
-	}
+  /**
+   * If set, the coords of a home activity will only be changed once, thus all home acts have the
+   * same shuffled coords.
+   *
+   * @param givenHomeActString The String defining a home act
+   */
+  public void setChangeHomeActsOnlyOnceTrue(String givenHomeActString) {
+    this.homeActString = givenHomeActString;
+  }
 
-	@Override
-	public void run(Person person) {
+  @Override
+  public void run(Person person) {
 
-		try {
-			// Keep old person untouched
-			Double.parseDouble(person.getId().toString());
-			
-			Plan plan = person.getPlans().get(0);
-			for (PlanElement planElement : plan.getPlanElements()) {
-				if(planElement instanceof Activity){
-					Activity act = (Activity) planElement;
-					act.setCoord(this.coordTransform.transform(act.getCoord()));
-				}
-			}
-			
-			this.popWriter.writePerson(person);
-		} catch (Exception e) {
-			// clones need to be handled
+    try {
+      // Keep old person untouched
+      Double.parseDouble(person.getId().toString());
 
-			Plan plan = person.getPlans().get(0);
+      Plan plan = person.getPlans().get(0);
+      for (PlanElement planElement : plan.getPlanElements()) {
+        if (planElement instanceof Activity) {
+          Activity act = (Activity) planElement;
+          act.setCoord(this.coordTransform.transform(act.getCoord()));
+        }
+      }
 
-			Coord coordOfHomeAct = null;
+      this.popWriter.writePerson(person);
+    } catch (Exception e) {
+      // clones need to be handled
 
-			for (PlanElement planElement : plan.getPlanElements()) {
-				if(planElement instanceof Activity){
-					Activity act = (Activity) planElement;
+      Plan plan = person.getPlans().get(0);
 
-					double x = -0.5 + MatsimRandom.getRandom().nextDouble();
-					double y = -0.5 + MatsimRandom.getRandom().nextDouble();
+      Coord coordOfHomeAct = null;
 
-					double scale = Math.sqrt((this.radius * this.radius)/(x * x + y * y)) * MatsimRandom.getRandom().nextDouble();
+      for (PlanElement planElement : plan.getPlanElements()) {
+        if (planElement instanceof Activity) {
+          Activity act = (Activity) planElement;
 
-					Coord oldCoord = this.coordTransform.transform(act.getCoord());
+          double x = -0.5 + MatsimRandom.getRandom().nextDouble();
+          double y = -0.5 + MatsimRandom.getRandom().nextDouble();
 
-					Coord shuffledCoords = new Coord(oldCoord.getX() + x * scale, oldCoord.getY() + y * scale);
+          double scale =
+              Math.sqrt((this.radius * this.radius) / (x * x + y * y))
+                  * MatsimRandom.getRandom().nextDouble();
 
-					if(this.homeActString != null){
-						if(act.getType().equalsIgnoreCase(this.homeActString)){
-							if (coordOfHomeAct == null){
-								coordOfHomeAct = shuffledCoords;
-							}
-							act.setCoord(coordOfHomeAct);
-						} else {
-							act.setCoord(shuffledCoords);
-						}
-					} else {
-						act.setCoord(shuffledCoords);
-					}
+          Coord oldCoord = this.coordTransform.transform(act.getCoord());
 
-				}
-			}
+          Coord shuffledCoords =
+              new Coord(oldCoord.getX() + x * scale, oldCoord.getY() + y * scale);
 
-			this.popWriter.writePerson(person);
-		}
-	}
+          if (this.homeActString != null) {
+            if (act.getType().equalsIgnoreCase(this.homeActString)) {
+              if (coordOfHomeAct == null) {
+                coordOfHomeAct = shuffledCoords;
+              }
+              act.setCoord(coordOfHomeAct);
+            } else {
+              act.setCoord(shuffledCoords);
+            }
+          } else {
+            act.setCoord(shuffledCoords);
+          }
+        }
+      }
 
-	public static void main(final String[] args) {
-		Gbl.startMeasurement();
+      this.popWriter.writePerson(person);
+    }
+  }
 
-		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+  public static void main(final String[] args) {
+    Gbl.startMeasurement();
 
-		String networkFile = "./bb_cl.xml.gz";
-		String inPlansFile = "./plan_korridor_50x.xml.gz";
-		String outPlansFile = "./plan_korridor_50x_sc.xml.gz";
+    MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		Network net = sc.getNetwork();
-		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
+    String networkFile = "./bb_cl.xml.gz";
+    String inPlansFile = "./plan_korridor_50x.xml.gz";
+    String outPlansFile = "./plan_korridor_50x_sc.xml.gz";
 
-		Population inPop = sc.getPopulation();
-		MatsimReader popReader = new PopulationReader(sc);
-		popReader.readFile(inPlansFile);
+    Network net = sc.getNetwork();
+    new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
-		ShuffleCoords shuffleCoords = new ShuffleCoords(net, inPop, outPlansFile, 10.0, TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.DHDN_GK4));
-		shuffleCoords.run(inPop);
-		shuffleCoords.writeEndPlans();
+    Population inPop = sc.getPopulation();
+    MatsimReader popReader = new PopulationReader(sc);
+    popReader.readFile(inPlansFile);
 
-		Gbl.printElapsedTime();
-	}
+    ShuffleCoords shuffleCoords =
+        new ShuffleCoords(
+            net,
+            inPop,
+            outPlansFile,
+            10.0,
+            TransformationFactory.getCoordinateTransformation(
+                TransformationFactory.DHDN_GK4, TransformationFactory.DHDN_GK4));
+    shuffleCoords.run(inPop);
+    shuffleCoords.writeEndPlans();
+
+    Gbl.printElapsedTime();
+  }
 }

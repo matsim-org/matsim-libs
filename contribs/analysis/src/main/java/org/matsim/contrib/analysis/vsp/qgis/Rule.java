@@ -5,27 +5,26 @@ package org.matsim.contrib.analysis.vsp.qgis;
  */
 public class Rule {
 
-    private String filter;
-    private int symbol;
-    private String label;
+  private String filter;
+  private int symbol;
+  private String label;
 
-    public Rule(String filter, int symbol, String label){
+  public Rule(String filter, int symbol, String label) {
 
-        this.filter = filter;
-        this.symbol = symbol;
-        this.label = label;
+    this.filter = filter;
+    this.symbol = symbol;
+    this.label = label;
+  }
 
-    }
+  public String getFilter() {
+    return filter;
+  }
 
-    public String getFilter() {
-        return filter;
-    }
+  public int getSymbol() {
+    return symbol;
+  }
 
-    public int getSymbol() {
-        return symbol;
-    }
-
-    public String getLabel() {
-        return label;
-    }
+  public String getLabel() {
+    return label;
+  }
 }

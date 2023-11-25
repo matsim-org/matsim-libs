@@ -21,37 +21,36 @@ package org.matsim.facilities;
 
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.utils.objectattributes.FailingObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * Root class for activity facilities.
  *
- * Maintainer: mrieser / Senozon AG
+ * <p>Maintainer: mrieser / Senozon AG
  */
 public interface ActivityFacilities extends MatsimToplevelContainer, Attributable {
 
-	public String getName();
+  public String getName();
 
-	public void setName(String name);
-	
-	@Override
-	public ActivityFacilitiesFactory getFactory();
+  public void setName(String name);
 
-	public Map<Id<ActivityFacility>, ? extends ActivityFacility> getFacilities();
+  @Override
+  public ActivityFacilitiesFactory getFactory();
 
-	public void addActivityFacility(ActivityFacility facility);
+  public Map<Id<ActivityFacility>, ? extends ActivityFacility> getFacilities();
 
-	@Deprecated // I think that this should be phased out; use Attributable inside ActivityFacility.  kai, mar'19
-	public FailingObjectAttributes getFacilityAttributes();
+  public void addActivityFacility(ActivityFacility facility);
 
-	/* not sure if this method should be in the interface, but too many users seem to use and like it,
-	 * so there seems to be a need for it...   mrieser/jul13
-	 */
-	public TreeMap<Id<ActivityFacility>, ActivityFacility> getFacilitiesForActivityType(final String actType);
-	
+  @Deprecated // I think that this should be phased out; use Attributable inside ActivityFacility.
+  // kai, mar'19
+  public FailingObjectAttributes getFacilityAttributes();
+
+  /* not sure if this method should be in the interface, but too many users seem to use and like it,
+   * so there seems to be a need for it...   mrieser/jul13
+   */
+  public TreeMap<Id<ActivityFacility>, ActivityFacility> getFacilitiesForActivityType(
+      final String actType);
 }

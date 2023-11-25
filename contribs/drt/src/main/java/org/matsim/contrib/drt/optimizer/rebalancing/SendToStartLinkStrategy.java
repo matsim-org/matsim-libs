@@ -22,17 +22,19 @@ package org.matsim.contrib.drt.optimizer.rebalancing;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
  * This is just an example how to implement RebalancingStrategy, not a real rebalancing strategy.
- * 
+ *
  * @author michalm
  */
 public class SendToStartLinkStrategy implements RebalancingStrategy {
-	@Override
-	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
-		return rebalancableVehicles.map(v -> new Relocation(v, v.getStartLink())).collect(Collectors.toList());
-	}
+  @Override
+  public List<Relocation> calcRelocations(
+      Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
+    return rebalancableVehicles
+        .map(v -> new Relocation(v, v.getStartLink()))
+        .collect(Collectors.toList());
+  }
 }

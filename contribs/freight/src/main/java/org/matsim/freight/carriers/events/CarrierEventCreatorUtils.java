@@ -32,23 +32,21 @@ import java.util.List;
  */
 public final class CarrierEventCreatorUtils {
 
-	private CarrierEventCreatorUtils(){
-	}
+  private CarrierEventCreatorUtils() {}
 
-	/**
-	 * @return a collection of the standard freightEvent creators
-	 */
-	public static Collection<CarrierEventCreator> getStandardEventCreators(){
-		List<CarrierEventCreator> creators = new ArrayList<>();
-		creators.add(new CarrierServiceEndEventCreator());
-		creators.add(new CarrierServiceStartEventCreator());
-		creators.add(new CarrierShipmentDeliveryStartEventCreator());
-		creators.add(new CarrierShipmentDeliveryEndEventCreator());
-		creators.add(new CarrierShipmentPickupStartEventCreator());
-		creators.add(new CarrierShipmentPickupEndEventCreator());
-		creators.add(new CarrierTourEndEventCreator());
-		creators.add(new CarrierTourStartEventCreator());
-		return creators;
-	}
-
+  /**
+   * @return a collection of the standard freightEvent creators
+   */
+  public static Collection<CarrierEventCreator> getStandardEventCreators() {
+    List<CarrierEventCreator> creators = new ArrayList<>();
+    creators.add(new CarrierServiceEndEventCreator());
+    creators.add(new CarrierServiceStartEventCreator());
+    creators.add(new CarrierShipmentDeliveryStartEventCreator());
+    creators.add(new CarrierShipmentDeliveryEndEventCreator());
+    creators.add(new CarrierShipmentPickupStartEventCreator());
+    creators.add(new CarrierShipmentPickupEndEventCreator());
+    creators.add(new CarrierTourEndEventCreator());
+    creators.add(new CarrierTourStartEventCreator());
+    return creators;
+  }
 }

@@ -21,45 +21,44 @@
 package org.matsim.api.core.v01.events;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
 public class VehicleAbortsEvent extends Event {
 
-	public static final String EVENT_TYPE = "vehicle aborts";
-	
-	public static final String ATTRIBUTE_LINK = "link";
-	public static final String ATTRIBUTE_VEHICLE = "vehicle";
+  public static final String EVENT_TYPE = "vehicle aborts";
 
-	private final Id<Vehicle> vehicleId;
-	private final Id<Link> linkId;
+  public static final String ATTRIBUTE_LINK = "link";
+  public static final String ATTRIBUTE_VEHICLE = "vehicle";
 
-	public VehicleAbortsEvent(final double time, final Id<Vehicle> vehicleId, final Id<Link> linkId) {
-		super(time);
-		this.vehicleId = vehicleId;
-		this.linkId = linkId;
-	}
-	
-	public Id<Vehicle> getVehicleId() {
-		return this.vehicleId;
-	}
-	
-	public Id<Link> getLinkId() {
-		return this.linkId;
-	}
+  private final Id<Vehicle> vehicleId;
+  private final Id<Link> linkId;
 
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
-	
-	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
-		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		return attr;
-	}
+  public VehicleAbortsEvent(final double time, final Id<Vehicle> vehicleId, final Id<Link> linkId) {
+    super(time);
+    this.vehicleId = vehicleId;
+    this.linkId = linkId;
+  }
+
+  public Id<Vehicle> getVehicleId() {
+    return this.vehicleId;
+  }
+
+  public Id<Link> getLinkId() {
+    return this.linkId;
+  }
+
+  @Override
+  public String getEventType() {
+    return EVENT_TYPE;
+  }
+
+  @Override
+  public Map<String, String> getAttributes() {
+    Map<String, String> attr = super.getAttributes();
+    attr.put(ATTRIBUTE_LINK, this.linkId.toString());
+    attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
+    return attr;
+  }
 }

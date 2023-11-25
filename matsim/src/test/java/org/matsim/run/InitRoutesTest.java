@@ -23,7 +23,6 @@ package org.matsim.run;
 import static org.junit.Assert.*;
 
 import java.io.File;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -57,59 +56,60 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class InitRoutesTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  @Test
+  public void testMain() throws Exception {
+    Config config = utils.loadConfig((String) null);
+    final String NETWORK_FILE = "test/scenarios/equil/network.xml";
+    final String PLANS_FILE_TESTINPUT = utils.getOutputDirectory() + "plans.in.xml";
+    final String PLANS_FILE_TESTOUTPUT = utils.getOutputDirectory() + "plans.out.xml";
+    final String CONFIG_FILE = utils.getOutputDirectory() + "config.xml";
 
-	@Test public void testMain() throws Exception {
-		Config config = utils.loadConfig((String)null);
-		final String NETWORK_FILE = "test/scenarios/equil/network.xml";
-		final String PLANS_FILE_TESTINPUT = utils.getOutputDirectory() + "plans.in.xml";
-		final String PLANS_FILE_TESTOUTPUT = utils.getOutputDirectory() + "plans.out.xml";
-		final String CONFIG_FILE = utils.getOutputDirectory() + "config.xml";
+    // prepare data like world and network
+    MutableScenario scenario =
+        (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    Network network = scenario.getNetwork();
+    new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILE);
 
-		// prepare data like world and network
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILE);
+    // create one person with missing link in act
+    Population population =
+        ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
+    Person person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
+    population.addPerson(person);
+    Plan plan = PersonUtils.createAndAddPlan(person, true);
+    Activity a1 =
+        PopulationUtils.createAndAddActivityFromLinkId(plan, "h", Id.create("1", Link.class));
+    a1.setEndTime(3600);
+    PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+    PopulationUtils.createAndAddActivityFromLinkId(plan, "w", Id.create("20", Link.class));
 
-		// create one person with missing link in act
-		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
-		Person person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
-		population.addPerson(person);
-		Plan plan = PersonUtils.createAndAddPlan(person, true);
-		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", Id.create("1", Link.class));
-		a1.setEndTime(3600);
-		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", Id.create("20", Link.class));
+    // write person to file
+    new PopulationWriter(population, network).write(PLANS_FILE_TESTINPUT);
 
-		// write person to file
-		new PopulationWriter(population, network).write(PLANS_FILE_TESTINPUT);
+    // prepare config for test
+    config.network().setInputFile(NETWORK_FILE);
+    config.plans().setInputFile(PLANS_FILE_TESTINPUT);
+    new ConfigWriter(config).write(CONFIG_FILE);
 
-		// prepare config for test
-		config.network().setInputFile(NETWORK_FILE);
-		config.plans().setInputFile(PLANS_FILE_TESTINPUT);
-		new ConfigWriter(config).write(CONFIG_FILE);
+    // some pre-tests
+    assertFalse("Output-File should not yet exist.", new File(PLANS_FILE_TESTOUTPUT).exists());
 
-		// some pre-tests
-		assertFalse("Output-File should not yet exist.", new File(PLANS_FILE_TESTOUTPUT).exists());
+    // now run the tested class
+    InitRoutes.main(new String[] {CONFIG_FILE, PLANS_FILE_TESTOUTPUT});
 
-		// now run the tested class
-		InitRoutes.main(new String[] {CONFIG_FILE, PLANS_FILE_TESTOUTPUT});
-
-		// now perform some tests
-		assertTrue("no output generated.", new File(PLANS_FILE_TESTOUTPUT).exists());
-		Population population2 = scenario.getPopulation();
-		new PopulationReader(scenario).readFile(PLANS_FILE_TESTOUTPUT);
-		assertEquals("wrong number of persons.", 1, population2.getPersons().size());
-		Person person2 = population2.getPersons().get(Id.create("1", Person.class));
-		assertNotNull("person 1 missing", person2);
-		assertEquals("wrong number of plans in person 1", 1, person2.getPlans().size());
-		Plan plan2 = person2.getPlans().get(0);
-		Leg leg2 = (Leg) plan2.getPlanElements().get(1);
-		NetworkRoute route2 = (NetworkRoute) leg2.getRoute();
-		assertNotNull("no route assigned.", route2);
-		assertEquals("wrong route", 2, route2.getLinkIds().size());
-	}
-
+    // now perform some tests
+    assertTrue("no output generated.", new File(PLANS_FILE_TESTOUTPUT).exists());
+    Population population2 = scenario.getPopulation();
+    new PopulationReader(scenario).readFile(PLANS_FILE_TESTOUTPUT);
+    assertEquals("wrong number of persons.", 1, population2.getPersons().size());
+    Person person2 = population2.getPersons().get(Id.create("1", Person.class));
+    assertNotNull("person 1 missing", person2);
+    assertEquals("wrong number of plans in person 1", 1, person2.getPlans().size());
+    Plan plan2 = person2.getPlans().get(0);
+    Leg leg2 = (Leg) plan2.getPlanElements().get(1);
+    NetworkRoute route2 = (NetworkRoute) leg2.getRoute();
+    assertNotNull("no route assigned.", route2);
+    assertEquals("wrong route", 2, route2.getLinkIds().size());
+  }
 }

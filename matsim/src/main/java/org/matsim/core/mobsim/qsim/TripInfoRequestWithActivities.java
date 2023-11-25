@@ -1,4 +1,3 @@
-
 /*
  * *********************************************************************** *
  * project: org.matsim.*
@@ -28,106 +27,117 @@ import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
-class TripInfoRequestWithActivities implements TripInfo.Request{
-	// this is a pure data class and so one could decide the not have it behind an interface.  However, having it behind the interface means that only
-	// hte getters are public, which leaves us more room to refactor.  kai, jan'20
+class TripInfoRequestWithActivities implements TripInfo.Request {
+  // this is a pure data class and so one could decide the not have it behind an interface.
+  // However, having it behind the interface means that only
+  // hte getters are public, which leaves us more room to refactor.  kai, jan'20
 
-	private final Facility fromFacility;
-	private final Facility toFacility;
-	private final double time;
-	private final TimeInterpretation timeInterpretation;
-	private final Route route;
-//	private final Activity fromActivity;
-//	private final Activity toActivity;
+  private final Facility fromFacility;
+  private final Facility toFacility;
+  private final double time;
+  private final TimeInterpretation timeInterpretation;
+  private final Route route;
 
-	private TripInfoRequestWithActivities( Scenario scenario, Activity fromActivity, Activity toActivity, double time,
-					       TimeInterpretation timeInterpretation, Route route ) {
-		this.route = route;
-//		this.fromActivity = fromActivity;
-//		this.toActivity = toActivity;
-		this.fromFacility = FacilitiesUtils.toFacility(fromActivity, scenario.getActivityFacilities());
-		this.toFacility = FacilitiesUtils.toFacility(toActivity, scenario.getActivityFacilities());
-		this.time = time;
-		this.timeInterpretation = timeInterpretation;
-	}
+  //	private final Activity fromActivity;
+  //	private final Activity toActivity;
 
-	@Override
-	public Facility getFromFacility() {
-		return fromFacility;
-	}
+  private TripInfoRequestWithActivities(
+      Scenario scenario,
+      Activity fromActivity,
+      Activity toActivity,
+      double time,
+      TimeInterpretation timeInterpretation,
+      Route route) {
+    this.route = route;
+    //		this.fromActivity = fromActivity;
+    //		this.toActivity = toActivity;
+    this.fromFacility = FacilitiesUtils.toFacility(fromActivity, scenario.getActivityFacilities());
+    this.toFacility = FacilitiesUtils.toFacility(toActivity, scenario.getActivityFacilities());
+    this.time = time;
+    this.timeInterpretation = timeInterpretation;
+  }
 
-	@Override
-	public Facility getToFacility() {
-		return toFacility;
-	}
+  @Override
+  public Facility getFromFacility() {
+    return fromFacility;
+  }
 
-	@Override
-	public double getTime() {
-		return time;
-	}
+  @Override
+  public Facility getToFacility() {
+    return toFacility;
+  }
 
-	@Override
-	public TimeInterpretation getTimeInterpretation() {
-		return timeInterpretation;
-	}
+  @Override
+  public double getTime() {
+    return time;
+  }
 
-	@Override
-	public Route getPlannedRoute(){
-		return route;
-	}
+  @Override
+  public TimeInterpretation getTimeInterpretation() {
+    return timeInterpretation;
+  }
 
-//	Activity getFromActivity() {
-//		return fromActivity;
-//	}
-//
-//	Activity getToActivity() {
-//		return toActivity;
-//	}
-	// these were used in the code to actually change the activity end time.  There is, however, no guarantee that these are still the behavioral objects
-	// .  kai, jan'20
+  @Override
+  public Route getPlannedRoute() {
+    return route;
+  }
 
-	static class Builder {
-		private final Scenario scenario;
-		private Route route;
-		// this is deliberately a builder and not a constructor so that we can add arguments later without having to add constructors with longer and longer
-		// argument lists.  kai, mar'19
+  //	Activity getFromActivity() {
+  //		return fromActivity;
+  //	}
+  //
+  //	Activity getToActivity() {
+  //		return toActivity;
+  //	}
+  // these were used in the code to actually change the activity end time.  There is, however, no
+  // guarantee that these are still the behavioral objects
+  // .  kai, jan'20
 
-		Builder(Scenario scenario) {
-			this.scenario = scenario;
-		}
+  static class Builder {
+    private final Scenario scenario;
+    private Route route;
 
-		private double time;
-		private TimeInterpretation timeInterpretation = TimeInterpretation.departure;
-		private Activity fromActivity;
-		private Activity toActivity;
+    // this is deliberately a builder and not a constructor so that we can add arguments later
+    // without having to add constructors with longer and longer
+    // argument lists.  kai, mar'19
 
-		Builder setFromActivity(Activity fromActivity) {
-			this.fromActivity = fromActivity;
-			return this;
-		}
+    Builder(Scenario scenario) {
+      this.scenario = scenario;
+    }
 
-		Builder setToActivity(Activity toActivity) {
-			this.toActivity = toActivity;
-			return this;
-		}
+    private double time;
+    private TimeInterpretation timeInterpretation = TimeInterpretation.departure;
+    private Activity fromActivity;
+    private Activity toActivity;
 
-		Builder setTime(double time) {
-			this.time = time;
-			return this;
-		}
+    Builder setFromActivity(Activity fromActivity) {
+      this.fromActivity = fromActivity;
+      return this;
+    }
 
-		Builder setTimeInterpretation(TimeInterpretation timeInterpretation) {
-			this.timeInterpretation = timeInterpretation;
-			return this;
-		}
+    Builder setToActivity(Activity toActivity) {
+      this.toActivity = toActivity;
+      return this;
+    }
 
-		Builder setPlannedRoute( Route route ) {
-			this.route = route ;
-			return this ;
-		}
+    Builder setTime(double time) {
+      this.time = time;
+      return this;
+    }
 
-		TripInfo.Request createRequest() {
-			return new TripInfoRequestWithActivities(scenario, fromActivity, toActivity, time, timeInterpretation, route);
-		}
-	}
+    Builder setTimeInterpretation(TimeInterpretation timeInterpretation) {
+      this.timeInterpretation = timeInterpretation;
+      return this;
+    }
+
+    Builder setPlannedRoute(Route route) {
+      this.route = route;
+      return this;
+    }
+
+    TripInfo.Request createRequest() {
+      return new TripInfoRequestWithActivities(
+          scenario, fromActivity, toActivity, time, timeInterpretation, route);
+    }
+  }
 }

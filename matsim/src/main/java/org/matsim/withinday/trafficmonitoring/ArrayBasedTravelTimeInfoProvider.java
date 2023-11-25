@@ -21,7 +21,6 @@
 package org.matsim.withinday.trafficmonitoring;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -30,40 +29,39 @@ import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime.TravelTimeInfo
 
 public class ArrayBasedTravelTimeInfoProvider implements TravelTimeInfoProvider {
 
-	private final TravelTimeInfo[] arrayLinkData;
-	private final TravelTimeInfoProvider delegate;
-	
-	public ArrayBasedTravelTimeInfoProvider(Map<Id<Link>, TravelTimeInfo> linkData, Network network) {
-		this.delegate = new MapBasedTravelTimeInfoProvider(linkData);
-		this.arrayLinkData = new TravelTimeInfo[linkData.size()];
-	}
-	
-	/*
-	 * This method is called from the EventHandler part of the WithinDayTravelTime.
-	 * There, only link ids are available. We cannot optimize this. 
-	 */
-	@Override
-	public TravelTimeInfo getTravelTimeInfo(final Id<Link> linkId) {
-		return this.delegate.getTravelTimeInfo(linkId);
-	}
-	
-	/*
-	 * This method is called from the TravelTime part of the WithinDayTravelTime.
-	 * There, link are available. we can optimize this by using an array instead of a map.
-	 */
-	@Override
-	public TravelTimeInfo getTravelTimeInfo(Link link) {
-		if (link instanceof HasIndex) {
-			int index = ((HasIndex) link).getArrayIndex();
-			TravelTimeInfo data = this.arrayLinkData[index];
-			if (data == null) {
-				data = this.delegate.getTravelTimeInfo(link);
-				this.arrayLinkData[index] = data;
-			}
-			return data;
-		} else {
-			return this.delegate.getTravelTimeInfo(link);
-		}
-	}
-	
+  private final TravelTimeInfo[] arrayLinkData;
+  private final TravelTimeInfoProvider delegate;
+
+  public ArrayBasedTravelTimeInfoProvider(Map<Id<Link>, TravelTimeInfo> linkData, Network network) {
+    this.delegate = new MapBasedTravelTimeInfoProvider(linkData);
+    this.arrayLinkData = new TravelTimeInfo[linkData.size()];
+  }
+
+  /*
+   * This method is called from the EventHandler part of the WithinDayTravelTime.
+   * There, only link ids are available. We cannot optimize this.
+   */
+  @Override
+  public TravelTimeInfo getTravelTimeInfo(final Id<Link> linkId) {
+    return this.delegate.getTravelTimeInfo(linkId);
+  }
+
+  /*
+   * This method is called from the TravelTime part of the WithinDayTravelTime.
+   * There, link are available. we can optimize this by using an array instead of a map.
+   */
+  @Override
+  public TravelTimeInfo getTravelTimeInfo(Link link) {
+    if (link instanceof HasIndex) {
+      int index = ((HasIndex) link).getArrayIndex();
+      TravelTimeInfo data = this.arrayLinkData[index];
+      if (data == null) {
+        data = this.delegate.getTravelTimeInfo(link);
+        this.arrayLinkData[index] = data;
+      }
+      return data;
+    } else {
+      return this.delegate.getTravelTimeInfo(link);
+    }
+  }
 }

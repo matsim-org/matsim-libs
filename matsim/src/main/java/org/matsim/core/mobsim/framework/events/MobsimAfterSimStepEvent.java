@@ -26,15 +26,14 @@ import org.matsim.core.mobsim.framework.Mobsim;
  */
 public class MobsimAfterSimStepEvent<T extends Mobsim> extends AbstractMobsimEvent<T> {
 
-	private final double simTime;
-	
-	public MobsimAfterSimStepEvent(final T queuesim, final double simTime) {
-		super(queuesim);
-		this.simTime = simTime;
-	}
+  private final double simTime;
 
-	public double getSimulationTime() {
-		return this.simTime;
-	}
+  public MobsimAfterSimStepEvent(final T queuesim, final double simTime) {
+    super(queuesim);
+    this.simTime = simTime;
+  }
 
+  public double getSimulationTime() {
+    return this.simTime;
+  }
 }

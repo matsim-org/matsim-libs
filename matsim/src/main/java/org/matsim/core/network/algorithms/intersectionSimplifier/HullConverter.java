@@ -21,7 +21,6 @@ package org.matsim.core.network.algorithms.intersectionSimplifier;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
@@ -33,75 +32,75 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-/** 
- * Converts a {@link Geometry}, specifically a {@link Polygon} to a sequence
- * of coordinates, each representing a boundary point of the polygon. This is 
- * used to write a concave hull's characteristics to an {@link ObjectAttributes}
- * file for facilities, or simply as a {@link Facility}'s {@link Attributes}. 
+/**
+ * Converts a {@link Geometry}, specifically a {@link Polygon} to a sequence of coordinates, each
+ * representing a boundary point of the polygon. This is used to write a concave hull's
+ * characteristics to an {@link ObjectAttributes} file for facilities, or simply as a {@link
+ * Facility}'s {@link Attributes}.
  *
  * @author jwjoubert
  */
 public class HullConverter implements AttributeConverter<Geometry> {
-	private final Logger log = LogManager.getLogger(HullConverter.class);
+  private final Logger log = LogManager.getLogger(HullConverter.class);
 
-	@Override
-	public Geometry convert(String value) {
-		GeometryFactory gf = new GeometryFactory();
-		Geometry g;
+  @Override
+  public Geometry convert(String value) {
+    GeometryFactory gf = new GeometryFactory();
+    Geometry g;
 
-		List<Coordinate> list = new ArrayList<Coordinate>();
-		String[] sa = value.split(",");
-		for(String s : sa){
-			String[] sa2 = s.substring(1, s.length()-1).split(";");
-			double x = Double.parseDouble(sa2[0]);
-			double y = Double.parseDouble(sa2[1]);
-			list.add(new Coordinate(x, y));
-		}
+    List<Coordinate> list = new ArrayList<Coordinate>();
+    String[] sa = value.split(",");
+    for (String s : sa) {
+      String[] sa2 = s.substring(1, s.length() - 1).split(";");
+      double x = Double.parseDouble(sa2[0]);
+      double y = Double.parseDouble(sa2[1]);
+      list.add(new Coordinate(x, y));
+    }
 
-		Coordinate[] ca = new Coordinate[list.size()];
-		
-		/* Distinguish between points, lines and polygons. */
-		if(ca.length == 1){
-			ca[0] = list.get(0);
-			g = gf.createPoint(ca[0]);
-		} else if(ca.length == 2){
-			ca[0] = list.get(0);
-			ca[1] = list.get(1);
-			g = gf.createLineString(ca);
-		} else{
-			for(int i = 0; i < list.size(); i++){
-				ca[i] = list.get(i);
-			}
-			g = gf.createPolygon(gf.createLinearRing(ca), null);
-		}
-		
-		return g;
-	}
+    Coordinate[] ca = new Coordinate[list.size()];
 
-	@Override
-	public String convertToString(Object o) {
-		if(!(o instanceof Geometry)){
-			log.error("Could not convert the geometry: it is not of type Geometry. Returning empty string.");
-			return "";
-		}
-		
-		/* Convert to the format: (x1;y1),(x2;y2),...,(xn;yn) */
-		Coordinate[] ca = ((Geometry)o).getCoordinates();
-		StringBuilder s = new StringBuilder();
-		for(int i = 0; i < ca.length-1; i++){
-			s.append("(");
-			s.append(ca[i].x);
-			s.append(";");
-			s.append(ca[i].y);
-			s.append("),");
-		}
-		s.append("(");
-		s.append(ca[ca.length - 1].x);
-		s.append(";");
-		s.append(ca[ca.length - 1].y);
-		s.append(")");
-		
-		return s.toString();
-	}
+    /* Distinguish between points, lines and polygons. */
+    if (ca.length == 1) {
+      ca[0] = list.get(0);
+      g = gf.createPoint(ca[0]);
+    } else if (ca.length == 2) {
+      ca[0] = list.get(0);
+      ca[1] = list.get(1);
+      g = gf.createLineString(ca);
+    } else {
+      for (int i = 0; i < list.size(); i++) {
+        ca[i] = list.get(i);
+      }
+      g = gf.createPolygon(gf.createLinearRing(ca), null);
+    }
 
+    return g;
+  }
+
+  @Override
+  public String convertToString(Object o) {
+    if (!(o instanceof Geometry)) {
+      log.error(
+          "Could not convert the geometry: it is not of type Geometry. Returning empty string.");
+      return "";
+    }
+
+    /* Convert to the format: (x1;y1),(x2;y2),...,(xn;yn) */
+    Coordinate[] ca = ((Geometry) o).getCoordinates();
+    StringBuilder s = new StringBuilder();
+    for (int i = 0; i < ca.length - 1; i++) {
+      s.append("(");
+      s.append(ca[i].x);
+      s.append(";");
+      s.append(ca[i].y);
+      s.append("),");
+    }
+    s.append("(");
+    s.append(ca[ca.length - 1].x);
+    s.append(";");
+    s.append(ca[ca.length - 1].y);
+    s.append(")");
+
+    return s.toString();
+  }
 }

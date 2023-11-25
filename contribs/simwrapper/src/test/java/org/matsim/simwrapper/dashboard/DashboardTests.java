@@ -1,5 +1,6 @@
 package org.matsim.simwrapper.dashboard;
 
+import java.nio.file.Path;
 import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,103 +14,93 @@ import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.TestScenario;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.nio.file.Path;
-
 public class DashboardTests {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private void run(Dashboard... dashboards) {
+  private void run(Dashboard... dashboards) {
 
-		Config config = TestScenario.loadConfig(utils);
-		config.controller().setLastIteration(2);
+    Config config = TestScenario.loadConfig(utils);
+    config.controller().setLastIteration(2);
 
-		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
-		group.defaultParams().sampleSize = 0.001;
+    SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
+    group.defaultParams().sampleSize = 0.001;
 
-		SimWrapper sw = SimWrapper.create(config);
-		for (Dashboard d : dashboards) {
-			sw.addDashboard(d);
-		}
+    SimWrapper sw = SimWrapper.create(config);
+    for (Dashboard d : dashboards) {
+      sw.addDashboard(d);
+    }
 
-		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
-		controler.run();
-	}
+    Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
+    controler.run();
+  }
 
-	@Test
-	public void defaults() {
+  @Test
+  public void defaults() {
 
-		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
+    Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
 
-		run();
+    run();
 
-		// Ensure default dashboards have been added
-		Assertions.assertThat(out)
-				.isDirectoryContaining("glob:**stuck_agents.csv");
-	}
+    // Ensure default dashboards have been added
+    Assertions.assertThat(out).isDirectoryContaining("glob:**stuck_agents.csv");
+  }
 
-	@Test
-	public void stuckAgents() {
+  @Test
+  public void stuckAgents() {
 
-		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
+    Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
 
-		run(new StuckAgentDashboard());
+    run(new StuckAgentDashboard());
 
-		Assertions.assertThat(out)
-				.isDirectoryContaining("glob:**stuck_agents.csv");
+    Assertions.assertThat(out).isDirectoryContaining("glob:**stuck_agents.csv");
+  }
 
-	}
+  @Test
+  public void trip() {
 
-	@Test
-	public void trip() {
+    Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
 
-		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
+    run(new TripDashboard());
+    Assertions.assertThat(out)
+        .isDirectoryContaining("glob:**trip_stats.csv")
+        .isDirectoryContaining("glob:**mode_share.csv");
+  }
 
-		run(new TripDashboard());
-		Assertions.assertThat(out)
-				.isDirectoryContaining("glob:**trip_stats.csv")
-				.isDirectoryContaining("glob:**mode_share.csv");
-	}
+  @Test
+  public void tripRef() {
 
-	@Test
-	public void tripRef() {
+    Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
 
-		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
+    run(
+        new TripDashboard(
+            "mode_share_ref.csv", "mode_share_per_dist_ref.csv", "mode_users_ref.csv"));
+    Assertions.assertThat(out)
+        .isDirectoryContaining("glob:**trip_stats.csv")
+        .isDirectoryContaining("glob:**mode_share.csv");
+  }
 
-		run(new TripDashboard("mode_share_ref.csv", "mode_share_per_dist_ref.csv", "mode_users_ref.csv"));
-		Assertions.assertThat(out)
-			.isDirectoryContaining("glob:**trip_stats.csv")
-			.isDirectoryContaining("glob:**mode_share.csv");
+  @Test
+  public void populationAttribute() {
 
-	}
+    Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
 
-	@Test
-	public void populationAttribute() {
+    run(new PopulationAttributeDashboard());
+    Assertions.assertThat(out)
+        .isDirectoryContaining("glob:**amount_per_age_group.csv")
+        .isDirectoryContaining("glob:**amount_per_sex_group.csv")
+        .isDirectoryContaining("glob:**total_agents.csv");
+  }
 
-		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
+  @Test
+  public void traffic() {
 
-		run(new PopulationAttributeDashboard());
-		Assertions.assertThat(out)
-				.isDirectoryContaining("glob:**amount_per_age_group.csv")
-				.isDirectoryContaining("glob:**amount_per_sex_group.csv")
-				.isDirectoryContaining("glob:**total_agents.csv");
+    Path out = Path.of(utils.getOutputDirectory(), "analysis", "traffic");
 
+    run(new TrafficDashboard());
 
-	}
-
-	@Test
-	public void traffic() {
-
-		Path out = Path.of(utils.getOutputDirectory(), "analysis", "traffic");
-
-		run(new TrafficDashboard());
-
-		Assertions.assertThat(out)
-				.isDirectoryContaining("glob:**traffic_stats_by_link_daily.csv")
-				.isDirectoryContaining("glob:**traffic_stats_by_road_type_and_hour.csv")
-				.isDirectoryContaining("glob:**traffic_stats_by_road_type_daily.csv");
-
-
-	}
-
+    Assertions.assertThat(out)
+        .isDirectoryContaining("glob:**traffic_stats_by_link_daily.csv")
+        .isDirectoryContaining("glob:**traffic_stats_by_road_type_and_hour.csv")
+        .isDirectoryContaining("glob:**traffic_stats_by_road_type_daily.csv");
+  }
 }

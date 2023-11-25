@@ -28,17 +28,22 @@ import org.matsim.lanes.LanesConsistencyChecker;
  */
 public final class LanesAndSignalsCleaner {
 
-    public void run(Scenario scenario){
-        LanesConsistencyChecker lanesConsistency = new LanesConsistencyChecker(scenario.getNetwork(), scenario.getLanes());
-        lanesConsistency.setRemoveMalformed(true);
-        lanesConsistency.checkConsistency();
+  public void run(Scenario scenario) {
+    LanesConsistencyChecker lanesConsistency =
+        new LanesConsistencyChecker(scenario.getNetwork(), scenario.getLanes());
+    lanesConsistency.setRemoveMalformed(true);
+    lanesConsistency.checkConsistency();
 
-        SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-        SignalSystemsDataConsistencyChecker signalsConsistency = new SignalSystemsDataConsistencyChecker(scenario.getNetwork(), scenario.getLanes(), signalsData);
-        signalsConsistency.checkConsistency();
-        SignalGroupsDataConsistencyChecker signalGroupsConsistency = new SignalGroupsDataConsistencyChecker(scenario);
-        signalGroupsConsistency.checkConsistency();
-        SignalControlDataConsistencyChecker signalControlConsistency = new SignalControlDataConsistencyChecker(scenario);
-        signalControlConsistency.checkConsistency();
-    }
+    SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+    SignalSystemsDataConsistencyChecker signalsConsistency =
+        new SignalSystemsDataConsistencyChecker(
+            scenario.getNetwork(), scenario.getLanes(), signalsData);
+    signalsConsistency.checkConsistency();
+    SignalGroupsDataConsistencyChecker signalGroupsConsistency =
+        new SignalGroupsDataConsistencyChecker(scenario);
+    signalGroupsConsistency.checkConsistency();
+    SignalControlDataConsistencyChecker signalControlConsistency =
+        new SignalControlDataConsistencyChecker(scenario);
+    signalControlConsistency.checkConsistency();
+  }
 }

@@ -27,27 +27,25 @@ import org.matsim.withinday.controller.ExecutedPlansService;
 
 /**
  * @author nagel
- *
  */
 public class KeepLastExecuted extends AbstractMultithreadedModule {
 
-	private ExecutedPlansService executedPlans;
+  private ExecutedPlansService executedPlans;
 
-	public KeepLastExecuted(Config config, ExecutedPlansService executedPlans) {
-		super(config.global());
-		this.executedPlans = executedPlans;
-	}
+  public KeepLastExecuted(Config config, ExecutedPlansService executedPlans) {
+    super(config.global());
+    this.executedPlans = executedPlans;
+  }
 
-	@Override
-	public PlanAlgorithm getPlanAlgoInstance() {
-		return new PlanAlgorithm() {
-			@Override
-			public void run(Plan plan) {
-				Plan newPlan = executedPlans.getExecutedPlans().get( plan.getPerson().getId() ) ;
-				Gbl.assertNotNull( newPlan ) ;
-				PopulationUtils.copyFromTo(newPlan, plan, true);
-			}
-		};
-	}
-
+  @Override
+  public PlanAlgorithm getPlanAlgoInstance() {
+    return new PlanAlgorithm() {
+      @Override
+      public void run(Plan plan) {
+        Plan newPlan = executedPlans.getExecutedPlans().get(plan.getPerson().getId());
+        Gbl.assertNotNull(newPlan);
+        PopulationUtils.copyFromTo(newPlan, plan, true);
+      }
+    };
+  }
 }

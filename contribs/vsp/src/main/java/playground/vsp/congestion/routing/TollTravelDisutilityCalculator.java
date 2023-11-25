@@ -17,9 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
+/** */
 package playground.vsp.congestion.routing;
 
 import org.apache.logging.log4j.LogManager;
@@ -31,84 +29,94 @@ import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
-
 import playground.vsp.congestion.handlers.TollHandler;
 
 /**
  * @author ikaddoura
- *
  */
-public class TollTravelDisutilityCalculator implements TravelDisutility{
+public class TollTravelDisutilityCalculator implements TravelDisutility {
 
-	private static final Logger log = LogManager.getLogger(TollTravelDisutilityCalculator.class);
+  private static final Logger log = LogManager.getLogger(TollTravelDisutilityCalculator.class);
 
-	/*
-	 * Blur the Social Cost to speed up the relaxation process. Values between
-	 * 0.0 and 1.0 are valid. 0.0 means the old value will be kept, 1.0 means
-	 * the old value will be totally overwritten.
-	 */
-	private final double blendFactor = 0.1;
+  /*
+   * Blur the Social Cost to speed up the relaxation process. Values between
+   * 0.0 and 1.0 are valid. 0.0 means the old value will be kept, 1.0 means
+   * the old value will be totally overwritten.
+   */
+  private final double blendFactor = 0.1;
 
-	private TravelTime timeCalculator;
-	private double marginalUtlOfMoney;
-	private double distanceCostRateCar;
-	private double marginalUtlOfTravelTime;
-	private TollHandler tollHandler;
+  private TravelTime timeCalculator;
+  private double marginalUtlOfMoney;
+  private double distanceCostRateCar;
+  private double marginalUtlOfTravelTime;
+  private TollHandler tollHandler;
 
-	@Deprecated
-	public TollTravelDisutilityCalculator(TravelTime timeCalculator, ScoringConfigGroup cnScoringGroup, TollHandler tollHandler) {
-		this.timeCalculator = timeCalculator;
-		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
-		this.distanceCostRateCar = cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate();
-		// ignores cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfDistance();
-		this.marginalUtlOfTravelTime = (-cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
-		this.tollHandler = tollHandler;
+  @Deprecated
+  public TollTravelDisutilityCalculator(
+      TravelTime timeCalculator, ScoringConfigGroup cnScoringGroup, TollHandler tollHandler) {
+    this.timeCalculator = timeCalculator;
+    this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
+    this.distanceCostRateCar =
+        cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate();
+    // ignores cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfDistance();
+    this.marginalUtlOfTravelTime =
+        (-cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0)
+            + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
+    this.tollHandler = tollHandler;
 
-		log.info("The 'blend factor' which is used for the calculation of the expected tolls in the next iteration is set to " + this.blendFactor);
-	}
+    log.info(
+        "The 'blend factor' which is used for the calculation of the expected tolls in the next iteration is set to "
+            + this.blendFactor);
+  }
 
-	@Override
-	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle v) {
+  @Override
+  public double getLinkTravelDisutility(
+      final Link link, final double time, final Person person, final Vehicle v) {
 
-		double linkTravelTime = this.timeCalculator.getLinkTravelTime(link, time, person, v);
-		double linkTravelTimeDisutility = this.marginalUtlOfTravelTime * linkTravelTime ;
+    double linkTravelTime = this.timeCalculator.getLinkTravelTime(link, time, person, v);
+    double linkTravelTimeDisutility = this.marginalUtlOfTravelTime * linkTravelTime;
 
-		double distance = link.getLength();
-		double distanceCost = - this.distanceCostRateCar * distance;
-		double linkDistanceDisutility = this.marginalUtlOfMoney * distanceCost;
+    double distance = link.getLength();
+    double distanceCost = -this.distanceCostRateCar * distance;
+    double linkDistanceDisutility = this.marginalUtlOfMoney * distanceCost;
 
-		double linkExpectedTollDisutility = calculateExpectedTollDisutility(link, time, person);
+    double linkExpectedTollDisutility = calculateExpectedTollDisutility(link, time, person);
 
-		double linkTravelDisutility = linkTravelTimeDisutility + linkDistanceDisutility + linkExpectedTollDisutility;
+    double linkTravelDisutility =
+        linkTravelTimeDisutility + linkDistanceDisutility + linkExpectedTollDisutility;
 
-		return linkTravelDisutility;
-	}
+    return linkTravelDisutility;
+  }
 
-	private double calculateExpectedTollDisutility(Link link, double time, Person person) {
+  private double calculateExpectedTollDisutility(Link link, double time, Person person) {
 
-		/* The following is an estimate of the tolls that an agent would have to pay if choosing that link in the next
-		iteration i based on the tolls in iteration i-1 and i-2 */
+    /* The following is an estimate of the tolls that an agent would have to pay if choosing that link in the next
+    iteration i based on the tolls in iteration i-1 and i-2 */
 
-		double linkExpectedTollNewValue = this.tollHandler.getAvgToll(link.getId(), time);
-		double linkExpectedTollOldValue = this.tollHandler.getAvgTollOldValue(link.getId(), time);
+    double linkExpectedTollNewValue = this.tollHandler.getAvgToll(link.getId(), time);
+    double linkExpectedTollOldValue = this.tollHandler.getAvgTollOldValue(link.getId(), time);
 
-		double blendedOldValue = (1 - blendFactor) * linkExpectedTollOldValue;
-		double blendedNewValue = blendFactor * linkExpectedTollNewValue;
+    double blendedOldValue = (1 - blendFactor) * linkExpectedTollOldValue;
+    double blendedNewValue = blendFactor * linkExpectedTollNewValue;
 
-//		if (linkExpectedTollNewValue != 0 || linkExpectedTollOldValue != 0) {
-//			log.info("-----------> Person " + person.getId() + ": Expected toll (new value) on link " + link.getId() + " at " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS) + ": " + linkExpectedTollNewValue);
-//			log.info("-----------> Person " + person.getId() + ": Expected toll (old value) on link " + link.getId() + " at " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS) + ": " + linkExpectedTollOldValue);
-//
-//			log.info("ExpectedToll: " + (blendedNewValue + blendedOldValue) );
-//		}
+    //		if (linkExpectedTollNewValue != 0 || linkExpectedTollOldValue != 0) {
+    //			log.info("-----------> Person " + person.getId() + ": Expected toll (new value) on link " +
+    // link.getId() + " at " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS) + ": " +
+    // linkExpectedTollNewValue);
+    //			log.info("-----------> Person " + person.getId() + ": Expected toll (old value) on link " +
+    // link.getId() + " at " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS) + ": " +
+    // linkExpectedTollOldValue);
+    //
+    //			log.info("ExpectedToll: " + (blendedNewValue + blendedOldValue) );
+    //		}
 
-		double linkExpectedTollDisutility = -1 * this.marginalUtlOfMoney * (blendedOldValue + blendedNewValue);
-		return linkExpectedTollDisutility;
-	}
+    double linkExpectedTollDisutility =
+        -1 * this.marginalUtlOfMoney * (blendedOldValue + blendedNewValue);
+    return linkExpectedTollDisutility;
+  }
 
-	@Override
-	public double getLinkMinimumTravelDisutility(Link link) {
-		throw new UnsupportedOperationException();
-	}
-
+  @Override
+  public double getLinkMinimumTravelDisutility(Link link) {
+    throw new UnsupportedOperationException();
+  }
 }

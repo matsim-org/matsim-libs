@@ -22,7 +22,6 @@ package playground.vsp.andreas.bvgAna.mrieser.analysis;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
@@ -32,36 +31,34 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * Tracks at which facility a vehicle is currently located. If a vehicle departs at a facility,
- * no information about its location can be returned until the vehicle arrives at some other
- * facility.
+ * Tracks at which facility a vehicle is currently located. If a vehicle departs at a facility, no
+ * information about its location can be returned until the vehicle arrives at some other facility.
  *
  * @author mrieser
  */
-public class VehicleTracker implements VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
+public class VehicleTracker
+    implements VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
 
-	private final Map<Id<Vehicle>, Id<TransitStopFacility>> vehicleFacilityMap = new HashMap<>();
-	
-	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		this.vehicleFacilityMap.put(event.getVehicleId(), event.getFacilityId());
-	}
+  private final Map<Id<Vehicle>, Id<TransitStopFacility>> vehicleFacilityMap = new HashMap<>();
 
-	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		this.vehicleFacilityMap.remove(event.getVehicleId());
-		
-	}
-	
-	public void reset(int iteration) {
-		this.vehicleFacilityMap.clear();
-	}
+  public void handleEvent(VehicleArrivesAtFacilityEvent event) {
+    this.vehicleFacilityMap.put(event.getVehicleId(), event.getFacilityId());
+  }
 
-	/**
-	 * @param vehicleId
-	 * @return the id of the facility where the specified vehicle is currently located, 
-	 * <code>null</code> if the vehicle is currently at no known location.
-	 */
-	public Id<TransitStopFacility> getFacilityIdForVehicle(final Id<Vehicle> vehicleId) {
-		return this.vehicleFacilityMap.get(vehicleId);
-	}
-	
+  public void handleEvent(VehicleDepartsAtFacilityEvent event) {
+    this.vehicleFacilityMap.remove(event.getVehicleId());
+  }
+
+  public void reset(int iteration) {
+    this.vehicleFacilityMap.clear();
+  }
+
+  /**
+   * @param vehicleId
+   * @return the id of the facility where the specified vehicle is currently located, <code>null
+   *     </code> if the vehicle is currently at no known location.
+   */
+  public Id<TransitStopFacility> getFacilityIdForVehicle(final Id<Vehicle> vehicleId) {
+    return this.vehicleFacilityMap.get(vehicleId);
+  }
 }

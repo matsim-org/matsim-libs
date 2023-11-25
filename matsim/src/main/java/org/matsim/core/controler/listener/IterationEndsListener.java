@@ -24,12 +24,12 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 
 /**
  * @author dgrether
- *
  */
 public interface IterationEndsListener extends ControlerListener {
-	/**
-	 * Notifies all observers of the Controler that a iteration is finished
-	 * @param event
-	 */
-	public void notifyIterationEnds(IterationEndsEvent event);
+  /**
+   * Notifies all observers of the Controler that a iteration is finished
+   *
+   * @param event
+   */
+  public void notifyIterationEnds(IterationEndsEvent event);
 }

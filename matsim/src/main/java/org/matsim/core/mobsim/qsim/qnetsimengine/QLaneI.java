@@ -20,7 +20,6 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Collection;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -28,76 +27,80 @@ import org.matsim.lanes.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 
-
 /**
  * Interface for QLanes, which (can) make up the QLinks.
- * 
- * @author nagel
  *
+ * @author nagel
  */
 public interface QLaneI extends Identifiable<Lane> {
-	
-	void addFromWait( final QVehicle veh);
 
-	boolean isAcceptingFromWait(QVehicle veh);
+  void addFromWait(final QVehicle veh);
 
-	boolean isActive();
+  boolean isAcceptingFromWait(QVehicle veh);
 
-	double getSimulatedFlowCapacityPerTimeStep();
-	
-	void recalcTimeVariantAttributes();
-	
-	QVehicle getVehicle(final Id<Vehicle> vehicleId);
+  boolean isActive();
 
-	double getStorageCapacity();
-	
-	static interface VisData {
-		public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions, double now ) ;
-	}
+  double getSimulatedFlowCapacityPerTimeStep();
 
-	VisData getVisData();
+  void recalcTimeVariantAttributes();
 
-	/**
-	 * Needs to be added _upstream_ of the regular stop location so that a possible second stop on the link can also be served.
-	 * <p></p>
-	 * Notes:<ul>
-	 * <li> is not only used for transit and should thus be renamed.  kai, nov'14
-	 * </ul>
-	 */
-	void addTransitSlightlyUpstreamOfStop(final QVehicle veh);
-	
-	void changeUnscaledFlowCapacityPerSecond( final double val ) ;
+  QVehicle getVehicle(final Id<Vehicle> vehicleId);
 
-	void changeEffectiveNumberOfLanes( final double val ) ;
+  double getStorageCapacity();
 
-	boolean doSimStep();
+  static interface VisData {
+    public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(
+        Collection<AgentSnapshotInfo> positions, double now);
+  }
 
-	void clearVehicles();
+  VisData getVisData();
 
-	Collection<MobsimVehicle> getAllVehicles();
+  /**
+   * Needs to be added _upstream_ of the regular stop location so that a possible second stop on the
+   * link can also be served.
+   *
+   * <p>Notes:
+   *
+   * <ul>
+   *   <li>is not only used for transit and should thus be renamed. kai, nov'14
+   * </ul>
+   */
+  void addTransitSlightlyUpstreamOfStop(final QVehicle veh);
 
-	void addFromUpstream(final QVehicle veh);
+  void changeUnscaledFlowCapacityPerSecond(final double val);
 
-	boolean isNotOfferingVehicle();
+  void changeEffectiveNumberOfLanes(final double val);
 
-	QVehicle popFirstVehicle();
+  boolean doSimStep();
 
-	QVehicle getFirstVehicle();
+  void clearVehicles();
 
-	double getLastMovementTimeOfFirstVehicle();
+  Collection<MobsimVehicle> getAllVehicles();
 
-	boolean isAcceptingFromUpstream();
+  void addFromUpstream(final QVehicle veh);
 
-//	void changeSpeedMetersPerSecond(double val) ;
-	// cannot be consistently implemented with current design, since it is not a parameter of the LinkSpeedCalculator.  kai, feb'18
+  boolean isNotOfferingVehicle();
 
-	/**
-	 * When multiple lanes lead to the same next link, the QLinkLanesImpl needs to decide which lane to use.  It uses
-	 * the one with the smallest load.
-	 */
-	double getLoadIndicator() ;
-	
-	void initBeforeSimStep();
-	// yyyy could you please explain why this here was added.  Why can't the same thing be done at the beginning of "doSimStep"?  kai, nov'18
+  QVehicle popFirstVehicle();
+
+  QVehicle getFirstVehicle();
+
+  double getLastMovementTimeOfFirstVehicle();
+
+  boolean isAcceptingFromUpstream();
+
+  //	void changeSpeedMetersPerSecond(double val) ;
+  // cannot be consistently implemented with current design, since it is not a parameter of the
+  // LinkSpeedCalculator.  kai, feb'18
+
+  /**
+   * When multiple lanes lead to the same next link, the QLinkLanesImpl needs to decide which lane
+   * to use. It uses the one with the smallest load.
+   */
+  double getLoadIndicator();
+
+  void initBeforeSimStep();
+  // yyyy could you please explain why this here was added.  Why can't the same thing be done at the
+  // beginning of "doSimStep"?  kai, nov'18
 
 }

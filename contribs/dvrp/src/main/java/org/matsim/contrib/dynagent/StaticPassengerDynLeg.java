@@ -28,35 +28,34 @@ import org.matsim.core.utils.misc.OptionalTime;
  * @author jbischoff
  */
 public class StaticPassengerDynLeg implements PassengerDynLeg {
-	private final Route route;
-	private final String mode;
+  private final Route route;
+  private final String mode;
 
-	public StaticPassengerDynLeg(Route route, String mode) {
-		this.route = route;
-		this.mode = mode;
-	}
+  public StaticPassengerDynLeg(Route route, String mode) {
+    this.route = route;
+    this.mode = mode;
+  }
 
-	@Override
-	public String getMode() {
-		return mode;
-	}
+  @Override
+  public String getMode() {
+    return mode;
+  }
 
-	@Override
-	public void arrivedOnLinkByNonNetworkMode(Id<Link> linkId) {
-	}
+  @Override
+  public void arrivedOnLinkByNonNetworkMode(Id<Link> linkId) {}
 
-	@Override
-	public Id<Link> getDestinationLinkId() {
-		return route.getEndLinkId();
-	}
+  @Override
+  public Id<Link> getDestinationLinkId() {
+    return route.getEndLinkId();
+  }
 
-	@Override
-	public OptionalTime getExpectedTravelTime() {
-		return route.getTravelTime();
-	}
+  @Override
+  public OptionalTime getExpectedTravelTime() {
+    return route.getTravelTime();
+  }
 
-	@Override
-	public Double getExpectedTravelDistance() {
-		return route.getDistance();
-	}
+  @Override
+  public Double getExpectedTravelDistance() {
+    return route.getDistance();
+  }
 }

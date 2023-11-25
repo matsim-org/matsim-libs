@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * Attributes.java
@@ -19,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.utils.objectattributes.attributable;
+package org.matsim.utils.objectattributes.attributable;
 
 import java.util.*;
 
@@ -28,17 +27,17 @@ import java.util.*;
  */
 public interface Attributes {
 
-	public Object putAttribute( final String attribute, final Object value);
+  public Object putAttribute(final String attribute, final Object value);
 
-	public Object getAttribute( final String attribute);
+  public Object getAttribute(final String attribute);
 
-	public Object removeAttribute( final String attribute );
+  public Object removeAttribute(final String attribute);
 
-	public void clear();
+  public void clear();
 
-	public Map<String, Object> getAsMap();
+  public Map<String, Object> getAsMap();
 
-	public int size();
+  public int size();
 
-	public boolean isEmpty();
+  public boolean isEmpty();
 }

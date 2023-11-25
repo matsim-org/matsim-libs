@@ -22,5 +22,5 @@ package org.matsim.contrib.ev.charging;
 import org.matsim.core.events.handler.EventHandler;
 
 public interface QuitQueueAtChargerEventHandler extends EventHandler {
-	void handleEvent(QuitQueueAtChargerEvent event);
+  void handleEvent(QuitQueueAtChargerEvent event);
 }

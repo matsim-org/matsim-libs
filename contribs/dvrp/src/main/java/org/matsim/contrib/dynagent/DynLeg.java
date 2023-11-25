@@ -24,13 +24,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.misc.OptionalTime;
 
 public interface DynLeg extends DynAction {
-	String getMode();
+  String getMode();
 
-	void arrivedOnLinkByNonNetworkMode(Id<Link> linkId);
+  void arrivedOnLinkByNonNetworkMode(Id<Link> linkId);
 
-	Id<Link> getDestinationLinkId();
+  Id<Link> getDestinationLinkId();
 
-	OptionalTime getExpectedTravelTime();
+  OptionalTime getExpectedTravelTime();
 
-	Double getExpectedTravelDistance();
+  Double getExpectedTravelDistance();
 }

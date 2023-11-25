@@ -22,15 +22,15 @@ package org.matsim.contrib.signals.data.signalgroups.v20;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
+
 /**
  * @author jbischoff
- * 
  */
 final class SignalGroupsDataFactoryImpl implements SignalGroupsDataFactory {
 
-	@Override
-	public SignalGroupData createSignalGroupData(Id<SignalSystem> signalSystemId, Id<SignalGroup> signalGroupId) {
-		return new SignalGroupDataImpl(signalSystemId, signalGroupId);
-	}
-
+  @Override
+  public SignalGroupData createSignalGroupData(
+      Id<SignalSystem> signalSystemId, Id<SignalGroup> signalGroupId) {
+    return new SignalGroupDataImpl(signalSystemId, signalGroupId);
+  }
 }

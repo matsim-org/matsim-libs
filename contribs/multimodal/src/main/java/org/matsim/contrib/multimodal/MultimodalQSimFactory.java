@@ -20,10 +20,9 @@
 
 package org.matsim.contrib.multimodal;
 
-import java.util.Map;
-
+import com.google.inject.Provider;
 import jakarta.inject.Inject;
-
+import java.util.Map;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.multimodal.simengine.MultiModalQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -31,27 +30,28 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.Provider;
-
 public class MultimodalQSimFactory implements Provider<Mobsim> {
 
-	private Scenario scenario;
-	private EventsManager eventsManager;
-	private Map<String, TravelTime> multiModalTravelTimes;
+  private Scenario scenario;
+  private EventsManager eventsManager;
+  private Map<String, TravelTime> multiModalTravelTimes;
 
-	@Inject
-	MultimodalQSimFactory(Scenario scenario, EventsManager eventsManager, Map<String, TravelTime> multiModalTravelTimes) {
-		this.scenario = scenario;
-		this.eventsManager = eventsManager;
-		this.multiModalTravelTimes = multiModalTravelTimes;
-	}
+  @Inject
+  MultimodalQSimFactory(
+      Scenario scenario,
+      EventsManager eventsManager,
+      Map<String, TravelTime> multiModalTravelTimes) {
+    this.scenario = scenario;
+    this.eventsManager = eventsManager;
+    this.multiModalTravelTimes = multiModalTravelTimes;
+  }
 
-	@Override
-	public Mobsim get() {
-		return new QSimBuilder(scenario.getConfig()) //
-									   .useDefaults()
-									   .addQSimModule(new MultiModalQSimModule(multiModalTravelTimes))
-									   .configureQSimComponents(MultiModalQSimModule::configureComponents ) //
-									   .build(scenario, eventsManager);
-	}
+  @Override
+  public Mobsim get() {
+    return new QSimBuilder(scenario.getConfig()) //
+        .useDefaults()
+        .addQSimModule(new MultiModalQSimModule(multiModalTravelTimes))
+        .configureQSimComponents(MultiModalQSimModule::configureComponents) //
+        .build(scenario, eventsManager);
+  }
 }

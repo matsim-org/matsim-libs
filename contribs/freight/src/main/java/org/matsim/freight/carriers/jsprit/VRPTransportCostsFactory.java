@@ -25,5 +25,5 @@ package org.matsim.freight.carriers.jsprit;
  * @author steffenaxer
  */
 public interface VRPTransportCostsFactory {
-    VRPTransportCosts createVRPTransportCosts();
+  VRPTransportCosts createVRPTransportCosts();
 }

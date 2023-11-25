@@ -20,7 +20,6 @@
 package org.matsim.contrib.socnetsim.usage.replanning.removers;
 
 import com.google.inject.Inject;
-import org.matsim.core.config.Config;
 import org.matsim.contrib.socnetsim.framework.replanning.removers.AbstractDumbRemoverFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
@@ -28,30 +27,28 @@ import org.matsim.contrib.socnetsim.framework.replanning.selectors.InverseScoreW
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.ParetoWeight;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.highestweightselection.HighestWeightSelector;
 import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
+import org.matsim.core.config.Config;
 
 public class ParetoMinSelectorFactory extends AbstractDumbRemoverFactory {
-	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+  private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
 
-	@Inject
-	public ParetoMinSelectorFactory(
-			final Config conf,
-			final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory ) {
-		super( getMaxPlansPerAgent( conf ) );
-		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
-	}
+  @Inject
+  public ParetoMinSelectorFactory(
+      final Config conf,
+      final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory) {
+    super(getMaxPlansPerAgent(conf));
+    this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+  }
 
+  private static int getMaxPlansPerAgent(final Config conf) {
+    final GroupReplanningConfigGroup group =
+        (GroupReplanningConfigGroup) conf.getModule(GroupReplanningConfigGroup.GROUP_NAME);
+    return group.getMaxPlansPerAgent();
+  }
 
-	private static int getMaxPlansPerAgent(final Config conf) {
-		final GroupReplanningConfigGroup group = (GroupReplanningConfigGroup) conf.getModule( GroupReplanningConfigGroup.GROUP_NAME );
-		return group.getMaxPlansPerAgent();
-	}
-
-	@Override
-	public GroupLevelPlanSelector createSelector() {
-		return new HighestWeightSelector(
-				true ,
-				incompatiblePlansIdentifierFactory,
-				new ParetoWeight(
-					new InverseScoreWeight() ) );
-	}
+  @Override
+  public GroupLevelPlanSelector createSelector() {
+    return new HighestWeightSelector(
+        true, incompatiblePlansIdentifierFactory, new ParetoWeight(new InverseScoreWeight()));
+  }
 }

@@ -22,7 +22,6 @@ package playground.vsp.openberlinscenario.cemdap.output;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -36,40 +35,38 @@ import org.matsim.core.utils.io.IOUtils;
 @Deprecated
 public class CemdapPersonParser {
 
-	private final static Logger LOG = LogManager.getLogger(CemdapPersonParser.class);
+  private static final Logger LOG = LogManager.getLogger(CemdapPersonParser.class);
 
-	// Cemdap adults/children file columns
-//	private static final int HH_ID = 0;
-	private static final int P_ID = 1;
-//	...
-	
+  // Cemdap adults/children file columns
+  //	private static final int HH_ID = 0;
+  private static final int P_ID = 1;
 
-	public CemdapPersonParser() {
-	}
+  //	...
 
-	
-	public final void parse(String cemdapPersonFile, List<Id<Person>> personsIds) {
-		int lineCount = 0;
+  public CemdapPersonParser() {}
 
-		try {
-			BufferedReader bufferedReader = IOUtils.getBufferedReader(cemdapPersonFile);
-			String currentLine = null;
+  public final void parse(String cemdapPersonFile, List<Id<Person>> personsIds) {
+    int lineCount = 0;
 
-			while ((currentLine = bufferedReader.readLine()) != null) {
-				String[] entries = currentLine.split("\t", -1);
-				lineCount++;
-				
-				if (lineCount % 1000000 == 0) {
-					LOG.info("Line " + lineCount + ": " + personsIds.size() + " persons stores so far.");
-					Gbl.printMemoryUsage();
-				}
-				Id<Person> personId = Id.create(Integer.parseInt(entries[P_ID]), Person.class);
-				personsIds.add(personId);
-			}
-		} catch (IOException e) {
-			LOG.error(e);
-		}
-		LOG.info(lineCount + " lines parsed.");
-		LOG.info(personsIds.size() + " persons stored.");
-	}
+    try {
+      BufferedReader bufferedReader = IOUtils.getBufferedReader(cemdapPersonFile);
+      String currentLine = null;
+
+      while ((currentLine = bufferedReader.readLine()) != null) {
+        String[] entries = currentLine.split("\t", -1);
+        lineCount++;
+
+        if (lineCount % 1000000 == 0) {
+          LOG.info("Line " + lineCount + ": " + personsIds.size() + " persons stores so far.");
+          Gbl.printMemoryUsage();
+        }
+        Id<Person> personId = Id.create(Integer.parseInt(entries[P_ID]), Person.class);
+        personsIds.add(personId);
+      }
+    } catch (IOException e) {
+      LOG.error(e);
+    }
+    LOG.info(lineCount + " lines parsed.");
+    LOG.info(personsIds.size() + " persons stored.");
+  }
 }

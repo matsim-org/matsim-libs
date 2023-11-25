@@ -24,9 +24,7 @@ package org.matsim.freight.carriers.events.eventhandler;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 
-
 public interface CarrierTourEndEventHandler extends EventHandler {
 
-	void handleEvent( CarrierTourEndEvent event );
-
+  void handleEvent(CarrierTourEndEvent event);
 }

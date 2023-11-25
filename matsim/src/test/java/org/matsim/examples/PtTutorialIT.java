@@ -23,7 +23,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -50,109 +49,144 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class PtTutorialIT {
 
-	private final static Logger log = LogManager.getLogger(PtTutorialIT.class);
+  private static final Logger log = LogManager.getLogger(PtTutorialIT.class);
 
-	public @Rule MatsimTestUtils utils = new MatsimTestUtils();
+  public @Rule MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void ensure_tutorial_runs() throws MalformedURLException {
-		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "0.config.xml"));
-		config.controller().setLastIteration(1);
+  @Test
+  public void ensure_tutorial_runs() throws MalformedURLException {
+    Config config =
+        this.utils.loadConfig(
+            IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "0.config.xml"));
+    config.controller().setLastIteration(1);
 
-		try {
-			Controler controler = new Controler(config);
-			final EnterVehicleEventCounter enterVehicleEventCounter = new EnterVehicleEventCounter();
-			final StageActivityDurationChecker stageActivityDurationChecker = new StageActivityDurationChecker();
-			controler.addOverridingModule( new AbstractModule(){
-				@Override public void install() {
-					this.addEventHandlerBinding().toInstance( enterVehicleEventCounter );
-					this.addEventHandlerBinding().toInstance( stageActivityDurationChecker );
-				}
-			});
-			controler.run();
-			Assert.assertEquals( 1867, enterVehicleEventCounter.getCnt() );
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			Assert.fail("There shouldn't be any exception, but there was ... :-(");
-		}
-		final String it1Plans = "ITERS/it.1/1.plans.xml.gz";
-		Assert.assertTrue(new File(config.controller().getOutputDirectory(), it1Plans).exists());
-		Assert.assertTrue(new File(config.controller().getOutputDirectory(), "output_config.xml").exists());
+    try {
+      Controler controler = new Controler(config);
+      final EnterVehicleEventCounter enterVehicleEventCounter = new EnterVehicleEventCounter();
+      final StageActivityDurationChecker stageActivityDurationChecker =
+          new StageActivityDurationChecker();
+      controler.addOverridingModule(
+          new AbstractModule() {
+            @Override
+            public void install() {
+              this.addEventHandlerBinding().toInstance(enterVehicleEventCounter);
+              this.addEventHandlerBinding().toInstance(stageActivityDurationChecker);
+            }
+          });
+      controler.run();
+      Assert.assertEquals(1867, enterVehicleEventCounter.getCnt());
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      Assert.fail("There shouldn't be any exception, but there was ... :-(");
+    }
+    final String it1Plans = "ITERS/it.1/1.plans.xml.gz";
+    Assert.assertTrue(new File(config.controller().getOutputDirectory(), it1Plans).exists());
+    Assert.assertTrue(
+        new File(config.controller().getOutputDirectory(), "output_config.xml").exists());
 
-		log.info( Controler.DIVIDER ) ;
-		log.info( Controler.DIVIDER ) ;
-		// try to restart from output:
-		log.info( Controler.DIVIDER ) ;
-		log.info( Controler.DIVIDER ) ;
+    log.info(Controler.DIVIDER);
+    log.info(Controler.DIVIDER);
+    // try to restart from output:
+    log.info(Controler.DIVIDER);
+    log.info(Controler.DIVIDER);
 
-		config.plans().setInputFile(new File(utils.getOutputDirectory() + "/" + it1Plans).toURI().toURL().toString());
+    config
+        .plans()
+        .setInputFile(
+            new File(utils.getOutputDirectory() + "/" + it1Plans).toURI().toURL().toString());
 
-		config.controller().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles );
-		// note: cannot delete directory since some of the input resides there. kai, sep'15
+    config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+    // note: cannot delete directory since some of the input resides there. kai, sep'15
 
-		config.controller().setFirstIteration(10);
-		config.controller().setLastIteration(10);
+    config.controller().setFirstIteration(10);
+    config.controller().setLastIteration(10);
 
-		try {
-			Controler controler = new Controler(config);
-			final EnterVehicleEventCounter enterVehicleEventCounter = new EnterVehicleEventCounter();
-			final StageActivityDurationChecker stageActivityDurationChecker = new StageActivityDurationChecker();
-			controler.addOverridingModule( new AbstractModule(){
-				@Override public void install() {
-					this.addEventHandlerBinding().toInstance( enterVehicleEventCounter );
-					this.addEventHandlerBinding().toInstance( stageActivityDurationChecker );
-				}
-			});
-			controler.run();
-			System.err.println( " cnt=" +  enterVehicleEventCounter.getCnt() ) ;
-			Assert.assertEquals( 1867, enterVehicleEventCounter.getCnt() );
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			Assert.fail("There shouldn't be any exception, but there was ... :-(");
-		}
+    try {
+      Controler controler = new Controler(config);
+      final EnterVehicleEventCounter enterVehicleEventCounter = new EnterVehicleEventCounter();
+      final StageActivityDurationChecker stageActivityDurationChecker =
+          new StageActivityDurationChecker();
+      controler.addOverridingModule(
+          new AbstractModule() {
+            @Override
+            public void install() {
+              this.addEventHandlerBinding().toInstance(enterVehicleEventCounter);
+              this.addEventHandlerBinding().toInstance(stageActivityDurationChecker);
+            }
+          });
+      controler.run();
+      System.err.println(" cnt=" + enterVehicleEventCounter.getCnt());
+      Assert.assertEquals(1867, enterVehicleEventCounter.getCnt());
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      Assert.fail("There shouldn't be any exception, but there was ... :-(");
+    }
+  }
 
-	}
+  private static final class EnterVehicleEventCounter implements PersonEntersVehicleEventHandler {
+    private long cnt = 0;
 
-	private static final class EnterVehicleEventCounter implements PersonEntersVehicleEventHandler {
-		private long cnt = 0 ;
-		@Override public void reset(int iteration) {
-			cnt = 0 ;
-		}
-		@Override public void handleEvent( PersonEntersVehicleEvent event ) {
-			cnt++ ;
-		}
-		public final long getCnt() {
-			return this.cnt;
-		}
-	}
+    @Override
+    public void reset(int iteration) {
+      cnt = 0;
+    }
 
-	/**
-	 * tests matsim-org/matsim-libs/issues/917
-	 */
-	private static final class StageActivityDurationChecker implements ActivityStartEventHandler, ActivityEndEventHandler {
-		private Map<Id<Person>, ActivityStartEvent> personId2ActivityStartEvent = new HashMap<>();
+    @Override
+    public void handleEvent(PersonEntersVehicleEvent event) {
+      cnt++;
+    }
 
-		@Override public void reset(int iteration) {
-			personId2ActivityStartEvent.clear();
-		}
-		@Override public void handleEvent( ActivityStartEvent event ) {
-			if (StageActivityTypeIdentifier.isStageActivity(event.getActType()) ) {
-				personId2ActivityStartEvent.put(event.getPersonId(), event);
-			}
-		}
-		@Override public void handleEvent( ActivityEndEvent endEvent ) {
-			if (StageActivityTypeIdentifier.isStageActivity(endEvent.getActType()) ) {
-				ActivityStartEvent startEvent = personId2ActivityStartEvent.get(endEvent.getPersonId());
-				Assert.assertEquals("Stage activity should have same type in current ActivityEndEvent and in last ActivityStartEvent, but did not. PersonId " +
-								endEvent.getPersonId() +  ", ActivityStartEvent type: " + startEvent.getActType() +  ", ActivityEndEvent type: " + endEvent.getActType() +
-								", start time: " + startEvent.getTime() + ", end time: " + endEvent.getTime(),
-						startEvent.getActType(), endEvent.getActType());
-				Assert.assertEquals("Stage activity should have a duration of 0 seconds, but did not. PersonId " +
-								endEvent.getPersonId() +  ", start time: " + startEvent.getTime() + ", end time: " + endEvent.getTime(),
-						0.0, startEvent.getTime() - endEvent.getTime(), MatsimTestUtils.EPSILON);
-				personId2ActivityStartEvent.remove(endEvent.getPersonId());
-			}
-		}
-	}
+    public final long getCnt() {
+      return this.cnt;
+    }
+  }
 
+  /** tests matsim-org/matsim-libs/issues/917 */
+  private static final class StageActivityDurationChecker
+      implements ActivityStartEventHandler, ActivityEndEventHandler {
+    private Map<Id<Person>, ActivityStartEvent> personId2ActivityStartEvent = new HashMap<>();
+
+    @Override
+    public void reset(int iteration) {
+      personId2ActivityStartEvent.clear();
+    }
+
+    @Override
+    public void handleEvent(ActivityStartEvent event) {
+      if (StageActivityTypeIdentifier.isStageActivity(event.getActType())) {
+        personId2ActivityStartEvent.put(event.getPersonId(), event);
+      }
+    }
+
+    @Override
+    public void handleEvent(ActivityEndEvent endEvent) {
+      if (StageActivityTypeIdentifier.isStageActivity(endEvent.getActType())) {
+        ActivityStartEvent startEvent = personId2ActivityStartEvent.get(endEvent.getPersonId());
+        Assert.assertEquals(
+            "Stage activity should have same type in current ActivityEndEvent and in last ActivityStartEvent, but did not. PersonId "
+                + endEvent.getPersonId()
+                + ", ActivityStartEvent type: "
+                + startEvent.getActType()
+                + ", ActivityEndEvent type: "
+                + endEvent.getActType()
+                + ", start time: "
+                + startEvent.getTime()
+                + ", end time: "
+                + endEvent.getTime(),
+            startEvent.getActType(),
+            endEvent.getActType());
+        Assert.assertEquals(
+            "Stage activity should have a duration of 0 seconds, but did not. PersonId "
+                + endEvent.getPersonId()
+                + ", start time: "
+                + startEvent.getTime()
+                + ", end time: "
+                + endEvent.getTime(),
+            0.0,
+            startEvent.getTime() - endEvent.getTime(),
+            MatsimTestUtils.EPSILON);
+        personId2ActivityStartEvent.remove(endEvent.getPersonId());
+      }
+    }
+  }
 }

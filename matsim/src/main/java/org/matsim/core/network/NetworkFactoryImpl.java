@@ -35,28 +35,35 @@ import org.matsim.core.utils.geometry.CoordUtils;
  */
 /*deliberately package*/ final class NetworkFactoryImpl implements NetworkFactory {
 
-	@SuppressWarnings("unused")
-	private final static Logger log = LogManager.getLogger(NetworkFactory.class);
+  @SuppressWarnings("unused")
+  private static final Logger log = LogManager.getLogger(NetworkFactory.class);
 
-	private final LinkFactory linkFactory;
+  private final LinkFactory linkFactory;
 
-	private final Network network;
+  private final Network network;
 
-	NetworkFactoryImpl(final Network network, final LinkFactory linkFactory) {
-		this.network = network;
-		this.linkFactory = linkFactory;
-	}
+  NetworkFactoryImpl(final Network network, final LinkFactory linkFactory) {
+    this.network = network;
+    this.linkFactory = linkFactory;
+  }
 
-	@Override
-	public Node createNode(final Id<Node> id, final Coord coord) {
-		Node node = NetworkUtils.createNode(id);
-		node.setCoord(coord) ;
-		return node ;
-	}
+  @Override
+  public Node createNode(final Id<Node> id, final Coord coord) {
+    Node node = NetworkUtils.createNode(id);
+    node.setCoord(coord);
+    return node;
+  }
 
-	@Override
-	public Link createLink(Id<Link> id, Node fromNode, Node toNode) {
-		return this.linkFactory.createLink(id, fromNode, toNode, 
-				this.network, CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()), 1.0, 1.0, 1.0);
-	}
+  @Override
+  public Link createLink(Id<Link> id, Node fromNode, Node toNode) {
+    return this.linkFactory.createLink(
+        id,
+        fromNode,
+        toNode,
+        this.network,
+        CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()),
+        1.0,
+        1.0,
+        1.0);
+  }
 }

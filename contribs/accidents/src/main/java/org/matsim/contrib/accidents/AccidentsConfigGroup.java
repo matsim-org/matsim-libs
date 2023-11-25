@@ -22,67 +22,66 @@ package org.matsim.contrib.accidents;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
- * 
  * @author ikaddoura
  */
-
 public final class AccidentsConfigGroup extends ReflectiveConfigGroup {
-	// needs to be public because of reflection-based annotations
+  // needs to be public because of reflection-based annotations
 
-	public static final String GROUP_NAME = "accidents" ;
-	
-	public static final String BVWP_ROAD_TYPE_ATTRIBUTE_NAME = "bvwpRoadType";
+  public static final String GROUP_NAME = "accidents";
 
-	public AccidentsConfigGroup() {
-		super(GROUP_NAME);
-	}
-	
-	private boolean enableAccidentsModule = true;
-	private final String accidentsComputationMethodAttributeName = "accidentsComputationMethod";
-	
-	private double scaleFactor = 10.;
-		
-	private AccidentsComputationMethod accidentsComputationMethod = AccidentsComputationMethod.BVWP;
-				
-	@StringGetter( "enableAccidentsModule" )
-	public boolean isEnableAccidentsModule() {
-		return enableAccidentsModule;
-	}
+  public static final String BVWP_ROAD_TYPE_ATTRIBUTE_NAME = "bvwpRoadType";
 
-	@StringSetter( "enableAccidentsModule" )
-	public void setEnableAccidentsModule(boolean enableAccidentsModule) {
-		this.enableAccidentsModule = enableAccidentsModule;
-	}
+  public AccidentsConfigGroup() {
+    super(GROUP_NAME);
+  }
 
-	@StringGetter( "scaleFactor" )
-	public double getScaleFactor() {
-		return scaleFactor;
-	}
+  private boolean enableAccidentsModule = true;
+  private final String accidentsComputationMethodAttributeName = "accidentsComputationMethod";
 
-	@StringSetter( "scaleFactor" )
-	public void setScaleFactor(double scaleFactor) {
-		this.scaleFactor = scaleFactor;
-	}
+  private double scaleFactor = 10.;
 
-	@StringGetter( "accidentsComputationMethod" )
-	public AccidentsComputationMethod getAccidentsComputationMethod() {
-		return accidentsComputationMethod;
-	}
+  private AccidentsComputationMethod accidentsComputationMethod = AccidentsComputationMethod.BVWP;
 
-	@StringSetter( "accidentsComputationMethod" )
-	public void AccidentsComputationMethod(AccidentsComputationMethod accidentsComputationMethod) {
-		this.accidentsComputationMethod = accidentsComputationMethod;
-	}
-	
-	// yyyyyy this implies that you can change the accidents computation method PER LINK.  Is that what you want?  kai, sep'19
-	public String getAccidentsComputationMethodAttributeName() {
-		return accidentsComputationMethodAttributeName;
-	}
+  @StringGetter("enableAccidentsModule")
+  public boolean isEnableAccidentsModule() {
+    return enableAccidentsModule;
+  }
 
-	/**
-	* @author mmayobre
-	*/
+  @StringSetter("enableAccidentsModule")
+  public void setEnableAccidentsModule(boolean enableAccidentsModule) {
+    this.enableAccidentsModule = enableAccidentsModule;
+  }
 
-	public enum AccidentsComputationMethod {BVWP}
+  @StringGetter("scaleFactor")
+  public double getScaleFactor() {
+    return scaleFactor;
+  }
+
+  @StringSetter("scaleFactor")
+  public void setScaleFactor(double scaleFactor) {
+    this.scaleFactor = scaleFactor;
+  }
+
+  @StringGetter("accidentsComputationMethod")
+  public AccidentsComputationMethod getAccidentsComputationMethod() {
+    return accidentsComputationMethod;
+  }
+
+  @StringSetter("accidentsComputationMethod")
+  public void AccidentsComputationMethod(AccidentsComputationMethod accidentsComputationMethod) {
+    this.accidentsComputationMethod = accidentsComputationMethod;
+  }
+
+  // yyyyyy this implies that you can change the accidents computation method PER LINK.  Is that
+  // what you want?  kai, sep'19
+  public String getAccidentsComputationMethodAttributeName() {
+    return accidentsComputationMethodAttributeName;
+  }
+
+  /**
+   * @author mmayobre
+   */
+  public enum AccidentsComputationMethod {
+    BVWP
+  }
 }
-

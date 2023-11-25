@@ -20,6 +20,11 @@
 
 package org.matsim.contrib.ev.infrastructure;
 
+import com.google.inject.Inject;
+import com.google.inject.Key;
+import com.google.inject.Provider;
+import com.google.inject.name.Named;
+import com.google.inject.name.Names;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.ChargingLogic;
@@ -27,60 +32,65 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
-import com.google.inject.Inject;
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.name.Named;
-import com.google.inject.name.Names;
-
 /**
  * @author Michal Maciejewski (michalm)
  */
 public final class ChargingInfrastructureModule extends AbstractModule {
-	public static final String CHARGERS = "chargers";
-	private final Key<Network> networkKey;
+  public static final String CHARGERS = "chargers";
+  private final Key<Network> networkKey;
 
-	@Inject
-	private EvConfigGroup evCfg;
+  @Inject private EvConfigGroup evCfg;
 
-	public ChargingInfrastructureModule() {
-		this(Key.get(Network.class));
-	}
+  public ChargingInfrastructureModule() {
+    this(Key.get(Network.class));
+  }
 
-	public ChargingInfrastructureModule(Key<Network> networkKey) {
-		this.networkKey = networkKey;
-	}
+  public ChargingInfrastructureModule(Key<Network> networkKey) {
+    this.networkKey = networkKey;
+  }
 
-	@Override
-	public void install() {
-		bind(Network.class).annotatedWith(Names.named(CHARGERS)).to(networkKey).asEagerSingleton();
+  @Override
+  public void install() {
+    bind(Network.class).annotatedWith(Names.named(CHARGERS)).to(networkKey).asEagerSingleton();
 
-		bind(ChargingInfrastructureSpecification.class).toProvider(() -> {
-			ChargingInfrastructureSpecification chargingInfrastructureSpecification = new ChargingInfrastructureSpecificationDefaultImpl();
-			new ChargerReader(chargingInfrastructureSpecification).parse(
-					ConfigGroup.getInputFileURL(getConfig().getContext(), evCfg.chargersFile));
-			return chargingInfrastructureSpecification;
-		}).asEagerSingleton();
+    bind(ChargingInfrastructureSpecification.class)
+        .toProvider(
+            () -> {
+              ChargingInfrastructureSpecification chargingInfrastructureSpecification =
+                  new ChargingInfrastructureSpecificationDefaultImpl();
+              new ChargerReader(chargingInfrastructureSpecification)
+                  .parse(ConfigGroup.getInputFileURL(getConfig().getContext(), evCfg.chargersFile));
+              return chargingInfrastructureSpecification;
+            })
+        .asEagerSingleton();
 
-		installQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				bind(ChargingInfrastructure.class).toProvider(new Provider<>() {
-					@Inject
-					@Named(CHARGERS)
-					private Network network;
-					@Inject
-					private ChargingInfrastructureSpecification chargingInfrastructureSpecification;
-					@Inject
-					private ChargingLogic.Factory chargingLogicFactory;
+    installQSimModule(
+        new AbstractQSimModule() {
+          @Override
+          protected void configureQSim() {
+            bind(ChargingInfrastructure.class)
+                .toProvider(
+                    new Provider<>() {
+                      @Inject
+                      @Named(CHARGERS)
+                      private Network network;
 
-					@Override
-					public ChargingInfrastructure get() {
-						return ChargingInfrastructureUtils.createChargingInfrastructure(chargingInfrastructureSpecification,
-								network.getLinks()::get, chargingLogicFactory );
-					}
-				}).asEagerSingleton();
-			}
-		});
-	}
+                      @Inject
+                      private ChargingInfrastructureSpecification
+                          chargingInfrastructureSpecification;
+
+                      @Inject private ChargingLogic.Factory chargingLogicFactory;
+
+                      @Override
+                      public ChargingInfrastructure get() {
+                        return ChargingInfrastructureUtils.createChargingInfrastructure(
+                            chargingInfrastructureSpecification,
+                            network.getLinks()::get,
+                            chargingLogicFactory);
+                      }
+                    })
+                .asEagerSingleton();
+          }
+        });
+  }
 }

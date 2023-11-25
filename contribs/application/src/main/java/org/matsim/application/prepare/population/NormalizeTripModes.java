@@ -1,5 +1,8 @@
 package org.matsim.application.prepare.population;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.*;
@@ -9,162 +12,175 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import picocli.CommandLine;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-
-@CommandLine.Command(name = "normalize-trip-modes", description = "Adjust trip modes to be the same throughout the day.", showDefaultValues = true)
+@CommandLine.Command(
+    name = "normalize-trip-modes",
+    description = "Adjust trip modes to be the same throughout the day.",
+    showDefaultValues = true)
 public class NormalizeTripModes implements MATSimAppCommand {
 
-	private static final Logger log = LogManager.getLogger(NormalizeTripModes.class);
+  private static final Logger log = LogManager.getLogger(NormalizeTripModes.class);
 
-	@CommandLine.Option(names = "--input", description = "Path to input population", required = true)
-	private Path input;
+  @CommandLine.Option(names = "--input", description = "Path to input population", required = true)
+  private Path input;
 
-	@CommandLine.Option(names = "--output", description = "Path for output population", required = true)
-	private Path output;
+  @CommandLine.Option(
+      names = "--output",
+      description = "Path for output population",
+      required = true)
+  private Path output;
 
-	@CommandLine.Option(names = "--subpopulation", description = "Subpopulation filter", defaultValue = "person")
-	private String subpopulation;
+  @CommandLine.Option(
+      names = "--subpopulation",
+      description = "Subpopulation filter",
+      defaultValue = "person")
+  private String subpopulation;
 
-	@CommandLine.Option(names = "--chain-based-modes", description = "Chain-based modes", defaultValue = "car,bike", split = ",")
-	private Set<String> chainBasedModes;
+  @CommandLine.Option(
+      names = "--chain-based-modes",
+      description = "Chain-based modes",
+      defaultValue = "car,bike",
+      split = ",")
+  private Set<String> chainBasedModes;
 
-	@CommandLine.Option(names = "--modes", description = "Modes to choose from.", defaultValue = "walk", split = ",")
-	private List<String> modes;
+  @CommandLine.Option(
+      names = "--modes",
+      description = "Modes to choose from.",
+      defaultValue = "walk",
+      split = ",")
+  private List<String> modes;
 
-	@CommandLine.Option(names = "--duplicate-per-mode", description = "Duplicate selected plan for each mode", defaultValue = "false")
-	private boolean perMode;
+  @CommandLine.Option(
+      names = "--duplicate-per-mode",
+      description = "Duplicate selected plan for each mode",
+      defaultValue = "false")
+  private boolean perMode;
 
-	@CommandLine.Option(names = "--remove-staging-activities", description = "Remove all staging activities.", defaultValue = "false")
-	private boolean rmStaging;
+  @CommandLine.Option(
+      names = "--remove-staging-activities",
+      description = "Remove all staging activities.",
+      defaultValue = "false")
+  private boolean rmStaging;
 
-	private final SplittableRandom rnd = new SplittableRandom(4117);
+  private final SplittableRandom rnd = new SplittableRandom(4117);
 
-	public static void main(String[] args) {
-		new NormalizeTripModes().execute(args);
-	}
+  public static void main(String[] args) {
+    new NormalizeTripModes().execute(args);
+  }
 
-	@Override
-	public Integer call() throws Exception {
+  @Override
+  public Integer call() throws Exception {
 
-		Population population = PopulationUtils.readPopulation(input.toString());
+    Population population = PopulationUtils.readPopulation(input.toString());
 
-		if (output.getParent() != null) Files.createDirectories(output.getParent());
+    if (output.getParent() != null) Files.createDirectories(output.getParent());
 
-		int processed = 0;
-		int skipped = 0;
+    int processed = 0;
+    int skipped = 0;
 
-		for (Person person : population.getPersons().values()) {
+    for (Person person : population.getPersons().values()) {
 
-			String subpop = PopulationUtils.getSubpopulation(person);
-			if (!subpop.equals(subpopulation)) continue;
+      String subpop = PopulationUtils.getSubpopulation(person);
+      if (!subpop.equals(subpopulation)) continue;
 
-			if (perMode)
-				duplicatePlans(person);
-			else if (rmStaging)
-				skipped += selectModeAndClean(population.getFactory(), person) ? 0 : 1;
-			else
-				skipped += selectMode(person) ? 0 : 1;
+      if (perMode) duplicatePlans(person);
+      else if (rmStaging) skipped += selectModeAndClean(population.getFactory(), person) ? 0 : 1;
+      else skipped += selectMode(person) ? 0 : 1;
 
-			processed++;
-		}
+      processed++;
+    }
 
-		log.info("Processed {} out of {} persons", processed, population.getPersons().size());
+    log.info("Processed {} out of {} persons", processed, population.getPersons().size());
 
-		if (skipped > 0)
-			log.warn("Skipped {} persons due to car availability", skipped);
+    if (skipped > 0) log.warn("Skipped {} persons due to car availability", skipped);
 
+    PopulationUtils.writePopulation(population, output.toString());
 
-		PopulationUtils.writePopulation(population, output.toString());
+    return 0;
+  }
 
-		return 0;
-	}
+  private void duplicatePlans(Person person) {
 
-	private void duplicatePlans(Person person) {
+    Plan plan = person.getSelectedPlan();
 
-		Plan plan = person.getSelectedPlan();
+    // remove all unselected plans
+    Set<Plan> plans = new HashSet<>(person.getPlans());
+    plans.remove(plan);
+    plans.forEach(person::removePlan);
 
-		// remove all unselected plans
-		Set<Plan> plans = new HashSet<>(person.getPlans());
-		plans.remove(plan);
-		plans.forEach(person::removePlan);
+    for (String mode : modes) {
 
-		for (String mode : modes) {
+      if (!PersonUtils.canUseCar(person) && mode.equals("car")) continue;
 
-			if (!PersonUtils.canUseCar(person) && mode.equals("car"))
-				continue;
+      plan.setType(mode);
 
-			plan.setType(mode);
+      for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(plan)) {
+        for (Leg leg : trip.getLegsOnly()) {
 
-			for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(plan)) {
-				for (Leg leg : trip.getLegsOnly()) {
+          leg.setRoute(null);
+          leg.setMode(mode);
+          TripStructureUtils.setRoutingMode(leg, mode);
+        }
+      }
 
-					leg.setRoute(null);
-					leg.setMode(mode);
-					TripStructureUtils.setRoutingMode(leg, mode);
-				}
+      plan = person.createCopyOfSelectedPlanAndMakeSelected();
+    }
+  }
 
-			}
+  private boolean selectMode(Person person) {
 
-			plan = person.createCopyOfSelectedPlanAndMakeSelected();
-		}
+    List<String> select = new ArrayList<>(modes);
 
-	}
+    if (!PersonUtils.canUseCar(person)) select.removeIf(m -> m.equals("car"));
 
-	private boolean selectMode(Person person) {
+    if (select.isEmpty()) {
+      // No modes to select from. Probably tried to set to all car plans, but person is not allowed
+      // to use car."
+      return false;
+    }
 
-		List<String> select = new ArrayList<>(modes);
+    String mode = select.get(rnd.nextInt(select.size()));
 
-		if (!PersonUtils.canUseCar(person))
-			select.removeIf(m -> m.equals("car"));
+    for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan())) {
+      for (Leg leg : trip.getLegsOnly()) {
+        leg.setRoute(null);
+        leg.setMode(mode);
+        TripStructureUtils.setRoutingMode(leg, mode);
+      }
+    }
 
-		if (select.isEmpty()) {
-			// No modes to select from. Probably tried to set to all car plans, but person is not allowed to use car."
-			return false;
-		}
+    return true;
+  }
 
-		String mode = select.get(rnd.nextInt(select.size()));
+  private boolean selectModeAndClean(PopulationFactory f, Person person) {
 
-		for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan())) {
-			for (Leg leg : trip.getLegsOnly()) {
-				leg.setRoute(null);
-				leg.setMode(mode);
-				TripStructureUtils.setRoutingMode(leg, mode);
-			}
-		}
+    List<String> select = new ArrayList<>(modes);
 
-		return true;
-	}
+    if (!PersonUtils.canUseCar(person)) select.removeIf(m -> m.equals("car"));
 
-	private boolean selectModeAndClean(PopulationFactory f, Person person) {
+    if (select.isEmpty()) {
+      // No modes to select from. Probably tried to set to all car plans, but person is not allowed
+      // to use car."
+      return false;
+    }
 
-		List<String> select = new ArrayList<>(modes);
+    Plan plan = person.getSelectedPlan();
+    plan.setScore(null);
 
-		if (!PersonUtils.canUseCar(person))
-			select.removeIf(m -> m.equals("car"));
+    String mode = select.get(rnd.nextInt(select.size()));
 
-		if (select.isEmpty()) {
-			// No modes to select from. Probably tried to set to all car plans, but person is not allowed to use car."
-			return false;
-		}
+    List<Activity> activities =
+        TripStructureUtils.getActivities(
+            plan, TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
 
-		Plan plan = person.getSelectedPlan();
-		plan.setScore(null);
+    plan.getPlanElements().clear();
 
-		String mode = select.get(rnd.nextInt(select.size()));
+    for (int i = 0; i < activities.size() - 1; i++) {
+      plan.addActivity(activities.get(i));
+      plan.addLeg(f.createLeg(mode));
+    }
 
-		List<Activity> activities = TripStructureUtils.getActivities(plan, TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
+    plan.addActivity(activities.get(activities.size() - 1));
 
-		plan.getPlanElements().clear();
-
-		for (int i = 0; i < activities.size() - 1; i++) {
-			plan.addActivity(activities.get(i));
-			plan.addLeg(f.createLeg(mode));
-		}
-
-		plan.addActivity(activities.get(activities.size() - 1));
-
-		return true;
-	}
+    return true;
+  }
 }

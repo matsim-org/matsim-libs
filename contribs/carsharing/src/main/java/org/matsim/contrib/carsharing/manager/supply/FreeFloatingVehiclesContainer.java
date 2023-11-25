@@ -2,7 +2,6 @@ package org.matsim.contrib.carsharing.manager.supply;
 
 import java.util.Collection;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.carsharing.qsim.FreefloatingAreas;
@@ -16,137 +15,135 @@ import org.matsim.core.utils.geometry.CoordUtils;
  */
 public class FreeFloatingVehiclesContainer implements VehiclesContainer {
 
-	private QuadTree<CSVehicle> availableFFVehicleLocationQuadTree;
-	private Map<String, CSVehicle> ffvehicleIdMap;
-	private Map<CSVehicle, Link> availableFFvehiclesMap;
-	private SearchableNetwork network;
-	private FreefloatingAreas freefloatingAreas;
+  private QuadTree<CSVehicle> availableFFVehicleLocationQuadTree;
+  private Map<String, CSVehicle> ffvehicleIdMap;
+  private Map<CSVehicle, Link> availableFFvehiclesMap;
+  private SearchableNetwork network;
+  private FreefloatingAreas freefloatingAreas;
 
-	public FreeFloatingVehiclesContainer(QuadTree<CSVehicle> ffVehicleLocationQuadTree,
-			Map<String, CSVehicle> ffvehicleIdMap, Map<CSVehicle, Link> ffvehiclesMap) {
+  public FreeFloatingVehiclesContainer(
+      QuadTree<CSVehicle> ffVehicleLocationQuadTree,
+      Map<String, CSVehicle> ffvehicleIdMap,
+      Map<CSVehicle, Link> ffvehiclesMap) {
 
-		this.availableFFVehicleLocationQuadTree = ffVehicleLocationQuadTree;
-		this.availableFFvehiclesMap = ffvehiclesMap;
-		this.ffvehicleIdMap = ffvehicleIdMap;
+    this.availableFFVehicleLocationQuadTree = ffVehicleLocationQuadTree;
+    this.availableFFvehiclesMap = ffvehiclesMap;
+    this.ffvehicleIdMap = ffvehicleIdMap;
+  }
 
-	}
+  public QuadTree<CSVehicle> getFfVehicleLocationQuadTree() {
+    return availableFFVehicleLocationQuadTree;
+  }
 
-	public QuadTree<CSVehicle> getFfVehicleLocationQuadTree() {
-		return availableFFVehicleLocationQuadTree;
-	}
+  public Map<String, CSVehicle> getFfvehicleIdMap() {
+    return ffvehicleIdMap;
+  }
 
-	public Map<String, CSVehicle> getFfvehicleIdMap() {
-		return ffvehicleIdMap;
-	}
+  public Map<CSVehicle, Link> getFfvehiclesMap() {
+    return availableFFvehiclesMap;
+  }
 
-	public Map<CSVehicle, Link> getFfvehiclesMap() {
-		return availableFFvehiclesMap;
-	}
+  public void setNetwork(SearchableNetwork network) {
+    this.network = network;
+  }
 
-	public void setNetwork(SearchableNetwork network) {
-		this.network = network;
-	}
+  public SearchableNetwork getNetwork() {
+    return this.network;
+  }
 
-	public SearchableNetwork getNetwork() {
-		return this.network;
-	}
+  public void setFreefloatingAreas(FreefloatingAreas areas) {
+    this.freefloatingAreas = areas;
+  }
 
-	public void setFreefloatingAreas(FreefloatingAreas areas) {
-		this.freefloatingAreas = areas;
-	}
+  public FreefloatingAreas getFreefloatingAreas() {
+    return this.freefloatingAreas;
+  }
 
-	public FreefloatingAreas getFreefloatingAreas() {
-		return this.freefloatingAreas;
-	}
+  public boolean reserveVehicle(CSVehicle vehicle) {
+    synchronized (availableFFVehicleLocationQuadTree) {
+      Link link = this.availableFFvehiclesMap.get(vehicle);
 
-	public boolean reserveVehicle(CSVehicle vehicle) {
-		synchronized (availableFFVehicleLocationQuadTree) {
-			Link link = this.availableFFvehiclesMap.get(vehicle);
+      if (link == null) {
+        return false;
+      }
 
-			if (link == null) {
-				return false;
-			}
+      Coord coord = link.getCoord();
+      this.availableFFvehiclesMap.remove(vehicle);
+      this.availableFFVehicleLocationQuadTree.remove(coord.getX(), coord.getY(), vehicle);
 
-			Coord coord = link.getCoord();
-			this.availableFFvehiclesMap.remove(vehicle);
-			this.availableFFVehicleLocationQuadTree.remove(coord.getX(), coord.getY(), vehicle);
+      return true;
+    }
+  }
 
-			return true;
-		}
-	}
+  public void parkVehicle(CSVehicle vehicle, Link link) {
+    synchronized (availableFFVehicleLocationQuadTree) {
+      Coord coord = link.getCoord();
 
-	public void parkVehicle(CSVehicle vehicle, Link link) {
-		synchronized (availableFFVehicleLocationQuadTree) {
+      availableFFVehicleLocationQuadTree.put(coord.getX(), coord.getY(), vehicle);
+      availableFFvehiclesMap.put(vehicle, link);
+    }
+  }
 
-			Coord coord = link.getCoord();
+  @Override
+  public Link getVehicleLocation(CSVehicle vehicle) {
+    return availableFFvehiclesMap.get(vehicle);
+  }
 
-			availableFFVehicleLocationQuadTree.put(coord.getX(), coord.getY(), vehicle);
-			availableFFvehiclesMap.put(vehicle, link);
-		}
-	}
+  @Override
+  public CSVehicle findClosestAvailableVehicle(
+      Link startLink, String typeOfVehicle, double searchDistance) {
+    synchronized (availableFFVehicleLocationQuadTree) {
+      Collection<CSVehicle> location =
+          availableFFVehicleLocationQuadTree.getDisk(
+              startLink.getCoord().getX(), startLink.getCoord().getY(), searchDistance);
+      if (location.isEmpty()) return null;
 
-	@Override
-	public Link getVehicleLocation(CSVehicle vehicle) {
-		return availableFFvehiclesMap.get(vehicle);
-	}
+      CSVehicle closest = null;
+      double closestFound = searchDistance;
 
-	@Override
-	public CSVehicle findClosestAvailableVehicle(Link startLink, String typeOfVehicle, double searchDistance) {
-		synchronized (availableFFVehicleLocationQuadTree) {
+      for (CSVehicle vehicle : location) {
+        if (vehicle.getType().equals(typeOfVehicle)) {
+          Link vehicleLink = this.availableFFvehiclesMap.get(vehicle);
 
-			Collection<CSVehicle> location = availableFFVehicleLocationQuadTree.getDisk(startLink.getCoord().getX(),
-					startLink.getCoord().getY(), searchDistance);
-			if (location.isEmpty())
-				return null;
+          if (vehicleLink != null) {
+            Coord coord = this.availableFFvehiclesMap.get(vehicle).getCoord();
 
-			CSVehicle closest = null;
-			double closestFound = searchDistance;
+            if (CoordUtils.calcEuclideanDistance(startLink.getCoord(), coord) < closestFound) {
+              closest = vehicle;
+              closestFound = CoordUtils.calcEuclideanDistance(startLink.getCoord(), coord);
+            }
+          }
+        }
+      }
 
-			for (CSVehicle vehicle : location) {
-				if (vehicle.getType().equals(typeOfVehicle)) {
-					Link vehicleLink = this.availableFFvehiclesMap.get(vehicle);
+      return closest;
+    }
+  }
 
-					if (vehicleLink != null) {
-						Coord coord = this.availableFFvehiclesMap.get(vehicle).getCoord();
+  @Override
+  public Link findClosestAvailableParkingLocation(Link destinationLink, double searchDistance) {
 
-						if (CoordUtils.calcEuclideanDistance(startLink.getCoord(), coord) < closestFound) {
-							closest = vehicle;
-							closestFound = CoordUtils.calcEuclideanDistance(startLink.getCoord(), coord);
-						}
-					}
-				}
-			}
+    if (this.getFreefloatingAreas() == null) {
+      return destinationLink;
+    }
 
-			return closest;
-		}
-	}
+    Coord destination = destinationLink.getCoord();
 
-	@Override
-	public Link findClosestAvailableParkingLocation(Link destinationLink, double searchDistance) {
+    if (this.getFreefloatingAreas().contains(destination)) {
+      return destinationLink;
+    } else {
+      Coord[] nearestPoints = this.getFreefloatingAreas().nearestPoints(destination);
 
-		if (this.getFreefloatingAreas() == null) {
-			return destinationLink;
-		}
+      double distance = CoordUtils.calcEuclideanDistance(nearestPoints[0], nearestPoints[1]);
 
-		Coord destination = destinationLink.getCoord();
+      if ((this.getNetwork() != null) && (distance <= searchDistance)) {
+        return this.getNetwork().getNearestLinkExactly(nearestPoints[0]);
+      } else {
+        return null;
+      }
+    }
+  }
 
-		if (this.getFreefloatingAreas().contains(destination)) {
-			return destinationLink;
-		} else {
-			Coord[] nearestPoints = this.getFreefloatingAreas().nearestPoints(destination);
-
-			double distance = CoordUtils.calcEuclideanDistance(nearestPoints[0], nearestPoints[1]);
-
-			if ((this.getNetwork() != null) && (distance <= searchDistance)) {
-				return this.getNetwork().getNearestLinkExactly(nearestPoints[0]);
-			} else {
-				return null;
-			}
-		}
-	}
-
-	@Override
-	public void reserveParking(Link destinationLink) {
-
-	}
+  @Override
+  public void reserveParking(Link destinationLink) {}
 }

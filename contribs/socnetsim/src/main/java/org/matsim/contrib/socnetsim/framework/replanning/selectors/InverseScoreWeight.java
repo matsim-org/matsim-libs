@@ -20,16 +20,13 @@
 package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
 import org.matsim.api.core.v01.population.Plan;
-
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
 
 public class InverseScoreWeight implements WeightCalculator {
-	@Override
-	public double getWeight(
-			final Plan indivPlan,
-			final ReplanningGroup group) {
-		Double score = indivPlan.getScore();
-		// if there is a plan without score, select it
-		return score == null ? Double.POSITIVE_INFINITY : -score;
-	}
+  @Override
+  public double getWeight(final Plan indivPlan, final ReplanningGroup group) {
+    Double score = indivPlan.getScore();
+    // if there is a plan without score, select it
+    return score == null ? Double.POSITIVE_INFINITY : -score;
+  }
 }

@@ -1,5 +1,6 @@
 package org.matsim.contrib.locationchoice.timegeography;
 
+import jakarta.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
@@ -17,49 +18,55 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import jakarta.inject.Provider;
-
 public class LocationChoicePlanStrategy implements PlanStrategy {
 
-	private PlanStrategyImpl delegate;
+  private PlanStrategyImpl delegate;
 
-	public LocationChoicePlanStrategy(Scenario scenario, Provider<TripRouter> tripRouterProvider, TimeInterpretation timeInterpretation) {
-		final DestinationChoiceConfigGroup destinationChoiceConfigGroup = ConfigUtils.addOrGetModule( scenario.getConfig(), DestinationChoiceConfigGroup.class ) ;
-		if ( DestinationChoiceConfigGroup.Algotype.bestResponse== destinationChoiceConfigGroup.getAlgorithm() ) {
-			throw new RuntimeException("best response location choice not supported as part of LocationChoicePlanStrategy. " +
-					"Use BestReplyLocationChoicePlanStrategy instead, but be aware that as of now some Java coding is necessary to do that. kai, feb'13") ;
-		}
-		switch( destinationChoiceConfigGroup.getPlanSelector() ){
-			case "BestScore":
-				delegate = new PlanStrategyImpl( new BestPlanSelector() );
-				break;
-			case "ChangeExpBeta":
-				delegate = new PlanStrategyImpl( new ExpBetaPlanChanger( scenario.getConfig().scoring().getBrainExpBeta() ) );
-				break;
-			case "SelectRandom":
-				delegate = new PlanStrategyImpl( new RandomPlanSelector() );
-				break;
-			default:
-				delegate = new PlanStrategyImpl( new ExpBetaPlanSelector( scenario.getConfig().scoring() ) );
-				break;
-		}
-		delegate.addStrategyModule(new DestinationChoice( tripRouterProvider, scenario, timeInterpretation) );
-		delegate.addStrategyModule(new ReRoute(scenario, tripRouterProvider, timeInterpretation));
-	}
+  public LocationChoicePlanStrategy(
+      Scenario scenario,
+      Provider<TripRouter> tripRouterProvider,
+      TimeInterpretation timeInterpretation) {
+    final DestinationChoiceConfigGroup destinationChoiceConfigGroup =
+        ConfigUtils.addOrGetModule(scenario.getConfig(), DestinationChoiceConfigGroup.class);
+    if (DestinationChoiceConfigGroup.Algotype.bestResponse
+        == destinationChoiceConfigGroup.getAlgorithm()) {
+      throw new RuntimeException(
+          "best response location choice not supported as part of LocationChoicePlanStrategy. "
+              + "Use BestReplyLocationChoicePlanStrategy instead, but be aware that as of now some Java coding is necessary to do that. kai, feb'13");
+    }
+    switch (destinationChoiceConfigGroup.getPlanSelector()) {
+      case "BestScore":
+        delegate = new PlanStrategyImpl(new BestPlanSelector());
+        break;
+      case "ChangeExpBeta":
+        delegate =
+            new PlanStrategyImpl(
+                new ExpBetaPlanChanger(scenario.getConfig().scoring().getBrainExpBeta()));
+        break;
+      case "SelectRandom":
+        delegate = new PlanStrategyImpl(new RandomPlanSelector());
+        break;
+      default:
+        delegate = new PlanStrategyImpl(new ExpBetaPlanSelector(scenario.getConfig().scoring()));
+        break;
+    }
+    delegate.addStrategyModule(
+        new DestinationChoice(tripRouterProvider, scenario, timeInterpretation));
+    delegate.addStrategyModule(new ReRoute(scenario, tripRouterProvider, timeInterpretation));
+  }
 
-	@Override
-	public void run(HasPlansAndId<Plan, Person> person) {
-		delegate.run(person);
-	}
+  @Override
+  public void run(HasPlansAndId<Plan, Person> person) {
+    delegate.run(person);
+  }
 
-	@Override
-	public void init(ReplanningContext replanningContext) {
-		delegate.init(replanningContext);
-	}
+  @Override
+  public void init(ReplanningContext replanningContext) {
+    delegate.init(replanningContext);
+  }
 
-	@Override
-	public void finish() {
-		delegate.finish();
-	}
-
+  @Override
+  public void finish() {
+    delegate.finish();
+  }
 }

@@ -29,33 +29,36 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
-/**
- * Controler to automatically write rail sim analysis files.
- */
-public final class RailsimLinkStateControlerListener implements IterationEndsListener, IterationStartsListener {
+/** Controler to automatically write rail sim analysis files. */
+public final class RailsimLinkStateControlerListener
+    implements IterationEndsListener, IterationStartsListener {
 
-	private RailLinkStateAnalysis analysis;
-	private OutputDirectoryHierarchy controlerIO;
-	private final EventsManager eventsManager;
-	private final Scenario scenario;
+  private RailLinkStateAnalysis analysis;
+  private OutputDirectoryHierarchy controlerIO;
+  private final EventsManager eventsManager;
+  private final Scenario scenario;
 
-	@Inject
-	RailsimLinkStateControlerListener(Scenario scenario, EventsManager eventsManager, OutputDirectoryHierarchy controlerIO) {
-		this.eventsManager = eventsManager;
-		this.controlerIO = controlerIO;
-		this.scenario = scenario;
-		this.analysis = new RailLinkStateAnalysis();
-	}
+  @Inject
+  RailsimLinkStateControlerListener(
+      Scenario scenario, EventsManager eventsManager, OutputDirectoryHierarchy controlerIO) {
+    this.eventsManager = eventsManager;
+    this.controlerIO = controlerIO;
+    this.scenario = scenario;
+    this.analysis = new RailLinkStateAnalysis();
+  }
 
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		this.eventsManager.addHandler(this.analysis);
-	}
+  @Override
+  public void notifyIterationStarts(IterationStartsEvent event) {
+    this.eventsManager.addHandler(this.analysis);
+  }
 
-	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		String railLinkStatesCsvFilename = this.controlerIO.getIterationFilename(event.getIteration(), "railsimLinkStates.csv", this.scenario.getConfig().controller().getCompressionType());
-		RailsimCsvWriter.writeLinkStatesCsv(this.analysis.events, railLinkStatesCsvFilename);
-	}
-
+  @Override
+  public void notifyIterationEnds(IterationEndsEvent event) {
+    String railLinkStatesCsvFilename =
+        this.controlerIO.getIterationFilename(
+            event.getIteration(),
+            "railsimLinkStates.csv",
+            this.scenario.getConfig().controller().getCompressionType());
+    RailsimCsvWriter.writeLinkStatesCsv(this.analysis.events, railLinkStatesCsvFilename);
+  }
 }

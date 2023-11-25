@@ -53,184 +53,189 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class RunCarsharingIT {
 
-	private final static Logger log = LogManager.getLogger(RunCarsharingIT.class);
+  private static final Logger log = LogManager.getLogger(RunCarsharingIT.class);
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public final void test() {
-		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "/config.xml",
-				new FreeFloatingConfigGroup(),
-				new OneWayCarsharingConfigGroup(),
-				new TwoWayCarsharingConfigGroup(),
-				new CarsharingConfigGroup(),
-				new DvrpConfigGroup());
+  @Test
+  public final void test() {
+    Config config =
+        ConfigUtils.loadConfig(
+            utils.getClassInputDirectory() + "/config.xml",
+            new FreeFloatingConfigGroup(),
+            new OneWayCarsharingConfigGroup(),
+            new TwoWayCarsharingConfigGroup(),
+            new CarsharingConfigGroup(),
+            new DvrpConfigGroup());
 
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
+    config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 
-		config.network().setInputFile("network.xml");
+    config.network().setInputFile("network.xml");
 
-		config.plans().setInputFile("10persons.xml");
-		//		config.plans().setInputPersonAttributeFile("1000desiresAttributes.xml");
-		//		config.plans().setInputPersonAttributeFile( null );
-		// (Not needed.  I removed this from config.xml, so setting to null is not needed here.. kai, jun'19)
+    config.plans().setInputFile("10persons.xml");
+    //		config.plans().setInputPersonAttributeFile("1000desiresAttributes.xml");
+    //		config.plans().setInputPersonAttributeFile( null );
+    // (Not needed.  I removed this from config.xml, so setting to null is not needed here.. kai,
+    // jun'19)
 
-		config.facilities().setInputFile("facilities.xml");
-		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
+    config.facilities().setInputFile("facilities.xml");
+    config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
 
-		config.routing().setAccessEgressType(AccessEgressType.none); // otherwise does not work. kai,feb'16
-		config.routing().setRoutingRandomness(0.);
-		//		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressType.directWalk);
+    config
+        .routing()
+        .setAccessEgressType(AccessEgressType.none); // otherwise does not work. kai,feb'16
+    config.routing().setRoutingRandomness(0.);
+    //		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressType.directWalk);
 
-		CarsharingConfigGroup csConfig = (CarsharingConfigGroup) config.getModule(CarsharingConfigGroup.GROUP_NAME);
-		csConfig.setvehiclelocations(utils.getClassInputDirectory() + "/CarsharingStations.xml");
-		csConfig.setmembership(utils.getClassInputDirectory() + "/CSMembership.xml");
-		//OneWayCarsharingConfigGroup oneWayConfig = (OneWayCarsharingConfigGroup) config.getModule( OneWayCarsharingConfigGroup.GROUP_NAME ) ;
-		//oneWayConfig.setvehiclelocations( utils.getClassInputDirectory()+"/Stations.txt");
+    CarsharingConfigGroup csConfig =
+        (CarsharingConfigGroup) config.getModule(CarsharingConfigGroup.GROUP_NAME);
+    csConfig.setvehiclelocations(utils.getClassInputDirectory() + "/CarsharingStations.xml");
+    csConfig.setmembership(utils.getClassInputDirectory() + "/CSMembership.xml");
+    // OneWayCarsharingConfigGroup oneWayConfig = (OneWayCarsharingConfigGroup) config.getModule(
+    // OneWayCarsharingConfigGroup.GROUP_NAME ) ;
+    // oneWayConfig.setvehiclelocations( utils.getClassInputDirectory()+"/Stations.txt");
 
-		//TwoWayCarsharingConfigGroup twoWayConfig = (TwoWayCarsharingConfigGroup) config.getModule( TwoWayCarsharingConfigGroup.GROUP_NAME ) ;
-		//twoWayConfig.setvehiclelocations( utils.getClassInputDirectory()+"/CarsharingStations.xml");
+    // TwoWayCarsharingConfigGroup twoWayConfig = (TwoWayCarsharingConfigGroup) config.getModule(
+    // TwoWayCarsharingConfigGroup.GROUP_NAME ) ;
+    // twoWayConfig.setvehiclelocations( utils.getClassInputDirectory()+"/CarsharingStations.xml");
 
-		config.subtourModeChoice().setBehavior(SubtourModeChoice.Behavior.fromAllModesToSpecifiedModes);
-		config.subtourModeChoice().setProbaForRandomSingleTripMode(0.);
+    config.subtourModeChoice().setBehavior(SubtourModeChoice.Behavior.fromAllModesToSpecifiedModes);
+    config.subtourModeChoice().setProbaForRandomSingleTripMode(0.);
 
-		//		config.global().setNumberOfThreads(1);
-		//		config.qsim().setNumberOfThreads(1);
+    //		config.global().setNumberOfThreads(1);
+    //		config.qsim().setNumberOfThreads(1);
 
-		{
-			TeleportedModeParams params = new TeleportedModeParams(TransportMode.non_network_walk);
-			params.setTeleportedModeSpeed(0.83333333333);
-			//			params.setTeleportedModeSpeed( 2.0 );
-			params.setBeelineDistanceFactor(1.3);
-			config.routing().addModeRoutingParams(params);
-		}
-		{
-			config.routing().removeModeRoutingParams(TransportMode.walk);
-			TeleportedModeParams params = new TeleportedModeParams(TransportMode.walk);
-			params.setTeleportedModeSpeed(0.83333333333);
-			//			params.setTeleportedModeSpeed( 2.0 );
-			params.setBeelineDistanceFactor(1.3);
-			config.routing().addModeRoutingParams(params);
-		}
+    {
+      TeleportedModeParams params = new TeleportedModeParams(TransportMode.non_network_walk);
+      params.setTeleportedModeSpeed(0.83333333333);
+      //			params.setTeleportedModeSpeed( 2.0 );
+      params.setBeelineDistanceFactor(1.3);
+      config.routing().addModeRoutingParams(params);
+    }
+    {
+      config.routing().removeModeRoutingParams(TransportMode.walk);
+      TeleportedModeParams params = new TeleportedModeParams(TransportMode.walk);
+      params.setTeleportedModeSpeed(0.83333333333);
+      //			params.setTeleportedModeSpeed( 2.0 );
+      params.setBeelineDistanceFactor(1.3);
+      config.routing().addModeRoutingParams(params);
+    }
 
-		// ---
+    // ---
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		config.routing().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
+    Scenario scenario = ScenarioUtils.loadScenario(config);
+    config.routing().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 
-		// ---
+    // ---
 
-		final Controler controler = new Controler(scenario);
-		//		controler.setDirtyShutdown(true);
+    final Controler controler = new Controler(scenario);
+    //		controler.setDirtyShutdown(true);
 
-		RunCarsharing.installCarSharing(controler);
+    RunCarsharing.installCarSharing(controler);
 
-		final MyAnalysis myAnalysis = new MyAnalysis();
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				this.bind(MyAnalysis.class).toInstance(myAnalysis);
-				this.addControlerListenerBinding().toInstance(myAnalysis);
-			}
-		});
+    final MyAnalysis myAnalysis = new MyAnalysis();
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            this.bind(MyAnalysis.class).toInstance(myAnalysis);
+            this.addControlerListenerBinding().toInstance(myAnalysis);
+          }
+        });
 
-		// ---
+    // ---
 
-		controler.run();
+    controler.run();
 
-		log.info("done");
-	}
+    log.info("done");
+  }
 
-	static class MyAnalysis implements AfterMobsimListener {
+  static class MyAnalysis implements AfterMobsimListener {
 
-		@Inject private LegHistogram histogram;
+    @Inject private LegHistogram histogram;
 
-		void testOutput(int iteration) {
-			int nofLegs = 0;
-			for (int nofDepartures : this.histogram.getDepartures()) {
-				nofLegs += nofDepartures;
-			}
-			log.info("number of legs:\t" + nofLegs + "\t100%");
+    void testOutput(int iteration) {
+      int nofLegs = 0;
+      for (int nofDepartures : this.histogram.getDepartures()) {
+        nofLegs += nofDepartures;
+      }
+      log.info("number of legs:\t" + nofLegs + "\t100%");
 
-			for (String legMode : this.histogram.getLegModes()) {
-				int nOfModeLegs = 0;
-				for (int nofDepartures : this.histogram.getDepartures(legMode)) {
-					nOfModeLegs += nofDepartures;
-				}
-				if (iteration == 0) {
-					if (TransportMode.walk.equals(legMode)) {
-						// walk is used for access+egress to car
-						// -> number of walk legs for access+egress equals twice the number of car legs = 44
-						Assert.assertEquals(44, nOfModeLegs);
-					} else if ("oneway_vehicle".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
-					} else if (TransportMode.car.equals(legMode)) {
-						Assert.assertEquals(22, nOfModeLegs);
-					} else if ("egress_walk_ow".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
-					} else if ("access_walk_ow".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
-					}
-				} else if (iteration == 10) {
+      for (String legMode : this.histogram.getLegModes()) {
+        int nOfModeLegs = 0;
+        for (int nofDepartures : this.histogram.getDepartures(legMode)) {
+          nOfModeLegs += nofDepartures;
+        }
+        if (iteration == 0) {
+          if (TransportMode.walk.equals(legMode)) {
+            // walk is used for access+egress to car
+            // -> number of walk legs for access+egress equals twice the number of car legs = 44
+            Assert.assertEquals(44, nOfModeLegs);
+          } else if ("oneway_vehicle".equals(legMode)) {
+            Assert.assertEquals(0, nOfModeLegs);
+          } else if (TransportMode.car.equals(legMode)) {
+            Assert.assertEquals(22, nOfModeLegs);
+          } else if ("egress_walk_ow".equals(legMode)) {
+            Assert.assertEquals(0, nOfModeLegs);
+          } else if ("access_walk_ow".equals(legMode)) {
+            Assert.assertEquals(0, nOfModeLegs);
+          }
+        } else if (iteration == 10) {
 
-					if (TransportMode.walk.equals(legMode)) {
+          if (TransportMode.walk.equals(legMode)) {
 
-						Assert.assertEquals(2, nOfModeLegs);
-					} else if ("bike".equals(legMode)) {
-						Assert.assertEquals(2, nOfModeLegs);
-					} else if (TransportMode.car.equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
-					} else if ("twoway_vehicle".equals(legMode)) {
+            Assert.assertEquals(2, nOfModeLegs);
+          } else if ("bike".equals(legMode)) {
+            Assert.assertEquals(2, nOfModeLegs);
+          } else if (TransportMode.car.equals(legMode)) {
+            Assert.assertEquals(0, nOfModeLegs);
+          } else if ("twoway_vehicle".equals(legMode)) {
 
-						Assert.assertEquals(6, nOfModeLegs);
+            Assert.assertEquals(6, nOfModeLegs);
 
-					} else if ("oneway_vehicle".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+          } else if ("oneway_vehicle".equals(legMode)) {
+            Assert.assertEquals(0, nOfModeLegs);
 
-					} else if ("egress_walk_ow".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
-					} else if ("access_walk_ow".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
-					} else if ("egress_walk_tw".equals(legMode)) {
-						Assert.assertEquals(3, nOfModeLegs);
-					} else if ("access_walk_tw".equals(legMode)) {
-						Assert.assertEquals(3, nOfModeLegs);
-					} else if ("egress_walk_ff".equals(legMode)) {
-						Assert.assertEquals(2, nOfModeLegs);
-					} else if ("access_walk_ff".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
-					}
-				} else if (iteration == 20) {
-					if (TransportMode.walk.equals(legMode)) {
-						Assert.assertEquals(5, nOfModeLegs);
-					} else if ("bike".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
-					} else if ("twoway_vehicle".equals(legMode)) {
-						Assert.assertEquals(6, nOfModeLegs);
-					} else if ("freefloating_vehicle".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
-					} else if ("egress_walk_tw".equals(legMode)) {
-						Assert.assertEquals(3, nOfModeLegs);
-					} else if ("access_walk_tw".equals(legMode)) {
-						Assert.assertEquals(3, nOfModeLegs);
-					} else if ("access_walk_ff".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+          } else if ("egress_walk_ow".equals(legMode)) {
+            Assert.assertEquals(0, nOfModeLegs);
+          } else if ("access_walk_ow".equals(legMode)) {
+            Assert.assertEquals(0, nOfModeLegs);
+          } else if ("egress_walk_tw".equals(legMode)) {
+            Assert.assertEquals(3, nOfModeLegs);
+          } else if ("access_walk_tw".equals(legMode)) {
+            Assert.assertEquals(3, nOfModeLegs);
+          } else if ("egress_walk_ff".equals(legMode)) {
+            Assert.assertEquals(2, nOfModeLegs);
+          } else if ("access_walk_ff".equals(legMode)) {
+            Assert.assertEquals(0, nOfModeLegs);
+          }
+        } else if (iteration == 20) {
+          if (TransportMode.walk.equals(legMode)) {
+            Assert.assertEquals(5, nOfModeLegs);
+          } else if ("bike".equals(legMode)) {
+            Assert.assertEquals(0, nOfModeLegs);
+          } else if ("twoway_vehicle".equals(legMode)) {
+            Assert.assertEquals(6, nOfModeLegs);
+          } else if ("freefloating_vehicle".equals(legMode)) {
+            Assert.assertEquals(0, nOfModeLegs);
+          } else if ("egress_walk_tw".equals(legMode)) {
+            Assert.assertEquals(3, nOfModeLegs);
+          } else if ("access_walk_tw".equals(legMode)) {
+            Assert.assertEquals(3, nOfModeLegs);
+          } else if ("access_walk_ff".equals(legMode)) {
+            Assert.assertEquals(0, nOfModeLegs);
 
-					} else if ("egress_walk_ff".equals(legMode)) {
-						Assert.assertEquals(0, nOfModeLegs);
+          } else if ("egress_walk_ff".equals(legMode)) {
+            Assert.assertEquals(0, nOfModeLegs);
+          }
+        }
+      }
+    }
 
-					}
-				}
-			}
-
-		}
-
-		@Override
-		public void notifyAfterMobsim(AfterMobsimEvent event) {
-			testOutput(event.getIteration());
-		}
-
-	}
+    @Override
+    public void notifyAfterMobsim(AfterMobsimEvent event) {
+      testOutput(event.getIteration());
+    }
+  }
 }
-

@@ -20,33 +20,33 @@
 package org.matsim.contrib.socnetsim.usage.replanning.removers;
 
 import com.google.inject.Inject;
-import org.matsim.core.config.Config;
 import org.matsim.contrib.socnetsim.framework.replanning.removers.AbstractDumbRemoverFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.LowestScoreSumSelectorForRemoval;
 import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
+import org.matsim.core.config.Config;
 
 public class MinimumSumSelectorFactory extends AbstractDumbRemoverFactory {
-	
-	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
 
-	@Inject
-	public MinimumSumSelectorFactory(
-			final Config config,
-			final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory ) {
-		super( getMaxPlansPerAgent( config ) );
-		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
-	}
+  private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
 
-	private static int getMaxPlansPerAgent(final Config conf) {
-		final GroupReplanningConfigGroup group = (GroupReplanningConfigGroup) conf.getModule( GroupReplanningConfigGroup.GROUP_NAME );
-		return group.getMaxPlansPerAgent();
-	}
+  @Inject
+  public MinimumSumSelectorFactory(
+      final Config config,
+      final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory) {
+    super(getMaxPlansPerAgent(config));
+    this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+  }
 
-	@Override
-	public GroupLevelPlanSelector createSelector() {
-		return new LowestScoreSumSelectorForRemoval(
-				incompatiblePlansIdentifierFactory);
-	}
+  private static int getMaxPlansPerAgent(final Config conf) {
+    final GroupReplanningConfigGroup group =
+        (GroupReplanningConfigGroup) conf.getModule(GroupReplanningConfigGroup.GROUP_NAME);
+    return group.getMaxPlansPerAgent();
+  }
+
+  @Override
+  public GroupLevelPlanSelector createSelector() {
+    return new LowestScoreSumSelectorForRemoval(incompatiblePlansIdentifierFactory);
+  }
 }

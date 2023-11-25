@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.drt.fare;
 
+import java.util.List;
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.junit.Assert;
 import org.junit.Test;
@@ -31,68 +32,85 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.core.events.ParallelEventsManager;
 
-import java.util.List;
-
 /**
  * @author jbischoff
  */
 public class DrtFareHandlerTest {
 
-	/**
-	 * Test method for {@link DrtFareHandler}.
-	 */
-	@Test
-	public void testDrtFareHandler() {
-		String mode = "mode_0";
-		DrtFareParams fareParams = new DrtFareParams();
-		fareParams.baseFare = 1;
-		fareParams.minFarePerTrip = 1.5;
-		fareParams.dailySubscriptionFee = 1;
-		fareParams.distanceFare_m = 1.0 / 1000.0;
-		fareParams.timeFare_h = 15;
+  /** Test method for {@link DrtFareHandler}. */
+  @Test
+  public void testDrtFareHandler() {
+    String mode = "mode_0";
+    DrtFareParams fareParams = new DrtFareParams();
+    fareParams.baseFare = 1;
+    fareParams.minFarePerTrip = 1.5;
+    fareParams.dailySubscriptionFee = 1;
+    fareParams.distanceFare_m = 1.0 / 1000.0;
+    fareParams.timeFare_h = 15;
 
-		ParallelEventsManager events = new ParallelEventsManager(false);
-		events.addHandler(new DrtFareHandler(mode, fareParams, events));
+    ParallelEventsManager events = new ParallelEventsManager(false);
+    events.addHandler(new DrtFareHandler(mode, fareParams, events));
 
-		final MutableDouble fare = new MutableDouble(0);
-		events.addHandler(new PersonMoneyEventHandler() {
-			@Override
-			public void handleEvent(PersonMoneyEvent event) {
-				fare.add(event.getAmount());
-			}
+    final MutableDouble fare = new MutableDouble(0);
+    events.addHandler(
+        new PersonMoneyEventHandler() {
+          @Override
+          public void handleEvent(PersonMoneyEvent event) {
+            fare.add(event.getAmount());
+          }
 
-			@Override
-			public void reset(int iteration) {
-			}
-		});
+          @Override
+          public void reset(int iteration) {}
+        });
 
-		events.initProcessing();
+    events.initProcessing();
 
-		var personId = Id.createPersonId("p1");
-		{
-			var requestId = Id.create(0, Request.class);
-			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId, List.of(personId), Id.createLinkId("12"),
-					Id.createLinkId("23"), 240, 1000, 0.0, 0.0, 0.0));
-			events.processEvent(new PassengerDroppedOffEvent(300.0, mode, requestId, personId, null));
-			events.flush();
+    var personId = Id.createPersonId("p1");
+    {
+      var requestId = Id.create(0, Request.class);
+      events.processEvent(
+          new DrtRequestSubmittedEvent(
+              0.0,
+              mode,
+              requestId,
+              List.of(personId),
+              Id.createLinkId("12"),
+              Id.createLinkId("23"),
+              240,
+              1000,
+              0.0,
+              0.0,
+              0.0));
+      events.processEvent(new PassengerDroppedOffEvent(300.0, mode, requestId, personId, null));
+      events.flush();
 
-			//fare: 1 (daily fee) + 1 (distance()+ 1 basefare + 1 (time)
-			Assert.assertEquals(-4.0, fare.getValue(), 0);
-		}
-		{
-			// test minFarePerTrip
-			var requestId = Id.create(1, Request.class);
-			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId, List.of(personId), Id.createLinkId("45"),
-					Id.createLinkId("56"), 24, 100, 0.0, 0.0, 0.0));
-			events.processEvent(new PassengerDroppedOffEvent(300.0, mode, requestId, personId, null));
-			events.finishProcessing();
+      // fare: 1 (daily fee) + 1 (distance()+ 1 basefare + 1 (time)
+      Assert.assertEquals(-4.0, fare.getValue(), 0);
+    }
+    {
+      // test minFarePerTrip
+      var requestId = Id.create(1, Request.class);
+      events.processEvent(
+          new DrtRequestSubmittedEvent(
+              0.0,
+              mode,
+              requestId,
+              List.of(personId),
+              Id.createLinkId("45"),
+              Id.createLinkId("56"),
+              24,
+              100,
+              0.0,
+              0.0,
+              0.0));
+      events.processEvent(new PassengerDroppedOffEvent(300.0, mode, requestId, personId, null));
+      events.finishProcessing();
 
-			/*
-			 * fare new trip: 0 (daily fee already paid) + 0.1 (distance)+ 1 basefare + 0.1 (time) = 1.2 < minFarePerTrip = 1.5
-			 * --> new total fare: 4 (previous trip) + 1.5 (minFarePerTrip for new trip) = 5.5
-			 */
-			Assert.assertEquals(-5.5, fare.getValue(), 0);
-		}
-	}
-
+      /*
+       * fare new trip: 0 (daily fee already paid) + 0.1 (distance)+ 1 basefare + 0.1 (time) = 1.2 < minFarePerTrip = 1.5
+       * --> new total fare: 4 (previous trip) + 1.5 (minFarePerTrip for new trip) = 5.5
+       */
+      Assert.assertEquals(-5.5, fare.getValue(), 0);
+    }
+  }
 }

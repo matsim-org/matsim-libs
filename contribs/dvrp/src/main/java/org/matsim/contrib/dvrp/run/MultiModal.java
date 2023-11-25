@@ -27,9 +27,9 @@ import java.util.stream.Stream;
  * @author Michal Maciejewski (michalm)
  */
 public interface MultiModal<M extends Modal> {
-	Collection<M> getModalElements();
+  Collection<M> getModalElements();
 
-	default Stream<String> modes() {
-		return getModalElements().stream().map(Modal::getMode);
-	}
+  default Stream<String> modes() {
+    return getModalElements().stream().map(Modal::getMode);
+  }
 }

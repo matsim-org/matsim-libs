@@ -20,7 +20,6 @@
 package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
 import org.matsim.api.core.v01.population.Plan;
-
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
@@ -29,41 +28,31 @@ import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGrou
  * @author thibautd
  */
 public class LowestScoreOfJointPlanWeight implements WeightCalculator {
-	private final WeightCalculator baseWeight;
-	private final JointPlans jointPlans;
+  private final WeightCalculator baseWeight;
+  private final JointPlans jointPlans;
 
+  public LowestScoreOfJointPlanWeight(final JointPlans jointPlans) {
+    this(new ScoreWeight(), jointPlans);
+  }
 
-	public LowestScoreOfJointPlanWeight(
-			final JointPlans jointPlans) {
-		this( new ScoreWeight() , jointPlans );
-	}
+  public LowestScoreOfJointPlanWeight(
+      final WeightCalculator baseWeight, final JointPlans jointPlans) {
+    this.baseWeight = baseWeight;
+    this.jointPlans = jointPlans;
+  }
 
-	public LowestScoreOfJointPlanWeight(
-			final WeightCalculator baseWeight,
-			final JointPlans jointPlans) {
-		this.baseWeight = baseWeight;
-		this.jointPlans = jointPlans;
-	}
+  @Override
+  public double getWeight(final Plan indivPlan, final ReplanningGroup replanningGroup) {
+    final JointPlan jointPlan = jointPlans.getJointPlan(indivPlan);
 
-	@Override
-	public double getWeight(
-			final Plan indivPlan,
-			final ReplanningGroup replanningGroup) {
-		final JointPlan jointPlan = jointPlans.getJointPlan( indivPlan );
+    if (jointPlan == null) return baseWeight.getWeight(indivPlan, replanningGroup);
 
-		if ( jointPlan == null ) return baseWeight.getWeight( indivPlan , replanningGroup );
+    double minWeight = Double.POSITIVE_INFINITY;
 
-		double minWeight = Double.POSITIVE_INFINITY;
+    for (Plan p : jointPlan.getIndividualPlans().values()) {
+      minWeight = Math.min(minWeight, baseWeight.getWeight(p, replanningGroup));
+    }
 
-		for ( Plan p : jointPlan.getIndividualPlans().values() ) {
-			minWeight = Math.min(
-					minWeight, 
-					baseWeight.getWeight(
-						p,
-						replanningGroup ) );
-		}
-
-		return minWeight;
-	}
+    return minWeight;
+  }
 }
-

@@ -20,7 +20,6 @@
 package org.matsim.contrib.locationchoice.zzunused;
 
 import java.util.ArrayList;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -39,190 +38,211 @@ import org.matsim.vehicles.Vehicle;
 @Deprecated // (I think)
 class BackwardDijkstraMultipleDestinations extends Dijkstra {
 
-	private final static Logger log = LogManager.getLogger(BackwardDijkstraMultipleDestinations.class);
-	final TravelDisutility costFunction;
-	final TravelTime timeFunction;
-	private int iterationID = Integer.MIN_VALUE + 1;
-	private Node deadEndEntryNode;
-	private final boolean pruneDeadEnds;
-	
-	private double estimatedStartTime = 0.0;
+  private static final Logger log =
+      LogManager.getLogger(BackwardDijkstraMultipleDestinations.class);
+  final TravelDisutility costFunction;
+  final TravelTime timeFunction;
+  private int iterationID = Integer.MIN_VALUE + 1;
+  private Node deadEndEntryNode;
+  private final boolean pruneDeadEnds;
 
-	public BackwardDijkstraMultipleDestinations(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction) {
-		this(network, costFunction, timeFunction, null);
-	}
+  private double estimatedStartTime = 0.0;
 
-	public BackwardDijkstraMultipleDestinations(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction,
-			final PreProcessDijkstra preProcessData) {
-		
-		super(network, costFunction, timeFunction, preProcessData);
+  public BackwardDijkstraMultipleDestinations(
+      final Network network, final TravelDisutility costFunction, final TravelTime timeFunction) {
+    this(network, costFunction, timeFunction, null);
+  }
 
-		this.network = network;
-		this.costFunction = costFunction;
-		this.timeFunction = timeFunction;
+  public BackwardDijkstraMultipleDestinations(
+      final Network network,
+      final TravelDisutility costFunction,
+      final TravelTime timeFunction,
+      final PreProcessDijkstra preProcessData) {
 
-		if (preProcessData != null) {
-			if (preProcessData.containsData() == false) {
-				this.pruneDeadEnds = false;
-				log.warn("The preprocessing data provided to router class Dijkstra contains no data! Please execute its run(...) method first!");
-				log.warn("Running without dead-end pruning.");
-			} else {
-				this.pruneDeadEnds = true;
-			}
-		} else {
-			this.pruneDeadEnds = false;
-		}
-	}
-	
-	@Override
-	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime, final Person person, final Vehicle vehicle) {
+    super(network, costFunction, timeFunction, preProcessData);
 
-		//log.info("fromNode: " + fromNode.getId() + " toNode: " + toNode.getId());
-		
-		double arrivalTime = 0;
-		augmentIterationId();
-		
-		if (this.pruneDeadEnds == true) {
-			this.deadEndEntryNode = getPreProcessData(toNode).getDeadEndEntryNode();
-		}
-		
-		// now construct the path, traversing backwards 
-		ArrayList<Node> nodes = new ArrayList<Node>();
-		ArrayList<Link> links = new ArrayList<Link>();
+    this.network = network;
+    this.costFunction = costFunction;
+    this.timeFunction = timeFunction;
 
-		nodes.add(0, toNode);
-		Link tmpLink = getData(toNode).getPrevLink();
-		if (tmpLink != null) {
-			//bw: from changed to "toNode"
-			while (tmpLink.getToNode() != fromNode) {
-				links.add(0, tmpLink);
-				nodes.add(0, tmpLink.getToNode());
-				tmpLink = getData(tmpLink.getToNode()).getPrevLink();				
-			}
-			links.add(0, tmpLink);
-			nodes.add(0, tmpLink.getFromNode());
-		}
-		DijkstraNodeData toNodeData = getData(toNode);
-		arrivalTime = toNodeData.getTime();
-		// bw: -1.0 * times as we are going backwards (startTime > arrivalTime)
-		double travelTime = -1.0 * (arrivalTime - this.estimatedStartTime);
-		Path path = new Path(nodes, links, travelTime, toNodeData.getCost());
+    if (preProcessData != null) {
+      if (preProcessData.containsData() == false) {
+        this.pruneDeadEnds = false;
+        log.warn(
+            "The preprocessing data provided to router class Dijkstra contains no data! Please execute its run(...) method first!");
+        log.warn("Running without dead-end pruning.");
+      } else {
+        this.pruneDeadEnds = true;
+      }
+    } else {
+      this.pruneDeadEnds = false;
+    }
+  }
 
-		return path;
-	}
-	
-	public void calcLeastCostTree(Node fromNode, double startTime) {
+  @Override
+  public Path calcLeastCostPath(
+      final Node fromNode,
+      final Node toNode,
+      final double startTime,
+      final Person person,
+      final Vehicle vehicle) {
 
-		augmentIterationId();
+    // log.info("fromNode: " + fromNode.getId() + " toNode: " + toNode.getId());
 
-		PseudoRemovePriorityQueue<Node> pendingNodes = new PseudoRemovePriorityQueue<Node>(500);
-		// initFromNode
-		DijkstraNodeData data = getData(fromNode);
-		visitNode(fromNode, data, pendingNodes, this.estimatedStartTime, 0, null);
+    double arrivalTime = 0;
+    augmentIterationId();
 
-		while (true) {
-			Node outNode = pendingNodes.poll();
-			if (outNode == null) return;
-			relaxNode(outNode, null, pendingNodes);
-		}
-	}
+    if (this.pruneDeadEnds == true) {
+      this.deadEndEntryNode = getPreProcessData(toNode).getDeadEndEntryNode();
+    }
 
-	@Override
-	protected void relaxNode(final Node outNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes) {
+    // now construct the path, traversing backwards
+    ArrayList<Node> nodes = new ArrayList<Node>();
+    ArrayList<Link> links = new ArrayList<Link>();
 
-		DijkstraNodeData outData = getData(outNode);
-		double currTime = outData.getTime();
-		double currCost = outData.getCost();
-		if (this.pruneDeadEnds) {
-			PreProcessDijkstra.DeadEndData ddOutData = getPreProcessData(outNode);
-			// bw: changed from "getOutLinks" to "getInLinks"
-			for (Link l : outNode.getInLinks().values()) {
-				if (canPassLink(l)) {
-					// bw: changed from "getToNode"
-					Node n = l.getFromNode();
-					PreProcessDijkstra.DeadEndData ddData = getPreProcessData(n);
+    nodes.add(0, toNode);
+    Link tmpLink = getData(toNode).getPrevLink();
+    if (tmpLink != null) {
+      // bw: from changed to "toNode"
+      while (tmpLink.getToNode() != fromNode) {
+        links.add(0, tmpLink);
+        nodes.add(0, tmpLink.getToNode());
+        tmpLink = getData(tmpLink.getToNode()).getPrevLink();
+      }
+      links.add(0, tmpLink);
+      nodes.add(0, tmpLink.getFromNode());
+    }
+    DijkstraNodeData toNodeData = getData(toNode);
+    arrivalTime = toNodeData.getTime();
+    // bw: -1.0 * times as we are going backwards (startTime > arrivalTime)
+    double travelTime = -1.0 * (arrivalTime - this.estimatedStartTime);
+    Path path = new Path(nodes, links, travelTime, toNodeData.getCost());
 
-					/* IF the current node n is not in a dead end
-					 * OR it is in the same dead end as the fromNode
-					 * OR it is in the same dead end as the toNode
-					 * THEN we add the current node to the pending nodes */
-					if ((ddData.getDeadEndEntryNode() == null)
-							|| (ddOutData.getDeadEndEntryNode() != null)
-							|| ((this.deadEndEntryNode != null)
-									&& (this.deadEndEntryNode.getId() == ddData.getDeadEndEntryNode().getId()))) {
-						addToPendingNodes(l, n, pendingNodes, currTime, currCost, toNode);
-					}
-				}
-			}
-		} else { // this.pruneDeadEnds == false
-			// bw: changed from "getOutLinks" to "getInLinks"
-			//log.info("outNode: "  + outNode.getId());
-			for (Link l : outNode.getInLinks().values()) {
-				if (canPassLink(l)) {
-					//log.info("	inLink: "  + l.getId());
-					// bw: changed from "getToNode"
-					//log.info("		fromNode: " + l.getFromNode().getId());
-					addToPendingNodes(l, l.getFromNode(), pendingNodes, currTime, currCost, toNode);
-				}
-			}
-		}
-	}
+    return path;
+  }
 
-	@Override
-	protected boolean addToPendingNodes(final Link l, final Node n,
-			final RouterPriorityQueue<Node> pendingNodes, double currTime,
-			final double currCost, final Node toNode) {
+  public void calcLeastCostTree(Node fromNode, double startTime) {
 
-		// bw: travel time has to be negative while costs are still positive
-		// But we have a problem if current time is negative. Use previous day instead! 
-		double travelTime = 0.0;
-		double travelCost = 0.0;
-		if (currTime < 0) {
-			double timeMod = 24.0 * 3600.0 - Math.abs(currTime % (24.0 * 3600.0));
-			travelTime = -1.0 * this.timeFunction.getLinkTravelTime(l, timeMod, getPerson(), getVehicle());
-			travelCost = this.costFunction.getLinkTravelDisutility(l, timeMod, null, null);			
-		}
-		else {
-			travelTime = -1.0 * this.timeFunction.getLinkTravelTime(l, currTime, getPerson(), getVehicle());
-			travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, null, null);
-		}		
-		
-		DijkstraNodeData data = getData(n);
-		double nCost = data.getCost();
-		if (!data.isVisited(this.iterationID)) {
-			visitNode(n, data, pendingNodes, currTime + travelTime, currCost
-					+ travelCost, l);
-			return true;
-		}
-		double totalCost = currCost + travelCost;
-		if (totalCost < nCost) {
-			//revisitNode:
-			pendingNodes.remove(n);
-			data.visit(l, totalCost, currTime + travelTime, this.iterationID);
-			pendingNodes.add(n, getPriority(data));
-			
-			return true;
-		}
+    augmentIterationId();
 
-		return false;
-	}
+    PseudoRemovePriorityQueue<Node> pendingNodes = new PseudoRemovePriorityQueue<Node>(500);
+    // initFromNode
+    DijkstraNodeData data = getData(fromNode);
+    visitNode(fromNode, data, pendingNodes, this.estimatedStartTime, 0, null);
 
-	@Override
-	protected void visitNode(final Node n, final DijkstraNodeData data,
-			final RouterPriorityQueue<Node> pendingNodes, final double time, final double cost,
-			final Link outLink) {		
-		data.visit(outLink, cost, time, this.iterationID);
-		
-		//if (outLink != null) log.info("OutLink: " + outLink.getId()+ " Node " + n.getId() + " costs " + cost + " time " + time/60.0); 
-		
-		pendingNodes.add(n, getPriority(data));
-	}
+    while (true) {
+      Node outNode = pendingNodes.poll();
+      if (outNode == null) return;
+      relaxNode(outNode, null, pendingNodes);
+    }
+  }
 
-	public double getEstimatedStartTime() {
-		return estimatedStartTime;
-	}
+  @Override
+  protected void relaxNode(
+      final Node outNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes) {
 
-	public void setEstimatedStartTime(double estimatedStartTime) {
-		this.estimatedStartTime = estimatedStartTime;
-	}
+    DijkstraNodeData outData = getData(outNode);
+    double currTime = outData.getTime();
+    double currCost = outData.getCost();
+    if (this.pruneDeadEnds) {
+      PreProcessDijkstra.DeadEndData ddOutData = getPreProcessData(outNode);
+      // bw: changed from "getOutLinks" to "getInLinks"
+      for (Link l : outNode.getInLinks().values()) {
+        if (canPassLink(l)) {
+          // bw: changed from "getToNode"
+          Node n = l.getFromNode();
+          PreProcessDijkstra.DeadEndData ddData = getPreProcessData(n);
+
+          /* IF the current node n is not in a dead end
+           * OR it is in the same dead end as the fromNode
+           * OR it is in the same dead end as the toNode
+           * THEN we add the current node to the pending nodes */
+          if ((ddData.getDeadEndEntryNode() == null)
+              || (ddOutData.getDeadEndEntryNode() != null)
+              || ((this.deadEndEntryNode != null)
+                  && (this.deadEndEntryNode.getId() == ddData.getDeadEndEntryNode().getId()))) {
+            addToPendingNodes(l, n, pendingNodes, currTime, currCost, toNode);
+          }
+        }
+      }
+    } else { // this.pruneDeadEnds == false
+      // bw: changed from "getOutLinks" to "getInLinks"
+      // log.info("outNode: "  + outNode.getId());
+      for (Link l : outNode.getInLinks().values()) {
+        if (canPassLink(l)) {
+          // log.info("	inLink: "  + l.getId());
+          // bw: changed from "getToNode"
+          // log.info("		fromNode: " + l.getFromNode().getId());
+          addToPendingNodes(l, l.getFromNode(), pendingNodes, currTime, currCost, toNode);
+        }
+      }
+    }
+  }
+
+  @Override
+  protected boolean addToPendingNodes(
+      final Link l,
+      final Node n,
+      final RouterPriorityQueue<Node> pendingNodes,
+      double currTime,
+      final double currCost,
+      final Node toNode) {
+
+    // bw: travel time has to be negative while costs are still positive
+    // But we have a problem if current time is negative. Use previous day instead!
+    double travelTime = 0.0;
+    double travelCost = 0.0;
+    if (currTime < 0) {
+      double timeMod = 24.0 * 3600.0 - Math.abs(currTime % (24.0 * 3600.0));
+      travelTime =
+          -1.0 * this.timeFunction.getLinkTravelTime(l, timeMod, getPerson(), getVehicle());
+      travelCost = this.costFunction.getLinkTravelDisutility(l, timeMod, null, null);
+    } else {
+      travelTime =
+          -1.0 * this.timeFunction.getLinkTravelTime(l, currTime, getPerson(), getVehicle());
+      travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, null, null);
+    }
+
+    DijkstraNodeData data = getData(n);
+    double nCost = data.getCost();
+    if (!data.isVisited(this.iterationID)) {
+      visitNode(n, data, pendingNodes, currTime + travelTime, currCost + travelCost, l);
+      return true;
+    }
+    double totalCost = currCost + travelCost;
+    if (totalCost < nCost) {
+      // revisitNode:
+      pendingNodes.remove(n);
+      data.visit(l, totalCost, currTime + travelTime, this.iterationID);
+      pendingNodes.add(n, getPriority(data));
+
+      return true;
+    }
+
+    return false;
+  }
+
+  @Override
+  protected void visitNode(
+      final Node n,
+      final DijkstraNodeData data,
+      final RouterPriorityQueue<Node> pendingNodes,
+      final double time,
+      final double cost,
+      final Link outLink) {
+    data.visit(outLink, cost, time, this.iterationID);
+
+    // if (outLink != null) log.info("OutLink: " + outLink.getId()+ " Node " + n.getId() + " costs "
+    // + cost + " time " + time/60.0);
+
+    pendingNodes.add(n, getPriority(data));
+  }
+
+  public double getEstimatedStartTime() {
+    return estimatedStartTime;
+  }
+
+  public void setEstimatedStartTime(double estimatedStartTime) {
+    this.estimatedStartTime = estimatedStartTime;
+  }
 }

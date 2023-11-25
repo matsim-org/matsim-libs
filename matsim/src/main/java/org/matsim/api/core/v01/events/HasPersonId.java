@@ -17,9 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
+/** */
 package org.matsim.api.core.v01.events;
 
 import org.matsim.api.core.v01.Id;
@@ -27,10 +25,9 @@ import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author nagel
- *
  */
 public interface HasPersonId {
-	String ATTRIBUTE_PERSON = "person";
+  String ATTRIBUTE_PERSON = "person";
 
-	Id<Person> getPersonId() ;
+  Id<Person> getPersonId();
 }

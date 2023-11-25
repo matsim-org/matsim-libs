@@ -20,40 +20,35 @@
 package org.matsim.contrib.socnetsim.jointactivities.replanning.modules;
 
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.replanning.ReplanningContext;
-
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import org.matsim.contrib.socnetsim.jointactivities.replanning.modules.MutateActivityLocationsToLocationsOfOthersAlgorithm.ChoiceSet;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.ReplanningContext;
 
 /**
  * @author thibautd
  */
 @Deprecated
-public class MutateActivityLocationsToLocationsOfOthersModule extends AbstractMultithreadedGenericStrategyModule<GroupPlans> {
-	private final ChoiceSet choiceSet;
+public class MutateActivityLocationsToLocationsOfOthersModule
+    extends AbstractMultithreadedGenericStrategyModule<GroupPlans> {
+  private final ChoiceSet choiceSet;
 
-	public MutateActivityLocationsToLocationsOfOthersModule(
-			final int nThreads,
-			final Population population,
-			final String type) {
-		this( nThreads , new ChoiceSet( population , type ) );
-	}
+  public MutateActivityLocationsToLocationsOfOthersModule(
+      final int nThreads, final Population population, final String type) {
+    this(nThreads, new ChoiceSet(population, type));
+  }
 
-	public MutateActivityLocationsToLocationsOfOthersModule(
-			final int nThreads,
-			final ChoiceSet choiceSet) {
-		super( nThreads );
-		this.choiceSet = choiceSet;
-	}
+  public MutateActivityLocationsToLocationsOfOthersModule(
+      final int nThreads, final ChoiceSet choiceSet) {
+    super(nThreads);
+    this.choiceSet = choiceSet;
+  }
 
-	@Override
-	public GenericPlanAlgorithm<GroupPlans> createAlgorithm(ReplanningContext replanningContext) {
-		return new MutateActivityLocationsToLocationsOfOthersAlgorithm(
-				choiceSet,
-				MatsimRandom.getLocalInstance());
-	}
+  @Override
+  public GenericPlanAlgorithm<GroupPlans> createAlgorithm(ReplanningContext replanningContext) {
+    return new MutateActivityLocationsToLocationsOfOthersAlgorithm(
+        choiceSet, MatsimRandom.getLocalInstance());
+  }
 }
-

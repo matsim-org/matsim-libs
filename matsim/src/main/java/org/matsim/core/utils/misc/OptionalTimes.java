@@ -27,9 +27,9 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
  * @author Michal Maciejewski (michalm)
  */
 public class OptionalTimes {
-	@CanIgnoreReturnValue
-	public static OptionalTime requireDefined(OptionalTime time) {
-		Preconditions.checkArgument(time.isDefined(), "Time must be defined");
-		return time;
-	}
+  @CanIgnoreReturnValue
+  public static OptionalTime requireDefined(OptionalTime time) {
+    Preconditions.checkArgument(time.isDefined(), "Time must be defined");
+    return time;
+  }
 }

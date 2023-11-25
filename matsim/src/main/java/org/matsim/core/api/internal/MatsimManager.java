@@ -20,10 +20,9 @@
 
 package org.matsim.core.api.internal;
 
-/**Marker interface for "managers", which seem to be classes where modules can get registered.
- * 
+/**
+ * Marker interface for "managers", which seem to be classes where modules can get registered.
+ *
  * @author nagel
  */
-public interface MatsimManager {
-
-}
+public interface MatsimManager {}

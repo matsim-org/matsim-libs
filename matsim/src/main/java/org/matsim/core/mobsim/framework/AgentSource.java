@@ -22,11 +22,11 @@ package org.matsim.core.mobsim.framework;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 
 /**
- * If you add an AgentSource into the QSim, the method insertAgentsIntoMobsim() will be called during the initialization phase.
+ * If you add an AgentSource into the QSim, the method insertAgentsIntoMobsim() will be called
+ * during the initialization phase.
  */
 public interface AgentSource extends QSimComponent {
-	// keep stable: referenced from book
+  // keep stable: referenced from book
 
-    public void insertAgentsIntoMobsim();
-
+  public void insertAgentsIntoMobsim();
 }

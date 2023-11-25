@@ -20,18 +20,16 @@
 package org.matsim.contrib.signals.model;
 
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
-
 
 /**
  * @author dgrether
- *
  */
 public interface AmberLogic {
 
-	public Set<SignalGroupStateChangeRequest> processDropping(double now, Id<SignalSystem> systemId, Id<SignalGroup> signalGroupId);
+  public Set<SignalGroupStateChangeRequest> processDropping(
+      double now, Id<SignalSystem> systemId, Id<SignalGroup> signalGroupId);
 
-	public Set<SignalGroupStateChangeRequest> processOnsets(double now, Id<SignalSystem> systemId, Id<SignalGroup> signalGroupId);
-
+  public Set<SignalGroupStateChangeRequest> processOnsets(
+      double now, Id<SignalSystem> systemId, Id<SignalGroup> signalGroupId);
 }

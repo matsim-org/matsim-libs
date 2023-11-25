@@ -24,32 +24,38 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
 final class BatteryDefaultImpl implements Battery {
-	private final double capacity;
-	private double charge;
+  private final double capacity;
+  private double charge;
 
-	BatteryDefaultImpl( double capacity, double charge ) {
-		this.capacity = capacity;
-		this.charge = charge;
-	}
+  BatteryDefaultImpl(double capacity, double charge) {
+    this.capacity = capacity;
+    this.charge = charge;
+  }
 
-	@Override
-	public double getCapacity() {
-		return capacity;
-	}
+  @Override
+  public double getCapacity() {
+    return capacity;
+  }
 
-	@Override
-	public double getCharge() {
-		return charge;
-	}
+  @Override
+  public double getCharge() {
+    return charge;
+  }
 
-	@Override
-	public void setCharge(double charge) {
-		Preconditions.checkArgument(charge >= 0 && charge <= capacity, "Charge outside allowed range (SOC=%s)", charge / capacity);
-		this.charge = charge;
-	}
+  @Override
+  public void setCharge(double charge) {
+    Preconditions.checkArgument(
+        charge >= 0 && charge <= capacity,
+        "Charge outside allowed range (SOC=%s)",
+        charge / capacity);
+    this.charge = charge;
+  }
 
-	@Override
-	public String toString() {
-		return MoreObjects.toStringHelper(this).add("capacity", capacity).add("charge", charge).toString();
-	}
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("capacity", capacity)
+        .add("charge", charge)
+        .toString();
+  }
 }

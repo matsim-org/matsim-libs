@@ -19,11 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data.signalcontrol.v20;
 
-import java.io.IOException;
-
 import jakarta.xml.bind.JAXBException;
+import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -39,97 +37,96 @@ import org.xml.sax.SAXException;
 
 /**
  * @author dgrether
- * 
  */
 public class SignalControlData20ReaderWriterTest {
 
-	private static final Logger log = LogManager.getLogger(SignalControlData20ReaderWriterTest.class);
+  private static final Logger log = LogManager.getLogger(SignalControlData20ReaderWriterTest.class);
 
-	private static final String TESTXML = "testSignalControl_v2.0.xml";
+  private static final String TESTXML = "testSignalControl_v2.0.xml";
 
-	private Id<SignalSystem> systemId42 = Id.create("42", SignalSystem.class);
-	
-	private Id<SignalPlan> signalPlanId8 = Id.create("8", SignalPlan.class);
-	
-	private Id<SignalGroup> groupId23 = Id.create("23", SignalGroup.class);
-	
-	private Id<SignalSystem> systemId43 = Id.create("43", SignalSystem.class);
-	
-//	private Id id24 = new IdImpl("24");
+  private Id<SignalSystem> systemId42 = Id.create("42", SignalSystem.class);
 
-//	private Id id5 = new IdImpl("5");
+  private Id<SignalPlan> signalPlanId8 = Id.create("8", SignalPlan.class);
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+  private Id<SignalGroup> groupId23 = Id.create("23", SignalGroup.class);
 
-	@Test
-	public void testReader() throws JAXBException, SAXException, ParserConfigurationException, IOException{
-		SignalControlData controlData = new SignalControlDataImpl();
-		SignalControlReader20 reader = new SignalControlReader20(controlData);
-		reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
-		checkContent(controlData);
-	}
-	
+  private Id<SignalSystem> systemId43 = Id.create("43", SignalSystem.class);
+
+  //	private Id id24 = new IdImpl("24");
+
+  //	private Id id5 = new IdImpl("5");
+
+  @Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
+
   @Test
-  public void testWriter() throws JAXBException, SAXException, ParserConfigurationException, IOException {
-  	String testoutput = this.testUtils.getOutputDirectory()  + "testSignalControlOutput.xml";
-  	log.debug("reading file...");
-  	//read the test file
-		SignalControlData controlData = new SignalControlDataImpl();
-		SignalControlReader20 reader = new SignalControlReader20(controlData);
-		reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
-  	
-  	//write the test file
-  	log.debug("write the test file...");
-  	SignalControlWriter20 writer = new SignalControlWriter20(controlData);
-  	writer.write(testoutput);
-  	
-  	log.debug("and read it again");
-		controlData = new SignalControlDataImpl();
-		reader = new SignalControlReader20(controlData);
-		reader.readFile(testoutput);
-  	checkContent(controlData);
+  public void testReader()
+      throws JAXBException, SAXException, ParserConfigurationException, IOException {
+    SignalControlData controlData = new SignalControlDataImpl();
+    SignalControlReader20 reader = new SignalControlReader20(controlData);
+    reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
+    checkContent(controlData);
   }
 
-	
-	
-	
-	private void checkContent(SignalControlData controlData) {
-		Assert.assertNotNull(controlData);
-		Assert.assertEquals(2, controlData.getSignalSystemControllerDataBySystemId().size());
-		
-		//first controller
-		SignalSystemControllerData systemController = controlData.getSignalSystemControllerDataBySystemId().get(systemId42);
-		Assert.assertNotNull(systemController);
-		Assert.assertNotNull(systemController.getControllerIdentifier());
-		Assert.assertEquals("DefaultPlanbasedSignalSystemController", systemController.getControllerIdentifier());
-		Assert.assertNotNull(systemController.getSignalPlanData());
-		SignalPlanData plan = systemController.getSignalPlanData().get(signalPlanId8);
-		Assert.assertNotNull(plan);
-		double startTime = plan.getStartTime();
-		Assert.assertEquals(0.0, startTime, MatsimTestUtils.EPSILON);
-		double stopTime = plan.getEndTime();
-		Assert.assertEquals(0.0, stopTime, MatsimTestUtils.EPSILON);
-		Integer cycleTime = plan.getCycleTime();
-		Assert.assertNotNull(cycleTime);
-		Assert.assertEquals(Integer.valueOf(60), cycleTime);
-		Assert.assertEquals(3, plan.getOffset());
-		
-		Assert.assertNotNull(plan.getSignalGroupSettingsDataByGroupId());
-		SignalGroupSettingsData signalGroupSettings = plan.getSignalGroupSettingsDataByGroupId().get(groupId23);
-		Assert.assertNotNull(signalGroupSettings);
-		Assert.assertEquals(groupId23, signalGroupSettings.getSignalGroupId());
-		Assert.assertNotNull(signalGroupSettings.getOnset());
-		Assert.assertEquals(0, signalGroupSettings.getOnset());
-		Assert.assertNotNull(signalGroupSettings.getDropping());
-		Assert.assertEquals(45, signalGroupSettings.getDropping());
-		
-		//second controller
-		systemController = controlData.getSignalSystemControllerDataBySystemId().get(systemId43);
-		Assert.assertNotNull(systemController);
-		Assert.assertNotNull(systemController.getControllerIdentifier());
-		Assert.assertEquals("logicbasedActuatedController", systemController.getControllerIdentifier());
-		Assert.assertNull(systemController.getSignalPlanData());
-	}
+  @Test
+  public void testWriter()
+      throws JAXBException, SAXException, ParserConfigurationException, IOException {
+    String testoutput = this.testUtils.getOutputDirectory() + "testSignalControlOutput.xml";
+    log.debug("reading file...");
+    // read the test file
+    SignalControlData controlData = new SignalControlDataImpl();
+    SignalControlReader20 reader = new SignalControlReader20(controlData);
+    reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
 
+    // write the test file
+    log.debug("write the test file...");
+    SignalControlWriter20 writer = new SignalControlWriter20(controlData);
+    writer.write(testoutput);
+
+    log.debug("and read it again");
+    controlData = new SignalControlDataImpl();
+    reader = new SignalControlReader20(controlData);
+    reader.readFile(testoutput);
+    checkContent(controlData);
+  }
+
+  private void checkContent(SignalControlData controlData) {
+    Assert.assertNotNull(controlData);
+    Assert.assertEquals(2, controlData.getSignalSystemControllerDataBySystemId().size());
+
+    // first controller
+    SignalSystemControllerData systemController =
+        controlData.getSignalSystemControllerDataBySystemId().get(systemId42);
+    Assert.assertNotNull(systemController);
+    Assert.assertNotNull(systemController.getControllerIdentifier());
+    Assert.assertEquals(
+        "DefaultPlanbasedSignalSystemController", systemController.getControllerIdentifier());
+    Assert.assertNotNull(systemController.getSignalPlanData());
+    SignalPlanData plan = systemController.getSignalPlanData().get(signalPlanId8);
+    Assert.assertNotNull(plan);
+    double startTime = plan.getStartTime();
+    Assert.assertEquals(0.0, startTime, MatsimTestUtils.EPSILON);
+    double stopTime = plan.getEndTime();
+    Assert.assertEquals(0.0, stopTime, MatsimTestUtils.EPSILON);
+    Integer cycleTime = plan.getCycleTime();
+    Assert.assertNotNull(cycleTime);
+    Assert.assertEquals(Integer.valueOf(60), cycleTime);
+    Assert.assertEquals(3, plan.getOffset());
+
+    Assert.assertNotNull(plan.getSignalGroupSettingsDataByGroupId());
+    SignalGroupSettingsData signalGroupSettings =
+        plan.getSignalGroupSettingsDataByGroupId().get(groupId23);
+    Assert.assertNotNull(signalGroupSettings);
+    Assert.assertEquals(groupId23, signalGroupSettings.getSignalGroupId());
+    Assert.assertNotNull(signalGroupSettings.getOnset());
+    Assert.assertEquals(0, signalGroupSettings.getOnset());
+    Assert.assertNotNull(signalGroupSettings.getDropping());
+    Assert.assertEquals(45, signalGroupSettings.getDropping());
+
+    // second controller
+    systemController = controlData.getSignalSystemControllerDataBySystemId().get(systemId43);
+    Assert.assertNotNull(systemController);
+    Assert.assertNotNull(systemController.getControllerIdentifier());
+    Assert.assertEquals("logicbasedActuatedController", systemController.getControllerIdentifier());
+    Assert.assertNull(systemController.getSignalPlanData());
+  }
 }

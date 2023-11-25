@@ -22,7 +22,6 @@ package org.matsim.contrib.socnetsim.jointactivities.replanning;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,142 +32,150 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 
 /**
- * Links plans with "joinable" activities, that is,
- * plans of social contacts with activities of a given type
- * at the same location.
- * Ideally, time overlap should be included.
+ * Links plans with "joinable" activities, that is, plans of social contacts with activities of a
+ * given type at the same location. Ideally, time overlap should be included.
+ *
  * @author thibautd
  */
 public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier {
-	private static final Logger log =
-		LogManager.getLogger(JoinableActivitiesPlanLinkIdentifier.class);
+  private static final Logger log =
+      LogManager.getLogger(JoinableActivitiesPlanLinkIdentifier.class);
 
-	private final String type;
+  private final String type;
 
-	public JoinableActivitiesPlanLinkIdentifier(
-			final String type) {
-		this.type = type;
-	}
+  public JoinableActivitiesPlanLinkIdentifier(final String type) {
+    this.type = type;
+  }
 
-	@Override
-	public boolean areLinked(
-			final Plan p1,
-			final Plan p2) {
-		final Queue<LocationEvent> events = new PriorityQueue<LocationEvent>( p1.getPlanElements().size() + p2.getPlanElements().size() );
+  @Override
+  public boolean areLinked(final Plan p1, final Plan p2) {
+    final Queue<LocationEvent> events =
+        new PriorityQueue<LocationEvent>(p1.getPlanElements().size() + p2.getPlanElements().size());
 
-		fillEvents( p1 , events );
-		fillEvents( p2 , events );
+    fillEvents(p1, events);
+    fillEvents(p2, events);
 
-		final Id pers1 = p1.getPerson().getId();
-		Id loc1 = null;
-		String type1 = null;
-		Id loc2 = null;
-		String type2 = null;
+    final Id pers1 = p1.getPerson().getId();
+    Id loc1 = null;
+    String type1 = null;
+    Id loc2 = null;
+    String type2 = null;
 
-		while ( !events.isEmpty() ) {
-			final LocationEvent event = events.remove();
+    while (!events.isEmpty()) {
+      final LocationEvent event = events.remove();
 
-			if ( log.isTraceEnabled() ) {
-				log.trace( "got event "+event+" from queue" );
-			}
+      if (log.isTraceEnabled()) {
+        log.trace("got event " + event + " from queue");
+      }
 
-			if ( pers1.equals( event.getPersonId() ) ) {
-				loc1 = event.getLocationId();
-				type1 = event.getActType();
-			}
-			else {
-				loc2 = event.getLocationId();
-				type2 = event.getActType();
-			}
+      if (pers1.equals(event.getPersonId())) {
+        loc1 = event.getLocationId();
+        type1 = event.getActType();
+      } else {
+        loc2 = event.getLocationId();
+        type2 = event.getActType();
+      }
 
-			if ( loc1 != null && loc2 != null &&
-					loc1.equals( loc2 ) &&
-					type1.equals( type ) && type2.equals( type ) ) {
-				return true;
-			}
-		}
+      if (loc1 != null
+          && loc2 != null
+          && loc1.equals(loc2)
+          && type1.equals(type)
+          && type2.equals(type)) {
+        return true;
+      }
+    }
 
-		return false;
-	}
+    return false;
+  }
 
-	private void fillEvents(
-			final Plan plan,
-			final Queue<LocationEvent> events) {
-		final Id personId = plan.getPerson().getId();
-		double lastEnd = 0;
-		int ind = 0;
-		List<Activity> activities = TripStructureUtils.getActivities(plan,
-				StageActivityHandling.ExcludeStageActivities);
-		for ( int i = 0; i < activities.size(); i++) {
-			Activity act = activities.get(i);
-			final Id loc = act.getFacilityId();
+  private void fillEvents(final Plan plan, final Queue<LocationEvent> events) {
+    final Id personId = plan.getPerson().getId();
+    double lastEnd = 0;
+    int ind = 0;
+    List<Activity> activities =
+        TripStructureUtils.getActivities(plan, StageActivityHandling.ExcludeStageActivities);
+    for (int i = 0; i < activities.size(); i++) {
+      Activity act = activities.get(i);
+      final Id loc = act.getFacilityId();
 
-			final LocationEvent event =
-				new LocationEvent(
-						ind++,
-						personId,
-						act.getType(),
-						loc,
-						lastEnd );
+      final LocationEvent event = new LocationEvent(ind++, personId, act.getType(), loc, lastEnd);
 
-			if (i < activities.size() - 1) { // skip the last activity
-				// correct times if inconsistent
-				lastEnd = Math.max(lastEnd, act.getEndTime().isDefined()
-						? act.getEndTime().seconds()
-						: lastEnd + act.getMaximumDuration().seconds());
-			}
+      if (i < activities.size() - 1) { // skip the last activity
+        // correct times if inconsistent
+        lastEnd =
+            Math.max(
+                lastEnd,
+                act.getEndTime().isDefined()
+                    ? act.getEndTime().seconds()
+                    : lastEnd + act.getMaximumDuration().seconds());
+      }
 
-			if ( log.isTraceEnabled() ) {
-				log.trace( "add event "+event+" to queue" );
-			}
+      if (log.isTraceEnabled()) {
+        log.trace("add event " + event + " to queue");
+      }
 
-			events.add( event );
-		}
-	}
+      events.add(event);
+    }
+  }
 
-	private static class LocationEvent implements Comparable<LocationEvent> {
-		private final String type;
-		private final Id locId;
-		private final Id personId;
-		private final double startTime;
-		private int index;
+  private static class LocationEvent implements Comparable<LocationEvent> {
+    private final String type;
+    private final Id locId;
+    private final Id personId;
+    private final double startTime;
+    private int index;
 
-		public LocationEvent(
-				final int index,
-				final Id personId,
-				final String type,
-				final Id locId,
-				final double startTime ) {
-			if ( locId == null ) throw new NullPointerException( "null location for person "+personId+" activity type "+type );
-			this.index = index;
-			this.type = type;
-			this.locId = locId;
-			this.personId = personId;
-			this.startTime = startTime;
-		}
+    public LocationEvent(
+        final int index,
+        final Id personId,
+        final String type,
+        final Id locId,
+        final double startTime) {
+      if (locId == null)
+        throw new NullPointerException(
+            "null location for person " + personId + " activity type " + type);
+      this.index = index;
+      this.type = type;
+      this.locId = locId;
+      this.personId = personId;
+      this.startTime = startTime;
+    }
 
-		public Id getLocationId() { return locId; }
-		public Id getPersonId() { return personId; }
-		public String getActType() { return type; }
+    public Id getLocationId() {
+      return locId;
+    }
 
-		@Override
-		public int compareTo(final LocationEvent o) {
-			final int comp = Double.compare( startTime , o.startTime );
-			if ( comp != 0 ) return comp;
+    public Id getPersonId() {
+      return personId;
+    }
 
-			// order as in plan.
-			if ( personId.equals( o.personId ) ) return index - o.index;
+    public String getActType() {
+      return type;
+    }
 
-			// ugly, but could not find a better way to enforce consistency
-			return personId.compareTo( o.personId );
-		}
+    @Override
+    public int compareTo(final LocationEvent o) {
+      final int comp = Double.compare(startTime, o.startTime);
+      if (comp != 0) return comp;
 
-		@Override
-		public String toString() {
-			return "[person="+personId+
-				"; type="+type+
-				"; location="+locId+
-				"; startTime="+startTime+"]";
-		}
-	}
+      // order as in plan.
+      if (personId.equals(o.personId)) return index - o.index;
+
+      // ugly, but could not find a better way to enforce consistency
+      return personId.compareTo(o.personId);
+    }
+
+    @Override
+    public String toString() {
+      return "[person="
+          + personId
+          + "; type="
+          + type
+          + "; location="
+          + locId
+          + "; startTime="
+          + startTime
+          + "]";
+    }
+  }
 }

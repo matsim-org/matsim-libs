@@ -22,17 +22,15 @@
 
 package org.matsim.core.controler;
 
+import jakarta.inject.Inject;
+import java.util.Set;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.events.MatsimEventsReader;
 
-import jakarta.inject.Inject;
-import java.util.Set;
-
 /**
- *
  * An attempt at making analysis modules reusable by emulating parts of the ControlerListener
  * protocol while reading an events file.
  *
@@ -40,87 +38,99 @@ import java.util.Set;
  */
 public final class ReplayEvents {
 
-    public interface Results {
-        <T> T get(Class<? extends T> type);
+  public interface Results {
+    <T> T get(Class<? extends T> type);
+  }
+
+  @Inject Set<ControlerListener> controlerListenersDeclaredByModules;
+
+  @Inject ControlerListenerManager controlerListenerManager;
+
+  @Inject EventsManager eventsManager;
+
+  public static Results run(
+      final Config config, final String eventsFilename, final AbstractModule... modules) {
+    final com.google.inject.Injector injector =
+        Injector.createInjector(
+            config,
+            new Module(),
+            new AbstractModule() {
+              @Override
+              public void install() {
+                for (AbstractModule module : modules) {
+                  install(module);
+                }
+              }
+            });
+    ReplayEvents instance = injector.getInstance(ReplayEvents.class);
+    instance.playEventsFile(eventsFilename, 1, false);
+
+    return new Results() {
+      @Override
+      public <T> T get(Class<? extends T> type) {
+        return injector.getInstance(type);
+      }
+    };
+  }
+
+  public void playEventsFile(String eventsFilename, int iterationNumber, boolean isLastIteration) {
+    ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerStartupEvent();
+    for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
+      if (controlerListener instanceof StartupListener) {
+        ((StartupListener) controlerListener).notifyStartup(new StartupEvent(null));
+      }
     }
-
-    @Inject
-    Set<ControlerListener> controlerListenersDeclaredByModules;
-
-    @Inject
-    ControlerListenerManager controlerListenerManager;
-
-    @Inject
-    EventsManager eventsManager;
-
-    public static Results run(final Config config, final String eventsFilename, final AbstractModule... modules) {
-        final com.google.inject.Injector injector = Injector.createInjector(
-                config,
-                new Module(),
-                new AbstractModule() {
-                    @Override
-                    public void install() {
-                        for (AbstractModule module : modules) {
-                            install(module);
-                        }
-                    }
-                });
-        ReplayEvents instance = injector.getInstance(ReplayEvents.class);
-        instance.playEventsFile(eventsFilename, 1, false);
-
-        return new Results() {
-            @Override
-            public <T> T get(Class<? extends T> type) {
-                return injector.getInstance(type);
-            }
-        };
+    ((ControlerListenerManagerImpl) controlerListenerManager)
+        .fireControlerIterationStartsEvent(iterationNumber, isLastIteration);
+    for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
+      if (controlerListener instanceof IterationStartsListener) {
+        ((IterationStartsListener) controlerListener)
+            .notifyIterationStarts(
+                new IterationStartsEvent(null, iterationNumber, isLastIteration));
+      }
     }
-
-    public void playEventsFile(String eventsFilename, int iterationNumber, boolean isLastIteration) {
-        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerStartupEvent();
-        for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
-            if (controlerListener instanceof StartupListener) {
-                ((StartupListener) controlerListener).notifyStartup(new StartupEvent(null));
-            }
-        }
-        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerIterationStartsEvent(iterationNumber, isLastIteration);
-        for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
-            if (controlerListener instanceof IterationStartsListener) {
-                ((IterationStartsListener) controlerListener).notifyIterationStarts(new IterationStartsEvent(null, iterationNumber, isLastIteration));
-            }
-        }
-        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerBeforeMobsimEvent(iterationNumber, isLastIteration);
-        for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
-            if (controlerListener instanceof BeforeMobsimListener) {
-                ((BeforeMobsimListener) controlerListener).notifyBeforeMobsim(new BeforeMobsimEvent(null, iterationNumber, isLastIteration));
-            }
-        }
-        new MatsimEventsReader(eventsManager).readFile(eventsFilename);
-        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerAfterMobsimEvent(iterationNumber, isLastIteration);
-        for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
-            if (controlerListener instanceof AfterMobsimListener) {
-                ((AfterMobsimListener) controlerListener).notifyAfterMobsim(new AfterMobsimEvent(null, iterationNumber, isLastIteration));
-            }
-        }
-        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerIterationEndsEvent(iterationNumber, isLastIteration);
-        for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
-            if (controlerListener instanceof IterationEndsListener) {
-                ((IterationEndsListener) controlerListener).notifyIterationEnds(new IterationEndsEvent(null, iterationNumber, isLastIteration));
-            }
-        }
-        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerShutdownEvent(false, iterationNumber);
-        for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
-            if (controlerListener instanceof ShutdownListener) {
-                ((ShutdownListener) controlerListener).notifyShutdown(new ShutdownEvent(null, false, iterationNumber));
-            }
-        }
+    ((ControlerListenerManagerImpl) controlerListenerManager)
+        .fireControlerBeforeMobsimEvent(iterationNumber, isLastIteration);
+    for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
+      if (controlerListener instanceof BeforeMobsimListener) {
+        ((BeforeMobsimListener) controlerListener)
+            .notifyBeforeMobsim(new BeforeMobsimEvent(null, iterationNumber, isLastIteration));
+      }
     }
-
-    public static class Module extends AbstractModule {
-        @Override
-		public void install() {
-			bind(ReplayEvents.class).asEagerSingleton();
-            bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class).asEagerSingleton();
-		}
+    new MatsimEventsReader(eventsManager).readFile(eventsFilename);
+    ((ControlerListenerManagerImpl) controlerListenerManager)
+        .fireControlerAfterMobsimEvent(iterationNumber, isLastIteration);
+    for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
+      if (controlerListener instanceof AfterMobsimListener) {
+        ((AfterMobsimListener) controlerListener)
+            .notifyAfterMobsim(new AfterMobsimEvent(null, iterationNumber, isLastIteration));
+      }
     }
+    ((ControlerListenerManagerImpl) controlerListenerManager)
+        .fireControlerIterationEndsEvent(iterationNumber, isLastIteration);
+    for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
+      if (controlerListener instanceof IterationEndsListener) {
+        ((IterationEndsListener) controlerListener)
+            .notifyIterationEnds(new IterationEndsEvent(null, iterationNumber, isLastIteration));
+      }
+    }
+    ((ControlerListenerManagerImpl) controlerListenerManager)
+        .fireControlerShutdownEvent(false, iterationNumber);
+    for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
+      if (controlerListener instanceof ShutdownListener) {
+        ((ShutdownListener) controlerListener)
+            .notifyShutdown(new ShutdownEvent(null, false, iterationNumber));
+      }
+    }
+  }
+
+  public static class Module extends AbstractModule {
+    @Override
+    public void install() {
+      bind(ReplayEvents.class).asEagerSingleton();
+      bind(ControlerListenerManager.class)
+          .to(ControlerListenerManagerImpl.class)
+          .asEagerSingleton();
+    }
+  }
 }

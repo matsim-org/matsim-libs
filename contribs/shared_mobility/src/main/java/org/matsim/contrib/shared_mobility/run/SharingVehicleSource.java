@@ -15,26 +15,26 @@ import org.matsim.vehicles.VehiclesFactory;
  * @author steffenaxer
  */
 public class SharingVehicleSource implements AgentSource {
-    private QSim qsim;
-    private SharingServiceSpecification specification;
+  private QSim qsim;
+  private SharingServiceSpecification specification;
 
-    public SharingVehicleSource(QSim qSim, SharingServiceSpecification specification) {
-        this.qsim = qSim;
-        this.specification = specification;
+  public SharingVehicleSource(QSim qSim, SharingServiceSpecification specification) {
+    this.qsim = qSim;
+    this.specification = specification;
+  }
+
+  @Override
+  public void insertAgentsIntoMobsim() {
+
+    VehiclesFactory factory = this.qsim.getScenario().getVehicles().getFactory();
+
+    for (SharingVehicleSpecification veh : specification.getVehicles()) {
+      Id<Link> startLink = veh.getStartLinkId().get();
+      Id<Vehicle> vehId = Id.createVehicleId(veh.getId().toString());
+      Vehicle basicVehicle = factory.createVehicle(vehId, VehicleUtils.getDefaultVehicleType());
+      QVehicleImpl qvehicle = new QVehicleImpl(basicVehicle);
+      qvehicle.setCurrentLink(this.qsim.getScenario().getNetwork().getLinks().get(startLink));
+      qsim.addParkedVehicle(qvehicle, startLink);
     }
-
-    @Override
-    public void insertAgentsIntoMobsim() {
-
-        VehiclesFactory factory = this.qsim.getScenario().getVehicles().getFactory();
-
-        for (SharingVehicleSpecification veh : specification.getVehicles()) {
-            Id<Link> startLink = veh.getStartLinkId().get();
-            Id<Vehicle> vehId = Id.createVehicleId(veh.getId().toString());
-            Vehicle basicVehicle = factory.createVehicle(vehId, VehicleUtils.getDefaultVehicleType());
-            QVehicleImpl qvehicle = new QVehicleImpl(basicVehicle);
-            qvehicle.setCurrentLink(this.qsim.getScenario().getNetwork().getLinks().get(startLink));
-            qsim.addParkedVehicle(qvehicle, startLink);
-        }
-    }
+  }
 }

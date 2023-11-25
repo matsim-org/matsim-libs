@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
+import static org.junit.Assert.fail;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -28,49 +30,53 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import static org.junit.Assert.fail;
-
 /**
  * @author nagel
- *
  */
 public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV1FallbackToAverage {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	/**
-	 * Test method for {@link RunDetailedEmissionToolOnlineExample#main(java.lang.String[])}.
-	 */
+  /** Test method for {@link RunDetailedEmissionToolOnlineExample#main(java.lang.String[])}. */
 
-	/*
-	 *
-	 * Fallback to Average
-	 * this was the previous behaviour.
-	 *
-	 * */
-	@Test
-	public final void testDetailed_vehTypeV1_FallbackToAverage() {
-		try {
-			//			Config config = onlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml"} ) ;
-			var scenarioUrl = ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv1" );
-			var configUrl = IOUtils.extendUrl( scenarioUrl, "config_detailed.xml" );
-			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String [] { configUrl.toString() } );
+  /*
+   *
+   * Fallback to Average
+   * this was the previous behaviour.
+   *
+   * */
+  @Test
+  public final void testDetailed_vehTypeV1_FallbackToAverage() {
+    try {
+      //			Config config = onlineExample.prepareConfig( new
+      // String[]{"./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml"} ) ;
+      var scenarioUrl = ExamplesUtils.getTestScenarioURL("emissions-sampleScenario/testv2_Vehv1");
+      var configUrl = IOUtils.extendUrl(scenarioUrl, "config_detailed.xml");
+      Config config =
+          RunDetailedEmissionToolOnlineExample.prepareConfig(new String[] {configUrl.toString()});
 
-			config.controller().setOutputDirectory( utils.getOutputDirectory() );
-			config.controller().setLastIteration( 1 );
-			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-			emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-			emissionsConfig.setDetailedVsAverageLookupBehavior(
-					EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ); //This is the previous behaviour -> Test only pass, if falling back to average table :(
-			emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.csv");
-			emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.csv" );
-			emissionsConfig.setHbefaTableConsistencyCheckingLevel( EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.consistent );
+      config.controller().setOutputDirectory(utils.getOutputDirectory());
+      config.controller().setLastIteration(1);
+      EmissionsConfigGroup emissionsConfig =
+          ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
+      emissionsConfig.setHbefaVehicleDescriptionSource(
+          EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
+      emissionsConfig.setDetailedVsAverageLookupBehavior(
+          EmissionsConfigGroup.DetailedVsAverageLookupBehavior
+              .tryDetailedThenTechnologyAverageThenAverageTable); // This is the previous behaviour
+      // -> Test only pass, if falling
+      // back to average table :(
+      emissionsConfig.setAverageColdEmissionFactorsFile(
+          "../sample_41_EFA_ColdStart_vehcat_2020average.csv");
+      emissionsConfig.setAverageWarmEmissionFactorsFile(
+          "../sample_41_EFA_HOT_vehcat_2020average.csv");
+      emissionsConfig.setHbefaTableConsistencyCheckingLevel(
+          EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.consistent);
 
-			Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config ) ;
-			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
-		} catch ( Exception ee ) {
-			ee.printStackTrace();
-			fail("something did not work" ) ;
-		}
-	}
-
+      Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario(config);
+      RunDetailedEmissionToolOnlineExample.run(scenario);
+    } catch (Exception ee) {
+      ee.printStackTrace();
+      fail("something did not work");
+    }
+  }
 }

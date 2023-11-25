@@ -29,77 +29,80 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
  */
 public class MobsimListenerManagerTest {
 
-	@Test
-	public void testAddQueueSimulationListener() {
-		MobsimListenerManager manager = new MobsimListenerManager(null);
-		TestSimListener simpleListener = new TestSimListener();
-		TestSubSimListener subListener = new TestSubSimListener();
-		TestExtendedSimListener extendedListener = new TestExtendedSimListener();
-		TestDoubleSimListener doubleListener = new TestDoubleSimListener();
-		manager.addQueueSimulationListener(simpleListener);
-		manager.addQueueSimulationListener(subListener);
-		manager.addQueueSimulationListener(extendedListener);
-		manager.addQueueSimulationListener(doubleListener);
-		manager.fireQueueSimulationInitializedEvent();
-		Assert.assertEquals(1, simpleListener.count);
-		Assert.assertEquals(1, subListener.count);
-		Assert.assertEquals(1, extendedListener.count);
-		Assert.assertEquals(1, doubleListener.count);
-	}
+  @Test
+  public void testAddQueueSimulationListener() {
+    MobsimListenerManager manager = new MobsimListenerManager(null);
+    TestSimListener simpleListener = new TestSimListener();
+    TestSubSimListener subListener = new TestSubSimListener();
+    TestExtendedSimListener extendedListener = new TestExtendedSimListener();
+    TestDoubleSimListener doubleListener = new TestDoubleSimListener();
+    manager.addQueueSimulationListener(simpleListener);
+    manager.addQueueSimulationListener(subListener);
+    manager.addQueueSimulationListener(extendedListener);
+    manager.addQueueSimulationListener(doubleListener);
+    manager.fireQueueSimulationInitializedEvent();
+    Assert.assertEquals(1, simpleListener.count);
+    Assert.assertEquals(1, subListener.count);
+    Assert.assertEquals(1, extendedListener.count);
+    Assert.assertEquals(1, doubleListener.count);
+  }
 
-	@Test
-	public void testRemoveQueueSimulationListener() {
-		MobsimListenerManager manager = new MobsimListenerManager(null);
-		TestSimListener simpleListener = new TestSimListener();
-		TestSubSimListener subListener = new TestSubSimListener();
-		TestExtendedSimListener extendedListener = new TestExtendedSimListener();
-		TestDoubleSimListener doubleListener = new TestDoubleSimListener();
-		manager.addQueueSimulationListener(simpleListener);
-		manager.addQueueSimulationListener(subListener);
-		manager.addQueueSimulationListener(extendedListener);
-		manager.addQueueSimulationListener(doubleListener);
-		manager.fireQueueSimulationInitializedEvent();
-		Assert.assertEquals(1, simpleListener.count);
-		Assert.assertEquals(1, subListener.count);
-		Assert.assertEquals(1, extendedListener.count);
-		Assert.assertEquals(1, doubleListener.count);
+  @Test
+  public void testRemoveQueueSimulationListener() {
+    MobsimListenerManager manager = new MobsimListenerManager(null);
+    TestSimListener simpleListener = new TestSimListener();
+    TestSubSimListener subListener = new TestSubSimListener();
+    TestExtendedSimListener extendedListener = new TestExtendedSimListener();
+    TestDoubleSimListener doubleListener = new TestDoubleSimListener();
+    manager.addQueueSimulationListener(simpleListener);
+    manager.addQueueSimulationListener(subListener);
+    manager.addQueueSimulationListener(extendedListener);
+    manager.addQueueSimulationListener(doubleListener);
+    manager.fireQueueSimulationInitializedEvent();
+    Assert.assertEquals(1, simpleListener.count);
+    Assert.assertEquals(1, subListener.count);
+    Assert.assertEquals(1, extendedListener.count);
+    Assert.assertEquals(1, doubleListener.count);
 
-		manager.removeQueueSimulationListener(simpleListener);
-		manager.removeQueueSimulationListener(subListener);
-		manager.removeQueueSimulationListener(extendedListener);
-		manager.removeQueueSimulationListener(doubleListener);
-		manager.fireQueueSimulationInitializedEvent();
-		Assert.assertEquals(1, simpleListener.count); // should stay at 1
-		Assert.assertEquals(1, subListener.count);
-		Assert.assertEquals(1, extendedListener.count);
-		Assert.assertEquals(1, doubleListener.count);
-	}
+    manager.removeQueueSimulationListener(simpleListener);
+    manager.removeQueueSimulationListener(subListener);
+    manager.removeQueueSimulationListener(extendedListener);
+    manager.removeQueueSimulationListener(doubleListener);
+    manager.fireQueueSimulationInitializedEvent();
+    Assert.assertEquals(1, simpleListener.count); // should stay at 1
+    Assert.assertEquals(1, subListener.count);
+    Assert.assertEquals(1, extendedListener.count);
+    Assert.assertEquals(1, doubleListener.count);
+  }
 
-	/*package*/ static class TestSimListener implements MobsimInitializedListener {
-		public int count = 0;
-		@Override
-		public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-			this.count++;
-		}
-	}
+  /*package*/ static class TestSimListener implements MobsimInitializedListener {
+    public int count = 0;
 
-	/*package*/ static class TestSubSimListener extends TestSimListener {
-		// interface implemented by super class
-	}
+    @Override
+    public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+      this.count++;
+    }
+  }
 
-	/*package*/ interface ExtendedSimListener extends MobsimInitializedListener {
-		// interface inherited
-	}
+  /*package*/ static class TestSubSimListener extends TestSimListener {
+    // interface implemented by super class
+  }
 
-	/*package*/ static class TestExtendedSimListener implements ExtendedSimListener {
-		public int count = 0;
-		@Override
-		public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-			this.count++;
-		}
-	}
+  /*package*/ interface ExtendedSimListener extends MobsimInitializedListener {
+    // interface inherited
+  }
 
-	/*package*/ static class TestDoubleSimListener extends TestExtendedSimListener implements MobsimInitializedListener {
-		// class implements an already implemented interface, should only be called once!
-	}
+  /*package*/ static class TestExtendedSimListener implements ExtendedSimListener {
+    public int count = 0;
+
+    @Override
+    public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+      this.count++;
+    }
+  }
+
+  /*package*/ static class TestDoubleSimListener extends TestExtendedSimListener
+      implements MobsimInitializedListener {
+    // class implements an already implemented interface, should only be called once!
+  }
 }

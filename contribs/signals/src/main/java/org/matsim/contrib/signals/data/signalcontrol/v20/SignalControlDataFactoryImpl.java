@@ -26,27 +26,24 @@ import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 
-
 /**
  * @author dgrether
- *
  */
 public final class SignalControlDataFactoryImpl implements SignalControlDataFactory {
 
-	@Override
-	public SignalGroupSettingsData createSignalGroupSettingsData(Id<SignalGroup> signalGroupId) {
-		return new SignalGroupSettingsDataImpl(signalGroupId);
-	}
+  @Override
+  public SignalGroupSettingsData createSignalGroupSettingsData(Id<SignalGroup> signalGroupId) {
+    return new SignalGroupSettingsDataImpl(signalGroupId);
+  }
 
-	@Override
-	public SignalPlanData createSignalPlanData(Id<SignalPlan> id) {
-		return new SignalPlanDataImpl(id);
-	}
+  @Override
+  public SignalPlanData createSignalPlanData(Id<SignalPlan> id) {
+    return new SignalPlanDataImpl(id);
+  }
 
-	@Override
-	public SignalSystemControllerData createSignalSystemControllerData(Id<SignalSystem> signalSystemId) {
-		return new SignalSystemControllerDataImpl(signalSystemId);
-	}
-
-
+  @Override
+  public SignalSystemControllerData createSignalSystemControllerData(
+      Id<SignalSystem> signalSystemId) {
+    return new SignalSystemControllerDataImpl(signalSystemId);
+  }
 }

@@ -19,38 +19,38 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointactivities.replanning.modules.prismiclocationchoice;
 
+import jakarta.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.ReplanningContext;
-
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.AbstractMultithreadedGenericStrategyModule;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouter;
-
-import jakarta.inject.Provider;
 
 /**
  * @author thibautd
  */
-public class PrismicLocationChoiceModule  extends AbstractMultithreadedGenericStrategyModule<GroupPlans> {
-	private final Scenario scenario;
-	private Provider<TripRouter> tripRouterProvider;
+public class PrismicLocationChoiceModule
+    extends AbstractMultithreadedGenericStrategyModule<GroupPlans> {
+  private final Scenario scenario;
+  private Provider<TripRouter> tripRouterProvider;
 
-	public PrismicLocationChoiceModule(final Scenario sc, Provider<TripRouter> tripRouterProvider) {
-		super( sc.getConfig().global() );
-		this.scenario = sc;
-		this.tripRouterProvider = tripRouterProvider;
-	}
+  public PrismicLocationChoiceModule(final Scenario sc, Provider<TripRouter> tripRouterProvider) {
+    super(sc.getConfig().global());
+    this.scenario = sc;
+    this.tripRouterProvider = tripRouterProvider;
+  }
 
-	@Override
-	public GenericPlanAlgorithm<GroupPlans> createAlgorithm(final ReplanningContext replanningContext) {
-		return new PrismicLocationChoiceAlgorithm(
-				(PrismicLocationChoiceConfigGroup) scenario.getConfig().getModule( PrismicLocationChoiceConfigGroup.GROUP_NAME ),
-				scenario.getActivityFacilities(),
-				(SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME ),
-				JointActingTypes.JOINT_STAGE_ACTS );
-	}
+  @Override
+  public GenericPlanAlgorithm<GroupPlans> createAlgorithm(
+      final ReplanningContext replanningContext) {
+    return new PrismicLocationChoiceAlgorithm(
+        (PrismicLocationChoiceConfigGroup)
+            scenario.getConfig().getModule(PrismicLocationChoiceConfigGroup.GROUP_NAME),
+        scenario.getActivityFacilities(),
+        (SocialNetwork) scenario.getScenarioElement(SocialNetwork.ELEMENT_NAME),
+        JointActingTypes.JOINT_STAGE_ACTS);
+  }
 }
-

@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.hybridsim.simulation;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -27,36 +29,31 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-
 public class HybridMobsimProvider implements Provider<Mobsim> {
 
-	private final Scenario sc;
-	private final EventsManager em;
+  private final Scenario sc;
+  private final EventsManager em;
 
-	@Inject
-	HybridMobsimProvider(Scenario sc, EventsManager eventsManager) {
-		this.sc = sc;
-		this.em = eventsManager;
+  @Inject
+  HybridMobsimProvider(Scenario sc, EventsManager eventsManager) {
+    this.sc = sc;
+    this.em = eventsManager;
+  }
 
-	}
+  @Override
+  public Mobsim get() {
+    QSimConfigGroup conf = this.sc.getConfig().qsim();
+    if (conf == null) {
+      throw new NullPointerException(
+          "There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
+    }
 
-	@Override
-	public Mobsim get() {
-		QSimConfigGroup conf = this.sc.getConfig().qsim();
-		if (conf == null) {
-			throw new NullPointerException(
-					"There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
-		}
+    Config config = this.sc.getConfig();
 
-		Config config = this.sc.getConfig();
-
-		return new QSimBuilder(config) //
-							 .useDefaults() //
-							 .addQSimModule(new HybridQSimModule()) //
-							 .configureQSimComponents(HybridQSimModule::configureComponents ) //
-							 .build(sc, em);
-	}
-
+    return new QSimBuilder(config) //
+        .useDefaults() //
+        .addQSimModule(new HybridQSimModule()) //
+        .configureQSimComponents(HybridQSimModule::configureComponents) //
+        .build(sc, em);
+  }
 }

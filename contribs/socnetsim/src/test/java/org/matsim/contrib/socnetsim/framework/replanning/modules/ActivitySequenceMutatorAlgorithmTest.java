@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.modules;
 
+import java.util.Random;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -30,126 +31,119 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 
-import java.util.Random;
-
 /**
  * @author thibautd
  */
 public class ActivitySequenceMutatorAlgorithmTest {
-	@Test
-	public void testTwoActivities() throws Exception {
-		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
-		
-		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
-		plan.addLeg( PopulationUtils.createLeg("mode") );
-		plan.addActivity( PopulationUtils.createActivityFromLinkId("w", Id.create( "w" , Link.class )) );
-		plan.addLeg( PopulationUtils.createLeg("mode") );
-		plan.addActivity( PopulationUtils.createActivityFromLinkId("l", Id.create( "l" , Link.class )) );
-		plan.addLeg( PopulationUtils.createLeg("mode") );
-		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
+  @Test
+  public void testTwoActivities() throws Exception {
+    final Plan plan =
+        PopulationUtils.createPlan(
+            PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
 
-		final PlanAlgorithm testee =
-			new ActivitySequenceMutatorAlgorithm(
-					new Random( 890 ),
-					StageActivityHandling.StagesAsNormalActivities );
-		testee.run( plan );
+    plan.addActivity(PopulationUtils.createActivityFromLinkId("h", Id.create("h", Link.class)));
+    plan.addLeg(PopulationUtils.createLeg("mode"));
+    plan.addActivity(PopulationUtils.createActivityFromLinkId("w", Id.create("w", Link.class)));
+    plan.addLeg(PopulationUtils.createLeg("mode"));
+    plan.addActivity(PopulationUtils.createActivityFromLinkId("l", Id.create("l", Link.class)));
+    plan.addLeg(PopulationUtils.createLeg("mode"));
+    plan.addActivity(PopulationUtils.createActivityFromLinkId("h", Id.create("h", Link.class)));
 
-		Assert.assertEquals(
-				"unexpected size of plan "+plan.getPlanElements(),
-				plan.getPlanElements().size(),
-				7 );
-		Assert.assertEquals(
-				"unexpected type of first in-plan activity",
-				((Activity) plan.getPlanElements().get( 2 )).getType(),
-				"l" );
-		Assert.assertEquals(
-				"unexpected type of second in-plan activity",
-				((Activity) plan.getPlanElements().get( 4 )).getType(),
-				"w" );
-	}
+    final PlanAlgorithm testee =
+        new ActivitySequenceMutatorAlgorithm(
+            new Random(890), StageActivityHandling.StagesAsNormalActivities);
+    testee.run(plan);
 
-	@Test
-	public void testOneActivities() throws Exception {
-		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
-		
-		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
-		plan.addLeg( PopulationUtils.createLeg("mode") );
-		plan.addActivity( PopulationUtils.createActivityFromLinkId("w", Id.create( "w" , Link.class )) );
-		plan.addLeg( PopulationUtils.createLeg("mode") );
-		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
+    Assert.assertEquals(
+        "unexpected size of plan " + plan.getPlanElements(), plan.getPlanElements().size(), 7);
+    Assert.assertEquals(
+        "unexpected type of first in-plan activity",
+        ((Activity) plan.getPlanElements().get(2)).getType(),
+        "l");
+    Assert.assertEquals(
+        "unexpected type of second in-plan activity",
+        ((Activity) plan.getPlanElements().get(4)).getType(),
+        "w");
+  }
 
-		final PlanAlgorithm testee =
-			new ActivitySequenceMutatorAlgorithm(
-					new Random( 890 ),
-					StageActivityHandling.StagesAsNormalActivities );
-		testee.run( plan );
+  @Test
+  public void testOneActivities() throws Exception {
+    final Plan plan =
+        PopulationUtils.createPlan(
+            PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
 
-		Assert.assertEquals(
-				"unexpected size of plan "+plan.getPlanElements(),
-				plan.getPlanElements().size(),
-				5 );
-		Assert.assertEquals(
-				"unexpected type of first in-plan activity",
-				((Activity) plan.getPlanElements().get( 2 )).getType(),
-				"w" );
-	}
+    plan.addActivity(PopulationUtils.createActivityFromLinkId("h", Id.create("h", Link.class)));
+    plan.addLeg(PopulationUtils.createLeg("mode"));
+    plan.addActivity(PopulationUtils.createActivityFromLinkId("w", Id.create("w", Link.class)));
+    plan.addLeg(PopulationUtils.createLeg("mode"));
+    plan.addActivity(PopulationUtils.createActivityFromLinkId("h", Id.create("h", Link.class)));
 
-	@Test
-	public void testZeroActivities() throws Exception {
-		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
-		
-		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
-		plan.addLeg( PopulationUtils.createLeg("mode") );
-		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
+    final PlanAlgorithm testee =
+        new ActivitySequenceMutatorAlgorithm(
+            new Random(890), StageActivityHandling.StagesAsNormalActivities);
+    testee.run(plan);
 
-		final PlanAlgorithm testee =
-			new ActivitySequenceMutatorAlgorithm(
-					new Random( 890 ),
-					StageActivityHandling.StagesAsNormalActivities );
-		testee.run( plan );
+    Assert.assertEquals(
+        "unexpected size of plan " + plan.getPlanElements(), plan.getPlanElements().size(), 5);
+    Assert.assertEquals(
+        "unexpected type of first in-plan activity",
+        ((Activity) plan.getPlanElements().get(2)).getType(),
+        "w");
+  }
 
-		Assert.assertEquals(
-				"unexpected size of plan "+plan.getPlanElements(),
-				plan.getPlanElements().size(),
-				3 );
-	}
+  @Test
+  public void testZeroActivities() throws Exception {
+    final Plan plan =
+        PopulationUtils.createPlan(
+            PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
 
-	@Test
-	public void testStage() throws Exception {
-		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
-		
-		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
-		plan.addLeg( PopulationUtils.createLeg("mode") );
-		plan.addActivity( PopulationUtils.createActivityFromLinkId("stage", Id.create( "s" , Link.class )) );
-		plan.addLeg( PopulationUtils.createLeg("mode") );
-		plan.addActivity( PopulationUtils.createActivityFromLinkId("w", Id.create( "w" , Link.class )) );
-		plan.addLeg( PopulationUtils.createLeg("mode") );
-		plan.addActivity( PopulationUtils.createActivityFromLinkId("l", Id.create( "l" , Link.class )) );
-		plan.addLeg( PopulationUtils.createLeg("mode") );
-		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", Id.create( "h" , Link.class )) );
+    plan.addActivity(PopulationUtils.createActivityFromLinkId("h", Id.create("h", Link.class)));
+    plan.addLeg(PopulationUtils.createLeg("mode"));
+    plan.addActivity(PopulationUtils.createActivityFromLinkId("h", Id.create("h", Link.class)));
 
-		final PlanAlgorithm testee =
-			new ActivitySequenceMutatorAlgorithm(
-					new Random( 890 ),
-					StageActivityHandling.ExcludeStageActivities );
-		testee.run( plan );
+    final PlanAlgorithm testee =
+        new ActivitySequenceMutatorAlgorithm(
+            new Random(890), StageActivityHandling.StagesAsNormalActivities);
+    testee.run(plan);
 
-		Assert.assertEquals(
-				"unexpected size of plan "+plan.getPlanElements(),
-				plan.getPlanElements().size(),
-				9 );
-		Assert.assertEquals(
-				"unexpected type of first in-plan activity",
-				((Activity) plan.getPlanElements().get( 2 )).getType(),
-				"stage" );
-		Assert.assertEquals(
-				"unexpected type of second in-plan activity",
-				((Activity) plan.getPlanElements().get( 4 )).getType(),
-				"l" );
-		Assert.assertEquals(
-				"unexpected type of third in-plan activity",
-				((Activity) plan.getPlanElements().get( 6 )).getType(),
-				"w" );
-	}
+    Assert.assertEquals(
+        "unexpected size of plan " + plan.getPlanElements(), plan.getPlanElements().size(), 3);
+  }
+
+  @Test
+  public void testStage() throws Exception {
+    final Plan plan =
+        PopulationUtils.createPlan(
+            PopulationUtils.getFactory().createPerson(Id.create("somebody", Person.class)));
+
+    plan.addActivity(PopulationUtils.createActivityFromLinkId("h", Id.create("h", Link.class)));
+    plan.addLeg(PopulationUtils.createLeg("mode"));
+    plan.addActivity(PopulationUtils.createActivityFromLinkId("stage", Id.create("s", Link.class)));
+    plan.addLeg(PopulationUtils.createLeg("mode"));
+    plan.addActivity(PopulationUtils.createActivityFromLinkId("w", Id.create("w", Link.class)));
+    plan.addLeg(PopulationUtils.createLeg("mode"));
+    plan.addActivity(PopulationUtils.createActivityFromLinkId("l", Id.create("l", Link.class)));
+    plan.addLeg(PopulationUtils.createLeg("mode"));
+    plan.addActivity(PopulationUtils.createActivityFromLinkId("h", Id.create("h", Link.class)));
+
+    final PlanAlgorithm testee =
+        new ActivitySequenceMutatorAlgorithm(
+            new Random(890), StageActivityHandling.ExcludeStageActivities);
+    testee.run(plan);
+
+    Assert.assertEquals(
+        "unexpected size of plan " + plan.getPlanElements(), plan.getPlanElements().size(), 9);
+    Assert.assertEquals(
+        "unexpected type of first in-plan activity",
+        ((Activity) plan.getPlanElements().get(2)).getType(),
+        "stage");
+    Assert.assertEquals(
+        "unexpected type of second in-plan activity",
+        ((Activity) plan.getPlanElements().get(4)).getType(),
+        "l");
+    Assert.assertEquals(
+        "unexpected type of third in-plan activity",
+        ((Activity) plan.getPlanElements().get(6)).getType(),
+        "w");
+  }
 }
-

@@ -20,7 +20,6 @@ package playground.vsp.congestion;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,7 +49,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
@@ -58,211 +56,329 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 /**
  * @author amit
  */
-
 public class TestForEmergenceTime {
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	@Test
-	public final void emergenceTimeTest_v4(){
+  @Test
+  public final void emergenceTimeTest_v4() {
 
-		String [] congestionPricingImpl = {"v4"};
+    String[] congestionPricingImpl = {"v4"};
 
-		for(String impl :congestionPricingImpl){
-			List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays(impl);
-			for(CongestionEvent event : congestionEvents){
-				if(event.getCausingAgentId().equals(Id.createPersonId("21"))){
-					Assert.assertEquals("wrong emergence time", 8*3600+55, event.getEmergenceTime(), MatsimTestUtils.EPSILON);
-					Assert.assertEquals("wrong linkId", Id.createLinkId("3"), event.getLinkId());
-				}
-			}
-		}
-	}
+    for (String impl : congestionPricingImpl) {
+      List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays(impl);
+      for (CongestionEvent event : congestionEvents) {
+        if (event.getCausingAgentId().equals(Id.createPersonId("21"))) {
+          Assert.assertEquals(
+              "wrong emergence time",
+              8 * 3600 + 55,
+              event.getEmergenceTime(),
+              MatsimTestUtils.EPSILON);
+          Assert.assertEquals("wrong linkId", Id.createLinkId("3"), event.getLinkId());
+        }
+      }
+    }
+  }
 
-//	@Test
-//	public final void emergenceTimeTest_v6(){
-//
-//		String [] congestionPricingImpl = {"v6"};
-//
-//		for(String impl :congestionPricingImpl){
-//			List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays(impl);
-//			for(CongestionEvent event : congestionEvents){
-//				if(event.getCausingAgentId().equals(Id.createPersonId("21"))){
-//					Assert.assertEquals("wrong emergence time", 8*3600+55, event.getEmergenceTime(), MatsimTestUtils.EPSILON);
-//					Assert.assertEquals("wrong linkId", Id.createLinkId("3"), event.getLinkId());
-//				}
-//			}
-//		}
-//	}
-	
-	private List<CongestionEvent> getAffectedPersonId2Delays(String congestionPricingImpl){
+  //	@Test
+  //	public final void emergenceTimeTest_v6(){
+  //
+  //		String [] congestionPricingImpl = {"v6"};
+  //
+  //		for(String impl :congestionPricingImpl){
+  //			List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays(impl);
+  //			for(CongestionEvent event : congestionEvents){
+  //				if(event.getCausingAgentId().equals(Id.createPersonId("21"))){
+  //					Assert.assertEquals("wrong emergence time", 8*3600+55, event.getEmergenceTime(),
+  // MatsimTestUtils.EPSILON);
+  //					Assert.assertEquals("wrong linkId", Id.createLinkId("3"), event.getLinkId());
+  //				}
+  //			}
+  //		}
+  //	}
 
-		int numberOfPersonInPlan = 10;
-		createPseudoInputs pseudoInputs = new createPseudoInputs();
-		pseudoInputs.createNetwork();
-		pseudoInputs.createPopulation(numberOfPersonInPlan);
-		Scenario sc = pseudoInputs.scenario;
+  private List<CongestionEvent> getAffectedPersonId2Delays(String congestionPricingImpl) {
 
-		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
-		car.setMaximumVelocity(20);
-		car.setPcuEquivalents(1.0);
-		sc.getVehicles().addVehicleType(car);
+    int numberOfPersonInPlan = 10;
+    createPseudoInputs pseudoInputs = new createPseudoInputs();
+    pseudoInputs.createNetwork();
+    pseudoInputs.createPopulation(numberOfPersonInPlan);
+    Scenario sc = pseudoInputs.scenario;
 
-		sc.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+    VehicleType car =
+        VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
+    car.setMaximumVelocity(20);
+    car.setPcuEquivalents(1.0);
+    sc.getVehicles().addVehicleType(car);
 
-		EventsManager events = EventsUtils.createEventsManager();
+    sc.getConfig()
+        .qsim()
+        .setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
-		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
+    EventsManager events = EventsUtils.createEventsManager();
 
-		events.addHandler( new CongestionEventHandler() {
+    final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 
-			@Override
-			public void reset(int iteration) {				
-			}
+    events.addHandler(
+        new CongestionEventHandler() {
 
-			@Override
-			public void handleEvent(CongestionEvent event) {
-				congestionEvents.add(event);
-			}
+          @Override
+          public void reset(int iteration) {}
 
-		});
+          @Override
+          public void handleEvent(CongestionEvent event) {
+            congestionEvents.add(event);
+          }
+        });
 
-		if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new CongestionHandlerImplV4(events, sc));
-//		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new CongestionHandlerImplV6(events, sc));
+    if (congestionPricingImpl.equalsIgnoreCase("v4"))
+      events.addHandler(new CongestionHandlerImplV4(events, sc));
+    //		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new
+    // CongestionHandlerImplV6(events, sc));
 
-		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
-		new QSimBuilder(sc.getConfig()).useDefaults().build(sc, events).run();
+    PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
+    new QSimBuilder(sc.getConfig()).useDefaults().build(sc, events).run();
 
-		return congestionEvents;
-	}
+    return congestionEvents;
+  }
 
-	/**
-	 * generates network with 8 links. Even persons will go on one branch (down) and odd persons will go on other (up). A person come from top. 
-	 *<p> 
-	 *<p>				  o
-	 *<p> 				  |
-	 *<p>				  8
-	 *<p>				  |
-	 *<p>				  |
-	 *<p>				  o
-	 *<p> 				  |
-	 *<p>				  7 
-	 *<p>				  |
-	 *<p>				  |
-	 *<p>  o--1---o---2---o----3----o----4----o
-	 *<p>				  |
-	 *<p>				  |
-	 *<p>				  5
-	 *<p>				  |
-	 *<p>				  o----6----o
-	 */
-	private class createPseudoInputs {
-		Scenario scenario;
-		Config config;
-		Network network;
-		Population population;
-		Link link1;
-		Link link2;
-		Link link3;
-		Link link4;
-		Link link5;
-		Link link6;
-		Link link7;
-		public createPseudoInputs(){
-			config=ConfigUtils.createConfig();
-			this.scenario = ScenarioUtils.loadScenario(config);
-			network =  (Network) this.scenario.getNetwork();
-			population = this.scenario.getPopulation();
-		}
+  /**
+   * generates network with 8 links. Even persons will go on one branch (down) and odd persons will
+   * go on other (up). A person come from top.
+   *
+   * <p>
+   *
+   * <p>o
+   *
+   * <p>|
+   *
+   * <p>8
+   *
+   * <p>|
+   *
+   * <p>|
+   *
+   * <p>o
+   *
+   * <p>|
+   *
+   * <p>7
+   *
+   * <p>|
+   *
+   * <p>|
+   *
+   * <p>o--1---o---2---o----3----o----4----o
+   *
+   * <p>|
+   *
+   * <p>|
+   *
+   * <p>5
+   *
+   * <p>|
+   *
+   * <p>o----6----o
+   */
+  private class createPseudoInputs {
+    Scenario scenario;
+    Config config;
+    Network network;
+    Population population;
+    Link link1;
+    Link link2;
+    Link link3;
+    Link link4;
+    Link link5;
+    Link link6;
+    Link link7;
 
-		private void createNetwork(){
+    public createPseudoInputs() {
+      config = ConfigUtils.createConfig();
+      this.scenario = ScenarioUtils.loadScenario(config);
+      network = (Network) this.scenario.getNetwork();
+      population = this.scenario.getPopulation();
+    }
 
-			Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("1"), new Coord((double) 0, (double) 0)) ;
-			Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId("2"), new Coord((double) 100, (double) 100));
-			Node node3 = NetworkUtils.createAndAddNode(network, Id.createNodeId("3"), new Coord((double) 300, (double) 90));
-			Node node4 = NetworkUtils.createAndAddNode(network, Id.createNodeId("4"), new Coord((double) 500, (double) 200));
-			Node node5 = NetworkUtils.createAndAddNode(network, Id.createNodeId("5"), new Coord((double) 700, (double) 150));
-			Node node6 = NetworkUtils.createAndAddNode(network, Id.createNodeId("6"), new Coord((double) 500, (double) 20));
-			Node node7 = NetworkUtils.createAndAddNode(network, Id.createNodeId("7"), new Coord((double) 700, (double) 100));
-			Node node8 = NetworkUtils.createAndAddNode(network, Id.createNodeId("8"), new Coord((double) 250, (double) 300));
-			final Node fromNode = node1;
-			final Node toNode = node2;
+    private void createNetwork() {
 
-			link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("1")), fromNode, toNode, 1000.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
-			final Node fromNode1 = node2;
-			final Node toNode1 = node3;
-			link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("2")), fromNode1, toNode1, 1000.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
-			final Node fromNode2 = node3;
-			final Node toNode2 = node4;
-			link3 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("3")), fromNode2, toNode2, 10.0, 20.0, (double) 360, (double) 1, null, (String) "7");
-			final Node fromNode3 = node4;
-			final Node toNode3 = node5;
-			link4 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("4")), fromNode3, toNode3, 1000.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
-			final Node fromNode4 = node3;
-			final Node toNode4 = node6;
-			link5 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("5")), fromNode4, toNode4, 1000.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
-			final Node fromNode5 = node6;
-			final Node toNode5 = node7;
-			link6 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("6")), fromNode5, toNode5, 1000.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
-			final Node fromNode6 = node8;
-			final Node toNode6 = node3;
-			link7 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("7")), fromNode6, toNode6, 1000.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
-		}
+      Node node1 =
+          NetworkUtils.createAndAddNode(
+              network, Id.createNodeId("1"), new Coord((double) 0, (double) 0));
+      Node node2 =
+          NetworkUtils.createAndAddNode(
+              network, Id.createNodeId("2"), new Coord((double) 100, (double) 100));
+      Node node3 =
+          NetworkUtils.createAndAddNode(
+              network, Id.createNodeId("3"), new Coord((double) 300, (double) 90));
+      Node node4 =
+          NetworkUtils.createAndAddNode(
+              network, Id.createNodeId("4"), new Coord((double) 500, (double) 200));
+      Node node5 =
+          NetworkUtils.createAndAddNode(
+              network, Id.createNodeId("5"), new Coord((double) 700, (double) 150));
+      Node node6 =
+          NetworkUtils.createAndAddNode(
+              network, Id.createNodeId("6"), new Coord((double) 500, (double) 20));
+      Node node7 =
+          NetworkUtils.createAndAddNode(
+              network, Id.createNodeId("7"), new Coord((double) 700, (double) 100));
+      Node node8 =
+          NetworkUtils.createAndAddNode(
+              network, Id.createNodeId("8"), new Coord((double) 250, (double) 300));
+      final Node fromNode = node1;
+      final Node toNode = node2;
 
-		private void createPopulation(int numberOfPersons){
+      link1 =
+          NetworkUtils.createAndAddLink(
+              network,
+              Id.createLinkId(String.valueOf("1")),
+              fromNode,
+              toNode,
+              1000.0,
+              20.0,
+              (double) 3600,
+              (double) 1,
+              null,
+              (String) "7");
+      final Node fromNode1 = node2;
+      final Node toNode1 = node3;
+      link2 =
+          NetworkUtils.createAndAddLink(
+              network,
+              Id.createLinkId(String.valueOf("2")),
+              fromNode1,
+              toNode1,
+              1000.0,
+              20.0,
+              (double) 3600,
+              (double) 1,
+              null,
+              (String) "7");
+      final Node fromNode2 = node3;
+      final Node toNode2 = node4;
+      link3 =
+          NetworkUtils.createAndAddLink(
+              network,
+              Id.createLinkId(String.valueOf("3")),
+              fromNode2,
+              toNode2,
+              10.0,
+              20.0,
+              (double) 360,
+              (double) 1,
+              null,
+              (String) "7");
+      final Node fromNode3 = node4;
+      final Node toNode3 = node5;
+      link4 =
+          NetworkUtils.createAndAddLink(
+              network,
+              Id.createLinkId(String.valueOf("4")),
+              fromNode3,
+              toNode3,
+              1000.0,
+              20.0,
+              (double) 3600,
+              (double) 1,
+              null,
+              (String) "7");
+      final Node fromNode4 = node3;
+      final Node toNode4 = node6;
+      link5 =
+          NetworkUtils.createAndAddLink(
+              network,
+              Id.createLinkId(String.valueOf("5")),
+              fromNode4,
+              toNode4,
+              1000.0,
+              20.0,
+              (double) 3600,
+              (double) 1,
+              null,
+              (String) "7");
+      final Node fromNode5 = node6;
+      final Node toNode5 = node7;
+      link6 =
+          NetworkUtils.createAndAddLink(
+              network,
+              Id.createLinkId(String.valueOf("6")),
+              fromNode5,
+              toNode5,
+              1000.0,
+              20.0,
+              (double) 3600,
+              (double) 1,
+              null,
+              (String) "7");
+      final Node fromNode6 = node8;
+      final Node toNode6 = node3;
+      link7 =
+          NetworkUtils.createAndAddLink(
+              network,
+              Id.createLinkId(String.valueOf("7")),
+              fromNode6,
+              toNode6,
+              1000.0,
+              20.0,
+              (double) 3600,
+              (double) 1,
+              null,
+              (String) "7");
+    }
 
-			for(int i=0;i<numberOfPersons;i++){
-				Id<Person> id = Id.createPersonId(i);
-				Person p = population.getFactory().createPerson(id);
-				Plan plan = population.getFactory().createPlan();
-				p.addPlan(plan);
-				Activity a1 = population.getFactory().createActivityFromLinkId("h", link1.getId());
-				a1.setEndTime(8*3600+i);
-				Leg leg = population.getFactory().createLeg(TransportMode.car);
-				plan.addActivity(a1);
-				plan.addLeg(leg);
-				LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
-				NetworkRoute route;
-				List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-				if(i%2==0) {
-					route= (NetworkRoute) factory.createRoute(link1.getId(), link4.getId());
-					linkIds.add(link2.getId());
-					linkIds.add(link3.getId());
-					route.setLinkIds(link1.getId(), linkIds, link4.getId());
-					leg.setRoute(route);
-					Activity a2 = population.getFactory().createActivityFromLinkId("w", link4.getId());
-					plan.addActivity(a2);
-				} else {
-					route = (NetworkRoute) factory.createRoute(link1.getId(), link6.getId());
-					linkIds.add(link2.getId());
-					linkIds.add(link5.getId());
-					route.setLinkIds(link1.getId(), linkIds, link6.getId());
-					leg.setRoute(route);
-					Activity a2 = population.getFactory().createActivityFromLinkId("w", link6.getId());
-					plan.addActivity(a2);
-				}
-				population.addPerson(p);
-			}
+    private void createPopulation(int numberOfPersons) {
 
-			Id<Person> id = Id.createPersonId("21");
-			Person p = population.getFactory().createPerson(id);
-			Plan plan = population.getFactory().createPlan();
-			p.addPlan(plan);
-			Activity a1 = population.getFactory().createActivityFromLinkId("h", link7.getId());
-			a1.setEndTime(8*3600+54);
-			Leg leg = population.getFactory().createLeg(TransportMode.car);
-			plan.addActivity(a1);
-			plan.addLeg(leg);
-			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
-			NetworkRoute route = (NetworkRoute) factory.createRoute(link7.getId(), link4.getId());
-			List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-			linkIds.add(link3.getId());
-			route.setLinkIds(link7.getId(), linkIds, link4.getId());
-			leg.setRoute(route);
-			Activity a2 = population.getFactory().createActivityFromLinkId("w", link4.getId());
-			plan.addActivity(a2);
-			population.addPerson(p);
-		}
-	}
+      for (int i = 0; i < numberOfPersons; i++) {
+        Id<Person> id = Id.createPersonId(i);
+        Person p = population.getFactory().createPerson(id);
+        Plan plan = population.getFactory().createPlan();
+        p.addPlan(plan);
+        Activity a1 = population.getFactory().createActivityFromLinkId("h", link1.getId());
+        a1.setEndTime(8 * 3600 + i);
+        Leg leg = population.getFactory().createLeg(TransportMode.car);
+        plan.addActivity(a1);
+        plan.addLeg(leg);
+        LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
+        NetworkRoute route;
+        List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+        if (i % 2 == 0) {
+          route = (NetworkRoute) factory.createRoute(link1.getId(), link4.getId());
+          linkIds.add(link2.getId());
+          linkIds.add(link3.getId());
+          route.setLinkIds(link1.getId(), linkIds, link4.getId());
+          leg.setRoute(route);
+          Activity a2 = population.getFactory().createActivityFromLinkId("w", link4.getId());
+          plan.addActivity(a2);
+        } else {
+          route = (NetworkRoute) factory.createRoute(link1.getId(), link6.getId());
+          linkIds.add(link2.getId());
+          linkIds.add(link5.getId());
+          route.setLinkIds(link1.getId(), linkIds, link6.getId());
+          leg.setRoute(route);
+          Activity a2 = population.getFactory().createActivityFromLinkId("w", link6.getId());
+          plan.addActivity(a2);
+        }
+        population.addPerson(p);
+      }
+
+      Id<Person> id = Id.createPersonId("21");
+      Person p = population.getFactory().createPerson(id);
+      Plan plan = population.getFactory().createPlan();
+      p.addPlan(plan);
+      Activity a1 = population.getFactory().createActivityFromLinkId("h", link7.getId());
+      a1.setEndTime(8 * 3600 + 54);
+      Leg leg = population.getFactory().createLeg(TransportMode.car);
+      plan.addActivity(a1);
+      plan.addLeg(leg);
+      LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
+      NetworkRoute route = (NetworkRoute) factory.createRoute(link7.getId(), link4.getId());
+      List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+      linkIds.add(link3.getId());
+      route.setLinkIds(link7.getId(), linkIds, link4.getId());
+      leg.setRoute(route);
+      Activity a2 = population.getFactory().createActivityFromLinkId("w", link4.getId());
+      plan.addActivity(a2);
+      population.addPerson(p);
+    }
+  }
 }
-

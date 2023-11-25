@@ -22,105 +22,106 @@ package org.matsim.contrib.socnetsim.framework.replanning;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.utils.misc.Counter;
-
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
+import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * Generalizes the PlanStrategy concept to joint replanning.
+ *
  * @author thibautd
  */
 public class GroupPlanStrategy {
-	private final GroupLevelPlanSelector selector;
-	private final List<GenericStrategyModule<GroupPlans>> strategyModules =
-			new ArrayList<GenericStrategyModule<GroupPlans>>();
+  private final GroupLevelPlanSelector selector;
+  private final List<GenericStrategyModule<GroupPlans>> strategyModules =
+      new ArrayList<GenericStrategyModule<GroupPlans>>();
 
-	public GroupPlanStrategy(final GroupLevelPlanSelector selector) {
-		this.selector = selector;
-	}
+  public GroupPlanStrategy(final GroupLevelPlanSelector selector) {
+    this.selector = selector;
+  }
 
-	public void addStrategyModule(final GenericStrategyModule<GroupPlans> module) {
-		strategyModules.add( module );
-	}
+  public void addStrategyModule(final GenericStrategyModule<GroupPlans> module) {
+    strategyModules.add(module);
+  }
 
-	public void run(
-			// XXX what is the best at this level: ReplanningContext or ControllerRegistry?
-			final ReplanningContext replanningContext,
-			final JointPlans jointPlans,
-			final Collection<ReplanningGroup> groups) {
-		List<GroupPlans> plansToHandle = new ArrayList<GroupPlans>();
+  public void run(
+      // XXX what is the best at this level: ReplanningContext or ControllerRegistry?
+      final ReplanningContext replanningContext,
+      final JointPlans jointPlans,
+      final Collection<ReplanningGroup> groups) {
+    List<GroupPlans> plansToHandle = new ArrayList<GroupPlans>();
 
-		Counter selectCounter = new Counter( "["+selector.getClass().getSimpleName()+"] selecting plan # " );
-		for (ReplanningGroup group : groups) {
-			selectCounter.incCounter();
-			GroupPlans plans = selector.selectPlans(
-					jointPlans,
-					group );
+    Counter selectCounter =
+        new Counter("[" + selector.getClass().getSimpleName() + "] selecting plan # ");
+    for (ReplanningGroup group : groups) {
+      selectCounter.incCounter();
+      GroupPlans plans = selector.selectPlans(jointPlans, group);
 
-			if (plans == null) {
-				// this is a valid output from the selector,
-				// if no plans combination is possible.
-				selectCounter.printCounter();
-				throw new RuntimeException( "no plan returned by the selector for group "+group );
-			}
+      if (plans == null) {
+        // this is a valid output from the selector,
+        // if no plans combination is possible.
+        selectCounter.printCounter();
+        throw new RuntimeException("no plan returned by the selector for group " + group);
+      }
 
-			if (strategyModules.size() > 0) {
-				plans = GroupPlans.copyPlans( jointPlans.getFactory() , plans );
-				plansToHandle.add( plans );
-				assert !jointPlansAreRegistered( plans , jointPlans );
-			}
+      if (strategyModules.size() > 0) {
+        plans = GroupPlans.copyPlans(jointPlans.getFactory(), plans);
+        plansToHandle.add(plans);
+        assert !jointPlansAreRegistered(plans, jointPlans);
+      }
 
-			select( plans );
-		}
-		selectCounter.printCounter();
+      select(plans);
+    }
+    selectCounter.printCounter();
 
-		for (GenericStrategyModule<GroupPlans> module : strategyModules) {
-			module.handlePlans( replanningContext , plansToHandle );
-		}
+    for (GenericStrategyModule<GroupPlans> module : strategyModules) {
+      module.handlePlans(replanningContext, plansToHandle);
+    }
 
-		// the modules are allowed to modify joint structure:
-		// register joint plans afterhand only.
-		final Counter jpCounter = new Counter( "Register joint plans for group # " , " / "+plansToHandle.size() );
-		for (GroupPlans groupPlans : plansToHandle) {
-			jpCounter.incCounter();
-			jointPlans.addJointPlans( groupPlans.getJointPlans() );
-		}
-		jpCounter.printCounter();
-	}
+    // the modules are allowed to modify joint structure:
+    // register joint plans afterhand only.
+    final Counter jpCounter =
+        new Counter("Register joint plans for group # ", " / " + plansToHandle.size());
+    for (GroupPlans groupPlans : plansToHandle) {
+      jpCounter.incCounter();
+      jointPlans.addJointPlans(groupPlans.getJointPlans());
+    }
+    jpCounter.printCounter();
+  }
 
-	private static boolean jointPlansAreRegistered(
-			final GroupPlans plans,
-			final JointPlans jointPlans) {
-		for (JointPlan jp : plans.getJointPlans()) {
-			if (jointPlans.contains( jp )) return true;
-		}
-		return false;
-	}
+  private static boolean jointPlansAreRegistered(
+      final GroupPlans plans, final JointPlans jointPlans) {
+    for (JointPlan jp : plans.getJointPlans()) {
+      if (jointPlans.contains(jp)) return true;
+    }
+    return false;
+  }
 
-	private static void select(final GroupPlans plans) {
-		for (JointPlan jp : plans.getJointPlans()) {
-			for (Plan p : jp.getIndividualPlans().values()) {
-				p.getPerson().setSelectedPlan(p);
-			}
-		}
+  private static void select(final GroupPlans plans) {
+    for (JointPlan jp : plans.getJointPlans()) {
+      for (Plan p : jp.getIndividualPlans().values()) {
+        p.getPerson().setSelectedPlan(p);
+      }
+    }
 
-		for (Plan p : plans.getIndividualPlans()) {
-			p.getPerson().setSelectedPlan(p);
-		}
-	}
+    for (Plan p : plans.getIndividualPlans()) {
+      p.getPerson().setSelectedPlan(p);
+    }
+  }
 
-	@Override
-	public String toString() {
-		return "["+getClass().getSimpleName()+": "
-			+selector.getClass().getSimpleName()
-			+";"+strategyModules+"]";
-	}
+  @Override
+  public String toString() {
+    return "["
+        + getClass().getSimpleName()
+        + ": "
+        + selector.getClass().getSimpleName()
+        + ";"
+        + strategyModules
+        + "]";
+  }
 }
-

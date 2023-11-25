@@ -18,28 +18,30 @@ import org.matsim.core.controler.Controler;
  */
 public class DrtOperationsControlerCreator {
 
-	/**
-	 * Creates a controller in one step.
-	 *
-	 * @param config
-	 * @param otfvis
-	 * @return
-	 */
-	public static Controler createControler(Config config, boolean otfvis) {
-		MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
+  /**
+   * Creates a controller in one step.
+   *
+   * @param config
+   * @param otfvis
+   * @return
+   */
+  public static Controler createControler(Config config, boolean otfvis) {
+    MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
 
-		Controler controler = DrtControlerCreator.createControler(config, otfvis);
+    Controler controler = DrtControlerCreator.createControler(config, otfvis);
 
-		for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
-			controler.addOverridingModule(new ShiftDrtModeModule(drtCfg));
-			controler.addOverridingQSimModule(new DrtModeQSimModule(drtCfg, new ShiftDrtModeOptimizerQSimModule(drtCfg)));
-			controler.addOverridingModule(new OperationFacilitiesModeModule((DrtWithOperationsConfigGroup) drtCfg));
-			controler.addOverridingQSimModule(new OperationFacilitiesQSimModule(drtCfg));
-			controler.addOverridingModule(new DrtShiftEfficiencyModeModule(drtCfg));
-		}
+    for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
+      controler.addOverridingModule(new ShiftDrtModeModule(drtCfg));
+      controler.addOverridingQSimModule(
+          new DrtModeQSimModule(drtCfg, new ShiftDrtModeOptimizerQSimModule(drtCfg)));
+      controler.addOverridingModule(
+          new OperationFacilitiesModeModule((DrtWithOperationsConfigGroup) drtCfg));
+      controler.addOverridingQSimModule(new OperationFacilitiesQSimModule(drtCfg));
+      controler.addOverridingModule(new DrtShiftEfficiencyModeModule(drtCfg));
+    }
 
-		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
+    controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
 
-		return controler;
-	}
+    return controler;
+  }
 }

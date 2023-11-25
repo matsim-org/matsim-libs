@@ -20,7 +20,6 @@ package org.matsim.core.router;
 
 import java.util.Arrays;
 import java.util.List;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -34,94 +33,101 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
-
-
 /**
  * @author thibautd
  */
 public class TeleportationRoutingModule implements RoutingModule {
 
-	private final String mode;
+  private final String mode;
 
-	private final double beelineDistanceFactor;
-	private final double networkTravelSpeed;
-	private final Scenario scenario;
+  private final double beelineDistanceFactor;
+  private final double networkTravelSpeed;
+  private final Scenario scenario;
 
-	public TeleportationRoutingModule(
-			final String mode,
-			final Scenario scenario,
-			final double networkTravelSpeed,
-			final double beelineDistanceFactor) {
-		this.networkTravelSpeed = networkTravelSpeed;
-		this.beelineDistanceFactor = beelineDistanceFactor;
-		this.mode = mode;
-		this.scenario = scenario ;
-	}
+  public TeleportationRoutingModule(
+      final String mode,
+      final Scenario scenario,
+      final double networkTravelSpeed,
+      final double beelineDistanceFactor) {
+    this.networkTravelSpeed = networkTravelSpeed;
+    this.beelineDistanceFactor = beelineDistanceFactor;
+    this.mode = mode;
+    this.scenario = scenario;
+  }
 
-	@Override
-	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
-		final Facility fromFacility = request.getFromFacility();
-		final Facility toFacility = request.getToFacility();
-		final double departureTime = request.getDepartureTime();
-		final Person person = request.getPerson();
-		
-		Leg newLeg = this.scenario.getPopulation().getFactory().createLeg( this.mode );
-		newLeg.setDepartureTime( departureTime );
+  @Override
+  public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+    final Facility fromFacility = request.getFromFacility();
+    final Facility toFacility = request.getToFacility();
+    final double departureTime = request.getDepartureTime();
+    final Person person = request.getPerson();
 
-		double travTime = routeLeg(
-				person,
-				newLeg,
-				fromFacility,
-				toFacility,
-				departureTime);
+    Leg newLeg = this.scenario.getPopulation().getFactory().createLeg(this.mode);
+    newLeg.setDepartureTime(departureTime);
 
-		// otherwise, information may be lost
-		newLeg.setTravelTime( travTime );
+    double travTime = routeLeg(person, newLeg, fromFacility, toFacility, departureTime);
 
-		return Arrays.asList(newLeg);
-	}
+    // otherwise, information may be lost
+    newLeg.setTravelTime(travTime);
 
-	@Override
-	public String toString() {
-		return "[TeleportationRoutingModule: mode="+this.mode+"]";
-	}
+    return Arrays.asList(newLeg);
+  }
 
+  @Override
+  public String toString() {
+    return "[TeleportationRoutingModule: mode=" + this.mode + "]";
+  }
 
-	/* package */ double routeLeg( Person person, Leg leg, Facility fromFacility, Facility toFacility, double depTime ) {
-		// yyyy there is a test that uses the above; todo: make that test use the official RoutingModule interface.  kai, nov'19
+  /* package */ double routeLeg(
+      Person person, Leg leg, Facility fromFacility, Facility toFacility, double depTime) {
+    // yyyy there is a test that uses the above; todo: make that test use the official RoutingModule
+    // interface.  kai, nov'19
 
-		// make simple assumption about distance and walking speed
+    // make simple assumption about distance and walking speed
 
-		final Coord fromActCoord = 	FacilitiesUtils.decideOnCoord( fromFacility, scenario.getNetwork(), scenario.getConfig() ) ;
-		Gbl.assertNotNull( fromActCoord );
-		final Coord toActCoord = FacilitiesUtils.decideOnCoord( toFacility, scenario.getNetwork(), scenario.getConfig() ) ;
-		Gbl.assertNotNull( toActCoord );
-		double dist = CoordUtils.calcEuclideanDistance( fromActCoord, toActCoord );
-		// create an empty route, but with realistic travel time
+    final Coord fromActCoord =
+        FacilitiesUtils.decideOnCoord(fromFacility, scenario.getNetwork(), scenario.getConfig());
+    Gbl.assertNotNull(fromActCoord);
+    final Coord toActCoord =
+        FacilitiesUtils.decideOnCoord(toFacility, scenario.getNetwork(), scenario.getConfig());
+    Gbl.assertNotNull(toActCoord);
+    double dist = CoordUtils.calcEuclideanDistance(fromActCoord, toActCoord);
+    // create an empty route, but with realistic travel time
 
-		Id<Link> fromFacilityLinkId = fromFacility.getLinkId();
-		if ( fromFacilityLinkId==null ) {
-			// (yyyy there is a test that does not have a context, and thus the call below fails.  todo: adapt test.  kai, nov'19)
-			fromFacilityLinkId = FacilitiesUtils.decideOnLink( fromFacility, scenario.getNetwork() ).getId() ;
-		}
+    Id<Link> fromFacilityLinkId = fromFacility.getLinkId();
+    if (fromFacilityLinkId == null) {
+      // (yyyy there is a test that does not have a context, and thus the call below fails.  todo:
+      // adapt test.  kai, nov'19)
+      fromFacilityLinkId =
+          FacilitiesUtils.decideOnLink(fromFacility, scenario.getNetwork()).getId();
+    }
 
-		Id<Link> toFacilityLinkId = toFacility.getLinkId();
-		if ( toFacilityLinkId==null ) {
-			// (yyyy: same as above)
-			toFacilityLinkId = FacilitiesUtils.decideOnLink( toFacility, scenario.getNetwork() ).getId() ;
-		}
+    Id<Link> toFacilityLinkId = toFacility.getLinkId();
+    if (toFacilityLinkId == null) {
+      // (yyyy: same as above)
+      toFacilityLinkId = FacilitiesUtils.decideOnLink(toFacility, scenario.getNetwork()).getId();
+    }
 
-		Route route = this.scenario.getPopulation().getFactory().getRouteFactories().createRoute(Route.class, fromFacilityLinkId, toFacilityLinkId );
-		double estimatedNetworkDistance = dist * this.beelineDistanceFactor;
-		int travTime = (int) (estimatedNetworkDistance / this.networkTravelSpeed);
-		route.setTravelTime(travTime);
-		route.setDistance(estimatedNetworkDistance);
-		leg.setRoute(route);
-		leg.setDepartureTime(depTime);
-		leg.setTravelTime(travTime);
-		Leg r = (leg);
-		r.setTravelTime( depTime + travTime - r.getDepartureTime().seconds()); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
-		return travTime;
-	}
-
+    Route route =
+        this.scenario
+            .getPopulation()
+            .getFactory()
+            .getRouteFactories()
+            .createRoute(Route.class, fromFacilityLinkId, toFacilityLinkId);
+    double estimatedNetworkDistance = dist * this.beelineDistanceFactor;
+    int travTime = (int) (estimatedNetworkDistance / this.networkTravelSpeed);
+    route.setTravelTime(travTime);
+    route.setDistance(estimatedNetworkDistance);
+    leg.setRoute(route);
+    leg.setDepartureTime(depTime);
+    leg.setTravelTime(travTime);
+    Leg r = (leg);
+    r.setTravelTime(
+        depTime
+            + travTime
+            - r.getDepartureTime()
+                .seconds()); // yy something needs to be done once there are alternative
+    // implementations of the interface.  kai, apr'10
+    return travTime;
+  }
 }

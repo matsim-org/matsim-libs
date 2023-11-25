@@ -28,6 +28,8 @@ import org.matsim.pt.Umlauf;
  */
 public interface TransitDriverAgentFactory extends MatsimFactory {
 
-	AbstractTransitDriverAgent createTransitDriver(Umlauf umlauf, InternalInterface internalInterface, TransitStopAgentTracker transitStopAgentTracker);
-
+  AbstractTransitDriverAgent createTransitDriver(
+      Umlauf umlauf,
+      InternalInterface internalInterface,
+      TransitStopAgentTracker transitStopAgentTracker);
 }

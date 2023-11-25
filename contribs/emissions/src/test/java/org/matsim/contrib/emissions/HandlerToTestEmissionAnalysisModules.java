@@ -26,67 +26,56 @@ import org.matsim.core.events.handler.EventHandler;
 
 /**
  * minimalistic handler to compare calculate sums in some tests
- * @author julia
  *
+ * @author julia
  */
 class HandlerToTestEmissionAnalysisModules implements EventsManager {
-	private Double sumOverAll=0.0;
+  private Double sumOverAll = 0.0;
 
-	@Override
-	public void processEvent(Event event) {	
-		for(String attribute: event.getAttributes().keySet()){
-			try {
-				if (!(attribute.equals("time"))) {
-					sumOverAll += Double.parseDouble(event.getAttributes().get(attribute));
-				}
-				
-			} catch (NumberFormatException e) {
-				String notANumber = event.getAttributes().get(attribute);
-				if(notANumber.equals("coldEmissionEvent")||notANumber.equals("coldEmissionEventLinkId")||notANumber.equals("personId")){
-					//everything ok
-				}else{
-					//Assert.fail("this is not an expected cold emission event attribute: "+notANumber);
-				}
-				
-			}
-		}
+  @Override
+  public void processEvent(Event event) {
+    for (String attribute : event.getAttributes().keySet()) {
+      try {
+        if (!(attribute.equals("time"))) {
+          sumOverAll += Double.parseDouble(event.getAttributes().get(attribute));
+        }
 
-	}
+      } catch (NumberFormatException e) {
+        String notANumber = event.getAttributes().get(attribute);
+        if (notANumber.equals("coldEmissionEvent")
+            || notANumber.equals("coldEmissionEventLinkId")
+            || notANumber.equals("personId")) {
+          // everything ok
+        } else {
+          // Assert.fail("this is not an expected cold emission event attribute: "+notANumber);
+        }
+      }
+    }
+  }
 
-	@Override
-	public void addHandler(EventHandler handler) {
-	}
+  @Override
+  public void addHandler(EventHandler handler) {}
 
-	@Override
-	public void removeHandler(EventHandler handler) {
+  @Override
+  public void removeHandler(EventHandler handler) {}
 
-	}
+  @Override
+  public void resetHandlers(int iteration) {}
 
-	@Override
-	public void resetHandlers(int iteration) {
-	}
+  @Override
+  public void initProcessing() {}
 
-	@Override
-	public void initProcessing() {
+  @Override
+  public void afterSimStep(double time) {}
 
-	}
+  @Override
+  public void finishProcessing() {}
 
-	@Override
-	public void afterSimStep(double time) {
+  public void reset() {
+    sumOverAll = .0;
+  }
 
-	}
-
-	@Override
-	public void finishProcessing() {
-
-	}
-
-	public void reset() {
-		sumOverAll=.0;
-	}
-
-	public Double getSum() {
-		return sumOverAll;
-	}
-
+  public Double getSum() {
+    return sumOverAll;
+  }
 }

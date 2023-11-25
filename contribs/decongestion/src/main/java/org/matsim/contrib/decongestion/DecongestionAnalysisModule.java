@@ -19,31 +19,27 @@
 
 package org.matsim.contrib.decongestion;
 
-import org.matsim.core.controler.AbstractModule;
-
 import org.matsim.contrib.decongestion.data.DecongestionInfo;
 import org.matsim.contrib.decongestion.handler.DelayAnalysis;
 import org.matsim.contrib.decongestion.handler.PersonVehicleTracker;
+import org.matsim.core.controler.AbstractModule;
 
 /**
-* @author ikaddoura
-*/
-
+ * @author ikaddoura
+ */
 public class DecongestionAnalysisModule extends AbstractModule {
-	
-	@Override
-	public void install() {
-				
-		this.bind(DecongestionInfo.class).asEagerSingleton();		
-		
-		this.bind(DelayAnalysis.class).asEagerSingleton();				
-		this.addEventHandlerBinding().to(DelayAnalysis.class);
 
-		this.bind(PersonVehicleTracker.class).asEagerSingleton();
-		this.addEventHandlerBinding().to(PersonVehicleTracker.class);
-		
-		this.addControlerListenerBinding().to(DecongestionControlerListener.class);
-	}
+  @Override
+  public void install() {
 
+    this.bind(DecongestionInfo.class).asEagerSingleton();
+
+    this.bind(DelayAnalysis.class).asEagerSingleton();
+    this.addEventHandlerBinding().to(DelayAnalysis.class);
+
+    this.bind(PersonVehicleTracker.class).asEagerSingleton();
+    this.addEventHandlerBinding().to(PersonVehicleTracker.class);
+
+    this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+  }
 }
-

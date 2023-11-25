@@ -23,21 +23,18 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
 
-
 /**
  * @author dgrether
- *
  */
 public final class SignalSystemsDataFactoryImpl implements SignalSystemsDataFactory {
 
-	@Override
-	public SignalData createSignalData(Id<Signal> id) {
-		return new SignalDataImpl(id);
-	}
+  @Override
+  public SignalData createSignalData(Id<Signal> id) {
+    return new SignalDataImpl(id);
+  }
 
-	@Override
-	public SignalSystemData createSignalSystemData(Id<SignalSystem> id) {
-		return new SignalSystemDataImpl(id);
-	}
-
+  @Override
+  public SignalSystemData createSignalSystemData(Id<SignalSystem> id) {
+    return new SignalSystemDataImpl(id);
+  }
 }

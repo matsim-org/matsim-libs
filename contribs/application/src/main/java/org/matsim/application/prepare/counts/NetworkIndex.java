@@ -1,5 +1,10 @@
 package org.matsim.application.prepare.counts;
 
+import java.io.IOException;
+import java.util.*;
+import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -16,268 +21,245 @@ import org.matsim.core.utils.io.IOUtils;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
-import javax.annotation.Nullable;
-import java.io.IOException;
-import java.util.*;
-import java.util.function.BiPredicate;
-import java.util.stream.Collectors;
-
 /**
- * Wrapper class for an STRtree. Can be used to match objects, geometries for example, to an MATSim network.
+ * Wrapper class for an STRtree. Can be used to match objects, geometries for example, to an MATSim
+ * network.
  */
 public final class NetworkIndex<T> {
 
-	private final STRtree index = new STRtree();
-	private final double range;
-	private final GeometryFactory factory = new GeometryFactory();
-	private final GeometryGetter<T> getter;
-	private final List<BiPredicate<LinkGeometry, T>> filter = new ArrayList<>();
-	/**
-	 * Stores references to all records in the tree.
-	 */
-	private final Map<Id<Link>, LinkGeometry> records = new HashMap<>();
-	private GeometryDistance<T> distance;
+  private final STRtree index = new STRtree();
+  private final double range;
+  private final GeometryFactory factory = new GeometryFactory();
+  private final GeometryGetter<T> getter;
+  private final List<BiPredicate<LinkGeometry, T>> filter = new ArrayList<>();
 
-	/**
-	 * Create network index from links in the network.
-	 */
-	public NetworkIndex(Network network, double range, GeometryGetter<T> getter) {
-		this(network, new HashMap<>(), range, getter);
-	}
+  /** Stores references to all records in the tree. */
+  private final Map<Id<Link>, LinkGeometry> records = new HashMap<>();
 
+  private GeometryDistance<T> distance;
 
-	/**
-	 * Create network index from links in the network with additional geometries.
-	 */
-	public NetworkIndex(Network network, Map<Id<Link>, Geometry> geometries, double range, GeometryGetter<T> getter) {
+  /** Create network index from links in the network. */
+  public NetworkIndex(Network network, double range, GeometryGetter<T> getter) {
+    this(network, new HashMap<>(), range, getter);
+  }
 
-		this.range = range;
-		this.getter = getter;
-		// Standard geometric distance
-		this.distance = (geom, toMatch) -> geom.distance(this.getter.getGeometry(toMatch));
+  /** Create network index from links in the network with additional geometries. */
+  public NetworkIndex(
+      Network network, Map<Id<Link>, Geometry> geometries, double range, GeometryGetter<T> getter) {
 
-		for (Link link : network.getLinks().values()) {
-			Geometry geom = geometries.getOrDefault(link.getId(), this.link2LineString(link));
-			LinkGeometry r = new LinkGeometry(link, geom);
-			this.index.insert(r.geometry.getEnvelopeInternal(), r);
-			this.records.put(link.getId(), r);
-		}
+    this.range = range;
+    this.getter = getter;
+    // Standard geometric distance
+    this.distance = (geom, toMatch) -> geom.distance(this.getter.getGeometry(toMatch));
 
-		this.index.build();
-	}
+    for (Link link : network.getLinks().values()) {
+      Geometry geom = geometries.getOrDefault(link.getId(), this.link2LineString(link));
+      LinkGeometry r = new LinkGeometry(link, geom);
+      this.index.insert(r.geometry.getEnvelopeInternal(), r);
+      this.records.put(link.getId(), r);
+    }
 
-	/**
-	 * Calculate the minimum hausdorff distance between two geometries.
-	 * Unlike the classical distance, this uses the minimum instead of maximum of the two directed distances.
-	 * This makes it more usable for geometries with different extent.
-	 * This function may be used to compute the similarity of two line strings.
-	 */
-	public static double minHausdorffDistance(Geometry g1, Geometry g2) {
+    this.index.build();
+  }
 
-		DiscreteHausdorffDistance d1 = new DiscreteHausdorffDistance(g1, g2);
-		double u = d1.orientedDistance();
+  /**
+   * Calculate the minimum hausdorff distance between two geometries. Unlike the classical distance,
+   * this uses the minimum instead of maximum of the two directed distances. This makes it more
+   * usable for geometries with different extent. This function may be used to compute the
+   * similarity of two line strings.
+   */
+  public static double minHausdorffDistance(Geometry g1, Geometry g2) {
 
-		DiscreteHausdorffDistance d2 = new DiscreteHausdorffDistance(g2, g1);
-		double v = d2.orientedDistance();
+    DiscreteHausdorffDistance d1 = new DiscreteHausdorffDistance(g1, g2);
+    double u = d1.orientedDistance();
 
-		return Math.min(u, v);
-	}
+    DiscreteHausdorffDistance d2 = new DiscreteHausdorffDistance(g2, g1);
+    double v = d2.orientedDistance();
 
-	/**
-	 * Calculates the angle of vector from v to u.
-	 */
-	public static double angle(Coordinate v, Coordinate u) {
-		return Math.atan2(u.getY() - v.getY(), u.getX() - v.getX());
-	}
+    return Math.min(u, v);
+  }
 
-	/**
-	 * Angle between two line strings in radians -pi to pi.
-	 */
-	public static double angle(LineString u, LineString v) {
+  /** Calculates the angle of vector from v to u. */
+  public static double angle(Coordinate v, Coordinate u) {
+    return Math.atan2(u.getY() - v.getY(), u.getX() - v.getX());
+  }
 
-		double ux = u.getEndPoint().getCoordinate().getX() - u.getStartPoint().getCoordinate().getX();
-		double uy = u.getEndPoint().getCoordinate().getY() - u.getStartPoint().getCoordinate().getY();
+  /** Angle between two line strings in radians -pi to pi. */
+  public static double angle(LineString u, LineString v) {
 
-		double vx = v.getEndPoint().getCoordinate().getX() - v.getStartPoint().getCoordinate().getX();
-		double vy = v.getEndPoint().getCoordinate().getY() - v.getStartPoint().getCoordinate().getY();
+    double ux = u.getEndPoint().getCoordinate().getX() - u.getStartPoint().getCoordinate().getX();
+    double uy = u.getEndPoint().getCoordinate().getY() - u.getStartPoint().getCoordinate().getY();
 
-		double cross = ux * vy - uy * vx;
-		double dot = ux * vx + uy * vy;
+    double vx = v.getEndPoint().getCoordinate().getX() - v.getStartPoint().getCoordinate().getX();
+    double vy = v.getEndPoint().getCoordinate().getY() - v.getStartPoint().getCoordinate().getY();
 
-		return Math.atan2(cross, dot);
-	}
+    double cross = ux * vy - uy * vx;
+    double dot = ux * vx + uy * vy;
 
-	/**
-	 * Read network geometries that have been written with {@link org.matsim.contrib.sumo.SumoNetworkConverter}.
-	 */
-	public static Map<Id<Link>, Geometry> readGeometriesFromSumo(String path, MathTransform crs) throws IOException, TransformException {
+    return Math.atan2(cross, dot);
+  }
 
-		Map<Id<Link>, Geometry> result = new HashMap<>();
+  /**
+   * Read network geometries that have been written with {@link
+   * org.matsim.contrib.sumo.SumoNetworkConverter}.
+   */
+  public static Map<Id<Link>, Geometry> readGeometriesFromSumo(String path, MathTransform crs)
+      throws IOException, TransformException {
 
-		GeometryFactory factory = new GeometryFactory();
+    Map<Id<Link>, Geometry> result = new HashMap<>();
 
-		try (CSVParser csv = new CSVParser(IOUtils.getBufferedReader(path), CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).build())) {
+    GeometryFactory factory = new GeometryFactory();
 
-			for (CSVRecord r : csv) {
-				String idAsString = r.get("LinkId");
-				String raw = r.get("Geometry");
+    try (CSVParser csv =
+        new CSVParser(
+            IOUtils.getBufferedReader(path),
+            CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).build())) {
 
-				LineString link = parseCoordinates(raw, factory);
-				Id<Link> linkId = Id.createLinkId(idAsString);
+      for (CSVRecord r : csv) {
+        String idAsString = r.get("LinkId");
+        String raw = r.get("Geometry");
 
-				result.put(linkId, JTS.transform(link, crs));
-			}
-		}
+        LineString link = parseCoordinates(raw, factory);
+        Id<Link> linkId = Id.createLinkId(idAsString);
 
-		return result;
-	}
+        result.put(linkId, JTS.transform(link, crs));
+      }
+    }
 
-	private static LineString parseCoordinates(String coordinateSequence, GeometryFactory factory) {
+    return result;
+  }
 
-		String[] split = coordinateSequence.split("\\)");
+  private static LineString parseCoordinates(String coordinateSequence, GeometryFactory factory) {
 
-		Coordinate[] coordinates = new Coordinate[split.length];
+    String[] split = coordinateSequence.split("\\)");
 
-		for (int i = 0; i < split.length; i++) {
-			String coord = split[i];
-			int toRemove = coord.indexOf("(");
+    Coordinate[] coordinates = new Coordinate[split.length];
 
-			String cleaned = coord.substring(toRemove + 1);
+    for (int i = 0; i < split.length; i++) {
+      String coord = split[i];
+      int toRemove = coord.indexOf("(");
 
-			String[] split1 = cleaned.split(",");
+      String cleaned = coord.substring(toRemove + 1);
 
-			Coordinate coordinate = new Coordinate();
-			coordinate.setX(Double.parseDouble(split1[0]));
-			coordinate.setY(Double.parseDouble(split1[1]));
+      String[] split1 = cleaned.split(",");
 
-			coordinates[i] = coordinate;
-		}
+      Coordinate coordinate = new Coordinate();
+      coordinate.setX(Double.parseDouble(split1[0]));
+      coordinate.setY(Double.parseDouble(split1[1]));
 
-		return factory.createLineString(coordinates);
-	}
+      coordinates[i] = coordinate;
+    }
 
-	/**
-	 * Change the distance calculation.
-	 */
-	public NetworkIndex<T> setDistanceCalculator(GeometryDistance<T> distance) {
-		this.distance = distance;
-		return this;
-	}
+    return factory.createLineString(coordinates);
+  }
 
-	/**
-	 * Uses an STRtree to match an Object to a network link. Custom filters are applied to filter the query results.
-	 * The closest link to the object, based on the distance function is returned.
-	 *
-	 * @param filter optional filter, only for this query.
-	 */
-	@SuppressWarnings("unchecked")
-	public Link query(T toMatch, @Nullable BiPredicate<LinkGeometry, T> filter) {
+  /** Change the distance calculation. */
+  public NetworkIndex<T> setDistanceCalculator(GeometryDistance<T> distance) {
+    this.distance = distance;
+    return this;
+  }
 
-		Geometry geometry = getter.getGeometry(toMatch);
+  /**
+   * Uses an STRtree to match an Object to a network link. Custom filters are applied to filter the
+   * query results. The closest link to the object, based on the distance function is returned.
+   *
+   * @param filter optional filter, only for this query.
+   */
+  @SuppressWarnings("unchecked")
+  public Link query(T toMatch, @Nullable BiPredicate<LinkGeometry, T> filter) {
 
-		Envelope searchArea = geometry.buffer(this.range).getEnvelopeInternal();
+    Geometry geometry = getter.getGeometry(toMatch);
 
-		List<LinkGeometry> result = index.query(searchArea);
+    Envelope searchArea = geometry.buffer(this.range).getEnvelopeInternal();
 
-		if (result.isEmpty())
-			return null;
+    List<LinkGeometry> result = index.query(searchArea);
 
-		return getClosestCandidate(result, toMatch, filter);
-	}
+    if (result.isEmpty()) return null;
 
-	/**
-	 * See {@link #query(Object, BiPredicate)}.
-	 */
-	public Link query(T toMatch) {
-		return query(toMatch, null);
-	}
+    return getClosestCandidate(result, toMatch, filter);
+  }
 
-	/**
-	 * Transforms a MATSim network link to a LineString Object.
-	 */
-	private LineString link2LineString(Link link) {
+  /** See {@link #query(Object, BiPredicate)}. */
+  public Link query(T toMatch) {
+    return query(toMatch, null);
+  }
 
-		Coord from = link.getFromNode().getCoord();
-		Coord to = link.getToNode().getCoord();
-		Coordinate[] coordinates = {MGC.coord2Coordinate(from), MGC.coord2Coordinate(to)};
+  /** Transforms a MATSim network link to a LineString Object. */
+  private LineString link2LineString(Link link) {
 
-		return factory.createLineString(coordinates);
-	}
+    Coord from = link.getFromNode().getCoord();
+    Coord to = link.getToNode().getCoord();
+    Coordinate[] coordinates = {MGC.coord2Coordinate(from), MGC.coord2Coordinate(to)};
 
-	/**
-	 * Removes a Link from the index.
-	 */
-	public void remove(Link link) {
-		LinkGeometry r = records.get(link.getId());
-		index.remove(r.geometry.getEnvelopeInternal(), r);
-	}
+    return factory.createLineString(coordinates);
+  }
 
-	private Link getClosestCandidate(List<LinkGeometry> result, T toMatch, BiPredicate<LinkGeometry, T> filter) {
+  /** Removes a Link from the index. */
+  public void remove(Link link) {
+    LinkGeometry r = records.get(link.getId());
+    index.remove(r.geometry.getEnvelopeInternal(), r);
+  }
 
-		if (result.isEmpty())
-			return null;
+  private Link getClosestCandidate(
+      List<LinkGeometry> result, T toMatch, BiPredicate<LinkGeometry, T> filter) {
 
-		if (result.size() == 1)
-			return result.stream().findFirst().get().link;
+    if (result.isEmpty()) return null;
 
-		applyFilter(result, toMatch, filter);
+    if (result.size() == 1) return result.stream().findFirst().get().link;
 
-		if (result.isEmpty())
-			return null;
+    applyFilter(result, toMatch, filter);
 
-		Map<Link, Double> distances = result.stream().collect(Collectors.toMap(r -> r.link, r -> distance.computeDistance(r.geometry, toMatch)));
-		Map.Entry<Link, Double> min = Collections.min(distances.entrySet(), Comparator.comparingDouble(Map.Entry::getValue));
-		return min.getKey();
-	}
+    if (result.isEmpty()) return null;
 
-	/**
-	 * Add a Predicate to test if query results are a valid candidate. Should return false if element should NOT be returned.
-	 */
-	public void addLinkFilter(BiPredicate<LinkGeometry, T> filter) {
-		this.filter.add(filter);
-	}
+    Map<Link, Double> distances =
+        result.stream()
+            .collect(
+                Collectors.toMap(r -> r.link, r -> distance.computeDistance(r.geometry, toMatch)));
+    Map.Entry<Link, Double> min =
+        Collections.min(distances.entrySet(), Comparator.comparingDouble(Map.Entry::getValue));
+    return min.getKey();
+  }
 
-	private void applyFilter(List<LinkGeometry> result, T toMatch, BiPredicate<LinkGeometry, T> filter) {
+  /**
+   * Add a Predicate to test if query results are a valid candidate. Should return false if element
+   * should NOT be returned.
+   */
+  public void addLinkFilter(BiPredicate<LinkGeometry, T> filter) {
+    this.filter.add(filter);
+  }
 
-		outer:
-		for (var it = result.iterator(); it.hasNext(); ) {
-			LinkGeometry next = it.next();
-			for (BiPredicate<LinkGeometry, T> predicate : this.filter) {
-				if (!predicate.test(next, toMatch)) {
-					it.remove();
-					// No further filter should be checked
-					continue outer;
-				}
-			}
+  private void applyFilter(
+      List<LinkGeometry> result, T toMatch, BiPredicate<LinkGeometry, T> filter) {
 
-			if (filter != null && !filter.test(next, toMatch))
-				it.remove();
-		}
-	}
+    outer:
+    for (var it = result.iterator(); it.hasNext(); ) {
+      LinkGeometry next = it.next();
+      for (BiPredicate<LinkGeometry, T> predicate : this.filter) {
+        if (!predicate.test(next, toMatch)) {
+          it.remove();
+          // No further filter should be checked
+          continue outer;
+        }
+      }
 
-	/**
-	 * Set the logic to get a geometry from the matching object.
-	 */
-	@FunctionalInterface
-	public interface GeometryGetter<T> {
+      if (filter != null && !filter.test(next, toMatch)) it.remove();
+    }
+  }
 
-		Geometry getGeometry(T toMatch);
-	}
+  /** Set the logic to get a geometry from the matching object. */
+  @FunctionalInterface
+  public interface GeometryGetter<T> {
 
+    Geometry getGeometry(T toMatch);
+  }
 
-	/**
-	 * Logic to compute distance or similarity between two objects.
-	 */
-	@FunctionalInterface
-	public interface GeometryDistance<T> {
+  /** Logic to compute distance or similarity between two objects. */
+  @FunctionalInterface
+  public interface GeometryDistance<T> {
 
-		double computeDistance(Geometry geom, T toMatch);
+    double computeDistance(Geometry geom, T toMatch);
+  }
 
-	}
-
-	/**
-	 * Holding link and its geometry.
-	 */
-	public record LinkGeometry(Link link, Geometry geometry) { }
+  /** Holding link and its geometry. */
+  public record LinkGeometry(Link link, Geometry geometry) {}
 }
-

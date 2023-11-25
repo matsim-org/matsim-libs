@@ -20,20 +20,14 @@
 package org.matsim.contrib.minibus.hook;
 
 /**
- * 
- * Handles {@link OperatorCostContainer} and does something meaningful with them. 
- * 
- * @author aneumann
+ * Handles {@link OperatorCostContainer} and does something meaningful with them.
  *
+ * @author aneumann
  */
 interface OperatorCostContainerHandler {
 
-	void handleOperatorCostContainer(OperatorCostContainer operatorCostContainer);
+  void handleOperatorCostContainer(OperatorCostContainer operatorCostContainer);
 
-	/**
-	 * Reset everything
-	 *
-     */
-	void reset();
-	
+  /** Reset everything */
+  void reset();
 }

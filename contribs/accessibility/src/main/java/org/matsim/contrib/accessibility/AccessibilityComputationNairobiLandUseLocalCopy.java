@@ -20,7 +20,6 @@ package org.matsim.contrib.accessibility;
 
 import java.util.Arrays;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Envelope;
@@ -38,75 +37,91 @@ import org.matsim.facilities.ActivityFacilities;
  * @author dziemke
  */
 class AccessibilityComputationNairobiLandUseLocalCopy {
-	public static final Logger LOG = LogManager.getLogger(AccessibilityComputationNairobiLandUseLocalCopy.class);
+  public static final Logger LOG =
+      LogManager.getLogger(AccessibilityComputationNairobiLandUseLocalCopy.class);
 
-	public static void main(String[] args) {
-		int tileSize_m = 500;
-		boolean push2Geoserver = false; // Set true for run on server
-		boolean createQGisOutput = true; // Set false for run on server
+  public static void main(String[] args) {
+    int tileSize_m = 500;
+    boolean push2Geoserver = false; // Set true for run on server
+    boolean createQGisOutput = true; // Set false for run on server
 
-		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
+    final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
 
-		Envelope envelope = new Envelope(246000, 271000, 9853000, 9863000); // Central part of Nairobi
-		String scenarioCRS = "EPSG:21037"; // EPSG:21037 = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
+    Envelope envelope = new Envelope(246000, 271000, 9853000, 9863000); // Central part of Nairobi
+    String scenarioCRS = "EPSG:21037"; // EPSG:21037 = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 
-		config.network().setInputFile("../nairobi/data/nairobi/input/2015-10-15_network.xml");
-		config.facilities().setInputFile("../nairobi/data/land_use/Nairobi_LU_2010/facilities.xml");
-		String runId = "ke_nairobi_landuse_hexagons_" + tileSize_m;
-		config.controller().setOutputDirectory("../nairobi/data/nairobi/output/" + runId + "_lcpt_par4_car_tr-7_500/");
-		config.controller().setRunId(runId);
+    config.network().setInputFile("../nairobi/data/nairobi/input/2015-10-15_network.xml");
+    config.facilities().setInputFile("../nairobi/data/land_use/Nairobi_LU_2010/facilities.xml");
+    String runId = "ke_nairobi_landuse_hexagons_" + tileSize_m;
+    config
+        .controller()
+        .setOutputDirectory("../nairobi/data/nairobi/output/" + runId + "_lcpt_par4_car_tr-7_500/");
+    config.controller().setRunId(runId);
 
-		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setLastIteration(0);
+    config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+    config.controller().setLastIteration(0);
 
-		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
-		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBoxHexagons);
-		acg.setEnvelope(envelope);
-		acg.setTileSize_m(tileSize_m);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, false);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-		//acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-		acg.setOutputCrs(scenarioCRS);
+    AccessibilityConfigGroup acg =
+        ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
+    acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBoxHexagons);
+    acg.setEnvelope(envelope);
+    acg.setTileSize_m(tileSize_m);
+    acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, false);
+    acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+    // acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+    acg.setOutputCrs(scenarioCRS);
 
-		//acg.setUseParallelization(false);
+    // acg.setUseParallelization(false);
 
-		ConfigUtils.setVspDefaults(config);
+    ConfigUtils.setVspDefaults(config);
 
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
+    final Scenario scenario = ScenarioUtils.loadScenario(config);
 
-//		final List<String> activityTypes = Arrays.asList(new String[]{"educational", "commercial", "industrial", "recreational", "water_body"});
-		final List<String> activityTypes = Arrays.asList(new String[]{"educational"});
-		final ActivityFacilities densityFacilities = AccessibilityUtils.createFacilityForEachLink(Labels.DENSITIY, scenario.getNetwork());
+    //		final List<String> activityTypes = Arrays.asList(new String[]{"educational", "commercial",
+    // "industrial", "recreational", "water_body"});
+    final List<String> activityTypes = Arrays.asList(new String[] {"educational"});
+    final ActivityFacilities densityFacilities =
+        AccessibilityUtils.createFacilityForEachLink(Labels.DENSITIY, scenario.getNetwork());
 
-		final Controler controler = new Controler(scenario);
+    final Controler controler = new Controler(scenario);
 
-		for (String activityType : activityTypes) {
-			AccessibilityModule module = new AccessibilityModule();
-			module.setConsideredActivityType(activityType);
-			module.addAdditionalFacilityData(densityFacilities);
-			module.setPushing2Geoserver(push2Geoserver);
-			module.setCreateQGisOutput(createQGisOutput);
-			controler.addOverridingModule(module);
-		}
+    for (String activityType : activityTypes) {
+      AccessibilityModule module = new AccessibilityModule();
+      module.setConsideredActivityType(activityType);
+      module.addAdditionalFacilityData(densityFacilities);
+      module.setPushing2Geoserver(push2Geoserver);
+      module.setCreateQGisOutput(createQGisOutput);
+      controler.addOverridingModule(module);
+    }
 
-		controler.run();
+    controler.run();
 
-		if (createQGisOutput) {
-			final Integer range = 9; // In the current implementation, this must always be 9
-			final Double lowerBound = -3.5; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
-			final Double upperBound = 3.5;
-			final int populationThreshold = (int) (10 / (1000/tileSize_m * 1000/tileSize_m)); // People per km^2 or roads (?)
+    if (createQGisOutput) {
+      final Integer range = 9; // In the current implementation, this must always be 9
+      final Double lowerBound =
+          -3.5; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
+      final Double upperBound = 3.5;
+      final int populationThreshold =
+          (int) (10 / (1000 / tileSize_m * 1000 / tileSize_m)); // People per km^2 or roads (?)
 
-			String osName = System.getProperty("os.name");
-			String workingDirectory = config.controller().getOutputDirectory();
-			for (String actType : activityTypes) {
-				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
-				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
-					VisualizationUtils.createQGisOutputRuleBasedStandardColorRange(actType, mode.toString(), envelope, workingDirectory,
-							scenarioCRS, lowerBound, upperBound, range, populationThreshold);
-					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode.toString(), osName);
-				}
-			}
-		}
-	}
+      String osName = System.getProperty("os.name");
+      String workingDirectory = config.controller().getOutputDirectory();
+      for (String actType : activityTypes) {
+        String actSpecificWorkingDirectory = workingDirectory + actType + "/";
+        for (Modes4Accessibility mode : acg.getIsComputingMode()) {
+          VisualizationUtils.createQGisOutputRuleBasedStandardColorRange(
+              actType,
+              mode.toString(),
+              envelope,
+              workingDirectory,
+              scenarioCRS,
+              lowerBound,
+              upperBound,
+              range,
+              populationThreshold);
+          VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode.toString(), osName);
+        }
+      }
+    }
+  }
 }

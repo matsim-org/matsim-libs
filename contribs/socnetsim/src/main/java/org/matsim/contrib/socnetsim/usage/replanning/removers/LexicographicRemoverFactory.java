@@ -19,35 +19,32 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.usage.replanning.removers;
 
-import org.matsim.api.core.v01.Scenario;
-
-import org.matsim.contrib.socnetsim.framework.replanning.removers.LexicographicForCompositionExtraPlanRemover;
-import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
-import org.matsim.contrib.socnetsim.framework.replanning.ExtraPlanRemover;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.socnetsim.framework.replanning.ExtraPlanRemover;
+import org.matsim.contrib.socnetsim.framework.replanning.removers.LexicographicForCompositionExtraPlanRemover;
+import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 
 /**
  * @author thibautd
  */
 public class LexicographicRemoverFactory implements Provider<ExtraPlanRemover> {
 
-	private final Scenario sc;
+  private final Scenario sc;
 
-	@Inject
-	public LexicographicRemoverFactory( final Scenario sc ) {
-		this.sc = sc;
-	}
+  @Inject
+  public LexicographicRemoverFactory(final Scenario sc) {
+    this.sc = sc;
+  }
 
-	@Override
-	public ExtraPlanRemover get() {
-		final GroupReplanningConfigGroup conf = (GroupReplanningConfigGroup)
-				sc.getConfig().getModule(
-						GroupReplanningConfigGroup.GROUP_NAME );
+  @Override
+  public ExtraPlanRemover get() {
+    final GroupReplanningConfigGroup conf =
+        (GroupReplanningConfigGroup)
+            sc.getConfig().getModule(GroupReplanningConfigGroup.GROUP_NAME);
 
-		return new LexicographicForCompositionExtraPlanRemover(
-				conf.getMaxPlansPerComposition(),
-				conf.getMaxPlansPerAgent() );
-	}
+    return new LexicographicForCompositionExtraPlanRemover(
+        conf.getMaxPlansPerComposition(), conf.getMaxPlansPerAgent());
+  }
 }
-

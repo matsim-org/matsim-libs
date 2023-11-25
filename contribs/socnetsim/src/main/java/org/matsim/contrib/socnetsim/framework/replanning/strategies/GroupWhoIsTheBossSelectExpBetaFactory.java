@@ -19,41 +19,36 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.strategies;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.gbl.MatsimRandom;
-
 import com.google.inject.Inject;
-
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.socnetsim.framework.replanning.NonInnovativeStrategyFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.LogitWeight;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.whoisthebossselector.WhoIsTheBossSelector;
+import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * @author thibautd
  */
 public class GroupWhoIsTheBossSelectExpBetaFactory extends NonInnovativeStrategyFactory {
 
-	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
-	private final Scenario sc;
+  private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+  private final Scenario sc;
 
-	@Inject
-	public GroupWhoIsTheBossSelectExpBetaFactory( IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory , Scenario sc ) {
-		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
-		this.sc = sc;
-	}
+  @Inject
+  public GroupWhoIsTheBossSelectExpBetaFactory(
+      IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory, Scenario sc) {
+    this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+    this.sc = sc;
+  }
 
-
-	@Override
-	public GroupLevelPlanSelector createSelector() {
-		return
-				 new WhoIsTheBossSelector(
-					 MatsimRandom.getLocalInstance(),
-					 incompatiblePlansIdentifierFactory ,
-					 new LogitWeight(
-						MatsimRandom.getLocalInstance(),
-						sc.getConfig().scoring().getBrainExpBeta()) );
-	}
+  @Override
+  public GroupLevelPlanSelector createSelector() {
+    return new WhoIsTheBossSelector(
+        MatsimRandom.getLocalInstance(),
+        incompatiblePlansIdentifierFactory,
+        new LogitWeight(
+            MatsimRandom.getLocalInstance(), sc.getConfig().scoring().getBrainExpBeta()));
+  }
 }
-

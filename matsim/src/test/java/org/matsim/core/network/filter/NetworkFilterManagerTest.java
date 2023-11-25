@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * NetworkFilterManagerTest.java
@@ -21,6 +20,7 @@
 
 package org.matsim.core.network.filter;
 
+import com.google.common.collect.ImmutableSet;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,94 +34,95 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import com.google.common.collect.ImmutableSet;
-
 /**
  * @author mstraub Austrian Institute of Technology
  */
 public class NetworkFilterManagerTest {
 
-	private static final double DELTA = 0.00001;
+  private static final double DELTA = 0.00001;
 
-	private static final double CAPACITY = 12.34;
-	private static final double FREESPEED = 13.888;
-	private static final double LENGTH = 777;
-	private static final int NR_OF_LANES = 2;
-	private static final String ATTRIBUTE_KEY = "key";
-	private static final String ATTRIBUTE_VALUE = "value";
-	private static final String ATTRIBUTE_KEY2 = "key2";
-	private static final int ATTRIBUTE_VALUE2 = 2;
+  private static final double CAPACITY = 12.34;
+  private static final double FREESPEED = 13.888;
+  private static final double LENGTH = 777;
+  private static final int NR_OF_LANES = 2;
+  private static final String ATTRIBUTE_KEY = "key";
+  private static final String ATTRIBUTE_VALUE = "value";
+  private static final String ATTRIBUTE_KEY2 = "key2";
+  private static final int ATTRIBUTE_VALUE2 = 2;
 
-	private Network filterNetwork;
+  private Network filterNetwork;
 
-	@Before
-	public void prepareTestAllowedModes() {
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Network network = scenario.getNetwork();
+  @Before
+  public void prepareTestAllowedModes() {
+    Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    Network network = scenario.getNetwork();
 
-		Node a = network.getFactory().createNode(Id.create("a", Node.class), new Coord(0, 0));
-		Node b = network.getFactory().createNode(Id.create("b", Node.class), new Coord(0, LENGTH));
-		Node c = network.getFactory().createNode(Id.create("c", Node.class), new Coord(LENGTH, LENGTH));
-		Link ab = network.getFactory().createLink(Id.create("ab", Link.class), a, b);
-		Link ac = network.getFactory().createLink(Id.create("ac", Link.class), a, c);
+    Node a = network.getFactory().createNode(Id.create("a", Node.class), new Coord(0, 0));
+    Node b = network.getFactory().createNode(Id.create("b", Node.class), new Coord(0, LENGTH));
+    Node c = network.getFactory().createNode(Id.create("c", Node.class), new Coord(LENGTH, LENGTH));
+    Link ab = network.getFactory().createLink(Id.create("ab", Link.class), a, b);
+    Link ac = network.getFactory().createLink(Id.create("ac", Link.class), a, c);
 
-		enrichLink(ab);
-		enrichLink(ac);
+    enrichLink(ab);
+    enrichLink(ac);
 
-		network.addNode(a);
-		network.addNode(b);
-		network.addNode(c);
-		network.addLink(ab);
-		network.addLink(ac);
+    network.addNode(a);
+    network.addNode(b);
+    network.addNode(c);
+    network.addLink(ab);
+    network.addLink(ac);
 
-		filterNetwork = network;
-	}
+    filterNetwork = network;
+  }
 
-	private static void enrichLink(Link link) {
-		link.setAllowedModes(ImmutableSet.of("car"));
-		link.setCapacity(CAPACITY);
-		link.setFreespeed(FREESPEED);
-		link.setLength(LENGTH);
-		link.setNumberOfLanes(NR_OF_LANES);
-		link.getAttributes().putAttribute(ATTRIBUTE_KEY, ATTRIBUTE_VALUE);
-		link.getAttributes().putAttribute(ATTRIBUTE_KEY2, ATTRIBUTE_VALUE2);
-	}
+  private static void enrichLink(Link link) {
+    link.setAllowedModes(ImmutableSet.of("car"));
+    link.setCapacity(CAPACITY);
+    link.setFreespeed(FREESPEED);
+    link.setLength(LENGTH);
+    link.setNumberOfLanes(NR_OF_LANES);
+    link.getAttributes().putAttribute(ATTRIBUTE_KEY, ATTRIBUTE_VALUE);
+    link.getAttributes().putAttribute(ATTRIBUTE_KEY2, ATTRIBUTE_VALUE2);
+  }
 
-	@Test
-	public void filterTest() {
-		NetworkFilterManager networkFilterManager = new NetworkFilterManager(filterNetwork, new NetworkConfigGroup());
-		networkFilterManager.addNodeFilter(new NetworkNodeFilter() {
-			@Override
-			public boolean judgeNode(Node n) {
-				if (n.getId().toString().equals("a"))
-					return true;
-				return false;
-			}
-		});
-		networkFilterManager.addLinkFilter(new NetworkLinkFilter() {
-			@Override
-			public boolean judgeLink(Link l) {
-				if (l.getId().toString().equals("ac"))
-					return false;
-				return true;
-			}
-		});
+  @Test
+  public void filterTest() {
+    NetworkFilterManager networkFilterManager =
+        new NetworkFilterManager(filterNetwork, new NetworkConfigGroup());
+    networkFilterManager.addNodeFilter(
+        new NetworkNodeFilter() {
+          @Override
+          public boolean judgeNode(Node n) {
+            if (n.getId().toString().equals("a")) return true;
+            return false;
+          }
+        });
+    networkFilterManager.addLinkFilter(
+        new NetworkLinkFilter() {
+          @Override
+          public boolean judgeLink(Link l) {
+            if (l.getId().toString().equals("ac")) return false;
+            return true;
+          }
+        });
 
-		Network filteredNetwork = networkFilterManager.applyFilters();
+    Network filteredNetwork = networkFilterManager.applyFilters();
 
-		Assert.assertEquals(2, filteredNetwork.getNodes().size());
-		Assert.assertTrue("must be added by nodefilter", filteredNetwork.getNodes().containsKey(Id.createNodeId("a")));
-		Assert.assertTrue("must be added for ab link", filteredNetwork.getNodes().containsKey(Id.createNodeId("b")));
+    Assert.assertEquals(2, filteredNetwork.getNodes().size());
+    Assert.assertTrue(
+        "must be added by nodefilter",
+        filteredNetwork.getNodes().containsKey(Id.createNodeId("a")));
+    Assert.assertTrue(
+        "must be added for ab link", filteredNetwork.getNodes().containsKey(Id.createNodeId("b")));
 
-		Assert.assertEquals(1, filteredNetwork.getLinks().size());
+    Assert.assertEquals(1, filteredNetwork.getLinks().size());
 
-		Link ab = filteredNetwork.getLinks().get(Id.createLinkId("ab"));
-		Assert.assertEquals(CAPACITY, ab.getCapacity(), DELTA);
-		Assert.assertEquals(FREESPEED, ab.getFreespeed(), DELTA);
-		Assert.assertEquals(LENGTH, ab.getLength(), DELTA);
-		Assert.assertEquals(NR_OF_LANES, ab.getNumberOfLanes(), DELTA);
-		Assert.assertEquals(ATTRIBUTE_VALUE, ab.getAttributes().getAttribute(ATTRIBUTE_KEY));
-		Assert.assertEquals(ATTRIBUTE_VALUE2, ab.getAttributes().getAttribute(ATTRIBUTE_KEY2));
-	}
-
+    Link ab = filteredNetwork.getLinks().get(Id.createLinkId("ab"));
+    Assert.assertEquals(CAPACITY, ab.getCapacity(), DELTA);
+    Assert.assertEquals(FREESPEED, ab.getFreespeed(), DELTA);
+    Assert.assertEquals(LENGTH, ab.getLength(), DELTA);
+    Assert.assertEquals(NR_OF_LANES, ab.getNumberOfLanes(), DELTA);
+    Assert.assertEquals(ATTRIBUTE_VALUE, ab.getAttributes().getAttribute(ATTRIBUTE_KEY));
+    Assert.assertEquals(ATTRIBUTE_VALUE2, ab.getAttributes().getAttribute(ATTRIBUTE_KEY2));
+  }
 }

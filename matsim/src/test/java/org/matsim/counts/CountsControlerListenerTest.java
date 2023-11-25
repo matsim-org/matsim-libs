@@ -19,13 +19,12 @@
 
 package org.matsim.counts;
 
+import com.google.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,397 +51,468 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Provider;
-
 /**
  * @author mrieser
  */
 public class CountsControlerListenerTest {
 
-	@Rule public MatsimTestUtils util = new MatsimTestUtils();
+  @Rule public MatsimTestUtils util = new MatsimTestUtils();
 
-	@Test
-	public void testUseVolumesOfIteration() {
-		Config config = ConfigUtils.createConfig();
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		CountsControlerListener ccl = new CountsControlerListener(config.global(), scenario.getNetwork(), config.controller(), config.counts(), null, null, null);
+  @Test
+  public void testUseVolumesOfIteration() {
+    Config config = ConfigUtils.createConfig();
+    Scenario scenario = ScenarioUtils.createScenario(config);
+    CountsControlerListener ccl =
+        new CountsControlerListener(
+            config.global(),
+            scenario.getNetwork(),
+            config.controller(),
+            config.counts(),
+            null,
+            null,
+            null);
 
-		// test defaults
-		Assert.assertEquals(10, config.counts().getWriteCountsInterval());
-		Assert.assertEquals(5, config.counts().getAverageCountsOverIterations());
+    // test defaults
+    Assert.assertEquals(10, config.counts().getWriteCountsInterval());
+    Assert.assertEquals(5, config.counts().getAverageCountsOverIterations());
 
-		// now the real tests
-		Assert.assertFalse(ccl.useVolumesOfIteration(0, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(1, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(2, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(3, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(4, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(5, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(6, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(7, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(8, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(9, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(10, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(11, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(12, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(13, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(14, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(15, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(16, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(17, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(18, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(19, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(20, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(21, 0));
+    // now the real tests
+    Assert.assertFalse(ccl.useVolumesOfIteration(0, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(1, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(2, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(3, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(4, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(5, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(6, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(7, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(8, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(9, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(10, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(11, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(12, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(13, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(14, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(15, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(16, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(17, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(18, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(19, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(20, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(21, 0));
 
-		// change some values
-		config.counts().setWriteCountsInterval(8);
-		config.counts().setAverageCountsOverIterations(2);
-		Assert.assertFalse(ccl.useVolumesOfIteration(0, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(1, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(2, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(3, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(4, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(5, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(6, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(7, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(8, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(9, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(10, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(11, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(12, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(13, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(14, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(15, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(16, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(17, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(18, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(19, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(20, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(21, 0));
+    // change some values
+    config.counts().setWriteCountsInterval(8);
+    config.counts().setAverageCountsOverIterations(2);
+    Assert.assertFalse(ccl.useVolumesOfIteration(0, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(1, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(2, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(3, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(4, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(5, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(6, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(7, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(8, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(9, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(10, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(11, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(12, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(13, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(14, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(15, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(16, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(17, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(18, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(19, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(20, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(21, 0));
 
-		// change some values: averaging = 1
-		config.counts().setWriteCountsInterval(5);
-		config.counts().setAverageCountsOverIterations(1);
-		Assert.assertTrue(ccl.useVolumesOfIteration(0, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(1, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(2, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(3, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(4, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(5, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(6, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(7, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(8, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(9, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(10, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(11, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(12, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(13, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(14, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(15, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(16, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(17, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(18, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(19, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(20, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(21, 0));
+    // change some values: averaging = 1
+    config.counts().setWriteCountsInterval(5);
+    config.counts().setAverageCountsOverIterations(1);
+    Assert.assertTrue(ccl.useVolumesOfIteration(0, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(1, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(2, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(3, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(4, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(5, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(6, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(7, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(8, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(9, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(10, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(11, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(12, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(13, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(14, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(15, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(16, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(17, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(18, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(19, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(20, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(21, 0));
 
-		// change some values: averaging = 0
-		config.counts().setWriteCountsInterval(5);
-		config.counts().setAverageCountsOverIterations(0);
-		Assert.assertTrue(ccl.useVolumesOfIteration(0, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(1, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(2, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(3, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(4, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(5, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(6, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(7, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(8, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(9, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(10, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(11, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(12, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(13, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(14, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(15, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(16, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(17, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(18, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(19, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(20, 0));
-		Assert.assertFalse(ccl.useVolumesOfIteration(21, 0));
+    // change some values: averaging = 0
+    config.counts().setWriteCountsInterval(5);
+    config.counts().setAverageCountsOverIterations(0);
+    Assert.assertTrue(ccl.useVolumesOfIteration(0, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(1, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(2, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(3, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(4, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(5, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(6, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(7, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(8, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(9, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(10, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(11, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(12, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(13, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(14, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(15, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(16, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(17, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(18, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(19, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(20, 0));
+    Assert.assertFalse(ccl.useVolumesOfIteration(21, 0));
 
-		// change some values: interval equal averaging
-		config.counts().setWriteCountsInterval(5);
-		config.counts().setAverageCountsOverIterations(5);
-		Assert.assertFalse(ccl.useVolumesOfIteration(0, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(1, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(2, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(3, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(4, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(5, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(6, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(7, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(8, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(9, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(10, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(11, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(12, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(13, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(14, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(15, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(16, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(17, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(18, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(19, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(20, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(21, 0));
+    // change some values: interval equal averaging
+    config.counts().setWriteCountsInterval(5);
+    config.counts().setAverageCountsOverIterations(5);
+    Assert.assertFalse(ccl.useVolumesOfIteration(0, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(1, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(2, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(3, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(4, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(5, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(6, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(7, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(8, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(9, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(10, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(11, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(12, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(13, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(14, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(15, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(16, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(17, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(18, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(19, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(20, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(21, 0));
 
-		// change some values: averaging > interval
-		config.counts().setWriteCountsInterval(5);
-		config.counts().setAverageCountsOverIterations(6);
-		Assert.assertFalse(ccl.useVolumesOfIteration(0, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(1, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(2, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(3, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(4, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(5, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(6, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(7, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(8, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(9, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(10, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(11, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(12, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(13, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(14, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(15, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(16, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(17, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(18, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(19, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(20, 0));
-		Assert.assertTrue(ccl.useVolumesOfIteration(21, 0));
+    // change some values: averaging > interval
+    config.counts().setWriteCountsInterval(5);
+    config.counts().setAverageCountsOverIterations(6);
+    Assert.assertFalse(ccl.useVolumesOfIteration(0, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(1, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(2, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(3, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(4, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(5, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(6, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(7, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(8, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(9, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(10, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(11, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(12, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(13, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(14, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(15, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(16, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(17, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(18, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(19, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(20, 0));
+    Assert.assertTrue(ccl.useVolumesOfIteration(21, 0));
 
-		// change some values: different firstIteration
-		config.counts().setWriteCountsInterval(5);
-		config.counts().setAverageCountsOverIterations(3);
-		Assert.assertFalse(ccl.useVolumesOfIteration(4, 4));
-		Assert.assertFalse(ccl.useVolumesOfIteration(5, 4));
-		Assert.assertFalse(ccl.useVolumesOfIteration(6, 4));
-		Assert.assertFalse(ccl.useVolumesOfIteration(7, 4));
-		Assert.assertTrue(ccl.useVolumesOfIteration(8, 4));
-		Assert.assertTrue(ccl.useVolumesOfIteration(9, 4));
-		Assert.assertTrue(ccl.useVolumesOfIteration(10, 4));
-		Assert.assertFalse(ccl.useVolumesOfIteration(11, 4));
-		Assert.assertFalse(ccl.useVolumesOfIteration(12, 4));
-		Assert.assertTrue(ccl.useVolumesOfIteration(13, 4));
-		Assert.assertTrue(ccl.useVolumesOfIteration(14, 4));
-		Assert.assertTrue(ccl.useVolumesOfIteration(15, 4));
-		Assert.assertFalse(ccl.useVolumesOfIteration(16, 4));
-		Assert.assertFalse(ccl.useVolumesOfIteration(17, 4));
-		Assert.assertTrue(ccl.useVolumesOfIteration(18, 4));
-		Assert.assertTrue(ccl.useVolumesOfIteration(19, 4));
-		Assert.assertTrue(ccl.useVolumesOfIteration(20, 4));
-		Assert.assertFalse(ccl.useVolumesOfIteration(21, 4));
-	}
+    // change some values: different firstIteration
+    config.counts().setWriteCountsInterval(5);
+    config.counts().setAverageCountsOverIterations(3);
+    Assert.assertFalse(ccl.useVolumesOfIteration(4, 4));
+    Assert.assertFalse(ccl.useVolumesOfIteration(5, 4));
+    Assert.assertFalse(ccl.useVolumesOfIteration(6, 4));
+    Assert.assertFalse(ccl.useVolumesOfIteration(7, 4));
+    Assert.assertTrue(ccl.useVolumesOfIteration(8, 4));
+    Assert.assertTrue(ccl.useVolumesOfIteration(9, 4));
+    Assert.assertTrue(ccl.useVolumesOfIteration(10, 4));
+    Assert.assertFalse(ccl.useVolumesOfIteration(11, 4));
+    Assert.assertFalse(ccl.useVolumesOfIteration(12, 4));
+    Assert.assertTrue(ccl.useVolumesOfIteration(13, 4));
+    Assert.assertTrue(ccl.useVolumesOfIteration(14, 4));
+    Assert.assertTrue(ccl.useVolumesOfIteration(15, 4));
+    Assert.assertFalse(ccl.useVolumesOfIteration(16, 4));
+    Assert.assertFalse(ccl.useVolumesOfIteration(17, 4));
+    Assert.assertTrue(ccl.useVolumesOfIteration(18, 4));
+    Assert.assertTrue(ccl.useVolumesOfIteration(19, 4));
+    Assert.assertTrue(ccl.useVolumesOfIteration(20, 4));
+    Assert.assertFalse(ccl.useVolumesOfIteration(21, 4));
+  }
 
-	@Test
-	public void test_writeCountsInterval() {
-		Config config = this.util.createConfig(ExamplesUtils.getTestScenarioURL("triangle"));
-		CountsConfigGroup cConfig = config.counts();
+  @Test
+  public void test_writeCountsInterval() {
+    Config config = this.util.createConfig(ExamplesUtils.getTestScenarioURL("triangle"));
+    CountsConfigGroup cConfig = config.counts();
 
-		cConfig.setWriteCountsInterval(3);
-		cConfig.setAverageCountsOverIterations(1);
-		cConfig.setOutputFormat("txt");
-		cConfig.setInputFile("counts.xml"); // just any file to activate the counts feature
+    cConfig.setWriteCountsInterval(3);
+    cConfig.setAverageCountsOverIterations(1);
+    cConfig.setOutputFormat("txt");
+    cConfig.setInputFile("counts.xml"); // just any file to activate the counts feature
 
-		final Controler controler = new Controler(ScenarioUtils.createScenario(config));
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(Mobsim.class).toProvider(DummyMobsimFactory.class);
-			}
-		});
-		config.controller().setFirstIteration(0);
-		config.controller().setLastIteration(7);
+    final Controler controler = new Controler(ScenarioUtils.createScenario(config));
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            bind(Mobsim.class).toProvider(DummyMobsimFactory.class);
+          }
+        });
+    config.controller().setFirstIteration(0);
+    config.controller().setLastIteration(7);
 
-        controler.getConfig().controller().setCreateGraphs(false);
-		controler.getConfig().controller().setDumpDataAtEnd(false);
-		controler.getConfig().controller().setWriteEventsInterval(0);
-		config.controller().setWritePlansInterval(0);
-		controler.run();
+    controler.getConfig().controller().setCreateGraphs(false);
+    controler.getConfig().controller().setDumpDataAtEnd(false);
+    controler.getConfig().controller().setWriteEventsInterval(0);
+    config.controller().setWritePlansInterval(0);
+    controler.run();
 
-		Assert.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.0/0.countscompare.txt").exists());
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.1/1.countscompare.txt").exists());
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.2/2.countscompare.txt").exists());
-		Assert.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompare.txt").exists());
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.4/4.countscompare.txt").exists());
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.5/5.countscompare.txt").exists());
-		Assert.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.6/6.countscompare.txt").exists());
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.7/7.countscompare.txt").exists());
-	}
+    Assert.assertTrue(
+        new File(config.controller().getOutputDirectory() + "ITERS/it.0/0.countscompare.txt")
+            .exists());
+    Assert.assertFalse(
+        new File(config.controller().getOutputDirectory() + "ITERS/it.1/1.countscompare.txt")
+            .exists());
+    Assert.assertFalse(
+        new File(config.controller().getOutputDirectory() + "ITERS/it.2/2.countscompare.txt")
+            .exists());
+    Assert.assertTrue(
+        new File(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompare.txt")
+            .exists());
+    Assert.assertFalse(
+        new File(config.controller().getOutputDirectory() + "ITERS/it.4/4.countscompare.txt")
+            .exists());
+    Assert.assertFalse(
+        new File(config.controller().getOutputDirectory() + "ITERS/it.5/5.countscompare.txt")
+            .exists());
+    Assert.assertTrue(
+        new File(config.controller().getOutputDirectory() + "ITERS/it.6/6.countscompare.txt")
+            .exists());
+    Assert.assertFalse(
+        new File(config.controller().getOutputDirectory() + "ITERS/it.7/7.countscompare.txt")
+            .exists());
+  }
 
-	@Test
-	public void testReset_CorrectlyExecuted() throws IOException {
-		Config config = this.util.createConfig(ExamplesUtils.getTestScenarioURL("triangle"));
-		config.network().setInputFile("network.xml");	// network file which is used by the counts file
+  @Test
+  public void testReset_CorrectlyExecuted() throws IOException {
+    Config config = this.util.createConfig(ExamplesUtils.getTestScenarioURL("triangle"));
+    config.network().setInputFile("network.xml"); // network file which is used by the counts file
 
-		CountsConfigGroup cConfig = config.counts();
+    CountsConfigGroup cConfig = config.counts();
 
-		cConfig.setWriteCountsInterval(3);
-		cConfig.setAverageCountsOverIterations(2);
-		cConfig.setOutputFormat("txt");
-		cConfig.setInputFile("counts.xml"); // just any file to activate the counts feature
+    cConfig.setWriteCountsInterval(3);
+    cConfig.setAverageCountsOverIterations(2);
+    cConfig.setOutputFormat("txt");
+    cConfig.setInputFile("counts.xml"); // just any file to activate the counts feature
 
-		final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(Mobsim.class).toProvider(DummyMobsimFactory.class);
-			}
-		});
-		config.controller().setFirstIteration(0);
-		config.controller().setLastIteration(7);
+    final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            bind(Mobsim.class).toProvider(DummyMobsimFactory.class);
+          }
+        });
+    config.controller().setFirstIteration(0);
+    config.controller().setLastIteration(7);
 
-        controler.getConfig().controller().setCreateGraphs(false);
-		controler.getConfig().controller().setDumpDataAtEnd(false);
-		controler.getConfig().controller().setWriteEventsInterval(0);
-		config.controller().setWritePlansInterval(0);
-		controler.run();
+    controler.getConfig().controller().setCreateGraphs(false);
+    controler.getConfig().controller().setDumpDataAtEnd(false);
+    controler.getConfig().controller().setWriteEventsInterval(0);
+    config.controller().setWritePlansInterval(0);
+    controler.run();
 
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.0/0.countscompareAWTV.txt").exists());
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.1/1.countscompareAWTV.txt").exists());
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.2/2.countscompareAWTV.txt").exists());
-		Assert.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt").exists());
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.4/4.countscompareAWTV.txt").exists());
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.5/5.countscompareAWTV.txt").exists());
-		Assert.assertTrue(new File(config.controller().getOutputDirectory() + "ITERS/it.6/6.countscompareAWTV.txt").exists());
-		Assert.assertFalse(new File(config.controller().getOutputDirectory() + "ITERS/it.7/7.countscompareAWTV.txt").exists());
+    Assert.assertFalse(
+        new File(config.controller().getOutputDirectory() + "ITERS/it.0/0.countscompareAWTV.txt")
+            .exists());
+    Assert.assertFalse(
+        new File(config.controller().getOutputDirectory() + "ITERS/it.1/1.countscompareAWTV.txt")
+            .exists());
+    Assert.assertFalse(
+        new File(config.controller().getOutputDirectory() + "ITERS/it.2/2.countscompareAWTV.txt")
+            .exists());
+    Assert.assertTrue(
+        new File(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt")
+            .exists());
+    Assert.assertFalse(
+        new File(config.controller().getOutputDirectory() + "ITERS/it.4/4.countscompareAWTV.txt")
+            .exists());
+    Assert.assertFalse(
+        new File(config.controller().getOutputDirectory() + "ITERS/it.5/5.countscompareAWTV.txt")
+            .exists());
+    Assert.assertTrue(
+        new File(config.controller().getOutputDirectory() + "ITERS/it.6/6.countscompareAWTV.txt")
+            .exists());
+    Assert.assertFalse(
+        new File(config.controller().getOutputDirectory() + "ITERS/it.7/7.countscompareAWTV.txt")
+            .exists());
 
-		Assert.assertEquals(3.5, getVolume(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
-		Assert.assertEquals(6.5, getVolume(config.controller().getOutputDirectory() + "ITERS/it.6/6.countscompareAWTV.txt"), 1e-8);
-	}
+    Assert.assertEquals(
+        3.5,
+        getVolume(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"),
+        1e-8);
+    Assert.assertEquals(
+        6.5,
+        getVolume(config.controller().getOutputDirectory() + "ITERS/it.6/6.countscompareAWTV.txt"),
+        1e-8);
+  }
 
-	@Test
-	public void testFilterAnalyzedModes() throws IOException {
-		Config config = util.createConfig(ExamplesUtils.getTestScenarioURL("triangle"));
-		config.network().setInputFile("network.xml");	// network file which is used by the counts file
+  @Test
+  public void testFilterAnalyzedModes() throws IOException {
+    Config config = util.createConfig(ExamplesUtils.getTestScenarioURL("triangle"));
+    config.network().setInputFile("network.xml"); // network file which is used by the counts file
 
-		CountsConfigGroup cConfig = config.counts();
+    CountsConfigGroup cConfig = config.counts();
 
-		cConfig.setWriteCountsInterval(3);
-		cConfig.setAverageCountsOverIterations(2);
-		cConfig.setOutputFormat("txt");
-		cConfig.setInputFile("counts.xml"); // just any file to activate the counts feature
+    cConfig.setWriteCountsInterval(3);
+    cConfig.setAverageCountsOverIterations(2);
+    cConfig.setOutputFormat("txt");
+    cConfig.setInputFile("counts.xml"); // just any file to activate the counts feature
 
-		config.controller().setMobsim("dummy");
-		config.controller().setFirstIteration(0);
-		config.controller().setLastIteration(3);
+    config.controller().setMobsim("dummy");
+    config.controller().setFirstIteration(0);
+    config.controller().setLastIteration(3);
 
-		createAndRunControler(config);
-		Assert.assertEquals(150, getVolume(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
+    createAndRunControler(config);
+    Assert.assertEquals(
+        150,
+        getVolume(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"),
+        1e-8);
 
-		// enable modes filtering and count only car
-		cConfig.setAnalyzedModes(TransportMode.car);
-		cConfig.setFilterModes(true);
-		createAndRunControler(config);
-		Assert.assertEquals(100, getVolume(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
+    // enable modes filtering and count only car
+    cConfig.setAnalyzedModes(TransportMode.car);
+    cConfig.setFilterModes(true);
+    createAndRunControler(config);
+    Assert.assertEquals(
+        100,
+        getVolume(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"),
+        1e-8);
 
-		// enable modes filtering and count only walk
-		cConfig.setAnalyzedModes(TransportMode.walk);
-		cConfig.setFilterModes(true);
-		createAndRunControler(config);
-		Assert.assertEquals(50, getVolume(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
+    // enable modes filtering and count only walk
+    cConfig.setAnalyzedModes(TransportMode.walk);
+    cConfig.setFilterModes(true);
+    createAndRunControler(config);
+    Assert.assertEquals(
+        50,
+        getVolume(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"),
+        1e-8);
 
-		// enable modes filtering and count only bike
-		cConfig.setAnalyzedModes(TransportMode.bike);
-		cConfig.setFilterModes(true);
-		createAndRunControler(config);
-		Assert.assertEquals(0, getVolume(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
+    // enable modes filtering and count only bike
+    cConfig.setAnalyzedModes(TransportMode.bike);
+    cConfig.setFilterModes(true);
+    createAndRunControler(config);
+    Assert.assertEquals(
+        0,
+        getVolume(config.controller().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"),
+        1e-8);
+  }
 
+  private void createAndRunControler(Config config) {
+    final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            bind(Mobsim.class).to(DummyMobsim2.class);
+            // use single threaded manager because the dummy mobsim doesn't correctly calls
+            // EventsManager interface which may fail for parallel implementations
+            bind(EventsManager.class).to(EventsManagerImpl.class).in(Singleton.class);
+          }
+        });
+    controler.getConfig().controller().setCreateGraphs(false);
+    controler.getConfig().controller().setDumpDataAtEnd(false);
+    controler
+        .getConfig()
+        .controller()
+        .setOverwriteFileSetting(
+            OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+    controler.getConfig().controller().setWriteEventsInterval(0);
+    config.controller().setWritePlansInterval(0);
+    controler.run();
+  }
 
-	}
+  private double getVolume(final String filename) throws IOException {
+    BufferedReader reader = IOUtils.getBufferedReader(filename);
+    reader.readLine(); // header
+    String line = reader.readLine(); // link 100
+    if (line == null) {
+      return Double.NaN; // should never happen...
+    }
+    String[] parts =
+        line.split(
+            "\t"); // [0] = linkId, [1] = Count Station Id, [2] = matsim volume, [3] = real volume,
+    // [4] = normalized relative error
+    return Double.parseDouble(parts[2]);
+  }
 
-	private void createAndRunControler(Config config) {
-		final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(Mobsim.class).to(DummyMobsim2.class);
-				// use single threaded manager because the dummy mobsim doesn't correctly calls EventsManager interface which may fail for parallel implementations
-				bind(EventsManager.class).to(EventsManagerImpl.class).in(Singleton.class);
-			}
-		});
-		controler.getConfig().controller().setCreateGraphs(false);
-		controler.getConfig().controller().setDumpDataAtEnd(false);
-		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.getConfig().controller().setWriteEventsInterval(0);
-		config.controller().setWritePlansInterval(0);
-		controler.run();
-	}
+  private static class DummyMobsim implements Mobsim {
+    private final EventsManager eventsManager;
+    private final int nOfEvents;
 
-	private double getVolume(final String filename) throws IOException {
-		BufferedReader reader = IOUtils.getBufferedReader(filename);
-		reader.readLine(); // header
-		String line = reader.readLine(); // link 100
-		if (line == null) {
-			return Double.NaN; // should never happen...
-		}
-		String[] parts = line.split("\t");// [0] = linkId, [1] = Count Station Id, [2] = matsim volume, [3] = real volume, [4] = normalized relative error
-		return Double.parseDouble(parts[2]);
-	}
+    public DummyMobsim(EventsManager eventsManager, final int nOfEvents) {
+      this.eventsManager = eventsManager;
+      this.nOfEvents = nOfEvents;
+    }
 
-	private static class DummyMobsim implements Mobsim {
-		private final EventsManager eventsManager;
-		private final int nOfEvents;
-		public DummyMobsim(EventsManager eventsManager, final int nOfEvents) {
-			this.eventsManager = eventsManager;
-			this.nOfEvents = nOfEvents;
-		}
+    @Override
+    public void run() {
+      Id<Link> linkId = Id.create("100", Link.class);
+      for (int i = 0; i < this.nOfEvents; i++) {
+        this.eventsManager.processEvent(
+            new LinkLeaveEvent(60.0, Id.create(i, Vehicle.class), linkId));
+      }
+    }
+  }
 
-		@Override
-		public void run() {
-			Id<Link> linkId = Id.create("100", Link.class);
-			for (int i = 0; i < this.nOfEvents; i++) {
-				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, Id.create(i, Vehicle.class), linkId));
-			}
-		}
-	}
+  @Singleton
+  private static class DummyMobsimFactory implements Provider<Mobsim> {
+    private int count = 1;
+    @Inject EventsManager eventsManager;
 
-	@Singleton
-	private static class DummyMobsimFactory implements Provider<Mobsim> {
-		private int count = 1;
-		@Inject EventsManager eventsManager;
+    @Override
+    public Mobsim get() {
+      return new DummyMobsim(eventsManager, count++);
+    }
+  }
 
-		@Override
-		public Mobsim get() {
-			return new DummyMobsim(eventsManager, count++);
-		}
-	}
+  private static class DummyMobsim2 implements Mobsim {
+    @Inject EventsManager eventsManager;
 
-	private static class DummyMobsim2 implements Mobsim {
-		@Inject EventsManager eventsManager;
-
-		@Override
-		public void run() {
-			Id<Link> linkId = Id.create("100", Link.class);
-			for (int i = 0; i < 100; i++) {
-				Id<Person> agentId = Id.create(i, Person.class);
-				Id<Vehicle> vehId = Id.create(i, Vehicle.class);
-				this.eventsManager.processEvent(new PersonDepartureEvent(60.0, agentId, linkId, TransportMode.car, TransportMode.car));
-				this.eventsManager.processEvent(new VehicleEntersTrafficEvent(60.0, agentId, linkId, vehId, TransportMode.car, 1.0));
-				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, vehId, linkId));
-			}
-			for (int i = 100; i < 150; i++) {
-				Id<Person> agentId = Id.create(i, Person.class);
-				Id<Vehicle> vehId = Id.create(i, Vehicle.class);
-				this.eventsManager.processEvent(new PersonDepartureEvent(60.0, agentId, linkId, TransportMode.walk, TransportMode.walk));
-				this.eventsManager.processEvent(new VehicleEntersTrafficEvent(60.0, agentId, linkId, vehId, TransportMode.walk, 1.0));
-				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, vehId, linkId));
-			}
-		}
-	}
-
+    @Override
+    public void run() {
+      Id<Link> linkId = Id.create("100", Link.class);
+      for (int i = 0; i < 100; i++) {
+        Id<Person> agentId = Id.create(i, Person.class);
+        Id<Vehicle> vehId = Id.create(i, Vehicle.class);
+        this.eventsManager.processEvent(
+            new PersonDepartureEvent(60.0, agentId, linkId, TransportMode.car, TransportMode.car));
+        this.eventsManager.processEvent(
+            new VehicleEntersTrafficEvent(60.0, agentId, linkId, vehId, TransportMode.car, 1.0));
+        this.eventsManager.processEvent(new LinkLeaveEvent(60.0, vehId, linkId));
+      }
+      for (int i = 100; i < 150; i++) {
+        Id<Person> agentId = Id.create(i, Person.class);
+        Id<Vehicle> vehId = Id.create(i, Vehicle.class);
+        this.eventsManager.processEvent(
+            new PersonDepartureEvent(
+                60.0, agentId, linkId, TransportMode.walk, TransportMode.walk));
+        this.eventsManager.processEvent(
+            new VehicleEntersTrafficEvent(60.0, agentId, linkId, vehId, TransportMode.walk, 1.0));
+        this.eventsManager.processEvent(new LinkLeaveEvent(60.0, vehId, linkId));
+      }
+    }
+  }
 }

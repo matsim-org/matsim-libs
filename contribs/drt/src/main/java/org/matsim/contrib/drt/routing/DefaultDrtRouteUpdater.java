@@ -17,13 +17,13 @@
  * *********************************************************************** */
 package org.matsim.contrib.drt.routing;
 
+import com.google.common.util.concurrent.Futures;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -41,57 +41,70 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-import com.google.common.util.concurrent.Futures;
-
 /**
  * @author michalm (Michal Maciejewski)
  */
 public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater {
-	private final DrtConfigGroup drtCfg;
-	private final Network network;
-	private final Population population;
-	private final ExecutorServiceWithResource<? extends RouteCreator> executorService;
+  private final DrtConfigGroup drtCfg;
+  private final Network network;
+  private final Population population;
+  private final ExecutorServiceWithResource<? extends RouteCreator> executorService;
 
-	public DefaultDrtRouteUpdater(DrtConfigGroup drtCfg, Network network, Population population, Config config,
-			Supplier<RouteCreator> drtRouteCreatorSupplier) {
-		this.drtCfg = drtCfg;
-		this.network = network;
-		this.population = population;
+  public DefaultDrtRouteUpdater(
+      DrtConfigGroup drtCfg,
+      Network network,
+      Population population,
+      Config config,
+      Supplier<RouteCreator> drtRouteCreatorSupplier) {
+    this.drtCfg = drtCfg;
+    this.network = network;
+    this.population = population;
 
-		// XXX uses the global.numberOfThreads, not drt.numberOfThreads, as this is executed in the replanning phase
-		executorService = new ExecutorServiceWithResource<>(IntStream.range(0, config.global().getNumberOfThreads())
-				.mapToObj(i -> drtRouteCreatorSupplier.get())
-				.collect(Collectors.toList()));
-	}
+    // XXX uses the global.numberOfThreads, not drt.numberOfThreads, as this is executed in the
+    // replanning phase
+    executorService =
+        new ExecutorServiceWithResource<>(
+            IntStream.range(0, config.global().getNumberOfThreads())
+                .mapToObj(i -> drtRouteCreatorSupplier.get())
+                .collect(Collectors.toList()));
+  }
 
-	@Override
-	public void notifyReplanning(ReplanningEvent event) {
-		List<Future<?>> futures = new LinkedList<>();
+  @Override
+  public void notifyReplanning(ReplanningEvent event) {
+    List<Future<?>> futures = new LinkedList<>();
 
-		for (Person person : population.getPersons().values()) {
-			for (Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan())) {
-				for (Leg leg : trip.getLegsOnly()) {
-					if (leg.getMode().equals(drtCfg.getMode())) {
-						futures.add(executorService.submitRunnable(
-								router -> updateDrtRoute(router, person, trip.getTripAttributes(), leg)));
-					}
-				}
-			}
-		}
+    for (Person person : population.getPersons().values()) {
+      for (Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan())) {
+        for (Leg leg : trip.getLegsOnly()) {
+          if (leg.getMode().equals(drtCfg.getMode())) {
+            futures.add(
+                executorService.submitRunnable(
+                    router -> updateDrtRoute(router, person, trip.getTripAttributes(), leg)));
+          }
+        }
+      }
+    }
 
-		futures.forEach(Futures::getUnchecked);
-	}
+    futures.forEach(Futures::getUnchecked);
+  }
 
-	private void updateDrtRoute(RouteCreator drtRouteCreator, Person person, Attributes tripAttributes, Leg drtLeg) {
-		Link fromLink = network.getLinks().get(drtLeg.getRoute().getStartLinkId());
-		Link toLink = network.getLinks().get(drtLeg.getRoute().getEndLinkId());
-		RouteFactories routeFactories = population.getFactory().getRouteFactories();
-		drtLeg.setRoute(drtRouteCreator.createRoute(drtLeg.getDepartureTime().seconds(), fromLink, toLink, person,
-				tripAttributes, routeFactories));
-	}
+  private void updateDrtRoute(
+      RouteCreator drtRouteCreator, Person person, Attributes tripAttributes, Leg drtLeg) {
+    Link fromLink = network.getLinks().get(drtLeg.getRoute().getStartLinkId());
+    Link toLink = network.getLinks().get(drtLeg.getRoute().getEndLinkId());
+    RouteFactories routeFactories = population.getFactory().getRouteFactories();
+    drtLeg.setRoute(
+        drtRouteCreator.createRoute(
+            drtLeg.getDepartureTime().seconds(),
+            fromLink,
+            toLink,
+            person,
+            tripAttributes,
+            routeFactories));
+  }
 
-	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-		executorService.shutdown();
-	}
+  @Override
+  public void notifyShutdown(ShutdownEvent event) {
+    executorService.shutdown();
+  }
 }

@@ -23,23 +23,24 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimFactory;
 
-
 /**
  * Builder for the content of BasicLaneDefinitions
+ *
  * @author dgrether
  */
 public interface LanesFactory extends MatsimFactory {
 
-	/**
-	 * 
-	 * @param linkIdReference id of the links the lanes of the created object belong to
-	 * @return An empty instance of LanesToLinkAssignment for the Link with the Id given as parameter
-	 */
-	LanesToLinkAssignment createLanesToLinkAssignment(Id<Link> linkIdReference);
-	/**
-	 * Creates an instance of BasicLane with the id given as parameter.
-	 * @param laneId
-	 * @return
-	 */
-	Lane createLane(Id<Lane> laneId);
+  /**
+   * @param linkIdReference id of the links the lanes of the created object belong to
+   * @return An empty instance of LanesToLinkAssignment for the Link with the Id given as parameter
+   */
+  LanesToLinkAssignment createLanesToLinkAssignment(Id<Link> linkIdReference);
+
+  /**
+   * Creates an instance of BasicLane with the id given as parameter.
+   *
+   * @param laneId
+   * @return
+   */
+  Lane createLane(Id<Lane> laneId);
 }

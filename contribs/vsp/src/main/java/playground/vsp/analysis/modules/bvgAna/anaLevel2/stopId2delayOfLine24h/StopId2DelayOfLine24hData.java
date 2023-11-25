@@ -19,47 +19,59 @@
 
 package playground.vsp.analysis.modules.bvgAna.anaLevel2.stopId2delayOfLine24h;
 
-import java.util.TreeMap;
 import java.util.Map.Entry;
-
+import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
 /**
  * Simple data container to sum up the delay of each line
- * 
- * @author aneumann
  *
+ * @author aneumann
  */
 public class StopId2DelayOfLine24hData {
-	
-	private final Id stopId;
-	
-	private TreeMap<Id, Tuple<Integer, Double>> lineId2Delay24h = new TreeMap<Id, Tuple<Integer, Double>>();
-//	private TreeMap<Id, LinkedList<Tuple<Double, Double>>> routeId2TimeDelayMap = new TreeMap<Id, LinkedList<Tuple<Double,Double>>>();
-//	private TreeMap<Id, LinkedList<Tuple<Double, Double>>> vehId2TimeDelayMap = new TreeMap<Id, LinkedList<Tuple<Double,Double>>>();
-	
-	public StopId2DelayOfLine24hData(Id stopId){
-		this.stopId = stopId;
-	}
 
-	public void addDelayForLine(Id lineId, double delay) {
-		if(this.lineId2Delay24h.get(lineId) == null){
-			this.lineId2Delay24h.put(lineId, new Tuple<Integer, Double>(new Integer(0), new Double(0.0)));
-		}
-		Tuple<Integer, Double> oldTuple = this.lineId2Delay24h.get(lineId);
-		Tuple<Integer, Double> newTuple = new Tuple<Integer, Double>(new Integer(oldTuple.getFirst().intValue() + 1), new Double(oldTuple.getSecond().doubleValue() + delay));
-		this.lineId2Delay24h.put(lineId, newTuple);
-	}
-	
-	@Override
-	public String toString() {
-		StringBuffer strB = new StringBuffer();
-		strB.append("Average delay per line for stop " + this.stopId + ": ");
-		for (Entry<Id, Tuple<Integer, Double>> entry : this.lineId2Delay24h.entrySet()) {
-			strB.append("Line " + entry.getKey() + " with " + entry.getValue().getFirst().intValue() + " departures has an average delay of " + entry.getValue().getSecond().doubleValue() / entry.getValue().getFirst().doubleValue() + "s");
-		}
-		return strB.toString();
-	}
+  private final Id stopId;
 
+  private TreeMap<Id, Tuple<Integer, Double>> lineId2Delay24h =
+      new TreeMap<Id, Tuple<Integer, Double>>();
+
+  //	private TreeMap<Id, LinkedList<Tuple<Double, Double>>> routeId2TimeDelayMap = new TreeMap<Id,
+  // LinkedList<Tuple<Double,Double>>>();
+  //	private TreeMap<Id, LinkedList<Tuple<Double, Double>>> vehId2TimeDelayMap = new TreeMap<Id,
+  // LinkedList<Tuple<Double,Double>>>();
+
+  public StopId2DelayOfLine24hData(Id stopId) {
+    this.stopId = stopId;
+  }
+
+  public void addDelayForLine(Id lineId, double delay) {
+    if (this.lineId2Delay24h.get(lineId) == null) {
+      this.lineId2Delay24h.put(lineId, new Tuple<Integer, Double>(new Integer(0), new Double(0.0)));
+    }
+    Tuple<Integer, Double> oldTuple = this.lineId2Delay24h.get(lineId);
+    Tuple<Integer, Double> newTuple =
+        new Tuple<Integer, Double>(
+            new Integer(oldTuple.getFirst().intValue() + 1),
+            new Double(oldTuple.getSecond().doubleValue() + delay));
+    this.lineId2Delay24h.put(lineId, newTuple);
+  }
+
+  @Override
+  public String toString() {
+    StringBuffer strB = new StringBuffer();
+    strB.append("Average delay per line for stop " + this.stopId + ": ");
+    for (Entry<Id, Tuple<Integer, Double>> entry : this.lineId2Delay24h.entrySet()) {
+      strB.append(
+          "Line "
+              + entry.getKey()
+              + " with "
+              + entry.getValue().getFirst().intValue()
+              + " departures has an average delay of "
+              + entry.getValue().getSecond().doubleValue()
+                  / entry.getValue().getFirst().doubleValue()
+              + "s");
+    }
+    return strB.toString();
+  }
 }

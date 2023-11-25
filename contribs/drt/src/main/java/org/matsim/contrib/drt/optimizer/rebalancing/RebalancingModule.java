@@ -35,33 +35,38 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
  */
 public class RebalancingModule extends AbstractDvrpModeModule {
 
-	private final DrtConfigGroup drtCfg;
+  private final DrtConfigGroup drtCfg;
 
-	public RebalancingModule(DrtConfigGroup drtCfg) {
-		super(drtCfg.getMode());
-		this.drtCfg = drtCfg;
-	}
+  public RebalancingModule(DrtConfigGroup drtCfg) {
+    super(drtCfg.getMode());
+    this.drtCfg = drtCfg;
+  }
 
-	@Override
-	public void install() {
-		if (drtCfg.getRebalancingParams().isPresent()) {
-			RebalancingParams rebalancingParams = drtCfg.getRebalancingParams().get();
-			install(new DrtModeZonalSystemModule(drtCfg));
+  @Override
+  public void install() {
+    if (drtCfg.getRebalancingParams().isPresent()) {
+      RebalancingParams rebalancingParams = drtCfg.getRebalancingParams().get();
+      install(new DrtModeZonalSystemModule(drtCfg));
 
-			if (rebalancingParams.getRebalancingStrategyParams() instanceof MinCostFlowRebalancingStrategyParams) {
-				install(new DrtModeMinCostFlowRebalancingModule(drtCfg));
-			} else if (rebalancingParams.getRebalancingStrategyParams() instanceof PlusOneRebalancingStrategyParams) {
-				install(new DrtModePlusOneRebalanceModule(drtCfg));
-			} else if (rebalancingParams.getRebalancingStrategyParams() instanceof FeedforwardRebalancingStrategyParams) {
-				install(new DrtModeFeedforwardRebalanceModule(drtCfg));
-			} else if (rebalancingParams.getRebalancingStrategyParams() instanceof CustomRebalancingStrategyParams) {
-				// User is responsible for installing custom module
-			} else {
-				throw new RuntimeException(
-						"Unsupported rebalancingStrategyParams: " + rebalancingParams.getRebalancingStrategyParams());
-			}
-		} else {
-			bindModal(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();
-		}
-	}
+      if (rebalancingParams.getRebalancingStrategyParams()
+          instanceof MinCostFlowRebalancingStrategyParams) {
+        install(new DrtModeMinCostFlowRebalancingModule(drtCfg));
+      } else if (rebalancingParams.getRebalancingStrategyParams()
+          instanceof PlusOneRebalancingStrategyParams) {
+        install(new DrtModePlusOneRebalanceModule(drtCfg));
+      } else if (rebalancingParams.getRebalancingStrategyParams()
+          instanceof FeedforwardRebalancingStrategyParams) {
+        install(new DrtModeFeedforwardRebalanceModule(drtCfg));
+      } else if (rebalancingParams.getRebalancingStrategyParams()
+          instanceof CustomRebalancingStrategyParams) {
+        // User is responsible for installing custom module
+      } else {
+        throw new RuntimeException(
+            "Unsupported rebalancingStrategyParams: "
+                + rebalancingParams.getRebalancingStrategyParams());
+      }
+    } else {
+      bindModal(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();
+    }
+  }
 }

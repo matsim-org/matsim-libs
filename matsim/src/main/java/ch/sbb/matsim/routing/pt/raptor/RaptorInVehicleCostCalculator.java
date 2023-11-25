@@ -27,14 +27,23 @@ import org.matsim.vehicles.Vehicle;
  */
 public interface RaptorInVehicleCostCalculator {
 
-	double getInVehicleCost(double inVehicleTime, double marginalUtility_utl_s, Person person, Vehicle vehicle, RaptorParameters paramters, RouteSegmentIterator iterator);
+  double getInVehicleCost(
+      double inVehicleTime,
+      double marginalUtility_utl_s,
+      Person person,
+      Vehicle vehicle,
+      RaptorParameters paramters,
+      RouteSegmentIterator iterator);
 
-	interface RouteSegmentIterator {
-		boolean hasNext();
-		void next();
-		double getInVehicleTime();
-		double getPassengerCount();
-		double getTimeOfDay();
-	}
+  interface RouteSegmentIterator {
+    boolean hasNext();
 
+    void next();
+
+    double getInVehicleTime();
+
+    double getPassengerCount();
+
+    double getTimeOfDay();
+  }
 }

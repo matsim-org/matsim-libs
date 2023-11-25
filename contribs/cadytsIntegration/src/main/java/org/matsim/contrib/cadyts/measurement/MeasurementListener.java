@@ -20,12 +20,14 @@
 
 package org.matsim.contrib.cadyts.measurement;
 
+import cadyts.demand.PlanBuilder;
+import cadyts.measurements.SingleLinkMeasurement.TYPE;
+import cadyts.supply.SimResults;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -39,132 +41,139 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.analysis.kai.Databins;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 
-import cadyts.demand.PlanBuilder;
-import cadyts.measurements.SingleLinkMeasurement.TYPE;
-import cadyts.supply.SimResults;
+public class MeasurementListener
+    implements PlansTranslator<Measurement>,
+        PersonDepartureEventHandler,
+        PersonArrivalEventHandler,
+        SimResults<Measurement> {
 
-public class MeasurementListener implements PlansTranslator<Measurement>,  
-		PersonDepartureEventHandler, PersonArrivalEventHandler, SimResults<Measurement> {
-	
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	private static final Logger log = LogManager.getLogger(MeasurementListener.class);
+  private static final Logger log = LogManager.getLogger(MeasurementListener.class);
 
-	private final Scenario scenario;
+  private final Scenario scenario;
 
-	private final Map<Id<Person>,PersonDepartureEvent> driverAgents = new TreeMap<>() ;
-	
-	private int iteration = -1;
+  private final Map<Id<Person>, PersonDepartureEvent> driverAgents = new TreeMap<>();
 
-	// this is _only_ there for output:
-	Set<Plan> plansEverSeen = new HashSet<>();
+  private int iteration = -1;
 
-	private static final String STR_PLANSTEPFACTORY = "planStepFactory";
-	private static final String STR_ITERATION = "iteration";
+  // this is _only_ there for output:
+  Set<Plan> plansEverSeen = new HashSet<>();
 
-	private final Measurements  measurements ;
+  private static final String STR_PLANSTEPFACTORY = "planStepFactory";
+  private static final String STR_ITERATION = "iteration";
 
-	private final Databins<Measurement> databins ;
+  private final Measurements measurements;
 
-	MeasurementListener(final Scenario scenario, Measurements measurements) {
-		this.measurements = measurements ;
-		this.scenario = scenario;
-		
-		double[] dataBoundaries = new double[24] ;
-		for ( int ii=0 ; ii<dataBoundaries.length; ii++ ) {
-			dataBoundaries[ii] = ii * 3600. ;
-			// hourly bins, not connected to anything; this might be improved ...
-		}
-		this.databins = new Databins<Measurement>( "travel times for measurement facility at each hour" , dataBoundaries ) ;
-	}
+  private final Databins<Measurement> databins;
 
-	private long plansFound = 0;
-	private long plansNotFound = 0;
+  MeasurementListener(final Scenario scenario, Measurements measurements) {
+    this.measurements = measurements;
+    this.scenario = scenario;
 
-	@Override
-	public final cadyts.demand.Plan<Measurement> getCadytsPlan(final Plan plan) {
-		@SuppressWarnings("unchecked")
-		PlanBuilder<Measurement> planStepFactory = (PlanBuilder<Measurement>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
-		if (planStepFactory == null) {
-			this.plansNotFound++;
-			return null;
-		}
-		this.plansFound++;
-		final cadyts.demand.Plan<Measurement> planSteps = planStepFactory.getResult();
-		return planSteps;
-	}
+    double[] dataBoundaries = new double[24];
+    for (int ii = 0; ii < dataBoundaries.length; ii++) {
+      dataBoundaries[ii] = ii * 3600.;
+      // hourly bins, not connected to anything; this might be improved ...
+    }
+    this.databins =
+        new Databins<Measurement>(
+            "travel times for measurement facility at each hour", dataBoundaries);
+  }
 
-	@Override
-	public void reset(final int iteration1) {
-		this.iteration = iteration1;
+  private long plansFound = 0;
+  private long plansNotFound = 0;
 
-		log.warn("found " + this.plansFound + " out of " + (this.plansFound + this.plansNotFound) + " ("
-				+ (100. * this.plansFound / (this.plansFound + this.plansNotFound)) + "%)");
-		log.warn("(above values may both be at zero for a couple of iterations if multiple plans per agent all have no score)");
+  @Override
+  public final cadyts.demand.Plan<Measurement> getCadytsPlan(final Plan plan) {
+    @SuppressWarnings("unchecked")
+    PlanBuilder<Measurement> planStepFactory =
+        (PlanBuilder<Measurement>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
+    if (planStepFactory == null) {
+      this.plansNotFound++;
+      return null;
+    }
+    this.plansFound++;
+    final cadyts.demand.Plan<Measurement> planSteps = planStepFactory.getResult();
+    return planSteps;
+  }
 
-		this.driverAgents.clear();
-	}
+  @Override
+  public void reset(final int iteration1) {
+    this.iteration = iteration1;
 
-	@Override
-	public void handleEvent(PersonDepartureEvent event) {
-		this.driverAgents.put(event.getPersonId(), event ) ;
-	}
-	
-	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-		PersonDepartureEvent dpEvent = this.driverAgents.remove( event.getPersonId() ) ;
-		double ttime = event.getTime() - dpEvent.getTime() ;
-		
-		// the travel time determines the measurement "facility":
-		Measurement measurement = measurements.getMeasurementFromTTimeInSeconds(ttime) ;
-		
-		// the following will fill the cadyts plan:
-		// get the planStepFactory for the plan (or create one):
-		Person person = this.scenario.getPopulation().getPersons().get(event.getPersonId());
-		PlanBuilder<Measurement> tmpPlanStepFactory = getPlanStepFactoryForPlan(person.getSelectedPlan());
-		// add the measurement:
-		if (tmpPlanStepFactory != null) {
-			// can this happen?? Maybe in early time steps???
-						
-			tmpPlanStepFactory.addTurn( measurement, (int) event.getTime());
-		}
-		
-		// the following will lead to getSimValue:
-		int idx = this.databins.getIndex( dpEvent.getTime() ) ;
-		this.databins.inc( measurement, idx);
+    log.warn(
+        "found "
+            + this.plansFound
+            + " out of "
+            + (this.plansFound + this.plansNotFound)
+            + " ("
+            + (100. * this.plansFound / (this.plansFound + this.plansNotFound))
+            + "%)");
+    log.warn(
+        "(above values may both be at zero for a couple of iterations if multiple plans per agent all have no score)");
 
-	}
+    this.driverAgents.clear();
+  }
 
-	// ###################################################################################
-	// only private functions below here (low level functionality)
+  @Override
+  public void handleEvent(PersonDepartureEvent event) {
+    this.driverAgents.put(event.getPersonId(), event);
+  }
 
-	private PlanBuilder<Measurement> getPlanStepFactoryForPlan(final Plan selectedPlan) {
+  @Override
+  public void handleEvent(PersonArrivalEvent event) {
+    PersonDepartureEvent dpEvent = this.driverAgents.remove(event.getPersonId());
+    double ttime = event.getTime() - dpEvent.getTime();
 
-		@SuppressWarnings("unchecked")
-		PlanBuilder<Measurement> planStepFactory = (PlanBuilder<Measurement>) selectedPlan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
+    // the travel time determines the measurement "facility":
+    Measurement measurement = measurements.getMeasurementFromTTimeInSeconds(ttime);
 
-		Integer factoryIteration = (Integer) selectedPlan.getCustomAttributes().get(STR_ITERATION);
-		if (planStepFactory == null || factoryIteration == null || factoryIteration != this.iteration) {
-			// attach the iteration number to the plan:
-			selectedPlan.getCustomAttributes().put(STR_ITERATION, this.iteration);
+    // the following will fill the cadyts plan:
+    // get the planStepFactory for the plan (or create one):
+    Person person = this.scenario.getPopulation().getPersons().get(event.getPersonId());
+    PlanBuilder<Measurement> tmpPlanStepFactory =
+        getPlanStepFactoryForPlan(person.getSelectedPlan());
+    // add the measurement:
+    if (tmpPlanStepFactory != null) {
+      // can this happen?? Maybe in early time steps???
 
-			// construct a new PlanBulder and attach it to the plan:
-			planStepFactory = new PlanBuilder<Measurement>();
-			selectedPlan.getCustomAttributes().put(STR_PLANSTEPFACTORY, planStepFactory);
+      tmpPlanStepFactory.addTurn(measurement, (int) event.getTime());
+    }
 
-			// memorize the plan as being seen:
-			this.plansEverSeen.add(selectedPlan);
-		}
+    // the following will lead to getSimValue:
+    int idx = this.databins.getIndex(dpEvent.getTime());
+    this.databins.inc(measurement, idx);
+  }
 
-		return planStepFactory;
-	}
+  // ###################################################################################
+  // only private functions below here (low level functionality)
 
-	@Override
-	public double getSimValue(Measurement mea, int startTime_s, int endTime_s, TYPE type) {
-		Objects.requireNonNull( mea );
-		return this.databins.getValue( mea, this.databins.getIndex( startTime_s ) ) ;
-	}
+  private PlanBuilder<Measurement> getPlanStepFactoryForPlan(final Plan selectedPlan) {
 
-	
+    @SuppressWarnings("unchecked")
+    PlanBuilder<Measurement> planStepFactory =
+        (PlanBuilder<Measurement>) selectedPlan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
 
+    Integer factoryIteration = (Integer) selectedPlan.getCustomAttributes().get(STR_ITERATION);
+    if (planStepFactory == null || factoryIteration == null || factoryIteration != this.iteration) {
+      // attach the iteration number to the plan:
+      selectedPlan.getCustomAttributes().put(STR_ITERATION, this.iteration);
+
+      // construct a new PlanBulder and attach it to the plan:
+      planStepFactory = new PlanBuilder<Measurement>();
+      selectedPlan.getCustomAttributes().put(STR_PLANSTEPFACTORY, planStepFactory);
+
+      // memorize the plan as being seen:
+      this.plansEverSeen.add(selectedPlan);
+    }
+
+    return planStepFactory;
+  }
+
+  @Override
+  public double getSimValue(Measurement mea, int startTime_s, int endTime_s, TYPE type) {
+    Objects.requireNonNull(mea);
+    return this.databins.getValue(mea, this.databins.getIndex(startTime_s));
+  }
 }

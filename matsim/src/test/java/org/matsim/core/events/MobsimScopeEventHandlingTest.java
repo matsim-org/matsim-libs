@@ -30,38 +30,39 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
  * @author Michal Maciejewski (michalm)
  */
 public class MobsimScopeEventHandlingTest {
-	private final EventsManager eventsManager = mock(EventsManager.class);
-	private final MobsimScopeEventHandling eventHandling = new MobsimScopeEventHandling(eventsManager);
-	private final MobsimScopeEventHandler handler = mock(MobsimScopeEventHandler.class);
+  private final EventsManager eventsManager = mock(EventsManager.class);
+  private final MobsimScopeEventHandling eventHandling =
+      new MobsimScopeEventHandling(eventsManager);
+  private final MobsimScopeEventHandler handler = mock(MobsimScopeEventHandler.class);
 
-	@Test
-	public void test_addMobsimScopeHandler() {
-		eventHandling.addMobsimScopeHandler(handler);
+  @Test
+  public void test_addMobsimScopeHandler() {
+    eventHandling.addMobsimScopeHandler(handler);
 
-		verify(eventsManager, times(1)).addHandler(argThat(arg -> arg == handler));
-	}
+    verify(eventsManager, times(1)).addHandler(argThat(arg -> arg == handler));
+  }
 
-	@Test
-	public void test_notifyAfterMobsim_oneHandler() {
-		eventHandling.addMobsimScopeHandler(handler);
-		eventHandling.notifyAfterMobsim(new AfterMobsimEvent(null, 99, false));
+  @Test
+  public void test_notifyAfterMobsim_oneHandler() {
+    eventHandling.addMobsimScopeHandler(handler);
+    eventHandling.notifyAfterMobsim(new AfterMobsimEvent(null, 99, false));
 
-		verify(eventsManager, times(1)).removeHandler(argThat(arg -> arg == handler));
-		verify(handler, times(1)).cleanupAfterMobsim(intThat(arg -> arg == 99));
-	}
+    verify(eventsManager, times(1)).removeHandler(argThat(arg -> arg == handler));
+    verify(handler, times(1)).cleanupAfterMobsim(intThat(arg -> arg == 99));
+  }
 
-	@Test
-	public void test_notifyAfterMobsim_noHandlersAfterRemoval() {
-		eventHandling.addMobsimScopeHandler(handler);
-		eventHandling.notifyAfterMobsim(new AfterMobsimEvent(null, 99, false));
+  @Test
+  public void test_notifyAfterMobsim_noHandlersAfterRemoval() {
+    eventHandling.addMobsimScopeHandler(handler);
+    eventHandling.notifyAfterMobsim(new AfterMobsimEvent(null, 99, false));
 
-		verify(eventsManager, times(1)).removeHandler(any());
-		verify(handler, times(1)).cleanupAfterMobsim(anyInt());
+    verify(eventsManager, times(1)).removeHandler(any());
+    verify(handler, times(1)).cleanupAfterMobsim(anyInt());
 
-		//no handlers in this iteration, so no new calls to removeHandler() and cleanupAfterMobsim()
-		eventHandling.notifyAfterMobsim(new AfterMobsimEvent(null, 100, false));
+    // no handlers in this iteration, so no new calls to removeHandler() and cleanupAfterMobsim()
+    eventHandling.notifyAfterMobsim(new AfterMobsimEvent(null, 100, false));
 
-		verify(eventsManager, times(1)).removeHandler(any());
-		verify(handler, times(1)).cleanupAfterMobsim(anyInt());
-	}
+    verify(eventsManager, times(1)).removeHandler(any());
+    verify(handler, times(1)).cleanupAfterMobsim(anyInt());
+  }
 }

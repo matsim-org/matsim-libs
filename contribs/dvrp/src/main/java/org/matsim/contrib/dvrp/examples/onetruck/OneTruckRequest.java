@@ -27,34 +27,34 @@ import org.matsim.contrib.dvrp.optimizer.Request;
  * @author michalm
  */
 public final class OneTruckRequest implements Request {
-	private final Id<Request> id;
-	private final double submissionTime;
+  private final Id<Request> id;
+  private final double submissionTime;
 
-	private final Link fromLink;
-	private final Link toLink;
+  private final Link fromLink;
+  private final Link toLink;
 
-	public OneTruckRequest(Id<Request> id, Link fromLink, Link toLink, double submissionTime) {
-		this.id = id;
-		this.submissionTime = submissionTime;
-		this.fromLink = fromLink;
-		this.toLink = toLink;
-	}
+  public OneTruckRequest(Id<Request> id, Link fromLink, Link toLink, double submissionTime) {
+    this.id = id;
+    this.submissionTime = submissionTime;
+    this.fromLink = fromLink;
+    this.toLink = toLink;
+  }
 
-	@Override
-	public Id<Request> getId() {
-		return id;
-	}
+  @Override
+  public Id<Request> getId() {
+    return id;
+  }
 
-	@Override
-	public double getSubmissionTime() {
-		return submissionTime;
-	}
+  @Override
+  public double getSubmissionTime() {
+    return submissionTime;
+  }
 
-	public Link getFromLink() {
-		return fromLink;
-	}
+  public Link getFromLink() {
+    return fromLink;
+  }
 
-	public Link getToLink() {
-		return toLink;
-	}
+  public Link getToLink() {
+    return toLink;
+  }
 }

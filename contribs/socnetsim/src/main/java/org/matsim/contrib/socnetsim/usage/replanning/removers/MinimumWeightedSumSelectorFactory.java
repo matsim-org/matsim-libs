@@ -21,7 +21,6 @@ package org.matsim.contrib.socnetsim.usage.replanning.removers;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
 import org.matsim.contrib.socnetsim.framework.replanning.removers.AbstractDumbRemoverFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
@@ -29,34 +28,36 @@ import org.matsim.contrib.socnetsim.framework.replanning.selectors.InverseScoreW
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.WeightedWeight;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.highestweightselection.HighestWeightSelector;
 import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
+import org.matsim.core.config.Config;
 
 public class MinimumWeightedSumSelectorFactory extends AbstractDumbRemoverFactory {
-	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
-	private final Scenario sc;
+  private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+  private final Scenario sc;
 
-	@Inject
-	public MinimumWeightedSumSelectorFactory( final Scenario sc, final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory ) {
-		super( getMaxPlansPerAgent( sc.getConfig() ) );
-		this.sc = sc;
-		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
-	}
+  @Inject
+  public MinimumWeightedSumSelectorFactory(
+      final Scenario sc,
+      final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory) {
+    super(getMaxPlansPerAgent(sc.getConfig()));
+    this.sc = sc;
+    this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+  }
 
-	private static int getMaxPlansPerAgent(final Config conf) {
-		final GroupReplanningConfigGroup group = (GroupReplanningConfigGroup) conf.getModule( GroupReplanningConfigGroup.GROUP_NAME );
-		return group.getMaxPlansPerAgent();
-	}
+  private static int getMaxPlansPerAgent(final Config conf) {
+    final GroupReplanningConfigGroup group =
+        (GroupReplanningConfigGroup) conf.getModule(GroupReplanningConfigGroup.GROUP_NAME);
+    return group.getMaxPlansPerAgent();
+  }
 
-	@Override
-	public GroupLevelPlanSelector createSelector() {
-		final GroupReplanningConfigGroup weights = (GroupReplanningConfigGroup)
-				sc.getConfig().getModule(
-					GroupReplanningConfigGroup.GROUP_NAME );
-		return new HighestWeightSelector(
-				true ,
-				incompatiblePlansIdentifierFactory,
-				new WeightedWeight(
-					new InverseScoreWeight(),
-					weights.getWeightAttributeName(),
-					sc.getPopulation()  ));
-	}
+  @Override
+  public GroupLevelPlanSelector createSelector() {
+    final GroupReplanningConfigGroup weights =
+        (GroupReplanningConfigGroup)
+            sc.getConfig().getModule(GroupReplanningConfigGroup.GROUP_NAME);
+    return new HighestWeightSelector(
+        true,
+        incompatiblePlansIdentifierFactory,
+        new WeightedWeight(
+            new InverseScoreWeight(), weights.getWeightAttributeName(), sc.getPopulation()));
+  }
 }

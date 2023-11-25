@@ -20,6 +20,12 @@
 
 package org.matsim.core.network.io;
 
+import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -30,179 +36,175 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-
-import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
-
 /*package*/ class NetworkWriterHandlerImplV2 implements NetworkWriterHandler {
-	private final CoordinateTransformation transformation;
-	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
+  private final CoordinateTransformation transformation;
+  private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
 
-	NetworkWriterHandlerImplV2(CoordinateTransformation transformation) {
-		this.transformation = transformation;
-	}
+  NetworkWriterHandlerImplV2(CoordinateTransformation transformation) {
+    this.transformation = transformation;
+  }
 
-	public void putAttributeConverters(final Map<Class<?>, AttributeConverter<?>> converters) {
-		attributesWriter.putAttributeConverters(converters);
-	}
+  public void putAttributeConverters(final Map<Class<?>, AttributeConverter<?>> converters) {
+    attributesWriter.putAttributeConverters(converters);
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	//
-	// interface implementation
-	//
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  //
+  // interface implementation
+  //
+  //////////////////////////////////////////////////////////////////////
 
-	//////////////////////////////////////////////////////////////////////
-	// <network ... > ... </network>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <network ... > ... </network>
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void startNetwork(final Network network, final BufferedWriter out) throws IOException {
-		out.write("<network");
-		if (network.getName() != null) {
-			out.write(" name=\"" + encodeAttributeValue(network.getName()) + "\"");
-		}
-		out.write(">\n\n");
+  @Override
+  public void startNetwork(final Network network, final BufferedWriter out) throws IOException {
+    out.write("<network");
+    if (network.getName() != null) {
+      out.write(" name=\"" + encodeAttributeValue(network.getName()) + "\"");
+    }
+    out.write(">\n\n");
 
-		attributesWriter.writeAttributes( "\t" , out , network.getAttributes() );
-	}
+    attributesWriter.writeAttributes("\t", out, network.getAttributes());
+  }
 
-	@Override
-	public void endNetwork(final BufferedWriter out) throws IOException {
-		out.write("</network>\n");
-	}
+  @Override
+  public void endNetwork(final BufferedWriter out) throws IOException {
+    out.write("</network>\n");
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// <nodes ... > ... </nodes>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <nodes ... > ... </nodes>
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void startNodes(final Network network, final BufferedWriter out) throws IOException {
-		out.write("\t<nodes>\n");
-	}
+  @Override
+  public void startNodes(final Network network, final BufferedWriter out) throws IOException {
+    out.write("\t<nodes>\n");
+  }
 
-	@Override
-	public void endNodes(final BufferedWriter out) throws IOException {
-		out.write("\t</nodes>\n\n");
-	}
+  @Override
+  public void endNodes(final BufferedWriter out) throws IOException {
+    out.write("\t</nodes>\n\n");
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// <links ... > ... </links>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <links ... > ... </links>
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void startLinks(final Network network, final BufferedWriter out) throws IOException {
-		out.write("\t<links");
-		if (network.getCapacityPeriod() != Integer.MIN_VALUE) {
-			out.write(" capperiod=\"" + Time.writeTime(network.getCapacityPeriod()) + "\"");
-		}
+  @Override
+  public void startLinks(final Network network, final BufferedWriter out) throws IOException {
+    out.write("\t<links");
+    if (network.getCapacityPeriod() != Integer.MIN_VALUE) {
+      out.write(" capperiod=\"" + Time.writeTime(network.getCapacityPeriod()) + "\"");
+    }
 
-		out.write(" effectivecellsize=\"" + network.getEffectiveCellSize() + "\"");
-		out.write(" effectivelanewidth=\"" + network.getEffectiveLaneWidth() + "\"");
+    out.write(" effectivecellsize=\"" + network.getEffectiveCellSize() + "\"");
+    out.write(" effectivelanewidth=\"" + network.getEffectiveLaneWidth() + "\"");
 
-		out.write(">\n");
-	}
+    out.write(">\n");
+  }
 
-	@Override
-	public void endLinks(final BufferedWriter out) throws IOException {
-		out.write("\t</links>\n\n");
-	}
+  @Override
+  public void endLinks(final BufferedWriter out) throws IOException {
+    out.write("\t</links>\n\n");
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// <node ... > ... </node>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <node ... > ... </node>
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void startNode(final Node node, final BufferedWriter out) throws IOException {
-		out.write("\t\t<node");
-		out.write(" id=\"" + encodeAttributeValue(node.getId().toString()) + "\"");
-		final Coord coord = transformation.transform( node.getCoord() );
-		out.write(" x=\"" + coord.getX() + "\"");
-		out.write(" y=\"" + coord.getY() + "\"");
-		if ( coord.hasZ() ) out.write(" z=\"" + coord.getZ() + "\"");
-		if (NetworkUtils.getType( node ) != null) {
-			out.write(" type=\"" + encodeAttributeValue(NetworkUtils.getType(node)) + "\"");
-		}
-		if (NetworkUtils.getOrigId( node ) != null) {
-			out.write(" origid=\"" + encodeAttributeValue(NetworkUtils.getOrigId(node)) + "\"");
-		}
-		out.write(" >\n");
+  @Override
+  public void startNode(final Node node, final BufferedWriter out) throws IOException {
+    out.write("\t\t<node");
+    out.write(" id=\"" + encodeAttributeValue(node.getId().toString()) + "\"");
+    final Coord coord = transformation.transform(node.getCoord());
+    out.write(" x=\"" + coord.getX() + "\"");
+    out.write(" y=\"" + coord.getY() + "\"");
+    if (coord.hasZ()) out.write(" z=\"" + coord.getZ() + "\"");
+    if (NetworkUtils.getType(node) != null) {
+      out.write(" type=\"" + encodeAttributeValue(NetworkUtils.getType(node)) + "\"");
+    }
+    if (NetworkUtils.getOrigId(node) != null) {
+      out.write(" origid=\"" + encodeAttributeValue(NetworkUtils.getOrigId(node)) + "\"");
+    }
+    out.write(" >\n");
 
-		attributesWriter.writeAttributes( "\t\t\t" , out , node.getAttributes() );
-	}
+    attributesWriter.writeAttributes("\t\t\t", out, node.getAttributes());
+  }
 
-	@Override
-	public void endNode(final BufferedWriter out) throws IOException {
-		out.write("\t\t</node>\n");
-	}
+  @Override
+  public void endNode(final BufferedWriter out) throws IOException {
+    out.write("\t\t</node>\n");
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// <link ... > ... </link>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <link ... > ... </link>
+  //////////////////////////////////////////////////////////////////////
 
-	private Set<String> lastSet = null;
-	private String lastModes = null;
+  private Set<String> lastSet = null;
+  private String lastModes = null;
 
-	@Override
-	public void startLink(final Link link, final BufferedWriter out) throws IOException {
-		out.write("\t\t<link");
-		out.write(" id=\"" + encodeAttributeValue(link.getId().toString()) + "\"");
-		out.write(" from=\"" + encodeAttributeValue(link.getFromNode().getId().toString()) + "\"");
-		out.write(" to=\"" + encodeAttributeValue(link.getToNode().getId().toString()) + "\"");
-		out.write(" length=\"" + link.getLength() + "\"");
-		out.write(" freespeed=\"" + link.getFreespeed() + "\"");
-		out.write(" capacity=\"" + link.getCapacity() + "\"");
-		out.write(" permlanes=\"" + link.getNumberOfLanes() + "\"");
-		out.write(" oneway=\"1\"");
+  @Override
+  public void startLink(final Link link, final BufferedWriter out) throws IOException {
+    out.write("\t\t<link");
+    out.write(" id=\"" + encodeAttributeValue(link.getId().toString()) + "\"");
+    out.write(" from=\"" + encodeAttributeValue(link.getFromNode().getId().toString()) + "\"");
+    out.write(" to=\"" + encodeAttributeValue(link.getToNode().getId().toString()) + "\"");
+    out.write(" length=\"" + link.getLength() + "\"");
+    out.write(" freespeed=\"" + link.getFreespeed() + "\"");
+    out.write(" capacity=\"" + link.getCapacity() + "\"");
+    out.write(" permlanes=\"" + link.getNumberOfLanes() + "\"");
+    out.write(" oneway=\"1\"");
 
-		Set<String> modes = link.getAllowedModes();
-		if (modes != null) {
-			if (modes != this.lastSet) { // default LinkImpl internally caches the modes-set, thus the != operator works indeed
-				StringBuilder buffer = new StringBuilder();
-				int counter = 0;
-				for (String mode : modes) {
-					if (counter > 0) {
-						buffer.append(',');
-					}
-					buffer.append(mode);
-					counter++;
-				}
-				this.lastModes = encodeAttributeValue(buffer.toString());
-				this.lastSet = modes;
-			}
-			out.write(" modes=\"" + this.lastModes + "\"");
-		}
+    Set<String> modes = link.getAllowedModes();
+    if (modes != null) {
+      if (modes
+          != this
+              .lastSet) { // default LinkImpl internally caches the modes-set, thus the != operator
+        // works indeed
+        StringBuilder buffer = new StringBuilder();
+        int counter = 0;
+        for (String mode : modes) {
+          if (counter > 0) {
+            buffer.append(',');
+          }
+          buffer.append(mode);
+          counter++;
+        }
+        this.lastModes = encodeAttributeValue(buffer.toString());
+        this.lastSet = modes;
+      }
+      out.write(" modes=\"" + this.lastModes + "\"");
+    }
 
-//		if (link instanceof Link) {
-//			Link link = link;
-//			if (NetworkUtils.getOrigId( link ) != null) {
-//				out.write(" origid=\"" + NetworkUtils.getOrigId( link ) + "\"");
-//			}
-//			if (NetworkUtils.getType(li) != null) {
-//				out.write(" type=\"" + NetworkUtils.getType(li) + "\"");
-//			}
-			// is now in the attributes, no special treatment. kai, dec'16
-//		}
-		out.write(" >\n");
+    //		if (link instanceof Link) {
+    //			Link link = link;
+    //			if (NetworkUtils.getOrigId( link ) != null) {
+    //				out.write(" origid=\"" + NetworkUtils.getOrigId( link ) + "\"");
+    //			}
+    //			if (NetworkUtils.getType(li) != null) {
+    //				out.write(" type=\"" + NetworkUtils.getType(li) + "\"");
+    //			}
+    // is now in the attributes, no special treatment. kai, dec'16
+    //		}
+    out.write(" >\n");
 
-		attributesWriter.writeAttributes( "\t\t\t" , out , link.getAttributes() );
-	}
+    attributesWriter.writeAttributes("\t\t\t", out, link.getAttributes());
+  }
 
-	@Override
-	public void endLink(final BufferedWriter out) throws IOException {
-		out.write("\t\t</link>\n");
-	}
+  @Override
+  public void endLink(final BufferedWriter out) throws IOException {
+    out.write("\t\t</link>\n");
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// <!-- ============ ... ========== -->
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <!-- ============ ... ========== -->
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void writeSeparator(final BufferedWriter out) throws IOException {
-		out.write("<!-- =================================================" +
-				"===================== -->\n\n");
-	}
+  @Override
+  public void writeSeparator(final BufferedWriter out) throws IOException {
+    out.write(
+        "<!-- =================================================" + "===================== -->\n\n");
+  }
 }

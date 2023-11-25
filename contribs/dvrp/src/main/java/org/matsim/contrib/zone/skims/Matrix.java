@@ -25,7 +25,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.zone.Zone;
 
@@ -35,46 +34,47 @@ import org.matsim.contrib.zone.Zone;
  * @author Michal Maciejewski (michalm)
  */
 public final class Matrix {
-	//Range of unsigned short: 0-65535 (18:12:15)
-	//In case 18 hours is not enough, we can reduce the resolution from seconds to tens of seconds
-	private static final int MAX_UNSIGNED_SHORT = Short.MAX_VALUE - Short.MIN_VALUE;
+  // Range of unsigned short: 0-65535 (18:12:15)
+  // In case 18 hours is not enough, we can reduce the resolution from seconds to tens of seconds
+  private static final int MAX_UNSIGNED_SHORT = Short.MAX_VALUE - Short.MIN_VALUE;
 
-	//there are usually not so many Zone objects, so not a problem if zoneIndex2localIndex is sparse
-	private final int[] zoneIndex2matrixIndex = new int[Id.getNumberOfIds(Zone.class)];
-	private final short[][] matrix;
+  // there are usually not so many Zone objects, so not a problem if zoneIndex2localIndex is sparse
+  private final int[] zoneIndex2matrixIndex = new int[Id.getNumberOfIds(Zone.class)];
+  private final short[][] matrix;
 
-	public Matrix(Set<Zone> zones) {
-		//to make sure we do not refer to zones added later
-		Arrays.fill(zoneIndex2matrixIndex, -1);
+  public Matrix(Set<Zone> zones) {
+    // to make sure we do not refer to zones added later
+    Arrays.fill(zoneIndex2matrixIndex, -1);
 
-		int nextIndex = 0;
-		for (Zone zone : zones) {
-			zoneIndex2matrixIndex[zone.getId().index()] = nextIndex;
-			nextIndex++;
-		}
+    int nextIndex = 0;
+    for (Zone zone : zones) {
+      zoneIndex2matrixIndex[zone.getId().index()] = nextIndex;
+      nextIndex++;
+    }
 
-		matrix = new short[zones.size()][zones.size()];
-		for (var row : matrix) {
-			Arrays.fill(row, (short)MAX_UNSIGNED_SHORT);//-1
-		}
-	}
+    matrix = new short[zones.size()][zones.size()];
+    for (var row : matrix) {
+      Arrays.fill(row, (short) MAX_UNSIGNED_SHORT); // -1
+    }
+  }
 
-	public int get(Zone fromZone, Zone toZone) {
-		short shortValue = matrix[matrixIndex(fromZone)][matrixIndex(toZone)];
-		if (shortValue == -1) {
-			throw new NoSuchElementException("No value set for zones: " + fromZone.getId() + " -> " + toZone.getId());
-		}
-		return Short.toUnsignedInt(shortValue);
-	}
+  public int get(Zone fromZone, Zone toZone) {
+    short shortValue = matrix[matrixIndex(fromZone)][matrixIndex(toZone)];
+    if (shortValue == -1) {
+      throw new NoSuchElementException(
+          "No value set for zones: " + fromZone.getId() + " -> " + toZone.getId());
+    }
+    return Short.toUnsignedInt(shortValue);
+  }
 
-	void set(Zone fromZone, Zone toZone, double value) {
-		checkArgument(Double.isFinite(value) && value >= 0 && value < MAX_UNSIGNED_SHORT);
-		matrix[matrixIndex(fromZone)][matrixIndex(toZone)] = (short)value;
-	}
+  void set(Zone fromZone, Zone toZone, double value) {
+    checkArgument(Double.isFinite(value) && value >= 0 && value < MAX_UNSIGNED_SHORT);
+    matrix[matrixIndex(fromZone)][matrixIndex(toZone)] = (short) value;
+  }
 
-	private int matrixIndex(Zone zone) {
-		int index = zoneIndex2matrixIndex[zone.getId().index()];
-		checkArgument(index >= 0, "Matrix was not created for zone: (%s)", zone);
-		return index;
-	}
+  private int matrixIndex(Zone zone) {
+    int index = zoneIndex2matrixIndex[zone.getId().index()];
+    checkArgument(index >= 0, "Matrix was not created for zone: (%s)", zone);
+    return index;
+  }
 }

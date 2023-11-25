@@ -22,7 +22,6 @@ package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import java.util.Iterator;
 import java.util.TreeMap;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -35,93 +34,96 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 
 /**
- * @author anhorni
- * Uses FacilityPenalty to manage the facililities' loads by taking care of activity start and end events.
+ * @author anhorni Uses FacilityPenalty to manage the facililities' loads by taking care of activity
+ *     start and end events.
  */
 class EventsToFacilityLoad implements ActivityStartEventHandler, ActivityEndEventHandler {
 
-	private TreeMap<Id, FacilityPenalty> facilityPenalties;
-	private final static Logger log = LogManager.getLogger(EventsToFacilityLoad.class);
+  private TreeMap<Id, FacilityPenalty> facilityPenalties;
+  private static final Logger log = LogManager.getLogger(EventsToFacilityLoad.class);
 
-	EventsToFacilityLoad( final ActivityFacilities facilities, TreeMap<Id, FacilityPenalty> facilityPenalties, FrozenTastesConfigGroup config ) {
-		this.facilityPenalties = facilityPenalties;
+  EventsToFacilityLoad(
+      final ActivityFacilities facilities,
+      TreeMap<Id, FacilityPenalty> facilityPenalties,
+      FrozenTastesConfigGroup config) {
+    this.facilityPenalties = facilityPenalties;
 
-		log.info("facilities size: " + facilities.getFacilities().values().size());
-				
-		int counter = 0;
-		int nextMsg = 1;
-		for (ActivityFacility f : facilities.getFacilities().values()) {
-			counter++;
-			if (counter % nextMsg == 0) {
-				nextMsg *= 2;
-				log.info(" facility # " + counter);
-			}
-			double capacity = Double.MAX_VALUE;
-			Iterator<? extends ActivityOption> iter_act = f.getActivityOptions().values().iterator();
-			while (iter_act.hasNext()){
-				ActivityOption act = iter_act.next();
-				if (act.getCapacity() < capacity) {
-					capacity = act.getCapacity();
-				}
-			}
-			this.facilityPenalties.put(f.getId(), new FacilityPenalty(capacity, config) );
-		}
-		log.info("finished init");
-	}
+    log.info("facilities size: " + facilities.getFacilities().values().size());
 
-	/**
-	 * Add an arrival event in "FacilityLoad" for every start of an activity
-	 * Home activities are excluded.
-	 */
-	@Override
-	public void handleEvent(final ActivityStartEvent event) {
-		if (!(event.getActType().startsWith("h") || event.getActType().startsWith("tta"))) {
-			Id facilityId = event.getFacilityId();
-			this.facilityPenalties.get(facilityId).getFacilityLoad().addArrival(event.getTime());
-		}
-	}
+    int counter = 0;
+    int nextMsg = 1;
+    for (ActivityFacility f : facilities.getFacilities().values()) {
+      counter++;
+      if (counter % nextMsg == 0) {
+        nextMsg *= 2;
+        log.info(" facility # " + counter);
+      }
+      double capacity = Double.MAX_VALUE;
+      Iterator<? extends ActivityOption> iter_act = f.getActivityOptions().values().iterator();
+      while (iter_act.hasNext()) {
+        ActivityOption act = iter_act.next();
+        if (act.getCapacity() < capacity) {
+          capacity = act.getCapacity();
+        }
+      }
+      this.facilityPenalties.put(f.getId(), new FacilityPenalty(capacity, config));
+    }
+    log.info("finished init");
+  }
 
-	/**
-	 * Add a departure event in "FacilityLoad" for every ending of an activity
-	 * Home activities are excluded
-	 */
-	@Override
-	public void handleEvent(final ActivityEndEvent event) {
-		if (!(event.getActType().startsWith("h") || event.getActType().startsWith("tta"))) {
-			Id facilityId = event.getFacilityId();
-			this.facilityPenalties.get(facilityId).getFacilityLoad().addDeparture(event.getTime());
-		}
-	}
+  /**
+   * Add an arrival event in "FacilityLoad" for every start of an activity Home activities are
+   * excluded.
+   */
+  @Override
+  public void handleEvent(final ActivityStartEvent event) {
+    if (!(event.getActType().startsWith("h") || event.getActType().startsWith("tta"))) {
+      Id facilityId = event.getFacilityId();
+      this.facilityPenalties.get(facilityId).getFacilityLoad().addArrival(event.getTime());
+    }
+  }
 
-	public void finish() {
-		log.info("EventsToFacilityLoad start finish() method");
-		Iterator<? extends FacilityPenalty> iter_fp = this.facilityPenalties.values().iterator();
-		while (iter_fp.hasNext()){
-			FacilityPenalty fp = iter_fp.next();
-			fp.finish();
-		}
-		log.info("EventsToFacilityLoad end finish() method");
-	}
+  /**
+   * Add a departure event in "FacilityLoad" for every ending of an activity Home activities are
+   * excluded
+   */
+  @Override
+  public void handleEvent(final ActivityEndEvent event) {
+    if (!(event.getActType().startsWith("h") || event.getActType().startsWith("tta"))) {
+      Id facilityId = event.getFacilityId();
+      this.facilityPenalties.get(facilityId).getFacilityLoad().addDeparture(event.getTime());
+    }
+  }
 
-	@Override
-	public void reset(final int iteration) {
-		log.info("Not really resetting anything here.");
-	}
+  public void finish() {
+    log.info("EventsToFacilityLoad start finish() method");
+    Iterator<? extends FacilityPenalty> iter_fp = this.facilityPenalties.values().iterator();
+    while (iter_fp.hasNext()) {
+      FacilityPenalty fp = iter_fp.next();
+      fp.finish();
+    }
+    log.info("EventsToFacilityLoad end finish() method");
+  }
 
-	public void resetAll(final int iteration) {
-		Iterator<? extends FacilityPenalty> iter_fp = this.facilityPenalties.values().iterator();
-		while (iter_fp.hasNext()){
-			FacilityPenalty fp = iter_fp.next();
-			fp.reset();
-		}
-		log.info("EventsToFacilityLoad resetted");
-	}
+  @Override
+  public void reset(final int iteration) {
+    log.info("Not really resetting anything here.");
+  }
 
-	public TreeMap<Id, FacilityPenalty> getFacilityPenalties() {
-		return facilityPenalties;
-	}
+  public void resetAll(final int iteration) {
+    Iterator<? extends FacilityPenalty> iter_fp = this.facilityPenalties.values().iterator();
+    while (iter_fp.hasNext()) {
+      FacilityPenalty fp = iter_fp.next();
+      fp.reset();
+    }
+    log.info("EventsToFacilityLoad resetted");
+  }
 
-//	public void setFacilityPenalties(TreeMap<Id, FacilityPenalty> facilityPenalties) {
-//		this.facilityPenalties = facilityPenalties;
-//	}
+  public TreeMap<Id, FacilityPenalty> getFacilityPenalties() {
+    return facilityPenalties;
+  }
+
+  //	public void setFacilityPenalties(TreeMap<Id, FacilityPenalty> facilityPenalties) {
+  //		this.facilityPenalties = facilityPenalties;
+  //	}
 }

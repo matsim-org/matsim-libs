@@ -28,31 +28,30 @@ import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgentFactory;
 
-/**
- * Module to install railsim functionality.
- */
+/** Module to install railsim functionality. */
 public class RailsimQSimModule extends AbstractQSimModule implements QSimComponentsConfigurator {
 
-	public static final String COMPONENT_NAME = "Railsim";
+  public static final String COMPONENT_NAME = "Railsim";
 
-	@Override
-	public void configure(QSimComponentsConfig components) {
-		components.addNamedComponent(COMPONENT_NAME);
-	}
+  @Override
+  public void configure(QSimComponentsConfig components) {
+    components.addNamedComponent(COMPONENT_NAME);
+  }
 
-	@Override
-	protected void configureQSim() {
-		bind(RailsimQSimEngine.class).asEagerSingleton();
+  @Override
+  protected void configureQSim() {
+    bind(RailsimQSimEngine.class).asEagerSingleton();
 
-		bind(TrainRouter.class).asEagerSingleton();
-		bind(RailResourceManager.class).asEagerSingleton();
+    bind(TrainRouter.class).asEagerSingleton();
+    bind(RailResourceManager.class).asEagerSingleton();
 
-		// This Interface might be replaced with other implementations
-		bind(TrainDisposition.class).to(SimpleDisposition.class).asEagerSingleton();
+    // This Interface might be replaced with other implementations
+    bind(TrainDisposition.class).to(SimpleDisposition.class).asEagerSingleton();
 
-		addQSimComponentBinding(COMPONENT_NAME).to(RailsimQSimEngine.class);
+    addQSimComponentBinding(COMPONENT_NAME).to(RailsimQSimEngine.class);
 
-		OptionalBinder.newOptionalBinder(binder(), TransitDriverAgentFactory.class)
-			.setBinding().to(RailsimDriverAgentFactory.class);
-	}
+    OptionalBinder.newOptionalBinder(binder(), TransitDriverAgentFactory.class)
+        .setBinding()
+        .to(RailsimDriverAgentFactory.class);
+  }
 }

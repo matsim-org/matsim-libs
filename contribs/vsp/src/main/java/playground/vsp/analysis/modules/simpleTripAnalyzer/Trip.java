@@ -22,54 +22,50 @@ import org.matsim.api.core.v01.Coord;
 
 /**
  * @author droeder
- *
  */
-public class Trip{
-	
-	static final String HEADER = "mode;start;end;beeline;dist;fromX;fromY;toX;toY;";
-	public Double beeline;
-	Double dist = null; 
-	Double start = Double.NaN;
-	Double end = Double.NaN;
-	String mode = null;
-	Coord from,to;
-	boolean stuck = false;
-	
-	Trip(){
-	}
-	
-	public double getDuration(){
-		return (end - start);
-	}
-	
-	@Override
-	public String toString(){
-		StringBuffer b = new StringBuffer();
-		b.append(mode + ";");
-		b.append(start + ";");
-		b.append(end + ";");
-		b.append(beeline + ";");
-		b.append(dist + ";");
-		b.append((from == null) ? null : from.getX() + ";");
-		b.append((from == null) ? null : from.getY() + ";");
-		b.append((to == null) ? null : to.getX() + ";");
-		b.append((to == null) ? null : to.getY() + ";");
-		return b.toString();
-	}
+public class Trip {
 
-	/**
-	 * @return
-	 */
-	public final String getMode() {
-		return mode;
-	}
+  static final String HEADER = "mode;start;end;beeline;dist;fromX;fromY;toX;toY;";
+  public Double beeline;
+  Double dist = null;
+  Double start = Double.NaN;
+  Double end = Double.NaN;
+  String mode = null;
+  Coord from, to;
+  boolean stuck = false;
 
-	/**
-	 * @return
-	 */
-	public final Double getDist() {
-		return dist;
-	}
-	
+  Trip() {}
+
+  public double getDuration() {
+    return (end - start);
+  }
+
+  @Override
+  public String toString() {
+    StringBuffer b = new StringBuffer();
+    b.append(mode + ";");
+    b.append(start + ";");
+    b.append(end + ";");
+    b.append(beeline + ";");
+    b.append(dist + ";");
+    b.append((from == null) ? null : from.getX() + ";");
+    b.append((from == null) ? null : from.getY() + ";");
+    b.append((to == null) ? null : to.getX() + ";");
+    b.append((to == null) ? null : to.getY() + ";");
+    return b.toString();
+  }
+
+  /**
+   * @return
+   */
+  public final String getMode() {
+    return mode;
+  }
+
+  /**
+   * @return
+   */
+  public final Double getDist() {
+    return dist;
+  }
 }
-

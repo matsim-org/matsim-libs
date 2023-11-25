@@ -27,40 +27,43 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * Travel time calculator for unknown modes. Agents move with constant speed. No
- * agent specific parameters are taken into account.
+ * Travel time calculator for unknown modes. Agents move with constant speed. No agent specific
+ * parameters are taken into account.
  */
 public class UnknownTravelTime implements TravelTime {
 
-	private final boolean speed;
-	private final boolean speedFactor;
-	private final double value;
+  private final boolean speed;
+  private final boolean speedFactor;
+  private final double value;
 
-	public UnknownTravelTime(String mode, RoutingConfigGroup routingConfigGroup) {
+  public UnknownTravelTime(String mode, RoutingConfigGroup routingConfigGroup) {
 
-		Double speed = routingConfigGroup.getTeleportedModeSpeeds().get(mode);
-		Double speedFactor = routingConfigGroup.getTeleportedModeFreespeedFactors().get(mode);
+    Double speed = routingConfigGroup.getTeleportedModeSpeeds().get(mode);
+    Double speedFactor = routingConfigGroup.getTeleportedModeFreespeedFactors().get(mode);
 
-		if (speed != null && speedFactor != null) {
-			throw new RuntimeException("Speed as well as speed factor was found for mode " + mode +
-					"!  Don't know which should be used. Aborting.");
-		} else if (speed == null && speedFactor == null) {
-			throw new RuntimeException("Neither speed nor speed factor was found for mode " + mode + "! Aborting.");
-		} else if (speed != null) {
-			this.value = speed;
-			this.speed = true;
-			this.speedFactor = false;
-		} else {
-			this.value = speedFactor;
-			this.speed = false;
-			this.speedFactor = true;
-		}
-	}
+    if (speed != null && speedFactor != null) {
+      throw new RuntimeException(
+          "Speed as well as speed factor was found for mode "
+              + mode
+              + "!  Don't know which should be used. Aborting.");
+    } else if (speed == null && speedFactor == null) {
+      throw new RuntimeException(
+          "Neither speed nor speed factor was found for mode " + mode + "! Aborting.");
+    } else if (speed != null) {
+      this.value = speed;
+      this.speed = true;
+      this.speedFactor = false;
+    } else {
+      this.value = speedFactor;
+      this.speed = false;
+      this.speedFactor = true;
+    }
+  }
 
-	@Override
-	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		if (speed) return link.getLength() / this.value;
-		else if (speedFactor) return (link.getLength() / link.getFreespeed()) * this.value;
-		else throw new RuntimeException("Neither speed nor speed factor was found! Aborting.");
-	}
+  @Override
+  public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+    if (speed) return link.getLength() / this.value;
+    else if (speedFactor) return (link.getLength() / link.getFreespeed()) * this.value;
+    else throw new RuntimeException("Neither speed nor speed factor was found! Aborting.");
+  }
 }

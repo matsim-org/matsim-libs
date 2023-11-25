@@ -34,29 +34,32 @@ import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 
 final class PlotPlans {
 
-    public static void main(String[] args) {
-        Config config = new Config();
-        config.addCoreModules();
-        Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("input/usecases/chessboard/network/grid9x9.xml");
+  public static void main(String[] args) {
+    Config config = new Config();
+    config.addCoreModules();
+    Scenario scenario = ScenarioUtils.createScenario(config);
+    new MatsimNetworkReader(scenario.getNetwork())
+        .readFile("input/usecases/chessboard/network/grid9x9.xml");
 
-        CarrierVehicleTypes types = new CarrierVehicleTypes();
-        new CarrierVehicleTypeReader(types).readFile("input/usecases/chessboard/freight/vehicleTypes.xml");
+    CarrierVehicleTypes types = new CarrierVehicleTypes();
+    new CarrierVehicleTypeReader(types)
+        .readFile("input/usecases/chessboard/freight/vehicleTypes.xml");
 
-        final Carriers carriers = new Carriers();
-//		new CarrierPlanXmlReader(carriers).read("input/usecases/chessboard/freight/singleCarrierTwentyActivities.xml");
-        new CarrierPlanXmlReader(carriers, types ).readFile("output/ITERS/it.140/140.carrierPlans.xml" );
+    final Carriers carriers = new Carriers();
+    //		new
+    // CarrierPlanXmlReader(carriers).read("input/usecases/chessboard/freight/singleCarrierTwentyActivities.xml");
+    new CarrierPlanXmlReader(carriers, types).readFile("output/ITERS/it.140/140.carrierPlans.xml");
 
-        new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
+    new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 
-        final Carrier carrier = carriers.getCarriers().get(Id.create("carrier1",Carrier.class));
-        VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork());
-        VehicleRoutingProblem vrp = vrpBuilder.build();
+    final Carrier carrier = carriers.getCarriers().get(Id.create("carrier1", Carrier.class));
+    VehicleRoutingProblem.Builder vrpBuilder =
+        MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork());
+    VehicleRoutingProblem vrp = vrpBuilder.build();
 
-        VehicleRoutingProblemSolution solution = MatsimJspritFactory.createSolution(carrier.getSelectedPlan(), vrp);
+    VehicleRoutingProblemSolution solution =
+        MatsimJspritFactory.createSolution(carrier.getSelectedPlan(), vrp);
 
-        new Plotter(vrp,solution.getRoutes()).plot("output/plot_140", "carrier1");
-
-    }
-
+    new Plotter(vrp, solution.getRoutes()).plot("output/plot_140", "carrier1");
+  }
 }

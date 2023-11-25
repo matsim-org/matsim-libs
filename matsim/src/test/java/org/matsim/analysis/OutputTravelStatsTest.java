@@ -19,47 +19,42 @@
 
 package org.matsim.analysis;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
-import org.matsim.testcases.MatsimTestUtils;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
+import org.matsim.testcases.MatsimTestUtils;
 
 public class OutputTravelStatsTest {
 
-	@Rule
-	public MatsimTestUtils util = new MatsimTestUtils();
+  @Rule public MatsimTestUtils util = new MatsimTestUtils();
 
-	@Test
-	public void testActivitiesOutputCSV() throws IOException {
-		String outputDirectory = util.getOutputDirectory();
+  @Test
+  public void testActivitiesOutputCSV() throws IOException {
+    String outputDirectory = util.getOutputDirectory();
 
-		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controller().setLastIteration(10);
-		config.controller().setWriteTripsInterval(1);
-		config.controller().setOutputDirectory(outputDirectory);
-		Controler c = new Controler(config);
+    Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
+    config.controller().setLastIteration(10);
+    config.controller().setWriteTripsInterval(1);
+    config.controller().setOutputDirectory(outputDirectory);
+    Controler c = new Controler(config);
 
-		c.run();
+    c.run();
 
-		File csv = new File(outputDirectory, "output_activities.csv.gz");
+    File csv = new File(outputDirectory, "output_activities.csv.gz");
 
-		assertThat(csv).exists();
+    assertThat(csv).exists();
 
-		assertThat(new GZIPInputStream(new FileInputStream(csv)))
-				.asString(StandardCharsets.UTF_8)
-				.startsWith("person;activity_number;activity_id;activity_type;start_time;end_time;maximum_duration;link_id;facility_id;coord_x;coord_y");
-
-	}
-
-
+    assertThat(new GZIPInputStream(new FileInputStream(csv)))
+        .asString(StandardCharsets.UTF_8)
+        .startsWith(
+            "person;activity_number;activity_id;activity_type;start_time;end_time;maximum_duration;link_id;facility_id;coord_x;coord_y");
+  }
 }

@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.multimodal.simengine;
 
+import java.util.HashSet;
+import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -27,45 +29,47 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-import java.util.HashSet;
-import java.util.Set;
-
 class MultiModalDepartureHandler implements DepartureHandler {
 
-	private final MultiModalSimEngine simEngine;
-	private Set<String> handledModes = new HashSet<>();
-	
-	public MultiModalDepartureHandler(MultiModalSimEngine simEngine, MultiModalConfigGroup multiModalConfigGroup) {
-		this.simEngine = simEngine;
-		this.handledModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
-	}
-	
-	@Override
-	public boolean handleDeparture(double now, MobsimAgent mobsimAgent, Id linkId) {
+  private final MultiModalSimEngine simEngine;
+  private Set<String> handledModes = new HashSet<>();
 
-		if (handledModes.contains(mobsimAgent.getMode())) {
-			if (mobsimAgent instanceof MobsimDriverAgent) {
-				handleMultiModalDeparture(now, (MobsimDriverAgent)mobsimAgent, linkId);
-				return true;
-			} else {
-				throw new UnsupportedOperationException("MobsimAgent is not from type MobsimDriverAgent - cannot handle departure. Found PersonAgent class is " + mobsimAgent.getClass().toString());
-			}
-		}
-		
-		return false;
-	}
-	
-	private void handleMultiModalDeparture(double now, MobsimDriverAgent personAgent, Id linkId) {
-		
-		MultiModalQLinkExtension extension = simEngine.getMultiModalQLinkExtension(linkId);
-		
-//		if ((personAgent.getDestinationLinkId().equals(linkId)) && (personAgent.chooseNextLinkId() == null)) {
-		if ((personAgent.getDestinationLinkId().equals(linkId)) && (personAgent.isWantingToArriveOnCurrentLink() )) {
-			personAgent.endLegAndComputeNextState(now);
-			this.simEngine.internalInterface.arrangeNextAgentState(personAgent);
-			/* yyyy The "non-departure" should be caught in the framework.  kai, dec'11 */  
-		} else {
-			extension.addDepartingAgent(personAgent, now);
-		}				
-	}
-}	
+  public MultiModalDepartureHandler(
+      MultiModalSimEngine simEngine, MultiModalConfigGroup multiModalConfigGroup) {
+    this.simEngine = simEngine;
+    this.handledModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
+  }
+
+  @Override
+  public boolean handleDeparture(double now, MobsimAgent mobsimAgent, Id linkId) {
+
+    if (handledModes.contains(mobsimAgent.getMode())) {
+      if (mobsimAgent instanceof MobsimDriverAgent) {
+        handleMultiModalDeparture(now, (MobsimDriverAgent) mobsimAgent, linkId);
+        return true;
+      } else {
+        throw new UnsupportedOperationException(
+            "MobsimAgent is not from type MobsimDriverAgent - cannot handle departure. Found PersonAgent class is "
+                + mobsimAgent.getClass().toString());
+      }
+    }
+
+    return false;
+  }
+
+  private void handleMultiModalDeparture(double now, MobsimDriverAgent personAgent, Id linkId) {
+
+    MultiModalQLinkExtension extension = simEngine.getMultiModalQLinkExtension(linkId);
+
+    //		if ((personAgent.getDestinationLinkId().equals(linkId)) && (personAgent.chooseNextLinkId()
+    // == null)) {
+    if ((personAgent.getDestinationLinkId().equals(linkId))
+        && (personAgent.isWantingToArriveOnCurrentLink())) {
+      personAgent.endLegAndComputeNextState(now);
+      this.simEngine.internalInterface.arrangeNextAgentState(personAgent);
+      /* yyyy The "non-departure" should be caught in the framework.  kai, dec'11 */
+    } else {
+      extension.addDepartingAgent(personAgent, now);
+    }
+  }
+}

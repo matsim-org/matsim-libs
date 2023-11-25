@@ -23,5 +23,4 @@ package org.matsim.contrib.taxi.util.stats;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public record TimeBinSample<V>(int timeBin, V value) {
-}
+public record TimeBinSample<V>(int timeBin, V value) {}

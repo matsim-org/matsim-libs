@@ -20,7 +20,6 @@ package playground.vsp.analysis.modules.ptRoutes2paxAnalysis;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -30,50 +29,56 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 /**
  * @author droeder
- *
  */
 public class TransitLineContainer {
 
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(TransitLineContainer.class);
-	private Id<TransitLine> id;
-	private Map<Id<TransitRoute>, TransitRouteContainer> routeContainer;
+  @SuppressWarnings("unused")
+  private static final Logger log = LogManager.getLogger(TransitLineContainer.class);
 
-	public TransitLineContainer(TransitLine l, double countsInterval, int maxSlice) {
-		this.id = l.getId();
-		this.routeContainer = getRouteContainer(l, countsInterval, maxSlice);
-	}
-	
-	public Id<TransitLine> getId(){
-		return this.id;
-	}
+  private Id<TransitLine> id;
+  private Map<Id<TransitRoute>, TransitRouteContainer> routeContainer;
 
-	/**
-	 * @param l
-	 * @return
-	 */
-	private Map<Id<TransitRoute>, TransitRouteContainer> getRouteContainer(TransitLine l, double countsInterval, int maxSlice) {
-		Map<Id<TransitRoute>, TransitRouteContainer> rc = new HashMap<Id<TransitRoute>, TransitRouteContainer>();
-		for(TransitRoute r: l.getRoutes().values()){
-			rc.put(r.getId(), new TransitRouteContainer(r, countsInterval, maxSlice));
-		}
-		return rc;
-	}
-	
-	public void paxBoarding(Id<TransitRoute> routeId, Id<Link> stopIndexId, double time){
-		this.routeContainer.get(routeId).paxBoarding(stopIndexId, time);
-	}
-	
-	public void paxAlighting(Id<TransitRoute> routeId, Id<Link> stopIndexId, double time){
-		this.routeContainer.get(routeId).paxAlighting(stopIndexId, time);
-	}
-	
-	public void vehicleDeparts(double time, double vehCapacity, double nrSeatsInUse, Id<Link> stopIndexId, Id<TransitRoute> routeId){
-		this.routeContainer.get(routeId).vehicleDeparts(time, vehCapacity, nrSeatsInUse, stopIndexId);
-	}
-	
-	public Map<Id<TransitRoute>, TransitRouteContainer> getTransitRouteContainer(){
-		return this.routeContainer;
-	}
+  public TransitLineContainer(TransitLine l, double countsInterval, int maxSlice) {
+    this.id = l.getId();
+    this.routeContainer = getRouteContainer(l, countsInterval, maxSlice);
+  }
+
+  public Id<TransitLine> getId() {
+    return this.id;
+  }
+
+  /**
+   * @param l
+   * @return
+   */
+  private Map<Id<TransitRoute>, TransitRouteContainer> getRouteContainer(
+      TransitLine l, double countsInterval, int maxSlice) {
+    Map<Id<TransitRoute>, TransitRouteContainer> rc =
+        new HashMap<Id<TransitRoute>, TransitRouteContainer>();
+    for (TransitRoute r : l.getRoutes().values()) {
+      rc.put(r.getId(), new TransitRouteContainer(r, countsInterval, maxSlice));
+    }
+    return rc;
+  }
+
+  public void paxBoarding(Id<TransitRoute> routeId, Id<Link> stopIndexId, double time) {
+    this.routeContainer.get(routeId).paxBoarding(stopIndexId, time);
+  }
+
+  public void paxAlighting(Id<TransitRoute> routeId, Id<Link> stopIndexId, double time) {
+    this.routeContainer.get(routeId).paxAlighting(stopIndexId, time);
+  }
+
+  public void vehicleDeparts(
+      double time,
+      double vehCapacity,
+      double nrSeatsInUse,
+      Id<Link> stopIndexId,
+      Id<TransitRoute> routeId) {
+    this.routeContainer.get(routeId).vehicleDeparts(time, vehCapacity, nrSeatsInUse, stopIndexId);
+  }
+
+  public Map<Id<TransitRoute>, TransitRouteContainer> getTransitRouteContainer() {
+    return this.routeContainer;
+  }
 }
-

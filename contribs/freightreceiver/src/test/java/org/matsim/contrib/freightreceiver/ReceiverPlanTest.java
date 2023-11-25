@@ -18,23 +18,22 @@
 
 package org.matsim.contrib.freightreceiver;
 
-import org.matsim.api.core.v01.Id;
 import org.junit.Assert;
 import org.junit.Test;
-
+import org.matsim.api.core.v01.Id;
 
 public class ReceiverPlanTest {
 
+  @Test
+  public void testBuilderTwo() {
+    Receiver receiver = ReceiverUtils.newInstance(Id.create("1", Receiver.class));
+    ReceiverPlan.Builder builder = ReceiverPlan.Builder.newInstance(receiver, true);
+    ReceiverPlan plan = builder.build();
+    Assert.assertEquals(
+        "Wrong receiver Id", Id.create("1", Receiver.class), plan.getReceiver().getId());
+    Assert.assertNull("Score should be null", plan.getScore());
+  }
 
-	@Test
-	public void testBuilderTwo() {
-		Receiver receiver = ReceiverUtils.newInstance( Id.create( "1", Receiver.class ) );
-		ReceiverPlan.Builder builder = ReceiverPlan.Builder.newInstance(receiver, true);
-		ReceiverPlan plan = builder.build();
-		Assert.assertEquals("Wrong receiver Id", Id.create("1", Receiver.class), plan.getReceiver().getId());
-		Assert.assertNull("Score should be null", plan.getScore());
-	}
-
-	/* TODO Add tests to check ReceiverOrders */
+  /* TODO Add tests to check ReceiverOrders */
 
 }

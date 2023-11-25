@@ -21,45 +21,38 @@ package org.matsim.contrib.socnetsim.jointtrips.router;
 
 import java.util.Collections;
 import java.util.List;
-
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.RoutingRequest;
 import org.matsim.facilities.Facility;
-
-import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 
 /**
  * @author thibautd
  */
 public class PassengerRoutingModule implements RoutingModule {
-	private final PopulationFactory popFactory;
-	private final String modeName;
+  private final PopulationFactory popFactory;
+  private final String modeName;
 
-	public PassengerRoutingModule(
-			final String modeName,
-			final PopulationFactory popFactory) {
-		this.modeName = modeName;
-		this.popFactory = popFactory;
-	}
+  public PassengerRoutingModule(final String modeName, final PopulationFactory popFactory) {
+    this.modeName = modeName;
+    this.popFactory = popFactory;
+  }
 
-	@Override
-	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
-		final Facility fromFacility = request.getFromFacility();
-		final Facility toFacility = request.getToFacility();
-		final double departureTime = request.getDepartureTime();
-		
-		Leg l = popFactory.createLeg( modeName );
-		l.setDepartureTime( departureTime );
-		Route r = new PassengerRoute( fromFacility.getLinkId() , toFacility.getLinkId() );
-		l.setRoute( r );
-		l.setTravelTime(0.0);
-		return Collections.singletonList( l );
-	}
+  @Override
+  public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+    final Facility fromFacility = request.getFromFacility();
+    final Facility toFacility = request.getToFacility();
+    final double departureTime = request.getDepartureTime();
 
+    Leg l = popFactory.createLeg(modeName);
+    l.setDepartureTime(departureTime);
+    Route r = new PassengerRoute(fromFacility.getLinkId(), toFacility.getLinkId());
+    l.setRoute(r);
+    l.setTravelTime(0.0);
+    return Collections.singletonList(l);
+  }
 }
-

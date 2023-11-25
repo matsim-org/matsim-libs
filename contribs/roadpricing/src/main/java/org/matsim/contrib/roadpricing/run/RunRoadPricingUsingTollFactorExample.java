@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.roadpricing.run;
 
+import java.net.URL;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.Config;
@@ -28,58 +29,71 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleType;
 
-import java.net.URL;
-
 /**
- * Illustrative example how to first read a "base" toll file, and then make it dependent on the vehicle type.
- * <br/><br/>
+ * Illustrative example how to first read a "base" toll file, and then make it dependent on the
+ * vehicle type. <br>
+ * <br>
  * Not tested.
  *
  * @author nagel
  */
 public class RunRoadPricingUsingTollFactorExample {
-	private static final String TEST_CONFIG = "./contribs/roadpricing/test/input/org/matsim/contrib/roadpricing/AvoidTolledRouteTest/config.xml";
+  private static final String TEST_CONFIG =
+      "./contribs/roadpricing/test/input/org/matsim/contrib/roadpricing/AvoidTolledRouteTest/config.xml";
 
-	public static void main(String[] args) {
+  public static void main(String[] args) {
 
-		// load the config from file:
-		Config config;
-		if (args.length > 0) {
-			config = ConfigUtils.loadConfig(args[0], RoadPricingUtils.createConfigGroup());
-		} else {
-			config = ConfigUtils.loadConfig(TEST_CONFIG, RoadPricingUtils.createConfigGroup());
-		}
-		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+    // load the config from file:
+    Config config;
+    if (args.length > 0) {
+      config = ConfigUtils.loadConfig(args[0], RoadPricingUtils.createConfigGroup());
+    } else {
+      config = ConfigUtils.loadConfig(TEST_CONFIG, RoadPricingUtils.createConfigGroup());
+    }
+    config
+        .controller()
+        .setOverwriteFileSetting(
+            OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
-		// "materialize" the road pricing config group:
-		RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.class);
+    // "materialize" the road pricing config group:
+    RoadPricingConfigGroup rpConfig =
+        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.class);
 
-		// load the scenario from file.  This will _not_ load the road pricing file, since it is not part of the main distribution.
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
+    // load the scenario from file.  This will _not_ load the road pricing file, since it is not
+    // part of the main distribution.
+    final Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		// define the toll factor as an anonymous class.  If more flexibility is needed, convert to "full" class.
-		TollFactor tollFactor = (personId, vehicleId, linkId, time) -> {
-			VehicleType someVehicleType = null; // --> replace by something meaningful <--
-			//noinspection ConstantConditions
-			if (scenario.getVehicles().getVehicles().get(vehicleId).getType().equals(someVehicleType)) {
-				return 2;
-			} else {
-				return 1;
-			}
-		};
+    // define the toll factor as an anonymous class.  If more flexibility is needed, convert to
+    // "full" class.
+    TollFactor tollFactor =
+        (personId, vehicleId, linkId, time) -> {
+          VehicleType someVehicleType = null; // --> replace by something meaningful <--
+          //noinspection ConstantConditions
+          if (scenario
+              .getVehicles()
+              .getVehicles()
+              .get(vehicleId)
+              .getType()
+              .equals(someVehicleType)) {
+            return 2;
+          } else {
+            return 1;
+          }
+        };
 
-		// instantiate the road pricing scheme, with the toll factor inserted:
-		URL roadpricingUrl = IOUtils.extendUrl(config.getContext(), rpConfig.getTollLinksFile());
-		RoadPricingSchemeUsingTollFactor scheme = RoadPricingSchemeUsingTollFactor.createAndRegisterRoadPricingSchemeUsingTollFactor(roadpricingUrl, tollFactor, scenario );
+    // instantiate the road pricing scheme, with the toll factor inserted:
+    URL roadpricingUrl = IOUtils.extendUrl(config.getContext(), rpConfig.getTollLinksFile());
+    RoadPricingSchemeUsingTollFactor scheme =
+        RoadPricingSchemeUsingTollFactor.createAndRegisterRoadPricingSchemeUsingTollFactor(
+            roadpricingUrl, tollFactor, scenario);
 
-		// instantiate the control(l)er:
-		Controler controler = new Controler(scenario);
+    // instantiate the control(l)er:
+    Controler controler = new Controler(scenario);
 
-		// add the road pricing module, with our scheme from above inserted:
-		controler.addOverridingModule( new RoadPricingModule( scheme ) );
+    // add the road pricing module, with our scheme from above inserted:
+    controler.addOverridingModule(new RoadPricingModule(scheme));
 
-		// run everything:
-		controler.run();
-	}
-
+    // run everything:
+    controler.run();
+  }
 }

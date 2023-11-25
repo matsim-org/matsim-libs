@@ -24,30 +24,34 @@ import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.dynagent.FirstLastSimStepDynActivity;
 
 public class SinglePassengerDropoffActivity extends FirstLastSimStepDynActivity {
-	private final PassengerHandler passengerHandler;
-	private final DynAgent driver;
-	private final PassengerRequest request;
+  private final PassengerHandler passengerHandler;
+  private final DynAgent driver;
+  private final PassengerRequest request;
 
-	private final double departureTime;
+  private final double departureTime;
 
-	public SinglePassengerDropoffActivity(PassengerHandler passengerHandler, DynAgent driver, StayTask dropoffTask,
-			PassengerRequest request, String activityType) {
-		super(activityType);
+  public SinglePassengerDropoffActivity(
+      PassengerHandler passengerHandler,
+      DynAgent driver,
+      StayTask dropoffTask,
+      PassengerRequest request,
+      String activityType) {
+    super(activityType);
 
-		this.passengerHandler = passengerHandler;
-		this.driver = driver;
-		this.request = request;
+    this.passengerHandler = passengerHandler;
+    this.driver = driver;
+    this.request = request;
 
-		departureTime = dropoffTask.getEndTime();
-	}
+    departureTime = dropoffTask.getEndTime();
+  }
 
-	@Override
-	protected boolean isLastStep(double now) {
-		return now >= departureTime;
-	}
+  @Override
+  protected boolean isLastStep(double now) {
+    return now >= departureTime;
+  }
 
-	@Override
-	protected void afterLastStep(double now) {
-		passengerHandler.dropOffPassengers(driver, request.getId(), now);
-	}
+  @Override
+  protected void afterLastStep(double now) {
+    passengerHandler.dropOffPassengers(driver, request.getId(), now);
+  }
 }

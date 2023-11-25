@@ -26,42 +26,49 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author droeder
- *
  */
 public class TikzNode {
 
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(TikzNode.class);
-	private Coord coord;
-	private Id<TikzNode> id;
+  @SuppressWarnings("unused")
+  private static final Logger log = LogManager.getLogger(TikzNode.class);
 
-	public TikzNode(TransitStopFacility f, int i) {
-		this.coord = f.getCoord();
-//		this.id = new IdImpl(f.getId().toString().replaceAll("_", ""));
-		this.id = Id.create(i, TikzNode.class);
-	}
-	
-	public Coord getCoord(){
-		return this.coord;
-	}
-	
-	public String getTikzString(String styleId){
-		return ("\\node [" + styleId + "] (" + this.id.toString() + 
-				") at (" + this.coord.getX() + "," + this.coord.getY() +") {};");	
-	}
+  private Coord coord;
+  private Id<TikzNode> id;
 
-	public Id<TikzNode> getId() {
-		return this.id;
-	}
+  public TikzNode(TransitStopFacility f, int i) {
+    this.coord = f.getCoord();
+    //		this.id = new IdImpl(f.getId().toString().replaceAll("_", ""));
+    this.id = Id.create(i, TikzNode.class);
+  }
 
-	/**
-	 * @param xOffset
-	 * @param yOffset
-	 * @param scale 
-	 * @return 
-	 */
-	public void offset(Double xOffset, Double yOffset, Double scale) {
-		this.coord = new Coord((this.coord.getX() + xOffset) * scale, (this.coord.getY() + yOffset) * scale);
-	}
+  public Coord getCoord() {
+    return this.coord;
+  }
+
+  public String getTikzString(String styleId) {
+    return ("\\node ["
+        + styleId
+        + "] ("
+        + this.id.toString()
+        + ") at ("
+        + this.coord.getX()
+        + ","
+        + this.coord.getY()
+        + ") {};");
+  }
+
+  public Id<TikzNode> getId() {
+    return this.id;
+  }
+
+  /**
+   * @param xOffset
+   * @param yOffset
+   * @param scale
+   * @return
+   */
+  public void offset(Double xOffset, Double yOffset, Double scale) {
+    this.coord =
+        new Coord((this.coord.getX() + xOffset) * scale, (this.coord.getY() + yOffset) * scale);
+  }
 }
-

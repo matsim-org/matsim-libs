@@ -34,61 +34,74 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 
 public final class PModule extends AbstractModule {
-	private final static Logger log = LogManager.getLogger(PModule.class);
+  private static final Logger log = LogManager.getLogger(PModule.class);
 
-	@Override public void install() {
+  @Override
+  public void install() {
 
-		addControlerListenerBinding().to(PControlerListener.class) ;
-//		addControlerListenerBinding().toInstance(pTransitRouterFactory);
-		// (needs to be injected _after_ PControlerListener, so that it is executed _before_ PControlerListener.
-		// yyyy injecting the TransitRouterFactory besides the TransitRouter is a fix to re-configure the factory in every iteration.
-		// A more general solution suggested by MZ would be to define an iteration scope.  Then the factory could be forced
-		// to reconstruct itself in every iteration, thus pulling new information (in this case the updated transit schedule)
-		// by itself.  Is on the "list", has not been done yet, will be done eventually, until then this remains the way it is.
-		// kai, jan'17)
-		// The iteration scope of PControlerListener should be executed before iteration scope of PTransitRouterFactory.
-		// It is not clear, how to control over the order of the execution. If transit schedule and thus transit router needs to be updated at every iteration,
-		// it needs to be explicitly triggered in PControlerListener which is mainly same as before. See also MATSim-768. GL, AA, AN. Jan'18
+    addControlerListenerBinding().to(PControlerListener.class);
+    //		addControlerListenerBinding().toInstance(pTransitRouterFactory);
+    // (needs to be injected _after_ PControlerListener, so that it is executed _before_
+    // PControlerListener.
+    // yyyy injecting the TransitRouterFactory besides the TransitRouter is a fix to re-configure
+    // the factory in every iteration.
+    // A more general solution suggested by MZ would be to define an iteration scope.  Then the
+    // factory could be forced
+    // to reconstruct itself in every iteration, thus pulling new information (in this case the
+    // updated transit schedule)
+    // by itself.  Is on the "list", has not been done yet, will be done eventually, until then this
+    // remains the way it is.
+    // kai, jan'17)
+    // The iteration scope of PControlerListener should be executed before iteration scope of
+    // PTransitRouterFactory.
+    // It is not clear, how to control over the order of the execution. If transit schedule and thus
+    // transit router needs to be updated at every iteration,
+    // it needs to be explicitly triggered in PControlerListener which is mainly same as before. See
+    // also MATSim-768. GL, AA, AN. Jan'18
 
-		bind(TicketMachineI.class).to(TicketMachineDefaultImpl.class);
-		
-		if ( ConfigUtils.addOrGetModule(getConfig(), PConfigGroup.class ).getSubsidyApproach() == null ) {
-			log.info("There is no subsidy added to the operators' score.");
-			
-		} else if ( ConfigUtils.addOrGetModule(getConfig(), PConfigGroup.class ).getSubsidyApproach().equals("perPassenger") )  {
-			log.warn("There is a subsidy added to the operators' score. Approach: 'perPassenger'."
-					+ " This approach is rather an example how to implement a subsidy computation approach and should not be used"
-					+ " for real studies...");
-			bind(SubsidyI.class).to(PerPassengerSubsidy.class);
-		
-		} else {
-			log.warn("Unknown subsidy approach: " + ConfigUtils.addOrGetModule(getConfig(), PConfigGroup.class ).getSubsidyApproach());
-			log.warn("Add the following lines of code to your run class:");
-			log.warn("");
-			log.warn("controler.addOverridingModule(new AbstractModule() {");
-			log.warn("");
-			log.warn("	@Override");
-			log.warn("	public void install() {");
-			log.warn("		this.bind(SubsidyI.class).to(<YourSubsidyApproach>.class)");
-			log.warn("	}");
-			log.warn("});");
-			log.warn("");
-			throw new RuntimeException("Aborting...");
-		}
+    bind(TicketMachineI.class).to(TicketMachineDefaultImpl.class);
 
-		bind(POperators.class).to(PBox.class).asEagerSingleton();
-		// (needs to be a singleton since it is a data container, and all clients should use the same data container. kai, jan'17)
+    if (ConfigUtils.addOrGetModule(getConfig(), PConfigGroup.class).getSubsidyApproach() == null) {
+      log.info("There is no subsidy added to the operators' score.");
 
-		bindMobsim().toProvider(PQSimProvider.class) ;
-		bind(LineId2PtMode.class).to( BVGLines2PtModes.class ) ;
+    } else if (ConfigUtils.addOrGetModule(getConfig(), PConfigGroup.class)
+        .getSubsidyApproach()
+        .equals("perPassenger")) {
+      log.warn(
+          "There is a subsidy added to the operators' score. Approach: 'perPassenger'."
+              + " This approach is rather an example how to implement a subsidy computation approach and should not be used"
+              + " for real studies...");
+      bind(SubsidyI.class).to(PerPassengerSubsidy.class);
 
-		install( new PStatsModule() ) ;
+    } else {
+      log.warn(
+          "Unknown subsidy approach: "
+              + ConfigUtils.addOrGetModule(getConfig(), PConfigGroup.class).getSubsidyApproach());
+      log.warn("Add the following lines of code to your run class:");
+      log.warn("");
+      log.warn("controler.addOverridingModule(new AbstractModule() {");
+      log.warn("");
+      log.warn("	@Override");
+      log.warn("	public void install() {");
+      log.warn("		this.bind(SubsidyI.class).to(<YourSubsidyApproach>.class)");
+      log.warn("	}");
+      log.warn("});");
+      log.warn("");
+      throw new RuntimeException("Aborting...");
+    }
 
-		if ( ConfigUtils.addOrGetModule(getConfig(), PConfigGroup.class ).getReRouteAgentsStuck() ) {
-			bind(PersonReRouteStuckFactory.class).to( PersonReRouteStuckFactoryImpl.class );
-			bind(AgentsStuckHandlerImpl.class) ;
-		}
+    bind(POperators.class).to(PBox.class).asEagerSingleton();
+    // (needs to be a singleton since it is a data container, and all clients should use the same
+    // data container. kai, jan'17)
 
-	}
+    bindMobsim().toProvider(PQSimProvider.class);
+    bind(LineId2PtMode.class).to(BVGLines2PtModes.class);
 
+    install(new PStatsModule());
+
+    if (ConfigUtils.addOrGetModule(getConfig(), PConfigGroup.class).getReRouteAgentsStuck()) {
+      bind(PersonReRouteStuckFactory.class).to(PersonReRouteStuckFactoryImpl.class);
+      bind(AgentsStuckHandlerImpl.class);
+    }
+  }
 }

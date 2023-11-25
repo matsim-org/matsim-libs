@@ -22,46 +22,50 @@ package playground.vsp.andreas.fcd;
 import org.matsim.api.core.v01.Id;
 
 public class FcdEvent {
-	
-	private final double time;
-	private final Id linkId;
-	private final double averageSpeed;
-	private final double linkCoverage;
-	private final Id vehId;
-	private final int minuteOfWeek;
-	
-	public FcdEvent(double time, Id linkId, double averageSpeed, double linkCoverage, Id vehId, int minuteOfWeek){
-		this.time = time;
-		this.linkId = linkId;
-		this.averageSpeed = averageSpeed;
-		this.linkCoverage = linkCoverage;
-		this.vehId = vehId;
-		this.minuteOfWeek = minuteOfWeek;
-	}
 
-	public double getTime() {
-		return this.time;
-	}
+  private final double time;
+  private final Id linkId;
+  private final double averageSpeed;
+  private final double linkCoverage;
+  private final Id vehId;
+  private final int minuteOfWeek;
 
-	public Id getLinkId() {
-		return this.linkId;
-	}
+  public FcdEvent(
+      double time,
+      Id linkId,
+      double averageSpeed,
+      double linkCoverage,
+      Id vehId,
+      int minuteOfWeek) {
+    this.time = time;
+    this.linkId = linkId;
+    this.averageSpeed = averageSpeed;
+    this.linkCoverage = linkCoverage;
+    this.vehId = vehId;
+    this.minuteOfWeek = minuteOfWeek;
+  }
 
-	public double getAverageSpeed() {
-		return this.averageSpeed;
-	}
+  public double getTime() {
+    return this.time;
+  }
 
-	public double getLinkCoverage() {
-		return this.linkCoverage;
-	}
+  public Id getLinkId() {
+    return this.linkId;
+  }
 
-	public Id getVehId() {
-		return this.vehId;
-	}
+  public double getAverageSpeed() {
+    return this.averageSpeed;
+  }
 
-	public int getMinuteOfWeek() {
-		return this.minuteOfWeek;
-	}
+  public double getLinkCoverage() {
+    return this.linkCoverage;
+  }
 
-	
+  public Id getVehId() {
+    return this.vehId;
+  }
+
+  public int getMinuteOfWeek() {
+    return this.minuteOfWeek;
+  }
 }

@@ -25,15 +25,16 @@ import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
 
 public class ClipIncompleteEntities extends AreaFilter {
 
-	public ClipIncompleteEntities(IdTrackerType idTrackerType,
-			boolean clipIncompleteEntities, boolean completeWays,
-			boolean completeRelations) {
-		super(idTrackerType, true, completeWays, completeRelations, true);
-	}
+  public ClipIncompleteEntities(
+      IdTrackerType idTrackerType,
+      boolean clipIncompleteEntities,
+      boolean completeWays,
+      boolean completeRelations) {
+    super(idTrackerType, true, completeWays, completeRelations, true);
+  }
 
-	@Override
-	protected boolean isNodeWithinArea(Node arg0) {
-		return true;
-	}
-
+  @Override
+  protected boolean isNodeWithinArea(Node arg0) {
+    return true;
+  }
 }

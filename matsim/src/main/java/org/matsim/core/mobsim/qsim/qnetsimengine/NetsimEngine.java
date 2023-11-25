@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * NetsimEngine.java
@@ -19,9 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- /**
- * 
- */
+/** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.Id;
@@ -33,16 +30,14 @@ import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 
 /**
  * @author kainagel
- *
  */
 public interface NetsimEngine {
 
-	void registerAdditionalAgentOnLink(MobsimAgent planAgent);
+  void registerAdditionalAgentOnLink(MobsimAgent planAgent);
 
-	MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId);
+  MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId);
 
-	void addParkedVehicle(MobsimVehicle veh, Id<Link> linkId);
+  void addParkedVehicle(MobsimVehicle veh, Id<Link> linkId);
 
-	NetsimNetwork getNetsimNetwork();
-
+  NetsimNetwork getNetsimNetwork();
 }

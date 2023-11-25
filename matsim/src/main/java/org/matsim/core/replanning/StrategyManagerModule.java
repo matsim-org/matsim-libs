@@ -27,6 +27,8 @@ import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -40,87 +42,101 @@ import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-
 public class StrategyManagerModule extends AbstractModule {
-	@Override
-	public void install() {
-		int externalCounter = 0;
+  @Override
+  public void install() {
+    int externalCounter = 0;
 
-		install(new DefaultPlanStrategiesModule());
-		// (does commands of type "bind(PlanStrategy.class).annotatedWith(Names.named(strategyName))", i.e.
-		// plan strategies can be looked up under their names (*))
+    install(new DefaultPlanStrategiesModule());
+    // (does commands of type "bind(PlanStrategy.class).annotatedWith(Names.named(strategyName))",
+    // i.e.
+    // plan strategies can be looked up under their names (*))
 
-		bind(StrategyManager.class).in(Singleton.class);
-		bind(new TypeLiteral<StrategyChooser<Plan, Person>>() {}).to(new TypeLiteral<WeightedStrategyChooser<Plan, Person>>() {}).asEagerSingleton();
-		bind(ReplanningContext.class).to(ReplanningContextImpl.class).asEagerSingleton();
+    bind(StrategyManager.class).in(Singleton.class);
+    bind(new TypeLiteral<StrategyChooser<Plan, Person>>() {})
+        .to(new TypeLiteral<WeightedStrategyChooser<Plan, Person>>() {})
+        .asEagerSingleton();
+    bind(ReplanningContext.class).to(ReplanningContextImpl.class).asEagerSingleton();
 
-		MapBinder<ReplanningConfigGroup.StrategySettings, PlanStrategy> planStrategyMapBinder = MapBinder.newMapBinder(binder(), ReplanningConfigGroup.StrategySettings.class, PlanStrategy.class);
-		// (this will bind a Map that has StrategySettings as key, and PlanStrategy as value.  Not sure why StrategySettings as key, and not just the name, but possibly this is mean to allow adding
-		// the same strategy multiple times, with possibly different settings.)
+    MapBinder<ReplanningConfigGroup.StrategySettings, PlanStrategy> planStrategyMapBinder =
+        MapBinder.newMapBinder(
+            binder(), ReplanningConfigGroup.StrategySettings.class, PlanStrategy.class);
+    // (this will bind a Map that has StrategySettings as key, and PlanStrategy as value.  Not sure
+    // why StrategySettings as key, and not just the name, but possibly this is mean to allow adding
+    // the same strategy multiple times, with possibly different settings.)
 
-		for (ReplanningConfigGroup.StrategySettings settings : getConfig().replanning().getStrategySettings()) {
-			String name = settings.getStrategyName() ;
-			if (name.equals("ExternalModule")) {
-				// plan strategy is some external executable:
-				externalCounter++;
-				planStrategyMapBinder.addBinding(settings).toProvider(new ExternalModuleProvider(externalCounter, settings.getExePath()));
-			} else if (name.contains(".")) {
-				// plan strategy is in Java, but it is found via the class loader:
-				if (name.startsWith("org.matsim.core")
-						    // && !name.startsWith("org.matsim.contrib.")
-				) {
-					// org.matsim.core strategies are not to be loaded via the class loader:
-					throw new RuntimeException("Strategies in the org.matsim.core package must not be loaded by name!");
-				} else {
-					try {
-						Class klass = Class.forName(name);
-						if (PlanStrategy.class.isAssignableFrom(klass)) {
-							planStrategyMapBinder.addBinding(settings).to(klass);
-						} else if (Provider.class.isAssignableFrom(klass)) {
-							planStrategyMapBinder.addBinding(settings).toProvider(klass);
-						} else {
-							throw new RuntimeException("You specified a class name as a strategy, but it is neither a PlanStrategy nor a Provider.");
-						}
-					} catch (ClassNotFoundException e) {
-						throw new RuntimeException("You specified something which looks like a class name as a strategy, but the class could not be found.", e);
-					}
-				}
-			} else {
-				// this is the normal case: plan strategy comes from within matsim
-				planStrategyMapBinder.addBinding(settings).to(Key.get(PlanStrategy.class, Names.named(settings.getStrategyName())));
-				// (settings is the key ... ok.  The Key.get(...) returns the PlanStrategy that was registered under its name at (*) above.)
-			}
-		}
-		
-		install(new ConflictModule());
-	}
+    for (ReplanningConfigGroup.StrategySettings settings :
+        getConfig().replanning().getStrategySettings()) {
+      String name = settings.getStrategyName();
+      if (name.equals("ExternalModule")) {
+        // plan strategy is some external executable:
+        externalCounter++;
+        planStrategyMapBinder
+            .addBinding(settings)
+            .toProvider(new ExternalModuleProvider(externalCounter, settings.getExePath()));
+      } else if (name.contains(".")) {
+        // plan strategy is in Java, but it is found via the class loader:
+        if (name.startsWith("org.matsim.core")
+        // && !name.startsWith("org.matsim.contrib.")
+        ) {
+          // org.matsim.core strategies are not to be loaded via the class loader:
+          throw new RuntimeException(
+              "Strategies in the org.matsim.core package must not be loaded by name!");
+        } else {
+          try {
+            Class klass = Class.forName(name);
+            if (PlanStrategy.class.isAssignableFrom(klass)) {
+              planStrategyMapBinder.addBinding(settings).to(klass);
+            } else if (Provider.class.isAssignableFrom(klass)) {
+              planStrategyMapBinder.addBinding(settings).toProvider(klass);
+            } else {
+              throw new RuntimeException(
+                  "You specified a class name as a strategy, but it is neither a PlanStrategy nor a Provider.");
+            }
+          } catch (ClassNotFoundException e) {
+            throw new RuntimeException(
+                "You specified something which looks like a class name as a strategy, but the class could not be found.",
+                e);
+          }
+        }
+      } else {
+        // this is the normal case: plan strategy comes from within matsim
+        planStrategyMapBinder
+            .addBinding(settings)
+            .to(Key.get(PlanStrategy.class, Names.named(settings.getStrategyName())));
+        // (settings is the key ... ok.  The Key.get(...) returns the PlanStrategy that was
+        // registered under its name at (*) above.)
+      }
+    }
 
-	/**
-	 * If plan strategy comes from some external executable.  E.g. some external router that is not in Java.
-	 */
-	private static class ExternalModuleProvider implements Provider<PlanStrategy> {
+    install(new ConflictModule());
+  }
 
-		@Inject
-		private OutputDirectoryHierarchy controlerIO;
+  /**
+   * If plan strategy comes from some external executable. E.g. some external router that is not in
+   * Java.
+   */
+  private static class ExternalModuleProvider implements Provider<PlanStrategy> {
 
-		@Inject
-		private Scenario scenario;
+    @Inject private OutputDirectoryHierarchy controlerIO;
 
-		private int externalCounter;
-		private String exePath;
+    @Inject private Scenario scenario;
 
-		public ExternalModuleProvider(int externalCounter, String exePath) {
-			this.externalCounter = externalCounter;
-			this.exePath = exePath;
-		}
+    private int externalCounter;
+    private String exePath;
 
-		@Override
-		public PlanStrategy get() {
-			PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>());
-			builder.addStrategyModule(new ExternalModule(exePath, "ext" + externalCounter, controlerIO, scenario));
-			return builder.build();
-		}
-	}
+    public ExternalModuleProvider(int externalCounter, String exePath) {
+      this.externalCounter = externalCounter;
+      this.exePath = exePath;
+    }
+
+    @Override
+    public PlanStrategy get() {
+      PlanStrategyImpl.Builder builder =
+          new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>());
+      builder.addStrategyModule(
+          new ExternalModule(exePath, "ext" + externalCounter, controlerIO, scenario));
+      return builder.build();
+    }
+  }
 }

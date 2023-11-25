@@ -26,21 +26,20 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 
 public abstract class AbstractQuery implements OTFQuery, OTFQueryRemote {
 
-	@Override
-	public abstract Type getType();
+  @Override
+  public abstract Type getType();
 
-	@Override
-	public abstract void installQuery(SimulationViewForQueries simulationView);
+  @Override
+  public abstract void installQuery(SimulationViewForQueries simulationView);
 
-	@Override
-	public abstract void setId(String id);
+  @Override
+  public abstract void setId(String id);
 
-	@Override
-	public abstract OTFQueryResult query();
+  @Override
+  public abstract OTFQueryResult query();
 
-	@Override
-	public void uninstall() {
-		// Default implementation doesn't do anything.
-	}
-
+  @Override
+  public void uninstall() {
+    // Default implementation doesn't do anything.
+  }
 }

@@ -28,21 +28,26 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
 
 public class CurrentLegReplannerFactory extends WithinDayDuringLegReplannerFactory {
 
-	private final Scenario scenario;
-	private final LeastCostPathCalculator pathCalculator;
+  private final Scenario scenario;
+  private final LeastCostPathCalculator pathCalculator;
 
-	public CurrentLegReplannerFactory(Scenario scenario, ActivityEndReschedulerProvider withinDayEngine,
-																		LeastCostPathCalculator pathCalculator) {
-		super(withinDayEngine);
-		this.scenario = scenario;
-		this.pathCalculator = pathCalculator;
-	}
+  public CurrentLegReplannerFactory(
+      Scenario scenario,
+      ActivityEndReschedulerProvider withinDayEngine,
+      LeastCostPathCalculator pathCalculator) {
+    super(withinDayEngine);
+    this.scenario = scenario;
+    this.pathCalculator = pathCalculator;
+  }
 
-	@Override
-	public WithinDayDuringLegReplanner createReplanner() {
-		WithinDayDuringLegReplanner replanner = new CurrentLegReplanner(super.getId(), scenario,
-				this.getWithinDayEngine().getActivityRescheduler(), 
-				this.pathCalculator);
-		return replanner;
-	}
+  @Override
+  public WithinDayDuringLegReplanner createReplanner() {
+    WithinDayDuringLegReplanner replanner =
+        new CurrentLegReplanner(
+            super.getId(),
+            scenario,
+            this.getWithinDayEngine().getActivityRescheduler(),
+            this.pathCalculator);
+    return replanner;
+  }
 }

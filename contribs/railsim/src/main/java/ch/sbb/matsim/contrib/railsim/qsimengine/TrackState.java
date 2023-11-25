@@ -19,14 +19,10 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-/**
- * Current state of a track.
- */
+/** Current state of a track. */
 public enum TrackState {
-	FREE,
+  FREE,
 
-	/**
-	 * Blocked tracks that are exclusively available for trains.
-	 */
-	BLOCKED
+  /** Blocked tracks that are exclusively available for trains. */
+  BLOCKED
 }

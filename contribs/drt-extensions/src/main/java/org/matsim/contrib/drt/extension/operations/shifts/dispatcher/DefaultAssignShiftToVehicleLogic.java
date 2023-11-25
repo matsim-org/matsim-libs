@@ -8,52 +8,51 @@
  */
 package org.matsim.contrib.drt.extension.operations.shifts.dispatcher;
 
+import java.util.Iterator;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
-
-import java.util.Iterator;
 
 /**
  * @author nkuehnel / MOIA
  */
 public class DefaultAssignShiftToVehicleLogic implements AssignShiftToVehicleLogic {
 
-	private final ShiftsParams drtShiftParams;
+  private final ShiftsParams drtShiftParams;
 
-	public DefaultAssignShiftToVehicleLogic(ShiftsParams drtShiftParams) {
-		this.drtShiftParams = drtShiftParams;
-	}
+  public DefaultAssignShiftToVehicleLogic(ShiftsParams drtShiftParams) {
+    this.drtShiftParams = drtShiftParams;
+  }
 
-	@Override
-	public boolean canAssignVehicleToShift(ShiftDvrpVehicle vehicle, DrtShift shift) {
-		// cannot assign shift outside of service hours
-		if (shift.getEndTime() > vehicle.getServiceEndTime()
-				|| shift.getStartTime() < vehicle.getServiceBeginTime()) {
-			return false;
-		}
+  @Override
+  public boolean canAssignVehicleToShift(ShiftDvrpVehicle vehicle, DrtShift shift) {
+    // cannot assign shift outside of service hours
+    if (shift.getEndTime() > vehicle.getServiceEndTime()
+        || shift.getStartTime() < vehicle.getServiceBeginTime()) {
+      return false;
+    }
 
-		// assign shift to inactive vehicle
-		if (vehicle.getShifts().isEmpty()) {
-			return true;
-		}
+    // assign shift to inactive vehicle
+    if (vehicle.getShifts().isEmpty()) {
+      return true;
+    }
 
-		final Iterator<DrtShift> iterator = vehicle.getShifts().iterator();
-		DrtShift previous = iterator.next();
-		if (!iterator.hasNext()) {
-			if (previous.getEndTime() + drtShiftParams.changeoverDuration < shift.getStartTime()) {
-				return true;
-			}
-		}
+    final Iterator<DrtShift> iterator = vehicle.getShifts().iterator();
+    DrtShift previous = iterator.next();
+    if (!iterator.hasNext()) {
+      if (previous.getEndTime() + drtShiftParams.changeoverDuration < shift.getStartTime()) {
+        return true;
+      }
+    }
 
-		while (iterator.hasNext()) {
-			DrtShift next = iterator.next();
-			if (shift.getEndTime() + drtShiftParams.changeoverDuration < next.getStartTime()
-					&& previous.getEndTime() + drtShiftParams.changeoverDuration < shift.getStartTime()) {
-				return true;
-			}
-			previous = next;
-		}
-		return false;
-	}
+    while (iterator.hasNext()) {
+      DrtShift next = iterator.next();
+      if (shift.getEndTime() + drtShiftParams.changeoverDuration < next.getStartTime()
+          && previous.getEndTime() + drtShiftParams.changeoverDuration < shift.getStartTime()) {
+        return true;
+      }
+      previous = next;
+    }
+    return false;
+  }
 }

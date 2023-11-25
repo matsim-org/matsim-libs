@@ -21,14 +21,13 @@
 package org.matsim.core.router;
 
 import java.util.List;
-
 import org.matsim.api.core.v01.population.PlanElement;
 
-public class RoutingModeMainModeIdentifier implements MainModeIdentifier, AnalysisMainModeIdentifier {
+public class RoutingModeMainModeIdentifier
+    implements MainModeIdentifier, AnalysisMainModeIdentifier {
 
-	@Override
-	public String identifyMainMode(List<? extends PlanElement> tripElements) {
-		return TripStructureUtils.identifyMainMode(tripElements);
-	}
-
+  @Override
+  public String identifyMainMode(List<? extends PlanElement> tripElements) {
+    return TripStructureUtils.identifyMainMode(tripElements);
+  }
 }

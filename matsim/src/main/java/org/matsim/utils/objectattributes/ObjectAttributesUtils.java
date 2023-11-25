@@ -29,28 +29,29 @@ import java.util.Map;
  */
 public final class ObjectAttributesUtils {
 
-	private ObjectAttributesUtils() {
-		// abstract helper class
-	}
-	
-	public static void copyAllAttributes(ObjectAttributes source, ObjectAttributes destination, String objectId) {
-		Map<String, Object> sAttrs = source.attributes.get(objectId);
-		if (sAttrs != null) {
-			Map<String, Object> dAttrs = destination.attributes.get(objectId);
-			if (dAttrs == null) {
-				dAttrs = new IdentityHashMap<String, Object>();
-				destination.attributes.put(objectId, dAttrs);
-			}
-			dAttrs.putAll(sAttrs);
-		}
-	}
-	
-	public static Collection<String> getAllAttributeNames(ObjectAttributes attributes, final String objectId) {
-		Map<String, Object> map = attributes.attributes.get(objectId);
-		if (map == null) {
-			return Collections.emptyList();
-		}
-		return Collections.unmodifiableCollection(map.keySet());
-	}
+  private ObjectAttributesUtils() {
+    // abstract helper class
+  }
 
+  public static void copyAllAttributes(
+      ObjectAttributes source, ObjectAttributes destination, String objectId) {
+    Map<String, Object> sAttrs = source.attributes.get(objectId);
+    if (sAttrs != null) {
+      Map<String, Object> dAttrs = destination.attributes.get(objectId);
+      if (dAttrs == null) {
+        dAttrs = new IdentityHashMap<String, Object>();
+        destination.attributes.put(objectId, dAttrs);
+      }
+      dAttrs.putAll(sAttrs);
+    }
+  }
+
+  public static Collection<String> getAllAttributeNames(
+      ObjectAttributes attributes, final String objectId) {
+    Map<String, Object> map = attributes.attributes.get(objectId);
+    if (map == null) {
+      return Collections.emptyList();
+    }
+    return Collections.unmodifiableCollection(map.keySet());
+  }
 }

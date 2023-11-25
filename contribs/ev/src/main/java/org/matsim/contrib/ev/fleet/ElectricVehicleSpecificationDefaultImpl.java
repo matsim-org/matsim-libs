@@ -20,53 +20,56 @@
 
 package org.matsim.contrib.ev.fleet;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import java.util.Collection;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 final class ElectricVehicleSpecificationDefaultImpl implements ElectricVehicleSpecification {
 
-	private final Vehicle matsimVehicle;
+  private final Vehicle matsimVehicle;
 
-	ElectricVehicleSpecificationDefaultImpl( Vehicle matsimVehicle ) {
-		this.matsimVehicle = matsimVehicle;
-		//provided per vehicle type (in engine info)
-		Preconditions.checkArgument(getInitialSoc() >= 0 && getInitialSoc() <= 1, "Invalid initialCharge or batteryCapacity of vehicle: %s", getId());
-	}
+  ElectricVehicleSpecificationDefaultImpl(Vehicle matsimVehicle) {
+    this.matsimVehicle = matsimVehicle;
+    // provided per vehicle type (in engine info)
+    Preconditions.checkArgument(
+        getInitialSoc() >= 0 && getInitialSoc() <= 1,
+        "Invalid initialCharge or batteryCapacity of vehicle: %s",
+        getId());
+  }
 
-	@Override
-	public Id<Vehicle> getId() {
-		return matsimVehicle.getId();
-	}
+  @Override
+  public Id<Vehicle> getId() {
+    return matsimVehicle.getId();
+  }
 
-	@Override
-	public Vehicle getMatsimVehicle() {
-		return matsimVehicle;
-	}
+  @Override
+  public Vehicle getMatsimVehicle() {
+    return matsimVehicle;
+  }
 
-	@Override
-	public ImmutableList<String> getChargerTypes() {
-		var engineInfo = matsimVehicle.getType().getEngineInformation();
-		return ImmutableList.copyOf((Collection<String>)engineInfo.getAttributes().getAttribute( ElectricFleetUtils.CHARGER_TYPES ) );
-	}
+  @Override
+  public ImmutableList<String> getChargerTypes() {
+    var engineInfo = matsimVehicle.getType().getEngineInformation();
+    return ImmutableList.copyOf(
+        (Collection<String>)
+            engineInfo.getAttributes().getAttribute(ElectricFleetUtils.CHARGER_TYPES));
+  }
 
-	@Override
-	public double getInitialSoc() {
-		return (double)matsimVehicle.getAttributes().getAttribute( ElectricFleetUtils.INITIAL_SOC );
-	}
+  @Override
+  public double getInitialSoc() {
+    return (double) matsimVehicle.getAttributes().getAttribute(ElectricFleetUtils.INITIAL_SOC);
+  }
 
-	@Override
-	public double getBatteryCapacity() {
-		var engineInfo = matsimVehicle.getType().getEngineInformation();
-		return VehicleUtils.getEnergyCapacity(engineInfo) * EvUnits.J_PER_kWh;
-	}
+  @Override
+  public double getBatteryCapacity() {
+    var engineInfo = matsimVehicle.getType().getEngineInformation();
+    return VehicleUtils.getEnergyCapacity(engineInfo) * EvUnits.J_PER_kWh;
+  }
 }

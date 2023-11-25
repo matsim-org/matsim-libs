@@ -20,10 +20,6 @@
 
 package org.matsim.core.events.algorithms;
 
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.utils.io.IOUtils;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -31,121 +27,126 @@ import java.io.OutputStreamWriter;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.utils.io.IOUtils;
 
 public class EventWriterXML implements EventWriter, BasicEventHandler {
-	private final BufferedWriter out;
+  private final BufferedWriter out;
 
-	public EventWriterXML(final String outfilename) {
-		this.out = IOUtils.getBufferedWriter(outfilename);
-		this.writeHeader();
-	}
+  public EventWriterXML(final String outfilename) {
+    this.out = IOUtils.getBufferedWriter(outfilename);
+    this.writeHeader();
+  }
 
-	/**
-	 * Constructor so you can pass System.out or System.err to the writer to see the result on the console.
-	 *
-	 * @param stream
-	 */
-	public EventWriterXML(final OutputStream stream ) {
-		this.out = new BufferedWriter(new OutputStreamWriter(stream, StandardCharsets.UTF_8));
-		this.writeHeader();
-	}
+  /**
+   * Constructor so you can pass System.out or System.err to the writer to see the result on the
+   * console.
+   *
+   * @param stream
+   */
+  public EventWriterXML(final OutputStream stream) {
+    this.out = new BufferedWriter(new OutputStreamWriter(stream, StandardCharsets.UTF_8));
+    this.writeHeader();
+  }
 
-	private void writeHeader() {
-		try {
-			this.out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<events version=\"1.0\">\n");
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
+  private void writeHeader() {
+    try {
+      this.out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<events version=\"1.0\">\n");
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
 
-	@Override
-	public void closeFile() {
-		try {
-			this.out.write("</events>");
-			// I added a "\n" to make it look nicer on the console.  Can't say if this may have unintended side
-			// effects anywhere else.  kai, oct'12
-			// fails signalsystems test (and presumably other tests in contrib/playground) since they compare
-			// checksums of event files.  Removed that change again.  kai, oct'12
-			this.out.close();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
+  @Override
+  public void closeFile() {
+    try {
+      this.out.write("</events>");
+      // I added a "\n" to make it look nicer on the console.  Can't say if this may have unintended
+      // side
+      // effects anywhere else.  kai, oct'12
+      // fails signalsystems test (and presumably other tests in contrib/playground) since they
+      // compare
+      // checksums of event files.  Removed that change again.  kai, oct'12
+      this.out.close();
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
 
-	@Override
-	public void reset(final int iter) {
-	}
+  @Override
+  public void reset(final int iter) {}
 
-	@Override
-	public void handleEvent(final Event event) {
-		try {
-			this.out.append("\t<event ");
-			Map<String, String> attr = event.getAttributes();
-			for (Map.Entry<String, String> entry : attr.entrySet()) {
-				this.out.append(entry.getKey());
-				this.out.append("=\"");
-				this.out.append(encodeAttributeValue(entry.getValue()));
-				this.out.append("\" ");
-			}
-			this.out.append(" />\n");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+  @Override
+  public void handleEvent(final Event event) {
+    try {
+      this.out.append("\t<event ");
+      Map<String, String> attr = event.getAttributes();
+      for (Map.Entry<String, String> entry : attr.entrySet()) {
+        this.out.append(entry.getKey());
+        this.out.append("=\"");
+        this.out.append(encodeAttributeValue(entry.getValue()));
+        this.out.append("\" ");
+      }
+      this.out.append(" />\n");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 
-	// the following method was taken from MatsimXmlWriter in order to correctly encode attributes, but
-	// to forego the overhead of using the full MatsimXmlWriter.
-	/**
-	 * Encodes the given string in such a way that it no longer contains
-	 * characters that have a special meaning in xml.
-	 *
-	 * @see <a href="http://www.w3.org/International/questions/qa-escapes#use">http://www.w3.org/International/questions/qa-escapes#use</a>
-	 * @param attributeValue
-	 * @return String with some characters replaced by their xml-encoding.
-	 */
-	private String encodeAttributeValue(final String attributeValue) {
-		if (attributeValue == null) {
-			return null;
-		}
-		int len = attributeValue.length();
-		boolean encode = false;
-		for (int pos = 0; pos < len; pos++) {
-			char ch = attributeValue.charAt(pos);
-			if (ch == '<') {
-				encode = true;
-				break;
-			} else if (ch == '>') {
-				encode = true;
-				break;
-			} else if (ch == '\"') {
-				encode = true;
-				break;
-			} else if (ch == '&') {
-				encode = true;
-				break;
-			}
-		}
-		if (encode) {
-			StringBuilder bf = new StringBuilder(attributeValue.length() + 30);
-			for (int pos = 0; pos < len; pos++) {
-				char ch = attributeValue.charAt(pos);
-				if (ch == '<') {
-					bf.append("&lt;");
-				} else if (ch == '>') {
-					bf.append("&gt;");
-				} else if (ch == '\"') {
-					bf.append("&quot;");
-				} else if (ch == '&') {
-					bf.append("&amp;");
-				} else {
-					bf.append(ch);
-				}
-			}
+  // the following method was taken from MatsimXmlWriter in order to correctly encode attributes,
+  // but
+  // to forego the overhead of using the full MatsimXmlWriter.
+  /**
+   * Encodes the given string in such a way that it no longer contains characters that have a
+   * special meaning in xml.
+   *
+   * @see <a
+   *     href="http://www.w3.org/International/questions/qa-escapes#use">http://www.w3.org/International/questions/qa-escapes#use</a>
+   * @param attributeValue
+   * @return String with some characters replaced by their xml-encoding.
+   */
+  private String encodeAttributeValue(final String attributeValue) {
+    if (attributeValue == null) {
+      return null;
+    }
+    int len = attributeValue.length();
+    boolean encode = false;
+    for (int pos = 0; pos < len; pos++) {
+      char ch = attributeValue.charAt(pos);
+      if (ch == '<') {
+        encode = true;
+        break;
+      } else if (ch == '>') {
+        encode = true;
+        break;
+      } else if (ch == '\"') {
+        encode = true;
+        break;
+      } else if (ch == '&') {
+        encode = true;
+        break;
+      }
+    }
+    if (encode) {
+      StringBuilder bf = new StringBuilder(attributeValue.length() + 30);
+      for (int pos = 0; pos < len; pos++) {
+        char ch = attributeValue.charAt(pos);
+        if (ch == '<') {
+          bf.append("&lt;");
+        } else if (ch == '>') {
+          bf.append("&gt;");
+        } else if (ch == '\"') {
+          bf.append("&quot;");
+        } else if (ch == '&') {
+          bf.append("&amp;");
+        } else {
+          bf.append(ch);
+        }
+      }
 
-			return bf.toString();
-		}
-		return attributeValue;
-
-	}
-
+      return bf.toString();
+    }
+    return attributeValue;
+  }
 }

@@ -18,43 +18,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
+/** */
 package playground.vsp.zzArchive.bvwpOld;
 
 import playground.vsp.zzArchive.bvwpOld.Values.Attribute;
 
-
-
 /**
  * @author Ihab
- *
  */
- class UtilityChangesRuleOfHalf extends UtilityChanges {
-	
-		
-		@Override
-		UtlChangesData utlChangePerEntry(Attribute attribute,
-				double deltaAmount, double quantityNullfall, double quantityPlanfall, double margUtl) {
+class UtilityChangesRuleOfHalf extends UtilityChanges {
 
-		UtlChangesData utlChanges = new UtlChangesData() ;
-		
-		if ( deltaAmount > 0  && !attribute.equals(Attribute.costOfProduction)) {
-			// wir sind aufnehmend; es gilt die RoH
-			utlChanges.utl = (quantityPlanfall-quantityNullfall) * margUtl / 2. ;
-		} else {
-			utlChanges.utl = 0. ;
-		}
+  @Override
+  UtlChangesData utlChangePerEntry(
+      Attribute attribute,
+      double deltaAmount,
+      double quantityNullfall,
+      double quantityPlanfall,
+      double margUtl) {
 
-		return utlChanges;
-	}
+    UtlChangesData utlChanges = new UtlChangesData();
 
-	@Override
-	double computeImplicitUtility(Attributes econValues,
-			Attributes quantitiesNullfall,
-			Attributes quantitiesPlanfall) {
-		return 0;
-	}
+    if (deltaAmount > 0 && !attribute.equals(Attribute.costOfProduction)) {
+      // wir sind aufnehmend; es gilt die RoH
+      utlChanges.utl = (quantityPlanfall - quantityNullfall) * margUtl / 2.;
+    } else {
+      utlChanges.utl = 0.;
+    }
 
+    return utlChanges;
+  }
+
+  @Override
+  double computeImplicitUtility(
+      Attributes econValues, Attributes quantitiesNullfall, Attributes quantitiesPlanfall) {
+    return 0;
+  }
 }

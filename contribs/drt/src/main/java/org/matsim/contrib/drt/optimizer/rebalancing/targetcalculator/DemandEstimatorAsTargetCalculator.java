@@ -23,7 +23,6 @@ package org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.ToDoubleFunction;
-
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.ZonalDemandEstimator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -32,17 +31,18 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
  * @author michalm
  */
 public class DemandEstimatorAsTargetCalculator implements RebalancingTargetCalculator {
-	private final ZonalDemandEstimator demandEstimator;
-	private final double demandEstimationPeriod;
+  private final ZonalDemandEstimator demandEstimator;
+  private final double demandEstimationPeriod;
 
-	public DemandEstimatorAsTargetCalculator(ZonalDemandEstimator demandEstimator, double demandEstimationPeriod) {
-		this.demandEstimator = demandEstimator;
-		this.demandEstimationPeriod = demandEstimationPeriod;
-	}
+  public DemandEstimatorAsTargetCalculator(
+      ZonalDemandEstimator demandEstimator, double demandEstimationPeriod) {
+    this.demandEstimator = demandEstimator;
+    this.demandEstimationPeriod = demandEstimationPeriod;
+  }
 
-	@Override
-	public ToDoubleFunction<DrtZone> calculate(double time,
-			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
-		return demandEstimator.getExpectedDemand(time, demandEstimationPeriod);
-	}
+  @Override
+  public ToDoubleFunction<DrtZone> calculate(
+      double time, Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
+    return demandEstimator.getExpectedDemand(time, demandEstimationPeriod);
+  }
 }

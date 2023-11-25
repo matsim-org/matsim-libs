@@ -27,29 +27,28 @@ import java.util.function.DoubleSupplier;
  * @author michalm
  */
 public final class IdleDynActivity implements DynActivity {
-	private final String activityType;
-	private final DoubleSupplier endTimeSupplier;
+  private final String activityType;
+  private final DoubleSupplier endTimeSupplier;
 
-	public IdleDynActivity(String activityType, double endTime) {
-		this(activityType, () -> endTime);
-	}
+  public IdleDynActivity(String activityType, double endTime) {
+    this(activityType, () -> endTime);
+  }
 
-	public IdleDynActivity(String activityType, DoubleSupplier endTimeSupplier) {
-		this.activityType = activityType;
-		this.endTimeSupplier = endTimeSupplier;
-	}
+  public IdleDynActivity(String activityType, DoubleSupplier endTimeSupplier) {
+    this.activityType = activityType;
+    this.endTimeSupplier = endTimeSupplier;
+  }
 
-	@Override
-	public final String getActivityType() {
-		return activityType;
-	}
+  @Override
+  public final String getActivityType() {
+    return activityType;
+  }
 
-	@Override
-	public final double getEndTime() {
-		return endTimeSupplier.getAsDouble();
-	}
+  @Override
+  public final double getEndTime() {
+    return endTimeSupplier.getAsDouble();
+  }
 
-	@Override
-	public final void doSimStep(double now) {
-	}
+  @Override
+  public final void doSimStep(double now) {}
 }

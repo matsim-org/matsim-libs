@@ -21,14 +21,11 @@ package org.matsim.core.replanning;
 
 /**
  * A partial, inside view of the Controler which is available during replanning.
- * @author michaz
  *
+ * @author michaz
  */
 public interface ReplanningContext {
 
-	/**
-	 * The current iteration.
-	 */
-	int getIteration();
-
+  /** The current iteration. */
+  int getIteration();
 }

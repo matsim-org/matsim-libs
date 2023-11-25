@@ -30,20 +30,19 @@ import org.matsim.facilities.filters.Filter;
  * @author ychen
  */
 public interface PersonFilter extends Filter, PersonAlgorithm {
-	/**
-	 * judges whether the Person will be selected or not
-	 *
-	 * @param person person being judged
-	 * @return true if the Person meets the criterion of the filter
-	 */
-	boolean judge(Person person);
+  /**
+   * judges whether the Person will be selected or not
+   *
+   * @param person person being judged
+   * @return true if the Person meets the criterion of the filter
+   */
+  boolean judge(Person person);
 
-	/**
-	 * sends the person to the next PersonAlgorithm, which could be another filter.
-	 *
-	 * @param person person to be handled
-	 */
-	@Override
-	void run(Person person);
-
+  /**
+   * sends the person to the next PersonAlgorithm, which could be another filter.
+   *
+   * @param person person to be handled
+   */
+  @Override
+  void run(Person person);
 }

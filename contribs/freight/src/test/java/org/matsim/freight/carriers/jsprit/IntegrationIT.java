@@ -27,6 +27,7 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
 import com.graphhopper.jsprit.core.util.Solutions;
+import java.util.concurrent.ExecutionException;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,77 +41,86 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.util.concurrent.ExecutionException;
-
 public class IntegrationIT {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testJsprit() throws ExecutionException, InterruptedException {
-		final String networkFilename = utils.getClassInputDirectory() + "/merged-network-simplified.xml.gz";
-		final String vehicleTypeFilename = utils.getClassInputDirectory() + "/vehicleTypes.xml";
-		final String carrierFilename = utils.getClassInputDirectory() + "/carrier.xml";
+  @Test
+  public void testJsprit() throws ExecutionException, InterruptedException {
+    final String networkFilename =
+        utils.getClassInputDirectory() + "/merged-network-simplified.xml.gz";
+    final String vehicleTypeFilename = utils.getClassInputDirectory() + "/vehicleTypes.xml";
+    final String carrierFilename = utils.getClassInputDirectory() + "/carrier.xml";
 
-		Config config = ConfigUtils.createConfig();
-		config.global().setRandomSeed(4177);
+    Config config = ConfigUtils.createConfig();
+    config.global().setRandomSeed(4177);
 
-		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightCarriersConfigGroup.setCarriersFile(carrierFilename);
-		freightCarriersConfigGroup.setCarriersVehicleTypesFile(vehicleTypeFilename);
-		freightCarriersConfigGroup.setTravelTimeSliceWidth(24*3600);
-		freightCarriersConfigGroup.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.enforceBeginnings);
+    FreightCarriersConfigGroup freightCarriersConfigGroup =
+        ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+    freightCarriersConfigGroup.setCarriersFile(carrierFilename);
+    freightCarriersConfigGroup.setCarriersVehicleTypesFile(vehicleTypeFilename);
+    freightCarriersConfigGroup.setTravelTimeSliceWidth(24 * 3600);
+    freightCarriersConfigGroup.setTimeWindowHandling(
+        FreightCarriersConfigGroup.TimeWindowHandling.enforceBeginnings);
 
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
+    Scenario scenario = ScenarioUtils.createScenario(config);
+    new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 
-		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
+    CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
 
-		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
-			CarriersUtils.setJspritIterations(carrier, 1);
-		}
+    for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
+      CarriersUtils.setJspritIterations(carrier, 1);
+    }
 
-		CarriersUtils.runJsprit(scenario);
-		double scoreWithRunJsprit = 0;
-		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
-			scoreWithRunJsprit = scoreWithRunJsprit + carrier.getSelectedPlan().getJspritScore();
-		}
-		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), CarriersUtils.getCarriers(scenario), CarriersUtils.getCarrierVehicleTypes(scenario));
-		Assert.assertEquals("The score of both runs are not the same", scoreWithRunJsprit, scoreRunWithOldStructure, MatsimTestUtils.EPSILON);
-	}
+    CarriersUtils.runJsprit(scenario);
+    double scoreWithRunJsprit = 0;
+    for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
+      scoreWithRunJsprit = scoreWithRunJsprit + carrier.getSelectedPlan().getJspritScore();
+    }
+    double scoreRunWithOldStructure =
+        generateCarrierPlans(
+            scenario.getNetwork(),
+            CarriersUtils.getCarriers(scenario),
+            CarriersUtils.getCarrierVehicleTypes(scenario));
+    Assert.assertEquals(
+        "The score of both runs are not the same",
+        scoreWithRunJsprit,
+        scoreRunWithOldStructure,
+        MatsimTestUtils.EPSILON);
+  }
 
-	private static double generateCarrierPlans(Network network, Carriers carriers, CarrierVehicleTypes vehicleTypes) {
-		final Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(network,
-				vehicleTypes.getVehicleTypes().values());
-		// netBuilder.setBaseTravelTimeAndDisutility(travelTime, travelDisutility) ;
-		netBuilder.setTimeSliceWidth(1800); // !!!!, otherwise it will not do anything.
-		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
-		double score = 0;
+  private static double generateCarrierPlans(
+      Network network, Carriers carriers, CarrierVehicleTypes vehicleTypes) {
+    final Builder netBuilder =
+        NetworkBasedTransportCosts.Builder.newInstance(
+            network, vehicleTypes.getVehicleTypes().values());
+    // netBuilder.setBaseTravelTimeAndDisutility(travelTime, travelDisutility) ;
+    netBuilder.setTimeSliceWidth(1800); // !!!!, otherwise it will not do anything.
+    final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
+    double score = 0;
 
-		for (Carrier carrier : carriers.getCarriers().values()) {
+    for (Carrier carrier : carriers.getCarriers().values()) {
 
-			carrier.clearPlans();
-			VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier,
-					network);
-			vrpBuilder.setRoutingCost(netBasedCosts);
-			VehicleRoutingProblem problem = vrpBuilder.build();
+      carrier.clearPlans();
+      VehicleRoutingProblem.Builder vrpBuilder =
+          MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
+      vrpBuilder.setRoutingCost(netBasedCosts);
+      VehicleRoutingProblem problem = vrpBuilder.build();
 
-			VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
+      VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
 
-			VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
-			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution);
+      VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
+      CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution);
 
-			NetworkRouter.routePlan(newPlan, netBasedCosts);
-			// (maybe not optimal, but since re-routing is a matsim strategy,
-			// certainly ok as initial solution)
+      NetworkRouter.routePlan(newPlan, netBasedCosts);
+      // (maybe not optimal, but since re-routing is a matsim strategy,
+      // certainly ok as initial solution)
 
-			carrier.setSelectedPlan(newPlan);
+      carrier.setSelectedPlan(newPlan);
 
-			SolutionPrinter.print(problem, solution, SolutionPrinter.Print.VERBOSE);
-			score = score + newPlan.getJspritScore();
-		}
-		return score;
-	}
-
+      SolutionPrinter.print(problem, solution, SolutionPrinter.Print.VERBOSE);
+      score = score + newPlan.getJspritScore();
+    }
+    return score;
+  }
 }

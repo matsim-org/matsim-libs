@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * IterationCounter.java
@@ -19,8 +18,8 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.controler;
+package org.matsim.core.controler;
 
 public interface IterationCounter {
-	Integer getIterationNumber();
+  Integer getIterationNumber();
 }

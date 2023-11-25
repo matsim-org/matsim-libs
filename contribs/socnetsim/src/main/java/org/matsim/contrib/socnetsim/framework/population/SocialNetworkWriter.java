@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.population;
 
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -27,107 +28,93 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Counter;
 
-import java.util.*;
-
 /**
  * @author thibautd
  */
 public class SocialNetworkWriter extends MatsimXmlWriter {
-	private static final Logger log =
-		LogManager.getLogger(SocialNetworkWriter.class);
+  private static final Logger log = LogManager.getLogger(SocialNetworkWriter.class);
 
-	public static final String ROOT_TAG = "socialnet";
-	public static final String EGO_TAG = "ego";
-	public static final String TIE_TAG = "tie";
+  public static final String ROOT_TAG = "socialnet";
+  public static final String EGO_TAG = "ego";
+  public static final String TIE_TAG = "tie";
 
-	public static final String REFLECTIVE_ATT = "isReflective";
-	public static final String EGO_ATT = "egoId";
-	public static final String ALTER_ATT = "alterId";
+  public static final String REFLECTIVE_ATT = "isReflective";
+  public static final String EGO_ATT = "egoId";
+  public static final String ALTER_ATT = "alterId";
 
-	public static final String METADATA_TAG = "metadata";
-	public static final String ATTRIBUTE_TAG = "attribute";
-	public static final String NAME_ATT = "name";
-	public static final String VALUE_ATT = "value";
+  public static final String METADATA_TAG = "metadata";
+  public static final String ATTRIBUTE_TAG = "attribute";
+  public static final String NAME_ATT = "name";
+  public static final String VALUE_ATT = "value";
 
-	private final SocialNetwork network;
+  private final SocialNetwork network;
 
-	public SocialNetworkWriter( final SocialNetwork network ) {
-		this.network = network;
-	}
+  public SocialNetworkWriter(final SocialNetwork network) {
+    this.network = network;
+  }
 
-	public void write( final String file ) {
-		this.openFile( file );
-		log.info( "Start writing social network in file "+file );
-		this.writeXmlHead();
-		this.writeDoctype( ROOT_TAG , "socialnetwork_v1.dtd" );
-		this.writeStartTag(
-				ROOT_TAG,
-				Collections.singletonList(
-					createTuple(
-						REFLECTIVE_ATT,
-						network.isReflective() ) ) );
-		writeMetadata();
-		writeEgos();
-		writeNetwork( );
-		this.writeEndTag( ROOT_TAG );
-		this.close();
-		log.info( "Finished writing social network in file "+file );
-	}
+  public void write(final String file) {
+    this.openFile(file);
+    log.info("Start writing social network in file " + file);
+    this.writeXmlHead();
+    this.writeDoctype(ROOT_TAG, "socialnetwork_v1.dtd");
+    this.writeStartTag(
+        ROOT_TAG, Collections.singletonList(createTuple(REFLECTIVE_ATT, network.isReflective())));
+    writeMetadata();
+    writeEgos();
+    writeNetwork();
+    this.writeEndTag(ROOT_TAG);
+    this.close();
+    log.info("Finished writing social network in file " + file);
+  }
 
-	private void writeMetadata() {
-		if ( network.getMetadata().isEmpty() ) return;
-		writeStartTag( METADATA_TAG , Collections.<Tuple<String, String>>emptyList() );
+  private void writeMetadata() {
+    if (network.getMetadata().isEmpty()) return;
+    writeStartTag(METADATA_TAG, Collections.<Tuple<String, String>>emptyList());
 
-		for ( Map.Entry<String, String> e : network.getMetadata().entrySet() ) {
-			writeStartTag(
-					ATTRIBUTE_TAG,
-					Arrays.asList(
-						createTuple(
-							NAME_ATT,
-							e.getKey() ),
-						createTuple(
-							VALUE_ATT,
-							e.getValue() ) ),
-					true);
-		}
+    for (Map.Entry<String, String> e : network.getMetadata().entrySet()) {
+      writeStartTag(
+          ATTRIBUTE_TAG,
+          Arrays.asList(createTuple(NAME_ATT, e.getKey()), createTuple(VALUE_ATT, e.getValue())),
+          true);
+    }
 
-		writeEndTag( METADATA_TAG );
-		writeContent( "" , true ); // to skip a line
-	}
+    writeEndTag(METADATA_TAG);
+    writeContent("", true); // to skip a line
+  }
 
-	private void writeEgos() {
-		log.info( "start writing egos..." );
-		final Counter counter = new Counter( "[SocialNetworkWriter] writing ego # " );
-		for ( Id ego : network.getEgos() ) {
-			counter.incCounter();
-			final List<Tuple<String,String>> atts = new ArrayList<Tuple<String, String>>();
-			atts.add( createTuple( EGO_ATT , ego.toString() ) );
-			writeStartTag( EGO_TAG , atts , true );
-		}
-		counter.printCounter();
-		log.info( "finished writing egos." );
-	}
+  private void writeEgos() {
+    log.info("start writing egos...");
+    final Counter counter = new Counter("[SocialNetworkWriter] writing ego # ");
+    for (Id ego : network.getEgos()) {
+      counter.incCounter();
+      final List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
+      atts.add(createTuple(EGO_ATT, ego.toString()));
+      writeStartTag(EGO_TAG, atts, true);
+    }
+    counter.printCounter();
+    log.info("finished writing egos.");
+  }
 
-	private void writeNetwork() {
-		log.info( "start writing ties..." );
-		final Counter counter = new Counter( "[SocialNetworkWriter] writing tie # " );
-		final Set<Id> dumpedEgos = new HashSet<Id>();
-		final boolean reflective = network.isReflective();
-		for ( Id ego : network.getEgos() ) {
-			final Iterable<Id<Person>> alters = network.getAlters( ego );
-			for ( Id<Person> alter : alters ) {
-				if ( reflective && dumpedEgos.contains( alter ) ) continue;
+  private void writeNetwork() {
+    log.info("start writing ties...");
+    final Counter counter = new Counter("[SocialNetworkWriter] writing tie # ");
+    final Set<Id> dumpedEgos = new HashSet<Id>();
+    final boolean reflective = network.isReflective();
+    for (Id ego : network.getEgos()) {
+      final Iterable<Id<Person>> alters = network.getAlters(ego);
+      for (Id<Person> alter : alters) {
+        if (reflective && dumpedEgos.contains(alter)) continue;
 
-				counter.incCounter();
-				final List<Tuple<String,String>> atts = new ArrayList<Tuple<String, String>>();
-				atts.add( createTuple( EGO_ATT , ego.toString() ) );
-				atts.add( createTuple( ALTER_ATT , alter.toString() ) );
-				writeStartTag( TIE_TAG , atts , true );
-			}
-			dumpedEgos.add( ego );
-		}
-		counter.printCounter();
-		log.info( "finished writing ties." );
-	}
+        counter.incCounter();
+        final List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
+        atts.add(createTuple(EGO_ATT, ego.toString()));
+        atts.add(createTuple(ALTER_ATT, alter.toString()));
+        writeStartTag(TIE_TAG, atts, true);
+      }
+      dumpedEgos.add(ego);
+    }
+    counter.printCounter();
+    log.info("finished writing ties.");
+  }
 }
-

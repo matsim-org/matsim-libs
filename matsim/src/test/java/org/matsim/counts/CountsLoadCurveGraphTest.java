@@ -29,15 +29,15 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class CountsLoadCurveGraphTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  @Test
+  public void testCreateChart() {
+    CountsFixture fixture = new CountsFixture();
+    fixture.setUp();
 
-	@Test public void testCreateChart() {
-		CountsFixture fixture = new CountsFixture();
-		fixture.setUp();
-
-		CountsLoadCurveGraph eg = new CountsLoadCurveGraph(fixture.ceateCountSimCompList(), 1, "testCreateChart");
-		assertNotNull("No graph is created", eg.createChart(0));
-	}
+    CountsLoadCurveGraph eg =
+        new CountsLoadCurveGraph(fixture.ceateCountSimCompList(), 1, "testCreateChart");
+    assertNotNull("No graph is created", eg.createChart(0));
+  }
 }

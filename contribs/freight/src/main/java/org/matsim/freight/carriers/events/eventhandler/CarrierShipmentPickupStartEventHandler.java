@@ -28,8 +28,7 @@ import org.matsim.freight.carriers.events.CarrierShipmentPickupStartEvent;
  * Interface to listen to shipmentPickedUpEvents.
  *
  * @author sschroeder
- *
  */
 public interface CarrierShipmentPickupStartEventHandler extends EventHandler {
-	void handleEvent(CarrierShipmentPickupStartEvent event);
+  void handleEvent(CarrierShipmentPickupStartEvent event);
 }

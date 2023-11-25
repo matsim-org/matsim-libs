@@ -21,23 +21,20 @@ package ch.sbb.matsim.contrib.railsim.analysis.trainstates;
 
 import ch.sbb.matsim.contrib.railsim.eventhandlers.RailsimTrainStateEventHandler;
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
-
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Handler collecting all {@link RailsimTrainStateEvent}s.
- */
+/** Handler collecting all {@link RailsimTrainStateEvent}s. */
 public final class TrainStateAnalysis implements RailsimTrainStateEventHandler {
 
-	final List<RailsimTrainStateEvent> events = new ArrayList<>(1000);
+  final List<RailsimTrainStateEvent> events = new ArrayList<>(1000);
 
-	@Override
-	public void handleEvent(RailsimTrainStateEvent event) {
-		this.events.add(event);
-	}
+  @Override
+  public void handleEvent(RailsimTrainStateEvent event) {
+    this.events.add(event);
+  }
 
-	public List<RailsimTrainStateEvent> getEvents() {
-		return events;
-	}
+  public List<RailsimTrainStateEvent> getEvents() {
+    return events;
+  }
 }

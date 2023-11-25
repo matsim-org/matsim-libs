@@ -18,6 +18,5 @@
  * *********************************************************************** */
 /**
  * @author nagel
- *
  */
 package org.matsim.codeexamples.fixedTimeSignals;

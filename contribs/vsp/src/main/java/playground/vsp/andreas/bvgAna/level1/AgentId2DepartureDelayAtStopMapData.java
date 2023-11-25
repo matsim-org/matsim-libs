@@ -20,58 +20,61 @@
 package playground.vsp.andreas.bvgAna.level1;
 
 import java.util.ArrayList;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 
 /**
- * Simple data container to store departure time and agent enters vehicle time for each agent at different stops.
- * 
- * @author aneumann
+ * Simple data container to store departure time and agent enters vehicle time for each agent at
+ * different stops.
  *
+ * @author aneumann
  */
 public class AgentId2DepartureDelayAtStopMapData {
-	
-	private final Id personId;
 
-	// Could be double[] ???
-	private ArrayList<Double> agentDepartsPTInteraction = new ArrayList<Double>();
-	private ArrayList<Double> agentEntersVehicle = new ArrayList<Double>();
-	
-	public AgentId2DepartureDelayAtStopMapData(Id personId){
-		this.personId = personId;
-	}
-	
-	/**
-	 * Get departure time sorted by occurrence for each departs pt interaction event.
-	 * 
-	 * @return A list containing the departure time 
-	 */
-	public ArrayList<Double> getAgentDepartsPTInteraction() {
-		return this.agentDepartsPTInteraction;
-	}
+  private final Id personId;
 
-	/**
-	 * Get enter time sorted by occurrence for each agent enters a vehicle event.
-	 * 
-	 * @return A list containing the enter time 
-	 */
-	public ArrayList<Double> getAgentEntersVehicle() {
-		return this.agentEntersVehicle;
-	}	
-	
-	@Override
-	public String toString() {
-		return "Person: " + this.personId + ", # left pt interaction: " + this.agentDepartsPTInteraction.size() + ", # vehicle entered: " + this.agentEntersVehicle.size();
-	}
+  // Could be double[] ???
+  private ArrayList<Double> agentDepartsPTInteraction = new ArrayList<Double>();
+  private ArrayList<Double> agentEntersVehicle = new ArrayList<Double>();
 
-	public void addAgentDepartureEvent(PersonDepartureEvent event) {
-		this.agentDepartsPTInteraction.add(new Double(event.getTime()));		
-	}
+  public AgentId2DepartureDelayAtStopMapData(Id personId) {
+    this.personId = personId;
+  }
 
-	public void addPersonEntersVehicleEvent(PersonEntersVehicleEvent event) {
-		this.agentEntersVehicle.add(new Double(event.getTime()));		
-	}
+  /**
+   * Get departure time sorted by occurrence for each departs pt interaction event.
+   *
+   * @return A list containing the departure time
+   */
+  public ArrayList<Double> getAgentDepartsPTInteraction() {
+    return this.agentDepartsPTInteraction;
+  }
 
+  /**
+   * Get enter time sorted by occurrence for each agent enters a vehicle event.
+   *
+   * @return A list containing the enter time
+   */
+  public ArrayList<Double> getAgentEntersVehicle() {
+    return this.agentEntersVehicle;
+  }
+
+  @Override
+  public String toString() {
+    return "Person: "
+        + this.personId
+        + ", # left pt interaction: "
+        + this.agentDepartsPTInteraction.size()
+        + ", # vehicle entered: "
+        + this.agentEntersVehicle.size();
+  }
+
+  public void addAgentDepartureEvent(PersonDepartureEvent event) {
+    this.agentDepartsPTInteraction.add(new Double(event.getTime()));
+  }
+
+  public void addPersonEntersVehicleEvent(PersonEntersVehicleEvent event) {
+    this.agentEntersVehicle.add(new Double(event.getTime()));
+  }
 }

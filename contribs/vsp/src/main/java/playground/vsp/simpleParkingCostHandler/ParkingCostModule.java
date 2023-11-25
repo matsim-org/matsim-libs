@@ -22,16 +22,13 @@ package playground.vsp.simpleParkingCostHandler;
 import org.matsim.core.controler.AbstractModule;
 
 /**
-* @author ikaddoura
-*/
-
+ * @author ikaddoura
+ */
 public class ParkingCostModule extends AbstractModule {
 
-	@Override
-	public void install() {
+  @Override
+  public void install() {
 
-		addEventHandlerBinding().to(ParkingCostHandler.class);
-	}
-
+    addEventHandlerBinding().to(ParkingCostHandler.class);
+  }
 }
-

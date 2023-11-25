@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * Attributable.java
@@ -19,12 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.utils.objectattributes.attributable;
+package org.matsim.utils.objectattributes.attributable;
 
 /**
  * @author thibautd
  */
 public interface Attributable {
 
-	Attributes getAttributes();
+  Attributes getAttributes();
 }

@@ -19,6 +19,11 @@
 
 package org.matsim.contrib.minibus.stats.operatorLogger;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Locale;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -26,125 +31,126 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Locale;
-
 /**
  * Reads a pLogger file and writes it to tex.
- * 
- * @author aneumann
  *
+ * @author aneumann
  */
 final class Log2Tex {
-	
-	private static final Logger log = LogManager.getLogger(Log2Tex.class);
 
-	public static void convertLog2Tex(String inputFile, String outputFile){
-		ArrayList<LogElement> logElements = LogReader.readFile(inputFile);
-		
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
+  private static final Logger log = LogManager.getLogger(Log2Tex.class);
 
-		int lastIteration = -1;
-		int operatorCounterInThatIteration = 1;
-		String lastOperatorName = "";
-		int lastPaxSum = 0;
+  public static void convertLog2Tex(String inputFile, String outputFile) {
+    ArrayList<LogElement> logElements = LogReader.readFile(inputFile);
 
-			try {
-				try {
-					for (LogElement logElement : logElements) {
+    BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 
-					if (logElement.getIteration() != lastIteration) {
-						lastIteration = logElement.getIteration();
-						operatorCounterInThatIteration = 1;
-						lastOperatorName = "";
-						lastPaxSum = 0;
-						writer.write("\\addlinespace[1.0em]"); writer.newLine();
-					}
+    int lastIteration = -1;
+    int operatorCounterInThatIteration = 1;
+    String lastOperatorName = "";
+    int lastPaxSum = 0;
 
-					StringBuffer strB = new StringBuffer();
+    try {
+      try {
+        for (LogElement logElement : logElements) {
 
-					strB.append(" & ");
+          if (logElement.getIteration() != lastIteration) {
+            lastIteration = logElement.getIteration();
+            operatorCounterInThatIteration = 1;
+            lastOperatorName = "";
+            lastPaxSum = 0;
+            writer.write("\\addlinespace[1.0em]");
+            writer.newLine();
+          }
 
-					String operatorName = logElement.getOperatorId().toString().split("_")[1];
-					if (!lastOperatorName.equalsIgnoreCase(operatorName)) {
-						strB.append("O" + operatorCounterInThatIteration + " -- ");
-						operatorCounterInThatIteration++;
-						strB.append(operatorName);
-						lastOperatorName = operatorName;
-					}
+          StringBuffer strB = new StringBuffer();
 
-					strB.append(" & ");
+          strB.append(" & ");
 
-					String iteration = logElement.getPlanId().toString().split("_")[0];
-					strB.append(iteration);
+          String operatorName = logElement.getOperatorId().toString().split("_")[1];
+          if (!lastOperatorName.equalsIgnoreCase(operatorName)) {
+            strB.append("O" + operatorCounterInThatIteration + " -- ");
+            operatorCounterInThatIteration++;
+            strB.append(operatorName);
+            lastOperatorName = operatorName;
+          }
 
-					strB.append(" & ");
+          strB.append(" & ");
 
-					String startTime = Time.writeTime(logElement.getStartTime(), Time.TIMEFORMAT_HHMM); //row[9].split(":")[0] + ":" + row[9].split(":")[1];
-					strB.append(startTime);
-					strB.append("--");
-					String endTime = Time.writeTime(logElement.getEndTime(), Time.TIMEFORMAT_HHMM); //row[10].split(":")[0] + ":" + row[10].split(":")[1];
-					strB.append(endTime);
+          String iteration = logElement.getPlanId().toString().split("_")[0];
+          strB.append(iteration);
 
-					strB.append(" & ");
+          strB.append(" & ");
 
-					ArrayList<Id<TransitStopFacility>> stops = logElement.getStopsToBeServed(); //nodes.split(",");
-					boolean firstIsDone = false;
-					for (Id<TransitStopFacility> stop : stops) {
-						if (firstIsDone) {
-							strB.append("--");
-						}
-						firstIsDone = true;
-						strB.append(stop.toString());
-					}
+          String startTime =
+              Time.writeTime(
+                  logElement.getStartTime(),
+                  Time.TIMEFORMAT_HHMM); // row[9].split(":")[0] + ":" + row[9].split(":")[1];
+          strB.append(startTime);
+          strB.append("--");
+          String endTime =
+              Time.writeTime(
+                  logElement.getEndTime(),
+                  Time.TIMEFORMAT_HHMM); // row[10].split(":")[0] + ":" + row[10].split(":")[1];
+          strB.append(endTime);
 
-					strB.append(" & ");
+          strB.append(" & ");
 
-					String veh = Integer.toString(logElement.getnVeh());
-					strB.append(veh);
+          ArrayList<Id<TransitStopFacility>> stops =
+              logElement.getStopsToBeServed(); // nodes.split(",");
+          boolean firstIsDone = false;
+          for (Id<TransitStopFacility> stop : stops) {
+            if (firstIsDone) {
+              strB.append("--");
+            }
+            firstIsDone = true;
+            strB.append(stop.toString());
+          }
 
-					strB.append(" & ");
+          strB.append(" & ");
 
-					strB.append(Integer.toString(logElement.getnPax()));
-					lastPaxSum += logElement.getnPax();
+          String veh = Integer.toString(logElement.getnVeh());
+          strB.append(veh);
 
-					strB.append(" & ");
+          strB.append(" & ");
 
-					double score = logElement.getScore();
-					score = score / Double.parseDouble(veh);
-					score = Math.round(score * 10.) / 10.;
-					DecimalFormat df = (DecimalFormat)DecimalFormat.getInstance(Locale.US);
-					df.applyPattern("#,###,##0.0");
-					String s = df.format(score);
+          strB.append(Integer.toString(logElement.getnPax()));
+          lastPaxSum += logElement.getnPax();
 
-					if (s.contains("-")) {
-						s = s.substring(1, s.length());
-						strB.append("$-$");
-					} else {
-						strB.append("$+$");
-					}
+          strB.append(" & ");
 
-					strB.append(s);
+          double score = logElement.getScore();
+          score = score / Double.parseDouble(veh);
+          score = Math.round(score * 10.) / 10.;
+          DecimalFormat df = (DecimalFormat) DecimalFormat.getInstance(Locale.US);
+          df.applyPattern("#,###,##0.0");
+          String s = df.format(score);
 
-					strB.append(" \\tabularnewline");
+          if (s.contains("-")) {
+            s = s.substring(1, s.length());
+            strB.append("$-$");
+          } else {
+            strB.append("$+$");
+          }
 
-					strB.append(" % pax sum " + lastPaxSum);
+          strB.append(s);
 
-					writer.write(strB.toString()); writer.newLine();
+          strB.append(" \\tabularnewline");
 
-					}
-				} catch (NumberFormatException e) {
-					log.info("Had one NumberFormatException. Run Debugger...");
-				}
+          strB.append(" % pax sum " + lastPaxSum);
 
-				writer.flush();
-				writer.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	}
+          writer.write(strB.toString());
+          writer.newLine();
+        }
+      } catch (NumberFormatException e) {
+        log.info("Had one NumberFormatException. Run Debugger...");
+      }
+
+      writer.flush();
+      writer.close();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
 }

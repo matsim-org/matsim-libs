@@ -20,18 +20,18 @@
 package org.matsim.core.mobsim.qsim.interfaces;
 
 import java.util.Collection;
-
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.core.api.internal.MatsimNetworkObject;
 import org.matsim.vis.snapshotwriters.VisLink;
 
 public interface NetsimLink extends Customizable, VisLink, MatsimNetworkObject {
-	
-	@Override
-	Collection<MobsimVehicle> getAllVehicles();
-	// not terribly efficient, but a possible method also for general mobsims
 
-	Collection<MobsimVehicle> getAllNonParkedVehicles();
-	// not terribly efficient, but a possible method also for general mobsims
+  @Override
+  Collection<MobsimVehicle> getAllVehicles();
+
+  // not terribly efficient, but a possible method also for general mobsims
+
+  Collection<MobsimVehicle> getAllNonParkedVehicles();
+  // not terribly efficient, but a possible method also for general mobsims
 
 }

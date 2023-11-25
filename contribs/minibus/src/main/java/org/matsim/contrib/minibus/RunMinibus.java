@@ -28,42 +28,42 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
-
 /**
  * Entry point, registers all necessary hooks
- * 
+ *
  * @author aneumann
  */
 public final class RunMinibus {
 
-	private final static Logger log = LogManager.getLogger(RunMinibus.class);
-	
-	private final Config config ;
-	
-	public RunMinibus( final String [] args ) {
-		if(args.length == 0){
-			log.info("Arg 1: config.xml is missing.");
-			log.info("Check http://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/atlantis/minibus/ for an example.");
-			System.exit(1);
-		}
-		config = ConfigUtils.loadConfig( args[0], new PConfigGroup() ) ;
-	}
-	
-	public final void run() {
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-		Controler controler = new Controler(scenario);
-		
-		controler.addOverridingModule(new PModule()) ;
-		
-		controler.run();
-	}
-	
-	public final Config getConfig() {
-		return this.config ;
-	}
+  private static final Logger log = LogManager.getLogger(RunMinibus.class);
 
-	public static void main(final String[] args) {
-		new RunMinibus( args ).run() ;
-	}
+  private final Config config;
+
+  public RunMinibus(final String[] args) {
+    if (args.length == 0) {
+      log.info("Arg 1: config.xml is missing.");
+      log.info(
+          "Check http://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/atlantis/minibus/ for an example.");
+      System.exit(1);
+    }
+    config = ConfigUtils.loadConfig(args[0], new PConfigGroup());
+  }
+
+  public final void run() {
+    Scenario scenario = ScenarioUtils.loadScenario(config);
+
+    Controler controler = new Controler(scenario);
+
+    controler.addOverridingModule(new PModule());
+
+    controler.run();
+  }
+
+  public final Config getConfig() {
+    return this.config;
+  }
+
+  public static void main(final String[] args) {
+    new RunMinibus(args).run();
+  }
 }

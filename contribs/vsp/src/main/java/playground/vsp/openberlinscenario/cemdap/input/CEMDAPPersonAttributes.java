@@ -19,10 +19,15 @@
 
 package playground.vsp.openberlinscenario.cemdap.input;
 
-/**
- * Created by amit on 02.12.17.
- */
-
+/** Created by amit on 02.12.17. */
 public enum CEMDAPPersonAttributes {
-    householdId, age, employed, gender, hasLicense, locationOfSchool, locationOfWork, parent, student
+  householdId,
+  age,
+  employed,
+  gender,
+  hasLicense,
+  locationOfSchool,
+  locationOfWork,
+  parent,
+  student
 }

@@ -33,59 +33,59 @@ import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-public class PackageMain extends Links2ESRIShape{
+public class PackageMain extends Links2ESRIShape {
 
-	private static Logger log = LogManager.getLogger(Links2ESRIShape.class);
+  private static Logger log = LogManager.getLogger(Links2ESRIShape.class);
 
-	public PackageMain(Network network, String filename) {
-		super(network, filename, "DHDN_GK4");
-	}
+  public PackageMain(Network network, String filename) {
+    super(network, filename, "DHDN_GK4");
+  }
 
-	public static void main(String[] args) {
-		String netfile = null ;
-		String outputFileLs = null ;
-		String outputFileP = null ;
+  public static void main(String[] args) {
+    String netfile = null;
+    String outputFileLs = null;
+    String outputFileP = null;
 
-		if ( args.length == 0 ) {
-			netfile = "d:\\Berlin\\berlin-fggeoinfo\\30_Run_20_percent\\20101005_run777_778\\network_modified_20100806_added_BBI_AS_cl.xml.gz";
-//		String netfile = "./test/scenarios/berlin/network.xml.gz";
-			EventsCompareConfig.eventsFileOne = "E:/run778/output/ITERS/it.900/run778.900.events.txt";
-			EventsCompareConfig.eventsFileTwo = "E:/run777/output/ITERS/it.900/run777.900.events.txt";
+    if (args.length == 0) {
+      netfile =
+          "d:\\Berlin\\berlin-fggeoinfo\\30_Run_20_percent\\20101005_run777_778\\network_modified_20100806_added_BBI_AS_cl.xml.gz";
+      //		String netfile = "./test/scenarios/berlin/network.xml.gz";
+      EventsCompareConfig.eventsFileOne = "E:/run778/output/ITERS/it.900/run778.900.events.txt";
+      EventsCompareConfig.eventsFileTwo = "E:/run777/output/ITERS/it.900/run777.900.events.txt";
 
-			outputFileLs = "e:\\temp\\networkLs_abs.shp";
-			outputFileP = "e:\\temp\\networkP_abs.shp";
-		} else if ( args.length == 3 ) {
-			netfile = args[0] ;
-			outputFileLs = args[1] ;
-			outputFileP  = args[2] ;
-		} else {
-			log.error("Arguments cannot be interpreted.  Aborting ...") ;
-			System.exit(-1) ;
-		}
+      outputFileLs = "e:\\temp\\networkLs_abs.shp";
+      outputFileP = "e:\\temp\\networkP_abs.shp";
+    } else if (args.length == 3) {
+      netfile = args[0];
+      outputFileLs = args[1];
+      outputFileP = args[2];
+    } else {
+      log.error("Arguments cannot be interpreted.  Aborting ...");
+      System.exit(-1);
+    }
 
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
+    MutableScenario scenario =
+        (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
-		log.info("loading network from " + netfile);
-		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netfile);
-		log.info("done.");
+    log.info("loading network from " + netfile);
+    final Network network = scenario.getNetwork();
+    new MatsimNetworkReader(scenario.getNetwork()).readFile(netfile);
+    log.info("done.");
 
-		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "DHDN_GK4");
-//		builder.setFeatureGeneratorPrototype(CountVehOnLinksStringBasedFeatureGenerator.class);
-		builder.setFeatureGeneratorPrototype(CountVehOnLinksStringBasedFeatureGenerator.class);
-		builder.setWidthCoefficient(0.5);
-		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
-		new Links2ESRIShape(network,outputFileLs, builder).write();
+    FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "DHDN_GK4");
+    //		builder.setFeatureGeneratorPrototype(CountVehOnLinksStringBasedFeatureGenerator.class);
+    builder.setFeatureGeneratorPrototype(CountVehOnLinksStringBasedFeatureGenerator.class);
+    builder.setWidthCoefficient(0.5);
+    builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
+    new Links2ESRIShape(network, outputFileLs, builder).write();
 
-		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
-		builder.setWidthCoefficient(0.01);
-//		builder.setFeatureGeneratorPrototype(CountVehOnLinksPolygonBasedFeatureGenerator.class);
-		builder.setFeatureGeneratorPrototype(CountVehOnLinksPolygonBasedFeatureGenerator.class);
-		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
-		builder.setCoordinateReferenceSystem(crs);
-		new Links2ESRIShape(network,outputFileP, builder).write();
-
-	}
-
+    CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
+    builder.setWidthCoefficient(0.01);
+    //		builder.setFeatureGeneratorPrototype(CountVehOnLinksPolygonBasedFeatureGenerator.class);
+    builder.setFeatureGeneratorPrototype(CountVehOnLinksPolygonBasedFeatureGenerator.class);
+    builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
+    builder.setCoordinateReferenceSystem(crs);
+    new Links2ESRIShape(network, outputFileP, builder).write();
+  }
 }

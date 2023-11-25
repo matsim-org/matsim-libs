@@ -19,6 +19,9 @@
 
 package playground.vsp.andreas.mzilske.osm;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -42,228 +45,292 @@ import org.openstreetmap.osmosis.core.domain.v0_6.WayNode;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 import org.openstreetmap.osmosis.core.task.v0_6.SinkSource;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class NetworkSink implements SinkSource {
 
-	private static final  Logger log = LogManager.getLogger(NetworkSink.class);
-	private final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
-	private final Network network;
-	private final CoordinateTransformation transform;
-	private boolean scaleMaxSpeed = false;
-	private Sink sink;
+  private static final Logger log = LogManager.getLogger(NetworkSink.class);
+  private final Map<String, OsmHighwayDefaults> highwayDefaults =
+      new HashMap<String, OsmHighwayDefaults>();
+  private final Network network;
+  private final CoordinateTransformation transform;
+  private boolean scaleMaxSpeed = false;
+  private Sink sink;
 
+  public NetworkSink(Network network2, CoordinateTransformation transform) {
+    super();
+    this.network = network2;
+    this.transform = transform;
+  }
 
+  public void setHighwayDefaults(
+      final int hierarchy,
+      final String highwayType,
+      final double lanes,
+      final double freespeed,
+      final double freespeedFactor,
+      final double laneCapacity_vehPerHour,
+      final boolean oneway) {
+    this.highwayDefaults.put(
+        highwayType,
+        new OsmHighwayDefaults(lanes, freespeed, freespeedFactor, laneCapacity_vehPerHour, oneway));
+  }
 
-	public NetworkSink(Network network2, CoordinateTransformation transform) {
-		super();
-		this.network = network2;
-		this.transform = transform;
-	}
+  private void readLink(Way entry) {
+    List<WayNode> wayNodes = entry.getWayNodes();
+    if (wayNodes.size() < 2) {
 
-	public void setHighwayDefaults(final int hierarchy, final String highwayType, final double lanes, final double freespeed,
-			final double freespeedFactor, final double laneCapacity_vehPerHour, final boolean oneway) {
-		this.highwayDefaults.put(highwayType, new OsmHighwayDefaults(lanes, freespeed, freespeedFactor, laneCapacity_vehPerHour, oneway));
-	}
+    } else {
+      WayNode fromNode = wayNodes.get(0);
+      for (int i = 1, n = wayNodes.size(); i < n; i++) {
+        WayNode toNode = wayNodes.get(i);
+        org.matsim.api.core.v01.network.Node fromMatsimNode =
+            network
+                .getNodes()
+                .get(Id.create(fromNode.getNodeId(), org.matsim.api.core.v01.network.Node.class));
+        if (fromMatsimNode == null) {
+          throw new RuntimeException("Missing node: " + fromNode.getNodeId());
+        }
+        org.matsim.api.core.v01.network.Node toMatsimNode =
+            network
+                .getNodes()
+                .get(Id.create(toNode.getNodeId(), org.matsim.api.core.v01.network.Node.class));
+        if (toMatsimNode == null) {
+          throw new RuntimeException("Missing node: " + toNode.getNodeId());
+        }
+        double length =
+            CoordUtils.calcEuclideanDistance(fromMatsimNode.getCoord(), toMatsimNode.getCoord());
+        createLink((Network) this.network, entry, fromNode, toNode, length);
+        fromNode = toNode;
+      }
+    }
+  }
 
-	private void readLink(Way entry) {
-		List<WayNode> wayNodes = entry.getWayNodes();
-		if (wayNodes.size() < 2) {
+  private void readNode(Node osmNode) {
+    Coord osmCoord = new Coord(osmNode.getLongitude(), osmNode.getLatitude());
+    Coord transformedCoord = transform.transform(osmCoord);
+    org.matsim.api.core.v01.network.Node node =
+        network
+            .getFactory()
+            .createNode(
+                Id.create(osmNode.getId(), org.matsim.api.core.v01.network.Node.class),
+                transformedCoord);
+    network.addNode(node);
+    osmNode.getTags().add(new Tag("matsim:node-id", node.getId().toString()));
+  }
 
-		} else {
-			WayNode fromNode = wayNodes.get(0);
-			for (int i = 1, n = wayNodes.size(); i < n; i++) {
-				WayNode toNode = wayNodes.get(i);
-				org.matsim.api.core.v01.network.Node fromMatsimNode = network.getNodes().get(Id.create(fromNode.getNodeId(), org.matsim.api.core.v01.network.Node.class));
-				if (fromMatsimNode == null) {
-					throw new RuntimeException("Missing node: "+fromNode.getNodeId());
-				}
-				org.matsim.api.core.v01.network.Node toMatsimNode = network.getNodes().get(Id.create(toNode.getNodeId(), org.matsim.api.core.v01.network.Node.class));
-				if (toMatsimNode == null) {
-					throw new RuntimeException("Missing node: "+toNode.getNodeId());
-				}
-				double length = CoordUtils.calcEuclideanDistance(fromMatsimNode.getCoord(), toMatsimNode.getCoord());
-				createLink((Network) this.network, entry, fromNode, toNode, length);
-				fromNode = toNode;
-			}
-		}
-	}
+  @Override
+  public void close() {
+    sink.close();
+  }
 
+  private void createLink(
+      final Network network,
+      final Way way,
+      final WayNode fromNode,
+      final WayNode toNode,
+      final double length) {
+    TagCollectionImpl tagCollection = new TagCollectionImpl(way.getTags());
+    Map<String, String> tags = tagCollection.buildMap();
+    String highway = tags.get("highway");
 
-	private void readNode(Node osmNode) {
-		Coord osmCoord = new Coord(osmNode.getLongitude(), osmNode.getLatitude());
-		Coord transformedCoord = transform.transform(osmCoord);
-		org.matsim.api.core.v01.network.Node node = network.getFactory().createNode(Id.create(osmNode.getId(), org.matsim.api.core.v01.network.Node.class), transformedCoord);
-		network.addNode(node);
-		osmNode.getTags().add(new Tag("matsim:node-id", node.getId().toString()));
-	}
+    OsmHighwayDefaults defaults = this.highwayDefaults.get(highway);
+    if (defaults == null) {
+      defaults = this.highwayDefaults.get("tertiary");
+    }
+    String origId = Long.toString(way.getId());
+    double nofLanes = defaults.lanes;
+    double laneCapacity = defaults.laneCapacity;
+    double freespeed = defaults.freespeed;
+    double freespeedFactor = defaults.freespeedFactor;
+    boolean oneway = defaults.oneway;
+    boolean onewayReverse = false;
 
+    if (tags.containsKey("oneway")) {
+      String onewayTag = tags.get("oneway");
+      if ("yes".equals(onewayTag)) {
+        oneway = true;
+      }
+    }
 
-	@Override
-	public void close() {
-		sink.close();
-	}
+    if (tags.containsKey("maxspeed")) {
+      try {
+        double maxspeed = Double.parseDouble(tags.get("maxspeed"));
+        if (maxspeed < freespeed) {
+          // freespeed doesn't always mean it's the maximum speed allowed.
+          // thus only correct freespeed if maxspeed is lower than freespeed.
+          freespeed = maxspeed;
+        }
+      } catch (NumberFormatException e) {
+        log.warn("Could not parse freespeed tag:" + e.getMessage() + ". Ignoring it.");
+      }
+    }
 
-	private void createLink(final Network network, final Way way, final WayNode fromNode, final WayNode toNode, final double length) {
-		TagCollectionImpl tagCollection = new TagCollectionImpl(way.getTags());
-		Map<String, String> tags = tagCollection.buildMap();
-		String highway = tags.get("highway");
+    // check tag "lanes"
+    if (tags.containsKey("lanes")) {
+      try {
+        if (Double.parseDouble(tags.get("lanes")) > 0) {
+          nofLanes = Double.parseDouble(tags.get("lanes"));
+        }
+      } catch (Exception e) {
+        log.warn("Could not parse lanes tag:" + e.getMessage() + ". Ignoring it.");
+      }
+    }
 
-		OsmHighwayDefaults defaults = this.highwayDefaults.get(highway);
-		if (defaults == null) {
-			defaults = this.highwayDefaults.get("tertiary");
-		}
-		String origId = Long.toString(way.getId());
-		double nofLanes = defaults.lanes;
-		double laneCapacity = defaults.laneCapacity;
-		double freespeed = defaults.freespeed;
-		double freespeedFactor = defaults.freespeedFactor;
-		boolean oneway = defaults.oneway;
-		boolean onewayReverse = false;
+    // create the link(s)
+    double capacity = nofLanes * laneCapacity;
 
-		if (tags.containsKey("oneway")) {
-			String onewayTag = tags.get("oneway");
-			if ("yes".equals(onewayTag)) {
-				oneway = true;
-			} 
-		}
+    if (this.scaleMaxSpeed) {
+      freespeed = freespeed * freespeedFactor;
+    }
 
-		if (tags.containsKey("maxspeed")) {
-			try {
-				double maxspeed = Double.parseDouble(tags.get("maxspeed"));
-				if (maxspeed < freespeed) {
-					// freespeed doesn't always mean it's the maximum speed allowed.
-					// thus only correct freespeed if maxspeed is lower than freespeed.
-					freespeed = maxspeed;
-				}
-			} catch (NumberFormatException e) {
-				log.warn("Could not parse freespeed tag:" + e.getMessage() + ". Ignoring it.");
-			}
-		}
+    // only create link, if both nodes were found, node could be null, since nodes outside a layer
+    // were dropped
+    long fromNodeNumber = fromNode.getNodeId();
+    long toNodeNumber = toNode.getNodeId();
+    if (!onewayReverse) {
+      Id<Link> id =
+          Id.create(
+              Long.toString(way.getId())
+                  + "_"
+                  + Long.toString(fromNodeNumber)
+                  + "_"
+                  + Long.toString(toNodeNumber),
+              Link.class);
+      if (!network.getLinks().containsKey(id)) {
+        final Id<Link> id2 = id;
+        final double freespeed1 = freespeed;
+        final double capacity1 = capacity;
+        final double numLanes = nofLanes;
+        Link l =
+            NetworkUtils.createAndAddLink(
+                network,
+                id2,
+                network
+                    .getNodes()
+                    .get(Id.create(fromNodeNumber, org.matsim.api.core.v01.network.Node.class)),
+                network
+                    .getNodes()
+                    .get(Id.create(toNodeNumber, org.matsim.api.core.v01.network.Node.class)),
+                length,
+                freespeed1,
+                capacity1,
+                numLanes);
+        final String id1 = origId;
+        NetworkUtils.setOrigId(((Link) l), id1);
+        tagWayForward(way, l);
+      } else {
+        log.warn("Duplicate link: " + id);
+      }
+    }
+    if (!oneway) {
+      Id<Link> id =
+          Id.create(
+              Long.toString(way.getId())
+                  + "_"
+                  + Long.toString(fromNodeNumber)
+                  + "_"
+                  + Long.toString(toNodeNumber)
+                  + "_R",
+              Link.class);
+      if (!network.getLinks().containsKey(id)) {
+        final Id<Link> id2 = id;
+        final double freespeed1 = freespeed;
+        final double capacity1 = capacity;
+        final double numLanes = nofLanes;
+        Link l =
+            NetworkUtils.createAndAddLink(
+                network,
+                id2,
+                network
+                    .getNodes()
+                    .get(Id.create(toNodeNumber, org.matsim.api.core.v01.network.Node.class)),
+                network
+                    .getNodes()
+                    .get(Id.create(fromNodeNumber, org.matsim.api.core.v01.network.Node.class)),
+                length,
+                freespeed1,
+                capacity1,
+                numLanes);
+        final String id1 = origId;
+        NetworkUtils.setOrigId(((Link) l), id1);
+        tagWayBackward(way, l);
+      } else {
+        log.warn("Duplicate link: " + id);
+      }
+    }
+  }
 
-		// check tag "lanes"
-		if (tags.containsKey("lanes")) {
-			try {
-				if(Double.parseDouble(tags.get("lanes")) > 0){
-					nofLanes = Double.parseDouble(tags.get("lanes"));
-				}
-			} catch (Exception e) {
-				log.warn("Could not parse lanes tag:" + e.getMessage() + ". Ignoring it.");
-			}
-		}
+  private void tagWayBackward(Way way, Link l) {
+    way.getTags()
+        .add(new Tag("matsim:backward:link-id:" + l.getId().toString(), l.getId().toString()));
+  }
 
-		// create the link(s)
-		double capacity = nofLanes * laneCapacity;
+  private void tagWayForward(Way way, Link l) {
+    way.getTags()
+        .add(new Tag("matsim:forward:link-id:" + l.getId().toString(), l.getId().toString()));
+  }
 
-		if (this.scaleMaxSpeed) {
-			freespeed = freespeed * freespeedFactor;
-		}
+  @Override
+  public void initialize(Map<String, Object> map) {}
 
-		// only create link, if both nodes were found, node could be null, since nodes outside a layer were dropped
-		long fromNodeNumber = fromNode.getNodeId();
-		long toNodeNumber = toNode.getNodeId();
-		if (!onewayReverse) {
-			Id<Link> id = Id.create(Long.toString(way.getId())+"_"+Long.toString(fromNodeNumber)+"_"+Long.toString(toNodeNumber), Link.class);
-			if (!network.getLinks().containsKey(id)) {
-				final Id<Link> id2 = id;
-				final double freespeed1 = freespeed;
-				final double capacity1 = capacity;
-				final double numLanes = nofLanes;
-				Link l = NetworkUtils.createAndAddLink(network,id2, network.getNodes().get(Id.create(fromNodeNumber, org.matsim.api.core.v01.network.Node.class)), network.getNodes().get(Id.create(toNodeNumber, org.matsim.api.core.v01.network.Node.class)), length, freespeed1, capacity1, numLanes );
-				final String id1 = origId;
-				NetworkUtils.setOrigId( ((Link) l), id1 ) ;
-				tagWayForward(way, l);
-			} else {
-				log.warn("Duplicate link: " + id);
-			}
-		}
-		if (!oneway) {
-			Id<Link> id = Id.create(Long.toString(way.getId())+"_"+Long.toString(fromNodeNumber)+"_"+Long.toString(toNodeNumber)+"_R", Link.class);
-			if (!network.getLinks().containsKey(id)) {
-				final Id<Link> id2 = id;
-				final double freespeed1 = freespeed;
-				final double capacity1 = capacity;
-				final double numLanes = nofLanes;
-				Link l = NetworkUtils.createAndAddLink(network,id2, network.getNodes().get(Id.create(toNodeNumber, org.matsim.api.core.v01.network.Node.class)), network.getNodes().get(Id.create(fromNodeNumber, org.matsim.api.core.v01.network.Node.class)), length, freespeed1, capacity1, numLanes );
-				final String id1 = origId;
-				NetworkUtils.setOrigId( ((Link) l), id1 ) ;
-				tagWayBackward(way, l);
-			} else {
-				log.warn("Duplicate link: " + id);
-			}
-		}
-	}
+  private static class OsmHighwayDefaults {
+    public final double lanes;
+    public final double freespeed;
+    public final double freespeedFactor;
+    public final double laneCapacity;
+    public final boolean oneway;
 
-	private void tagWayBackward(Way way, Link l) {
-		way.getTags().add(new Tag("matsim:backward:link-id:" + l.getId().toString(), l.getId().toString()));
-	}
+    public OsmHighwayDefaults(
+        final double lanes,
+        final double freespeed,
+        final double freespeedFactor,
+        final double laneCapacity,
+        final boolean oneway) {
+      this.lanes = lanes;
+      this.freespeed = freespeed;
+      this.freespeedFactor = freespeedFactor;
+      this.laneCapacity = laneCapacity;
+      this.oneway = oneway;
+    }
+  }
 
-	private void tagWayForward(Way way, Link l) {
-		way.getTags().add(new Tag("matsim:forward:link-id:" + l.getId().toString(), l.getId().toString()));
-	}
+  @Override
+  public void process(EntityContainer entityContainer) {
+    entityContainer.process(
+        new EntityProcessor() {
 
-	@Override
-	public void initialize(Map<String, Object> map) {
+          @Override
+          public void process(BoundContainer bound) {
+            sink.process(bound);
+          }
 
-	}
+          @Override
+          public void process(NodeContainer node) {
+            readNode(node.getEntity());
+            sink.process(node);
+          }
 
-	private static class OsmHighwayDefaults {
-		public final double lanes;
-		public final double freespeed;
-		public final double freespeedFactor;
-		public final double laneCapacity;
-		public final boolean oneway;
+          @Override
+          public void process(RelationContainer relation) {
+            sink.process(relation);
+          }
 
-		public OsmHighwayDefaults(final double lanes, final double freespeed, final double freespeedFactor, final double laneCapacity, final boolean oneway) {
-			this.lanes = lanes;
-			this.freespeed = freespeed;
-			this.freespeedFactor = freespeedFactor;
-			this.laneCapacity = laneCapacity;
-			this.oneway = oneway;
-		}
-	}
+          @Override
+          public void process(WayContainer way) {
+            readLink(way.getEntity());
+            sink.process(way);
+          }
+        });
+  }
 
-	@Override
-	public void process(EntityContainer entityContainer) {
-		entityContainer.process(new EntityProcessor() {
+  @Override
+  public void complete() {
+    System.out.println(network.getNodes().size());
+    System.out.println(network.getLinks().size());
+    sink.complete();
+  }
 
-			@Override
-			public void process(BoundContainer bound) {
-				sink.process(bound);
-			}
-
-			@Override
-			public void process(NodeContainer node) {
-				readNode(node.getEntity());
-				sink.process(node);
-			}
-
-			@Override
-			public void process(RelationContainer relation) {
-				sink.process(relation);
-			}
-
-			@Override
-			public void process(WayContainer way) {
-				readLink(way.getEntity());
-				sink.process(way);
-			}
-
-		});
-	}
-
-	@Override
-	public void complete() {
-		System.out.println(network.getNodes().size());
-		System.out.println(network.getLinks().size());
-		sink.complete();
-	}
-
-	@Override
-	public void setSink(Sink sink) {
-		this.sink = sink;
-	}
-
+  @Override
+  public void setSink(Sink sink) {
+    this.sink = sink;
+  }
 }

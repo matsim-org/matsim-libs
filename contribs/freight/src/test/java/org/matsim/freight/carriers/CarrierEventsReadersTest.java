@@ -20,6 +20,10 @@
 
 package org.matsim.freight.carriers;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,216 +40,237 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-
 /**
  * @author Kai Martins-Turner (kturner)
  * @author Niclas Richter (nixlaos)
  */
 public class CarrierEventsReadersTest {
 
+  @Rule public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Rule
-	public final MatsimTestUtils utils = new MatsimTestUtils();
+  private final Id<Link> linkId = Id.createLinkId("demoLink");
+  private final Id<Link> linkId2 = Id.createLinkId("demoLink2");
+  private final Id<Carrier> carrierId = Id.create("testCarrier", Carrier.class);
+  private final Id<Vehicle> vehicleId = Id.createVehicleId("myVehicle");
 
-	private final Id<Link> linkId = Id.createLinkId("demoLink");
-	private final Id<Link> linkId2 = Id.createLinkId("demoLink2");
-	private final Id<Carrier> carrierId = Id.create("testCarrier", Carrier.class);
-	private final Id<Vehicle> vehicleId = Id.createVehicleId("myVehicle");
+  private final Id<Tour> tourId = Id.create("myCarrierTour", Tour.class);
+  private final CarrierService service =
+      CarrierService.Builder.newInstance(Id.create("service42", CarrierService.class), linkId2)
+          .build();
+  private final CarrierShipment shipment =
+      CarrierShipment.Builder.newInstance(
+              Id.create("shipment11", CarrierShipment.class), linkId, linkId2, 7)
+          .build();
 
-	private final Id<Tour> tourId = Id.create("myCarrierTour", Tour.class);
-	private final CarrierService service = CarrierService.Builder.newInstance(Id.create("service42", CarrierService.class), linkId2 ).build();
-	private final CarrierShipment shipment = CarrierShipment.Builder.newInstance(Id.create("shipment11", CarrierShipment.class), linkId, linkId2,7 ).build();
+  private final List<Event> carrierEvents =
+      List.of(
+          new CarrierTourStartEvent(10, carrierId, linkId, vehicleId, tourId),
+          new CarrierTourEndEvent(500, carrierId, linkId, vehicleId, tourId),
+          new CarrierServiceStartEvent(20, carrierId, service, vehicleId),
+          new CarrierServiceEndEvent(25, carrierId, service, vehicleId),
+          new CarrierShipmentPickupStartEvent(100, carrierId, shipment, vehicleId),
+          new CarrierShipmentPickupEndEvent(115, carrierId, shipment, vehicleId),
+          new CarrierShipmentDeliveryStartEvent(210, carrierId, shipment, vehicleId),
+          new CarrierShipmentDeliveryEndEvent(225, carrierId, shipment, vehicleId));
 
-	private final List<Event> carrierEvents = List.of(
-		new CarrierTourStartEvent(10, carrierId, linkId, vehicleId, tourId),
-		new CarrierTourEndEvent(500, carrierId, linkId, vehicleId, tourId),
-		new CarrierServiceStartEvent(20, carrierId, service, vehicleId),
-		new CarrierServiceEndEvent(25, carrierId, service, vehicleId),
-		new CarrierShipmentPickupStartEvent(100, carrierId, shipment, vehicleId),
-		new CarrierShipmentPickupEndEvent(115, carrierId, shipment, vehicleId),
-		new CarrierShipmentDeliveryStartEvent(210, carrierId, shipment, vehicleId),
-		new CarrierShipmentDeliveryEndEvent(225, carrierId, shipment, vehicleId)
-	);
+  @Test
+  public void testWriteReadServiceBasedEvents() {
+    EventsManager eventsManager1 = EventsUtils.createEventsManager();
+    EventsManager eventsManager2 = EventsUtils.createEventsManager();
+    EventsCollector collector1 = new EventsCollector();
+    EventsCollector collector2 = new EventsCollector();
 
-	@Test
-	public void testWriteReadServiceBasedEvents() {
-		EventsManager eventsManager1 = EventsUtils.createEventsManager();
-		EventsManager eventsManager2 = EventsUtils.createEventsManager();
-		EventsCollector collector1 = new EventsCollector();
-		EventsCollector collector2 = new EventsCollector();
+    eventsManager1.addHandler(collector1);
+    eventsManager1.initProcessing();
+    CarrierEventsReaders.createEventsReader(eventsManager1)
+        .readFile(utils.getClassInputDirectory() + "serviceBasedEvents.xml");
+    eventsManager1.finishProcessing();
 
-		eventsManager1.addHandler(collector1);
-		eventsManager1.initProcessing();
-		CarrierEventsReaders.createEventsReader(eventsManager1)
-				.readFile(utils.getClassInputDirectory() + "serviceBasedEvents.xml");
-		eventsManager1.finishProcessing();
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    EventWriterXML writer = new EventWriterXML(outputStream);
+    collector1.getEvents().forEach(writer::handleEvent);
+    writer.closeFile();
 
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		EventWriterXML writer = new EventWriterXML(outputStream);
-		collector1.getEvents().forEach(writer::handleEvent);
-		writer.closeFile();
+    eventsManager2.addHandler(collector2);
+    eventsManager2.initProcessing();
+    CarrierEventsReaders.createEventsReader(eventsManager2)
+        .readStream(
+            new ByteArrayInputStream(outputStream.toByteArray()),
+            ControllerConfigGroup.EventsFileFormat.xml);
+    eventsManager2.finishProcessing();
 
-		eventsManager2.addHandler(collector2);
-		eventsManager2.initProcessing();
-		CarrierEventsReaders.createEventsReader(eventsManager2)
-				.readStream(new ByteArrayInputStream(outputStream.toByteArray()), ControllerConfigGroup.EventsFileFormat.xml);
-		eventsManager2.finishProcessing();
+    Assert.assertEquals(collector1.getEvents(), collector2.getEvents());
+  }
 
-		Assert.assertEquals(collector1.getEvents(), collector2.getEvents());
-	}
+  @Test
+  public void testReadServiceBasedEvents() {
 
+    EventsManager eventsManager = EventsUtils.createEventsManager();
+    TestEventHandlerTours eventHandlerTours = new TestEventHandlerTours();
+    TestEventHandlerServices eventHandlerServices = new TestEventHandlerServices();
 
-	@Test
-	public void testReadServiceBasedEvents() {
+    eventsManager.addHandler(eventHandlerTours);
+    eventsManager.addHandler(eventHandlerServices);
+    eventsManager.initProcessing();
+    CarrierEventsReaders.createEventsReader(eventsManager)
+        .readFile(utils.getClassInputDirectory() + "serviceBasedEvents.xml");
+    eventsManager.finishProcessing();
 
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		TestEventHandlerTours eventHandlerTours = new TestEventHandlerTours();
-		TestEventHandlerServices eventHandlerServices = new TestEventHandlerServices();
+    Assert.assertEquals(
+        "Number of tour related carrier events is not correct",
+        4,
+        eventHandlerTours.handledEvents.size());
+    Assert.assertEquals(
+        "Number of service related carrier events is not correct",
+        14,
+        eventHandlerServices.handledEvents.size());
+  }
 
-		eventsManager.addHandler(eventHandlerTours);
-		eventsManager.addHandler(eventHandlerServices);
-		eventsManager.initProcessing();
-		CarrierEventsReaders.createEventsReader(eventsManager)
-				.readFile(utils.getClassInputDirectory() + "serviceBasedEvents.xml");
-		eventsManager.finishProcessing();
+  @Test
+  public void testWriteReadShipmentBasedEvents() {
+    EventsManager eventsManager1 = EventsUtils.createEventsManager();
+    EventsManager eventsManager2 = EventsUtils.createEventsManager();
+    EventsCollector collector1 = new EventsCollector();
+    EventsCollector collector2 = new EventsCollector();
 
-		Assert.assertEquals("Number of tour related carrier events is not correct", 4 , eventHandlerTours.handledEvents.size());
-		Assert.assertEquals("Number of service related carrier events is not correct", 14 , eventHandlerServices.handledEvents.size());
-	}
+    eventsManager1.addHandler(collector1);
+    eventsManager1.initProcessing();
+    CarrierEventsReaders.createEventsReader(eventsManager1)
+        .readFile(utils.getClassInputDirectory() + "shipmentBasedEvents.xml");
+    eventsManager1.finishProcessing();
 
-	@Test
-	public void testWriteReadShipmentBasedEvents() {
-		EventsManager eventsManager1 = EventsUtils.createEventsManager();
-		EventsManager eventsManager2 = EventsUtils.createEventsManager();
-		EventsCollector collector1 = new EventsCollector();
-		EventsCollector collector2 = new EventsCollector();
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    EventWriterXML writer = new EventWriterXML(outputStream);
+    collector1.getEvents().forEach(writer::handleEvent);
+    writer.closeFile();
 
-		eventsManager1.addHandler(collector1);
-		eventsManager1.initProcessing();
-		CarrierEventsReaders.createEventsReader(eventsManager1)
-			.readFile(utils.getClassInputDirectory() + "shipmentBasedEvents.xml");
-		eventsManager1.finishProcessing();
+    eventsManager2.addHandler(collector2);
+    eventsManager2.initProcessing();
+    CarrierEventsReaders.createEventsReader(eventsManager2)
+        .readStream(
+            new ByteArrayInputStream(outputStream.toByteArray()),
+            ControllerConfigGroup.EventsFileFormat.xml);
+    eventsManager2.finishProcessing();
 
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		EventWriterXML writer = new EventWriterXML(outputStream);
-		collector1.getEvents().forEach(writer::handleEvent);
-		writer.closeFile();
+    Assert.assertEquals(collector1.getEvents(), collector2.getEvents());
+  }
 
-		eventsManager2.addHandler(collector2);
-		eventsManager2.initProcessing();
-		CarrierEventsReaders.createEventsReader(eventsManager2)
-			.readStream(new ByteArrayInputStream(outputStream.toByteArray()), ControllerConfigGroup.EventsFileFormat.xml);
-		eventsManager2.finishProcessing();
+  @Test
+  public void testReadShipmentBasedEvents() {
 
-		Assert.assertEquals(collector1.getEvents(), collector2.getEvents());
-	}
+    EventsManager eventsManager = EventsUtils.createEventsManager();
+    TestEventHandlerTours eventHandlerTours = new TestEventHandlerTours();
+    TestEventHandlerShipments testEventHandlerShipments = new TestEventHandlerShipments();
 
-	@Test
-	public void testReadShipmentBasedEvents() {
+    eventsManager.addHandler(eventHandlerTours);
+    eventsManager.addHandler(testEventHandlerShipments);
+    eventsManager.initProcessing();
+    CarrierEventsReaders.createEventsReader(eventsManager)
+        .readFile(utils.getClassInputDirectory() + "shipmentBasedEvents.xml");
+    eventsManager.finishProcessing();
 
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		TestEventHandlerTours eventHandlerTours = new TestEventHandlerTours();
-		TestEventHandlerShipments testEventHandlerShipments = new TestEventHandlerShipments();
+    Assert.assertEquals(
+        "Number of tour related carrier events is not correct",
+        2,
+        eventHandlerTours.handledEvents.size());
+    Assert.assertEquals(
+        "Number of shipments related carrier events is not correct",
+        20,
+        testEventHandlerShipments.handledEvents.size());
+  }
 
-		eventsManager.addHandler(eventHandlerTours);
-		eventsManager.addHandler(testEventHandlerShipments);
-		eventsManager.initProcessing();
-		CarrierEventsReaders.createEventsReader(eventsManager)
-			.readFile(utils.getClassInputDirectory() + "shipmentBasedEvents.xml");
-		eventsManager.finishProcessing();
+  /**
+   * This test is testing the reader with some locally created events (see above). This test is
+   * inspired by the DrtEventsReaderTest from michalm.
+   */
+  @Test
+  public void testReader() {
+    var outputStream = new ByteArrayOutputStream();
+    EventWriterXML writer = new EventWriterXML(outputStream);
+    carrierEvents.forEach(writer::handleEvent);
+    writer.closeFile();
 
-		Assert.assertEquals("Number of tour related carrier events is not correct", 2 , eventHandlerTours.handledEvents.size());
-		Assert.assertEquals("Number of shipments related carrier events is not correct", 20 , testEventHandlerShipments.handledEvents.size());
-	}
+    EventsManager eventsManager = EventsUtils.createEventsManager();
+    TestEventHandlerTours eventHandlerTours = new TestEventHandlerTours();
+    TestEventHandlerServices eventHandlerServices = new TestEventHandlerServices();
+    TestEventHandlerShipments eventHandlerShipments = new TestEventHandlerShipments();
 
+    eventsManager.addHandler(eventHandlerTours);
+    eventsManager.addHandler(eventHandlerServices);
+    eventsManager.addHandler(eventHandlerShipments);
 
-	/**
-	 * This test is testing the reader with some locally created events (see above).
-	 * This test is inspired by the DrtEventsReaderTest from michalm.
-	 */
-	@Test
-	public void testReader() {
-		var outputStream = new ByteArrayOutputStream();
-		EventWriterXML writer = new EventWriterXML(outputStream);
-		carrierEvents.forEach(writer::handleEvent);
-		writer.closeFile();
+    eventsManager.initProcessing();
+    CarrierEventsReaders.createEventsReader(eventsManager)
+        .readStream(
+            new ByteArrayInputStream(outputStream.toByteArray()),
+            ControllerConfigGroup.EventsFileFormat.xml);
+    eventsManager.finishProcessing();
 
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		TestEventHandlerTours eventHandlerTours = new TestEventHandlerTours();
-		TestEventHandlerServices eventHandlerServices = new TestEventHandlerServices();
-		TestEventHandlerShipments eventHandlerShipments = new TestEventHandlerShipments();
+    var handledEvents = new ArrayList<Event>();
+    handledEvents.addAll(eventHandlerTours.handledEvents);
+    handledEvents.addAll(eventHandlerServices.handledEvents);
+    handledEvents.addAll(eventHandlerShipments.handledEvents);
 
-		eventsManager.addHandler(eventHandlerTours);
-		eventsManager.addHandler(eventHandlerServices);
-		eventsManager.addHandler(eventHandlerShipments);
+    // Please note: This test is sensitive to the order of events as they are added in carrierEvents
+    // (input) and the resukts of the handler...
+    Assert.assertArrayEquals(carrierEvents.toArray(), handledEvents.toArray());
+  }
 
-		eventsManager.initProcessing();
-		CarrierEventsReaders.createEventsReader(eventsManager)
-			.readStream(new ByteArrayInputStream(outputStream.toByteArray()),
-				ControllerConfigGroup.EventsFileFormat.xml);
-		eventsManager.finishProcessing();
+  private static class TestEventHandlerTours
+      implements CarrierTourStartEventHandler, CarrierTourEndEventHandler {
+    private final List<Event> handledEvents = new ArrayList<>();
 
-		var handledEvents = new ArrayList<Event>();
-		handledEvents.addAll(eventHandlerTours.handledEvents);
-		handledEvents.addAll(eventHandlerServices.handledEvents);
-		handledEvents.addAll(eventHandlerShipments.handledEvents);
+    @Override
+    public void handleEvent(CarrierTourEndEvent event) {
+      handledEvents.add(event);
+    }
 
-		//Please note: This test is sensitive to the order of events as they are added in carrierEvents (input) and the resukts of the handler...
-		Assert.assertArrayEquals(carrierEvents.toArray(), handledEvents.toArray());
-	}
+    @Override
+    public void handleEvent(CarrierTourStartEvent event) {
+      handledEvents.add(event);
+    }
+  }
 
-	private static class TestEventHandlerTours
-		implements CarrierTourStartEventHandler, CarrierTourEndEventHandler {
-		private final List<Event> handledEvents = new ArrayList<>();
+  private static class TestEventHandlerServices
+      implements CarrierServiceStartEventHandler, CarrierServiceEndEventHandler {
+    private final List<Event> handledEvents = new ArrayList<>();
 
+    @Override
+    public void handleEvent(CarrierServiceEndEvent event) {
+      handledEvents.add(event);
+    }
 
-		@Override public void handleEvent(CarrierTourEndEvent event) {
-			handledEvents.add(event);
-		}
+    @Override
+    public void handleEvent(CarrierServiceStartEvent event) {
+      handledEvents.add(event);
+    }
+  }
 
-		@Override public void handleEvent(CarrierTourStartEvent event) {
-			handledEvents.add(event);
-		}
-	}
+  private static class TestEventHandlerShipments
+      implements CarrierShipmentDeliveryStartEventHandler,
+          CarrierShipmentDeliveryEndEventHandler,
+          CarrierShipmentPickupStartEventHandler,
+          CarrierShipmentPickupEndEventHandler {
+    private final List<Event> handledEvents = new ArrayList<>();
 
-	private static class TestEventHandlerServices
-		implements CarrierServiceStartEventHandler, CarrierServiceEndEventHandler {
-		private final List<Event> handledEvents = new ArrayList<>();
+    @Override
+    public void handleEvent(CarrierShipmentDeliveryEndEvent event) {
+      handledEvents.add(event);
+    }
 
-		@Override public void handleEvent(CarrierServiceEndEvent event) {
-			handledEvents.add(event);
-		}
+    @Override
+    public void handleEvent(CarrierShipmentPickupEndEvent event) {
+      handledEvents.add(event);
+    }
 
-		@Override public void handleEvent(CarrierServiceStartEvent event) {
-			handledEvents.add(event);
-		}
+    @Override
+    public void handleEvent(CarrierShipmentDeliveryStartEvent event) {
+      handledEvents.add(event);
+    }
 
-	}
-
-	private static class TestEventHandlerShipments
-		implements CarrierShipmentDeliveryStartEventHandler, CarrierShipmentDeliveryEndEventHandler, CarrierShipmentPickupStartEventHandler, CarrierShipmentPickupEndEventHandler {
-		private final List<Event> handledEvents = new ArrayList<>();
-
-
-		@Override public void handleEvent(CarrierShipmentDeliveryEndEvent event) {
-			handledEvents.add(event);
-		}
-
-		@Override public void handleEvent(CarrierShipmentPickupEndEvent event) {
-			handledEvents.add(event);
-		}
-
-		@Override public void handleEvent(CarrierShipmentDeliveryStartEvent event) {
-			handledEvents.add(event);
-		}
-
-		@Override public void handleEvent(CarrierShipmentPickupStartEvent event) {
-			handledEvents.add(event);
-		}
-	}
+    @Override
+    public void handleEvent(CarrierShipmentPickupStartEvent event) {
+      handledEvents.add(event);
+    }
+  }
 }

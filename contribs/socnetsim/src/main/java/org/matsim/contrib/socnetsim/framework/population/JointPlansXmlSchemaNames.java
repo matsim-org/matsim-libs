@@ -23,13 +23,12 @@ package org.matsim.contrib.socnetsim.framework.population;
  * @author thibautd
  */
 public class JointPlansXmlSchemaNames {
-	private JointPlansXmlSchemaNames() {}
+  private JointPlansXmlSchemaNames() {}
 
-	public static String ROOT_TAG = "jointPlans";
-	public static String JOINT_PLAN_TAG = "jointPlan";
-	public static String PLAN_TAG = "individualPlan";
+  public static String ROOT_TAG = "jointPlans";
+  public static String JOINT_PLAN_TAG = "jointPlan";
+  public static String PLAN_TAG = "individualPlan";
 
-	public static String PERSON_ATT = "personId";
-	public static String PLAN_NR_ATT = "planNr";
+  public static String PERSON_ATT = "personId";
+  public static String PLAN_NR_ATT = "planNr";
 }
-

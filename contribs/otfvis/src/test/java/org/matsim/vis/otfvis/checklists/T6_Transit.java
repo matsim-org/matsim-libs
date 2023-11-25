@@ -26,8 +26,7 @@ import org.matsim.pt.demo.TwoLinesDemo;
 
 public class T6_Transit {
 
-	public static void main(final String[] args) {
-		TwoLinesDemo.main(args);
-	}
-
+  public static void main(final String[] args) {
+    TwoLinesDemo.main(args);
+  }
 }

@@ -24,47 +24,43 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 
 /**
- * A class to create a object which contains modal and link information. 
- * 
+ * A class to create a object which contains modal and link information.
+ *
  * @author amit
  */
-
 public final class ModalCountsLinkIdentifier implements Identifiable<ModalCountsLinkIdentifier> {
-	
-	private final String mode;
-	private final Id<Link> linkId;
-	private final Id<ModalCountsLinkIdentifier> id;
-	
-	public static final String separator = "_&_";
-	
-	public String getMode() {
-		return mode;
-	}
 
-	public Id<Link> getLinkId() {
-		return linkId;
-	}
+  private final String mode;
+  private final Id<Link> linkId;
+  private final Id<ModalCountsLinkIdentifier> id;
 
-	public ModalCountsLinkIdentifier(final String mode, final Id<Link> linkId) {
-		this.mode = mode;
-		this.linkId = linkId;
-		this.id = ModalCountsUtils.getModalCountLinkId(mode, linkId);
-	}
+  public static final String separator = "_&_";
 
-	public static String getModeLinkSplitter(){
-		return separator;
-	}
+  public String getMode() {
+    return mode;
+  }
 
-	@Override
-	public Id<ModalCountsLinkIdentifier> getId() {
-		return this.id;
-	}
+  public Id<Link> getLinkId() {
+    return linkId;
+  }
 
-	@Override
-	public String toString() {
-		return "ModalLink[" +
-				"mode='" + mode + '\'' +
-				", linkId=" + linkId +
-				']';
-	}
+  public ModalCountsLinkIdentifier(final String mode, final Id<Link> linkId) {
+    this.mode = mode;
+    this.linkId = linkId;
+    this.id = ModalCountsUtils.getModalCountLinkId(mode, linkId);
+  }
+
+  public static String getModeLinkSplitter() {
+    return separator;
+  }
+
+  @Override
+  public Id<ModalCountsLinkIdentifier> getId() {
+    return this.id;
+  }
+
+  @Override
+  public String toString() {
+    return "ModalLink[" + "mode='" + mode + '\'' + ", linkId=" + linkId + ']';
+  }
 }

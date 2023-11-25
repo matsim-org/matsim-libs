@@ -23,10 +23,11 @@ package org.matsim.withinday.mobsim;
 import org.matsim.withinday.replanning.parallel.ParallelDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
-public class DuringActivityReplanningModule extends WithinDayReplanningModule<WithinDayDuringActivityReplannerFactory> {
-		
-	public DuringActivityReplanningModule(ParallelDuringActivityReplanner parallelDuringActivityReplanner) {
-		this.parallelReplanner = parallelDuringActivityReplanner;
-	}
+public class DuringActivityReplanningModule
+    extends WithinDayReplanningModule<WithinDayDuringActivityReplannerFactory> {
 
+  public DuringActivityReplanningModule(
+      ParallelDuringActivityReplanner parallelDuringActivityReplanner) {
+    this.parallelReplanner = parallelDuringActivityReplanner;
+  }
 }

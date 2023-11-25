@@ -41,84 +41,107 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class ExternalModuleTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-    private Scenario scenario;
-    private OutputDirectoryHierarchy outputDirectoryHierarchy;
-    private Scenario originalScenario;
+  private Scenario scenario;
+  private OutputDirectoryHierarchy outputDirectoryHierarchy;
+  private Scenario originalScenario;
 
-    @Before
-    public void setUp() {
-        scenario = ScenarioUtils.loadScenario(utils.loadConfig("test/scenarios/equil/config.xml"));
-        originalScenario = ScenarioUtils.loadScenario(utils.loadConfig("test/scenarios/equil/config.xml"));
-        final String outputDirectory = utils.getOutputDirectory();
-        outputDirectoryHierarchy = new OutputDirectoryHierarchy(
-                outputDirectory, OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists, this.scenario.getConfig().controller().getCompressionType());
-        scenario.getConfig().controller().setOutputDirectory( outputDirectory );
-//        scenario.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+  @Before
+  public void setUp() {
+    scenario = ScenarioUtils.loadScenario(utils.loadConfig("test/scenarios/equil/config.xml"));
+    originalScenario =
+        ScenarioUtils.loadScenario(utils.loadConfig("test/scenarios/equil/config.xml"));
+    final String outputDirectory = utils.getOutputDirectory();
+    outputDirectoryHierarchy =
+        new OutputDirectoryHierarchy(
+            outputDirectory,
+            OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists,
+            this.scenario.getConfig().controller().getCompressionType());
+    scenario.getConfig().controller().setOutputDirectory(outputDirectory);
+    //        scenario.getConfig().controler().setOverwriteFileSetting(
+    // OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 
-//        // the following includes all retrofittings that were added later:
-//        com.google.inject.Injector injector = Injector.createInjector( scenario.getConfig(), new AbstractModule(){
-//            @Override public void install(){
-//                install( new NewControlerModule() );
-//                install( new ControlerDefaultCoreListenersModule() );
-//                install( new ControlerDefaultsModule() );
-//                install( new ScenarioByInstanceModule( scenario ) );
-//            }
-//        } );;
-//        PrepareForSim prepareForSim = injector.getInstance( PrepareForSim.class ) ;
-//        prepareForSim.run();
-    }
+    //        // the following includes all retrofittings that were added later:
+    //        com.google.inject.Injector injector = Injector.createInjector( scenario.getConfig(),
+    // new AbstractModule(){
+    //            @Override public void install(){
+    //                install( new NewControlerModule() );
+    //                install( new ControlerDefaultCoreListenersModule() );
+    //                install( new ControlerDefaultsModule() );
+    //                install( new ScenarioByInstanceModule( scenario ) );
+    //            }
+    //        } );;
+    //        PrepareForSim prepareForSim = injector.getInstance( PrepareForSim.class ) ;
+    //        prepareForSim.run();
+  }
 
-    @Test
-    public void testNoOpExternalModule() {
-        ExternalModule testee = new ExternalModule(new ExternalModule.ExeRunnerDelegate() {
-            @Override
-            public boolean invoke() {
-                Population inPopulation = loadPopulation(outputDirectoryHierarchy.getTempPath()+"/test_plans.in.xml");
-                new PopulationWriter(inPopulation).write(outputDirectoryHierarchy.getTempPath()+"/test_plans.out.xml");
+  @Test
+  public void testNoOpExternalModule() {
+    ExternalModule testee =
+        new ExternalModule(
+            new ExternalModule.ExeRunnerDelegate() {
+              @Override
+              public boolean invoke() {
+                Population inPopulation =
+                    loadPopulation(outputDirectoryHierarchy.getTempPath() + "/test_plans.in.xml");
+                new PopulationWriter(inPopulation)
+                    .write(outputDirectoryHierarchy.getTempPath() + "/test_plans.out.xml");
                 return true;
-            }
-        }, "test", outputDirectoryHierarchy, scenario);
-        replanPopulation(scenario.getPopulation(), testee);
-        Assert.assertTrue(PopulationUtils.equalPopulation(scenario.getPopulation(), originalScenario.getPopulation()));
-    }
+              }
+            },
+            "test",
+            outputDirectoryHierarchy,
+            scenario);
+    replanPopulation(scenario.getPopulation(), testee);
+    Assert.assertTrue(
+        PopulationUtils.equalPopulation(
+            scenario.getPopulation(), originalScenario.getPopulation()));
+  }
 
-    @Test
-    public void testPlanEmptyingExternalModule() {
-        ExternalModule testee = new ExternalModule(new ExternalModule.ExeRunnerDelegate() {
-            @Override
-            public boolean invoke() {
-                Population inPopulation = loadPopulation(outputDirectoryHierarchy.getTempPath()+"/test_plans.in.xml");
+  @Test
+  public void testPlanEmptyingExternalModule() {
+    ExternalModule testee =
+        new ExternalModule(
+            new ExternalModule.ExeRunnerDelegate() {
+              @Override
+              public boolean invoke() {
+                Population inPopulation =
+                    loadPopulation(outputDirectoryHierarchy.getTempPath() + "/test_plans.in.xml");
                 for (Person person : inPopulation.getPersons().values()) {
-                    person.getSelectedPlan().getPlanElements().clear();
+                  person.getSelectedPlan().getPlanElements().clear();
                 }
-                new PopulationWriter(inPopulation).write(outputDirectoryHierarchy.getTempPath()+"/test_plans.out.xml");
+                new PopulationWriter(inPopulation)
+                    .write(outputDirectoryHierarchy.getTempPath() + "/test_plans.out.xml");
                 return true;
-            }
-        }, "test", outputDirectoryHierarchy, scenario);
-        replanPopulation(scenario.getPopulation(), testee);
-        Assert.assertFalse(PopulationUtils.equalPopulation(scenario.getPopulation(), originalScenario.getPopulation()));
-    }
+              }
+            },
+            "test",
+            outputDirectoryHierarchy,
+            scenario);
+    replanPopulation(scenario.getPopulation(), testee);
+    Assert.assertFalse(
+        PopulationUtils.equalPopulation(
+            scenario.getPopulation(), originalScenario.getPopulation()));
+  }
 
-    private Population loadPopulation(String filename) {
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        new PopulationReader(scenario).readFile(filename);
-        return scenario.getPopulation();
-    }
+  private Population loadPopulation(String filename) {
+    Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    new PopulationReader(scenario).readFile(filename);
+    return scenario.getPopulation();
+  }
 
-    private void replanPopulation(Population population, PlanStrategyModule testee) {
-        testee.prepareReplanning(new ReplanningContext() {
-            @Override
-            public int getIteration() {
-                return 0;
-            }
+  private void replanPopulation(Population population, PlanStrategyModule testee) {
+    testee.prepareReplanning(
+        new ReplanningContext() {
+          @Override
+          public int getIteration() {
+            return 0;
+          }
         });
-        for (Person person : population.getPersons().values()) {
-            testee.handlePlan(person.getSelectedPlan());
-        }
-        testee.finishReplanning();
+    for (Person person : population.getPersons().values()) {
+      testee.handlePlan(person.getSelectedPlan());
     }
-
+    testee.finishReplanning();
+  }
 }

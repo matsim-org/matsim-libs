@@ -22,13 +22,12 @@ package org.matsim.core.mobsim.framework.listeners;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 /**
- *  Listeners of QueueSimulation should implement this if they want to be
- *  notified after QueueSimulation.beforeSimStep() was invoked.
+ * Listeners of QueueSimulation should implement this if they want to be notified after
+ * QueueSimulation.beforeSimStep() was invoked.
  *
  * @author dgrether
  */
 public interface MobsimBeforeSimStepListener extends MobsimListener {
 
-	public void notifyMobsimBeforeSimStep(final MobsimBeforeSimStepEvent e);
-
+  public void notifyMobsimBeforeSimStep(final MobsimBeforeSimStepEvent e);
 }

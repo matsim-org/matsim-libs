@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.etaxi;
 
+import com.google.inject.Inject;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
@@ -27,24 +28,22 @@ import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.evrp.ChargingActivity;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 
-import com.google.inject.Inject;
-
 /**
  * @author michalm
  */
 public class ETaxiActionCreator implements VrpAgentLogic.DynActionCreator {
-	private final TaxiActionCreator taxiActionCreator;
+  private final TaxiActionCreator taxiActionCreator;
 
-	@Inject
-	public ETaxiActionCreator(TaxiActionCreator taxiActionCreator) {
-		this.taxiActionCreator = taxiActionCreator;
-	}
+  @Inject
+  public ETaxiActionCreator(TaxiActionCreator taxiActionCreator) {
+    this.taxiActionCreator = taxiActionCreator;
+  }
 
-	@Override
-	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
-		Task task = vehicle.getSchedule().getCurrentTask();
-		return task.getTaskType().equals(ETaxiChargingTask.TYPE) ?
-				new ChargingActivity((ETaxiChargingTask)task) :
-				taxiActionCreator.createAction(dynAgent, vehicle, now);
-	}
+  @Override
+  public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
+    Task task = vehicle.getSchedule().getCurrentTask();
+    return task.getTaskType().equals(ETaxiChargingTask.TYPE)
+        ? new ChargingActivity((ETaxiChargingTask) task)
+        : taxiActionCreator.createAction(dynAgent, vehicle, now);
+  }
 }

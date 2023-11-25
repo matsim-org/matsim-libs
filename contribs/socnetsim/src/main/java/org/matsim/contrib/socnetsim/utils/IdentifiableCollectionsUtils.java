@@ -19,40 +19,33 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.utils;
 
+import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-
-import java.util.Collection;
 
 /**
  * @author thibautd
  */
 public class IdentifiableCollectionsUtils {
 
-	public static boolean containsAll(
-			final Collection<? extends Id> list,
-			final Collection<? extends Identifiable> contained) {
-		for ( Identifiable id : contained ) {
-			if ( !list.contains( id.getId() ) ) return false;
-		}
-		return true;
-	}
+  public static boolean containsAll(
+      final Collection<? extends Id> list, final Collection<? extends Identifiable> contained) {
+    for (Identifiable id : contained) {
+      if (!list.contains(id.getId())) return false;
+    }
+    return true;
+  }
 
-	public static boolean contains(
-			final Collection<? extends Identifiable> list,
-			final Id passengerId) {
-		for ( Identifiable e : list ) {
-			if ( e.getId().equals( passengerId ) ) return true;
-		}
-		return false;
-	}
+  public static boolean contains(
+      final Collection<? extends Identifiable> list, final Id passengerId) {
+    for (Identifiable e : list) {
+      if (e.getId().equals(passengerId)) return true;
+    }
+    return false;
+  }
 
-	public static void addAll(
-			final Collection<Id> collectionToFill,
-			final Collection<? extends Identifiable> passengers) {
-		for ( Identifiable p : passengers ) collectionToFill.add( p.getId() );
-	}
-
-
+  public static void addAll(
+      final Collection<Id> collectionToFill, final Collection<? extends Identifiable> passengers) {
+    for (Identifiable p : passengers) collectionToFill.add(p.getId());
+  }
 }
-

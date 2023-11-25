@@ -27,129 +27,104 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
+import org.matsim.core.population.PopulationUtils;
 
 /**
  * @author thibautd
  */
 public class MergingTest {
-	private JointPlans jointPlans = new JointPlans();
-	private final List<GroupPlans> testPlans = new ArrayList<GroupPlans>();
+  private JointPlans jointPlans = new JointPlans();
+  private final List<GroupPlans> testPlans = new ArrayList<GroupPlans>();
 
-	// /////////////////////////////////////////////////////////////////////////
-	// fixtures management
-	// /////////////////////////////////////////////////////////////////////////
-	@After
-	public void clean() {
-		testPlans.clear();
-		jointPlans = new JointPlans();
-	}
+  // /////////////////////////////////////////////////////////////////////////
+  // fixtures management
+  // /////////////////////////////////////////////////////////////////////////
+  @After
+  public void clean() {
+    testPlans.clear();
+    jointPlans = new JointPlans();
+  }
 
-	@Before
-	public void allIndividuals() {
-		List<Plan> plans = new ArrayList<Plan>();
+  @Before
+  public void allIndividuals() {
+    List<Plan> plans = new ArrayList<Plan>();
 
-		for (int i=0; i<20; i++) {
-			plans.add( PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(i, Person.class))) );
-		}
+    for (int i = 0; i < 20; i++) {
+      plans.add(
+          PopulationUtils.createPlan(
+              PopulationUtils.getFactory().createPerson(Id.create(i, Person.class))));
+    }
 
-		testPlans.add( new GroupPlans( Collections.EMPTY_LIST , plans ) );
-	}
+    testPlans.add(new GroupPlans(Collections.EMPTY_LIST, plans));
+  }
 
-	@Before
-	public void allJoints() {
-		List<JointPlan> plans = new ArrayList<JointPlan>();
+  @Before
+  public void allJoints() {
+    List<JointPlan> plans = new ArrayList<JointPlan>();
 
-		for (int i=0; i<10; i++) {
-			final Map<Id<Person>, Plan> indivPlans = new HashMap< >();
-			for (int j=0; j<1000; j+=100) {
-				Id<Person> id = Id.create( i + j , Person.class );
-				final Id<Person> id1 = id;
-				indivPlans.put(
-						id,
-						PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(id1)) );
-			}
-			plans.add( jointPlans.getFactory().createJointPlan( indivPlans ) );
-		}
+    for (int i = 0; i < 10; i++) {
+      final Map<Id<Person>, Plan> indivPlans = new HashMap<>();
+      for (int j = 0; j < 1000; j += 100) {
+        Id<Person> id = Id.create(i + j, Person.class);
+        final Id<Person> id1 = id;
+        indivPlans.put(
+            id, PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(id1)));
+      }
+      plans.add(jointPlans.getFactory().createJointPlan(indivPlans));
+    }
 
-		testPlans.add( new GroupPlans( plans , Collections.EMPTY_LIST ) );
-	}
+    testPlans.add(new GroupPlans(plans, Collections.EMPTY_LIST));
+  }
 
-	// /////////////////////////////////////////////////////////////////////////
-	// tests
-	// /////////////////////////////////////////////////////////////////////////
-	@Test
-	public void testProbOne() throws Exception {
-		JointPlanMergingAlgorithm algo =
-			new JointPlanMergingAlgorithm(
-					jointPlans.getFactory(),
-					1d,
-					new Random( 12 ));
+  // /////////////////////////////////////////////////////////////////////////
+  // tests
+  // /////////////////////////////////////////////////////////////////////////
+  @Test
+  public void testProbOne() throws Exception {
+    JointPlanMergingAlgorithm algo =
+        new JointPlanMergingAlgorithm(jointPlans.getFactory(), 1d, new Random(12));
 
-		for (GroupPlans gp : testPlans) {
-			int nplans = countPlans( gp );
-			algo.run( gp );
-			assertEquals(
-					"unexpected number of joint plans",
-					1,
-					gp.getJointPlans().size());
-			assertEquals(
-					"unexpected number of individual plans",
-					0,
-					gp.getIndividualPlans().size());
-			assertEquals(
-					"unexpected overall number of plans",
-					nplans,
-					countPlans( gp ));
+    for (GroupPlans gp : testPlans) {
+      int nplans = countPlans(gp);
+      algo.run(gp);
+      assertEquals("unexpected number of joint plans", 1, gp.getJointPlans().size());
+      assertEquals("unexpected number of individual plans", 0, gp.getIndividualPlans().size());
+      assertEquals("unexpected overall number of plans", nplans, countPlans(gp));
+    }
+  }
 
-		}
-	}
+  @Test
+  public void testProbZero() throws Exception {
+    JointPlanMergingAlgorithm algo =
+        new JointPlanMergingAlgorithm(jointPlans.getFactory(), 0d, new Random(12));
 
-	@Test
-	public void testProbZero() throws Exception {
-		JointPlanMergingAlgorithm algo =
-			new JointPlanMergingAlgorithm(
-					jointPlans.getFactory(),
-					0d,
-					new Random( 12 ));
+    for (GroupPlans gp : testPlans) {
+      int nplans = countPlans(gp);
+      int nindivplans = gp.getIndividualPlans().size();
+      int njointplans = gp.getJointPlans().size();
+      algo.run(gp);
+      assertEquals("unexpected number of joint plans", njointplans, gp.getJointPlans().size());
+      assertEquals(
+          "unexpected number of individual plans", nindivplans, gp.getIndividualPlans().size());
+      assertEquals("unexpected overall number of plans", nplans, countPlans(gp));
+    }
+  }
 
-		for (GroupPlans gp : testPlans) {
-			int nplans = countPlans( gp );
-			int nindivplans = gp.getIndividualPlans().size();
-			int njointplans = gp.getJointPlans().size();
-			algo.run( gp );
-			assertEquals(
-					"unexpected number of joint plans",
-					njointplans,
-					gp.getJointPlans().size());
-			assertEquals(
-					"unexpected number of individual plans",
-					nindivplans,
-					gp.getIndividualPlans().size());
-			assertEquals(
-					"unexpected overall number of plans",
-					nplans,
-					countPlans( gp ));
-		}
-	}
+  private int countPlans(final GroupPlans gp) {
+    int c = 0;
 
-	private int countPlans(final GroupPlans gp) {
-		int c = 0;
+    for (JointPlan jp : gp.getJointPlans()) c += jp.getIndividualPlans().size();
+    c += gp.getIndividualPlans().size();
 
-		for (JointPlan jp : gp.getJointPlans()) c += jp.getIndividualPlans().size();
-		c += gp.getIndividualPlans().size();
-
-		return c;
-	}
+    return c;
+  }
 }
-

@@ -1,9 +1,5 @@
 package org.matsim.api.core.v01;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationConfig;
@@ -20,95 +16,98 @@ import com.fasterxml.jackson.databind.deser.Deserializers;
 import com.fasterxml.jackson.databind.deser.KeyDeserializers;
 import com.fasterxml.jackson.databind.ser.Serializers;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Use as follows with your {@link ObjectMapper} instance:
- * 
- * {@code objectMapper.registerModule(IdDeSerializationModule.getInstance());}
+ *
+ * <p>{@code objectMapper.registerModule(IdDeSerializationModule.getInstance());}
  */
 public class IdDeSerializationModule extends Module {
 
-	private static final String NAME = IdDeSerializationModule.class.getSimpleName();
-	private static final Version VERSION = new Version(0, 1, 0, null, "org.matsim", "api.core.v01");
+  private static final String NAME = IdDeSerializationModule.class.getSimpleName();
+  private static final Version VERSION = new Version(0, 1, 0, null, "org.matsim", "api.core.v01");
 
-	private static Module instance = null;
+  private static Module instance = null;
 
-	private IdDeSerializationModule() {
-		// nothing to do here
-	}
+  private IdDeSerializationModule() {
+    // nothing to do here
+  }
 
-	public static Module getInstance() {
-		if (instance == null) {
-			instance = new IdDeSerializationModule();
-		}
-		return instance;
-	}
+  public static Module getInstance() {
+    if (instance == null) {
+      instance = new IdDeSerializationModule();
+    }
+    return instance;
+  }
 
-	@Override
-	public String getModuleName() {
-		return NAME;
-	}
+  @Override
+  public String getModuleName() {
+    return NAME;
+  }
 
-	@Override
-	public Version version() {
-		return VERSION;
-	}
+  @Override
+  public Version version() {
+    return VERSION;
+  }
 
-	@Override
-	public void setupModule(SetupContext context) {
-		context.addSerializers(new IdSerializers());
-		context.addDeserializers(new IdDeserializers());
-		context.addKeyDeserializers(new IdKeyDeserializers());
-	}
+  @Override
+  public void setupModule(SetupContext context) {
+    context.addSerializers(new IdSerializers());
+    context.addDeserializers(new IdDeserializers());
+    context.addKeyDeserializers(new IdKeyDeserializers());
+  }
 
-	private static final StdSerializer<?> SERIALIZER = new IdAnnotations.JsonIdSerializer<>(Id.class);
-	private static final Map<Class<?>, KeyDeserializer> KEY_DESERIALIZER_CACHE = new HashMap<>();
+  private static final StdSerializer<?> SERIALIZER = new IdAnnotations.JsonIdSerializer<>(Id.class);
+  private static final Map<Class<?>, KeyDeserializer> KEY_DESERIALIZER_CACHE = new HashMap<>();
 
-	private static final class IdSerializers extends Serializers.Base {
+  private static final class IdSerializers extends Serializers.Base {
 
-		@Override
-		public JsonSerializer<?> findSerializer(SerializationConfig config, JavaType type,
-				BeanDescription beanDesc) {
-			if (type.getRawClass().equals(Id.class) && type.containedTypeCount() == 1) {
-				return SERIALIZER;
-			}
-			return null;
-		}
+    @Override
+    public JsonSerializer<?> findSerializer(
+        SerializationConfig config, JavaType type, BeanDescription beanDesc) {
+      if (type.getRawClass().equals(Id.class) && type.containedTypeCount() == 1) {
+        return SERIALIZER;
+      }
+      return null;
+    }
+  }
 
-	}
+  private static final class IdDeserializers extends Deserializers.Base {
 
-	private static final class IdDeserializers extends Deserializers.Base {
+    @Override
+    public JsonDeserializer<?> findBeanDeserializer(
+        JavaType type, DeserializationConfig config, BeanDescription beanDesc)
+        throws JsonMappingException {
+      if (type.getRawClass().equals(Id.class) && type.containedTypeCount() == 1) {
+        return IdAnnotations.JsonIdDeserializer.getInstance(type.containedType(0).getRawClass());
+      }
+      return null;
+    }
+  }
 
-		@Override
-		public JsonDeserializer<?> findBeanDeserializer(JavaType type, DeserializationConfig config,
-				BeanDescription beanDesc) throws JsonMappingException {
-			if (type.getRawClass().equals(Id.class) && type.containedTypeCount() == 1) {
-				return IdAnnotations.JsonIdDeserializer.getInstance(type.containedType(0).getRawClass());
-			}
-			return null;
-		}
+  private static final class IdKeyDeserializers implements KeyDeserializers {
 
-	}
+    @Override
+    public KeyDeserializer findKeyDeserializer(
+        JavaType type, DeserializationConfig config, BeanDescription beanDesc)
+        throws JsonMappingException {
+      if (type.getRawClass().equals(Id.class) && type.containedTypeCount() == 1) {
+        return KEY_DESERIALIZER_CACHE.computeIfAbsent(
+            type.containedType(0).getRawClass(),
+            k ->
+                new KeyDeserializer() {
 
-	private static final class IdKeyDeserializers implements KeyDeserializers {
-
-		@Override
-		public KeyDeserializer findKeyDeserializer(JavaType type, DeserializationConfig config,
-				BeanDescription beanDesc) throws JsonMappingException {
-			if (type.getRawClass().equals(Id.class) && type.containedTypeCount() == 1) {
-				return KEY_DESERIALIZER_CACHE.computeIfAbsent(type.containedType(0).getRawClass(),
-						k -> new KeyDeserializer() {
-
-							@Override
-							public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
-								return Id.create(key, k);
-							}
-
-						});
-			}
-			return null;
-		}
-
-	}
-
+                  @Override
+                  public Object deserializeKey(String key, DeserializationContext ctxt)
+                      throws IOException {
+                    return Id.create(key, k);
+                  }
+                });
+      }
+      return null;
+    }
+  }
 }

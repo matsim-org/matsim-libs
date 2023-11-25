@@ -24,15 +24,15 @@ import org.matsim.api.core.v01.network.Link;
 
 public interface NodeData {
 
-	public void resetVisited();
-	
-	public void visit(final Link comingFrom, final double cost, final double time, final int iterID);
-	
-	public boolean isVisited(final int iterID);
-	
-	public double getCost();
-	
-	public double getTime();
-	
-	public Link getPrevLink();	
+  public void resetVisited();
+
+  public void visit(final Link comingFrom, final double cost, final double time, final int iterID);
+
+  public boolean isVisited(final int iterID);
+
+  public double getCost();
+
+  public double getTime();
+
+  public Link getPrevLink();
 }

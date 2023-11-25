@@ -24,8 +24,7 @@ import org.matsim.core.mobsim.qsim.components.QSimComponent;
 
 public interface ActivityHandler extends QSimComponent {
 
-	boolean handleActivity(MobsimAgent agent);
+  boolean handleActivity(MobsimAgent agent);
 
-	void rescheduleActivityEnd(MobsimAgent agent);
-
+  void rescheduleActivityEnd(MobsimAgent agent);
 }

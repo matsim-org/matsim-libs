@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -37,100 +36,87 @@ import org.matsim.core.population.PopulationUtils;
  */
 public class LeastPointedPlanPruningConflictSolverTest {
 
-	@Test
-	public void testPruneSmallestJointPlan() {
-		final JointPlans jointPlans = new JointPlans();
-		final Map<Id<Person>, Plan> smallJp = new HashMap< >();
-		final Map<Id<Person>, Plan> bigJp = new HashMap< >();
+  @Test
+  public void testPruneSmallestJointPlan() {
+    final JointPlans jointPlans = new JointPlans();
+    final Map<Id<Person>, Plan> smallJp = new HashMap<>();
+    final Map<Id<Person>, Plan> bigJp = new HashMap<>();
 
-		final ReplanningGroup group = new ReplanningGroup();
+    final ReplanningGroup group = new ReplanningGroup();
 
-		Id<Person> id = Id.createPersonId( 1 );
-		{
-			final Id<Person> id1 = id;
-			final Person person = PopulationUtils.getFactory().createPerson(id1);
-			group.addPerson( person );
-			{
-				final Plan plan = jointPlans.getFactory().createIndividualPlan( person );
-				plan.setScore( 1d );
-				person.addPlan( plan );
-				bigJp.put( id , plan );
-			}
-			{
-				final Plan plan = jointPlans.getFactory().createIndividualPlan( person );
-				plan.setScore( 0d );
-				person.addPlan( plan );
-				smallJp.put( id , plan );
-			}
-		}
+    Id<Person> id = Id.createPersonId(1);
+    {
+      final Id<Person> id1 = id;
+      final Person person = PopulationUtils.getFactory().createPerson(id1);
+      group.addPerson(person);
+      {
+        final Plan plan = jointPlans.getFactory().createIndividualPlan(person);
+        plan.setScore(1d);
+        person.addPlan(plan);
+        bigJp.put(id, plan);
+      }
+      {
+        final Plan plan = jointPlans.getFactory().createIndividualPlan(person);
+        plan.setScore(0d);
+        person.addPlan(plan);
+        smallJp.put(id, plan);
+      }
+    }
 
-		id = Id.createPersonId( 2 );
-		{
-			final Id<Person> id1 = id;
-			final Person person = PopulationUtils.getFactory().createPerson(id1);
-			group.addPerson( person );
-			{
-				final Plan plan = jointPlans.getFactory().createIndividualPlan( person );
-				plan.setScore( 0d );
-				person.addPlan( plan );
-				bigJp.put( id , plan );
-			}
-			{
-				final Plan plan = jointPlans.getFactory().createIndividualPlan( person );
-				plan.setScore( 1d );
-				person.addPlan( plan );
-				smallJp.put( id , plan );
-			}
-		}
+    id = Id.createPersonId(2);
+    {
+      final Id<Person> id1 = id;
+      final Person person = PopulationUtils.getFactory().createPerson(id1);
+      group.addPerson(person);
+      {
+        final Plan plan = jointPlans.getFactory().createIndividualPlan(person);
+        plan.setScore(0d);
+        person.addPlan(plan);
+        bigJp.put(id, plan);
+      }
+      {
+        final Plan plan = jointPlans.getFactory().createIndividualPlan(person);
+        plan.setScore(1d);
+        person.addPlan(plan);
+        smallJp.put(id, plan);
+      }
+    }
 
-		id = Id.createPersonId( 3 );
-		{
-			final Id<Person> id1 = id;
-			final Person person = PopulationUtils.getFactory().createPerson(id1);
-			group.addPerson( person );
-			{
-				final Plan plan = jointPlans.getFactory().createIndividualPlan( person );
-				plan.setScore( 1d );
-				person.addPlan( plan );
-				bigJp.put( id , plan );
-			}
-			{
-				final Plan plan = jointPlans.getFactory().createIndividualPlan( person );
-				plan.setScore( 0d );
-				person.addPlan( plan );
-			}
-		}
+    id = Id.createPersonId(3);
+    {
+      final Id<Person> id1 = id;
+      final Person person = PopulationUtils.getFactory().createPerson(id1);
+      group.addPerson(person);
+      {
+        final Plan plan = jointPlans.getFactory().createIndividualPlan(person);
+        plan.setScore(1d);
+        person.addPlan(plan);
+        bigJp.put(id, plan);
+      }
+      {
+        final Plan plan = jointPlans.getFactory().createIndividualPlan(person);
+        plan.setScore(0d);
+        person.addPlan(plan);
+      }
+    }
 
-		jointPlans.addJointPlan(
-				jointPlans.getFactory().createJointPlan(
-					bigJp ) );
-		jointPlans.addJointPlan(
-				jointPlans.getFactory().createJointPlan(
-					smallJp ) );
+    jointPlans.addJointPlan(jointPlans.getFactory().createJointPlan(bigJp));
+    jointPlans.addJointPlan(jointPlans.getFactory().createJointPlan(smallJp));
 
-		test( new ConflictSolverTestsFixture(
-					jointPlans,
-					group,
-					smallJp.values() ) );
-	}
+    test(new ConflictSolverTestsFixture(jointPlans, group, smallJp.values()));
+  }
 
-	private static void test(final ConflictSolverTestsFixture fixture) {
-		final ConflictSolver testee = new LeastPointedPlanPruningConflictSolver();
+  private static void test(final ConflictSolverTestsFixture fixture) {
+    final ConflictSolver testee = new LeastPointedPlanPruningConflictSolver();
 
-		testee.attemptToSolveConflicts( fixture.recordsPerJointPlan );
+    testee.attemptToSolveConflicts(fixture.recordsPerJointPlan);
 
-		for ( PlanRecord r : fixture.allRecords ) {
-			if ( fixture.expectedUnfeasiblePlans.contains( r.getPlan() ) ) {
-				Assert.assertFalse(
-						"plan "+r.getPlan()+" unexpectedly feasible",
-						r.isFeasible() );
-			}
-			else {
-				Assert.assertTrue(
-						"plan "+r.getPlan()+" unexpectedly unfeasible",
-						r.isFeasible() );
-			}
-		}
-	}
+    for (PlanRecord r : fixture.allRecords) {
+      if (fixture.expectedUnfeasiblePlans.contains(r.getPlan())) {
+        Assert.assertFalse("plan " + r.getPlan() + " unexpectedly feasible", r.isFeasible());
+      } else {
+        Assert.assertTrue("plan " + r.getPlan() + " unexpectedly unfeasible", r.isFeasible());
+      }
+    }
+  }
 }
-

@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * LinkWrapperFacility.java
@@ -19,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.router;
+package org.matsim.core.router;
 
 import java.util.Map;
 import org.matsim.api.core.v01.Coord;
@@ -33,38 +32,43 @@ import org.matsim.facilities.Facility;
  * Wraps a Link into a Facility with a specific coordinate.
  * Useful for, e.g., Access and egress leg distance calculations
  */
-public final class LinkWrapperFacilityWithSpecificCoord implements Facility, Identifiable<ActivityFacility> {
+public final class LinkWrapperFacilityWithSpecificCoord
+    implements Facility, Identifiable<ActivityFacility> {
 
-	private final Link wrappedLink;
-	private final Coord wrappedCoord;
+  private final Link wrappedLink;
+  private final Coord wrappedCoord;
 
-	public LinkWrapperFacilityWithSpecificCoord(final Link linkToWrap, final Coord coordToWrap) {
-		wrappedLink = linkToWrap;
-		wrappedCoord = coordToWrap;
-	}
+  public LinkWrapperFacilityWithSpecificCoord(final Link linkToWrap, final Coord coordToWrap) {
+    wrappedLink = linkToWrap;
+    wrappedCoord = coordToWrap;
+  }
 
-	@Override
-	public Coord getCoord() {
-		return wrappedCoord;
-	}
+  @Override
+  public Coord getCoord() {
+    return wrappedCoord;
+  }
 
-	@Override
-	public Id<ActivityFacility> getId() {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public Id<ActivityFacility> getId() {
+    throw new UnsupportedOperationException();
+  }
 
-	@Override
-	public Map<String, Object> getCustomAttributes() {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public Map<String, Object> getCustomAttributes() {
+    throw new UnsupportedOperationException();
+  }
 
-	@Override
-	public Id<Link> getLinkId() {
-		return wrappedLink.getId();
-	}
+  @Override
+  public Id<Link> getLinkId() {
+    return wrappedLink.getId();
+  }
 
-	@Override
-	public String toString() {
-		return "[LinkWrapperFacilityWithSpecificCoord: wrappedLink="+ wrappedLink +", wrapped Coord: "+wrappedCoord+"]";
-	}
+  @Override
+  public String toString() {
+    return "[LinkWrapperFacilityWithSpecificCoord: wrappedLink="
+        + wrappedLink
+        + ", wrapped Coord: "
+        + wrappedCoord
+        + "]";
+  }
 }

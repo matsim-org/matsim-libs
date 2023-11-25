@@ -22,14 +22,12 @@ package org.matsim.core.mobsim.framework.listeners;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 
 /**
- * This interface can be implemented when a notification is needed before the
- * QueueSimulation instance starts it's shutdown process.
+ * This interface can be implemented when a notification is needed before the QueueSimulation
+ * instance starts it's shutdown process.
  *
  * @author dgrether
  */
-public interface MobsimBeforeCleanupListener extends
-		MobsimListener {
+public interface MobsimBeforeCleanupListener extends MobsimListener {
 
-	public void notifyMobsimBeforeCleanup(final MobsimBeforeCleanupEvent e);
-
+  public void notifyMobsimBeforeCleanup(final MobsimBeforeCleanupEvent e);
 }

@@ -34,86 +34,96 @@ import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-
 /**
  * @author mrieser
  */
 public class TransitStopAgentTrackerTest {
 
-	private static final Logger log = LogManager.getLogger(TransitStopAgentTrackerTest.class);
+  private static final Logger log = LogManager.getLogger(TransitStopAgentTrackerTest.class);
 
-	@Test public void testAddAgent() {
-		EventsManager events = EventsUtils.createEventsManager();
-		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
-		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		PTPassengerAgent agent1 = new FakeAgent(null, null);
-		PTPassengerAgent agent2 = new FakeAgent(null, null);
-		PTPassengerAgent agent3 = new FakeAgent(null, null);
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord((double) 2, (double) 3), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord((double) 3, (double) 4), false);
+  @Test
+  public void testAddAgent() {
+    EventsManager events = EventsUtils.createEventsManager();
+    TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
+    TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
+    PTPassengerAgent agent1 = new FakeAgent(null, null);
+    PTPassengerAgent agent2 = new FakeAgent(null, null);
+    PTPassengerAgent agent3 = new FakeAgent(null, null);
+    TransitStopFacility stop1 =
+        builder.createTransitStopFacility(
+            Id.create(1, TransitStopFacility.class), new Coord((double) 2, (double) 3), false);
+    TransitStopFacility stop2 =
+        builder.createTransitStopFacility(
+            Id.create(2, TransitStopFacility.class), new Coord((double) 3, (double) 4), false);
 
-		assertFalse(tracker.getAgentsAtFacility(stop1.getId()).contains(agent1));
-		tracker.addAgentToStop(10, agent1, stop1.getId());
-		assertTrue(tracker.getAgentsAtFacility(stop1.getId()).contains(agent1));
-		assertFalse(tracker.getAgentsAtFacility(stop2.getId()).contains(agent1));
-		assertFalse(tracker.getAgentsAtFacility(stop1.getId()).contains(agent2));
-		tracker.addAgentToStop(10, agent2, stop1.getId());
-		assertTrue(tracker.getAgentsAtFacility(stop1.getId()).contains(agent2));
+    assertFalse(tracker.getAgentsAtFacility(stop1.getId()).contains(agent1));
+    tracker.addAgentToStop(10, agent1, stop1.getId());
+    assertTrue(tracker.getAgentsAtFacility(stop1.getId()).contains(agent1));
+    assertFalse(tracker.getAgentsAtFacility(stop2.getId()).contains(agent1));
+    assertFalse(tracker.getAgentsAtFacility(stop1.getId()).contains(agent2));
+    tracker.addAgentToStop(10, agent2, stop1.getId());
+    assertTrue(tracker.getAgentsAtFacility(stop1.getId()).contains(agent2));
 
-		tracker.addAgentToStop(10, agent3, stop2.getId());
-		assertFalse(tracker.getAgentsAtFacility(stop1.getId()).contains(agent3));
-		assertFalse(tracker.getAgentsAtFacility(stop2.getId()).contains(agent1));
-		assertFalse(tracker.getAgentsAtFacility(stop2.getId()).contains(agent2));
-		assertTrue(tracker.getAgentsAtFacility(stop2.getId()).contains(agent3));
-	}
+    tracker.addAgentToStop(10, agent3, stop2.getId());
+    assertFalse(tracker.getAgentsAtFacility(stop1.getId()).contains(agent3));
+    assertFalse(tracker.getAgentsAtFacility(stop2.getId()).contains(agent1));
+    assertFalse(tracker.getAgentsAtFacility(stop2.getId()).contains(agent2));
+    assertTrue(tracker.getAgentsAtFacility(stop2.getId()).contains(agent3));
+  }
 
-	@Test public void testRemoveAgent() {
-		EventsManager events = EventsUtils.createEventsManager();
-		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
-		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		PTPassengerAgent agent1 = new FakeAgent(null, null);
-		PTPassengerAgent agent2 = new FakeAgent(null, null);
-		PTPassengerAgent agent3 = new FakeAgent(null, null);
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord((double) 2, (double) 3), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord((double) 3, (double) 4), false);
+  @Test
+  public void testRemoveAgent() {
+    EventsManager events = EventsUtils.createEventsManager();
+    TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
+    TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
+    PTPassengerAgent agent1 = new FakeAgent(null, null);
+    PTPassengerAgent agent2 = new FakeAgent(null, null);
+    PTPassengerAgent agent3 = new FakeAgent(null, null);
+    TransitStopFacility stop1 =
+        builder.createTransitStopFacility(
+            Id.create(1, TransitStopFacility.class), new Coord((double) 2, (double) 3), false);
+    TransitStopFacility stop2 =
+        builder.createTransitStopFacility(
+            Id.create(2, TransitStopFacility.class), new Coord((double) 3, (double) 4), false);
 
-		tracker.addAgentToStop(10, agent1, stop1.getId());
-		tracker.addAgentToStop(10, agent2, stop1.getId());
-		tracker.addAgentToStop(10, agent3, stop2.getId());
-		assertEquals(2, tracker.getAgentsAtFacility(stop1.getId()).size());
-		assertEquals(1, tracker.getAgentsAtFacility(stop2.getId()).size());
-		assertTrue(tracker.getAgentsAtFacility(stop1.getId()).contains(agent1));
-		tracker.removeAgentFromStop(agent1, stop1.getId());
-		assertFalse(tracker.getAgentsAtFacility(stop1.getId()).contains(agent1));
-		assertTrue(tracker.getAgentsAtFacility(stop1.getId()).contains(agent2));
-		assertTrue(tracker.getAgentsAtFacility(stop2.getId()).contains(agent3));
-		assertEquals(1, tracker.getAgentsAtFacility(stop1.getId()).size());
-		tracker.removeAgentFromStop(agent1, stop1.getId()); // cannot be removed
-		assertEquals(1, tracker.getAgentsAtFacility(stop1.getId()).size()); // should stay the same
-	}
+    tracker.addAgentToStop(10, agent1, stop1.getId());
+    tracker.addAgentToStop(10, agent2, stop1.getId());
+    tracker.addAgentToStop(10, agent3, stop2.getId());
+    assertEquals(2, tracker.getAgentsAtFacility(stop1.getId()).size());
+    assertEquals(1, tracker.getAgentsAtFacility(stop2.getId()).size());
+    assertTrue(tracker.getAgentsAtFacility(stop1.getId()).contains(agent1));
+    tracker.removeAgentFromStop(agent1, stop1.getId());
+    assertFalse(tracker.getAgentsAtFacility(stop1.getId()).contains(agent1));
+    assertTrue(tracker.getAgentsAtFacility(stop1.getId()).contains(agent2));
+    assertTrue(tracker.getAgentsAtFacility(stop2.getId()).contains(agent3));
+    assertEquals(1, tracker.getAgentsAtFacility(stop1.getId()).size());
+    tracker.removeAgentFromStop(agent1, stop1.getId()); // cannot be removed
+    assertEquals(1, tracker.getAgentsAtFacility(stop1.getId()).size()); // should stay the same
+  }
 
-	@Test public void testGetAgentsAtStopImmutable() {
-		EventsManager events = EventsUtils.createEventsManager();
-		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
-		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		PTPassengerAgent agent1 = new FakeAgent(null, null);
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord((double) 2, (double) 3), false);
+  @Test
+  public void testGetAgentsAtStopImmutable() {
+    EventsManager events = EventsUtils.createEventsManager();
+    TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
+    TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
+    PTPassengerAgent agent1 = new FakeAgent(null, null);
+    TransitStopFacility stop1 =
+        builder.createTransitStopFacility(
+            Id.create(1, TransitStopFacility.class), new Coord((double) 2, (double) 3), false);
 
-		try {
-			tracker.getAgentsAtFacility(stop1.getId()).add(agent1);
-			fail("missing exception, empty list should be immutable.");
-		}
-		catch (UnsupportedOperationException e) {
-			log.info("catched expected exception.", e);
-		}
+    try {
+      tracker.getAgentsAtFacility(stop1.getId()).add(agent1);
+      fail("missing exception, empty list should be immutable.");
+    } catch (UnsupportedOperationException e) {
+      log.info("catched expected exception.", e);
+    }
 
-		tracker.addAgentToStop(10, agent1, stop1.getId());
-		try {
-			tracker.getAgentsAtFacility(stop1.getId()).remove(0);
-			fail("missing exception, non-empty list should be immutable.");
-		}
-		catch (UnsupportedOperationException e) {
-			log.info("catched expected exception.", e);
-		}
-	}
+    tracker.addAgentToStop(10, agent1, stop1.getId());
+    try {
+      tracker.getAgentsAtFacility(stop1.getId()).remove(0);
+      fail("missing exception, non-empty list should be immutable.");
+    } catch (UnsupportedOperationException e) {
+      log.info("catched expected exception.", e);
+    }
+  }
 }

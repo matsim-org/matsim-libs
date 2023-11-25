@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -38,182 +37,174 @@ import org.matsim.core.utils.misc.OptionalTime;
 /**
  * @author thibautd
  */
-public class DriverRoute implements Route , NetworkRoute {
-	private final NetworkRoute netRoute;
-	private final Set<Id<Person>> passengers = new TreeSet<Id<Person>>();
+public class DriverRoute implements Route, NetworkRoute {
+  private final NetworkRoute netRoute;
+  private final Set<Id<Person>> passengers = new TreeSet<Id<Person>>();
 
-	public DriverRoute(final Id<Link> startLink , final Id<Link> endLink) {
-		netRoute = RouteUtils.createLinkNetworkRouteImpl(startLink, endLink);
-	}
+  public DriverRoute(final Id<Link> startLink, final Id<Link> endLink) {
+    netRoute = RouteUtils.createLinkNetworkRouteImpl(startLink, endLink);
+  }
 
-	public DriverRoute(final NetworkRoute r, final Collection<Id<Person>> passengers) {
-		netRoute = r != null ? (NetworkRoute) r.clone() : RouteUtils.createLinkNetworkRouteImpl(null, null);
-		this.passengers.addAll( passengers );
-	}
+  public DriverRoute(final NetworkRoute r, final Collection<Id<Person>> passengers) {
+    netRoute =
+        r != null ? (NetworkRoute) r.clone() : RouteUtils.createLinkNetworkRouteImpl(null, null);
+    this.passengers.addAll(passengers);
+  }
 
-	public Collection<Id<Person>> getPassengersIds() {
-		return Collections.unmodifiableSet(passengers);
-	}
+  public Collection<Id<Person>> getPassengersIds() {
+    return Collections.unmodifiableSet(passengers);
+  }
 
-	public void addPassenger(final Id<Person> passenger) {
-		passengers.add( passenger );
-	}
+  public void addPassenger(final Id<Person> passenger) {
+    passengers.add(passenger);
+  }
 
-	public void addPassengers(final Collection<Id<Person>> ps) {
-		passengers.addAll( ps );
-	}
+  public void addPassengers(final Collection<Id<Person>> ps) {
+    passengers.addAll(ps);
+  }
 
-	public boolean removePassenger(final Id<Person> passenger) {
-		return passengers.remove( passenger );
-	}
+  public boolean removePassenger(final Id<Person> passenger) {
+    return passengers.remove(passenger);
+  }
 
-	public boolean removePassengers(final Collection<Id<Person>> toRemove) {
-		return this.passengers.removeAll( toRemove );
-	}
+  public boolean removePassengers(final Collection<Id<Person>> toRemove) {
+    return this.passengers.removeAll(toRemove);
+  }
 
-	public void setPassengerIds(final Collection<Id<Person>> ps) {
-		passengers.clear();
-		passengers.addAll( ps );
-	}
+  public void setPassengerIds(final Collection<Id<Person>> ps) {
+    passengers.clear();
+    passengers.addAll(ps);
+  }
 
-	@Override
-	public double getDistance() {
-		return netRoute.getDistance();
-	}
+  @Override
+  public double getDistance() {
+    return netRoute.getDistance();
+  }
 
-	@Override
-	public void setLinkIds(
-			final Id<Link> startLinkId,
-			final List<Id<Link>> linkIds,
-			final Id<Link> endLinkId) {
-		netRoute.setLinkIds(startLinkId, linkIds, endLinkId);
-	}
+  @Override
+  public void setLinkIds(
+      final Id<Link> startLinkId, final List<Id<Link>> linkIds, final Id<Link> endLinkId) {
+    netRoute.setLinkIds(startLinkId, linkIds, endLinkId);
+  }
 
-	@Override
-	public void setTravelCost(double travelCost) {
-		netRoute.setTravelCost(travelCost);
-	}
+  @Override
+  public void setTravelCost(double travelCost) {
+    netRoute.setTravelCost(travelCost);
+  }
 
-	@Override
-	public double getTravelCost() {
-		return netRoute.getTravelCost();
-	}
+  @Override
+  public double getTravelCost() {
+    return netRoute.getTravelCost();
+  }
 
-	@Override
-	public List<Id<Link>> getLinkIds() {
-		return netRoute.getLinkIds();
-	}
+  @Override
+  public List<Id<Link>> getLinkIds() {
+    return netRoute.getLinkIds();
+  }
 
-	@Override
-	public void setDistance(final double distance) {
-		netRoute.setDistance(distance);
-	}
+  @Override
+  public void setDistance(final double distance) {
+    netRoute.setDistance(distance);
+  }
 
-	@Override
-	public OptionalTime getTravelTime() {
-		return netRoute.getTravelTime();
-	}
+  @Override
+  public OptionalTime getTravelTime() {
+    return netRoute.getTravelTime();
+  }
 
-	@Override
-	public NetworkRoute getSubRoute(
-			final Id<Link> fromLinkId,
-			final Id<Link> toLinkId) {
-		return netRoute.getSubRoute(fromLinkId, toLinkId);
-	}
+  @Override
+  public NetworkRoute getSubRoute(final Id<Link> fromLinkId, final Id<Link> toLinkId) {
+    return netRoute.getSubRoute(fromLinkId, toLinkId);
+  }
 
-	@Override
-	public void setTravelTime(final double travelTime) {
-		netRoute.setTravelTime(travelTime);
-	}
+  @Override
+  public void setTravelTime(final double travelTime) {
+    netRoute.setTravelTime(travelTime);
+  }
 
-	@Override
-	public void setTravelTimeUndefined() {
-		netRoute.setTravelTimeUndefined();
-	}
+  @Override
+  public void setTravelTimeUndefined() {
+    netRoute.setTravelTimeUndefined();
+  }
 
-	@Override
-	public void setVehicleId(final Id vehicleId) {
-		netRoute.setVehicleId(vehicleId);
-	}
+  @Override
+  public void setVehicleId(final Id vehicleId) {
+    netRoute.setVehicleId(vehicleId);
+  }
 
-	@Override
-	public Id getVehicleId() {
-		return netRoute.getVehicleId();
-	}
+  @Override
+  public Id getVehicleId() {
+    return netRoute.getVehicleId();
+  }
 
-	@Override
-	public Id<Link> getStartLinkId() {
-		return netRoute.getStartLinkId();
-	}
+  @Override
+  public Id<Link> getStartLinkId() {
+    return netRoute.getStartLinkId();
+  }
 
-	@Override
-	public Id<Link> getEndLinkId() {
-		return netRoute.getEndLinkId();
-	}
+  @Override
+  public Id<Link> getEndLinkId() {
+    return netRoute.getEndLinkId();
+  }
 
-	@Override
-	public void setStartLinkId(final Id<Link> linkId) {
-		netRoute.setStartLinkId(linkId);
-	}
+  @Override
+  public void setStartLinkId(final Id<Link> linkId) {
+    netRoute.setStartLinkId(linkId);
+  }
 
-	@Override
-	public void setEndLinkId(final Id<Link> linkId) {
-		netRoute.setEndLinkId(linkId);
-	}
+  @Override
+  public void setEndLinkId(final Id<Link> linkId) {
+    netRoute.setEndLinkId(linkId);
+  }
 
-	@Override
-	public DriverRoute clone() {
-		DriverRoute c =
-			new DriverRoute(
-					netRoute,
-					passengers);
-		return c;
-	}
+  @Override
+  public DriverRoute clone() {
+    DriverRoute c = new DriverRoute(netRoute, passengers);
+    return c;
+  }
 
-	@Override
-	public void setRouteDescription(
-			final String routeDescription) {
-		String[] info = routeDescription.trim().split( " " );
-		String[] ps = info[0].split( "," );
+  @Override
+  public void setRouteDescription(final String routeDescription) {
+    String[] info = routeDescription.trim().split(" ");
+    String[] ps = info[0].split(",");
 
-		for (String p : ps) {
-			passengers.add( Id.create( p , Person.class ) );
-		}
+    for (String p : ps) {
+      passengers.add(Id.create(p, Person.class));
+    }
 
-		List<Id<Link>> ls = new ArrayList<Id<Link>>();
-		for (int i=1; i < info.length; i++) {
-			ls.add( Id.create( info[i] , Link.class ) );
-		}
-		setLinkIds( getStartLinkId() , ls , getEndLinkId() );
-	}
+    List<Id<Link>> ls = new ArrayList<Id<Link>>();
+    for (int i = 1; i < info.length; i++) {
+      ls.add(Id.create(info[i], Link.class));
+    }
+    setLinkIds(getStartLinkId(), ls, getEndLinkId());
+  }
 
-	@Override
-	public String getRouteDescription() {
-		StringBuffer d = new StringBuffer();
-		Iterator<Id<Person>> ps = passengers.iterator();
-		if (ps.hasNext()) d.append( ps.next() );
+  @Override
+  public String getRouteDescription() {
+    StringBuffer d = new StringBuffer();
+    Iterator<Id<Person>> ps = passengers.iterator();
+    if (ps.hasNext()) d.append(ps.next());
 
-		while (ps.hasNext()) {
-			d.append( "," );
-			d.append( ps.next() );
-		}
+    while (ps.hasNext()) {
+      d.append(",");
+      d.append(ps.next());
+    }
 
-		for (Id<Link> l : getLinkIds()) {
-			d.append( " " );
-			d.append( l );
-		}
+    for (Id<Link> l : getLinkIds()) {
+      d.append(" ");
+      d.append(l);
+    }
 
-		return d.toString();
-	}
+    return d.toString();
+  }
 
-	@Override
-	public String getRouteType() {
-		return "driver";
-	}
-	
-	@Override
-	public String toString() {
-		return "[DriverRoute: delegate="+netRoute+"; passengers="+passengers+"]";
-	}
+  @Override
+  public String getRouteType() {
+    return "driver";
+  }
+
+  @Override
+  public String toString() {
+    return "[DriverRoute: delegate=" + netRoute + "; passengers=" + passengers + "]";
+  }
 }
-

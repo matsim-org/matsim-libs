@@ -20,7 +20,6 @@
 package org.matsim.core.config.groups;
 
 import java.util.Map;
-
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
@@ -28,44 +27,49 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  */
 public final class LinkStatsConfigGroup extends ReflectiveConfigGroup {
 
-	public static final String GROUP_NAME = "linkStats";
+  public static final String GROUP_NAME = "linkStats";
 
-	private static final String WRITELINKSTATSINTERVAL = "writeLinkStatsInterval";
-	private static final String AVERAGELINKSTATSOVERITERATIONS = "averageLinkStatsOverIterations";
+  private static final String WRITELINKSTATSINTERVAL = "writeLinkStatsInterval";
+  private static final String AVERAGELINKSTATSOVERITERATIONS = "averageLinkStatsOverIterations";
 
-	private int writeLinkStatsInterval = 50;
-	private int averageLinkStatsOverIterations = 5;
+  private int writeLinkStatsInterval = 50;
+  private int averageLinkStatsOverIterations = 5;
 
-	public LinkStatsConfigGroup() {
-		super(GROUP_NAME);
-	}
+  public LinkStatsConfigGroup() {
+    super(GROUP_NAME);
+  }
 
-	@Override
-	public Map<String, String> getComments() {
-		Map<String, String> comments = super.getComments();
-		comments.put(WRITELINKSTATSINTERVAL, "Specifies how often the link stats should be calculated and written. Use 0 to disable the generation of link stats.");
-		comments.put(AVERAGELINKSTATSOVERITERATIONS, "Specifies over how many iterations the link volumes should be averaged that are used for the " +
-				"link statistics. Use 1 or 0 to only use the link volumes of a single iteration. This values cannot be larger than the value specified for " + WRITELINKSTATSINTERVAL);
-		return comments;
-	}
+  @Override
+  public Map<String, String> getComments() {
+    Map<String, String> comments = super.getComments();
+    comments.put(
+        WRITELINKSTATSINTERVAL,
+        "Specifies how often the link stats should be calculated and written. Use 0 to disable the generation of link stats.");
+    comments.put(
+        AVERAGELINKSTATSOVERITERATIONS,
+        "Specifies over how many iterations the link volumes should be averaged that are used for the "
+            + "link statistics. Use 1 or 0 to only use the link volumes of a single iteration. This values cannot be larger than the value specified for "
+            + WRITELINKSTATSINTERVAL);
+    return comments;
+  }
 
-	@StringGetter( WRITELINKSTATSINTERVAL )
-	public int getWriteLinkStatsInterval() {
-		return this.writeLinkStatsInterval;
-	}
-	
-	@StringSetter( WRITELINKSTATSINTERVAL )
-	public void setWriteLinkStatsInterval(int writeCountsInterval) {
-		this.writeLinkStatsInterval = writeCountsInterval;
-	}
-	
-	@StringGetter( AVERAGELINKSTATSOVERITERATIONS )
-	public int getAverageLinkStatsOverIterations() {
-		return this.averageLinkStatsOverIterations;
-	}
-	
-	@StringSetter( AVERAGELINKSTATSOVERITERATIONS )
-	public void setAverageLinkStatsOverIterations(int averageLinkStatsOverIterations) {
-		this.averageLinkStatsOverIterations = averageLinkStatsOverIterations;
-	}
+  @StringGetter(WRITELINKSTATSINTERVAL)
+  public int getWriteLinkStatsInterval() {
+    return this.writeLinkStatsInterval;
+  }
+
+  @StringSetter(WRITELINKSTATSINTERVAL)
+  public void setWriteLinkStatsInterval(int writeCountsInterval) {
+    this.writeLinkStatsInterval = writeCountsInterval;
+  }
+
+  @StringGetter(AVERAGELINKSTATSOVERITERATIONS)
+  public int getAverageLinkStatsOverIterations() {
+    return this.averageLinkStatsOverIterations;
+  }
+
+  @StringSetter(AVERAGELINKSTATSOVERITERATIONS)
+  public void setAverageLinkStatsOverIterations(int averageLinkStatsOverIterations) {
+    this.averageLinkStatsOverIterations = averageLinkStatsOverIterations;
+  }
 }

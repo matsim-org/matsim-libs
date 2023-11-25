@@ -5,66 +5,63 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.AbstractRoute;
 
 public class CarsharingRoute extends AbstractRoute {
-/*package*/ final static String ROUTE_TYPE = "carsharing";
-	
-	private String routeDescription = null;
-	private boolean oldRoute = false;
-	private boolean keepthecar = false;
-	private String vehicleType = null;
-	private String company = null;
-	
-	
-	public CarsharingRoute(Id<Link> startLinkId, Id<Link> endLinkId) {
-		super(startLinkId, endLinkId);
-	}
+  /*package*/ static final String ROUTE_TYPE = "carsharing";
 
-	@Override
-	public String getRouteDescription() {
-		return this.routeDescription + " keepthecar=" + keepthecar + " company=" + company;
-	}
+  private String routeDescription = null;
+  private boolean oldRoute = false;
+  private boolean keepthecar = false;
+  private String vehicleType = null;
+  private String company = null;
 
-	@Override
-	public void setRouteDescription(String routeDescription) {
-		this.routeDescription = routeDescription;
-		
-	}
+  public CarsharingRoute(Id<Link> startLinkId, Id<Link> endLinkId) {
+    super(startLinkId, endLinkId);
+  }
 
-	@Override
-	public String getRouteType() {
-		return ROUTE_TYPE;
-	}
+  @Override
+  public String getRouteDescription() {
+    return this.routeDescription + " keepthecar=" + keepthecar + " company=" + company;
+  }
 
-	public boolean isKeepthecar() {
-		return keepthecar;
-	}
+  @Override
+  public void setRouteDescription(String routeDescription) {
+    this.routeDescription = routeDescription;
+  }
 
-	public void setKeepthecar(boolean keepthecar) {
-		this.oldRoute = true;
-		this.keepthecar = keepthecar;
-	}
+  @Override
+  public String getRouteType() {
+    return ROUTE_TYPE;
+  }
 
-	public String getVehicleType() {
-		return vehicleType;
-	}
+  public boolean isKeepthecar() {
+    return keepthecar;
+  }
 
-	public void setVehicleType(String vehicleType) {
-		this.oldRoute = true;
+  public void setKeepthecar(boolean keepthecar) {
+    this.oldRoute = true;
+    this.keepthecar = keepthecar;
+  }
 
-		this.vehicleType = vehicleType;
-	}
+  public String getVehicleType() {
+    return vehicleType;
+  }
 
-	public String getCompany() {
-		return company;
-	}
+  public void setVehicleType(String vehicleType) {
+    this.oldRoute = true;
 
-	public void setCompany(String company) {
-		this.oldRoute = true;
+    this.vehicleType = vehicleType;
+  }
 
-		this.company = company;
-	}
+  public String getCompany() {
+    return company;
+  }
 
-	public boolean isOldRoute() {
-		return oldRoute;
-	}
+  public void setCompany(String company) {
+    this.oldRoute = true;
 
+    this.company = company;
+  }
+
+  public boolean isOldRoute() {
+    return oldRoute;
+  }
 }

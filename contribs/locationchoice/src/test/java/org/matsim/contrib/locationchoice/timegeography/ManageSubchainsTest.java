@@ -34,26 +34,32 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class ManageSubchainsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  @Test
+  public void testPrimarySecondaryActivityFound() {
+    Initializer initializer = new Initializer();
+    initializer.init(utils);
+    ManageSubchains manager = new ManageSubchains();
 
-	@Test public void testPrimarySecondaryActivityFound() {
-		Initializer initializer = new Initializer();
-		initializer.init(utils);
-		ManageSubchains manager = new ManageSubchains();
+    Plan plan =
+        initializer
+            .getControler()
+            .getScenario()
+            .getPopulation()
+            .getPersons()
+            .get(Id.create("1", Person.class))
+            .getSelectedPlan();
+    Activity act = PopulationUtils.getFirstActivity(((Plan) plan));
+    final Activity act1 = act;
+    Leg leg = PopulationUtils.getNextLeg(((Plan) plan), act1);
+    manager.primaryActivityFound(act, leg);
+    assertEquals(act, manager.getSubChains().get(0).getFirstPrimAct());
+    final Leg leg1 = leg;
 
-        Plan plan = initializer.getControler().getScenario().getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan();
-		Activity act = PopulationUtils.getFirstActivity( ((Plan) plan) );
-		final Activity act1 = act;
-		Leg leg = PopulationUtils.getNextLeg(((Plan) plan), act1);
-		manager.primaryActivityFound(act, leg);
-		assertEquals(act, manager.getSubChains().get(0).getFirstPrimAct());
-		final Leg leg1 = leg;
-
-		act = PopulationUtils.getNextActivity(((Plan) plan), leg1);
-		final Activity act2 = act;
-		manager.secondaryActivityFound(act, PopulationUtils.getNextLeg(((Plan) plan), act2));
-		assertEquals(act, manager.getSubChains().get(0).getSlActs().get(0));
-	}
+    act = PopulationUtils.getNextActivity(((Plan) plan), leg1);
+    final Activity act2 = act;
+    manager.secondaryActivityFound(act, PopulationUtils.getNextLeg(((Plan) plan), act2));
+    assertEquals(act, manager.getSubChains().get(0).getSlActs().get(0));
+  }
 }

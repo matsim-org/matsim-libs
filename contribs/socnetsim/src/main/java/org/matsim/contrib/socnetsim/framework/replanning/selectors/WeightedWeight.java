@@ -21,37 +21,33 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
 
 /**
  * @author thibautd
  */
 public class WeightedWeight implements WeightCalculator {
-	private final WeightCalculator delegate;
+  private final WeightCalculator delegate;
 
-	private final String weightAttribute;
-	private final Population population;
+  private final String weightAttribute;
+  private final Population population;
 
-	public WeightedWeight(
-			final WeightCalculator delegate,
-			final String weightAttribute,
-			final Population population ) {
-		this.delegate = delegate;
-		this.weightAttribute = weightAttribute;
-		this.population = population;
-	}
+  public WeightedWeight(
+      final WeightCalculator delegate, final String weightAttribute, final Population population) {
+    this.delegate = delegate;
+    this.weightAttribute = weightAttribute;
+    this.population = population;
+  }
 
-	@Override
-	public double getWeight(
-			final Plan indivPlan,
-			final ReplanningGroup replanningGroup) {
-		final Double weight = (Double)
-//			personAttributes.getAttribute(
-//				indivPlan.getPerson().getId().toString(),
-//				weightAttribute );
-						      indivPlan.getPerson().getAttributes().getAttribute( weightAttribute );
-		return (weight == null ? 1 : weight.doubleValue()) * delegate.getWeight( indivPlan , replanningGroup );
-	}
+  @Override
+  public double getWeight(final Plan indivPlan, final ReplanningGroup replanningGroup) {
+    final Double weight =
+        (Double)
+            //			personAttributes.getAttribute(
+            //				indivPlan.getPerson().getId().toString(),
+            //				weightAttribute );
+            indivPlan.getPerson().getAttributes().getAttribute(weightAttribute);
+    return (weight == null ? 1 : weight.doubleValue())
+        * delegate.getWeight(indivPlan, replanningGroup);
+  }
 }
-

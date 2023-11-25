@@ -23,17 +23,16 @@ package org.matsim.contrib.shared_mobility.run;
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+import com.google.inject.BindingAnnotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-
-import com.google.inject.BindingAnnotation;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 @BindingAnnotation
-@Target({ FIELD, PARAMETER, METHOD })
+@Target({FIELD, PARAMETER, METHOD})
 @Retention(RUNTIME)
 public @interface SharingMode {
-	String value();
+  String value();
 }

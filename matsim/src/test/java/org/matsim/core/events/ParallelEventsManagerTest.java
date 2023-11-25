@@ -1,52 +1,51 @@
 package org.matsim.core.events;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-
 public class ParallelEventsManagerTest {
 
-    private final Event e = new EventsManagerImplTest.MyEvent(5);
+  private final Event e = new EventsManagerImplTest.MyEvent(5);
 
-    private EventsManagerImplTest.CountingMyEventHandler handler;
+  private EventsManagerImplTest.CountingMyEventHandler handler;
 
-    @Before
-    public void setUp() throws Exception {
-        handler = new EventsManagerImplTest.CountingMyEventHandler();
-    }
+  @Before
+  public void setUp() throws Exception {
+    handler = new EventsManagerImplTest.CountingMyEventHandler();
+  }
 
-    @Test
-    public void forgetInit() {
+  @Test
+  public void forgetInit() {
 
-        EventsManager m = EventsUtils.createParallelEventsManager();
+    EventsManager m = EventsUtils.createParallelEventsManager();
 
-        m.addHandler(handler);
+    m.addHandler(handler);
 
-        assertThrows(IllegalStateException.class, () -> m.processEvent(e));
+    assertThrows(IllegalStateException.class, () -> m.processEvent(e));
 
-        m.initProcessing();
-        m.processEvent(e);
+    m.initProcessing();
+    m.processEvent(e);
 
-        m.finishProcessing();
+    m.finishProcessing();
 
-        assertEquals(1, handler.counter);
-    }
+    assertEquals(1, handler.counter);
+  }
 
-    @Test
-    public void lateHandler() {
+  @Test
+  public void lateHandler() {
 
-        EventsManager m = EventsUtils.createParallelEventsManager();
-        m.initProcessing();
+    EventsManager m = EventsUtils.createParallelEventsManager();
+    m.initProcessing();
 
-        assertThrows(IllegalStateException.class, () -> m.addHandler(handler));
+    assertThrows(IllegalStateException.class, () -> m.addHandler(handler));
 
-        m.processEvent(e);
+    m.processEvent(e);
 
-        assertEquals(0, handler.counter);
-
-    }
+    assertEquals(0, handler.counter);
+  }
 }

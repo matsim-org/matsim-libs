@@ -22,78 +22,85 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 
+import com.google.common.base.MoreObjects;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
-
-import com.google.common.base.MoreObjects;
 
 /**
  * @author michalm
  */
 public class InsertionWithDetourData {
-	public static class InsertionDetourData {
-		/**
-		 * Detour necessary to get from start or the preceding stop to pickup.
-		 * <p>
-		 * If pickup is inserted at the (existing) previous stop -> no detour.
-		 */
-		public final PathData detourToPickup;
-		/**
-		 * Detour necessary to get from pickup to the next stop or 0 if appended at the end.
-		 * <p>
-		 * IMPORTANT: At this point the dropoff location is not taken into account !!!
-		 * "zero" detour if pickup inserted at the end of schedule !!!
-		 */
-		public final PathData detourFromPickup;
-		/**
-		 * Detour necessary to get from the preceding stop (could be a stop of the corresponding pickup) to dropoff.
-		 * <p>
-		 * If dropoff is inserted at the (existing) previous stop -> no detour.
-		 * If dropoff inserted directly after pickup -> detour from pickup
-		 */
-		public final PathData detourToDropoff;
-		/**
-		 * Detour necessary to get from dropoff to the next stop or no detour if appended at the end.
-		 * <p>
-		 * "zero" detour if dropoff inserted at the end of schedule
-		 */
-		public final PathData detourFromDropoff;
+  public static class InsertionDetourData {
+    /**
+     * Detour necessary to get from start or the preceding stop to pickup.
+     *
+     * <p>If pickup is inserted at the (existing) previous stop -> no detour.
+     */
+    public final PathData detourToPickup;
 
-		public InsertionDetourData(PathData detourToPickup, PathData detourFromPickup, PathData detourToDropoff,
-				PathData detourFromDropoff) {
-			this.detourToPickup = detourToPickup;
-			this.detourFromPickup = detourFromPickup;
-			this.detourToDropoff = detourToDropoff;
-			this.detourFromDropoff = detourFromDropoff;
-		}
+    /**
+     * Detour necessary to get from pickup to the next stop or 0 if appended at the end.
+     *
+     * <p>IMPORTANT: At this point the dropoff location is not taken into account !!! "zero" detour
+     * if pickup inserted at the end of schedule !!!
+     */
+    public final PathData detourFromPickup;
 
-		@Override
-		public String toString() {
-			return MoreObjects.toStringHelper(this)
-					.add("detourToPickup", detourToPickup)
-					.add("detourFromPickup", detourFromPickup)
-					.add("detourToDropoff", detourToDropoff)
-					.add("detourFromDropoff", detourFromDropoff)
-					.toString();
-		}
-	}
+    /**
+     * Detour necessary to get from the preceding stop (could be a stop of the corresponding pickup)
+     * to dropoff.
+     *
+     * <p>If dropoff is inserted at the (existing) previous stop -> no detour. If dropoff inserted
+     * directly after pickup -> detour from pickup
+     */
+    public final PathData detourToDropoff;
 
-	public final Insertion insertion;
-	public final InsertionDetourData detourData;
-	public final DetourTimeInfo detourTimeInfo;
+    /**
+     * Detour necessary to get from dropoff to the next stop or no detour if appended at the end.
+     *
+     * <p>"zero" detour if dropoff inserted at the end of schedule
+     */
+    public final PathData detourFromDropoff;
 
-	public InsertionWithDetourData(Insertion insertion, InsertionDetourData detourData, DetourTimeInfo detourTimeInfo) {
-		this.insertion = insertion;
-		this.detourData = detourData;
-		this.detourTimeInfo = detourTimeInfo;
-	}
+    public InsertionDetourData(
+        PathData detourToPickup,
+        PathData detourFromPickup,
+        PathData detourToDropoff,
+        PathData detourFromDropoff) {
+      this.detourToPickup = detourToPickup;
+      this.detourFromPickup = detourFromPickup;
+      this.detourToDropoff = detourToDropoff;
+      this.detourFromDropoff = detourFromDropoff;
+    }
 
-	@Override
-	public String toString() {
-		return MoreObjects.toStringHelper(this)
-				.add("insertion", insertion)
-				.add("insertionDetourData", detourData)
-				.add("detourTimeInfo", detourTimeInfo)
-				.toString();
-	}
+    @Override
+    public String toString() {
+      return MoreObjects.toStringHelper(this)
+          .add("detourToPickup", detourToPickup)
+          .add("detourFromPickup", detourFromPickup)
+          .add("detourToDropoff", detourToDropoff)
+          .add("detourFromDropoff", detourFromDropoff)
+          .toString();
+    }
+  }
+
+  public final Insertion insertion;
+  public final InsertionDetourData detourData;
+  public final DetourTimeInfo detourTimeInfo;
+
+  public InsertionWithDetourData(
+      Insertion insertion, InsertionDetourData detourData, DetourTimeInfo detourTimeInfo) {
+    this.insertion = insertion;
+    this.detourData = detourData;
+    this.detourTimeInfo = detourTimeInfo;
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("insertion", insertion)
+        .add("insertionDetourData", detourData)
+        .add("detourTimeInfo", detourTimeInfo)
+        .toString();
+  }
 }

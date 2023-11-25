@@ -20,33 +20,28 @@
 package org.matsim.contrib.socnetsim.framework.replanning;
 
 import org.matsim.api.core.v01.population.Plan;
-
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 
 /**
  * Two plans are considered linked if the agents are linked by a social tie.
  *
- * Thinked to be used as a "AND" condition in the {@link CompositePlanLinkIdentifier}:
- * the plans which fulfil at least one "OR" condition will be linked iif the
- * agents are social contacts.
+ * <p>Thinked to be used as a "AND" condition in the {@link CompositePlanLinkIdentifier}: the plans
+ * which fulfil at least one "OR" condition will be linked iif the agents are social contacts.
+ *
  * @author thibautd
  */
 public class SocialNetworkPlanLinkIdentifier implements PlanLinkIdentifier {
-	final SocialNetwork sn;
+  final SocialNetwork sn;
 
-	public SocialNetworkPlanLinkIdentifier(
-			final SocialNetwork sn) {
-		if ( sn == null ) throw new NullPointerException( "Social Network is null!");
-		this.sn = sn;
-	}
+  public SocialNetworkPlanLinkIdentifier(final SocialNetwork sn) {
+    if (sn == null) throw new NullPointerException("Social Network is null!");
+    this.sn = sn;
+  }
 
-	@Override
-	public boolean areLinked(
-			final Plan p1,
-			final Plan p2) {
-		return sn.getAlters( p1.getPerson().getId() ) .contains( p2.getPerson().getId() ) ||
-			sn.getAlters( p2.getPerson().getId() ) .contains( p1.getPerson().getId() );
-	}
+  @Override
+  public boolean areLinked(final Plan p1, final Plan p2) {
+    return sn.getAlters(p1.getPerson().getId()).contains(p2.getPerson().getId())
+        || sn.getAlters(p2.getPerson().getId()).contains(p1.getPerson().getId());
+  }
 }
-

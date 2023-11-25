@@ -28,23 +28,23 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author michalm
  */
 public class OfflineETaskTracker implements ETaskTracker {
-	private final MobsimTimer timer;
-	private final ETask task;
-	private final double chargeAtStart;
+  private final MobsimTimer timer;
+  private final ETask task;
+  private final double chargeAtStart;
 
-	public OfflineETaskTracker(EvDvrpVehicle vehicle, MobsimTimer timer) {
-		this.timer = timer;
-		task = (ETask)vehicle.getSchedule().getCurrentTask();
-		chargeAtStart = vehicle.getElectricVehicle().getBattery().getCharge();
-	}
+  public OfflineETaskTracker(EvDvrpVehicle vehicle, MobsimTimer timer) {
+    this.timer = timer;
+    task = (ETask) vehicle.getSchedule().getCurrentTask();
+    chargeAtStart = vehicle.getElectricVehicle().getBattery().getCharge();
+  }
 
-	@Override
-	public double predictEndTime() {
-		return Math.max(task.getEndTime(), timer.getTimeOfDay());
-	}
+  @Override
+  public double predictEndTime() {
+    return Math.max(task.getEndTime(), timer.getTimeOfDay());
+  }
 
-	@Override
-	public double predictChargeAtEnd() {
-		return chargeAtStart - task.getTotalEnergy();
-	}
+  @Override
+  public double predictChargeAtEnd() {
+    return chargeAtStart - task.getTotalEnergy();
+  }
 }

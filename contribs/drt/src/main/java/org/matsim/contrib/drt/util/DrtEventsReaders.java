@@ -22,9 +22,10 @@ package org.matsim.contrib.drt.util;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Map;
-
+import one.util.streamex.StreamEx;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
@@ -36,28 +37,30 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.MatsimEventsReader.CustomEventMapper;
 
-import com.google.common.collect.ImmutableMap;
-
-import one.util.streamex.StreamEx;
-
 public final class DrtEventsReaders {
-	public static final List<DrtTaskType> STANDARD_TASK_TYPES = List.of(DrtDriveTask.TYPE, DefaultDrtStopTask.TYPE,
-			DrtStayTask.TYPE, EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE);
+  public static final List<DrtTaskType> STANDARD_TASK_TYPES =
+      List.of(
+          DrtDriveTask.TYPE,
+          DefaultDrtStopTask.TYPE,
+          DrtStayTask.TYPE,
+          EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE);
 
-	public static MatsimEventsReader createEventsReader(EventsManager eventsManager,
-			DrtTaskType... nonStandardTaskTypes) {
-		MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
+  public static MatsimEventsReader createEventsReader(
+      EventsManager eventsManager, DrtTaskType... nonStandardTaskTypes) {
+    MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
 
-		var taskTypeByString = StreamEx.of(STANDARD_TASK_TYPES)
-				.append(nonStandardTaskTypes)
-				.collect(toImmutableMap(DrtTaskType::name, type -> type));
+    var taskTypeByString =
+        StreamEx.of(STANDARD_TASK_TYPES)
+            .append(nonStandardTaskTypes)
+            .collect(toImmutableMap(DrtTaskType::name, type -> type));
 
-		Map<String, CustomEventMapper> customEventMappers = ImmutableMap.<String, CustomEventMapper>builder()
-				.putAll(DvrpEventsReaders.createCustomEventMappers(taskTypeByString::get))
-				.put(DrtRequestSubmittedEvent.EVENT_TYPE, DrtRequestSubmittedEvent::convert)
-				.build();
+    Map<String, CustomEventMapper> customEventMappers =
+        ImmutableMap.<String, CustomEventMapper>builder()
+            .putAll(DvrpEventsReaders.createCustomEventMappers(taskTypeByString::get))
+            .put(DrtRequestSubmittedEvent.EVENT_TYPE, DrtRequestSubmittedEvent::convert)
+            .build();
 
-		customEventMappers.forEach(reader::addCustomEventMapper);
-		return reader;
-	}
+    customEventMappers.forEach(reader::addCustomEventMapper);
+    return reader;
+  }
 }

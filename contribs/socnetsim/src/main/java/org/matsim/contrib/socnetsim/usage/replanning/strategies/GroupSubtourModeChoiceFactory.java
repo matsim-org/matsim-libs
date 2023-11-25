@@ -41,69 +41,68 @@ import org.matsim.core.utils.timing.TimeInterpretation;
  */
 public class GroupSubtourModeChoiceFactory extends AbstractConfigurableSelectionStrategy {
 
-	private final Scenario sc;
-	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
-	private final Provider<TripRouter> tripRouterFactory;
-	private final PlanLinkIdentifier planLinkIdentifier;
-	private final TimeInterpretation timeInterpretation;
+  private final Scenario sc;
+  private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
+  private final Provider<TripRouter> tripRouterFactory;
+  private final PlanLinkIdentifier planLinkIdentifier;
+  private final TimeInterpretation timeInterpretation;
 
-	@Inject
-	public GroupSubtourModeChoiceFactory(Scenario sc, PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory, Provider<TripRouter> tripRouterFactory,
-										 @Strong PlanLinkIdentifier planLinkIdentifier, jakarta.inject.Provider<TripRouter> tripRouterProvider, TimeInterpretation timeInterpretation) {
-		this.sc = sc;
-		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
-		this.tripRouterFactory = tripRouterFactory;
-		this.planLinkIdentifier = planLinkIdentifier;
-		this.timeInterpretation = timeInterpretation;
-	}
+  @Inject
+  public GroupSubtourModeChoiceFactory(
+      Scenario sc,
+      PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
+      Provider<TripRouter> tripRouterFactory,
+      @Strong PlanLinkIdentifier planLinkIdentifier,
+      jakarta.inject.Provider<TripRouter> tripRouterProvider,
+      TimeInterpretation timeInterpretation) {
+    this.sc = sc;
+    this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
+    this.tripRouterFactory = tripRouterFactory;
+    this.planLinkIdentifier = planLinkIdentifier;
+    this.timeInterpretation = timeInterpretation;
+  }
 
+  @Override
+  public GroupPlanStrategy get() {
+    final GroupPlanStrategy strategy = instantiateStrategy(sc.getConfig());
 
-	@Override
-	public GroupPlanStrategy get() {
-		final GroupPlanStrategy strategy = instantiateStrategy(sc.getConfig());
+    // Why the hell did I put this here???
+    // strategy.addStrategyModule(
+    //		createReRouteModule(
+    //			sc.getConfig(),
+    //			planRoutingAlgorithmFactory,
+    //			tripRouterFactory ) );
+    PermissibleModesCalculator permissibleModesCalculator =
+        new PermissibleModesCalculatorImpl(sc.getConfig());
+    strategy.addStrategyModule(
+        new IndividualBasedGroupStrategyModule(
+            new SubtourModeChoice(
+                sc.getConfig().global(),
+                sc.getConfig().subtourModeChoice(),
+                permissibleModesCalculator)));
 
-		// Why the hell did I put this here???
-		//strategy.addStrategyModule(
-		//		createReRouteModule(
-		//			sc.getConfig(),
-		//			planRoutingAlgorithmFactory,
-		//			tripRouterFactory ) );
-		PermissibleModesCalculator permissibleModesCalculator = new PermissibleModesCalculatorImpl(sc.getConfig());
-		strategy.addStrategyModule(
-				new IndividualBasedGroupStrategyModule(
-						new SubtourModeChoice(
-								sc.getConfig().global(), sc.getConfig().subtourModeChoice(), permissibleModesCalculator)));
+    // TODO: add an option to enable or disable this part?
+    final VehicleRessources vehicles =
+        (VehicleRessources) sc.getScenarioElement(VehicleRessources.ELEMENT_NAME);
+    if (vehicles != null) {
+      strategy.addStrategyModule(
+          GroupPlanStrategyFactoryUtils.createVehicleAllocationModule(sc.getConfig(), vehicles));
+    }
 
-		// TODO: add an option to enable or disable this part?
-		final VehicleRessources vehicles =
-				(VehicleRessources) sc.getScenarioElement(
-						VehicleRessources.ELEMENT_NAME);
-		if (vehicles != null) {
-			strategy.addStrategyModule(
-					GroupPlanStrategyFactoryUtils.createVehicleAllocationModule(
-							sc.getConfig(),
-							vehicles) );
-		}
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createReRouteModule(
+            sc.getConfig(), planRoutingAlgorithmFactory, tripRouterFactory));
 
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createReRouteModule(
-					sc.getConfig(),
-					planRoutingAlgorithmFactory,
-					tripRouterFactory ) );
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createSynchronizerModule(
+            sc.getConfig(), tripRouterFactory, timeInterpretation));
 
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createSynchronizerModule(
-					sc.getConfig(),
-					tripRouterFactory, timeInterpretation) );
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
+            sc.getConfig(),
+            ((JointPlans) sc.getScenarioElement(JointPlans.ELEMENT_NAME)).getFactory(),
+            planLinkIdentifier));
 
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
-					sc.getConfig(),
-					((JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME  )).getFactory(),
-					planLinkIdentifier));
-
-		return strategy;
-
-	}
+    return strategy;
+  }
 }
-

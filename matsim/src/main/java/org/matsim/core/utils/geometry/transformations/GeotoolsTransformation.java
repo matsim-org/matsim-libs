@@ -39,45 +39,42 @@ import org.opengis.referencing.operation.TransformException;
  */
 public class GeotoolsTransformation implements CoordinateTransformation {
 
-	private MathTransform transform;
+  private MathTransform transform;
 
-	/**
-	 * Creates a new coordinate transformation that makes use of GeoTools.
-	 * The coordinate systems to translate from and to can either be specified as
-	 * shortened names, as defined in {@link TransformationFactory}, or as
-	 * Well-Known-Text (WKT) as supported by the GeoTools.
-	 *
-	 * @param from Specifies the origin coordinate reference system
-	 * @param to Specifies the destination coordinate reference system
-	 *
-	 * @see <a href="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">WKT specifications</a>
-	 */
-	public GeotoolsTransformation(final String from, final String to) {
-		CoordinateReferenceSystem sourceCRS = MGC.getCRS(from);
-		CoordinateReferenceSystem targetCRS = MGC.getCRS(to);
+  /**
+   * Creates a new coordinate transformation that makes use of GeoTools. The coordinate systems to
+   * translate from and to can either be specified as shortened names, as defined in {@link
+   * TransformationFactory}, or as Well-Known-Text (WKT) as supported by the GeoTools.
+   *
+   * @param from Specifies the origin coordinate reference system
+   * @param to Specifies the destination coordinate reference system
+   * @see <a
+   *     href="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html">WKT
+   *     specifications</a>
+   */
+  public GeotoolsTransformation(final String from, final String to) {
+    CoordinateReferenceSystem sourceCRS = MGC.getCRS(from);
+    CoordinateReferenceSystem targetCRS = MGC.getCRS(to);
 
-		try {
-			this.transform = CRS.findMathTransform(sourceCRS, targetCRS,true);
-		} catch (FactoryException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    try {
+      this.transform = CRS.findMathTransform(sourceCRS, targetCRS, true);
+    } catch (FactoryException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-	@Override
-	public Coord transform(final Coord coord) {
-		Point p = null;
-		try {
-			p = (Point) JTS.transform(MGC.coord2Point(coord), this.transform);
-		} catch (TransformException e) {
-			throw new RuntimeException(e);
-		}
-		if(coord.hasZ()){
-			return CoordUtils.createCoord(p.getX(), p.getY(), coord.getZ());
-		} else{
-			return MGC.point2Coord(p);
-		}
-	}
-
-
-
+  @Override
+  public Coord transform(final Coord coord) {
+    Point p = null;
+    try {
+      p = (Point) JTS.transform(MGC.coord2Point(coord), this.transform);
+    } catch (TransformException e) {
+      throw new RuntimeException(e);
+    }
+    if (coord.hasZ()) {
+      return CoordUtils.createCoord(p.getX(), p.getY(), coord.getZ());
+    } else {
+      return MGC.point2Coord(p);
+    }
+  }
 }

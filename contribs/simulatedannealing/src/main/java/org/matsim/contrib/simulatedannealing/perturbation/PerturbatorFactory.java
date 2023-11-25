@@ -12,17 +12,16 @@ import org.matsim.contrib.simulatedannealing.SimulatedAnnealing;
 import org.matsim.contrib.simulatedannealing.SimulatedAnnealingListener;
 
 /**
- *
  * Provides a function to create pertubators dynamically during the simulation.
  *
  * @author nkuehnel / MOIA
  */
 public interface PerturbatorFactory<T> extends SimulatedAnnealingListener<T> {
 
-	Perturbator<T> createPerturbator(int iteration, double temperature);
+  Perturbator<T> createPerturbator(int iteration, double temperature);
 
-	default void solutionAccepted(SimulatedAnnealing.Solution<T> oldSolution, SimulatedAnnealing.Solution<T> newSolution) {}
+  default void solutionAccepted(
+      SimulatedAnnealing.Solution<T> oldSolution, SimulatedAnnealing.Solution<T> newSolution) {}
 
-	default void reset(int iteration){}
-
+  default void reset(int iteration) {}
 }

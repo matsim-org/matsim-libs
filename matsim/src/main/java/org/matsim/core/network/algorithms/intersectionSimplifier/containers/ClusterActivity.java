@@ -25,43 +25,40 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Node;
 
-
 /**
  * A simple class linking a {@link DigicoreActivity} to a specific cluster.
- * 
+ *
  * @author jwjoubert
  */
-public class ClusterActivity implements Identifiable<Coord>{
-	private Id<Coord> activityId;
-	private Node node;
-	private Cluster cluster;
-	
-	public ClusterActivity(Id<Coord> activityId, Node node, Cluster cluster){
-		this.activityId = activityId;
-		this.node = node;
-		this.cluster = cluster;
-	}
+public class ClusterActivity implements Identifiable<Coord> {
+  private Id<Coord> activityId;
+  private Node node;
+  private Cluster cluster;
 
-	public Coord getCoord() {
-		return this.node.getCoord();
-	}
-	
-	public Node getNode() {
-		return this.node;
-	}
+  public ClusterActivity(Id<Coord> activityId, Node node, Cluster cluster) {
+    this.activityId = activityId;
+    this.node = node;
+    this.cluster = cluster;
+  }
 
-	public Cluster getCluster() {
-		return cluster;
-	}
-	
-	public void setCluster(Cluster cluster){
-		this.cluster = cluster;
-	}
+  public Coord getCoord() {
+    return this.node.getCoord();
+  }
 
-	@Override
-	public Id<Coord> getId() {
-		return this.activityId;
-	}
-	
+  public Node getNode() {
+    return this.node;
+  }
 
+  public Cluster getCluster() {
+    return cluster;
+  }
+
+  public void setCluster(Cluster cluster) {
+    this.cluster = cluster;
+  }
+
+  @Override
+  public Id<Coord> getId() {
+    return this.activityId;
+  }
 }

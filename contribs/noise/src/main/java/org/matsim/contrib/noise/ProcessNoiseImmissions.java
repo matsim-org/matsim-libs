@@ -17,9 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
+/** */
 package org.matsim.contrib.noise;
 
 import java.io.BufferedReader;
@@ -27,7 +25,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Envelope;
@@ -40,234 +37,235 @@ import org.matsim.core.utils.misc.Time;
 
 /**
  * @author ikaddoura
- *
  */
 public final class ProcessNoiseImmissions {
 
-	private static final Logger log = LogManager.getLogger(ProcessNoiseImmissions.class);
+  private static final Logger log = LogManager.getLogger(ProcessNoiseImmissions.class);
 
-	private final double receiverPointGap;
-	private final String workingDirectory;
-	private String receiverPointsFile;
+  private final double receiverPointGap;
+  private final String workingDirectory;
+  private String receiverPointsFile;
 
-	private final String outputPath;
+  private final String outputPath;
 
-	private Map<Double, Map<Id<ReceiverPoint>, Double>> time2rp2value = new HashMap<>();
-	private List<NoiseModule.NoiseListener> listeners = new ArrayList<>() ;
+  private Map<Double, Map<Id<ReceiverPoint>, Double>> time2rp2value = new HashMap<>();
+  private List<NoiseModule.NoiseListener> listeners = new ArrayList<>();
 
-	public ProcessNoiseImmissions(String workingDirectory, String receiverPointsFile, double receiverPointGap) {
-		this.workingDirectory = workingDirectory;
-		this.receiverPointsFile = receiverPointsFile;
-		this.receiverPointGap = receiverPointGap;
-		this.outputPath = workingDirectory;
-	}
+  public ProcessNoiseImmissions(
+      String workingDirectory, String receiverPointsFile, double receiverPointGap) {
+    this.workingDirectory = workingDirectory;
+    this.receiverPointsFile = receiverPointsFile;
+    this.receiverPointGap = receiverPointGap;
+    this.outputPath = workingDirectory;
+  }
 
-	public static void main(String[] args) {
-		String workingDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/ITERS/it.100/immissions/";
-		String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/receiverPoints/receiverPoints.csv";
+  public static void main(String[] args) {
+    String workingDirectory =
+        "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/ITERS/it.100/immissions/";
+    String receiverPointsFile =
+        "/Users/ihab/Documents/workspace/runs-svn/cn/output/cn/receiverPoints/receiverPoints.csv";
 
-		ProcessNoiseImmissions readNoiseFile = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile, 100);
-		readNoiseFile.run();
-	}
+    ProcessNoiseImmissions readNoiseFile =
+        new ProcessNoiseImmissions(workingDirectory, receiverPointsFile, 100);
+    readNoiseFile.run();
+  }
 
-	public void run() {
+  public void run() {
 
-		String label = "immission";
-		String outputFile = outputPath + label + "_processed.csv";
+    String label = "immission";
+    String outputFile = outputPath + label + "_processed.csv";
 
-		try {
+    try {
 
-			double startTime = 3600.;
-			double timeBinSize = 3600.;
-			double endTime = 24. * 3600.;
-			String separator = ";";
-			for ( double time = startTime ; time <= endTime ; time = time + timeBinSize ) {
+      double startTime = 3600.;
+      double timeBinSize = 3600.;
+      double endTime = 24. * 3600.;
+      String separator = ";";
+      for (double time = startTime; time <= endTime; time = time + timeBinSize) {
 
-				log.info("Reading time bin: " + time);
+        log.info("Reading time bin: " + time);
 
-				String fileName = workingDirectory + label + "_" + time + ".csv";
-				BufferedReader br = IOUtils.getBufferedReader(fileName);
+        String fileName = workingDirectory + label + "_" + time + ".csv";
+        BufferedReader br = IOUtils.getBufferedReader(fileName);
 
-				String line = null;
-				line = br.readLine();
+        String line = null;
+        line = br.readLine();
 
-				Map<Id<ReceiverPoint>, Double> rp2value = new HashMap<>();
-				int lineCounter = 0;
-				log.info("Reading lines ");
-				while ((line = br.readLine()) != null) {
+        Map<Id<ReceiverPoint>, Double> rp2value = new HashMap<>();
+        int lineCounter = 0;
+        log.info("Reading lines ");
+        while ((line = br.readLine()) != null) {
 
-					if (lineCounter % 10000 == 0.) {
-						log.info("# " + lineCounter);
-					}
+          if (lineCounter % 10000 == 0.) {
+            log.info("# " + lineCounter);
+          }
 
-					String[] columns = line.split( separator );
-					Id<ReceiverPoint> rp = null;
-					Double value = null;
-					for (int column = 0; column < columns.length; column++) {
-						if (column == 0) {
-							rp = Id.create(columns[column], ReceiverPoint.class);
-						} else if (column == 1) {
-							value = Double.valueOf(columns[column]);
-						} else {
-//							throw new RuntimeException("More than two columns. Aborting...");
-						}
-						rp2value.put(rp, value);
+          String[] columns = line.split(separator);
+          Id<ReceiverPoint> rp = null;
+          Double value = null;
+          for (int column = 0; column < columns.length; column++) {
+            if (column == 0) {
+              rp = Id.create(columns[column], ReceiverPoint.class);
+            } else if (column == 1) {
+              value = Double.valueOf(columns[column]);
+            } else {
+              //							throw new RuntimeException("More than two columns. Aborting...");
+            }
+            rp2value.put(rp, value);
+          }
+          lineCounter++;
+          time2rp2value.put(time, rp2value);
+        }
+      }
 
-					}
-					lineCounter++;
-					time2rp2value.put(time, rp2value);
-				}
-			}
+      BufferedReader br = IOUtils.getBufferedReader(this.receiverPointsFile);
+      String line = br.readLine();
 
-			BufferedReader br = IOUtils.getBufferedReader(this.receiverPointsFile);
-			String line = br.readLine();
+      Map<Id<ReceiverPoint>, Coord> rp2Coord = new HashMap<Id<ReceiverPoint>, Coord>();
+      int lineCounter = 0;
 
-			Map<Id<ReceiverPoint>, Coord> rp2Coord = new HashMap<Id<ReceiverPoint>, Coord>();
-			int lineCounter = 0;
+      log.info("Reading receiver points file");
 
-			log.info("Reading receiver points file");
+      while ((line = br.readLine()) != null) {
 
-			while( (line = br.readLine()) != null){
+        if (lineCounter % 10000 == 0.) {
+          log.info("# " + lineCounter);
+        }
 
-				if (lineCounter % 10000 == 0.) {
-					log.info("# " + lineCounter);
-				}
+        String[] columns = line.split(separator);
+        Id<ReceiverPoint> rpId = null;
+        double x = 0;
+        double y = 0;
 
-				String[] columns = line.split( separator );
-				Id<ReceiverPoint> rpId = null;
-				double x = 0;
-				double y = 0;
+        for (int i = 0; i < columns.length; i++) {
 
-				for(int i = 0; i < columns.length; i++){
+          switch (i) {
+            case 0:
+              rpId = Id.create(columns[i], ReceiverPoint.class);
+              break;
+            case 1:
+              x = Double.valueOf(columns[i]);
+              break;
+            case 2:
+              y = Double.valueOf(columns[i]);
+              break;
+            default:
+              throw new RuntimeException("More than three columns. Aborting...");
+          }
+        }
 
-					switch(i){
+        lineCounter++;
+        rp2Coord.put(rpId, new Coord(x, y));
+      }
 
-					case 0: rpId = Id.create(columns[i], ReceiverPoint.class);
-							break;
-					case 1: x = Double.valueOf(columns[i]);
-							break;
-					case 2: y = Double.valueOf(columns[i]);
-							break;
-					default: throw new RuntimeException("More than three columns. Aborting...");
+      BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile));
 
-					}
+      // write headers
+      bw.write("Receiver Point Id;x;y");
 
-				}
+      for (double time = startTime; time <= endTime; time = time + timeBinSize) {
+        bw.write(";" + label + "_" + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS));
+      }
 
-				lineCounter++;
-				rp2Coord.put(rpId, new Coord(x, y));
+      bw.write(";Lden;L_6-9;L_16-19");
 
-			}
+      bw.newLine();
 
-			BufferedWriter bw = new BufferedWriter( new FileWriter( outputFile ) );
+      // fill table
+      for (Id<ReceiverPoint> rp : time2rp2value.get(endTime).keySet()) {
+        bw.write(rp.toString() + ";" + rp2Coord.get(rp).getX() + ";" + rp2Coord.get(rp).getY());
 
-			// write headers
-			bw.write("Receiver Point Id;x;y" );
+        for (double time = startTime; time <= endTime; time = time + timeBinSize) {
+          bw.write(";" + time2rp2value.get(time).get(rp));
+        }
 
-			for ( double time = startTime ; time <= endTime ; time = time + timeBinSize ) {
-				bw.write(";" + label + "_" + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS ) );
-			}
+        // aggregate time intervals
 
-			bw.write(";Lden;L_6-9;L_16-19" );
+        double termDay = 0.;
+        // day: 7-19
+        for (double time = 8 * 3600.; time <= 19 * 3600.; time = time + timeBinSize) {
+          termDay = termDay + Math.pow(10, time2rp2value.get(time).get(rp) / 10);
+        }
 
-			bw.newLine();
+        double termEvening = 0.;
+        // evening: 19-23
+        for (double time = 20 * 3600.; time <= 23 * 3600.; time = time + timeBinSize) {
+          termEvening = termEvening + Math.pow(10, (time2rp2value.get(time).get(rp) + 5) / 10);
+        }
 
-			// fill table
-			for (Id<ReceiverPoint> rp : time2rp2value.get( endTime ).keySet()) {
-				bw.write(rp.toString() + ";" + rp2Coord.get(rp ).getX() + ";" + rp2Coord.get(rp ).getY() );
+        double termNight = 0.;
+        // night: 23-7
 
-				for ( double time = startTime ; time <= endTime ; time = time + timeBinSize ) {
-					bw.write(";" + time2rp2value.get(time ).get(rp ) );
-				}
+        // nightA: 23-24
+        for (double time = 24 * 3600.; time <= 24 * 3600.; time = time + timeBinSize) {
+          termNight = termNight + Math.pow(10, (time2rp2value.get(time).get(rp) + 10) / 10);
+        }
+        // nightB: 0-7
+        for (double time = 1 * 3600.; time <= 7 * 3600.; time = time + timeBinSize) {
+          termNight = termNight + Math.pow(10, (time2rp2value.get(time).get(rp) + 10) / 10);
+        }
 
-				// aggregate time intervals
+        double Lden = 10 * Math.log10(1. / 24. * (termDay + termEvening + termNight));
+        bw.write(";" + Lden);
 
-				double termDay = 0.;
-				// day: 7-19
-				for (double time = 8 * 3600.; time <= 19 * 3600.; time = time + timeBinSize ) {
-					termDay = termDay + Math.pow(10, time2rp2value.get(time).get(rp) / 10);
-				}
+        double term69 = 0.;
+        for (double time = 7 * 3600.; time <= 9 * 3600.; time = time + timeBinSize) {
+          term69 = term69 + Math.pow(10, (time2rp2value.get(time).get(rp)) / 10);
+        }
+        double L_69 = 10 * Math.log10(1. / 3. * term69);
+        bw.write(";" + L_69);
 
-				double termEvening = 0.;
-				// evening: 19-23
-				for (double time = 20 * 3600.; time <= 23 * 3600.; time = time + timeBinSize ) {
-					termEvening = termEvening + Math.pow(10, (time2rp2value.get(time).get(rp) + 5) / 10);
-				}
+        double term1619 = 0.;
+        for (double time = 17 * 3600.; time <= 19 * 3600.; time = time + timeBinSize) {
+          term1619 = term1619 + Math.pow(10, (time2rp2value.get(time).get(rp)) / 10);
+        }
+        double L_1619 = 10 * Math.log10(1. / 3. * term1619);
+        bw.write(";" + L_1619);
 
-				double termNight = 0.;
-				// night: 23-7
+        bw.newLine();
+        // TODO
+        //				for( NoiseModule.NoiseListener listener : listeners ){
+        //					XYTRecord.Builder builder = new XYTRecord.Builder().setCoord( ... );
+        //					builder.put( "Lden", Lden  ) ;
+        //					builder.put( "Lden", Lden  ) ;
+        //					XYTRecord record = builder.build();;
+        //					listener.newRecord( record );
+        //				}
 
-				// nightA: 23-24
-				for (double time = 24 * 3600.; time <= 24 * 3600.; time = time + timeBinSize ) {
-					termNight = termNight + Math.pow(10, (time2rp2value.get(time).get(rp) + 10) / 10);
-				}
-				// nightB: 0-7
-				for (double time = 1 * 3600.; time <= 7 * 3600.; time = time + timeBinSize ) {
-					termNight = termNight + Math.pow(10, (time2rp2value.get(time).get(rp) + 10) / 10);
-				}
+      }
 
-				double Lden = 10 * Math.log10(1./24. * (termDay + termEvening + termNight));
-				bw.write(";" + Lden );
+      bw.close();
+      log.info("Output written to " + outputFile);
+    } catch (IOException e1) {
+      e1.printStackTrace();
+    }
 
-				double term69 = 0.;
-				for (double time = 7 * 3600.; time <= 9 * 3600.; time = time + timeBinSize ) {
-					term69 = term69 + Math.pow(10, (time2rp2value.get(time).get(rp)) / 10);
-				}
-				double L_69 = 10 * Math.log10(1./3. * term69);
-				bw.write(";" + L_69 );
+    String qGisProjectFile = "immission.qgs";
 
-				double term1619 = 0.;
-				for (double time = 17 * 3600.; time <= 19 * 3600.; time = time + timeBinSize ) {
-					term1619 = term1619 + Math.pow(10, (time2rp2value.get(time).get(rp)) / 10);
-				}
-				double L_1619 = 10 * Math.log10(1./3. * term1619);
-				bw.write(";" + L_1619 );
+    QGisWriter writer = new QGisWriter(TransformationFactory.DHDN_GK4, workingDirectory);
 
-				bw.newLine();
-// TODO
-//				for( NoiseModule.NoiseListener listener : listeners ){
-//					XYTRecord.Builder builder = new XYTRecord.Builder().setCoord( ... );
-//					builder.put( "Lden", Lden  ) ;
-//					builder.put( "Lden", Lden  ) ;
-//					XYTRecord record = builder.build();;
-//					listener.newRecord( record );
-//				}
+    // ################################################################################################################################################
+    Envelope envelope = new Envelope(4568808, 5803042, 4622772, 5844280);
+    writer.setEnvelope(envelope);
 
-			}
+    VectorLayer noiseLayer =
+        new VectorLayer("noise", outputFile, QGisConstants.geometryType.Point, true);
+    noiseLayer.setDelimiter(";");
+    noiseLayer.setXField("x");
+    noiseLayer.setYField("y");
 
-			bw.close();
-			log.info("Output written to " + outputFile);
-		}
+    GraduatedSymbolRenderer renderer =
+        RendererFactory.createNoiseRenderer(noiseLayer, this.receiverPointGap);
+    renderer.setRenderingAttribute("Lden");
 
-		catch (IOException e1) {
-			e1.printStackTrace();
-		}
+    writer.addLayer(noiseLayer);
 
-		String qGisProjectFile = "immission.qgs";
+    // ################################################################################################################################################
 
-		QGisWriter writer = new QGisWriter(TransformationFactory.DHDN_GK4, workingDirectory);
+    writer.write(qGisProjectFile);
+  }
 
-// ################################################################################################################################################
-		Envelope envelope = new Envelope(4568808,5803042,4622772,5844280);
-		writer.setEnvelope(envelope);
-
-		VectorLayer noiseLayer = new VectorLayer("noise", outputFile, QGisConstants.geometryType.Point, true);
-		noiseLayer.setDelimiter(";");
-		noiseLayer.setXField("x");
-		noiseLayer.setYField("y");
-
-        GraduatedSymbolRenderer renderer = RendererFactory.createNoiseRenderer(noiseLayer, this.receiverPointGap );
-		renderer.setRenderingAttribute("Lden");
-
-		writer.addLayer(noiseLayer);
-
-// ################################################################################################################################################
-
-		writer.write(qGisProjectFile);
-
-	}
-
-	public void addListener( NoiseModule.NoiseListener noiseListener ){
-		listeners.add( noiseListener ) ;
-	}
+  public void addListener(NoiseModule.NoiseListener noiseListener) {
+    listeners.add(noiseListener);
+  }
 }

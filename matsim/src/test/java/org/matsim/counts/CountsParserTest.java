@@ -31,77 +31,91 @@ import org.xml.sax.SAXException;
 
 public class CountsParserTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  @Test
+  public void testSEElementCounts() throws SAXException {
+    AttributeFactory attributeFactory = new AttributeFactory();
+    final Counts counts = new Counts();
+    MatsimCountsReader reader = new MatsimCountsReader(counts);
+    reader.setDoctype("counts_v1.xsd");
 
-	@Test public void testSEElementCounts() throws SAXException {
-		AttributeFactory attributeFactory = new AttributeFactory();
-		final Counts counts = new Counts();
-		MatsimCountsReader reader = new MatsimCountsReader(counts);
-		reader.setDoctype("counts_v1.xsd");
+    reader.startElement("", "counts", "counts", attributeFactory.createCountsAttributes());
 
-		reader.startElement("", "counts", "counts", attributeFactory.createCountsAttributes());
+    assertEquals("Counts attribute setting failed", "testName", counts.getName());
+    assertEquals("Counts attribute setting failed", "testDesc", counts.getDescription());
+    assertEquals("Counts attribute setting failed", 2000, counts.getYear());
+    try {
+      reader.endElement("", "counts", "counts");
+    } catch (SAXException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-		assertEquals("Counts attribute setting failed", "testName", counts.getName());
-		assertEquals("Counts attribute setting failed", "testDesc", counts.getDescription());
-		assertEquals("Counts attribute setting failed", 2000, counts.getYear());
-		try {
-			reader.endElement("", "counts", "counts");
-		} catch (SAXException e) {
-			throw new RuntimeException(e);
-		}
-	}
+  @Test
+  public void testSEElementCountWithoutCoords() throws SAXException {
+    AttributeFactory attributeFactory = new AttributeFactory();
+    final Counts counts = new Counts();
+    MatsimCountsReader reader = new MatsimCountsReader(counts);
+    reader.setDoctype("counts_v1.xsd");
 
-	@Test public void testSEElementCountWithoutCoords() throws SAXException {
-		AttributeFactory attributeFactory = new AttributeFactory();
-		final Counts counts = new Counts();
-		MatsimCountsReader reader = new MatsimCountsReader(counts);
-		reader.setDoctype("counts_v1.xsd");
+    reader.startElement("", "counts", "counts", attributeFactory.createCountsAttributes());
+    reader.startElement("", "count", "count", attributeFactory.createCountAttributes());
 
-		reader.startElement("", "counts", "counts", attributeFactory.createCountsAttributes());
-		reader.startElement("", "count", "count", attributeFactory.createCountAttributes());
+    Count count = counts.getCount(Id.create(1, Link.class));
+    assertEquals("Count attribute setting failed", "testNr", count.getCsLabel());
+    assertNull("Count attributes x,y should not be set", count.getCoord());
 
-		Count count = counts.getCount(Id.create(1, Link.class));
-		assertEquals("Count attribute setting failed", "testNr", count.getCsLabel());
-		assertNull("Count attributes x,y should not be set", count.getCoord());
+    reader.endElement("", "count", "count");
+    reader.endElement("", "counts", "counts");
+  }
 
-		reader.endElement("", "count", "count");
-		reader.endElement("", "counts", "counts");
-	}
+  @Test
+  public void testSEElementCountWithCoords() throws SAXException {
+    AttributeFactory attributeFactory = new AttributeFactory();
+    final Counts counts = new Counts();
+    MatsimCountsReader reader = new MatsimCountsReader(counts);
+    reader.setDoctype("counts_v1.xsd");
 
-	@Test public void testSEElementCountWithCoords() throws SAXException {
-		AttributeFactory attributeFactory = new AttributeFactory();
-		final Counts counts = new Counts();
-		MatsimCountsReader reader = new MatsimCountsReader(counts);
-		reader.setDoctype("counts_v1.xsd");
+    reader.startElement("", "counts", "counts", attributeFactory.createCountsAttributes());
+    reader.startElement("", "count", "count", attributeFactory.createCountAttributesWithCoords());
 
-		reader.startElement("", "counts", "counts", attributeFactory.createCountsAttributes());
-		reader.startElement("", "count", "count", attributeFactory.createCountAttributesWithCoords());
+    Count count = counts.getCount(Id.create(1, Link.class));
+    assertNotNull("Count attribute x,y setting failed", count.getCoord());
+    assertEquals(
+        "Count attribute x setting failed",
+        123.456,
+        count.getCoord().getX(),
+        MatsimTestUtils.EPSILON);
+    assertEquals(
+        "Count attribute y setting failed",
+        987.654,
+        count.getCoord().getY(),
+        MatsimTestUtils.EPSILON);
 
-		Count count = counts.getCount(Id.create(1, Link.class));
-		assertNotNull("Count attribute x,y setting failed", count.getCoord());
-		assertEquals("Count attribute x setting failed", 123.456, count.getCoord().getX(), MatsimTestUtils.EPSILON);
-		assertEquals("Count attribute y setting failed", 987.654, count.getCoord().getY(), MatsimTestUtils.EPSILON);
+    reader.endElement("", "count", "count");
+    reader.endElement("", "counts", "counts");
+  }
 
-		reader.endElement("", "count", "count");
-		reader.endElement("", "counts", "counts");
-	}
+  @Test
+  public void testSEElementVolume() throws SAXException {
+    AttributeFactory attributeFactory = new AttributeFactory();
+    final Counts counts = new Counts();
+    MatsimCountsReader reader = new MatsimCountsReader(counts);
+    reader.setDoctype("counts_v1.xsd");
 
-	@Test public void testSEElementVolume() throws SAXException {
-		AttributeFactory attributeFactory = new AttributeFactory();
-		final Counts counts = new Counts();
-		MatsimCountsReader reader = new MatsimCountsReader(counts);
-		reader.setDoctype("counts_v1.xsd");
+    reader.startElement("", "counts", "counts", attributeFactory.createCountsAttributes());
+    reader.startElement("", "count", "count", attributeFactory.createCountAttributes());
+    reader.startElement("", "volume", "volume", attributeFactory.createVolumeAttributes());
 
-		reader.startElement("", "counts", "counts", attributeFactory.createCountsAttributes());
-		reader.startElement("", "count", "count", attributeFactory.createCountAttributes());
-		reader.startElement("", "volume", "volume", attributeFactory.createVolumeAttributes());
+    assertEquals(
+        "Volume attribute setting failed",
+        100.0,
+        counts.getCount(Id.create(1, Link.class)).getVolume(1).getValue(),
+        MatsimTestUtils.EPSILON);
 
-		assertEquals("Volume attribute setting failed", 100.0, counts.getCount(Id.create(1, Link.class)).getVolume(1).getValue(), MatsimTestUtils.EPSILON);
-
-		reader.endElement("", "volume", "volume");
-		reader.endElement("", "count", "count");
-		reader.endElement("", "counts", "counts");
-	}
+    reader.endElement("", "volume", "volume");
+    reader.endElement("", "count", "count");
+    reader.endElement("", "counts", "counts");
+  }
 }

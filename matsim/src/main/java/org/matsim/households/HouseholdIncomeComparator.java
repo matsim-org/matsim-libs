@@ -22,7 +22,6 @@ package org.matsim.households;
 import java.io.Serializable;
 import java.util.Comparator;
 
-
 /**
  * Simple comparator for households to compare them by income
  *
@@ -30,21 +29,19 @@ import java.util.Comparator;
  */
 public class HouseholdIncomeComparator implements Comparator<Household>, Serializable {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@Override
-	public int compare(Household o1, Household o2) {
-		if (o1.getIncome().getIncomePeriod() != o2.getIncome().getIncomePeriod()){
-			throw new IllegalArgumentException("Can only compare Households with incomes in "
-					+ " same income period");
-		}
-		if (o1.getIncome().getIncome() < o2.getIncome().getIncome()){
-			return -1;
-		}
-		else if (o1.getIncome().getIncome() > o2.getIncome().getIncome()){
-			return 1;
-		}
-		return 0;
-	}
-
+  @Override
+  public int compare(Household o1, Household o2) {
+    if (o1.getIncome().getIncomePeriod() != o2.getIncome().getIncomePeriod()) {
+      throw new IllegalArgumentException(
+          "Can only compare Households with incomes in " + " same income period");
+    }
+    if (o1.getIncome().getIncome() < o2.getIncome().getIncome()) {
+      return -1;
+    } else if (o1.getIncome().getIncome() > o2.getIncome().getIncome()) {
+      return 1;
+    }
+    return 0;
+  }
 }

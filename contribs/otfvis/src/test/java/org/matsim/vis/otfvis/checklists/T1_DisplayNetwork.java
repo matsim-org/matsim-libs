@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * 
+ *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -27,8 +27,7 @@ import org.matsim.contrib.otfvis.OTFVis;
  */
 public class T1_DisplayNetwork {
 
-	public static void main(String[] args) {
-		OTFVis.playNetwork("./test/scenarios/equil/network.xml");
-	}
-
+  public static void main(String[] args) {
+    OTFVis.playNetwork("./test/scenarios/equil/network.xml");
+  }
 }

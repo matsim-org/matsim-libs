@@ -20,7 +20,6 @@
 package org.matsim.testcases.utils;
 
 import java.util.Map;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,33 +33,33 @@ import org.matsim.core.events.handler.BasicEventHandler;
  */
 public class EventsLogger implements BasicEventHandler {
 
-	private final static Logger log = LogManager.getLogger(EventsLogger.class);
-	private final Level level;
+  private static final Logger log = LogManager.getLogger(EventsLogger.class);
+  private final Level level;
 
-	public EventsLogger() {
-		this(Level.DEBUG);
-	}
+  public EventsLogger() {
+    this(Level.DEBUG);
+  }
 
-	public EventsLogger(final Level level) {
-		this.level = level;
-	}
+  public EventsLogger(final Level level) {
+    this.level = level;
+  }
 
-	@Override
-	public void handleEvent(final Event event) {
-		StringBuilder eventXML = new StringBuilder("\t<event ");
-		Map<String, String> attr = event.getAttributes();
-		for (Map.Entry<String, String> entry : attr.entrySet()) {
-			eventXML.append(entry.getKey());
-			eventXML.append("=\"");
-			eventXML.append(entry.getValue());
-			eventXML.append("\" ");
-		}
-		eventXML.append(" />");
-		log.log(this.level, eventXML.toString());
-	}
+  @Override
+  public void handleEvent(final Event event) {
+    StringBuilder eventXML = new StringBuilder("\t<event ");
+    Map<String, String> attr = event.getAttributes();
+    for (Map.Entry<String, String> entry : attr.entrySet()) {
+      eventXML.append(entry.getKey());
+      eventXML.append("=\"");
+      eventXML.append(entry.getValue());
+      eventXML.append("\" ");
+    }
+    eventXML.append(" />");
+    log.log(this.level, eventXML.toString());
+  }
 
-	@Override
-	public void reset(int iteration) {
-		log.log(this.level, "EventHandler reset, iteration = " + iteration);
-	}
+  @Override
+  public void reset(int iteration) {
+    log.log(this.level, "EventHandler reset, iteration = " + iteration);
+  }
 }

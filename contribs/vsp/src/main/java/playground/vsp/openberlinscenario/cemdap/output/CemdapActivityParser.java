@@ -22,7 +22,6 @@ package playground.vsp.openberlinscenario.cemdap.output;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -35,43 +34,40 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class CemdapActivityParser {
 
-	private final static Logger LOG = LogManager.getLogger(CemdapActivityParser.class);
+  private static final Logger LOG = LogManager.getLogger(CemdapActivityParser.class);
 
-	// Cemdap activity file columns
-//	private static final int HH_ID = 0;
-	private static final int P_ID = 1;
-//	...
-	private static final int ORIG_ZONE_ID = 5;
-	
+  // Cemdap activity file columns
+  //	private static final int HH_ID = 0;
+  private static final int P_ID = 1;
+  //	...
+  private static final int ORIG_ZONE_ID = 5;
 
-	public CemdapActivityParser() {
-	}
+  public CemdapActivityParser() {}
 
-	
-	public final void parse(String cemdapActivityFile, Map<Id<Person>, String> personHomeMap) {
-		int lineCount = 0;
+  public final void parse(String cemdapActivityFile, Map<Id<Person>, String> personHomeMap) {
+    int lineCount = 0;
 
-		try {
-			BufferedReader bufferedReader = IOUtils.getBufferedReader(cemdapActivityFile);
-			String currentLine = null;
+    try {
+      BufferedReader bufferedReader = IOUtils.getBufferedReader(cemdapActivityFile);
+      String currentLine = null;
 
-			while ((currentLine = bufferedReader.readLine()) != null) {
-				String[] entries = currentLine.split("\t", -1);
-				lineCount++;
-				
-				if (lineCount % 1000000 == 0) {
-					LOG.info("Line " + lineCount + ": " + personHomeMap.size() + " persons stored so far.");
-					Gbl.printMemoryUsage();
-				}
-				Id<Person> personId = Id.create(Integer.parseInt(entries[P_ID]), Person.class);
-				if (!personHomeMap.containsKey(personId)) {
-					personHomeMap.put(personId, entries[ORIG_ZONE_ID]);
-				}
-			}
-		} catch (IOException e) {
-			LOG.error(e);
-		}
-		LOG.info(lineCount + " lines parsed.");
-		LOG.info(personHomeMap.size() + " persons stored.");
-	}
+      while ((currentLine = bufferedReader.readLine()) != null) {
+        String[] entries = currentLine.split("\t", -1);
+        lineCount++;
+
+        if (lineCount % 1000000 == 0) {
+          LOG.info("Line " + lineCount + ": " + personHomeMap.size() + " persons stored so far.");
+          Gbl.printMemoryUsage();
+        }
+        Id<Person> personId = Id.create(Integer.parseInt(entries[P_ID]), Person.class);
+        if (!personHomeMap.containsKey(personId)) {
+          personHomeMap.put(personId, entries[ORIG_ZONE_ID]);
+        }
+      }
+    } catch (IOException e) {
+      LOG.error(e);
+    }
+    LOG.info(lineCount + " lines parsed.");
+    LOG.info(personHomeMap.size() + " persons stored.");
+  }
 }

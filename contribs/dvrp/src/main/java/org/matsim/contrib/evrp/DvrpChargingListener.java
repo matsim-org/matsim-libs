@@ -27,24 +27,24 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
  * @author michalm
  */
 public class DvrpChargingListener implements ChargingListener {
-	private final ChargingActivity chargingActivity;
+  private final ChargingActivity chargingActivity;
 
-	public DvrpChargingListener(ChargingActivity chargingActivity) {
-		this.chargingActivity = chargingActivity;
-	}
+  public DvrpChargingListener(ChargingActivity chargingActivity) {
+    this.chargingActivity = chargingActivity;
+  }
 
-	@Override
-	public void notifyVehicleQueued(ElectricVehicle ev, double now) {
-		chargingActivity.vehicleQueued(now);
-	}
+  @Override
+  public void notifyVehicleQueued(ElectricVehicle ev, double now) {
+    chargingActivity.vehicleQueued(now);
+  }
 
-	@Override
-	public void notifyChargingStarted(ElectricVehicle ev, double now) {
-		chargingActivity.chargingStarted(now);
-	}
+  @Override
+  public void notifyChargingStarted(ElectricVehicle ev, double now) {
+    chargingActivity.chargingStarted(now);
+  }
 
-	@Override
-	public void notifyChargingEnded(ElectricVehicle ev, double now) {
-		chargingActivity.chargingEnded(now);
-	}
+  @Override
+  public void notifyChargingEnded(ElectricVehicle ev, double now) {
+    chargingActivity.chargingEnded(now);
+  }
 }

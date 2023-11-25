@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * TestEventLibrary.java
@@ -19,12 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.jdeqsim.util;
+package org.matsim.core.mobsim.jdeqsim.util;
 
 import static org.junit.Assert.assertEquals;
 
 import java.util.LinkedList;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -38,28 +36,59 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class TestEventLibrary {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  @Test
+  public void testGetTravelTime() {
+    LinkedList<Event> events = new LinkedList<Event>();
+    events.add(
+        new PersonDepartureEvent(
+            20,
+            Id.create("2", Person.class),
+            Id.create("0", Link.class),
+            TransportMode.car,
+            TransportMode.car));
+    events.add(
+        new PersonArrivalEvent(
+            30, Id.create("2", Person.class), Id.create("0", Link.class), TransportMode.car));
+    events.add(
+        new PersonDepartureEvent(
+            90,
+            Id.create("1", Person.class),
+            Id.create("0", Link.class),
+            TransportMode.car,
+            TransportMode.car));
+    events.add(
+        new PersonArrivalEvent(
+            110, Id.create("1", Person.class), Id.create("0", Link.class), TransportMode.car));
 
-	@Test public void testGetTravelTime(){
-		LinkedList<Event> events=new LinkedList<Event>();
-		events.add(new PersonDepartureEvent(20, Id.create("2", Person.class), Id.create("0", Link.class), TransportMode.car, TransportMode.car));
-		events.add(new PersonArrivalEvent(30, Id.create("2", Person.class), Id.create("0", Link.class), TransportMode.car));
-		events.add(new PersonDepartureEvent(90, Id.create("1", Person.class), Id.create("0", Link.class), TransportMode.car, TransportMode.car));
-		events.add(new PersonArrivalEvent(110, Id.create("1", Person.class), Id.create("0", Link.class), TransportMode.car));
+    assertEquals(20.0, EventLibrary.getTravelTime(events, 1), MatsimTestUtils.EPSILON);
+  }
 
-		assertEquals(20.0, EventLibrary.getTravelTime(events,1), MatsimTestUtils.EPSILON);
-	}
+  @Test
+  public void testGetAverageTravelTime() {
+    LinkedList<Event> events = new LinkedList<Event>();
+    events.add(
+        new PersonDepartureEvent(
+            20,
+            Id.create("2", Person.class),
+            Id.create("0", Link.class),
+            TransportMode.car,
+            TransportMode.car));
+    events.add(
+        new PersonArrivalEvent(
+            30, Id.create("2", Person.class), Id.create("0", Link.class), TransportMode.car));
+    events.add(
+        new PersonDepartureEvent(
+            90,
+            Id.create("1", Person.class),
+            Id.create("0", Link.class),
+            TransportMode.car,
+            TransportMode.car));
+    events.add(
+        new PersonArrivalEvent(
+            110, Id.create("1", Person.class), Id.create("0", Link.class), TransportMode.car));
 
-	@Test public void testGetAverageTravelTime(){
-		LinkedList<Event> events=new LinkedList<Event>();
-		events.add(new PersonDepartureEvent(20, Id.create("2", Person.class), Id.create("0", Link.class), TransportMode.car, TransportMode.car));
-		events.add(new PersonArrivalEvent(30, Id.create("2", Person.class), Id.create("0", Link.class), TransportMode.car));
-		events.add(new PersonDepartureEvent(90, Id.create("1", Person.class), Id.create("0", Link.class), TransportMode.car, TransportMode.car));
-		events.add(new PersonArrivalEvent(110, Id.create("1", Person.class), Id.create("0", Link.class), TransportMode.car));
-
-		assertEquals(30.0, EventLibrary.getSumTravelTime(events), MatsimTestUtils.EPSILON);
-	}
-
+    assertEquals(30.0, EventLibrary.getSumTravelTime(events), MatsimTestUtils.EPSILON);
+  }
 }

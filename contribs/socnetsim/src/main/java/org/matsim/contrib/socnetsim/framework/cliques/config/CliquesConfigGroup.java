@@ -20,77 +20,75 @@
 package org.matsim.contrib.socnetsim.framework.cliques.config;
 
 import java.util.TreeMap;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.ConfigGroup;
 
 /**
  * Defines the file used to import clique information.
+ *
  * @author thibautd
  */
 public class CliquesConfigGroup extends ConfigGroup {
 
-	private static final Logger log = LogManager.getLogger(CliquesConfigGroup.class);
+  private static final Logger log = LogManager.getLogger(CliquesConfigGroup.class);
 
-	public static final String GROUP_NAME = "Cliques";
+  public static final String GROUP_NAME = "Cliques";
 
-	//parameter names
-	private static final String FILE = "inputCliquesFile";
+  // parameter names
+  private static final String FILE = "inputCliquesFile";
 
-	//parameter values
-	private String file;
+  // parameter values
+  private String file;
 
-	public CliquesConfigGroup() {
-		super(GROUP_NAME);
-		log.debug("cliques config group initialized");
-	}
+  public CliquesConfigGroup() {
+    super(GROUP_NAME);
+    log.debug("cliques config group initialized");
+  }
 
-	/*
-	 * =========================================================================
-	 * base class methods
-	 * =========================================================================
-	 */
-	@Override
-	public void addParam(String param_name, String value) {
-		// emulate previous behavior of reader (ignore null values at reading). td Apr'15
-		if ( "null".equalsIgnoreCase( value ) ) return;
-	
-		log.debug("addParam called for cliques: param_name="+param_name+", value="+value);
-		if (param_name.equals(FILE)) {
-			log.debug("file field detected");
-			this.file = value;
-		}
-	}
+  /*
+   * =========================================================================
+   * base class methods
+   * =========================================================================
+   */
+  @Override
+  public void addParam(String param_name, String value) {
+    // emulate previous behavior of reader (ignore null values at reading). td Apr'15
+    if ("null".equalsIgnoreCase(value)) return;
 
-	@Override
-	public String getValue(String param_name) {
-		if (param_name.equals(FILE)) {
-			return this.file;
-		}
-		return null;
-	}
+    log.debug("addParam called for cliques: param_name=" + param_name + ", value=" + value);
+    if (param_name.equals(FILE)) {
+      log.debug("file field detected");
+      this.file = value;
+    }
+  }
 
-	@Override
-	public TreeMap<String,String> getParams() {
-		TreeMap<String,String> map = new TreeMap<String,String>();
-		this.addParameterToMap(map, FILE);
-		return map;
-	}
+  @Override
+  public String getValue(String param_name) {
+    if (param_name.equals(FILE)) {
+      return this.file;
+    }
+    return null;
+  }
 
-	/*
-	 * =========================================================================
-	 * getters/setters
-	 * =========================================================================
-	 */
+  @Override
+  public TreeMap<String, String> getParams() {
+    TreeMap<String, String> map = new TreeMap<String, String>();
+    this.addParameterToMap(map, FILE);
+    return map;
+  }
 
-	public String getInputFile() {
-		return this.file;
-	}
+  /*
+   * =========================================================================
+   * getters/setters
+   * =========================================================================
+   */
 
-	public void setInputFile(String file) {
-		this.file = file;
-	}
+  public String getInputFile() {
+    return this.file;
+  }
 
+  public void setInputFile(String file) {
+    this.file = file;
+  }
 }
-

@@ -21,33 +21,34 @@
 package org.matsim.contrib.ev.infrastructure;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.collections.SpecificationContainer;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-final class ChargingInfrastructureSpecificationDefaultImpl implements ChargingInfrastructureSpecification {
-	private final SpecificationContainer<Charger, ChargerSpecification> container = new SpecificationContainer<>();
+final class ChargingInfrastructureSpecificationDefaultImpl
+    implements ChargingInfrastructureSpecification {
+  private final SpecificationContainer<Charger, ChargerSpecification> container =
+      new SpecificationContainer<>();
 
-	@Override
-	public Map<Id<Charger>, ChargerSpecification> getChargerSpecifications() {
-		return container.getSpecifications();
-	}
+  @Override
+  public Map<Id<Charger>, ChargerSpecification> getChargerSpecifications() {
+    return container.getSpecifications();
+  }
 
-	@Override
-	public void addChargerSpecification(ChargerSpecification specification) {
-		container.addSpecification(specification);
-	}
+  @Override
+  public void addChargerSpecification(ChargerSpecification specification) {
+    container.addSpecification(specification);
+  }
 
-	@Override
-	public void replaceChargerSpecification(ChargerSpecification specification) {
-		container.replaceSpecification(specification);
-	}
+  @Override
+  public void replaceChargerSpecification(ChargerSpecification specification) {
+    container.replaceSpecification(specification);
+  }
 
-	@Override
-	public void removeChargerSpecification(Id<Charger> chargerId) {
-		container.removeSpecification(chargerId);
-	}
+  @Override
+  public void removeChargerSpecification(Id<Charger> chargerId) {
+    container.removeSpecification(chargerId);
+  }
 }

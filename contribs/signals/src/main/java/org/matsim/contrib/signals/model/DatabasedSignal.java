@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalData;
@@ -31,62 +30,57 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
 import org.matsim.lanes.Lane;
 
-
 /**
  * @author dgrether
- *
  */
 public final class DatabasedSignal implements Signal {
 
-	private List<SignalizeableItem> signalizedItems = new ArrayList<SignalizeableItem>();
+  private List<SignalizeableItem> signalizedItems = new ArrayList<SignalizeableItem>();
 
-	private SignalData data;
+  private SignalData data;
 
-	public DatabasedSignal(SignalData signalData) {
-		this.data = signalData;
-	}
+  public DatabasedSignal(SignalData signalData) {
+    this.data = signalData;
+  }
 
-	@Override
-	public Id<Link> getLinkId() {
-		return this.data.getLinkId();
-	}
+  @Override
+  public Id<Link> getLinkId() {
+    return this.data.getLinkId();
+  }
 
-	@Override
-	public void setState(SignalGroupState state) {
-		if (this.data.getTurningMoveRestrictions() == null || this.data.getTurningMoveRestrictions().isEmpty()){
-			for (SignalizeableItem item : this.signalizedItems){
-				item.setSignalStateAllTurningMoves(state);
-			}
-		}
-		else {
-			for (SignalizeableItem item : this.signalizedItems){
-				for (Id<Link> toLinkId : this.data.getTurningMoveRestrictions()) {
-					item.setSignalStateForTurningMove(state, toLinkId);
-				}
-			}
-		}
-	}
+  @Override
+  public void setState(SignalGroupState state) {
+    if (this.data.getTurningMoveRestrictions() == null
+        || this.data.getTurningMoveRestrictions().isEmpty()) {
+      for (SignalizeableItem item : this.signalizedItems) {
+        item.setSignalStateAllTurningMoves(state);
+      }
+    } else {
+      for (SignalizeableItem item : this.signalizedItems) {
+        for (Id<Link> toLinkId : this.data.getTurningMoveRestrictions()) {
+          item.setSignalStateForTurningMove(state, toLinkId);
+        }
+      }
+    }
+  }
 
-	
-	@Override
-	public void addSignalizeableItem(SignalizeableItem signalizedItem) {
-		this.signalizedItems.add(signalizedItem);
-	}
+  @Override
+  public void addSignalizeableItem(SignalizeableItem signalizedItem) {
+    this.signalizedItems.add(signalizedItem);
+  }
 
-	@Override
-	public Set<Id<Lane>> getLaneIds() {
-		return this.data.getLaneIds();
-	}
+  @Override
+  public Set<Id<Lane>> getLaneIds() {
+    return this.data.getLaneIds();
+  }
 
-	@Override
-	public Id<Signal> getId() {
-		return this.data.getId();
-	}
+  @Override
+  public Id<Signal> getId() {
+    return this.data.getId();
+  }
 
-	@Override
-	public Collection<SignalizeableItem> getSignalizeableItems() {
-		return this.signalizedItems;
-	}
-
-
+  @Override
+  public Collection<SignalizeableItem> getSignalizeableItems() {
+    return this.signalizedItems;
+  }
 }

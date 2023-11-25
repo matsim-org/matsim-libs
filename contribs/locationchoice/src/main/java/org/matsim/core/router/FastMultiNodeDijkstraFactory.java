@@ -22,7 +22,6 @@ package org.matsim.core.router;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.ArrayRoutingNetworkFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -36,51 +35,57 @@ import org.matsim.core.router.util.TravelTime;
 
 public class FastMultiNodeDijkstraFactory implements LeastCostPathCalculatorFactory {
 
-	private final boolean searchAllEndNodes;
-	private final boolean usePreProcessData;
-	private final RoutingNetworkFactory routingNetworkFactory;
-	private final Map<Network, RoutingNetwork> routingNetworks = new HashMap<>();
-	private final Map<Network, PreProcessDijkstra> preProcessData = new HashMap<>();
+  private final boolean searchAllEndNodes;
+  private final boolean usePreProcessData;
+  private final RoutingNetworkFactory routingNetworkFactory;
+  private final Map<Network, RoutingNetwork> routingNetworks = new HashMap<>();
+  private final Map<Network, PreProcessDijkstra> preProcessData = new HashMap<>();
 
-	public FastMultiNodeDijkstraFactory() {
-		this(false);
-	}
+  public FastMultiNodeDijkstraFactory() {
+    this(false);
+  }
 
-	public FastMultiNodeDijkstraFactory(boolean searchAllEndNodes) {
-		this(false, searchAllEndNodes);
-	}
+  public FastMultiNodeDijkstraFactory(boolean searchAllEndNodes) {
+    this(false, searchAllEndNodes);
+  }
 
-	public FastMultiNodeDijkstraFactory(final boolean usePreProcessData, final boolean searchAllEndNodes) {
-		this.usePreProcessData = usePreProcessData;
-		this.searchAllEndNodes = searchAllEndNodes;
-		this.routingNetworkFactory = new ArrayRoutingNetworkFactory();
-	}
+  public FastMultiNodeDijkstraFactory(
+      final boolean usePreProcessData, final boolean searchAllEndNodes) {
+    this.usePreProcessData = usePreProcessData;
+    this.searchAllEndNodes = searchAllEndNodes;
+    this.routingNetworkFactory = new ArrayRoutingNetworkFactory();
+  }
 
-	@Override
-	public synchronized LeastCostPathCalculator createPathCalculator(final Network network,
-			final TravelDisutility travelCosts, final TravelTime travelTimes) {
+  @Override
+  public synchronized LeastCostPathCalculator createPathCalculator(
+      final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
 
-		RoutingNetwork routingNetwork = this.routingNetworks.get(network);
-		PreProcessDijkstra preProcessDijkstra = this.preProcessData.get(network);
+    RoutingNetwork routingNetwork = this.routingNetworks.get(network);
+    PreProcessDijkstra preProcessDijkstra = this.preProcessData.get(network);
 
-		if (routingNetwork == null) {
-			routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
+    if (routingNetwork == null) {
+      routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
 
-			if (this.usePreProcessData) {
-				preProcessDijkstra = new PreProcessDijkstra();
-				preProcessDijkstra.run(network);
-				this.preProcessData.put(network, preProcessDijkstra);
+      if (this.usePreProcessData) {
+        preProcessDijkstra = new PreProcessDijkstra();
+        preProcessDijkstra.run(network);
+        this.preProcessData.put(network, preProcessDijkstra);
 
-				for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
-					node.setDeadEndData(preProcessDijkstra.getNodeData(node.getNode()));
-				}
-			}
+        for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
+          node.setDeadEndData(preProcessDijkstra.getNodeData(node.getNode()));
+        }
+      }
 
-			this.routingNetworks.put(network, routingNetwork);
-		}
-		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
+      this.routingNetworks.put(network, routingNetwork);
+    }
+    FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
 
-		return new FastMultiNodeDijkstra(routingNetwork, travelCosts, travelTimes, preProcessDijkstra,
-				fastRouterFactory, this.searchAllEndNodes);
-	}
+    return new FastMultiNodeDijkstra(
+        routingNetwork,
+        travelCosts,
+        travelTimes,
+        preProcessDijkstra,
+        fastRouterFactory,
+        this.searchAllEndNodes);
+  }
 }

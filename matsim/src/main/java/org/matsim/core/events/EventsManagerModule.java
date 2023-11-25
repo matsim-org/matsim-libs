@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * EventsManagerModule.java
@@ -19,41 +18,41 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.events;
+package org.matsim.core.events;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import java.util.Set;
 import org.apache.commons.lang3.BooleanUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.handler.EventHandler;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-import java.util.Set;
-
 public final class EventsManagerModule extends AbstractModule {
 
-	@Override
-	public void install() {
-		if (BooleanUtils.isTrue(getConfig().eventsManager().getOneThreadPerHandler())) {
-			bindEventsManager().to(ParallelEventsManager.class).in(Singleton.class);
-		} else if (getConfig().eventsManager().getNumberOfThreads() != null) {
-			if (BooleanUtils.isTrue(getConfig().eventsManager().getSynchronizeOnSimSteps())) {
-				bindEventsManager().to(SimStepParallelEventsManagerImpl.class).in(Singleton.class);
-			} else {
-				bindEventsManager().to(ParallelEventsManagerImpl.class).in(Singleton.class);
-			}
-		} else {
-			bindEventsManager().to(SimStepParallelEventsManagerImpl.class).in(Singleton.class);
-		}
-		bind(EventHandlerRegistrator.class).asEagerSingleton();
-	}
+  @Override
+  public void install() {
+    if (BooleanUtils.isTrue(getConfig().eventsManager().getOneThreadPerHandler())) {
+      bindEventsManager().to(ParallelEventsManager.class).in(Singleton.class);
+    } else if (getConfig().eventsManager().getNumberOfThreads() != null) {
+      if (BooleanUtils.isTrue(getConfig().eventsManager().getSynchronizeOnSimSteps())) {
+        bindEventsManager().to(SimStepParallelEventsManagerImpl.class).in(Singleton.class);
+      } else {
+        bindEventsManager().to(ParallelEventsManagerImpl.class).in(Singleton.class);
+      }
+    } else {
+      bindEventsManager().to(SimStepParallelEventsManagerImpl.class).in(Singleton.class);
+    }
+    bind(EventHandlerRegistrator.class).asEagerSingleton();
+  }
 
-	public static class EventHandlerRegistrator {
-		@Inject
-		EventHandlerRegistrator(EventsManager eventsManager, Set<EventHandler> eventHandlersDeclaredByModules) {
-			for (EventHandler eventHandler : eventHandlersDeclaredByModules) {
-				eventsManager.addHandler(eventHandler);
-			}
-		}
-	}
+  public static class EventHandlerRegistrator {
+    @Inject
+    EventHandlerRegistrator(
+        EventsManager eventsManager, Set<EventHandler> eventHandlersDeclaredByModules) {
+      for (EventHandler eventHandler : eventHandlersDeclaredByModules) {
+        eventsManager.addHandler(eventHandler);
+      }
+    }
+  }
 }

@@ -20,7 +20,6 @@ package org.matsim.contrib.minibus.hook;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,35 +32,32 @@ import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
 
-
 /**
  * @author droeder
- *
  */
-abstract class AbstractPersonReRouteStuck extends AbstractPersonAlgorithm  {
-	
-	final PlanAlgorithm router;
+abstract class AbstractPersonReRouteStuck extends AbstractPersonAlgorithm {
 
-    private static final Logger log = LogManager.getLogger(PersonReRouteStuck.class);
-	
-	final Set<Id<Person>> agentsStuck;
+  final PlanAlgorithm router;
 
-	AbstractPersonReRouteStuck(final PlanAlgorithm router, final MutableScenario scenario, Set<Id<Person>> agentsStuck) {
-		super();
-		this.router = router;
-        Network network = scenario.getNetwork();
-		Network net = network;
-		if (NetworkUtils.isMultimodal(network)) {
-			log.info("Network seems to be multimodal. XY2Links will only use car links.");
-			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-			net = NetworkUtils.createNetwork(scenario.getConfig().network());
-			HashSet<String> modes = new HashSet<>();
-			modes.add(TransportMode.car);
-			filter.filter(net, modes);
-		}
-		this.agentsStuck = agentsStuck;
-		log.info("initialized");
-	}
+  private static final Logger log = LogManager.getLogger(PersonReRouteStuck.class);
 
+  final Set<Id<Person>> agentsStuck;
+
+  AbstractPersonReRouteStuck(
+      final PlanAlgorithm router, final MutableScenario scenario, Set<Id<Person>> agentsStuck) {
+    super();
+    this.router = router;
+    Network network = scenario.getNetwork();
+    Network net = network;
+    if (NetworkUtils.isMultimodal(network)) {
+      log.info("Network seems to be multimodal. XY2Links will only use car links.");
+      TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+      net = NetworkUtils.createNetwork(scenario.getConfig().network());
+      HashSet<String> modes = new HashSet<>();
+      modes.add(TransportMode.car);
+      filter.filter(net, modes);
+    }
+    this.agentsStuck = agentsStuck;
+    log.info("initialized");
+  }
 }
-

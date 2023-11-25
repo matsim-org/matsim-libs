@@ -21,6 +21,7 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import static org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiOptimizer.OneTaxiTaskType;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
@@ -36,47 +37,47 @@ import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.dynagent.IdleDynActivity;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
-import com.google.inject.Inject;
-
 /**
  * @author michalm
  */
 public final class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
-	private final PassengerHandler passengerHandler;
-	private final MobsimTimer timer;
-	private final String mobsimMode;
+  private final PassengerHandler passengerHandler;
+  private final MobsimTimer timer;
+  private final String mobsimMode;
 
-	@Inject
-	public OneTaxiActionCreator(@DvrpMode(TransportMode.taxi) PassengerHandler passengerHandler, MobsimTimer timer,
-			DvrpConfigGroup dvrpCfg) {
-		this.passengerHandler = passengerHandler;
-		this.timer = timer;
-		this.mobsimMode = dvrpCfg.mobsimMode;
-	}
+  @Inject
+  public OneTaxiActionCreator(
+      @DvrpMode(TransportMode.taxi) PassengerHandler passengerHandler,
+      MobsimTimer timer,
+      DvrpConfigGroup dvrpCfg) {
+    this.passengerHandler = passengerHandler;
+    this.timer = timer;
+    this.mobsimMode = dvrpCfg.mobsimMode;
+  }
 
-	@Override
-	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
-		Task task = vehicle.getSchedule().getCurrentTask();
-		switch ((OneTaxiTaskType)task.getTaskType()) {
-			case EMPTY_DRIVE:
-			case OCCUPIED_DRIVE:
-				return VrpLegFactory.createWithOfflineTracker(mobsimMode, vehicle, timer);
+  @Override
+  public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
+    Task task = vehicle.getSchedule().getCurrentTask();
+    switch ((OneTaxiTaskType) task.getTaskType()) {
+      case EMPTY_DRIVE:
+      case OCCUPIED_DRIVE:
+        return VrpLegFactory.createWithOfflineTracker(mobsimMode, vehicle, timer);
 
-			case PICKUP:
-				OneTaxiServeTask pickupTask = (OneTaxiServeTask)task;
-				return new SinglePassengerPickupActivity(passengerHandler, dynAgent, pickupTask,
-						pickupTask.getRequest(), "OneTaxiPickup");
+      case PICKUP:
+        OneTaxiServeTask pickupTask = (OneTaxiServeTask) task;
+        return new SinglePassengerPickupActivity(
+            passengerHandler, dynAgent, pickupTask, pickupTask.getRequest(), "OneTaxiPickup");
 
-			case DROPOFF:
-				OneTaxiServeTask dropoffTask = (OneTaxiServeTask)task;
-				return new SinglePassengerDropoffActivity(passengerHandler, dynAgent, dropoffTask,
-						dropoffTask.getRequest(), "OneTaxiDropoff");
+      case DROPOFF:
+        OneTaxiServeTask dropoffTask = (OneTaxiServeTask) task;
+        return new SinglePassengerDropoffActivity(
+            passengerHandler, dynAgent, dropoffTask, dropoffTask.getRequest(), "OneTaxiDropoff");
 
-			case WAIT:
-				return new IdleDynActivity("OneTaxiStay", task::getEndTime);
+      case WAIT:
+        return new IdleDynActivity("OneTaxiStay", task::getEndTime);
 
-			default:
-				throw new IllegalStateException();
-		}
-	}
+      default:
+        throw new IllegalStateException();
+    }
+  }
 }

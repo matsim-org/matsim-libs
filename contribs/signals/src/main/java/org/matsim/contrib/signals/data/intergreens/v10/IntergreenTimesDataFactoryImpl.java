@@ -22,16 +22,14 @@ package org.matsim.contrib.signals.data.intergreens.v10;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.SignalSystem;
 
-
 /**
  * @author dgrether
- *
  */
 final class IntergreenTimesDataFactoryImpl implements IntergreenTimesDataFactory {
 
-	@Override
-	public IntergreensForSignalSystemData createIntergreensForSignalSystem(Id<SignalSystem> signalSystemId) {
-		return new IntergreensForSignalSystemDataImpl(signalSystemId);
-	}
-
+  @Override
+  public IntergreensForSignalSystemData createIntergreensForSignalSystem(
+      Id<SignalSystem> signalSystemId) {
+    return new IntergreensForSignalSystemDataImpl(signalSystemId);
+  }
 }

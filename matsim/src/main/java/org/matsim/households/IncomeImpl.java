@@ -19,44 +19,41 @@
 
 package org.matsim.households;
 
-
-
 /**
  * @author dgrether
  */
 public class IncomeImpl implements Income {
 
-	private String currency;
-	private IncomePeriod period;
-	private double income;
-	
-	public IncomeImpl(double income, IncomePeriod period) {
-		this.period = period;
-		this.income = income;
-	}
-	
-	@Override
-	public String getCurrency() {
-		return this.currency;
-	}
+  private String currency;
+  private IncomePeriod period;
+  private double income;
 
-	@Override
-	public double getIncome() {
-		return this.income;
-	}
+  public IncomeImpl(double income, IncomePeriod period) {
+    this.period = period;
+    this.income = income;
+  }
 
-	@Override
-	public IncomePeriod getIncomePeriod() {
-		return this.period;
-	}
+  @Override
+  public String getCurrency() {
+    return this.currency;
+  }
 
-	@Override
-	public void setCurrency(String currency) {
-		this.currency = currency;
-	}
+  @Override
+  public double getIncome() {
+    return this.income;
+  }
 
-	public void setIncome(double income, IncomePeriod period) {
-		this.income = income;
-	}
-	
+  @Override
+  public IncomePeriod getIncomePeriod() {
+    return this.period;
+  }
+
+  @Override
+  public void setCurrency(String currency) {
+    this.currency = currency;
+  }
+
+  public void setIncome(double income, IncomePeriod period) {
+    this.income = income;
+  }
 }

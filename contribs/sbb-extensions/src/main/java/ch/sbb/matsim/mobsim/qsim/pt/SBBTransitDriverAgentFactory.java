@@ -33,19 +33,22 @@ import org.matsim.pt.Umlauf;
  */
 public class SBBTransitDriverAgentFactory implements TransitDriverAgentFactory {
 
-    private final Set<String> deterministicModes;
+  private final Set<String> deterministicModes;
 
-    SBBTransitDriverAgentFactory(Set<String> deterministicModes) {
-        this.deterministicModes = deterministicModes;
+  SBBTransitDriverAgentFactory(Set<String> deterministicModes) {
+    this.deterministicModes = deterministicModes;
+  }
+
+  @Override
+  public AbstractTransitDriverAgent createTransitDriver(
+      Umlauf umlauf,
+      InternalInterface internalInterface,
+      TransitStopAgentTracker transitStopAgentTracker) {
+    String mode = umlauf.getUmlaufStuecke().get(0).getRoute().getTransportMode();
+    if (this.deterministicModes.contains(mode)) {
+      return new SBBTransitDriverAgent(umlauf, mode, transitStopAgentTracker, internalInterface);
     }
-
-    @Override
-    public AbstractTransitDriverAgent createTransitDriver(Umlauf umlauf, InternalInterface internalInterface, TransitStopAgentTracker transitStopAgentTracker) {
-        String mode = umlauf.getUmlaufStuecke().get(0).getRoute().getTransportMode();
-        if (this.deterministicModes.contains(mode)) {
-            return new SBBTransitDriverAgent(umlauf, mode,transitStopAgentTracker, internalInterface);
-        }
-        return new TransitDriverAgentImpl(umlauf, TransportMode.car, transitStopAgentTracker, internalInterface);
-    }
-
+    return new TransitDriverAgentImpl(
+        umlauf, TransportMode.car, transitStopAgentTracker, internalInterface);
+  }
 }

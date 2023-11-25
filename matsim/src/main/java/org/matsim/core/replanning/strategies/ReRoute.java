@@ -19,6 +19,8 @@
 
 package org.matsim.core.replanning.strategies;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.GlobalConfigGroup;
@@ -30,21 +32,19 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-
 public class ReRoute implements Provider<PlanStrategy> {
 
-	@Inject private GlobalConfigGroup globalConfigGroup;
-	@Inject private ActivityFacilities facilities;
-	@Inject private Provider<TripRouter> tripRouterProvider;
-	@Inject private TimeInterpretation timeInterpretation;
+  @Inject private GlobalConfigGroup globalConfigGroup;
+  @Inject private ActivityFacilities facilities;
+  @Inject private Provider<TripRouter> tripRouterProvider;
+  @Inject private TimeInterpretation timeInterpretation;
 
-	@Override
-	public PlanStrategy get() {
-		Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan,Person>()) ;
-		builder.addStrategyModule(new org.matsim.core.replanning.modules.ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
-		return builder.build() ;
-	}
-
+  @Override
+  public PlanStrategy get() {
+    Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>());
+    builder.addStrategyModule(
+        new org.matsim.core.replanning.modules.ReRoute(
+            facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
+    return builder.build();
+  }
 }

@@ -19,17 +19,19 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data;
 
-
 /**
  * A place for constants to xml schemata
+ *
  * @author dgrether
  */
 public final class MatsimSignalSystemsReader {
 
-	public static final String SIGNALSYSTEMS20 = "http://www.matsim.org/files/dtd/signalSystems_v2.0.xsd";
+  public static final String SIGNALSYSTEMS20 =
+      "http://www.matsim.org/files/dtd/signalSystems_v2.0.xsd";
 
-	public static final String SIGNALGROUPS20 = "http://www.matsim.org/files/dtd/signalGroups_v2.0.xsd";
+  public static final String SIGNALGROUPS20 =
+      "http://www.matsim.org/files/dtd/signalGroups_v2.0.xsd";
 
-	public static final String SIGNALCONTROL20 = "http://www.matsim.org/files/dtd/signalControl_v2.0.xsd";
-	
+  public static final String SIGNALCONTROL20 =
+      "http://www.matsim.org/files/dtd/signalControl_v2.0.xsd";
 }

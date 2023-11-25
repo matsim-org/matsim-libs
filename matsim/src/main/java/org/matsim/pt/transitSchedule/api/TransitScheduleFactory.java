@@ -21,7 +21,6 @@
 package org.matsim.pt.transitSchedule.api;
 
 import java.util.List;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimFactory;
@@ -33,20 +32,29 @@ import org.matsim.core.utils.misc.OptionalTime;
  */
 public interface TransitScheduleFactory extends MatsimFactory {
 
-	public abstract TransitSchedule createTransitSchedule();
+  public abstract TransitSchedule createTransitSchedule();
 
-	public abstract TransitLine createTransitLine(final Id<TransitLine> lineId);
+  public abstract TransitLine createTransitLine(final Id<TransitLine> lineId);
 
-	public abstract TransitRoute createTransitRoute(final Id<TransitRoute> routeId, final NetworkRoute route, final List<TransitRouteStop> stops, final String mode);
+  public abstract TransitRoute createTransitRoute(
+      final Id<TransitRoute> routeId,
+      final NetworkRoute route,
+      final List<TransitRouteStop> stops,
+      final String mode);
 
-	public abstract TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay);
+  public abstract TransitRouteStop createTransitRouteStop(
+      final TransitStopFacility stop, final double arrivalDelay, final double departureDelay);
 
-	public abstract TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final OptionalTime arrivalDelay, final OptionalTime departureDelay);
+  public abstract TransitRouteStop createTransitRouteStop(
+      final TransitStopFacility stop,
+      final OptionalTime arrivalDelay,
+      final OptionalTime departureDelay);
 
-	public abstract TransitRouteStop.Builder<?> createTransitRouteStopBuilder(final TransitStopFacility stop);
+  public abstract TransitRouteStop.Builder<?> createTransitRouteStopBuilder(
+      final TransitStopFacility stop);
 
-	public abstract TransitStopFacility createTransitStopFacility(final Id<TransitStopFacility> facilityId, final Coord coordinate, final boolean blocksLane);
+  public abstract TransitStopFacility createTransitStopFacility(
+      final Id<TransitStopFacility> facilityId, final Coord coordinate, final boolean blocksLane);
 
-	public abstract Departure createDeparture(final Id<Departure> departureId, final double time);
-
+  public abstract Departure createDeparture(final Id<Departure> departureId, final double time);
 }

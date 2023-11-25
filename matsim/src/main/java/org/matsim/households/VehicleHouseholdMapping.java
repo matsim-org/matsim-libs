@@ -20,38 +20,34 @@
 package org.matsim.households;
 
 import java.util.Map;
-
 import javax.annotation.Nullable;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.vehicles.Vehicle;
 
 /**
  * Tiny helper to get the household associated with a vehicle's id.
- * 
- * @author dgrether
  *
+ * @author dgrether
  */
 public class VehicleHouseholdMapping {
 
-	private final Map<Id<Vehicle>, Household> vhMap = new IdMap<>(Vehicle.class);
+  private final Map<Id<Vehicle>, Household> vhMap = new IdMap<>(Vehicle.class);
 
-	public VehicleHouseholdMapping(Households hhs) {
-		this.reinitialize(hhs);
-	}
+  public VehicleHouseholdMapping(Households hhs) {
+    this.reinitialize(hhs);
+  }
 
-	public void reinitialize(Households hhs) {
-		this.vhMap.clear();
-		for (Household h : hhs.getHouseholds().values()) {
-			for (Id<Vehicle> vehicle : h.getVehicleIds()) {
-				this.vhMap.put(vehicle, h);
-			}
-		}
-	}
+  public void reinitialize(Households hhs) {
+    this.vhMap.clear();
+    for (Household h : hhs.getHouseholds().values()) {
+      for (Id<Vehicle> vehicle : h.getVehicleIds()) {
+        this.vhMap.put(vehicle, h);
+      }
+    }
+  }
 
-	public @Nullable Household getHousehold(Id<Vehicle> vehicleId) {
-		return this.vhMap.get(vehicleId);
-	}
-
+  public @Nullable Household getHousehold(Id<Vehicle> vehicleId) {
+    return this.vhMap.get(vehicleId);
+  }
 }

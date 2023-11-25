@@ -20,22 +20,18 @@
 
 package org.matsim.core.trafficmonitoring;
 
-/**
- *  Returns the travel time that is stored in the TravelTimeData objects without modification. 
- *
- */
+/** Returns the travel time that is stored in the TravelTimeData objects without modification. */
 class AveragingTravelTimeGetter implements TravelTimeGetter {
 
-	private TimeSlotComputation travelTimeAggregator;
-	
-	public AveragingTravelTimeGetter( TimeSlotComputation travelTimeAggregator ) {
-		this.travelTimeAggregator = travelTimeAggregator;		
-	}
-	
-	@Override
-	public double getTravelTime(TravelTimeData travelTimeData, double time) {
-		final int timeSlot = travelTimeAggregator.getTimeSlotIndex(time);
-		return travelTimeData.getTravelTime(timeSlot, time);
-	}
+  private TimeSlotComputation travelTimeAggregator;
 
+  public AveragingTravelTimeGetter(TimeSlotComputation travelTimeAggregator) {
+    this.travelTimeAggregator = travelTimeAggregator;
+  }
+
+  @Override
+  public double getTravelTime(TravelTimeData travelTimeData, double time) {
+    final int timeSlot = travelTimeAggregator.getTimeSlotIndex(time);
+    return travelTimeData.getTravelTime(timeSlot, time);
+  }
 }

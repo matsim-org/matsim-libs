@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.stream.Stream;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -49,110 +48,129 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
  * @author michalm
  */
 public class DefaultDrtOptimizer implements DrtOptimizer {
-	private static final Logger log = LogManager.getLogger(DefaultDrtOptimizer.class);
+  private static final Logger log = LogManager.getLogger(DefaultDrtOptimizer.class);
 
-	private final DrtConfigGroup drtCfg;
-	private final Integer rebalancingInterval;
-	private final Fleet fleet;
-	private final DrtScheduleInquiry scheduleInquiry;
-	private final ScheduleTimingUpdater scheduleTimingUpdater;
-	private final RebalancingStrategy rebalancingStrategy;
-	private final MobsimTimer mobsimTimer;
-	private final DepotFinder depotFinder;
-	private final EmptyVehicleRelocator relocator;
-	private final UnplannedRequestInserter requestInserter;
-	private final DrtRequestInsertionRetryQueue insertionRetryQueue;
+  private final DrtConfigGroup drtCfg;
+  private final Integer rebalancingInterval;
+  private final Fleet fleet;
+  private final DrtScheduleInquiry scheduleInquiry;
+  private final ScheduleTimingUpdater scheduleTimingUpdater;
+  private final RebalancingStrategy rebalancingStrategy;
+  private final MobsimTimer mobsimTimer;
+  private final DepotFinder depotFinder;
+  private final EmptyVehicleRelocator relocator;
+  private final UnplannedRequestInserter requestInserter;
+  private final DrtRequestInsertionRetryQueue insertionRetryQueue;
 
-	private final Queue<DrtRequest> unplannedRequests = new LinkedList<>();
+  private final Queue<DrtRequest> unplannedRequests = new LinkedList<>();
 
-	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer, DepotFinder depotFinder,
-			RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry, ScheduleTimingUpdater scheduleTimingUpdater,
-			EmptyVehicleRelocator relocator, UnplannedRequestInserter requestInserter, DrtRequestInsertionRetryQueue insertionRetryQueue) {
-		this.drtCfg = drtCfg;
-		this.fleet = fleet;
-		this.mobsimTimer = mobsimTimer;
-		this.depotFinder = depotFinder;
-		this.rebalancingStrategy = rebalancingStrategy;
-		this.scheduleInquiry = scheduleInquiry;
-		this.scheduleTimingUpdater = scheduleTimingUpdater;
-		this.relocator = relocator;
-		this.requestInserter = requestInserter;
-		this.insertionRetryQueue = insertionRetryQueue;
+  public DefaultDrtOptimizer(
+      DrtConfigGroup drtCfg,
+      Fleet fleet,
+      MobsimTimer mobsimTimer,
+      DepotFinder depotFinder,
+      RebalancingStrategy rebalancingStrategy,
+      DrtScheduleInquiry scheduleInquiry,
+      ScheduleTimingUpdater scheduleTimingUpdater,
+      EmptyVehicleRelocator relocator,
+      UnplannedRequestInserter requestInserter,
+      DrtRequestInsertionRetryQueue insertionRetryQueue) {
+    this.drtCfg = drtCfg;
+    this.fleet = fleet;
+    this.mobsimTimer = mobsimTimer;
+    this.depotFinder = depotFinder;
+    this.rebalancingStrategy = rebalancingStrategy;
+    this.scheduleInquiry = scheduleInquiry;
+    this.scheduleTimingUpdater = scheduleTimingUpdater;
+    this.relocator = relocator;
+    this.requestInserter = requestInserter;
+    this.insertionRetryQueue = insertionRetryQueue;
 
-		rebalancingInterval = drtCfg.getRebalancingParams().map(rebalancingParams -> rebalancingParams.interval).orElse(null);
-	}
+    rebalancingInterval =
+        drtCfg
+            .getRebalancingParams()
+            .map(rebalancingParams -> rebalancingParams.interval)
+            .orElse(null);
+  }
 
-	@Override
-	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
-		boolean scheduleTimingUpdated = false;
-		if (!unplannedRequests.isEmpty() || insertionRetryQueue.hasRequestsToRetryNow(e.getSimulationTime())) {
-			for (DvrpVehicle v : fleet.getVehicles().values()) {
-				scheduleTimingUpdater.updateTimings(v);
-			}
-			scheduleTimingUpdated = true;
+  @Override
+  public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
+    boolean scheduleTimingUpdated = false;
+    if (!unplannedRequests.isEmpty()
+        || insertionRetryQueue.hasRequestsToRetryNow(e.getSimulationTime())) {
+      for (DvrpVehicle v : fleet.getVehicles().values()) {
+        scheduleTimingUpdater.updateTimings(v);
+      }
+      scheduleTimingUpdated = true;
 
-			requestInserter.scheduleUnplannedRequests(unplannedRequests);
-		}
+      requestInserter.scheduleUnplannedRequests(unplannedRequests);
+    }
 
-		relocateVehiclesToDepot(drtCfg.returnToDepotEvaluationInterval, drtCfg.returnToDepotTimeout);
-		if (rebalancingInterval != null && e.getSimulationTime() % rebalancingInterval == 0) {
-			if (!scheduleTimingUpdated) {
-				for (DvrpVehicle v : fleet.getVehicles().values()) {
-					scheduleTimingUpdater.updateTimings(v);
-				}
-			}
+    relocateVehiclesToDepot(drtCfg.returnToDepotEvaluationInterval, drtCfg.returnToDepotTimeout);
+    if (rebalancingInterval != null && e.getSimulationTime() % rebalancingInterval == 0) {
+      if (!scheduleTimingUpdated) {
+        for (DvrpVehicle v : fleet.getVehicles().values()) {
+          scheduleTimingUpdater.updateTimings(v);
+        }
+      }
 
-			rebalanceFleet();
-		}
-	}
+      rebalanceFleet();
+    }
+  }
 
-	private void rebalanceFleet() {
-		// right now we relocate only idle vehicles (vehicles that are being relocated cannot be relocated)
-		Stream<? extends DvrpVehicle> rebalancableVehicles = fleet.getVehicles().values().stream().filter(scheduleInquiry::isIdle);
-		List<Relocation> relocations = rebalancingStrategy.calcRelocations(rebalancableVehicles, mobsimTimer.getTimeOfDay());
+  private void rebalanceFleet() {
+    // right now we relocate only idle vehicles (vehicles that are being relocated cannot be
+    // relocated)
+    Stream<? extends DvrpVehicle> rebalancableVehicles =
+        fleet.getVehicles().values().stream().filter(scheduleInquiry::isIdle);
+    List<Relocation> relocations =
+        rebalancingStrategy.calcRelocations(rebalancableVehicles, mobsimTimer.getTimeOfDay());
 
-		if (!relocations.isEmpty()) {
-			log.debug("Fleet rebalancing: #relocations=" + relocations.size());
-			for (Relocation r : relocations) {
-				Link currentLink = ((DrtStayTask)r.vehicle.getSchedule().getCurrentTask()).getLink();
-				if (currentLink != r.link) {
-					relocator.relocateVehicle(r.vehicle, r.link, EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE);
-				}
-			}
-		}
-	}
+    if (!relocations.isEmpty()) {
+      log.debug("Fleet rebalancing: #relocations=" + relocations.size());
+      for (Relocation r : relocations) {
+        Link currentLink = ((DrtStayTask) r.vehicle.getSchedule().getCurrentTask()).getLink();
+        if (currentLink != r.link) {
+          relocator.relocateVehicle(
+              r.vehicle, r.link, EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE);
+        }
+      }
+    }
+  }
 
-	@Override
-	public void requestSubmitted(Request request) {
-		unplannedRequests.add((DrtRequest)request);
-	}
+  @Override
+  public void requestSubmitted(Request request) {
+    unplannedRequests.add((DrtRequest) request);
+  }
 
-	@Override
-	public void nextTask(DvrpVehicle vehicle) {
-		scheduleTimingUpdater.updateBeforeNextTask(vehicle);
-		vehicle.getSchedule().nextTask();
-	}
+  @Override
+  public void nextTask(DvrpVehicle vehicle) {
+    scheduleTimingUpdater.updateBeforeNextTask(vehicle);
+    vehicle.getSchedule().nextTask();
+  }
 
-	private void relocateVehiclesToDepot(double evaluationInterval, double timeout) {
-		if (drtCfg.idleVehiclesReturnToDepots && mobsimTimer.getTimeOfDay() % evaluationInterval == 0) {
-			fleet.getVehicles().values().stream()
-				.filter(scheduleInquiry::isIdle)
-				.filter(v -> stayTimeoutExceeded(v, timeout))
-				.forEach(v -> {
-					Link depotLink = depotFinder.findDepot(v);
-					if (depotLink != null) {
-						relocator.relocateVehicle(v, depotLink, EmptyVehicleRelocator.RELOCATE_VEHICLE_TO_DEPOT_TASK_TYPE);
-					}
-				});
-		}
-	}
+  private void relocateVehiclesToDepot(double evaluationInterval, double timeout) {
+    if (drtCfg.idleVehiclesReturnToDepots && mobsimTimer.getTimeOfDay() % evaluationInterval == 0) {
+      fleet.getVehicles().values().stream()
+          .filter(scheduleInquiry::isIdle)
+          .filter(v -> stayTimeoutExceeded(v, timeout))
+          .forEach(
+              v -> {
+                Link depotLink = depotFinder.findDepot(v);
+                if (depotLink != null) {
+                  relocator.relocateVehicle(
+                      v, depotLink, EmptyVehicleRelocator.RELOCATE_VEHICLE_TO_DEPOT_TASK_TYPE);
+                }
+              });
+    }
+  }
 
-	boolean stayTimeoutExceeded(DvrpVehicle vehicle, double timeout) {
-		if (STAY.isBaseTypeOf(vehicle.getSchedule().getCurrentTask())) {
-			double now = mobsimTimer.getTimeOfDay();
-			double taskStart = vehicle.getSchedule().getCurrentTask().getBeginTime();
-			return (now - taskStart) > timeout;
-		}
-		return false;
-	}
+  boolean stayTimeoutExceeded(DvrpVehicle vehicle, double timeout) {
+    if (STAY.isBaseTypeOf(vehicle.getSchedule().getCurrentTask())) {
+      double now = mobsimTimer.getTimeOfDay();
+      double taskStart = vehicle.getSchedule().getCurrentTask().getBeginTime();
+      return (now - taskStart) > timeout;
+    }
+    return false;
+  }
 }

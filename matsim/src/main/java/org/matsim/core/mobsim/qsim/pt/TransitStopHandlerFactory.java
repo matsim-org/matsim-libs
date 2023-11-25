@@ -27,6 +27,5 @@ import org.matsim.vehicles.Vehicle;
  */
 public interface TransitStopHandlerFactory extends MatsimFactory {
 
-	public TransitStopHandler createTransitStopHandler(Vehicle vehicle);
-
+  public TransitStopHandler createTransitStopHandler(Vehicle vehicle);
 }

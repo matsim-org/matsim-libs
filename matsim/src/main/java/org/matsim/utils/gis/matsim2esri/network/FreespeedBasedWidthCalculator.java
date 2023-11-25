@@ -25,16 +25,14 @@ import org.matsim.api.core.v01.network.Network;
 
 public class FreespeedBasedWidthCalculator implements WidthCalculator {
 
-	private final Double widthCoefficient;
+  private final Double widthCoefficient;
 
-	public FreespeedBasedWidthCalculator(final Network network, final Double coef) {
-		this.widthCoefficient = coef;
-	}
+  public FreespeedBasedWidthCalculator(final Network network, final Double coef) {
+    this.widthCoefficient = coef;
+  }
 
-	@Override
-	public double getWidth(final Link link) {
-		return link.getFreespeed() * this.widthCoefficient;
-	}
-
-
+  @Override
+  public double getWidth(final Link link) {
+    return link.getFreespeed() * this.widthCoefficient;
+  }
 }

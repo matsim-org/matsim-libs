@@ -25,13 +25,13 @@ import org.matsim.core.router.util.PreProcessDijkstra.DeadEndData;
 
 public interface RoutingNetworkNode extends Node {
 
-	public Node getNode();
+  public Node getNode();
 
-	public void setOutLinksArray(RoutingNetworkLink[] outLinks);
+  public void setOutLinksArray(RoutingNetworkLink[] outLinks);
 
-	public RoutingNetworkLink[] getOutLinksArray();
+  public RoutingNetworkLink[] getOutLinksArray();
 
-	public void setDeadEndData(DeadEndData deadEndData);
+  public void setDeadEndData(DeadEndData deadEndData);
 
-	public DeadEndData getDeadEndData();
+  public DeadEndData getDeadEndData();
 }

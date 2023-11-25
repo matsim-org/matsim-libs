@@ -19,7 +19,6 @@
 package org.matsim.core.network;
 
 import java.util.Collection;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -27,18 +26,16 @@ import org.matsim.core.utils.collections.QuadTree;
 
 /**
  * @author nagel
- *
  */
 public interface SearchableNetwork {
 
-	Link getNearestLinkExactly(Coord coord);
+  Link getNearestLinkExactly(Coord coord);
 
-	Node getNearestNode(Coord coord);
+  Node getNearestNode(Coord coord);
 
-	Collection<Node> getNearestNodes(Coord coord, double distance);
+  Collection<Node> getNearestNodes(Coord coord, double distance);
 
-	QuadTree<Node> getNodeQuadTree();
+  QuadTree<Node> getNodeQuadTree();
 
-	LinkQuadTree getLinkQuadTree();
-
+  LinkQuadTree getLinkQuadTree();
 }

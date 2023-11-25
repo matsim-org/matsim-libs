@@ -21,31 +21,26 @@ package playground.vsp.analysis.modules.ptTripAnalysis.traveltime;
 
 import java.util.ArrayList;
 import java.util.Collection;
-
 import org.matsim.api.core.v01.population.PlanElement;
-
 import playground.vsp.analysis.modules.ptTripAnalysis.AbstractPlan2TripsFilter;
 
 /**
  * @author droeder
- *
  */
-public class Plan2TripsFilter extends AbstractPlan2TripsFilter{
-	
-	private Collection<String> networkmodes;
-	private Collection<String> ptModes;
-	
-	public Plan2TripsFilter(Collection<String> ptModes, Collection<String> networkModes) {
-		this.ptModes = ptModes;
-		this.networkmodes = networkModes;
-	}
+public class Plan2TripsFilter extends AbstractPlan2TripsFilter {
 
-	@Override
-	protected TTAnalysisTrip generateTrip(ArrayList<PlanElement> elements) {
-		TTAnalysisTrip trip = new TTAnalysisTrip(this.ptModes, this.networkmodes);
-		trip.addElements(elements);
-		return trip;
-	}
-	
+  private Collection<String> networkmodes;
+  private Collection<String> ptModes;
 
+  public Plan2TripsFilter(Collection<String> ptModes, Collection<String> networkModes) {
+    this.ptModes = ptModes;
+    this.networkmodes = networkModes;
+  }
+
+  @Override
+  protected TTAnalysisTrip generateTrip(ArrayList<PlanElement> elements) {
+    TTAnalysisTrip trip = new TTAnalysisTrip(this.ptModes, this.networkmodes);
+    trip.addElements(elements);
+    return trip;
+  }
 }

@@ -21,95 +21,85 @@ package org.matsim.contrib.dvrp.schedule;
 
 import java.util.List;
 import java.util.stream.Stream;
-
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 
 /**
- * A Schedule contains Tasks. <br/>
- * <br/>
+ * A Schedule contains Tasks. <br>
+ * <br>
  * Design comments:
+ *
  * <ul>
- * <li>This interface makes fairly strong assumptions on its implementation. I am wondering a bit if the design purpose
- * might not be better expressed by removing the interfaces and simply have the implementation. kai, feb'17
- * <li>I am happy with Task as an interface. Otherwise casts like (List<DrtTask>)getTasks() would not work (directly).
- * michalm, aug'17
+ *   <li>This interface makes fairly strong assumptions on its implementation. I am wondering a bit
+ *       if the design purpose might not be better expressed by removing the interfaces and simply
+ *       have the implementation. kai, feb'17
+ *   <li>I am happy with Task as an interface. Otherwise casts like (List<DrtTask>)getTasks() would
+ *       not work (directly). michalm, aug'17
  * </ul>
  *
  * @author michalm
  * @author (of documentation) nagel
  */
 public interface Schedule {
-	static Schedule create(DvrpVehicleSpecification vehicleSpecification) {
-		return new ScheduleImpl(vehicleSpecification);
-	}
+  static Schedule create(DvrpVehicleSpecification vehicleSpecification) {
+    return new ScheduleImpl(vehicleSpecification);
+  }
 
-	enum ScheduleStatus {
-		UNPLANNED, PLANNED, STARTED, COMPLETED
-	}
+  enum ScheduleStatus {
+    UNPLANNED,
+    PLANNED,
+    STARTED,
+    COMPLETED
+  }
 
-	/**
-	 * Tasks in the schedule.
-	 */
-	List<? extends Task> getTasks();// unmodifiableList
+  /** Tasks in the schedule. */
+  List<? extends Task> getTasks(); // unmodifiableList
 
-	/**
-	 * Stream of tasks in the schedule.
-	 */
-	Stream<? extends Task> tasks();
+  /** Stream of tasks in the schedule. */
+  Stream<? extends Task> tasks();
 
-	/**
-	 * Shortcut to getTasks().size()
-	 */
-	int getTaskCount();
+  /** Shortcut to getTasks().size() */
+  int getTaskCount();
 
-	/**
-	 * Pointer to current task.
-	 */
-	Task getCurrentTask();
+  /** Pointer to current task. */
+  Task getCurrentTask();
 
-	/**
-	 * A Task can be planned, started, and done. A schedule can in addition be unplanned. And the naming is a bit
-	 * different.
-	 */
-	ScheduleStatus getStatus();
+  /**
+   * A Task can be planned, started, and done. A schedule can in addition be unplanned. And the
+   * naming is a bit different.
+   */
+  ScheduleStatus getStatus();
 
-	/**
-	 * Returns the begin time of the initial task, or fails if the Schedule is unplanned.
-	 */
-	double getBeginTime();
+  /** Returns the begin time of the initial task, or fails if the Schedule is unplanned. */
+  double getBeginTime();
 
-	/**
-	 * Returns the end time of the final task, or fails if the Schedule is unplanned.
-	 */
-	double getEndTime();
+  /** Returns the end time of the final task, or fails if the Schedule is unplanned. */
+  double getEndTime();
 
-	// schedule modification functionality:
+  // schedule modification functionality:
 
-	/**
-	 * Add a Task to the Schedule.
-	 */
-	void addTask(Task task);
+  /** Add a Task to the Schedule. */
+  void addTask(Task task);
 
-	/**
-	 * Insert a Task into the Schedule at the specified position. The method should re-set all task indices of those
-	 * tasks that are moved.
-	 */
-	void addTask(int taskIdx, Task task);
+  /**
+   * Insert a Task into the Schedule at the specified position. The method should re-set all task
+   * indices of those tasks that are moved.
+   */
+  void addTask(int taskIdx, Task task);
 
-	/**
-	 * Does what it says.
-	 */
-	void removeLastTask();
+  /** Does what it says. */
+  void removeLastTask();
 
-	/**
-	 * Remove a Task from the Schedule at the specified position. The method should re-set all task indices of those
-	 * tasks that are moved.
-	 */
-	void removeTask(Task task);
+  /**
+   * Remove a Task from the Schedule at the specified position. The method should re-set all task
+   * indices of those tasks that are moved.
+   */
+  void removeTask(Task task);
 
-	/**
-	 * This behaves a bit like it.next() in collections: It moves to the next task, makes it the current one, and
-	 * returns it. If no task is left, it sets the Schedule to completed and returns null.
-	 */
-	Task nextTask();// this one seems synchronous (will be executed when switching between DynActions)
+  /**
+   * This behaves a bit like it.next() in collections: It moves to the next task, makes it the
+   * current one, and returns it. If no task is left, it sets the Schedule to completed and returns
+   * null.
+   */
+  Task
+      nextTask(); // this one seems synchronous (will be executed when switching between DynActions)
 }

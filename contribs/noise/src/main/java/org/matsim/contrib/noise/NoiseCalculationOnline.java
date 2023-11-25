@@ -17,11 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
+/** */
 package org.matsim.contrib.noise;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -31,49 +30,45 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 
-import com.google.inject.Inject;
-
-
 /**
- *
  * @author ikaddoura
- *
  */
-final class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsimListener, StartupListener {
-	private static final Logger log = LogManager.getLogger(NoiseCalculationOnline.class);
+final class NoiseCalculationOnline
+    implements BeforeMobsimListener, AfterMobsimListener, StartupListener {
+  private static final Logger log = LogManager.getLogger(NoiseCalculationOnline.class);
 
-	@Inject
-	private NoiseContext noiseContext;
+  @Inject private NoiseContext noiseContext;
 
-	@Inject
-	private NoiseTimeTracker timeTracker;
+  @Inject private NoiseTimeTracker timeTracker;
 
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		NoiseWriter.writeReceiverPoints(noiseContext, event.getServices().getConfig().controller().getOutputDirectory() + "/receiverPoints/", false);
-	}
+  @Override
+  public void notifyStartup(StartupEvent event) {
+    NoiseWriter.writeReceiverPoints(
+        noiseContext,
+        event.getServices().getConfig().controller().getOutputDirectory() + "/receiverPoints/",
+        false);
+  }
 
-	@Override
-	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+  @Override
+  public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 
-		log.info("Resetting noise immissions, activity information and damages...");
+    log.info("Resetting noise immissions, activity information and damages...");
 
-		this.noiseContext.getNoiseLinks().clear();
-		this.noiseContext.getTimeInterval2linkId2noiseLinks().clear();
+    this.noiseContext.getNoiseLinks().clear();
+    this.noiseContext.getTimeInterval2linkId2noiseLinks().clear();
 
-		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-			rp.reset();
-		}
-	}
+    for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
+      rp.reset();
+    }
+  }
 
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		timeTracker.computeFinalTimeIntervals();
-		log.info("Noise calculation completed.");
-	}
+  @Override
+  public void notifyAfterMobsim(AfterMobsimEvent event) {
+    timeTracker.computeFinalTimeIntervals();
+    log.info("Noise calculation completed.");
+  }
 
-	NoiseContext getNoiseContext() {
-		return noiseContext;
-	}
-
+  NoiseContext getNoiseContext() {
+    return noiseContext;
+  }
 }

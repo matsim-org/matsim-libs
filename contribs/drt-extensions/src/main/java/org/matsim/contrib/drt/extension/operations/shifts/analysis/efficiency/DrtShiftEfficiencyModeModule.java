@@ -21,24 +21,28 @@ import org.matsim.core.controler.MatsimServices;
  */
 public class DrtShiftEfficiencyModeModule extends AbstractDvrpModeModule {
 
-    private final DrtConfigGroup drtConfigGroup;
+  private final DrtConfigGroup drtConfigGroup;
 
-    public DrtShiftEfficiencyModeModule(DrtConfigGroup drtConfigGroup) {
-        super(drtConfigGroup.getMode());
-        this.drtConfigGroup = drtConfigGroup;
-    }
+  public DrtShiftEfficiencyModeModule(DrtConfigGroup drtConfigGroup) {
+    super(drtConfigGroup.getMode());
+    this.drtConfigGroup = drtConfigGroup;
+  }
 
-    @Override
-    public void install() {
-        bindModal(ShiftEfficiencyTracker.class).toProvider(modalProvider(getter ->
-                new ShiftEfficiencyTracker())).asEagerSingleton();
-        addEventHandlerBinding().to(modalKey(ShiftEfficiencyTracker.class));
-		bindModal(ShiftEfficiencyAnalysisControlerListener.class).toProvider(modalProvider(getter ->
-						new ShiftEfficiencyAnalysisControlerListener(drtConfigGroup,
-								getter.getModal(ShiftEfficiencyTracker.class),
-								getter.getModal(new TypeLiteral<Provider<DrtShiftsSpecification>>(){}),
-								getter.get(MatsimServices.class))
-		));
-        addControlerListenerBinding().to(modalKey(ShiftEfficiencyAnalysisControlerListener.class));
-    }
+  @Override
+  public void install() {
+    bindModal(ShiftEfficiencyTracker.class)
+        .toProvider(modalProvider(getter -> new ShiftEfficiencyTracker()))
+        .asEagerSingleton();
+    addEventHandlerBinding().to(modalKey(ShiftEfficiencyTracker.class));
+    bindModal(ShiftEfficiencyAnalysisControlerListener.class)
+        .toProvider(
+            modalProvider(
+                getter ->
+                    new ShiftEfficiencyAnalysisControlerListener(
+                        drtConfigGroup,
+                        getter.getModal(ShiftEfficiencyTracker.class),
+                        getter.getModal(new TypeLiteral<Provider<DrtShiftsSpecification>>() {}),
+                        getter.get(MatsimServices.class))));
+    addControlerListenerBinding().to(modalKey(ShiftEfficiencyAnalysisControlerListener.class));
+  }
 }

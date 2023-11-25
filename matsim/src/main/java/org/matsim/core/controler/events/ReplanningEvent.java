@@ -29,12 +29,11 @@ import org.matsim.core.replanning.ReplanningContext;
  * @author mrieser
  */
 public final class ReplanningEvent extends AbstractIterationEvent {
-	public ReplanningEvent(MatsimServices services, int iteration, boolean isLastIteration) {
-		super(services, iteration, isLastIteration);
-	}
+  public ReplanningEvent(MatsimServices services, int iteration, boolean isLastIteration) {
+    super(services, iteration, isLastIteration);
+  }
 
-	public ReplanningContext getReplanningContext() {
-		return services.getInjector().getInstance(ReplanningContext.class);
-	}
-
+  public ReplanningContext getReplanningContext() {
+    return services.getInjector().getInstance(ReplanningContext.class);
+  }
 }

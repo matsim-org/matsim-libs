@@ -20,13 +20,12 @@
 
 package org.matsim.contrib.drt.routing;
 
-import org.matsim.api.core.v01.Id;
-
 import com.google.common.collect.ImmutableMap;
+import org.matsim.api.core.v01.Id;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public interface DrtStopNetwork {
-	ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> getDrtStops();
+  ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> getDrtStops();
 }

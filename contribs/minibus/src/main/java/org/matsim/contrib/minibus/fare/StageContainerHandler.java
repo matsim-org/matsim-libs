@@ -20,20 +20,14 @@
 package org.matsim.contrib.minibus.fare;
 
 /**
- * 
- * Handles {@link StageContainer} and does something meaningful with them. 
- * 
- * @author aneumann
+ * Handles {@link StageContainer} and does something meaningful with them.
  *
+ * @author aneumann
  */
 public interface StageContainerHandler {
 
-	public void handleFareContainer(StageContainer stageContainer);
+  public void handleFareContainer(StageContainer stageContainer);
 
-	/**
-	 * Reset everything
-	 *
-     */
-	public void reset();
-	
+  /** Reset everything */
+  public void reset();
 }

@@ -27,56 +27,44 @@ import org.matsim.core.scoring.ScoringFunction;
 
 /**
  * A Scoring Function that only respects the travel time.
- * 
+ *
  * @author cdobler
  */
 public class OnlyTravelTimeDependentScoringFunction implements ScoringFunction {
-	
-	private double score;
 
-	public OnlyTravelTimeDependentScoringFunction() {
-	}
+  private double score;
 
-	@Override
-	public void handleActivity(Activity activity) {
+  public OnlyTravelTimeDependentScoringFunction() {}
 
-	}
+  @Override
+  public void handleActivity(Activity activity) {}
 
-	@Override
-	public void handleLeg(Leg leg) {
-		score -= leg.getTravelTime().seconds();
-	}
+  @Override
+  public void handleLeg(Leg leg) {
+    score -= leg.getTravelTime().seconds();
+  }
 
-	@Override
-	public void agentStuck(final double time) {
-	}
+  @Override
+  public void agentStuck(final double time) {}
 
-	@Override
-	public void addMoney(final double amount) {
-	}
+  @Override
+  public void addMoney(final double amount) {}
 
-	@Override
-	public void addScore(final double amount) {
-	}
+  @Override
+  public void addScore(final double amount) {}
 
+  @Override
+  public void finish() {}
 
-	@Override
-	public void finish() {
-		
-	}
+  @Override
+  public double getScore() {
+    return score;
+  }
 
-	@Override
-	public double getScore() {
-		return score;
-	}
+  public void reset() {
+    score = 0.0;
+  }
 
-	public void reset() {		
-		score = 0.0;
-	}
-
-	@Override
-	public void handleEvent(Event event) {
-
-	}
-	
+  @Override
+  public void handleEvent(Event event) {}
 }

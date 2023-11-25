@@ -19,33 +19,27 @@
  * *********************************************************************** */
 package playground.vsp.parkAndRide.example;
 
-
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-
 import playground.vsp.parkAndRide.PRAdaptiveCapacityControl;
 
-
 /**
- * 
  * @author ikaddoura
- *
  */
 public class PRControlerListener implements StartupListener {
-	
-	private PRAdaptiveCapacityControl adaptiveControl;
-	private MatsimServices controler;
-	
-	PRControlerListener(MatsimServices controler, PRAdaptiveCapacityControl adaptiveControl) {
-		this.adaptiveControl = adaptiveControl;
-		this.controler = controler;
-	}
 
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		
-		controler.getEvents().addHandler(adaptiveControl);
-	}
+  private PRAdaptiveCapacityControl adaptiveControl;
+  private MatsimServices controler;
 
+  PRControlerListener(MatsimServices controler, PRAdaptiveCapacityControl adaptiveControl) {
+    this.adaptiveControl = adaptiveControl;
+    this.controler = controler;
+  }
+
+  @Override
+  public void notifyStartup(StartupEvent event) {
+
+    controler.getEvents().addHandler(adaptiveControl);
+  }
 }

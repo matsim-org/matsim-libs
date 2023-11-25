@@ -18,9 +18,7 @@
  * *********************************************************************** *
  */
 
-/**
- *
- */
+/** */
 package org.matsim.contrib.dvrp.passenger;
 
 import org.matsim.core.events.handler.EventHandler;
@@ -29,5 +27,5 @@ import org.matsim.core.events.handler.EventHandler;
  * @author michalm (Michal Maciejewski)
  */
 public interface PassengerDroppedOffEventHandler extends EventHandler {
-	void handleEvent(PassengerDroppedOffEvent event);
+  void handleEvent(PassengerDroppedOffEvent event);
 }

@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -42,98 +41,119 @@ import org.matsim.vehicles.Vehicles;
 
 /**
  * @author droeder
- *
  */
-public class PtRoutes2PaxAnalysisHandler implements
-											// we need to know the position of the vehicle and when it departs
-											VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler,
-											// we want to be notified when agents enter/leave vehicles
-											PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
-											// we don't want to count the transitDrivers, but we need to know which vehicles they are using
-											TransitDriverStartsEventHandler{
+public class PtRoutes2PaxAnalysisHandler
+    implements
+        // we need to know the position of the vehicle and when it departs
+        VehicleArrivesAtFacilityEventHandler,
+        VehicleDepartsAtFacilityEventHandler,
+        // we want to be notified when agents enter/leave vehicles
+        PersonEntersVehicleEventHandler,
+        PersonLeavesVehicleEventHandler,
+        // we don't want to count the transitDrivers, but we need to know which vehicles they are
+        // using
+        TransitDriverStartsEventHandler {
 
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(PtRoutes2PaxAnalysisHandler.class);
-	private HashMap<Id, TransitLineContainer> linesContainer;
-	private Map<Id, AnalysisVehicle> transitVehicles;
-	private List<Id> drivers;
-	private Vehicles vehicles;
+  @SuppressWarnings("unused")
+  private static final Logger log = LogManager.getLogger(PtRoutes2PaxAnalysisHandler.class);
 
-	public PtRoutes2PaxAnalysisHandler(double interval, int maxSlice, Map<Id<TransitLine>, TransitLine> lines, Vehicles vehicles) {
-		this.drivers = new ArrayList<Id>();
-		this.transitVehicles = new HashMap<Id, AnalysisVehicle>();
-		this.linesContainer = new HashMap<Id, TransitLineContainer>();
-		this.vehicles = vehicles;
-		for(TransitLine l: lines.values()){
-			this.linesContainer.put(l.getId(), new TransitLineContainer(l, interval, maxSlice));
-		}
-	}
+  private HashMap<Id, TransitLineContainer> linesContainer;
+  private Map<Id, AnalysisVehicle> transitVehicles;
+  private List<Id> drivers;
+  private Vehicles vehicles;
 
-	@Override
-	public void reset(int iteration) {
-		// do nothing
-	}
+  public PtRoutes2PaxAnalysisHandler(
+      double interval, int maxSlice, Map<Id<TransitLine>, TransitLine> lines, Vehicles vehicles) {
+    this.drivers = new ArrayList<Id>();
+    this.transitVehicles = new HashMap<Id, AnalysisVehicle>();
+    this.linesContainer = new HashMap<Id, TransitLineContainer>();
+    this.vehicles = vehicles;
+    for (TransitLine l : lines.values()) {
+      this.linesContainer.put(l.getId(), new TransitLineContainer(l, interval, maxSlice));
+    }
+  }
 
-	@Override
-	public void handleEvent(TransitDriverStartsEvent event) {
-		this.drivers.add(event.getDriverId());
-		Vehicle v = this.vehicles.getVehicles().get(event.getVehicleId());
-		double seats = (v.getType().getCapacity().getSeats() == null) ? 0: v.getType().getCapacity().getSeats();
-		double standing = (v.getType().getCapacity().getStandingRoom() == null) ? 0: v.getType().getCapacity().getStandingRoom();
-		this.transitVehicles.put(event.getVehicleId(), new AnalysisVehicle(v.getId(), null, seats + standing, event.getTransitLineId(), event.getTransitRouteId() ));
-	}
+  @Override
+  public void reset(int iteration) {
+    // do nothing
+  }
 
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		// dont count the driver
-		if(this.drivers.contains(event.getPersonId())){
-			// but finish his route and remove him and the vehicle
-			this.drivers.remove(event.getPersonId());
-//			AnalysisVehicle v = this.transitVehicles.remove(event.getVehicleId());
-//			this.linesContainer.get(v.getLineId()).vehicleDeparts(
-//					event.getTime(), 
-//					v.getCapacity(), 
-//					v.getSeatsOccupied(), 
-//					v.getStopIndexId(),
-//					v.getRouteId());
-		}else{
-			// only count boarding/alighting for transit
-			if(!this.transitVehicles.keySet().contains(event.getVehicleId())) return;
-			AnalysisVehicle v = this.transitVehicles.get(event.getVehicleId());
-			v.personAlights();
-			this.linesContainer.get(v.getLineId()).paxAlighting(v.getRouteId(), v.getStopIndexId(), event.getTime());
-		}
-	}
+  @Override
+  public void handleEvent(TransitDriverStartsEvent event) {
+    this.drivers.add(event.getDriverId());
+    Vehicle v = this.vehicles.getVehicles().get(event.getVehicleId());
+    double seats =
+        (v.getType().getCapacity().getSeats() == null) ? 0 : v.getType().getCapacity().getSeats();
+    double standing =
+        (v.getType().getCapacity().getStandingRoom() == null)
+            ? 0
+            : v.getType().getCapacity().getStandingRoom();
+    this.transitVehicles.put(
+        event.getVehicleId(),
+        new AnalysisVehicle(
+            v.getId(),
+            null,
+            seats + standing,
+            event.getTransitLineId(),
+            event.getTransitRouteId()));
+  }
 
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		// dont count the driver
-		if(this.drivers.contains(event.getPersonId())) return;
-		// only count boarding/alighting for transit
-		if(!this.transitVehicles.keySet().contains(event.getVehicleId())) return;
-		AnalysisVehicle v = this.transitVehicles.get(event.getVehicleId());
-		v.personBoards();
-		this.linesContainer.get(v.getLineId()).paxBoarding(v.getRouteId(), v.getStopIndexId(), event.getTime());
-	}
+  @Override
+  public void handleEvent(PersonLeavesVehicleEvent event) {
+    // dont count the driver
+    if (this.drivers.contains(event.getPersonId())) {
+      // but finish his route and remove him and the vehicle
+      this.drivers.remove(event.getPersonId());
+      //			AnalysisVehicle v = this.transitVehicles.remove(event.getVehicleId());
+      //			this.linesContainer.get(v.getLineId()).vehicleDeparts(
+      //					event.getTime(),
+      //					v.getCapacity(),
+      //					v.getSeatsOccupied(),
+      //					v.getStopIndexId(),
+      //					v.getRouteId());
+    } else {
+      // only count boarding/alighting for transit
+      if (!this.transitVehicles.keySet().contains(event.getVehicleId())) return;
+      AnalysisVehicle v = this.transitVehicles.get(event.getVehicleId());
+      v.personAlights();
+      this.linesContainer
+          .get(v.getLineId())
+          .paxAlighting(v.getRouteId(), v.getStopIndexId(), event.getTime());
+    }
+  }
 
-	@Override
-	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		AnalysisVehicle v = this.transitVehicles.get(event.getVehicleId());
-		this.linesContainer.get(v.getLineId()).vehicleDeparts(
-				event.getTime(), 
-				v.getCapacity(), 
-				v.getSeatsOccupied(), 
-				v.getStopIndexId(),
-				v.getRouteId());
-	}
+  @Override
+  public void handleEvent(PersonEntersVehicleEvent event) {
+    // dont count the driver
+    if (this.drivers.contains(event.getPersonId())) return;
+    // only count boarding/alighting for transit
+    if (!this.transitVehicles.keySet().contains(event.getVehicleId())) return;
+    AnalysisVehicle v = this.transitVehicles.get(event.getVehicleId());
+    v.personBoards();
+    this.linesContainer
+        .get(v.getLineId())
+        .paxBoarding(v.getRouteId(), v.getStopIndexId(), event.getTime());
+  }
 
-	@Override
-	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		this.transitVehicles.get(event.getVehicleId()).setLocationId(event.getFacilityId());
-	}
-	
-	public Map<Id, TransitLineContainer> getTransitLinesContainer(){
-		return this.linesContainer;
-	}
+  @Override
+  public void handleEvent(VehicleDepartsAtFacilityEvent event) {
+    AnalysisVehicle v = this.transitVehicles.get(event.getVehicleId());
+    this.linesContainer
+        .get(v.getLineId())
+        .vehicleDeparts(
+            event.getTime(),
+            v.getCapacity(),
+            v.getSeatsOccupied(),
+            v.getStopIndexId(),
+            v.getRouteId());
+  }
+
+  @Override
+  public void handleEvent(VehicleArrivesAtFacilityEvent event) {
+    this.transitVehicles.get(event.getVehicleId()).setLocationId(event.getFacilityId());
+  }
+
+  public Map<Id, TransitLineContainer> getTransitLinesContainer() {
+    return this.linesContainer;
+  }
 }
-

@@ -29,11 +29,12 @@ import org.junit.Test;
  * @author Michal Maciejewski (michalm)
  */
 public class OptionalTimesTest {
-	@Test
-	public void requireDefined() {
-		assertThatThrownBy(() -> OptionalTimes.requireDefined(OptionalTime.undefined())).isExactlyInstanceOf(
-				IllegalArgumentException.class).hasMessage("Time must be defined");
+  @Test
+  public void requireDefined() {
+    assertThatThrownBy(() -> OptionalTimes.requireDefined(OptionalTime.undefined()))
+        .isExactlyInstanceOf(IllegalArgumentException.class)
+        .hasMessage("Time must be defined");
 
-		assertThat(OptionalTimes.requireDefined(OptionalTime.defined(1)).seconds()).isEqualTo(1);
-	}
+    assertThat(OptionalTimes.requireDefined(OptionalTime.defined(1)).seconds()).isEqualTo(1);
+  }
 }

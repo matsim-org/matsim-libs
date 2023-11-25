@@ -26,20 +26,20 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
 public class TimeAsTravelDisutility implements TravelDisutility {
-	private final TravelTime travelTime;
+  private final TravelTime travelTime;
 
-	public TimeAsTravelDisutility(TravelTime travelTime) {
-		this.travelTime = travelTime;
-	}
+  public TimeAsTravelDisutility(TravelTime travelTime) {
+    this.travelTime = travelTime;
+  }
 
-	@Override
-	public double getLinkTravelDisutility(final Link link, final double time, final Person person,
-			final Vehicle vehicle) {
-		return travelTime.getLinkTravelTime(link, time, person, vehicle);
-	}
+  @Override
+  public double getLinkTravelDisutility(
+      final Link link, final double time, final Person person, final Vehicle vehicle) {
+    return travelTime.getLinkTravelTime(link, time, person, vehicle);
+  }
 
-	@Override
-	public double getLinkMinimumTravelDisutility(Link link) {
-		return link.getLength() / link.getFreespeed();
-	}
+  @Override
+  public double getLinkMinimumTravelDisutility(Link link) {
+    return link.getLength() / link.getFreespeed();
+  }
 }

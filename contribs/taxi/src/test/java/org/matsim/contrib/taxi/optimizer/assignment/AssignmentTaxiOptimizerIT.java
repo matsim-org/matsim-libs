@@ -27,54 +27,53 @@ import org.matsim.contrib.taxi.optimizer.assignment.TaxiToRequestAssignmentCostP
 import org.matsim.testcases.MatsimTestUtils;
 
 public class AssignmentTaxiOptimizerIT {
-	@Rule
-	public final MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testAssignment_arrivalTime() {
-		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
-		params.mode = Mode.ARRIVAL_TIME;
-		params.vehPlanningHorizonOversupply = 99999;
-		params.vehPlanningHorizonUndersupply = 99999;
-		params.nearestRequestsLimit = 99999;
-		params.nearestVehiclesLimit = 99999;
-		runBenchmark(true, params, utils);
-	}
+  @Test
+  public void testAssignment_arrivalTime() {
+    AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
+    params.mode = Mode.ARRIVAL_TIME;
+    params.vehPlanningHorizonOversupply = 99999;
+    params.vehPlanningHorizonUndersupply = 99999;
+    params.nearestRequestsLimit = 99999;
+    params.nearestVehiclesLimit = 99999;
+    runBenchmark(true, params, utils);
+  }
 
-	@Test
-	public void testAssignment_pickupTime() {
-		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
-		params.mode = Mode.PICKUP_TIME;
-		params.vehPlanningHorizonOversupply = 120;
-		params.vehPlanningHorizonUndersupply = 30;
-		params.nearestRequestsLimit = 10;
-		params.nearestVehiclesLimit = 10;
-		params.reoptimizationTimeStep = 10;
-		runBenchmark(true, params, utils);
-	}
+  @Test
+  public void testAssignment_pickupTime() {
+    AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
+    params.mode = Mode.PICKUP_TIME;
+    params.vehPlanningHorizonOversupply = 120;
+    params.vehPlanningHorizonUndersupply = 30;
+    params.nearestRequestsLimit = 10;
+    params.nearestVehiclesLimit = 10;
+    params.reoptimizationTimeStep = 10;
+    runBenchmark(true, params, utils);
+  }
 
-	@Test
-	public void testAssignment_dse() {
-		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
-		params.mode = Mode.DSE;
-		params.vehPlanningHorizonOversupply = 120;
-		params.vehPlanningHorizonUndersupply = 30;
-		params.nearestRequestsLimit = 10;
-		params.nearestVehiclesLimit = 10;
-		params.reoptimizationTimeStep = 10;
-		runBenchmark(true, params, utils);
-	}
+  @Test
+  public void testAssignment_dse() {
+    AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
+    params.mode = Mode.DSE;
+    params.vehPlanningHorizonOversupply = 120;
+    params.vehPlanningHorizonUndersupply = 30;
+    params.nearestRequestsLimit = 10;
+    params.nearestVehiclesLimit = 10;
+    params.reoptimizationTimeStep = 10;
+    runBenchmark(true, params, utils);
+  }
 
-	@Test
-	public void testAssignment_totalWaitTime() {
-		AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
-		params.mode = Mode.TOTAL_WAIT_TIME;
-		params.vehPlanningHorizonOversupply = 120;
-		params.vehPlanningHorizonUndersupply = 30;
-		params.nearestRequestsLimit = 10;
-		params.nearestVehiclesLimit = 10;
-		params.reoptimizationTimeStep = 10;
-		params.nullPathCost = 300;
-		runBenchmark(true, params, utils);
-	}
+  @Test
+  public void testAssignment_totalWaitTime() {
+    AssignmentTaxiOptimizerParams params = new AssignmentTaxiOptimizerParams();
+    params.mode = Mode.TOTAL_WAIT_TIME;
+    params.vehPlanningHorizonOversupply = 120;
+    params.vehPlanningHorizonUndersupply = 30;
+    params.nearestRequestsLimit = 10;
+    params.nearestVehiclesLimit = 10;
+    params.reoptimizationTimeStep = 10;
+    params.nullPathCost = 300;
+    runBenchmark(true, params, utils);
+  }
 }

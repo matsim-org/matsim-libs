@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * Attributes.java
@@ -19,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.utils.objectattributes.attributable;
+package org.matsim.utils.objectattributes.attributable;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -30,51 +29,51 @@ import java.util.function.Supplier;
  */
 public final class LazyAllocationAttributes implements Attributes {
 
-	private final Consumer<Attributes> consumer;
-	private final Supplier<Attributes> supplier;
-	
-	public LazyAllocationAttributes(final Consumer<Attributes> consumer, final Supplier<Attributes> supplier) {
-		this.consumer = consumer;
-		this.supplier = supplier;
-	}
-	
-	@Override
-	public Object putAttribute(String attribute, Object value) {
-		Attributes attributes = this.supplier.get();
-		if (Objects.isNull(attributes)) {
-			attributes = new AttributesImpl();
-			this.consumer.accept(attributes);
-		}
-		attributes.putAttribute(attribute, value);
-		return null;
-	}
+  private final Consumer<Attributes> consumer;
+  private final Supplier<Attributes> supplier;
 
-	@Override
-	public Object getAttribute(String attribute) {
-		return null;
-	}
+  public LazyAllocationAttributes(
+      final Consumer<Attributes> consumer, final Supplier<Attributes> supplier) {
+    this.consumer = consumer;
+    this.supplier = supplier;
+  }
 
-	@Override
-	public Object removeAttribute(String attribute) {
-		return null;
-	}
+  @Override
+  public Object putAttribute(String attribute, Object value) {
+    Attributes attributes = this.supplier.get();
+    if (Objects.isNull(attributes)) {
+      attributes = new AttributesImpl();
+      this.consumer.accept(attributes);
+    }
+    attributes.putAttribute(attribute, value);
+    return null;
+  }
 
-	@Override
-	public void clear() {
-	}
+  @Override
+  public Object getAttribute(String attribute) {
+    return null;
+  }
 
-	@Override
-	public Map<String, Object> getAsMap() {
-		return Collections.emptyMap();
-	}
+  @Override
+  public Object removeAttribute(String attribute) {
+    return null;
+  }
 
-	@Override
-	public int size() {
-		return 0;
-	}
+  @Override
+  public void clear() {}
 
-	@Override
-	public boolean isEmpty() {
-		return true;
-	}
+  @Override
+  public Map<String, Object> getAsMap() {
+    return Collections.emptyMap();
+  }
+
+  @Override
+  public int size() {
+    return 0;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return true;
+  }
 }

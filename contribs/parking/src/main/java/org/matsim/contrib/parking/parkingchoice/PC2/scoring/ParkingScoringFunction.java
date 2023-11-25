@@ -21,25 +21,24 @@ package org.matsim.contrib.parking.parkingchoice.PC2.scoring;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
 
-public class ParkingScoringFunction implements BasicScoring{
-	double score=0;
-	private Plan plan;
-	private ParkingScore parkingScoreManager;
+public class ParkingScoringFunction implements BasicScoring {
+  double score = 0;
+  private Plan plan;
+  private ParkingScore parkingScoreManager;
 
-	public ParkingScoringFunction(Plan plan, ParkingScore parkingScoreManager) {
-		super();
-		this.plan = plan;
-		this.parkingScoreManager = parkingScoreManager;
-	}
-	
-	@Override
-	public void finish() {
-		score = parkingScoreManager.getScore(plan.getPerson().getId());
-	}
+  public ParkingScoringFunction(Plan plan, ParkingScore parkingScoreManager) {
+    super();
+    this.plan = plan;
+    this.parkingScoreManager = parkingScoreManager;
+  }
 
-	@Override
-	public double getScore() {
-		return score;
-	}
+  @Override
+  public void finish() {
+    score = parkingScoreManager.getScore(plan.getPerson().getId());
+  }
 
+  @Override
+  public double getScore() {
+    return score;
+  }
 }

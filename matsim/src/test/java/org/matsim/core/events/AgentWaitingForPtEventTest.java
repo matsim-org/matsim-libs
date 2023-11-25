@@ -34,20 +34,21 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class AgentWaitingForPtEventTest {
 
-	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
+  @Rule public MatsimTestUtils helper = new MatsimTestUtils();
 
-	@Test
-	public void testReadWriteXml() {
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-		Id<TransitStopFacility> waitStopId = Id.create("1980", TransitStopFacility.class);
-		Id<TransitStopFacility> destinationStopId = Id.create("0511", TransitStopFacility.class);
-		double time = 5.0 * 3600 + 11.0 + 60;
-		AgentWaitingForPtEvent event = new AgentWaitingForPtEvent(time, person.getId(), waitStopId, destinationStopId);
-		AgentWaitingForPtEvent event2 = XmlEventsTester.testWriteReadXml(helper.getOutputDirectory() + "events.xml", event);
-		Assert.assertEquals("wrong time of event.", time, event2.getTime(), 1e-8);
-		Assert.assertEquals("1", event2.getPersonId().toString());
-		Assert.assertEquals("1980", event2.getWaitingAtStopId().toString());
-		Assert.assertEquals("0511", event2.getDestinationStopId().toString());
-	}
-
+  @Test
+  public void testReadWriteXml() {
+    Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+    Id<TransitStopFacility> waitStopId = Id.create("1980", TransitStopFacility.class);
+    Id<TransitStopFacility> destinationStopId = Id.create("0511", TransitStopFacility.class);
+    double time = 5.0 * 3600 + 11.0 + 60;
+    AgentWaitingForPtEvent event =
+        new AgentWaitingForPtEvent(time, person.getId(), waitStopId, destinationStopId);
+    AgentWaitingForPtEvent event2 =
+        XmlEventsTester.testWriteReadXml(helper.getOutputDirectory() + "events.xml", event);
+    Assert.assertEquals("wrong time of event.", time, event2.getTime(), 1e-8);
+    Assert.assertEquals("1", event2.getPersonId().toString());
+    Assert.assertEquals("1980", event2.getWaitingAtStopId().toString());
+    Assert.assertEquals("0511", event2.getDestinationStopId().toString());
+  }
 }

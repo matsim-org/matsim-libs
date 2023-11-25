@@ -22,7 +22,6 @@ package org.matsim.examples;
 
 import java.util.Arrays;
 import java.util.Collection;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -48,60 +47,66 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 @RunWith(Parameterized.class)
-public class EquilTest  {
-	private static final Logger log = LogManager.getLogger( EquilTest.class ) ;
+public class EquilTest {
+  private static final Logger log = LogManager.getLogger(EquilTest.class);
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private final boolean isUsingFastCapacityUpdate;
+  private final boolean isUsingFastCapacityUpdate;
 
-	public EquilTest(boolean isUsingFastCapacityUpdate) {
-		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
-	}
+  public EquilTest(boolean isUsingFastCapacityUpdate) {
+    this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
+  }
 
-	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
-	public static Collection<Object> parameterObjects () {
-		Object [] capacityUpdates = new Object [] { false, true };
-		return Arrays.asList(capacityUpdates);
-	}
+  @Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
+  public static Collection<Object> parameterObjects() {
+    Object[] capacityUpdates = new Object[] {false, true};
+    return Arrays.asList(capacityUpdates);
+  }
 
-	@Test
-	public void testEquil() {
-		Config config = ConfigUtils.createConfig() ;
-		config.controller().setOutputDirectory( utils.getOutputDirectory() );
-		config.qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);
-		config.facilities().setFacilitiesSource( FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile );
+  @Test
+  public void testEquil() {
+    Config config = ConfigUtils.createConfig();
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
+    config.qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);
+    config
+        .facilities()
+        .setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile);
 
-		String netFileName = "test/scenarios/equil/network.xml";
-		String popFileName = "test/scenarios/equil/plans100.xml";
+    String netFileName = "test/scenarios/equil/network.xml";
+    String popFileName = "test/scenarios/equil/plans100.xml";
 
-		System.out.println( utils.getInputDirectory() );
-		String referenceFileName = utils.getInputDirectory() + "events.xml.gz";
+    System.out.println(utils.getInputDirectory());
+    String referenceFileName = utils.getInputDirectory() + "events.xml.gz";
 
-		String eventsFileName = utils.getOutputDirectory() + "events.xml.gz";
+    String eventsFileName = utils.getOutputDirectory() + "events.xml.gz";
 
-		MutableScenario scenario = ScenarioUtils.createMutableScenario(config );
+    MutableScenario scenario = ScenarioUtils.createMutableScenario(config);
 
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
+    new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 
-		MatsimReader plansReader = new PopulationReader(scenario);
-		plansReader.readFile(popFileName);
+    MatsimReader plansReader = new PopulationReader(scenario);
+    plansReader.readFile(popFileName);
 
-		EventsManager events = EventsUtils.createEventsManager();
-		EventWriterXML writer = new EventWriterXML(eventsFileName);
-		events.addHandler(writer);
+    EventsManager events = EventsUtils.createEventsManager();
+    EventWriterXML writer = new EventWriterXML(eventsFileName);
+    events.addHandler(writer);
 
-		//		SimulationTimer.setTime(0); // I don't think this is needed. kai, may'10
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+    //		SimulationTimer.setTime(0); // I don't think this is needed. kai, may'10
+    PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 
-		new QSimBuilder(scenario.getConfig()) //
-			.useDefaults() //
-			.build(scenario, events) //
-			.run();
+    new QSimBuilder(scenario.getConfig()) //
+        .useDefaults() //
+        .build(scenario, events) //
+        .run();
 
-		writer.closeFile();
+    writer.closeFile();
 
-		final EventsFileComparator.Result result = new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( referenceFileName , eventsFileName );
-		Assert.assertEquals("different event files.", EventsFileComparator.Result.FILES_ARE_EQUAL, result );
-	}
+    final EventsFileComparator.Result result =
+        new EventsFileComparator()
+            .setIgnoringCoordinates(true)
+            .runComparison(referenceFileName, eventsFileName);
+    Assert.assertEquals(
+        "different event files.", EventsFileComparator.Result.FILES_ARE_EQUAL, result);
+  }
 }

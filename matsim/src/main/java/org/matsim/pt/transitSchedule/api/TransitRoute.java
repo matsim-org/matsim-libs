@@ -22,7 +22,6 @@ package org.matsim.pt.transitSchedule.api;
 
 import java.util.List;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -35,44 +34,43 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  */
 public interface TransitRoute extends Identifiable<TransitRoute>, Attributable {
 
-	void setDescription(final String description);
+  void setDescription(final String description);
 
-	String getDescription();
+  String getDescription();
 
-	/**
-	 * Sets the transport mode with which this transit route is handled, e.g.
-	 * <code>bus</code> or <code>train</code>.
-	 *
-	 * @param mode
-	 */
-	void setTransportMode(final String mode);
+  /**
+   * Sets the transport mode with which this transit route is handled, e.g. <code>bus</code> or
+   * <code>train</code>.
+   *
+   * @param mode
+   */
+  void setTransportMode(final String mode);
 
-	String getTransportMode();
+  String getTransportMode();
 
-	void addDeparture(final Departure departure);
+  void addDeparture(final Departure departure);
 
-	boolean removeDeparture(final Departure departure);
+  boolean removeDeparture(final Departure departure);
 
-	/**
-	 * @return an immutable Map of all departures assigned to this route
-	 */
-	Map<Id<Departure>, Departure> getDepartures();
+  /**
+   * @return an immutable Map of all departures assigned to this route
+   */
+  Map<Id<Departure>, Departure> getDepartures();
 
-	NetworkRoute getRoute();
+  NetworkRoute getRoute();
 
-	void setRoute(final NetworkRoute route);
+  void setRoute(final NetworkRoute route);
 
-	/**
-	 * @return an immutable list of all stops of this route in the order along the route
-	 */
-	List<TransitRouteStop> getStops();
+  /**
+   * @return an immutable list of all stops of this route in the order along the route
+   */
+  List<TransitRouteStop> getStops();
 
-	/**
-	 * @param stop
-	 * @return the {@link TransitRouteStop} of this route that stops at the specified
-	 * {@link TransitStopFacility}. <code>null</code> if this route does not stop at the
-	 * specified location.
-	 */
-	TransitRouteStop getStop(final TransitStopFacility stop);
-
+  /**
+   * @param stop
+   * @return the {@link TransitRouteStop} of this route that stops at the specified {@link
+   *     TransitStopFacility}. <code>null</code> if this route does not stop at the specified
+   *     location.
+   */
+  TransitRouteStop getStop(final TransitStopFacility stop);
 }

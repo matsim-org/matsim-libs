@@ -19,7 +19,6 @@
 
 package org.matsim.core.scenario;
 
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,9 +35,6 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.households.Household;
 import org.matsim.households.HouseholdUtils;
-import org.matsim.pt.transitSchedule.TransitScheduleUtils;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -46,84 +42,98 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ScenarioLoaderImplTest {
 
-	@Rule public MatsimTestUtils util = new MatsimTestUtils();
+  @Rule public MatsimTestUtils util = new MatsimTestUtils();
 
-	@Test
-	public void testLoadScenario_loadTransitData() {
-		// test the create/load sequence:
-		{
-			ScenarioBuilder builder = new ScenarioBuilder(ConfigUtils.loadConfig(IOUtils.extendUrl(this.util.classInputResourcePath(), "transitConfig.xml")));
-			// facilities is there by default????
-			Scenario scenario = builder.build() ;
-			Assert.assertEquals(0, scenario.getTransitSchedule().getTransitLines().size());
-			Assert.assertEquals(0, scenario.getTransitSchedule().getFacilities().size());
-			ScenarioUtils.loadScenario(scenario);
-			Assert.assertEquals(1, scenario.getTransitSchedule().getTransitLines().size());
-			Assert.assertEquals(2, scenario.getTransitSchedule().getFacilities().size());
-		}
+  @Test
+  public void testLoadScenario_loadTransitData() {
+    // test the create/load sequence:
+    {
+      ScenarioBuilder builder =
+          new ScenarioBuilder(
+              ConfigUtils.loadConfig(
+                  IOUtils.extendUrl(this.util.classInputResourcePath(), "transitConfig.xml")));
+      // facilities is there by default????
+      Scenario scenario = builder.build();
+      Assert.assertEquals(0, scenario.getTransitSchedule().getTransitLines().size());
+      Assert.assertEquals(0, scenario.getTransitSchedule().getFacilities().size());
+      ScenarioUtils.loadScenario(scenario);
+      Assert.assertEquals(1, scenario.getTransitSchedule().getTransitLines().size());
+      Assert.assertEquals(2, scenario.getTransitSchedule().getFacilities().size());
+    }
 
-		// load directly:
-		{
-			Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(IOUtils.extendUrl(this.util.classInputResourcePath(), "transitConfig.xml")));
-			Assert.assertEquals(1, scenario.getTransitSchedule().getTransitLines().size());
-			Assert.assertEquals(2, scenario.getTransitSchedule().getFacilities().size());
-		}
-	}
+    // load directly:
+    {
+      Scenario scenario =
+          ScenarioUtils.loadScenario(
+              ConfigUtils.loadConfig(
+                  IOUtils.extendUrl(this.util.classInputResourcePath(), "transitConfig.xml")));
+      Assert.assertEquals(1, scenario.getTransitSchedule().getTransitLines().size());
+      Assert.assertEquals(2, scenario.getTransitSchedule().getFacilities().size());
+    }
+  }
 
-	@Test
-	public void testLoadScenario_loadPersonAttributes_nowDeprecated() {
-		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(this.util.classInputResourcePath(), "personAttributesConfig.xml"));
-		config.plans().addParam("inputPersonAttributesFile", "personAttributes.xml");
-		config.plans().setInsistingOnUsingDeprecatedPersonAttributeFile( true );
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Population population = scenario.getPopulation();
-		Person person = population.getPersons().get( Id.createPersonId( "1" ) ) ;
-		Gbl.assertNotNull( person );
-		Assert.assertEquals("world", person.getAttributes().getAttribute( "hello" ) );
-	}
+  @Test
+  public void testLoadScenario_loadPersonAttributes_nowDeprecated() {
+    Config config =
+        ConfigUtils.loadConfig(
+            IOUtils.extendUrl(this.util.classInputResourcePath(), "personAttributesConfig.xml"));
+    config.plans().addParam("inputPersonAttributesFile", "personAttributes.xml");
+    config.plans().setInsistingOnUsingDeprecatedPersonAttributeFile(true);
+    Scenario scenario = ScenarioUtils.loadScenario(config);
+    Population population = scenario.getPopulation();
+    Person person = population.getPersons().get(Id.createPersonId("1"));
+    Gbl.assertNotNull(person);
+    Assert.assertEquals("world", person.getAttributes().getAttribute("hello"));
+  }
 
-	@Test
-	public void testLoadScenario_loadPersonAttributes() {
-		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(this.util.classInputResourcePath(), "personAttributesConfig.xml"));
-		config.plans().addParam("inputPersonAttributesFile", "personAttributes.xml");
-		boolean caughtException=false ;
-		Scenario scenario = null ;
-		try{
-			scenario = ScenarioUtils.loadScenario( config );
-		} catch ( Exception ee ) {
-			// expected exception
-			caughtException = true ;
-		}
-		Assert.assertTrue( caughtException );
-	}
+  @Test
+  public void testLoadScenario_loadPersonAttributes() {
+    Config config =
+        ConfigUtils.loadConfig(
+            IOUtils.extendUrl(this.util.classInputResourcePath(), "personAttributesConfig.xml"));
+    config.plans().addParam("inputPersonAttributesFile", "personAttributes.xml");
+    boolean caughtException = false;
+    Scenario scenario = null;
+    try {
+      scenario = ScenarioUtils.loadScenario(config);
+    } catch (Exception ee) {
+      // expected exception
+      caughtException = true;
+    }
+    Assert.assertTrue(caughtException);
+  }
 
+  @Test
+  public void testLoadScenario_loadFacilitiesAttributes() {
+    Config config =
+        ConfigUtils.loadConfig(
+            IOUtils.extendUrl(this.util.classInputResourcePath(), "facilityAttributesConfig.xml"));
+    config.facilities().setInsistingOnUsingDeprecatedFacilitiesAttributeFile(true);
+    config.facilities().addParam("inputFacilityAttributesFile", "facilityAttributes.xml");
+    Scenario scenario = ScenarioUtils.loadScenario(config);
+    Assert.assertEquals(
+        "unexpected attribute value",
+        "world",
+        FacilitiesUtils.getFacilityAttribute(
+            scenario
+                .getActivityFacilities()
+                .getFacilities()
+                .get(Id.create(1, ActivityFacility.class)),
+            "hello"));
+  }
 
-	@Test
-	public void testLoadScenario_loadFacilitiesAttributes() {
-		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(this.util.classInputResourcePath(), "facilityAttributesConfig.xml"));
-		config.facilities().setInsistingOnUsingDeprecatedFacilitiesAttributeFile(true);
-		config.facilities().addParam("inputFacilityAttributesFile", "facilityAttributes.xml");
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Assert.assertEquals(
-				"unexpected attribute value",
-				"world",
-				FacilitiesUtils.getFacilityAttribute(
-						scenario.getActivityFacilities().getFacilities().get(Id.create(1, ActivityFacility.class)),
-						"hello"));
-	}
-
-	@Test
-	public void testLoadScenario_loadHouseholdAttributes() {
-		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(this.util.classInputResourcePath(), "householdAttributesConfig.xml"));
-		config.households().addParam("inputHouseholdAttributesFile", "householdAttributes.xml");
-		config.households().setInsistingOnUsingDeprecatedHouseholdsAttributeFile(true);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Assert.assertEquals(
-				"unexpected attribute value",
-				"world",
-				HouseholdUtils.getHouseholdAttribute(
-						scenario.getHouseholds().getHouseholds().get(Id.create(1, Household.class)),
-						"hello"));
-
-	}
+  @Test
+  public void testLoadScenario_loadHouseholdAttributes() {
+    Config config =
+        ConfigUtils.loadConfig(
+            IOUtils.extendUrl(this.util.classInputResourcePath(), "householdAttributesConfig.xml"));
+    config.households().addParam("inputHouseholdAttributesFile", "householdAttributes.xml");
+    config.households().setInsistingOnUsingDeprecatedHouseholdsAttributeFile(true);
+    Scenario scenario = ScenarioUtils.loadScenario(config);
+    Assert.assertEquals(
+        "unexpected attribute value",
+        "world",
+        HouseholdUtils.getHouseholdAttribute(
+            scenario.getHouseholds().getHouseholds().get(Id.create(1, Household.class)), "hello"));
+  }
 }

@@ -22,7 +22,6 @@ package org.matsim.core.network;
 
 import java.util.Collections;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -37,168 +36,184 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /*deliberately package*/ class NodeImpl implements Node, Lockable {
 
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // member variables
+  //////////////////////////////////////////////////////////////////////
 
-	private String type = null;
-	private String origid = null;
+  private String type = null;
+  private String origid = null;
 
-	private transient  Map<Id<Link>, Link> inlinks  = new IdentifiableArrayMap<>();
-	private transient  Map<Id<Link>, Link> outlinks = new IdentifiableArrayMap<>();
+  private transient Map<Id<Link>, Link> inlinks = new IdentifiableArrayMap<>();
+  private transient Map<Id<Link>, Link> outlinks = new IdentifiableArrayMap<>();
 
-	private Coord coord;
-	private final Id<Node> id;
-	private boolean locked = false ;
+  private Coord coord;
+  private final Id<Node> id;
+  private boolean locked = false;
 
-	private final static Logger log = LogManager.getLogger(Node.class);
-	private final Attributes attributes = new AttributesImpl();
+  private static final Logger log = LogManager.getLogger(Node.class);
+  private final Attributes attributes = new AttributesImpl();
 
-	//////////////////////////////////////////////////////////////////////
-	// constructor
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // constructor
+  //////////////////////////////////////////////////////////////////////
 
-	NodeImpl(final Id<Node> id, final Coord coord) {
-		this(id, coord, null);
-	}
+  NodeImpl(final Id<Node> id, final Coord coord) {
+    this(id, coord, null);
+  }
 
-	/* package */NodeImpl(final Id<Node> id, final Coord coord, final String type) {
-		this(id);
-		this.coord = coord;
-		NetworkUtils.setType(this,type);
-	}
+  /* package */ NodeImpl(final Id<Node> id, final Coord coord, final String type) {
+    this(id);
+    this.coord = coord;
+    NetworkUtils.setType(this, type);
+  }
 
-	/* package */NodeImpl(Id<Node> id) {
-		this.id = id ;
-		this.coord = null ;
-	}
-	
-	/* package */ void  setType( final String type ) {
-		this.type = type == null ? null : type.intern();
-	}	
-	
-	private static int cnt2 = 0 ;
-	@Override
-	public final boolean addInLink(Link inlink) {
-		Id<Link> linkid = inlink.getId();
-		if (this.inlinks.containsKey(linkid)) {
-			throw new IllegalArgumentException(this + ": inlink_id=" + inlink.getId() + " already exists");
-		}
-//		if (this.outlinks.containsKey(linkid) && (cnt2 < 1)) {
-//			cnt2++ ;
-//			log.warn(this + ": inlink_id=" + inlink.getId() + " is now in- and out-link");
-//			log.warn(Gbl.ONLYONCE) ;
-//		}
-		// (this means it is a loop link; they have become an acceptable data structure within matsim.  kai, sep'19)
-		this.inlinks.put(linkid, inlink);
-		return true; // yy should return true only if collection changed as result of call
-	}
+  /* package */ NodeImpl(Id<Node> id) {
+    this.id = id;
+    this.coord = null;
+  }
 
-	private static int cnt = 0 ;
-	@Override
-	public final boolean addOutLink(Link outlink) {
-		Id<Link> linkid = outlink.getId();
-		if (this.outlinks.containsKey(linkid)) {
-			throw new IllegalArgumentException(this + ": outlink_id=" + outlink.getId() + " already exists");
-		}
-		if (this.inlinks.containsKey(linkid) && (cnt < 1)) {
-			cnt++ ;
-			log.warn(this.toString() + ": outlink_id=" + outlink.getId() + " is now in- and out-link");
-			log.warn(Gbl.ONLYONCE) ;
-		}
-		this.outlinks.put(linkid, outlink);
-		return true ; // yy should return true only if collection changed as result of call
-	}
-	@Override
-	public void setCoord(final Coord coord){
-		testForLocked();
-		this.coord = coord;
-	}
+  /* package */ void setType(final String type) {
+    this.type = type == null ? null : type.intern();
+  }
 
-	/*package*/ void setOrigId(final String origId){
-		this.origid = origId ;
-	}
+  private static int cnt2 = 0;
 
-	//////////////////////////////////////////////////////////////////////
-	// remove methods
-	//////////////////////////////////////////////////////////////////////
+  @Override
+  public final boolean addInLink(Link inlink) {
+    Id<Link> linkid = inlink.getId();
+    if (this.inlinks.containsKey(linkid)) {
+      throw new IllegalArgumentException(
+          this + ": inlink_id=" + inlink.getId() + " already exists");
+    }
+    //		if (this.outlinks.containsKey(linkid) && (cnt2 < 1)) {
+    //			cnt2++ ;
+    //			log.warn(this + ": inlink_id=" + inlink.getId() + " is now in- and out-link");
+    //			log.warn(Gbl.ONLYONCE) ;
+    //		}
+    // (this means it is a loop link; they have become an acceptable data structure within matsim.
+    // kai, sep'19)
+    this.inlinks.put(linkid, inlink);
+    return true; // yy should return true only if collection changed as result of call
+  }
 
-	@Override
-	public final Link removeInLink( final Id<Link> linkId ) {
-		return this.inlinks.remove(linkId) ;
-	}
+  private static int cnt = 0;
 
-	@Override
-	public Link removeOutLink(final Id<Link> outLinkId) {
-		return this.outlinks.remove(outLinkId);
-	}
+  @Override
+  public final boolean addOutLink(Link outlink) {
+    Id<Link> linkid = outlink.getId();
+    if (this.outlinks.containsKey(linkid)) {
+      throw new IllegalArgumentException(
+          this + ": outlink_id=" + outlink.getId() + " already exists");
+    }
+    if (this.inlinks.containsKey(linkid) && (cnt < 1)) {
+      cnt++;
+      log.warn(this.toString() + ": outlink_id=" + outlink.getId() + " is now in- and out-link");
+      log.warn(Gbl.ONLYONCE);
+    }
+    this.outlinks.put(linkid, outlink);
+    return true; // yy should return true only if collection changed as result of call
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// get methods
-	//////////////////////////////////////////////////////////////////////
+  @Override
+  public void setCoord(final Coord coord) {
+    testForLocked();
+    this.coord = coord;
+  }
 
-	/*package*/ String getOrigId() {
-		return this.origid ;
-	}
-	
-	/*package*/ String getType() {
-		return this.type ;
-	}
-	
-	@Override
-	public Map<Id<Link>, ? extends Link> getInLinks() {
-		return Collections.unmodifiableMap(this.inlinks);
-	}
+  /*package*/ void setOrigId(final String origId) {
+    this.origid = origId;
+  }
 
-	@Override
-	public Map<Id<Link>, ? extends Link> getOutLinks() {
-		return Collections.unmodifiableMap(this.outlinks);
-	}
+  //////////////////////////////////////////////////////////////////////
+  // remove methods
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public Coord getCoord() {
-		return this.coord;
-	}
+  @Override
+  public final Link removeInLink(final Id<Link> linkId) {
+    return this.inlinks.remove(linkId);
+  }
 
-	@Override
-	public Id<Node> getId() {
-		return this.id;
-	}
+  @Override
+  public Link removeOutLink(final Id<Link> outLinkId) {
+    return this.outlinks.remove(outLinkId);
+  }
 
+  //////////////////////////////////////////////////////////////////////
+  // get methods
+  //////////////////////////////////////////////////////////////////////
 
-//	private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
-//		ois.defaultReadObject();
-//
-//		inlinks = new LinkedHashMap<>(4, 0.95f);
-//		outlinks = new LinkedHashMap<>(4, 0.95f);
-//
-//	}
+  /*package*/ String getOrigId() {
+    return this.origid;
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// print methods
-	//////////////////////////////////////////////////////////////////////
+  /*package*/ String getType() {
+    return this.type;
+  }
 
-	@Override
-	public String toString() {
-		return "[id=" + this.id + "]" +
-				"[coord=" + this.coord + "]" +
-				"[type=" + this.type + "]" +
-				"[nof_inlinks=" + this.inlinks.size() + "]" +
-				"[nof_outlinks=" + this.outlinks.size() + "]";
-	}
+  @Override
+  public Map<Id<Link>, ? extends Link> getInLinks() {
+    return Collections.unmodifiableMap(this.inlinks);
+  }
 
-	@Override
-	public void setLocked() {
-		this.locked = true ;
-	}
-	private void testForLocked() {
-		if ( locked ) {
-			throw new RuntimeException( "Network is locked; too late to do this.  See comments in code.") ;
-		}
-	}
+  @Override
+  public Map<Id<Link>, ? extends Link> getOutLinks() {
+    return Collections.unmodifiableMap(this.outlinks);
+  }
 
-	@Override
-	public Attributes getAttributes() {
-		return attributes;
-	}
+  @Override
+  public Coord getCoord() {
+    return this.coord;
+  }
+
+  @Override
+  public Id<Node> getId() {
+    return this.id;
+  }
+
+  //	private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+  //		ois.defaultReadObject();
+  //
+  //		inlinks = new LinkedHashMap<>(4, 0.95f);
+  //		outlinks = new LinkedHashMap<>(4, 0.95f);
+  //
+  //	}
+
+  //////////////////////////////////////////////////////////////////////
+  // print methods
+  //////////////////////////////////////////////////////////////////////
+
+  @Override
+  public String toString() {
+    return "[id="
+        + this.id
+        + "]"
+        + "[coord="
+        + this.coord
+        + "]"
+        + "[type="
+        + this.type
+        + "]"
+        + "[nof_inlinks="
+        + this.inlinks.size()
+        + "]"
+        + "[nof_outlinks="
+        + this.outlinks.size()
+        + "]";
+  }
+
+  @Override
+  public void setLocked() {
+    this.locked = true;
+  }
+
+  private void testForLocked() {
+    if (locked) {
+      throw new RuntimeException("Network is locked; too late to do this.  See comments in code.");
+    }
+  }
+
+  @Override
+  public Attributes getAttributes() {
+    return attributes;
+  }
 }

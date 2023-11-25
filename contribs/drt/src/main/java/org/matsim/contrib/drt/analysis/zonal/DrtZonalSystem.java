@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-
 import javax.annotation.Nullable;
-
+import one.util.streamex.EntryStream;
+import one.util.streamex.StreamEx;
 import org.apache.commons.lang3.tuple.Pair;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
@@ -38,9 +38,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-import one.util.streamex.EntryStream;
-import one.util.streamex.StreamEx;
-
 /**
  * @author jbischoff
  * @author Michal Maciejewski (michalm)
@@ -48,64 +45,67 @@ import one.util.streamex.StreamEx;
  */
 public class DrtZonalSystem {
 
-	public static DrtZonalSystem createFromPreparedGeometries(Network network,
-			Map<String, PreparedGeometry> geometries) {
+  public static DrtZonalSystem createFromPreparedGeometries(
+      Network network, Map<String, PreparedGeometry> geometries) {
 
-		//geometries without links are skipped
-		Map<String, List<Link>> linksByGeometryId = StreamEx.of(network.getLinks().values())
-				.mapToEntry(l -> getGeometryIdForLink(l, geometries), l -> l)
-				.filterKeys(Objects::nonNull)
-				.grouping(toList());
+    // geometries without links are skipped
+    Map<String, List<Link>> linksByGeometryId =
+        StreamEx.of(network.getLinks().values())
+            .mapToEntry(l -> getGeometryIdForLink(l, geometries), l -> l)
+            .filterKeys(Objects::nonNull)
+            .grouping(toList());
 
-		//the zonal system contains only zones that have at least one link
-		List<DrtZone> zones = EntryStream.of(linksByGeometryId)
-				.mapKeyValue((id, links) -> new DrtZone(id, geometries.get(id), links))
-				.collect(toList());
+    // the zonal system contains only zones that have at least one link
+    List<DrtZone> zones =
+        EntryStream.of(linksByGeometryId)
+            .mapKeyValue((id, links) -> new DrtZone(id, geometries.get(id), links))
+            .collect(toList());
 
-		return new DrtZonalSystem(zones);
-	}
+    return new DrtZonalSystem(zones);
+  }
 
-	/**
-	 * @param link
-	 * @return the the {@code PreparedGeometry} that contains the {@code linkId}.
-	 * If a given link's {@code Coord} borders two or more cells, the allocation to a cell is random.
-	 * Result may be null in case the given link is outside of the service area.
-	 */
-	@Nullable
-	private static String getGeometryIdForLink(Link link, Map<String, PreparedGeometry> geometries) {
-		Point linkCoord = MGC.coord2Point(link.getToNode().getCoord());
-		return geometries.entrySet()
-				.stream()
-				.filter(e -> e.getValue().intersects(linkCoord))
-				.findAny()
-				.map(Entry::getKey)
-				.orElse(null);
-	}
+  /**
+   * @param link
+   * @return the the {@code PreparedGeometry} that contains the {@code linkId}. If a given link's
+   *     {@code Coord} borders two or more cells, the allocation to a cell is random. Result may be
+   *     null in case the given link is outside of the service area.
+   */
+  @Nullable
+  private static String getGeometryIdForLink(Link link, Map<String, PreparedGeometry> geometries) {
+    Point linkCoord = MGC.coord2Point(link.getToNode().getCoord());
+    return geometries.entrySet().stream()
+        .filter(e -> e.getValue().intersects(linkCoord))
+        .findAny()
+        .map(Entry::getKey)
+        .orElse(null);
+  }
 
-	private final Map<String, DrtZone> zones;
-	private final Map<Id<Link>, DrtZone> link2zone;
+  private final Map<String, DrtZone> zones;
+  private final Map<Id<Link>, DrtZone> link2zone;
 
-	public DrtZonalSystem(Collection<DrtZone> zones) {
-		this.zones = zones.stream().collect(toMap(DrtZone::getId, z -> z));
-		this.link2zone = zones.stream()
-				.flatMap(zone -> zone.getLinks().stream().map(link -> Pair.of(link.getId(), zone)))
-				.collect(toMap(Pair::getKey, Pair::getValue));
-	}
+  public DrtZonalSystem(Collection<DrtZone> zones) {
+    this.zones = zones.stream().collect(toMap(DrtZone::getId, z -> z));
+    this.link2zone =
+        zones.stream()
+            .flatMap(zone -> zone.getLinks().stream().map(link -> Pair.of(link.getId(), zone)))
+            .collect(toMap(Pair::getKey, Pair::getValue));
+  }
 
-	/**
-	 * @param linkId
-	 * @return the the {@code DrtZone} that contains the {@code linkId}. If the given link's {@code Coord} borders two or more cells, the allocation to a cell is random.
-	 * Result may be null in case the given link is outside of the service area.
-	 */
-	@Nullable
-	public DrtZone getZoneForLinkId(Id<Link> linkId) {
-		return link2zone.get(linkId);
-	}
+  /**
+   * @param linkId
+   * @return the the {@code DrtZone} that contains the {@code linkId}. If the given link's {@code
+   *     Coord} borders two or more cells, the allocation to a cell is random. Result may be null in
+   *     case the given link is outside of the service area.
+   */
+  @Nullable
+  public DrtZone getZoneForLinkId(Id<Link> linkId) {
+    return link2zone.get(linkId);
+  }
 
-	/**
-	 * @return the zones
-	 */
-	public Map<String, DrtZone> getZones() {
-		return zones;
-	}
+  /**
+   * @return the zones
+   */
+  public Map<String, DrtZone> getZones() {
+    return zones;
+  }
 }

@@ -29,54 +29,67 @@ import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
 import org.matsim.pt.config.TransitConfigGroup.TransitRoutingAlgorithmType;
 import org.matsim.pt.router.TransitRouterModule;
 
-
 public class TripRouterModule extends AbstractModule {
 
-    @Override
-    public void install() {
-	    // yy The code below will install _one_ LeastCostPathCalculator, which will be Dijkstra or Landmarks or something.  It will be the
-	    // same Landmarks instance for all modes ... although one could do better by doing the preprocessing separately for the different modes.
-	    // kai/mm, jan'17
+  @Override
+  public void install() {
+    // yy The code below will install _one_ LeastCostPathCalculator, which will be Dijkstra or
+    // Landmarks or something.  It will be the
+    // same Landmarks instance for all modes ... although one could do better by doing the
+    // preprocessing separately for the different modes.
+    // kai/mm, jan'17
 
-        bind(TripRouter.class); // not thread-safe, not a singleton
-        bind(MainModeIdentifier.class).to(MainModeIdentifierImpl.class);
-        bind(AnalysisMainModeIdentifier.class).to(DefaultAnalysisMainModeIdentifier.class);
+    bind(TripRouter.class); // not thread-safe, not a singleton
+    bind(MainModeIdentifier.class).to(MainModeIdentifierImpl.class);
+    bind(AnalysisMainModeIdentifier.class).to(DefaultAnalysisMainModeIdentifier.class);
 
-        bind(MultimodalLinkChooser.class).to(MultimodalLinkChooserDefaultImpl.class);
+    bind(MultimodalLinkChooser.class).to(MultimodalLinkChooserDefaultImpl.class);
 
-        install(new LeastCostPathCalculatorModule());
-        install(new TransitRouterModule());
-        bind(SingleModeNetworksCache.class).asEagerSingleton();
-        RoutingConfigGroup routeConfigGroup = getConfig().routing();
-        for (String mode : routeConfigGroup.getTeleportedModeFreespeedFactors().keySet()) {
-            if (getConfig().transit().isUseTransit() && getConfig().transit().getTransitModes().contains(mode)) {
-                // default config contains "pt" as teleported mode, but if we have simulated transit, this is supposed to override it
-                // better solve this on the config level eventually.
-                continue;
-            }
-            addRoutingModuleBinding(mode).toProvider(new FreespeedFactorRouting(getConfig().routing().getModeRoutingParams().get(mode)));
-        }
-        for (String mode : routeConfigGroup.getTeleportedModeSpeeds().keySet()) {
-            addRoutingModuleBinding(mode).toProvider(new BeelineTeleportationRouting(getConfig().routing().getModeRoutingParams().get(mode)));
-        }
-
-        boolean linkToLinkRouting = getConfig().controller().isLinkToLinkRoutingEnabled();
-        if (linkToLinkRouting) {
-            bind(NetworkTurnInfoBuilderI.class).to(NetworkTurnInfoBuilder.class) ;
-        }
-        for (String mode : routeConfigGroup.getNetworkModes()) {
-            addRoutingModuleBinding(mode).toProvider(linkToLinkRouting ? //
-                    new LinkToLinkRouting(mode) : new NetworkRoutingProvider(mode));
-        }
-        if (getConfig().transit().isUseTransit()) {
-            if (getConfig().transit().getRoutingAlgorithmType() != TransitRoutingAlgorithmType.SwissRailRaptor) {
-                // the SwissRailRaptorModule adds the routingModuleBinding itself
-                for (String mode : getConfig().transit().getTransitModes()) {
-                    addRoutingModuleBinding(mode).toProvider(Transit.class);
-                }
-            }
-        }
-
-        this.bind( FallbackRoutingModule.class ).to( FallbackRoutingModuleDefaultImpl.class ) ;
+    install(new LeastCostPathCalculatorModule());
+    install(new TransitRouterModule());
+    bind(SingleModeNetworksCache.class).asEagerSingleton();
+    RoutingConfigGroup routeConfigGroup = getConfig().routing();
+    for (String mode : routeConfigGroup.getTeleportedModeFreespeedFactors().keySet()) {
+      if (getConfig().transit().isUseTransit()
+          && getConfig().transit().getTransitModes().contains(mode)) {
+        // default config contains "pt" as teleported mode, but if we have simulated transit, this
+        // is supposed to override it
+        // better solve this on the config level eventually.
+        continue;
+      }
+      addRoutingModuleBinding(mode)
+          .toProvider(
+              new FreespeedFactorRouting(getConfig().routing().getModeRoutingParams().get(mode)));
     }
+    for (String mode : routeConfigGroup.getTeleportedModeSpeeds().keySet()) {
+      addRoutingModuleBinding(mode)
+          .toProvider(
+              new BeelineTeleportationRouting(
+                  getConfig().routing().getModeRoutingParams().get(mode)));
+    }
+
+    boolean linkToLinkRouting = getConfig().controller().isLinkToLinkRoutingEnabled();
+    if (linkToLinkRouting) {
+      bind(NetworkTurnInfoBuilderI.class).to(NetworkTurnInfoBuilder.class);
+    }
+    for (String mode : routeConfigGroup.getNetworkModes()) {
+      addRoutingModuleBinding(mode)
+          .toProvider(
+              linkToLinkRouting
+                  ? //
+                  new LinkToLinkRouting(mode)
+                  : new NetworkRoutingProvider(mode));
+    }
+    if (getConfig().transit().isUseTransit()) {
+      if (getConfig().transit().getRoutingAlgorithmType()
+          != TransitRoutingAlgorithmType.SwissRailRaptor) {
+        // the SwissRailRaptorModule adds the routingModuleBinding itself
+        for (String mode : getConfig().transit().getTransitModes()) {
+          addRoutingModuleBinding(mode).toProvider(Transit.class);
+        }
+      }
+    }
+
+    this.bind(FallbackRoutingModule.class).to(FallbackRoutingModuleDefaultImpl.class);
+  }
 }

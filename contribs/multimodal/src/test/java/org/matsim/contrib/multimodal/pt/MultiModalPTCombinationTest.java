@@ -22,7 +22,6 @@ package org.matsim.contrib.multimodal.pt;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -35,13 +34,13 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -49,8 +48,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.multimodal.MultiModalModule;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -58,187 +57,198 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class MultiModalPTCombinationTest {
 
-	private static final Logger log = LogManager.getLogger(MultiModalPTCombinationTest.class);
+  private static final Logger log = LogManager.getLogger(MultiModalPTCombinationTest.class);
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	/**
-	 * Two things are tested here:
-	 * - Multi-modal simulation can handle TransitAgents (previously, the TransitAgent class did not implement
-	 *   the HasPerson interface. As a result, the multi-modal simulation crashed since it could not access
-	 *   the person).
-	 * - Multi-modal simulation can handle transit_walk legs (not yet ready...).
-	 * ---> in nov'19 we are trying to replace transit_walk by normal walk and routingMode=pt, so this test is
-	 * probably no longer very useful, there is no more special walk mode for pt agents - gl-nov'19
-	 */
-	@Test
-	public void testMultiModalPtCombination() {
+  /**
+   * Two things are tested here: - Multi-modal simulation can handle TransitAgents (previously, the
+   * TransitAgent class did not implement the HasPerson interface. As a result, the multi-modal
+   * simulation crashed since it could not access the person). - Multi-modal simulation can handle
+   * transit_walk legs (not yet ready...). ---> in nov'19 we are trying to replace transit_walk by
+   * normal walk and routingMode=pt, so this test is probably no longer very useful, there is no
+   * more special walk mode for pt agents - gl-nov'19
+   */
+  @Test
+  public void testMultiModalPtCombination() {
 
-		Fixture f = new Fixture();
-		f.init();
+    Fixture f = new Fixture();
+    f.init();
 
-//		Person ptPerson = f.createPersonAndAdd(f.scenario, "0", TransportMode.transit_walk);
-		Person ptPerson = f.createPersonAndAdd(f.scenario, "0", TransportMode.walk, TransportMode.pt);
-		Person walkPerson = f.createPersonAndAdd(f.scenario, "1", TransportMode.walk, TransportMode.walk);
+    //		Person ptPerson = f.createPersonAndAdd(f.scenario, "0", TransportMode.transit_walk);
+    Person ptPerson = f.createPersonAndAdd(f.scenario, "0", TransportMode.walk, TransportMode.pt);
+    Person walkPerson =
+        f.createPersonAndAdd(f.scenario, "1", TransportMode.walk, TransportMode.walk);
 
-		Scenario scenario = f.scenario;
-		Config config = scenario.getConfig();
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
+    Scenario scenario = f.scenario;
+    Config config = scenario.getConfig();
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
 
-		MultiModalConfigGroup mmcg = new MultiModalConfigGroup();
-		mmcg.setMultiModalSimulationEnabled(true);
-		mmcg.setSimulatedModes(TransportMode.walk + "," + TransportMode.transit_walk);//TODO: is this still useful if no agent can still use transit_walk?
-		config.addModule(mmcg);
+    MultiModalConfigGroup mmcg = new MultiModalConfigGroup();
+    mmcg.setMultiModalSimulationEnabled(true);
+    mmcg.setSimulatedModes(
+        TransportMode.walk
+            + ","
+            + TransportMode.transit_walk); // TODO: is this still useful if no agent can still use
+    // transit_walk?
+    config.addModule(mmcg);
 
-		config.qsim().setEndTime(24*3600);
+    config.qsim().setEndTime(24 * 3600);
 
-		config.controller().setLastIteration(0);
-		// doesn't matter - MultiModalModule sets the mobsim unconditionally. it just can't be something
-		// which the ControlerDefaultsModule knows about. Try it, you will get an error. Quite safe.
-		config.controller().setMobsim("myMobsim");
+    config.controller().setLastIteration(0);
+    // doesn't matter - MultiModalModule sets the mobsim unconditionally. it just can't be something
+    // which the ControlerDefaultsModule knows about. Try it, you will get an error. Quite safe.
+    config.controller().setMobsim("myMobsim");
 
+    ActivityParams homeParams = new ActivityParams("home");
+    homeParams.setTypicalDuration(16 * 3600);
+    config.scoring().addActivityParams(homeParams);
 
-		ActivityParams homeParams = new ActivityParams("home");
-		homeParams.setTypicalDuration(16*3600);
-		config.scoring().addActivityParams(homeParams);
+    // set default walk speed; according to Weidmann 1.34 [m/s]
+    double defaultWalkSpeed = 1.34;
+    config.routing().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
+    final RoutingConfigGroup.TeleportedModeParams pt =
+        new RoutingConfigGroup.TeleportedModeParams(TransportMode.pt);
+    pt.setTeleportedModeFreespeedFactor(2.0);
+    config.routing().addParameterSet(pt);
 
-		// set default walk speed; according to Weidmann 1.34 [m/s]
-		double defaultWalkSpeed = 1.34;
-		config.routing().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
-		final RoutingConfigGroup.TeleportedModeParams pt = new RoutingConfigGroup.TeleportedModeParams( TransportMode.pt );
-		pt.setTeleportedModeFreespeedFactor( 2.0 );
-		config.routing().addParameterSet( pt );
+    config.travelTimeCalculator().setFilterModes(true);
 
-        config.travelTimeCalculator().setFilterModes(true);
+    Controler controler = new Controler(scenario);
+    controler.getConfig().controller().setCreateGraphs(false);
+    controler.getConfig().controller().setDumpDataAtEnd(false);
+    controler.getConfig().controller().setWriteEventsInterval(0);
+    //		controler.setOverwriteFiles(true);
 
-		Controler controler = new Controler(scenario);
-        controler.getConfig().controller().setCreateGraphs(false);
-		controler.getConfig().controller().setDumpDataAtEnd(false);
-		controler.getConfig().controller().setWriteEventsInterval(0);
-//		controler.setOverwriteFiles(true);
+    controler.addOverridingModule(new MultiModalModule());
 
-        controler.addOverridingModule(new MultiModalModule());
+    LinkModeChecker linkModeChecker = new LinkModeChecker(scenario.getNetwork());
+    controler.getEvents().addHandler(linkModeChecker);
 
-        LinkModeChecker linkModeChecker = new LinkModeChecker(scenario.getNetwork());
-		controler.getEvents().addHandler(linkModeChecker);
+    controler.run();
 
-		controler.run();
+    /*
+     * Assume that the agent's plan was changed from "home-pt-home" to
+     * "home-transit_walk-pt_interact-pt-pt_interact-transit_walk-home"
+     */
+    Plan ptPlan = ptPerson.getSelectedPlan();
+    Assert.assertEquals(ptPlan.getPlanElements().toString(), 7, ptPlan.getPlanElements().size());
 
-		/*
-		 * Assume that the agent's plan was changed from "home-pt-home" to
-		 * "home-transit_walk-pt_interact-pt-pt_interact-transit_walk-home"
-		 */
-		Plan ptPlan = ptPerson.getSelectedPlan();
-		Assert.assertEquals(ptPlan.getPlanElements().toString(), 7, ptPlan.getPlanElements().size());
+    Plan walkPlan = walkPerson.getSelectedPlan();
+    if (!config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none)) {
+      Assert.assertEquals(
+          walkPlan.getPlanElements().toString(), 7, walkPlan.getPlanElements().size());
+    } else {
+      Assert.assertEquals(
+          walkPlan.getPlanElements().toString(), 3, walkPlan.getPlanElements().size());
+    }
 
-		Plan walkPlan = walkPerson.getSelectedPlan();
-		if ( !config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-			Assert.assertEquals(walkPlan.getPlanElements().toString(), 7, walkPlan.getPlanElements().size());
-		} else {
-			Assert.assertEquals(walkPlan.getPlanElements().toString(), 3, walkPlan.getPlanElements().size());
-		}
+    /*
+     * These tests fail since the TransitRouter (?) does not create NetworkRoutes.
+     * As a result, the multi-modal simulation removes the pt agent from the simulation.
+     */
+    // assume that the transit_walk legs have network routes
+    //		Assert.assertEquals(true, ((Leg) plan.getPlanElements().get(1)).getRoute() instanceof
+    // NetworkRoute);
+    //		Assert.assertEquals(true, ((Leg) plan.getPlanElements().get(5)).getRoute() instanceof
+    // NetworkRoute);
 
-		/*
-		 * These tests fail since the TransitRouter (?) does not create NetworkRoutes.
-		 * As a result, the multi-modal simulation removes the pt agent from the simulation.
-		 */
-		// assume that the transit_walk legs have network routes
-//		Assert.assertEquals(true, ((Leg) plan.getPlanElements().get(1)).getRoute() instanceof NetworkRoute);
-//		Assert.assertEquals(true, ((Leg) plan.getPlanElements().get(5)).getRoute() instanceof NetworkRoute);
+    // assume that the number of arrival events is correct
+    //		Assert.assertEquals(4, linkModeChecker.arrivalCount);
 
-		// assume that the number of arrival events is correct
-//		Assert.assertEquals(4, linkModeChecker.arrivalCount);
+    // assume that the number of link left events is correct
+    //		Assert.assertEquals(8, linkModeChecker.linkLeftCount);
+  }
 
-		// assume that the number of link left events is correct
-//		Assert.assertEquals(8, linkModeChecker.linkLeftCount);
-	}
+  private static class LinkModeChecker
+      implements BasicEventHandler,
+          LinkLeaveEventHandler,
+          PersonDepartureEventHandler,
+          PersonArrivalEventHandler,
+          VehicleEntersTrafficEventHandler,
+          VehicleLeavesTrafficEventHandler {
 
+    private final Network network;
+    private final Map<Id<Person>, String> modes = new HashMap<>();
+    private final Map<Id<Person>, Double> departures = new HashMap<>();
+    final Map<String, Integer> leftCountPerMode = new HashMap<>();
+    final Map<String, Double> travelTimesPerMode = new HashMap<>();
 
+    private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
-	private static class LinkModeChecker implements BasicEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler,
-			PersonArrivalEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+    public LinkModeChecker(Network network) {
+      this.network = network;
 
-		private final Network network;
-		private final Map<Id<Person>, String> modes = new HashMap<>();
-		private final Map<Id<Person>, Double> departures = new HashMap<>();
-		final Map<String, Integer> leftCountPerMode = new HashMap<>();
-		final Map<String, Double> travelTimesPerMode = new HashMap<>();
+      leftCountPerMode.put(TransportMode.pt, 0);
+      leftCountPerMode.put(TransportMode.car, 0);
+      leftCountPerMode.put(TransportMode.walk, 0);
+      leftCountPerMode.put(TransportMode.transit_walk, 0);
 
-		private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+      travelTimesPerMode.put(TransportMode.pt, 0.0);
+      travelTimesPerMode.put(TransportMode.car, 0.0);
+      travelTimesPerMode.put(TransportMode.walk, 0.0);
+      travelTimesPerMode.put(TransportMode.transit_walk, 0.0);
+    }
 
-		public LinkModeChecker(Network network) {
-			this.network = network;
+    @Override
+    public void reset(int iteration) {
+      delegate.reset(iteration);
+      // nothing else to do here
+    }
 
-			leftCountPerMode.put(TransportMode.pt, 0);
-			leftCountPerMode.put(TransportMode.car, 0);
-			leftCountPerMode.put(TransportMode.walk, 0);
-			leftCountPerMode.put(TransportMode.transit_walk, 0);
+    @Override
+    public void handleEvent(PersonDepartureEvent event) {
+      this.modes.put(event.getPersonId(), event.getLegMode());
+      this.departures.put(event.getPersonId(), event.getTime());
+    }
 
-			travelTimesPerMode.put(TransportMode.pt, 0.0);
-			travelTimesPerMode.put(TransportMode.car, 0.0);
-			travelTimesPerMode.put(TransportMode.walk, 0.0);
-			travelTimesPerMode.put(TransportMode.transit_walk, 0.0);
-		}
+    @Override
+    public void handleEvent(LinkLeaveEvent event) {
+      Link link = this.network.getLinks().get(event.getLinkId());
+      Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
 
-		@Override
-		public void reset(int iteration) {
-			delegate.reset(iteration);
-			// nothing else to do here
-		}
+      if (!link.getAllowedModes().contains(this.modes.get(driverId))) {
+        log.error("Found mode " + this.modes.get(driverId) + " on link " + link.getId());
+      }
 
-		@Override
-		public void handleEvent(PersonDepartureEvent event) {
-			this.modes.put(event.getPersonId(), event.getLegMode());
-			this.departures.put(event.getPersonId(), event.getTime());
-		}
+      // assume that the agent is allowed to travel on the link
+      Assert.assertEquals(true, link.getAllowedModes().contains(this.modes.get(driverId)));
 
-		@Override
-		public void handleEvent(LinkLeaveEvent event) {
-			Link link = this.network.getLinks().get(event.getLinkId());
-			Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
+      String mode = this.modes.get(driverId);
+      int count = this.leftCountPerMode.get(mode);
+      this.leftCountPerMode.put(mode, count + 1);
+    }
 
-			if (!link.getAllowedModes().contains(this.modes.get(driverId))) {
-				log.error("Found mode " + this.modes.get(driverId) + " on link " + link.getId());
-			}
+    @Override
+    public void handleEvent(PersonArrivalEvent event) {
+      String mode = this.modes.remove(event.getPersonId());
+      if (mode.contains(TransportMode.non_network_walk)
+          || mode.contains(TransportMode.non_network_walk)) {
+        return;
+      }
 
-			// assume that the agent is allowed to travel on the link
-			Assert.assertEquals(true, link.getAllowedModes().contains(this.modes.get(driverId)));
+      double tripTravelTime = event.getTime() - this.departures.remove(event.getPersonId());
+      Double modeTravelTime = this.travelTimesPerMode.get(mode);
+      if (modeTravelTime == null) {
+        LogManager.getLogger(this.getClass()).warn("mode:" + mode);
+        LogManager.getLogger(this.getClass()).warn("travelTimesPerMode:" + mode);
+      }
+      this.travelTimesPerMode.put(mode, modeTravelTime + tripTravelTime);
+    }
 
-			String mode = this.modes.get(driverId);
-			int count = this.leftCountPerMode.get(mode);
-			this.leftCountPerMode.put(mode, count + 1);
-		}
+    @Override
+    public void handleEvent(Event event) {
+      log.info(event.toString());
+    }
 
-		@Override
-		public void handleEvent(PersonArrivalEvent event) {
-			String mode = this.modes.remove(event.getPersonId());
-			if ( mode.contains(TransportMode.non_network_walk ) || mode.contains(TransportMode.non_network_walk ) ) {
-				return ;
-			}
+    @Override
+    public void handleEvent(VehicleLeavesTrafficEvent event) {
+      delegate.handleEvent(event);
+    }
 
-			double tripTravelTime = event.getTime() - this.departures.remove(event.getPersonId());
-			Double modeTravelTime = this.travelTimesPerMode.get(mode);
-			if ( modeTravelTime==null ) {
-				LogManager.getLogger(this.getClass()).warn("mode:" + mode );
-				LogManager.getLogger(this.getClass()).warn("travelTimesPerMode:" + mode );
-			}
-			this.travelTimesPerMode.put(mode, modeTravelTime + tripTravelTime);
-		}
-
-		@Override
-		public void handleEvent(Event event) {
-			log.info(event.toString());
-		}
-
-		@Override
-		public void handleEvent(VehicleLeavesTrafficEvent event) {
-			delegate.handleEvent(event);
-		}
-
-		@Override
-		public void handleEvent(VehicleEntersTrafficEvent event) {
-			delegate.handleEvent(event);
-		}
-	}
+    @Override
+    public void handleEvent(VehicleEntersTrafficEvent event) {
+      delegate.handleEvent(event);
+    }
+  }
 }

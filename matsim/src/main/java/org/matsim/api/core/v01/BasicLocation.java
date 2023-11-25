@@ -19,13 +19,10 @@
 
 package org.matsim.api.core.v01;
 
-
-
 /**
  * @author dgrether
  */
 public interface BasicLocation {
 
-	public Coord getCoord();
-
+  public Coord getCoord();
 }

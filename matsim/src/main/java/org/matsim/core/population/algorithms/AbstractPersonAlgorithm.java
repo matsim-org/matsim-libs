@@ -27,22 +27,22 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.misc.Counter;
 
 public abstract class AbstractPersonAlgorithm implements PersonAlgorithm {
-	// this is ok as non-final since methods that contain code are final. kai, may'17
+  // this is ok as non-final since methods that contain code are final. kai, may'17
 
-	private final static Logger log = LogManager.getLogger(AbstractPersonAlgorithm.class);
+  private static final Logger log = LogManager.getLogger(AbstractPersonAlgorithm.class);
 
-	public final void run(final Population plans) {
-		log.info("running " + this.getClass().getName() + " algorithm...");
-		Counter counter = new Counter(" person # ");
+  public final void run(final Population plans) {
+    log.info("running " + this.getClass().getName() + " algorithm...");
+    Counter counter = new Counter(" person # ");
 
-		for (Person p : plans.getPersons().values()) {
-			counter.incCounter();
-			this.run(p);
-		}
-		counter.printCounter();
-		log.info("done running algorithm.");
-	}
+    for (Person p : plans.getPersons().values()) {
+      counter.incCounter();
+      this.run(p);
+    }
+    counter.printCounter();
+    log.info("done running algorithm.");
+  }
 
-	@Override
-	public abstract void run(Person person);
+  @Override
+  public abstract void run(Person person);
 }

@@ -18,59 +18,55 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
+/** */
 package playground.vsp.zzArchive.bvwpOld;
 
 import playground.vsp.zzArchive.bvwpOld.Values.Attribute;
 
-
-
 /**
  * @author Ihab
- *
  */
 @Deprecated
 class UtilityChangesBVWP2015 extends UtilityChanges {
 
+  @Override
+  UtlChangesData utlChangePerEntry(
+      Attribute attribute,
+      double deltaAmount,
+      double quantityNullfall,
+      double quantityPlanfall,
+      double margUtl) {
 
-	@Override
-	UtlChangesData utlChangePerEntry(Attribute attribute,
-			double deltaAmount, double quantityNullfall, double quantityPlanfall, double margUtl) {
+    UtlChangesData utlChanges = new UtlChangesData();
 
-		UtlChangesData utlChanges = new UtlChangesData() ;
+    if (attribute.equals(Attribute.priceUser)) {
+      // (Nutzerpreis hat keine Auswirkungen auf Resourcenverzehr!)
+      utlChanges.utl = 0.;
+    } else {
+      if (deltaAmount > 0) {
+        // wir sind aufnehmend; es zaehlt der Planfall:
+        utlChanges.utl = quantityPlanfall * margUtl;
+      } else {
+        utlChanges.utl = -quantityNullfall * margUtl;
+      }
+    }
 
-		if ( attribute.equals(Attribute.priceUser) ) {
-			// (Nutzerpreis hat keine Auswirkungen auf Resourcenverzehr!)
-			utlChanges.utl = 0. ;
-		} else {
-			if ( deltaAmount > 0 ) {
-				// wir sind aufnehmend; es zaehlt der Planfall:
-				utlChanges.utl = quantityPlanfall * margUtl ;
-			} else {
-				utlChanges.utl = -quantityNullfall * margUtl ;
-			}
-		}
+    return utlChanges;
+  }
 
-		return utlChanges;
-	}
+  @Override
+  double computeImplicitUtility(
+      Attributes econValues, Attributes quantitiesNullfall, Attributes quantitiesPlanfall) {
+    double sum = 0.;
+    for (Attribute attribute : Attribute.values()) {
+      if (attribute != Attribute.XX && attribute != Attribute.costOfProduction) {
+        final double quantityPlanfall = quantitiesPlanfall.getByEntry(attribute);
+        final double quantityNullfall = quantitiesNullfall.getByEntry(attribute);
+        final double margUtl = econValues.getByEntry(attribute);
 
-	@Override
-	double computeImplicitUtility(Attributes econValues,
-			Attributes quantitiesNullfall,
-			Attributes quantitiesPlanfall) {
-		double sum = 0. ;
-		for ( Attribute attribute : Attribute.values() ) {
-			if ( attribute != Attribute.XX && attribute != Attribute.costOfProduction ) {
-				final double quantityPlanfall = quantitiesPlanfall.getByEntry(attribute);
-				final double quantityNullfall = quantitiesNullfall.getByEntry(attribute);
-				final double margUtl = econValues.getByEntry(attribute) ;
-
-				sum += - margUtl * (quantityPlanfall+quantityNullfall)/2. ;
-			}
-		}
-		return sum ;
-	}
-
+        sum += -margUtl * (quantityPlanfall + quantityNullfall) / 2.;
+      }
+    }
+    return sum;
+  }
 }

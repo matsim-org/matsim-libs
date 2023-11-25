@@ -27,20 +27,18 @@ import com.google.inject.Singleton;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 
-/**
- * Railsim module installing all needed component.
- */
+/** Railsim module installing all needed component. */
 public class RailsimModule extends AbstractModule {
 
-	@Override
-	public void install() {
-		installQSimModule(new RailsimQSimModule());
-		ConfigUtils.addOrGetModule(getConfig(), RailsimConfigGroup.class);
+  @Override
+  public void install() {
+    installQSimModule(new RailsimQSimModule());
+    ConfigUtils.addOrGetModule(getConfig(), RailsimConfigGroup.class);
 
-		bind(RailsimLinkStateControlerListener.class).in(Singleton.class);
-		addControlerListenerBinding().to(RailsimLinkStateControlerListener.class);
+    bind(RailsimLinkStateControlerListener.class).in(Singleton.class);
+    addControlerListenerBinding().to(RailsimLinkStateControlerListener.class);
 
-		bind(RailsimTrainStateControlerListener.class).in(Singleton.class);
-		addControlerListenerBinding().to(RailsimTrainStateControlerListener.class);
-	}
+    bind(RailsimTrainStateControlerListener.class).in(Singleton.class);
+    addControlerListenerBinding().to(RailsimTrainStateControlerListener.class);
+  }
 }

@@ -18,14 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
+/** */
 package org.matsim.contrib.decongestion;
 
-
 import java.io.IOException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -41,57 +37,61 @@ import org.matsim.core.scenario.ScenarioUtils;
  * Starts an interval-based decongestion pricing simulation run.
  *
  * @author ikaddoura
- *
  */
 public class DecongestionRunExampleFromConfig {
 
-	private static final Logger log = LogManager.getLogger(DecongestionRunExampleFromConfig.class);
+  private static final Logger log = LogManager.getLogger(DecongestionRunExampleFromConfig.class);
 
-	private static String configFile;
+  private static String configFile;
 
-	public static void main(String[] args) throws IOException {
-		if (args.length > 0) {
-			log.info("Starting simulation run with the following arguments:");
+  public static void main(String[] args) throws IOException {
+    if (args.length > 0) {
+      log.info("Starting simulation run with the following arguments:");
 
-			configFile = args[0];
-			log.info("config file: "+ configFile);
+      configFile = args[0];
+      log.info("config file: " + configFile);
 
-		} else {
-			configFile = "path/to/config.xml";
-		}
+    } else {
+      configFile = "path/to/config.xml";
+    }
 
-		DecongestionRunExampleFromConfig main = new DecongestionRunExampleFromConfig();
-		main.run();
-	}
+    DecongestionRunExampleFromConfig main = new DecongestionRunExampleFromConfig();
+    main.run();
+  }
 
-	private void run() throws IOException {
+  private void run() throws IOException {
 
-		Config config = ConfigUtils.loadConfig(configFile, new DecongestionConfigGroup());
+    Config config = ConfigUtils.loadConfig(configFile, new DecongestionConfigGroup());
 
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
+    final Scenario scenario = ScenarioUtils.loadScenario(config);
+    Controler controler = new Controler(scenario);
 
-		// #############################################################
+    // #############################################################
 
-		// congestion toll computation
+    // congestion toll computation
 
-		controler.addOverridingModule(new DecongestionModule(scenario));
+    controler.addOverridingModule(new DecongestionModule(scenario));
 
-		// toll-adjusted routing
+    // toll-adjusted routing
 
-		final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
+    final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory =
+        new TollTimeDistanceTravelDisutilityFactory();
 
-                controler.addOverridingModule(new AbstractModule(){
-			@Override
-			public void install() {
-				this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
-			}
-		});
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            this.bindCarTravelDisutilityFactory().toInstance(travelDisutilityFactory);
+          }
+        });
 
-		// #############################################################
+    // #############################################################
 
-		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
-        controler.run();
-	}
+    controler
+        .getConfig()
+        .controller()
+        .setOverwriteFileSetting(
+            OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
+    controler.run();
+  }
 }
-

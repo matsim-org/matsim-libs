@@ -8,74 +8,77 @@
  */
 package org.matsim.contrib.simulatedannealing.perturbation;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.matsim.contrib.simulatedannealing.SimulatedAnnealingConfigGroup;
-
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.contrib.simulatedannealing.SimulatedAnnealingConfigGroup;
 
 /**
  * @author nkuehnel / MOIA
  */
 public class ChainedPerturbatorParams extends SimulatedAnnealingConfigGroup.PerturbationParams {
 
-	private static final Logger log = LogManager.getLogger(ChainedPerturbatorParams.class);
+  private static final Logger log = LogManager.getLogger(ChainedPerturbatorParams.class);
 
-	public final static String IDENTIFIER = "chainedPerturbator";
+  public static final String IDENTIFIER = "chainedPerturbator";
 
-	@Parameter
-	@Comment("Maximum number of perturbations per perturbator iteration.")
-	public int maxPerturbations = 10;
+  @Parameter
+  @Comment("Maximum number of perturbations per perturbator iteration.")
+  public int maxPerturbations = 10;
 
-	@Parameter
-	@Comment("Minimum number of perturbations per perturbator iteration.")
-	public int minPerturbations = 1;
+  @Parameter
+  @Comment("Minimum number of perturbations per perturbator iteration.")
+  public int minPerturbations = 1;
 
+  public ChainedPerturbatorParams() {
+    super(IDENTIFIER);
+  }
 
-	public ChainedPerturbatorParams() {
-		super(IDENTIFIER);
-	}
+  public void addPerturbationParams(final SimulatedAnnealingConfigGroup.PerturbationParams params) {
+    final SimulatedAnnealingConfigGroup.PerturbationParams previous =
+        this.getPerturbationParams(params.identifier);
 
-	public void addPerturbationParams(final SimulatedAnnealingConfigGroup.PerturbationParams params) {
-		final SimulatedAnnealingConfigGroup.PerturbationParams previous = this.getPerturbationParams(params.identifier);
+    if (previous != null) {
+      log.info(
+          "perturbation parameters for identifier "
+              + previous.identifier
+              + " were just overwritten.");
 
-		if (previous != null) {
-			log.info("perturbation parameters for identifier " + previous.identifier
-					+ " were just overwritten.");
+      final boolean removed = removeParameterSet(previous);
+      if (!removed) throw new RuntimeException("problem replacing perturbator params ");
+    }
 
-			final boolean removed = removeParameterSet(previous);
-			if (!removed)
-				throw new RuntimeException("problem replacing perturbator params ");
-		}
+    super.addParameterSet(params);
+  }
 
-		super.addParameterSet(params);
-	}
+  public SimulatedAnnealingConfigGroup.PerturbationParams getPerturbationParams(
+      final String identifier) {
+    return this.getPerturbationParamsPerType().get(identifier);
+  }
 
-	public SimulatedAnnealingConfigGroup.PerturbationParams getPerturbationParams(final String identifier) {
-		return this.getPerturbationParamsPerType().get(identifier);
-	}
+  public Map<String, SimulatedAnnealingConfigGroup.PerturbationParams>
+      getPerturbationParamsPerType() {
+    final Map<String, SimulatedAnnealingConfigGroup.PerturbationParams> map = new LinkedHashMap<>();
 
-	public Map<String, SimulatedAnnealingConfigGroup.PerturbationParams> getPerturbationParamsPerType() {
-		final Map<String, SimulatedAnnealingConfigGroup.PerturbationParams> map = new LinkedHashMap<>();
+    for (SimulatedAnnealingConfigGroup.PerturbationParams pars : getPerturbationParams()) {
+      map.put(pars.identifier, pars);
+    }
 
-		for (SimulatedAnnealingConfigGroup.PerturbationParams pars : getPerturbationParams()) {
-			map.put(pars.identifier, pars);
-		}
+    return map;
+  }
 
-		return map;
-	}
-
-	public Collection<SimulatedAnnealingConfigGroup.PerturbationParams> getPerturbationParams() {
-		@SuppressWarnings("unchecked")
-		Collection<SimulatedAnnealingConfigGroup.PerturbationParams> collection = (Collection<SimulatedAnnealingConfigGroup.PerturbationParams>) getParameterSets(
-				SimulatedAnnealingConfigGroup.PerturbationParams.SET_TYPE);
-		for (SimulatedAnnealingConfigGroup.PerturbationParams params : collection) {
-			if (this.isLocked()) {
-				params.setLocked();
-			}
-		}
-		return collection;
-	}
+  public Collection<SimulatedAnnealingConfigGroup.PerturbationParams> getPerturbationParams() {
+    @SuppressWarnings("unchecked")
+    Collection<SimulatedAnnealingConfigGroup.PerturbationParams> collection =
+        (Collection<SimulatedAnnealingConfigGroup.PerturbationParams>)
+            getParameterSets(SimulatedAnnealingConfigGroup.PerturbationParams.SET_TYPE);
+    for (SimulatedAnnealingConfigGroup.PerturbationParams params : collection) {
+      if (this.isLocked()) {
+        params.setLocked();
+      }
+    }
+    return collection;
+  }
 }

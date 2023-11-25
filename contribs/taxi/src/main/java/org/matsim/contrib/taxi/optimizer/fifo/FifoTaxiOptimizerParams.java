@@ -19,26 +19,23 @@
 
 package org.matsim.contrib.taxi.optimizer.fifo;
 
+import jakarta.validation.constraints.Positive;
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 
-import jakarta.validation.constraints.Positive;
-
 public final class FifoTaxiOptimizerParams extends AbstractTaxiOptimizerParams {
-	public static final String SET_NAME = "FifoTaxiOptimizer";
+  public static final String SET_NAME = "FifoTaxiOptimizer";
 
-	/**
-	 * {@value #REOPTIMIZATION_TIME_STEP_EXP}
-	 */
-	@Parameter
-	@Comment(REOPTIMIZATION_TIME_STEP_EXP)
-	@Positive
-	public int reoptimizationTimeStep = 1;
+  /** {@value #REOPTIMIZATION_TIME_STEP_EXP} */
+  @Parameter
+  @Comment(REOPTIMIZATION_TIME_STEP_EXP)
+  @Positive
+  public int reoptimizationTimeStep = 1;
 
-	public FifoTaxiOptimizerParams() {
-		super(SET_NAME, true, true);
-	}
+  public FifoTaxiOptimizerParams() {
+    super(SET_NAME, true, true);
+  }
 
-	public int getReoptimizationTimeStep() {
-		return reoptimizationTimeStep;
-	}
+  public int getReoptimizationTimeStep() {
+    return reoptimizationTimeStep;
+  }
 }

@@ -39,57 +39,59 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class SBBTransitQSimEngineIntegrationTest {
 
-    private static final Logger log = LogManager.getLogger(SBBTransitQSimEngineIntegrationTest.class);
-    @Rule public MatsimTestUtils utils = new MatsimTestUtils();
+  private static final Logger log = LogManager.getLogger(SBBTransitQSimEngineIntegrationTest.class);
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public void testIntegration() {
-        TestFixture f = new TestFixture();
+  @Test
+  public void testIntegration() {
+    TestFixture f = new TestFixture();
 
-        f.config.controller().setOutputDirectory(this.utils.getOutputDirectory());
-        f.config.controller().setLastIteration(0);
+    f.config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+    f.config.controller().setLastIteration(0);
 
-        Controler controler = new Controler(f.scenario);
-        controler.addOverridingModule(new SBBTransitModule());
-        controler.configureQSimComponents(components -> {
-            new SBBTransitEngineQSimModule().configure(components);
+    Controler controler = new Controler(f.scenario);
+    controler.addOverridingModule(new SBBTransitModule());
+    controler.configureQSimComponents(
+        components -> {
+          new SBBTransitEngineQSimModule().configure(components);
         });
 
-        controler.run();
+    controler.run();
 
-        Mobsim mobsim = controler.getInjector().getInstance(Mobsim.class);
-        Assert.assertNotNull(mobsim);
-        Assert.assertEquals(QSim.class, mobsim.getClass());
+    Mobsim mobsim = controler.getInjector().getInstance(Mobsim.class);
+    Assert.assertNotNull(mobsim);
+    Assert.assertEquals(QSim.class, mobsim.getClass());
 
-        QSim qsim = (QSim) mobsim;
-        QSimComponentsConfig components = qsim.getChildInjector().getInstance(QSimComponentsConfig.class);
-        Assert.assertTrue(components.hasNamedComponent(SBBTransitEngineQSimModule.COMPONENT_NAME));
-        Assert.assertFalse(components.hasNamedComponent(TransitEngineModule.TRANSIT_ENGINE_NAME));
-    }
+    QSim qsim = (QSim) mobsim;
+    QSimComponentsConfig components =
+        qsim.getChildInjector().getInstance(QSimComponentsConfig.class);
+    Assert.assertTrue(components.hasNamedComponent(SBBTransitEngineQSimModule.COMPONENT_NAME));
+    Assert.assertFalse(components.hasNamedComponent(TransitEngineModule.TRANSIT_ENGINE_NAME));
+  }
 
-    @Test
-    public void testIntegration_misconfiguration() {
-        TestFixture f = new TestFixture();
+  @Test
+  public void testIntegration_misconfiguration() {
+    TestFixture f = new TestFixture();
 
-        Set<String> mainModes = new HashSet<>();
-        mainModes.add("car");
-        mainModes.add("train");
-        f.config.qsim().setMainModes(mainModes);
-        f.config.controller().setOutputDirectory(this.utils.getOutputDirectory());
-        f.config.controller().setLastIteration(0);
+    Set<String> mainModes = new HashSet<>();
+    mainModes.add("car");
+    mainModes.add("train");
+    f.config.qsim().setMainModes(mainModes);
+    f.config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+    f.config.controller().setLastIteration(0);
 
-        Controler controler = new Controler(f.scenario);
-        controler.addOverridingModule(new SBBTransitModule());
-        controler.configureQSimComponents(components -> {
-            new SBBTransitEngineQSimModule().configure(components);
+    Controler controler = new Controler(f.scenario);
+    controler.addOverridingModule(new SBBTransitModule());
+    controler.configureQSimComponents(
+        components -> {
+          new SBBTransitEngineQSimModule().configure(components);
         });
 
-        try {
-            controler.run();
-            Assert.fail("Expected exception, got none.");
-        } catch (RuntimeException e) {
-            Assert.assertTrue(e.getMessage().endsWith("This will not work! common modes = train"));
-        }
+    try {
+      controler.run();
+      Assert.fail("Expected exception, got none.");
+    } catch (RuntimeException e) {
+      Assert.assertTrue(e.getMessage().endsWith("This will not work! common modes = train"));
     }
-
+  }
 }

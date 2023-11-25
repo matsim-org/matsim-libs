@@ -22,10 +22,8 @@ package org.matsim.households;
  * @author dgrether
  */
 public class HouseholdsReaderV10 extends AbstractHouseholdsReaderV10 {
-	
 
-	public HouseholdsReaderV10(Households households) {
-		super(households);
-	}
-	
+  public HouseholdsReaderV10(Households households) {
+    super(households);
+  }
 }

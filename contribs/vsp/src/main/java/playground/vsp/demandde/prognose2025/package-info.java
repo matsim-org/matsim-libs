@@ -19,9 +19,9 @@
  * *********************************************************************** */
 
 /**
- * Very first, very incomplete steps for a demand reader from "Prognose 2025" demand (including analysis situation at 200X).
- * 
- * @author nagel
+ * Very first, very incomplete steps for a demand reader from "Prognose 2025" demand (including
+ * analysis situation at 200X).
  *
+ * @author nagel
  */
 package playground.vsp.demandde.prognose2025;

@@ -20,15 +20,13 @@
 
 package playground.vsp.cadyts.multiModeCadyts;
 
+import jakarta.inject.Inject;
 import java.io.BufferedWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import jakarta.inject.Inject;
-
 import org.apache.logging.log4j.LogManager;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.VolumesAnalyzer;
@@ -51,170 +49,188 @@ import org.matsim.counts.Counts;
  */
 public class MultiModeCountsControlerListener implements StartupListener, IterationEndsListener {
 
-	/*
-	 * String used to identify the operation in the IterationStopWatch.
-	 */
-	public static final String OPERATION_COMPARECOUNTS = "compare with counts";
+  /*
+   * String used to identify the operation in the IterationStopWatch.
+   */
+  public static final String OPERATION_COMPARECOUNTS = "compare with counts";
 
-	private final ControllerConfigGroup controllerConfigGroup;
-	private final CountsConfigGroup config; // useful to get the link ids of counting stations and other infor for averaging
-	private final Set<String> analyzedModes;
-	private final VolumesAnalyzer volumesAnalyzer;
-	private final IterationStopWatch iterationStopwatch;
-	private final OutputDirectoryHierarchy controlerIO;
+  private final ControllerConfigGroup controllerConfigGroup;
+  private final CountsConfigGroup
+      config; // useful to get the link ids of counting stations and other infor for averaging
+  private final Set<String> analyzedModes;
+  private final VolumesAnalyzer volumesAnalyzer;
+  private final IterationStopWatch iterationStopwatch;
+  private final OutputDirectoryHierarchy controlerIO;
 
-	@com.google.inject.Inject(optional=true)
-	private /*final*/ Counts<Link> counts = null; //Although Guice allows injecting final fields, doing so is disallowed because the injected value may not be visible to other threads.
+  @com.google.inject.Inject(optional = true)
+  private /*final*/ Counts<Link> counts =
+      null; // Although Guice allows injecting final fields, doing so is disallowed because the
 
-	private final Map<Id<Link>, Map<String,double[]>> linkStats = new HashMap<>();
-	private int iterationsUsed = 0;
+  // injected value may not be visible to other threads.
 
-	@Inject
-	private MultiModeCountsControlerListener(QSimConfigGroup qsimConfigGroup, ControllerConfigGroup controllerConfigGroup, CountsConfigGroup countsConfigGroup, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
-		this.controllerConfigGroup = controllerConfigGroup;
-		this.config = countsConfigGroup;
-		this.volumesAnalyzer = volumesAnalyzer;
-		this.analyzedModes =   CollectionUtils.stringToSet(this.config.getAnalyzedModes());
-		Set<String> mainModes = new HashSet<>(qsimConfigGroup.getMainModes());
+  private final Map<Id<Link>, Map<String, double[]>> linkStats = new HashMap<>();
+  private int iterationsUsed = 0;
 
-		if( ! this.analyzedModes.equals( mainModes ) ) {
-			LogManager.getLogger(MultiModeCountsControlerListener.class).
-			warn("Analyzed modes in counts config group and main modes in qsim are not same. Using a common set istead.");
-			this.analyzedModes.addAll(mainModes);
-		}
+  @Inject
+  private MultiModeCountsControlerListener(
+      QSimConfigGroup qsimConfigGroup,
+      ControllerConfigGroup controllerConfigGroup,
+      CountsConfigGroup countsConfigGroup,
+      VolumesAnalyzer volumesAnalyzer,
+      IterationStopWatch iterationStopwatch,
+      OutputDirectoryHierarchy controlerIO) {
+    this.controllerConfigGroup = controllerConfigGroup;
+    this.config = countsConfigGroup;
+    this.volumesAnalyzer = volumesAnalyzer;
+    this.analyzedModes = CollectionUtils.stringToSet(this.config.getAnalyzedModes());
+    Set<String> mainModes = new HashSet<>(qsimConfigGroup.getMainModes());
 
-		this.iterationStopwatch = iterationStopwatch;
-		this.controlerIO = controlerIO;
-	}
+    if (!this.analyzedModes.equals(mainModes)) {
+      LogManager.getLogger(MultiModeCountsControlerListener.class)
+          .warn(
+              "Analyzed modes in counts config group and main modes in qsim are not same. Using a common set istead.");
+      this.analyzedModes.addAll(mainModes);
+    }
 
-	@Override
-	public void notifyStartup(final StartupEvent controlerStartupEvent) {
-		if (counts != null) {
-			for (Id<Link> linkId : counts.getCounts().keySet()) {
-				Map<String, double[]> mode2counts = new HashMap<>();
-				for(String mode : this.analyzedModes){
-					mode2counts.put(mode, new double [24]);
-				}
-				this.linkStats.put(linkId, mode2counts);
-			}
-		}
-	}
+    this.iterationStopwatch = iterationStopwatch;
+    this.controlerIO = controlerIO;
+  }
 
-	@Override
-	public void notifyIterationEnds(final IterationEndsEvent event) {
-		if(counts==null) {
+  @Override
+  public void notifyStartup(final StartupEvent controlerStartupEvent) {
+    if (counts != null) {
+      for (Id<Link> linkId : counts.getCounts().keySet()) {
+        Map<String, double[]> mode2counts = new HashMap<>();
+        for (String mode : this.analyzedModes) {
+          mode2counts.put(mode, new double[24]);
         }
-		else if ( event.getIteration() == controllerConfigGroup.getFirstIteration()){
-			// write the data for first iteration too
-			addVolumes(volumesAnalyzer);
-			writeData(event, this.linkStats);
-			reset();
-		} else if ( this.config.getWriteCountsInterval() > 0 ) {
-			if (useVolumesOfIteration(event.getIteration(), controllerConfigGroup.getFirstIteration())) {
-				addVolumes(volumesAnalyzer);
-			}
+        this.linkStats.put(linkId, mode2counts);
+      }
+    }
+  }
 
-			if (createCountsInIteration(event.getIteration())) {
-				iterationStopwatch.beginOperation(OPERATION_COMPARECOUNTS);
-				Map<Id<Link>, Map<String, double[]>> averages;
-				if (this.iterationsUsed > 1) {
-					averages = new HashMap<>();
-					for (Map.Entry<Id<Link>, Map<String, double[]>> e : this.linkStats.entrySet()) {
-						Id<Link> linkId = e.getKey();
-						Map<String, double[]> mode2avgcounts = new HashMap<>();
-						for(Entry<String, double[]> entry : e.getValue().entrySet()) {
-							double[] totalVolumesPerHour = entry.getValue();
-							double[] averageVolumesPerHour = new double[totalVolumesPerHour.length];
-							for (int i = 0; i < totalVolumesPerHour.length; i++) {
-								averageVolumesPerHour[i] =  totalVolumesPerHour[i] / this.iterationsUsed;
-							}
-							mode2avgcounts.put(entry.getKey(), averageVolumesPerHour);
-						}
-						averages.put(linkId, mode2avgcounts);
-					}
-				} else {
-					averages = this.linkStats;
-				}
+  @Override
+  public void notifyIterationEnds(final IterationEndsEvent event) {
+    if (counts == null) {
+    } else if (event.getIteration() == controllerConfigGroup.getFirstIteration()) {
+      // write the data for first iteration too
+      addVolumes(volumesAnalyzer);
+      writeData(event, this.linkStats);
+      reset();
+    } else if (this.config.getWriteCountsInterval() > 0) {
+      if (useVolumesOfIteration(event.getIteration(), controllerConfigGroup.getFirstIteration())) {
+        addVolumes(volumesAnalyzer);
+      }
 
-				writeData(event, averages);
+      if (createCountsInIteration(event.getIteration())) {
+        iterationStopwatch.beginOperation(OPERATION_COMPARECOUNTS);
+        Map<Id<Link>, Map<String, double[]>> averages;
+        if (this.iterationsUsed > 1) {
+          averages = new HashMap<>();
+          for (Map.Entry<Id<Link>, Map<String, double[]>> e : this.linkStats.entrySet()) {
+            Id<Link> linkId = e.getKey();
+            Map<String, double[]> mode2avgcounts = new HashMap<>();
+            for (Entry<String, double[]> entry : e.getValue().entrySet()) {
+              double[] totalVolumesPerHour = entry.getValue();
+              double[] averageVolumesPerHour = new double[totalVolumesPerHour.length];
+              for (int i = 0; i < totalVolumesPerHour.length; i++) {
+                averageVolumesPerHour[i] = totalVolumesPerHour[i] / this.iterationsUsed;
+              }
+              mode2avgcounts.put(entry.getKey(), averageVolumesPerHour);
+            }
+            averages.put(linkId, mode2avgcounts);
+          }
+        } else {
+          averages = this.linkStats;
+        }
 
-				reset();
-				iterationStopwatch.endOperation(OPERATION_COMPARECOUNTS);
-			}
-		}
-	}
+        writeData(event, averages);
 
-	private void writeData(final IterationEndsEvent event, Map<Id<Link>, Map<String, double[]>> averages) {
-		String filename = controlerIO.getIterationFilename(event.getIteration(), "multiMode_hourlyCounts.txt");
-		try(BufferedWriter writer = IOUtils.getBufferedWriter(filename)) {
-			writer.write("linkID\tMode\t");
-			for(int t =1; t <=24; t++) {
-				writer.write(t+"\t");
-			}
-			writer.newLine();
+        reset();
+        iterationStopwatch.endOperation(OPERATION_COMPARECOUNTS);
+      }
+    }
+  }
 
-			for(Id<Link> linkId : averages.keySet()) {
-				for(String mode : averages.get(linkId).keySet()) {
-					writer.write(linkId+"\t");
-					writer.write(mode+"\t");
+  private void writeData(
+      final IterationEndsEvent event, Map<Id<Link>, Map<String, double[]>> averages) {
+    String filename =
+        controlerIO.getIterationFilename(event.getIteration(), "multiMode_hourlyCounts.txt");
+    try (BufferedWriter writer = IOUtils.getBufferedWriter(filename)) {
+      writer.write("linkID\tMode\t");
+      for (int t = 1; t <= 24; t++) {
+        writer.write(t + "\t");
+      }
+      writer.newLine();
 
-					if(averages.get(linkId).get(mode).length<24) throw new RuntimeException("time bins are smaller than 24. Aborting...");
+      for (Id<Link> linkId : averages.keySet()) {
+        for (String mode : averages.get(linkId).keySet()) {
+          writer.write(linkId + "\t");
+          writer.write(mode + "\t");
 
-					for(double d : averages.get(linkId).get(mode)) {
-						writer.write(	d * config.getCountsScaleFactor() + "\t"	);
-					}
-					writer.newLine();
-				}
-			}
-			writer.close();
-		} catch (Exception e) {
-			throw new RuntimeException("Data is not written. Reason :"+e);
-		}
-	}
+          if (averages.get(linkId).get(mode).length < 24)
+            throw new RuntimeException("time bins are smaller than 24. Aborting...");
 
-	/*package*/
-	private boolean useVolumesOfIteration(final int iteration, final int firstIteration) {
-		int iterationMod = iteration % this.config.getWriteCountsInterval();
-		int effectiveIteration = iteration - firstIteration;
-		int averaging = Math.min(this.config.getAverageCountsOverIterations(), this.config.getWriteCountsInterval());
-		if (iterationMod == 0) {
-			return ((this.config.getAverageCountsOverIterations() <= 1) ||
-					(effectiveIteration >= averaging));
-		}
-		return (iterationMod > (this.config.getWriteCountsInterval() - this.config.getAverageCountsOverIterations())
-				&& (effectiveIteration + (this.config.getWriteCountsInterval() - iterationMod) >= averaging));
-	}
+          for (double d : averages.get(linkId).get(mode)) {
+            writer.write(d * config.getCountsScaleFactor() + "\t");
+          }
+          writer.newLine();
+        }
+      }
+      writer.close();
+    } catch (Exception e) {
+      throw new RuntimeException("Data is not written. Reason :" + e);
+    }
+  }
 
-	/*package*/
-	private boolean createCountsInIteration(final int iteration) {
-		return ((iteration % this.config.getWriteCountsInterval() == 0) && (this.iterationsUsed >= this.config.getAverageCountsOverIterations()));
-	}
+  /*package*/
+  private boolean useVolumesOfIteration(final int iteration, final int firstIteration) {
+    int iterationMod = iteration % this.config.getWriteCountsInterval();
+    int effectiveIteration = iteration - firstIteration;
+    int averaging =
+        Math.min(
+            this.config.getAverageCountsOverIterations(), this.config.getWriteCountsInterval());
+    if (iterationMod == 0) {
+      return ((this.config.getAverageCountsOverIterations() <= 1)
+          || (effectiveIteration >= averaging));
+    }
+    return (iterationMod
+            > (this.config.getWriteCountsInterval() - this.config.getAverageCountsOverIterations())
+        && (effectiveIteration + (this.config.getWriteCountsInterval() - iterationMod)
+            >= averaging));
+  }
 
-	private void addVolumes(final VolumesAnalyzer volumes) {
-		this.iterationsUsed++;
-		for (Map.Entry<Id<Link>, Map<String, double[]>> e : this.linkStats.entrySet()) {
-			Id<Link> linkId = e.getKey();
-			Map<String, double[]> mode2counts =  e.getValue();
-			for (String mode : mode2counts.keySet()) {
-				double[] volumesPerHour = mode2counts.get(mode);
-				double[] newVolume = volumes.getVolumesPerHourForLink(linkId, mode);
-				for (int i = 0; i < 24; i++) {
-					volumesPerHour[i] += newVolume[i];
-				}
-				mode2counts.put(mode, volumesPerHour);
-			}
-			this.linkStats.put(linkId, mode2counts);
-		}
-	}
+  /*package*/
+  private boolean createCountsInIteration(final int iteration) {
+    return ((iteration % this.config.getWriteCountsInterval() == 0)
+        && (this.iterationsUsed >= this.config.getAverageCountsOverIterations()));
+  }
 
-	private void reset() {
-		this.iterationsUsed = 0;
-		for(Map<String, double[]> mode2counts : this.linkStats.values()) {
-			for (double[] hours : mode2counts.values()) {
-				for (int i = 0; i < hours.length; i++) {
-					hours[i] = 0.0;
-				}
-			}
-		}
-	}
+  private void addVolumes(final VolumesAnalyzer volumes) {
+    this.iterationsUsed++;
+    for (Map.Entry<Id<Link>, Map<String, double[]>> e : this.linkStats.entrySet()) {
+      Id<Link> linkId = e.getKey();
+      Map<String, double[]> mode2counts = e.getValue();
+      for (String mode : mode2counts.keySet()) {
+        double[] volumesPerHour = mode2counts.get(mode);
+        double[] newVolume = volumes.getVolumesPerHourForLink(linkId, mode);
+        for (int i = 0; i < 24; i++) {
+          volumesPerHour[i] += newVolume[i];
+        }
+        mode2counts.put(mode, volumesPerHour);
+      }
+      this.linkStats.put(linkId, mode2counts);
+    }
+  }
+
+  private void reset() {
+    this.iterationsUsed = 0;
+    for (Map<String, double[]> mode2counts : this.linkStats.values()) {
+      for (double[] hours : mode2counts.values()) {
+        for (int i = 0; i < hours.length; i++) {
+          hours[i] = 0.0;
+        }
+      }
+    }
+  }
 }

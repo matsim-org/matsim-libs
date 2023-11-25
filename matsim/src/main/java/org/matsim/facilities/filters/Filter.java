@@ -22,19 +22,19 @@ package org.matsim.facilities.filters;
 
 /**
  * basic interface for implementing Filters
- * 
+ *
  * @author ychen
  */
 public interface Filter {
-	/**
-	 * Counts, how many objects (e.g. {@link org.matsim.api.core.v01.population.Person}s, 
-	 * {@link org.matsim.api.core.v01.events.Event Events}) were selected by the filter.
-	 */
-	void count();
+  /**
+   * Counts, how many objects (e.g. {@link org.matsim.api.core.v01.population.Person}s, {@link
+   * org.matsim.api.core.v01.events.Event Events}) were selected by the filter.
+   */
+  void count();
 
-	/**
-	 * @return the number of objects (e.g. {@link org.matsim.api.core.v01.population.Person}s, 
-	 * {@link org.matsim.api.core.v01.events.Event Events}) were selected by the filter.
-	 */
-	int getCount();
+  /**
+   * @return the number of objects (e.g. {@link org.matsim.api.core.v01.population.Person}s, {@link
+   *     org.matsim.api.core.v01.events.Event Events}) were selected by the filter.
+   */
+  int getCount();
 }

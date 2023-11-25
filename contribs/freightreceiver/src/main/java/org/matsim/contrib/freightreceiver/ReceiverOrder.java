@@ -18,109 +18,99 @@
 
 package org.matsim.contrib.freightreceiver;
 
-import org.apache.logging.log4j.Logger;
+import java.util.ArrayList;
+import java.util.Collection;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.freight.carriers.Carrier;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * A collection of all the orders of a receiver delivered by a single carrier.
  *
  * @author wlbean, jwjoubert
  */
+public class ReceiverOrder implements BasicPlan {
 
-public class ReceiverOrder implements BasicPlan{
+  private final Logger log = LogManager.getLogger(ReceiverOrder.class);
+  private final Id<Receiver> receiverId;
+  private final Collection<Order> orders;
+  private Double cost = null;
+  private final Id<Carrier> carrierId;
+  private Carrier carrier = null;
 
-	private final Logger log = LogManager.getLogger(ReceiverOrder.class);
-	private final Id<Receiver> receiverId;
-	private final Collection<Order> orders;
-	private Double cost = null;
-	private final Id<Carrier> carrierId;
-	private Carrier carrier = null;
+  @Override
+  public String toString() {
+    StringBuilder strb = new StringBuilder();
+    strb.append("[");
 
-	@Override
-	public String toString() {
-		StringBuilder strb = new StringBuilder(  ) ;
-		strb.append("[") ;
+    for (Order order : orders) {
+      strb.append(order.toString());
+    }
 
-		for( Order order : orders ){
-			strb.append( order.toString() ) ;
-		}
+    strb.append("]");
+    return strb.toString();
+  }
 
-		strb.append("]") ;
-		return strb.toString() ;
-	}
+  public ReceiverOrder(
+      final Id<Receiver> receiverId, final Collection<Order> orders, final Id<Carrier> carrierId) {
+    this.orders = orders;
+    this.receiverId = receiverId;
+    this.carrierId = carrierId;
+  }
 
-	public ReceiverOrder(final Id<Receiver> receiverId, final Collection<Order> orders, final Id<Carrier> carrierId){
-		this.orders = orders;
-		this.receiverId = receiverId;
-		this.carrierId = carrierId;
-	}
+  public final ReceiverOrder createCopy() {
+    Collection<Order> ordersCopy = new ArrayList<>();
+    for (Order order : orders) {
+      ordersCopy.add(order.createCopy());
+    }
+    ReceiverOrder receiverOrderCopy =
+        new ReceiverOrder(this.receiverId, ordersCopy, this.carrierId);
+    receiverOrderCopy.cost = this.cost;
+    receiverOrderCopy.carrier = this.carrier;
+    return receiverOrderCopy;
+  }
 
-	public final ReceiverOrder createCopy() {
-		Collection<Order> ordersCopy = new ArrayList<>() ;
-		for( Order order : orders ){
-			ordersCopy.add( order.createCopy() ) ;
-		}
-		ReceiverOrder receiverOrderCopy = new ReceiverOrder( this.receiverId, ordersCopy, this.carrierId );
-		receiverOrderCopy.cost = this.cost;
-		receiverOrderCopy.carrier = this.carrier ;
-		return receiverOrderCopy ;
-	}
+  /** Get the back pointer to this {@link ReceiverOrder}'s {@link Receiver}. */
+  public Id<Receiver> getReceiverId() {
+    return receiverId;
+  }
 
-	/**
-	 * Get the back pointer to this {@link ReceiverOrder}'s {@link Receiver}.
-	 */
-	public Id<Receiver> getReceiverId(){
-		return receiverId;
-	}
+  @Override
+  public Double getScore() {
+    if (cost == null) {
+      log.warn("The cost/score has not been set yet. Returning null.");
+    }
+    return cost;
+  }
 
-	@Override
-	public Double getScore() {
-		if(cost == null) {
-			log.warn("The cost/score has not been set yet. Returning null.");
-		}
-		return cost;
-	}
+  @Override
+  public void setScore(Double cost) {
+    this.cost = cost;
+  }
 
-	@Override
-	public void setScore(Double cost) {
-		this.cost  = cost;
-	}
+  public Collection<Order> getReceiverProductOrders() {
+    return this.orders;
+  }
 
-	public Collection<Order> getReceiverProductOrders(){
-		return this.orders;
-	}
+  /**
+   * Get the actual {@link Carrier} of this {@link ReceiverOrder}. This will only be set once FIXME
+   * ... has been called to link the receivers and carriers.
+   */
+  public Carrier getCarrier() {
+    if (this.carrier == null) {
+      log.error("The carriers have not been linked to the receivers yet. Returning null.");
+    }
+    return this.carrier;
+  }
 
+  /** Get the pointer {@link Id} of this {@link ReceiverOrder}'s {@link Carrier}. */
+  public Id<Carrier> getCarrierId() {
+    return this.carrierId;
+  }
 
-	/**
-	 * Get the actual {@link Carrier} of this {@link ReceiverOrder}. This will
-	 * only be set once FIXME ... has been called to link the receivers and
-	 * carriers.
-	 */
-	public Carrier getCarrier() {
-		if(this.carrier == null) {
-			log.error("The carriers have not been linked to the receivers yet. Returning null.");
-		}
-		return this.carrier;
-	}
-
-	/**
-	 * Get the pointer {@link Id} of this {@link ReceiverOrder}'s {@link Carrier}.
-	 */
-	public Id<Carrier> getCarrierId(){
-		return this.carrierId;
-	}
-
-
-	public void setCarrier(final Carrier carrier) {
-		this.carrier = carrier;
-	}
-
-
+  public void setCarrier(final Carrier carrier) {
+    this.carrier = carrier;
+  }
 }
-

@@ -30,20 +30,30 @@ import org.matsim.core.router.util.*;
 
 public class LeastCostPathCalculatorModule extends AbstractModule {
 
-    @Override
-    public void install() {
-	    // yy The code below will install _one_ LeastCostPathCalculator, which will be Dijkstra or Landmarks or something.  It will be the
-	    // same Landmarks instance for all modes ... although one could do better by doing the preprocessing separately for the different modes.
-	    // kai/mm, jan'17
+  @Override
+  public void install() {
+    // yy The code below will install _one_ LeastCostPathCalculator, which will be Dijkstra or
+    // Landmarks or something.  It will be the
+    // same Landmarks instance for all modes ... although one could do better by doing the
+    // preprocessing separately for the different modes.
+    // kai/mm, jan'17
 
-        Config config = getConfig();
-        if (config.controller().getRoutingAlgorithmType().equals(ControllerConfigGroup.RoutingAlgorithmType.Dijkstra)) {
-            bind(LeastCostPathCalculatorFactory.class).to(DijkstraFactory.class);
-        } else if (config.controller().getRoutingAlgorithmType().equals(ControllerConfigGroup.RoutingAlgorithmType.AStarLandmarks)) {
-            bind(LeastCostPathCalculatorFactory.class).to(AStarLandmarksFactory.class);
-        } else if (config.controller().getRoutingAlgorithmType().equals(ControllerConfigGroup.RoutingAlgorithmType.SpeedyALT)) {
-            bind(LeastCostPathCalculatorFactory.class).to(SpeedyALTFactory.class);
-        }
+    Config config = getConfig();
+    if (config
+        .controller()
+        .getRoutingAlgorithmType()
+        .equals(ControllerConfigGroup.RoutingAlgorithmType.Dijkstra)) {
+      bind(LeastCostPathCalculatorFactory.class).to(DijkstraFactory.class);
+    } else if (config
+        .controller()
+        .getRoutingAlgorithmType()
+        .equals(ControllerConfigGroup.RoutingAlgorithmType.AStarLandmarks)) {
+      bind(LeastCostPathCalculatorFactory.class).to(AStarLandmarksFactory.class);
+    } else if (config
+        .controller()
+        .getRoutingAlgorithmType()
+        .equals(ControllerConfigGroup.RoutingAlgorithmType.SpeedyALT)) {
+      bind(LeastCostPathCalculatorFactory.class).to(SpeedyALTFactory.class);
     }
-
+  }
 }

@@ -20,7 +20,6 @@
 package org.matsim.contrib.socnetsim.framework.scoring;
 
 import java.util.Random;
-
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -29,92 +28,92 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  * @author thibautd
  */
 public class GroupSizePreferencesConfigGroup extends ReflectiveConfigGroup {
-	public static final String GROUP_NAME = "groupSizePreferences";
+  public static final String GROUP_NAME = "groupSizePreferences";
 
-	private String activityType = "leisure";
-	private int seed = 1234;
-	private int minPref = 0;
-	private int maxPref = 0;
+  private String activityType = "leisure";
+  private int seed = 1234;
+  private int minPref = 0;
+  private int maxPref = 0;
 
-	private double utilityOfMissingContact_util_s = -6 / 3600d;
+  private double utilityOfMissingContact_util_s = -6 / 3600d;
 
-	public GroupSizePreferencesConfigGroup() {
-		super( GROUP_NAME );
-	}
+  public GroupSizePreferencesConfigGroup() {
+    super(GROUP_NAME);
+  }
 
-	@StringGetter( "activityType" )
-	public String getActivityType() {
-		return activityType;
-	}
+  @StringGetter("activityType")
+  public String getActivityType() {
+    return activityType;
+  }
 
-	@StringSetter( "activityType" )
-	public void setActivityType( String activityType ) {
-		this.activityType = activityType;
-	}
+  @StringSetter("activityType")
+  public void setActivityType(String activityType) {
+    this.activityType = activityType;
+  }
 
-	@StringGetter( "seed" )
-	public int getSeed() {
-		return seed;
-	}
+  @StringGetter("seed")
+  public int getSeed() {
+    return seed;
+  }
 
-	@StringSetter( "seed" )
-	public void setSeed( int seed ) {
-		this.seed = seed;
-	}
+  @StringSetter("seed")
+  public void setSeed(int seed) {
+    this.seed = seed;
+  }
 
-	@StringGetter( "minPref" )
-	public int getMinPref() {
-		return minPref;
-	}
+  @StringGetter("minPref")
+  public int getMinPref() {
+    return minPref;
+  }
 
-	@StringSetter( "minPref" )
-	public void setMinPref( int minPref ) {
-		this.minPref = minPref;
-	}
+  @StringSetter("minPref")
+  public void setMinPref(int minPref) {
+    this.minPref = minPref;
+  }
 
-	@StringGetter( "maxPref" )
-	public int getMaxPref() {
-		return maxPref;
-	}
+  @StringGetter("maxPref")
+  public int getMaxPref() {
+    return maxPref;
+  }
 
-	@StringSetter( "maxPref" )
-	public void setMaxPref( int maxPref ) {
-		this.maxPref = maxPref;
-	}
+  @StringSetter("maxPref")
+  public void setMaxPref(int maxPref) {
+    this.maxPref = maxPref;
+  }
 
-	public double getUtilityOfMissingContact_util_s() {
-		return utilityOfMissingContact_util_s;
-	}
+  public double getUtilityOfMissingContact_util_s() {
+    return utilityOfMissingContact_util_s;
+  }
 
-	@StringGetter( "utilityOfMissingContact_util_h" )
-	public double getUtilityOfMissingContact_util_h() {
-		return getUtilityOfMissingContact_util_s() * 3600d;
-	}
+  @StringGetter("utilityOfMissingContact_util_h")
+  public double getUtilityOfMissingContact_util_h() {
+    return getUtilityOfMissingContact_util_s() * 3600d;
+  }
 
-	public void setUtilityOfMissingContact_util_s( double utilityOfMissingContact_util_s ) {
-		this.utilityOfMissingContact_util_s = utilityOfMissingContact_util_s;
-	}
+  public void setUtilityOfMissingContact_util_s(double utilityOfMissingContact_util_s) {
+    this.utilityOfMissingContact_util_s = utilityOfMissingContact_util_s;
+  }
 
-	@StringSetter( "utilityOfMissingContact_util_h" )
-	public void setUtilityOfMissingContact_util_h( double utilityOfMissingContact_util_h ) {
-		setUtilityOfMissingContact_util_s( utilityOfMissingContact_util_h / 3600d );
-	}
+  @StringSetter("utilityOfMissingContact_util_h")
+  public void setUtilityOfMissingContact_util_h(double utilityOfMissingContact_util_h) {
+    setUtilityOfMissingContact_util_s(utilityOfMissingContact_util_h / 3600d);
+  }
 
-	@Override
-	protected void checkConsistency(Config config) {
-		super.checkConsistency(config);
-		if ( maxPref < minPref ) throw new IllegalStateException( "max pref "+maxPref+" lower than min "+minPref+"!" );
-	}
+  @Override
+  protected void checkConsistency(Config config) {
+    super.checkConsistency(config);
+    if (maxPref < minPref)
+      throw new IllegalStateException("max pref " + maxPref + " lower than min " + minPref + "!");
+  }
 
-	public int getPersonPreference( final Person person, Config config ) {
-		checkConsistency(config);
+  public int getPersonPreference(final Person person, Config config) {
+    checkConsistency(config);
 
-		final int personalSeed = seed + person.getId().toString().hashCode();
-		final Random random = new Random( personalSeed );
-		// AH argues this is necessary to be closer to random...
-		for ( int i=0; i < 5; i++ ) random.nextLong();
+    final int personalSeed = seed + person.getId().toString().hashCode();
+    final Random random = new Random(personalSeed);
+    // AH argues this is necessary to be closer to random...
+    for (int i = 0; i < 5; i++) random.nextLong();
 
-		return minPref + ((maxPref != minPref) ? random.nextInt( maxPref - minPref ) : 0);
-	}
+    return minPref + ((maxPref != minPref) ? random.nextInt(maxPref - minPref) : 0);
+  }
 }
-

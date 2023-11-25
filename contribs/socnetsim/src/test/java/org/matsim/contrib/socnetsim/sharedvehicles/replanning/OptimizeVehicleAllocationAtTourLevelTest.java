@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -36,6 +35,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.socnetsim.framework.population.JointPlan;
+import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
+import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
@@ -44,123 +46,122 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.vehicles.Vehicle;
 
-import org.matsim.contrib.socnetsim.framework.population.JointPlan;
-import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
-import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
-
 /**
  * @author thibautd
  */
 public class OptimizeVehicleAllocationAtTourLevelTest {
-	private static final String MODE = "the_vehicular_mode";
+  private static final String MODE = "the_vehicular_mode";
 
-	private final PopulationFactory popFact = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory();
+  private final PopulationFactory popFact =
+      ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
 
-	private GroupPlans createTestPlan(final Random random) {
-		// attempt to get a high diversity of joint structures.
-		final int nMembers = random.nextInt( 100 );
-		//final int nJointPlans = random.nextInt( nMembers );
-		//final double pJoin = 0.1;
-		//final JointPlansFactory jointPlansFact = new JointPlans().getFactory();
+  private GroupPlans createTestPlan(final Random random) {
+    // attempt to get a high diversity of joint structures.
+    final int nMembers = random.nextInt(100);
+    // final int nJointPlans = random.nextInt( nMembers );
+    // final double pJoin = 0.1;
+    // final JointPlansFactory jointPlansFact = new JointPlans().getFactory();
 
-		final List<Plan> individualPlans = new ArrayList<Plan>();
-		final List<JointPlan> jointPlans = new ArrayList<JointPlan>();
+    final List<Plan> individualPlans = new ArrayList<Plan>();
+    final List<JointPlan> jointPlans = new ArrayList<JointPlan>();
 
-		// create plans
-		int currentId = 0;
-		for (int j=0; j < nMembers; j++) {
-			final Id<Person> id = Id.create( currentId++ , Person.class );
-			final Person person = PopulationUtils.getFactory().createPerson(id);
+    // create plans
+    int currentId = 0;
+    for (int j = 0; j < nMembers; j++) {
+      final Id<Person> id = Id.create(currentId++, Person.class);
+      final Person person = PopulationUtils.getFactory().createPerson(id);
 
-			final Plan plan = PopulationUtils.createPlan(person);
-			fillPlan( plan , random );
-			person.addPlan( plan );
+      final Plan plan = PopulationUtils.createPlan(person);
+      fillPlan(plan, random);
+      person.addPlan(plan);
 
-			individualPlans.add( plan );
-		}
+      individualPlans.add(plan);
+    }
 
-		// TODO: join some plans in joint plans
+    // TODO: join some plans in joint plans
 
-		return new GroupPlans( jointPlans , individualPlans );
-	}
+    return new GroupPlans(jointPlans, individualPlans);
+  }
 
-	private void fillPlan(
-			final Plan plan,
-			final Random random) {
-		final Id<Link> homeLinkId = Id.create( "versailles" , Link.class );
+  private void fillPlan(final Plan plan, final Random random) {
+    final Id<Link> homeLinkId = Id.create("versailles", Link.class);
 
-		final Activity firstAct = popFact.createActivityFromLinkId( "h" , homeLinkId );
-		firstAct.setEndTime( random.nextDouble() * 24 * 3600d );
-		plan.addActivity( firstAct );
+    final Activity firstAct = popFact.createActivityFromLinkId("h", homeLinkId);
+    firstAct.setEndTime(random.nextDouble() * 24 * 3600d);
+    plan.addActivity(firstAct);
 
-		final Leg l = popFact.createLeg( MODE );
-		l.setRoute( RouteUtils.createLinkNetworkRouteImpl(Id.create( 1 , Link.class ), Id.create( 12 , Link.class )) );
-		l.setTravelTime( random.nextDouble() * 36000 );
-		plan.addLeg( l );
+    final Leg l = popFact.createLeg(MODE);
+    l.setRoute(
+        RouteUtils.createLinkNetworkRouteImpl(Id.create(1, Link.class), Id.create(12, Link.class)));
+    l.setTravelTime(random.nextDouble() * 36000);
+    plan.addLeg(l);
 
-		plan.addActivity( popFact.createActivityFromLinkId( "h" , homeLinkId ) );
-	}
+    plan.addActivity(popFact.createActivityFromLinkId("h", homeLinkId));
+  }
 
-	@Test
-	@Ignore( "TODO" )
-	public void testVehiclesAreAllocatedAtTheTourLevel() throws Exception {
-		throw new UnsupportedOperationException( "TODO" );
-	}
+  @Test
+  @Ignore("TODO")
+  public void testVehiclesAreAllocatedAtTheTourLevel() throws Exception {
+    throw new UnsupportedOperationException("TODO");
+  }
 
-	@Test
-	public void testCannotFindBetterAllocationRandomly() throws Exception {
-		Set<String> stages = new HashSet<>();// formerly EmptyStageActivityTypes.INSTANCE;
+  @Test
+  public void testCannotFindBetterAllocationRandomly() throws Exception {
+    Set<String> stages = new HashSet<>(); // formerly EmptyStageActivityTypes.INSTANCE;
 
-		for ( int i = 0; i < 5; i++ ) {
-			final GroupPlans optimized = createTestPlan( new Random( i ) );
+    for (int i = 0; i < 5; i++) {
+      final GroupPlans optimized = createTestPlan(new Random(i));
 
-			final VehicleRessources vehs = createRessources( optimized );
+      final VehicleRessources vehs = createRessources(optimized);
 
-			final OptimizeVehicleAllocationAtTourLevelAlgorithm algo =
-				new OptimizeVehicleAllocationAtTourLevelAlgorithm(
-						stages,
-						new Random( 1234 ),
-						vehs,
-						Collections.singleton( MODE ),
-						false,
-						TimeInterpretation.create(ConfigUtils.createConfig()));
-			algo.run( optimized );
-			final double optimizedOverlap = algo.calcOverlap( optimized );
-			final Counter counter = new Counter( "test plan # "+(i+1)+", test # " );
-			for ( int j = 0; j < 500; j++ ) {
-				counter.incCounter();
-				final GroupPlans randomized = createTestPlan( new Random( i ) );
-				 new AllocateVehicleToPlansInGroupPlanAlgorithm(
-						new Random( j ),
-						vehs,
-						Collections.singleton( MODE ), 
-						false,
-						false).run( randomized );
-				 final double randomizedOverlap = algo.calcOverlap( randomized );
-				 Assert.assertTrue(
-						 "["+i+","+j+"] found better solution than optimized one: "+randomizedOverlap+" < "+optimizedOverlap,
-						 optimizedOverlap <= randomizedOverlap );
-			}
-			counter.printCounter();
-		}
-	}
+      final OptimizeVehicleAllocationAtTourLevelAlgorithm algo =
+          new OptimizeVehicleAllocationAtTourLevelAlgorithm(
+              stages,
+              new Random(1234),
+              vehs,
+              Collections.singleton(MODE),
+              false,
+              TimeInterpretation.create(ConfigUtils.createConfig()));
+      algo.run(optimized);
+      final double optimizedOverlap = algo.calcOverlap(optimized);
+      final Counter counter = new Counter("test plan # " + (i + 1) + ", test # ");
+      for (int j = 0; j < 500; j++) {
+        counter.incCounter();
+        final GroupPlans randomized = createTestPlan(new Random(i));
+        new AllocateVehicleToPlansInGroupPlanAlgorithm(
+                new Random(j), vehs, Collections.singleton(MODE), false, false)
+            .run(randomized);
+        final double randomizedOverlap = algo.calcOverlap(randomized);
+        Assert.assertTrue(
+            "["
+                + i
+                + ","
+                + j
+                + "] found better solution than optimized one: "
+                + randomizedOverlap
+                + " < "
+                + optimizedOverlap,
+            optimizedOverlap <= randomizedOverlap);
+      }
+      counter.printCounter();
+    }
+  }
 
-	private VehicleRessources createRessources(final GroupPlans optimized) {
-		final Set<Id<Vehicle>> ids = new HashSet<>();
-		final int nVehicles = optimized.getAllIndividualPlans().size() / 2;
+  private VehicleRessources createRessources(final GroupPlans optimized) {
+    final Set<Id<Vehicle>> ids = new HashSet<>();
+    final int nVehicles = optimized.getAllIndividualPlans().size() / 2;
 
-		int i = 0;
-		for ( Plan p : optimized.getAllIndividualPlans() ) {
-			if ( i++ == nVehicles ) break;
-			ids.add( Id.create( p.getPerson().getId() , Vehicle.class ) );
-		}
+    int i = 0;
+    for (Plan p : optimized.getAllIndividualPlans()) {
+      if (i++ == nVehicles) break;
+      ids.add(Id.create(p.getPerson().getId(), Vehicle.class));
+    }
 
-		return new VehicleRessources() {
-			@Override
-			public Set<Id<Vehicle>> identifyVehiclesUsableForAgent(final Id<Person> person) {
-				return ids;
-			}
-		};
-	}
+    return new VehicleRessources() {
+      @Override
+      public Set<Id<Vehicle>> identifyVehiclesUsableForAgent(final Id<Person> person) {
+        return ids;
+      }
+    };
+  }
 }
-

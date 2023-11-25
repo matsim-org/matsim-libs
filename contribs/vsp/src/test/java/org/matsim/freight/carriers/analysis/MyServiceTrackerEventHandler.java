@@ -33,48 +33,51 @@ import org.matsim.freight.carriers.events.eventhandler.CarrierServiceEndEventHan
 import org.matsim.freight.carriers.events.eventhandler.CarrierServiceStartEventHandler;
 import org.matsim.vehicles.Vehicles;
 
- class MyServiceTrackerEventHandler implements ActivityStartEventHandler, CarrierServiceStartEventHandler, CarrierServiceEndEventHandler {
-    private final Vehicles vehicles;
-    private final Network network;
-    private final Carriers carriers;
+class MyServiceTrackerEventHandler
+    implements ActivityStartEventHandler,
+        CarrierServiceStartEventHandler,
+        CarrierServiceEndEventHandler {
+  private final Vehicles vehicles;
+  private final Network network;
+  private final Carriers carriers;
 
-    private FreightAnalysisServiceTracking serviceTracking = new FreightAnalysisServiceTracking();
+  private FreightAnalysisServiceTracking serviceTracking = new FreightAnalysisServiceTracking();
 
-    MyServiceTrackerEventHandler(Vehicles vehicles, Network network, Carriers carriers) {
-        this.network = network;
-        this.carriers = carriers;
-        this.vehicles = vehicles;
-        this.init();
+  MyServiceTrackerEventHandler(Vehicles vehicles, Network network, Carriers carriers) {
+    this.network = network;
+    this.carriers = carriers;
+    this.vehicles = vehicles;
+    this.init();
+  }
+
+  private void init() {
+    for (Carrier carrier : carriers.getCarriers().values()) {
+
+      for (CarrierService service : carrier.getServices().values()) {
+        serviceTracking.addTracker(service, carrier.getId());
+      }
     }
+    serviceTracking.estimateArrivalTimes(carriers);
+  }
 
-    private void init() {
-        for (Carrier carrier : carriers.getCarriers().values()) {
+  @Override
+  public void handleEvent(CarrierServiceEndEvent event) {
+    serviceTracking.handleEndEvent(event);
+  }
 
-            for (CarrierService service : carrier.getServices().values()) {
-                serviceTracking.addTracker(service, carrier.getId());
-            }
-        }
-        serviceTracking.estimateArrivalTimes(carriers);
+  @Override
+  public void handleEvent(CarrierServiceStartEvent event) {
+    serviceTracking.handleStartEvent(event);
+  }
+
+  @Override
+  public void handleEvent(ActivityStartEvent activityStartEvent) {
+    if (activityStartEvent.getActType().equals("service")) {
+      serviceTracking.trackServiceActivityStart(activityStartEvent);
     }
+  }
 
-    @Override
-    public void handleEvent(CarrierServiceEndEvent event) {
-        serviceTracking.handleEndEvent(event);
-    }
-
-    @Override
-    public void handleEvent(CarrierServiceStartEvent event) {
-        serviceTracking.handleStartEvent(event);
-    }
-
-    @Override
-    public void handleEvent(ActivityStartEvent activityStartEvent) {
-        if (activityStartEvent.getActType().equals("service")) {
-            serviceTracking.trackServiceActivityStart(activityStartEvent);
-        }
-    }
-
-    public FreightAnalysisServiceTracking getServiceTracking() {
-        return serviceTracking;
-    }
+  public FreightAnalysisServiceTracking getServiceTracking() {
+    return serviceTracking;
+  }
 }

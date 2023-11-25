@@ -21,20 +21,17 @@ import org.matsim.interfaces.basic.v01.Id;
 package org.matsim.lanes;
 
 import java.util.SortedMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+
 /**
- *
  * @author dgrether
- *
  */
 public interface LanesToLinkAssignment {
 
-	SortedMap<Id<Lane>, Lane> getLanes();
+  SortedMap<Id<Lane>, Lane> getLanes();
 
-	void addLane(Lane lane);
+  void addLane(Lane lane);
 
-	Id<Link> getLinkId();
-
+  Id<Link> getLinkId();
 }

@@ -21,56 +21,54 @@ package org.matsim.contrib.signals.data.signalgroups.v20;
 
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
 
-
 /**
  * @author dgrether
- *
  */
 public final class SignalGroupsDataImpl implements SignalGroupsData {
 
-	private Map<Id<SignalSystem>, Map<Id<SignalGroup>, SignalGroupData>> signalGroupsDataBySystemId = new TreeMap<>();
-	
-	private SignalGroupsDataFactory factory;
-	
-	public SignalGroupsDataImpl(){
-		this.factory = new SignalGroupsDataFactoryImpl();
-	}
-	
-	@Override
-	public void addSignalGroupData(SignalGroupData signalGroupData) {
-		Id<SignalSystem> signalSystemId = signalGroupData.getSignalSystemId();
-		Map<Id<SignalGroup>, SignalGroupData> map = this.signalGroupsDataBySystemId.get(signalSystemId);
-		if (map == null){
-			map = new TreeMap<>();
-			this.signalGroupsDataBySystemId.put(signalSystemId, map);
-		}
-		map.put(signalGroupData.getId(), signalGroupData);
-	}
+  private Map<Id<SignalSystem>, Map<Id<SignalGroup>, SignalGroupData>> signalGroupsDataBySystemId =
+      new TreeMap<>();
 
-	@Override
-	public Map<Id<SignalGroup>, SignalGroupData> getSignalGroupDataBySystemId(Id<SignalSystem> signalSystemId) {
-		return this.signalGroupsDataBySystemId.get(signalSystemId);
-	}
+  private SignalGroupsDataFactory factory;
 
-	@Override
-	public SignalGroupsDataFactory getFactory() {
-		return this.factory;
-	}
+  public SignalGroupsDataImpl() {
+    this.factory = new SignalGroupsDataFactoryImpl();
+  }
 
-	@Override
-	public Map<Id<SignalSystem>, Map<Id<SignalGroup>, SignalGroupData>> getSignalGroupDataBySignalSystemId() {
-		return signalGroupsDataBySystemId;
-	}
+  @Override
+  public void addSignalGroupData(SignalGroupData signalGroupData) {
+    Id<SignalSystem> signalSystemId = signalGroupData.getSignalSystemId();
+    Map<Id<SignalGroup>, SignalGroupData> map = this.signalGroupsDataBySystemId.get(signalSystemId);
+    if (map == null) {
+      map = new TreeMap<>();
+      this.signalGroupsDataBySystemId.put(signalSystemId, map);
+    }
+    map.put(signalGroupData.getId(), signalGroupData);
+  }
 
-	@Override
-	public void setFactory(SignalGroupsDataFactory factory) {
-		this.factory = factory;
-	}
+  @Override
+  public Map<Id<SignalGroup>, SignalGroupData> getSignalGroupDataBySystemId(
+      Id<SignalSystem> signalSystemId) {
+    return this.signalGroupsDataBySystemId.get(signalSystemId);
+  }
 
-	
+  @Override
+  public SignalGroupsDataFactory getFactory() {
+    return this.factory;
+  }
+
+  @Override
+  public Map<Id<SignalSystem>, Map<Id<SignalGroup>, SignalGroupData>>
+      getSignalGroupDataBySignalSystemId() {
+    return signalGroupsDataBySystemId;
+  }
+
+  @Override
+  public void setFactory(SignalGroupsDataFactory factory) {
+    this.factory = factory;
+  }
 }

@@ -20,61 +20,69 @@
 package org.matsim.contrib.noise.examples;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.noise.MergeNoiseCSVFile;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.NoiseOfflineCalculation;
-import org.matsim.contrib.noise.MergeNoiseCSVFile;
 import org.matsim.contrib.noise.ProcessNoiseImmissions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- *
- * An example how to compute noise levels, damages etc. for a single iteration (= offline noise computation).
+ * An example how to compute noise levels, damages etc. for a single iteration (= offline noise
+ * computation).
  *
  * @author ikaddoura
- *
  */
 public class NoiseOfflineCalculationExample {
 
-	private static String runDirectory = "pathTo/RunDirectory/";
-	private static String outputDirectory = "pathTo/analysis-output-directory/";
-	private static String runId = "runXYZ";
+  private static String runDirectory = "pathTo/RunDirectory/";
+  private static String outputDirectory = "pathTo/analysis-output-directory/";
+  private static String runId = "runXYZ";
 
-	public static void main(String[] args) {
+  public static void main(String[] args) {
 
-		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
-		config.controller().setRunId(runId);
-		config.network().setInputFile(runDirectory + runId + ".output_network.xml.gz");
-		config.plans().setInputFile(runDirectory + runId + ".output_plans.xml.gz");
-		config.controller().setOutputDirectory(runDirectory);
+    Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
+    config.controller().setRunId(runId);
+    config.network().setInputFile(runDirectory + runId + ".output_network.xml.gz");
+    config.plans().setInputFile(runDirectory + runId + ".output_plans.xml.gz");
+    config.controller().setOutputDirectory(runDirectory);
 
-		// adjust the default noise parameters
-		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config,NoiseConfigGroup.class) ;
-		noiseParameters.setReceiverPointGap(12345789.);
-		// ...
+    // adjust the default noise parameters
+    NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
+    noiseParameters.setReceiverPointGap(12345789.);
+    // ...
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+    Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, outputDirectory);
-		noiseCalculation.run();
+    NoiseOfflineCalculation noiseCalculation =
+        new NoiseOfflineCalculation(scenario, outputDirectory);
+    noiseCalculation.run();
 
-		// some processing of the output data
-		if (!outputDirectory.endsWith("/")) outputDirectory = outputDirectory + "/";
+    // some processing of the output data
+    if (!outputDirectory.endsWith("/")) outputDirectory = outputDirectory + "/";
 
-		String outputFilePath = outputDirectory + "noise-analysis/";
-		ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv", noiseParameters.getReceiverPointGap());
-		process.run();
+    String outputFilePath = outputDirectory + "noise-analysis/";
+    ProcessNoiseImmissions process =
+        new ProcessNoiseImmissions(
+            outputFilePath + "immissions/",
+            outputFilePath + "receiverPoints/receiverPoints.csv",
+            noiseParameters.getReceiverPointGap());
+    process.run();
 
-		final String[] labels = { "immission", "consideredAgentUnits" , "damages_receiverPoint" };
-		final String[] workingDirectories = { outputFilePath + "/immissions/" , outputFilePath + "/consideredAgentUnits/" , outputFilePath + "/damages_receiverPoint/" };
+    final String[] labels = {"immission", "consideredAgentUnits", "damages_receiverPoint"};
+    final String[] workingDirectories = {
+      outputFilePath + "/immissions/",
+      outputFilePath + "/consideredAgentUnits/",
+      outputFilePath + "/damages_receiverPoint/"
+    };
 
-		MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
-		merger.setReceiverPointsFile(outputFilePath + "receiverPoints/receiverPoints.csv");
-		merger.setOutputDirectory(outputFilePath);
-		merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
-		merger.setWorkingDirectory(workingDirectories);
-		merger.setLabel(labels);
-		merger.run();
-	}
+    MergeNoiseCSVFile merger = new MergeNoiseCSVFile();
+    merger.setReceiverPointsFile(outputFilePath + "receiverPoints/receiverPoints.csv");
+    merger.setOutputDirectory(outputFilePath);
+    merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
+    merger.setWorkingDirectory(workingDirectories);
+    merger.setLabel(labels);
+    merger.run();
+  }
 }

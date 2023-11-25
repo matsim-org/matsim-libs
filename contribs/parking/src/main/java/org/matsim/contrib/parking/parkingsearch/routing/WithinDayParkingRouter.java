@@ -19,8 +19,8 @@
 
 package org.matsim.contrib.parking.parkingsearch.routing;
 
+import com.google.inject.name.Named;
 import jakarta.inject.Inject;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -34,39 +34,39 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.name.Named;
-
 /**
  * @author jbischoff
  */
 public class WithinDayParkingRouter implements ParkingRouter {
 
-	private final Network network;
-	private final LeastCostPathCalculator pathCalculator;
+  private final Network network;
+  private final LeastCostPathCalculator pathCalculator;
 
-	@Inject
-	WithinDayParkingRouter(@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, Network network) {
-		this.network = network;
-		pathCalculator = new DijkstraFactory().createPathCalculator(network, new TimeAsTravelDisutility(travelTime),
-				travelTime);
-	}
+  @Inject
+  WithinDayParkingRouter(
+      @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, Network network) {
+    this.network = network;
+    pathCalculator =
+        new DijkstraFactory()
+            .createPathCalculator(network, new TimeAsTravelDisutility(travelTime), travelTime);
+  }
 
-	@Override
-	public NetworkRoute getRouteFromParkingToDestination(Id<Link> destinationLinkId, double departureTime,
-			Id<Link> startLinkId) {
+  @Override
+  public NetworkRoute getRouteFromParkingToDestination(
+      Id<Link> destinationLinkId, double departureTime, Id<Link> startLinkId) {
 
-		Link startLink = this.network.getLinks().get(startLinkId);
-		Link endLink = this.network.getLinks().get(destinationLinkId);
+    Link startLink = this.network.getLinks().get(startLinkId);
+    Link endLink = this.network.getLinks().get(destinationLinkId);
 
-		Path path = this.pathCalculator.calcLeastCostPath(startLink.getToNode(), endLink.getFromNode(), departureTime,
-				null, null);
-		NetworkRoute carRoute = RouteUtils.createLinkNetworkRouteImpl(startLinkId, endLink.getId());
-		carRoute.setLinkIds(startLink.getId(), NetworkUtils.getLinkIds(path.links), endLink.getId());
-		carRoute.setTravelTime(path.travelTime);
-		double distance = RouteUtils.calcDistance(carRoute, 1.0, 1.0, network);
-		carRoute.setDistance(distance);
+    Path path =
+        this.pathCalculator.calcLeastCostPath(
+            startLink.getToNode(), endLink.getFromNode(), departureTime, null, null);
+    NetworkRoute carRoute = RouteUtils.createLinkNetworkRouteImpl(startLinkId, endLink.getId());
+    carRoute.setLinkIds(startLink.getId(), NetworkUtils.getLinkIds(path.links), endLink.getId());
+    carRoute.setTravelTime(path.travelTime);
+    double distance = RouteUtils.calcDistance(carRoute, 1.0, 1.0, network);
+    carRoute.setDistance(distance);
 
-		return carRoute;
-	}
-
+    return carRoute;
+  }
 }

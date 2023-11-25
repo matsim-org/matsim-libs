@@ -26,14 +26,13 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 public interface UmlaufStueckI {
 
-	TransitLine getLine();
+  TransitLine getLine();
 
-	TransitRoute getRoute();
+  TransitRoute getRoute();
 
-	Departure getDeparture();
+  Departure getDeparture();
 
-	boolean isFahrt();
+  boolean isFahrt();
 
-	NetworkRoute getCarRoute();
-
+  NetworkRoute getCarRoute();
 }

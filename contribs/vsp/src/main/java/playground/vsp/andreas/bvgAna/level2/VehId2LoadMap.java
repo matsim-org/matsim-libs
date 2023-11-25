@@ -20,8 +20,6 @@
 package playground.vsp.andreas.bvgAna.level2;
 
 import java.util.Map;
-
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -31,57 +29,57 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
-
 import playground.vsp.andreas.bvgAna.level1.VehId2OccupancyHandler;
 
 /**
  * Calculates the load of a vehicles depending on time and vehicle characteristics given.
- * 
- * @author aneumann
  *
+ * @author aneumann
  */
-public class VehId2LoadMap implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
+public class VehId2LoadMap
+    implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
-	private final Logger log = LogManager.getLogger(VehId2LoadMap.class);
-//	private final Level logLevel = Level.DEBUG;
-	
-	private VehId2OccupancyHandler vehId2OccupancyHandler;
-	private Map<Id<Vehicle>, Vehicle> vehiclesMap;
-	
-	public VehId2LoadMap(Vehicles vehicles){
-//		this.log.setLevel(this.logLevel);
-		this.vehId2OccupancyHandler = new VehId2OccupancyHandler();
-		this.vehiclesMap = vehicles.getVehicles();
-	}
-	
-	/**
-	 * @return Returns the load for a given vehicle id and time.
-	 */
-	public double getVehLoadByTime(Id<Vehicle> vehId, double time){
-		double occupancy = this.vehId2OccupancyHandler.getVehicleLoad(vehId, time);
-		double capacity = this.vehiclesMap.get(vehId).getType().getCapacity().getSeats().intValue()
-						+ this.vehiclesMap.get(vehId).getType().getCapacity().getStandingRoom().intValue();
-		double load = occupancy / capacity;
-		this.log.debug("Occupancy " + occupancy + ", Capacity " + capacity + ", Load " + load);
-		
-		if(load > 1.0){
-			this.log.warn("Load for vehicle " + vehId + " at " + time + " > 1. Better check this");
-		}
-		return load;
-	}
+  private final Logger log = LogManager.getLogger(VehId2LoadMap.class);
+  //	private final Level logLevel = Level.DEBUG;
 
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		this.vehId2OccupancyHandler.handleEvent(event);
-	}
+  private VehId2OccupancyHandler vehId2OccupancyHandler;
+  private Map<Id<Vehicle>, Vehicle> vehiclesMap;
 
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		this.vehId2OccupancyHandler.handleEvent(event);
-	}
+  public VehId2LoadMap(Vehicles vehicles) {
+    //		this.log.setLevel(this.logLevel);
+    this.vehId2OccupancyHandler = new VehId2OccupancyHandler();
+    this.vehiclesMap = vehicles.getVehicles();
+  }
 
-	@Override
-	public void reset(int iteration) {
-		this.vehId2OccupancyHandler.reset(iteration);		
-	}
+  /**
+   * @return Returns the load for a given vehicle id and time.
+   */
+  public double getVehLoadByTime(Id<Vehicle> vehId, double time) {
+    double occupancy = this.vehId2OccupancyHandler.getVehicleLoad(vehId, time);
+    double capacity =
+        this.vehiclesMap.get(vehId).getType().getCapacity().getSeats().intValue()
+            + this.vehiclesMap.get(vehId).getType().getCapacity().getStandingRoom().intValue();
+    double load = occupancy / capacity;
+    this.log.debug("Occupancy " + occupancy + ", Capacity " + capacity + ", Load " + load);
+
+    if (load > 1.0) {
+      this.log.warn("Load for vehicle " + vehId + " at " + time + " > 1. Better check this");
+    }
+    return load;
+  }
+
+  @Override
+  public void handleEvent(PersonEntersVehicleEvent event) {
+    this.vehId2OccupancyHandler.handleEvent(event);
+  }
+
+  @Override
+  public void handleEvent(PersonLeavesVehicleEvent event) {
+    this.vehId2OccupancyHandler.handleEvent(event);
+  }
+
+  @Override
+  public void reset(int iteration) {
+    this.vehId2OccupancyHandler.reset(iteration);
+  }
 }

@@ -1,6 +1,7 @@
 // This software is released into the Public Domain.  See copying.txt for details.
 package playground.vsp.andreas.mzilske.osm;
 
+import java.util.Map;
 import org.openstreetmap.osmosis.core.container.v0_6.BoundContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityProcessor;
@@ -20,175 +21,150 @@ import org.openstreetmap.osmosis.core.store.SingleClassObjectSerializationFactor
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 import org.openstreetmap.osmosis.core.task.v0_6.SinkSource;
 
-import java.util.Map;
-
-
 /**
  * Restricts output of nodes to those that are used in ways.
- * 
+ *
  * @author Brett Henderson
  * @author Karl Newman
- * @author Christoph Sommer 
+ * @author Christoph Sommer
  */
 public class UsedNodeAndWayFilter implements SinkSource, EntityProcessor {
-	private Sink sink;
-	private SimpleObjectStore<NodeContainer> allNodes;
-	private SimpleObjectStore<WayContainer> allWays;
-	private SimpleObjectStore<RelationContainer> allRelations;
-	private IdTracker requiredNodes;
-	private IdTracker requiredWays;
+  private Sink sink;
+  private SimpleObjectStore<NodeContainer> allNodes;
+  private SimpleObjectStore<WayContainer> allWays;
+  private SimpleObjectStore<RelationContainer> allRelations;
+  private IdTracker requiredNodes;
+  private IdTracker requiredWays;
 
+  /**
+   * Creates a new instance.
+   *
+   * @param idTrackerType Defines the id tracker implementation to use.
+   */
+  public UsedNodeAndWayFilter(IdTrackerType idTrackerType) {
+    allNodes =
+        new SimpleObjectStore<NodeContainer>(
+            new SingleClassObjectSerializationFactory(NodeContainer.class), "afnd", true);
+    allWays =
+        new SimpleObjectStore<WayContainer>(
+            new SingleClassObjectSerializationFactory(WayContainer.class), "afwy", true);
+    allRelations =
+        new SimpleObjectStore<RelationContainer>(
+            new SingleClassObjectSerializationFactory(RelationContainer.class), "afrl", true);
 
-	/**
-	 * Creates a new instance.
-	 *
-	 * @param idTrackerType
-	 *            Defines the id tracker implementation to use.
-	 */
-	public UsedNodeAndWayFilter(IdTrackerType idTrackerType) {
-		allNodes = new SimpleObjectStore<NodeContainer>(
-				new SingleClassObjectSerializationFactory(NodeContainer.class), "afnd", true);
-		allWays = new SimpleObjectStore<WayContainer>(
-				new SingleClassObjectSerializationFactory(WayContainer.class), "afwy", true);
-		allRelations = new SimpleObjectStore<RelationContainer>(
-				new SingleClassObjectSerializationFactory(RelationContainer.class), "afrl", true);
+    requiredNodes = IdTrackerFactory.createInstance(idTrackerType);
+    requiredWays = IdTrackerFactory.createInstance(idTrackerType);
+  }
 
-		requiredNodes = IdTrackerFactory.createInstance(idTrackerType);
-		requiredWays = IdTrackerFactory.createInstance(idTrackerType);
-		
-	}
+  /** {@inheritDoc} */
+  public void process(EntityContainer entityContainer) {
+    // Ask the entity container to invoke the appropriate processing method
+    // for the entity type.
+    entityContainer.process(this);
+  }
 
+  /** {@inheritDoc} */
+  public void process(BoundContainer boundContainer) {
+    // By default, pass it on unchanged
+    sink.process(boundContainer);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void process(EntityContainer entityContainer) {
-		// Ask the entity container to invoke the appropriate processing method
-		// for the entity type.
-		entityContainer.process(this);
-	}
+  /** {@inheritDoc} */
+  public void process(NodeContainer container) {
+    allNodes.add(container);
+  }
 
+  /** {@inheritDoc} */
+  public void process(WayContainer container) {
+    allWays.add(container);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void process(BoundContainer boundContainer) {
-		// By default, pass it on unchanged
-		sink.process(boundContainer);
-	}
+  /** {@inheritDoc} */
+  public void process(RelationContainer container) {
+    Relation relation;
 
+    relation = container.getEntity();
+    for (RelationMember reference : relation.getMembers()) {
+      if (reference.getMemberType().equals(EntityType.Node)) {
+        requiredNodes.set(reference.getMemberId());
+      } else if (reference.getMemberType().equals(EntityType.Way)) {
+        requiredWays.set(reference.getMemberId());
+      }
+    }
+    allRelations.add(container);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void process(NodeContainer container) {
-		allNodes.add(container);
-	}
+  /** {@inheritDoc} */
+  public void complete() {
 
+    ReleasableIterator<WayContainer> wayIterator = allWays.iterate();
+    while (wayIterator.hasNext()) {
+      WayContainer wayContainer = wayIterator.next();
+      long wayId = wayContainer.getEntity().getId();
+      if (!requiredWays.get(wayId)) {
+        continue;
+      }
+      for (WayNode nodeReference : wayContainer.getEntity().getWayNodes()) {
+        requiredNodes.set(nodeReference.getNodeId());
+      }
+    }
+    wayIterator.close();
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void process(WayContainer container) {
-		allWays.add(container);
-	}
+    // send on all required nodes
+    ReleasableIterator<NodeContainer> nodeIterator = allNodes.iterate();
+    while (nodeIterator.hasNext()) {
+      NodeContainer nodeContainer = nodeIterator.next();
+      long nodeId = nodeContainer.getEntity().getId();
+      if (!requiredNodes.get(nodeId)) {
+        continue;
+      }
+      sink.process(nodeContainer);
+    }
+    nodeIterator.close();
+    nodeIterator = null;
 
+    wayIterator = allWays.iterate();
+    while (wayIterator.hasNext()) {
+      WayContainer way = wayIterator.next();
+      if (!requiredWays.get(way.getEntity().getId())) {
+        continue;
+      }
+      sink.process(way);
+    }
+    wayIterator.close();
+    wayIterator = null;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void process(RelationContainer container) {
-		Relation relation;
+    // send on all relations
+    ReleasableIterator<RelationContainer> relationIterator = allRelations.iterate();
+    while (relationIterator.hasNext()) {
+      sink.process(relationIterator.next());
+    }
+    relationIterator.close();
+    relationIterator = null;
 
-		relation = container.getEntity();
-		for (RelationMember reference : relation.getMembers()) {
-			if (reference.getMemberType().equals(EntityType.Node)) {
-				requiredNodes.set(reference.getMemberId());
-			} else if (reference.getMemberType().equals(EntityType.Way)) {
-				requiredWays.set(reference.getMemberId());
-			}
-		}
-		allRelations.add(container);
-	}
+    // done
+    sink.complete();
+  }
 
+  @Override
+  public void close() {
+    if (allNodes != null) {
+      allNodes.close();
+    }
+    if (allWays != null) {
+      allWays.close();
+    }
+    if (allRelations != null) {
+      allRelations.close();
+    }
+    sink.close();
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void complete() {
+  @Override
+  public void setSink(Sink sink) {
+    this.sink = sink;
+  }
 
-		ReleasableIterator<WayContainer> wayIterator = allWays.iterate();
-		while (wayIterator.hasNext()) {
-			WayContainer wayContainer = wayIterator.next();
-			long wayId = wayContainer.getEntity().getId();
-			if (!requiredWays.get(wayId)) {
-				continue;
-			}
-			for (WayNode nodeReference : wayContainer.getEntity().getWayNodes()) {
-				requiredNodes.set(nodeReference.getNodeId());
-			}
-		}
-		wayIterator.close();
-
-
-		// send on all required nodes
-		ReleasableIterator<NodeContainer> nodeIterator = allNodes.iterate();
-		while (nodeIterator.hasNext()) {
-			NodeContainer nodeContainer = nodeIterator.next();
-			long nodeId = nodeContainer.getEntity().getId();
-			if (!requiredNodes.get(nodeId)) {
-				continue;
-			}
-			sink.process(nodeContainer);
-		}
-		nodeIterator.close();
-		nodeIterator = null;
-
-		wayIterator = allWays.iterate();
-		while (wayIterator.hasNext()) {
-			WayContainer way = wayIterator.next();
-			if (!requiredWays.get(way.getEntity().getId())) {
-				continue;
-			}
-			sink.process(way);
-		}
-		wayIterator.close();
-		wayIterator = null;
-
-		// send on all relations
-		ReleasableIterator<RelationContainer> relationIterator = allRelations.iterate();
-		while (relationIterator.hasNext()) {
-			sink.process(relationIterator.next());
-		}
-		relationIterator.close();
-		relationIterator = null;
-
-		// done
-		sink.complete();
-	}
-
-	@Override
-	public void close() {
-		if (allNodes != null) {
-			allNodes.close();
-		}
-		if (allWays != null) {
-			allWays.close();
-		}
-		if (allRelations != null) {
-			allRelations.close();
-		}
-		sink.close();
-	}
-
-
-	@Override
-	public void setSink(Sink sink) {
-		this.sink = sink;
-	}
-
-	@Override
-	public void initialize(Map<String, Object> map) {
-
-	}
+  @Override
+  public void initialize(Map<String, Object> map) {}
 }

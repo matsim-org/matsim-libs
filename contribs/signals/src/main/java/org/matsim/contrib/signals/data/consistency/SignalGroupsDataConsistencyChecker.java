@@ -20,7 +20,6 @@
 package org.matsim.contrib.signals.data.consistency;
 
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,56 +32,62 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 
-
 /**
  * @author dgrether
- *
  */
 public final class SignalGroupsDataConsistencyChecker implements ConsistencyChecker {
 
-	
-	private static final Logger log = LogManager.getLogger(SignalGroupsDataConsistencyChecker.class);
-	
-	private SignalsData signalsData;
+  private static final Logger log = LogManager.getLogger(SignalGroupsDataConsistencyChecker.class);
 
-	public SignalGroupsDataConsistencyChecker(Scenario scenario) {
-		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+  private SignalsData signalsData;
 
-	}
-	
-	/**
-	 * @see ConsistencyChecker#checkConsistency()
-	 */
-	@Override
-	public void checkConsistency() {
-		log.info("Checking consistency of SignalGroupsData...");
-		this.checkGroupToSignalsMatching();
-		log.info("Checked consistency of SignalGroupsData.");
-	}
+  public SignalGroupsDataConsistencyChecker(Scenario scenario) {
+    this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+  }
 
-	private void checkGroupToSignalsMatching() {
-		SignalGroupsData groups = this.signalsData.getSignalGroupsData();
-		SignalSystemsData signals = this.signalsData.getSignalSystemsData();
-		for (Map<Id<SignalGroup>, SignalGroupData> groupByIdMap : groups.getSignalGroupDataBySignalSystemId().values()) {
-			for (SignalGroupData group : groupByIdMap.values()) {
-				for (Id<Signal> signalId : group.getSignalIds()) {
-					SignalSystemData signalSystem = signals.getSignalSystemData().get(group.getSignalSystemId());
-					if (signalSystem == null) {
-						log.error("Error: No SignalSystem for SignalGroup." );
-						log.error("\t\tSignalGroup Id: " + group.getId() + " is specified to be in SignalSystem Id: " + group.getSignalSystemId() + " but "
-								+ " this signal system is not existing in the specification of the signal systems.");
-						
-					}
-					else if (! signalSystem.getSignalData().containsKey(signalId)){
-							log.error("Error: No Signal for SignalGroup." );
-							log.error("\t\tSignalGroup Id: " + group.getId() + " of SignalSystem Id: " + group.getSignalSystemId() + " points"
-									+ " to  Signal Id: " + signalId + " but this signal is not specified. ");
-						}
-					}
-				}
-			}
-		}
-		
-		
-	}
+  /**
+   * @see ConsistencyChecker#checkConsistency()
+   */
+  @Override
+  public void checkConsistency() {
+    log.info("Checking consistency of SignalGroupsData...");
+    this.checkGroupToSignalsMatching();
+    log.info("Checked consistency of SignalGroupsData.");
+  }
 
+  private void checkGroupToSignalsMatching() {
+    SignalGroupsData groups = this.signalsData.getSignalGroupsData();
+    SignalSystemsData signals = this.signalsData.getSignalSystemsData();
+    for (Map<Id<SignalGroup>, SignalGroupData> groupByIdMap :
+        groups.getSignalGroupDataBySignalSystemId().values()) {
+      for (SignalGroupData group : groupByIdMap.values()) {
+        for (Id<Signal> signalId : group.getSignalIds()) {
+          SignalSystemData signalSystem =
+              signals.getSignalSystemData().get(group.getSignalSystemId());
+          if (signalSystem == null) {
+            log.error("Error: No SignalSystem for SignalGroup.");
+            log.error(
+                "\t\tSignalGroup Id: "
+                    + group.getId()
+                    + " is specified to be in SignalSystem Id: "
+                    + group.getSignalSystemId()
+                    + " but "
+                    + " this signal system is not existing in the specification of the signal systems.");
+
+          } else if (!signalSystem.getSignalData().containsKey(signalId)) {
+            log.error("Error: No Signal for SignalGroup.");
+            log.error(
+                "\t\tSignalGroup Id: "
+                    + group.getId()
+                    + " of SignalSystem Id: "
+                    + group.getSignalSystemId()
+                    + " points"
+                    + " to  Signal Id: "
+                    + signalId
+                    + " but this signal is not specified. ");
+          }
+        }
+      }
+    }
+  }
+}

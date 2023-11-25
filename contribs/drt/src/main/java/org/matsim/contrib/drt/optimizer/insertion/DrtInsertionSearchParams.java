@@ -26,7 +26,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  * @author Michal Maciejewski (michalm)
  */
 public abstract class DrtInsertionSearchParams extends ReflectiveConfigGroup {
-	public DrtInsertionSearchParams(String paramSetName) {
-		super(paramSetName);
-	}
+  public DrtInsertionSearchParams(String paramSetName) {
+    super(paramSetName);
+  }
 }

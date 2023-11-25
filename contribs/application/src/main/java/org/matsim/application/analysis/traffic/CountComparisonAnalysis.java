@@ -1,5 +1,10 @@
 package org.matsim.application.analysis.traffic;
 
+import static tech.tablesaw.aggregate.AggregateFunctions.count;
+import static tech.tablesaw.aggregate.AggregateFunctions.mean;
+
+import java.nio.file.Path;
+import java.util.*;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -21,233 +26,253 @@ import picocli.CommandLine;
 import tech.tablesaw.api.*;
 import tech.tablesaw.selection.Selection;
 
-import java.nio.file.Path;
-import java.util.*;
-
-import static tech.tablesaw.aggregate.AggregateFunctions.count;
-import static tech.tablesaw.aggregate.AggregateFunctions.mean;
-
-@CommandLine.Command(name = "count-comparison", description = "Produces comparisons of observed and simulated counts.")
-@CommandSpec(requireEvents = true, requireCounts = true, requireNetwork = true,
-		produces = {"count_comparison_by_hour.csv", "count_comparison_daily.csv", "count_comparison_quality.csv", "count_error_by_hour.csv"})
+@CommandLine.Command(
+    name = "count-comparison",
+    description = "Produces comparisons of observed and simulated counts.")
+@CommandSpec(
+    requireEvents = true,
+    requireCounts = true,
+    requireNetwork = true,
+    produces = {
+      "count_comparison_by_hour.csv",
+      "count_comparison_daily.csv",
+      "count_comparison_quality.csv",
+      "count_error_by_hour.csv"
+    })
 public class CountComparisonAnalysis implements MATSimAppCommand {
 
-	@CommandLine.Mixin
-	private final InputOptions input = InputOptions.ofCommand(CountComparisonAnalysis.class);
+  @CommandLine.Mixin
+  private final InputOptions input = InputOptions.ofCommand(CountComparisonAnalysis.class);
 
-	@CommandLine.Mixin
-	private final OutputOptions output = OutputOptions.ofCommand(CountComparisonAnalysis.class);
+  @CommandLine.Mixin
+  private final OutputOptions output = OutputOptions.ofCommand(CountComparisonAnalysis.class);
 
-	@CommandLine.Mixin
-	private SampleOptions sample;
+  @CommandLine.Mixin private SampleOptions sample;
 
-	@CommandLine.Option(names = "--limits", split = ",", description = "Limits for quality label categories", defaultValue = "0.6,0.8,1.2,1.4")
-	private List<Double> limits;
+  @CommandLine.Option(
+      names = "--limits",
+      split = ",",
+      description = "Limits for quality label categories",
+      defaultValue = "0.6,0.8,1.2,1.4")
+  private List<Double> limits;
 
-	@CommandLine.Option(names = "--labels", split = ",", description = "Labels for quality categories", defaultValue = "major under,under,ok,over,major over")
-	private List<String> labels;
+  @CommandLine.Option(
+      names = "--labels",
+      split = ",",
+      description = "Labels for quality categories",
+      defaultValue = "major under,under,ok,over,major over")
+  private List<String> labels;
 
-	@CommandLine.Option(names = "--transport-mode", description = "Mode to analyze", split = ",", defaultValue = TransportMode.car)
-	private Set<String> modes;
+  @CommandLine.Option(
+      names = "--transport-mode",
+      description = "Mode to analyze",
+      split = ",",
+      defaultValue = TransportMode.car)
+  private Set<String> modes;
 
-	public static void main(String[] args) {
-		new CountComparisonAnalysis().execute(args);
-	}
+  public static void main(String[] args) {
+    new CountComparisonAnalysis().execute(args);
+  }
 
-	private static String cut(double relError, List<Double> errorGroups, List<String> labels) {
+  private static String cut(double relError, List<Double> errorGroups, List<String> labels) {
 
-		int idx = Collections.binarySearch(errorGroups, relError);
+    int idx = Collections.binarySearch(errorGroups, relError);
 
-		if (idx >= 0)
-			return labels.get(idx);
+    if (idx >= 0) return labels.get(idx);
 
-		int ins = -(idx + 1);
-		return labels.get(ins);
-	}
+    int ins = -(idx + 1);
+    return labels.get(ins);
+  }
 
-	private static int[] sum(int[] a, int[] b) {
-		int[] counts = new int[a.length];
-		for (int i = 0; i < counts.length; i++) {
-			counts[i] = a[i] + b[i];
-		}
+  private static int[] sum(int[] a, int[] b) {
+    int[] counts = new int[a.length];
+    for (int i = 0; i < counts.length; i++) {
+      counts[i] = a[i] + b[i];
+    }
 
-		return counts;
-	}
+    return counts;
+  }
 
-	@Override
-	public Integer call() throws Exception {
+  @Override
+  public Integer call() throws Exception {
 
-		EventsManager eventsManager = EventsUtils.createEventsManager();
+    EventsManager eventsManager = EventsUtils.createEventsManager();
 
-		Network network = input.getNetwork();
+    Network network = input.getNetwork();
 
-		VolumesAnalyzer volume = new VolumesAnalyzer(3600, 86400, network, true);
+    VolumesAnalyzer volume = new VolumesAnalyzer(3600, 86400, network, true);
 
-		eventsManager.addHandler(volume);
+    eventsManager.addHandler(volume);
 
-		eventsManager.initProcessing();
+    eventsManager.initProcessing();
 
-		EventsUtils.readEvents(eventsManager, input.getEventsPath());
+    EventsUtils.readEvents(eventsManager, input.getEventsPath());
 
-		eventsManager.finishProcessing();
+    eventsManager.finishProcessing();
 
-		Counts<Link> counts = new Counts<>();
-		MatsimCountsReader reader = new MatsimCountsReader(counts);
-		reader.readFile(input.getCountsPath());
+    Counts<Link> counts = new Counts<>();
+    MatsimCountsReader reader = new MatsimCountsReader(counts);
+    reader.readFile(input.getCountsPath());
 
-		Table byHour = writeOutput(counts, network, volume);
+    Table byHour = writeOutput(counts, network, volume);
 
-		writeErrorMetrics(byHour, output.getPath("count_error_by_hour.csv"));
+    writeErrorMetrics(byHour, output.getPath("count_error_by_hour.csv"));
 
-		return 0;
-	}
+    return 0;
+  }
 
-	private Table writeOutput(Counts<Link> counts, Network network, VolumesAnalyzer volumes) {
+  private Table writeOutput(Counts<Link> counts, Network network, VolumesAnalyzer volumes) {
 
-		Map<Id<Link>, ? extends Link> links = network.getLinks();
+    Map<Id<Link>, ? extends Link> links = network.getLinks();
 
-		Table byHour = Table.create(
-				StringColumn.create("link_id"),
-				StringColumn.create("name"),
-				StringColumn.create("road_type"),
-				IntColumn.create("hour"),
-				DoubleColumn.create("observed_traffic_volume"),
-				DoubleColumn.create("simulated_traffic_volume")
-		);
+    Table byHour =
+        Table.create(
+            StringColumn.create("link_id"),
+            StringColumn.create("name"),
+            StringColumn.create("road_type"),
+            IntColumn.create("hour"),
+            DoubleColumn.create("observed_traffic_volume"),
+            DoubleColumn.create("simulated_traffic_volume"));
 
-		Table dailyTrafficVolume = Table.create(StringColumn.create("link_id"),
-				StringColumn.create("name"),
-				StringColumn.create("road_type"),
-				DoubleColumn.create("observed_traffic_volume"),
-				DoubleColumn.create("simulated_traffic_volume")
-		);
+    Table dailyTrafficVolume =
+        Table.create(
+            StringColumn.create("link_id"),
+            StringColumn.create("name"),
+            StringColumn.create("road_type"),
+            DoubleColumn.create("observed_traffic_volume"),
+            DoubleColumn.create("simulated_traffic_volume"));
 
-		for (Map.Entry<Id<Link>, Count<Link>> entry : counts.getCounts().entrySet()) {
-			Id<Link> key = entry.getKey();
-			Map<Integer, Volume> countVolume = entry.getValue().getVolumes();
-			String name = entry.getValue().getCsLabel();
+    for (Map.Entry<Id<Link>, Count<Link>> entry : counts.getCounts().entrySet()) {
+      Id<Link> key = entry.getKey();
+      Map<Integer, Volume> countVolume = entry.getValue().getVolumes();
+      String name = entry.getValue().getCsLabel();
 
-			Link link = links.get(key);
-			String type = NetworkUtils.getHighwayType(link);
+      Link link = links.get(key);
+      String type = NetworkUtils.getHighwayType(link);
 
-			if (countVolume.isEmpty())
-				continue;
+      if (countVolume.isEmpty()) continue;
+
+      Optional<int[]> opt =
+          modes.stream()
+              .map(mode -> volumes.getVolumesForLink(key, mode))
+              .filter(Objects::nonNull)
+              .reduce(CountComparisonAnalysis::sum);
 
-			Optional<int[]> opt = modes.stream()
-					.map(mode -> volumes.getVolumesForLink(key, mode))
-					.filter(Objects::nonNull)
-					.reduce(CountComparisonAnalysis::sum);
+      int[] volumesForLink;
+      if (countVolume.isEmpty() || opt.isEmpty()) {
+        volumesForLink = new int[24];
+      } else {
+        volumesForLink = opt.get();
+      }
+
+      double simulatedTrafficVolumeByDay = 0;
+      double observedTrafficVolumeByDay = 0;
 
-			int[] volumesForLink;
-			if (countVolume.isEmpty() || opt.isEmpty()) {
-				volumesForLink = new int[24];
-			} else {
-				volumesForLink = opt.get();
-			}
+      if (countVolume.size() == 24) {
 
-			double simulatedTrafficVolumeByDay = 0;
-			double observedTrafficVolumeByDay = 0;
+        for (int hour = 1; hour < 25; hour++) {
 
-			if (countVolume.size() == 24) {
+          double observedTrafficVolumeAtHour = countVolume.get(hour).getValue();
+          double simulatedTrafficVolumeAtHour =
+              (double) volumesForLink[hour - 1] / this.sample.getSample();
 
-				for (int hour = 1; hour < 25; hour++) {
+          simulatedTrafficVolumeByDay += simulatedTrafficVolumeAtHour;
+          observedTrafficVolumeByDay += observedTrafficVolumeAtHour;
 
-					double observedTrafficVolumeAtHour = countVolume.get(hour).getValue();
-					double simulatedTrafficVolumeAtHour = (double) volumesForLink[hour - 1] / this.sample.getSample();
+          Row row = byHour.appendRow();
+          row.setString("link_id", key.toString());
+          row.setString("name", name);
+          row.setString("road_type", type);
+          row.setInt("hour", hour - 1);
+          row.setDouble("observed_traffic_volume", observedTrafficVolumeAtHour);
+          row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeAtHour);
+        }
+      } else
+        observedTrafficVolumeByDay =
+            countVolume.values().stream().mapToDouble(Volume::getValue).sum();
 
-					simulatedTrafficVolumeByDay += simulatedTrafficVolumeAtHour;
-					observedTrafficVolumeByDay += observedTrafficVolumeAtHour;
+      Row row = dailyTrafficVolume.appendRow();
+      row.setString("link_id", key.toString());
+      row.setString("name", name);
+      row.setString("road_type", type);
+      row.setDouble("observed_traffic_volume", observedTrafficVolumeByDay);
+      row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeByDay);
+    }
 
-					Row row = byHour.appendRow();
-					row.setString("link_id", key.toString());
-					row.setString("name", name);
-					row.setString("road_type", type);
-					row.setInt("hour", hour - 1);
-					row.setDouble("observed_traffic_volume", observedTrafficVolumeAtHour);
-					row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeAtHour);
-				}
-			} else
-				observedTrafficVolumeByDay = countVolume.values().stream().mapToDouble(Volume::getValue).sum();
+    DoubleColumn relError =
+        dailyTrafficVolume
+            .doubleColumn("simulated_traffic_volume")
+            .divide(dailyTrafficVolume.doubleColumn("observed_traffic_volume"))
+            .setName("rel_error");
 
-			Row row = dailyTrafficVolume.appendRow();
-			row.setString("link_id", key.toString());
-			row.setString("name", name);
-			row.setString("road_type", type);
-			row.setDouble("observed_traffic_volume", observedTrafficVolumeByDay);
-			row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeByDay);
-		}
+    StringColumn qualityLabel =
+        relError
+            .copy()
+            .map(err -> cut(err, limits, labels), ColumnType.STRING::create)
+            .setName("quality");
 
-		DoubleColumn relError = dailyTrafficVolume.doubleColumn("simulated_traffic_volume")
-				.divide(dailyTrafficVolume.doubleColumn("observed_traffic_volume"))
-				.setName("rel_error");
+    dailyTrafficVolume.addColumns(relError, qualityLabel);
 
-		StringColumn qualityLabel = relError.copy()
-				.map(err -> cut(err, limits, labels), ColumnType.STRING::create)
-				.setName("quality");
+    dailyTrafficVolume = dailyTrafficVolume.sortOn("road_type", "link_id");
+    dailyTrafficVolume.write().csv(output.getPath("count_comparison_daily.csv").toFile());
 
-		dailyTrafficVolume.addColumns(relError, qualityLabel);
+    byHour = byHour.sortOn("name");
+    byHour.write().csv(output.getPath("count_comparison_by_hour.csv").toFile());
 
+    Table byQuality = dailyTrafficVolume.summarize("quality", count).by("quality", "road_type");
+    byQuality.column(2).setName("n");
 
-		dailyTrafficVolume = dailyTrafficVolume.sortOn("road_type", "link_id");
-		dailyTrafficVolume.write().csv(output.getPath("count_comparison_daily.csv").toFile());
+    // Sort by quality
+    Comparator<Row> cmp = Comparator.comparingInt(row -> labels.indexOf(row.getString("quality")));
 
-		byHour = byHour.sortOn("name");
-		byHour.write().csv(output.getPath("count_comparison_by_hour.csv").toFile());
+    byQuality = byQuality.sortOn(cmp.thenComparing(row -> row.getNumber("n")));
+    byQuality.addColumns(byQuality.doubleColumn("n").copy().setName("share"));
 
-		Table byQuality = dailyTrafficVolume.summarize("quality", count).by("quality", "road_type");
-		byQuality.column(2).setName("n");
+    List<String> roadTypes = byQuality.stringColumn("road_type").unique().asList();
 
-		// Sort by quality
-		Comparator<Row> cmp = Comparator.comparingInt(row -> labels.indexOf(row.getString("quality")));
+    // Norm within each road type
+    for (String roadType : roadTypes) {
+      DoubleColumn share = byQuality.doubleColumn("share");
+      Selection sel = byQuality.stringColumn("road_type").isEqualTo(roadType);
 
-		byQuality = byQuality.sortOn(cmp.thenComparing(row -> row.getNumber("n")));
-		byQuality.addColumns(byQuality.doubleColumn("n").copy().setName("share"));
+      double total = share.where(sel).sum();
+      if (total > 0) share.set(sel, share.divide(total));
+    }
 
-		List<String> roadTypes = byQuality.stringColumn("road_type").unique().asList();
+    byQuality.write().csv(output.getPath("count_comparison_quality.csv").toFile());
 
-		// Norm within each road type
-		for (String roadType : roadTypes) {
-			DoubleColumn share = byQuality.doubleColumn("share");
-			Selection sel = byQuality.stringColumn("road_type").isEqualTo(roadType);
+    return byHour;
+  }
 
-			double total = share.where(sel).sum();
-			if (total > 0)
-				share.set(sel, share.divide(total));
-		}
+  private void writeErrorMetrics(Table byHour, Path path) {
 
-		byQuality.write().csv(output.getPath("count_comparison_quality.csv").toFile());
+    byHour.addColumns(
+        byHour
+            .doubleColumn("simulated_traffic_volume")
+            .subtract(byHour.doubleColumn("observed_traffic_volume"))
+            .setName("error"));
 
-		return byHour;
-	}
+    byHour.addColumns(byHour.doubleColumn("error").abs().setName("abs_error"));
 
-	private void writeErrorMetrics(Table byHour, Path path) {
+    DoubleColumn relError =
+        byHour
+            .doubleColumn("abs_error")
+            .multiply(100)
+            .divide(byHour.doubleColumn("observed_traffic_volume"))
+            .setName("rel_error");
 
-		byHour.addColumns(
-				byHour.doubleColumn("simulated_traffic_volume").subtract(byHour.doubleColumn("observed_traffic_volume")).setName("error")
-		);
+    // Cut-off at Max error
+    relError = relError.set(relError.isMissing(), 1000d);
+    relError = relError.map(d -> Math.min(d, 1000d));
 
-		byHour.addColumns(
-				byHour.doubleColumn("error").abs().setName("abs_error")
-		);
+    byHour.addColumns(relError);
 
-		DoubleColumn relError = byHour.doubleColumn("abs_error")
-				.multiply(100)
-				.divide(byHour.doubleColumn("observed_traffic_volume"))
-				.setName("rel_error");
+    Table aggr = byHour.summarize("error", "abs_error", "rel_error", mean).by("hour");
 
-		// Cut-off at Max error
-		relError = relError.set(relError.isMissing(), 1000d);
-		relError = relError.map(d -> Math.min(d, 1000d));
+    aggr.column("Mean [error]").setName("mean_bias");
+    aggr.column("Mean [rel_error]").setName("mean_rel_error");
+    aggr.column("Mean [abs_error]").setName("mean_abs_error");
 
-		byHour.addColumns(relError);
-
-		Table aggr = byHour.summarize("error", "abs_error", "rel_error", mean).by("hour");
-
-		aggr.column("Mean [error]").setName("mean_bias");
-		aggr.column("Mean [rel_error]").setName("mean_rel_error");
-		aggr.column("Mean [abs_error]").setName("mean_abs_error");
-
-		aggr.write().csv(path.toFile());
-	}
-
+    aggr.write().csv(path.toFile());
+  }
 }

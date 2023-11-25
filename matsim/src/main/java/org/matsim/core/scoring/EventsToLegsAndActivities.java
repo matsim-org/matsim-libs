@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * EventsToLegsAndActivities.java
@@ -19,8 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.scoring;
+package org.matsim.core.scoring;
 
+import jakarta.inject.Inject;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
@@ -28,84 +28,94 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 
-import jakarta.inject.Inject;
-
 /**
- * For TripScoring to work correctly, activities and legs must be created in the correct order.
- * Thus combine the two EventHandlers {@link EventsToLegs} and {@link EventsToActivities} in one, so it will run in the same thread when handling events.
+ * For TripScoring to work correctly, activities and legs must be created in the correct order. Thus
+ * combine the two EventHandlers {@link EventsToLegs} and {@link EventsToActivities} in one, so it
+ * will run in the same thread when handling events.
  *
  * @author mrieser / Simunto GmbH
  */
-public class EventsToLegsAndActivities implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, LinkEnterEventHandler,
-		TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+public class EventsToLegsAndActivities
+    implements ActivityStartEventHandler,
+        ActivityEndEventHandler,
+        PersonDepartureEventHandler,
+        PersonArrivalEventHandler,
+        LinkEnterEventHandler,
+        TeleportationArrivalEventHandler,
+        TransitDriverStartsEventHandler,
+        PersonEntersVehicleEventHandler,
+        VehicleArrivesAtFacilityEventHandler,
+        VehicleEntersTrafficEventHandler,
+        VehicleLeavesTrafficEventHandler {
 
-	private final EventsToLegs legsDelegate;
-	private final EventsToActivities actsDelegate;
+  private final EventsToLegs legsDelegate;
+  private final EventsToActivities actsDelegate;
 
-	@Inject
-	public EventsToLegsAndActivities(EventsToLegs eventsToLegs, EventsToActivities eventsToActivities) {
-		this.legsDelegate = eventsToLegs;
-		this.actsDelegate = eventsToActivities;
-	}
+  @Inject
+  public EventsToLegsAndActivities(
+      EventsToLegs eventsToLegs, EventsToActivities eventsToActivities) {
+    this.legsDelegate = eventsToLegs;
+    this.actsDelegate = eventsToActivities;
+  }
 
-	@Override
-	public void handleEvent(ActivityEndEvent event) {
-		this.actsDelegate.handleEvent(event);
-	}
+  @Override
+  public void handleEvent(ActivityEndEvent event) {
+    this.actsDelegate.handleEvent(event);
+  }
 
-	@Override
-	public void handleEvent(ActivityStartEvent event) {
-		this.actsDelegate.handleEvent(event);
-	}
+  @Override
+  public void handleEvent(ActivityStartEvent event) {
+    this.actsDelegate.handleEvent(event);
+  }
 
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		this.legsDelegate.handleEvent(event);
-	}
+  @Override
+  public void handleEvent(LinkEnterEvent event) {
+    this.legsDelegate.handleEvent(event);
+  }
 
-	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-		this.legsDelegate.handleEvent(event);
-	}
+  @Override
+  public void handleEvent(PersonArrivalEvent event) {
+    this.legsDelegate.handleEvent(event);
+  }
 
-	@Override
-	public void handleEvent(PersonDepartureEvent event) {
-		this.legsDelegate.handleEvent(event);
-	}
+  @Override
+  public void handleEvent(PersonDepartureEvent event) {
+    this.legsDelegate.handleEvent(event);
+  }
 
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		this.legsDelegate.handleEvent(event);
-	}
+  @Override
+  public void handleEvent(PersonEntersVehicleEvent event) {
+    this.legsDelegate.handleEvent(event);
+  }
 
-	@Override
-	public void handleEvent(TransitDriverStartsEvent event) {
-		this.legsDelegate.handleEvent(event);
-	}
+  @Override
+  public void handleEvent(TransitDriverStartsEvent event) {
+    this.legsDelegate.handleEvent(event);
+  }
 
-	@Override
-	public void handleEvent(VehicleEntersTrafficEvent event) {
-		this.legsDelegate.handleEvent(event);
-	}
+  @Override
+  public void handleEvent(VehicleEntersTrafficEvent event) {
+    this.legsDelegate.handleEvent(event);
+  }
 
-	@Override
-	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		this.legsDelegate.handleEvent(event);
-	}
+  @Override
+  public void handleEvent(VehicleLeavesTrafficEvent event) {
+    this.legsDelegate.handleEvent(event);
+  }
 
-	@Override
-	public void handleEvent(TeleportationArrivalEvent event) {
-		this.legsDelegate.handleEvent(event);
-	}
+  @Override
+  public void handleEvent(TeleportationArrivalEvent event) {
+    this.legsDelegate.handleEvent(event);
+  }
 
-	@Override
-	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		this.legsDelegate.handleEvent(event);
-	}
+  @Override
+  public void handleEvent(VehicleArrivesAtFacilityEvent event) {
+    this.legsDelegate.handleEvent(event);
+  }
 
-	@Override
-	public void reset(int iteration) {
-		this.actsDelegate.reset(iteration);
-		this.legsDelegate.reset(iteration);
-	}
+  @Override
+  public void reset(int iteration) {
+    this.actsDelegate.reset(iteration);
+    this.legsDelegate.reset(iteration);
+  }
 }

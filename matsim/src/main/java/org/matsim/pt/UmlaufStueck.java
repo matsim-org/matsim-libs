@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * UmlaufStueck.java
@@ -19,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.pt;
+package org.matsim.pt;
 
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -28,41 +27,38 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 public class UmlaufStueck implements UmlaufStueckI {
 
-	private TransitLine line;
-	private TransitRoute route;
-	private Departure departure;
-	
-	public UmlaufStueck(TransitLine line, TransitRoute route,
-			Departure departure) {
-		this.line = line;
-		this.route = route;
-		this.departure = departure;
-	}
+  private TransitLine line;
+  private TransitRoute route;
+  private Departure departure;
 
-	@Override
-	public TransitLine getLine() {
-		return line;
-	}
+  public UmlaufStueck(TransitLine line, TransitRoute route, Departure departure) {
+    this.line = line;
+    this.route = route;
+    this.departure = departure;
+  }
 
-	@Override
-	public TransitRoute getRoute() {
-		return route;
-	}
+  @Override
+  public TransitLine getLine() {
+    return line;
+  }
 
-	@Override
-	public Departure getDeparture() {
-		return departure;
-	}
+  @Override
+  public TransitRoute getRoute() {
+    return route;
+  }
 
-	@Override
-	public NetworkRoute getCarRoute() {
-		return route.getRoute();
-	}
+  @Override
+  public Departure getDeparture() {
+    return departure;
+  }
 
-	@Override
-	public boolean isFahrt() {
-		return true;
-	}
-	
+  @Override
+  public NetworkRoute getCarRoute() {
+    return route.getRoute();
+  }
 
+  @Override
+  public boolean isFahrt() {
+    return true;
+  }
 }

@@ -21,8 +21,6 @@ package playground.vsp.analysis.modules.bvgAna.anaLevel1.vehId2DelayAtStop;
 
 import java.util.LinkedList;
 import java.util.TreeMap;
-
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,44 +31,49 @@ import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityE
 
 /**
  * Collects <code>VehicleDepartsAtFacilityEvent</code> for each vehicle
- * 
- * @author aneumann
  *
+ * @author aneumann
  */
-public class VehId2DelayAtStopHandler implements VehicleDepartsAtFacilityEventHandler, TransitDriverStartsEventHandler{
+public class VehId2DelayAtStopHandler
+    implements VehicleDepartsAtFacilityEventHandler, TransitDriverStartsEventHandler {
 
-	private final Logger log = LogManager.getLogger(VehId2DelayAtStopHandler.class);
-//	private final Level logLevel = Level.DEBUG;
-	
-	private TreeMap<Id, LinkedList<VehId2DelayAtStopData>> vehId2DelayAtStopMap = new TreeMap<Id, LinkedList<VehId2DelayAtStopData>>();
-	
-	public VehId2DelayAtStopHandler(){
-//		this.log.setLevel(this.logLevel);
-	}
-	
-	/**
-	 * @return A map containing the <code>VehicleDepartsAtFacilityEvent</code> for each route starting with a <code>TransitDriverStartsEvent</code> for each vehicle
-	 */
-	public TreeMap<Id, LinkedList<VehId2DelayAtStopData>> getVehId2DelayAtStopMap(){
-		return this.vehId2DelayAtStopMap;
-	}
-	
-	@Override
-	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		this.vehId2DelayAtStopMap.get(event.getVehicleId()).getLast().addVehicleDepartsAtFacilityEvent(event);
-	}
-	
-	@Override
-	public void handleEvent(TransitDriverStartsEvent event) {
-		if(this.vehId2DelayAtStopMap.get(event.getVehicleId()) == null){
-			this.vehId2DelayAtStopMap.put(event.getVehicleId(), new LinkedList<VehId2DelayAtStopData>());
-		}
-		
-		this.vehId2DelayAtStopMap.get(event.getVehicleId()).add(new VehId2DelayAtStopData(event));
-	}
-	
-	@Override
-	public void reset(int iteration) {
-		this.log.debug("reset method in iteration " + iteration + " not implemented, yet");		
-	}
+  private final Logger log = LogManager.getLogger(VehId2DelayAtStopHandler.class);
+  //	private final Level logLevel = Level.DEBUG;
+
+  private TreeMap<Id, LinkedList<VehId2DelayAtStopData>> vehId2DelayAtStopMap =
+      new TreeMap<Id, LinkedList<VehId2DelayAtStopData>>();
+
+  public VehId2DelayAtStopHandler() {
+    //		this.log.setLevel(this.logLevel);
+  }
+
+  /**
+   * @return A map containing the <code>VehicleDepartsAtFacilityEvent</code> for each route starting
+   *     with a <code>TransitDriverStartsEvent</code> for each vehicle
+   */
+  public TreeMap<Id, LinkedList<VehId2DelayAtStopData>> getVehId2DelayAtStopMap() {
+    return this.vehId2DelayAtStopMap;
+  }
+
+  @Override
+  public void handleEvent(VehicleDepartsAtFacilityEvent event) {
+    this.vehId2DelayAtStopMap
+        .get(event.getVehicleId())
+        .getLast()
+        .addVehicleDepartsAtFacilityEvent(event);
+  }
+
+  @Override
+  public void handleEvent(TransitDriverStartsEvent event) {
+    if (this.vehId2DelayAtStopMap.get(event.getVehicleId()) == null) {
+      this.vehId2DelayAtStopMap.put(event.getVehicleId(), new LinkedList<VehId2DelayAtStopData>());
+    }
+
+    this.vehId2DelayAtStopMap.get(event.getVehicleId()).add(new VehId2DelayAtStopData(event));
+  }
+
+  @Override
+  public void reset(int iteration) {
+    this.log.debug("reset method in iteration " + iteration + " not implemented, yet");
+  }
 }

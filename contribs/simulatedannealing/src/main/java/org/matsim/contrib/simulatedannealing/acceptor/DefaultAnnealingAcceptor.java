@@ -9,7 +9,6 @@
 package org.matsim.contrib.simulatedannealing.acceptor;
 
 import java.util.random.RandomGenerator;
-
 import org.matsim.contrib.simulatedannealing.SimulatedAnnealing;
 import org.matsim.contrib.simulatedannealing.SimulatedAnnealingConfigGroup;
 import org.matsim.core.gbl.Gbl;
@@ -20,39 +19,39 @@ import org.matsim.core.gbl.MatsimRandom;
  */
 public final class DefaultAnnealingAcceptor<T> implements Acceptor<T> {
 
-	private final RandomGenerator random;
+  private final RandomGenerator random;
 
-	private final SimulatedAnnealingConfigGroup simAnCfg;
+  private final SimulatedAnnealingConfigGroup simAnCfg;
 
+  public DefaultAnnealingAcceptor(SimulatedAnnealingConfigGroup simAnCfg) {
+    this.simAnCfg = simAnCfg;
+    this.random = MatsimRandom.getLocalInstance();
+  }
 
+  @Override
+  public boolean accept(
+      SimulatedAnnealing.Solution<T> currentSolution,
+      SimulatedAnnealing.Solution<T> acceptedSolution,
+      double temperature) {
 
-	public DefaultAnnealingAcceptor(SimulatedAnnealingConfigGroup simAnCfg) {
-		this.simAnCfg = simAnCfg;
-		this.random = MatsimRandom.getLocalInstance();
-	}
+    Gbl.assertNotNull(currentSolution);
+    Gbl.assertNotNull(acceptedSolution);
 
-	@Override
-	public boolean accept(SimulatedAnnealing.Solution<T> currentSolution,
-						  SimulatedAnnealing.Solution<T> acceptedSolution,
-						  double temperature) {
+    Gbl.assertIf(currentSolution.getCost().isPresent());
+    Gbl.assertIf(acceptedSolution.getCost().isPresent());
 
-		Gbl.assertNotNull(currentSolution);
-		Gbl.assertNotNull(acceptedSolution);
+    // If the new solution is better, accept it
+    double currentCost = currentSolution.getCost().getAsDouble();
+    double acceptedCost = acceptedSolution.getCost().getAsDouble();
 
-		Gbl.assertIf(currentSolution.getCost().isPresent());
-		Gbl.assertIf(acceptedSolution.getCost().isPresent());
+    if (currentCost < acceptedCost) {
+      return true;
+    }
 
-		// If the new solution is better, accept it
-		double currentCost = currentSolution.getCost().getAsDouble();
-		double acceptedCost = acceptedSolution.getCost().getAsDouble();
+    // If the new solution is worse, calculate an acceptance probability
+    double acceptanceProbability =
+        Math.exp(-(simAnCfg.k * (currentCost - acceptedCost) / temperature));
 
-		if (currentCost < acceptedCost) {
-			return true;
-		}
-
-		// If the new solution is worse, calculate an acceptance probability
-		double acceptanceProbability = Math.exp(-(simAnCfg.k * (currentCost - acceptedCost) / temperature));
-
-		return random.nextDouble() < acceptanceProbability;
-	}
+    return random.nextDouble() < acceptanceProbability;
+  }
 }

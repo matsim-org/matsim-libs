@@ -1,6 +1,6 @@
 /*
  * Copyright 2018 Gunnar Flötteröd
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -24,39 +24,36 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.vehicles.Vehicle;
 
 /**
- *
  * @author Gunnar Flötteröd
- *
  */
 public interface TransitEmulator {
 
-	public static class Trip {
+  public static class Trip {
 
-		private final Id<Vehicle> vehicleId;
+    private final Id<Vehicle> vehicleId;
 
-		private final double accessTime_s;
+    private final double accessTime_s;
 
-		private final double egressTime_s;
+    private final double egressTime_s;
 
-		public Trip(final Id<Vehicle> vehicleId, final double accessTime_s, final double egressTime_s) {
-			this.vehicleId = vehicleId;
-			this.accessTime_s = accessTime_s;
-			this.egressTime_s = egressTime_s;
-		}
+    public Trip(final Id<Vehicle> vehicleId, final double accessTime_s, final double egressTime_s) {
+      this.vehicleId = vehicleId;
+      this.accessTime_s = accessTime_s;
+      this.egressTime_s = egressTime_s;
+    }
 
-		public Id<Vehicle> vehicleId() {
-			return this.vehicleId;
-		}
+    public Id<Vehicle> vehicleId() {
+      return this.vehicleId;
+    }
 
-		public double accessTime_s() {
-			return this.accessTime_s;
-		}
+    public double accessTime_s() {
+      return this.accessTime_s;
+    }
 
-		public double egressTime_s() {
-			return this.egressTime_s;
-		}
-	}
+    public double egressTime_s() {
+      return this.egressTime_s;
+    }
+  }
 
-	public Trip findTrip(Leg leg, double earliestDepartureTime_s);
-
+  public Trip findTrip(Leg leg, double earliestDepartureTime_s);
 }

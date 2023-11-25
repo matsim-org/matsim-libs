@@ -21,7 +21,6 @@
 package org.matsim.contrib.av.robotaxi.run;
 
 import java.net.URL;
-
 import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -30,9 +29,10 @@ import org.matsim.examples.ExamplesUtils;
  * @author Michal Maciejewski (michalm)
  */
 public class RunRobotaxiExampleIT {
-	@Test
-	public void testRun() {
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_config.xml");
-		RunRobotaxiExample.run(configUrl, false);
-	}
+  @Test
+  public void testRun() {
+    URL configUrl =
+        IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_config.xml");
+    RunRobotaxiExample.run(configUrl, false);
+  }
 }

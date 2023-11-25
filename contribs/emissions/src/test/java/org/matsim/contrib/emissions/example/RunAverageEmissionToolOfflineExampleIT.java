@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
+import java.net.URL;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,105 +33,129 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result;
 
-import java.net.URL;
-
 /**
  * @author ihab
- *
  */
-public class RunAverageEmissionToolOfflineExampleIT{
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+public class RunAverageEmissionToolOfflineExampleIT {
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public final void testAverage_vehTypeV1() {
-		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
+  @Test
+  public final void testAverage_vehTypeV1() {
+    RunAverageEmissionToolOfflineExample offlineExample =
+        new RunAverageEmissionToolOfflineExample();
 
-//		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv1/config_average.xml");
-		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv1" );
-		URL configUrl = IOUtils.extendUrl( scenarioUrl, "config_average.xml" );
-		Config config = offlineExample.prepareConfig( new String [] {configUrl.toString()} );
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
+    //		Config config =
+    // offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv1/config_average.xml");
+    URL scenarioUrl = ExamplesUtils.getTestScenarioURL("emissions-sampleScenario/testv2_Vehv1");
+    URL configUrl = IOUtils.extendUrl(scenarioUrl, "config_average.xml");
+    Config config = offlineExample.prepareConfig(new String[] {configUrl.toString()});
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
 
-		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-		emissionsConfig.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
+    EmissionsConfigGroup emissionsConfig =
+        ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
+    emissionsConfig.setHbefaVehicleDescriptionSource(
+        HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
 
-		offlineExample.run();
+    offlineExample.run();
 
-		String expected = utils.getInputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
-		String actual = utils.getOutputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
-		Result result = EventsUtils.compareEventsFiles( expected, actual );
-		Assert.assertEquals( Result.FILES_ARE_EQUAL, result);
-	}
+    String expected =
+        utils.getInputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
+    String actual =
+        utils.getOutputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
+    Result result = EventsUtils.compareEventsFiles(expected, actual);
+    Assert.assertEquals(Result.FILES_ARE_EQUAL, result);
+  }
 
-	@Test
-	public final void testAverage_vehTypeV2() {
-		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
+  @Test
+  public final void testAverage_vehTypeV2() {
+    RunAverageEmissionToolOfflineExample offlineExample =
+        new RunAverageEmissionToolOfflineExample();
 
-//		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_average.xml");
-		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv2" );
-		URL configUrl = IOUtils.extendUrl( scenarioUrl, "config_average.xml" );
-		Config config = offlineExample.prepareConfig( new String [] {configUrl.toString()} );
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
+    //		Config config =
+    // offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_average.xml");
+    URL scenarioUrl = ExamplesUtils.getTestScenarioURL("emissions-sampleScenario/testv2_Vehv2");
+    URL configUrl = IOUtils.extendUrl(scenarioUrl, "config_average.xml");
+    Config config = offlineExample.prepareConfig(new String[] {configUrl.toString()});
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
 
-		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-		emissionsConfig.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.asEngineInformationAttributes );
-		// (this is currently the default.  kai, apr'21)
+    EmissionsConfigGroup emissionsConfig =
+        ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
+    emissionsConfig.setHbefaVehicleDescriptionSource(
+        HbefaVehicleDescriptionSource.asEngineInformationAttributes);
+    // (this is currently the default.  kai, apr'21)
 
-		offlineExample.run();
+    offlineExample.run();
 
-		String expected = utils.getInputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
-		String actual = utils.getOutputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
-		Result result = EventsUtils.compareEventsFiles( expected, actual );
-		Assert.assertEquals( Result.FILES_ARE_EQUAL, result);
-	}
+    String expected =
+        utils.getInputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
+    String actual =
+        utils.getOutputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
+    Result result = EventsUtils.compareEventsFiles(expected, actual);
+    Assert.assertEquals(Result.FILES_ARE_EQUAL, result);
+  }
 
-	/**
-	 * It is a bit odd that this test works: fromVehicleTypeDescription points to vehicles v1, but it actually reads v2.  Has to do with the fact
-	 * that the normal vehicles reader, where this could be checked, has no way to access the emissions config group.  And {@link EmissionUtils},
-	 * where this is used, has no way to know which file format was originally read.  See some discussion there.  :-(
-	 */
-	@Test
-	public final void testAverage_vehTypeV2b() {
-		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
+  /**
+   * It is a bit odd that this test works: fromVehicleTypeDescription points to vehicles v1, but it
+   * actually reads v2. Has to do with the fact that the normal vehicles reader, where this could be
+   * checked, has no way to access the emissions config group. And {@link EmissionUtils}, where this
+   * is used, has no way to know which file format was originally read. See some discussion there.
+   * :-(
+   */
+  @Test
+  public final void testAverage_vehTypeV2b() {
+    RunAverageEmissionToolOfflineExample offlineExample =
+        new RunAverageEmissionToolOfflineExample();
 
-//		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_average.xml");
-		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv2" );
-		URL configUrl = IOUtils.extendUrl( scenarioUrl, "config_average.xml" );
-		Config config = offlineExample.prepareConfig( new String [] {configUrl.toString()} );
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
+    //		Config config =
+    // offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_average.xml");
+    URL scenarioUrl = ExamplesUtils.getTestScenarioURL("emissions-sampleScenario/testv2_Vehv2");
+    URL configUrl = IOUtils.extendUrl(scenarioUrl, "config_average.xml");
+    Config config = offlineExample.prepareConfig(new String[] {configUrl.toString()});
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
 
-		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-		emissionsConfig.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
+    EmissionsConfigGroup emissionsConfig =
+        ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
+    emissionsConfig.setHbefaVehicleDescriptionSource(
+        HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
 
-		offlineExample.run();
+    offlineExample.run();
 
-		String expected = utils.getInputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
-		String actual = utils.getOutputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
-		Result result = EventsUtils.compareEventsFiles( expected, actual );
-		Assert.assertEquals( Result.FILES_ARE_EQUAL, result);
+    String expected =
+        utils.getInputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
+    String actual =
+        utils.getOutputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
+    Result result = EventsUtils.compareEventsFiles(expected, actual);
+    Assert.assertEquals(Result.FILES_ARE_EQUAL, result);
+  }
 
-	}
+  @Test
+  public final void testAverage_vehTypeV2_HBEFA4() {
+    RunAverageEmissionToolOfflineExample offlineExample =
+        new RunAverageEmissionToolOfflineExample();
 
-	@Test
-	public final void testAverage_vehTypeV2_HBEFA4() {
-		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
+    //		Config config =
+    // offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_average.xml");
+    URL scenarioUrl = ExamplesUtils.getTestScenarioURL("emissions-sampleScenario/testv2_Vehv2");
+    URL configUrl = IOUtils.extendUrl(scenarioUrl, "config_average.xml");
+    Config config = offlineExample.prepareConfig(new String[] {configUrl.toString()});
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
 
-//		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_average.xml");
-		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv2" );
-		URL configUrl = IOUtils.extendUrl( scenarioUrl, "config_average.xml" );
-		Config config = offlineExample.prepareConfig( new String [] {configUrl.toString()} );
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
+    EmissionsConfigGroup emissionsConfig =
+        ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
+    emissionsConfig.setAverageColdEmissionFactorsFile(
+        "../sample_41_EFA_ColdStart_vehcat_2020average.csv");
+    emissionsConfig.setAverageWarmEmissionFactorsFile(
+        "../sample_41_EFA_HOT_vehcat_2020average.csv");
+    emissionsConfig.setHbefaVehicleDescriptionSource(
+        HbefaVehicleDescriptionSource.asEngineInformationAttributes);
 
-		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.csv");
-		emissionsConfig.setAverageWarmEmissionFactorsFile("../sample_41_EFA_HOT_vehcat_2020average.csv");
-		emissionsConfig.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.asEngineInformationAttributes );
+    offlineExample.run();
 
-		offlineExample.run();
-
-		String expected = utils.getInputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
-		String actual = utils.getOutputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
-		Result result = EventsUtils.compareEventsFiles( expected, actual );
-		Assert.assertEquals( Result.FILES_ARE_EQUAL, result);
-	}
+    String expected =
+        utils.getInputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
+    String actual =
+        utils.getOutputDirectory() + RunAverageEmissionToolOfflineExample.emissionEventsFilename;
+    Result result = EventsUtils.compareEventsFiles(expected, actual);
+    Assert.assertEquals(Result.FILES_ARE_EQUAL, result);
+  }
 }

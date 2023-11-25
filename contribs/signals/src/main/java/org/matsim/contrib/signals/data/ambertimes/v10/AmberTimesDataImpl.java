@@ -20,7 +20,6 @@ package org.matsim.contrib.signals.data.ambertimes.v10;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.SignalSystem;
 
@@ -30,60 +29,59 @@ import org.matsim.contrib.signals.model.SignalSystem;
  */
 public final class AmberTimesDataImpl implements AmberTimesData {
 
-	private Map<Id<SignalSystem>, AmberTimeData> amberTimeData = new HashMap<>();
-	private Double defaultAmberTimeGreen;
-	private Integer globalDefaultAmberTime;
-	private Integer globalDefaultRedAmberTime;
-	private AmberTimesDataFactory factory = new AmberTimesDataFactoryImpl();
-	
-	@Override
-	public void addAmberTimeData(AmberTimeData amberTimeData) {
-		this.amberTimeData.put(amberTimeData.getSignalSystemId(), amberTimeData);
-	}
+  private Map<Id<SignalSystem>, AmberTimeData> amberTimeData = new HashMap<>();
+  private Double defaultAmberTimeGreen;
+  private Integer globalDefaultAmberTime;
+  private Integer globalDefaultRedAmberTime;
+  private AmberTimesDataFactory factory = new AmberTimesDataFactoryImpl();
 
-	@Override
-	public Map<Id<SignalSystem>, AmberTimeData> getAmberTimeDataBySystemId() {
-		return amberTimeData;
-	}
+  @Override
+  public void addAmberTimeData(AmberTimeData amberTimeData) {
+    this.amberTimeData.put(amberTimeData.getSignalSystemId(), amberTimeData);
+  }
 
-	@Override
-	public Integer getDefaultAmber() {
-		return this.globalDefaultAmberTime;
-	}
+  @Override
+  public Map<Id<SignalSystem>, AmberTimeData> getAmberTimeDataBySystemId() {
+    return amberTimeData;
+  }
 
-	@Override
-	public Double getDefaultAmberTimeGreen() {
-		return this.defaultAmberTimeGreen;
-	}
+  @Override
+  public Integer getDefaultAmber() {
+    return this.globalDefaultAmberTime;
+  }
 
-	@Override
-	public Integer getDefaultRedAmber() {
-		return this.globalDefaultRedAmberTime;
-	}
+  @Override
+  public Double getDefaultAmberTimeGreen() {
+    return this.defaultAmberTimeGreen;
+  }
 
-	@Override
-	public void setDefaultAmber(Integer seconds) {
-		this.globalDefaultAmberTime=seconds;
-	}
+  @Override
+  public Integer getDefaultRedAmber() {
+    return this.globalDefaultRedAmberTime;
+  }
 
-	@Override
-	public void setDefaultAmberTimeGreen(Double proportion) {
-		this.defaultAmberTimeGreen=proportion;
-	}
+  @Override
+  public void setDefaultAmber(Integer seconds) {
+    this.globalDefaultAmberTime = seconds;
+  }
 
-	@Override
-	public void setDefaultRedAmber(Integer seconds) {
-		this.globalDefaultRedAmberTime=seconds;
-	}
+  @Override
+  public void setDefaultAmberTimeGreen(Double proportion) {
+    this.defaultAmberTimeGreen = proportion;
+  }
 
-	@Override
-	public AmberTimesDataFactory getFactory() {
-		return this.factory ;
-	}
+  @Override
+  public void setDefaultRedAmber(Integer seconds) {
+    this.globalDefaultRedAmberTime = seconds;
+  }
 
-	@Override
-	public void setFactory(AmberTimesDataFactory factory) {
-		this.factory = factory;
-	}
+  @Override
+  public AmberTimesDataFactory getFactory() {
+    return this.factory;
+  }
 
+  @Override
+  public void setFactory(AmberTimesDataFactory factory) {
+    this.factory = factory;
+  }
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * 
+ *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,20 +22,14 @@ package org.matsim.core.mobsim.qsim.interfaces;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
-import org.matsim.facilities.Facility;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import java.util.List;
-import java.util.Map;
 
 public interface DepartureHandler extends QSimComponent {
 
-	/**
-	 * @return <code>true</code> if the departure is handled, <code>false</code> if other DepartureHandlers should be tried as well.
-	 */
-	boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId);
-
+  /**
+   * @return <code>true</code> if the departure is handled, <code>false</code> if other
+   *     DepartureHandlers should be tried as well.
+   */
+  boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId);
 }

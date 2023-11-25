@@ -18,25 +18,24 @@
  * *********************************************************************** */
 package org.matsim.core.router.util;
 
+import java.awt.geom.Rectangle2D;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-
-import java.awt.geom.Rectangle2D;
 
 /**
  * @author thibautd
  */
 public class PieSlicesLandmarker implements Landmarker {
-	private final Rectangle2D.Double travelZone;
+  private final Rectangle2D.Double travelZone;
 
-	public PieSlicesLandmarker( Rectangle2D.Double travelZone ) {
-		this.travelZone = travelZone;
-	}
+  public PieSlicesLandmarker(Rectangle2D.Double travelZone) {
+    this.travelZone = travelZone;
+  }
 
-	@Override
-	public Node[] identifyLandmarks( int nLandmarks, Network network ) {
-		final LandmarkerPieSlices delegate = new LandmarkerPieSlices( nLandmarks , travelZone );
-		delegate.run( network );
-		return delegate.getLandmarks();
-	}
+  @Override
+  public Node[] identifyLandmarks(int nLandmarks, Network network) {
+    final LandmarkerPieSlices delegate = new LandmarkerPieSlices(nLandmarks, travelZone);
+    delegate.run(network);
+    return delegate.getLandmarks();
+  }
 }

@@ -1,6 +1,9 @@
 package org.matsim.modechoice;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.google.inject.Injector;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,48 +16,38 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-
 public class EstimateRouterTest {
 
-	private EstimateRouter router;
-	private InformedModeChoiceConfigGroup group;
-	private Controler controler;
+  private EstimateRouter router;
+  private InformedModeChoiceConfigGroup group;
+  private Controler controler;
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Before
-	public void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
 
-		Config config = TestScenario.loadConfig(utils);
+    Config config = TestScenario.loadConfig(utils);
 
-		group = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
+    group = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 
-		controler = MATSimApplication.prepare(TestScenario.class, config);
+    controler = MATSimApplication.prepare(TestScenario.class, config);
 
-		Injector injector = controler.getInjector();
-		router = injector.getInstance(EstimateRouter.class);
+    Injector injector = controler.getInjector();
+    router = injector.getInstance(EstimateRouter.class);
+  }
 
-	}
+  @Test
+  public void routing() {
 
-	@Test
-	public void routing() {
+    Map<Id<Person>, ? extends Person> persons =
+        controler.getScenario().getPopulation().getPersons();
 
+    Plan plan = persons.get(TestScenario.Agents.get(1)).getSelectedPlan();
+    PlanModel planModel = PlanModel.newInstance(plan);
 
-		Map<Id<Person>, ? extends Person> persons = controler.getScenario().getPopulation().getPersons();
+    router.routeModes(planModel, group.getModes());
 
-		Plan plan = persons.get(TestScenario.Agents.get(1)).getSelectedPlan();
-		PlanModel planModel = PlanModel.newInstance(plan);
-
-		router.routeModes(planModel, group.getModes());
-
-		assertThat(planModel)
-				.isNotNull();
-
-
-	}
+    assertThat(planModel).isNotNull();
+  }
 }

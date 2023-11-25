@@ -28,18 +28,20 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.zone.Zone;
 
 public class NetworkWithZonesUtils {
-	// if CRSs of the network and zones are different, zoneFinder should convert between CRSs
-	public static IdMap<Link, Zone> createLinkToZoneMap(Network network, ZoneFinder zoneFinder) {
-		return network.getLinks()
-				.values()
-				.stream()
-				.collect(IdCollectors.toIdMap(Link.class, Identifiable::getId, l -> zoneFinder.findZone(l.getToNode().getCoord())));
-	}
+  // if CRSs of the network and zones are different, zoneFinder should convert between CRSs
+  public static IdMap<Link, Zone> createLinkToZoneMap(Network network, ZoneFinder zoneFinder) {
+    return network.getLinks().values().stream()
+        .collect(
+            IdCollectors.toIdMap(
+                Link.class,
+                Identifiable::getId,
+                l -> zoneFinder.findZone(l.getToNode().getCoord())));
+  }
 
-	public static IdMap<Node, Zone> createNodeToZoneMap(Network network, ZoneFinder zoneFinder) {
-		return network.getNodes()
-				.values()
-				.stream()
-				.collect(IdCollectors.toIdMap(Node.class, Identifiable::getId, n -> zoneFinder.findZone(n.getCoord())));
-	}
+  public static IdMap<Node, Zone> createNodeToZoneMap(Network network, ZoneFinder zoneFinder) {
+    return network.getNodes().values().stream()
+        .collect(
+            IdCollectors.toIdMap(
+                Node.class, Identifiable::getId, n -> zoneFinder.findZone(n.getCoord())));
+  }
 }

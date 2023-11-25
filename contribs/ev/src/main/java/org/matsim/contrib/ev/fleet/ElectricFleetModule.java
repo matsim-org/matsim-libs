@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.ev.fleet;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.ChargingPower;
@@ -31,58 +33,78 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.vehicles.Vehicles;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-
 /**
  * @author Michal Maciejewski (michalm)
  */
 public final class ElectricFleetModule extends AbstractModule {
-	@Inject
-	private EvConfigGroup evCfg;
+  @Inject private EvConfigGroup evCfg;
 
-	@Override
-	public void install() {
-		bind(ElectricFleetSpecification.class).toProvider(new Provider<>() {
-			@Inject private Vehicles vehicles;
-			@Override public ElectricFleetSpecification get() {
-				ElectricFleetSpecification fleetSpecification = new ElectricFleetSpecificationDefaultImpl();
-				ElectricFleetUtils.createAndAddVehicleSpecificationsFromMatsimVehicles(fleetSpecification,
-						vehicles.getVehicles().values() );
-				return fleetSpecification;
-			}
-		}).asEagerSingleton();
+  @Override
+  public void install() {
+    bind(ElectricFleetSpecification.class)
+        .toProvider(
+            new Provider<>() {
+              @Inject private Vehicles vehicles;
 
-		installQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				bind(ElectricFleet.class).toProvider(new Provider<>() {
-					@Inject private ElectricFleetSpecification fleetSpecification;
-					@Inject private DriveEnergyConsumption.Factory driveConsumptionFactory;
-					@Inject private AuxEnergyConsumption.Factory auxConsumptionFactory;
-					@Inject private ChargingPower.Factory chargingPowerFactory;
+              @Override
+              public ElectricFleetSpecification get() {
+                ElectricFleetSpecification fleetSpecification =
+                    new ElectricFleetSpecificationDefaultImpl();
+                ElectricFleetUtils.createAndAddVehicleSpecificationsFromMatsimVehicles(
+                    fleetSpecification, vehicles.getVehicles().values());
+                return fleetSpecification;
+              }
+            })
+        .asEagerSingleton();
 
-					@Override
-					public ElectricFleet get() {
-						return ElectricFleetUtils.createDefaultFleet(fleetSpecification, driveConsumptionFactory, auxConsumptionFactory,
-								chargingPowerFactory );
-					}
-				}).asEagerSingleton();
+    installQSimModule(
+        new AbstractQSimModule() {
+          @Override
+          protected void configureQSim() {
+            bind(ElectricFleet.class)
+                .toProvider(
+                    new Provider<>() {
+                      @Inject private ElectricFleetSpecification fleetSpecification;
+                      @Inject private DriveEnergyConsumption.Factory driveConsumptionFactory;
+                      @Inject private AuxEnergyConsumption.Factory auxConsumptionFactory;
+                      @Inject private ChargingPower.Factory chargingPowerFactory;
 
-				if (evCfg.transferFinalSoCToNextIteration) {
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toInstance(new MobsimBeforeCleanupListener() {
-						@Inject private ElectricFleetSpecification electricFleetSpecification;
-						@Inject private ElectricFleet electricFleet;
-						@Override public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
-							for (var oldSpec : electricFleetSpecification.getVehicleSpecifications().values()) {
-								var matsimVehicle = oldSpec.getMatsimVehicle();
-								double socAtEndOfCurrentIteration = electricFleet.getElectricVehicles().get(oldSpec.getId()).getBattery().getSoc();
-								ElectricFleetUtils.setInitialSoc(matsimVehicle, socAtEndOfCurrentIteration );
-							}
-						}
-					});
-				}
-			}
-		});
-	}
+                      @Override
+                      public ElectricFleet get() {
+                        return ElectricFleetUtils.createDefaultFleet(
+                            fleetSpecification,
+                            driveConsumptionFactory,
+                            auxConsumptionFactory,
+                            chargingPowerFactory);
+                      }
+                    })
+                .asEagerSingleton();
+
+            if (evCfg.transferFinalSoCToNextIteration) {
+              addQSimComponentBinding(EvModule.EV_COMPONENT)
+                  .toInstance(
+                      new MobsimBeforeCleanupListener() {
+                        @Inject private ElectricFleetSpecification electricFleetSpecification;
+                        @Inject private ElectricFleet electricFleet;
+
+                        @Override
+                        public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
+                          for (var oldSpec :
+                              electricFleetSpecification.getVehicleSpecifications().values()) {
+                            var matsimVehicle = oldSpec.getMatsimVehicle();
+                            double socAtEndOfCurrentIteration =
+                                electricFleet
+                                    .getElectricVehicles()
+                                    .get(oldSpec.getId())
+                                    .getBattery()
+                                    .getSoc();
+                            ElectricFleetUtils.setInitialSoc(
+                                matsimVehicle, socAtEndOfCurrentIteration);
+                          }
+                        }
+                      });
+            }
+          }
+        });
+  }
 }

@@ -19,45 +19,36 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.modules;
 
+import java.util.function.Predicate;
+import org.matsim.contrib.socnetsim.framework.replanning.modules.TourModeUnifierAlgorithm.SubtourFirstModeIdentifier;
+import org.matsim.contrib.socnetsim.framework.replanning.modules.TourModeUnifierAlgorithm.SubtourModeIdentifier;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.MainModeIdentifier;
-
-import java.util.Set;
-import java.util.function.Predicate;
-
-import org.matsim.contrib.socnetsim.framework.replanning.modules.TourModeUnifierAlgorithm.SubtourFirstModeIdentifier;
-import org.matsim.contrib.socnetsim.framework.replanning.modules.TourModeUnifierAlgorithm.SubtourModeIdentifier;
 
 /**
  * @author thibautd
  */
 public class TourModeUnifierModule extends AbstractMultithreadedModule {
-	private final Predicate<String> stages; // formerly StageActivityTypes
-	private final SubtourModeIdentifier modeIdentifier;
+  private final Predicate<String> stages; // formerly StageActivityTypes
+  private final SubtourModeIdentifier modeIdentifier;
 
-	public TourModeUnifierModule(
-			final int nThreads,
-			final Predicate<String> stages,
-			final MainModeIdentifier modeIdentifier) {
-		this( nThreads,
-				stages,
-				new SubtourFirstModeIdentifier(
-					modeIdentifier ) );
-	}
+  public TourModeUnifierModule(
+      final int nThreads, final Predicate<String> stages, final MainModeIdentifier modeIdentifier) {
+    this(nThreads, stages, new SubtourFirstModeIdentifier(modeIdentifier));
+  }
 
-	public TourModeUnifierModule(
-			final int nThreads,
-			final Predicate<String> stages,
-			final SubtourModeIdentifier modeIdentifier) {
-		super( nThreads );
-		this.stages = stages;
-		this.modeIdentifier = modeIdentifier;
-	}
+  public TourModeUnifierModule(
+      final int nThreads,
+      final Predicate<String> stages,
+      final SubtourModeIdentifier modeIdentifier) {
+    super(nThreads);
+    this.stages = stages;
+    this.modeIdentifier = modeIdentifier;
+  }
 
-	@Override
-	public PlanAlgorithm getPlanAlgoInstance() {
-		return new TourModeUnifierAlgorithm( stages , modeIdentifier );
-	}
+  @Override
+  public PlanAlgorithm getPlanAlgoInstance() {
+    return new TourModeUnifierAlgorithm(stages, modeIdentifier);
+  }
 }
-

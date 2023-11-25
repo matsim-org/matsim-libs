@@ -1,100 +1,82 @@
 package org.matsim.modechoice.search;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import it.unimi.dsi.fastutil.doubles.DoubleIterator;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class ModeChoiceSearchTest {
 
+  @Test
+  public void order() {
 
-	@Test
-	public void order() {
+    ModeChoiceSearch search = new ModeChoiceSearch(3, 3);
 
-		ModeChoiceSearch search = new ModeChoiceSearch(3, 3);
+    search.addEstimates("A", new double[] {1, 4, 3});
+    search.addEstimates("B", new double[] {4, 3, 1});
+    search.addEstimates("C", new double[] {6, 2, 4});
 
-		search.addEstimates("A", new double[]{1, 4, 3});
-		search.addEstimates("B", new double[]{4, 3, 1});
-		search.addEstimates("C", new double[]{6, 2, 4});
+    System.out.printf(search.toString());
 
-		System.out.printf(search.toString());
+    String[] result = new String[3];
 
-		String[] result = new String[3];
+    DoubleIterator iter = search.iter(result);
 
-		DoubleIterator iter = search.iter(result);
+    assertThat(iter).toIterable().startsWith(14d).endsWith(4d);
 
-		assertThat(iter).toIterable()
-				.startsWith(14d)
-				.endsWith(4d);
+    iter = search.iter(result);
+    iter.nextDouble();
 
+    assertThat(result).containsExactly("C", "A", "C");
 
-		iter = search.iter(result);
-		iter.nextDouble();
+    iter.nextDouble();
 
-		assertThat(result)
-				.containsExactly("C", "A", "C");
+    assertThat(result).containsExactly("C", "B", "C");
+  }
 
-		iter.nextDouble();
+  @Test
+  public void negative() {
 
-		assertThat(result)
-				.containsExactly("C", "B", "C");
+    ModeChoiceSearch search = new ModeChoiceSearch(3, 3);
 
-	}
+    search.addEstimates("A", new double[] {1, -4, 3});
+    search.addEstimates("B", new double[] {-4, 3, 1});
+    search.addEstimates("C", new double[] {6, 2, -4});
 
+    String[] result = new String[3];
 
-	@Test
-	public void negative() {
+    DoubleIterator iter = search.iter(result);
 
-		ModeChoiceSearch search = new ModeChoiceSearch(3, 3);
+    assertThat(iter).toIterable().startsWith(12d).endsWith(-12d);
 
-		search.addEstimates("A", new double[]{1, -4, 3});
-		search.addEstimates("B", new double[]{-4, 3, 1});
-		search.addEstimates("C", new double[]{6, 2, -4});
+    iter = search.iter(result);
+    iter.nextDouble();
 
-		String[] result = new String[3];
+    assertThat(result).containsExactly("C", "B", "A");
+  }
 
-		DoubleIterator iter = search.iter(result);
+  @Test
+  public void nullValues() {
 
-		assertThat(iter).toIterable()
-				.startsWith(12d)
-				.endsWith(-12d);
+    ModeChoiceSearch search = new ModeChoiceSearch(3, 3);
 
-		iter = search.iter(result);
-		iter.nextDouble();
+    search.addEstimates("A", new double[] {1, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY});
+    search.addEstimates("B", new double[] {Double.NEGATIVE_INFINITY, 3, Double.NEGATIVE_INFINITY});
+    search.addEstimates("C", new double[] {6, 2, Double.NEGATIVE_INFINITY});
 
-		assertThat(result)
-				.containsExactly("C", "B", "A");
-	}
+    String[] result = new String[3];
 
+    DoubleIterator iter = search.iter(result);
 
-	@Test
-	public void nullValues() {
+    assertThat(iter).toIterable().startsWith(9d).endsWith(3d);
 
-		ModeChoiceSearch search = new ModeChoiceSearch(3, 3);
+    iter = search.iter(result);
+    iter.nextDouble();
 
-		search.addEstimates("A", new double[]{1, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY});
-		search.addEstimates("B", new double[]{Double.NEGATIVE_INFINITY, 3, Double.NEGATIVE_INFINITY});
-		search.addEstimates("C", new double[]{6, 2, Double.NEGATIVE_INFINITY});
+    assertThat(result).containsExactly("C", "B", null);
 
-		String[] result = new String[3];
+    iter.nextDouble();
 
-		DoubleIterator iter = search.iter(result);
-
-		assertThat(iter).toIterable()
-				.startsWith(9d)
-				.endsWith(3d);
-
-		iter = search.iter(result);
-		iter.nextDouble();
-
-		assertThat(result)
-				.containsExactly("C", "B", null);
-
-		iter.nextDouble();
-
-		assertThat(result)
-				.containsExactly("C", "C", null);
-
-	}
-
+    assertThat(result).containsExactly("C", "C", null);
+  }
 }

@@ -19,27 +19,24 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data.signalsystems.v20;
 
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 
-import java.util.Map;
-
-
 /**
  * @author dgrether
  */
 public interface SignalSystemControllerData {
-	
-	public Id<SignalSystem> getSignalSystemId();
-	
-	public String getControllerIdentifier();
-	
-	public void setControllerIdentifier(String identifier);
-	
-	public Map<Id<SignalPlan>, SignalPlanData> getSignalPlanData();
-	
-	public void addSignalPlanData(SignalPlanData plan);
 
+  public Id<SignalSystem> getSignalSystemId();
+
+  public String getControllerIdentifier();
+
+  public void setControllerIdentifier(String identifier);
+
+  public Map<Id<SignalPlan>, SignalPlanData> getSignalPlanData();
+
+  public void addSignalPlanData(SignalPlanData plan);
 }

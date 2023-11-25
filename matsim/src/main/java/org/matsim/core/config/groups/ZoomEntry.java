@@ -23,53 +23,49 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Serializable;
-
 import javax.imageio.ImageIO;
 
-public final class ZoomEntry  implements Serializable {
-	private static final long serialVersionUID = 1L;
+public final class ZoomEntry implements Serializable {
+  private static final long serialVersionUID = 1L;
 
-	private Rectangle2D zoomstart;
-	private BufferedImage snap;
-	private String name;
+  private Rectangle2D zoomstart;
+  private BufferedImage snap;
+  private String name;
 
-	public ZoomEntry() {
+  public ZoomEntry() {}
 
-	}
+  public ZoomEntry(BufferedImage snap, Rectangle2D zoomstore, String name) {
+    super();
+    this.snap = snap;
+    this.zoomstart = zoomstore;
+    this.name = name;
+  }
 
-	public ZoomEntry(BufferedImage snap, Rectangle2D zoomstore, String name) {
-		super();
-		this.snap = snap;
-		this.zoomstart = zoomstore;
-		this.name = name;
-	}
+  private void writeObject(java.io.ObjectOutputStream s) throws IOException {
+    s.writeUTF(this.name);
+    s.writeDouble(this.zoomstart.getX());
+    s.writeDouble(this.zoomstart.getY());
+    s.writeDouble(this.zoomstart.getWidth());
+    s.writeDouble(this.zoomstart.getHeight());
+    ImageIO.write(this.snap, "jpg", s);
+  }
 
-	private void writeObject( java.io.ObjectOutputStream s ) throws IOException {
-		s.writeUTF(this.name);
-		s.writeDouble(this.zoomstart.getX());
-		s.writeDouble(this.zoomstart.getY());
-		s.writeDouble(this.zoomstart.getWidth());
-		s.writeDouble(this.zoomstart.getHeight());
-		ImageIO.write(this.snap, "jpg", s);
-	}
+  private void readObject(java.io.ObjectInputStream s) throws IOException {
+    this.name = s.readUTF();
+    this.zoomstart =
+        new Rectangle2D.Double(s.readDouble(), s.readDouble(), s.readDouble(), s.readDouble());
+    this.snap = ImageIO.read(s);
+  }
 
+  public Rectangle2D getZoomstart() {
+    return this.zoomstart;
+  }
 
-	private void readObject( java.io.ObjectInputStream s ) throws IOException {
-		this.name = s.readUTF();
-		this.zoomstart = new Rectangle2D.Double(s.readDouble(),s.readDouble(),s.readDouble(),s.readDouble());
-		this.snap = ImageIO.read(s);
-	}
+  public BufferedImage getSnap() {
+    return this.snap;
+  }
 
-	public Rectangle2D getZoomstart() {
-		return this.zoomstart;
-	}
-	
-	public BufferedImage getSnap() {
-		return this.snap;
-	}
-	
-	public String getName() {
-		return this.name;
-	}
-
+  public String getName() {
+    return this.name;
+  }
 }

@@ -26,7 +26,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 import org.matsim.vehicles.Vehicle;
 
-
 /**
  * Describes a single departure along a route in a transit line.
  *
@@ -34,44 +33,43 @@ import org.matsim.vehicles.Vehicle;
  */
 public class DepartureImpl implements Departure {
 
-	private final Id<Departure> id;
-	private final double departureTime;
-	private Id<Vehicle> vehicleId = null;
-	private final Attributes attributes = new AttributesImpl();
-	
-	protected DepartureImpl(final Id<Departure> id, final double departureTime) {
-		this.id = id;
-		this.departureTime = departureTime;
-	}
+  private final Id<Departure> id;
+  private final double departureTime;
+  private Id<Vehicle> vehicleId = null;
+  private final Attributes attributes = new AttributesImpl();
 
-	@Override
-	public Id<Departure> getId() {
-		return this.id;
-	}
+  protected DepartureImpl(final Id<Departure> id, final double departureTime) {
+    this.id = id;
+    this.departureTime = departureTime;
+  }
 
-	@Override
-	public double getDepartureTime() {
-		return this.departureTime;
-	}
+  @Override
+  public Id<Departure> getId() {
+    return this.id;
+  }
 
-	@Override
-	public void setVehicleId(final Id<Vehicle> vehicleId) {
-		this.vehicleId = vehicleId;
-	}
+  @Override
+  public double getDepartureTime() {
+    return this.departureTime;
+  }
 
-	@Override
-	public Id<Vehicle> getVehicleId() {
-		return this.vehicleId;
-	}
+  @Override
+  public void setVehicleId(final Id<Vehicle> vehicleId) {
+    this.vehicleId = vehicleId;
+  }
 
-	@Override
-	public Attributes getAttributes() {
-		return this.attributes;
-	}
+  @Override
+  public Id<Vehicle> getVehicleId() {
+    return this.vehicleId;
+  }
 
-	@Override
-	public String toString() {
-		return "[DepartureImpl: id=" + this.id + ", depTime=" + this.departureTime + "]";
-	}
-	
+  @Override
+  public Attributes getAttributes() {
+    return this.attributes;
+  }
+
+  @Override
+  public String toString() {
+    return "[DepartureImpl: id=" + this.id + ", depTime=" + this.departureTime + "]";
+  }
 }

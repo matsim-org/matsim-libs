@@ -20,29 +20,26 @@
 package org.matsim.contrib.accidents;
 
 /**
-* @author ikaddoura
-*/
+ * @author ikaddoura
+ */
+class TimeBinInfo {
 
- class TimeBinInfo {
-	
-	private final int intervalNr;
-	private double accidentCosts;
-		
-	public int getIntervalNr() {
-		return intervalNr;
-	}
+  private final int intervalNr;
+  private double accidentCosts;
 
-	public TimeBinInfo(int intervalNr) {
-		this.intervalNr = intervalNr;
-	}
+  public int getIntervalNr() {
+    return intervalNr;
+  }
 
-	public double getAccidentCosts() {
-		return accidentCosts;
-	}
+  public TimeBinInfo(int intervalNr) {
+    this.intervalNr = intervalNr;
+  }
 
-	public void setAccidentCosts(double accidentCosts) {
-		this.accidentCosts = accidentCosts;
-	}
+  public double getAccidentCosts() {
+    return accidentCosts;
+  }
 
+  public void setAccidentCosts(double accidentCosts) {
+    this.accidentCosts = accidentCosts;
+  }
 }
-

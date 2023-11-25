@@ -19,56 +19,50 @@
  * *********************************************************************** */
 package playground.vsp.gexf;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
-
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 
-
-
 /**
  * @author dgrether
- *
  */
 public class GexfWriter extends MatsimJaxbXmlWriter {
 
-	private static final Logger log = LogManager.getLogger(GexfWriter.class);
-	
-	private final static String xsdPath = "http://www.gexf.net/1.2draft/gexf.xsd";
+  private static final Logger log = LogManager.getLogger(GexfWriter.class);
 
-	private XMLGexfContent gexfContent;
+  private static final String xsdPath = "http://www.gexf.net/1.2draft/gexf.xsd";
 
-	public GexfWriter(XMLGexfContent gexf){
-		this.gexfContent = gexf;
-	}
-	
-	@Override
-	public void write(String filename) {
-		log.info("writing output to " + filename);
-		JAXBContext jc;
-		try {
-			jc = JAXBContext.newInstance(playground.vsp.gexf.ObjectFactory.class);
-			Marshaller m = jc.createMarshaller();
-			super.setMarshallerProperties(xsdPath, m);
-			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
-			m.marshal(gexfContent, bufout);
-			bufout.close();
-			log.info(filename + " written successfully.");
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}		
-	}
+  private XMLGexfContent gexfContent;
 
+  public GexfWriter(XMLGexfContent gexf) {
+    this.gexfContent = gexf;
+  }
+
+  @Override
+  public void write(String filename) {
+    log.info("writing output to " + filename);
+    JAXBContext jc;
+    try {
+      jc = JAXBContext.newInstance(playground.vsp.gexf.ObjectFactory.class);
+      Marshaller m = jc.createMarshaller();
+      super.setMarshallerProperties(xsdPath, m);
+      BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
+      m.marshal(gexfContent, bufout);
+      bufout.close();
+      log.info(filename + " written successfully.");
+    } catch (JAXBException e) {
+      e.printStackTrace();
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 }

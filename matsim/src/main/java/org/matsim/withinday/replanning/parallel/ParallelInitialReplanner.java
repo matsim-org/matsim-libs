@@ -30,10 +30,9 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialRep
  * @author Christoph Dobler
  */
 public class ParallelInitialReplanner extends ParallelReplanner<WithinDayInitialReplannerFactory> {
-		
-	public ParallelInitialReplanner(int numOfThreads, EventsManager eventsManager) {
-		super(numOfThreads, eventsManager);
-		this.init("ParallelInitialReplanner");
-	}
-		
+
+  public ParallelInitialReplanner(int numOfThreads, EventsManager eventsManager) {
+    super(numOfThreads, eventsManager);
+    this.init("ParallelInitialReplanner");
+  }
 }

@@ -32,18 +32,22 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author Michal Maciejewski (michalm)
  */
 public class RunETaxiBenchmarkTest {
-	private static final Logger log = LogManager.getLogger(RunETaxiBenchmarkTest.class);
+  private static final Logger log = LogManager.getLogger(RunETaxiBenchmarkTest.class);
 
-	@Rule
-	public final MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testRuleBased() {
-		String configPath = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_etaxi_benchmark_config.xml").toString();
-		String[] args = { configPath, "--config:controler.outputDirectory", utils.getOutputDirectory() };
-		// the config file suppresses most writing of output.  Presumably, since it is to be run as a benchmark.  One can override it here, but it is again overwritten later.  So
-		// I guess that the authors really mean it.  In consequence, cannot test regression on the functionality of the benchmark.  kai, nov'22
+  @Test
+  public void testRuleBased() {
+    String configPath =
+        IOUtils.extendUrl(
+                ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_etaxi_benchmark_config.xml")
+            .toString();
+    String[] args = {configPath, "--config:controler.outputDirectory", utils.getOutputDirectory()};
+    // the config file suppresses most writing of output.  Presumably, since it is to be run as a
+    // benchmark.  One can override it here, but it is again overwritten later.  So
+    // I guess that the authors really mean it.  In consequence, cannot test regression on the
+    // functionality of the benchmark.  kai, nov'22
 
-		RunETaxiBenchmark.run(args, 2);
-	}
+    RunETaxiBenchmark.run(args, 2);
+  }
 }

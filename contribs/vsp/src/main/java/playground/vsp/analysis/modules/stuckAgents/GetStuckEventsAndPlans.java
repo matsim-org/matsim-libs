@@ -20,7 +20,6 @@ package playground.vsp.analysis.modules.stuckAgents;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -28,59 +27,58 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.handler.EventHandler;
-
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.modules.plansSubset.GetPlansSubset;
 
 /**
  * @author droeder
- *
  */
-public class GetStuckEventsAndPlans extends AbstractAnalysisModule{
+public class GetStuckEventsAndPlans extends AbstractAnalysisModule {
 
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(GetStuckEventsAndPlans.class);
-	private GetStuckEvents stuckEventHandler;
-	private Scenario sc;
-	private GetPlansSubset plans;
+  @SuppressWarnings("unused")
+  private static final Logger log = LogManager.getLogger(GetStuckEventsAndPlans.class);
 
-	/**
-	 * A class to collect all StuckEvents from the eventsFile and all corresponding Persons
-	 * from the Population. 
-	 * @param sc, the scenario containing the plans
-	 */
-	public GetStuckEventsAndPlans(Scenario sc) {
-		super(GetStuckEventsAndPlans.class.getSimpleName());
-		this.stuckEventHandler = new GetStuckEvents();
-		this.sc = sc;
-	}
+  private GetStuckEvents stuckEventHandler;
+  private Scenario sc;
+  private GetPlansSubset plans;
 
-	@Override
-	public List<EventHandler> getEventHandler() {
-		List<EventHandler> list = new ArrayList<EventHandler>();
-		list.add(this.stuckEventHandler);
-		return list;
-	}
+  /**
+   * A class to collect all StuckEvents from the eventsFile and all corresponding Persons from the
+   * Population.
+   *
+   * @param sc, the scenario containing the plans
+   */
+  public GetStuckEventsAndPlans(Scenario sc) {
+    super(GetStuckEventsAndPlans.class.getSimpleName());
+    this.stuckEventHandler = new GetStuckEvents();
+    this.sc = sc;
+  }
 
-	@Override
-	public void preProcessData() {
-		//do nothing
-	}
+  @Override
+  public List<EventHandler> getEventHandler() {
+    List<EventHandler> list = new ArrayList<EventHandler>();
+    list.add(this.stuckEventHandler);
+    return list;
+  }
 
-	@Override
-	public void postProcessData() {
-		ArrayList<Id<Person>> stuckAgents = new ArrayList<>();
-		for(PersonStuckEvent e: this.stuckEventHandler.getEvents()){
-			stuckAgents.add(e.getPersonId());
-		}
-		this.plans = new GetPlansSubset(this.sc, stuckAgents, false);
-		this.plans.postProcessData();
-	}
+  @Override
+  public void preProcessData() {
+    // do nothing
+  }
 
-	@Override
-	public void writeResults(String outputFolder) {
-		this.stuckEventHandler.writeResults(outputFolder);
-		this.plans.writeResults(outputFolder);
-	}
+  @Override
+  public void postProcessData() {
+    ArrayList<Id<Person>> stuckAgents = new ArrayList<>();
+    for (PersonStuckEvent e : this.stuckEventHandler.getEvents()) {
+      stuckAgents.add(e.getPersonId());
+    }
+    this.plans = new GetPlansSubset(this.sc, stuckAgents, false);
+    this.plans.postProcessData();
+  }
+
+  @Override
+  public void writeResults(String outputFolder) {
+    this.stuckEventHandler.writeResults(outputFolder);
+    this.plans.writeResults(outputFolder);
+  }
 }
-

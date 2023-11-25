@@ -19,21 +19,19 @@
 
 package org.matsim.core.replanning.strategies;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-
 public class ChangeExpBeta implements Provider<PlanStrategy> {
 
-    @Inject private ScoringConfigGroup config;
+  @Inject private ScoringConfigGroup config;
 
-    @Override
-	public PlanStrategy get() {
-        return new PlanStrategyImpl(new ExpBetaPlanChanger(config.getBrainExpBeta()));
-	}
-
+  @Override
+  public PlanStrategy get() {
+    return new PlanStrategyImpl(new ExpBetaPlanChanger(config.getBrainExpBeta()));
+  }
 }

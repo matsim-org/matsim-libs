@@ -26,9 +26,10 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
  * @author michalm
  */
 public interface DrtTaskFactory {
-	DrtDriveTask createDriveTask(DvrpVehicle vehicle, VrpPathWithTravelData path, DrtTaskType drtTaskType);
+  DrtDriveTask createDriveTask(
+      DvrpVehicle vehicle, VrpPathWithTravelData path, DrtTaskType drtTaskType);
 
-	DrtStopTask createStopTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link);
+  DrtStopTask createStopTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link);
 
-	DrtStayTask createStayTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link);
+  DrtStayTask createStayTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link);
 }

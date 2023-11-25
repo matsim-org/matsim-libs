@@ -20,7 +20,6 @@
 package org.matsim.core.config.groups;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
@@ -31,147 +30,161 @@ import org.matsim.core.utils.misc.StringUtils;
  */
 public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
-	public static final String GROUP_NAME = "subtourModeChoice";
-	
-	public final static String MODES = "modes";
-	public final static String CHAINBASEDMODES = "chainBasedModes";
-	public final static String CARAVAIL = "considerCarAvailability";
-	public final static String SINGLE_PROBA = "probaForRandomSingleTripMode";
-	public final static String COORD_DISTANCE = "coordDistance";
+  public static final String GROUP_NAME = "subtourModeChoice";
 
-	private static final String BEHAVIOR = "behavior";
-	
-	private String[] chainBasedModes = new String[] { TransportMode.car, TransportMode.bike };
-	private String[] allModes = new String[] { TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk };
-	// default is false for backward compatibility
-	private boolean considerCarAvailability = false;
-	private SubtourModeChoice.Behavior behavior = SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes ;
-	
-	private double probaForRandomSingleTripMode = 0. ; // yyyyyy backwards compatibility setting; should be change. kai, may'18
+  public static final String MODES = "modes";
+  public static final String CHAINBASEDMODES = "chainBasedModes";
+  public static final String CARAVAIL = "considerCarAvailability";
+  public static final String SINGLE_PROBA = "probaForRandomSingleTripMode";
+  public static final String COORD_DISTANCE = "coordDistance";
 
-	private double coordDistance = 0;
-	
-	public SubtourModeChoiceConfigGroup() {
-		super(GROUP_NAME);
-	}
+  private static final String BEHAVIOR = "behavior";
 
-	@StringGetter( MODES )
-	private String getModesString() {
-		return toString( allModes );
-	}
+  private String[] chainBasedModes = new String[] {TransportMode.car, TransportMode.bike};
+  private String[] allModes =
+      new String[] {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
+  // default is false for backward compatibility
+  private boolean considerCarAvailability = false;
+  private SubtourModeChoice.Behavior behavior =
+      SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes;
 
-	@StringGetter( CHAINBASEDMODES )
-	private String getChainBaseModesString() {
-		return toString( chainBasedModes );
-	}
+  private double probaForRandomSingleTripMode =
+      0.; // yyyyyy backwards compatibility setting; should be change. kai, may'18
 
-	private static String toString( final String[] modes ) {
-		// (not same as toString() because of argument!)
-		
-		StringBuilder b = new StringBuilder();
+  private double coordDistance = 0;
 
-		if (modes.length > 0) b.append( modes[ 0 ] );
-		for (int i=1; i < modes.length; i++) {
-			b.append( ',' );
-			b.append( modes[ i ] );
-		}
+  public SubtourModeChoiceConfigGroup() {
+    super(GROUP_NAME);
+  }
 
-		return b.toString();
-	}
+  @StringGetter(MODES)
+  private String getModesString() {
+    return toString(allModes);
+  }
 
-	private static String[] toArray( final String modes ) {
-		String[] parts = StringUtils.explode(modes, ',');
+  @StringGetter(CHAINBASEDMODES)
+  private String getChainBaseModesString() {
+    return toString(chainBasedModes);
+  }
 
-		for (int i = 0, n = parts.length; i < n; i++) {
-			parts[i] = parts[i].trim().intern();
-		}
+  private static String toString(final String[] modes) {
+    // (not same as toString() because of argument!)
 
-		return parts;
-	}
+    StringBuilder b = new StringBuilder();
 
-	@StringSetter( MODES )
-	private void setModes( final String value ) {
-		setModes( toArray( value ) );
-	}
+    if (modes.length > 0) b.append(modes[0]);
+    for (int i = 1; i < modes.length; i++) {
+      b.append(',');
+      b.append(modes[i]);
+    }
 
-	@StringSetter( CHAINBASEDMODES )
-	private void setChainBasedModes( final String value ) {
-		setChainBasedModes( toArray( value ) );
-	}
+    return b.toString();
+  }
 
-	@Override
-	public Map<String, String> getComments() {
-		Map<String, String> comments = super.getComments();
-		comments.put(MODES, "Defines all the modes available, including chain-based modes, seperated by commas" );
-		comments.put(CHAINBASEDMODES, "Defines the chain-based modes, seperated by commas" );
-		comments.put(CARAVAIL, "Defines whether car availability must be considered or not. A agent has no car only if it has no license, or never access to a car" );
-		comments.put(SINGLE_PROBA, "Defines the probability of changing a single trip for a unchained mode instead of subtour.");
-		comments.put(COORD_DISTANCE, "If greater than 0, subtours will also consider coordinates to be at the same location when smaller than set distance.");
+  private static String[] toArray(final String modes) {
+    String[] parts = StringUtils.explode(modes, ',');
 
-		{
-			StringBuilder msg = new StringBuilder("Only for backwards compatibility.  Defines if only trips from modes list should change mode, or all trips.  Options: ");
-			for ( SubtourModeChoice.Behavior behavior : SubtourModeChoice.Behavior.values() ) {
-				msg.append(behavior.name());
-				msg.append(' ');
-			}
-			comments.put(BEHAVIOR, msg.toString());
-		}
-		return comments;
-	}
+    for (int i = 0, n = parts.length; i < n; i++) {
+      parts[i] = parts[i].trim().intern();
+    }
 
-	/* direct access */
+    return parts;
+  }
 
-	public void setModes( final String[] modes ) {
-		this.allModes = modes;
-	}
+  @StringSetter(MODES)
+  private void setModes(final String value) {
+    setModes(toArray(value));
+  }
 
-	public String[] getModes() {
-		return this.allModes;
-	}
+  @StringSetter(CHAINBASEDMODES)
+  private void setChainBasedModes(final String value) {
+    setChainBasedModes(toArray(value));
+  }
 
-	public void setChainBasedModes( final String[] modes ) {
-		this.chainBasedModes = modes;
-	}
+  @Override
+  public Map<String, String> getComments() {
+    Map<String, String> comments = super.getComments();
+    comments.put(
+        MODES, "Defines all the modes available, including chain-based modes, seperated by commas");
+    comments.put(CHAINBASEDMODES, "Defines the chain-based modes, seperated by commas");
+    comments.put(
+        CARAVAIL,
+        "Defines whether car availability must be considered or not. A agent has no car only if it has no license, or never access to a car");
+    comments.put(
+        SINGLE_PROBA,
+        "Defines the probability of changing a single trip for a unchained mode instead of subtour.");
+    comments.put(
+        COORD_DISTANCE,
+        "If greater than 0, subtours will also consider coordinates to be at the same location when smaller than set distance.");
 
-	public String[] getChainBasedModes() {
-		return this.chainBasedModes;
-	}
+    {
+      StringBuilder msg =
+          new StringBuilder(
+              "Only for backwards compatibility.  Defines if only trips from modes list should change mode, or all trips.  Options: ");
+      for (SubtourModeChoice.Behavior behavior : SubtourModeChoice.Behavior.values()) {
+        msg.append(behavior.name());
+        msg.append(' ');
+      }
+      comments.put(BEHAVIOR, msg.toString());
+    }
+    return comments;
+  }
 
-	@StringSetter( CARAVAIL )
-	public void setConsiderCarAvailability(final boolean value) {
-		this.considerCarAvailability = value;
-	}
+  /* direct access */
 
-	@StringGetter( CARAVAIL )
-	public boolean considerCarAvailability() {
-		return considerCarAvailability;
-	}
-	@StringSetter( BEHAVIOR )
-	public final void setBehavior( SubtourModeChoice.Behavior behavior ) {
-		this.behavior = behavior ;
-	}
-	@StringGetter( BEHAVIOR )
-	public final SubtourModeChoice.Behavior getBehavior() {
-		return this.behavior ;
-	}
+  public void setModes(final String[] modes) {
+    this.allModes = modes;
+  }
 
-	@StringGetter(SINGLE_PROBA)
-	public double getProbaForRandomSingleTripMode() {
-		return this.probaForRandomSingleTripMode;
-	}
+  public String[] getModes() {
+    return this.allModes;
+  }
 
-	@StringSetter(SINGLE_PROBA)
-	public void setProbaForRandomSingleTripMode(double probaForRandomSingleTripMode) {
-		this.probaForRandomSingleTripMode = probaForRandomSingleTripMode;
-	}
+  public void setChainBasedModes(final String[] modes) {
+    this.chainBasedModes = modes;
+  }
 
-	@StringGetter(COORD_DISTANCE)
-	public double getCoordDistance() {
-		return coordDistance;
-	}
+  public String[] getChainBasedModes() {
+    return this.chainBasedModes;
+  }
 
-	@StringSetter(COORD_DISTANCE)
-	public void setCoordDistance(double coordDistance) {
-		this.coordDistance = coordDistance;
-	}
+  @StringSetter(CARAVAIL)
+  public void setConsiderCarAvailability(final boolean value) {
+    this.considerCarAvailability = value;
+  }
+
+  @StringGetter(CARAVAIL)
+  public boolean considerCarAvailability() {
+    return considerCarAvailability;
+  }
+
+  @StringSetter(BEHAVIOR)
+  public final void setBehavior(SubtourModeChoice.Behavior behavior) {
+    this.behavior = behavior;
+  }
+
+  @StringGetter(BEHAVIOR)
+  public final SubtourModeChoice.Behavior getBehavior() {
+    return this.behavior;
+  }
+
+  @StringGetter(SINGLE_PROBA)
+  public double getProbaForRandomSingleTripMode() {
+    return this.probaForRandomSingleTripMode;
+  }
+
+  @StringSetter(SINGLE_PROBA)
+  public void setProbaForRandomSingleTripMode(double probaForRandomSingleTripMode) {
+    this.probaForRandomSingleTripMode = probaForRandomSingleTripMode;
+  }
+
+  @StringGetter(COORD_DISTANCE)
+  public double getCoordDistance() {
+    return coordDistance;
+  }
+
+  @StringSetter(COORD_DISTANCE)
+  public void setCoordDistance(double coordDistance) {
+    this.coordDistance = coordDistance;
+  }
 }

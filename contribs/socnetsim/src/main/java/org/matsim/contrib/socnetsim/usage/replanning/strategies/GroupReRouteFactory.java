@@ -19,63 +19,60 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.GroupPlanStrategy;
-import org.matsim.contrib.socnetsim.usage.replanning.GroupPlanStrategyFactoryUtils;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import org.matsim.contrib.socnetsim.usage.replanning.GroupPlanStrategyFactoryUtils;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 /**
  * @author thibautd
  */
 public class GroupReRouteFactory extends AbstractConfigurableSelectionStrategy {
-	private final Scenario sc;
-	private final PlanRoutingAlgorithmFactory routingAlgorithmFactory;
-	private final Provider<TripRouter> tripRouterFactory;
-	private final PlanLinkIdentifier planLinkIdentifier;
-	private final TimeInterpretation timeInterpretation;
+  private final Scenario sc;
+  private final PlanRoutingAlgorithmFactory routingAlgorithmFactory;
+  private final Provider<TripRouter> tripRouterFactory;
+  private final PlanLinkIdentifier planLinkIdentifier;
+  private final TimeInterpretation timeInterpretation;
 
+  @Inject
+  public GroupReRouteFactory(
+      Scenario sc,
+      PlanRoutingAlgorithmFactory routingAlgorithmFactory,
+      Provider<TripRouter> tripRouterFactory,
+      @Strong PlanLinkIdentifier planLinkIdentifier,
+      TimeInterpretation timeInterpretation) {
+    this.sc = sc;
+    this.routingAlgorithmFactory = routingAlgorithmFactory;
+    this.tripRouterFactory = tripRouterFactory;
+    this.planLinkIdentifier = planLinkIdentifier;
+    this.timeInterpretation = timeInterpretation;
+  }
 
-	@Inject
-	public GroupReRouteFactory( Scenario sc , PlanRoutingAlgorithmFactory routingAlgorithmFactory , Provider<TripRouter> tripRouterFactory ,
-			@Strong PlanLinkIdentifier planLinkIdentifier, TimeInterpretation timeInterpretation ) {
-		this.sc = sc;
-		this.routingAlgorithmFactory = routingAlgorithmFactory;
-		this.tripRouterFactory = tripRouterFactory;
-		this.planLinkIdentifier = planLinkIdentifier;
-		this.timeInterpretation = timeInterpretation;
-	}
+  @Override
+  public GroupPlanStrategy get() {
+    final GroupPlanStrategy strategy = instantiateStrategy(sc.getConfig());
 
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createReRouteModule(
+            sc.getConfig(), routingAlgorithmFactory, tripRouterFactory));
 
-	@Override
-	public GroupPlanStrategy get() {
-		final GroupPlanStrategy strategy = instantiateStrategy( sc.getConfig() );
-	
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createReRouteModule(
-						sc.getConfig(),
-						routingAlgorithmFactory,
-						tripRouterFactory) );
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createSynchronizerModule(
+            sc.getConfig(), tripRouterFactory, timeInterpretation));
 
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createSynchronizerModule(
-					sc.getConfig(),
-					tripRouterFactory, timeInterpretation ) );
-		
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
-					sc.getConfig(),
-					((JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME ) ).getFactory(),
-					planLinkIdentifier ));
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
+            sc.getConfig(),
+            ((JointPlans) sc.getScenarioElement(JointPlans.ELEMENT_NAME)).getFactory(),
+            planLinkIdentifier));
 
-		return strategy;
-	}
+    return strategy;
+  }
 }
-

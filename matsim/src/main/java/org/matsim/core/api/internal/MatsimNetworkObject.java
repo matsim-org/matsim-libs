@@ -20,11 +20,10 @@
 
 package org.matsim.core.api.internal;
 
-/**Marker interface for those network objects that are not identifiable (although they usually have something 
- * like xxx.getNode().getId() ).
- * 
+/**
+ * Marker interface for those network objects that are not identifiable (although they usually have
+ * something like xxx.getNode().getId() ).
+ *
  * @author nagel
  */
-public interface MatsimNetworkObject {
-
-}
+public interface MatsimNetworkObject {}

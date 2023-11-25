@@ -31,9 +31,9 @@ import org.apache.logging.log4j.core.filter.ThresholdFilter;
 import org.matsim.core.controler.Controler;
 
 /**
- * A helper class to be used as logger for counting the number of log-messages per log-level.
- * <br />
+ * A helper class to be used as logger for counting the number of log-messages per log-level. <br>
  * To be used in the following way:
+ *
  * <pre>
  *   LogCounter logger = new LogCounter(Level.WARN);
  *   logger.activiate()
@@ -41,98 +41,103 @@ import org.matsim.core.controler.Controler;
  *   logger.deactiviate();
  *   System.out.println("number of warnings: " + logger.getWarnCount());
  * </pre>
- * It is important that the logger is deactivated at the end of your test! If not, it
- * will also count the log-messages of all other tests running afterwards, slowing down
- * the test execution.
+ *
+ * It is important that the logger is deactivated at the end of your test! If not, it will also
+ * count the log-messages of all other tests running afterwards, slowing down the test execution.
  *
  * @author mrieser
  */
 public class LogCounter extends AbstractAppender {
 
-	private static final String NAME = "logCounter";
+  private static final String NAME = "logCounter";
 
-	private final Level level;
+  private final Level level;
 
-	private int cntFATAL = 0;
-	private int cntERROR = 0;
-	private int cntWARN = 0;
-	private int cntINFO = 0;
-	private int cntDEBUG = 0;
-	private int cntTRACE = 0;
+  private int cntFATAL = 0;
+  private int cntERROR = 0;
+  private int cntWARN = 0;
+  private int cntINFO = 0;
+  private int cntDEBUG = 0;
+  private int cntTRACE = 0;
 
-	public LogCounter() {
-		super(NAME,
-				ThresholdFilter.createFilter(Level.ALL, Filter.Result.ACCEPT, Filter.Result.ACCEPT),
-				Controler.DEFAULTLOG4JLAYOUT,
-				false,
-				new Property[0]);
-		this.level = Level.ALL;
-	}
+  public LogCounter() {
+    super(
+        NAME,
+        ThresholdFilter.createFilter(Level.ALL, Filter.Result.ACCEPT, Filter.Result.ACCEPT),
+        Controler.DEFAULTLOG4JLAYOUT,
+        false,
+        new Property[0]);
+    this.level = Level.ALL;
+  }
 
-	public LogCounter(Level threshold) {
-		super(NAME,
-				ThresholdFilter.createFilter(threshold, Filter.Result.ACCEPT, Filter.Result.DENY),
-				Controler.DEFAULTLOG4JLAYOUT,
-				false,
-				new Property[0]);
-		this.level = threshold;
-	}
+  public LogCounter(Level threshold) {
+    super(
+        NAME,
+        ThresholdFilter.createFilter(threshold, Filter.Result.ACCEPT, Filter.Result.DENY),
+        Controler.DEFAULTLOG4JLAYOUT,
+        false,
+        new Property[0]);
+    this.level = threshold;
+  }
 
-	@Override
-	public void append(final LogEvent event) {
-		if (event.getLevel() == Level.FATAL) this.cntFATAL++;
-		if (event.getLevel() == Level.ERROR) this.cntERROR++;
-		if (event.getLevel() == Level.WARN) this.cntWARN++;
-		if (event.getLevel() == Level.INFO) this.cntINFO++;
-		if (event.getLevel() == Level.DEBUG) this.cntDEBUG++;
-		if (event.getLevel() == Level.TRACE) this.cntTRACE++;
-	}
+  @Override
+  public void append(final LogEvent event) {
+    if (event.getLevel() == Level.FATAL) this.cntFATAL++;
+    if (event.getLevel() == Level.ERROR) this.cntERROR++;
+    if (event.getLevel() == Level.WARN) this.cntWARN++;
+    if (event.getLevel() == Level.INFO) this.cntINFO++;
+    if (event.getLevel() == Level.DEBUG) this.cntDEBUG++;
+    if (event.getLevel() == Level.TRACE) this.cntTRACE++;
+  }
 
-	public int getFatalCount() {
-		return this.cntFATAL;
-	}
+  public int getFatalCount() {
+    return this.cntFATAL;
+  }
 
-	public int getErrorCount() {
-		return this.cntERROR;
-	}
+  public int getErrorCount() {
+    return this.cntERROR;
+  }
 
-	public int getWarnCount() {
-		return this.cntWARN;
-	}
+  public int getWarnCount() {
+    return this.cntWARN;
+  }
 
-	public int getInfoCount() {
-		return this.cntINFO;
-	}
+  public int getInfoCount() {
+    return this.cntINFO;
+  }
 
-	public int getDebugCount() {
-		return this.cntDEBUG;
-	}
+  public int getDebugCount() {
+    return this.cntDEBUG;
+  }
 
-	public int getTraceCount() {
-		return this.cntTRACE;
-	}
+  public int getTraceCount() {
+    return this.cntTRACE;
+  }
 
-	public void resetCounts() {
-		this.cntFATAL = 0;
-		this.cntERROR = 0;
-		this.cntWARN = 0;
-		this.cntINFO = 0;
-		this.cntDEBUG = 0;
-		this.cntTRACE = 0;
-	}
+  public void resetCounts() {
+    this.cntFATAL = 0;
+    this.cntERROR = 0;
+    this.cntWARN = 0;
+    this.cntINFO = 0;
+    this.cntDEBUG = 0;
+    this.cntTRACE = 0;
+  }
 
-	public void activate() {
-		this.start();
-		final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-		ctx.getConfiguration().getRootLogger().addAppender(this, this.level, null);//addLogger("org.apache.logging.log4j", loggerConfig);
-		ctx.updateLoggers();
-	}
+  public void activate() {
+    this.start();
+    final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+    ctx.getConfiguration()
+        .getRootLogger()
+        .addAppender(
+            this, this.level, null); // addLogger("org.apache.logging.log4j", loggerConfig);
+    ctx.updateLoggers();
+  }
 
-	public void deactivate() {
-		this.stop();
-		final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-		final Configuration config = ctx.getConfiguration();
-		config.getRootLogger().removeAppender(NAME);
-		ctx.updateLoggers();
-	}
+  public void deactivate() {
+    this.stop();
+    final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+    final Configuration config = ctx.getConfiguration();
+    config.getRootLogger().removeAppender(NAME);
+    ctx.updateLoggers();
+  }
 }

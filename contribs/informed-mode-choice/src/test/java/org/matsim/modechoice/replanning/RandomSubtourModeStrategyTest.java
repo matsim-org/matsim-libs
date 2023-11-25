@@ -12,33 +12,36 @@ import org.matsim.modechoice.TestScenario;
 
 public class RandomSubtourModeStrategyTest extends ScenarioTest {
 
-	@Override
-	protected String[] getArgs() {
-		return new String[]{"--mc"};
-	}
+  @Override
+  protected String[] getArgs() {
+    return new String[] {"--mc"};
+  }
 
-	@Test
-	public void person() {
+  @Test
+  public void person() {
 
-		PrepareForMobsim prepare = injector.getInstance(PrepareForMobsim.class);
-		prepare.run();
+    PrepareForMobsim prepare = injector.getInstance(PrepareForMobsim.class);
+    prepare.run();
 
-		PlanStrategy strategy = injector.getInstance(Key.get(PlanStrategy.class, Names.named(InformedModeChoiceModule.RANDOM_SUBTOUR_MODE_STRATEGY)));
+    PlanStrategy strategy =
+        injector.getInstance(
+            Key.get(
+                PlanStrategy.class,
+                Names.named(InformedModeChoiceModule.RANDOM_SUBTOUR_MODE_STRATEGY)));
 
-		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(5));
+    Person person =
+        controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(5));
 
-		person.getPlans().removeIf(p -> person.getSelectedPlan() != p);
+    person.getPlans().removeIf(p -> person.getSelectedPlan() != p);
 
-		for (int i = 0; i < 20; i++) {
-			run(strategy, person);
-		}
+    for (int i = 0; i < 20; i++) {
+      run(strategy, person);
+    }
+  }
 
-	}
-
-	private void run(PlanStrategy strategy, Person person) {
-		strategy.init(() -> 1);
-		strategy.run(person);
-		strategy.finish();
-	}
-
+  private void run(PlanStrategy strategy, Person person) {
+    strategy.init(() -> 1);
+    strategy.run(person);
+    strategy.finish();
+  }
 }

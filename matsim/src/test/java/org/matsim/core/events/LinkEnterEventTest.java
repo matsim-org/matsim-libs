@@ -35,16 +35,16 @@ import org.matsim.vehicles.Vehicle;
  */
 public class LinkEnterEventTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-
-	@Test public void testWriteReadXml() {
-		final LinkEnterEvent event1 = new LinkEnterEvent(6823.8, Id.create("veh", Vehicle.class),
-				Id.create("abcd", Link.class));
-		final LinkEnterEvent event2 = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", event1);
-		assertEquals(event1.getTime(), event2.getTime(), MatsimTestUtils.EPSILON);
-		assertEquals(event1.getLinkId(), event2.getLinkId());
-		assertEquals(event1.getVehicleId(), event2.getVehicleId());
-	}
+  @Test
+  public void testWriteReadXml() {
+    final LinkEnterEvent event1 =
+        new LinkEnterEvent(6823.8, Id.create("veh", Vehicle.class), Id.create("abcd", Link.class));
+    final LinkEnterEvent event2 =
+        XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml", event1);
+    assertEquals(event1.getTime(), event2.getTime(), MatsimTestUtils.EPSILON);
+    assertEquals(event1.getLinkId(), event2.getLinkId());
+    assertEquals(event1.getVehicleId(), event2.getVehicleId());
+  }
 }

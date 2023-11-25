@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * PrepareForMobsim.java
@@ -19,8 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.controler;
+package org.matsim.core.controler;
 
-
-public interface PrepareForMobsim extends Runnable {
-}
+public interface PrepareForMobsim extends Runnable {}

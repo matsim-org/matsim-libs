@@ -24,22 +24,21 @@ import org.matsim.api.core.v01.population.Person;
 
 public interface PC2Parking {
 
-	public Id<PC2Parking> getId();
+  public Id<PC2Parking> getId();
 
-	public int getMaximumParkingCapacity();
+  public int getMaximumParkingCapacity();
 
-	public int getAvailableParkingCapacity();
+  public int getAvailableParkingCapacity();
 
-	public void parkVehicle();
+  public void parkVehicle();
 
-	public void unparkVehicle();
-	
-	public double getCost(Id<Person> agentId, double arrivalTime, double parkingDurationInSecond);
-	
-	public Coord getCoordinate();
+  public void unparkVehicle();
 
-	public String getGroupName();
-	
-	public void resetAvailability();
-	
+  public double getCost(Id<Person> agentId, double arrivalTime, double parkingDurationInSecond);
+
+  public Coord getCoordinate();
+
+  public String getGroupName();
+
+  public void resetAvailability();
 }

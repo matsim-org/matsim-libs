@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -40,83 +39,85 @@ import org.matsim.vehicles.Vehicle;
  */
 public class HouseholdBasedVehicleRessourcesTest {
 
-	@Test
-	public void testVehiclesIdsAreCorrect() throws Exception {
-		final Households households = createHouseholds();
-		final VehicleRessources testee = new HouseholdBasedVehicleRessources( households );
+  @Test
+  public void testVehiclesIdsAreCorrect() throws Exception {
+    final Households households = createHouseholds();
+    final VehicleRessources testee = new HouseholdBasedVehicleRessources(households);
 
-		for (Household household : households.getHouseholds().values()) {
-			final Set<Id<Vehicle>> expected = new HashSet<Id<Vehicle>>( household.getVehicleIds() );
-			for (Id<Person> person : household.getMemberIds()) {
-				final Set<Id<Vehicle>> actual = testee.identifyVehiclesUsableForAgent( person );
-				assertEquals(
-						"unexpected vehicles for agent "+person,
-						expected,
-						actual);
-			}
-		}
-	}
+    for (Household household : households.getHouseholds().values()) {
+      final Set<Id<Vehicle>> expected = new HashSet<Id<Vehicle>>(household.getVehicleIds());
+      for (Id<Person> person : household.getMemberIds()) {
+        final Set<Id<Vehicle>> actual = testee.identifyVehiclesUsableForAgent(person);
+        assertEquals("unexpected vehicles for agent " + person, expected, actual);
+      }
+    }
+  }
 
-	private static Households createHouseholds() {
-		final HouseholdsImpl hhs = new HouseholdsImpl();
+  private static Households createHouseholds() {
+    final HouseholdsImpl hhs = new HouseholdsImpl();
 
-		int c = 0;
-		int v = 0;
-		// NO INTERFACE BASED WAY TO ADD MEMBERS ???????
-		HouseholdImpl hh = (HouseholdImpl) hhs.getFactory().createHousehold( Id.create( "small" , Household.class) );
-		hh.setMemberIds( Arrays.<Id<Person>>asList( Id.create( c++ , Person.class ) ) );
-		hh.setVehicleIds( Collections.<Id<Vehicle>>emptyList() );
-		hhs.addHousehold( hh );
+    int c = 0;
+    int v = 0;
+    // NO INTERFACE BASED WAY TO ADD MEMBERS ???????
+    HouseholdImpl hh =
+        (HouseholdImpl) hhs.getFactory().createHousehold(Id.create("small", Household.class));
+    hh.setMemberIds(Arrays.<Id<Person>>asList(Id.create(c++, Person.class)));
+    hh.setVehicleIds(Collections.<Id<Vehicle>>emptyList());
+    hhs.addHousehold(hh);
 
-		hh = (HouseholdImpl) hhs.getFactory().createHousehold( Id.create( "big" , Household.class) );
-		hh.setMemberIds( Arrays.<Id<Person>>asList(
-					Id.create( c++ , Person.class ),
-					Id.create( c++ , Person.class ),
-					Id.create( c++ , Person.class ),
-					Id.create( c++ , Person.class ),
-					Id.create( c++ , Person.class ),
-					Id.create( c++ , Person.class ),
-					Id.create( c++ , Person.class ),
-					Id.create( c++ , Person.class )) );
-		hh.setVehicleIds( Arrays.<Id<Vehicle>>asList( Id.create( v++ , Vehicle.class ) ) );
-		hhs.addHousehold( hh );
+    hh = (HouseholdImpl) hhs.getFactory().createHousehold(Id.create("big", Household.class));
+    hh.setMemberIds(
+        Arrays.<Id<Person>>asList(
+            Id.create(c++, Person.class),
+            Id.create(c++, Person.class),
+            Id.create(c++, Person.class),
+            Id.create(c++, Person.class),
+            Id.create(c++, Person.class),
+            Id.create(c++, Person.class),
+            Id.create(c++, Person.class),
+            Id.create(c++, Person.class)));
+    hh.setVehicleIds(Arrays.<Id<Vehicle>>asList(Id.create(v++, Vehicle.class)));
+    hhs.addHousehold(hh);
 
-		hh = (HouseholdImpl) hhs.getFactory().createHousehold( Id.create( "lots of vehicles" , Household.class) );
-		hh.setMemberIds( Arrays.<Id<Person>>asList(
-					Id.create( c++ , Person.class ),
-					Id.create( c++ , Person.class ),
-					Id.create( c++ , Person.class ),
-					Id.create( c++ , Person.class ),
-					Id.create( c++ , Person.class ),
-					Id.create( c++ , Person.class ),
-					Id.create( c++ , Person.class ),
-					Id.create( c++ , Person.class )) );
-		hh.setVehicleIds( Arrays.<Id<Vehicle>>asList(
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class ),
-					Id.create( v++ , Vehicle.class )) );
-		hhs.addHousehold( hh );
+    hh =
+        (HouseholdImpl)
+            hhs.getFactory().createHousehold(Id.create("lots of vehicles", Household.class));
+    hh.setMemberIds(
+        Arrays.<Id<Person>>asList(
+            Id.create(c++, Person.class),
+            Id.create(c++, Person.class),
+            Id.create(c++, Person.class),
+            Id.create(c++, Person.class),
+            Id.create(c++, Person.class),
+            Id.create(c++, Person.class),
+            Id.create(c++, Person.class),
+            Id.create(c++, Person.class)));
+    hh.setVehicleIds(
+        Arrays.<Id<Vehicle>>asList(
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class),
+            Id.create(v++, Vehicle.class)));
+    hhs.addHousehold(hh);
 
-		return hhs;
-	}
+    return hhs;
+  }
 }
-

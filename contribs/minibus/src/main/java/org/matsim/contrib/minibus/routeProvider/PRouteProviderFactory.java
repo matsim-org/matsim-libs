@@ -28,30 +28,67 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
- * 
  * @author aneumann
- *
  */
 public final class PRouteProviderFactory {
-	private PRouteProviderFactory(){} // should not be instantiated
+  private PRouteProviderFactory() {} // should not be instantiated
 
-	private final static Logger log = LogManager.getLogger(PRouteProviderFactory.class);
+  private static final Logger log = LogManager.getLogger(PRouteProviderFactory.class);
 
-	public static PRouteProvider createRouteProvider(Network network, Population population, PConfigGroup pConfig, TransitSchedule pStopsOnly, String outputDir, EventsManager eventsManager) {
+  public static PRouteProvider createRouteProvider(
+      Network network,
+      Population population,
+      PConfigGroup pConfig,
+      TransitSchedule pStopsOnly,
+      String outputDir,
+      EventsManager eventsManager) {
 
-		RandomStopProvider randomStopProvider = new RandomStopProvider(pConfig, population, pStopsOnly, outputDir);
+    RandomStopProvider randomStopProvider =
+        new RandomStopProvider(pConfig, population, pStopsOnly, outputDir);
 
-		if(pConfig.getRouteProvider().equalsIgnoreCase(SimpleBackAndForthScheduleProvider.NAME)){
-			return new SimpleBackAndForthScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, randomStopProvider, pConfig.getVehicleMaximumVelocity(), pConfig.getDriverRestTime(), pConfig.getMode());
-		} else if(pConfig.getRouteProvider().equalsIgnoreCase(SimpleCircleScheduleProvider.NAME)){
-			return new SimpleCircleScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, randomStopProvider, pConfig.getVehicleMaximumVelocity(), pConfig.getDriverRestTime(), pConfig.getMode());
-		} else if(pConfig.getRouteProvider().equalsIgnoreCase(ComplexCircleScheduleProvider.NAME)){
-			return new ComplexCircleScheduleProvider(pStopsOnly, network, randomStopProvider, pConfig.getVehicleMaximumVelocity(), pConfig.getPlanningSpeedFactor(), pConfig.getDriverRestTime(), pConfig.getMode());
-		} else if(pConfig.getRouteProvider().equalsIgnoreCase(TimeAwareComplexCircleScheduleProvider.NAME)){
-			return new TimeAwareComplexCircleScheduleProvider(pStopsOnly, network, randomStopProvider, pConfig.getVehicleMaximumVelocity(), pConfig.getPlanningSpeedFactor(), pConfig.getDriverRestTime(), pConfig.getPIdentifier(), eventsManager, pConfig.getMode());
-		} else {
-			log.error("There is no route provider specified. " + pConfig.getRouteProvider() + " unknown");
-			return null;
-		}
-	}
+    if (pConfig.getRouteProvider().equalsIgnoreCase(SimpleBackAndForthScheduleProvider.NAME)) {
+      return new SimpleBackAndForthScheduleProvider(
+          pConfig.getPIdentifier(),
+          pStopsOnly,
+          network,
+          randomStopProvider,
+          pConfig.getVehicleMaximumVelocity(),
+          pConfig.getDriverRestTime(),
+          pConfig.getMode());
+    } else if (pConfig.getRouteProvider().equalsIgnoreCase(SimpleCircleScheduleProvider.NAME)) {
+      return new SimpleCircleScheduleProvider(
+          pConfig.getPIdentifier(),
+          pStopsOnly,
+          network,
+          randomStopProvider,
+          pConfig.getVehicleMaximumVelocity(),
+          pConfig.getDriverRestTime(),
+          pConfig.getMode());
+    } else if (pConfig.getRouteProvider().equalsIgnoreCase(ComplexCircleScheduleProvider.NAME)) {
+      return new ComplexCircleScheduleProvider(
+          pStopsOnly,
+          network,
+          randomStopProvider,
+          pConfig.getVehicleMaximumVelocity(),
+          pConfig.getPlanningSpeedFactor(),
+          pConfig.getDriverRestTime(),
+          pConfig.getMode());
+    } else if (pConfig
+        .getRouteProvider()
+        .equalsIgnoreCase(TimeAwareComplexCircleScheduleProvider.NAME)) {
+      return new TimeAwareComplexCircleScheduleProvider(
+          pStopsOnly,
+          network,
+          randomStopProvider,
+          pConfig.getVehicleMaximumVelocity(),
+          pConfig.getPlanningSpeedFactor(),
+          pConfig.getDriverRestTime(),
+          pConfig.getPIdentifier(),
+          eventsManager,
+          pConfig.getMode());
+    } else {
+      log.error("There is no route provider specified. " + pConfig.getRouteProvider() + " unknown");
+      return null;
+    }
+  }
 }

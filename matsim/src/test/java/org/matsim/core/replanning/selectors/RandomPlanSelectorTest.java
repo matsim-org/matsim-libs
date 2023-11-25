@@ -38,49 +38,47 @@ import org.matsim.core.population.PopulationUtils;
  */
 public class RandomPlanSelectorTest extends AbstractPlanSelectorTest {
 
-	private final static Logger log = LogManager.getLogger(RandomPlanSelectorTest.class);
+  private static final Logger log = LogManager.getLogger(RandomPlanSelectorTest.class);
 
-	@Override
-	protected PlanSelector<Plan, Person> getPlanSelector() {
-		return new RandomPlanSelector<Plan, Person>();
-	}
+  @Override
+  protected PlanSelector<Plan, Person> getPlanSelector() {
+    return new RandomPlanSelector<Plan, Person>();
+  }
 
-	/**
-	 * Test that each of a person's plans is randomly selected.
-	 */
-	@Test public void testRandom() {
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-		Plan plan1 = PersonUtils.createAndAddPlan(person, false);
-		Plan plan2 = PersonUtils.createAndAddPlan(person, false);
-		plan2.setScore(10.0);
-		Plan plan3 = PersonUtils.createAndAddPlan(person, false);
-		plan3.setScore(-50.0);
-		Plan plan4 = PersonUtils.createAndAddPlan(person, false);
-		plan4.setScore(0.0);
+  /** Test that each of a person's plans is randomly selected. */
+  @Test
+  public void testRandom() {
+    Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+    Plan plan1 = PersonUtils.createAndAddPlan(person, false);
+    Plan plan2 = PersonUtils.createAndAddPlan(person, false);
+    plan2.setScore(10.0);
+    Plan plan3 = PersonUtils.createAndAddPlan(person, false);
+    plan3.setScore(-50.0);
+    Plan plan4 = PersonUtils.createAndAddPlan(person, false);
+    plan4.setScore(0.0);
 
-		RandomPlanSelector<Plan, Person> selector = new RandomPlanSelector<Plan, Person>();
-		int cnt1 = 0;
-		int cnt2 = 0;
-		int cnt3 = 0;
-		int cnt4 = 0;
+    RandomPlanSelector<Plan, Person> selector = new RandomPlanSelector<Plan, Person>();
+    int cnt1 = 0;
+    int cnt2 = 0;
+    int cnt3 = 0;
+    int cnt4 = 0;
 
-		for (int i = 0; i < 4000; i++) {
-			Plan plan = selector.selectPlan(person);
-			if (plan == plan1) cnt1++;
-			if (plan == plan2) cnt2++;
-			if (plan == plan3) cnt3++;
-			if (plan == plan4) cnt4++;
-		}
+    for (int i = 0; i < 4000; i++) {
+      Plan plan = selector.selectPlan(person);
+      if (plan == plan1) cnt1++;
+      if (plan == plan2) cnt2++;
+      if (plan == plan3) cnt3++;
+      if (plan == plan4) cnt4++;
+    }
 
-		log.info("Plan 1 was returned " + cnt1 + " times.");
-		log.info("Plan 2 was returned " + cnt2 + " times.");
-		log.info("Plan 3 was returned " + cnt3 + " times.");
-		log.info("Plan 4 was returned " + cnt4 + " times.");
+    log.info("Plan 1 was returned " + cnt1 + " times.");
+    log.info("Plan 2 was returned " + cnt2 + " times.");
+    log.info("Plan 3 was returned " + cnt3 + " times.");
+    log.info("Plan 4 was returned " + cnt4 + " times.");
 
-		assertEquals(966, cnt1);
-		assertEquals(1014, cnt2);
-		assertEquals(1039, cnt3);
-		assertEquals(981, cnt4);
-	}
-
+    assertEquals(966, cnt1);
+    assertEquals(1014, cnt2);
+    assertEquals(1039, cnt3);
+    assertEquals(981, cnt4);
+  }
 }

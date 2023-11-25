@@ -24,5 +24,5 @@ package org.matsim.contrib.dvrp.run;
  * @author Michal Maciejewski (michalm)
  */
 public interface Modal {
-	String getMode();
+  String getMode();
 }

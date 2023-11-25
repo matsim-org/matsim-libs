@@ -26,13 +26,13 @@ import org.matsim.core.population.routes.RouteFactory;
  * @author michalm (Michal Maciejewski)
  */
 public class DrtRouteFactory implements RouteFactory {
-	@Override
-	public Route createRoute(Id<Link> startLinkId, Id<Link> endLinkId) {
-		return new DrtRoute(startLinkId, endLinkId);
-	}
+  @Override
+  public Route createRoute(Id<Link> startLinkId, Id<Link> endLinkId) {
+    return new DrtRoute(startLinkId, endLinkId);
+  }
 
-	@Override
-	public String getCreatedRouteType() {
-		return DrtRoute.ROUTE_TYPE;
-	}
+  @Override
+  public String getCreatedRouteType() {
+    return DrtRoute.ROUTE_TYPE;
+  }
 }

@@ -24,15 +24,13 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 
 /**
  * @author dgrether
- *
  */
 public interface IterationStartsListener extends ControlerListener {
 
-	/**
-	 * Notifies all observers of the Controler that a iteration is setup
-	 *
-	 * @param event
-	 */
-	public void notifyIterationStarts(IterationStartsEvent event);
-
+  /**
+   * Notifies all observers of the Controler that a iteration is setup
+   *
+   * @param event
+   */
+  public void notifyIterationStarts(IterationStartsEvent event);
 }

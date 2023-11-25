@@ -38,60 +38,64 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class Initializer {
 
-	private Controler controler;
+  private Controler controler;
 
-	public void init(MatsimTestUtils utils) {
-		// lnk does not work. get path to locationchcoice
-		String path = utils.getPackageInputDirectory() + "config.xml";
+  public void init(MatsimTestUtils utils) {
+    // lnk does not work. get path to locationchcoice
+    String path = utils.getPackageInputDirectory() + "config.xml";
 
-		Config config = ConfigUtils.loadConfig(path, new DestinationChoiceConfigGroup());
+    Config config = ConfigUtils.loadConfig(path, new DestinationChoiceConfigGroup());
 
-		//Config config = testCase.loadConfig(path);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		preparePlans(scenario);
+    // Config config = testCase.loadConfig(path);
+    Scenario scenario = ScenarioUtils.loadScenario(config);
+    preparePlans(scenario);
 
-		this.controler = new Controler(scenario);
-		this.controler.getConfig().controller().setCreateGraphs(false);
-		this.controler.getConfig().controller().setWriteEventsInterval(0); // disables events-writing
-		this.controler.getConfig()
-				.controller()
-				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		this.controler.run();
-	}
+    this.controler = new Controler(scenario);
+    this.controler.getConfig().controller().setCreateGraphs(false);
+    this.controler.getConfig().controller().setWriteEventsInterval(0); // disables events-writing
+    this.controler
+        .getConfig()
+        .controller()
+        .setOverwriteFileSetting(
+            OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+    this.controler.run();
+  }
 
-	public MatsimServices getControler() {
-		return controler;
-	}
+  public MatsimServices getControler() {
+    return controler;
+  }
 
-	private static void preparePlans(Scenario scenario) {
-		//plans are missing departure times, so clear all routes to re-route all legs and provide some departure times
-		scenario.getPopulation()
-				.getPersons()
-				.values()
-				.stream()
-				.flatMap(p -> p.getSelectedPlan().getPlanElements().stream())
-				.filter(Leg.class::isInstance)
-				.forEach(planElement -> ((Leg)planElement).setRoute(null));
+  private static void preparePlans(Scenario scenario) {
+    // plans are missing departure times, so clear all routes to re-route all legs and provide some
+    // departure times
+    scenario.getPopulation().getPersons().values().stream()
+        .flatMap(p -> p.getSelectedPlan().getPlanElements().stream())
+        .filter(Leg.class::isInstance)
+        .forEach(planElement -> ((Leg) planElement).setRoute(null));
 
-		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(
-				scenario.getConfig().scoring());
-		PlanAlgorithm router = new PlanRouter(new TripRouterFactoryBuilderWithDefaults().build(scenario).get(), TimeInterpretation.create(scenario.getConfig()));
-		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, scenario);
-		scenario.getPopulation().getPersons().values().forEach(pp4s::run);
+    final FreespeedTravelTimeAndDisutility timeCostCalc =
+        new FreespeedTravelTimeAndDisutility(scenario.getConfig().scoring());
+    PlanAlgorithm router =
+        new PlanRouter(
+            new TripRouterFactoryBuilderWithDefaults().build(scenario).get(),
+            TimeInterpretation.create(scenario.getConfig()));
+    PersonPrepareForSim pp4s = new PersonPrepareForSim(router, scenario);
+    scenario.getPopulation().getPersons().values().forEach(pp4s::run);
 
-		scenario.getPopulation().getPersons().values().forEach(new PersonCalcTimes()::run);
+    scenario.getPopulation().getPersons().values().forEach(new PersonCalcTimes()::run);
 
-//		//a bit hacky way of setting endTimes for activities
-//		scenario.getPopulation().getPersons().values().stream().map(HasPlansAndId::getSelectedPlan).forEach(plan -> {
-//			for (int i = 0; i < plan.getPlanElements().size(); i++) {
-//				PlanElement planElement = plan.getPlanElements().get(i);
-//				if (planElement instanceof Leg) {
-//					Leg leg = (Leg)planElement;
-//					Activity previousActivity = (Activity)plan.getPlanElements().get(i - 1);
-//					previousActivity.setEndTime(leg.getDepartureTime().seconds());
-//				}
-//			}
-//		});
+    //		//a bit hacky way of setting endTimes for activities
+    //
+    //	scenario.getPopulation().getPersons().values().stream().map(HasPlansAndId::getSelectedPlan).forEach(plan -> {
+    //			for (int i = 0; i < plan.getPlanElements().size(); i++) {
+    //				PlanElement planElement = plan.getPlanElements().get(i);
+    //				if (planElement instanceof Leg) {
+    //					Leg leg = (Leg)planElement;
+    //					Activity previousActivity = (Activity)plan.getPlanElements().get(i - 1);
+    //					previousActivity.setEndTime(leg.getDepartureTime().seconds());
+    //				}
+    //			}
+    //		});
 
-	}
+  }
 }

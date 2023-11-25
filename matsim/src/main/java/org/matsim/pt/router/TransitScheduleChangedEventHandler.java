@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * TransitScheduleChangedEventHandler.java
@@ -19,12 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.pt.router;
+package org.matsim.pt.router;
 
 import org.matsim.core.events.handler.EventHandler;
 
 public interface TransitScheduleChangedEventHandler extends EventHandler {
 
-    void handleEvent(TransitScheduleChangedEvent event);
-
+  void handleEvent(TransitScheduleChangedEvent event);
 }

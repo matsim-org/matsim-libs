@@ -40,46 +40,55 @@ import org.matsim.core.router.util.TravelTime;
  * @author michalm
  */
 public class EmptyVehicleRelocator {
-	public static final DrtTaskType RELOCATE_VEHICLE_TASK_TYPE = new DrtTaskType("RELOCATE", DRIVE);
-	public static final DrtTaskType RELOCATE_VEHICLE_TO_DEPOT_TASK_TYPE = new DrtTaskType("RELOCATE_TO_DEPOT", DRIVE);
+  public static final DrtTaskType RELOCATE_VEHICLE_TASK_TYPE = new DrtTaskType("RELOCATE", DRIVE);
+  public static final DrtTaskType RELOCATE_VEHICLE_TO_DEPOT_TASK_TYPE =
+      new DrtTaskType("RELOCATE_TO_DEPOT", DRIVE);
 
-	private final TravelTime travelTime;
-	private final MobsimTimer timer;
-	private final DrtTaskFactory taskFactory;
-	private final LeastCostPathCalculator router;
+  private final TravelTime travelTime;
+  private final MobsimTimer timer;
+  private final DrtTaskFactory taskFactory;
+  private final LeastCostPathCalculator router;
 
-	public EmptyVehicleRelocator(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
-			MobsimTimer timer, DrtTaskFactory taskFactory) {
-		this.travelTime = travelTime;
-		this.timer = timer;
-		this.taskFactory = taskFactory;
-		router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
-	}
+  public EmptyVehicleRelocator(
+      Network network,
+      TravelTime travelTime,
+      TravelDisutility travelDisutility,
+      MobsimTimer timer,
+      DrtTaskFactory taskFactory) {
+    this.travelTime = travelTime;
+    this.timer = timer;
+    this.taskFactory = taskFactory;
+    router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
+  }
 
-	public void relocateVehicle(DvrpVehicle vehicle, Link link, DrtTaskType relocationTaskType) {
-		DrtStayTask currentTask = (DrtStayTask)vehicle.getSchedule().getCurrentTask();
-		Link currentLink = currentTask.getLink();
+  public void relocateVehicle(DvrpVehicle vehicle, Link link, DrtTaskType relocationTaskType) {
+    DrtStayTask currentTask = (DrtStayTask) vehicle.getSchedule().getCurrentTask();
+    Link currentLink = currentTask.getLink();
 
-		if (currentLink != link) {
-			VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(currentLink, link, timer.getTimeOfDay(), router,
-					travelTime);
-			if (path.getArrivalTime() < vehicle.getServiceEndTime()) {
-				relocateVehicleImpl(vehicle, path, relocationTaskType);
-			}
-		}
-	}
+    if (currentLink != link) {
+      VrpPathWithTravelData path =
+          VrpPaths.calcAndCreatePath(currentLink, link, timer.getTimeOfDay(), router, travelTime);
+      if (path.getArrivalTime() < vehicle.getServiceEndTime()) {
+        relocateVehicleImpl(vehicle, path, relocationTaskType);
+      }
+    }
+  }
 
-	private void relocateVehicleImpl(DvrpVehicle vehicle, VrpPathWithTravelData vrpPath, DrtTaskType relocationTaskType) {
-		Schedule schedule = vehicle.getSchedule();
-		DrtStayTask stayTask = (DrtStayTask)schedule.getCurrentTask();
-		if (stayTask.getTaskIdx() != schedule.getTaskCount() - 1) {
-			throw new IllegalStateException("The current STAY task is not last. Not possible without prebooking");
-		}
+  private void relocateVehicleImpl(
+      DvrpVehicle vehicle, VrpPathWithTravelData vrpPath, DrtTaskType relocationTaskType) {
+    Schedule schedule = vehicle.getSchedule();
+    DrtStayTask stayTask = (DrtStayTask) schedule.getCurrentTask();
+    if (stayTask.getTaskIdx() != schedule.getTaskCount() - 1) {
+      throw new IllegalStateException(
+          "The current STAY task is not last. Not possible without prebooking");
+    }
 
-		stayTask.setEndTime(vrpPath.getDepartureTime()); // finish STAY
-		schedule.addTask(taskFactory.createDriveTask(vehicle, vrpPath, relocationTaskType)); // add RELOCATE
-		// append STAY
-		schedule.addTask(taskFactory.createStayTask(vehicle, vrpPath.getArrivalTime(), vehicle.getServiceEndTime(),
-				vrpPath.getToLink()));
-	}
+    stayTask.setEndTime(vrpPath.getDepartureTime()); // finish STAY
+    schedule.addTask(
+        taskFactory.createDriveTask(vehicle, vrpPath, relocationTaskType)); // add RELOCATE
+    // append STAY
+    schedule.addTask(
+        taskFactory.createStayTask(
+            vehicle, vrpPath.getArrivalTime(), vehicle.getServiceEndTime(), vrpPath.getToLink()));
+  }
 }

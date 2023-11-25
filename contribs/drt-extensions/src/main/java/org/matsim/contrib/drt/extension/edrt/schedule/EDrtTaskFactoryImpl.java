@@ -23,38 +23,43 @@ import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.evrp.EvDvrpVehicle;
-import org.matsim.contrib.evrp.VrpPathEnergyConsumptions;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.evrp.EvDvrpVehicle;
+import org.matsim.contrib.evrp.VrpPathEnergyConsumptions;
 
 /**
  * @author michalm
  */
 public class EDrtTaskFactoryImpl implements DrtTaskFactory {
-	@Override
-	public EDrtDriveTask createDriveTask(DvrpVehicle vehicle, VrpPathWithTravelData path, DrtTaskType taskType) {
-		ElectricVehicle ev = ((EvDvrpVehicle)vehicle).getElectricVehicle();
-		double totalEnergy = VrpPathEnergyConsumptions.calcTotalEnergy(ev, path, path.getDepartureTime());
-		return new EDrtDriveTask(path, taskType, totalEnergy);
-	}
+  @Override
+  public EDrtDriveTask createDriveTask(
+      DvrpVehicle vehicle, VrpPathWithTravelData path, DrtTaskType taskType) {
+    ElectricVehicle ev = ((EvDvrpVehicle) vehicle).getElectricVehicle();
+    double totalEnergy =
+        VrpPathEnergyConsumptions.calcTotalEnergy(ev, path, path.getDepartureTime());
+    return new EDrtDriveTask(path, taskType, totalEnergy);
+  }
 
-	@Override
-	public EDrtStopTask createStopTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link) {
-		ElectricVehicle ev = ((EvDvrpVehicle)vehicle).getElectricVehicle();
-		double auxEnergy = ev.getAuxEnergyConsumption()
-				.calcEnergyConsumption(beginTime, endTime - beginTime, link.getId());
-		return new EDrtStopTask(beginTime, endTime, link, auxEnergy);
-	}
+  @Override
+  public EDrtStopTask createStopTask(
+      DvrpVehicle vehicle, double beginTime, double endTime, Link link) {
+    ElectricVehicle ev = ((EvDvrpVehicle) vehicle).getElectricVehicle();
+    double auxEnergy =
+        ev.getAuxEnergyConsumption()
+            .calcEnergyConsumption(beginTime, endTime - beginTime, link.getId());
+    return new EDrtStopTask(beginTime, endTime, link, auxEnergy);
+  }
 
-	@Override
-	public EDrtStayTask createStayTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link) {
-		return new EDrtStayTask(beginTime, endTime, link, 0);// no energy consumption during STAY
-	}
+  @Override
+  public EDrtStayTask createStayTask(
+      DvrpVehicle vehicle, double beginTime, double endTime, Link link) {
+    return new EDrtStayTask(beginTime, endTime, link, 0); // no energy consumption during STAY
+  }
 
-	public EDrtChargingTask createChargingTask(DvrpVehicle vehicle, double beginTime, double endTime, Charger charger,
-			double totalEnergy) {
-		return new EDrtChargingTask(beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(),
-				totalEnergy);
-	}
+  public EDrtChargingTask createChargingTask(
+      DvrpVehicle vehicle, double beginTime, double endTime, Charger charger, double totalEnergy) {
+    return new EDrtChargingTask(
+        beginTime, endTime, charger, ((EvDvrpVehicle) vehicle).getElectricVehicle(), totalEnergy);
+  }
 }

@@ -24,13 +24,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
 public class ReplanningIdGenerator {
-	
-	private static int idCount = 0;
-	
-	public synchronized static Id<WithinDayReplanner> getNextId() {
-		Id<WithinDayReplanner> id = Id.create(idCount, WithinDayReplanner.class);
-		idCount++;
-		
-		return id;
-	}
+
+  private static int idCount = 0;
+
+  public static synchronized Id<WithinDayReplanner> getNextId() {
+    Id<WithinDayReplanner> id = Id.create(idCount, WithinDayReplanner.class);
+    idCount++;
+
+    return id;
+  }
 }

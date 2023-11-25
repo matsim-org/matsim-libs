@@ -19,12 +19,10 @@
  * *********************************************************************** */
 package org.matsim.vis.otfvis.opengl.queries;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -39,98 +37,89 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.GLUtils;
 
-
 /**
  * @author dgrether
- *
  */
 public class QueryNodeById extends AbstractQuery implements OTFQuery {
 
-	private static final Logger log = LogManager.getLogger(QueryNodeById.class);
-	
-	private List<Id<Node>> nodeIds;
+  private static final Logger log = LogManager.getLogger(QueryNodeById.class);
 
-	private transient Result result;
+  private List<Id<Node>> nodeIds;
 
-	@Override
-	public void setId(String id) {
-		this.nodeIds = QueryUtils.parseIds(id, Node.class);
-	}
+  private transient Result result;
 
-	@Override
-	public void installQuery(SimulationViewForQueries simulationView) {
-		Network net = simulationView.getNetwork();
-		this.fillResult(net);
-	}
+  @Override
+  public void setId(String id) {
+    this.nodeIds = QueryUtils.parseIds(id, Node.class);
+  }
 
-	private void fillResult(Network net){
-		this.result = new Result();
-		if (this.nodeIds.size() == 0) return;
+  @Override
+  public void installQuery(SimulationViewForQueries simulationView) {
+    Network net = simulationView.getNetwork();
+    this.fillResult(net);
+  }
 
-		//get the nodes from the network
-		List<Node> nodes = new ArrayList<Node>();
-		for (Id<Node> id : this.nodeIds){
-			Node node = net.getNodes().get(id);
-			if (node != null){
-				nodes.add(node);
-				log.info("Node id " + id + " found in network.");
-			}
-			else {
-				log.info("Node id " + id + " not found in network.");
-			}
-		}
-		List<Coord> coords = new ArrayList<Coord>();
-		for (Node l : nodes){
-			Coord coord = OTFServerQuadTree.getOTFTransformation().transform(l.getCoord());
-			coords.add(coord);
-		}
-		this.result.coords = coords;
-	}
-	
-	
-	@Override
-	public void uninstall() {
-		this.nodeIds.clear();
-	}
+  private void fillResult(Network net) {
+    this.result = new Result();
+    if (this.nodeIds.size() == 0) return;
 
-	@Override
-	public Type getType() {
-		return OTFQuery.Type.LINK;
-	}
+    // get the nodes from the network
+    List<Node> nodes = new ArrayList<Node>();
+    for (Id<Node> id : this.nodeIds) {
+      Node node = net.getNodes().get(id);
+      if (node != null) {
+        nodes.add(node);
+        log.info("Node id " + id + " found in network.");
+      } else {
+        log.info("Node id " + id + " not found in network.");
+      }
+    }
+    List<Coord> coords = new ArrayList<Coord>();
+    for (Node l : nodes) {
+      Coord coord = OTFServerQuadTree.getOTFTransformation().transform(l.getCoord());
+      coords.add(coord);
+    }
+    this.result.coords = coords;
+  }
 
-	@Override
-	public OTFQueryResult query() {
-		return this.result;
-	}
+  @Override
+  public void uninstall() {
+    this.nodeIds.clear();
+  }
 
-	private static final class Result implements OTFQueryResult{
+  @Override
+  public Type getType() {
+    return OTFQuery.Type.LINK;
+  }
 
-		private List<Coord> coords;
+  @Override
+  public OTFQueryResult query() {
+    return this.result;
+  }
 
-		@Override
-		public void draw(OTFOGLDrawer drawer) {
-			GL2 gl = OTFGLAbstractDrawable.getGl();
-			gl.glColor3d(1.0, 0.0, 0.0);
-			gl.glEnable(GL.GL_BLEND);
-			gl.glEnable(GL.GL_LINE_SMOOTH);
-			for (Coord c : coords){
-				GLUtils.drawCircle(gl, (float) c.getX(), (float) c.getY(), 100);
-			}
-			gl.glDisable(GL.GL_LINE_SMOOTH);
-			gl.glDisable(GL.GL_BLEND);
+  private static final class Result implements OTFQueryResult {
 
-		}
+    private List<Coord> coords;
 
-		@Override
-		public void remove() {
-			
-		}
+    @Override
+    public void draw(OTFOGLDrawer drawer) {
+      GL2 gl = OTFGLAbstractDrawable.getGl();
+      gl.glColor3d(1.0, 0.0, 0.0);
+      gl.glEnable(GL.GL_BLEND);
+      gl.glEnable(GL.GL_LINE_SMOOTH);
+      for (Coord c : coords) {
+        GLUtils.drawCircle(gl, (float) c.getX(), (float) c.getY(), 100);
+      }
+      gl.glDisable(GL.GL_LINE_SMOOTH);
+      gl.glDisable(GL.GL_BLEND);
+    }
 
-		@Override
-		public boolean isAlive() {
-			return true;
-		}
-		
-	}
-	
+    @Override
+    public void remove() {}
+
+    @Override
+    public boolean isAlive() {
+      return true;
+    }
+  }
 }

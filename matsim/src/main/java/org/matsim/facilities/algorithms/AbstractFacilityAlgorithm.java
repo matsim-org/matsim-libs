@@ -25,10 +25,9 @@ import org.matsim.facilities.ActivityFacility;
 
 public abstract class AbstractFacilityAlgorithm implements FacilityAlgorithm {
 
-	public void run(final ActivityFacilities facilities) {
-		for (ActivityFacility f : facilities.getFacilities().values()) {
-			run(f);
-		}
-	}
-
+  public void run(final ActivityFacilities facilities) {
+    for (ActivityFacility f : facilities.getFacilities().values()) {
+      run(f);
+    }
+  }
 }

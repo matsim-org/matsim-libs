@@ -25,78 +25,77 @@ import java.io.IOException;
 
 /*package*/ class MatricesWriterHandlerImplV1 implements MatricesWriterHandler {
 
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // member variables
+  //////////////////////////////////////////////////////////////////////
 
-	//////////////////////////////////////////////////////////////////////
-	//
-	// interface implementation
-	//
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  //
+  // interface implementation
+  //
+  //////////////////////////////////////////////////////////////////////
 
-	//////////////////////////////////////////////////////////////////////
-	// <matrices ... > ... </matrices>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <matrices ... > ... </matrices>
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void startMatrices(final Matrices matrices, final BufferedWriter out) throws IOException {
-		out.write("<matrices");
-		if (matrices.getName() != null) {
-			out.write(" name=\"" + matrices.getName() + "\"");
-		}
-		out.write(">\n\n");
-	}
+  @Override
+  public void startMatrices(final Matrices matrices, final BufferedWriter out) throws IOException {
+    out.write("<matrices");
+    if (matrices.getName() != null) {
+      out.write(" name=\"" + matrices.getName() + "\"");
+    }
+    out.write(">\n\n");
+  }
 
-	@Override
-	public void endMatrices(final BufferedWriter out) throws IOException {
-		out.write("</matrices>\n");
-	}
+  @Override
+  public void endMatrices(final BufferedWriter out) throws IOException {
+    out.write("</matrices>\n");
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// <matrix ... > ... </matrix>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <matrix ... > ... </matrix>
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void startMatrix(final Matrix matrix, final BufferedWriter out) throws IOException {
-		out.write("\t<matrix");
-		out.write(" id=\"" + matrix.getId() + "\"");
+  @Override
+  public void startMatrix(final Matrix matrix, final BufferedWriter out) throws IOException {
+    out.write("\t<matrix");
+    out.write(" id=\"" + matrix.getId() + "\"");
 
-		if (matrix.getDesc() != null) {
-			out.write(" desc=\"" + matrix.getDesc() + "\"");
-		}
-		out.write(">\n");
-	}
+    if (matrix.getDesc() != null) {
+      out.write(" desc=\"" + matrix.getDesc() + "\"");
+    }
+    out.write(">\n");
+  }
 
-	@Override
-	public void endMatrix(final BufferedWriter out) throws IOException {
-		out.write("\t</matrix>\n\n");
-	}
+  @Override
+  public void endMatrix(final BufferedWriter out) throws IOException {
+    out.write("\t</matrix>\n\n");
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// <entry ... />
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <entry ... />
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void startEntry(final Entry entry, final BufferedWriter out) throws IOException {
-		out.write("\t\t<entry");
-		out.write(" from_id=\"" + entry.getFromLocation() + "\"");
-		out.write(" to_id=\"" + entry.getToLocation() + "\"");
-		out.write(" value=\"" + entry.getValue() + "\"");
-		out.write(" />\n");
-	}
+  @Override
+  public void startEntry(final Entry entry, final BufferedWriter out) throws IOException {
+    out.write("\t\t<entry");
+    out.write(" from_id=\"" + entry.getFromLocation() + "\"");
+    out.write(" to_id=\"" + entry.getToLocation() + "\"");
+    out.write(" value=\"" + entry.getValue() + "\"");
+    out.write(" />\n");
+  }
 
-	@Override
-	public void endEntry(final BufferedWriter out) throws IOException {
-	}
+  @Override
+  public void endEntry(final BufferedWriter out) throws IOException {}
 
-	//////////////////////////////////////////////////////////////////////
-	// <!-- ============ ... ========== -->
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <!-- ============ ... ========== -->
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void writeSeparator(final BufferedWriter out) throws IOException {
-		out.write("<!-- =================================================" +
-							"===================== -->\n\n");
-	}
+  @Override
+  public void writeSeparator(final BufferedWriter out) throws IOException {
+    out.write(
+        "<!-- =================================================" + "===================== -->\n\n");
+  }
 }

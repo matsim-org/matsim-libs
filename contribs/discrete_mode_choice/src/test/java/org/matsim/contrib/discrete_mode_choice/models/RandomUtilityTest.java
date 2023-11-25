@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
@@ -34,43 +33,65 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 public class RandomUtilityTest {
-	@Test
-	public void testRandomUtility() throws NoFeasibleChoiceException {
-		TripFilter tripFilter = new CompositeTripFilter(Collections.emptySet());
-		ModeAvailability modeAvailability = new DefaultModeAvailability(Arrays.asList("car", "pt", "walk"));
-		TripConstraintFactory constraintFactory = new CompositeTripConstraintFactory();
-		FallbackBehaviour fallbackBehaviour = FallbackBehaviour.EXCEPTION;
-		TripEstimator estimator = new UniformTripEstimator(TimeInterpretation.create(
-				ActivityDurationInterpretation.tryEndTimeThenDuration, TripDurationHandling.shiftActivityEndTimes));
-		UtilitySelectorFactory selectorFactory = new RandomSelector.Factory();
+  @Test
+  public void testRandomUtility() throws NoFeasibleChoiceException {
+    TripFilter tripFilter = new CompositeTripFilter(Collections.emptySet());
+    ModeAvailability modeAvailability =
+        new DefaultModeAvailability(Arrays.asList("car", "pt", "walk"));
+    TripConstraintFactory constraintFactory = new CompositeTripConstraintFactory();
+    FallbackBehaviour fallbackBehaviour = FallbackBehaviour.EXCEPTION;
+    TripEstimator estimator =
+        new UniformTripEstimator(
+            TimeInterpretation.create(
+                ActivityDurationInterpretation.tryEndTimeThenDuration,
+                TripDurationHandling.shiftActivityEndTimes));
+    UtilitySelectorFactory selectorFactory = new RandomSelector.Factory();
 
-		Activity originActivity = PopulationUtils.createActivityFromCoord("generic", new Coord(0.0, 0.0));
-		originActivity.setEndTime(0.0);
+    Activity originActivity =
+        PopulationUtils.createActivityFromCoord("generic", new Coord(0.0, 0.0));
+    originActivity.setEndTime(0.0);
 
-		Activity destinationActivity = PopulationUtils.createActivityFromCoord("generic", new Coord(0.0, 0.0));
-		originActivity.setEndTime(0.0);
+    Activity destinationActivity =
+        PopulationUtils.createActivityFromCoord("generic", new Coord(0.0, 0.0));
+    originActivity.setEndTime(0.0);
 
-		List<DiscreteModeChoiceTrip> trips = Collections.singletonList(new DiscreteModeChoiceTrip(originActivity,
-				destinationActivity, null, Collections.emptyList(), 0, 0, 0, new AttributesImpl()));
+    List<DiscreteModeChoiceTrip> trips =
+        Collections.singletonList(
+            new DiscreteModeChoiceTrip(
+                originActivity,
+                destinationActivity,
+                null,
+                Collections.emptyList(),
+                0,
+                0,
+                0,
+                new AttributesImpl()));
 
-		TripBasedModel model = new TripBasedModel(estimator, tripFilter, modeAvailability, constraintFactory,
-				selectorFactory, fallbackBehaviour,
-				TimeInterpretation.create(ActivityDurationInterpretation.tryEndTimeThenDuration,
-						TripDurationHandling.shiftActivityEndTimes));
+    TripBasedModel model =
+        new TripBasedModel(
+            estimator,
+            tripFilter,
+            modeAvailability,
+            constraintFactory,
+            selectorFactory,
+            fallbackBehaviour,
+            TimeInterpretation.create(
+                ActivityDurationInterpretation.tryEndTimeThenDuration,
+                TripDurationHandling.shiftActivityEndTimes));
 
-		Map<String, Integer> choices = new HashMap<>();
-		Random random = new Random(0);
+    Map<String, Integer> choices = new HashMap<>();
+    Random random = new Random(0);
 
-		int numberOfSamples = 1000000;
+    int numberOfSamples = 1000000;
 
-		for (int i = 0; i < numberOfSamples; i++) {
-			List<TripCandidate> result = model.chooseModes(null, trips, random);
-			String mode = result.get(0).getMode();
-			choices.put(mode, choices.getOrDefault(mode, 0) + 1);
-		}
+    for (int i = 0; i < numberOfSamples; i++) {
+      List<TripCandidate> result = model.chooseModes(null, trips, random);
+      String mode = result.get(0).getMode();
+      choices.put(mode, choices.getOrDefault(mode, 0) + 1);
+    }
 
-		assertEquals(0.33, (double) choices.get("car") / numberOfSamples, 1e-2);
-		assertEquals(0.33, (double) choices.get("pt") / numberOfSamples, 1e-2);
-		assertEquals(0.33, (double) choices.get("walk") / numberOfSamples, 1e-2);
-	}
+    assertEquals(0.33, (double) choices.get("car") / numberOfSamples, 1e-2);
+    assertEquals(0.33, (double) choices.get("pt") / numberOfSamples, 1e-2);
+    assertEquals(0.33, (double) choices.get("walk") / numberOfSamples, 1e-2);
+  }
 }

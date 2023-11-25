@@ -20,6 +20,12 @@
 
 package org.matsim.contrib.analysis.christoph;
 
+import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.*;
+import java.util.List;
 import org.jfree.chart.axis.NumberAxis;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -40,275 +46,279 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
-import java.awt.*;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.*;
-import java.util.List;
-
 /**
- * Counts the number of activities performed at a time based on events.
- * Agents who only perform a single activity create no events. Information about
- * them is collected using a IterationStartListener.
+ * Counts the number of activities performed at a time based on events. Agents who only perform a
+ * single activity create no events. Information about them is collected using a
+ * IterationStartListener.
  *
  * @author cdobler
  */
-public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEndEventHandler,
-		StartupListener, BeforeMobsimListener, IterationEndsListener {
+public class ActivitiesAnalyzer
+    implements ActivityStartEventHandler,
+        ActivityEndEventHandler,
+        StartupListener,
+        BeforeMobsimListener,
+        IterationEndsListener {
 
-	public static String defaultActivitiesFileName = "activityCounts";
+  public static String defaultActivitiesFileName = "activityCounts";
 
-	private final boolean autoConfig;
+  private final boolean autoConfig;
 
-	private double endTime = 30*3600;
+  private double endTime = 30 * 3600;
 
-	private String activitiesFileName = defaultActivitiesFileName;
-	private final Set<Id> observedAgents;
-	private boolean createGraphs;
-	private final Map<String, LinkedList<ActivityData>> activityCountData = new TreeMap<String, LinkedList<ActivityData>>();
-	private final LinkedList<ActivityData> overallCount = new LinkedList<ActivityData>();
+  private String activitiesFileName = defaultActivitiesFileName;
+  private final Set<Id> observedAgents;
+  private boolean createGraphs;
+  private final Map<String, LinkedList<ActivityData>> activityCountData =
+      new TreeMap<String, LinkedList<ActivityData>>();
+  private final LinkedList<ActivityData> overallCount = new LinkedList<ActivityData>();
 
-	/**
-	 * This is how most people will probably will use this class.
-	 * It has to be created an registered as ControlerListener.
-	 * Then, it auto-configures itself (register as events handler,
-	 * get paths to output files, ...).
-	 */
-	public ActivitiesAnalyzer() {
+  /**
+   * This is how most people will probably will use this class. It has to be created an registered
+   * as ControlerListener. Then, it auto-configures itself (register as events handler, get paths to
+   * output files, ...).
+   */
+  public ActivitiesAnalyzer() {
 
-		this.autoConfig = true;
-		this.createGraphs = true;
-		this.observedAgents = null;
+    this.autoConfig = true;
+    this.createGraphs = true;
+    this.observedAgents = null;
 
-		reset(0);
-	}
+    reset(0);
+  }
 
-	public ActivitiesAnalyzer(String activitiesFileName, Set<String> activityTypes, boolean createGraphs) {
-		this(activitiesFileName, activityTypes, null, createGraphs);
-	}
+  public ActivitiesAnalyzer(
+      String activitiesFileName, Set<String> activityTypes, boolean createGraphs) {
+    this(activitiesFileName, activityTypes, null, createGraphs);
+  }
 
-	public ActivitiesAnalyzer(String activitiesFileName, Set<String> activityTypes, Set<Id> observedAgents, boolean createGraphs) {
+  public ActivitiesAnalyzer(
+      String activitiesFileName,
+      Set<String> activityTypes,
+      Set<Id> observedAgents,
+      boolean createGraphs) {
 
-		this.autoConfig = false;
+    this.autoConfig = false;
 
-		this.activitiesFileName = activitiesFileName;
-		this.createGraphs = createGraphs;
+    this.activitiesFileName = activitiesFileName;
+    this.createGraphs = createGraphs;
 
-		// use all activity defined in the set
-		for (String activityType : activityTypes) {
-			this.activityCountData.put(activityType, new LinkedList<ActivityData>());
-		}
+    // use all activity defined in the set
+    for (String activityType : activityTypes) {
+      this.activityCountData.put(activityType, new LinkedList<ActivityData>());
+    }
 
-		if (observedAgents != null) {
-			// make a copy to prevent people changing the set over the iterations
-			this.observedAgents = new HashSet<Id>(observedAgents);
-		} else this.observedAgents = null;
+    if (observedAgents != null) {
+      // make a copy to prevent people changing the set over the iterations
+      this.observedAgents = new HashSet<Id>(observedAgents);
+    } else this.observedAgents = null;
 
-		reset(0);
-	}
+    reset(0);
+  }
 
-	public void setCreateGraphs(boolean createGraphs) {
-		this.createGraphs = createGraphs;
-	}
+  public void setCreateGraphs(boolean createGraphs) {
+    this.createGraphs = createGraphs;
+  }
 
-	public void setEndTime(double endTime) {
-		this.endTime = endTime;
-	}
+  public void setEndTime(double endTime) {
+    this.endTime = endTime;
+  }
 
-	@Override
-	public void handleEvent(ActivityEndEvent event) {
+  @Override
+  public void handleEvent(ActivityEndEvent event) {
 
-		if (observedAgents != null && !observedAgents.contains(event.getPersonId())) return;
+    if (observedAgents != null && !observedAgents.contains(event.getPersonId())) return;
 
-		LinkedList<ActivityData> list = this.activityCountData.get(event.getActType());
+    LinkedList<ActivityData> list = this.activityCountData.get(event.getActType());
 
-		// ignore not observed activity types
-		if (list == null) return;
+    // ignore not observed activity types
+    if (list == null) return;
 
-		changeCount(event.getTime(), list, -1);
-		changeCount(event.getTime(), this.overallCount, -1);
-	}
+    changeCount(event.getTime(), list, -1);
+    changeCount(event.getTime(), this.overallCount, -1);
+  }
 
+  @Override
+  public void handleEvent(ActivityStartEvent event) {
 
-	@Override
-	public void handleEvent(ActivityStartEvent event) {
+    if (observedAgents != null && !observedAgents.contains(event.getPersonId())) return;
 
-		if (observedAgents != null && !observedAgents.contains(event.getPersonId())) return;
+    LinkedList<ActivityData> list = this.activityCountData.get(event.getActType());
 
-		LinkedList<ActivityData> list = this.activityCountData.get(event.getActType());
+    // ignore not observed activity types
+    if (list == null) return;
 
-		// ignore not observed activity types
-		if (list == null) return;
+    changeCount(event.getTime(), list, 1);
+    changeCount(event.getTime(), this.overallCount, 1);
+  }
 
-		changeCount(event.getTime(), list, 1);
-		changeCount(event.getTime(), this.overallCount, 1);
-	}
+  private void changeCount(double time, LinkedList<ActivityData> list, int delta) {
 
-	private void changeCount(double time, LinkedList<ActivityData> list, int delta) {
+    ActivityData activityData = list.getLast();
 
-		ActivityData activityData = list.getLast();
+    /*
+     * If there is already another entry for the same time step, re-use it.
+     * Otherwise create a new one.
+     */
+    if (time == activityData.time) {
+      activityData.activityCount += delta;
+    } else {
+      list.add(new ActivityData(time, activityData.activityCount + delta));
+    }
+  }
 
-		/*
-		 * If there is already another entry for the same time step, re-use it.
-		 * Otherwise create a new one.
-		 */
-		if (time == activityData.time) {
-			activityData.activityCount += delta;
-		} else {
-			list.add(new ActivityData(time, activityData.activityCount + delta));
-		}
-	}
+  @Override
+  public void reset(final int iter) {
+    for (List<ActivityData> list : this.activityCountData.values()) {
+      list.clear();
+      list.add(new ActivityData(0.0, 0));
+    }
+    this.overallCount.clear();
+    this.overallCount.add(new ActivityData(0.0, 0));
+  }
 
-	@Override
-	public void reset(final int iter) {
-		for (List<ActivityData> list : this.activityCountData.values()) {
-			list.clear();
-			list.add(new ActivityData(0.0, 0));
-		}
-		this.overallCount.clear();
-		this.overallCount.add(new ActivityData(0.0, 0));
-	}
+  @Override
+  public void notifyStartup(StartupEvent event) {
 
+    MatsimServices controler = event.getServices();
 
-	@Override
-	public void notifyStartup(StartupEvent event) {
+    if (autoConfig) {
+      // use all activity types defined in the config
+      Set<String> activityTypes =
+          new TreeSet<String>(event.getServices().getConfig().scoring().getActivityTypes());
+      for (String activityType : activityTypes) {
+        this.activityCountData.put(activityType, new LinkedList<ActivityData>());
+      }
 
-		MatsimServices controler = event.getServices();
+      controler.getEvents().addHandler(this);
+    }
+  }
 
-		if (autoConfig) {
-			// use all activity types defined in the config
-			Set<String> activityTypes = new TreeSet<String>(event.getServices().getConfig().scoring().getActivityTypes());
-			for (String activityType : activityTypes) {
-				this.activityCountData.put(activityType, new LinkedList<ActivityData>());
-			}
+  @Override
+  public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 
-			controler.getEvents().addHandler(this);
-		}
-	}
+    ActivityData overallActivityData = this.overallCount.getLast();
 
-	@Override
-	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+    for (Person person : event.getServices().getScenario().getPopulation().getPersons().values()) {
 
-		ActivityData overallActivityData = this.overallCount.getLast();
+      if (this.observedAgents != null && !this.observedAgents.contains(person.getId())) continue;
 
-        for (Person person : event.getServices().getScenario().getPopulation().getPersons().values()) {
+      Plan plan = person.getSelectedPlan();
+      Activity firstActivity = (Activity) plan.getPlanElements().get(0);
+      LinkedList<ActivityData> list = activityCountData.get(firstActivity.getType());
 
-			if (this.observedAgents != null && !this.observedAgents.contains(person.getId())) continue;
+      // ignore not observed activity types
+      if (list == null) continue;
 
-			Plan plan = person.getSelectedPlan();
-			Activity firstActivity = (Activity) plan.getPlanElements().get(0);
-			LinkedList<ActivityData> list = activityCountData.get(firstActivity.getType());
+      ActivityData activityData = list.getLast();
+      activityData.activityCount += 1;
+      overallActivityData.activityCount += 1;
+    }
+  }
 
-			// ignore not observed activity types
-			if (list == null) continue;
+  @Override
+  public void notifyIterationEnds(IterationEndsEvent event) {
 
-			ActivityData activityData = list.getLast();
-			activityData.activityCount += 1;
-			overallActivityData.activityCount += 1;
-		}
-	}
+    OutputDirectoryHierarchy outputDirectoryHierarchy = event.getServices().getControlerIO();
 
-	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
+    try {
+      for (String activityType : this.activityCountData.keySet()) {
+        String fileName =
+            outputDirectoryHierarchy.getIterationFilename(
+                event.getIteration(), this.activitiesFileName + "_" + activityType + ".txt");
+        BufferedWriter activitiesWriter = IOUtils.getBufferedWriter(fileName);
 
-		OutputDirectoryHierarchy outputDirectoryHierarchy = event.getServices().getControlerIO();
+        activitiesWriter.write("TIME");
+        activitiesWriter.write("\t");
+        activitiesWriter.write(activityType.toUpperCase());
+        activitiesWriter.write("\n");
 
-		try {
-			for (String activityType : this.activityCountData.keySet()) {
-				String fileName = outputDirectoryHierarchy.getIterationFilename(event.getIteration(), this.activitiesFileName + "_" + activityType + ".txt");
-				BufferedWriter activitiesWriter = IOUtils.getBufferedWriter(fileName);
+        List<ActivityData> list = this.activityCountData.get(activityType);
+        for (ActivityData activityData : list) {
+          activitiesWriter.write(String.valueOf(activityData.time));
+          activitiesWriter.write("\t");
+          activitiesWriter.write(String.valueOf(activityData.activityCount));
+          activitiesWriter.write("\n");
+        }
 
-				activitiesWriter.write("TIME");
-				activitiesWriter.write("\t");
-				activitiesWriter.write(activityType.toUpperCase());
-				activitiesWriter.write("\n");
+        activitiesWriter.flush();
+        activitiesWriter.close();
+      }
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
 
-				List<ActivityData> list = this.activityCountData.get(activityType);
-				for (ActivityData activityData : list) {
-					activitiesWriter.write(String.valueOf(activityData.time));
-					activitiesWriter.write("\t");
-					activitiesWriter.write(String.valueOf(activityData.activityCount));
-					activitiesWriter.write("\n");
-				}
+    if (this.createGraphs) {
+      // create chart when data of more than one iteration is available.
+      XYLineChart chart;
 
-				activitiesWriter.flush();
-				activitiesWriter.close();
-			}
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+      /*
+       * number of performed activities
+       */
+      chart = new XYLineChart("Number of performed Activities", "time", "# activities");
+      for (String activityType : this.activityCountData.keySet()) {
+        List<ActivityData> list = this.activityCountData.get(activityType);
+        int length = list.size();
 
-		if (this.createGraphs) {
-			// create chart when data of more than one iteration is available.
-			XYLineChart chart;
+        double[] times = new double[length * 2 - 1];
+        double[] counts = new double[length * 2 - 1];
+        Iterator<ActivityData> iter = list.iterator();
+        int i = 0;
+        double lastValue = 0.0;
+        while (iter.hasNext()) {
+          ActivityData activityData = iter.next();
+          times[i] = Math.min(activityData.time, this.endTime) / 3600.0;
+          counts[i] = activityData.activityCount;
+          if (i > 0) {
+            times[i - 1] = Math.min(activityData.time, this.endTime) / 3600.0;
+            counts[i - 1] = lastValue;
+          }
+          lastValue = activityData.activityCount;
+          i += 2;
+        }
+        chart.addSeries(activityType, times, counts);
+      }
+      int length = this.overallCount.size();
+      double[] times = new double[length * 2 - 1];
+      double[] counts = new double[length * 2 - 1];
+      Iterator<ActivityData> iter = this.overallCount.iterator();
+      int i = 0;
+      double lastValue = 0.0;
+      while (iter.hasNext()) {
+        ActivityData activityData = iter.next();
+        times[i] = Math.min(activityData.time, this.endTime) / 3600.0;
+        counts[i] = activityData.activityCount;
+        if (i > 0) {
+          times[i - 1] = Math.min(activityData.time, this.endTime) / 3600.0;
+          counts[i - 1] = lastValue;
+        }
+        lastValue = activityData.activityCount;
+        i += 2;
+      }
+      chart.addSeries("overall", times, counts);
 
-			/*
-			 * number of performed activities
-			 */
-			chart = new XYLineChart("Number of performed Activities", "time", "# activities");
-			for (String activityType : this.activityCountData.keySet()) {
-				List<ActivityData> list = this.activityCountData.get(activityType);
-				int length = list.size();
+      NumberAxis domainAxis = (NumberAxis) chart.getChart().getXYPlot().getDomainAxis();
+      domainAxis.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 11));
+      domainAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+      domainAxis.setAutoRange(false);
+      domainAxis.setRange(0, endTime / 3600.0);
 
-				double[] times = new double[length * 2 - 1];
-				double[] counts = new double[length * 2 - 1];
-				Iterator<ActivityData> iter = list.iterator();
-				int i = 0;
-				double lastValue = 0.0;
-				while (iter.hasNext()) {
-					ActivityData activityData = iter.next();
-					times[i] = Math.min(activityData.time, this.endTime) / 3600.0;
-					counts[i] = activityData.activityCount;
-					if (i > 0) {
-						times[i - 1] = Math.min(activityData.time, this.endTime) / 3600.0;
-						counts[i - 1] = lastValue;
-					}
-					lastValue = activityData.activityCount;
-					i += 2;
-				}
-				chart.addSeries(activityType, times, counts);
-			}
-			int length = this.overallCount.size();
-			double[] times = new double[length * 2 - 1];
-			double[] counts = new double[length * 2 - 1];
-			Iterator<ActivityData> iter = this.overallCount.iterator();
-			int i = 0;
-			double lastValue = 0.0;
-			while (iter.hasNext()) {
-				ActivityData activityData = iter.next();
-				times[i] = Math.min(activityData.time, this.endTime) / 3600.0;
-				counts[i] = activityData.activityCount;
-				if (i > 0) {
-					times[i - 1] = Math.min(activityData.time, this.endTime) / 3600.0;
-					counts[i - 1] = lastValue;
-				}
-				lastValue = activityData.activityCount;
-				i += 2;
-			}
-			chart.addSeries("overall", times, counts);
+      chart.addMatsimLogo();
+      String fileName =
+          outputDirectoryHierarchy.getIterationFilename(
+              event.getIteration(), this.activitiesFileName + ".png");
+      chart.saveAsPng(fileName, 800, 600);
+    }
+  }
 
-		    NumberAxis domainAxis = (NumberAxis) chart.getChart().getXYPlot().getDomainAxis();
-		    domainAxis.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 11));
-		    domainAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
-		    domainAxis.setAutoRange(false);
-		    domainAxis.setRange(0, endTime / 3600.0);
+  private static class ActivityData {
 
-			chart.addMatsimLogo();
-			String fileName = outputDirectoryHierarchy.getIterationFilename(event.getIteration(), this.activitiesFileName + ".png");
-			chart.saveAsPng(fileName, 800, 600);
-		}
-	}
+    public final double time;
+    public int activityCount;
 
-	private static class ActivityData {
-
-		public final double time;
-		public int activityCount;
-
-		public ActivityData(double time, int activityCount) {
-			this.time = time;
-			this.activityCount = activityCount;
-		}
-	}
-
+    public ActivityData(double time, int activityCount) {
+      this.time = time;
+      this.activityCount = activityCount;
+    }
+  }
 }

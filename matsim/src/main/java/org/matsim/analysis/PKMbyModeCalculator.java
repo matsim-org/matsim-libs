@@ -20,6 +20,7 @@
 
 package org.matsim.analysis;
 
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -28,7 +29,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-import jakarta.inject.Inject;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
@@ -44,89 +44,100 @@ import org.matsim.core.utils.charts.StackedBarChart;
 
 /**
  * analyses passenger kilometer traveled based on experienced plans.
+ *
  * @author jbischoff
  */
 public class PKMbyModeCalculator {
 
-    private final Map<Integer,Map<String,Double>> pmtPerIteration = new TreeMap<>();
-    private final boolean writePng;
-    private final OutputDirectoryHierarchy controllerIO;
-		private final String delimiter;
-    private final static String FILENAME = "pkm_modestats";
+  private final Map<Integer, Map<String, Double>> pmtPerIteration = new TreeMap<>();
+  private final boolean writePng;
+  private final OutputDirectoryHierarchy controllerIO;
+  private final String delimiter;
+  private static final String FILENAME = "pkm_modestats";
 
-    @Inject
-    PKMbyModeCalculator(ControllerConfigGroup controllerConfigGroup, OutputDirectoryHierarchy controllerIO, GlobalConfigGroup globalConfig) {
-        writePng = controllerConfigGroup.isCreateGraphs();
-        this.controllerIO = controllerIO;
-        this.delimiter = globalConfig.getDefaultDelimiter();
-    }
+  @Inject
+  PKMbyModeCalculator(
+      ControllerConfigGroup controllerConfigGroup,
+      OutputDirectoryHierarchy controllerIO,
+      GlobalConfigGroup globalConfig) {
+    writePng = controllerConfigGroup.isCreateGraphs();
+    this.controllerIO = controllerIO;
+    this.delimiter = globalConfig.getDefaultDelimiter();
+  }
 
-    void addIteration(int iteration, IdMap<Person, Plan> map) {
-        Map<String,Double> pmtbyMode = map.values()
-                .parallelStream()
-                .flatMap(plan -> plan.getPlanElements().stream())
-                .filter(Leg.class::isInstance)
-                .map(l->{
-                    Leg leg = (Leg) l;
-                    double dist = leg.getRoute()!=null?leg.getRoute().getDistance():0;
-                    if (Double.isNaN(dist)) {dist = 0.0; }
-                    return new AbstractMap.SimpleEntry<>(leg.getMode(),dist);
+  void addIteration(int iteration, IdMap<Person, Plan> map) {
+    Map<String, Double> pmtbyMode =
+        map.values().parallelStream()
+            .flatMap(plan -> plan.getPlanElements().stream())
+            .filter(Leg.class::isInstance)
+            .map(
+                l -> {
+                  Leg leg = (Leg) l;
+                  double dist = leg.getRoute() != null ? leg.getRoute().getDistance() : 0;
+                  if (Double.isNaN(dist)) {
+                    dist = 0.0;
+                  }
+                  return new AbstractMap.SimpleEntry<>(leg.getMode(), dist);
                 })
-                .collect(Collectors.toMap(e->e.getKey(),e->e.getValue(),(a,b)->a+b));
-        pmtPerIteration.put(iteration,pmtbyMode);
-    }
+            .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (a, b) -> a + b));
+    pmtPerIteration.put(iteration, pmtbyMode);
+  }
 
+  void writeOutput() {
+    writeVKTText();
+  }
 
-    void writeOutput() {
-        writeVKTText();
+  private void writeVKTText() {
+    TreeSet<String> allModes = new TreeSet<>();
+    allModes.addAll(
+        this.pmtPerIteration.values().stream()
+            .flatMap(i -> i.keySet().stream())
+            .collect(Collectors.toSet()));
 
-    }
+    try (CSVPrinter csvPrinter =
+        new CSVPrinter(
+            Files.newBufferedWriter(Paths.get(controllerIO.getOutputFilename(FILENAME + ".csv"))),
+            CSVFormat.DEFAULT.withDelimiter(this.delimiter.charAt(0)))) {
+      csvPrinter.print("Iteration");
+      csvPrinter.printRecord(allModes);
 
-    private void writeVKTText() {
-        TreeSet<String> allModes = new TreeSet<>();
-        allModes.addAll(this.pmtPerIteration.values()
-                .stream()
-                .flatMap(i->i.keySet().stream())
-                .collect(Collectors.toSet()));
-
-        try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(controllerIO.getOutputFilename( FILENAME+ ".csv"))), CSVFormat.DEFAULT.withDelimiter(this.delimiter.charAt(0)))) {
-            csvPrinter.print("Iteration");
-            csvPrinter.printRecord(allModes);
-
-            for (Map.Entry<Integer,Map<String,Double>> e : pmtPerIteration.entrySet()){
-                csvPrinter.print(e.getKey());
-                for (String mode : allModes){
-                    csvPrinter.print((int) Math.round(e.getValue().getOrDefault(mode, 0.0) / 1000.0));
-                }
-                csvPrinter.println();
-            }
-
-
-        } catch (IOException e) {
-            LogManager.getLogger(getClass()).error("Could not write PKM Modestats.");
+      for (Map.Entry<Integer, Map<String, Double>> e : pmtPerIteration.entrySet()) {
+        csvPrinter.print(e.getKey());
+        for (String mode : allModes) {
+          csvPrinter.print((int) Math.round(e.getValue().getOrDefault(mode, 0.0) / 1000.0));
         }
-        if (writePng){
-            String[] categories = new String[pmtPerIteration.size()];
-            int i = 0;
-            for (Integer it : pmtPerIteration.keySet()){
-                categories[i++] = it.toString();
-            }
+        csvPrinter.println();
+      }
 
-            StackedBarChart chart = new StackedBarChart("Passenger kilometers traveled per Mode","Iteration","pkm",categories);
-            //rotate x-axis by 90degrees
-            chart.getChart().getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.UP_90);
-
-            for (String mode : allModes){
-                double[] value =  pmtPerIteration.values().stream()
-                        .mapToDouble(k->k.getOrDefault(mode,0.0)/1000.0)
-                        .toArray();
-                chart.addSeries(mode, value);
-            }
-            chart.addMatsimLogo();
-            chart.saveAsPng(controllerIO.getOutputFilename(FILENAME+ ".png"), 1024, 768);
-
-        }
-
+    } catch (IOException e) {
+      LogManager.getLogger(getClass()).error("Could not write PKM Modestats.");
     }
+    if (writePng) {
+      String[] categories = new String[pmtPerIteration.size()];
+      int i = 0;
+      for (Integer it : pmtPerIteration.keySet()) {
+        categories[i++] = it.toString();
+      }
+
+      StackedBarChart chart =
+          new StackedBarChart(
+              "Passenger kilometers traveled per Mode", "Iteration", "pkm", categories);
+      // rotate x-axis by 90degrees
+      chart
+          .getChart()
+          .getCategoryPlot()
+          .getDomainAxis()
+          .setCategoryLabelPositions(CategoryLabelPositions.UP_90);
+
+      for (String mode : allModes) {
+        double[] value =
+            pmtPerIteration.values().stream()
+                .mapToDouble(k -> k.getOrDefault(mode, 0.0) / 1000.0)
+                .toArray();
+        chart.addSeries(mode, value);
+      }
+      chart.addMatsimLogo();
+      chart.saveAsPng(controllerIO.getOutputFilename(FILENAME + ".png"), 1024, 768);
+    }
+  }
 }
-

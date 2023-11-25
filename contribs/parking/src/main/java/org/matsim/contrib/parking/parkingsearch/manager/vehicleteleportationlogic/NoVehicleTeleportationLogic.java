@@ -17,9 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
+/** */
 package org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogic;
 
 import org.matsim.api.core.v01.Id;
@@ -27,18 +25,21 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * @author  jbischoff
- *	In this implementation, agents always walk back to their car, regardless of its location.
- *
+ * @author jbischoff In this implementation, agents always walk back to their car, regardless of its
+ *     location.
  */
 public class NoVehicleTeleportationLogic implements VehicleTeleportationLogic {
 
-	/* (non-Javadoc)
-	 * @see playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationLogic#getVehicleLocation(org.matsim.api.core.v01.Id, org.matsim.api.core.v01.Id, org.matsim.api.core.v01.Id)
-	 */
-	@Override
-	public Id<Link> getVehicleLocation(Id<Link> agentLinkId, Id<Vehicle> vehicleId, Id<Link> vehicleLinkId, double time, String mode) {
-		return vehicleLinkId;
-	}
-
+  /* (non-Javadoc)
+   * @see playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationLogic#getVehicleLocation(org.matsim.api.core.v01.Id, org.matsim.api.core.v01.Id, org.matsim.api.core.v01.Id)
+   */
+  @Override
+  public Id<Link> getVehicleLocation(
+      Id<Link> agentLinkId,
+      Id<Vehicle> vehicleId,
+      Id<Link> vehicleLinkId,
+      double time,
+      String mode) {
+    return vehicleLinkId;
+  }
 }

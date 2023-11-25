@@ -26,28 +26,27 @@ import org.matsim.api.core.v01.network.Link;
 
 /**
  * @author nagel
- *
  */
 public class ActivityFacilitiesFactoryImpl implements ActivityFacilitiesFactory {
 
-	@Override
-	public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Coord coord) {
-		return new ActivityFacilityImpl(id, coord, null);
-	}
-	
-	@Override
-	public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Id<Link> linkId) {
-		return new ActivityFacilityImpl(id, null, linkId);
-	}
-	
-	@Override
-	public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Coord coord, Id<Link> linkId) {
-		return new ActivityFacilityImpl(id, coord, linkId);
-	}
+  @Override
+  public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Coord coord) {
+    return new ActivityFacilityImpl(id, coord, null);
+  }
 
-	@Override
-	public ActivityOption createActivityOption(String type) {
-		return new ActivityOptionImpl(type);
-	}
+  @Override
+  public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Id<Link> linkId) {
+    return new ActivityFacilityImpl(id, null, linkId);
+  }
 
+  @Override
+  public ActivityFacility createActivityFacility(
+      Id<ActivityFacility> id, Coord coord, Id<Link> linkId) {
+    return new ActivityFacilityImpl(id, coord, linkId);
+  }
+
+  @Override
+  public ActivityOption createActivityOption(String type) {
+    return new ActivityOptionImpl(type);
+  }
 }

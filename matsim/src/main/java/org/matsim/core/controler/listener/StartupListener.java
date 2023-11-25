@@ -27,11 +27,10 @@ import org.matsim.core.controler.events.StartupEvent;
  */
 public interface StartupListener extends ControlerListener {
 
-	/**
-	 * Notifies all observers that the controler is initialized and they should do the same
-	 *
-	 * @param event
-	 */
-	public void notifyStartup(final StartupEvent event);
-
+  /**
+   * Notifies all observers that the controler is initialized and they should do the same
+   *
+   * @param event
+   */
+  public void notifyStartup(final StartupEvent event);
 }

@@ -25,21 +25,22 @@ import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingCostModel;
 
 /**
  * @author jbischoff
- *
  */
 public class ParkingCostCalculatorExample implements ParkingCostModel {
 
-	private double hourlyParkingCharge;
+  private double hourlyParkingCharge;
 
-	public ParkingCostCalculatorExample(double hourlyParkingCharge) {
-		this.hourlyParkingCharge = hourlyParkingCharge;
-	}
-	
-	@Override
-	public double calcParkingCost(double arrivalTimeInSeconds, double durationInSeconds, Id<Person> personId, Id parkingFacilityId) {
-					
-			return hourlyParkingCharge*(durationInSeconds/3600);
-		
-	}
+  public ParkingCostCalculatorExample(double hourlyParkingCharge) {
+    this.hourlyParkingCharge = hourlyParkingCharge;
+  }
 
+  @Override
+  public double calcParkingCost(
+      double arrivalTimeInSeconds,
+      double durationInSeconds,
+      Id<Person> personId,
+      Id parkingFacilityId) {
+
+    return hourlyParkingCharge * (durationInSeconds / 3600);
+  }
 }

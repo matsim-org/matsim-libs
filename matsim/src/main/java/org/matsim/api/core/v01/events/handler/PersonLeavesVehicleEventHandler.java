@@ -24,5 +24,5 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.EventHandler;
 
 public interface PersonLeavesVehicleEventHandler extends EventHandler {
-	public void handleEvent(PersonLeavesVehicleEvent event);
+  public void handleEvent(PersonLeavesVehicleEvent event);
 }

@@ -1,5 +1,12 @@
 package org.matsim.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 import org.junit.Assume;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -18,194 +25,223 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import picocli.CommandLine;
 
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-
 public class MATSimApplicationTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void help() {
+  @Test
+  public void help() {
 
-		int ret = MATSimApplication.execute(TestScenario.class, "--help");
+    int ret = MATSimApplication.execute(TestScenario.class, "--help");
 
-		assertEquals("Return code should be 0", 0, ret);
-	}
+    assertEquals("Return code should be 0", 0, ret);
+  }
 
-	@Test
-	public void config() {
+  @Test
+  public void config() {
 
-		Controler controler = MATSimApplication.prepare(TestScenario.class, ConfigUtils.createConfig(),
-				"-c:controler.runId=Test123", "--config:global.numberOfThreads=4", "--config:plans.inputCRS", "EPSG:1234");
+    Controler controler =
+        MATSimApplication.prepare(
+            TestScenario.class,
+            ConfigUtils.createConfig(),
+            "-c:controler.runId=Test123",
+            "--config:global.numberOfThreads=4",
+            "--config:plans.inputCRS",
+            "EPSG:1234");
 
-		Config config = controler.getConfig();
+    Config config = controler.getConfig();
 
-		assertThat(config.controller().getRunId()).isEqualTo("Test123");
-		assertThat(config.global().getNumberOfThreads()).isEqualTo(4);
-		assertThat(config.plans().getInputCRS()).isEqualTo("EPSG:1234");
+    assertThat(config.controller().getRunId()).isEqualTo("Test123");
+    assertThat(config.global().getNumberOfThreads()).isEqualTo(4);
+    assertThat(config.plans().getInputCRS()).isEqualTo("EPSG:1234");
+  }
 
-	}
+  @Test
+  public void yaml() {
 
-	@Test
-	public void yaml() {
+    Path yml = Path.of(utils.getClassInputDirectory(), "specs.yml");
 
-		Path yml = Path.of(utils.getClassInputDirectory(), "specs.yml");
+    Controler controler =
+        MATSimApplication.prepare(
+            TestScenario.class, ConfigUtils.createConfig(), "--yaml", yml.toString());
 
-		Controler controler = MATSimApplication.prepare(TestScenario.class, ConfigUtils.createConfig(), "--yaml", yml.toString());
+    assertThat(controler.getConfig().controller().getRunId()).isEqualTo("567");
 
-		assertThat(controler.getConfig().controller().getRunId())
-				.isEqualTo("567");
+    ScoringConfigGroup score = controler.getConfig().scoring();
 
-		ScoringConfigGroup score = controler.getConfig().scoring();
+    ScoringConfigGroup.ScoringParameterSet params = score.getScoringParameters(null);
 
-		ScoringConfigGroup.ScoringParameterSet params = score.getScoringParameters(null);
+    assertThat(params.getOrCreateModeParams("car").getConstant()).isEqualTo(-1);
 
-		assertThat(params.getOrCreateModeParams("car").getConstant())
-				.isEqualTo(-1);
+    assertThat(params.getOrCreateModeParams("bike").getConstant()).isEqualTo(-2);
+  }
 
-		assertThat(params.getOrCreateModeParams("bike").getConstant())
-				.isEqualTo(-2);
+  @Test
+  public void sample() {
 
-	}
+    Controler controler =
+        MATSimApplication.prepare(TestScenario.class, ConfigUtils.createConfig(), "--10pct");
 
-	@Test
-	public void sample() {
+    assertThat(controler.getConfig().controller().getRunId()).isEqualTo("run-10pct");
 
-		Controler controler = MATSimApplication.prepare(TestScenario.class, ConfigUtils.createConfig(),
-				"--10pct");
+    controler = MATSimApplication.prepare(TestScenario.class, ConfigUtils.createConfig());
 
-		assertThat(controler.getConfig().controller().getRunId())
-				.isEqualTo("run-10pct");
+    assertThat(controler.getConfig().controller().getRunId()).isEqualTo("run-25pct");
+  }
 
-		controler = MATSimApplication.prepare(TestScenario.class, ConfigUtils.createConfig());
+  @Test
+  public void population() throws MalformedURLException {
 
-		assertThat(controler.getConfig().controller().getRunId())
-				.isEqualTo("run-25pct");
+    Path input = Path.of(utils.getClassInputDirectory());
+    Path output = Path.of(utils.getOutputDirectory());
 
-	}
+    assertThat(input.resolve("persons.xml")).exists();
 
-	@Test
-	public void population() throws MalformedURLException {
+    MATSimApplication.execute(
+        TestScenario.class,
+        "prepare",
+        "trajectory-to-plans",
+        "--samples",
+        "0.5",
+        "0.1",
+        "--sample-size",
+        "1.0",
+        "--name",
+        "test",
+        "--population",
+        input.resolve("persons.xml").toString(),
+        "--attributes",
+        input.resolve("attributes.xml").toString(),
+        "--output",
+        output.toString());
 
-		Path input = Path.of(utils.getClassInputDirectory());
-		Path output = Path.of(utils.getOutputDirectory());
+    Path plans = output.resolve("test-100pct.plans.xml.gz");
 
-		assertThat(input.resolve("persons.xml")).exists();
+    assertThat(plans).exists();
+    assertThat(output.resolve("test-50pct.plans.xml.gz")).exists();
 
-		MATSimApplication.execute(TestScenario.class, "prepare", "trajectory-to-plans",
-				"--samples", "0.5", "0.1",
-				"--sample-size", "1.0",
-				"--name", "test",
-				"--population", input.resolve("persons.xml").toString(),
-				"--attributes", input.resolve("attributes.xml").toString(),
-				"--output", output.toString()
-		);
+    MATSimApplication.execute(
+        TestScenario.class,
+        "prepare",
+        "generate-short-distance-trips",
+        "--population",
+        plans.toString(),
+        "--num-trips",
+        "2");
 
-		Path plans = output.resolve("test-100pct.plans.xml.gz");
+    var actualContent =
+        IOUtils.getInputStream(
+            output.resolve("test-100pct.plans-with-trips.xml.gz").toUri().toURL());
+    var expectedContent =
+        IOUtils.getInputStream(
+            input.resolve("test-100pct.plans-with-trips.xml.gz").toUri().toURL());
 
-		assertThat(plans).exists();
-		assertThat(output.resolve("test-50pct.plans.xml.gz")).exists();
+    assertThat(IOUtils.isEqual(actualContent, expectedContent)).isTrue();
+  }
 
-		MATSimApplication.execute(TestScenario.class, "prepare", "generate-short-distance-trips",
-				"--population", plans.toString(),
-				"--num-trips", "2"
-		);
+  @Test
+  @Ignore("Class is deprecated")
+  public void freight() {
 
-		var actualContent = IOUtils.getInputStream(
-				output.resolve("test-100pct.plans-with-trips.xml.gz").toUri().toURL());
-		var expectedContent = IOUtils.getInputStream(
-				input.resolve("test-100pct.plans-with-trips.xml.gz").toUri().toURL());
+    Path input =
+        Path.of(
+                "..",
+                "..",
+                "..",
+                "..",
+                "shared-svn",
+                "komodnext",
+                "data",
+                "freight",
+                "original_data")
+            .toAbsolutePath()
+            .normalize();
 
-		assertThat(IOUtils.isEqual(actualContent, expectedContent)).isTrue();
-	}
+    Assume.assumeTrue(Files.exists(input));
 
-	@Test
-	@Ignore("Class is deprecated")
-	public void freight() {
+    Path output = Path.of(utils.getOutputDirectory());
 
-		Path input = Path.of("..", "..", "..", "..",
-				"shared-svn", "komodnext", "data", "freight", "original_data").toAbsolutePath().normalize();
+    String network = input.resolve("german-primary-road.network.xml.gz").toString();
 
-		Assume.assumeTrue(Files.exists(input));
+    String allFreightTrips = output.resolve("german-wide-freight-trips.xml.gz").toString();
+    MATSimApplication.execute(
+        TestScenario.class,
+        "prepare",
+        "generate-german-freight-trips",
+        input.toString(),
+        "--sample",
+        "0.25",
+        "--network",
+        network,
+        "--input-crs",
+        "EPSG:5677",
+        "--output",
+        allFreightTrips);
 
-		Path output = Path.of(utils.getOutputDirectory());
+    String freightTrips = output.resolve("freight-trips.xml.gz").toString();
+    MATSimApplication.execute(
+        TestScenario.class,
+        "prepare",
+        "extract-freight-trips",
+        allFreightTrips,
+        "--network",
+        network,
+        "--shp",
+        input.resolve("../DusseldorfBoundary/newDusseldorfBoundary.shp").toString(),
+        "--input-crs",
+        "EPSG:5677",
+        "--target-crs",
+        "EPSG:25832",
+        "--output",
+        freightTrips);
+  }
 
-		String network = input.resolve("german-primary-road.network.xml.gz").toString();
+  @Test
+  public void run() {
 
-		String allFreightTrips = output.resolve("german-wide-freight-trips.xml.gz").toString();
-		MATSimApplication.execute(TestScenario.class, "prepare", "generate-german-freight-trips",
-				input.toString(),
-				"--sample", "0.25",
-				"--network", network,
-				"--input-crs", "EPSG:5677",
-				"--output", allFreightTrips
-		);
+    Config config = ConfigUtils.createConfig();
+    Path out = Path.of(utils.getOutputDirectory()).resolve("out");
 
-		String freightTrips = output.resolve("freight-trips.xml.gz").toString();
-		MATSimApplication.execute(TestScenario.class, "prepare", "extract-freight-trips",
-				allFreightTrips,
-				"--network", network,
-				"--shp", input.resolve("../DusseldorfBoundary/newDusseldorfBoundary.shp").toString(),
-				"--input-crs", "EPSG:5677",
-				"--target-crs", "EPSG:25832",
-				"--output", freightTrips
-		);
+    config.controller().setOutputDirectory(out.toString());
+    config
+        .controller()
+        .setOverwriteFileSetting(
+            OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+    config.controller().setLastIteration(1);
 
-	}
+    int ret = MATSimApplication.execute(TestScenario.class, config);
 
-	@Test
-	public void run() {
+    // Content defined in the post process section
+    assertThat(out.resolve("test.txt")).hasContent("Inhalt");
+  }
 
-		Config config = ConfigUtils.createConfig();
-		Path out = Path.of(utils.getOutputDirectory()).resolve("out");
+  @MATSimApplication.Prepare({
+    TrajectoryToPlans.class,
+    GenerateShortDistanceTrips.class,
+    ExtractRelevantFreightTrips.class,
+    MergePopulations.class
+  })
+  public static final class TestScenario extends MATSimApplication {
 
-		config.controller().setOutputDirectory(out.toString());
-		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setLastIteration(1);
+    @CommandLine.Mixin private SampleOptions sample = new SampleOptions(1, 10, 25);
 
-		int ret = MATSimApplication.execute(TestScenario.class, config);
+    public TestScenario(Config config) {
+      super(config);
+    }
 
-		// Content defined in the post process section
-		assertThat(out.resolve("test.txt"))
-				.hasContent("Inhalt");
+    // Public constructor is required to run the class
+    public TestScenario() {}
 
-	}
+    @Override
+    protected Config prepareConfig(Config config) {
 
-	@MATSimApplication.Prepare({
-			TrajectoryToPlans.class, GenerateShortDistanceTrips.class, ExtractRelevantFreightTrips.class, MergePopulations.class
-	})
-	public static final class TestScenario extends MATSimApplication {
+      config.controller().setRunId(sample.adjustName("run-25pct"));
+      return config;
+    }
 
-		@CommandLine.Mixin
-		private SampleOptions sample = new SampleOptions(1, 10, 25);
-
-		public TestScenario(Config config) {
-			super(config);
-		}
-
-		// Public constructor is required to run the class
-		public TestScenario() {
-		}
-
-		@Override
-		protected Config prepareConfig(Config config) {
-
-			config.controller().setRunId(sample.adjustName("run-25pct"));
-			return config;
-		}
-
-
-		@Override
-		protected List<MATSimAppCommand> preparePostProcessing(Path outputFolder, String runId) {
-			return List.of(new TestCommand(outputFolder.resolve("test.txt"), "Inhalt"));
-		}
-	}
-
+    @Override
+    protected List<MATSimAppCommand> preparePostProcessing(Path outputFolder, String runId) {
+      return List.of(new TestCommand(outputFolder.resolve("test.txt"), "Inhalt"));
+    }
+  }
 }

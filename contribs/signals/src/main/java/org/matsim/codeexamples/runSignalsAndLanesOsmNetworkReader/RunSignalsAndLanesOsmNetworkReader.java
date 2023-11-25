@@ -39,75 +39,78 @@ import org.matsim.lanes.LanesWriter;
 
 /**
  * @author tthunig
- *
  */
 public class RunSignalsAndLanesOsmNetworkReader {
 
-	/**
-	 * @param args first argument input OSM file, second argument output directory
-	 */
-	public static void main(String[] args) {
-		
-		String inputOSM = "myOsmFile.osm";
-		String outputDir = "myOutputDir/";
-		if (args != null && args.length > 1) {
-			inputOSM = args[0];
-			outputDir = args[1];
-		}
-		
-		// ** adapt this according to your scenario **
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
-				TransformationFactory.WGS84_UTM33N);
+  /**
+   * @param args first argument input OSM file, second argument output directory
+   */
+  public static void main(String[] args) {
 
-		// create a config
-		Config config = ConfigUtils.createConfig();
-		SignalSystemsConfigGroup signalSystemsConfigGroup = ConfigUtils.addOrGetModule(config,
-				SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
-		signalSystemsConfigGroup.setUseSignalSystems(true);
-		config.qsim().setUseLanes(true);
+    String inputOSM = "myOsmFile.osm";
+    String outputDir = "myOutputDir/";
+    if (args != null && args.length > 1) {
+      inputOSM = args[0];
+      outputDir = args[1];
+    }
 
-		// create a scenario
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
-		// pick network, lanes and signals data from the scenario
-		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-		Lanes lanes = scenario.getLanes();
-		Network network = scenario.getNetwork();
+    // ** adapt this according to your scenario **
+    CoordinateTransformation ct =
+        TransformationFactory.getCoordinateTransformation(
+            TransformationFactory.WGS84, TransformationFactory.WGS84_UTM33N);
 
-		// create and configure the signals and lanes osm reader
-		SignalsAndLanesOsmNetworkReader reader = new SignalsAndLanesOsmNetworkReader(network, ct, signalsData, lanes);
-		reader.setMergeOnewaySignalSystems(false);
-		reader.setAllowUTurnAtLeftLaneOnly(true);
-		reader.setMakePedestrianSignals(false);
-		
-        // set bounding box for signals and lanes (south, west, north, east)
-		// ** adapt this according to your scenario **
-		reader.setBoundingBox(52.448, 13.23, 52.57, 13.5); // this is berlin
-		
-		// create network, lanes and signal data
-		reader.parse(inputOSM);
+    // create a config
+    Config config = ConfigUtils.createConfig();
+    SignalSystemsConfigGroup signalSystemsConfigGroup =
+        ConfigUtils.addOrGetModule(
+            config, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
+    signalSystemsConfigGroup.setUseSignalSystems(true);
+    config.qsim().setUseLanes(true);
 
-        // Simplify the network except the junctions with signals as this might mess up already created plans
-		NetworkSimplifier netSimplify = new NetworkSimplifier();
-		netSimplify.setNodesNotToMerge(reader.getNodesNotToMerge());
-		netSimplify.run(network);
+    // create a scenario
+    Scenario scenario = ScenarioUtils.createScenario(config);
+    scenario.addScenarioElement(
+        SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
+    // pick network, lanes and signals data from the scenario
+    SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+    Lanes lanes = scenario.getLanes();
+    Network network = scenario.getNetwork();
 
-        /*
-         * Clean the Network. Cleaning means removing disconnected components, so that
-         * afterwards there is a route from every link to every other link. This may not
-         * be the case in the initial network converted from OpenStreetMap.
-         */
-		new NetworkCleaner().run(network);
-		new LanesAndSignalsCleaner().run(scenario);
+    // create and configure the signals and lanes osm reader
+    SignalsAndLanesOsmNetworkReader reader =
+        new SignalsAndLanesOsmNetworkReader(network, ct, signalsData, lanes);
+    reader.setMergeOnewaySignalSystems(false);
+    reader.setAllowUTurnAtLeftLaneOnly(true);
+    reader.setMakePedestrianSignals(false);
 
-		// write the files out
-		new NetworkWriter(network).write(outputDir + "network.xml");
-		new LanesWriter(lanes).write(outputDir + "lanes.xml");
-		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
-		signalsWriter.setSignalSystemsOutputFilename(outputDir + "signalSystems.xml");
-		signalsWriter.setSignalGroupsOutputFilename(outputDir + "signalGroups.xml");
-		signalsWriter.setSignalControlOutputFilename(outputDir + "signalControl.xml");
-		signalsWriter.writeSignalsData(scenario);
-	}
+    // set bounding box for signals and lanes (south, west, north, east)
+    // ** adapt this according to your scenario **
+    reader.setBoundingBox(52.448, 13.23, 52.57, 13.5); // this is berlin
 
+    // create network, lanes and signal data
+    reader.parse(inputOSM);
+
+    // Simplify the network except the junctions with signals as this might mess up already created
+    // plans
+    NetworkSimplifier netSimplify = new NetworkSimplifier();
+    netSimplify.setNodesNotToMerge(reader.getNodesNotToMerge());
+    netSimplify.run(network);
+
+    /*
+     * Clean the Network. Cleaning means removing disconnected components, so that
+     * afterwards there is a route from every link to every other link. This may not
+     * be the case in the initial network converted from OpenStreetMap.
+     */
+    new NetworkCleaner().run(network);
+    new LanesAndSignalsCleaner().run(scenario);
+
+    // write the files out
+    new NetworkWriter(network).write(outputDir + "network.xml");
+    new LanesWriter(lanes).write(outputDir + "lanes.xml");
+    SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
+    signalsWriter.setSignalSystemsOutputFilename(outputDir + "signalSystems.xml");
+    signalsWriter.setSignalGroupsOutputFilename(outputDir + "signalGroups.xml");
+    signalsWriter.setSignalControlOutputFilename(outputDir + "signalControl.xml");
+    signalsWriter.writeSignalsData(scenario);
+  }
 }

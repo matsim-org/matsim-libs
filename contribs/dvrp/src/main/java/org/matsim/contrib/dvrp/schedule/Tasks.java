@@ -22,17 +22,17 @@ package org.matsim.contrib.dvrp.schedule;
 import org.matsim.api.core.v01.network.Link;
 
 public class Tasks {
-	public static Link getBeginLink(Task task) {
-		if (task instanceof DriveTask) {
-			return ((DriveTask)task).getPath().getFromLink();
-		}
-		return ((StayTask)task).getLink();
-	}
+  public static Link getBeginLink(Task task) {
+    if (task instanceof DriveTask) {
+      return ((DriveTask) task).getPath().getFromLink();
+    }
+    return ((StayTask) task).getLink();
+  }
 
-	public static Link getEndLink(Task task) {
-		if (task instanceof DriveTask) {
-			return ((DriveTask)task).getPath().getToLink();
-		}
-		return ((StayTask)task).getLink();
-	}
+  public static Link getEndLink(Task task) {
+    if (task instanceof DriveTask) {
+      return ((DriveTask) task).getPath().getToLink();
+    }
+    return ((StayTask) task).getLink();
+  }
 }

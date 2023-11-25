@@ -1,7 +1,11 @@
 package org.matsim.modechoice.replanning;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.google.inject.Key;
 import com.google.inject.name.Names;
+import java.util.ArrayList;
+import java.util.List;
 import org.assertj.core.data.Offset;
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
@@ -11,94 +15,103 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.modechoice.*;
 import org.matsim.modechoice.search.TopKChoicesGenerator;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-
 public class SelectSubtourModeStrategyTest extends ScenarioTest {
 
-	@Override
-	protected String[] getArgs() {
-		return new String[]{"--mc"};
-	}
+  @Override
+  protected String[] getArgs() {
+    return new String[] {"--mc"};
+  }
 
-	@Test
-	public void person() {
+  @Test
+  public void person() {
 
-		PrepareForMobsim prepare = injector.getInstance(PrepareForMobsim.class);
-		prepare.run();
+    PrepareForMobsim prepare = injector.getInstance(PrepareForMobsim.class);
+    prepare.run();
 
+    PlanStrategy strategy =
+        injector.getInstance(
+            Key.get(
+                PlanStrategy.class,
+                Names.named(InformedModeChoiceModule.SELECT_SUBTOUR_MODE_STRATEGY)));
 
-		PlanStrategy strategy = injector.getInstance(Key.get(PlanStrategy.class, Names.named(InformedModeChoiceModule.SELECT_SUBTOUR_MODE_STRATEGY)));
+    Person person =
+        controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(5));
 
-		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(5));
+    person.getPlans().removeIf(p -> person.getSelectedPlan() != p);
 
-		person.getPlans().removeIf(p -> person.getSelectedPlan() != p);
+    for (int i = 0; i < 20; i++) {
+      run(strategy, person);
+    }
+  }
 
-		for (int i = 0; i < 20; i++) {
-			run(strategy, person);
-		}
+  @Test
+  public void constraint() {
 
-	}
+    TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
 
-	@Test
-	public void constraint() {
+    Person person =
+        controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(1));
 
-		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
+    PlanModel model = PlanModel.newInstance(person.getSelectedPlan());
 
-		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(1));
+    List<String[]> modes = new ArrayList<>();
 
-		PlanModel model = PlanModel.newInstance(person.getSelectedPlan());
+    modes.add(
+        new String[] {
+          TransportMode.car,
+          TransportMode.car,
+          TransportMode.car,
+          TransportMode.car,
+          TransportMode.car,
+          TransportMode.car,
+          TransportMode.car
+        });
+    modes.add(
+        new String[] {
+          TransportMode.car,
+          TransportMode.car,
+          TransportMode.car,
+          TransportMode.walk,
+          TransportMode.car,
+          TransportMode.car,
+          TransportMode.car
+        });
 
-		List<String[]> modes = new ArrayList<>();
+    List<PlanCandidate> result = generator.generatePredefined(model, modes);
 
-		modes.add(new String[]{TransportMode.car, TransportMode.car, TransportMode.car, TransportMode.car, TransportMode.car, TransportMode.car, TransportMode.car});
-		modes.add(new String[]{TransportMode.car, TransportMode.car, TransportMode.car, TransportMode.walk, TransportMode.car, TransportMode.car, TransportMode.car});
+    assertThat(result.get(0).getUtility()).isEqualTo(-7.8, Offset.offset(0.1));
 
-		List<PlanCandidate> result = generator.generatePredefined(model, modes);
+    assertThat(result.get(1).getUtility()).isEqualTo(Double.NEGATIVE_INFINITY);
+  }
 
-		assertThat(result.get(0).getUtility())
-				.isEqualTo(-7.8, Offset.offset(0.1));
+  @Test
+  public void allowedModes() {
 
-		assertThat(result.get(1).getUtility())
-				.isEqualTo(Double.NEGATIVE_INFINITY);
+    TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
 
-	}
+    // This agent is not allowed to use car
+    Person person =
+        controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(6));
 
-	@Test
-	public void allowedModes() {
+    PlanModel model = PlanModel.newInstance(person.getSelectedPlan());
 
+    System.out.println(model);
 
-		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
+    List<String[]> modes = new ArrayList<>();
 
-		// This agent is not allowed to use car
-		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(6));
+    modes.add(new String[] {TransportMode.walk, TransportMode.walk});
+    modes.add(new String[] {TransportMode.car, TransportMode.car});
 
-		PlanModel model = PlanModel.newInstance(person.getSelectedPlan());
+    List<PlanCandidate> result = generator.generatePredefined(model, modes);
 
-		System.out.println(model);
+    assertThat(result.get(0).getUtility()).isEqualTo(-27.8, Offset.offset(0.1));
 
-		List<String[]> modes = new ArrayList<>();
+    assertThat(result.get(1).getUtility()).isEqualTo(Double.NEGATIVE_INFINITY);
+  }
 
-		modes.add(new String[]{TransportMode.walk, TransportMode.walk});
-		modes.add(new String[]{TransportMode.car, TransportMode.car});
-
-		List<PlanCandidate> result = generator.generatePredefined(model, modes);
-
-		assertThat(result.get(0).getUtility())
-				.isEqualTo(-27.8, Offset.offset(0.1));
-
-		assertThat(result.get(1).getUtility())
-				.isEqualTo(Double.NEGATIVE_INFINITY);
-
-	}
-
-	private void run(PlanStrategy strategy, Person person) {
-		strategy.init(() -> 1);
-		strategy.run(person);
-		strategy.finish();
-	}
-
+  private void run(PlanStrategy strategy, Person person) {
+    strategy.init(() -> 1);
+    strategy.run(person);
+    strategy.finish();
+  }
 }

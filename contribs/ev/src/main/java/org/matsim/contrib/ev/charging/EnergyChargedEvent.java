@@ -21,7 +21,6 @@
 package org.matsim.contrib.ev.charging;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.contrib.ev.infrastructure.Charger;
@@ -31,53 +30,54 @@ import org.matsim.vehicles.Vehicle;
  * @author Michal Maciejewski (michalm)
  */
 public class EnergyChargedEvent extends Event {
-	public static final String EVENT_TYPE = "energy_charged";
-	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-	public static final String ATTRIBUTE_CHARGER = "charger";
-	public static final String ATTRIBUTE_ENERGY = "energy";
-	public static final String ATTRIBUTE_END_CHARGE = "endCharge";
+  public static final String EVENT_TYPE = "energy_charged";
+  public static final String ATTRIBUTE_VEHICLE = "vehicle";
+  public static final String ATTRIBUTE_CHARGER = "charger";
+  public static final String ATTRIBUTE_ENERGY = "energy";
+  public static final String ATTRIBUTE_END_CHARGE = "endCharge";
 
-	private final Id<Charger> chargerId;
-	private final Id<Vehicle> vehicleId;
-	private final double energy;
-	private final double endCharge;
+  private final Id<Charger> chargerId;
+  private final Id<Vehicle> vehicleId;
+  private final double energy;
+  private final double endCharge;
 
-	public EnergyChargedEvent(double time, Id<Charger> chargerId, Id<Vehicle> vehicleId, double energy, double endCharge) {
-		super(time);
-		this.chargerId = chargerId;
-		this.vehicleId = vehicleId;
-		this.energy = energy;
-		this.endCharge = endCharge;
-	}
+  public EnergyChargedEvent(
+      double time, Id<Charger> chargerId, Id<Vehicle> vehicleId, double energy, double endCharge) {
+    super(time);
+    this.chargerId = chargerId;
+    this.vehicleId = vehicleId;
+    this.energy = energy;
+    this.endCharge = endCharge;
+  }
 
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
+  @Override
+  public String getEventType() {
+    return EVENT_TYPE;
+  }
 
-	public Id<Charger> getChargerId() {
-		return chargerId;
-	}
+  public Id<Charger> getChargerId() {
+    return chargerId;
+  }
 
-	public Id<Vehicle> getVehicleId() {
-		return vehicleId;
-	}
+  public Id<Vehicle> getVehicleId() {
+    return vehicleId;
+  }
 
-	public double getEnergy() {
-		return energy;
-	}
+  public double getEnergy() {
+    return energy;
+  }
 
-	public double getEndCharge() {
-		return endCharge;
-	}
+  public double getEndCharge() {
+    return endCharge;
+  }
 
-	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_CHARGER, chargerId + "");
-		attr.put(ATTRIBUTE_VEHICLE, vehicleId + "");
-		attr.put(ATTRIBUTE_ENERGY, energy + "");
-		attr.put(ATTRIBUTE_END_CHARGE, endCharge + "");
-		return attr;
-	}
+  @Override
+  public Map<String, String> getAttributes() {
+    Map<String, String> attr = super.getAttributes();
+    attr.put(ATTRIBUTE_CHARGER, chargerId + "");
+    attr.put(ATTRIBUTE_VEHICLE, vehicleId + "");
+    attr.put(ATTRIBUTE_ENERGY, energy + "");
+    attr.put(ATTRIBUTE_END_CHARGE, endCharge + "");
+    return attr;
+  }
 }

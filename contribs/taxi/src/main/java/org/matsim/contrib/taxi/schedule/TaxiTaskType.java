@@ -21,24 +21,25 @@
 package org.matsim.contrib.taxi.schedule;
 
 import java.util.Optional;
-
 import org.matsim.contrib.dvrp.schedule.Task;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public record TaxiTaskType(String name, Optional<TaxiTaskBaseType> baseType) implements Task.TaskType {
-	public TaxiTaskType(TaxiTaskBaseType baseType) {
-		this(baseType.name(), Optional.of(baseType));
-	}
+public record TaxiTaskType(String name, Optional<TaxiTaskBaseType> baseType)
+    implements Task.TaskType {
+  public TaxiTaskType(TaxiTaskBaseType baseType) {
+    this(baseType.name(), Optional.of(baseType));
+  }
 
-	public TaxiTaskType(String name, TaxiTaskBaseType baseType) {
-		this(name, Optional.of(baseType));
-	}
+  public TaxiTaskType(String name, TaxiTaskBaseType baseType) {
+    this(name, Optional.of(baseType));
+  }
 
-	// baseType can be empty if the task type requires a special handling which is not provided by the standard taxi
-	// algorithms (e.g. e-taxi charging task cannot be handled as 'STAY')
-	public TaxiTaskType(String name) {
-		this(name, Optional.empty());
-	}
+  // baseType can be empty if the task type requires a special handling which is not provided by the
+  // standard taxi
+  // algorithms (e.g. e-taxi charging task cannot be handled as 'STAY')
+  public TaxiTaskType(String name) {
+    this(name, Optional.empty());
+  }
 }

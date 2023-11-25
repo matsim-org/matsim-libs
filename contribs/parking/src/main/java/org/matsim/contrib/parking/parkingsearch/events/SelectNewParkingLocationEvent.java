@@ -19,57 +19,58 @@
 
 package org.matsim.contrib.parking.parkingsearch.events;
 
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.Map;
-
 /**
  * @author Ricardo Ewert
  */
-
 public class SelectNewParkingLocationEvent extends Event {
-	public static final String EVENT_TYPE = "select new parking location";
-	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-	public static final String ATTRIBUTE_Current_LINK = "link";
-	public static final String ATTRIBUTE_ParkingDestination_LINK = "parkingDestinationLink";
-	private final Id<Link> currentLinkId;
-	private final Id<Link> parkingDestinationLinkId;
-	private final Id<Vehicle> vehicleId;
+  public static final String EVENT_TYPE = "select new parking location";
+  public static final String ATTRIBUTE_VEHICLE = "vehicle";
+  public static final String ATTRIBUTE_Current_LINK = "link";
+  public static final String ATTRIBUTE_ParkingDestination_LINK = "parkingDestinationLink";
+  private final Id<Link> currentLinkId;
+  private final Id<Link> parkingDestinationLinkId;
+  private final Id<Vehicle> vehicleId;
 
-	public SelectNewParkingLocationEvent(final double time, Id<Vehicle> vehicleId, Id<Link> currentLinkId, Id<Link> parkingDestinationLinkId) {
-		super(time);
-		this.currentLinkId = currentLinkId;
-		this.vehicleId = vehicleId;
-		this.parkingDestinationLinkId = parkingDestinationLinkId;
-	}
+  public SelectNewParkingLocationEvent(
+      final double time,
+      Id<Vehicle> vehicleId,
+      Id<Link> currentLinkId,
+      Id<Link> parkingDestinationLinkId) {
+    super(time);
+    this.currentLinkId = currentLinkId;
+    this.vehicleId = vehicleId;
+    this.parkingDestinationLinkId = parkingDestinationLinkId;
+  }
 
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
+  @Override
+  public String getEventType() {
+    return EVENT_TYPE;
+  }
 
-	public Id<Link> getCurrentLinkId() {
-		return currentLinkId;
-	}
+  public Id<Link> getCurrentLinkId() {
+    return currentLinkId;
+  }
 
-	public Id<Link> getparkingDestinationLinkId() {
-		return parkingDestinationLinkId;
-	}
+  public Id<Link> getparkingDestinationLinkId() {
+    return parkingDestinationLinkId;
+  }
 
-	public Id<Vehicle> getVehicleId() {
-		return vehicleId;
-	}
+  public Id<Vehicle> getVehicleId() {
+    return vehicleId;
+  }
 
-	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		attr.put(ATTRIBUTE_Current_LINK, this.currentLinkId.toString());
-		attr.put(ATTRIBUTE_ParkingDestination_LINK, this.parkingDestinationLinkId.toString());
-		return attr;
-	}
-
+  @Override
+  public Map<String, String> getAttributes() {
+    Map<String, String> attr = super.getAttributes();
+    attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
+    attr.put(ATTRIBUTE_Current_LINK, this.currentLinkId.toString());
+    attr.put(ATTRIBUTE_ParkingDestination_LINK, this.parkingDestinationLinkId.toString());
+    return attr;
+  }
 }

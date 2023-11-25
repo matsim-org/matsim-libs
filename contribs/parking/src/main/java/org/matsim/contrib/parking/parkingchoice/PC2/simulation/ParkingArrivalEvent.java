@@ -19,7 +19,6 @@
 package org.matsim.contrib.parking.parkingchoice.PC2.simulation;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -28,83 +27,84 @@ import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PC2Parking;
 
 public class ParkingArrivalEvent extends Event {
 
-	private Id parkingId;
-	private Id personId;
-	public final static String ATTRIBUTE_PARKING_ID = "parkingId";
-	public final static String ATTRIBUTE_PERSON_ID = "personId";
-	public final static String EVENT_TYPE = "parkingArrivalEvent";
-	public final static String DEST_COORD_X = "destinationCoordinateX";
-	public final static String DEST_COORD_Y = "destinationCoordinateY";
-	public final static String PARKING_SCORE = "parkingScore";
-	private Coord destCoordinate;
-	private double score;
+  private Id parkingId;
+  private Id personId;
+  public static final String ATTRIBUTE_PARKING_ID = "parkingId";
+  public static final String ATTRIBUTE_PERSON_ID = "personId";
+  public static final String EVENT_TYPE = "parkingArrivalEvent";
+  public static final String DEST_COORD_X = "destinationCoordinateX";
+  public static final String DEST_COORD_Y = "destinationCoordinateY";
+  public static final String PARKING_SCORE = "parkingScore";
+  private Coord destCoordinate;
+  private double score;
 
-	// yyyyyy the parking arrival event returns person id, not vehicle id.  Do we change to vehicle id, or add the vehicle
-	// id to the event?  It is used for the walk distance; for that we need the person id. kai, jul'15
+  // yyyyyy the parking arrival event returns person id, not vehicle id.  Do we change to vehicle
+  // id, or add the vehicle
+  // id to the event?  It is used for the walk distance; for that we need the person id. kai, jul'15
 
-	public ParkingArrivalEvent(double time, Id parkingId, Id personId, Coord destCoordinate, double score) {
-		super(time);
-		this.destCoordinate = destCoordinate;
-		this.score = score;
+  public ParkingArrivalEvent(
+      double time, Id parkingId, Id personId, Coord destCoordinate, double score) {
+    super(time);
+    this.destCoordinate = destCoordinate;
+    this.score = score;
 
-		this.parkingId = parkingId;
-		this.personId = personId;
-	}
+    this.parkingId = parkingId;
+    this.personId = personId;
+  }
 
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
+  @Override
+  public String getEventType() {
+    return EVENT_TYPE;
+  }
 
-	@Override
-	public Map<String, String> getAttributes() {
-		final Map<String, String> attributes = super.getAttributes();
-		attributes.put(ATTRIBUTE_PARKING_ID, parkingId.toString());
-		attributes.put(ATTRIBUTE_PERSON_ID, personId!=null?personId.toString():null);
-		if (destCoordinate==null){
-			attributes.put(DEST_COORD_X, null);
-			attributes.put(DEST_COORD_Y, null);
-		} else {
-			attributes.put(DEST_COORD_X, Double.toString(destCoordinate.getX()));
-			attributes.put(DEST_COORD_Y, Double.toString(destCoordinate.getY()));
-		}
+  @Override
+  public Map<String, String> getAttributes() {
+    final Map<String, String> attributes = super.getAttributes();
+    attributes.put(ATTRIBUTE_PARKING_ID, parkingId.toString());
+    attributes.put(ATTRIBUTE_PERSON_ID, personId != null ? personId.toString() : null);
+    if (destCoordinate == null) {
+      attributes.put(DEST_COORD_X, null);
+      attributes.put(DEST_COORD_Y, null);
+    } else {
+      attributes.put(DEST_COORD_X, Double.toString(destCoordinate.getX()));
+      attributes.put(DEST_COORD_Y, Double.toString(destCoordinate.getY()));
+    }
 
-		attributes.put(PARKING_SCORE, Double.toString(score));
-		return attributes;
-	}
+    attributes.put(PARKING_SCORE, Double.toString(score));
+    return attributes;
+  }
 
-	public static Coord getDestCoord(Map<String, String> attributes){
-		String destCoordXString = attributes.get(ParkingArrivalEvent.DEST_COORD_X);
-		String destCoordYString = attributes.get(ParkingArrivalEvent.DEST_COORD_Y);
+  public static Coord getDestCoord(Map<String, String> attributes) {
+    String destCoordXString = attributes.get(ParkingArrivalEvent.DEST_COORD_X);
+    String destCoordYString = attributes.get(ParkingArrivalEvent.DEST_COORD_Y);
 
-		if (destCoordXString==null || destCoordYString==null){
-			return null;
-		} else {
-			return new Coord(Double.parseDouble(destCoordXString), Double.parseDouble(destCoordYString));
-		}
-	}
+    if (destCoordXString == null || destCoordYString == null) {
+      return null;
+    } else {
+      return new Coord(Double.parseDouble(destCoordXString), Double.parseDouble(destCoordYString));
+    }
+  }
 
-	public static double getScore(Map<String, String> attributes){
-		String scoreString = attributes.get(ParkingArrivalEvent.PARKING_SCORE);
-		return Double.parseDouble(scoreString);
-	}
+  public static double getScore(Map<String, String> attributes) {
+    String scoreString = attributes.get(ParkingArrivalEvent.PARKING_SCORE);
+    return Double.parseDouble(scoreString);
+  }
 
-	public static Id<Person> getPersonId(Map<String, String> attributes){
-		String personIdString = attributes.get(ParkingArrivalEvent.ATTRIBUTE_PERSON_ID);
-		if (personIdString==null){
-			return null;
-		} else {
-			return Id.create(personIdString, Person.class);
-		}
-	}
+  public static Id<Person> getPersonId(Map<String, String> attributes) {
+    String personIdString = attributes.get(ParkingArrivalEvent.ATTRIBUTE_PERSON_ID);
+    if (personIdString == null) {
+      return null;
+    } else {
+      return Id.create(personIdString, Person.class);
+    }
+  }
 
-	public static Id<PC2Parking> getParkingId(Map<String, String> attributes){
-		String parkingIdString = attributes.get(ParkingArrivalEvent.ATTRIBUTE_PARKING_ID);
-		if (parkingIdString==null){
-			return null;
-		} else {
-			return Id.create(parkingIdString, PC2Parking.class);
-		}
-	}
-
+  public static Id<PC2Parking> getParkingId(Map<String, String> attributes) {
+    String parkingIdString = attributes.get(ParkingArrivalEvent.ATTRIBUTE_PARKING_ID);
+    if (parkingIdString == null) {
+      return null;
+    } else {
+      return Id.create(parkingIdString, PC2Parking.class);
+    }
+  }
 }

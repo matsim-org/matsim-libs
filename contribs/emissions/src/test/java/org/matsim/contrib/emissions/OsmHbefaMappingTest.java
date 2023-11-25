@@ -1,141 +1,140 @@
 package org.matsim.contrib.emissions;
 
+import static org.junit.Assert.*;
+
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkUtils;
 
-import static org.junit.Assert.*;
-
 public class OsmHbefaMappingTest {
 
-    @Test
-    public void testRegularMapping() {
+  @Test
+  public void testRegularMapping() {
 
-        var mapping = OsmHbefaMapping.build();
-        var link = getTestLink("primary", 70 / 3.6);
+    var mapping = OsmHbefaMapping.build();
+    var link = getTestLink("primary", 70 / 3.6);
 
-        var hbefaType = mapping.determineHebfaType(link);
+    var hbefaType = mapping.determineHebfaType(link);
 
-        assertEquals("URB/Trunk-City/70", hbefaType);
-    }
+    assertEquals("URB/Trunk-City/70", hbefaType);
+  }
 
-	@Test
-	public void testMergedLinkTypeMapping() {
+  @Test
+  public void testMergedLinkTypeMapping() {
 
-		var mapping = OsmHbefaMapping.build();
-		var link = getTestLink("primary|railway.tram", 70 / 3.6);
+    var mapping = OsmHbefaMapping.build();
+    var link = getTestLink("primary|railway.tram", 70 / 3.6);
 
-		var hbefaType = mapping.determineHebfaType(link);
+    var hbefaType = mapping.determineHebfaType(link);
 
-		assertEquals("URB/Trunk-City/70", hbefaType);
-	}
+    assertEquals("URB/Trunk-City/70", hbefaType);
+  }
 
-    @Test(expected = RuntimeException.class)
-    public void testUnknownType() {
+  @Test(expected = RuntimeException.class)
+  public void testUnknownType() {
 
-        var mapping = OsmHbefaMapping.build();
-        var link = getTestLink("unknown-tag", 100 / 3.6);
+    var mapping = OsmHbefaMapping.build();
+    var link = getTestLink("unknown-tag", 100 / 3.6);
 
-        mapping.determineHebfaType(link);
+    mapping.determineHebfaType(link);
 
-        fail("Expected Runtime Exception.");
-    }
+    fail("Expected Runtime Exception.");
+  }
 
-    @Test
-    public void testFastMotorway() {
+  @Test
+  public void testFastMotorway() {
 
-        var mapping = OsmHbefaMapping.build();
-        var link = getTestLink("motorway", 100 / 3.6);
+    var mapping = OsmHbefaMapping.build();
+    var link = getTestLink("motorway", 100 / 3.6);
 
-        var hbefaType = mapping.determineHebfaType(link);
+    var hbefaType = mapping.determineHebfaType(link);
 
-        assertEquals("URB/MW-Nat./100", hbefaType);
-    }
+    assertEquals("URB/MW-Nat./100", hbefaType);
+  }
 
-	@Test
-	public void testMotorwayWithNoExactSpeedTag() {
+  @Test
+  public void testMotorwayWithNoExactSpeedTag() {
 
-		var mapping = OsmHbefaMapping.build();
+    var mapping = OsmHbefaMapping.build();
 
-		var link = getTestLink("motorway", 100.11 / 3.6);
-		var hbefaType = mapping.determineHebfaType(link);
-		assertEquals("URB/MW-Nat./100", hbefaType);
+    var link = getTestLink("motorway", 100.11 / 3.6);
+    var hbefaType = mapping.determineHebfaType(link);
+    assertEquals("URB/MW-Nat./100", hbefaType);
 
-		link = getTestLink("motorway", 86.11 / 3.6);
-		hbefaType = mapping.determineHebfaType(link);
-		assertEquals("URB/MW-Nat./90", hbefaType);
+    link = getTestLink("motorway", 86.11 / 3.6);
+    hbefaType = mapping.determineHebfaType(link);
+    assertEquals("URB/MW-Nat./90", hbefaType);
+  }
 
-	}
+  @Test
+  public void testFastMotorwayLink() {
 
-	@Test
-	public void testFastMotorwayLink() {
+    var mapping = OsmHbefaMapping.build();
+    var link = getTestLink("motorway_link", 100 / 3.6);
 
-		var mapping = OsmHbefaMapping.build();
-		var link = getTestLink("motorway_link", 100 / 3.6);
+    var hbefaType = mapping.determineHebfaType(link);
 
-		var hbefaType = mapping.determineHebfaType(link);
+    assertEquals("URB/MW-Nat./100", hbefaType);
+  }
 
-		assertEquals("URB/MW-Nat./100", hbefaType);
-	}
+  @Test
+  public void testLivingStreet() {
+    var mapping = OsmHbefaMapping.build();
+    var link = getTestLink("living_street", 50 / 3.6);
 
-	@Test
-	public void testLivingStreet() {
-		var mapping = OsmHbefaMapping.build();
-		var link = getTestLink("living_street", 50 / 3.6);
+    var hbefaType = mapping.determineHebfaType(link);
 
-		var hbefaType = mapping.determineHebfaType(link);
+    assertEquals("URB/Access/50", hbefaType);
+  }
 
-		assertEquals("URB/Access/50", hbefaType);
-	}
+  @Test
+  public void testUnclassified() {
 
-    @Test
-    public void testUnclassified() {
+    var mapping = OsmHbefaMapping.build();
+    var link = getTestLink("unclassified", 50 / 3.6);
 
-        var mapping = OsmHbefaMapping.build();
-        var link = getTestLink("unclassified", 50 / 3.6);
+    var hbefaType = mapping.determineHebfaType(link);
 
-        var hbefaType = mapping.determineHebfaType(link);
+    assertEquals("URB/Access/50", hbefaType);
+  }
 
-        assertEquals("URB/Access/50", hbefaType);
-    }
+  @Test
+  public void testNoHighwayType() {
 
-    @Test
-    public void testNoHighwayType() {
+    var mapping = OsmHbefaMapping.build();
+    var link = getTestLink(" ", 60 / 3.6);
 
-        var mapping = OsmHbefaMapping.build();
-        var link = getTestLink(" ", 60 / 3.6);
+    var hbefaType = mapping.determineHebfaType(link);
 
-        var hbefaType = mapping.determineHebfaType(link);
+    assertEquals("URB/Local/60", hbefaType);
+  }
 
-        assertEquals("URB/Local/60", hbefaType);
-    }
+  @Test
+  public void testNoAllowedSpeedTag() {
 
-    @Test
-    public void testNoAllowedSpeedTag() {
+    var mapping = OsmHbefaMapping.build();
+    var link = getTestLink("residential", 40 / 3.6);
+    link.getAttributes().removeAttribute(NetworkUtils.ALLOWED_SPEED);
 
-        var mapping = OsmHbefaMapping.build();
-        var link = getTestLink("residential", 40 / 3.6);
-        link.getAttributes().removeAttribute(NetworkUtils.ALLOWED_SPEED);
+    var hbefaType = mapping.determineHebfaType(link);
 
-        var hbefaType = mapping.determineHebfaType(link);
+    assertEquals("URB/Access/40", hbefaType);
+  }
 
-        assertEquals("URB/Access/40", hbefaType);
-    }
+  private static Link getTestLink(String osmRoadType, double allowedSpeed) {
 
-    private static Link getTestLink(String osmRoadType, double allowedSpeed) {
+    var network = NetworkUtils.createNetwork();
+    var from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(0, 0));
+    var to = network.getFactory().createNode(Id.createNodeId("to"), new Coord(0, 1000));
+    var link = network.getFactory().createLink(Id.createLinkId("link"), from, to);
+    link.setFreespeed(allowedSpeed);
+    link.setCapacity(1000);
+    link.setNumberOfLanes(1);
+    link.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, allowedSpeed);
+    link.getAttributes().putAttribute(NetworkUtils.TYPE, osmRoadType);
 
-        var network = NetworkUtils.createNetwork();
-        var from = network.getFactory().createNode(Id.createNodeId("from"), new Coord(0, 0));
-        var to = network.getFactory().createNode(Id.createNodeId("to"), new Coord(0, 1000));
-        var link = network.getFactory().createLink(Id.createLinkId("link"), from, to);
-        link.setFreespeed(allowedSpeed);
-        link.setCapacity(1000);
-        link.setNumberOfLanes(1);
-        link.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, allowedSpeed);
-        link.getAttributes().putAttribute(NetworkUtils.TYPE, osmRoadType);
-
-        return link;
-    }
+    return link;
+  }
 }

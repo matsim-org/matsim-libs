@@ -25,22 +25,21 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  * @author thibautd
  */
 public class SocialNetworkConfigGroup extends ReflectiveConfigGroup {
-	public static final String GROUP_NAME = "socialNetwork";
+  public static final String GROUP_NAME = "socialNetwork";
 
-	private String inputFile = null;
+  private String inputFile = null;
 
-	public SocialNetworkConfigGroup() {
-		super( GROUP_NAME );
-	}
+  public SocialNetworkConfigGroup() {
+    super(GROUP_NAME);
+  }
 
-	@StringGetter( "inputFile" )
-	public String getInputFile() {
-		return this.inputFile;
-	}
+  @StringGetter("inputFile")
+  public String getInputFile() {
+    return this.inputFile;
+  }
 
-	@StringSetter( "inputFile" )
-	public void setInputFile(final String inputFile) {
-		this.inputFile = inputFile;
-	}
+  @StringSetter("inputFile")
+  public void setInputFile(final String inputFile) {
+    this.inputFile = inputFile;
+  }
 }
-

@@ -19,25 +19,23 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.controller;
 
-import org.matsim.api.core.v01.Scenario;
-
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import org.matsim.api.core.v01.Scenario;
 
 /**
  * @author thibautd
  */
 public final class ScenarioElementProvider<T> implements Provider<T> {
-	private final String elementName;
-	@Inject Scenario sc;
+  private final String elementName;
+  @Inject Scenario sc;
 
-	public ScenarioElementProvider( final String elementName ) {
-		this.elementName = elementName;
-	}
+  public ScenarioElementProvider(final String elementName) {
+    this.elementName = elementName;
+  }
 
-	@Override
-	public T get() {
-		return (T) sc.getScenarioElement( elementName );
-	}
+  @Override
+  public T get() {
+    return (T) sc.getScenarioElement(elementName);
+  }
 }
-

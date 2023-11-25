@@ -21,25 +21,25 @@
 package org.matsim.contrib.common.histogram;
 
 public class UniformHistogram extends AbstractHistogram<Double> {
-	public static UniformHistogram create(double binSize, int binCount, double[] values) {
-		UniformHistogram histogram = new UniformHistogram(binSize, binCount);
-		histogram.addValues(values);
-		return histogram;
-	}
+  public static UniformHistogram create(double binSize, int binCount, double[] values) {
+    UniformHistogram histogram = new UniformHistogram(binSize, binCount);
+    histogram.addValues(values);
+    return histogram;
+  }
 
-	private final double binSize;
+  private final double binSize;
 
-	public UniformHistogram(double binSize, int binCount) {
-		super(binCount);
-		this.binSize = binSize;
-	}
+  public UniformHistogram(double binSize, int binCount) {
+    super(binCount);
+    this.binSize = binSize;
+  }
 
-	public void addValue(double value) {
-		increment(Math.min((int)(value / binSize), counts.length - 1));
-	}
+  public void addValue(double value) {
+    increment(Math.min((int) (value / binSize), counts.length - 1));
+  }
 
-	@Override
-	public Double getBin(int idx) {
-		return idx * binSize;
-	}
+  @Override
+  public Double getBin(int idx) {
+    return idx * binSize;
+  }
 }

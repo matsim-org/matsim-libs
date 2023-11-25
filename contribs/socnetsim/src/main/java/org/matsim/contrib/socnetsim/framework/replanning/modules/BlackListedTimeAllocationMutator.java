@@ -21,7 +21,6 @@ package org.matsim.contrib.socnetsim.framework.replanning.modules;
 
 import java.util.List;
 import java.util.Random;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
@@ -37,73 +36,70 @@ import org.matsim.core.utils.misc.OptionalTime;
  * @author thibautd
  */
 public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
-	private static final Logger log =
-		LogManager.getLogger(BlackListedTimeAllocationMutator.class);
+  private static final Logger log = LogManager.getLogger(BlackListedTimeAllocationMutator.class);
 
-	private final double mutationRange;
-	private final Random random;
-	private Setting setting = Setting.MUTATE_END;
+  private final double mutationRange;
+  private final Random random;
+  private Setting setting = Setting.MUTATE_END;
 
-	public enum Setting {
-		MUTATE_DUR,
-		MUTATE_END,
-		MUTATE_END_AS_DUR;
-	}
+  public enum Setting {
+    MUTATE_DUR,
+    MUTATE_END,
+    MUTATE_END_AS_DUR;
+  }
 
-	public BlackListedTimeAllocationMutator(
-			final double mutationRange,
-			final Random random) {
-		this.mutationRange = mutationRange;
-		this.random = random;
-		log.debug( "setting initialized to "+setting );
-	}
+  public BlackListedTimeAllocationMutator(final double mutationRange, final Random random) {
+    this.mutationRange = mutationRange;
+    this.random = random;
+    log.debug("setting initialized to " + setting);
+  }
 
-	@Override
-	public void run(final Plan plan) {
-		final List<Activity> activities = TripStructureUtils.getActivities( plan, StageActivityHandling.ExcludeStageActivities );
-		final int nActs = activities.size();
-		// when mutating durations "blindly", avoid creating activities ending before
-		// the previous activity.
-		OptionalTime lastEndTime = OptionalTime.undefined();
-		for ( Activity a : activities ) {
-			switch ( setting ) {
-				case MUTATE_DUR:
-					a.getMaximumDuration().ifDefined(d -> a.setMaximumDuration(mutateTime(d)));
-					break;
-				case MUTATE_END:
-					if (a.getEndTime().isDefined()) {
-						a.setEndTime(  mutateTime(a.getEndTime().seconds()));
-						lastEndTime = a.getEndTime();
-					} else if (lastEndTime.isDefined()) {
-						a.setEndTime( lastEndTime.seconds() );
-					}
-					break;
-				case MUTATE_END_AS_DUR:
-					final OptionalTime oldTime = a.getEndTime();
-					if ( oldTime.isUndefined() ) break;
-					final double newTime = mutateTime( oldTime.seconds() );
-					// doing this so rather than sampling mut directly allows
-					// to avoid negative times
-					final double mut = newTime - oldTime.seconds();
-					// shift all times after the mutated time (as if we were working on durations)
-					for ( Activity currAct : activities.subList( activities.indexOf( a ) , nActs ) ) {
-						currAct.setEndTime( currAct.getEndTime().seconds() + mut );
-					}
-					break;
-				default:
-					throw new RuntimeException( "what is that? "+setting );
-			}
-		}
-	}
+  @Override
+  public void run(final Plan plan) {
+    final List<Activity> activities =
+        TripStructureUtils.getActivities(plan, StageActivityHandling.ExcludeStageActivities);
+    final int nActs = activities.size();
+    // when mutating durations "blindly", avoid creating activities ending before
+    // the previous activity.
+    OptionalTime lastEndTime = OptionalTime.undefined();
+    for (Activity a : activities) {
+      switch (setting) {
+        case MUTATE_DUR:
+          a.getMaximumDuration().ifDefined(d -> a.setMaximumDuration(mutateTime(d)));
+          break;
+        case MUTATE_END:
+          if (a.getEndTime().isDefined()) {
+            a.setEndTime(mutateTime(a.getEndTime().seconds()));
+            lastEndTime = a.getEndTime();
+          } else if (lastEndTime.isDefined()) {
+            a.setEndTime(lastEndTime.seconds());
+          }
+          break;
+        case MUTATE_END_AS_DUR:
+          final OptionalTime oldTime = a.getEndTime();
+          if (oldTime.isUndefined()) break;
+          final double newTime = mutateTime(oldTime.seconds());
+          // doing this so rather than sampling mut directly allows
+          // to avoid negative times
+          final double mut = newTime - oldTime.seconds();
+          // shift all times after the mutated time (as if we were working on durations)
+          for (Activity currAct : activities.subList(activities.indexOf(a), nActs)) {
+            currAct.setEndTime(currAct.getEndTime().seconds() + mut);
+          }
+          break;
+        default:
+          throw new RuntimeException("what is that? " + setting);
+      }
+    }
+  }
 
-	private double mutateTime(final double time) {
-		final double t = time + (int)((this.random.nextDouble() * 2.0 - 1.0) * mutationRange);
-		return t < 0 ? 0 : t;
-	}
+  private double mutateTime(final double time) {
+    final double t = time + (int) ((this.random.nextDouble() * 2.0 - 1.0) * mutationRange);
+    return t < 0 ? 0 : t;
+  }
 
-	public void setSetting(final Setting setting) {
-		log.debug( "setting set to "+setting );
-		this.setting = setting;
-	}
+  public void setSetting(final Setting setting) {
+    log.debug("setting set to " + setting);
+    this.setting = setting;
+  }
 }
-

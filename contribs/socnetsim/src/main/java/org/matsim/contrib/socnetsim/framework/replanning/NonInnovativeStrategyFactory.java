@@ -22,17 +22,15 @@ package org.matsim.contrib.socnetsim.framework.replanning;
 import com.google.inject.Provider;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 
-
 /**
  * @author thibautd
  */
 public abstract class NonInnovativeStrategyFactory implements Provider<GroupPlanStrategy> {
 
-	@Override
-	public GroupPlanStrategy get() {
-		return new GroupPlanStrategy( createSelector() );
-	}
+  @Override
+  public GroupPlanStrategy get() {
+    return new GroupPlanStrategy(createSelector());
+  }
 
-	public abstract GroupLevelPlanSelector createSelector();
+  public abstract GroupLevelPlanSelector createSelector();
 }
-

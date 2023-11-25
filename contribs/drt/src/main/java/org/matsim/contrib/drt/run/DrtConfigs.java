@@ -22,38 +22,47 @@ package org.matsim.contrib.drt.run;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class DrtConfigs {
-	private static final Logger LOGGER = LogManager.getLogger(DrtControlerCreator.class);
+  private static final Logger LOGGER = LogManager.getLogger(DrtControlerCreator.class);
 
-	public static void adjustMultiModeDrtConfig(MultiModeDrtConfigGroup multiModeDrtCfg,
-																							ScoringConfigGroup planCalcScoreCfg, RoutingConfigGroup plansCalcRouteCfg) {
-		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
-			DrtConfigs.adjustDrtConfig(drtCfg, planCalcScoreCfg, plansCalcRouteCfg);
-		}
-	}
+  public static void adjustMultiModeDrtConfig(
+      MultiModeDrtConfigGroup multiModeDrtCfg,
+      ScoringConfigGroup planCalcScoreCfg,
+      RoutingConfigGroup plansCalcRouteCfg) {
+    for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
+      DrtConfigs.adjustDrtConfig(drtCfg, planCalcScoreCfg, plansCalcRouteCfg);
+    }
+  }
 
-	public static void adjustDrtConfig(DrtConfigGroup drtCfg, ScoringConfigGroup planCalcScoreCfg,
-			RoutingConfigGroup plansCalcRouteCfg) {
-		String drtStageActivityType = ScoringConfigGroup.createStageActivityType(drtCfg.getMode());
-		if (planCalcScoreCfg.getActivityParams(drtStageActivityType) == null) {
-			addDrtStageActivityParams(planCalcScoreCfg, drtStageActivityType);
-		}
-	}
+  public static void adjustDrtConfig(
+      DrtConfigGroup drtCfg,
+      ScoringConfigGroup planCalcScoreCfg,
+      RoutingConfigGroup plansCalcRouteCfg) {
+    String drtStageActivityType = ScoringConfigGroup.createStageActivityType(drtCfg.getMode());
+    if (planCalcScoreCfg.getActivityParams(drtStageActivityType) == null) {
+      addDrtStageActivityParams(planCalcScoreCfg, drtStageActivityType);
+    }
+  }
 
-	private static void addDrtStageActivityParams(ScoringConfigGroup planCalcScoreCfg, String stageActivityType) {
-		ScoringConfigGroup.ActivityParams params = new ScoringConfigGroup.ActivityParams(stageActivityType);
-		params.setTypicalDuration(1);
-		params.setScoringThisActivityAtAll(false);
-		planCalcScoreCfg.getScoringParametersPerSubpopulation().values().forEach(k -> k.addActivityParams(params));
-		if (planCalcScoreCfg.getScoringParameters(null) != null)
-			planCalcScoreCfg.addActivityParams(params);
-		LOGGER.info("drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
-	}
-
+  private static void addDrtStageActivityParams(
+      ScoringConfigGroup planCalcScoreCfg, String stageActivityType) {
+    ScoringConfigGroup.ActivityParams params =
+        new ScoringConfigGroup.ActivityParams(stageActivityType);
+    params.setTypicalDuration(1);
+    params.setScoringThisActivityAtAll(false);
+    planCalcScoreCfg
+        .getScoringParametersPerSubpopulation()
+        .values()
+        .forEach(k -> k.addActivityParams(params));
+    if (planCalcScoreCfg.getScoringParameters(null) != null)
+      planCalcScoreCfg.addActivityParams(params);
+    LOGGER.info(
+        "drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
+  }
 }

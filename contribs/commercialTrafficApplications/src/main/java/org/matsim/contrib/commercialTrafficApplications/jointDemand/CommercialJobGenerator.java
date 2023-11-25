@@ -21,32 +21,28 @@ package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.freight.carriers.Carriers;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.freight.carriers.Carriers;
 
 public interface CommercialJobGenerator extends BeforeMobsimListener, AfterMobsimListener {
 
-	String COMMERCIALJOB_ACTIVITYTYPE_PREFIX = "commercialJob";
-	String CUSTOMER_ATTRIBUTE_NAME = "customer";
-	String SERVICEID_ATTRIBUTE_NAME = "serviceId";
-	String EXPECTED_ARRIVALTIME_NAME = "eta";
-	String SERVICE_DURATION_NAME = "duration";
+  String COMMERCIALJOB_ACTIVITYTYPE_PREFIX = "commercialJob";
+  String CUSTOMER_ATTRIBUTE_NAME = "customer";
+  String SERVICEID_ATTRIBUTE_NAME = "serviceId";
+  String EXPECTED_ARRIVALTIME_NAME = "eta";
+  String SERVICE_DURATION_NAME = "duration";
 
-	/**
-	 * Converts Jsprit tours to MATSim freight agents and inserts them into the population
-	 */
-	default void createAndAddFreightAgents(Carriers carriers, Population population) {}
+  /** Converts Jsprit tours to MATSim freight agents and inserts them into the population */
+  default void createAndAddFreightAgents(Carriers carriers, Population population) {}
 
-	/**
-	 * generates the services (out of the person population) and assigns them to the carriers
-	 */
-	default void generateIterationServices(Carriers carriers, Population population) {}
+  /** generates the services (out of the person population) and assigns them to the carriers */
+  default void generateIterationServices(Carriers carriers, Population population) {}
 
-	/**
-	 * removes freight agents and their vehicles from the scenario
-	 * @param scenario
-	 */
-	default void removeFreightAgents(Scenario scenario) {}
-
-	}
+  /**
+   * removes freight agents and their vehicles from the scenario
+   *
+   * @param scenario
+   */
+  default void removeFreightAgents(Scenario scenario) {}
+}

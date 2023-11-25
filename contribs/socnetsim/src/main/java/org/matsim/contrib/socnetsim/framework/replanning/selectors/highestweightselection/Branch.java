@@ -20,7 +20,6 @@
 package org.matsim.contrib.socnetsim.framework.replanning.selectors.highestweightselection;
 
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
@@ -28,26 +27,23 @@ import org.matsim.api.core.v01.population.Person;
  * @author thibautd
  */
 final class Branch {
-	private final Set<Id<Person>> cotravelers;
-	private final Set<Id> incompatibilityGroups;
+  private final Set<Id<Person>> cotravelers;
+  private final Set<Id> incompatibilityGroups;
 
-	public Branch(
-			final Set<Id<Person>> cotravs,
-			final Set<Id> incompatibilityGroups) {
-		this.cotravelers = cotravs;
-		this.incompatibilityGroups = incompatibilityGroups;
-	}
+  public Branch(final Set<Id<Person>> cotravs, final Set<Id> incompatibilityGroups) {
+    this.cotravelers = cotravs;
+    this.incompatibilityGroups = incompatibilityGroups;
+  }
 
-	@Override
-	public boolean equals(final Object o) {
-		return o instanceof Branch &&
-			((Branch) o).cotravelers.equals( cotravelers ) &&
-			((Branch) o).incompatibilityGroups.equals( incompatibilityGroups );
-	}
+  @Override
+  public boolean equals(final Object o) {
+    return o instanceof Branch
+        && ((Branch) o).cotravelers.equals(cotravelers)
+        && ((Branch) o).incompatibilityGroups.equals(incompatibilityGroups);
+  }
 
-	@Override
-	public int hashCode() {
-		return cotravelers.hashCode() + incompatibilityGroups.hashCode();
-	}
+  @Override
+  public int hashCode() {
+    return cotravelers.hashCode() + incompatibilityGroups.hashCode();
+  }
 }
-

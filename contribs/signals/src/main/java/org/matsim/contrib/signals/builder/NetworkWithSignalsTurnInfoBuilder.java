@@ -18,9 +18,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.builder;
 
+import com.google.inject.Inject;
 import java.util.List;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -32,49 +32,44 @@ import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
 
-import com.google.inject.Inject;
-
-
 /**
- * Do bind(NetworkTurnInfoBuilder.class).to(NetworkWithSignalsTurnInfoBuilder.class)
- * if the extended NetworkWithSignalsTurnInfoBuilder (with
- * SignalsData information) should be used for building turning restriction.
- * 
- * Otherwise the default NetworkTurnInfoBuilder is used for link to link routing.
+ * Do bind(NetworkTurnInfoBuilder.class).to(NetworkWithSignalsTurnInfoBuilder.class) if the extended
+ * NetworkWithSignalsTurnInfoBuilder (with SignalsData information) should be used for building
+ * turning restriction.
+ *
+ * <p>Otherwise the default NetworkTurnInfoBuilder is used for link to link routing.
  *
  * @author nagel, michalm
  */
 class NetworkWithSignalsTurnInfoBuilder implements NetworkTurnInfoBuilderI {
 
-	NetworkTurnInfoBuilder delegate ;
-	private Scenario scenario;
+  NetworkTurnInfoBuilder delegate;
+  private Scenario scenario;
 
+  @Inject
+  public NetworkWithSignalsTurnInfoBuilder(Scenario scenario) {
+    this.scenario = scenario;
+    delegate = new NetworkTurnInfoBuilder(scenario);
+  }
 
+  @Override
+  public Map<Id<Link>, List<TurnInfo>> createAllowedTurnInfos() {
+    Map<Id<Link>, List<TurnInfo>> allowedInLinkTurnInfoMap = delegate.createAllowedTurnInfos();
 
-		@Inject
-		public NetworkWithSignalsTurnInfoBuilder(Scenario scenario)
-		{
-			this.scenario = scenario ;
-			delegate = new NetworkTurnInfoBuilder( scenario ) ;
-		}
+    final SignalSystemsConfigGroup signalsConfig =
+        ConfigUtils.addOrGetModule(
+            scenario.getConfig(),
+            SignalSystemsConfigGroup.GROUP_NAME,
+            SignalSystemsConfigGroup.class);
 
-
-		@Override
-		public Map<Id<Link>, List<TurnInfo>> createAllowedTurnInfos()
-		{
-			Map<Id<Link>, List<TurnInfo>> allowedInLinkTurnInfoMap = delegate.createAllowedTurnInfos();
-
-			final SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(
-					scenario.getConfig(), SignalSystemsConfigGroup.GROUP_NAME,
-					SignalSystemsConfigGroup.class);
-
-			if (signalsConfig.isUseSignalSystems()) {
-				SignalSystemsData ssd = ((SignalsData)scenario
-						.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData();
-				Map<Id<Link>, List<TurnInfo>> signalsTurnInfoMap = SignalsTurnInfoBuilder
-						.createSignalsTurnInfos(ssd);
-				delegate.mergeTurnInfoMaps(allowedInLinkTurnInfoMap, signalsTurnInfoMap);
-			}
-			return allowedInLinkTurnInfoMap;
-		}
-	}
+    if (signalsConfig.isUseSignalSystems()) {
+      SignalSystemsData ssd =
+          ((SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME))
+              .getSignalSystemsData();
+      Map<Id<Link>, List<TurnInfo>> signalsTurnInfoMap =
+          SignalsTurnInfoBuilder.createSignalsTurnInfos(ssd);
+      delegate.mergeTurnInfoMaps(allowedInLinkTurnInfoMap, signalsTurnInfoMap);
+    }
+    return allowedInLinkTurnInfoMap;
+  }
+}

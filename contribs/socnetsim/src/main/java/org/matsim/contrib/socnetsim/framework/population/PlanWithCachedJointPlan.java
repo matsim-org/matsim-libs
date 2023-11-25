@@ -22,7 +22,6 @@ package org.matsim.contrib.socnetsim.framework.population;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -34,185 +33,196 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
- * For performance reasons.
- * Using this class is by no means mandatory.
+ * For performance reasons. Using this class is by no means mandatory.
  *
  * @author thibautd
  */
 public final class PlanWithCachedJointPlan implements Plan {
-	// should be small, because we use linear search: the idea is to be much faster
-	// then a HashMap lookup, which runs in constant time but is relatively slow.
-	// For a given state of the plans, there are typically two joint plans to remember:
-	// the "weak" and "strong" plans. Hence the size.
-	private static final int SIZE = 3;
-	
-	private Plan delegate ;
+  // should be small, because we use linear search: the idea is to be much faster
+  // then a HashMap lookup, which runs in constant time but is relatively slow.
+  // For a given state of the plans, there are typically two joint plans to remember:
+  // the "weak" and "strong" plans. Hence the size.
+  private static final int SIZE = 3;
 
-	private final JointPlan[] jointPlans = new JointPlan[ SIZE ];
-	private final int[] lastAccess = new int[ SIZE ];
-	private final int[] keys = new int[ SIZE ];
+  private Plan delegate;
 
-	private int accessCount = 0;
-	private final Attributes attributes = new AttributesImpl();
-	@Override
-	public final Attributes getAttributes() {
-		return this.attributes;
-	}
+  private final JointPlan[] jointPlans = new JointPlan[SIZE];
+  private final int[] lastAccess = new int[SIZE];
+  private final int[] keys = new int[SIZE];
 
-	public PlanWithCachedJointPlan( final Person person ) {
-		delegate = PopulationUtils.createPlan(person) ;
+  private int accessCount = 0;
+  private final Attributes attributes = new AttributesImpl();
 
-		for ( int i=0; i < SIZE; i++ ) {
-			lastAccess[ i ] = -1;
-			keys[ i ] = Integer.MIN_VALUE;
-		}
-	}
+  @Override
+  public final Attributes getAttributes() {
+    return this.attributes;
+  }
 
-	public boolean hasCached( final int containerId ) {
-		// could not find a better way... The problem is that the fact
-		// that the cache returns null does not mean that there is
-		// no joint plan attached, but a null is a meaningful value (meaning no
-		// joint plan), so searching the HashMap for each null value kills the
-		// performance.
-		// If this causes (performance) problems, one could cache the index of
-		// this id and use it for the next get.
-		for ( int i=0; i < SIZE; i++ ) {
-			if ( keys[ i ] == containerId ) return true;
-		}
-		return false;
-	}
+  public PlanWithCachedJointPlan(final Person person) {
+    delegate = PopulationUtils.createPlan(person);
 
-	public JointPlan getJointPlan(final int containerId ) {
-		for ( int i=0; i < SIZE; i++ ) {
-			if ( keys[ i ] == containerId ) {
-				notifyAccess( i );
-				return jointPlans[ i ];
-			}
-		}
-		return null;
-	}
+    for (int i = 0; i < SIZE; i++) {
+      lastAccess[i] = -1;
+      keys[i] = Integer.MIN_VALUE;
+    }
+  }
 
-	public void setJointPlan(
-			final int containerId,
-			final JointPlan jp) {
-		final int slot = findLeastRecentlyUsedSlot();
+  public boolean hasCached(final int containerId) {
+    // could not find a better way... The problem is that the fact
+    // that the cache returns null does not mean that there is
+    // no joint plan attached, but a null is a meaningful value (meaning no
+    // joint plan), so searching the HashMap for each null value kills the
+    // performance.
+    // If this causes (performance) problems, one could cache the index of
+    // this id and use it for the next get.
+    for (int i = 0; i < SIZE; i++) {
+      if (keys[i] == containerId) return true;
+    }
+    return false;
+  }
 
-		notifyAccess( slot );
-		keys[ slot ] = containerId;
-		jointPlans[ slot ] = jp;
-	}
+  public JointPlan getJointPlan(final int containerId) {
+    for (int i = 0; i < SIZE; i++) {
+      if (keys[i] == containerId) {
+        notifyAccess(i);
+        return jointPlans[i];
+      }
+    }
+    return null;
+  }
 
-	private int findLeastRecentlyUsedSlot() {
-		int cacheLoc = -1;
-		int lastAccessLoc = Integer.MAX_VALUE;
+  public void setJointPlan(final int containerId, final JointPlan jp) {
+    final int slot = findLeastRecentlyUsedSlot();
 
-		for ( int i=0; i < SIZE; i++ ) {
-			if ( lastAccess[ i ] == -1 ) return i; // free slot
-			if ( lastAccess[ i ] < lastAccessLoc ) {
-				// was last accessed before the currently chosen loc
-				cacheLoc = i;
-				lastAccessLoc = lastAccess[ i ];
-			}
-		}
+    notifyAccess(slot);
+    keys[slot] = containerId;
+    jointPlans[slot] = jp;
+  }
 
-		return cacheLoc;
-	}
+  private int findLeastRecentlyUsedSlot() {
+    int cacheLoc = -1;
+    int lastAccessLoc = Integer.MAX_VALUE;
 
-	private void notifyAccess( final int slot ) {
-		lastAccess[ slot ] = accessCount++;
-	}
+    for (int i = 0; i < SIZE; i++) {
+      if (lastAccess[i] == -1) return i; // free slot
+      if (lastAccess[i] < lastAccessLoc) {
+        // was last accessed before the currently chosen loc
+        cacheLoc = i;
+        lastAccessLoc = lastAccess[i];
+      }
+    }
 
-	// should not be useful, but necessary for the remove method of JointPlans
-	// to be well behaved
-	public void resetJointPlan( final int containerId ) {
-		for ( int i=0; i < SIZE; i++ ) {
-			if ( keys[ i ] == containerId ) {
-				lastAccess[ i ] = -1;
-				jointPlans[ i ] = null;
-				return;
-			}
-		}
-	}
+    return cacheLoc;
+  }
 
-	@Override
-	public void setScore(Double score) {
-		this.delegate.setScore(score);
-	}
+  private void notifyAccess(final int slot) {
+    lastAccess[slot] = accessCount++;
+  }
 
-	@Override
-	public Double getScore() {
-		return this.delegate.getScore();
-	}
+  // should not be useful, but necessary for the remove method of JointPlans
+  // to be well behaved
+  public void resetJointPlan(final int containerId) {
+    for (int i = 0; i < SIZE; i++) {
+      if (keys[i] == containerId) {
+        lastAccess[i] = -1;
+        jointPlans[i] = null;
+        return;
+      }
+    }
+  }
 
-	@Override
-	public List<PlanElement> getPlanElements() {
-		return this.delegate.getPlanElements();
-	}
+  @Override
+  public void setScore(Double score) {
+    this.delegate.setScore(score);
+  }
 
-	@Override
-	public void addLeg(Leg leg) {
-		this.delegate.addLeg(leg);
-	}
+  @Override
+  public Double getScore() {
+    return this.delegate.getScore();
+  }
 
-	@Override
-	public void addActivity(Activity act) {
-		this.delegate.addActivity(act);
-	}
+  @Override
+  public List<PlanElement> getPlanElements() {
+    return this.delegate.getPlanElements();
+  }
 
-	@Override
-	public Map<String, Object> getCustomAttributes() {
-		return this.delegate.getCustomAttributes();
-	}
+  @Override
+  public void addLeg(Leg leg) {
+    this.delegate.addLeg(leg);
+  }
 
-	@Override
-	public String getType() {
-		return this.delegate.getType();
-	}
+  @Override
+  public void addActivity(Activity act) {
+    this.delegate.addActivity(act);
+  }
 
-	@Override
-	public void setType(String type) {
-		this.delegate.setType(type);
-	}
-	
-	@Override
-	public Id<Plan> getId() { return null; }
+  @Override
+  public Map<String, Object> getCustomAttributes() {
+    return this.delegate.getCustomAttributes();
+  }
 
-	@Override
-	public void setPlanId(Id<Plan> planId) { /* nothing to do here */ }
-	
-	@Override
-	public int getIterationCreated() { return -1; }
+  @Override
+  public String getType() {
+    return this.delegate.getType();
+  }
 
-	@Override
-	public void setIterationCreated(int iteration) { /* nothing to do here */ }
+  @Override
+  public void setType(String type) {
+    this.delegate.setType(type);
+  }
 
-	@Override
-	public String getPlanMutator() { return null; }
+  @Override
+  public Id<Plan> getId() {
+    return null;
+  }
 
-	@Override
-	public void setPlanMutator(String planMutator) { /* nothing to do here */ }
+  @Override
+  public void setPlanId(Id<Plan> planId) {
+    /* nothing to do here */
+  }
 
-	@Override
-	public Person getPerson() {
-		return this.delegate.getPerson();
-	}
+  @Override
+  public int getIterationCreated() {
+    return -1;
+  }
 
-	@Override
-	public void setPerson(Person person) {
-		this.delegate.setPerson(person);
-	}
-	
-	public final void copyFrom( Plan in) {
-		// yy we really need a more systematic way for plans copying.  kai, nov15
-		PopulationUtils.copyFromTo(in, delegate);
-	}
+  @Override
+  public void setIterationCreated(int iteration) {
+    /* nothing to do here */
+  }
 
-	@Override
-	public String toString() {
-		return "PlanWithCachedJointPlan{" +
-				"delegate=" + delegate +
-				", jointPlans=" + Arrays.toString( jointPlans ) +
-				'}';
-	}
+  @Override
+  public String getPlanMutator() {
+    return null;
+  }
+
+  @Override
+  public void setPlanMutator(String planMutator) {
+    /* nothing to do here */
+  }
+
+  @Override
+  public Person getPerson() {
+    return this.delegate.getPerson();
+  }
+
+  @Override
+  public void setPerson(Person person) {
+    this.delegate.setPerson(person);
+  }
+
+  public final void copyFrom(Plan in) {
+    // yy we really need a more systematic way for plans copying.  kai, nov15
+    PopulationUtils.copyFromTo(in, delegate);
+  }
+
+  @Override
+  public String toString() {
+    return "PlanWithCachedJointPlan{"
+        + "delegate="
+        + delegate
+        + ", jointPlans="
+        + Arrays.toString(jointPlans)
+        + '}';
+  }
 }
-

@@ -20,6 +20,7 @@
 
 package org.matsim.core.population.routes;
 
+import java.util.Collection;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,84 +37,92 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.util.Collection;
-
 /**
  * @author mrieser
  */
 public class RouteFactoryIntegrationTest {
 
-	@Rule
-	public final MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	/**
-	 * Tests that the plans-reader and ReRoute-strategy module use the specified RouteFactory.
-	 */
-	@Test
-	public void testRouteFactoryIntegration() {
-		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
-		config.plans().setInputFile("plans2.xml");
-		Collection<StrategySettings> settings = config.replanning().getStrategySettings();
-		for (StrategySettings setting: settings) {
-			if ("ReRoute".equals(setting.getStrategyName())) {
-				setting.setWeight(1.0);
-			} else {
-				setting.setWeight(0.0);
-			}
-		}
-		config.controller().setLastIteration(1);
+  /** Tests that the plans-reader and ReRoute-strategy module use the specified RouteFactory. */
+  @Test
+  public void testRouteFactoryIntegration() {
+    Config config =
+        utils.loadConfig(
+            IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+    config.plans().setInputFile("plans2.xml");
+    Collection<StrategySettings> settings = config.replanning().getStrategySettings();
+    for (StrategySettings setting : settings) {
+      if ("ReRoute".equals(setting.getStrategyName())) {
+        setting.setWeight(1.0);
+      } else {
+        setting.setWeight(0.0);
+      }
+    }
+    config.controller().setLastIteration(1);
 
-//		 test the default
-		config.controller().setOutputDirectory(utils.getOutputDirectory() + "/default");
-		Controler controler = new Controler(config);
-        controler.getConfig().controller().setCreateGraphs(false);
-        controler.getConfig().controller().setWriteEventsInterval(0);
-		controler.run();
+    //		 test the default
+    config.controller().setOutputDirectory(utils.getOutputDirectory() + "/default");
+    Controler controler = new Controler(config);
+    controler.getConfig().controller().setCreateGraphs(false);
+    controler.getConfig().controller().setWriteEventsInterval(0);
+    controler.run();
 
-        Population population = controler.getScenario().getPopulation();
-		for (Person person : population.getPersons().values()) {
-			for (Plan plan : person.getPlans()) {
-				for (PlanElement pe : plan.getPlanElements()) {
-					if (pe instanceof Leg) {
-						Leg leg = (Leg) pe;
-						Route route = leg.getRoute();
-						Assert.assertTrue(route instanceof NetworkRoute  || route instanceof GenericRouteImpl ); // that must be different from the class used below
-						// yy I added the "|| route instanceof GenericRouteImpl" to compensate for the added walk legs; a more precise
-						// test would be better. kai, feb'16
-					}
-				}
-			}
-		}
+    Population population = controler.getScenario().getPopulation();
+    for (Person person : population.getPersons().values()) {
+      for (Plan plan : person.getPlans()) {
+        for (PlanElement pe : plan.getPlanElements()) {
+          if (pe instanceof Leg) {
+            Leg leg = (Leg) pe;
+            Route route = leg.getRoute();
+            Assert.assertTrue(
+                route instanceof NetworkRoute
+                    || route
+                        instanceof
+                        GenericRouteImpl); // that must be different from the class used below
+            // yy I added the "|| route instanceof GenericRouteImpl" to compensate for the added
+            // walk legs; a more precise
+            // test would be better. kai, feb'16
+          }
+        }
+      }
+    }
 
-		// test another setting
-		config.controller().setOutputDirectory(utils.getOutputDirectory() + "/variant1");
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory(NetworkRoute.class, new HeavyCompressedNetworkRouteFactory(scenario.getNetwork(), TransportMode.car));
-		ScenarioUtils.loadScenario(scenario);
+    // test another setting
+    config.controller().setOutputDirectory(utils.getOutputDirectory() + "/variant1");
+    MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
+    scenario
+        .getPopulation()
+        .getFactory()
+        .getRouteFactories()
+        .setRouteFactory(
+            NetworkRoute.class,
+            new HeavyCompressedNetworkRouteFactory(scenario.getNetwork(), TransportMode.car));
+    ScenarioUtils.loadScenario(scenario);
 
-		Controler controler2 = new Controler(scenario);
-        controler2.getConfig().controller().setCreateGraphs(false);
-        controler2.getConfig().controller().setWriteEventsInterval(0);
-		controler2.run();
+    Controler controler2 = new Controler(scenario);
+    controler2.getConfig().controller().setCreateGraphs(false);
+    controler2.getConfig().controller().setWriteEventsInterval(0);
+    controler2.run();
 
-        Population population2 = controler2.getScenario().getPopulation();
-		for (Person person : population2.getPersons().values()) {
-			int planCounter = 0;
-			for (Plan plan : person.getPlans()) {
-				planCounter++;
-				for (PlanElement pe : plan.getPlanElements()) {
-					if (pe instanceof Leg) {
-						Leg leg = (Leg) pe;
-						Route route = leg.getRoute();
-						Assert.assertTrue("person: " + person.getId() + "; plan: " + planCounter,
-								route instanceof HeavyCompressedNetworkRoute || route instanceof GenericRouteImpl );
-						// yy I added the "|| route instanceof GenericRouteImpl" to compensate for the added walk legs; a more precise
-						// test would be better. kai, feb'16
-					}
-				}
-			}
-		}
-
-	}
-
+    Population population2 = controler2.getScenario().getPopulation();
+    for (Person person : population2.getPersons().values()) {
+      int planCounter = 0;
+      for (Plan plan : person.getPlans()) {
+        planCounter++;
+        for (PlanElement pe : plan.getPlanElements()) {
+          if (pe instanceof Leg) {
+            Leg leg = (Leg) pe;
+            Route route = leg.getRoute();
+            Assert.assertTrue(
+                "person: " + person.getId() + "; plan: " + planCounter,
+                route instanceof HeavyCompressedNetworkRoute || route instanceof GenericRouteImpl);
+            // yy I added the "|| route instanceof GenericRouteImpl" to compensate for the added
+            // walk legs; a more precise
+            // test would be better. kai, feb'16
+          }
+        }
+      }
+    }
+  }
 }

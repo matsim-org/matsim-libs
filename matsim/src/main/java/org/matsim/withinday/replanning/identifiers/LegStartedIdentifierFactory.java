@@ -27,20 +27,21 @@ import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
 public class LegStartedIdentifierFactory extends DuringLegIdentifierFactory {
 
-	private final LinkReplanningMap linkReplanningMap;
-	private final MobsimDataProvider mobsimDataProvider;
-	
-	public LegStartedIdentifierFactory(LinkReplanningMap linkReplanningMap, MobsimDataProvider mobsimDataProvider) {
-		this.linkReplanningMap = linkReplanningMap;
-		this.mobsimDataProvider = mobsimDataProvider;
-	}
-	
-	@Override
-	public DuringLegAgentSelector createIdentifier() {
-		DuringLegAgentSelector identifier = new LegStartedIdentifier(this.linkReplanningMap, this.mobsimDataProvider);
-		this.addAgentFiltersToIdentifier(identifier);
-		identifier.setAgentSelectorFactory(this);
-		return identifier;
-	}
+  private final LinkReplanningMap linkReplanningMap;
+  private final MobsimDataProvider mobsimDataProvider;
 
+  public LegStartedIdentifierFactory(
+      LinkReplanningMap linkReplanningMap, MobsimDataProvider mobsimDataProvider) {
+    this.linkReplanningMap = linkReplanningMap;
+    this.mobsimDataProvider = mobsimDataProvider;
+  }
+
+  @Override
+  public DuringLegAgentSelector createIdentifier() {
+    DuringLegAgentSelector identifier =
+        new LegStartedIdentifier(this.linkReplanningMap, this.mobsimDataProvider);
+    this.addAgentFiltersToIdentifier(identifier);
+    identifier.setAgentSelectorFactory(this);
+    return identifier;
+  }
 }

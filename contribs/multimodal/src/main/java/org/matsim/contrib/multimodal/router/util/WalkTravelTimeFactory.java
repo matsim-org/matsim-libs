@@ -20,37 +20,35 @@
 
 package org.matsim.contrib.multimodal.router.util;
 
+import jakarta.inject.Provider;
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 
-import jakarta.inject.Provider;
-import java.util.Map;
-
 public class WalkTravelTimeFactory implements Provider<TravelTime> {
 
-	private final RoutingConfigGroup routingConfigGroup;
-	private final Map<Id<Link>, Double> linkSlopes;	// slope information in %
+  private final RoutingConfigGroup routingConfigGroup;
+  private final Map<Id<Link>, Double> linkSlopes; // slope information in %
 
-	public WalkTravelTimeFactory(RoutingConfigGroup routingConfigGroup) {
-		this(routingConfigGroup, null);
-	}
+  public WalkTravelTimeFactory(RoutingConfigGroup routingConfigGroup) {
+    this(routingConfigGroup, null);
+  }
 
-	public WalkTravelTimeFactory(RoutingConfigGroup routingConfigGroup,
-															 Map<Id<Link>, Double> linkSlopes) {
-		this.routingConfigGroup = routingConfigGroup;
-		this.linkSlopes = linkSlopes;
+  public WalkTravelTimeFactory(
+      RoutingConfigGroup routingConfigGroup, Map<Id<Link>, Double> linkSlopes) {
+    this.routingConfigGroup = routingConfigGroup;
+    this.linkSlopes = linkSlopes;
 
-		if (routingConfigGroup.getTeleportedModeSpeeds().get(TransportMode.walk) == null) {
-			throw new RuntimeException("No speed was found for mode walk! Aborting.");
-		}
-	}
+    if (routingConfigGroup.getTeleportedModeSpeeds().get(TransportMode.walk) == null) {
+      throw new RuntimeException("No speed was found for mode walk! Aborting.");
+    }
+  }
 
-	@Override
-	public TravelTime get() {
-		return new WalkTravelTime(this.routingConfigGroup, this.linkSlopes);
-	}
-
+  @Override
+  public TravelTime get() {
+    return new WalkTravelTime(this.routingConfigGroup, this.linkSlopes);
+  }
 }

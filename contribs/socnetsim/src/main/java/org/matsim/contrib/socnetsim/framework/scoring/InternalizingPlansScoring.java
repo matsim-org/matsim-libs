@@ -21,207 +21,200 @@ package org.matsim.contrib.socnetsim.framework.scoring;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetworkReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.corelisteners.PlansScoring;
-import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.MapUtils;
-import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
-import org.matsim.contrib.socnetsim.framework.population.SocialNetworkReader;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author thibautd
  */
-public class InternalizingPlansScoring implements PlansScoring, ScoringListener, IterationStartsListener {
-	private static final Logger log =
-		LogManager.getLogger(InternalizingPlansScoring.class);
+public class InternalizingPlansScoring
+    implements PlansScoring, ScoringListener, IterationStartsListener {
+  private static final Logger log = LogManager.getLogger(InternalizingPlansScoring.class);
 
+  private EventsToScore eventsToScore;
 
-	private EventsToScore eventsToScore;
+  private final Scenario sc;
+  private final EventsManager events;
 
-	private final Scenario sc;
-	private final EventsManager events;
+  private final InternalizationSettings ratioCalculator;
 
-	private final InternalizationSettings ratioCalculator;
+  @Inject
+  public InternalizingPlansScoring(
+      final InternalizationSettings ratio,
+      final Scenario sc,
+      final EventsManager events,
+      final ScoringFunctionFactory scoringFunctionFactory) {
+    this.ratioCalculator = ratio;
+    this.sc = sc;
+    this.events = events;
+    this.eventsToScore =
+        EventsToScore.createWithScoreUpdating(this.sc, scoringFunctionFactory, events);
+  }
 
-	@Inject
-	public InternalizingPlansScoring(
-			final InternalizationSettings ratio,
-			final Scenario sc,
-			final EventsManager events,
-			final ScoringFunctionFactory scoringFunctionFactory) {
-		this.ratioCalculator = ratio;
-		this.sc = sc ;
-		this.events = events ;
-		this.eventsToScore = EventsToScore.createWithScoreUpdating(this.sc, scoringFunctionFactory, events);
+  @Override
+  public void notifyScoring(final ScoringEvent event) {
+    this.eventsToScore.finish();
+    internalizeAltersScores();
+  }
 
-	}
+  private void internalizeAltersScores() {
+    if (log.isTraceEnabled()) log.trace("internalizing alter's scores");
 
+    // first need to let the scores unmodified, to "internalize" "raw" scores
+    final Map<Id, Double> internalizedScores = new HashMap<Id, Double>();
 
-	@Override
-	public void notifyScoring(final ScoringEvent event) {
-		this.eventsToScore.finish();
-		internalizeAltersScores();
-	}
+    for (Person ego : sc.getPopulation().getPersons().values()) {
+      final Collection<? extends Person> alters =
+          MapUtils.get(
+              ratioCalculator.getInternalizationNetwork().getAlters(ego.getId()),
+              sc.getPopulation().getPersons());
 
-	private void internalizeAltersScores() {
-		if ( log.isTraceEnabled() ) log.trace( "internalizing alter's scores" );
+      double internalizedScore = getScore(ego);
 
-		// first need to let the scores unmodified, to "internalize" "raw" scores
-		final Map<Id, Double> internalizedScores = new HashMap<Id, Double>();
+      if (log.isTraceEnabled()) {
+        log.trace("internalizing alter's scores for ego " + ego);
+        log.trace(alters.size() + " alters");
+        log.trace("initial score " + internalizedScore);
+      }
 
-		for ( Person ego : sc.getPopulation().getPersons().values() ) {
-			final Collection<? extends Person> alters =
-				MapUtils.get(
-						ratioCalculator.getInternalizationNetwork().getAlters( ego.getId() ),
-						sc.getPopulation().getPersons() );
+      for (Person alter : alters) {
+        if (alter == null) throw new NullPointerException("not all alters part of the population?");
+        final double ratio = ratioCalculator.getInternalizationRatio(ego.getId(), alter.getId());
+        internalizedScore += ratio * getScore(alter);
+      }
 
-			double internalizedScore = getScore( ego );
+      assert !internalizedScores.containsKey(ego.getId());
 
-			if ( log.isTraceEnabled() ) {
-				log.trace( "internalizing alter's scores for ego "+ego );
-				log.trace( alters.size()+" alters" );
-				log.trace( "initial score "+internalizedScore );
-			}
+      internalizedScores.put(ego.getId(), internalizedScore);
 
-			for ( Person alter : alters ) {
-				if ( alter == null ) throw new NullPointerException( "not all alters part of the population?" );
-				final double ratio = ratioCalculator.getInternalizationRatio( ego.getId() , alter.getId() );
-				internalizedScore += ratio * getScore( alter );
-			}
+      if (log.isTraceEnabled()) {
+        log.trace("FINISHED internalizing alter's scores for ego " + ego);
+        log.trace("new score " + internalizedScore);
+      }
+    }
 
-			assert !internalizedScores.containsKey( ego.getId() );
+    for (Person p : sc.getPopulation().getPersons().values()) {
+      assert internalizedScores.containsKey(p.getId());
+      setScore(p, internalizedScores.remove(p.getId()));
+    }
 
-			internalizedScores.put(
-					ego.getId(), 
-					internalizedScore );
+    assert internalizedScores.isEmpty();
+    if (log.isTraceEnabled()) log.trace("internalizing alter's scores: DONE");
+  }
 
-			if ( log.isTraceEnabled() ) {
-				log.trace( "FINISHED internalizing alter's scores for ego "+ego );
-				log.trace( "new score "+internalizedScore );
-			}
-		}
+  private static void setScore(final Person p, final Double score) {
+    if (score == null) throw new NullPointerException("got null score for person " + p);
+    if (score.isNaN()) throw new RuntimeException("got NaN score for person " + p);
 
-		for ( Person p : sc.getPopulation().getPersons().values() ) {
-			assert internalizedScores.containsKey( p.getId() );
-			setScore( p , internalizedScores.remove( p.getId() ) );
-		}
+    p.getSelectedPlan().setScore(score);
+  }
 
-		assert internalizedScores.isEmpty();
-		if ( log.isTraceEnabled() ) log.trace( "internalizing alter's scores: DONE" );
-	}
+  private static double getScore(final Person p) {
+    final Double score = p.getSelectedPlan().getScore();
 
-	private static void setScore(
-			final Person p,
-			final Double score) {
-		if ( score == null ) throw new NullPointerException( "got null score for person "+p );
-		if ( score.isNaN() ) throw new RuntimeException( "got NaN score for person "+p );
+    if (score == null) throw new NullPointerException("got null score for person " + p);
+    if (score.isNaN()) throw new RuntimeException("got NaN score for person " + p);
 
-		p.getSelectedPlan().setScore( score );
-	}
+    return score.doubleValue();
+  }
 
-	private static double getScore(final Person p) {
-		final Double score = p.getSelectedPlan().getScore();
+  @Override
+  public void notifyIterationStarts(final IterationStartsEvent event) {
+    this.eventsToScore.beginIteration(event.getIteration(), event.isLastIteration());
+  }
 
-		if ( score == null ) throw new NullPointerException( "got null score for person "+p );
-		if ( score.isNaN() ) throw new RuntimeException( "got NaN score for person "+p );
+  public interface InternalizationSettings {
+    SocialNetwork getInternalizationNetwork();
 
-		return score.doubleValue();
-	}
+    double getInternalizationRatio(Id ego, Id alter);
+  }
 
-	@Override
-	public void notifyIterationStarts( final IterationStartsEvent event ) {
-		this.eventsToScore.beginIteration( event.getIteration(), event.isLastIteration() );
-	}
+  @Singleton
+  public static class ConfigBasedInternalizationSettings implements InternalizationSettings {
+    private final double ratio;
+    private final SocialNetwork network;
 
-	public interface InternalizationSettings {
-		SocialNetwork getInternalizationNetwork();
-		double getInternalizationRatio( Id ego , Id alter );
-	}
+    @Inject
+    public ConfigBasedInternalizationSettings(final Scenario sc) {
+      final InternalizationConfigGroup group =
+          (InternalizationConfigGroup)
+              sc.getConfig().getModule(InternalizationConfigGroup.GROUP_NAME);
 
-	@Singleton
-	public static class ConfigBasedInternalizationSettings implements InternalizationSettings {
-		private final double ratio;
-		private final SocialNetwork network;
+      this.network =
+          group.getInternalizationSocialNetworkFile() == null
+              ? (SocialNetwork) sc.getScenarioElement(SocialNetwork.ELEMENT_NAME)
+              : readSocialNetwork(group);
+      this.ratio = calc(group);
+    }
 
-		@Inject
-		public ConfigBasedInternalizationSettings(final Scenario sc) {
-			final InternalizationConfigGroup group = (InternalizationConfigGroup)
-					sc.getConfig().getModule( InternalizationConfigGroup.GROUP_NAME );
+    private SocialNetwork readSocialNetwork(final InternalizationConfigGroup group) {
+      final Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+      // could be added to global scenario somehow
+      new SocialNetworkReader("sn", sc).readFile(group.getInternalizationSocialNetworkFile());
+      return (SocialNetwork) sc.getScenarioElement("sn");
+    }
 
-			this.network = group.getInternalizationSocialNetworkFile() == null ?
-					(SocialNetwork) sc.getScenarioElement( SocialNetwork.ELEMENT_NAME ) :
-					readSocialNetwork( group );
-			this.ratio = calc( group );
-		}
+    private static double calc(final InternalizationConfigGroup group) {
 
-		private SocialNetwork readSocialNetwork(final InternalizationConfigGroup group) {
-			final Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig() );
-			// could be added to global scenario somehow
-			new SocialNetworkReader( "sn" , sc ).readFile(group.getInternalizationSocialNetworkFile());
-			return (SocialNetwork) sc.getScenarioElement( "sn" );
-		}
+      if (group == null) {
+        log.warn("no " + InternalizationConfigGroup.GROUP_NAME + " module found in config");
+        log.warn("using null internalization ratio as a consequence");
+        return 0;
+      }
 
-		private static double calc( final InternalizationConfigGroup group ) {
+      final double ratio = group.getInternalizationRatio();
 
-			if ( group == null ) {
-				log.warn( "no "+InternalizationConfigGroup.GROUP_NAME+" module found in config" );
-				log.warn( "using null internalization ratio as a consequence" );
-				return 0;
-			}
+      final double epsilon = 1E-9;
 
-			final double ratio = group.getInternalizationRatio();
+      if (ratio < -epsilon) {
+        log.warn("internalization ratio " + ratio + " is negative!");
+        log.warn("agents will try to DECREASE the score of their alters!");
+      }
 
-			final double epsilon = 1E-9;
+      if (Math.abs(ratio) < epsilon) {
+        log.info("null internalisation ratio: egoistic agents");
+      }
 
-			if ( ratio < -epsilon ) {
-				log.warn( "internalization ratio "+ratio+" is negative!" );
-				log.warn( "agents will try to DECREASE the score of their alters!" );
-			}
+      if (Math.abs(ratio - 1) < epsilon) {
+        log.info("unit internalisation ratio: agents try to maximize group average utility");
+      }
 
-			if ( Math.abs( ratio ) < epsilon ) {
-				log.info( "null internalisation ratio: egoistic agents" );
-			}
+      if (ratio > 1 + epsilon) {
+        log.warn("internalization ratio " + ratio + " is greater than one!");
+        log.warn("agents will value the utility of alters higher than their own!");
+      }
 
-			if ( Math.abs( ratio - 1 ) < epsilon ) {
-				log.info( "unit internalisation ratio: agents try to maximize group average utility" );
-			}
+      log.info("setting internalization ratio to " + ratio);
+      return ratio;
+    }
 
-			if ( ratio > 1 + epsilon ) {
-				log.warn( "internalization ratio "+ratio+" is greater than one!" );
-				log.warn( "agents will value the utility of alters higher than their own!" );
-			}
+    @Override
+    public SocialNetwork getInternalizationNetwork() {
+      return network;
+    }
 
-			log.info( "setting internalization ratio to "+ratio );
-			return ratio;
-		}
-
-		@Override
-		public SocialNetwork getInternalizationNetwork() {
-			return network;
-		}
-
-		@Override
-		public double getInternalizationRatio(final Id ego, final Id alter) {
-			return ratio;
-		}
-	}
+    @Override
+    public double getInternalizationRatio(final Id ego, final Id alter) {
+      return ratio;
+    }
+  }
 }
-

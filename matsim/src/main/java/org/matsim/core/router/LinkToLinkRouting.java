@@ -19,13 +19,11 @@
 
 package org.matsim.core.router;
 
+import com.google.inject.name.Named;
+import jakarta.inject.*;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import jakarta.inject.*;
-
-import com.google.inject.name.Named;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -39,99 +37,114 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-public class LinkToLinkRouting
-        implements Provider<RoutingModule> {
-    private final String mode;
+public class LinkToLinkRouting implements Provider<RoutingModule> {
+  private final String mode;
 
-    @Inject
-    PopulationFactory populationFactory;
+  @Inject PopulationFactory populationFactory;
 
-    @Inject
-    SingleModeNetworksCache singleModeNetworksCache;
+  @Inject SingleModeNetworksCache singleModeNetworksCache;
 
-    @Inject
-		RoutingConfigGroup routingConfigGroup;
+  @Inject RoutingConfigGroup routingConfigGroup;
 
-    @Inject
-    LeastCostPathCalculatorFactory leastCostPathCalcFactory;
+  @Inject LeastCostPathCalculatorFactory leastCostPathCalcFactory;
 
-    @Inject
-    Scenario scenario;
+  @Inject Scenario scenario;
 
-    @Inject
-    Map<String, TravelDisutilityFactory> travelDisutilities;
+  @Inject Map<String, TravelDisutilityFactory> travelDisutilities;
 
-    @Inject
-    Network network;
+  @Inject Network network;
 
-    @Inject
-    LinkToLinkTravelTime travelTimes;
+  @Inject LinkToLinkTravelTime travelTimes;
 
-    @Inject
-    NetworkTurnInfoBuilderI networkTurnInfoBuilder;
+  @Inject NetworkTurnInfoBuilderI networkTurnInfoBuilder;
 
-    @Inject
-    TimeInterpretation timeInterpretation;
+  @Inject TimeInterpretation timeInterpretation;
 
-    @Inject
-    @Named(TransportMode.walk)
-    private RoutingModule walkRouter;
+  @Inject
+  @Named(TransportMode.walk)
+  private RoutingModule walkRouter;
 
-    @Inject
-    private MultimodalLinkChooser multimodalLinkChooser;
+  @Inject private MultimodalLinkChooser multimodalLinkChooser;
 
-    public LinkToLinkRouting(String mode) {
-        this.mode = mode;
+  public LinkToLinkRouting(String mode) {
+    this.mode = mode;
+  }
+
+  /**
+   * Similar logic as in the {@link NetworkRoutingProvider}. regarding access egress behaviour.
+   *
+   * @see NetworkRoutingProvider#get()
+   */
+  @Override
+  public RoutingModule get() {
+
+    // the network refers to the (transport)mode:
+    Network filteredNetwork = null;
+    Network invertedNetwork = null;
+
+    // Ensure this is not performed concurrently by multiple threads!
+    synchronized (this.singleModeNetworksCache.getSingleModeNetworksCache()) {
+      filteredNetwork = this.singleModeNetworksCache.getSingleModeNetworksCache().get(mode);
+      invertedNetwork =
+          this.singleModeNetworksCache.getSingleModeNetworksCache().get(mode + "-inv");
+      if (filteredNetwork == null) {
+        TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+        Set<String> modes = new HashSet<>();
+        modes.add(mode);
+        filteredNetwork = NetworkUtils.createNetwork(scenario.getConfig().network());
+        filter.filter(filteredNetwork, modes);
+
+        invertedNetwork =
+            new NetworkInverter(filteredNetwork, networkTurnInfoBuilder.createAllowedTurnInfos())
+                .getInvertedNetwork();
+
+        this.singleModeNetworksCache.getSingleModeNetworksCache().put(mode, filteredNetwork);
+        this.singleModeNetworksCache
+            .getSingleModeNetworksCache()
+            .put(mode + "-inv", invertedNetwork);
+      }
     }
 
+    InvertedLeastPathCalculator leastCostPathCalculator =
+        InvertedLeastPathCalculator.create(
+            leastCostPathCalcFactory,
+            travelDisutilities.get(mode),
+            filteredNetwork,
+            invertedNetwork,
+            travelTimes);
 
-    /**
-     * Similar logic as in the {@link NetworkRoutingProvider}. regarding access egress behaviour.
-     * @see NetworkRoutingProvider#get()
-     */
-    @Override
-    public RoutingModule get() {
+    // see NetworkRoutingProvider for some notes
+    if (!routingConfigGroup
+        .getAccessEgressType()
+        .equals(RoutingConfigGroup.AccessEgressType.none)) {
+      if (mode.equals(TransportMode.walk)) {
+        return DefaultRoutingModules.createAccessEgressNetworkRouter(
+            mode,
+            leastCostPathCalculator,
+            scenario,
+            filteredNetwork,
+            invertedNetwork,
+            null,
+            null,
+            timeInterpretation,
+            multimodalLinkChooser);
+      } else {
+        return DefaultRoutingModules.createAccessEgressNetworkRouter(
+            mode,
+            leastCostPathCalculator,
+            scenario,
+            filteredNetwork,
+            invertedNetwork,
+            walkRouter,
+            walkRouter,
+            timeInterpretation,
+            multimodalLinkChooser);
+      }
 
-        // the network refers to the (transport)mode:
-        Network filteredNetwork = null;
-        Network invertedNetwork = null;
-
-        // Ensure this is not performed concurrently by multiple threads!
-        synchronized (this.singleModeNetworksCache.getSingleModeNetworksCache()) {
-            filteredNetwork = this.singleModeNetworksCache.getSingleModeNetworksCache().get(mode);
-            invertedNetwork = this.singleModeNetworksCache.getSingleModeNetworksCache().get(mode + "-inv");
-            if (filteredNetwork == null) {
-                TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-                Set<String> modes = new HashSet<>();
-                modes.add(mode);
-                filteredNetwork = NetworkUtils.createNetwork(scenario.getConfig().network());
-                filter.filter(filteredNetwork, modes);
-
-                invertedNetwork = new NetworkInverter(filteredNetwork, networkTurnInfoBuilder.createAllowedTurnInfos()).getInvertedNetwork();
-
-                this.singleModeNetworksCache.getSingleModeNetworksCache().put(mode, filteredNetwork);
-                this.singleModeNetworksCache.getSingleModeNetworksCache().put(mode + "-inv", invertedNetwork);
-            }
-        }
-
-        InvertedLeastPathCalculator leastCostPathCalculator = InvertedLeastPathCalculator.create(
-                leastCostPathCalcFactory, travelDisutilities.get(mode),
-                filteredNetwork, invertedNetwork, travelTimes
-        );
-
-        // see NetworkRoutingProvider for some notes
-        if (!routingConfigGroup.getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none)) {
-            if (mode.equals(TransportMode.walk)) {
-                return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, leastCostPathCalculator, scenario,
-                        filteredNetwork, invertedNetwork, null,null, timeInterpretation, multimodalLinkChooser);
-            } else {
-                return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, leastCostPathCalculator, scenario,
-                        filteredNetwork, invertedNetwork, walkRouter, walkRouter, timeInterpretation, multimodalLinkChooser);
-            }
-
-        } else {
-            // pure inverted router
-            return new LinkToLinkRoutingModule(mode, populationFactory, filteredNetwork, invertedNetwork, leastCostPathCalculator);
-        }
+    } else {
+      // pure inverted router
+      return new LinkToLinkRoutingModule(
+          mode, populationFactory, filteredNetwork, invertedNetwork, leastCostPathCalculator);
     }
+  }
 }

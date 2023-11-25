@@ -19,58 +19,56 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.population;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.utils.misc.Counter;
-import org.matsim.contrib.socnetsim.utils.CollectionUtils;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.socnetsim.utils.CollectionUtils;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * @author thibautd
  */
 public final class SocialNetworkUtils {
-	private SocialNetworkUtils() {}
+  private SocialNetworkUtils() {}
 
-	public static SocialNetwork createNetworkOfUnknownFriendsOfFriends( final SocialNetwork socialNetwork ) {
-		final Counter counter = new Counter( "search secondary friends of agent # ");
-		final SocialNetwork secondaryNetwork = new SocialNetworkImpl( );
+  public static SocialNetwork createNetworkOfUnknownFriendsOfFriends(
+      final SocialNetwork socialNetwork) {
+    final Counter counter = new Counter("search secondary friends of agent # ");
+    final SocialNetwork secondaryNetwork = new SocialNetworkImpl();
 
-		for ( Id ego : socialNetwork.getEgos() ) {
-			final Set<Id<Person>> alters = socialNetwork.getAlters( ego );
-			counter.incCounter();
+    for (Id ego : socialNetwork.getEgos()) {
+      final Set<Id<Person>> alters = socialNetwork.getAlters(ego);
+      counter.incCounter();
 
-			for ( Id<Person> alter : alters ) {
-				final Set<Id<Person>> altersOfAlter = socialNetwork.getAlters( alter );
+      for (Id<Person> alter : alters) {
+        final Set<Id<Person>> altersOfAlter = socialNetwork.getAlters(alter);
 
-				for ( Id<Person> alterOfAlter : altersOfAlter ) {
-					// is the ego?
-					if ( alterOfAlter.equals( ego ) ) continue;
-					// already a friend?
-					if ( alters.contains( alterOfAlter ) ) continue;
+        for (Id<Person> alterOfAlter : altersOfAlter) {
+          // is the ego?
+          if (alterOfAlter.equals(ego)) continue;
+          // already a friend?
+          if (alters.contains(alterOfAlter)) continue;
 
-					secondaryNetwork.addBidirectionalTie( ego , alterOfAlter );
-				}
-			}
-		}
-		counter.printCounter();
+          secondaryNetwork.addBidirectionalTie(ego, alterOfAlter);
+        }
+      }
+    }
+    counter.printCounter();
 
-		return secondaryNetwork;
-	}
+    return secondaryNetwork;
+  }
 
-	public static Map<Id<Person>, Set<Id<Person>>> getSubnetwork(
-			final SocialNetwork network,
-			final Set<Id<Person>> egos ) {
-		final Map<Id<Person>, Set<Id<Person>>> subnet = new LinkedHashMap<>();
+  public static Map<Id<Person>, Set<Id<Person>>> getSubnetwork(
+      final SocialNetwork network, final Set<Id<Person>> egos) {
+    final Map<Id<Person>, Set<Id<Person>>> subnet = new LinkedHashMap<>();
 
-		for ( Id ego : egos ) {
-			final Set<Id<Person>> alters = network.getAlters( ego );
-			subnet.put( ego , CollectionUtils.<Id<Person>>intersectSorted( egos , alters ) );
-		}
+    for (Id ego : egos) {
+      final Set<Id<Person>> alters = network.getAlters(ego);
+      subnet.put(ego, CollectionUtils.<Id<Person>>intersectSorted(egos, alters));
+    }
 
-		return subnet;
-	}
+    return subnet;
+  }
 }
-

@@ -19,77 +19,73 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.sharedvehicles;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import org.matsim.contrib.socnetsim.framework.controller.AbstractPrepareForSimListener;
+import org.matsim.contrib.socnetsim.framework.controller.ScenarioElementProvider;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
 import org.matsim.contrib.socnetsim.jointtrips.router.JointPlanRouterFactory;
-import org.matsim.contrib.socnetsim.framework.controller.ScenarioElementProvider;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 /**
  * @author thibautd
  */
 public class JointVehiclesModule extends AbstractModule {
 
-	@Override
-	public void install() {
-//		if ( !scenario.getConfig().qsim().getVehicleBehavior().equals( "wait" ) ) {
-//			throw new RuntimeException( "agents should wait for vehicles when vehicle ressources are used! Setting is "+
-//					scenario.getConfig().qsim().getVehicleBehavior() );
-//		}
-		// For convenience
-		bind( VehicleRessources.class ).toProvider( new ScenarioElementProvider<VehicleRessources>( VehicleRessources.ELEMENT_NAME ) );
+  @Override
+  public void install() {
+    //		if ( !scenario.getConfig().qsim().getVehicleBehavior().equals( "wait" ) ) {
+    //			throw new RuntimeException( "agents should wait for vehicles when vehicle ressources are
+    // used! Setting is "+
+    //					scenario.getConfig().qsim().getVehicleBehavior() );
+    //		}
+    // For convenience
+    bind(VehicleRessources.class)
+        .toProvider(new ScenarioElementProvider<VehicleRessources>(VehicleRessources.ELEMENT_NAME));
 
-		addControlerListenerBinding().toInstance(
-			new AbstractPrepareForSimListener() {
-				@Inject JointPlans jointPlans;
-				@Inject VehicleRessources vehicles;
-				@Inject @Strong PlanLinkIdentifier planlinks;
+    addControlerListenerBinding()
+        .toInstance(
+            new AbstractPrepareForSimListener() {
+              @Inject JointPlans jointPlans;
+              @Inject VehicleRessources vehicles;
+              @Inject @Strong PlanLinkIdentifier planlinks;
 
-				@Override
-				public GenericPlanAlgorithm<ReplanningGroup> createAlgorithm(ReplanningContext replanningContext) {
-					return new PrepareVehicleAllocationForSimAlgorithm(
-								MatsimRandom.getLocalInstance(),
-								jointPlans,
-								vehicles,
-								planlinks );
-				}
+              @Override
+              public GenericPlanAlgorithm<ReplanningGroup> createAlgorithm(
+                  ReplanningContext replanningContext) {
+                return new PrepareVehicleAllocationForSimAlgorithm(
+                    MatsimRandom.getLocalInstance(), jointPlans, vehicles, planlinks);
+              }
 
-				@Override
-				protected String getName() {
-					return "PrepareVehiclesForSim";
-				}
+              @Override
+              protected String getName() {
+                return "PrepareVehiclesForSim";
+              }
+            });
 
-			} );
+    addControlerListenerBinding().to(VehicleAllocationConsistencyChecker.class);
 
-		addControlerListenerBinding().to( VehicleAllocationConsistencyChecker.class );
+    bind(PlanRoutingAlgorithmFactory.class)
+        .toProvider(
+            new Provider<PlanRoutingAlgorithmFactory>() {
+              @Inject Scenario sc;
+              @Inject TimeInterpretation timeInterpretation;
 
-		bind( PlanRoutingAlgorithmFactory.class ).toProvider( 
-				new Provider<PlanRoutingAlgorithmFactory>() {
-					@Inject Scenario sc;
-					@Inject TimeInterpretation timeInterpretation;
-
-					@Override
-					public PlanRoutingAlgorithmFactory get() {
-						final PlanRoutingAlgorithmFactory jointRouterFactory =
-									new JointPlanRouterFactory(
-											sc.getActivityFacilities(), timeInterpretation );
-						return new PlanRouterWithVehicleRessourcesFactory(
-									jointRouterFactory );
-					}
-				} );
-
-	}
+              @Override
+              public PlanRoutingAlgorithmFactory get() {
+                final PlanRoutingAlgorithmFactory jointRouterFactory =
+                    new JointPlanRouterFactory(sc.getActivityFacilities(), timeInterpretation);
+                return new PlanRouterWithVehicleRessourcesFactory(jointRouterFactory);
+              }
+            });
+  }
 }
-

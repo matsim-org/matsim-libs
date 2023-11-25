@@ -26,34 +26,33 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
 
 public abstract class AbstractPersonFilter implements PersonAlgorithm, PersonFilter {
 
-	protected PersonAlgorithm nextAlgorithm = null;
-	private int count = 0;
-	
-	@Override
-	abstract public boolean judge(Person person);
+  protected PersonAlgorithm nextAlgorithm = null;
+  private int count = 0;
 
-	@Override
-	public void run(Person person) {
-		if (judge(person)) {
-			count();
-			this.nextAlgorithm.run(person);
-		}	
-	}
+  @Override
+  public abstract boolean judge(Person person);
 
-	@Override
-	public void count() {
-		this.count++;
-	}
+  @Override
+  public void run(Person person) {
+    if (judge(person)) {
+      count();
+      this.nextAlgorithm.run(person);
+    }
+  }
 
-	@Override
-	public int getCount() {
-		return this.count;
-	}
+  @Override
+  public void count() {
+    this.count++;
+  }
 
-	public void run(Population population) {
-		for (Person person : population.getPersons().values()) {
-			run(person);
-		}
-	}
-	
+  @Override
+  public int getCount() {
+    return this.count;
+  }
+
+  public void run(Population population) {
+    for (Person person : population.getPersons().values()) {
+      run(person);
+    }
+  }
 }

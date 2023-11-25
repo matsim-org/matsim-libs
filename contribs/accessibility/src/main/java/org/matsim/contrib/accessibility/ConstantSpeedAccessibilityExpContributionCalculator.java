@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.accessibility;
 
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.*;
@@ -37,160 +38,197 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
-import java.util.*;
-
 /**
  * @author thibautd, dziemke
  */
-final class ConstantSpeedAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
-	private static final Logger LOG = LogManager.getLogger(ConstantSpeedAccessibilityExpContributionCalculator.class);
+final class ConstantSpeedAccessibilityExpContributionCalculator
+    implements AccessibilityContributionCalculator {
+  private static final Logger LOG =
+      LogManager.getLogger(ConstantSpeedAccessibilityExpContributionCalculator.class);
 
-	// Estimates travel time by a constant speed along network, considering all links (including highways, which seems
-	// to be realistic in South Africa, but less elsewhere)
-	private final LeastCostPathTree lcptTravelDistance = new LeastCostPathTree(new FreeSpeedTravelTime(), new LinkLengthTravelDisutility());
+  // Estimates travel time by a constant speed along network, considering all links (including
+  // highways, which seems
+  // to be realistic in South Africa, but less elsewhere)
+  private final LeastCostPathTree lcptTravelDistance =
+      new LeastCostPathTree(new FreeSpeedTravelTime(), new LinkLengthTravelDisutility());
 
-	private final String mode;
-	private Config config;
-	// private Network network;
-	private Network subNetwork;
-	private Scenario scenario;
+  private final String mode;
+  private Config config;
+  // private Network network;
+  private Network subNetwork;
+  private Scenario scenario;
 
-	private double logitScaleParameter;
+  private double logitScaleParameter;
 
-	private double betaModeTT;	// in MATSim this is [utils/h]: cnScoringGroup.getTravelingBike_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
-	private double betaModeTD;	// in MATSim this is 0 !!! since getMonetaryDistanceCostRateBike doesn't exist:
-	private double constMode;
-	private double modeSpeed_m_h = -1;
+  private double
+      betaModeTT; // in MATSim this is [utils/h]: cnScoringGroup.getTravelingBike_utils_hr() -
+  // cnScoringGroup.getPerforming_utils_hr()
+  private double
+      betaModeTD; // in MATSim this is 0 !!! since getMonetaryDistanceCostRateBike doesn't exist:
+  private double constMode;
+  private double modeSpeed_m_h = -1;
 
-	private double betaWalkTT;
-	private double betaWalkTD;
-	private double walkSpeed_m_h;
+  private double betaWalkTT;
+  private double betaWalkTD;
+  private double walkSpeed_m_h;
 
-	private Node fromNode = null;
+  private Node fromNode = null;
 
-	Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
-	Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities;
+  Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
+  Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities;
 
+  public ConstantSpeedAccessibilityExpContributionCalculator(
+      final String mode, final Scenario scenario) {
+    this.mode = mode;
+    this.scenario = scenario;
 
-	public ConstantSpeedAccessibilityExpContributionCalculator(final String mode, final Scenario scenario) {
-		this.mode = mode;
-		this.scenario = scenario;
+    this.config = scenario.getConfig();
+    final ScoringConfigGroup scoringConfigGroup = config.scoring();
 
-		this.config = scenario.getConfig();
-		final ScoringConfigGroup scoringConfigGroup = config.scoring() ;
+    if (scoringConfigGroup.getOrCreateModeParams(mode).getMonetaryDistanceRate() != 0.) {
+      LOG.error(
+          "Monetary distance cost rate for "
+              + mode
+              + " different from zero, but not used in accessibility computations");
+    }
 
-		if (scoringConfigGroup.getOrCreateModeParams(mode).getMonetaryDistanceRate() != 0.) {
-			LOG.error("Monetary distance cost rate for " + mode + " different from zero, but not used in accessibility computations");
-		}
+    logitScaleParameter = scoringConfigGroup.getBrainExpBeta();
 
-		logitScaleParameter = scoringConfigGroup.getBrainExpBeta();
+    if (config.routing().getTeleportedModeSpeeds().get(mode) == null) {
+      LOG.error("No teleported mode speed for mode " + mode + " set.");
+    }
+    this.modeSpeed_m_h = config.routing().getTeleportedModeSpeeds().get(mode) * 3600.;
 
-		if (config.routing().getTeleportedModeSpeeds().get(mode) == null) {
-			LOG.error("No teleported mode speed for mode " + mode + " set.");
-		}
-		this.modeSpeed_m_h = config.routing().getTeleportedModeSpeeds().get(mode) * 3600.;
+    final ScoringConfigGroup.ModeParams modeParams = scoringConfigGroup.getOrCreateModeParams(mode);
+    betaModeTT =
+        modeParams.getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
+    betaModeTD = modeParams.getMarginalUtilityOfDistance();
+    constMode = modeParams.getConstant();
 
-		final ScoringConfigGroup.ModeParams modeParams = scoringConfigGroup.getOrCreateModeParams(mode);
-		betaModeTT = modeParams.getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
-		betaModeTD = modeParams.getMarginalUtilityOfDistance();
-		constMode = modeParams.getConstant();
+    betaWalkTT =
+        scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling()
+            - scoringConfigGroup.getPerforming_utils_hr();
+    betaWalkTD =
+        scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
+    this.walkSpeed_m_h = config.routing().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600;
+  }
 
-		betaWalkTT = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
-		betaWalkTD = scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
-		this.walkSpeed_m_h = config.routing().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600;
-	}
+  @Override
+  public void initialize(ActivityFacilities measuringPoints, ActivityFacilities opportunities) {
+    LOG.warn("Initializing calculator for mode " + mode + "...");
+    LOG.warn("Full network has " + scenario.getNetwork().getNodes().size() + " nodes.");
+    subNetwork = NetworkUtils.createNetwork(config);
+    Set<String> modeSet = new HashSet<>();
+    TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+    if (mode.equals(Modes4Accessibility.freespeed.name())) {
+      modeSet.add(TransportMode.car);
+    } else {
+      modeSet.add(mode);
+    }
+    filter.filter(subNetwork, modeSet);
+    if (subNetwork.getNodes().size() == 0) {
+      throw new RuntimeException("Network has 0 nodes for mode " + mode + ". Something is wrong.");
+    }
+    LOG.warn(
+        "sub-network for mode "
+            + modeSet.toString()
+            + " now has "
+            + subNetwork.getNodes().size()
+            + " nodes.");
 
+    this.aggregatedMeasurePoints =
+        AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, subNetwork);
+    this.aggregatedOpportunities =
+        AccessibilityUtils.aggregateOpportunitiesWithSameNearestNode(
+            opportunities, subNetwork, scenario.getConfig());
+  }
 
-	@Override
-	public void initialize(ActivityFacilities measuringPoints, ActivityFacilities opportunities) {
-		LOG.warn("Initializing calculator for mode " + mode + "...");
-		LOG.warn("Full network has " + scenario.getNetwork().getNodes().size() + " nodes.");
-		subNetwork = NetworkUtils.createNetwork(config);
-		Set<String> modeSet = new HashSet<>();
-		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
-		if (mode.equals(Modes4Accessibility.freespeed.name())) {
-			modeSet.add(TransportMode.car);
-		} else {
-			modeSet.add(mode);
-		}
-		filter.filter(subNetwork, modeSet);
-		if (subNetwork.getNodes().size() == 0) {
-			throw new RuntimeException("Network has 0 nodes for mode " + mode + ". Something is wrong.");
-		}
-		LOG.warn("sub-network for mode " + modeSet.toString() + " now has " + subNetwork.getNodes().size() + " nodes.");
+  @Override
+  public void notifyNewOriginNode(Id<? extends BasicLocation> fromNodeId, Double departureTime) {
+    this.fromNode = subNetwork.getNodes().get(fromNodeId);
+    this.lcptTravelDistance.calculate(subNetwork, fromNode, departureTime);
+  }
 
-		this.aggregatedMeasurePoints = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, subNetwork);
-		this.aggregatedOpportunities = AccessibilityUtils.aggregateOpportunitiesWithSameNearestNode(opportunities, subNetwork, scenario.getConfig());
-	}
+  @Override
+  public double computeContributionOfOpportunity(
+      ActivityFacility origin,
+      Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities,
+      Double departureTime) {
+    double expSum = 0.;
 
+    for (final AggregationObject destination : aggregatedOpportunities.values()) {
+      // TODO departure time is not used, dz, apr'17
+      Link nearestLinkToOrigin = NetworkUtils.getNearestLinkExactly(subNetwork, origin.getCoord());
 
+      // Captures the distance between the origin via the link to the node:
+      Distances distances =
+          NetworkUtil.getDistances2NodeViaGivenLink(
+              origin.getCoord(), nearestLinkToOrigin, fromNode);
 
-	@Override
-	public void notifyNewOriginNode(Id<? extends BasicLocation> fromNodeId, Double departureTime) {
-		this.fromNode = subNetwork.getNodes().get(fromNodeId);
-		this.lcptTravelDistance.calculate(subNetwork, fromNode, departureTime);
-	}
+      // TODO: extract this walk part?
+      // In the state found before modularization (june 15), this was anyway not consistent accross
+      // modes
+      // (different for PtMatrix), pointing to the fact that making this mode-specific might make
+      // sense.
+      // distance to road, and then to node:
 
+      // Utility to get on the network by walking
+      double distancePoint2Intersection_m = distances.getDistancePoint2Intersection();
+      double utilityMeasuringPoint2Road =
+          (distancePoint2Intersection_m / this.walkSpeed_m_h * betaWalkTT)
+              + (distancePoint2Intersection_m * betaWalkTD);
 
-	@Override
-	public double computeContributionOfOpportunity(ActivityFacility origin,
-			Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime) {
-		double expSum = 0.;
+      // Utility on the network to first node
+      double distanceIntersection2Node_m = distances.getDistanceIntersection2Node();
+      double utilityRoad2Node =
+          (distanceIntersection2Node_m / modeSpeed_m_h * betaModeTT)
+              + (distanceIntersection2Node_m * betaModeTD); // toll or money ???
 
-		for (final AggregationObject destination : aggregatedOpportunities.values()) {
-			// TODO departure time is not used, dz, apr'17
-			Link nearestLinkToOrigin = NetworkUtils.getNearestLinkExactly(subNetwork, origin.getCoord());
+      // Uutility on the network from first node to destination node
+      double travelDistance_m =
+          lcptTravelDistance
+              .getTree()
+              .get(((Node) destination.getNearestBasicLocation()).getId())
+              .getCost(); // travel link distances on road network for bicycle and walk
+      double utility =
+          ((travelDistance_m / modeSpeed_m_h * betaModeTT)
+              + (travelDistance_m * betaModeTD)); // toll or money ???
 
-			// Captures the distance between the origin via the link to the node:
-			Distances distances = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLinkToOrigin, fromNode);
+      // Utility based on opportunities that are attached to destination node
+      double sumExpVjkWalk = destination.getSum();
 
-			// TODO: extract this walk part?
-			// In the state found before modularization (june 15), this was anyway not consistent accross modes
-			// (different for PtMatrix), pointing to the fact that making this mode-specific might make sense.
-			// distance to road, and then to node:
+      // exp(beta * a) * exp(beta * b) = exp(beta * (a+b))
+      expSum +=
+          Math.exp(
+                  logitScaleParameter
+                      * (constMode + utilityMeasuringPoint2Road + utilityRoad2Node + utility))
+              * sumExpVjkWalk;
+    }
+    return expSum;
+  }
 
-			// Utility to get on the network by walking
-			double distancePoint2Intersection_m = distances.getDistancePoint2Intersection();
-			double utilityMeasuringPoint2Road = (distancePoint2Intersection_m / this.walkSpeed_m_h * betaWalkTT)	+ (distancePoint2Intersection_m * betaWalkTD);
+  @Override
+  public ConstantSpeedAccessibilityExpContributionCalculator duplicate() {
+    LOG.info("Creating another ConstantSpeedAccessibilityExpContributionCalculator object.");
+    ConstantSpeedAccessibilityExpContributionCalculator
+        constantSpeedAccessibilityExpContributionCalculator =
+            new ConstantSpeedAccessibilityExpContributionCalculator(this.mode, this.scenario);
+    constantSpeedAccessibilityExpContributionCalculator.subNetwork = this.subNetwork;
+    constantSpeedAccessibilityExpContributionCalculator.aggregatedMeasurePoints =
+        this.aggregatedMeasurePoints;
+    constantSpeedAccessibilityExpContributionCalculator.aggregatedOpportunities =
+        this.aggregatedOpportunities;
+    return constantSpeedAccessibilityExpContributionCalculator;
+  }
 
-			// Utility on the network to first node
-			double distanceIntersection2Node_m = distances.getDistanceIntersection2Node();
-			double utilityRoad2Node = (distanceIntersection2Node_m / modeSpeed_m_h * betaModeTT)	+ (distanceIntersection2Node_m * betaModeTD); // toll or money ???
+  @Override
+  public Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>>
+      getAggregatedMeasurePoints() {
+    return aggregatedMeasurePoints;
+  }
 
-			// Uutility on the network from first node to destination node
-			double travelDistance_m = lcptTravelDistance.getTree().get(((Node) destination.getNearestBasicLocation()).getId()).getCost(); // travel link distances on road network for bicycle and walk
-			double utility = ((travelDistance_m / modeSpeed_m_h * betaModeTT) + (travelDistance_m * betaModeTD)); // toll or money ???
-
-			// Utility based on opportunities that are attached to destination node
-			double sumExpVjkWalk = destination.getSum();
-
-			// exp(beta * a) * exp(beta * b) = exp(beta * (a+b))
-			expSum += Math.exp(logitScaleParameter * (constMode + utilityMeasuringPoint2Road + utilityRoad2Node + utility)) * sumExpVjkWalk;
-		}
-		return expSum;
-	}
-
-
-	@Override
-	public ConstantSpeedAccessibilityExpContributionCalculator duplicate() {
-		LOG.info("Creating another ConstantSpeedAccessibilityExpContributionCalculator object.");
-		ConstantSpeedAccessibilityExpContributionCalculator constantSpeedAccessibilityExpContributionCalculator =
-				new ConstantSpeedAccessibilityExpContributionCalculator(this.mode, this.scenario);
-		constantSpeedAccessibilityExpContributionCalculator.subNetwork = this.subNetwork;
-		constantSpeedAccessibilityExpContributionCalculator.aggregatedMeasurePoints = this.aggregatedMeasurePoints;
-		constantSpeedAccessibilityExpContributionCalculator.aggregatedOpportunities = this.aggregatedOpportunities;
-		return constantSpeedAccessibilityExpContributionCalculator;
-	}
-
-
-	@Override
-	public Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> getAggregatedMeasurePoints() {
-		return aggregatedMeasurePoints;
-	}
-
-
-	@Override
-	public Map<Id<? extends BasicLocation>, AggregationObject> getAgregatedOpportunities() {
-		return aggregatedOpportunities;
-	}
+  @Override
+  public Map<Id<? extends BasicLocation>, AggregationObject> getAgregatedOpportunities() {
+    return aggregatedOpportunities;
+  }
 }

@@ -19,39 +19,32 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.modules;
 
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.replanning.ReplanningContext;
-
 import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.ReplanningContext;
 
 /**
- * "widens" joint plans randomly. To use before
- * JointPlanAlgorithms which insert new interactions.
- * It does not considers any other "tie" information than the group.
- * Hence, if the group is not a clique, this may result in meaningless groupings.
+ * "widens" joint plans randomly. To use before JointPlanAlgorithms which insert new interactions.
+ * It does not considers any other "tie" information than the group. Hence, if the group is not a
+ * clique, this may result in meaningless groupings.
+ *
  * @author thibautd
  */
 public class JointPlanMergingModule extends AbstractMultithreadedGenericStrategyModule<GroupPlans> {
-	private final double probAcceptance;
-	private final JointPlanFactory factory;
+  private final double probAcceptance;
+  private final JointPlanFactory factory;
 
-	public JointPlanMergingModule(
-			final JointPlanFactory factory,
-			final int nThreads,
-			final double probAcceptance) {
-		super( nThreads );
-		this.factory = factory;
-		this.probAcceptance = probAcceptance;
-	}
+  public JointPlanMergingModule(
+      final JointPlanFactory factory, final int nThreads, final double probAcceptance) {
+    super(nThreads);
+    this.factory = factory;
+    this.probAcceptance = probAcceptance;
+  }
 
-	@Override
-	public GenericPlanAlgorithm<GroupPlans> createAlgorithm(ReplanningContext replanningContext) {
-		return new JointPlanMergingAlgorithm(
-				factory,
-				probAcceptance,
-				MatsimRandom.getLocalInstance() );
-	}
+  @Override
+  public GenericPlanAlgorithm<GroupPlans> createAlgorithm(ReplanningContext replanningContext) {
+    return new JointPlanMergingAlgorithm(factory, probAcceptance, MatsimRandom.getLocalInstance());
+  }
 }
-

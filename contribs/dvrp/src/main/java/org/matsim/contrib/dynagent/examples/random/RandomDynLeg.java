@@ -20,7 +20,6 @@
 package org.matsim.contrib.dynagent.examples.random;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -31,75 +30,75 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.vehicles.Vehicle;
 
 public class RandomDynLeg implements DriverDynLeg {
-	private final Network network;
+  private final Network network;
 
-	private Id<Link> currentLinkId;
-	private Id<Link> nextLinkId;
-	private Id<Link> destinationLinkId;
+  private Id<Link> currentLinkId;
+  private Id<Link> nextLinkId;
+  private Id<Link> destinationLinkId;
 
-	public RandomDynLeg(Id<Link> fromLinkId, Network network) {
-		this.network = network;
-		currentLinkId = fromLinkId;
+  public RandomDynLeg(Id<Link> fromLinkId, Network network) {
+    this.network = network;
+    currentLinkId = fromLinkId;
 
-		doRandomChoice();
-	}
+    doRandomChoice();
+  }
 
-	@Override
-	public void movedOverNode(Id<Link> newLinkId) {
-		currentLinkId = newLinkId;
-		doRandomChoice();
-	}
+  @Override
+  public void movedOverNode(Id<Link> newLinkId) {
+    currentLinkId = newLinkId;
+    doRandomChoice();
+  }
 
-	@Override
-	public Id<Link> getNextLinkId() {
-		return nextLinkId;
-	}
+  @Override
+  public Id<Link> getNextLinkId() {
+    return nextLinkId;
+  }
 
-	@Override
-	public Id<Link> getDestinationLinkId() {
-		return destinationLinkId;
-	}
+  @Override
+  public Id<Link> getDestinationLinkId() {
+    return destinationLinkId;
+  }
 
-	private void doRandomChoice() {
-		// Do I want to end at this link?
-		if (MatsimRandom.getRandom().nextInt(10) == 0) {// 10% chance
-			nextLinkId = null;
-			destinationLinkId = currentLinkId;
-		} else {
-			// Where do I want to move next?
-			Link currentLink = network.getLinks().get(currentLinkId);
-			Map<Id<Link>, ?> possibleNextLinks = currentLink.getToNode().getOutLinks();
+  private void doRandomChoice() {
+    // Do I want to end at this link?
+    if (MatsimRandom.getRandom().nextInt(10) == 0) { // 10% chance
+      nextLinkId = null;
+      destinationLinkId = currentLinkId;
+    } else {
+      // Where do I want to move next?
+      Link currentLink = network.getLinks().get(currentLinkId);
+      Map<Id<Link>, ?> possibleNextLinks = currentLink.getToNode().getOutLinks();
 
-			// Let's choose the next link randomly
-			nextLinkId = RandomDynAgentLogic.chooseRandomElement(possibleNextLinks.keySet());
+      // Let's choose the next link randomly
+      nextLinkId = RandomDynAgentLogic.chooseRandomElement(possibleNextLinks.keySet());
 
-			// at this point the destination can be anything, QSim does not take it into account
-			destinationLinkId = null;
-		}
-	}
+      // at this point the destination can be anything, QSim does not take it into account
+      destinationLinkId = null;
+    }
+  }
 
-	@Override
-	public String getMode() {
-		return TransportMode.car;
-	}
+  @Override
+  public String getMode() {
+    return TransportMode.car;
+  }
 
-	@Override
-	public void arrivedOnLinkByNonNetworkMode(Id<Link> linkId) {
-		currentLinkId = linkId;
-	}
+  @Override
+  public void arrivedOnLinkByNonNetworkMode(Id<Link> linkId) {
+    currentLinkId = linkId;
+  }
 
-	@Override
-	public Id<Vehicle> getPlannedVehicleId() {
-		return null;
-	}
+  @Override
+  public Id<Vehicle> getPlannedVehicleId() {
+    return null;
+  }
 
-	@Override
-	public OptionalTime getExpectedTravelTime() {
-		return OptionalTime.undefined();// teleportation unsupported
-	}
+  @Override
+  public OptionalTime getExpectedTravelTime() {
+    return OptionalTime.undefined(); // teleportation unsupported
+  }
 
-	@Override
-	public Double getExpectedTravelDistance() {
-		return null;// teleportation unsupported
-	}
+  @Override
+  public Double getExpectedTravelDistance() {
+    return null; // teleportation unsupported
+  }
 }

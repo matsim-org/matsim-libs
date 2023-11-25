@@ -20,7 +20,5 @@
  *  * ***********************************************************************
  */
 
-/**
- * Testing modules with the Controler, only through their external interface.
- */
+/** Testing modules with the Controler, only through their external interface. */
 package org.matsim.modules;

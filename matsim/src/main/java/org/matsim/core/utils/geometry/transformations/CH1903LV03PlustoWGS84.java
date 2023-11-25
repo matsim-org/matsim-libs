@@ -29,39 +29,41 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
  *
  * @author boescpa
  * @author mrieser
- * 
- * @see <a href="http://de.wikipedia.org/wiki/Schweizer_Landeskoordinaten">de.wikipedia.org/wiki/Schweizer_Landeskoordinaten</a>
- * @see <a href="http://www.swisstopo.admin.ch/internet/swisstopo/de/home/topics/survey/sys/refsys/switzerland.parsysrelated1.24280.downloadList.87003.DownloadFile.tmp/ch1903wgs84de.pdf">Swisstopo Umrechnungen (PDF)</a>
+ * @see <a
+ *     href="http://de.wikipedia.org/wiki/Schweizer_Landeskoordinaten">de.wikipedia.org/wiki/Schweizer_Landeskoordinaten</a>
+ * @see <a
+ *     href="http://www.swisstopo.admin.ch/internet/swisstopo/de/home/topics/survey/sys/refsys/switzerland.parsysrelated1.24280.downloadList.87003.DownloadFile.tmp/ch1903wgs84de.pdf">Swisstopo
+ *     Umrechnungen (PDF)</a>
  */
 public class CH1903LV03PlustoWGS84 implements CoordinateTransformation {
 
-	@Override
-	public Coord transform(Coord coord) {
-		
-		/* Important Note: in the Swiss Grid, y describes easting and x describes 
-		 * northing, contrary to the usual naming conventions!		 */ 
-		double yNorm = (coord.getX() - 2600000.0) / 1000000.0;
-		double xNorm = (coord.getY() - 1200000.0) / 1000000.0;
+  @Override
+  public Coord transform(Coord coord) {
 
-		double longitude10000Sec = 
-			2.6779094 +
-			4.728982 * yNorm +
-			0.791484 * yNorm * xNorm +
-			0.1306 * yNorm * Math.pow(xNorm, 2) -
-			0.0436 * Math.pow(yNorm, 3);
-		
-		double latitude10000Sec = 
-			16.9023892 +
-			3.238272 * xNorm -
-			0.270978 * Math.pow(yNorm, 2) - 
-			0.002528 * Math.pow(xNorm, 2) -
-			0.0447 * Math.pow(yNorm, 2) * xNorm - 
-			0.0140 * Math.pow(xNorm, 3);
+    /* Important Note: in the Swiss Grid, y describes easting and x describes
+     * northing, contrary to the usual naming conventions!		 */
+    double yNorm = (coord.getX() - 2600000.0) / 1000000.0;
+    double xNorm = (coord.getY() - 1200000.0) / 1000000.0;
 
-		if (coord.hasZ()) {
-			return new Coord(longitude10000Sec * 100.0 / 36.0, latitude10000Sec * 100.0 / 36.0, coord.getZ());
-		}
-		return new Coord(longitude10000Sec * 100.0 / 36.0, latitude10000Sec * 100.0 / 36.0);
-	}
+    double longitude10000Sec =
+        2.6779094
+            + 4.728982 * yNorm
+            + 0.791484 * yNorm * xNorm
+            + 0.1306 * yNorm * Math.pow(xNorm, 2)
+            - 0.0436 * Math.pow(yNorm, 3);
 
+    double latitude10000Sec =
+        16.9023892
+            + 3.238272 * xNorm
+            - 0.270978 * Math.pow(yNorm, 2)
+            - 0.002528 * Math.pow(xNorm, 2)
+            - 0.0447 * Math.pow(yNorm, 2) * xNorm
+            - 0.0140 * Math.pow(xNorm, 3);
+
+    if (coord.hasZ()) {
+      return new Coord(
+          longitude10000Sec * 100.0 / 36.0, latitude10000Sec * 100.0 / 36.0, coord.getZ());
+    }
+    return new Coord(longitude10000Sec * 100.0 / 36.0, latitude10000Sec * 100.0 / 36.0);
+  }
 }

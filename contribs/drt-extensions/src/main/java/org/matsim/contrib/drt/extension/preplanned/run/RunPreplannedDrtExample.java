@@ -24,7 +24,6 @@ import static org.matsim.contrib.drt.extension.preplanned.optimizer.PreplannedDr
 
 import java.net.URL;
 import java.util.Map;
-
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
@@ -39,29 +38,38 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * @author michal.mac
  */
 public class RunPreplannedDrtExample {
-	public static void run(URL configUrl, boolean otfvis, int lastIteration,
-			Map<String, PreplannedSchedules> preplannedSchedulesByMode) {
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
-				new OTFVisConfigGroup());
-		config.controller().setLastIteration(lastIteration);
+  public static void run(
+      URL configUrl,
+      boolean otfvis,
+      int lastIteration,
+      Map<String, PreplannedSchedules> preplannedSchedulesByMode) {
+    Config config =
+        ConfigUtils.loadConfig(
+            configUrl,
+            new MultiModeDrtConfigGroup(),
+            new DvrpConfigGroup(),
+            new OTFVisConfigGroup());
+    config.controller().setLastIteration(lastIteration);
 
-		Controler controler = PreplannedDrtControlerCreator.createControler(config, otfvis);
+    Controler controler = PreplannedDrtControlerCreator.createControler(config, otfvis);
 
-		MultiModeDrtConfigGroup.get(config)
-				.getModalElements()
-				.stream()
-				.map(DrtConfigGroup::getMode)
-				.forEach(mode -> controler.addOverridingQSimModule(new AbstractDvrpModeQSimModule(mode) {
-					@Override
-					protected void configureQSim() {
-						bindModal(PreplannedSchedules.class).toInstance(preplannedSchedulesByMode.get(mode));
-					}
-				}));
+    MultiModeDrtConfigGroup.get(config).getModalElements().stream()
+        .map(DrtConfigGroup::getMode)
+        .forEach(
+            mode ->
+                controler.addOverridingQSimModule(
+                    new AbstractDvrpModeQSimModule(mode) {
+                      @Override
+                      protected void configureQSim() {
+                        bindModal(PreplannedSchedules.class)
+                            .toInstance(preplannedSchedulesByMode.get(mode));
+                      }
+                    }));
 
-		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule());
-		}
+    if (otfvis) {
+      controler.addOverridingModule(new OTFVisLiveModule());
+    }
 
-		controler.run();
-	}
+    controler.run();
+  }
 }

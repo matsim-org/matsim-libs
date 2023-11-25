@@ -23,7 +23,6 @@ package org.matsim.core.population.io;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Stack;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -52,198 +51,197 @@ import org.xml.sax.Attributes;
  * @author mrieser
  * @author balmermi
  */
-/*package*/ class PopulationReaderMatsimV1 extends MatsimXmlParser implements
-		MatsimReader {
+/*package*/ class PopulationReaderMatsimV1 extends MatsimXmlParser implements MatsimReader {
 
-	private final static String PLANS = "plans";
-	private final static String PERSON = "person";
-	private final static String PLAN = "plan";
-	private final static String ACT = "act";
-	private final static String LEG = "leg";
-	private final static String ROUTE = "route";
+  private static final String PLANS = "plans";
+  private static final String PERSON = "person";
+  private static final String PLAN = "plan";
+  private static final String ACT = "act";
+  private static final String LEG = "leg";
+  private static final String ROUTE = "route";
 
-	private final static String ATTR_X100 = "x100";
-	private final static String ATTR_Y100 = "y100";
+  private static final String ATTR_X100 = "x100";
+  private static final String ATTR_Y100 = "y100";
 
-	private final CoordinateTransformation coordinateTransformation;
+  private final CoordinateTransformation coordinateTransformation;
 
-	private final Population plans;
-	private final Network network;
+  private final Population plans;
+  private final Network network;
 
-	private Person currperson = null;
+  private Person currperson = null;
 
-	private Plan currplan = null;
+  private Plan currplan = null;
 
-	private Leg currleg = null;
+  private Leg currleg = null;
 
-	private NetworkRoute currroute = null;
-	private String routeNodes = null;
+  private NetworkRoute currroute = null;
+  private String routeNodes = null;
 
-	private Activity prevAct = null;
+  private Activity prevAct = null;
 
-	public PopulationReaderMatsimV1(final Scenario scenario) {
-		this( new IdentityTransformation() , scenario );
-	}
+  public PopulationReaderMatsimV1(final Scenario scenario) {
+    this(new IdentityTransformation(), scenario);
+  }
 
-	public PopulationReaderMatsimV1(
-			final CoordinateTransformation coordinateTransformation,
-			final Scenario scenario) {
-		super(ValidationType.DTD_ONLY);
-		this.coordinateTransformation = coordinateTransformation;
-		this.plans = scenario.getPopulation();
-		this.network = scenario.getNetwork();
-	}
+  public PopulationReaderMatsimV1(
+      final CoordinateTransformation coordinateTransformation, final Scenario scenario) {
+    super(ValidationType.DTD_ONLY);
+    this.coordinateTransformation = coordinateTransformation;
+    this.plans = scenario.getPopulation();
+    this.network = scenario.getNetwork();
+  }
 
-	@Override
-	public void startTag(final String name, final Attributes atts,
-			final Stack<String> context) {
-		if (PLANS.equals(name)) {
-			startPlans(atts);
-		}
-		else if (PERSON.equals(name)) {
-			startPerson(atts);
-		}
-		else if (PLAN.equals(name)) {
-			startPlan(atts);
-		}
-		else if (ACT.equals(name)) {
-			startAct(atts);
-		}
-		else if (LEG.equals(name)) {
-			startLeg(atts);
-		}
-		else if (ROUTE.equals(name)) {
-			startRoute(atts);
-		}
-		else {
-			throw new RuntimeException(this + "[tag=" + name + " not known or not supported]");
-		}
-	}
+  @Override
+  public void startTag(final String name, final Attributes atts, final Stack<String> context) {
+    if (PLANS.equals(name)) {
+      startPlans(atts);
+    } else if (PERSON.equals(name)) {
+      startPerson(atts);
+    } else if (PLAN.equals(name)) {
+      startPlan(atts);
+    } else if (ACT.equals(name)) {
+      startAct(atts);
+    } else if (LEG.equals(name)) {
+      startLeg(atts);
+    } else if (ROUTE.equals(name)) {
+      startRoute(atts);
+    } else {
+      throw new RuntimeException(this + "[tag=" + name + " not known or not supported]");
+    }
+  }
 
-	@Override
-	public void endTag(final String name, final String content,
-			final Stack<String> context) {
-		if (PERSON.equals(name)) {
-			this.plans.addPerson(this.currperson);
-			this.currperson = null;
-		}
-		else if (PLAN.equals(name)) {
-			if (this.currplan.getPlanElements() instanceof ArrayList) {
-				((ArrayList<?>) this.currplan.getPlanElements()).trimToSize();
-			}
-			this.currplan = null;
-		}
-		else if (LEG.equals(name)) {
-			this.currleg = null;
-		}
-		else if (ROUTE.equals(name)) {
-			this.routeNodes = content;
-		}
-	}
+  @Override
+  public void endTag(final String name, final String content, final Stack<String> context) {
+    if (PERSON.equals(name)) {
+      this.plans.addPerson(this.currperson);
+      this.currperson = null;
+    } else if (PLAN.equals(name)) {
+      if (this.currplan.getPlanElements() instanceof ArrayList) {
+        ((ArrayList<?>) this.currplan.getPlanElements()).trimToSize();
+      }
+      this.currplan = null;
+    } else if (LEG.equals(name)) {
+      this.currleg = null;
+    } else if (ROUTE.equals(name)) {
+      this.routeNodes = content;
+    }
+  }
 
-	private void startPlans(final Attributes atts) {
-		this.plans.setName(atts.getValue("name"));
-	}
+  private void startPlans(final Attributes atts) {
+    this.plans.setName(atts.getValue("name"));
+  }
 
-	private void startPerson(final Attributes atts) {
-		this.currperson = PopulationUtils.getFactory().createPerson(Id.create(atts.getValue("id"), Person.class));
-		PersonUtils.setSex(this.currperson, atts.getValue("sex"));
+  private void startPerson(final Attributes atts) {
+    this.currperson =
+        PopulationUtils.getFactory().createPerson(Id.create(atts.getValue("id"), Person.class));
+    PersonUtils.setSex(this.currperson, atts.getValue("sex"));
 
-		PersonUtils.setAge(this.currperson, Integer.parseInt(atts.getValue("age")));
+    PersonUtils.setAge(this.currperson, Integer.parseInt(atts.getValue("age")));
 
-		PersonUtils.setLicence(this.currperson, atts.getValue("license"));
-		PersonUtils.setCarAvail(this.currperson, atts.getValue("car_avail"));
-		String employed = atts.getValue("employed");
-		if (employed == null) {
-			PersonUtils.setEmployed(this.currperson, null);
-		} else {
-			PersonUtils.setEmployed(this.currperson, "yes".equals(employed));
-		}
-	}
+    PersonUtils.setLicence(this.currperson, atts.getValue("license"));
+    PersonUtils.setCarAvail(this.currperson, atts.getValue("car_avail"));
+    String employed = atts.getValue("employed");
+    if (employed == null) {
+      PersonUtils.setEmployed(this.currperson, null);
+    } else {
+      PersonUtils.setEmployed(this.currperson, "yes".equals(employed));
+    }
+  }
 
-	private void startPlan(final Attributes atts) {
-		String sel = atts.getValue("selected");
-		boolean selected;
-		if (sel.equals("yes")) {
-			selected = true;
-		}
-		else if (sel.equals("no")) {
-			selected = false;
-		}
-		else {
-			throw new NumberFormatException(
-					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
-		}
-		this.currplan = PersonUtils.createAndAddPlan(this.currperson, selected);
-		this.routeNodes = null;
+  private void startPlan(final Attributes atts) {
+    String sel = atts.getValue("selected");
+    boolean selected;
+    if (sel.equals("yes")) {
+      selected = true;
+    } else if (sel.equals("no")) {
+      selected = false;
+    } else {
+      throw new NumberFormatException(
+          "Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
+    }
+    this.currplan = PersonUtils.createAndAddPlan(this.currperson, selected);
+    this.routeNodes = null;
 
-		String scoreString = atts.getValue("score");
-		if (scoreString != null) {
-			double score = Double.parseDouble(scoreString);
-			this.currplan.setScore(score);
-		}
+    String scoreString = atts.getValue("score");
+    if (scoreString != null) {
+      double score = Double.parseDouble(scoreString);
+      this.currplan.setScore(score);
+    }
+  }
 
-	}
+  private void startAct(final Attributes atts) {
+    Activity act = null;
+    if (atts.getValue("link") != null) {
+      final Id<Link> linkId = Id.create(atts.getValue("link"), Link.class);
+      act =
+          PopulationUtils.createAndAddActivityFromLinkId(
+              this.currplan, atts.getValue("type"), linkId);
+      if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
+        final Coord coord = parseCoord(atts);
+        act.setCoord(coord);
+      }
+    } else if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
+      final Coord coord = parseCoord(atts);
+      act =
+          PopulationUtils.createAndAddActivityFromCoord(
+              this.currplan, atts.getValue("type"), coord);
+    } else {
+      throw new IllegalArgumentException(
+          "Either the coords or the link must be specified for an Act.");
+    }
+    Time.parseOptionalTime(atts.getValue("start_time"))
+        .ifDefinedOrElse(act::setStartTime, act::setStartTimeUndefined);
+    Time.parseOptionalTime(atts.getValue("dur"))
+        .ifDefinedOrElse(act::setMaximumDuration, act::setMaximumDurationUndefined);
+    Time.parseOptionalTime(atts.getValue("end_time"))
+        .ifDefinedOrElse(act::setEndTime, act::setEndTimeUndefined);
 
-	private void startAct(final Attributes atts) {
-		Activity act = null;
-		if (atts.getValue("link") != null) {
-			final Id<Link> linkId = Id.create(atts.getValue("link"), Link.class);
-			act = PopulationUtils.createAndAddActivityFromLinkId(this.currplan, atts.getValue("type"), linkId);
-			if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
-				final Coord coord = parseCoord( atts );
-				act.setCoord(coord);
-			}
-		} else if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
-			final Coord coord = parseCoord( atts );
-			act = PopulationUtils.createAndAddActivityFromCoord(this.currplan, atts.getValue("type"), coord);
-		} else {
-			throw new IllegalArgumentException("Either the coords or the link must be specified for an Act.");
-		}
-		Time.parseOptionalTime(atts.getValue("start_time"))
-				.ifDefinedOrElse(act::setStartTime, act::setStartTimeUndefined);
-		Time.parseOptionalTime(atts.getValue("dur"))
-				.ifDefinedOrElse(act::setMaximumDuration, act::setMaximumDurationUndefined);
-		Time.parseOptionalTime(atts.getValue("end_time"))
-				.ifDefinedOrElse(act::setEndTime, act::setEndTimeUndefined);
+    if (this.routeNodes != null) {
+      this.currroute.setLinkIds(
+          this.prevAct.getLinkId(),
+          NetworkUtils.getLinkIds(
+              RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, this.routeNodes))),
+          act.getLinkId());
+      this.routeNodes = null;
+      this.currroute = null;
+    }
+    this.prevAct = act;
+  }
 
+  private Coord parseCoord(Attributes atts) {
+    return coordinateTransformation.transform(
+        new Coord(
+            Double.parseDouble(atts.getValue(ATTR_X100)),
+            Double.parseDouble(atts.getValue(ATTR_Y100))));
+  }
 
-		if (this.routeNodes != null) {
-			this.currroute.setLinkIds(this.prevAct.getLinkId(), NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, this.routeNodes))), act.getLinkId());
-			this.routeNodes = null;
-			this.currroute = null;
-		}
-		this.prevAct = act;
-	}
+  private void startLeg(final Attributes atts) {
+    this.currleg =
+        PopulationUtils.createAndAddLeg(
+            this.currplan, atts.getValue("mode").toLowerCase(Locale.ROOT).intern());
+    Time.parseOptionalTime(atts.getValue("dep_time"))
+        .ifDefinedOrElse(currleg::setDepartureTime, currleg::setDepartureTimeUndefined);
+    Time.parseOptionalTime(atts.getValue("trav_time"))
+        .ifDefinedOrElse(currleg::setTravelTime, currleg::setTravelTimeUndefined);
+    //		LegImpl r = this.currleg;
+    //		r.setTravelTime( Time.parseTime(atts.getValue("arr_time")) - r.getDepartureTime() );
+    // arrival time is in dtd, but no longer evaluated in code (according to not being in API).
+    // kai, jun'16
+  }
 
-	private Coord parseCoord(Attributes atts) {
-		return coordinateTransformation.transform(
-				new Coord(
-						Double.parseDouble(atts.getValue( ATTR_X100 )),
-						Double.parseDouble(atts.getValue( ATTR_Y100 )) ) );
-	}
-
-	private void startLeg(final Attributes atts) {
-		this.currleg = PopulationUtils.createAndAddLeg( this.currplan, atts.getValue("mode").toLowerCase(Locale.ROOT).intern() );
-		Time.parseOptionalTime(atts.getValue("dep_time"))
-				.ifDefinedOrElse(currleg::setDepartureTime, currleg::setDepartureTimeUndefined);
-		Time.parseOptionalTime(atts.getValue("trav_time"))
-				.ifDefinedOrElse(currleg::setTravelTime, currleg::setTravelTimeUndefined);
-//		LegImpl r = this.currleg;
-//		r.setTravelTime( Time.parseTime(atts.getValue("arr_time")) - r.getDepartureTime() );
-		// arrival time is in dtd, but no longer evaluated in code (according to not being in API).  kai, jun'16
-	}
-
-	private void startRoute(final Attributes atts) {
-		this.currroute = this.plans.getFactory().getRouteFactories().createRoute(NetworkRoute.class, this.prevAct.getLinkId(), this.prevAct.getLinkId());
-		this.currleg.setRoute(this.currroute);
-		if (atts.getValue("dist") != null) {
-			this.currroute.setDistance(Double.parseDouble(atts.getValue("dist")));
-		}
-		if (atts.getValue("trav_time") != null) {
-			Time.parseOptionalTime(atts.getValue("trav_time"))
-					.ifDefinedOrElse(currroute::setTravelTime, currroute::setTravelTimeUndefined);
-		}
-	}
-
+  private void startRoute(final Attributes atts) {
+    this.currroute =
+        this.plans
+            .getFactory()
+            .getRouteFactories()
+            .createRoute(NetworkRoute.class, this.prevAct.getLinkId(), this.prevAct.getLinkId());
+    this.currleg.setRoute(this.currroute);
+    if (atts.getValue("dist") != null) {
+      this.currroute.setDistance(Double.parseDouble(atts.getValue("dist")));
+    }
+    if (atts.getValue("trav_time") != null) {
+      Time.parseOptionalTime(atts.getValue("trav_time"))
+          .ifDefinedOrElse(currroute::setTravelTime, currroute::setTravelTimeUndefined);
+    }
+  }
 }

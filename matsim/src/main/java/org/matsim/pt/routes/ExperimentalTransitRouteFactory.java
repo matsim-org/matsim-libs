@@ -28,14 +28,13 @@ import org.matsim.core.population.routes.RouteFactory;
 @Deprecated
 public class ExperimentalTransitRouteFactory implements RouteFactory {
 
-	@Override
-	public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
-		return new ExperimentalTransitRoute(startLinkId, endLinkId);
-	}
+  @Override
+  public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
+    return new ExperimentalTransitRoute(startLinkId, endLinkId);
+  }
 
-	@Override
-	public String getCreatedRouteType() {
-		return ExperimentalTransitRoute.ROUTE_TYPE;
-	}
-
+  @Override
+  public String getCreatedRouteType() {
+    return ExperimentalTransitRoute.ROUTE_TYPE;
+  }
 }

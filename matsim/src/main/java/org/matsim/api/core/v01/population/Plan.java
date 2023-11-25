@@ -21,7 +21,6 @@
 package org.matsim.api.core.v01.population;
 
 import java.util.List;
-
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
@@ -29,50 +28,44 @@ import org.matsim.core.api.internal.MatsimPopulationObject;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
- * A plan contains the intention of an agent.  In consequence, all information is <i>expected</i>.  For example,
- * travel times and travel distances in routes are expected.  Even something like mode could be expected, if the
- * plan is fed into a mobsim that is within-day replanning capable at the mode level.
- * <p></p>
- * The only thing which is not "expected" in the same sense is the score.
+ * A plan contains the intention of an agent. In consequence, all information is <i>expected</i>.
+ * For example, travel times and travel distances in routes are expected. Even something like mode
+ * could be expected, if the plan is fed into a mobsim that is within-day replanning capable at the
+ * mode level.
  *
+ * <p>The only thing which is not "expected" in the same sense is the score.
  */
-public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan, Attributable, Identifiable<Plan> {
-	
-	public abstract List<PlanElement> getPlanElements();
+public interface Plan
+    extends MatsimPopulationObject, Customizable, BasicPlan, Attributable, Identifiable<Plan> {
 
-	public abstract void addLeg(final Leg leg);
+  public abstract List<PlanElement> getPlanElements();
 
-	public abstract void addActivity(final Activity act);
+  public abstract void addLeg(final Leg leg);
 
+  public abstract void addActivity(final Activity act);
 
-	/**
-	 * Plan type, which may be used to ensure there is at least one plan of a certain type.
-	 */
-	public abstract String getType();
+  /** Plan type, which may be used to ensure there is at least one plan of a certain type. */
+  public abstract String getType();
 
-	public abstract void setType(final String type);
-	
-	public abstract void setPlanId(Id<Plan> planId);
-	
-	public abstract Id<Plan> getId();
-	
-	public abstract int getIterationCreated();
-	
-	public abstract void setIterationCreated(int iteration);
-	
-	public abstract String getPlanMutator();
-	
-	public abstract void setPlanMutator(String planMutator);
+  public abstract void setType(final String type);
 
-	public abstract Person getPerson();
+  public abstract void setPlanId(Id<Plan> planId);
 
-	/**
-	 * Sets the reference to the person.
-	 * This is done automatically if using Person.addPlan(). Make
-	 * sure that the bidirectional reference is set correctly if
-	 * you are using this method!.
-	 */
-	public abstract void setPerson(Person person);
-	
+  public abstract Id<Plan> getId();
 
+  public abstract int getIterationCreated();
+
+  public abstract void setIterationCreated(int iteration);
+
+  public abstract String getPlanMutator();
+
+  public abstract void setPlanMutator(String planMutator);
+
+  public abstract Person getPerson();
+
+  /**
+   * Sets the reference to the person. This is done automatically if using Person.addPlan(). Make
+   * sure that the bidirectional reference is set correctly if you are using this method!.
+   */
+  public abstract void setPerson(Person person);
 }

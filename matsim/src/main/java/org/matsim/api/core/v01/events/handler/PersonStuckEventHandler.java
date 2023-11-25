@@ -24,5 +24,5 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.core.events.handler.EventHandler;
 
 public interface PersonStuckEventHandler extends EventHandler {
-	public void handleEvent (PersonStuckEvent event);
+  public void handleEvent(PersonStuckEvent event);
 }

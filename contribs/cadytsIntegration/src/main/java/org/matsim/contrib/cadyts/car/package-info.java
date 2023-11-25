@@ -15,7 +15,6 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** *//**
- * Cadyts infrastructure for car plan calibration based on link traffic counts.
- */
+ * *********************************************************************** */
+/** Cadyts infrastructure for car plan calibration based on link traffic counts. */
 package org.matsim.contrib.cadyts.car;

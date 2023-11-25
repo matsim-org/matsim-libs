@@ -19,7 +19,6 @@
 package org.matsim.contrib.parking.parkingchoice.PC2.simulation;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
@@ -27,48 +26,47 @@ import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PC2Parking;
 
 public class ParkingDepartureEvent extends Event {
 
-	private Id parkingId;
-	public final static String ATTRIBUTE_PARKING_ID = "parkingId";
-	public final static String ATTRIBUTE_PERSON_ID = "personId";
-	public final static String EVENT_TYPE = "parkingDepartureEvent";
-	private Id personId;
+  private Id parkingId;
+  public static final String ATTRIBUTE_PARKING_ID = "parkingId";
+  public static final String ATTRIBUTE_PERSON_ID = "personId";
+  public static final String EVENT_TYPE = "parkingDepartureEvent";
+  private Id personId;
 
-	public ParkingDepartureEvent(double time, Id parkingId, Id personId) {
-		super(time);
+  public ParkingDepartureEvent(double time, Id parkingId, Id personId) {
+    super(time);
 
-		this.parkingId = parkingId;
-		this.personId = personId;
-	}
+    this.parkingId = parkingId;
+    this.personId = personId;
+  }
 
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
+  @Override
+  public String getEventType() {
+    return EVENT_TYPE;
+  }
 
-	@Override
-	public Map<String, String> getAttributes() {
-		final Map<String, String> attributes = super.getAttributes();
-		attributes.put(ATTRIBUTE_PARKING_ID, parkingId.toString());
-		attributes.put(ATTRIBUTE_PERSON_ID, personId!=null?personId.toString():null);
-		return attributes;
-	}
+  @Override
+  public Map<String, String> getAttributes() {
+    final Map<String, String> attributes = super.getAttributes();
+    attributes.put(ATTRIBUTE_PARKING_ID, parkingId.toString());
+    attributes.put(ATTRIBUTE_PERSON_ID, personId != null ? personId.toString() : null);
+    return attributes;
+  }
 
-	public static Id<Person> getPersonId(Map<String, String> attributes){
-		String personIdString = attributes.get(ParkingDepartureEvent.ATTRIBUTE_PERSON_ID);
-		if (personIdString==null){
-			return null;
-		} else {
-			return Id.create(personIdString, Person.class);
-		}
-	}
+  public static Id<Person> getPersonId(Map<String, String> attributes) {
+    String personIdString = attributes.get(ParkingDepartureEvent.ATTRIBUTE_PERSON_ID);
+    if (personIdString == null) {
+      return null;
+    } else {
+      return Id.create(personIdString, Person.class);
+    }
+  }
 
-	public static Id<PC2Parking> getParkingId(Map<String, String> attributes){
-		String parkingIdString = attributes.get(ParkingDepartureEvent.ATTRIBUTE_PARKING_ID);
-		if (parkingIdString==null){
-			return null;
-		} else {
-			return Id.create(parkingIdString, PC2Parking.class);
-		}
-	}
-
+  public static Id<PC2Parking> getParkingId(Map<String, String> attributes) {
+    String parkingIdString = attributes.get(ParkingDepartureEvent.ATTRIBUTE_PARKING_ID);
+    if (parkingIdString == null) {
+      return null;
+    } else {
+      return Id.create(parkingIdString, PC2Parking.class);
+    }
+  }
 }

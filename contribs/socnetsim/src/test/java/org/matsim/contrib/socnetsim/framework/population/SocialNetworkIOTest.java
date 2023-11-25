@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,102 +38,81 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author thibautd
  */
 public class SocialNetworkIOTest {
-	@Rule
-	public final MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testReinputReflective() {
-		testReinput( true );
-	}
+  @Test
+  public void testReinputReflective() {
+    testReinput(true);
+  }
 
-	@Test
-	public void testReinputNonReflective() {
-		testReinput( false );
-	}
+  @Test
+  public void testReinputNonReflective() {
+    testReinput(false);
+  }
 
-	private void testReinput(final boolean isReflective) {
-		final SocialNetwork output = generateRandomSocialNetwork( isReflective );
-		final String path = utils.getOutputDirectory()+"/sn.xml";
+  private void testReinput(final boolean isReflective) {
+    final SocialNetwork output = generateRandomSocialNetwork(isReflective);
+    final String path = utils.getOutputDirectory() + "/sn.xml";
 
-		new SocialNetworkWriter( output ).write( path );
+    new SocialNetworkWriter(output).write(path);
 
-		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new SocialNetworkReader( sc ).readFile( path );
+    final Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    new SocialNetworkReader(sc).readFile(path);
 
-		final SocialNetwork input = (SocialNetwork)
-			sc.getScenarioElement( SocialNetwork.ELEMENT_NAME );
+    final SocialNetwork input = (SocialNetwork) sc.getScenarioElement(SocialNetwork.ELEMENT_NAME);
 
-		Assert.assertEquals(
-				"unexpected reflectiveness",
-				output.isReflective(),
-				input.isReflective() );
+    Assert.assertEquals("unexpected reflectiveness", output.isReflective(), input.isReflective());
 
-		Assert.assertEquals(
-				"unexpected number of egos",
-				output.getEgos().size(),
-				input.getEgos().size() );
+    Assert.assertEquals(
+        "unexpected number of egos", output.getEgos().size(), input.getEgos().size());
 
-		Assert.assertEquals(
-				"different ego ids",
-				output.getEgos(),
-				input.getEgos() );
+    Assert.assertEquals("different ego ids", output.getEgos(), input.getEgos());
 
-		final Counter c = new Counter( "Test alters of ego # " );
-		for ( Id ego : output.getEgos() ) {
-			c.incCounter();
-			final Set<Id<Person>> expectedAlters = output.getAlters( ego );
-			final Set<Id<Person>> actualAlters = input.getAlters( ego );
+    final Counter c = new Counter("Test alters of ego # ");
+    for (Id ego : output.getEgos()) {
+      c.incCounter();
+      final Set<Id<Person>> expectedAlters = output.getAlters(ego);
+      final Set<Id<Person>> actualAlters = input.getAlters(ego);
 
-			Assert.assertEquals(
-					"unexpected number of alters for ego "+ego,
-					expectedAlters.size(),
-					actualAlters.size() );
+      Assert.assertEquals(
+          "unexpected number of alters for ego " + ego, expectedAlters.size(), actualAlters.size());
 
-			Assert.assertEquals(
-					"unexpected alters for ego "+ego,
-					expectedAlters,
-					actualAlters );
-		}
+      Assert.assertEquals("unexpected alters for ego " + ego, expectedAlters, actualAlters);
+    }
 
-		Assert.assertEquals(
-				"different metadata",
-				output.getMetadata(),
-				input.getMetadata() );
+    Assert.assertEquals("different metadata", output.getMetadata(), input.getMetadata());
 
-		c.printCounter();
-	}
+    c.printCounter();
+  }
 
-	private SocialNetwork generateRandomSocialNetwork(final boolean isReflective) {
-		final SocialNetwork sn = new SocialNetworkImpl( isReflective );
+  private SocialNetwork generateRandomSocialNetwork(final boolean isReflective) {
+    final SocialNetwork sn = new SocialNetworkImpl(isReflective);
 
-		final int nEgos = 500;
-		final List<Id> ids = new ArrayList<Id>( nEgos );
+    final int nEgos = 500;
+    final List<Id> ids = new ArrayList<Id>(nEgos);
 
-		for ( int i=0; i < nEgos; i++ ) {
-			final Id<Person> id = Id.create( i , Person.class );
-			sn.addEgo( id );
-			ids.add( id );
-		}
+    for (int i = 0; i < nEgos; i++) {
+      final Id<Person> id = Id.create(i, Person.class);
+      sn.addEgo(id);
+      ids.add(id);
+    }
 
-		final Random random = new Random( 20140114 );
-		for ( Id ego : ids ) {
-			final int nAlters = random.nextInt( nEgos );
-			final List<Id> remainingPossibleAlters = new ArrayList<Id>( ids );
-			remainingPossibleAlters.remove( ego );
+    final Random random = new Random(20140114);
+    for (Id ego : ids) {
+      final int nAlters = random.nextInt(nEgos);
+      final List<Id> remainingPossibleAlters = new ArrayList<Id>(ids);
+      remainingPossibleAlters.remove(ego);
 
-			for ( int i=0; i < nAlters; i++ ) {
-				final Id alter =
-					remainingPossibleAlters.remove(
-							random.nextInt(
-								remainingPossibleAlters.size() ) );
-				if ( isReflective ) sn.addBidirectionalTie( ego , alter );
-				else sn.addMonodirectionalTie( ego , alter );
-			}
-		}
+      for (int i = 0; i < nAlters; i++) {
+        final Id alter =
+            remainingPossibleAlters.remove(random.nextInt(remainingPossibleAlters.size()));
+        if (isReflective) sn.addBidirectionalTie(ego, alter);
+        else sn.addMonodirectionalTie(ego, alter);
+      }
+    }
 
-		sn.addMetadata( "some attribute" , "some value" );
-		sn.addMetadata( "some other attribute" , "some other value" );
-		return sn;
-	}
+    sn.addMetadata("some attribute", "some value");
+    sn.addMetadata("some other attribute", "some other value");
+    return sn;
+  }
 }
-

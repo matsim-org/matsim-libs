@@ -20,7 +20,6 @@
 package org.matsim.core.mobsim.jdeqsim.scenarios;
 
 import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -30,14 +29,13 @@ import org.matsim.api.core.v01.population.Population;
 
 public class EquilPopulationPlans1Modified1 {
 
-	public void modifyPopulation(Population population) {
-		// modify population: a plan was needed, which contained some properties to be compared with C++
-		Person p = population.getPersons().get(Id.create("1", Person.class));
-		Plan plan = p.getSelectedPlan();
-		List<? extends PlanElement> actsLegs = plan.getPlanElements();
-		((Activity)actsLegs.get(0)).setEndTime(360);
-		((Activity)actsLegs.get(2)).setEndTime(900); // this requires immediate departure after arrival
-		((Activity)actsLegs.get(4)).setEndTime(2000);
-	}
-
+  public void modifyPopulation(Population population) {
+    // modify population: a plan was needed, which contained some properties to be compared with C++
+    Person p = population.getPersons().get(Id.create("1", Person.class));
+    Plan plan = p.getSelectedPlan();
+    List<? extends PlanElement> actsLegs = plan.getPlanElements();
+    ((Activity) actsLegs.get(0)).setEndTime(360);
+    ((Activity) actsLegs.get(2)).setEndTime(900); // this requires immediate departure after arrival
+    ((Activity) actsLegs.get(4)).setEndTime(2000);
+  }
 }

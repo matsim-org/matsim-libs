@@ -18,34 +18,37 @@
  * *********************************************************************** */
 
 package org.matsim.contrib.ev.discharging;
+
 /*
  * created by jbischoff, 11.10.2018
  */
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.vehicles.VehicleType;
 
-public final class VehicleTypeSpecificDriveEnergyConsumptionFactory implements DriveEnergyConsumption.Factory {
+public final class VehicleTypeSpecificDriveEnergyConsumptionFactory
+    implements DriveEnergyConsumption.Factory {
 
-	private final Map<Id<VehicleType>, DriveEnergyConsumption.Factory> consumptionMap = new HashMap<>();
+  private final Map<Id<VehicleType>, DriveEnergyConsumption.Factory> consumptionMap =
+      new HashMap<>();
 
-	public void addEnergyConsumptionModelFactory(Id<VehicleType> vehicleTypeId,
-			DriveEnergyConsumption.Factory driveEnergyConsumption) {
-		consumptionMap.put(vehicleTypeId, driveEnergyConsumption);
-	}
+  public void addEnergyConsumptionModelFactory(
+      Id<VehicleType> vehicleTypeId, DriveEnergyConsumption.Factory driveEnergyConsumption) {
+    consumptionMap.put(vehicleTypeId, driveEnergyConsumption);
+  }
 
-	@Override
-	public DriveEnergyConsumption create(ElectricVehicle electricVehicle) {
-		var vehicleType = electricVehicle.getVehicleSpecification().getMatsimVehicle().getType().getId();
-		DriveEnergyConsumption c = consumptionMap.get(vehicleType).create(electricVehicle);
-		if (c == null) {
-			throw new RuntimeException(
-					"No EnergyConsumptionModel for VehicleType " + vehicleType + " has been defined.");
-		}
-		return c;
-	}
+  @Override
+  public DriveEnergyConsumption create(ElectricVehicle electricVehicle) {
+    var vehicleType =
+        electricVehicle.getVehicleSpecification().getMatsimVehicle().getType().getId();
+    DriveEnergyConsumption c = consumptionMap.get(vehicleType).create(electricVehicle);
+    if (c == null) {
+      throw new RuntimeException(
+          "No EnergyConsumptionModel for VehicleType " + vehicleType + " has been defined.");
+    }
+    return c;
+  }
 }

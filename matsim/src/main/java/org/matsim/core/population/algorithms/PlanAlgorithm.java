@@ -23,5 +23,5 @@ package org.matsim.core.population.algorithms;
 import org.matsim.api.core.v01.population.Plan;
 
 public interface PlanAlgorithm {
-	public abstract void run(Plan plan);
+  public abstract void run(Plan plan);
 }

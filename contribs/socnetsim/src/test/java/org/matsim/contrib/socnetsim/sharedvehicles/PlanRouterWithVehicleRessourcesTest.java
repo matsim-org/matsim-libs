@@ -24,7 +24,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -55,85 +54,91 @@ import org.matsim.vehicles.Vehicle;
  */
 public class PlanRouterWithVehicleRessourcesTest {
 
-	@Test
-	public void testVehicleIdsAreKeptIfSomething() throws Exception {
-		final Config config = ConfigUtils.createConfig();
-		final PopulationFactory factory = ScenarioUtils.createScenario(config).getPopulation().getFactory();
+  @Test
+  public void testVehicleIdsAreKeptIfSomething() throws Exception {
+    final Config config = ConfigUtils.createConfig();
+    final PopulationFactory factory =
+        ScenarioUtils.createScenario(config).getPopulation().getFactory();
 
-		final Id<Link> linkId = Id.create( "the_link" , Link.class );
-		final Id<Person> personId = Id.create( "somebody" , Person.class );
-		final Id<Vehicle> vehicleId = Id.create( "stolen_car" , Vehicle.class );
-		final Person person = factory.createPerson( personId );
-		final Plan plan = factory.createPlan();
-		person.addPlan( plan );
-		plan.setPerson( person );
+    final Id<Link> linkId = Id.create("the_link", Link.class);
+    final Id<Person> personId = Id.create("somebody", Person.class);
+    final Id<Vehicle> vehicleId = Id.create("stolen_car", Vehicle.class);
+    final Person person = factory.createPerson(personId);
+    final Plan plan = factory.createPlan();
+    person.addPlan(plan);
+    plan.setPerson(person);
 
-		final Activity firstAct = factory.createActivityFromLinkId( "h" , linkId );
-		plan.addActivity( firstAct );
-		firstAct.setEndTime( 223 );
+    final Activity firstAct = factory.createActivityFromLinkId("h", linkId);
+    plan.addActivity(firstAct);
+    firstAct.setEndTime(223);
 
-		final Leg leg = factory.createLeg( TransportMode.car );
-		leg.setTravelTime(0.0);
-		TripStructureUtils.setRoutingMode( leg, leg.getMode() );
-		plan.addLeg( leg );
-		final NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(linkId, Collections.<Id<Link>>emptyList(), linkId);
-		route.setVehicleId( vehicleId );
-		leg.setRoute( route );
+    final Leg leg = factory.createLeg(TransportMode.car);
+    leg.setTravelTime(0.0);
+    TripStructureUtils.setRoutingMode(leg, leg.getMode());
+    plan.addLeg(leg);
+    final NetworkRoute route =
+        RouteUtils.createLinkNetworkRouteImpl(linkId, Collections.<Id<Link>>emptyList(), linkId);
+    route.setVehicleId(vehicleId);
+    leg.setRoute(route);
 
-		plan.addActivity( factory.createActivityFromLinkId( "h" , linkId ) );
+    plan.addActivity(factory.createActivityFromLinkId("h", linkId));
 
-		final TripRouter tripRouter = createTripRouter( factory, config);
+    final TripRouter tripRouter = createTripRouter(factory, config);
 
-		final PlanRouterWithVehicleRessources router =
-			new PlanRouterWithVehicleRessources(
-				new PlanRouter( tripRouter, TimeInterpretation.create(config) ) );
+    final PlanRouterWithVehicleRessources router =
+        new PlanRouterWithVehicleRessources(
+            new PlanRouter(tripRouter, TimeInterpretation.create(config)));
 
-		router.run( plan );
+    router.run(plan);
 
-		for ( Trip trip : TripStructureUtils.getTrips( plan ) ) {
-			for (Leg l : trip.getLegsOnly()) {
-				assertEquals(
-					"unexpected vehicle id",
-					vehicleId,
-					((NetworkRoute) l.getRoute()).getVehicleId());
-			}
-		}
-	}
+    for (Trip trip : TripStructureUtils.getTrips(plan)) {
+      for (Leg l : trip.getLegsOnly()) {
+        assertEquals(
+            "unexpected vehicle id", vehicleId, ((NetworkRoute) l.getRoute()).getVehicleId());
+      }
+    }
+  }
 
-	private static TripRouter createTripRouter(final PopulationFactory factory, Config config) {
-		// create some stages to check the behavior with that
-		final String stage = "realize that actually, you did't forget to close the window, and go again interaction";
-		final TripRouter.Builder builder = new TripRouter.Builder(config) ;
-		builder.setRoutingModule(
-				TransportMode.car,
-				new RoutingModule() {
-					@Override
-					public List<? extends PlanElement> calcRoute(RoutingRequest request) {
-						final Facility fromFacility = request.getFromFacility();
-						final Facility toFacility = request.getToFacility();
-						
-						final List<PlanElement> legs = new ArrayList<PlanElement>();
+  private static TripRouter createTripRouter(final PopulationFactory factory, Config config) {
+    // create some stages to check the behavior with that
+    final String stage =
+        "realize that actually, you did't forget to close the window, and go again interaction";
+    final TripRouter.Builder builder = new TripRouter.Builder(config);
+    builder.setRoutingModule(
+        TransportMode.car,
+        new RoutingModule() {
+          @Override
+          public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+            final Facility fromFacility = request.getFromFacility();
+            final Facility toFacility = request.getToFacility();
 
-						for (int i=0; i < 5; i++) {
-							final Leg l = factory.createLeg( TransportMode.car );	
-							l.setTravelTime(0.0);
-							l.setRoute( RouteUtils.createLinkNetworkRouteImpl(fromFacility.getLinkId(), Collections.<Id<Link>>emptyList(),
-									fromFacility.getLinkId()) );
-							legs.add( l );
-							legs.add( factory.createActivityFromLinkId( stage , fromFacility.getLinkId() ) );
-							((Activity) legs.get(legs.size() - 1)).setMaximumDuration(0.0);
-						}
+            final List<PlanElement> legs = new ArrayList<PlanElement>();
 
-						final Leg l = factory.createLeg( TransportMode.car );	
-						l.setTravelTime(0.0);
-						l.setRoute( RouteUtils.createLinkNetworkRouteImpl(fromFacility.getLinkId(), Collections.<Id<Link>>emptyList(), toFacility.getLinkId()) );
-						legs.add( l );
+            for (int i = 0; i < 5; i++) {
+              final Leg l = factory.createLeg(TransportMode.car);
+              l.setTravelTime(0.0);
+              l.setRoute(
+                  RouteUtils.createLinkNetworkRouteImpl(
+                      fromFacility.getLinkId(),
+                      Collections.<Id<Link>>emptyList(),
+                      fromFacility.getLinkId()));
+              legs.add(l);
+              legs.add(factory.createActivityFromLinkId(stage, fromFacility.getLinkId()));
+              ((Activity) legs.get(legs.size() - 1)).setMaximumDuration(0.0);
+            }
 
-						return legs ;
-					}
+            final Leg l = factory.createLeg(TransportMode.car);
+            l.setTravelTime(0.0);
+            l.setRoute(
+                RouteUtils.createLinkNetworkRouteImpl(
+                    fromFacility.getLinkId(),
+                    Collections.<Id<Link>>emptyList(),
+                    toFacility.getLinkId()));
+            legs.add(l);
 
-				});
-		return builder.build() ;
-	}
+            return legs;
+          }
+        });
+    return builder.build();
+  }
 }
-

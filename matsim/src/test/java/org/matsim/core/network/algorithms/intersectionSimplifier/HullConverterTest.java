@@ -29,94 +29,73 @@ import org.locationtech.jts.geom.Polygon;
 
 public class HullConverterTest {
 
-	public void testConvert() {
+  public void testConvert() {}
 
-	}	
+  /** 4 3 (5,0)-------(5,5) | | | | | | | | (0,0)-------(5,0) 1 2 */
+  @Test
+  public void testConvertString() {
+    /* Must pass a Geometry. */
+    Object o = new Integer(0);
+    HullConverter hc = new HullConverter();
+    String s = hc.convertToString(o);
+    Assert.assertTrue("Should receive empty string", s.isEmpty());
 
-	/**
-	 * 	   4           3
-	 *   (5,0)-------(5,5)
-	 *     |           |
-	 *     |           |
-	 *     |           |
-	 *     |           |
-	 *   (0,0)-------(5,0)
-	 *     1           2
-	 */
-	@Test
-	public void testConvertString(){
-		/* Must pass a Geometry. */
-		Object o = new Integer(0);
-		HullConverter hc = new HullConverter();
-		String s = hc.convertToString(o);
-		Assert.assertTrue("Should receive empty string", s.isEmpty());
-		
-		/* Check String. */
-		GeometryFactory gf = new GeometryFactory();
-		Coordinate[] ca = new Coordinate[5];
-		ca[0] = new Coordinate(0.0, 0.0);
-		ca[1] = new Coordinate(5.0, 0.0);
-		ca[2] = new Coordinate(5.0, 5.0);
-		ca[3] = new Coordinate(0.0, 5.0);
-		ca[4] = ca[0];
-		
-		/* Point */
-		Point point = gf.createPoint(ca[0]);
-		s = hc.convertToString(point);
-		String pointString = "(0.0;0.0)";
-		Assert.assertTrue("Wrong string for point.", pointString.equalsIgnoreCase(s));
-		
-		/* Line */
-		Coordinate[] ca2 = new Coordinate[2];
-		ca2[0] = ca[0];
-		ca2[1] = ca[1];
-		LineString line = gf.createLineString(ca2);
-		s = hc.convertToString(line);
-		String lineString = "(0.0;0.0),(5.0;0.0)";
-		Assert.assertTrue("Wrong string for line.", lineString.equalsIgnoreCase(s));
-		
-		/* Polygon */
-		Polygon polygon = gf.createPolygon(ca);
-		s = hc.convertToString(polygon);
-		String polygonString = "(0.0;0.0),(5.0;0.0),(5.0;5.0),(0.0;5.0),(0.0;0.0)"; 
-		Assert.assertTrue("Wrong string for polygon.", polygonString.equalsIgnoreCase(s));
-	}
-	
-	
-	/**
-	 *   (5,0)-------(5,5)
-	 *     |           |
-	 *     |           |
-	 *     |           |
-	 *     |           |
-	 *   (0,0)-------(5,0)
-	 */
-	@Test
-	public void testConstructor(){
-		HullConverter hc = new HullConverter();
-		GeometryFactory gf = new GeometryFactory();
-		Coordinate[] ca = new Coordinate[5];
-		ca[0] = new Coordinate(0.0, 0.0);
-		ca[1] = new Coordinate(5.0, 0.0);
-		ca[2] = new Coordinate(5.0, 5.0);
-		ca[3] = new Coordinate(0.0, 5.0);
-		ca[4] = ca[0];
-		
-		/* Point */
-		Point point = gf.createPoint(ca[0]);
-		Assert.assertEquals("Wrong point.", point, hc.convert(hc.convertToString(point)));
-		
-		/* Line */
-		Coordinate[] ca2 = new Coordinate[2];
-		ca2[0] = ca[0];
-		ca2[1] = ca[1];
-		LineString line = gf.createLineString(ca2);
-		Assert.assertEquals("Wrong line.", line, hc.convert(hc.convertToString(line)));
-		
-		/* Polygon */
-		Polygon polygon = gf.createPolygon(ca);
-		Assert.assertEquals("Wrong polygon.", polygon, hc.convert(hc.convertToString(polygon)));
-	}
-	
+    /* Check String. */
+    GeometryFactory gf = new GeometryFactory();
+    Coordinate[] ca = new Coordinate[5];
+    ca[0] = new Coordinate(0.0, 0.0);
+    ca[1] = new Coordinate(5.0, 0.0);
+    ca[2] = new Coordinate(5.0, 5.0);
+    ca[3] = new Coordinate(0.0, 5.0);
+    ca[4] = ca[0];
 
+    /* Point */
+    Point point = gf.createPoint(ca[0]);
+    s = hc.convertToString(point);
+    String pointString = "(0.0;0.0)";
+    Assert.assertTrue("Wrong string for point.", pointString.equalsIgnoreCase(s));
+
+    /* Line */
+    Coordinate[] ca2 = new Coordinate[2];
+    ca2[0] = ca[0];
+    ca2[1] = ca[1];
+    LineString line = gf.createLineString(ca2);
+    s = hc.convertToString(line);
+    String lineString = "(0.0;0.0),(5.0;0.0)";
+    Assert.assertTrue("Wrong string for line.", lineString.equalsIgnoreCase(s));
+
+    /* Polygon */
+    Polygon polygon = gf.createPolygon(ca);
+    s = hc.convertToString(polygon);
+    String polygonString = "(0.0;0.0),(5.0;0.0),(5.0;5.0),(0.0;5.0),(0.0;0.0)";
+    Assert.assertTrue("Wrong string for polygon.", polygonString.equalsIgnoreCase(s));
+  }
+
+  /** (5,0)-------(5,5) | | | | | | | | (0,0)-------(5,0) */
+  @Test
+  public void testConstructor() {
+    HullConverter hc = new HullConverter();
+    GeometryFactory gf = new GeometryFactory();
+    Coordinate[] ca = new Coordinate[5];
+    ca[0] = new Coordinate(0.0, 0.0);
+    ca[1] = new Coordinate(5.0, 0.0);
+    ca[2] = new Coordinate(5.0, 5.0);
+    ca[3] = new Coordinate(0.0, 5.0);
+    ca[4] = ca[0];
+
+    /* Point */
+    Point point = gf.createPoint(ca[0]);
+    Assert.assertEquals("Wrong point.", point, hc.convert(hc.convertToString(point)));
+
+    /* Line */
+    Coordinate[] ca2 = new Coordinate[2];
+    ca2[0] = ca[0];
+    ca2[1] = ca[1];
+    LineString line = gf.createLineString(ca2);
+    Assert.assertEquals("Wrong line.", line, hc.convert(hc.convertToString(line)));
+
+    /* Polygon */
+    Polygon polygon = gf.createPolygon(ca);
+    Assert.assertEquals("Wrong polygon.", polygon, hc.convert(hc.convertToString(polygon)));
+  }
 }

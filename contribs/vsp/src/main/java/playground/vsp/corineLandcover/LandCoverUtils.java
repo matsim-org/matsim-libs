@@ -25,45 +25,48 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Based on the classification of the CORINE land cover data, zones are categorized in two parts: one for home activities and other for rest of the activities.
- * Created by amit on 31.07.17.
+ * Based on the classification of the CORINE land cover data, zones are categorized in two parts:
+ * one for home activities and other for rest of the activities. Created by amit on 31.07.17.
  */
-
 public class LandCoverUtils {
 
-    public enum LandCoverActivityType {home, other}
+  public enum LandCoverActivityType {
+    home,
+    other
+  }
 
-    public static final String CORINE_LANDCOVER_TAG_ID = "CODE_12";
+  public static final String CORINE_LANDCOVER_TAG_ID = "CODE_12";
 
-    private final Map<LandCoverActivityType, List<Integer>> activityType2LandCoverId = new HashMap<>();
+  private final Map<LandCoverActivityType, List<Integer>> activityType2LandCoverId =
+      new HashMap<>();
 
-    LandCoverUtils() {
-        {
-            List<Integer> landCoverIds = new ArrayList<>();
-            landCoverIds.add(111); // continuous urban fabric
-            landCoverIds.add(112); // Discontinuous urban fabric
-            activityType2LandCoverId.put(LandCoverActivityType.home,landCoverIds);
-        }
-        {
-            List<Integer> landCoverIds = new ArrayList<>();
-            landCoverIds.add(111); // continuous urban fabric
-            landCoverIds.add(112); // Discontinuous urban fabric
-            landCoverIds.add(121); //Industrial or commercial use
-            landCoverIds.add(123); //Port areas
-            landCoverIds.add(124); //Airports
-            landCoverIds.add(133); //Construction sites
-            landCoverIds.add(142); //Sport and leisure facilities
-            activityType2LandCoverId.put(LandCoverActivityType.other, landCoverIds);
-        }
+  LandCoverUtils() {
+    {
+      List<Integer> landCoverIds = new ArrayList<>();
+      landCoverIds.add(111); // continuous urban fabric
+      landCoverIds.add(112); // Discontinuous urban fabric
+      activityType2LandCoverId.put(LandCoverActivityType.home, landCoverIds);
     }
-
-    public List<LandCoverActivityType> getActivityTypesFromZone(final int landCoverId){
-        List<LandCoverActivityType> output = new ArrayList<>();
-        for(LandCoverActivityType activityTypeFromLandCover : activityType2LandCoverId.keySet() ) {
-            if (activityType2LandCoverId.get(activityTypeFromLandCover).contains(landCoverId)) {
-                output.add(activityTypeFromLandCover);
-            }
-        }
-        return output;
+    {
+      List<Integer> landCoverIds = new ArrayList<>();
+      landCoverIds.add(111); // continuous urban fabric
+      landCoverIds.add(112); // Discontinuous urban fabric
+      landCoverIds.add(121); // Industrial or commercial use
+      landCoverIds.add(123); // Port areas
+      landCoverIds.add(124); // Airports
+      landCoverIds.add(133); // Construction sites
+      landCoverIds.add(142); // Sport and leisure facilities
+      activityType2LandCoverId.put(LandCoverActivityType.other, landCoverIds);
     }
+  }
+
+  public List<LandCoverActivityType> getActivityTypesFromZone(final int landCoverId) {
+    List<LandCoverActivityType> output = new ArrayList<>();
+    for (LandCoverActivityType activityTypeFromLandCover : activityType2LandCoverId.keySet()) {
+      if (activityType2LandCoverId.get(activityTypeFromLandCover).contains(landCoverId)) {
+        output.add(activityTypeFromLandCover);
+      }
+    }
+    return output;
+  }
 }

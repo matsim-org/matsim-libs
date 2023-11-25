@@ -19,122 +19,117 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.usage.replanning;
 
+import jakarta.inject.Provider;
+import java.util.List;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
+import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
+import org.matsim.contrib.socnetsim.framework.replanning.GenericStrategyModule;
+import org.matsim.contrib.socnetsim.framework.replanning.IndividualBasedGroupStrategyModule;
+import org.matsim.contrib.socnetsim.framework.replanning.JointPlanBasedGroupStrategyModule;
+import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
+import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
+import org.matsim.contrib.socnetsim.framework.replanning.modules.RecomposeJointPlanModule;
+import org.matsim.contrib.socnetsim.framework.replanning.modules.TourModeUnifierModule;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.contrib.socnetsim.jointtrips.replanning.modules.SynchronizeCoTravelerPlansModule;
+import org.matsim.contrib.socnetsim.sharedvehicles.SharedVehicleUtils;
+import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
+import org.matsim.contrib.socnetsim.sharedvehicles.replanning.AllocateVehicleToPlansInGroupPlanModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
-import org.matsim.contrib.socnetsim.framework.replanning.modules.TourModeUnifierModule;
-import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
-import org.matsim.contrib.socnetsim.framework.replanning.GenericStrategyModule;
-import org.matsim.contrib.socnetsim.framework.replanning.IndividualBasedGroupStrategyModule;
-import org.matsim.contrib.socnetsim.framework.replanning.JointPlanBasedGroupStrategyModule;
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
-import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
-import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
-import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
-import org.matsim.contrib.socnetsim.framework.replanning.modules.RecomposeJointPlanModule;
-import org.matsim.contrib.socnetsim.jointtrips.replanning.modules.SynchronizeCoTravelerPlansModule;
-import org.matsim.contrib.socnetsim.sharedvehicles.SharedVehicleUtils;
-import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
-import org.matsim.contrib.socnetsim.sharedvehicles.replanning.AllocateVehicleToPlansInGroupPlanModule;
-
-import jakarta.inject.Provider;
-import java.util.List;
 
 /**
  * @author thibautd
  */
 public class GroupPlanStrategyFactoryUtils {
 
-	//public static GroupPlanStrategy createRandomSelectingStrategy(
-	//		final IncompatiblePlansIdentifierFactory fact) {
-	//	return new GroupPlanStrategy(
-	//			new RandomGroupLevelSelector(
-	//				MatsimRandom.getLocalInstance(),
-	//				fact) );
-	//}
+  // public static GroupPlanStrategy createRandomSelectingStrategy(
+  //		final IncompatiblePlansIdentifierFactory fact) {
+  //	return new GroupPlanStrategy(
+  //			new RandomGroupLevelSelector(
+  //				MatsimRandom.getLocalInstance(),
+  //				fact) );
+  // }
 
-	// /////////////////////////////////////////////////////////////////////////
-	// standard modules
-	// /////////////////////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////////////////////
+  // standard modules
+  // /////////////////////////////////////////////////////////////////////////
 
-	public static GenericStrategyModule<GroupPlans> createSynchronizerModule(
-			final Config config,
-			final Provider<TripRouter> tripRouterFactory, TimeInterpretation timeInterpretation) {
-		return new JointPlanBasedGroupStrategyModule(
-				new SynchronizeCoTravelerPlansModule(
-					config.global().getNumberOfThreads(), timeInterpretation ) );
-	}
+  public static GenericStrategyModule<GroupPlans> createSynchronizerModule(
+      final Config config,
+      final Provider<TripRouter> tripRouterFactory,
+      TimeInterpretation timeInterpretation) {
+    return new JointPlanBasedGroupStrategyModule(
+        new SynchronizeCoTravelerPlansModule(
+            config.global().getNumberOfThreads(), timeInterpretation));
+  }
 
-	public static GenericStrategyModule<GroupPlans> createReRouteModule(
-			final Config config,
-			final PlanRoutingAlgorithmFactory planRouterFactory,
-			final Provider<TripRouter> tripRouterFactory) {
-		return new IndividualBasedGroupStrategyModule(
-				new AbstractMultithreadedModule( config.global() ) {
-					@Override
-					public PlanAlgorithm getPlanAlgoInstance() {
-						return planRouterFactory.createPlanRoutingAlgorithm( tripRouterFactory.get() );
-					}
-				});
-	}
+  public static GenericStrategyModule<GroupPlans> createReRouteModule(
+      final Config config,
+      final PlanRoutingAlgorithmFactory planRouterFactory,
+      final Provider<TripRouter> tripRouterFactory) {
+    return new IndividualBasedGroupStrategyModule(
+        new AbstractMultithreadedModule(config.global()) {
+          @Override
+          public PlanAlgorithm getPlanAlgoInstance() {
+            return planRouterFactory.createPlanRoutingAlgorithm(tripRouterFactory.get());
+          }
+        });
+  }
 
-	public static GenericStrategyModule<GroupPlans> createJointTripAwareTourModeUnifierModule(
-			final Config config,
-			final MainModeIdentifier mainModeIdentifier) {
+  public static GenericStrategyModule<GroupPlans> createJointTripAwareTourModeUnifierModule(
+      final Config config, final MainModeIdentifier mainModeIdentifier) {
 
-		return new IndividualBasedGroupStrategyModule(
-				new TourModeUnifierModule(
-					config.global().getNumberOfThreads(),
-					JointActingTypes.JOINT_STAGE_ACTS::contains,
-					new MainModeIdentifier() {
-						@Override
-						public String identifyMainMode(
-								final List<? extends PlanElement> tripElements) {
-							for ( PlanElement pe : tripElements ) {
-								if ( pe instanceof Leg &&
-										((Leg) pe).getMode().equals( JointActingTypes.PASSENGER ) ) {
-									return TransportMode.pt;
-								}
-								if ( pe instanceof Leg &&
-										((Leg) pe).getMode().equals( JointActingTypes.DRIVER ) ) {
-									return TransportMode.car;
-								}
+    return new IndividualBasedGroupStrategyModule(
+        new TourModeUnifierModule(
+            config.global().getNumberOfThreads(),
+            JointActingTypes.JOINT_STAGE_ACTS::contains,
+            new MainModeIdentifier() {
+              @Override
+              public String identifyMainMode(final List<? extends PlanElement> tripElements) {
+                for (PlanElement pe : tripElements) {
+                  if (pe instanceof Leg
+                      && ((Leg) pe).getMode().equals(JointActingTypes.PASSENGER)) {
+                    return TransportMode.pt;
+                  }
+                  if (pe instanceof Leg && ((Leg) pe).getMode().equals(JointActingTypes.DRIVER)) {
+                    return TransportMode.car;
+                  }
+                }
+                // The idea, I guess, is that in subtour mode choice the driver needs to conserve
+                // her/his vehicle, while the
+                // passenger does not.  The above implementation seems incomplete in the sense that
+                // it only looks at the _first_
+                // occurence of a joint leg, i.e. someone who starts as a passenger always needs to
+                // be a passenger, etc.
 
-							}
-							// The idea, I guess, is that in subtour mode choice the driver needs to conserve her/his vehicle, while the
-							// passenger does not.  The above implementation seems incomplete in the sense that it only looks at the _first_
-							// occurence of a joint leg, i.e. someone who starts as a passenger always needs to be a passenger, etc.
+                return mainModeIdentifier.identifyMainMode(tripElements);
+              }
+            }));
+  }
 
-							return mainModeIdentifier.identifyMainMode( tripElements );
-						}
-					}) );
-	}
+  public static GenericStrategyModule<GroupPlans> createRecomposeJointPlansModule(
+      final Config config,
+      final JointPlanFactory jpFactory,
+      final PlanLinkIdentifier linkIdentifier) {
+    return new RecomposeJointPlanModule(
+        config.global().getNumberOfThreads(), jpFactory, linkIdentifier);
+  }
 
-	public static GenericStrategyModule<GroupPlans> createRecomposeJointPlansModule(
-			final Config config,
-			final JointPlanFactory jpFactory,
-			final PlanLinkIdentifier linkIdentifier) {
-		return new RecomposeJointPlanModule(
-				config.global().getNumberOfThreads(),
-				jpFactory,
-				linkIdentifier );
-	}
-
-	public static GenericStrategyModule<GroupPlans> createVehicleAllocationModule(
-			final Config config,
-			final VehicleRessources vehicles) {
-		return new AllocateVehicleToPlansInGroupPlanModule(
-				config.global().getNumberOfThreads(),
-				vehicles,
-				SharedVehicleUtils.DEFAULT_VEHICULAR_MODES,
-				true,
-				true);
-	}
+  public static GenericStrategyModule<GroupPlans> createVehicleAllocationModule(
+      final Config config, final VehicleRessources vehicles) {
+    return new AllocateVehicleToPlansInGroupPlanModule(
+        config.global().getNumberOfThreads(),
+        vehicles,
+        SharedVehicleUtils.DEFAULT_VEHICULAR_MODES,
+        true,
+        true);
+  }
 }
-

@@ -23,11 +23,10 @@ import org.matsim.api.core.v01.network.Link;
 
 /**
  * @author nagel
- *
  */
 public interface HasLinkId {
 
-	String ATTRIBUTE_LINK = "link";
-	Id<Link> getLinkId();
+  String ATTRIBUTE_LINK = "link";
 
+  Id<Link> getLinkId();
 }

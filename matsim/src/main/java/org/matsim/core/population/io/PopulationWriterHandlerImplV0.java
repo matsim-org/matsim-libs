@@ -22,7 +22,6 @@ package org.matsim.core.population.io;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -39,177 +38,173 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 
-	/*package*/ class PopulationWriterHandlerImplV0 extends AbstractPopulationWriterHandler {
+/*package*/ class PopulationWriterHandlerImplV0 extends AbstractPopulationWriterHandler {
 
-	private final CoordinateTransformation coordinateTransformation;
-	private final Network network;
+  private final CoordinateTransformation coordinateTransformation;
+  private final Network network;
 
-	protected PopulationWriterHandlerImplV0(
-			final CoordinateTransformation coordinateTransformation,
-			final Network network) {
-		this.coordinateTransformation = coordinateTransformation;
-		this.network = network;
-	}
+  protected PopulationWriterHandlerImplV0(
+      final CoordinateTransformation coordinateTransformation, final Network network) {
+    this.coordinateTransformation = coordinateTransformation;
+    this.network = network;
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	//
-	// interface implementation
-	//
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  //
+  // interface implementation
+  //
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void writeHeaderAndStartElement(BufferedWriter out) throws IOException {
-		out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
-		out.write("<!DOCTYPE plans SYSTEM \"" + MatsimXmlWriter.DEFAULT_DTD_LOCATION + "plans_v0.dtd\">\n\n");
-	}
+  @Override
+  public void writeHeaderAndStartElement(BufferedWriter out) throws IOException {
+    out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+    out.write(
+        "<!DOCTYPE plans SYSTEM \"" + MatsimXmlWriter.DEFAULT_DTD_LOCATION + "plans_v0.dtd\">\n\n");
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// <plans ... > ... </plans>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <plans ... > ... </plans>
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void startPlans(final Population plans, final BufferedWriter out) throws IOException {
-		out.write("<plans>\n\n");
-	}
+  @Override
+  public void startPlans(final Population plans, final BufferedWriter out) throws IOException {
+    out.write("<plans>\n\n");
+  }
 
-	@Override
-	public void endPlans(final BufferedWriter out) throws IOException {
-		out.write("</plans>\n");
-		out.flush();
-	}
+  @Override
+  public void endPlans(final BufferedWriter out) throws IOException {
+    out.write("</plans>\n");
+    out.flush();
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// <person ... > ... </person>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <person ... > ... </person>
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void startPerson(final Person person, final BufferedWriter out) throws IOException {
-		out.write("\t<person");
-		out.write(" id=\"" + person.getId() + "\"");
-		out.write(">\n");
-	}
+  @Override
+  public void startPerson(final Person person, final BufferedWriter out) throws IOException {
+    out.write("\t<person");
+    out.write(" id=\"" + person.getId() + "\"");
+    out.write(">\n");
+  }
 
-	@Override
-	public void endPerson(final BufferedWriter out) throws IOException {
-		out.write("\t</person>\n\n");
-	}
+  @Override
+  public void endPerson(final BufferedWriter out) throws IOException {
+    out.write("\t</person>\n\n");
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// <travelcard ... />
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <travelcard ... />
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void startTravelCard(final String travelcard, final BufferedWriter out) throws IOException {
-	}
+  @Override
+  public void startTravelCard(final String travelcard, final BufferedWriter out)
+      throws IOException {}
 
-	@Override
-	public void endTravelCard(final BufferedWriter out) throws IOException {
-	}
+  @Override
+  public void endTravelCard(final BufferedWriter out) throws IOException {}
 
-	//////////////////////////////////////////////////////////////////////
-	// <plan ... > ... </plan>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <plan ... > ... </plan>
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void startPlan(final Plan plan, final BufferedWriter out) throws IOException {
-		out.write("\t\t<plan");
-		if (plan.getScore() != null)
-			out.write(" score=\"" + plan.getScore().toString() + "\"");
-		if (PersonUtils.isSelected(plan))
-			out.write(" selected=\"" + "yes" + "\"");
-		else
-			out.write(" selected=\"" + "no" + "\"");
-		out.write(">\n");
-	}
+  @Override
+  public void startPlan(final Plan plan, final BufferedWriter out) throws IOException {
+    out.write("\t\t<plan");
+    if (plan.getScore() != null) out.write(" score=\"" + plan.getScore().toString() + "\"");
+    if (PersonUtils.isSelected(plan)) out.write(" selected=\"" + "yes" + "\"");
+    else out.write(" selected=\"" + "no" + "\"");
+    out.write(">\n");
+  }
 
-	@Override
-	public void endPlan(final BufferedWriter out) throws IOException {
-		out.write("\t\t</plan>\n\n");
-	}
+  @Override
+  public void endPlan(final BufferedWriter out) throws IOException {
+    out.write("\t\t</plan>\n\n");
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// <act ... > ... </act>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <act ... > ... </act>
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void startAct(final Activity act, final BufferedWriter out) throws IOException {
-		out.write("\t\t\t<act");
-		out.write(" type=\"" + act.getType() + "\"");
-		if (act.getCoord() != null) {
-			final Coord coord = coordinateTransformation.transform( act.getCoord() );
-			out.write(" x100=\"" + coord.getX() + "\"");
-			out.write(" y100=\"" + coord.getY() + "\"");
-		}
-		if (act.getLinkId() != null)
-			out.write(" link=\"" + act.getLinkId() + "\"");
-		if (act.getStartTime().seconds() != Integer.MIN_VALUE)
-			out.write(" start_time=\"" + Time.writeTime(act.getStartTime().seconds()) + "\"");
-		if (act.getMaximumDuration().isDefined())
-			out.write(" dur=\"" + Time.writeTime(act.getMaximumDuration().seconds()) + "\"");
-		if (act.getEndTime().seconds() != Integer.MIN_VALUE)
-			out.write(" end_time=\"" + Time.writeTime(act.getEndTime().seconds()) + "\"");
-		out.write(" />\n");
-	}
+  @Override
+  public void startAct(final Activity act, final BufferedWriter out) throws IOException {
+    out.write("\t\t\t<act");
+    out.write(" type=\"" + act.getType() + "\"");
+    if (act.getCoord() != null) {
+      final Coord coord = coordinateTransformation.transform(act.getCoord());
+      out.write(" x100=\"" + coord.getX() + "\"");
+      out.write(" y100=\"" + coord.getY() + "\"");
+    }
+    if (act.getLinkId() != null) out.write(" link=\"" + act.getLinkId() + "\"");
+    if (act.getStartTime().seconds() != Integer.MIN_VALUE)
+      out.write(" start_time=\"" + Time.writeTime(act.getStartTime().seconds()) + "\"");
+    if (act.getMaximumDuration().isDefined())
+      out.write(" dur=\"" + Time.writeTime(act.getMaximumDuration().seconds()) + "\"");
+    if (act.getEndTime().seconds() != Integer.MIN_VALUE)
+      out.write(" end_time=\"" + Time.writeTime(act.getEndTime().seconds()) + "\"");
+    out.write(" />\n");
+  }
 
-	@Override
-	public void endAct(final BufferedWriter out) throws IOException {
-	}
+  @Override
+  public void endAct(final BufferedWriter out) throws IOException {}
 
-	//////////////////////////////////////////////////////////////////////
-	// <leg ... > ... </leg>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <leg ... > ... </leg>
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void startLeg(final Leg leg, final BufferedWriter out) throws IOException {
-		out.write("\t\t\t<leg");
-		out.write(" mode=\"" + leg.getMode() + "\"");
-		if (leg.getDepartureTime().seconds() != Integer.MIN_VALUE)
-			out.write(" dep_time=\"" + Time.writeTime(leg.getDepartureTime().seconds()) + "\"");
-		if (leg.getTravelTime().seconds() != Integer.MIN_VALUE)
-			out.write(" trav_time=\"" + Time.writeTime(leg.getTravelTime().seconds()) + "\"");
-//		if (leg instanceof LegImpl){
-//			LegImpl l = (LegImpl)leg;
-//			if (l.getDepartureTime() + l.getTravelTime() != Time.getUndefinedTime())
-//				out.write(" arr_time=\"" + Time.writeTime(l.getDepartureTime() + l.getTravelTime()) + "\"");
-//		}
-		// arrival time is in dtd, but no longer evaluated in code (according to not being in API).  kai, jun'16
-		out.write(">\n");
-	}
+  @Override
+  public void startLeg(final Leg leg, final BufferedWriter out) throws IOException {
+    out.write("\t\t\t<leg");
+    out.write(" mode=\"" + leg.getMode() + "\"");
+    if (leg.getDepartureTime().seconds() != Integer.MIN_VALUE)
+      out.write(" dep_time=\"" + Time.writeTime(leg.getDepartureTime().seconds()) + "\"");
+    if (leg.getTravelTime().seconds() != Integer.MIN_VALUE)
+      out.write(" trav_time=\"" + Time.writeTime(leg.getTravelTime().seconds()) + "\"");
+    //		if (leg instanceof LegImpl){
+    //			LegImpl l = (LegImpl)leg;
+    //			if (l.getDepartureTime() + l.getTravelTime() != Time.getUndefinedTime())
+    //				out.write(" arr_time=\"" + Time.writeTime(l.getDepartureTime() + l.getTravelTime()) +
+    // "\"");
+    //		}
+    // arrival time is in dtd, but no longer evaluated in code (according to not being in API).
+    // kai, jun'16
+    out.write(">\n");
+  }
 
-	@Override
-	public void endLeg(final BufferedWriter out) throws IOException {
-		out.write("\t\t\t</leg>\n");
-	}
+  @Override
+  public void endLeg(final BufferedWriter out) throws IOException {
+    out.write("\t\t\t</leg>\n");
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// <route ... > ... </route>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <route ... > ... </route>
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void startRoute(final Route route, final BufferedWriter out) throws IOException {
-		out.write("\t\t\t\t<route>");
+  @Override
+  public void startRoute(final Route route, final BufferedWriter out) throws IOException {
+    out.write("\t\t\t\t<route>");
 
-		if (route instanceof NetworkRoute) {
-			for (Node n : RouteUtils.getNodes((NetworkRoute) route, this.network)) {
-				out.write(n.getId() + " ");
-			}
-		} else {
-			out.write(route.getRouteDescription());
-		}
-	}
+    if (route instanceof NetworkRoute) {
+      for (Node n : RouteUtils.getNodes((NetworkRoute) route, this.network)) {
+        out.write(n.getId() + " ");
+      }
+    } else {
+      out.write(route.getRouteDescription());
+    }
+  }
 
-	@Override
-	public void endRoute(final BufferedWriter out) throws IOException {
-		out.write("</route>\n");
-	}
+  @Override
+  public void endRoute(final BufferedWriter out) throws IOException {
+    out.write("</route>\n");
+  }
 
-	//////////////////////////////////////////////////////////////////////
-	// <!-- ============ ... ========== -->
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <!-- ============ ... ========== -->
+  //////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void writeSeparator(final BufferedWriter out) throws IOException {
-		out.write("<!-- =================================================" +
-							"===================== -->\n\n");
-	}
+  @Override
+  public void writeSeparator(final BufferedWriter out) throws IOException {
+    out.write(
+        "<!-- =================================================" + "===================== -->\n\n");
+  }
 }

@@ -31,26 +31,26 @@ import org.matsim.vehicles.Vehicle;
  *
  * @author thomas
  */
-class TravelDistanceCalculator implements TravelDisutility{
+class TravelDistanceCalculator implements TravelDisutility {
 
-	private static final Logger log = LogManager.getLogger(TravelDistanceCalculator.class);
+  private static final Logger log = LogManager.getLogger(TravelDistanceCalculator.class);
 
-	@Override
-	public double getLinkTravelDisutility(final Link link, final double time, final Person person,
-			final Vehicle vehicle) {
-		return getLinkTravelDisutilityImpl(link);
-	}
+  @Override
+  public double getLinkTravelDisutility(
+      final Link link, final double time, final Person person, final Vehicle vehicle) {
+    return getLinkTravelDisutilityImpl(link);
+  }
 
-	@Override
-	public double getLinkMinimumTravelDisutility(Link link) {
-		return getLinkTravelDisutilityImpl(link);
-	}
+  @Override
+  public double getLinkMinimumTravelDisutility(Link link) {
+    return getLinkTravelDisutilityImpl(link);
+  }
 
-	private double getLinkTravelDisutilityImpl(Link link) {
-		if (link != null) {
-			return link.getLength();    // travel distance in meter
-		}
-		log.warn("Link is null. Returned 0 as distance.");
-		return 0.;
-	}
+  private double getLinkTravelDisutilityImpl(Link link) {
+    if (link != null) {
+      return link.getLength(); // travel distance in meter
+    }
+    log.warn("Link is null. Returned 0 as distance.");
+    return 0.;
+  }
 }

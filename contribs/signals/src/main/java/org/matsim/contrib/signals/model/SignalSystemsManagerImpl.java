@@ -22,7 +22,6 @@ package org.matsim.contrib.signals.model;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -32,67 +31,66 @@ import org.matsim.core.api.experimental.events.EventsManager;
  */
 public final class SignalSystemsManagerImpl implements SignalSystemsManager {
 
-	private SortedMap<Id<SignalSystem>, SignalSystem> signalSystems = new TreeMap<>();
-	
-	private AmberLogic amberLogic = new EmptyAmberLogicImpl();
+  private SortedMap<Id<SignalSystem>, SignalSystem> signalSystems = new TreeMap<>();
 
-	private EventsManager eventsManager;
+  private AmberLogic amberLogic = new EmptyAmberLogicImpl();
 
-	private SignalsData signalData;
+  private EventsManager eventsManager;
 
-	private IntergreensLogic intergreensLogic = null;
-	
-	public SignalSystemsManagerImpl(SignalsData signalData, EventsManager eventsManager) {
-//		this.signalData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-		this.signalData = signalData;
-		this.eventsManager = eventsManager;
-	}
-	
-	@Override
-	public EventsManager getEventsManager() {
-		return this.eventsManager;
-	}
-	
-	@Override
-	public void requestControlUpdate(double time_sec) {
-		for (SignalSystem system : this.signalSystems.values()){
-			system.updateState(time_sec);
-		}
-	}
+  private SignalsData signalData;
 
-	@Override
-	public AmberLogic getAmberLogic(){
-		return this.amberLogic;
-	}
+  private IntergreensLogic intergreensLogic = null;
 
-	@Override
-	public void addSignalSystem(SignalSystem system) {
-		this.signalSystems.put(system.getId(), system);
-	}
+  public SignalSystemsManagerImpl(SignalsData signalData, EventsManager eventsManager) {
+    //		this.signalData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+    this.signalData = signalData;
+    this.eventsManager = eventsManager;
+  }
 
-	@Override
-	public void setAmberLogic(AmberLogic amberLogic) {
-		this.amberLogic = amberLogic;
-	}
+  @Override
+  public EventsManager getEventsManager() {
+    return this.eventsManager;
+  }
 
-	@Override
-	public Map<Id<SignalSystem>, SignalSystem> getSignalSystems() {
-		return this.signalSystems;
-	}
+  @Override
+  public void requestControlUpdate(double time_sec) {
+    for (SignalSystem system : this.signalSystems.values()) {
+      system.updateState(time_sec);
+    }
+  }
 
-	@Override
-	public SignalsData getSignalsData() {
-		return this.signalData;
-	}
+  @Override
+  public AmberLogic getAmberLogic() {
+    return this.amberLogic;
+  }
 
-	@Override
-	public IntergreensLogic getIntergreensLogic() {
-		return this.intergreensLogic;
-	}
+  @Override
+  public void addSignalSystem(SignalSystem system) {
+    this.signalSystems.put(system.getId(), system);
+  }
 
-	@Override
-	public void setIntergreensLogic(IntergreensLogic logic) {
-		this.intergreensLogic = logic;
-	}
+  @Override
+  public void setAmberLogic(AmberLogic amberLogic) {
+    this.amberLogic = amberLogic;
+  }
 
+  @Override
+  public Map<Id<SignalSystem>, SignalSystem> getSignalSystems() {
+    return this.signalSystems;
+  }
+
+  @Override
+  public SignalsData getSignalsData() {
+    return this.signalData;
+  }
+
+  @Override
+  public IntergreensLogic getIntergreensLogic() {
+    return this.intergreensLogic;
+  }
+
+  @Override
+  public void setIntergreensLogic(IntergreensLogic logic) {
+    this.intergreensLogic = logic;
+  }
 }

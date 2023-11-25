@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -39,81 +38,90 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.routes.TransitPassengerRoute;
 
 /**
- *
  * @author aneumann
- *
  */
 public class AgentId2PlannedDepartureTimeMap {
 
-	private static final Logger log = LogManager.getLogger(AgentId2PlannedDepartureTimeMap.class);
-//	private static final Level logLevel = Level.DEBUG;
+  private static final Logger log = LogManager.getLogger(AgentId2PlannedDepartureTimeMap.class);
 
-	/**
-	 * Returns the planned departure time for each pt leg of a given set of agents
-	 *
-	 * @param pop The population
-	 * @param agentIds The Set of agents to be analyzed
-	 * @return A map sorted first by agentId, second by StopId-Time tuples
-	 */
-	public static Map<Id,List<Tuple<Id,AgentId2PlannedDepartureTimeMapData>>> getAgentId2PlannedPTDepartureTimeMap(Population pop, Set<Id<Person>> agentIds){
+  //	private static final Level logLevel = Level.DEBUG;
 
-//		AgentId2PlannedDepartureTimeMap.log.setLevel(AgentId2PlannedDepartureTimeMap.logLevel);
-		Map<Id, List<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>> agentId2PlannedDepartureMap = new TreeMap<Id, List<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>>();
+  /**
+   * Returns the planned departure time for each pt leg of a given set of agents
+   *
+   * @param pop The population
+   * @param agentIds The Set of agents to be analyzed
+   * @return A map sorted first by agentId, second by StopId-Time tuples
+   */
+  public static Map<Id, List<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>>
+      getAgentId2PlannedPTDepartureTimeMap(Population pop, Set<Id<Person>> agentIds) {
 
-		for (Person person : pop.getPersons().values()) {
-			if(agentIds.contains(person.getId())){
+    //		AgentId2PlannedDepartureTimeMap.log.setLevel(AgentId2PlannedDepartureTimeMap.logLevel);
+    Map<Id, List<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>> agentId2PlannedDepartureMap =
+        new TreeMap<Id, List<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>>();
 
-				// person in set, so do something
+    for (Person person : pop.getPersons().values()) {
+      if (agentIds.contains(person.getId())) {
 
-				List<Tuple<Id, AgentId2PlannedDepartureTimeMapData>> plannedDepartureList = new ArrayList<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>();
-				agentId2PlannedDepartureMap.put(person.getId(), plannedDepartureList);
+        // person in set, so do something
 
-				Plan plan = person.getSelectedPlan();
-				double runningTime = 0.0;
-				boolean firstActDone = false;
-				for (PlanElement pE : plan.getPlanElements()) {
+        List<Tuple<Id, AgentId2PlannedDepartureTimeMapData>> plannedDepartureList =
+            new ArrayList<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>();
+        agentId2PlannedDepartureMap.put(person.getId(), plannedDepartureList);
 
-					if(pE instanceof Activity){
-						Activity act = (Activity) pE;
+        Plan plan = person.getSelectedPlan();
+        double runningTime = 0.0;
+        boolean firstActDone = false;
+        for (PlanElement pE : plan.getPlanElements()) {
 
-						if(!firstActDone){
-							runningTime = act.getEndTime().seconds();
-							firstActDone = true;
-						} else {
-							if(act.getMaximumDuration().isUndefined()){
-								runningTime += act.getMaximumDuration().seconds();
-							} else {
-								runningTime = act.getEndTime().seconds();
-							}
-						}
-					}
+          if (pE instanceof Activity) {
+            Activity act = (Activity) pE;
 
-					if(pE instanceof Leg){
+            if (!firstActDone) {
+              runningTime = act.getEndTime().seconds();
+              firstActDone = true;
+            } else {
+              if (act.getMaximumDuration().isUndefined()) {
+                runningTime += act.getMaximumDuration().seconds();
+              } else {
+                runningTime = act.getEndTime().seconds();
+              }
+            }
+          }
 
-						Leg leg = (Leg) pE;
+          if (pE instanceof Leg) {
 
-						if(leg.getMode() == TransportMode.pt){
-							// it's the start of a new pt leg, report it
-							if (leg.getRoute() instanceof TransitPassengerRoute){
-								TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
-								plannedDepartureList.add(new Tuple<Id, AgentId2PlannedDepartureTimeMapData>(route.getAccessStopId(), new AgentId2PlannedDepartureTimeMapData(route.getAccessStopId(), runningTime, route.getLineId(), route.getRouteId())));
-							} else if (leg.getRoute() != null) {
-								log.warn("unknown route description found - only know to handle ExperimentalTransitRoute, got " + leg.getRoute().getClass().getCanonicalName());
-							}
-						}
+            Leg leg = (Leg) pE;
 
-						// add the legs travel time
-						if(leg.getTravelTime().isUndefined()){
-							log.debug("Undefined travel time found");
-						} else {
-							runningTime += leg.getTravelTime().seconds();
-						}
+            if (leg.getMode() == TransportMode.pt) {
+              // it's the start of a new pt leg, report it
+              if (leg.getRoute() instanceof TransitPassengerRoute) {
+                TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
+                plannedDepartureList.add(
+                    new Tuple<Id, AgentId2PlannedDepartureTimeMapData>(
+                        route.getAccessStopId(),
+                        new AgentId2PlannedDepartureTimeMapData(
+                            route.getAccessStopId(),
+                            runningTime,
+                            route.getLineId(),
+                            route.getRouteId())));
+              } else if (leg.getRoute() != null) {
+                log.warn(
+                    "unknown route description found - only know to handle ExperimentalTransitRoute, got "
+                        + leg.getRoute().getClass().getCanonicalName());
+              }
+            }
 
-					}
-				}
-			}
-		}
-		return agentId2PlannedDepartureMap;
-	}
-
+            // add the legs travel time
+            if (leg.getTravelTime().isUndefined()) {
+              log.debug("Undefined travel time found");
+            } else {
+              runningTime += leg.getTravelTime().seconds();
+            }
+          }
+        }
+      }
+    }
+    return agentId2PlannedDepartureMap;
+  }
 }

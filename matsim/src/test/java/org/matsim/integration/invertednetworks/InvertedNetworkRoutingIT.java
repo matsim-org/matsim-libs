@@ -20,7 +20,6 @@
 package org.matsim.integration.invertednetworks;
 
 import org.junit.Assert;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.controler.Controler;
@@ -30,66 +29,70 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class InvertedNetworkRoutingIT {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	@Test
-	public final void testLanesInvertedNetworkRouting() {
-		InvertedNetworkRoutingTestFixture f = new InvertedNetworkRoutingTestFixture(false, true, false);
-		f.scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
-		f.scenario.getConfig().travelTimeCalculator().setSeparateModes( false );
-		Controler c = new Controler(f.scenario);
-		c.getConfig().controller().setDumpDataAtEnd(false);
-		c.getConfig().controller().setCreateGraphs(false);
-		final InvertedNetworkRoutingTestEventHandler testHandler = new InvertedNetworkRoutingTestEventHandler();
-		c.addControlerListener(new StartupListener(){
-			@Override
-			public void notifyStartup(StartupEvent event) {
-				event.getServices().getEvents().addHandler(testHandler);
-			}
-		});
-		c.run();
-		Assert.assertTrue("No traffic on link", testHandler.hadTrafficOnLink25);
-	}
+  @Test
+  public final void testLanesInvertedNetworkRouting() {
+    InvertedNetworkRoutingTestFixture f = new InvertedNetworkRoutingTestFixture(false, true, false);
+    f.scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
+    f.scenario.getConfig().travelTimeCalculator().setSeparateModes(false);
+    Controler c = new Controler(f.scenario);
+    c.getConfig().controller().setDumpDataAtEnd(false);
+    c.getConfig().controller().setCreateGraphs(false);
+    final InvertedNetworkRoutingTestEventHandler testHandler =
+        new InvertedNetworkRoutingTestEventHandler();
+    c.addControlerListener(
+        new StartupListener() {
+          @Override
+          public void notifyStartup(StartupEvent event) {
+            event.getServices().getEvents().addHandler(testHandler);
+          }
+        });
+    c.run();
+    Assert.assertTrue("No traffic on link", testHandler.hadTrafficOnLink25);
+  }
 
+  @Test
+  public final void testModesInvertedNetworkRouting() {
+    InvertedNetworkRoutingTestFixture f = new InvertedNetworkRoutingTestFixture(true, false, false);
+    f.scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
+    f.scenario.getConfig().travelTimeCalculator().setSeparateModes(false);
+    Controler c = new Controler(f.scenario);
+    c.getConfig().controller().setDumpDataAtEnd(false);
+    c.getConfig().controller().setCreateGraphs(false);
+    final InvertedNetworkRoutingTestEventHandler testHandler =
+        new InvertedNetworkRoutingTestEventHandler();
+    c.addControlerListener(
+        new StartupListener() {
+          @Override
+          public void notifyStartup(StartupEvent event) {
+            event.getServices().getEvents().addHandler(testHandler);
+          }
+        });
+    c.run();
+    Assert.assertTrue("No traffic on link", testHandler.hadTrafficOnLink25);
+  }
 
-	@Test
-	public final void testModesInvertedNetworkRouting() {
-		InvertedNetworkRoutingTestFixture f = new InvertedNetworkRoutingTestFixture(true, false, false);
-		f.scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
-		f.scenario.getConfig().travelTimeCalculator().setSeparateModes( false );
-		Controler c = new Controler(f.scenario);
-		c.getConfig().controller().setDumpDataAtEnd(false);
-		c.getConfig().controller().setCreateGraphs(false);
-		final InvertedNetworkRoutingTestEventHandler testHandler = new InvertedNetworkRoutingTestEventHandler();
-		c.addControlerListener(new StartupListener(){
-			@Override
-			public void notifyStartup(StartupEvent event) {
-				event.getServices().getEvents().addHandler(testHandler);
-			}
-		});
-		c.run();
-		Assert.assertTrue("No traffic on link", testHandler.hadTrafficOnLink25);
-	}
-
-	@Test
-	public final void testModesNotInvertedNetworkRouting() {
-		InvertedNetworkRoutingTestFixture f = new InvertedNetworkRoutingTestFixture(true, false, false);
-		f.scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
-		f.scenario.getConfig().controller().setLinkToLinkRoutingEnabled(false);
-		f.scenario.getConfig().travelTimeCalculator().setCalculateLinkToLinkTravelTimes(false);
-		Controler c = new Controler(f.scenario);
-		//c.addOverridingModule(new InvertedNetworkRoutingGuiceModule());
-		c.getConfig().controller().setDumpDataAtEnd(false);
-		c.getConfig().controller().setCreateGraphs(false);
-		final InvertedNetworkRoutingTestEventHandler testHandler = new InvertedNetworkRoutingTestEventHandler();
-		c.addControlerListener(new StartupListener(){
-			@Override
-			public void notifyStartup(StartupEvent event) {
-				event.getServices().getEvents().addHandler(testHandler);
-			}
-		});
-		c.run();
-		Assert.assertTrue("No traffic on link", testHandler.hadTrafficOnLink25);
-	}
+  @Test
+  public final void testModesNotInvertedNetworkRouting() {
+    InvertedNetworkRoutingTestFixture f = new InvertedNetworkRoutingTestFixture(true, false, false);
+    f.scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
+    f.scenario.getConfig().controller().setLinkToLinkRoutingEnabled(false);
+    f.scenario.getConfig().travelTimeCalculator().setCalculateLinkToLinkTravelTimes(false);
+    Controler c = new Controler(f.scenario);
+    // c.addOverridingModule(new InvertedNetworkRoutingGuiceModule());
+    c.getConfig().controller().setDumpDataAtEnd(false);
+    c.getConfig().controller().setCreateGraphs(false);
+    final InvertedNetworkRoutingTestEventHandler testHandler =
+        new InvertedNetworkRoutingTestEventHandler();
+    c.addControlerListener(
+        new StartupListener() {
+          @Override
+          public void notifyStartup(StartupEvent event) {
+            event.getServices().getEvents().addHandler(testHandler);
+          }
+        });
+    c.run();
+    Assert.assertTrue("No traffic on link", testHandler.hadTrafficOnLink25);
+  }
 }

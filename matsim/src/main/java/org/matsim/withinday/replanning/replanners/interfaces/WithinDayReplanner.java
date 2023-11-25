@@ -33,51 +33,52 @@ import org.matsim.withinday.replanning.identifiers.interfaces.AgentSelector;
  * 	Plans.
  */
 /**
- * @param <T>  
+ * @param <T>
  */
 public abstract class WithinDayReplanner<T extends AgentSelector> {
-	
-	protected final Id<WithinDayReplanner> id;
-	protected final Scenario scenario;
-	protected final ActivityEndRescheduler internalInterface;
 
-	protected OptionalTime time = OptionalTime.undefined();
+  protected final Id<WithinDayReplanner> id;
+  protected final Scenario scenario;
+  protected final ActivityEndRescheduler internalInterface;
 
-	public WithinDayReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler activityEndRescheduler) {
-		this.id = id;
-		this.scenario = scenario;
-		this.internalInterface = activityEndRescheduler;
-	}
-	
-	public abstract boolean doReplanning(MobsimAgent withinDayAgent);
-	
-	public final Id<WithinDayReplanner> getId() {
-		return this.id;
-	}
-	
-	public final OptionalTime getTime() {
-		return this.time;
-	}
-	
-	public final void setTime(double time) {
-		this.time = OptionalTime.defined(time);
-	}
-	
-	public void reset() {
-		this.time = OptionalTime.undefined();
-	}
-	
-	@Override	
-	public boolean equals(Object o) {
-		if (o instanceof WithinDayReplanner) {
-			WithinDayReplanner<?> replanner = (WithinDayReplanner<?>) o;
-			return replanner.getId().equals(this.getId());
-		}
-		return false;
-	}
-	
-	@Override
-	public int hashCode() {
-		return getId().hashCode();
-	}
+  protected OptionalTime time = OptionalTime.undefined();
+
+  public WithinDayReplanner(
+      Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler activityEndRescheduler) {
+    this.id = id;
+    this.scenario = scenario;
+    this.internalInterface = activityEndRescheduler;
+  }
+
+  public abstract boolean doReplanning(MobsimAgent withinDayAgent);
+
+  public final Id<WithinDayReplanner> getId() {
+    return this.id;
+  }
+
+  public final OptionalTime getTime() {
+    return this.time;
+  }
+
+  public final void setTime(double time) {
+    this.time = OptionalTime.defined(time);
+  }
+
+  public void reset() {
+    this.time = OptionalTime.undefined();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof WithinDayReplanner) {
+      WithinDayReplanner<?> replanner = (WithinDayReplanner<?>) o;
+      return replanner.getId().equals(this.getId());
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return getId().hashCode();
+  }
 }

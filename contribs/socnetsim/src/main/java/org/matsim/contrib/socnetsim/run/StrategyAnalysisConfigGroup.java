@@ -26,33 +26,32 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  */
 public class StrategyAnalysisConfigGroup extends ReflectiveConfigGroup {
 
-	public static final String GROUP_NAME = "strategyanalysis";
+  public static final String GROUP_NAME = "strategyanalysis";
 
-	private boolean dumpGroupSizes = false;
-	private boolean dumpAllocation = false;
+  private boolean dumpGroupSizes = false;
+  private boolean dumpAllocation = false;
 
-	public StrategyAnalysisConfigGroup() {
-		super( GROUP_NAME );
-	}
+  public StrategyAnalysisConfigGroup() {
+    super(GROUP_NAME);
+  }
 
-	@StringGetter( "dumpGroupSizes" )
-	public boolean isDumpGroupSizes() {
-		return this.dumpGroupSizes;
-	}
+  @StringGetter("dumpGroupSizes")
+  public boolean isDumpGroupSizes() {
+    return this.dumpGroupSizes;
+  }
 
-	@StringSetter( "dumpGroupSizes" )
-	public void setDumpGroupSizes( final boolean dumpGroupSizes ) {
-		this.dumpGroupSizes = dumpGroupSizes;
-	}
+  @StringSetter("dumpGroupSizes")
+  public void setDumpGroupSizes(final boolean dumpGroupSizes) {
+    this.dumpGroupSizes = dumpGroupSizes;
+  }
 
-	@StringGetter( "dumpAllocation" )
-	public boolean isDumpAllocation() {
-		return this.dumpAllocation;
-	}
+  @StringGetter("dumpAllocation")
+  public boolean isDumpAllocation() {
+    return this.dumpAllocation;
+  }
 
-	@StringSetter( "dumpAllocation" )
-	public void setDumpAllocation(boolean dumpAllocation) {
-		this.dumpAllocation = dumpAllocation;
-	}
+  @StringSetter("dumpAllocation")
+  public void setDumpAllocation(boolean dumpAllocation) {
+    this.dumpAllocation = dumpAllocation;
+  }
 }
-

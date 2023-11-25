@@ -24,7 +24,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -51,112 +50,174 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class PersonIntersectAreaFilterTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  @Test
+  public void testFilter() throws Exception {
+    /* create a simple network where agents can drive from the lower left
+     * to the upper right */
+    Network network = NetworkUtils.createNetwork();
+    Node node0 =
+        NetworkUtils.createAndAddNode(
+            network, Id.create("0", Node.class), new Coord((double) 0, (double) 0));
+    Node node1 =
+        NetworkUtils.createAndAddNode(
+            network, Id.create("1", Node.class), new Coord((double) 10, (double) 10));
+    Node node2 =
+        NetworkUtils.createAndAddNode(
+            network, Id.create("2", Node.class), new Coord((double) 90, (double) 10));
+    Node node3 =
+        NetworkUtils.createAndAddNode(
+            network, Id.create("3", Node.class), new Coord((double) 10, (double) 90));
+    Node node4 =
+        NetworkUtils.createAndAddNode(
+            network, Id.create("4", Node.class), new Coord((double) 90, (double) 90));
+    Node node5 =
+        NetworkUtils.createAndAddNode(
+            network, Id.create("5", Node.class), new Coord((double) 100, (double) 100));
+    final Node fromNode = node0;
+    final Node toNode = node1;
+    Link link0 =
+        NetworkUtils.createAndAddLink(
+            network,
+            Id.create("0", Link.class),
+            fromNode,
+            toNode,
+            (double) 20,
+            (double) 20,
+            (double) 100,
+            (double) 1);
+    final Node fromNode1 = node1;
+    final Node toNode1 = node2;
+    /*	Link link1=*/ NetworkUtils.createAndAddLink(
+        network,
+        Id.create("1", Link.class),
+        fromNode1,
+        toNode1,
+        (double) 100,
+        (double) 20,
+        (double) 100,
+        (double) 1);
+    final Node fromNode2 = node2;
+    final Node toNode2 = node4;
+    Link link2 =
+        NetworkUtils.createAndAddLink(
+            network,
+            Id.create("2", Link.class),
+            fromNode2,
+            toNode2,
+            (double) 100,
+            (double) 20,
+            (double) 100,
+            (double) 1);
+    final Node fromNode3 = node1;
+    final Node toNode3 = node3;
+    /*	Link link3=*/ NetworkUtils.createAndAddLink(
+        network,
+        Id.create("3", Link.class),
+        fromNode3,
+        toNode3,
+        (double) 100,
+        (double) 20,
+        (double) 100,
+        (double) 1);
+    final Node fromNode4 = node3;
+    final Node toNode4 = node4;
+    Link link4 =
+        NetworkUtils.createAndAddLink(
+            network,
+            Id.create("4", Link.class),
+            fromNode4,
+            toNode4,
+            (double) 100,
+            (double) 20,
+            (double) 100,
+            (double) 1);
+    final Node fromNode5 = node4;
+    final Node toNode5 = node5;
+    Link link5 =
+        NetworkUtils.createAndAddLink(
+            network,
+            Id.create("5", Link.class),
+            fromNode5,
+            toNode5,
+            (double) 20,
+            (double) 20,
+            (double) 100,
+            (double) 1);
 
-	@Test public void testFilter() throws Exception {
-		/* create a simple network where agents can drive from the lower left
-		 * to the upper right */
-		Network network = NetworkUtils.createNetwork();
-        Node node0 = NetworkUtils.createAndAddNode(network, Id.create("0", Node.class), new Coord((double) 0, (double) 0));
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 10, (double) 10));
-		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 90, (double) 10));
-		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 10, (double) 90));
-		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord((double) 90, (double) 90));
-		Node node5 = NetworkUtils.createAndAddNode(network, Id.create("5", Node.class), new Coord((double) 100, (double) 100));
-		final Node fromNode = node0;
-		final Node toNode = node1;
-		Link link0 = NetworkUtils.createAndAddLink(network,Id.create("0", Link.class), fromNode, toNode, (double) 20, (double) 20, (double) 100, (double) 1 );
-		final Node fromNode1 = node1;
-		final Node toNode1 = node2;
-/*	Link link1=*/NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode1, toNode1, (double) 100, (double) 20, (double) 100, (double) 1 );
-final Node fromNode2 = node2;
-final Node toNode2 = node4;
-		Link link2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode2, toNode2, (double) 100, (double) 20, (double) 100, (double) 1 );
-		final Node fromNode3 = node1;
-		final Node toNode3 = node3;
-/*	Link link3=*/NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), fromNode3, toNode3, (double) 100, (double) 20, (double) 100, (double) 1 );
-final Node fromNode4 = node3;
-final Node toNode4 = node4;
-		Link link4 = NetworkUtils.createAndAddLink(network,Id.create("4", Link.class), fromNode4, toNode4, (double) 100, (double) 20, (double) 100, (double) 1 );
-		final Node fromNode5 = node4;
-		final Node toNode5 = node5;
-		Link link5 = NetworkUtils.createAndAddLink(network,Id.create("5", Link.class), fromNode5, toNode5, (double) 20, (double) 20, (double) 100, (double) 1 );
+    // create a test person
+    Person person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
+    Plan plan = PersonUtils.createAndAddPlan(person, true);
 
-		// create a test person
-		Person person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
-		Plan plan = PersonUtils.createAndAddPlan(person, true);
+    Activity act1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link0.getId());
+    act1.setEndTime(8.0 * 3600);
 
-		Activity act1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link0.getId());
-		act1.setEndTime(8.0*3600);
+    Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+    leg.setDepartureTime(8.0 * 3600);
+    leg.setTravelTime(2.0 * 60);
 
-		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-		leg.setDepartureTime(8.0*3600);
-		leg.setTravelTime(2.0*60);
+    PopulationUtils.createAndAddActivityFromLinkId(plan, "w", link5.getId());
 
-		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", link5.getId());
+    NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(link0.getId(), link5.getId());
+    leg.setRoute(route);
 
-		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(link0.getId(), link5.getId());
-		leg.setRoute(route);
+    // prepare route
+    route.setLinkIds(link0.getId(), NetworkUtils.getLinkIds("1 2"), link5.getId());
 
-		// prepare route
-		route.setLinkIds(link0.getId(), NetworkUtils.getLinkIds("1 2"), link5.getId());
+    // prepare area of interest
+    HashMap<Id<Link>, Link> aoi = new HashMap<>();
 
-		// prepare area of interest
-		HashMap<Id<Link>, Link> aoi = new HashMap<>();
+    // prepare filter
+    PersonIntersectAreaFilter filter = null;
 
-		// prepare filter
-		PersonIntersectAreaFilter filter = null;
+    // test route through aoi
+    aoi.clear();
+    aoi.put(link2.getId(), link2);
+    filter = new PersonIntersectAreaFilter(null, aoi, network);
+    assertTrue("test route through aoi", filter.judge(person));
 
-		// test route through aoi
-		aoi.clear();
-		aoi.put(link2.getId(), link2);
-		filter = new PersonIntersectAreaFilter(null, aoi, network);
-		assertTrue("test route through aoi", filter.judge(person));
+    // test departure link
+    aoi.clear();
+    aoi.put(link0.getId(), link0);
+    filter = new PersonIntersectAreaFilter(null, aoi, network);
+    assertTrue("test departure link as aoi", filter.judge(person));
 
-		// test departure link
-		aoi.clear();
-		aoi.put(link0.getId(), link0);
-		filter = new PersonIntersectAreaFilter(null, aoi, network);
-		assertTrue("test departure link as aoi", filter.judge(person));
+    // test arrival link
+    aoi.clear();
+    aoi.put(link5.getId(), link5);
+    filter = new PersonIntersectAreaFilter(null, aoi, network);
+    assertTrue("test arrival link as aoi", filter.judge(person));
 
-		// test arrival link
-		aoi.clear();
-		aoi.put(link5.getId(), link5);
-		filter = new PersonIntersectAreaFilter(null, aoi, network);
-		assertTrue("test arrival link as aoi", filter.judge(person));
+    // test route outside aoi
+    aoi.clear();
+    aoi.put(link4.getId(), link4);
+    filter = new PersonIntersectAreaFilter(null, aoi, network);
+    assertFalse("test route outside aoi", filter.judge(person));
 
-		// test route outside aoi
-		aoi.clear();
-		aoi.put(link4.getId(), link4);
-		filter = new PersonIntersectAreaFilter(null, aoi, network);
-		assertFalse("test route outside aoi", filter.judge(person));
+    // prepare bee-line tests
+    leg.setMode(TransportMode.walk);
+    leg.setRoute(
+        RouteUtils.createLinkNetworkRouteImpl(link0.getId(), link5.getId())); // empty route
 
-		// prepare bee-line tests
-		leg.setMode(TransportMode.walk);
-		leg.setRoute(RouteUtils.createLinkNetworkRouteImpl(link0.getId(), link5.getId())); // empty route
+    // test bee-line without alternative aoi
+    aoi.clear();
+    aoi.put(link2.getId(), link2);
+    filter = new PersonIntersectAreaFilter(null, aoi, network);
+    assertFalse("test bee-line without alternative aoi", filter.judge(person));
 
-		// test bee-line without alternative aoi
-		aoi.clear();
-		aoi.put(link2.getId(), link2);
-		filter = new PersonIntersectAreaFilter(null, aoi, network);
-		assertFalse("test bee-line without alternative aoi", filter.judge(person));
+    // test bee-line with too small alternative aoi
+    aoi.clear();
+    aoi.put(link2.getId(), link2);
+    filter = new PersonIntersectAreaFilter(null, aoi, network);
+    filter.setAlternativeAOI(new Coord((double) 100, (double) 0), 20.0);
+    assertFalse("test bee-line with too small alternative aoi", filter.judge(person));
 
-		// test bee-line with too small alternative aoi
-		aoi.clear();
-		aoi.put(link2.getId(), link2);
-		filter = new PersonIntersectAreaFilter(null, aoi, network);
-		filter.setAlternativeAOI(new Coord((double) 100, (double) 0), 20.0);
-		assertFalse("test bee-line with too small alternative aoi", filter.judge(person));
-
-		// test bee-line with big enough alternative aoi
-		aoi.clear();
-		aoi.put(link2.getId(), link2);
-		filter = new PersonIntersectAreaFilter(null, aoi, network);
-		filter.setAlternativeAOI(new Coord((double) 100, (double) 0), 80.0);
-		assertTrue("test bee-line with big enough alternative aoi", filter.judge(person));
-
-	}
-
+    // test bee-line with big enough alternative aoi
+    aoi.clear();
+    aoi.put(link2.getId(), link2);
+    filter = new PersonIntersectAreaFilter(null, aoi, network);
+    filter.setAlternativeAOI(new Coord((double) 100, (double) 0), 80.0);
+    assertTrue("test bee-line with big enough alternative aoi", filter.judge(person));
+  }
 }

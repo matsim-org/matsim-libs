@@ -24,17 +24,15 @@ import org.matsim.core.mobsim.framework.PlayPauseSimulationControlI;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 
 /**
- * If a OTFServer reports to be alive (by returning true in the method isLive()) it can savely be casted
- * to an OTFLiveServerRemote instance. This offers additional options only useful with
- * the actual running simulation. Most importantly the answering of queries.
- *  
- * @author dstrippgen
+ * If a OTFServer reports to be alive (by returning true in the method isLive()) it can savely be
+ * casted to an OTFLiveServerRemote instance. This offers additional options only useful with the
+ * actual running simulation. Most importantly the answering of queries.
  *
+ * @author dstrippgen
  */
 public interface OTFLiveServer extends OTFServer, PlayPauseSimulationControlI {
-	
-	OTFQueryRemote answerQuery(AbstractQuery query);
 
-	void removeQueries();
-	
+  OTFQueryRemote answerQuery(AbstractQuery query);
+
+  void removeQueries();
 }

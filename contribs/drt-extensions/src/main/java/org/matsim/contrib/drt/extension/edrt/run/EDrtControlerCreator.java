@@ -40,36 +40,40 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class EDrtControlerCreator {
 
-	public static Controler createControler(Config config, boolean otfvis) {
-		MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
-		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
+  public static Controler createControler(Config config, boolean otfvis) {
+    MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
+    DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
 
-		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
-		ScenarioUtils.loadScenario(scenario);
+    Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
+    ScenarioUtils.loadScenario(scenario);
 
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new MultiModeEDrtModule());
-		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new EvModule());
+    Controler controler = new Controler(scenario);
+    controler.addOverridingModule(new MultiModeEDrtModule());
+    controler.addOverridingModule(new DvrpModule());
+    controler.addOverridingModule(new EvModule());
 
-		for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
-			controler.addOverridingQSimModule(new EvDvrpFleetQSimModule(drtCfg.getMode()));
-		}
+    for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
+      controler.addOverridingQSimModule(new EvDvrpFleetQSimModule(drtCfg.getMode()));
+    }
 
-		controler.addOverridingQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				this.bind(IdleDischargingHandler.VehicleProvider.class).to(OperatingVehicleProvider.class);
-			}
-		});
+    controler.addOverridingQSimModule(
+        new AbstractQSimModule() {
+          @Override
+          protected void configureQSim() {
+            this.bind(IdleDischargingHandler.VehicleProvider.class)
+                .to(OperatingVehicleProvider.class);
+          }
+        });
 
-//		controler.configureQSimComponents(DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT),
-//				multiModeDrtConfig.modes().collect(toList())));
-		controler.configureQSimComponents( DvrpQSimComponents.activateModes( multiModeDrtConfig.modes().toArray(String[]::new ) ) );
+    //
+    //	controler.configureQSimComponents(DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT),
+    //				multiModeDrtConfig.modes().collect(toList())));
+    controler.configureQSimComponents(
+        DvrpQSimComponents.activateModes(multiModeDrtConfig.modes().toArray(String[]::new)));
 
-		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule());
-		}
-		return controler;
-	}
+    if (otfvis) {
+      controler.addOverridingModule(new OTFVisLiveModule());
+    }
+    return controler;
+  }
 }

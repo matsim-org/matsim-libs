@@ -20,7 +20,6 @@
 package org.matsim.contrib.av.robotaxi.run;
 
 import java.net.URL;
-
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiControlerCreator;
@@ -29,9 +28,13 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunRobotaxiExample {
-	public static void run(URL configUrl, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configUrl, new DvrpConfigGroup(), new OTFVisConfigGroup(),
-				new MultiModeTaxiConfigGroup());
-		TaxiControlerCreator.createControler(config, otfvis).run();
-	}
+  public static void run(URL configUrl, boolean otfvis) {
+    Config config =
+        ConfigUtils.loadConfig(
+            configUrl,
+            new DvrpConfigGroup(),
+            new OTFVisConfigGroup(),
+            new MultiModeTaxiConfigGroup());
+    TaxiControlerCreator.createControler(config, otfvis).run();
+  }
 }

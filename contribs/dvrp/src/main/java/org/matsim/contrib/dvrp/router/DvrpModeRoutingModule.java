@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.router;
 
 import static org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DefaultMainLegRouter.RouteCreator;
@@ -34,65 +35,76 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.Inject;
-
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class DvrpModeRoutingModule extends AbstractDvrpModeModule {
-	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+  private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
-	public DvrpModeRoutingModule(String mode, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory) {
-		super(mode);
-		this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
-	}
+  public DvrpModeRoutingModule(
+      String mode, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory) {
+    super(mode);
+    this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
+  }
 
-	@Override
-	public void install() {
-		addRoutingModuleBinding(getMode()).toProvider(new DvrpRoutingModuleProvider(getMode()));// not singleton
+  @Override
+  public void install() {
+    addRoutingModuleBinding(getMode())
+        .toProvider(new DvrpRoutingModuleProvider(getMode())); // not singleton
 
-		modalMapBinder(DvrpRoutingModuleProvider.Stage.class, RoutingModule.class).addBinding(
-						DvrpRoutingModuleProvider.Stage.MAIN)
-				.toProvider(new DefaultMainLegRouterProvider(getMode()));// not singleton
+    modalMapBinder(DvrpRoutingModuleProvider.Stage.class, RoutingModule.class)
+        .addBinding(DvrpRoutingModuleProvider.Stage.MAIN)
+        .toProvider(new DefaultMainLegRouterProvider(getMode())); // not singleton
 
-		bindModal(RouteCreator.class).toProvider(
-				new GenericRouteCreatorProvider(getMode(), leastCostPathCalculatorFactory));// not singleton
+    bindModal(RouteCreator.class)
+        .toProvider(
+            new GenericRouteCreatorProvider(
+                getMode(), leastCostPathCalculatorFactory)); // not singleton
 
-		bindModal(AccessEgressFacilityFinder.class).toProvider(
-						modalProvider(getter -> new DecideOnLinkAccessEgressFacilityFinder(getter.getModal(Network.class))))
-				.asEagerSingleton();
-	}
+    bindModal(AccessEgressFacilityFinder.class)
+        .toProvider(
+            modalProvider(
+                getter ->
+                    new DecideOnLinkAccessEgressFacilityFinder(getter.getModal(Network.class))))
+        .asEagerSingleton();
+  }
 
-	public static class DefaultMainLegRouterProvider extends ModalProviders.AbstractProvider<DvrpMode, RoutingModule> {
-		@Inject
-		private Scenario scenario;
+  public static class DefaultMainLegRouterProvider
+      extends ModalProviders.AbstractProvider<DvrpMode, RoutingModule> {
+    @Inject private Scenario scenario;
 
-		public DefaultMainLegRouterProvider(String mode) {
-			super(mode, DvrpModes::mode);
-		}
+    public DefaultMainLegRouterProvider(String mode) {
+      super(mode, DvrpModes::mode);
+    }
 
-		@Override
-		public RoutingModule get() {
-			return new DefaultMainLegRouter(getMode(), getModalInstance(Network.class),
-					scenario.getPopulation().getFactory(), getModalInstance(RouteCreator.class));
-		}
-	}
+    @Override
+    public RoutingModule get() {
+      return new DefaultMainLegRouter(
+          getMode(),
+          getModalInstance(Network.class),
+          scenario.getPopulation().getFactory(),
+          getModalInstance(RouteCreator.class));
+    }
+  }
 
-	private static class GenericRouteCreatorProvider
-			extends ModalProviders.AbstractProvider<DvrpMode, GenericRouteCreator> {
-		private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+  private static class GenericRouteCreatorProvider
+      extends ModalProviders.AbstractProvider<DvrpMode, GenericRouteCreator> {
+    private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
-		private GenericRouteCreatorProvider(String mode,
-				LeastCostPathCalculatorFactory leastCostPathCalculatorFactory) {
-			super(mode, DvrpModes::mode);
-			this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
-		}
+    private GenericRouteCreatorProvider(
+        String mode, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory) {
+      super(mode, DvrpModes::mode);
+      this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
+    }
 
-		@Override
-		public GenericRouteCreator get() {
-			var travelTime = getModalInstance(TravelTime.class);
-			return new GenericRouteCreator(leastCostPathCalculatorFactory, getModalInstance(Network.class), travelTime,
-					getModalInstance(TravelDisutilityFactory.class));
-		}
-	}
+    @Override
+    public GenericRouteCreator get() {
+      var travelTime = getModalInstance(TravelTime.class);
+      return new GenericRouteCreator(
+          leastCostPathCalculatorFactory,
+          getModalInstance(Network.class),
+          travelTime,
+          getModalInstance(TravelDisutilityFactory.class));
+    }
+  }
 }

@@ -25,11 +25,10 @@ package org.matsim.freight.carriers.controler;
  * Utils class for (package-private) content of freight.carriers.controler - package;
  *
  * @author kturner
- *
  */
 public class CarrierControlerUtils {
 
-	public static CarrierStrategyManager createDefaultCarrierStrategyManager() {
-		return new CarrierStrategyManagerImpl();
-	}
+  public static CarrierStrategyManager createDefaultCarrierStrategyManager() {
+    return new CarrierStrategyManagerImpl();
+  }
 }

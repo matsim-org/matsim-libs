@@ -34,88 +34,96 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.MatsimVehicleWriter;
 
-
 /**
- *
- * Use the config file as created by the
- * {@link CreateEmissionConfig CreateEmissionConfig} to calculate
- * emissions based on the link leave events of an events file. Resulting emission events are written into an event file.
+ * Use the config file as created by the {@link CreateEmissionConfig CreateEmissionConfig} to
+ * calculate emissions based on the link leave events of an events file. Resulting emission events
+ * are written into an event file.
  *
  * @author benjamin, julia
  */
-public final class RunAverageEmissionToolOfflineExample{
+public final class RunAverageEmissionToolOfflineExample {
 
-//	private static final String configFile = "./scenarios/sampleScenario/testv2_Vehv1/config_average.xml";
+  //	private static final String configFile =
+  // "./scenarios/sampleScenario/testv2_Vehv1/config_average.xml";
 
-	public static final String emissionEventsFilename = "emission.events.offline.xml.gz";
+  public static final String emissionEventsFilename = "emission.events.offline.xml.gz";
 
-	// (remove dependency of one test/execution path from other. kai/ihab, nov'18)
+  // (remove dependency of one test/execution path from other. kai/ihab, nov'18)
 
-	private Config config;
+  private Config config;
 
-	// =======================================================================================================
+  // =======================================================================================================
 
-	public static void main (String[] args){
-		RunAverageEmissionToolOfflineExample emissionToolOfflineExampleV2 = new RunAverageEmissionToolOfflineExample();
-		emissionToolOfflineExampleV2.run();
-	}
+  public static void main(String[] args) {
+    RunAverageEmissionToolOfflineExample emissionToolOfflineExampleV2 =
+        new RunAverageEmissionToolOfflineExample();
+    emissionToolOfflineExampleV2.run();
+  }
 
-//	public Config prepareConfig() {
-//		config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
-//		return config;
-//	}
+  //	public Config prepareConfig() {
+  //		config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
+  //		return config;
+  //	}
 
-	public Config prepareConfig(String args){
-		throw new RuntimeException("execution path no longer exists");
-	}
-	public Config prepareConfig(String [] args) {
-		config = ConfigUtils.loadConfig(args, new EmissionsConfigGroup());
-		EmissionsConfigGroup ecg = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-		ecg.setHbefaVehicleDescriptionSource(EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
-		return config;
-	}
+  public Config prepareConfig(String args) {
+    throw new RuntimeException("execution path no longer exists");
+  }
 
-	public void run() {
-		if ( config==null ) {
-//			this.prepareConfig() ;
-			throw new RuntimeException( "this execution path no longer exists" );
-		}
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+  public Config prepareConfig(String[] args) {
+    config = ConfigUtils.loadConfig(args, new EmissionsConfigGroup());
+    EmissionsConfigGroup ecg = ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
+    ecg.setHbefaVehicleDescriptionSource(
+        EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
+    return config;
+  }
 
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		// If you get an Exception "queue full" with the eventsManager above, please try the "old" single threaded one (below)
-		// There is an issue that the ParallelEventsManager has problems if the number of events is to hugh.
-		// see also https://github.com/matsim-org/matsim-libs/issues/1091
-//		EventsManager eventsManager = new EventsManagerImpl();
+  public void run() {
+    if (config == null) {
+      //			this.prepareConfig() ;
+      throw new RuntimeException("this execution path no longer exists");
+    }
+    Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		AbstractModule module = new AbstractModule(){
-			@Override
-			public void install(){
-				bind( Scenario.class ).toInstance( scenario );
-				bind( EventsManager.class ).toInstance( eventsManager );
-				bind( EmissionModule.class ) ;
-//				bind( OutputDirectoryHierarchy.class );
-			}
-		};;
+    EventsManager eventsManager = EventsUtils.createEventsManager();
+    // If you get an Exception "queue full" with the eventsManager above, please try the "old"
+    // single threaded one (below)
+    // There is an issue that the ParallelEventsManager has problems if the number of events is to
+    // hugh.
+    // see also https://github.com/matsim-org/matsim-libs/issues/1091
+    //		EventsManager eventsManager = new EventsManagerImpl();
 
-		com.google.inject.Injector injector = Injector.createInjector(config, module );
+    AbstractModule module =
+        new AbstractModule() {
+          @Override
+          public void install() {
+            bind(Scenario.class).toInstance(scenario);
+            bind(EventsManager.class).toInstance(eventsManager);
+            bind(EmissionModule.class);
+            //				bind( OutputDirectoryHierarchy.class );
+          }
+        };
+    ;
 
-		EmissionModule emissionModule = injector.getInstance(EmissionModule.class);
-//		OutputDirectoryHierarchy outputDirectoryHierarchy = injector.getInstance( OutputDirectoryHierarchy.class );
+    com.google.inject.Injector injector = Injector.createInjector(config, module);
 
-		final String outputDirectory = scenario.getConfig().controller().getOutputDirectory();
-		EventWriterXML emissionEventWriter = new EventWriterXML( outputDirectory + emissionEventsFilename );
-		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
+    EmissionModule emissionModule = injector.getInstance(EmissionModule.class);
+    //		OutputDirectoryHierarchy outputDirectoryHierarchy = injector.getInstance(
+    // OutputDirectoryHierarchy.class );
 
-		eventsManager.initProcessing();
-		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
-//		matsimEventsReader.readFile( "./scenarios/sampleScenario/5.events.xml.gz" );
-		matsimEventsReader.readFile( IOUtils.extendUrl( config.getContext(), "../output_events.xml.gz" ).toString() );
-		eventsManager.finishProcessing();
+    final String outputDirectory = scenario.getConfig().controller().getOutputDirectory();
+    EventWriterXML emissionEventWriter =
+        new EventWriterXML(outputDirectory + emissionEventsFilename);
+    emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 
-		emissionEventWriter.closeFile();
+    eventsManager.initProcessing();
+    MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
+    //		matsimEventsReader.readFile( "./scenarios/sampleScenario/5.events.xml.gz" );
+    matsimEventsReader.readFile(
+        IOUtils.extendUrl(config.getContext(), "../output_events.xml.gz").toString());
+    eventsManager.finishProcessing();
 
-		new MatsimVehicleWriter( scenario.getVehicles() ).writeFile( outputDirectory + "vehicles.xml.gz" );
+    emissionEventWriter.closeFile();
 
-	}
+    new MatsimVehicleWriter(scenario.getVehicles()).writeFile(outputDirectory + "vehicles.xml.gz");
+  }
 }

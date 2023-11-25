@@ -20,44 +20,40 @@
 package org.matsim.contrib.signals.model;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.contrib.signals.controller.SignalController;
 
-
 /**
  * @author dgrether, tthunig
- *
  */
 public interface SignalSystem extends Identifiable<SignalSystem> {
-	
-	public static final int SWITCH_OFF_SEQUENCE_LENGTH = 5;
-	
-	public void setSignalSystemsManager(SignalSystemsManager signalManager);
 
-	public void updateState(double now);
+  public static final int SWITCH_OFF_SEQUENCE_LENGTH = 5;
 
-	public void setSignalSystemController(SignalController controller);
+  public void setSignalSystemsManager(SignalSystemsManager signalManager);
 
-	public void addSignal(Signal signal);
-	
-	public Map<Id<Signal>, Signal> getSignals();
+  public void updateState(double now);
 
-	public void addSignalGroup(SignalGroup group);
-	
-	public Map<Id<SignalGroup>, SignalGroup> getSignalGroups();
+  public void setSignalSystemController(SignalController controller);
 
-	public void scheduleDropping(double now, Id<SignalGroup> signalGroupId);
+  public void addSignal(Signal signal);
 
-	public void scheduleOnset(double now, Id<SignalGroup> signalGroupId);
+  public Map<Id<Signal>, Signal> getSignals();
 
-	public SignalController getSignalController();
+  public void addSignalGroup(SignalGroup group);
 
-	public void simulationInitialized(double now);
-	
-	public void switchOff(double now);
-	
-	public void startPlan(double now);
-	
+  public Map<Id<SignalGroup>, SignalGroup> getSignalGroups();
+
+  public void scheduleDropping(double now, Id<SignalGroup> signalGroupId);
+
+  public void scheduleOnset(double now, Id<SignalGroup> signalGroupId);
+
+  public SignalController getSignalController();
+
+  public void simulationInitialized(double now);
+
+  public void switchOff(double now);
+
+  public void startPlan(double now);
 }

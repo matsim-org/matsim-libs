@@ -20,7 +20,6 @@
 package org.matsim.contrib.socnetsim.jointtrips.scoring;
 
 import java.util.Set;
-
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -29,43 +28,44 @@ import org.matsim.core.scoring.SumScoringFunction;
  * @author thibautd
  */
 public class BlackListedActivityScoringFunction implements SumScoringFunction.ActivityScoring {
-	private final SumScoringFunction.ActivityScoring delegate;
+  private final SumScoringFunction.ActivityScoring delegate;
 
-	private final Set<String> blackList; // formerly StageActivityTypes
+  private final Set<String> blackList; // formerly StageActivityTypes
 
-	public BlackListedActivityScoringFunction(
-			final Set<String> blackList,
-			final SumScoringFunction.ActivityScoring delegate) {
-		this.blackList = blackList;
-		this.delegate = delegate;
-	}
+  public BlackListedActivityScoringFunction(
+      final Set<String> blackList, final SumScoringFunction.ActivityScoring delegate) {
+    this.blackList = blackList;
+    this.delegate = delegate;
+  }
 
-	@Override
-	public void handleFirstActivity(Activity act) {
-		if ( blackList.contains( act.getType() ) || StageActivityTypeIdentifier.isStageActivity(act.getType()) ) return;
-		delegate.handleFirstActivity( act);
-	}
+  @Override
+  public void handleFirstActivity(Activity act) {
+    if (blackList.contains(act.getType())
+        || StageActivityTypeIdentifier.isStageActivity(act.getType())) return;
+    delegate.handleFirstActivity(act);
+  }
 
-	@Override
-	public void handleActivity(Activity act) {
-		if ( blackList.contains( act.getType() ) || StageActivityTypeIdentifier.isStageActivity(act.getType()) ) return;
-		delegate.handleActivity( act);
-	}
+  @Override
+  public void handleActivity(Activity act) {
+    if (blackList.contains(act.getType())
+        || StageActivityTypeIdentifier.isStageActivity(act.getType())) return;
+    delegate.handleActivity(act);
+  }
 
-	@Override
-	public void handleLastActivity(Activity act) {
-		if ( blackList.contains( act.getType() ) || StageActivityTypeIdentifier.isStageActivity(act.getType()) ) return;
-		delegate.handleLastActivity( act);
-	}
+  @Override
+  public void handleLastActivity(Activity act) {
+    if (blackList.contains(act.getType())
+        || StageActivityTypeIdentifier.isStageActivity(act.getType())) return;
+    delegate.handleLastActivity(act);
+  }
 
-	@Override
-	public void finish() {
-		delegate.finish();
-	}
+  @Override
+  public void finish() {
+    delegate.finish();
+  }
 
-	@Override
-	public double getScore() {
-		return delegate.getScore();
-	}
+  @Override
+  public double getScore() {
+    return delegate.getScore();
+  }
 }
-

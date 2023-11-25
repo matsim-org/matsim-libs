@@ -20,28 +20,24 @@
 package org.matsim.contrib.signals.model;
 
 import java.util.List;
-
 import org.matsim.api.core.v01.Id;
-
 
 /**
  * @author dgrether
- *
  */
 public interface SignalPlan {
 
-	public List<Id<SignalGroup>> getDroppings(double timeSeconds);
+  public List<Id<SignalGroup>> getDroppings(double timeSeconds);
 
-	public List<Id<SignalGroup>> getOnsets(double timeSeconds);
+  public List<Id<SignalGroup>> getOnsets(double timeSeconds);
 
-	public double getEndTime();
-	
-	public double getStartTime();
+  public double getEndTime();
 
-	public Id<SignalPlan> getId();
-	
-	public Integer getOffset();
-	
-	public Integer getCycleTime();
-	
+  public double getStartTime();
+
+  public Id<SignalPlan> getId();
+
+  public Integer getOffset();
+
+  public Integer getCycleTime();
 }

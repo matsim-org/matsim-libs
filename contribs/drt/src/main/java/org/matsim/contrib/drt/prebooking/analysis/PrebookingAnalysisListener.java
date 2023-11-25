@@ -8,35 +8,36 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
 public class PrebookingAnalysisListener implements IterationStartsListener, IterationEndsListener {
-	private final String mode;
+  private final String mode;
 
-	private final OutputDirectoryHierarchy outputHierarchy;
-	private final EventsManager eventsManager;
+  private final OutputDirectoryHierarchy outputHierarchy;
+  private final EventsManager eventsManager;
 
-	private PrebookingAnalysisHandler handler;
+  private PrebookingAnalysisHandler handler;
 
-	public PrebookingAnalysisListener(String mode, EventsManager eventsManager,
-			OutputDirectoryHierarchy outputHierarchy) {
-		this.mode = mode;
-		this.eventsManager = eventsManager;
-		this.outputHierarchy = outputHierarchy;
-	}
+  public PrebookingAnalysisListener(
+      String mode, EventsManager eventsManager, OutputDirectoryHierarchy outputHierarchy) {
+    this.mode = mode;
+    this.eventsManager = eventsManager;
+    this.outputHierarchy = outputHierarchy;
+  }
 
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		handler = new PrebookingAnalysisHandler(mode);
-		eventsManager.addHandler(handler);
-	}
+  @Override
+  public void notifyIterationStarts(IterationStartsEvent event) {
+    handler = new PrebookingAnalysisHandler(mode);
+    eventsManager.addHandler(handler);
+  }
 
-	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		eventsManager.removeHandler(handler);
+  @Override
+  public void notifyIterationEnds(IterationEndsEvent event) {
+    eventsManager.removeHandler(handler);
 
-		String outputPath = outputHierarchy.getIterationFilename(event.getIteration(), getOutputFileName());
-		new PrebookingAnalysisWriter(outputPath).write(handler.getRecords());
-	}
+    String outputPath =
+        outputHierarchy.getIterationFilename(event.getIteration(), getOutputFileName());
+    new PrebookingAnalysisWriter(outputPath).write(handler.getRecords());
+  }
 
-	private String getOutputFileName() {
-		return String.format("prebooking_%s.csv", mode);
-	}
+  private String getOutputFileName() {
+    return String.format("prebooking_%s.csv", mode);
+  }
 }

@@ -26,14 +26,13 @@ import org.matsim.api.core.v01.population.Route;
 
 public final class GenericRouteFactory implements RouteFactory {
 
-	@Override
-	public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
-		return RouteUtils.createGenericRouteImpl(startLinkId, endLinkId);
-	}
-	
-	@Override
-	public String getCreatedRouteType() {
-		return GenericRouteImpl.ROUTE_TYPE;
-	}
+  @Override
+  public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
+    return RouteUtils.createGenericRouteImpl(startLinkId, endLinkId);
+  }
 
+  @Override
+  public String getCreatedRouteType() {
+    return GenericRouteImpl.ROUTE_TYPE;
+  }
 }

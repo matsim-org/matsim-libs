@@ -26,34 +26,46 @@ import org.matsim.vehicles.Vehicle;
 
 public interface AgentSnapshotInfo {
 
-	String marker = "marker";
+  String marker = "marker";
 
-	// !!! WARNING: The enum list can only be extended.  Making it shorter or changing the sequence of existing elements
-	// will break the otfvis binary channel, meaning that *.mvi files generated until then will become weird. kai, jan'10
-	enum AgentState { PERSON_AT_ACTIVITY, PERSON_DRIVING_CAR, PERSON_OTHER_MODE, TRANSIT_DRIVER, MARKER }
-	// !!! WARNING: See comment above this enum.
+  // !!! WARNING: The enum list can only be extended.  Making it shorter or changing the sequence of
+  // existing elements
+  // will break the otfvis binary channel, meaning that *.mvi files generated until then will become
+  // weird. kai, jan'10
+  enum AgentState {
+    PERSON_AT_ACTIVITY,
+    PERSON_DRIVING_CAR,
+    PERSON_OTHER_MODE,
+    TRANSIT_DRIVER,
+    MARKER
+  }
 
-	enum DrivingState { NOT_DRIVING, FREE_FLOW, CONGESTED }
+  // !!! WARNING: See comment above this enum.
 
-	Id<Person> getId() ;
+  enum DrivingState {
+    NOT_DRIVING,
+    FREE_FLOW,
+    CONGESTED
+  }
 
-	Id<Vehicle> getVehicleId();
+  Id<Person> getId();
 
-	Id<Link> getLinkId();
+  Id<Vehicle> getVehicleId();
 
-	DrivingState getDrivingState();
+  Id<Link> getLinkId();
 
-	double getEasting();
+  DrivingState getDrivingState();
 
-	double getNorthing();
+  double getEasting();
 
-	@Deprecated
-	double getAzimuth();
+  double getNorthing();
 
-	double getColorValueBetweenZeroAndOne();
+  @Deprecated
+  double getAzimuth();
 
-	AgentState getAgentState();
+  double getColorValueBetweenZeroAndOne();
 
-	int getUserDefined() ;
+  AgentState getAgentState();
 
+  int getUserDefined();
 }

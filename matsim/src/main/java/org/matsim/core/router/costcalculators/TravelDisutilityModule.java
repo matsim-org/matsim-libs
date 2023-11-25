@@ -27,15 +27,15 @@ import org.matsim.core.controler.AbstractModule;
 
 public class TravelDisutilityModule extends AbstractModule {
 
-    @Override
-    public void install() {
-        RoutingConfigGroup routeConfigGroup = getConfig().routing();
-        for (String mode : routeConfigGroup.getNetworkModes()) {
+  @Override
+  public void install() {
+    RoutingConfigGroup routeConfigGroup = getConfig().routing();
+    for (String mode : routeConfigGroup.getNetworkModes()) {
 
-            final RandomizingTimeDistanceTravelDisutilityFactory builder = new RandomizingTimeDistanceTravelDisutilityFactory( mode, getConfig() );
+      final RandomizingTimeDistanceTravelDisutilityFactory builder =
+          new RandomizingTimeDistanceTravelDisutilityFactory(mode, getConfig());
 
-                addTravelDisutilityFactoryBinding(mode ).toInstance( builder );
-        }
+      addTravelDisutilityFactoryBinding(mode).toInstance(builder);
     }
-
+  }
 }

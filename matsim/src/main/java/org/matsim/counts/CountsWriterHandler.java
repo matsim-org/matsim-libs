@@ -19,25 +19,31 @@
  * *********************************************************************** */
 
 package org.matsim.counts;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 
 interface CountsWriterHandler {
-	//////////////////////////////////////////////////////////////////////
-	// <counts ... > ... </counts>
-	//////////////////////////////////////////////////////////////////////
-	public void startCounts(final Counts counts, final BufferedWriter out) throws IOException;
-	public void endCounts(final BufferedWriter out) throws IOException;
-	//////////////////////////////////////////////////////////////////////
-	// <count ... > ... </count>
-	//////////////////////////////////////////////////////////////////////
-	public void startCount(final Count count, final BufferedWriter out) throws IOException;
-	public void endCount(final BufferedWriter out) throws IOException;
-	//////////////////////////////////////////////////////////////////////
-	// <volume ... />
-	//////////////////////////////////////////////////////////////////////
-	public void startVolume(final Volume volume, final BufferedWriter out) throws IOException;
-	public void endVolume(final BufferedWriter out) throws IOException;
-	
-	public void writeSeparator(final BufferedWriter out) throws IOException;
+  //////////////////////////////////////////////////////////////////////
+  // <counts ... > ... </counts>
+  //////////////////////////////////////////////////////////////////////
+  public void startCounts(final Counts counts, final BufferedWriter out) throws IOException;
+
+  public void endCounts(final BufferedWriter out) throws IOException;
+
+  //////////////////////////////////////////////////////////////////////
+  // <count ... > ... </count>
+  //////////////////////////////////////////////////////////////////////
+  public void startCount(final Count count, final BufferedWriter out) throws IOException;
+
+  public void endCount(final BufferedWriter out) throws IOException;
+
+  //////////////////////////////////////////////////////////////////////
+  // <volume ... />
+  //////////////////////////////////////////////////////////////////////
+  public void startVolume(final Volume volume, final BufferedWriter out) throws IOException;
+
+  public void endVolume(final BufferedWriter out) throws IOException;
+
+  public void writeSeparator(final BufferedWriter out) throws IOException;
 }

@@ -19,6 +19,8 @@
 
 package org.matsim.core.router;
 
+import jakarta.inject.Provider;
+import java.util.Arrays;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
@@ -34,113 +36,120 @@ import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterModule;
 
-import jakarta.inject.Provider;
-import java.util.Arrays;
-
 public class TripRouterFactoryBuilderWithDefaults {
 
-	private Provider<TransitRouter> transitRouterFactory;
+  private Provider<TransitRouter> transitRouterFactory;
 
-	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
-    private TravelTime carTravelTime;
-    private TravelDisutility carTravelDisutility;
+  private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+  private TravelTime carTravelTime;
+  private TravelDisutility carTravelDisutility;
 
-    public static Provider<TripRouter> createTripRouterProvider(
-            final Scenario scenario,
-            final LeastCostPathCalculatorFactory leastCostAlgoFactory,
-            final Provider<TransitRouter> transitRouterFactory) {
-        TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
-        builder.setLeastCostPathCalculatorFactory(leastCostAlgoFactory);
-        builder.setTransitRouterFactory(transitRouterFactory);
-        return builder.build(scenario);
-	}
+  public static Provider<TripRouter> createTripRouterProvider(
+      final Scenario scenario,
+      final LeastCostPathCalculatorFactory leastCostAlgoFactory,
+      final Provider<TransitRouter> transitRouterFactory) {
+    TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
+    builder.setLeastCostPathCalculatorFactory(leastCostAlgoFactory);
+    builder.setTransitRouterFactory(transitRouterFactory);
+    return builder.build(scenario);
+  }
 
-    public void setTransitRouterFactory(Provider<TransitRouter> transitRouterFactory) {
-		this.transitRouterFactory = transitRouterFactory;
-	}
+  public void setTransitRouterFactory(Provider<TransitRouter> transitRouterFactory) {
+    this.transitRouterFactory = transitRouterFactory;
+  }
 
-	public void setLeastCostPathCalculatorFactory(LeastCostPathCalculatorFactory leastCostPathCalculatorFactory) {
-		this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
-	}
+  public void setLeastCostPathCalculatorFactory(
+      LeastCostPathCalculatorFactory leastCostPathCalculatorFactory) {
+    this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
+  }
 
-	public Provider<TripRouter> build(final Scenario scenario) {
-        return Injector.createInjector(scenario.getConfig(),
-                AbstractModule.override(
-                        Arrays.asList(
-                                new ScenarioByInstanceModule(scenario),
-                                new TripRouterModule(),
-                                new TravelDisutilityModule(),
-                                new TravelTimeCalculatorModule(),
-                                new TimeInterpretationModule(),
-                                new EventsManagerModule()),
-                        new AbstractModule() {
-							@Override
-                            public void install() {
-                                if (leastCostPathCalculatorFactory != null) {
-                                    bind(LeastCostPathCalculatorFactory.class).toInstance(leastCostPathCalculatorFactory);
-                                }
-                                if (transitRouterFactory != null && getConfig().transit().isUseTransit()) {
-                                    bind(TransitRouter.class).toProvider(transitRouterFactory);
-                                }
-                                if (carTravelDisutility != null) {
-                                    addTravelDisutilityFactoryBinding("car").toInstance(new TravelDisutilityFactory() {
-                                        @Override
-                                        public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
-                                            return carTravelDisutility;
-                                        }
-                                    });
-                                }
-                                if (carTravelTime != null) {
-                                    addTravelTimeBinding("car").toInstance(carTravelTime);
-                                }
-                            }
-                        })).getProvider(TripRouter.class);
-    }
-
-    public static Provider<TripRouter> createDefaultTripRouterFactoryImpl(final Scenario scenario) {
-        return Injector.createInjector(scenario.getConfig(),
-                new TripRouterModule(),
-                new TravelDisutilityModule(),
-                new TravelTimeCalculatorModule(),
-                new EventsManagerModule(),
-                new TimeInterpretationModule(),
+  public Provider<TripRouter> build(final Scenario scenario) {
+    return Injector.createInjector(
+            scenario.getConfig(),
+            AbstractModule.override(
+                Arrays.asList(
+                    new ScenarioByInstanceModule(scenario),
+                    new TripRouterModule(),
+                    new TravelDisutilityModule(),
+                    new TravelTimeCalculatorModule(),
+                    new TimeInterpretationModule(),
+                    new EventsManagerModule()),
                 new AbstractModule() {
-                    @Override
-                    public void install() {
-                        install(new ScenarioByInstanceModule(scenario));
+                  @Override
+                  public void install() {
+                    if (leastCostPathCalculatorFactory != null) {
+                      bind(LeastCostPathCalculatorFactory.class)
+                          .toInstance(leastCostPathCalculatorFactory);
                     }
-                })
-                .getProvider(TripRouter.class);
-    }
+                    if (transitRouterFactory != null && getConfig().transit().isUseTransit()) {
+                      bind(TransitRouter.class).toProvider(transitRouterFactory);
+                    }
+                    if (carTravelDisutility != null) {
+                      addTravelDisutilityFactoryBinding("car")
+                          .toInstance(
+                              new TravelDisutilityFactory() {
+                                @Override
+                                public TravelDisutility createTravelDisutility(
+                                    TravelTime timeCalculator) {
+                                  return carTravelDisutility;
+                                }
+                              });
+                    }
+                    if (carTravelTime != null) {
+                      addTravelTimeBinding("car").toInstance(carTravelTime);
+                    }
+                  }
+                }))
+        .getProvider(TripRouter.class);
+  }
 
-    public static Provider<TransitRouter> createDefaultTransitRouter(final Scenario scenario) {
-        return Injector.createInjector(scenario.getConfig(),
-                new TransitRouterModule(),
-                new AbstractModule() {
-                    @Override
-                    public void install() {
-                        install(new ScenarioByInstanceModule(scenario));
-                    }
-                })
+  public static Provider<TripRouter> createDefaultTripRouterFactoryImpl(final Scenario scenario) {
+    return Injector.createInjector(
+            scenario.getConfig(),
+            new TripRouterModule(),
+            new TravelDisutilityModule(),
+            new TravelTimeCalculatorModule(),
+            new EventsManagerModule(),
+            new TimeInterpretationModule(),
+            new AbstractModule() {
+              @Override
+              public void install() {
+                install(new ScenarioByInstanceModule(scenario));
+              }
+            })
+        .getProvider(TripRouter.class);
+  }
+
+  public static Provider<TransitRouter> createDefaultTransitRouter(final Scenario scenario) {
+    return Injector.createInjector(
+            scenario.getConfig(),
+            new TransitRouterModule(),
+            new AbstractModule() {
+              @Override
+              public void install() {
+                install(new ScenarioByInstanceModule(scenario));
+              }
+            })
         .getProvider(TransitRouter.class);
-	}
+  }
 
-	public static LeastCostPathCalculatorFactory createDefaultLeastCostPathCalculatorFactory(final Scenario scenario) {
-        return Injector.createInjector(scenario.getConfig(),
-                new ScenarioByInstanceModule(scenario),
-                new EventsManagerModule(),
-                new TravelDisutilityModule(),
-                new TravelTimeCalculatorModule(),
-                new LeastCostPathCalculatorModule())
+  public static LeastCostPathCalculatorFactory createDefaultLeastCostPathCalculatorFactory(
+      final Scenario scenario) {
+    return Injector.createInjector(
+            scenario.getConfig(),
+            new ScenarioByInstanceModule(scenario),
+            new EventsManagerModule(),
+            new TravelDisutilityModule(),
+            new TravelTimeCalculatorModule(),
+            new LeastCostPathCalculatorModule())
         .getInstance(LeastCostPathCalculatorFactory.class);
-    }
+  }
 
-    public void setTravelTime(TravelTime travelTime) {
-        this.carTravelTime = travelTime;
-    }
+  public void setTravelTime(TravelTime travelTime) {
+    this.carTravelTime = travelTime;
+  }
 
-    public void setTravelDisutility(TravelDisutility travelDisutility) {
-        this.carTravelDisutility = travelDisutility;
-    }
-
+  public void setTravelDisutility(TravelDisutility travelDisutility) {
+    this.carTravelDisutility = travelDisutility;
+  }
 }

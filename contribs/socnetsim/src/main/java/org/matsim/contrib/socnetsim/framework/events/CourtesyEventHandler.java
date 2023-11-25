@@ -18,12 +18,11 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.events;
 
-
 import org.matsim.core.events.handler.EventHandler;
 
 /**
  * @author thibautd
  */
 public interface CourtesyEventHandler extends EventHandler {
-	void handleEvent( CourtesyEvent event );
+  void handleEvent(CourtesyEvent event);
 }

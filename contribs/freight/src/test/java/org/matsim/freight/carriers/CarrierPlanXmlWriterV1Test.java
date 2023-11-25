@@ -24,32 +24,30 @@ package org.matsim.freight.carriers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.freight.carriers.*;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-/**
- */
+/** */
 public class CarrierPlanXmlWriterV1Test {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	@Test
-	public void testCarrierPlanWriterWrites() {
+  @Test
+  public void testCarrierPlanWriterWrites() {
 
-		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile( testUtils.getPackageInputDirectory() + "vehicleTypes_v2.xml" );
-		VehicleType defaultVehicleType = VehicleUtils.getFactory().createVehicleType( Id.create("default", VehicleType.class ) );
-		carrierVehicleTypes.getVehicleTypes().put( defaultVehicleType.getId(), defaultVehicleType );
+    CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
+    new CarrierVehicleTypeReader(carrierVehicleTypes)
+        .readFile(testUtils.getPackageInputDirectory() + "vehicleTypes_v2.xml");
+    VehicleType defaultVehicleType =
+        VehicleUtils.getFactory().createVehicleType(Id.create("default", VehicleType.class));
+    carrierVehicleTypes.getVehicleTypes().put(defaultVehicleType.getId(), defaultVehicleType);
 
-		Carriers carriers = new Carriers();
-		CarrierPlanReaderV1 carrierPlanReaderV1 = new CarrierPlanReaderV1(carriers, carrierVehicleTypes );
-		carrierPlanReaderV1.readFile(testUtils.getClassInputDirectory() + "carrierPlansEquils.xml");
-		CarrierPlanXmlWriterV1 planWriter = new CarrierPlanXmlWriterV1(carriers.getCarriers().values());
-		planWriter.write(testUtils.getOutputDirectory() + "carrierPlansEquilsWritten.xml");
-	}
-
-
+    Carriers carriers = new Carriers();
+    CarrierPlanReaderV1 carrierPlanReaderV1 =
+        new CarrierPlanReaderV1(carriers, carrierVehicleTypes);
+    carrierPlanReaderV1.readFile(testUtils.getClassInputDirectory() + "carrierPlansEquils.xml");
+    CarrierPlanXmlWriterV1 planWriter = new CarrierPlanXmlWriterV1(carriers.getCarriers().values());
+    planWriter.write(testUtils.getOutputDirectory() + "carrierPlansEquilsWritten.xml");
+  }
 }

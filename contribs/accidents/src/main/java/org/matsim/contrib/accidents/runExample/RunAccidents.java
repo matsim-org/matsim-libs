@@ -23,7 +23,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -39,84 +38,88 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
-* @author ikaddoura, mmayobre
-*/
-
+ * @author ikaddoura, mmayobre
+ */
 public class RunAccidents {
-	private static final Logger log = LogManager.getLogger(RunAccidents.class);
+  private static final Logger log = LogManager.getLogger(RunAccidents.class);
 
-	public static void main(String[] args) throws IOException {
-		RunAccidents main = new RunAccidents();
-		main.run();
-	}
+  public static void main(String[] args) throws IOException {
+    RunAccidents main = new RunAccidents();
+    main.run();
+  }
 
-	private void run() throws MalformedURLException, IOException {
-		log.info("Loading scenario...");
+  private void run() throws MalformedURLException, IOException {
+    log.info("Loading scenario...");
 
-		String configFile = "path/to/configFile.xml";
+    String configFile = "path/to/configFile.xml";
 
-		Config config = ConfigUtils.loadConfig(configFile );
+    Config config = ConfigUtils.loadConfig(configFile);
 
-		AccidentsConfigGroup accidentsSettings = ConfigUtils.addOrGetModule(config, AccidentsConfigGroup.class);
-		accidentsSettings.setEnableAccidentsModule(true);
+    AccidentsConfigGroup accidentsSettings =
+        ConfigUtils.addOrGetModule(config, AccidentsConfigGroup.class);
+    accidentsSettings.setEnableAccidentsModule(true);
 
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
+    final Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		// Preprocess network
-		AccidentsNetworkModification networkModification = new AccidentsNetworkModification(scenario);
+    // Preprocess network
+    AccidentsNetworkModification networkModification = new AccidentsNetworkModification(scenario);
 
-		String[] tunnelLinks = readCSVFile("tunnelLinksCSVfile");
-		String[] planfreeLinks = readCSVFile("planfreeLinksCSVfile");
+    String[] tunnelLinks = readCSVFile("tunnelLinksCSVfile");
+    String[] planfreeLinks = readCSVFile("planfreeLinksCSVfile");
 
-		networkModification.setLinkAttributsBasedOnOSMFile("osmlandUseFile", "EPSG:31468" , tunnelLinks, planfreeLinks );
+    networkModification.setLinkAttributsBasedOnOSMFile(
+        "osmlandUseFile", "EPSG:31468", tunnelLinks, planfreeLinks);
 
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new AccidentsModule());
+    Controler controler = new Controler(scenario);
+    controler.addOverridingModule(new AccidentsModule());
 
-		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		controler.run();
-	}
+    controler
+        .getConfig()
+        .controller()
+        .setOverwriteFileSetting(
+            OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+    controler.run();
+  }
 
-	private String[] readCSVFile(String csvFile) {
-		ArrayList<Id<Link>> links = new ArrayList<>();
+  private String[] readCSVFile(String csvFile) {
+    ArrayList<Id<Link>> links = new ArrayList<>();
 
-		BufferedReader br = IOUtils.getBufferedReader(csvFile);
+    BufferedReader br = IOUtils.getBufferedReader(csvFile);
 
-		String line = null;
-		try {
-			line = br.readLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+    String line = null;
+    try {
+      line = br.readLine();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
 
-		try {
-			int countWarning = 0;
-			while ((line = br.readLine()) != null) {
+    try {
+      int countWarning = 0;
+      while ((line = br.readLine()) != null) {
 
-				String[] columns = line.split(";");
-				Id<Link> linkId = null;
-				for (int column = 0; column < columns.length; column++) {
-					if (column == 0) {
-						linkId = Id.createLinkId(columns[column]);
-					} else {
-						if (countWarning < 1) {
-							log.warn("Expecting the link Id to be in the first column. Ignoring further columns...");
-						} else if (countWarning == 1) {
-							log.warn("This message is only given once.");
-						}
-						countWarning++;
-					}
-				}
-				log.info("Adding link ID " + linkId);
-				links.add(linkId);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        String[] columns = line.split(";");
+        Id<Link> linkId = null;
+        for (int column = 0; column < columns.length; column++) {
+          if (column == 0) {
+            linkId = Id.createLinkId(columns[column]);
+          } else {
+            if (countWarning < 1) {
+              log.warn(
+                  "Expecting the link Id to be in the first column. Ignoring further columns...");
+            } else if (countWarning == 1) {
+              log.warn("This message is only given once.");
+            }
+            countWarning++;
+          }
+        }
+        log.info("Adding link ID " + linkId);
+        links.add(linkId);
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
 
-		String[] linkIDsArray = (String[]) links.toArray();
-		return linkIDsArray ;
-	}
-
+    String[] linkIDsArray = (String[]) links.toArray();
+    return linkIDsArray;
+  }
 }
-

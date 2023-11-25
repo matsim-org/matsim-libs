@@ -21,92 +21,88 @@ package org.matsim.contrib.socnetsim.sharedvehicles;
 
 import java.util.Iterator;
 import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.contrib.socnetsim.jointtrips.router.JointPlanRouter;
 
 /**
  * @author thibautd
- *
- * @deprecated -- I think that this functionality is now also in the central {@link TripRouter}.  kai, apr'23
+ * @deprecated -- I think that this functionality is now also in the central {@link TripRouter}.
+ *     kai, apr'23
  */
 public class PlanRouterWithVehicleRessources implements PlanAlgorithm {
-	private final PlanAlgorithm delegate;
+  private final PlanAlgorithm delegate;
 
-	PlanRouterWithVehicleRessources(
-			final PlanAlgorithm delegate) {
-		this.delegate = delegate;
-	}
+  PlanRouterWithVehicleRessources(final PlanAlgorithm delegate) {
+    this.delegate = delegate;
+  }
 
-	@Override
-	public void run(final Plan plan) {
-		final List<Trip> oldTrips =
-			TripStructureUtils.getTrips( plan );
+  @Override
+  public void run(final Plan plan) {
+    final List<Trip> oldTrips = TripStructureUtils.getTrips(plan);
 
-		delegate.run( plan );
+    delegate.run(plan);
 
-		final List<Trip> newTrips =
-			TripStructureUtils.getTrips( plan );
+    final List<Trip> newTrips = TripStructureUtils.getTrips(plan);
 
-		transmitVehicleInformation(
-				oldTrips,
-				newTrips);
-	}
+    transmitVehicleInformation(oldTrips, newTrips);
+  }
 
-	private static void transmitVehicleInformation(
-			final List<Trip> oldTrips,
-			final List<Trip> newTrips) {
-		assert oldTrips.size() == newTrips.size();
-		final Iterator<Trip> oldIter = oldTrips.iterator();
-		final Iterator<Trip> newIter = newTrips.iterator();
+  private static void transmitVehicleInformation(
+      final List<Trip> oldTrips, final List<Trip> newTrips) {
+    assert oldTrips.size() == newTrips.size();
+    final Iterator<Trip> oldIter = oldTrips.iterator();
+    final Iterator<Trip> newIter = newTrips.iterator();
 
-		while ( oldIter.hasNext() ) {
-			final Trip old = oldIter.next();
-			final Trip young = newIter.next();
+    while (oldIter.hasNext()) {
+      final Trip old = oldIter.next();
+      final Trip young = newIter.next();
 
-			final Id oldVeh = getVehicleId( old );
-			for (Leg l : young.getLegsOnly()) {
-				if ( !(l.getRoute() instanceof NetworkRoute) ) continue;
-				((NetworkRoute) l.getRoute()).setVehicleId( oldVeh );
-			}
-		}
-	}
+      final Id oldVeh = getVehicleId(old);
+      for (Leg l : young.getLegsOnly()) {
+        if (!(l.getRoute() instanceof NetworkRoute)) continue;
+        ((NetworkRoute) l.getRoute()).setVehicleId(oldVeh);
+      }
+    }
+  }
 
-	private static Id getVehicleId(final Trip old) {
-		Id id = null;
-		for (Leg l : old.getLegsOnly()) {
-			if ( !(l.getRoute() instanceof NetworkRoute) ) continue;
-			final Id currId = ((NetworkRoute) l.getRoute()).getVehicleId();
+  private static Id getVehicleId(final Trip old) {
+    Id id = null;
+    for (Leg l : old.getLegsOnly()) {
+      if (!(l.getRoute() instanceof NetworkRoute)) continue;
+      final Id currId = ((NetworkRoute) l.getRoute()).getVehicleId();
 
-			// would be more efficient to just return the first found Id,
-			// but there would be a risk of this problem poping up at some
-			// point
-			if ( id != null && !id.equals( currId ) ) {
-				throw new RuntimeException( "cannot handle trips with multiple vehicles, such as "+id+" and "+currId+" in "+l.getRoute() );
-			}
+      // would be more efficient to just return the first found Id,
+      // but there would be a risk of this problem poping up at some
+      // point
+      if (id != null && !id.equals(currId)) {
+        throw new RuntimeException(
+            "cannot handle trips with multiple vehicles, such as "
+                + id
+                + " and "
+                + currId
+                + " in "
+                + l.getRoute());
+      }
 
-			id = currId;
-		}
+      id = currId;
+    }
 
-		return id;
-	}
+    return id;
+  }
 
-//	public TripRouter getTripRouter() {
-//		if (delegate instanceof PlanRouter) {
-//			return ((PlanRouter) delegate).getTripRouter();
-//		}
-//		if (delegate instanceof JointPlanRouter) {
-//			return ((JointPlanRouter) delegate).getTripRouter();
-//		}
-//		throw new IllegalStateException( ""+delegate.getClass() );
-//	}
+  //	public TripRouter getTripRouter() {
+  //		if (delegate instanceof PlanRouter) {
+  //			return ((PlanRouter) delegate).getTripRouter();
+  //		}
+  //		if (delegate instanceof JointPlanRouter) {
+  //			return ((JointPlanRouter) delegate).getTripRouter();
+  //		}
+  //		throw new IllegalStateException( ""+delegate.getClass() );
+  //	}
 }
-

@@ -1,5 +1,7 @@
 package org.matsim.modechoice.replanning;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.GlobalConfigGroup;
@@ -11,39 +13,27 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-
-/**
- * Provider for {@link SelectSubtourModeStrategy}.
- */
+/** Provider for {@link SelectSubtourModeStrategy}. */
 public class SelectSubtourModeStrategyProvider implements Provider<PlanStrategy> {
 
-	@Inject
-	private Provider<TripRouter> tripRouterProvider;
-	@Inject
-	private GlobalConfigGroup globalConfigGroup;
-	@Inject
-	private ActivityFacilities facilities;
-	@Inject
-	private TimeInterpretation timeInterpretation;
-	@Inject
-	private Provider<GeneratorContext> generator;
-	@Inject
-	private Config config;
-	@Inject
-	private Scenario scenario;
+  @Inject private Provider<TripRouter> tripRouterProvider;
+  @Inject private GlobalConfigGroup globalConfigGroup;
+  @Inject private ActivityFacilities facilities;
+  @Inject private TimeInterpretation timeInterpretation;
+  @Inject private Provider<GeneratorContext> generator;
+  @Inject private Config config;
+  @Inject private Scenario scenario;
 
-	@Override
-	public PlanStrategy get() {
+  @Override
+  public PlanStrategy get() {
 
-		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
+    PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
 
-		builder.addStrategyModule(new SelectSubtourModeStrategy(config, scenario, generator));
+    builder.addStrategyModule(new SelectSubtourModeStrategy(config, scenario, generator));
 
-		builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
+    builder.addStrategyModule(
+        new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
 
-		return builder.build();
-
-	}
+    return builder.build();
+  }
 }

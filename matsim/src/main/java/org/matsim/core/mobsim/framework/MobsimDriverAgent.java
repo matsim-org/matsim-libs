@@ -20,6 +20,4 @@
 
 package org.matsim.core.mobsim.framework;
 
-public interface MobsimDriverAgent extends MobsimAgent, DriverAgent {
-
-}
+public interface MobsimDriverAgent extends MobsimAgent, DriverAgent {}

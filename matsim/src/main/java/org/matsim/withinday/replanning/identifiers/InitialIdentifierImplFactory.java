@@ -26,18 +26,17 @@ import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifierF
 
 public class InitialIdentifierImplFactory extends InitialIdentifierFactory {
 
-	private MobsimDataProvider mobsimDataProvider;
-	
-	public InitialIdentifierImplFactory(MobsimDataProvider mobsimDataProvider) {
-		this.mobsimDataProvider = mobsimDataProvider;
-	}
-	
-	@Override
-	public InitialIdentifier createIdentifier() {
-		InitialIdentifier identifier = new InitialIdentifierImpl(mobsimDataProvider);
-		identifier.setAgentSelectorFactory(this);
-		this.addAgentFiltersToIdentifier(identifier);
-		return identifier;
-	}
+  private MobsimDataProvider mobsimDataProvider;
 
+  public InitialIdentifierImplFactory(MobsimDataProvider mobsimDataProvider) {
+    this.mobsimDataProvider = mobsimDataProvider;
+  }
+
+  @Override
+  public InitialIdentifier createIdentifier() {
+    InitialIdentifier identifier = new InitialIdentifierImpl(mobsimDataProvider);
+    identifier.setAgentSelectorFactory(this);
+    this.addAgentFiltersToIdentifier(identifier);
+    return identifier;
+  }
 }

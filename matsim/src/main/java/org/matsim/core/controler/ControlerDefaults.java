@@ -27,38 +27,42 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
 /**
  * Intention of this class is to have the controler defaults clearly marked and visible.
- * <p></p>
- * The initial use case of this is that we want to deprecated the pattern of taking out a factory from the controler, wrapping something 
- * around it, and putting it back in, since such things may depend on the calling sequence and may thus be unstable.  Users
- * should then rather use the default factory (provided here) and wrap everything around it in a sequence they control themselves. 
- * <p></p>
- * I just renamed this from ControlerUtils to ControlerDefaults since XxxUtils is for us, in many case, the outmost user interface,
- * and the material here IMO is not "outermost".  kai, nov'13
- * 
- * @author nagel
  *
+ * <p>The initial use case of this is that we want to deprecated the pattern of taking out a factory
+ * from the controler, wrapping something around it, and putting it back in, since such things may
+ * depend on the calling sequence and may thus be unstable. Users should then rather use the default
+ * factory (provided here) and wrap everything around it in a sequence they control themselves.
+ *
+ * <p>I just renamed this from ControlerUtils to ControlerDefaults since XxxUtils is for us, in many
+ * case, the outmost user interface, and the material here IMO is not "outermost". kai, nov'13
+ *
+ * @author nagel
  */
 /**
- * @deprecated -- this pre-dates guice injection; one should rather use guice and {@link ControlerDefaultsModule}.  kai, mar'20
+ * @deprecated -- this pre-dates guice injection; one should rather use guice and {@link
+ *     ControlerDefaultsModule}. kai, mar'20
  */
 public final class ControlerDefaults {
-	
-	private ControlerDefaults(){} // should not be instantiated
 
-	/**
-	 * @deprecated -- this pre-dates guice injection; one should rather use guice and {@link ControlerDefaultsModule}.  kai, mar'20
-	 */
-	public static ScoringFunctionFactory createDefaultScoringFunctionFactory(Scenario scenario) {
-		return new CharyparNagelScoringFunctionFactory( scenario );
-	}
+  private ControlerDefaults() {} // should not be instantiated
 
-	/**
-	 * @deprecated -- this pre-dates guice injection; one should rather use guice and {@link ControlerDefaultsModule}.  kai, mar'20
-	 */
-	public static TravelDisutilityFactory createDefaultTravelDisutilityFactory(Scenario scenario) {
-		final RandomizingTimeDistanceTravelDisutilityFactory builder = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, scenario.getConfig() );
-                // tendency to set this to 3. right away (i.e. through PlansCalcRouteConfigGroup default). kai/bk, mar'15
-                return builder;
-	}
+  /**
+   * @deprecated -- this pre-dates guice injection; one should rather use guice and {@link
+   *     ControlerDefaultsModule}. kai, mar'20
+   */
+  public static ScoringFunctionFactory createDefaultScoringFunctionFactory(Scenario scenario) {
+    return new CharyparNagelScoringFunctionFactory(scenario);
+  }
 
+  /**
+   * @deprecated -- this pre-dates guice injection; one should rather use guice and {@link
+   *     ControlerDefaultsModule}. kai, mar'20
+   */
+  public static TravelDisutilityFactory createDefaultTravelDisutilityFactory(Scenario scenario) {
+    final RandomizingTimeDistanceTravelDisutilityFactory builder =
+        new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, scenario.getConfig());
+    // tendency to set this to 3. right away (i.e. through PlansCalcRouteConfigGroup default).
+    // kai/bk, mar'15
+    return builder;
+  }
 }

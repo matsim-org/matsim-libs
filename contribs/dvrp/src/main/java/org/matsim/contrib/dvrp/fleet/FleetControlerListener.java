@@ -26,20 +26,22 @@ import org.matsim.core.controler.listener.ShutdownListener;
 
 class FleetControlerListener implements ShutdownListener {
 
-	private static final String OUTPUT_FILE_NAME = "vehicles.xml.gz";
-	private final OutputDirectoryHierarchy controlerIO;
-	private FleetSpecification fleetSpecification;
-	private final String mode;
+  private static final String OUTPUT_FILE_NAME = "vehicles.xml.gz";
+  private final OutputDirectoryHierarchy controlerIO;
+  private FleetSpecification fleetSpecification;
+  private final String mode;
 
-	FleetControlerListener(String mode, OutputDirectoryHierarchy controlerIO, FleetSpecification fleetSpecification) {
-		this.mode = mode;
-		this.controlerIO = controlerIO;
-		this.fleetSpecification = fleetSpecification;
-	}
+  FleetControlerListener(
+      String mode, OutputDirectoryHierarchy controlerIO, FleetSpecification fleetSpecification) {
+    this.mode = mode;
+    this.controlerIO = controlerIO;
+    this.fleetSpecification = fleetSpecification;
+  }
 
-	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-		FleetWriter writer = new FleetWriter(fleetSpecification.getVehicleSpecifications().values().stream());
-		writer.write(controlerIO.getOutputFilename(mode + "_" +  OUTPUT_FILE_NAME));
-	}
+  @Override
+  public void notifyShutdown(ShutdownEvent event) {
+    FleetWriter writer =
+        new FleetWriter(fleetSpecification.getVehicleSpecifications().values().stream());
+    writer.write(controlerIO.getOutputFilename(mode + "_" + OUTPUT_FILE_NAME));
+  }
 }

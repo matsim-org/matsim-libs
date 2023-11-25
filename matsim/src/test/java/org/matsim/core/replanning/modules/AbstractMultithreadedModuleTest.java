@@ -34,57 +34,58 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
  */
 public class AbstractMultithreadedModuleTest {
 
-	private final static Logger log = LogManager.getLogger(AbstractMultithreadedModuleTest.class);
+  private static final Logger log = LogManager.getLogger(AbstractMultithreadedModuleTest.class);
 
-	@Test
-	public void testGetNumOfThreads() {
-		Config config = new Config();
-		config.addCoreModules();
-		config.global().setNumberOfThreads(3);
-		DummyAbstractMultithreadedModule testee = new DummyAbstractMultithreadedModule(config.global());
-		Assert.assertEquals(3, testee.getNumOfThreads());
-	}
+  @Test
+  public void testGetNumOfThreads() {
+    Config config = new Config();
+    config.addCoreModules();
+    config.global().setNumberOfThreads(3);
+    DummyAbstractMultithreadedModule testee = new DummyAbstractMultithreadedModule(config.global());
+    Assert.assertEquals(3, testee.getNumOfThreads());
+  }
 
-	@Test
-	public void testCrashingThread() {
-		try {
-			DummyCrashingModule testee = new DummyCrashingModule(2);
-			testee.prepareReplanning(null);
-			testee.handlePlan(null);
-			testee.handlePlan(null);
-			testee.handlePlan(null);
-			testee.finishReplanning();
-			Assert.fail("expected exception, got none.");
-		} catch (Exception e) {
-			log.info("Catched expected exception.", e);
-		}
+  @Test
+  public void testCrashingThread() {
+    try {
+      DummyCrashingModule testee = new DummyCrashingModule(2);
+      testee.prepareReplanning(null);
+      testee.handlePlan(null);
+      testee.handlePlan(null);
+      testee.handlePlan(null);
+      testee.finishReplanning();
+      Assert.fail("expected exception, got none.");
+    } catch (Exception e) {
+      log.info("Catched expected exception.", e);
+    }
+  }
 
-	}
+  private static class DummyAbstractMultithreadedModule extends AbstractMultithreadedModule {
+    public DummyAbstractMultithreadedModule(GlobalConfigGroup globalConfigGroup) {
+      super(globalConfigGroup);
+    }
 
-	private static class DummyAbstractMultithreadedModule extends AbstractMultithreadedModule {
-		public DummyAbstractMultithreadedModule(GlobalConfigGroup globalConfigGroup) {
-			super(globalConfigGroup);
-		}
-		@Override
-		public PlanAlgorithm getPlanAlgoInstance() {
-			return null;
-		}
-	}
+    @Override
+    public PlanAlgorithm getPlanAlgoInstance() {
+      return null;
+    }
+  }
 
-	private static class DummyCrashingModule extends AbstractMultithreadedModule {
-		public DummyCrashingModule(final int nOfThreads) {
-			super(nOfThreads);
-		}
-		@Override
-		public PlanAlgorithm getPlanAlgoInstance() {
-			return new CrashingPlanAlgo();
-		}
-	}
+  private static class DummyCrashingModule extends AbstractMultithreadedModule {
+    public DummyCrashingModule(final int nOfThreads) {
+      super(nOfThreads);
+    }
 
-	private static class CrashingPlanAlgo implements PlanAlgorithm {
-		@Override
-		public void run(Plan plan) {
-			throw new IllegalArgumentException("just some exception to crash this thread.");
-		}
-	}
+    @Override
+    public PlanAlgorithm getPlanAlgoInstance() {
+      return new CrashingPlanAlgo();
+    }
+  }
+
+  private static class CrashingPlanAlgo implements PlanAlgorithm {
+    @Override
+    public void run(Plan plan) {
+      throw new IllegalArgumentException("just some exception to crash this thread.");
+    }
+  }
 }

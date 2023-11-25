@@ -25,36 +25,34 @@ import java.util.Map;
 
 /**
  * @author dgrether
- *
  */
 public final class VisSignalSystem {
-	
-	private String id;
-	private Map<String, VisSignalGroup> signalGroups = new HashMap<String, VisSignalGroup>();
-	private Point2D.Float visCoordinate;
 
-	public VisSignalSystem(String id){
-		this.id = id;
-	}
+  private String id;
+  private Map<String, VisSignalGroup> signalGroups = new HashMap<String, VisSignalGroup>();
+  private Point2D.Float visCoordinate;
 
-	public String getId() {
-		return this.id;
-	}
+  public VisSignalSystem(String id) {
+    this.id = id;
+  }
 
-	public void addOTFSignalGroup(VisSignalGroup group){
-		this.signalGroups.put(group.getId(), group);
-	}
-	
-	public Map<String, VisSignalGroup> getOTFSignalGroups(){
-		return this.signalGroups;
-	}
-	
-	public void setVisCoordinate(Point2D.Float visCoordinate) {
-		this.visCoordinate = visCoordinate;
-	}
-	
-	public Point2D.Float getVisCoordinate(){
-		return this.visCoordinate;
-	}
-	
+  public String getId() {
+    return this.id;
+  }
+
+  public void addOTFSignalGroup(VisSignalGroup group) {
+    this.signalGroups.put(group.getId(), group);
+  }
+
+  public Map<String, VisSignalGroup> getOTFSignalGroups() {
+    return this.signalGroups;
+  }
+
+  public void setVisCoordinate(Point2D.Float visCoordinate) {
+    this.visCoordinate = visCoordinate;
+  }
+
+  public Point2D.Float getVisCoordinate() {
+    return this.visCoordinate;
+  }
 }

@@ -28,15 +28,15 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
  * @author michalm
  */
 public interface OnlineDriveTaskTracker extends TaskTracker {
-	VrpPath getPath();
+  VrpPath getPath();
 
-	int getCurrentLinkIdx();
+  int getCurrentLinkIdx();
 
-	double getCurrentLinkEnterTime();
+  double getCurrentLinkEnterTime();
 
-	LinkTimePair getDiversionPoint();
+  LinkTimePair getDiversionPoint();
 
-	void divertPath(VrpPathWithTravelData newSubPath);
+  void divertPath(VrpPathWithTravelData newSubPath);
 
-	void movedOverNode(Link nextLink);
+  void movedOverNode(Link nextLink);
 }

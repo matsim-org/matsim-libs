@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.evrp;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -28,27 +29,27 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.ev.discharging.IdleDischargingHandler;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
-import com.google.inject.Inject;
-
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class OperatingVehicleProvider implements IdleDischargingHandler.VehicleProvider {
-	private final DvrpVehicleLookup dvrpVehicleLookup;
+  private final DvrpVehicleLookup dvrpVehicleLookup;
 
-	@Inject
-	public OperatingVehicleProvider(DvrpVehicleLookup dvrpVehicleLookup) {
-		this.dvrpVehicleLookup = dvrpVehicleLookup;
-	}
+  @Inject
+  public OperatingVehicleProvider(DvrpVehicleLookup dvrpVehicleLookup) {
+    this.dvrpVehicleLookup = dvrpVehicleLookup;
+  }
 
-	@Override
-	public ElectricVehicle getVehicle(ActivityStartEvent event) {
-		//assumes driverId == vehicleId
-		DvrpVehicle vehicle = dvrpVehicleLookup.lookupVehicle(Id.create(event.getPersonId(), DvrpVehicle.class));
+  @Override
+  public ElectricVehicle getVehicle(ActivityStartEvent event) {
+    // assumes driverId == vehicleId
+    DvrpVehicle vehicle =
+        dvrpVehicleLookup.lookupVehicle(Id.create(event.getPersonId(), DvrpVehicle.class));
 
-		//do not discharge if (1) not a DVRP vehicle or (2) a DVRP vehicle that just completed the schedule
-		return vehicle == null || event.getActType().equals(VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE) ?
-				null :
-				((EvDvrpVehicle)vehicle).getElectricVehicle();
-	}
+    // do not discharge if (1) not a DVRP vehicle or (2) a DVRP vehicle that just completed the
+    // schedule
+    return vehicle == null || event.getActType().equals(VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE)
+        ? null
+        : ((EvDvrpVehicle) vehicle).getElectricVehicle();
+  }
 }

@@ -22,25 +22,24 @@ package org.matsim.lanes;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-
 /**
- * 
  * @author dgrether
  * @see LanesFactory
  */
 final class LanesFactoryImpl implements LanesFactory {
-	/**
-	 * @see LanesFactory#createLanesToLinkAssignment(org.matsim.api.core.v01.Id)
-	 */
-	@Override
-	public LanesToLinkAssignment createLanesToLinkAssignment(Id<Link> linkIdReference) {
-		return new LanesToLinkAssignmentImpl(linkIdReference);
-	}
-	/**
-	 * @see LanesFactory#createLane(org.matsim.api.core.v01.Id)
-	 */
-	@Override
-	public Lane createLane(Id<Lane> id) {
-		return new LaneImpl(id);
-	}
+  /**
+   * @see LanesFactory#createLanesToLinkAssignment(org.matsim.api.core.v01.Id)
+   */
+  @Override
+  public LanesToLinkAssignment createLanesToLinkAssignment(Id<Link> linkIdReference) {
+    return new LanesToLinkAssignmentImpl(linkIdReference);
+  }
+
+  /**
+   * @see LanesFactory#createLane(org.matsim.api.core.v01.Id)
+   */
+  @Override
+  public Lane createLane(Id<Lane> id) {
+    return new LaneImpl(id);
+  }
 }

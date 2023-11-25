@@ -18,68 +18,59 @@
  * *********************************************************************** */
 
 /**
- * 
  * @author ikaddoura
- * 
  */
 package playground.vsp.analysis.modules.bvgAna.anaLevel1.stopId2RouteId2DelayAtStop;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.MutableScenario;
-
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
-import playground.vsp.analysis.modules.bvgAna.anaLevel1.stopId2RouteId2DelayAtStop.StopId2RouteId2DelayAtStopHandler;
 
 /**
- * 
  * @author ikaddoura, aneumann
- *
  */
-public class StopId2RouteId2DelayAtStopAnalyzer extends AbstractAnalysisModule{
-	private final static Logger log = LogManager.getLogger(StopId2RouteId2DelayAtStopAnalyzer.class);
-	private MutableScenario scenario;
-	private StopId2RouteId2DelayAtStopHandler delayHandler;
-	private TreeMap<Id, TreeMap<Id, StopId2RouteId2DelayAtStopData>> stopId2RouteId2DelayAtStop;
-				
-	public StopId2RouteId2DelayAtStopAnalyzer() {
-		super(StopId2RouteId2DelayAtStopAnalyzer.class.getSimpleName());
-	}
-	
-	public void init(MutableScenario scenario) {
-		this.scenario = scenario;
-		this.delayHandler = new StopId2RouteId2DelayAtStopHandler();
-	}
-	
-	@Override
-	public List<EventHandler> getEventHandler() {
-		List<EventHandler> handler = new LinkedList<EventHandler>();
-		handler.add(this.delayHandler);		
-		return handler;
-	}
+public class StopId2RouteId2DelayAtStopAnalyzer extends AbstractAnalysisModule {
+  private static final Logger log = LogManager.getLogger(StopId2RouteId2DelayAtStopAnalyzer.class);
+  private MutableScenario scenario;
+  private StopId2RouteId2DelayAtStopHandler delayHandler;
+  private TreeMap<Id, TreeMap<Id, StopId2RouteId2DelayAtStopData>> stopId2RouteId2DelayAtStop;
 
-	@Override
-	public void preProcessData() {
-	}
+  public StopId2RouteId2DelayAtStopAnalyzer() {
+    super(StopId2RouteId2DelayAtStopAnalyzer.class.getSimpleName());
+  }
 
-	@Override
-	public void postProcessData() {
-		this.stopId2RouteId2DelayAtStop = this.delayHandler.getStopId2RouteId2DelayAtStopMap();
-	}
+  public void init(MutableScenario scenario) {
+    this.scenario = scenario;
+    this.delayHandler = new StopId2RouteId2DelayAtStopHandler();
+  }
 
-	@Override
-	public void writeResults(String outputFolder) {
-		// ...
-	}
+  @Override
+  public List<EventHandler> getEventHandler() {
+    List<EventHandler> handler = new LinkedList<EventHandler>();
+    handler.add(this.delayHandler);
+    return handler;
+  }
 
-	public TreeMap<Id, TreeMap<Id, StopId2RouteId2DelayAtStopData>> getStopId2RouteId2DelayAtStop() {
-		return stopId2RouteId2DelayAtStop;
-	}
-	
+  @Override
+  public void preProcessData() {}
+
+  @Override
+  public void postProcessData() {
+    this.stopId2RouteId2DelayAtStop = this.delayHandler.getStopId2RouteId2DelayAtStopMap();
+  }
+
+  @Override
+  public void writeResults(String outputFolder) {
+    // ...
+  }
+
+  public TreeMap<Id, TreeMap<Id, StopId2RouteId2DelayAtStopData>> getStopId2RouteId2DelayAtStop() {
+    return stopId2RouteId2DelayAtStop;
+  }
 }

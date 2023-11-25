@@ -24,45 +24,45 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class IntegerCache {
-	// yyyy not sure what this class is doing.  as long as MIN_VALUE=0 (as I am finding it), it just seems to receive an
-	// Integer, and return an Integer of the same value.  Maybe there was historically a situation where this did not start 
-	// at 0, and then one wanted to get rid of the (un)boxing overhead? kai, jan'16
-	
-	private final static Logger log = LogManager.getLogger(IntegerCache.class);
-		
-	
-	private static final int MIN_VALUE = 0;
-	private static final int MAX_VALUE = 8192;
-	
-	private static boolean initialized = false;
-	private static Integer [] cache;
+  // yyyy not sure what this class is doing.  as long as MIN_VALUE=0 (as I am finding it), it just
+  // seems to receive an
+  // Integer, and return an Integer of the same value.  Maybe there was historically a situation
+  // where this did not start
+  // at 0, and then one wanted to get rid of the (un)boxing overhead? kai, jan'16
 
-	public static Integer getInteger(final int i) {
-		
-		if (!initialized) {
-			init();
-		}
+  private static final Logger log = LogManager.getLogger(IntegerCache.class);
 
-		if ( i < MAX_VALUE && i >= MIN_VALUE) {
-			return cache[i + MIN_VALUE];
-		}
-		
-		return Integer.valueOf(i);
-	}
-	
-	synchronized private static void init() {
-		if (initialized) {
-			log.warn("IntegerCache has already been initialized.");
-			return;
-		}
-		
-		log.info("Initializing IntegerCache ...");
-		cache = new Integer [MAX_VALUE - MIN_VALUE];
-		for (int i = 0; i < (MAX_VALUE - MIN_VALUE); i++) {
-			cache[i] = Integer.valueOf(i - MIN_VALUE);
-		}
-		log.info("done.");
-		initialized = true;
-	}
-	
+  private static final int MIN_VALUE = 0;
+  private static final int MAX_VALUE = 8192;
+
+  private static boolean initialized = false;
+  private static Integer[] cache;
+
+  public static Integer getInteger(final int i) {
+
+    if (!initialized) {
+      init();
+    }
+
+    if (i < MAX_VALUE && i >= MIN_VALUE) {
+      return cache[i + MIN_VALUE];
+    }
+
+    return Integer.valueOf(i);
+  }
+
+  private static synchronized void init() {
+    if (initialized) {
+      log.warn("IntegerCache has already been initialized.");
+      return;
+    }
+
+    log.info("Initializing IntegerCache ...");
+    cache = new Integer[MAX_VALUE - MIN_VALUE];
+    for (int i = 0; i < (MAX_VALUE - MIN_VALUE); i++) {
+      cache[i] = Integer.valueOf(i - MIN_VALUE);
+    }
+    log.info("done.");
+    initialized = true;
+  }
 }

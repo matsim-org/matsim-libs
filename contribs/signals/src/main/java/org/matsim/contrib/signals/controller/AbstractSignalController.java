@@ -21,28 +21,25 @@ package org.matsim.contrib.signals.controller;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 
 /**
- * 
  * @author dgrether
- *
  */
 public abstract class AbstractSignalController implements SignalController {
 
-	protected SignalSystem system ;
-	protected Map<Id<SignalPlan>, SignalPlan> signalPlans = new HashMap<>();
+  protected SignalSystem system;
+  protected Map<Id<SignalPlan>, SignalPlan> signalPlans = new HashMap<>();
 
-	@Override
-	public void addPlan(SignalPlan plan) {
-		this.signalPlans.put(plan.getId(), plan);
-	}
+  @Override
+  public void addPlan(SignalPlan plan) {
+    this.signalPlans.put(plan.getId(), plan);
+  }
 
-	@Override
-	public void setSignalSystem(SignalSystem signalSystem) {
-		this.system = signalSystem;
-	}
+  @Override
+  public void setSignalSystem(SignalSystem signalSystem) {
+    this.system = signalSystem;
+  }
 }

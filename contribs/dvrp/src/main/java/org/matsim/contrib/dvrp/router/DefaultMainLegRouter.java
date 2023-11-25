@@ -19,8 +19,9 @@
 
 package org.matsim.contrib.dvrp.router;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import java.util.List;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -34,52 +35,71 @@ import org.matsim.core.router.RoutingRequest;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-
 /**
  * @author michalm (Michal Maciejewski)
  */
 public class DefaultMainLegRouter implements RoutingModule {
-	public interface RouteCreator {
-		/**
-		 * Creates a route based on basic trip characteristics (departure time, origin
-		 * and destination location) and potential person- or trip-based requirements.
-		 */
-		Route createRoute(double departureTime, Link accessActLink, Link egressActLink, Person person,
-				Attributes tripAttributes, RouteFactories routeFactories);
-	}
+  public interface RouteCreator {
+    /**
+     * Creates a route based on basic trip characteristics (departure time, origin and destination
+     * location) and potential person- or trip-based requirements.
+     */
+    Route createRoute(
+        double departureTime,
+        Link accessActLink,
+        Link egressActLink,
+        Person person,
+        Attributes tripAttributes,
+        RouteFactories routeFactories);
+  }
 
-	private final String mode;
-	private final PopulationFactory populationFactory;
-	private final Network modalNetwork;
-	private final RouteCreator routeCreator;
+  private final String mode;
+  private final PopulationFactory populationFactory;
+  private final Network modalNetwork;
+  private final RouteCreator routeCreator;
 
-	public DefaultMainLegRouter(String mode, Network modalNetwork, PopulationFactory populationFactory,
-			RouteCreator routeCreator) {
-		this.mode = mode;
-		this.populationFactory = populationFactory;
-		this.modalNetwork = modalNetwork;
-		this.routeCreator = routeCreator;
-	}
+  public DefaultMainLegRouter(
+      String mode,
+      Network modalNetwork,
+      PopulationFactory populationFactory,
+      RouteCreator routeCreator) {
+    this.mode = mode;
+    this.populationFactory = populationFactory;
+    this.modalNetwork = modalNetwork;
+    this.routeCreator = routeCreator;
+  }
 
-	@Override
-	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
-		final Facility fromFacility = request.getFromFacility();
-		final Facility toFacility = request.getToFacility();
-		final double departureTime = request.getDepartureTime();
-		
-		Link accessActLink = Preconditions.checkNotNull(modalNetwork.getLinks().get(fromFacility.getLinkId()),
-				"link: %s does not exist in the network of mode: %s", fromFacility.getLinkId(), mode);
-		Link egressActLink = Preconditions.checkNotNull(modalNetwork.getLinks().get(toFacility.getLinkId()),
-				"link: %s does not exist in the network of mode: %s", toFacility.getLinkId(), mode);
-		Route route = routeCreator.createRoute(departureTime, accessActLink, egressActLink,
-				request.getPerson(), request.getAttributes(), populationFactory.getRouteFactories());
+  @Override
+  public List<? extends PlanElement> calcRoute(RoutingRequest request) {
+    final Facility fromFacility = request.getFromFacility();
+    final Facility toFacility = request.getToFacility();
+    final double departureTime = request.getDepartureTime();
 
-		Leg leg = populationFactory.createLeg(mode);
-		leg.setDepartureTime(departureTime);
-		leg.setTravelTime(route.getTravelTime().seconds());
-		leg.setRoute(route);
-		return ImmutableList.of(leg);
-	}
+    Link accessActLink =
+        Preconditions.checkNotNull(
+            modalNetwork.getLinks().get(fromFacility.getLinkId()),
+            "link: %s does not exist in the network of mode: %s",
+            fromFacility.getLinkId(),
+            mode);
+    Link egressActLink =
+        Preconditions.checkNotNull(
+            modalNetwork.getLinks().get(toFacility.getLinkId()),
+            "link: %s does not exist in the network of mode: %s",
+            toFacility.getLinkId(),
+            mode);
+    Route route =
+        routeCreator.createRoute(
+            departureTime,
+            accessActLink,
+            egressActLink,
+            request.getPerson(),
+            request.getAttributes(),
+            populationFactory.getRouteFactories());
+
+    Leg leg = populationFactory.createLeg(mode);
+    leg.setDepartureTime(departureTime);
+    leg.setTravelTime(route.getTravelTime().seconds());
+    leg.setRoute(route);
+    return ImmutableList.of(leg);
+  }
 }

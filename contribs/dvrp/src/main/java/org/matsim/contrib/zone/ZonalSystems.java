@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
@@ -38,41 +37,49 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.util.DistanceUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-import com.google.common.collect.Maps;
-
-//TODO add zone indexing?
+// TODO add zone indexing?
 public class ZonalSystems {
-	public static Set<Zone> filterZonesWithNodes(Collection<? extends Node> nodes, ZonalSystem zonalSystem) {
-		return nodes.stream().map(zonalSystem::getZone).collect(toSet());
-	}
+  public static Set<Zone> filterZonesWithNodes(
+      Collection<? extends Node> nodes, ZonalSystem zonalSystem) {
+    return nodes.stream().map(zonalSystem::getZone).collect(toSet());
+  }
 
-	public static List<Node> selectNodesWithinArea(Collection<? extends Node> nodes, List<PreparedGeometry> areaGeoms) {
-		return nodes.stream().filter(node -> {
-			Point point = MGC.coord2Point(node.getCoord());
-			return areaGeoms.stream().anyMatch(serviceArea -> serviceArea.intersects(point));
-		}).collect(toList());
-	}
+  public static List<Node> selectNodesWithinArea(
+      Collection<? extends Node> nodes, List<PreparedGeometry> areaGeoms) {
+    return nodes.stream()
+        .filter(
+            node -> {
+              Point point = MGC.coord2Point(node.getCoord());
+              return areaGeoms.stream().anyMatch(serviceArea -> serviceArea.intersects(point));
+            })
+        .collect(toList());
+  }
 
-	public static Map<Zone, Node> computeMostCentralNodes(Collection<? extends Node> nodes, ZonalSystem zonalSystem) {
-		BinaryOperator<Node> chooseMoreCentralNode = (n1, n2) -> {
-			Zone zone = zonalSystem.getZone(n1);
-			return DistanceUtils.calculateSquaredDistance(n1, zone) <= DistanceUtils.calculateSquaredDistance(n2,
-					zone) ? n1 : n2;
-		};
-		return nodes.stream()
-				.map(n -> Pair.of(n, zonalSystem.getZone(n)))
-				.collect(toMap(Pair::getValue, Pair::getKey, chooseMoreCentralNode));
-	}
+  public static Map<Zone, Node> computeMostCentralNodes(
+      Collection<? extends Node> nodes, ZonalSystem zonalSystem) {
+    BinaryOperator<Node> chooseMoreCentralNode =
+        (n1, n2) -> {
+          Zone zone = zonalSystem.getZone(n1);
+          return DistanceUtils.calculateSquaredDistance(n1, zone)
+                  <= DistanceUtils.calculateSquaredDistance(n2, zone)
+              ? n1
+              : n2;
+        };
+    return nodes.stream()
+        .map(n -> Pair.of(n, zonalSystem.getZone(n)))
+        .collect(toMap(Pair::getValue, Pair::getKey, chooseMoreCentralNode));
+  }
 
-	public static IdMap<Zone, List<Zone>> initZonesByDistance(Map<Id<Zone>, Zone> zones) {
-		IdMap<Zone, List<Zone>> zonesByDistance = new IdMap<>(Zone.class);
-		for (final Zone currentZone : zones.values()) {
-			List<Zone> sortedZones = zones.values()
-					.stream()
-					.sorted(Comparator.comparing(z -> DistanceUtils.calculateSquaredDistance(currentZone, z)))
-					.collect(Collectors.toList());
-			zonesByDistance.put(currentZone.getId(), sortedZones);
-		}
-		return zonesByDistance;
-	}
+  public static IdMap<Zone, List<Zone>> initZonesByDistance(Map<Id<Zone>, Zone> zones) {
+    IdMap<Zone, List<Zone>> zonesByDistance = new IdMap<>(Zone.class);
+    for (final Zone currentZone : zones.values()) {
+      List<Zone> sortedZones =
+          zones.values().stream()
+              .sorted(
+                  Comparator.comparing(z -> DistanceUtils.calculateSquaredDistance(currentZone, z)))
+              .collect(Collectors.toList());
+      zonesByDistance.put(currentZone.getId(), sortedZones);
+    }
+    return zonesByDistance;
+  }
 }

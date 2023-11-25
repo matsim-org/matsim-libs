@@ -20,8 +20,9 @@
 
 package org.matsim.contrib.dvrp.benchmark;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import jakarta.inject.Named;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
@@ -32,37 +33,36 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-
 /**
  * @author Michal Maciejewski (michalm)
  */
 class DvrpBenchmarkQSimModule extends AbstractQSimModule {
-	@Override
-	protected void configureQSim() {
-		bind(QNetworkFactory.class).toProvider(new Provider<>() {
-			@Inject
-			private Scenario scenario;
+  @Override
+  protected void configureQSim() {
+    bind(QNetworkFactory.class)
+        .toProvider(
+            new Provider<>() {
+              @Inject private Scenario scenario;
 
-			@Inject
-			private EventsManager events;
+              @Inject private EventsManager events;
 
-			@Inject
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-			private TravelTime estimatedTravelTime;
+              @Inject
+              @Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
+              private TravelTime estimatedTravelTime;
 
-			@Override
-			public QNetworkFactory get() {
-				ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
-				factory.setLinkSpeedCalculator(
-						(vehicle, link, time) -> calcLinkSpeed(estimatedTravelTime, vehicle.getVehicle(), link, time));
-				return factory;
-			}
-		});
-	}
+              @Override
+              public QNetworkFactory get() {
+                ConfigurableQNetworkFactory factory =
+                    new ConfigurableQNetworkFactory(events, scenario);
+                factory.setLinkSpeedCalculator(
+                    (vehicle, link, time) ->
+                        calcLinkSpeed(estimatedTravelTime, vehicle.getVehicle(), link, time));
+                return factory;
+              }
+            });
+  }
 
-	static double calcLinkSpeed(TravelTime travelTime, Vehicle vehicle, Link link, double time) {
-		return link.getLength() / travelTime.getLinkTravelTime(link, time, null, vehicle);
-	}
+  static double calcLinkSpeed(TravelTime travelTime, Vehicle vehicle, Link link, double time) {
+    return link.getLength() / travelTime.getLinkTravelTime(link, time, null, vehicle);
+  }
 }

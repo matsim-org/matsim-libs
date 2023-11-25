@@ -22,7 +22,6 @@ package org.matsim.contrib.signals.data.conflicts;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -32,54 +31,55 @@ import org.matsim.contrib.signals.model.SignalSystem;
  */
 public final class ConflictDataImpl implements ConflictData {
 
-	private ConflictDataFactory factory = new ConflictDataFactoryImpl();
-	
-	private Map<Id<SignalSystem>, IntersectionDirections> conflictsPerSignalSystem = new HashMap<>();
-	private Map<Id<Node>, IntersectionDirections> conflictsPerNode = new HashMap<>();
-	
-	private Map<Id<SignalSystem>, Id<Node>> system2nodeMap = new HashMap<>();
-	private Map<Id<Node>, Id<SignalSystem>> node2systemMap = new HashMap<>();
-	
-	@Override
-	public void addConflictingDirectionsForIntersection(Id<SignalSystem> signalSystemId, Id<Node> nodeId,
-			IntersectionDirections conflictingDirections) {
-		conflictsPerSignalSystem.put(signalSystemId, conflictingDirections);
-		conflictsPerNode.put(nodeId, conflictingDirections);
-		
-		system2nodeMap.put(signalSystemId, nodeId);
-		node2systemMap.put(nodeId, signalSystemId);
-	}
+  private ConflictDataFactory factory = new ConflictDataFactoryImpl();
 
-	@Override
-	public Map<Id<SignalSystem>, IntersectionDirections> getConflictsPerSignalSystem() {
-		return conflictsPerSignalSystem;
-	}
+  private Map<Id<SignalSystem>, IntersectionDirections> conflictsPerSignalSystem = new HashMap<>();
+  private Map<Id<Node>, IntersectionDirections> conflictsPerNode = new HashMap<>();
 
-	@Override
-	public Map<Id<Node>, IntersectionDirections> getConflictsPerNode() {
-		return conflictsPerNode;
-	}
+  private Map<Id<SignalSystem>, Id<Node>> system2nodeMap = new HashMap<>();
+  private Map<Id<Node>, Id<SignalSystem>> node2systemMap = new HashMap<>();
 
-	@Override
-	public ConflictDataFactory getFactory() {
-		return factory;
-	}
+  @Override
+  public void addConflictingDirectionsForIntersection(
+      Id<SignalSystem> signalSystemId,
+      Id<Node> nodeId,
+      IntersectionDirections conflictingDirections) {
+    conflictsPerSignalSystem.put(signalSystemId, conflictingDirections);
+    conflictsPerNode.put(nodeId, conflictingDirections);
 
-	@Override
-	public void setFactory(ConflictDataFactory factory) {
-		this.factory = factory;
-	}
+    system2nodeMap.put(signalSystemId, nodeId);
+    node2systemMap.put(nodeId, signalSystemId);
+  }
 
-	@Override
-	public void removeConflictingDirectionsForSignalSystem(Id<SignalSystem> signalSystemId) {
-		conflictsPerSignalSystem.remove(signalSystemId);
-		conflictsPerNode.remove(system2nodeMap.get(signalSystemId));
-	}
+  @Override
+  public Map<Id<SignalSystem>, IntersectionDirections> getConflictsPerSignalSystem() {
+    return conflictsPerSignalSystem;
+  }
 
-	@Override
-	public void removeConflictingDirectionsForNode(Id<Node> nodeId) {
-		conflictsPerNode.remove(nodeId);
-		conflictsPerSignalSystem.remove(node2systemMap.get(nodeId));
-	}
+  @Override
+  public Map<Id<Node>, IntersectionDirections> getConflictsPerNode() {
+    return conflictsPerNode;
+  }
 
+  @Override
+  public ConflictDataFactory getFactory() {
+    return factory;
+  }
+
+  @Override
+  public void setFactory(ConflictDataFactory factory) {
+    this.factory = factory;
+  }
+
+  @Override
+  public void removeConflictingDirectionsForSignalSystem(Id<SignalSystem> signalSystemId) {
+    conflictsPerSignalSystem.remove(signalSystemId);
+    conflictsPerNode.remove(system2nodeMap.get(signalSystemId));
+  }
+
+  @Override
+  public void removeConflictingDirectionsForNode(Id<Node> nodeId) {
+    conflictsPerNode.remove(nodeId);
+    conflictsPerSignalSystem.remove(node2systemMap.get(nodeId));
+  }
 }

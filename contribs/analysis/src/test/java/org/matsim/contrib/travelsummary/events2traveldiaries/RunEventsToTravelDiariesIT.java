@@ -26,21 +26,25 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author nagel
  */
 public class RunEventsToTravelDiariesIT {
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @SuppressWarnings("static-method")
-    @Test
-    public final void test() {
+  @SuppressWarnings("static-method")
+  @Test
+  public final void test() {
 
-        String[] str = {"../../examples/scenarios/equil/config.xml", "../../examples/scenarios/equil/output_events.xml.gz", "_test", utils.getOutputDirectory()};
-        // This goes through the file system (nothing to do with resource paths etc.)
-        // It's OK in an integration test, but keep in mind that it wouldn't work like that in a separate repository.
+    String[] str = {
+      "../../examples/scenarios/equil/config.xml",
+      "../../examples/scenarios/equil/output_events.xml.gz",
+      "_test",
+      utils.getOutputDirectory()
+    };
+    // This goes through the file system (nothing to do with resource paths etc.)
+    // It's OK in an integration test, but keep in mind that it wouldn't work like that in a
+    // separate repository.
 
-        RunEventsToTravelDiaries.main(str);
+    RunEventsToTravelDiaries.main(str);
 
-        // yy missing: something that compares output files to expectations. kai, may'15
+    // yy missing: something that compares output files to expectations. kai, may'15
 
-    }
-
+  }
 }

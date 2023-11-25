@@ -19,9 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.qsim;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -34,57 +35,54 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-
 /**
  * @author thibautd
  */
 public class JointQSimFactory implements MobsimFactory, Provider<QSim> {
-	private static final Logger log =
-		LogManager.getLogger(JointQSimFactory.class);
-	
-	private final Scenario sc;
-	private final EventsManager events;
-	private final Config config;
+  private static final Logger log = LogManager.getLogger(JointQSimFactory.class);
 
-	@Inject
-	public JointQSimFactory( final Scenario sc, final EventsManager events, final Config config ) {
-		this.sc = sc;
-		this.events = events;
-		this.config = config;
-	}
-	
-	public JointQSimFactory() {
-		this( null , null, ConfigUtils.createConfig() );
-	}
-	
-	@Override
-	public QSim get() {
-		return createMobsim( sc , events );
-	}
+  private final Scenario sc;
+  private final EventsManager events;
+  private final Config config;
 
-	@Override
-	public QSim createMobsim(
-			final Scenario sc1,
-			final EventsManager eventsManager) {
-        final QSimConfigGroup conf = sc1.getConfig().qsim();
-        if (conf == null) {
-            throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
-        }
+  @Inject
+  public JointQSimFactory(final Scenario sc, final EventsManager events, final Config config) {
+    this.sc = sc;
+    this.events = events;
+    this.config = config;
+  }
 
-		if ( !conf.getMainModes().contains( JointActingTypes.DRIVER ) ) {
-			log.warn( "adding the driver mode as a main mode in the config at "+getClass()+" initialisation!" );
-			final List<String> ms = new ArrayList<String>( conf.getMainModes() );
-			ms.add( JointActingTypes.DRIVER );
-			conf.setMainModes( ms );
-		}
-		
-		return new QSimBuilder(config) //
-							 .useDefaults() //
-							 .addQSimModule(new JointQSimModule()) //
-							 .configureQSimComponents(JointQSimModule::configureComponents ) //
-							 .build(sc1, eventsManager);
-	}
+  public JointQSimFactory() {
+    this(null, null, ConfigUtils.createConfig());
+  }
+
+  @Override
+  public QSim get() {
+    return createMobsim(sc, events);
+  }
+
+  @Override
+  public QSim createMobsim(final Scenario sc1, final EventsManager eventsManager) {
+    final QSimConfigGroup conf = sc1.getConfig().qsim();
+    if (conf == null) {
+      throw new NullPointerException(
+          "There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
+    }
+
+    if (!conf.getMainModes().contains(JointActingTypes.DRIVER)) {
+      log.warn(
+          "adding the driver mode as a main mode in the config at "
+              + getClass()
+              + " initialisation!");
+      final List<String> ms = new ArrayList<String>(conf.getMainModes());
+      ms.add(JointActingTypes.DRIVER);
+      conf.setMainModes(ms);
+    }
+
+    return new QSimBuilder(config) //
+        .useDefaults() //
+        .addQSimModule(new JointQSimModule()) //
+        .configureQSimComponents(JointQSimModule::configureComponents) //
+        .build(sc1, eventsManager);
+  }
 }
-

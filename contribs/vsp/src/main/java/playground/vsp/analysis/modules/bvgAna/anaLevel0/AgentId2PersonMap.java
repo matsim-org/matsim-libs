@@ -20,47 +20,52 @@
 package playground.vsp.analysis.modules.bvgAna.anaLevel0;
 
 import java.util.TreeMap;
-
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 
 /**
- * 
  * @author ikaddoura, aneumann
- *
  */
 public class AgentId2PersonMap {
 
-	private static final Logger log = LogManager.getLogger(AgentId2PersonMap.class);
-//	private static final Level logLevel = Level.DEBUG;
-	
-	/**
-	 * @param pop The given population
-	 * @param agentIds Set of agent ids of interest
-	 * @return Returns a map holding the populations person for each given agent id
-	 */
-	public static TreeMap<Id, Person> getAgentId2PersonMap(Population pop){
-//		AgentId2PersonMap.log.setLevel(AgentId2PersonMap.logLevel);
-		
-		TreeMap<Id, Person> agentId2PersonMap = new TreeMap<Id, Person>();
-		
-		log.debug("Parsing population...");
-		
-		for (Person person : pop.getPersons().values()) {
-			if(person instanceof Person){
-				agentId2PersonMap.put(person.getId(), person);
-			} else {
-				log.debug(person + " is not of type PersonImpl, but of type " + person.getClass() + ". Don't know how to handle that one.");
-			}
-		}
-		
-		log.debug("Finished. Added " + agentId2PersonMap.size() + " persons of " + pop.getPersons().size() + " persons given by population to the map.");
-		
-		return agentId2PersonMap;
-	}
+  private static final Logger log = LogManager.getLogger(AgentId2PersonMap.class);
+
+  //	private static final Level logLevel = Level.DEBUG;
+
+  /**
+   * @param pop The given population
+   * @param agentIds Set of agent ids of interest
+   * @return Returns a map holding the populations person for each given agent id
+   */
+  public static TreeMap<Id, Person> getAgentId2PersonMap(Population pop) {
+    //		AgentId2PersonMap.log.setLevel(AgentId2PersonMap.logLevel);
+
+    TreeMap<Id, Person> agentId2PersonMap = new TreeMap<Id, Person>();
+
+    log.debug("Parsing population...");
+
+    for (Person person : pop.getPersons().values()) {
+      if (person instanceof Person) {
+        agentId2PersonMap.put(person.getId(), person);
+      } else {
+        log.debug(
+            person
+                + " is not of type PersonImpl, but of type "
+                + person.getClass()
+                + ". Don't know how to handle that one.");
+      }
+    }
+
+    log.debug(
+        "Finished. Added "
+            + agentId2PersonMap.size()
+            + " persons of "
+            + pop.getPersons().size()
+            + " persons given by population to the map.");
+
+    return agentId2PersonMap;
+  }
 }

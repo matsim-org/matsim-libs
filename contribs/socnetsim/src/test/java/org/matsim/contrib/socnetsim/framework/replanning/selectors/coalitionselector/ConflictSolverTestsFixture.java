@@ -21,16 +21,10 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionsel
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-
-import org.matsim.core.utils.collections.MapUtils;
-import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.ScoreWeight;
@@ -39,34 +33,29 @@ import org.matsim.contrib.socnetsim.framework.replanning.selectors.ScoreWeight;
  * @author thibautd
  */
 public class ConflictSolverTestsFixture {
-	public final JointPlans jointPlans;
-	public final ReplanningGroup replanningGroup;
-	public final Set<Plan> expectedUnfeasiblePlans;
-	public final CoalitionSelector.RecordsOfJointPlan recordsPerJointPlan;
-	public final Collection<PlanRecord> allRecords = new ArrayList<PlanRecord>();
+  public final JointPlans jointPlans;
+  public final ReplanningGroup replanningGroup;
+  public final Set<Plan> expectedUnfeasiblePlans;
+  public final CoalitionSelector.RecordsOfJointPlan recordsPerJointPlan;
+  public final Collection<PlanRecord> allRecords = new ArrayList<PlanRecord>();
 
-	public ConflictSolverTestsFixture(
-			final JointPlans jointPlans,
-			final ReplanningGroup group,
-			final Collection<? extends Plan> expectedUnfeasiblePlans) {
-		this.jointPlans = jointPlans;
-		this.replanningGroup = group;
-		this.expectedUnfeasiblePlans = new HashSet<>( expectedUnfeasiblePlans );
-		this.recordsPerJointPlan = new CoalitionSelector.RecordsOfJointPlan( jointPlans );
+  public ConflictSolverTestsFixture(
+      final JointPlans jointPlans,
+      final ReplanningGroup group,
+      final Collection<? extends Plan> expectedUnfeasiblePlans) {
+    this.jointPlans = jointPlans;
+    this.replanningGroup = group;
+    this.expectedUnfeasiblePlans = new HashSet<>(expectedUnfeasiblePlans);
+    this.recordsPerJointPlan = new CoalitionSelector.RecordsOfJointPlan(jointPlans);
 
-		// create agents
-		for ( Person person : group.getPersons() ) {
-			final PointingAgent agent =
-				new PointingAgent(
-						person,
-						group,
-						new ScoreWeight() );
+    // create agents
+    for (Person person : group.getPersons()) {
+      final PointingAgent agent = new PointingAgent(person, group, new ScoreWeight());
 
-			for ( PlanRecord r : agent.getRecords() ) {
-				allRecords.add( r );
-				recordsPerJointPlan.addRecord( r );
-			}
-		}
-	}
+      for (PlanRecord r : agent.getRecords()) {
+        allRecords.add(r);
+        recordsPerJointPlan.addRecord(r);
+      }
+    }
+  }
 }
-

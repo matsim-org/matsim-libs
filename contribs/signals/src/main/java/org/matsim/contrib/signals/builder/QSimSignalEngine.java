@@ -19,9 +19,13 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.builder;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.signals.model.Signal;
+import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -32,73 +36,65 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkLanesImpl;
 import org.matsim.lanes.Lane;
 
-import com.google.inject.Inject;
-
-import org.matsim.contrib.signals.model.Signal;
-import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.contrib.signals.model.SignalSystemsManager;
-
-
 /**
  * @author dgrether
- *
- */ 
+ */
 class QSimSignalEngine implements SignalEngine {
 
-	private static final Logger log = LogManager.getLogger(QSimSignalEngine.class);
+  private static final Logger log = LogManager.getLogger(QSimSignalEngine.class);
 
-	private SignalSystemsManager signalManager;
+  private SignalSystemsManager signalManager;
 
-	@Inject
-	public QSimSignalEngine(SignalSystemsManager signalManager) {
-		this.signalManager = signalManager;
-	}
+  @Inject
+  public QSimSignalEngine(SignalSystemsManager signalManager) {
+    this.signalManager = signalManager;
+  }
 
-	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		this.initializeSignalizedItems(((Netsim)e.getQueueSimulation()));
-	}
+  @Override
+  public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+    this.initializeSignalizedItems(((Netsim) e.getQueueSimulation()));
+  }
 
+  @Override
+  public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
+    this.signalManager.requestControlUpdate(e.getSimulationTime());
+  }
 
-	@Override
-	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
-		this.signalManager.requestControlUpdate(e.getSimulationTime());
-	}
-	
-	private void initializeSignalizedItems(Netsim qSim) {
-		NetsimNetwork net = qSim.getNetsimNetwork();
-		for (SignalSystem system : this.signalManager.getSignalSystems().values()){
-			for (Signal signal : system.getSignals().values()){
-				signal.getSignalizeableItems().clear();
-				log.debug("initializing signal " + signal.getId() + " on link " + signal.getLinkId());
-				NetsimLink link = net.getNetsimLinks().get(signal.getLinkId());
-				if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
-					QLinkImpl l = (QLinkImpl) link;
-					l.setSignalized(true);
-					signal.addSignalizeableItem(l);
-				}
-				else {
-					QLinkLanesImpl l = (QLinkLanesImpl) link;
-//					log.debug("  signal is on lanes: ");
-					for (Id<Lane> laneId : signal.getLaneIds()){
-//						log.debug("    lane id: " + laneId);
-						SignalizeableItem lane = getQLane(laneId, l);
-						lane.setSignalized(true);
-						signal.addSignalizeableItem(lane);
-					}
-				}
-			}
-			system.simulationInitialized(qSim.getSimTimer().getTimeOfDay());
-		}
-	}
+  private void initializeSignalizedItems(Netsim qSim) {
+    NetsimNetwork net = qSim.getNetsimNetwork();
+    for (SignalSystem system : this.signalManager.getSignalSystems().values()) {
+      for (Signal signal : system.getSignals().values()) {
+        signal.getSignalizeableItems().clear();
+        log.debug("initializing signal " + signal.getId() + " on link " + signal.getLinkId());
+        NetsimLink link = net.getNetsimLinks().get(signal.getLinkId());
+        if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()) {
+          QLinkImpl l = (QLinkImpl) link;
+          l.setSignalized(true);
+          signal.addSignalizeableItem(l);
+        } else {
+          QLinkLanesImpl l = (QLinkLanesImpl) link;
+          //					log.debug("  signal is on lanes: ");
+          for (Id<Lane> laneId : signal.getLaneIds()) {
+            //						log.debug("    lane id: " + laneId);
+            SignalizeableItem lane = getQLane(laneId, l);
+            lane.setSignalized(true);
+            signal.addSignalizeableItem(lane);
+          }
+        }
+      }
+      system.simulationInitialized(qSim.getSimTimer().getTimeOfDay());
+    }
+  }
 
-	private SignalizeableItem getQLane(Id<Lane> laneId, QLinkLanesImpl link){
-		if (link.getQueueLanes().containsKey(laneId)){
-			return (SignalizeableItem) link.getQueueLanes().get(laneId);
-		}
-		throw new IllegalArgumentException("QLane Id " + laneId + "on link Id" + link.getLink().getId() + "  not found. Check configuration!");
-	}
-
-	
-	
+  private SignalizeableItem getQLane(Id<Lane> laneId, QLinkLanesImpl link) {
+    if (link.getQueueLanes().containsKey(laneId)) {
+      return (SignalizeableItem) link.getQueueLanes().get(laneId);
+    }
+    throw new IllegalArgumentException(
+        "QLane Id "
+            + laneId
+            + "on link Id"
+            + link.getLink().getId()
+            + "  not found. Check configuration!");
+  }
 }

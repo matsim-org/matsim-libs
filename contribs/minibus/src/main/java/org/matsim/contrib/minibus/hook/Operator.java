@@ -21,7 +21,6 @@ package org.matsim.contrib.minibus.hook;
 
 import java.util.List;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConstants.OperatorState;
 import org.matsim.contrib.minibus.replanning.PStrategy;
@@ -32,42 +31,46 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * 
  * @author aneumann
- *
  */
 public interface Operator {
-	
-	public boolean init(PRouteProvider pRouteProvider, PStrategy initialStrategy, int iteration, double initialBudget);
-	
-	public void score(Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap, SubsidyI subsidy, RouteDesignScoringManager routeDesignScoringManager);
-	
-	public void replan(PStrategyManager pStrategyManager, int iteration);
 
-	public TransitLine getCurrentTransitLine();
+  public boolean init(
+      PRouteProvider pRouteProvider,
+      PStrategy initialStrategy,
+      int iteration,
+      double initialBudget);
 
-	public double getBudget();
+  public void score(
+      Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap,
+      SubsidyI subsidy,
+      RouteDesignScoringManager routeDesignScoringManager);
 
-	public int getNumberOfVehiclesOwned();
-	
-	public List<PPlan> getAllPlans();
+  public void replan(PStrategyManager pStrategyManager, int iteration);
 
-	public int getCurrentIteration();
+  public TransitLine getCurrentTransitLine();
 
-	public PRouteProvider getRouteProvider();
+  public double getBudget();
 
-	public PFranchise getFranchise();
+  public int getNumberOfVehiclesOwned();
 
-	public Id<Operator> getId();
-	
-	public Id<PPlan> getNewPlanId();
+  public List<PPlan> getAllPlans();
 
-	public PPlan getBestPlan();
-	
-	public double getMinOperationTime();
-	
-	public OperatorState getOperatorState();
+  public int getCurrentIteration();
 
-	public void setBudget(double budget);
+  public PRouteProvider getRouteProvider();
 
+  public PFranchise getFranchise();
+
+  public Id<Operator> getId();
+
+  public Id<PPlan> getNewPlanId();
+
+  public PPlan getBestPlan();
+
+  public double getMinOperationTime();
+
+  public OperatorState getOperatorState();
+
+  public void setBudget(double budget);
 }

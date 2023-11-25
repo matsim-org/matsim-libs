@@ -23,19 +23,17 @@ import org.matsim.analysis.XYTRecord;
 import org.matsim.core.controler.AbstractModule;
 
 /**
-* @author ikaddoura
-*/
+ * @author ikaddoura
+ */
 public final class NoiseModule extends AbstractModule {
 
-	@Override
-	public void install() {
-		install(new NoiseComputationModule());
-		install(new NoiseDefaultCarTravelDisutilityModule());
-	}
+  @Override
+  public void install() {
+    install(new NoiseComputationModule());
+    install(new NoiseDefaultCarTravelDisutilityModule());
+  }
 
-	interface NoiseListener{
-		void newRecord( XYTRecord record ) ;
-	}
-
+  interface NoiseListener {
+    void newRecord(XYTRecord record);
+  }
 }
-

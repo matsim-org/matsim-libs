@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * ZZEverythingInPackageIsPackageFinalOrEmpty.java
@@ -19,15 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
- /**
- * 
- */
+/** */
 package org.matsim.core.population.routes;
 
 /**
  * @author nagel
- *
  */
-public class ZZEverythingInPackageIsPackageFinalOrEmpty {
-
-}
+public class ZZEverythingInPackageIsPackageFinalOrEmpty {}

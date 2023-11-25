@@ -23,22 +23,22 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
  * Minimal functionality of dvrp optimizers in the dvrp contrib. <br>
- * </br>
- * More specific functionality (such as request modification & cancellation, or vehicle tracking) should be offered by
- * subinterfaces.
- * 
+ * </br> More specific functionality (such as request modification & cancellation, or vehicle
+ * tracking) should be offered by subinterfaces.
+ *
  * @author michalm
  * @author (of documentation) nagel
  */
 public interface VrpOptimizer {
-	/**
-	 * This is called by the framework every time a request is submitted so that the optimizer is notified of it.
-	 */
-	void requestSubmitted(Request request);
+  /**
+   * This is called by the framework every time a request is submitted so that the optimizer is
+   * notified of it.
+   */
+  void requestSubmitted(Request request);
 
-	/**
-	 * Called by the framework when it moves on to the next task. It is presumably the task of the optimizer to update
-	 * the "currentTask" setting.
-	 */
-	void nextTask(DvrpVehicle vehicle);
+  /**
+   * Called by the framework when it moves on to the next task. It is presumably the task of the
+   * optimizer to update the "currentTask" setting.
+   */
+  void nextTask(DvrpVehicle vehicle);
 }

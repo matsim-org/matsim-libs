@@ -21,66 +21,63 @@ package org.matsim.contrib.socnetsim.framework.cliques.config;
 
 import java.util.Arrays;
 import java.util.List;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
-
 
 /**
  * @author thibautd
  */
 public class JointTripInsertorConfigGroup extends ReflectiveConfigGroup {
 
-	public static final String GROUP_NAME = "jointTripInsertor";
+  public static final String GROUP_NAME = "jointTripInsertor";
 
-	private List<String> chainBasedModes = Arrays.asList( TransportMode.car , TransportMode.bike );
-	private double betaDetour = 2;
-	private double scale = 1;
+  private List<String> chainBasedModes = Arrays.asList(TransportMode.car, TransportMode.bike);
+  private double betaDetour = 2;
+  private double scale = 1;
 
-	public JointTripInsertorConfigGroup() {
-		super( GROUP_NAME );
-	}
+  public JointTripInsertorConfigGroup() {
+    super(GROUP_NAME);
+  }
 
-	@StringGetter( "chainBasedModes" )
-	public String getStringChainBasedModes() {
-		if ( chainBasedModes.isEmpty() ) return "";
+  @StringGetter("chainBasedModes")
+  public String getStringChainBasedModes() {
+    if (chainBasedModes.isEmpty()) return "";
 
-		final StringBuffer b = new StringBuffer( chainBasedModes.get( 0 ) );
-		for ( int i=1; i < chainBasedModes.size(); i++ ) {
-			b.append( ',' );
-			b.append( chainBasedModes.get( i ) );
-		}
+    final StringBuffer b = new StringBuffer(chainBasedModes.get(0));
+    for (int i = 1; i < chainBasedModes.size(); i++) {
+      b.append(',');
+      b.append(chainBasedModes.get(i));
+    }
 
-		return b.toString();
-	}
+    return b.toString();
+  }
 
-	public List<String> getChainBasedModes() {
-		return this.chainBasedModes;
-	}
+  public List<String> getChainBasedModes() {
+    return this.chainBasedModes;
+  }
 
-	@StringGetter( "betaDetour" )
-	public double getBetaDetour() {
-		return this.betaDetour;
-	}
+  @StringGetter("betaDetour")
+  public double getBetaDetour() {
+    return this.betaDetour;
+  }
 
-	@StringSetter( "betaDetour" )
-	public void setBetaDetour(final String betaDetour) {
-		this.betaDetour = Double.parseDouble( betaDetour );
-	}
+  @StringSetter("betaDetour")
+  public void setBetaDetour(final String betaDetour) {
+    this.betaDetour = Double.parseDouble(betaDetour);
+  }
 
-	@StringGetter( "scale" )
-	public double getScale() {
-		return this.scale;
-	}
+  @StringGetter("scale")
+  public double getScale() {
+    return this.scale;
+  }
 
-	@StringSetter( "scale" )
-	public void setScale(final String scale) {
-		this.scale = Double.parseDouble( scale );
-	}
+  @StringSetter("scale")
+  public void setScale(final String scale) {
+    this.scale = Double.parseDouble(scale);
+  }
 
-	@StringSetter( "chainBasedModes" )
-	public void setChainBasedModes(final String chainBasedModes) {
-		this.chainBasedModes = Arrays.asList( chainBasedModes.split(",") );
-	}
+  @StringSetter("chainBasedModes")
+  public void setChainBasedModes(final String chainBasedModes) {
+    this.chainBasedModes = Arrays.asList(chainBasedModes.split(","));
+  }
 }
-

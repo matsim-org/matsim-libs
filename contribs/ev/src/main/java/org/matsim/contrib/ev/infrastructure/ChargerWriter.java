@@ -24,34 +24,37 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
-
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 public final class ChargerWriter extends MatsimXmlWriter {
-	private final Stream<? extends ChargerSpecification> chargerSpecifications;
+  private final Stream<? extends ChargerSpecification> chargerSpecifications;
 
-	public ChargerWriter(Stream<? extends ChargerSpecification> chargerSpecifications) {
-		this.chargerSpecifications = chargerSpecifications;
-	}
+  public ChargerWriter(Stream<? extends ChargerSpecification> chargerSpecifications) {
+    this.chargerSpecifications = chargerSpecifications;
+  }
 
-	public void write(String file) {
-		openFile(file);
-		writeDoctype("chargers", "http://matsim.org/files/dtd/chargers_v1.dtd");
-		writeStartTag("chargers", Collections.emptyList());
-		writeChargers();
-		writeEndTag("chargers");
-		close();
-	}
+  public void write(String file) {
+    openFile(file);
+    writeDoctype("chargers", "http://matsim.org/files/dtd/chargers_v1.dtd");
+    writeStartTag("chargers", Collections.emptyList());
+    writeChargers();
+    writeEndTag("chargers");
+    close();
+  }
 
-	private void writeChargers() {
-		chargerSpecifications.forEach(c -> {
-			List<Tuple<String, String>> atts = Arrays.asList(Tuple.of("id", c.getId().toString()),
-					Tuple.of("link", c.getLinkId() + ""), Tuple.of("type", c.getChargerType()),
-					Tuple.of("plug_power", EvUnits.W_to_kW(c.getPlugPower()) + ""),
-					Tuple.of("plug_count", c.getPlugCount() + ""));
-			writeStartTag("charger", atts, true);
-		});
-	}
+  private void writeChargers() {
+    chargerSpecifications.forEach(
+        c -> {
+          List<Tuple<String, String>> atts =
+              Arrays.asList(
+                  Tuple.of("id", c.getId().toString()),
+                  Tuple.of("link", c.getLinkId() + ""),
+                  Tuple.of("type", c.getChargerType()),
+                  Tuple.of("plug_power", EvUnits.W_to_kW(c.getPlugPower()) + ""),
+                  Tuple.of("plug_count", c.getPlugCount() + ""));
+          writeStartTag("charger", atts, true);
+        });
+  }
 }

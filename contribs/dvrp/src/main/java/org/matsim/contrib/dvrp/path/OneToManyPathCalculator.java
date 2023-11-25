@@ -32,9 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
-
 import javax.annotation.Nullable;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -52,169 +50,183 @@ import org.matsim.core.utils.misc.OptionalTime;
  * @author Sebastian Hörl, IRT SystemX (sebhoerl)
  */
 class OneToManyPathCalculator {
-	private final IdMap<Node, Node> nodeMap;
-	private final LeastCostPathTree dijkstraTree;
-	private final TravelTime travelTime;
-	private final boolean forwardSearch;
-	private final Link fromLink;
-	private final double startTime;
+  private final IdMap<Node, Node> nodeMap;
+  private final LeastCostPathTree dijkstraTree;
+  private final TravelTime travelTime;
+  private final boolean forwardSearch;
+  private final Link fromLink;
+  private final double startTime;
 
-	OneToManyPathCalculator(IdMap<Node, Node> nodeMap, LeastCostPathTree dijkstraTree, TravelTime travelTime,
-			boolean forwardSearch, Link fromLink, double startTime) {
-		this.nodeMap = nodeMap;
-		this.dijkstraTree = dijkstraTree;
-		this.travelTime = travelTime;
-		this.forwardSearch = forwardSearch;
-		this.fromLink = fromLink;
-		this.startTime = startTime;
+  OneToManyPathCalculator(
+      IdMap<Node, Node> nodeMap,
+      LeastCostPathTree dijkstraTree,
+      TravelTime travelTime,
+      boolean forwardSearch,
+      Link fromLink,
+      double startTime) {
+    this.nodeMap = nodeMap;
+    this.dijkstraTree = dijkstraTree;
+    this.travelTime = travelTime;
+    this.forwardSearch = forwardSearch;
+    this.fromLink = fromLink;
+    this.startTime = startTime;
 
-		verifyParallelLinks();
-	}
+    verifyParallelLinks();
+  }
 
-	void calculateDijkstraTree(Collection<Link> toLinks) {
-		calculateDijkstraTree(toLinks, Double.POSITIVE_INFINITY);
-	}
+  void calculateDijkstraTree(Collection<Link> toLinks) {
+    calculateDijkstraTree(toLinks, Double.POSITIVE_INFINITY);
+  }
 
-	void calculateDijkstraTree(Collection<Link> toLinks, double maxTravelTime) {
-		var toNodes = toLinks.stream().filter(link -> link != fromLink).map(this::getEndNode).collect(toList());
-		if (toNodes.size() == 0) {
-			return;
-		}
+  void calculateDijkstraTree(Collection<Link> toLinks, double maxTravelTime) {
+    var toNodes =
+        toLinks.stream().filter(link -> link != fromLink).map(this::getEndNode).collect(toList());
+    if (toNodes.size() == 0) {
+      return;
+    }
 
-		int fromNodeIdx = getStartNode(fromLink).getId().index();
-		var stopCriterion = withMaxTravelTime(allEndNodesReached(toNodes), maxTravelTime);
+    int fromNodeIdx = getStartNode(fromLink).getId().index();
+    var stopCriterion = withMaxTravelTime(allEndNodesReached(toNodes), maxTravelTime);
 
-		if (forwardSearch) {
-			dijkstraTree.calculate(fromNodeIdx, startTime, null, null, stopCriterion);
-		} else {
-			dijkstraTree.calculateBackwards(fromNodeIdx, startTime, null, null, stopCriterion);
-		}
-	}
+    if (forwardSearch) {
+      dijkstraTree.calculate(fromNodeIdx, startTime, null, null, stopCriterion);
+    } else {
+      dijkstraTree.calculateBackwards(fromNodeIdx, startTime, null, null, stopCriterion);
+    }
+  }
 
-	PathData createPathDataLazily(Link toLink) {
-		if (toLink == fromLink) {
-			return PathData.EMPTY;
-		} else {
-			Node endNode = getEndNode(toLink);
-			double pathTravelTime = getTravelTime(endNode.getId().index());
-			if (pathTravelTime == Double.POSITIVE_INFINITY) {
-				return PathData.INFEASIBLE;
-			}
-			Supplier<Path> pathSupplier = () -> createPath(endNode);
-			return new PathData(pathSupplier, pathTravelTime,
-					getFirstAndLastLinkTT(fromLink, toLink, pathTravelTime, startTime));
-		}
-	}
+  PathData createPathDataLazily(Link toLink) {
+    if (toLink == fromLink) {
+      return PathData.EMPTY;
+    } else {
+      Node endNode = getEndNode(toLink);
+      double pathTravelTime = getTravelTime(endNode.getId().index());
+      if (pathTravelTime == Double.POSITIVE_INFINITY) {
+        return PathData.INFEASIBLE;
+      }
+      Supplier<Path> pathSupplier = () -> createPath(endNode);
+      return new PathData(
+          pathSupplier,
+          pathTravelTime,
+          getFirstAndLastLinkTT(fromLink, toLink, pathTravelTime, startTime));
+    }
+  }
 
-	PathData createPathDataEagerly(Link toLink) {
-		if (toLink == fromLink) {
-			return PathData.EMPTY;
-		} else {
-			Node endNode = getEndNode(toLink);
-			if (dijkstraTree.getTime(endNode.getId().index()).isUndefined()) {
-				return PathData.INFEASIBLE;
-			}
-			Path path = createPath(endNode);
-			return new PathData(path, getFirstAndLastLinkTT(fromLink, toLink, path.travelTime, startTime));
-		}
-	}
+  PathData createPathDataEagerly(Link toLink) {
+    if (toLink == fromLink) {
+      return PathData.EMPTY;
+    } else {
+      Node endNode = getEndNode(toLink);
+      if (dijkstraTree.getTime(endNode.getId().index()).isUndefined()) {
+        return PathData.INFEASIBLE;
+      }
+      Path path = createPath(endNode);
+      return new PathData(
+          path, getFirstAndLastLinkTT(fromLink, toLink, path.travelTime, startTime));
+    }
+  }
 
-	@Nullable
-	Path createPath(Node toNode) {
-		int toNodeIndex = toNode.getId().index();
-		double travelTime = getTravelTime(toNodeIndex);
-		if (travelTime == Double.POSITIVE_INFINITY) {
-			return null;
-		}
-		var nodes = constructNodeSequence(dijkstraTree, toNode, forwardSearch);
-		var links = constructLinkSequence(nodes);
-		double cost = dijkstraTree.getCost(toNodeIndex);
-		return new Path(nodes, links, travelTime, cost);
-	}
+  @Nullable
+  Path createPath(Node toNode) {
+    int toNodeIndex = toNode.getId().index();
+    double travelTime = getTravelTime(toNodeIndex);
+    if (travelTime == Double.POSITIVE_INFINITY) {
+      return null;
+    }
+    var nodes = constructNodeSequence(dijkstraTree, toNode, forwardSearch);
+    var links = constructLinkSequence(nodes);
+    double cost = dijkstraTree.getCost(toNodeIndex);
+    return new Path(nodes, links, travelTime, cost);
+  }
 
-	private double getTravelTime(int toNodeIndex) {
-		OptionalTime endTime = dijkstraTree.getTime(toNodeIndex);
-		if (endTime.isUndefined()) {
-			return Double.POSITIVE_INFINITY;
-		}
-		int travelTimeMultiplier = forwardSearch ? 1 : -1;
-		return travelTimeMultiplier * (dijkstraTree.getTime(toNodeIndex).seconds() - startTime);
-	}
+  private double getTravelTime(int toNodeIndex) {
+    OptionalTime endTime = dijkstraTree.getTime(toNodeIndex);
+    if (endTime.isUndefined()) {
+      return Double.POSITIVE_INFINITY;
+    }
+    int travelTimeMultiplier = forwardSearch ? 1 : -1;
+    return travelTimeMultiplier * (dijkstraTree.getTime(toNodeIndex).seconds() - startTime);
+  }
 
-	private List<Node> constructNodeSequence(LeastCostPathTree dijkstraTree, Node toNode, boolean forward) {
-		ArrayList<Node> nodes = new ArrayList<>();
-		nodes.add(toNode);
+  private List<Node> constructNodeSequence(
+      LeastCostPathTree dijkstraTree, Node toNode, boolean forward) {
+    ArrayList<Node> nodes = new ArrayList<>();
+    nodes.add(toNode);
 
-		int index = dijkstraTree.getComingFrom(toNode.getId().index());
-		while (index >= 0) {
-			nodes.add(nodeMap.get(Id.get(index, Node.class)));
-			index = dijkstraTree.getComingFrom(index);
-		}
+    int index = dijkstraTree.getComingFrom(toNode.getId().index());
+    while (index >= 0) {
+      nodes.add(nodeMap.get(Id.get(index, Node.class)));
+      index = dijkstraTree.getComingFrom(index);
+    }
 
-		if (forward) {
-			Collections.reverse(nodes);
-		}
-		return nodes;
-	}
+    if (forward) {
+      Collections.reverse(nodes);
+    }
+    return nodes;
+  }
 
-	private List<Link> constructLinkSequence(List<Node> nodes) {
-		List<Link> links = new ArrayList<>(nodes.size() - 1);
-		Node prevNode = nodes.get(0);
-		for (int i = 1; i < nodes.size(); i++) {
-			Node nextNode = nodes.get(i);
-			for (Link link : prevNode.getOutLinks().values()) {
-				//FIXME this method will not work properly if there are many prevNode -> nextNode links
-				//TODO save link idx in tree OR pre-check: at most 1 arc per each node pair OR choose faster/better link
-				// sh, 26/07/2023, added a check further below to increase awareness
-				if (link.getToNode() == nextNode) {
-					links.add(link);
-					break;
-				}
-			}
-			prevNode = nextNode;
-		}
-		return links;
-	}
+  private List<Link> constructLinkSequence(List<Node> nodes) {
+    List<Link> links = new ArrayList<>(nodes.size() - 1);
+    Node prevNode = nodes.get(0);
+    for (int i = 1; i < nodes.size(); i++) {
+      Node nextNode = nodes.get(i);
+      for (Link link : prevNode.getOutLinks().values()) {
+        // FIXME this method will not work properly if there are many prevNode -> nextNode links
+        // TODO save link idx in tree OR pre-check: at most 1 arc per each node pair OR choose
+        // faster/better link
+        // sh, 26/07/2023, added a check further below to increase awareness
+        if (link.getToNode() == nextNode) {
+          links.add(link);
+          break;
+        }
+      }
+      prevNode = nextNode;
+    }
+    return links;
+  }
 
-	private Node getEndNode(Link link) {
-		return forwardSearch ? link.getFromNode() : link.getToNode();
-	}
+  private Node getEndNode(Link link) {
+    return forwardSearch ? link.getFromNode() : link.getToNode();
+  }
 
-	private Node getStartNode(Link link) {
-		return forwardSearch ? link.getToNode() : link.getFromNode();
-	}
+  private Node getStartNode(Link link) {
+    return forwardSearch ? link.getToNode() : link.getFromNode();
+  }
 
-	private double getFirstAndLastLinkTT(Link fromLink, Link toLink, double pathTravelTime, double time) {
-		double lastLinkTT = forwardSearch ?
-				VrpPaths.getLastLinkTT(travelTime, toLink, time + pathTravelTime) :
-				VrpPaths.getLastLinkTT(travelTime, fromLink, time);
-		return FIRST_LINK_TT + lastLinkTT;
-	}
+  private double getFirstAndLastLinkTT(
+      Link fromLink, Link toLink, double pathTravelTime, double time) {
+    double lastLinkTT =
+        forwardSearch
+            ? VrpPaths.getLastLinkTT(travelTime, toLink, time + pathTravelTime)
+            : VrpPaths.getLastLinkTT(travelTime, fromLink, time);
+    return FIRST_LINK_TT + lastLinkTT;
+  }
 
-	private final static Logger logger = LogManager.getLogger(OneToManyPathCalculator.class);
-	private static int parallelLinksWarningCount = 0;
+  private static final Logger logger = LogManager.getLogger(OneToManyPathCalculator.class);
+  private static int parallelLinksWarningCount = 0;
 
-	private void verifyParallelLinks() {
-		if (parallelLinksWarningCount < 20) {
-			for (Node prevNode : nodeMap.values()) {
-				Set<Integer> candidates = new HashSet<>();
+  private void verifyParallelLinks() {
+    if (parallelLinksWarningCount < 20) {
+      for (Node prevNode : nodeMap.values()) {
+        Set<Integer> candidates = new HashSet<>();
 
-				for (Link link : prevNode.getOutLinks().values()) {
-					if (!candidates.add(link.getToNode().getId().index())) {
-						logger.warn(
-								"Found parallel links between nodes {} and {}. This may lead to problems in path calculation.",
-								prevNode.getId().toString(), link.getToNode().getId().toString());
+        for (Link link : prevNode.getOutLinks().values()) {
+          if (!candidates.add(link.getToNode().getId().index())) {
+            logger.warn(
+                "Found parallel links between nodes {} and {}. This may lead to problems in path calculation.",
+                prevNode.getId().toString(),
+                link.getToNode().getId().toString());
 
-						if (parallelLinksWarningCount > 20) {
-							logger.warn("Consider using NetworkSegmentDoubleLinks.run on your network");
-							logger.warn("Only showing 20 of these warnings ...");
-							return;
-						}
+            if (parallelLinksWarningCount > 20) {
+              logger.warn("Consider using NetworkSegmentDoubleLinks.run on your network");
+              logger.warn("Only showing 20 of these warnings ...");
+              return;
+            }
 
-						parallelLinksWarningCount++;
-					}
-				}
-			}
-		}
-	}
+            parallelLinksWarningCount++;
+          }
+        }
+      }
+    }
+  }
 }

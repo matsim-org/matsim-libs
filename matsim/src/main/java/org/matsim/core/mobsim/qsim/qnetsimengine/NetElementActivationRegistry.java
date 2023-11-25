@@ -21,14 +21,16 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 abstract class NetElementActivationRegistry {
-	// yy In my language intuition, a NetElementActivator (previous name) is something that activates something else.  
-	// Here, however, this something that is is activated _by_ something else.  What is a better name?  ActiveNetElementsRegister? 
+  // yy In my language intuition, a NetElementActivator (previous name) is something that activates
+  // something else.
+  // Here, however, this something that is is activated _by_ something else.  What is a better name?
+  //  ActiveNetElementsRegister?
 
-	abstract void registerNodeAsActive(final QNodeI node);
-	
-	abstract int getNumberOfSimulatedNodes();
-	
-	abstract void registerLinkAsActive(final QLinkI link);
+  abstract void registerNodeAsActive(final QNodeI node);
 
-	abstract int getNumberOfSimulatedLinks();
-} 
+  abstract int getNumberOfSimulatedNodes();
+
+  abstract void registerLinkAsActive(final QLinkI link);
+
+  abstract int getNumberOfSimulatedLinks();
+}

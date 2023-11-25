@@ -24,11 +24,9 @@ package org.matsim.analysis;
 
 import org.matsim.core.controler.AbstractModule;
 
-
 public class VolumesAnalyzerModule extends AbstractModule {
-    @Override
-    public void install() {
-        bind(VolumesAnalyzer.class).asEagerSingleton();
-    }
-
+  @Override
+  public void install() {
+    bind(VolumesAnalyzer.class).asEagerSingleton();
+  }
 }

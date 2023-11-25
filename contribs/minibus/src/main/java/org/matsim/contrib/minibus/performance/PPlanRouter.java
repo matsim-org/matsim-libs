@@ -20,7 +20,6 @@
 package org.matsim.contrib.minibus.performance;
 
 import java.util.List;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -38,143 +37,126 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
 /**
- * {@link PlanAlgorithm} responsible for routing all trips of a plan.
- * Activity times are not updated, even if the previous trip arrival time
- * is after the activity end time.
- * <br>
+ * {@link PlanAlgorithm} responsible for routing all trips of a plan. Activity times are not
+ * updated, even if the previous trip arrival time is after the activity end time. <br>
  * <b>Duplicated code: Just one change that affects the run method. See comment there.</b>
  *
  * @author aneumann, thibautd
  */
 final class PPlanRouter implements PlanAlgorithm, PersonAlgorithm {
-	private final TripRouter routingHandler;
-	private final ActivityFacilities facilities;
+  private final TripRouter routingHandler;
+  private final ActivityFacilities facilities;
 
-	/**
-	 * Initialises an instance.
-	 * @param routingHandler the {@link TripRouter} to use to route individual trips
-	 * @param facilities the {@link ActivityFacilities} to which activities are refering.
-	 * May be <tt>null</tt>: in this case, the router will be given facilities wrapping the
-	 * origin and destination activity.
-	 */
-	public PPlanRouter(
-			final TripRouter routingHandler,
-			final ActivityFacilities facilities) {
-		this.routingHandler = routingHandler;
-		this.facilities = facilities;
-	}
+  /**
+   * Initialises an instance.
+   *
+   * @param routingHandler the {@link TripRouter} to use to route individual trips
+   * @param facilities the {@link ActivityFacilities} to which activities are refering. May be
+   *     <tt>null</tt>: in this case, the router will be given facilities wrapping the origin and
+   *     destination activity.
+   */
+  public PPlanRouter(final TripRouter routingHandler, final ActivityFacilities facilities) {
+    this.routingHandler = routingHandler;
+    this.facilities = facilities;
+  }
 
-	/**
-	 * Short for initialising without facilities.
-	 * @param routingHandler
-	 */
-	public PPlanRouter(
-			final TripRouter routingHandler) {
-		this( routingHandler , null );
-	}
+  /**
+   * Short for initialising without facilities.
+   *
+   * @param routingHandler
+   */
+  public PPlanRouter(final TripRouter routingHandler) {
+    this(routingHandler, null);
+  }
 
-	/**
-	 * Gives access to the {@link TripRouter} used
-	 * to compute routes.
-	 *
-	 * @return the internal TripRouter instance.
-	 */
-	public TripRouter getTripRouter() {
-		return routingHandler;
-	}
+  /**
+   * Gives access to the {@link TripRouter} used to compute routes.
+   *
+   * @return the internal TripRouter instance.
+   */
+  public TripRouter getTripRouter() {
+    return routingHandler;
+  }
 
-	@Override
-	public void run(final Plan plan) {
-		final List<Trip> trips = TripStructureUtils.getTrips( plan );
+  @Override
+  public void run(final Plan plan) {
+    final List<Trip> trips = TripStructureUtils.getTrips(plan);
 
-		for (Trip trip : trips) {
-			
-			
-			/** That's the only check that got added.... **/
-			if (TripStructureUtils.identifyMainMode(trip.getTripElements()).equals(TransportMode.pt)) {
-				final List<? extends PlanElement> newTrip =
-						routingHandler.calcRoute(
-								TripStructureUtils.identifyMainMode( trip.getTripElements() ),
-								toFacility( trip.getOriginActivity() ),
-								toFacility( trip.getDestinationActivity() ),
-								calcEndOfActivity( trip.getOriginActivity() , plan ),
-								plan.getPerson(), trip.getTripAttributes() );
+    for (Trip trip : trips) {
 
-					TripRouter.insertTrip(
-							plan, 
-							trip.getOriginActivity(),
-							newTrip,
-							trip.getDestinationActivity());
-			}
-			
-		}
-	}
+      /** That's the only check that got added.... * */
+      if (TripStructureUtils.identifyMainMode(trip.getTripElements()).equals(TransportMode.pt)) {
+        final List<? extends PlanElement> newTrip =
+            routingHandler.calcRoute(
+                TripStructureUtils.identifyMainMode(trip.getTripElements()),
+                toFacility(trip.getOriginActivity()),
+                toFacility(trip.getDestinationActivity()),
+                calcEndOfActivity(trip.getOriginActivity(), plan),
+                plan.getPerson(),
+                trip.getTripAttributes());
 
-	@Override
-	public void run(final Person person) {
-		for (Plan plan : person.getPlans()) {
-			run( plan );
-		}
-	}
+        TripRouter.insertTrip(
+            plan, trip.getOriginActivity(), newTrip, trip.getDestinationActivity());
+      }
+    }
+  }
 
-	// /////////////////////////////////////////////////////////////////////////
-	// helpers
-	// /////////////////////////////////////////////////////////////////////////
-	private Facility toFacility(final Activity act) {
-		if ((act.getLinkId() == null || act.getCoord() == null)
-				&& facilities != null
-				&& !facilities.getFacilities().isEmpty()) {
-			// use facilities only if the activity does not provides the required fields.
-			return facilities.getFacilities().get( act.getFacilityId() );
-		}
-		return FacilitiesUtils.toFacility( act, facilities );
-	}
+  @Override
+  public void run(final Person person) {
+    for (Plan plan : person.getPlans()) {
+      run(plan);
+    }
+  }
 
-	private static double calcEndOfActivity(
-			final Activity activity,
-			final Plan plan) {
-		if (activity.getEndTime().isDefined())
-			return activity.getEndTime().seconds();
+  // /////////////////////////////////////////////////////////////////////////
+  // helpers
+  // /////////////////////////////////////////////////////////////////////////
+  private Facility toFacility(final Activity act) {
+    if ((act.getLinkId() == null || act.getCoord() == null)
+        && facilities != null
+        && !facilities.getFacilities().isEmpty()) {
+      // use facilities only if the activity does not provides the required fields.
+      return facilities.getFacilities().get(act.getFacilityId());
+    }
+    return FacilitiesUtils.toFacility(act, facilities);
+  }
 
-		// no sufficient information in the activity...
-		// do it the long way.
-		// XXX This is inefficient! Using a cache for each plan may be an option
-		// (knowing that plan elements are iterated in proper sequence,
-		// no need to re-examine the parts of the plan already known)
-		double now = 0;
+  private static double calcEndOfActivity(final Activity activity, final Plan plan) {
+    if (activity.getEndTime().isDefined()) return activity.getEndTime().seconds();
 
-		for (PlanElement pe : plan.getPlanElements()) {
-			now = updateNow( now , pe );
-			if (pe == activity) return now;
-		}
+    // no sufficient information in the activity...
+    // do it the long way.
+    // XXX This is inefficient! Using a cache for each plan may be an option
+    // (knowing that plan elements are iterated in proper sequence,
+    // no need to re-examine the parts of the plan already known)
+    double now = 0;
 
-		throw new RuntimeException( "activity "+activity+" not found in "+plan.getPlanElements() );
-	}
+    for (PlanElement pe : plan.getPlanElements()) {
+      now = updateNow(now, pe);
+      if (pe == activity) return now;
+    }
 
-	private static double updateNow(
-			final double now,
-			final PlanElement pe) {
-		if (pe instanceof Activity) {
-			Activity act = (Activity) pe;
-			OptionalTime startTime = act.getStartTime();
-			OptionalTime dur = act.getMaximumDuration();
-			if (act.getEndTime().isDefined()) {
-				// use fromAct.endTime as time for routing
-				return act.getEndTime().seconds();
-			}
-			else if (startTime.isDefined() && dur.isDefined()) {
-				// use fromAct.startTime + fromAct.duration as time for routing
-				return startTime.seconds() + dur.seconds();
-			}
-			else if (dur.isDefined()) {
-				// use last used time + fromAct.duration as time for routing
-				return now + dur.seconds();
-			}
-			else {
-				throw new RuntimeException("activity has neither end-time nor duration." + act);
-			}
-		}
-		return now + ((Leg)pe).getTravelTime().orElse(0);
-	}	
+    throw new RuntimeException("activity " + activity + " not found in " + plan.getPlanElements());
+  }
+
+  private static double updateNow(final double now, final PlanElement pe) {
+    if (pe instanceof Activity) {
+      Activity act = (Activity) pe;
+      OptionalTime startTime = act.getStartTime();
+      OptionalTime dur = act.getMaximumDuration();
+      if (act.getEndTime().isDefined()) {
+        // use fromAct.endTime as time for routing
+        return act.getEndTime().seconds();
+      } else if (startTime.isDefined() && dur.isDefined()) {
+        // use fromAct.startTime + fromAct.duration as time for routing
+        return startTime.seconds() + dur.seconds();
+      } else if (dur.isDefined()) {
+        // use last used time + fromAct.duration as time for routing
+        return now + dur.seconds();
+      } else {
+        throw new RuntimeException("activity has neither end-time nor duration." + act);
+      }
+    }
+    return now + ((Leg) pe).getTravelTime().orElse(0);
+  }
 }
-

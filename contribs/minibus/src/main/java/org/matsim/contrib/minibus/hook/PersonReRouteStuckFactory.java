@@ -18,28 +18,23 @@
  * *********************************************************************** */
 package org.matsim.contrib.minibus.hook;
 
+import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
 
-import java.util.Set;
-
-
 /**
  * @author droeder
- *
  */
 interface PersonReRouteStuckFactory {
-	
 
-	/**
-	 * @param router
-	 * @param scenario
-	 * @param agentsStuck
-	 * @return
-	 */
-	public AbstractPersonReRouteStuck getReRouteStuck(PlanAlgorithm router, MutableScenario scenario, Set<Id<Person>> agentsStuck) ;
-
+  /**
+   * @param router
+   * @param scenario
+   * @param agentsStuck
+   * @return
+   */
+  public AbstractPersonReRouteStuck getReRouteStuck(
+      PlanAlgorithm router, MutableScenario scenario, Set<Id<Person>> agentsStuck);
 }
-

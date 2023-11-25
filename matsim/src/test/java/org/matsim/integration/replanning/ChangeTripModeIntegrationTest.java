@@ -70,70 +70,87 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ChangeTripModeIntegrationTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  @Test
+  public void testStrategyManagerConfigLoaderIntegration() {
+    // setup config
+    final Config config = utils.loadConfig((String) null);
+    final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
+    final StrategySettings strategySettings =
+        new StrategySettings(Id.create("1", StrategySettings.class));
+    strategySettings.setStrategyName("ChangeTripMode");
+    strategySettings.setWeight(1.0);
+    config.replanning().addStrategySettings(strategySettings);
+    //		config.setParam("changeMode", "modes", "car,walk");
+    String[] str = {"car", "walk"};
+    config.changeMode().setModes(str);
 
-	@Test public void testStrategyManagerConfigLoaderIntegration() {
-		// setup config
-		final Config config = utils.loadConfig((String)null);
-		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
-		strategySettings.setStrategyName("ChangeTripMode");
-		strategySettings.setWeight(1.0);
-		config.replanning().addStrategySettings(strategySettings);
-		//		config.setParam("changeMode", "modes", "car,walk");
-		String[] str = {"car","walk"} ;
-		config.changeMode().setModes(str);
+    // setup network
+    Network network = (Network) scenario.getNetwork();
+    Node node1 =
+        NetworkUtils.createAndAddNode(
+            network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+    Node node2 =
+        NetworkUtils.createAndAddNode(
+            network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
+    final Node fromNode = node1;
+    final Node toNode = node2;
+    Link link =
+        NetworkUtils.createAndAddLink(
+            network,
+            Id.create(1, Link.class),
+            fromNode,
+            toNode,
+            (double) 1000,
+            (double) 10,
+            (double) 3600,
+            (double) 1);
 
-		// setup network
-		Network network = (Network) scenario.getNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
-		final Node fromNode = node1;
-		final Node toNode = node2;
-		Link link = NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, (double) 1000, (double) 10, (double) 3600, (double) 1 );
+    // setup population with one person
+    Population population = scenario.getPopulation();
+    Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+    population.addPerson(person);
+    Plan plan = PersonUtils.createAndAddPlan(person, true);
+    Activity act = PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(0, 0));
+    act.setLinkId(link.getId());
+    act.setEndTime(8.0 * 3600);
+    PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+    act =
+        PopulationUtils.createAndAddActivityFromCoord(
+            plan, "work", new Coord((double) 0, (double) 500));
+    act.setLinkId(link.getId());
 
-		// setup population with one person
-		Population population = scenario.getPopulation();
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-		population.addPerson(person);
-		Plan plan = PersonUtils.createAndAddPlan(person, true);
-		Activity act = PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(0, 0));
-		act.setLinkId(link.getId());
-		act.setEndTime(8.0 * 3600);
-		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-		act = PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 500));
-		act.setLinkId(link.getId());
+    com.google.inject.Injector injector =
+        Injector.createInjector(
+            config,
+            new AbstractModule() {
+              @Override
+              public void install() {
+                install(new ScenarioByInstanceModule(scenario));
+                install(new NewControlerModule());
+                install(new ControlerDefaultCoreListenersModule());
+                install(new StandaloneExperiencedPlansModule());
+                install(new DefaultMobsimModule());
+                install(new EventsManagerModule());
+                install(new StrategyManagerModule());
+                install(new CharyparNagelScoringFunctionModule());
+                install(new TripRouterModule());
+                install(new TravelTimeCalculatorModule());
+                install(new TravelDisutilityModule());
+                install(new TimeInterpretationModule());
+                bind(PrepareForSim.class).to(PrepareForSimImpl.class);
+                bind(PrepareForMobsim.class).to(PrepareForMobsimImpl.class);
+              }
+            });
+    final StrategyManager manager = injector.getInstance(StrategyManager.class);
+    manager.run(population, 0, injector.getInstance(ReplanningContext.class));
 
-		com.google.inject.Injector injector = Injector.createInjector(config, new AbstractModule() {
-			@Override
-			public void install() {
-				install(new ScenarioByInstanceModule(scenario));
-				install(new NewControlerModule());
-				install(new ControlerDefaultCoreListenersModule());
-				install(new StandaloneExperiencedPlansModule());
-				install(new DefaultMobsimModule());
-				install(new EventsManagerModule());
-				install(new StrategyManagerModule());
-				install(new CharyparNagelScoringFunctionModule());
-				install(new TripRouterModule());
-				install(new TravelTimeCalculatorModule());
-				install(new TravelDisutilityModule());
-				install(new TimeInterpretationModule());
-				bind( PrepareForSim.class ).to( PrepareForSimImpl.class ) ;
-				bind( PrepareForMobsim.class ).to( PrepareForMobsimImpl.class ) ;
-			}
-		});
-		final StrategyManager manager = injector.getInstance(StrategyManager.class);
-		manager.run(population, 0, injector.getInstance(ReplanningContext.class));
-
-		// test that everything worked as expected
-		assertEquals("number of plans in person.", 2, person.getPlans().size());
-		Plan newPlan = person.getSelectedPlan();
-		Leg newLeg = (Leg) newPlan.getPlanElements().get(1);
-		assertEquals(TransportMode.walk, newLeg.getMode());
-		assertNotNull("the leg should now have a route.", newLeg.getRoute());
-	}
-
+    // test that everything worked as expected
+    assertEquals("number of plans in person.", 2, person.getPlans().size());
+    Plan newPlan = person.getSelectedPlan();
+    Leg newLeg = (Leg) newPlan.getPlanElements().get(1);
+    assertEquals(TransportMode.walk, newLeg.getMode());
+    assertNotNull("the leg should now have a route.", newLeg.getRoute());
+  }
 }

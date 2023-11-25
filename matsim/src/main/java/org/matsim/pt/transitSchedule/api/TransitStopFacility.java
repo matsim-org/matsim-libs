@@ -32,30 +32,29 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  *
  * @author mrieser
  */
-public interface TransitStopFacility extends Facility, Identifiable<TransitStopFacility>, Attributable {
+public interface TransitStopFacility
+    extends Facility, Identifiable<TransitStopFacility>, Attributable {
 
-	boolean getIsBlockingLane();
+  boolean getIsBlockingLane();
 
-	void setLinkId(final Id<Link> linkId);
+  void setLinkId(final Id<Link> linkId);
 
-	/**
-	 * Sets a human name for the stop facility, e.g. to be displayed
-	 * on vehicles or at the stops' locations. The name can be
-	 * <code>null</code> to delete a previously assigned name.
-	 *
-	 * @param name
-	 */
-	void setName(final String name);
+  /**
+   * Sets a human name for the stop facility, e.g. to be displayed on vehicles or at the stops'
+   * locations. The name can be <code>null</code> to delete a previously assigned name.
+   *
+   * @param name
+   */
+  void setName(final String name);
 
-	/**
-	 * @return name of the stop facility. Can be <code>null</code>.
-	 */
-	String getName();
+  /**
+   * @return name of the stop facility. Can be <code>null</code>.
+   */
+  String getName();
 
-	Id<TransitStopArea> getStopAreaId();
+  Id<TransitStopArea> getStopAreaId();
 
-	void setStopAreaId(Id<TransitStopArea> stopAreaId);
+  void setStopAreaId(Id<TransitStopArea> stopAreaId);
 
-	void setCoord(Coord coord);
-	
+  void setCoord(Coord coord);
 }

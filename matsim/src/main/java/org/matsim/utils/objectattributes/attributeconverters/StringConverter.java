@@ -21,27 +21,26 @@ package org.matsim.utils.objectattributes.attributeconverters;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.matsim.utils.objectattributes.AttributeConverter;
-
 
 /**
  * @author mrieser
  */
 public class StringConverter implements AttributeConverter<String> {
-	private final Map<String, String> stringCache = new HashMap<String, String>(1000);
-	@Override
-	public String convert(String value) {
-		String s = this.stringCache.get(value);
-		if (s == null) {
-			s = value;
-			this.stringCache.put(s, s);
-		}
-		return s;
-	}
+  private final Map<String, String> stringCache = new HashMap<String, String>(1000);
 
-	@Override
-	public String convertToString(Object o) {
-		return (String) o;
-	}
+  @Override
+  public String convert(String value) {
+    String s = this.stringCache.get(value);
+    if (s == null) {
+      s = value;
+      this.stringCache.put(s, s);
+    }
+    return s;
+  }
+
+  @Override
+  public String convertToString(Object o) {
+    return (String) o;
+  }
 }

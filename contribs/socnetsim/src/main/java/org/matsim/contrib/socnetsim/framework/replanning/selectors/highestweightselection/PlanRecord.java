@@ -22,65 +22,66 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors.highestweigh
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
-
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 
 final class PlanRecord {
-	PersonRecord person;
-	final Plan plan;
-	/**
-	 * The joint plan to which pertains the individual plan,
-	 * if any.
-	 */
-	final JointPlan jointPlan;
-	/**
-	 * the plan records corresponding to the other plans in the joint plan
-	 */
-	final Collection<PlanRecord> linkedPlans = new HashSet<PlanRecord>();
-	final double avgJointPlanWeight;
-	double cachedMaximumWeight = Double.NaN;
-	// true if all partners are still unallocated
-	boolean isStillFeasible = true;
+  PersonRecord person;
+  final Plan plan;
 
-	private Collection<PlanRecord> incompatiblePlans = null;
-	private Set<Id> incompatibilityGroups = null;
+  /** The joint plan to which pertains the individual plan, if any. */
+  final JointPlan jointPlan;
 
-	public PlanRecord(
-			final Plan plan,
-			final JointPlan jointPlan,
-			final double weight) {
-		this.plan = plan;
-		this.jointPlan = jointPlan;
-		this.avgJointPlanWeight = weight;
-	}
+  /** the plan records corresponding to the other plans in the joint plan */
+  final Collection<PlanRecord> linkedPlans = new HashSet<PlanRecord>();
 
-	@Override
-	public String toString() {
-		return "{PlanRecord: "+plan.getPerson().getId()+":"+plan.getScore()+
-			" linkedWith:"+(jointPlan == null ? "[]" : jointPlan.getIndividualPlans().keySet())+
-			" linkedPlansSize:"+linkedPlans.size()+
-			" weight="+avgJointPlanWeight+
-			" isFeasible="+isStillFeasible+"}";
-	}
+  final double avgJointPlanWeight;
+  double cachedMaximumWeight = Double.NaN;
+  // true if all partners are still unallocated
+  boolean isStillFeasible = true;
 
-	public Collection<PlanRecord> getIncompatiblePlans() {
-		return this.incompatiblePlans;
-	}
+  private Collection<PlanRecord> incompatiblePlans = null;
+  private Set<Id> incompatibilityGroups = null;
 
-	public void setIncompatiblePlans(final Collection<PlanRecord> incompatiblePlans) {
-		if ( this.incompatiblePlans != null ) throw new IllegalStateException();
-		this.incompatiblePlans = incompatiblePlans;
-	}
+  public PlanRecord(final Plan plan, final JointPlan jointPlan, final double weight) {
+    this.plan = plan;
+    this.jointPlan = jointPlan;
+    this.avgJointPlanWeight = weight;
+  }
 
-	public Set<Id> getIncompatibilityGroups() {
-		return this.incompatibilityGroups;
-	}
+  @Override
+  public String toString() {
+    return "{PlanRecord: "
+        + plan.getPerson().getId()
+        + ":"
+        + plan.getScore()
+        + " linkedWith:"
+        + (jointPlan == null ? "[]" : jointPlan.getIndividualPlans().keySet())
+        + " linkedPlansSize:"
+        + linkedPlans.size()
+        + " weight="
+        + avgJointPlanWeight
+        + " isFeasible="
+        + isStillFeasible
+        + "}";
+  }
 
-	public void setIncompatibilityGroups(final Set<Id> incompatibilityGroups) {
-		if ( this.incompatibilityGroups != null ) throw new IllegalStateException();
-		this.incompatibilityGroups = incompatibilityGroups;
-	}
+  public Collection<PlanRecord> getIncompatiblePlans() {
+    return this.incompatiblePlans;
+  }
+
+  public void setIncompatiblePlans(final Collection<PlanRecord> incompatiblePlans) {
+    if (this.incompatiblePlans != null) throw new IllegalStateException();
+    this.incompatiblePlans = incompatiblePlans;
+  }
+
+  public Set<Id> getIncompatibilityGroups() {
+    return this.incompatibilityGroups;
+  }
+
+  public void setIncompatibilityGroups(final Set<Id> incompatibilityGroups) {
+    if (this.incompatibilityGroups != null) throw new IllegalStateException();
+    this.incompatibilityGroups = incompatibilityGroups;
+  }
 }

@@ -24,7 +24,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 import java.util.function.ToDoubleFunction;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -46,53 +45,70 @@ import org.matsim.examples.ExamplesUtils;
  * @author Michal Maciejewski (michalm)
  */
 public class EqualVehicleDensityTargetCalculatorTest {
-	private final Config config = ConfigUtils.loadConfig(
-			IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "eight_shared_taxi_config.xml"),
-			new MultiModeDrtConfigGroup());
+  private final Config config =
+      ConfigUtils.loadConfig(
+          IOUtils.extendUrl(
+              ExamplesUtils.getTestScenarioURL("dvrp-grid"), "eight_shared_taxi_config.xml"),
+          new MultiModeDrtConfigGroup());
 
-	private final Network network = NetworkUtils.readNetwork(
-			config.network().getInputFileURL(config.getContext()).toString());
+  private final Network network =
+      NetworkUtils.readNetwork(config.network().getInputFileURL(config.getContext()).toString());
 
-	private final DrtZonalSystem zonalSystem = DrtZonalSystem.createFromPreparedGeometries(network,
-			DrtGridUtils.createGridFromNetwork(network, 500.));
+  private final DrtZonalSystem zonalSystem =
+      DrtZonalSystem.createFromPreparedGeometries(
+          network, DrtGridUtils.createGridFromNetwork(network, 500.));
 
-	@Test
-	public void calculate_oneVehiclePerZone() {
-		var targetFunction = new EqualVehicleDensityTargetCalculator(zonalSystem,
-				createFleetSpecification(8)).calculate(0, Map.of());
-		zonalSystem.getZones().keySet().forEach(id -> assertTarget(targetFunction, zonalSystem, id, 1));
-	}
+  @Test
+  public void calculate_oneVehiclePerZone() {
+    var targetFunction =
+        new EqualVehicleDensityTargetCalculator(zonalSystem, createFleetSpecification(8))
+            .calculate(0, Map.of());
+    zonalSystem.getZones().keySet().forEach(id -> assertTarget(targetFunction, zonalSystem, id, 1));
+  }
 
-	@Test
-	public void calculate_lessVehiclesThanZones() {
-		var targetFunction = new EqualVehicleDensityTargetCalculator(zonalSystem,
-				createFleetSpecification(7)).calculate(0, Map.of());
-		zonalSystem.getZones().keySet().forEach(id -> assertTarget(targetFunction, zonalSystem, id, 7. / 8));
-	}
+  @Test
+  public void calculate_lessVehiclesThanZones() {
+    var targetFunction =
+        new EqualVehicleDensityTargetCalculator(zonalSystem, createFleetSpecification(7))
+            .calculate(0, Map.of());
+    zonalSystem
+        .getZones()
+        .keySet()
+        .forEach(id -> assertTarget(targetFunction, zonalSystem, id, 7. / 8));
+  }
 
-	@Test
-	public void calculate_moreVehiclesThanZones() {
-		var targetFunction = new EqualVehicleDensityTargetCalculator(zonalSystem,
-				createFleetSpecification(9)).calculate(0, Map.of());
-		zonalSystem.getZones().keySet().forEach(id -> assertTarget(targetFunction, zonalSystem, id, 9. / 8));
-	}
+  @Test
+  public void calculate_moreVehiclesThanZones() {
+    var targetFunction =
+        new EqualVehicleDensityTargetCalculator(zonalSystem, createFleetSpecification(9))
+            .calculate(0, Map.of());
+    zonalSystem
+        .getZones()
+        .keySet()
+        .forEach(id -> assertTarget(targetFunction, zonalSystem, id, 9. / 8));
+  }
 
-	private FleetSpecification createFleetSpecification(int count) {
-		FleetSpecification fleetSpecification = new FleetSpecificationImpl();
-		for (int i = 0; i < count; i++) {
-			fleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder()
-					.id(Id.create(i + "", DvrpVehicle.class))
-					.startLinkId(Id.createLinkId("a"))
-					.capacity(1)
-					.serviceBeginTime(0)
-					.serviceEndTime(100)
-					.build());
-		}
-		return fleetSpecification;
-	}
+  private FleetSpecification createFleetSpecification(int count) {
+    FleetSpecification fleetSpecification = new FleetSpecificationImpl();
+    for (int i = 0; i < count; i++) {
+      fleetSpecification.addVehicleSpecification(
+          ImmutableDvrpVehicleSpecification.newBuilder()
+              .id(Id.create(i + "", DvrpVehicle.class))
+              .startLinkId(Id.createLinkId("a"))
+              .capacity(1)
+              .serviceBeginTime(0)
+              .serviceEndTime(100)
+              .build());
+    }
+    return fleetSpecification;
+  }
 
-	private void assertTarget(ToDoubleFunction<DrtZone> targetFunction, DrtZonalSystem zonalSystem, String zoneId,
-			double expectedValue) {
-		assertThat(targetFunction.applyAsDouble(zonalSystem.getZones().get(zoneId))).isEqualTo(expectedValue);
-	}
+  private void assertTarget(
+      ToDoubleFunction<DrtZone> targetFunction,
+      DrtZonalSystem zonalSystem,
+      String zoneId,
+      double expectedValue) {
+    assertThat(targetFunction.applyAsDouble(zonalSystem.getZones().get(zoneId)))
+        .isEqualTo(expectedValue);
+  }
 }

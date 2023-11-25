@@ -24,10 +24,10 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 public class MyComparator implements Comparator<Comp>, Serializable {
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@Override
-	public int compare(final Comp o1, final Comp o2) {
-		return Double.compare(o1.getXval(), o2.getXval());
-	}
+  @Override
+  public int compare(final Comp o1, final Comp o2) {
+    return Double.compare(o1.getXval(), o2.getXval());
+  }
 }

@@ -20,6 +20,9 @@
 package org.matsim.contrib.emissions;
 
 import com.google.inject.Inject;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,210 +32,288 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * @author benjamin
- *
  */
 public final class EmissionModule {
-	private static final Logger logger = LogManager.getLogger(EmissionModule.class);
+  private static final Logger logger = LogManager.getLogger(EmissionModule.class);
 
-	private final Scenario scenario;
-	private WarmEmissionHandler warmEmissionHandler;
-	private ColdEmissionHandler coldEmissionHandler;
+  private final Scenario scenario;
+  private WarmEmissionHandler warmEmissionHandler;
+  private ColdEmissionHandler coldEmissionHandler;
 
-	private final EventsManager eventsManager;
-	private final EmissionsConfigGroup emissionConfigGroup;
+  private final EventsManager eventsManager;
+  private final EmissionsConfigGroup emissionConfigGroup;
 
-	//===
+  // ===
 
-	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
-	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
+  private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
+  private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
 
-	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
-	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
+  private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
+  private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
 
-	private Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds;
+  private Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>>
+      hbefaRoadTrafficSpeeds;
 
-	private final Set<Pollutant> warmPollutants = new HashSet<>();
-	private final Set<Pollutant> coldPollutants = new HashSet<>();
-	// these are/were the "automatic" maps collected by JM from the hbefa files.  kai, jan'20
+  private final Set<Pollutant> warmPollutants = new HashSet<>();
+  private final Set<Pollutant> coldPollutants = new HashSet<>();
 
-	@Inject
-	public EmissionModule(final Scenario scenario, final EventsManager eventsManager) {
+  // these are/were the "automatic" maps collected by JM from the hbefa files.  kai, jan'20
 
-		this.scenario = scenario;
-		this.emissionConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), EmissionsConfigGroup.class);
-		this.eventsManager = emissionConfigGroup.isWritingEmissionsEvents() ? eventsManager : EventsUtils.createEventsManager();
+  @Inject
+  public EmissionModule(final Scenario scenario, final EventsManager eventsManager) {
 
-		checkConfigConsistency();
-		checkNetworkConsistency();
+    this.scenario = scenario;
+    this.emissionConfigGroup =
+        ConfigUtils.addOrGetModule(scenario.getConfig(), EmissionsConfigGroup.class);
+    this.eventsManager =
+        emissionConfigGroup.isWritingEmissionsEvents()
+            ? eventsManager
+            : EventsUtils.createEventsManager();
 
-		createLookupTables();
-		createEmissionHandlers();
+    checkConfigConsistency();
+    checkNetworkConsistency();
 
-		// Event handlers are now added to the event manager inside the respective Handlers, jm march '18
-	}
+    createLookupTables();
+    createEmissionHandlers();
 
-	public WarmEmissionAnalysisModule getWarmEmissionAnalysisModule() {
-		// makes sense to have this public for externalization computations.  kai, jan'20
-		return this.warmEmissionHandler.getWarmEmissionAnalysisModule();
-	}
+    // Event handlers are now added to the event manager inside the respective Handlers, jm march
+    // '18
+  }
 
-	public ColdEmissionAnalysisModule getColdEmissionAnalysisModule() {
-		// makes sense to have this public for externalization computations.  kai, jan'20
-		return this.coldEmissionHandler.getColdEmissionAnalysisModule();
-	}
+  public WarmEmissionAnalysisModule getWarmEmissionAnalysisModule() {
+    // makes sense to have this public for externalization computations.  kai, jan'20
+    return this.warmEmissionHandler.getWarmEmissionAnalysisModule();
+  }
 
-	// make these available for position emission module
-	Set<Pollutant> getWarmPollutants() {
-		return warmPollutants;
-	}
+  public ColdEmissionAnalysisModule getColdEmissionAnalysisModule() {
+    // makes sense to have this public for externalization computations.  kai, jan'20
+    return this.coldEmissionHandler.getColdEmissionAnalysisModule();
+  }
 
-	Set<Pollutant> getColdPollutants() {
-		return coldPollutants;
-	}
+  // make these available for position emission module
+  Set<Pollutant> getWarmPollutants() {
+    return warmPollutants;
+  }
 
-	// probably, this is useful; e.g., emission events are not written and a few handlers must be attached to events manager
-	// for the analysis purpose. Need a test. Amit Apr'17
-	public EventsManager getEmissionEventsManager() {
-		return eventsManager;
-	}
+  Set<Pollutant> getColdPollutants() {
+    return coldPollutants;
+  }
 
-	public void writeEmissionInformation() {
-		logger.info("Warm emissions were not calculated for " + warmEmissionHandler.getLinkLeaveWarnCnt() + " of " +
-				warmEmissionHandler.getLinkLeaveCnt() + " link leave events (no corresponding link enter event).");
-		int noVehicleLeavesTrafficEmissions = warmEmissionHandler.getSameLinkTrafficLeaveWarnCnt() + warmEmissionHandler.getUnusualTrafficLeaveWarnCnt();
-		logger.info("Warm emissions were not calculated for " + noVehicleLeavesTrafficEmissions + " of " + warmEmissionHandler.getTrafficLeaveCnt() +
-				" vehicle leaves traffic events (no corresponding link enter event).");
-		if ( warmEmissionHandler.getUnusualTrafficLeaveWarnCnt() > 0 ) {
-			logger.info(warmEmissionHandler.getUnusualTrafficLeaveWarnCnt() + " events occurred where the vehicle left traffic without entering ANY link " +
-					"(no warm emissions calculated). These events might need to be investigated."); }
+  // probably, this is useful; e.g., emission events are not written and a few handlers must be
+  // attached to events manager
+  // for the analysis purpose. Need a test. Amit Apr'17
+  public EventsManager getEmissionEventsManager() {
+    return eventsManager;
+  }
 
-		WarmEmissionAnalysisModule wam = warmEmissionHandler.getWarmEmissionAnalysisModule();
+  public void writeEmissionInformation() {
+    logger.info(
+        "Warm emissions were not calculated for "
+            + warmEmissionHandler.getLinkLeaveWarnCnt()
+            + " of "
+            + warmEmissionHandler.getLinkLeaveCnt()
+            + " link leave events (no corresponding link enter event).");
+    int noVehicleLeavesTrafficEmissions =
+        warmEmissionHandler.getSameLinkTrafficLeaveWarnCnt()
+            + warmEmissionHandler.getUnusualTrafficLeaveWarnCnt();
+    logger.info(
+        "Warm emissions were not calculated for "
+            + noVehicleLeavesTrafficEmissions
+            + " of "
+            + warmEmissionHandler.getTrafficLeaveCnt()
+            + " vehicle leaves traffic events (no corresponding link enter event).");
+    if (warmEmissionHandler.getUnusualTrafficLeaveWarnCnt() > 0) {
+      logger.info(
+          warmEmissionHandler.getUnusualTrafficLeaveWarnCnt()
+              + " events occurred where the vehicle left traffic without entering ANY link "
+              + "(no warm emissions calculated). These events might need to be investigated.");
+    }
 
-		logger.info("Emission calculation based on `Free flow only' occured for " + wam.getFreeFlowOccurences() + " of " +
-				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		logger.info("Emission calculation based on `Stop&Go only' occured for " + wam.getStopGoOccurences() + " of " +
-				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		logger.info("Emission calculation based on `Fractions' occured for " + wam.getFractionOccurences() + " of " +
-				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		logger.info("Free flow occured on " + wam.getFreeFlowKmCounter() + " km of total " +
-				wam.getKmCounter() + " km, where emissions were calculated.");
-		logger.info("Stop&Go occured on " + wam.getStopGoKmCounter() + " km of total " +
-				wam.getKmCounter() + " km, where emissions were calculated.");
-		logger.info("Emission calculation terminated. Emission events can be found in regular events file.");
-	}
+    WarmEmissionAnalysisModule wam = warmEmissionHandler.getWarmEmissionAnalysisModule();
 
-	private void checkConfigConsistency() {
+    logger.info(
+        "Emission calculation based on `Free flow only' occured for "
+            + wam.getFreeFlowOccurences()
+            + " of "
+            + wam.getWarmEmissionEventCounter()
+            + " warm emission events.");
+    logger.info(
+        "Emission calculation based on `Stop&Go only' occured for "
+            + wam.getStopGoOccurences()
+            + " of "
+            + wam.getWarmEmissionEventCounter()
+            + " warm emission events.");
+    logger.info(
+        "Emission calculation based on `Fractions' occured for "
+            + wam.getFractionOccurences()
+            + " of "
+            + wam.getWarmEmissionEventCounter()
+            + " warm emission events.");
+    logger.info(
+        "Free flow occured on "
+            + wam.getFreeFlowKmCounter()
+            + " km of total "
+            + wam.getKmCounter()
+            + " km, where emissions were calculated.");
+    logger.info(
+        "Stop&Go occured on "
+            + wam.getStopGoKmCounter()
+            + " km of total "
+            + wam.getKmCounter()
+            + " km, where emissions were calculated.");
+    logger.info(
+        "Emission calculation terminated. Emission events can be found in regular events file.");
+  }
 
-		if (shouldCreateDetailedTables()) {
-			//Check if value was loaded
-			if (StringUtils.isBlank(emissionConfigGroup.getDetailedColdEmissionFactorsFile())) {
-				throw new RuntimeException("You have requested " + emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
-						" cold emissions file.");
-			}
-			if (StringUtils.isBlank(emissionConfigGroup.getDetailedWarmEmissionFactorsFile())) {
-				throw new RuntimeException("You have requested " + emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
-						" warm emissions file.");
-			}
-		} else if (shouldCreateAverageTables()) {
-			if (StringUtils.isBlank(emissionConfigGroup.getAverageColdEmissionFactorsFile())) {
-				throw new RuntimeException("You have requested " + emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
-						" cold emissions file.");
-			}
-			if (StringUtils.isBlank(emissionConfigGroup.getAverageWarmEmissionFactorsFile())) {
-				throw new RuntimeException("You have requested " + emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
-						" warm emissions file.");
-			}
-		} else {
-			throw new RuntimeException("This should not happen. Check your emission config.");
-		}
-	}
+  private void checkConfigConsistency() {
 
-	private void checkNetworkConsistency() {
+    if (shouldCreateDetailedTables()) {
+      // Check if value was loaded
+      if (StringUtils.isBlank(emissionConfigGroup.getDetailedColdEmissionFactorsFile())) {
+        throw new RuntimeException(
+            "You have requested "
+                + emissionConfigGroup.getDetailedVsAverageLookupBehavior()
+                + " but are not providing a corresponding"
+                + " cold emissions file.");
+      }
+      if (StringUtils.isBlank(emissionConfigGroup.getDetailedWarmEmissionFactorsFile())) {
+        throw new RuntimeException(
+            "You have requested "
+                + emissionConfigGroup.getDetailedVsAverageLookupBehavior()
+                + " but are not providing a corresponding"
+                + " warm emissions file.");
+      }
+    } else if (shouldCreateAverageTables()) {
+      if (StringUtils.isBlank(emissionConfigGroup.getAverageColdEmissionFactorsFile())) {
+        throw new RuntimeException(
+            "You have requested "
+                + emissionConfigGroup.getDetailedVsAverageLookupBehavior()
+                + " but are not providing a corresponding"
+                + " cold emissions file.");
+      }
+      if (StringUtils.isBlank(emissionConfigGroup.getAverageWarmEmissionFactorsFile())) {
+        throw new RuntimeException(
+            "You have requested "
+                + emissionConfigGroup.getDetailedVsAverageLookupBehavior()
+                + " but are not providing a corresponding"
+                + " warm emissions file.");
+      }
+    } else {
+      throw new RuntimeException("This should not happen. Check your emission config.");
+    }
+  }
 
-		var allMatch = scenario.getNetwork().getLinks().values().parallelStream()
-				.map(link -> link.getAttributes().getAttribute(EmissionUtils.HBEFA_ROAD_TYPE))
-				.allMatch(roadType -> roadType instanceof String);
+  private void checkNetworkConsistency() {
 
-		if (!allMatch)
-			throw new RuntimeException("The Emission Contrib expects HbefaRoadTypes to be set as link attributes. " +
-					"Use EmissionUtils.setHbefaRoadType(link, type) to set HbefaRoadTypes on each link. " +
-					"Alternatively use an existing mapper such as OsmHbefaMapping, VisumHbefaRoadTypeMapping or VspHbefaRoadTypeMapping to set HbefaRoadTypes on your network.");
-	}
+    var allMatch =
+        scenario.getNetwork().getLinks().values().parallelStream()
+            .map(link -> link.getAttributes().getAttribute(EmissionUtils.HBEFA_ROAD_TYPE))
+            .allMatch(roadType -> roadType instanceof String);
 
-	private void createLookupTables() {
-		logger.info("entering createLookupTables");
+    if (!allMatch)
+      throw new RuntimeException(
+          "The Emission Contrib expects HbefaRoadTypes to be set as link attributes. "
+              + "Use EmissionUtils.setHbefaRoadType(link, type) to set HbefaRoadTypes on each link. "
+              + "Alternatively use an existing mapper such as OsmHbefaMapping, VisumHbefaRoadTypeMapping or VspHbefaRoadTypeMapping to set HbefaRoadTypes on your network.");
+  }
 
-		if (shouldCreateAverageTables()) {
-			this.avgHbefaColdTable = HbefaTables.loadAverageCold(emissionConfigGroup.getAverageColdEmissionFactorsFileURL(scenario.getConfig().getContext()));
-			addPollutantsToMap(coldPollutants, avgHbefaColdTable.keySet());
-			// yy The naming and signature of the above should presumably be changed: (1) addPollutantsToX implies signature (pollutants,
-			// X).  But it is actually the other way round (even if it does not read that way.  (2) "coldPollutants" is not a Map.  Since
-			// this is a private method, maybe one could also have a method "memorizeColdPollutants" and then not have coldPollutants as
-			// field. kai, dec'22
+  private void createLookupTables() {
+    logger.info("entering createLookupTables");
 
-			this.avgHbefaWarmTable = HbefaTables.loadAverageWarm(emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(scenario.getConfig().getContext()));
-			addPollutantsToMap(warmPollutants, avgHbefaWarmTable.keySet());
-		}
-		if (shouldCreateDetailedTables()) {
-			this.detailedHbefaColdTable = HbefaTables.loadDetailedCold(emissionConfigGroup.getDetailedColdEmissionFactorsFileURL(scenario.getConfig().getContext()));
-			addPollutantsToMap(coldPollutants, detailedHbefaColdTable.keySet());
-			this.detailedHbefaWarmTable = HbefaTables.loadDetailedWarm(emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(scenario.getConfig().getContext()));
-			addPollutantsToMap(warmPollutants, detailedHbefaWarmTable.keySet());
-		}
+    if (shouldCreateAverageTables()) {
+      this.avgHbefaColdTable =
+          HbefaTables.loadAverageCold(
+              emissionConfigGroup.getAverageColdEmissionFactorsFileURL(
+                  scenario.getConfig().getContext()));
+      addPollutantsToMap(coldPollutants, avgHbefaColdTable.keySet());
+      // yy The naming and signature of the above should presumably be changed: (1) addPollutantsToX
+      // implies signature (pollutants,
+      // X).  But it is actually the other way round (even if it does not read that way.  (2)
+      // "coldPollutants" is not a Map.  Since
+      // this is a private method, maybe one could also have a method "memorizeColdPollutants" and
+      // then not have coldPollutants as
+      // field. kai, dec'22
 
-		logger.info("leaving createLookupTables");
+      this.avgHbefaWarmTable =
+          HbefaTables.loadAverageWarm(
+              emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(
+                  scenario.getConfig().getContext()));
+      addPollutantsToMap(warmPollutants, avgHbefaWarmTable.keySet());
+    }
+    if (shouldCreateDetailedTables()) {
+      this.detailedHbefaColdTable =
+          HbefaTables.loadDetailedCold(
+              emissionConfigGroup.getDetailedColdEmissionFactorsFileURL(
+                  scenario.getConfig().getContext()));
+      addPollutantsToMap(coldPollutants, detailedHbefaColdTable.keySet());
+      this.detailedHbefaWarmTable =
+          HbefaTables.loadDetailedWarm(
+              emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(
+                  scenario.getConfig().getContext()));
+      addPollutantsToMap(warmPollutants, detailedHbefaWarmTable.keySet());
+    }
 
-		//create HBEFA Speed tables. try on detailed values first.
-		if (detailedHbefaWarmTable != null) {
-			hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(detailedHbefaWarmTable);
-		} else if (avgHbefaWarmTable != null) {
-			hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(avgHbefaWarmTable);
-		} else {
-			throw new RuntimeException("hbefaRoadTrafficSpeed table not created");        //Is table mandatory? -> If yes throw exception
-		}
-	}
+    logger.info("leaving createLookupTables");
 
-	private void addPollutantsToMap(Set<Pollutant> addTo, Set<? extends HbefaEmissionFactorKey> keys) {
-		for (HbefaEmissionFactorKey key : keys) {
-			addTo.add(key.getComponent());
-		}
-	}
+    // create HBEFA Speed tables. try on detailed values first.
+    if (detailedHbefaWarmTable != null) {
+      hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(detailedHbefaWarmTable);
+    } else if (avgHbefaWarmTable != null) {
+      hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(avgHbefaWarmTable);
+    } else {
+      throw new RuntimeException(
+          "hbefaRoadTrafficSpeed table not created"); // Is table mandatory? -> If yes throw
+      // exception
+    }
+  }
 
-	private boolean shouldCreateAverageTables() {
-		switch (emissionConfigGroup.getDetailedVsAverageLookupBehavior()) {
-			case tryDetailedThenTechnologyAverageThenAverageTable:
-			case directlyTryAverageTable:
-				return true;
-			default:
-				return false;
-		}
-	}
+  private void addPollutantsToMap(
+      Set<Pollutant> addTo, Set<? extends HbefaEmissionFactorKey> keys) {
+    for (HbefaEmissionFactorKey key : keys) {
+      addTo.add(key.getComponent());
+    }
+  }
 
-	private boolean shouldCreateDetailedTables() {
-		switch (emissionConfigGroup.getDetailedVsAverageLookupBehavior()) {
-			case onlyTryDetailedElseAbort:
-			case tryDetailedThenTechnologyAverageElseAbort:
-			case tryDetailedThenTechnologyAverageThenAverageTable:
-				return true;
-			default:
-				return false;
-		}
-	}
+  private boolean shouldCreateAverageTables() {
+    switch (emissionConfigGroup.getDetailedVsAverageLookupBehavior()) {
+      case tryDetailedThenTechnologyAverageThenAverageTable:
+      case directlyTryAverageTable:
+        return true;
+      default:
+        return false;
+    }
+  }
 
-	private void createEmissionHandlers() {
-		logger.info("entering createEmissionHandlers");
+  private boolean shouldCreateDetailedTables() {
+    switch (emissionConfigGroup.getDetailedVsAverageLookupBehavior()) {
+      case onlyTryDetailedElseAbort:
+      case tryDetailedThenTechnologyAverageElseAbort:
+      case tryDetailedThenTechnologyAverageThenAverageTable:
+        return true;
+      default:
+        return false;
+    }
+  }
 
-		warmEmissionHandler = new WarmEmissionHandler(scenario, avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, warmPollutants, eventsManager);
+  private void createEmissionHandlers() {
+    logger.info("entering createEmissionHandlers");
 
-		coldEmissionHandler = new ColdEmissionHandler(scenario, avgHbefaColdTable, detailedHbefaColdTable, coldPollutants, eventsManager);
-		// this initiates all cold emissions processing!
+    warmEmissionHandler =
+        new WarmEmissionHandler(
+            scenario,
+            avgHbefaWarmTable,
+            detailedHbefaWarmTable,
+            hbefaRoadTrafficSpeeds,
+            warmPollutants,
+            eventsManager);
 
-		logger.info("leaving createEmissionHandlers");
-	}
+    coldEmissionHandler =
+        new ColdEmissionHandler(
+            scenario, avgHbefaColdTable, detailedHbefaColdTable, coldPollutants, eventsManager);
+    // this initiates all cold emissions processing!
+
+    logger.info("leaving createEmissionHandlers");
+  }
 }

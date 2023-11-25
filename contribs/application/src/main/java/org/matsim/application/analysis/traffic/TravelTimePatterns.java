@@ -1,6 +1,9 @@
 package org.matsim.application.analysis.traffic;
 
 import com.google.common.base.Joiner;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.logging.log4j.LogManager;
@@ -29,458 +32,470 @@ import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import picocli.CommandLine;
 
-import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
-
 @CommandLine.Command(
-		name = "travel-time-patterns",
-		description = "Download travel time pattern from online API.",
-		mixinStandardHelpOptions = true
-)
+    name = "travel-time-patterns",
+    description = "Download travel time pattern from online API.",
+    mixinStandardHelpOptions = true)
 public class TravelTimePatterns implements MATSimAppCommand {
 
-	private static final Logger log = LogManager.getLogger(TravelTimePatterns.class);
+  private static final Logger log = LogManager.getLogger(TravelTimePatterns.class);
 
+  @CommandLine.Option(
+      names = "--api",
+      description = "Online API used. Choose from [HERE]",
+      defaultValue = "HERE",
+      required = false)
+  private TravelTimeAnalysis.API api;
 
-	@CommandLine.Option(names = "--api", description = "Online API used. Choose from [HERE]", defaultValue = "HERE", required = false)
-	private TravelTimeAnalysis.API api;
+  @CommandLine.Option(names = "--app-id", description = "App id for HERE API", required = true)
+  private String appId;
 
-	@CommandLine.Option(names = "--app-id", description = "App id for HERE API", required = true)
-	private String appId;
+  @CommandLine.Option(names = "--app-code", description = "App code for HERE API", required = true)
+  private String appCode;
 
-	@CommandLine.Option(names = "--app-code", description = "App code for HERE API", required = true)
-	private String appCode;
+  @CommandLine.Option(
+      names = "--max-fc",
+      defaultValue = "FC5",
+      description = "Max detail level, where FC5 is the most detailed.")
+  private HereMapsLayer.FC fc;
 
-	@CommandLine.Option(names = "--max-fc", defaultValue = "FC5", description = "Max detail level, where FC5 is the most detailed.")
-	private HereMapsLayer.FC fc;
+  @CommandLine.Option(
+      names = "--weekday",
+      defaultValue = "4",
+      description = "Number of weekday to use, 0=Sunday")
+  private int weekday = 3;
 
-	@CommandLine.Option(names = "--weekday", defaultValue = "4", description = "Number of weekday to use, 0=Sunday")
-	private int weekday = 3;
+  @CommandLine.Option(
+      names = "--output",
+      defaultValue = "trafficPatterns.csv",
+      description = "Output csv",
+      required = true)
+  private Path output;
 
-	@CommandLine.Option(names = "--output", defaultValue = "trafficPatterns.csv", description = "Output csv", required = true)
-	private Path output;
+  @CommandLine.Option(
+      names = "--output-links",
+      description = "Path to csv in order to write link attributes.")
+  private Path linkOutput;
 
-	@CommandLine.Option(names = "--output-links", description = "Path to csv in order to write link attributes.")
-	private Path linkOutput;
+  @CommandLine.Option(
+      names = "--output-network",
+      description = "Write a time-variant in MATSim format.")
+  private Path networkOutput;
 
-	@CommandLine.Option(names = "--output-network", description = "Write a time-variant in MATSim format.")
-	private Path networkOutput;
+  @CommandLine.Mixin private ShpOptions shp = new ShpOptions();
 
-	@CommandLine.Mixin
-	private ShpOptions shp = new ShpOptions();
+  @CommandLine.Mixin private CsvOptions csv = new CsvOptions();
 
-	@CommandLine.Mixin
-	private CsvOptions csv = new CsvOptions();
+  @CommandLine.Mixin private CrsOptions crs = new CrsOptions("EPSG:4326");
 
-	@CommandLine.Mixin
-	private CrsOptions crs = new CrsOptions("EPSG:4326");
+  public static void main(String[] args) {
+    new TravelTimePatterns().execute(args);
+  }
 
-	public static void main(String[] args) {
-		new TravelTimePatterns().execute(args);
-	}
+  @Override
+  public Integer call() throws Exception {
 
-	@Override
-	public Integer call() throws Exception {
+    if (api != TravelTimeAnalysis.API.HERE) {
+      log.error("Only HERE API is currently supported.");
+      return 2;
+    }
 
-		if (api != TravelTimeAnalysis.API.HERE) {
-			log.error("Only HERE API is currently supported.");
-			return 2;
-		}
+    if (shp.getShapeFile() == null) {
+      log.error("Shape file is required!");
+      return 2;
+    }
 
-		if (shp.getShapeFile() == null) {
-			log.error("Shape file is required!");
-			return 2;
-		}
+    Envelope bbox = shp.getGeometry().getEnvelopeInternal();
 
-		Envelope bbox = shp.getGeometry().getEnvelopeInternal();
+    bbox =
+        JTS.transform(
+            bbox,
+            CRS.findMathTransform(CRS.decode(shp.getShapeCrs()), DefaultGeographicCRS.WGS84, true));
 
-		bbox = JTS.transform(bbox, CRS.findMathTransform(CRS.decode(shp.getShapeCrs()), DefaultGeographicCRS.WGS84, true));
+    HereMapsLayer patternLayer = new HereMapsLayer("TRAFFIC_PATTERN", appId, appCode);
 
-		HereMapsLayer patternLayer = new HereMapsLayer("TRAFFIC_PATTERN", appId, appCode);
+    HereMapsLayer.Result st = patternLayer.fetch(HereMapsLayer.FC.STATIC, 0, 0);
 
-		HereMapsLayer.Result st = patternLayer.fetch(HereMapsLayer.FC.STATIC, 0, 0);
+    Map<String, double[]> speedValues = createSpeedValues(st);
 
-		Map<String, double[]> speedValues = createSpeedValues(st);
+    HereMapsLayer.Result patterns = patternLayer.fetchAll(bbox, fc);
 
-		HereMapsLayer.Result patterns = patternLayer.fetchAll(bbox, fc);
+    Map<String, Double> ffSpeed = new HashMap<>();
+    Map<String, Double> avgSpeed = new HashMap<>();
 
-		Map<String, Double> ffSpeed = new HashMap<>();
-		Map<String, Double> avgSpeed = new HashMap<>();
+    // from ref and to ref speeds
+    Map<String, double[]> fSpeeds = new HashMap<>();
+    Map<String, double[]> tSpeeds = new HashMap<>();
 
-		// from ref and to ref speeds
-		Map<String, double[]> fSpeeds = new HashMap<>();
-		Map<String, double[]> tSpeeds = new HashMap<>();
+    try (CSVPrinter printer = csv.createPrinter(output)) {
 
-		try (CSVPrinter printer = csv.createPrinter(output)) {
+      Set<String> written = new HashSet<>();
 
-			Set<String> written = new HashSet<>();
+      printer.printRecord("LINK_ID", "time", "speed");
 
-			printer.printRecord("LINK_ID", "time", "speed");
+      for (CSVRecord record : patterns.getRecords()) {
 
-			for (CSVRecord record : patterns.getRecords()) {
+        String id = record.get("LINK_ID");
 
-				String id = record.get("LINK_ID");
+        if (!written.add(id)) continue;
 
-				if (!written.add(id))
-					continue;
+        avgSpeed.put(id, parseSpeed(record.get("AVG_SPEED")));
+        ffSpeed.put(id, parseSpeed(record.get("FREE_FLOW_SPEED")));
 
-				avgSpeed.put(id, parseSpeed(record.get("AVG_SPEED")));
-				ffSpeed.put(id, parseSpeed(record.get("FREE_FLOW_SPEED")));
+        double[] values = null;
 
-				double[] values = null;
+        if (record.get("F_WEEKDAY").contains(",")) {
+          values = speedValues.get(record.get("F_WEEKDAY").split(",")[weekday]);
+          fSpeeds.put(id, values);
+        } else if (record.get("T_WEEKDAY").contains(",")) {
+          values = speedValues.get(record.get("T_WEEKDAY").split(",")[weekday]);
+          tSpeeds.put(id, values);
+        }
 
-				if (record.get("F_WEEKDAY").contains(",")) {
-					values = speedValues.get(record.get("F_WEEKDAY").split(",")[weekday]);
-					fSpeeds.put(id, values);
-				} else if (record.get("T_WEEKDAY").contains(",")) {
-					values = speedValues.get(record.get("T_WEEKDAY").split(",")[weekday]);
-					tSpeeds.put(id, values);
-				}
+        if (values == null) {
+          continue;
+        }
 
-				if (values == null) {
-					continue;
-				}
+        for (int i = 0; i < values.length; i++) {
+          printer.print(id);
+          printer.print(i * 900);
+          printer.print(values[i]);
+          printer.println();
+        }
+      }
+    }
 
-				for (int i = 0; i < values.length; i++) {
-					printer.print(id);
-					printer.print(i * 900);
-					printer.print(values[i]);
-					printer.println();
-				}
+    HereMapsLayer linkLayer = new HereMapsLayer("LINK", appId, appCode);
+    HereMapsLayer.Result links = null;
 
-			}
+    Map<String, CSVRecord> linkRecords = new HashMap<>();
 
-		}
+    // fetch link layer if required
+    if (linkOutput != null || networkOutput != null) {
+      links = linkLayer.fetchAll(bbox, fc);
+      for (CSVRecord record : links.getRecords()) {
+        linkRecords.put(record.get("LINK_ID"), record);
+      }
+    }
 
-		HereMapsLayer linkLayer = new HereMapsLayer("LINK", appId, appCode);
-		HereMapsLayer.Result links = null;
+    if (linkOutput != null) {
 
-		Map<String, CSVRecord> linkRecords = new HashMap<>();
+      HereMapsLayer geom = new HereMapsLayer("ROAD_GEOM", appId, appCode);
 
-		// fetch link layer if required
-		if (linkOutput != null || networkOutput != null) {
-			links = linkLayer.fetchAll(bbox, fc);
-			for (CSVRecord record : links.getRecords()) {
-				linkRecords.put(record.get("LINK_ID"), record);
-			}
-		}
+      Map<String, String> geometries = createGeometries(geom.fetchAll(bbox, fc));
 
-		if (linkOutput != null) {
+      Set<String> written = new HashSet<>();
 
-			HereMapsLayer geom = new HereMapsLayer("ROAD_GEOM", appId, appCode);
+      log.info("Writing attributes to {}", linkOutput);
 
-			Map<String, String> geometries = createGeometries(geom.fetchAll(bbox, fc));
+      try (CSVPrinter printer = csv.createPrinter(this.linkOutput)) {
 
-			Set<String> written = new HashSet<>();
+        for (String h : links.getHeader()) {
+          printer.print(h);
+        }
 
-			log.info("Writing attributes to {}", linkOutput);
+        printer.print("avgSpeed");
+        printer.print("freeflowSpeed");
+        printer.print("wkt");
+        printer.println();
 
-			try (CSVPrinter printer = csv.createPrinter(this.linkOutput)) {
+        for (CSVRecord record : links.getRecords()) {
 
-				for (String h : links.getHeader()) {
-					printer.print(h);
-				}
+          String id = record.get("LINK_ID");
 
-				printer.print("avgSpeed");
-				printer.print("freeflowSpeed");
-				printer.print("wkt");
-				printer.println();
+          // only write each link one time
+          if (!written.add(id)) continue;
 
-				for (CSVRecord record : links.getRecords()) {
+          for (String s : record) {
+            printer.print(s);
+          }
 
-					String id = record.get("LINK_ID");
+          printer.print(avgSpeed.get(id));
+          printer.print(ffSpeed.get(id));
+          printer.print(geometries.get(id));
+          printer.println();
+        }
+      }
+    }
 
-					// only write each link one time
-					if (!written.add(id))
-						continue;
+    if (networkOutput != null) {
 
-					for (String s : record) {
-						printer.print(s);
-					}
+      NetworkConfigGroup group = new NetworkConfigGroup();
+      group.setTimeVariantNetwork(true);
 
-					printer.print(avgSpeed.get(id));
-					printer.print(ffSpeed.get(id));
-					printer.print(geometries.get(id));
-					printer.println();
+      Network network = NetworkUtils.createNetwork(group);
+      List<NetworkChangeEvent> changeEvents = new ArrayList<>();
 
-				}
-			}
-		}
+      ProjectionUtils.putCRS(network, crs.getTargetCRS());
 
-		if (networkOutput != null) {
+      CoordinateTransformation ct = crs.getTransformation();
 
+      NetworkFactory f = network.getFactory();
 
-			NetworkConfigGroup group = new NetworkConfigGroup();
-			group.setTimeVariantNetwork(true);
+      HereMapsLayer attrLayer = new HereMapsLayer("LINK_ATTRIBUTE", appId, appCode);
+      HereMapsLayer.Result attrs = attrLayer.fetchAll(bbox, fc);
 
-			Network network = NetworkUtils.createNetwork(group);
-			List<NetworkChangeEvent> changeEvents = new ArrayList<>();
+      /*
+      HereMapsLayer attr2Layer = new HereMapsLayer("LINK_ATTRIBUTE2", appId, appCode);
+      HereMapsLayer.Result attrs2 = attr2Layer.fetchAll(bbox, fc);
 
-			ProjectionUtils.putCRS(network, crs.getTargetCRS());
+      HereMapsLayer speedLayer = new HereMapsLayer("SPEED_LIMITS", appId, appCode);
+      HereMapsLayer.Result speed = speedLayer.fetchAll(bbox, fc);
 
-			CoordinateTransformation ct = crs.getTransformation();
+      HereMapsLayer signLayer = new HereMapsLayer("TRAFFIC_SIGN", appId, appCode);
+      HereMapsLayer.Result sign = speedLayer.fetchAll(bbox, fc);
+       */
 
-			NetworkFactory f = network.getFactory();
+      Set<String> written = new HashSet<>();
 
-			HereMapsLayer attrLayer = new HereMapsLayer("LINK_ATTRIBUTE", appId, appCode);
-			HereMapsLayer.Result attrs = attrLayer.fetchAll(bbox, fc);
+      for (CSVRecord record : attrs.getRecords()) {
 
-			/*
-			HereMapsLayer attr2Layer = new HereMapsLayer("LINK_ATTRIBUTE2", appId, appCode);
-			HereMapsLayer.Result attrs2 = attr2Layer.fetchAll(bbox, fc);
+        String id = record.get("LINK_ID");
 
-			HereMapsLayer speedLayer = new HereMapsLayer("SPEED_LIMITS", appId, appCode);
-			HereMapsLayer.Result speed = speedLayer.fetchAll(bbox, fc);
+        if (!written.add(id)) continue;
 
-			HereMapsLayer signLayer = new HereMapsLayer("TRAFFIC_SIGN", appId, appCode);
-			HereMapsLayer.Result sign = speedLayer.fetchAll(bbox, fc);
-			 */
+        CSVRecord linkRecord = linkRecords.get(id);
 
-			Set<String> written = new HashSet<>();
+        double[] lat = parseCoords(linkRecord.get("LAT"));
+        double[] lon = parseCoords(linkRecord.get("LON"));
 
-			for (CSVRecord record : attrs.getRecords()) {
+        String t = record.get("TRAVEL_DIRECTION");
 
-				String id = record.get("LINK_ID");
+        Node ref =
+            addOrGetNode(
+                network, linkRecord.get("REF_NODE_ID"), ct.transform(new Coord(lon[0], lat[0])));
+        Node nonRef =
+            addOrGetNode(
+                network, linkRecord.get("NONREF_NODE_ID"), ct.transform(new Coord(lon[1], lat[1])));
 
-				if (!written.add(id))
-					continue;
+        double allowedSpeed = parseSpeedCategory(record.get("SPEED_CATEGORY"));
 
-				CSVRecord linkRecord = linkRecords.get(id);
+        Set<String> modes =
+            HereMapsLayer.VehicleType.parse(Integer.parseInt(record.get("VEHICLE_TYPES"))).stream()
+                .map(Object::toString)
+                .collect(Collectors.toSet());
 
-				double[] lat = parseCoords(linkRecord.get("LAT"));
-				double[] lon = parseCoords(linkRecord.get("LON"));
+        // create links for both directions
+        if (t.equals("B")) {
 
-				String t = record.get("TRAVEL_DIRECTION");
+          Link linkF = f.createLink(Id.createLinkId(id + "f"), ref, nonRef);
+          Link linkT = f.createLink(Id.createLinkId(id + "t"), nonRef, ref);
 
-				Node ref = addOrGetNode(network, linkRecord.get("REF_NODE_ID"), ct.transform(new Coord(lon[0], lat[0])));
-				Node nonRef = addOrGetNode(network, linkRecord.get("NONREF_NODE_ID"), ct.transform(new Coord(lon[1], lat[1])));
+          linkF.setLength(parseDouble(linkRecord.get("LINK_LENGTH")));
+          linkT.setLength(parseDouble(linkRecord.get("LINK_LENGTH")));
 
-				double allowedSpeed = parseSpeedCategory(record.get("SPEED_CATEGORY"));
+          linkT.setNumberOfLanes(parseDouble(record.get("TO_REF_NUM_LANES")));
+          linkF.setNumberOfLanes(parseDouble(record.get("FROM_REF_NUM_LANES")));
 
-				Set<String> modes = HereMapsLayer.VehicleType.parse(Integer.parseInt(record.get("VEHICLE_TYPES"))).stream()
-						.map(Object::toString).collect(Collectors.toSet());
+          linkF.setFreespeed(retrieveSpeed(ffSpeed, id, record));
+          linkT.setFreespeed(retrieveSpeed(ffSpeed, id, record));
 
-				// create links for both directions
-				if (t.equals("B")) {
+          linkF.setAllowedModes(modes);
+          linkT.setAllowedModes(modes);
 
-					Link linkF = f.createLink(Id.createLinkId(id + "f"), ref, nonRef);
-					Link linkT = f.createLink(Id.createLinkId(id + "t"), nonRef, ref);
+          linkF.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, allowedSpeed);
+          linkT.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, allowedSpeed);
 
-					linkF.setLength(parseDouble(linkRecord.get("LINK_LENGTH")));
-					linkT.setLength(parseDouble(linkRecord.get("LINK_LENGTH")));
+          changeEvents.addAll(createChangeEvents(linkF, fSpeeds.getOrDefault(id, null)));
+          changeEvents.addAll(createChangeEvents(linkT, tSpeeds.getOrDefault(id, null)));
 
-					linkT.setNumberOfLanes(parseDouble(record.get("TO_REF_NUM_LANES")));
-					linkF.setNumberOfLanes(parseDouble(record.get("FROM_REF_NUM_LANES")));
+          network.addLink(linkF);
+          network.addLink(linkT);
 
-					linkF.setFreespeed(retrieveSpeed(ffSpeed, id, record));
-					linkT.setFreespeed(retrieveSpeed(ffSpeed, id, record));
+        } else if (t.equals("F")) {
+          // from ref node
+          Link link = f.createLink(Id.createLinkId(id), ref, nonRef);
 
-					linkF.setAllowedModes(modes);
-					linkT.setAllowedModes(modes);
+          link.setLength(parseDouble(linkRecord.get("LINK_LENGTH")));
+          link.setNumberOfLanes(parseDouble(record.get("FROM_REF_NUM_LANES")));
 
-					linkF.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, allowedSpeed);
-					linkT.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, allowedSpeed);
+          link.setFreespeed(retrieveSpeed(ffSpeed, id, record));
+          link.setAllowedModes(modes);
+          link.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, allowedSpeed);
 
-					changeEvents.addAll(createChangeEvents(linkF, fSpeeds.getOrDefault(id, null)));
-					changeEvents.addAll(createChangeEvents(linkT, tSpeeds.getOrDefault(id, null)));
+          changeEvents.addAll(createChangeEvents(link, fSpeeds.getOrDefault(id, null)));
 
-					network.addLink(linkF);
-					network.addLink(linkT);
+          network.addLink(link);
 
-				} else if (t.equals("F")) {
-					// from ref node
-					Link link = f.createLink(Id.createLinkId(id), ref, nonRef);
+        } else if (t.equals("T")) {
+          // to ref node
+          Link link = f.createLink(Id.createLinkId(id), nonRef, ref);
 
-					link.setLength(parseDouble(linkRecord.get("LINK_LENGTH")));
-					link.setNumberOfLanes(parseDouble(record.get("FROM_REF_NUM_LANES")));
+          link.setLength(parseDouble(linkRecord.get("LINK_LENGTH")));
+          link.setNumberOfLanes(parseDouble(record.get("TO_REF_NUM_LANES")));
+          link.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, allowedSpeed);
 
-					link.setFreespeed(retrieveSpeed(ffSpeed, id, record));
-					link.setAllowedModes(modes);
-					link.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, allowedSpeed);
+          link.setFreespeed(retrieveSpeed(ffSpeed, id, record));
+          link.setAllowedModes(modes);
 
-					changeEvents.addAll(createChangeEvents(link, fSpeeds.getOrDefault(id, null)));
+          changeEvents.addAll(createChangeEvents(link, tSpeeds.getOrDefault(id, null)));
 
-					network.addLink(link);
+          network.addLink(link);
+        } else throw new IllegalStateException("Unknown travel direction: " + t);
+      }
 
-				} else if (t.equals("T")) {
-					// to ref node
-					Link link = f.createLink(Id.createLinkId(id), nonRef, ref);
+      new NetworkCleaner().run(network);
 
-					link.setLength(parseDouble(linkRecord.get("LINK_LENGTH")));
-					link.setNumberOfLanes(parseDouble(record.get("TO_REF_NUM_LANES")));
-					link.getAttributes().putAttribute(NetworkUtils.ALLOWED_SPEED, allowedSpeed);
+      log.info("Writing network to {}", networkOutput);
 
-					link.setFreespeed(retrieveSpeed(ffSpeed, id, record));
-					link.setAllowedModes(modes);
+      NetworkUtils.writeNetwork(network, networkOutput.toString());
 
-					changeEvents.addAll(createChangeEvents(link, tSpeeds.getOrDefault(id, null)));
+      String eventPath = networkOutput.toString().replace(".xml", "-events.xml");
+      log.info("Writing {} change events to {}", changeEvents.size(), eventPath);
 
-					network.addLink(link);
-				} else
-					throw new IllegalStateException("Unknown travel direction: " + t);
+      NetworkChangeEventsWriter writer = new NetworkChangeEventsWriter();
+      writer.write(eventPath, changeEvents);
+    }
 
-			}
+    return 0;
+  }
 
-			new NetworkCleaner().run(network);
+  /** Creates network change events from time bin interpretation. */
+  private Collection<NetworkChangeEvent> createChangeEvents(Link link, double[] speeds) {
 
-			log.info("Writing network to {}", networkOutput);
+    List<NetworkChangeEvent> events = new ArrayList<>();
 
-			NetworkUtils.writeNetwork(network, networkOutput.toString());
+    if (speeds == null) return events;
 
-			String eventPath = networkOutput.toString().replace(".xml", "-events.xml");
-			log.info("Writing {} change events to {}", changeEvents.size(), eventPath);
+    double last = Double.MAX_VALUE;
 
-			NetworkChangeEventsWriter writer = new NetworkChangeEventsWriter();
-			writer.write(eventPath, changeEvents);
-		}
+    for (int i = 0; i < speeds.length; i++) {
 
-		return 0;
-	}
+      double v = speeds[i];
+      if (v != last) {
 
-	/**
-	 * Creates network change events from time bin interpretation.
-	 */
-	private Collection<NetworkChangeEvent> createChangeEvents(Link link, double[] speeds) {
+        NetworkChangeEvent ev = new NetworkChangeEvent(i * 900);
+        ev.addLink(link);
+        ev.setFreespeedChange(
+            new NetworkChangeEvent.ChangeValue(
+                NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, v));
+        events.add(ev);
+        last = v;
+      }
+    }
 
-		List<NetworkChangeEvent> events = new ArrayList<>();
+    return events;
+  }
 
-		if (speeds == null)
-			return events;
+  private static double retrieveSpeed(Map<String, Double> ffSpeed, String id, CSVRecord record) {
 
-		double last = Double.MAX_VALUE;
+    double speed = ffSpeed.getOrDefault(id, 0d);
 
-		for (int i = 0; i < speeds.length; i++) {
+    return speed != 0
+        ? speed
+        : HereMapsLayer.SpeedCategory.values()[Integer.parseInt(record.get("SPEED_CATEGORY"))]
+            .speed;
+  }
 
-			double v = speeds[i];
-			if (v != last) {
+  private static Node addOrGetNode(Network network, String nodeId, Coord transform) {
 
-				NetworkChangeEvent ev = new NetworkChangeEvent(i * 900);
-				ev.addLink(link);
-				ev.setFreespeedChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, v));
-				events.add(ev);
-				last = v;
-			}
-		}
+    Id<Node> id = Id.createNodeId(nodeId);
 
-		return events;
-	}
+    if (network.getNodes().containsKey(id)) return network.getNodes().get(id);
 
-	private static double retrieveSpeed(Map<String, Double> ffSpeed, String id, CSVRecord record) {
+    Node node = network.getFactory().createNode(id, transform);
+    network.addNode(node);
+    return node;
+  }
 
-		double speed = ffSpeed.getOrDefault(id, 0d);
+  private static Map<String, double[]> createSpeedValues(HereMapsLayer.Result st) {
 
-		return speed != 0 ? speed : HereMapsLayer.SpeedCategory.values()[Integer.parseInt(record.get("SPEED_CATEGORY"))].speed;
-	}
+    Map<String, double[]> map = new HashMap<>();
 
-	private static Node addOrGetNode(Network network, String nodeId, Coord transform) {
+    for (CSVRecord record : st.getRecords()) {
 
-		Id<Node> id = Id.createNodeId(nodeId);
+      String id = record.get("PATTERN_ID");
 
-		if (network.getNodes().containsKey(id))
-			return network.getNodes().get(id);
+      String[] values = record.get("SPEED_VALUES").split(",");
 
-		Node node = network.getFactory().createNode(id, transform);
-		network.addNode(node);
-		return node;
-	}
+      map.put(id, Arrays.stream(values).mapToDouble(TravelTimePatterns::parseSpeed).toArray());
+    }
 
-	private static Map<String, double[]> createSpeedValues(HereMapsLayer.Result st) {
+    return map;
+  }
 
-		Map<String, double[]> map = new HashMap<>();
+  private static Map<String, String> createGeometries(HereMapsLayer.Result geom) {
 
-		for (CSVRecord record : st.getRecords()) {
+    HashMap<String, String> map = new HashMap<>();
 
-			String id = record.get("PATTERN_ID");
+    for (CSVRecord record : geom.getRecords()) {
 
-			String[] values = record.get("SPEED_VALUES").split(",");
+      String linkId = record.get("LINK_ID");
 
-			map.put(id, Arrays.stream(values).mapToDouble(TravelTimePatterns::parseSpeed).toArray());
-		}
+      if (record.get("LON").isBlank() || record.get("LAT").isBlank()) continue;
 
-		return map;
-	}
+      double[] lons =
+          Arrays.stream(record.get("LON").split(","))
+              .mapToDouble(TravelTimePatterns::parseDouble)
+              .toArray();
+      double[] lats =
+          Arrays.stream(record.get("LAT").split(","))
+              .mapToDouble(TravelTimePatterns::parseDouble)
+              .toArray();
 
-	private static Map<String, String> createGeometries(HereMapsLayer.Result geom) {
+      // Coordinates are given as longs
+      lons[0] *= 10e-6;
+      lats[0] *= 10e-6;
 
-		HashMap<String, String> map = new HashMap<>();
+      // sometimes it's malformed
+      int n = Math.min(lons.length, lats.length);
 
-		for (CSVRecord record : geom.getRecords()) {
+      if (n <= 1) continue;
 
-			String linkId = record.get("LINK_ID");
+      for (int i = 1; i < n; i++) {
+        lats[i] = lats[i - 1] + lats[i] * 10e-6;
+        lons[i] = lons[i - 1] + lons[i] * 10e-6;
+      }
 
-			if (record.get("LON").isBlank() || record.get("LAT").isBlank())
-				continue;
+      String[] wkt = new String[n];
+      for (int i = 0; i < n; i++) {
+        wkt[i] = lons[i] + " " + lats[i];
+      }
 
-			double[] lons = Arrays.stream(record.get("LON").split(",")).mapToDouble(TravelTimePatterns::parseDouble).toArray();
-			double[] lats = Arrays.stream(record.get("LAT").split(",")).mapToDouble(TravelTimePatterns::parseDouble).toArray();
+      String s = "LINESTRING(" + Joiner.on(", ").join(wkt) + ")";
+      map.put(linkId, s);
+    }
 
-			// Coordinates are given as longs
-			lons[0] *= 10e-6;
-			lats[0] *= 10e-6;
+    return map;
+  }
 
-			// sometimes it's malformed
-			int n = Math.min(lons.length, lats.length);
+  /**
+   * Converts HERE coordinates from [10^-5 degree WGS84]. Comma separated. Each value is relative to
+   * the previous.
+   */
+  private static double[] parseCoords(String s) {
+    double[] x = Arrays.stream(s.split(",")).mapToDouble(TravelTimePatterns::parseDouble).toArray();
+    x[0] *= 10e-6;
+    for (int i = 1; i < x.length; i++) {
+      x[i] = x[i - 1] + x[i] * 10e-6;
+    }
 
-			if (n <= 1)
-				continue;
+    return x;
+  }
 
-			for (int i = 1; i < n; i++) {
-				lats[i] = lats[i - 1] + lats[i] * 10e-6;
-				lons[i] = lons[i - 1] + lons[i] * 10e-6;
-			}
+  private static double parseDouble(String s) {
+    if (s.isBlank() || s.equals("null")) return 0;
 
-			String[] wkt = new String[n];
-			for (int i = 0; i < n; i++) {
-				wkt[i] = lons[i] + " " + lats[i];
-			}
+    return Double.parseDouble(s);
+  }
 
-			String s = "LINESTRING(" + Joiner.on(", ").join(wkt) + ")";
-			map.put(linkId, s);
-		}
+  private static double parseSpeed(String s) {
+    if (s.isBlank()) return Double.NaN;
 
-		return map;
-	}
+    return Integer.parseInt(s) / 3.6;
+  }
 
-	/**
-	 * Converts HERE coordinates from [10^-5 degree WGS84]. Comma separated. Each value is relative to the previous.
-	 */
-	private static double[] parseCoords(String s) {
-		double[] x = Arrays.stream(s.split(",")).mapToDouble(TravelTimePatterns::parseDouble).toArray();
-		x[0] *= 10e-6;
-		for (int i = 1; i < x.length; i++) {
-			x[i] = x[i - 1] + x[i] * 10e-6;
-		}
-
-		return x;
-	}
-
-	private static double parseDouble(String s) {
-		if (s.isBlank() || s.equals("null"))
-			return 0;
-
-		return Double.parseDouble(s);
-	}
-
-	private static double parseSpeed(String s) {
-		if (s.isBlank())
-			return Double.NaN;
-
-		return Integer.parseInt(s) / 3.6;
-	}
-
-	private static double parseSpeedCategory(String s) {
-		return switch (Integer.parseInt(s)) {
-			case 1 -> 999;
-			case 2 -> 130/3.6;
-			case 3 -> 100/3.6;
-			case 4 -> 90/3.6;
-			case 5 -> 70/3.6;
-			case 6 -> 50/3.6;
-			case 7 -> 30/3.6;
-			case 8 -> 11/3.6;
-			default -> -1;
-		};
-	}
-
+  private static double parseSpeedCategory(String s) {
+    return switch (Integer.parseInt(s)) {
+      case 1 -> 999;
+      case 2 -> 130 / 3.6;
+      case 3 -> 100 / 3.6;
+      case 4 -> 90 / 3.6;
+      case 5 -> 70 / 3.6;
+      case 6 -> 50 / 3.6;
+      case 7 -> 30 / 3.6;
+      case 8 -> 11 / 3.6;
+      default -> -1;
+    };
+  }
 }

@@ -24,7 +24,6 @@ import java.awt.Color;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
-
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.title.ImageTitle;
@@ -42,60 +41,61 @@ import org.matsim.core.gbl.MatsimResource;
  */
 public abstract class ChartUtil {
 
-	protected final String chartTitle;
-	protected final String xAxisLabel;
-	protected final String yAxisLabel;
-	protected JFreeChart chart = null;
+  protected final String chartTitle;
+  protected final String xAxisLabel;
+  protected final String yAxisLabel;
+  protected JFreeChart chart = null;
 
-	public ChartUtil(final String title, final String xAxisLabel, final String yAxisLabel) {
-		this.chartTitle = title;
-		this.xAxisLabel = xAxisLabel;
-		this.yAxisLabel = yAxisLabel;
-	}
+  public ChartUtil(final String title, final String xAxisLabel, final String yAxisLabel) {
+    this.chartTitle = title;
+    this.xAxisLabel = xAxisLabel;
+    this.yAxisLabel = yAxisLabel;
+  }
 
-	public abstract JFreeChart getChart();
+  public abstract JFreeChart getChart();
 
-	/**
-	 * Stores the chart as PNG image file.
-	 *
-	 * @param filename The filename of the resulting PNG file.
-	 * @param width The width of the chart.
-	 * @param height The height of the chart.
-	 */
-	public void saveAsPng(final String filename, final int width, final int height) {
-		try {
-			ChartUtils.saveChartAsPNG(new File(filename), getChart(), width, height, null, true, 9);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch ( Exception e ) {
-			e.printStackTrace() ;
-			// I just had an out of bounds error inside the method; don't know what that means but does not feel like a reason 
-			// to not continue.  kai, apr'30
-		}
-	}
+  /**
+   * Stores the chart as PNG image file.
+   *
+   * @param filename The filename of the resulting PNG file.
+   * @param width The width of the chart.
+   * @param height The height of the chart.
+   */
+  public void saveAsPng(final String filename, final int width, final int height) {
+    try {
+      ChartUtils.saveChartAsPNG(new File(filename), getChart(), width, height, null, true, 9);
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (Exception e) {
+      e.printStackTrace();
+      // I just had an out of bounds error inside the method; don't know what that means but does
+      // not feel like a reason
+      // to not continue.  kai, apr'30
+    }
+  }
 
-	/**
-	 * Adds the MATSim Logo in the lower right corner of the chart.
-	 */
-	public void addMatsimLogo() {
-		try {
-			Image image = MatsimResource.getAsImage("matsim_logo_transparent_small.png");
-			Title subtitle = new ImageTitle(image, RectangleEdge.BOTTOM, HorizontalAlignment.RIGHT, VerticalAlignment.BOTTOM);
-			this.chart.addSubtitle(subtitle);
-		} catch ( Exception e ) {
-			e.printStackTrace() ;
-			// I just had a resource-not-found error inside the method; don't know what that means but does not feel like a reason 
-			// to not continue.  kai, apr'30
-		}
-	}
+  /** Adds the MATSim Logo in the lower right corner of the chart. */
+  public void addMatsimLogo() {
+    try {
+      Image image = MatsimResource.getAsImage("matsim_logo_transparent_small.png");
+      Title subtitle =
+          new ImageTitle(
+              image, RectangleEdge.BOTTOM, HorizontalAlignment.RIGHT, VerticalAlignment.BOTTOM);
+      this.chart.addSubtitle(subtitle);
+    } catch (Exception e) {
+      e.printStackTrace();
+      // I just had a resource-not-found error inside the method; don't know what that means but
+      // does not feel like a reason
+      // to not continue.  kai, apr'30
+    }
+  }
 
-	/**
-	 * Adds default formatting options for the charts, like a white background etc.
-	 * Requires the member {@link #chart} to be set by the overriding class!
-	 */
-	protected void addDefaultFormatting() {
-		this.chart.setBackgroundPaint(new Color(1.0f, 1.0f, 1.0f, 1.0f));
-		this.chart.getLegend().setBorder(0.0, 0.0, 0.0, 0.0);
-	}
-
+  /**
+   * Adds default formatting options for the charts, like a white background etc. Requires the
+   * member {@link #chart} to be set by the overriding class!
+   */
+  protected void addDefaultFormatting() {
+    this.chart.setBackgroundPaint(new Color(1.0f, 1.0f, 1.0f, 1.0f));
+    this.chart.getLegend().setBorder(0.0, 0.0, 0.0, 0.0);
+  }
 }

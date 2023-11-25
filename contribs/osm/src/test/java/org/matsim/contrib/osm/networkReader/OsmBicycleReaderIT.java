@@ -1,5 +1,7 @@
 package org.matsim.contrib.osm.networkReader;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.network.Network;
@@ -8,28 +10,31 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 public class OsmBicycleReaderIT {
 
-	private static final CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:32631");
+  private static final CoordinateTransformation coordinateTransformation =
+      TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:32631");
 
-	@Rule
-	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
 
-	@Test
-	public void test_andorra() {
+  @Test
+  public void test_andorra() {
 
-		final Path inputFile = Paths.get(matsimTestUtils.getPackageInputDirectory()).resolve("andorra-latest.osm.pbf");
+    final Path inputFile =
+        Paths.get(matsimTestUtils.getPackageInputDirectory()).resolve("andorra-latest.osm.pbf");
 
-		Network network = new OsmBicycleReader.Builder()
-				.setCoordinateTransformation(coordinateTransformation)
-				.build()
-				.read(inputFile);
+    Network network =
+        new OsmBicycleReader.Builder()
+            .setCoordinateTransformation(coordinateTransformation)
+            .build()
+            .read(inputFile);
 
-		Network expectedResult = NetworkUtils.readNetwork(Paths.get(matsimTestUtils.getInputDirectory()).resolve("expected-result.xml.gz").toString());
+    Network expectedResult =
+        NetworkUtils.readNetwork(
+            Paths.get(matsimTestUtils.getInputDirectory())
+                .resolve("expected-result.xml.gz")
+                .toString());
 
-		Utils.assertEquals(expectedResult, network);
-	}
+    Utils.assertEquals(expectedResult, network);
+  }
 }

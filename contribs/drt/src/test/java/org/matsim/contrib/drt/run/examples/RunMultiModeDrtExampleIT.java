@@ -21,16 +21,16 @@
 package org.matsim.contrib.drt.run.examples;
 
 import java.net.URL;
-
 import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
 public class RunMultiModeDrtExampleIT {
-	@Test
-	public void testRun() {
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
-				"multi_mode_one_shared_taxi_config.xml");
-		RunMultiModeDrtExample.run(configUrl, false, 0);
-	}
+  @Test
+  public void testRun() {
+    URL configUrl =
+        IOUtils.extendUrl(
+            ExamplesUtils.getTestScenarioURL("dvrp-grid"), "multi_mode_one_shared_taxi_config.xml");
+    RunMultiModeDrtExample.run(configUrl, false, 0);
+  }
 }

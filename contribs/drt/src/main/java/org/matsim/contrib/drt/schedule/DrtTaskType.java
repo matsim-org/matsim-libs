@@ -21,23 +21,24 @@
 package org.matsim.contrib.drt.schedule;
 
 import java.util.Optional;
-
 import org.matsim.contrib.dvrp.schedule.Task;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public record DrtTaskType(String name, Optional<DrtTaskBaseType> baseType) implements Task.TaskType {
-	public DrtTaskType(DrtTaskBaseType baseType) {
-		this(baseType.name(), Optional.of(baseType));
-	}
+public record DrtTaskType(String name, Optional<DrtTaskBaseType> baseType)
+    implements Task.TaskType {
+  public DrtTaskType(DrtTaskBaseType baseType) {
+    this(baseType.name(), Optional.of(baseType));
+  }
 
-	public DrtTaskType(String name, DrtTaskBaseType baseType) {
-		this(name, Optional.of(baseType));
-	}
+  public DrtTaskType(String name, DrtTaskBaseType baseType) {
+    this(name, Optional.of(baseType));
+  }
 
-	// baseType can be empty if the task type requires a special handling which is not provided by the standard DRT algorithms
-	public DrtTaskType(String name) {
-		this(name, Optional.empty());
-	}
+  // baseType can be empty if the task type requires a special handling which is not provided by the
+  // standard DRT algorithms
+  public DrtTaskType(String name) {
+    this(name, Optional.empty());
+  }
 }

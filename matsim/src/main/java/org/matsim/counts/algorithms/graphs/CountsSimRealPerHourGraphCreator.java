@@ -22,32 +22,28 @@ package org.matsim.counts.algorithms.graphs;
 
 import java.util.List;
 import java.util.Vector;
-
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.algorithms.graphs.helper.MyURL;
 
-
 public class CountsSimRealPerHourGraphCreator extends CountsGraphsCreator {
 
-	
-	public CountsSimRealPerHourGraphCreator(final String sectionTitle) {
-		super(sectionTitle);
-	}
-	
-	
-	@Override
-	public List<CountsGraph> createGraphs(final List<CountSimComparison> ccl, final int iteration) {	
+  public CountsSimRealPerHourGraphCreator(final String sectionTitle) {
+    super(sectionTitle);
+  }
 
-		List<CountsGraph> graphList=new Vector<CountsGraph>();
-		for (int i=1; i<25; i++) {
-			
-			String fileName="simVsRealVolumesHour"+(i)+"Iteration"+iteration;
-			CountsSimRealPerHourGraph sg=new CountsSimRealPerHourGraph(ccl, iteration, fileName );
-			sg.createChart(i);
-			graphList.add(sg);
-			this.section.addURL(new MyURL(fileName+".html", "hour: "+(i)));
-		}
-		
-		return graphList;
-	}
+  @Override
+  public List<CountsGraph> createGraphs(final List<CountSimComparison> ccl, final int iteration) {
+
+    List<CountsGraph> graphList = new Vector<CountsGraph>();
+    for (int i = 1; i < 25; i++) {
+
+      String fileName = "simVsRealVolumesHour" + (i) + "Iteration" + iteration;
+      CountsSimRealPerHourGraph sg = new CountsSimRealPerHourGraph(ccl, iteration, fileName);
+      sg.createChart(i);
+      graphList.add(sg);
+      this.section.addURL(new MyURL(fileName + ".html", "hour: " + (i)));
+    }
+
+    return graphList;
+  }
 }

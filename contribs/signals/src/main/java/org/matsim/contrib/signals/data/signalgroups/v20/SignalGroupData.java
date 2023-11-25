@@ -20,28 +20,23 @@
 package org.matsim.contrib.signals.data.signalgroups.v20;
 
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
 
-
 /**
  * @author dgrether
- *
  */
 public interface SignalGroupData extends Identifiable<SignalGroup> {
-	
-	public Id<SignalSystem> getSignalSystemId();
-	
-	@Override
-	public Id<SignalGroup> getId();
-	
-	public void addSignalId(Id<Signal> signalId);
-	
-	public Set<Id<Signal>> getSignalIds();
 
+  public Id<SignalSystem> getSignalSystemId();
 
+  @Override
+  public Id<SignalGroup> getId();
+
+  public void addSignalId(Id<Signal> signalId);
+
+  public Set<Id<Signal>> getSignalIds();
 }

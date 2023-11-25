@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * TerminateAtFixedIterationNumber.java
@@ -22,25 +21,23 @@
 package org.matsim.core.controler;
 
 import jakarta.inject.Inject;
-
 import org.matsim.core.config.groups.ControllerConfigGroup;
 
 class TerminateAtFixedIterationNumber implements TerminationCriterion {
-	private final int lastIteration;
+  private final int lastIteration;
 
-	@Inject
-	TerminateAtFixedIterationNumber(ControllerConfigGroup controllerConfigGroup) {
-		this.lastIteration = controllerConfigGroup.getLastIteration();
-	}
+  @Inject
+  TerminateAtFixedIterationNumber(ControllerConfigGroup controllerConfigGroup) {
+    this.lastIteration = controllerConfigGroup.getLastIteration();
+  }
 
-	@Override
-	public boolean mayTerminateAfterIteration(int iteration) {
-		return iteration >= lastIteration;
-	}
+  @Override
+  public boolean mayTerminateAfterIteration(int iteration) {
+    return iteration >= lastIteration;
+  }
 
-	@Override
-	public boolean doTerminate(int iteration) {
-		return iteration >= lastIteration;
-	}
-
+  @Override
+  public boolean doTerminate(int iteration) {
+    return iteration >= lastIteration;
+  }
 }

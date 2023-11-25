@@ -20,7 +20,6 @@
 package org.matsim.contrib.locationchoice.zzunused;
 
 import java.util.ArrayList;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -34,56 +33,62 @@ import org.matsim.vehicles.Vehicle;
 
 @Deprecated // (I think)
 class ForwardDijkstraMultipleDestinations extends Dijkstra {
-		
-	public ForwardDijkstraMultipleDestinations(Network network, TravelDisutility costFunction, TravelTime timeFunction) {
-		super(network, costFunction, timeFunction);
-	}
 
-	@Override
-	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime, final Person person, final Vehicle vehicle) {
-		// yyyyyy could you please explain why this needs to be re-implemented?  I would feel better if this would just use the method of
-		// the original class.  kai, jan'13
-		
-		
-		// now construct the path
-		ArrayList<Node> nodes = new ArrayList<Node>();
-		ArrayList<Link> links = new ArrayList<Link>();
+  public ForwardDijkstraMultipleDestinations(
+      Network network, TravelDisutility costFunction, TravelTime timeFunction) {
+    super(network, costFunction, timeFunction);
+  }
 
-		nodes.add(0, toNode);
-		Link tmpLink = getData(toNode).getPrevLink();
-		if (tmpLink != null) {
-			while (tmpLink.getFromNode() != fromNode) {
-				links.add(0, tmpLink);
-				nodes.add(0, tmpLink.getFromNode());
-				tmpLink = getData(tmpLink.getFromNode()).getPrevLink();
-			}
-			links.add(0, tmpLink);
-			nodes.add(0, tmpLink.getFromNode());
-		}
-		// arrival time was not ok in earlier versions!
-		DijkstraNodeData toNodeData = getData(toNode);
-		double arrivalTime = toNodeData.getTime();
-		Path path = new Path(nodes, links, arrivalTime - startTime, toNodeData.getCost());
+  @Override
+  public Path calcLeastCostPath(
+      final Node fromNode,
+      final Node toNode,
+      final double startTime,
+      final Person person,
+      final Vehicle vehicle) {
+    // yyyyyy could you please explain why this needs to be re-implemented?  I would feel better if
+    // this would just use the method of
+    // the original class.  kai, jan'13
 
-		return path;
-	}
-		
-	public void calcLeastCostTree(Node fromNode, double startTime) {
+    // now construct the path
+    ArrayList<Node> nodes = new ArrayList<Node>();
+    ArrayList<Link> links = new ArrayList<Link>();
 
-		augmentIterationId();
+    nodes.add(0, toNode);
+    Link tmpLink = getData(toNode).getPrevLink();
+    if (tmpLink != null) {
+      while (tmpLink.getFromNode() != fromNode) {
+        links.add(0, tmpLink);
+        nodes.add(0, tmpLink.getFromNode());
+        tmpLink = getData(tmpLink.getFromNode()).getPrevLink();
+      }
+      links.add(0, tmpLink);
+      nodes.add(0, tmpLink.getFromNode());
+    }
+    // arrival time was not ok in earlier versions!
+    DijkstraNodeData toNodeData = getData(toNode);
+    double arrivalTime = toNodeData.getTime();
+    Path path = new Path(nodes, links, arrivalTime - startTime, toNodeData.getCost());
 
-		PseudoRemovePriorityQueue<Node> pendingNodes = new PseudoRemovePriorityQueue<Node>(500);
-		
-		//initFromNode
-		DijkstraNodeData data = getData(fromNode);
-		visitNode(fromNode, data, pendingNodes, startTime, 0, null);
+    return path;
+  }
 
-		while (true) {
-			Node outNode = pendingNodes.poll();
+  public void calcLeastCostTree(Node fromNode, double startTime) {
 
-			if (outNode == null) return;
+    augmentIterationId();
 
-			relaxNode(outNode, null, pendingNodes);
-		}
-	}
+    PseudoRemovePriorityQueue<Node> pendingNodes = new PseudoRemovePriorityQueue<Node>(500);
+
+    // initFromNode
+    DijkstraNodeData data = getData(fromNode);
+    visitNode(fromNode, data, pendingNodes, startTime, 0, null);
+
+    while (true) {
+      Node outNode = pendingNodes.poll();
+
+      if (outNode == null) return;
+
+      relaxNode(outNode, null, pendingNodes);
+    }
+  }
 }

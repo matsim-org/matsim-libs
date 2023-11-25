@@ -31,11 +31,11 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
  */
 public class SpeedyDijkstraTest extends AbstractLeastCostPathCalculatorTest {
 
-	@Override
-	protected LeastCostPathCalculator getLeastCostPathCalculator(final Network network) {
-		FreespeedTravelTimeAndDisutility travelTimeCostCalculator = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
-		SpeedyGraph g = new SpeedyGraph(network);
-		return new SpeedyDijkstra(g, travelTimeCostCalculator, travelTimeCostCalculator);
-	}
-
+  @Override
+  protected LeastCostPathCalculator getLeastCostPathCalculator(final Network network) {
+    FreespeedTravelTimeAndDisutility travelTimeCostCalculator =
+        new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
+    SpeedyGraph g = new SpeedyGraph(network);
+    return new SpeedyDijkstra(g, travelTimeCostCalculator, travelTimeCostCalculator);
+  }
 }

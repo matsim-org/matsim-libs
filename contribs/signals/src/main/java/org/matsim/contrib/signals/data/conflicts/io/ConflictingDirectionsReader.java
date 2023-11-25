@@ -23,13 +23,12 @@ package org.matsim.contrib.signals.data.conflicts.io;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.data.conflicts.ConflictData;
-import org.matsim.contrib.signals.data.conflicts.IntersectionDirections;
 import org.matsim.contrib.signals.data.conflicts.Direction;
+import org.matsim.contrib.signals.data.conflicts.IntersectionDirections;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -39,92 +38,104 @@ import org.xml.sax.Attributes;
  */
 public final class ConflictingDirectionsReader extends MatsimXmlParser {
 
-	final static String INTERSECTION = "intersection";
-	final static String SIGNAL_SYSTEM_ID = "signalSystemId";
-	final static String NODE_ID = "nodeId";
-	final static String DIRECTION = "direction";
-	final static String ID = "id";
-	final static String FROM_LINK_ID = "fromLinkId";
-	final static String TO_LINK_ID = "toLinkId";
-	final static String CONFLICTING_DIRECTIONS = "conflictingDirections";
-	final static String DIRECTIONS_WITH_RIGHT_OF_WAY = "directionsWithRightOfWay";
-	final static String DIRECTIONS_WHICH_MUST_YIELD = "directionsWhichMustYield";
-	final static String NON_CONFLICTING_DIRECTIONS = "nonConflictingDirections";
+  static final String INTERSECTION = "intersection";
+  static final String SIGNAL_SYSTEM_ID = "signalSystemId";
+  static final String NODE_ID = "nodeId";
+  static final String DIRECTION = "direction";
+  static final String ID = "id";
+  static final String FROM_LINK_ID = "fromLinkId";
+  static final String TO_LINK_ID = "toLinkId";
+  static final String CONFLICTING_DIRECTIONS = "conflictingDirections";
+  static final String DIRECTIONS_WITH_RIGHT_OF_WAY = "directionsWithRightOfWay";
+  static final String DIRECTIONS_WHICH_MUST_YIELD = "directionsWhichMustYield";
+  static final String NON_CONFLICTING_DIRECTIONS = "nonConflictingDirections";
 
-	private ConflictData conflictData;
+  private ConflictData conflictData;
 
-	private IntersectionDirections currentIntersection;
-	private Direction currentDirection;
+  private IntersectionDirections currentIntersection;
+  private Direction currentDirection;
 
-	public ConflictingDirectionsReader(ConflictData conflictData) {
-		super(ValidationType.NO_VALIDATION);
-		this.conflictData = conflictData;
-		this.setValidating(false);
-	}
+  public ConflictingDirectionsReader(ConflictData conflictData) {
+    super(ValidationType.NO_VALIDATION);
+    this.conflictData = conflictData;
+    this.setValidating(false);
+  }
 
+  @Override
+  public void startTag(String name, Attributes atts, Stack<String> context) {
+    switch (name) {
+      case INTERSECTION:
+        startIntersection(
+            Id.create(atts.getValue(SIGNAL_SYSTEM_ID), SignalSystem.class),
+            Id.createNodeId(atts.getValue(NODE_ID)));
+        break;
+      case DIRECTION:
+        startDirection(
+            Id.create(atts.getValue(ID), Direction.class),
+            Id.createLinkId(atts.getValue(FROM_LINK_ID)),
+            Id.createLinkId(atts.getValue(TO_LINK_ID)));
+        break;
+      default:
+        break;
+    }
+  }
 
-	@Override
-	public void startTag(String name, Attributes atts, Stack<String> context) {
-		switch (name) {
-		case INTERSECTION:
-			startIntersection(Id.create(atts.getValue(SIGNAL_SYSTEM_ID), SignalSystem.class), Id.createNodeId(atts.getValue(NODE_ID)));
-			break;
-		case DIRECTION:
-			startDirection(Id.create(atts.getValue(ID), Direction.class), Id.createLinkId(atts.getValue(FROM_LINK_ID)), Id.createLinkId(atts.getValue(TO_LINK_ID)));
-			break;
-		default:
-			break;
-		}
-	}
+  private void startDirection(Id<Direction> directionId, Id<Link> fromLinkId, Id<Link> toLinkId) {
+    currentDirection =
+        conflictData
+            .getFactory()
+            .createDirection(
+                currentIntersection.getSignalSystemId(),
+                currentIntersection.getNodeId(),
+                fromLinkId,
+                toLinkId,
+                directionId);
+    currentIntersection.addDirection(currentDirection);
+  }
 
-	private void startDirection(Id<Direction> directionId, Id<Link> fromLinkId, Id<Link> toLinkId) {
-		currentDirection = conflictData.getFactory().createDirection(currentIntersection.getSignalSystemId(), currentIntersection.getNodeId(), fromLinkId, toLinkId, directionId);
-		currentIntersection.addDirection(currentDirection);
-	}
+  private void startIntersection(Id<SignalSystem> signalSystemId, Id<Node> nodeId) {
+    currentIntersection =
+        conflictData
+            .getFactory()
+            .createConflictingDirectionsContainerForIntersection(signalSystemId, nodeId);
+    conflictData.addConflictingDirectionsForIntersection(
+        signalSystemId, nodeId, currentIntersection);
+  }
 
+  @Override
+  public void endTag(String name, String content, Stack<String> context) {
+    switch (name) {
+      case CONFLICTING_DIRECTIONS:
+      case DIRECTIONS_WITH_RIGHT_OF_WAY:
+      case DIRECTIONS_WHICH_MUST_YIELD:
+      case NON_CONFLICTING_DIRECTIONS:
+        if (content != null && !content.equals("") && !content.equals(" ")) {
+          addConflictsForCurrentDirection(name, content);
+        }
+        break;
+      default:
+        break;
+    }
+  }
 
-	private void startIntersection(Id<SignalSystem> signalSystemId, Id<Node> nodeId) {
-		currentIntersection = conflictData.getFactory().createConflictingDirectionsContainerForIntersection(signalSystemId, nodeId);
-		conflictData.addConflictingDirectionsForIntersection(signalSystemId, nodeId, currentIntersection);
-	}
-
-
-	@Override
-	public void endTag(String name, String content, Stack<String> context) {
-		switch (name) {
-		case CONFLICTING_DIRECTIONS:
-		case DIRECTIONS_WITH_RIGHT_OF_WAY:
-		case DIRECTIONS_WHICH_MUST_YIELD:
-		case NON_CONFLICTING_DIRECTIONS:
-			if (content != null && !content.equals("") && !content.equals(" ")) {
-				addConflictsForCurrentDirection(name, content);
-			}
-			break;
-		default:
-			break;
-		}
-	}
-
-
-	private void addConflictsForCurrentDirection(String name, String directions) {
-		List<String> directionsList = Arrays.asList(directions.trim().split(" "));
-		for (String direction : directionsList) {
-			Id<Direction> directionId = Id.create(direction, Direction.class);
-			switch (name) {
-			case CONFLICTING_DIRECTIONS:
-				currentDirection.addConflictingDirection(directionId);
-				break;
-			case DIRECTIONS_WITH_RIGHT_OF_WAY:
-				currentDirection.addDirectionWithRightOfWay(directionId);
-				break;
-			case DIRECTIONS_WHICH_MUST_YIELD:
-				currentDirection.addDirectionWhichMustYield(directionId);
-				break;
-			case NON_CONFLICTING_DIRECTIONS:
-				currentDirection.addNonConflictingDirection(directionId);
-				break;
-			}
-		}
-	}
-
+  private void addConflictsForCurrentDirection(String name, String directions) {
+    List<String> directionsList = Arrays.asList(directions.trim().split(" "));
+    for (String direction : directionsList) {
+      Id<Direction> directionId = Id.create(direction, Direction.class);
+      switch (name) {
+        case CONFLICTING_DIRECTIONS:
+          currentDirection.addConflictingDirection(directionId);
+          break;
+        case DIRECTIONS_WITH_RIGHT_OF_WAY:
+          currentDirection.addDirectionWithRightOfWay(directionId);
+          break;
+        case DIRECTIONS_WHICH_MUST_YIELD:
+          currentDirection.addDirectionWhichMustYield(directionId);
+          break;
+        case NON_CONFLICTING_DIRECTIONS:
+          currentDirection.addNonConflictingDirection(directionId);
+          break;
+      }
+    }
+  }
 }

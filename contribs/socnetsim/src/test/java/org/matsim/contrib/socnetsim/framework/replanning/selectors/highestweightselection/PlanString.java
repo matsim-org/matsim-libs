@@ -22,29 +22,27 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors.highestweigh
 import org.matsim.api.core.v01.Id;
 
 final class PlanString {
-	public final PlanRecord planRecord;
-	public final PlanString tail;
-	private final double weight;
+  public final PlanRecord planRecord;
+  public final PlanString tail;
+  private final double weight;
 
-	public PlanString(
-			final PlanRecord head,
-			final PlanString tail) {
-		this.planRecord = head;
-		this.tail = tail;
-		this.weight = head.avgJointPlanWeight + (tail == null ? 0 : tail.getWeight());
-	}
+  public PlanString(final PlanRecord head, final PlanString tail) {
+    this.planRecord = head;
+    this.tail = tail;
+    this.weight = head.avgJointPlanWeight + (tail == null ? 0 : tail.getWeight());
+  }
 
-	public double getWeight() {
-		return weight;
-	}
+  public double getWeight() {
+    return weight;
+  }
 
-	public boolean containsPerson(final Id id) {
-		return planRecord.plan.getPerson().getId().equals( id ) ||
-			(tail != null && tail.containsPerson( id ));
-	}
+  public boolean containsPerson(final Id id) {
+    return planRecord.plan.getPerson().getId().equals(id)
+        || (tail != null && tail.containsPerson(id));
+  }
 
-	@Override
-	public String toString() {
-		return "("+planRecord+"; "+tail+")";
-	}
+  @Override
+  public String toString() {
+    return "(" + planRecord + "; " + tail + ")";
+  }
 }

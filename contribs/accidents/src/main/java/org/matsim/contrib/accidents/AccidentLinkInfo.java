@@ -21,31 +21,27 @@ package org.matsim.contrib.accidents;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 /**
-* @author ikaddoura, mmayobre
-*/
-
+ * @author ikaddoura, mmayobre
+ */
 class AccidentLinkInfo {
-	
-	private final Id<Link> linkId;
-	
-	private final Map<Integer, TimeBinInfo> timeSpecificInfo = new HashMap<>();
-	
-	public AccidentLinkInfo(Id<Link> linkId) {
-		this.linkId = linkId;
-	}
-	
-	public Id<Link> getLinkId() {
-		return linkId;
-	}
 
-	public Map<Integer, TimeBinInfo> getTimeSpecificInfo() {
-		return timeSpecificInfo;
-	}
+  private final Id<Link> linkId;
 
+  private final Map<Integer, TimeBinInfo> timeSpecificInfo = new HashMap<>();
+
+  public AccidentLinkInfo(Id<Link> linkId) {
+    this.linkId = linkId;
+  }
+
+  public Id<Link> getLinkId() {
+    return linkId;
+  }
+
+  public Map<Integer, TimeBinInfo> getTimeSpecificInfo() {
+    return timeSpecificInfo;
+  }
 }
-

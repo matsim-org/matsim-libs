@@ -21,11 +21,10 @@ package org.matsim.core.mobsim.framework;
 
 /**
  * @author nagel
- *
  */
 public interface Steppable {
-	
-	public void doSimStep( double time ) ;
-	// yyyy it is to be debated if "time" should be passed as an argument.  kai, jun'10
+
+  public void doSimStep(double time);
+  // yyyy it is to be debated if "time" should be passed as an argument.  kai, jun'10
 
 }

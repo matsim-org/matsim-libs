@@ -17,9 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
+/** */
 package org.matsim.contrib.drt.run;
 
 import org.matsim.api.core.v01.Scenario;
@@ -37,43 +35,44 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author michalm (Michal Maciejewski)
  */
 public final class DrtControlerCreator {
-	/**
-	 * Creates a standard scenario and adds a DRT route factory to the route factories.
-	 *
-	 * @param config
-	 * @return
-	 */
-	public static Scenario createScenarioWithDrtRouteFactory(Config config) {
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		scenario.getPopulation()
-				.getFactory()
-				.getRouteFactories()
-				.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
-		return scenario;
-	}
+  /**
+   * Creates a standard scenario and adds a DRT route factory to the route factories.
+   *
+   * @param config
+   * @return
+   */
+  public static Scenario createScenarioWithDrtRouteFactory(Config config) {
+    Scenario scenario = ScenarioUtils.createScenario(config);
+    scenario
+        .getPopulation()
+        .getFactory()
+        .getRouteFactories()
+        .setRouteFactory(DrtRoute.class, new DrtRouteFactory());
+    return scenario;
+  }
 
-	/**
-	 * Creates a controller in one step.
-	 *
-	 * @param config
-	 * @param otfvis
-	 * @return
-	 */
-	public static Controler createControler(Config config, boolean otfvis) {
-		MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
-		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
+  /**
+   * Creates a controller in one step.
+   *
+   * @param config
+   * @param otfvis
+   * @return
+   */
+  public static Controler createControler(Config config, boolean otfvis) {
+    MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
+    DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
 
-		Scenario scenario = createScenarioWithDrtRouteFactory(config);
-		ScenarioUtils.loadScenario(scenario);
+    Scenario scenario = createScenarioWithDrtRouteFactory(config);
+    ScenarioUtils.loadScenario(scenario);
 
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new MultiModeDrtModule());
-		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
+    Controler controler = new Controler(scenario);
+    controler.addOverridingModule(new DvrpModule());
+    controler.addOverridingModule(new MultiModeDrtModule());
+    controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
 
-		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule());
-		}
-		return controler;
-	}
+    if (otfvis) {
+      controler.addOverridingModule(new OTFVisLiveModule());
+    }
+    return controler;
+  }
 }

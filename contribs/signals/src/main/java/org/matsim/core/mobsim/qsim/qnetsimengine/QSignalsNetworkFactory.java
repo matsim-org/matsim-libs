@@ -21,6 +21,7 @@
  */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -34,73 +35,92 @@ import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
-import com.google.inject.Inject;
-
 /**
- * this class adds the turn acceptance logic for signals. 
- * it checks whether the signal for the specific turn shows green.
- * 
+ * this class adds the turn acceptance logic for signals. it checks whether the signal for the
+ * specific turn shows green.
+ *
  * @author tthunig
  */
-public final class QSignalsNetworkFactory implements QNetworkFactory{
+public final class QSignalsNetworkFactory implements QNetworkFactory {
 
-	private final QNetworkFactory delegate;
-	private final Scenario scenario;
-	private final EventsManager events;
-	private NetsimEngineContext context;
-	private NetsimInternalInterface netsimEngine ;
-	
-	@Inject QSignalsNetworkFactory(Scenario scenario, EventsManager events) {
-		this.scenario = scenario;
-		this.events = events;
-		if (scenario.getConfig().qsim().isUseLanes()) {
-			delegate = new QLanesNetworkFactory(events, scenario, new DefaultQNetworkFactory( events, scenario ) );
-			// this is a cheap shortcut, since we are in the same package.  Otherwise, one would need, in SignalsModule, something like
-			// bind( DefaultQNetworkFactory.class );
-			// bind( QLanesNetworkFactory.class );
-			// and then get it into the present class by injection.  kai, jun'23
-		} else {
-			delegate = new DefaultQNetworkFactory(events, scenario);
-			// this is a cheap shortcut, since we are in the same package.  Otherwise, one would need, in SignalsModule, something like
-			// bind( DefaultQNetworkFactory.class );
-			// and then get it into the present class by injection.  kai, jun'23
-		}
-	}
-	
-	@Override
-	public void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface simEngine1 ) {
-		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-		linkWidthCalculator.setLinkWidthForVis( scenario.getConfig().qsim().getLinkWidthForVis() );
-		linkWidthCalculator.setLaneWidth( scenario.getNetwork().getEffectiveLaneWidth() );
-		
-		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = AbstractQNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
-		
-		this.netsimEngine = simEngine1;
-		this.context = new NetsimEngineContext( events, scenario.getNetwork().getEffectiveCellSize(), agentCounter, agentSnapshotInfoBuilder, 
-				scenario.getConfig().qsim(), mobsimTimer, linkWidthCalculator );
-		
-		delegate.initializeFactory(agentCounter, mobsimTimer, simEngine1);
-	}
+  private final QNetworkFactory delegate;
+  private final Scenario scenario;
+  private final EventsManager events;
+  private NetsimEngineContext context;
+  private NetsimInternalInterface netsimEngine;
 
-	@Override
-	public QNodeI createNetsimNode( Node node ) {
-		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context, scenario.getConfig().qsim() ) ;
-		
-		// check whether turn acceptance logic is enabled
-		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
-				SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
-		if (signalsConfigGroup.getIntersectionLogic().equals(IntersectionLogic.CONFLICTING_DIRECTIONS_AND_TURN_RESTRICTIONS)) {
-			builder.setTurnAcceptanceLogic(new UnprotectedLeftTurnAcceptanceLogic(
-					((SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME)).getConflictingDirectionsData(), scenario.getLanes()));
-		} else {
-			builder.setTurnAcceptanceLogic(new SignalTurnAcceptanceLogic());
-		}
-		return builder.build(node);
-	}
+  @Inject
+  QSignalsNetworkFactory(Scenario scenario, EventsManager events) {
+    this.scenario = scenario;
+    this.events = events;
+    if (scenario.getConfig().qsim().isUseLanes()) {
+      delegate =
+          new QLanesNetworkFactory(events, scenario, new DefaultQNetworkFactory(events, scenario));
+      // this is a cheap shortcut, since we are in the same package.  Otherwise, one would need, in
+      // SignalsModule, something like
+      // bind( DefaultQNetworkFactory.class );
+      // bind( QLanesNetworkFactory.class );
+      // and then get it into the present class by injection.  kai, jun'23
+    } else {
+      delegate = new DefaultQNetworkFactory(events, scenario);
+      // this is a cheap shortcut, since we are in the same package.  Otherwise, one would need, in
+      // SignalsModule, something like
+      // bind( DefaultQNetworkFactory.class );
+      // and then get it into the present class by injection.  kai, jun'23
+    }
+  }
 
-	@Override
-	public QLinkI createNetsimLink( Link link, QNodeI queueNode ) {
-		return delegate.createNetsimLink(link, queueNode);
-	}
+  @Override
+  public void initializeFactory(
+      AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface simEngine1) {
+    SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+    linkWidthCalculator.setLinkWidthForVis(scenario.getConfig().qsim().getLinkWidthForVis());
+    linkWidthCalculator.setLaneWidth(scenario.getNetwork().getEffectiveLaneWidth());
 
+    AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder =
+        AbstractQNetsimEngine.createAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
+
+    this.netsimEngine = simEngine1;
+    this.context =
+        new NetsimEngineContext(
+            events,
+            scenario.getNetwork().getEffectiveCellSize(),
+            agentCounter,
+            agentSnapshotInfoBuilder,
+            scenario.getConfig().qsim(),
+            mobsimTimer,
+            linkWidthCalculator);
+
+    delegate.initializeFactory(agentCounter, mobsimTimer, simEngine1);
+  }
+
+  @Override
+  public QNodeI createNetsimNode(Node node) {
+    QNodeImpl.Builder builder =
+        new QNodeImpl.Builder(netsimEngine, context, scenario.getConfig().qsim());
+
+    // check whether turn acceptance logic is enabled
+    SignalSystemsConfigGroup signalsConfigGroup =
+        ConfigUtils.addOrGetModule(
+            scenario.getConfig(),
+            SignalSystemsConfigGroup.GROUP_NAME,
+            SignalSystemsConfigGroup.class);
+    if (signalsConfigGroup
+        .getIntersectionLogic()
+        .equals(IntersectionLogic.CONFLICTING_DIRECTIONS_AND_TURN_RESTRICTIONS)) {
+      builder.setTurnAcceptanceLogic(
+          new UnprotectedLeftTurnAcceptanceLogic(
+              ((SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME))
+                  .getConflictingDirectionsData(),
+              scenario.getLanes()));
+    } else {
+      builder.setTurnAcceptanceLogic(new SignalTurnAcceptanceLogic());
+    }
+    return builder.build(node);
+  }
+
+  @Override
+  public QLinkI createNetsimLink(Link link, QNodeI queueNode) {
+    return delegate.createNetsimLink(link, queueNode);
+  }
 }

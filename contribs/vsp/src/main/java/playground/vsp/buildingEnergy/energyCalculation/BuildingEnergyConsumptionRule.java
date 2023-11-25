@@ -21,41 +21,29 @@ package playground.vsp.buildingEnergy.energyCalculation;
 import java.util.HashMap;
 import java.util.Map;
 
-
-
-
 /**
  * @author droeder
- *
  */
-public interface BuildingEnergyConsumptionRule{
-	
-	/**
-	 * 
-	 * @param maxSize
-	 * @param currentOccupancy
-	 * @return energy consumption in kWh
-	 */
-	public double getEnergyConsumption_kWh(double maxSize, double currentOccupancy);
+public interface BuildingEnergyConsumptionRule {
 
-	
-	
-	public class BuildingEnergyConsumptionRuleFactory{
-		
-		private Map<String, BuildingEnergyConsumptionRule> rules = new HashMap<String, BuildingEnergyConsumptionRule>();   
+  /**
+   * @param maxSize
+   * @param currentOccupancy
+   * @return energy consumption in kWh
+   */
+  public double getEnergyConsumption_kWh(double maxSize, double currentOccupancy);
 
-		public void setRule(String actType, BuildingEnergyConsumptionRule rule){
-			this.rules.put(actType, rule);
-		}
-		
-		BuildingEnergyConsumptionRule getRule(String actType){
-			return rules.get(actType);
-		}
-	}
-	
-	
-	
-	
-	
+  public class BuildingEnergyConsumptionRuleFactory {
+
+    private Map<String, BuildingEnergyConsumptionRule> rules =
+        new HashMap<String, BuildingEnergyConsumptionRule>();
+
+    public void setRule(String actType, BuildingEnergyConsumptionRule rule) {
+      this.rules.put(actType, rule);
+    }
+
+    BuildingEnergyConsumptionRule getRule(String actType) {
+      return rules.get(actType);
+    }
+  }
 }
-

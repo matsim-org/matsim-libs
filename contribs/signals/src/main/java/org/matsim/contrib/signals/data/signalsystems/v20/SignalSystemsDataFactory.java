@@ -20,19 +20,16 @@
 package org.matsim.contrib.signals.data.signalsystems.v20;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
-
+import org.matsim.core.api.internal.MatsimFactory;
 
 /**
  * @author dgrether
- *
  */
 public interface SignalSystemsDataFactory extends MatsimFactory {
 
-	public SignalSystemData createSignalSystemData(Id<SignalSystem> id);
-	
-	public SignalData createSignalData(Id<Signal> id);
-	
+  public SignalSystemData createSignalSystemData(Id<SignalSystem> id);
+
+  public SignalData createSignalData(Id<Signal> id);
 }

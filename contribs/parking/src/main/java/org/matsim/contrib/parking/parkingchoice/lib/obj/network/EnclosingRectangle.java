@@ -19,50 +19,48 @@
 package org.matsim.contrib.parking.parkingchoice.lib.obj.network;
 
 import org.matsim.api.core.v01.Coord;
+
 /**
- *
  * @author rashid_waraich
- *
  */
 public class EnclosingRectangle {
 
-	double minX = Double.MAX_VALUE;
-	double minY = Double.MAX_VALUE;
-	double maxX = Double.MIN_VALUE;
-	double maxY = Double.MIN_VALUE;
+  double minX = Double.MAX_VALUE;
+  double minY = Double.MAX_VALUE;
+  double maxX = Double.MIN_VALUE;
+  double maxY = Double.MIN_VALUE;
 
-	public void registerCoord(Coord coord){
-		if (coord.getX() < minX) {
-			minX = coord.getX();
-		}
+  public void registerCoord(Coord coord) {
+    if (coord.getX() < minX) {
+      minX = coord.getX();
+    }
 
-		if (coord.getY() < minY) {
-			minY = coord.getY();
-		}
+    if (coord.getY() < minY) {
+      minY = coord.getY();
+    }
 
-		if (coord.getX() > maxX) {
-			maxX = coord.getX();
-		}
+    if (coord.getX() > maxX) {
+      maxX = coord.getX();
+    }
 
-		if (coord.getY() > maxY) {
-			maxY = coord.getY();
-		}
-	}
+    if (coord.getY() > maxY) {
+      maxY = coord.getY();
+    }
+  }
 
-	public double getMinX() {
-		return minX;
-	}
+  public double getMinX() {
+    return minX;
+  }
 
-	public double getMinY() {
-		return minY;
-	}
+  public double getMinY() {
+    return minY;
+  }
 
-	public double getMaxX() {
-		return maxX;
-	}
+  public double getMaxX() {
+    return maxX;
+  }
 
-	public double getMaxY() {
-		return maxY;
-	}
-
+  public double getMaxY() {
+    return maxY;
+  }
 }

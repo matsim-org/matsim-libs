@@ -28,7 +28,7 @@ import org.matsim.core.controler.MatsimServices;
  * @author dgrether
  */
 public final class IterationEndsEvent extends AbstractIterationEvent {
-	public IterationEndsEvent(MatsimServices services, int iteration, boolean isLastIteration) {
-		super(services, iteration, isLastIteration);
-	}
+  public IterationEndsEvent(MatsimServices services, int iteration, boolean isLastIteration) {
+    super(services, iteration, isLastIteration);
+  }
 }

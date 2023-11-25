@@ -22,47 +22,48 @@ package org.matsim.contrib.socnetsim.jointtrips.replanning;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.router.TripStructureUtils.Trip;
-
+import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
 import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
-import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
 
 /**
  * @author thibautd
  */
 public final class JointTripsPlanLinkIdentifier implements PlanLinkIdentifier {
 
-	@Override
-	public boolean areLinked(
-			final Plan p1,
-			final Plan p2) {
-		final boolean areLinked = containsCoTraveler( p1 , p2.getPerson().getId() );
-		assert areLinked == containsCoTraveler( p2 , p1.getPerson().getId() ) :
-			"inconsistent plans "+p1+" "+(areLinked ? "contains " : "does not contains ")+p2.getPerson().getId()+
-			" and "+p2+" "+(!areLinked ? "contains " : "does not contains ")+p1.getPerson().getId();
-		return areLinked;
-	}
+  @Override
+  public boolean areLinked(final Plan p1, final Plan p2) {
+    final boolean areLinked = containsCoTraveler(p1, p2.getPerson().getId());
+    assert areLinked == containsCoTraveler(p2, p1.getPerson().getId())
+        : "inconsistent plans "
+            + p1
+            + " "
+            + (areLinked ? "contains " : "does not contains ")
+            + p2.getPerson().getId()
+            + " and "
+            + p2
+            + " "
+            + (!areLinked ? "contains " : "does not contains ")
+            + p1.getPerson().getId();
+    return areLinked;
+  }
 
-	private static boolean containsCoTraveler(
-			final Plan plan,
-			final Id cotraveler) {
-		for ( Trip t : TripStructureUtils.getTrips( plan ) ) {
-			for ( Leg l : t.getLegsOnly() ) {
-				if ( l.getRoute() instanceof DriverRoute ) {
-					if ( ((DriverRoute) l.getRoute()).getPassengersIds().contains( cotraveler ) ) {
-						return true;
-					}
-				}
-				else if ( l.getRoute() instanceof PassengerRoute ) {
-					if ( ((PassengerRoute) l.getRoute()).getDriverId().equals( cotraveler ) ) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
+  private static boolean containsCoTraveler(final Plan plan, final Id cotraveler) {
+    for (Trip t : TripStructureUtils.getTrips(plan)) {
+      for (Leg l : t.getLegsOnly()) {
+        if (l.getRoute() instanceof DriverRoute) {
+          if (((DriverRoute) l.getRoute()).getPassengersIds().contains(cotraveler)) {
+            return true;
+          }
+        } else if (l.getRoute() instanceof PassengerRoute) {
+          if (((PassengerRoute) l.getRoute()).getDriverId().equals(cotraveler)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
 }
-

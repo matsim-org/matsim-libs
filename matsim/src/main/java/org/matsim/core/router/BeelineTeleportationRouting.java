@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * BeelineTeleportationRouting.java
@@ -19,27 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.router;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.groups.RoutingConfigGroup;
+package org.matsim.core.router;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 
 class BeelineTeleportationRouting implements Provider<RoutingModule> {
 
-	private final RoutingConfigGroup.TeleportedModeParams params;
+  private final RoutingConfigGroup.TeleportedModeParams params;
 
-	public BeelineTeleportationRouting( RoutingConfigGroup.TeleportedModeParams params ) {
-		this.params = params;
-	}
+  public BeelineTeleportationRouting(RoutingConfigGroup.TeleportedModeParams params) {
+    this.params = params;
+  }
 
-	@Inject
-	private Scenario scenario ;
+  @Inject private Scenario scenario;
 
-	@Override
-	public RoutingModule get() {
-		return DefaultRoutingModules.createTeleportationRouter(params.getMode(), scenario, params);
-	}
+  @Override
+  public RoutingModule get() {
+    return DefaultRoutingModules.createTeleportationRouter(params.getMode(), scenario, params);
+  }
 }

@@ -19,41 +19,43 @@
  * *********************************************************************** */
 
 package org.matsim.counts;
+
 // import org.matsim.demandmodeling.gbl.Gbl;
 
 public class Volume {
-	private final int h_;
-	private double val_;
+  private final int h_;
+  private double val_;
 
-	protected Volume(final int h, final double val) {
-		
-		/* no error checking needed as we use schema instead of dtd
-		
-		if ((h == -1)) {
-			Gbl.errorMsg("[h="+h+", negative values are not allowed!]");
-		}
-		if ((val == -1)) {
-			Gbl.errorMsg("[val="+val+", negative values are not allowed!]");
-		}
-		*/
-		
-		this.h_ = h;
-		this.val_ = val;	
-	}
+  protected Volume(final int h, final double val) {
 
-	public final void setValue(double val) {
-		this.val_ = val;
-	}
+    /* no error checking needed as we use schema instead of dtd
 
-	public final int getHourOfDayStartingWithOne() {
-		return this.h_;
-	}
-	public final double getValue() {
-		return this.val_;
-	}
-	
-	@Override
-	public final String toString() {
-		return "[" + this.h_ + "===" + this.val_ + "]";
-	}
+    if ((h == -1)) {
+    	Gbl.errorMsg("[h="+h+", negative values are not allowed!]");
+    }
+    if ((val == -1)) {
+    	Gbl.errorMsg("[val="+val+", negative values are not allowed!]");
+    }
+    */
+
+    this.h_ = h;
+    this.val_ = val;
+  }
+
+  public final void setValue(double val) {
+    this.val_ = val;
+  }
+
+  public final int getHourOfDayStartingWithOne() {
+    return this.h_;
+  }
+
+  public final double getValue() {
+    return this.val_;
+  }
+
+  @Override
+  public final String toString() {
+    return "[" + this.h_ + "===" + this.val_ + "]";
+  }
 }

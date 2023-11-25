@@ -19,26 +19,34 @@
 
 package org.matsim.core.scoring.functions;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PersonUtils;
-import org.matsim.utils.math.RandomFromDistribution;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SplittableRandom;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.utils.math.RandomFromDistribution;
 
 public class PersonSpecificScoringAttributesSetter {
 
-    public static void setLogNormalModeConstant(Collection<Person> persons, String mode, double mean, double sigma,
-                                                SplittableRandom splittableRandom) {
-        persons.forEach(person -> {
-            Map<String, String> modeConstants = PersonUtils.getModeConstants(person);
-            if (modeConstants == null) {
-                modeConstants = new HashMap<>();
-            }
-            modeConstants.put(mode, Double.toString(RandomFromDistribution.nextLogNormalFromMeanAndSigma(splittableRandom, mean, sigma)));
-            PersonUtils.setModeConstants(person, modeConstants);
+  public static void setLogNormalModeConstant(
+      Collection<Person> persons,
+      String mode,
+      double mean,
+      double sigma,
+      SplittableRandom splittableRandom) {
+    persons.forEach(
+        person -> {
+          Map<String, String> modeConstants = PersonUtils.getModeConstants(person);
+          if (modeConstants == null) {
+            modeConstants = new HashMap<>();
+          }
+          modeConstants.put(
+              mode,
+              Double.toString(
+                  RandomFromDistribution.nextLogNormalFromMeanAndSigma(
+                      splittableRandom, mean, sigma)));
+          PersonUtils.setModeConstants(person, modeConstants);
         });
-    }
+  }
 }

@@ -20,24 +20,23 @@
 
 package org.matsim.contrib.ev.fleet;
 
+import com.google.common.collect.ImmutableList;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.common.collect.ImmutableList;
-
 public interface ElectricVehicle extends Identifiable<Vehicle> {
-	DriveEnergyConsumption getDriveEnergyConsumption();
+  DriveEnergyConsumption getDriveEnergyConsumption();
 
-	AuxEnergyConsumption getAuxEnergyConsumption();
+  AuxEnergyConsumption getAuxEnergyConsumption();
 
-	ChargingPower getChargingPower();
+  ChargingPower getChargingPower();
 
-	Battery getBattery();
+  Battery getBattery();
 
-	ElectricVehicleSpecification getVehicleSpecification();
+  ElectricVehicleSpecification getVehicleSpecification();
 
-	ImmutableList<String> getChargerTypes();
+  ImmutableList<String> getChargerTypes();
 }

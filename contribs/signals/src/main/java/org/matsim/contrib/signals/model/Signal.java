@@ -21,31 +21,26 @@ package org.matsim.contrib.signals.model;
 
 import java.util.Collection;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
 import org.matsim.lanes.Lane;
 
-
 /**
  * @author dgrether
- *
  */
 public interface Signal {
 
-	public Id<Signal> getId();
-	
-	public Id<Link> getLinkId();
-	
-	public Set<Id<Lane>> getLaneIds();
+  public Id<Signal> getId();
 
-	public void addSignalizeableItem(SignalizeableItem signalizedItem);
+  public Id<Link> getLinkId();
 
-	public Collection<SignalizeableItem> getSignalizeableItems();
-	
-	public void setState(SignalGroupState state);
-	
-	
+  public Set<Id<Lane>> getLaneIds();
+
+  public void addSignalizeableItem(SignalizeableItem signalizedItem);
+
+  public Collection<SignalizeableItem> getSignalizeableItems();
+
+  public void setState(SignalGroupState state);
 }

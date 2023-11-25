@@ -23,19 +23,19 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 /**
- * Net energy taken from the battery to propel the vehicle, i.e. consumed by the motor minus effectively regenerated
- * (returned back to the battery).
+ * Net energy taken from the battery to propel the vehicle, i.e. consumed by the motor minus
+ * effectively regenerated (returned back to the battery).
  */
 public interface DriveEnergyConsumption {
-	interface Factory {
-		DriveEnergyConsumption create(ElectricVehicle electricVehicle);
-	}
+  interface Factory {
+    DriveEnergyConsumption create(ElectricVehicle electricVehicle);
+  }
 
-	/**
-	 * @param link          Link where energy is consumed
-	 * @param travelTime    TravelTime spent on link
-	 * @param linkEnterTime time of entering link (may be undefined)
-	 * @return energy consumed by vehicle on link in J
-	 */
-	double calcEnergyConsumption(Link link, double travelTime, double linkEnterTime);
+  /**
+   * @param link Link where energy is consumed
+   * @param travelTime TravelTime spent on link
+   * @param linkEnterTime time of entering link (may be undefined)
+   * @return energy consumed by vehicle on link in J
+   */
+  double calcEnergyConsumption(Link link, double travelTime, double linkEnterTime);
 }

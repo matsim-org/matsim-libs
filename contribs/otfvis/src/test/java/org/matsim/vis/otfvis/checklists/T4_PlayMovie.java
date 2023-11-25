@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * 
+ *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -27,9 +27,9 @@ import org.matsim.contrib.otfvis.OTFVis;
  */
 public class T4_PlayMovie {
 
-	public static void main(String[] args) {
-		String[] movies = new String[1];
-		movies[0] = "./output/OTFVisTestsQSim/ITERS/it.1/1.otfvis.mvi";
-		OTFVis.playMVI(movies);
-	}
+  public static void main(String[] args) {
+    String[] movies = new String[1];
+    movies[0] = "./output/OTFVisTestsQSim/ITERS/it.1/1.otfvis.mvi";
+    OTFVis.playMVI(movies);
+  }
 }

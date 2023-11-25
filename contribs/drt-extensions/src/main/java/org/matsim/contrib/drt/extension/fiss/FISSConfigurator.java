@@ -8,6 +8,9 @@
  */
 package org.matsim.contrib.drt.extension.fiss;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -26,87 +29,86 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 /**
  * @author nkuehnel / MOIA, hrewald
  */
 public class FISSConfigurator {
 
-    private static final Logger LOG = LogManager.getLogger(FISSConfigurator.class);
+  private static final Logger LOG = LogManager.getLogger(FISSConfigurator.class);
 
-    private FISSConfigurator() {
-        throw new IllegalStateException("Utility class");
+  private FISSConfigurator() {
+    throw new IllegalStateException("Utility class");
+  }
+
+  // Should be called late in the setup process (at least after DRT/DVRP modules)
+  public static void configure(Controler controler) {
+
+    Scenario scenario = controler.getScenario();
+    Config config = controler.getConfig();
+
+    if (!config
+        .qsim()
+        .getVehiclesSource()
+        .equals(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData)) {
+      throw new IllegalArgumentException(
+          "For the time being, FISS works with vehicle types from vehicles data, please check config!");
     }
 
-    // Should be called late in the setup process (at least after DRT/DVRP modules)
-    public static void configure(Controler controler) {
+    FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
 
-        Scenario scenario = controler.getScenario();
-        Config config = controler.getConfig();
+    Vehicles vehiclesContainer = scenario.getVehicles();
 
-        if (!config.qsim().getVehiclesSource()
-                .equals(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData)) {
-            throw new IllegalArgumentException("For the time being, FISS works with vehicle types from vehicles data, please check config!");
+    Set<String> finalFissModes = new HashSet<>(fissConfigGroup.sampledModes);
+
+    for (String sampledMode : fissConfigGroup.sampledModes) {
+      if (!config.qsim().getMainModes().contains(sampledMode)) {
+        LOG.warn("{} is not a qsim mode, can and will not apply FISS.", sampledMode);
+        finalFissModes.remove(sampledMode);
+
+        continue;
+      }
+      final Id<VehicleType> vehicleTypeId = Id.create(sampledMode, VehicleType.class);
+      VehicleType vehicleType = vehiclesContainer.getVehicleTypes().get(vehicleTypeId);
+      if (vehicleType == null) {
+        vehicleType = VehicleUtils.createVehicleType(vehicleTypeId);
+        vehiclesContainer.addVehicleType(vehicleType);
+        LOG.info("Created explicit default vehicle type for mode '{}'", sampledMode);
+      }
+      final double pcu = vehicleType.getPcuEquivalents() / fissConfigGroup.sampleFactor;
+      LOG.info("Set pcuEquivalent of vehicleType '{}' to {}", vehicleTypeId, pcu);
+      vehicleType.setPcuEquivalents(pcu);
+    }
+
+    fissConfigGroup.sampledModes = finalFissModes;
+    controler.addOverridingQSimModule(new FISSQSimModule());
+    // controler.configureQSimComponents(activateModes(MultiModeDrtConfigGroup.get(config).modes().collect(Collectors.toList())));
+  }
+
+  public static QSimComponentsConfigurator activateModes() {
+    return activateModes(List.of(), List.of()); // no dvrp modes
+  }
+
+  public static QSimComponentsConfigurator activateModes(
+      List<String> additionalNamedComponents, List<String> dvrpModes) {
+    return components -> {
+      if (!dvrpModes.isEmpty()) {
+        components.addNamedComponent(DynActivityEngine.COMPONENT_NAME);
+        components.addNamedComponent(PreplanningEngineQSimModule.COMPONENT_NAME);
+      }
+
+      components.removeNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
+      components.addNamedComponent(FISSQSimModule.COMPONENT_NAME);
+      components.addNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
+
+      additionalNamedComponents.forEach(components::addNamedComponent);
+
+      if (!dvrpModes.isEmpty()) {
+        // activate all DvrpMode components
+        MultiModals.requireAllModesUnique(dvrpModes);
+        for (String m : dvrpModes) {
+          components.addComponent(DvrpModes.mode(m));
         }
-
-        FISSConfigGroup fissConfigGroup = ConfigUtils.addOrGetModule(config, FISSConfigGroup.class);
-
-        Vehicles vehiclesContainer = scenario.getVehicles();
-
-		Set<String> finalFissModes = new HashSet<>(fissConfigGroup.sampledModes);
-
-        for (String sampledMode : fissConfigGroup.sampledModes) {
-            if (!config.qsim().getMainModes().contains(sampledMode)) {
-                LOG.warn("{} is not a qsim mode, can and will not apply FISS.", sampledMode);
-                finalFissModes.remove(sampledMode);
-
-                continue;
-            }
-            final Id<VehicleType> vehicleTypeId = Id.create(sampledMode, VehicleType.class);
-            VehicleType vehicleType = vehiclesContainer.getVehicleTypes().get(vehicleTypeId);
-            if (vehicleType == null) {
-                vehicleType = VehicleUtils.createVehicleType(vehicleTypeId);
-                vehiclesContainer.addVehicleType(vehicleType);
-                LOG.info("Created explicit default vehicle type for mode '{}'", sampledMode);
-            }
-            final double pcu = vehicleType.getPcuEquivalents() / fissConfigGroup.sampleFactor;
-            LOG.info("Set pcuEquivalent of vehicleType '{}' to {}", vehicleTypeId, pcu);
-            vehicleType.setPcuEquivalents(pcu);
-        }
-
-        fissConfigGroup.sampledModes = finalFissModes;
-        controler.addOverridingQSimModule(new FISSQSimModule());
-        // controler.configureQSimComponents(activateModes(MultiModeDrtConfigGroup.get(config).modes().collect(Collectors.toList())));
-    }
-
-    public static QSimComponentsConfigurator activateModes() {
-        return activateModes(List.of(), List.of()); // no dvrp modes
-    }
-
-    public static QSimComponentsConfigurator activateModes(List<String> additionalNamedComponents,List<String> dvrpModes) {
-        return components -> {
-            if (!dvrpModes.isEmpty()) {
-                components.addNamedComponent(DynActivityEngine.COMPONENT_NAME);
-                components.addNamedComponent(PreplanningEngineQSimModule.COMPONENT_NAME);
-            }
-
-            components.removeNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
-            components.addNamedComponent(FISSQSimModule.COMPONENT_NAME);
-            components.addNamedComponent(QNetsimEngineModule.COMPONENT_NAME);
-
-            additionalNamedComponents.forEach(components::addNamedComponent);
-
-
-            if (!dvrpModes.isEmpty()) {
-                // activate all DvrpMode components
-                MultiModals.requireAllModesUnique(dvrpModes);
-                for (String m : dvrpModes) {
-                    components.addComponent(DvrpModes.mode(m));
-                }
-            }
-        };
-    }
+      }
+    };
+  }
 }

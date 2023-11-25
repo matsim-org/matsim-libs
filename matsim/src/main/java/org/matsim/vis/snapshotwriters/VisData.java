@@ -23,10 +23,11 @@ import java.util.Collection;
 
 /**
  * Interface for methods to provide a visualizer with data.
+ *
  * @author dgrether
  */
 public interface VisData {
 
-	public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(final Collection<AgentSnapshotInfo> positions);
-
+  public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(
+      final Collection<AgentSnapshotInfo> positions);
 }

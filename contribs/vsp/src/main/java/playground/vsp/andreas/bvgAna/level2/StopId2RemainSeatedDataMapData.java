@@ -22,91 +22,107 @@ package playground.vsp.andreas.bvgAna.level2;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 
 /**
- * Collects occupancy at arrival and number of agents leaving the vehicle for on <code>VehicleArrivesAtFacilityEvent</code>
+ * Collects occupancy at arrival and number of agents leaving the vehicle for on <code>
+ * VehicleArrivesAtFacilityEvent</code>
  *
  * @author aneumann
- *
  */
 public class StopId2RemainSeatedDataMapData {
 
-	private VehicleArrivesAtFacilityEvent arrivalEvent;
-	private final int occupancyAtArrival;
-	private int agentsLeaving = 0;
-	private int agentsEntering = 0;
+  private VehicleArrivesAtFacilityEvent arrivalEvent;
+  private final int occupancyAtArrival;
+  private int agentsLeaving = 0;
+  private int agentsEntering = 0;
 
-	public StopId2RemainSeatedDataMapData(VehicleArrivesAtFacilityEvent event, int occupancyAtArrival){
-		this.arrivalEvent = event;
-		this.occupancyAtArrival = occupancyAtArrival;
-	}
+  public StopId2RemainSeatedDataMapData(
+      VehicleArrivesAtFacilityEvent event, int occupancyAtArrival) {
+    this.arrivalEvent = event;
+    this.occupancyAtArrival = occupancyAtArrival;
+  }
 
-	/**
-	 * @return Returns number of agents which did not leave the vehicle at that stop
-	 */
-	public int getNumberOfAgentsRemainedSeated(){
-		return this.occupancyAtArrival - this.agentsLeaving;
-	}
+  /**
+   * @return Returns number of agents which did not leave the vehicle at that stop
+   */
+  public int getNumberOfAgentsRemainedSeated() {
+    return this.occupancyAtArrival - this.agentsLeaving;
+  }
 
-	/**
-	 * @return Returns the fraction of agents which did not leave the vehicle at the stop based on the occupancy at arrival
-	 */
-	public double getFractionRemainedSeated(){
-		return this.getNumberOfAgentsRemainedSeated() / (double) this.occupancyAtArrival;
-	}
+  /**
+   * @return Returns the fraction of agents which did not leave the vehicle at the stop based on the
+   *     occupancy at arrival
+   */
+  public double getFractionRemainedSeated() {
+    return this.getNumberOfAgentsRemainedSeated() / (double) this.occupancyAtArrival;
+  }
 
-	/**
-	 * @return Returns number of agents which entered the vehicle at that stop
-	 */
-	public int getNumberOfAgentsEntering(){
-		return this.agentsEntering;
-	}
+  /**
+   * @return Returns number of agents which entered the vehicle at that stop
+   */
+  public int getNumberOfAgentsEntering() {
+    return this.agentsEntering;
+  }
 
-	/**
-	 * @return Returns number of agents which arrived in vehicle at that stop
-	 */
-	public final int getNumberOfAgentsArriving() {
-		return occupancyAtArrival;
-	}
+  /**
+   * @return Returns number of agents which arrived in vehicle at that stop
+   */
+  public final int getNumberOfAgentsArriving() {
+    return occupancyAtArrival;
+  }
 
-	/**
-	 * @return Returns the fraction of agents which entered the vehicle at the stop based on the occupancy at arrival
-	 */
-	public double getFractionEntering(){
-		return this.getNumberOfAgentsEntering() / (double) this.occupancyAtArrival;
-	}
+  /**
+   * @return Returns the fraction of agents which entered the vehicle at the stop based on the
+   *     occupancy at arrival
+   */
+  public double getFractionEntering() {
+    return this.getNumberOfAgentsEntering() / (double) this.occupancyAtArrival;
+  }
 
-	/**
-	 * @return Returns number of agents which left the vehicle at that stop
-	 */
-	public int getNumberOfAgentsLeaving(){
-		return this.agentsLeaving;
-	}
+  /**
+   * @return Returns number of agents which left the vehicle at that stop
+   */
+  public int getNumberOfAgentsLeaving() {
+    return this.agentsLeaving;
+  }
 
-	/**
-	 * @return Returns the fraction of agents which left the vehicle at the stop based on the occupancy at arrival
-	 */
-	public double getFractionLeaving(){
-		return this.getNumberOfAgentsLeaving() / (double) this.occupancyAtArrival;
-	}
+  /**
+   * @return Returns the fraction of agents which left the vehicle at the stop based on the
+   *     occupancy at arrival
+   */
+  public double getFractionLeaving() {
+    return this.getNumberOfAgentsLeaving() / (double) this.occupancyAtArrival;
+  }
 
-	/**
-	 * @return Returns the <code>VehicleArrivesAtFacilityEvent</code>
-	 */
-	public VehicleArrivesAtFacilityEvent getVehicleArrivesAtFacilityEvent(){
-		return this.arrivalEvent;
-	}
+  /**
+   * @return Returns the <code>VehicleArrivesAtFacilityEvent</code>
+   */
+  public VehicleArrivesAtFacilityEvent getVehicleArrivesAtFacilityEvent() {
+    return this.arrivalEvent;
+  }
 
-	protected void addAgentLeaving() {
-		this.agentsLeaving++;
-	}
+  protected void addAgentLeaving() {
+    this.agentsLeaving++;
+  }
 
-	protected void addAgentEntering() {
-		this.agentsEntering++;
-	}
+  protected void addAgentEntering() {
+    this.agentsEntering++;
+  }
 
-	@Override
-	public String toString() {
-		return "Event: " + this.getVehicleArrivesAtFacilityEvent() + " - Remained: " + this.getNumberOfAgentsRemainedSeated() + " (" + this.getFractionRemainedSeated() * 100 + "%) - Left: " +
-		this.getNumberOfAgentsLeaving() + " (" + this.getFractionLeaving() * 100 + "%) - Entered: " + this.getNumberOfAgentsEntering() + " (" + this.getFractionEntering() * 100 + "%)";
-	}
-
+  @Override
+  public String toString() {
+    return "Event: "
+        + this.getVehicleArrivesAtFacilityEvent()
+        + " - Remained: "
+        + this.getNumberOfAgentsRemainedSeated()
+        + " ("
+        + this.getFractionRemainedSeated() * 100
+        + "%) - Left: "
+        + this.getNumberOfAgentsLeaving()
+        + " ("
+        + this.getFractionLeaving() * 100
+        + "%) - Entered: "
+        + this.getNumberOfAgentsEntering()
+        + " ("
+        + this.getFractionEntering() * 100
+        + "%)";
+  }
 }

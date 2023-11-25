@@ -19,49 +19,35 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-/**
- * Util class for fuzzy comparisons.
- */
+/** Util class for fuzzy comparisons. */
 final class FuzzyUtils {
 
-	private static final double EPSILON = 1E-5;
+  private static final double EPSILON = 1E-5;
 
-	private FuzzyUtils() {
-	}
+  private FuzzyUtils() {}
 
-	/**
-	 * Returns true if two doubles are approximately equal.
-	 */
-	public static boolean equals(double a, double b) {
-		return a == b || Math.abs(a - b) < EPSILON;
-	}
+  /** Returns true if two doubles are approximately equal. */
+  public static boolean equals(double a, double b) {
+    return a == b || Math.abs(a - b) < EPSILON;
+  }
 
-	/**
-	 * Returns true if the first double is approximately greater than the second.
-	 */
-	public static boolean greaterEqualThan(double a, double b) {
-		return equals(a, b) || a - b > EPSILON;
-	}
+  /** Returns true if the first double is approximately greater than the second. */
+  public static boolean greaterEqualThan(double a, double b) {
+    return equals(a, b) || a - b > EPSILON;
+  }
 
-	/**
-	 * Returns true if the first double is certainly greater than the second.
-	 */
-	public static boolean greaterThan(double a, double b) {
-		return a - b > EPSILON;
-	}
+  /** Returns true if the first double is certainly greater than the second. */
+  public static boolean greaterThan(double a, double b) {
+    return a - b > EPSILON;
+  }
 
-	/**
-	 * Returns true if the first double is approximately less than the second.
-	 */
-	public static boolean lessEqualThan(double a, double b) {
-		return equals(a, b) || b - a > EPSILON;
-	}
+  /** Returns true if the first double is approximately less than the second. */
+  public static boolean lessEqualThan(double a, double b) {
+    return equals(a, b) || b - a > EPSILON;
+  }
 
-	/**
-	 * Returns true if the first double is approximately less than the second.
-	 */
-	public static boolean lessThan(double a, double b) {
-		return b - a > EPSILON;
-	}
-
+  /** Returns true if the first double is approximately less than the second. */
+  public static boolean lessThan(double a, double b) {
+    return b - a > EPSILON;
+  }
 }

@@ -25,41 +25,39 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * @deprecated Functionality is removed. VehicleTypes must be set (and available) when creating the vehicle. kai/kai jan'22
- * <p>
- * Loader that loads/assigns vehicleTypes to their vehicles and carriers respectively.
- *
+ * @deprecated Functionality is removed. VehicleTypes must be set (and available) when creating the
+ *     vehicle. kai/kai jan'22
+ *     <p>Loader that loads/assigns vehicleTypes to their vehicles and carriers respectively.
  * @author sschroeder
- *
  */
 @Deprecated
 public class CarrierVehicleTypeLoader {
 
-	@SuppressWarnings("unused")
-	private static final  Logger logger = LogManager.getLogger(CarrierVehicleTypeLoader.class);
+  @SuppressWarnings("unused")
+  private static final Logger logger = LogManager.getLogger(CarrierVehicleTypeLoader.class);
 
-	/**
-	 * Constructs the loader with the carriers the types should be assigned to.
-	 *
-	 * @param carriers
-	 *
-	 *  * @deprecated Functionality is removed. VehicleTypes must be set (and available) when creating the vehicle. kai/kai jan'22
-	 */
-	@Deprecated
-	public CarrierVehicleTypeLoader(Carriers carriers) {
-		super();
-	}
+  /**
+   * Constructs the loader with the carriers the types should be assigned to.
+   *
+   * @param carriers
+   *     <p>* @deprecated Functionality is removed. VehicleTypes must be set (and available) when
+   *     creating the vehicle. kai/kai jan'22
+   */
+  @Deprecated
+  public CarrierVehicleTypeLoader(Carriers carriers) {
+    super();
+  }
 
-	/**
-	 * Assigns types to carriers and their vehicles.
-	 *
-	 * @param types
-	 *
-	 * @deprecated Functionality is removed. VehicleTypes must be set (and available) when creating the vehicle. kai/kai jan'22
-	 */
-	@Deprecated
-	public void loadVehicleTypes(CarrierVehicleTypes types){
-		logger.error("Functionality is removed. VehicleTypes must be set (and available) when creating the vehicle.");
-	}
-
+  /**
+   * Assigns types to carriers and their vehicles.
+   *
+   * @param types
+   * @deprecated Functionality is removed. VehicleTypes must be set (and available) when creating
+   *     the vehicle. kai/kai jan'22
+   */
+  @Deprecated
+  public void loadVehicleTypes(CarrierVehicleTypes types) {
+    logger.error(
+        "Functionality is removed. VehicleTypes must be set (and available) when creating the vehicle.");
+  }
 }

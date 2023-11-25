@@ -19,16 +19,14 @@
  * *********************************************************************** */
 
 package org.matsim.contrib.otfvis;
+
 /**
- * A generic starter for the OnTheFly Visualizer that supports
- * MATSim Visualizer Files (MVI) and MATSim Config Files for the live simulation and visualization.
- *
- * 
+ * A generic starter for the OnTheFly Visualizer that supports MATSim Visualizer Files (MVI) and
+ * MATSim Config Files for the live simulation and visualization.
  */
 public class RunOTFVis {
 
-	public static void main(String[] args) {
-		OTFVis.main(args);
-	}
-
+  public static void main(String[] args) {
+    OTFVis.main(args);
+  }
 }

@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * AbstractQSimModuleTest.java
@@ -19,11 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim;
+package org.matsim.core.mobsim.qsim;
 
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicLong;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -43,171 +44,170 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-
 public class AbstractQSimModuleTest {
-	@Test
-	public void testOverrides() {
-		AbstractQSimModule moduleA = new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				getConfig().createModule("testA");
-				bind(String.class).toInstance("testAString");
-			}
-		};
+  @Test
+  public void testOverrides() {
+    AbstractQSimModule moduleA =
+        new AbstractQSimModule() {
+          @Override
+          protected void configureQSim() {
+            getConfig().createModule("testA");
+            bind(String.class).toInstance("testAString");
+          }
+        };
 
-		AbstractQSimModule moduleB = new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				getConfig().createModule("testB");
-				bind(String.class).toInstance("testBString");
-			}
-		};
+    AbstractQSimModule moduleB =
+        new AbstractQSimModule() {
+          @Override
+          protected void configureQSim() {
+            getConfig().createModule("testB");
+            bind(String.class).toInstance("testBString");
+          }
+        };
 
-		AbstractQSimModule composite = AbstractQSimModule.overrideQSimModules(Collections.singleton(moduleA),
-				Collections.singletonList(moduleB));
+    AbstractQSimModule composite =
+        AbstractQSimModule.overrideQSimModules(
+            Collections.singleton(moduleA), Collections.singletonList(moduleB));
 
-		Config config = ConfigUtils.createConfig();
-		composite.setConfig(config);
+    Config config = ConfigUtils.createConfig();
+    composite.setConfig(config);
 
-		Injector injector = Guice.createInjector(composite);
+    Injector injector = Guice.createInjector(composite);
 
-		Assert.assertTrue(config.getModules().containsKey("testA"));
-		Assert.assertTrue(config.getModules().containsKey("testB"));
+    Assert.assertTrue(config.getModules().containsKey("testA"));
+    Assert.assertTrue(config.getModules().containsKey("testB"));
 
-		Assert.assertEquals("testBString", injector.getInstance(String.class));
-	}
+    Assert.assertEquals("testBString", injector.getInstance(String.class));
+  }
 
-	@Test
-	public void testOverrideAgentFactory() {
-		Config config = ConfigUtils.createConfig();
-		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setLastIteration(0);
+  @Test
+  public void testOverrideAgentFactory() {
+    Config config = ConfigUtils.createConfig();
+    config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+    config.controller().setLastIteration(0);
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+    Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
-		Person person = populationFactory.createPerson(Id.createPersonId("person"));
-		Plan plan =  populationFactory.createPlan();
-		plan.addActivity( populationFactory.createActivityFromLinkId("type", Id.createLinkId("0")));
-		person.addPlan(plan);
-		scenario.getPopulation().addPerson(person);
+    PopulationFactory populationFactory = scenario.getPopulation().getFactory();
+    Person person = populationFactory.createPerson(Id.createPersonId("person"));
+    Plan plan = populationFactory.createPlan();
+    plan.addActivity(populationFactory.createActivityFromLinkId("type", Id.createLinkId("0")));
+    person.addPlan(plan);
+    scenario.getPopulation().addPerson(person);
 
-		AtomicLong value = new AtomicLong(0);
+    AtomicLong value = new AtomicLong(0);
 
-		Controler controler = new Controler(scenario);
-		controler.addOverridingQSimModule(new TestQSimModule(value));
-		controler.run();
+    Controler controler = new Controler(scenario);
+    controler.addOverridingQSimModule(new TestQSimModule(value));
+    controler.run();
 
-		Assert.assertTrue(value.get() > 0);
-	}
+    Assert.assertTrue(value.get() > 0);
+  }
 
-	@Test
-	public void testOverrideAgentFactoryTwice() {
-		Config config = ConfigUtils.createConfig();
-		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setLastIteration(0);
+  @Test
+  public void testOverrideAgentFactoryTwice() {
+    Config config = ConfigUtils.createConfig();
+    config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+    config.controller().setLastIteration(0);
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+    Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
-		Person person = populationFactory.createPerson(Id.createPersonId("person"));
-		Plan plan =  populationFactory.createPlan();
-		plan.addActivity( populationFactory.createActivityFromLinkId("type", Id.createLinkId("0")));
-		person.addPlan(plan);
-		scenario.getPopulation().addPerson(person);
+    PopulationFactory populationFactory = scenario.getPopulation().getFactory();
+    Person person = populationFactory.createPerson(Id.createPersonId("person"));
+    Plan plan = populationFactory.createPlan();
+    plan.addActivity(populationFactory.createActivityFromLinkId("type", Id.createLinkId("0")));
+    person.addPlan(plan);
+    scenario.getPopulation().addPerson(person);
 
-		AtomicLong value1 = new AtomicLong(0);
-		AtomicLong value2 = new AtomicLong(0);
+    AtomicLong value1 = new AtomicLong(0);
+    AtomicLong value2 = new AtomicLong(0);
 
-		Controler controler = new Controler(scenario);
-		controler.addOverridingQSimModule(new TestQSimModule(value1));
-		controler.addOverridingQSimModule(new TestQSimModule(value2));
-		controler.run();
+    Controler controler = new Controler(scenario);
+    controler.addOverridingQSimModule(new TestQSimModule(value1));
+    controler.addOverridingQSimModule(new TestQSimModule(value2));
+    controler.run();
 
-		Assert.assertTrue(value1.get() == 0);
-		Assert.assertTrue(value2.get() > 0);
-	}
+    Assert.assertTrue(value1.get() == 0);
+    Assert.assertTrue(value2.get() > 0);
+  }
 
-	private class TestQSimModule extends AbstractQSimModule {
-		private final AtomicLong value;
+  private class TestQSimModule extends AbstractQSimModule {
+    private final AtomicLong value;
 
-		public TestQSimModule(AtomicLong value) {
-			this.value = value;
-		}
+    public TestQSimModule(AtomicLong value) {
+      this.value = value;
+    }
 
-		@Override
-		protected void configureQSim() {
-			bind(AtomicLong.class).toInstance(value);
-			bind(AgentFactory.class).to(TestAgentFactory.class).asEagerSingleton();
-		}
-	}
+    @Override
+    protected void configureQSim() {
+      bind(AtomicLong.class).toInstance(value);
+      bind(AgentFactory.class).to(TestAgentFactory.class).asEagerSingleton();
+    }
+  }
 
-	static private class TestAgentFactory implements AgentFactory {
-		private final AgentFactory delegate;
-		private final AtomicLong value;
+  private static class TestAgentFactory implements AgentFactory {
+    private final AgentFactory delegate;
+    private final AtomicLong value;
 
-		@Inject
-		public TestAgentFactory(Netsim simulation, AtomicLong value, TimeInterpretation timeInterpretation) {
-			delegate = new DefaultAgentFactory(simulation, timeInterpretation);
-			this.value = value;
-		}
+    @Inject
+    public TestAgentFactory(
+        Netsim simulation, AtomicLong value, TimeInterpretation timeInterpretation) {
+      delegate = new DefaultAgentFactory(simulation, timeInterpretation);
+      this.value = value;
+    }
 
-		@Override
-		public MobsimAgent createMobsimAgentFromPerson(Person p) {
-			value.incrementAndGet();
-			return delegate.createMobsimAgentFromPerson(p);
-		}
-	}
+    @Override
+    public MobsimAgent createMobsimAgentFromPerson(Person p) {
+      value.incrementAndGet();
+      return delegate.createMobsimAgentFromPerson(p);
+    }
+  }
 
-	@Test
-	public void testAddEngine() {
-		Config config = ConfigUtils.createConfig();
-		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setLastIteration(0);
+  @Test
+  public void testAddEngine() {
+    Config config = ConfigUtils.createConfig();
+    config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+    config.controller().setLastIteration(0);
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+    Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		TestEngine engine = new TestEngine();
+    TestEngine engine = new TestEngine();
 
-		Controler controler = new Controler(scenario);
+    Controler controler = new Controler(scenario);
 
-		controler.addOverridingQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				addQSimComponentBinding("MyEngine").toInstance(engine);
-			}
-		});
+    controler.addOverridingQSimModule(
+        new AbstractQSimModule() {
+          @Override
+          protected void configureQSim() {
+            addQSimComponentBinding("MyEngine").toInstance(engine);
+          }
+        });
 
-		controler.configureQSimComponents(components -> {
-			components.addNamedComponent("MyEngine");
-		});
+    controler.configureQSimComponents(
+        components -> {
+          components.addNamedComponent("MyEngine");
+        });
 
-		controler.run();
+    controler.run();
 
-		Assert.assertTrue(engine.called);
-	}
+    Assert.assertTrue(engine.called);
+  }
 
-	static private class TestEngine implements MobsimEngine {
-		public boolean called = false;
+  private static class TestEngine implements MobsimEngine {
+    public boolean called = false;
 
-		@Override
-		public void doSimStep(double time) {
-			called = true;
-		}
+    @Override
+    public void doSimStep(double time) {
+      called = true;
+    }
 
-		@Override
-		public void onPrepareSim() {
-		}
+    @Override
+    public void onPrepareSim() {}
 
-		@Override
-		public void afterSim() {
-		}
+    @Override
+    public void afterSim() {}
 
-		@Override
-		public void setInternalInterface(InternalInterface internalInterface) {
-		}
-	}
+    @Override
+    public void setInternalInterface(InternalInterface internalInterface) {}
+  }
 }

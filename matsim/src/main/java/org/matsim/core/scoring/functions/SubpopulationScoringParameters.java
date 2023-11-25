@@ -18,73 +18,83 @@
  * *********************************************************************** */
 package org.matsim.core.scoring.functions;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.groups.ScoringConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.ScenarioConfigGroup;
-import org.matsim.core.population.PopulationUtils;
-import org.matsim.pt.PtConstants;
-import org.matsim.pt.config.TransitConfigGroup;
-
 import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.pt.PtConstants;
+import org.matsim.pt.config.TransitConfigGroup;
 
 /**
  * @author thibautd
  */
 public class SubpopulationScoringParameters implements ScoringParametersForPerson {
-	private final ScoringConfigGroup config;
-	private final ScenarioConfigGroup scConfig;
-	private final TransitConfigGroup transitConfigGroup;
-	private final Map<String, ScoringParameters> params = new HashMap<>();
-	private final Population population;
+  private final ScoringConfigGroup config;
+  private final ScenarioConfigGroup scConfig;
+  private final TransitConfigGroup transitConfigGroup;
+  private final Map<String, ScoringParameters> params = new HashMap<>();
+  private final Population population;
 
-	@Inject
-	SubpopulationScoringParameters(PlansConfigGroup plansConfigGroup, ScoringConfigGroup scoringConfigGroup, ScenarioConfigGroup scenarioConfigGroup, Population population, TransitConfigGroup transitConfigGroup) {
-		this.config = scoringConfigGroup;
-		this.scConfig = scenarioConfigGroup;
-		this.transitConfigGroup = transitConfigGroup;
-		this.population = population ;
-	}
+  @Inject
+  SubpopulationScoringParameters(
+      PlansConfigGroup plansConfigGroup,
+      ScoringConfigGroup scoringConfigGroup,
+      ScenarioConfigGroup scenarioConfigGroup,
+      Population population,
+      TransitConfigGroup transitConfigGroup) {
+    this.config = scoringConfigGroup;
+    this.scConfig = scenarioConfigGroup;
+    this.transitConfigGroup = transitConfigGroup;
+    this.population = population;
+  }
 
-	public SubpopulationScoringParameters(Scenario scenario) {
-		this(scenario.getConfig().plans(), scenario.getConfig().scoring(), scenario.getConfig().scenario(), scenario.getPopulation(), scenario.getConfig().transit());
-	}
+  public SubpopulationScoringParameters(Scenario scenario) {
+    this(
+        scenario.getConfig().plans(),
+        scenario.getConfig().scoring(),
+        scenario.getConfig().scenario(),
+        scenario.getPopulation(),
+        scenario.getConfig().transit());
+  }
 
-	@Override
-	public ScoringParameters getScoringParameters(Person person) {
-//		final String subpopulation = (String) PopulationUtils.getPersonAttribute( person, subpopulationAttributeName) ;
-		final String subpopulation = PopulationUtils.getSubpopulation( person );
+  @Override
+  public ScoringParameters getScoringParameters(Person person) {
+    //		final String subpopulation = (String) PopulationUtils.getPersonAttribute( person,
+    // subpopulationAttributeName) ;
+    final String subpopulation = PopulationUtils.getSubpopulation(person);
 
-		if (!this.params.containsKey(subpopulation)) {
-			/* lazy initialization of params. not strictly thread safe, as different threads could
-			 * end up with different params-object, although all objects will have the same
-			 * values in them due to using the same config. Still much better from a memory performance
-			 * point of view than giving each ScoringFunction its own copy of the params.
-			 */
-			ScoringParameters.Builder builder = new ScoringParameters.Builder(this.config, this.config.getScoringParameters(subpopulation), scConfig);
-			if (transitConfigGroup.isUseTransit()) {
-				// yyyy this should go away somehow. :-)
+    if (!this.params.containsKey(subpopulation)) {
+      /* lazy initialization of params. not strictly thread safe, as different threads could
+       * end up with different params-object, although all objects will have the same
+       * values in them due to using the same config. Still much better from a memory performance
+       * point of view than giving each ScoringFunction its own copy of the params.
+       */
+      ScoringParameters.Builder builder =
+          new ScoringParameters.Builder(
+              this.config, this.config.getScoringParameters(subpopulation), scConfig);
+      if (transitConfigGroup.isUseTransit()) {
+        // yyyy this should go away somehow. :-)
 
+        ScoringConfigGroup.ActivityParams transitActivityParams =
+            new ScoringConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
+        transitActivityParams.setTypicalDuration(120.0);
+        transitActivityParams.setOpeningTime(0.);
+        transitActivityParams.setClosingTime(0.);
+        ActivityUtilityParameters.Builder modeParamsBuilder =
+            new ActivityUtilityParameters.Builder(transitActivityParams);
+        modeParamsBuilder.setScoreAtAll(false);
+        builder.setActivityParameters(PtConstants.TRANSIT_ACTIVITY_TYPE, modeParamsBuilder.build());
+      }
 
+      this.params.put(subpopulation, builder.build());
+    }
 
-				ScoringConfigGroup.ActivityParams transitActivityParams = new ScoringConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
-				transitActivityParams.setTypicalDuration(120.0);
-				transitActivityParams.setOpeningTime(0.) ;
-				transitActivityParams.setClosingTime(0.) ;
-				ActivityUtilityParameters.Builder modeParamsBuilder = new ActivityUtilityParameters.Builder(transitActivityParams);
-				modeParamsBuilder.setScoreAtAll(false);
-				builder.setActivityParameters(PtConstants.TRANSIT_ACTIVITY_TYPE, modeParamsBuilder.build());
-			}
-
-			this.params.put(
-					subpopulation,
-					builder.build());
-		}
-
-		return this.params.get(subpopulation);
-	}
+    return this.params.get(subpopulation);
+  }
 }

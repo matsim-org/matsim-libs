@@ -25,29 +25,29 @@ import java.io.IOException;
 
 interface MatricesWriterHandler {
 
-	//////////////////////////////////////////////////////////////////////
-	// <matrices ... > ... </matrices>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <matrices ... > ... </matrices>
+  //////////////////////////////////////////////////////////////////////
 
-	public void startMatrices(final Matrices matrices, final BufferedWriter out) throws IOException;
+  public void startMatrices(final Matrices matrices, final BufferedWriter out) throws IOException;
 
-	public void endMatrices(final BufferedWriter out) throws IOException;
+  public void endMatrices(final BufferedWriter out) throws IOException;
 
-	//////////////////////////////////////////////////////////////////////
-	// <matrix ... > ... </matrix>
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <matrix ... > ... </matrix>
+  //////////////////////////////////////////////////////////////////////
 
-	public void startMatrix(final Matrix matrix, final BufferedWriter out) throws IOException;
+  public void startMatrix(final Matrix matrix, final BufferedWriter out) throws IOException;
 
-	public void endMatrix(final BufferedWriter out) throws IOException;
+  public void endMatrix(final BufferedWriter out) throws IOException;
 
-	//////////////////////////////////////////////////////////////////////
-	// <entry ... />
-	//////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // <entry ... />
+  //////////////////////////////////////////////////////////////////////
 
-	public void startEntry(final Entry entry, final BufferedWriter out) throws IOException;
+  public void startEntry(final Entry entry, final BufferedWriter out) throws IOException;
 
-	public void endEntry(final BufferedWriter out) throws IOException;
-	
-	public void writeSeparator(final BufferedWriter out) throws IOException;
+  public void endEntry(final BufferedWriter out) throws IOException;
+
+  public void writeSeparator(final BufferedWriter out) throws IOException;
 }

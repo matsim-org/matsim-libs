@@ -21,7 +21,6 @@ package org.matsim.contrib.taxi.optimizer.rules;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.stream.Stream;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -39,112 +38,137 @@ import org.matsim.core.router.util.TravelTime;
  * @author michalm
  */
 public class RuleBasedRequestInserter implements UnplannedRequestInserter {
-	private final TaxiScheduler scheduler;
-	private final BestDispatchFinder dispatchFinder;
-	private final MobsimTimer timer;
+  private final TaxiScheduler scheduler;
+  private final BestDispatchFinder dispatchFinder;
+  private final MobsimTimer timer;
 
-	private final IdleTaxiZonalRegistry idleTaxiRegistry;
-	private final UnplannedRequestZonalRegistry unplannedRequestRegistry;
+  private final IdleTaxiZonalRegistry idleTaxiRegistry;
+  private final UnplannedRequestZonalRegistry unplannedRequestRegistry;
 
-	private final RuleBasedTaxiOptimizerParams params;
+  private final RuleBasedTaxiOptimizerParams params;
 
-	public RuleBasedRequestInserter(TaxiScheduler scheduler, MobsimTimer timer, Network network, TravelTime travelTime,
-			TravelDisutility travelDisutility, RuleBasedTaxiOptimizerParams params, ZonalRegisters zonalRegisters) {
-		this(scheduler, timer,
-				new BestDispatchFinder(scheduler.getScheduleInquiry(), network, timer, travelTime, travelDisutility),
-				params, zonalRegisters);
-	}
+  public RuleBasedRequestInserter(
+      TaxiScheduler scheduler,
+      MobsimTimer timer,
+      Network network,
+      TravelTime travelTime,
+      TravelDisutility travelDisutility,
+      RuleBasedTaxiOptimizerParams params,
+      ZonalRegisters zonalRegisters) {
+    this(
+        scheduler,
+        timer,
+        new BestDispatchFinder(
+            scheduler.getScheduleInquiry(), network, timer, travelTime, travelDisutility),
+        params,
+        zonalRegisters);
+  }
 
-	public RuleBasedRequestInserter(TaxiScheduler scheduler, MobsimTimer timer, BestDispatchFinder dispatchFinder,
-			RuleBasedTaxiOptimizerParams params, ZonalRegisters zonalRegisters) {
-		this.scheduler = scheduler;
-		this.timer = timer;
-		this.params = params;
-		this.dispatchFinder = dispatchFinder;
-		this.idleTaxiRegistry = zonalRegisters.idleTaxiRegistry;
-		this.unplannedRequestRegistry = zonalRegisters.unplannedRequestRegistry;
-	}
+  public RuleBasedRequestInserter(
+      TaxiScheduler scheduler,
+      MobsimTimer timer,
+      BestDispatchFinder dispatchFinder,
+      RuleBasedTaxiOptimizerParams params,
+      ZonalRegisters zonalRegisters) {
+    this.scheduler = scheduler;
+    this.timer = timer;
+    this.params = params;
+    this.dispatchFinder = dispatchFinder;
+    this.idleTaxiRegistry = zonalRegisters.idleTaxiRegistry;
+    this.unplannedRequestRegistry = zonalRegisters.unplannedRequestRegistry;
+  }
 
-	@Override
-	public void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests) {
-		if (isReduceTP(unplannedRequests)) {
-			scheduleIdleVehiclesImpl(unplannedRequests);// reduce T_P to increase throughput (demand > supply)
-		} else {
-			scheduleUnplannedRequestsImpl(unplannedRequests);// reduce T_W (regular NOS)
-		}
-	}
+  @Override
+  public void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests) {
+    if (isReduceTP(unplannedRequests)) {
+      scheduleIdleVehiclesImpl(
+          unplannedRequests); // reduce T_P to increase throughput (demand > supply)
+    } else {
+      scheduleUnplannedRequestsImpl(unplannedRequests); // reduce T_W (regular NOS)
+    }
+  }
 
-	public enum Goal {
-		MIN_WAIT_TIME, MIN_PICKUP_TIME, DEMAND_SUPPLY_EQUIL
-	}
+  public enum Goal {
+    MIN_WAIT_TIME,
+    MIN_PICKUP_TIME,
+    DEMAND_SUPPLY_EQUIL
+  }
 
-	private boolean isReduceTP(Collection<DrtRequest> unplannedRequests) {
-		return switch (params.goal) {
-			case MIN_PICKUP_TIME -> true;
+  private boolean isReduceTP(Collection<DrtRequest> unplannedRequests) {
+    return switch (params.goal) {
+      case MIN_PICKUP_TIME -> true;
 
-			case MIN_WAIT_TIME -> false;
+      case MIN_WAIT_TIME -> false;
 
-			case DEMAND_SUPPLY_EQUIL -> {
-				double now = timer.getTimeOfDay();
-				long awaitingReqCount = unplannedRequests.stream()
-						.filter(r -> ((PassengerRequest)r).getEarliestStartTime() <= now)//urgent requests
-						.count();
-				yield awaitingReqCount > idleTaxiRegistry.getVehicleCount();}
-		};
-	}
+      case DEMAND_SUPPLY_EQUIL -> {
+        double now = timer.getTimeOfDay();
+        long awaitingReqCount =
+            unplannedRequests.stream()
+                .filter(
+                    r -> ((PassengerRequest) r).getEarliestStartTime() <= now) // urgent requests
+                .count();
+        yield awaitingReqCount > idleTaxiRegistry.getVehicleCount();
+      }
+    };
+  }
 
-	// request-initiated scheduling
-	private void scheduleUnplannedRequestsImpl(Collection<DrtRequest> unplannedRequests) {
-		// vehicles are not immediately removed so calculate 'idleCount' locally
-		int idleCount = idleTaxiRegistry.getVehicleCount();
-		int nearestVehiclesLimit = params.nearestVehiclesLimit;
+  // request-initiated scheduling
+  private void scheduleUnplannedRequestsImpl(Collection<DrtRequest> unplannedRequests) {
+    // vehicles are not immediately removed so calculate 'idleCount' locally
+    int idleCount = idleTaxiRegistry.getVehicleCount();
+    int nearestVehiclesLimit = params.nearestVehiclesLimit;
 
-		Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
-		while (reqIter.hasNext() && idleCount > 0) {
-			DrtRequest req = reqIter.next();
+    Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
+    while (reqIter.hasNext() && idleCount > 0) {
+      DrtRequest req = reqIter.next();
 
-			Stream<DvrpVehicle> selectedVehs = idleCount > nearestVehiclesLimit ?
-					idleTaxiRegistry.findNearestVehicles(req.getFromLink().getFromNode(), nearestVehiclesLimit) :
-					idleTaxiRegistry.vehicles();
+      Stream<DvrpVehicle> selectedVehs =
+          idleCount > nearestVehiclesLimit
+              ? idleTaxiRegistry.findNearestVehicles(
+                  req.getFromLink().getFromNode(), nearestVehiclesLimit)
+              : idleTaxiRegistry.vehicles();
 
-			BestDispatchFinder.Dispatch<DrtRequest> best = dispatchFinder.findBestVehicleForRequest(req, selectedVehs);
-			if (best == null) {
-				// XXX NOTE:
-				// There may be no idle vehicle in the registry despite idleCount > 0
-				// Some vehicles may not be idle because they have been assigned another customer,
-				// while for others the time window ends (t1).
-				// Their statuses will be updated in this time step (we are just before the sim step,
-				// triggered by a MobsimBeforeSimStepEvent). Consequently, they will be
-				// removed from this registry, but till then they are there.
-				return;
-			}
+      BestDispatchFinder.Dispatch<DrtRequest> best =
+          dispatchFinder.findBestVehicleForRequest(req, selectedVehs);
+      if (best == null) {
+        // XXX NOTE:
+        // There may be no idle vehicle in the registry despite idleCount > 0
+        // Some vehicles may not be idle because they have been assigned another customer,
+        // while for others the time window ends (t1).
+        // Their statuses will be updated in this time step (we are just before the sim step,
+        // triggered by a MobsimBeforeSimStepEvent). Consequently, they will be
+        // removed from this registry, but till then they are there.
+        return;
+      }
 
-			scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
+      scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
 
-			reqIter.remove();
-			unplannedRequestRegistry.removeRequest(req);
-			idleCount--;
-		}
-	}
+      reqIter.remove();
+      unplannedRequestRegistry.removeRequest(req);
+      idleCount--;
+    }
+  }
 
-	// vehicle-initiated scheduling
-	private void scheduleIdleVehiclesImpl(Collection<DrtRequest> unplannedRequests) {
-		int nearestRequestsLimit = params.nearestRequestsLimit;
-		Iterator<DvrpVehicle> vehIter = idleTaxiRegistry.vehicles().iterator();
-		while (vehIter.hasNext() && !unplannedRequests.isEmpty()) {
-			DvrpVehicle veh = vehIter.next();
-			Link link = ((TaxiStayTask)veh.getSchedule().getCurrentTask()).getLink();
+  // vehicle-initiated scheduling
+  private void scheduleIdleVehiclesImpl(Collection<DrtRequest> unplannedRequests) {
+    int nearestRequestsLimit = params.nearestRequestsLimit;
+    Iterator<DvrpVehicle> vehIter = idleTaxiRegistry.vehicles().iterator();
+    while (vehIter.hasNext() && !unplannedRequests.isEmpty()) {
+      DvrpVehicle veh = vehIter.next();
+      Link link = ((TaxiStayTask) veh.getSchedule().getCurrentTask()).getLink();
 
-			Stream<DrtRequest> selectedReqs = unplannedRequests.size() > nearestRequestsLimit ?
-					unplannedRequestRegistry.findNearestRequests(link.getToNode(), nearestRequestsLimit) :
-					unplannedRequests.stream();
+      Stream<DrtRequest> selectedReqs =
+          unplannedRequests.size() > nearestRequestsLimit
+              ? unplannedRequestRegistry.findNearestRequests(link.getToNode(), nearestRequestsLimit)
+              : unplannedRequests.stream();
 
-			BestDispatchFinder.Dispatch<DrtRequest> best = dispatchFinder.findBestRequestForVehicle(veh, selectedReqs);
+      BestDispatchFinder.Dispatch<DrtRequest> best =
+          dispatchFinder.findBestRequestForVehicle(veh, selectedReqs);
 
-			scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
+      scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
 
-			unplannedRequests.remove(best.destination);
-			unplannedRequestRegistry.removeRequest(best.destination);
-		}
-	}
+      unplannedRequests.remove(best.destination);
+      unplannedRequestRegistry.removeRequest(best.destination);
+    }
+  }
 }

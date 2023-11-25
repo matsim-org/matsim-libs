@@ -20,6 +20,4 @@
 
 package org.matsim.core.controler;
 
-public interface ControlerI extends Runnable {
-
-}
+public interface ControlerI extends Runnable {}

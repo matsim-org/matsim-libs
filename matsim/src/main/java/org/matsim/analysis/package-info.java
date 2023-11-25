@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * package-info.java
@@ -19,7 +18,5 @@
  *                                                                         *
  * *********************************************************************** */
 
- /**
- * Every class maintained by its author.
- */
+/** Every class maintained by its author. */
 package org.matsim.analysis;

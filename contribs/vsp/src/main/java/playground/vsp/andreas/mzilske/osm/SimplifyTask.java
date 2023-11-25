@@ -19,6 +19,9 @@
 
 package playground.vsp.andreas.mzilske.osm;
 
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 import org.openstreetmap.osmosis.core.container.v0_6.BoundContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityProcessor;
@@ -36,201 +39,174 @@ import org.openstreetmap.osmosis.core.store.SingleClassObjectSerializationFactor
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 import org.openstreetmap.osmosis.core.task.v0_6.SinkSource;
 
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-
 public class SimplifyTask implements SinkSource, EntityProcessor {
 
-	private Sink sink;
+  private Sink sink;
 
-	private IdTracker visitedNodes;
+  private IdTracker visitedNodes;
 
-	private IdTracker requiredNodes;
+  private IdTracker requiredNodes;
 
-	private SimpleObjectStore<NodeContainer> allNodes;
-	
-	private SimpleObjectStore<WayContainer> allWays;
+  private SimpleObjectStore<NodeContainer> allNodes;
 
-	private int count = 0; // just for debug stats
+  private SimpleObjectStore<WayContainer> allWays;
 
-	private IdTracker availableNodes;
+  private int count = 0; // just for debug stats
 
-	/**
-	 * Creates a new instance.
-	 * 
-	 * @param idTrackerType
-	 *            Defines the id tracker implementation to use.
-	 */
-	public SimplifyTask(IdTrackerType idTrackerType) {
-		requiredNodes = IdTrackerFactory.createInstance(idTrackerType);
-		visitedNodes = IdTrackerFactory.createInstance(idTrackerType);
-		availableNodes = IdTrackerFactory.createInstance(idTrackerType);
-		allNodes = new SimpleObjectStore<NodeContainer>(
-				new SingleClassObjectSerializationFactory(NodeContainer.class),
-				"afnd", true);
-		allWays = new SimpleObjectStore<WayContainer>(
-				new SingleClassObjectSerializationFactory(WayContainer.class),
-				"afwy", true);
-		
-	}
+  private IdTracker availableNodes;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void process(EntityContainer entityContainer) {
-		// Ask the entity container to invoke the appropriate processing method
-		// for the entity type.
-		entityContainer.process(this);
-	}
+  /**
+   * Creates a new instance.
+   *
+   * @param idTrackerType Defines the id tracker implementation to use.
+   */
+  public SimplifyTask(IdTrackerType idTrackerType) {
+    requiredNodes = IdTrackerFactory.createInstance(idTrackerType);
+    visitedNodes = IdTrackerFactory.createInstance(idTrackerType);
+    availableNodes = IdTrackerFactory.createInstance(idTrackerType);
+    allNodes =
+        new SimpleObjectStore<NodeContainer>(
+            new SingleClassObjectSerializationFactory(NodeContainer.class), "afnd", true);
+    allWays =
+        new SimpleObjectStore<WayContainer>(
+            new SingleClassObjectSerializationFactory(WayContainer.class), "afwy", true);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void process(BoundContainer boundContainer) {
-		// pass on the bounds information unchanged
-		sink.process(boundContainer);
-	}
+  /** {@inheritDoc} */
+  @Override
+  public void process(EntityContainer entityContainer) {
+    // Ask the entity container to invoke the appropriate processing method
+    // for the entity type.
+    entityContainer.process(this);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void process(NodeContainer container) {
+  /** {@inheritDoc} */
+  @Override
+  public void process(BoundContainer boundContainer) {
+    // pass on the bounds information unchanged
+    sink.process(boundContainer);
+  }
 
-		// stuff all nodes into a file
-		availableNodes.set(container.getEntity().getId());
-		allNodes.add(container);
+  /** {@inheritDoc} */
+  @Override
+  public void process(NodeContainer container) {
 
-		// debug
-		count++;
-		if (count % 50000 == 0)
-			System.out.println(count + " nodes processed so far");
-	}
+    // stuff all nodes into a file
+    availableNodes.set(container.getEntity().getId());
+    allNodes.add(container);
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void process(WayContainer container) {
-		Way way = container.getEntity();
-		List<WayNode> wayNodes = way.getWayNodes();
-		if (wayNodes.size() < 2) {
-		
-		} else {
-			WayNode startNode = wayNodes.get(0);
-			WayNode endNode = wayNodes.get(wayNodes.size()-1);
+    // debug
+    count++;
+    if (count % 50000 == 0) System.out.println(count + " nodes processed so far");
+  }
 
-			requiredNodes.set(startNode.getNodeId());
-			requiredNodes.set(endNode.getNodeId());
-			
-			for (WayNode wayNode : wayNodes) {
-				long nodeId = wayNode.getNodeId();
-				if (visitedNodes.get(nodeId)) {
-					requiredNodes.set(nodeId);
-				}
-				visitedNodes.set(nodeId);
-			}
+  /** {@inheritDoc} */
+  @Override
+  public void process(WayContainer container) {
+    Way way = container.getEntity();
+    List<WayNode> wayNodes = way.getWayNodes();
+    if (wayNodes.size() < 2) {
 
-			int prevRealNodeIndex = 0;
-			WayNode prevRealNode = wayNodes.get(prevRealNodeIndex);
-			for (int i = 1; i < wayNodes.size(); i++) {
-				WayNode node = wayNodes.get(i);
-				if (requiredNodes.get(node.getNodeId())) {
-					if (prevRealNode.getNodeId() == node.getNodeId()) {
-						/* We detected a loop between to "real" nodes.
-						 * Set some nodes between the start/end-loop-node to "used" again.
-						 * But don't set all of them to "used", as we still want to do some network-thinning.
-						 * I decided to use sqrt(.)-many nodes in between...
-						 */
-						double increment = Math.sqrt(i - prevRealNodeIndex);
-						double nextNodeToKeep = prevRealNodeIndex + increment;
-						for (double j = nextNodeToKeep; j < i; j += increment) {
-							int index = (int) Math.floor(j);
-							WayNode intermediaryNode = wayNodes.get(index);
-							requiredNodes.set(intermediaryNode.getNodeId());
-						}
-					}
-					prevRealNodeIndex = i;
-					prevRealNode = node;
-				}
-			}
+    } else {
+      WayNode startNode = wayNodes.get(0);
+      WayNode endNode = wayNodes.get(wayNodes.size() - 1);
 
-			
-		}
-		allWays.add(container);
-	}
+      requiredNodes.set(startNode.getNodeId());
+      requiredNodes.set(endNode.getNodeId());
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void process(RelationContainer container) {
-		// Do nothing (Drop all relations)
-	}
+      for (WayNode wayNode : wayNodes) {
+        long nodeId = wayNode.getNodeId();
+        if (visitedNodes.get(nodeId)) {
+          requiredNodes.set(nodeId);
+        }
+        visitedNodes.set(nodeId);
+      }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void complete() {
-		ReleasableIterator<NodeContainer> nodeIterator;
-		ReleasableIterator<WayContainer> wayIterator;
-		NodeContainer nodeContainer;
-		long nodeId;
+      int prevRealNodeIndex = 0;
+      WayNode prevRealNode = wayNodes.get(prevRealNodeIndex);
+      for (int i = 1; i < wayNodes.size(); i++) {
+        WayNode node = wayNodes.get(i);
+        if (requiredNodes.get(node.getNodeId())) {
+          if (prevRealNode.getNodeId() == node.getNodeId()) {
+            /* We detected a loop between to "real" nodes.
+             * Set some nodes between the start/end-loop-node to "used" again.
+             * But don't set all of them to "used", as we still want to do some network-thinning.
+             * I decided to use sqrt(.)-many nodes in between...
+             */
+            double increment = Math.sqrt(i - prevRealNodeIndex);
+            double nextNodeToKeep = prevRealNodeIndex + increment;
+            for (double j = nextNodeToKeep; j < i; j += increment) {
+              int index = (int) Math.floor(j);
+              WayNode intermediaryNode = wayNodes.get(index);
+              requiredNodes.set(intermediaryNode.getNodeId());
+            }
+          }
+          prevRealNodeIndex = i;
+          prevRealNode = node;
+        }
+      }
+    }
+    allWays.add(container);
+  }
 
-		// Send on only the required nodes
-		nodeIterator = allNodes.iterate();
-		while (nodeIterator.hasNext()) {
-			nodeContainer = nodeIterator.next();
-			nodeId = nodeContainer.getEntity().getId();
+  /** {@inheritDoc} */
+  @Override
+  public void process(RelationContainer container) {
+    // Do nothing (Drop all relations)
+  }
 
-			if (requiredNodes.get(nodeId)) {
-				sink.process(nodeContainer);
-			}
-		}
-		nodeIterator.close();
-		
-		wayIterator = allWays.iterate();
-		while (wayIterator.hasNext()) {
-			WayContainer wayContainer = wayIterator.next();
-			Way way = wayContainer.getEntity().getWriteableInstance();
-			ListIterator<WayNode> i = way.getWayNodes().listIterator();
-			while (i.hasNext()) {
-				WayNode wayNode = i.next();
-				if (!requiredNodes.get(wayNode.getNodeId()) || !availableNodes.get(wayNode.getNodeId())) {
-					i.remove();
-				}
-			}
-			sink.process(wayContainer);
-		}
-		wayIterator.close();
-		
-		sink.complete();
-	}
+  /** {@inheritDoc} */
+  @Override
+  public void complete() {
+    ReleasableIterator<NodeContainer> nodeIterator;
+    ReleasableIterator<WayContainer> wayIterator;
+    NodeContainer nodeContainer;
+    long nodeId;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void close() {
-		allNodes.close();
-		allWays.close();
-		sink.close();
-	}
+    // Send on only the required nodes
+    nodeIterator = allNodes.iterate();
+    while (nodeIterator.hasNext()) {
+      nodeContainer = nodeIterator.next();
+      nodeId = nodeContainer.getEntity().getId();
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setSink(Sink sink) {
-		this.sink = sink;
-	}
+      if (requiredNodes.get(nodeId)) {
+        sink.process(nodeContainer);
+      }
+    }
+    nodeIterator.close();
 
-	@Override
-	public void initialize(Map<String, Object> map) {
+    wayIterator = allWays.iterate();
+    while (wayIterator.hasNext()) {
+      WayContainer wayContainer = wayIterator.next();
+      Way way = wayContainer.getEntity().getWriteableInstance();
+      ListIterator<WayNode> i = way.getWayNodes().listIterator();
+      while (i.hasNext()) {
+        WayNode wayNode = i.next();
+        if (!requiredNodes.get(wayNode.getNodeId()) || !availableNodes.get(wayNode.getNodeId())) {
+          i.remove();
+        }
+      }
+      sink.process(wayContainer);
+    }
+    wayIterator.close();
 
-	}
+    sink.complete();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void close() {
+    allNodes.close();
+    allWays.close();
+    sink.close();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void setSink(Sink sink) {
+    this.sink = sink;
+  }
+
+  @Override
+  public void initialize(Map<String, Object> map) {}
 }

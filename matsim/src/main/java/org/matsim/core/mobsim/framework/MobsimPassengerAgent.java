@@ -20,6 +20,4 @@
 
 package org.matsim.core.mobsim.framework;
 
-public interface MobsimPassengerAgent extends MobsimAgent, PassengerAgent {
-
-}
+public interface MobsimPassengerAgent extends MobsimAgent, PassengerAgent {}

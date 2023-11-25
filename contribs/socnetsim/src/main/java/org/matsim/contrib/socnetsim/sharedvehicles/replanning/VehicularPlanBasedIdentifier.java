@@ -19,23 +19,19 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.sharedvehicles.replanning;
 
+import java.util.Collections;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import org.matsim.contrib.socnetsim.sharedvehicles.SharedVehicleUtils;
-
-import java.util.Collections;
 
 /**
  * @author thibautd
  */
 public final class VehicularPlanBasedIdentifier implements PlanLinkIdentifier {
-	@Override
-	public boolean areLinked(
-			final Plan p1,
-			final Plan p2) {
-		return !Collections.disjoint(
-			SharedVehicleUtils.getVehiclesInPlan( p1 , SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) ,
-			SharedVehicleUtils.getVehiclesInPlan( p2 , SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) );
-	}
+  @Override
+  public boolean areLinked(final Plan p1, final Plan p2) {
+    return !Collections.disjoint(
+        SharedVehicleUtils.getVehiclesInPlan(p1, SharedVehicleUtils.DEFAULT_VEHICULAR_MODES),
+        SharedVehicleUtils.getVehiclesInPlan(p2, SharedVehicleUtils.DEFAULT_VEHICULAR_MODES));
+  }
 }
-

@@ -21,7 +21,6 @@ package org.matsim.core.population.io;
 
 import java.util.ArrayList;
 import java.util.Stack;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -53,347 +52,381 @@ import org.xml.sax.Attributes;
  * @author mrieser
  * @author balmermi
  */
-/* deliberately package */ class PopulationReaderMatsimV5 extends MatsimXmlParser implements MatsimReader {
+/* deliberately package */ class PopulationReaderMatsimV5 extends MatsimXmlParser
+    implements MatsimReader {
 
-	private final static String POPULATION = "population";
-	private final static String PERSON = "person";
-	private final static String PLAN = "plan";
-	private final static String ACT = "act";
-	private final static String LEG = "leg";
-	private final static String ROUTE = "route";
+  private static final String POPULATION = "population";
+  private static final String PERSON = "person";
+  private static final String PLAN = "plan";
+  private static final String ACT = "act";
+  private static final String LEG = "leg";
+  private static final String ROUTE = "route";
 
-	private final static String ATTR_POPULATION_DESC = "desc";
-	private final static String ATTR_PERSON_ID = "id";
-	private final static String ATTR_PERSON_SEX = "sex";
-	private final static String ATTR_PERSON_AGE = "age";
-	private final static String ATTR_PERSON_LICENSE = "license";
-	private final static String ATTR_PERSON_CARAVAIL = "car_avail";
-	private final static String ATTR_PERSON_EMPLOYED = "employed";
-	private final static String ATTR_PLAN_SCORE = "score";
-	private final static String ATTR_PLAN_TYPE = "type";
-	private final static String ATTR_PLAN_SELECTED = "selected";
-	private final static String ATTR_ACT_TYPE = "type";
-	private final static String ATTR_ACT_X = "x";
-	private final static String ATTR_ACT_Y = "y";
-	private final static String ATTR_ACT_LINK = "link";
-	private final static String ATTR_ACT_FACILITY = "facility";
-	private final static String ATTR_ACT_STARTTIME = "start_time";
-	private final static String ATTR_ACT_ENDTIME = "end_time";
-	private final static String ATTR_ACT_MAXDUR = "max_dur";
-	private final static String ATTR_LEG_MODE = "mode";
-	private final static String ATTR_LEG_DEPTIME = "dep_time";
-	private final static String ATTR_LEG_TRAVTIME = "trav_time";
-//	private final static String ATTR_LEG_ARRTIME = "arr_time";
-	private static final String ATTR_ROUTE_STARTLINK = "start_link";
-	private static final String ATTR_ROUTE_ENDLINK = "end_link";
+  private static final String ATTR_POPULATION_DESC = "desc";
+  private static final String ATTR_PERSON_ID = "id";
+  private static final String ATTR_PERSON_SEX = "sex";
+  private static final String ATTR_PERSON_AGE = "age";
+  private static final String ATTR_PERSON_LICENSE = "license";
+  private static final String ATTR_PERSON_CARAVAIL = "car_avail";
+  private static final String ATTR_PERSON_EMPLOYED = "employed";
+  private static final String ATTR_PLAN_SCORE = "score";
+  private static final String ATTR_PLAN_TYPE = "type";
+  private static final String ATTR_PLAN_SELECTED = "selected";
+  private static final String ATTR_ACT_TYPE = "type";
+  private static final String ATTR_ACT_X = "x";
+  private static final String ATTR_ACT_Y = "y";
+  private static final String ATTR_ACT_LINK = "link";
+  private static final String ATTR_ACT_FACILITY = "facility";
+  private static final String ATTR_ACT_STARTTIME = "start_time";
+  private static final String ATTR_ACT_ENDTIME = "end_time";
+  private static final String ATTR_ACT_MAXDUR = "max_dur";
+  private static final String ATTR_LEG_MODE = "mode";
+  private static final String ATTR_LEG_DEPTIME = "dep_time";
+  private static final String ATTR_LEG_TRAVTIME = "trav_time";
+  //	private final static String ATTR_LEG_ARRTIME = "arr_time";
+  private static final String ATTR_ROUTE_STARTLINK = "start_link";
+  private static final String ATTR_ROUTE_ENDLINK = "end_link";
 
-	private final static String VALUE_YES = "yes";
-	private final static String VALUE_NO = "no";
-	private final static String VALUE_UNDEF = "undef";
+  private static final String VALUE_YES = "yes";
+  private static final String VALUE_NO = "no";
+  private static final String VALUE_UNDEF = "undef";
 
-	private final CoordinateTransformation coordinateTransformation;
+  private final CoordinateTransformation coordinateTransformation;
 
-	private final Scenario scenario;
-	private final Population plans;
+  private final Scenario scenario;
+  private final Population plans;
 
-	private Person currperson = null;
-	private Plan currplan = null;
-	private Activity curract = null;
-	private Leg currleg = null;
-	private Route currRoute = null;
-	private String routeDescription = null;
+  private Person currperson = null;
+  private Plan currplan = null;
+  private Activity curract = null;
+  private Leg currleg = null;
+  private Route currRoute = null;
+  private String routeDescription = null;
 
-	private Activity prevAct = null;
+  private Activity prevAct = null;
 
-	PopulationReaderMatsimV5(final Scenario scenario) {
-		this( new IdentityTransformation() , scenario );
-	}
+  PopulationReaderMatsimV5(final Scenario scenario) {
+    this(new IdentityTransformation(), scenario);
+  }
 
-	PopulationReaderMatsimV5(
-			final CoordinateTransformation coordinateTransformation,
-			final Scenario scenario) {
-		super(ValidationType.DTD_ONLY);
-		this.coordinateTransformation = coordinateTransformation;
-		this.scenario = scenario;
-		this.plans = scenario.getPopulation();
-	}
+  PopulationReaderMatsimV5(
+      final CoordinateTransformation coordinateTransformation, final Scenario scenario) {
+    super(ValidationType.DTD_ONLY);
+    this.coordinateTransformation = coordinateTransformation;
+    this.scenario = scenario;
+    this.plans = scenario.getPopulation();
+  }
 
-	@Override
-	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
-		if (POPULATION.equals(name)) {
-			startPopulation(atts);
-		} else if (PERSON.equals(name)) {
-			startPerson(atts);
-		} else if (PLAN.equals(name)) {
-			startPlan(atts);
-		} else if (ACT.equals(name)) {
-			startAct(atts);
-		} else if (LEG.equals(name)) {
-			startLeg(atts);
-		} else if (ROUTE.equals(name)) {
-			startRoute(atts);
-		} else {
-			throw new RuntimeException(this + "[tag=" + name + " not known or not supported]");
-		}
-	}
+  @Override
+  public void startTag(final String name, final Attributes atts, final Stack<String> context) {
+    if (POPULATION.equals(name)) {
+      startPopulation(atts);
+    } else if (PERSON.equals(name)) {
+      startPerson(atts);
+    } else if (PLAN.equals(name)) {
+      startPlan(atts);
+    } else if (ACT.equals(name)) {
+      startAct(atts);
+    } else if (LEG.equals(name)) {
+      startLeg(atts);
+    } else if (ROUTE.equals(name)) {
+      startRoute(atts);
+    } else {
+      throw new RuntimeException(this + "[tag=" + name + " not known or not supported]");
+    }
+  }
 
-	@Override
-	public void endTag(final String name, final String content, final Stack<String> context) {
-		if (PERSON.equals(name)) {
-			this.plans.addPerson(this.currperson);
-			this.currperson = null;
-		} else if (PLAN.equals(name)) {
-			if (this.currplan.getPlanElements() instanceof ArrayList<?>) {
-				((ArrayList<?>) this.currplan.getPlanElements()).trimToSize();
-			}
-			this.currplan = null;
-		} else if (ACT.equals(name)) {
-			this.prevAct = this.curract;
-			this.curract = null;
-		} else if (ROUTE.equals(name)) {
-			endRoute(content);
-		}
-	}
+  @Override
+  public void endTag(final String name, final String content, final Stack<String> context) {
+    if (PERSON.equals(name)) {
+      this.plans.addPerson(this.currperson);
+      this.currperson = null;
+    } else if (PLAN.equals(name)) {
+      if (this.currplan.getPlanElements() instanceof ArrayList<?>) {
+        ((ArrayList<?>) this.currplan.getPlanElements()).trimToSize();
+      }
+      this.currplan = null;
+    } else if (ACT.equals(name)) {
+      this.prevAct = this.curract;
+      this.curract = null;
+    } else if (ROUTE.equals(name)) {
+      endRoute(content);
+    }
+  }
 
-	private void startPopulation(final Attributes atts) {
-		this.plans.setName(atts.getValue(ATTR_POPULATION_DESC));
-	}
+  private void startPopulation(final Attributes atts) {
+    this.plans.setName(atts.getValue(ATTR_POPULATION_DESC));
+  }
 
-	private void startPerson(final Attributes atts) {
-		String ageString = atts.getValue(ATTR_PERSON_AGE);
-//		int age = Integer.MIN_VALUE;
-		Integer age = null ;
-		if (ageString != null)
-			age = Integer.parseInt(ageString);
-		this.currperson = PopulationUtils.getFactory().createPerson(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
-		PersonUtils.setSex(this.currperson, atts.getValue(ATTR_PERSON_SEX));
-		PersonUtils.setAge(this.currperson, age);
-		PersonUtils.setLicence(this.currperson, atts.getValue(ATTR_PERSON_LICENSE));
-		PersonUtils.setCarAvail(this.currperson, atts.getValue(ATTR_PERSON_CARAVAIL));
-		String employed = atts.getValue(ATTR_PERSON_EMPLOYED);
-		if (employed == null) {
-			PersonUtils.setEmployed(this.currperson, null);
-		} else {
-			PersonUtils.setEmployed(this.currperson, VALUE_YES.equals(employed));
-		}
-	}
+  private void startPerson(final Attributes atts) {
+    String ageString = atts.getValue(ATTR_PERSON_AGE);
+    //		int age = Integer.MIN_VALUE;
+    Integer age = null;
+    if (ageString != null) age = Integer.parseInt(ageString);
+    this.currperson =
+        PopulationUtils.getFactory()
+            .createPerson(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
+    PersonUtils.setSex(this.currperson, atts.getValue(ATTR_PERSON_SEX));
+    PersonUtils.setAge(this.currperson, age);
+    PersonUtils.setLicence(this.currperson, atts.getValue(ATTR_PERSON_LICENSE));
+    PersonUtils.setCarAvail(this.currperson, atts.getValue(ATTR_PERSON_CARAVAIL));
+    String employed = atts.getValue(ATTR_PERSON_EMPLOYED);
+    if (employed == null) {
+      PersonUtils.setEmployed(this.currperson, null);
+    } else {
+      PersonUtils.setEmployed(this.currperson, VALUE_YES.equals(employed));
+    }
+  }
 
-	private void startPlan(final Attributes atts) {
-		String sel = atts.getValue(ATTR_PLAN_SELECTED);
-		boolean selected;
-		if (VALUE_YES.equals(sel)) {
-			selected = true;
-		}
-		else if (VALUE_NO.equals(sel)) {
-			selected = false;
-		}
-		else {
-			throw new IllegalArgumentException(
-					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
-		}
-		this.routeDescription = null;
-		this.currplan = PersonUtils.createAndAddPlan(this.currperson, selected);
+  private void startPlan(final Attributes atts) {
+    String sel = atts.getValue(ATTR_PLAN_SELECTED);
+    boolean selected;
+    if (VALUE_YES.equals(sel)) {
+      selected = true;
+    } else if (VALUE_NO.equals(sel)) {
+      selected = false;
+    } else {
+      throw new IllegalArgumentException(
+          "Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
+    }
+    this.routeDescription = null;
+    this.currplan = PersonUtils.createAndAddPlan(this.currperson, selected);
 
-		String scoreString = atts.getValue(ATTR_PLAN_SCORE);
-		if (scoreString != null) {
-			double score = Double.parseDouble(scoreString);
-			this.currplan.setScore(score);
-		}
+    String scoreString = atts.getValue(ATTR_PLAN_SCORE);
+    if (scoreString != null) {
+      double score = Double.parseDouble(scoreString);
+      this.currplan.setScore(score);
+    }
 
-		String type = atts.getValue(ATTR_PLAN_TYPE);
-		if (type != null) {
-			this.currplan.setType(type);
-		}
-	}
+    String type = atts.getValue(ATTR_PLAN_TYPE);
+    if (type != null) {
+      this.currplan.setType(type);
+    }
+  }
 
-	private void startAct(final Attributes atts) {
-		if (atts.getValue(ATTR_ACT_LINK) != null) {
-			Id<Link> linkId1 = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
-			this.curract = PopulationUtils.createAndAddActivityFromLinkId(this.currplan, atts.getValue(ATTR_ACT_TYPE), linkId1);
-			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
-				final Coord coord = parseCoord( atts );
-				this.curract.setCoord(coord);
-			}
-		} else if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
-			final Coord coord = parseCoord( atts );
-			this.curract = PopulationUtils.createAndAddActivityFromCoord(this.currplan, atts.getValue(ATTR_ACT_TYPE), coord);
-		} else {
-			throw new IllegalArgumentException("In this version of MATSim either the coords or the link must be specified for an Act.");
-		}
-		Time.parseOptionalTime(atts.getValue(ATTR_ACT_STARTTIME))
-				.ifDefinedOrElse(curract::setStartTime, curract::setStartTimeUndefined);
-		Time.parseOptionalTime(atts.getValue(ATTR_ACT_MAXDUR))
-				.ifDefinedOrElse(curract::setMaximumDuration, curract::setMaximumDurationUndefined);
-		Time.parseOptionalTime(atts.getValue(ATTR_ACT_ENDTIME))
-				.ifDefinedOrElse(curract::setEndTime, curract::setEndTimeUndefined);
-		String fId = atts.getValue(ATTR_ACT_FACILITY);
-		if (fId != null) {
-			this.curract.setFacilityId(Id.create(fId, ActivityFacility.class));
-		}
-		if (this.routeDescription != null) {
-			finishLastRoute();
-		}
-	}
+  private void startAct(final Attributes atts) {
+    if (atts.getValue(ATTR_ACT_LINK) != null) {
+      Id<Link> linkId1 = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
+      this.curract =
+          PopulationUtils.createAndAddActivityFromLinkId(
+              this.currplan, atts.getValue(ATTR_ACT_TYPE), linkId1);
+      if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
+        final Coord coord = parseCoord(atts);
+        this.curract.setCoord(coord);
+      }
+    } else if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
+      final Coord coord = parseCoord(atts);
+      this.curract =
+          PopulationUtils.createAndAddActivityFromCoord(
+              this.currplan, atts.getValue(ATTR_ACT_TYPE), coord);
+    } else {
+      throw new IllegalArgumentException(
+          "In this version of MATSim either the coords or the link must be specified for an Act.");
+    }
+    Time.parseOptionalTime(atts.getValue(ATTR_ACT_STARTTIME))
+        .ifDefinedOrElse(curract::setStartTime, curract::setStartTimeUndefined);
+    Time.parseOptionalTime(atts.getValue(ATTR_ACT_MAXDUR))
+        .ifDefinedOrElse(curract::setMaximumDuration, curract::setMaximumDurationUndefined);
+    Time.parseOptionalTime(atts.getValue(ATTR_ACT_ENDTIME))
+        .ifDefinedOrElse(curract::setEndTime, curract::setEndTimeUndefined);
+    String fId = atts.getValue(ATTR_ACT_FACILITY);
+    if (fId != null) {
+      this.curract.setFacilityId(Id.create(fId, ActivityFacility.class));
+    }
+    if (this.routeDescription != null) {
+      finishLastRoute();
+    }
+  }
 
-	private Coord parseCoord(Attributes atts) {
-		return this.coordinateTransformation.transform(
-				new Coord(
-						Double.parseDouble(atts.getValue( ATTR_ACT_X )),
-						Double.parseDouble(atts.getValue( ATTR_ACT_Y )) ) );
-	}
+  private Coord parseCoord(Attributes atts) {
+    return this.coordinateTransformation.transform(
+        new Coord(
+            Double.parseDouble(atts.getValue(ATTR_ACT_X)),
+            Double.parseDouble(atts.getValue(ATTR_ACT_Y))));
+  }
 
-	private void finishLastRoute() {
-		Id<Link> startLinkId = null;
-		if (this.currRoute.getStartLinkId() != null) {
-			startLinkId = this.currRoute.getStartLinkId();
-		} else if (this.prevAct.getLinkId() != null) {
-			startLinkId = this.prevAct.getLinkId();
-		}
-		Id<Link> endLinkId = null;
-		if (this.currRoute.getEndLinkId() != null) {
-			endLinkId = this.currRoute.getEndLinkId();
-		} else if (this.curract != null && this.curract.getLinkId() != null) {
-			endLinkId = this.curract.getLinkId();
-		}
+  private void finishLastRoute() {
+    Id<Link> startLinkId = null;
+    if (this.currRoute.getStartLinkId() != null) {
+      startLinkId = this.currRoute.getStartLinkId();
+    } else if (this.prevAct.getLinkId() != null) {
+      startLinkId = this.prevAct.getLinkId();
+    }
+    Id<Link> endLinkId = null;
+    if (this.currRoute.getEndLinkId() != null) {
+      endLinkId = this.currRoute.getEndLinkId();
+    } else if (this.curract != null && this.curract.getLinkId() != null) {
+      endLinkId = this.curract.getLinkId();
+    }
 
-		this.currRoute.setStartLinkId(startLinkId);
-		this.currRoute.setEndLinkId(endLinkId);
-		this.currRoute.setRouteDescription(this.routeDescription.trim());
-		if (Double.isNaN(this.currRoute.getDistance())) {
-			if (this.currRoute instanceof NetworkRoute) {
-				if (!this.scenario.getNetwork().getLinks().isEmpty()) {
-					this.currRoute.setDistance(RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) this.currRoute, this.scenario.getNetwork()));
-				}
-			} else {
-				Coord fromCoord = getCoord(this.prevAct);
-				Coord toCoord = getCoord(this.curract);
-				if (fromCoord != null && toCoord != null) {
-					double dist = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
-					if ( this.scenario.getConfig().routing().
-							getModeRoutingParams().containsKey(  this.currleg.getMode()  ) ) {
-						double estimatedNetworkDistance = dist * this.scenario.getConfig().routing().
-								getModeRoutingParams().get( this.currleg.getMode() ).getBeelineDistanceFactor() ;
-						this.currRoute.setDistance(estimatedNetworkDistance);
-					}
-				}
-			}
-		}
-		if (this.currRoute.getTravelTime().isUndefined()) {
-			this.currleg.getTravelTime().ifDefined(this.currRoute::setTravelTime);
-		}
+    this.currRoute.setStartLinkId(startLinkId);
+    this.currRoute.setEndLinkId(endLinkId);
+    this.currRoute.setRouteDescription(this.routeDescription.trim());
+    if (Double.isNaN(this.currRoute.getDistance())) {
+      if (this.currRoute instanceof NetworkRoute) {
+        if (!this.scenario.getNetwork().getLinks().isEmpty()) {
+          this.currRoute.setDistance(
+              RouteUtils.calcDistanceExcludingStartEndLink(
+                  (NetworkRoute) this.currRoute, this.scenario.getNetwork()));
+        }
+      } else {
+        Coord fromCoord = getCoord(this.prevAct);
+        Coord toCoord = getCoord(this.curract);
+        if (fromCoord != null && toCoord != null) {
+          double dist = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
+          if (this.scenario
+              .getConfig()
+              .routing()
+              .getModeRoutingParams()
+              .containsKey(this.currleg.getMode())) {
+            double estimatedNetworkDistance =
+                dist
+                    * this.scenario
+                        .getConfig()
+                        .routing()
+                        .getModeRoutingParams()
+                        .get(this.currleg.getMode())
+                        .getBeelineDistanceFactor();
+            this.currRoute.setDistance(estimatedNetworkDistance);
+          }
+        }
+      }
+    }
+    if (this.currRoute.getTravelTime().isUndefined()) {
+      this.currleg.getTravelTime().ifDefined(this.currRoute::setTravelTime);
+    }
 
-		this.routeDescription = null;
-		this.currRoute = null;
+    this.routeDescription = null;
+    this.currRoute = null;
+  }
 
-	}
+  private Coord getCoord(Activity activity) {
+    if (activity == null) {
+      return null;
+    }
+    Coord fromCoord;
+    if (activity.getCoord() != null) {
+      fromCoord = activity.getCoord();
+    } else {
+      if (!this.scenario.getNetwork().getLinks().isEmpty()) {
+        fromCoord = this.scenario.getNetwork().getLinks().get(activity.getLinkId()).getCoord();
+      } else {
+        fromCoord = null;
+      }
+    }
+    return fromCoord;
+  }
 
-	private Coord getCoord(Activity activity) {
-		if (activity == null) {
-			return null;
-		}
-		Coord fromCoord;
-		if (activity.getCoord() != null) {
-			fromCoord = activity.getCoord();
-		} else {
-			if (!this.scenario.getNetwork().getLinks().isEmpty()) {
-				fromCoord = this.scenario.getNetwork().getLinks().get(activity.getLinkId()).getCoord();
-			} else {
-				fromCoord = null;
-			}
-		}
-		return fromCoord;
-	}
+  private void startLeg(final Attributes atts) {
+    if (this.routeDescription != null) {
+      finishLastRoute();
+    }
 
-	private void startLeg(final Attributes atts) {
-		if (this.routeDescription != null) {
-			finishLastRoute();
-		}
+    String mode = atts.getValue(ATTR_LEG_MODE);
+    if (VALUE_UNDEF.equals(mode)) {
+      mode = "undefined";
+    }
+    this.currleg = PopulationUtils.createAndAddLeg(this.currplan, mode.intern());
+    Time.parseOptionalTime(atts.getValue(ATTR_LEG_DEPTIME))
+        .ifDefinedOrElse(currleg::setDepartureTime, currleg::setDepartureTimeUndefined);
+    Time.parseOptionalTime(atts.getValue(ATTR_LEG_TRAVTIME))
+        .ifDefinedOrElse(currleg::setTravelTime, currleg::setTravelTimeUndefined);
+    //		LegImpl r = this.currleg;
+    //		r.setTravelTime( Time.parseTime(atts.getValue(ATTR_LEG_ARRTIME)) - r.getDepartureTime() );
+    // arrival time is in dtd, but no longer evaluated in code (according to not being in API).
+    // kai, jun'16
+  }
 
-		String mode = atts.getValue(ATTR_LEG_MODE);
-		if (VALUE_UNDEF.equals(mode)) {
-			mode = "undefined";
-		}
-		this.currleg = PopulationUtils.createAndAddLeg( this.currplan, mode.intern() );
-		Time.parseOptionalTime(atts.getValue(ATTR_LEG_DEPTIME))
-				.ifDefinedOrElse(currleg::setDepartureTime, currleg::setDepartureTimeUndefined);
-		Time.parseOptionalTime(atts.getValue(ATTR_LEG_TRAVTIME))
-				.ifDefinedOrElse(currleg::setTravelTime, currleg::setTravelTimeUndefined);
-//		LegImpl r = this.currleg;
-//		r.setTravelTime( Time.parseTime(atts.getValue(ATTR_LEG_ARRTIME)) - r.getDepartureTime() );
-		// arrival time is in dtd, but no longer evaluated in code (according to not being in API).  kai, jun'16
-	}
+  private void startRoute(final Attributes atts) {
+    String startLinkId = atts.getValue(ATTR_ROUTE_STARTLINK);
+    String endLinkId = atts.getValue(ATTR_ROUTE_ENDLINK);
+    String routeType = atts.getValue("type");
 
-	private void startRoute(final Attributes atts) {
-		String startLinkId = atts.getValue(ATTR_ROUTE_STARTLINK);
-		String endLinkId = atts.getValue(ATTR_ROUTE_ENDLINK);
-		String routeType = atts.getValue("type");
+    if (routeType == null) {
+      String legMode = this.currleg.getMode();
+      if ("pt".equals(legMode)) {
+        routeType = "experimentalPt1";
+      } else if ("car".equals(legMode)) {
+        routeType = "links";
+      } else {
+        routeType = "generic";
+      }
+    }
 
-		if (routeType == null) {
-			String legMode = this.currleg.getMode();
-			if ("pt".equals(legMode)) {
-				routeType = "experimentalPt1";
-			} else if ("car".equals(legMode)) {
-				routeType = "links";
-			} else {
-				routeType = "generic";
-			}
-		}
+    RouteFactories factory = this.scenario.getPopulation().getFactory().getRouteFactories();
+    Class<? extends Route> routeClass = factory.getRouteClassForType(routeType);
 
-		RouteFactories factory = this.scenario.getPopulation().getFactory().getRouteFactories();
-		Class<? extends Route> routeClass = factory.getRouteClassForType(routeType);
+    this.currRoute =
+        this.scenario
+            .getPopulation()
+            .getFactory()
+            .getRouteFactories()
+            .createRoute(
+                routeClass,
+                startLinkId == null ? null : Id.create(startLinkId, Link.class),
+                endLinkId == null ? null : Id.create(endLinkId, Link.class));
+    this.currleg.setRoute(this.currRoute);
 
-		this.currRoute = this.scenario.getPopulation().getFactory().getRouteFactories().createRoute(routeClass, startLinkId == null ? null : Id.create(startLinkId, Link.class), endLinkId == null ? null : Id.create(endLinkId, Link.class));
-		this.currleg.setRoute(this.currRoute);
+    if (atts.getValue("trav_time") != null) {
+      Time.parseOptionalTime(atts.getValue("trav_time"))
+          .ifDefinedOrElse(currRoute::setTravelTime, currRoute::setTravelTimeUndefined);
+    }
+    if (atts.getValue("distance") != null) {
+      this.currRoute.setDistance(Double.parseDouble(atts.getValue("distance")));
+    }
+    if (atts.getValue("vehicleRefId") != null && this.currRoute instanceof NetworkRoute) {
+      ((NetworkRoute) this.currRoute)
+          .setVehicleId(Id.create(atts.getValue("vehicleRefId"), Vehicle.class));
+    }
+  }
 
-		if (atts.getValue("trav_time") != null) {
-			Time.parseOptionalTime(atts.getValue("trav_time"))
-					.ifDefinedOrElse(currRoute::setTravelTime, currRoute::setTravelTimeUndefined);
-		}
-		if (atts.getValue("distance") != null) {
-			this.currRoute.setDistance(Double.parseDouble(atts.getValue("distance")));
-		}
-		if (atts.getValue("vehicleRefId") != null && this.currRoute instanceof NetworkRoute ) {
-			((NetworkRoute)this.currRoute).setVehicleId(Id.create(atts.getValue("vehicleRefId"), Vehicle.class));
-		}
-	}
+  private void endRoute(final String content) {
+    this.routeDescription = content;
 
-	private void endRoute(final String content) {
-		this.routeDescription = content;
+    Id<Link> startLinkId = this.currRoute.getStartLinkId();
+    Id<Link> endLinkId = this.currRoute.getEndLinkId();
+    this.currRoute.setStartLinkId(startLinkId);
+    this.currRoute.setEndLinkId(endLinkId);
+    this.currRoute.setRouteDescription(this.routeDescription.trim());
 
-		Id<Link> startLinkId = this.currRoute.getStartLinkId();
-		Id<Link> endLinkId = this.currRoute.getEndLinkId();
-		this.currRoute.setStartLinkId(startLinkId);
-		this.currRoute.setEndLinkId(endLinkId);
-		this.currRoute.setRouteDescription(this.routeDescription.trim());
+    if (Double.isNaN(this.currRoute.getDistance())) {
+      if (this.currRoute instanceof NetworkRoute) {
+        if (!this.scenario.getNetwork().getLinks().isEmpty()) {
+          this.currRoute.setDistance(
+              RouteUtils.calcDistanceExcludingStartEndLink(
+                  (NetworkRoute) this.currRoute, this.scenario.getNetwork()));
+        }
+      } else {
+        Coord fromCoord = getCoord(this.prevAct);
+        Coord toCoord = getCoord(this.curract);
+        if (fromCoord != null && toCoord != null) {
+          double dist = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
+          if (this.scenario
+              .getConfig()
+              .routing()
+              .getModeRoutingParams()
+              .containsKey(this.currleg.getMode())) {
+            double estimatedNetworkDistance =
+                dist
+                    * this.scenario
+                        .getConfig()
+                        .routing()
+                        .getModeRoutingParams()
+                        .get(this.currleg.getMode())
+                        .getBeelineDistanceFactor();
+            this.currRoute.setDistance(estimatedNetworkDistance);
+          }
+        }
+      }
+    }
+    if (this.currRoute.getTravelTime().isUndefined()) {
+      this.currleg.getTravelTime().ifDefined(this.currRoute::setTravelTime);
+    }
 
-		if (Double.isNaN(this.currRoute.getDistance())) {
-			if (this.currRoute instanceof NetworkRoute) {
-				if (!this.scenario.getNetwork().getLinks().isEmpty()) {
-					this.currRoute.setDistance(RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) this.currRoute, this.scenario.getNetwork()));
-				}
-			} else {
-				Coord fromCoord = getCoord(this.prevAct);
-				Coord toCoord = getCoord(this.curract);
-				if (fromCoord != null && toCoord != null) {
-					double dist = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
-					if ( this.scenario.getConfig().routing().
-							getModeRoutingParams().containsKey(  this.currleg.getMode()  ) ) {
-						double estimatedNetworkDistance = dist * this.scenario.getConfig().routing().
-								getModeRoutingParams().get( this.currleg.getMode() ).getBeelineDistanceFactor() ;
-						this.currRoute.setDistance(estimatedNetworkDistance);
-					}
-				}
-			}
-		}
-		if (this.currRoute.getTravelTime().isUndefined()) {
-			this.currleg.getTravelTime().ifDefined(this.currRoute::setTravelTime);
-		}
-
-		if (this.currRoute.getEndLinkId() != null) {
-			// this route is complete
-			this.currRoute = null;
-			this.routeDescription = null;
-		}
-	}
-
+    if (this.currRoute.getEndLinkId() != null) {
+      // this route is complete
+      this.currRoute = null;
+      this.routeDescription = null;
+    }
+  }
 }

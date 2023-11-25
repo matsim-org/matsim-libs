@@ -21,42 +21,40 @@
 package org.matsim.core.scoring.functions;
 
 /**
- * This is a re-implementation of the original CharyparNagel function, based on a
- * modular approach.
+ * This is a re-implementation of the original CharyparNagel function, based on a modular approach.
+ *
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public final class CharyparNagelAgentStuckScoring implements org.matsim.core.scoring.SumScoringFunction.AgentStuckScoring {
+public final class CharyparNagelAgentStuckScoring
+    implements org.matsim.core.scoring.SumScoringFunction.AgentStuckScoring {
 
-	private double score;
+  private double score;
 
-	private static final double INITIAL_SCORE = 0.0;
+  private static final double INITIAL_SCORE = 0.0;
 
-	/** The parameters used for scoring */
-	private final ScoringParameters params;
+  /** The parameters used for scoring */
+  private final ScoringParameters params;
 
-	public CharyparNagelAgentStuckScoring(final ScoringParameters params) {
-		this.params = params;
-		this.score = INITIAL_SCORE;
-	}
+  public CharyparNagelAgentStuckScoring(final ScoringParameters params) {
+    this.params = params;
+    this.score = INITIAL_SCORE;
+  }
 
-	@Override
-	public void agentStuck(final double time) {
-		this.score += getStuckPenalty();
-	}
+  @Override
+  public void agentStuck(final double time) {
+    this.score += getStuckPenalty();
+  }
 
-	@Override
-	public void finish() {
+  @Override
+  public void finish() {}
 
-	}
+  @Override
+  public double getScore() {
+    return this.score;
+  }
 
-	@Override
-	public double getScore() {
-		return this.score;
-	}
-
-	private double getStuckPenalty() {
-		return this.params.abortedPlanScore;
-	}
-
+  private double getStuckPenalty() {
+    return this.params.abortedPlanScore;
+  }
 }

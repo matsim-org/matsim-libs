@@ -20,6 +20,7 @@ package org.matsim.contrib.drt.scheduler;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 
+import com.google.inject.Inject;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -27,28 +28,28 @@ import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
-import com.google.inject.Inject;
-
 /**
  * @author michalm
  */
 public class DrtScheduleInquiry implements ScheduleInquiry {
-	private final MobsimTimer timer;
+  private final MobsimTimer timer;
 
-	@Inject
-	public DrtScheduleInquiry(MobsimTimer timer) {
-		this.timer = timer;
-	}
+  @Inject
+  public DrtScheduleInquiry(MobsimTimer timer) {
+    this.timer = timer;
+  }
 
-	@Override
-	public boolean isIdle(DvrpVehicle vehicle) {
-		Schedule schedule = vehicle.getSchedule();
-		if (timer.getTimeOfDay() >= vehicle.getServiceEndTime() || schedule.getStatus() != ScheduleStatus.STARTED) {
-			return false;
-		}
+  @Override
+  public boolean isIdle(DvrpVehicle vehicle) {
+    Schedule schedule = vehicle.getSchedule();
+    if (timer.getTimeOfDay() >= vehicle.getServiceEndTime()
+        || schedule.getStatus() != ScheduleStatus.STARTED) {
+      return false;
+    }
 
-		Task currentTask = schedule.getCurrentTask();
-		return currentTask.getTaskIdx() == schedule.getTaskCount() - 1 // last task (because no prebooking)
-				&& STAY.isBaseTypeOf(currentTask);
-	}
+    Task currentTask = schedule.getCurrentTask();
+    return currentTask.getTaskIdx()
+            == schedule.getTaskCount() - 1 // last task (because no prebooking)
+        && STAY.isBaseTypeOf(currentTask);
+  }
 }

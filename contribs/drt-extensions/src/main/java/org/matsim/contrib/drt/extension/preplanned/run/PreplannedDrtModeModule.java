@@ -20,6 +20,9 @@
 
 package org.matsim.contrib.drt.extension.preplanned.run;
 
+import com.google.common.base.Preconditions;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtModeRoutingModule;
@@ -35,44 +38,49 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.common.base.Preconditions;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
-
 /**
  * @author michalm (Michal Maciejewski)
  */
 public final class PreplannedDrtModeModule extends AbstractDvrpModeModule {
 
-	private final DrtConfigGroup drtCfg;
+  private final DrtConfigGroup drtCfg;
 
-	public PreplannedDrtModeModule(DrtConfigGroup drtCfg) {
-		super(drtCfg.getMode());
-		this.drtCfg = drtCfg;
-	}
+  public PreplannedDrtModeModule(DrtConfigGroup drtCfg) {
+    super(drtCfg.getMode());
+    this.drtCfg = drtCfg;
+  }
 
-	@Override
-	public void install() {
-		DvrpModes.registerDvrpMode(binder(), getMode());
-		install(new DvrpModeRoutingNetworkModule(getMode(), drtCfg.useModeFilteredSubnetwork));
-		bindModal(TravelTime.class).to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
-		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
-		bindModal(StopTimeCalculator.class).toInstance(new DefaultStopTimeCalculator(drtCfg.stopDuration));
+  @Override
+  public void install() {
+    DvrpModes.registerDvrpMode(binder(), getMode());
+    install(new DvrpModeRoutingNetworkModule(getMode(), drtCfg.useModeFilteredSubnetwork));
+    bindModal(TravelTime.class)
+        .to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
+    bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
+    bindModal(StopTimeCalculator.class)
+        .toInstance(new DefaultStopTimeCalculator(drtCfg.stopDuration));
 
-		install(new FleetModule(getMode(), drtCfg.vehiclesFile == null ?
-				null :
-				ConfigGroup.getInputFileURL(getConfig().getContext(), drtCfg.vehiclesFile),
-				drtCfg.changeStartLinkToLastLinkInSchedule));
+    install(
+        new FleetModule(
+            getMode(),
+            drtCfg.vehiclesFile == null
+                ? null
+                : ConfigGroup.getInputFileURL(getConfig().getContext(), drtCfg.vehiclesFile),
+            drtCfg.changeStartLinkToLastLinkInSchedule));
 
-		Preconditions.checkArgument(drtCfg.getRebalancingParams().isEmpty(), "Rebalancing must not be enabled."
-				+ " It would interfere with simulation of pre-calculated vehicle schedules."
-				+ " Remove the rebalancing params from the drt config");
+    Preconditions.checkArgument(
+        drtCfg.getRebalancingParams().isEmpty(),
+        "Rebalancing must not be enabled."
+            + " It would interfere with simulation of pre-calculated vehicle schedules."
+            + " Remove the rebalancing params from the drt config");
 
-		install(new DrtModeRoutingModule(drtCfg));
+    install(new DrtModeRoutingModule(drtCfg));
 
-		drtCfg.getDrtFareParams()
-				.ifPresent(params -> addEventHandlerBinding().toInstance(new DrtFareHandler(getMode(), params)));
+    drtCfg
+        .getDrtFareParams()
+        .ifPresent(
+            params -> addEventHandlerBinding().toInstance(new DrtFareHandler(getMode(), params)));
 
-		Preconditions.checkArgument(drtCfg.getDrtSpeedUpParams().isEmpty());
-	}
+    Preconditions.checkArgument(drtCfg.getDrtSpeedUpParams().isEmpty());
+  }
 }

@@ -22,9 +22,7 @@ package org.matsim.contrib.locationchoice.timegeography;
 
 import java.util.Random;
 import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.contrib.locationchoice.utils.TreesBuilder;
@@ -35,103 +33,115 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
 abstract class AbstractLocationMutator implements PlanAlgorithm {
-	// yy not clear why we need this as abstract class: does not have abstract methods.  Could as well be a final class that is used in the other classes.  kai, mar'19
+  // yy not clear why we need this as abstract class: does not have abstract methods.  Could as well
+  // be a final class that is used in the other classes.  kai, mar'19
 
-	private TreeMap<String, ? extends QuadTree<ActivityFacility>> quadTreesOfType;
+  private TreeMap<String, ? extends QuadTree<ActivityFacility>> quadTreesOfType;
 
-	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
-	private TreeMap<String, ActivityFacilityImpl []> facilitiesOfType;
-	private ActivitiesHandler defineFlexibleActivities;
-	private boolean locationChoiceBasedOnKnowledge = true;
-	private final Random random;
+  // avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
+  private TreeMap<String, ActivityFacilityImpl[]> facilitiesOfType;
+  private ActivitiesHandler defineFlexibleActivities;
+  private boolean locationChoiceBasedOnKnowledge = true;
+  private final Random random;
 
-	private final Scenario scenario;
-	private final DestinationChoiceConfigGroup dccg;
+  private final Scenario scenario;
+  private final DestinationChoiceConfigGroup dccg;
 
-	// ----------------------------------------------------------
+  // ----------------------------------------------------------
 
-	AbstractLocationMutator( final Scenario scenario, Random random ) {
-		this.dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
-		this.defineFlexibleActivities = new ActivitiesHandler(this.dccg);
-		this.quadTreesOfType = new TreeMap<>();
-		this.facilitiesOfType = new TreeMap<>();
-		this.scenario = scenario;
-		this.random = random;
-		this.initLocal();
-	}
+  AbstractLocationMutator(final Scenario scenario, Random random) {
+    this.dccg =
+        (DestinationChoiceConfigGroup)
+            scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+    this.defineFlexibleActivities = new ActivitiesHandler(this.dccg);
+    this.quadTreesOfType = new TreeMap<>();
+    this.facilitiesOfType = new TreeMap<>();
+    this.scenario = scenario;
+    this.random = random;
+    this.initLocal();
+  }
 
-	AbstractLocationMutator( Scenario scenario, TreeMap<String, ? extends QuadTree<ActivityFacility>> quad_trees,
-					 TreeMap<String, ActivityFacilityImpl[]> facilities_of_type, Random random ) {
-		this.dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
-		this.defineFlexibleActivities = new ActivitiesHandler(this.dccg);
-		this.quadTreesOfType = quad_trees;
-		this.facilitiesOfType = facilities_of_type;
-		if (this.defineFlexibleActivities.getFlexibleTypes().size() > 0) {
-			locationChoiceBasedOnKnowledge = false;
-		}
-		this.scenario = scenario;
-		this.random = random;
-	}
-	
-	private void initLocal() {
+  AbstractLocationMutator(
+      Scenario scenario,
+      TreeMap<String, ? extends QuadTree<ActivityFacility>> quad_trees,
+      TreeMap<String, ActivityFacilityImpl[]> facilities_of_type,
+      Random random) {
+    this.dccg =
+        (DestinationChoiceConfigGroup)
+            scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+    this.defineFlexibleActivities = new ActivitiesHandler(this.dccg);
+    this.quadTreesOfType = quad_trees;
+    this.facilitiesOfType = facilities_of_type;
+    if (this.defineFlexibleActivities.getFlexibleTypes().size() > 0) {
+      locationChoiceBasedOnKnowledge = false;
+    }
+    this.scenario = scenario;
+    this.random = random;
+  }
 
-		if (this.defineFlexibleActivities.getFlexibleTypes().size() > 0) {
-			locationChoiceBasedOnKnowledge = false;
-		}
-		this.initTrees(scenario.getActivityFacilities());
-	}
+  private void initLocal() {
 
-	/**
-	 * Initialize the quadtrees of all available activity types
-	 */
-	private void initTrees(ActivityFacilities facilities) {
-		TreesBuilder treesBuilder = new TreesBuilder(this.scenario.getNetwork(), (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME));
-		treesBuilder.createTrees(facilities);
-		this.facilitiesOfType = treesBuilder.getFacilitiesOfType();
-		this.quadTreesOfType = treesBuilder.getQuadTreesOfType();
-	}
+    if (this.defineFlexibleActivities.getFlexibleTypes().size() > 0) {
+      locationChoiceBasedOnKnowledge = false;
+    }
+    this.initTrees(scenario.getActivityFacilities());
+  }
 
-	protected final TreeMap<String, ? extends QuadTree<ActivityFacility>> getQuadTreesOfType(){
-		return quadTreesOfType;
-	}
+  /** Initialize the quadtrees of all available activity types */
+  private void initTrees(ActivityFacilities facilities) {
+    TreesBuilder treesBuilder =
+        new TreesBuilder(
+            this.scenario.getNetwork(),
+            (DestinationChoiceConfigGroup)
+                this.scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME));
+    treesBuilder.createTrees(facilities);
+    this.facilitiesOfType = treesBuilder.getFacilitiesOfType();
+    this.quadTreesOfType = treesBuilder.getQuadTreesOfType();
+  }
 
-	protected final void setQuadTreesOfType( TreeMap<String, ? extends QuadTree<ActivityFacility>> quadTreesOfType ){
-		this.quadTreesOfType = quadTreesOfType;
-	}
+  protected final TreeMap<String, ? extends QuadTree<ActivityFacility>> getQuadTreesOfType() {
+    return quadTreesOfType;
+  }
 
-	protected final TreeMap<String, ActivityFacilityImpl[]> getFacilitiesOfType(){
-		return facilitiesOfType;
-	}
+  protected final void setQuadTreesOfType(
+      TreeMap<String, ? extends QuadTree<ActivityFacility>> quadTreesOfType) {
+    this.quadTreesOfType = quadTreesOfType;
+  }
 
-	protected final void setFacilitiesOfType( TreeMap<String, ActivityFacilityImpl[]> facilitiesOfType ){
-		this.facilitiesOfType = facilitiesOfType;
-	}
+  protected final TreeMap<String, ActivityFacilityImpl[]> getFacilitiesOfType() {
+    return facilitiesOfType;
+  }
 
-	protected final ActivitiesHandler getDefineFlexibleActivities(){
-		return defineFlexibleActivities;
-	}
+  protected final void setFacilitiesOfType(
+      TreeMap<String, ActivityFacilityImpl[]> facilitiesOfType) {
+    this.facilitiesOfType = facilitiesOfType;
+  }
 
-	protected final void setDefineFlexibleActivities( ActivitiesHandler defineFlexibleActivities ){
-		this.defineFlexibleActivities = defineFlexibleActivities;
-	}
+  protected final ActivitiesHandler getDefineFlexibleActivities() {
+    return defineFlexibleActivities;
+  }
 
-	protected final boolean isLocationChoiceBasedOnKnowledge(){
-		return locationChoiceBasedOnKnowledge;
-	}
+  protected final void setDefineFlexibleActivities(ActivitiesHandler defineFlexibleActivities) {
+    this.defineFlexibleActivities = defineFlexibleActivities;
+  }
 
-	protected final void setLocationChoiceBasedOnKnowledge( boolean locationChoiceBasedOnKnowledge ){
-		this.locationChoiceBasedOnKnowledge = locationChoiceBasedOnKnowledge;
-	}
+  protected final boolean isLocationChoiceBasedOnKnowledge() {
+    return locationChoiceBasedOnKnowledge;
+  }
 
-	protected final Random getRandom(){
-		return random;
-	}
+  protected final void setLocationChoiceBasedOnKnowledge(boolean locationChoiceBasedOnKnowledge) {
+    this.locationChoiceBasedOnKnowledge = locationChoiceBasedOnKnowledge;
+  }
 
-	protected final Scenario getScenario(){
-		return scenario;
-	}
+  protected final Random getRandom() {
+    return random;
+  }
 
-	protected final DestinationChoiceConfigGroup getDccg(){
-		return dccg;
-	}
+  protected final Scenario getScenario() {
+    return scenario;
+  }
+
+  protected final DestinationChoiceConfigGroup getDccg() {
+    return dccg;
+  }
 }

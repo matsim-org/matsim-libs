@@ -23,7 +23,6 @@ package org.matsim.api.core.v01.network;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.core.network.LinkFactory;
 
 /**
  * @author dgrether
@@ -31,16 +30,15 @@ import org.matsim.core.network.LinkFactory;
  */
 public interface NetworkFactory extends MatsimFactory {
 
-	public Node createNode(final Id<Node> id, final Coord coord);
+  public Node createNode(final Id<Node> id, final Coord coord);
 
-	/**
-	 * Creates a link with the given id leading from one node to another.
-	 *
-	 * @param id
-	 * @param fromNode
-	 * @param toNode
-	 * @return the newly created link
-	 */
-	public Link createLink(final Id<Link> id, final Node fromNode, final Node toNode);
-
+  /**
+   * Creates a link with the given id leading from one node to another.
+   *
+   * @param id
+   * @param fromNode
+   * @param toNode
+   * @return the newly created link
+   */
+  public Link createLink(final Id<Link> id, final Node fromNode, final Node toNode);
 }

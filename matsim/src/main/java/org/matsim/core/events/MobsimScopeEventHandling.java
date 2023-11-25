@@ -20,41 +20,40 @@
 
 package org.matsim.core.events;
 
-import java.util.Collection;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-
+import java.util.Collection;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
 /**
- * Meant for event handlers that are created anew in each iteration and should operate only until the end of the current
- * mobsim. Typically, these are event handlers created in AbstractQSimModules.
+ * Meant for event handlers that are created anew in each iteration and should operate only until
+ * the end of the current mobsim. Typically, these are event handlers created in
+ * AbstractQSimModules.
  *
  * @author Michal Maciejewski (michalm)
  */
 @Singleton
 public class MobsimScopeEventHandling implements AfterMobsimListener {
-	private final Collection<MobsimScopeEventHandler> eventHandlers = new ConcurrentLinkedQueue<>();
-	private final EventsManager eventsManager;
+  private final Collection<MobsimScopeEventHandler> eventHandlers = new ConcurrentLinkedQueue<>();
+  private final EventsManager eventsManager;
 
-	@Inject
-	public MobsimScopeEventHandling(EventsManager eventsManager) {
-		this.eventsManager = eventsManager;
-	}
+  @Inject
+  public MobsimScopeEventHandling(EventsManager eventsManager) {
+    this.eventsManager = eventsManager;
+  }
 
-	public void addMobsimScopeHandler(MobsimScopeEventHandler handler) {
-		eventHandlers.add(handler);
-		eventsManager.addHandler(handler);
-	}
+  public void addMobsimScopeHandler(MobsimScopeEventHandler handler) {
+    eventHandlers.add(handler);
+    eventsManager.addHandler(handler);
+  }
 
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		eventHandlers.forEach(eventsManager::removeHandler);
-		eventHandlers.forEach(eventHandler -> eventHandler.cleanupAfterMobsim(event.getIteration()));
-		eventHandlers.clear();
-	}
+  @Override
+  public void notifyAfterMobsim(AfterMobsimEvent event) {
+    eventHandlers.forEach(eventsManager::removeHandler);
+    eventHandlers.forEach(eventHandler -> eventHandler.cleanupAfterMobsim(event.getIteration()));
+    eventHandlers.clear();
+  }
 }

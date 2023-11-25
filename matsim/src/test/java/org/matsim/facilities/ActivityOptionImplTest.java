@@ -22,6 +22,4 @@ package org.matsim.facilities;
 /**
  * @author mrieser / Senozon AG
  */
-public class ActivityOptionImplTest {
-
-}
+public class ActivityOptionImplTest {}

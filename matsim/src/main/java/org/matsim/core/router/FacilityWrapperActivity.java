@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * FacilityWrapperActivity.java
@@ -19,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.router;
+package org.matsim.core.router;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -31,104 +30,104 @@ import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class FacilityWrapperActivity implements Activity {
-	private final Facility wrapped;
+  private final Facility wrapped;
 
-	public FacilityWrapperActivity(final Facility toWrap) {
-		this.wrapped = toWrap;
-	}
+  public FacilityWrapperActivity(final Facility toWrap) {
+    this.wrapped = toWrap;
+  }
 
-	@Override
-	public OptionalTime getEndTime() {
-		throw new UnsupportedOperationException( "only facility fields access are supported" );
-	}
+  @Override
+  public OptionalTime getEndTime() {
+    throw new UnsupportedOperationException("only facility fields access are supported");
+  }
 
-	@Override
-	public void setEndTime(double seconds) {
-		throw new UnsupportedOperationException( "only facility fields access are supported" );
-	}
+  @Override
+  public void setEndTime(double seconds) {
+    throw new UnsupportedOperationException("only facility fields access are supported");
+  }
 
-	@Override
-	public void setEndTimeUndefined() {
-		throw new UnsupportedOperationException( "only facility fields access are supported" );
-	}
+  @Override
+  public void setEndTimeUndefined() {
+    throw new UnsupportedOperationException("only facility fields access are supported");
+  }
 
-	@Override
-	public String getType() {
-		throw new UnsupportedOperationException( "only facility fields access are supported" );
-	}
+  @Override
+  public String getType() {
+    throw new UnsupportedOperationException("only facility fields access are supported");
+  }
 
-	@Override
-	public void setType(String type) {
-		throw new UnsupportedOperationException( "only facility fields access are supported" );
-	}
+  @Override
+  public void setType(String type) {
+    throw new UnsupportedOperationException("only facility fields access are supported");
+  }
 
-	@Override
-	public Coord getCoord() {
-		return wrapped.getCoord();
-	}
+  @Override
+  public Coord getCoord() {
+    return wrapped.getCoord();
+  }
 
-	@Override
-	public OptionalTime getStartTime() {
-		throw new UnsupportedOperationException( "only facility fields access are supported" );
-	}
+  @Override
+  public OptionalTime getStartTime() {
+    throw new UnsupportedOperationException("only facility fields access are supported");
+  }
 
-	@Override
-	public void setStartTime(double seconds) {
-		throw new UnsupportedOperationException( "only facility fields access are supported" );
-	}
+  @Override
+  public void setStartTime(double seconds) {
+    throw new UnsupportedOperationException("only facility fields access are supported");
+  }
 
-	@Override
-	public void setStartTimeUndefined() {
-		throw new UnsupportedOperationException( "only facility fields access are supported" );
-	}
+  @Override
+  public void setStartTimeUndefined() {
+    throw new UnsupportedOperationException("only facility fields access are supported");
+  }
 
-	@Override
-	public OptionalTime getMaximumDuration() {
-		throw new UnsupportedOperationException( "only facility fields access are supported" );
-	}
+  @Override
+  public OptionalTime getMaximumDuration() {
+    throw new UnsupportedOperationException("only facility fields access are supported");
+  }
 
-	@Override
-	public void setMaximumDuration(double seconds) {
-		throw new UnsupportedOperationException( "only facility fields access are supported" );
-	}
+  @Override
+  public void setMaximumDuration(double seconds) {
+    throw new UnsupportedOperationException("only facility fields access are supported");
+  }
 
-	@Override
-	public void setMaximumDurationUndefined() {
-		throw new UnsupportedOperationException( "only facility fields access are supported" );
-	}
+  @Override
+  public void setMaximumDurationUndefined() {
+    throw new UnsupportedOperationException("only facility fields access are supported");
+  }
 
-	@Override
-	public Id<Link> getLinkId() {
-		return wrapped.getLinkId();
-	}
+  @Override
+  public Id<Link> getLinkId() {
+    return wrapped.getLinkId();
+  }
 
-	@Override
-	public Id<ActivityFacility> getFacilityId() {
-		throw new UnsupportedOperationException( "only facility fields access are supported" );
-	}
+  @Override
+  public Id<ActivityFacility> getFacilityId() {
+    throw new UnsupportedOperationException("only facility fields access are supported");
+  }
 
-	@Override
-	public String toString() {
-		return "[FacilityWrapper: wrapped="+wrapped+"]";
-	}
+  @Override
+  public String toString() {
+    return "[FacilityWrapper: wrapped=" + wrapped + "]";
+  }
 
-	@Override
-	public void setLinkId(Id<Link> id) {
-		throw new RuntimeException("not implemented") ;
-	}
+  @Override
+  public void setLinkId(Id<Link> id) {
+    throw new RuntimeException("not implemented");
+  }
 
-	@Override
-	public void setFacilityId(Id<ActivityFacility> id) {
-		throw new RuntimeException("not implemented") ;
-	}
+  @Override
+  public void setFacilityId(Id<ActivityFacility> id) {
+    throw new RuntimeException("not implemented");
+  }
 
-	@Override
-	public void setCoord(Coord coord) {
-		throw new RuntimeException("not implemented") ;
-	}
+  @Override
+  public void setCoord(Coord coord) {
+    throw new RuntimeException("not implemented");
+  }
 
-	@Override
-	public Attributes getAttributes() {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public Attributes getAttributes() {
+    throw new UnsupportedOperationException();
+  }
 }

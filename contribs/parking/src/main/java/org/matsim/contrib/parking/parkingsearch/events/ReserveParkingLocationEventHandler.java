@@ -24,9 +24,7 @@ import org.matsim.core.events.handler.EventHandler;
 /**
  * @author Ricardo Ewert
  */
-
 public interface ReserveParkingLocationEventHandler extends EventHandler {
 
-	void handleEvent(ReserveParkingLocationEvent event);
-
+  void handleEvent(ReserveParkingLocationEvent event);
 }

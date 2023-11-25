@@ -26,5 +26,5 @@ import org.matsim.contrib.dvrp.schedule.Task;
  * @author michalm
  */
 public interface ETask extends Task {
-	double getTotalEnergy();
+  double getTotalEnergy();
 }

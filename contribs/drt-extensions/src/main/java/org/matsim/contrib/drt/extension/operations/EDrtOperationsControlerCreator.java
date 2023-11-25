@@ -22,30 +22,33 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
  */
 public class EDrtOperationsControlerCreator {
 
-	public static Controler createControler(Config config, boolean otfvis) {
+  public static Controler createControler(Config config, boolean otfvis) {
 
-		MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
+    MultiModeDrtConfigGroup multiModeDrtConfig = MultiModeDrtConfigGroup.get(config);
 
-		Controler controler = EDrtControlerCreator.createControler(config, otfvis);
+    Controler controler = EDrtControlerCreator.createControler(config, otfvis);
 
-		for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
-			controler.addOverridingModule(new ShiftDrtModeModule(drtCfg));
-			controler.addOverridingQSimModule(new DrtModeQSimModule(drtCfg, new ShiftDrtModeOptimizerQSimModule(drtCfg)));
-			controler.addOverridingQSimModule(new ShiftEDrtModeOptimizerQSimModule(drtCfg));
-			controler.addOverridingQSimModule(new EvShiftDvrpFleetQSimModule(drtCfg.getMode()));
-			controler.addOverridingModule(new OperationFacilitiesModeModule((DrtWithOperationsConfigGroup) drtCfg));
-			controler.addOverridingQSimModule(new OperationFacilitiesQSimModule(drtCfg));
-			controler.addOverridingModule(new DrtShiftEfficiencyModeModule(drtCfg));
-		}
+    for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
+      controler.addOverridingModule(new ShiftDrtModeModule(drtCfg));
+      controler.addOverridingQSimModule(
+          new DrtModeQSimModule(drtCfg, new ShiftDrtModeOptimizerQSimModule(drtCfg)));
+      controler.addOverridingQSimModule(new ShiftEDrtModeOptimizerQSimModule(drtCfg));
+      controler.addOverridingQSimModule(new EvShiftDvrpFleetQSimModule(drtCfg.getMode()));
+      controler.addOverridingModule(
+          new OperationFacilitiesModeModule((DrtWithOperationsConfigGroup) drtCfg));
+      controler.addOverridingQSimModule(new OperationFacilitiesQSimModule(drtCfg));
+      controler.addOverridingModule(new DrtShiftEfficiencyModeModule(drtCfg));
+    }
 
+    controler.addOverridingQSimModule(
+        new AbstractQSimModule() {
+          @Override
+          protected void configureQSim() {
+            this.bind(IdleDischargingHandler.VehicleProvider.class)
+                .to(ShiftOperatingVehicleProvider.class);
+          }
+        });
 
-		controler.addOverridingQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				this.bind(IdleDischargingHandler.VehicleProvider.class).to(ShiftOperatingVehicleProvider.class);
-			}
-		});
-
-		return controler;
-	}
+    return controler;
+  }
 }

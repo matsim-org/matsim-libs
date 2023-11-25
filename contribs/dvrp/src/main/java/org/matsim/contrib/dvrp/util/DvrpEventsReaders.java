@@ -22,7 +22,6 @@ package org.matsim.contrib.dvrp.util;
 
 import java.util.Map;
 import java.util.function.Function;
-
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
@@ -37,22 +36,31 @@ import org.matsim.core.events.MatsimEventsReader;
 
 public class DvrpEventsReaders {
 
-	public static Map<String, MatsimEventsReader.CustomEventMapper> createCustomEventMappers(
-			Function<String, Task.TaskType> stringToTaskTypeConverter) {
-		return Map.of(PassengerRequestSubmittedEvent.EVENT_TYPE, PassengerRequestSubmittedEvent::convert,//
-				PassengerRequestScheduledEvent.EVENT_TYPE, PassengerRequestScheduledEvent::convert,//
-				PassengerRequestRejectedEvent.EVENT_TYPE, PassengerRequestRejectedEvent::convert,//
-				PassengerWaitingEvent.EVENT_TYPE, PassengerWaitingEvent::convert,//
-				PassengerPickedUpEvent.EVENT_TYPE, PassengerPickedUpEvent::convert, //
-				PassengerDroppedOffEvent.EVENT_TYPE, PassengerDroppedOffEvent::convert,//
-				TaskStartedEvent.EVENT_TYPE, e -> TaskStartedEvent.convert(e, stringToTaskTypeConverter),
-				TaskEndedEvent.EVENT_TYPE, e -> TaskEndedEvent.convert(e, stringToTaskTypeConverter));
-	}
+  public static Map<String, MatsimEventsReader.CustomEventMapper> createCustomEventMappers(
+      Function<String, Task.TaskType> stringToTaskTypeConverter) {
+    return Map.of(
+        PassengerRequestSubmittedEvent.EVENT_TYPE,
+        PassengerRequestSubmittedEvent::convert, //
+        PassengerRequestScheduledEvent.EVENT_TYPE,
+        PassengerRequestScheduledEvent::convert, //
+        PassengerRequestRejectedEvent.EVENT_TYPE,
+        PassengerRequestRejectedEvent::convert, //
+        PassengerWaitingEvent.EVENT_TYPE,
+        PassengerWaitingEvent::convert, //
+        PassengerPickedUpEvent.EVENT_TYPE,
+        PassengerPickedUpEvent::convert, //
+        PassengerDroppedOffEvent.EVENT_TYPE,
+        PassengerDroppedOffEvent::convert, //
+        TaskStartedEvent.EVENT_TYPE,
+        e -> TaskStartedEvent.convert(e, stringToTaskTypeConverter),
+        TaskEndedEvent.EVENT_TYPE,
+        e -> TaskEndedEvent.convert(e, stringToTaskTypeConverter));
+  }
 
-	public static MatsimEventsReader createEventsReader(EventsManager eventsManager,
-			Function<String, Task.TaskType> stringToTaskTypeConverter) {
-		MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
-		createCustomEventMappers(stringToTaskTypeConverter).forEach(reader::addCustomEventMapper);
-		return reader;
-	}
+  public static MatsimEventsReader createEventsReader(
+      EventsManager eventsManager, Function<String, Task.TaskType> stringToTaskTypeConverter) {
+    MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
+    createCustomEventMappers(stringToTaskTypeConverter).forEach(reader::addCustomEventMapper);
+    return reader;
+  }
 }

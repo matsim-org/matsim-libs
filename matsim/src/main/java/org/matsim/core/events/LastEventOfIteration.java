@@ -27,13 +27,12 @@ import org.matsim.api.core.v01.events.Event;
  */
 public final class LastEventOfIteration extends Event {
 
-	public LastEventOfIteration(final double time) {
-		super(time);
-	}
+  public LastEventOfIteration(final double time) {
+    super(time);
+  }
 
-	@Override
-	public String getEventType() {
-		return null;
-	}
-
+  @Override
+  public String getEventType() {
+    return null;
+  }
 }

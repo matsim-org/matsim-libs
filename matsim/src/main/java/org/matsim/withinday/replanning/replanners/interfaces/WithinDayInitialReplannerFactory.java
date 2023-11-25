@@ -23,12 +23,13 @@ package org.matsim.withinday.replanning.replanners.interfaces;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 
-public abstract class WithinDayInitialReplannerFactory extends WithinDayReplannerFactory<InitialIdentifier> {
-	
-	public WithinDayInitialReplannerFactory(WithinDayEngine withinDayEngine) {
-		super(withinDayEngine);
-	}
-	
-	@Override
-	public abstract WithinDayInitialReplanner createReplanner();
+public abstract class WithinDayInitialReplannerFactory
+    extends WithinDayReplannerFactory<InitialIdentifier> {
+
+  public WithinDayInitialReplannerFactory(WithinDayEngine withinDayEngine) {
+    super(withinDayEngine);
+  }
+
+  @Override
+  public abstract WithinDayInitialReplanner createReplanner();
 }

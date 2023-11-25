@@ -25,44 +25,45 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 
 /**
- * DvrpVehicle is created from DvrpVehicleSpecification.
- * Its lifespan is one QSim simulation (same as of the optimizer and schedules created during simulation).
+ * DvrpVehicle is created from DvrpVehicleSpecification. Its lifespan is one QSim simulation (same
+ * as of the optimizer and schedules created during simulation).
  *
  * @author michalm
  */
 public interface DvrpVehicle extends Identifiable<DvrpVehicle> {
 
-	/**
-	 * @return the link at which vehicle starts operating (i.e. depot)
-	 */
-	Link getStartLink();
+  /**
+   * @return the link at which vehicle starts operating (i.e. depot)
+   */
+  Link getStartLink();
 
-	/**
-	 * @return the amount of people/goods that can be served/transported at the same time
-	 */
-	int getCapacity();
+  /**
+   * @return the amount of people/goods that can be served/transported at the same time
+   */
+  int getCapacity();
 
-	/**
-	 * @return (desired) time when the vehicle should start operating (inclusive); can be different from
-	 * {@link Schedule#getBeginTime()}
-	 */
-	double getServiceBeginTime();
+  /**
+   * @return (desired) time when the vehicle should start operating (inclusive); can be different
+   *     from {@link Schedule#getBeginTime()}
+   */
+  double getServiceBeginTime();
 
-	/**
-	 * @return (desired) time by which the vehicle should stop operating (exclusive); can be different from
-	 * {@link Schedule#getEndTime()}
-	 */
-	double getServiceEndTime();
+  /**
+   * @return (desired) time by which the vehicle should stop operating (exclusive); can be different
+   *     from {@link Schedule#getEndTime()}
+   */
+  double getServiceEndTime();
 
-	/**
-	 * Design comment(s):
-	 * <ul>
-	 * <li>Typically, the Schedule is meant to be changed only by the optimizer. Note, however, that the present design
-	 * does not prevent other classes to change it, so be careful. kai, feb'17
-	 * </ul>
-	 */
-	Schedule getSchedule();
+  /**
+   * Design comment(s):
+   *
+   * <ul>
+   *   <li>Typically, the Schedule is meant to be changed only by the optimizer. Note, however, that
+   *       the present design does not prevent other classes to change it, so be careful. kai,
+   *       feb'17
+   * </ul>
+   */
+  Schedule getSchedule();
 
-
-	DvrpVehicleSpecification getSpecification();
+  DvrpVehicleSpecification getSpecification();
 }

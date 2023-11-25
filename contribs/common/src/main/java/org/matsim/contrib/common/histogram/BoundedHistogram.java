@@ -23,41 +23,41 @@ package org.matsim.contrib.common.histogram;
 import java.util.Arrays;
 
 public class BoundedHistogram extends AbstractHistogram<Double> {
-	public static BoundedHistogram create(double[] bounds, double[] values) {
-		BoundedHistogram histogram = new BoundedHistogram(bounds);
-		histogram.addValues(values);
-		return histogram;
-	}
+  public static BoundedHistogram create(double[] bounds, double[] values) {
+    BoundedHistogram histogram = new BoundedHistogram(bounds);
+    histogram.addValues(values);
+    return histogram;
+  }
 
-	private final double[] bounds;
+  private final double[] bounds;
 
-	public BoundedHistogram(double[] bounds) {
-		super(bounds.length - 1);
+  public BoundedHistogram(double[] bounds) {
+    super(bounds.length - 1);
 
-		for (int i = 1; i < bounds.length; i++) {
-			if (bounds[i - 1] >= bounds[i]) {
-				throw new IllegalArgumentException("Bounds are not sorted");
-			}
-		}
+    for (int i = 1; i < bounds.length; i++) {
+      if (bounds[i - 1] >= bounds[i]) {
+        throw new IllegalArgumentException("Bounds are not sorted");
+      }
+    }
 
-		this.bounds = bounds;
-	}
+    this.bounds = bounds;
+  }
 
-	public void addValue(double value) {
-		if (value < bounds[0] || value >= bounds[bounds.length - 1]) {
-			throw new IllegalArgumentException("Value=" + value + " beyond the bounds");
-		}
+  public void addValue(double value) {
+    if (value < bounds[0] || value >= bounds[bounds.length - 1]) {
+      throw new IllegalArgumentException("Value=" + value + " beyond the bounds");
+    }
 
-		int idx = Arrays.binarySearch(bounds, value);
-		if (idx < 0) {
-			idx = -idx - 2;
-		}
+    int idx = Arrays.binarySearch(bounds, value);
+    if (idx < 0) {
+      idx = -idx - 2;
+    }
 
-		increment(idx);
-	}
+    increment(idx);
+  }
 
-	@Override
-	public Double getBin(int idx) {
-		return bounds[idx];
-	}
+  @Override
+  public Double getBin(int idx) {
+    return bounds[idx];
+  }
 }

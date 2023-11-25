@@ -20,6 +20,9 @@
 
 package org.matsim.contrib.drt.run;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.prebooking.PrebookingManager;
@@ -39,69 +42,81 @@ import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
-
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
-	private final DrtConfigGroup drtCfg;
-	private final AbstractQSimModule optimizerQSimModule;
+  private final DrtConfigGroup drtCfg;
+  private final AbstractQSimModule optimizerQSimModule;
 
-	public DrtModeQSimModule(DrtConfigGroup drtCfg) {
-		this(drtCfg, new DrtModeOptimizerQSimModule(drtCfg));
-	}
+  public DrtModeQSimModule(DrtConfigGroup drtCfg) {
+    this(drtCfg, new DrtModeOptimizerQSimModule(drtCfg));
+  }
 
-	public DrtModeQSimModule(DrtConfigGroup drtCfg, AbstractQSimModule optimizerQSimModule) {
-		super(drtCfg.getMode());
-		this.drtCfg = drtCfg;
-		this.optimizerQSimModule = optimizerQSimModule;
-	}
+  public DrtModeQSimModule(DrtConfigGroup drtCfg, AbstractQSimModule optimizerQSimModule) {
+    super(drtCfg.getMode());
+    this.drtCfg = drtCfg;
+    this.optimizerQSimModule = optimizerQSimModule;
+  }
 
-	@Override
-	protected void configureQSim() {
-		boolean teleportDrtUsers = drtCfg.getDrtSpeedUpParams().isPresent() && DrtSpeedUp.isTeleportDrtUsers(
-				drtCfg.getDrtSpeedUpParams().get(), getConfig().controller(), getIterationNumber());
-		if (teleportDrtUsers) {
-			install(new PassengerEngineQSimModule(getMode(),
-					PassengerEngineQSimModule.PassengerEngineType.TELEPORTING));
-			bindModal(TeleportedRouteCalculator.class).toProvider(
-					modalProvider(getter -> getter.getModal(DrtSpeedUp.class).createTeleportedRouteCalculator()))
-					.asEagerSingleton();
-		} else {
-			install(new VrpAgentSourceQSimModule(getMode()));
-			install(new PassengerEngineQSimModule(getMode()));
-			install(optimizerQSimModule);
-		}
+  @Override
+  protected void configureQSim() {
+    boolean teleportDrtUsers =
+        drtCfg.getDrtSpeedUpParams().isPresent()
+            && DrtSpeedUp.isTeleportDrtUsers(
+                drtCfg.getDrtSpeedUpParams().get(), getConfig().controller(), getIterationNumber());
+    if (teleportDrtUsers) {
+      install(
+          new PassengerEngineQSimModule(
+              getMode(), PassengerEngineQSimModule.PassengerEngineType.TELEPORTING));
+      bindModal(TeleportedRouteCalculator.class)
+          .toProvider(
+              modalProvider(
+                  getter -> getter.getModal(DrtSpeedUp.class).createTeleportedRouteCalculator()))
+          .asEagerSingleton();
+    } else {
+      install(new VrpAgentSourceQSimModule(getMode()));
+      install(new PassengerEngineQSimModule(getMode()));
+      install(optimizerQSimModule);
+    }
 
-		if (drtCfg.getPrebookingParams().isPresent()) {
-			install(new PrebookingModeQSimModule(getMode(), drtCfg.getPrebookingParams().get()));
-			bindModal(AdvanceRequestProvider.class).to(modalKey(PrebookingManager.class));
-		} else {
-			bindModal(AdvanceRequestProvider.class).toInstance(AdvanceRequestProvider.NONE);
-		}
+    if (drtCfg.getPrebookingParams().isPresent()) {
+      install(new PrebookingModeQSimModule(getMode(), drtCfg.getPrebookingParams().get()));
+      bindModal(AdvanceRequestProvider.class).to(modalKey(PrebookingManager.class));
+    } else {
+      bindModal(AdvanceRequestProvider.class).toInstance(AdvanceRequestProvider.NONE);
+    }
 
-		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
+    bindModal(PassengerRequestValidator.class)
+        .to(DefaultPassengerRequestValidator.class)
+        .asEagerSingleton();
 
-		bindModal(PassengerRequestCreator.class).toProvider(new Provider<DrtRequestCreator>() {
-			@Inject
-			private EventsManager events;
+    bindModal(PassengerRequestCreator.class)
+        .toProvider(
+            new Provider<DrtRequestCreator>() {
+              @Inject private EventsManager events;
 
-			@Override
-			public DrtRequestCreator get() {
-				return new DrtRequestCreator(getMode(), events);
-			}
-		}).asEagerSingleton();
-		
-		// this is not the actual selection which DynActionCreator is used, see
-		// DrtModeOptimizerQSimModule
-		bindModal(DrtActionCreator.class)
-				.toProvider(modalProvider(getter -> new DrtActionCreator(getter.getModal(PassengerHandler.class),
-						getter.getModal(VrpLegFactory.class))))
-				.in(Singleton.class); // Not an eager binding, as taxi contrib doesn't need this implementation, but
-										// would search for VrpLegFactory which is provided in the
-										// DrtModeOptimizerModule if bound eagerly
-	}
+              @Override
+              public DrtRequestCreator get() {
+                return new DrtRequestCreator(getMode(), events);
+              }
+            })
+        .asEagerSingleton();
+
+    // this is not the actual selection which DynActionCreator is used, see
+    // DrtModeOptimizerQSimModule
+    bindModal(DrtActionCreator.class)
+        .toProvider(
+            modalProvider(
+                getter ->
+                    new DrtActionCreator(
+                        getter.getModal(PassengerHandler.class),
+                        getter.getModal(VrpLegFactory.class))))
+        .in(
+            Singleton
+                .class); // Not an eager binding, as taxi contrib doesn't need this implementation,
+    // but
+    // would search for VrpLegFactory which is provided in the
+    // DrtModeOptimizerModule if bound eagerly
+  }
 }

@@ -21,16 +21,17 @@
 package org.matsim.contrib.av.robotaxi.run;
 
 import java.net.URL;
-
 import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
 public class RunDrtAndTaxiExampleTest {
-	@Test
-	public void run() {
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
-				"one_taxi_and_one_shared_taxi_config.xml");
-		RunDrtAndTaxiExample.run(configUrl, false);
-	}
+  @Test
+  public void run() {
+    URL configUrl =
+        IOUtils.extendUrl(
+            ExamplesUtils.getTestScenarioURL("dvrp-grid"),
+            "one_taxi_and_one_shared_taxi_config.xml");
+    RunDrtAndTaxiExample.run(configUrl, false);
+  }
 }

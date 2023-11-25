@@ -27,11 +27,11 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
  * @author michalm
  */
 public interface ChargingTask extends ETask {
-	ChargingWithAssignmentLogic getChargingLogic();
+  ChargingWithAssignmentLogic getChargingLogic();
 
-	ElectricVehicle getElectricVehicle();
+  ElectricVehicle getElectricVehicle();
 
-	double getChargingStartedTime();
+  double getChargingStartedTime();
 
-	void setChargingStartedTime(double chargingStartedTime);
+  void setChargingStartedTime(double chargingStartedTime);
 }

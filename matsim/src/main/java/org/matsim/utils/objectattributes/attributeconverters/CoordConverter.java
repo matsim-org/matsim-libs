@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * CoordConverter.java
@@ -19,35 +18,32 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.utils.objectattributes.attributeconverters;
+package org.matsim.utils.objectattributes.attributeconverters;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
-import java.util.Locale;
-
 public class CoordConverter implements AttributeConverter<Coord> {
-	private final Logger log = LogManager.getLogger(CoordConverter.class);
+  private final Logger log = LogManager.getLogger(CoordConverter.class);
 
-	@Override
-	public Coord convert(String value) {
-		String s = value.replace("(", "");
-		s = s.replace(")", "");
-		String[] sa = s.split(";");
-		return new Coord(Double.parseDouble(sa[0]), Double.parseDouble(sa[1]));
-	}
+  @Override
+  public Coord convert(String value) {
+    String s = value.replace("(", "");
+    s = s.replace(")", "");
+    String[] sa = s.split(";");
+    return new Coord(Double.parseDouble(sa[0]), Double.parseDouble(sa[1]));
+  }
 
-	@Override
-	public String convertToString(Object o) {
-		if(!(o instanceof Coord)){
-			log.error("Object is not of type Coord: " + o.getClass().toString());
-			return null;
-		}
-		Coord c = (Coord)o;
-		
-		return String.format("(%s;%s)", Double.toString(c.getX()), Double.toString(c.getY()));
-	}
+  @Override
+  public String convertToString(Object o) {
+    if (!(o instanceof Coord)) {
+      log.error("Object is not of type Coord: " + o.getClass().toString());
+      return null;
+    }
+    Coord c = (Coord) o;
 
+    return String.format("(%s;%s)", Double.toString(c.getX()), Double.toString(c.getY()));
+  }
 }

@@ -32,107 +32,107 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class FreightActivity implements Activity {
 
-	private final Activity act;
+  private final Activity act;
 
-	private final TimeWindow timeWindow;
+  private final TimeWindow timeWindow;
 
-	public FreightActivity(Activity act, TimeWindow timeWindow) {
-		super();
-		this.act = act;
-		this.timeWindow = timeWindow;
-	}
+  public FreightActivity(Activity act, TimeWindow timeWindow) {
+    super();
+    this.act = act;
+    this.timeWindow = timeWindow;
+  }
 
-	public TimeWindow getTimeWindow(){
-		return timeWindow;
-	}
+  public TimeWindow getTimeWindow() {
+    return timeWindow;
+  }
 
-	@Override
-	public OptionalTime getEndTime() {
-		return act.getEndTime();
-	}
+  @Override
+  public OptionalTime getEndTime() {
+    return act.getEndTime();
+  }
 
-	@Override
-	public void setEndTime(double seconds) {
-		act.setEndTime(seconds);
-	}
+  @Override
+  public void setEndTime(double seconds) {
+    act.setEndTime(seconds);
+  }
 
-	@Override
-	public void setEndTimeUndefined() {
-		act.setEndTimeUndefined();
-	}
+  @Override
+  public void setEndTimeUndefined() {
+    act.setEndTimeUndefined();
+  }
 
-	@Override
-	public String getType() {
-		return act.getType();
-	}
+  @Override
+  public String getType() {
+    return act.getType();
+  }
 
-	@Override
-	public void setType(String type) {
-		act.setType(type);
-	}
+  @Override
+  public void setType(String type) {
+    act.setType(type);
+  }
 
-	@Override
-	public Coord getCoord() {
-		return act.getCoord();
-	}
+  @Override
+  public Coord getCoord() {
+    return act.getCoord();
+  }
 
-	@Override
-	public OptionalTime getStartTime() {
-		return act.getStartTime();
-	}
+  @Override
+  public OptionalTime getStartTime() {
+    return act.getStartTime();
+  }
 
-	@Override
-	public void setStartTime(double seconds) {
-		act.setStartTime(seconds);
-	}
+  @Override
+  public void setStartTime(double seconds) {
+    act.setStartTime(seconds);
+  }
 
-	@Override
-	public void setStartTimeUndefined() {
-		act.setStartTimeUndefined();
-	}
+  @Override
+  public void setStartTimeUndefined() {
+    act.setStartTimeUndefined();
+  }
 
-	@Override
-	public OptionalTime getMaximumDuration() {
-		return act.getMaximumDuration();
-	}
+  @Override
+  public OptionalTime getMaximumDuration() {
+    return act.getMaximumDuration();
+  }
 
-	@Override
-	public void setMaximumDuration(double seconds) {
-		act.setMaximumDuration(seconds);
-	}
+  @Override
+  public void setMaximumDuration(double seconds) {
+    act.setMaximumDuration(seconds);
+  }
 
-	@Override
-	public void setMaximumDurationUndefined() {
-		act.setMaximumDurationUndefined();
-	}
+  @Override
+  public void setMaximumDurationUndefined() {
+    act.setMaximumDurationUndefined();
+  }
 
-	@Override
-	public Id<Link> getLinkId() {
-		return act.getLinkId();
-	}
+  @Override
+  public Id<Link> getLinkId() {
+    return act.getLinkId();
+  }
 
-	@Override
-	public Id<ActivityFacility> getFacilityId() {
-		return act.getFacilityId();
-	}
+  @Override
+  public Id<ActivityFacility> getFacilityId() {
+    return act.getFacilityId();
+  }
 
-	@Override
-	public void setLinkId(Id<Link> id) {
-		throw new RuntimeException("not implemented") ;
-	}
+  @Override
+  public void setLinkId(Id<Link> id) {
+    throw new RuntimeException("not implemented");
+  }
 
-	@Override
-	public void setFacilityId(Id<ActivityFacility> id) {
-		throw new RuntimeException("not implemented") ;
-	}
+  @Override
+  public void setFacilityId(Id<ActivityFacility> id) {
+    throw new RuntimeException("not implemented");
+  }
 
-	@Override
-	public void setCoord(Coord coord) {
-		throw new RuntimeException("not implemented") ;
-	}
+  @Override
+  public void setCoord(Coord coord) {
+    throw new RuntimeException("not implemented");
+  }
 
-	@Override
-	public Attributes getAttributes() {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public Attributes getAttributes() {
+    throw new UnsupportedOperationException();
+  }
 }

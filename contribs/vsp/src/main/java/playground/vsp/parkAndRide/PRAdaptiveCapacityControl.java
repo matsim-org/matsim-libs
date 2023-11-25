@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.vsp.parkAndRide;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -31,95 +33,91 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * An adaptive traffic light observing the number of vehicles per park-and-ride facility.
- * 
- * @author ikaddoura
  *
+ * @author ikaddoura
  */
-public class PRAdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHandler, LinkLeaveEventHandler {
-	
-//	private static final Logger log = LogManager.getLogger(PRAdaptiveCapacityControl.class);
-	private Map<Id, Integer> prId2vehicles = new HashMap<Id, Integer>();
-	private Map<Id, SignalizeableItem> prId2ampel = new HashMap<Id, SignalizeableItem>();
-	private Map<Id<PRFacility>, PRFacility> id2prFacility = new HashMap<>();
-	
-	private InternalInterface internalInterface;
-	
-	public PRAdaptiveCapacityControl(Map<Id<PRFacility>, PRFacility> id2prFacility) {
-		this.id2prFacility = id2prFacility;
-	}
+public class PRAdaptiveCapacityControl
+    implements MobsimEngine, LinkEnterEventHandler, LinkLeaveEventHandler {
 
-	@Override
-	public void doSimStep(double time) {
-		
-		for (Id<PRFacility> prId : this.prId2ampel.keySet()){
-			if (this.prId2vehicles.get(prId) >= this.id2prFacility.get(prId).getCapacity()){
-				this.prId2ampel.get(prId).setSignalStateAllTurningMoves(SignalGroupState.RED);
-			} else {
-				this.prId2ampel.get(prId).setSignalStateAllTurningMoves(SignalGroupState.GREEN);
-			}
-		}
-	}
+  //	private static final Logger log = LogManager.getLogger(PRAdaptiveCapacityControl.class);
+  private Map<Id, Integer> prId2vehicles = new HashMap<Id, Integer>();
+  private Map<Id, SignalizeableItem> prId2ampel = new HashMap<Id, SignalizeableItem>();
+  private Map<Id<PRFacility>, PRFacility> id2prFacility = new HashMap<>();
 
-	@Override
-	public void onPrepareSim() {
+  private InternalInterface internalInterface;
 
-		for (PRFacility pr : this.id2prFacility.values()){
-			this.prId2vehicles.put(pr.getId(), 0);
+  public PRAdaptiveCapacityControl(Map<Id<PRFacility>, PRFacility> id2prFacility) {
+    this.id2prFacility = id2prFacility;
+  }
 
-			Id prLink2in = pr.getPrLink2in();
-			SignalizeableItem ampel = (SignalizeableItem) this.getMobsim().getNetsimNetwork().getNetsimLink(prLink2in) ;
-			ampel.setSignalized(true);
-			this.prId2ampel.put(pr.getId(), ampel);
-		}
-	}
+  @Override
+  public void doSimStep(double time) {
 
-	@Override
-	public void afterSim() {
-	}
+    for (Id<PRFacility> prId : this.prId2ampel.keySet()) {
+      if (this.prId2vehicles.get(prId) >= this.id2prFacility.get(prId).getCapacity()) {
+        this.prId2ampel.get(prId).setSignalStateAllTurningMoves(SignalGroupState.RED);
+      } else {
+        this.prId2ampel.get(prId).setSignalStateAllTurningMoves(SignalGroupState.GREEN);
+      }
+    }
+  }
 
-	@Override
-	public void setInternalInterface(InternalInterface internalInterface) {
-		this.internalInterface = internalInterface;		
-	}
+  @Override
+  public void onPrepareSim() {
 
-	public Netsim getMobsim() {
-		return ((QSim) this.internalInterface.getMobsim());
-	}
+    for (PRFacility pr : this.id2prFacility.values()) {
+      this.prId2vehicles.put(pr.getId(), 0);
 
-	@Override
-	public void reset(int iteration) {
-		this.prId2ampel.clear();
-		this.prId2vehicles.clear();
-	}
+      Id prLink2in = pr.getPrLink2in();
+      SignalizeableItem ampel =
+          (SignalizeableItem) this.getMobsim().getNetsimNetwork().getNetsimLink(prLink2in);
+      ampel.setSignalized(true);
+      this.prId2ampel.put(pr.getId(), ampel);
+    }
+  }
 
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		for (PRFacility pr : this.id2prFacility.values()){
-			Id id = pr.getPrLink3in();
-			if (id.toString().equals(event.getLinkId().toString())){
-//				log.info("Car entered ParkAndRideFacilty: " + id.toString());
-				int vehNr = this.prId2vehicles.get(pr.getId()) + 1;
-				this.prId2vehicles.put(pr.getId(), vehNr);
-			}
-		}
-	}
+  @Override
+  public void afterSim() {}
 
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		for (PRFacility pr : this.id2prFacility.values()){
-			Id id = pr.getPrLink3out();
+  @Override
+  public void setInternalInterface(InternalInterface internalInterface) {
+    this.internalInterface = internalInterface;
+  }
 
-			if (id.toString().equals(event.getLinkId().toString())){
-//				log.info("Car left ParkAndRideFacilty: " + id.toString());
-				int vehNr = this.prId2vehicles.get(pr.getId()) - 1;
-				this.prId2vehicles.put(pr.getId(), vehNr);
-			}
-		}
-	}
+  public Netsim getMobsim() {
+    return ((QSim) this.internalInterface.getMobsim());
+  }
 
+  @Override
+  public void reset(int iteration) {
+    this.prId2ampel.clear();
+    this.prId2vehicles.clear();
+  }
+
+  @Override
+  public void handleEvent(LinkEnterEvent event) {
+    for (PRFacility pr : this.id2prFacility.values()) {
+      Id id = pr.getPrLink3in();
+      if (id.toString().equals(event.getLinkId().toString())) {
+        //				log.info("Car entered ParkAndRideFacilty: " + id.toString());
+        int vehNr = this.prId2vehicles.get(pr.getId()) + 1;
+        this.prId2vehicles.put(pr.getId(), vehNr);
+      }
+    }
+  }
+
+  @Override
+  public void handleEvent(LinkLeaveEvent event) {
+    for (PRFacility pr : this.id2prFacility.values()) {
+      Id id = pr.getPrLink3out();
+
+      if (id.toString().equals(event.getLinkId().toString())) {
+        //				log.info("Car left ParkAndRideFacilty: " + id.toString());
+        int vehNr = this.prId2vehicles.get(pr.getId()) - 1;
+        this.prId2vehicles.put(pr.getId(), vehNr);
+      }
+    }
+  }
 }

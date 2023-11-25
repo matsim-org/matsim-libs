@@ -17,9 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
+/** */
 package playground.vsp.congestion.handlers;
 
 import java.io.BufferedWriter;
@@ -28,7 +26,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -40,207 +37,224 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-
 import playground.vsp.congestion.DelayInfo;
 
-/** 
- * 
- * For each agent leaving a link: Compute a delay as the difference between free speed travel time and actual travel time.
- * 
- * In this implementation, the delay is partially allocated to the agents ahead in the flow queue until the delay is fully internalized (cost recovery).
- * Each causing agent has to pay for 1 / c_flow which is deducted from the delay to be internalized.
- * 
- * Spill-back effects are taken into account by saving the remaining delay (considered to result from the storage capacity constraint)
- * for later when possibly reaching the bottleneck link
- * 
- * @author ikaddoura
+/**
+ * For each agent leaving a link: Compute a delay as the difference between free speed travel time
+ * and actual travel time.
  *
+ * <p>In this implementation, the delay is partially allocated to the agents ahead in the flow queue
+ * until the delay is fully internalized (cost recovery). Each causing agent has to pay for 1 /
+ * c_flow which is deducted from the delay to be internalized.
+ *
+ * <p>Spill-back effects are taken into account by saving the remaining delay (considered to result
+ * from the storage capacity constraint) for later when possibly reaching the bottleneck link
+ *
+ * @author ikaddoura
  */
 public final class CongestionHandlerImplV3 implements CongestionHandler, ActivityEndEventHandler {
 
-	private final static Logger log = LogManager.getLogger(CongestionHandlerImplV3.class);
+  private static final Logger log = LogManager.getLogger(CongestionHandlerImplV3.class);
 
-	private CongestionHandlerBaseImpl delegate;
+  private CongestionHandlerBaseImpl delegate;
 
-	private final Map<Id<Person>, Double> agentId2storageDelay = new HashMap<>();
-	private double delayNotInternalized_spillbackNoCausingAgent = 0.;
+  private final Map<Id<Person>, Double> agentId2storageDelay = new HashMap<>();
+  private double delayNotInternalized_spillbackNoCausingAgent = 0.;
 
-	public CongestionHandlerImplV3(EventsManager events, Scenario scenario) {
-		this.delegate = new CongestionHandlerBaseImpl(events, scenario);
-	}
+  public CongestionHandlerImplV3(EventsManager events, Scenario scenario) {
+    this.delegate = new CongestionHandlerBaseImpl(events, scenario);
+  }
 
-	@Override
-	public final void reset(int iteration) {
+  @Override
+  public final void reset(int iteration) {
 
-		delegate.reset(iteration);
+    delegate.reset(iteration);
 
-		this.agentId2storageDelay.clear();
-		this.delayNotInternalized_spillbackNoCausingAgent = 0.;
-	}
+    this.agentId2storageDelay.clear();
+    this.delayNotInternalized_spillbackNoCausingAgent = 0.;
+  }
 
-	@Override
-	public final void handleEvent(TransitDriverStartsEvent event) {
-		delegate.handleEvent(event);
-	}
+  @Override
+  public final void handleEvent(TransitDriverStartsEvent event) {
+    delegate.handleEvent(event);
+  }
 
-	@Override
-	public final void handleEvent(PersonStuckEvent event) {
-		delegate.handleEvent(event);
-	}
+  @Override
+  public final void handleEvent(PersonStuckEvent event) {
+    delegate.handleEvent(event);
+  }
 
-	@Override
-	public final void handleEvent(VehicleEntersTrafficEvent event) {
-		delegate.handleEvent(event);
-	}
+  @Override
+  public final void handleEvent(VehicleEntersTrafficEvent event) {
+    delegate.handleEvent(event);
+  }
 
-	@Override
-	public final void handleEvent(PersonDepartureEvent event) {
-		delegate.handleEvent(event);
-	}
+  @Override
+  public final void handleEvent(PersonDepartureEvent event) {
+    delegate.handleEvent(event);
+  }
 
-	@Override
-	public final void handleEvent(LinkEnterEvent event) {
-		delegate.handleEvent(event);
-	}
+  @Override
+  public final void handleEvent(LinkEnterEvent event) {
+    delegate.handleEvent(event);
+  }
 
-	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-		delegate.handleEvent(event);
-	}
+  @Override
+  public void handleEvent(PersonArrivalEvent event) {
+    delegate.handleEvent(event);
+  }
 
-	@Override
-	public final void writeCongestionStats(String fileName) {
-		File file = new File(fileName);
+  @Override
+  public final void writeCongestionStats(String fileName) {
+    File file = new File(fileName);
 
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("Total delay [hours];" + this.delegate.getTotalDelay() / 3600.);
-			bw.newLine();
-			bw.write("Total internalized delay [hours];" + this.delegate.getTotalInternalizedDelay() / 3600.);
-			bw.newLine();
-			bw.write("Not internalized delay (rounding errors) [hours];" + this.delegate.getDelayNotInternalized_roundingErrors() / 3600.);
-			bw.newLine();
-			bw.write("Not internalized delay (spill-back related delays without identifiying the causing agent) [hours];" + this.delayNotInternalized_spillbackNoCausingAgent / 3600.);
-			bw.newLine();
+    try {
+      BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+      bw.write("Total delay [hours];" + this.delegate.getTotalDelay() / 3600.);
+      bw.newLine();
+      bw.write(
+          "Total internalized delay [hours];" + this.delegate.getTotalInternalizedDelay() / 3600.);
+      bw.newLine();
+      bw.write(
+          "Not internalized delay (rounding errors) [hours];"
+              + this.delegate.getDelayNotInternalized_roundingErrors() / 3600.);
+      bw.newLine();
+      bw.write(
+          "Not internalized delay (spill-back related delays without identifiying the causing agent) [hours];"
+              + this.delayNotInternalized_spillbackNoCausingAgent / 3600.);
+      bw.newLine();
 
-			bw.close();
+      bw.close();
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		log.info("Congestion statistics written to " + fileName);	
-	}
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    log.info("Congestion statistics written to " + fileName);
+  }
 
-	@Override
-	public final double getTotalDelay() {
-		return this.delegate.getTotalDelay();
-	}
-	
-	public final double getDelayNotInternalizedSpillbackNoCausingAgent() {
-		return this.delayNotInternalized_spillbackNoCausingAgent;
-	}
+  @Override
+  public final double getTotalDelay() {
+    return this.delegate.getTotalDelay();
+  }
 
-	@Override
-	public void handleEvent(ActivityEndEvent event) {
-		// I read the following as: remove non-allocated delays from agents once they are no longer on a leg. kai, sep'15
+  public final double getDelayNotInternalizedSpillbackNoCausingAgent() {
+    return this.delayNotInternalized_spillbackNoCausingAgent;
+  }
 
-		if (event.getActType().contains("interaction")) {
-			// skip
-		} else {
-			if (this.agentId2storageDelay.get(event.getPersonId()) == null) {
-				// skip that person
+  @Override
+  public void handleEvent(ActivityEndEvent event) {
+    // I read the following as: remove non-allocated delays from agents once they are no longer on a
+    // leg. kai, sep'15
 
-			} else {
-				if (this.agentId2storageDelay.get(event.getPersonId()) != 0.) {
-					// log.warn("A delay of " + this.agentId2storageDelay.get(event.getDriverId()) + " sec. resulting from spill-back effects was not internalized. Setting the delay to 0.");
-					this.delayNotInternalized_spillbackNoCausingAgent += this.agentId2storageDelay.get(event.getPersonId());
-				}
-				this.agentId2storageDelay.put(event.getPersonId(), 0.);
-			}
-		}
-	}
+    if (event.getActType().contains("interaction")) {
+      // skip
+    } else {
+      if (this.agentId2storageDelay.get(event.getPersonId()) == null) {
+        // skip that person
 
-	@Override
-	public final void handleEvent(LinkLeaveEvent event) {
-		// yy see my note under CongestionHandlerBaseImpl.handleEvent( LinkLeaveEvent ... ) . kai, sep'15
-		
-		// coming here ...
-		this.delegate.handleEvent( event ) ;
+      } else {
+        if (this.agentId2storageDelay.get(event.getPersonId()) != 0.) {
+          // log.warn("A delay of " + this.agentId2storageDelay.get(event.getDriverId()) + " sec.
+          // resulting from spill-back effects was not internalized. Setting the delay to 0.");
+          this.delayNotInternalized_spillbackNoCausingAgent +=
+              this.agentId2storageDelay.get(event.getPersonId());
+        }
+        this.agentId2storageDelay.put(event.getPersonId(), 0.);
+      }
+    }
+  }
 
-		if (this.delegate.getPtVehicleIDs().contains(event.getVehicleId())){
-			// skip pt vehicles
-		} else {
-			
-			Id<Person> personId = this.delegate.getVehicle2DriverEventHandler().getDriverOfVehicle( event.getVehicleId() ) ;
+  @Override
+  public final void handleEvent(LinkLeaveEvent event) {
+    // yy see my note under CongestionHandlerBaseImpl.handleEvent( LinkLeaveEvent ... ) . kai,
+    // sep'15
 
-			if (this.delegate.getCarPersonIDs().contains(personId)) {
-				// car
-				LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get( event.getLinkId() ) ;
-				DelayInfo delayInfo = linkInfo.getFlowQueue().getLast();
-				calculateCongestion(event, delayInfo);
-			}
-		}
-	}
+    // coming here ...
+    this.delegate.handleEvent(event);
 
+    if (this.delegate.getPtVehicleIDs().contains(event.getVehicleId())) {
+      // skip pt vehicles
+    } else {
 
-	@Override
-	public void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo) {
-		// yy see my note under CongestionHandlerBaseImpl.handleEvent( LinkLeaveEvent ... ) . kai, sep'15
-		
-		double delayOnThisLink = delayInfo.linkLeaveTime - delayInfo.freeSpeedLeaveTime ;
+      Id<Person> personId =
+          this.delegate.getVehicle2DriverEventHandler().getDriverOfVehicle(event.getVehicleId());
 
-		// Check if this (affected) agent was previously delayed without internalizing the delay.
+      if (this.delegate.getCarPersonIDs().contains(personId)) {
+        // car
+        LinkCongestionInfo linkInfo =
+            this.delegate.getLinkId2congestionInfo().get(event.getLinkId());
+        DelayInfo delayInfo = linkInfo.getFlowQueue().getLast();
+        calculateCongestion(event, delayInfo);
+      }
+    }
+  }
 
-		double agentDelayWithDelaysOnPreviousLinks = 0.;		
+  @Override
+  public void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo) {
+    // yy see my note under CongestionHandlerBaseImpl.handleEvent( LinkLeaveEvent ... ) . kai,
+    // sep'15
 
-		if (this.agentId2storageDelay.get(delayInfo.personId) == null) {
-			agentDelayWithDelaysOnPreviousLinks = delayOnThisLink;
-		} else {
-			agentDelayWithDelaysOnPreviousLinks = delayOnThisLink + this.agentId2storageDelay.get(delayInfo.personId);
-			this.agentId2storageDelay.put(Id.createPersonId(delayInfo.personId), 0.);
-		}
+    double delayOnThisLink = delayInfo.linkLeaveTime - delayInfo.freeSpeedLeaveTime;
 
-		if (agentDelayWithDelaysOnPreviousLinks < 0.) {
-			throw new RuntimeException("The total delay is below 0. Aborting...");
+    // Check if this (affected) agent was previously delayed without internalizing the delay.
 
-		} else if (agentDelayWithDelaysOnPreviousLinks == 0.) {
-			// The agent was leaving the link without a delay.  Nothing to do ...
+    double agentDelayWithDelaysOnPreviousLinks = 0.;
 
-		} else {
-			// The agent was leaving the link with a delay.
+    if (this.agentId2storageDelay.get(delayInfo.personId) == null) {
+      agentDelayWithDelaysOnPreviousLinks = delayOnThisLink;
+    } else {
+      agentDelayWithDelaysOnPreviousLinks =
+          delayOnThisLink + this.agentId2storageDelay.get(delayInfo.personId);
+      this.agentId2storageDelay.put(Id.createPersonId(delayInfo.personId), 0.);
+    }
 
-			double storageDelay = this.delegate.computeFlowCongestionAndReturnStorageDelay(event.getTime(), event.getLinkId(), delayInfo, agentDelayWithDelaysOnPreviousLinks);
+    if (agentDelayWithDelaysOnPreviousLinks < 0.) {
+      throw new RuntimeException("The total delay is below 0. Aborting...");
 
-			if (storageDelay < 0.) {
-				throw new RuntimeException("The delay resulting from the storage capacity is below 0. (" + storageDelay + ") Aborting...");
+    } else if (agentDelayWithDelaysOnPreviousLinks == 0.) {
+      // The agent was leaving the link without a delay.  Nothing to do ...
 
-			} else if (storageDelay == 0.) {
-				// The delay resulting from the storage capacity is 0.
+    } else {
+      // The agent was leaving the link with a delay.
 
-			} else if (storageDelay > 0.) {	
-				// Saving the delay resulting from the storage capacity constraint for later when reaching the bottleneck link.
-				this.agentId2storageDelay.put(Id.createPersonId(delayInfo.personId), storageDelay);
-			} 
-		}
-	}
+      double storageDelay =
+          this.delegate.computeFlowCongestionAndReturnStorageDelay(
+              event.getTime(), event.getLinkId(), delayInfo, agentDelayWithDelaysOnPreviousLinks);
 
-	@Override
-	public double getTotalInternalizedDelay() {
-		return this.delegate.getTotalInternalizedDelay();
-	}
+      if (storageDelay < 0.) {
+        throw new RuntimeException(
+            "The delay resulting from the storage capacity is below 0. ("
+                + storageDelay
+                + ") Aborting...");
 
-	@Override
-	public double getTotalRoundingErrorDelay() {
-		return this.delegate.getDelayNotInternalized_roundingErrors();
-	}
+      } else if (storageDelay == 0.) {
+        // The delay resulting from the storage capacity is 0.
 
-	@Override
-	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		delegate.handleEvent(event);
-	}
+      } else if (storageDelay > 0.) {
+        // Saving the delay resulting from the storage capacity constraint for later when reaching
+        // the bottleneck link.
+        this.agentId2storageDelay.put(Id.createPersonId(delayInfo.personId), storageDelay);
+      }
+    }
+  }
+
+  @Override
+  public double getTotalInternalizedDelay() {
+    return this.delegate.getTotalInternalizedDelay();
+  }
+
+  @Override
+  public double getTotalRoundingErrorDelay() {
+    return this.delegate.getDelayNotInternalized_roundingErrors();
+  }
+
+  @Override
+  public void handleEvent(VehicleLeavesTrafficEvent event) {
+    delegate.handleEvent(event);
+  }
 }

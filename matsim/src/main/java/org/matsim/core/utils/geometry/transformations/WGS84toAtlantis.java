@@ -24,28 +24,26 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 /**
- * Transforms coordinates from a synthetic coordinate system to WGS84. The 
- * transformed coordinates will lie somewhere in the atlantic ocean, so it's not
- * disturbed by photographic texture. Coordinates in the synthetic coordinate 
- * system should be in the range (-100000,-100000)-(100000,100000) to have a useful transformation.
+ * Transforms coordinates from a synthetic coordinate system to WGS84. The transformed coordinates
+ * will lie somewhere in the atlantic ocean, so it's not disturbed by photographic texture.
+ * Coordinates in the synthetic coordinate system should be in the range
+ * (-100000,-100000)-(100000,100000) to have a useful transformation.
  *
  * @author mrieser
- * 
  * @see <a href="http://en.wikipedia.org/wiki/Atlantis">Atlantis</a>
  */
 public class WGS84toAtlantis implements CoordinateTransformation {
 
-	@Override
-	public Coord transform(Coord coord) {
-		double latitude = (coord.getY() - 10.0) * 10000.0 ;
-		double longitude = (coord.getX() + 30.0) * 10000.0 ;
-		double elevation;
-		try{
-			elevation = coord.getZ();
-			return new Coord(longitude, latitude, elevation);
-		} catch (Exception e){
-			return new Coord(longitude, latitude);
-		}
-	}
-
+  @Override
+  public Coord transform(Coord coord) {
+    double latitude = (coord.getY() - 10.0) * 10000.0;
+    double longitude = (coord.getX() + 30.0) * 10000.0;
+    double elevation;
+    try {
+      elevation = coord.getZ();
+      return new Coord(longitude, latitude, elevation);
+    } catch (Exception e) {
+      return new Coord(longitude, latitude);
+    }
+  }
 }

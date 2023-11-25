@@ -20,7 +20,6 @@
 package org.matsim.core.router;
 
 import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,111 +56,125 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 public class PseudoTransitRoutingModuleTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testRouteLeg() {
-		final Fixture f = new Fixture();
-		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0/3600, +6.0/3600, 0.0);
-		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
+  @Test
+  public void testRouteLeg() {
+    final Fixture f = new Fixture();
+    FreespeedTravelTimeAndDisutility freespeed =
+        new FreespeedTravelTimeAndDisutility(-6.0 / 3600, +6.0 / 3600, 0.0);
+    LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
 
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-		Leg leg = PopulationUtils.createLeg(TransportMode.pt);
-		Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 0));
-		fromAct.setLinkId(Id.create("1", Link.class));
-		Activity toAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 3000));
-		toAct.setLinkId(Id.create("3", Link.class));
+    Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+    Leg leg = PopulationUtils.createLeg(TransportMode.pt);
+    Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 0));
+    fromAct.setLinkId(Id.create("1", Link.class));
+    Activity toAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 3000));
+    toAct.setLinkId(Id.create("3", Link.class));
 
-		{
-			TeleportedModeParams params = new TeleportedModeParams("mode") ;
-			params.setTeleportedModeFreespeedFactor(2.);
-			params.setBeelineDistanceFactor(1.);
-			double tt = new FreespeedFactorRoutingModule(
-					"mode", f.s.getPopulation().getFactory(),
-					f.s.getNetwork(), routeAlgo, params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
-			Assert.assertEquals(400.0, tt, 1e-8);
-			Assert.assertEquals(400.0, leg.getTravelTime().seconds(), 1e-8);
-//			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
-			Assert.assertEquals(3000.0, leg.getRoute().getDistance(), 1e-8);
-		}{
-			TeleportedModeParams params = new TeleportedModeParams("mode") ;
-			params.setTeleportedModeFreespeedFactor(3.);
-			params.setBeelineDistanceFactor(2.);
-			double tt = new FreespeedFactorRoutingModule(
-					"mode", f.s.getPopulation().getFactory(),
-					f.s.getNetwork(), routeAlgo, params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
-			Assert.assertEquals(600.0, tt, 1e-8);
-			Assert.assertEquals(600.0, leg.getTravelTime().seconds(), 1e-8);
-			Assert.assertEquals(6000.0, leg.getRoute().getDistance(), 1e-8);
-		}{
-			// the following test is newer than the ones above.  I wanted to test the freespeed limit.  But could not do it in the same way
-			// above since it is not in FreespeedTravelTimeAndDisutility.  Could have modified that disutility.  But preferred to test in context.
-			// Thus the more complicated injector thing.  kai, nov'16
+    {
+      TeleportedModeParams params = new TeleportedModeParams("mode");
+      params.setTeleportedModeFreespeedFactor(2.);
+      params.setBeelineDistanceFactor(1.);
+      double tt =
+          new FreespeedFactorRoutingModule(
+                  "mode", f.s.getPopulation().getFactory(), f.s.getNetwork(), routeAlgo, params)
+              .routeLeg(person, leg, fromAct, toAct, 7.0 * 3600);
+      Assert.assertEquals(400.0, tt, 1e-8);
+      Assert.assertEquals(400.0, leg.getTravelTime().seconds(), 1e-8);
+      //			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
+      Assert.assertEquals(3000.0, leg.getRoute().getDistance(), 1e-8);
+    }
+    {
+      TeleportedModeParams params = new TeleportedModeParams("mode");
+      params.setTeleportedModeFreespeedFactor(3.);
+      params.setBeelineDistanceFactor(2.);
+      double tt =
+          new FreespeedFactorRoutingModule(
+                  "mode", f.s.getPopulation().getFactory(), f.s.getNetwork(), routeAlgo, params)
+              .routeLeg(person, leg, fromAct, toAct, 7.0 * 3600);
+      Assert.assertEquals(600.0, tt, 1e-8);
+      Assert.assertEquals(600.0, leg.getTravelTime().seconds(), 1e-8);
+      Assert.assertEquals(6000.0, leg.getRoute().getDistance(), 1e-8);
+    }
+    {
+      // the following test is newer than the ones above.  I wanted to test the freespeed limit.
+      // But could not do it in the same way
+      // above since it is not in FreespeedTravelTimeAndDisutility.  Could have modified that
+      // disutility.  But preferred to test in context.
+      // Thus the more complicated injector thing.  kai, nov'16
 
-			TeleportedModeParams params = new TeleportedModeParams("mode") ;
-			params.setTeleportedModeFreespeedFactor(2.);
-			params.setBeelineDistanceFactor(1.);
-			params.setTeleportedModeFreespeedLimit(5.);
-			f.s.getConfig().routing().addModeRoutingParams(params);
-			f.s.getConfig().controller().setOutputDirectory(utils.getOutputDirectory());
+      TeleportedModeParams params = new TeleportedModeParams("mode");
+      params.setTeleportedModeFreespeedFactor(2.);
+      params.setBeelineDistanceFactor(1.);
+      params.setTeleportedModeFreespeedLimit(5.);
+      f.s.getConfig().routing().addModeRoutingParams(params);
+      f.s.getConfig().controller().setOutputDirectory(utils.getOutputDirectory());
 
-			com.google.inject.Injector injector = Injector.createInjector(f.s.getConfig(), new AbstractModule() {
-				@Override public void install() {
-					install(new NewControlerModule());
-					install(new ControlerDefaultCoreListenersModule());
-					install(new ControlerDefaultsModule()) ;
-					install(new ScenarioByInstanceModule(f.s));
-				}
-			});
+      com.google.inject.Injector injector =
+          Injector.createInjector(
+              f.s.getConfig(),
+              new AbstractModule() {
+                @Override
+                public void install() {
+                  install(new NewControlerModule());
+                  install(new ControlerDefaultCoreListenersModule());
+                  install(new ControlerDefaultsModule());
+                  install(new ScenarioByInstanceModule(f.s));
+                }
+              });
 
-			TripRouter tripRouter = injector.getInstance(TripRouter.class) ;
+      TripRouter tripRouter = injector.getInstance(TripRouter.class);
 
-			Facility fromFacility = FacilitiesUtils.toFacility(fromAct, f.s.getActivityFacilities() ) ;
-			Facility toFacility = FacilitiesUtils.toFacility(toAct, f.s.getActivityFacilities() );
+      Facility fromFacility = FacilitiesUtils.toFacility(fromAct, f.s.getActivityFacilities());
+      Facility toFacility = FacilitiesUtils.toFacility(toAct, f.s.getActivityFacilities());
 
-			List<? extends PlanElement> result = tripRouter.calcRoute("mode", fromFacility, toFacility, 7.0*3600., person, new AttributesImpl()) ;
-			Gbl.assertIf( result.size()==1);
-			Leg newLeg = (Leg) result.get(0) ;
+      List<? extends PlanElement> result =
+          tripRouter.calcRoute(
+              "mode", fromFacility, toFacility, 7.0 * 3600., person, new AttributesImpl());
+      Gbl.assertIf(result.size() == 1);
+      Leg newLeg = (Leg) result.get(0);
 
-			Assert.assertEquals(800.0, newLeg.getTravelTime().seconds(), 1e-8);
-//			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
-			Assert.assertEquals(3000.0, newLeg.getRoute().getDistance(), 1e-8);
-		}
-	}
+      Assert.assertEquals(800.0, newLeg.getTravelTime().seconds(), 1e-8);
+      //			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
+      Assert.assertEquals(3000.0, newLeg.getRoute().getDistance(), 1e-8);
+    }
+  }
 
-	private static class Fixture {
-		public final Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+  private static class Fixture {
+    public final Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		public Fixture() {
-			s.getConfig().controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-			TeleportedModeParams walk = new TeleportedModeParams(TransportMode.walk);
-			walk.setBeelineDistanceFactor(1.3);
-			walk.setTeleportedModeSpeed(3.0 / 3.6);
-			s.getConfig().routing().addModeRoutingParams(walk);
+    public Fixture() {
+      s.getConfig()
+          .controller()
+          .setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+      TeleportedModeParams walk = new TeleportedModeParams(TransportMode.walk);
+      walk.setBeelineDistanceFactor(1.3);
+      walk.setTeleportedModeSpeed(3.0 / 3.6);
+      s.getConfig().routing().addModeRoutingParams(walk);
 
-			Network net = this.s.getNetwork();
-			NetworkFactory nf = net.getFactory();
-			Node n1 = nf.createNode(Id.create("1", Node.class), new Coord(0, 0));
-			Node n2 = nf.createNode(Id.create("2", Node.class), new Coord(0, 1000));
-			Node n3 = nf.createNode(Id.create("3", Node.class), new Coord(0, 2000));
-			Node n4 = nf.createNode(Id.create("4", Node.class), new Coord(0, 3000));
-			net.addNode(n1);
-			net.addNode(n2);
-			net.addNode(n3);
-			net.addNode(n4);
-			Link l1 = nf.createLink(Id.create("1", Link.class), n1, n2);
-			Link l2 = nf.createLink(Id.create("2", Link.class), n2, n3);
-			Link l3 = nf.createLink(Id.create("3", Link.class), n3, n4);
-			l1.setFreespeed(10.0);
-			l2.setFreespeed(10.0);
-			l3.setFreespeed(10.0);
-			l1.setLength(1000.0);
-			l2.setLength(1000.0);
-			l3.setLength(1000.0);
-			net.addLink(l1);
-			net.addLink(l2);
-			net.addLink(l3);
-		}
-	}
+      Network net = this.s.getNetwork();
+      NetworkFactory nf = net.getFactory();
+      Node n1 = nf.createNode(Id.create("1", Node.class), new Coord(0, 0));
+      Node n2 = nf.createNode(Id.create("2", Node.class), new Coord(0, 1000));
+      Node n3 = nf.createNode(Id.create("3", Node.class), new Coord(0, 2000));
+      Node n4 = nf.createNode(Id.create("4", Node.class), new Coord(0, 3000));
+      net.addNode(n1);
+      net.addNode(n2);
+      net.addNode(n3);
+      net.addNode(n4);
+      Link l1 = nf.createLink(Id.create("1", Link.class), n1, n2);
+      Link l2 = nf.createLink(Id.create("2", Link.class), n2, n3);
+      Link l3 = nf.createLink(Id.create("3", Link.class), n3, n4);
+      l1.setFreespeed(10.0);
+      l2.setFreespeed(10.0);
+      l3.setFreespeed(10.0);
+      l1.setLength(1000.0);
+      l2.setLength(1000.0);
+      l3.setLength(1000.0);
+      net.addLink(l1);
+      net.addLink(l2);
+      net.addLink(l3);
+    }
+  }
 }

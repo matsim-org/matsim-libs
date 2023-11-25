@@ -19,67 +19,64 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.controller;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import java.util.Collection;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
+import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
+import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupIdentifier;
+import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
+import org.matsim.contrib.socnetsim.framework.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-
-import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
-import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
-import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupIdentifier;
-import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
-import org.matsim.contrib.socnetsim.framework.replanning.modules.AbstractMultithreadedGenericStrategyModule;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 /**
  * @author thibautd
  */
-public abstract class AbstractPrepareForSimListener extends AbstractMultithreadedGenericStrategyModule<ReplanningGroup> implements StartupListener {
-	@Inject protected GroupIdentifier links;
-	@Inject protected Scenario sc;
-	@Inject protected PlanRoutingAlgorithmFactory routingAlgoFactory;
-	@Inject protected ScoringFunctionFactory scoringFunctionFactory;
-	@Inject protected Provider<TripRouter> tripRouter;
-	@Inject protected Map<String, TravelDisutilityFactory> travelDisutility;
-	@Inject protected Map<String, Provider<TravelTime>> travelTime;
+public abstract class AbstractPrepareForSimListener
+    extends AbstractMultithreadedGenericStrategyModule<ReplanningGroup> implements StartupListener {
+  @Inject protected GroupIdentifier links;
+  @Inject protected Scenario sc;
+  @Inject protected PlanRoutingAlgorithmFactory routingAlgoFactory;
+  @Inject protected ScoringFunctionFactory scoringFunctionFactory;
+  @Inject protected Provider<TripRouter> tripRouter;
+  @Inject protected Map<String, TravelDisutilityFactory> travelDisutility;
+  @Inject protected Map<String, Provider<TravelTime>> travelTime;
 
-	public AbstractPrepareForSimListener( ) {
-		super( 1 );
-	}
+  public AbstractPrepareForSimListener() {
+    super(1);
+  }
 
-	public AbstractPrepareForSimListener( final GlobalConfigGroup globalConfigGroup ) {
-		super( globalConfigGroup );
-	}
+  public AbstractPrepareForSimListener(final GlobalConfigGroup globalConfigGroup) {
+    super(globalConfigGroup);
+  }
 
-	@Override
-	public void notifyStartup( StartupEvent event ) {
+  @Override
+  public void notifyStartup(StartupEvent event) {
 
-		final Collection<ReplanningGroup> groups = links.identifyGroups( sc.getPopulation() );
+    final Collection<ReplanningGroup> groups = links.identifyGroups(sc.getPopulation());
 
-		// not nice, but replanningcontextimp wants iteration number...
-		final ReplanningContext context = new ReplanningContext() {
-			@Override
-			public int getIteration() {
-				return 0;
-			}
-		};
+    // not nice, but replanningcontextimp wants iteration number...
+    final ReplanningContext context =
+        new ReplanningContext() {
+          @Override
+          public int getIteration() {
+            return 0;
+          }
+        };
 
-		this.handlePlans( context , groups );
-	}
+    this.handlePlans(context, groups);
+  }
 
-	@Override
-	public abstract GenericPlanAlgorithm<ReplanningGroup> createAlgorithm( ReplanningContext replanningContext );
+  @Override
+  public abstract GenericPlanAlgorithm<ReplanningGroup> createAlgorithm(
+      ReplanningContext replanningContext);
 }
-

@@ -20,10 +20,8 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
-import java.util.HashMap;
-
 import jakarta.inject.Inject;
-
+import java.util.HashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -35,55 +33,64 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-
 /**
  * The starting point of the whole micro-simulation.
+ *
  * @see <a href="http://www.matsim.org/docs/jdeqsim">http://www.matsim.org/docs/jdeqsim</a>
  * @author rashid_waraich
  */
 public class JDEQSimulation implements Mobsim {
 
-	private final static Logger log = LogManager.getLogger(JDEQSimulation.class);
+  private static final Logger log = LogManager.getLogger(JDEQSimulation.class);
 
-	private final JDEQSimConfigGroup config;
-	protected Scenario scenario;
-	private final EventsManager events;
-	private final TimeInterpretation timeInterpretation;
+  private final JDEQSimConfigGroup config;
+  protected Scenario scenario;
+  private final EventsManager events;
+  private final TimeInterpretation timeInterpretation;
 
-	@Inject
-	public JDEQSimulation(final JDEQSimConfigGroup config, final Scenario scenario, final EventsManager events, final TimeInterpretation timeInterpretation) {
-		Road.setConfig(config);
-		Message.setEventsManager(events);
-		this.config = config;
-		this.scenario = scenario;
-		this.events = events;
-		this.timeInterpretation = timeInterpretation;
-	}
+  @Inject
+  public JDEQSimulation(
+      final JDEQSimConfigGroup config,
+      final Scenario scenario,
+      final EventsManager events,
+      final TimeInterpretation timeInterpretation) {
+    Road.setConfig(config);
+    Message.setEventsManager(events);
+    this.config = config;
+    this.scenario = scenario;
+    this.events = events;
+    this.timeInterpretation = timeInterpretation;
+  }
 
-	@Override
-	public void run() {
-		events.initProcessing();
-		Timer t = new Timer();
-		t.startTimer();
+  @Override
+  public void run() {
+    events.initProcessing();
+    Timer t = new Timer();
+    t.startTimer();
 
-		Scheduler scheduler = new Scheduler(new MessageQueue(), config.getSimulationEndTime().orElse(Double.MAX_VALUE));
-		Road.setAllRoads(new HashMap<Id<Link>, Road>());
+    Scheduler scheduler =
+        new Scheduler(new MessageQueue(), config.getSimulationEndTime().orElse(Double.MAX_VALUE));
+    Road.setAllRoads(new HashMap<Id<Link>, Road>());
 
-		// initialize network
-		Road road;
-		for (Link link : this.scenario.getNetwork().getLinks().values()) {
-			road = new Road(scheduler, link);
-			Road.getAllRoads().put(link.getId(), road);
-		}
+    // initialize network
+    Road road;
+    for (Link link : this.scenario.getNetwork().getLinks().values()) {
+      road = new Road(scheduler, link);
+      Road.getAllRoads().put(link.getId(), road);
+    }
 
-		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			new Vehicle(scheduler, person, timeInterpretation); // the vehicle registers itself to the scheduler
-		}
+    for (Person person : this.scenario.getPopulation().getPersons().values()) {
+      new Vehicle(
+          scheduler, person, timeInterpretation); // the vehicle registers itself to the scheduler
+    }
 
-		scheduler.startSimulation();
+    scheduler.startSimulation();
 
-		t.endTimer();
-		log.info("Time needed for one iteration (only JDEQSimulation part): " + t.getMeasuredTime() + "[ms]");
-		events.finishProcessing();
-	}
+    t.endTimer();
+    log.info(
+        "Time needed for one iteration (only JDEQSimulation part): "
+            + t.getMeasuredTime()
+            + "[ms]");
+    events.finishProcessing();
+  }
 }

@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * Transit.java
@@ -19,17 +18,18 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.pt.transitSchedule.api;
+package org.matsim.pt.transitSchedule.api;
 
-import com.google.inject.BindingAnnotation;
-import java.lang.annotation.Target;
-import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import com.google.inject.BindingAnnotation;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 @BindingAnnotation
-@Target({ FIELD, PARAMETER, METHOD }) @Retention(RUNTIME)
-public @interface Transit {
-}
+@Target({FIELD, PARAMETER, METHOD})
+@Retention(RUNTIME)
+public @interface Transit {}

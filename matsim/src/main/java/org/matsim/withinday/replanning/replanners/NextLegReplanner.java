@@ -37,44 +37,48 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.utils.EditTrips;
 
 /**
- * The NextLegReplanner can be used while an agent is performing an activity. The
- * replanner creates a new trip from the current activity to the next main activity 
- * in the agent's plan.
- * 
- * In fact this should be renamed to NextTripReplanner. cdobler, apr'14
+ * The NextLegReplanner can be used while an agent is performing an activity. The replanner creates
+ * a new trip from the current activity to the next main activity in the agent's plan.
+ *
+ * <p>In fact this should be renamed to NextTripReplanner. cdobler, apr'14
  */
 public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 
-	private final TripRouter tripRouter;
-	private final TimeInterpretation timeInterpretation;
+  private final TripRouter tripRouter;
+  private final TimeInterpretation timeInterpretation;
 
-	NextLegReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface, TripRouter tripRouter, TimeInterpretation timeInterpretation) {
-		super(id, scenario, internalInterface);
-		this.tripRouter = tripRouter;
-		this.timeInterpretation = timeInterpretation;
-	}
+  NextLegReplanner(
+      Id<WithinDayReplanner> id,
+      Scenario scenario,
+      ActivityEndRescheduler internalInterface,
+      TripRouter tripRouter,
+      TimeInterpretation timeInterpretation) {
+    super(id, scenario, internalInterface);
+    this.tripRouter = tripRouter;
+    this.timeInterpretation = timeInterpretation;
+  }
 
-	@Override
-	public boolean doReplanning(MobsimAgent withinDayAgent) {
-		
-		Plan executedPlan = WithinDayAgentUtils.getModifiablePlan(withinDayAgent);
+  @Override
+  public boolean doReplanning(MobsimAgent withinDayAgent) {
 
-		// If we don't have an executed plan
-		if (executedPlan == null) return false;
+    Plan executedPlan = WithinDayAgentUtils.getModifiablePlan(withinDayAgent);
 
-		// Get the activity currently performed by the agent as well as the subsequent trip.
-		Activity currentActivity = (Activity) WithinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
-		Trip trip = TripStructureUtils.findTripStartingAtActivity( currentActivity, executedPlan );
+    // If we don't have an executed plan
+    if (executedPlan == null) return false;
 
-		// If there is no trip after the activity.
-		if (trip == null) return false;
-		
-		String routingMode = TripStructureUtils.identifyMainMode(trip.getTripElements());
-		OptionalTime departureTime = TripStructureUtils.getDepartureTime(trip);
-		// To replan pt legs, we would need internalInterface of type InternalInterface.class
-		new EditTrips( this.tripRouter, scenario, null, timeInterpretation ).replanFutureTrip(trip, executedPlan, routingMode, departureTime.seconds() );
-		
-		return true;
-	}
+    // Get the activity currently performed by the agent as well as the subsequent trip.
+    Activity currentActivity = (Activity) WithinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
+    Trip trip = TripStructureUtils.findTripStartingAtActivity(currentActivity, executedPlan);
 
+    // If there is no trip after the activity.
+    if (trip == null) return false;
+
+    String routingMode = TripStructureUtils.identifyMainMode(trip.getTripElements());
+    OptionalTime departureTime = TripStructureUtils.getDepartureTime(trip);
+    // To replan pt legs, we would need internalInterface of type InternalInterface.class
+    new EditTrips(this.tripRouter, scenario, null, timeInterpretation)
+        .replanFutureTrip(trip, executedPlan, routingMode, departureTime.seconds());
+
+    return true;
+  }
 }

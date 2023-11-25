@@ -21,39 +21,37 @@
 package org.matsim.vis.otfvis.opengl.gl;
 
 /**
- * Represents a very basic, immutable three-dimensional point.  (Since we
- * have limited use for it in this project, it's easier to roll our own than
- * to use the one defined in the javax.vecmath package.)
+ * Represents a very basic, immutable three-dimensional point. (Since we have limited use for it in
+ * this project, it's easier to roll our own than to use the one defined in the javax.vecmath
+ * package.)
  *
  * @author Chris Campbell
  */
 public class Point3f {
-    
-    public float x, y, z;
-    
-    public Point3f() {
-    }
-    
-    public Point3f(float x, float y, float z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-    
-    public float getX() {
-        return x;
-    }
-    
-    public float getY() {
-        return y;
-    }
-    
-    public float getZ() {
-        return z;
-    }
-    
-    public String toString() {
-    	return "("+x+","+y+","+z+")";
-    }
-    
+
+  public float x, y, z;
+
+  public Point3f() {}
+
+  public Point3f(float x, float y, float z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+  }
+
+  public float getX() {
+    return x;
+  }
+
+  public float getY() {
+    return y;
+  }
+
+  public float getZ() {
+    return z;
+  }
+
+  public String toString() {
+    return "(" + x + "," + y + "," + z + ")";
+  }
 }

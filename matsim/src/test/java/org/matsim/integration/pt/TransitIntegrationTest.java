@@ -31,41 +31,48 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class TransitIntegrationTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test(expected = RuntimeException.class)
-	public void testPtInteractionParams() {
-		Config config = ConfigUtils.createConfig();
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		ScoringConfigGroup.ActivityParams params = new ScoringConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
-		params.setScoringThisActivityAtAll(true);
-		params.setTypicalDuration(60.0);
-		config.scoring().addActivityParams(params);
-		// ---
-		config.controller().setLastIteration(0); // in case the exception is _not_ thrown, we don't need 100 iterations to find that out ...
-		// ---
-		Controler controler = new Controler(config);
-		controler.run();
-	}
+  @Test(expected = RuntimeException.class)
+  public void testPtInteractionParams() {
+    Config config = ConfigUtils.createConfig();
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
+    ScoringConfigGroup.ActivityParams params =
+        new ScoringConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
+    params.setScoringThisActivityAtAll(true);
+    params.setTypicalDuration(60.0);
+    config.scoring().addActivityParams(params);
+    // ---
+    config
+        .controller()
+        .setLastIteration(
+            0); // in case the exception is _not_ thrown, we don't need 100 iterations to find that
+    // out ...
+    // ---
+    Controler controler = new Controler(config);
+    controler.run();
+  }
 
+  @Test(expected = RuntimeException.class)
+  public void testSubpopulationParams() {
+    Config config = ConfigUtils.createConfig();
+    config.controller().setOutputDirectory(utils.getOutputDirectory());
+    ScoringConfigGroup.ActivityParams params = new ScoringConfigGroup.ActivityParams("home");
+    params.setScoringThisActivityAtAll(true);
+    params.setTypicalDuration(60.0);
+    ScoringParameterSet sps = config.scoring().getOrCreateScoringParameters("one");
+    sps.addActivityParams(params);
+    ScoringParameterSet sps2 = config.scoring().getOrCreateScoringParameters("two");
+    sps2.addActivityParams(params);
+    // ---
+    config
+        .controller()
+        .setLastIteration(
+            0); // in case the exception is _not_ thrown, we don't need 100 iterations to find that
+    // out ...
+    config.checkConsistency();
 
-	@Test(expected = RuntimeException.class)
-	public void testSubpopulationParams() {
-		Config config = ConfigUtils.createConfig();
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		ScoringConfigGroup.ActivityParams params = new ScoringConfigGroup.ActivityParams("home");
-		params.setScoringThisActivityAtAll(true);
-		params.setTypicalDuration(60.0);
-		ScoringParameterSet sps = config.scoring().getOrCreateScoringParameters("one");
-		sps.addActivityParams(params);
-		ScoringParameterSet sps2 = config.scoring().getOrCreateScoringParameters("two");
-		sps2.addActivityParams(params);
-		// ---
-		config.controller().setLastIteration(0); // in case the exception is _not_ thrown, we don't need 100 iterations to find that out ...
-		config.checkConsistency();
-
-		Controler controler = new Controler(config);
-		controler.run();
-	}
-
+    Controler controler = new Controler(config);
+    controler.run();
+  }
 }

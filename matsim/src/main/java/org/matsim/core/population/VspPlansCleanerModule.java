@@ -26,12 +26,13 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 
 public final class VspPlansCleanerModule extends AbstractModule {
-    @Override
-    public void install() {
-        PlansConfigGroup.ActivityDurationInterpretation actDurInterpr = getConfig().plans().getActivityDurationInterpretation() ;
-        if ( actDurInterpr != PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime
-                || getConfig().plans().isRemovingUnneccessaryPlanAttributes() ) {
-            addControlerListenerBinding().to(VspPlansCleaner.class);
-        }
+  @Override
+  public void install() {
+    PlansConfigGroup.ActivityDurationInterpretation actDurInterpr =
+        getConfig().plans().getActivityDurationInterpretation();
+    if (actDurInterpr != PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime
+        || getConfig().plans().isRemovingUnneccessaryPlanAttributes()) {
+      addControlerListenerBinding().to(VspPlansCleaner.class);
     }
+  }
 }

@@ -20,7 +20,6 @@
 package org.matsim.contrib.socnetsim.sharedvehicles;
 
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
@@ -29,11 +28,8 @@ import org.matsim.vehicles.Vehicle;
  * @author thibautd
  */
 public interface VehicleRessources {
-	public static final String ELEMENT_NAME = "vehicleRessources";
+  public static final String ELEMENT_NAME = "vehicleRessources";
 
-	/**
-	 * gives access to the ids of the vehicles the Person can use
-	 */
-	public Set<Id<Vehicle>> identifyVehiclesUsableForAgent(Id<Person> person);
+  /** gives access to the ids of the vehicles the Person can use */
+  public Set<Id<Vehicle>> identifyVehiclesUsableForAgent(Id<Person> person);
 }
-

@@ -26,36 +26,35 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 final class VehicleImpl implements Vehicle {
 
-    private VehicleType type;
-    private Id<Vehicle> id;
-    private Attributes attributes;
+  private VehicleType type;
+  private Id<Vehicle> id;
+  private Attributes attributes;
 
-    VehicleImpl(Id<Vehicle> id, VehicleType type) {
-        Gbl.assertNotNull(id);
-        Gbl.assertNotNull(type);
-        this.id = id;
-        this.type = type;
-        this.attributes = new AttributesImpl();
-    }
+  VehicleImpl(Id<Vehicle> id, VehicleType type) {
+    Gbl.assertNotNull(id);
+    Gbl.assertNotNull(type);
+    this.id = id;
+    this.type = type;
+    this.attributes = new AttributesImpl();
+  }
 
-    @Override
-    public Id<Vehicle> getId() {
-        return id;
-    }
+  @Override
+  public Id<Vehicle> getId() {
+    return id;
+  }
 
-    @Override
-    public VehicleType getType() {
-        return this.type;
-    }
+  @Override
+  public VehicleType getType() {
+    return this.type;
+  }
 
-    @Override
-    public String toString() {
-        return "[ID=" + id + " | type=" + type.toString() + "]";
-    }
+  @Override
+  public String toString() {
+    return "[ID=" + id + " | type=" + type.toString() + "]";
+  }
 
-
-    @Override
-    public Attributes getAttributes() {
-        return this.attributes;
-    }
+  @Override
+  public Attributes getAttributes() {
+    return this.attributes;
+  }
 }

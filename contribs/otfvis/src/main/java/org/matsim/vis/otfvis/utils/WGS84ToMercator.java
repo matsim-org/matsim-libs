@@ -26,67 +26,77 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 public class WGS84ToMercator {
 
-	public static class Project implements CoordinateTransformation {
+  public static class Project implements CoordinateTransformation {
 
-		private double radius;
+    private double radius;
 
-		public Project(int zoom) {
-			int tileSize = 256;
-			int circumference = widthOfWorldInPixels(zoom, tileSize);
-		    this.radius = circumference / (2* Math.PI);
-		}
+    public Project(int zoom) {
+      int tileSize = 256;
+      int circumference = widthOfWorldInPixels(zoom, tileSize);
+      this.radius = circumference / (2 * Math.PI);
+    }
 
-		@Override
-		public Coord transform(Coord coord) {
-			Coord otherResult; 
-			double elevation;
-			try{
-				elevation = coord.getZ();
-				otherResult = new Coord((double) MercatorUtils.longToX(coord.getX(), radius), (double) MercatorUtils.latToY(coord.getY(), radius), elevation);
-			} catch (Exception e){
-				otherResult = new Coord((double) MercatorUtils.longToX(coord.getX(), radius), (double) MercatorUtils.latToY(coord.getY(), radius));
-			}
-			return otherResult;
-		}
+    @Override
+    public Coord transform(Coord coord) {
+      Coord otherResult;
+      double elevation;
+      try {
+        elevation = coord.getZ();
+        otherResult =
+            new Coord(
+                (double) MercatorUtils.longToX(coord.getX(), radius),
+                (double) MercatorUtils.latToY(coord.getY(), radius),
+                elevation);
+      } catch (Exception e) {
+        otherResult =
+            new Coord(
+                (double) MercatorUtils.longToX(coord.getX(), radius),
+                (double) MercatorUtils.latToY(coord.getY(), radius));
+      }
+      return otherResult;
+    }
 
-		private int widthOfWorldInPixels(int zoom, int TILE_SIZE) {
-	        int tiles = (int)Math.pow(2 , zoom);
-	        int circumference = TILE_SIZE * tiles;
-	        return circumference;
-	    }
-		
-	}
+    private int widthOfWorldInPixels(int zoom, int TILE_SIZE) {
+      int tiles = (int) Math.pow(2, zoom);
+      int circumference = TILE_SIZE * tiles;
+      return circumference;
+    }
+  }
 
+  public static class Deproject implements CoordinateTransformation {
 
-	public static class Deproject implements CoordinateTransformation {
+    private double radius;
 
-		private double radius;
-		
-		public Deproject(int zoom) {
-			int tileSize = 256;
-			int circumference = widthOfWorldInPixels(zoom, tileSize);
-		    this.radius = circumference / (2* Math.PI);
-		}
+    public Deproject(int zoom) {
+      int tileSize = 256;
+      int circumference = widthOfWorldInPixels(zoom, tileSize);
+      this.radius = circumference / (2 * Math.PI);
+    }
 
-		@Override
-		public Coord transform(Coord coord) {
-			Coord otherResult; 
-			double elevation;
-			try{
-				elevation = coord.getZ();
-				otherResult = new Coord(MercatorUtils.xToLong((int) coord.getX(), radius), MercatorUtils.yToLat((int) coord.getY(), radius), elevation);
-			} catch (Exception e){
-				otherResult = new Coord(MercatorUtils.xToLong((int) coord.getX(), radius), MercatorUtils.yToLat((int) coord.getY(), radius));
-			}
-			return otherResult;
-		}
+    @Override
+    public Coord transform(Coord coord) {
+      Coord otherResult;
+      double elevation;
+      try {
+        elevation = coord.getZ();
+        otherResult =
+            new Coord(
+                MercatorUtils.xToLong((int) coord.getX(), radius),
+                MercatorUtils.yToLat((int) coord.getY(), radius),
+                elevation);
+      } catch (Exception e) {
+        otherResult =
+            new Coord(
+                MercatorUtils.xToLong((int) coord.getX(), radius),
+                MercatorUtils.yToLat((int) coord.getY(), radius));
+      }
+      return otherResult;
+    }
 
-		private int widthOfWorldInPixels(int zoom, int TILE_SIZE) {
-	        int tiles = (int)Math.pow(2 , zoom);
-	        int circumference = TILE_SIZE * tiles;
-	        return circumference;
-	    }
-		
-	}
-	
+    private int widthOfWorldInPixels(int zoom, int TILE_SIZE) {
+      int tiles = (int) Math.pow(2, zoom);
+      int circumference = TILE_SIZE * tiles;
+      return circumference;
+    }
+  }
 }

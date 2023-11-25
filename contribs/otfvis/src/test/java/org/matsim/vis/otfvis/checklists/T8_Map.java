@@ -9,12 +9,12 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class T8_Map {
 
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("test/scenarios/berlin/config.xml");
-		OTFVisConfigGroup otfVisConfigGroup = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
-		otfVisConfigGroup.setMapOverlayMode(true);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		OTFVis.playScenario(scenario);
-	}
-
+  public static void main(String[] args) {
+    Config config = ConfigUtils.loadConfig("test/scenarios/berlin/config.xml");
+    OTFVisConfigGroup otfVisConfigGroup =
+        ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
+    otfVisConfigGroup.setMapOverlayMode(true);
+    Scenario scenario = ScenarioUtils.loadScenario(config);
+    OTFVis.playScenario(scenario);
+  }
 }

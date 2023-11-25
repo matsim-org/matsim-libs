@@ -25,10 +25,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime.TravelTimeInfo;
 
 public interface TravelTimeInfoProvider {
-	
-	/*package*/ TravelTimeInfo getTravelTimeInfo(final Id<Link> linkId);
-	
-	/*package*/ TravelTimeInfo getTravelTimeInfo(final Link link);
-	// needs to be available separately since sometimes calling
-	// with the link argument is faster. kai, dec'17
+
+  /*package*/ TravelTimeInfo getTravelTimeInfo(final Id<Link> linkId);
+
+  /*package*/ TravelTimeInfo getTravelTimeInfo(final Link link);
+  // needs to be available separately since sometimes calling
+  // with the link argument is faster. kai, dec'17
 }

@@ -19,8 +19,8 @@
 
 package org.matsim.contrib.accidents;
 
+import com.google.inject.Inject;
 import java.util.ArrayList;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -33,102 +33,125 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 
-import com.google.inject.Inject;
-
 /**
-* @author ikaddoura, mmayobre
-*/
+ * @author ikaddoura, mmayobre
+ */
+class AccidentControlerListener
+    implements StartupListener, IterationEndsListener, AfterMobsimListener {
+  private static final Logger log = LogManager.getLogger(AccidentControlerListener.class);
 
- class AccidentControlerListener implements StartupListener, IterationEndsListener, AfterMobsimListener {
-	private static final Logger log = LogManager.getLogger(AccidentControlerListener.class);
+  @Inject private AnalysisEventHandler analzyer;
 
-	@Inject
-	private AnalysisEventHandler analzyer;
-	
-	@Inject
-	private Scenario scenario;
-	
-	@Inject
-	private AccidentsContext accidentsContext;
+  @Inject private Scenario scenario;
 
-	@Inject AccidentControlerListener(){}
-		
-	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {		
-		AccidentWriter accidentWriter = new AccidentWriter();
-		accidentWriter.write(this.scenario, event, this.accidentsContext.getLinkId2info(), analzyer);	
-	}
+  @Inject private AccidentsContext accidentsContext;
 
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		
-		log.info("Computing accident costs per link and time bin...");
-		AccidentsConfigGroup accidentsCfg = (AccidentsConfigGroup) scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
-		
-		double totalAccidentCostsPerDay = 0.;
-		
-		final double timeBinSize = this.scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize();	
-		
-		for (AccidentLinkInfo linkInfo : this.accidentsContext.getLinkId2info().values()) {
-					
-			Link link = this.scenario.getNetwork().getLinks().get(linkInfo.getLinkId());			
+  @Inject
+  AccidentControlerListener() {}
 
-			for (double endTime = timeBinSize ; endTime <= this.scenario.getConfig().travelTimeCalculator().getMaxTime(); endTime = endTime + timeBinSize ) {
-				
-				final double time = (endTime - timeBinSize/2.);
-				final int timeBinNr = (int) (time / timeBinSize);
-				
-				final AccidentsConfigGroup accidentSettings = (AccidentsConfigGroup) scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
-				final double demand = accidentSettings.getScaleFactor() * analzyer.getDemand(linkInfo.getLinkId(), timeBinNr);
-				
-				double accidentCosts = 0.;
-								
-				String linkAccidentsComputationMethod = (String) this.scenario.getNetwork().getLinks().get(linkInfo.getLinkId()).getAttributes().getAttribute(accidentsCfg.getAccidentsComputationMethodAttributeName());
-				
-				if (linkAccidentsComputationMethod == null) {
-					throw new RuntimeException("Required link attribute " + accidentsCfg.getAccidentsComputationMethodAttributeName() + " is null."
-							+ " Please pre-process your network and specify the link attributes that are required to compute accident costs. Aborting...");
-				}
-				
-				if (linkAccidentsComputationMethod.equals( AccidentsComputationMethod.BVWP.toString() )) {
-					String bvwpRoadTypeString = (String) link.getAttributes().getAttribute( AccidentsConfigGroup.BVWP_ROAD_TYPE_ATTRIBUTE_NAME );
+  @Override
+  public void notifyIterationEnds(IterationEndsEvent event) {
+    AccidentWriter accidentWriter = new AccidentWriter();
+    accidentWriter.write(this.scenario, event, this.accidentsContext.getLinkId2info(), analzyer);
+  }
 
-					if (bvwpRoadTypeString == null) {
-						throw new RuntimeException("Required link attribute " + AccidentsConfigGroup.BVWP_ROAD_TYPE_ATTRIBUTE_NAME + " is null."
-								+ " Please pre-process your network and specify the link attributes that are required to compute accident costs. Aborting...");
-					}
-					
-					ArrayList<Integer> bvwpRoadType = new ArrayList<>();
-					bvwpRoadType.add(0, Integer.valueOf(bvwpRoadTypeString.split(",")[0]));
-					bvwpRoadType.add(1, Integer.valueOf(bvwpRoadTypeString.split(",")[1]));
-					bvwpRoadType.add(2, Integer.valueOf(bvwpRoadTypeString.split(",")[2]));
-					accidentCosts = AccidentCostComputationBVWP.computeAccidentCosts(demand, link, bvwpRoadType);
-				
-				} else {
-					throw new RuntimeException("Unknown accident computation approach or value not set. Aborting...");
-				}
-								
-				TimeBinInfo timeBinInfo = new TimeBinInfo(timeBinNr);
-				timeBinInfo.setAccidentCosts(accidentCosts);
-				
-				linkInfo.getTimeSpecificInfo().put(timeBinNr, timeBinInfo);
-				
-				totalAccidentCostsPerDay += accidentCosts;
-			}
-		}
-		log.info("Computing accident costs per link and time bin... Done.");
-		
-		log.info("+++ Total accident costs per day [EUR] (upscaled to full population size): " + totalAccidentCostsPerDay);		
-	}
+  @Override
+  public void notifyAfterMobsim(AfterMobsimEvent event) {
 
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		
-		for (Link link : this.scenario.getNetwork().getLinks().values()) {
-			AccidentLinkInfo info = new AccidentLinkInfo(link.getId());			
-			this.accidentsContext.getLinkId2info().put(link.getId(), info);
-		}
-		log.info("Initializing all link-specific information... Done.");
+    log.info("Computing accident costs per link and time bin...");
+    AccidentsConfigGroup accidentsCfg =
+        (AccidentsConfigGroup)
+            scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
 
-	}
+    double totalAccidentCostsPerDay = 0.;
+
+    final double timeBinSize =
+        this.scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize();
+
+    for (AccidentLinkInfo linkInfo : this.accidentsContext.getLinkId2info().values()) {
+
+      Link link = this.scenario.getNetwork().getLinks().get(linkInfo.getLinkId());
+
+      for (double endTime = timeBinSize;
+          endTime <= this.scenario.getConfig().travelTimeCalculator().getMaxTime();
+          endTime = endTime + timeBinSize) {
+
+        final double time = (endTime - timeBinSize / 2.);
+        final int timeBinNr = (int) (time / timeBinSize);
+
+        final AccidentsConfigGroup accidentSettings =
+            (AccidentsConfigGroup)
+                scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
+        final double demand =
+            accidentSettings.getScaleFactor() * analzyer.getDemand(linkInfo.getLinkId(), timeBinNr);
+
+        double accidentCosts = 0.;
+
+        String linkAccidentsComputationMethod =
+            (String)
+                this.scenario
+                    .getNetwork()
+                    .getLinks()
+                    .get(linkInfo.getLinkId())
+                    .getAttributes()
+                    .getAttribute(accidentsCfg.getAccidentsComputationMethodAttributeName());
+
+        if (linkAccidentsComputationMethod == null) {
+          throw new RuntimeException(
+              "Required link attribute "
+                  + accidentsCfg.getAccidentsComputationMethodAttributeName()
+                  + " is null."
+                  + " Please pre-process your network and specify the link attributes that are required to compute accident costs. Aborting...");
+        }
+
+        if (linkAccidentsComputationMethod.equals(AccidentsComputationMethod.BVWP.toString())) {
+          String bvwpRoadTypeString =
+              (String)
+                  link.getAttributes()
+                      .getAttribute(AccidentsConfigGroup.BVWP_ROAD_TYPE_ATTRIBUTE_NAME);
+
+          if (bvwpRoadTypeString == null) {
+            throw new RuntimeException(
+                "Required link attribute "
+                    + AccidentsConfigGroup.BVWP_ROAD_TYPE_ATTRIBUTE_NAME
+                    + " is null."
+                    + " Please pre-process your network and specify the link attributes that are required to compute accident costs. Aborting...");
+          }
+
+          ArrayList<Integer> bvwpRoadType = new ArrayList<>();
+          bvwpRoadType.add(0, Integer.valueOf(bvwpRoadTypeString.split(",")[0]));
+          bvwpRoadType.add(1, Integer.valueOf(bvwpRoadTypeString.split(",")[1]));
+          bvwpRoadType.add(2, Integer.valueOf(bvwpRoadTypeString.split(",")[2]));
+          accidentCosts =
+              AccidentCostComputationBVWP.computeAccidentCosts(demand, link, bvwpRoadType);
+
+        } else {
+          throw new RuntimeException(
+              "Unknown accident computation approach or value not set. Aborting...");
+        }
+
+        TimeBinInfo timeBinInfo = new TimeBinInfo(timeBinNr);
+        timeBinInfo.setAccidentCosts(accidentCosts);
+
+        linkInfo.getTimeSpecificInfo().put(timeBinNr, timeBinInfo);
+
+        totalAccidentCostsPerDay += accidentCosts;
+      }
+    }
+    log.info("Computing accident costs per link and time bin... Done.");
+
+    log.info(
+        "+++ Total accident costs per day [EUR] (upscaled to full population size): "
+            + totalAccidentCostsPerDay);
+  }
+
+  @Override
+  public void notifyStartup(StartupEvent event) {
+
+    for (Link link : this.scenario.getNetwork().getLinks().values()) {
+      AccidentLinkInfo info = new AccidentLinkInfo(link.getId());
+      this.accidentsContext.getLinkId2info().put(link.getId(), info);
+    }
+    log.info("Initializing all link-specific information... Done.");
+  }
 }

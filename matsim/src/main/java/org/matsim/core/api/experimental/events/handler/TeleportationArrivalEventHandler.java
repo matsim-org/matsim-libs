@@ -22,9 +22,7 @@ package org.matsim.core.api.experimental.events.handler;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.events.handler.EventHandler;
 
-
 public interface TeleportationArrivalEventHandler extends EventHandler {
 
-    public void handleEvent(TeleportationArrivalEvent event);
-
+  public void handleEvent(TeleportationArrivalEvent event);
 }

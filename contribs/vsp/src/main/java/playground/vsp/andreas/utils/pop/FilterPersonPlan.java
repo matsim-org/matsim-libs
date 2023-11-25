@@ -38,67 +38,66 @@ import org.matsim.core.scenario.ScenarioUtils;
  * Filter persons, not using a specific TransportMode.
  *
  * @author aneumann
- *
  */
 public class FilterPersonPlan extends NewPopulation {
-	private int planswritten = 0;
-	private int personshandled = 0;
+  private int planswritten = 0;
+  private int personshandled = 0;
 
-	public FilterPersonPlan(Network network, Population plans, String filename) {
-		super(network, plans, filename);
-	}
+  public FilterPersonPlan(Network network, Population plans, String filename) {
+    super(network, plans, filename);
+  }
 
-	@Override
-	public void run(Person person) {
+  @Override
+  public void run(Person person) {
 
-		this.personshandled++;
+    this.personshandled++;
 
-		if(person.getPlans().size() != 1){
-			System.err.println("Person got more than one plan");
-		} else {
+    if (person.getPlans().size() != 1) {
+      System.err.println("Person got more than one plan");
+    } else {
 
-			Plan plan = person.getPlans().get(0);
-			boolean keepPlan = true;
+      Plan plan = person.getPlans().get(0);
+      boolean keepPlan = true;
 
-			// only keep person if every leg is a car leg
-			for (PlanElement planElement : plan.getPlanElements()) {
-				if(planElement instanceof Leg){
-					if(((Leg)planElement).getMode() != TransportMode.car && ((Leg)planElement).getMode() != TransportMode.pt){
-						keepPlan = false;
-					}
-				}
-			}
+      // only keep person if every leg is a car leg
+      for (PlanElement planElement : plan.getPlanElements()) {
+        if (planElement instanceof Leg) {
+          if (((Leg) planElement).getMode() != TransportMode.car
+              && ((Leg) planElement).getMode() != TransportMode.pt) {
+            keepPlan = false;
+          }
+        }
+      }
 
-			if(keepPlan){
-				this.popWriter.writePerson(person);
-				this.planswritten++;
-			}
+      if (keepPlan) {
+        this.popWriter.writePerson(person);
+        this.planswritten++;
+      }
+    }
+  }
 
-		}
+  public static void main(final String[] args) {
+    Gbl.startMeasurement();
 
-	}
+    MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-	public static void main(final String[] args) {
-		Gbl.startMeasurement();
+    String networkFile = "./bb_cl.xml.gz";
+    String inPlansFile = "./baseplan.xml.gz";
+    String outPlansFile = "./baseplan_car_pt_only.xml.gz";
 
-		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    Network net = sc.getNetwork();
+    new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
-		String networkFile = "./bb_cl.xml.gz";
-		String inPlansFile = "./baseplan.xml.gz";
-		String outPlansFile = "./baseplan_car_pt_only.xml.gz";
+    Population inPop = sc.getPopulation();
+    MatsimReader popReader = new PopulationReader(sc);
+    popReader.readFile(inPlansFile);
 
-		Network net = sc.getNetwork();
-		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
+    FilterPersonPlan dp = new FilterPersonPlan(net, inPop, outPlansFile);
+    dp.run(inPop);
+    System.out.println(
+        dp.personshandled + " persons handled; " + dp.planswritten + " plans written to file");
+    dp.writeEndPlans();
 
-		Population inPop = sc.getPopulation();
-		MatsimReader popReader = new PopulationReader(sc);
-		popReader.readFile(inPlansFile);
-
-		FilterPersonPlan dp = new FilterPersonPlan(net, inPop, outPlansFile);
-		dp.run(inPop);
-		System.out.println(dp.personshandled + " persons handled; " + dp.planswritten + " plans written to file");
-		dp.writeEndPlans();
-
-		Gbl.printElapsedTime();
-	}
+    Gbl.printElapsedTime();
+  }
 }

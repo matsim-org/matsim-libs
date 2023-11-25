@@ -25,28 +25,27 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 
 public abstract class AbstractPlanFilter implements PlanFilter, PlanAlgorithm {
 
-	protected PlanAlgorithm nextAlgorithm = null;
-	private int count = 0;
+  protected PlanAlgorithm nextAlgorithm = null;
+  private int count = 0;
 
-	@Override
-	abstract public boolean judge(Plan plan);
+  @Override
+  public abstract boolean judge(Plan plan);
 
-	@Override
-	public void run(final Plan plan) {
-		if (judge(plan)) {
-			count();
-			this.nextAlgorithm.run(plan);
-		}
-	}
+  @Override
+  public void run(final Plan plan) {
+    if (judge(plan)) {
+      count();
+      this.nextAlgorithm.run(plan);
+    }
+  }
 
-	@Override
-	public void count() {
-		this.count++;
-	}
+  @Override
+  public void count() {
+    this.count++;
+  }
 
-	@Override
-	public int getCount() {
-		return this.count;
-	}
-
+  @Override
+  public int getCount() {
+    return this.count;
+  }
 }

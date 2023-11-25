@@ -44,138 +44,147 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class EventsToScoreTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  /**
+   * Tests that an AgentUtilityEvent is handled by calling the method addUtility() of a scoring
+   * function.
+   */
+  @Test
+  public void testAddMoney() {
+    MutableScenario scenario =
+        (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    Population population = scenario.getPopulation();
+    Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+    population.addPerson(person);
+    MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();
+    EventsManager events = EventsUtils.createEventsManager();
+    EventsToScore e2s = EventsToScore.createWithoutScoreUpdating(scenario, sfFactory, events);
+    e2s.beginIteration(0, false);
+    events.initProcessing();
+    events.processEvent(
+        new PersonMoneyEvent(3600.0, person.getId(), 3.4, "tollRefund", "motorwayOperator"));
+    events.finishProcessing();
+    e2s.finish();
+    Assert.assertEquals(3.4, e2s.getAgentScore(person.getId()), 0);
+  }
 
-	/**
-	 * Tests that an AgentUtilityEvent is handled by calling the method addUtility() of a scoring function.
-	 */
-	@Test public void testAddMoney() {
-        MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        Population population = scenario.getPopulation();
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-		population.addPerson(person);
-		MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();
-		EventsManager events = EventsUtils.createEventsManager();
-		EventsToScore e2s = EventsToScore.createWithoutScoreUpdating(scenario, sfFactory, events);
-		e2s.beginIteration(0, false);
-		events.initProcessing();
-		events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), 3.4, "tollRefund", "motorwayOperator"));
-		events.finishProcessing();
-		e2s.finish();
-		Assert.assertEquals(3.4, e2s.getAgentScore(person.getId()), 0);
-	}
+  @Test
+  public void testMsaAveraging() {
+    Config config = ConfigUtils.createConfig();
 
-	@Test public void testMsaAveraging() {
-		Config config = ConfigUtils.createConfig() ;
+    config.controller().setFirstIteration(10);
+    config.controller().setLastIteration(110);
 
-		config.controller().setFirstIteration(10);
-		config.controller().setLastIteration(110);
+    config.scoring().setMarginalUtilityOfMoney(1.);
 
-		config.scoring().setMarginalUtilityOfMoney(1.);
+    config.scoring().setFractionOfIterationsToStartScoreMSA(0.9);
 
-		config.scoring().setFractionOfIterationsToStartScoreMSA(0.9);
+    Scenario scenario = ScenarioUtils.createScenario(config);
+    Population population = scenario.getPopulation();
+    Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+    population.addPerson(person);
+    Plan plan = PopulationUtils.createPlan();
+    person.addPlan(plan);
 
-		Scenario scenario = ScenarioUtils.createScenario(config);
-        Population population = scenario.getPopulation();
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-		population.addPerson(person);
-		Plan plan = PopulationUtils.createPlan() ;
-		person.addPlan(plan);
+    ScoringFunctionFactory sfFactory = new CharyparNagelScoringFunctionFactory(scenario);
+    EventsManager events = EventsUtils.createEventsManager();
+    EventsToScore e2s = EventsToScore.createWithScoreUpdating(scenario, sfFactory, events);
 
-		ScoringFunctionFactory sfFactory = new CharyparNagelScoringFunctionFactory( scenario );
-		EventsManager events = EventsUtils.createEventsManager();
-		EventsToScore e2s = EventsToScore.createWithScoreUpdating(scenario, sfFactory, events);
+    for (int mockIteration = config.controller().getFirstIteration();
+        mockIteration <= config.controller().getLastIteration();
+        mockIteration++) {
 
-		for (int mockIteration = config.controller().getFirstIteration(); mockIteration <= config.controller().getLastIteration() ; mockIteration++ ) {
+      e2s.beginIteration(mockIteration, false);
+      ;
+      events.initProcessing();
 
-			e2s.beginIteration(mockIteration, false); ;
-			events.initProcessing();
+      // generating a money event with amount mockIteration-98 (i.e. 1, 2, 3, 4):
+      events.processEvent(
+          new PersonMoneyEvent(3600.0, person.getId(), mockIteration - 98, "bribe", "contractor"));
 
-			// generating a money event with amount mockIteration-98 (i.e. 1, 2, 3, 4):
-			events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), mockIteration-98, "bribe", "contractor" ));
+      events.finishProcessing();
+      e2s.finish();
 
-			events.finishProcessing();
-			e2s.finish() ;
+      System.out.println("score: " + person.getSelectedPlan().getScore());
 
-			System.out.println( "score: " + person.getSelectedPlan().getScore() ) ;
+      switch (mockIteration) {
+        case 99:
+          Assert.assertEquals(1.0, person.getSelectedPlan().getScore(), 0);
+          break;
+        case 100:
+          // first MSA iteration; plain score should be ok:
+          Assert.assertEquals(2.0, person.getSelectedPlan().getScore(), 0);
+          break;
+        case 101:
+          // second MSA iteration
+          // (2+3)/2 = 2.5
+          Assert.assertEquals(2.5, person.getSelectedPlan().getScore(), 0);
+          break;
+        case 102:
+          // 3rd MSA iteration
+          // (2+3+4)/3 = 3
+          Assert.assertEquals(3.0, person.getSelectedPlan().getScore(), 0);
+          break;
+        case 103:
+          // (2+3+4+5)/4 = 3.5
+          Assert.assertEquals(3.5, person.getSelectedPlan().getScore(), 0);
+          break;
+        case 104:
+          // 3rd MSA iteration
+          Assert.assertEquals(4.0, person.getSelectedPlan().getScore(), 0);
+          break;
+        case 105:
+          // 3rd MSA iteration
+          Assert.assertEquals(4.5, person.getSelectedPlan().getScore(), 0);
+          break;
+        case 106:
+          // 3rd MSA iteration
+          Assert.assertEquals(5.0, person.getSelectedPlan().getScore(), 0);
+          break;
+        case 107:
+          // 3rd MSA iteration
+          Assert.assertEquals(5.5, person.getSelectedPlan().getScore(), 0);
+          break;
+        case 108:
+          // 3rd MSA iteration
+          Assert.assertEquals(6.0, person.getSelectedPlan().getScore(), 0);
+          break;
+        case 109:
+          // 3rd MSA iteration
+          Assert.assertEquals(6.5, person.getSelectedPlan().getScore(), 0);
+          break;
+        case 110:
+          // 3rd MSA iteration
+          Assert.assertEquals(7.0, person.getSelectedPlan().getScore(), 0);
+          break;
+      }
+    }
+  }
 
-			switch(mockIteration){
-			case 99:
-				Assert.assertEquals(1.0, person.getSelectedPlan().getScore(), 0);
-				break ;
-			case 100:
-				// first MSA iteration; plain score should be ok:
-				Assert.assertEquals(2.0, person.getSelectedPlan().getScore(), 0);
-				break ;
-			case 101:
-				// second MSA iteration
-				// (2+3)/2 = 2.5
-				Assert.assertEquals(2.5, person.getSelectedPlan().getScore(), 0);
-				break ;
-			case 102:
-				// 3rd MSA iteration
-				// (2+3+4)/3 = 3
-				Assert.assertEquals(3.0, person.getSelectedPlan().getScore(), 0);
-				break ;
-			case 103:
-				// (2+3+4+5)/4 = 3.5
-				Assert.assertEquals(3.5, person.getSelectedPlan().getScore(), 0);
-				break ;
-			case 104:
-				// 3rd MSA iteration
-				Assert.assertEquals(4.0, person.getSelectedPlan().getScore(), 0);
-				break ;
-			case 105:
-				// 3rd MSA iteration
-				Assert.assertEquals(4.5, person.getSelectedPlan().getScore(), 0);
-				break ;
-			case 106:
-				// 3rd MSA iteration
-				Assert.assertEquals(5.0, person.getSelectedPlan().getScore(), 0);
-				break ;
-			case 107:
-				// 3rd MSA iteration
-				Assert.assertEquals(5.5, person.getSelectedPlan().getScore(), 0);
-				break ;
-			case 108:
-				// 3rd MSA iteration
-				Assert.assertEquals(6.0, person.getSelectedPlan().getScore(), 0);
-				break ;
-			case 109:
-				// 3rd MSA iteration
-				Assert.assertEquals(6.5, person.getSelectedPlan().getScore(), 0);
-				break ;
-			case 110:
-				// 3rd MSA iteration
-				Assert.assertEquals(7.0, person.getSelectedPlan().getScore(), 0);
-				break ;
-			}
+  private static class MockScoringFunctionFactory implements ScoringFunctionFactory {
 
-		}
-	}
+    @Override
+    public ScoringFunction createNewScoringFunction(final Person person) {
+      SumScoringFunction sumScoringFunction = new SumScoringFunction();
+      sumScoringFunction.addScoringFunction(
+          new SumScoringFunction.MoneyScoring() {
+            double money = 0.0;
 
-	private static class MockScoringFunctionFactory implements ScoringFunctionFactory {
+            @Override
+            public void addMoney(double amount) {
+              money += amount;
+            }
 
-		@Override
-		public ScoringFunction createNewScoringFunction(final Person person) {
-			SumScoringFunction sumScoringFunction = new SumScoringFunction();
-			sumScoringFunction.addScoringFunction(new SumScoringFunction.MoneyScoring() {
-				double money = 0.0;
-				@Override
-				public void addMoney(double amount) {
-					money += amount;
-				}
-				@Override
-				public void finish() {}
-				@Override
-				public double getScore() {
-					return money;
-				}
-			});
-			return sumScoringFunction;
-		}
+            @Override
+            public void finish() {}
 
-	}
+            @Override
+            public double getScore() {
+              return money;
+            }
+          });
+      return sumScoringFunction;
+    }
+  }
 }

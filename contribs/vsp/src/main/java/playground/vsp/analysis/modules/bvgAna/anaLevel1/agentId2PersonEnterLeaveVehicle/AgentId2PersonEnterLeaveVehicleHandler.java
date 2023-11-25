@@ -21,7 +21,6 @@ package playground.vsp.analysis.modules.bvgAna.anaLevel1.agentId2PersonEnterLeav
 
 import java.util.ArrayList;
 import java.util.TreeMap;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -29,71 +28,74 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
-
 import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 
 /**
- * Collects all <code>PersonEntersVehicleEvent</code> and <code>PersonLeavesVehicleEvent</code> for a given set of agents.
- * 
- * @author ikaddoura, aneumann
+ * Collects all <code>PersonEntersVehicleEvent</code> and <code>PersonLeavesVehicleEvent</code> for
+ * a given set of agents.
  *
+ * @author ikaddoura, aneumann
  */
-public class AgentId2PersonEnterLeaveVehicleHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
-	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
-	private final Logger log = LogManager.getLogger(AgentId2PersonEnterLeaveVehicleHandler.class);
-	
-	private TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> agentId2EnterEventMap = new TreeMap<Id, ArrayList<PersonEntersVehicleEvent>>();
-	private TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> agentId2LeaveEventMap = new TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>>();
+public class AgentId2PersonEnterLeaveVehicleHandler
+    implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
+  private PtDriverIdAnalyzer ptDriverIdAnalyzer;
+  private final Logger log = LogManager.getLogger(AgentId2PersonEnterLeaveVehicleHandler.class);
 
-	public AgentId2PersonEnterLeaveVehicleHandler(PtDriverIdAnalyzer ptDriverPrefixAnalyzer) {
-		this.ptDriverIdAnalyzer = ptDriverPrefixAnalyzer;
-		log.warn("Ignoring the pt driver. Is that right or is the pt driver supposed to be considered? ik");
-		log.warn("Not differentiating between public and private vehicles. Is that supposed to happen here? ik");
-	}
+  private TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> agentId2EnterEventMap =
+      new TreeMap<Id, ArrayList<PersonEntersVehicleEvent>>();
+  private TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> agentId2LeaveEventMap =
+      new TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>>();
 
-	/**
-	 * @return Returns a map containing all <code>PersonEntersVehicleEvent</code> for each agent id.
-	 */
-	public TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> getAgentId2EnterEventMap() {
-		return this.agentId2EnterEventMap;
-	}
+  public AgentId2PersonEnterLeaveVehicleHandler(PtDriverIdAnalyzer ptDriverPrefixAnalyzer) {
+    this.ptDriverIdAnalyzer = ptDriverPrefixAnalyzer;
+    log.warn(
+        "Ignoring the pt driver. Is that right or is the pt driver supposed to be considered? ik");
+    log.warn(
+        "Not differentiating between public and private vehicles. Is that supposed to happen here? ik");
+  }
 
-	/**
-	 * @return Returns a map containing all <code>PersonLeavesVehicleEvent</code> for each agent id.
-	 */
-	public TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> getAgentId2LeaveEventMap() {
-		return this.agentId2LeaveEventMap;
-	}
+  /**
+   * @return Returns a map containing all <code>PersonEntersVehicleEvent</code> for each agent id.
+   */
+  public TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> getAgentId2EnterEventMap() {
+    return this.agentId2EnterEventMap;
+  }
 
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		Id agentId = event.getPersonId();
-		if(this.ptDriverIdAnalyzer.isPtDriver(agentId)){
-			// pt driver
-		} else {
-			if(this.agentId2EnterEventMap.get(agentId) == null){
-				this.agentId2EnterEventMap.put(agentId, new ArrayList<PersonEntersVehicleEvent>());
-			}
-			this.agentId2EnterEventMap.get(agentId).add(event);
-		}		
-	}
+  /**
+   * @return Returns a map containing all <code>PersonLeavesVehicleEvent</code> for each agent id.
+   */
+  public TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> getAgentId2LeaveEventMap() {
+    return this.agentId2LeaveEventMap;
+  }
 
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		Id agentId = event.getPersonId();
-		if(this.ptDriverIdAnalyzer.isPtDriver(agentId)){
-			// pt driver
-		} else {
-			if(this.agentId2LeaveEventMap.get(agentId) == null){
-				this.agentId2LeaveEventMap.put(agentId, new ArrayList<PersonLeavesVehicleEvent>());
-			}
-			this.agentId2LeaveEventMap.get(agentId).add(event);
-		}		
-	}
+  @Override
+  public void handleEvent(PersonEntersVehicleEvent event) {
+    Id agentId = event.getPersonId();
+    if (this.ptDriverIdAnalyzer.isPtDriver(agentId)) {
+      // pt driver
+    } else {
+      if (this.agentId2EnterEventMap.get(agentId) == null) {
+        this.agentId2EnterEventMap.put(agentId, new ArrayList<PersonEntersVehicleEvent>());
+      }
+      this.agentId2EnterEventMap.get(agentId).add(event);
+    }
+  }
 
-	@Override
-	public void reset(int iteration) {
-		this.log.debug("reset method in iteration " + iteration + " not implemented, yet");		
-	}
+  @Override
+  public void handleEvent(PersonLeavesVehicleEvent event) {
+    Id agentId = event.getPersonId();
+    if (this.ptDriverIdAnalyzer.isPtDriver(agentId)) {
+      // pt driver
+    } else {
+      if (this.agentId2LeaveEventMap.get(agentId) == null) {
+        this.agentId2LeaveEventMap.put(agentId, new ArrayList<PersonLeavesVehicleEvent>());
+      }
+      this.agentId2LeaveEventMap.get(agentId).add(event);
+    }
+  }
 
+  @Override
+  public void reset(int iteration) {
+    this.log.debug("reset method in iteration " + iteration + " not implemented, yet");
+  }
 }

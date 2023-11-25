@@ -20,23 +20,21 @@
 
 package org.matsim.contrib.drt.optimizer.insertion.selective;
 
-import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
-
 import jakarta.validation.constraints.Positive;
+import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class SelectiveInsertionSearchParams extends DrtInsertionSearchParams {
-	public static final String SET_NAME = "SelectiveInsertionSearch";
+  public static final String SET_NAME = "SelectiveInsertionSearch";
 
-	//use values that underestimate the actual speed, so the risk that the pre-filtering returns an insertion that
-	//violates time windows constraints (for existing passengers, given the actual path)
-	@Parameter
-	@Positive
-	public double restrictiveBeelineSpeedFactor = 0.5;
+  // use values that underestimate the actual speed, so the risk that the pre-filtering returns an
+  // insertion that
+  // violates time windows constraints (for existing passengers, given the actual path)
+  @Parameter @Positive public double restrictiveBeelineSpeedFactor = 0.5;
 
-	public SelectiveInsertionSearchParams() {
-		super(SET_NAME);
-	}
+  public SelectiveInsertionSearchParams() {
+    super(SET_NAME);
+  }
 }

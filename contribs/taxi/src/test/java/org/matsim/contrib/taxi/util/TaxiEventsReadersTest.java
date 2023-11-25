@@ -26,7 +26,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -54,62 +53,67 @@ import org.matsim.core.events.algorithms.EventWriterXML;
  * @author Michal Maciejewski (michalm)
  */
 public class TaxiEventsReadersTest {
-	private final String mode = "mode_1";
-	private final Id<Link> link1 = Id.createLinkId("link_1");
-	private final Id<Link> link2 = Id.createLinkId("link_2");
-	private final Id<DvrpVehicle> vehicle = Id.create("vehicle_1", DvrpVehicle.class);
-	private final Id<Person> driver = Id.create("driver_1", Person.class);
+  private final String mode = "mode_1";
+  private final Id<Link> link1 = Id.createLinkId("link_1");
+  private final Id<Link> link2 = Id.createLinkId("link_2");
+  private final Id<DvrpVehicle> vehicle = Id.create("vehicle_1", DvrpVehicle.class);
+  private final Id<Person> driver = Id.create("driver_1", Person.class);
 
-	//standard dvrp events are tested in DvrpEventsReadersTest
-	private final List<Event> taxiEvents = List.of(taskStarted(10, TaxiEmptyDriveTask.TYPE, 0, link1),//
-			taskEnded(30, TaxiPickupTask.TYPE, 1, link2), //
-			taskStarted(50, TaxiOccupiedDriveTask.TYPE, 2, link1),//
-			taskEnded(70, TaxiDropoffTask.TYPE, 3, link1),//
-			taskStarted(90, TaxiStayTask.TYPE, 4, link1),//
-			taskEnded(110, ETaxiScheduler.DRIVE_TO_CHARGER, 5, link2),//
-			taskStarted(130, ETaxiChargingTask.TYPE, 6, link2)//
-	);
+  // standard dvrp events are tested in DvrpEventsReadersTest
+  private final List<Event> taxiEvents =
+      List.of(
+          taskStarted(10, TaxiEmptyDriveTask.TYPE, 0, link1), //
+          taskEnded(30, TaxiPickupTask.TYPE, 1, link2), //
+          taskStarted(50, TaxiOccupiedDriveTask.TYPE, 2, link1), //
+          taskEnded(70, TaxiDropoffTask.TYPE, 3, link1), //
+          taskStarted(90, TaxiStayTask.TYPE, 4, link1), //
+          taskEnded(110, ETaxiScheduler.DRIVE_TO_CHARGER, 5, link2), //
+          taskStarted(130, ETaxiChargingTask.TYPE, 6, link2) //
+          );
 
-	@Test
-	public void testReader() {
-		var outputStream = new ByteArrayOutputStream();
-		EventWriterXML writer = new EventWriterXML(outputStream);
-		taxiEvents.forEach(writer::handleEvent);
-		writer.closeFile();
+  @Test
+  public void testReader() {
+    var outputStream = new ByteArrayOutputStream();
+    EventWriterXML writer = new EventWriterXML(outputStream);
+    taxiEvents.forEach(writer::handleEvent);
+    writer.closeFile();
 
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		TestEventHandler handler = new TestEventHandler();
-		eventsManager.addHandler(handler);
-		eventsManager.initProcessing();
-		TaxiEventsReaders.createEventsReader(eventsManager)
-				.readStream(new ByteArrayInputStream(outputStream.toByteArray()),
-						ControllerConfigGroup.EventsFileFormat.xml);
-		eventsManager.finishProcessing();
+    EventsManager eventsManager = EventsUtils.createEventsManager();
+    TestEventHandler handler = new TestEventHandler();
+    eventsManager.addHandler(handler);
+    eventsManager.initProcessing();
+    TaxiEventsReaders.createEventsReader(eventsManager)
+        .readStream(
+            new ByteArrayInputStream(outputStream.toByteArray()),
+            ControllerConfigGroup.EventsFileFormat.xml);
+    eventsManager.finishProcessing();
 
-		assertThat(handler.handledEvents).usingRecursiveFieldByFieldElementComparator()
-				.containsExactlyElementsOf(taxiEvents);
-	}
+    assertThat(handler.handledEvents)
+        .usingRecursiveFieldByFieldElementComparator()
+        .containsExactlyElementsOf(taxiEvents);
+  }
 
-	private TaskStartedEvent taskStarted(double time, TaxiTaskType taskType, int taskIndex, Id<Link> linkId) {
-		return new TaskStartedEvent(time, mode, vehicle, driver, taskType, taskIndex, linkId);
-	}
+  private TaskStartedEvent taskStarted(
+      double time, TaxiTaskType taskType, int taskIndex, Id<Link> linkId) {
+    return new TaskStartedEvent(time, mode, vehicle, driver, taskType, taskIndex, linkId);
+  }
 
-	private TaskEndedEvent taskEnded(double time, TaxiTaskType taskType, int taskIndex, Id<Link> linkId) {
-		return new TaskEndedEvent(time, mode, vehicle, driver, taskType, taskIndex, linkId);
-	}
+  private TaskEndedEvent taskEnded(
+      double time, TaxiTaskType taskType, int taskIndex, Id<Link> linkId) {
+    return new TaskEndedEvent(time, mode, vehicle, driver, taskType, taskIndex, linkId);
+  }
 
-	private static class TestEventHandler implements TaskStartedEventHandler, TaskEndedEventHandler {
-		private final List<Event> handledEvents = new ArrayList<>();
+  private static class TestEventHandler implements TaskStartedEventHandler, TaskEndedEventHandler {
+    private final List<Event> handledEvents = new ArrayList<>();
 
-		@Override
-		public void handleEvent(TaskStartedEvent event) {
-			handledEvents.add(event);
-		}
+    @Override
+    public void handleEvent(TaskStartedEvent event) {
+      handledEvents.add(event);
+    }
 
-		@Override
-		public void handleEvent(TaskEndedEvent event) {
-			handledEvents.add(event);
-		}
-	}
-
+    @Override
+    public void handleEvent(TaskEndedEvent event) {
+      handledEvents.add(event);
+    }
+  }
 }

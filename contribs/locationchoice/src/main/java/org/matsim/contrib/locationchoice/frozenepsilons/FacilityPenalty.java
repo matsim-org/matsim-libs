@@ -20,7 +20,6 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
-
 /*
  * TODO: (discussion)
  * 1.	At the moment a facility has activities and an activity has a capacity.
@@ -41,93 +40,91 @@ import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroupI;
 
 class FacilityPenalty {
 
-	private final double scaleNumberOfPersons;
-	private FacilityLoad facilityLoad;
-	private double capacity = 0.0;
-	private static final  int numberOfTimeBins = 4*24;
-	private double sumCapacityPenaltyFactor = 0.0;
-	private double restraintFcnFactor = 0.0;
-	private double restraintFcnExp = 0.0;
+  private final double scaleNumberOfPersons;
+  private FacilityLoad facilityLoad;
+  private double capacity = 0.0;
+  private static final int numberOfTimeBins = 4 * 24;
+  private double sumCapacityPenaltyFactor = 0.0;
+  private double restraintFcnFactor = 0.0;
+  private double restraintFcnExp = 0.0;
 
-	FacilityPenalty( double minCapacity, DestinationChoiceConfigGroupI config ) {
-		this.capacity = minCapacity;
-		this.scaleNumberOfPersons = config.getScaleFactor() ;
-		this.facilityLoad = new FacilityLoad(FacilityPenalty.numberOfTimeBins, scaleNumberOfPersons);
-		this.restraintFcnFactor = config.getRestraintFcnFactor();
-		this.restraintFcnExp = config.getRestraintFcnExp();
-	}
+  FacilityPenalty(double minCapacity, DestinationChoiceConfigGroupI config) {
+    this.capacity = minCapacity;
+    this.scaleNumberOfPersons = config.getScaleFactor();
+    this.facilityLoad = new FacilityLoad(FacilityPenalty.numberOfTimeBins, scaleNumberOfPersons);
+    this.restraintFcnFactor = config.getRestraintFcnFactor();
+    this.restraintFcnExp = config.getRestraintFcnExp();
+  }
 
-	private double calculateCapPenaltyFactor(int startTimeBinIndex, int endTimeBinIndex) {
+  private double calculateCapPenaltyFactor(int startTimeBinIndex, int endTimeBinIndex) {
 
-		double [] facilityload = this.facilityLoad.getLoad();
-		double capPenaltyFactor = 0.0;
+    double[] facilityload = this.facilityLoad.getLoad();
+    double capPenaltyFactor = 0.0;
 
-		for (int i=startTimeBinIndex; i<endTimeBinIndex+1; i++) {
-			if (this.capacity > 0) {
-				capPenaltyFactor += restraintFcnFactor*Math.pow( (facilityload[i]-scaleNumberOfPersons)/(this.capacity), restraintFcnExp);
-			}
+    for (int i = startTimeBinIndex; i < endTimeBinIndex + 1; i++) {
+      if (this.capacity > 0) {
+        capPenaltyFactor +=
+            restraintFcnFactor
+                * Math.pow(
+                    (facilityload[i] - scaleNumberOfPersons) / (this.capacity), restraintFcnExp);
+      }
 
-			/*
-			 * facilityload[i]-scaleNumberOfPersons: being alone in a facility does not
-			 * reduce the utility.
-			 *
-			 * } else: do nothing: is penalized by costs for waiting time
-			 */
-		}
-		capPenaltyFactor /= (endTimeBinIndex-startTimeBinIndex+1);
-		capPenaltyFactor = Math.min(0.5, capPenaltyFactor);
-		this.sumCapacityPenaltyFactor += capPenaltyFactor * this.scaleNumberOfPersons;
-		return capPenaltyFactor;
-	}
+      /*
+       * facilityload[i]-scaleNumberOfPersons: being alone in a facility does not
+       * reduce the utility.
+       *
+       * } else: do nothing: is penalized by costs for waiting time
+       */
+    }
+    capPenaltyFactor /= (endTimeBinIndex - startTimeBinIndex + 1);
+    capPenaltyFactor = Math.min(0.5, capPenaltyFactor);
+    this.sumCapacityPenaltyFactor += capPenaltyFactor * this.scaleNumberOfPersons;
+    return capPenaltyFactor;
+  }
 
-	double getCapacityPenaltyFactor( double startTime, double endTime ) {
+  double getCapacityPenaltyFactor(double startTime, double endTime) {
 
-		if (startTime>24.0*3600.0 && endTime>24.0*3600.0) {
-			return 0.0;
-		}
-		else if (endTime>24.0*3600.0) {
-			endTime=24.0*3600.0;
-		}
+    if (startTime > 24.0 * 3600.0 && endTime > 24.0 * 3600.0) {
+      return 0.0;
+    } else if (endTime > 24.0 * 3600.0) {
+      endTime = 24.0 * 3600.0;
+    }
 
-		int startTimeBinIndex = this.facilityLoad.timeBinIndex(startTime);
-		int endTimeBinIndex = this.facilityLoad.timeBinIndex(endTime);
-		return calculateCapPenaltyFactor(startTimeBinIndex, endTimeBinIndex);
-	}
+    int startTimeBinIndex = this.facilityLoad.timeBinIndex(startTime);
+    int endTimeBinIndex = this.facilityLoad.timeBinIndex(endTime);
+    return calculateCapPenaltyFactor(startTimeBinIndex, endTimeBinIndex);
+  }
 
-	FacilityLoad getFacilityLoad() {
-		return facilityLoad;
-	}
+  FacilityLoad getFacilityLoad() {
+    return facilityLoad;
+  }
 
-//	public void setFacilityLoad(FacilityLoad facilityLoad) {
-//		this.facilityLoad = facilityLoad;
-//	}
+  //	public void setFacilityLoad(FacilityLoad facilityLoad) {
+  //		this.facilityLoad = facilityLoad;
+  //	}
 
-	public double getCapacity() {
-		return capacity;
-	}
+  public double getCapacity() {
+    return capacity;
+  }
 
+  public void setCapacity(double capacity) {
+    this.capacity = capacity;
+  }
 
-	public void setCapacity(double capacity) {
-		this.capacity = capacity;
-	}
+  public double getSumCapacityPenaltyFactor() {
+    return sumCapacityPenaltyFactor;
+  }
 
+  public void setSumCapacityPenaltyFactor(double sumCapacityPenaltyFactor) {
+    this.sumCapacityPenaltyFactor = sumCapacityPenaltyFactor;
+  }
 
-	public double getSumCapacityPenaltyFactor() {
-		return sumCapacityPenaltyFactor;
-	}
+  public void finish() {
+    this.facilityLoad.finish();
+  }
 
-
-	public void setSumCapacityPenaltyFactor(double sumCapacityPenaltyFactor) {
-		this.sumCapacityPenaltyFactor = sumCapacityPenaltyFactor;
-	}
-
-	public void finish() {
-		this.facilityLoad.finish();
-	}
-
-	public void reset() {
-		this.sumCapacityPenaltyFactor = 0.0;
-		this.facilityLoad.reset();
-	}
-
+  public void reset() {
+    this.sumCapacityPenaltyFactor = 0.0;
+    this.facilityLoad.reset();
+  }
 }

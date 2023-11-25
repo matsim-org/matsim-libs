@@ -21,7 +21,6 @@ package org.matsim.contrib.drt.optimizer.rebalancing;
 
 import java.util.List;
 import java.util.stream.Stream;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
@@ -31,19 +30,16 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
  * @author michalm
  */
 public interface RebalancingStrategy {
-	class Relocation {
-		public final DvrpVehicle vehicle;
-		public final Link link;
+  class Relocation {
+    public final DvrpVehicle vehicle;
+    public final Link link;
 
-		public Relocation(DvrpVehicle vehicle, Link link) {
-			this.vehicle = vehicle;
-			this.link = link;
-		}
-	}
+    public Relocation(DvrpVehicle vehicle, Link link) {
+      this.vehicle = vehicle;
+      this.link = link;
+    }
+  }
 
-	/**
-	 * This method is called at each re-balancing step (interval defined in config).
-	 *
-	 */
-	List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time);
+  /** This method is called at each re-balancing step (interval defined in config). */
+  List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time);
 }

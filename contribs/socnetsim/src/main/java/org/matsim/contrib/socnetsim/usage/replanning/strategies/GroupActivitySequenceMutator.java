@@ -19,91 +19,84 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.utils.timing.TimeInterpretation;
-import org.matsim.contrib.socnetsim.framework.replanning.modules.ActivitySequenceMutatorModule;
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.GroupPlanStrategy;
-import org.matsim.contrib.socnetsim.usage.replanning.GroupPlanStrategyFactoryUtils;
 import org.matsim.contrib.socnetsim.framework.replanning.IndividualBasedGroupStrategyModule;
+import org.matsim.contrib.socnetsim.framework.replanning.modules.ActivitySequenceMutatorModule;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
 import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import org.matsim.contrib.socnetsim.usage.replanning.GroupPlanStrategyFactoryUtils;
+import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 /**
- * @author thibautd 
+ * @author thibautd
  */
 public class GroupActivitySequenceMutator extends AbstractConfigurableSelectionStrategy {
 
-	private final Scenario sc;
-	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
-	private final Provider<TripRouter> tripRouterFactory;
-	private final PlanLinkIdentifier planLinkIdentifier;
-	private final MainModeIdentifier mainModeIdentifier;
-	private final TimeInterpretation timeInterpretation;
+  private final Scenario sc;
+  private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
+  private final Provider<TripRouter> tripRouterFactory;
+  private final PlanLinkIdentifier planLinkIdentifier;
+  private final MainModeIdentifier mainModeIdentifier;
+  private final TimeInterpretation timeInterpretation;
 
-	@Inject
-	public GroupActivitySequenceMutator( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , Provider<TripRouter> tripRouterFactory ,
-			@Strong PlanLinkIdentifier planLinkIdentifier, MainModeIdentifier mainModeIdentifier, TimeInterpretation timeInterpretation ) {
-		this.sc = sc;
-		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
-		this.tripRouterFactory = tripRouterFactory;
-		this.planLinkIdentifier = planLinkIdentifier;
-		this.mainModeIdentifier = mainModeIdentifier;
-		this.timeInterpretation = timeInterpretation;
-	}
+  @Inject
+  public GroupActivitySequenceMutator(
+      Scenario sc,
+      PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
+      Provider<TripRouter> tripRouterFactory,
+      @Strong PlanLinkIdentifier planLinkIdentifier,
+      MainModeIdentifier mainModeIdentifier,
+      TimeInterpretation timeInterpretation) {
+    this.sc = sc;
+    this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
+    this.tripRouterFactory = tripRouterFactory;
+    this.planLinkIdentifier = planLinkIdentifier;
+    this.mainModeIdentifier = mainModeIdentifier;
+    this.timeInterpretation = timeInterpretation;
+  }
 
+  @Override
+  public GroupPlanStrategy get() {
+    final GroupPlanStrategy strategy = instantiateStrategy(sc.getConfig());
 
-	@Override
-	public GroupPlanStrategy get() {
-		final GroupPlanStrategy strategy = instantiateStrategy( sc.getConfig() );
+    strategy.addStrategyModule(
+        new IndividualBasedGroupStrategyModule(
+            new ActivitySequenceMutatorModule(sc.getConfig().global().getNumberOfThreads())));
 
-		strategy.addStrategyModule(
-				new IndividualBasedGroupStrategyModule(
-					new ActivitySequenceMutatorModule(
-						sc.getConfig().global().getNumberOfThreads()) ) );
-	
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createJointTripAwareTourModeUnifierModule(
-					sc.getConfig(),
-					mainModeIdentifier ) );
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createJointTripAwareTourModeUnifierModule(
+            sc.getConfig(), mainModeIdentifier));
 
-		// TODO: add an option to enable or disable this part?
-		final VehicleRessources vehicles =
-				(VehicleRessources) sc.getScenarioElement(
-					VehicleRessources.ELEMENT_NAME );
-		if ( vehicles != null ) {
-			strategy.addStrategyModule(
-					GroupPlanStrategyFactoryUtils.createVehicleAllocationModule(
-						sc.getConfig(),
-						vehicles ) );
-		}
+    // TODO: add an option to enable or disable this part?
+    final VehicleRessources vehicles =
+        (VehicleRessources) sc.getScenarioElement(VehicleRessources.ELEMENT_NAME);
+    if (vehicles != null) {
+      strategy.addStrategyModule(
+          GroupPlanStrategyFactoryUtils.createVehicleAllocationModule(sc.getConfig(), vehicles));
+    }
 
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createReRouteModule(
-					sc.getConfig(),
-					planRoutingAlgorithmFactory,
-					tripRouterFactory ) );
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createReRouteModule(
+            sc.getConfig(), planRoutingAlgorithmFactory, tripRouterFactory));
 
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
-					sc.getConfig(),
-					((JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME )).getFactory(),
-					planLinkIdentifier ));
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
+            sc.getConfig(),
+            ((JointPlans) sc.getScenarioElement(JointPlans.ELEMENT_NAME)).getFactory(),
+            planLinkIdentifier));
 
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createSynchronizerModule(
-					sc.getConfig(),
-					tripRouterFactory, timeInterpretation ) );
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createSynchronizerModule(
+            sc.getConfig(), tripRouterFactory, timeInterpretation));
 
-		return strategy;
-	}
+    return strategy;
+  }
 }
-

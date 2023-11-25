@@ -21,11 +21,7 @@ package org.matsim.contrib.signals.builder;
 
 import org.matsim.core.controler.listener.ControlerListener;
 
-
 /**
  * @author dgrether
- *
  */
-public interface SignalControlerListener extends ControlerListener {
-	
-}
+public interface SignalControlerListener extends ControlerListener {}

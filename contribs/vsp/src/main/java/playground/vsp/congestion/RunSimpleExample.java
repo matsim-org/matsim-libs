@@ -18,14 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
+/** */
 package playground.vsp.congestion;
 
-
 import java.io.IOException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -34,7 +30,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
-
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.TollHandler;
@@ -42,53 +37,63 @@ import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutil
 
 /**
  * @author ikaddoura
- *
  */
 public class RunSimpleExample {
 
-	private static final Logger log = LogManager.getLogger(RunSimpleExample.class);
+  private static final Logger log = LogManager.getLogger(RunSimpleExample.class);
 
-	static String configFile;
+  static String configFile;
 
-	public static void main(String[] args) throws IOException {
+  public static void main(String[] args) throws IOException {
 
-		if (args.length > 0) {
+    if (args.length > 0) {
 
-			configFile = args[0];
-			log.info("first argument (config file): "+ configFile);
+      configFile = args[0];
+      log.info("first argument (config file): " + configFile);
 
-		} else {
-			configFile = "../../runs-svn/internalizationCar/input/config_internalizationCar.xml";
-		}
+    } else {
+      configFile = "../../runs-svn/internalizationCar/input/config_internalizationCar.xml";
+    }
 
-		RunSimpleExample main = new RunSimpleExample();
-		main.run();
-	}
+    RunSimpleExample main = new RunSimpleExample();
+    main.run();
+  }
 
-	private void run() {
+  private void run() {
 
-		Controler controler = new Controler(configFile);
+    Controler controler = new Controler(configFile);
 
-		TollHandler tollHandler = new TollHandler(controler.getScenario());
+    TollHandler tollHandler = new TollHandler(controler.getScenario());
 
-		final CongestionTollTimeDistanceTravelDisutilityFactory tollDisutilityCalculatorFactory = new CongestionTollTimeDistanceTravelDisutilityFactory(
-				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig()),
-				tollHandler, controler.getConfig().scoring());
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
-			}
-		});
+    final CongestionTollTimeDistanceTravelDisutilityFactory tollDisutilityCalculatorFactory =
+        new CongestionTollTimeDistanceTravelDisutilityFactory(
+            new RandomizingTimeDistanceTravelDisutilityFactory(
+                TransportMode.car, controler.getConfig()),
+            tollHandler,
+            controler.getConfig().scoring());
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+          }
+        });
 
-		// Define the pricing approach and the congestion implementation.
-//		services.addControlerListener(new AverageCongestionPricingControlerListener( (ScenarioImpl) services.getScenario(), tollHandler ));
-		controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
+    // Define the pricing approach and the congestion implementation.
+    //		services.addControlerListener(new AverageCongestionPricingControlerListener( (ScenarioImpl)
+    // services.getScenario(), tollHandler ));
+    controler.addControlerListener(
+        new MarginalCongestionPricingContolerListener(
+            controler.getScenario(),
+            tollHandler,
+            new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
 
-		controler.addOverridingModule(new OTFVisFileWriterModule());
-		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.run();
-
-	}
+    controler.addOverridingModule(new OTFVisFileWriterModule());
+    controler
+        .getConfig()
+        .controller()
+        .setOverwriteFileSetting(
+            OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+    controler.run();
+  }
 }
-

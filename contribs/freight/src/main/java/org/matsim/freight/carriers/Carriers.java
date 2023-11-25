@@ -21,49 +21,44 @@
 
 package org.matsim.freight.carriers;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 
 /**
  * A container that maps carriers.
  *
  * @author sschroeder
- *
  */
 public class Carriers {
 
-	@SuppressWarnings("unused")
-	private static final  Logger log = LogManager.getLogger(Carriers.class);
+  @SuppressWarnings("unused")
+  private static final Logger log = LogManager.getLogger(Carriers.class);
 
-	private final Map<Id<Carrier>, Carrier> carriers = new LinkedHashMap<>();
+  private final Map<Id<Carrier>, Carrier> carriers = new LinkedHashMap<>();
 
-	public Carriers(Collection<Carrier> carriers) {
-		makeMap(carriers);
-	}
+  public Carriers(Collection<Carrier> carriers) {
+    makeMap(carriers);
+  }
 
-	public Carriers() {
-	}
+  public Carriers() {}
 
-	private void makeMap(Collection<Carrier> carriers) {
-		for (Carrier carrier : carriers) {
-			this.carriers.put(carrier.getId(), carrier);
-		}
-	}
+  private void makeMap(Collection<Carrier> carriers) {
+    for (Carrier carrier : carriers) {
+      this.carriers.put(carrier.getId(), carrier);
+    }
+  }
 
-	public Map<Id<Carrier>, Carrier> getCarriers() {
-		return carriers;
-	}
+  public Map<Id<Carrier>, Carrier> getCarriers() {
+    return carriers;
+  }
 
-	public void addCarrier(Carrier carrier) {
-		if(!carriers.containsKey(carrier.getId())){
-			carriers.put(carrier.getId(), carrier);
-		}
-		else log.warn("carrier " + carrier.getId() + " already exists");
-	}
-
+  public void addCarrier(Carrier carrier) {
+    if (!carriers.containsKey(carrier.getId())) {
+      carriers.put(carrier.getId(), carrier);
+    } else log.warn("carrier " + carrier.getId() + " already exists");
+  }
 }

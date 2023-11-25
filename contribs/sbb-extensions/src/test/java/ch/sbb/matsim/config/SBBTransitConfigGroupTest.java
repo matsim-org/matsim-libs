@@ -35,28 +35,28 @@ import org.matsim.core.config.ConfigWriter;
  */
 public class SBBTransitConfigGroupTest {
 
-    @Test
-    public void testConfigIO() {
-        System.setProperty("matsim.preferLocalDtds", "true");
+  @Test
+  public void testConfigIO() {
+    System.setProperty("matsim.preferLocalDtds", "true");
 
-        SBBTransitConfigGroup ptConfig1 = new SBBTransitConfigGroup();
-        Config config1 = ConfigUtils.createConfig(ptConfig1);
+    SBBTransitConfigGroup ptConfig1 = new SBBTransitConfigGroup();
+    Config config1 = ConfigUtils.createConfig(ptConfig1);
 
-        ptConfig1.setDeterministicServiceModes(Collections.singleton("schienenfahrzeug"));
-        ptConfig1.setCreateLinkEventsInterval(4);
+    ptConfig1.setDeterministicServiceModes(Collections.singleton("schienenfahrzeug"));
+    ptConfig1.setCreateLinkEventsInterval(4);
 
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        OutputStreamWriter writer = new OutputStreamWriter(output);
-        new ConfigWriter(config1).writeStream(writer);
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    OutputStreamWriter writer = new OutputStreamWriter(output);
+    new ConfigWriter(config1).writeStream(writer);
 
-        SBBTransitConfigGroup ptConfig2 = new SBBTransitConfigGroup();
-        Config config2 = ConfigUtils.createConfig(ptConfig2);
+    SBBTransitConfigGroup ptConfig2 = new SBBTransitConfigGroup();
+    Config config2 = ConfigUtils.createConfig(ptConfig2);
 
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        new ConfigReader(config2).parse(input);
+    ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
+    new ConfigReader(config2).parse(input);
 
-        Assert.assertEquals(1, ptConfig2.getDeterministicServiceModes().size());
-        Assert.assertTrue(ptConfig2.getDeterministicServiceModes().contains("schienenfahrzeug"));
-        Assert.assertEquals(4, ptConfig2.getCreateLinkEventsInterval());
-    }
+    Assert.assertEquals(1, ptConfig2.getDeterministicServiceModes().size());
+    Assert.assertTrue(ptConfig2.getDeterministicServiceModes().contains("schienenfahrzeug"));
+    Assert.assertEquals(4, ptConfig2.getCreateLinkEventsInterval());
+  }
 }

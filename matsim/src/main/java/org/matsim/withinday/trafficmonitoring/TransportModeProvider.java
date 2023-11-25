@@ -22,7 +22,6 @@ package org.matsim.withinday.trafficmonitoring;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -33,36 +32,37 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Person;
 
 /**
- * Returns an agent's current transport mode or null if the agent is performing an activity. 
- * 
+ * Returns an agent's current transport mode or null if the agent is performing an activity.
+ *
  * @author cdobler
  */
-public class TransportModeProvider implements PersonArrivalEventHandler, PersonDepartureEventHandler, PersonStuckEventHandler {
+public class TransportModeProvider
+    implements PersonArrivalEventHandler, PersonDepartureEventHandler, PersonStuckEventHandler {
 
-	private final Map<Id<Person>, String> transportModes = new ConcurrentHashMap<Id<Person>, String>();
-	
-	public String getTransportMode(Id<Person> agentId) {
-		return this.transportModes.get(agentId);
-	}
-	
-	@Override
-	public void reset(int iteration) {
-		this.transportModes.clear();
-	}
+  private final Map<Id<Person>, String> transportModes =
+      new ConcurrentHashMap<Id<Person>, String>();
 
-	@Override
-	public void handleEvent(PersonStuckEvent event) {
-		this.transportModes.remove(event.getPersonId());
-	}
+  public String getTransportMode(Id<Person> agentId) {
+    return this.transportModes.get(agentId);
+  }
 
-	@Override
-	public void handleEvent(PersonDepartureEvent event) {
-		this.transportModes.put(event.getPersonId(), event.getLegMode());
-	}
+  @Override
+  public void reset(int iteration) {
+    this.transportModes.clear();
+  }
 
-	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-		this.transportModes.remove(event.getPersonId());
-	}
+  @Override
+  public void handleEvent(PersonStuckEvent event) {
+    this.transportModes.remove(event.getPersonId());
+  }
 
+  @Override
+  public void handleEvent(PersonDepartureEvent event) {
+    this.transportModes.put(event.getPersonId(), event.getLegMode());
+  }
+
+  @Override
+  public void handleEvent(PersonArrivalEvent event) {
+    this.transportModes.remove(event.getPersonId());
+  }
 }

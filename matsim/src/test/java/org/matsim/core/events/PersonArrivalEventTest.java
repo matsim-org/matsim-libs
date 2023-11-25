@@ -36,16 +36,21 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class PersonArrivalEventTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-
-	@Test public void testWriteReadXml() {
-		final PersonArrivalEvent event = XmlEventsTester.testWriteReadXml(utils.getOutputDirectory() + "events.xml",
-				new PersonArrivalEvent(68423.98, Id.create("443", Person.class), Id.create("78-3", Link.class), TransportMode.bike));
-		assertEquals(68423.98, event.getTime(), MatsimTestUtils.EPSILON);
-		assertEquals(Id.create("443", Person.class), event.getPersonId());
-		assertEquals(Id.create("78-3", Link.class), event.getLinkId());
-		assertEquals(TransportMode.bike, event.getLegMode());
-	}
+  @Test
+  public void testWriteReadXml() {
+    final PersonArrivalEvent event =
+        XmlEventsTester.testWriteReadXml(
+            utils.getOutputDirectory() + "events.xml",
+            new PersonArrivalEvent(
+                68423.98,
+                Id.create("443", Person.class),
+                Id.create("78-3", Link.class),
+                TransportMode.bike));
+    assertEquals(68423.98, event.getTime(), MatsimTestUtils.EPSILON);
+    assertEquals(Id.create("443", Person.class), event.getPersonId());
+    assertEquals(Id.create("78-3", Link.class), event.getLinkId());
+    assertEquals(TransportMode.bike, event.getLegMode());
+  }
 }

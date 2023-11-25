@@ -21,53 +21,49 @@ package org.matsim.contrib.signals.model;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 
-
 /**
  * @author dgrether
- *
  */
 public final class SignalGroupImpl implements SignalGroup {
-	
-	private Id<SignalGroup> id;
-	private Map<Id<Signal>, Signal> signals = new HashMap<>();
-	private SignalGroupState state;
 
-	public SignalGroupImpl(Id<SignalGroup> id) {
-		this.id = id;
-	}
-	
-	@Override
-	public Id<SignalGroup> getId(){
-		return this.id;
-	}
+  private Id<SignalGroup> id;
+  private Map<Id<Signal>, Signal> signals = new HashMap<>();
+  private SignalGroupState state;
 
-	/* do not call this directly. Use scheduleDropping/Onset in the SignalSystem implementation instead.
-	 * visibility can't be restricted in the interface. theresa, apr'17 */
-	@Override
-	public void setState(SignalGroupState state) {
-		this.state = state;
-		for (Signal s : this.signals.values()){
-			s.setState(state);
-		}
-	}
+  public SignalGroupImpl(Id<SignalGroup> id) {
+    this.id = id;
+  }
 
-	@Override
-	public SignalGroupState getState() {
-		return this.state;
-	}
+  @Override
+  public Id<SignalGroup> getId() {
+    return this.id;
+  }
 
-	@Override
-	public void addSignal(Signal signal) {
-		this.signals.put(signal.getId(), signal);
-	}
+  /* do not call this directly. Use scheduleDropping/Onset in the SignalSystem implementation instead.
+   * visibility can't be restricted in the interface. theresa, apr'17 */
+  @Override
+  public void setState(SignalGroupState state) {
+    this.state = state;
+    for (Signal s : this.signals.values()) {
+      s.setState(state);
+    }
+  }
 
-	@Override
-	public Map<Id<Signal>, Signal> getSignals() {
-		return this.signals;
-	}
+  @Override
+  public SignalGroupState getState() {
+    return this.state;
+  }
 
+  @Override
+  public void addSignal(Signal signal) {
+    this.signals.put(signal.getId(), signal);
+  }
+
+  @Override
+  public Map<Id<Signal>, Signal> getSignals() {
+    return this.signals;
+  }
 }

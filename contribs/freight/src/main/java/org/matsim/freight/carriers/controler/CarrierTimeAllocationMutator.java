@@ -20,80 +20,77 @@
  */
 package org.matsim.freight.carriers.controler;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.freight.carriers.CarrierPlan;
 import org.matsim.freight.carriers.ScheduledTour;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 /**
  * @author nagel
- *
  */
 public class CarrierTimeAllocationMutator implements GenericPlanStrategyModule<CarrierPlan> {
-	public static final class Factory {
-		private double probability = 1.;
-		private double mutationRange = 3600.*3;
-		public CarrierTimeAllocationMutator build() {
-			return new CarrierTimeAllocationMutator( probability, mutationRange );
-		}
-		public Factory setProbability( double probability ) {
-			this.probability = probability;
-			return this;
-		}
-		public Factory setMutationRange( double mutationRange ){
-			this.mutationRange = mutationRange;
-			return this;
-		}
-	}
+  public static final class Factory {
+    private double probability = 1.;
+    private double mutationRange = 3600. * 3;
 
-	private double probability = 1.;
+    public CarrierTimeAllocationMutator build() {
+      return new CarrierTimeAllocationMutator(probability, mutationRange);
+    }
 
-	/**
-	 * max. departure time mutation: +/- 0.5 * mutationRange
-	 */
-	private double mutationRange = 3600. * 3.;
+    public Factory setProbability(double probability) {
+      this.probability = probability;
+      return this;
+    }
 
-	/**
-	 * @deprecated -- use {@link Factory}
-	 */
-	@Deprecated public CarrierTimeAllocationMutator() {
-	}
+    public Factory setMutationRange(double mutationRange) {
+      this.mutationRange = mutationRange;
+      return this;
+    }
+  }
 
-	/**
-	 * @deprecated -- use {@link Factory}
-	 */
-	@Deprecated public CarrierTimeAllocationMutator(double probability, double mutationRange ) {
-		this.probability = probability;
-		this.mutationRange = mutationRange;
-	}
+  private double probability = 1.;
 
-	@Override
-	public void handlePlan(CarrierPlan carrierPlan) {
-		Collection<ScheduledTour> newTours = new ArrayList<>() ;
-		for ( ScheduledTour tour : carrierPlan.getScheduledTours() ) {
-			if(MatsimRandom.getRandom().nextDouble() < probability) {
-				double departureTime = tour.getDeparture() + (MatsimRandom.getRandom().nextDouble() - 0.5) * mutationRange;
-				if ( departureTime < tour.getVehicle().getEarliestStartTime() ) {
-					departureTime = tour.getVehicle().getEarliestStartTime();
-				}
-				newTours.add(ScheduledTour.newInstance(tour.getTour(), tour.getVehicle(), departureTime));
-			}
-			else newTours.add(tour);
-		}
-		carrierPlan.getScheduledTours().clear();
-		carrierPlan.getScheduledTours().addAll( newTours ) ;
-	}
+  /** max. departure time mutation: +/- 0.5 * mutationRange */
+  private double mutationRange = 3600. * 3.;
 
-	@Override
-	public void prepareReplanning(ReplanningContext replanningContext) {
-	}
+  /**
+   * @deprecated -- use {@link Factory}
+   */
+  @Deprecated
+  public CarrierTimeAllocationMutator() {}
 
-	@Override
-	public void finishReplanning() {
-	}
+  /**
+   * @deprecated -- use {@link Factory}
+   */
+  @Deprecated
+  public CarrierTimeAllocationMutator(double probability, double mutationRange) {
+    this.probability = probability;
+    this.mutationRange = mutationRange;
+  }
 
+  @Override
+  public void handlePlan(CarrierPlan carrierPlan) {
+    Collection<ScheduledTour> newTours = new ArrayList<>();
+    for (ScheduledTour tour : carrierPlan.getScheduledTours()) {
+      if (MatsimRandom.getRandom().nextDouble() < probability) {
+        double departureTime =
+            tour.getDeparture() + (MatsimRandom.getRandom().nextDouble() - 0.5) * mutationRange;
+        if (departureTime < tour.getVehicle().getEarliestStartTime()) {
+          departureTime = tour.getVehicle().getEarliestStartTime();
+        }
+        newTours.add(ScheduledTour.newInstance(tour.getTour(), tour.getVehicle(), departureTime));
+      } else newTours.add(tour);
+    }
+    carrierPlan.getScheduledTours().clear();
+    carrierPlan.getScheduledTours().addAll(newTours);
+  }
+
+  @Override
+  public void prepareReplanning(ReplanningContext replanningContext) {}
+
+  @Override
+  public void finishReplanning() {}
 }

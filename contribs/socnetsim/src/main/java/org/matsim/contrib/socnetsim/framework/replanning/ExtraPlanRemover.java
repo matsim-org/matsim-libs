@@ -26,12 +26,8 @@ import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGrou
  * @author thibautd
  */
 public interface ExtraPlanRemover {
-	/**
-	 * @return true if at least one plan was removed for at least one agent,
-	 * false otherwise
-	 */
-	public boolean removePlansInGroup(
-			JointPlans jointPlans,
-			ReplanningGroup group );
+  /**
+   * @return true if at least one plan was removed for at least one agent, false otherwise
+   */
+  public boolean removePlansInGroup(JointPlans jointPlans, ReplanningGroup group);
 }
-

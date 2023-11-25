@@ -1,18 +1,17 @@
 package org.matsim.contrib.accessibility.osm;
 
 public final class OsmKeys {
-	// used from outside, e.g. vsp-playgrounds
+  // used from outside, e.g. vsp-playgrounds
 
-	private OsmKeys() {} // Do not instantiate
-	
-	public static final String AMENITY = "amenity";
-	public static final String LEISURE = "leisure";
+  private OsmKeys() {} // Do not instantiate
 
-	/**
-	 * @deprecated -- yyyyyy can this work?  (IMO, the string is mis-spelled.)  kai, feb'20
-	 */
-	@Deprecated
-	public static final String TOURISM = "tourims";
+  public static final String AMENITY = "amenity";
+  public static final String LEISURE = "leisure";
 
-	public static final String SHOP = "shop";
+  /**
+   * @deprecated -- yyyyyy can this work? (IMO, the string is mis-spelled.) kai, feb'20
+   */
+  @Deprecated public static final String TOURISM = "tourims";
+
+  public static final String SHOP = "shop";
 }

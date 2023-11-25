@@ -25,17 +25,15 @@ import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 
-
 /**
  * @author dgrether
- *
  */
 public interface SignalModelFactory {
-	
-	public SignalSystem createSignalSystem(Id<SignalSystem> id);
-	
-	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem);
 
-	public SignalPlan createSignalPlan(SignalPlanData planData);
-	
+  public SignalSystem createSignalSystem(Id<SignalSystem> id);
+
+  public SignalController createSignalSystemController(
+      String controllerIdentifier, SignalSystem signalSystem);
+
+  public SignalPlan createSignalPlan(SignalPlanData planData);
 }

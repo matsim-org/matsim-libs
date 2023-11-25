@@ -23,6 +23,8 @@
 package org.matsim.core.controler;
 
 import com.google.inject.Inject;
+import java.io.File;
+import javax.imageio.ImageIO;
 import org.matsim.analysis.IterationTravelStatsModule;
 import org.matsim.analysis.LegHistogramModule;
 import org.matsim.analysis.LegTimesModule;
@@ -47,55 +49,59 @@ import org.matsim.counts.CountsModule;
 import org.matsim.guice.DependencyGraphModule;
 import org.matsim.vis.snapshotwriters.SnapshotWritersModule;
 
-import javax.imageio.ImageIO;
-import java.io.File;
-
 public final class ControlerDefaultsModule extends AbstractModule {
-    @Override
-    public void install() {
-        install(new EventsManagerModule());
-        install(new DefaultMobsimModule());
-        install(new TravelTimeCalculatorModule());
-        install(new TravelDisutilityModule());
-        install(new CharyparNagelScoringFunctionModule());
-        install(new TripRouterModule());
-        install(new StrategyManagerModule());
-        install(new TimeInterpretationModule());
-        if (getConfig().replanningAnnealer().isActivateAnnealingModule()) {
-            addControlerListenerBinding().to(ReplanningAnnealer.class);
-        }
-
-        // I think that the ones coming here are all for analysis only, and thus not central to the iterations. kai, apr'18
-        install(new LinkStatsModule());
-        install(new VolumesAnalyzerModule());
-        install(new LegHistogramModule());
-        install(new LegTimesModule());
-        install(new IterationTravelStatsModule());
-        install(new ScoreStatsModule());
-        install(new ModeStatsModule());
-        install(new CountsModule());
-        install(new VspPlansCleanerModule());
-        install(new SnapshotWritersModule());
-        install(new DependencyGraphModule());
-        install(new PlanInheritanceModule());
-
-		// Comment by Tarek Chouaki.
-		// To make sure the cache files used under ChartUtils are located in tmp folder in the output directory
-		// The ImageIO.setCacheDirectory method checks if the provided directory exists so it needs to be created first
-		// Maybe not the best place to but this but since ChartUtils is used by many modules, including default ones,
-		//  the cache needs to be always set correctly.
-		addControlerListenerBinding().toInstance(new StartupListener() {
-			@Inject
-			private OutputDirectoryHierarchy outputDirectoryHierarchy;
-			@Override   public void notifyStartup(StartupEvent event) {
-				ImageIO.setCacheDirectory(new File(outputDirectoryHierarchy.getTempPath()));
-			}
-		});
-
-    	/* Comment by kai (mz thinks it is not helpful): The framework eventually calls the above method, which calls the include
-        * methods , which (fairly quickly) call their own install methods, etc.  Eventually, everything is resolved down to the
-        * "bindTo..." methods, which are the leaves.
-    	*/
-
+  @Override
+  public void install() {
+    install(new EventsManagerModule());
+    install(new DefaultMobsimModule());
+    install(new TravelTimeCalculatorModule());
+    install(new TravelDisutilityModule());
+    install(new CharyparNagelScoringFunctionModule());
+    install(new TripRouterModule());
+    install(new StrategyManagerModule());
+    install(new TimeInterpretationModule());
+    if (getConfig().replanningAnnealer().isActivateAnnealingModule()) {
+      addControlerListenerBinding().to(ReplanningAnnealer.class);
     }
+
+    // I think that the ones coming here are all for analysis only, and thus not central to the
+    // iterations. kai, apr'18
+    install(new LinkStatsModule());
+    install(new VolumesAnalyzerModule());
+    install(new LegHistogramModule());
+    install(new LegTimesModule());
+    install(new IterationTravelStatsModule());
+    install(new ScoreStatsModule());
+    install(new ModeStatsModule());
+    install(new CountsModule());
+    install(new VspPlansCleanerModule());
+    install(new SnapshotWritersModule());
+    install(new DependencyGraphModule());
+    install(new PlanInheritanceModule());
+
+    // Comment by Tarek Chouaki.
+    // To make sure the cache files used under ChartUtils are located in tmp folder in the output
+    // directory
+    // The ImageIO.setCacheDirectory method checks if the provided directory exists so it needs to
+    // be created first
+    // Maybe not the best place to but this but since ChartUtils is used by many modules, including
+    // default ones,
+    //  the cache needs to be always set correctly.
+    addControlerListenerBinding()
+        .toInstance(
+            new StartupListener() {
+              @Inject private OutputDirectoryHierarchy outputDirectoryHierarchy;
+
+              @Override
+              public void notifyStartup(StartupEvent event) {
+                ImageIO.setCacheDirectory(new File(outputDirectoryHierarchy.getTempPath()));
+              }
+            });
+
+    /* Comment by kai (mz thinks it is not helpful): The framework eventually calls the above method, which calls the include
+     * methods , which (fairly quickly) call their own install methods, etc.  Eventually, everything is resolved down to the
+     * "bindTo..." methods, which are the leaves.
+     */
+
+  }
 }

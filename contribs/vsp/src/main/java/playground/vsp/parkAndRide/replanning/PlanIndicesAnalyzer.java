@@ -18,120 +18,113 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
+/** */
 package playground.vsp.parkAndRide.replanning;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-
 import playground.vsp.parkAndRide.PRConstants;
-
 
 /**
  * @author ikaddoura
- *
  */
 public class PlanIndicesAnalyzer {
-//	private static final Logger log = LogManager.getLogger(PlanIndicesAnalyzer.class);
+  //	private static final Logger log = LogManager.getLogger(PlanIndicesAnalyzer.class);
 
-	private List<PlanElement> planElements = new ArrayList<PlanElement>();
-	
-	private boolean hasParkAndRide = false;
-	private boolean hasHomeActivity = false;
-	private boolean hasWorkActivity = false;
+  private List<PlanElement> planElements = new ArrayList<PlanElement>();
 
-	private List<Integer> homeActs = new ArrayList<Integer>();
-	private List<Integer> workActs = new ArrayList<Integer>();
-	private List<Integer> allActs = new ArrayList<Integer>();
-	private List<Integer> prActs = new ArrayList<Integer>();
-	
-	public PlanIndicesAnalyzer(Plan plan) {
-		this.planElements = plan.getPlanElements();
-	}
-	
-	public void setIndices(){
-		
-		this.allActs.clear();
-		this.homeActs.clear();
-		this.workActs.clear();
-		this.prActs.clear();
-		
-		for (int i = 0; i < planElements.size(); i++) {
-			PlanElement pe = planElements.get(i);
-			
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
-				this.allActs.add(i);
-				if (act.toString().contains(PRConstants.PARKANDRIDE_ACTIVITY_TYPE)){
-					hasParkAndRide = true;
-					this.prActs.add(i);
-				} else if (act.toString().contains("home")){
-					hasHomeActivity = true;
-					this.homeActs.add(i);						
-				} else if (act.toString().contains("work")){
-					hasWorkActivity = true;
-					this.workActs.add(i);
-				}
-			}
-		}
-	}
+  private boolean hasParkAndRide = false;
+  private boolean hasHomeActivity = false;
+  private boolean hasWorkActivity = false;
 
-	public List<Integer> getHomeActs() {
-		return homeActs;
-	}
+  private List<Integer> homeActs = new ArrayList<Integer>();
+  private List<Integer> workActs = new ArrayList<Integer>();
+  private List<Integer> allActs = new ArrayList<Integer>();
+  private List<Integer> prActs = new ArrayList<Integer>();
 
-	public List<Integer> getWorkActs() {
-		return workActs;
-	}
+  public PlanIndicesAnalyzer(Plan plan) {
+    this.planElements = plan.getPlanElements();
+  }
 
-	public List<Integer> getAllActs() {
-		return allActs;
-	}
+  public void setIndices() {
 
-	public List<Integer> getPrActs() {
-		return prActs;
-	}
+    this.allActs.clear();
+    this.homeActs.clear();
+    this.workActs.clear();
+    this.prActs.clear();
 
-	public boolean hasParkAndRide() {
-		return hasParkAndRide;
-	}
+    for (int i = 0; i < planElements.size(); i++) {
+      PlanElement pe = planElements.get(i);
 
-	public boolean hasHomeActivity() {
-		return hasHomeActivity;
-	}
+      if (pe instanceof Activity) {
+        Activity act = (Activity) pe;
+        this.allActs.add(i);
+        if (act.toString().contains(PRConstants.PARKANDRIDE_ACTIVITY_TYPE)) {
+          hasParkAndRide = true;
+          this.prActs.add(i);
+        } else if (act.toString().contains("home")) {
+          hasHomeActivity = true;
+          this.homeActs.add(i);
+        } else if (act.toString().contains("work")) {
+          hasWorkActivity = true;
+          this.workActs.add(i);
+        }
+      }
+    }
+  }
 
-	public boolean hasWorkActivity() {
-		return hasWorkActivity;
-	}
+  public List<Integer> getHomeActs() {
+    return homeActs;
+  }
 
-	public int getMinHomeAfterWork(int workIndex) {
-		int minHomeAfterWork = 999999;
-		for (Integer homeIndex : this.getHomeActs()){
-			if (homeIndex > workIndex){
-				if (homeIndex < minHomeAfterWork){
-					minHomeAfterWork = homeIndex;
-				}
-			}
-		}
-		return minHomeAfterWork;
-	}
+  public List<Integer> getWorkActs() {
+    return workActs;
+  }
 
-	public int getMaxHomeBeforeWork(int workIndex) {
-		int maxHomeBeforeWork = 0;
-		for (Integer homeIndex : this.getHomeActs()){
-			if (homeIndex < workIndex){
-				if (homeIndex > maxHomeBeforeWork){
-					maxHomeBeforeWork = homeIndex;
-				}
-			}
-		}
-		return maxHomeBeforeWork;
-	}
-	
+  public List<Integer> getAllActs() {
+    return allActs;
+  }
+
+  public List<Integer> getPrActs() {
+    return prActs;
+  }
+
+  public boolean hasParkAndRide() {
+    return hasParkAndRide;
+  }
+
+  public boolean hasHomeActivity() {
+    return hasHomeActivity;
+  }
+
+  public boolean hasWorkActivity() {
+    return hasWorkActivity;
+  }
+
+  public int getMinHomeAfterWork(int workIndex) {
+    int minHomeAfterWork = 999999;
+    for (Integer homeIndex : this.getHomeActs()) {
+      if (homeIndex > workIndex) {
+        if (homeIndex < minHomeAfterWork) {
+          minHomeAfterWork = homeIndex;
+        }
+      }
+    }
+    return minHomeAfterWork;
+  }
+
+  public int getMaxHomeBeforeWork(int workIndex) {
+    int maxHomeBeforeWork = 0;
+    for (Integer homeIndex : this.getHomeActs()) {
+      if (homeIndex < workIndex) {
+        if (homeIndex > maxHomeBeforeWork) {
+          maxHomeBeforeWork = homeIndex;
+        }
+      }
+    }
+    return maxHomeBeforeWork;
+  }
 }

@@ -20,45 +20,43 @@
 package org.matsim.contrib.socnetsim.sharedvehicles.replanning;
 
 import java.util.Collection;
-
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.replanning.ReplanningContext;
-
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.ReplanningContext;
 
 /**
  * @author thibautd
  */
-public class AllocateVehicleToPlansInGroupPlanModule extends AbstractMultithreadedGenericStrategyModule<GroupPlans> {
-	private final VehicleRessources vehicleRessources;
-	private final Collection<String> modes;
-	private final boolean allowNullRoutes;
-	private final boolean preserveAllocations;
+public class AllocateVehicleToPlansInGroupPlanModule
+    extends AbstractMultithreadedGenericStrategyModule<GroupPlans> {
+  private final VehicleRessources vehicleRessources;
+  private final Collection<String> modes;
+  private final boolean allowNullRoutes;
+  private final boolean preserveAllocations;
 
-	public AllocateVehicleToPlansInGroupPlanModule(
-			final int nThreads,
-			final VehicleRessources vehicleRessources,
-			final Collection<String> modes,
-			final boolean allowNullRoutes,
-			final boolean preserveAllocations) {
-		super( nThreads );
-		this.vehicleRessources = vehicleRessources;
-		this.modes = modes;
-		this.allowNullRoutes = allowNullRoutes;
-		this.preserveAllocations = preserveAllocations;
-	}
+  public AllocateVehicleToPlansInGroupPlanModule(
+      final int nThreads,
+      final VehicleRessources vehicleRessources,
+      final Collection<String> modes,
+      final boolean allowNullRoutes,
+      final boolean preserveAllocations) {
+    super(nThreads);
+    this.vehicleRessources = vehicleRessources;
+    this.modes = modes;
+    this.allowNullRoutes = allowNullRoutes;
+    this.preserveAllocations = preserveAllocations;
+  }
 
-	@Override
-	public GenericPlanAlgorithm<GroupPlans> createAlgorithm(ReplanningContext replanningContext) {
-		return new AllocateVehicleToPlansInGroupPlanAlgorithm(
-				MatsimRandom.getLocalInstance(),
-				vehicleRessources,
-				modes,
-				allowNullRoutes,
-				preserveAllocations);
-	}
+  @Override
+  public GenericPlanAlgorithm<GroupPlans> createAlgorithm(ReplanningContext replanningContext) {
+    return new AllocateVehicleToPlansInGroupPlanAlgorithm(
+        MatsimRandom.getLocalInstance(),
+        vehicleRessources,
+        modes,
+        allowNullRoutes,
+        preserveAllocations);
+  }
 }
-

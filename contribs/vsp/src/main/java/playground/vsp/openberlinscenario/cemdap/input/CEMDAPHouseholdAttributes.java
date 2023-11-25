@@ -18,7 +18,14 @@
  * *********************************************************************** */
 
 package playground.vsp.openberlinscenario.cemdap.input;
+
 /**
  * @author dziemke
  */
-public enum CEMDAPHouseholdAttributes {numberOfAdults, totalNumberOfHouseholdVehicles, homeTSZLocation, numberOfChildren, householdStructure}
+public enum CEMDAPHouseholdAttributes {
+  numberOfAdults,
+  totalNumberOfHouseholdVehicles,
+  homeTSZLocation,
+  numberOfChildren,
+  householdStructure
+}

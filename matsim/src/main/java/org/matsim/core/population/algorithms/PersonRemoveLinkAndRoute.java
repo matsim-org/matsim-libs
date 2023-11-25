@@ -26,23 +26,24 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 
-public final class PersonRemoveLinkAndRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
+public final class PersonRemoveLinkAndRoute extends AbstractPersonAlgorithm
+    implements PlanAlgorithm {
 
-	@Override
-	public void run(final Person person) {
-		for (Plan plan : person.getPlans()) {
-			run(plan);
-		}
-	}
+  @Override
+  public void run(final Person person) {
+    for (Plan plan : person.getPlans()) {
+      run(plan);
+    }
+  }
 
-	@Override
-	public void run(final Plan plan) {
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				((Activity) pe).setLinkId(null);
-			} else if (pe instanceof Leg) {
-				((Leg) pe).setRoute(null);
-			}
-		}
-	}
+  @Override
+  public void run(final Plan plan) {
+    for (PlanElement pe : plan.getPlanElements()) {
+      if (pe instanceof Activity) {
+        ((Activity) pe).setLinkId(null);
+      } else if (pe instanceof Leg) {
+        ((Leg) pe).setRoute(null);
+      }
+    }
+  }
 }

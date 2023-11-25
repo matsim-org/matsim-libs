@@ -21,14 +21,12 @@ package org.matsim.contrib.cadyts.general;
 import org.matsim.api.core.v01.Id;
 
 /**
- * Interface for class that provides the method to look up the "counted" item from its id.
- * Necessary to generalize CadytsBuilder.
- * 
- * @author nagel
+ * Interface for class that provides the method to look up the "counted" item from its id. Necessary
+ * to generalize CadytsBuilder.
  *
+ * @author nagel
  */
 public interface LookUpItemFromId<T> {
-	
-	T getItem( Id<T> id ) ;
 
+  T getItem(Id<T> id);
 }

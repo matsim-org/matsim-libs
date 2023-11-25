@@ -20,22 +20,21 @@
 
 package org.matsim.core.modal;
 
-import java.lang.annotation.Annotation;
-
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
+import java.lang.annotation.Annotation;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public interface ModalAnnotationCreator<M extends Annotation> {
-	M mode(String mode);
+  M mode(String mode);
 
-	default <T> Key<T> key(Class<T> type, String mode) {
-		return Key.get(type, mode(mode));
-	}
+  default <T> Key<T> key(Class<T> type, String mode) {
+    return Key.get(type, mode(mode));
+  }
 
-	default <T> Key<T> key(TypeLiteral<T> typeLiteral, String mode) {
-		return Key.get(typeLiteral, mode(mode));
-	}
+  default <T> Key<T> key(TypeLiteral<T> typeLiteral, String mode) {
+    return Key.get(typeLiteral, mode(mode));
+  }
 }

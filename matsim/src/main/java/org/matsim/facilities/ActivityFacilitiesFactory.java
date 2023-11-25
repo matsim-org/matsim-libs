@@ -27,16 +27,15 @@ import org.matsim.core.api.internal.MatsimFactory;
 
 /**
  * @author nagel
- *
  */
 public interface ActivityFacilitiesFactory extends MatsimFactory {
 
-	public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Coord coord);
-	
-	public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Id<Link> linkId);
-	
-	public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Coord coord, Id<Link> linkId);
+  public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Coord coord);
 
-	public ActivityOption createActivityOption(String type);
+  public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Id<Link> linkId);
 
+  public ActivityFacility createActivityFacility(
+      Id<ActivityFacility> id, Coord coord, Id<Link> linkId);
+
+  public ActivityOption createActivityOption(String type);
 }

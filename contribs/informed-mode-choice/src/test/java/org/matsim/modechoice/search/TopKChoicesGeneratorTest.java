@@ -1,5 +1,9 @@
 package org.matsim.modechoice.search;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Collection;
+import java.util.List;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
@@ -12,149 +16,141 @@ import org.matsim.modechoice.PlanModel;
 import org.matsim.modechoice.ScenarioTest;
 import org.matsim.modechoice.TestScenario;
 
-import java.util.Collection;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class TopKChoicesGeneratorTest extends ScenarioTest {
 
-	@Test
-	public void choices() {
+  @Test
+  public void choices() {
 
-		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
+    TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
 
-		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(0));
+    Person person =
+        controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(0));
 
-		Collection<PlanCandidate> candidates = generator.generate(PlanModel.newInstance(person.getSelectedPlan()));
+    Collection<PlanCandidate> candidates =
+        generator.generate(PlanModel.newInstance(person.getSelectedPlan()));
 
-		assertThat(candidates)
-				.hasSize(5)
-				.first()
-				.isEqualTo(new PlanCandidate(new String[]{"car", "car", "car", "car"}, Double.NaN));
+    assertThat(candidates)
+        .hasSize(5)
+        .first()
+        .isEqualTo(new PlanCandidate(new String[] {"car", "car", "car", "car"}, Double.NaN));
 
+    person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(1));
+    candidates = generator.generate(PlanModel.newInstance(person.getSelectedPlan()));
+    assertThat(candidates)
+        .hasSize(5)
+        .first()
+        .isEqualTo(
+            new PlanCandidate(
+                new String[] {"car", "car", "car", "car", "car", "car", "car"}, Double.NaN));
+  }
 
-		person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(1));
-		candidates = generator.generate(PlanModel.newInstance(person.getSelectedPlan()));
-		assertThat(candidates)
-				.hasSize(5)
-				.first()
-				.isEqualTo(new PlanCandidate(new String[]{"car", "car", "car", "car", "car", "car", "car"}, Double.NaN));
+  @Test
+  public void person() {
 
-	}
+    TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
 
-	@Test
-	public void person() {
+    Person person =
+        controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("10390"));
 
-		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
+    Collection<PlanCandidate> candidates =
+        generator.generate(PlanModel.newInstance(person.getSelectedPlan()));
 
-		Person person = controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("10390"));
+    assertThat(candidates).contains(new PlanCandidate(new String[] {"car"}, -5.96));
+  }
 
-		Collection<PlanCandidate> candidates = generator.generate(PlanModel.newInstance(person.getSelectedPlan()));
+  @Test
+  public void invariance() {
 
-		assertThat(candidates)
-				.contains(new PlanCandidate(new String[]{"car"}, -5.96));
+    TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
 
-	}
+    for (Person p : controler.getScenario().getPopulation().getPersons().values()) {
 
+      if (!PersonUtils.canUseCar(p)) continue;
 
-	@Test
-	public void invariance() {
+      Plan orig = p.getSelectedPlan();
 
-		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
+      Plan car = p.createCopyOfSelectedPlanAndMakeSelected();
+      setLegs(car, "car");
+      Collection<PlanCandidate> carCandidates = generator.generate(PlanModel.newInstance(car));
 
+      p.setSelectedPlan(orig);
 
-		for (Person p : controler.getScenario().getPopulation().getPersons().values()) {
+      Plan walk = p.createCopyOfSelectedPlanAndMakeSelected();
+      setLegs(walk, "walk");
+      Collection<PlanCandidate> walkCandidates = generator.generate(PlanModel.newInstance(walk));
 
-			if (!PersonUtils.canUseCar(p))
-				continue;
+      assertThat(carCandidates).isEqualTo(walkCandidates);
+    }
+  }
 
-			Plan orig = p.getSelectedPlan();
+  @Test
+  public void predefined() {
 
-			Plan car = p.createCopyOfSelectedPlanAndMakeSelected();
-			setLegs(car, "car");
-			Collection<PlanCandidate> carCandidates = generator.generate(PlanModel.newInstance(car));
+    TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
 
-			p.setSelectedPlan(orig);
+    Person person =
+        controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(0));
 
-			Plan walk = p.createCopyOfSelectedPlanAndMakeSelected();
-			setLegs(walk, "walk");
-			Collection<PlanCandidate> walkCandidates = generator.generate(PlanModel.newInstance(walk));
+    PlanModel model = PlanModel.newInstance(person.getSelectedPlan());
 
-			assertThat(carCandidates)
-					.isEqualTo(walkCandidates);
-		}
-	}
+    Collection<PlanCandidate> result = generator.generate(model, null, null, 6, 0, Double.NaN);
 
-	@Test
-	public void predefined() {
+    PlanCandidate first = result.iterator().next();
 
-		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
+    assertThat(first.getPlanType()).isEqualTo("car-car-car-car");
+    assertThat(first.getUtility()).isEqualTo(-6.186329864145045);
 
-		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(0));
+    List<PlanCandidate> candidates =
+        generator.generatePredefined(
+            model,
+            List.of(
+                new String[] {"car", "car", "car", "car"},
+                new String[] {"walk", "walk", "walk", "walk"},
+                new String[] {"walk", "bike", null, "car"}));
 
-		PlanModel model = PlanModel.newInstance(person.getSelectedPlan());
+    PlanCandidate car = candidates.get(0);
 
-		Collection<PlanCandidate> result = generator.generate(model, null, null, 6, 0, Double.NaN);
+    assertThat(car.getPlanType()).isEqualTo("car-car-car-car");
+    assertThat(car.getUtility()).isEqualTo(first.getUtility());
 
-		PlanCandidate first = result.iterator().next();
+    PlanCandidate walk = candidates.get(1);
 
-		assertThat(first.getPlanType()).isEqualTo("car-car-car-car");
-		assertThat(first.getUtility()).isEqualTo(-6.186329864145045);
+    assertThat(walk.getPlanType()).isEqualTo("walk-walk-walk-walk");
+    assertThat(walk.getUtility()).isLessThan(first.getUtility());
+  }
 
+  @Test
+  public void threshold() {
 
-		List<PlanCandidate> candidates = generator.generatePredefined(model, List.of(
-				new String[]{"car", "car", "car", "car"},
-				new String[]{"walk", "walk", "walk", "walk"},
-				new String[]{"walk", "bike", null, "car"}
-		));
+    TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
 
-		PlanCandidate car = candidates.get(0);
+    Person person =
+        controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(0));
 
-		assertThat(car.getPlanType()).isEqualTo("car-car-car-car");
-		assertThat(car.getUtility()).isEqualTo(first.getUtility());
+    PlanModel planModel = PlanModel.newInstance(person.getSelectedPlan());
 
-		PlanCandidate walk = candidates.get(1);
+    Collection<PlanCandidate> candidates =
+        generator.generate(planModel, null, null, 15, -1, Double.NaN);
 
-		assertThat(walk.getPlanType()).isEqualTo("walk-walk-walk-walk");
-		assertThat(walk.getUtility()).isLessThan(first.getUtility());
+    assertThat(candidates).hasSize(15);
 
-	}
+    candidates = generator.generate(planModel, null, null, 15, 2, Double.NaN);
 
-	@Test
-	public void threshold() {
+    assertThat(candidates).hasSize(3);
 
+    candidates = generator.generate(planModel, null, null, 15, -1, -8);
 
-		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
+    assertThat(candidates).hasSize(1);
+  }
 
-		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(0));
-
-		PlanModel planModel = PlanModel.newInstance(person.getSelectedPlan());
-
-		Collection<PlanCandidate> candidates = generator.generate(planModel, null, null, 15, -1, Double.NaN);
-
-		assertThat(candidates).hasSize(15);
-
-		candidates = generator.generate(planModel, null, null, 15, 2, Double.NaN);
-
-		assertThat(candidates).hasSize(3);
-
-		candidates = generator.generate(planModel, null, null, 15, -1, -8);
-
-		assertThat(candidates).hasSize(1);
-	}
-
-	/**
-	 * Normalize modes for all legs.
-	 */
-	private static void setLegs(Plan plan, String mode) {
-		for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(plan)) {
-			for (Leg leg : trip.getLegsOnly()) {
-				leg.setRoute(null);
-				leg.setMode(mode);
-				TripStructureUtils.setRoutingMode(leg, mode);
-			}
-		}
-	}
-
+  /** Normalize modes for all legs. */
+  private static void setLegs(Plan plan, String mode) {
+    for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(plan)) {
+      for (Leg leg : trip.getLegsOnly()) {
+        leg.setRoute(null);
+        leg.setMode(mode);
+        TripStructureUtils.setRoutingMode(leg, mode);
+      }
+    }
+  }
 }

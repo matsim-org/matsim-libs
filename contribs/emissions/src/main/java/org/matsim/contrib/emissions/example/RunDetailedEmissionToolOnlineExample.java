@@ -29,66 +29,69 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * 
- * After creating a config file with 
- * {@link CreateEmissionConfig CreateEmissionConfig}
- * this class runs a simulation and calculates emissions online.
- * Results are written into events file (including emission events) for some iterations (as specified by the config).
- * <p></p>
- * See <a href="{@docRoot}/src-html/org/matsim/contrib/emissions/example/RunEmissionToolOnlineExample.html#line.39">here</a> for the listing.
-
+ * After creating a config file with {@link CreateEmissionConfig CreateEmissionConfig} this class
+ * runs a simulation and calculates emissions online. Results are written into events file
+ * (including emission events) for some iterations (as specified by the config).
+ *
+ * <p>See <a
+ * href="{@docRoot}/src-html/org/matsim/contrib/emissions/example/RunEmissionToolOnlineExample.html#line.39">here</a>
+ * for the listing.
  *
  * @author benjamin, julia
  */
-
 public final class RunDetailedEmissionToolOnlineExample {
 
-//	private static final String configFile = "./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml";
+  //	private static final String configFile =
+  // "./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml";
 
-	public static Config prepareConfig( String[] args ) {
-		Config config;
-//		if ( args == null || args.length == 0 ) {
-//			config = ConfigUtils.loadConfig( configFile, new EmissionsConfigGroup() );
-//		} else {
-			config = ConfigUtils.loadConfig( args, new EmissionsConfigGroup() );
-//		}
-		return config;
-	}
+  public static Config prepareConfig(String[] args) {
+    Config config;
+    //		if ( args == null || args.length == 0 ) {
+    //			config = ConfigUtils.loadConfig( configFile, new EmissionsConfigGroup() );
+    //		} else {
+    config = ConfigUtils.loadConfig(args, new EmissionsConfigGroup());
+    //		}
+    return config;
+  }
 
-	public static Scenario prepareScenario( Config config ) {
-		Scenario scenario = ScenarioUtils.loadScenario( config );
+  public static Scenario prepareScenario(Config config) {
+    Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		//load emissions config
-//		EmissionsConfigGroup emissionsConfigGroup =  (EmissionsConfigGroup) config.getModules().get(EmissionsConfigGroup.GROUP_NAME);
-//		URL context = scenario.getConfig().getContext();
-//		URL mappingFile = emissionsConfigGroup.getEmissionRoadTypeMappingFileURL(context);
+    // load emissions config
+    //		EmissionsConfigGroup emissionsConfigGroup =  (EmissionsConfigGroup)
+    // config.getModules().get(EmissionsConfigGroup.GROUP_NAME);
+    //		URL context = scenario.getConfig().getContext();
+    //		URL mappingFile = emissionsConfigGroup.getEmissionRoadTypeMappingFileURL(context);
 
-		//add Hbefa mappings to the network
-//		HbefaRoadTypeMapping vhtm = VisumHbefaRoadTypeMapping.createVisumRoadTypeMapping(mappingFile);
-//		vhtm.addHbefaMappings(scenario.getNetwork());
-		
-		// no need for the mapping file; hbefa mappings were directly written into the link attributes. ihab nov '18
+    // add Hbefa mappings to the network
+    //		HbefaRoadTypeMapping vhtm =
+    // VisumHbefaRoadTypeMapping.createVisumRoadTypeMapping(mappingFile);
+    //		vhtm.addHbefaMappings(scenario.getNetwork());
 
-		return scenario ;
-	}
+    // no need for the mapping file; hbefa mappings were directly written into the link attributes.
+    // ihab nov '18
 
-	public static void run( Scenario scenario, AbstractModule... modules ) {
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(EmissionModule.class).asEagerSingleton();
-			}
-		});
-		for ( AbstractModule module : modules ) {
-			controler.addOverridingModule( module );
-		}
-		controler.run();
-	}
-	public static void main(String[] args) {
-		Config config = prepareConfig( args ) ;
-		Scenario scenario = prepareScenario( config ) ;
-		run( scenario ) ;
-	}
+    return scenario;
+  }
 
+  public static void run(Scenario scenario, AbstractModule... modules) {
+    Controler controler = new Controler(scenario);
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            bind(EmissionModule.class).asEagerSingleton();
+          }
+        });
+    for (AbstractModule module : modules) {
+      controler.addOverridingModule(module);
+    }
+    controler.run();
+  }
+
+  public static void main(String[] args) {
+    Config config = prepareConfig(args);
+    Scenario scenario = prepareScenario(config);
+    run(scenario);
+  }
 }

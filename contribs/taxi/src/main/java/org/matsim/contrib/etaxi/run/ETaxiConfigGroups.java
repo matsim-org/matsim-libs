@@ -28,12 +28,12 @@ import org.matsim.contrib.taxi.run.TaxiConfigGroup;
  * @author Michal Maciejewski (michalm)
  */
 public class ETaxiConfigGroups {
-	public static TaxiConfigGroup createWithCustomETaxiOptimizerParams() {
-		TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
-		taxiCfg.addOptimizerParamsDefinition(AssignmentETaxiOptimizerParams.SET_NAME,
-				AssignmentETaxiOptimizerParams::new);
-		taxiCfg.addOptimizerParamsDefinition(RuleBasedETaxiOptimizerParams.SET_NAME,
-				RuleBasedETaxiOptimizerParams::new);
-		return taxiCfg;
-	}
+  public static TaxiConfigGroup createWithCustomETaxiOptimizerParams() {
+    TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
+    taxiCfg.addOptimizerParamsDefinition(
+        AssignmentETaxiOptimizerParams.SET_NAME, AssignmentETaxiOptimizerParams::new);
+    taxiCfg.addOptimizerParamsDefinition(
+        RuleBasedETaxiOptimizerParams.SET_NAME, RuleBasedETaxiOptimizerParams::new);
+    return taxiCfg;
+  }
 }

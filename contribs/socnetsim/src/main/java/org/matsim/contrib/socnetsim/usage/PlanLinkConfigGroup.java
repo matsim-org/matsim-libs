@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 
@@ -31,85 +30,83 @@ import org.matsim.core.utils.collections.CollectionUtils;
  * @author thibautd
  */
 public class PlanLinkConfigGroup extends ReflectiveConfigGroup {
-	public static final String GROUP_NAME = "planLinkIdentifier";
+  public static final String GROUP_NAME = "planLinkIdentifier";
 
-	public static enum LinkStrength {
-		strong( true , true ), // a strong link is also weak
-		weak( false , true ),
-		none( false , false );
+  public static enum LinkStrength {
+    strong(true, true), // a strong link is also weak
+    weak(false, true),
+    none(false, false);
+    private final boolean isStrong, isWeak;
 
-		private final boolean isStrong, isWeak;
+    private LinkStrength(final boolean strong, final boolean weak) {
+      this.isStrong = strong;
+      this.isWeak = weak;
+    }
 
-		private LinkStrength( final boolean strong , final boolean weak ) {
-			this.isStrong = strong;
-			this.isWeak = weak;
-		}
+    public boolean isStrong() {
+      return this.isStrong;
+    }
 
-		public boolean isStrong() {
-			return this.isStrong;
-		}
+    public boolean isWeak() {
+      return this.isWeak;
+    }
+  }
 
-		public boolean isWeak() {
-			return this.isWeak;
-		}
-	}
+  private LinkStrength linkJointTrips = LinkStrength.strong;
+  private LinkStrength linkVehicles = LinkStrength.weak;
+  private LinkStrength linkJoinableActivities = LinkStrength.weak;
+  private final Set<String> joinableTypes = new TreeSet<String>(Collections.singleton("leisure"));
 
-	private LinkStrength linkJointTrips = LinkStrength.strong;
-	private LinkStrength linkVehicles = LinkStrength.weak;
-	private LinkStrength linkJoinableActivities = LinkStrength.weak;
-	private final Set<String> joinableTypes = new TreeSet<String>( Collections.singleton( "leisure" ) );
+  public PlanLinkConfigGroup() {
+    super(GROUP_NAME);
+  }
 
-	public PlanLinkConfigGroup() {
-		super( GROUP_NAME );
-	}
+  @StringGetter("linkJointTrips")
+  public LinkStrength getLinkJointTrips() {
+    return this.linkJointTrips;
+  }
 
-	@StringGetter( "linkJointTrips" )
-	public LinkStrength getLinkJointTrips() {
-		return this.linkJointTrips;
-	}
+  @StringSetter("linkJointTrips")
+  public void setLinkJointTrips(LinkStrength linkJointTrips) {
+    this.linkJointTrips = linkJointTrips;
+  }
 
-	@StringSetter( "linkJointTrips" )
-	public void setLinkJointTrips(LinkStrength linkJointTrips) {
-		this.linkJointTrips = linkJointTrips;
-	}
+  @StringGetter("linkVehicles")
+  public LinkStrength getLinkVehicles() {
+    return this.linkVehicles;
+  }
 
-	@StringGetter( "linkVehicles" )
-	public LinkStrength getLinkVehicles() {
-		return this.linkVehicles;
-	}
+  @StringSetter("linkVehicles")
+  public void setLinkVehicles(LinkStrength linkVehicles) {
+    this.linkVehicles = linkVehicles;
+  }
 
-	@StringSetter( "linkVehicles" )
-	public void setLinkVehicles(LinkStrength linkVehicles) {
-		this.linkVehicles = linkVehicles;
-	}
+  @StringGetter("linkJoinableActivities")
+  public LinkStrength getLinkJoinableActivities() {
+    return this.linkJoinableActivities;
+  }
 
-	@StringGetter( "linkJoinableActivities" )
-	public LinkStrength getLinkJoinableActivities() {
-		return this.linkJoinableActivities;
-	}
+  @StringSetter("linkJoinableActivities")
+  public void setLinkJoinableActivities(LinkStrength linkJoinableActivities) {
+    this.linkJoinableActivities = linkJoinableActivities;
+  }
 
-	@StringSetter( "linkJoinableActivities" )
-	public void setLinkJoinableActivities(LinkStrength linkJoinableActivities) {
-		this.linkJoinableActivities = linkJoinableActivities;
-	}
+  public Collection<String> getJoinableTypes() {
+    return this.joinableTypes;
+  }
 
-	public Collection<String> getJoinableTypes() {
-		return this.joinableTypes;
-	}
+  public void addJoinableType(String type) {
+    this.joinableTypes.add(type);
+  }
 
-	public void addJoinableType(String type) {
-		this.joinableTypes.add( type );
-	}
+  @StringGetter("joinableTypes")
+  public String getJoinableTypesString() {
+    return CollectionUtils.setToString(joinableTypes);
+  }
 
-	@StringGetter( "joinableTypes" )
-	public String getJoinableTypesString() {
-		return CollectionUtils.setToString( joinableTypes );
-	}
-
-	@StringSetter( "joinableTypes" )
-	public void setJoinableTypes(final String types) {
-		joinableTypes.clear();
-		joinableTypes.addAll( CollectionUtils.stringToSet( types ) );
-	}
+  @StringSetter("joinableTypes")
+  public void setJoinableTypes(final String types) {
+    joinableTypes.clear();
+    joinableTypes.addAll(CollectionUtils.stringToSet(types));
+  }
 }
-

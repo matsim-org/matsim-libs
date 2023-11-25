@@ -22,7 +22,6 @@ package org.matsim.contrib.signals.data.conflicts;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -33,48 +32,48 @@ import org.matsim.contrib.signals.model.SignalSystem;
  */
 final class IntersectionDirectionsImpl implements IntersectionDirections {
 
-	private Id<SignalSystem> signalSystemId;
-	private Id<Node> nodeId;
-	private Map<Id<Direction>, Direction> directionsOfThisIntersection = new HashMap<>();
-	
-	IntersectionDirectionsImpl(Id<SignalSystem> signalSystemId, Id<Node> nodeId) {
-		this.signalSystemId = signalSystemId;
-		this.nodeId = nodeId;
-	}
-	
-	@Override
-	public Id<SignalSystem> getSignalSystemId() {
-		return signalSystemId;
-	}
+  private Id<SignalSystem> signalSystemId;
+  private Id<Node> nodeId;
+  private Map<Id<Direction>, Direction> directionsOfThisIntersection = new HashMap<>();
 
-	@Override
-	public Id<Node> getNodeId() {
-		return nodeId;
-	}
+  IntersectionDirectionsImpl(Id<SignalSystem> signalSystemId, Id<Node> nodeId) {
+    this.signalSystemId = signalSystemId;
+    this.nodeId = nodeId;
+  }
 
-	@Override
-	public void addDirection(Direction direction) {
-		this.directionsOfThisIntersection.put(direction.getId(), direction);
-	}
+  @Override
+  public Id<SignalSystem> getSignalSystemId() {
+    return signalSystemId;
+  }
 
-	@Override
-	public Direction getDirection(Id<Link> fromLink, Id<Link> toLink) {
-		for (Direction d : directionsOfThisIntersection.values()) {
-			if (d.getFromLink().equals(fromLink) && d.getToLink().equals(toLink)) {
-				return d;
-			}
-		}
-//		throw new RuntimeException("SignalSystem " + signalSystemId + " has no direction with from-Link " + fromLink + " and to-link " + toLink);
-		/* rather return null when the direction does not exist instead of throwing an exception. 
-		 * with this one does not have to specify all directions of intersections when one does 
-		 * not need them (e.g. u-turns in the cottbus scenario).
-		 * theresa, jul'18 */
-		return null;
-	}
+  @Override
+  public Id<Node> getNodeId() {
+    return nodeId;
+  }
 
-	@Override
-	public Map<Id<Direction>, Direction> getDirections() {
-		return directionsOfThisIntersection;
-	}
+  @Override
+  public void addDirection(Direction direction) {
+    this.directionsOfThisIntersection.put(direction.getId(), direction);
+  }
 
+  @Override
+  public Direction getDirection(Id<Link> fromLink, Id<Link> toLink) {
+    for (Direction d : directionsOfThisIntersection.values()) {
+      if (d.getFromLink().equals(fromLink) && d.getToLink().equals(toLink)) {
+        return d;
+      }
+    }
+    //		throw new RuntimeException("SignalSystem " + signalSystemId + " has no direction with
+    // from-Link " + fromLink + " and to-link " + toLink);
+    /* rather return null when the direction does not exist instead of throwing an exception.
+     * with this one does not have to specify all directions of intersections when one does
+     * not need them (e.g. u-turns in the cottbus scenario).
+     * theresa, jul'18 */
+    return null;
+  }
+
+  @Override
+  public Map<Id<Direction>, Direction> getDirections() {
+    return directionsOfThisIntersection;
+  }
 }

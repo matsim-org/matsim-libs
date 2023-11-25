@@ -28,23 +28,22 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
  */
 public class FilteredScoreStats extends AbstractPlanAnalyzerPerGroup {
 
-	public FilteredScoreStats(
-			final int graphWriteInterval,
-			final OutputDirectoryHierarchy controlerIO,
-			final Scenario scenario,
-			final GroupIdentifier groupIdentifier) {
-		super(graphWriteInterval, controlerIO, scenario, groupIdentifier);
-	}
+  public FilteredScoreStats(
+      final int graphWriteInterval,
+      final OutputDirectoryHierarchy controlerIO,
+      final Scenario scenario,
+      final GroupIdentifier groupIdentifier) {
+    super(graphWriteInterval, controlerIO, scenario, groupIdentifier);
+  }
 
-	@Override
-	protected double calcStat(final Plan plan) {
-		final Double score = plan.getScore();
-		return score == null ? Double.NaN : score;
-	}
+  @Override
+  protected double calcStat(final Plan plan) {
+    final Double score = plan.getScore();
+    return score == null ? Double.NaN : score;
+  }
 
-	@Override
-	protected String getStatName() {
-		return "Score";
-	}
+  @Override
+  protected String getStatName() {
+    return "Score";
+  }
 }
-

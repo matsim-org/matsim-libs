@@ -21,7 +21,6 @@ package org.matsim.core.mobsim.hermes;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -46,207 +45,226 @@ import org.matsim.vehicles.Vehicle;
  */
 public class TravelTimeTest {
 
-	@Test
-	public void testEquilOneAgent() {
-		Map<Id<Vehicle>, Map<Id<Link>, Double>> agentTravelTimes = new HashMap<>();
+  @Test
+  public void testEquilOneAgent() {
+    Map<Id<Vehicle>, Map<Id<Link>, Double>> agentTravelTimes = new HashMap<>();
 
-		Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
-		MatsimRandom.reset(config.global().getRandomSeed());
-		Scenario scenario = ScenarioUtils.createScenario(config);
+    Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
+    MatsimRandom.reset(config.global().getRandomSeed());
+    Scenario scenario = ScenarioUtils.createScenario(config);
 
-		String popFileName = "plans1.xml";
-		config.plans().setInputFile(popFileName);
+    String popFileName = "plans1.xml";
+    config.plans().setInputFile(popFileName);
 
-		ScenarioUtils.loadScenario(scenario);
+    ScenarioUtils.loadScenario(scenario);
 
-		EventsManager events = new ParallelEventsManager(false);
-		events.addHandler(new EventTestHandler(agentTravelTimes));
+    EventsManager events = new ParallelEventsManager(false);
+    events.addHandler(new EventTestHandler(agentTravelTimes));
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		new HermesBuilder() //
-			.build(scenario, events) //
-			.run();
+    PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+    new HermesBuilder() //
+        .build(scenario, events) //
+        .run();
 
-		Map<Id<Link>, Double> travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
-		Assert.assertEquals(358.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(180.0, travelTimes.get(Id.create(15, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-		// this one is NOT a travel time (it includes two activities and a zero-length trip)
-		Assert.assertEquals(13558.0, travelTimes.get(Id.create(20, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(358.0, travelTimes.get(Id.create(21, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1251.0, travelTimes.get(Id.create(22, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(358.0, travelTimes.get(Id.create(23, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-	}
+    Map<Id<Link>, Double> travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
+    Assert.assertEquals(
+        358.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    Assert.assertEquals(
+        180.0, travelTimes.get(Id.create(15, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    // this one is NOT a travel time (it includes two activities and a zero-length trip)
+    Assert.assertEquals(
+        13558.0, travelTimes.get(Id.create(20, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    Assert.assertEquals(
+        358.0, travelTimes.get(Id.create(21, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    Assert.assertEquals(
+        1251.0, travelTimes.get(Id.create(22, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    Assert.assertEquals(
+        358.0, travelTimes.get(Id.create(23, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+  }
 
-	@Test
-	/**
-	 * This test shows that the Netsim always rounds up link travel times.
-	 * Please note that a computed link travel time of 400.0s is treated the same,
-	 * i.e. it is rounded up to 401s.
-	 */
-	public void testEquilOneAgentTravelTimeRounding() {
-		Map<Id<Vehicle>, Map<Id<Link>, Double>> agentTravelTimes = new HashMap<>();
+  @Test
+  /**
+   * This test shows that the Netsim always rounds up link travel times. Please note that a computed
+   * link travel time of 400.0s is treated the same, i.e. it is rounded up to 401s.
+   */
+  public void testEquilOneAgentTravelTimeRounding() {
+    Map<Id<Vehicle>, Map<Id<Link>, Double>> agentTravelTimes = new HashMap<>();
 
-		Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
-		MatsimRandom.reset(config.global().getRandomSeed());
-		Scenario scenario = ScenarioUtils.createScenario(config);
+    Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
+    MatsimRandom.reset(config.global().getRandomSeed());
+    Scenario scenario = ScenarioUtils.createScenario(config);
 
-		String popFileName = "plans1.xml";
-		config.plans().setInputFile(popFileName);
+    String popFileName = "plans1.xml";
+    config.plans().setInputFile(popFileName);
 
-		ScenarioUtils.loadScenario(scenario);
+    ScenarioUtils.loadScenario(scenario);
 
-		EventsManager events = new ParallelEventsManager(false);
-		events.addHandler(new EventTestHandler(agentTravelTimes));
+    EventsManager events = new ParallelEventsManager(false);
+    events.addHandler(new EventTestHandler(agentTravelTimes));
 
-		// Travel time 359.9712023038
-		scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(27.78);
-		ScenarioImporter.flush();
+    // Travel time 359.9712023038
+    scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(27.78);
+    ScenarioImporter.flush();
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		new HermesBuilder() //
-			.build(scenario, events) //
-			.run();
+    PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+    new HermesBuilder() //
+        .build(scenario, events) //
+        .run();
 
-		Map<Id<Link>, Double> travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
-		Assert.assertEquals(358.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    Map<Id<Link>, Double> travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
+    Assert.assertEquals(
+        358.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
 
-		// Travel time 359.9712023038
-		scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(27.85);
-		ScenarioImporter.flush();
+    // Travel time 359.9712023038
+    scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(27.85);
+    ScenarioImporter.flush();
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		new HermesBuilder() //
-			.build(scenario, events) //
-			.run();
+    PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+    new HermesBuilder() //
+        .build(scenario, events) //
+        .run();
 
-		travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
-		Assert.assertEquals(358.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
+    Assert.assertEquals(
+        358.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
 
-		// Travel time 359.066427289
-		scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(27.85);
-		ScenarioImporter.flush();
+    // Travel time 359.066427289
+    scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(27.85);
+    ScenarioImporter.flush();
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		new HermesBuilder() //
-			.build(scenario, events) //
-			.run();
+    PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+    new HermesBuilder() //
+        .build(scenario, events) //
+        .run();
 
-		travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
-		Assert.assertEquals(358.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
+    Assert.assertEquals(
+        358.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
 
-		// Travel time 358.4229390681
-		scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(27.9);
-		ScenarioImporter.flush();
+    // Travel time 358.4229390681
+    scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(27.9);
+    ScenarioImporter.flush();
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		new HermesBuilder() //
-			.build(scenario, events) //
-			.run();
+    PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+    new HermesBuilder() //
+        .build(scenario, events) //
+        .run();
 
-		travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
-		Assert.assertEquals(358.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
+    Assert.assertEquals(
+        358.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
 
-		// Travel time 360.3603603604
-		scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(27.75);
-		ScenarioImporter.flush();
+    // Travel time 360.3603603604
+    scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(27.75);
+    ScenarioImporter.flush();
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		new HermesBuilder() //
-			.build(scenario, events) //
-			.run();
+    PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+    new HermesBuilder() //
+        .build(scenario, events) //
+        .run();
 
-		travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
-		Assert.assertEquals(358.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
+    Assert.assertEquals(
+        358.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
 
-		// Travel time 400.0
-		scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setLength(10000.0);
-		scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(25.0);
-		ScenarioImporter.flush();
+    // Travel time 400.0
+    scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setLength(10000.0);
+    scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(25.0);
+    ScenarioImporter.flush();
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		new HermesBuilder() //
-			.build(scenario, events) //
-			.run();
+    PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+    new HermesBuilder() //
+        .build(scenario, events) //
+        .run();
 
-		travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
-		Assert.assertEquals(401.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-	}
+    travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
+    Assert.assertEquals(
+        401.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+  }
 
-	@Test
-	public void testEquilTwoAgents() {
-		Map<Id<Vehicle>, Map<Id<Link>, Double>> agentTravelTimes = new HashMap<>();
+  @Test
+  public void testEquilTwoAgents() {
+    Map<Id<Vehicle>, Map<Id<Link>, Double>> agentTravelTimes = new HashMap<>();
 
-		Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
-		MatsimRandom.reset(config.global().getRandomSeed());
-		Scenario scenario = ScenarioUtils.createScenario(config);
+    Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
+    MatsimRandom.reset(config.global().getRandomSeed());
+    Scenario scenario = ScenarioUtils.createScenario(config);
 
-		String popFileName = "plans2.xml";
-		config.plans().setInputFile(popFileName);
+    String popFileName = "plans2.xml";
+    config.plans().setInputFile(popFileName);
 
-		ScenarioUtils.loadScenario(scenario);
+    ScenarioUtils.loadScenario(scenario);
 
-		EventsManager events = new ParallelEventsManager(false);
-		events.addHandler(new EventTestHandler(agentTravelTimes));
+    EventsManager events = new ParallelEventsManager(false);
+    events.addHandler(new EventTestHandler(agentTravelTimes));
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		new HermesBuilder() //
-			.build(scenario, events) //
-			.run();
+    PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+    new HermesBuilder() //
+        .build(scenario, events) //
+        .run();
 
-		Map<Id<Link>, Double> travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
-		Assert.assertEquals(358.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(180.0, travelTimes.get(Id.create(15, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-		// this one is NOT a travel time (it includes two activities and a zero-length trip)
-		Assert.assertEquals(13558.0, travelTimes.get(Id.create(20, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(358.0, travelTimes.get(Id.create(21, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1251.0, travelTimes.get(Id.create(22, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(358.0, travelTimes.get(Id.create(23, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    Map<Id<Link>, Double> travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
+    Assert.assertEquals(
+        358.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    Assert.assertEquals(
+        180.0, travelTimes.get(Id.create(15, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    // this one is NOT a travel time (it includes two activities and a zero-length trip)
+    Assert.assertEquals(
+        13558.0, travelTimes.get(Id.create(20, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    Assert.assertEquals(
+        358.0, travelTimes.get(Id.create(21, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    Assert.assertEquals(
+        1251.0, travelTimes.get(Id.create(22, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    Assert.assertEquals(
+        358.0, travelTimes.get(Id.create(23, Link.class)).intValue(), MatsimTestUtils.EPSILON);
 
+    travelTimes = agentTravelTimes.get(Id.create("2", Vehicle.class));
+    Assert.assertEquals(
+        358.0, travelTimes.get(Id.create(5, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    Assert.assertEquals(
+        180.0, travelTimes.get(Id.create(14, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    // this one is NOT a travel time (it includes two activities and a zero-length trip)
+    Assert.assertEquals(
+        13558.0, travelTimes.get(Id.create(20, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    Assert.assertEquals(
+        358.0, travelTimes.get(Id.create(21, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    Assert.assertEquals(
+        1251.0, travelTimes.get(Id.create(22, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+    Assert.assertEquals(
+        358.0, travelTimes.get(Id.create(23, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+  }
 
-		travelTimes = agentTravelTimes.get(Id.create("2", Vehicle.class));
-		Assert.assertEquals(358.0, travelTimes.get(Id.create(5, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(180.0, travelTimes.get(Id.create(14, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-		// this one is NOT a travel time (it includes two activities and a zero-length trip)
-		Assert.assertEquals(13558.0, travelTimes.get(Id.create(20, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(358.0, travelTimes.get(Id.create(21, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1251.0, travelTimes.get(Id.create(22, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(358.0, travelTimes.get(Id.create(23, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-	}
+  private static class EventTestHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
+    private final Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleTravelTimes;
 
-	private static class EventTestHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
+    public EventTestHandler(Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleTravelTimes) {
+      this.vehicleTravelTimes = vehicleTravelTimes;
+    }
 
-		private final Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleTravelTimes;
+    @Override
+    public void handleEvent(LinkEnterEvent event) {
+      Map<Id<Link>, Double> travelTimes = this.vehicleTravelTimes.get(event.getVehicleId());
+      if (travelTimes == null) {
+        travelTimes = new HashMap<>();
+        this.vehicleTravelTimes.put(event.getVehicleId(), travelTimes);
+      }
+      travelTimes.put(event.getLinkId(), event.getTime());
+    }
 
-		public EventTestHandler(Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleTravelTimes) {
-			this.vehicleTravelTimes = vehicleTravelTimes;
-		}
+    @Override
+    public void handleEvent(LinkLeaveEvent event) {
+      Map<Id<Link>, Double> travelTimes = this.vehicleTravelTimes.get(event.getVehicleId());
+      if (travelTimes != null) {
+        Double d = travelTimes.get(event.getLinkId());
+        if (d != null) {
+          double time = event.getTime() - d;
+          travelTimes.put(event.getLinkId(), time);
+        }
+      }
+    }
 
-		@Override
-		public void handleEvent(LinkEnterEvent event) {
-			Map<Id<Link>, Double> travelTimes = this.vehicleTravelTimes.get(event.getVehicleId());
-			if (travelTimes == null) {
-				travelTimes = new HashMap<>();
-				this.vehicleTravelTimes.put(event.getVehicleId(), travelTimes);
-			}
-			travelTimes.put(event.getLinkId(), event.getTime());
-		}
-
-		@Override
-		public void handleEvent(LinkLeaveEvent event) {
-			Map<Id<Link>, Double> travelTimes = this.vehicleTravelTimes.get(event.getVehicleId());
-			if (travelTimes != null) {
-				Double d = travelTimes.get(event.getLinkId());
-				if (d != null) {
-					double time = event.getTime() - d;
-					travelTimes.put(event.getLinkId(), time);
-				}
-			}
-		}
-
-		@Override
-		public void reset(int iteration) {
-		}
-	}
-
+    @Override
+    public void reset(int iteration) {}
+  }
 }

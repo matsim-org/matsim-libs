@@ -4,18 +4,18 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 
 public class ParkingSearchPopulationModule extends AbstractQSimModule {
-	public final static String COMPONENT_NAME = "ParkingSearch";
+  public static final String COMPONENT_NAME = "ParkingSearch";
 
-	@Override
-	protected void configureQSim() {
-		if (getConfig().transit().isUseTransit()) {
-			throw new RuntimeException("parking search together with transit is not implemented (should not be difficult)") ;
-		}
+  @Override
+  protected void configureQSim() {
+    if (getConfig().transit().isUseTransit()) {
+      throw new RuntimeException(
+          "parking search together with transit is not implemented (should not be difficult)");
+    }
 
-		bind(AgentFactory.class).to(ParkingAgentFactory.class).asEagerSingleton(); // (**)
-		bind(ParkingPopulationAgentSource.class).asEagerSingleton();
+    bind(AgentFactory.class).to(ParkingAgentFactory.class).asEagerSingleton(); // (**)
+    bind(ParkingPopulationAgentSource.class).asEagerSingleton();
 
-		addQSimComponentBinding( COMPONENT_NAME ).to( ParkingPopulationAgentSource.class );
-	}
-
+    addQSimComponentBinding(COMPONENT_NAME).to(ParkingPopulationAgentSource.class);
+  }
 }

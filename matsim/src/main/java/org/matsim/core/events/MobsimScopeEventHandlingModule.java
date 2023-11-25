@@ -20,40 +20,39 @@
 
 package org.matsim.core.events;
 
-import java.util.Set;
-
+import com.google.inject.multibindings.Multibinder;
 import jakarta.inject.Inject;
-
+import java.util.Set;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-
-import com.google.inject.multibindings.Multibinder;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class MobsimScopeEventHandlingModule extends AbstractModule {
-	@Override
-	public void install() {
-		bind(MobsimScopeEventHandling.class).asEagerSingleton();
-		addControlerListenerBinding().to(MobsimScopeEventHandling.class);
+  @Override
+  public void install() {
+    bind(MobsimScopeEventHandling.class).asEagerSingleton();
+    addControlerListenerBinding().to(MobsimScopeEventHandling.class);
 
-		installQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				Multibinder.newSetBinder(binder(), MobsimScopeEventHandler.class);
-				bind(MobsimScopeEventHandlerRegistrator.class).asEagerSingleton();
-			}
-		});
-	}
+    installQSimModule(
+        new AbstractQSimModule() {
+          @Override
+          protected void configureQSim() {
+            Multibinder.newSetBinder(binder(), MobsimScopeEventHandler.class);
+            bind(MobsimScopeEventHandlerRegistrator.class).asEagerSingleton();
+          }
+        });
+  }
 
-	static class MobsimScopeEventHandlerRegistrator {
-		@Inject
-		MobsimScopeEventHandlerRegistrator(MobsimScopeEventHandling eventHandling,
-				Set<MobsimScopeEventHandler> eventHandlersDeclaredByModules) {
-			for (MobsimScopeEventHandler eventHandler : eventHandlersDeclaredByModules) {
-				eventHandling.addMobsimScopeHandler(eventHandler);
-			}
-		}
-	}
+  static class MobsimScopeEventHandlerRegistrator {
+    @Inject
+    MobsimScopeEventHandlerRegistrator(
+        MobsimScopeEventHandling eventHandling,
+        Set<MobsimScopeEventHandler> eventHandlersDeclaredByModules) {
+      for (MobsimScopeEventHandler eventHandler : eventHandlersDeclaredByModules) {
+        eventHandling.addMobsimScopeHandler(eventHandler);
+      }
+    }
+  }
 }

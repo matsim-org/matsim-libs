@@ -17,42 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.objectattributes.attributeconverters;/*
- * created by jbischoff, 22.08.2018
- */
+package org.matsim.utils.objectattributes.attributeconverters; /*
+                                                                * created by jbischoff, 22.08.2018
+                                                                */
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
 public class DoubleArrayConverter implements AttributeConverter<double[]> {
 
-    private static final String DELIMITER = ",";
+  private static final String DELIMITER = ",";
 
-    @Override
-    public double[] convert(String value) {
-        String[] values = value.split(DELIMITER);
-        double[] result = new double[values.length];
-        for (int i = 0; i < values.length; i++) {
-            result[i] = Double.parseDouble(values[i]);
-        }
-        return result;
+  @Override
+  public double[] convert(String value) {
+    String[] values = value.split(DELIMITER);
+    double[] result = new double[values.length];
+    for (int i = 0; i < values.length; i++) {
+      result[i] = Double.parseDouble(values[i]);
     }
+    return result;
+  }
 
-    @Override
-    public String convertToString(Object o) {
-        if (!(o instanceof double[])) {
-            LogManager.getLogger(getClass()).error("Object is not of type double[] " + o.getClass().toString());
-            return null;
-        }
-        double[] s = (double[]) o;
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < s.length; i++) {
-            if (i > 0) {
-                result.append(DELIMITER);
-            }
-            result.append(s[i]);
-        }
-        return result.toString();
+  @Override
+  public String convertToString(Object o) {
+    if (!(o instanceof double[])) {
+      LogManager.getLogger(getClass())
+          .error("Object is not of type double[] " + o.getClass().toString());
+      return null;
     }
+    double[] s = (double[]) o;
+    StringBuilder result = new StringBuilder();
+    for (int i = 0; i < s.length; i++) {
+      if (i > 0) {
+        result.append(DELIMITER);
+      }
+      result.append(s[i]);
+    }
+    return result.toString();
+  }
 }

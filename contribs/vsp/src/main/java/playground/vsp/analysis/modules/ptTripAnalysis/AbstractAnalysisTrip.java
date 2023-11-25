@@ -25,37 +25,33 @@ import org.locationtech.jts.geom.Point;
 
 /**
  * @author droeder
- *
  */
 public abstract class AbstractAnalysisTrip {
-	private Coordinate start;
-	private Coordinate end;
-	private String mode = null;
-	
-	
-	public String getMode(){
-		return this.mode;
-	}
-	
-	public void setMode(String mode){
-		this.mode = mode;
-	}
+  private Coordinate start;
+  private Coordinate end;
+  private String mode = null;
 
-	public Point getStart() {
-		return new GeometryFactory().createPoint(start);
-	}
+  public String getMode() {
+    return this.mode;
+  }
 
-	public void setStart(Coordinate start) {
-		this.start = start;
-	}
+  public void setMode(String mode) {
+    this.mode = mode;
+  }
 
-	public Point getEnd() {
-		return new GeometryFactory().createPoint(end);
-	}
+  public Point getStart() {
+    return new GeometryFactory().createPoint(start);
+  }
 
-	public void setEnd(Coordinate end) {
-		this.end = end;
-	}
-	
-	
+  public void setStart(Coordinate start) {
+    this.start = start;
+  }
+
+  public Point getEnd() {
+    return new GeometryFactory().createPoint(end);
+  }
+
+  public void setEnd(Coordinate end) {
+    this.end = end;
+  }
 }

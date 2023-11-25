@@ -15,22 +15,27 @@ import org.matsim.core.modal.ModalProviders;
  */
 public class ShiftDvrpFleetQsimModule extends AbstractDvrpModeQSimModule {
 
-	public ShiftDvrpFleetQsimModule(String mode) {
-		super(mode);
-	}
+  public ShiftDvrpFleetQsimModule(String mode) {
+    super(mode);
+  }
 
-	@Override
-	public void configureQSim() {
-		bindModal(Fleet.class).toProvider(new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
+  @Override
+  public void configureQSim() {
+    bindModal(Fleet.class)
+        .toProvider(
+            new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
 
-			@Override
-			public Fleet get() {
-				FleetSpecification fleetSpecification = getModalInstance(FleetSpecification.class);
-				Network network = getModalInstance(Network.class);
-				return Fleets.createCustomFleet(fleetSpecification,
-						s -> new DefaultShiftDvrpVehicle(new DvrpVehicleImpl(s, network.getLinks().get(s.getStartLinkId()))));
-
-			}
-		}).asEagerSingleton();
-	}
+              @Override
+              public Fleet get() {
+                FleetSpecification fleetSpecification = getModalInstance(FleetSpecification.class);
+                Network network = getModalInstance(Network.class);
+                return Fleets.createCustomFleet(
+                    fleetSpecification,
+                    s ->
+                        new DefaultShiftDvrpVehicle(
+                            new DvrpVehicleImpl(s, network.getLinks().get(s.getStartLinkId()))));
+              }
+            })
+        .asEagerSingleton();
+  }
 }

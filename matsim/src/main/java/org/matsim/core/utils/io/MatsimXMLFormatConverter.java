@@ -19,16 +19,10 @@
  * *********************************************************************** */
 package org.matsim.core.utils.io;
 
-
 /**
- * This class provides helper methods to convert the
- * different MATSim XML versions to other versions.
+ * This class provides helper methods to convert the different MATSim XML versions to other
+ * versions.
  *
  * @author dgrether
- *
  */
-public class MatsimXMLFormatConverter {
-
-	
-	
-}
+public class MatsimXMLFormatConverter {}

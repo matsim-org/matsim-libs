@@ -22,7 +22,6 @@ package org.matsim.contrib.taxi.util.stats;
 
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
 import org.matsim.contrib.dvrp.analysis.ExecutedTask;
 import org.matsim.contrib.taxi.util.stats.DurationStats.State;
 
@@ -31,30 +30,31 @@ import org.matsim.contrib.taxi.util.stats.DurationStats.State;
  */
 public class TimeBinSamples {
 
-	public static Stream<TimeBinSample<ExecutedTask>> taskSamples(ExecutedTask task, int binSize) {
-		return samples(task, task.beginTime, task.endTime, binSize);
-	}
+  public static Stream<TimeBinSample<ExecutedTask>> taskSamples(ExecutedTask task, int binSize) {
+    return samples(task, task.beginTime, task.endTime, binSize);
+  }
 
-	public static <V> Stream<TimeBinSample<State<V>>> stateSamples(State<V> state, int binSize) {
-		return samples(state, state.beginTime(), state.endTime(), binSize);
-	}
+  public static <V> Stream<TimeBinSample<State<V>>> stateSamples(State<V> state, int binSize) {
+    return samples(state, state.beginTime(), state.endTime(), binSize);
+  }
 
-	public static <V> Stream<TimeBinSample<V>> samples(V value, double from, double to, int binSize) {
-		if (from == to) {
-			return Stream.empty();
-		}
+  public static <V> Stream<TimeBinSample<V>> samples(V value, double from, double to, int binSize) {
+    if (from == to) {
+      return Stream.empty();
+    }
 
-		//beginTime is inclusive
-		int fromTimeBin = (int)(from / binSize);
+    // beginTime is inclusive
+    int fromTimeBin = (int) (from / binSize);
 
-		//endTime is exclusive -- special handling needed
-		double toTimeBinDouble = to / binSize;
-		int toTimeBin = (int)toTimeBinDouble;
+    // endTime is exclusive -- special handling needed
+    double toTimeBinDouble = to / binSize;
+    int toTimeBin = (int) toTimeBinDouble;
 
-		//if endTime == toTimeBin * binSize ==> the task ends with the end of the previous time bin
-		if (toTimeBinDouble == toTimeBin) {
-			toTimeBin--;
-		}
-		return IntStream.rangeClosed(fromTimeBin, toTimeBin).mapToObj(t -> new TimeBinSample<>(t, value));
-	}
+    // if endTime == toTimeBin * binSize ==> the task ends with the end of the previous time bin
+    if (toTimeBinDouble == toTimeBin) {
+      toTimeBin--;
+    }
+    return IntStream.rangeClosed(fromTimeBin, toTimeBin)
+        .mapToObj(t -> new TimeBinSample<>(t, value));
+  }
 }

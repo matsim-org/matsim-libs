@@ -21,17 +21,15 @@
 package org.matsim.core.router.priorityqueue;
 
 /**
- * An interface to mark classes that enumerate their objects. Each index
- * should be unique and can e.g. be used to lookup values in an array. This feature
- * is used in some classed due to performance reasons since a lookup in an array
- * is much faster than in a map.
+ * An interface to mark classes that enumerate their objects. Each index should be unique and can
+ * e.g. be used to lookup values in an array. This feature is used in some classed due to
+ * performance reasons since a lookup in an array is much faster than in a map.
  *
  * @see BinaryMinHeap
- *
  * @author cdobler
  */
 @Deprecated // Id.index() should be used instead nowadays.
 public interface HasIndex {
 
-	public int getArrayIndex();
+  public int getArrayIndex();
 }

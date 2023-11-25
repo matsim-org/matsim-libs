@@ -21,5 +21,4 @@ package org.matsim.core.controler.corelisteners;
 
 import org.matsim.core.controler.listener.ControlerListener;
 
-public interface DumpDataAtEnd extends ControlerListener {
-}
+public interface DumpDataAtEnd extends ControlerListener {}

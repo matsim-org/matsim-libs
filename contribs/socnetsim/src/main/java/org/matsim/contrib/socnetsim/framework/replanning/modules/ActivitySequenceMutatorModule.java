@@ -29,16 +29,13 @@ import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
  */
 public class ActivitySequenceMutatorModule extends AbstractMultithreadedModule {
 
-	public ActivitySequenceMutatorModule(
-			final int numOfThreads) {
-		super(numOfThreads);
-	}
+  public ActivitySequenceMutatorModule(final int numOfThreads) {
+    super(numOfThreads);
+  }
 
-	@Override
-	public PlanAlgorithm getPlanAlgoInstance() {
-		return new ActivitySequenceMutatorAlgorithm(
-				MatsimRandom.getLocalInstance(),
-				StageActivityHandling.ExcludeStageActivities );
-	}
+  @Override
+  public PlanAlgorithm getPlanAlgoInstance() {
+    return new ActivitySequenceMutatorAlgorithm(
+        MatsimRandom.getLocalInstance(), StageActivityHandling.ExcludeStageActivities);
+  }
 }
-

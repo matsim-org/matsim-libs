@@ -4,44 +4,49 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 
-public class NoVehicleCarSharingEvent extends Event{
+public class NoVehicleCarSharingEvent extends Event {
 
-	public static final String EVENT_TYPE = "no carsharing vehicle";
-	
-	private final Id<Link> originLinkId;
+  public static final String EVENT_TYPE = "no carsharing vehicle";
 
-	private final Id<Link> destinationLinkId;
+  private final Id<Link> originLinkId;
 
-	private final String carsharingType;
+  private final Id<Link> destinationLinkId;
 
-	private String companyId;
+  private final String carsharingType;
 
-	public NoVehicleCarSharingEvent(double time, String carsharingType, String companyId, Link currentLink, Link destinationLink) {
-		super(time);
-		this.originLinkId = currentLink.getId();
-		this.destinationLinkId = destinationLink.getId();
-		this.carsharingType = carsharingType;
-		this.companyId = companyId;
-	}
+  private String companyId;
 
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
+  public NoVehicleCarSharingEvent(
+      double time,
+      String carsharingType,
+      String companyId,
+      Link currentLink,
+      Link destinationLink) {
+    super(time);
+    this.originLinkId = currentLink.getId();
+    this.destinationLinkId = destinationLink.getId();
+    this.carsharingType = carsharingType;
+    this.companyId = companyId;
+  }
 
-	public Id<Link> getOriginLinkId(){
-		return this.originLinkId;
-	}
+  @Override
+  public String getEventType() {
+    return EVENT_TYPE;
+  }
 
-	public Id<Link> getDestinationLinkId(){
-		return this.destinationLinkId;
-	}
+  public Id<Link> getOriginLinkId() {
+    return this.originLinkId;
+  }
 
-	public String getCarsharingType() {
-		return this.carsharingType;
-	}
+  public Id<Link> getDestinationLinkId() {
+    return this.destinationLinkId;
+  }
 
-	public String getCompanyId() {
-		return this.companyId;
-	}
+  public String getCarsharingType() {
+    return this.carsharingType;
+  }
+
+  public String getCompanyId() {
+    return this.companyId;
+  }
 }

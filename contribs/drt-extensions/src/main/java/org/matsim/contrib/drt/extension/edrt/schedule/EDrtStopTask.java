@@ -27,15 +27,15 @@ import org.matsim.contrib.evrp.ETask;
  * @author michalm
  */
 public class EDrtStopTask extends DefaultDrtStopTask implements ETask {
-	private final double consumedEnergy;
+  private final double consumedEnergy;
 
-	public EDrtStopTask(double beginTime, double endTime, Link link, double consumedEnergy) {
-		super(beginTime, endTime, link);
-		this.consumedEnergy = consumedEnergy;
-	}
+  public EDrtStopTask(double beginTime, double endTime, Link link, double consumedEnergy) {
+    super(beginTime, endTime, link);
+    this.consumedEnergy = consumedEnergy;
+  }
 
-	@Override
-	public double getTotalEnergy() {
-		return consumedEnergy;
-	}
+  @Override
+  public double getTotalEnergy() {
+    return consumedEnergy;
+  }
 }

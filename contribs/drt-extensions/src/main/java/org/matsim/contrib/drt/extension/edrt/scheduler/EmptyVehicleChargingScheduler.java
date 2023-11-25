@@ -19,6 +19,11 @@
 
 package org.matsim.contrib.drt.extension.edrt.scheduler;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.extension.edrt.schedule.EDrtTaskFactoryImpl;
@@ -34,73 +39,76 @@ import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.evrp.EvDvrpVehicle;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 /**
  * @author michalm
  */
 public class EmptyVehicleChargingScheduler {
-	private final MobsimTimer timer;
-	private final EDrtTaskFactoryImpl taskFactory;
-	private final Map<Id<Link>, List<Charger>> linkToChargersMap;
+  private final MobsimTimer timer;
+  private final EDrtTaskFactoryImpl taskFactory;
+  private final Map<Id<Link>, List<Charger>> linkToChargersMap;
 
-	public EmptyVehicleChargingScheduler(MobsimTimer timer, DrtTaskFactory taskFactory,
-			ChargingInfrastructure chargingInfrastructure) {
-		this.timer = timer;
-		this.taskFactory = (EDrtTaskFactoryImpl)taskFactory;
-		linkToChargersMap = chargingInfrastructure.getChargers()
-				.values()
-				.stream()
-				.collect(Collectors.groupingBy(c -> c.getLink().getId()));
-	}
+  public EmptyVehicleChargingScheduler(
+      MobsimTimer timer,
+      DrtTaskFactory taskFactory,
+      ChargingInfrastructure chargingInfrastructure) {
+    this.timer = timer;
+    this.taskFactory = (EDrtTaskFactoryImpl) taskFactory;
+    linkToChargersMap =
+        chargingInfrastructure.getChargers().values().stream()
+            .collect(Collectors.groupingBy(c -> c.getLink().getId()));
+  }
 
-	public void chargeVehicle(DvrpVehicle vehicle) {
-		DrtStayTask currentTask = (DrtStayTask)vehicle.getSchedule().getCurrentTask();
-		Link currentLink = currentTask.getLink();
-		List<Charger> chargers = linkToChargersMap.get(currentLink.getId());
-		if (chargers != null) {
-			Optional<Charger> freeCharger = chargers.stream().filter(c -> c.getLogic().getPluggedVehicles().isEmpty()).findFirst();
+  public void chargeVehicle(DvrpVehicle vehicle) {
+    DrtStayTask currentTask = (DrtStayTask) vehicle.getSchedule().getCurrentTask();
+    Link currentLink = currentTask.getLink();
+    List<Charger> chargers = linkToChargersMap.get(currentLink.getId());
+    if (chargers != null) {
+      Optional<Charger> freeCharger =
+          chargers.stream().filter(c -> c.getLogic().getPluggedVehicles().isEmpty()).findFirst();
 
-			// Empty charger or at least smallest queue charger
-			Charger charger = freeCharger.orElseGet(() -> chargers.stream().min(Comparator.comparingInt(e -> e.getLogic().getQueuedVehicles().size())).orElseThrow());
-			ElectricVehicle ev = ((EvDvrpVehicle)vehicle).getElectricVehicle();
-			if (!charger.getLogic().getChargingStrategy().isChargingCompleted(ev)) {
-				chargeVehicleImpl(vehicle, charger);
-			}
-		}
-	}
+      // Empty charger or at least smallest queue charger
+      Charger charger =
+          freeCharger.orElseGet(
+              () ->
+                  chargers.stream()
+                      .min(Comparator.comparingInt(e -> e.getLogic().getQueuedVehicles().size()))
+                      .orElseThrow());
+      ElectricVehicle ev = ((EvDvrpVehicle) vehicle).getElectricVehicle();
+      if (!charger.getLogic().getChargingStrategy().isChargingCompleted(ev)) {
+        chargeVehicleImpl(vehicle, charger);
+      }
+    }
+  }
 
+  private void chargeVehicleImpl(DvrpVehicle vehicle, Charger charger) {
+    Schedule schedule = vehicle.getSchedule();
+    DrtStayTask stayTask = (DrtStayTask) schedule.getCurrentTask();
+    if (stayTask.getTaskIdx() != schedule.getTaskCount() - 1) {
+      throw new IllegalStateException(
+          "The current STAY task is not last. Not possible without prebooking");
+    }
+    stayTask.setEndTime(timer.getTimeOfDay()); // finish STAY
 
+    // add CHARGING TASK
+    double beginTime = stayTask.getEndTime();
+    ChargingStrategy strategy = charger.getLogic().getChargingStrategy();
+    ElectricVehicle ev = ((EvDvrpVehicle) vehicle).getElectricVehicle();
+    double totalEnergy = -strategy.calcRemainingEnergyToCharge(ev);
 
-	private void chargeVehicleImpl(DvrpVehicle vehicle, Charger charger) {
-		Schedule schedule = vehicle.getSchedule();
-		DrtStayTask stayTask = (DrtStayTask)schedule.getCurrentTask();
-		if (stayTask.getTaskIdx() != schedule.getTaskCount() - 1) {
-			throw new IllegalStateException("The current STAY task is not last. Not possible without prebooking");
-		}
-		stayTask.setEndTime(timer.getTimeOfDay()); // finish STAY
+    double chargingDuration =
+        Math.min(strategy.calcRemainingTimeToCharge(ev), vehicle.getServiceEndTime() - beginTime);
+    if (chargingDuration <= 0) {
+      return; // no charging
+    }
+    double endTime = beginTime + chargingDuration;
 
-		// add CHARGING TASK
-		double beginTime = stayTask.getEndTime();
-		ChargingStrategy strategy = charger.getLogic().getChargingStrategy();
-		ElectricVehicle ev = ((EvDvrpVehicle)vehicle).getElectricVehicle();
-		double totalEnergy = -strategy.calcRemainingEnergyToCharge(ev);
+    schedule.addTask(
+        taskFactory.createChargingTask(vehicle, beginTime, endTime, charger, totalEnergy));
+    ((ChargingWithAssignmentLogic) charger.getLogic()).assignVehicle(ev);
 
-		double chargingDuration = Math.min(strategy.calcRemainingTimeToCharge(ev),
-				vehicle.getServiceEndTime() - beginTime);
-		if (chargingDuration <= 0) {
-			return;// no charging
-		}
-		double endTime = beginTime + chargingDuration;
-
-		schedule.addTask(taskFactory.createChargingTask(vehicle, beginTime, endTime, charger, totalEnergy));
-		((ChargingWithAssignmentLogic)charger.getLogic()).assignVehicle(ev);
-
-		// append STAY
-		schedule.addTask(taskFactory.createStayTask(vehicle, endTime, vehicle.getServiceEndTime(), charger.getLink()));
-	}
+    // append STAY
+    schedule.addTask(
+        taskFactory.createStayTask(
+            vehicle, endTime, vehicle.getServiceEndTime(), charger.getLink()));
+  }
 }

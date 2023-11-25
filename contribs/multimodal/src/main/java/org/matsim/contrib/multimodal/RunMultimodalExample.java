@@ -26,26 +26,22 @@ import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerUtils;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * 
- * This class shows an example how to set up a controler and with
- * an initialized multi-modal simulation.
- **
+ * This class shows an example how to set up a controler and with an initialized multi-modal
+ * simulation. *
+ *
  * @author cdobler
  */
 public class RunMultimodalExample {
 
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig( args, new MultiModalConfigGroup() ) ;
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		PrepareMultiModalScenario.run(scenario);
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new MultiModalModule());
-		controler.run();
-	}
-
+  public static void main(String[] args) {
+    Config config = ConfigUtils.loadConfig(args, new MultiModalConfigGroup());
+    Scenario scenario = ScenarioUtils.loadScenario(config);
+    PrepareMultiModalScenario.run(scenario);
+    Controler controler = new Controler(scenario);
+    controler.addOverridingModule(new MultiModalModule());
+    controler.run();
+  }
 }

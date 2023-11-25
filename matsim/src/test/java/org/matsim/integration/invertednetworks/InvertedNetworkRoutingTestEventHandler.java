@@ -26,18 +26,17 @@ import org.matsim.api.core.v01.network.Link;
 
 public class InvertedNetworkRoutingTestEventHandler implements LinkEnterEventHandler {
 
-	public boolean hadTrafficOnLink25 = false;
-	
-	@Override
-	public void reset(int iteration) {
-		this.hadTrafficOnLink25 = false;
-	}
+  public boolean hadTrafficOnLink25 = false;
 
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		if (event.getLinkId().equals(Id.create("25", Link.class))) {
-			this.hadTrafficOnLink25 = true;
-		}
-	}
+  @Override
+  public void reset(int iteration) {
+    this.hadTrafficOnLink25 = false;
+  }
 
+  @Override
+  public void handleEvent(LinkEnterEvent event) {
+    if (event.getLinkId().equals(Id.create("25", Link.class))) {
+      this.hadTrafficOnLink25 = true;
+    }
+  }
 }

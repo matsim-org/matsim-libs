@@ -22,24 +22,23 @@ package org.matsim.counts.algorithms.graphs;
 
 import java.util.List;
 import java.util.Vector;
-
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.algorithms.graphs.helper.MyURL;
 
 public class CountsSimReal24GraphCreator extends CountsGraphsCreator {
-	
-	public CountsSimReal24GraphCreator(final String sectionTitle) {
-		super(sectionTitle);
-	}
-		
-	@Override
-	public List<CountsGraph> createGraphs(final List<CountSimComparison> ccl, final int iteration) {	
-		List<CountsGraph> graphList=new Vector<CountsGraph>();			
-		String fileName="simVsRealVolumes24Iteration"+iteration;
-		CountsSimReal24Graph sg=new CountsSimReal24Graph(ccl, iteration, fileName );
-		sg.createChart(0);
-		graphList.add(sg);
-		this.section.addURL(new MyURL(fileName+".html", fileName));		
-		return graphList;
-	}
+
+  public CountsSimReal24GraphCreator(final String sectionTitle) {
+    super(sectionTitle);
+  }
+
+  @Override
+  public List<CountsGraph> createGraphs(final List<CountSimComparison> ccl, final int iteration) {
+    List<CountsGraph> graphList = new Vector<CountsGraph>();
+    String fileName = "simVsRealVolumes24Iteration" + iteration;
+    CountsSimReal24Graph sg = new CountsSimReal24Graph(ccl, iteration, fileName);
+    sg.createChart(0);
+    graphList.add(sg);
+    this.section.addURL(new MyURL(fileName + ".html", fileName));
+    return graphList;
+  }
 }

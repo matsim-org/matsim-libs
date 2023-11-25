@@ -22,9 +22,6 @@ package org.matsim.contrib.socnetsim.usage;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.socnetsim.usage.replanning.StrongLinkIdentifierProvider;
-import org.matsim.contrib.socnetsim.usage.replanning.WeakLinkIdentifierProvider;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
@@ -32,32 +29,40 @@ import org.matsim.contrib.socnetsim.sharedvehicles.SharedVehicleUtils;
 import org.matsim.contrib.socnetsim.sharedvehicles.VehicleBasedIncompatiblePlansIdentifierFactory;
 import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
 import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
+import org.matsim.contrib.socnetsim.usage.replanning.StrongLinkIdentifierProvider;
+import org.matsim.contrib.socnetsim.usage.replanning.WeakLinkIdentifierProvider;
+import org.matsim.core.controler.AbstractModule;
 
 /**
  * @author thibautd
  */
 public class ConfigConfiguredPlanLinkIdentifierModule extends AbstractModule {
+  @Override
+  public void install() {
+    bind(PlanLinkIdentifier.class)
+        .annotatedWith(PlanLinkIdentifier.Strong.class)
+        .toProvider(StrongLinkIdentifierProvider.class);
+    bind(PlanLinkIdentifier.class)
+        .annotatedWith(PlanLinkIdentifier.Weak.class)
+        .toProvider(WeakLinkIdentifierProvider.class);
+
+    bind(IncompatiblePlansIdentifierFactory.class).toProvider(new IncompatibilityProvider());
+  }
+
+  private static class IncompatibilityProvider
+      implements Provider<IncompatiblePlansIdentifierFactory> {
+    @Inject Scenario sc;
+
     @Override
-    public void install() {
-        bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Strong.class ).toProvider( StrongLinkIdentifierProvider.class );
-        bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Weak.class ).toProvider( WeakLinkIdentifierProvider.class );
-
-		bind(IncompatiblePlansIdentifierFactory.class).toProvider( new IncompatibilityProvider() );
-
+    public IncompatiblePlansIdentifierFactory get() {
+      final GroupReplanningConfigGroup conf =
+          (GroupReplanningConfigGroup)
+              sc.getConfig().getModule(GroupReplanningConfigGroup.GROUP_NAME);
+      return conf.getConsiderVehicleIncompatibilities()
+              && sc.getScenarioElement(VehicleRessources.ELEMENT_NAME) != null
+          ? new VehicleBasedIncompatiblePlansIdentifierFactory(
+              SharedVehicleUtils.DEFAULT_VEHICULAR_MODES)
+          : new EmptyIncompatiblePlansIdentifierFactory();
     }
-
-	private static class IncompatibilityProvider implements Provider<IncompatiblePlansIdentifierFactory> {
-		@Inject
-		Scenario sc;
-
-		@Override
-		public IncompatiblePlansIdentifierFactory get() {
-			final GroupReplanningConfigGroup conf = (GroupReplanningConfigGroup) sc.getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME );
-			return conf.getConsiderVehicleIncompatibilities() &&
-					sc.getScenarioElement( VehicleRessources.ELEMENT_NAME ) != null ?
-						new VehicleBasedIncompatiblePlansIdentifierFactory(
-								SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) :
-						new EmptyIncompatiblePlansIdentifierFactory();
-		}
-	}
+  }
 }

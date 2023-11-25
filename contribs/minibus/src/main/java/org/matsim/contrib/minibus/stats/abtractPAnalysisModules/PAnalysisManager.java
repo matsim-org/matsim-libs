@@ -19,15 +19,13 @@
 
 package org.matsim.contrib.minibus.stats.abtractPAnalysisModules;
 
+import jakarta.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
-import jakarta.inject.Inject;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -48,105 +46,115 @@ import org.matsim.vehicles.Vehicles;
  * Plugs in all analysis.
  *
  * @author aneumann
- *
  */
-public final class PAnalysisManager implements StartupListener, IterationStartsListener, IterationEndsListener{
-	private final static Logger log = LogManager.getLogger(PAnalysisManager.class);
+public final class PAnalysisManager
+    implements StartupListener, IterationStartsListener, IterationEndsListener {
+  private static final Logger log = LogManager.getLogger(PAnalysisManager.class);
 
-	private final String pIdentifier;
-	private final List<PAnalysisModule> pAnalyzesList = new LinkedList<>();
-	private final HashMap<String, BufferedWriter> pAnalyis2Writer = new HashMap<>();
-	private boolean firstIteration = true;
-	@Inject private LineId2PtMode lineSetter;
+  private final String pIdentifier;
+  private final List<PAnalysisModule> pAnalyzesList = new LinkedList<>();
+  private final HashMap<String, BufferedWriter> pAnalyis2Writer = new HashMap<>();
+  private boolean firstIteration = true;
+  @Inject private LineId2PtMode lineSetter;
 
-	public PAnalysisManager(PConfigGroup pConfig){
-		log.info("enabled");
-		this.pIdentifier = pConfig.getPIdentifier();
-	}
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		// create all analyzes
-		this.pAnalyzesList.add(new CountTripsPerMode());
-		this.pAnalyzesList.add(new CountVehPerMode());
-        this.pAnalyzesList.add(new CountVehicleMeterPerMode(event.getServices().getScenario().getNetwork()));
-        this.pAnalyzesList.add(new AverageTripDistanceMeterPerMode(event.getServices().getScenario().getNetwork()));
-		this.pAnalyzesList.add(new AverageInVehicleTripTravelTimeSecondsPerMode());
-		this.pAnalyzesList.add(new AverageWaitingTimeSecondsPerMode());
-		this.pAnalyzesList.add(new AverageNumberOfStopsPerMode());
-		this.pAnalyzesList.add(new CountTransfersPerModeModeCombination());
-		this.pAnalyzesList.add(new CountTripsPerPtModeCombination());
-		this.pAnalyzesList.add(new AverageLoadPerDeparturePerMode());
-		this.pAnalyzesList.add(new CountDeparturesWithNoCapacityLeftPerMode());
-		this.pAnalyzesList.add(new CountDeparturesPerMode());
+  public PAnalysisManager(PConfigGroup pConfig) {
+    log.info("enabled");
+    this.pIdentifier = pConfig.getPIdentifier();
+  }
 
-        CountPassengerMeterPerMode countPassengerMeterPerMode = new CountPassengerMeterPerMode(event.getServices().getScenario().getNetwork());
-		this.pAnalyzesList.add(countPassengerMeterPerMode);
-        CountCapacityMeterPerMode countCapacityMeterPerMode = new CountCapacityMeterPerMode(event.getServices().getScenario().getNetwork());
-		this.pAnalyzesList.add(countCapacityMeterPerMode);
-		this.pAnalyzesList.add(new AverageLoadPerDistancePerMode(countPassengerMeterPerMode, countCapacityMeterPerMode));
+  @Override
+  public void notifyStartup(StartupEvent event) {
+    // create all analyzes
+    this.pAnalyzesList.add(new CountTripsPerMode());
+    this.pAnalyzesList.add(new CountVehPerMode());
+    this.pAnalyzesList.add(
+        new CountVehicleMeterPerMode(event.getServices().getScenario().getNetwork()));
+    this.pAnalyzesList.add(
+        new AverageTripDistanceMeterPerMode(event.getServices().getScenario().getNetwork()));
+    this.pAnalyzesList.add(new AverageInVehicleTripTravelTimeSecondsPerMode());
+    this.pAnalyzesList.add(new AverageWaitingTimeSecondsPerMode());
+    this.pAnalyzesList.add(new AverageNumberOfStopsPerMode());
+    this.pAnalyzesList.add(new CountTransfersPerModeModeCombination());
+    this.pAnalyzesList.add(new CountTripsPerPtModeCombination());
+    this.pAnalyzesList.add(new AverageLoadPerDeparturePerMode());
+    this.pAnalyzesList.add(new CountDeparturesWithNoCapacityLeftPerMode());
+    this.pAnalyzesList.add(new CountDeparturesPerMode());
 
-		// register all analyzes
-		for (PAnalysisModule ana : this.pAnalyzesList) {
-			event.getServices().getEvents().addHandler(ana);
-		}
-	}
+    CountPassengerMeterPerMode countPassengerMeterPerMode =
+        new CountPassengerMeterPerMode(event.getServices().getScenario().getNetwork());
+    this.pAnalyzesList.add(countPassengerMeterPerMode);
+    CountCapacityMeterPerMode countCapacityMeterPerMode =
+        new CountCapacityMeterPerMode(event.getServices().getScenario().getNetwork());
+    this.pAnalyzesList.add(countCapacityMeterPerMode);
+    this.pAnalyzesList.add(
+        new AverageLoadPerDistancePerMode(countPassengerMeterPerMode, countCapacityMeterPerMode));
 
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		// update pt mode for each line in schedule
-		updateLineId2ptModeMap(event.getServices().getScenario().getTransitSchedule());
-		updateVehicleTypes(event.getServices().getScenario().getTransitVehicles());
-	}
+    // register all analyzes
+    for (PAnalysisModule ana : this.pAnalyzesList) {
+      event.getServices().getEvents().addHandler(ana);
+    }
+  }
 
-	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		if (this.firstIteration) {
-			// create the output folder for this module
-			String outFilename = event.getServices().getControlerIO().getOutputPath() + PConstants.statsOutputFolder + PAnalysisManager.class.getSimpleName() + "/";
-			new File(outFilename).mkdir();
+  @Override
+  public void notifyIterationStarts(IterationStartsEvent event) {
+    // update pt mode for each line in schedule
+    updateLineId2ptModeMap(event.getServices().getScenario().getTransitSchedule());
+    updateVehicleTypes(event.getServices().getScenario().getTransitVehicles());
+  }
 
-			// create one output stream for each analysis
-			for (PAnalysisModule ana : this.pAnalyzesList) {
-				try {
-					String moduleOutFilename = outFilename + ana.getName() + ".txt";
-					BufferedWriter writer = IOUtils.getBufferedWriter(moduleOutFilename);
-					writer.write("# iteration" + ana.getHeader());
-					writer.newLine();
-					this.pAnalyis2Writer.put(ana.getName(), writer);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			this.firstIteration = false;
-		}
+  @Override
+  public void notifyIterationEnds(IterationEndsEvent event) {
+    if (this.firstIteration) {
+      // create the output folder for this module
+      String outFilename =
+          event.getServices().getControlerIO().getOutputPath()
+              + PConstants.statsOutputFolder
+              + PAnalysisManager.class.getSimpleName()
+              + "/";
+      new File(outFilename).mkdir();
 
-		// write results to corresponding files
-		for (PAnalysisModule ana : this.pAnalyzesList) {
-			BufferedWriter writer = this.pAnalyis2Writer.get(ana.getName());
-			try {
-				writer.write(event.getIteration() + ana.getResult());
-				writer.newLine();
-				writer.flush();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
+      // create one output stream for each analysis
+      for (PAnalysisModule ana : this.pAnalyzesList) {
+        try {
+          String moduleOutFilename = outFilename + ana.getName() + ".txt";
+          BufferedWriter writer = IOUtils.getBufferedWriter(moduleOutFilename);
+          writer.write("# iteration" + ana.getHeader());
+          writer.newLine();
+          this.pAnalyis2Writer.put(ana.getName(), writer);
+        } catch (IOException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+      }
+      this.firstIteration = false;
+    }
 
-	private void updateLineId2ptModeMap(TransitSchedule transitSchedule) {
-		this.lineSetter.setPtModesForEachLine(transitSchedule, this.pIdentifier);
-		HashMap<Id<TransitLine>, String> lineIds2ptModeMap = this.lineSetter.getLineId2ptModeMap();
+    // write results to corresponding files
+    for (PAnalysisModule ana : this.pAnalyzesList) {
+      BufferedWriter writer = this.pAnalyis2Writer.get(ana.getName());
+      try {
+        writer.write(event.getIteration() + ana.getResult());
+        writer.newLine();
+        writer.flush();
+      } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+    }
+  }
 
-		for (PAnalysisModule ana : this.pAnalyzesList) {
-			ana.setLineId2ptModeMap(lineIds2ptModeMap);
-		}
-	}
+  private void updateLineId2ptModeMap(TransitSchedule transitSchedule) {
+    this.lineSetter.setPtModesForEachLine(transitSchedule, this.pIdentifier);
+    HashMap<Id<TransitLine>, String> lineIds2ptModeMap = this.lineSetter.getLineId2ptModeMap();
 
-	private void updateVehicleTypes(Vehicles vehicles) {
-		for (PAnalysisModule ana : this.pAnalyzesList) {
-			ana.updateVehicles(vehicles);
-		}
-	}
+    for (PAnalysisModule ana : this.pAnalyzesList) {
+      ana.setLineId2ptModeMap(lineIds2ptModeMap);
+    }
+  }
+
+  private void updateVehicleTypes(Vehicles vehicles) {
+    for (PAnalysisModule ana : this.pAnalyzesList) {
+      ana.updateVehicles(vehicles);
+    }
+  }
 }

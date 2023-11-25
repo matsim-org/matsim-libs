@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
@@ -34,75 +33,94 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 public class NestedLogitTest {
-	@Test
-	public void testRedBusBlueBus() throws NoFeasibleChoiceException {
-		TripFilter tripFilter = new CompositeTripFilter(Collections.emptySet());
-		ModeAvailability modeAvailability = new DefaultModeAvailability(Arrays.asList("car", "redbus", "bluebus"));
-		TripConstraintFactory constraintFactory = new CompositeTripConstraintFactory();
-		FallbackBehaviour fallbackBehaviour = FallbackBehaviour.EXCEPTION;
-		ConstantTripEstimator estimator = new ConstantTripEstimator();
+  @Test
+  public void testRedBusBlueBus() throws NoFeasibleChoiceException {
+    TripFilter tripFilter = new CompositeTripFilter(Collections.emptySet());
+    ModeAvailability modeAvailability =
+        new DefaultModeAvailability(Arrays.asList("car", "redbus", "bluebus"));
+    TripConstraintFactory constraintFactory = new CompositeTripConstraintFactory();
+    FallbackBehaviour fallbackBehaviour = FallbackBehaviour.EXCEPTION;
+    ConstantTripEstimator estimator = new ConstantTripEstimator();
 
-		double minimumUtility = Double.NEGATIVE_INFINITY;
-		double maximumUtility = Double.POSITIVE_INFINITY;
+    double minimumUtility = Double.NEGATIVE_INFINITY;
+    double maximumUtility = Double.POSITIVE_INFINITY;
 
-		Activity originActivity = PopulationUtils.createActivityFromCoord("generic", new Coord(0.0, 0.0));
-		originActivity.setEndTime(0.0);
+    Activity originActivity =
+        PopulationUtils.createActivityFromCoord("generic", new Coord(0.0, 0.0));
+    originActivity.setEndTime(0.0);
 
-		Activity destinationActivity = PopulationUtils.createActivityFromCoord("generic", new Coord(0.0, 0.0));
-		originActivity.setEndTime(0.0);
+    Activity destinationActivity =
+        PopulationUtils.createActivityFromCoord("generic", new Coord(0.0, 0.0));
+    originActivity.setEndTime(0.0);
 
-		DefaultNestStructure structure = new DefaultNestStructure();
-		DefaultNest ptNest = new DefaultNest("pt", 1.0);
-		structure.addNest(structure.getRoot(), ptNest);
+    DefaultNestStructure structure = new DefaultNestStructure();
+    DefaultNest ptNest = new DefaultNest("pt", 1.0);
+    structure.addNest(structure.getRoot(), ptNest);
 
-		UtilitySelectorFactory selectorFactory = new NestedLogitSelector.Factory(structure, minimumUtility,
-				maximumUtility);
+    UtilitySelectorFactory selectorFactory =
+        new NestedLogitSelector.Factory(structure, minimumUtility, maximumUtility);
 
-		List<DiscreteModeChoiceTrip> trips = Collections.singletonList(new DiscreteModeChoiceTrip(originActivity,
-				destinationActivity, null, Collections.emptyList(), 0, 0, 0, new AttributesImpl()));
+    List<DiscreteModeChoiceTrip> trips =
+        Collections.singletonList(
+            new DiscreteModeChoiceTrip(
+                originActivity,
+                destinationActivity,
+                null,
+                Collections.emptyList(),
+                0,
+                0,
+                0,
+                new AttributesImpl()));
 
-		TripBasedModel model = new TripBasedModel(estimator, tripFilter, modeAvailability, constraintFactory,
-				selectorFactory, fallbackBehaviour,
-				TimeInterpretation.create(ActivityDurationInterpretation.tryEndTimeThenDuration,
-						TripDurationHandling.shiftActivityEndTimes));
-		Map<String, Integer> choices = new HashMap<>();
-		Random random = new Random(0);
+    TripBasedModel model =
+        new TripBasedModel(
+            estimator,
+            tripFilter,
+            modeAvailability,
+            constraintFactory,
+            selectorFactory,
+            fallbackBehaviour,
+            TimeInterpretation.create(
+                ActivityDurationInterpretation.tryEndTimeThenDuration,
+                TripDurationHandling.shiftActivityEndTimes));
+    Map<String, Integer> choices = new HashMap<>();
+    Random random = new Random(0);
 
-		int numberOfSamples = 10000;
+    int numberOfSamples = 10000;
 
-		estimator.setAlternative("car", -1.0, structure.getRoot());
-		estimator.setAlternative("redbus", -1.0, ptNest);
-		estimator.setAlternative("bluebus", -1.0, ptNest);
-		estimator.setAlternative("walk", -1.0, structure.getRoot());
+    estimator.setAlternative("car", -1.0, structure.getRoot());
+    estimator.setAlternative("redbus", -1.0, ptNest);
+    estimator.setAlternative("bluebus", -1.0, ptNest);
+    estimator.setAlternative("walk", -1.0, structure.getRoot());
 
-		{
-			ptNest.setScaleParameter(1.0); // NO nesting in principle
-			choices.clear();
+    {
+      ptNest.setScaleParameter(1.0); // NO nesting in principle
+      choices.clear();
 
-			for (int i = 0; i < numberOfSamples; i++) {
-				List<TripCandidate> result = model.chooseModes(null, trips, random);
-				String mode = result.get(0).getMode();
-				choices.put(mode, choices.getOrDefault(mode, 0) + 1);
-			}
+      for (int i = 0; i < numberOfSamples; i++) {
+        List<TripCandidate> result = model.chooseModes(null, trips, random);
+        String mode = result.get(0).getMode();
+        choices.put(mode, choices.getOrDefault(mode, 0) + 1);
+      }
 
-			assertEquals(0.33, (double) choices.get("car") / numberOfSamples, 1e-2);
-			assertEquals(0.33, (double) choices.get("redbus") / numberOfSamples, 1e-2);
-			assertEquals(0.33, (double) choices.get("bluebus") / numberOfSamples, 1e-2);
-		}
+      assertEquals(0.33, (double) choices.get("car") / numberOfSamples, 1e-2);
+      assertEquals(0.33, (double) choices.get("redbus") / numberOfSamples, 1e-2);
+      assertEquals(0.33, (double) choices.get("bluebus") / numberOfSamples, 1e-2);
+    }
 
-		{
-			ptNest.setScaleParameter(20.0); // Strong nesting
-			choices.clear();
+    {
+      ptNest.setScaleParameter(20.0); // Strong nesting
+      choices.clear();
 
-			for (int i = 0; i < numberOfSamples; i++) {
-				List<TripCandidate> result = model.chooseModes(null, trips, random);
-				String mode = result.get(0).getMode();
-				choices.put(mode, choices.getOrDefault(mode, 0) + 1);
-			}
+      for (int i = 0; i < numberOfSamples; i++) {
+        List<TripCandidate> result = model.chooseModes(null, trips, random);
+        String mode = result.get(0).getMode();
+        choices.put(mode, choices.getOrDefault(mode, 0) + 1);
+      }
 
-			assertEquals(0.5, (double) choices.get("car") / numberOfSamples, 1e-2);
-			assertEquals(0.25, (double) choices.get("redbus") / numberOfSamples, 1e-2);
-			assertEquals(0.25, (double) choices.get("bluebus") / numberOfSamples, 1e-2);
-		}
-	}
+      assertEquals(0.5, (double) choices.get("car") / numberOfSamples, 1e-2);
+      assertEquals(0.25, (double) choices.get("redbus") / numberOfSamples, 1e-2);
+      assertEquals(0.25, (double) choices.get("bluebus") / numberOfSamples, 1e-2);
+    }
+  }
 }

@@ -26,5 +26,5 @@ import org.matsim.core.events.handler.EventHandler;
  * @author Michal Maciejewski (michalm)
  */
 public interface TaskEndedEventHandler extends EventHandler {
-	void handleEvent(TaskEndedEvent event);
+  void handleEvent(TaskEndedEvent event);
 }

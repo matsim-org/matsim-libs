@@ -23,7 +23,6 @@ package org.matsim.core.gbl;
 import static org.junit.Assert.assertEquals;
 
 import java.awt.Image;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
@@ -33,16 +32,14 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class MatsimResourceTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  @Test
+  public final void testGetAsImage() {
+    final Image logo = MatsimResource.getAsImage("matsim_logo_transparent.png");
 
-	@Test public final void testGetAsImage() {
-		final Image logo = MatsimResource.getAsImage("matsim_logo_transparent.png");
-
-		// verify that the correct image was correctly loaded by testing its dimension
-		assertEquals(256, logo.getWidth(null));
-		assertEquals(48, logo.getHeight(null));
-	}
-
+    // verify that the correct image was correctly loaded by testing its dimension
+    assertEquals(256, logo.getWidth(null));
+    assertEquals(48, logo.getHeight(null));
+  }
 }

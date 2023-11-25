@@ -24,52 +24,49 @@ import org.matsim.api.core.v01.Coord;
 
 /**
  * @author droeder
- *
  */
 public class ActivityToMode {
 
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(ActivityToMode.class);
-	private Double time;
-	private String mode;
-	private String actType;
-	private Coord coord;
+  @SuppressWarnings("unused")
+  private static final Logger log = LogManager.getLogger(ActivityToMode.class);
 
-	public ActivityToMode(String actType, String mode, Double time, Coord coord) {
-		this.actType = actType;
-		this.mode = mode;
-		this.time = time;
-		this.coord = coord;
-	}
+  private Double time;
+  private String mode;
+  private String actType;
+  private Coord coord;
 
-	/**
-	 * @return the time
-	 */
-	public Double getTime() {
-		return time;
-	}
+  public ActivityToMode(String actType, String mode, Double time, Coord coord) {
+    this.actType = actType;
+    this.mode = mode;
+    this.time = time;
+    this.coord = coord;
+  }
 
-	/**
-	 * @return the mode
-	 */
-	public String getMode() {
-		return mode;
-	}
+  /**
+   * @return the time
+   */
+  public Double getTime() {
+    return time;
+  }
 
-	/**
-	 * @return the actType
-	 */
-	public String getActType() {
-		return actType;
-	}
-	
-	/**
-	 * 
-	 * @return the coord
-	 */
-	public Coord getCoord(){
-		return this.coord;
-	}
-	
+  /**
+   * @return the mode
+   */
+  public String getMode() {
+    return mode;
+  }
+
+  /**
+   * @return the actType
+   */
+  public String getActType() {
+    return actType;
+  }
+
+  /**
+   * @return the coord
+   */
+  public Coord getCoord() {
+    return this.coord;
+  }
 }
-

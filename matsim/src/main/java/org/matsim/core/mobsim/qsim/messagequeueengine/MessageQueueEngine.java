@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * MessageQueueEngine.java
@@ -19,26 +18,24 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim.messagequeueengine;
+package org.matsim.core.mobsim.qsim.messagequeueengine;
 
+import jakarta.inject.Inject;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.qsim.jdeqsimengine.SteppableScheduler;
 
-import jakarta.inject.Inject;
-
 class MessageQueueEngine implements MobsimBeforeSimStepListener {
 
-	private final SteppableScheduler scheduler;
+  private final SteppableScheduler scheduler;
 
-	@Inject
-	MessageQueueEngine(final SteppableScheduler scheduler) {
-		this.scheduler = scheduler;
-	}
+  @Inject
+  MessageQueueEngine(final SteppableScheduler scheduler) {
+    this.scheduler = scheduler;
+  }
 
-	@Override
-	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
-		scheduler.doSimStep(e.getSimulationTime());
-	}
-
+  @Override
+  public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
+    scheduler.doSimStep(e.getSimulationTime());
+  }
 }

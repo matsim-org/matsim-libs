@@ -19,33 +19,28 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.modules;
 
-import org.matsim.core.replanning.ReplanningContext;
-
 import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
+import org.matsim.core.replanning.ReplanningContext;
 
 /**
  * @author thibautd
  */
-public class RecomposeJointPlanModule extends AbstractMultithreadedGenericStrategyModule<GroupPlans> {
-	private final JointPlanFactory factory;
-	private final PlanLinkIdentifier linkIdentifier;
+public class RecomposeJointPlanModule
+    extends AbstractMultithreadedGenericStrategyModule<GroupPlans> {
+  private final JointPlanFactory factory;
+  private final PlanLinkIdentifier linkIdentifier;
 
-	public RecomposeJointPlanModule(
-			final int nThreads,
-			final JointPlanFactory factory,
-			final PlanLinkIdentifier linkIdentifier) {
-		super( nThreads );
-		this.factory = factory;
-		this.linkIdentifier = linkIdentifier;
-	}
+  public RecomposeJointPlanModule(
+      final int nThreads, final JointPlanFactory factory, final PlanLinkIdentifier linkIdentifier) {
+    super(nThreads);
+    this.factory = factory;
+    this.linkIdentifier = linkIdentifier;
+  }
 
-	@Override
-	public GenericPlanAlgorithm<GroupPlans> createAlgorithm(ReplanningContext replanningContext) {
-		return new RecomposeJointPlanAlgorithm(
-				factory,
-				linkIdentifier);
-	}
+  @Override
+  public GenericPlanAlgorithm<GroupPlans> createAlgorithm(ReplanningContext replanningContext) {
+    return new RecomposeJointPlanAlgorithm(factory, linkIdentifier);
+  }
 }
-

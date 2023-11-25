@@ -19,50 +19,46 @@
 
 package org.matsim.contrib.parking.parkingsearch.events;
 
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.Map;
-
 /**
  * @author jbischoff
  */
-
 public class StartWaitingForParkingEvent extends Event {
-	public static final String EVENT_TYPE = "started waiting for parking";
-	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-	public static final String ATTRIBUTE_LINK = "link";
-	private final Id<Link> linkId;
-	private final Id<Vehicle> vehicleId;
+  public static final String EVENT_TYPE = "started waiting for parking";
+  public static final String ATTRIBUTE_VEHICLE = "vehicle";
+  public static final String ATTRIBUTE_LINK = "link";
+  private final Id<Link> linkId;
+  private final Id<Vehicle> vehicleId;
 
-	public StartWaitingForParkingEvent(final double time, Id<Vehicle> vehicleId, Id<Link> linkId) {
-		super(time);
-		this.linkId = linkId;
-		this.vehicleId = vehicleId;
+  public StartWaitingForParkingEvent(final double time, Id<Vehicle> vehicleId, Id<Link> linkId) {
+    super(time);
+    this.linkId = linkId;
+    this.vehicleId = vehicleId;
+  }
 
-	}
+  @Override
+  public String getEventType() {
+    return EVENT_TYPE;
+  }
 
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
+  public Id<Link> getLinkId() {
+    return linkId;
+  }
 
-	public Id<Link> getLinkId() {
-		return linkId;
-	}
+  public Id<Vehicle> getVehicleId() {
+    return vehicleId;
+  }
 
-	public Id<Vehicle> getVehicleId() {
-		return vehicleId;
-	}
-
-	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
-		return attr;
-	}
-
+  @Override
+  public Map<String, String> getAttributes() {
+    Map<String, String> attr = super.getAttributes();
+    attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
+    attr.put(ATTRIBUTE_LINK, this.linkId.toString());
+    return attr;
+  }
 }

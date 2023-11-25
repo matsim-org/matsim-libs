@@ -30,23 +30,24 @@ import org.matsim.core.router.util.TravelTime;
  * @author michalm
  */
 public interface DetourTimeEstimator {
-	static DetourTimeEstimator createBeelineBasedEstimator(double beelineSpeed) {
-		return (from, to, departureTime) -> DistanceUtils.calculateDistance(from.getToNode(), to.getToNode())
-				/ beelineSpeed;
-	}
+  static DetourTimeEstimator createBeelineBasedEstimator(double beelineSpeed) {
+    return (from, to, departureTime) ->
+        DistanceUtils.calculateDistance(from.getToNode(), to.getToNode()) / beelineSpeed;
+  }
 
-	static DetourTimeEstimator createMatrixBasedEstimator(double speedFactor, TravelTimeMatrix matrix,
-			TravelTime travelTime) {
-		return (from, to, departureTime) -> {
-			if (from == to) {
-				return 0;
-			}
-			double duration = FIRST_LINK_TT;
-			duration += matrix.getTravelTime(from.getToNode(), to.getFromNode(), departureTime + duration);
-			duration += VrpPaths.getLastLinkTT(travelTime, to, departureTime + duration);
-			return duration / speedFactor;
-		};
-	}
+  static DetourTimeEstimator createMatrixBasedEstimator(
+      double speedFactor, TravelTimeMatrix matrix, TravelTime travelTime) {
+    return (from, to, departureTime) -> {
+      if (from == to) {
+        return 0;
+      }
+      double duration = FIRST_LINK_TT;
+      duration +=
+          matrix.getTravelTime(from.getToNode(), to.getFromNode(), departureTime + duration);
+      duration += VrpPaths.getLastLinkTT(travelTime, to, departureTime + duration);
+      return duration / speedFactor;
+    };
+  }
 
-	double estimateTime(Link from, Link to, double departureTime);
+  double estimateTime(Link from, Link to, double departureTime);
 }

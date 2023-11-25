@@ -18,51 +18,52 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.scoring;
 
-import org.matsim.core.config.ReflectiveConfigGroup;
-
 import java.util.Map;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author thibautd
  */
 public class InternalizationConfigGroup extends ReflectiveConfigGroup {
 
-    public static final String GROUP_NAME = "scoreInternalization";
+  public static final String GROUP_NAME = "scoreInternalization";
 
-    private String internalizationSocialNetworkFile = null;
-    private double internalizationRatio = 0;
+  private String internalizationSocialNetworkFile = null;
+  private double internalizationRatio = 0;
 
-    public InternalizationConfigGroup() {
-        super( GROUP_NAME );
-    }
+  public InternalizationConfigGroup() {
+    super(GROUP_NAME);
+  }
 
-    @Override
-    public Map<String,String> getComments() {
-        final Map<String,String> map = super.getComments();
-        map.put( "internalizationSocialNetworkFile" ,
-                "path to the file defining the score internalization social network, if any. If null, the social network of the simulation will be used.");
-        map.put( "internalizationRatio" ,
-                "ratio by which to multiply the scores of social contacts before suming them with the ego's score. 0 means egoism, 1 average group score maximisation." );
-        return map;
-    }
+  @Override
+  public Map<String, String> getComments() {
+    final Map<String, String> map = super.getComments();
+    map.put(
+        "internalizationSocialNetworkFile",
+        "path to the file defining the score internalization social network, if any. If null, the social network of the simulation will be used.");
+    map.put(
+        "internalizationRatio",
+        "ratio by which to multiply the scores of social contacts before suming them with the ego's score. 0 means egoism, 1 average group score maximisation.");
+    return map;
+  }
 
-    @StringGetter( "internalizationSocialNetworkFile" )
-    public String getInternalizationSocialNetworkFile() {
-        return internalizationSocialNetworkFile;
-    }
+  @StringGetter("internalizationSocialNetworkFile")
+  public String getInternalizationSocialNetworkFile() {
+    return internalizationSocialNetworkFile;
+  }
 
-    @StringSetter( "internalizationSocialNetworkFile" )
-    public void setInternalizationSocialNetworkFile(final String internalizationSocialNetwork) {
-        this.internalizationSocialNetworkFile = internalizationSocialNetwork;
-    }
+  @StringSetter("internalizationSocialNetworkFile")
+  public void setInternalizationSocialNetworkFile(final String internalizationSocialNetwork) {
+    this.internalizationSocialNetworkFile = internalizationSocialNetwork;
+  }
 
-    @StringGetter( "internalizationRatio" )
-    public double getInternalizationRatio() {
-        return internalizationRatio;
-    }
+  @StringGetter("internalizationRatio")
+  public double getInternalizationRatio() {
+    return internalizationRatio;
+  }
 
-    @StringSetter( "internalizationRatio" )
-    public void setInternalizationRatio(final double internalizationRatio) {
-        this.internalizationRatio = internalizationRatio;
-    }
+  @StringSetter("internalizationRatio")
+  public void setInternalizationRatio(final double internalizationRatio) {
+    this.internalizationRatio = internalizationRatio;
+  }
 }

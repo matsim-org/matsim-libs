@@ -21,19 +21,14 @@ package org.matsim.core.config.consistency;
 
 import org.matsim.core.config.Config;
 
-
 /**
- * Implement this interface to implement consistency checks of the
- * MATSim config. Implementations of this class that are added 
- * to the Config instance used are triggered by the parser after
- * the config.xml file is read.
- * 
- * 
- * @author dgrether
+ * Implement this interface to implement consistency checks of the MATSim config. Implementations of
+ * this class that are added to the Config instance used are triggered by the parser after the
+ * config.xml file is read.
  *
+ * @author dgrether
  */
 public interface ConfigConsistencyChecker {
 
-	public void checkConsistency(Config config);
-	
+  public void checkConsistency(Config config);
 }

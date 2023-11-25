@@ -21,9 +21,6 @@ package org.matsim.contrib.socnetsim.run;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
 import org.matsim.contrib.socnetsim.framework.SocialNetworkConfigGroup;
 import org.matsim.contrib.socnetsim.framework.controller.JointDecisionProcessModule;
 import org.matsim.contrib.socnetsim.framework.controller.SocialNetworkModule;
@@ -34,46 +31,50 @@ import org.matsim.contrib.socnetsim.jointtrips.JointTripsModule;
 import org.matsim.contrib.socnetsim.usage.ConfigConfiguredPlanLinkIdentifierModule;
 import org.matsim.contrib.socnetsim.usage.analysis.SocnetsimDefaultAnalysisModule;
 import org.matsim.contrib.socnetsim.usage.replanning.DefaultGroupStrategyRegistryModule;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
 
 /**
  * Starts a simulation with a social network, joint trips and joint activities.
+ *
  * @author thibautd
  */
 public class RunSocialNetwork {
-	public static void main(final String[] args) {
-		final String configFile = args[ 0 ];
+  public static void main(final String[] args) {
+    final String configFile = args[0];
 
-		final Scenario scenario = RunUtils.createScenario( configFile );
-		final Config config = scenario.getConfig();
+    final Scenario scenario = RunUtils.createScenario(configFile);
+    final Config config = scenario.getConfig();
 
-		// TODO: put somehow in a module
-		final SocialNetworkConfigGroup snConf = (SocialNetworkConfigGroup)
-				config.getModule( SocialNetworkConfigGroup.GROUP_NAME );
+    // TODO: put somehow in a module
+    final SocialNetworkConfigGroup snConf =
+        (SocialNetworkConfigGroup) config.getModule(SocialNetworkConfigGroup.GROUP_NAME);
 
-		new SocialNetworkReader( scenario ).readFile( snConf.getInputFile() );
+    new SocialNetworkReader(scenario).readFile(snConf.getInputFile());
 
-		final SocialNetwork sn = (SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME );
-		for ( Id p : scenario.getPopulation().getPersons().keySet() ) {
-			if ( !sn.getEgos().contains( p ) ) sn.addEgo( p );
-		}
+    final SocialNetwork sn =
+        (SocialNetwork) scenario.getScenarioElement(SocialNetwork.ELEMENT_NAME);
+    for (Id p : scenario.getPopulation().getPersons().keySet()) {
+      if (!sn.getEgos().contains(p)) sn.addEgo(p);
+    }
 
-		final Controler controler = new Controler( scenario );
-		controler.addOverridingModule( new JointDecisionProcessModule() );
-		// One needs to add the various features one wants to use in one module to be safe:
-		// this way, if two features conflict, a crash will occur at injection.
-		controler.addOverridingModule(
-				new AbstractModule() {
-					@Override
-					public void install() {
-						install( new ConfigConfiguredPlanLinkIdentifierModule());
-						install( new SocnetsimDefaultAnalysisModule() );
-						install( new JointActivitiesScoringModule() );
-						install( new DefaultGroupStrategyRegistryModule() );
-						install( new JointTripsModule() );
-						install( new SocialNetworkModule() );
-					}
-				} );
-		controler.run();
-	}
+    final Controler controler = new Controler(scenario);
+    controler.addOverridingModule(new JointDecisionProcessModule());
+    // One needs to add the various features one wants to use in one module to be safe:
+    // this way, if two features conflict, a crash will occur at injection.
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            install(new ConfigConfiguredPlanLinkIdentifierModule());
+            install(new SocnetsimDefaultAnalysisModule());
+            install(new JointActivitiesScoringModule());
+            install(new DefaultGroupStrategyRegistryModule());
+            install(new JointTripsModule());
+            install(new SocialNetworkModule());
+          }
+        });
+    controler.run();
+  }
 }
-

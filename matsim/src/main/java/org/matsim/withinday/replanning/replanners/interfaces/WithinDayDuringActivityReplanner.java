@@ -28,10 +28,11 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityAgen
 /*
  * Replans only Agents that are currently performing an Activity.
  */
-public abstract class WithinDayDuringActivityReplanner extends WithinDayReplanner<DuringActivityAgentSelector> {
+public abstract class WithinDayDuringActivityReplanner
+    extends WithinDayReplanner<DuringActivityAgentSelector> {
 
-	public WithinDayDuringActivityReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface) {
-		super(id, scenario, internalInterface);
-	}
-	
+  public WithinDayDuringActivityReplanner(
+      Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface) {
+    super(id, scenario, internalInterface);
+  }
 }

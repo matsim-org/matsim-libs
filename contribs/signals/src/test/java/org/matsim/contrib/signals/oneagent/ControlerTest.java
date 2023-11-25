@@ -20,7 +20,6 @@
 package org.matsim.contrib.signals.oneagent;
 
 import org.junit.Assert;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -28,6 +27,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalGroupSettingsData;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
 import org.matsim.core.controler.Controler;
@@ -35,112 +38,111 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
-import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.signalcontrol.v20.SignalGroupSettingsData;
-import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsLogger;
 
-
 /**
- * Contains tests that use the signals one agent scenario as base and test functionality of the Controler.
- * @author dgrether
+ * Contains tests that use the signals one agent scenario as base and test functionality of the
+ * Controler.
  *
+ * @author dgrether
  */
 public class ControlerTest {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	/**
-	 * Tests the setup with a traffic light that shows all the time green in the 0th iteration.
-	 * After the mobsim is run the signal settings are changed thus in the 1st iteration
-	 * the signal should be red in sec [0,99] and green in [100,2000]
-	 */
-	@Test
-	public void testModifySignalControlDataOnsetOffset() {
-		//configure and load standard scenario
-		Fixture fixture = new Fixture();
-		Scenario scenario = fixture.createAndLoadTestScenarioOneSignal(false);
-		scenario.getConfig().controller().setFirstIteration(0);
-		scenario.getConfig().controller().setLastIteration(1);
-		scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
-		scenario.getConfig().controller().setWriteEventsInterval(1);
+  /**
+   * Tests the setup with a traffic light that shows all the time green in the 0th iteration. After
+   * the mobsim is run the signal settings are changed thus in the 1st iteration the signal should
+   * be red in sec [0,99] and green in [100,2000]
+   */
+  @Test
+  public void testModifySignalControlDataOnsetOffset() {
+    // configure and load standard scenario
+    Fixture fixture = new Fixture();
+    Scenario scenario = fixture.createAndLoadTestScenarioOneSignal(false);
+    scenario.getConfig().controller().setFirstIteration(0);
+    scenario.getConfig().controller().setLastIteration(1);
+    scenario.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
+    scenario.getConfig().controller().setWriteEventsInterval(1);
 
-		Controler controler = new Controler(scenario);
-        controler.getConfig().controller().setCreateGraphs(false);
-        controler.addControlerListener(new AfterMobsimListener() {
+    Controler controler = new Controler(scenario);
+    controler.getConfig().controller().setCreateGraphs(false);
+    controler.addControlerListener(
+        new AfterMobsimListener() {
 
-			@Override
-			public void notifyAfterMobsim(AfterMobsimEvent event) {
-				Scenario scenario = event.getServices().getScenario();
-				int dropping = 0;
-				int onset = 100;
-				for (SignalSystemControllerData intersectionSignal :
-					((SignalsData) scenario
-						.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalControlData()
-						.getSignalSystemControllerDataBySystemId().values()) {
+          @Override
+          public void notifyAfterMobsim(AfterMobsimEvent event) {
+            Scenario scenario = event.getServices().getScenario();
+            int dropping = 0;
+            int onset = 100;
+            for (SignalSystemControllerData intersectionSignal :
+                ((SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME))
+                    .getSignalControlData()
+                    .getSignalSystemControllerDataBySystemId()
+                    .values()) {
 
-					for (SignalPlanData plan : intersectionSignal.getSignalPlanData().values()) {
-						plan.setCycleTime(2000);
-						for (SignalGroupSettingsData data : plan.getSignalGroupSettingsDataByGroupId().values()) {
-							data.setDropping(dropping);
-							data.setOnset(onset);
-						}
-					}
-				}
-			}
-		});
+              for (SignalPlanData plan : intersectionSignal.getSignalPlanData().values()) {
+                plan.setCycleTime(2000);
+                for (SignalGroupSettingsData data :
+                    plan.getSignalGroupSettingsDataByGroupId().values()) {
+                  data.setDropping(dropping);
+                  data.setOnset(onset);
+                }
+              }
+            }
+          }
+        });
 
-		controler.addControlerListener((IterationStartsListener)event -> {
-			event.getServices().getEvents().addHandler(new EventsLogger());
+    controler.addControlerListener(
+        (IterationStartsListener)
+            event -> {
+              event.getServices().getEvents().addHandler(new EventsLogger());
 
-			TestLink2EnterEventHandler enterHandler = new TestLink2EnterEventHandler();
-			if (0 == event.getIteration()) {
-				enterHandler.link2EnterTime = 38.0;
-			}
+              TestLink2EnterEventHandler enterHandler = new TestLink2EnterEventHandler();
+              if (0 == event.getIteration()) {
+                enterHandler.link2EnterTime = 38.0;
+              }
 
-			if (1 == event.getIteration()) {
-				enterHandler.link2EnterTime = 100.0;
-				SignalGroupStateChangedEventHandler signalsHandler0 = new TestSignalGroupStateChangedHandler();
-				event.getServices().getEvents().addHandler(signalsHandler0);
-			}
-		});
+              if (1 == event.getIteration()) {
+                enterHandler.link2EnterTime = 100.0;
+                SignalGroupStateChangedEventHandler signalsHandler0 =
+                    new TestSignalGroupStateChangedHandler();
+                event.getServices().getEvents().addHandler(signalsHandler0);
+              }
+            });
 
-		controler.run();
-	}
+    controler.run();
+  }
 
+  private static final class TestSignalGroupStateChangedHandler
+      implements SignalGroupStateChangedEventHandler {
 
-	private static final class TestSignalGroupStateChangedHandler implements
-			SignalGroupStateChangedEventHandler {
+    @Override
+    public void reset(int i) {}
 
-		@Override
-		public void reset(int i) {}
+    @Override
+    public void handleEvent(SignalGroupStateChangedEvent e) {
+      if (e.getNewState().equals(SignalGroupState.RED)) {
+        Assert.assertEquals(0.0, e.getTime(), 1e-7);
+      } else if (e.getNewState().equals(SignalGroupState.GREEN)) {
+        Assert.assertEquals(100.0, e.getTime(), 1e-7);
+      }
+    }
+  }
 
-		@Override
-		public void handleEvent(SignalGroupStateChangedEvent e) {
-			if (e.getNewState().equals(SignalGroupState.RED)){
-				Assert.assertEquals(0.0, e.getTime(), 1e-7);
-			}
-			else if (e.getNewState().equals(SignalGroupState.GREEN)) {
-				Assert.assertEquals(100.0, e.getTime(), 1e-7);
-			}
-		}
-	}
+  private static final class TestLink2EnterEventHandler implements LinkEnterEventHandler {
+    final Id<Link> linkId2 = Id.create(2, Link.class);
+    double link2EnterTime = 0;
 
+    @Override
+    public void reset(int i) {}
 
-	private static final class TestLink2EnterEventHandler implements LinkEnterEventHandler {
-		final Id<Link> linkId2 = Id.create(2, Link.class);
-		double link2EnterTime = 0;
-		@Override
-		public void reset(int i) {}
-		@Override
-		public void handleEvent(LinkEnterEvent e){
-			if (e.getLinkId().equals(linkId2)) {
-				Assert.assertEquals(link2EnterTime,  e.getTime(), MatsimTestUtils.EPSILON);
-			}
-		}
-	}
-
+    @Override
+    public void handleEvent(LinkEnterEvent e) {
+      if (e.getLinkId().equals(linkId2)) {
+        Assert.assertEquals(link2EnterTime, e.getTime(), MatsimTestUtils.EPSILON);
+      }
+    }
+  }
 }

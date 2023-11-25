@@ -20,6 +20,9 @@
 
 package org.matsim.core.utils.geometry;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,57 +39,64 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 /**
  * @author kainagel
- *
  */
 public class GeometryUtilsTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public final void testIntersectingLinks() {
-		
-		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL("equil"), "config.xml" ) ) ;
-		
-		final Network network = ScenarioUtils.loadScenario(config).getNetwork();
+  @Test
+  public final void testIntersectingLinks() {
 
-		{
-			double xx = -15001 ;
-			LineString testSegment = new GeometryFactory().createLineString(new Coordinate[]{new Coordinate(xx,0),new Coordinate(xx,10000)}) ;
+    Config config =
+        ConfigUtils.loadConfig(
+            IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 
-			List<Link> results = GeometryUtils.findIntersectingLinks(testSegment, network);
+    final Network network = ScenarioUtils.loadScenario(config).getNetwork();
 
-			List<Id<Link>> expectedLinkIds = List.of(Id.createLinkId(1));
+    {
+      double xx = -15001;
+      LineString testSegment =
+          new GeometryFactory()
+              .createLineString(
+                  new Coordinate[] {new Coordinate(xx, 0), new Coordinate(xx, 10000)});
 
-			Assert.assertEquals(expectedLinkIds.size(), results.size()) ;
-			for ( int ii=0 ; ii<expectedLinkIds.size() ; ii++ ) {
-				Assert.assertEquals( "wrong link id", expectedLinkIds.get(ii), results.get(ii).getId() ) ;
-			}
-		}
-		{
-			double xx = -14001 ;
-			LineString testSegment = new GeometryFactory().createLineString(new Coordinate[]{new Coordinate(xx,0),new Coordinate(xx,10000)}) ;
+      List<Link> results = GeometryUtils.findIntersectingLinks(testSegment, network);
 
-			List<Link> results = GeometryUtils.findIntersectingLinks(testSegment, network);
+      List<Id<Link>> expectedLinkIds = List.of(Id.createLinkId(1));
 
-			Set<Id<Link>> intersectingLinkIds = new HashSet<>();
-			for (Link link : results) {
-				intersectingLinkIds.add(link.getId());
-			}
+      Assert.assertEquals(expectedLinkIds.size(), results.size());
+      for (int ii = 0; ii < expectedLinkIds.size(); ii++) {
+        Assert.assertEquals("wrong link id", expectedLinkIds.get(ii), results.get(ii).getId());
+      }
+    }
+    {
+      double xx = -14001;
+      LineString testSegment =
+          new GeometryFactory()
+              .createLineString(
+                  new Coordinate[] {new Coordinate(xx, 0), new Coordinate(xx, 10000)});
 
-			List<Id<Link>> expectedIds = List.of(Id.createLinkId(2), Id.createLinkId(3), Id.createLinkId(4), Id.createLinkId(5), Id.createLinkId(6));
+      List<Link> results = GeometryUtils.findIntersectingLinks(testSegment, network);
 
-			Assert.assertEquals(expectedIds.size(), results.size());
-			for (Id<Link> id : expectedIds) {
-				Assert.assertTrue("expected link " + id, intersectingLinkIds.contains(id));
-			}
-		}
-		
-	}
+      Set<Id<Link>> intersectingLinkIds = new HashSet<>();
+      for (Link link : results) {
+        intersectingLinkIds.add(link.getId());
+      }
 
+      List<Id<Link>> expectedIds =
+          List.of(
+              Id.createLinkId(2),
+              Id.createLinkId(3),
+              Id.createLinkId(4),
+              Id.createLinkId(5),
+              Id.createLinkId(6));
+
+      Assert.assertEquals(expectedIds.size(), results.size());
+      for (Id<Link> id : expectedIds) {
+        Assert.assertTrue("expected link " + id, intersectingLinkIds.contains(id));
+      }
+    }
+  }
 }

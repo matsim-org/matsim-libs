@@ -31,52 +31,54 @@ import org.matsim.vehicles.*;
 
 /**
  * Generates vehicles for a whole transit schedule
- * 
- * @author aneumann
  *
+ * @author aneumann
  */
 class PVehiclesFactory {
-	
-	@SuppressWarnings("unused")
-	private final static Logger log = LogManager.getLogger(PVehiclesFactory.class);
-	
-	private final PConfigGroup pConfig;
 
-	public PVehiclesFactory(PConfigGroup pConfig) {
-		this.pConfig = pConfig;
-	}
+  @SuppressWarnings("unused")
+  private static final Logger log = LogManager.getLogger(PVehiclesFactory.class);
 
-	/**
-	 * Create vehicles for each departure of the given transit schedule.
-	 * 
-	 * @return Vehicles used by paratranit lines
-	 */
-	public Vehicles createVehicles(TransitSchedule pTransitSchedule){		
-		Vehicles vehicles = VehicleUtils.createVehiclesContainer();		
-		VehiclesFactory vehFactory = vehicles.getFactory();
-		VehicleType vehType = vehFactory.createVehicleType(Id.create(this.pConfig.getPIdentifier(), VehicleType.class));
-//		VehicleCapacity capacity = new VehicleCapacity();
-		vehType.getCapacity().setSeats(this.pConfig.getPaxPerVehicle()); // 2018-11 the driver no longer takes one seat
-		vehType.getCapacity().setStandingRoom(0);
-//		vehType.setCapacity(capacity);
-		vehType.setPcuEquivalents(this.pConfig.getPassengerCarEquivalents());
-		vehType.setMaximumVelocity(this.pConfig.getVehicleMaximumVelocity());
-        VehicleUtils.setAccessTime(vehType, this.pConfig.getDelayPerBoardingPassenger());
-		VehicleUtils.setEgressTime(vehType, this.pConfig.getDelayPerAlightingPassenger());
-		VehicleUtils.setDoorOperationMode(vehType, this.pConfig.getDoorOperationMode()) ;
-		vehicles.addVehicleType( vehType);
-	
-		for (TransitLine line : pTransitSchedule.getTransitLines().values()) {
-			for (TransitRoute route : line.getRoutes().values()) {
-				for (Departure departure : route.getDepartures().values()) {
-					if (!vehicles.getVehicles().keySet().contains(departure.getVehicleId())) {
-						Vehicle vehicle = vehFactory.createVehicle(departure.getVehicleId(), vehType);
-						vehicles.addVehicle( vehicle);
-					}
-				}
-			}
-		}
-		
-		return vehicles;
-	}
+  private final PConfigGroup pConfig;
+
+  public PVehiclesFactory(PConfigGroup pConfig) {
+    this.pConfig = pConfig;
+  }
+
+  /**
+   * Create vehicles for each departure of the given transit schedule.
+   *
+   * @return Vehicles used by paratranit lines
+   */
+  public Vehicles createVehicles(TransitSchedule pTransitSchedule) {
+    Vehicles vehicles = VehicleUtils.createVehiclesContainer();
+    VehiclesFactory vehFactory = vehicles.getFactory();
+    VehicleType vehType =
+        vehFactory.createVehicleType(Id.create(this.pConfig.getPIdentifier(), VehicleType.class));
+    //		VehicleCapacity capacity = new VehicleCapacity();
+    vehType
+        .getCapacity()
+        .setSeats(this.pConfig.getPaxPerVehicle()); // 2018-11 the driver no longer takes one seat
+    vehType.getCapacity().setStandingRoom(0);
+    //		vehType.setCapacity(capacity);
+    vehType.setPcuEquivalents(this.pConfig.getPassengerCarEquivalents());
+    vehType.setMaximumVelocity(this.pConfig.getVehicleMaximumVelocity());
+    VehicleUtils.setAccessTime(vehType, this.pConfig.getDelayPerBoardingPassenger());
+    VehicleUtils.setEgressTime(vehType, this.pConfig.getDelayPerAlightingPassenger());
+    VehicleUtils.setDoorOperationMode(vehType, this.pConfig.getDoorOperationMode());
+    vehicles.addVehicleType(vehType);
+
+    for (TransitLine line : pTransitSchedule.getTransitLines().values()) {
+      for (TransitRoute route : line.getRoutes().values()) {
+        for (Departure departure : route.getDepartures().values()) {
+          if (!vehicles.getVehicles().keySet().contains(departure.getVehicleId())) {
+            Vehicle vehicle = vehFactory.createVehicle(departure.getVehicleId(), vehType);
+            vehicles.addVehicle(vehicle);
+          }
+        }
+      }
+    }
+
+    return vehicles;
+  }
 }

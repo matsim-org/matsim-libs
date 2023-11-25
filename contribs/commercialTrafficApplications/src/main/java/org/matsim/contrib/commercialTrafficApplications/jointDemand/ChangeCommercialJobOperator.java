@@ -17,63 +17,75 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.commercialTrafficApplications.jointDemand;/*
- * created by jbischoff, 22.05.2019
- */
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.freight.carriers.Carrier;
-import org.matsim.freight.carriers.Carriers;
-import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.algorithms.PlanAlgorithm;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+package org.matsim.contrib.commercialTrafficApplications.jointDemand; /*
+                                                                       * created by jbischoff, 22.05.2019
+                                                                       */
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.Carriers;
 
 /**
  * Changes the carrier for a single, random commercial job in the given plan. <br>
- * Can only choose carriers that operate within the same market. The market is (assumed to be) an attribute of the carrier.
+ * Can only choose carriers that operate within the same market. The market is (assumed to be) an
+ * attribute of the carrier.
  */
 public final class ChangeCommercialJobOperator extends AbstractMultithreadedModule {
 
-    public static final String SELECTOR_NAME = "ChangeCommercialJobOperator";
+  public static final String SELECTOR_NAME = "ChangeCommercialJobOperator";
 
-    private final Carriers carriers;
+  private final Carriers carriers;
 
-	ChangeCommercialJobOperator(GlobalConfigGroup globalConfigGroup, Carriers carriers) {
-        super(globalConfigGroup);
-        this.carriers = carriers;
-    }
+  ChangeCommercialJobOperator(GlobalConfigGroup globalConfigGroup, Carriers carriers) {
+    super(globalConfigGroup);
+    this.carriers = carriers;
+  }
 
-    @Override
-    public PlanAlgorithm getPlanAlgoInstance() {
-        Random random = MatsimRandom.getLocalInstance();
-        return plan -> {
-            List<Activity> activitiesWithJobs = new ArrayList<>(JointDemandUtils.getCustomerActivitiesExpectingJobs(plan));
-            if (activitiesWithJobs.isEmpty()) {
-                return;
-            }
-            int randomActIdx = random.nextInt(activitiesWithJobs.size());
+  @Override
+  public PlanAlgorithm getPlanAlgoInstance() {
+    Random random = MatsimRandom.getLocalInstance();
+    return plan -> {
+      List<Activity> activitiesWithJobs =
+          new ArrayList<>(JointDemandUtils.getCustomerActivitiesExpectingJobs(plan));
+      if (activitiesWithJobs.isEmpty()) {
+        return;
+      }
+      int randomActIdx = random.nextInt(activitiesWithJobs.size());
 
-            Activity selectedActivity = activitiesWithJobs.get(randomActIdx);
-            int randomJobIdx = random.nextInt(JointDemandUtils.getNumberOfJobsForActivity(selectedActivity)) + 1; //the smallest index is 1.
+      Activity selectedActivity = activitiesWithJobs.get(randomActIdx);
+      int randomJobIdx =
+          random.nextInt(JointDemandUtils.getNumberOfJobsForActivity(selectedActivity))
+              + 1; // the smallest index is 1.
 
-            Id<Carrier> currentCarrier = JointDemandUtils.getCurrentlySelectedCarrierForJob(selectedActivity, randomJobIdx);
-            String market = JointDemandUtils.getCarrierMarket(carriers.getCarriers().get(currentCarrier));
-            Set<Id<Carrier>> operators4Market = JointDemandUtils.getExistingOperatorsForMarket(carriers, market);
+      Id<Carrier> currentCarrier =
+          JointDemandUtils.getCurrentlySelectedCarrierForJob(selectedActivity, randomJobIdx);
+      String market = JointDemandUtils.getCarrierMarket(carriers.getCarriers().get(currentCarrier));
+      Set<Id<Carrier>> operators4Market =
+          JointDemandUtils.getExistingOperatorsForMarket(carriers, market);
 
-            if (operators4Market.remove(currentCarrier)) {
-                if (!operators4Market.isEmpty()) {
-                    Id<Carrier> newCarrier = operators4Market.stream().skip(random.nextInt(operators4Market.size())).findFirst().orElse(currentCarrier);
-                    JointDemandUtils.setJobCarrier(selectedActivity, randomJobIdx, newCarrier);
-                }
-            } else
-                throw new RuntimeException(currentCarrier.toString() + " is not part of the commercial traffic carriers for market " + market);
-        };
-    }
+      if (operators4Market.remove(currentCarrier)) {
+        if (!operators4Market.isEmpty()) {
+          Id<Carrier> newCarrier =
+              operators4Market.stream()
+                  .skip(random.nextInt(operators4Market.size()))
+                  .findFirst()
+                  .orElse(currentCarrier);
+          JointDemandUtils.setJobCarrier(selectedActivity, randomJobIdx, newCarrier);
+        }
+      } else
+        throw new RuntimeException(
+            currentCarrier.toString()
+                + " is not part of the commercial traffic carriers for market "
+                + market);
+    };
+  }
 }

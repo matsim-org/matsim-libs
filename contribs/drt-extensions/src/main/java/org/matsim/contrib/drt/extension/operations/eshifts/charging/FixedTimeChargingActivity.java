@@ -11,36 +11,36 @@ import org.matsim.contrib.evrp.ChargingTask;
  */
 public class FixedTimeChargingActivity implements DynActivity {
 
-	private final ChargingTask chargingTask;
-	private final ChargingActivity delegate;
+  private final ChargingTask chargingTask;
+  private final ChargingActivity delegate;
 
-	private final double endTime;
+  private final double endTime;
 
-	public FixedTimeChargingActivity(ChargingTask chargingTask, double endTime) {
-		this.chargingTask = chargingTask;
-		this.endTime = endTime;
-		this.delegate = new ChargingActivity(chargingTask);
-	}
+  public FixedTimeChargingActivity(ChargingTask chargingTask, double endTime) {
+    this.chargingTask = chargingTask;
+    this.endTime = endTime;
+    this.delegate = new ChargingActivity(chargingTask);
+  }
 
-	@Override
-	public String getActivityType() {
-		return ChargingActivity.ACTIVITY_TYPE;
-	}
+  @Override
+  public String getActivityType() {
+    return ChargingActivity.ACTIVITY_TYPE;
+  }
 
-	@Override
-	public double getEndTime() {
-		return endTime;
-	}
+  @Override
+  public double getEndTime() {
+    return endTime;
+  }
 
-	@Override
-	public void doSimStep(double now) {
-		delegate.doSimStep(now);
-		ChargingWithAssignmentLogic logic = chargingTask.getChargingLogic();
-		ElectricVehicle ev = chargingTask.getElectricVehicle();
-		if(now == endTime) {
-			if(delegate.getEndTime() > now) {
-				logic.removeVehicle(ev, now);
-			}
-		}
-	}
+  @Override
+  public void doSimStep(double now) {
+    delegate.doSimStep(now);
+    ChargingWithAssignmentLogic logic = chargingTask.getChargingLogic();
+    ElectricVehicle ev = chargingTask.getElectricVehicle();
+    if (now == endTime) {
+      if (delegate.getEndTime() > now) {
+        logic.removeVehicle(ev, now);
+      }
+    }
+  }
 }

@@ -23,79 +23,78 @@ import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 
 /**
- * A simple helper class to store arbitrary attributes (identified by Strings) for
- * arbitrary objects (identified by String-Ids). Note that this implementation uses
- * large amounts of memory for storing many attributes for many objects, it is not
- * heavily optimized.
- * <p></p>
- * <em>This class is not thread-safe.</em>
- * <p></p>
- * More information can be found in the package's Javadoc.
- * <p></p>
- * Example(s):<ul>
- * <li> {@link RunObjectAttributesExample}
+ * A simple helper class to store arbitrary attributes (identified by Strings) for arbitrary objects
+ * (identified by String-Ids). Note that this implementation uses large amounts of memory for
+ * storing many attributes for many objects, it is not heavily optimized.
+ *
+ * <p><em>This class is not thread-safe.</em>
+ *
+ * <p>More information can be found in the package's Javadoc.
+ *
+ * <p>Example(s):
+ *
+ * <ul>
+ *   <li>{@link RunObjectAttributesExample}
  * </ul>
+ *
  * @author mrieser
  */
 public class ObjectAttributes implements MatsimExtensionPoint {
 
-	/*package*/ Map<String, Map<String, Object>> attributes = new LinkedHashMap<String, Map<String, Object>>(1000);
-	
-	@Override
-	public String toString() {
-		StringBuilder stb = new StringBuilder() ;
-		for ( Entry<String, Map<String,Object>> entry : attributes.entrySet() ) {
-			String key = entry.getKey() ;
-			stb.append("key=").append(key);
-			Map<String,Object> map = entry.getValue() ;
-			for ( Entry<String,Object> ee : map.entrySet() ) {
-				String subkey = ee.getKey();
-				stb.append("; subkey=").append(subkey);
-				stb.append("; object=").append(ee.getValue().toString());
-			}
-			stb.append("\n") ;
-		}
-		return stb.toString() ;
-	}
+  /*package*/ Map<String, Map<String, Object>> attributes =
+      new LinkedHashMap<String, Map<String, Object>>(1000);
 
-	public Object putAttribute(final String objectId, final String attribute, final Object value) {
-		Map<String, Object> attMap = this.attributes.get(objectId);
-		if (attMap == null) {
-			attMap = new IdentityHashMap<String, Object>(5);
-			this.attributes.put(objectId, attMap);
-		}
-		return attMap.put(attribute.intern(), value);
-	}
+  @Override
+  public String toString() {
+    StringBuilder stb = new StringBuilder();
+    for (Entry<String, Map<String, Object>> entry : attributes.entrySet()) {
+      String key = entry.getKey();
+      stb.append("key=").append(key);
+      Map<String, Object> map = entry.getValue();
+      for (Entry<String, Object> ee : map.entrySet()) {
+        String subkey = ee.getKey();
+        stb.append("; subkey=").append(subkey);
+        stb.append("; object=").append(ee.getValue().toString());
+      }
+      stb.append("\n");
+    }
+    return stb.toString();
+  }
 
-	public Object getAttribute(final String objectId, final String attribute) {
-		Map<String, Object> attMap = this.attributes.get(objectId);
-		if (attMap == null) {
-			return null;
-		}
-		return attMap.get(attribute.intern());
-	}
+  public Object putAttribute(final String objectId, final String attribute, final Object value) {
+    Map<String, Object> attMap = this.attributes.get(objectId);
+    if (attMap == null) {
+      attMap = new IdentityHashMap<String, Object>(5);
+      this.attributes.put(objectId, attMap);
+    }
+    return attMap.put(attribute.intern(), value);
+  }
 
-	public Object removeAttribute(final String objectId, final String attribute) {
-		Map<String, Object> attMap = this.attributes.get(objectId);
-		if (attMap == null) {
-			return null;
-		}
-		return attMap.remove(attribute.intern());
-	}
+  public Object getAttribute(final String objectId, final String attribute) {
+    Map<String, Object> attMap = this.attributes.get(objectId);
+    if (attMap == null) {
+      return null;
+    }
+    return attMap.get(attribute.intern());
+  }
 
-	public void removeAllAttributes(final String objectId) {
-		this.attributes.remove(objectId);
-	}
+  public Object removeAttribute(final String objectId, final String attribute) {
+    Map<String, Object> attMap = this.attributes.get(objectId);
+    if (attMap == null) {
+      return null;
+    }
+    return attMap.remove(attribute.intern());
+  }
 
-	/**
-	 * Deletes all attributes of all objects, and all objects-ids.
-	 */
-	public void clear() {
-		this.attributes.clear();
-	}
+  public void removeAllAttributes(final String objectId) {
+    this.attributes.remove(objectId);
+  }
 
+  /** Deletes all attributes of all objects, and all objects-ids. */
+  public void clear() {
+    this.attributes.clear();
+  }
 }

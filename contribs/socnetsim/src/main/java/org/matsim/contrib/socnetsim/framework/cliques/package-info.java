@@ -17,8 +17,5 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-/**
- * contains classes which assume a clique network structure
- */
+/** contains classes which assume a clique network structure */
 package org.matsim.contrib.socnetsim.framework.cliques;
-

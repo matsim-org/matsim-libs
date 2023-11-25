@@ -22,21 +22,18 @@ package org.matsim.contrib.signals.data.signalcontrol.v20;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.SignalGroup;
 
-
 /**
  * @author dgrether
- *
  */
 public interface SignalGroupSettingsData {
 
-	public Id<SignalGroup> getSignalGroupId();
-	
-	public int getOnset();
+  public Id<SignalGroup> getSignalGroupId();
 
-	public void setOnset(int second);
+  public int getOnset();
 
-	public int getDropping();
+  public void setOnset(int second);
 
-	public void setDropping(int second);
-	
+  public int getDropping();
+
+  public void setDropping(int second);
 }

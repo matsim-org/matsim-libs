@@ -20,7 +20,6 @@ package org.matsim.contrib.taxi.optimizer.assignment;
 
 import java.util.Collection;
 import java.util.List;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.fleet.Fleet;
@@ -39,61 +38,94 @@ import org.matsim.core.router.util.TravelTime;
  * @author michalm
  */
 public class AssignmentRequestInserter implements UnplannedRequestInserter {
-	private final Fleet fleet;
-	private final TaxiScheduler scheduler;
-	private final MobsimTimer timer;
-	private final AssignmentTaxiOptimizerParams params;
+  private final Fleet fleet;
+  private final TaxiScheduler scheduler;
+  private final MobsimTimer timer;
+  private final AssignmentTaxiOptimizerParams params;
 
-	private final VehicleAssignmentProblem<DrtRequest> assignmentProblem;
-	private final TaxiToRequestAssignmentCostProvider assignmentCostProvider;
+  private final VehicleAssignmentProblem<DrtRequest> assignmentProblem;
+  private final TaxiToRequestAssignmentCostProvider assignmentCostProvider;
 
-	public AssignmentRequestInserter(Fleet fleet, Network network, MobsimTimer timer, TravelTime travelTime,
-			TravelDisutility travelDisutility, TaxiScheduler scheduler, AssignmentTaxiOptimizerParams params) {
-		this(fleet, timer, network, travelTime, travelDisutility, scheduler, params,
-				new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime));
-	}
+  public AssignmentRequestInserter(
+      Fleet fleet,
+      Network network,
+      MobsimTimer timer,
+      TravelTime travelTime,
+      TravelDisutility travelDisutility,
+      TaxiScheduler scheduler,
+      AssignmentTaxiOptimizerParams params) {
+    this(
+        fleet,
+        timer,
+        network,
+        travelTime,
+        travelDisutility,
+        scheduler,
+        params,
+        new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime));
+  }
 
-	public AssignmentRequestInserter(Fleet fleet, MobsimTimer timer, Network network, TravelTime travelTime,
-			TravelDisutility travelDisutility, TaxiScheduler scheduler, AssignmentTaxiOptimizerParams params,
-			LeastCostPathCalculator router) {
-		this.fleet = fleet;
-		this.scheduler = scheduler;
-		this.timer = timer;
-		this.params = params;
+  public AssignmentRequestInserter(
+      Fleet fleet,
+      MobsimTimer timer,
+      Network network,
+      TravelTime travelTime,
+      TravelDisutility travelDisutility,
+      TaxiScheduler scheduler,
+      AssignmentTaxiOptimizerParams params,
+      LeastCostPathCalculator router) {
+    this.fleet = fleet;
+    this.scheduler = scheduler;
+    this.timer = timer;
+    this.params = params;
 
-		assignmentProblem = new VehicleAssignmentProblem<>(network, travelTime, travelDisutility, router,
-				params.nearestRequestsLimit, params.nearestVehiclesLimit);
+    assignmentProblem =
+        new VehicleAssignmentProblem<>(
+            network,
+            travelTime,
+            travelDisutility,
+            router,
+            params.nearestRequestsLimit,
+            params.nearestVehiclesLimit);
 
-		assignmentCostProvider = new TaxiToRequestAssignmentCostProvider(params);
-	}
+    assignmentCostProvider = new TaxiToRequestAssignmentCostProvider(params);
+  }
 
-	@Override
-	public void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests) {
-		// advance request not considered => horizon==0
-		AssignmentRequestData rData = AssignmentRequestData.create(timer.getTimeOfDay(), 0, unplannedRequests);
-		if (rData.getSize() == 0) {
-			return;
-		}
-		VehicleData vData = initVehicleData(rData);
-		if (vData.getSize() == 0) {
-			return;
-		}
+  @Override
+  public void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests) {
+    // advance request not considered => horizon==0
+    AssignmentRequestData rData =
+        AssignmentRequestData.create(timer.getTimeOfDay(), 0, unplannedRequests);
+    if (rData.getSize() == 0) {
+      return;
+    }
+    VehicleData vData = initVehicleData(rData);
+    if (vData.getSize() == 0) {
+      return;
+    }
 
-		AssignmentCost<DrtRequest> cost = assignmentCostProvider.getCost(rData, vData);
-		List<Dispatch<DrtRequest>> assignments = assignmentProblem.findAssignments(vData, rData, cost);
+    AssignmentCost<DrtRequest> cost = assignmentCostProvider.getCost(rData, vData);
+    List<Dispatch<DrtRequest>> assignments = assignmentProblem.findAssignments(vData, rData, cost);
 
-		for (Dispatch<DrtRequest> a : assignments) {
-			scheduler.scheduleRequest(a.vehicle, a.destination, a.path);
-			unplannedRequests.remove(a.destination);
-		}
-	}
+    for (Dispatch<DrtRequest> a : assignments) {
+      scheduler.scheduleRequest(a.vehicle, a.destination, a.path);
+      unplannedRequests.remove(a.destination);
+    }
+  }
 
-	private VehicleData initVehicleData(AssignmentRequestData rData) {
-		long idleVehs = fleet.getVehicles().values().stream().filter(scheduler.getScheduleInquiry()::isIdle).count();
-		double vehPlanningHorizon = idleVehs < rData.getUrgentReqCount() ?
-				params.vehPlanningHorizonUndersupply :
-				params.vehPlanningHorizonOversupply;
-		return new VehicleData(timer.getTimeOfDay(), scheduler.getScheduleInquiry(),
-				fleet.getVehicles().values().stream(), vehPlanningHorizon);
-	}
+  private VehicleData initVehicleData(AssignmentRequestData rData) {
+    long idleVehs =
+        fleet.getVehicles().values().stream()
+            .filter(scheduler.getScheduleInquiry()::isIdle)
+            .count();
+    double vehPlanningHorizon =
+        idleVehs < rData.getUrgentReqCount()
+            ? params.vehPlanningHorizonUndersupply
+            : params.vehPlanningHorizonOversupply;
+    return new VehicleData(
+        timer.getTimeOfDay(),
+        scheduler.getScheduleInquiry(),
+        fleet.getVehicles().values().stream(),
+        vehPlanningHorizon);
+  }
 }

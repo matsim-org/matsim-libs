@@ -21,80 +21,80 @@ package playground.vsp.airPollution.exposure;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class Cell {
 
-	private final int x;
-	private final int y;
-	
-	public Cell(int x, int y){
-		this.x= x;
-		this.y= y;
-	}
-	
-	public int getX(){
-		return this.x;
-	}
-	
-	public int getY(){
-		return this.y;
-	}
-	
-	public int getDistanceBetweenCells(Cell cell){
-		int distance = Math.abs(this.x-cell.getX());
-		distance += Math.abs(this.y-cell.getY());
-		return distance;
-	}
-	
-	public List<Cell> getNearbyCells(int noOfXCells, int noOfYCells, int distance){
-		if(distance<0){
-			LogManager.getLogger(Cell.class).warn("Negative distance - will not return any nearby neighbors.");
-			return null;
-		}
-		List<Cell> nearbyCells = new ArrayList<Cell>();
-		for(int i= this.x -distance; i<=this.x+distance; i++){
-			if (i>=0 && i<= noOfXCells) {
-				for (int j = this.y - distance; j <= this.y + distance; j++) {
-					if (j>=0 && j<= noOfYCells) {
-						Cell nearby = new Cell(i, j);
-						if (this.getDistanceBetweenCells(nearby) < distance) {
-							nearbyCells.add(nearby);
-						}
-					}
-				}
-			}
-		}
-		return nearbyCells;
-	}
+  private final int x;
+  private final int y;
 
-	public List<Cell> getCellsWithExactDistance(int noOfXCells, int noOfYCells, int distance) {
-		if(distance<0){
-			LogManager.getLogger(Cell.class).warn("Negative distance - will not return any nearby neighbors.");
-			return null;
-		}
-		List<Cell> cells = new ArrayList<Cell>();
-		
-		for(int i = this.x-distance; i< this.x+ distance+1; i++){
-			if(i>=0 && i<= noOfXCells){
-				int xDistance = Math.abs(this.x-i);
-				int y1 = -distance + xDistance + this.y;
-				int y2 = distance - xDistance + this.y;
-				if(y1>=0 && y1<= noOfYCells){
-					cells.add(new Cell(i, y1));
-				}
-				if(y2>=0 && y2 <= noOfYCells && y2-y1!=0){
-					cells.add(new Cell(i, y2));
-				}
-			}
-		}
-		
-		return cells;
-	}
-	
-	public String toString(){
-		return "x = " + this.x + " y = " + this.y;
-	}
+  public Cell(int x, int y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  public int getX() {
+    return this.x;
+  }
+
+  public int getY() {
+    return this.y;
+  }
+
+  public int getDistanceBetweenCells(Cell cell) {
+    int distance = Math.abs(this.x - cell.getX());
+    distance += Math.abs(this.y - cell.getY());
+    return distance;
+  }
+
+  public List<Cell> getNearbyCells(int noOfXCells, int noOfYCells, int distance) {
+    if (distance < 0) {
+      LogManager.getLogger(Cell.class)
+          .warn("Negative distance - will not return any nearby neighbors.");
+      return null;
+    }
+    List<Cell> nearbyCells = new ArrayList<Cell>();
+    for (int i = this.x - distance; i <= this.x + distance; i++) {
+      if (i >= 0 && i <= noOfXCells) {
+        for (int j = this.y - distance; j <= this.y + distance; j++) {
+          if (j >= 0 && j <= noOfYCells) {
+            Cell nearby = new Cell(i, j);
+            if (this.getDistanceBetweenCells(nearby) < distance) {
+              nearbyCells.add(nearby);
+            }
+          }
+        }
+      }
+    }
+    return nearbyCells;
+  }
+
+  public List<Cell> getCellsWithExactDistance(int noOfXCells, int noOfYCells, int distance) {
+    if (distance < 0) {
+      LogManager.getLogger(Cell.class)
+          .warn("Negative distance - will not return any nearby neighbors.");
+      return null;
+    }
+    List<Cell> cells = new ArrayList<Cell>();
+
+    for (int i = this.x - distance; i < this.x + distance + 1; i++) {
+      if (i >= 0 && i <= noOfXCells) {
+        int xDistance = Math.abs(this.x - i);
+        int y1 = -distance + xDistance + this.y;
+        int y2 = distance - xDistance + this.y;
+        if (y1 >= 0 && y1 <= noOfYCells) {
+          cells.add(new Cell(i, y1));
+        }
+        if (y2 >= 0 && y2 <= noOfYCells && y2 - y1 != 0) {
+          cells.add(new Cell(i, y2));
+        }
+      }
+    }
+
+    return cells;
+  }
+
+  public String toString() {
+    return "x = " + this.x + " y = " + this.y;
+  }
 }

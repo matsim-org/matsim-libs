@@ -20,12 +20,11 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.Collection;
-
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
  * @author michalm
  */
 public interface UnplannedRequestInserter {
-	void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests);
+  void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests);
 }

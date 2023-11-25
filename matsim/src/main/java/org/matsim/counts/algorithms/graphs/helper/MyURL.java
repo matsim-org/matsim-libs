@@ -21,12 +21,11 @@
 package org.matsim.counts.algorithms.graphs.helper;
 
 public class MyURL {
-	public final String address;
-	public final String displayText;
+  public final String address;
+  public final String displayText;
 
-	public MyURL(String address, String displayText){
-		this.address=address;
-		this.displayText=displayText;
-	}
-
+  public MyURL(String address, String displayText) {
+    this.address = address;
+    this.displayText = displayText;
+  }
 }

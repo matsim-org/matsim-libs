@@ -35,19 +35,21 @@ import org.matsim.facilities.ActivityFacilities;
 
 public class SubtourModeChoice implements Provider<PlanStrategy> {
 
-	@Inject private Provider<TripRouter> tripRouterProvider;
-	@Inject private GlobalConfigGroup globalConfigGroup;
-	@Inject private SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup;
-	@Inject private ActivityFacilities facilities;
-	@Inject private PermissibleModesCalculator permissibleModesCalculator;
-	@Inject private TimeInterpretation timeInterpretation;
+  @Inject private Provider<TripRouter> tripRouterProvider;
+  @Inject private GlobalConfigGroup globalConfigGroup;
+  @Inject private SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup;
+  @Inject private ActivityFacilities facilities;
+  @Inject private PermissibleModesCalculator permissibleModesCalculator;
+  @Inject private TimeInterpretation timeInterpretation;
 
-	@Override
-	public PlanStrategy get() {
-		PlanStrategyImpl.Builder builder = new Builder(new RandomPlanSelector<>());
-		builder.addStrategyModule(new org.matsim.core.replanning.modules.SubtourModeChoice(globalConfigGroup, subtourModeChoiceConfigGroup, permissibleModesCalculator));
-		builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
-		return builder.build();
-	}
-
+  @Override
+  public PlanStrategy get() {
+    PlanStrategyImpl.Builder builder = new Builder(new RandomPlanSelector<>());
+    builder.addStrategyModule(
+        new org.matsim.core.replanning.modules.SubtourModeChoice(
+            globalConfigGroup, subtourModeChoiceConfigGroup, permissibleModesCalculator));
+    builder.addStrategyModule(
+        new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
+    return builder.build();
+  }
 }

@@ -27,32 +27,31 @@ import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 
 class HermesBuilder implements AllowsConfiguration {
 
-	@Override
-	public AllowsConfiguration addOverridingModule(AbstractModule abstractModule) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  @Override
+  public AllowsConfiguration addOverridingModule(AbstractModule abstractModule) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	@Override
-	public AllowsConfiguration addOverridingQSimModule(AbstractQSimModule qsimModule) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  @Override
+  public AllowsConfiguration addOverridingQSimModule(AbstractQSimModule qsimModule) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	@Override
-	public AllowsConfiguration addQSimModule(AbstractQSimModule qsimModule) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  @Override
+  public AllowsConfiguration addQSimModule(AbstractQSimModule qsimModule) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	@Override
-	public AllowsConfiguration configureQSimComponents(QSimComponentsConfigurator configurator) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	public Hermes build(Scenario scenario, EventsManager eventsmanager) {
-		return new Hermes(scenario, eventsmanager);
-	}
+  @Override
+  public AllowsConfiguration configureQSimComponents(QSimComponentsConfigurator configurator) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
+  public Hermes build(Scenario scenario, EventsManager eventsmanager) {
+    return new Hermes(scenario, eventsmanager);
+  }
 }

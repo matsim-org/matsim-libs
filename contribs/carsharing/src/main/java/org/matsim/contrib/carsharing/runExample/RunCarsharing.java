@@ -1,11 +1,10 @@
 package org.matsim.contrib.carsharing.runExample;
 
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
@@ -51,142 +50,145 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
-
 /**
  * @author balac
  */
-
 public class RunCarsharing {
 
-	public static void main(String[] args) {
-		final Config config = ConfigUtils.loadConfig(args[0]);
+  public static void main(String[] args) {
+    final Config config = ConfigUtils.loadConfig(args[0]);
 
-		if (Integer.parseInt(config.getModule("qsim").getValue("numberOfThreads")) > 1)
-			LogManager.getLogger("org.matsim.core.controler").warn(
-					"Carsharing contrib is not stable for parallel qsim!! If the error occures please use 1 as the number of threads.");
+    if (Integer.parseInt(config.getModule("qsim").getValue("numberOfThreads")) > 1)
+      LogManager.getLogger("org.matsim.core.controler")
+          .warn(
+              "Carsharing contrib is not stable for parallel qsim!! If the error occures please use 1 as the number of threads.");
 
-		CarsharingUtils.addConfigModules(config);
+    CarsharingUtils.addConfigModules(config);
 
-		final Scenario sc = ScenarioUtils.createScenario(config);
-		sc.getPopulation().getFactory().getRouteFactories().setRouteFactory(CarsharingRoute.class,
-				new CarsharingRouteFactory());
-		ScenarioUtils.loadScenario(sc);
+    final Scenario sc = ScenarioUtils.createScenario(config);
+    sc.getPopulation()
+        .getFactory()
+        .getRouteFactories()
+        .setRouteFactory(CarsharingRoute.class, new CarsharingRouteFactory());
+    ScenarioUtils.loadScenario(sc);
 
-		final Controler controler = new Controler(sc);
+    final Controler controler = new Controler(sc);
 
-		installCarSharing(controler);
+    installCarSharing(controler);
 
-		controler.run();
+    controler.run();
+  }
 
-	}
+  public static void installCarSharing(final Controler controler) {
 
-	public static void installCarSharing(final Controler controler) {
+    final Scenario scenario = controler.getScenario();
+    TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+    Set<String> modes = new HashSet<>();
+    modes.add("car");
+    Network networkFF = NetworkUtils.createNetwork();
+    filter.filter(networkFF, modes);
+    CarsharingXmlReaderNew reader = new CarsharingXmlReaderNew(networkFF);
 
-		final Scenario scenario = controler.getScenario();
-		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
-		Set<String> modes = new HashSet<>();
-		modes.add("car");
-		Network networkFF = NetworkUtils.createNetwork();
-		filter.filter(networkFF, modes);
-		CarsharingXmlReaderNew reader = new CarsharingXmlReaderNew(networkFF);
+    final CarsharingConfigGroup configGroup =
+        (CarsharingConfigGroup) scenario.getConfig().getModule(CarsharingConfigGroup.GROUP_NAME);
 
-		final CarsharingConfigGroup configGroup = (CarsharingConfigGroup) scenario.getConfig()
-				.getModule(CarsharingConfigGroup.GROUP_NAME);
+    reader.readFile(configGroup.getvehiclelocations());
 
-		reader.readFile(configGroup.getvehiclelocations());
+    Set<String> carsharingCompanies = reader.getCompanies().keySet();
 
-		Set<String> carsharingCompanies = reader.getCompanies().keySet();
+    MembershipReader membershipReader = new MembershipReader();
 
-		MembershipReader membershipReader = new MembershipReader();
+    membershipReader.readFile(configGroup.getmembership());
 
-		membershipReader.readFile(configGroup.getmembership());
+    final MembershipContainer memberships = membershipReader.getMembershipContainer();
 
-		final MembershipContainer memberships = membershipReader.getMembershipContainer();
+    final CostsCalculatorContainer costsCalculatorContainer =
+        CarsharingUtils.createCompanyCostsStructure(carsharingCompanies);
 
-		final CostsCalculatorContainer costsCalculatorContainer = CarsharingUtils
-				.createCompanyCostsStructure(carsharingCompanies);
+    final CarsharingListener carsharingListener = new CarsharingListener();
+    // final CarsharingSupplyInterface carsharingSupplyContainer = new
+    // CarsharingSupplyContainer(controler.getScenario());
 
-		final CarsharingListener carsharingListener = new CarsharingListener();
-		// final CarsharingSupplyInterface carsharingSupplyContainer = new
-		// CarsharingSupplyContainer(controler.getScenario());
+    final KeepingTheCarModel keepingCarModel = new KeepingTheCarModelExample();
+    final ChooseTheCompany chooseCompany = new ChooseTheCompanyExample();
+    final ChooseVehicleType chooseCehicleType = new ChooseVehicleTypeExample();
+    final RouterProvider routerProvider = new RouterProviderImpl();
+    final CurrentTotalDemand currentTotalDemand = new CurrentTotalDemandImpl(networkFF);
+    // final CarsharingManagerInterface carsharingManager = new
+    // CarsharingManagerNew();
+    final RouteCarsharingTrip routeCarsharingTrip = new RouteCarsharingTripImpl();
+    final VehicleChoiceAgent vehicleChoiceAgent = new VehicleChoiceAgentImpl();
+    // ===adding carsharing objects on supply and demand infrastructure ===
+    controler.addOverridingQSimModule(new CarSharingQSimModule());
+    controler.addOverridingModule(new DvrpTravelTimeModule());
+    controler.configureQSimComponents(CarSharingQSimModule::configureComponents);
 
-		final KeepingTheCarModel keepingCarModel = new KeepingTheCarModelExample();
-		final ChooseTheCompany chooseCompany = new ChooseTheCompanyExample();
-		final ChooseVehicleType chooseCehicleType = new ChooseVehicleTypeExample();
-		final RouterProvider routerProvider = new RouterProviderImpl();
-		final CurrentTotalDemand currentTotalDemand = new CurrentTotalDemandImpl(networkFF);
-		// final CarsharingManagerInterface carsharingManager = new
-		// CarsharingManagerNew();
-		final RouteCarsharingTrip routeCarsharingTrip = new RouteCarsharingTripImpl();
-		final VehicleChoiceAgent vehicleChoiceAgent = new VehicleChoiceAgentImpl();
-		// ===adding carsharing objects on supply and demand infrastructure ===
-		controler.addOverridingQSimModule(new CarSharingQSimModule());
-		controler.addOverridingModule(new DvrpTravelTimeModule());
-		controler.configureQSimComponents(CarSharingQSimModule::configureComponents);
+    controler.addOverridingModule(
+        new AbstractModule() {
 
-		controler.addOverridingModule(new AbstractModule() {
+          @Override
+          public void install() {
+            bind(KeepingTheCarModel.class).toInstance(keepingCarModel);
+            bind(ChooseTheCompany.class).toInstance(chooseCompany);
+            bind(ChooseVehicleType.class).toInstance(chooseCehicleType);
+            bind(RouterProvider.class).toInstance(routerProvider);
+            bind(CurrentTotalDemand.class).toInstance(currentTotalDemand);
+            bind(RouteCarsharingTrip.class).toInstance(routeCarsharingTrip);
+            bind(CostsCalculatorContainer.class).toInstance(costsCalculatorContainer);
+            bind(MembershipContainer.class).toInstance(memberships);
+            bind(CarsharingSupplyInterface.class).to(CarsharingSupplyContainer.class);
+            bind(CarsharingManagerInterface.class).to(CarsharingManagerNew.class);
+            bind(VehicleChoiceAgent.class).toInstance(vehicleChoiceAgent);
+            bind(DemandHandler.class).asEagerSingleton();
+            bind(Network.class)
+                .annotatedWith(Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING))
+                .to(Network.class);
 
-			@Override
-			public void install() {
-				bind(KeepingTheCarModel.class).toInstance(keepingCarModel);
-				bind(ChooseTheCompany.class).toInstance(chooseCompany);
-				bind(ChooseVehicleType.class).toInstance(chooseCehicleType);
-				bind(RouterProvider.class).toInstance(routerProvider);
-				bind(CurrentTotalDemand.class).toInstance(currentTotalDemand);
-				bind(RouteCarsharingTrip.class).toInstance(routeCarsharingTrip);
-				bind(CostsCalculatorContainer.class).toInstance(costsCalculatorContainer);
-				bind(MembershipContainer.class).toInstance(memberships);
-				bind(CarsharingSupplyInterface.class).to(CarsharingSupplyContainer.class);
-				bind(CarsharingManagerInterface.class).to(CarsharingManagerNew.class);
-				bind(VehicleChoiceAgent.class).toInstance(vehicleChoiceAgent);
-				bind(DemandHandler.class).asEagerSingleton();
-				bind(Network.class).annotatedWith(Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING))
-						.to(Network.class);
+            bind(Network.class).annotatedWith(Names.named("carnetwork")).toInstance(networkFF);
+            bind(TravelTime.class)
+                .annotatedWith(Names.named("ff"))
+                .to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
+          }
+        });
 
-				bind(Network.class).annotatedWith(Names.named("carnetwork")).toInstance(networkFF);
-				bind(TravelTime.class).annotatedWith(Names.named("ff"))
-						.to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
-			}
+    // === carsharing specific replanning strategies ===
 
-		});
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            this.addPlanStrategyBinding("RandomTripToCarsharingStrategy")
+                .to(RandomTripToCarsharingStrategy.class);
+            this.addPlanStrategyBinding("CarsharingSubtourModeChoiceStrategy")
+                .to(CarsharingSubtourModeChoiceStrategy.class);
+          }
+        });
 
-		// === carsharing specific replanning strategies ===
+    // === adding qsimfactory, controller listeners and event handlers
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
+            addControlerListenerBinding().toInstance(carsharingListener);
+            addControlerListenerBinding().to(CarsharingManagerNew.class);
+            // bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);
+            addEventHandlerBinding().to(PersonArrivalDepartureHandler.class);
+            addEventHandlerBinding().to(DemandHandler.class);
+          }
+        });
+    // === adding carsharing specific scoring factory ===
+    controler.addOverridingModule(
+        new AbstractModule() {
 
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				this.addPlanStrategyBinding("RandomTripToCarsharingStrategy").to(RandomTripToCarsharingStrategy.class);
-				this.addPlanStrategyBinding("CarsharingSubtourModeChoiceStrategy")
-						.to(CarsharingSubtourModeChoiceStrategy.class);
-			}
-		});
+          @Override
+          public void install() {
 
-		// === adding qsimfactory, controller listeners and event handlers
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addControlerListenerBinding().toInstance(carsharingListener);
-				addControlerListenerBinding().to(CarsharingManagerNew.class);
-				// bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);
-				addEventHandlerBinding().to(PersonArrivalDepartureHandler.class);
-				addEventHandlerBinding().to(DemandHandler.class);
-			}
-		});
-		// === adding carsharing specific scoring factory ===
-		controler.addOverridingModule(new AbstractModule() {
+            bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);
+          }
+        });
 
-			@Override
-			public void install() {
+    // === routing moduels for carsharing trips ===
 
-				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);
-			}
-		});
-
-		// === routing moduels for carsharing trips ===
-
-		controler.addOverridingModule(CarsharingUtils.createRoutingModule());
-	}
-
+    controler.addOverridingModule(CarsharingUtils.createRoutingModule());
+  }
 }

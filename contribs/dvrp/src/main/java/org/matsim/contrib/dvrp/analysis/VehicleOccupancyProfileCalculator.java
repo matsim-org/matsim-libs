@@ -21,11 +21,14 @@ package org.matsim.contrib.dvrp.analysis;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.Event;
@@ -35,11 +38,11 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.common.timeprofile.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEventHandler;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
@@ -47,217 +50,222 @@ import org.matsim.contrib.dvrp.vrpagent.TaskStartedEventHandler;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-
 /**
  * @author michalm (Michal Maciejewski)
  */
 public class VehicleOccupancyProfileCalculator
-		implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TaskStartedEventHandler,
-		TaskEndedEventHandler {
+    implements PersonEntersVehicleEventHandler,
+        PersonLeavesVehicleEventHandler,
+        TaskStartedEventHandler,
+        TaskEndedEventHandler {
 
-	private static class VehicleState {
-		private Task.TaskType taskType;
-		private int occupancy;
-		private double beginTime;
-	}
+  private static class VehicleState {
+    private Task.TaskType taskType;
+    private int occupancy;
+    private double beginTime;
+  }
 
-	private final TimeDiscretizer timeDiscretizer;
+  private final TimeDiscretizer timeDiscretizer;
 
-	private Map<Task.TaskType, double[]> nonPassengerServingTaskProfiles;
-	private ImmutableList<double[]> vehicleOccupancyProfiles;
+  private Map<Task.TaskType, double[]> nonPassengerServingTaskProfiles;
+  private ImmutableList<double[]> vehicleOccupancyProfiles;
 
-	private final ImmutableSet<Task.TaskType> passengerServingTaskTypes;
-	private final Map<Id<DvrpVehicle>, VehicleState> vehicleStates = new IdMap<>(DvrpVehicle.class);
+  private final ImmutableSet<Task.TaskType> passengerServingTaskTypes;
+  private final Map<Id<DvrpVehicle>, VehicleState> vehicleStates = new IdMap<>(DvrpVehicle.class);
 
-	private final double analysisEndTime;
-	private final int maxCapacity;
+  private final double analysisEndTime;
+  private final int maxCapacity;
 
-	private final String dvrpMode;
+  private final String dvrpMode;
 
-	private boolean wasConsolidatedInThisIteration = false;
+  private boolean wasConsolidatedInThisIteration = false;
 
-	public VehicleOccupancyProfileCalculator(String dvrpMode, FleetSpecification fleet, int timeInterval,
-			QSimConfigGroup qsimConfig, ImmutableSet<Task.TaskType> passengerServingTaskTypes) {
-		this.dvrpMode = dvrpMode;
-		this.passengerServingTaskTypes = passengerServingTaskTypes;
+  public VehicleOccupancyProfileCalculator(
+      String dvrpMode,
+      FleetSpecification fleet,
+      int timeInterval,
+      QSimConfigGroup qsimConfig,
+      ImmutableSet<Task.TaskType> passengerServingTaskTypes) {
+    this.dvrpMode = dvrpMode;
+    this.passengerServingTaskTypes = passengerServingTaskTypes;
 
-		double qsimEndTime = qsimConfig.getEndTime().orElse(0);
-		double maxServiceEndTime = fleet.getVehicleSpecifications()
-				.values()
-				.stream()
-				.mapToDouble(DvrpVehicleSpecification::getServiceEndTime)
-				.max()
-				.orElse(0);
-		analysisEndTime = Math.max(qsimEndTime, maxServiceEndTime);
-		timeDiscretizer = new TimeDiscretizer((int)Math.ceil(analysisEndTime), timeInterval);
+    double qsimEndTime = qsimConfig.getEndTime().orElse(0);
+    double maxServiceEndTime =
+        fleet.getVehicleSpecifications().values().stream()
+            .mapToDouble(DvrpVehicleSpecification::getServiceEndTime)
+            .max()
+            .orElse(0);
+    analysisEndTime = Math.max(qsimEndTime, maxServiceEndTime);
+    timeDiscretizer = new TimeDiscretizer((int) Math.ceil(analysisEndTime), timeInterval);
 
-		maxCapacity = fleet.getVehicleSpecifications()
-				.values()
-				.stream()
-				.mapToInt(DvrpVehicleSpecification::getCapacity)
-				.max()
-				.orElse(0);
-	}
+    maxCapacity =
+        fleet.getVehicleSpecifications().values().stream()
+            .mapToInt(DvrpVehicleSpecification::getCapacity)
+            .max()
+            .orElse(0);
+  }
 
-	private void consolidate() {
-		Preconditions.checkState(!wasConsolidatedInThisIteration || vehicleStates.isEmpty(),
-					"The profiles has been already consolidated, but the vehicles states are not empty."
-							+ " This means consolidation was done too early (before all events has been processed)."
-							+ " Hint: run consolidate() after Mobsim is completed (e.g. MobsimBeforeCleanupEvent is sent).");
+  private void consolidate() {
+    Preconditions.checkState(
+        !wasConsolidatedInThisIteration || vehicleStates.isEmpty(),
+        "The profiles has been already consolidated, but the vehicles states are not empty."
+            + " This means consolidation was done too early (before all events has been processed)."
+            + " Hint: run consolidate() after Mobsim is completed (e.g. MobsimBeforeCleanupEvent is sent).");
 
-		if (!wasConsolidatedInThisIteration) {
-			// consolidate
-			for (VehicleState state : vehicleStates.values()) {
-				if (state.taskType != null) {
-					increment(state, analysisEndTime);
-				}
-			}
-			vehicleStates.clear();
+    if (!wasConsolidatedInThisIteration) {
+      // consolidate
+      for (VehicleState state : vehicleStates.values()) {
+        if (state.taskType != null) {
+          increment(state, analysisEndTime);
+        }
+      }
+      vehicleStates.clear();
 
-			nonPassengerServingTaskProfiles.values().forEach(this::normalizeProfile);
-			vehicleOccupancyProfiles.forEach(this::normalizeProfile);
-			wasConsolidatedInThisIteration = true;
-		}
-	}
+      nonPassengerServingTaskProfiles.values().forEach(this::normalizeProfile);
+      vehicleOccupancyProfiles.forEach(this::normalizeProfile);
+      wasConsolidatedInThisIteration = true;
+    }
+  }
 
-	private void normalizeProfile(double[] profile) {
-		for (int i = 0; i < profile.length; i++) {
-			profile[i] /= timeDiscretizer.getTimeInterval();
-		}
-	}
+  private void normalizeProfile(double[] profile) {
+    for (int i = 0; i < profile.length; i++) {
+      profile[i] /= timeDiscretizer.getTimeInterval();
+    }
+  }
 
-	public Map<Task.TaskType, double[]> getNonPassengerServingTaskProfiles() {
-		this.consolidate();
-		return nonPassengerServingTaskProfiles;
-	}
+  public Map<Task.TaskType, double[]> getNonPassengerServingTaskProfiles() {
+    this.consolidate();
+    return nonPassengerServingTaskProfiles;
+  }
 
-	public List<double[]> getVehicleOccupancyProfiles() {
-		this.consolidate();
-		return vehicleOccupancyProfiles;
-	}
+  public List<double[]> getVehicleOccupancyProfiles() {
+    this.consolidate();
+    return vehicleOccupancyProfiles;
+  }
 
-	public double[] getNumberOfVehiclesInServiceProfile() {
-		double[] numberOfVehiclesInServiceProfile = new double[timeDiscretizer.getIntervalCount()];
-		Map<Task.TaskType, double[]> nonPassengerServingTaskProfiles = getNonPassengerServingTaskProfiles();
-		List<double[]> vehicleOccupancyProfiles = getVehicleOccupancyProfiles();
-		for (int i = 0; i < timeDiscretizer.getIntervalCount(); i++) {
-			double total = 0.0;
-			for (double[] profile : nonPassengerServingTaskProfiles.values()) {
-				total += profile[i];
-			}
-			for (double[] profile : vehicleOccupancyProfiles) {
-				total += profile[i];
-			}
-			numberOfVehiclesInServiceProfile[i] = total;
-		}
-		return numberOfVehiclesInServiceProfile;
-	}
+  public double[] getNumberOfVehiclesInServiceProfile() {
+    double[] numberOfVehiclesInServiceProfile = new double[timeDiscretizer.getIntervalCount()];
+    Map<Task.TaskType, double[]> nonPassengerServingTaskProfiles =
+        getNonPassengerServingTaskProfiles();
+    List<double[]> vehicleOccupancyProfiles = getVehicleOccupancyProfiles();
+    for (int i = 0; i < timeDiscretizer.getIntervalCount(); i++) {
+      double total = 0.0;
+      for (double[] profile : nonPassengerServingTaskProfiles.values()) {
+        total += profile[i];
+      }
+      for (double[] profile : vehicleOccupancyProfiles) {
+        total += profile[i];
+      }
+      numberOfVehiclesInServiceProfile[i] = total;
+    }
+    return numberOfVehiclesInServiceProfile;
+  }
 
-	public TimeDiscretizer getTimeDiscretizer() {
-		return timeDiscretizer;
-	}
+  public TimeDiscretizer getTimeDiscretizer() {
+    return timeDiscretizer;
+  }
 
-	private void increment(VehicleState state, double endTime) {
-		Verify.verify(state.taskType != null);
-		Verify.verify(state.occupancy >= 0);
-		Verify.verify(state.occupancy <= maxCapacity);
+  private void increment(VehicleState state, double endTime) {
+    Verify.verify(state.taskType != null);
+    Verify.verify(state.occupancy >= 0);
+    Verify.verify(state.occupancy <= maxCapacity);
 
-		boolean servingPassengers = passengerServingTaskTypes.contains(state.taskType) || state.occupancy > 0;
+    boolean servingPassengers =
+        passengerServingTaskTypes.contains(state.taskType) || state.occupancy > 0;
 
-		double[] profile = servingPassengers ?
-				vehicleOccupancyProfiles.get(state.occupancy) :
-				nonPassengerServingTaskProfiles.computeIfAbsent(state.taskType,
-						v -> new double[timeDiscretizer.getIntervalCount()]);
-		increment(profile, Math.min(state.beginTime, endTime), endTime);
-	}
+    double[] profile =
+        servingPassengers
+            ? vehicleOccupancyProfiles.get(state.occupancy)
+            : nonPassengerServingTaskProfiles.computeIfAbsent(
+                state.taskType, v -> new double[timeDiscretizer.getIntervalCount()]);
+    increment(profile, Math.min(state.beginTime, endTime), endTime);
+  }
 
-	private void increment(double[] values, double beginTime, double endTime) {
-		if (beginTime == endTime && beginTime >= analysisEndTime) {
-			return;
-		}
-		endTime = Math.min(endTime, analysisEndTime);
+  private void increment(double[] values, double beginTime, double endTime) {
+    if (beginTime == endTime && beginTime >= analysisEndTime) {
+      return;
+    }
+    endTime = Math.min(endTime, analysisEndTime);
 
-		double timeInterval = timeDiscretizer.getTimeInterval();
-		int fromIdx = timeDiscretizer.getIdx(beginTime);
-		int toIdx = timeDiscretizer.getIdx(endTime);
+    double timeInterval = timeDiscretizer.getTimeInterval();
+    int fromIdx = timeDiscretizer.getIdx(beginTime);
+    int toIdx = timeDiscretizer.getIdx(endTime);
 
-		for (int i = fromIdx; i < toIdx; i++) {
-			values[i] += timeInterval;
-		}
+    for (int i = fromIdx; i < toIdx; i++) {
+      values[i] += timeInterval;
+    }
 
-		// reduce first time bin
-		values[fromIdx] -= beginTime % timeInterval;
+    // reduce first time bin
+    values[fromIdx] -= beginTime % timeInterval;
 
-		// handle last time bin
-		values[toIdx] += endTime % timeInterval;
-	}
+    // handle last time bin
+    values[toIdx] += endTime % timeInterval;
+  }
 
-	/* Event handling starts here */
+  /* Event handling starts here */
 
-	@Override
-	public void handleEvent(TaskStartedEvent event) {
-		if (!event.getDvrpMode().equals(dvrpMode)) {
-			return;
-		}
+  @Override
+  public void handleEvent(TaskStartedEvent event) {
+    if (!event.getDvrpMode().equals(dvrpMode)) {
+      return;
+    }
 
-		final VehicleState state;
-		if (event.getTaskIndex() == 0) {
-			state = new VehicleState();
-			vehicleStates.put(event.getDvrpVehicleId(), state);
-		} else {
-			state = vehicleStates.get(event.getDvrpVehicleId());
-		}
-		state.taskType = event.getTaskType();
-		state.beginTime = event.getTime();
-	}
+    final VehicleState state;
+    if (event.getTaskIndex() == 0) {
+      state = new VehicleState();
+      vehicleStates.put(event.getDvrpVehicleId(), state);
+    } else {
+      state = vehicleStates.get(event.getDvrpVehicleId());
+    }
+    state.taskType = event.getTaskType();
+    state.beginTime = event.getTime();
+  }
 
-	@Override
-	public void handleEvent(TaskEndedEvent event) {
-		if (!event.getDvrpMode().equals(dvrpMode)) {
-			return;
-		}
+  @Override
+  public void handleEvent(TaskEndedEvent event) {
+    if (!event.getDvrpMode().equals(dvrpMode)) {
+      return;
+    }
 
-		VehicleState state = vehicleStates.get(event.getDvrpVehicleId());
-		increment(state, event.getTime());
-		state.taskType = null;
-	}
+    VehicleState state = vehicleStates.get(event.getDvrpVehicleId());
+    increment(state, event.getTime());
+    state.taskType = null;
+  }
 
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		processOccupancyChange(event, event.getVehicleId(), +1);
-	}
+  @Override
+  public void handleEvent(PersonEntersVehicleEvent event) {
+    processOccupancyChange(event, event.getVehicleId(), +1);
+  }
 
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		processOccupancyChange(event, event.getVehicleId(), -1);
-	}
+  @Override
+  public void handleEvent(PersonLeavesVehicleEvent event) {
+    processOccupancyChange(event, event.getVehicleId(), -1);
+  }
 
-	private <E extends Event & HasPersonId> void processOccupancyChange(E event, Id<Vehicle> vehicleId, int change) {
-		VehicleState state = vehicleStates.get(Id.create(vehicleId, DvrpVehicle.class));
-		if (state != null && !isDriver(event.getPersonId(), vehicleId)) {
-			increment(state, event.getTime());
-			state.occupancy += change;
-			state.beginTime = event.getTime();
-		}
-	}
+  private <E extends Event & HasPersonId> void processOccupancyChange(
+      E event, Id<Vehicle> vehicleId, int change) {
+    VehicleState state = vehicleStates.get(Id.create(vehicleId, DvrpVehicle.class));
+    if (state != null && !isDriver(event.getPersonId(), vehicleId)) {
+      increment(state, event.getTime());
+      state.occupancy += change;
+      state.beginTime = event.getTime();
+    }
+  }
 
-	private boolean isDriver(Id<Person> personId, Id<Vehicle> vehicleId) {
-		return personId.equals(vehicleId);
-	}
+  private boolean isDriver(Id<Person> personId, Id<Vehicle> vehicleId) {
+    return personId.equals(vehicleId);
+  }
 
-	@Override
-	public void reset(int iteration) {
-		vehicleStates.clear();
+  @Override
+  public void reset(int iteration) {
+    vehicleStates.clear();
 
-		vehicleOccupancyProfiles = IntStream.rangeClosed(0, maxCapacity)
-				.mapToObj(i -> new double[timeDiscretizer.getIntervalCount()])
-				.collect(toImmutableList());
+    vehicleOccupancyProfiles =
+        IntStream.rangeClosed(0, maxCapacity)
+            .mapToObj(i -> new double[timeDiscretizer.getIntervalCount()])
+            .collect(toImmutableList());
 
-		nonPassengerServingTaskProfiles = new HashMap<>();
-		wasConsolidatedInThisIteration = false;
-	}
+    nonPassengerServingTaskProfiles = new HashMap<>();
+    wasConsolidatedInThisIteration = false;
+  }
 }

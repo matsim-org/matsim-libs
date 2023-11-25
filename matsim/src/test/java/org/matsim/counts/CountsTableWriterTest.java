@@ -24,31 +24,29 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Locale;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.testcases.MatsimTestUtils;
 
-
 public class CountsTableWriterTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+  @Test
+  public void testTableCreation() {
+    CountsFixture fixture = new CountsFixture();
+    fixture.setUp();
 
-	@Test public void testTableCreation() {
-		CountsFixture fixture = new CountsFixture();
-		fixture.setUp();
+    CountsComparisonAlgorithm cca = fixture.getCCA();
+    cca.run();
 
-		CountsComparisonAlgorithm cca = fixture.getCCA();
-		cca.run();
+    CountSimComparisonTableWriter ctw =
+        new CountSimComparisonTableWriter(cca.getComparison(), Locale.ENGLISH);
+    ctw.writeFile(utils.getOutputDirectory() + "/countTable.txt");
 
-		CountSimComparisonTableWriter ctw = new CountSimComparisonTableWriter(cca.getComparison(), Locale.ENGLISH);
-		ctw.writeFile(utils.getOutputDirectory() + "/countTable.txt");
-
-		File f = new File(utils.getOutputDirectory() + "/countTable.txt");
-		assertTrue(f.length() > 0.0);
-	}
+    File f = new File(utils.getOutputDirectory() + "/countTable.txt");
+    assertTrue(f.length() > 0.0);
+  }
 }

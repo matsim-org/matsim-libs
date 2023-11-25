@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -40,283 +39,259 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.socnetsim.framework.population.JointPlan;
+import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
+import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
+import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 
-import org.matsim.contrib.socnetsim.framework.population.JointPlan;
-import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
-import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
-import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
-
 /**
  * @author thibautd
  */
 public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
-	private static final Logger log =
-		LogManager.getLogger(AllocateVehicleToPlansInGroupPlanAlgorithmTest.class);
+  private static final Logger log =
+      LogManager.getLogger(AllocateVehicleToPlansInGroupPlanAlgorithmTest.class);
 
-	private static final String MODE = "the_vehicular_mode";
+  private static final String MODE = "the_vehicular_mode";
 
-	// uncomment to get more information in case of failure
-	//@Before
-	//public void setupLog() {
-	//	LogManager.getLogger( AllocateVehicleToPlansInGroupPlanAlgorithm.class ).setLevel( Level.TRACE );
-	//}
+  // uncomment to get more information in case of failure
+  // @Before
+  // public void setupLog() {
+  //	LogManager.getLogger( AllocateVehicleToPlansInGroupPlanAlgorithm.class ).setLevel( Level.TRACE
+  // );
+  // }
 
-	private GroupPlans createTestPlan() {
-		final List<Plan> indivPlans = new ArrayList<Plan>();
-		final List<JointPlan> jointPlans = new ArrayList<JointPlan>();
+  private GroupPlans createTestPlan() {
+    final List<Plan> indivPlans = new ArrayList<Plan>();
+    final List<JointPlan> jointPlans = new ArrayList<JointPlan>();
 
-		final PopulationFactory popFact = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory();
-		for ( int i = 0; i < 5; i++ ) {
-			final Person person = popFact.createPerson( Id.createPersonId( "indiv-"+i ) );
-			final Plan plan = popFact.createPlan();
-			person.addPlan( plan );
-			plan.setPerson( person );
-			indivPlans.add( plan );
+    final PopulationFactory popFact =
+        ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
+    for (int i = 0; i < 5; i++) {
+      final Person person = popFact.createPerson(Id.createPersonId("indiv-" + i));
+      final Plan plan = popFact.createPlan();
+      person.addPlan(plan);
+      plan.setPerson(person);
+      indivPlans.add(plan);
 
-			plan.addActivity( popFact.createActivityFromCoord( "h" , new Coord((double) 12, (double) 34)) );
-			if ( i % 2 == 0 ) {
-				plan.addLeg( popFact.createLeg( "some_non_vehicular_mode" ) );
-			}
-			else {
-				final Leg l = popFact.createLeg( MODE );
-				l.setRoute( RouteUtils.createLinkNetworkRouteImpl(Id.createLinkId( 1 ), Id.createLinkId( 12 )) );
-				plan.addLeg( l );
-			}
-			plan.addActivity( popFact.createActivityFromLinkId( "h" , Id.createLinkId( 42 ) ) );
-		}
+      plan.addActivity(popFact.createActivityFromCoord("h", new Coord((double) 12, (double) 34)));
+      if (i % 2 == 0) {
+        plan.addLeg(popFact.createLeg("some_non_vehicular_mode"));
+      } else {
+        final Leg l = popFact.createLeg(MODE);
+        l.setRoute(RouteUtils.createLinkNetworkRouteImpl(Id.createLinkId(1), Id.createLinkId(12)));
+        plan.addLeg(l);
+      }
+      plan.addActivity(popFact.createActivityFromLinkId("h", Id.createLinkId(42)));
+    }
 
-		final JointPlanFactory jpFact = new JointPlanFactory();
-		for ( int i = 1; i < 5; i++ ) {
-			final Map<Id<Person>, Plan> plans = new HashMap< >();
-			for ( int j = 0; j < i; j++ ) {
-				final Person person = popFact.createPerson( Id.createPersonId( "joint-"+i+"-"+j ) );
-				final Plan plan = popFact.createPlan();
-				person.addPlan( plan );
-				plan.setPerson( person );
-				plans.put( person.getId() , plan );
+    final JointPlanFactory jpFact = new JointPlanFactory();
+    for (int i = 1; i < 5; i++) {
+      final Map<Id<Person>, Plan> plans = new HashMap<>();
+      for (int j = 0; j < i; j++) {
+        final Person person = popFact.createPerson(Id.createPersonId("joint-" + i + "-" + j));
+        final Plan plan = popFact.createPlan();
+        person.addPlan(plan);
+        plan.setPerson(person);
+        plans.put(person.getId(), plan);
 
-				plan.addActivity( popFact.createActivityFromCoord( "h" , new Coord((double) 12, (double) 34)) );
-				if ( (j+1) % 2 == 0 ) {
-					plan.addLeg( popFact.createLeg( "some_non_vehicular_mode" ) );
-				}
-				else {
-					final Leg l = popFact.createLeg( MODE );
-					l.setRoute( RouteUtils.createLinkNetworkRouteImpl(Id.createLinkId( 1 ), Id.createLinkId( 12 )) );
-					plan.addLeg( l );
-				}
-				plan.addActivity( popFact.createActivityFromLinkId( "h" , Id.createLinkId( 42 ) ) );
-			}
-			jointPlans.add( jpFact.createJointPlan( plans ) );
-		}
+        plan.addActivity(popFact.createActivityFromCoord("h", new Coord((double) 12, (double) 34)));
+        if ((j + 1) % 2 == 0) {
+          plan.addLeg(popFact.createLeg("some_non_vehicular_mode"));
+        } else {
+          final Leg l = popFact.createLeg(MODE);
+          l.setRoute(
+              RouteUtils.createLinkNetworkRouteImpl(Id.createLinkId(1), Id.createLinkId(12)));
+          plan.addLeg(l);
+        }
+        plan.addActivity(popFact.createActivityFromLinkId("h", Id.createLinkId(42)));
+      }
+      jointPlans.add(jpFact.createJointPlan(plans));
+    }
 
-		return new GroupPlans( jointPlans , indivPlans );
-	}
+    return new GroupPlans(jointPlans, indivPlans);
+  }
 
-	@Test
-	public void testEnoughVehiclesForEverybody() {
-		// tests that one vehicle is allocated to each one if possible
-		final Random random = new Random( 1234 );
+  @Test
+  public void testEnoughVehiclesForEverybody() {
+    // tests that one vehicle is allocated to each one if possible
+    final Random random = new Random(1234);
 
-		for ( int i = 0; i < 10 ; i++ ) {
-			final GroupPlans testPlan = createTestPlan();
-			final VehicleRessources vehs = createEnoughVehicles( testPlan );
+    for (int i = 0; i < 10; i++) {
+      final GroupPlans testPlan = createTestPlan();
+      final VehicleRessources vehs = createEnoughVehicles(testPlan);
 
-			final AllocateVehicleToPlansInGroupPlanAlgorithm algo =
-				new AllocateVehicleToPlansInGroupPlanAlgorithm(
-						random,
-						vehs,
-						Collections.singleton( MODE ),
-						false,
-						false);
-			algo.run( testPlan );
+      final AllocateVehicleToPlansInGroupPlanAlgorithm algo =
+          new AllocateVehicleToPlansInGroupPlanAlgorithm(
+              random, vehs, Collections.singleton(MODE), false, false);
+      algo.run(testPlan);
 
-			final Set<Id> allocated = new HashSet<Id>();
-			for ( Plan p : testPlan.getAllIndividualPlans() ) {
-				final Id v = assertSingleVehicleAndGetVehicleId( p );
-				Assert.assertTrue(
-						"vehicle "+v+" already allocated",
-						v == null || allocated.add( v ) );
-			}
-		}
-	}
+      final Set<Id> allocated = new HashSet<Id>();
+      for (Plan p : testPlan.getAllIndividualPlans()) {
+        final Id v = assertSingleVehicleAndGetVehicleId(p);
+        Assert.assertTrue("vehicle " + v + " already allocated", v == null || allocated.add(v));
+      }
+    }
+  }
 
-	@Test
-	public void testOneVehiclePerTwoPersons() {
-		// tests that the allocation minimizes overlaps
-		final Random random = new Random( 1234 );
+  @Test
+  public void testOneVehiclePerTwoPersons() {
+    // tests that the allocation minimizes overlaps
+    final Random random = new Random(1234);
 
-		for ( int i = 0; i < 10 ; i++ ) {
-			final GroupPlans testPlan = createTestPlan();
-			final VehicleRessources vehs = createHalfVehicles( testPlan );
+    for (int i = 0; i < 10; i++) {
+      final GroupPlans testPlan = createTestPlan();
+      final VehicleRessources vehs = createHalfVehicles(testPlan);
 
-			final AllocateVehicleToPlansInGroupPlanAlgorithm algo =
-				new AllocateVehicleToPlansInGroupPlanAlgorithm(
-						random,
-						vehs,
-						Collections.singleton( MODE ),
-						false,
-						false);
-			algo.run( testPlan );
+      final AllocateVehicleToPlansInGroupPlanAlgorithm algo =
+          new AllocateVehicleToPlansInGroupPlanAlgorithm(
+              random, vehs, Collections.singleton(MODE), false, false);
+      algo.run(testPlan);
 
-			final Map<Id, Integer> counts = new LinkedHashMap<Id, Integer>();
-			for ( Plan p : testPlan.getAllIndividualPlans() ) {
-				final Id v = assertSingleVehicleAndGetVehicleId( p );
-				// non-vehicular plan?
-				if ( v == null ) continue;
-				Integer c = counts.get( v );
-				counts.put( v , c == null ? 1 : c + 1 );
-			}
+      final Map<Id, Integer> counts = new LinkedHashMap<Id, Integer>();
+      for (Plan p : testPlan.getAllIndividualPlans()) {
+        final Id v = assertSingleVehicleAndGetVehicleId(p);
+        // non-vehicular plan?
+        if (v == null) continue;
+        Integer c = counts.get(v);
+        counts.put(v, c == null ? 1 : c + 1);
+      }
 
-			final int max = Collections.max( counts.values() );
-			Assert.assertTrue(
-					"one vehicle was allocated "+max+" times while maximum expected was 2 in "+counts,
-					max <= 2 );
-		}
-	}
+      final int max = Collections.max(counts.values());
+      Assert.assertTrue(
+          "one vehicle was allocated " + max + " times while maximum expected was 2 in " + counts,
+          max <= 2);
+    }
+  }
 
-	@Test
-	public void testRandomness() {
-		final Random random = new Random( 1234 );
+  @Test
+  public void testRandomness() {
+    final Random random = new Random(1234);
 
-		final Map<Id, Id> allocations = new HashMap<Id, Id>();
-		final Set<Id> agentsWithSeveralVehicles = new HashSet<Id>();
-		for ( int i = 0; i < 50 ; i++ ) {
-			final GroupPlans testPlan = createTestPlan();
-			final VehicleRessources vehs = createHalfVehicles( testPlan );
+    final Map<Id, Id> allocations = new HashMap<Id, Id>();
+    final Set<Id> agentsWithSeveralVehicles = new HashSet<Id>();
+    for (int i = 0; i < 50; i++) {
+      final GroupPlans testPlan = createTestPlan();
+      final VehicleRessources vehs = createHalfVehicles(testPlan);
 
-			final AllocateVehicleToPlansInGroupPlanAlgorithm algo =
-				new AllocateVehicleToPlansInGroupPlanAlgorithm(
-						random,
-						vehs,
-						Collections.singleton( MODE ),
-						false,
-						false);
-			algo.run( testPlan );
+      final AllocateVehicleToPlansInGroupPlanAlgorithm algo =
+          new AllocateVehicleToPlansInGroupPlanAlgorithm(
+              random, vehs, Collections.singleton(MODE), false, false);
+      algo.run(testPlan);
 
-			for ( Plan p : testPlan.getAllIndividualPlans() ) {
-				final Id v = assertSingleVehicleAndGetVehicleId( p );
-				// non-vehicular plan?
-				if ( v == null ) continue;
-				final Id person = p.getPerson().getId();
-				final Id oldV = allocations.get( person );
-				
-				if ( oldV == null ) {
-					allocations.put( person , v );
-				}
-				else if ( !oldV.equals( v ) ) {
-					agentsWithSeveralVehicles.add( person );
-				}
-			}
-		}
+      for (Plan p : testPlan.getAllIndividualPlans()) {
+        final Id v = assertSingleVehicleAndGetVehicleId(p);
+        // non-vehicular plan?
+        if (v == null) continue;
+        final Id person = p.getPerson().getId();
+        final Id oldV = allocations.get(person);
 
-		Assert.assertEquals(
-				"unexpected number of agents having got several vehicles",
-				allocations.size(),
-				agentsWithSeveralVehicles.size() );
-	}
+        if (oldV == null) {
+          allocations.put(person, v);
+        } else if (!oldV.equals(v)) {
+          agentsWithSeveralVehicles.add(person);
+        }
+      }
+    }
 
-	@Test
-	public void testDeterminism() {
-		final Map<Id, Id> allocations = new HashMap<Id, Id>();
-		final Set<Id> agentsWithSeveralVehicles = new HashSet<Id>();
-		for ( int i = 0; i < 50 ; i++ ) {
-			final GroupPlans testPlan = createTestPlan();
-			final VehicleRessources vehs = createHalfVehicles( testPlan );
+    Assert.assertEquals(
+        "unexpected number of agents having got several vehicles",
+        allocations.size(),
+        agentsWithSeveralVehicles.size());
+  }
 
-			final AllocateVehicleToPlansInGroupPlanAlgorithm algo =
-				new AllocateVehicleToPlansInGroupPlanAlgorithm(
-						new Random( 1432 ),
-						vehs,
-						Collections.singleton( MODE ),
-						false,
-						false);
-			algo.run( testPlan );
+  @Test
+  public void testDeterminism() {
+    final Map<Id, Id> allocations = new HashMap<Id, Id>();
+    final Set<Id> agentsWithSeveralVehicles = new HashSet<Id>();
+    for (int i = 0; i < 50; i++) {
+      final GroupPlans testPlan = createTestPlan();
+      final VehicleRessources vehs = createHalfVehicles(testPlan);
 
-			for ( Plan p : testPlan.getAllIndividualPlans() ) {
-				final Id v = assertSingleVehicleAndGetVehicleId( p );
-				// non-vehicular plan?
-				if ( v == null ) continue;
-				final Id person = p.getPerson().getId();
-				final Id oldV = allocations.get( person );
-				
-				if ( oldV == null ) {
-					allocations.put( person , v );
-				}
-				else if ( !oldV.equals( v ) ) {
-					agentsWithSeveralVehicles.add( person );
-				}
-			}
-		}
+      final AllocateVehicleToPlansInGroupPlanAlgorithm algo =
+          new AllocateVehicleToPlansInGroupPlanAlgorithm(
+              new Random(1432), vehs, Collections.singleton(MODE), false, false);
+      algo.run(testPlan);
 
-		Assert.assertEquals(
-				"unexpected number of agents having got several vehicles",
-				0,
-				agentsWithSeveralVehicles.size() );
-	}
+      for (Plan p : testPlan.getAllIndividualPlans()) {
+        final Id v = assertSingleVehicleAndGetVehicleId(p);
+        // non-vehicular plan?
+        if (v == null) continue;
+        final Id person = p.getPerson().getId();
+        final Id oldV = allocations.get(person);
 
-	private static Id assertSingleVehicleAndGetVehicleId(final Plan p) {
-		Id v = null;
+        if (oldV == null) {
+          allocations.put(person, v);
+        } else if (!oldV.equals(v)) {
+          agentsWithSeveralVehicles.add(person);
+        }
+      }
+    }
 
-		for ( PlanElement pe : p.getPlanElements() ) {
-			if ( !(pe instanceof Leg) ) continue;
-			final Leg leg = (Leg) pe;
+    Assert.assertEquals(
+        "unexpected number of agents having got several vehicles",
+        0,
+        agentsWithSeveralVehicles.size());
+  }
 
-			if ( !MODE.equals( leg.getMode() ) ) continue;
-			final NetworkRoute r = (NetworkRoute) leg.getRoute();
-			
-			Assert.assertNotNull(
-					"null vehicle id in route",
-					r.getVehicleId() );
+  private static Id assertSingleVehicleAndGetVehicleId(final Plan p) {
+    Id v = null;
 
-			Assert.assertTrue(
-					"vehicle "+r.getVehicleId()+" not the same as "+v,
-					v == null || r.getVehicleId().equals( v ) );
+    for (PlanElement pe : p.getPlanElements()) {
+      if (!(pe instanceof Leg)) continue;
+      final Leg leg = (Leg) pe;
 
-			v = r.getVehicleId();
-		}
+      if (!MODE.equals(leg.getMode())) continue;
+      final NetworkRoute r = (NetworkRoute) leg.getRoute();
 
-		return v;
-	}
+      Assert.assertNotNull("null vehicle id in route", r.getVehicleId());
 
-	private static VehicleRessources createEnoughVehicles( final GroupPlans plans ) {
-		final Set<Id<Vehicle>> vehs = new HashSet<>();
+      Assert.assertTrue(
+          "vehicle " + r.getVehicleId() + " not the same as " + v,
+          v == null || r.getVehicleId().equals(v));
 
-		for ( int i = 0; i < plans.getAllIndividualPlans().size() ; i++ ) {
-			vehs.add( Id.create( i , Vehicle.class ) );
-		}
+      v = r.getVehicleId();
+    }
 
-		log.trace( "created "+vehs.size()+" vehicles" );
+    return v;
+  }
 
-		return new VehicleRessources() {
-				@Override
-				public Set<Id<Vehicle>> identifyVehiclesUsableForAgent(final Id<Person> person) {
-					return vehs;
-				}
-			};
-	}
+  private static VehicleRessources createEnoughVehicles(final GroupPlans plans) {
+    final Set<Id<Vehicle>> vehs = new HashSet<>();
 
-	private static VehicleRessources createHalfVehicles( final GroupPlans plans ) {
-		final Set<Id<Vehicle>> vehs = new HashSet<Id<Vehicle>>();
+    for (int i = 0; i < plans.getAllIndividualPlans().size(); i++) {
+      vehs.add(Id.create(i, Vehicle.class));
+    }
 
-		// half the agents have no vehicular route: divide by 4
-		for ( int i = 0; i < plans.getAllIndividualPlans().size() / 4. ; i++ ) {
-			vehs.add( Id.create( i , Vehicle.class) );
-		}
+    log.trace("created " + vehs.size() + " vehicles");
 
-		log.trace( "created "+vehs.size()+" vehicles" );
+    return new VehicleRessources() {
+      @Override
+      public Set<Id<Vehicle>> identifyVehiclesUsableForAgent(final Id<Person> person) {
+        return vehs;
+      }
+    };
+  }
 
-		return new VehicleRessources() {
-				@Override
-				public Set<Id<Vehicle>> identifyVehiclesUsableForAgent(final Id<Person> person) {
-					return vehs;
-				}
-			};
-	}
+  private static VehicleRessources createHalfVehicles(final GroupPlans plans) {
+    final Set<Id<Vehicle>> vehs = new HashSet<Id<Vehicle>>();
+
+    // half the agents have no vehicular route: divide by 4
+    for (int i = 0; i < plans.getAllIndividualPlans().size() / 4.; i++) {
+      vehs.add(Id.create(i, Vehicle.class));
+    }
+
+    log.trace("created " + vehs.size() + " vehicles");
+
+    return new VehicleRessources() {
+      @Override
+      public Set<Id<Vehicle>> identifyVehiclesUsableForAgent(final Id<Person> person) {
+        return vehs;
+      }
+    };
+  }
 }
-

@@ -25,7 +25,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -57,107 +56,171 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-
 /**
  * @author mrieser
  */
 public class TransitAgentTest {
 
-	@Test public void testAcceptLineRoute() {
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+  @Test
+  public void testAcceptLineRoute() {
+    MutableScenario scenario =
+        (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		Network network = (Network) scenario.getNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
-		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
-		final Node fromNode = node1;
-		final Node toNode = node2;
-		NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, 1000.0, 10.0, 3600.0, (double) 1 );
-		final Node fromNode1 = node2;
-		final Node toNode1 = node3;
-		NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, 1000.0, 10.0, 3600.0, (double) 1 );
+    Network network = (Network) scenario.getNetwork();
+    Node node1 =
+        NetworkUtils.createAndAddNode(
+            network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+    Node node2 =
+        NetworkUtils.createAndAddNode(
+            network, Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
+    Node node3 =
+        NetworkUtils.createAndAddNode(
+            network, Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
+    final Node fromNode = node1;
+    final Node toNode = node2;
+    NetworkUtils.createAndAddLink(
+        network, Id.create("1", Link.class), fromNode, toNode, 1000.0, 10.0, 3600.0, (double) 1);
+    final Node fromNode1 = node2;
+    final Node toNode1 = node3;
+    NetworkUtils.createAndAddLink(
+        network, Id.create("2", Link.class), fromNode1, toNode1, 1000.0, 10.0, 3600.0, (double) 1);
 
-		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		PopulationFactory pb = scenario.getPopulation().getFactory();
-		Person person = pb.createPerson(Id.create("1", Person.class));
-		Plan plan = pb.createPlan();
-		person.addPlan(plan);
-		Activity homeAct = pb.createActivityFromLinkId("home", Id.create("1", Link.class));
-		Leg leg = pb.createLeg(TransportMode.pt);
-		TransitStopFacility stopFacility1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 100, (double) 100), false);
-		TransitStopFacility stopFacility2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 900, (double) 100), false);
-		TransitRouteStop stop1 = builder.createTransitRouteStop(stopFacility1, 50, 60);
-		TransitRouteStop stop2 = builder.createTransitRouteStop(stopFacility2, 100, 110);
-		TransitLine line1 = builder.createTransitLine(Id.create("L1", TransitLine.class));
-		TransitLine line2 = builder.createTransitLine(Id.create("L2", TransitLine.class));
-		TransitRoute route1a = builder.createTransitRoute(Id.create("1a", TransitRoute.class), null, Arrays.asList(stop1, stop2), TransportMode.pt);
-		TransitRoute route1b = builder.createTransitRoute(Id.create("1b", TransitRoute.class), null, Collections.<TransitRouteStop>emptyList(), TransportMode.pt);
-		TransitRoute route2a = builder.createTransitRoute(Id.create("2a", TransitRoute.class), null, Collections.<TransitRouteStop>emptyList(), TransportMode.pt);
-		leg.setRoute(new DefaultTransitPassengerRoute(stopFacility1, line1, route1a, stopFacility2));
-		Activity workAct = pb.createActivityFromLinkId("work", Id.create("2", Link.class));
-		plan.addActivity(homeAct);
-		plan.addLeg(leg);
-		plan.addActivity(workAct);
+    TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
+    PopulationFactory pb = scenario.getPopulation().getFactory();
+    Person person = pb.createPerson(Id.create("1", Person.class));
+    Plan plan = pb.createPlan();
+    person.addPlan(plan);
+    Activity homeAct = pb.createActivityFromLinkId("home", Id.create("1", Link.class));
+    Leg leg = pb.createLeg(TransportMode.pt);
+    TransitStopFacility stopFacility1 =
+        builder.createTransitStopFacility(
+            Id.create("1", TransitStopFacility.class),
+            new Coord((double) 100, (double) 100),
+            false);
+    TransitStopFacility stopFacility2 =
+        builder.createTransitStopFacility(
+            Id.create("2", TransitStopFacility.class),
+            new Coord((double) 900, (double) 100),
+            false);
+    TransitRouteStop stop1 = builder.createTransitRouteStop(stopFacility1, 50, 60);
+    TransitRouteStop stop2 = builder.createTransitRouteStop(stopFacility2, 100, 110);
+    TransitLine line1 = builder.createTransitLine(Id.create("L1", TransitLine.class));
+    TransitLine line2 = builder.createTransitLine(Id.create("L2", TransitLine.class));
+    TransitRoute route1a =
+        builder.createTransitRoute(
+            Id.create("1a", TransitRoute.class),
+            null,
+            Arrays.asList(stop1, stop2),
+            TransportMode.pt);
+    TransitRoute route1b =
+        builder.createTransitRoute(
+            Id.create("1b", TransitRoute.class),
+            null,
+            Collections.<TransitRouteStop>emptyList(),
+            TransportMode.pt);
+    TransitRoute route2a =
+        builder.createTransitRoute(
+            Id.create("2a", TransitRoute.class),
+            null,
+            Collections.<TransitRouteStop>emptyList(),
+            TransportMode.pt);
+    leg.setRoute(new DefaultTransitPassengerRoute(stopFacility1, line1, route1a, stopFacility2));
+    Activity workAct = pb.createActivityFromLinkId("work", Id.create("2", Link.class));
+    plan.addActivity(homeAct);
+    plan.addLeg(leg);
+    plan.addActivity(workAct);
 
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim sim = new QSimBuilder(scenario.getConfig()) //
-			.useDefaults() //
-			.build(scenario, eventsManager);
-		TransitAgent agent = TransitAgent.createTransitAgent(person, sim, sim.getChildInjector().getInstance(TimeInterpretation.class));
-		sim.insertAgentIntoMobsim(agent);
-		agent.endActivityAndComputeNextState(10);
+    EventsManager eventsManager = EventsUtils.createEventsManager();
+    PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+    QSim sim =
+        new QSimBuilder(scenario.getConfig()) //
+            .useDefaults() //
+            .build(scenario, eventsManager);
+    TransitAgent agent =
+        TransitAgent.createTransitAgent(
+            person, sim, sim.getChildInjector().getInstance(TimeInterpretation.class));
+    sim.insertAgentIntoMobsim(agent);
+    agent.endActivityAndComputeNextState(10);
 
-		assertTrue(agent.getEnterTransitRoute(line1, route1a, route1a.getStops(), null));
-		assertFalse(agent.getEnterTransitRoute(line1, route1b, route1b.getStops(), null));
-		assertFalse(agent.getEnterTransitRoute(line2, route2a, route2a.getStops(), null));
-		assertTrue(agent.getEnterTransitRoute(line1, route1a, route1a.getStops(), null)); // offering the same line again should yield "true"
-	}
+    assertTrue(agent.getEnterTransitRoute(line1, route1a, route1a.getStops(), null));
+    assertFalse(agent.getEnterTransitRoute(line1, route1b, route1b.getStops(), null));
+    assertFalse(agent.getEnterTransitRoute(line2, route2a, route2a.getStops(), null));
+    assertTrue(
+        agent.getEnterTransitRoute(
+            line1,
+            route1a,
+            route1a.getStops(),
+            null)); // offering the same line again should yield "true"
+  }
 
-	@Test public void testArriveAtStop() {
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+  @Test
+  public void testArriveAtStop() {
+    MutableScenario scenario =
+        (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		Network network = (Network) scenario.getNetwork();
-		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
-		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
-		final Node fromNode = node1;
-		final Node toNode = node2;
-		NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, 1000.0, 10.0, 3600.0, (double) 1 );
-		final Node fromNode1 = node2;
-		final Node toNode1 = node3;
-		NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, 1000.0, 10.0, 3600.0, (double) 1 );
+    Network network = (Network) scenario.getNetwork();
+    Node node1 =
+        NetworkUtils.createAndAddNode(
+            network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+    Node node2 =
+        NetworkUtils.createAndAddNode(
+            network, Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
+    Node node3 =
+        NetworkUtils.createAndAddNode(
+            network, Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
+    final Node fromNode = node1;
+    final Node toNode = node2;
+    NetworkUtils.createAndAddLink(
+        network, Id.create("1", Link.class), fromNode, toNode, 1000.0, 10.0, 3600.0, (double) 1);
+    final Node fromNode1 = node2;
+    final Node toNode1 = node3;
+    NetworkUtils.createAndAddLink(
+        network, Id.create("2", Link.class), fromNode1, toNode1, 1000.0, 10.0, 3600.0, (double) 1);
 
-		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		PopulationFactory pb = scenario.getPopulation().getFactory();
-		Person person = pb.createPerson(Id.create("1", Person.class));
-		Plan plan = pb.createPlan();
-		person.addPlan(plan);
-		Activity homeAct = pb.createActivityFromLinkId("home", Id.create("1", Link.class));
-		Leg leg = pb.createLeg(TransportMode.pt);
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 100, (double) 100), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 900, (double) 100), false);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 1900, (double) 100), false);
-		TransitLine line1 = builder.createTransitLine(Id.create("L1", TransitLine.class));
-		leg.setRoute(new DefaultTransitPassengerRoute(stop1, line1, null, stop2));
-		Activity workAct = pb.createActivityFromLinkId("work", Id.create("2", Link.class));
-		plan.addActivity(homeAct);
-		plan.addLeg(leg);
-		plan.addActivity(workAct);
+    TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
+    PopulationFactory pb = scenario.getPopulation().getFactory();
+    Person person = pb.createPerson(Id.create("1", Person.class));
+    Plan plan = pb.createPlan();
+    person.addPlan(plan);
+    Activity homeAct = pb.createActivityFromLinkId("home", Id.create("1", Link.class));
+    Leg leg = pb.createLeg(TransportMode.pt);
+    TransitStopFacility stop1 =
+        builder.createTransitStopFacility(
+            Id.create("1", TransitStopFacility.class),
+            new Coord((double) 100, (double) 100),
+            false);
+    TransitStopFacility stop2 =
+        builder.createTransitStopFacility(
+            Id.create("2", TransitStopFacility.class),
+            new Coord((double) 900, (double) 100),
+            false);
+    TransitStopFacility stop3 =
+        builder.createTransitStopFacility(
+            Id.create("3", TransitStopFacility.class),
+            new Coord((double) 1900, (double) 100),
+            false);
+    TransitLine line1 = builder.createTransitLine(Id.create("L1", TransitLine.class));
+    leg.setRoute(new DefaultTransitPassengerRoute(stop1, line1, null, stop2));
+    Activity workAct = pb.createActivityFromLinkId("work", Id.create("2", Link.class));
+    plan.addActivity(homeAct);
+    plan.addLeg(leg);
+    plan.addActivity(workAct);
 
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim sim = new QSimBuilder(scenario.getConfig()) //
-				.useDefaults() //
-				.build(scenario, eventsManager);
-		TransitAgent agent = TransitAgent.createTransitAgent(person, sim, sim.getChildInjector().getInstance(TimeInterpretation.class));
-		sim.insertAgentIntoMobsim(agent);
-		agent.endActivityAndComputeNextState(10);
+    EventsManager eventsManager = EventsUtils.createEventsManager();
+    PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+    QSim sim =
+        new QSimBuilder(scenario.getConfig()) //
+            .useDefaults() //
+            .build(scenario, eventsManager);
+    TransitAgent agent =
+        TransitAgent.createTransitAgent(
+            person, sim, sim.getChildInjector().getInstance(TimeInterpretation.class));
+    sim.insertAgentIntoMobsim(agent);
+    agent.endActivityAndComputeNextState(10);
 
-		assertFalse(agent.getExitAtStop(stop1));
-		assertTrue(agent.getExitAtStop(stop2));
-		assertFalse(agent.getExitAtStop(stop3));
-		assertTrue(agent.getExitAtStop(stop2)); // offering the same stop again should yield "true"
-	}
-
+    assertFalse(agent.getExitAtStop(stop1));
+    assertTrue(agent.getExitAtStop(stop2));
+    assertFalse(agent.getExitAtStop(stop3));
+    assertTrue(agent.getExitAtStop(stop2)); // offering the same stop again should yield "true"
+  }
 }

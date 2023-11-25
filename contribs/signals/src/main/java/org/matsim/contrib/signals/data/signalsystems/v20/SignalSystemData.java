@@ -20,22 +20,17 @@
 package org.matsim.contrib.signals.data.signalsystems.v20;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
 
-
-
 /**
  * @author dgrether
- *
  */
 public interface SignalSystemData extends Identifiable<SignalSystem> {
 
-	public Map<Id<Signal>, SignalData> getSignalData();
+  public Map<Id<Signal>, SignalData> getSignalData();
 
-	public void addSignalData(SignalData signalData);
-	
+  public void addSignalData(SignalData signalData);
 }

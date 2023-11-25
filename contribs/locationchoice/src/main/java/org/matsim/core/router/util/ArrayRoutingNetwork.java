@@ -23,25 +23,23 @@ package org.matsim.core.router.util;
 import org.matsim.api.core.v01.network.Network;
 
 public class ArrayRoutingNetwork extends AbstractRoutingNetwork {
-		
-	public ArrayRoutingNetwork(Network network) {
-		super(network);
-	}
-	
-	@Override
-	public final void initialize() {
-		// nothing to do here
-	}
 
-	@Override
-	public void setName(String name) {
-		throw new RuntimeException("not implemented") ;
-	}
+  public ArrayRoutingNetwork(Network network) {
+    super(network);
+  }
 
-	@Override
-	public String getName() {
-		throw new RuntimeException("not implemented") ;
-	}
+  @Override
+  public final void initialize() {
+    // nothing to do here
+  }
 
+  @Override
+  public void setName(String name) {
+    throw new RuntimeException("not implemented");
+  }
 
+  @Override
+  public String getName() {
+    throw new RuntimeException("not implemented");
+  }
 }

@@ -9,32 +9,38 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public final class NetworkUtil {
-	private NetworkUtil(){} // do not instantiate
+  private NetworkUtil() {} // do not instantiate
 
-	@SuppressWarnings("unused")
-	private static final Logger log = LogManager.getLogger(NetworkUtil.class);
-	
-	/**
-	 * This method calculates the distance between a point and a node via a link (which should contains
-	 * the node) as the sum of
-	 * <ul>
-	 * <li> the orthogonal distance between the point and the link and
-	 * <li> the distance between the intersection point of the orthogonal
-	 * projection (from the point to the link) to the node.
-	 * </ul>
-	 * If the orthogonal projection of the point to the line does not intersects the link, the method
-	 * returns the Euclidean distance between the point and the node.
-	 */
-	public static Distances getDistances2NodeViaGivenLink(Coord coord, Link link, Node destinationNode){
-		Coord intersection = CoordUtils.orthogonalProjectionOnLineSegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
-		
-		Distances distances = new Distances();
-		
-		double distanceCoord2Intersection = NetworkUtils.getEuclideanDistance(coord, intersection);
-		double distanceIntersection2Node = NetworkUtils.getEuclideanDistance(intersection, destinationNode.getCoord());
+  @SuppressWarnings("unused")
+  private static final Logger log = LogManager.getLogger(NetworkUtil.class);
 
-		distances.setDistanceCoord2Intersection(distanceCoord2Intersection);
-		distances.setDistanceIntersetion2Node(distanceIntersection2Node);
-		return distances;
-	}
+  /**
+   * This method calculates the distance between a point and a node via a link (which should
+   * contains the node) as the sum of
+   *
+   * <ul>
+   *   <li>the orthogonal distance between the point and the link and
+   *   <li>the distance between the intersection point of the orthogonal projection (from the point
+   *       to the link) to the node.
+   * </ul>
+   *
+   * If the orthogonal projection of the point to the line does not intersects the link, the method
+   * returns the Euclidean distance between the point and the node.
+   */
+  public static Distances getDistances2NodeViaGivenLink(
+      Coord coord, Link link, Node destinationNode) {
+    Coord intersection =
+        CoordUtils.orthogonalProjectionOnLineSegment(
+            link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
+
+    Distances distances = new Distances();
+
+    double distanceCoord2Intersection = NetworkUtils.getEuclideanDistance(coord, intersection);
+    double distanceIntersection2Node =
+        NetworkUtils.getEuclideanDistance(intersection, destinationNode.getCoord());
+
+    distances.setDistanceCoord2Intersection(distanceCoord2Intersection);
+    distances.setDistanceIntersetion2Node(distanceIntersection2Node);
+    return distances;
+  }
 }

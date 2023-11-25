@@ -22,44 +22,51 @@ package org.matsim.contrib.drt.optimizer.insertion.extensive;
 
 import java.util.Collection;
 import java.util.Optional;
-
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.*;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 
 /**
  * @author michalm
  */
 final class ExtensiveInsertionSearch implements DrtInsertionSearch {
-	private final ExtensiveInsertionProvider insertionProvider;
-	private final MultiInsertionDetourPathCalculator detourPathCalculator;
-	private final InsertionDetourTimeCalculator detourTimeCalculator;
-	private final BestInsertionFinder bestInsertionFinder;
+  private final ExtensiveInsertionProvider insertionProvider;
+  private final MultiInsertionDetourPathCalculator detourPathCalculator;
+  private final InsertionDetourTimeCalculator detourTimeCalculator;
+  private final BestInsertionFinder bestInsertionFinder;
 
-	public ExtensiveInsertionSearch(ExtensiveInsertionProvider insertionProvider,
-			MultiInsertionDetourPathCalculator detourPathCalculator, InsertionCostCalculator insertionCostCalculator,
-			StopTimeCalculator stopTimeCalculator) {
-		this.insertionProvider = insertionProvider;
-		this.detourPathCalculator = detourPathCalculator;
-		this.detourTimeCalculator = new InsertionDetourTimeCalculator(stopTimeCalculator, null);
-		this.bestInsertionFinder = new BestInsertionFinder(insertionCostCalculator);
-	}
+  public ExtensiveInsertionSearch(
+      ExtensiveInsertionProvider insertionProvider,
+      MultiInsertionDetourPathCalculator detourPathCalculator,
+      InsertionCostCalculator insertionCostCalculator,
+      StopTimeCalculator stopTimeCalculator) {
+    this.insertionProvider = insertionProvider;
+    this.detourPathCalculator = detourPathCalculator;
+    this.detourTimeCalculator = new InsertionDetourTimeCalculator(stopTimeCalculator, null);
+    this.bestInsertionFinder = new BestInsertionFinder(insertionCostCalculator);
+  }
 
-	@Override
-	public Optional<InsertionWithDetourData> findBestInsertion(DrtRequest drtRequest,
-			Collection<VehicleEntry> vehicleEntries) {
-		var insertions = insertionProvider.getInsertions(drtRequest, vehicleEntries);
-		if (insertions.isEmpty()) {
-			return Optional.empty();
-		}
+  @Override
+  public Optional<InsertionWithDetourData> findBestInsertion(
+      DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries) {
+    var insertions = insertionProvider.getInsertions(drtRequest, vehicleEntries);
+    if (insertions.isEmpty()) {
+      return Optional.empty();
+    }
 
-		DetourPathDataCache pathData = detourPathCalculator.calculatePaths(drtRequest, insertions);
-		return bestInsertionFinder.findBestInsertion(drtRequest, insertions.stream().map(i -> {
-			var insertionDetourData = pathData.createInsertionDetourData(i);
-			return new InsertionWithDetourData(i, insertionDetourData,
-					detourTimeCalculator.calculateDetourTimeInfo(i, insertionDetourData, drtRequest));
-		}));
-	}
+    DetourPathDataCache pathData = detourPathCalculator.calculatePaths(drtRequest, insertions);
+    return bestInsertionFinder.findBestInsertion(
+        drtRequest,
+        insertions.stream()
+            .map(
+                i -> {
+                  var insertionDetourData = pathData.createInsertionDetourData(i);
+                  return new InsertionWithDetourData(
+                      i,
+                      insertionDetourData,
+                      detourTimeCalculator.calculateDetourTimeInfo(
+                          i, insertionDetourData, drtRequest));
+                }));
+  }
 }

@@ -20,7 +20,6 @@ package org.matsim.contrib.parking.parkingchoice.PC2.analysis;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -32,45 +31,43 @@ import org.matsim.contrib.parking.parkingchoice.PC2.simulation.ParkingArrivalEve
 import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
 import org.matsim.core.events.handler.BasicEventHandler;
 
-public abstract  class AverageWalkDistanceStats implements BasicEventHandler {
+public abstract class AverageWalkDistanceStats implements BasicEventHandler {
 
-	private static final Logger log = LogManager.getLogger(AverageWalkDistanceStats.class);
+  private static final Logger log = LogManager.getLogger(AverageWalkDistanceStats.class);
 
-	private HashMap<Id<PC2Parking>, PC2Parking> parking;
+  private HashMap<Id<PC2Parking>, PC2Parking> parking;
 
-	private HashMap<String, LinkedList<Double>> walkDistances;
+  private HashMap<String, LinkedList<Double>> walkDistances;
 
-	@Override
-	public void reset(int iteration) {
-		walkDistances=new HashMap<String, LinkedList<Double>>();
-	}
+  @Override
+  public void reset(int iteration) {
+    walkDistances = new HashMap<String, LinkedList<Double>>();
+  }
 
-	public AverageWalkDistanceStats(HashMap<Id<PC2Parking>, PC2Parking> parking) {
-		this.parking = parking;
-	}
+  public AverageWalkDistanceStats(HashMap<Id<PC2Parking>, PC2Parking> parking) {
+    this.parking = parking;
+  }
 
-	@Override
-	public void handleEvent(Event event) {
-		if (event.getEventType().equalsIgnoreCase(ParkingArrivalEvent.EVENT_TYPE)
-				) {
-			Id<Person> personId=ParkingArrivalEvent.getPersonId(event.getAttributes());
-			if (personId != null) {
-				Id<PC2Parking> parkingId = ParkingArrivalEvent.getParkingId(event.getAttributes());
+  @Override
+  public void handleEvent(Event event) {
+    if (event.getEventType().equalsIgnoreCase(ParkingArrivalEvent.EVENT_TYPE)) {
+      Id<Person> personId = ParkingArrivalEvent.getPersonId(event.getAttributes());
+      if (personId != null) {
+        Id<PC2Parking> parkingId = ParkingArrivalEvent.getParkingId(event.getAttributes());
 
-				Coord destCoord = ParkingArrivalEvent.getDestCoord(event.getAttributes());
+        Coord destCoord = ParkingArrivalEvent.getDestCoord(event.getAttributes());
 
-				double walkDistance = GeneralLib.getDistance(parking.get(parkingId).getCoordinate(),
-						destCoord);
+        double walkDistance =
+            GeneralLib.getDistance(parking.get(parkingId).getCoordinate(), destCoord);
 
-				if (!walkDistances.containsKey(getGroupName(parkingId))){
-					walkDistances.put(getGroupName(parkingId), new LinkedList<Double>());
-				}
+        if (!walkDistances.containsKey(getGroupName(parkingId))) {
+          walkDistances.put(getGroupName(parkingId), new LinkedList<Double>());
+        }
 
-				walkDistances.get(getGroupName(parkingId)).add(walkDistance);
+        walkDistances.get(getGroupName(parkingId)).add(walkDistance);
+      }
+    }
+  }
 
-			}
-		}
-	}
-
-	public abstract String getGroupName(Id<PC2Parking> parkingId);
+  public abstract String getGroupName(Id<PC2Parking> parkingId);
 }

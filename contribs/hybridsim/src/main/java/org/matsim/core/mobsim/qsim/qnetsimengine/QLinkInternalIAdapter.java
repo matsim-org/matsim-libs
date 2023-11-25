@@ -22,22 +22,21 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import org.matsim.api.core.v01.network.Link;
 
 public class QLinkInternalIAdapter {
-	private final QLinkI ql;
+  private final QLinkI ql;
 
-	QLinkInternalIAdapter(QLinkI qLinkImpl) {
-		this.ql = qLinkImpl;
-	}
+  QLinkInternalIAdapter(QLinkI qLinkImpl) {
+    this.ql = qLinkImpl;
+  }
 
-	public boolean isAcceptingFromUpstream() {
-		return this.ql.getAcceptingQLane().isAcceptingFromUpstream();
-	}
+  public boolean isAcceptingFromUpstream() {
+    return this.ql.getAcceptingQLane().isAcceptingFromUpstream();
+  }
 
-	public Link getLink() {
-		return this.ql.getLink();
-	}
+  public Link getLink() {
+    return this.ql.getLink();
+  }
 
-	public void addFromUpstream(QVehicle veh) {
-		this.ql.getAcceptingQLane().addFromUpstream(veh);
-
-	}
+  public void addFromUpstream(QVehicle veh) {
+    this.ql.getAcceptingQLane().addFromUpstream(veh);
+  }
 }

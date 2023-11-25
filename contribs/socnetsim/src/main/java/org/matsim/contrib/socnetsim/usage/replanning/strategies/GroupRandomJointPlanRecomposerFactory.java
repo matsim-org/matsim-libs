@@ -19,53 +19,50 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.gbl.MatsimRandom;
-
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.GroupPlanStrategy;
-import org.matsim.contrib.socnetsim.usage.replanning.GroupPlanStrategyFactoryUtils;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.highestweightselection.RandomGroupLevelSelector;
+import org.matsim.contrib.socnetsim.usage.replanning.GroupPlanStrategyFactoryUtils;
+import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * @author thibautd
  */
 public class GroupRandomJointPlanRecomposerFactory implements Provider<GroupPlanStrategy> {
 
-	private final Scenario sc;
-	private final PlanLinkIdentifier planLinkIdentifier;
+  private final Scenario sc;
+  private final PlanLinkIdentifier planLinkIdentifier;
 
-	@Inject
-	public GroupRandomJointPlanRecomposerFactory( Scenario sc , @Strong PlanLinkIdentifier planLinkIdentifier ) {
-		this.sc = sc;
-		this.planLinkIdentifier = planLinkIdentifier;
-	}
+  @Inject
+  public GroupRandomJointPlanRecomposerFactory(
+      Scenario sc, @Strong PlanLinkIdentifier planLinkIdentifier) {
+    this.sc = sc;
+    this.planLinkIdentifier = planLinkIdentifier;
+  }
 
-	@Override
-	public GroupPlanStrategy get() {
-		// Note that this breaks incompatibility constraints, but not
-		// joint plans constraints. Thus, it is not such a "recomposition"
-		// as a grouping of joint plans.
-		final GroupPlanStrategy strategy = new GroupPlanStrategy(
-				new RandomGroupLevelSelector(
-					MatsimRandom.getLocalInstance(),
-					new EmptyIncompatiblePlansIdentifierFactory() ) );
+  @Override
+  public GroupPlanStrategy get() {
+    // Note that this breaks incompatibility constraints, but not
+    // joint plans constraints. Thus, it is not such a "recomposition"
+    // as a grouping of joint plans.
+    final GroupPlanStrategy strategy =
+        new GroupPlanStrategy(
+            new RandomGroupLevelSelector(
+                MatsimRandom.getLocalInstance(), new EmptyIncompatiblePlansIdentifierFactory()));
 
-		// recompose
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
-						sc.getConfig(),
-						((JointPlans) sc.getScenarioElement(JointPlans.ELEMENT_NAME)).getFactory(),
-						planLinkIdentifier));
+    // recompose
+    strategy.addStrategyModule(
+        GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
+            sc.getConfig(),
+            ((JointPlans) sc.getScenarioElement(JointPlans.ELEMENT_NAME)).getFactory(),
+            planLinkIdentifier));
 
-		return strategy;
-
-	}
+    return strategy;
+  }
 }
-

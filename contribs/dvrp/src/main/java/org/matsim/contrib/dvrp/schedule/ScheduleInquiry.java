@@ -25,5 +25,5 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
  * @author michalm
  */
 public interface ScheduleInquiry {
-	boolean isIdle(DvrpVehicle vehicle);
+  boolean isIdle(DvrpVehicle vehicle);
 }

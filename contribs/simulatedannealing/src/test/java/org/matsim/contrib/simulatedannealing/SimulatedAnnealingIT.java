@@ -1,11 +1,17 @@
 package org.matsim.contrib.simulatedannealing;
 
 import com.google.inject.TypeLiteral;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.contrib.simulatedannealing.acceptor.DefaultAnnealingAcceptor;
+import org.matsim.contrib.simulatedannealing.cost.CostCalculator;
+import org.matsim.contrib.simulatedannealing.perturbation.ChainedPerturbatorFactory;
+import org.matsim.contrib.simulatedannealing.perturbation.PerturbatorFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -17,142 +23,164 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.contrib.simulatedannealing.acceptor.DefaultAnnealingAcceptor;
-import org.matsim.contrib.simulatedannealing.cost.CostCalculator;
-import org.matsim.contrib.simulatedannealing.perturbation.ChainedPerturbatorFactory;
-import org.matsim.contrib.simulatedannealing.perturbation.PerturbatorFactory;
 import org.matsim.testcases.MatsimTestUtils;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 
 /**
  * @author nkuehnel / MOIA
  */
 public class SimulatedAnnealingIT {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+  @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	public void testIntegratedAnnealingInQSim() {
+  @Test
+  public void testIntegratedAnnealingInQSim() {
 
-		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+    final Config config =
+        utils.loadConfig(
+            IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 
-		final Controler controler = new Controler(config);
+    final Controler controler = new Controler(config);
 
-		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.getConfig().controller().setCreateGraphs(false);
-		controler.getConfig().controller().setWriteEventsInterval(0);
+    controler
+        .getConfig()
+        .controller()
+        .setOverwriteFileSetting(
+            OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+    controler.getConfig().controller().setCreateGraphs(false);
+    controler.getConfig().controller().setWriteEventsInterval(0);
 
-		SimulatedAnnealingConfigGroup simAnCfg = new SimulatedAnnealingConfigGroup();
-		config.controller().setLastIteration(10);
+    SimulatedAnnealingConfigGroup simAnCfg = new SimulatedAnnealingConfigGroup();
+    config.controller().setLastIteration(10);
 
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
+    controler.addOverridingModule(
+        new AbstractModule() {
+          @Override
+          public void install() {
 
-				bind(new TypeLiteral<SimulatedAnnealing<VolumeEstimator>>(){}).toProvider(new Provider<>() {
+            bind(new TypeLiteral<SimulatedAnnealing<VolumeEstimator>>() {})
+                .toProvider(
+                    new Provider<>() {
 
-					@Inject
-					CostCalculator<VolumeEstimator> costCalculator;
+                      @Inject CostCalculator<VolumeEstimator> costCalculator;
 
-					@Inject
-					PerturbatorFactory<VolumeEstimator> perturbatorFactory;
+                      @Inject PerturbatorFactory<VolumeEstimator> perturbatorFactory;
 
-					@Override
-					public SimulatedAnnealing<VolumeEstimator> get() {
-						return new SimulatedAnnealing<>(costCalculator, new DefaultAnnealingAcceptor<>(simAnCfg),
-								perturbatorFactory, new VolumeEstimator(0), simAnCfg.coolingSchedule, simAnCfg);
-					}
-				}).asEagerSingleton();
+                      @Override
+                      public SimulatedAnnealing<VolumeEstimator> get() {
+                        return new SimulatedAnnealing<>(
+                            costCalculator,
+                            new DefaultAnnealingAcceptor<>(simAnCfg),
+                            perturbatorFactory,
+                            new VolumeEstimator(0),
+                            simAnCfg.coolingSchedule,
+                            simAnCfg);
+                      }
+                    })
+                .asEagerSingleton();
 
-				bind(VolumeEstimator.class).toProvider(new TypeLiteral<SimulatedAnnealing<VolumeEstimator>>(){});
+            bind(VolumeEstimator.class)
+                .toProvider(new TypeLiteral<SimulatedAnnealing<VolumeEstimator>>() {});
 
-				VolumeCostCalculator costCalculator = new VolumeCostCalculator();
-				bind(new TypeLiteral<CostCalculator<VolumeEstimator>>(){}).toInstance(costCalculator);
-				addEventHandlerBinding().toInstance(costCalculator);
+            VolumeCostCalculator costCalculator = new VolumeCostCalculator();
+            bind(new TypeLiteral<CostCalculator<VolumeEstimator>>() {}).toInstance(costCalculator);
+            addEventHandlerBinding().toInstance(costCalculator);
 
-				bind(new TypeLiteral<PerturbatorFactory<VolumeEstimator>>(){}).toInstance(
-						new ChainedPerturbatorFactory.Builder<VolumeEstimator>()
-								.add((iteration, temperature) -> current -> {
-									return new VolumeEstimator((int) (current.estimation * MatsimRandom.getRandom().nextDouble(2.)));
-								}, 1)
-								.add((iteration, temperature) -> current -> {
-									return new VolumeEstimator(current.estimation + MatsimRandom.getRandom().nextInt(10) - 5);
-								}, 1)
-								.initialTemperature(simAnCfg.initialTemperature)
-								.maxPerturbations(3)
-								.minPerturbations(1)
-								.build()
-				);
+            bind(new TypeLiteral<PerturbatorFactory<VolumeEstimator>>() {})
+                .toInstance(
+                    new ChainedPerturbatorFactory.Builder<VolumeEstimator>()
+                        .add(
+                            (iteration, temperature) ->
+                                current -> {
+                                  return new VolumeEstimator(
+                                      (int)
+                                          (current.estimation
+                                              * MatsimRandom.getRandom().nextDouble(2.)));
+                                },
+                            1)
+                        .add(
+                            (iteration, temperature) ->
+                                current -> {
+                                  return new VolumeEstimator(
+                                      current.estimation
+                                          + MatsimRandom.getRandom().nextInt(10)
+                                          - 5);
+                                },
+                            1)
+                        .initialTemperature(simAnCfg.initialTemperature)
+                        .maxPerturbations(3)
+                        .minPerturbations(1)
+                        .build());
 
-				addControlerListenerBinding().to(new TypeLiteral<SimulatedAnnealing<VolumeEstimator>>() {}).asEagerSingleton();
+            addControlerListenerBinding()
+                .to(new TypeLiteral<SimulatedAnnealing<VolumeEstimator>>() {})
+                .asEagerSingleton();
 
-				addControlerListenerBinding().toProvider(new Provider<>() {
+            addControlerListenerBinding()
+                .toProvider(
+                    new Provider<>() {
 
-					@Inject
-					MatsimServices matsimServices;
+                      @Inject MatsimServices matsimServices;
 
-					@Inject
-					SimulatedAnnealing<VolumeEstimator> simulatedAnnealing;
+                      @Inject SimulatedAnnealing<VolumeEstimator> simulatedAnnealing;
 
-					@Override
-					public ControlerListener get() {
-						return new SimulatedAnnealingAnalysis<>(getConfig(), matsimServices, simulatedAnnealing);
-					}
-				});
-			}
-		});
+                      @Override
+                      public ControlerListener get() {
+                        return new SimulatedAnnealingAnalysis<>(
+                            getConfig(), matsimServices, simulatedAnnealing);
+                      }
+                    });
+          }
+        });
 
-		controler.addOverridingQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				addMobsimScopeEventHandlerBinding().toInstance(new MobsimScopeEventHandler() {
+    controler.addOverridingQSimModule(
+        new AbstractQSimModule() {
+          @Override
+          protected void configureQSim() {
+            addMobsimScopeEventHandlerBinding()
+                .toInstance(
+                    new MobsimScopeEventHandler() {
 
-					@Inject
-					VolumeEstimator volumeEstimator;
+                      @Inject VolumeEstimator volumeEstimator;
 
-					public void cleanupAfterMobsim(int iteration) {
-						System.out.println(volumeEstimator.estimation);
-					}
-				});
-			}
-		});
+                      public void cleanupAfterMobsim(int iteration) {
+                        System.out.println(volumeEstimator.estimation);
+                      }
+                    });
+          }
+        });
 
+    controler.run();
+  }
 
+  private static class VolumeCostCalculator
+      implements CostCalculator<VolumeEstimator>, LinkLeaveEventHandler {
 
-		controler.run();
-	}
+    private int counter = 0;
 
-	private static class VolumeCostCalculator implements CostCalculator<VolumeEstimator>, LinkLeaveEventHandler {
+    @Override
+    public double calculateCost(VolumeEstimator solution) {
+      return Math.abs(counter - solution.estimation);
+    }
 
-		private int counter = 0;
+    @Override
+    public void reset(int iteration) {
+      counter = 0;
+    }
 
-		@Override
-		public double calculateCost(VolumeEstimator solution) {
-			return Math.abs(counter - solution.estimation);
-		}
+    @Override
+    public void handleEvent(LinkLeaveEvent event) {
+      if (Id.createLinkId(15).equals(event.getLinkId())) {
+        counter++;
+      }
+    }
+  }
 
-		@Override
-		public void reset(int iteration) {
-			counter = 0;
-		}
+  static class VolumeEstimator {
 
-		@Override
-		public void handleEvent(LinkLeaveEvent event) {
-			if(Id.createLinkId(15).equals(event.getLinkId())) {
-				counter++;
-			}
-		}
-	}
+    private final int estimation;
 
-	static class VolumeEstimator {
-
-		private final int estimation;
-
-		VolumeEstimator(int estimation) {
-			this.estimation = estimation;
-		}
-	}
+    VolumeEstimator(int estimation) {
+      this.estimation = estimation;
+    }
+  }
 }

@@ -21,7 +21,6 @@
 package org.matsim.contrib.drt.analysis.zonal;
 
 import java.util.function.IntUnaryOperator;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -29,18 +28,18 @@ import org.matsim.core.gbl.MatsimRandom;
  * @author tschlenther
  */
 public class RandomDrtZoneTargetLinkSelector implements DrtZoneTargetLinkSelector {
-	private final IntUnaryOperator random;
+  private final IntUnaryOperator random;
 
-	public RandomDrtZoneTargetLinkSelector() {
-		this(MatsimRandom.getLocalInstance()::nextInt);
-	}
+  public RandomDrtZoneTargetLinkSelector() {
+    this(MatsimRandom.getLocalInstance()::nextInt);
+  }
 
-	public RandomDrtZoneTargetLinkSelector(IntUnaryOperator random) {
-		this.random = random;
-	}
+  public RandomDrtZoneTargetLinkSelector(IntUnaryOperator random) {
+    this.random = random;
+  }
 
-	@Override
-	public Link selectTargetLink(DrtZone zone) {
-		return zone.getLinks().get(random.applyAsInt(zone.getLinks().size()));
-	}
+  @Override
+  public Link selectTargetLink(DrtZone zone) {
+    return zone.getLinks().get(random.applyAsInt(zone.getLinks().size()));
+  }
 }

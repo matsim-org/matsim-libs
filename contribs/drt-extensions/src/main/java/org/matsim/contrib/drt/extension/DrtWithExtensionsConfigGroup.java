@@ -20,42 +20,43 @@
 package org.matsim.contrib.drt.extension;
 
 import java.util.Optional;
-
 import javax.annotation.Nullable;
-
 import org.matsim.contrib.drt.extension.companions.DrtCompanionParams;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 
 /**
  * @author Steffen Axer
- *
- * This class summarizes all optional drt parametersets and should be used while creating MultiModeDrtConfigGroup instances
+ *     <p>This class summarizes all optional drt parametersets and should be used while creating
+ *     MultiModeDrtConfigGroup instances
  */
 public class DrtWithExtensionsConfigGroup extends DrtConfigGroup {
 
-	@Nullable
-	private DrtCompanionParams drtCompanionParams;
+  @Nullable private DrtCompanionParams drtCompanionParams;
 
-	@Nullable
-	private DrtOperationsParams drtOperationsParams;
+  @Nullable private DrtOperationsParams drtOperationsParams;
 
-	public DrtWithExtensionsConfigGroup() {
-		// Optional
-		addDefinition(DrtCompanionParams.SET_NAME, DrtCompanionParams::new, () -> drtCompanionParams,
-				params -> drtCompanionParams = (DrtCompanionParams) params);
+  public DrtWithExtensionsConfigGroup() {
+    // Optional
+    addDefinition(
+        DrtCompanionParams.SET_NAME,
+        DrtCompanionParams::new,
+        () -> drtCompanionParams,
+        params -> drtCompanionParams = (DrtCompanionParams) params);
 
-		// Optional
-		addDefinition(DrtOperationsParams.SET_NAME, DrtOperationsParams::new, () -> drtOperationsParams,
-				params -> drtOperationsParams = (DrtOperationsParams) params);
-	}
+    // Optional
+    addDefinition(
+        DrtOperationsParams.SET_NAME,
+        DrtOperationsParams::new,
+        () -> drtOperationsParams,
+        params -> drtOperationsParams = (DrtOperationsParams) params);
+  }
 
-	public Optional<DrtCompanionParams> getDrtCompanionParams() {
-		return Optional.ofNullable(drtCompanionParams);
-	}
+  public Optional<DrtCompanionParams> getDrtCompanionParams() {
+    return Optional.ofNullable(drtCompanionParams);
+  }
 
-	public Optional<DrtOperationsParams> getDrtOperationsParams() {
-		return Optional.ofNullable(drtOperationsParams);
-	}
-	
+  public Optional<DrtOperationsParams> getDrtOperationsParams() {
+    return Optional.ofNullable(drtOperationsParams);
+  }
 }

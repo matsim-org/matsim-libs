@@ -31,16 +31,25 @@ import org.matsim.freight.carriers.ScheduledTour;
 import org.matsim.freight.carriers.Tour;
 import org.matsim.vehicles.Vehicle;
 
-/*package-private*/  final class CarrierShipmentPickupStartEventCreator implements CarrierEventCreator {
+/*package-private*/ final class CarrierShipmentPickupStartEventCreator
+    implements CarrierEventCreator {
 
-	@Override
-	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, int activityCounter, Id<Vehicle> vehicleId) {
-		if(event instanceof ActivityStartEvent startEvent && CarrierConstants.PICKUP.equals((startEvent).getActType()) ) {
-			Tour.TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
-			if (element instanceof Tour.Pickup pickupActivity) {
-				return new CarrierShipmentPickupStartEvent(event.getTime(), carrier.getId(), pickupActivity.getShipment(), vehicleId );
-			}
-		}
-		return null;
-	}
+  @Override
+  public Event createEvent(
+      Event event,
+      Carrier carrier,
+      Activity activity,
+      ScheduledTour scheduledTour,
+      int activityCounter,
+      Id<Vehicle> vehicleId) {
+    if (event instanceof ActivityStartEvent startEvent
+        && CarrierConstants.PICKUP.equals((startEvent).getActType())) {
+      Tour.TourElement element = scheduledTour.getTour().getTourElements().get(activityCounter);
+      if (element instanceof Tour.Pickup pickupActivity) {
+        return new CarrierShipmentPickupStartEvent(
+            event.getTime(), carrier.getId(), pickupActivity.getShipment(), vehicleId);
+      }
+    }
+    return null;
+  }
 }

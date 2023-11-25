@@ -26,22 +26,19 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 
-public abstract class AbstractHouseholdAlgorithm implements HouseholdAlgorithm{
+public abstract class AbstractHouseholdAlgorithm implements HouseholdAlgorithm {
 
-	private final static Logger log = LogManager.getLogger(AbstractHouseholdAlgorithm.class);
-	
-	public final void run(final Households households) {
-		log.info("Running " + this.getClass().getName() + " algorithm...");
-		Counter counter = new Counter(" household # ");
-		
-		for(Household h : households.getHouseholds().values()) {
-			this.run(h);
-			counter.incCounter();
-		}
-		counter.printCounter();
-		log.info("Done running algorithm.");
-	}
-	
-	
+  private static final Logger log = LogManager.getLogger(AbstractHouseholdAlgorithm.class);
+
+  public final void run(final Households households) {
+    log.info("Running " + this.getClass().getName() + " algorithm...");
+    Counter counter = new Counter(" household # ");
+
+    for (Household h : households.getHouseholds().values()) {
+      this.run(h);
+      counter.incCounter();
+    }
+    counter.printCounter();
+    log.info("Done running algorithm.");
+  }
 }
-

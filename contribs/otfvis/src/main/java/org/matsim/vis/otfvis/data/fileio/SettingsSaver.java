@@ -30,10 +30,8 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Locale;
-
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.Config;
@@ -43,123 +41,118 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 /**
  * @author dgrether
  * @author michaz
- *
  */
 public class SettingsSaver {
 
-	private static final Logger log = LogManager.getLogger(SettingsSaver.class);
+  private static final Logger log = LogManager.getLogger(SettingsSaver.class);
 
-	private final String fileName;
+  private final String fileName;
 
-	public SettingsSaver(String filename) {
-		if (filename.startsWith("file:")) {
-			this.fileName = filename.substring(5);
-		} else {
-			this.fileName = filename;
-		}
-	}
+  public SettingsSaver(String filename) {
+    if (filename.startsWith("file:")) {
+      this.fileName = filename.substring(5);
+    } else {
+      this.fileName = filename;
+    }
+  }
 
-	private File chooseFile(boolean saveIt) {
-		File selFile = new File(fileName + ".vcfg");
-		File currentDirectory = selFile.getAbsoluteFile().getParentFile();
-		JFileChooser fc = new JFileChooser(currentDirectory);
-		fc.setSelectedFile(selFile);
-		if (saveIt) {
-			fc.setDialogType(JFileChooser.SAVE_DIALOG);
-		}
-		fc.setFileFilter(new FileFilter() {
-			@Override
-			public boolean accept(File f) {
-				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith(".vcfg");
-			}
+  private File chooseFile(boolean saveIt) {
+    File selFile = new File(fileName + ".vcfg");
+    File currentDirectory = selFile.getAbsoluteFile().getParentFile();
+    JFileChooser fc = new JFileChooser(currentDirectory);
+    fc.setSelectedFile(selFile);
+    if (saveIt) {
+      fc.setDialogType(JFileChooser.SAVE_DIALOG);
+    }
+    fc.setFileFilter(
+        new FileFilter() {
+          @Override
+          public boolean accept(File f) {
+            return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith(".vcfg");
+          }
 
-			@Override
-			public String getDescription() {
-				return "OTFVis Config File (*.vcfg)";
-			}
-		});
-		int state = saveIt ? fc.showSaveDialog(null) : fc.showOpenDialog(null);
-		if (state == JFileChooser.APPROVE_OPTION) {
-			File selectedFile = fc.getSelectedFile();
-			return selectedFile;
-		} else {
-			log.info("Auswahl abgebrochen");
-			return null;
-		}
+          @Override
+          public String getDescription() {
+            return "OTFVis Config File (*.vcfg)";
+          }
+        });
+    int state = saveIt ? fc.showSaveDialog(null) : fc.showOpenDialog(null);
+    if (state == JFileChooser.APPROVE_OPTION) {
+      File selectedFile = fc.getSelectedFile();
+      return selectedFile;
+    } else {
+      log.info("Auswahl abgebrochen");
+      return null;
+    }
+  }
 
-	}
+  private OTFVisConfigGroup readConfigFromFile(File file) {
+    ObjectInputStream inFile;
+    if (file == null) {
+      throw new NullPointerException("Not able to read config from file.");
+    }
+    try {
+      inFile = new ObjectInputStream(new FileInputStream(file));
+      OTFVisConfigGroup visConfig = (OTFVisConfigGroup) inFile.readObject();
+      log.info("Config read from file : " + file.getAbsolutePath());
+      log.info("Config has " + visConfig.getZooms().size() + " zoom entries...");
+      dumpConfig(visConfig);
+      return visConfig;
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+    throw new IllegalArgumentException("Not able to read config from file: " + file.getPath());
+  }
 
-	private OTFVisConfigGroup readConfigFromFile(File file) {
-		ObjectInputStream inFile;
-		if (file == null) {
-			throw new NullPointerException("Not able to read config from file.");
-		}
-		try {
-			inFile = new ObjectInputStream(new FileInputStream(file));
-			OTFVisConfigGroup visConfig = (OTFVisConfigGroup) inFile.readObject();
-			log.info("Config read from file : " + file.getAbsolutePath());
-			log.info("Config has " + visConfig.getZooms().size()
-					+ " zoom entries...");
-			dumpConfig(visConfig);
-			return visConfig;
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		throw new IllegalArgumentException(
-				"Not able to read config from file: " + file.getPath());
-	}
+  public void saveSettingsAs(OTFVisConfigGroup visConfig) {
+    File file = chooseFile(true);
+    if (file != null) {
+      OutputStream out;
+      try {
+        out = new FileOutputStream(file);
+        ObjectOutputStream outFile = new ObjectOutputStream(out);
+        visConfig.clearModified();
+        outFile.writeObject(visConfig);
+        outFile.close();
+        log.info("Config has " + visConfig.getZooms().size() + " zoom entries");
+        log.info("Config written to file...");
+        dumpConfig(visConfig);
+        out.close();
+      } catch (FileNotFoundException e) {
+        e.printStackTrace();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
 
-	public void saveSettingsAs(OTFVisConfigGroup visConfig) {
-		File file = chooseFile(true);
-		if (file != null) {
-			OutputStream out;
-			try {
-				out = new FileOutputStream(file);
-				ObjectOutputStream outFile = new ObjectOutputStream(out);
-				visConfig.clearModified();
-				outFile.writeObject(visConfig);
-				outFile.close();
-				log.info("Config has " + visConfig.getZooms().size()
-						+ " zoom entries");
-				log.info("Config written to file...");
-				dumpConfig(visConfig);
-				out.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+  public OTFVisConfigGroup chooseAndReadSettingsFile() {
+    File file = chooseFile(false);
+    return readConfigFromFile(file);
+  }
 
-	public OTFVisConfigGroup chooseAndReadSettingsFile() {
-		File file = chooseFile(false);
-		return readConfigFromFile(file);
-	}
+  private void dumpConfig(OTFVisConfigGroup visConfig) {
+    log.info("OTFVis config dump:");
+    StringWriter writer = new StringWriter();
+    Config tmpConfig = new Config();
+    tmpConfig.addModule(visConfig);
+    PrintWriter pw = new PrintWriter(writer);
+    new ConfigWriter(tmpConfig).writeStream(pw);
+    log.info("\n\n" + writer.getBuffer().toString());
+    log.info("Complete config dump done.");
+  }
 
-	private void dumpConfig(OTFVisConfigGroup visConfig) {
-		log.info("OTFVis config dump:");
-		StringWriter writer = new StringWriter();
-		Config tmpConfig = new Config();
-		tmpConfig.addModule(visConfig);
-		PrintWriter pw = new PrintWriter(writer);
-		new ConfigWriter(tmpConfig).writeStream(pw);
-		log.info("\n\n" + writer.getBuffer().toString());
-		log.info("Complete config dump done.");
-	}
-
-	public OTFVisConfigGroup tryToReadSettingsFile() {
-		File file = new File(fileName + ".vcfg");
-		System.out.println(file.getAbsolutePath());
-		if (file.exists()) {
-			return readConfigFromFile(file);
-		} else {
-			return null;
-		}
-	}
-
+  public OTFVisConfigGroup tryToReadSettingsFile() {
+    File file = new File(fileName + ".vcfg");
+    System.out.println(file.getAbsolutePath());
+    if (file.exists()) {
+      return readConfigFromFile(file);
+    } else {
+      return null;
+    }
+  }
 }

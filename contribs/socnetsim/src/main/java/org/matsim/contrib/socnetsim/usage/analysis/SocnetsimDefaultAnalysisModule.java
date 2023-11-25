@@ -21,6 +21,8 @@ package org.matsim.contrib.socnetsim.usage.analysis;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import jakarta.inject.Singleton;
+import java.util.Collections;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -32,99 +34,100 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.listener.ControlerListener;
 
-import jakarta.inject.Singleton;
-import java.util.Collections;
-
 /**
  * @author thibautd
  */
 public class SocnetsimDefaultAnalysisModule extends AbstractModule {
 
-	@Override
-	public void install() {
-		final Identifier groupIdentifier = new Identifier();
-		binder().requestInjection( groupIdentifier );
+  @Override
+  public void install() {
+    final Identifier groupIdentifier = new Identifier();
+    binder().requestInjection(groupIdentifier);
 
-		this.addControlerListenerBinding().toProvider(
-				new Provider<ControlerListener>() {
-					@Inject
-					OutputDirectoryHierarchy controlerIO;
-					@Inject
-					Scenario scenario;
+    this.addControlerListenerBinding()
+        .toProvider(
+            new Provider<ControlerListener>() {
+              @Inject OutputDirectoryHierarchy controlerIO;
+              @Inject Scenario scenario;
 
-					@Override
-					public ControlerListener get() {
-						return new FilteredScoreStats(
-								((GroupReplanningConfigGroup) scenario.getConfig().getModule(GroupReplanningConfigGroup.GROUP_NAME)).getGraphWriteInterval(),
-								controlerIO,
-								scenario,
-								groupIdentifier);
-					}
-				});
+              @Override
+              public ControlerListener get() {
+                return new FilteredScoreStats(
+                    ((GroupReplanningConfigGroup)
+                            scenario.getConfig().getModule(GroupReplanningConfigGroup.GROUP_NAME))
+                        .getGraphWriteInterval(),
+                    controlerIO,
+                    scenario,
+                    groupIdentifier);
+              }
+            });
 
-		this.addControlerListenerBinding().toProvider(
-				new Provider<ControlerListener>() {
-					@Inject OutputDirectoryHierarchy controlerIO;
-					@Inject Scenario scenario;
+    this.addControlerListenerBinding()
+        .toProvider(
+            new Provider<ControlerListener>() {
+              @Inject OutputDirectoryHierarchy controlerIO;
+              @Inject Scenario scenario;
 
-					@Override
-					public ControlerListener get() {
+              @Override
+              public ControlerListener get() {
 
-						return new JointPlanSizeStats(
-									((GroupReplanningConfigGroup) scenario.getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME )).getGraphWriteInterval(),
-									controlerIO,
-									scenario,
-									groupIdentifier);
-					}
-				});
+                return new JointPlanSizeStats(
+                    ((GroupReplanningConfigGroup)
+                            scenario.getConfig().getModule(GroupReplanningConfigGroup.GROUP_NAME))
+                        .getGraphWriteInterval(),
+                    controlerIO,
+                    scenario,
+                    groupIdentifier);
+              }
+            });
 
-		this.addControlerListenerBinding().toProvider(
-				new Provider<ControlerListener>() {
-					@Inject
-					OutputDirectoryHierarchy controlerIO;
-					@Inject
-					Scenario scenario;
+    this.addControlerListenerBinding()
+        .toProvider(
+            new Provider<ControlerListener>() {
+              @Inject OutputDirectoryHierarchy controlerIO;
+              @Inject Scenario scenario;
 
-					@Override
-					public ControlerListener get() {
+              @Override
+              public ControlerListener get() {
 
-						return new JointTripsStats(
-								((GroupReplanningConfigGroup) scenario.getConfig().getModule(GroupReplanningConfigGroup.GROUP_NAME)).getGraphWriteInterval(),
-								controlerIO,
-								scenario,
-								groupIdentifier);
-					}
-				});
+                return new JointTripsStats(
+                    ((GroupReplanningConfigGroup)
+                            scenario.getConfig().getModule(GroupReplanningConfigGroup.GROUP_NAME))
+                        .getGraphWriteInterval(),
+                    controlerIO,
+                    scenario,
+                    groupIdentifier);
+              }
+            });
 
+    bind(CourtesyHistogram.class).in(Singleton.class);
+    this.addEventHandlerBinding().to(CourtesyHistogram.class);
+    this.addControlerListenerBinding().to(CourtesyHistogramListener.class);
+  }
 
-		bind( CourtesyHistogram.class ).in( Singleton.class );
-		this.addEventHandlerBinding().to( CourtesyHistogram.class );
-		this.addControlerListenerBinding().to(CourtesyHistogramListener.class);
-	}
+  private static class Identifier implements AbstractPlanAnalyzerPerGroup.GroupIdentifier {
+    private AbstractPlanAnalyzerPerGroup.GroupIdentifier delegate;
 
-	private static class Identifier implements AbstractPlanAnalyzerPerGroup.GroupIdentifier {
-		private AbstractPlanAnalyzerPerGroup.GroupIdentifier delegate;
+    @Inject
+    public void injectDelegate(final GroupIdentifier replanningIdentifier) {
+      this.delegate =
+          replanningIdentifier instanceof FixedGroupsIdentifier
+              ? new CliquesSizeGroupIdentifier(
+                  ((FixedGroupsIdentifier) replanningIdentifier).getGroupInfo())
+              : new AbstractPlanAnalyzerPerGroup.GroupIdentifier() {
+                private final Iterable<Id<Clique>> groups =
+                    Collections.<Id<Clique>>singleton(Id.create("all", Clique.class));
 
-		@Inject
-		public void injectDelegate( final GroupIdentifier replanningIdentifier ) {
-			this.delegate = replanningIdentifier instanceof FixedGroupsIdentifier ?
-				new CliquesSizeGroupIdentifier(
-						((FixedGroupsIdentifier) replanningIdentifier).getGroupInfo() ) :
-				new AbstractPlanAnalyzerPerGroup.GroupIdentifier() {
-					private final Iterable<Id<Clique>> groups = Collections.<Id<Clique>>singleton( Id.create( "all" , Clique.class ) );
+                @Override
+                public Iterable<Id<Clique>> getGroups(final Person person) {
+                  return groups;
+                }
+              };
+    }
 
-					@Override
-					public Iterable<Id<Clique>> getGroups(final Person person) {
-						return groups;
-					}
-				};
-		}
-
-		@Override
-		public Iterable<Id<Clique>> getGroups(final Person person) {
-			return delegate.getGroups( person );
-		}
-
-	}
+    @Override
+    public Iterable<Id<Clique>> getGroups(final Person person) {
+      return delegate.getGroups(person);
+    }
+  }
 }
-

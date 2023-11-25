@@ -20,12 +20,11 @@
 
 package org.matsim.contrib.dvrp.analysis;
 
+import com.google.common.base.Preconditions;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Tasks;
-
-import com.google.common.base.Preconditions;
 
 /**
  * Immutable
@@ -33,30 +32,37 @@ import com.google.common.base.Preconditions;
  * @author Michal Maciejewski (michalm)
  */
 public class ExecutedTask {
-	/**
-	 * ExecutedTasks should be created from events rather than Tasks
-	 */
-	public static ExecutedTask createFromTask(Task task) {
-		// just some sanity check. However, even already PERFORMED tasks can be still modified (the class has setters),
-		// so no guarantee if the created ExecutedTask really represents its actual execution.
-		Preconditions.checkArgument(task.getStatus() == Task.TaskStatus.PERFORMED);
-		return new ExecutedTask(task.getTaskType(), task.getBeginTime(), task.getEndTime(),
-				Tasks.getBeginLink(task).getId(), Tasks.getEndLink(task).getId());
-	}
+  /** ExecutedTasks should be created from events rather than Tasks */
+  public static ExecutedTask createFromTask(Task task) {
+    // just some sanity check. However, even already PERFORMED tasks can be still modified (the
+    // class has setters),
+    // so no guarantee if the created ExecutedTask really represents its actual execution.
+    Preconditions.checkArgument(task.getStatus() == Task.TaskStatus.PERFORMED);
+    return new ExecutedTask(
+        task.getTaskType(),
+        task.getBeginTime(),
+        task.getEndTime(),
+        Tasks.getBeginLink(task).getId(),
+        Tasks.getEndLink(task).getId());
+  }
 
-	public final Task.TaskType taskType;
-	public final double beginTime;
-	public final double endTime;
-	public final Id<Link> startLinkId;
-	public final Id<Link> endLinkId;
+  public final Task.TaskType taskType;
+  public final double beginTime;
+  public final double endTime;
+  public final Id<Link> startLinkId;
+  public final Id<Link> endLinkId;
 
-	public ExecutedTask(Task.TaskType taskType, double beginTime, double endTime, Id<Link> startLinkId,
-			Id<Link> endLinkId) {
-		Preconditions.checkArgument(beginTime <= endTime);
-		this.taskType = Preconditions.checkNotNull(taskType);
-		this.beginTime = beginTime;
-		this.endTime = endTime;
-		this.startLinkId = Preconditions.checkNotNull(startLinkId);
-		this.endLinkId = Preconditions.checkNotNull(endLinkId);
-	}
+  public ExecutedTask(
+      Task.TaskType taskType,
+      double beginTime,
+      double endTime,
+      Id<Link> startLinkId,
+      Id<Link> endLinkId) {
+    Preconditions.checkArgument(beginTime <= endTime);
+    this.taskType = Preconditions.checkNotNull(taskType);
+    this.beginTime = beginTime;
+    this.endTime = endTime;
+    this.startLinkId = Preconditions.checkNotNull(startLinkId);
+    this.endLinkId = Preconditions.checkNotNull(endLinkId);
+  }
 }

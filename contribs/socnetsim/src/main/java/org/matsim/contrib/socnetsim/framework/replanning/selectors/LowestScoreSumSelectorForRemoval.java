@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
-
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
@@ -29,21 +28,14 @@ import org.matsim.contrib.socnetsim.framework.replanning.selectors.highestweight
  * @author thibautd
  */
 public class LowestScoreSumSelectorForRemoval implements GroupLevelPlanSelector {
-	private final GroupLevelPlanSelector delegate;
-	
-	public LowestScoreSumSelectorForRemoval(
-			final IncompatiblePlansIdentifierFactory incompFact) {
-		delegate = new HighestWeightSelector(
-				true ,
-				incompFact,
-				new InverseScoreWeight());
-	}
+  private final GroupLevelPlanSelector delegate;
 
-	@Override
-	public GroupPlans selectPlans(
-			final JointPlans jointPlans,
-			final ReplanningGroup group) {
-		return delegate.selectPlans( jointPlans , group);
-	}
+  public LowestScoreSumSelectorForRemoval(final IncompatiblePlansIdentifierFactory incompFact) {
+    delegate = new HighestWeightSelector(true, incompFact, new InverseScoreWeight());
+  }
+
+  @Override
+  public GroupPlans selectPlans(final JointPlans jointPlans, final ReplanningGroup group) {
+    return delegate.selectPlans(jointPlans, group);
+  }
 }
-

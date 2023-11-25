@@ -24,5 +24,5 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.core.events.handler.EventHandler;
 
 public interface ActivityEndEventHandler extends EventHandler {
-	public void handleEvent (ActivityEndEvent event);
+  public void handleEvent(ActivityEndEvent event);
 }

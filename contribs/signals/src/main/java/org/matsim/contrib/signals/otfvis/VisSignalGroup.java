@@ -19,49 +19,44 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.otfvis;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.lanes.VisSignal;
 
-import java.util.HashMap;
-import java.util.Map;
-
-
-
 /**
  * @author dgrether
- *
  */
 public final class VisSignalGroup {
 
-	private String id;
-	private Map<String, VisSignal> signalPositions = new HashMap<String, VisSignal>();
-	private String systemId;
-	
-	public VisSignalGroup(String signalSystemId, String id){
-		this.systemId = signalSystemId;
-		this.id = id;
-	}
-	
-	public String getId() {
-		return this.id;
-	}
-	
-	public String getSignalSystemId(){
-		return this.systemId;
-	}
+  private String id;
+  private Map<String, VisSignal> signalPositions = new HashMap<String, VisSignal>();
+  private String systemId;
 
-	public void setState(SignalGroupState state) {
-		for (VisSignal p : this.signalPositions.values()){
-			p.setState(state);
-		}
-	}
+  public VisSignalGroup(String signalSystemId, String id) {
+    this.systemId = signalSystemId;
+    this.id = id;
+  }
 
-	public void addSignal(VisSignal signal) {
-		this.signalPositions.put(signal.getId(), signal);
-	}
+  public String getId() {
+    return this.id;
+  }
 
-	public Map<String, VisSignal> getSignals() {
-		return this.signalPositions;
-	}
-	
+  public String getSignalSystemId() {
+    return this.systemId;
+  }
+
+  public void setState(SignalGroupState state) {
+    for (VisSignal p : this.signalPositions.values()) {
+      p.setState(state);
+    }
+  }
+
+  public void addSignal(VisSignal signal) {
+    this.signalPositions.put(signal.getId(), signal);
+  }
+
+  public Map<String, VisSignal> getSignals() {
+    return this.signalPositions;
+  }
 }

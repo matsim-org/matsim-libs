@@ -30,25 +30,28 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
  */
 public class LeaveRoadMessage extends EventMessage {
 
-	@Override
-	public void handleMessage() {
-		Road road = (Road) this.getReceivingUnit();
-		road.leaveRoad(vehicle, getMessageArrivalTime());
-	}
+  @Override
+  public void handleMessage() {
+    Road road = (Road) this.getReceivingUnit();
+    road.leaveRoad(vehicle, getMessageArrivalTime());
+  }
 
-	public LeaveRoadMessage(Scheduler scheduler, Vehicle vehicle) {
-		super(scheduler, vehicle);
-		priority = JDEQSimConfigGroup.PRIORITY_LEAVE_ROAD_MESSAGE;
-	}
+  public LeaveRoadMessage(Scheduler scheduler, Vehicle vehicle) {
+    super(scheduler, vehicle);
+    priority = JDEQSimConfigGroup.PRIORITY_LEAVE_ROAD_MESSAGE;
+  }
 
-	@Override
-	public void processEvent() {
-		Road road = (Road) this.getReceivingUnit();
-		Event event = null;
+  @Override
+  public void processEvent() {
+    Road road = (Road) this.getReceivingUnit();
+    Event event = null;
 
-		event = new LinkLeaveEvent(this.getMessageArrivalTime(), Id.create(vehicle.getOwnerPerson().getId(), org.matsim.vehicles.Vehicle.class), road.getLink().getId());
+    event =
+        new LinkLeaveEvent(
+            this.getMessageArrivalTime(),
+            Id.create(vehicle.getOwnerPerson().getId(), org.matsim.vehicles.Vehicle.class),
+            road.getLink().getId());
 
-		eventsManager.processEvent(event);
-	}
-
+    eventsManager.processEvent(event);
+  }
 }

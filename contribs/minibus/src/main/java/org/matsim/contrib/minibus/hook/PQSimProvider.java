@@ -21,7 +21,6 @@ package org.matsim.contrib.minibus.hook;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -29,7 +28,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
@@ -37,28 +35,28 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
  * The MobsimFactory is only necessary so that I can add the {@link PTransitAgent}.
  *
  * @author aneumann
- *
  */
 class PQSimProvider implements Provider<Mobsim> {
 
-	@SuppressWarnings("unused")
-	private final static Logger log = LogManager.getLogger(PQSimProvider.class);
+  @SuppressWarnings("unused")
+  private static final Logger log = LogManager.getLogger(PQSimProvider.class);
 
-	@Inject Scenario scenario ;
-	@Inject EventsManager eventsManager ;
-	@Inject Config config;
+  @Inject Scenario scenario;
+  @Inject EventsManager eventsManager;
+  @Inject Config config;
 
-	@Override
-	public Netsim get() {
+  @Override
+  public Netsim get() {
 
-		QSimConfigGroup conf = scenario.getConfig().qsim();
-		if (conf == null) {
-			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
-		}
+    QSimConfigGroup conf = scenario.getConfig().qsim();
+    if (conf == null) {
+      throw new NullPointerException(
+          "There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
+    }
 
-		return new QSimBuilder(config) //
-				.useDefaults()
-				.addOverridingQSimModule(new MinibusPopulationModule())
-				.build(scenario, eventsManager);
-	}
+    return new QSimBuilder(config) //
+        .useDefaults()
+        .addOverridingQSimModule(new MinibusPopulationModule())
+        .build(scenario, eventsManager);
+  }
 }

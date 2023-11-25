@@ -23,43 +23,55 @@ package org.matsim.core.router;
 import org.matsim.api.core.v01.network.Node;
 
 /**
- * Used by the MultiNodeDijkstra to store initial time and cost. 
- * 
+ * Used by the MultiNodeDijkstra to store initial time and cost.
+ *
  * @see org.matsim.core.router.MultiNodeDijkstra
  * @author cdobler
  */
 public class InitialNode {
-	//cant make final, extended by OneToManyPathSearch.ToNode
-	//need a decision. Amit Sep'17
-	
-	public Node node;
-	// additional travel disutility related to visiting this node
-	public final double initialCost;
-	// additional travel time related to visiting this node
-	public final double initialTime;
-	
-	public InitialNode(final Node node, final double initialCost, final double initialTime) {
-		this.node = node;
-		this.initialCost = initialCost;
-		this.initialTime = initialTime;
-	}
+  // cant make final, extended by OneToManyPathSearch.ToNode
+  // need a decision. Amit Sep'17
 
-	// allowing node as null; many duplicates of InitialNode does not require node thus removing such duplicate classes by setting node as null. Amit Sep'17
-	public InitialNode(final double initialCost, final double initialTime) {
-		this(null, initialCost, initialTime);
-	}
-	
-	@Override
-	public String toString() {
-		if (node == null) {
-			return "[id=" + " null " + "]" +
-					"[initialCost=" + this.initialCost + "]" +
-					"[initialTime=" + this.initialTime + "]";
-		} else {
-			return "[id=" + this.node.getId() + "]" +
-					"[initialCost=" + this.initialCost + "]" +
-					"[initialTime=" + this.initialTime + "]";
-		}
+  public Node node;
+  // additional travel disutility related to visiting this node
+  public final double initialCost;
+  // additional travel time related to visiting this node
+  public final double initialTime;
 
-	}
+  public InitialNode(final Node node, final double initialCost, final double initialTime) {
+    this.node = node;
+    this.initialCost = initialCost;
+    this.initialTime = initialTime;
+  }
+
+  // allowing node as null; many duplicates of InitialNode does not require node thus removing such
+  // duplicate classes by setting node as null. Amit Sep'17
+  public InitialNode(final double initialCost, final double initialTime) {
+    this(null, initialCost, initialTime);
+  }
+
+  @Override
+  public String toString() {
+    if (node == null) {
+      return "[id="
+          + " null "
+          + "]"
+          + "[initialCost="
+          + this.initialCost
+          + "]"
+          + "[initialTime="
+          + this.initialTime
+          + "]";
+    } else {
+      return "[id="
+          + this.node.getId()
+          + "]"
+          + "[initialCost="
+          + this.initialCost
+          + "]"
+          + "[initialTime="
+          + this.initialTime
+          + "]";
+    }
+  }
 }
