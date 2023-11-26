@@ -48,5 +48,13 @@ An example how to get started with your own project, including a complete pom.xm
 
 Code examples are at https://github.com/matsim-org/matsim-code-examples.
 
+## Code formatting
 
+We use [fmt-maven-plugin](https://github.com/spotify/fmt-maven-plugin) for formatting Java code according to [Google Java Style](https://google.github.io/styleguide/javaguide.html).
+This maven plugin internally uses [google-java-format](https://github.com/google/google-java-format) to format code or check if it has been properly formatted.  
 
+To format code, run `mvn com.spotify.fmt:fmt-maven-plugin:format`.
+For ease of coding, we suggest configuring the code formatting settings in your IDE (see instructions for [IntelliJ](https://github.com/google/google-java-format#intellij-android-studio-and-other-jetbrains-ides)
+and [Eclipse](https://github.com/google/google-java-format#eclipse)).
+
+Java code formatting is checked in CI. Passing this check is required to be able to merge a PR to protected branches.
