@@ -92,7 +92,7 @@ jobs:
 
       - name: Build module (with dependencies)
         if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
-        run: mvn install --batch-mode --also-make --projects ${{matrix.module}} -DskipTests -Dsource.skip
+        run: mvn install --batch-mode --also-make --projects ${{matrix.module}} -DskipTests -Dsource.skip -Dfmt.skip
 
       - name: Test module
         if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
