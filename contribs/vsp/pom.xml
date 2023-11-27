@@ -150,7 +150,7 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>5.2.4</version>
+			<version>5.2.5</version>
 			<exclusions>
 				<!-- needed to compile in IntelliJ with Eclipse compiler -->
 				<!-- see: https://bugs.eclipse.org/bugs/show_bug.cgi?id=536928 -->
