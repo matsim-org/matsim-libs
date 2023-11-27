@@ -76,11 +76,25 @@ import com.google.inject.util.Modules;
 public abstract class AbstractModule implements Module {
 
 	private Binder binder;
+	private Multibinder<EventHandler> eventHandlerMultibinder;
+	private Multibinder<ControlerListener> controlerListenerMultibinder;
+
+	/**
+	 * Contents retrieved (I think) by injected method QSim#addQueueSimulationListeners(...).  Is not public, and therefore cannot be referenced from here.
+	 * <br/>
+	 * I think that that method will be called every time the mobsim will be constructed.  If the injected classes are singletons, they will
+	 * presumably be re-used, otherwise they will be newly constructed.
+	 */
+	private Multibinder<MobsimListener> mobsimListenerMultibinder;
+
+	private Multibinder<SnapshotWriter> snapshotWriterMultibinder;
+	private MapBinder<Class<?>, AttributeConverter<?>> attributeConverterMapBinder;
+	private Multibinder<AbstractQSimModule> qsimModulesMultibinder;
 
 	@Inject
 	com.google.inject.Injector bootstrapInjector;
-
 	private Config config;
+	private Multibinder<AbstractQSimModule> qsimOverridingModulesMultibinder;
 
 	public AbstractModule() {
 		// config will be injected later
@@ -98,6 +112,18 @@ public abstract class AbstractModule implements Module {
 		// Guice error messages should give the code location of the error in the user's module,
 		// not in this class.
 		this.binder = binder.skipSources(AbstractModule.class);
+
+		this.mobsimListenerMultibinder = Multibinder.newSetBinder(this.binder, MobsimListener.class);
+		this.snapshotWriterMultibinder = Multibinder.newSetBinder(this.binder, SnapshotWriter.class);
+		this.eventHandlerMultibinder = Multibinder.newSetBinder(this.binder, EventHandler.class);
+		this.controlerListenerMultibinder = Multibinder.newSetBinder(this.binder, ControlerListener.class);
+		this.attributeConverterMapBinder =
+				MapBinder.newMapBinder(
+						this.binder,
+						new TypeLiteral<Class<?>>(){},
+						new TypeLiteral<AttributeConverter<?>>() {} );
+		this.qsimModulesMultibinder = Multibinder.newSetBinder(this.binder, AbstractQSimModule.class);
+		this.qsimOverridingModulesMultibinder = Multibinder.newSetBinder( this.binder, AbstractQSimModule.class, Names.named( "overridesFromAbstractModule" ) );
 		this.install();
 	}
 
@@ -113,29 +139,28 @@ public abstract class AbstractModule implements Module {
 	}
 
 	protected final LinkedBindingBuilder<EventHandler> addEventHandlerBinding() {
-		return Multibinder.newSetBinder(this.binder, EventHandler.class).addBinding();
+		return eventHandlerMultibinder.addBinding();
 	}
 
 	protected final void installQSimModule(AbstractQSimModule qsimModule) {
-		Multibinder.newSetBinder(this.binder, AbstractQSimModule.class).addBinding().toInstance(qsimModule);
+		qsimModulesMultibinder.addBinding().toInstance(qsimModule);
 	}
 	protected final void installOverridingQSimModule(AbstractQSimModule qsimModule) {
-		Multibinder.newSetBinder( this.binder, AbstractQSimModule.class, Names.named( "overridesFromAbstractModule" ) ).addBinding().toInstance(qsimModule);
+		qsimOverridingModulesMultibinder.addBinding().toInstance(qsimModule);
 	}
 
 	/**
 	 * @see ControlerListener
 	 */
 	protected final LinkedBindingBuilder<ControlerListener> addControlerListenerBinding() {
-		return Multibinder.newSetBinder(this.binder, ControlerListener.class).addBinding();
+		return controlerListenerMultibinder.addBinding();
 	}
 
 	/**
 	 * @see StrategyManagerModule
 	 */
 	protected final com.google.inject.binder.LinkedBindingBuilder<PlanSelector<Plan, Person>> bindPlanSelectorForRemoval() {
-		return bind(new TypeLiteral<>() {
-        });
+		return bind(new TypeLiteral<PlanSelector<Plan, Person>>(){});
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<PlanStrategy> addPlanStrategyBinding(String selectorName) {
@@ -151,18 +176,15 @@ public abstract class AbstractModule implements Module {
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<MobsimListener> addMobsimListenerBinding() {
-		return Multibinder.newSetBinder(this.binder, MobsimListener.class).addBinding();
+		return mobsimListenerMultibinder.addBinding();
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<SnapshotWriter> addSnapshotWriterBinding() {
-		return Multibinder.newSetBinder(this.binder, SnapshotWriter.class).addBinding();
+		return snapshotWriterMultibinder.addBinding();
 	}
 
 	protected final LinkedBindingBuilder<AttributeConverter<?>> addAttributeConverterBinding(final Class<?> clazz ) {
-		return MapBinder.newMapBinder(
-			this.binder,
-			new TypeLiteral<Class<?>>(){},
-			new TypeLiteral<AttributeConverter<?>>() {} ).addBinding( clazz );
+		return attributeConverterMapBinder.addBinding( clazz );
 	}
 	/**
 	 * @deprecated better use {@link #addTravelDisutilityFactoryBinding(String)}.
