@@ -2,6 +2,7 @@ package org.matsim.contrib.drt.prebooking;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
 
+import org.matsim.contrib.drt.prebooking.abandon.AbandonVoter;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
@@ -27,12 +28,17 @@ public class PrebookingActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final VrpAgentLogic.DynActionCreator delegate;
 	private final PassengerHandler passengerHandler;
 	private final PassengerStopDurationProvider stopDurationProvider;
+	private final PrebookingManager prebookingManager;
+	private final AbandonVoter abandonVoter;
 
 	public PrebookingActionCreator(PassengerHandler passengerHandler, VrpAgentLogic.DynActionCreator delegate,
-			PassengerStopDurationProvider stopDurationProvider) {
+			PassengerStopDurationProvider stopDurationProvider, PrebookingManager prebookingManager,
+			AbandonVoter abandonVoter) {
 		this.delegate = delegate;
 		this.passengerHandler = passengerHandler;
 		this.stopDurationProvider = stopDurationProvider;
+		this.prebookingManager = prebookingManager;
+		this.abandonVoter = abandonVoter;
 	}
 
 	@Override
@@ -42,7 +48,8 @@ public class PrebookingActionCreator implements VrpAgentLogic.DynActionCreator {
 		if (getBaseTypeOrElseThrow(task).equals(DrtTaskBaseType.STOP)) {
 			DrtStopTask stopTask = (DrtStopTask) task;
 			return new PrebookingStopActivity(passengerHandler, dynAgent, stopTask, stopTask.getDropoffRequests(),
-					stopTask.getPickupRequests(), DrtActionCreator.DRT_STOP_NAME, () -> stopTask.getEndTime(), stopDurationProvider, vehicle);
+					stopTask.getPickupRequests(), DrtActionCreator.DRT_STOP_NAME, () -> stopTask.getEndTime(),
+					stopDurationProvider, vehicle, prebookingManager, abandonVoter);
 		}
 
 		return delegate.createAction(dynAgent, vehicle, now);

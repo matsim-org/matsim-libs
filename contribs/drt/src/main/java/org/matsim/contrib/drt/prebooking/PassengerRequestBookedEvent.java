@@ -1,5 +1,6 @@
 package org.matsim.contrib.drt.prebooking;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -16,7 +17,7 @@ public class PassengerRequestBookedEvent extends AbstractPassengerRequestEvent {
 	public static final String EVENT_TYPE = "PassengerRequest booked";
 
 	public PassengerRequestBookedEvent(double time, String mode, Id<Request> requestId, Id<Person> personId) {
-		super(time, mode, requestId, personId);
+		super(time, mode, requestId, List.of(personId));
 	}
 
 	@Override

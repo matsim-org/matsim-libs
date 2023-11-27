@@ -42,4 +42,8 @@ public interface DrtStopTask extends StayTask {
 	void addDropoffRequest(AcceptedDrtRequest request);
 
 	void addPickupRequest(AcceptedDrtRequest request);
+	
+	void removePickupRequest(Id<Request> requestId);
+	
+	void removeDropoffRequest(Id<Request> requestId);
 }

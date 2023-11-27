@@ -20,13 +20,15 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.api.core.v01.events.HasPersonId;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This class is designed for inheritance without overriding.
@@ -35,19 +37,20 @@ import org.matsim.api.core.v01.events.HasPersonId;
  *
  * @author Michal Maciejewski (michalm)
  */
-public abstract class AbstractPassengerRequestEvent extends Event implements HasPersonId {
+public abstract class AbstractPassengerRequestEvent extends Event {
 	public static final String ATTRIBUTE_MODE = "mode";
 	public static final String ATTRIBUTE_REQUEST = "request";
+	public static final String ATTRIBUTE_PERSON = "person";
 
 	private final String mode;
 	private final Id<Request> requestId;
-	private final Id<Person> personId;
+	private final List<Id<Person>> personIds;
 
-	protected AbstractPassengerRequestEvent(double time, String mode, Id<Request> requestId, Id<Person> personId) {
+	protected AbstractPassengerRequestEvent(double time, String mode, Id<Request> requestId, List<Id<Person>> personIds) {
 		super(time);
 		this.mode = mode;
 		this.requestId = requestId;
-		this.personId = personId;
+		this.personIds = personIds;
 	}
 
 	public final String getMode() {
@@ -62,11 +65,10 @@ public abstract class AbstractPassengerRequestEvent extends Event implements Has
 	}
 
 	/**
-	 * @return id of the passenger (person)
+	 * @return ids of the passengers (persons)
 	 */
-	@Override
-	public final Id<Person> getPersonId() {
-		return personId;
+	public final List<Id<Person>> getPersonIds() {
+		return List.copyOf(personIds);
 	}
 
 	@Override
@@ -74,6 +76,7 @@ public abstract class AbstractPassengerRequestEvent extends Event implements Has
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_MODE, mode);
 		attr.put(ATTRIBUTE_REQUEST, requestId + "");
+		attr.put(ATTRIBUTE_PERSON, personIds.stream().map(Object::toString).collect(Collectors.joining(",")));
 		return attr;
 	}
 }

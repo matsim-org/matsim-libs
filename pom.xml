@@ -30,7 +30,7 @@
         <maven.compiler.release>17</maven.compiler.release>
         <argLine></argLine>
 
-        <log4j.version>2.21.1</log4j.version>
+        <log4j.version>2.22.0</log4j.version>
         <geotools.version>29.2</geotools.version>
 		<osmosis.version>0.49.1</osmosis.version>
         <jts.version>1.19.0</jts.version>
@@ -107,7 +107,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.13.0</version>
+                <version>3.14.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -137,7 +137,7 @@
             <dependency>
                 <groupId>com.opencsv</groupId>
                 <artifactId>opencsv</artifactId>
-                <version>5.8</version>
+                <version>5.9</version>
             </dependency>
             <dependency>
                 <groupId>org.geotools</groupId>
@@ -323,7 +323,7 @@
 			<dependency>
 				<groupId>net.bytebuddy</groupId>
 				<artifactId>byte-buddy</artifactId>
-				<version>1.14.9</version>
+				<version>1.14.10</version>
 				<scope>test</scope>
 			</dependency>
 

@@ -18,6 +18,8 @@
 
 package org.matsim.contrib.drt.extension.edrt.run;
 
+import static org.junit.Assert.assertEquals;
+
 import java.net.URL;
 
 import org.junit.Test;
@@ -25,10 +27,15 @@ import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.prebooking.logic.ProbabilityBasedPrebookingLogic;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -57,6 +64,50 @@ public class RunEDrtScenarioIT {
 		Controler controller = RunEDrtScenario.createControler(config, false);
 		ProbabilityBasedPrebookingLogic.install(controller, drtConfig, 0.5, 4.0 * 3600.0);
 		
+		PrebookingTracker tracker = new PrebookingTracker();
+		tracker.install(controller);
+		
 		controller.run();
+		
+		assertEquals(74, tracker.immediateScheduled);
+		assertEquals(198, tracker.prebookedScheduled);
+		assertEquals(116, tracker.immediateRejected);
+		assertEquals(7, tracker.prebookedRejected);
+	}
+	
+	static private class PrebookingTracker implements PassengerRequestRejectedEventHandler, PassengerRequestScheduledEventHandler {
+		int immediateScheduled = 0;
+		int prebookedScheduled = 0;
+		int immediateRejected = 0;
+		int prebookedRejected = 0;
+		
+		@Override
+		public void handleEvent(PassengerRequestScheduledEvent event) {
+			if (event.getRequestId().toString().contains("prebooked")) {
+				prebookedScheduled++;
+			} else {
+				immediateScheduled++;
+			}
+		}
+
+		@Override
+		public void handleEvent(PassengerRequestRejectedEvent event) {
+			if (event.getRequestId().toString().contains("prebooked")) {
+				prebookedRejected++;
+			} else {
+				immediateRejected++;
+			}
+		}
+		
+		void install(Controler controller) {
+			PrebookingTracker thisTracker = this;
+			
+			controller.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					addEventHandlerBinding().toInstance(thisTracker);
+				}
+			});
+		}
 	}
 }

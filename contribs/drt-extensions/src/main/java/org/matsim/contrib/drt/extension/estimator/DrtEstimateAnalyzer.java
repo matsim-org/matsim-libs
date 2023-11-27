@@ -5,7 +5,9 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.extension.estimator.run.DrtEstimatorConfigGroup;
 import org.matsim.contrib.drt.routing.DrtRoute;
@@ -23,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Analyzes and outputs drt estimates errors metrics based on daily requests.
@@ -96,22 +99,25 @@ public final class DrtEstimateAnalyzer implements StartupListener, ShutdownListe
 		DescriptiveStatistics fare = new DescriptiveStatistics();
 
 		for (DrtEventSequenceCollector.EventSequence seq : collector.getPerformedRequestSequences().values()) {
-			if (seq.getPickedUp().isPresent() && seq.getDroppedOff().isPresent()) {
+			Map<Id<Person>, DrtEventSequenceCollector.EventSequence.PersonEvents> personEvents = seq.getPersonEvents();
+			for (Map.Entry<Id<Person>, DrtEventSequenceCollector.EventSequence.PersonEvents> entry : personEvents.entrySet()) {
+				if (entry.getValue().getPickedUp().isPresent() && entry.getValue().getDroppedOff().isPresent()) {
 
-				// many attributes are not filled, when using the constructor
-				DrtRoute route = new DrtRoute(seq.getSubmitted().getFromLinkId(), seq.getSubmitted().getToLinkId());
-				route.setDirectRideTime(seq.getSubmitted().getUnsharedRideTime());
-				route.setDistance(seq.getSubmitted().getUnsharedRideDistance());
+					// many attributes are not filled, when using the constructor
+					DrtRoute route = new DrtRoute(seq.getSubmitted().getFromLinkId(), seq.getSubmitted().getToLinkId());
+					route.setDirectRideTime(seq.getSubmitted().getUnsharedRideTime());
+					route.setDistance(seq.getSubmitted().getUnsharedRideDistance());
 
-				double valWaitTime = seq.getPickedUp().get().getTime() - seq.getSubmitted().getTime();
-				double valTravelTime = seq.getDroppedOff().get().getTime() - seq.getPickedUp().get().getTime();
-				double valFare = seq.getDrtFares().stream().mapToDouble(PersonMoneyEvent::getAmount).sum();
+					double valWaitTime = entry.getValue().getPickedUp().get().getTime() - seq.getSubmitted().getTime();
+					double valTravelTime = entry.getValue().getDroppedOff().get().getTime() - entry.getValue().getPickedUp().get().getTime();
+					double valFare = seq.getDrtFares().stream().mapToDouble(PersonMoneyEvent::getAmount).sum();
 
-				DrtEstimator.Estimate estimate = estimator.estimate(route, OptionalTime.defined(seq.getSubmitted().getTime()));
+					DrtEstimator.Estimate estimate = estimator.estimate(route, OptionalTime.defined(seq.getSubmitted().getTime()));
 
-				waitTime.addValue(Math.abs(estimate.waitingTime() - valWaitTime));
-				travelTime.addValue(Math.abs(estimate.travelTime() - valTravelTime));
-				fare.addValue(Math.abs(estimate.fare() - valFare));
+					waitTime.addValue(Math.abs(estimate.waitingTime() - valWaitTime));
+					travelTime.addValue(Math.abs(estimate.travelTime() - valTravelTime));
+					fare.addValue(Math.abs(estimate.fare() - valFare));
+				}
 			}
 		}
 

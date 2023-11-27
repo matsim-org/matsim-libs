@@ -20,13 +20,15 @@
 
 package org.matsim.contrib.drt.passenger;
 
+import com.google.common.base.MoreObjects;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 
-import com.google.common.base.MoreObjects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author michalm
@@ -38,7 +40,7 @@ public class DrtRequest implements PassengerRequest {
 	private final double latestStartTime;
 	private final double latestArrivalTime;
 
-	private final Id<Person> passengerId;
+	private final List<Id<Person>> passengerIds = new ArrayList<>();
 	private final String mode;
 
 	private final Link fromLink;
@@ -50,7 +52,7 @@ public class DrtRequest implements PassengerRequest {
 		earliestStartTime = builder.earliestStartTime;
 		latestStartTime = builder.latestStartTime;
 		latestArrivalTime = builder.latestArrivalTime;
-		passengerId = builder.passengerId;
+		passengerIds.addAll(builder.passengerIds);
 		mode = builder.mode;
 		fromLink = builder.fromLink;
 		toLink = builder.toLink;
@@ -67,7 +69,7 @@ public class DrtRequest implements PassengerRequest {
 		builder.earliestStartTime = copy.getEarliestStartTime();
 		builder.latestStartTime = copy.getLatestStartTime();
 		builder.latestArrivalTime = copy.getLatestArrivalTime();
-		builder.passengerId = copy.getPassengerId();
+		builder.passengerIds = new ArrayList<>(copy.getPassengerIds());
 		builder.mode = copy.getMode();
 		builder.fromLink = copy.getFromLink();
 		builder.toLink = copy.getToLink();
@@ -109,13 +111,18 @@ public class DrtRequest implements PassengerRequest {
 	}
 
 	@Override
-	public Id<Person> getPassengerId() {
-		return passengerId;
+	public List<Id<Person>> getPassengerIds() {
+		return List.copyOf(passengerIds);
 	}
 
 	@Override
 	public String getMode() {
 		return mode;
+	}
+
+	@Override
+	public int getPassengerCount() {
+		return passengerIds.size();
 	}
 
 	@Override
@@ -126,7 +133,7 @@ public class DrtRequest implements PassengerRequest {
 				.add("earliestStartTime", earliestStartTime)
 				.add("latestStartTime", latestStartTime)
 				.add("latestArrivalTime", latestArrivalTime)
-				.add("passengerId", passengerId)
+				.add("passengerIds", passengerIds.stream().map(Object::toString).collect(Collectors.joining(",")))
 				.add("mode", mode)
 				.add("fromLink", fromLink)
 				.add("toLink", toLink)
@@ -139,7 +146,7 @@ public class DrtRequest implements PassengerRequest {
 		private double earliestStartTime;
 		private double latestStartTime;
 		private double latestArrivalTime;
-		private Id<Person> passengerId;
+		private List<Id<Person>> passengerIds = new ArrayList<>();
 		private String mode;
 		private Link fromLink;
 		private Link toLink;
@@ -172,8 +179,8 @@ public class DrtRequest implements PassengerRequest {
 			return this;
 		}
 
-		public Builder passengerId(Id<Person> val) {
-			passengerId = val;
+		public Builder passengerIds(List<Id<Person>> val) {
+			passengerIds = new ArrayList<>(val);
 			return this;
 		}
 

@@ -27,7 +27,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -38,6 +40,7 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.util.DistanceUtils;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector.EventSequence;
@@ -270,7 +273,9 @@ public class DrtSpeedUpTest {
 
 	private EventSequence eventSequence(String id, double submittedTime, double waitTime, double inVehicleSpeed) {
 		var requestId = Id.create(id, Request.class);
-		var submittedEvent = new DrtRequestSubmittedEvent(submittedTime, MODE, requestId, null, linkAB.getId(),
+		var personId = Id.create(id, Person.class);
+
+		var submittedEvent = new DrtRequestSubmittedEvent(submittedTime, MODE, requestId, List.of(personId), linkAB.getId(),
 				linkBC.getId(), Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN);
 		var pickupEvent = new PassengerPickedUpEvent(submittedTime + waitTime, MODE, requestId, null, null);
 		double rideTime = DistanceUtils.calculateDistance(linkBC, linkAB) / inVehicleSpeed;
@@ -280,7 +285,8 @@ public class DrtSpeedUpTest {
 				MODE, requestId.toString());
 		var departureEvent = mock(PersonDepartureEvent.class);
 
-		return new EventSequence(departureEvent, submittedEvent, mock(PassengerRequestScheduledEvent.class),
+
+		return new EventSequence(Id.createPersonId("r1"), departureEvent, submittedEvent, mock(PassengerRequestScheduledEvent.class),
 				pickupEvent, dropoffEvent, List.of(drtFare));
 	}
 

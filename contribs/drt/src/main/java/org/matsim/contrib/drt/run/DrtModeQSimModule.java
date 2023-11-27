@@ -77,7 +77,7 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		}
 
 		if (drtCfg.getPrebookingParams().isPresent()) {
-			install(new PrebookingModeQSimModule(getMode()));
+			install(new PrebookingModeQSimModule(getMode(), drtCfg.getPrebookingParams().get()));
 			bindModal(AdvanceRequestProvider.class).to(modalKey(PrebookingManager.class));
 		} else {
 			bindModal(AdvanceRequestProvider.class).toInstance(AdvanceRequestProvider.NONE);
