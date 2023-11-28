@@ -124,6 +124,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>it.unimi.dsi</groupId>
+			<artifactId>fastutil-core</artifactId>
+			<version>8.5.12</version>
+		</dependency>
+		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-main</artifactId>
 			<version>${geotools.version}</version>
