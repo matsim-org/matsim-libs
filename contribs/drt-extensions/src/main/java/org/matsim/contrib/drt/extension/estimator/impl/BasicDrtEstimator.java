@@ -68,9 +68,6 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 		int nRejections = collector.getRejectedRequestSequences().size();
 		int nSubmitted = collector.getRequestSubmissions().size();
 
-		// TODO: somehow configure initial estimates, probably behind interface and class
-		// TODO: optimistic, pessimistic initial etc
-
 		for (DrtEventSequenceCollector.EventSequence seq : collector.getPerformedRequestSequences().values()) {
 
 			Map<Id<Person>, DrtEventSequenceCollector.EventSequence.PersonEvents> personEvents = seq.getPersonEvents();
