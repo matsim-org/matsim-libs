@@ -1,14 +1,17 @@
 package org.matsim.contrib.drt.prebooking;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
+import org.matsim.contrib.drt.prebooking.abandon.AbandonVoter;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -38,16 +41,19 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 	private final IdMap<Request, Double> leaveTimes = new IdMap<>(Request.class);
 	private final Set<Id<Request>> enteredRequests = new HashSet<>();
 
+	private final PrebookingManager prebookingManager;
 	private final PassengerHandler passengerHandler;
-	
+
 	private final PassengerStopDurationProvider stopDurationProvider;
+	private final AbandonVoter abandonVoter;
+
 	private final Supplier<Double> endTime;
 
 	public PrebookingStopActivity(PassengerHandler passengerHandler, DynAgent driver, StayTask task,
 			Map<Id<Request>, ? extends AcceptedDrtRequest> dropoffRequests,
 			Map<Id<Request>, ? extends AcceptedDrtRequest> pickupRequests, String activityType,
-			Supplier<Double> endTime, PassengerStopDurationProvider stopDurationProvider, 
-			DvrpVehicle vehicle) {
+			Supplier<Double> endTime, PassengerStopDurationProvider stopDurationProvider, DvrpVehicle vehicle,
+			PrebookingManager prebookingManager, AbandonVoter abandonVoter) {
 		super(activityType);
 		this.passengerHandler = passengerHandler;
 		this.driver = driver;
@@ -55,6 +61,8 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 		this.pickupRequests = pickupRequests;
 		this.stopDurationProvider = stopDurationProvider;
 		this.vehicle = vehicle;
+		this.prebookingManager = prebookingManager;
+		this.abandonVoter = abandonVoter;
 		this.endTime = endTime;
 	}
 
@@ -85,42 +93,52 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 			var entry = iterator.next();
 
 			if (entry.getValue() <= now) { // Request should leave now
-				passengerHandler.dropOffPassenger(driver, entry.getKey(), now);
+				passengerHandler.dropOffPassengers(driver, entry.getKey(), now);
+				prebookingManager.notifyDropoff(entry.getKey());
 				iterator.remove();
 			}
 		}
 	}
 
 	private boolean updatePickupRequests(double now) {
-		for (var request : pickupRequests.values()) {
+		var pickupIterator = pickupRequests.values().iterator();
+
+		while (pickupIterator.hasNext()) {
+			var request = pickupIterator.next();
+
 			if (!enteredRequests.contains(request.getId()) && !enterTimes.containsKey(request.getId())) {
 				// this is a new request that has been added after the activity has been created
 				// or that had not arrived yet
 
-				if (passengerHandler.notifyWaitForPassenger(this, this.driver, request.getId())) {
+				if (passengerHandler.notifyWaitForPassengers(this, this.driver, request.getId())) {
 					// agent starts to enter
 					queuePickup(request, now);
+				} else if (now > request.getEarliestStartTime()) {
+					if (abandonVoter.abandonRequest(now, vehicle, request)) {
+						prebookingManager.abandon(request.getId());
+					}
 				}
 			}
 		}
 
-		var iterator = enterTimes.entrySet().iterator();
+		var enterIterator = enterTimes.entrySet().iterator();
 
-		while (iterator.hasNext()) {
-			var entry = iterator.next();
+		while (enterIterator.hasNext()) {
+			var entry = enterIterator.next();
 
 			if (entry.getValue() <= now) {
 				// let agent enter now
-				Verify.verify(passengerHandler.tryPickUpPassenger(this, driver, entry.getKey(), now));
+				Verify.verify(passengerHandler.tryPickUpPassengers(this, driver, entry.getKey(), now));
 				enteredRequests.add(entry.getKey());
-				iterator.remove();
+				enterIterator.remove();
 			}
 		}
 
-		return enterTimes.size() == 0 && enteredRequests.size() == pickupRequests.size();
+		return enterTimes.size() == 0 && pickupRequests.size() == enteredRequests.size();
 	}
 
 	private void queuePickup(AcceptedDrtRequest request, double now) {
+		prebookingManager.notifyPickup(now, request);
 		double enterTime = now + stopDurationProvider.calcPickupDuration(vehicle, request.getRequest());
 		enterTimes.put(request.getId(), enterTime);
 	}
@@ -131,13 +149,17 @@ public class PrebookingStopActivity extends FirstLastSimStepDynActivity implemen
 	}
 
 	@Override
-	public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now) {
-		var request = getRequestForPassenger(passenger.getId());
+	public void notifyPassengersAreReadyForDeparture(List<MobsimPassengerAgent> passengers, double now) {
+		var request = getRequestForPassengers(passengers.stream().map(Identifiable::getId).toList());
 		queuePickup(request, now);
 	}
 
-	private AcceptedDrtRequest getRequestForPassenger(Id<Person> passengerId) {
-		return pickupRequests.values().stream().filter(r -> passengerId.equals(r.getPassengerId())).findAny()
+
+	private AcceptedDrtRequest getRequestForPassengers(List<Id<Person>> passengerIds) {
+		return pickupRequests.values()
+				.stream()
+				.filter(r -> r.getPassengerIds().size() == passengerIds.size() && r.getPassengerIds().containsAll(passengerIds))
+				.findAny()
 				.orElseThrow(() -> new IllegalArgumentException("I am waiting for different passengers!"));
 	}
 }

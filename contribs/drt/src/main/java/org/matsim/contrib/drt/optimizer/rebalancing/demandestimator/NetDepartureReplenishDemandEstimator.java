@@ -43,7 +43,7 @@ public class NetDepartureReplenishDemandEstimator
 	public void handleEvent(PassengerRequestRejectedEvent event) {
 		if (event.getMode().equals(mode)) {
 			// Ignore rejected request.
-			potentialDrtTripsMap.remove(event.getPersonId());
+			potentialDrtTripsMap.remove(event.getRequestId());
 		}
 	}
 

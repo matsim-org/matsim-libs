@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Coord;
@@ -358,6 +359,8 @@ public class PrebookingTestEnvironment {
 		public double submissionTime = Double.NaN;
 		public double pickupTime = Double.NaN;
 		public double dropoffTime = Double.NaN;
+
+		public List<Double> submissionTimes = new LinkedList<>();
 	}
 
 	private Map<String, RequestInfo> requestInfo = new HashMap<>();
@@ -379,13 +382,17 @@ public class PrebookingTestEnvironment {
 			PassengerDroppedOffEventHandler, PassengerRequestRejectedEventHandler {
 		@Override
 		public void handleEvent(DrtRequestSubmittedEvent event) {
-			requestInfo.computeIfAbsent(event.getPersonId().toString(), id -> new RequestInfo()).submissionTime = event
+			String ids = event.getPersonIds().stream().map(Object::toString).collect(Collectors.joining("-"));
+			requestInfo.computeIfAbsent(ids, id -> new RequestInfo()).submissionTime = event
 					.getTime();
+			requestInfo.computeIfAbsent(ids, id -> new RequestInfo()).submissionTimes
+					.add(event.getTime());
+
 		}
 
 		@Override
 		public void handleEvent(PassengerRequestRejectedEvent event) {
-			requestInfo.computeIfAbsent(event.getPersonId().toString(), id -> new RequestInfo()).rejected = true;
+			requestInfo.computeIfAbsent(event.getPersonIds().stream().map(Object::toString).collect(Collectors.joining("-")), id -> new RequestInfo()).rejected = true;
 		}
 
 		@Override

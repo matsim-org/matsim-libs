@@ -20,12 +20,13 @@
 
 package org.matsim.contrib.drt.passenger;
 
+import com.google.common.base.MoreObjects;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.optimizer.Request;
 
-import com.google.common.base.MoreObjects;
+import java.util.List;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -98,8 +99,8 @@ public class AcceptedDrtRequest {
 		return request.getToLink();
 	}
 
-	public Id<Person> getPassengerId() {
-		return request.getPassengerId();
+	public List<Id<Person>> getPassengerIds() {
+		return request.getPassengerIds();
 	}
 
 	public String getMode() {
