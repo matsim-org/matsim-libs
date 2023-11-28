@@ -17,6 +17,11 @@ public class DrtEstimatorConfigGroup extends ReflectiveConfigGroupWithConfigurab
 		BASIC,
 
 		/**
+		 * Will use the bound initial estimator, without any updates.
+		 */
+		INITIAL,
+
+		/**
 		 * Custom estimator, that needs to provided via binding.
 		 */
 		CUSTOM
@@ -56,6 +61,14 @@ public class DrtEstimatorConfigGroup extends ReflectiveConfigGroupWithConfigurab
 	@Override
 	public String getMode() {
 		return mode;
+	}
+
+	/**
+	 * Set estimator type and return same instance.
+	 */
+	public DrtEstimatorConfigGroup withEstimator(EstimatorType estimator) {
+		this.estimator = estimator;
+		return this;
 	}
 
 }
