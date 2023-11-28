@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -35,22 +36,28 @@ public class CountTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
+	private Counts<Link> counts;
+
+	@Before
+	public void setUp() throws Exception {
+		this.counts = new Counts<>();
+	}
 
 	@Test public void testCreateVolume() {
-		Count count = new Count(Id.create(0, Link.class), "1");
+		Count count = counts.createAndAddCount(Id.create(0, Link.class), "1");
 		Volume volume = count.createVolume(1, 100.0);
 		assertTrue("Creation and initialization of volume failed", volume.getHourOfDayStartingWithOne()==1);
 		assertTrue("Creation and initialization of volume failed", volume.getValue()==100.0);
 	}
 
 	@Test public void testGetVolume() {
-		Count count = new Count(Id.create(0, Link.class), "1");
+		Count count = counts.createAndAddCount(Id.create(0, Link.class), "1");
 		count.createVolume(1, 100.0);
 		assertTrue("Getting volume failed", count.getVolume(1).getValue() == 100.0);
 	}
 
 	@Test public void testGetVolumes() {
-		Count count = new Count(Id.create(0, Link.class), "1");
+		Count count = counts.createAndAddCount(Id.create(0, Link.class), "1");
 		count.createVolume(1, 100.0);
 
 		Iterator<Volume> vol_it = count.getVolumes().values().iterator();
