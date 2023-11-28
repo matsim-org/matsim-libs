@@ -97,7 +97,7 @@ public class CountsParserWriterTest {
 		f.counts.setName(null);
 		Assert.assertNull(f.counts.getName());
 		String filename = this.utils.getOutputDirectory() + "counts.xml";
-		new CountsWriter(f.counts).write(filename);
+		new CountsWriterV1(f.counts).write(filename);
 
 		Counts counts2 = new Counts();
 		new CountsReaderMatsimV1(counts2).readFile(filename);
