@@ -6,7 +6,7 @@ import org.matsim.application.prepare.network.CreateGeoJsonNetwork;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
-import org.matsim.simwrapper.viz.Links;
+import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.Plotly;
 import org.matsim.simwrapper.viz.Table;
 import tech.tablesaw.plotly.components.Axis;
@@ -67,15 +67,27 @@ public class TrafficDashboard implements Dashboard {
 				viz.enableFilter = false;
 			}));
 
-		// TODO: not working ideally, should be converted to map viz
-		layout.row("map").el(Links.class, (viz, data) -> {
+		// TODO: Could be done per mode, by using the tab feature
 
-			viz.network = data.compute(CreateGeoJsonNetwork.class, "network.geojson");
-			viz.datasets.csvBase = data.compute(TrafficAnalysis.class, "traffic_stats_by_link_daily.csv", args);
+		layout.row("map").el(MapPlot.class, (viz, data) -> {
+
+			viz.title = "Traffic statistics";
 			viz.center = data.context().getCenter();
+			viz.zoom = data.context().mapZoomLevel;
 
-			viz.display.color.columnName = "avg_speed";
-			viz.display.width.columnName = "avg_speed";
+			viz.setShape(data.compute(CreateGeoJsonNetwork.class, "network.geojson"), "id");
+
+			viz.addDataset("traffic", data.compute(TrafficAnalysis.class, "traffic_stats_by_link_daily.csv"));
+
+			viz.display.lineColor.dataset = "traffic";
+			viz.display.lineColor.columnName = "avg_speed";
+			viz.display.lineColor.join = "link_id";
+			viz.display.lineColor.setColorRamp(Plotly.ColorScheme.RdYlBu, 5, false);
+
+			viz.display.lineWidth.dataset = "traffic";
+			viz.display.lineWidth.columnName = "simulated_traffic_volume";
+			viz.display.lineWidth.scaleFactor = 20000d;
+			viz.display.lineWidth.join = "link_id";
 
 			viz.height = 12d;
 		});

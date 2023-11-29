@@ -248,6 +248,21 @@ public final class CommandRunner {
 	}
 
 	/**
+	 * Return the output of a command with a placeholder.
+	 */
+	public Path getRequiredPath(Class<? extends MATSimAppCommand> command, String file, String placeholder) {
+		CommandSpec spec = ApplicationUtils.getSpec(command);
+		if (!ArrayUtils.contains(spec.produces(), file))
+			throw new IllegalArgumentException(String.format("Command %s does not declare output %s", command, file));
+		if (!file.contains("%s"))
+			throw new IllegalArgumentException(String.format("File %s does not contain placeholder %%s", file));
+
+		file = String.format(file, placeholder);
+
+		return buildPath(spec, command).resolve(file);
+	}
+
+	/**
 	 * Base path for the runner.
 	 */
 	public Path getOutput() {

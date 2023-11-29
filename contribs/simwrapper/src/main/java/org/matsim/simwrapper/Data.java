@@ -107,6 +107,15 @@ public final class Data {
 		return this.getUnixPath(this.path.getParent().relativize(path));
 	}
 
+	/**
+	 * Uses a command to construct the required output.
+	 * @param command the command to be executed
+	 * @param file name of the produced output file, which must contain a placeholder that is going to be replaced
+	 * @param placeholder string to insert into the placeholder
+	 */
+	public String computeWithPlaceholder(Class<? extends MATSimAppCommand> command, String file, String placeholder, String... args) {
+		throw new UnsupportedOperationException("Not implemented yet.");
+	}
 	public String subcommand(String command, String file) {
 		throw new UnsupportedOperationException("Not implemented yet.");
 	}
