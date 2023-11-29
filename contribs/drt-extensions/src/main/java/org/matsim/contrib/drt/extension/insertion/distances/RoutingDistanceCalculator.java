@@ -19,7 +19,7 @@ public class RoutingDistanceCalculator implements DistanceCalculator {
 	// set this up in a more intelligent way, I'm not sure, but I guess that the
 	// constraints are accesses in parallel by DRT. /sh nov'23
 	@Override
-	public synchronized double estimateDistance(double departureTime, Link fromLink, Link toLink) {
+	public synchronized double calculateDistance(double departureTime, Link fromLink, Link toLink) {
 		VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(fromLink, toLink, departureTime, router, travelTime);
 		return VrpPaths.calcDistance(path);
 	}

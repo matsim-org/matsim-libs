@@ -15,8 +15,9 @@ import org.matsim.contrib.drt.extension.insertion.constraints.SkillsConstraint.R
 import org.matsim.contrib.drt.extension.insertion.constraints.SkillsConstraint.VehicleSkillsSupplier;
 import org.matsim.contrib.drt.extension.insertion.constraints.VehicleRangeConstraint;
 import org.matsim.contrib.drt.extension.insertion.constraints.VehicleRangeConstraint.VehicleRangeSupplier;
-import org.matsim.contrib.drt.extension.insertion.distances.ApproximateDistanceCalculator;
+import org.matsim.contrib.drt.extension.insertion.distances.DistanceApproximator;
 import org.matsim.contrib.drt.extension.insertion.distances.DistanceCalculator;
+import org.matsim.contrib.drt.extension.insertion.distances.EuclideanDistanceApproximator;
 import org.matsim.contrib.drt.extension.insertion.distances.RoutingDistanceCalculator;
 import org.matsim.contrib.drt.extension.insertion.objectives.PassengerDelayObjective;
 import org.matsim.contrib.drt.extension.insertion.objectives.VehicleActiveTimeObjective;
@@ -173,10 +174,93 @@ public class DrtInsertionModule extends AbstractDvrpModeQSimModule {
 		return this;
 	}
 
+	// DISTANCES
+
+	private DistanceCalculator distanceCalculator;
+	private DistanceApproximator distanceApproximator;
+
+	private Class<? extends DistanceCalculator> distanceCalculatorClass;
+	private Class<? extends DistanceApproximator> distanceApproximatorClass;
+
+	public DrtInsertionModule withDistanceCalculator(DistanceCalculator distanceCalculator) {
+		Preconditions.checkState(this.distanceCalculator == null && this.distanceCalculatorClass == null);
+		this.distanceCalculator = distanceCalculator;
+		return this;
+	}
+
+	public DrtInsertionModule withDistanceCalculator(Class<? extends DistanceCalculator> distanceCalculatorClass) {
+		Preconditions.checkState(this.distanceCalculator == null && this.distanceCalculatorClass == null);
+		this.distanceCalculatorClass = distanceCalculatorClass;
+		return this;
+	}
+
+	public DrtInsertionModule withDistanceApproximator(DistanceApproximator distanceApproximator) {
+		Preconditions.checkState(this.distanceApproximator == null && this.distanceApproximatorClass == null);
+		this.distanceApproximator = distanceApproximator;
+		return this;
+	}
+
+	public DrtInsertionModule withDistanceApproximator(
+			Class<? extends DistanceApproximator> distanceApproximatorClass) {
+		Preconditions.checkState(this.distanceApproximator == null && this.distanceApproximatorClass == null);
+		this.distanceApproximatorClass = distanceApproximatorClass;
+		return this;
+	}
+
+	public DrtInsertionModule withEuclideanDistanceApproximator(double euclideanDistanceFactor) {
+		Preconditions.checkState(this.distanceApproximator == null && this.distanceApproximatorClass == null);
+		this.distanceApproximator = new EuclideanDistanceApproximator(euclideanDistanceFactor);
+		return this;
+	}
+
+	public DrtInsertionModule withEuclideanDistanceCalculator(double euclideanDistanceFactor) {
+		Preconditions.checkState(this.distanceCalculator == null && this.distanceCalculatorClass == null);
+		this.distanceCalculator = new EuclideanDistanceApproximator(euclideanDistanceFactor);
+		return this;
+	}
+
+	private void configureDistances() {
+		bindModal(RoutingDistanceCalculator.class).toProvider(modalProvider(getter -> {
+			LeastCostPathCalculatorFactory factory = new SpeedyALTFactory();
+
+			TravelTime travelTime = getter.getModal(TravelTime.class);
+			TravelDisutility travelDisutility = new OnlyTimeDependentTravelDisutility(travelTime);
+			Network network = getter.getModal(Network.class);
+
+			printDistanceWarning();
+
+			return new RoutingDistanceCalculator(factory.createPathCalculator(network, travelDisutility, travelTime),
+					travelTime);
+		}));
+
+		if (distanceCalculator == null && distanceCalculatorClass == null) {
+			distanceCalculatorClass = RoutingDistanceCalculator.class;
+		}
+
+		if (distanceApproximator == null && distanceApproximatorClass == null) {
+			distanceApproximator = DistanceApproximator.NULL;
+		}
+
+		if (distanceCalculator != null) {
+			bindModal(DistanceCalculator.class).toInstance(distanceCalculator);
+		}
+
+		if (distanceCalculatorClass != null) {
+			bindModal(DistanceCalculator.class).to(modalKey(distanceCalculatorClass));
+		}
+
+		if (distanceApproximator != null) {
+			bindModal(DistanceApproximator.class).toInstance(distanceApproximator);
+		}
+
+		if (distanceApproximatorClass != null) {
+			bindModal(DistanceApproximator.class).to(modalKey(distanceApproximatorClass));
+		}
+	}
+
 	// RANGE CONSTRAINT
 
 	private boolean useRangeConstraint = false;
-	private double rangeEstimationFactor = Double.NaN;
 
 	private VehicleRangeSupplier vehicleRangeSupplier;
 	private Class<? extends VehicleRangeSupplier> vehicleRangeSupplierClass;
@@ -200,11 +284,6 @@ public class DrtInsertionModule extends AbstractDvrpModeQSimModule {
 		return this;
 	}
 
-	public DrtInsertionModule withRangeEstimationFactor(double rangeEstimationFactor) {
-		this.rangeEstimationFactor = rangeEstimationFactor;
-		return this;
-	}
-
 	private void configureRangeContraint(List<Key<? extends DrtInsertionConstraint>> constraintBindings) {
 		if (useRangeConstraint) {
 			if (vehicleRangeSupplier != null) {
@@ -216,10 +295,12 @@ public class DrtInsertionModule extends AbstractDvrpModeQSimModule {
 			}
 
 			bindModal(VehicleRangeConstraint.class).toProvider(modalProvider(getter -> {
-				DistanceCalculator distanceCalculator = getter.getModal(RoutingDistanceCalculator.class);
-				DistanceCalculator distanceApproximator = Double.isFinite(rangeEstimationFactor)
-						? new ApproximateDistanceCalculator(rangeEstimationFactor)
-						: null;
+				DistanceCalculator distanceCalculator = getter.getModal(DistanceCalculator.class);
+				DistanceApproximator distanceApproximator = getter.getModal(DistanceApproximator.class);
+
+				if (distanceApproximator == DistanceApproximator.NULL) {
+					distanceApproximator = null;
+				}
 
 				return new VehicleRangeConstraint(vehicleRangeSupplier, distanceCalculator, distanceApproximator);
 			}));
@@ -362,7 +443,7 @@ public class DrtInsertionModule extends AbstractDvrpModeQSimModule {
 			final DistanceCalculator distanceCalculator;
 
 			if (Double.isFinite(distanceObjectiveEstimationFactor)) {
-				distanceCalculator = new ApproximateDistanceCalculator(distanceObjectiveEstimationFactor);
+				distanceCalculator = new EuclideanDistanceApproximator(distanceObjectiveEstimationFactor);
 			} else {
 				distanceCalculator = getter.getModal(RoutingDistanceCalculator.class);
 			}
@@ -373,6 +454,8 @@ public class DrtInsertionModule extends AbstractDvrpModeQSimModule {
 
 	@Override
 	protected void configureQSim() {
+		configureDistances();
+
 		List<Key<? extends DrtInsertionConstraint>> constraintBindings = new LinkedList<>();
 		configureExclusivityConstraint(constraintBindings);
 		configureSingleRequestConstraint(constraintBindings);
@@ -424,19 +507,6 @@ public class DrtInsertionModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(CostCalculationStrategy.class).to(modalKey(ConfigurableCostCalculatorStrategy.class));
 		bindModal(DrtOfferAcceptor.class).to(modalKey(PromisedTimeWindowOfferAcceptor.class));
-
-		bindModal(RoutingDistanceCalculator.class).toProvider(modalProvider(getter -> {
-			LeastCostPathCalculatorFactory factory = new SpeedyALTFactory();
-
-			TravelTime travelTime = getter.getModal(TravelTime.class);
-			TravelDisutility travelDisutility = new OnlyTimeDependentTravelDisutility(travelTime);
-			Network network = getter.getModal(Network.class);
-
-			printDistanceWarning();
-
-			return new RoutingDistanceCalculator(factory.createPathCalculator(network, travelDisutility, travelTime),
-					travelTime);
-		}));
 	}
 
 	private final static Logger logger = LogManager.getLogger(DrtInsertionModule.class);
