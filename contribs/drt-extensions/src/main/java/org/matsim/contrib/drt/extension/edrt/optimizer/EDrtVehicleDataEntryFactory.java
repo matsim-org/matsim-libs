@@ -75,6 +75,9 @@ public class EDrtVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
 			nextTaskIdx = 0;
 			chargeBeforeNextTask = battery.getCharge();
 		} else { // STARTED
+			if (currentTime >= vehicle.getServiceEndTime()) {
+				return null;
+			}
 			Task currentTask = schedule.getCurrentTask();
 			ETaskTracker eTracker = (ETaskTracker)currentTask.getTaskTracker();
 			chargeBeforeNextTask = eTracker.predictChargeAtEnd();
