@@ -74,8 +74,8 @@ public class EDrtVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
 		if (schedule.getStatus() == ScheduleStatus.PLANNED) {
 			nextTaskIdx = 0;
 			chargeBeforeNextTask = battery.getCharge();
-			// STARTED, but the vehicle is out of service time
 		} else if (currentTime >= vehicle.getServiceEndTime()) {
+			// The vehicle is out of service time
 			return null;
 		} else {
 			// STARTED, vehicle is in service time
