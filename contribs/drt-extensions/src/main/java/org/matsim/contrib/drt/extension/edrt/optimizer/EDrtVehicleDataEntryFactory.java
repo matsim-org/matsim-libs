@@ -71,19 +71,22 @@ public class EDrtVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
 		Battery battery = ((EvDvrpVehicle)vehicle).getElectricVehicle().getBattery();
 		int nextTaskIdx;
 		double chargeBeforeNextTask;
-		if (schedule.getStatus() == ScheduleStatus.PLANNED) {
-			nextTaskIdx = 0;
-			chargeBeforeNextTask = battery.getCharge();
-		} else if (currentTime >= vehicle.getServiceEndTime()) {
-			// The vehicle is out of service time
-			return null;
-		} else {
-			// STARTED, vehicle is in service time
-			Task currentTask = schedule.getCurrentTask();
-			ETaskTracker eTracker = (ETaskTracker)currentTask.getTaskTracker();
-			chargeBeforeNextTask = eTracker.predictChargeAtEnd();
-			nextTaskIdx = currentTask.getTaskIdx() + 1;
+
+		switch (schedule.getStatus()) {
+			case PLANNED:
+				nextTaskIdx = 0;
+				chargeBeforeNextTask = battery.getCharge();
+				break;
+			case STARTED:
+				Task currentTask = schedule.getCurrentTask();
+				ETaskTracker eTracker = (ETaskTracker) currentTask.getTaskTracker();
+				chargeBeforeNextTask = eTracker.predictChargeAtEnd();
+				nextTaskIdx = currentTask.getTaskIdx() + 1;
+				break;
+			default:
+				return null;
 		}
+
 
 		List<? extends Task> tasks = schedule.getTasks();
 		for (int i = nextTaskIdx; i < tasks.size() - 1; i++) {
