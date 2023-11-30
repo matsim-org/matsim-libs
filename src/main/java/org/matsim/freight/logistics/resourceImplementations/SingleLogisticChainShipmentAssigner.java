@@ -28,34 +28,33 @@ import org.matsim.freight.logistics.ShipmentAssigner;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
 /**
- * Ganz einfacher {@link ShipmentAssigner}:
- * Voraussetzung: Der {@link LSPPlan} hat genau 1 {@link LogisticChain}.
- * <p>
- * Dann wird das {@link  LSPShipment} diesem zugeordnet.
- * <p>
- * (Falls die Voraussetzung "exakt 1 LogisticChain pro Plan" nicht erfüllt ist, kommt eine RuntimeException)
+ * Ganz einfacher {@link ShipmentAssigner}: Voraussetzung: Der {@link LSPPlan} hat genau 1 {@link
+ * LogisticChain}.
+ *
+ * <p>Dann wird das {@link LSPShipment} diesem zugeordnet.
+ *
+ * <p>(Falls die Voraussetzung "exakt 1 LogisticChain pro Plan" nicht erfüllt ist, kommt eine
+ * RuntimeException)
  */
 class SingleLogisticChainShipmentAssigner implements ShipmentAssigner {
 
-	private LSP lsp;
+  private LSP lsp;
 
-	SingleLogisticChainShipmentAssigner() {
-	}
+  SingleLogisticChainShipmentAssigner() {}
 
-	@Override
-	public LSP getLSP() {
-		throw new RuntimeException("not implemented");
-	}
+  @Override
+  public LSP getLSP() {
+    throw new RuntimeException("not implemented");
+  }
 
-	public void setLSP(LSP lsp) {
-		this.lsp = lsp;
-	}
+  public void setLSP(LSP lsp) {
+    this.lsp = lsp;
+  }
 
-	@Override
-	public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
-		Gbl.assertIf(lspPlan.getLogisticChains().size() == 1);
-		LogisticChain singleSolution = lspPlan.getLogisticChains().iterator().next();
-		singleSolution.addShipmentToChain(shipment);
-	}
-
+  @Override
+  public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
+    Gbl.assertIf(lspPlan.getLogisticChains().size() == 1);
+    LogisticChain singleSolution = lspPlan.getLogisticChains().iterator().next();
+    singleSolution.addShipmentToChain(shipment);
+  }
 }

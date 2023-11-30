@@ -31,38 +31,38 @@ import org.matsim.freight.logistics.shipment.Requirement;
 
 class RequirementsAssigner implements ShipmentAssigner {
 
-	private final Collection<LogisticChain> feasibleLogisticChains;
-	private LSP lsp;
+  private final Collection<LogisticChain> feasibleLogisticChains;
+  private LSP lsp;
 
-	public RequirementsAssigner() {
-		this.feasibleLogisticChains = new ArrayList<>();
-	}
+  public RequirementsAssigner() {
+    this.feasibleLogisticChains = new ArrayList<>();
+  }
 
-	@Override
-	public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
-		feasibleLogisticChains.clear();
+  @Override
+  public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
+    feasibleLogisticChains.clear();
 
-		label:
-		for (LogisticChain solution : lspPlan.getLogisticChains()) {
-			for (Requirement requirement : shipment.getRequirements()) {
-				if (!requirement.checkRequirement(solution)) {
+    label:
+    for (LogisticChain solution : lspPlan.getLogisticChains()) {
+      for (Requirement requirement : shipment.getRequirements()) {
+        if (!requirement.checkRequirement(solution)) {
 
-					continue label;
-				}
-			}
-			feasibleLogisticChains.add(solution);
-		}
-		LogisticChain chosenSolution = feasibleLogisticChains.iterator().next();
-		chosenSolution.addShipmentToChain(shipment);
-	}
+          continue label;
+        }
+      }
+      feasibleLogisticChains.add(solution);
+    }
+    LogisticChain chosenSolution = feasibleLogisticChains.iterator().next();
+    chosenSolution.addShipmentToChain(shipment);
+  }
 
-	@Override public LSP getLSP(){
-		throw new RuntimeException( "not implemented" );
-	}
+  @Override
+  public LSP getLSP() {
+    throw new RuntimeException("not implemented");
+  }
 
-	@Override
-	public void setLSP(LSP lsp) {
-		this.lsp = lsp;
-	}
-
+  @Override
+  public void setLSP(LSP lsp) {
+    this.lsp = lsp;
+  }
 }

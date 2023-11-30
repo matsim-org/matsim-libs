@@ -26,42 +26,40 @@ import org.matsim.freight.logistics.LogisticChainElement;
 
 /*package-private*/ class LoggedShipmentLoad implements ShipmentPlanElement {
 
-	private final double startTime;
-	private final double endTime;
-	private final LogisticChainElement element;
-	private final Id<LSPResource> resourceId;
+  private final double startTime;
+  private final double endTime;
+  private final LogisticChainElement element;
+  private final Id<LSPResource> resourceId;
 
-	LoggedShipmentLoad(ShipmentUtils.LoggedShipmentLoadBuilder builder) {
-		this.startTime = builder.getStartTime();
-		this.endTime = builder.getEndTime();
-		this.element = builder.getElement();
-		this.resourceId = builder.getResourceId();
-	}
+  LoggedShipmentLoad(ShipmentUtils.LoggedShipmentLoadBuilder builder) {
+    this.startTime = builder.getStartTime();
+    this.endTime = builder.getEndTime();
+    this.element = builder.getElement();
+    this.resourceId = builder.getResourceId();
+  }
 
+  @Override
+  public String getElementType() {
+    return "LOAD";
+  }
 
-	@Override
-	public String getElementType() {
-		return "LOAD";
-	}
+  @Override
+  public double getStartTime() {
+    return startTime;
+  }
 
-	@Override
-	public double getStartTime() {
-		return startTime;
-	}
+  @Override
+  public double getEndTime() {
+    return endTime;
+  }
 
-	@Override
-	public double getEndTime() {
-		return endTime;
-	}
+  @Override
+  public LogisticChainElement getLogisticChainElement() {
+    return element;
+  }
 
-	@Override
-	public LogisticChainElement getLogisticChainElement() {
-		return element;
-	}
-
-	@Override
-	public Id<LSPResource> getResourceId() {
-		return resourceId;
-	}
-
+  @Override
+  public Id<LSPResource> getResourceId() {
+    return resourceId;
+  }
 }

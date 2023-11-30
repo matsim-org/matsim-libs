@@ -1,15 +1,14 @@
 package org.matsim.freight.logistics.events;
 
+import static org.matsim.freight.logistics.HasLspShipmentId.ATTRIBUTE_LSP_SHIPMENT_ID;
+
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.HasLinkId;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.logistics.HasLspShipmentId;
 import org.matsim.freight.logistics.shipment.LSPShipment;
-
-import java.util.Map;
-
-import static org.matsim.freight.logistics.HasLspShipmentId.ATTRIBUTE_LSP_SHIPMENT_ID;
 
 /**
  * A general logistic event contains the information (= {@link Id}) of the - the location (= {@link

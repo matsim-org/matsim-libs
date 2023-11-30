@@ -27,11 +27,10 @@ import org.matsim.freight.logistics.shipment.Requirement;
 
 /*package-private*/ class BlueRequirement implements Requirement {
 
-	static final String BLUE = "blue";
+  static final String BLUE = "blue";
 
-	@Override
-	public boolean checkRequirement(LogisticChain solution) {
-		return solution.getAttributes().getAttribute(ATTRIBUTE_COLOR).equals(BLUE);
-	}
-
+  @Override
+  public boolean checkRequirement(LogisticChain solution) {
+    return solution.getAttributes().getAttribute(ATTRIBUTE_COLOR).equals(BLUE);
+  }
 }

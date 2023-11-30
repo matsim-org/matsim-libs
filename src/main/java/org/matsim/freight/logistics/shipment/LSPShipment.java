@@ -29,34 +29,39 @@ import org.matsim.freight.logistics.HasSimulationTrackers;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
- * This is, for example, a shipment that DHL moves from A to B.  It may use multiple carriers to achieve that.
- * <p>
- * Questions/comments:<ul>
- * <li>Within more modern MATSim, we would probably prefer to have from and to in coordinates, not link IDs.</li>
+ * This is, for example, a shipment that DHL moves from A to B. It may use multiple carriers to
+ * achieve that.
+ *
+ * <p>Questions/comments:
+ *
+ * <ul>
+ *   <li>Within more modern MATSim, we would probably prefer to have from and to in coordinates, not
+ *       link IDs.
  * </ul>
  */
-public interface LSPShipment extends Identifiable<LSPShipment>, Attributable, HasSimulationTrackers<LSPShipment> {
+public interface LSPShipment
+    extends Identifiable<LSPShipment>, Attributable, HasSimulationTrackers<LSPShipment> {
 
-	Id<Link> getFrom(); // same as in CarrierShipment
+  Id<Link> getFrom(); // same as in CarrierShipment
 
-	Id<Link> getTo(); // same as in CarrierShipment
+  Id<Link> getTo(); // same as in CarrierShipment
 
-	TimeWindow getPickupTimeWindow(); // same as in CarrierShipment
+  TimeWindow getPickupTimeWindow(); // same as in CarrierShipment
 
-	TimeWindow getDeliveryTimeWindow(); // same as in CarrierShipment
+  TimeWindow getDeliveryTimeWindow(); // same as in CarrierShipment
 
-	int getSize(); // same as in CarrierShipment
+  int getSize(); // same as in CarrierShipment
 
-	double getDeliveryServiceTime(); // same as in CarrierShipment
+  double getDeliveryServiceTime(); // same as in CarrierShipment
 
-	double getPickupServiceTime(); // same as in CarrierShipment
+  double getPickupServiceTime(); // same as in CarrierShipment
 
-//	ShipmentPlan getShipmentPlan();
+  //	ShipmentPlan getShipmentPlan();
 
-	ShipmentPlan getShipmentLog();
+  ShipmentPlan getShipmentLog();
 
-	Collection<Requirement> getRequirements();
+  Collection<Requirement> getRequirements();
 
-//	void setLspId(Id<LSP> id);
-//	Id<LSP> getLspId();
+  //	void setLspId(Id<LSP> id);
+  //	Id<LSP> getLspId();
 }

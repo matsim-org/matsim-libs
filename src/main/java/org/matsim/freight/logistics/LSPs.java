@@ -27,21 +27,19 @@ import org.matsim.api.core.v01.Id;
 
 public class LSPs {
 
-	private final Map<Id<LSP>, LSP> lsps = new LinkedHashMap<>();
+  private final Map<Id<LSP>, LSP> lsps = new LinkedHashMap<>();
 
-	public LSPs(Collection<LSP> lsps) {
-		makeMap(lsps);
-	}
+  public LSPs(Collection<LSP> lsps) {
+    makeMap(lsps);
+  }
 
-	private void makeMap(Collection<LSP> lsps) {
-		for (LSP c : lsps) {
-			this.lsps.put(c.getId(), c);
-		}
-	}
+  private void makeMap(Collection<LSP> lsps) {
+    for (LSP c : lsps) {
+      this.lsps.put(c.getId(), c);
+    }
+  }
 
-
-	public Map<Id<LSP>, LSP> getLSPs() {
-		return lsps;
-	}
-
+  public Map<Id<LSP>, LSP> getLSPs() {
+    return lsps;
+  }
 }

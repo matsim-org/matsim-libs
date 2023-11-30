@@ -26,14 +26,13 @@ import org.matsim.freight.logistics.HasBackpointer;
 
 public interface ShipmentPlan extends HasBackpointer<Id<LSPShipment>> {
 
-	Id<LSPShipment> getLspShipmentId();
+  Id<LSPShipment> getLspShipmentId();
 
-	Map<Id<ShipmentPlanElement>, ShipmentPlanElement> getPlanElements();
+  Map<Id<ShipmentPlanElement>, ShipmentPlanElement> getPlanElements();
 
-	void addPlanElement(Id<ShipmentPlanElement> id, ShipmentPlanElement element);
+  void addPlanElement(Id<ShipmentPlanElement> id, ShipmentPlanElement element);
 
-	ShipmentPlanElement getMostRecentEntry();
+  ShipmentPlanElement getMostRecentEntry();
 
-	void clear();
-
+  void clear();
 }

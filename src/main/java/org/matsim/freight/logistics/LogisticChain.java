@@ -27,19 +27,21 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
- * A LogisticsSolution can be seen as a representative of a
- * transport chain. It consists of several chain links that implement the interface
- * {@link LogisticChainElement}. The latter is more a logical than a physical entity.
- * Physical entities, in turn, are housed inside classes that implement the interface
- * {@link LSPResource}. This introduction of an intermediate layer allows physical Resources
- * to be used by several {@link LogisticChain}s and thus transport chains.
+ * A LogisticsSolution can be seen as a representative of a transport chain. It consists of several
+ * chain links that implement the interface {@link LogisticChainElement}. The latter is more a
+ * logical than a physical entity. Physical entities, in turn, are housed inside classes that
+ * implement the interface {@link LSPResource}. This introduction of an intermediate layer allows
+ * physical Resources to be used by several {@link LogisticChain}s and thus transport chains.
  */
-public interface LogisticChain extends Identifiable<LogisticChain>, KnowsLSP, HasSimulationTrackers<LogisticChain>, Attributable {
+public interface LogisticChain
+    extends Identifiable<LogisticChain>,
+        KnowsLSP,
+        HasSimulationTrackers<LogisticChain>,
+        Attributable {
 
-	Collection<LogisticChainElement> getLogisticChainElements();
+  Collection<LogisticChainElement> getLogisticChainElements();
 
-	Collection<Id<LSPShipment>> getShipmentIds();
+  Collection<Id<LSPShipment>> getShipmentIds();
 
-	void addShipmentToChain(LSPShipment shipment);
-
+  void addShipmentToChain(LSPShipment shipment);
 }

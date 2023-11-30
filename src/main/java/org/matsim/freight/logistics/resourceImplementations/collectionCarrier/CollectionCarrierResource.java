@@ -29,61 +29,61 @@ import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierVehicle;
 import org.matsim.freight.logistics.*;
 
-/*package-private*/ class CollectionCarrierResource extends LSPDataObject<LSPResource> implements LSPCarrierResource {
+/*package-private*/ class CollectionCarrierResource extends LSPDataObject<LSPResource>
+    implements LSPCarrierResource {
 
-	private final Carrier carrier;
-	private final List<LogisticChainElement> clientElements;
-	private final CollectionCarrierScheduler collectionScheduler;
-	private final Network network;
+  private final Carrier carrier;
+  private final List<LogisticChainElement> clientElements;
+  private final CollectionCarrierScheduler collectionScheduler;
+  private final Network network;
 
-	CollectionCarrierResource(CollectionCarrierUtils.CollectionCarrierResourceBuilder builder) {
-		super(builder.id);
-		this.collectionScheduler = builder.collectionScheduler;
-		this.clientElements = builder.clientElements;
-		this.carrier = builder.carrier;
-		this.network = builder.network;
-	}
+  CollectionCarrierResource(CollectionCarrierUtils.CollectionCarrierResourceBuilder builder) {
+    super(builder.id);
+    this.collectionScheduler = builder.collectionScheduler;
+    this.clientElements = builder.clientElements;
+    this.carrier = builder.carrier;
+    this.network = builder.network;
+  }
 
-	@Override
-	public Id<Link> getStartLinkId() {
-		Id<Link> depotLinkId = null;
-		for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
-			if (depotLinkId == null || depotLinkId == vehicle.getLinkId()) {
-				depotLinkId = vehicle.getLinkId();
-			}
-		}
+  @Override
+  public Id<Link> getStartLinkId() {
+    Id<Link> depotLinkId = null;
+    for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
+      if (depotLinkId == null || depotLinkId == vehicle.getLinkId()) {
+        depotLinkId = vehicle.getLinkId();
+      }
+    }
 
-		return depotLinkId;
-	}
+    return depotLinkId;
+  }
 
-	@Override
-	public Id<Link> getEndLinkId() {
-		Id<Link> depotLinkId = null;
-		for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
-			if (depotLinkId == null || depotLinkId == vehicle.getLinkId()) {
-				depotLinkId = vehicle.getLinkId();
-			}
-		}
+  @Override
+  public Id<Link> getEndLinkId() {
+    Id<Link> depotLinkId = null;
+    for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
+      if (depotLinkId == null || depotLinkId == vehicle.getLinkId()) {
+        depotLinkId = vehicle.getLinkId();
+      }
+    }
 
-		return depotLinkId;
-	}
+    return depotLinkId;
+  }
 
-	@Override
-	public Collection<LogisticChainElement> getClientElements() {
-		return clientElements;
-	}
+  @Override
+  public Collection<LogisticChainElement> getClientElements() {
+    return clientElements;
+  }
 
-	@Override
-	public void schedule(int bufferTime, LSPPlan lspPlan) {
-		collectionScheduler.scheduleShipments(lspPlan, this, bufferTime);
-	}
+  @Override
+  public void schedule(int bufferTime, LSPPlan lspPlan) {
+    collectionScheduler.scheduleShipments(lspPlan, this, bufferTime);
+  }
 
-	public Carrier getCarrier() {
-		return carrier;
-	}
+  public Carrier getCarrier() {
+    return carrier;
+  }
 
-	public Network getNetwork() {
-		return network;
-	}
-
+  public Network getNetwork() {
+    return network;
+  }
 }

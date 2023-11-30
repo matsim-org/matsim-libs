@@ -26,42 +26,40 @@ import org.matsim.freight.logistics.LogisticChainElement;
 
 class LoggedShipmentUnload implements ShipmentPlanElement {
 
-	private final double startTime;
-	private final double endTime;
-	private final LogisticChainElement element;
-	private final Id<LSPResource> resourceId;
+  private final double startTime;
+  private final double endTime;
+  private final LogisticChainElement element;
+  private final Id<LSPResource> resourceId;
 
-	LoggedShipmentUnload(ShipmentUtils.LoggedShipmentUnloadBuilder builder) {
-		this.startTime = builder.startTime;
-		this.endTime = builder.endTime;
-		this.element = builder.element;
-		this.resourceId = builder.resourceId;
-	}
+  LoggedShipmentUnload(ShipmentUtils.LoggedShipmentUnloadBuilder builder) {
+    this.startTime = builder.startTime;
+    this.endTime = builder.endTime;
+    this.element = builder.element;
+    this.resourceId = builder.resourceId;
+  }
 
+  @Override
+  public LogisticChainElement getLogisticChainElement() {
+    return element;
+  }
 
-	@Override
-	public LogisticChainElement getLogisticChainElement() {
-		return element;
-	}
+  @Override
+  public Id<LSPResource> getResourceId() {
+    return resourceId;
+  }
 
-	@Override
-	public Id<LSPResource> getResourceId() {
-		return resourceId;
-	}
+  @Override
+  public String getElementType() {
+    return "UNLOAD";
+  }
 
-	@Override
-	public String getElementType() {
-		return "UNLOAD";
-	}
+  @Override
+  public double getStartTime() {
+    return startTime;
+  }
 
-	@Override
-	public double getStartTime() {
-		return startTime;
-	}
-
-	@Override
-	public double getEndTime() {
-		return endTime;
-	}
-
+  @Override
+  public double getEndTime() {
+    return endTime;
+  }
 }

@@ -29,28 +29,29 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
 
 /*package-private*/ class MaybeTodayAssigner implements ShipmentAssigner {
 
-	private final Random random;
-	private LSP lsp;
+  private final Random random;
+  private LSP lsp;
 
-	public MaybeTodayAssigner() {
-		this.random = new Random(1);
-	}
+  public MaybeTodayAssigner() {
+    this.random = new Random(1);
+  }
 
-	@Override
-	public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
-		boolean assignToday = random.nextBoolean();
-		if (assignToday) {
-			Gbl.assertIf(lspPlan.getLogisticChains().size() == 1);
-			lspPlan.getLogisticChains().iterator().next().addShipmentToChain(shipment);
-		}
-	}
+  @Override
+  public void assignToPlan(LSPPlan lspPlan, LSPShipment shipment) {
+    boolean assignToday = random.nextBoolean();
+    if (assignToday) {
+      Gbl.assertIf(lspPlan.getLogisticChains().size() == 1);
+      lspPlan.getLogisticChains().iterator().next().addShipmentToChain(shipment);
+    }
+  }
 
-	@Override public LSP getLSP(){
-		throw new RuntimeException( "not implemented" );
-	}
+  @Override
+  public LSP getLSP() {
+    throw new RuntimeException("not implemented");
+  }
 
-	@Override public void setLSP(LSP lsp) {
-		this.lsp = lsp;
-	}
-
+  @Override
+  public void setLSP(LSP lsp) {
+    this.lsp = lsp;
+  }
 }

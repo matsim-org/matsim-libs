@@ -26,17 +26,15 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
-/**
- *
- */
-public interface LSPResource extends Identifiable<LSPResource>, HasSimulationTrackers<LSPResource>, Attributable {
+/** */
+public interface LSPResource
+    extends Identifiable<LSPResource>, HasSimulationTrackers<LSPResource>, Attributable {
 
-	Id<Link> getStartLinkId();
+  Id<Link> getStartLinkId();
 
-	Id<Link> getEndLinkId();
+  Id<Link> getEndLinkId();
 
-	Collection<LogisticChainElement> getClientElements();
+  Collection<LogisticChainElement> getClientElements();
 
-	void schedule(int bufferTime, LSPPlan lspPlan);
-
+  void schedule(int bufferTime, LSPPlan lspPlan);
 }

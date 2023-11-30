@@ -14,62 +14,64 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
 
 class MultipleChainsUtils {
-	private MultipleChainsUtils(){
-	}
-	public static RandomLogisticChainShipmentAssigner createRandomLogisticChainShipmentAssigner() {
-		return new RandomLogisticChainShipmentAssigner();
-	}
+  private MultipleChainsUtils() {}
 
-	public static RoundRobinLogisticChainShipmentAssigner createRoundRobinLogisticChainShipmentAssigner() {
-		return new RoundRobinLogisticChainShipmentAssigner();
-	}
+  public static RandomLogisticChainShipmentAssigner createRandomLogisticChainShipmentAssigner() {
+    return new RandomLogisticChainShipmentAssigner();
+  }
 
-	public static PrimaryLogisticChainShipmentAssigner createPrimaryLogisticChainShipmentAssigner() {
-		return new PrimaryLogisticChainShipmentAssigner();
-	}
+  public static RoundRobinLogisticChainShipmentAssigner
+      createRoundRobinLogisticChainShipmentAssigner() {
+    return new RoundRobinLogisticChainShipmentAssigner();
+  }
 
-	public static Collection<LSPShipment> createLSPShipmentsFromCarrierShipments(Carrier carrier) {
-		List<LSPShipment> shipmentList = new ArrayList<>();
+  public static PrimaryLogisticChainShipmentAssigner createPrimaryLogisticChainShipmentAssigner() {
+    return new PrimaryLogisticChainShipmentAssigner();
+  }
 
-		List<CarrierShipment> carrierShipments = carrier.getShipments().values().stream()
-				.toList();
+  public static Collection<LSPShipment> createLSPShipmentsFromCarrierShipments(Carrier carrier) {
+    List<LSPShipment> shipmentList = new ArrayList<>();
 
-		for (CarrierShipment shipment : carrierShipments) {
-			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(Id.create(shipment.getId().toString(), LSPShipment.class));
-			builder.setCapacityDemand(shipment.getSize());
-			builder.setFromLinkId(shipment.getFrom());
-			builder.setToLinkId(shipment.getTo());
-			builder.setStartTimeWindow(shipment.getPickupTimeWindow());
-			builder.setEndTimeWindow(shipment.getDeliveryTimeWindow());
-			builder.setPickupServiceTime(shipment.getPickupServiceTime());
-			builder.setDeliveryServiceTime(shipment.getDeliveryServiceTime());
-			shipmentList.add(builder.build());
-		}
-		return shipmentList;
-	}
+    List<CarrierShipment> carrierShipments = carrier.getShipments().values().stream().toList();
 
-	public enum LspPlanTypes {
-		SINGLE_ONE_ECHELON_CHAIN("singleOneEchelonChain"),
-		SINGLE_TWO_ECHELON_CHAIN("singleTwoEchelonChain"),
-		MULTIPLE_ONE_ECHELON_CHAINS("multipleOneEchelonChains"),
-		MULTIPLE_TWO_ECHELON_CHAINS("multipleTwoEchelonChains"),
-		MULTIPLE_MIXED_ECHELON_CHAINS("multipleMixedEchelonChains");
+    for (CarrierShipment shipment : carrierShipments) {
+      ShipmentUtils.LSPShipmentBuilder builder =
+          ShipmentUtils.LSPShipmentBuilder.newInstance(
+              Id.create(shipment.getId().toString(), LSPShipment.class));
+      builder.setCapacityDemand(shipment.getSize());
+      builder.setFromLinkId(shipment.getFrom());
+      builder.setToLinkId(shipment.getTo());
+      builder.setStartTimeWindow(shipment.getPickupTimeWindow());
+      builder.setEndTimeWindow(shipment.getDeliveryTimeWindow());
+      builder.setPickupServiceTime(shipment.getPickupServiceTime());
+      builder.setDeliveryServiceTime(shipment.getDeliveryServiceTime());
+      shipmentList.add(builder.build());
+    }
+    return shipmentList;
+  }
 
-		private static final Map<String, LspPlanTypes > stringToEnum =
-				Stream.of(values()).collect(toMap(Object::toString, e -> e));
-		private final String label;
+  public enum LspPlanTypes {
+    SINGLE_ONE_ECHELON_CHAIN("singleOneEchelonChain"),
+    SINGLE_TWO_ECHELON_CHAIN("singleTwoEchelonChain"),
+    MULTIPLE_ONE_ECHELON_CHAINS("multipleOneEchelonChains"),
+    MULTIPLE_TWO_ECHELON_CHAINS("multipleTwoEchelonChains"),
+    MULTIPLE_MIXED_ECHELON_CHAINS("multipleMixedEchelonChains");
 
-		LspPlanTypes(String label) {this.label = label;}
+    private static final Map<String, LspPlanTypes> stringToEnum =
+        Stream.of(values()).collect(toMap(Object::toString, e -> e));
+    private final String label;
 
-		public static LspPlanTypes fromString(String label) {
-			return stringToEnum.get(label);
+    LspPlanTypes(String label) {
+      this.label = label;
+    }
 
-		}
+    public static LspPlanTypes fromString(String label) {
+      return stringToEnum.get(label);
+    }
 
-		@Override
-		public String toString() {
-			return label;
-		}
-	}
-
+    @Override
+    public String toString() {
+      return label;
+    }
+  }
 }

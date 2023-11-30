@@ -30,108 +30,119 @@ import org.matsim.freight.logistics.LSPDataObject;
 
 class LSPShipmentImpl extends LSPDataObject<LSPShipment> implements LSPShipment {
 
-	private final Id<Link> fromLinkId;
-	private final Id<Link> toLinkId;
-	private final TimeWindow startTimeWindow;
-	private final TimeWindow endTimeWindow;
-	private final int capacityDemand;
-	private final double deliveryServiceTime;
-	private final double pickupServiceTime;
-//	private final ShipmentPlan shipmentPlan;
-	@Deprecated //This will be removed in the future and replaced by using the events. KMT, Mai'23
-	private final ShipmentPlan shipmentLog;
-	private final List<Requirement> requirements;
-//	private Id<LSP> lspId;
+  private final Id<Link> fromLinkId;
+  private final Id<Link> toLinkId;
+  private final TimeWindow startTimeWindow;
+  private final TimeWindow endTimeWindow;
+  private final int capacityDemand;
+  private final double deliveryServiceTime;
+  private final double pickupServiceTime;
+  //	private final ShipmentPlan shipmentPlan;
+  @Deprecated // This will be removed in the future and replaced by using the events. KMT, Mai'23
+  private final ShipmentPlan shipmentLog;
+  private final List<Requirement> requirements;
 
-	LSPShipmentImpl(ShipmentUtils.LSPShipmentBuilder builder) {
-		super(builder.id);
-		this.fromLinkId = builder.fromLinkId;
-		this.toLinkId = builder.toLinkId;
-		this.startTimeWindow = builder.startTimeWindow;
-		this.endTimeWindow = builder.endTimeWindow;
-		this.capacityDemand = builder.capacityDemand;
-		this.deliveryServiceTime = builder.deliveryServiceTime;
-		this.pickupServiceTime = builder.pickupServiceTime;
-//		this.shipmentPlan = new ShipmentPlanImpl(this.getId());
-		this.shipmentLog = new ShipmentPlanImpl(this.getId());
-		this.requirements = new ArrayList<>();
-		this.requirements.addAll(builder.requirements);
-	}
+  //	private Id<LSP> lspId;
 
-	@Override
-	public Id<Link> getFrom() {
-		return fromLinkId;
-	}
+  LSPShipmentImpl(ShipmentUtils.LSPShipmentBuilder builder) {
+    super(builder.id);
+    this.fromLinkId = builder.fromLinkId;
+    this.toLinkId = builder.toLinkId;
+    this.startTimeWindow = builder.startTimeWindow;
+    this.endTimeWindow = builder.endTimeWindow;
+    this.capacityDemand = builder.capacityDemand;
+    this.deliveryServiceTime = builder.deliveryServiceTime;
+    this.pickupServiceTime = builder.pickupServiceTime;
+    //		this.shipmentPlan = new ShipmentPlanImpl(this.getId());
+    this.shipmentLog = new ShipmentPlanImpl(this.getId());
+    this.requirements = new ArrayList<>();
+    this.requirements.addAll(builder.requirements);
+  }
 
-	@Override
-	public Id<Link> getTo() {
-		return toLinkId;
-	}
+  @Override
+  public Id<Link> getFrom() {
+    return fromLinkId;
+  }
 
-	@Override
-	public TimeWindow getPickupTimeWindow() {
-		return startTimeWindow;
-	}
+  @Override
+  public Id<Link> getTo() {
+    return toLinkId;
+  }
 
-	@Override
-	public TimeWindow getDeliveryTimeWindow() {
-		return endTimeWindow;
-	}
+  @Override
+  public TimeWindow getPickupTimeWindow() {
+    return startTimeWindow;
+  }
 
-//	@Override
-//	public ShipmentPlan getShipmentPlan() {
-//		return shipmentPlan;
-//	}
+  @Override
+  public TimeWindow getDeliveryTimeWindow() {
+    return endTimeWindow;
+  }
 
-	@Deprecated //This will be removed in the future and replaced by using the events. KMT, Mai'23
-	@Override
-	public ShipmentPlan getShipmentLog() {
-		return shipmentLog;
-	}
+  //	@Override
+  //	public ShipmentPlan getShipmentPlan() {
+  //		return shipmentPlan;
+  //	}
 
-	@Override
-	public int getSize() {
-		return capacityDemand;
-	}
+  @Deprecated // This will be removed in the future and replaced by using the events. KMT, Mai'23
+  @Override
+  public ShipmentPlan getShipmentLog() {
+    return shipmentLog;
+  }
 
-	@Override
-	public double getDeliveryServiceTime() {
-		return deliveryServiceTime;
-	}
+  @Override
+  public int getSize() {
+    return capacityDemand;
+  }
 
-	@Override
-	public Collection<Requirement> getRequirements() {
-		return requirements;
-	}
+  @Override
+  public double getDeliveryServiceTime() {
+    return deliveryServiceTime;
+  }
 
+  @Override
+  public Collection<Requirement> getRequirements() {
+    return requirements;
+  }
 
-	@Override
-	public double getPickupServiceTime() {
-		return pickupServiceTime;
-	}
+  @Override
+  public double getPickupServiceTime() {
+    return pickupServiceTime;
+  }
 
-//	@Override public void setLspId(Id<LSP> lspId) {
-//		this.lspId = lspId;
-//	}
-//
-//	@Override public Id<LSP> getLspId() {
-//		return this.lspId;
-//	}
+  //	@Override public void setLspId(Id<LSP> lspId) {
+  //		this.lspId = lspId;
+  //	}
+  //
+  //	@Override public Id<LSP> getLspId() {
+  //		return this.lspId;
+  //	}
 
-	@Override public String toString() {
-		return "LSPShipmentImpl{" +
-				"Id=" + getId() +
-				"\t fromLinkId=" + fromLinkId +
-				"\t toLinkId=" + toLinkId +
-				"\t capacityDemand=" + capacityDemand +
-				"\t startTimeWindow=" + startTimeWindow +
-				"\t endTimeWindow=" + endTimeWindow +
-				"\t capacityDemand=" + capacityDemand +
-				"\t deliveryServiceTime=" + deliveryServiceTime +
-				"\t pickupServiceTime=" + pickupServiceTime +
-//				"\t schedule=" + schedule +
-//				"\t log=" + log +
-//				"\t requirements=" + requirements +
-				'}';
-	}
+  @Override
+  public String toString() {
+    return "LSPShipmentImpl{"
+        + "Id="
+        + getId()
+        + "\t fromLinkId="
+        + fromLinkId
+        + "\t toLinkId="
+        + toLinkId
+        + "\t capacityDemand="
+        + capacityDemand
+        + "\t startTimeWindow="
+        + startTimeWindow
+        + "\t endTimeWindow="
+        + endTimeWindow
+        + "\t capacityDemand="
+        + capacityDemand
+        + "\t deliveryServiceTime="
+        + deliveryServiceTime
+        + "\t pickupServiceTime="
+        + pickupServiceTime
+        +
+        //				"\t schedule=" + schedule +
+        //				"\t log=" + log +
+        //				"\t requirements=" + requirements +
+        '}';
+  }
 }

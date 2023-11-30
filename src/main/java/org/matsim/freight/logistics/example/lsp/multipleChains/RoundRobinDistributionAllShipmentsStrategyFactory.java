@@ -36,49 +36,51 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
 
 /*package-private*/ class RoundRobinDistributionAllShipmentsStrategyFactory {
 
-	private RoundRobinDistributionAllShipmentsStrategyFactory() { } // class contains only static methods; do not instantiate
+  private
+  RoundRobinDistributionAllShipmentsStrategyFactory() {} // class contains only static methods; do
+                                                         // not instantiate
 
-	/*package-private*/ static GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
-		GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup()));
-		GenericPlanStrategyModule<LSPPlan> roundRobinModule = new GenericPlanStrategyModule<>() {
+  /*package-private*/ static GenericPlanStrategy<LSPPlan, LSP> createStrategy() {
+    GenericPlanStrategyImpl<LSPPlan, LSP> strategy =
+        new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup()));
+    GenericPlanStrategyModule<LSPPlan> roundRobinModule =
+        new GenericPlanStrategyModule<>() {
 
-			@Override
-			public void prepareReplanning(ReplanningContext replanningContext) {
-			}
+          @Override
+          public void prepareReplanning(ReplanningContext replanningContext) {}
 
-			@Override
-			public void handlePlan(LSPPlan lspPlan) {
+          @Override
+          public void handlePlan(LSPPlan lspPlan) {
 
-				// Shifting shipments only makes sense for multiple chains
-				if (lspPlan.getLogisticChains().size() < 2) return;
+            // Shifting shipments only makes sense for multiple chains
+            if (lspPlan.getLogisticChains().size() < 2) return;
 
-				for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
-					logisticChain.getShipmentIds().clear();
-				}
+            for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
+              logisticChain.getShipmentIds().clear();
+            }
 
-				LSP lsp = lspPlan.getLSP();
-				Map<LogisticChain, Integer> shipmentCountByChain = new LinkedHashMap<>();
+            LSP lsp = lspPlan.getLSP();
+            Map<LogisticChain, Integer> shipmentCountByChain = new LinkedHashMap<>();
 
-				for (LSPShipment shipment : lsp.getShipments()) {
-					if (shipmentCountByChain.isEmpty()) {
-						for (LogisticChain chain : lsp.getSelectedPlan().getLogisticChains()) {
-							shipmentCountByChain.put(chain, 0);
-						}
-					}
-					LogisticChain minChain = Collections.min(shipmentCountByChain.entrySet(), Map.Entry.comparingByValue()).getKey();
-					minChain.addShipmentToChain(shipment);
-					shipmentCountByChain.merge(minChain, 1, Integer::sum);
-				}
-			}
+            for (LSPShipment shipment : lsp.getShipments()) {
+              if (shipmentCountByChain.isEmpty()) {
+                for (LogisticChain chain : lsp.getSelectedPlan().getLogisticChains()) {
+                  shipmentCountByChain.put(chain, 0);
+                }
+              }
+              LogisticChain minChain =
+                  Collections.min(shipmentCountByChain.entrySet(), Map.Entry.comparingByValue())
+                      .getKey();
+              minChain.addShipmentToChain(shipment);
+              shipmentCountByChain.merge(minChain, 1, Integer::sum);
+            }
+          }
 
-			@Override
-			public void finishReplanning() {
-			}
+          @Override
+          public void finishReplanning() {}
+        };
 
-		};
-
-		strategy.addStrategyModule(roundRobinModule);
-		return strategy;
-	}
-
+    strategy.addStrategyModule(roundRobinModule);
+    return strategy;
+  }
 }

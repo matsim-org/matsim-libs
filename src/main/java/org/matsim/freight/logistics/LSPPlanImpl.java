@@ -1,4 +1,3 @@
-
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
@@ -27,102 +26,110 @@ import org.matsim.freight.logistics.shipment.ShipmentPlan;
 
 public class LSPPlanImpl implements LSPPlan {
 
-	private final Collection<LogisticChain> logisticChains;
-	private final Collection<ShipmentPlan> shipmentPlans;
-	private LSP lsp;
-	private Double score = null;
-	private ShipmentAssigner assigner;
-	private String type = null;
+  private final Collection<LogisticChain> logisticChains;
+  private final Collection<ShipmentPlan> shipmentPlans;
+  private LSP lsp;
+  private Double score = null;
+  private ShipmentAssigner assigner;
+  private String type = null;
 
-	public LSPPlanImpl() {
-		this.logisticChains = new ArrayList<>();
-		this.shipmentPlans = new ArrayList<>();
-	}
+  public LSPPlanImpl() {
+    this.logisticChains = new ArrayList<>();
+    this.shipmentPlans = new ArrayList<>();
+  }
 
-	@Override
-	public LSPPlan addLogisticChain(LogisticChain solution) {
-		this.logisticChains.add(solution);
-		solution.setLSP(this.lsp);
-		return this;
-	}
+  @Override
+  public LSPPlan addLogisticChain(LogisticChain solution) {
+    this.logisticChains.add(solution);
+    solution.setLSP(this.lsp);
+    return this;
+  }
 
-	@Override
-	public Collection<LogisticChain> getLogisticChains() {
-		return logisticChains;
-	}
+  @Override
+  public Collection<LogisticChain> getLogisticChains() {
+    return logisticChains;
+  }
 
-	@Override
-	public ShipmentAssigner getAssigner() {
-		return assigner;
-	}
+  @Override
+  public ShipmentAssigner getAssigner() {
+    return assigner;
+  }
 
-	@Override
-	public LSPPlan setAssigner(ShipmentAssigner assigner) {
-		this.assigner = assigner;
-		this.assigner.setLSP(this.lsp);
-		return this;
-	}
+  @Override
+  public LSPPlan setAssigner(ShipmentAssigner assigner) {
+    this.assigner = assigner;
+    this.assigner.setLSP(this.lsp);
+    return this;
+  }
 
-	@Override public Collection<ShipmentPlan> getShipmentPlans() {
-		return this.shipmentPlans;
-	}
+  @Override
+  public Collection<ShipmentPlan> getShipmentPlans() {
+    return this.shipmentPlans;
+  }
 
-	@Override public LSPPlan addShipmentPlan(ShipmentPlan shipmentPlan) {
-		this.shipmentPlans.add(shipmentPlan);
-		return null;
-	}
+  @Override
+  public LSPPlan addShipmentPlan(ShipmentPlan shipmentPlan) {
+    this.shipmentPlans.add(shipmentPlan);
+    return null;
+  }
 
-	@Override
-	public Double getScore() {
-		return score;
-	}
+  @Override
+  public Double getScore() {
+    return score;
+  }
 
-	@Override
-	public void setScore(Double score) {
-		this.score = score;
-	}
+  @Override
+  public void setScore(Double score) {
+    this.score = score;
+  }
 
-	@Override
-	public String getType() {
-		return this.type;
-	}
+  @Override
+  public String getType() {
+    return this.type;
+  }
 
-	@Override
-	public void setType(final String type) {
-		this.type = type;
-	}
+  @Override
+  public void setType(final String type) {
+    this.type = type;
+  }
 
-	@Override
-	public LSP getLSP() {
-		return lsp;
-	}
+  @Override
+  public LSP getLSP() {
+    return lsp;
+  }
 
-	@Override
-	public void setLSP(LSP lsp) {
-		this.lsp = lsp;
-		if (assigner != null) {
-			this.assigner.setLSP(lsp);
-			// yy vom Design her wäre es vlt. einfacher und logischer, wenn der assigner einen backpointer auf den LSPPlan hätte. Dann
-			// müsste man nicht (wie hier) hedgen gegen unterschiedliche Initialisierungssequenzen. kai, may'22
-		}
-		for (LogisticChain solution : logisticChains) {
-			solution.setLSP(lsp);
-		}
-	}
+  @Override
+  public void setLSP(LSP lsp) {
+    this.lsp = lsp;
+    if (assigner != null) {
+      this.assigner.setLSP(lsp);
+      // yy vom Design her wäre es vlt. einfacher und logischer, wenn der assigner einen backpointer
+      // auf den LSPPlan hätte. Dann
+      // müsste man nicht (wie hier) hedgen gegen unterschiedliche Initialisierungssequenzen. kai,
+      // may'22
+    }
+    for (LogisticChain solution : logisticChains) {
+      solution.setLSP(lsp);
+    }
+  }
 
-	@Override public String toString() {
-		StringBuilder strb = new StringBuilder();
-			strb.append("[score=").append(this.score).append("]");
-			strb.append(", [type=").append(this.type).append("]");
-			for (LogisticChain logisticChain : this.logisticChains) {
-				strb.append(", [LogisticChainId=").append(logisticChain.getId()).append("], [No of LogisticChainElements=").append(logisticChain.getLogisticChainElements().size()).append("] \n");
-				if (!logisticChain.getLogisticChainElements().isEmpty()){
-					for (LogisticChainElement solutionElement : logisticChain.getLogisticChainElements()) {
-						strb.append("\t \t").append(solutionElement.toString()).append("\n");
-					}
-				}
-			}
-		return strb.toString();
-	}
-
+  @Override
+  public String toString() {
+    StringBuilder strb = new StringBuilder();
+    strb.append("[score=").append(this.score).append("]");
+    strb.append(", [type=").append(this.type).append("]");
+    for (LogisticChain logisticChain : this.logisticChains) {
+      strb.append(", [LogisticChainId=")
+          .append(logisticChain.getId())
+          .append("], [No of LogisticChainElements=")
+          .append(logisticChain.getLogisticChainElements().size())
+          .append("] \n");
+      if (!logisticChain.getLogisticChainElements().isEmpty()) {
+        for (LogisticChainElement solutionElement : logisticChain.getLogisticChainElements()) {
+          strb.append("\t \t").append(solutionElement.toString()).append("\n");
+        }
+      }
+    }
+    return strb.toString();
+  }
 }

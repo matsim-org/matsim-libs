@@ -28,55 +28,52 @@ import org.matsim.freight.logistics.LogisticChainElement;
 
 class ScheduledShipmentLoad implements ShipmentPlanElement {
 
-	private final double startTime;
-	private final double endTime;
-	private final LogisticChainElement element;
-	private final Id<LSPResource> resourceId;
-	private final Id<Carrier> carrierId;
-	private final CarrierService carrierService;
+  private final double startTime;
+  private final double endTime;
+  private final LogisticChainElement element;
+  private final Id<LSPResource> resourceId;
+  private final Id<Carrier> carrierId;
+  private final CarrierService carrierService;
 
-	ScheduledShipmentLoad(ShipmentUtils.ScheduledShipmentLoadBuilder builder) {
-		this.startTime = builder.startTime;
-		this.endTime = builder.endTime;
-		this.element = builder.element;
-		this.resourceId = builder.resourceId;
-		this.carrierId = builder.carrierId;
-		this.carrierService = builder.carrierService;
-	}
+  ScheduledShipmentLoad(ShipmentUtils.ScheduledShipmentLoadBuilder builder) {
+    this.startTime = builder.startTime;
+    this.endTime = builder.endTime;
+    this.element = builder.element;
+    this.resourceId = builder.resourceId;
+    this.carrierId = builder.carrierId;
+    this.carrierService = builder.carrierService;
+  }
 
+  @Override
+  public String getElementType() {
+    return "LOAD";
+  }
 
-	@Override
-	public String getElementType() {
-		return "LOAD";
-	}
+  @Override
+  public double getStartTime() {
+    return startTime;
+  }
 
-	@Override
-	public double getStartTime() {
-		return startTime;
-	}
+  @Override
+  public double getEndTime() {
+    return endTime;
+  }
 
-	@Override
-	public double getEndTime() {
-		return endTime;
-	}
+  @Override
+  public LogisticChainElement getLogisticChainElement() {
+    return element;
+  }
 
-	@Override
-	public LogisticChainElement getLogisticChainElement() {
-		return element;
-	}
+  @Override
+  public Id<LSPResource> getResourceId() {
+    return resourceId;
+  }
 
-	@Override
-	public Id<LSPResource> getResourceId() {
-		return resourceId;
-	}
+  public Id<Carrier> getCarrierId() {
+    return carrierId;
+  }
 
-	public Id<Carrier> getCarrierId() {
-		return carrierId;
-	}
-
-	public CarrierService getCarrierService() {
-		return carrierService;
-	}
-
-
+  public CarrierService getCarrierService() {
+    return carrierService;
+  }
 }

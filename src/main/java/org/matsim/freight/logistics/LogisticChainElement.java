@@ -23,32 +23,33 @@ package org.matsim.freight.logistics;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
-public interface LogisticChainElement extends Identifiable<LogisticChainElement>, HasBackpointer<LogisticChain>, HasSimulationTrackers<LogisticChainElement>, Attributable {
+public interface LogisticChainElement
+    extends Identifiable<LogisticChainElement>,
+        HasBackpointer<LogisticChain>,
+        HasSimulationTrackers<LogisticChainElement>,
+        Attributable {
 
-	void connectWithNextElement(LogisticChainElement element);
+  void connectWithNextElement(LogisticChainElement element);
 
-	/**
-	 * The logistics solution element wraps around a resource.  Don't know why we need this wrapping.
-	 *
-	 * @return the resource
-	 */
-	LSPResource getResource();
+  /**
+   * The logistics solution element wraps around a resource. Don't know why we need this wrapping.
+   *
+   * @return the resource
+   */
+  LSPResource getResource();
 
-	LogisticChainElement getPreviousElement();
+  LogisticChainElement getPreviousElement();
 
-	LogisticChainElement getNextElement();
+  LogisticChainElement getNextElement();
 
-	/**
-	 * This collection stores LSPShipments that are waiting for their treatment in this element or more precisely the Resource that is in
-	 * charge of the actual physical handling.
-	 *
-	 * @return WaitingShipments
-	 */
-	WaitingShipments getIncomingShipments();
+  /**
+   * This collection stores LSPShipments that are waiting for their treatment in this element or
+   * more precisely the Resource that is in charge of the actual physical handling.
+   *
+   * @return WaitingShipments
+   */
+  WaitingShipments getIncomingShipments();
 
-	/**
-	 * Shipments that have already been treated.
-	 */
-	WaitingShipments getOutgoingShipments();
-
+  /** Shipments that have already been treated. */
+  WaitingShipments getOutgoingShipments();
 }

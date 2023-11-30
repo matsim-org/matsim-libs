@@ -30,65 +30,67 @@ import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 
-/*package-private*/ class MainRunCarrierResource extends LSPDataObject<LSPResource> implements LSPCarrierResource {
+/*package-private*/ class MainRunCarrierResource extends LSPDataObject<LSPResource>
+    implements LSPCarrierResource {
 
-	private static final Logger log = LogManager.getLogger(MainRunCarrierResource.class);
+  private static final Logger log = LogManager.getLogger(MainRunCarrierResource.class);
 
-	private final Carrier carrier;
-	private final Id<Link> fromLinkId;
-	private final Id<Link> toLinkId;
-	private final Collection<LogisticChainElement> clientElements;
-	private final MainRunCarrierScheduler mainRunScheduler;
+  private final Carrier carrier;
+  private final Id<Link> fromLinkId;
+  private final Id<Link> toLinkId;
+  private final Collection<LogisticChainElement> clientElements;
+  private final MainRunCarrierScheduler mainRunScheduler;
 
-	private final ResourceImplementationUtils.VehicleReturn vehicleReturn;
-	private final Network network;
+  private final ResourceImplementationUtils.VehicleReturn vehicleReturn;
+  private final Network network;
 
+  MainRunCarrierResource(MainRunCarrierUtils.MainRunCarrierResourceBuilder builder) {
+    super(builder.getId());
+    this.carrier = builder.getCarrier();
+    this.fromLinkId = builder.getFromLinkId();
+    this.toLinkId = builder.getToLinkId();
+    this.clientElements = builder.getClientElements();
+    this.mainRunScheduler = builder.getMainRunScheduler();
+    if (builder.getVehicleReturn() != null) {
+      this.vehicleReturn = builder.getVehicleReturn();
+    } else {
+      log.warn(
+          "Return behaviour was not specified. Using the following setting as default: "
+              + ResourceImplementationUtils.VehicleReturn.endAtToLink);
+      this.vehicleReturn = ResourceImplementationUtils.VehicleReturn.endAtToLink;
+    }
+    this.network = builder.getNetwork();
+  }
 
-	MainRunCarrierResource(MainRunCarrierUtils.MainRunCarrierResourceBuilder builder) {
-		super(builder.getId());
-		this.carrier = builder.getCarrier();
-		this.fromLinkId = builder.getFromLinkId();
-		this.toLinkId = builder.getToLinkId();
-		this.clientElements = builder.getClientElements();
-		this.mainRunScheduler = builder.getMainRunScheduler();
-		if (builder.getVehicleReturn() != null){
-			this.vehicleReturn = builder.getVehicleReturn();
-		} else {
-			log.warn("Return behaviour was not specified. Using the following setting as default: " + ResourceImplementationUtils.VehicleReturn.endAtToLink);
-			this.vehicleReturn = ResourceImplementationUtils.VehicleReturn.endAtToLink;
-		}
-		this.network = builder.getNetwork();
-	}
+  @Override
+  public Id<Link> getStartLinkId() {
+    return fromLinkId;
+  }
 
-	@Override
-	public Id<Link> getStartLinkId() {
-		return fromLinkId;
-	}
+  @Override
+  public Id<Link> getEndLinkId() {
+    return toLinkId;
+  }
 
-	@Override
-	public Id<Link> getEndLinkId() {
-		return toLinkId;
-	}
+  @Override
+  public Collection<LogisticChainElement> getClientElements() {
+    return clientElements;
+  }
 
-	@Override
-	public Collection<LogisticChainElement> getClientElements() {
-		return clientElements;
-	}
+  @Override
+  public void schedule(int bufferTime, LSPPlan lspPlan) {
+    mainRunScheduler.scheduleShipments(lspPlan, this, bufferTime);
+  }
 
-	@Override
-	public void schedule(int bufferTime, LSPPlan lspPlan) {
-		mainRunScheduler.scheduleShipments(lspPlan, this, bufferTime);
-	}
+  public Carrier getCarrier() {
+    return carrier;
+  }
 
-	public Carrier getCarrier() {
-		return carrier;
-	}
+  public Network getNetwork() {
+    return network;
+  }
 
-	public Network getNetwork() {
-		return network;
-	}
-
-	public ResourceImplementationUtils.VehicleReturn getVehicleReturn() {
-		return vehicleReturn;
-	}
+  public ResourceImplementationUtils.VehicleReturn getVehicleReturn() {
+    return vehicleReturn;
+  }
 }
