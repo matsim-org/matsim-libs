@@ -20,13 +20,12 @@
 
 package org.matsim.freight.logistics;
 
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import java.util.ArrayList;
+import java.util.Collection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-
-import java.util.ArrayList;
-import java.util.Collection;
+import org.matsim.freight.logistics.shipment.LSPShipment;
 
 /* package-private */ class LogisticChainImpl extends LSPDataObject<LogisticChain> implements LogisticChain {
 	private static final Logger log = LogManager.getLogger(LogisticChainImpl.class);
@@ -45,13 +44,13 @@ import java.util.Collection;
 	}
 
 	@Override
-	public void setLSP( LSP lsp ) {
-		this.lsp = lsp;
+	public LSP getLSP() {
+		return lsp;
 	}
 
 	@Override
-	public LSP getLSP() {
-		return lsp;
+	public void setLSP( LSP lsp ) {
+		this.lsp = lsp;
 	}
 
 	@Override

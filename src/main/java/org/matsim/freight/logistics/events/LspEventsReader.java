@@ -29,22 +29,25 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- *  Creates an {@link MatsimEventsReader} that also handles the {@link org.matsim.freight.logistics.LSP} specific events.
-
+ * Creates an {@link MatsimEventsReader} that also handles the {@link
+ * org.matsim.freight.logistics.LSP} specific events.
+ *
  * @author kturner (Kai Martins-Turner)
  */
 public class LspEventsReader {
 
-	public static Map<String, MatsimEventsReader.CustomEventMapper> createCustomEventMappers() {
-		Map<String, MatsimEventsReader.CustomEventMapper> map = new TreeMap<>(CarrierEventsReaders.createCustomEventMappers());// also get all the Carrier-related EventMapper
-		map.put(HandlingInHubStartsEvent.EVENT_TYPE, HandlingInHubStartsEvent::convert);
-		return map;
-	}
+  public static Map<String, MatsimEventsReader.CustomEventMapper> createCustomEventMappers() {
+    Map<String, MatsimEventsReader.CustomEventMapper> map =
+        new TreeMap<>(
+            CarrierEventsReaders
+                .createCustomEventMappers()); // also get all the Carrier-related EventMapper
+    map.put(HandlingInHubStartsEvent.EVENT_TYPE, HandlingInHubStartsEvent::convert);
+    return map;
+  }
 
-	public static MatsimEventsReader createEventsReader(EventsManager eventsManager) {
-		MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
-		createCustomEventMappers().forEach(reader::addCustomEventMapper);
-		return reader;
-	}
-
+  public static MatsimEventsReader createEventsReader(EventsManager eventsManager) {
+    MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
+    createCustomEventMappers().forEach(reader::addCustomEventMapper);
+    return reader;
+  }
 }

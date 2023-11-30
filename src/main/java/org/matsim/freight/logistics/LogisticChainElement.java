@@ -23,7 +23,6 @@ package org.matsim.freight.logistics;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
-
 public interface LogisticChainElement extends Identifiable<LogisticChainElement>, HasBackpointer<LogisticChain>, HasSimulationTrackers<LogisticChainElement>, Attributable {
 
 	void connectWithNextElement(LogisticChainElement element);

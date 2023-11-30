@@ -20,13 +20,11 @@
 
 package org.matsim.freight.logistics;
 
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.utils.objectattributes.attributable.Attributable;
-
-import java.util.Collection;
-
 
 /**
  * A LogisticsSolution can be seen as a representative of a

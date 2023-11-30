@@ -23,6 +23,7 @@ package org.matsim.freight.logistics;
 import com.google.inject.Provides;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -40,13 +41,10 @@ import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.Carriers;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.controler.*;
-
-import java.util.List;
-
 
 public class LSPModule extends AbstractModule {
 	private static final Logger log = LogManager.getLogger(LSPModule.class);

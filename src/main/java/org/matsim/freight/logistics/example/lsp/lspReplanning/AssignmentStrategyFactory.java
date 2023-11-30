@@ -1,16 +1,16 @@
 package org.matsim.freight.logistics.example.lsp.lspReplanning;
 
+import org.matsim.core.replanning.GenericPlanStrategy;
+import org.matsim.core.replanning.GenericPlanStrategyImpl;
+import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.LogisticChainElement;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
-import org.matsim.core.replanning.GenericPlanStrategy;
-import org.matsim.core.replanning.GenericPlanStrategyImpl;
-import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 /**
  * @deprecated  This class is a work-around. Please do not use this method for any new runs!

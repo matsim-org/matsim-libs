@@ -20,17 +20,16 @@
 
 package org.matsim.freight.logistics.resourceImplementations;
 
-import org.matsim.freight.logistics.LSPCarrierResource;
-import org.matsim.freight.logistics.LSPResource;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TransshipmentHubResource;
+import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-
-import static org.junit.Assert.*;
-
+import org.matsim.freight.logistics.LSPCarrierResource;
+import org.matsim.freight.logistics.LSPResource;
+import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
+import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TransshipmentHubResource;
 
 public class FirstReloadResourceTest {
 

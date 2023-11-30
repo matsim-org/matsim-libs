@@ -1,13 +1,12 @@
 package org.matsim.freight.logistics;
 
+import java.util.List;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.GenericStrategyManagerImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.PlanSelector;
-
-import java.util.List;
 
 /**
  * Normally, this would be infrastructure that is configurable via the config.  Since we ain't there yet, the way to configure this is something like:

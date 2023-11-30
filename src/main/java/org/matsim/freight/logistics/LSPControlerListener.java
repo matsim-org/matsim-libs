@@ -22,8 +22,9 @@ package org.matsim.freight.logistics;
 
 
 import jakarta.inject.Inject;
-import org.matsim.freight.logistics.io.LSPPlanXmlWriter;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -35,14 +36,11 @@ import org.matsim.core.controler.listener.*;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierPlanWriter;
-import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.Carriers;
+import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.controler.CarrierAgentTracker;
-
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-
+import org.matsim.freight.logistics.io.LSPPlanXmlWriter;
+import org.matsim.freight.logistics.shipment.LSPShipment;
 
 class LSPControlerListener implements BeforeMobsimListener, AfterMobsimListener, ScoringListener,
 		ReplanningListener, IterationStartsListener, IterationEndsListener, ShutdownListener {

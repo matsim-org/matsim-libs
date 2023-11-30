@@ -20,9 +20,8 @@
 
 package org.matsim.freight.logistics.shipment;
 
-import org.matsim.api.core.v01.Id;
-
 import java.util.*;
+import org.matsim.api.core.v01.Id;
 
 /*package-private*/ class ShipmentPlanImpl implements ShipmentPlan {
 

@@ -1,12 +1,11 @@
 package org.matsim.freight.logistics.example.lsp.multipleChains;
 
-import org.matsim.freight.logistics.LSP;
-import org.matsim.freight.logistics.LSPPlan;
-import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.core.replanning.selectors.PlanSelector;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.freight.logistics.LSP;
+import org.matsim.freight.logistics.LSPPlan;
 
 class LSPWorstPlanForRemovalSelector implements PlanSelector<LSPPlan, LSP> {
 

@@ -1,12 +1,6 @@
 package org.matsim.freight.logistics.example.lsp.multipleChains;
 
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
-import org.matsim.freight.logistics.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -26,27 +20,26 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
-import org.matsim.freight.carriers.controler.CarrierControlerUtils;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
+import org.matsim.freight.logistics.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import org.matsim.freight.logistics.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
+import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.vehicles.VehicleType;
-
-import java.util.*;
 
 final class ExampleMultipleMixedEchelonChains {
 
-	private static final Logger log = LogManager.getLogger(ExampleMultipleMixedEchelonChains.class);
-
-	private static final AssignerSetting assignerSetting = AssignerSetting.primary;
-	enum AssignerSetting {primary, roundRobin}
-
-	private static final double TOLL_VALUE = 1000;
-
 	static final double HUBCOSTS_FIX = 100;
-
+	private static final Logger log = LogManager.getLogger(ExampleMultipleMixedEchelonChains.class);
+	private static final AssignerSetting assignerSetting = AssignerSetting.primary;
+	private static final double TOLL_VALUE = 1000;
 	private static final Id<Link> DEPOT_LINK_ID = Id.createLinkId("i(5,0)");
 	private static final Id<Link> HUB_LINK_ID = Id.createLinkId("j(5,3)");
-
 	private static final VehicleType VEH_TYPE_SMALL_05 = CarrierVehicleType.Builder.newInstance(Id.create("small05", VehicleType.class))
 			.setCapacity(5)
 			.setMaxVelocity(10)
@@ -54,7 +47,6 @@ final class ExampleMultipleMixedEchelonChains {
 			.setCostPerDistanceUnit(0.001)
 			.setCostPerTimeUnit(0.01)
 			.build();
-
 	private static final VehicleType VEH_TYPE_LARGE_50 = CarrierVehicleType.Builder.newInstance(Id.create("large50", VehicleType.class))
 			.setCapacity(50)
 			.setMaxVelocity(10)
@@ -322,5 +314,7 @@ final class ExampleMultipleMixedEchelonChains {
 		}
 		return resourceList;
 	}
+
+	enum AssignerSetting {primary, roundRobin}
 
 }

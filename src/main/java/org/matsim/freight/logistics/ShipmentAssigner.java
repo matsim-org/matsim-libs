@@ -24,18 +24,20 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
 
 /**
  * Takes an {@link LSPShipment} and normally assigns it to something that belongs to an {@link LSP}.
- * <br/><br/>
- * If there are several {@link LogisticChain}s, the {@link LSP} has to assign each {@link LSPShipment} to
- * the suitable one. For this purpose, each LSPPlan contains a pluggable strategy that
- * is contained in classes implementing the interface {@link ShipmentAssigner}.
- * <br/><br/>
- * Discussion points:<ul>
- * <li> yyyy Shipments are normally assigned to the selected plan only.  I am not sure if this is what I would
- * expect from the outside. kai, may'22</li>
+ * <br>
+ * <br>
+ * If there are several {@link LogisticChain}s, the {@link LSP} has to assign each {@link
+ * LSPShipment} to the suitable one. For this purpose, each LSPPlan contains a pluggable strategy
+ * that is contained in classes implementing the interface {@link ShipmentAssigner}. <br>
+ * <br>
+ * Discussion points:
+ *
+ * <ul>
+ *   <li>yyyy Shipments are normally assigned to the selected plan only. I am not sure if this is
+ *       what I would expect from the outside. kai, may'22
  * </ul>
  */
 public interface ShipmentAssigner extends KnowsLSP {
 
-	void assignToPlan(LSPPlan lspPlan, LSPShipment shipment);
-
+  void assignToPlan(LSPPlan lspPlan, LSPShipment shipment);
 }

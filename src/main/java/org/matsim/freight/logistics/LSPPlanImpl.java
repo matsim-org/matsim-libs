@@ -21,10 +21,9 @@
 
 package org.matsim.freight.logistics;
 
-import org.matsim.freight.logistics.shipment.ShipmentPlan;
-
 import java.util.ArrayList;
 import java.util.Collection;
+import org.matsim.freight.logistics.shipment.ShipmentPlan;
 
 public class LSPPlanImpl implements LSPPlan {
 

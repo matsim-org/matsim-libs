@@ -20,13 +20,6 @@
 
 package org.matsim.freight.logistics.resourceImplementations.mainRunCarrier;
 
-import org.matsim.freight.logistics.LSPCarrierResource;
-import org.matsim.freight.logistics.LSPSimulationTracker;
-import org.matsim.freight.logistics.LogisticChainElement;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentLeg;
-import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -36,6 +29,13 @@ import org.matsim.freight.carriers.Tour.ServiceActivity;
 import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierTourEndEventHandler;
+import org.matsim.freight.logistics.LSPCarrierResource;
+import org.matsim.freight.logistics.LSPSimulationTracker;
+import org.matsim.freight.logistics.LogisticChainElement;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentLeg;
+import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 
 public class MainRunTourEndEventHandler implements AfterMobsimListener, CarrierTourEndEventHandler, LSPSimulationTracker<LSPShipment> {
 // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way to do the junit testing. kmt jun'23
@@ -43,8 +43,8 @@ public class MainRunTourEndEventHandler implements AfterMobsimListener, CarrierT
 	private final CarrierService carrierService;
 	private final LogisticChainElement logisticChainElement;
 	private final LSPCarrierResource resource;
-	private LSPShipment lspShipment;
 	private final Tour tour;
+	private LSPShipment lspShipment;
 
 	MainRunTourEndEventHandler(LSPShipment lspShipment, CarrierService carrierService, LogisticChainElement logisticChainElement, LSPCarrierResource resource, Tour tour) {
 		this.lspShipment = lspShipment;
@@ -83,13 +83,13 @@ public class MainRunTourEndEventHandler implements AfterMobsimListener, CarrierT
 		builder.setResourceId(resource.getId());
 		builder.setCarrierId(event.getCarrierId());
 		ShipmentPlanElement unload = builder.build();
-		String idString = unload.getResourceId() + "" + unload.getLogisticChainElement().getId() + "" + unload.getElementType();
+		String idString = unload.getResourceId() + "" + unload.getLogisticChainElement().getId() + unload.getElementType();
 		Id<ShipmentPlanElement> unloadId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getShipmentLog().addPlanElement(unloadId, unload);
 	}
 
 	private void logTransport(CarrierTourEndEvent event) {
-		String idString = resource.getId() + "" + logisticChainElement.getId() + "" + "TRANSPORT";
+		String idString = resource.getId() + "" + logisticChainElement.getId() + "TRANSPORT";
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentPlanElement abstractPlanElement = lspShipment.getShipmentLog().getPlanElements().get(id);
 		if (abstractPlanElement instanceof ShipmentLeg transport) {

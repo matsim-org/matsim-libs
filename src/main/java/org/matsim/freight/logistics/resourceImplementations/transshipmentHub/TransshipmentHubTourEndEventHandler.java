@@ -20,16 +20,13 @@
 
 package org.matsim.freight.logistics.resourceImplementations.transshipmentHub;
 
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.freight.logistics.LSPResource;
-import org.matsim.freight.logistics.LSPSimulationTracker;
-import org.matsim.freight.logistics.LogisticChainElement;
-import org.matsim.freight.logistics.events.HandlingInHubStartsEvent;
-import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.shipment.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.freight.carriers.*;
@@ -37,10 +34,12 @@ import org.matsim.freight.carriers.Tour.ServiceActivity;
 import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierTourEndEventHandler;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import org.matsim.freight.logistics.LSPResource;
+import org.matsim.freight.logistics.LSPSimulationTracker;
+import org.matsim.freight.logistics.LogisticChainElement;
+import org.matsim.freight.logistics.events.HandlingInHubStartsEvent;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
+import org.matsim.freight.logistics.shipment.*;
 
 public class TransshipmentHubTourEndEventHandler implements AfterMobsimListener, LSPSimulationTracker<LSPResource>, CarrierTourEndEventHandler {
 // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way to do the junit testing. kmt jun'23

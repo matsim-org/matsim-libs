@@ -1,6 +1,7 @@
 package org.matsim.freight.logistics.example.lsp.multipleChains;
 
 import com.google.inject.Inject;
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -18,8 +19,6 @@ import org.matsim.freight.carriers.events.CarrierTourStartEvent;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
-import java.util.*;
 
 /**
  * @author Kai Martins-Turner (kturner)
@@ -55,12 +54,11 @@ class EventBasedCarrierScorer_MultipleChains implements CarrierScoringFunctionFa
 	private class EventBasedScoring implements SumScoringFunction.ArbitraryEventScoring {
 
 		final Logger log = LogManager.getLogger(EventBasedScoring.class);
-		private double score;
 		private final double MAX_SHIFT_DURATION = 8 * 3600;
 		private final Map<VehicleType, Double>  vehicleType2TourDuration = new LinkedHashMap<>();
 		private final Map<VehicleType, Integer>  vehicleType2ScoredFixCosts = new LinkedHashMap<>();
-
 		private final Map<Id<Tour>, Double> tourStartTime = new LinkedHashMap<>();
+		private double score;
 
 		public EventBasedScoring() {
 			super();
@@ -122,12 +120,10 @@ class EventBasedCarrierScorer_MultipleChains implements CarrierScoringFunctionFa
 		final Logger log = LogManager.getLogger(EventBasedScoring.class);
 
 		private final double toll;
-		private double score;
-
 //		private final List<String> vehicleTypesToBeTolled = Arrays.asList("large50");
 private final List<String> vehicleTypesToBeTolled = List.of("heavy40t");
-
 		private final List<Id<Vehicle>> tolledVehicles = new ArrayList<>();
+		private double score;
 
 		public LinkBasedTollScoring(double toll) {
 			super();

@@ -1,15 +1,14 @@
 package org.matsim.freight.logistics.io;
 
-import org.matsim.freight.logistics.LSPs;
+import java.util.Collections;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.freight.carriers.CarrierPlanXmlReader;
 import org.matsim.freight.carriers.CarrierVehicleTypeReader;
 import org.matsim.freight.carriers.CarrierVehicleTypes;
 import org.matsim.freight.carriers.Carriers;
+import org.matsim.freight.logistics.LSPs;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.util.Collections;
 
 public class LSPReadWriteTest {
 

@@ -20,15 +20,14 @@
 
 package org.matsim.freight.logistics.example.lspAndDemand.requirementsChecking;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.ShipmentAssigner;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.Requirement;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 class RequirementsAssigner implements ShipmentAssigner {
 
@@ -57,12 +56,13 @@ class RequirementsAssigner implements ShipmentAssigner {
 		chosenSolution.addShipmentToChain(shipment);
 	}
 
+	@Override public LSP getLSP(){
+		throw new RuntimeException( "not implemented" );
+	}
+
 	@Override
 	public void setLSP(LSP lsp) {
 		this.lsp = lsp;
-	}
-	@Override public LSP getLSP(){
-		throw new RuntimeException( "not implemented" );
 	}
 
 }

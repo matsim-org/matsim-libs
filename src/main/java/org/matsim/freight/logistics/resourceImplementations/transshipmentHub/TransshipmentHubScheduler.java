@@ -20,6 +20,10 @@
 
 package org.matsim.freight.logistics.resourceImplementations.transshipmentHub;
 
+import java.util.ArrayList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LSPResourceScheduler;
 import org.matsim.freight.logistics.LogisticChainElement;
@@ -27,11 +31,6 @@ import org.matsim.freight.logistics.LspShipmentWithTime;
 import org.matsim.freight.logistics.shipment.ShipmentPlan;
 import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-
-import java.util.ArrayList;
 
 /*package-private*/ class TransshipmentHubScheduler extends LSPResourceScheduler {
 

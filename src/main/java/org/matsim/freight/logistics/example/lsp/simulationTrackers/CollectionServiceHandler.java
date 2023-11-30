@@ -20,6 +20,8 @@
 
 package org.matsim.freight.logistics.example.lsp.simulationTrackers;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.freight.carriers.CarrierService;
@@ -30,10 +32,6 @@ import org.matsim.freight.carriers.events.eventhandler.CarrierServiceStartEventH
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
-
-import java.util.ArrayList;
-import java.util.Collection;
-
 
 /*package-private*/ class CollectionServiceHandler implements CarrierServiceStartEventHandler, CarrierServiceEndEventHandler {
 

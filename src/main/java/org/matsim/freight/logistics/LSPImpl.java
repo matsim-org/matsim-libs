@@ -20,13 +20,12 @@
 
 package org.matsim.freight.logistics;
 
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.freight.logistics.shipment.LSPShipment;
 
 /* package-private */class LSPImpl extends LSPDataObject<LSP> implements LSP {
 	private static final Logger log = LogManager.getLogger(LSPImpl.class);
@@ -52,15 +51,6 @@ import java.util.List;
 		this.resources = builder.resources;
 	}
 
-	/**
-	 * This is used from {@link LSPControlerListener} and not meant to be used from user code.  Users should bind {@link LSPScorerFactory}.
-	 */
-	/* package-private */ void setScorer(LSPScorer scorer){
-		this.scorer = scorer;
-		scorer.setEmbeddingContainer(this);
-		this.addSimulationTracker(scorer);
-	}
-
 	public static LSPPlan copyPlan(LSPPlan plan2copy) {
 		List<LogisticChain> newPlanChains = new ArrayList<>();
 		for (LogisticChain initialPlanChain : plan2copy.getLogisticChains()) {
@@ -78,6 +68,15 @@ import java.util.List;
 		copiedPlan.setType(plan2copy.getType());
 		copiedPlan.getLogisticChains().addAll(newPlanChains);
 		return copiedPlan;
+	}
+
+	/**
+	 * This is used from {@link LSPControlerListener} and not meant to be used from user code.  Users should bind {@link LSPScorerFactory}.
+	 */
+	/* package-private */ void setScorer(LSPScorer scorer){
+		this.scorer = scorer;
+		scorer.setEmbeddingContainer(this);
+		this.addSimulationTracker(scorer);
 	}
 
 	@Override

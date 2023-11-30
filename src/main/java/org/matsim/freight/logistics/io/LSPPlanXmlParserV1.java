@@ -20,6 +20,17 @@
 
 package org.matsim.freight.logistics.io;
 
+import static org.matsim.freight.logistics.LSPConstants.*;
+
+import java.util.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.freight.carriers.*;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
@@ -30,23 +41,11 @@ import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.Tra
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.freight.carriers.*;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.xml.sax.Attributes;
-
-import java.util.*;
-
-import static org.matsim.freight.logistics.LSPConstants.*;
 
 /**
  * Reads data out of LSPPlans file and builds the LSPs with their according resources, shipments and plans.
@@ -56,13 +55,16 @@ import static org.matsim.freight.logistics.LSPConstants.*;
 class LSPPlanXmlParserV1 extends MatsimXmlParser {
 
 	public static final Logger logger = LogManager.getLogger( LSPPlanXmlParserV1.class );
-
+	private final LSPs lsPs;
+	private final Carriers carriers;
+	private final Map<String, String> elementIdResourceIdMap = new LinkedHashMap<>();
+	private final Map<String, ShipmentPlanElement> planElements = new LinkedHashMap<>();
+	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
+	private final List<LogisticChain> logisticChains = new LinkedList<>();
 	private LSP currentLsp = null;
 	private Carrier currentCarrier = null;
 	private LSPShipment currentShipment = null;
 	private LSPPlan currentLspPlan = null;
-	private final LSPs lsPs;
-	private final Carriers carriers;
 	private CarrierCapabilities.Builder capabilityBuilder;
 	private TransshipmentHubResource hubResource;
 	private String currentHubId;
@@ -73,10 +75,6 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 	private String selected;
 	private String shipmentPlanId;
 	private String shipmentChainId;
-	private final Map<String, String> elementIdResourceIdMap = new LinkedHashMap<>();
-	private final Map<String, ShipmentPlanElement> planElements = new LinkedHashMap<>();
-	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
-	private final List<LogisticChain> logisticChains = new LinkedList<>();
 
 	LSPPlanXmlParserV1( LSPs lsPs, Carriers carriers ) {
 		super(ValidationType.XSD_ONLY);

@@ -20,11 +20,7 @@
 
 package org.matsim.freight.logistics.resourceImplementations.mainRunCarrier;
 
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.resourceImplementations.CarrierSchedulerUtils;
-import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -33,9 +29,12 @@ import org.matsim.freight.carriers.Tour.Leg;
 import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.NetworkRouter;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.resourceImplementations.CarrierSchedulerUtils;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
+import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.vehicles.VehicleType;
-
-import java.util.*;
 
 /**
  * In the case of the MainRunResource, the incoming LSPShipments are bundled
@@ -56,11 +55,12 @@ import java.util.*;
 	private Carrier carrier;
 	private MainRunCarrierResource resource;
 	private ArrayList<LSPShipmentCarrierServicePair> pairs;
-
+	private int tourIdIndex = 1; //Have unique TourIds for the MainRun.
+	
 	/*package-private*/   MainRunCarrierScheduler() {
 		this.pairs = new ArrayList<>();
 	}
-	
+
 	@Override protected void initializeValues( LSPResource resource ) {
 		this.pairs = new ArrayList<>();
 		if (resource.getClass() == MainRunCarrierResource.class) {
@@ -71,6 +71,7 @@ import java.util.*;
 			this.carrier.getPlans().clear();
 		}
 	}
+
 	@Override protected void scheduleResource() {
 		int load = 0;
 		List<LspShipmentWithTime> copyOfAssignedShipments = new ArrayList<>(lspShipmentsWithTime);
@@ -78,7 +79,7 @@ import java.util.*;
 		ArrayList<LspShipmentWithTime> shipmentsInCurrentTour = new ArrayList<>();
 //		ArrayList<ScheduledTour> scheduledTours = new ArrayList<>();
 		List<CarrierPlan> scheduledPlans = new LinkedList<>();
-		
+
 		for (LspShipmentWithTime tuple : copyOfAssignedShipments) {
 			//Add job as "services" to the carrier. So the carrier has this available
 			CarrierService carrierService = convertToCarrierService(tuple);
@@ -110,7 +111,6 @@ import java.util.*;
 		carrier.setSelectedPlan(plan);
 	}
 
-	private int tourIdIndex = 1; //Have unique TourIds for the MainRun.
 	private CarrierPlan createPlan(Carrier carrier, List<LspShipmentWithTime> tuples) {
 
 		//TODO: Allgemein: Hier ist alles manuell zusammen gesetzt; es findet KEINE Tourenplanung statt!

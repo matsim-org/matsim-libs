@@ -20,9 +20,8 @@
 
 package org.matsim.freight.logistics.example.lsp.simulationTrackers;
 
-import org.matsim.freight.logistics.LSPSimulationTracker;
-import org.matsim.freight.logistics.LSPUtils;
-import org.matsim.freight.logistics.LogisticChain;
+import java.util.ArrayList;
+import java.util.Collection;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
@@ -38,9 +37,9 @@ import org.matsim.freight.carriers.events.CarrierTourStartEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierServiceEndEventHandler;
 import org.matsim.freight.carriers.events.eventhandler.CarrierServiceStartEventHandler;
 import org.matsim.freight.carriers.events.eventhandler.CarrierTourStartEventHandler;
-
-import java.util.ArrayList;
-import java.util.Collection;
+import org.matsim.freight.logistics.LSPSimulationTracker;
+import org.matsim.freight.logistics.LSPUtils;
+import org.matsim.freight.logistics.LogisticChain;
 
 /*package-private*/ class LinearCostTracker implements AfterMobsimListener, LSPSimulationTracker<LogisticChain>,
 		LinkEnterEventHandler,
@@ -79,18 +78,15 @@ import java.util.Collection;
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		for (EventHandler handler : eventHandlers) {
-			if (handler instanceof TourStartHandler) {
-				TourStartHandler startHandler = (TourStartHandler) handler;
-				this.vehicleFixedCosts = startHandler.getVehicleFixedCosts();
+			if (handler instanceof TourStartHandler startHandler) {
+        this.vehicleFixedCosts = startHandler.getVehicleFixedCosts();
 			}
-			if (handler instanceof DistanceAndTimeHandler) {
-				DistanceAndTimeHandler distanceHandler = (DistanceAndTimeHandler) handler;
-				this.distanceCosts = distanceHandler.getDistanceCosts();
+			if (handler instanceof DistanceAndTimeHandler distanceHandler) {
+        this.distanceCosts = distanceHandler.getDistanceCosts();
 				this.timeCosts = distanceHandler.getTimeCosts();
 			}
-			if (handler instanceof CollectionServiceHandler) {
-				CollectionServiceHandler collectionHandler = (CollectionServiceHandler) handler;
-				totalNumberOfShipments = collectionHandler.getTotalNumberOfShipments();
+			if (handler instanceof CollectionServiceHandler collectionHandler) {
+        totalNumberOfShipments = collectionHandler.getTotalNumberOfShipments();
 				System.out.println(totalNumberOfShipments);
 				totalWeightOfShipments = collectionHandler.getTotalWeightOfShipments();
 				loadingCosts = collectionHandler.getTotalLoadingCosts();

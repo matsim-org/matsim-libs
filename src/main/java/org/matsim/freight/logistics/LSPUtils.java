@@ -20,16 +20,15 @@
 
 package org.matsim.freight.logistics;
 
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentPlan;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.freight.carriers.CarriersUtils;
-import org.matsim.freight.carriers.Carriers;
-import org.matsim.utils.objectattributes.attributable.Attributable;
-
 import java.util.ArrayList;
 import java.util.Collection;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.freight.carriers.Carriers;
+import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentPlan;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 public final class LSPUtils {
 	private static final String lspsString = "lsps";
@@ -97,6 +96,36 @@ public final class LSPUtils {
 
 	public static void setFixedCost(Attributable attributable, Double fixedCost) {
 		attributable.getAttributes().putAttribute("fixedCost", fixedCost);
+	}
+
+	/**
+	 * Gives back the {@link LSPShipment} object of the {@link LSP}, which matches to the shipmentId
+	 * @param lsp In this LSP this method tries to find the shipment.
+	 * @param shipmentId Id of the shipment that should be found.
+	 * @return the lspShipment object or null, if it is not found.
+	 */
+	public static LSPShipment findLspShipment(LSP lsp, Id<LSPShipment> shipmentId){
+		for (LSPShipment lspShipment : lsp.getShipments()) {
+			if (lspShipment.getId().equals(shipmentId)) {
+				return lspShipment;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Returns the {@link ShipmentPlan} of an {@link LSPShipment}.
+	 * @param lspPlan the lspPlan: It contains the information of its shipmentPlans
+	 * @param shipmentId Id of the shipment that should be found.
+	 * @return the shipmentPlan object or null, if it is not found.
+	 */
+	public static ShipmentPlan findLspShipmentPlan(LSPPlan lspPlan, Id<LSPShipment> shipmentId){
+		for (ShipmentPlan shipmentPlan : lspPlan.getShipmentPlans()) {
+			if (shipmentPlan.getLspShipmentId().equals(shipmentId)) {
+				return shipmentPlan;
+			}
+		}
+		return null;
 	}
 
 	public static final class LSPBuilder {
@@ -215,36 +244,6 @@ public final class LSPUtils {
 		public LogisticChainElement build() {
 			return new LogisticChainElementImpl(this);
 		}
-	}
-
-	/**
-	 * Gives back the {@link LSPShipment} object of the {@link LSP}, which matches to the shipmentId
-	 * @param lsp In this LSP this method tries to find the shipment.
-	 * @param shipmentId Id of the shipment that should be found.
-	 * @return the lspShipment object or null, if it is not found.
-	 */
-	public static LSPShipment findLspShipment(LSP lsp, Id<LSPShipment> shipmentId){
-		for (LSPShipment lspShipment : lsp.getShipments()) {
-			if (lspShipment.getId().equals(shipmentId)) {
-				return lspShipment;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Returns the {@link ShipmentPlan} of an {@link LSPShipment}.
-	 * @param lspPlan the lspPlan: It contains the information of its shipmentPlans
-	 * @param shipmentId Id of the shipment that should be found.
-	 * @return the shipmentPlan object or null, if it is not found.
-	 */
-	public static ShipmentPlan findLspShipmentPlan(LSPPlan lspPlan, Id<LSPShipment> shipmentId){
-		for (ShipmentPlan shipmentPlan : lspPlan.getShipmentPlans()) {
-			if (shipmentPlan.getLspShipmentId().equals(shipmentId)) {
-				return shipmentPlan;
-			}
-		}
-		return null;
 	}
 
 }

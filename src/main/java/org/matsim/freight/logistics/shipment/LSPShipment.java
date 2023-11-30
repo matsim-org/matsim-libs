@@ -20,14 +20,13 @@
 
 package org.matsim.freight.logistics.shipment;
 
-import org.matsim.freight.logistics.HasSimulationTrackers;
+import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.carriers.TimeWindow;
+import org.matsim.freight.logistics.HasSimulationTrackers;
 import org.matsim.utils.objectattributes.attributable.Attributable;
-
-import java.util.Collection;
 
 /**
  * This is, for example, a shipment that DHL moves from A to B.  It may use multiple carriers to achieve that.

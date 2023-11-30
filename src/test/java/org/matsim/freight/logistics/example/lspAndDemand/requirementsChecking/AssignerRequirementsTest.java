@@ -20,14 +20,11 @@
 
 package org.matsim.freight.logistics.example.lspAndDemand.requirementsChecking;
 
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.example.lspAndDemand.requirementsChecking.BlueRequirement;
-import org.matsim.freight.logistics.example.lspAndDemand.requirementsChecking.RedRequirement;
-import org.matsim.freight.logistics.example.lspAndDemand.requirementsChecking.RequirementsAssigner;
-import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -39,14 +36,13 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
+import org.matsim.freight.logistics.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
-
-import static org.junit.Assert.assertTrue;
 
 public class AssignerRequirementsTest {
 

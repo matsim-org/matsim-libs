@@ -20,12 +20,11 @@
 
 package org.matsim.freight.logistics;
 
+import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.utils.objectattributes.attributable.Attributable;
-
-import java.util.Collection;
 
 /**
  *

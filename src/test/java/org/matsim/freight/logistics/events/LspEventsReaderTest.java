@@ -1,5 +1,9 @@
 package org.matsim.freight.logistics.events;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -14,11 +18,6 @@ import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierTourEndEventHandler;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.shipment.LSPShipment;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Kai Martins-Turner (kturner)

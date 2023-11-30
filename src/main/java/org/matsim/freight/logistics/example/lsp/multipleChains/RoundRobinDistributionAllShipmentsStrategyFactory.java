@@ -20,20 +20,19 @@
 
 package org.matsim.freight.logistics.example.lsp.multipleChains;
 
-import org.matsim.freight.logistics.LSP;
-import org.matsim.freight.logistics.LSPPlan;
-import org.matsim.freight.logistics.LogisticChain;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.matsim.freight.logistics.LSP;
+import org.matsim.freight.logistics.LSPPlan;
+import org.matsim.freight.logistics.LogisticChain;
+import org.matsim.freight.logistics.shipment.LSPShipment;
 
 /*package-private*/ class RoundRobinDistributionAllShipmentsStrategyFactory {
 

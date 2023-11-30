@@ -1,10 +1,9 @@
 package org.matsim.freight.logistics.example.lsp.multipleChains;
 
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -25,15 +24,15 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
-import org.matsim.freight.carriers.controler.CarrierControlerUtils;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
+import org.matsim.freight.logistics.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.vehicles.VehicleType;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 final class ExampleMultipleOneEchelonChainsReplanning {
 

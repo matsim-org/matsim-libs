@@ -20,15 +20,10 @@
 
 package org.matsim.freight.logistics.example.lsp.initialPlans;
 
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
-import org.matsim.freight.logistics.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
-import org.matsim.freight.logistics.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -38,13 +33,17 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
+import org.matsim.freight.logistics.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
+import org.matsim.freight.logistics.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import org.matsim.freight.logistics.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
+import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Random;
 
 /*A transport chain with five elements (collection-> reloading -> main run -> reloading -> delivery) is created and scheduled
  *

@@ -20,16 +20,15 @@
 
 package org.matsim.freight.logistics.example.lsp.lspReplanning;
 
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import java.util.Collection;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
-
-import java.util.Collection;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 
 @Deprecated
 /*package-private*/ class TomorrowShipmentAssignerStrategyFactory {

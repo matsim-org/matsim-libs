@@ -20,14 +20,13 @@
 
 package org.matsim.freight.logistics.example.lsp.simulationTrackers;
 
+import java.util.Collection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierTourStartEventHandler;
-
-import java.util.Collection;
 
 /*package-private*/ class TourStartHandler implements CarrierTourStartEventHandler {
 

@@ -20,9 +20,8 @@
 
 package org.matsim.freight.logistics.lspPlanTests;
 
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
+import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -34,9 +33,10 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
+import org.matsim.freight.logistics.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
 import org.matsim.vehicles.VehicleType;
-
-import static org.junit.Assert.*;
 
 public class CollectionLSPPlanTest {
 

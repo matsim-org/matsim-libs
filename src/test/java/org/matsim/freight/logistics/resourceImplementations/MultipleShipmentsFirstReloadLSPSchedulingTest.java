@@ -20,15 +20,11 @@
 
 package org.matsim.freight.logistics.resourceImplementations;
 
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
-import org.matsim.freight.logistics.resourceImplementations.collectionCarrier.CollectionServiceEndEventHandler;
-import org.matsim.freight.logistics.resourceImplementations.collectionCarrier.CollectionTourEndEventHandler;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TransshipmentHubTourEndEventHandler;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map.Entry;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -42,14 +38,17 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
+import org.matsim.freight.logistics.resourceImplementations.collectionCarrier.CollectionServiceEndEventHandler;
+import org.matsim.freight.logistics.resourceImplementations.collectionCarrier.CollectionTourEndEventHandler;
+import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
+import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TransshipmentHubTourEndEventHandler;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Map.Entry;
-
-import static org.junit.Assert.*;
 
 public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 	private LSP lsp;

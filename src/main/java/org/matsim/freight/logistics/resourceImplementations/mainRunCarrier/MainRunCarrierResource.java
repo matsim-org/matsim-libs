@@ -20,16 +20,15 @@
 
 package org.matsim.freight.logistics.resourceImplementations.mainRunCarrier;
 
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
+import java.util.Collection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.freight.carriers.Carrier;
-
-import java.util.Collection;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 
 /*package-private*/ class MainRunCarrierResource extends LSPDataObject<LSPResource> implements LSPCarrierResource {
 

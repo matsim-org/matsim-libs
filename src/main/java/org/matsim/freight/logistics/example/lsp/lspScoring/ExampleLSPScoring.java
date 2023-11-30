@@ -20,11 +20,7 @@
 
 package org.matsim.freight.logistics.example.lsp.lspScoring;
 
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -42,9 +38,12 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierServiceEndEventHandler;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
+import org.matsim.freight.logistics.resourceImplementations.collectionCarrier.CollectionCarrierUtils;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.vehicles.VehicleType;
-
-import java.util.*;
 
 /* Example for customized scoring. Each customer that is visited will give a random tip between zero and five
  *

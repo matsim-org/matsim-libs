@@ -20,12 +20,6 @@
 
 package org.matsim.freight.logistics.resourceImplementations.distributionCarrier;
 
-import org.matsim.freight.logistics.LSPCarrierResource;
-import org.matsim.freight.logistics.LSPSimulationTracker;
-import org.matsim.freight.logistics.LogisticChainElement;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.freight.carriers.CarrierService;
 import org.matsim.freight.carriers.Tour;
@@ -33,6 +27,12 @@ import org.matsim.freight.carriers.Tour.ServiceActivity;
 import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierTourStartEventHandler;
+import org.matsim.freight.logistics.LSPCarrierResource;
+import org.matsim.freight.logistics.LSPSimulationTracker;
+import org.matsim.freight.logistics.LogisticChainElement;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 
 public class DistributionTourStartEventHandler implements CarrierTourStartEventHandler, LSPSimulationTracker<LSPShipment> {
 // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way to do the junit testing. kmt jun'23
@@ -40,9 +40,8 @@ public class DistributionTourStartEventHandler implements CarrierTourStartEventH
 	private final CarrierService carrierService;
 	private final LogisticChainElement element;
 	private final LSPCarrierResource resource;
-	private LSPShipment lspShipment;
-
 	private final Tour tour;
+	private LSPShipment lspShipment;
 
 	DistributionTourStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticChainElement element, LSPCarrierResource resource, Tour tour) {
 		this.carrierService = carrierService;
@@ -81,7 +80,7 @@ public class DistributionTourStartEventHandler implements CarrierTourStartEventH
 		builder.setEndTime(event.getTime());
 		builder.setStartTime(event.getTime() - getCumulatedLoadingTime(tour));
 		ShipmentPlanElement loggedShipmentLoad = builder.build();
-		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getLogisticChainElement().getId() + "" + loggedShipmentLoad.getElementType();
+		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getLogisticChainElement().getId() + loggedShipmentLoad.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getShipmentLog().addPlanElement(loadId, loggedShipmentLoad);
 	}
@@ -95,7 +94,7 @@ public class DistributionTourStartEventHandler implements CarrierTourStartEventH
 		builder.setResourceId(resource.getId());
 		builder.setStartTime(event.getTime());
 		ShipmentPlanElement transport = builder.build();
-		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + "" + transport.getElementType();
+		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + transport.getElementType();
 		Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getShipmentLog().addPlanElement(transportId, transport);
 	}

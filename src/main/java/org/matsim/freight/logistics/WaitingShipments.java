@@ -20,9 +20,8 @@
 
 package org.matsim.freight.logistics;
 
-import org.matsim.freight.logistics.shipment.LSPShipment;
-
 import java.util.Collection;
+import org.matsim.freight.logistics.shipment.LSPShipment;
 
 /**
  * Each LogisticsSolutionElement maintains two collections of WaitingShipments.

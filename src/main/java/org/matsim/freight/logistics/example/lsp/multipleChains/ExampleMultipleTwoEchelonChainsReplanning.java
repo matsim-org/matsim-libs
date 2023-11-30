@@ -1,12 +1,9 @@
 package org.matsim.freight.logistics.example.lsp.multipleChains;
 
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
-import org.matsim.freight.logistics.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -27,22 +24,22 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
-import org.matsim.freight.carriers.controler.CarrierControlerUtils;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
+import org.matsim.freight.logistics.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import org.matsim.freight.logistics.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
+import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.vehicles.VehicleType;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 final class ExampleMultipleTwoEchelonChainsReplanning {
 
-	private static final Logger log = LogManager.getLogger(ExampleMultipleTwoEchelonChainsReplanning.class);
-
 	static final double HUBCOSTS_FIX = 100;
-
+	private static final Logger log = LogManager.getLogger(ExampleMultipleTwoEchelonChainsReplanning.class);
 	private static final Id<Link> DEPOT_LINK_ID = Id.createLinkId("i(5,0)");
 	private static final Id<Link> HUB_LEFT_LINK_ID = Id.createLinkId("i(1,5)R");
 	private static final Id<Link> HUB_RIGHT_LINK_ID = Id.createLinkId("j(9,5)");

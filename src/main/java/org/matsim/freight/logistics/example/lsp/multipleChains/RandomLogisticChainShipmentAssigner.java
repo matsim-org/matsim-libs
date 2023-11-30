@@ -1,16 +1,15 @@
 package org.matsim.freight.logistics.example.lsp.multipleChains;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.ShipmentAssigner;
 import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.gbl.MatsimRandom;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 /**
  * The {@link LSPShipment} is assigned randomly to a {@link LogisticChain}.

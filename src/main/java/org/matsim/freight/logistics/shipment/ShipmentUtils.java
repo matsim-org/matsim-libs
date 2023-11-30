@@ -20,18 +20,17 @@
 
 package org.matsim.freight.logistics.shipment;
 
-import org.matsim.freight.logistics.LSPPlan;
-import org.matsim.freight.logistics.LSPResource;
-import org.matsim.freight.logistics.LogisticChainElement;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierService;
 import org.matsim.freight.carriers.TimeWindow;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import org.matsim.freight.logistics.LSPPlan;
+import org.matsim.freight.logistics.LSPResource;
+import org.matsim.freight.logistics.LogisticChainElement;
 
 public final class ShipmentUtils {
 	private ShipmentUtils() {
@@ -141,58 +140,58 @@ public final class ShipmentUtils {
 			return new LoggedShipmentLoadBuilder();
 		}
 
-		public void setStartTime(double startTime){
-			this.startTime = startTime;
-		}
-
-		public void setEndTime(double endTime){
-			this.endTime = endTime;
-		}
-
 		public void setLogisticsChainElement(LogisticChainElement element){
 			this.element = element;
-		}
-
-		public void setResourceId(Id<LSPResource> resourceId){
-			this.resourceId = resourceId;
-		}
-
-		public void setLinkId(Id<Link> linkId){
-			this.linkId = linkId;
-		}
-
-		public void setCarrierId(Id<Carrier> carrierId){
-			this.carrierId = carrierId;
 		}
 
 		public LoggedShipmentLoad build(){
 			return new LoggedShipmentLoad(this);
 		}
 
-		// --- Getters --- //
-
 		public double getStartTime() {
 			return startTime;
+		}
+
+		public void setStartTime(double startTime){
+			this.startTime = startTime;
 		}
 
 		public double getEndTime() {
 			return endTime;
 		}
 
+		public void setEndTime(double endTime){
+			this.endTime = endTime;
+		}
+
 		public LogisticChainElement getElement() {
 			return element;
 		}
 
+		// --- Getters --- //
+
 		public Id<LSPResource> getResourceId() {
 			return resourceId;
+		}
+
+		public void setResourceId(Id<LSPResource> resourceId){
+			this.resourceId = resourceId;
 		}
 
 		public Id<Carrier> getCarrierId() {
 			return carrierId;
 		}
 
+		public void setCarrierId(Id<Carrier> carrierId){
+			this.carrierId = carrierId;
+		}
+
 		public Id<Link> getLinkId() {
 			return linkId;
+		}
+
+		public void setLinkId(Id<Link> linkId){
+			this.linkId = linkId;
 		}
 	}
 
@@ -211,28 +210,8 @@ public final class ShipmentUtils {
 			return new LoggedShipmentTransportBuilder();
 		}
 
-		public void setStartTime(double startTime){
-			this.startTime = startTime;
-		}
-
 		public void setLogisticChainElement(LogisticChainElement element){
 			this.element = element;
-		}
-
-		public void setResourceId(Id<LSPResource> resourceId){
-			this.resourceId = resourceId;
-		}
-
-		public void setFromLinkId(Id<Link> fromLinkId){
-			this.fromLinkId = fromLinkId;
-		}
-
-		public void setToLinkId(Id<Link> toLinkId){
-			this.toLinkId = toLinkId;
-		}
-
-		public void setCarrierId(Id<Carrier> carrierId){
-			this.carrierId = carrierId;
 		}
 
 		public LoggedShipmentTransport build(){
@@ -244,6 +223,10 @@ public final class ShipmentUtils {
 			return startTime;
 		}
 
+		public void setStartTime(double startTime){
+			this.startTime = startTime;
+		}
+
 		public LogisticChainElement getElement() {
 			return element;
 		}
@@ -252,16 +235,32 @@ public final class ShipmentUtils {
 			return resourceId;
 		}
 
+		public void setResourceId(Id<LSPResource> resourceId){
+			this.resourceId = resourceId;
+		}
+
 		public Id<Link> getFromLinkId() {
 			return fromLinkId;
+		}
+
+		public void setFromLinkId(Id<Link> fromLinkId){
+			this.fromLinkId = fromLinkId;
 		}
 
 		public Id<Link> getToLinkId() {
 			return toLinkId;
 		}
 
+		public void setToLinkId(Id<Link> toLinkId){
+			this.toLinkId = toLinkId;
+		}
+
 		public Id<Carrier> getCarrierId() {
 			return carrierId;
+		}
+
+		public void setCarrierId(Id<Carrier> carrierId){
+			this.carrierId = carrierId;
 		}
 	}
 
@@ -497,6 +496,7 @@ public final class ShipmentUtils {
 
 	public static final class LSPShipmentBuilder {
 		final Id<LSPShipment> id;
+		final List<Requirement> requirements;
 		Id<Link> fromLinkId;
 		Id<Link> toLinkId;
 		TimeWindow startTimeWindow;
@@ -504,15 +504,14 @@ public final class ShipmentUtils {
 		int capacityDemand;
 		double deliveryServiceTime;
 		double pickupServiceTime;
-		final List<Requirement> requirements;
-
-		public static LSPShipmentBuilder newInstance( Id<LSPShipment> id ){
-			return new LSPShipmentBuilder(id);
-		}
 
 		private LSPShipmentBuilder( Id<LSPShipment> id ){
 			this.requirements = new ArrayList<>();
 			this.id = id;
+		}
+
+		public static LSPShipmentBuilder newInstance( Id<LSPShipment> id ){
+			return new LSPShipmentBuilder(id);
 		}
 
 		public void setFromLinkId(Id<Link> fromLinkId ){

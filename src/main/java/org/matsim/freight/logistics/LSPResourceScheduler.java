@@ -20,11 +20,10 @@
 
 package org.matsim.freight.logistics;
 
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
-
 import java.util.ArrayList;
 import java.util.Comparator;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 
 /**
  * Resources are scheduled separately by calling their individual scheduling algorithm.

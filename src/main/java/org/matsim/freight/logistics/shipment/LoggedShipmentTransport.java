@@ -20,12 +20,12 @@
 
 package org.matsim.freight.logistics.shipment;
 
-import org.matsim.freight.logistics.LSPResource;
-import org.matsim.freight.logistics.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierService;
+import org.matsim.freight.logistics.LSPResource;
+import org.matsim.freight.logistics.LogisticChainElement;
 
 final class LoggedShipmentTransport implements ShipmentLeg {
 

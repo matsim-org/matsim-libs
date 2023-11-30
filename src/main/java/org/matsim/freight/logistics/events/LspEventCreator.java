@@ -21,19 +21,16 @@
 
 package org.matsim.freight.logistics.events;
 
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 
 /**
- *
  * @author Kai Martins-Turner (kturner)
  */
-
 public interface LspEventCreator {
 
-	// I am unsure, if I need the activity or not. kmt 'dec22
-	Event createEvent(Event event, Id<LSPShipment> lspShipmentId, Activity activity);
+  // I am unsure, if I need the activity or not. kmt 'dec22
+  Event createEvent(Event event, Id<LSPShipment> lspShipmentId, Activity activity);
 }

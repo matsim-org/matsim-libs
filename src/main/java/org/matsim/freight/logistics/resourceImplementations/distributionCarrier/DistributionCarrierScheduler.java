@@ -20,11 +20,10 @@
 
 package org.matsim.freight.logistics.resourceImplementations.distributionCarrier;
 
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.resourceImplementations.CarrierSchedulerUtils;
-import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.freight.carriers.*;
@@ -32,12 +31,12 @@ import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.Tour.Leg;
 import org.matsim.freight.carriers.Tour.ServiceActivity;
 import org.matsim.freight.carriers.Tour.TourElement;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.resourceImplementations.CarrierSchedulerUtils;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
+import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.vehicles.VehicleType;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Ähnlich zu CollectionCarrierScheduler: Nun werden Sendungen verteilt statt eingesammelt.
@@ -54,6 +53,7 @@ import java.util.List;
 	private Carrier carrier;
 	private DistributionCarrierResource resource;
 	private ArrayList<LSPCarrierPair> pairs;
+	private int carrierCnt = 1;
 
 	DistributionCarrierScheduler() {
 		this.pairs = new ArrayList<>();
@@ -196,7 +196,7 @@ import java.util.List;
 		builder.setCarrierService(serviceActivity.getService());
 
 		ShipmentPlanElement load = builder.build();
-		String idString = load.getResourceId() + "" + load.getLogisticChainElement().getId() + "" + load.getElementType();
+		String idString = load.getResourceId() + "" + load.getLogisticChainElement().getId() + load.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, load);
 	}
@@ -224,7 +224,7 @@ import java.util.List;
 		builder.setToLinkId(serviceActivity.getLocation());
 		builder.setCarrierService(serviceActivity.getService());
 		ShipmentPlanElement transport = builder.build();
-		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + "" + transport.getElementType();
+		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + transport.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, transport);
 	}
@@ -255,7 +255,6 @@ import java.util.List;
 		ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, unload);
 	}
 
-	private int carrierCnt = 1;
 	private Carrier createAuxiliaryCarrier(ArrayList<LspShipmentWithTime> shipmentsInCurrentTour, double startTime) {
 		final Id<Carrier> carrierId = Id.create(carrier.getId().toString() + carrierCnt, Carrier.class);
 		carrierCnt ++;

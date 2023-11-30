@@ -1,15 +1,14 @@
 package org.matsim.freight.logistics.example.lsp.multipleChains;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.ShipmentAssigner;
 import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.core.gbl.Gbl;
-
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * The {@link LSPShipment} is assigned consecutively to a {@link LogisticChain}.
@@ -21,10 +20,9 @@ import java.util.Map;
 
 class RoundRobinLogisticChainShipmentAssigner implements ShipmentAssigner {
 
-	private LSP lsp;
-
 	// map of logistic chains and their number of assigned shipments in order of addition
 	Map<LogisticChain, Integer> shipmentCountByChain = new LinkedHashMap<>();
+	private LSP lsp;
 
 	RoundRobinLogisticChainShipmentAssigner() {
 	}

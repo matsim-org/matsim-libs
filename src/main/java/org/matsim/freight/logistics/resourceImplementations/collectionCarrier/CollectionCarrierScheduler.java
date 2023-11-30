@@ -20,11 +20,7 @@
 
 package org.matsim.freight.logistics.resourceImplementations.collectionCarrier;
 
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.resourceImplementations.CarrierSchedulerUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import java.util.ArrayList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierService;
@@ -32,8 +28,11 @@ import org.matsim.freight.carriers.ScheduledTour;
 import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.Tour.Leg;
 import org.matsim.freight.carriers.Tour.TourElement;
-
-import java.util.ArrayList;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.resourceImplementations.CarrierSchedulerUtils;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 
 /**
  * Schedules the {@link CollectionCarrierResource}.
@@ -125,7 +124,7 @@ import java.util.ArrayList;
 		builder.setLinkId(serviceActivity.getLocation());
 		builder.setCarrierService(serviceActivity.getService());
 		ShipmentPlanElement load = builder.build();
-		String idString = load.getResourceId() + "" + load.getLogisticChainElement().getId() + "" + load.getElementType();
+		String idString = load.getResourceId() + "" + load.getLogisticChainElement().getId() + load.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, load);
 	}
@@ -150,7 +149,7 @@ import java.util.ArrayList;
 		builder.setToLinkId(tour.getEndLinkId());
 		builder.setCarrierService(serviceActivity.getService());
 		ShipmentPlanElement transport = builder.build();
-		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + "" + transport.getElementType();
+		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + transport.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, transport);
 	}
@@ -191,7 +190,7 @@ import java.util.ArrayList;
 		builder.setLinkId(tour.getEndLinkId());
 		builder.setCarrierService(serviceActivity.getService());
 		ShipmentPlanElement unload = builder.build();
-		String idString = unload.getResourceId() + "" + unload.getLogisticChainElement().getId() + "" + unload.getElementType();
+		String idString = unload.getResourceId() + "" + unload.getLogisticChainElement().getId() + unload.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getShipment().getId()).addPlanElement(id, unload);
 	}

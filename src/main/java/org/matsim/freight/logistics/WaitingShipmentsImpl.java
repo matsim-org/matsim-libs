@@ -20,12 +20,11 @@
 
 package org.matsim.freight.logistics;
 
-import org.matsim.freight.logistics.shipment.LSPShipment;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import org.matsim.freight.logistics.shipment.LSPShipment;
 
 /* package-private */ class WaitingShipmentsImpl implements WaitingShipments {
 

@@ -20,18 +20,7 @@
 
 package org.matsim.freight.logistics.io;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.freight.logistics.LSP;
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TransshipmentHubResource;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import static org.matsim.freight.logistics.LSPConstants.*;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -39,8 +28,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import static org.matsim.freight.logistics.LSPConstants.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.LSP;
+import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TransshipmentHubResource;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 
 /**
  * Writes out resources, shipments and plans for each LSP in an XML-file including header for validating against

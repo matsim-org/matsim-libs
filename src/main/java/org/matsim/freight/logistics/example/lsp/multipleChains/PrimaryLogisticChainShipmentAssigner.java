@@ -1,11 +1,11 @@
 package org.matsim.freight.logistics.example.lsp.multipleChains;
 
+import org.matsim.core.gbl.Gbl;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.ShipmentAssigner;
 import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.core.gbl.Gbl;
 
 /**
  * The {@link LSPShipment} is assigned to the first {@link LogisticChain}.

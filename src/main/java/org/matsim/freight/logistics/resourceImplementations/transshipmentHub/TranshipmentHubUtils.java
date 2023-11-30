@@ -1,13 +1,12 @@
 package org.matsim.freight.logistics.resourceImplementations.transshipmentHub;
 
-import org.matsim.freight.logistics.LSPResource;
-import org.matsim.freight.logistics.LSPResourceScheduler;
-import org.matsim.freight.logistics.LogisticChainElement;
+import java.util.ArrayList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-
-import java.util.ArrayList;
+import org.matsim.freight.logistics.LSPResource;
+import org.matsim.freight.logistics.LSPResourceScheduler;
+import org.matsim.freight.logistics.LogisticChainElement;
 
 /**
  * @author Kai Martins-Turner (kturner)
@@ -24,28 +23,28 @@ public class TranshipmentHubUtils {
             return new TranshipmentHubSchedulerBuilder();
         }
 
-        public TranshipmentHubSchedulerBuilder setCapacityNeedLinear(double capacityNeedLinear) {
-            this.capacityNeedLinear = capacityNeedLinear;
-            return this;
-        }
-
-        public TranshipmentHubSchedulerBuilder setCapacityNeedFixed(double capacityNeedFixed) {
-            this.capacityNeedFixed = capacityNeedFixed;
-            return this;
-        }
-
         public TransshipmentHubScheduler build() {
             return new TransshipmentHubScheduler(this);
         }
-
-        //--- Getters ---
 
         double getCapacityNeedLinear() {
             return capacityNeedLinear;
         }
 
+        public TranshipmentHubSchedulerBuilder setCapacityNeedLinear(double capacityNeedLinear) {
+            this.capacityNeedLinear = capacityNeedLinear;
+            return this;
+        }
+
+        //--- Getters ---
+
         double getCapacityNeedFixed() {
             return capacityNeedFixed;
+        }
+
+        public TranshipmentHubSchedulerBuilder setCapacityNeedFixed(double capacityNeedFixed) {
+            this.capacityNeedFixed = capacityNeedFixed;
+            return this;
         }
     }
 
@@ -54,8 +53,8 @@ public class TranshipmentHubUtils {
         private final Id<LSPResource> id;
         private final Id<Link> locationLinkId;
         private final ArrayList<LogisticChainElement> clientElements;
-        private TransshipmentHubScheduler transshipmentHubScheduler;
         private final Scenario scenario;
+        private TransshipmentHubScheduler transshipmentHubScheduler;
 
         private TransshipmentHubBuilder(Id<LSPResource> id, Id<Link> locationLinkId, Scenario scenario) {
             this.id = id;
@@ -68,19 +67,14 @@ public class TranshipmentHubUtils {
             return new TransshipmentHubBuilder(id, locationLinkId, scenario);
         }
 
-        public TransshipmentHubBuilder setTransshipmentHubScheduler(LSPResourceScheduler TranshipmentHubScheduler) {
-            this.transshipmentHubScheduler = (TransshipmentHubScheduler) TranshipmentHubScheduler;
-            return this;
-        }
-
         public TransshipmentHubResource build() {
             return new TransshipmentHubResource(this, scenario);
         }
-        //--- Getters ---
 
         Id<LSPResource> getId() {
             return id;
         }
+        //--- Getters ---
 
         Id<Link> getLocationLinkId() {
             return locationLinkId;
@@ -88,6 +82,11 @@ public class TranshipmentHubUtils {
 
         TransshipmentHubScheduler getTransshipmentHubScheduler() {
             return transshipmentHubScheduler;
+        }
+
+        public TransshipmentHubBuilder setTransshipmentHubScheduler(LSPResourceScheduler TranshipmentHubScheduler) {
+            this.transshipmentHubScheduler = (TransshipmentHubScheduler) TranshipmentHubScheduler;
+            return this;
         }
 
         ArrayList<LogisticChainElement> getClientElements() {

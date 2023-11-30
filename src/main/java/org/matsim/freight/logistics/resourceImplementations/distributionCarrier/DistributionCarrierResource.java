@@ -20,14 +20,13 @@
 
 package org.matsim.freight.logistics.resourceImplementations.distributionCarrier;
 
+import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierVehicle;
 import org.matsim.freight.logistics.*;
-
-import java.util.Collection;
 
 /*package-private*/ class DistributionCarrierResource extends LSPDataObject<LSPResource> implements LSPCarrierResource {
 

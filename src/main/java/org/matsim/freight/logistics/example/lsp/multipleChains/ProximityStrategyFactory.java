@@ -1,7 +1,8 @@
 package org.matsim.freight.logistics.example.lsp.multipleChains;
 
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.shipment.LSPShipment;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -13,10 +14,8 @@ import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.shipment.LSPShipment;
 
 final class ProximityStrategyFactory {
 

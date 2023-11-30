@@ -20,26 +20,26 @@
 
 package org.matsim.freight.logistics.resourceImplementations;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierVehicle;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.freight.carriers.Carrier;
-import org.matsim.freight.carriers.CarrierVehicle;
 import org.matsim.vehicles.VehicleType;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.*;
 
 public class ResourceImplementationUtils {
 
 	private static final Logger log = LogManager.getLogger(ResourceImplementationUtils.class);
+	private static final String CARRIER_TYPE_ATTR = "carrierType" ;
 
 	public static SimpleForwardLogisticChainScheduler createDefaultSimpleForwardLogisticChainScheduler(List<LSPResource> resources) {
 		return new SimpleForwardLogisticChainScheduler(resources);
@@ -161,13 +161,6 @@ public class ResourceImplementationUtils {
 		}
 	}
 
-	public enum VehicleReturn {returnToFromLink, endAtToLink}
-
-
-	public enum CARRIER_TYPE {collectionCarrier, mainRunCarrier, distributionCarrier, undefined}
-
-	private static final String CARRIER_TYPE_ATTR = "carrierType" ;
-
 	public static CARRIER_TYPE getCarrierType(Carrier carrier) {
 		if (carrier.getAttributes().getAttribute(CARRIER_TYPE_ATTR) instanceof CARRIER_TYPE carrierType) {
 			return carrierType;
@@ -182,8 +175,12 @@ public class ResourceImplementationUtils {
 		}
 
 	}
+
 	public static void setCarrierType(Carrier carrier, CARRIER_TYPE carrierType) {
 		carrier.getAttributes().putAttribute(CARRIER_TYPE_ATTR, carrierType ) ;
 	}
+
+	public enum VehicleReturn {returnToFromLink, endAtToLink}
+	public enum CARRIER_TYPE {collectionCarrier, mainRunCarrier, distributionCarrier, undefined}
 
 }

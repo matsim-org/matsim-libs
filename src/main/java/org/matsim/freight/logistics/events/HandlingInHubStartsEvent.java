@@ -22,16 +22,15 @@
 package org.matsim.freight.logistics.events;
 
 
+import static org.matsim.freight.logistics.events.LspEventAttributes.ATTRIBUTE_EXP_HANDLING_DURATION;
+import static org.matsim.freight.logistics.events.LspEventAttributes.ATTRIBUTE_HUB_ID;
+
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.shipment.LSPShipment;
-
-import java.util.Map;
-
-import static org.matsim.freight.logistics.events.LspEventAttributes.ATTRIBUTE_EXP_HANDLING_DURATION;
-import static org.matsim.freight.logistics.events.LspEventAttributes.ATTRIBUTE_HUB_ID;
 
 /**
  * An event, that informs that the handling of a {@link LSPShipment}  in a hub has started.
@@ -48,6 +47,16 @@ public final class HandlingInHubStartsEvent extends AbstractLspEvent {
 		super(time, linkId, lspShipmentId);
 		this.hubId = hubId;
 		this.expHandlingDuration = expHandlingDuration;
+	}
+
+	public static HandlingInHubStartsEvent convert (GenericEvent event) {
+		Map<String, String> attributes = event.getAttributes();
+		double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));
+		Id<Link> linkId = Id.createLinkId(attributes.get(ATTRIBUTE_LINK));
+		Id<LSPShipment> lspSipmentId = Id.create(attributes.get(ATTRIBUTE_LSP_SHIPMENT_ID), LSPShipment.class);
+		var hubId = Id.create(attributes.get(ATTRIBUTE_HUB_ID), LSPResource.class);
+		double expHandlingDuration = Double.parseDouble(attributes.get(ATTRIBUTE_EXP_HANDLING_DURATION));
+		return new HandlingInHubStartsEvent(time, linkId, lspSipmentId, hubId, expHandlingDuration);
 	}
 
 	@Override public String getEventType() {
@@ -68,15 +77,5 @@ public final class HandlingInHubStartsEvent extends AbstractLspEvent {
 		attr.put(ATTRIBUTE_HUB_ID, hubId.toString());
 		attr.put(ATTRIBUTE_EXP_HANDLING_DURATION, String.valueOf(expHandlingDuration));
 		return attr;
-	}
-
-	public static HandlingInHubStartsEvent convert (GenericEvent event) {
-		Map<String, String> attributes = event.getAttributes();
-		double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));
-		Id<Link> linkId = Id.createLinkId(attributes.get(ATTRIBUTE_LINK));
-		Id<LSPShipment> lspSipmentId = Id.create(attributes.get(ATTRIBUTE_LSP_SHIPMENT_ID), LSPShipment.class);
-		var hubId = Id.create(attributes.get(ATTRIBUTE_HUB_ID), LSPResource.class);
-		double expHandlingDuration = Double.parseDouble(attributes.get(ATTRIBUTE_EXP_HANDLING_DURATION));
-		return new HandlingInHubStartsEvent(time, linkId, lspSipmentId, hubId, expHandlingDuration);
 	}
 }

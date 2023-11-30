@@ -20,6 +20,12 @@
 
 package org.matsim.freight.logistics.resourceImplementations.distributionCarrier;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.freight.carriers.CarrierService;
+import org.matsim.freight.carriers.events.CarrierServiceStartEvent;
+import org.matsim.freight.carriers.events.eventhandler.CarrierServiceStartEventHandler;
 import org.matsim.freight.logistics.LSPCarrierResource;
 import org.matsim.freight.logistics.LSPSimulationTracker;
 import org.matsim.freight.logistics.LogisticChainElement;
@@ -27,12 +33,6 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentLeg;
 import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.freight.carriers.CarrierService;
-import org.matsim.freight.carriers.events.CarrierServiceStartEvent;
-import org.matsim.freight.carriers.events.eventhandler.CarrierServiceStartEventHandler;
 
 public class DistributionServiceStartEventHandler implements AfterMobsimListener, CarrierServiceStartEventHandler, LSPSimulationTracker<LSPShipment> {
 // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way to do the junit testing. kmt jun'23
@@ -64,7 +64,7 @@ public class DistributionServiceStartEventHandler implements AfterMobsimListener
 	}
 
 	private void logTransport(CarrierServiceStartEvent event) {
-		String idString = resource.getId() + "" + logisticChainElement.getId() + "" + "TRANSPORT";
+		String idString = resource.getId() + "" + logisticChainElement.getId() + "TRANSPORT";
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentPlanElement abstractPlanElement = lspShipment.getShipmentLog().getPlanElements().get(id);
 		if (abstractPlanElement instanceof ShipmentLeg transport) {
@@ -81,7 +81,7 @@ public class DistributionServiceStartEventHandler implements AfterMobsimListener
 		builder.setStartTime(event.getTime());
 		builder.setEndTime(event.getTime() + event.getServiceDuration());
 		ShipmentPlanElement unload = builder.build();
-		String idString = unload.getResourceId() + "" + unload.getLogisticChainElement().getId() + "" + unload.getElementType();
+		String idString = unload.getResourceId() + "" + unload.getLogisticChainElement().getId() + unload.getElementType();
 		Id<ShipmentPlanElement> unloadId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getShipmentLog().addPlanElement(unloadId, unload);
 	}

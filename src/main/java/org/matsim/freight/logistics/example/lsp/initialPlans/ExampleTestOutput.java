@@ -12,21 +12,28 @@ import org.matsim.examples.ExamplesUtils;
 
 class ExampleTestOutput {
 
-	public static void main( String[] args ){
+  public static void main(String[] args) {
 
-		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) );
+    Config config =
+        ConfigUtils.loadConfig(
+            IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 
-		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-		config.controller().setLastIteration( 1 );
+    config
+        .controller()
+        .setOverwriteFileSetting(
+            OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+    config.controller().setLastIteration(1);
 
-		Scenario scenario = ScenarioUtils.loadScenario( config );
+    Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		Controler controler = new Controler( scenario );
+    Controler controler = new Controler(scenario);
 
-		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
-		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
-		controler.run();
-
-	}
-
+    // The VSP default settings are designed for person transport simulation. After talking to Kai,
+    // they will be set to WARN here. Kai MT may'23
+    controler
+        .getConfig()
+        .vspExperimental()
+        .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
+    controler.run();
+  }
 }

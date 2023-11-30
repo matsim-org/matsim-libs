@@ -20,14 +20,7 @@
 
 package org.matsim.freight.logistics.example.lsp.initialPlans;
 
-import org.matsim.freight.logistics.example.lsp.lspReplanning.AssignmentStrategyFactory;
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
-import org.matsim.freight.logistics.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -52,9 +45,15 @@ import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierServiceEndEventHandler;
 import org.matsim.freight.carriers.events.eventhandler.CarrierTourEndEventHandler;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.example.lsp.lspReplanning.AssignmentStrategyFactory;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
+import org.matsim.freight.logistics.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import org.matsim.freight.logistics.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
+import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.vehicles.VehicleType;
-
-import java.util.*;
 
 /**
  * The LSP have to possibilities to send the goods from the first depot to the recipients:

@@ -20,13 +20,7 @@
 
 package org.matsim.freight.logistics.example.lsp.initialPlans;
 
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
-import org.matsim.freight.logistics.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
-import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -50,9 +44,14 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
+import org.matsim.freight.logistics.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import org.matsim.freight.logistics.resourceImplementations.mainRunCarrier.MainRunCarrierUtils;
+import org.matsim.freight.logistics.resourceImplementations.transshipmentHub.TranshipmentHubUtils;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.vehicles.VehicleType;
-
-import java.util.*;
 
 /**
  * This is an academic example for the 2-echelon problem.
@@ -84,11 +83,6 @@ final class ExampleTwoEchelonGrid {
 
 	private static final Id<Link> DEPOT_LINK_ID = Id.createLinkId("i(5,0)");
 	private static final Id<Link> HUB_LINK_ID = Id.createLinkId("j(5,3)");
-
-	enum DemandSetting {oneCustomer, tenCustomers}
-	enum CarrierCostSetting {sameCost, lowerCost4LastMile}
-
-
 	private static final VehicleType VEH_TYPE_LARGE_50 = CarrierVehicleType.Builder.newInstance(Id.create("large50", VehicleType.class))
 			.setCapacity(50)
 			.setMaxVelocity(10)
@@ -96,7 +90,6 @@ final class ExampleTwoEchelonGrid {
 			.setCostPerDistanceUnit(0.01)
 			.setCostPerTimeUnit(0.01)
 			.build();
-
 	private static final VehicleType VEH_TYPE_SMALL_05 = CarrierVehicleType.Builder.newInstance(Id.create("small05", VehicleType.class))
 			.setCapacity(5)
 			.setMaxVelocity(10)
@@ -148,7 +141,7 @@ final class ExampleTwoEchelonGrid {
 
 		log.info("Run MATSim");
 		log.warn("Runs settings were: Demand: "  + demandSetting +  "\n CarrierCosts: "  + costSetting  + "\n HubCosts: "  + HUBCOSTS_FIX + "\n tollValue: "  + TOLL_VALUE);
-		
+
 		//The VSP default settings are designed for person transport simulation. After talking to Kai, they will be set to WARN here. Kai MT may'23
 		controler.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 		controler.run();
@@ -274,7 +267,7 @@ final class ExampleTwoEchelonGrid {
 
 			final VehicleType vehType;
 			switch (costSetting) {
-				case sameCost ->  vehType = VEH_TYPE_LARGE_50;	
+				case sameCost ->  vehType = VEH_TYPE_LARGE_50;
 				case lowerCost4LastMile -> 	vehType = VEH_TYPE_SMALL_05;
 				default -> throw new IllegalStateException("Unexpected value: " + costSetting);
 			}
@@ -361,7 +354,7 @@ final class ExampleTwoEchelonGrid {
 						throw new RuntimeException("Link is not in Network!");
 					}
 				}
-				
+
 				for(int i = 1; i <= 10; i++) {
 					Id<LSPShipment> id = Id.create("Shipment_" + i, LSPShipment.class);
 					ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id);
@@ -398,6 +391,10 @@ final class ExampleTwoEchelonGrid {
 		}
 		return resourcesList;
 	}
+
+	enum DemandSetting {oneCustomer, tenCustomers}
+
+	enum CarrierCostSetting {sameCost, lowerCost4LastMile}
 
 
 	//		@Override public ScoringFunction createScoringFunction(Carrier carrier ){

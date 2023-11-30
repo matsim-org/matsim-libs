@@ -20,6 +20,12 @@
 
 package org.matsim.freight.logistics.resourceImplementations.collectionCarrier;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.freight.carriers.CarrierService;
+import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
+import org.matsim.freight.carriers.events.eventhandler.CarrierServiceEndEventHandler;
 import org.matsim.freight.logistics.LSPCarrierResource;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LSPSimulationTracker;
@@ -28,12 +34,6 @@ import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentLeg;
 import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.ShipmentUtils;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.freight.carriers.CarrierService;
-import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
-import org.matsim.freight.carriers.events.eventhandler.CarrierServiceEndEventHandler;
 
 public class CollectionServiceEndEventHandler implements AfterMobsimListener, CarrierServiceEndEventHandler, LSPSimulationTracker<LSPShipment> {
 // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way to do the junit testing. kmt jun'23
@@ -74,7 +74,7 @@ public class CollectionServiceEndEventHandler implements AfterMobsimListener, Ca
 		builder.setLinkId(event.getLinkId());
 		builder.setCarrierId(event.getCarrierId());
 		ShipmentPlanElement loggedShipmentLoad = builder.build();
-		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getLogisticChainElement().getId() + "" + loggedShipmentLoad.getElementType();
+		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getLogisticChainElement().getId() + loggedShipmentLoad.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getShipmentLog().addPlanElement(loadId, loggedShipmentLoad);
 	}
@@ -87,7 +87,7 @@ public class CollectionServiceEndEventHandler implements AfterMobsimListener, Ca
 		builder.setFromLinkId(event.getLinkId());
 		builder.setCarrierId(event.getCarrierId());
 		ShipmentLeg transport = builder.build();
-		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + "" + transport.getElementType();
+		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + transport.getElementType();
 		Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getShipmentLog().addPlanElement(transportId, transport);
 	}

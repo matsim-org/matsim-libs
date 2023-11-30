@@ -20,10 +20,9 @@
 
 package org.matsim.freight.logistics.shipment;
 
-import org.matsim.freight.logistics.HasBackpointer;
-import org.matsim.api.core.v01.Id;
-
 import java.util.Map;
+import org.matsim.api.core.v01.Id;
+import org.matsim.freight.logistics.HasBackpointer;
 
 public interface ShipmentPlan extends HasBackpointer<Id<LSPShipment>> {
 

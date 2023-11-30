@@ -20,10 +20,10 @@
 
 package org.matsim.freight.logistics.example.lspAndDemand.requirementsChecking;
 
+import static org.matsim.freight.logistics.example.lspAndDemand.requirementsChecking.ExampleCheckRequirementsOfAssigner.ATTRIBUTE_COLOR;
+
 import org.matsim.freight.logistics.LogisticChain;
 import org.matsim.freight.logistics.shipment.Requirement;
-
-import static org.matsim.freight.logistics.example.lspAndDemand.requirementsChecking.ExampleCheckRequirementsOfAssigner.ATTRIBUTE_COLOR;
 
 /*package-private*/ class BlueRequirement implements Requirement {
 

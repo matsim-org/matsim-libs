@@ -20,12 +20,12 @@
 
 package org.matsim.freight.logistics.shipment;
 
-import org.matsim.freight.logistics.LSPResource;
-import org.matsim.freight.logistics.LogisticChainElement;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierService;
+import org.matsim.freight.logistics.LSPResource;
+import org.matsim.freight.logistics.LogisticChainElement;
 
 final class ScheduledShipmentTransport implements ShipmentLeg {
 
@@ -65,6 +65,10 @@ final class ScheduledShipmentTransport implements ShipmentLeg {
 		return endTime;
 	}
 
+	@Override public void setEndTime( double time ){
+		throw new RuntimeException( "not implemented" );
+	}
+
 	@Override
 	public LogisticChainElement getLogisticChainElement() {
 		return element;
@@ -75,15 +79,17 @@ final class ScheduledShipmentTransport implements ShipmentLeg {
 		return resourceId;
 	}
 
-
 	@Override public Id<Link> getToLinkId() {
 		return toLinkId;
+	}
+
+	@Override public void setToLinkId( Id<Link> endLinkId ){
+		throw new RuntimeException( "not implemented" );
 	}
 
 	@Override public Id<Carrier> getCarrierId() {
 		return carrierId;
 	}
-
 
 	@Override public Id<Link> getFromLinkId() {
 		return fromLinkId;
@@ -91,12 +97,6 @@ final class ScheduledShipmentTransport implements ShipmentLeg {
 
 	@Override public CarrierService getCarrierService() {
 		return carrierService;
-	}
-	@Override public void setEndTime( double time ){
-		throw new RuntimeException( "not implemented" );
-	}
-	@Override public void setToLinkId( Id<Link> endLinkId ){
-		throw new RuntimeException( "not implemented" );
 	}
 
 }

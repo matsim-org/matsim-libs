@@ -20,18 +20,17 @@
 
 package org.matsim.freight.logistics.io;
 
-import org.matsim.freight.logistics.LSPConstants;
-import org.matsim.freight.logistics.LSPs;
+import java.net.URL;
+import java.util.Stack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.freight.carriers.Carriers;
+import org.matsim.freight.logistics.LSPConstants;
+import org.matsim.freight.logistics.LSPs;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
-import java.net.URL;
-import java.util.Stack;
 
 /**
  * Delegates a LSPPlanXmlParser according to declared schema definition file

@@ -20,11 +20,10 @@
 
 package org.matsim.freight.logistics.resourceImplementations;
 
+import java.util.List;
+import org.matsim.api.core.v01.Id;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.api.core.v01.Id;
-
-import java.util.List;
 
 /**
  * In the class SimpleForwardSolutionScheduler two tasks are performed:

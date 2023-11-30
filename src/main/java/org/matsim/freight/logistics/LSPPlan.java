@@ -20,11 +20,10 @@
 
 package org.matsim.freight.logistics;
 
+import java.util.Collection;
+import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.freight.logistics.shipment.LSPShipment;
 import org.matsim.freight.logistics.shipment.ShipmentPlan;
-import org.matsim.api.core.v01.population.BasicPlan;
-
-import java.util.Collection;
 
 /**
  * This interface has the following properties:<ul>

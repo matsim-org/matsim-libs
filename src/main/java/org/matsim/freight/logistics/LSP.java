@@ -20,10 +20,9 @@
 
 package org.matsim.freight.logistics;
 
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.api.core.v01.population.HasPlansAndId;
-
 import java.util.Collection;
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.freight.logistics.shipment.LSPShipment;
 
 /**
  * In the class library, the interface LSP has the following tasks:

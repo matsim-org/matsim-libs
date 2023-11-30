@@ -1,10 +1,9 @@
 package org.matsim.freight.logistics.example.lsp.multipleChains;
 
-import org.matsim.freight.logistics.*;
-import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
-import org.matsim.freight.logistics.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -26,22 +25,19 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controler.CarrierControlerUtils;
 import org.matsim.freight.carriers.controler.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controler.CarrierStrategyManager;
+import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
+import org.matsim.freight.logistics.resourceImplementations.distributionCarrier.DistributionCarrierUtils;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.vehicles.VehicleType;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 final class ExampleMultipleOneEchelonChains {
 
 	private static final Logger log = LogManager.getLogger(ExampleMultipleOneEchelonChains.class);
 
 	private static final DemandSetting demandSetting = DemandSetting.fiveUnits;
-	enum DemandSetting {oneUnit, fiveUnits}
-
 	private static final Id<Link> DEPOT_LINK_ID = Id.createLinkId("i(5,0)");
-
 	private static final VehicleType VEH_TYPE_SMALL_05 = CarrierVehicleType.Builder.newInstance(Id.create("small05", VehicleType.class))
 			.setCapacity(5)
 			.setMaxVelocity(10)
@@ -49,7 +45,6 @@ final class ExampleMultipleOneEchelonChains {
 			.setCostPerDistanceUnit(0.001)
 			.setCostPerTimeUnit(0.01)
 			.build();
-
 	private static final VehicleType VEH_TYPE_LARGE_50 = CarrierVehicleType.Builder.newInstance(Id.create("large50", VehicleType.class))
 			.setCapacity(50)
 			.setMaxVelocity(10)
@@ -295,5 +290,7 @@ final class ExampleMultipleOneEchelonChains {
 		}
 		return resourceList;
 	}
+
+	enum DemandSetting {oneUnit, fiveUnits}
 
 }

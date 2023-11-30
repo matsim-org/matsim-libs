@@ -20,16 +20,15 @@
 
 package org.matsim.freight.logistics.resourceImplementations.transshipmentHub;
 
+import java.util.Collection;
+import java.util.List;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.logistics.LSPDataObject;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.LSPResource;
 import org.matsim.freight.logistics.LogisticChainElement;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * {@link LSPResource} bei der die geplanten Tätigkeiten NICHT am Verkehr teilnehmen.

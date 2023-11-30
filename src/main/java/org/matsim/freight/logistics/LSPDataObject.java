@@ -1,15 +1,13 @@
 package org.matsim.freight.logistics;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
 
 public class LSPDataObject<T> implements HasSimulationTrackers<T>, Attributable, Identifiable<T> {
 

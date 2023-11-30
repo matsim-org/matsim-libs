@@ -20,13 +20,6 @@
 
 package org.matsim.freight.logistics.resourceImplementations.mainRunCarrier;
 
-import org.matsim.freight.logistics.LSPCarrierResource;
-import org.matsim.freight.logistics.LSPSimulationTracker;
-import org.matsim.freight.logistics.LogisticChainElement;
-import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.freight.logistics.shipment.ShipmentLeg;
-import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
-import org.matsim.freight.logistics.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -36,6 +29,13 @@ import org.matsim.freight.carriers.Tour.ServiceActivity;
 import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierTourStartEventHandler;
+import org.matsim.freight.logistics.LSPCarrierResource;
+import org.matsim.freight.logistics.LSPSimulationTracker;
+import org.matsim.freight.logistics.LogisticChainElement;
+import org.matsim.freight.logistics.shipment.LSPShipment;
+import org.matsim.freight.logistics.shipment.ShipmentLeg;
+import org.matsim.freight.logistics.shipment.ShipmentPlanElement;
+import org.matsim.freight.logistics.shipment.ShipmentUtils;
 
 public class MainRunTourStartEventHandler implements AfterMobsimListener, CarrierTourStartEventHandler, LSPSimulationTracker<LSPShipment> {
 // Todo: I have made it (temporarily) public because of junit tests :( -- need to find another way to do the junit testing. kmt jun'23
@@ -85,7 +85,7 @@ public class MainRunTourStartEventHandler implements AfterMobsimListener, Carrie
 		builder.setLogisticsChainElement(logisticChainElement);
 		builder.setResourceId(resource.getId());
 		ShipmentPlanElement loggedShipmentLoad = builder.build();
-		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getLogisticChainElement().getId() + "" + loggedShipmentLoad.getElementType();
+		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getLogisticChainElement().getId() + loggedShipmentLoad.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getShipmentLog().addPlanElement(loadId, loggedShipmentLoad);
 	}
@@ -109,7 +109,7 @@ public class MainRunTourStartEventHandler implements AfterMobsimListener, Carrie
 		builder.setLogisticChainElement(logisticChainElement);
 		builder.setResourceId(resource.getId());
 		ShipmentLeg transport = builder.build();
-		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + "" + transport.getElementType();
+		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + transport.getElementType();
 		Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getShipmentLog().addPlanElement(transportId, transport);
 	}

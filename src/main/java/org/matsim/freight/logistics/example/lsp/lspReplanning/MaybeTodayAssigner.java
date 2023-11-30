@@ -20,13 +20,12 @@
 
 package org.matsim.freight.logistics.example.lsp.lspReplanning;
 
+import java.util.Random;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.freight.logistics.LSP;
 import org.matsim.freight.logistics.LSPPlan;
 import org.matsim.freight.logistics.ShipmentAssigner;
 import org.matsim.freight.logistics.shipment.LSPShipment;
-import org.matsim.core.gbl.Gbl;
-
-import java.util.Random;
 
 /*package-private*/ class MaybeTodayAssigner implements ShipmentAssigner {
 
@@ -46,11 +45,12 @@ import java.util.Random;
 		}
 	}
 
-	@Override public void setLSP(LSP lsp) {
-		this.lsp = lsp;
-	}
 	@Override public LSP getLSP(){
 		throw new RuntimeException( "not implemented" );
+	}
+
+	@Override public void setLSP(LSP lsp) {
+		this.lsp = lsp;
 	}
 
 }
