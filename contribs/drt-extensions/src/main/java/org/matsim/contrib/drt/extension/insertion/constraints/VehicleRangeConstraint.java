@@ -3,6 +3,7 @@ package org.matsim.contrib.drt.extension.insertion.constraints;
 import javax.annotation.Nullable;
 
 import org.matsim.contrib.drt.extension.insertion.DrtInsertionConstraint;
+import org.matsim.contrib.drt.extension.insertion.distances.DistanceApproximator;
 import org.matsim.contrib.drt.extension.insertion.distances.DistanceCalculator;
 import org.matsim.contrib.drt.extension.insertion.distances.InsertionDistanceCalculator;
 import org.matsim.contrib.drt.extension.insertion.distances.InsertionDistanceCalculator.VehicleDistance;
@@ -16,10 +17,10 @@ public class VehicleRangeConstraint implements DrtInsertionConstraint {
 
 	private final VehicleRangeSupplier rangeSupplier;
 	private final DistanceCalculator distanceCalculator;
-	private final DistanceCalculator distanceApproximator;
+	private final DistanceApproximator distanceApproximator;
 
 	public VehicleRangeConstraint(VehicleRangeSupplier rangeSupplier, DistanceCalculator distanceEstimator,
-			@Nullable DistanceCalculator distanceApproximator) {
+			@Nullable DistanceApproximator distanceApproximator) {
 		this.rangeSupplier = rangeSupplier;
 		this.distanceCalculator = distanceEstimator;
 		this.distanceApproximator = distanceApproximator;
