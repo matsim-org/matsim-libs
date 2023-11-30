@@ -103,19 +103,21 @@ public class RailsimEngineMovingBlockTest {
 //		test.debugFiles(collector, "opposite");
 
 		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("sprinter", 1559, 200, 0)
-			.hasTrainState("sprinter2", 1368, 200, 0);
+			.hasTrainState("sprinter2", 1368, 200, 0)
+			.hasTrainState("sprinter", 1559, 200, 0);
 
 		test = getTestEngine("networkMovingBlocks.xml");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 0, "l1-2", "l6-7");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter2", 400, "l6-5", "l2-1");
 
+		// TODO sprinter 2 throttles, which should not be needed
+
 		test.doStateUpdatesUntil(2_000, 1);
-//		test.debugFiles(collector, "opposite_detailed");
+		test.debugFiles(collector, "opposite_detailed");
 
 		RailsimTestUtils.assertThat(collector)
-			.hasTrainState("sprinter", 1559, 200, 0)
-			.hasTrainState("sprinter2", 1368, 200, 0);
+			.hasTrainState("sprinter2", 1368, 200, 0)
+			.hasTrainState("sprinter", 1559, 200, 0);
 
 	}
 
@@ -151,4 +153,22 @@ public class RailsimEngineMovingBlockTest {
 			.hasTrainState("sprinter", 1984, 200, 0);
 
 	}
+
+
+	@Test
+	public void mixed() {
+
+		RailsimTestUtils.Holder test = getTestEngine("networkMixedTypes.xml");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "1-2", "20-21");
+//		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo", 0, "1-2", "20-21");
+//		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 0, "1-2", "20-21");
+
+		test.doSimStepUntil(5_000);
+
+		// TODO: multiple links within one moving block not fully correct yet
+
+
+	}
+
+
 }
