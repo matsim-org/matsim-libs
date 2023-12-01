@@ -42,6 +42,10 @@ public class ChargingInfrastructureUtils{
 
 	private ChargingInfrastructureUtils(){} // do not instantiate
 
+	public static ChargingInfrastructureSpecification createChargingInfrastructureSpecification() {
+		return new ChargingInfrastructureSpecificationDefaultImpl();
+	}
+
 	public static ChargingInfrastructure createChargingInfrastructure(
 			ChargingInfrastructureSpecification infrastructureSpecification, Function<Id<Link>, Link> linkProvider,
 			ChargingLogic.Factory chargingLogicFactory) {
