@@ -64,11 +64,6 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
 
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
-
-		if (config.controller().getCreateGraphsInterval()>0 && event.getIteration() % config.controller().getCreateGraphsInterval() == 0) {
-			//do something
-		}
-
         travelDistanceStats.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
         pHbyModeCalculator.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
         pkMbyModeCalculator.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
@@ -76,6 +71,7 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
 		boolean writeGraph = isWriteGraph(event);
 		pHbyModeCalculator.writeOutput(writeGraph);
         pkMbyModeCalculator.writeOutput(writeGraph);
+		travelDistanceStats.writeOutput(event.getIteration(), writeGraph);
 
         if (isWriteTripsAndLegs(event)) {
             tripsAndLegsWriter.write(experiencedPlansService.getExperiencedPlans()
