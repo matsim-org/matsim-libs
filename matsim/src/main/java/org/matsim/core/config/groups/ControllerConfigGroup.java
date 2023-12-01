@@ -73,6 +73,7 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 	private static final String WRITE_TRIPS_INTERVAL = "writeTripsInterval";
 	private static final String OVERWRITE_FILE = "overwriteFiles";
 	private static final String CREATE_GRAPHS = "createGraphs";
+	private static final String CREATE_GRAPHS_INTERVAL = "createGraphsInterval";
 	private static final String DUMP_DATA_AT_END = "dumpDataAtEnd";
 	private static final String CLEAN_ITERS_AT_END = "cleanItersAtEnd";
 	private static final String COMPRESSION_TYPE = "compressionType";
@@ -102,6 +103,7 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 	private String mobsim = MobsimType.qsim.toString();
 	private int writeSnapshotsInterval = 1;
 	private boolean createGraphs = true;
+	private int createGraphsInterval = 1;
 	private boolean dumpDataAtEnd = true;
 
 	private CompressionType compressionType = CompressionType.gzip;
@@ -371,6 +373,16 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( CREATE_GRAPHS )
 	public void setCreateGraphs(boolean createGraphs) {
 		this.createGraphs = createGraphs;
+	}
+
+	@StringGetter( CREATE_GRAPHS_INTERVAL )
+	public int getCreateGraphsInterval() {
+		return createGraphsInterval;
+	}
+
+	@StringSetter( CREATE_GRAPHS_INTERVAL )
+	public void setCreateGraphsInterval(int createGraphsInterval) {
+		this.createGraphsInterval = createGraphsInterval;
 	}
 
 	@StringGetter( OVERWRITE_FILE )

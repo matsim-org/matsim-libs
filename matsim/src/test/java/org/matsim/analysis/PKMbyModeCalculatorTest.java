@@ -160,10 +160,10 @@ public class PKMbyModeCalculatorTest {
 		controllerConfigGroup.setCreateGraphs(true);
 		controllerConfigGroup.setFirstIteration(0);
 		controllerConfigGroup.setLastIteration(10);
-		PKMbyModeCalculator pkmbyModeCalculator = new PKMbyModeCalculator(controllerConfigGroup, controlerIO, new GlobalConfigGroup());
+		PKMbyModeCalculator pkmbyModeCalculator = new PKMbyModeCalculator(controlerIO, new GlobalConfigGroup());
 		// iteration 0
 		pkmbyModeCalculator.addIteration(0, map);
-		pkmbyModeCalculator.writeOutput();
+		pkmbyModeCalculator.writeOutput(false);
 		Double totalCarDist = modeCalcDist.get("person1CarDist") + modeCalcDist.get("person2CarDist")
 				+ modeCalcDist.get("person3CarDist");
 		Double totalPtDist = modeCalcDist.get("person1PtDist") + modeCalcDist.get("person4PtDist");
@@ -176,7 +176,7 @@ public class PKMbyModeCalculatorTest {
 		map.remove(person2.getId());
 		// iteration 1
 		pkmbyModeCalculator.addIteration(1, map);
-		pkmbyModeCalculator.writeOutput();
+		pkmbyModeCalculator.writeOutput(false);
 		totalCarDist = modeCalcDist.get("person1CarDist") + modeCalcDist.get("person3CarDist");
 		totalPtDist = modeCalcDist.get("person1PtDist")  + modeCalcDist.get("person4PtDist");
 		totalWalkDist = modeCalcDist.get("person1WalkDist") + modeCalcDist.get("person3WalkDist") + modeCalcDist.get("person4WalkDist");
@@ -187,7 +187,7 @@ public class PKMbyModeCalculatorTest {
 		map.remove(person3.getId());
 		// iteration 2
 		pkmbyModeCalculator.addIteration(2, map);
-		pkmbyModeCalculator.writeOutput();
+		pkmbyModeCalculator.writeOutput(false);
 		totalCarDist = modeCalcDist.get("person1CarDist");
 		totalPtDist = modeCalcDist.get("person1PtDist")  + modeCalcDist.get("person4PtDist");
 		totalWalkDist = modeCalcDist.get("person1WalkDist") + modeCalcDist.get("person4WalkDist");

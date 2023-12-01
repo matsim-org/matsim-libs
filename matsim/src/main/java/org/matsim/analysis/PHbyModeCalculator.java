@@ -50,9 +50,8 @@ import org.matsim.core.utils.charts.StackedBarChart;
 public class PHbyModeCalculator {
 
 	private final Map<Integer,Map<String,TravelTimeAndWaitTime>> phtPerIteration = new TreeMap<>();
-	private final boolean writePng;
 	private final OutputDirectoryHierarchy controllerIO;
-		private final String delimiter;
+	private final String delimiter;
 	private final static String FILENAME = "ph_modestats";
 
 	private static final String TRAVEL_TIME_SUFFIX = "_travel";
@@ -60,8 +59,7 @@ public class PHbyModeCalculator {
 	private static final String STAGE_ACTIVITY = "stageActivity";
 
 	@Inject
-	PHbyModeCalculator(ControllerConfigGroup controllerConfigGroup, OutputDirectoryHierarchy controllerIO, GlobalConfigGroup globalConfig) {
-		this.writePng = controllerConfigGroup.isCreateGraphs();
+	PHbyModeCalculator(OutputDirectoryHierarchy controllerIO, GlobalConfigGroup globalConfig) {
 		this.controllerIO = controllerIO;
 		this.delimiter = globalConfig.getDefaultDelimiter();
 	}
@@ -97,19 +95,22 @@ public class PHbyModeCalculator {
 			}
 			if (Double.isNaN(travelTime)) {travelTime = 0.0; }
 			return new AbstractMap.SimpleEntry<>(leg.getMode(), new TravelTimeAndWaitTime(travelTime, waitTime));
-		} else if (pe instanceof Activity act) {
+		}
+
+		if (pe instanceof Activity act) {
 			if (StageActivityTypeIdentifier.isStageActivity(act.getType())) {
 				double duration = act.getEndTime().orElse(0) - act.getStartTime().orElse(0);
 				return new AbstractMap.SimpleEntry<>(STAGE_ACTIVITY, new TravelTimeAndWaitTime(0.0, duration));
 			}
 		}
+
 		return new AbstractMap.SimpleEntry<>(STAGE_ACTIVITY, new TravelTimeAndWaitTime(0.0, 0.0));
 	}
 
-	void writeOutput() {
+	void writeOutput(boolean writePng) {
 		writeCsv();
 		if(writePng){
-			writePng();
+			new Thread(this::writePng).start();
 		}
 	}
 
