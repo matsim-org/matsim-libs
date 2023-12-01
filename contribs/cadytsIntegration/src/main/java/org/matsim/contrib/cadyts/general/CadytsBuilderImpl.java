@@ -25,6 +25,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -44,9 +45,8 @@ public final class CadytsBuilderImpl {
 
 	private CadytsBuilderImpl(){} // do not instantiate
 
-	public static <T> AnalyticalCalibrator<T> buildCalibratorAndAddMeasurements(final Config config, final Counts<T> occupCounts,
-																				LookUpItemFromId<T> lookUp, Class<T> idType) {
-
+	public static <T extends Identifiable<T>> AnalyticalCalibrator<T> buildCalibratorAndAddMeasurements(final Config config, final Counts<T> occupCounts,
+																										LookUpItemFromId<T> lookUp, Class<T> idType) {
 		if (occupCounts.getCounts().size() == 0) {
 			log.warn("Counts container is empty.");
 		}

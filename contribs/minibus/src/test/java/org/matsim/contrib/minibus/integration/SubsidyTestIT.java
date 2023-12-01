@@ -105,8 +105,7 @@ public class SubsidyTestIT implements TabularFileHandler {
 		// Check final iteration
 		String actual = this.pStatsResults.get(2)[9];
 		// flaky (non-deterministic) test... allow multiple results
-		Assert.assertTrue("Number of budget (final iteration)",
-			List.of("174413625.6239444000", "174413625.7708889500", "174413625.7022777500").contains(actual));
+		Assert.assertEquals("Number of budget (final iteration)", 174413625.6, Double.parseDouble(actual), 1);
 	}
 
 	@Override

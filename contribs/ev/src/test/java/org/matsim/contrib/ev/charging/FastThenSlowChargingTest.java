@@ -25,8 +25,8 @@ import org.assertj.core.data.Percentage;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.EvUnits;
+import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.fleet.ElectricVehicleImpl;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
@@ -160,11 +160,11 @@ public class FastThenSlowChargingTest {
 		var specification = new TestEvSpecification(Id.create("ev_id", Vehicle.class), null, "vt",
 				ImmutableList.of("ct"), EvUnits.kWh_to_J(capacity_kWh), charge_kWh / capacity_kWh);
 
-		return ElectricVehicleImpl.create(specification, ev -> (link, travelTime, linkEnterTime) -> {
+		return ElectricFleetUtils.create(specification, ev -> ( link, travelTime, linkEnterTime) -> {
 			throw new UnsupportedOperationException();
 		}, ev -> (beginTime, duration, linkId) -> {
 			throw new UnsupportedOperationException();
-		}, FastThenSlowCharging::new);
+		}, FastThenSlowCharging::new );
 	}
 
 	@Test

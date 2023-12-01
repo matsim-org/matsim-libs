@@ -24,12 +24,14 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.simwrapper.SimWrapperModule;
+import org.matsim.modechoice.InformedModeChoiceConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
 import javax.annotation.Nullable;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -82,6 +84,8 @@ public class DrtTestScenario extends MATSimApplication {
 		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("freight_start").setTypicalDuration(60 * 15));
 		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("freight_end").setTypicalDuration(60 * 15));
 
+		InformedModeChoiceConfigGroup imc = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
+		imc.setModes(Set.of("drt", "av", "car", "pt", "bike", "walk"));
 
 		MultiModeDrtConfigGroup multiModeDrtConfig = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);

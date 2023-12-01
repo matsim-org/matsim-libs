@@ -89,7 +89,7 @@ public class RunEvExampleWithLTHConsumptionModel {
 			VehicleTypeSpecificDriveEnergyConsumptionFactory driveEnergyConsumptionFactory = new VehicleTypeSpecificDriveEnergyConsumptionFactory();
 			var vehicleType = Id.create( "EV_65.0kWh", VehicleType.class );
 			driveEnergyConsumptionFactory.addEnergyConsumptionModelFactory( vehicleType,
-					new LTHConsumptionModelReader( vehicleType ).readURL( ConfigGroup.getInputFileURL( config.getContext(), "MidCarMap.csv" ) ) );
+					new LTHConsumptionModelReader().readURL( ConfigGroup.getInputFileURL( config.getContext(), "MidCarMap.csv" ) ) );
 
 			controler.addOverridingModule( new EvModule() );
 			controler.addOverridingModule( new AbstractModule(){
@@ -105,6 +105,7 @@ public class RunEvExampleWithLTHConsumptionModel {
 				}
 			} );
 		}
+
 
 		controler.run();
 	}

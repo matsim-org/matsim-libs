@@ -113,6 +113,14 @@ public abstract class AbstractModule implements Module {
 		// not in this class.
 		this.binder = binder.skipSources(AbstractModule.class);
 
+		initializeMultibinders();
+
+		this.install();
+	}
+
+	private void initializeMultibinders() {
+		// We do need to make these calls here in order to register the multi binders. Otherwise, guice doesn't know, that they exist. In particular,
+		// if none of the corresponding addXXXBinding methods was called, the set binder would not be registered, and guice would complain.
 		this.mobsimListenerMultibinder = Multibinder.newSetBinder(this.binder, MobsimListener.class);
 		this.snapshotWriterMultibinder = Multibinder.newSetBinder(this.binder, SnapshotWriter.class);
 		this.eventHandlerMultibinder = Multibinder.newSetBinder(this.binder, EventHandler.class);
@@ -124,7 +132,6 @@ public abstract class AbstractModule implements Module {
 						new TypeLiteral<AttributeConverter<?>>() {} );
 		this.qsimModulesMultibinder = Multibinder.newSetBinder(this.binder, AbstractQSimModule.class);
 		this.qsimOverridingModulesMultibinder = Multibinder.newSetBinder( this.binder, AbstractQSimModule.class, Names.named( "overridesFromAbstractModule" ) );
-		this.install();
 	}
 
 	public abstract void install();

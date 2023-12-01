@@ -23,12 +23,13 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter.NO_INSERTION_FOUND_CAUSE;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.junit.Rule;
@@ -45,6 +46,7 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler.PickupDropoffTaskPair;
+import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -114,7 +116,7 @@ public class DefaultUnplannedRequestInserterTest {
 				PassengerRequestRejectedEvent.class);
 		verify(eventsManager, times(1)).processEvent(captor.capture());
 		assertThat(captor.getValue()).isEqualToComparingFieldByField(
-				new PassengerRequestRejectedEvent(now, mode, request1.getId(), request1.getPassengerId(),
+				new PassengerRequestRejectedEvent(now, mode, request1.getId(), request1.getPassengerIds(),
 						NO_INSERTION_FOUND_CAUSE));
 	}
 
@@ -197,7 +199,7 @@ public class DefaultUnplannedRequestInserterTest {
 		var unplannedRequests = requests(request1);
 		double now = 15;
 
-		var vehicle1Entry = new VehicleEntry(vehicle1, null, null, null, 0);
+		var vehicle1Entry = new VehicleEntry(vehicle1, null, null, null, null, 0);
 		var createEntryCounter = new MutableInt();
 		VehicleEntry.EntryFactory entryFactory = (vehicle, currentTime) -> {
 			//make sure the right arguments are passed
@@ -243,7 +245,7 @@ public class DefaultUnplannedRequestInserterTest {
 				PassengerRequestScheduledEvent.class);
 		verify(eventsManager, times(1)).processEvent(captor.capture());
 		assertThat(captor.getValue()).isEqualToComparingFieldByField(
-				new PassengerRequestScheduledEvent(now, mode, request1.getId(), request1.getPassengerId(),
+				new PassengerRequestScheduledEvent(now, mode, request1.getId(), request1.getPassengerIds(),
 						vehicle1.getId(), pickupEndTime, dropoffBeginTime));
 
 		//vehicle entry was created twice:
@@ -271,7 +273,7 @@ public class DefaultUnplannedRequestInserterTest {
 	private DrtRequest request(String id, String fromLinkId, String toLinkId) {
 		return DrtRequest.newBuilder()
 				.id(Id.create(id, Request.class))
-				.passengerId(Id.createPersonId(id))
+				.passengerIds(List.of(Id.createPersonId(id)))
 				.fromLink(link(fromLinkId))
 				.toLink(link(toLinkId))
 				.mode(mode)
@@ -283,7 +285,7 @@ public class DefaultUnplannedRequestInserterTest {
 			DrtInsertionSearch insertionSearch, RequestInsertionScheduler insertionScheduler) {
 		return new DefaultUnplannedRequestInserter(mode, fleet, () -> now, eventsManager, insertionScheduler,
 				vehicleEntryFactory, insertionRetryQueue, insertionSearch, DrtOfferAcceptor.DEFAULT_ACCEPTOR,
-				rule.forkJoinPool);
+				rule.forkJoinPool, StaticPassengerStopDurationProvider.of(10.0, 0.0));
 	}
 
 	private Link link(String id) {

@@ -22,121 +22,45 @@ package org.matsim.core.replanning.strategies;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
-import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup.TimeAllocationMutatorSubpopulationSettings;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
-import org.matsim.core.population.algorithms.PlanMutateTimeAllocationSimplified;
-import org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation;
+import org.matsim.core.population.algorithms.MutateActivityTimeAllocation;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
-
-import jakarta.inject.Provider;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
- * Wraps the {@link org.matsim.core.population.algorithms.PlanMutateTimeAllocation}-
+ * Wraps the {@link org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation}-
  * PlanAlgorithm into a {@link PlanStrategyModule} so it can be used for plans
  * replanning. Supports multiple threads.
  *
  * @author mrieser
- * @see org.matsim.core.population.algorithms.PlanMutateTimeAllocation
+ * @see org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation
  */
 class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 
-	private static boolean ACTIVITY_DURATION_WARNING_SHOWN = false;
 
 	private static final Logger log = LogManager.getLogger( TimeAllocationMutatorModule.class );
-
 	private final double mutationRange;
 	private final boolean affectingDuration;
-//	private final String subpopulationAttribute;
-	private final Map<String, Double> subpopulationMutationRanges;
-	private final Map<String, Boolean> subpopulationAffectingDuration;
-	private final PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation;
+	private final TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup;
 
-	/**
-	 * Creates a new TimeAllocationMutator with a mutation range as defined in
-	 * the configuration (module "TimeAllocationMutator", param "mutationRange").
-	 */
-	@Deprecated
-	TimeAllocationMutatorModule( Config config, Provider<TripRouter> tripRouterProvider, final double mutationRange, boolean affectingDuration ) {
-		super(config.global());
-		this.affectingDuration = affectingDuration;
-		this.mutationRange = mutationRange;
-		this.activityDurationInterpretation = (config.plans().getActivityDurationInterpretation());
-//		this.subpopulationAttribute = null;
-		this.subpopulationMutationRanges = null;
-		this.subpopulationAffectingDuration = null;
-		log.warn("deprecated constructor was used - individual time allocation mutator settings for subpopulations is not supported!");
-	}
 
-	TimeAllocationMutatorModule( Provider<TripRouter> tripRouterProvider, PlansConfigGroup plansConfigGroup, TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup, GlobalConfigGroup globalConfigGroup ) {
-		this(tripRouterProvider, plansConfigGroup, timeAllocationMutatorConfigGroup, globalConfigGroup, null);
-	}
-
-	TimeAllocationMutatorModule( Provider<TripRouter> tripRouterProvider, PlansConfigGroup plansConfigGroup, TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup, GlobalConfigGroup globalConfigGroup,
-							final Population population ) {
+	TimeAllocationMutatorModule( TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup, GlobalConfigGroup globalConfigGroup) {
 		super(globalConfigGroup);
-		this.activityDurationInterpretation = plansConfigGroup.getActivityDurationInterpretation();
 		this.mutationRange = timeAllocationMutatorConfigGroup.getMutationRange();
 		this.affectingDuration = timeAllocationMutatorConfigGroup.isAffectingDuration();
+		this.timeAllocationMutatorConfigGroup = timeAllocationMutatorConfigGroup;
 
-		// in case we have subpopulations and individual settings for them
-		if (
-//				plansConfigGroup.getSubpopulationAttributeName() != null &&
-				timeAllocationMutatorConfigGroup.isUseIndividualSettingsForSubpopulations() && population != null) {
-//			this.subpopulationAttribute = plansConfigGroup.getSubpopulationAttributeName();
-			this.subpopulationMutationRanges = new HashMap<>();
-			this.subpopulationAffectingDuration = new HashMap<>();
-
-			Collection<? extends ConfigGroup> settings = timeAllocationMutatorConfigGroup.getParameterSets(TimeAllocationMutatorSubpopulationSettings.SET_NAME);
-			for (ConfigGroup group : settings) {
-				TimeAllocationMutatorSubpopulationSettings subpopulationSettings = (TimeAllocationMutatorSubpopulationSettings) group;
-				String subpopulation = subpopulationSettings.getSubpopulation();
-				this.subpopulationMutationRanges.put(subpopulation, subpopulationSettings.getMutationRange());
-				this.subpopulationAffectingDuration.put(subpopulation, subpopulationSettings.isAffectingDuration());
-				log.info("Found individual time mutator settings for subpopulation: " + subpopulation);
-			}
-		} else {
-//			this.subpopulationAttribute = null;
-			this.subpopulationMutationRanges = null;
-			this.subpopulationAffectingDuration = null;
-		}
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		PlanAlgorithm pmta;
-		switch (this.activityDurationInterpretation) {
-		case minOfDurationAndEndTime:
-			pmta = new TripPlanMutateTimeAllocation(this.mutationRange, this.affectingDuration, MatsimRandom.getLocalInstance(),
-					this.subpopulationMutationRanges, this.subpopulationAffectingDuration);
-			break;
-		default:
-			if(this.affectingDuration) {
-				if (!ACTIVITY_DURATION_WARNING_SHOWN) {
-					log.warn("Please be aware that durations of activities now can mutate freely and possibly become negative." +
-							"This might be a problem if you have \n" +
-							"a) short activities that are only provided with duration and not with endtime  AND\n" +
-							"b) agents with only one or two initial plans.\n" +
-							"This can have impact on scoring and maybe even on qsim execution. It is recommended to set affectingDuration=false for such set up.");
-					ACTIVITY_DURATION_WARNING_SHOWN = true;
-				}
-			}
-			pmta = new PlanMutateTimeAllocationSimplified(
-					// TODO: is StageActivityHandling.ExcludeStageActivities right here?
-					StageActivityHandling.ExcludeStageActivities, this.mutationRange, this.affectingDuration, MatsimRandom.getLocalInstance());
-		}
+		PlanAlgorithm pmta = new MutateActivityTimeAllocation
+				(this.mutationRange, this.affectingDuration, MatsimRandom.getLocalInstance(),
+						timeAllocationMutatorConfigGroup.getLatestActivityEndTime(), timeAllocationMutatorConfigGroup.isMutateAroundInitialEndTimeOnly(),
+						timeAllocationMutatorConfigGroup.getMutationRangeStep());
 		return pmta;
 	}
 }

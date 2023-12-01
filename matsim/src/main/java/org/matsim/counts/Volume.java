@@ -21,14 +21,17 @@
 package org.matsim.counts;
 // import org.matsim.demandmodeling.gbl.Gbl;
 
+/**
+ * Old API to access data fron {@link Count}. This class is not needed when using new API via {@link MeasurementLocation}.
+ */
 public class Volume {
 	private final int h_;
 	private double val_;
 
 	protected Volume(final int h, final double val) {
-		
+
 		/* no error checking needed as we use schema instead of dtd
-		
+
 		if ((h == -1)) {
 			Gbl.errorMsg("[h="+h+", negative values are not allowed!]");
 		}
@@ -36,9 +39,9 @@ public class Volume {
 			Gbl.errorMsg("[val="+val+", negative values are not allowed!]");
 		}
 		*/
-		
+
 		this.h_ = h;
-		this.val_ = val;	
+		this.val_ = val;
 	}
 
 	public final void setValue(double val) {
@@ -51,7 +54,7 @@ public class Volume {
 	public final double getValue() {
 		return this.val_;
 	}
-	
+
 	@Override
 	public final String toString() {
 		return "[" + this.h_ + "===" + this.val_ + "]";

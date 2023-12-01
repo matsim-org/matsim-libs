@@ -26,6 +26,7 @@ import static org.matsim.core.config.groups.ControllerConfigGroup.EventsFileForm
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
@@ -71,9 +72,9 @@ public class DvrpEventsReadersTest {
 	}
 
 	private final List<Event> dvrpEvents = List.of(
-			new PassengerRequestSubmittedEvent(0, mode, request, person, fromLink, toLink),
-			new PassengerRequestScheduledEvent(1, mode, request, person, vehicle, 100, 200),
-			new PassengerRequestRejectedEvent(2, mode, request, person, "cause_1"),
+			new PassengerRequestSubmittedEvent(0, mode, request, List.of(person), fromLink, toLink),
+			new PassengerRequestScheduledEvent(1, mode, request, List.of(person), vehicle, 100, 200),
+			new PassengerRequestRejectedEvent(2, mode, request, List.of(person), "cause_1"),
 			new PassengerPickedUpEvent(111, mode, request, person, vehicle),
 			new PassengerDroppedOffEvent(222, mode, request, person, vehicle),
 			new TaskStartedEvent(300, mode, vehicle, driver, TestTaskType.DRIVE_TASK, 0, fromLink),

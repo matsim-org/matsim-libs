@@ -69,12 +69,11 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 		this.mutationRange = mutationRange;
 		this.affectingDuration = affectingDuration;
 		this.random = random;
-//		this.subpopulationAttribute = subpopulationAttribute;
 		this.subpopulationMutationRanges = subpopulationMutationRanges;
 		this.subpopulationAffectingDuration = subpopulationAffectingDuration;
 		this.latestEndTime = latestEndTime;
 	}
-	
+
 	@Override
 	public void run(final Plan plan) {
 		mutatePlan(plan);
@@ -89,12 +88,11 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 		final String subpopulation = this.getSubpopulation(plan);
 		final boolean affectingDuration = this.isAffectingDuration(subpopulation);
 		final double mutationRange = this.getMutationRange(subpopulation);
-		
+
 		// apply mutation to all activities except the last home activity
 		for (PlanElement pe : plan.getPlanElements()) {
 
-			if (pe instanceof Activity) {
-				Activity act = (Activity)pe;
+			if (pe instanceof Activity act) {
 
 				// handle first activity
 				if (isFirst) {
@@ -124,7 +122,7 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 								}
 								now += act.getMaximumDuration().seconds();
 								// (may feel a bit disturbing since it was not mutated but it is just using the "old" value which is perfectly ok. kai, jan'14)
-								
+
 								// set end time accordingly
 								act.setEndTime(now);
 							} else {
@@ -191,30 +189,28 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 	public void setUseActivityDurations(final boolean useActivityDurations) {
 		this.useActivityDurations = useActivityDurations;
 	}
-	
-	private final String getSubpopulation(final Plan plan) {
-//		if (this.subpopulationAttribute == null) return null;
+
+	private String getSubpopulation(final Plan plan) {
 		if (plan.getPerson() == null) return null;
-//		return (String) PopulationUtils.getPersonAttribute(plan.getPerson(), this.subpopulationAttribute);
 		return PopulationUtils.getSubpopulation( plan.getPerson() );
 	}
-	
-	private final boolean isAffectingDuration(final String subpopulation) {
+
+	private boolean isAffectingDuration(final String subpopulation) {
 		if (subpopulation != null) {
 			Boolean isAffectingDuration = this.subpopulationAffectingDuration.get(subpopulation);
 			if (isAffectingDuration != null) return isAffectingDuration.booleanValue();
 		}
-		
+
 		// fallback solution: no subpopulation attribute was found
 		return this.affectingDuration;
 	}
-	
-	private final double getMutationRange(final String subpopulation) {
+
+	private double getMutationRange(final String subpopulation) {
 		if (subpopulation != null) {
 			Double mutationRange = this.subpopulationMutationRanges.get(subpopulation);
 			if (mutationRange != null) return mutationRange.doubleValue();
 		}
-		
+
 		// fallback solution: no subpopulation attribute was found
 		return this.mutationRange;
 	}

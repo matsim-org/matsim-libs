@@ -37,6 +37,7 @@ import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.population.algorithms.PermissibleModesCalculator;
 import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
+import org.matsim.core.replanning.conflicts.WorstPlanForRemovalSelectorWithConflicts;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
@@ -53,6 +54,9 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
     public void install() {
         if (getConfig().replanning().getPlanSelectorForRemoval().equals(DefaultPlansRemover.WorstPlanSelector.toString())) {
             bindPlanSelectorForRemoval().to(WorstPlanForRemovalSelector.class);
+        }
+        if (getConfig().replanning().getPlanSelectorForRemoval().equals(WorstPlanForRemovalSelectorWithConflicts.SELECTOR_NAME)) {
+            bindPlanSelectorForRemoval().to(WorstPlanForRemovalSelectorWithConflicts.class);
         }
         if (getConfig().replanning().getPlanSelectorForRemoval().equals(DefaultPlansRemover.SelectRandom.toString())) {
             bindPlanSelectorForRemoval().to(new TypeLiteral<RandomPlanSelector<Plan, Person>>(){});
