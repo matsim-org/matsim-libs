@@ -110,10 +110,8 @@ public class RailsimEngineMovingBlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 0, "l1-2", "l6-7");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter2", 400, "l6-5", "l2-1");
 
-		// TODO sprinter 2 throttles, which should not be needed
-
-		test.doStateUpdatesUntil(2_000, 1);
-		test.debugFiles(collector, "opposite_detailed");
+		test.doStateUpdatesUntil(2_000, 5);
+//		test.debugFiles(collector, "opposite_detailed");
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("sprinter2", 1368, 200, 0)

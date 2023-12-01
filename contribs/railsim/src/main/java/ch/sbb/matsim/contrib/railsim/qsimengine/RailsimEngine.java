@@ -55,6 +55,11 @@ import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
  */
 final class RailsimEngine implements Steppable {
 
+	/**
+	 * Additional safety distance in meter that is added to the reservation distance.
+	 * Ensure that trains always have enough distance to progress.
+	 */
+	private static double SAFETY_DIST = 10;
 	private static final Logger log = LogManager.getLogger(RailsimEngine.class);
 	private final EventsManager eventsManager;
 	private final RailsimConfigGroup config;
@@ -332,13 +337,15 @@ final class RailsimEngine implements Steppable {
 		}
 
 		state.approvedDist = response.approvedDist();
-		state.approvedSpeed = response.approvedSpeed();
 
 		assert FuzzyUtils.greaterEqualThan(state.approvedDist, 0) : "Approved distance must be positive, but was " + response.approvedDist();
 
+		// At the moment the approved speed from the disposition is not used
 		// Stop when the approved distance is not enough
-		if (state.approvedDist < reserveDist)
+		if (FuzzyUtils.lessThan(state.approvedDist, reserveDist + SAFETY_DIST))
 			state.approvedSpeed = 0;
+		else
+			state.approvedSpeed = Double.POSITIVE_INFINITY;
 
 		// Return whether the train has to stop
 		return state.approvedSpeed != 0;
@@ -601,7 +608,18 @@ final class RailsimEngine implements Steppable {
 		// Find the earliest required update
 
 		double dist;
-		if (reserveDist <= accelDist && reserveDist <= decelDist && reserveDist <= tailDist && reserveDist <= headDist) {
+		if (FuzzyUtils.lessEqualThan(tailDist, decelDist) &&
+			FuzzyUtils.lessEqualThan(tailDist, reserveDist) &&
+			FuzzyUtils.lessEqualThan(tailDist, headDist) &&
+			FuzzyUtils.lessEqualThan(tailDist, accelDist)) {
+
+			// leave link has priority, and is ensured to be executed before others at same time step
+			// otherwise train might block links of same length as itself
+
+			dist = tailDist;
+			event.type = UpdateEvent.Type.LEAVE_LINK;
+
+		} else if (reserveDist <= accelDist && reserveDist <= decelDist && reserveDist <= tailDist && reserveDist <= headDist) {
 			dist = reserveDist;
 			event.type = UpdateEvent.Type.BLOCK_TRACK;
 		} else if (accelDist <= decelDist && accelDist <= reserveDist && accelDist <= tailDist && accelDist <= headDist) {
@@ -610,9 +628,6 @@ final class RailsimEngine implements Steppable {
 		} else if (decelDist <= accelDist && decelDist <= reserveDist && decelDist <= tailDist && decelDist <= headDist) {
 			dist = decelDist;
 			event.type = UpdateEvent.Type.SPEED_CHANGE;
-		} else if (tailDist <= decelDist && tailDist <= reserveDist && tailDist <= headDist) {
-			dist = tailDist;
-			event.type = UpdateEvent.Type.LEAVE_LINK;
 		} else {
 			dist = headDist;
 			event.type = UpdateEvent.Type.ENTER_LINK;
