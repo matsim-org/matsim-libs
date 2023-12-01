@@ -68,9 +68,9 @@ public class InsertionDistanceCalculator {
 		int beforePickupOccupancy = insertion.pickup.previousWaypoint.getOutgoingOccupancy();
 
 		double beforePickupDistance = distanceEstimator
-				.estimateDistance(insertion.pickup.previousWaypoint.getDepartureTime(), pickupFromLink, pickupNewLink);
+				.calculateDistance(insertion.pickup.previousWaypoint.getDepartureTime(), pickupFromLink, pickupNewLink);
 
-		double afterPickupDistance = distanceEstimator.estimateDistance(detourTimeInfo.pickupDetourInfo.departureTime,
+		double afterPickupDistance = distanceEstimator.calculateDistance(detourTimeInfo.pickupDetourInfo.departureTime,
 				pickupNewLink, pickupToLink);
 
 		addedDistances.add(new DistanceEntry(beforePickupDistance, beforePickupOccupancy));
@@ -128,7 +128,7 @@ public class InsertionDistanceCalculator {
 		final int beforeDropoffOccupancy;
 		if (insertion.dropoff.index > insertion.pickup.index) {
 			beforeDropoffOccupancy = insertion.dropoff.previousWaypoint.getOutgoingOccupancy() + 1;
-			double beforeDropoffDistance = distanceEstimator.estimateDistance(
+			double beforeDropoffDistance = distanceEstimator.calculateDistance(
 					insertion.dropoff.previousWaypoint.getDepartureTime(), dropoffFromLink, dropoffNewLink);
 
 			addedDistances.add(new DistanceEntry(beforeDropoffDistance, beforeDropoffOccupancy));
@@ -136,7 +136,7 @@ public class InsertionDistanceCalculator {
 			beforeDropoffOccupancy = beforePickupOccupancy + 1;
 		}
 
-		double afterDropoffDistance = distanceEstimator.estimateDistance(detourTimeInfo.dropoffDetourInfo.arrivalTime,
+		double afterDropoffDistance = distanceEstimator.calculateDistance(detourTimeInfo.dropoffDetourInfo.arrivalTime,
 				dropoffNewLink, dropoffToLink);
 		addedDistances.add(new DistanceEntry(afterDropoffDistance, beforeDropoffOccupancy - 1));
 

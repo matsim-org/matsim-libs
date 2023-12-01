@@ -17,38 +17,141 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
 package org.matsim.contrib.parking.run;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.parking.parkingsearch.ParkingSearchStrategy;
 import org.matsim.contrib.parking.parkingsearch.RunParkingSearchExample;
 import org.matsim.contrib.parking.parkingsearch.sim.ParkingSearchConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 /**
- * @author  jbischoff
- *
+ * @author jbischoff
  */
 public class RunParkingSearchScenarioIT {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testRunParking() {
+	public void testRunParkingBenesonStrategy() {
+		try {
+			String configFile = "./src/main/resources/parkingsearch/config.xml";
+			Config config = ConfigUtils.loadConfig(configFile, new ParkingSearchConfigGroup());
+			config.controller().setLastIteration(0);
+			config.controller().setOutputDirectory(utils.getOutputDirectory());
+
+			ParkingSearchConfigGroup configGroup = (ParkingSearchConfigGroup) config.getModules().get(ParkingSearchConfigGroup.GROUP_NAME);
+			configGroup.setParkingSearchStrategy(ParkingSearchStrategy.Benenson);
+
+			new RunParkingSearchExample().run(config, false);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail("something went wrong");
+		}
+	}
+
+	@Test
+	public void testRunParkingRandomStrategy() {
 		String configFile = "./src/main/resources/parkingsearch/config.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new ParkingSearchConfigGroup());
 		config.controller().setLastIteration(0);
-		config.controller().setOutputDirectory( utils.getOutputDirectory() );
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		ParkingSearchConfigGroup configGroup = (ParkingSearchConfigGroup) config.getModules().get(ParkingSearchConfigGroup.GROUP_NAME);
-		configGroup.setParkingSearchStrategy(ParkingSearchStrategy.Benenson);
+		configGroup.setParkingSearchStrategy(ParkingSearchStrategy.Random);
 
-		new RunParkingSearchExample().run(config,false);
+		try {
+			new RunParkingSearchExample().run(config, false);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail("something went wrong");
+		}
+	}
 
+	@Test
+	public void testRunParkingDistanceMemoryStrategy() {
+		try {
+			String configFile = "./src/main/resources/parkingsearch/config.xml";
+			Config config = ConfigUtils.loadConfig(configFile, new ParkingSearchConfigGroup());
+			config.controller().setLastIteration(0);
+			config.controller().setOutputDirectory(utils.getOutputDirectory());
+
+			ParkingSearchConfigGroup configGroup = (ParkingSearchConfigGroup) config.getModules().get(ParkingSearchConfigGroup.GROUP_NAME);
+			configGroup.setParkingSearchStrategy(ParkingSearchStrategy.DistanceMemory);
+
+			new RunParkingSearchExample().run(config, false);
+			{
+				Population expected = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+				PopulationUtils.readPopulation(expected, utils.getInputDirectory() + "/output_plans.xml.gz");
+
+				Population actual = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+				PopulationUtils.readPopulation(actual, utils.getOutputDirectory() + "/output_plans.xml.gz");
+
+				for (Id<Person> personId : expected.getPersons().keySet()) {
+					double scoreReference = expected.getPersons().get(personId).getSelectedPlan().getScore();
+					double scoreCurrent = actual.getPersons().get(personId).getSelectedPlan().getScore();
+					Assert.assertEquals("Scores of person=" + personId + " are different", scoreReference, scoreCurrent, MatsimTestUtils.EPSILON);
+				}
+
+			}
+			{
+				String expected = utils.getInputDirectory() + "/output_events.xml.gz";
+				String actual = utils.getOutputDirectory() + "/output_events.xml.gz";
+				EventsFileComparator.Result result = EventsUtils.compareEventsFiles(expected, actual);
+				Assert.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, result);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail("something went wrong");
+		}
+	}
+
+	@Test
+	public void testRunParkingNearestParkingSpotStrategy() {
+		try {
+			String configFile = "./src/main/resources/parkingsearch/config.xml";
+			Config config = ConfigUtils.loadConfig(configFile, new ParkingSearchConfigGroup());
+			config.controller().setLastIteration(0);
+			config.controller().setOutputDirectory(utils.getOutputDirectory());
+
+			ParkingSearchConfigGroup configGroup = (ParkingSearchConfigGroup) config.getModules().get(ParkingSearchConfigGroup.GROUP_NAME);
+			configGroup.setParkingSearchStrategy(ParkingSearchStrategy.NearestParkingSpot);
+
+			new RunParkingSearchExample().run(config, false);
+			{
+				Population expected = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+				PopulationUtils.readPopulation(expected, utils.getInputDirectory() + "/output_plans.xml.gz");
+
+				Population actual = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+				PopulationUtils.readPopulation(actual, utils.getOutputDirectory() + "/output_plans.xml.gz");
+
+				for (Id<Person> personId : expected.getPersons().keySet()) {
+					double scoreReference = expected.getPersons().get(personId).getSelectedPlan().getScore();
+					double scoreCurrent = actual.getPersons().get(personId).getSelectedPlan().getScore();
+					Assert.assertEquals("Scores of person=" + personId + " are different", scoreReference, scoreCurrent, MatsimTestUtils.EPSILON);
+				}
+
+			}
+			{
+				String expected = utils.getInputDirectory() + "/output_events.xml.gz";
+				String actual = utils.getOutputDirectory() + "/output_events.xml.gz";
+				EventsFileComparator.Result result = EventsUtils.compareEventsFiles(expected, actual);
+				Assert.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, result);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail("something went wrong");
+		}
 	}
 }

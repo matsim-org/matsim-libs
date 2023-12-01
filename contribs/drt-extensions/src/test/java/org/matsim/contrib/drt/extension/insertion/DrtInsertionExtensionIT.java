@@ -16,7 +16,9 @@ import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.IdSet;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.extension.insertion.distances.DistanceApproximator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -33,6 +35,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerWaitingEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerWaitingEventHandler;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEventHandler;
@@ -41,6 +44,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -251,6 +255,86 @@ public class DrtInsertionExtensionIT {
 
 		for (var item : handler.distances.entrySet()) {
 			assertTrue(item.getValue() < 100.0 * 1e3);
+		}
+	}
+
+	@Test
+	public void testRangeConstraintWithCustomInstances() {
+		Controler controller = createController();
+		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(controller.getConfig());
+
+		CustomCalculator distanceCalculator = new CustomCalculator();
+		CustomCalculator distanceApproximator = new CustomCalculator();
+
+		DrtInsertionModule insertionModule = new DrtInsertionModule(drtConfig) //
+				.withVehicleRange(100.0 * 1e3) //
+				.withDistanceCalculator(distanceCalculator) //
+				.withDistanceApproximator(distanceApproximator);
+
+		controller.addOverridingQSimModule(insertionModule);
+
+		DistanceHandler handler = new DistanceHandler(controller.getScenario().getNetwork());
+		handler.install(controller);
+
+		controller.run();
+
+		for (var item : handler.distances.entrySet()) {
+			assertTrue(item.getValue() < 100.0 * 1e3);
+		}
+
+		assertEquals(1470, distanceCalculator.calculatedDistances);
+		assertEquals(5288, distanceApproximator.calculatedDistances);
+	}
+
+	@Test
+	public void testRangeConstraintWithCustomInjection() {
+		Controler controller = createController();
+		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(controller.getConfig());
+
+		CustomDistanceCalculator distanceCalculator = new CustomDistanceCalculator();
+		CustomDistanceApproximator distanceApproximator = new CustomDistanceApproximator();
+
+		DrtInsertionModule insertionModule = new DrtInsertionModule(drtConfig) //
+				.withVehicleRange(100.0 * 1e3) //
+				.withDistanceCalculator(CustomDistanceCalculator.class) //
+				.withDistanceApproximator(CustomDistanceApproximator.class);
+
+		controller.addOverridingQSimModule(insertionModule);
+
+		controller.addOverridingQSimModule(new AbstractDvrpModeQSimModule("drt") {
+			@Override
+			protected void configureQSim() {
+				bindModal(CustomDistanceCalculator.class).toInstance(distanceCalculator);
+				bindModal(CustomDistanceApproximator.class).toInstance(distanceApproximator);
+			}
+		});
+
+		DistanceHandler handler = new DistanceHandler(controller.getScenario().getNetwork());
+		handler.install(controller);
+
+		controller.run();
+
+		for (var item : handler.distances.entrySet()) {
+			assertTrue(item.getValue() < 100.0 * 1e3);
+		}
+
+		assertEquals(1470, distanceCalculator.calculatedDistances);
+		assertEquals(5288, distanceApproximator.calculatedDistances);
+	}
+
+	static class CustomDistanceCalculator extends CustomCalculator {
+	}
+
+	static class CustomDistanceApproximator extends CustomCalculator {
+	}
+
+	static class CustomCalculator implements DistanceApproximator {
+		int calculatedDistances = 0;
+
+		@Override
+		public synchronized double calculateDistance(double departureTime, Link fromLink, Link toLink) {
+			calculatedDistances++;
+			return CoordUtils.calcEuclideanDistance(fromLink.getCoord(), toLink.getCoord());
 		}
 	}
 

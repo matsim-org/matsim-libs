@@ -3,9 +3,11 @@ package org.matsim.contrib.drt.extension.estimator.run;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.MapBinder;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
-import org.matsim.contrib.drt.extension.estimator.BasicDrtEstimator;
 import org.matsim.contrib.drt.extension.estimator.DrtEstimateAnalyzer;
 import org.matsim.contrib.drt.extension.estimator.DrtEstimator;
+import org.matsim.contrib.drt.extension.estimator.DrtInitialEstimator;
+import org.matsim.contrib.drt.extension.estimator.impl.BasicDrtEstimator;
+import org.matsim.contrib.drt.extension.estimator.impl.PessimisticDrtEstimator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -14,12 +16,21 @@ import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Main module that needs to be installed if any estimator is to be used.
  */
 public class DrtEstimatorModule extends AbstractModule {
+
+
+	/**
+	 * Map of initial providers.
+	 */
+	private final Map<String, Function<DrtConfigGroup, DrtInitialEstimator>> initial = new HashMap<>();
 
 	@Override
 	public void install() {
@@ -35,7 +46,24 @@ public class DrtEstimatorModule extends AbstractModule {
 		}
 	}
 
-	static final class ModeModule extends AbstractDvrpModeModule {
+	/**
+	 * Configure initial estimators for the given modes.
+	 *
+	 * @param getter modal getter, which can be used to use other modal components via guice
+	 */
+	public DrtEstimatorModule withInitialEstimator(Function<DrtConfigGroup, DrtInitialEstimator> getter, String... modes) {
+
+		if (modes.length == 0)
+			throw new IllegalArgumentException("At least one mode needs to be provided.");
+
+		for (String mode : modes) {
+			initial.put(mode, getter);
+		}
+
+		return this;
+	}
+
+	final class ModeModule extends AbstractDvrpModeModule {
 
 		private final DrtConfigGroup cfg;
 		private final DrtEstimatorConfigGroup group;
@@ -52,9 +80,20 @@ public class DrtEstimatorModule extends AbstractModule {
 			// try with default injections and overwrite
 			if (group.estimator == DrtEstimatorConfigGroup.EstimatorType.BASIC) {
 				bindModal(DrtEstimator.class).toProvider(modalProvider(
-					getter -> new BasicDrtEstimator(getter.getModal(DrtEventSequenceCollector.class), group, cfg)
+					getter -> new BasicDrtEstimator(
+						getter.getModal(DrtEventSequenceCollector.class),
+						getter.getModal(DrtInitialEstimator.class),
+						group, cfg
+					)
 				)).in(Singleton.class);
+			} else if (group.estimator == DrtEstimatorConfigGroup.EstimatorType.INITIAL) {
+				bindModal(DrtEstimator.class).to(modalKey(DrtInitialEstimator.class));
 			}
+
+			if (initial.containsKey(group.mode)) {
+				bindModal(DrtInitialEstimator.class).toProvider(() -> initial.get(group.mode).apply(cfg)).in(Singleton.class);
+			} else
+				bindModal(DrtInitialEstimator.class).toInstance(new PessimisticDrtEstimator(cfg));
 
 			// DRT Estimators will be available as Map<DvrpMode, DrtEstimator>
 			MapBinder.newMapBinder(this.binder(), DvrpMode.class, DrtEstimator.class)
