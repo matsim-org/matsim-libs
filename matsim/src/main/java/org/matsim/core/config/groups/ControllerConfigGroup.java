@@ -355,11 +355,6 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 		this.writeSnapshotsInterval = writeSnapshotsInterval;
 	}
 
-	@StringGetter( CREATE_GRAPHS )
-	public boolean isCreateGraphs() {
-		return createGraphs;
-	}
-
     /**
      * Sets whether graphs showing some analyses should automatically be
      * generated during the simulation. The generation of graphs usually takes a

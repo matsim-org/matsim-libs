@@ -99,8 +99,13 @@ public class TimeProfileCollector implements MobsimBeforeSimStepListener, Mobsim
 			}
 		}
 
-		for (ChartType t : chartTypes) {
-			generateImage(header, t);
+		int createGraphsInterval = matsimServices.getConfig().controller().getCreateGraphsInterval();
+		boolean createGraphs = createGraphsInterval >0 && matsimServices.getIterationNumber() % createGraphsInterval == 0;
+
+		if(createGraphs){
+			for (ChartType t : chartTypes) {
+				generateImage(header, t);
+			}
 		}
 	}
 
