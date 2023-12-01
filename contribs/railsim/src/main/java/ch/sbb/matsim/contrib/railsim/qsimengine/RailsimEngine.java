@@ -407,6 +407,8 @@ final class RailsimEngine implements Steppable {
 		assert resources.isBlockedBy(resources.getLink(state.headLink), state) : "Link has to be blocked by driver when entered";
 
 		state.headPosition = 0;
+		// Reset waiting flag
+		event.waitingForLink = false;
 
 		state.driver.notifyMoveOverNode(state.headLink);
 		createEvent(new LinkEnterEvent(time, state.driver.getVehicle().getId(), state.headLink));

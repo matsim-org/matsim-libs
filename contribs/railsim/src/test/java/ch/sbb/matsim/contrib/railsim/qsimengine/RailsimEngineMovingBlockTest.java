@@ -160,13 +160,28 @@ public class RailsimEngineMovingBlockTest {
 
 		RailsimTestUtils.Holder test = getTestEngine("networkMixedTypes.xml");
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "1-2", "20-21");
-//		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo", 0, "1-2", "20-21");
-//		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 0, "1-2", "20-21");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo", 0, "1-2", "20-21");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 0, "1-2", "20-21");
 
-		test.doSimStepUntil(5_000);
+		test.doSimStepUntil(2_000);
+//		test.debugFiles(collector, "mixed");
 
-		// TODO: multiple links within one moving block not fully correct yet
+		RailsimTestUtils.assertThat(collector)
+			.hasTrainState("regio", 802, 1000, 0)
+			.hasTrainState("cargo", 1241, 1000, 0)
+			.hasTrainState("sprinter", 1322, 1000, 0);
 
+		test = getTestEngine("networkMixedTypes.xml");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "1-2", "20-21");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Cargo, "cargo", 0, "1-2", "20-21");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Sprinter, "sprinter", 0, "1-2", "20-21");
+
+		test.doStateUpdatesUntil(2_000, 1);
+
+		RailsimTestUtils.assertThat(collector)
+			.hasTrainState("regio", 802, 1000, 0)
+			.hasTrainState("cargo", 1241, 1000, 0)
+			.hasTrainState("sprinter", 1322, 1000, 0);
 
 	}
 
