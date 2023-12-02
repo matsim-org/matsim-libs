@@ -84,7 +84,7 @@ jobs:
 
       - name: Setup Java
         if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: 17
           distribution: 'zulu'

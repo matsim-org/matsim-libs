@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.estimator;
+package org.matsim.contrib.drt.extension.estimator.impl;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.stat.regression.RegressionResults;
@@ -9,8 +9,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
+import org.matsim.contrib.drt.extension.estimator.DrtEstimator;
+import org.matsim.contrib.drt.extension.estimator.DrtInitialEstimator;
 import org.matsim.contrib.drt.extension.estimator.run.DrtEstimatorConfigGroup;
-import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
@@ -32,6 +33,7 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 	private final DrtEventSequenceCollector collector;
 	private final DrtEstimatorConfigGroup config;
 	private final DrtConfigGroup drtConfig;
+	private final DrtInitialEstimator initial;
 
 	private final SplittableRandom rnd = new SplittableRandom();
 	/**
@@ -40,10 +42,11 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 	private GlobalEstimate currentEst;
 	private RegressionResults fare;
 
-	public BasicDrtEstimator(DrtEventSequenceCollector collector, DrtEstimatorConfigGroup config,
-							 DrtConfigGroup drtConfig) {
+	public BasicDrtEstimator(DrtEventSequenceCollector collector, DrtInitialEstimator initial,
+							 DrtEstimatorConfigGroup config, DrtConfigGroup drtConfig) {
 		//zones = injector.getModal(DrtZonalSystem.class);
 		this.collector = collector;
+		this.initial = initial;
 		this.config = config;
 		this.drtConfig = drtConfig;
 	}
@@ -115,23 +118,8 @@ public class BasicDrtEstimator implements DrtEstimator, IterationEndsListener {
 	public Estimate estimate(DrtRoute route, OptionalTime departureTime) {
 
 		if (currentEst == null) {
-			// If not estimates are present, use travel time alpha as detour
-			// beta is not used, because estimates are supposed to be minimums and not worst cases
-			double travelTime = Math.min(route.getDirectRideTime() + drtConfig.maxAbsoluteDetour,
-				route.getDirectRideTime() * drtConfig.maxTravelTimeAlpha);
-
-			double fare = 0;
-			if (drtConfig.getDrtFareParams().isPresent()) {
-				DrtFareParams fareParams = drtConfig.getDrtFareParams().get();
-				fare = fareParams.distanceFare_m * route.getDistance()
-					+ fareParams.timeFare_h * route.getDirectRideTime() / 3600.0
-					+ fareParams.baseFare;
-
-				fare = Math.max(fare, fareParams.minFarePerTrip);
-			}
-
-			// for distance, also use the max travel time alpha
-			return new Estimate(route.getDistance() * drtConfig.maxTravelTimeAlpha, travelTime, drtConfig.maxWaitTime, fare, 0);
+			// Same interface, just different binding
+			return initial.estimate(route, departureTime);
 		}
 
 		double fare = 0;
