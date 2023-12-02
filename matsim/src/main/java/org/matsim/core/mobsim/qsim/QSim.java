@@ -422,8 +422,8 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		// trigger the after sim step listeners before finishing the events processing of this sim step.
 		// this gives after sim step listeners like snapshot generator the opportunity to generate events
 		// for the current time step.
-		this.events.afterSimStep(now);
 		this.listenerManager.fireQueueSimulationAfterSimStepEvent(now);
+		this.events.afterSimStep(now);
 
 
 		final QSimConfigGroup qsimConfigGroup = this.scenario.getConfig().qsim();
