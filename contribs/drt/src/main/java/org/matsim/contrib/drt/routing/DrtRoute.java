@@ -17,7 +17,13 @@
  * *********************************************************************** */
 package org.matsim.contrib.drt.routing;
 
-import com.google.common.base.MoreObjects;
+import static com.google.common.base.Preconditions.checkArgument;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -25,16 +31,10 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.core.population.routes.AbstractRoute;
 import org.matsim.core.utils.misc.OptionalTime;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import static com.google.common.base.Preconditions.checkArgument;
+import com.google.common.base.MoreObjects;
 
 /**
  * Assumptions:
@@ -47,7 +47,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * @author michalm (Michal Maciejewski)
  */
 public class DrtRoute extends AbstractRoute {
-  	private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	public final static String ROUTE_TYPE = TransportMode.drt;
 	private RouteDescription routeDescription = null;
 
@@ -62,6 +62,10 @@ public class DrtRoute extends AbstractRoute {
 
 	public double getMaxWaitTime() {
 		return routeDescription.getMaxWaitTime();
+	}
+
+	public double getMaxRideTime() {
+		return routeDescription.getMaxRideTime();
 	}
 
 	public List<String> getUnsharedPath() {
@@ -80,12 +84,17 @@ public class DrtRoute extends AbstractRoute {
 		this.routeDescription.setMaxWaitTime(maxWaitTime);
 	}
 
-	public void setUnsharedPath(VrpPathWithTravelData unsharedPath) {
-		List<String> links = new ArrayList<String>();
-		unsharedPath.iterator().forEachRemaining(l->{links.add(l.getId().toString());});
-		this.routeDescription.setUnsharedPath(links);
+	public void setMaxRideTime(double maxRideTime) {
+		this.routeDescription.setMaxRideTime(maxRideTime);
 	}
 
+	public void setUnsharedPath(VrpPathWithTravelData unsharedPath) {
+		List<String> links = new ArrayList<String>();
+		unsharedPath.iterator().forEachRemaining(l -> {
+			links.add(l.getId().toString());
+		});
+		this.routeDescription.setUnsharedPath(links);
+	}
 
 	@Override
 	public String getRouteDescription() {
@@ -134,30 +143,35 @@ public class DrtRoute extends AbstractRoute {
 		return value;
 	}
 
-
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
-				.add("maxWaitTime", routeDescription.getMaxWaitTime())
-				.add("directRideTime", routeDescription.getDirectRideTime())
-				.add("super", super.toString())
-				.toString();
+			.add("maxWaitTime", routeDescription.getMaxWaitTime())
+			.add("directRideTime", routeDescription.getDirectRideTime())
+			.add("maxRideTime", routeDescription.getMaxRideTime())
+			.add("super", super.toString())
+			.toString();
 	}
-
 
 	public static class RouteDescription {
 		private OptionalTime maxWaitTime = OptionalTime.undefined();
 		private OptionalTime directRideTime = OptionalTime.undefined();
+		private OptionalTime maxRideTime = OptionalTime.undefined();
 		private List<String> unsharedPath = new ArrayList<String>();
 
 		@JsonProperty("directRideTime")
 		public double getDirectRideTime() {
-			return directRideTime.isUndefined() ? OptionalTime.undefined().seconds() : directRideTime.seconds();
+			return directRideTime.seconds();
+		}
+
+		@JsonProperty("maxRideTime")
+		public double getMaxRideTime() {
+			return maxRideTime.seconds();
 		}
 
 		@JsonProperty("maxWaitTime")
 		public double getMaxWaitTime() {
-			return maxWaitTime.isUndefined() ? OptionalTime.undefined().seconds() : maxWaitTime.seconds();
+			return maxWaitTime.seconds();
 		}
 
 		@JsonProperty("unsharedPath")
@@ -169,6 +183,10 @@ public class DrtRoute extends AbstractRoute {
 			this.directRideTime = OptionalTime.defined(directRideTime);
 		}
 
+		public void setMaxRideTime(double maxRideTime) {
+			this.maxRideTime = OptionalTime.defined(maxRideTime);
+		}
+
 		public void setMaxWaitTime(double maxWaitTime) {
 			this.maxWaitTime = OptionalTime.defined(maxWaitTime);
 		}
@@ -176,6 +194,5 @@ public class DrtRoute extends AbstractRoute {
 		public void setUnsharedPath(List<String> unsharedPath) {
 			this.unsharedPath = unsharedPath;
 		}
-
 	}
 }

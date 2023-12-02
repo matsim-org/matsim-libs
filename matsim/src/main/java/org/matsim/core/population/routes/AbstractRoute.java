@@ -43,8 +43,6 @@ public abstract class AbstractRoute implements Route, Cloneable {
 
 	protected double travTime = UNDEFINED_TIME;
 
-	private double rideDuration = UNDEFINED_TIME;
-
 	private Id<Link> startLinkId = null;
 	private Id<Link> endLinkId = null;
 
@@ -72,19 +70,10 @@ public abstract class AbstractRoute implements Route, Cloneable {
 		return asOptionalTime(this.travTime);
 	}
 
-	public final OptionalTime getRideDuration() {
-		return asOptionalTime(this.rideDuration);
-	}
-
 	@Override
 	public final void setTravelTime(final double travTime) {
 		OptionalTime.assertDefined(travTime);
 		this.travTime = travTime;
-	}
-
-	public final void setRideDuration(final double rideDuration) {
-		OptionalTime.assertDefined(rideDuration);
-		this.rideDuration = rideDuration;
 	}
 
 	@Override

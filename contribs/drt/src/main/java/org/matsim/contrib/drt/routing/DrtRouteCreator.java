@@ -44,13 +44,12 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 	private final TravelTime travelTime;
 	private final LeastCostPathCalculator router;
 
-	public DrtRouteCreator(DrtConfigGroup drtCfg, Network modalNetwork,
-			LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, TravelTime travelTime,
-			TravelDisutilityFactory travelDisutilityFactory) {
+	public DrtRouteCreator(DrtConfigGroup drtCfg, Network modalNetwork, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
+		TravelTime travelTime, TravelDisutilityFactory travelDisutilityFactory) {
 		this.drtCfg = drtCfg;
 		this.travelTime = travelTime;
-		router = leastCostPathCalculatorFactory.createPathCalculator(modalNetwork,
-				travelDisutilityFactory.createTravelDisutility(travelTime), travelTime);
+		router = leastCostPathCalculatorFactory.createPathCalculator(modalNetwork, travelDisutilityFactory.createTravelDisutility(travelTime),
+			travelTime);
 	}
 
 	/**
@@ -61,30 +60,28 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 	 * @return maximum travel time
 	 */
 	static double getMaxTravelTime(DrtConfigGroup drtCfg, double unsharedRideTime) {
-		return Math.min(unsharedRideTime + drtCfg.maxAbsoluteDetour,
-				drtCfg.maxTravelTimeAlpha * unsharedRideTime + drtCfg.maxTravelTimeBeta);
+		return Math.min(unsharedRideTime + drtCfg.maxAbsoluteDetour, drtCfg.maxTravelTimeAlpha * unsharedRideTime + drtCfg.maxTravelTimeBeta);
 	}
 
-	static double getMaxRideDuration(DrtConfigGroup drtCfg, double unsharedRideTime) {
-		return Math.min(drtCfg.maxAbsoluteDetour,
-			drtCfg.maxDetourAlpha * unsharedRideTime + drtCfg.maxDetourBeta);
+	static double getMaxRideTime(DrtConfigGroup drtCfg, double unsharedRideTime) {
+		return Math.min(unsharedRideTime + drtCfg.maxAbsoluteDetour, drtCfg.maxDetourAlpha * unsharedRideTime + drtCfg.maxDetourBeta);
 	}
 
-	public Route createRoute(double departureTime, Link accessActLink, Link egressActLink, Person person,
-			Attributes tripAttributes, RouteFactories routeFactories) {
-		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(accessActLink, egressActLink, departureTime,
-				router, travelTime);
+	public Route createRoute(double departureTime, Link accessActLink, Link egressActLink, Person person, Attributes tripAttributes,
+		RouteFactories routeFactories) {
+		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(accessActLink, egressActLink, departureTime, router, travelTime);
 		double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
 		double maxTravelTime = getMaxTravelTime(drtCfg, unsharedRideTime);
-		double maxRideDuration = getMaxRideDuration(drtCfg, unsharedRideTime);
+		double maxRideDuration = getMaxRideTime(drtCfg, unsharedRideTime);
 		double unsharedDistance = VrpPaths.calcDistance(unsharedPath);//includes last link
 
 		DrtRoute route = routeFactories.createRoute(DrtRoute.class, accessActLink.getId(), egressActLink.getId());
 		route.setDistance(unsharedDistance);
 		route.setTravelTime(maxTravelTime);
-		route.setRideDuration(maxRideDuration);
+		route.setMaxRideTime(maxRideDuration);
 		route.setDirectRideTime(unsharedRideTime);
 		route.setMaxWaitTime(drtCfg.maxWaitTime);
+		route.setMaxRideTime(Double.MAX_VALUE);
 
 		if (this.drtCfg.storeUnsharedPath) {
 			route.setUnsharedPath(unsharedPath);
