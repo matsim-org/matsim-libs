@@ -51,7 +51,7 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Option(names = "--pruning", description = "Pruning parameter")
 	private String pruning;
 
-	@CommandLine.Option(names = "--modes", description = "Modes to include in estimation", defaultValue = "car,walk,bike,pt,ride", split = ",")
+	@CommandLine.Option(names = "--modes", description = "Modes to include in estimation", split = ",")
 	private Set<String> modes;
 
 	@CommandLine.Option(names = "--output", description = "Path for output population", required = true)
@@ -84,7 +84,10 @@ public class GenerateChoiceSet implements MATSimAppCommand, PersonAlgorithm {
 		log.info("Using k={}, pruning={}", topK, pruning);
 
 		imc.setTopK(topK);
-		imc.setModes(modes);
+
+		if (modes != null)
+			imc.setModes(modes);
+
 		imc.setPruning(pruning);
 
 		Injector injector = controler.getInjector();
