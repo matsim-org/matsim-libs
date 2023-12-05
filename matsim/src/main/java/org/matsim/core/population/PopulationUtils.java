@@ -817,6 +817,14 @@ public final class PopulationUtils {
 		act.setLinkId(linkId);
 		return act ;
 	}
+	
+	public static Activity convertInteractionToStandardActivity(Activity activity) {
+		if (activity instanceof InteractionActivity) {
+			return createActivity(activity);
+		} else {
+			return activity;
+		}
+	}
 
 	public static Leg createLeg(String transportMode) {
 		return getFactory().createLeg(transportMode) ;

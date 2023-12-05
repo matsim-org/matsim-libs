@@ -353,14 +353,17 @@ public class CalculateSkimMatrices {
     public final void calculateAndWriteNetworkMatrices(String networkFilename, String eventsFilename, double[] times, Config config, String outputPrefix, Predicate<Link> xy2linksPredicate)
             throws IOException {
         String prefix = outputPrefix == null ? "" : outputPrefix;
-        var netIndicators = calculateNetworkMatrices(networkFilename, eventsFilename, times, config, xy2linksPredicate);
+        var netIndicators = prepareAndCalculateNetworkMatrices(networkFilename, eventsFilename, times, config, xy2linksPredicate);
+        writeNetworkMatricesAsCSV(netIndicators, prefix);
+    }
+
+    public final void writeNetworkMatricesAsCSV(NetworkIndicators<String> netIndicators, String prefix) throws IOException {
         log.info("write CAR matrices to " + outputDirectory + (prefix.isEmpty() ? "" : (" with prefix " + prefix)));
         FloatMatrixIO.writeAsCSV(netIndicators.travelTimeMatrix, outputDirectory + "/" + prefix + CAR_TRAVELTIMES_FILENAME);
         FloatMatrixIO.writeAsCSV(netIndicators.distanceMatrix, outputDirectory + "/" + prefix + CAR_DISTANCES_FILENAME);
-
     }
 
-    public final NetworkIndicators<String> calculateNetworkMatrices(String networkFilename, String eventsFilename, double[] times, Config config, Predicate<Link> xy2linksPredicate) {
+    public final NetworkIndicators<String> prepareAndCalculateNetworkMatrices(String networkFilename, String eventsFilename, double[] times, Config config, Predicate<Link> xy2linksPredicate)  {
         Scenario scenario = ScenarioUtils.createScenario(config);
         log.info("loading network from " + networkFilename);
         new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
@@ -388,9 +391,13 @@ public class CalculateSkimMatrices {
         log.info("filter car-only network for assigning links to locations");
         final Network xy2linksNetwork = extractXy2LinksNetwork(carNetwork, xy2linksPredicate, config);
 
+        return calculateNetworkMatrices(times, carNetwork, xy2linksNetwork, tt, td);
+    }
+
+    public final NetworkIndicators<String> calculateNetworkMatrices(double[] times, Network carNetwork, Network xy2linksNetwork, TravelTime tt, TravelDisutility td) {
         log.info("calc CAR matrix for " + Time.writeTime(times[0]));
         NetworkIndicators<String> netIndicators = NetworkSkimMatrices.calculateSkimMatrices(
-                xy2linksNetwork, carNetwork, coordsPerZone, times[0], tt, td, this.numberOfThreads);
+            xy2linksNetwork, carNetwork, coordsPerZone, times[0], tt, td, this.numberOfThreads);
 
         if (tt instanceof FreeSpeedTravelTime) {
             log.info("Do not calculate CAR matrices for other times as only freespeed is being used");

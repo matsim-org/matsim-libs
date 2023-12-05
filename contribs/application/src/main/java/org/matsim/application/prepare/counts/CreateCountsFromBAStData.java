@@ -21,9 +21,10 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
+import org.matsim.counts.Measurable;
+import org.matsim.counts.MeasurementLocation;
 import picocli.CommandLine;
 
 import java.io.BufferedReader;
@@ -56,43 +57,29 @@ import java.util.stream.StreamSupport;
 @CommandLine.Command(name = "counts-from-bast", description = "Creates MATSim from BASt Stundenwerte.txt")
 public class CreateCountsFromBAStData implements MATSimAppCommand {
 
-	@CommandLine.Option(names = "--network", description = "path to MATSim network", required = true)
-	private String network;
-
+	private static final Logger log = LogManager.getLogger(CreateCountsFromBAStData.class);
 	@CommandLine.Option(names = "--road-types", description = "Define on which roads counts are created")
 	private final List<String> roadTypes = List.of("motorway", "primary", "trunk");
-
-	@CommandLine.Option(names = "--primary-data", description = "path to BASt Bundesstraßen-'Stundenwerte'-.txt file", required = true)
-	private Path primaryData;
-
-	@CommandLine.Option(names = "--motorway-data", description = "path to BASt Bundesautobahnen-'Stundenwerte'-.txt file", required = true)
-	private Path motorwayData;
-
-	@CommandLine.Option(names = "--station-data", description = "path to default BASt count station .csv", required = true)
-	private Path stationData;
-
-	@CommandLine.Option(names = "--search-range", description = "range for the buffer around count stations, in which links are queried", defaultValue = "50")
-	private double searchRange;
-
-	@CommandLine.Option(names = "--year", description = "Year of counts", required = true)
-	private int year;
-
-	@CommandLine.Option(names = "--car-output", description = "output car counts path", defaultValue = "car-counts-from-bast.xml.gz")
-	private Path carOutput;
-
-	@CommandLine.Option(names = "--freight-output", description = "output freight counts path", defaultValue = "freight-counts-from-bast.xml.gz")
-	private Path freightOutput;
-
 	@CommandLine.Mixin
 	private final ShpOptions shp = new ShpOptions();
-
 	@CommandLine.Mixin
 	private final CountsOption counts = new CountsOption();
-
 	@CommandLine.Mixin
 	private final CrsOptions crs = new CrsOptions("EPSG:25832");
-
-	private static final Logger log = LogManager.getLogger(CreateCountsFromBAStData.class);
+	@CommandLine.Option(names = "--network", description = "path to MATSim network", required = true)
+	private String network;
+	@CommandLine.Option(names = "--primary-data", description = "path to BASt Bundesstraßen-'Stundenwerte'-.txt file", required = true)
+	private Path primaryData;
+	@CommandLine.Option(names = "--motorway-data", description = "path to BASt Bundesautobahnen-'Stundenwerte'-.txt file", required = true)
+	private Path motorwayData;
+	@CommandLine.Option(names = "--station-data", description = "path to default BASt count station .csv", required = true)
+	private Path stationData;
+	@CommandLine.Option(names = "--search-range", description = "range for the buffer around count stations, in which links are queried", defaultValue = "50")
+	private double searchRange;
+	@CommandLine.Option(names = "--year", description = "Year of counts", required = true)
+	private int year;
+	@CommandLine.Option(names = "--output", description = "Output counts path", defaultValue = "counts-from-bast.xml.gz")
+	private Path output;
 
 	public static void main(String[] args) {
 		new CreateCountsFromBAStData().execute(args);
@@ -111,21 +98,23 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		readHourlyTrafficVolume(motorwayData, stations);
 
 		log.info("+++++++ Map aggregated traffic volumes to count stations +++++++");
-		Counts<Link> miv = new Counts<>();
-		Counts<Link> freight = new Counts<>();
-		stations.values().forEach(station -> mapTrafficVolumeToCount(station, miv, freight));
 
-		miv.setYear(year);
-		freight.setYear(year);
+		Counts<Link> mmCounts = new Counts<>();
+		mmCounts.setYear(year);
+		mmCounts.setName("BASt Counts");
+		mmCounts.setSource("Bundesanstalt für Straßenwesen");
+		mmCounts.setDescription("Aggregated daily traffic volumes for car and freight traffic.");
 
-		log.info("+++++++ Write MATSim counts to {} and {} +++++++", carOutput, freightOutput);
-		new CountsWriter(miv).write(carOutput.toString());
-		new CountsWriter(freight).write(freightOutput.toString());
+		stations.values().forEach(station -> mapTrafficVolumeToCount(station, mmCounts));
+
+		log.info("+++++++ Write MATSim counts to {} +++++++", output);
+		new CountsWriter(mmCounts).write(output.toString());
+
 
 		return 0;
 	}
 
-	private void mapTrafficVolumeToCount(BAStCountStation station, Counts<Link> miv, Counts<Link> freight) {
+	private void mapTrafficVolumeToCount(BAStCountStation station, Counts<Link> counts) {
 
 		if (!station.hasMatchedLink())
 			return;
@@ -135,18 +124,21 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 			return;
 		}
 
-		Count<Link> mivCount = miv.createAndAddCount(station.getMatchedLink().getId(), station.getName() + "_" + station.getDirection());
-		Count<Link> freightCount = freight.createAndAddCount(station.getMatchedLink().getId(), station.getName() + "_" + station.getDirection());
+		MeasurementLocation<Link> multiModeCount = counts.createAndAddMeasureLocation(station.getMatchedLink().getId(), station.getName() + "_" + station.getDirection());
+
+		Measurable carVolume = multiModeCount.createVolume(TransportMode.car);
+		Measurable freightVolume = multiModeCount.createVolume(TransportMode.truck);
 
 		var mivTrafficVolumes = station.getMivTrafficVolume();
 		var freightTrafficVolumes = station.getFreightTrafficVolume();
 
 		for (String hour : mivTrafficVolumes.keySet()) {
-
-			if (hour.startsWith("0")) hour.replace("0", "");
 			int h = Integer.parseInt(hour);
-			mivCount.createVolume(h, mivTrafficVolumes.get(hour));
-			freightCount.createVolume(h, freightTrafficVolumes.get(hour));
+			Double mivAtHour = mivTrafficVolumes.get(hour);
+			Double freightAtHour = freightTrafficVolumes.get(hour);
+
+			carVolume.setAtHour(h, mivAtHour);
+			freightVolume.setAtHour(h, freightAtHour);
 		}
 	}
 
@@ -194,31 +186,31 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 
 		try {
 			CSVParser records = CSVFormat
-					.Builder.create()
-					.setAllowMissingColumnNames(true)
-					.setDelimiter(';')
-					.setHeader()
-					.build()
-					.parse(reader);
+				.Builder.create()
+				.setAllowMissingColumnNames(true)
+				.setDelimiter(';')
+				.setHeader()
+				.build()
+				.parse(reader);
 
 			Set<String> keys = stations.keySet().stream()
-					.map(key -> key.replaceAll("_1", "").replaceAll("_2", ""))
-					.collect(Collectors.toSet());
+				.map(key -> key.replaceAll("_1", "").replaceAll("_2", ""))
+				.collect(Collectors.toSet());
 
 			// Filter for weekday Tuesday-Wednesday
 			preFilteredRecords = StreamSupport.stream(records.spliterator(), false)
-					.filter(row -> keys.contains(row.get("Zst")))
-					.filter(row -> {
-						int day;
-						try {
-							day = Integer.parseInt(row.get("Wotag").replace(" ", ""));
-						} catch (NumberFormatException e) {
-							log.warn("Error parsing week day number: {}", row.get("Wotag"));
-							return false;
-						}
-						return day > 1 && day < 5;
-					})
-					.collect(Collectors.toList());
+				.filter(row -> keys.contains(row.get("Zst")))
+				.filter(row -> {
+					int day;
+					try {
+						day = Integer.parseInt(row.get("Wotag").replace(" ", ""));
+					} catch (NumberFormatException e) {
+						log.warn("Error parsing week day number: {}", row.get("Wotag"));
+						return false;
+					}
+					return day > 1 && day < 5;
+				})
+				.collect(Collectors.toList());
 
 			if (preFilteredRecords == null || preFilteredRecords.isEmpty()) {
 				log.warn("Records read from {} don't contain the stations ... ", pathToDisaggregatedData);
@@ -228,8 +220,8 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 			log.info("+++++++ Start aggregation of traffic volume data +++++++");
 
 			Set<String> stationIds = preFilteredRecords.stream()
-					.map(row -> row.get("Zst"))
-					.collect(Collectors.toSet());
+				.map(row -> row.get("Zst"))
+				.collect(Collectors.toSet());
 
 			for (String number : stationIds) {
 				BAStCountStation direction1 = stations.get(number + "_1");
@@ -244,12 +236,12 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 				log.info("Process data for count station {}", direction1.getName());
 
 				List<CSVRecord> allEntriesOfStation = preFilteredRecords.stream()
-						.filter(row -> row.get("Zst").equals(number)).toList();
+					.filter(row -> row.get("Zst").equals(number)).toList();
 
 				for (String hour : hours) {
 					var hourlyTrafficVolumes = allEntriesOfStation.stream()
-							.filter(row -> row.get("Stunde").replace("\"", "")
-									.equals(hour)).toList();
+						.filter(row -> row.get("Stunde").replace("\"", "")
+							.equals(hour)).toList();
 
 					if (hourlyTrafficVolumes.isEmpty()) {
 						log.warn("No volume for station {} at hour {}", direction1.getName(), hour);
@@ -258,12 +250,12 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 
 					double divisor = hourlyTrafficVolumes.size();
 					double sumMiv1 = hourlyTrafficVolumes.stream()
-							.mapToDouble(row -> Double.parseDouble(row.get(mivCol1)))
-							.sum();
+						.mapToDouble(row -> Double.parseDouble(row.get(mivCol1)))
+						.sum();
 
 					double sumMiv2 = hourlyTrafficVolumes.stream()
-							.mapToDouble(row -> Double.parseDouble(row.get(mivCol2)))
-							.sum();
+						.mapToDouble(row -> Double.parseDouble(row.get(mivCol2)))
+						.sum();
 
 					double meanMiv1 = sumMiv1 / divisor;
 					double meanMiv2 = sumMiv2 / divisor;
@@ -273,12 +265,12 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 
 					//Same procedure for freight
 					double sumFreight1 = hourlyTrafficVolumes.stream()
-							.mapToDouble(row -> Double.parseDouble(row.get(freightCol1)))
-							.sum();
+						.mapToDouble(row -> Double.parseDouble(row.get(freightCol1)))
+						.sum();
 
 					double sumFreight2 = hourlyTrafficVolumes.stream()
-							.mapToDouble(row -> Double.parseDouble(row.get(freightCol2)))
-							.sum();
+						.mapToDouble(row -> Double.parseDouble(row.get(freightCol2)))
+						.sum();
 
 					double meanFreight1 = sumFreight1 / divisor;
 					double meanFreight2 = sumFreight2 / divisor;
@@ -382,12 +374,12 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 		try (BufferedReader reader = Files.newBufferedReader(pathToAggregatedData, StandardCharsets.ISO_8859_1)) {
 
 			CSVParser records = CSVFormat
-					.Builder.create()
-					.setAllowMissingColumnNames(true)
-					.setDelimiter(';')
-					.setHeader()
-					.build()
-					.parse(reader);
+				.Builder.create()
+				.setAllowMissingColumnNames(true)
+				.setDelimiter(';')
+				.setHeader()
+				.build()
+				.parse(reader);
 
 			for (CSVRecord row : records) {
 
@@ -417,7 +409,7 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 
 		Set<String> ignored = counts.getIgnored();
 		final Predicate<BAStCountStation> optFilter = station -> !ignored.contains(station.getId().replaceAll("_1", "")
-				.replaceAll("_2", ""));
+			.replaceAll("_2", ""));
 
 		final Predicate<BAStCountStation> shpFilter;
 		if (shp.getShapeFile() != null) {
@@ -430,9 +422,9 @@ public class CreateCountsFromBAStData implements MATSimAppCommand {
 
 		// Return filtered map with id as key and station as value
 		return stations.stream()
-				.filter(optFilter.and(shpFilter))
-				.collect(Collectors.toMap(
-						BAStCountStation::getId, Function.identity()
-				));
+			.filter(optFilter.and(shpFilter))
+			.collect(Collectors.toMap(
+				BAStCountStation::getId, Function.identity()
+			));
 	}
 }
