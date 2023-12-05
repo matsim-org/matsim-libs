@@ -23,6 +23,7 @@ import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
+import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.DeadlockAvoidance;
 import jakarta.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -54,10 +55,7 @@ public final class RailResourceManager {
 
 	private final Map<Id<RailResource>, RailResource> resources;
 
-	@Inject
-	public RailResourceManager(QSim qsim) {
-		this(qsim.getEventsManager(), ConfigUtils.addOrGetModule(qsim.getScenario().getConfig(), RailsimConfigGroup.class), qsim.getScenario().getNetwork());
-	}
+	private final DeadlockAvoidance dla;
 
 	/**
 	 * Retrieve source id of a link.
@@ -70,18 +68,21 @@ public final class RailResourceManager {
 			return Id.create(id, RailResource.class);
 	}
 
-	/**
-	 * All available resources.
-	 */
-	public Collection<RailResource> getResources() {
-		return resources.values();
+	@Inject
+	public RailResourceManager(QSim qsim, DeadlockAvoidance dla) {
+		this(qsim.getEventsManager(),
+			ConfigUtils.addOrGetModule(qsim.getScenario().getConfig(), RailsimConfigGroup.class),
+			qsim.getScenario().getNetwork(),
+			dla);
 	}
 
 	/**
 	 * Construct resources from network.
 	 */
-	public RailResourceManager(EventsManager eventsManager, RailsimConfigGroup config, Network network) {
+	public RailResourceManager(EventsManager eventsManager, RailsimConfigGroup config,
+							   Network network, DeadlockAvoidance dla) {
 		this.eventsManager = eventsManager;
+		this.dla = dla;
 		this.links = new IdMap<>(Link.class, network.getLinks().size());
 
 		// Mapping for resources to be created
@@ -113,6 +114,15 @@ public final class RailResourceManager {
 
 			resources.put(e.getKey(), r);
 		}
+
+		dla.initResources(resources);
+	}
+
+	/**
+	 * All available resources.
+	 */
+	public Collection<RailResource> getResources() {
+		return resources.values();
 	}
 
 	/**
@@ -134,17 +144,24 @@ public final class RailResourceManager {
 			return reservedDist;
 		}
 
+		if (!dla.check(time, link.resource, position)) {
+			return RailResourceInternal.NO_RESERVATION;
+		}
+
 		if (link.resource.hasCapacity(time, link, track, position)) {
 
 			double dist = link.resource.reserve(time, link, track, position);
 			eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), link.getLinkId(),
 				position.getDriver().getVehicle().getId(), link.resource.getState(link)));
 
-			assert dist >= 0: "Reserved distance must be equal or larger than 0.";
+			dla.onReserve(time, link.resource, position);
+
+			assert dist >= 0 : "Reserved distance must be equal or larger than 0.";
 
 			return dist;
 		}
 
+		// may be previously reserved dist, or no reservation
 		return reservedDist;
 	}
 
@@ -168,7 +185,11 @@ public final class RailResourceManager {
 	 */
 	public void releaseLink(double time, RailLink link, MobsimDriverAgent driver) {
 
-		link.resource.release(link, driver);
+		boolean release = link.resource.release(link, driver);
+
+		if (release) {
+			dla.onRelease(time, link.resource, driver);
+		}
 
 		eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), link.getLinkId(), driver.getVehicle().getId(),
 			link.resource.getState(link)));

@@ -28,8 +28,9 @@ interface RailResourceInternal extends RailResource {
 	double reserve(double time, RailLink link, int track, TrainPosition position);
 
 	/**
-	 * Releases this resource for the given agent.
+	 * Releases the link on this resource for the given agent.
+	 * @return if the resource was released, i.e. no more links are occupied.
 	 */
-	void release(RailLink link, MobsimDriverAgent driver);
+	boolean release(RailLink link, MobsimDriverAgent driver);
 
 }

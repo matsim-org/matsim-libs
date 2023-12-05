@@ -135,7 +135,7 @@ final class FixedBlockResource implements RailResourceInternal {
 	}
 
 	@Override
-	public void release(RailLink link, MobsimDriverAgent driver) {
+	public boolean release(RailLink link, MobsimDriverAgent driver) {
 
 		MobsimDriverAgent[] state = tracks.get(link);
 		int track = -1;
@@ -163,7 +163,10 @@ final class FixedBlockResource implements RailResourceInternal {
 		// if the driver has no more reservations, remove it from the set
 		if (allFree) {
 			reservations.remove(driver);
+			return true;
 		}
+
+		return false;
 	}
 
 }

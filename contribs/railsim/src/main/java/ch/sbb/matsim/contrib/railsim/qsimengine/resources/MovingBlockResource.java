@@ -199,7 +199,7 @@ final class MovingBlockResource implements RailResourceInternal {
 	}
 
 	@Override
-	public void release(RailLink link, MobsimDriverAgent driver) {
+	public boolean release(RailLink link, MobsimDriverAgent driver) {
 
 		moving.get(link).remove(driver);
 
@@ -224,7 +224,11 @@ final class MovingBlockResource implements RailResourceInternal {
 			// This track is completely free again
 			if (track.queue.isEmpty())
 				track.incoming = null;
+
+			return true;
 		}
+
+		return false;
 	}
 
 	/**

@@ -522,8 +522,8 @@ final class RailsimEngine implements Steppable {
 		}
 
 		// When trains are put into the network their tail may be longer than the current link
-		// this assertion may not hold depending on the network, should possibly be removed
-		assert state.routeIdx <= 2 || FuzzyUtils.greaterEqualThan(state.tailPosition, 0) : "Illegal state update. Tail position should not be negative";
+		// this assertion may not hold depending on the network
+//		assert state.routeIdx <= 2 || FuzzyUtils.greaterEqualThan(state.tailPosition, 0) : "Illegal state update. Tail position should not be negative";
 
 		assert FuzzyUtils.lessEqualThan(state.headPosition, resources.getLink(state.headLink).length) : "Illegal state update. Head position must be smaller than link length";
 		assert FuzzyUtils.greaterEqualThan(state.headPosition, 0) : "Head position must be positive";

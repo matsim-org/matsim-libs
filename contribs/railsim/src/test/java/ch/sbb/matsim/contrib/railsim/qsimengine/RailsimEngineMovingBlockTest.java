@@ -51,10 +51,10 @@ public class RailsimEngineMovingBlockTest {
 				f.accept(link);
 			}
 		}
-		RailResourceManager res = new RailResourceManager(eventsManager, config, net);
+		RailResourceManager res = new RailResourceManager(eventsManager, config, net, new NoDeadlockAvoidance());
 		TrainRouter router = new TrainRouter(net, res);
 
-		return new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, config, res, new SimpleDisposition(res, router, new NoDeadlockAvoidance())), net);
+		return new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, config, res, new SimpleDisposition(res, router)), net);
 	}
 
 	private RailsimTestUtils.Holder getTestEngine(String network) {

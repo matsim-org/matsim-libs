@@ -1,6 +1,7 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.DeadlockAvoidance;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.NoDeadlockAvoidance;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.SimpleDeadlockAvoidance;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SimpleDisposition;
@@ -8,6 +9,7 @@ import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
 import org.junit.Before;
 import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -36,7 +38,7 @@ public class RailsimDeadlockTest {
 		eventsManager.initProcessing();
 	}
 
-	private RailsimTestUtils.Holder getTestEngine(String network, @Nullable Consumer<Link> f) {
+	private RailsimTestUtils.Holder getTestEngine(String network, DeadlockAvoidance dla, @Nullable Consumer<Link> f) {
 		Network net = NetworkUtils.readNetwork(new File(utils.getPackageInputDirectory(), network).toString());
 		RailsimConfigGroup config = new RailsimConfigGroup();
 
@@ -48,10 +50,25 @@ public class RailsimDeadlockTest {
 			}
 		}
 
-		RailResourceManager res = new RailResourceManager(eventsManager, config, net);
+		RailResourceManager res = new RailResourceManager(eventsManager, config, net, dla);
 		TrainRouter router = new TrainRouter(net, res);
 
-		return new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, config, res, new SimpleDisposition(res, router, new SimpleDeadlockAvoidance(res))), net);
+		return new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, config, res, new SimpleDisposition(res, router)), net);
 	}
 
+	@Test
+	public void deadlock() {
+
+		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocksFixedBlocks.xml", new NoDeadlockAvoidance(), null);
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "AB", "EF");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "HG", "DC");
+
+		test.doSimStepUntil(150);
+		test.debugFiles(collector, "deadLock");
+
+		RailsimTestUtils.assertThat(collector)
+			.hasTrainState("regio", 140, "y1y", 0)
+			.hasTrainState("regio2", 140, "zy", 0);
+
+	}
 }
