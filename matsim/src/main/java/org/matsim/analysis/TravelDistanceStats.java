@@ -57,7 +57,7 @@ import java.util.stream.Collectors;
 
 public class TravelDistanceStats {
 
-	private static final int HISTORY_SIZE = 5000;
+	private static final int MAX_ITERATIONS_IN_GRAPH = 5000;
 
 	private final ControllerConfigGroup controllerConfigGroup;
 	private BufferedWriter out;
@@ -65,8 +65,8 @@ public class TravelDistanceStats {
 	private final String tripStatsPngName;
 	private final String delimiter;
 
-	private DoubleSummaryStatistics[] legStats;
-	private DoubleSummaryStatistics[] tripStats;
+	private Map<Integer, DoubleSummaryStatistics> legStats;
+	private Map<Integer, DoubleSummaryStatistics> tripStats;
 
 	private final static Logger log = LogManager.getLogger(TravelDistanceStats.class);
 
@@ -103,12 +103,9 @@ public class TravelDistanceStats {
 	}
 
 	private void initStats(ControllerConfigGroup controllerConfigGroup) {
-		int iterations = controllerConfigGroup.getLastIteration() - controllerConfigGroup.getFirstIteration();
-		if (iterations > HISTORY_SIZE) {
-			iterations = HISTORY_SIZE; // limit the history size
-		}
-		this.legStats = new DoubleSummaryStatistics[iterations+1];
-		this.tripStats = new DoubleSummaryStatistics[iterations+1];
+		int expectedIterations = controllerConfigGroup.getLastIteration() - controllerConfigGroup.getFirstIteration();
+		this.legStats = new HashMap<>(expectedIterations+1);
+		this.tripStats = new HashMap<>(expectedIterations+1);
 	}
 
 	public void addIteration(int iteration, IdMap<Person, Plan> map) {
@@ -122,22 +119,16 @@ public class TravelDistanceStats {
         log.info("(TravelDistanceStats takes an average over all legs where the simulation reports travelled (network) distances");
 		log.info("(and teleported legs whose route contains a distance.)");// TODO: still valid?
 
-		int index = getIndex(iteration);
-		if (index >= this.legStats.length){
-			return;
-		}
-		this.legStats[index] = legStats;
-		this.tripStats[index] = tripStats;
+		this.legStats.put(iteration, legStats);
+		this.tripStats.put(iteration, tripStats);
+
+		assert this.legStats.size() == this.tripStats.size();
 	}
 
 	void writeOutput(int iteration, boolean writePngs){
 		writeCsvEntry(iteration);
 
-		if (iteration >= HISTORY_SIZE){
-			return;
-		}
-
-		if(writePngs){
+		if(writePngs && this.legStats.size() < MAX_ITERATIONS_IN_GRAPH){
 			writePngs(iteration);
 		}
 	}
@@ -148,8 +139,8 @@ public class TravelDistanceStats {
 	}
 
 	private void writeCsvEntry(int iteration) {
-		DoubleSummaryStatistics legStats = this.legStats[getIndex(iteration)];
-		DoubleSummaryStatistics tripStats = this.tripStats[getIndex(iteration)];
+		DoubleSummaryStatistics legStats = this.legStats.get(iteration);
+		DoubleSummaryStatistics tripStats = this.tripStats.get(iteration);
 
 		try {
 			this.out.write(iteration + this.delimiter + legStats.getAverage() + this.delimiter + tripStats.getAverage() + "\n");
@@ -169,15 +160,14 @@ public class TravelDistanceStats {
 			return;
 		}
 
-		int index = getIndex(iteration);
 		// create chart when data of more than one iteration is available.
 		XYLineChart chart = new XYLineChart("Trip Travel Distance Statistics", "iteration", "average of the average trip distance per plan ");
-		double[] iterations = new double[index + 1];
-		double[] values = new double[index + 1];
+		double[] iterations = new double[iteration + 1];
+		double[] values = new double[iteration + 1];
 
-		for (int i = 0; i <= index; i++) {
+		for (int i = 0; i <= iteration; i++) {
 			iterations[i] = i + controllerConfigGroup.getFirstIteration();
-			values[i] = Optional.ofNullable(this.tripStats[i]).map(DoubleSummaryStatistics::getAverage).orElse(0.);
+			values[i] = Optional.ofNullable(this.tripStats.get(i)).map(DoubleSummaryStatistics::getAverage).orElse(0.);
 		}
 
 		chart.addSeries("executed plan", iterations, values);
@@ -190,15 +180,14 @@ public class TravelDistanceStats {
 			return;
 		}
 
-		int index = getIndex(iteration);
 		// create chart when data of more than one iteration is available.
 		XYLineChart chart = new XYLineChart("Leg Travel Distance Statistics", "iteration", "average of the average leg distance per plan ");
-		double[] iterations = new double[index + 1];
-		double[] values = new double[index + 1];
+		double[] iterations = new double[iteration + 1];
+		double[] values = new double[iteration + 1];
 
-		for (int i = 0; i <= index; i++) {
+		for (int i = 0; i <= iteration; i++) {
 			iterations[i] = i + controllerConfigGroup.getFirstIteration();
-			values[i] = Optional.ofNullable(this.legStats[i]).map(DoubleSummaryStatistics::getAverage).orElse(0.);
+			values[i] = Optional.ofNullable(this.legStats.get(i)).map(DoubleSummaryStatistics::getAverage).orElse(0.);
 
 		}
 
@@ -240,10 +229,6 @@ public class TravelDistanceStats {
 				  // the following means legs with infinite distance are ignored
 				  .filter(Double::isFinite)
 				  .summaryStatistics();
-	}
-
-	private int getIndex(int iteration) {
-		return iteration - controllerConfigGroup.getFirstIteration();
 	}
 
 	public void close() {
