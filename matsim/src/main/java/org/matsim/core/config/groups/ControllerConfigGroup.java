@@ -84,7 +84,6 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 
 	private static final String WRITE_SNAPSHOTS_INTERVAL = "writeSnapshotsInterval";
 
-
 	private String outputDirectory = "./output";
 	private int firstIteration = 0;
 	private int lastIteration = 1000;
@@ -359,42 +358,34 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 		this.writeSnapshotsInterval = writeSnapshotsInterval;
 	}
 
-	@StringGetter( CREATE_GRAPHS )
-	@Deprecated
-	public boolean getCreateGraphs() {
-		log.warn("Configuration 'createGraphs' is deprecated. Using 'createGraphsInterval' instead.");
-        return this.createGraphsInterval > 0;
-	}
-
-    /**
-     * Sets whether graphs showing some analyses should automatically be
-     * generated during the simulation. The generation of graphs usually takes a
-     * small amount of time that does not have any weight in big simulations,
-     * but add a significant overhead in smaller runs or in test cases where the
-     * graphical output is not even requested.
-     *
-     * @param createGraphs
-     *            true if graphs showing analyses' output should be generated.
-     */
-	@StringSetter( CREATE_GRAPHS )
-	@Deprecated
-	public void setCreateGraphs(boolean createGraphs) {
-		log.warn("Configuration 'createGraphs' is deprecated. Using 'createGraphsInterval' instead.");
-		if (createGraphs) {
-			this.setCreateGraphsInterval(1);
-		} else {
-			this.setCreateGraphsInterval(0);
-		}
-	}
-
 	@StringGetter( CREATE_GRAPHS_INTERVAL )
 	public int getCreateGraphsInterval() {
 		return createGraphsInterval;
 	}
 
+	/**
+	 * Sets whether graphs showing some analyses should automatically be
+	 * generated during the simulation. The generation of graphs usually takes a
+	 * small amount of time that does not have any weight in big simulations,
+	 * but add a significant overhead in smaller runs or in test cases where the
+	 * graphical output is not even requested.
+	 *
+	 * @param createGraphsInterval iteration interval in which graphs are generated
+	 */
 	@StringSetter( CREATE_GRAPHS_INTERVAL )
 	public void setCreateGraphsInterval(int createGraphsInterval) {
 		this.createGraphsInterval = createGraphsInterval;
+	}
+
+	@StringSetter( CREATE_GRAPHS )
+	@Deprecated
+	public void setCreateGraphs(boolean createGraphs) {
+		log.warn("Parameter 'createGraphs' is deprecated. Using 'createGraphsInterval' instead. The output_config.xml will contain the new parameter.");
+		if (createGraphs) {
+			this.setCreateGraphsInterval(1);
+		} else {
+			this.setCreateGraphsInterval(0);
+		}
 	}
 
 	@StringGetter( OVERWRITE_FILE )

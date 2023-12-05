@@ -176,7 +176,6 @@ public class ControllerConfigGroupTest {
 		//modify by deprecated setter
 		cg.setCreateGraphs(true);
 		Assert.assertEquals(1, cg.getCreateGraphsInterval());
-		Assert.assertEquals(true, cg.getCreateGraphs());
 	}
 
 
