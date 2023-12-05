@@ -46,6 +46,11 @@ public final class RailResourceManager {
 	 */
 	public static final int ANY_TRACK = -1;
 
+	/**
+	 * Constant to indicate than any track is allowed as long as the opposing direction is not blocked.
+	 */
+	public static final int ANY_TRACK_NON_BLOCKING = -2;
+
 	private final EventsManager eventsManager;
 
 	/**
@@ -144,6 +149,7 @@ public final class RailResourceManager {
 			return reservedDist;
 		}
 
+		// avoid deadlocks
 		if (!dla.check(time, link.resource, position)) {
 			return RailResourceInternal.NO_RESERVATION;
 		}

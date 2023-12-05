@@ -116,7 +116,7 @@ public class SimpleDisposition implements TrainDisposition {
 			if (link == currentLink)
 				continue;
 
-			dist = resources.tryBlockLink(time, link, RailResourceManager.ANY_TRACK, position);
+			dist = resources.tryBlockLink(time, link, RailResourceManager.ANY_TRACK_NON_BLOCKING, position);
 
 			if (dist == RailResource.NO_RESERVATION) {
 				stop = true;

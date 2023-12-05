@@ -20,14 +20,15 @@ public interface DeadlockAvoidance {
 	}
 
 	/**
-	 * Check if this resource is allowed to be reserved by the given train.
-	 */
-	boolean check(double time, RailResource resource, TrainPosition position);
-
-	/**
 	 * Called when a resource was reserved.
 	 */
 	void onReserve(double time, RailResource resource, TrainPosition position);
+
+	// TODO: the check might be more upstream to avoid being called multiple times
+	/**
+	 * Check if this resource is allowed to be reserved by the given train.
+	 */
+	boolean check(double time, RailResource resource, TrainPosition position);
 
 	/**
 	 * Called when a resource was released.

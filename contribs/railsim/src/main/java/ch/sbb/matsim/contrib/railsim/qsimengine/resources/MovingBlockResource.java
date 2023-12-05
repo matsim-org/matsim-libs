@@ -78,13 +78,13 @@ final class MovingBlockResource implements RailResourceInternal {
 		TrainEntry entry = reservations.get(position.getDriver());
 
 		// No entry yet
-		if (entry == null && track == RailResourceManager.ANY_TRACK) {
-			track = chooseTrack(link);
+		if (entry == null && track < 0) {
+			track = chooseTrack(link, track);
 
 			// No track was available
-			if (track == RailResourceManager.ANY_TRACK)
+			if (track < 0)
 				return false;
-		} else if (entry != null && track == RailResourceManager.ANY_TRACK) {
+		} else if (entry != null && track < 0) {
 			track = entry.track;
 		} else if (entry != null && track != entry.track) {
 			throw new IllegalStateException("Train is already on a different track.");
@@ -114,8 +114,8 @@ final class MovingBlockResource implements RailResourceInternal {
 		// store trains incoming link
 		if (!reservations.containsKey(position.getDriver())) {
 
-			if (track == RailResourceManager.ANY_TRACK)
-				track = chooseTrack(link);
+			if (track < 0)
+				track = chooseTrack(link, track);
 
 			TrainEntry e = new TrainEntry(track, position, links.size());
 			Track t = tracks[track];
@@ -140,10 +140,12 @@ final class MovingBlockResource implements RailResourceInternal {
 	/**
 	 * Chooses a track for trains that don't have one yet.
 	 */
-	private int chooseTrack(RailLink link) {
+	private int chooseTrack(RailLink link, int mode) {
 		int same = -1;
 		int available = -1;
 		int free = 0;
+
+		assert mode < 0: "Can not give a specific track at this point";
 
 		for (int i = 0; i < tracks.length; i++) {
 			if (tracks[i].incoming == link)
@@ -154,9 +156,12 @@ final class MovingBlockResource implements RailResourceInternal {
 			}
 		}
 
+		// Always try to keep a track in reserve in non blocking mode
+		int newTrack = mode == RailResourceManager.ANY_TRACK_NON_BLOCKING ? 1 : 0;
+
 		// If there is more than one free track, a new one is opened
-		if (same != -1)
-			return free > 1 ? available : same;
+		if (same != -1) // there is a train in the same direction already
+			return free > newTrack ? available : same;
 
 		return available;
 	}
