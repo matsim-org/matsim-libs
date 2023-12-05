@@ -19,6 +19,7 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine.disposition;
 
+import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.DeadlockAvoidance;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResource;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
@@ -38,10 +39,13 @@ public class SimpleDisposition implements TrainDisposition {
 	private final RailResourceManager resources;
 	private final TrainRouter router;
 
+	private final DeadlockAvoidance dla;
+
 	@Inject
-	public SimpleDisposition(RailResourceManager resources, TrainRouter router) {
+	public SimpleDisposition(RailResourceManager resources, TrainRouter router, DeadlockAvoidance dla) {
 		this.resources = resources;
 		this.router = router;
+		this.dla = dla;
 	}
 
 	@Override

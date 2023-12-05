@@ -2,10 +2,10 @@ package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.NoDeadlockAvoidance;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SimpleDisposition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,7 +54,7 @@ public class RailsimEngineMovingBlockTest {
 		RailResourceManager res = new RailResourceManager(eventsManager, config, net);
 		TrainRouter router = new TrainRouter(net, res);
 
-		return new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, config, res, new SimpleDisposition(res, router)), net);
+		return new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, config, res, new SimpleDisposition(res, router, new NoDeadlockAvoidance())), net);
 	}
 
 	private RailsimTestUtils.Holder getTestEngine(String network) {

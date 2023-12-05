@@ -218,4 +218,21 @@ final class TrainState implements TrainPosition {
 	public RailLink getRoute(int idx) {
 		return route.get(idx);
 	}
+
+	@Override
+	public List<RailLink> getRoute(int from, int to) {
+		return route.subList(from, to);
+	}
+
+	@Override
+	public List<RailLink> getRouteUntilNextStop() {
+		int from = routeIdx;
+
+		for (int i = 0; i < route.size(); i++) {
+			if (isStop(route.get(i).getLinkId())) {
+				return route.subList(from, i + 1);
+			}
+		}
+		return route.subList(from, route.size());
+	}
 }

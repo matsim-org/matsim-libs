@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * Interface allowing to query current train position and information.
@@ -58,6 +59,19 @@ public interface TrainPosition {
 	 * Get part of the route.
 	 */
 	RailLink getRoute(int idx);
+
+	/**
+	 * Get part of the route.
+	 *
+	 * @param from from index, inclusive
+	 * @param to   to index, exclusive
+	 */
+	List<RailLink> getRoute(int from, int to);
+
+	/**
+	 * Return the route until the next stop based on the current position.
+	 */
+	List<RailLink> getRouteUntilNextStop();
 
 	/**
 	 * Check whether to stop at certain link.
