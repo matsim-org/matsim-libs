@@ -131,7 +131,7 @@ public class MatsimCountsIOTest {
 	public void testDefaultYear_empty() {
 		Counts counts = new Counts();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		new CountsWriter(counts).write(out);
+		new CountsWriterV1(counts).write(out);
 
 		Counts counts2 = new Counts();
 		ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());

@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.ev;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.matsim.contrib.ev.charging.VehicleChargingHandler;
 import org.matsim.core.controler.AbstractModule;
@@ -26,6 +27,9 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 public class EvModule extends AbstractModule {
 	public static final String EV_COMPONENT = "EV_COMPONENT";
+
+	@Inject
+	private EvConfigGroup evCfg;
 
 	public EvModule(){}
 
@@ -36,7 +40,12 @@ public class EvModule extends AbstractModule {
 		// this is not for DynVehicles.  Does that mean that we cannot combine charging for normal vehicles with charging for eTaxis?  Can't say ...  kai, dec'22
 		installQSimModule(new AbstractQSimModule() {
 			@Override protected void configureQSim() {
-				addMobsimScopeEventHandlerBinding().to( VehicleChargingHandler.class ).in( Singleton.class );
+				bind(VehicleChargingHandler.class).in(Singleton.class);
+				addMobsimScopeEventHandlerBinding().to( VehicleChargingHandler.class);
+				if(evCfg.enforceChargingInteractionDuration){
+					this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(VehicleChargingHandler.class);
+					addMobsimListenerBinding().to(VehicleChargingHandler.class);
+				}
 			}
 		});
 

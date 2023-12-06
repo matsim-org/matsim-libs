@@ -11,7 +11,7 @@
 
   <properties>
     <protobuf.version>3.25.1</protobuf.version>
-    <grpc.version>1.59.0</grpc.version>
+    <grpc.version>1.59.1</grpc.version>
   </properties>
 
   <dependencies>
