@@ -56,7 +56,8 @@ public class SharingMetricsControlerListener implements IterationEndsListener {
 
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
-        boolean createGraphs = event.getServices().getConfig().controller().isCreateGraphs();
+		int createGraphsInterval = event.getServices().getConfig().controller().getCreateGraphsInterval();
+		boolean createGraphs = createGraphsInterval >0 && event.getIteration() % createGraphsInterval == 0;
 
         Map<Id<Request>, Double> sharingFactors = sharingFactorTracker.getSharingFactors();
         Map<Id<Request>, Boolean> poolingRates = sharingFactorTracker.getPoolingRates();
