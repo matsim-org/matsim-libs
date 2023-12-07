@@ -67,7 +67,7 @@ public class SharingMetricsControlerListener implements IterationEndsListener {
                 poolingRates,
                 filename(event, "sharingFactors", ".png"),
                 filename(event, "poolingRates", ".png"),
-                filename(event, "poolingMetrics", ".csv"),
+                filename(event, "sharingMetrics", ".csv"),
                 createGraphs);
 
         double nPooled = poolingRates.values().stream().filter(b -> b).count();
@@ -127,7 +127,7 @@ public class SharingMetricsControlerListener implements IterationEndsListener {
 
 
     private void writeIterationPoolingStats(String summarizePooling, int it) {
-        try (var bw = getAppendingBufferedWriter("drt_pooling_stats", ".csv")) {
+        try (var bw = getAppendingBufferedWriter("drt_sharing_metrics", ".csv")) {
             if (!headerWritten) {
                 headerWritten = true;
                 bw.write(line("runId", "iteration", "poolingRate", "sharingFactor", "nPooled", "nTotal"));
