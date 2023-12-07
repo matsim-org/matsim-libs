@@ -7,9 +7,7 @@ import org.geotools.data.FileDataStoreFactorySpi;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.referencing.CRS;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.*;
 import org.locationtech.jts.index.strtree.AbstractNode;
 import org.locationtech.jts.index.strtree.Boundable;
 import org.locationtech.jts.index.strtree.ItemBoundable;
@@ -35,7 +33,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -64,7 +65,7 @@ public final class ShpOptions {
 	 * Constructor to use shape options manually.
 	 */
 	public ShpOptions(Path shp, @Nullable String shpCrs, @Nullable Charset shpCharset) {
-		this.shp = shp.toString();
+		this.shp = shp == null ? null : shp.toString();
 		this.shpCrs = shpCrs;
 		this.shpCharset = shpCharset;
 	}
@@ -169,19 +170,24 @@ public final class ShpOptions {
 		if (features.isEmpty()) {
 			throw new IllegalStateException("There is no feature in the shape file. Aborting...");
 		}
-		Geometry geometry = (Geometry) features.iterator().next().getDefaultGeometry();
-		if (features.size() > 1) {
-			for (SimpleFeature simpleFeature : features) {
-				if (simpleFeature.getDefaultGeometry() == null) {
-					log.warn("Features {} has no geometry", simpleFeature);
-					continue;
-				}
 
-				Geometry subArea = (Geometry) simpleFeature.getDefaultGeometry();
-				geometry = geometry.union(subArea);
-			}
+		if (features.size() == 1) {
+            return (Geometry) features.iterator().next().getDefaultGeometry();
 		}
-		return geometry;
+
+		GeometryFactory factory = ((Geometry) features.iterator().next().getDefaultGeometry()).getFactory();
+
+		GeometryCollection geometryCollection = (GeometryCollection) factory.buildGeometry(
+			features.stream()
+				.filter(f -> f.getDefaultGeometry() != null)
+				.map(f -> (Geometry) f.getDefaultGeometry()).toList()
+		);
+
+		if (geometryCollection.isEmpty()) {
+			throw new IllegalStateException("There are noe geometries in the shape file.");
+		}
+
+		return geometryCollection.union();
 	}
 
 	/**
