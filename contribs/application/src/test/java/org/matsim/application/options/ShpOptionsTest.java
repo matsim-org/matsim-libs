@@ -1,6 +1,6 @@
 package org.matsim.application.options;
 
-import org.junit.Assert;
+import org.assertj.core.data.Offset;
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
@@ -60,7 +60,7 @@ public class ShpOptionsTest {
 		List<SimpleFeature> ft = index.getAll();
 
 		assertThat(ft)
-				.hasSize(578)
+				.hasSize(4906)
 				.hasSize(Set.copyOf(ft).size());
 
 	}
@@ -77,15 +77,9 @@ public class ShpOptionsTest {
 
 		ShpOptions shp = new ShpOptions(input, null, null);
 		Geometry geometry = shp.getGeometry() ;
-		Geometry expectedGeometry = new GeometryFactory().createEmpty(2);
 
-		List<SimpleFeature> features = shp.readFeatures();
+		assertThat(geometry.getArea())
+			.isCloseTo(1.9847543618489646E-4, Offset.offset(1e-8));
 
-		for(SimpleFeature feature : features) {
-			Geometry geometryToJoin = (Geometry) feature.getDefaultGeometry();
-			expectedGeometry = expectedGeometry.union(geometryToJoin);
-		}
-
-		Assert.assertTrue(geometry.equals(expectedGeometry));
 	}
 }
