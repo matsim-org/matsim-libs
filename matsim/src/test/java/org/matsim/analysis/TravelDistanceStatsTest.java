@@ -337,23 +337,33 @@ public class TravelDistanceStatsTest {
 
 	private void performTest(IdMap<Person, Plan> map, String outputDirectory) {
 
+		TravelDistanceStats travelDistanceStats = getTravelDistanceStats(outputDirectory);
+
+		travelDistanceStats.addIteration(0, map);
+		travelDistanceStats.writeOutput(0, false);
+		readAndValidateValues(0, person1legsum + person2legsum + person3legsum, 12,
+				person1TotalNumberOfLegs + person2TotalNumberOfLegs + person3TotalNumberOfLegs);
+
+		map.remove(person2.getId());
+		travelDistanceStats.addIteration(1, map);
+		travelDistanceStats.writeOutput(1, false);
+		readAndValidateValues(1, person1legsum + person3legsum, 8, person1TotalNumberOfLegs + person3TotalNumberOfLegs);
+
+		map.remove(person3.getId());
+		travelDistanceStats.addIteration(2, map);
+		travelDistanceStats.writeOutput(2, false);
+		readAndValidateValues(2, person1legsum, 6, person1TotalNumberOfLegs);
+		travelDistanceStats.close();
+	}
+
+	private static TravelDistanceStats getTravelDistanceStats(String outputDirectory) {
 		ControllerConfigGroup controllerConfigGroup = new ControllerConfigGroup();
 		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(outputDirectory,
 				OverwriteFileSetting.overwriteExistingFiles, CompressionType.gzip);
 		controllerConfigGroup.setCreateGraphs(true);
 		controllerConfigGroup.setFirstIteration(0);
 		controllerConfigGroup.setLastIteration(10);
-		TravelDistanceStats travelDistanceStats = new TravelDistanceStats(controllerConfigGroup, controlerIO, new GlobalConfigGroup());
-		travelDistanceStats.addIteration(0, map);
-		readAndValidateValues(0, person1legsum + person2legsum + person3legsum, 12,
-				person1TotalNumberOfLegs + person2TotalNumberOfLegs + person3TotalNumberOfLegs);
-		map.remove(person2.getId());
-		travelDistanceStats.addIteration(1, map);
-		readAndValidateValues(1, person1legsum + person3legsum, 8, person1TotalNumberOfLegs + person3TotalNumberOfLegs);
-		map.remove(person3.getId());
-		travelDistanceStats.addIteration(2, map);
-		readAndValidateValues(2, person1legsum, 6, person1TotalNumberOfLegs);
-		travelDistanceStats.close();
+        return new TravelDistanceStats(controllerConfigGroup, controlerIO, new GlobalConfigGroup());
 	}
 
 	private void readAndValidateValues(int itr, Double legSum, int totalTrip, long totalLeg) {
@@ -385,6 +395,7 @@ public class TravelDistanceStatsTest {
 				}
 				iteration++;
 			}
+			Assert.assertEquals("There are too less entries.", itr, iteration);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

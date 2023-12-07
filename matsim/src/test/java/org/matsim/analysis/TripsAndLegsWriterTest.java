@@ -23,8 +23,8 @@ package org.matsim.analysis;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.analysis.TripsAndLegsCSVWriter.NoLegsWriterExtension;
-import org.matsim.analysis.TripsAndLegsCSVWriter.NoTripWriterExtension;
+import org.matsim.analysis.TripsAndLegsWriter.NoLegsWriterExtension;
+import org.matsim.analysis.TripsAndLegsWriter.NoTripWriterExtension;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -60,7 +60,7 @@ import java.util.*;
  * @author Aravind
  *
  */
-public class TripsAndLegsCSVWriterTest {
+public class TripsAndLegsWriterTest {
 
 	Config config = ConfigUtils.createConfig();
 	Scenario scenario = ScenarioUtils.createScenario(config);
@@ -164,19 +164,19 @@ public class TripsAndLegsCSVWriterTest {
 	}
 
 	private void performTest(String tripsFilename, String legsFilename, IdMap<Person, Plan> map, AnalysisMainModeIdentifier mainModeIdentifier) {
-		TripsAndLegsCSVWriter.NoTripWriterExtension tripsWriterExtension = new NoTripWriterExtension();
-		TripsAndLegsCSVWriter.NoLegsWriterExtension legWriterExtension = new NoLegsWriterExtension();
-		TripsAndLegsCSVWriter.CustomTimeWriter timeWriter = new TripsAndLegsCSVWriter.DefaultTimeWriter();
-		TripsAndLegsCSVWriter.CustomTripsWriterExtension customTripsWriterExtension = new CustomTripsWriterExtesion();
-		TripsAndLegsCSVWriter.CustomLegsWriterExtension customLegsWriterExtension = new CustomLegsWriterExtesion();
-		TripsAndLegsCSVWriter tripsAndLegsWriter = new TripsAndLegsCSVWriter(scenario, tripsWriterExtension,
+		TripsAndLegsWriter.NoTripWriterExtension tripsWriterExtension = new NoTripWriterExtension();
+		TripsAndLegsWriter.NoLegsWriterExtension legWriterExtension = new NoLegsWriterExtension();
+		TripsAndLegsWriter.CustomTimeWriter timeWriter = new TripsAndLegsWriter.DefaultTimeWriter();
+		TripsAndLegsWriter.CustomTripsWriterExtension customTripsWriterExtension = new CustomTripsWriterExtesion();
+		TripsAndLegsWriter.CustomLegsWriterExtension customLegsWriterExtension = new CustomLegsWriterExtesion();
+		TripsAndLegsWriter tripsAndLegsWriter = new TripsAndLegsWriter(scenario, tripsWriterExtension,
 				legWriterExtension, mainModeIdentifier, timeWriter);
 		tripsAndLegsWriter.write(map, tripsFilename, legsFilename);
 		readTripsFromPlansFile(map, mainModeIdentifier);
 		readAndValidateTrips(persontrips, tripsFilename);
 		readLegsFromPlansFile(map);
 		readAndValidateLegs(legsfromplan, legsFilename);
-		TripsAndLegsCSVWriter tripsAndLegsWriterTest = new TripsAndLegsCSVWriter(scenario, customTripsWriterExtension,
+		TripsAndLegsWriter tripsAndLegsWriterTest = new TripsAndLegsWriter(scenario, customTripsWriterExtension,
 				customLegsWriterExtension, mainModeIdentifier, timeWriter);
 		tripsAndLegsWriterTest.write(map, tripsFilename, legsFilename);
 	}
@@ -671,7 +671,7 @@ public class TripsAndLegsCSVWriterTest {
 		NetworkUtils.writeNetwork(network, utils.getOutputDirectory() + "/network.xml");
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(utils.getOutputDirectory() + "/network.xml");
 	}
-	private static class CustomTripsWriterExtesion implements TripsAndLegsCSVWriter.CustomTripsWriterExtension{
+	private static class CustomTripsWriterExtesion implements TripsAndLegsWriter.CustomTripsWriterExtension{
 
 		@Override
 		public String[] getAdditionalTripHeader() {
@@ -701,7 +701,7 @@ public class TripsAndLegsCSVWriterTest {
 
 	}
 
-	static class CustomLegsWriterExtesion implements TripsAndLegsCSVWriter.CustomLegsWriterExtension {
+	static class CustomLegsWriterExtesion implements TripsAndLegsWriter.CustomLegsWriterExtension {
 		@Override
 		public String[] getAdditionalLegHeader() {
 			String[] legHeader = new String[]{"isIntermodalWalkPt"};

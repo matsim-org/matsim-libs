@@ -161,5 +161,22 @@ public class ControllerConfigGroupTest {
 		Assert.assertEquals(42, cg.getWriteSnapshotsInterval());
 	}
 
+	@Test
+	public void testCreateGraphsInterval() {
+		ControllerConfigGroup cg = new ControllerConfigGroup();
+		//initial value
+		Assert.assertEquals(1, cg.getCreateGraphsInterval());
+		//modify by string
+		cg.addParam("createGraphsInterval", "10");
+		Assert.assertEquals(10, cg.getCreateGraphsInterval());
+		//modify by setter
+		cg.setCreateGraphsInterval(42);
+		Assert.assertEquals("42", cg.getValue("createGraphsInterval"));
+		Assert.assertEquals(42, cg.getCreateGraphsInterval());
+		//modify by deprecated setter
+		cg.setCreateGraphs(true);
+		Assert.assertEquals(1, cg.getCreateGraphsInterval());
+	}
+
 
 }

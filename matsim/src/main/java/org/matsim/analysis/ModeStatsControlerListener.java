@@ -73,7 +73,6 @@ public final class ModeStatsControlerListener implements StartupListener, Iterat
 	private final String modeFileName;
 	private final String delimiter;
 
-	private final boolean createPNG;
 	private final ControllerConfigGroup controllerConfigGroup;
 
 	Map<String,Map<Integer,Double>> modeHistories = new HashMap<>();
@@ -94,7 +93,6 @@ public final class ModeStatsControlerListener implements StartupListener, Iterat
 		this.population = population1;
 		this.modeFileName = controlerIO.getOutputFilename(FILENAME_MODESTATS);
 		this.delimiter = globalConfigGroup.getDefaultDelimiter();
-		this.createPNG = controllerConfigGroup.isCreateGraphs();
 		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
@@ -105,7 +103,8 @@ public final class ModeStatsControlerListener implements StartupListener, Iterat
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		collectModeShareInfo(event) ;
+		collectModeShareInfo(event);
+		writeOutput(event);
 	}
 
 	private void collectModeShareInfo(final IterationEndsEvent event) {
@@ -156,7 +155,53 @@ public final class ModeStatsControlerListener implements StartupListener, Iterat
 			}
 			modeHistory.put( event.getIteration(), share ) ;
 		}
+		modeCnt.clear();
+	}
 
+	void writeOutput(IterationEndsEvent event) {
+		writeCsv(event);
+
+		if (isWriteGraphs(event)) {
+			writePngs();
+		}
+	}
+
+	private boolean isWriteGraphs(IterationEndsEvent event) {
+		return this.controllerConfigGroup.getCreateGraphsInterval() > 0 &&
+			event.getIteration() % this.controllerConfigGroup.getCreateGraphsInterval() == 0 &&
+			event.getIteration() > this.minIteration;
+	}
+
+	private void writePngs() {
+		// create chart when data of more than one iteration is available.
+		XYLineChart chart = new XYLineChart("Mode Statistics", "iteration", "mode");
+		for ( Entry<String, Map<Integer, Double>> entry : this.modeHistories.entrySet() ) {
+			String mode = entry.getKey() ;
+			Map<Integer, Double> history = entry.getValue() ;
+			chart.addSeries(mode, history ) ;
+		}
+		chart.addMatsimLogo();
+		chart.saveAsPng(this.modeFileName + ".png", 800, 600);
+
+		/////// EDIT: STACKED_BAR ///////////////////////////////////////////////////////
+		// create chart when data of more than one iteration is available.
+		StackedBarChart chart2 = new StackedBarChart("Mode Statistics", "iteration", "share");
+		for (Entry<String, Map<Integer, Double>> entry : this.modeHistories.entrySet()) {
+			String mode = entry.getKey();
+			Map<Integer, Double> history = entry.getValue();
+			double[] historyArray = new double[history.size()];
+			int i = 0;
+			for ( Entry<Integer,Double> entryHistory : history.entrySet() ) {
+				historyArray[i] = entryHistory.getValue();
+				i++;
+			}
+			chart2.addSeries(mode, historyArray);
+		}
+		chart2.addMatsimLogo();
+		chart2.saveAsPng(this.modeFileName + "_stackedbar.png", 800, 600);
+	}
+
+	private void writeCsv(IterationEndsEvent event) {
 		try (BufferedWriter modeOut = IOUtils.getBufferedWriter(this.modeFileName + ".csv")) {
 			modeOut.write("iteration");
 			for ( String mode : modes ) {
@@ -176,65 +221,5 @@ public final class ModeStatsControlerListener implements StartupListener, Iterat
 			e.printStackTrace();
 			throw new UncheckedIOException(e);
 		}
-
-
-		// yyyy the following does not work!!
-		// Why? The charts seem to be useful (JB, April 2017)
-		if (this.createPNG && event.getIteration() > this.minIteration) {
-			// create chart when data of more than one iteration is available.
-			XYLineChart chart = new XYLineChart("Mode Statistics", "iteration", "mode");
-			for ( Entry<String, Map<Integer, Double>> entry : this.modeHistories.entrySet() ) {
-				String mode = entry.getKey() ;
-				Map<Integer, Double> history = entry.getValue() ;
-//				log.warn( "about to add the following series:" ) ;
-//				for ( Entry<Integer, Double> item : history.entrySet() ) {
-//					log.warn( item.getKey() + " -- " + item.getValue() );
-//				}
-				chart.addSeries(mode, history ) ;
-			}
-			chart.addMatsimLogo();
-			chart.saveAsPng(this.modeFileName + ".png", 800, 600);
-
-			/////// EDIT: STACKED_BAR ///////////////////////////////////////////////////////
-			if (event.getIteration() > this.minIteration) {
-				// create chart when data of more than one iteration is available.
-				StackedBarChart chart2 = new StackedBarChart("Mode Statistics", "iteration", "share");
-				for (Entry<String, Map<Integer, Double>> entry : this.modeHistories.entrySet()) {
-					String mode = entry.getKey();
-					Map<Integer, Double> history = entry.getValue();
-					double[] historyArray = new double[history.size()];
-					int i = 0;
-					for ( Entry<Integer,Double> entryHistory : history.entrySet() ) {
-						historyArray[i] = entryHistory.getValue();
-						i++;
-					}
-					chart2.addSeries(mode, historyArray);
-				}
-				chart2.addMatsimLogo();
-				chart2.saveAsPng(this.modeFileName + "_stackedbar.png", 800, 600);
-			}
-		}
-		modeCnt.clear();
 	}
-
-	public final Map<String, Map<Integer, Double>> getModeHistories() {
-		return Collections.unmodifiableMap( this.modeHistories ) ;
-	}
-
-	////////////copied methods - to not depend on dvrp ///////////////////////////////////////////////////////
-	private void makeStayTaskSeriesGrey(XYPlot plot) {
-		XYDataset dataset = plot.getDataset(0);
-		for (int i = 0; i < dataset.getSeriesCount(); i++) {
-			plot.getRenderer().setSeriesPaint(i, Color.LIGHT_GRAY);
-			return;
-		}
-	}
-	private static void saveAsPNG(JFreeChart chart, String filename, int width, int height) {
-		try {
-			ChartUtils.writeChartAsPNG(new FileOutputStream(filename + ".png"), chart, width, height);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
