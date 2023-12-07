@@ -143,7 +143,9 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 		paramFields = getParamFields();
 		registeredParams = Sets.union(stringGetters.keySet(), paramFields.keySet());
 
-		checkModuleConsistency(setters.keySet().equals(stringGetters.keySet()), "setters and getters inconsistent");
+		// Each parameter which has a setter must have a getter. But there can be parameters which have a getter but no setter in order
+		// to provide backwards compatibility.
+		checkModuleConsistency(setters.keySet().containsAll(stringGetters.keySet()), "setters and getters inconsistent");
 		checkModuleConsistency(paramFields.keySet().stream().noneMatch(setters::containsKey),
 				"Use either StringGetter/Setter or Parameter annotations");
 	}

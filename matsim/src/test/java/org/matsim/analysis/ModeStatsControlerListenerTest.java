@@ -460,6 +460,7 @@ public class ModeStatsControlerListenerTest {
 				}
 				iteration++;
 			}
+			Assert.assertEquals(itr, iteration);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

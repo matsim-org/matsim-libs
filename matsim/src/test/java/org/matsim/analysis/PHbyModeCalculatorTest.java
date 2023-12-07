@@ -93,28 +93,28 @@ public class PHbyModeCalculatorTest {
 		controllerConfigGroup.setCreateGraphs(true);
 		controllerConfigGroup.setFirstIteration(0);
 		controllerConfigGroup.setLastIteration(10);
-		PHbyModeCalculator phbyModeCalculator = new PHbyModeCalculator(controllerConfigGroup, controlerIO, new GlobalConfigGroup());
+		PHbyModeCalculator phbyModeCalculator = new PHbyModeCalculator(controlerIO, new GlobalConfigGroup());
 
 		phbyModeCalculator.addIteration(1, map);
-		phbyModeCalculator.writeOutput();
+		phbyModeCalculator.writeOutput(false);
 		readAndValidateValues(1, map);
 
 		// removing person 2
 		map.remove(person2);
 		phbyModeCalculator.addIteration(2, map);
-		phbyModeCalculator.writeOutput();
+		phbyModeCalculator.writeOutput(false);
 		readAndValidateValues(2, map);
 
 		// removing person 3
 		map.remove(person3);
 		phbyModeCalculator.addIteration(3, map);
-		phbyModeCalculator.writeOutput();
+		phbyModeCalculator.writeOutput(false);
 		readAndValidateValues(3, map);
 
 		// removing person 4
 		map.remove(person4);
 		phbyModeCalculator.addIteration(4, map);
-		phbyModeCalculator.writeOutput();
+		phbyModeCalculator.writeOutput(false);
 		readAndValidateValues(4, map);
 	}
 

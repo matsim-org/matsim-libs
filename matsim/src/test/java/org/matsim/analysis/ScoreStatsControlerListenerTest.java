@@ -551,9 +551,12 @@ public class ScoreStatsControlerListenerTest {
 						0);
 				Assert.assertEquals("avg average score does not match", (getScore(population, "avgaverage")/getNoOfPlans(population)), avgAverage,
 						0);
+				break;
 			}
 			iteration++;
 		}
+
+		Assert.assertEquals(itr, iteration);
 
 		Assertions.assertThat(new File(outDir, "scorestats_group1.csv"))
 			.isFile();

@@ -178,7 +178,7 @@ import java.io.UncheckedIOException;
         } catch (UncheckedIOException e) {
             log.error("Could not write stopwatch file.", e);
         }
-        if (config.controller().isCreateGraphs()) {
+        if (config.controller().getCreateGraphsInterval() > 0 && iteration % config.controller().getCreateGraphsInterval() == 0) {
             this.getStopwatch().writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch.png", ControllerConfigGroup.CompressionType.none));
         }
         log.info(MARKER + "ITERATION " + iteration + " ENDS");
