@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.sharingfactor;
+package org.matsim.contrib.drt.sharingmetrics;
 
 import com.google.inject.Inject;
 import org.jfree.chart.ChartFactory;
@@ -26,11 +26,11 @@ import java.util.stream.Collectors;
 /**
  * @author nkuehnel / MOIA
  */
-public class SharingFactorControlerListener implements IterationEndsListener {
+public class SharingMetricsControlerListener implements IterationEndsListener {
     private final MatsimServices matsimServices;
 
     private final DrtConfigGroup drtConfigGroup;
-    private final SharingFactorTracker sharingFactorTracker;
+    private final SharingMetricsTracker sharingFactorTracker;
 
     private boolean headerWritten = false;
 
@@ -42,10 +42,10 @@ public class SharingFactorControlerListener implements IterationEndsListener {
 
 
     @Inject
-    public SharingFactorControlerListener(Config config,
-                                          DrtConfigGroup drtConfigGroup,
-                                          SharingFactorTracker sharingFactorTracker,
-                                          MatsimServices matsimServices) {
+    public SharingMetricsControlerListener(Config config,
+										   DrtConfigGroup drtConfigGroup,
+										   SharingMetricsTracker sharingFactorTracker,
+										   MatsimServices matsimServices) {
         this.drtConfigGroup = drtConfigGroup;
         this.sharingFactorTracker = sharingFactorTracker;
         this.matsimServices = matsimServices;
@@ -61,7 +61,7 @@ public class SharingFactorControlerListener implements IterationEndsListener {
         Map<Id<Request>, Double> sharingFactors = sharingFactorTracker.getSharingFactors();
         Map<Id<Request>, Boolean> poolingRates = sharingFactorTracker.getPoolingRates();
 
-        writeAndPlotShiftEfficiency(
+        writeAndPlotSharingMetrics(
                 sharingFactors,
                 poolingRates,
                 filename(event, "sharingFactors", ".png"),
@@ -77,7 +77,7 @@ public class SharingFactorControlerListener implements IterationEndsListener {
         writeIterationPoolingStats(meanPoolingRate + delimiter + meanSharingFactor + delimiter + nPooled +delimiter + nTotal, event.getIteration());
     }
 
-    private void writeAndPlotShiftEfficiency(Map<Id<Request>, Double> sharingFactorByRequest,
+    private void writeAndPlotSharingMetrics(Map<Id<Request>, Double> sharingFactorByRequest,
                                              Map<Id<Request>, Boolean> rates,
                                              String sharingFactors,
                                              String poolingRates,

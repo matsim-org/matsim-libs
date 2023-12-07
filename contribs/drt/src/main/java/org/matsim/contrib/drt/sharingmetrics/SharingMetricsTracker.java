@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.sharingfactor;
+package org.matsim.contrib.drt.sharingmetrics;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -16,7 +16,7 @@ import java.util.*;
 /**
  * @author nkuehnel / MOIA
  */
-public class SharingFactorTracker implements PassengerPickedUpEventHandler, PassengerDroppedOffEventHandler, MobsimBeforeCleanupListener {
+public class SharingMetricsTracker implements PassengerPickedUpEventHandler, PassengerDroppedOffEventHandler, MobsimBeforeCleanupListener {
 
 	private final GroupPredicate groupPredicate;
 
@@ -31,12 +31,10 @@ public class SharingFactorTracker implements PassengerPickedUpEventHandler, Pass
 	private final Map<Id<Request>, Boolean> poolingRate = new HashMap<>();
 
 	public interface GroupPredicate {
-		default boolean isGroupRepresentative(Id<Person> personId) {
-			return true;
-		}
+		boolean isGroupRepresentative(Id<Person> personId);
 	}
 
-	public SharingFactorTracker(GroupPredicate groupPredicate) {
+	public SharingMetricsTracker(GroupPredicate groupPredicate) {
 		this.groupPredicate = groupPredicate;
 	}
 

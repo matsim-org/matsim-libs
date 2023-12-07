@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.sharingfactor;
+package org.matsim.contrib.drt.sharingmetrics;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -20,7 +20,7 @@ import java.util.Set;
 public class SharingFactorTest {
 
 	/**
-	 * Test method for {@link SharingFactorTracker}.
+	 * Test method for {@link SharingMetricsTracker}.
 	 */
 	@Test
 	public void testDrtSharingFactorHandler() {
@@ -39,7 +39,7 @@ public class SharingFactorTest {
 
 
 		ParallelEventsManager events = new ParallelEventsManager(false);
-		SharingFactorTracker sharingFactorTracker = new SharingFactorTracker(new SharingFactorTracker.GroupPredicate() {
+		SharingMetricsTracker sharingFactorTracker = new SharingMetricsTracker(new SharingMetricsTracker.GroupPredicate() {
 			@Override
 			public boolean isGroupRepresentative(Id<Person> personId) {
 				return groupRepresentatives.contains(personId);
