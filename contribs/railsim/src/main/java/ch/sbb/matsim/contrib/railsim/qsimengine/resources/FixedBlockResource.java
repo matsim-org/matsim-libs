@@ -67,6 +67,11 @@ final class FixedBlockResource implements RailResourceInternal {
 	}
 
 	@Override
+	public Id<RailResource> getId() {
+		return id;
+	}
+
+	@Override
 	public ResourceType getType() {
 		return ResourceType.fixedBlock;
 	}
@@ -74,6 +79,11 @@ final class FixedBlockResource implements RailResourceInternal {
 	@Override
 	public List<RailLink> getLinks() {
 		return links;
+	}
+
+	@Override
+	public int getTotalCapacity() {
+		return capacity;
 	}
 
 	@Override

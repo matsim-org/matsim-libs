@@ -28,8 +28,8 @@ public interface DeadlockAvoidance {
 	void onReserve(double time, RailResource resource, TrainPosition position);
 
 	/**
-	 * Check if a segment of links may produce a deadlock.
-	 * @return the link that should not be reserved in order to avoid deadlock, or null if no deadlock is detected.
+	 * Check if reserving a segment of links may produce a deadlock.
+	 * @return the first link that should not be reserved in order to avoid deadlock, or null if no deadlock is detected.
 	 */
 	@Nullable
 	RailLink check(double time, List<RailLink> segment, TrainPosition position);

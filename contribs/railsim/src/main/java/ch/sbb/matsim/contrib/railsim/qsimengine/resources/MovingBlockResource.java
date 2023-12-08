@@ -18,6 +18,7 @@ final class MovingBlockResource implements RailResourceInternal {
 	private final Id<RailResource> id;
 	private final List<RailLink> links;
 	private final Track[] tracks;
+	private final int capacity;
 
 	/**
 	 * Links that are reserved by trains.
@@ -33,7 +34,7 @@ final class MovingBlockResource implements RailResourceInternal {
 		this.id = id;
 		this.links = links;
 
-		int capacity = links.stream().mapToInt(l -> l.tracks).min().orElseThrow();
+		this.capacity = links.stream().mapToInt(l -> l.tracks).min().orElseThrow();
 		this.tracks = new Track[capacity];
 
 		for (int i = 0; i < capacity; i++) {
@@ -48,6 +49,11 @@ final class MovingBlockResource implements RailResourceInternal {
 	}
 
 	@Override
+	public Id<RailResource> getId() {
+		return id;
+	}
+
+	@Override
 	public ResourceType getType() {
 		return ResourceType.movingBlock;
 	}
@@ -55,6 +61,11 @@ final class MovingBlockResource implements RailResourceInternal {
 	@Override
 	public List<RailLink> getLinks() {
 		return links;
+	}
+
+	@Override
+	public int getTotalCapacity() {
+		return capacity;
 	}
 
 	@Override
