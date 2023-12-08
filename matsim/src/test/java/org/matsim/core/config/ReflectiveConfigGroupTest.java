@@ -32,13 +32,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ReflectiveConfigGroup.InconsistentModuleException;
+import org.matsim.testcases.MatsimJunit5Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 import com.google.common.collect.ImmutableSet;
@@ -46,9 +46,7 @@ import com.google.common.collect.ImmutableSet;
 /**
  * @author thibautd
  */
-public class ReflectiveConfigGroupTest {
-	@Rule
-	public final MatsimTestUtils utils = new MatsimTestUtils();
+public class ReflectiveConfigGroupTest extends MatsimJunit5Test {
 
 	@Test
 	public void testDumpAndRead() {
@@ -128,7 +126,7 @@ public class ReflectiveConfigGroupTest {
 		Config dumpedConfig = new Config();
 		dumpedConfig.addModule(dumpedModule);
 
-		String fileName = utils.getOutputDirectory() + "/dump.xml";
+		String fileName = getOutputDirectory() + "/dump.xml";
 
 		new ConfigWriter(dumpedConfig).write(fileName);
 		Config readConfig = ConfigUtils.loadConfig(fileName);
@@ -141,7 +139,7 @@ public class ReflectiveConfigGroupTest {
 
 	@Test
 	public void testReadCollectionsIncludingEmptyString() {
-		String fileName = utils.getInputDirectory() + "/config_with_blank_comma_separated_elements.xml";
+		String fileName = getInputDirectory() + "/config_with_blank_comma_separated_elements.xml";
 		final Config readConfig = ConfigUtils.loadConfig(fileName);
 		final MyModule readModule = new MyModule();
 		// as a side effect, this loads the information
@@ -362,7 +360,7 @@ public class ReflectiveConfigGroupTest {
 		final String param = "my unknown param";
 		final String value = "my val";
 		testee.addParam(param, value);
-		Assert.assertEquals("unexpected stored value", value, testee.getValue(param));
+		Assertions.assertEquals(value, testee.getValue(param), "unexpected stored value");
 	}
 
 	@Test
