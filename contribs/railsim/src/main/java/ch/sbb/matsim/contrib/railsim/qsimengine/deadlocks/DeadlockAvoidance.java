@@ -1,10 +1,13 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks;
 
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,11 +27,12 @@ public interface DeadlockAvoidance {
 	 */
 	void onReserve(double time, RailResource resource, TrainPosition position);
 
-	// TODO: the check might be more upstream to avoid being called multiple times
 	/**
-	 * Check if this resource is allowed to be reserved by the given train.
+	 * Check if a segment of links may produce a deadlock.
+	 * @return the link that should not be reserved in order to avoid deadlock, or null if no deadlock is detected.
 	 */
-	boolean check(double time, RailResource resource, TrainPosition position);
+	@Nullable
+	RailLink check(double time, List<RailLink> segment, TrainPosition position);
 
 	/**
 	 * Called when a resource was released.

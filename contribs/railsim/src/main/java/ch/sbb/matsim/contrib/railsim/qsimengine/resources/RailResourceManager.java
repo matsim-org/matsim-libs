@@ -137,6 +137,12 @@ public final class RailResourceManager {
 		return links.get(id);
 	}
 
+
+	public RailLink checkForDeadlocks(double time, List<RailLink> segment, TrainPosition position) {
+
+		return dla.check(time, segment, position);
+	}
+
 	/**
 	 * Try to block a track and the underlying resource and return the allowed distance.
 	 */
@@ -147,11 +153,6 @@ public final class RailResourceManager {
 		// return only fully reserved links
 		if (reservedDist != RailResourceInternal.NO_RESERVATION && reservedDist == link.length) {
 			return reservedDist;
-		}
-
-		// avoid deadlocks
-		if (!dla.check(time, link.resource, position)) {
-			return RailResourceInternal.NO_RESERVATION;
 		}
 
 		if (link.resource.hasCapacity(time, link, track, position)) {

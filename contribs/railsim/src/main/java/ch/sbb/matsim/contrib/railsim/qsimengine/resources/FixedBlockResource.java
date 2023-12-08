@@ -45,8 +45,9 @@ final class FixedBlockResource implements RailResourceInternal {
 
 	/**
 	 * Tracks drivers that have at least one reservation on any link os this resource.
+	 * The link a driver used to enter the resource is stored for each.
 	 */
-	private final Set<MobsimDriverAgent> reservations;
+	private final Map<MobsimDriverAgent, RailLink> reservations;
 
 	/**
 	 * Maximum number of reservations.
@@ -57,7 +58,7 @@ final class FixedBlockResource implements RailResourceInternal {
 		this.id = id;
 		this.links = links;
 		this.capacity = links.stream().mapToInt(l -> l.tracks).min().orElseThrow();
-		this.reservations = new HashSet<>(capacity);
+		this.reservations = new HashMap<>(capacity);
 		this.tracks = new HashMap<>(links.size());
 
 		for (RailLink link : links) {
@@ -92,12 +93,28 @@ final class FixedBlockResource implements RailResourceInternal {
 			throw new IllegalArgumentException("Fixed block does not support choosing individual tracks.");
 
 		// there is no need to check the individual tracks here
-		if (reservations.contains(position.getDriver())) {
+		if (reservations.containsKey(position.getDriver())) {
 			return true;
 		}
 
-		return reservations.size() < capacity;
+		// Can return any free track
+		if (track == RailResourceManager.ANY_TRACK)
+			return reservations.size() < capacity;
+
+		assert track == RailResourceManager.ANY_TRACK_NON_BLOCKING;
+
+		boolean samePresent = false;
+		for (RailLink enterLink : reservations.values()) {
+			if (enterLink == link) {
+				samePresent = true;
+				break;
+			}
+		}
+
+		// if same direction is already used, one extra track needs to be available
+		return samePresent ? reservations.size() < capacity - 1 : reservations.size() < capacity;
 	}
+
 
 	@Override
 	public double getReservedDist(RailLink link, TrainPosition position) {
@@ -117,9 +134,11 @@ final class FixedBlockResource implements RailResourceInternal {
 		if (track >= 0)
 			throw new IllegalArgumentException("Fixed block does not support choosing individual tracks.");
 
-		// TODO: check direction of incoming train, to support ANY_TRACK and ANY_TRACK_NON_BLOCKING
+		assert position.getDriver() != null: "Driver must not be null.";
 
-		reservations.add(position.getDriver());
+		// store the link the driver used to enter the resource
+		if (!reservations.containsKey(position.getDriver()))
+			reservations.put(position.getDriver(), link);
 
 		if (reservations.size() > capacity) {
 			throw new IllegalStateException("Too many reservations. Capacity needs to be checked before calling reserve.");

@@ -19,9 +19,11 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
+import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.analysis.RailsimCsvWriter;
 import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
@@ -36,6 +38,8 @@ import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 import org.matsim.vehicles.MatsimVehicleReader;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -99,6 +103,22 @@ public class RailsimTestUtils {
 		Mockito.when(driver.getVehicle()).thenReturn(mobVeh);
 
 		test.engine.handleDeparture(time, driver, route.getStartLinkId(), route);
+	}
+
+	/**
+	 * Create a RailLink for testing.
+	 */
+	public static RailLink createLink(double length, int trainCapacity) {
+
+		Link link = Mockito.mock(Link.class, Answers.RETURNS_MOCKS);
+
+		AttributesImpl attr = new AttributesImpl();
+		Mockito.when(link.getAttributes()).thenReturn(attr);
+		Mockito.when(link.getLength()).thenReturn(length);
+
+		RailsimUtils.setTrainCapacity(link, trainCapacity);
+
+		return new RailLink(link);
 	}
 
 	/**
