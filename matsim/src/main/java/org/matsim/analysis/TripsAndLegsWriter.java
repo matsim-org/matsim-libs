@@ -79,7 +79,7 @@ public class TripsAndLegsWriter {
     private static final Logger log = LogManager.getLogger(TripsAndLegsWriter.class);
 
 	@Inject
-	TripsAndLegsWriter(Scenario scenario, CustomTripsWriterExtension tripsWriterExtension, CustomLegsWriterExtension legWriterExtension,
+	public TripsAndLegsWriter(Scenario scenario, CustomTripsWriterExtension tripsWriterExtension, CustomLegsWriterExtension legWriterExtension,
 					   AnalysisMainModeIdentifier mainModeIdentifier, CustomTimeWriter customTimeWriter) {
 		this.scenario = scenario;
 		this.tripsWriterExtension = tripsWriterExtension;
