@@ -16,7 +16,7 @@ public class ScenarioTest {
 	protected Injector injector;
 
 	@RegisterExtension
-	private MatsimTestUtils utils = new MatsimTestUtils();
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Before
 	public void setUp() throws Exception {

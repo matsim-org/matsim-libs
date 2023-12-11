@@ -22,6 +22,7 @@
 package org.matsim.freight.carriers.analysis;
 
 import org.junit.*;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
