@@ -1,6 +1,6 @@
 package org.matsim.contrib.accessibility.utils;
 
-import org.json.simple.JSONValue;
+import com.google.gson.Gson;
 import org.matsim.api.core.v01.Coord;
 
 import java.util.*;
@@ -34,7 +34,7 @@ public class GeoJsonPolygonFeatureWriter {
         featureCollectionMap.put("features", featuresList);
         featureCollectionMap.put("crs", parseCRS());
         featureCollectionMap.put("bbox", boundingBox.getBoundingBox());
-        return JSONValue.toJSONString(featureCollectionMap);
+        return new Gson().toJson(featureCollectionMap);
     }
 
     private List<Map<String, Object>> parseFeatureList() {
