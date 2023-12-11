@@ -196,7 +196,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 
 		Collection<SimpleFeature> polygonsInShape = null;
 		shp = new ShpOptions(shapeFilePath, shapeCRS, null);
-		if (shp.getShapeFile() != null && Files.exists(shp.getShapeFile())) {
+		if (shp.isDefined()) {
 			log.warn("Use of shpFile. Locations for the carriers and the demand only in shp: " + shp.getShapeFile());
 			polygonsInShape = shp.readFeatures();
 			crsTransformationFromNetworkToShape = shp.createTransformation(networkCRS);

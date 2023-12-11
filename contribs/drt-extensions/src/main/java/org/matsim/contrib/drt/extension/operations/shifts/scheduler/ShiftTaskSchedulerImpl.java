@@ -60,8 +60,6 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
 		this.network = network;
 		this.drtShiftParams = drtShiftParams;
 		this.router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
-
-		ShiftSchedules.initSchedules(operationFacilities, fleet, taskFactory);
 	}
 
     @Override

@@ -172,18 +172,19 @@ public class ReflectiveConfigGroupTest {
 	}
 
 	@Test
-	void testFailOnConstructingOrphanSetter() {
-		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
+	void testAllowOnConstructingOrphanSetter() {
+		// no exception
+		new ReflectiveConfigGroup("name") {
 			@StringSetter("setterWithoutGetter")
 			public void setStuff(String s) {
 			}
-		}).isInstanceOf(InconsistentModuleException.class);
+		};
 	}
 
 	@Test
 	void testFailOnConstructingOrphanGetter() {
 		assertThatThrownBy(() -> new ReflectiveConfigGroup("name") {
-			@StringGetter("setterWithoutGetter")
+			@StringGetter("getterWithoutSetter")
 			public Coord getStuff() {
 				return null;
 			}

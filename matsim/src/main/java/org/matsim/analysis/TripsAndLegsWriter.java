@@ -21,6 +21,7 @@
 
 package org.matsim.analysis;
 
+import jakarta.inject.Inject;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.ArrayUtils;
@@ -34,7 +35,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.router.AnalysisMainModeIdentifier;
-import org.matsim.core.router.RoutingModeMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.utils.collections.Tuple;
@@ -56,7 +56,7 @@ import java.util.stream.Collectors;
 /**
  * @author jbischoff / SBB
  */
-public class TripsAndLegsCSVWriter {
+public class TripsAndLegsWriter {
     public static final String[] TRIPSHEADER_BASE = {"person", "trip_number", "trip_id",
             "dep_time", "trav_time", "wait_time", "traveled_distance", "euclidean_distance",
             "main_mode", "longest_distance_mode", "modes", "start_activity_type",
@@ -70,43 +70,43 @@ public class TripsAndLegsCSVWriter {
 
     private final String[] TRIPSHEADER;
     private final String[] LEGSHEADER;
-    private final String separator;
     private final CustomTripsWriterExtension tripsWriterExtension;
     private final Scenario scenario;
     private final CustomLegsWriterExtension legsWriterExtension;
     private final AnalysisMainModeIdentifier mainModeIdentifier;
     private final CustomTimeWriter customTimeWriter;
 
-    private static final Logger log = LogManager.getLogger(TripsAndLegsCSVWriter.class);
+    private static final Logger log = LogManager.getLogger(TripsAndLegsWriter.class);
 
-    public TripsAndLegsCSVWriter(Scenario scenario, CustomTripsWriterExtension tripsWriterExtension,
-                                 CustomLegsWriterExtension legWriterExtension,
-                                 AnalysisMainModeIdentifier mainModeIdentifier, CustomTimeWriter customTimeWriter) {
-        this.scenario = scenario;
-        this.separator = scenario.getConfig().global().getDefaultDelimiter();
-        TRIPSHEADER = ArrayUtils.addAll(TRIPSHEADER_BASE, tripsWriterExtension.getAdditionalTripHeader());
-        LEGSHEADER = ArrayUtils.addAll(LEGSHEADER_BASE, legWriterExtension.getAdditionalLegHeader());
-        this.tripsWriterExtension = tripsWriterExtension;
-        this.legsWriterExtension = legWriterExtension;
-        this.mainModeIdentifier = mainModeIdentifier;
-        this.customTimeWriter = customTimeWriter;
-    }
+	@Inject
+	public TripsAndLegsWriter(Scenario scenario, CustomTripsWriterExtension tripsWriterExtension, CustomLegsWriterExtension legWriterExtension,
+					   AnalysisMainModeIdentifier mainModeIdentifier, CustomTimeWriter customTimeWriter) {
+		this.scenario = scenario;
+		this.tripsWriterExtension = tripsWriterExtension;
+		this.legsWriterExtension = legWriterExtension;
+		this.mainModeIdentifier = mainModeIdentifier;
+		this.customTimeWriter = customTimeWriter;
 
-    public void write(IdMap<Person, Plan> experiencedPlans, String tripsFilename, String legsFilename) {
+		TRIPSHEADER = ArrayUtils.addAll(TRIPSHEADER_BASE, tripsWriterExtension.getAdditionalTripHeader());
+		LEGSHEADER = ArrayUtils.addAll(LEGSHEADER_BASE, legWriterExtension.getAdditionalLegHeader());
+	}
+
+	private char getDefaultDelimiter(){
+		return scenario.getConfig().global().getDefaultDelimiter().charAt(0);
+	}
+
+	public void write(IdMap<Person, Plan> experiencedPlans, String tripsFilename, String legsFilename) {
         try (CSVPrinter tripsCSVprinter = new CSVPrinter(IOUtils.getBufferedWriter(tripsFilename),
-                CSVFormat.DEFAULT.withDelimiter(separator.charAt(0)).withHeader(TRIPSHEADER));
+                CSVFormat.Builder.create().setDelimiter(getDefaultDelimiter()).setHeader(TRIPSHEADER).build());
              CSVPrinter legsCSVprinter = new CSVPrinter(IOUtils.getBufferedWriter(legsFilename),
-                     CSVFormat.DEFAULT.withDelimiter(separator.charAt(0)).withHeader(LEGSHEADER))
-
+				 CSVFormat.Builder.create().setDelimiter(getDefaultDelimiter()).setHeader(LEGSHEADER).build())
         ) {
-
             for (Map.Entry<Id<Person>, Plan> entry : experiencedPlans.entrySet()) {
                 Tuple<Iterable<?>, Iterable<?>> tripsAndLegRecords = getPlanCSVRecords(entry.getValue(), entry.getKey());
                 tripsCSVprinter.printRecords(tripsAndLegRecords.getFirst());
                 legsCSVprinter.printRecords(tripsAndLegRecords.getSecond());
             }
         } catch (IOException e) {
-
             e.printStackTrace();
         }
     }
@@ -202,29 +202,14 @@ public class TripsAndLegsCSVWriter {
             tripRecord.add(firstPtBoardingStop != null ? firstPtBoardingStop : "");
             tripRecord.add(lastPtEgressStop != null ? lastPtEgressStop : "");
             tripRecord.addAll(tripsWriterExtension.getAdditionalTripColumns(personId, trip));
+
             if (TRIPSHEADER.length != tripRecord.size()) {
                 // put the whole error message also into the RuntimeException, so maven shows it on the command line output (log messages are shown incompletely)
-                StringBuilder str = new StringBuilder();
-                str.append("Custom CSV Trip Writer Extension does not provide an identical number of additional values and additional columns. Number of columns is " + TRIPSHEADER.length + ", and number of values is " + tripRecord.size() + ".\n");
-                str.append("TripsWriterExtension class was: " + tripsWriterExtension.getClass() + ". Column name to value pairs supplied were:\n");
-                for(int j = 0; j < Math.max(TRIPSHEADER.length, tripRecord.size()); j++) {
-                    String columnNameJ;
-                    try {
-                        columnNameJ = TRIPSHEADER[j];
-                    } catch (ArrayIndexOutOfBoundsException e) {
-                        columnNameJ = "!COLUMN MISSING!";
-                    }
-                    String tripRecordJ;
-                    try {
-                        tripRecordJ = tripRecord.get(j);
-                    } catch (IndexOutOfBoundsException e) {
-                        tripRecordJ = "!VALUE MISSING!";
-                    }
-                    str.append(j + ": " + columnNameJ + ": " + tripRecordJ + "\n");
-                }
-                log.error(str.toString());
-                throw new RuntimeException(str.toString());
+				String errorMessage = getTripErrorMessage(tripRecord).toString();
+				log.error(errorMessage);
+                throw new RuntimeException(errorMessage);
             }
+
             Activity prevAct = null;
             Leg prevLeg = null;
             List<PlanElement> allElements = new ArrayList<>();
@@ -232,9 +217,8 @@ public class TripsAndLegsCSVWriter {
             allElements.addAll(trip.getTripElements());
             allElements.add(trip.getDestinationActivity());
             for (PlanElement pe : allElements) {
-                if (pe instanceof Activity) {
-                    Activity currentAct = (Activity) pe;
-                    if (prevLeg != null) {
+                if (pe instanceof Activity currentAct) {
+					if (prevLeg != null) {
                         List<String> legRecord = getLegRecord(prevLeg, personId.toString(), tripId, prevAct, currentAct, trip);
                         legRecords.add(legRecord);
                     }
@@ -249,7 +233,32 @@ public class TripsAndLegsCSVWriter {
         return record;
     }
 
-    private List<String> getLegRecord(Leg leg, String personId, String tripId, Activity previousAct, Activity nextAct, TripStructureUtils.Trip trip) {
+	private StringBuilder getTripErrorMessage(List<String> tripRecord) {
+		StringBuilder str = new StringBuilder();
+		str.append("Custom CSV Trip Writer Extension does not provide an identical number of additional values and additional columns. Number of columns is ")
+           .append(TRIPSHEADER.length).append(", and number of values is ").append(tripRecord.size())
+           .append(".\n")
+		   .append("TripsWriterExtension class was: ").append(tripsWriterExtension.getClass())
+           .append(". Column name to value pairs supplied were:\n");
+		for(int j = 0; j < Math.max(TRIPSHEADER.length, tripRecord.size()); j++) {
+			String columnNameJ;
+			try {
+				columnNameJ = TRIPSHEADER[j];
+			} catch (ArrayIndexOutOfBoundsException e) {
+				columnNameJ = "!COLUMN MISSING!";
+			}
+			String tripRecordJ;
+			try {
+				tripRecordJ = tripRecord.get(j);
+			} catch (IndexOutOfBoundsException e) {
+				tripRecordJ = "!VALUE MISSING!";
+			}
+			str.append(j + ": " + columnNameJ + ": " + tripRecordJ + "\n");
+		}
+		return str;
+	}
+
+	private List<String> getLegRecord(Leg leg, String personId, String tripId, Activity previousAct, Activity nextAct, TripStructureUtils.Trip trip) {
         List<String> record = new ArrayList<>();
         record.add(personId);
         record.add(tripId);
@@ -290,34 +299,46 @@ public class TripsAndLegsCSVWriter {
         record.add(vehicleId != null ? vehicleId.toString() : "");
 
         record.addAll(legsWriterExtension.getAdditionalLegColumns(trip, leg));
+
         if (LEGSHEADER.length != record.size()) {
             // put the whole error message also into the RuntimeException, so maven shows it on the command line output (log messages are shown incompletely)
-            StringBuilder str = new StringBuilder();
-            str.append("Custom CSV Leg Writer Extension does not provide an identical number of additional values and additional columns. Number of columns is " + LEGSHEADER.length + ", and number of values is " + record.size() + ".\n");
-            str.append("LegsWriterExtension class was: " + legsWriterExtension.getClass() + ". Column name to value pairs supplied were:\n");
-            for(int j = 0; j < Math.max(LEGSHEADER.length, record.size()); j++) {
-                String columnNameJ;
-                try {
-                    columnNameJ = LEGSHEADER[j];
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    columnNameJ = "!COLUMN MISSING!";
-                }
-                String recordJ;
-                try {
-                    recordJ = record.get(j);
-                } catch (IndexOutOfBoundsException e) {
-                    recordJ = "!VALUE MISSING!";
-                }
-                str.append(j + ": " + columnNameJ + ": " + recordJ + "\n");
-            }
-            log.error(str.toString());
-            throw new RuntimeException(str.toString());
+			String errorMessage = getLegErrorMessage(record);
+			log.error(errorMessage);
+            throw new RuntimeException(errorMessage);
         }
 
         return record;
     }
 
-    private Coord getCoordFromActivity(Activity activity) {
+	private String getLegErrorMessage(List<String> record) {
+		StringBuilder str = new StringBuilder();
+		str.append("Custom CSV Leg Writer Extension does not provide an identical number of additional values and additional columns. Number of columns is ")
+		   .append(LEGSHEADER.length)
+		   .append(", and number of values is ")
+		   .append(record.size())
+		   .append(".\n")
+		   .append("LegsWriterExtension class was: ")
+		   .append(legsWriterExtension.getClass())
+		   .append(". Column name to value pairs supplied were:\n");
+		for(int j = 0; j < Math.max(LEGSHEADER.length, record.size()); j++) {
+			String columnNameJ;
+			try {
+				columnNameJ = LEGSHEADER[j];
+			} catch (ArrayIndexOutOfBoundsException e) {
+				columnNameJ = "!COLUMN MISSING!";
+			}
+			String recordJ;
+			try {
+				recordJ = record.get(j);
+			} catch (IndexOutOfBoundsException e) {
+				recordJ = "!VALUE MISSING!";
+			}
+			str.append(j).append(": ").append(columnNameJ).append(": ").append(recordJ).append("\n");
+		}
+		return str.toString();
+	}
+
+	private Coord getCoordFromActivity(Activity activity) {
         if (activity.getCoord() != null) {
             return activity.getCoord();
         } else if (activity.getFacilityId() != null && scenario.getActivityFacilities().getFacilities().containsKey(activity.getFacilityId())) {
