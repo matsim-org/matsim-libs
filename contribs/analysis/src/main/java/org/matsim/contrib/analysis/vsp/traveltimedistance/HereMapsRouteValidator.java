@@ -30,20 +30,17 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Optional;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
-
-import javax.swing.*;
-import javax.swing.text.html.Option;
 
 /**
  * @author jbischoff this class requests travel times and distances between two
@@ -119,28 +116,31 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
         } catch (MalformedURLException e) {
             log.error("URL is not working. Please check your API key", e);
 			result = Optional.empty();
-        } catch (IOException | ParseException e) {
+        } catch (IOException e) {
             log.error("Cannot read the content on the URL properly. Please manually check the URL", e);
 			result = Optional.empty();
         }
 		return result.orElse(new Tuple<>(0.0, 0.0));
     }
 
-	Optional<Tuple<Double, Double>> readFromJson(BufferedReader reader, String tripId) throws IOException, ParseException {
-		JSONParser jp = new JSONParser();
-		JSONObject jsonObject = (JSONObject) jp.parse(reader);
-		JSONArray routes = (JSONArray) jsonObject.get("routes");
+	Optional<Tuple<Double, Double>> readFromJson(BufferedReader reader, String tripId) throws IOException {
+		JsonElement jsonElement = JsonParser.parseReader(reader);
+		if(!jsonElement.isJsonObject()){
+			return Optional.empty();
+		}
+		JsonObject jsonObject = jsonElement.getAsJsonObject();
+		JsonArray routes = jsonObject.getAsJsonArray("routes");
 
 		if(routes.isEmpty()){
 			return Optional.empty();
 		}
 
-		JSONObject route = (JSONObject) routes.get(0);
-		JSONArray sections = (JSONArray) route.get("sections");
-		JSONObject section = (JSONObject) sections.get(0);
-		JSONObject summary = (JSONObject) section.get("summary");
-		long travelTime = (long) summary.get("duration");
-		long distance = (long) summary.get("length");
+		JsonObject route = routes.get(0).getAsJsonObject();
+		JsonArray sections = route.get("sections").getAsJsonArray();
+		JsonObject section = sections.get(0).getAsJsonObject();
+		JsonObject summary = section.get("summary").getAsJsonObject();
+		double travelTime = summary.get("duration").getAsDouble();
+		double distance = summary.get("length").getAsDouble();
 		if (writeDetailedFiles) {
 			String filename = outputPath + "/" + tripId + ".json.gz";
 			BufferedWriter bw = IOUtils.getBufferedWriter(filename);
@@ -149,7 +149,7 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 			bw.close();
 		}
 		reader.close();
-		return Optional.of(new Tuple<>((double) travelTime, (double) distance));
+		return Optional.of(new Tuple<>(travelTime, distance));
 	}
 
 }

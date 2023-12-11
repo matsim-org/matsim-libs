@@ -1,7 +1,5 @@
 package org.matsim.contrib.analysis.vsp.traveltimedistance;
 
-import org.jgrapht.alg.linkprediction.PreferentialAttachmentLinkPrediction;
-import org.json.simple.parser.ParseException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.utils.collections.Tuple;
@@ -17,7 +15,7 @@ public class HereMapsRouteValidatorTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testReadJson() throws IOException, ParseException {
+	public void testReadJson() throws IOException {
 		HereMapsRouteValidator hereMapsRouteValidator = getDummyValidator(false);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(utils.getClassInputDirectory() + "route.json")));
 		Optional<Tuple<Double, Double>> result = hereMapsRouteValidator.readFromJson(reader, null);
@@ -27,7 +25,7 @@ public class HereMapsRouteValidatorTest {
 	}
 
 	@Test
-	public void testWriteFile() throws IOException, ParseException {
+	public void testWriteFile() throws IOException {
 		HereMapsRouteValidator hereMapsRouteValidator = getDummyValidator(true);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(utils.getClassInputDirectory() + "route.json")));
 		hereMapsRouteValidator.readFromJson(reader, "tripId");
