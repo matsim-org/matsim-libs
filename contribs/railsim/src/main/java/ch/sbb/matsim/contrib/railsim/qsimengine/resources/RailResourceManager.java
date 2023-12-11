@@ -138,9 +138,11 @@ public final class RailResourceManager {
 	}
 
 
+	/**
+	 * Run the configured deadlock avoidance strategy.
+	 */
 	public RailLink checkForDeadlocks(double time, List<RailLink> segment, TrainPosition position) {
-
-		return dla.check(time, segment, position);
+		return dla.checkSegment(time, segment, position);
 	}
 
 	/**

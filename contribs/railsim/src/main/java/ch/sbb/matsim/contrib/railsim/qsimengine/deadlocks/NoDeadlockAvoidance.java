@@ -20,7 +20,7 @@ public class NoDeadlockAvoidance implements DeadlockAvoidance {
 
 	@Nullable
 	@Override
-	public RailLink check(double time, List<RailLink> segment, TrainPosition position) {
+	public RailLink checkSegment(double time, List<RailLink> segment, TrainPosition position) {
 		return null;
 	}
 

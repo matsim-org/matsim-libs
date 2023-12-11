@@ -1,5 +1,6 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
+import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.DeadlockAvoidance;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.NoDeadlockAvoidance;
@@ -64,11 +65,49 @@ public class RailsimDeadlockTest {
 		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "HG", "DC");
 
 		test.doSimStepUntil(150);
-		test.debugFiles(collector, "deadLock");
+//		test.debugFiles(collector, "deadLock");
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio", 140, "y1y", 0)
 			.hasTrainState("regio2", 140, "zy", 0);
 
 	}
+
+	@Test
+	public void oneWay() {
+
+		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocksFixedBlocks.xml", new SimpleDeadlockAvoidance(), null);
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio", 0, "AB", "EF");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2", 0, "HG", "CD");
+
+		test.doSimStepUntil(300);
+//		test.debugFiles(collector, "oneWay");
+
+		RailsimTestUtils.assertThat(collector)
+			.hasTrainState("regio", 139, "EF", 0)
+			.hasTrainState("regio2", 203, "CD", 0);
+
+	}
+
+	@Test
+	public void twoWay() {
+
+		RailsimTestUtils.Holder test = getTestEngine("networkDeadlocksFixedBlocks.xml", new SimpleDeadlockAvoidance(), l -> RailsimUtils.setTrainCapacity(l, 2));
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1a", 0, "AB", "EF");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio1b", 0, "AB", "EF");
+
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2a", 0, "HG", "CD");
+		RailsimTestUtils.createDeparture(test, TestVehicle.Regio, "regio2b", 0, "HG", "CD");
+
+		test.doSimStepUntil(300);
+		test.debugFiles(collector, "twoWay");
+
+		RailsimTestUtils.assertThat(collector)
+			.hasTrainState("regio1a", 139, "EF", 0)
+			.hasTrainState("regio1b", 227, "EF", 0)
+			.hasTrainState("regio2a", 110, "CD", 0)
+			.hasTrainState("regio2b", 220, "CD", 0);
+
+	}
+
 }

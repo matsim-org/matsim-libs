@@ -101,6 +101,7 @@ public class RailsimTestUtils {
 		Mockito.when(mobVeh.getVehicle()).thenReturn(vehicle);
 		Mockito.when(mobVeh.getId()).thenReturn(vehicleId);
 		Mockito.when(driver.getVehicle()).thenReturn(mobVeh);
+		Mockito.when(driver.getId()).thenReturn(Id.createPersonId("driver_" + veh));
 
 		test.engine.handleDeparture(time, driver, route.getStartLinkId(), route);
 	}

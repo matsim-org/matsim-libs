@@ -75,7 +75,7 @@
 				<attribute name="railsimResourceId" class="java.lang.String">CD</attribute>
 			</attributes>
 		</link>
-		<link id="Cx" from="C" to="x" length="1000" freespeed="40" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+		<link id="Cx" from="C" to="x" length="100" freespeed="40" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimResourceId" class="java.lang.String">Cx</attribute>
 			</attributes>
@@ -87,7 +87,7 @@
 		</link>
 
 
-		<link id="xy" from="x" to="y1" length="1000" freespeed="40" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+		<link id="xy" from="x" to="y1" length="100" freespeed="40" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimResourceId" class="java.lang.String">xy</attribute>
 			</attributes>
@@ -120,7 +120,7 @@
 			</attributes>
 		</link>
 
-		<link id="zE" from="z" to="E" length="1000" freespeed="40" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+		<link id="zE" from="z" to="E" length="100" freespeed="40" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimResourceId" class="java.lang.String">zE</attribute>
 			</attributes>
@@ -130,7 +130,7 @@
 				<attribute name="railsimResourceId" class="java.lang.String">zE</attribute>
 			</attributes>
 		</link>
-		<link id="EF" from="E" to="F" length="1000" freespeed="40" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+		<link id="EF" from="E" to="F" length="100" freespeed="40" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimResourceId" class="java.lang.String">EF</attribute>
 			</attributes>

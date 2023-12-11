@@ -32,7 +32,7 @@ public interface DeadlockAvoidance {
 	 * @return the first link that should not be reserved in order to avoid deadlock, or null if no deadlock is detected.
 	 */
 	@Nullable
-	RailLink check(double time, List<RailLink> segment, TrainPosition position);
+	RailLink checkSegment(double time, List<RailLink> segment, TrainPosition position);
 
 	/**
 	 * Called when a resource was released.

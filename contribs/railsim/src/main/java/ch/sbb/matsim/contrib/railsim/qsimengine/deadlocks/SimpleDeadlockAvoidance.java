@@ -21,15 +21,22 @@ public class SimpleDeadlockAvoidance implements DeadlockAvoidance {
 	/**
 	 * Maps driver to path of resource indices.
 	 */
-	private Int2ObjectMap<IntList> paths = new Int2ObjectOpenHashMap<>();
+	private final Int2ObjectMap<IntList> paths = new Int2ObjectOpenHashMap<>();
 
 	/**
 	 * Maps the index of a conflict point, to list of conflicting paths.
 	 */
-	private Int2ObjectMap<IntSet> conflictPoints = new Int2ObjectOpenHashMap<>();
+	private final Int2ObjectMap<IntSortedSet> conflictPoints = new Int2ObjectOpenHashMap<>();
 
 	@Inject
 	public SimpleDeadlockAvoidance() {
+	}
+
+	/**
+	 * This strategy only safeguards sections with single capacity.
+	 */
+	private static boolean isConflictPoint(RailResource resource) {
+		return resource.getTotalCapacity() == 1;
 	}
 
 	@Override
@@ -37,25 +44,25 @@ public class SimpleDeadlockAvoidance implements DeadlockAvoidance {
 
 		// Init relevant conflict points
 		for (RailResource r : resources.values()) {
-			if (r.getTotalCapacity() == 1)
-				conflictPoints.put(r.getId().index(), new IntOpenHashSet());
+			if (isConflictPoint(r))
+				conflictPoints.put(r.getId().index(), new IntAVLTreeSet());
 		}
 	}
 
 	@Override
 	public void onReserve(double time, RailResource resource, TrainPosition position) {
 
-		// stores the path
 		int driverIdx = position.getDriver().getId().index();
 
-		if (!paths.containsKey(driverIdx))
+		// stores the path, but only once
+		if (paths.containsKey(driverIdx))
 			return;
 
 		IntList path = paths.computeIfAbsent(driverIdx, (k) -> new IntArrayList());
 		for (RailLink link : position.getRouteUntilNextStop()) {
-			path.add(link.getLinkId().index());
+			path.add(link.getResource().getId().index());
 
-			if (link.getResource().getTotalCapacity() == 1)
+			if (isConflictPoint(link.getResource()))
 				conflictPoints.get(link.getResource().getId().index()).add(driverIdx);
 
 		}
@@ -63,22 +70,27 @@ public class SimpleDeadlockAvoidance implements DeadlockAvoidance {
 
 	@Nullable
 	@Override
-	public RailLink check(double time, List<RailLink> segment, TrainPosition position) {
+	public RailLink checkSegment(double time, List<RailLink> segment, TrainPosition position) {
 
 		int driverId = position.getDriver().getId().index();
 
 		for (RailLink link : position.getRouteUntilNextStop()) {
 
 			// Passing points can be ignored
-			if (link.getResource().getTotalCapacity() > 1)
+			if (!isConflictPoint(link.getResource()))
 				continue;
 
 			int conflictIdx = link.getResource().getId().index();
-			IntSet trains = conflictPoints.get(conflictIdx);
+			IntSortedSet trains = conflictPoints.get(conflictIdx);
+
+			// First reserving train is allowed to drive through the conflict points
+			if (trains.firstInt() == driverId)
+				continue;
 
 			// check all other trains with paths on this resource
 			for (int driver : trains) {
 
+				// own path can be ignored
 				if (driver == driverId)
 					continue;
 
@@ -102,8 +114,22 @@ public class SimpleDeadlockAvoidance implements DeadlockAvoidance {
 	@Override
 	public void onRelease(double time, RailResource resource, MobsimDriverAgent driver) {
 
-		// reset conflicting route
-		conflictPoints.put(resource.getId().index(), null);
+		int driverIdx = driver.getId().index();
+
+		IntList path = paths.get(driverIdx);
+
+		int rId = resource.getId().index();
+
+		if (path.getInt(0) == rId)
+			path.removeInt(0);
+
+		// Remove finished path
+		if (path.isEmpty())
+			paths.remove(driverIdx);
+
+		// Remove conflicting route
+		if (isConflictPoint(resource))
+			conflictPoints.get(rId).remove(driverIdx);
 
 	}
 
