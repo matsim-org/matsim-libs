@@ -563,10 +563,10 @@ public class ScoreStatsControlerListenerTest {
 
 		Assertions.assertEquals(itr, iteration);
 
-		assertThat(new File(outDir, "scorestats_group1.csv"))
-		Assert.assertEquals(itr, iteration);
+		assertThat(new File(outDir, "scorestats_group1.csv")).isFile();
+		Assertions.assertEquals(itr, iteration);
 
-		Assertions.assertThat(new File(outDir, "scorestats_group1.csv"))
+		assertThat(new File(outDir, "scorestats_group1.csv"))
 			.isFile();
 
 		assertThat(new File(outDir, "scorestats_group2.csv"))

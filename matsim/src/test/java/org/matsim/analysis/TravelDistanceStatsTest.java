@@ -397,7 +397,7 @@ public class TravelDistanceStatsTest {
 				}
 				iteration++;
 			}
-			Assert.assertEquals("There are too less entries.", itr, iteration);
+			Assertions.assertEquals(itr, iteration, "There are too less entries.");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
