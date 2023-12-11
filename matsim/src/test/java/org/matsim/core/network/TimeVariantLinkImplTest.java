@@ -22,7 +22,7 @@ package org.matsim.core.network;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -39,8 +39,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class TimeVariantLinkImplTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	private static final double TIME_BEFORE_FIRST_CHANGE_EVENTS = -99999;//when  base (default) link properties are used

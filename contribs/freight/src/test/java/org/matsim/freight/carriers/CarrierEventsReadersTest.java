@@ -21,7 +21,7 @@
 package org.matsim.freight.carriers;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -49,7 +49,7 @@ import java.util.List;
 public class CarrierEventsReadersTest {
 
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final Id<Link> linkId = Id.createLinkId("demoLink");

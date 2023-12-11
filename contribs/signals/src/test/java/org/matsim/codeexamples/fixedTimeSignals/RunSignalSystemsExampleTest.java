@@ -19,7 +19,7 @@
 package org.matsim.codeexamples.fixedTimeSignals;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -32,7 +32,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class RunSignalSystemsExampleTest {
 
-	@Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
 	public final void testExampleWithHoles() {

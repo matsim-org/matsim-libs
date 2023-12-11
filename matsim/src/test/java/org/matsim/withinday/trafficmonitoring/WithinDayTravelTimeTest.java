@@ -22,7 +22,7 @@ package org.matsim.withinday.trafficmonitoring;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -55,8 +55,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class WithinDayTravelTimeTest {
 
-	@Rule
-	public MatsimTestUtils helper = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils helper = new MatsimTestUtils();
 
 	private Link link22;
 	private double originalFreeSpeed22;

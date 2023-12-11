@@ -22,7 +22,7 @@
 package org.matsim.freight.carriers;
 
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -47,8 +47,8 @@ public class CarrierModuleTest {
 
     FreightCarriersConfigGroup freightCarriersConfigGroup;
 
-    @Rule
-    public MatsimTestUtils testUtils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
     @Before
     public void setUp(){

@@ -22,7 +22,7 @@ package org.matsim.core.events;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
@@ -33,8 +33,8 @@ import org.matsim.vehicles.Vehicle;
 
 public class VehicleArrivesAtFacilityEventImplTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	@Test public void testWriteReadXml() {

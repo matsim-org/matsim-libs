@@ -20,7 +20,7 @@
 package org.matsim.contrib.signals.integration;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.builder.Signals;
@@ -48,8 +48,8 @@ public class SignalSystemsIT {
 
 	private final static String CONFIG_FILE_NAME = "signalSystemsIntegrationConfig.xml";
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
 	public void testSignalSystems() {

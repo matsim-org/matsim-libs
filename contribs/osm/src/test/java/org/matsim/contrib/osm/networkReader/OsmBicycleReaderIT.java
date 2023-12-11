@@ -1,6 +1,6 @@
 package org.matsim.contrib.osm.networkReader;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
@@ -15,8 +15,8 @@ public class OsmBicycleReaderIT {
 
 	private static final CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:32631");
 
-	@Rule
-	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
 
 	@Test
 	public void test_andorra() {

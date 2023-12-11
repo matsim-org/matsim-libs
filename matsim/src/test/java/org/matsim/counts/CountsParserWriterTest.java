@@ -27,7 +27,7 @@ import java.util.Iterator;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
@@ -39,7 +39,7 @@ import org.xml.sax.SAXException;
  */
 public class CountsParserWriterTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
 	 * @author ahorni

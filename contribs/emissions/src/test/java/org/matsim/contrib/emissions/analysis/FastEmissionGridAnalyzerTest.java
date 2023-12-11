@@ -1,6 +1,6 @@
 package org.matsim.contrib.emissions.analysis;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -20,8 +20,8 @@ import static org.junit.Assert.assertTrue;
 
 public class FastEmissionGridAnalyzerTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
     @Test
     public void rasterNetwork_singleLink() {

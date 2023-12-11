@@ -1,7 +1,7 @@
 package org.matsim.contrib.bicycle;
 
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -34,7 +34,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class BicycleLinkSpeedCalculatorTest {
-    @Rule public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
     private static final double MAX_BICYCLE_SPEED = 15;
 
     private final Config config = ConfigUtils.createConfig();

@@ -25,7 +25,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
  */
 public class ObjectAttributesXmlReaderTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testParse_customConverter() throws SAXException, ParserConfigurationException, IOException {

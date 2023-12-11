@@ -22,7 +22,7 @@
  package org.matsim.facilities;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -50,7 +50,7 @@ public class FacilitiesReprojectionIOTest {
 					INITIAL_CRS,
 					TARGET_CRS);
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test

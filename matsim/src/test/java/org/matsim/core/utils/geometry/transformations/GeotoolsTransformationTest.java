@@ -20,7 +20,7 @@
 
 package org.matsim.core.utils.geometry.transformations;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -32,8 +32,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class GeotoolsTransformationTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	@Test public void testTransform(){

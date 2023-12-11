@@ -23,7 +23,7 @@ package org.matsim.core.replanning.strategies;
 import com.google.inject.Singleton;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -58,8 +58,8 @@ import jakarta.inject.Provider;
  */
 public class DeterministicMultithreadedReplanningIT {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	/**
 	 * Tests that the {@link TimeAllocationMutatorModule} generates always the same results

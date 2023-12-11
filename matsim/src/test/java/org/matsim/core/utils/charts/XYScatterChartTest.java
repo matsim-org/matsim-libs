@@ -29,7 +29,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -40,8 +40,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class XYScatterChartTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	/**

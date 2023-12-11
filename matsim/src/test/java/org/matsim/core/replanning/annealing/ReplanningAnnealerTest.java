@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -20,8 +20,8 @@ import org.matsim.testcases.MatsimTestUtils;
 public class ReplanningAnnealerTest {
 
     private static final String FILENAME_ANNEAL = "annealingRates.txt";
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
     private Scenario scenario;
     private Config config;
     private ReplanningAnnealerConfigGroup saConfig;

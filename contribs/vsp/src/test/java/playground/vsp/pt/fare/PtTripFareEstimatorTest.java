@@ -5,7 +5,7 @@ import com.google.inject.Injector;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.assertj.core.data.Offset;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -33,8 +33,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class PtTripFareEstimatorTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	protected InformedModeChoiceConfigGroup group;
 	protected Controler controler;

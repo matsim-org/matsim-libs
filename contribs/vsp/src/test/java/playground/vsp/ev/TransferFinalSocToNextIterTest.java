@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,8 +45,8 @@ public class TransferFinalSocToNextIterTest {
 	private static final Integer LAST_ITERATION = 1;
 	private static final double INITIAL_SOC = 0.95;
 
-	@Rule
-	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
 
 	@Test
 	public void test() {

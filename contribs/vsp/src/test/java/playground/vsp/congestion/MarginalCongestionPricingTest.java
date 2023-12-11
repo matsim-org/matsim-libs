@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -63,8 +63,8 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
  */
 
 public class MarginalCongestionPricingTest {
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
 	public final void implV4Test(){
@@ -89,7 +89,7 @@ public class MarginalCongestionPricingTest {
 		events.addHandler( new CongestionEventHandler() {
 
 			@Override
-			public void reset(int iteration) {				
+			public void reset(int iteration) {
 			}
 
 			@Override
@@ -114,7 +114,7 @@ public class MarginalCongestionPricingTest {
 		double person6Delay=0;
 		double person8_6Delay=0;
 		double person8_4Delay=0;
-		
+
 		int repetationPerson6Count=0;
 		int repetationPerson8_6Count=0;
 		int repetationPerson8_4Count=0;
@@ -153,7 +153,7 @@ public class MarginalCongestionPricingTest {
 					//	delays are 10, 10
 					person8_6Delay+=event.getDelay();
 					if(repetationPerson8_6Count>0){
-						Assert.assertEquals("wrong delay.", 20, person8_6Delay, MatsimTestUtils.EPSILON);	
+						Assert.assertEquals("wrong delay.", 20, person8_6Delay, MatsimTestUtils.EPSILON);
 					}
 					repetationPerson8_6Count++;
 					link3Delays++;
@@ -187,7 +187,7 @@ public class MarginalCongestionPricingTest {
 				} else if (event.getCausingAgentId().toString().equals("8") && event.getAffectedAgentId().toString().equals("9")) {
 					Assert.assertEquals("wrong delay.", 1, event.getDelay(), MatsimTestUtils.EPSILON);
 					link2Delays++;
-				} 
+				}
 
 			} else throw new RuntimeException("Delay can not occur on link id - "+event.getLinkId().toString());
 		}
@@ -208,7 +208,7 @@ public class MarginalCongestionPricingTest {
 	 * generates network with 6 links. Even persons will go on one branch (up) and odd persons will go on other (down).
 	 *<p>				  o----4----o
 	 *<p> 				  |
-	 *<p>				  3 
+	 *<p>				  3
 	 *<p>				  |
 	 *<p>				  |
 	 *<p>  o--1---o---2---o

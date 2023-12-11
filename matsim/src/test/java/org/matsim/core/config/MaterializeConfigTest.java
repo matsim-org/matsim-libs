@@ -3,15 +3,15 @@ package org.matsim.core.config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class MaterializeConfigTest {
 
 	private static final Logger log = LogManager.getLogger(MaterializeConfigTest.class);
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public final void testMaterializeAfterReadParameterSets() {

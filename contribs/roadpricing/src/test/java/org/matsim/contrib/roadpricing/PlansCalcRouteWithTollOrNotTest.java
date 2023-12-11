@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -64,8 +64,8 @@ import com.google.inject.Provider;
 public class PlansCalcRouteWithTollOrNotTest {
 	private static final Logger log = LogManager.getLogger( PlansCalcRouteWithTollOrNotTest.class );
 
-	@Rule
-	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
 
 	/**
 	 * Tests a few cases where the router can decide if it is better to pay the

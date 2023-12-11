@@ -32,8 +32,9 @@ import static org.mockito.Mockito.when;
 import java.util.*;
 
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
@@ -69,8 +70,8 @@ public class DefaultUnplannedRequestInserterTest {
 
 	private final EventsManager eventsManager = mock(EventsManager.class);
 
-	@Rule
-	public final ForkJoinPoolTestRule rule = new ForkJoinPoolTestRule();
+	@RegisterExtension
+	public final ForkJoinPoolExtension forkJoinPoolExtension = new ForkJoinPoolExtension();
 
 	@Test
 	public void nothingToSchedule() {
@@ -285,7 +286,7 @@ public class DefaultUnplannedRequestInserterTest {
 			DrtInsertionSearch insertionSearch, RequestInsertionScheduler insertionScheduler) {
 		return new DefaultUnplannedRequestInserter(mode, fleet, () -> now, eventsManager, insertionScheduler,
 				vehicleEntryFactory, insertionRetryQueue, insertionSearch, DrtOfferAcceptor.DEFAULT_ACCEPTOR,
-				rule.forkJoinPool, StaticPassengerStopDurationProvider.of(10.0, 0.0));
+				forkJoinPoolExtension.forkJoinPool, StaticPassengerStopDurationProvider.of(10.0, 0.0));
 	}
 
 	private Link link(String id) {

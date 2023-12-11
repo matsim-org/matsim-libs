@@ -23,7 +23,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.analysis.linkpaxvolumes.LinkPaxVolumesAnalysis;
 import org.matsim.analysis.linkpaxvolumes.LinkPaxVolumesWriter;
@@ -52,8 +52,8 @@ import java.util.stream.Collectors;
 
 public class LinkPaxVolumesAnalysisTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
     /**
      * Test method for {@link LinkPaxVolumesAnalysis}.

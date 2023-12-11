@@ -1,6 +1,6 @@
 package org.matsim.contrib.emissions.analysis;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.emissions.Pollutant;
@@ -16,8 +16,8 @@ import static org.junit.Assert.*;
 
 public class RawEmissionEventsReaderTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
     @Test
     public void handleNonEventNode() {

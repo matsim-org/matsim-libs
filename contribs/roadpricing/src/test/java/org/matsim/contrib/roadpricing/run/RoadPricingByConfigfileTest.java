@@ -21,7 +21,7 @@ package org.matsim.contrib.roadpricing.run;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
@@ -39,7 +39,7 @@ import static org.junit.Assert.fail;
  *
  */
 public class RoadPricingByConfigfileTest {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	private static final Logger log = LogManager.getLogger( RoadPricingByConfigfileTest.class );
 

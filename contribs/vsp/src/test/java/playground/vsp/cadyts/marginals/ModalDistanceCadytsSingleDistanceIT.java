@@ -19,7 +19,7 @@
 
 package playground.vsp.cadyts.marginals;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -58,8 +58,8 @@ import static org.junit.Assert.assertEquals;
 
 public class ModalDistanceCadytsSingleDistanceIT {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
     /**
      * This test runs a population of 1000 agents which have the same home and work place. All agents start with two plans.

@@ -22,7 +22,7 @@ package org.matsim.core.utils.misc;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -33,8 +33,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class StringUtilsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	/**

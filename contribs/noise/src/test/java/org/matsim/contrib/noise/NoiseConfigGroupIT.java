@@ -23,7 +23,7 @@
 package org.matsim.contrib.noise;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -40,8 +40,8 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class NoiseConfigGroupIT {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
 	public final void test0(){

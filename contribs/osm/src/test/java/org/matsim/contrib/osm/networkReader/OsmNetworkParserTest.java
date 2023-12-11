@@ -4,7 +4,7 @@ import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 
 import org.junit.After;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -25,8 +25,8 @@ public class OsmNetworkParserTest {
 	private final ExecutorService executor = Executors.newSingleThreadExecutor();
 	private static final CoordinateTransformation transformation = new IdentityTransformation();
 
-	@Rule
-	public MatsimTestUtils matsimUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils matsimUtils = new MatsimTestUtils();
 
 	@After
 	public void shutDownExecutor() {

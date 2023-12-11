@@ -21,7 +21,7 @@ package org.matsim.analysis;
 
 import com.google.inject.*;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -57,8 +57,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class LinkStatsControlerListenerTest {
 
-	@Rule
-	public MatsimTestUtils util = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
 	public void testlinksOutputCSV() throws IOException {

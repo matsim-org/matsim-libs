@@ -21,7 +21,7 @@
 
 package org.matsim.freight.carriers.analysis;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -29,8 +29,8 @@ import java.io.IOException;
 
 public class FreightAnalysisEventBasedTest {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
 	public void runFreightAnalysisEventBasedTest() throws IOException {

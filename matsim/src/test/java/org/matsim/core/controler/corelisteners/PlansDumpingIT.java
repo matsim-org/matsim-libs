@@ -19,7 +19,7 @@
 
 package org.matsim.core.controler.corelisteners;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class PlansDumpingIT {
 
-	@Rule public MatsimTestUtils util = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
 	public void testPlansDump_Interval() {

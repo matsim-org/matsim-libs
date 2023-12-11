@@ -7,7 +7,7 @@ import java.util.ListIterator;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,8 +40,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ScoreStatsControlerListenerTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private int avgexecuted;
 	private int avgworst;

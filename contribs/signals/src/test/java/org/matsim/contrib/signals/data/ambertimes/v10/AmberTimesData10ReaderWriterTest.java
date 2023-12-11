@@ -22,7 +22,7 @@ package org.matsim.contrib.signals.data.ambertimes.v10;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.Signal;
@@ -37,7 +37,7 @@ import java.io.IOException;
 /**
  * @author jbischoff
  * @author dgrether
- * 
+ *
  */
 public class AmberTimesData10ReaderWriterTest {
 
@@ -45,8 +45,8 @@ public class AmberTimesData10ReaderWriterTest {
 
 	private static final String TESTXML = "testAmberTimes_v1.0.xml";
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
 	public void testParser() throws IOException, JAXBException, SAXException,

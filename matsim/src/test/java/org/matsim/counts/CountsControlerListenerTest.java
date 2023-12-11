@@ -27,7 +27,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -59,7 +59,7 @@ import com.google.inject.Provider;
  */
 public class CountsControlerListenerTest {
 
-	@Rule public MatsimTestUtils util = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
 	public void testUseVolumesOfIteration() {

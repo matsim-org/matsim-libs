@@ -26,7 +26,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -55,10 +55,10 @@ import org.matsim.testcases.MatsimTestUtils;
 public class KNAnalysisEventsHandlerTest {
 
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	// yy this test is probably not doing anything with respect to some of the newer statistics, such as money. kai, mar'14 
+	// yy this test is probably not doing anything with respect to some of the newer statistics, such as money. kai, mar'14
 
 	public static final String BASE_FILE_NAME = "stats_";
 	public final Id<Person> DEFAULT_PERSON_ID = Id.create(123, Person.class);
@@ -124,7 +124,7 @@ public class KNAnalysisEventsHandlerTest {
     @Test
     @Ignore
 	public void testAveraging() {
-		// yy this test is probably not doing anything with respect to some of the newer statistics, such as money. kai, mar'14 
+		// yy this test is probably not doing anything with respect to some of the newer statistics, such as money. kai, mar'14
 
 		KNAnalysisEventsHandler testee = new KNAnalysisEventsHandler(this.scenario);
 

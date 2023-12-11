@@ -11,7 +11,7 @@ import java.io.Reader;
 import java.util.zip.GZIPInputStream;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -50,8 +50,8 @@ public class IterationTravelStatsControlerListenerTest {
 	private int first_act_y;
 	private int first_act_type;
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testIterationTravelStatsControlerListener() {

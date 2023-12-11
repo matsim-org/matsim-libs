@@ -2,7 +2,7 @@ package org.matsim.application;
 
 import org.junit.Assume;
 import org.junit.Ignore;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.application.options.SampleOptions;
 import org.matsim.application.prepare.freight.tripExtraction.ExtractRelevantFreightTrips;
@@ -28,8 +28,8 @@ import static org.junit.Assert.assertEquals;
 
 public class MATSimApplicationTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void help() {

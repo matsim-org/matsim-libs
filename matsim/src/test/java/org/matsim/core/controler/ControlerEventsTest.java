@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -42,8 +42,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ControlerEventsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	private List<Integer> calledStartupListener = null;

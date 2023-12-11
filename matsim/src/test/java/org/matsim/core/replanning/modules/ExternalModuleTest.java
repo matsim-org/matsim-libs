@@ -24,7 +24,7 @@ package org.matsim.core.replanning.modules;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -41,8 +41,8 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class ExternalModuleTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
     private Scenario scenario;
     private OutputDirectoryHierarchy outputDirectoryHierarchy;

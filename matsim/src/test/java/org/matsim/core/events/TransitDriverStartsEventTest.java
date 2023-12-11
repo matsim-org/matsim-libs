@@ -20,7 +20,7 @@
 package org.matsim.core.events;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
@@ -36,15 +36,15 @@ import org.matsim.vehicles.Vehicle;
  */
 public class TransitDriverStartsEventTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testWriteReadXml() {
-		final TransitDriverStartsEvent event1 = new TransitDriverStartsEvent(36095.2, 
-				Id.create("ptDrvr-1", Person.class), 
-				Id.create("vehicle-bus5", Vehicle.class), 
-				Id.create("line L-1", TransitLine.class), 
-				Id.create("route-R1", TransitRoute.class), 
+		final TransitDriverStartsEvent event1 = new TransitDriverStartsEvent(36095.2,
+				Id.create("ptDrvr-1", Person.class),
+				Id.create("vehicle-bus5", Vehicle.class),
+				Id.create("line L-1", TransitLine.class),
+				Id.create("route-R1", TransitRoute.class),
 				Id.create("departure-D-1", Departure.class));
 		final TransitDriverStartsEvent event2 = XmlEventsTester.testWriteReadXml(this.utils.getOutputDirectory() + "events.xml", event1);
 		Assert.assertEquals(event1.getTime(), event2.getTime(), 1.0e-9);

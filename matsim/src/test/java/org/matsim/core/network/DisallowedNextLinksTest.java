@@ -2,13 +2,15 @@ package org.matsim.core.network;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.rules.TemporaryFolder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -21,8 +23,8 @@ import org.matsim.utils.objectattributes.attributeconverters.DisallowedNextLinks
 
 public class DisallowedNextLinksTest {
 
-	@Rule
-	public TemporaryFolder tempFolder = new TemporaryFolder();
+	@TempDir
+	public File tempFolder;
 
 	@Test
 	public void testEquals() {
@@ -135,7 +137,7 @@ public class DisallowedNextLinksTest {
 		DisallowedNextLinks dnl0 = NetworkUtils.getOrCreateDisallowedNextLinks(l1);
 		dnl0.addDisallowedLinkSequence("car", List.of(l1.getId(), Id.createLinkId("2")));
 
-		File tempFile = tempFolder.newFile("network.xml");
+		File tempFile = new File(tempFolder, "network.xml");
 		new NetworkWriter(n).write(tempFile.toString());
 		Network network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(network).readFile(tempFile.toString());

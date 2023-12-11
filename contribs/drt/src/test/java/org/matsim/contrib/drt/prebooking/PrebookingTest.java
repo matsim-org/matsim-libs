@@ -2,7 +2,7 @@ package org.matsim.contrib.drt.prebooking;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.contrib.drt.prebooking.PrebookingTestEnvironment.RequestInfo;
 import org.matsim.contrib.drt.prebooking.logic.AttributeBasedPrebookingLogic;
@@ -14,9 +14,9 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author Sebastian Hörl (sebhoerl) / IRT SystemX
  */
 public class PrebookingTest {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
-	
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
 	@Test
 	public void withoutPrebookedRequests() {
 		/*-
@@ -49,7 +49,7 @@ public class PrebookingTest {
 		assertEquals(2086.0, taskInfo.get(2).startTime, 1e-3);
 		assertEquals(2146.0, taskInfo.get(2).endTime, 1e-3);
 	}
-	
+
 	static PrebookingParams installPrebooking(Controler controller) {
 		return installPrebooking(controller, true);
 	}
@@ -57,11 +57,11 @@ public class PrebookingTest {
 	static PrebookingParams installPrebooking(Controler controller, boolean installLogic) {
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(controller.getConfig());
 		drtConfig.addParameterSet(new PrebookingParams());
-		
+
 		if (installLogic) {
 			AttributeBasedPrebookingLogic.install(controller, drtConfig);
 		}
-		
+
 		return drtConfig.getPrebookingParams().get();
 	}
 
@@ -212,7 +212,7 @@ public class PrebookingTest {
 	@Test
 	public void sameTrip_differentDepartureTime() {
 		/*-
-		 * Two requests with the same origin and destination, but distinct departure time. 
+		 * Two requests with the same origin and destination, but distinct departure time.
 		 * - First, early one is submitted, then late one.
 		 * - Vehicle picks up and drops off early one, then late one.
 		 * - In total four stops (P,D,P,D)
@@ -250,7 +250,7 @@ public class PrebookingTest {
 	@Test
 	public void sameTrip_sameDepartureTime() {
 		/*-
-		 * Two requests with the same origin and destination, and same departure time. 
+		 * Two requests with the same origin and destination, and same departure time.
 		 * - First, A is submitted, then B.
 		 * - Vehicle picks up and A and B, then drops off A and B.
 		 * - In total two stops (P,D)
@@ -382,26 +382,26 @@ public class PrebookingTest {
 		 * Two requests with the same origin and destination, different departure times.
 		 * - First, A is submitted with departure time 2020
 		 * - Then, B is submitted with departure time 2000
-		 * 
-		 * - This is inverse of sameTrip_extendPickupDuration above, the request with the earlier departure 
+		 *
+		 * - This is inverse of sameTrip_extendPickupDuration above, the request with the earlier departure
 		 *   time is submitted second.
 		 * - We would expect the requests to be merged, but this is not so trivial with the current code base:
-		 *   It would be necessary to shift the stop task to the past and extend it. Theoretically, this is 
+		 *   It would be necessary to shift the stop task to the past and extend it. Theoretically, this is
 		 *   possible but it would be nice to embed this in a more robust way in the code base.
 		 * - Plus, it may change the current DRT behavior because we have these situations also in non-prebooked
 		 *   simulations: We may submit an immediate request and find an insertion for a stop task that starts
-		 *   in 5 seconds. This case is treated in standard DRT as any other request (extending the task but 
+		 *   in 5 seconds. This case is treated in standard DRT as any other request (extending the task but
 		 *   keeping the start time fixed).
-		 * - We follow this default behaviour here: Instead of *prepending* the task with the new request, we 
+		 * - We follow this default behaviour here: Instead of *prepending* the task with the new request, we
 		 *   *append* it as usual. If there is at least one pickup in the stop task with the standard stop
 		 *   durations, there is no additional cost of adding the request, but the person experiences a wait
 		 *   delay that could be minimized if we were able to prepend the task.
 		 * - (Then again, do we actually want to do this, it would reserve the vehicle a few seconds more than
 		 *   necessary for a stop that is potentially prebooked in a long time).
-		 *   
+		 *
 		 * - Expected behavior in current implementation: Merge new request with the later departing existing
 		 *   one, which generates wait time for the customer.
-		 *   
+		 *
 		 * - In total two stops (P, D)
 		 */
 
@@ -438,14 +438,14 @@ public class PrebookingTest {
 	public void sameTrip_inverseSubmission_splitPickup() {
 		/*-
 		 * Two requests with the same origin and destination, different departure times.
-		 * - First, A is submitted with departure time 2020 
+		 * - First, A is submitted with departure time 2020
 		 * - Then, B is submitted with departure time 1770
-		 * - B's departure is 250s before A, so appending it to A would lead to more than 300s 
+		 * - B's departure is 250s before A, so appending it to A would lead to more than 300s
 		 *   of wait time, which is not a valid insertion
 		 * - Hence, the insertion *after* the pickup of A is not valid
 		 * - But the insertion *before* A is possible (it is usually evaluated but dominated by the insertion after)
 		 * - TODO: May think this through and eliminate these insertion upfront
-		 * 
+		 *
 		 * - Expectation: Standard scheduling a prebooked request before another one (as if they had not the
 		 *   same origin link).
 		 * - In total three stops (P,P,D)

@@ -20,7 +20,7 @@
 package org.matsim.core.events;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -34,7 +34,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class AgentWaitingForPtEventTest {
 
-	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils helper = new MatsimTestUtils();
 
 	@Test
 	public void testReadWriteXml() {

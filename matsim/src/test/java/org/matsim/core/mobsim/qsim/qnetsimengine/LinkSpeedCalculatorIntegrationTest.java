@@ -23,7 +23,7 @@ import java.util.*;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -58,7 +58,7 @@ import org.matsim.testcases.utils.EventsLogger;
  */
 public class LinkSpeedCalculatorIntegrationTest {
 
-	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils helper = new MatsimTestUtils();
 
 	@Test
 	public void testIntegration_Default() {

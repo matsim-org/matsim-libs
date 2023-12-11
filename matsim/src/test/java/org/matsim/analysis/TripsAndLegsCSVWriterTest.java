@@ -21,7 +21,7 @@
 package org.matsim.analysis;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.analysis.TripsAndLegsCSVWriter.NoLegsWriterExtension;
 import org.matsim.analysis.TripsAndLegsCSVWriter.NoTripWriterExtension;
@@ -112,8 +112,8 @@ public class TripsAndLegsCSVWriterTest {
 	ArrayList<Object> legsfromplan = new ArrayList<>();
 	Map<String, Object> persontrips = new HashMap<>();
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testTripsAndLegsCSVWriter() {

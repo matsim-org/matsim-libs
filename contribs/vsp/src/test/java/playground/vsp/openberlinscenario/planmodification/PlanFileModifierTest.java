@@ -19,8 +19,8 @@ import org.matsim.testcases.MatsimTestUtils;
 public class PlanFileModifierTest {
     private final static Logger LOG = LogManager.getLogger(PlanFileModifierTest.class);
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
     private final static double SELECTION_PROBABILITY = 0.70;
     private final CoordinateTransformation ct = new IdentityTransformation();

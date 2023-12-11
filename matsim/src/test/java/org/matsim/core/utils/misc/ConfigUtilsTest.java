@@ -25,7 +25,7 @@ import java.net.URL;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -40,8 +40,8 @@ import static org.hamcrest.CoreMatchers.*;
 public class ConfigUtilsTest {
 	private static final Logger log = LogManager.getLogger( ConfigUtilsTest.class ) ;
 
-	@Rule
-	public MatsimTestUtils util = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
 	public void testLoadConfig_filenameOnly() throws IOException {

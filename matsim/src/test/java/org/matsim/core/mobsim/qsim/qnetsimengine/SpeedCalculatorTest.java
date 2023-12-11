@@ -1,7 +1,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import com.google.inject.Singleton;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -33,7 +33,7 @@ public class SpeedCalculatorTest{
     // This originally comes from the bicycle contrib.  One now needs access to AbstractQLink to properly test this functionality. In contrast, the
     // specific bicycle material should not be necessary. kai, jun'23
 
-    @Rule public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
     private final Config config = ConfigUtils.createConfig();
     private final Network unusedNetwork = NetworkUtils.createNetwork();
 

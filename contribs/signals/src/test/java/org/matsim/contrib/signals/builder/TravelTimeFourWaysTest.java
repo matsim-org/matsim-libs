@@ -21,7 +21,7 @@
 package org.matsim.contrib.signals.builder;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
@@ -49,8 +49,8 @@ public class TravelTimeFourWaysTest {
 
 	private static final String EVENTSFILE = "events.xml.gz";
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
 	public void testTrafficLightIntersection4arms() {

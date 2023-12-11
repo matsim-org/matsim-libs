@@ -1,7 +1,7 @@
 package org.matsim.contrib.drt.extension.operations.operationFacilities;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -13,8 +13,8 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class OperationFacilitiesIOTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
     @Test
     public void test() {

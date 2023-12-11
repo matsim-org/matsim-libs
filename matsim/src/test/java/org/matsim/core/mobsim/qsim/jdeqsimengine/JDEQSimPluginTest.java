@@ -21,7 +21,7 @@
 
  package org.matsim.core.mobsim.qsim.jdeqsimengine;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -38,8 +38,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class JDEQSimPluginTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private QSim prepareQSim(Scenario scenario, EventsManager eventsManager) {
         return new QSimBuilder(scenario.getConfig()) //

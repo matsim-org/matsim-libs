@@ -26,7 +26,7 @@ import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
@@ -55,7 +55,7 @@ public class RunCarsharingIT {
 
 	private final static Logger log = LogManager.getLogger(RunCarsharingIT.class);
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public final void test() {

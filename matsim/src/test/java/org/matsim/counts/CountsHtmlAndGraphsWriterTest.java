@@ -22,7 +22,7 @@ package org.matsim.counts;
 
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.counts.algorithms.CountsHtmlAndGraphsWriter;
@@ -38,8 +38,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class CountsHtmlAndGraphsWriterTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	@Test public void testGraphCreation() {

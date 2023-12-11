@@ -32,7 +32,7 @@ import java.util.Map.Entry;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -69,7 +69,7 @@ import org.matsim.vehicles.Vehicle;
 
 public abstract class AbstractJDEQSimTest {
 
-	@Rule
+	@RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	protected Map<Id<Vehicle>, Id<Person>> vehicleToDriver = null;

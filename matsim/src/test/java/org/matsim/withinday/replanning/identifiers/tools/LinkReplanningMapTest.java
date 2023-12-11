@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 
 import jakarta.inject.Inject;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup;
@@ -45,8 +45,8 @@ import org.matsim.withinday.controller.WithinDayModule;
  */
 public class LinkReplanningMapTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 

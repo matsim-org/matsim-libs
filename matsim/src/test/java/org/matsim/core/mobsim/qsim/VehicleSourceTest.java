@@ -19,7 +19,7 @@
 package org.matsim.core.mobsim.qsim;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -100,7 +100,7 @@ public class VehicleSourceTest {
 		);
 	}
 
-	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils helper = new MatsimTestUtils();
 	private Scenario scenario ;
 	private final String[] transportModes = new String[]{"bike", "car"};
 	private Link link1;

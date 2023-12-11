@@ -22,7 +22,7 @@ package org.matsim.vis.snapshotwriters;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -34,8 +34,8 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class PositionInfoTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	private static final double epsilon = 1e-8; // accuracy of double-comparisons

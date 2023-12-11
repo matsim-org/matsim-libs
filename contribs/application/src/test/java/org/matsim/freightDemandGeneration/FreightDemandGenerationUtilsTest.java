@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
@@ -26,9 +26,9 @@ import org.opengis.feature.simple.SimpleFeature;
  */
 public class FreightDemandGenerationUtilsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
-	
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
 	@Test
 	public void testPreparePopulation() {
 		String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";

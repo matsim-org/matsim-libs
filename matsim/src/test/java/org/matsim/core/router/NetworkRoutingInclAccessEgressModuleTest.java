@@ -1,6 +1,6 @@
 package org.matsim.core.router;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Coord;
@@ -49,8 +49,8 @@ public class NetworkRoutingInclAccessEgressModuleTest {
     private static final String SLOW_BUT_DIRECT_LINK = "slow-but-direct-link";
     private static final String FAST_BUT_LONGER_LINK = "fast-but-longer-link";
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
     private static Scenario createScenario(Config config) {
 

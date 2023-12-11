@@ -23,7 +23,7 @@
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,8 +38,8 @@ import static org.junit.Assert.assertTrue;
 
 public class SamplerTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
     private DestinationChoiceContext context;
     private Scenario scenario;

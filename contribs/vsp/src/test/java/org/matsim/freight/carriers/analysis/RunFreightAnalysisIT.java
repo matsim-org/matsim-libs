@@ -38,8 +38,8 @@ import java.util.*;
 
 public class RunFreightAnalysisIT {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Before
 	public void runAnalysis(){

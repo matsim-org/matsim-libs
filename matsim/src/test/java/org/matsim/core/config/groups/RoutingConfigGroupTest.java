@@ -25,7 +25,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
@@ -40,7 +40,7 @@ public class RoutingConfigGroupTest {
 	private final static Logger log = LogManager.getLogger(RoutingConfigGroupTest.class);
 	private final static int N_MODE_ROUTING_PARAMS_DEFAULT = 5 ;
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test

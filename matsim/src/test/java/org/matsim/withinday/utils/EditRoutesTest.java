@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -68,8 +68,8 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class EditRoutesTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	// yyyy This test relies heavily on position counting in plans.  With the introduction of intermediate walk legs the positions changed.
 	// I tried to guess the correct indices, but it would be more honest to change this to TripStructureUtils.  kai, feb'16

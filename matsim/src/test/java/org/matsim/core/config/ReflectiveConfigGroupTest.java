@@ -32,13 +32,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ReflectiveConfigGroup.InconsistentModuleException;
-import org.matsim.testcases.MatsimJunit5Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 import com.google.common.collect.ImmutableSet;
@@ -46,7 +47,9 @@ import com.google.common.collect.ImmutableSet;
 /**
  * @author thibautd
  */
-public class ReflectiveConfigGroupTest extends MatsimJunit5Test {
+public class ReflectiveConfigGroupTest {
+	@RegisterExtension
+	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testDumpAndRead() {
@@ -126,7 +129,7 @@ public class ReflectiveConfigGroupTest extends MatsimJunit5Test {
 		Config dumpedConfig = new Config();
 		dumpedConfig.addModule(dumpedModule);
 
-		String fileName = getOutputDirectory() + "/dump.xml";
+		String fileName = utils.getOutputDirectory() + "/dump.xml";
 
 		new ConfigWriter(dumpedConfig).write(fileName);
 		Config readConfig = ConfigUtils.loadConfig(fileName);
@@ -139,7 +142,7 @@ public class ReflectiveConfigGroupTest extends MatsimJunit5Test {
 
 	@Test
 	public void testReadCollectionsIncludingEmptyString() {
-		String fileName = getInputDirectory() + "/config_with_blank_comma_separated_elements.xml";
+		String fileName = utils.getInputDirectory() + "/config_with_blank_comma_separated_elements.xml";
 		final Config readConfig = ConfigUtils.loadConfig(fileName);
 		final MyModule readModule = new MyModule();
 		// as a side effect, this loads the information
@@ -360,7 +363,7 @@ public class ReflectiveConfigGroupTest extends MatsimJunit5Test {
 		final String param = "my unknown param";
 		final String value = "my val";
 		testee.addParam(param, value);
-		Assertions.assertEquals(value, testee.getValue(param), "unexpected stored value");
+		Assert.assertEquals("unexpected stored value", value, testee.getValue(param));
 	}
 
 	@Test

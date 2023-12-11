@@ -19,7 +19,7 @@
 package org.matsim.contrib.emissions.example;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.DetailedVsAverageLookupBehavior;
@@ -34,7 +34,7 @@ import org.matsim.testcases.MatsimTestUtils;
  *
  */
 public class RunDetailedEmissionToolOfflineExampleIT {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	/*
 	 *

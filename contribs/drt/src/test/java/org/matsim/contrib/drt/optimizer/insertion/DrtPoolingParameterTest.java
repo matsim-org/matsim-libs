@@ -4,7 +4,7 @@ import java.net.URL;
 import java.util.*;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -52,7 +52,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  */
 public class DrtPoolingParameterTest {
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 

@@ -1,7 +1,7 @@
 package org.matsim.contrib.emissions.events;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -36,7 +36,7 @@ import java.net.URL;
  */
 public class VehicleLeavesTrafficEventTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
     @Test
     public final void testRareEventsFromBerlinScenario (){

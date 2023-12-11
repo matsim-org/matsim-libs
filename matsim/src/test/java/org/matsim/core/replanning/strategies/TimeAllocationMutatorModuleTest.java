@@ -23,7 +23,7 @@ package org.matsim.core.replanning.strategies;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -52,8 +52,8 @@ import java.util.Random;
  */
 public class TimeAllocationMutatorModuleTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	@Test public void testSimplifiedMutation() {

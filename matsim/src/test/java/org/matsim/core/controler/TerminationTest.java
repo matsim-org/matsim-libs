@@ -3,7 +3,7 @@ package org.matsim.core.controler;
 import java.io.File;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -30,8 +30,8 @@ import com.google.inject.Singleton;
  * TerminationCriterion.
  */
 public class TerminationTest {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testSimulationEndsOnInterval() {

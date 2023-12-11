@@ -21,7 +21,7 @@ package org.matsim.integration.invertednetworks;
 
 import org.junit.Assert;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -30,8 +30,8 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class InvertedNetworkRoutingIT {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
 	public final void testLanesInvertedNetworkRouting() {

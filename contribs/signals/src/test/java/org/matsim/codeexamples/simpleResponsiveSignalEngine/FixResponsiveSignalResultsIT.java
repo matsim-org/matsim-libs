@@ -26,7 +26,7 @@ import java.util.SortedMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -46,16 +46,16 @@ import org.matsim.testcases.MatsimTestUtils;
 public class FixResponsiveSignalResultsIT {
 
 	private static final Logger LOG = LogManager.getLogger(FixResponsiveSignalResultsIT.class);
-	
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
 	public void testOneCrossingExample() {
 		LOG.info("Fix the results from the simple one-crossing-example in RunSimpleResponsiveSignalExample.");
 		RunSimpleResponsiveSignalExample responsiveSignal = new RunSimpleResponsiveSignalExample();
 		responsiveSignal.run();
-		
+
 		SignalsData signalsData = (SignalsData) responsiveSignal.getControler().getScenario().getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalSystemControllerData signalControlSystem1 = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId()
 				.get(Id.create("SignalSystem1", SignalSystem.class));
@@ -63,7 +63,7 @@ public class FixResponsiveSignalResultsIT {
 		SortedMap<Id<SignalGroup>, SignalGroupSettingsData> signalGroupSettings = signalPlan.getSignalGroupSettingsDataByGroupId();
 		SignalGroupSettingsData group1Setting = signalGroupSettings.get(Id.create("SignalGroup1", SignalGroup.class));
 		SignalGroupSettingsData group2Setting = signalGroupSettings.get(Id.create("SignalGroup2", SignalGroup.class));
-		
+
 		LOG.info("SignalGroup1: onset " + group1Setting.getOnset() + ", dropping " + group1Setting.getDropping());
 		LOG.info("SignalGroup2: onset " + group2Setting.getOnset() + ", dropping " + group2Setting.getDropping());
 		Assert.assertEquals(0, group1Setting.getOnset());
@@ -71,5 +71,5 @@ public class FixResponsiveSignalResultsIT {
 		Assert.assertEquals(30, group2Setting.getOnset());
 		Assert.assertEquals(55, group2Setting.getDropping());
 	}
-	
+
 }

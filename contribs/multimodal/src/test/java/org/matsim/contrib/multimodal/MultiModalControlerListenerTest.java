@@ -69,8 +69,8 @@ public class MultiModalControlerListenerTest {
 
 	private static final Logger log = LogManager.getLogger(MultiModalControlerListenerTest.class);
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@SuppressWarnings("static-method")
 	@Test

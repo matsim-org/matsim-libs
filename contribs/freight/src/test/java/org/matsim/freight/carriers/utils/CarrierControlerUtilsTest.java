@@ -30,7 +30,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -60,8 +60,8 @@ import java.util.concurrent.ExecutionException;
 
 public class CarrierControlerUtilsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private static final Logger log = LogManager.getLogger(CarrierControlerUtilsTest.class);
 
@@ -74,8 +74,8 @@ public class CarrierControlerUtilsTest {
 	private Carrier carrierWShipmentsOnlyFromCarrierWServices;
 	private Carrier carrierWShipmentsOnlyFromCarrierWShipments;
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Before
 	public void setUp() {

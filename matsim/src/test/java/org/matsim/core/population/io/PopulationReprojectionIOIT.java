@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -66,7 +66,7 @@ public class PopulationReprojectionIOIT {
 	private static final String NET_FILE = "network.xml.gz";
 	private static final String BASE_FILE = "plans_hwh_1pct.xml.gz";
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test

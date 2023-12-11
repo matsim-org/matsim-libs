@@ -20,7 +20,7 @@
 package org.matsim.withinday.trafficmonitoring;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
@@ -35,22 +35,22 @@ import com.google.inject.Inject;
 */
 
 public class TtmobsimListener implements MobsimAfterSimStepListener {
-	
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Inject
 	private TravelTime travelTime;
-	
+
 	private boolean case1 = false;
 	private boolean case2 = false;
-	
+
 	private Link link;
 	private double networkChangeEventTime;
 	private double reducedFreespeed;
 
 	public TtmobsimListener(NetworkChangeEvent nce) {
-		
+
 		if (nce.getLinks().size() > 1) {
 			throw new RuntimeException("Expecting only one network change event for a single link. Aborting...");
 		} else {
@@ -58,22 +58,22 @@ public class TtmobsimListener implements MobsimAfterSimStepListener {
 				this.link = link;
 				this.networkChangeEventTime = nce.getStartTime();
 				this.reducedFreespeed = nce.getFreespeedChange().getValue();
-				
+
 				Assert.assertEquals(true, this.reducedFreespeed < this.link.getFreespeed());
 			}
-		}	
+		}
 	}
 
 	@Override
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
-		
+
 		if (e.getSimulationTime() <= networkChangeEventTime) {
-			
+
 			Assert.assertEquals("Wrong travel time at time step " + e.getSimulationTime() + ". Should be the freespeed travel time.",
 					Math.ceil(link.getLength()/link.getFreespeed()),
 					Math.ceil(travelTime.getLinkTravelTime(link, e.getSimulationTime(), null, null)),
 					testUtils.EPSILON);
-			
+
 			case1 = true;
 
 		} else {
@@ -81,10 +81,10 @@ public class TtmobsimListener implements MobsimAfterSimStepListener {
 					Math.ceil(link.getLength() / reducedFreespeed),
 					Math.ceil(travelTime.getLinkTravelTime(link, e.getSimulationTime(), null, null)),
 					testUtils.EPSILON);
-			
+
 			case2 = true;
 		}
-		
+
 	}
 
 	public boolean isCase1() {

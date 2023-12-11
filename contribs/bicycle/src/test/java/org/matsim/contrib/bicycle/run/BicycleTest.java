@@ -21,8 +21,8 @@ package org.matsim.contrib.bicycle.run;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -51,7 +51,6 @@ import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.testcases.MatsimJunit5Test;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 import org.matsim.vehicles.Vehicle;
@@ -64,19 +63,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result.FILES_ARE_EQUAL;
 
 /**
  * @author dziemke
  */
-public class BicycleTest extends MatsimJunit5Test {
+public class BicycleTest {
 	private static final Logger LOG = LogManager.getLogger(BicycleTest.class);
 
 	private static final String bicycleMode = "bicycle";
 
+	@RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 	@Test
 	public void testNormal() {
-		Config config = ConfigUtils.createConfig(getClassInputDirectory() );
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
@@ -84,32 +88,33 @@ public class BicycleTest extends MatsimJunit5Test {
 		config.network().setInputFile("network_normal.xml");
 		config.plans().setInputFile("population_1200.xml");
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setOutputDirectory(getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 		config.controller().setCreateGraphs(false);
 
 		new RunBicycleExample().run(config );
 
 		LOG.info("Checking MATSim events file ...");
-		final String eventsFilenameReference = getInputDirectory() + "output_events.xml.gz";
-		final String eventsFilenameNew = getOutputDirectory() + "output_events.xml.gz";
-		Assertions.assertEquals(FILES_ARE_EQUAL, new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew), "Different event files.");
+		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
+		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
+		assertEquals("Different event files.", FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew));
 
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenarioReference).readFile(getInputDirectory() + "output_plans.xml.gz");
-		new PopulationReader(scenarioCurrent).readFile(getOutputDirectory() + "output_plans.xml.gz");
+		new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
+		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
 		for (Id<Person> personId : scenarioReference.getPopulation().getPersons().keySet()) {
 			double scoreReference = scenarioReference.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 			double scoreCurrent = scenarioCurrent.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
-			Assertions.assertEquals(scoreReference, scoreCurrent, MatsimTestUtils.EPSILON, "Scores of persons " + personId + " are different");
+			Assert.assertEquals("Scores of persons " + personId + " are different", scoreReference, scoreCurrent, MatsimTestUtils.EPSILON);
 		}
-		Assertions.assertTrue(PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()), "Populations are different");
+		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
 
 	@Test
 	public void testCobblestone() {
-		Config config = ConfigUtils.createConfig(getClassInputDirectory() );
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
@@ -119,7 +124,7 @@ public class BicycleTest extends MatsimJunit5Test {
 		config.plans().setInputFile("population_1200.xml");
 
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setOutputDirectory(getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 		config.controller().setCreateGraphs(false);
 
@@ -127,21 +132,22 @@ public class BicycleTest extends MatsimJunit5Test {
 		{
 			Scenario scenarioReference = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 			Scenario scenarioCurrent = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-			new PopulationReader( scenarioReference ).readFile( getInputDirectory() + "output_plans.xml.gz" );
-			new PopulationReader( scenarioCurrent ).readFile( getOutputDirectory() + "output_plans.xml.gz" );
-			Assertions.assertTrue(PopulationUtils.equalPopulation( scenarioReference.getPopulation(), scenarioCurrent.getPopulation() ), "Populations are different");
+			new PopulationReader( scenarioReference ).readFile( utils.getInputDirectory() + "output_plans.xml.gz" );
+			new PopulationReader( scenarioCurrent ).readFile( utils.getOutputDirectory() + "output_plans.xml.gz" );
+			assertTrue( "Populations are different", PopulationUtils.equalPopulation( scenarioReference.getPopulation(), scenarioCurrent.getPopulation() ) );
 		}
 		{
 			LOG.info( "Checking MATSim events file ..." );
-			final String eventsFilenameReference = getInputDirectory() + "output_events.xml.gz";
-			final String eventsFilenameNew = getOutputDirectory() + "output_events.xml.gz";
-			Assertions.assertEquals(FILES_ARE_EQUAL, new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew ), "Different event files.");
+			final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
+			final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
+			assertEquals( "Different event files.", FILES_ARE_EQUAL,
+					new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew ));
 		}
 	}
 
 	@Test
 	public void testPedestrian() {
-		Config config = ConfigUtils.createConfig(getClassInputDirectory() );
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
@@ -149,27 +155,28 @@ public class BicycleTest extends MatsimJunit5Test {
 		config.network().setInputFile("network_pedestrian.xml");
 		config.plans().setInputFile("population_1200.xml");
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setOutputDirectory(getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 		config.controller().setCreateGraphs(false);
 
 		new RunBicycleExample().run(config );
 
 		LOG.info("Checking MATSim events file ...");
-		final String eventsFilenameReference = getInputDirectory() + "output_events.xml.gz";
-		final String eventsFilenameNew = getOutputDirectory() + "output_events.xml.gz";
-		Assertions.assertEquals(FILES_ARE_EQUAL, new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew), "Different event files.");
+		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
+		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
+		assertEquals("Different event files.", FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew));
 
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenarioReference).readFile(getInputDirectory() + "output_plans.xml.gz");
-		new PopulationReader(scenarioCurrent).readFile(getOutputDirectory() + "output_plans.xml.gz");
-		Assertions.assertTrue(PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()), "Populations are different");
+		new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
+		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
+		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
 
 	@Test
 	public void testLane() {
-		Config config = ConfigUtils.createConfig(getClassInputDirectory() );
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
@@ -177,27 +184,28 @@ public class BicycleTest extends MatsimJunit5Test {
 		config.network().setInputFile("network_lane.xml");
 		config.plans().setInputFile("population_1200.xml");
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setOutputDirectory(getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 		config.controller().setCreateGraphs(false);
 
 		new RunBicycleExample().run(config );
 
 		LOG.info("Checking MATSim events file ...");
-		final String eventsFilenameReference = getInputDirectory() + "output_events.xml.gz";
-		final String eventsFilenameNew = getOutputDirectory() + "output_events.xml.gz";
-		Assertions.assertEquals(FILES_ARE_EQUAL, new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew), "Different event files.");
+		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
+		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
+		assertEquals("Different event files.", FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew));
 
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenarioReference).readFile(getInputDirectory() + "output_plans.xml.gz");
-		new PopulationReader(scenarioCurrent).readFile(getOutputDirectory() + "output_plans.xml.gz");
-		Assertions.assertTrue(PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()), "Populations are different");
+		new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
+		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
+		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
 
 	@Test
 	public void testGradient() {
-		Config config = ConfigUtils.createConfig(getClassInputDirectory() );
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
@@ -205,27 +213,28 @@ public class BicycleTest extends MatsimJunit5Test {
 		config.network().setInputFile("network_gradient.xml");
 		config.plans().setInputFile("population_1200.xml");
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setOutputDirectory(getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 		config.controller().setCreateGraphs(false);
 
 		new RunBicycleExample().run(config );
 
 		LOG.info("Checking MATSim events file ...");
-		final String eventsFilenameReference = getInputDirectory() + "output_events.xml.gz";
-		final String eventsFilenameNew = getOutputDirectory() + "output_events.xml.gz";
-		Assertions.assertEquals(FILES_ARE_EQUAL, new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew), "Different event files.");
+		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
+		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
+		assertEquals("Different event files.", FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( eventsFilenameReference, eventsFilenameNew));
 
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenarioReference).readFile(getInputDirectory() + "output_plans.xml.gz");
-		new PopulationReader(scenarioCurrent).readFile(getOutputDirectory() + "output_plans.xml.gz");
-		Assertions.assertTrue(PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()), "Populations are different");
+		new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
+		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
+		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
 
 	@Test
 	public void testGradientLane() {
-		Config config = ConfigUtils.createConfig(getClassInputDirectory() );
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
@@ -234,27 +243,28 @@ public class BicycleTest extends MatsimJunit5Test {
 		config.network().setInputFile("network_gradient_lane.xml");
 		config.plans().setInputFile("population_1200.xml");
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setOutputDirectory(getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 		config.controller().setCreateGraphs(false);
 
 		new RunBicycleExample().run(config );
 
 		LOG.info("Checking MATSim events file ...");
-		final String eventsFilenameReference = getInputDirectory() + "output_events.xml.gz";
-		final String eventsFilenameNew = getOutputDirectory() + "output_events.xml.gz";
-		Assertions.assertEquals(FILES_ARE_EQUAL, new EventsFileComparator().setIgnoringCoordinates( true ).runComparison(eventsFilenameReference, eventsFilenameNew), "Different event files.");
+		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
+		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
+		assertEquals("Different event files.", FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison(eventsFilenameReference, eventsFilenameNew));
 
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenarioReference).readFile(getInputDirectory() + "output_plans.xml.gz");
-		new PopulationReader(scenarioCurrent).readFile(getOutputDirectory() + "output_plans.xml.gz");
-		Assertions.assertTrue(PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()), "Populations are different");
+		new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
+		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
+		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
 
 	@Test
 	public void testNormal10It() {
-		Config config = ConfigUtils.createConfig(getClassInputDirectory() );
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
 
@@ -262,7 +272,7 @@ public class BicycleTest extends MatsimJunit5Test {
 		config.network().setInputFile("network_normal.xml");
 		config.plans().setInputFile("population_1200.xml");
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setOutputDirectory(getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		// 10 iterations
 		config.controller().setLastIteration(10);
 		config.controller().setWriteEventsInterval(10);
@@ -272,15 +282,16 @@ public class BicycleTest extends MatsimJunit5Test {
 		new RunBicycleExample().run(config );
 
 		LOG.info("Checking MATSim events file ...");
-		final String eventsFilenameReference = getInputDirectory() + "output_events.xml.gz";
-		final String eventsFilenameNew = getOutputDirectory() + "output_events.xml.gz";
-		Assertions.assertEquals(FILES_ARE_EQUAL, new EventsFileComparator().setIgnoringCoordinates( true ).runComparison(eventsFilenameReference, eventsFilenameNew), "Different event files.");
+		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
+		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
+		assertEquals("Different event files.", FILES_ARE_EQUAL,
+				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison(eventsFilenameReference, eventsFilenameNew));
 
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenarioReference).readFile(getInputDirectory() + "output_plans.xml.gz");
-		new PopulationReader(scenarioCurrent).readFile(getOutputDirectory() + "output_plans.xml.gz");
-		Assertions.assertTrue(PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()), "Populations are different");
+		new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
+		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
+		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
 
 	@Test public void testLinkBasedScoring() {
@@ -291,7 +302,7 @@ public class BicycleTest extends MatsimJunit5Test {
 //			new RunBicycleExample().run( config );
 //		}
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenarioReference).readFile(getInputDirectory() + "output_plans.xml.gz");
+		new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
 		{
 			Config config2 = createConfig( 0 );
 			BicycleConfigGroup bicycleConfigGroup2 = (BicycleConfigGroup) config2.getModules().get( "bicycle" );
@@ -299,23 +310,22 @@ public class BicycleTest extends MatsimJunit5Test {
 			new RunBicycleExample().run( config2 );
 		}
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenarioCurrent).readFile(getOutputDirectory() + "output_plans.xml.gz");
+		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
 
 //		LOG.info("Checking MATSim events file ...");
-//		final String eventsFilenameReference = getInputDirectory() + "output_events.xml.gz";
-//		final String eventsFilenameNew = getOutputDirectory() + "output_events.xml.gz";
-//		Assert.assertEquals("Different event files.", FILES_ARE_EQUAL,
+//		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
+//		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
+//		assertEquals("Different event files.", FILES_ARE_EQUAL,
 //				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison(eventsFilenameReference, eventsFilenameNew));
 
 		for (Id<Person> personId : scenarioReference.getPopulation().getPersons().keySet()) {
 			double scoreReference = scenarioReference.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 			double scoreCurrent = scenarioCurrent.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
-			Assertions.assertEquals(scoreReference, scoreCurrent, MatsimTestUtils.EPSILON, "Scores of persons " + personId + " are different");
+			Assert.assertEquals("Scores of persons " + personId + " are different", scoreReference, scoreCurrent, MatsimTestUtils.EPSILON);
 		}
-//		Assert.assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
+//		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
-	@Test
-	public void testLinkVsLegMotorizedScoring() {
+	@Test public void testLinkVsLegMotorizedScoring() {
 		// --- withOUT additional car traffic:
 //		{
 //			Config config2 = createConfig( 0 );
@@ -325,7 +335,7 @@ public class BicycleTest extends MatsimJunit5Test {
 //			new RunBicycleExample().run( config2 );
 //		}
 		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenarioReference).readFile(getInputDirectory() + "output_plans.xml.gz");
+		new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
 		// ---
 		// --- WITH additional car traffic:
 		{
@@ -384,22 +394,22 @@ public class BicycleTest extends MatsimJunit5Test {
 			controler.run();
 		}
 		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenarioCurrent).readFile(getOutputDirectory() + "output_plans.xml.gz");
+		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
 		// ---
 		// ---
 
 //		LOG.info("Checking MATSim events file ...");
-//		final String eventsFilenameReference = getInputDirectory() + "output_events.xml.gz";
-//		final String eventsFilenameNew = getOutputDirectory() + "output_events.xml.gz";
-//		Assert.assertEquals("Different event files.", FILES_ARE_EQUAL,
+//		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
+//		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
+//		assertEquals("Different event files.", FILES_ARE_EQUAL,
 //				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison(eventsFilenameReference, eventsFilenameNew));
 
 		for (Id<Person> personId : scenarioReference.getPopulation().getPersons().keySet()) {
 			double scoreReference = scenarioReference.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 			double scoreCurrent = scenarioCurrent.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
-			Assertions.assertEquals(scoreReference, scoreCurrent, MatsimTestUtils.EPSILON, "Scores of person=" + personId + " are different");
+			Assert.assertEquals("Scores of person=" + personId + " are different", scoreReference, scoreCurrent, MatsimTestUtils.EPSILON);
 		}
-//		Assert.assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
+//		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
 //	@Test public void testMotorizedInteraction() {
 ////		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
@@ -413,26 +423,26 @@ public class BicycleTest extends MatsimJunit5Test {
 //		new RunBicycleExample().run(config );
 //
 //		LOG.info("Checking MATSim events file ...");
-//		final String eventsFilenameReference = getInputDirectory() + "output_events.xml.gz";
-//		final String eventsFilenameNew = getOutputDirectory() + "output_events.xml.gz";
-//		Assert.assertEquals("Different event files.", FILES_ARE_EQUAL,
+//		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
+//		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
+//		assertEquals("Different event files.", FILES_ARE_EQUAL,
 //				new EventsFileComparator().setIgnoringCoordinates( true ).runComparison(eventsFilenameReference, eventsFilenameNew));
 //
 //		Scenario scenarioReference = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 //		Scenario scenarioCurrent = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		new PopulationReader(scenarioReference).readFile(getInputDirectory() + "output_plans.xml.gz");
-//		new PopulationReader(scenarioCurrent).readFile(getOutputDirectory() + "output_plans.xml.gz");
+//		new PopulationReader(scenarioReference).readFile(utils.getInputDirectory() + "output_plans.xml.gz");
+//		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
 //		for (Id<Person> personId : scenarioReference.getPopulation().getPersons().keySet()) {
 //			double scoreReference = scenarioReference.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 //			double scoreCurrent = scenarioCurrent.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
-//			Assert.Assert.assertEquals("Scores of persons " + personId + " are different", scoreReference, scoreCurrent, MatsimTestUtils.EPSILON);
+//			Assert.assertEquals("Scores of persons " + personId + " are different", scoreReference, scoreCurrent, MatsimTestUtils.EPSILON);
 //		}
-//		Assert.assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
+//		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 //	}
 
 	@Test
 	public void testInfrastructureSpeedFactor() {
-		Config config = ConfigUtils.createConfig(getClassInputDirectory() );
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		config.addModule(new BicycleConfigGroup());
 
 		config.controller().setWriteEventsInterval(0);
@@ -477,7 +487,7 @@ public class BicycleTest extends MatsimJunit5Test {
 		config.plans().setInputFile("population_4.xml");
 
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setOutputDirectory(getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 
 		config.global().setNumberOfThreads(1);
@@ -514,20 +524,20 @@ public class BicycleTest extends MatsimJunit5Test {
 
 		controler.run();
 
-		Assertions.assertEquals(3, linkHandler.getLinkId2demand().get(Id.createLinkId("2")), MatsimTestUtils.EPSILON, "All bicycle users should use the longest but fastest route where the bicycle infrastructur speed factor is set to 1.0");
-		Assertions.assertEquals(1, linkHandler.getLinkId2demand().get(Id.createLinkId("6")), MatsimTestUtils.EPSILON, "Only the car user should use the shortest route");
+		Assert.assertEquals("All bicycle users should use the longest but fastest route where the bicycle infrastructur speed factor is set to 1.0", 3, linkHandler.getLinkId2demand().get(Id.createLinkId("2")), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Only the car user should use the shortest route", 1, linkHandler.getLinkId2demand().get(Id.createLinkId("6")), MatsimTestUtils.EPSILON);
 
-		Assertions.assertEquals(1.0 + Math.ceil( 13000 / (25.0 /3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("2")).get(0), MatsimTestUtils.EPSILON, "Wrong travel time (bicycle user)");
-		Assertions.assertEquals(1.0 + Math.ceil( 13000 / (25.0 /3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("2")).get(1), MatsimTestUtils.EPSILON, "Wrong travel time (bicycle user)");
-		Assertions.assertEquals(1.0 + Math.ceil( 13000 / (25.0 /3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("2")).get(2), MatsimTestUtils.EPSILON, "Wrong travel time (bicycle user)");
+		Assert.assertEquals("Wrong travel time (bicycle user)", 1.0 + Math.ceil( 13000 / (25.0 /3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("2")).get(0), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time (bicycle user)", 1.0 + Math.ceil( 13000 / (25.0 /3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("2")).get(1), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time (bicycle user)", 1.0 + Math.ceil( 13000 / (25.0 /3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("2")).get(2), MatsimTestUtils.EPSILON);
 
-		Assertions.assertEquals(Math.ceil( 10000 / (13.88) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(0), MatsimTestUtils.EPSILON, "Wrong travel time (car user)");
+		Assert.assertEquals("Wrong travel time (car user)", Math.ceil( 10000 / (13.88) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(0), MatsimTestUtils.EPSILON);
 
 	}
 
 	@Test
 	public void testInfrastructureSpeedFactorDistanceMoreRelevantThanTravelTime() {
-		Config config = ConfigUtils.createConfig(getClassInputDirectory() );
+		Config config = ConfigUtils.createConfig(utils.getClassInputDirectory() );
 		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
 
 		config.controller().setWriteEventsInterval(0);
@@ -571,7 +581,7 @@ public class BicycleTest extends MatsimJunit5Test {
 		config.network().setInputFile("network_infrastructure-speed-factor.xml");
 		config.plans().setInputFile("population_4.xml");
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controller().setOutputDirectory(getOutputDirectory());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 
 		config.global().setNumberOfThreads(1);
@@ -601,16 +611,16 @@ public class BicycleTest extends MatsimJunit5Test {
 
 		controler.run();
 
-		Assertions.assertEquals(4, linkHandler.getLinkId2demand().get(Id.createLinkId("6")), MatsimTestUtils.EPSILON, "All bicycle users should use the shortest route even though the bicycle infrastructur speed factor is set to 0.1");
-		Assertions.assertEquals(Math.ceil(10000 / 13.88 ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(0), MatsimTestUtils.EPSILON, "Wrong travel time (car user)");
-		Assertions.assertEquals(Math.ceil( 10000 / (25. * 0.1 / 3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(1), MatsimTestUtils.EPSILON, "Wrong travel time (bicycle user)");
-		Assertions.assertEquals(Math.ceil( 10000 / (25. * 0.1 / 3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(2), MatsimTestUtils.EPSILON, "Wrong travel time (bicycle user)");
-		Assertions.assertEquals(Math.ceil( 10000 / (25. * 0.1 / 3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(3), MatsimTestUtils.EPSILON, "Wrong travel time (bicycle user)");
+		Assert.assertEquals("All bicycle users should use the shortest route even though the bicycle infrastructur speed factor is set to 0.1", 4, linkHandler.getLinkId2demand().get(Id.createLinkId("6")), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time (car user)", Math.ceil(10000 / 13.88 ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(0), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time (bicycle user)", Math.ceil( 10000 / (25. * 0.1 / 3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(1), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time (bicycle user)", Math.ceil( 10000 / (25. * 0.1 / 3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(2), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time (bicycle user)", Math.ceil( 10000 / (25. * 0.1 / 3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(3), MatsimTestUtils.EPSILON);
 	}
 
 	private Config createConfig( int lastIteration ){
 		//		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
-		Config config = ConfigUtils.createConfig( getClassInputDirectory() );
+		Config config = ConfigUtils.createConfig( utils.getClassInputDirectory() );
 		config.addModule( new BicycleConfigGroup() );
 		RunBicycleExample.fillConfigWithBicycleStandardValues( config );
 
@@ -618,7 +628,7 @@ public class BicycleTest extends MatsimJunit5Test {
 		config.network().setInputFile( "network_normal.xml" );
 		config.plans().setInputFile( "population_1200.xml" );
 		config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
-		config.controller().setOutputDirectory( getOutputDirectory() );
+		config.controller().setOutputDirectory( utils.getOutputDirectory() );
 		config.controller().setLastIteration( lastIteration );
 		config.controller().setLastIteration( lastIteration );
 		config.controller().setWriteEventsInterval( 10 );

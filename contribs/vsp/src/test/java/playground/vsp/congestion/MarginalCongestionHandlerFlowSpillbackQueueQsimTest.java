@@ -34,7 +34,7 @@ import jakarta.inject.Provider;
 
 import org.junit.Assert;
 import org.junit.Ignore;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -99,8 +99,8 @@ import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutil
 
 public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	private EventsManager events;
 

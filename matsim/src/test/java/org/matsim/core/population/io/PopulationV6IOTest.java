@@ -22,7 +22,7 @@
  package org.matsim.core.population.io;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -58,7 +58,7 @@ import java.util.Map;
  * @author thibautd
  */
 public class PopulationV6IOTest {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test

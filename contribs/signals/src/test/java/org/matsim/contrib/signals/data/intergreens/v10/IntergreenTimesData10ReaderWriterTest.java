@@ -27,7 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.SignalGroup;
@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
 
 /**
  * @author dgrether
- * 
+ *
  */
 public class IntergreenTimesData10ReaderWriterTest {
 
@@ -45,8 +45,8 @@ public class IntergreenTimesData10ReaderWriterTest {
 
 	private static final String TESTXML = "testIntergreenTimes_v1.0.xml";
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	private Id<SignalGroup> groupId1 = Id.create("1", SignalGroup.class);
 	private Id<SignalGroup> groupId2 = Id.create("2", SignalGroup.class);
@@ -97,7 +97,7 @@ public class IntergreenTimesData10ReaderWriterTest {
 		Assert.assertEquals(Integer.valueOf(3), ig23.getIntergreenTime(groupId1, groupId3));
 		Assert.assertEquals(Integer.valueOf(3), ig23.getIntergreenTime(groupId1, groupId4));
 		Assert.assertNull(ig23.getIntergreenTime(groupId2, groupId3));
-		
+
 		IntergreensForSignalSystemData ig42 = itd.getIntergreensForSignalSystemDataMap().get(systemId42);
 		Assert.assertNotNull(ig42);
 		Assert.assertEquals(Integer.valueOf(5), ig42.getIntergreenTime(groupId1, groupId2));

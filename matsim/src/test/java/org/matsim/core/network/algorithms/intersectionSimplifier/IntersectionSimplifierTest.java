@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -41,7 +41,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class IntersectionSimplifierTest {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testComplexIntersection() {
@@ -116,7 +116,7 @@ public class IntersectionSimplifierTest {
 		Cluster c2 = findCluster(clusters, CoordUtils.createCoord(225.0, 85.0));
 		Assert.assertNotNull("Could not find cluster with centroid (225.0,85.0)", c2);
 		Assert.assertEquals("Wrong number of points", 4, c2.getPoints().size());
-		
+
 		/* Write the cleaned network to file. */
 		new NetworkWriter(simpleNetwork).write(utils.getOutputDirectory() + "cleanNetwork.xml");
 	}
@@ -138,13 +138,13 @@ public class IntersectionSimplifierTest {
 		Cluster c2 = findCluster(clusters, CoordUtils.createCoord(225.0, 85.0));
 		Assert.assertNotNull("Could not find cluster with centroid (225.0,85.0)", c2);
 		Assert.assertEquals("Wrong number of points", 12, c2.getPoints().size());
-		
+
 		/* Write the cleaned network to file. */
 		new NetworkWriter(simpleNetwork).write(utils.getOutputDirectory() + "cleanNetwork.xml");
 	}
 
 	/**
-	 * The network cleaner will/should ensure that full connectivity remains. 
+	 * The network cleaner will/should ensure that full connectivity remains.
 	 */
 	@Test
 	public void testNetworkCleaner() {
@@ -194,7 +194,7 @@ public class IntersectionSimplifierTest {
 		ns.run(simpleNetwork);
 		new NetworkCleaner().run(simpleNetwork);
 		new NetworkWriter(simpleNetwork).write(utils.getOutputDirectory() + "network.xml");
-		
+
 		Assert.assertEquals("Wrong number of nodes.", 12l, simpleNetwork.getNodes().size());
 
 		Assert.assertNotNull("Should find node '1'", simpleNetwork.getNodes().get(Id.createNodeId("1")));
@@ -219,7 +219,7 @@ public class IntersectionSimplifierTest {
 		Assert.assertNotNull("Should find simplified node '23-24'", simpleNetwork.getNodes().get(Id.createNodeId("23-24")));
 	}
 
-	
+
 	private Cluster findCluster(List<Cluster> clusters, Coord c) {
 		Cluster cluster = null;
 		Iterator<Cluster> iterator = clusters.iterator();
@@ -234,7 +234,7 @@ public class IntersectionSimplifierTest {
 
 
 	/**
-	 * The following layout is not according to scale, but shows the structure 
+	 * The following layout is not according to scale, but shows the structure
 	 * of the two 'complex' intersections.
 	 *                                                                         11
 	 *                                                                          |
@@ -242,7 +242,7 @@ public class IntersectionSimplifierTest {
 	 *                                                                         12
 	 *                      3                                                /   \
 	 *                      |                                               /     \
-	 *                      |                                          .__ 13     14 __. 
+	 *                      |                                          .__ 13     14 __.
 	 *                      4                                         /     |      |    \
 	 *                    /   \                                      |      |      |     |
 	 *             .____ 5 ___ 6 _____________> 110m ______________ 15 ___ 16 ___ 17 ___ 18 ___.

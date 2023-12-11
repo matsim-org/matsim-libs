@@ -1,6 +1,6 @@
 package playground.vsp.cadyts.marginals;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -54,8 +54,8 @@ public class ModalDistanceAndCountsCadytsIT {
 		});
 	}
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private double countsWeight;
 	private double modalDistanceWeight;

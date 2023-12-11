@@ -20,7 +20,7 @@ package org.matsim.core.mobsim.hermes;
 
 import java.util.List;
 import java.util.Map;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Coord;
@@ -60,8 +60,8 @@ public class HermesRoundaboutTest {
 	public static final Coord A_START = new Coord(0, -60);
 
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	@Test

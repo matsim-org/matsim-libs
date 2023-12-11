@@ -3,7 +3,7 @@ package org.matsim.contrib.ev.example;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
@@ -20,7 +20,7 @@ public class RunEvExampleWithLTHConsumptionModelTest{
 
 	private static final Logger log = LogManager.getLogger(RunEvExample.class );
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test public void runTest(){
 		try {

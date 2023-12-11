@@ -28,7 +28,7 @@ import org.junit.Assert;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -44,37 +44,37 @@ import org.xml.sax.SAXException;
  * @author dgrether
  */
 public class SignalSystemsData20ReaderWriterTest {
-	
+
 	private static final Logger log = LogManager.getLogger(SignalSystemsData20ReaderWriterTest.class);
-	
+
   private static final String TESTXML  = "testSignalSystems_v2.0.xml";
-  
-  @Rule  public MatsimTestUtils testUtils = new MatsimTestUtils();
-  
+
+  @RegisterExtension public MatsimTestUtils testUtils = new MatsimTestUtils();
+
   private Id<SignalSystem> systemId1 = Id.create("1", SignalSystem.class);
   private Id<Signal> signalId1 = Id.create("1", Signal.class);
   private Id<Lane> laneId1 = Id.create("1", Lane.class);
   private Id<Link> linkId1 = Id.create("1", Link.class);
-  
+
   private Id<SignalSystem> systemId2 = Id.create("2", SignalSystem.class);
   private Id<Signal> signalId2 = Id.create("2", Signal.class);
   private Id<Link> linkId2 = Id.create("2", Link.class);
   private Id<Lane> laneId2 = Id.create("2", Lane.class);
-  
+
   private Id<Signal> signalId3 = Id.create("3", Signal.class);
   private Id<Link> linkId3 = Id.create("3", Link.class);
-  
+
   private Id<Link> linkId4 = Id.create("4", Link.class);
-  
+
   @Test
   public void testParser() throws IOException, JAXBException, SAXException, ParserConfigurationException {
   	SignalSystemsData lss = new SignalSystemsDataImpl();
   	SignalSystemsReader20 reader = new SignalSystemsReader20(lss);
   	reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
-  	
+
   	checkContent(lss);
   }
-  
+
   @Test
   public void testWriter() throws JAXBException, SAXException, ParserConfigurationException, IOException {
   	String testoutput = this.testUtils.getOutputDirectory()  + "testLssOutput.xml";
@@ -83,12 +83,12 @@ public class SignalSystemsData20ReaderWriterTest {
   	SignalSystemsData lss = new SignalSystemsDataImpl();
   	SignalSystemsReader20 reader = new SignalSystemsReader20(lss);
   	reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
-  	
+
   	//write the test file
   	log.debug("write the test file...");
   	SignalSystemsWriter20 writer = new SignalSystemsWriter20(lss);
   	writer.write(testoutput);
-  	
+
   	log.debug("and read it again");
   	lss = new SignalSystemsDataImpl();
   	reader = new SignalSystemsReader20(lss);
@@ -101,14 +101,14 @@ public class SignalSystemsData20ReaderWriterTest {
   	SignalSystemData ssdata = ss.getSignalSystemData().get(systemId1);
   	Assert.assertNotNull(ssdata);
   	Assert.assertEquals(2, ssdata.getSignalData().size());
-  	
+
   	SignalData signaldata = ssdata.getSignalData().get(signalId1);
   	Assert.assertNotNull(signaldata);
   	Assert.assertEquals(signalId1, signaldata.getId());
   	Assert.assertEquals(linkId1, signaldata.getLinkId());
   	Assert.assertNull(signaldata.getLaneIds());
   	Assert.assertNull(signaldata.getTurningMoveRestrictions());
-  	
+
   	signaldata = ssdata.getSignalData().get(signalId2);
   	Assert.assertNotNull(signaldata);
   	Assert.assertEquals(signalId2, signaldata.getId());
@@ -117,8 +117,8 @@ public class SignalSystemsData20ReaderWriterTest {
   	Assert.assertEquals(1, signaldata.getTurningMoveRestrictions().size());
   	Assert.assertEquals(linkId3, signaldata.getTurningMoveRestrictions().iterator().next());
   	Assert.assertNull(signaldata.getLaneIds());
-  	
-  	//system id 2 
+
+  	//system id 2
   	ssdata = ss.getSignalSystemData().get(systemId2);
   	Assert.assertNotNull(ssdata);
 
@@ -141,7 +141,7 @@ public class SignalSystemsData20ReaderWriterTest {
   	Assert.assertNotNull(signaldata.getTurningMoveRestrictions());
   	Assert.assertEquals(1, signaldata.getTurningMoveRestrictions().size());
   	Assert.assertTrue(signaldata.getTurningMoveRestrictions().contains(linkId3));
-  	
+
   }
 
 }

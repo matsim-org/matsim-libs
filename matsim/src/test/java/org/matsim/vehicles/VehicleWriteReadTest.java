@@ -6,14 +6,14 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class VehicleWriteReadTest{
 	private static final Logger log = LogManager.getLogger( VehicleWriteReadTest.class ) ;
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 
 	private static final String TESTXML_v1 = "testVehicles_v1_withDefaultValues.xml";

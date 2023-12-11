@@ -24,7 +24,7 @@ package org.matsim.freight.carriers.jsprit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -64,8 +64,8 @@ import java.util.concurrent.ExecutionException;
  */
 public class DistanceConstraintTest {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	static final Logger log = LogManager.getLogger(DistanceConstraintTest.class);
 

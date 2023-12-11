@@ -2,7 +2,7 @@ package org.matsim.modechoice;
 
 import com.google.inject.Injector;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -24,8 +24,8 @@ public class EstimateRouterTest {
 	private InformedModeChoiceConfigGroup group;
 	private Controler controler;
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Before
 	public void setUp() throws Exception {

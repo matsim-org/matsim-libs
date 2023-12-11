@@ -23,7 +23,7 @@ import com.google.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -40,7 +40,7 @@ import org.matsim.testcases.MatsimTestUtils;
 public class ControlerMobsimIntegrationTest {
 
 	private final static Logger log = LogManager.getLogger(ControlerMobsimIntegrationTest.class);
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testRunMobsim_customMobsim() {

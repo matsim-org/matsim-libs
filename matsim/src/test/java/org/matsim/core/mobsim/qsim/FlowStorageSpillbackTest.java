@@ -24,7 +24,7 @@ package org.matsim.core.mobsim.qsim;
 
 import java.util.*;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -61,8 +61,8 @@ import org.matsim.vehicles.Vehicle;
 @RunWith(Parameterized.class)
 public class FlowStorageSpillbackTest {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	private final boolean isUsingFastCapacityUpdate;
 

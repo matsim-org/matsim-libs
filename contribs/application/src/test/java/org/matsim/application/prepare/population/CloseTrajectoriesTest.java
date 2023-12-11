@@ -1,7 +1,7 @@
 package org.matsim.application.prepare.population;
 
 import org.assertj.core.api.Condition;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -17,8 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class CloseTrajectoriesTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void main() {

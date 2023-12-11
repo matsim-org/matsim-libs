@@ -21,7 +21,7 @@
 
 package org.matsim.freight.carriers;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.freight.carriers.CarrierVehicleTypeReader;
 import org.matsim.freight.carriers.CarrierVehicleTypeWriter;
@@ -30,8 +30,8 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class CarrierVehicleTypeWriterTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
 	public void testTypeWriter(){

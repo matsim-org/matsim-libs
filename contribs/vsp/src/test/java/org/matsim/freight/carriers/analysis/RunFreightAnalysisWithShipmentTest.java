@@ -22,7 +22,7 @@
 package org.matsim.freight.carriers.analysis;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -44,8 +44,8 @@ import java.util.LinkedHashMap;
 
 public class RunFreightAnalysisWithShipmentTest {
 
-    @Rule
-    public MatsimTestUtils testUtils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
     @Test
     public void runShipmentTrackerTest(){

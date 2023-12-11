@@ -43,7 +43,7 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -121,7 +121,7 @@ public class CreateAutomatedFDTest {
 			}
 		}
 		return Arrays.asList(combos2run);
-		
+
 	}
 
 	@Test
@@ -135,18 +135,18 @@ public class CreateAutomatedFDTest {
 		run(false);
 	}
 
-	@Test 
+	@Test
 	public void fdsCarBikeFastCapacityUpdate(){
 		run(true);
 	}
-	
+
 	@Test
 	public void fdsCarOnly(){
 		this.travelModes = new String [] {"car"};
 		run(false);
 	}
 
-	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils helper = new MatsimTestUtils();
 
 	private String [] travelModes;
 	public final Id<Link> flowDynamicsMeasurementLinkId = Id.createLinkId(0);
@@ -170,14 +170,14 @@ public class CreateAutomatedFDTest {
 			config.qsim().setSeepModeStorageFree(false);
 			config.qsim().setRestrictingSeepage(true);
 		}
-		
+
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
 		config.qsim().setTrafficDynamics(trafficDynamics);
 
 		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
-		
+
 		// ---
-		
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		createNetwork(scenario);
 
@@ -185,17 +185,17 @@ public class CreateAutomatedFDTest {
 
 
 		double networkDensity = 3.*(1000./7.5);
-		
+
 		double sumOfPCUInEachStep = 0.;
-		
+
 		//equal modal split run
 		for (String mode : travelModes) {
 			sumOfPCUInEachStep += modeVehicleTypes.get(mode).getPcuEquivalents() *  getMinNumberOfAgentAtStart(mode) ;
 		};
-		
+
 		int reduceNoOfDataPointsInPlot = 4; // 1--> will generate all possible data points;
 		if( sumOfPCUInEachStep >=3 ) reduceNoOfDataPointsInPlot = 1 ;
-		
+
 		int numberOfPoints = (int) Math.ceil( networkDensity/ (reduceNoOfDataPointsInPlot * sumOfPCUInEachStep) ) + 5;
 
 		List<Map<String,Integer>> points2Run = new ArrayList<>();
@@ -237,7 +237,7 @@ public class CreateAutomatedFDTest {
 			EventsManager events = EventsUtils.createEventsManager();
 			globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator(mode2FlowData);
 			events.addHandler(globalFlowDynamicsUpdator);
-			
+
 			final QSim qSim = new QSimBuilder(config) //
 					.useDefaults()
 					.configureQSimComponents( components -> {
@@ -263,11 +263,11 @@ public class CreateAutomatedFDTest {
 
 						final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(agent.getId(), Vehicle.class), travelModesTypes.get(travelMode));
 						final Id<Link> linkId4VehicleInsertion = Id.createLinkId("home");
-						
+
 //						qSim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
 						QVehicle qVehicle = new QVehicleImpl( vehicle ) ; // yyyyyy should use factory. kai, nov'18
 						qSim.addParkedVehicle( qVehicle, linkId4VehicleInsertion );
-						
+
 					}
 				}
 			};
@@ -279,7 +279,7 @@ public class CreateAutomatedFDTest {
 			Map<String, Tuple<Double, Double>> mode2FlowSpeed = new HashMap<>();
 			for(int i=0; i < travelModes.length; i++){
 
-				Tuple<Double, Double> flowSpeed = 
+				Tuple<Double, Double> flowSpeed =
 						new Tuple<>(this.mode2FlowData.get(Id.create(travelModes[i],VehicleType.class)).getPermanentFlow(),
 								this.mode2FlowData.get(Id.create(travelModes[i],VehicleType.class)).getPermanentAverageVelocity());
 				mode2FlowSpeed.put(travelModes[i], flowSpeed);
@@ -290,8 +290,8 @@ public class CreateAutomatedFDTest {
 		/*
 		 *	Basically overriding the helper.getOutputDirectory() method, such that,
 		 *	if file directory does not exists or same file already exists, remove and re-creates the whole dir hierarchy so that
-		 *	all existing files are re-written 
-		 *	else, just keep adding files in the directory.	
+		 *	all existing files are re-written
+		 *	else, just keep adding files in the directory.
 		 *	This is necessary in order to allow writing different tests results from JUnit parameterization.
 		 */
 
@@ -309,7 +309,7 @@ public class CreateAutomatedFDTest {
 		//plotting data
 		scatterPlot(outData,outFile);
 	}
-	
+
 	static int getMinNumberOfAgentAtStart(final String mode) {//equal modal split run
 		// only three different modes (and pcus) are used in this test ie -- car(1), truck(3), bike(0.25)
 		switch (mode) {
@@ -320,7 +320,7 @@ public class CreateAutomatedFDTest {
 		default : throw new RuntimeException("The test is not designed for this "+ mode + "yet.");
 		}
 	}
-	
+
 	class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {
 
 		private final Id<Link> ORIGIN_LINK_ID = Id.createLinkId("home");
@@ -364,8 +364,8 @@ public class CreateAutomatedFDTest {
 
 		@Override
 		public Id<Link> chooseNextLinkId() {
-			if (globalFlowDynamicsUpdator.isPermanent()){ 
-				isArriving = true; 
+			if (globalFlowDynamicsUpdator.isPermanent()){
+				isArriving = true;
 			}
 
 			if( ORIGIN_LINK_ID.equals(this.currentLinkId ) ){
@@ -544,7 +544,7 @@ public class CreateAutomatedFDTest {
 
 		XYSeries bikeFlow = null;
 		XYSeries bikeSpeed = null;
-		
+
 		if(travelModes.length==2) {
 			bikeFlow = new XYSeries(travelModes[1]+" flow");
 			bikeSpeed = new XYSeries(travelModes[1]+" speed");
@@ -553,7 +553,7 @@ public class CreateAutomatedFDTest {
 		for(double d :inputData.keySet()){
 			carFlow.add(d, inputData.get(d).get(mode1).getFirst());
 			carSpeed.add(d, inputData.get(d).get(mode1).getSecond());
-			
+
 			if(travelModes.length == 2) {
 				bikeFlow.add(d, inputData.get(d).get(travelModes[1]).getFirst());
 				bikeSpeed.add(d, inputData.get(d).get(travelModes[1]).getSecond());
@@ -573,14 +573,14 @@ public class CreateAutomatedFDTest {
 		// speed vs density
 		XYSeriesCollection speedDataset = new XYSeriesCollection();
 		speedDataset.addSeries(carSpeed);
-		
+
 		if ( travelModes.length==2 ) {
 			flowDataset.addSeries(bikeFlow);
 			speedDataset.addSeries(bikeSpeed);
 		}
 
 		NumberAxis speedAxis = new NumberAxis("Speed (m/s)");
-		speedAxis.setRange(0.0, 17.0); 
+		speedAxis.setRange(0.0, 17.0);
 
 		XYPlot plot2 = new XYPlot(speedDataset, null, speedAxis, new XYLineAndShapeRenderer(false,true));
 		plot2.setRangeAxisLocation(AxisLocation.TOP_OR_LEFT);
@@ -791,7 +791,7 @@ public class CreateAutomatedFDTest {
 			this.permanentAverageVelocity = this.getActualAverageVelocity();
 			LOG.info("Calculated permanent Speed from "+modeId+"'s lastXSpeeds : "+speedTable+"\nResult is : "+this.permanentAverageVelocity);
 			this.permanentFlow = this.getSlidingAverageLastXFlows900();
-			LOG.info("Calculated permanent Flow from "+modeId+"'s lastXFlows900 : "+lastXFlows900+"\nResult is :"+this.permanentFlow);	
+			LOG.info("Calculated permanent Flow from "+modeId+"'s lastXFlows900 : "+lastXFlows900+"\nResult is :"+this.permanentFlow);
 		}
 
 		//Getters/Setters
@@ -869,7 +869,7 @@ public class CreateAutomatedFDTest {
 		private boolean permanentRegime;
 
 		/**
-		 * container to store static properties of vehicles and dynamic flow properties during simulation 
+		 * container to store static properties of vehicles and dynamic flow properties during simulation
 		 */
 		public GlobalFlowDynamicsUpdator(Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> travelModeFlowDataContainer){
 			this.travelModesFlowData = travelModeFlowDataContainer;
@@ -883,7 +883,7 @@ public class CreateAutomatedFDTest {
 		}
 
 		@Override
-		public void reset(int iteration) {	
+		public void reset(int iteration) {
 			for (Id<VehicleType> vehTyp : this.travelModesFlowData .keySet()){
 				this.travelModesFlowData.get(vehTyp).reset();
 			}
@@ -905,16 +905,16 @@ public class CreateAutomatedFDTest {
 
 				//Aggregated data update
 				double nowTime = event.getTime();
-				if (event.getLinkId().equals(flowDynamicsMeasurementLinkId)){				
+				if (event.getLinkId().equals(flowDynamicsMeasurementLinkId)){
 					this.globalFlowData.updateFlow900(nowTime, pcuVeh);
 					this.globalFlowData.updateSpeedTable(nowTime, event.getVehicleId());
 					//Waiting for all agents to be on the track before studying stability
 					if ((this.globalFlowData.getNumberOfDrivingAgents() == this.globalFlowData.numberOfAgents) && (nowTime>1800)){	//TODO parametrize this correctly
 						/*//Taking speed check out, as it is not reliable on the global speed table
-						 *  Maybe making a list of moving averages could be smart, 
+						 *  Maybe making a list of moving averages could be smart,
 						 *  but there is no reliable converging process even in that case. (ssix, 25.10.13)
 						 * if (!(this.globalData.isSpeedStable())){
-							this.globalData.checkSpeedStability(); 
+							this.globalData.checkSpeedStability();
 							System.out.println("Checking speed stability in global data for: "+this.globalData.getSpeedTable());
 						}*/
 						if (!(this.globalFlowData.isFlowStable())){
@@ -928,7 +928,7 @@ public class CreateAutomatedFDTest {
 								if (! this.travelModesFlowData.get(vehTyp).isSpeedStable() || !(this.travelModesFlowData.get(vehTyp).isFlowStable())) {
 									modesStable = false;
 									break;
-								} 
+								}
 							}
 						}
 						if (modesStable){

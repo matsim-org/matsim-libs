@@ -30,7 +30,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.Signal;
@@ -42,15 +42,15 @@ import org.xml.sax.SAXException;
 /**
 * @author jbischoff
 * @author dgrether
-* 
+*
 */
 public class SignalGroups20ReaderWriterTest {
 	private static final Logger log = LogManager.getLogger(SignalGroups20ReaderWriterTest.class);
 
 	private static final String TESTXML = "testSignalGroups_v2.0.xml";
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	private Id<SignalSystem> id23 = Id.create("23", SignalSystem.class);
 	private Id<Signal> id1 = Id.create("1", Signal.class);
@@ -71,7 +71,7 @@ public class SignalGroups20ReaderWriterTest {
 		checkContent(sgd);
 
 	}
-	
+
 	@Test
 	public void testWriter() throws JAXBException, SAXException, ParserConfigurationException,
 			IOException {
@@ -93,21 +93,21 @@ public class SignalGroups20ReaderWriterTest {
 		reader.readFile(testoutput);
 		checkContent(sgd);
 	}
-	
 
-	
+
+
 	private void checkContent(SignalGroupsData sgd) {
 		Assert.assertNotNull(sgd);
 		Assert.assertNotNull(sgd.getSignalGroupDataBySignalSystemId());
 		Assert.assertNotNull(sgd.getSignalGroupDataBySystemId(id23));
-		
+
 		//sg23
 		Map<Id<SignalGroup>,SignalGroupData> ss23 = sgd.getSignalGroupDataBySystemId(id23);
 		Assert.assertEquals(id23,ss23.get(idSg1).getSignalSystemId());
 
 		Set<Id<Signal>> sg = ss23.get(idSg1).getSignalIds();
 		Assert.assertTrue(sg.contains(id1));
-		
+
 		//sg42
 		Assert.assertNotNull(sgd.getSignalGroupDataBySystemId(id42));
 		Map<Id<SignalGroup>,SignalGroupData> ss42 = sgd.getSignalGroupDataBySystemId(id42);
@@ -119,17 +119,17 @@ public class SignalGroups20ReaderWriterTest {
 		Assert.assertTrue(sg.contains(id1));
 		Assert.assertTrue(sg.contains(id4));
 		Assert.assertTrue(sg.contains(id5));
-		
 
-		
-		
-	
+
+
+
+
 		}
-		
-		
+
+
 	}
-	
-	
-	
-	
+
+
+
+
 

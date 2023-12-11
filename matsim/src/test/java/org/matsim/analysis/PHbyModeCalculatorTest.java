@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -46,8 +46,8 @@ public class PHbyModeCalculatorTest {
 	Id<Person> person3 = Id.create("person3", Person.class);
 	Id<Person> person4 = Id.create("person4", Person.class);
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	final IdMap<Person, Plan> map = new IdMap<>(Person.class);
 

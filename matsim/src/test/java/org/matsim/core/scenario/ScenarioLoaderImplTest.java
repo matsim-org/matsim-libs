@@ -21,7 +21,7 @@ package org.matsim.core.scenario;
 
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -46,7 +46,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ScenarioLoaderImplTest {
 
-	@Rule public MatsimTestUtils util = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
 	public void testLoadScenario_loadTransitData() {

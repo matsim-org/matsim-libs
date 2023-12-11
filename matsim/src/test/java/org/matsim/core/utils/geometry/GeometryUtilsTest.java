@@ -21,7 +21,7 @@
 package org.matsim.core.utils.geometry;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -46,13 +46,13 @@ import java.util.Set;
  */
 public class GeometryUtilsTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
 	public final void testIntersectingLinks() {
-		
+
 		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL("equil"), "config.xml" ) ) ;
-		
+
 		final Network network = ScenarioUtils.loadScenario(config).getNetwork();
 
 		{
@@ -86,7 +86,7 @@ public class GeometryUtilsTest {
 				Assert.assertTrue("expected link " + id, intersectingLinkIds.contains(id));
 			}
 		}
-		
+
 	}
 
 }

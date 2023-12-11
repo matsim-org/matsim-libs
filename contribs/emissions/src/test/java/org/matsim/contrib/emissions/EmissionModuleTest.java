@@ -1,6 +1,6 @@
 package org.matsim.contrib.emissions;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -22,8 +22,8 @@ import static org.junit.Assert.*;
  */
 public class EmissionModuleTest {
 
-    @Rule
-    public MatsimTestUtils testUtils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
     @Test(expected = RuntimeException.class)
     public void testWithIncorrectNetwork() {

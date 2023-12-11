@@ -9,14 +9,16 @@
 package org.matsim.contrib.simulatedannealing;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.rules.TemporaryFolder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.contrib.simulatedannealing.temperature.TemperatureFunction;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
@@ -26,8 +28,8 @@ import java.util.Map;
  */
 public class SimulatedAnnealingConfigGroupTest {
 
-	@Rule
-	public TemporaryFolder tempFolder = new TemporaryFolder();
+	@TempDir
+	public File tempFolder;
 
 	private static Config createConfig() {
 		Config config = ConfigUtils.createConfig();
@@ -42,9 +44,9 @@ public class SimulatedAnnealingConfigGroupTest {
 	}
 
 
-	private static Path writeConfig(final TemporaryFolder tempFolder) throws IOException {
+	private static Path writeConfig(final File tempFolder) throws IOException {
 		Config config = createConfig();
-		Path configFile = tempFolder.newFile("config.xml").toPath();
+		Path configFile = new File(tempFolder,"config.xml").toPath();
 		ConfigUtils.writeConfig(config, configFile.toString());
 		return configFile;
 	}

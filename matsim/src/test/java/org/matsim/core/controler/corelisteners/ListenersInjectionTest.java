@@ -20,7 +20,7 @@
 package org.matsim.core.controler.corelisteners;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
@@ -42,7 +42,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author thibautd
  */
 public class ListenersInjectionTest {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test

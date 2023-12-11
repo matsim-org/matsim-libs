@@ -26,7 +26,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
@@ -44,8 +44,8 @@ import org.matsim.testcases.utils.EventsCollector;
  */
 public class PersonMoneyEventIntegrationTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	@Test public void testWriteReadXxml() {

@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -40,8 +40,8 @@ public class PKMbyModeCalculatorTest {
 	Person person3 = PopulationUtils.getFactory().createPerson(Id.create(3, Person.class));
 	Person person4 = PopulationUtils.getFactory().createPerson(Id.create(4, Person.class));
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testPKMbyModeCalculator() {

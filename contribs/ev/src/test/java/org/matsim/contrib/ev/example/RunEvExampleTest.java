@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.testcases.MatsimJunit5TestExtension;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 public class RunEvExampleTest{
@@ -17,7 +17,7 @@ public class RunEvExampleTest{
 	private static final Logger log = LogManager.getLogger(RunEvExample.class );
 
 	@RegisterExtension
-	public MatsimJunit5TestExtension utils = new MatsimJunit5TestExtension() ;
+	public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test public void runTest(){
 		try {

@@ -1,6 +1,6 @@
 package playground.vsp.cadyts.marginals;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -28,8 +28,8 @@ import static org.junit.Assert.assertFalse;
 
 public class TripEventHandlerTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
 	 * This test takes the pt-tutorial from the scenarios module and performs one iteration. Afterwards it is tested

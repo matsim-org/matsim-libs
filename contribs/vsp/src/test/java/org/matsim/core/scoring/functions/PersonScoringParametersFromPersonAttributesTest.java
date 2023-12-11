@@ -21,7 +21,7 @@ package org.matsim.core.scoring.functions;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -50,8 +50,8 @@ import java.util.Set;
  */
 public class PersonScoringParametersFromPersonAttributesTest {
 
-	@Rule
-	public MatsimTestUtils utils;
+	@RegisterExtension
+	private MatsimTestUtils utils;
 	private PersonScoringParametersFromPersonAttributes personScoringParams;
 	private Population population;
 

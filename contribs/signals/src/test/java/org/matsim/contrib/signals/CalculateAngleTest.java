@@ -6,7 +6,7 @@ import java.util.TreeMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -29,15 +29,15 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author dgrether
  */
 public class CalculateAngleTest {
-	
+
 	private static final Logger log = LogManager.getLogger(CalculateAngleTest.class);
-  
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
-	
+
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
+
 	/**
     * @author aneumann
     */
-	@Test 
+	@Test
 	public void testGetLeftLane() {
 		Config conf = utils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(conf);
@@ -51,18 +51,18 @@ public class CalculateAngleTest {
 
 		Assert.assertEquals(
 				scenario.getNetwork().getLinks().get(Id.create("3", Link.class)), NetworkUtils.getLeftmostTurnExcludingU(scenario.getNetwork().getLinks().get(Id.create("22", Link.class))));
-		
+
 		Assert.assertEquals(
 				scenario.getNetwork().getLinks().get(Id.create("4", Link.class)), NetworkUtils.getLeftmostTurnExcludingU(scenario.getNetwork().getLinks().get(Id.create("33", Link.class))));
-		
+
 		Assert.assertEquals(
 				scenario.getNetwork().getLinks().get(Id.create("1", Link.class)), NetworkUtils.getLeftmostTurnExcludingU(scenario.getNetwork().getLinks().get(Id.create("44", Link.class))));
-		
+
 		Assert.assertEquals(
 				scenario.getNetwork().getLinks().get(Id.create("5", Link.class)), NetworkUtils.getLeftmostTurnExcludingU(scenario.getNetwork().getLinks().get(Id.create("3", Link.class))));
-				
+
 	}
-	
+
 	/**
 	 * @author dgrether
 	 */
@@ -82,13 +82,13 @@ public class CalculateAngleTest {
 			Assert.assertEquals("For angle " + angle + "CalculateAngle returns not the correct order of outlinks", Id.create(3, Link.class), entry.getValue().getId());
 			entry = m.higherEntry(entry.getKey());
 			Assert.assertEquals("For angle " + angle + "CalculateAngle returns not the correct order of outlinks", Id.create(4, Link.class), entry.getValue().getId());
-			
+
 			Link leftLane = NetworkUtils.getLeftmostTurnExcludingU(net.getLinks().get(Id.create(1, Link.class)));
 			Assert.assertEquals(Id.create(2, Link.class), leftLane.getId());
-			
+
 		}
 	}
-	
+
 	/**
 	 * creates a network with node 5 at 0,0 the other nodes build a cross spanning 200 m
 	 * coordinates:
@@ -98,7 +98,7 @@ public class CalculateAngleTest {
 	 *       |
 	 *       1
 	 * @param sc
-	 * @param ids 
+	 * @param ids
 	 */
 	private void createNetwork(Scenario sc, double alpha){
 		Network net = sc.getNetwork();
@@ -138,7 +138,7 @@ public class CalculateAngleTest {
 		link = netfac.createLink(Id.create(4, Link.class), node5, node4);
 		net.addLink(link);
 	}
-	
-	
-	
+
+
+
 }

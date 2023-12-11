@@ -19,7 +19,7 @@
 
 package org.matsim.analysis;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -36,8 +36,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class OutputTravelStatsTest {
 
-	@Rule
-	public MatsimTestUtils util = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
 	public void testActivitiesOutputCSV() throws IOException {

@@ -1,7 +1,7 @@
 package org.matsim.application.prepare;
 
 import org.junit.Assume;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 import picocli.CommandLine;
@@ -14,8 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ShapeFileTextLookupTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
     @Test
     public void main() {

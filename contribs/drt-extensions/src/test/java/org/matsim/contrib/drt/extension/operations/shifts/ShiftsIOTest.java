@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.util.Optional;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
@@ -22,8 +22,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ShiftsIOTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	private static final String TESTSHIFTSINPUT  = "testShifts.xml";

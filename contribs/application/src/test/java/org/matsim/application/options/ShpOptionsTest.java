@@ -2,7 +2,7 @@ package org.matsim.application.options;
 
 import org.junit.Assert;
 import org.junit.Assume;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -19,8 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ShpOptionsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void readZip() {

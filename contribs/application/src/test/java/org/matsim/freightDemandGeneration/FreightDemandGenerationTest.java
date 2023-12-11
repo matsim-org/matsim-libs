@@ -2,7 +2,7 @@ package org.matsim.freightDemandGeneration;
 
 import org.apache.logging.log4j.LogManager;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -15,8 +15,8 @@ import java.nio.file.Path;
  */
 public class FreightDemandGenerationTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testMain() {

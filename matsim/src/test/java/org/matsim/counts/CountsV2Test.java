@@ -2,7 +2,7 @@ package org.matsim.counts;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -26,8 +26,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CountsV2Test {
 
 	private final SplittableRandom random = new SplittableRandom(1234);
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void test_general_handling() throws IOException {

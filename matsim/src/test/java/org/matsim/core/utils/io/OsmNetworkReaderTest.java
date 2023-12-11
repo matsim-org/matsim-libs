@@ -20,7 +20,7 @@
 package org.matsim.core.utils.io;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -41,7 +41,7 @@ import java.io.ByteArrayInputStream;
  */
 public class OsmNetworkReaderTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testConversion() {
@@ -198,13 +198,13 @@ public class OsmNetworkReaderTest {
 		Assert.assertEquals("incomplete ways should not be converted.", 0, net.getNodes().size());
 		Assert.assertEquals("incomplete ways should not be converted.", 0, net.getLinks().size());
 	}
-	
+
 	@Test
 	public void testConversion_maxspeeds() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 		CoordinateTransformation ct = new IdentityTransformation();
-		
+
 		OsmNetworkReader reader = new OsmNetworkReader(net, ct);
 		reader.setKeepPaths(true);
 		reader.setHighwayDefaults(1, "motorway", 1, 50.0/3.6, 1.0, 2000.0);
@@ -242,7 +242,7 @@ public class OsmNetworkReaderTest {
 		 * - links 3 & 4: for way 2, in both directions
 		 * - links 5 & 6: for way 3, in both directions
 		 */
-		
+
 		Link link1 = net.getLinks().get(Id.create("1", Link.class));
 		Link link3 = net.getLinks().get(Id.create("3", Link.class));
 		Link link5 = net.getLinks().get(Id.create("5", Link.class));
@@ -256,20 +256,20 @@ public class OsmNetworkReaderTest {
 
 	/**
 	 * Tests that the conversion does not fail if a way does not contain any node. This might
-	 * happen if the osm-file was edited, e.g. with JOSM, and a link was deleted. Then, the way 
+	 * happen if the osm-file was edited, e.g. with JOSM, and a link was deleted. Then, the way
 	 * still exists, but marked as deleted, and all nodes removed from it.
-	 * Reported by jjoubert,15nov2012. 
+	 * Reported by jjoubert,15nov2012.
 	 */
 	@Test
 	public void testConversion_emptyWay() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 		CoordinateTransformation ct = new IdentityTransformation();
-		
+
 		OsmNetworkReader reader = new OsmNetworkReader(net, ct);
 		reader.setKeepPaths(true);
 		reader.setHighwayDefaults(1, "motorway", 1, 50.0/3.6, 1.0, 2000.0);
-		
+
 		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
 				"<osm version=\"0.6\" generator=\"Osmosis 0.36\">\n" +
 				"  <bound box=\"0,0,90,180\" origin=\"0.37-SNAPSHOT\"/>\n" +
@@ -293,12 +293,12 @@ public class OsmNetworkReaderTest {
 				"  </way>\n" +
 				"</osm>";
 		reader.parse(() -> new ByteArrayInputStream(str.getBytes()));
-		
+
 		/* this creates 4 links:
 		 * - links 1 & 2: for way 1, in both directions
 		 * - links 3 & 4: for way 2, in both directions
 		 */
-		
+
 		Link link1 = net.getLinks().get(Id.create("1", Link.class));
 		Link link3 = net.getLinks().get(Id.create("3", Link.class));
 		Assert.assertNotNull("Could not find converted link 1.", link1);

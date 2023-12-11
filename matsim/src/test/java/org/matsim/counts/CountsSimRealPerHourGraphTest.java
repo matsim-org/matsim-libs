@@ -22,15 +22,15 @@ package org.matsim.counts;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraph;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class CountsSimRealPerHourGraphTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	@Test public void testCreateChart() {

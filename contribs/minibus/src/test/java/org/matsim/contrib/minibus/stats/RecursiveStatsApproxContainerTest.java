@@ -20,14 +20,14 @@
 package org.matsim.contrib.minibus.stats;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.contrib.minibus.stats.RecursiveStatsApproxContainer;
 import org.matsim.testcases.MatsimTestUtils;
 
 
 public class RecursiveStatsApproxContainerTest {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public final void testRecursiveStatsContainer() {
@@ -43,7 +43,7 @@ public class RecursiveStatsApproxContainerTest {
 		Assert.assertEquals("std dev route", Double.NaN, stats.getStdDevRoutes(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("std dev pax", Double.NaN, stats.getStdDevPax(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("std dev veh", Double.NaN, stats.getStdDevVeh(), MatsimTestUtils.EPSILON);
-		
+
 		stats.handleNewEntry(2.0, 3.0, 3.0, 1.0);
 		Assert.assertEquals("mean coop", 1.5, stats.getArithmeticMeanOperators(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("mean route", 3.5, stats.getArithmeticMeanRoutes(), MatsimTestUtils.EPSILON);
@@ -53,7 +53,7 @@ public class RecursiveStatsApproxContainerTest {
 		Assert.assertEquals("std dev route", 0.7071067811865476, stats.getStdDevRoutes(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("std dev pax", 0.7071067811865476, stats.getStdDevPax(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("std dev veh", 1.4142135623730951, stats.getStdDevVeh(), MatsimTestUtils.EPSILON);
-		
+
 		stats.handleNewEntry(3.0, 2.0, 1.0, 2.0);
 		Assert.assertEquals("mean coop", 2.0, stats.getArithmeticMeanOperators(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("mean route", 3.0, stats.getArithmeticMeanRoutes(), MatsimTestUtils.EPSILON);
@@ -63,7 +63,7 @@ public class RecursiveStatsApproxContainerTest {
 		Assert.assertEquals("std dev route", 1.0, stats.getStdDevRoutes(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("std dev pax", 1.0, stats.getStdDevPax(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("std dev veh", 1.0, stats.getStdDevVeh(), MatsimTestUtils.EPSILON);
-		
+
 		stats.handleNewEntry(1.0, 4.0, 2.0, 3.0);
 		stats.handleNewEntry(2.0, 3.0, 3.0, 1.0);
 		stats.handleNewEntry(12.0, 12345.0, 123.0, 1234.0);

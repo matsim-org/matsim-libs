@@ -21,7 +21,7 @@ package org.matsim.integration;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -69,8 +69,8 @@ import static org.matsim.testcases.MatsimTestUtils.EPSILON;
  */
 public class EquilTwoAgentsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	/*package*/ final static Logger log = LogManager.getLogger(EquilTwoAgentsTest.class);
 

@@ -15,7 +15,7 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -72,7 +72,7 @@ import com.google.inject.Singleton;
 public class FrozenEpsilonLocaChoiceIT{
 	private static final Logger log = LogManager.getLogger( FrozenEpsilonLocaChoiceIT.class ) ;
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	/**
 	 * This one <em>is</em>, I think, testing the frozen epsilon location choice. kai, mar'19

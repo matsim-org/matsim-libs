@@ -20,7 +20,7 @@
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -46,8 +46,8 @@ import java.util.Map;
  */
 public class SmallScaleCommercialTrafficUtilsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void findZoneOfLinksTest() throws IOException, URISyntaxException {

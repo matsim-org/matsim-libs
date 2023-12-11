@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -36,7 +36,7 @@ import static org.junit.Assert.fail;
  *
  */
 public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV2FallbackToAverage {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	/**
 	 * Test method for {@link RunDetailedEmissionToolOnlineExample#main(String[])}.

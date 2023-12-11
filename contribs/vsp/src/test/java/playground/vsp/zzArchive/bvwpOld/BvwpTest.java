@@ -20,7 +20,7 @@
 
 package playground.vsp.zzArchive.bvwpOld;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -28,8 +28,8 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class BvwpTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	@Test public void testOne() {

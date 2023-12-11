@@ -22,7 +22,7 @@ package org.matsim.examples.simple;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -61,7 +61,7 @@ public class PtScoringTest {
 	      return new Object[] {TypicalDurationScoreComputation.relative, TypicalDurationScoreComputation.uniform};
 	  }
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void test_PtScoringLineswitch() {

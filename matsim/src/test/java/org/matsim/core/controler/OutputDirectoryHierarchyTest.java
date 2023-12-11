@@ -19,7 +19,7 @@
 package org.matsim.core.controler;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
@@ -34,7 +34,7 @@ import java.io.UncheckedIOException;
  * @author thibautd
  */
 public class OutputDirectoryHierarchyTest {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test

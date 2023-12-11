@@ -21,7 +21,7 @@
 
  package org.matsim.core.utils.geometry.geotools;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Point;
@@ -35,8 +35,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class MGCTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	@Test public void testCoord2CoordinateAndViceVersa(){

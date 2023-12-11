@@ -1,7 +1,7 @@
 package playground.vsp.openberlinscenario.cemdap.input;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -19,8 +19,8 @@ import java.util.Objects;
  */
 public class SynPopCreatorTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void TestGenerateDemand() {
@@ -39,13 +39,13 @@ public class SynPopCreatorTest {
 
 		SynPopCreator demandGeneratorCensus = new SynPopCreator(commuterFilesOutgoing, censusFile, utils.getOutputDirectory(),
 				numberOfPlansPerPerson, idsOfFederalStatesIncluded, defaultAdultsToEmployeesRatio, defaultEmployeesToCommutersRatio);
-		
+
 		demandGeneratorCensus.setShapeFileForSpatialRefinement(utils.getInputDirectory() + "Bezirksregion_EPSG_25833.shp");
 		demandGeneratorCensus.setIdsOfMunicipalitiesForSpatialRefinement(Arrays.asList("11000000"));
 		demandGeneratorCensus.setRefinementFeatureKeyInShapefile("SCHLUESSEL");
 
 		demandGeneratorCensus.generateDemand();
-		
+
 
 		String municipal = "Breydin";
 		ArrayList<String> possibleLocationsOfWork = readPossibleLocationsOfWork(commuterFileOutgoingTest, municipal);

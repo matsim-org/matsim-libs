@@ -22,7 +22,7 @@ package org.matsim.contrib.cadyts.utils;
 import java.io.IOException;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -30,8 +30,8 @@ import cadyts.utilities.io.tabularFileParser.TabularFileParser;
 
 public class CalibrationStatReaderTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testReader() throws IOException {

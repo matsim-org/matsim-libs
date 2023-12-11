@@ -20,7 +20,7 @@
 package org.matsim.core.scoring.functions;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -41,8 +41,8 @@ import java.util.SplittableRandom;
 
 public class PersonScoringParametersFromPersonAttributesIT {
 
-    @Rule
-    public MatsimTestUtils testUtils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
     @SuppressWarnings("unchecked")
     @Test

@@ -3,7 +3,7 @@ package org.matsim.pt.router;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptor;
 import com.google.inject.Injector;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -16,7 +16,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class TransitRouterModuleTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testTransitRoutingAlgorithm_DependencyInjection_Raptor() {

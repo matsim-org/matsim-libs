@@ -23,7 +23,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -79,7 +79,7 @@ public class JointTravelingSimulationIntegrationTest {
 	private static final Logger log =
 		LogManager.getLogger(JointTravelingSimulationIntegrationTest.class);
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private static enum RouteType {
@@ -87,7 +87,7 @@ public class JointTravelingSimulationIntegrationTest {
 		puAtDo,
 		puAtDoFullCycle,
 		everythingAtOrigin
-	}; 
+	};
 
 	// helps to understand test failures, but makes the test more expensive.
 	// => to set to true when fixing tests only
@@ -454,7 +454,7 @@ public class JointTravelingSimulationIntegrationTest {
 							fixture.puLink,
 							fixture.doLink );
 				dRoute.setLinkIds(
-						fixture.puLink , 
+						fixture.puLink ,
 						fixture.puToDoRoute,
 						fixture.doLink);
 				dRoute.addPassenger( passengerId1 );
@@ -489,7 +489,7 @@ public class JointTravelingSimulationIntegrationTest {
 			driverPlan.addActivity( act );
 		}
 
-		// passengers 
+		// passengers
 		for (Id passengerId : new Id[]{ passengerId1 , passengerId2 }) {
 			final Person p1 = factory.createPerson( passengerId );
 			final Plan p1Plan = factory.createPlan();

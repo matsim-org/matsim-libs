@@ -26,14 +26,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
-import org.matsim.testcases.MatsimJunit5TestExtension;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author thibautd
  */
 public class ConfigV2IOTest {
 	@RegisterExtension
-	public final MatsimJunit5TestExtension utils = new MatsimJunit5TestExtension();
+	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testInputSameAsOutput() {

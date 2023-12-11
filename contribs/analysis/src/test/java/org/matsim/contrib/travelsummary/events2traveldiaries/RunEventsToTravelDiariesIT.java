@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.travelsummary.events2traveldiaries;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -26,8 +26,8 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author nagel
  */
 public class RunEventsToTravelDiariesIT {
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
     @SuppressWarnings("static-method")
     @Test

@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
 
 import java.util.Set;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -45,8 +45,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class LegHistogramTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	/**

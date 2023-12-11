@@ -23,7 +23,7 @@
 
 import org.junit.Assert;
 import org.junit.Ignore;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -33,8 +33,8 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class MatsimServicesImplTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
     @Ignore
     @Test

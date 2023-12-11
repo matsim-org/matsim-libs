@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -52,8 +52,8 @@ public class ModeStatsControlerListenerTest {
 	HashMap<String, Integer> person1modes = new HashMap<>();
 	HashMap<String, Integer> person2modes = new HashMap<>();
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testModeStatsControlerListener() {

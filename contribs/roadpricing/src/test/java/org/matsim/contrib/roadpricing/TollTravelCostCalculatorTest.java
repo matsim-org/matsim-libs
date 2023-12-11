@@ -27,7 +27,7 @@ import java.util.List;
 
 import jakarta.inject.Provider;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -69,7 +69,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author mrieser
  */
 public class TollTravelCostCalculatorTest {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test

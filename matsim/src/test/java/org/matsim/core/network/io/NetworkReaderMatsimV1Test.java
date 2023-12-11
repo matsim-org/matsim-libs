@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
 import java.util.Set;
 import java.util.Stack;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -42,8 +42,8 @@ import org.xml.sax.Attributes;
 
 public class NetworkReaderMatsimV1Test {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	/**

@@ -2,7 +2,7 @@ package playground.vsp.scoring;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -28,8 +28,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class IncomeDependentUtilityOfMoneyPersonScoringParametersNoSubpopulationTest {
 
-	@Rule
-	public MatsimTestUtils utils;
+	@RegisterExtension
+	private MatsimTestUtils utils;
 	private IncomeDependentUtilityOfMoneyPersonScoringParameters personScoringParams;
 	private Population population;
 

@@ -3,7 +3,7 @@ package org.matsim.contrib.protobuf;
 import com.google.protobuf.Descriptors;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Condition;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.matsim.api.core.v01.Id;
@@ -27,11 +27,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class EventWriterPBTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
-
-    @Rule
-    public TemporaryFolder tmp = new TemporaryFolder();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
     @Test
     public void writer() throws IOException {

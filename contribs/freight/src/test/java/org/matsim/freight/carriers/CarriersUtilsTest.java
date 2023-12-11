@@ -22,7 +22,7 @@
 package org.matsim.freight.carriers;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.freight.carriers.*;
@@ -36,8 +36,8 @@ import static org.matsim.testcases.MatsimTestUtils.EPSILON;
  */
 public class CarriersUtilsTest {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
 	public void testAddAndGetVehicleToCarrier() {

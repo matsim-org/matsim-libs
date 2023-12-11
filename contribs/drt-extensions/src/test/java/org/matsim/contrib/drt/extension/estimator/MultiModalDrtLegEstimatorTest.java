@@ -1,7 +1,7 @@
 package org.matsim.contrib.drt.extension.estimator;
 
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.application.MATSimApplication;
 import org.matsim.contrib.drt.extension.DrtTestScenario;
@@ -26,8 +26,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class MultiModalDrtLegEstimatorTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private Controler controler;
 

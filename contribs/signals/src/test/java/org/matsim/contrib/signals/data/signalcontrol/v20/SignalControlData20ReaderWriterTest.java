@@ -27,7 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
@@ -39,7 +39,7 @@ import org.xml.sax.SAXException;
 
 /**
  * @author dgrether
- * 
+ *
  */
 public class SignalControlData20ReaderWriterTest {
 
@@ -48,19 +48,19 @@ public class SignalControlData20ReaderWriterTest {
 	private static final String TESTXML = "testSignalControl_v2.0.xml";
 
 	private Id<SignalSystem> systemId42 = Id.create("42", SignalSystem.class);
-	
+
 	private Id<SignalPlan> signalPlanId8 = Id.create("8", SignalPlan.class);
-	
+
 	private Id<SignalGroup> groupId23 = Id.create("23", SignalGroup.class);
-	
+
 	private Id<SignalSystem> systemId43 = Id.create("43", SignalSystem.class);
-	
+
 //	private Id id24 = new IdImpl("24");
 
 //	private Id id5 = new IdImpl("5");
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
 	public void testReader() throws JAXBException, SAXException, ParserConfigurationException, IOException{
@@ -69,7 +69,7 @@ public class SignalControlData20ReaderWriterTest {
 		reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
 		checkContent(controlData);
 	}
-	
+
   @Test
   public void testWriter() throws JAXBException, SAXException, ParserConfigurationException, IOException {
   	String testoutput = this.testUtils.getOutputDirectory()  + "testSignalControlOutput.xml";
@@ -78,12 +78,12 @@ public class SignalControlData20ReaderWriterTest {
 		SignalControlData controlData = new SignalControlDataImpl();
 		SignalControlReader20 reader = new SignalControlReader20(controlData);
 		reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
-  	
+
   	//write the test file
   	log.debug("write the test file...");
   	SignalControlWriter20 writer = new SignalControlWriter20(controlData);
   	writer.write(testoutput);
-  	
+
   	log.debug("and read it again");
 		controlData = new SignalControlDataImpl();
 		reader = new SignalControlReader20(controlData);
@@ -91,13 +91,13 @@ public class SignalControlData20ReaderWriterTest {
   	checkContent(controlData);
   }
 
-	
-	
-	
+
+
+
 	private void checkContent(SignalControlData controlData) {
 		Assert.assertNotNull(controlData);
 		Assert.assertEquals(2, controlData.getSignalSystemControllerDataBySystemId().size());
-		
+
 		//first controller
 		SignalSystemControllerData systemController = controlData.getSignalSystemControllerDataBySystemId().get(systemId42);
 		Assert.assertNotNull(systemController);
@@ -114,7 +114,7 @@ public class SignalControlData20ReaderWriterTest {
 		Assert.assertNotNull(cycleTime);
 		Assert.assertEquals(Integer.valueOf(60), cycleTime);
 		Assert.assertEquals(3, plan.getOffset());
-		
+
 		Assert.assertNotNull(plan.getSignalGroupSettingsDataByGroupId());
 		SignalGroupSettingsData signalGroupSettings = plan.getSignalGroupSettingsDataByGroupId().get(groupId23);
 		Assert.assertNotNull(signalGroupSettings);
@@ -123,7 +123,7 @@ public class SignalControlData20ReaderWriterTest {
 		Assert.assertEquals(0, signalGroupSettings.getOnset());
 		Assert.assertNotNull(signalGroupSettings.getDropping());
 		Assert.assertEquals(45, signalGroupSettings.getDropping());
-		
+
 		//second controller
 		systemController = controlData.getSignalSystemControllerDataBySystemId().get(systemId43);
 		Assert.assertNotNull(systemController);

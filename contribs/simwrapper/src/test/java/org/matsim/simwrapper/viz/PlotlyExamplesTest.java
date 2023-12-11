@@ -2,7 +2,7 @@ package org.matsim.simwrapper.viz;
 
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 import tech.tablesaw.api.IntColumn;
@@ -27,8 +27,8 @@ import static tech.tablesaw.plotly.traces.HistogramTrace.HistFunc.COUNT;
  */
 public class PlotlyExamplesTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private ObjectWriter writer;
 

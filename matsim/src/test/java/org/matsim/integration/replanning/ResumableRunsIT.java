@@ -21,7 +21,7 @@
 package org.matsim.integration.replanning;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -46,8 +46,8 @@ import java.net.MalformedURLException;
  */
 public class ResumableRunsIT {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
 	 * Runs a first simulation for 11 iteration, then restarts at iteration 10.

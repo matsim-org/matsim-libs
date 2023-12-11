@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
@@ -72,8 +72,8 @@ import com.google.common.base.MoreObjects;
  */
 public class RunDrtExampleIT {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testRunDrtExampleWithNoRejections_ExtensiveSearch() {
@@ -319,30 +319,30 @@ public class RunDrtExampleIT {
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
 	}
-	
+
 	@Test
 	public void testRunDrtWithPrebooking() {
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
 				"mielec_drt_config.xml");
-		
+
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		
+
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(config);
 		drtConfig.addParameterSet(new PrebookingParams());
-		
+
 		Controler controller = DrtControlerCreator.createControler(config, false);
 		ProbabilityBasedPrebookingLogic.install(controller, drtConfig, 0.5, 4.0 * 3600.0);
-		
+
 		PrebookingTracker tracker = new PrebookingTracker();
 		tracker.install(controller);
-		
+
 		controller.run();
-		
+
 		assertEquals(157, tracker.immediateScheduled);
 		assertEquals(205, tracker.prebookedScheduled);
 		assertEquals(26, tracker.immediateRejected);
@@ -467,13 +467,13 @@ public class RunDrtExampleIT {
 			}
 		}
 	}
-	
+
 	static private class PrebookingTracker implements PassengerRequestRejectedEventHandler, PassengerRequestScheduledEventHandler {
 		int immediateScheduled = 0;
 		int prebookedScheduled = 0;
 		int immediateRejected = 0;
 		int prebookedRejected = 0;
-		
+
 		@Override
 		public void handleEvent(PassengerRequestScheduledEvent event) {
 			if (event.getRequestId().toString().contains("prebooked")) {
@@ -491,10 +491,10 @@ public class RunDrtExampleIT {
 				immediateRejected++;
 			}
 		}
-		
+
 		void install(Controler controller) {
 			PrebookingTracker thisTracker = this;
-			
+
 			controller.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {

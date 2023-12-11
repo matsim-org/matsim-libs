@@ -29,7 +29,7 @@ import java.util.Map;
 import jakarta.inject.Inject;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -48,8 +48,8 @@ import org.matsim.testcases.MatsimTestUtils;
 public class ScoreStatsModuleTest {
 
 	public static final double DELTA = 0.0000000001;
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final boolean isUsingFastCapacityUpdate;
 	private final boolean isInsertingAccessEgressWalk;

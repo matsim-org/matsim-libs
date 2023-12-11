@@ -22,7 +22,7 @@
 
 package org.matsim.core.controler;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -33,8 +33,8 @@ import jakarta.inject.Singleton;
 
 public class MobsimListenerTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
     @Test
     public void testRunMobsim_listenerTransient() {

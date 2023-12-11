@@ -22,7 +22,7 @@
  package org.matsim.core.network;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -37,8 +37,8 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author thibautd
  */
 public class NetworkV2IOTest {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testNetworkAttributes() {

@@ -25,7 +25,7 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -40,7 +40,7 @@ import org.matsim.testcases.MatsimTestUtils;
 public class SBBTransitQSimEngineIntegrationTest {
 
     private static final Logger log = LogManager.getLogger(SBBTransitQSimEngineIntegrationTest.class);
-    @Rule public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
     @Test
     public void testIntegration() {

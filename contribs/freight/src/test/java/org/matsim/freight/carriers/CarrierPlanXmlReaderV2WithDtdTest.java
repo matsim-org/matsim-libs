@@ -33,7 +33,7 @@ import java.util.*;
 
 public class CarrierPlanXmlReaderV2WithDtdTest  {
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private Carrier testCarrier;

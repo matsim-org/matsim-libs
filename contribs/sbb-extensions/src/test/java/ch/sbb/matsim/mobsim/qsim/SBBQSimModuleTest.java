@@ -26,7 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -44,7 +44,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class SBBQSimModuleTest {
 
-    @Rule public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
     @Before
     public void setUp() {

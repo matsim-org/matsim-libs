@@ -23,7 +23,7 @@ package org.matsim.core.replanning.selectors;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
@@ -43,7 +43,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public abstract class AbstractPlanSelectorTest {
 
-	@Rule
+	@RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 

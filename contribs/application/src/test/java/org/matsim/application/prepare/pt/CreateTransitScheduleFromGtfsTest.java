@@ -1,7 +1,7 @@
 package org.matsim.application.prepare.pt;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -12,8 +12,8 @@ import java.nio.file.Path;
 
 public class CreateTransitScheduleFromGtfsTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void run() {

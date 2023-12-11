@@ -22,7 +22,7 @@ package org.matsim.contrib.taxi.optimizer.zonal;
 
 import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.runBenchmark;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter.Goal;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
@@ -30,7 +30,7 @@ import org.matsim.contrib.zone.ZonalSystemParams;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ZonalTaxiOptimizerIT {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test

@@ -22,7 +22,7 @@ package org.matsim.contrib.etaxi.run;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -34,7 +34,7 @@ import org.matsim.testcases.MatsimTestUtils;
 public class RunETaxiBenchmarkTest {
 	private static final Logger log = LogManager.getLogger(RunETaxiBenchmarkTest.class);
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test

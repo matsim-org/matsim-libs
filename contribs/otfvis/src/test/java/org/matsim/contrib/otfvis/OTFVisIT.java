@@ -24,7 +24,7 @@
 package org.matsim.contrib.otfvis;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -48,8 +48,8 @@ import static org.matsim.core.config.groups.ControllerConfigGroup.*;
  */
 public class OTFVisIT {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
 	public void testConvert() {

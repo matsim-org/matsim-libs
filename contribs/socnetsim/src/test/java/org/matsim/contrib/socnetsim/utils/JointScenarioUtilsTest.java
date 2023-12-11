@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Collection;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -47,7 +47,7 @@ import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
  * @author thibautd
  */
 public class JointScenarioUtilsTest {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
@@ -80,7 +80,7 @@ public class JointScenarioUtilsTest {
 
 			final Leg dumpedLeg = (Leg) dumpedPlan.getPlanElements().get( 1 );
 			final Leg loadedLeg = (Leg) loadedPlan.getPlanElements().get( 1 );
-			
+
 			if (dumpedLeg.getMode().equals( JointActingTypes.DRIVER )) {
 				assertEquals(
 						"wrong route class",
@@ -121,7 +121,7 @@ public class JointScenarioUtilsTest {
 		final Plan driverPlan = population.getFactory().createPlan();
 		driverPlan.setPerson( driver );
 		driver.addPlan( driverPlan );
-		
+
 		driverPlan.addActivity( population.getFactory().createActivityFromLinkId( "h" , Id.create( 1 , Link.class ) ) );
 		final Leg driverLeg = population.getFactory().createLeg( JointActingTypes.DRIVER );
 		final DriverRoute dRoute = new DriverRoute( Id.create( 1 , Link.class ) , Id.create( 1 , Link.class ) );
@@ -137,7 +137,7 @@ public class JointScenarioUtilsTest {
 		final Plan passengerPlan = population.getFactory().createPlan();
 		passengerPlan.setPerson( passenger );
 		passenger.addPlan( passengerPlan );
-		
+
 		passengerPlan.addActivity( population.getFactory().createActivityFromLinkId( "h" , Id.create( 1 , Link.class ) ) );
 		final Leg passengerLeg = population.getFactory().createLeg( JointActingTypes.PASSENGER );
 		final PassengerRoute pRoute = new PassengerRoute( Id.create( 1 , Link.class ) , Id.create( 1 , Link.class ) );

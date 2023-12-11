@@ -20,8 +20,9 @@
 package org.matsim.core.utils.io;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.rules.TemporaryFolder;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXParseException;
@@ -43,8 +44,8 @@ import java.util.Stack;
  */
 public class MatsimXmlParserTest {
 
-	@Rule
-	public TemporaryFolder tempFolder = new TemporaryFolder();
+	@TempDir
+	public File tempFolder;
 
 	@Test
 	public void testParsingReservedEntities_AttributeValue() {
@@ -302,7 +303,7 @@ public class MatsimXmlParserTest {
 
 		String secretValue = "S3CR3T";
 
-		File secretsFile = this.tempFolder.newFile("file-with-secrets.txt");
+		File secretsFile = new File(this.tempFolder,"file-with-secrets.txt");
 		try (OutputStream out = new FileOutputStream(secretsFile)) {
 			out.write(secretValue.getBytes(StandardCharsets.UTF_8));
 		}
@@ -349,7 +350,7 @@ public class MatsimXmlParserTest {
 
 		String secretValue = "S3CR3T";
 
-		File secretsFile = this.tempFolder.newFile("file-with-secrets.txt");
+		File secretsFile = new File(this.tempFolder, "file-with-secrets.txt");
 		try (OutputStream out = new FileOutputStream(secretsFile)) {
 			out.write(secretValue.getBytes(StandardCharsets.UTF_8));
 		}

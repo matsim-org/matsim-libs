@@ -1,7 +1,7 @@
 package org.matsim.contrib.simulatedannealing;
 
 import com.google.inject.TypeLiteral;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -31,8 +31,8 @@ import jakarta.inject.Provider;
  */
 public class SimulatedAnnealingIT {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testIntegratedAnnealingInQSim() {

@@ -24,7 +24,7 @@
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -42,7 +42,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author thibautd
  */
 public class CountsReprojectionIOTest {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test

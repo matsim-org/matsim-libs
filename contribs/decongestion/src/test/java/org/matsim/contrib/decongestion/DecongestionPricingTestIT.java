@@ -23,7 +23,7 @@
 package org.matsim.contrib.decongestion;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.analysis.ScoreStatsControlerListener.ScoreItem;
 import org.matsim.api.core.v01.Id;
@@ -54,8 +54,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class DecongestionPricingTestIT {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	/**
 	 * Kp = 0.0123

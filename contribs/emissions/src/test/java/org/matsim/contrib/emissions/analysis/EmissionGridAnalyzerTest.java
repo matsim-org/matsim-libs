@@ -3,7 +3,7 @@ package org.matsim.contrib.emissions.analysis;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -37,8 +37,8 @@ import static org.matsim.contrib.emissions.Pollutant.*;
 
 public class EmissionGridAnalyzerTest {
 
-    @Rule
-    public MatsimTestUtils testUtils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
     private Geometry createRect(double maxX, double maxY) {
         return new GeometryFactory().createPolygon(new Coordinate[]{

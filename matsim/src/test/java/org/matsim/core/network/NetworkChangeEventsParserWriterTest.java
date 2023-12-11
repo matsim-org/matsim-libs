@@ -21,7 +21,7 @@
 package org.matsim.core.network;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -43,8 +43,8 @@ import static org.junit.Assert.assertThat;
 
 public class NetworkChangeEventsParserWriterTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
 	public void testChangeEventsParserWriter() {

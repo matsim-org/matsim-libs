@@ -19,7 +19,7 @@
 package org.matsim.contrib.etaxi.run;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Population;
@@ -35,8 +35,8 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
  * @author michalm
  */
 public class RunETaxiScenarioIT {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testOneTaxi() {

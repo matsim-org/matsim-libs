@@ -25,7 +25,7 @@ import java.io.IOException;
 
 import org.geotools.data.FeatureSource;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -34,8 +34,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ShapeFileReaderTest {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils(); 
-	
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
+
 	/**
 	 * Based on message on users-mailing list from 20Dec2012)
 	 * @throws IOException

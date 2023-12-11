@@ -23,15 +23,15 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class TestEventLog {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	@Test public void testGetTravelTime(){

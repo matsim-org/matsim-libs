@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Ignore;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.minibus.PConfigGroup;
@@ -51,7 +51,7 @@ import org.matsim.testcases.MatsimTestUtils;
 public class SubsidyContextTestIT implements TabularFileHandler {
 
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final ArrayList<String[]> pStatsResults = new ArrayList<>();
 	private String gridScenarioDirectory ="../../example-scenario/input/";

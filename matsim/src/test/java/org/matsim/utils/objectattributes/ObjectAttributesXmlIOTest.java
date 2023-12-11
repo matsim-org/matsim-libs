@@ -24,7 +24,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
@@ -34,7 +34,8 @@ import org.xml.sax.SAXException;
  */
 public class ObjectAttributesXmlIOTest {
 
-	@Rule	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testReadWrite() throws IOException, SAXException, ParserConfigurationException {
@@ -52,7 +53,7 @@ public class ObjectAttributesXmlIOTest {
 		Assert.assertEquals(Double.valueOf(1.5), oa2.getAttribute("two", "c"));
 		Assert.assertEquals(Boolean.TRUE, oa2.getAttribute("two", "d"));
 	}
-	
+
 	@Test
 	public void testReadWrite_CustomAttribute() {
 		ObjectAttributes oa1 = new ObjectAttributes();
@@ -62,14 +63,14 @@ public class ObjectAttributesXmlIOTest {
 		MyTuple.MyTupleConverter converter = new MyTuple.MyTupleConverter();
 		writer.putAttributeConverter(MyTuple.class, converter);
 		writer.writeFile(this.utils.getOutputDirectory() + "oa.xml");
-		
+
 		Assert.assertFalse("toString() should return something different from converter to test functionality.", t.toString().equals(converter.convertToString(t)));
 
 		ObjectAttributes oa2 = new ObjectAttributes();
 		ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(oa2);
 		reader.putAttributeConverter(MyTuple.class, new MyTuple.MyTupleConverter());
 		reader.readFile(this.utils.getOutputDirectory() + "oa.xml");
-		
+
 		Object o = oa2.getAttribute("1", "A");
 		Assert.assertNotNull(o);
 		Assert.assertEquals(MyTuple.class, o.getClass());

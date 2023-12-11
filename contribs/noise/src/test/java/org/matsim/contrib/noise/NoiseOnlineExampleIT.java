@@ -26,7 +26,7 @@ import com.google.inject.multibindings.Multibinder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.analysis.XYTRecord;
 import org.matsim.api.core.v01.Coord;
@@ -54,8 +54,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NoiseOnlineExampleIT {
 	private static final Logger log = LogManager.getLogger( NoiseOnlineExampleIT.class ) ;
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
 	public final void test0(){

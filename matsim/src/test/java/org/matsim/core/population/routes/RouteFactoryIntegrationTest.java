@@ -21,7 +21,7 @@
 package org.matsim.core.population.routes;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
@@ -43,7 +43,7 @@ import java.util.Collection;
  */
 public class RouteFactoryIntegrationTest {
 
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**

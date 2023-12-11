@@ -2,7 +2,7 @@ package org.matsim.modechoice;
 
 import com.google.inject.Injector;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.MATSimApplication;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -15,8 +15,8 @@ public class ScenarioTest {
 	protected Controler controler;
 	protected Injector injector;
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Before
 	public void setUp() throws Exception {

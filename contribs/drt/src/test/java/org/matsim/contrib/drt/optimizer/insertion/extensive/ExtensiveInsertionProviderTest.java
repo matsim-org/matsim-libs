@@ -29,8 +29,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.*;
@@ -43,8 +43,8 @@ import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
  * @author Michal Maciejewski (michalm)
  */
 public class ExtensiveInsertionProviderTest {
-	@Rule
-	public final ForkJoinPoolTestRule rule = new ForkJoinPoolTestRule();
+	@RegisterExtension
+	public final ForkJoinPoolExtension rule = new ForkJoinPoolExtension();
 
 	@Test
 	public void getInsertions_noInsertionsGenerated() {

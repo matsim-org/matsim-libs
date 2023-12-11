@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -60,13 +60,13 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 
 public class MultipleSpillbackCausingLinksTest {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	/**
-	 * This test shows that (1) an agent can have spill back delays due to more than one link and 
+	 * This test shows that (1) an agent can have spill back delays due to more than one link and
 	 * therefore, need to iterate through all spill back causing links.
-	 * (2) an agent may have two different links as next link in the route and therefore correct one should be adopted. 
+	 * (2) an agent may have two different links as next link in the route and therefore correct one should be adopted.
 	 */
 	@Test
 	public final void multipleSpillBackTest(){
@@ -97,7 +97,7 @@ public class MultipleSpillbackCausingLinksTest {
 				// second next link in the
 				// route is link 6
 				// agent 3 and 4 leave prior to agent 2 during home work (trip3)
-				if(e.getCausingAgentId().equals(Id.createPersonId("3"))){ 
+				if(e.getCausingAgentId().equals(Id.createPersonId("3"))){
 					Assert.assertEquals("Delay on second next link in the route is not correct.", 10.0, e.getDelay(), MatsimTestUtils.EPSILON);
 				} else if (e.getCausingAgentId().equals(Id.createPersonId("4"))){
 					Assert.assertEquals("Delay on second next link in the route is not correct.", 10.0, e.getDelay(), MatsimTestUtils.EPSILON);
@@ -116,7 +116,7 @@ public class MultipleSpillbackCausingLinksTest {
 			}
 		}
 
-		// now check, for agent 2, first link in the route (trip1) is occur first and rest later time i.e. during index ==1. 
+		// now check, for agent 2, first link in the route (trip1) is occur first and rest later time i.e. during index ==1.
 		Assert.assertFalse("Congestion event for first next link in the route should occur first.", eventTimes.get(0) > eventTimes.get(1));
 
 		// all other congestion event for agent 2 while leaving link 1 should occur at the same time.
@@ -144,7 +144,7 @@ public class MultipleSpillbackCausingLinksTest {
 		events.addHandler( new CongestionEventHandler() {
 
 			@Override
-			public void reset(int iteration) {				
+			public void reset(int iteration) {
 			}
 
 			@Override
@@ -270,7 +270,7 @@ public class MultipleSpillbackCausingLinksTest {
 					Activity a4 = population.getFactory().createActivityFromLinkId("w", link4.getId());
 					plan.addActivity(a4);
 				}
-				population.addPerson(p);	
+				population.addPerson(p);
 			}
 		}
 	}

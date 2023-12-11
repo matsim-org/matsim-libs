@@ -22,6 +22,7 @@
  */
 package org.matsim.contrib.matrixbasedptrouter;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -30,8 +31,9 @@ import org.junit.Assert;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.rules.TemporaryFolder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
@@ -72,8 +74,8 @@ public class PtMatrixTest {
 
 	private static final Logger log = LogManager.getLogger(PtMatrixTest.class);
 
-	@Rule
-	public TemporaryFolder folder = new TemporaryFolder();
+	@TempDir
+	public File folder;
 
 	@Before
 	public void setUp() throws Exception {
@@ -103,7 +105,7 @@ public class PtMatrixTest {
 		config.routing().setTeleportedModeSpeed(TransportMode.pt, defaultPtSpeed ) ;
 
 		Network network = CreateTestNetwork.createTestNetwork();			// creates a dummy network
-		String location = CreateTestNetwork.createTestPtStationCSVFile(folder.newFile("ptStops.csv"));	// creates a dummy csv file with pt stops fitting into the dummy network
+		String location = CreateTestNetwork.createTestPtStationCSVFile(new File(folder, "ptStops.csv"));	// creates a dummy csv file with pt stops fitting into the dummy network
 
 		MatrixBasedPtRouterConfigGroup module = new MatrixBasedPtRouterConfigGroup();
 		module.setPtStopsInputFile(location);								// this is to be compatible with real code
@@ -207,8 +209,8 @@ public class PtMatrixTest {
 
 
 		Network network = CreateTestNetwork.createTestNetwork();			// creates a dummy network
-		String stopsLocation = CreateTestNetwork.createTestPtStationCSVFile(folder.newFile("ptStops.csv"));	// creates a dummy csv file with pt stops fitting into the dummy network
-		String timesLocation = CreateTestNetwork.createTestPtTravelTimesAndDistancesCSVFile(folder.newFile("ptTravelInfo.csv"));	// creates a dummy csv file with pt travel times fitting into the dummy network
+		String stopsLocation = CreateTestNetwork.createTestPtStationCSVFile(new File(folder, "ptStops.csv"));	// creates a dummy csv file with pt stops fitting into the dummy network
+		String timesLocation = CreateTestNetwork.createTestPtTravelTimesAndDistancesCSVFile(new File(folder, "ptTravelInfo.csv"));	// creates a dummy csv file with pt travel times fitting into the dummy network
 
 		MatrixBasedPtRouterConfigGroup module = new MatrixBasedPtRouterConfigGroup();
 		module.setUsingPtStops(true);

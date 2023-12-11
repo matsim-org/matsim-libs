@@ -21,7 +21,7 @@ package org.matsim.contrib.locationchoice.timegeography;
 
 import java.util.Random;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -32,8 +32,8 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class RandomLocationMutatorTest  {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
 	private MutableScenario scenario;

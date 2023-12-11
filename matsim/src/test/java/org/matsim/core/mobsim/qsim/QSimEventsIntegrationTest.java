@@ -22,9 +22,9 @@
 package org.matsim.core.mobsim.qsim;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Rule;
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
-import org.junit.rules.Timeout;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -35,12 +35,10 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+@Timeout(10)
 public class QSimEventsIntegrationTest {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
-
-	@Rule
-	public Timeout globalTimeout = new Timeout(10000);
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void netsimEngineHandlesExceptionCorrectly() {

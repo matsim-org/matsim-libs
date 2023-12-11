@@ -23,7 +23,7 @@ package org.matsim.utils.gis.matsim2esri.network;
 import java.util.Collection;
 
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -38,8 +38,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class Network2ESRIShapeTest   {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test public void testPolygonCapacityShape() {
 		String netFileName = "test/scenarios/equil/network.xml";

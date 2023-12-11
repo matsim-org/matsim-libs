@@ -20,7 +20,7 @@
  */
 package org.matsim.codeexamples.adaptiveSignals;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -29,13 +29,13 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class AdaptiveSignalsExampleTest {
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
-	
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
+
 	@Test
 	public void testAdaptiveSignalsExample() {
 		String configFileName = "./examples/tutorial/singleCrossingScenario/config.xml";
 		RunAdaptiveSignalsExample.run(configFileName, testUtils.getOutputDirectory() + "/", false);
 	}
-	
+
 }

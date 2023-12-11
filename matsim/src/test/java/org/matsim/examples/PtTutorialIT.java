@@ -27,7 +27,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Rule;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -52,7 +52,8 @@ public class PtTutorialIT {
 
 	private final static Logger log = LogManager.getLogger(PtTutorialIT.class);
 
-	public @Rule MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void ensure_tutorial_runs() throws MalformedURLException {
