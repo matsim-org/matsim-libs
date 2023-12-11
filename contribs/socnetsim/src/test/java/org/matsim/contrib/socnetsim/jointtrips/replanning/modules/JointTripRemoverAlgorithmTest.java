@@ -33,7 +33,7 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -65,7 +65,7 @@ public class JointTripRemoverAlgorithmTest {
 	// /////////////////////////////////////////////////////////////////////////
 	// init routines
 	// /////////////////////////////////////////////////////////////////////////
-	@Before
+	@BeforeEach
 	public void initFixtures() {
 		fixtures = new ArrayList<Fixture>();
 
@@ -537,7 +537,7 @@ public class JointTripRemoverAlgorithmTest {
 		expectedAfterRemoval.put(
 				passenger.getId(),
 				Arrays.asList( pAct1 , PopulationUtils.createLeg(TransportMode.pt) , pAct2 ));
-		
+
 		return new Fixture(
 				"complex access trip driver",
 				new JointPlanFactory().createJointPlan( plans ),
@@ -608,7 +608,7 @@ public class JointTripRemoverAlgorithmTest {
 		expectedAfterRemoval.put(
 				passenger.getId(),
 				Arrays.asList( pAct1 , PopulationUtils.createLeg(TransportMode.pt) , pAct2 ));
-		
+
 		Set<String> stageActivityTypes = new HashSet<>();
 		stageActivityTypes.add(stageType);
 

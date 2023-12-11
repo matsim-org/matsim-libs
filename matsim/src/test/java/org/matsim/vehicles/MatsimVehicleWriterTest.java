@@ -28,7 +28,7 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -50,7 +50,7 @@ public class MatsimVehicleWriterTest {
 	private Id<Vehicle> id42;
 	private Id<Vehicle> id42_23;
 
-	@Before public void setUp() {
+	@BeforeEach public void setUp() {
 
 		id23 = Id.create("23", Vehicle.class);
 		id42 = Id.create("42", Vehicle.class);

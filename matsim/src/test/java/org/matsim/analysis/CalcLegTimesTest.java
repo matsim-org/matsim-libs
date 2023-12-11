@@ -23,8 +23,8 @@ package org.matsim.analysis;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -67,7 +67,7 @@ public class CalcLegTimesTest {
 	private Population population = null;
 	private Network network = null;
 
-	@Before public void setUp() {
+	@BeforeEach public void setUp() {
 		utils.loadConfig((String)null);
 
 		MutableScenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -97,7 +97,7 @@ public class CalcLegTimesTest {
 		this.network.addLink(link);
 	}
 
-	@After public void tearDown() {
+	@AfterEach public void tearDown() {
 		this.population = null;
 		this.network = null;
 	}

@@ -10,7 +10,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.simwrapper.ComponentMixin;
@@ -48,7 +48,7 @@ public class PlotlyTest {
 		return mapper.writerFor(Plotly.class);
 	}
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		writer = createWriter();
 	}

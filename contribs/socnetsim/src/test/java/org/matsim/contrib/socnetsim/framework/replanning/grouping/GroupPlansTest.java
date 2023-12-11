@@ -27,8 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -48,7 +48,7 @@ public class GroupPlansTest {
 	private final List<GroupPlans> testPlans = new ArrayList<GroupPlans>();
 	private final JointPlanFactory factory = new JointPlanFactory();
 
-	@Before
+	@BeforeEach
 	public void initPlanWithoutJointPlan() {
 		final List<Plan> plans = new ArrayList<Plan>();
 
@@ -59,7 +59,7 @@ public class GroupPlansTest {
 		testPlans.add( new GroupPlans( Collections.EMPTY_LIST , plans ) );
 	}
 
-	@Before
+	@BeforeEach
 	public void initPlanWithoutIndividualPlans() {
 		final List<JointPlan> plans = new ArrayList<JointPlan>();
 
@@ -78,7 +78,7 @@ public class GroupPlansTest {
 		testPlans.add( new GroupPlans( plans , Collections.EMPTY_LIST ) );
 	}
 
-	@After
+	@AfterEach
 	public void clear() {
 		testPlans.clear();
 	}

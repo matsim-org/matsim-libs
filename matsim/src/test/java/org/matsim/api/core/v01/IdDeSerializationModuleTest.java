@@ -3,7 +3,7 @@ package org.matsim.api.core.v01;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.network.Link;
@@ -20,7 +20,7 @@ public class IdDeSerializationModuleTest {
 	private static final TypeFactory TYPE_FACTORY = TypeFactory.defaultInstance();
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
-	@Before
+	@BeforeEach
 	public void init() {
 		this.objectMapper.registerModule(IdDeSerializationModule.getInstance());
 	}

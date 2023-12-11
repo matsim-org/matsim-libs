@@ -2,7 +2,7 @@ package playground.vsp.openberlinscenario.planmodification;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -32,7 +32,7 @@ public class PlanFileModifierTest {
     private Population modifiedPopulationCase1;
     private Population modifiedPopulationCase2;
 
-    @Before
+    @BeforeEach
     public void initializeTestPopulations() {
 
         String formatedInputPlansFile = utils.getClassInputDirectory() + "testPlansFormated.xml";

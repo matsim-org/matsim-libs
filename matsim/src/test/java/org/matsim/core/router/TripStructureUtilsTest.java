@@ -25,8 +25,8 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -77,12 +77,12 @@ public class TripStructureUtilsTest {
 		}
 	}
 
-	@After
+	@AfterEach
 	public void clean() {
 		fixtures.clear();
 	}
 
-	@Before
+	@BeforeEach
 	public void createSimpleFixture() {
 		final Plan plan = populationFactory.createPlan();
 
@@ -146,7 +146,7 @@ public class TripStructureUtilsTest {
 					nTrips));
 	}
 
-	@Before
+	@BeforeEach
 	public void createFixtureWithComplexTrips() {
 		final Plan plan = populationFactory.createPlan();
 
@@ -241,7 +241,7 @@ public class TripStructureUtilsTest {
 	}
 
 
-	@Before
+	@BeforeEach
 	public void createFixtureWithSuccessiveActivities() {
 		final Plan plan = populationFactory.createPlan();
 
@@ -330,7 +330,7 @@ public class TripStructureUtilsTest {
 					nTrips));
 	}
 
-	@Before
+	@BeforeEach
 	public void createFixtureWithAccessEgress() {
 		final Plan plan = populationFactory.createPlan() ;
 
@@ -383,7 +383,7 @@ public class TripStructureUtilsTest {
 		for (Fixture fixture : fixtures) {
 			final List<Activity> acts =
 				TripStructureUtils.getActivities(
-						fixture.plan, 
+						fixture.plan,
 						StageActivityHandling.ExcludeStageActivities);
 
 			assertEquals(

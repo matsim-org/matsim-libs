@@ -24,7 +24,7 @@ package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -44,7 +44,7 @@ public class SamplerTest {
     private DestinationChoiceContext context;
     private Scenario scenario;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         Config config = ConfigUtils.loadConfig("test/scenarios/chessboard/config.xml", new FrozenTastesConfigGroup() );
         ConfigUtils.loadConfig(config, utils.getPackageInputDirectory() + "/config.xml");

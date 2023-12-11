@@ -18,7 +18,7 @@
 
 package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -41,7 +41,7 @@ public class IsTheRightCustomerScoredTest {
 
     Scenario scenario;
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
         Config config = ConfigUtils.loadConfig("./scenarios/grid/jointDemand_config.xml");

@@ -21,7 +21,7 @@
 
 package org.matsim.freight.carriers.analysis;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -44,7 +44,7 @@ public class RunFreightAnalysisIT {
 	@RegisterExtension
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	@Before
+	@BeforeEach
 	public void runAnalysis(){
 		final String packageInputDirectory = testUtils.getClassInputDirectory();
 		final String outputDirectory = testUtils.getOutputDirectory();

@@ -1,6 +1,6 @@
 package playground.vsp.scoring;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -33,7 +33,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 	private IncomeDependentUtilityOfMoneyPersonScoringParameters personScoringParams;
 	private Population population;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		TransitConfigGroup transitConfigGroup = new TransitConfigGroup();
 		ScenarioConfigGroup scenarioConfigGroup = new ScenarioConfigGroup();

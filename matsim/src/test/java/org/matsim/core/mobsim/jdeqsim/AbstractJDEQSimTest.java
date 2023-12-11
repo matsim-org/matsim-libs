@@ -30,8 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -76,14 +76,14 @@ import org.matsim.vehicles.Vehicle;
 	protected Map<Id<Person>, List<Event>> eventsByPerson = null;
 	public LinkedList<Event> allEvents = null;
 
-	@Before
+	@BeforeEach
 	public final void setUp() throws Exception {
 		this.eventsByPerson = new HashMap<Id<Person>, List<Event>>();
 		this.vehicleToDriver = new HashMap<>();
 		this.allEvents = new LinkedList<Event>();
 	}
 
-	@After
+	@AfterEach
 	public final void tearDown() throws Exception {
 		this.eventsByPerson = null;
 		this.vehicleToDriver = null;

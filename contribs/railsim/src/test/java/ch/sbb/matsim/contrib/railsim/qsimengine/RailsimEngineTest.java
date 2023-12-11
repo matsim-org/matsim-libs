@@ -23,7 +23,7 @@ import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SimpleDisposition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.network.Link;
@@ -45,7 +45,7 @@ public class RailsimEngineTest {
 	private EventsManager eventsManager;
 	private RailsimTestUtils.EventCollector collector;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		eventsManager = EventsUtils.createEventsManager();
 		collector = new RailsimTestUtils.EventCollector();

@@ -30,7 +30,7 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.util.Solutions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -79,7 +79,7 @@ public class CarrierControlerUtilsTest {
 	@RegisterExtension
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 
 		//Create carrier with services and shipments

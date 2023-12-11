@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.Random;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -37,7 +37,7 @@ public class WeightedRandomSelectionTest {
 	private final MutableDouble randomDouble = new MutableDouble();
 	private WeightedRandomSelection<String> weightedRandomSelection;
 
-	@Before
+	@BeforeEach
 	public void init() {
 		weightedRandomSelection = new WeightedRandomSelection<>(new Random() {
 			@Override

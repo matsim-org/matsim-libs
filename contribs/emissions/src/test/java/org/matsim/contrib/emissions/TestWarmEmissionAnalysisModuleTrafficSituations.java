@@ -19,7 +19,7 @@ package org.matsim.contrib.emissions;/* ****************************************
  * *********************************************************************** */
 
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -44,7 +44,7 @@ import static org.matsim.contrib.emissions.Pollutant.NOx;
 
 /**
  * @author joe
- 
+
 
 /*
  * test for playground.vsp.emissions.WarmEmissionAnalysisModule
@@ -96,7 +96,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 		return list;
 	}
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
@@ -257,7 +257,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
 			}
 		}
-		
+
 	}
 
 	private void fillAverageTable(	Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable) {
@@ -282,7 +282,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
 			}
 		}
-		
+
 	}
 
 	private void addDetailedRecordsToTestSpeedsTable(
@@ -302,7 +302,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
 
 }
-	
 
-	
+
+
 

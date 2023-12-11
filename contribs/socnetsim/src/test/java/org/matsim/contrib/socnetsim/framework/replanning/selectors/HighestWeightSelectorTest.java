@@ -31,7 +31,7 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -1200,11 +1200,11 @@ public class HighestWeightSelectorTest {
 
 		GroupPlans expected = new GroupPlans(
 					Arrays.asList( jointPlan2 , jointPlan4 ),
-					Collections.<Plan>emptyList()); 
+					Collections.<Plan>emptyList());
 
 		GroupPlans expectedForbidding = new GroupPlans(
 					Arrays.asList( jointPlan2 , jointPlan3 ),
-					Collections.<Plan>emptyList()); 
+					Collections.<Plan>emptyList());
 
 		return new Fixture(
 				"different forbids in jointPlans",
@@ -1224,7 +1224,7 @@ public class HighestWeightSelectorTest {
 				jointPlans);
 	}
 
-	@Before
+	@BeforeEach
 	public void setupLogging() {
 		//Logger.getRootLogger().setLevel( Level.TRACE );
 	}
@@ -1301,7 +1301,7 @@ public class HighestWeightSelectorTest {
 			throw new RuntimeException( "exception thrown for instance <<"+fixture.name+">>", e );
 		}
 
-		final GroupPlans expected = 
+		final GroupPlans expected =
 				blocking ?
 					fixture.expectedSelectedPlansWhenBlocking :
 					(forbidding ?

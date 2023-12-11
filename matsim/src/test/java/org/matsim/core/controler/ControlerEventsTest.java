@@ -26,8 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.Config;
@@ -52,11 +52,11 @@ public class ControlerEventsTest {
 		this.calledStartupListener.add(i);
 	}
 
-	@Before public void setUp() {
+	@BeforeEach public void setUp() {
 		this.calledStartupListener = new ArrayList<>(3);
 	}
 
-	@After public void tearDown() {
+	@AfterEach public void tearDown() {
 		this.calledStartupListener = null;
 	}
 

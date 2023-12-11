@@ -21,7 +21,7 @@
 
 package org.matsim.freight.carriers;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -50,7 +50,7 @@ public class CarrierModuleTest {
     @RegisterExtension
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-    @Before
+    @BeforeEach
     public void setUp(){
         Config config = ConfigUtils.createConfig() ;
         ScoringConfigGroup.ActivityParams workParams = new ScoringConfigGroup.ActivityParams("w");

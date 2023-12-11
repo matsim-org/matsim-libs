@@ -21,7 +21,7 @@
 
 package org.matsim.core.network.filter;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -54,7 +54,7 @@ public class NetworkFilterManagerTest {
 
 	private Network filterNetwork;
 
-	@Before
+	@BeforeEach
 	public void prepareTestAllowedModes() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();

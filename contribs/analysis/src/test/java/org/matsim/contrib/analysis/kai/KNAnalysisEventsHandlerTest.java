@@ -22,8 +22,8 @@ package org.matsim.contrib.analysis.kai;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Ignore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -68,7 +68,7 @@ public class KNAnalysisEventsHandlerTest {
 	private Population population = null ;
 	private Network network = null ;
 
-    @Before
+    @BeforeEach
 	public void setUp() throws Exception {
 
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -101,7 +101,7 @@ public class KNAnalysisEventsHandlerTest {
 		this.network.addLink(link);
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		this.population = null;
 		this.network = null;

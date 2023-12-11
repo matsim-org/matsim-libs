@@ -20,7 +20,7 @@ package org.matsim.core.mobsim.hermes;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.analysis.VolumesAnalyzer;
@@ -51,7 +51,7 @@ public class FlowCapacityTest {
 
 	private final static Logger log = LogManager.getLogger(FlowCapacityTest.class);
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		Id.resetCaches();
 	}

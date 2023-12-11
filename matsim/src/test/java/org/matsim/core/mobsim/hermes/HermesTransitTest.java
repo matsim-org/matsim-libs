@@ -1,6 +1,6 @@
 package org.matsim.core.mobsim.hermes;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -103,7 +103,7 @@ public class HermesTransitTest {
 		return new HermesBuilder().build(scenario, events);
 	}
 
-	@Before
+	@BeforeEach
 	public void prepareTest() {
 		Id.resetCaches();
 		ScenarioImporter.flush();

@@ -1,6 +1,6 @@
 package org.matsim.contrib.bicycle;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -42,7 +42,7 @@ public class BicycleLinkSpeedCalculatorTest {
     private BicycleConfigGroup configGroup;
     private final Network unusedNetwork = NetworkUtils.createNetwork();
 
-    @Before
+    @BeforeEach
     public void before() {
         configGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
         configGroup.setMaxBicycleSpeedForRouting(MAX_BICYCLE_SPEED);

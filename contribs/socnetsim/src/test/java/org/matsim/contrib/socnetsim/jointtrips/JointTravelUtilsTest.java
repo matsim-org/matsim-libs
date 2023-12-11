@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -50,12 +50,12 @@ import java.util.*;
 public class JointTravelUtilsTest {
 	private final List<Fixture> fixtures = new ArrayList<Fixture>();
 
-	@After
+	@AfterEach
 	public void clearFixtures() {
 		fixtures.clear();
 	}
 
-	@Before
+	@BeforeEach
 	public void initOnePassengerFixture() {
 		final Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("Alain Prost"));
 		final Person passenger1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Tintin"));
@@ -115,7 +115,7 @@ public class JointTravelUtilsTest {
 					new JointPlanFactory().createJointPlan( plans )));
 	}
 
-	@Before
+	@BeforeEach
 	public void initTwoPassengerTwoOdFixture() {
 		final Person driver = PopulationUtils.getFactory().createPerson(Id.create("Alain Prost", Person.class));
 		final Person passenger1 = PopulationUtils.getFactory().createPerson(Id.create("Tintin", Person.class));
@@ -206,7 +206,7 @@ public class JointTravelUtilsTest {
 					new JointPlanFactory().createJointPlan( plans )));
 	}
 
-	@Before
+	@BeforeEach
 	public void initTwoPassengersTwoOdsTwoJtFixture() {
 		final Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("Alain Prost"));
 		final Person passenger1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Tintin"));
@@ -327,7 +327,7 @@ public class JointTravelUtilsTest {
 					new JointPlanFactory().createJointPlan( plans )));
 	}
 
-	@Before
+	@BeforeEach
 	public void initTwoPassengersMiddleTripFixture() {
 		final Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("Alain Prost"));
 		final Person passenger1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Tintin"));
@@ -426,7 +426,7 @@ public class JointTravelUtilsTest {
 					new JointPlanFactory().createJointPlan( plans )));
 	}
 
-	@Before
+	@BeforeEach
 	public void initOnePassengerTwoTripsFixture() {
 		final Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("Alain Prost"));
 		final Person passenger1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Tintin"));
@@ -515,7 +515,7 @@ public class JointTravelUtilsTest {
 					new JointPlanFactory().createJointPlan( plans )));
 	}
 
-	@Before
+	@BeforeEach
 	public void initOnePassengerTwoTripsWithDifferentDriversFixture() {
 		final Person driver1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Alain Prost"));
 		final Person driver2 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Michel Vaillant"));
@@ -611,7 +611,7 @@ public class JointTravelUtilsTest {
 	}
 
 	// bugs may depend on iteration order...
-	@Before
+	@BeforeEach
 	public void initOnePassengerTwoTripsWithDifferentDriversSecondDriverFirstFixture() {
 		final Person driver1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Alain Prost"));
 		final Person driver2 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Michel Vaillant"));
@@ -712,7 +712,7 @@ public class JointTravelUtilsTest {
 	 * the same way going to the bus station when no bus is running is a valid, though stupid,
 	 * plan.
 	 */
-	@Before
+	@BeforeEach
 	public void initOnePassengerTwoTripsInconsistentSequenceFixture() {
 		final Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("Alain Prost"));
 		final Person passenger1 = PopulationUtils.getFactory().createPerson(Id.createPersonId("Tintin"));

@@ -25,7 +25,7 @@ import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.RangeQuerySettingsParamet
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.RouteSelectorParameterSet;
 import ch.sbb.matsim.routing.pt.raptor.RaptorStopFinder.Direction;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
@@ -44,7 +44,7 @@ import java.util.List;
  */
 public class SwissRailRaptorConfigGroupTest {
 
-    @Before
+    @BeforeEach
     public void setup() {
         System.setProperty("matsim.preferLocalDtds", "true");
     }

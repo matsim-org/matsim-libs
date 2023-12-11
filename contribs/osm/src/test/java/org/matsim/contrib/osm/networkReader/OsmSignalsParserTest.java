@@ -6,7 +6,7 @@ import de.topobyte.osm4j.core.model.impl.Relation;
 import de.topobyte.osm4j.core.model.impl.RelationMember;
 import de.topobyte.osm4j.core.model.impl.Tag;
 
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -34,7 +34,7 @@ public class OsmSignalsParserTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-	@After
+	@AfterEach
 	public void shutDownExecutor() {
 		executor.shutdown();
 	}

@@ -31,7 +31,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -70,7 +70,7 @@ public class MultiInsertionDetourPathCalculatorTest {
 	private final MultiInsertionDetourPathCalculator detourPathCalculator = new MultiInsertionDetourPathCalculator(
 			pathSearch, pathSearch, pathSearch, pathSearch, 1);
 
-	@After
+	@AfterEach
 	public void after() {
 		detourPathCalculator.notifyMobsimBeforeCleanup(null);
 	}

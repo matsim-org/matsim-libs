@@ -21,7 +21,7 @@
 
 package org.matsim.freight.carriers;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -38,7 +38,7 @@ public class CarrierVehicleTypeTest {
 
 	CarrierVehicleTypes types;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception{
 		final Id<VehicleType> vehicleTypeId = Id.create( "medium", VehicleType.class );
 		VehicleType mediumType = VehicleUtils.getFactory().createVehicleType( vehicleTypeId );

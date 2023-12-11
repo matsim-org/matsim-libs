@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -72,12 +72,12 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 		}
 	}
 
-	@After
+	@AfterEach
 	public void clear() {
 		fixtures.clear();
 	}
 
-	@Before
+	@BeforeEach
 	public void createSimpleFixture() {
 		final FixtureBuilder builder = new FixtureBuilder();
 
@@ -170,7 +170,7 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 		fixtures.add( builder.build() );
 	}
 
-	@Before
+	@BeforeEach
 	public void createFixtureWithPotentiallyNegativeEndTimes() {
 		final FixtureBuilder builder = new FixtureBuilder();
 

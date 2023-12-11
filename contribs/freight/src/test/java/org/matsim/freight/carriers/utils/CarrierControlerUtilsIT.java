@@ -26,7 +26,7 @@ import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -67,7 +67,7 @@ public class CarrierControlerUtilsIT {
 	@RegisterExtension
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 
 		//Create carrier with services and shipments

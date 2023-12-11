@@ -1,7 +1,7 @@
 package org.matsim.simwrapper.viz;
 
 import com.fasterxml.jackson.databind.ObjectWriter;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
@@ -32,7 +32,7 @@ public class PlotlyExamplesTest {
 
 	private ObjectWriter writer;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		writer = createWriter();
 	}

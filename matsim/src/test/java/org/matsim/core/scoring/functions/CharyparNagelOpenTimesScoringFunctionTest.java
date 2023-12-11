@@ -22,8 +22,8 @@ package org.matsim.core.scoring.functions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -53,7 +53,7 @@ public class CharyparNagelOpenTimesScoringFunctionTest {
 	private Person person = null;
 	private ActivityFacilities facilities = null;
 
-	@Before public void setUp() {
+	@BeforeEach public void setUp() {
 
 		final Config config = ConfigUtils.createConfig();
 		final Scenario scenario = ScenarioUtils.createScenario( config );
@@ -86,7 +86,7 @@ public class CharyparNagelOpenTimesScoringFunctionTest {
 		act.setEndTime(16.0 * 3600);
 	}
 
-	@After public void tearDown() {
+	@AfterEach public void tearDown() {
 		this.person = null;
 		this.facilities = null;
 	}

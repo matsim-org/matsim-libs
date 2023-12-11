@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -49,7 +49,7 @@ public class PermissibleModesCalculatorImplTest {
 		public final Plan plan;
 		public final boolean carAvail;
 
-		public Fixture( 
+		public Fixture(
 				final String name,
 				final Plan plan,
 				final boolean carAvail ) {
@@ -60,12 +60,12 @@ public class PermissibleModesCalculatorImplTest {
 	}
 	private final List<Fixture> fixtures = new ArrayList<Fixture>();
 
-	@After
+	@AfterEach
 	public void clean() {
 		fixtures.clear();
 	}
 
-	@Before
+	@BeforeEach
 	public void fixtureWithNothing() {
 		String name = "no information";
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
@@ -73,7 +73,7 @@ public class PermissibleModesCalculatorImplTest {
 		fixtures.add( new Fixture( name , plan , true ) );
 	}
 
-	@Before
+	@BeforeEach
 	public void fixtureWithNoLicense() {
 		String name = "no License";
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
@@ -82,7 +82,7 @@ public class PermissibleModesCalculatorImplTest {
 		fixtures.add( new Fixture( name , plan , false ) );
 	}
 
-	@Before
+	@BeforeEach
 	public void fixtureWithNoCar() {
 		String name = "no car" ;
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));
@@ -91,7 +91,7 @@ public class PermissibleModesCalculatorImplTest {
 		fixtures.add( new Fixture( name , plan , false ) );
 	}
 
-	@Before
+	@BeforeEach
 	public void fixtureWithCarSometimes() {
 		String name = "car sometimes";
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(name, Person.class));

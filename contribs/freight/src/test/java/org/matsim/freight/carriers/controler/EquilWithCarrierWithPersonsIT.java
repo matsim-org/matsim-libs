@@ -21,7 +21,7 @@
 
 package org.matsim.freight.carriers.controler;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -60,7 +60,7 @@ public class EquilWithCarrierWithPersonsIT {
 		return config;
 	}
 
-	@Before
+	@BeforeEach
 	public void setUp(){
 		Config config = commonConfig( testUtils );
 

@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
@@ -23,7 +23,7 @@ public class VehicleWriteReadTest{
 	private static final String OUTXML_v2 = "testOutputVehicles_v2.xml";
 
 
-	@Before
+	@BeforeEach
 	public void setUp() throws IOException {
 	}
 

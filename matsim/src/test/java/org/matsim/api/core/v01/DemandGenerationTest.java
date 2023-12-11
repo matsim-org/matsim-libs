@@ -23,8 +23,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.network.Link;
@@ -60,11 +60,11 @@ public class DemandGenerationTest {
 	private int personCount = 6;
 	private int linkCount = 6;
 
-	@Before public void setUp() {
+	@BeforeEach public void setUp() {
 		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	}
 
-	@After public void tearDown() {
+	@AfterEach public void tearDown() {
 		this.sc = null;
 	}
 

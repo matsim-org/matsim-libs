@@ -5,7 +5,7 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.assertj.core.data.Offset;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
@@ -62,7 +62,7 @@ public class TopKMinMaxTest {
 	@Mock
 	private EventsManager em;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		TestModule testModule = new TestModule();

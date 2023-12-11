@@ -29,7 +29,7 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.util.Solutions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -64,7 +64,7 @@ public class FixedCostsTest  {
 	private final Carriers carriers = new Carriers();
 	private final Carriers carriersPlannedAndRouted = new Carriers();
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		// Create carrier with services; service1 nearby the depot, service2 at the opposite side of the network
 		CarrierService service1 = createMatsimService("Service1", "i(3,0)", 1);

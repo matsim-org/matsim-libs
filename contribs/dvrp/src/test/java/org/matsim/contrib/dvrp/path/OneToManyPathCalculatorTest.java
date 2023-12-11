@@ -26,7 +26,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.List;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -68,7 +68,7 @@ public class OneToManyPathCalculatorTest {
 	private final LeastCostPathTree dijkstraTree = new LeastCostPathTree(new SpeedyGraph(network), travelTime,
 			new TimeAsTravelDisutility(travelTime));
 
-	@Before
+	@BeforeEach
 	public void init() {
 		for (Node node : List.of(nodeA, nodeB, nodeC, nodeD, nodeE)) {
 			nodeMap.put(node.getId(), node);

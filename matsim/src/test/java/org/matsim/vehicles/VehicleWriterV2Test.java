@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -52,7 +52,7 @@ public class VehicleWriterV2Test {
 	private Map<Id<VehicleType>, VehicleType> vehicleTypes;
 	private Map<Id<Vehicle>, Vehicle> vehicles;
 
-	@Before public void setUp() throws IOException {
+	@BeforeEach public void setUp() throws IOException {
 		String outfileName = utils.getOutputDirectory() + "../testOutputVehicles.xml";
 
 		// read it

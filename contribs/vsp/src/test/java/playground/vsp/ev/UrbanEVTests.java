@@ -60,7 +60,7 @@ public class UrbanEVTests {
 	private static UrbanEVTestHandler handler;
 	private static Map<Id<Person>, List<Activity>> plannedActivitiesPerPerson;
 
-	@BeforeClass
+	@BeforeEachClass
 	public static void run() {
 		Scenario scenario = CreateUrbanEVTestScenario.createTestScenario();
 		scenario.getConfig().controller().setOutputDirectory("test/output/playground/vsp/ev/UrbanEVTests/");

@@ -24,8 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -44,11 +44,11 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 	private final static Logger log = LogManager.getLogger(ExpBetaPlanSelectorTest.class);
 	private Config config = null;
 
-	@Before public void setUp() {
+	@BeforeEach public void setUp() {
 		this.config = utils.loadConfig((String)null); // required for planCalcScore.beta to be defined
 	}
 
-	@After public void tearDown() {
+	@AfterEach public void tearDown() {
 		this.config = null;
 	}
 

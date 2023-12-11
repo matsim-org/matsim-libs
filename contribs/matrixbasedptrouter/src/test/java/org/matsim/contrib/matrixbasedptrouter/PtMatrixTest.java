@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -76,7 +76,7 @@ public class PtMatrixTest {
 	@TempDir
 	public File folder;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		OutputDirectoryLogging.catchLogEntries();
 		// (collect log messages internally before they can be written to file.  Can be called multiple times without harm.)

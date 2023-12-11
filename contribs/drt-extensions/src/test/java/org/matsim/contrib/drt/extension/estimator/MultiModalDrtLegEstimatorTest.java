@@ -1,6 +1,6 @@
 package org.matsim.contrib.drt.extension.estimator;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.MATSimApplication;
@@ -31,7 +31,7 @@ public class MultiModalDrtLegEstimatorTest {
 
 	private Controler controler;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		Config config = DrtTestScenario.loadConfig(utils);

@@ -22,7 +22,7 @@ package org.matsim.counts;
 
 import java.util.Iterator;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ public class CountTest {
 
 	private Counts<Link> counts;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		this.counts = new Counts<>();
 	}

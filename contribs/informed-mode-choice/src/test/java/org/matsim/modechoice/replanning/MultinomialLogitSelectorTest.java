@@ -1,7 +1,7 @@
 package org.matsim.modechoice.replanning;
 
 import org.assertj.core.data.Offset;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.modechoice.PlanCandidate;
 
@@ -16,7 +16,7 @@ public class MultinomialLogitSelectorTest {
 
 	private static final int N = 500_000;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		selector = new MultinomialLogitSelector(1, new Random(0));
 	}

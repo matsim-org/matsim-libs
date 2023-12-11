@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -74,7 +74,7 @@ public class SingleInsertionDetourPathCalculatorTest {
 	private final SingleInsertionDetourPathCalculator detourPathCalculator = new SingleInsertionDetourPathCalculator(
 			null, new FreeSpeedTravelTime(), null, 1, (network, travelCosts, travelTimes) -> pathCalculator);
 
-	@After
+	@AfterEach
 	public void after() {
 		detourPathCalculator.notifyMobsimBeforeCleanup(null);
 	}

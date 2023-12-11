@@ -1,7 +1,7 @@
 package org.matsim.modechoice;
 
 import com.google.inject.Injector;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -27,7 +27,7 @@ public class EstimateRouterTest {
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		Config config = TestScenario.loadConfig(utils);

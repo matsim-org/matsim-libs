@@ -62,7 +62,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 	private static final String MODE = "the_vehicular_mode";
 
 	// uncomment to get more information in case of failure
-	//@Before
+	//@BeforeEach
 	//public void setupLog() {
 	//	LogManager.getLogger( AllocateVehicleToPlansInGroupPlanAlgorithm.class ).setLevel( Level.TRACE );
 	//}
@@ -205,7 +205,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 				if ( v == null ) continue;
 				final Id person = p.getPerson().getId();
 				final Id oldV = allocations.get( person );
-				
+
 				if ( oldV == null ) {
 					allocations.put( person , v );
 				}
@@ -244,7 +244,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 				if ( v == null ) continue;
 				final Id person = p.getPerson().getId();
 				final Id oldV = allocations.get( person );
-				
+
 				if ( oldV == null ) {
 					allocations.put( person , v );
 				}
@@ -269,7 +269,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 
 			if ( !MODE.equals( leg.getMode() ) ) continue;
 			final NetworkRoute r = (NetworkRoute) leg.getRoute();
-			
+
 			Assertions.assertNotNull(
 					r.getVehicleId(),
 					"null vehicle id in route" );

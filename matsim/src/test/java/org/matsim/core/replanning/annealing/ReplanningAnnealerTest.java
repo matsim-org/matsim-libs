@@ -3,7 +3,7 @@ package org.matsim.core.replanning.annealing;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -158,7 +158,7 @@ public class ReplanningAnnealerTest {
         return sb.toString();
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         this.config = ConfigUtils.createConfig();
         config.global().setDefaultDelimiter(";");

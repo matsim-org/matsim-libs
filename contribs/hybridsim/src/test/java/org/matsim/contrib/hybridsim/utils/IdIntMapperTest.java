@@ -13,8 +13,8 @@ package org.matsim.contrib.hybridsim.utils;
 //
 /****************************************************************************/
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -33,12 +33,12 @@ public class IdIntMapperTest {
 
     private IdIntMapper mapper;
 
-    @Before
+    @BeforeEach
     public void setup() {
         this.mapper = new IdIntMapper();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         this.mapper = null;
     }

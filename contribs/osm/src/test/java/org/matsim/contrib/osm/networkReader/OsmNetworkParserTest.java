@@ -3,7 +3,7 @@ package org.matsim.contrib.osm.networkReader;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -28,7 +28,7 @@ public class OsmNetworkParserTest {
 	@RegisterExtension
 	private MatsimTestUtils matsimUtils = new MatsimTestUtils();
 
-	@After
+	@AfterEach
 	public void shutDownExecutor() {
 		executor.shutdown();
 	}

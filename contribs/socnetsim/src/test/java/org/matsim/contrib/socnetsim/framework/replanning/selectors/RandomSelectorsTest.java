@@ -24,8 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -55,13 +55,13 @@ public class RandomSelectorsTest {
 	private final List<ReplanningGroup> testGroups = new ArrayList<ReplanningGroup>();
 	private JointPlans jointPlans = new JointPlans();
 
-	@After
+	@AfterEach
 	public void clear() {
 		testGroups.clear();
 		jointPlans = new JointPlans();
 	}
 
-	@Before
+	@BeforeEach
 	public void createIndividualPlans() {
 		ReplanningGroup group = new ReplanningGroup();
 		testGroups.add( group );
@@ -99,7 +99,7 @@ public class RandomSelectorsTest {
 		plan.setScore( -5000d );
 	}
 
-	@Before
+	@BeforeEach
 	public void createFullyJointPlans() {
 		ReplanningGroup group = new ReplanningGroup();
 		testGroups.add( group );
@@ -172,7 +172,7 @@ public class RandomSelectorsTest {
 				jointPlans.getFactory().createJointPlan( jp3 ) );
 	}
 
-	@Before
+	@BeforeEach
 	public void createPartiallyJointPlansMessOfJointPlans() {
 		ReplanningGroup group = new ReplanningGroup();
 		testGroups.add( group );
@@ -284,7 +284,7 @@ public class RandomSelectorsTest {
 				jointPlans.getFactory().createJointPlan( jp8 ) );
 	}
 
-	@Before
+	@BeforeEach
 	public void createPartiallyJointPlans() {
 		ReplanningGroup group = new ReplanningGroup();
 		testGroups.add( group );
@@ -338,7 +338,7 @@ public class RandomSelectorsTest {
 				jointPlans.getFactory().createJointPlan( jp2 ) );
 	}
 
-	@Before
+	@BeforeEach
 	public void createRandomFixtures() {
 		final Random random = new Random( 42 );
 		for ( int i=0; i < 100; i++ ) {

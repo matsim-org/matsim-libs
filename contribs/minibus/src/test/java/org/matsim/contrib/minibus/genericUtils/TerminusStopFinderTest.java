@@ -30,23 +30,23 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
- * 
+ *
  * @author gleich
  *
  */
 public class TerminusStopFinderTest {
-	
+
 	TransitSchedule schedule;
 	TransitScheduleFactory stopFactory;
 
 	@Test
 	void testFindSecondTerminusStop() {
-		/* 
+		/*
 		 * straight line
-		 * 
+		 *
 		 * /----------------------\
 		 * X------->--------------{>}
 		 */
@@ -54,13 +54,13 @@ public class TerminusStopFinderTest {
 		stops.add(getOrCreateStopAtCoord(0, 0));
 		stops.add(getOrCreateStopAtCoord(10, 0));
 		stops.add(getOrCreateStopAtCoord(40, 0));
-		
+
 		int indexSecondTerminusStop = TerminusStopFinder.findSecondTerminusStop(stops);
 		Assertions.assertEquals(2, indexSecondTerminusStop);
-		
-		/* 
+
+		/*
 		 * rectangular line
-		 * 
+		 *
 		 * <------{^}
 		 * |       |
 		 * |       |
@@ -72,13 +72,13 @@ public class TerminusStopFinderTest {
 		stops.add(getOrCreateStopAtCoord(10, 0));
 		stops.add(getOrCreateStopAtCoord(10, 10));
 		stops.add(getOrCreateStopAtCoord(0, 10));
-		
+
 		indexSecondTerminusStop = TerminusStopFinder.findSecondTerminusStop(stops);
 		Assertions.assertEquals(2, indexSecondTerminusStop);
-		
-		/* 
+
+		/*
 		 * triangular line both candidate stops at same distance from first terminus
-		 * 
+		 *
 		 * <---\
 		 * |    \
 		 * |     \
@@ -92,10 +92,10 @@ public class TerminusStopFinderTest {
 
 		indexSecondTerminusStop = TerminusStopFinder.findSecondTerminusStop(stops);
 		Assertions.assertEquals(1, indexSecondTerminusStop);
-		
-		/* 
+
+		/*
 		 * triangular line many stops
-		 * 
+		 *
 		 * <-\
 		 * |  \
 		 * |   \--{<}----\
@@ -110,16 +110,16 @@ public class TerminusStopFinderTest {
 		stops.add(getOrCreateStopAtCoord(40, 0));
 		stops.add(getOrCreateStopAtCoord(20, 10));
 		stops.add(getOrCreateStopAtCoord(0, 20));
-		
+
 		indexSecondTerminusStop = TerminusStopFinder.findSecondTerminusStop(stops);
 		Assertions.assertEquals(5, indexSecondTerminusStop);
-		
-		/* 
+
+		/*
 		 * TODO: Currently failing, would require a more elaborate algorithm to determine the terminus stop
 		 * More complex example:
-		 * 
+		 *
 		 * Back- and forth directions have different lengths. For the human eye the second terminus is obvious
-		 * 
+		 *
 		 * {<}------<---<---<---^
 		 *   \------>--->       |
 		 *              |       ^
@@ -151,17 +151,17 @@ public class TerminusStopFinderTest {
 		stops.add(getOrCreateStopAtCoord(30, 10));
 		stops.add(getOrCreateStopAtCoord(20, 10));
 		stops.add(getOrCreateStopAtCoord(10, 10));
-		
+
 		indexSecondTerminusStop = TerminusStopFinder.findSecondTerminusStop(stops);
 //		Assert.assertEquals(11, indexSecondTerminusStop);
 	}
-	
-	@Before
+
+	@BeforeEach
 	public void setUp() {
 		schedule = ScenarioUtils.loadScenario(ConfigUtils.createConfig()).getTransitSchedule();
 		stopFactory = schedule.getFactory();
 	}
-	
+
 	private TransitStopFacility getOrCreateStopAtCoord(int x, int y) {
 		Id<TransitStopFacility> stopId = getStopId(x, y);
 		if (schedule.getFacilities().containsKey(stopId)) {
@@ -171,7 +171,7 @@ public class TerminusStopFinderTest {
 					stopId, CoordUtils.createCoord(x, y), false);
 		}
 	}
-	
+
 	private Id<TransitStopFacility> getStopId(int x, int y) {
 		return Id.create(x + "," + y, TransitStopFacility.class);
 	}

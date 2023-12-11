@@ -20,7 +20,7 @@
 package ch.sbb.matsim.routing.pt.raptor;
 
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.core.config.Config;
@@ -38,7 +38,7 @@ import java.io.OutputStreamWriter;
  */
 public class RaptorUtilsTest {
 
-    @Before
+    @BeforeEach
     public void setup() {
         System.setProperty("matsim.preferLocalDtds", "true");
     }

@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Map;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -38,7 +38,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 public class NetworkSimplifierTest {
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		Id.resetCaches();
 	}
@@ -66,19 +66,19 @@ public class NetworkSimplifierTest {
 	@Test
 	void testRunMergeLinkStats() {
 		Network network = buildNetwork();
-		
+
 		NetworkSimplifier nst = new NetworkSimplifier();
 		nst.setMergeLinkStats(true);
 		nst.run(network, 20.0);
 		assertEquals(2, network.getLinks().size(), "Wrong number of links");
 		assertNotNull(network.getLinks().get(Id.createLinkId("AB-BC")), "Expected link not found.");
 		assertNotNull(network.getLinks().get(Id.createLinkId("CD-DE-EF")), "Expected link not found.");
-		
+
 		network = buildNetwork();
 		nst.run(network, 40.0);
 		assertEquals(1, network.getLinks().size(), "Wrong number of links");
 		assertNotNull(network.getLinks().get(Id.createLinkId("AB-BC-CD-DE-EF")), "Expected link not found.");
-		
+
 		network = buildNetwork();
 		nst.run(network, 5.0);
 		assertEquals(5, network.getLinks().size(), "Wrong number of links");
@@ -198,16 +198,16 @@ public class NetworkSimplifierTest {
 		Assertions.assertEquals(10.0, links.get(idHGGF).getFreespeed(), 1e-8);
 		Assertions.assertEquals(10.0, links.get(idFEED).getFreespeed(), 1e-8);
 	}
-	
-	
+
+
 	/**
 	 * Builds a test network like the following diagram.
-	 * 
+	 *
 	 * A--->B--->C===>D--->E--->F
-	 * 
-	 * with each link having length 10m. Links AB, BC, DE, and EF have one 
+	 *
+	 * with each link having length 10m. Links AB, BC, DE, and EF have one
 	 * lanes each, while CD has two lanes. All free-flow speeds are 60km/h.
-	 * 
+	 *
 	 * @return
 	 */
 	private Network buildNetwork(){
@@ -218,13 +218,13 @@ public class NetworkSimplifierTest {
 		Node d = NetworkUtils.createAndAddNode(network, Id.createNodeId("D"), CoordUtils.createCoord(30.0,  0.0));
 		Node e = NetworkUtils.createAndAddNode(network, Id.createNodeId("E"), CoordUtils.createCoord(40.0,  0.0));
 		Node f = NetworkUtils.createAndAddNode(network, Id.createNodeId("F"), CoordUtils.createCoord(50.0,  0.0));
-		
+
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("AB"), a, b, 10.0, 60.0/3.6, 1000.0, 1);
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("BC"), b, c, 10.0, 60.0/3.6, 1000.0, 1);
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("CD"), c, d, 10.0, 60.0/3.6, 1000.0, 2);
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("DE"), d, e, 10.0, 60.0/3.6, 1000.0, 1);
 		NetworkUtils.createAndAddLink(network, Id.createLinkId("EF"), e, f, 10.0, 60.0/3.6, 1000.0, 1);
-		
+
 		return network;
 	}
 

@@ -1,7 +1,7 @@
 package playground.vsp.flowEfficiency;
 
 import com.google.inject.Provides;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -82,7 +82,7 @@ public class HierarchicalFLowEfficiencyCalculatorTest {
 
 	}
 
-	@Before
+	@BeforeEach
 	public void simulate(){
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
 				"eight_shared_taxi_config.xml");

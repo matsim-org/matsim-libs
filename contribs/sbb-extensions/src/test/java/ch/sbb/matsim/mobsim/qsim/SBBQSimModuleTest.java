@@ -24,7 +24,7 @@ import ch.sbb.matsim.mobsim.qsim.pt.SBBTransitEngineQSimModule;
 import com.google.inject.Provides;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -46,7 +46,7 @@ public class SBBQSimModuleTest {
 
     @RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         System.setProperty("matsim.preferLocalDtds", "true");
     }

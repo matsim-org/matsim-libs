@@ -26,10 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -49,13 +49,13 @@ public class MergingTest {
 	// /////////////////////////////////////////////////////////////////////////
 	// fixtures management
 	// /////////////////////////////////////////////////////////////////////////
-	@After
+	@AfterEach
 	public void clean() {
 		testPlans.clear();
 		jointPlans = new JointPlans();
 	}
 
-	@Before
+	@BeforeEach
 	public void allIndividuals() {
 		List<Plan> plans = new ArrayList<Plan>();
 
@@ -66,7 +66,7 @@ public class MergingTest {
 		testPlans.add( new GroupPlans( Collections.EMPTY_LIST , plans ) );
 	}
 
-	@Before
+	@BeforeEach
 	public void allJoints() {
 		List<JointPlan> plans = new ArrayList<JointPlan>();
 

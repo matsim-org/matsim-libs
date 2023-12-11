@@ -23,7 +23,7 @@ package org.matsim.freight.carriers;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -41,7 +41,7 @@ public class CarrierVehicleTypeReaderTest {
 	private CarrierVehicleTypes types;
 	private String inFilename;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		types = new CarrierVehicleTypes();
 		inFilename = utils.getClassInputDirectory() + "vehicleTypes.xml";

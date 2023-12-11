@@ -21,7 +21,7 @@
 
 package org.matsim.freight.carriers;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -39,7 +39,7 @@ public class CarrierVehicleTypeLoaderTest {
 	private CarrierVehicleTypes types;
 	private Carriers carriers;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception{
 		types = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader(types).readFile(utils.getClassInputDirectory() + "vehicleTypes.xml");

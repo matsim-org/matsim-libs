@@ -22,7 +22,7 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -48,7 +48,7 @@ public class ExternalModuleTest {
     private OutputDirectoryHierarchy outputDirectoryHierarchy;
     private Scenario originalScenario;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         scenario = ScenarioUtils.loadScenario(utils.loadConfig("test/scenarios/equil/config.xml"));
         originalScenario = ScenarioUtils.loadScenario(utils.loadConfig("test/scenarios/equil/config.xml"));

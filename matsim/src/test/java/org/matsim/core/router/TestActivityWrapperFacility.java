@@ -22,7 +22,7 @@ package org.matsim.core.router;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -39,7 +39,7 @@ import org.matsim.facilities.Facility;
 public class TestActivityWrapperFacility {
 	private List<Activity> activities;
 
-	@Before
+	@BeforeEach
 	public void init() {
 		activities = new ArrayList<Activity>();
 

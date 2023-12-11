@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -57,7 +57,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 	private TripRouter tripRouter;
 	private Random random;
 
-	@Before
+	@BeforeEach
 	public void init() {
 		config = JointScenarioUtils.createConfig();
 //		tripRouter = new  TripRouter();
@@ -68,7 +68,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 	@Test
 	void testRemoverIgnorance() throws Exception {
 		final JointTripRemoverAlgorithm algo = new JointTripRemoverAlgorithm( random , new MainModeIdentifierImpl() );
-		
+
 		JointPlan jointPlan = createPlanWithJointTrips();
 
 		assertNull(
@@ -85,7 +85,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 					null,
 					(JointTripInsertorConfigGroup) config.getModule( JointTripInsertorConfigGroup.GROUP_NAME ),
 					TripStructureUtils.getRoutingModeIdentifier() ); // yyyyyy ??????
-		
+
 		JointPlan jointPlan = createPlanWithoutJointTrips();
 
 		assertNull(
