@@ -28,6 +28,7 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,6 +41,9 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
+
+import javax.swing.*;
+import javax.swing.text.html.Option;
 
 /**
  * @author jbischoff this class requests travel times and distances between two
@@ -91,9 +95,6 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 
     @Override
     public Tuple<Double, Double> getTravelTime(Coord fromCoord, Coord toCoord, double departureTime, String tripId) {
-        long travelTime = 0;
-        long distance = 0;
-
         Coord from = transformation.transform(fromCoord);
         Coord to = transformation.transform(toCoord);
 
@@ -110,36 +111,45 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 
         log.info(urlString);
 
+		Optional<Tuple<Double, Double>> result;
         try {
             URL url = new URL(urlString);
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-            JSONParser jp = new JSONParser();
-            JSONObject jsonObject = (JSONObject) jp.parse(in);
-            JSONArray routes = (JSONArray) jsonObject.get("routes");
-
-            if (!routes.isEmpty()) {
-                JSONObject route = (JSONObject) routes.get(0);
-                JSONArray sections = (JSONArray) route.get("sections");
-                JSONObject section = (JSONObject) sections.get(0);
-                JSONObject summary = (JSONObject) section.get("summary");
-                travelTime = (long) summary.get("duration");
-                distance = (long) summary.get("length");
-                if (writeDetailedFiles) {
-                    String filename = outputPath + "/" + tripId + ".json.gz";
-                    BufferedWriter bw = IOUtils.getBufferedWriter(filename);
-                    bw.write(jsonObject.toString());
-                    bw.flush();
-                    bw.close();
-                }
-            }
-
-            in.close();
+			result = readFromJson(in, tripId);
         } catch (MalformedURLException e) {
             log.error("URL is not working. Please check your API key", e);
+			result = Optional.empty();
         } catch (IOException | ParseException e) {
             log.error("Cannot read the content on the URL properly. Please manually check the URL", e);
+			result = Optional.empty();
         }
-        return new Tuple<Double, Double>((double) travelTime, (double) distance);
+		return result.orElse(new Tuple<>(0.0, 0.0));
     }
+
+	Optional<Tuple<Double, Double>> readFromJson(BufferedReader reader, String tripId) throws IOException, ParseException {
+		JSONParser jp = new JSONParser();
+		JSONObject jsonObject = (JSONObject) jp.parse(reader);
+		JSONArray routes = (JSONArray) jsonObject.get("routes");
+
+		if(routes.isEmpty()){
+			return Optional.empty();
+		}
+
+		JSONObject route = (JSONObject) routes.get(0);
+		JSONArray sections = (JSONArray) route.get("sections");
+		JSONObject section = (JSONObject) sections.get(0);
+		JSONObject summary = (JSONObject) section.get("summary");
+		long travelTime = (long) summary.get("duration");
+		long distance = (long) summary.get("length");
+		if (writeDetailedFiles) {
+			String filename = outputPath + "/" + tripId + ".json.gz";
+			BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+			bw.write(jsonObject.toString());
+			bw.flush();
+			bw.close();
+		}
+		reader.close();
+		return Optional.of(new Tuple<>((double) travelTime, (double) distance));
+	}
 
 }
